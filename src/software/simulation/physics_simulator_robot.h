@@ -25,18 +25,13 @@ class PhysicsSimulatorRobot : public SimulatorRobot
 {
    public:
     /**
-     * Create a new SimulatorRobot given a PhysicsRobot
+     * Create a new PhysicsSimulatorRobot given a PhysicsRobot
      *
      * @param physics_robot the PhysicsRobot to simulate and control
      */
     explicit PhysicsSimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot);
     explicit PhysicsSimulatorRobot() = delete;
 
-    /**
-     * Returns the ID of this robot
-     *
-     * @return the ID of this robot
-     */
     unsigned int getRobotId() override;
 
     /**
@@ -45,181 +40,65 @@ class PhysicsSimulatorRobot : public SimulatorRobot
     void clearBallInDribblerArea();
 
    protected:
-    /**
-     * Returns the x-position of the robot, in global field coordinates, in meters
-     *
-     * @return the x-position of the robot, in global field coordinates, in meters
-     */
     float getPositionX() override;
 
-    /**
-     * Returns the y-position of the robot, in global field coordinates, in meters
-     *
-     * @return the y-position of the robot, in global field coordinates, in meters
-     */
     float getPositionY() override;
 
-    /**
-     * Returns the orientation of the robot, in global field coordinates, in radians
-     *
-     * @return the orientation of the robot, in global field coordinates, in radians
-     */
     float getOrientation() override;
 
-    /**
-     * Returns the x-velocity of the robot, in global field coordinates, in m/s
-     *
-     * @return the x-velocity of the robot, in global field coordinates, in m/s
-     */
     float getVelocityX() override;
 
-    /**
-     * Returns the y-velocity of the robot, in global field coordinates, in m/s
-     *
-     * @return the y-velocity of the robot, in global field coordinates, in m/s
-     */
     float getVelocityY() override;
 
-    /**
-     * Returns the angular velocity of the robot, in rad/s
-     *
-     * @return the angular of the robot, in rad/s
-     */
     float getVelocityAngular() override;
 
-    /**
-     * Returns the battery voltage, in volts
-     *
-     * @return the battery voltage, in volts
-     */
     float getBatteryVoltage() override;
 
-    /**
-     * Fires the kicker, kicking the ball in the direction the robot is facing
-     * at the given speed if the ball is very close to the kicker
-     *
-     * @param speed_m_per_s How fast to kick the ball, in meters per second
-     */
     void kick(float speed_m_per_s) override;
 
-    /**
-     * Fires the chipper, chipping the ball in the direction the robot is facing
-     * for the given distance if the ball is very close to the chipper
-     *
-     * @param speed_m_per_s How far to chip the ball (the distance to the first bounce)
-     * in meters
-     */
     void chip(float distance_m) override;
 
-    /**
-     * Enables autokick on the robot. If the ball touches the kicker, the robot will
-     * kick the ball with the given speed.
-     *
-     * @param speed_m_per_s How fast to kick the ball in meters per second when
-     * the kicker is fired
-     */
     void enableAutokick(float speed_m_per_s) override;
 
-    /**
-     * Enables autochip on the robot. If the ball touches the chipper, the robot will
-     * chip the ball the given distance.
-     *
-     * @param speed_m_per_s How far to chip the ball (distance to the first bounce)
-     * when the chipper is fired
-     */
     void enableAutochip(float distance_m) override;
 
-    /**
-     * Disables autokick
-     */
     void disableAutokick() override;
 
-    /**
-     * Disables autochip
-     */
     void disableAutochip() override;
 
-    /**
-     * Returns true if autokick is enabled and false otherwise
-     *
-     * @return true if autokick is enabled and false otherwise
-     */
     bool isAutokickEnabled() override;
 
-    /**
-     * Returns true if autochip is enabled and false otherwise
-     *
-     * @return true if autochip is enabled and false otherwise
-     */
     bool isAutochipEnabled() override;
 
-    /**
-     * Sets the speed of the dribbler
-     *
-     * @param rpm The rpm to set for the dribbler
-     */
     void setDribblerSpeed(uint32_t rpm) override;
 
-    /**
-     * Makes the dribbler coast until another operation is applied to it
-     */
     void dribblerCoast() override;
 
-    /**
-     * Returns the temperature of the dribbler, in degrees C
-     *
-     * @return the temperature of the dribbler, in degrees C
-     */
     unsigned int getDribblerTemperatureDegC() override;
 
-    /**
-     * Applies the given force to the wheel
-     *
-     * @param force_in_newtons the force to apply to the wheel
-     */
     void applyWheelForceFrontLeft(float force_in_newtons) override;
     void applyWheelForceBackLeft(float force_in_newtons) override;
     void applyWheelForceBackRight(float force_in_newtons) override;
     void applyWheelForceFrontRight(float force_in_newtons) override;
 
-    /**
-     * Gets the motor speed for the wheel, in RPM
-     */
     float getMotorSpeedFrontLeft() override;
     float getMotorSpeedBackLeft() override;
     float getMotorSpeedBackRight() override;
     float getMotorSpeedFrontRight() override;
 
-    /**
-     * Sets the motor to coast (spin freely)
-     */
     void coastMotorBackLeft() override;
     void coastMotorBackRight() override;
     void coastMotorFrontLeft() override;
     void coastMotorFrontRight() override;
 
-    /**
-     * Sets the motor to brake (act against the current direction of rotation)
-     */
     void brakeMotorBackLeft() override;
     void brakeMotorBackRight() override;
     void brakeMotorFrontLeft() override;
     void brakeMotorFrontRight() override;
 
-    /**
-     * Sets the current primitive this robot is running to a new one
-     *
-     * @param firmware_world The world to run the primitive in
-     * @param primitive_msg The primitive to start
-     */
     void startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
                            const TbotsProto_Primitive& primitive_msg) override;
 
-    /**
-     * Runs the current primitive
-     *
-     * @param world The world to run the primitive in
-     */
     void runCurrentPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world) override;
 
    private:
@@ -275,8 +154,6 @@ class PhysicsSimulatorRobot : public SimulatorRobot
     void applyDribblerForce(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
 
     std::weak_ptr<PhysicsRobot> physics_robot;
-    std::optional<float> autokick_speed_m_per_s;
-    std::optional<float> autochip_distance_m;
     uint32_t dribbler_rpm;
 
     typedef struct DribblerBall_t
@@ -292,8 +169,6 @@ class PhysicsSimulatorRobot : public SimulatorRobot
     } DribblerBall;
 
     std::optional<DribblerBall> ball_in_dribbler_area;
-
-    std::unique_ptr<PrimitiveManager, FirmwarePrimitiveManagerDeleter> primitive_manager;
 
     // How much the dribbler damps the ball when they collide. Each component
     // of the damping can be changed separately so we have the flexibility to tune

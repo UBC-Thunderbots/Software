@@ -1,6 +1,9 @@
 #pragma once
 
 #include <memory>
+#include <optional>
+
+#include "software/simulation/firmware_object_deleter.h"
 
 extern "C"
 {
@@ -16,6 +19,11 @@ class SimulatorRobot
     friend class SimulatorRobotSingleton;
 
    public:
+    /**
+     * Create a new SimulatorRobot
+     */
+    explicit SimulatorRobot();
+
     /**
      * Returns the ID of this robot
      *
@@ -200,4 +208,8 @@ class SimulatorRobot
      * @param world The world to run the primitive in
      */
     virtual void runCurrentPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world) = 0;
+
+    std::optional<float> autokick_speed_m_per_s;
+    std::optional<float> autochip_distance_m;
+    std::unique_ptr<PrimitiveManager, FirmwarePrimitiveManagerDeleter> primitive_manager;
 };

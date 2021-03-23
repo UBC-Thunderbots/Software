@@ -6,10 +6,7 @@
 #include "software/math/math_functions.h"
 
 PhysicsSimulatorRobot::PhysicsSimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
-    : physics_robot(physics_robot),
-      autokick_speed_m_per_s(std::nullopt),
-      autochip_distance_m(std::nullopt),
-      dribbler_rpm(0)
+    : physics_robot(physics_robot), dribbler_rpm(0)
 {
     if (auto robot = this->physics_robot.lock())
     {
@@ -26,10 +23,6 @@ PhysicsSimulatorRobot::PhysicsSimulatorRobot(std::weak_ptr<PhysicsRobot> physics
                 this->onDribblerBallEndContact(robot, ball);
             });
     }
-
-    primitive_manager =
-        std::unique_ptr<PrimitiveManager, FirmwarePrimitiveManagerDeleter>(
-            app_primitive_manager_create(), FirmwarePrimitiveManagerDeleter());
 }
 
 void PhysicsSimulatorRobot::checkValidAndExecuteVoid(

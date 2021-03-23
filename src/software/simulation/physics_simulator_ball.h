@@ -21,18 +21,8 @@ class PhysicsSimulatorBall : public SimulatorBall
     explicit PhysicsSimulatorBall(std::weak_ptr<PhysicsBall> physics_ball);
     explicit PhysicsSimulatorBall() = delete;
 
-    /**
-     * Returns the current position of the ball, in global field coordinates, in meters
-     *
-     * @return the current position of the ball, in global field coordinates, in meters
-     */
     Point position() const override;
 
-    /**
-     * Returns the current velocity of the ball, in global field coordinates, in m/s
-     *
-     * @return the current velocity of the ball, in global field coordinates, in m/s
-     */
     Vector velocity() const override;
 
    private:

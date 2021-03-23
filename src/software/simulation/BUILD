@@ -2,8 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "simulator_robot",
+    srcs = ["simulator_robot.cpp"],
     hdrs = ["simulator_robot.h"],
     deps = [
+        ":firmware_object_deleter",
         "//firmware/app/world:firmware_world",
     ],
 )
