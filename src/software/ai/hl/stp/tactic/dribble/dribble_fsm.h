@@ -30,6 +30,8 @@ struct DribbleFSM
     static constexpr double BALL_CLOSE_TO_DEST_THRESHOLD = 0.1;
     // Threshold to determine if the robot has the expected orientation
     static constexpr Angle ROBOT_ORIENTATION_CLOSE_THRESHOLD = Angle::fromDegrees(5);
+    // Kick speed when breaking up continuous dribbling
+    static constexpr double DRIBBLE_KICK_SPEED = 0.05;
 
     /**
      * Converts the ball position to the robot's position given the direction that the
@@ -255,23 +257,41 @@ struct DribbleFSM
          *
          * @param event DribbleFSM::Update
          */
-        const auto dribble = [this](auto event) {
+        const auto dribble = [this, &continuous_dribbling_start_point](auto event) {
+            Point ball_position = event.common.world.ball().position();
             auto [target_destination, target_orientation] =
                 calculateNextDribbleDestinationAndOrientation(
                     event.common.world.ball(), event.common.robot,
                     event.control_params.dribble_destination,
                     event.control_params.final_dribble_orientation);
+            AutoChipOrKick auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::OFF, 0};
+
+            if (!event.control_params.allow_excessive_dribbling &&
+                !comparePoints(ball_position, continuous_dribbling_start_point, 1.0))
+            {
+                // give the ball a little kick
+                auto_chip_or_kick =
+                    AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, DRIBBLE_KICK_SPEED};
+                // reset dribbling start point
+                continuous_dribbling_start_point = ball_position;
+            }
 
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), target_destination, target_orientation, 0,
-                DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
-                AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+                DribblerMode::MAX_FORCE, BallCollisionType::ALLOW, auto_chip_or_kick,
                 MaxAllowedSpeedMode::PHYSICAL_LIMIT));
+        };
+
+        const auto start_dribble = [this, &continuous_dribbling_start_point,
+                                    dribble](auto event) {
+            // update continuous_dribbling_start_point once we start dribbling
+            continuous_dribbling_start_point = event.common.world.ball().position();
+            dribble(event);
         };
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *get_possession_s + update_e[have_possession] / dribble = dribble_s,
+            *get_possession_s + update_e[have_possession] / start_dribble = dribble_s,
             get_possession_s + update_e[!have_possession] / get_possession,
             dribble_s + update_e[!have_possession] / get_possession = get_possession_s,
             dribble_s + update_e[!dribbling_done] / dribble,
