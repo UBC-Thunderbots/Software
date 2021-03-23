@@ -3,8 +3,19 @@
 #include <QtWidgets/QGraphicsSimpleTextItem>
 
 #include "software/gui/drawing/ball.h"
+#include "software/gui/drawing/geom.h"
 #include "software/gui/drawing/field.h"
 #include "software/gui/drawing/team.h"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
+#include "software/ai/passing/pass_generator.h"
+
+auto pitch_division =
+    std::make_shared<const EighteenZonePitchDivision>(Field::createSSLDivisionBField());
+
+PassGenerator<EighteenZoneId> pass_generator(pitch_division,
+                                             std::make_shared<const PassingConfig>());
+
+using Zones = std::unordered_set<EighteenZoneId>;
 
 void drawWorld(QGraphicsScene* scene, const World& world, TeamColour friendly_team_colour)
 {
@@ -33,6 +44,37 @@ void drawWorld(QGraphicsScene* scene, const World& world, TeamColour friendly_te
     drawTeam(scene, world.enemyTeam(), enemy_team_colour_);
     drawBall(scene, world.ball().currentState());
     drawBallConeToFriendlyNet(scene, world.ball().position(), world.field());
+
+    QPen pen(blue_robot_color);
+    pen.setWidth(4);
+    pen.setCosmetic(true);
+
+    QBrush brush(blue_robot_color);
+    brush.setStyle(Qt::BrushStyle::SolidPattern);
+
+    auto pass_eval = pass_generator.generatePassEvaluation(world);
+    drawCircle(scene, Circle(pass_eval.getBestPassOnField().pass.receiverPoint(), 0.5),
+               pen, std::nullopt);
+
+    int counter = 0;
+    for (auto zone :
+         pass_eval.getBestZonesToCherryPick(world.field(), world.ball().position()))
+    {
+        counter++;
+
+        if (counter > 3)
+            break;
+        QPen pen(yellow_robot_color);
+        pen.setWidth(2);
+        pen.setCosmetic(true);
+
+        QBrush brush(yellow_robot_color);
+        brush.setStyle(Qt::BrushStyle::SolidPattern);
+        drawCircle(
+            scene,
+            Circle(pass_eval.getBestPassInZones({zone}).pass.receiverPoint(), 0.1), pen,
+            std::nullopt);
+    }
 }
 
 WorldDrawFunction getDrawWorldFunction(const World& world,
