@@ -23,16 +23,16 @@ PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
     const World& world)
 {
     auto generated_passes = samplePasses(world);
-    if (passes_.empty())
+    if (current_best_passes_.empty())
     {
-        passes_ = generated_passes;
+        current_best_passes_ = generated_passes;
     }
     auto optimized_passes = optimizePasses(world, generated_passes);
 
     updatePasses(world, optimized_passes);
 
-    return PassEvaluation<ZoneEnum>(pitch_division_, passes_, passing_config_,
-                                    world.getMostRecentTimestamp());
+    return PassEvaluation<ZoneEnum>(pitch_division_, current_best_passes_,
+                                    passing_config_, world.getMostRecentTimestamp());
 }
 
 template <class ZoneEnum>
@@ -71,8 +71,6 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
 {
     // Run gradient descent to optimize the passes to for the requested number
     // of iterations
-    // NOTE: Parallelizing this `for` loop would probably be safe and potentially more
-    //       performant
     ZonePassMap<ZoneEnum> optimized_passes;
 
     for (ZoneEnum zone_id : pitch_division_->getAllZoneIds())
@@ -106,10 +104,11 @@ void PassGenerator<ZoneEnum>::updatePasses(const World& world,
 {
     for (ZoneEnum zone_id : pitch_division_->getAllZoneIds())
     {
-        if (ratePass(world, passes_.at(zone_id).pass, pitch_division_->getZone(zone_id),
+        if (ratePass(world, current_best_passes_.at(zone_id).pass,
+                     pitch_division_->getZone(zone_id),
                      passing_config_) < optimized_passes.at(zone_id).rating)
         {
-            passes_.at(zone_id) = optimized_passes.at(zone_id);
+            current_best_passes_.at(zone_id) = optimized_passes.at(zone_id);
         }
     }
 }

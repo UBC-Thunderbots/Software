@@ -46,14 +46,13 @@ class PassGenerator
      *
      * NOTE: It is important that this function is able to run in 10ms.
      *
-     * This is because a pass is evaluated on the provided world and if the
-     * pass generator only completes an iteration of pass updates once every 5 seconds,
-     * very soon when optimizing the pass), and so the passes will likely be invalid by
-     * the time another iteration starts. Because of this, it is extremely important that
-     * the pass generator runs fast enough. Debug builds running on slightly slower
-     * computers could be unable to converge. It is recommended that all testing of things
-     * involving the PassGenerator be done with executables built in "Release" in order to
-     * maximize performance ("Release" can be 2-10x faster then "Debug").
+     * Passes are evaluated on the provided world. If the evaluation takes longer than
+     * the time between two vision frames, we will be evaluating on an outdated world.
+     *
+     * Because of this, it is extremely important that the pass generator runs fast
+     * enough. It is recommended that all testing of things involving the PassGenerator
+     * be done with executables built in "Release" in order to maximize performance
+     * ("Release" can be 2-10x faster then "Debug").
      *
      * @param world The world to compute the pass evaluation on
      *
@@ -99,7 +98,7 @@ class PassGenerator
 
     /**
      * Re-evaluates ratePass on the "previous ticks" passes and keeps the higher pass
-     * w/ the higher score in passes_;
+     * w/ the higher score in current_best_passes_;
      *
      * @param The world
      * @param optimized_passes The optimized_passes to update our internal cached
@@ -108,7 +107,7 @@ class PassGenerator
     void updatePasses(const World& world, const ZonePassMap<ZoneEnum>& optimized_passes);
 
     // All the passes that we are currently trying to optimize in gradient descent
-    ZonePassMap<ZoneEnum> passes_;
+    ZonePassMap<ZoneEnum> current_best_passes_;
 
     // The optimizer we're using to find passes
     GradientDescentOptimizer<NUM_PARAMS_TO_OPTIMIZE> optimizer_;

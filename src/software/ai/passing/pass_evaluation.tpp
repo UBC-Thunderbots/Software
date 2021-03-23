@@ -30,7 +30,7 @@ PassWithRating PassEvaluation<ZoneEnum>::getBestPassOnField() const
                             const std::pair<ZoneEnum, PassWithRating>& p2) {
                              return p1.second.rating < p2.second.rating;
                          });
-    return (*best_pass).second;
+    return best_pass->second;
 }
 
 template <class ZoneEnum>

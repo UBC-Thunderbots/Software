@@ -34,10 +34,8 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double pass_speed_quality = sigmoid(pass.speed(), min_pass_speed, 0.2) *
                                 (1 - sigmoid(pass.speed(), max_pass_speed, 0.2));
 
-    double pass_up_field_rating = pass.receiverPoint().x() / world.field().xLength();
-
-    return pass_up_field_rating * static_pass_quality * friendly_pass_rating *
-           enemy_pass_rating * shoot_pass_rating * pass_speed_quality * in_region_quality;
+    return static_pass_quality * friendly_pass_rating * enemy_pass_rating *
+           shoot_pass_rating * pass_speed_quality * in_region_quality;
 }
 
 double rateZone(const Field& field, const Rectangle& zone, const Point& ball_position,

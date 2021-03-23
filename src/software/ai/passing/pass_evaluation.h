@@ -50,7 +50,7 @@ class PassEvaluation
     /**
      * Given a set of zone_ids, returns the best PassWithRating in those zones
      *
-     * @raises std::invalid_argument if the zone_ids set is empty or if the zone_ids
+     * @throws std::invalid_argument if the zone_ids set is empty or if the zone_ids
      *         are out of bounds
      * @param zone_ids A set of zone_ids to find the best pass in
      * @return PassWithRating w/ the best pass in the given zones
