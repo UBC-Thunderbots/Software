@@ -101,10 +101,10 @@ double ratePassShootScore(const Ball& ball, const Field& field, const Team& enem
     // Prefer angles where the robot does not have to turn much after receiving the
     // pass to take the shot (or equivalently the shot deflection angle)
     //
-    // Receive points on the friendly side, almost always, need to rotate a full 180
-    // degrees to shoot on net. So we relax that requirement for passes on the friendly
-    // side.
-    if (pass.receiverPoint().x() < 0)
+    // Receiver robots on the friendly side, almost always, need to rotate a full 180
+    // degrees to shoot on net. So we relax that requirement for both receiver and ball
+    // locations on the friendly side
+    if (pass.receiverPoint().x() < 0 || ball.position().x() < 0)
     {
         ideal_max_rotation_to_shoot_degrees = 180;
     }
