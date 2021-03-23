@@ -1,11 +1,11 @@
-#include "software/simulation/simulator_robot.h"
+#include "software/simulation/physics_simulator_robot.h"
 
 #include "shared/constants.h"
 #include "software/geom/algorithms/acute_angle.h"
 #include "software/logger/logger.h"
 #include "software/math/math_functions.h"
 
-SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
+PhysicsSimulatorRobot::PhysicsSimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
     : physics_robot(physics_robot),
       autokick_speed_m_per_s(std::nullopt),
       autochip_distance_m(std::nullopt),
@@ -32,7 +32,7 @@ SimulatorRobot::SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot)
             app_primitive_manager_create(), FirmwarePrimitiveManagerDeleter());
 }
 
-void SimulatorRobot::checkValidAndExecuteVoid(
+void PhysicsSimulatorRobot::checkValidAndExecuteVoid(
     std::function<void(std::shared_ptr<PhysicsRobot>)> func)
 {
     if (auto robot = physics_robot.lock())
@@ -41,76 +41,78 @@ void SimulatorRobot::checkValidAndExecuteVoid(
     }
     else
     {
-        LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot"
+        LOG(WARNING) << "PhysicsSimulatorRobot being used with invalid PhysicsRobot"
                      << std::endl;
     }
 }
 
-float SimulatorRobot::checkValidAndReturnFloat(
+float PhysicsSimulatorRobot::checkValidAndReturnFloat(
     std::function<float(std::shared_ptr<PhysicsRobot>)> func)
 {
     if (auto robot = physics_robot.lock())
     {
         return func(robot);
     }
-    LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot" << std::endl;
+    LOG(WARNING) << "PhysicsSimulatorRobot being used with invalid PhysicsRobot"
+                 << std::endl;
     return 0.0f;
 }
 
-unsigned int SimulatorRobot::checkValidAndReturnUint(
+unsigned int PhysicsSimulatorRobot::checkValidAndReturnUint(
     std::function<unsigned int(std::shared_ptr<PhysicsRobot>)> func)
 {
     if (auto robot = physics_robot.lock())
     {
         return func(robot);
     }
-    LOG(WARNING) << "SimulatorRobot being used with invalid PhysicsRobot" << std::endl;
+    LOG(WARNING) << "PhysicsSimulatorRobot being used with invalid PhysicsRobot"
+                 << std::endl;
     return 0;
 }
 
-unsigned int SimulatorRobot::getRobotId()
+unsigned int PhysicsSimulatorRobot::getRobotId()
 {
     return checkValidAndReturnUint([](auto robot) { return robot->getRobotId(); });
 }
 
-float SimulatorRobot::getPositionX()
+float PhysicsSimulatorRobot::getPositionX()
 {
     return checkValidAndReturnFloat([](auto robot) { return robot->position().x(); });
 }
 
-float SimulatorRobot::getPositionY()
+float PhysicsSimulatorRobot::getPositionY()
 {
     return checkValidAndReturnFloat([](auto robot) { return robot->position().y(); });
 }
 
-float SimulatorRobot::getOrientation()
+float PhysicsSimulatorRobot::getOrientation()
 {
     return checkValidAndReturnFloat(
         [](auto robot) { return robot->orientation().toRadians(); });
 }
 
-float SimulatorRobot::getVelocityX()
+float PhysicsSimulatorRobot::getVelocityX()
 {
     return checkValidAndReturnFloat([](auto robot) { return robot->velocity().x(); });
 }
 
-float SimulatorRobot::getVelocityY()
+float PhysicsSimulatorRobot::getVelocityY()
 {
     return checkValidAndReturnFloat([](auto robot) { return robot->velocity().y(); });
 }
 
-float SimulatorRobot::getVelocityAngular()
+float PhysicsSimulatorRobot::getVelocityAngular()
 {
     return checkValidAndReturnFloat(
         [](auto robot) { return robot->angularVelocity().toRadians(); });
 }
 
-float SimulatorRobot::getBatteryVoltage()
+float PhysicsSimulatorRobot::getBatteryVoltage()
 {
     return ROBOT_MAX_BATTERY_VOLTAGE;
 }
 
-void SimulatorRobot::kick(float speed_m_per_s)
+void PhysicsSimulatorRobot::kick(float speed_m_per_s)
 {
     checkValidAndExecuteVoid([this, speed_m_per_s](auto robot) {
         if (ball_in_dribbler_area && ball_in_dribbler_area->can_be_controlled)
@@ -163,7 +165,7 @@ void SimulatorRobot::kick(float speed_m_per_s)
     });
 }
 
-void SimulatorRobot::chip(float distance_m)
+void PhysicsSimulatorRobot::chip(float distance_m)
 {
     checkValidAndExecuteVoid([this, distance_m](auto robot) {
         if (ball_in_dribbler_area && ball_in_dribbler_area->can_be_controlled)
@@ -194,7 +196,7 @@ void SimulatorRobot::chip(float distance_m)
     });
 }
 
-void SimulatorRobot::enableAutokick(float speed_m_per_s)
+void PhysicsSimulatorRobot::enableAutokick(float speed_m_per_s)
 {
     autokick_speed_m_per_s = speed_m_per_s;
     disableAutochip();
@@ -202,7 +204,7 @@ void SimulatorRobot::enableAutokick(float speed_m_per_s)
     kick(speed_m_per_s);
 }
 
-void SimulatorRobot::enableAutochip(float distance_m)
+void PhysicsSimulatorRobot::enableAutochip(float distance_m)
 {
     autochip_distance_m = distance_m;
     disableAutokick();
@@ -210,137 +212,137 @@ void SimulatorRobot::enableAutochip(float distance_m)
     chip(distance_m);
 }
 
-void SimulatorRobot::disableAutokick()
+void PhysicsSimulatorRobot::disableAutokick()
 {
     autokick_speed_m_per_s = std::nullopt;
 }
 
-void SimulatorRobot::disableAutochip()
+void PhysicsSimulatorRobot::disableAutochip()
 {
     autochip_distance_m = std::nullopt;
 }
 
-bool SimulatorRobot::isAutokickEnabled()
+bool PhysicsSimulatorRobot::isAutokickEnabled()
 {
     return autokick_speed_m_per_s.has_value();
 }
 
-bool SimulatorRobot::isAutochipEnabled()
+bool PhysicsSimulatorRobot::isAutochipEnabled()
 {
     return autochip_distance_m.has_value();
 }
 
-void SimulatorRobot::setDribblerSpeed(uint32_t rpm)
+void PhysicsSimulatorRobot::setDribblerSpeed(uint32_t rpm)
 {
     dribbler_rpm = rpm;
 }
 
-unsigned int SimulatorRobot::getDribblerTemperatureDegC()
+unsigned int PhysicsSimulatorRobot::getDribblerTemperatureDegC()
 {
     // Return a somewhat arbitrary "room temperature" temperature.
     // This is an ideal simulation so the dribbler will not overheat
     return 25;
 }
 
-void SimulatorRobot::dribblerCoast()
+void PhysicsSimulatorRobot::dribblerCoast()
 {
     setDribblerSpeed(0);
 }
 
-void SimulatorRobot::applyWheelForceFrontLeft(float force_in_newtons)
+void PhysicsSimulatorRobot::applyWheelForceFrontLeft(float force_in_newtons)
 {
     checkValidAndExecuteVoid([force_in_newtons](auto robot) {
         robot->applyWheelForceFrontLeft(force_in_newtons);
     });
 }
 
-void SimulatorRobot::applyWheelForceBackLeft(float force_in_newtons)
+void PhysicsSimulatorRobot::applyWheelForceBackLeft(float force_in_newtons)
 {
     checkValidAndExecuteVoid([force_in_newtons](auto robot) {
         robot->applyWheelForceBackLeft(force_in_newtons);
     });
 }
 
-void SimulatorRobot::applyWheelForceBackRight(float force_in_newtons)
+void PhysicsSimulatorRobot::applyWheelForceBackRight(float force_in_newtons)
 {
     checkValidAndExecuteVoid([force_in_newtons](auto robot) {
         robot->applyWheelForceBackRight(force_in_newtons);
     });
 }
 
-void SimulatorRobot::applyWheelForceFrontRight(float force_in_newtons)
+void PhysicsSimulatorRobot::applyWheelForceFrontRight(float force_in_newtons)
 {
     checkValidAndExecuteVoid([force_in_newtons](auto robot) {
         robot->applyWheelForceFrontRight(force_in_newtons);
     });
 }
 
-float SimulatorRobot::getMotorSpeedFrontLeft()
+float PhysicsSimulatorRobot::getMotorSpeedFrontLeft()
 {
     return checkValidAndReturnFloat(
         [](auto robot) { return robot->getMotorSpeedFrontLeft(); });
 }
 
-float SimulatorRobot::getMotorSpeedBackLeft()
+float PhysicsSimulatorRobot::getMotorSpeedBackLeft()
 {
     return checkValidAndReturnFloat(
         [](auto robot) { return robot->getMotorSpeedBackLeft(); });
 }
 
-float SimulatorRobot::getMotorSpeedBackRight()
+float PhysicsSimulatorRobot::getMotorSpeedBackRight()
 {
     return checkValidAndReturnFloat(
         [](auto robot) { return robot->getMotorSpeedBackRight(); });
 }
 
-float SimulatorRobot::getMotorSpeedFrontRight()
+float PhysicsSimulatorRobot::getMotorSpeedFrontRight()
 {
     return checkValidAndReturnFloat(
         [](auto robot) { return robot->getMotorSpeedFrontRight(); });
 }
 
-void SimulatorRobot::coastMotorFrontLeft()
+void PhysicsSimulatorRobot::coastMotorFrontLeft()
 {
     // We coast by simply doing nothing and not applying wheel force
 }
 
-void SimulatorRobot::coastMotorBackLeft()
+void PhysicsSimulatorRobot::coastMotorBackLeft()
 {
     // We coast by simply doing nothing and not applying wheel force
 }
 
-void SimulatorRobot::coastMotorBackRight()
+void PhysicsSimulatorRobot::coastMotorBackRight()
 {
     // We coast by simply doing nothing and not applying wheel force
 }
 
-void SimulatorRobot::coastMotorFrontRight()
+void PhysicsSimulatorRobot::coastMotorFrontRight()
 {
     // We coast by simply doing nothing and not applying wheel force
 }
 
-void SimulatorRobot::brakeMotorFrontLeft()
+void PhysicsSimulatorRobot::brakeMotorFrontLeft()
 {
     checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorFrontLeft(); });
 }
 
-void SimulatorRobot::brakeMotorBackLeft()
+void PhysicsSimulatorRobot::brakeMotorBackLeft()
 {
     checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorBackLeft(); });
 }
 
-void SimulatorRobot::brakeMotorBackRight()
+void PhysicsSimulatorRobot::brakeMotorBackRight()
 {
     checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorBackRight(); });
 }
 
-void SimulatorRobot::brakeMotorFrontRight()
+void PhysicsSimulatorRobot::brakeMotorFrontRight()
 {
     checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorFrontRight(); });
 }
 
-void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
-                                           PhysicsBall *physics_ball)
+void PhysicsSimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
+                                                  PhysicsBall *physics_ball)
 {
     if (dribbler_rpm > 0 && ball_in_dribbler_area)
     {
@@ -356,8 +358,8 @@ void SimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,
     }
 }
 
-void SimulatorRobot::onDribblerBallStartContact(PhysicsRobot *physics_robot,
-                                                PhysicsBall *physics_ball)
+void PhysicsSimulatorRobot::onDribblerBallStartContact(PhysicsRobot *physics_robot,
+                                                       PhysicsBall *physics_ball)
 {
     // Damp the ball when it collides with the dribbler. We damp each component
     // of the ball's momentum separately so we have the flexibility to tune this
@@ -397,32 +399,34 @@ void SimulatorRobot::onDribblerBallStartContact(PhysicsRobot *physics_robot,
     }
 }
 
-void SimulatorRobot::onDribblerBallEndContact(PhysicsRobot *physics_robot,
-                                              PhysicsBall *physics_ball)
+void PhysicsSimulatorRobot::onDribblerBallEndContact(PhysicsRobot *physics_robot,
+                                                     PhysicsBall *physics_ball)
 {
     clearBallInDribblerArea();
 }
 
-void SimulatorRobot::startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
-                                       const TbotsProto_Primitive &primitive_msg)
+void PhysicsSimulatorRobot::startNewPrimitive(
+    std::shared_ptr<FirmwareWorld_t> firmware_world,
+    const TbotsProto_Primitive &primitive_msg)
 {
     app_primitive_manager_startNewPrimitive(primitive_manager.get(), firmware_world.get(),
                                             primitive_msg);
 }
 
-void SimulatorRobot::runCurrentPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world)
+void PhysicsSimulatorRobot::runCurrentPrimitive(
+    std::shared_ptr<FirmwareWorld_t> firmware_world)
 {
     app_primitive_manager_runCurrentPrimitive(primitive_manager.get(),
                                               firmware_world.get());
 }
 
-void SimulatorRobot::clearBallInDribblerArea()
+void PhysicsSimulatorRobot::clearBallInDribblerArea()
 {
     ball_in_dribbler_area = std::nullopt;
 }
 
-void SimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot,
-                                        PhysicsBall *physics_ball)
+void PhysicsSimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot,
+                                               PhysicsBall *physics_ball)
 {
     auto robot = physics_robot->getRobotState();
     auto ball  = physics_ball->getBallState();
