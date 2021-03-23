@@ -96,7 +96,6 @@ cc_library(
         ":draw_functions",
         ":field",
         ":team",
-        "//software/ai/passing:pass_generator",
         "//software/world",
         "@qt//:qt_widgets",
     ],

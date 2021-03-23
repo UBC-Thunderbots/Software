@@ -113,6 +113,9 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
 
     using Zones = std::unordered_set<EighteenZoneId>;
 
+    // We want the two cherry pickers to be in rectangles on the +y and -y sides of the
+    // field in the +x half. We also further offset the rectangle from the goal line
+    // for the cherry-picker closer to where we're taking the corner kick from
     //
     //                FRIENDLY          ENEMY
     //        ┌──────┬──────┬──────┬──────┬──────┬─────┐
