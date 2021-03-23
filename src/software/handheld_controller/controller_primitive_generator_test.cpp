@@ -64,7 +64,7 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input)
                                  AutoChipOrKickMode::AUTOKICK,
                                  kick_speed,
                              },
-                             MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_kick_primitive, actual_primitive));
 }
@@ -88,7 +88,7 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input1
                                  AutoChipOrKickMode::AUTOCHIP,
                                  chip_distance,
                              },
-                             MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_chip_primitive, actual_primitive));
 }

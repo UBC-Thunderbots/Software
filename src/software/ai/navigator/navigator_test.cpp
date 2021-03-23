@@ -78,7 +78,7 @@ TEST_F(ThetaStarNavigatorTest, convert_chip_intent_to_move_with_autochip_primiti
                                  AutoChipOrKickMode::AUTOCHIP,
                                  0,
                              },
-                             MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
@@ -101,26 +101,7 @@ TEST_F(ThetaStarNavigatorTest, convert_kick_intent_to_move_with_autokick_primiti
                                  AutoChipOrKickMode::AUTOKICK,
                                  0,
                              },
-                             MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-    EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-        expected_primitive, primitive_set_msg->robot_primitives().at(0)));
-}
-
-TEST_F(ThetaStarNavigatorTest, convert_spinning_move_intent_to_spinning_move_primitive)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-
-    std::vector<std::unique_ptr<Intent>> intents;
-    intents.emplace_back(
-        std::make_unique<SpinningMoveIntent>(0, Point(), AngularVelocity::full(), 1));
-
-    auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
-
-    // Make sure we got exactly 1 primitive back
-    EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
-
-    auto expected_primitive = *createSpinningMovePrimitive(
-        Point(), 1, AngularVelocity::full(), DribblerMode::OFF);
+                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
@@ -209,16 +190,18 @@ TEST(NavigatorTest, move_intent_with_one_point_path_test_path_planner)
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<MoveIntent>(
         0, poi, Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT));
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        0.0));
 
     auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_set_msg->robot_primitives().size(), 1);
 
-    auto expected_primitive = *createMovePrimitive(
-        poi, 0, Angle::zero(), DribblerMode::OFF,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+    auto expected_primitive =
+        *createMovePrimitive(poi, 0, Angle::zero(), DribblerMode::OFF,
+                             AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_primitive, primitive_set_msg->robot_primitives().at(0)));
 }
@@ -249,7 +232,8 @@ TEST_F(NoPathNavigatorTest, move_intent_with_no_path_test_path_planner)
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<MoveIntent>(
         0, Point(), Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT));
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        0.0));
 
     auto primitive_set_msg = navigator.getAssignedPrimitives(world, intents);
 
