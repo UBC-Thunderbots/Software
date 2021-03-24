@@ -272,8 +272,6 @@ struct DribbleFSM
                 // give the ball a little kick
                 auto_chip_or_kick =
                     AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, DRIBBLE_KICK_SPEED};
-                // reset dribbling start point
-                continuous_dribbling_start_point = ball_position;
             }
 
             event.common.set_intent(std::make_unique<MoveIntent>(
