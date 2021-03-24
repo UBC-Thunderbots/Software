@@ -5,7 +5,8 @@
 #include "software/ai/hl/stp/action/stop_action.h"  // TODO (#1888): remove this dependency
 
 DribbleTactic::DribbleTactic()
-    : Tactic(false, {RobotCapability::Move, RobotCapability::Dribble}),
+    : Tactic(false,
+             {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
       fsm(),
       control_params{DribbleFSM::ControlParams{.dribble_destination       = std::nullopt,
                                                .final_dribble_orientation = std::nullopt,
