@@ -32,6 +32,9 @@ struct DribbleFSM
     static constexpr Angle ROBOT_ORIENTATION_CLOSE_THRESHOLD = Angle::fromDegrees(5);
     // Kick speed when breaking up continuous dribbling
     static constexpr double DRIBBLE_KICK_SPEED = 0.05;
+    // Maximum distance to continuously dribble the ball, slightly conservative to not
+    // break the 1 meter rule
+    static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.9;
 
     /**
      * Converts the ball position to the robot's position given the direction that the
@@ -267,7 +270,8 @@ struct DribbleFSM
             AutoChipOrKick auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::OFF, 0};
 
             if (!event.control_params.allow_excessive_dribbling &&
-                !comparePoints(ball_position, continuous_dribbling_start_point, 1.0))
+                !comparePoints(ball_position, continuous_dribbling_start_point,
+                               MAX_CONTINUOUS_DRIBBLING_DISTANCE))
             {
                 // give the ball a little kick
                 auto_chip_or_kick =

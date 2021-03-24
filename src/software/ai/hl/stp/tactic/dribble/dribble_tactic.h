@@ -6,7 +6,8 @@
 
 /**
  * The DribbleTactic will move the robot to intercept the ball and optionally dribble it
- * to the dribble destination with the robot facing the given direction
+ * to the dribble destination with the robot facing the given direction.
+ * It also optionally applies small kicks to not excessively dribble
  *
  * Done: When the ball is near the dribbler of the robot and the optional dribble
  * destination and face ball orientation conditions are satisfied
