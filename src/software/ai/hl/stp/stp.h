@@ -1,6 +1,8 @@
 #pragma once
 
 #include <random>
+#include <vector>
+#include <memory>
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/hl.h"
@@ -122,22 +124,35 @@ class STP : public HL
     PlayInfo getPlayInfo() override;
 
     /**
-     * Given a list of tactics and the current World, assigns robots from the friendly
-     * team to each tactic
+     * Given a vector of a vector of tactics and the current World, assigns robots
+     * from the friendly team to each tactic
      *
      * Some tactics may not be assigned a robot, depending on if there is a robot
      * capable of performing that tactic
      *
      * This will clear all assigned robots from all tactics
+     * 
+     * The outer vector ranks the inner vector of tactics by priority. Tactics in
+     * lower indexes of the outer vector will be assigned first. For example:
+     * 
+     * {
+     *      {goalie_tactic},
+     *      {crease_defender_1, crease_defender_2},
+     *      {move_tactic},
+     * }
+     * 
+     * The cost of assigning a goalie_tactic will be minimized across all robots first,
+     * followed by both the crease_defender tactics. The move_tactic will be assigned last.
      *
-     * The order of the given tactics determines their priority, with the tactics as the
-     * beginning of the vector being a higher priority than those at the end. The priority
-     * determines which tactics will NOT be assigned if there are not enough robots on the
-     * field to assign them all. For example, if a Play returned 6 Tactics but there were
-     * only 4 robots on the field at the time, only the first 4 Tactics in the vector
-     * would be assigned to robots and run.
+     * The order of the given tactics in the inner vector also determines their priority, with the
+     * tactics as the beginning of the vector being a higher priority than those at the end.
+     * The priority determines which tactics will NOT be assigned if there are not enough robots on the
+     * field to assign them all. For example, if a Play returned 4 Tactics but there were
+     * only 3 robots on the field at the time, only the first 3 Tactics in the vector
+     * would be assigned to robots and run. (In the example above, only the goalie and crease_defenders
+     * would be assigned)
      *
-     * @param tactics The list of tactics that should be assigned a robot. Note
+     * @param tactics The list of list of tactics that should be assigned a robot. Note
      * that this function modifies tactics to make the correct assignments, because we
      * need to modify the individual tactics _and_ possibly add/remove tactics
      * @param world The state of the world, which contains the friendly Robots that will
@@ -146,36 +161,10 @@ class STP : public HL
      * @return map from assigned tactics to robot
      */
     std::map<std::shared_ptr<const Tactic>, Robot> assignRobotsToTactics(
-        std::vector<std::shared_ptr<const Tactic>> tactics, const World &world);
+        std::vector<std::vector<std::shared_ptr<const Tactic>>> tactics,
+        const World &world);
 
    private:
-    /**
-     * Assigns non goalie robots to each non goalie tactic
-     *
-     * Some tactics may not be assigned a robot, depending on if there is a robot
-     * capable of performing that tactic
-     *
-     * This will clear all assigned robots from all tactics
-     *
-     * The order of the given tactics determines their priority, with the tactics as the
-     * beginning of the vector being a higher priority than those at the end. The priority
-     * determines which tactics will NOT be assigned if there are not enough robots on the
-     * field to assign them all. For example, if a Play returned 6 Tactics but there were
-     * only 4 robots on the field at the time, only the first 4 Tactics in the vector
-     * would be assigned to robots and run.
-     *
-     * @param world The state of the world for calculating robot costs
-     * @param non_goalie_robots The non goalie robots to assign to tactics
-     * @param [in/out] non_goalie_tactics The list of tactics that should be assigned a
-     * robot. Note that this function modifies non_goalie_tactics to make the correct
-     * assignments, because we need to modify the individual tactics _and_ possibly
-     * add/remove tactics
-     *
-     * @return The list of tactics that were assigned to the robots
-     */
-    static std::map<std::shared_ptr<const Tactic>, Robot> assignNonGoalieRobotsToTactics(
-        const World &world, const std::vector<Robot> &non_goalie_robots,
-        std::vector<std::shared_ptr<const Tactic>> &non_goalie_tactics);
 
     /**
      * Updates the current STP state based on the state of the world

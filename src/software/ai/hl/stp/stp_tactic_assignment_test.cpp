@@ -88,7 +88,7 @@ TEST_F(STPTacticAssignmentTest,
 
     std::vector<std::shared_ptr<const Tactic>> tactics = {move_tactic_1, move_tactic_2};
 
-    auto asst = stp.assignRobotsToTactics(tactics, world);
+    auto asst = stp.assignRobotsToTactics({tactics}, world);
 
     EXPECT_TRUE(allTacticsAssigned(tactics, asst));
 }
@@ -110,7 +110,7 @@ TEST_F(STPTacticAssignmentTest,
 
     std::vector<std::shared_ptr<const Tactic>> tactics = {move_tactic_1, move_tactic_2};
 
-    auto asst = stp.assignRobotsToTactics(tactics, world);
+    auto asst = stp.assignRobotsToTactics({tactics}, world);
 
     EXPECT_TRUE(asst.find(move_tactic_1) != asst.end());
     EXPECT_FALSE(asst.find(move_tactic_2) != asst.end());
@@ -133,7 +133,7 @@ TEST_F(STPTacticAssignmentTest,
 
     std::vector<std::shared_ptr<const Tactic>> tactics = {move_tactic_1};
 
-    auto asst = stp.assignRobotsToTactics(tactics, world);
+    auto asst = stp.assignRobotsToTactics({tactics}, world);
 
     EXPECT_TRUE(asst.find(move_tactic_1) != asst.end());
 }
@@ -150,7 +150,7 @@ TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_robots
 
     std::vector<std::shared_ptr<const Tactic>> tactics = {move_tactic_1};
 
-    auto asst = stp.assignRobotsToTactics(tactics, world);
+    auto asst = stp.assignRobotsToTactics({tactics}, world);
 
     EXPECT_FALSE(asst.find(move_tactic_1) != asst.end());
 }
@@ -176,7 +176,7 @@ TEST_F(STPTacticAssignmentTest,
     // way around to move_tactic_2. What we expect is that robot_0 will be assigned to
     // move_tactic_2 and "slide over" to make room for robot_1
 
-    auto asst = stp.assignRobotsToTactics(tactics, world);
+    auto asst = stp.assignRobotsToTactics({tactics}, world);
 
 
     // move_tactic_1 should be the only Tactic assigned a robot, since stop_tactic_1 is a
@@ -201,7 +201,7 @@ TEST_F(STPTacticAssignmentTest, test_assigning_1_tactic_to_1_robot)
 
     std::vector<std::shared_ptr<const Tactic>> tactics = {move_tactic_1};
 
-    auto asst = stp.assignRobotsToTactics(tactics, world);
+    auto asst = stp.assignRobotsToTactics({tactics}, world);
 
     ASSERT_TRUE(asst.find(move_tactic_1) != asst.end());
     EXPECT_EQ(asst.find(move_tactic_1)->second, robot_0);
@@ -232,7 +232,7 @@ TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap)
     // Each robot is close to separate tactic destinations. They should each be trivially
     // assigned to the tactic with the destination closest to their position
 
-    auto asst = stp.assignRobotsToTactics(tactics, world);
+    auto asst = stp.assignRobotsToTactics({tactics}, world);
 
     ASSERT_TRUE(asst.find(move_tactic_1) != asst.end());
     ASSERT_TRUE(asst.find(move_tactic_2) != asst.end());
@@ -274,7 +274,7 @@ TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_with_overla
     // way around to move_tactic_2. What we expect is that robot_0 will be assigned to
     // move_tactic_2 and "slide over" to make room for robot_1
 
-    auto asst = stp.assignRobotsToTactics(tactics, world);
+    auto asst = stp.assignRobotsToTactics({tactics}, world);
 
     ASSERT_TRUE(asst.find(move_tactic_1) != asst.end());
     ASSERT_TRUE(asst.find(move_tactic_2) != asst.end());
@@ -305,7 +305,7 @@ TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_2_tactics)
     // robot_2 should not be assigned since both robot_0 and robot_1 are more optimal
     // to assign to the tactics. robot_2 is too far away
 
-    auto asst = stp.assignRobotsToTactics(tactics, world);
+    auto asst = stp.assignRobotsToTactics({tactics}, world);
 
     ASSERT_TRUE(asst.find(move_tactic_1) != asst.end());
     ASSERT_TRUE(asst.find(move_tactic_2) != asst.end());
@@ -334,7 +334,7 @@ TEST_F(STPTacticAssignmentTest,
                                                           stop_tactic_3};
 
     // If all costs are equal, the robots and tactics are simply paired in order
-    auto asst = stp.assignRobotsToTactics(tactics, world);
+    auto asst = stp.assignRobotsToTactics({tactics}, world);
 
     ASSERT_TRUE(asst.find(stop_tactic_1) != asst.end());
     ASSERT_TRUE(asst.find(stop_tactic_2) != asst.end());
@@ -369,7 +369,7 @@ TEST_F(STPTacticAssignmentTest,
     std::vector<std::shared_ptr<const Tactic>> tactics = {stop_tactic_1, move_tactic_1,
                                                           stop_tactic_2};
 
-    auto asst = stp.assignRobotsToTactics(tactics, world);
+    auto asst = stp.assignRobotsToTactics({tactics}, world);
 
     ASSERT_TRUE(asst.find(stop_tactic_1) != asst.end());
     ASSERT_TRUE(asst.find(move_tactic_1) != asst.end());
@@ -399,7 +399,7 @@ TEST_F(STPTacticAssignmentTest,
 
     std::vector<std::shared_ptr<const Tactic>> tactics = {move_tactic_1};
 
-    auto asst = stp.assignRobotsToTactics(tactics, world);
+    auto asst = stp.assignRobotsToTactics({tactics}, world);
 
     ASSERT_TRUE(asst.find(move_tactic_1) != asst.end());
     EXPECT_EQ(asst.find(move_tactic_1)->second, robot_1);
@@ -425,7 +425,7 @@ TEST_F(STPTacticAssignmentTest,
     std::vector<std::shared_ptr<const Tactic>> tactics = {goalie_tactic_1,
                                                           goalie_tactic_2};
 
-    auto asst = stp.assignRobotsToTactics(tactics, world);
+    auto asst = stp.assignRobotsToTactics({tactics}, world);
 
     EXPECT_FALSE(asst.find(goalie_tactic_1) != asst.end());
     EXPECT_FALSE(asst.find(goalie_tactic_2) != asst.end());
@@ -452,7 +452,7 @@ TEST_F(STPTacticAssignmentTest,
     auto goalie_tactic_1 = std::make_shared<GoalieTestTactic>();
     std::vector<std::shared_ptr<const Tactic>> tactics = {goalie_tactic_1};
 
-    auto asst = stp.assignRobotsToTactics(tactics, world);
+    auto asst = stp.assignRobotsToTactics({tactics}, world);
 
     EXPECT_TRUE(allTacticsAssigned(tactics, asst));
     ASSERT_TRUE(asst.find(goalie_tactic_1) != asst.end());
@@ -462,7 +462,7 @@ TEST_F(STPTacticAssignmentTest,
     friendly_team.assignGoalie(1);
     world.updateFriendlyTeamState(friendly_team);
 
-    asst = stp.assignRobotsToTactics(tactics, world);
+    stp.assignRobotsToTactics({tactics}, world);
 
     EXPECT_TRUE(allTacticsAssigned(tactics, asst));
     ASSERT_TRUE(asst.find(goalie_tactic_1) != asst.end());
@@ -485,10 +485,10 @@ TEST_F(STPTacticAssignmentTest,
 
     auto goalie_tactic_1 = std::make_shared<GoalieTestTactic>();
     auto goalie_tactic_2 = std::make_shared<GoalieTestTactic>();
-    std::vector<std::shared_ptr<const Tactic>> tactics = {goalie_tactic_1,
-                                                          goalie_tactic_2};
+    std::vector<std::vector<std::shared_ptr<const Tactic>>> tactics = {{goalie_tactic_1},
+                                                                       {goalie_tactic_2}};
 
-    auto asst = stp.assignRobotsToTactics(tactics, world);
+    auto asst = stp.assignRobotsToTactics({tactics}, world);
 
     ASSERT_TRUE(asst.find(goalie_tactic_1) != asst.end());
     EXPECT_FALSE(asst.find(goalie_tactic_2) != asst.end());
@@ -517,7 +517,7 @@ TEST_F(STPTacticAssignmentTest,
     std::vector<std::shared_ptr<const Tactic>> tactics = {move_tactic_1};
     std::vector<Robot> expected_robots_assigned        = {robot_0, robot_1, robot_2};
 
-    auto asst = stp.assignRobotsToTactics(tactics, world);
+    auto asst = stp.assignRobotsToTactics({tactics}, world);
 
     // Check each tactic is assigned to the intended robot
     for (unsigned int i = 0; i < tactics.size(); i++)
