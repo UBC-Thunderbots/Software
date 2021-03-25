@@ -7,7 +7,7 @@
 #include "software/simulation/simulator_ball.h"
 
 /**
- * The SimulatorBall class acts as a wrapper for a PhysicsBall that deals with more
+ * The PhysicsSimulatorBall class acts as a wrapper for a PhysicsBall that deals with more
  * logic-focused elements for simulation.
  */
 class PhysicsSimulatorBall : public SimulatorBall
