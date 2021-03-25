@@ -1,8 +1,8 @@
 #pragma once
 
+#include <memory>
 #include <random>
 #include <vector>
-#include <memory>
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/hl.h"
@@ -131,26 +131,27 @@ class STP : public HL
      * capable of performing that tactic
      *
      * This will clear all assigned robots from all tactics
-     * 
+     *
      * The outer vector ranks the inner vector of tactics by priority. Tactics in
      * lower indexes of the outer vector will be assigned first. For example:
-     * 
+     *
      * {
      *      {goalie_tactic},
      *      {crease_defender_1, crease_defender_2},
      *      {move_tactic},
      * }
-     * 
-     * The cost of assigning a goalie_tactic will be minimized across all robots first,
-     * followed by both the crease_defender tactics. The move_tactic will be assigned last.
      *
-     * The order of the given tactics in the inner vector also determines their priority, with the
-     * tactics as the beginning of the vector being a higher priority than those at the end.
-     * The priority determines which tactics will NOT be assigned if there are not enough robots on the
-     * field to assign them all. For example, if a Play returned 4 Tactics but there were
-     * only 3 robots on the field at the time, only the first 3 Tactics in the vector
-     * would be assigned to robots and run. (In the example above, only the goalie and crease_defenders
-     * would be assigned)
+     * The cost of assigning a goalie_tactic will be minimized across all robots first,
+     * followed by both the crease_defender tactics. The move_tactic will be assigned
+     * last.
+     *
+     * The order of the given tactics in the inner vector also determines their priority,
+     * with the tactics at the beginning of the vector being a higher priority than those
+     * at the end. The priority determines which tactics will NOT be assigned if there are
+     * not enough robots on the field to assign them all. For example, if a Play returned
+     * 4 Tactics in total but there were only 3 robots on the field at the time, only the
+     * first 3 Tactics in the vectors would be assigned to robots and run. (In the example
+     * above, only the goalie and crease_defenders would be assigned)
      *
      * @param tactics The list of list of tactics that should be assigned a robot. Note
      * that this function modifies tactics to make the correct assignments, because we
@@ -161,11 +162,9 @@ class STP : public HL
      * @return map from assigned tactics to robot
      */
     std::map<std::shared_ptr<const Tactic>, Robot> assignRobotsToTactics(
-        std::vector<std::vector<std::shared_ptr<const Tactic>>> tactics,
-        const World &world);
+        ConstPriorityTacticVector tactics, const World &world);
 
    private:
-
     /**
      * Updates the current STP state based on the state of the world
      *

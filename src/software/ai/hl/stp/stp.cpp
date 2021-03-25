@@ -75,8 +75,9 @@ void STP::updateAIPlay(const World& world)
 std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World& world)
 {
     return current_play->get(
-        [this](const std::vector<std::shared_ptr<const Tactic>>& tactics,
-               const World& world) { return assignRobotsToTactics({tactics}, world); },
+        [this](const ConstPriorityTacticVector& tactics, const World& world) {
+            return assignRobotsToTactics(tactics, world);
+        },
         [this](const Tactic& tactic) {
             return buildMotionConstraintSet(current_game_state, tactic);
         },
@@ -181,12 +182,15 @@ bool STP::overrideAIPlayIfApplicable()
 
 
 std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
-    std::vector<std::vector<std::shared_ptr<const Tactic>>> tactics, const World& world)
+    ConstPriorityTacticVector tactics, const World& world)
 {
     std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment;
 
     std::optional<Robot> goalie_robot = world.friendlyTeam().goalie();
-    std::vector<Robot> robots   = world.friendlyTeam().getAllRobots();
+    std::vector<Robot> robots         = world.friendlyTeam().getAllRobots();
+
+    auto is_goalie_tactic = [](auto tactic) { return tactic->isGoalieTactic(); };
+    bool goalie_assigned  = false;
 
     // This functions optimizes the assignment of robots to tactics by minimizing
     // the total cost of assignment using the Hungarian algorithm
@@ -197,20 +201,31 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
     // algorithm that we use here
     for (auto tactic_vector : tactics)
     {
-        std::cerr<<tactic_vector.size()<<std::endl;
-        // We are only allowed to assign the pre-assigned goalie robot to the goalie tactic,
-        // so check if we have a goalie tactic in this tactic_vector and assign it to the
-        // goalie robot if it exists.
+        // We are only allowed to assign the pre-assigned goalie robot to the goalie
+        // tactic, so check if we have a goalie tactic in this tactic_vector and assign it
+        // to the goalie robot if it exists.
         auto goalie_tactic =
-            std::find_if(tactic_vector.begin(), tactic_vector.end(),
-                         [](auto tactic) { return tactic->isGoalieTactic(); });
+            std::find_if(tactic_vector.begin(), tactic_vector.end(), is_goalie_tactic);
 
-        if (goalie_tactic != tactic_vector.end() && goalie_robot)
+        if (goalie_tactic != tactic_vector.end())
         {
-            robot_tactic_assignment.emplace(*goalie_tactic, *goalie_robot);
-            std::remove(robots.begin(), robots.end(), *goalie_robot);
-            tactic_vector.erase(goalie_tactic);
+            if (goalie_robot && !goalie_assigned)
+            {
+                robot_tactic_assignment.emplace(*goalie_tactic, *goalie_robot);
+                goalie_assigned = true;
+
+                robots.erase(std::remove(robots.begin(), robots.end(), *goalie_robot),
+                             robots.end());
+            }
+
+            // remove all goalie tactics from the tactic_vector if they exist,
+            // we can only have 1 goalie
+            tactic_vector.erase(std::remove_if(tactic_vector.begin(), tactic_vector.end(),
+                                               is_goalie_tactic),
+                                tactic_vector.end());
         }
+
+        size_t num_tactics = tactic_vector.size();
 
         if (robots.size() < tactic_vector.size())
         {
@@ -218,6 +233,15 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
             // (aka don't assign) the tactics at the end of the vector since they are
             // considered lower priority
             tactic_vector.resize(robots.size());
+            num_tactics = tactic_vector.size();
+        }
+        else
+        {
+            // Assign rest of robots with StopTactic
+            for (auto i = tactic_vector.size(); i < robots.size(); i++)
+            {
+                tactic_vector.push_back(std::make_shared<StopTactic>(false));
+            }
         }
 
         size_t num_rows = robots.size();
@@ -271,8 +295,6 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
         Munkres<double> m;
         m.solve(matrix);
 
-        std::cerr<<matrix<<std::endl;
-
         // The Munkres matrix gets solved such that there will be exactly one 0 in every
         // row and exactly one 0 in every column. All other values will be -1. The 0's
         // indicate the "workers" and "jobs" (robots and tactics for us) that are most
@@ -282,19 +304,31 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
         //        -1, 0,-1,         and            0,-1,
         //         0,-1,-1,                       -1, 0,
         //        -1,-1, 0,
+        auto remaining_robots = robots;
+
         for (size_t row = 0; row < num_rows; row++)
         {
-            for (size_t col = 0; col < num_cols; col++)
+            for (size_t col = 0; col < num_tactics; col++)
             {
                 auto val = matrix(row, col);
                 if (val == 0)
                 {
                     robot_tactic_assignment.emplace(tactic_vector.at(col),
                                                     robots.at(row));
+                    remaining_robots.erase(remaining_robots.begin() + row);
                     break;
                 }
             }
         }
+
+        robots = remaining_robots;
+    }
+
+    // store readable assignment map for PlayInfo
+    readable_robot_tactic_assignment.clear();
+    for (const auto& [tactic, robot] : robot_tactic_assignment)
+    {
+        readable_robot_tactic_assignment.emplace(robot.id(), objectTypeName(*tactic));
     }
 
     return robot_tactic_assignment;
