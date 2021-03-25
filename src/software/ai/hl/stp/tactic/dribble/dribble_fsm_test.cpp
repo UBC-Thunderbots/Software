@@ -24,7 +24,7 @@ TEST(DribbleFSMTest, test_transitions)
                            TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM::GetPossessionState>));
 
-    // At ball point so transition to done
+    // Robot at ball point, so it has possession, so transition to dribble state
     robot = ::TestUtil::createRobotAtPos(Point(0.5, 0));
     fsm.process_event(
         DribbleFSM::Update({std::nullopt, std::nullopt, false},
