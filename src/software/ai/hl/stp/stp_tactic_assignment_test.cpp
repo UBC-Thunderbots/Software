@@ -485,8 +485,8 @@ TEST_F(STPTacticAssignmentTest,
 
     auto goalie_tactic_1 = std::make_shared<GoalieTestTactic>();
     auto goalie_tactic_2 = std::make_shared<GoalieTestTactic>();
-    std::vector<std::vector<std::shared_ptr<const Tactic>>> tactics = {goalie_tactic_1,
-                                                                       goalie_tactic_2};
+    std::vector<std::vector<std::shared_ptr<const Tactic>>> tactics = {
+        {goalie_tactic_1, goalie_tactic_2}};
 
     auto asst = stp.assignRobotsToTactics({tactics}, world);
 
