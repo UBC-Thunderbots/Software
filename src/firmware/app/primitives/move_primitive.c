@@ -217,32 +217,7 @@ static void app_move_primitive_tick(void* void_state_ptr, FirmwareWorld_t* world
     float minor_vec[2] = {major_vec[0], major_vec[1]};
     rotate(minor_vec, P_PI / 2);
 
-    PhysBot pb = app_physbot_create(robot, dest, major_vec, minor_vec);
-
-    const float dest_speed = state->position_trajectory.linear_speed[trajectory_index];
-
-    // plan major axis movement
-    float max_major_a     = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
-    float max_major_v     = state->max_speed_m_per_s;
-    float major_params[3] = {dest_speed, max_major_a, max_major_v};
-    app_physbot_planMove(&pb.maj, major_params);
-
-    // plan minor axis movement
-    float max_minor_a = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / 2.0f;
-    float max_minor_v = state->max_speed_m_per_s / 2.0f;
-    float minor_params[3] = {0, max_minor_a, max_minor_v};
-    app_physbot_planMove(&pb.min, minor_params);
-
-    // plan rotation movement
-    plan_move_rotation(&pb, app_firmware_robot_getVelocityAngular(robot));
-
-    float accel[3] = {0, 0, pb.rot.accel};
-
-    // rotate the accel and apply it
-    app_physbot_computeAccelInLocalCoordinates(
-        accel, pb, app_firmware_robot_getOrientation(robot), major_vec, minor_vec);
-
-    app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
+    app_firmware_robot_follow_pos_trajectory(position_trajectory);
 }
 
 /**

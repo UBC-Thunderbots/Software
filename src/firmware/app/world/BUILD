@@ -70,7 +70,8 @@ cc_library(
         ":charger",
         ":chicker",
         ":dribbler",
-        ":wheel",
+        ":force_wheel",
+        ":velocity_wheel",
     ],
 )
 
@@ -106,9 +107,15 @@ cc_test(
 )
 
 cc_library(
-    name = "wheel",
-    srcs = ["wheel.c"],
-    hdrs = ["wheel.h"],
+    name = "force_wheel",
+    srcs = ["force_wheel.c"],
+    hdrs = ["force_wheel.h"],
+)
+
+cc_library(
+    name = "velocity_wheel",
+    srcs = ["velocity_wheel.c"],
+    hdrs = ["velocity_wheel.h"],
 )
 
 cc_test(
