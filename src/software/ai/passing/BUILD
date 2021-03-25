@@ -50,6 +50,7 @@ cc_test(
 
 cc_library(
     name = "pass_with_rating",
+    srcs = ["pass_with_rating.cpp"],
     hdrs = ["pass_with_rating.h"],
     deps = [
         ":pass",

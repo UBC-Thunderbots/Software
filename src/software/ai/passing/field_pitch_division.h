@@ -4,6 +4,9 @@
 
 /**
  * A FieldPitchDivision is abstraction around how we split up the field.
+ *
+ * Pitch divisions with zones outside of the field may lead to undefined
+ * behaviour. Overlapping zones are supported, but not recommended.
  */
 template <class ZoneEnum>
 class FieldPitchDivision

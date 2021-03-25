@@ -87,7 +87,7 @@ class PassGenerator
 
     /**
      * Given a map of passes, runs a gradient descent optimizer to find
-     * better passes
+     * better passes.
      *
      * @param The world
      * @param The passes to be optimized mapped to the zone
@@ -97,7 +97,7 @@ class PassGenerator
                                          const ZonePassMap<ZoneEnum>& initial_passes);
 
     /**
-     * Re-evaluates ratePass on the "previous ticks" passes and keeps the higher pass
+     * Re-evaluates ratePass on the previous worlds passes and keeps the better pass
      * w/ the higher score in current_best_passes_;
      *
      * @param The world

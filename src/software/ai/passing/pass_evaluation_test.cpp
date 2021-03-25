@@ -93,10 +93,3 @@ TEST(PassEvaluation, get_pitch_division_and_timestamp)
     EXPECT_EQ(pass_eval.getFieldPitchDivsion(), pitch_division);
     EXPECT_EQ(pass_eval.getEvaluationTime(), Timestamp::fromSeconds(10));
 }
-
-bool operator==(const PassWithRating &lhs, const PassWithRating &rhs)
-{
-    return lhs.rating == rhs.rating &&
-           lhs.pass.receiverPoint() == rhs.pass.receiverPoint() &&
-           lhs.pass.speed() == rhs.pass.speed();
-}
