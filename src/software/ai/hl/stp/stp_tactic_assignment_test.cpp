@@ -485,8 +485,8 @@ TEST_F(STPTacticAssignmentTest,
 
     auto goalie_tactic_1 = std::make_shared<GoalieTestTactic>();
     auto goalie_tactic_2 = std::make_shared<GoalieTestTactic>();
-    std::vector<std::vector<std::shared_ptr<const Tactic>>> tactics = {{goalie_tactic_1},
-                                                                       {goalie_tactic_2}};
+    std::vector<std::vector<std::shared_ptr<const Tactic>>> tactics = {goalie_tactic_1,
+                                                                       goalie_tactic_2};
 
     auto asst = stp.assignRobotsToTactics({tactics}, world);
 
@@ -545,45 +545,6 @@ TEST_F(STPTacticAssignmentTest, test_greediness_of_tiered_assignment)
     //
     // {{move_tactic_1, move_tactic_2}} we expect (r2 to m1) and (r1 to m2)
     // {{move_tactic_1}, {move_tactic_2}} we expect (r1 to m1) and (r2 to m2)
-    Team friendly_team(Duration::fromSeconds(0));
-
-    Robot robot_0(0, Point(-1.5, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(0.5, 5), Vector(), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0));
-
-    friendly_team.updateRobots({robot_0, robot_1});
-    world.updateFriendlyTeamState(friendly_team);
-
-    auto move_tactic_0 = std::make_shared<MoveTestTactic>();
-    auto move_tactic_1 = std::make_shared<MoveTestTactic>();
-
-    move_tactic_0->updateControlParams(Point(0, 0));
-    move_tactic_1->updateControlParams(Point(2, 0));
-
-    std::vector<std::vector<std::shared_ptr<const Tactic>>> normal_tactics = {
-        {move_tactic_0, move_tactic_1}};
-
-    auto asst = stp.assignRobotsToTactics(normal_tactics, world);
-
-    ASSERT_TRUE(asst.find(move_tactic_0) != asst.end());
-    ASSERT_TRUE(asst.find(move_tactic_1) != asst.end());
-    EXPECT_EQ(asst.find(move_tactic_0)->second, robot_0);
-    EXPECT_EQ(asst.find(move_tactic_1)->second, robot_1);
-
-    std::vector<std::vector<std::shared_ptr<const Tactic>>> greedy_tactics = {
-        {move_tactic_0}, {move_tactic_1}};
-
-    asst = stp.assignRobotsToTactics(greedy_tactics, world);
-
-    ASSERT_TRUE(asst.find(move_tactic_0) != asst.end());
-    ASSERT_TRUE(asst.find(move_tactic_1) != asst.end());
-    EXPECT_EQ(asst.find(move_tactic_0)->second, robot_0);
-    EXPECT_EQ(asst.find(move_tactic_1)->second, robot_1);
-}
-
-TEST_F(STPTacticAssignmentTest, test_tiered_assignment_with_goalie)
-{
     Team friendly_team(Duration::fromSeconds(0));
 
     Robot robot_0(0, Point(-1.5, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
