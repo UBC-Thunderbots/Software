@@ -480,3 +480,30 @@ cc_library(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "penalty_goalie_tactic",
+    srcs = ["penalty_goalie_tactic.cpp"],
+    hdrs = ["penalty_goalie_tactic.h"],
+    deps = [
+        ":tactic",
+        "//shared:constants",
+        "//software/ai/evaluation:calc_best_shot",
+        "//software/ai/hl/stp/action:chip_action",
+        "//software/ai/hl/stp/action:intercept_ball_action",
+        "//software/ai/hl/stp/action:kick_action",
+        "//software/ai/hl/stp/action:move_action",
+        "//software/logger",
+        "//software/parameter:dynamic_parameters",
+    ],
+)
+
+cc_test(
+    name = "penalty_goalie_tactic_test",
+    srcs = ["penalty_goalie_tactic_test.cpp"],
+    deps = [
+        ":penalty_goalie_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
