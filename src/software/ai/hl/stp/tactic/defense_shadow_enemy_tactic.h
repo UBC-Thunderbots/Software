@@ -1,8 +1,8 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/parameter/dynamic_parameters.h"
 
 /**
  * The ShadowEnemyTactic will shadow and mark the robot specified in the given
@@ -28,8 +28,7 @@ class DefenseShadowEnemyTactic : public Tactic
         const Field &field, const Team &friendly_team, const Team &enemy_team,
         const Ball &ball, bool ignore_goalie, double shadow_distance,
         std::shared_ptr<const DefenseShadowEnemyTacticConfig>
-            defense_shadow_enemy_tactic_config =
-                DynamicParameters->getAIConfig()->getDefenseShadowEnemyTacticConfig());
+            defense_shadow_enemy_tactic_config);
 
     DefenseShadowEnemyTactic() = delete;
 

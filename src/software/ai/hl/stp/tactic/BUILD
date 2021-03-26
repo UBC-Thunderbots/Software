@@ -25,38 +25,6 @@ cc_test(
     ],
 )
 
-cc_library(
-    name = "chip_tactic",
-    srcs = ["chip_tactic.cpp"],
-    hdrs = ["chip_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//software/ai/hl/stp/action:chip_action",
-        "//software/logger",
-    ],
-)
-
-cc_test(
-    name = "chip_tactic_test",
-    srcs = ["chip_tactic_test.cpp"],
-    deps = [
-        ":chip_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "kickoff_chip_tactic_test",
-    srcs = ["kickoff_chip_tactic_test.cpp"],
-    deps = [
-        ":kickoff_chip_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
 cc_test(
     name = "penalty_setup_tactic_test",
     srcs = ["penalty_setup_tactic_test.cpp"],
@@ -72,9 +40,9 @@ cc_library(
     srcs = ["kickoff_chip_tactic.cpp"],
     hdrs = ["kickoff_chip_tactic.h"],
     deps = [
-        ":chip_tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
+        "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/logger",
     ],
 )
@@ -86,8 +54,9 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:autochip_move_action",
+        "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom/algorithms",
         "//software/logger",
@@ -113,12 +82,12 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:autochip_move_action",
+        "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
     ],
 )
 
@@ -139,9 +108,10 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:autochip_move_action",
         "//software/ai/hl/stp/action:chip_action",
+        "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/geom:line",
         "//software/geom/algorithms",
@@ -159,57 +129,6 @@ cc_test(
         "//software/ai/hl/stp/action:stop_action",
         "//software/test_util",
         "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "move_tactic",
-    srcs = ["move_tactic.cpp"],
-    hdrs = [
-        "move_fsm.h",
-        "move_tactic.h",
-    ],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/intent:move_intent",
-        "//software/logger",
-    ],
-)
-
-cc_test(
-    name = "move_fsm_test",
-    srcs = ["move_fsm_test.cpp"],
-    deps = [
-        ":move_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "move_tactic_test",
-    srcs = ["move_tactic_test.cpp"],
-    deps = [
-        ":move_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "simulated_move_tactic_test",
-    srcs = ["simulated_move_tactic_test.cpp"],
-    deps = [
-        "//software/ai/hl/stp/tactic:move_tactic",
-        "//software/simulated_tests:simulated_tactic_test_fixture",
-        "//software/simulated_tests:simulated_test_main",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/simulated_tests/validation_functions",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
     ],
 )
 
@@ -254,16 +173,26 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "penalty_kick_tactic_test",
+    srcs = ["penalty_kick_tactic_test.cpp"],
+    deps = [
+        ":penalty_kick_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "penalty_setup_tactic",
     srcs = ["penalty_setup_tactic.cpp"],
     hdrs = ["penalty_setup_tactic.h"],
     deps = [
-        ":move_tactic",
         "//shared:constants",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
+        "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
     ],
 )
@@ -276,7 +205,6 @@ cc_library(
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:calc_best_shot",
-        "//software/ai/hl/stp/action:autokick_move_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass",
         "//software/geom/algorithms",
@@ -303,7 +231,7 @@ cc_library(
         ":tactic",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:autochip_move_action",
+        "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/logger",
     ],
@@ -326,11 +254,11 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
     ],
 )
 
@@ -351,13 +279,13 @@ cc_library(
     deps = [
         ":tactic",
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:intercept_ball_action",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
     ],
 )
 
@@ -372,54 +300,14 @@ cc_test(
 )
 
 cc_library(
-    name = "stop_tactic",
-    srcs = ["stop_tactic.cpp"],
-    hdrs = [
-        "stop_fsm.h",
-        "stop_tactic.h",
-    ],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/action:stop_action",
-        "//software/ai/intent:move_intent",
-        "//software/ai/intent:stop_intent",
-        "//software/logger",
-    ],
-)
-
-cc_test(
-    name = "stop_fsm_test",
-    srcs = ["stop_fsm_test.cpp"],
-    deps = [
-        ":stop_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "stop_tactic_test",
-    srcs = ["stop_tactic_test.cpp"],
-    deps = [
-        ":stop_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "all_tactics",
     hdrs = ["all_tactics.h"],
     deps = [
         ":cherry_pick_tactic",
-        ":chip_tactic",
         ":crease_defender_tactic",
         ":defense_shadow_enemy_tactic",
         ":goalie_tactic",
         ":kickoff_chip_tactic",
-        ":move_tactic",
         ":passer_tactic",
         ":penalty_kick_tactic",
         ":penalty_setup_tactic",
@@ -427,8 +315,13 @@ cc_library(
         ":shadow_enemy_tactic",
         ":shadow_free_kicker_tactic",
         ":shoot_goal_tactic",
-        ":stop_tactic",
         ":tactic",
+        "//software/ai/hl/stp/tactic/chip:chip_tactic",
+        "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
+        "//software/ai/hl/stp/tactic/get_possession:get_possession_tactic",
+        "//software/ai/hl/stp/tactic/kick:kick_tactic",
+        "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/hl/stp/tactic/stop:stop_tactic",
     ],
 )
 

@@ -1,7 +1,6 @@
 #include "software/world/world.h"
 
 #include "boost/circular_buffer.hpp"
-#include "software/parameter/dynamic_parameters.h"
 
 World::World(const Field &field, const Ball &ball, const Team &friendly_team,
              const Team &enemy_team, unsigned int buffer_size)

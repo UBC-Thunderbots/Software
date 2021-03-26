@@ -9,6 +9,9 @@
  *
  * This class will run the provided coroutine continuously by restarting it every time the
  * coroutine has completed.
+ *
+ * If the Validation Function yields a non-empty error message, then the validator will
+ * add a failure with the error message
  */
 class NonTerminatingFunctionValidator
 {
@@ -29,8 +32,10 @@ class NonTerminatingFunctionValidator
      * on construction. The ValidationFunction will be restarted if it has completed. As
      * such, the ValidationFunction can never be "done" and will only terminate due to
      * failures within the ValidationFunction, such as a failed GoogleTest assert
+     *
+     * @return Error message if the non-terminating validation function failed
      */
-    void executeAndCheckForFailures();
+    std::optional<std::string> executeAndCheckForFailures();
 
    private:
     /**

@@ -83,12 +83,15 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_positive_x_positive_y)
         KickIntent kick_intent = dynamic_cast<KickIntent &>(*intent_ptr);
         EXPECT_EQ(0, kick_intent.getRobotId());
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-            kick_intent.getPrimitive().kick().kick_origin(),
+            kick_intent.getPrimitive().move().destination(),
             *createPointProto(Point(0, 0))));
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-            kick_intent.getPrimitive().kick().kick_direction(),
+            kick_intent.getPrimitive().move().final_angle(),
             *createAngleProto(Angle::zero())));
-        EXPECT_EQ(5.0, kick_intent.getPrimitive().kick().kick_speed_meters_per_second());
+        EXPECT_EQ(5.0, kick_intent.getPrimitive()
+                           .move()
+                           .auto_chip_or_kick()
+                           .autokick_speed_m_per_s());
     }
     catch (...)
     {
@@ -121,12 +124,15 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_negative_x_positive_y)
         KickIntent kick_intent = dynamic_cast<KickIntent &>(*intent_ptr);
         EXPECT_EQ(0, kick_intent.getRobotId());
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-            kick_intent.getPrimitive().kick().kick_origin(),
+            kick_intent.getPrimitive().move().destination(),
             *createPointProto(Point(-2.5, 2.5))));
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-            kick_intent.getPrimitive().kick().kick_direction(),
+            kick_intent.getPrimitive().move().final_angle(),
             *createAngleProto(Angle::fromDegrees(105))));
-        EXPECT_EQ(5.0, kick_intent.getPrimitive().kick().kick_speed_meters_per_second());
+        EXPECT_EQ(5.0, kick_intent.getPrimitive()
+                           .move()
+                           .auto_chip_or_kick()
+                           .autokick_speed_m_per_s());
     }
     catch (...)
     {
@@ -159,12 +165,15 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_negative_x_negative_y)
         KickIntent kick_intent = dynamic_cast<KickIntent &>(*intent_ptr);
         EXPECT_EQ(0, kick_intent.getRobotId());
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-            kick_intent.getPrimitive().kick().kick_origin(),
+            kick_intent.getPrimitive().move().destination(),
             *createPointProto(Point(-0.05, -0.2))));
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-            kick_intent.getPrimitive().kick().kick_direction(),
+            kick_intent.getPrimitive().move().final_angle(),
             *createAngleProto(Angle::fromDegrees(255))));
-        EXPECT_EQ(3.0, kick_intent.getPrimitive().kick().kick_speed_meters_per_second());
+        EXPECT_EQ(3.0, kick_intent.getPrimitive()
+                           .move()
+                           .auto_chip_or_kick()
+                           .autokick_speed_m_per_s());
     }
     catch (...)
     {
@@ -197,12 +206,15 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_positive_x_negative_y)
         KickIntent kick_intent = dynamic_cast<KickIntent &>(*intent_ptr);
         EXPECT_EQ(0, kick_intent.getRobotId());
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-            kick_intent.getPrimitive().kick().kick_origin(),
+            kick_intent.getPrimitive().move().destination(),
             *createPointProto(Point(0, 0))));
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-            kick_intent.getPrimitive().kick().kick_direction(),
+            kick_intent.getPrimitive().move().final_angle(),
             *createAngleProto(Angle::fromDegrees(306))));
-        EXPECT_EQ(5.0, kick_intent.getPrimitive().kick().kick_speed_meters_per_second());
+        EXPECT_EQ(5.0, kick_intent.getPrimitive()
+                           .move()
+                           .auto_chip_or_kick()
+                           .autokick_speed_m_per_s());
     }
     catch (...)
     {

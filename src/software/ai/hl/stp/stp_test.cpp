@@ -5,42 +5,48 @@
 #include <algorithm>
 #include <exception>
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/test_plays/halt_test_play.h"
 #include "software/ai/hl/stp/play/test_plays/move_test_play.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/test_util/test_util.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 class STPTest : public ::testing::Test
 {
    public:
-    STPTest() : stp([]() { return nullptr; }, DynamicParameters->getAIControlConfig(), 0)
+    STPTest()
+        : world(::TestUtil::createBlankTestingWorld()),
+          mutable_ai_control_config(std::make_shared<AiControlConfig>()),
+          ai_control_config(
+              std::const_pointer_cast<const AiControlConfig>(mutable_ai_control_config)),
+          play_config(std::make_shared<const ThunderbotsConfig>()->getPlayConfig()),
+          default_play_constructor([this]() -> std::unique_ptr<Play> {
+              return std::make_unique<HaltTestPlay>(play_config);
+          }),
+          // Give an explicit seed to STP so that our tests are deterministic
+          stp(default_play_constructor, ai_control_config, play_config, 123)
     {
+        std::cout << "Constructor called";
     }
 
    protected:
     void SetUp() override
     {
-        auto default_play_constructor = []() -> std::unique_ptr<Play> {
-            return std::make_unique<HaltTestPlay>();
-        };
-        // Explicitly setting override AI Play to be false because we can't rely on
-        // default values
-        MutableDynamicParameters->getMutableAIControlConfig()
-            ->mutableOverrideAIPlay()
-            ->setValue(false);
-        // Give an explicit seed to STP so that our tests are deterministic
-        stp   = STP(default_play_constructor, DynamicParameters->getAIControlConfig(), 0);
-        world = ::TestUtil::createBlankTestingWorld();
+        // Explicitly setting override AI Play to be false
+        mutable_ai_control_config->getMutableOverrideAiPlay()->setValue(false);
     }
 
+    World world;
+    std::shared_ptr<AiControlConfig> mutable_ai_control_config;
+    std::shared_ptr<const AiControlConfig> ai_control_config;
+    std::shared_ptr<const PlayConfig> play_config;
+    std::function<std::unique_ptr<Play>()> default_play_constructor;
     STP stp;
-    World world = ::TestUtil::createBlankTestingWorld();
 };
 
 TEST_F(STPTest, test_only_test_plays_are_registered_in_play_factory)
 {
-    auto play_names = GenericFactory<std::string, Play>::getRegisteredNames();
+    auto play_names = GenericFactory<std::string, Play, PlayConfig>::getRegisteredNames();
     EXPECT_EQ(2, play_names.size());
     EXPECT_EQ(std::count(play_names.begin(), play_names.end(), TYPENAME(MoveTestPlay)),
               1);
@@ -63,7 +69,7 @@ TEST_F(STPTest, test_calculate_new_play_when_one_play_valid)
     world = ::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
     auto play = stp.calculateNewPlay(world);
     EXPECT_TRUE(play);
-    EXPECT_EQ(TYPENAME(*play), TYPENAME(HaltTestPlay));
+    EXPECT_EQ(objectTypeName(*play), TYPENAME(HaltTestPlay));
 }
 
 TEST_F(STPTest, test_calculate_new_play_when_multiple_plays_valid)
@@ -80,14 +86,14 @@ TEST_F(STPTest, test_calculate_new_play_when_multiple_plays_valid)
     for (unsigned int i = 0; i < 10; i++)
     {
         play = stp.calculateNewPlay(world);
-        actual_play_names.emplace_back(TYPENAME(*play));
+        actual_play_names.emplace_back(objectTypeName(*play));
     }
 
     std::vector<std::string> expected_play_names = {
-        TYPENAME(MoveTestPlay), TYPENAME(MoveTestPlay), TYPENAME(MoveTestPlay),
-        TYPENAME(MoveTestPlay), TYPENAME(MoveTestPlay), TYPENAME(MoveTestPlay),
         TYPENAME(MoveTestPlay), TYPENAME(MoveTestPlay), TYPENAME(HaltTestPlay),
-        TYPENAME(MoveTestPlay),
+        TYPENAME(HaltTestPlay), TYPENAME(HaltTestPlay), TYPENAME(MoveTestPlay),
+        TYPENAME(MoveTestPlay), TYPENAME(MoveTestPlay), TYPENAME(MoveTestPlay),
+        TYPENAME(HaltTestPlay),
     };
 
     EXPECT_EQ(expected_play_names, actual_play_names);

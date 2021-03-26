@@ -3,8 +3,13 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/kickoff_chip_tactic.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
+
+KickoffFriendlyPlay::KickoffFriendlyPlay(std::shared_ptr<const PlayConfig> config)
+    : Play(config)
+{
+}
 
 bool KickoffFriendlyPlay::isApplicable(const World &world) const
 {
@@ -82,8 +87,9 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     // specific tactics
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
-    auto kickoff_chip_tactic = std::make_shared<KickoffChipTactic>(world.ball(), true);
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
+        play_config->getGoalieTacticConfig());
+    auto kickoff_chip_tactic = std::make_shared<KickoffChipTactic>(true);
 
     // Part 1: setup state (move to key positions)
     while (world.gameState().isSetupState())
@@ -140,4 +146,4 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, KickoffFriendlyPlay> factory;
+static TGenericFactory<std::string, Play, KickoffFriendlyPlay, PlayConfig> factory;

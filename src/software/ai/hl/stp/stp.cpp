@@ -8,6 +8,7 @@
 #include <exception>
 #include <random>
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"
@@ -15,17 +16,18 @@
 #include "software/ai/intent/stop_intent.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/util/typename/typename.h"
 
 STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
-         std::shared_ptr<const AIControlConfig> control_config, long random_seed)
+         std::shared_ptr<const AiControlConfig> control_config,
+         std::shared_ptr<const PlayConfig> play_config, long random_seed)
     : default_play_constructor(default_play_constructor),
       current_play(nullptr),
       readable_robot_tactic_assignment(),
       random_number_generator(random_seed),
       control_config(control_config),
+      play_config(play_config),
       override_play_name(""),
       previous_override_play_name(""),
       override_play(false),
@@ -43,26 +45,6 @@ void STP::updateSTPState(const World& world)
 void STP::updateGameState(const World& world)
 {
     current_game_state = world.gameState();
-    if (control_config->OverrideRefereeCommand()->value())
-    {
-        std::string previous_state_string =
-            control_config->PreviousRefereeCommand()->value();
-        std::string current_state_string =
-            control_config->CurrentRefereeCommand()->value();
-        try
-        {
-            RefereeCommand previous_state =
-                fromStringToRefereeCommand(previous_state_string);
-            current_game_state.updateRefereeCommand(previous_state);
-            RefereeCommand current_state =
-                fromStringToRefereeCommand(current_state_string);
-            current_game_state.updateRefereeCommand(current_state);
-        }
-        catch (std::invalid_argument& e)
-        {
-            LOG(WARNING) << e.what();
-        }
-    }
 }
 
 void STP::updateAIPlay(const World& world)
@@ -83,7 +65,7 @@ void STP::updateAIPlay(const World& world)
                 LOG(WARNING) << "Unable to assign a new Play. No Plays are valid"
                              << std::endl;
                 LOG(WARNING) << "Falling back to the default Play - "
-                             << TYPENAME(*default_play) << std::endl;
+                             << objectTypeName(*default_play) << std::endl;
                 current_play = std::move(default_play);
             }
         }
@@ -111,9 +93,9 @@ std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
 {
     std::vector<std::unique_ptr<Play>> applicable_plays;
     for (const auto& play_constructor :
-         GenericFactory<std::string, Play>::getRegisteredConstructors())
+         GenericFactory<std::string, Play, PlayConfig>::getRegisteredConstructors())
     {
-        auto play = play_constructor();
+        auto play = play_constructor(play_config);
         if (play->isApplicable(world))
         {
             applicable_plays.emplace_back(std::move(play));
@@ -139,7 +121,7 @@ std::optional<std::string> STP::getCurrentPlayName() const
 {
     if (current_play)
     {
-        return std::make_optional(TYPENAME(*current_play));
+        return std::make_optional(objectTypeName(*current_play));
     }
 
     return std::nullopt;
@@ -163,11 +145,11 @@ PlayInfo STP::getPlayInfo()
 bool STP::overrideAIPlayIfApplicable()
 {
     previous_override_play           = override_play;
-    override_play                    = control_config->OverrideAIPlay()->value();
+    override_play                    = control_config->getOverrideAiPlay()->value();
     bool override_play_value_changed = previous_override_play != override_play;
 
     previous_override_play_name = override_play_name;
-    override_play_name          = control_config->CurrentAIPlay()->value();
+    override_play_name          = control_config->getCurrentAiPlay()->value();
     bool override_play_name_value_changed =
         previous_override_play_name != override_play_name;
 
@@ -180,8 +162,8 @@ bool STP::overrideAIPlayIfApplicable()
         {
             try
             {
-                current_play =
-                    GenericFactory<std::string, Play>::create(override_play_name);
+                current_play = GenericFactory<std::string, Play, PlayConfig>::create(
+                    override_play_name, play_config);
             }
             catch (std::invalid_argument&)
             {
@@ -189,7 +171,7 @@ bool STP::overrideAIPlayIfApplicable()
                 LOG(WARNING) << "Error: The Play \"" << override_play_name
                              << "\" specified in the override is not valid." << std::endl;
                 LOG(WARNING) << "Falling back to the default Play - "
-                             << TYPENAME(*default_play) << std::endl;
+                             << objectTypeName(*default_play) << std::endl;
                 current_play = std::move(default_play);
             }
         }
@@ -243,7 +225,7 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
     readable_robot_tactic_assignment.clear();
     for (const auto& [tactic, robot] : robot_tactic_assignment)
     {
-        readable_robot_tactic_assignment.emplace(robot.id(), TYPENAME(*tactic));
+        readable_robot_tactic_assignment.emplace(robot.id(), objectTypeName(*tactic));
     }
 
     return robot_tactic_assignment;

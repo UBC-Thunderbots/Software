@@ -9,61 +9,32 @@ message Primitive
     oneof primitive
     {
         EstopPrimitive estop                  = 1;
-        ChipPrimitive chip                    = 2;
-        KickPrimitive kick                    = 3;
-        MovePrimitive move                    = 4;
-        SpinningMovePrimitive spinning_move   = 5;
-        AutochipMovePrimitive autochip_move   = 6;
-        AutokickMovePrimitive autokick_move   = 7;
-        StopPrimitive stop                    = 8;
-        DirectControlPrimitive direct_control = 9;
+        MovePrimitive move                    = 2;
+        StopPrimitive stop                    = 3;
+        DirectControlPrimitive direct_control = 4;
     }
 }
 
 message EstopPrimitive {}
 
-message ChipPrimitive
-{
-    Point chip_origin          = 1;
-    Angle chip_direction       = 2;
-    float chip_distance_meters = 3;
-}
-
-message KickPrimitive
-{
-    Point kick_origin                  = 1;
-    Angle kick_direction               = 2;
-    float kick_speed_meters_per_second = 3;
-}
-
 message MovePrimitive
 {
-    MovePositionParams position_params = 1;
-    Angle final_angle                  = 2;
-    float dribbler_speed_rpm           = 3;
-}
+    message AutoChipOrKick
+    {
+        oneof auto_chip_or_kick
+        {
+            float autokick_speed_m_per_s   = 1;
+            float autochip_distance_meters = 2;
+        };
+    }
 
-message SpinningMovePrimitive
-{
-    MovePositionParams position_params = 1;
-    AngularVelocity angular_velocity   = 2;
-    float dribbler_speed_rpm           = 3;
-}
-
-message AutochipMovePrimitive
-{
-    MovePositionParams position_params = 1;
-    Angle final_angle                  = 2;
-    float dribbler_speed_rpm           = 3;
-    float chip_distance_meters         = 4;
-}
-
-message AutokickMovePrimitive
-{
-    MovePositionParams position_params = 1;
-    Angle final_angle                  = 2;
-    float dribbler_speed_rpm           = 3;
-    float kick_speed_meters_per_second = 4;
+    Point destination                = 1;
+    float final_speed_m_per_s        = 2;
+    Angle final_angle                = 3;
+    float dribbler_speed_rpm         = 4;
+    float max_speed_m_per_s          = 5;
+    AutoChipOrKick auto_chip_or_kick = 6;
+    float target_spin_rev_per_s      = 7;
 }
 
 message StopPrimitive
@@ -107,16 +78,10 @@ message DirectControlPrimitive
     ChargeMode charge_mode = 3;
     oneof chick_command
     {
-        float kick_speed_meters_per_second     = 4;
-        float chip_distance_meters             = 5;
-        float autokick_speed_meters_per_second = 6;
-        float autochip_distance_meters         = 7;
+        float kick_speed_m_per_s       = 4;
+        float chip_distance_meters     = 5;
+        float autokick_speed_m_per_s   = 6;
+        float autochip_distance_meters = 7;
     }
     float dribbler_speed_rpm = 8;
-}
-
-message MovePositionParams
-{
-    Point destination                   = 1;
-    float final_speed_meters_per_second = 2;
 }

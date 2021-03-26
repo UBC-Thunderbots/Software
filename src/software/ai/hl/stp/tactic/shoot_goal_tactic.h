@@ -1,10 +1,10 @@
 #pragma once
 
 #include "shared/constants.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/parameter/dynamic_parameters.h"
 
 /**
  * The ShootGoalTactic will make the assigned robot shoot on the enemy net
@@ -32,8 +32,7 @@ class ShootGoalTactic : public Tactic
         const Field& field, const Team& friendly_team, const Team& enemy_team,
         const Ball& ball, Angle min_net_open_angle, std::optional<Point> chip_target,
         bool loop_forever,
-        std::shared_ptr<const ShootGoalTacticConfig> shoot_goal_tactic_config =
-            DynamicParameters->getAIConfig()->getShootGoalTacticConfig());
+        std::shared_ptr<const ShootGoalTacticConfig> shoot_goal_tactic_config);
 
     ShootGoalTactic() = delete;
 

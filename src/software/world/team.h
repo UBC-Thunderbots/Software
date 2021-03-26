@@ -120,6 +120,17 @@ class Team
     void setRobotExpiryBuffer(const Duration& new_robot_expiry_buffer_duration);
 
     /**
+     * Updates the unavailable capabilities of a specific robot. If the team does
+     * not have that robot, does not do anything.
+     *
+     * @param id the id of the desired Robot
+     * @param new_unavailable_robot_capabilities a set of the updated unavailable
+     * robot capabilities
+     * */
+    void setUnavailableRobotCapabilities(
+        RobotId id, const std::set<RobotCapability>& new_unavailable_robot_capabilities);
+
+    /**
      * Returns the robot with the given id. If this team does not have that robot,
      * returns an std::nullopt
      *
@@ -146,7 +157,7 @@ class Team
      * @return The ID of the goalie robot for this team if one is specified, otherwise
      * returns std::nullopt
      */
-    std::optional<unsigned int> getGoalieID() const;
+    std::optional<unsigned int> getGoalieId() const;
 
     /**
      * Returns a vector of all the robots on this team.

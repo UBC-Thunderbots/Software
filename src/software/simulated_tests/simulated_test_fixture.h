@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "software/ai/hl/stp/play/halt_play.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/sensor_fusion/sensor_fusion.h"
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
@@ -23,6 +24,10 @@ class SimulatedTestFixture : public ::testing::Test
     // if false, visualizer does not run during simulated tests
     // if true, running tests are displayed on the visualizer
     static bool enable_visualizer;
+
+    // Controls whether the AI will be stopped when the simulated test starts
+    // only if enable_visualizer is true
+    static bool stop_ai_on_start;
 
    protected:
     void SetUp() override;
@@ -102,7 +107,23 @@ class SimulatedTestFixture : public ::testing::Test
      */
     Field field() const;
 
+    // The dynamic params being used in the tests
+    std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config;
+    std::shared_ptr<const ThunderbotsConfig> thunderbots_config;
+
    private:
+    /**
+     * Runs one tick of the test and checks if the validation function is done
+     *
+     * @param simulation_time_step time step for stepping the simulation
+     * @param ai_time_step minimum time for one tick of AI
+     * @param world the shared_ptr to the world that is updated by this function
+     *
+     * @return if validation functions are done
+     */
+    bool tickTest(Duration simulation_time_step, Duration ai_time_step,
+                  std::shared_ptr<World> world);
+
     /**
      * A helper function that updates SensorFusion with the latest data from the Simulator
      */

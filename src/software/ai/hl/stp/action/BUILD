@@ -102,63 +102,6 @@ cc_test(
 )
 
 cc_library(
-    name = "autochip_move_action",
-    srcs = ["autochip_move_action.cpp"],
-    hdrs = ["autochip_move_action.h"],
-    deps = [
-        ":move_action",
-        "//software/ai/intent:autochip_move_intent",
-    ],
-)
-
-cc_test(
-    name = "autochip_move_action_test",
-    srcs = ["autochip_move_action_test.cpp"],
-    deps = [
-        ":autochip_move_action",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "autokick_move_action",
-    srcs = ["autokick_move_action.cpp"],
-    hdrs = ["autokick_move_action.h"],
-    deps = [
-        ":move_action",
-        "//software/ai/intent:autokick_move_intent",
-    ],
-)
-
-cc_test(
-    name = "autokick_move_action_test",
-    srcs = ["autokick_move_action_test.cpp"],
-    deps = [
-        ":autokick_move_action",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "spinning_move_action",
-    srcs = ["spinning_move_action.cpp"],
-    hdrs = ["spinning_move_action.h"],
-    deps = [
-        ":action",
-        "//software/ai/intent:spinning_move_intent",
-    ],
-)
-
-cc_test(
-    name = "spinning_move_action_test",
-    srcs = ["spinning_move_action_test.cpp"],
-    deps = [
-        ":spinning_move_action",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "stop_action",
     srcs = ["stop_action.cpp"],
     hdrs = ["stop_action.h"],
@@ -185,7 +128,6 @@ cc_library(
         ":intercept_ball_action",
         ":kick_action",
         ":move_action",
-        ":spinning_move_action",
         ":stop_action",
     ],
 )

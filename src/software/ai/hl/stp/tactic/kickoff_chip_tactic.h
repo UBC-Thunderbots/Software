@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/chip_tactic.h"
+#include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
 
 /**
  * The KickoffChipTactic will move the assigned robot to the given chip origin and then
@@ -17,7 +17,7 @@ class KickoffChipTactic : public ChipTactic
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit KickoffChipTactic(const Ball& ball, bool loop_forever);
+    explicit KickoffChipTactic(bool loop_forever);
 
     KickoffChipTactic() = delete;
 

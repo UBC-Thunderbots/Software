@@ -1,20 +1,17 @@
 #pragma once
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "shared/proto/robot_status_msg.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/backend/backend.h"
 #include "software/backend/ssl_proto_client.h"
 #include "software/networking/threaded_proto_multicast_listener.h"
 #include "software/networking/threaded_proto_multicast_sender.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/proto/logging/proto_log_reader.h"
 
 class ReplayBackend : public Backend
 {
    public:
-    explicit ReplayBackend(const std::string& replay_input_dir =
-                               DynamicParameters->getFullSystemMainCommandLineArgs()
-                                   ->replay_input_dir()
-                                   ->value());
+    explicit ReplayBackend(std::shared_ptr<const BackendConfig> config);
 
    private:
     void onValueReceived(TbotsProto::PrimitiveSet primitives) override;
