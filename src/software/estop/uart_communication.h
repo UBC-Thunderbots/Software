@@ -63,12 +63,11 @@ class UartCommunication
      * Reads a given number of bytes from serial port until num_read_bytes is read or
      * error occurs. Blocks current thread.
      *
-     * @param read_val buffer that will be set to the read data
      * @param num_read_bytes number of bytes that should be read
-     * @return true upon success, false otherwise
+     * @return vector of size num_read_bytes with read data
      * @throws boost:exception upon error during read
      */
-    bool serialRead(std::vector<unsigned char> &read_val, size_t num_read_bytes);
+    std::vector<unsigned char> serialRead(size_t num_read_bytes);
 
     /**
      * Flushes serial port data

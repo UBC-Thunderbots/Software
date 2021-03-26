@@ -10,15 +10,13 @@ UartCommunication::UartCommunication(IoService& io_service, int baud_rate,
     openPort(io_service, baud_rate, device_serial_port);
 }
 
-bool UartCommunication::serialRead(std::vector<unsigned char>& read_val,
-                                   size_t num_read_bytes)
+std::vector<unsigned char> UartCommunication::serialRead(size_t num_read_bytes)
 {
-    std::vector<unsigned char> temp_buffer(num_read_bytes);
-    size_t read_size =
-        boost::asio::read(*serial_port, boost::asio::buffer(temp_buffer, num_read_bytes));
-    read_val = temp_buffer;
+    std::vector<unsigned char> read_buffer(num_read_bytes);
 
-    return read_size == num_read_bytes;
+    boost::asio::read(*serial_port, boost::asio::buffer(read_buffer, num_read_bytes));
+
+    return read_buffer;
 }
 
 bool UartCommunication::serialWrite(const std::vector<unsigned char>& write_val)
