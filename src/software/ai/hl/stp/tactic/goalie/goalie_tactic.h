@@ -46,8 +46,8 @@ class GoalieTactic : public Tactic
      * @param goalie_restricted_area The rectangle that the goalie is to stay in
      * @returns goalie_suggested_position That the goalie should go to
      */
-    std::optional<Point> restrainGoalieInRectangle(Point goalie_desired_position,
-                                                   Rectangle goalie_restricted_area);
+    /*std::optional<Point> restrainGoalieInRectangle(Point goalie_desired_position,
+                                                   Rectangle goalie_restricted_area);*/
 
     void updateWorldParams(const World &world) override;
 
@@ -63,7 +63,7 @@ class GoalieTactic : public Tactic
     /**
      * Gets intersections between the ball velocity ray and the full goal segment
      */
-    std::vector<Point> getIntersectionsBetweenBallVelocityAndFullGoalSegment();
+    /*std::vector<Point> getIntersectionsBetweenBallVelocityAndFullGoalSegment();*/
 
     /**
      * Creates action to panic and stop the ball
@@ -73,8 +73,8 @@ class GoalieTactic : public Tactic
      *
      * @return the action to use to stop the ball
      */
-    std::shared_ptr<Action> panicAndStopBall(std::shared_ptr<MoveAction> move_action,
-                                             const Point &stop_ball_point);
+    /*std::shared_ptr<Action> panicAndStopBall(std::shared_ptr<MoveAction> move_action,
+                                             const Point &stop_ball_point);*/
 
     /**
      * Chip ball if safe
@@ -84,8 +84,8 @@ class GoalieTactic : public Tactic
      *
      * @return Action to chip the ball if it is safe to do so
      */
-    std::shared_ptr<Action> chipBallIfSafe(std::shared_ptr<ChipAction> chip_action,
-                                           std::shared_ptr<StopAction> stop_action);
+    /*std::shared_ptr<Action> chipBallIfSafe(std::shared_ptr<ChipAction> chip_action,
+                                           std::shared_ptr<StopAction> stop_action);*/
 
     /**
      * Position robot to block potential shots
@@ -94,7 +94,7 @@ class GoalieTactic : public Tactic
      *
      * @return The Action to position the robot to block the shot
      */
-    std::shared_ptr<Action> positionToBlockShot(std::shared_ptr<MoveAction> move_action);
+    /*std::shared_ptr<Action> positionToBlockShot(std::shared_ptr<MoveAction> move_action);*/
 
     bool isGoalieTactic() const override;
 
@@ -110,9 +110,7 @@ class GoalieTactic : public Tactic
     static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
     // Tactic parameters
+    HFSM<GoalieFSM> fsm;
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
-
-    BaseFSM<GoalieFSM> fsm;
-
     GoalieFSM::ControlParams control_params;
 };

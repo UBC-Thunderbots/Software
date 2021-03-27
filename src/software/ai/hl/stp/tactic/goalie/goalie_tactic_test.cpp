@@ -13,6 +13,8 @@
 #include "software/geom/line.h"
 #include "software/test_util/test_util.h"
 
+// TODO: delete this file once simulated_goalie_tactic_test is implemented
+
 // The following tests will make sure the goalie stays in the requested
 // deflated defense area when best positioning to defend the ball.
 // The diagram below shows the requested position (R) by the goalie to where
@@ -47,7 +49,7 @@ TEST_P(GoalieRestrainTest, goalie_position_safe)
 {
     World world = ::TestUtil::createBlankTestingWorld();
     GoalieTactic tactic =
-        GoalieTactic(world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
+        GoalieTactic(/*world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),*/true,
                      std::make_shared<const GoalieTacticConfig>());
 
     // test to make sure that points given outside of the rectangle
@@ -99,8 +101,8 @@ class GoalieTacticTest : public testing::Test
         world.updateFriendlyTeamState(new_team);
 
         GoalieTactic tactic =
-            GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
-                         world.enemyTeam(), std::make_shared<const GoalieTacticConfig>());
+            GoalieTactic(/*world.ball(), world.field(), world.friendlyTeam(),
+                         world.enemyTeam()*/true, std::make_shared<const GoalieTacticConfig>());
         tactic.updateRobot(goalie);
         auto action_ptr = tactic.getNextAction();
 
@@ -125,8 +127,8 @@ class GoalieTacticTest : public testing::Test
         world.updateFriendlyTeamState(new_team);
 
         GoalieTactic tactic =
-            GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
-                         world.enemyTeam(), std::make_shared<const GoalieTacticConfig>());
+                GoalieTactic(/*world.ball(), world.field(), world.friendlyTeam(),
+                         world.enemyTeam()*/true, std::make_shared<const GoalieTacticConfig>());
         tactic.updateRobot(goalie);
         auto action_ptr = tactic.getNextAction();
 
@@ -148,8 +150,8 @@ class GoalieTacticTest : public testing::Test
         world.updateFriendlyTeamState(new_team);
 
         GoalieTactic tactic =
-            GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
-                         world.enemyTeam(), std::make_shared<const GoalieTacticConfig>());
+                GoalieTactic(/*world.ball(), world.field(), world.friendlyTeam(),
+                         world.enemyTeam()*/true, std::make_shared<const GoalieTacticConfig>());
         tactic.updateRobot(goalie);
         auto action_ptr = tactic.getNextAction();
 

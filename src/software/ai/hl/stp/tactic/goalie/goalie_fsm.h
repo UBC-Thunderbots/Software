@@ -199,7 +199,7 @@ struct GoalieFSM
         };
 
         /**
-         * Action that updates the ChipFSM if it's safe to chip the ball,
+         * Action that updates the ChipIntent if it's safe to chip the ball,
          * or updates the StopIntent if it's not safe to chip the ball
          *
          * @param event GoalieFSM::Update event
@@ -250,18 +250,18 @@ struct GoalieFSM
 
             // by how much should the defense area be decreased so the goalie stays close
             // towards the net
-            auto defense_area_deflation =
-                    event.control_params.goalie_tactic_config->getDefenseAreaDeflation()->value();
+            /*auto defense_area_deflation =
+                    event.control_params.goalie_tactic_config->getDefenseAreaDeflation()->value();*/
             // we want to restrict the block cone to the friendly crease, also potentially
             // scaled by a defense_area_deflation_parameter
-            Rectangle deflated_defense_area = event.common.world.field().friendlyDefenseArea();
-            deflated_defense_area.inflate(-defense_area_deflation);
+            /*Rectangle deflated_defense_area = event.common.world.field().friendlyDefenseArea();
+            deflated_defense_area.inflate(-defense_area_deflation);*/
 
             // restrain the goalie in the deflated defense area, if the goalie cannot be
             // restrained or if there is no proper intersection, then we safely default to
             // center of the goal
             auto clamped_goalie_pos =
-                    restrainGoalieInRectangle(event.common.world.field(), goalie_pos, deflated_defense_area);
+                    restrainGoalieInRectangle(event.common.world.field(), goalie_pos, event.common.world.field().friendlyDefenseArea());
 
             // if the goalie could not be restrained in the deflated defense area,
             // then the ball must be either on a really sharp angle to the net where
