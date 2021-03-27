@@ -20,3 +20,21 @@ TEST(TransitionConditionTest, test_robot_stopped)
                                AngularVelocity::zero(), Timestamp::fromSeconds(0));
     EXPECT_FALSE(robotStopped(moving_robot));
 }
+
+TEST(TransitionConditionTest, test_compare_angles)
+{
+    Angle angle1 = Angle::fromDegrees(130);
+    Angle angle2 = Angle::fromDegrees(135);
+    Angle angle3 = Angle::fromDegrees(138);
+    EXPECT_TRUE(compareAngles(angle1, angle2, Angle::fromDegrees(5)));
+    EXPECT_FALSE(compareAngles(angle1, angle3, Angle::fromDegrees(5)));
+}
+
+TEST(TransitionConditionTest, test_compare_points)
+{
+    Point point1 = Point(1, 1);
+    Point point2 = Point(1, 2);
+    Point point3 = Point(2, 1);
+    EXPECT_TRUE(comparePoints(point1, point2, 1.0));
+    EXPECT_FALSE(comparePoints(point1, point3, 1.0));
+}
