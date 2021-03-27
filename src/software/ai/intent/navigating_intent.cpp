@@ -36,7 +36,8 @@ bool NavigatingIntent::operator==(const NavigatingIntent &other) const
 {
     return Intent::operator==(other) && destination == other.destination &&
            final_speed == other.final_speed &&
-           ball_collision_type == other.ball_collision_type;
+           ball_collision_type == other.ball_collision_type &&
+           max_allowed_speed_mode == other.max_allowed_speed_mode;
 }
 
 bool NavigatingIntent::operator!=(const NavigatingIntent &other) const

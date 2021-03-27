@@ -1,4 +1,4 @@
-#include "software/simulation/simulator_ball.h"
+#include "software/simulation/physics_simulator_ball.h"
 
 #include <Box2D/Box2D.h>
 #include <gtest/gtest.h>
@@ -7,7 +7,7 @@
 #include "software/simulation/physics/physics_world.h"
 #include "software/test_util/test_util.h"
 
-class SimulatorBallTest : public testing::Test
+class PhysicsSimulatorBallTest : public testing::Test
 {
    protected:
     virtual void SetUp()
@@ -19,7 +19,7 @@ class SimulatorBallTest : public testing::Test
         auto physics_ball = physics_world->getPhysicsBall();
         if (physics_ball.lock())
         {
-            simulator_ball = std::make_unique<SimulatorBall>(physics_ball);
+            simulator_ball = std::make_unique<PhysicsSimulatorBall>(physics_ball);
         }
         else
         {
@@ -29,18 +29,18 @@ class SimulatorBallTest : public testing::Test
         }
     }
 
-    std::unique_ptr<SimulatorBall> simulator_ball;
+    std::unique_ptr<PhysicsSimulatorBall> simulator_ball;
 
    private:
     std::unique_ptr<PhysicsWorld> physics_world;
 };
 
-TEST_F(SimulatorBallTest, test_get_position)
+TEST_F(PhysicsSimulatorBallTest, test_get_position)
 {
     EXPECT_LT((simulator_ball->position() - Point(1.01, -0.4)).length(), 0.001);
 }
 
-TEST_F(SimulatorBallTest, test_get_linear_velocity)
+TEST_F(PhysicsSimulatorBallTest, test_get_linear_velocity)
 {
     EXPECT_LT((simulator_ball->velocity() - Vector(0.02, -4.5)).length(), 0.001);
 }
