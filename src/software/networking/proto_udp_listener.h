@@ -5,28 +5,30 @@
 #include <string>
 
 template <class ReceiveProtoT>
-class ProtoMulticastListener
+class ProtoUdpListener
 {
    public:
     /**
-     * Creates an ProtoMulticastListener that will listen for ReceiveProtoT packets from
+     * Creates an ProtoUdpListener that will listen for ReceiveProtoT packets from
      * the network on the given address and port. For every ReceiveProtoT packet received,
      * the receive_callback will be called to perform any operations desired by the caller
      *
      * @param io_service The io_service to use to service incoming ReceiveProtoT data
-     * @param ip_address The ip address of the multicast group on which to listen for
+     * @param ip_address The ip address to listen on for
      * the given ReceiveProtoT packets (IPv4 in dotted decimal or IPv6 in hex string)
      *  example IPv4: 192.168.0.2
      *  example IPv6: ff02::c3d0:42d2:bb8%wlp4s0 (the interface is specified after %)
      * @param port The port on which to listen for ReceiveProtoT packets
      * @param receive_callback The function to run for every ReceiveProtoT packet received
      * from the network
+     * @param multicast If true, joins the multicast group of given ip_address
      */
-    ProtoMulticastListener(boost::asio::io_service& io_service,
-                           const std::string& ip_address, unsigned short port,
-                           std::function<void(ReceiveProtoT&)> receive_callback);
+    ProtoUdpListener(boost::asio::io_service& io_service, const std::string& ip_address,
+                     unsigned short port,
+                     std::function<void(ReceiveProtoT&)> receive_callback,
+                     bool multicast);
 
-    virtual ~ProtoMulticastListener();
+    virtual ~ProtoUdpListener();
 
    private:
     /**
@@ -50,4 +52,4 @@ class ProtoMulticastListener
     std::function<void(ReceiveProtoT&)> receive_callback;
 };
 
-#include "software/networking/proto_multicast_listener.tpp"
+#include "software/networking/proto_udp_listener.tpp"

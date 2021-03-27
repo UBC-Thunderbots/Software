@@ -1,17 +1,18 @@
 #pragma once
 
 template <class ReceiveProtoT>
-ThreadedProtoMulticastListener<ReceiveProtoT>::ThreadedProtoMulticastListener(
+ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
     const std::string& ip_address, const unsigned short port,
-    std::function<void(ReceiveProtoT)> receive_callback)
-    : io_service(), multicast_listener(io_service, ip_address, port, receive_callback)
+    std::function<void(ReceiveProtoT)> receive_callback, bool multicast)
+    : io_service(),
+      udp_listener(io_service, ip_address, port, receive_callback, multicast)
 {
     // start the thread to run the io_service in the background
     io_service_thread = std::thread([this]() { io_service.run(); });
 }
 
 template <class ReceiveProtoT>
-ThreadedProtoMulticastListener<ReceiveProtoT>::~ThreadedProtoMulticastListener()
+ThreadedProtoUdpListener<ReceiveProtoT>::~ThreadedProtoUdpListener()
 {
     // Stop the io_service. This is safe to call from another thread.
     // https://stackoverflow.com/questions/4808848/boost-asio-stopping-io-service

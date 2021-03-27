@@ -1,13 +1,14 @@
 #pragma once
 
 #include "software/logger/logger.h"
-#include "software/networking/proto_multicast_listener.h"
+#include "software/networking/proto_udp_listener.h"
 #include "software/util/typename/typename.h"
 
 template <class ReceiveProtoT>
-ProtoMulticastListener<ReceiveProtoT>::ProtoMulticastListener(
+ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     boost::asio::io_service& io_service, const std::string& ip_address,
-    const unsigned short port, std::function<void(ReceiveProtoT&)> receive_callback)
+    const unsigned short port, std::function<void(ReceiveProtoT&)> receive_callback,
+    bool multicast)
     : socket_(io_service), receive_callback(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(
@@ -20,30 +21,33 @@ ProtoMulticastListener<ReceiveProtoT>::ProtoMulticastListener(
     }
     catch (const boost::exception& ex)
     {
-        LOG(FATAL) << "MulticastListener: There was an issue binding the socket to "
-                      "the listen_endpoint when trying to connect to the multicast "
+        LOG(FATAL) << "UdpListener: There was an issue binding the socket to "
+                      "the listen_endpoint when trying to connect to the "
                       "address. This may be due to another instance of the "
-                      "MulticastListener running and using the port already. "
+                      "UdpListener running and using the port already. "
                       "(ip = "
                    << ip_address << ", port = " << port << ")" << std::endl;
     }
 
-    // Join the multicast group.
-    socket_.set_option(boost::asio::ip::multicast::join_group(
-        boost::asio::ip::address::from_string(ip_address)));
+    if (multicast)
+    {
+        // Join the multicast group.
+        socket_.set_option(boost::asio::ip::multicast::join_group(
+            boost::asio::ip::address::from_string(ip_address)));
+    }
 
     // Start listening for data asynchronously
     // See here for a great explanation about asynchronous operations:
     // https://stackoverflow.com/questions/34680985/what-is-the-difference-between-asynchronous-programming-and-multithreading
     socket_.async_receive_from(boost::asio::buffer(raw_received_data_, MAX_BUFFER_LENGTH),
                                sender_endpoint_,
-                               boost::bind(&ProtoMulticastListener::handleDataReception,
-                                           this, boost::asio::placeholders::error,
+                               boost::bind(&ProtoUdpListener::handleDataReception, this,
+                                           boost::asio::placeholders::error,
                                            boost::asio::placeholders::bytes_transferred));
 }
 
 template <class ReceiveProtoT>
-void ProtoMulticastListener<ReceiveProtoT>::handleDataReception(
+void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
     const boost::system::error_code& error, size_t num_bytes_received)
 {
     if (!error)
@@ -56,7 +60,7 @@ void ProtoMulticastListener<ReceiveProtoT>::handleDataReception(
         // Once we've handled the data, start listening again
         socket_.async_receive_from(
             boost::asio::buffer(raw_received_data_, MAX_BUFFER_LENGTH), sender_endpoint_,
-            boost::bind(&ProtoMulticastListener::handleDataReception, this,
+            boost::bind(&ProtoUdpListener::handleDataReception, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
     }
@@ -65,7 +69,7 @@ void ProtoMulticastListener<ReceiveProtoT>::handleDataReception(
         // Start listening again to receive the next data
         socket_.async_receive_from(
             boost::asio::buffer(raw_received_data_, MAX_BUFFER_LENGTH), sender_endpoint_,
-            boost::bind(&ProtoMulticastListener::handleDataReception, this,
+            boost::bind(&ProtoUdpListener::handleDataReception, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
 
@@ -84,7 +88,7 @@ void ProtoMulticastListener<ReceiveProtoT>::handleDataReception(
 }
 
 template <class ReceiveProtoT>
-ProtoMulticastListener<ReceiveProtoT>::~ProtoMulticastListener()
+ProtoUdpListener<ReceiveProtoT>::~ProtoUdpListener()
 {
     socket_.close();
 }
