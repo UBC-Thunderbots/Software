@@ -39,4 +39,14 @@ class DrawFunctionVisualizer : public ZoomableQGraphicsView
     // it, so we don't have to
     QGraphicsScene* graphics_scene;
     QOpenGLWidget* open_gl_widget;
+
+   protected:
+    /**
+     * When the context menu is called by right-clicking on the simulator field
+     *
+     * @param event The QContextMenuEvent to open
+     */
+    void contextMenuEvent(QContextMenuEvent* event) override;
+
+    Rectangle last_view_area;
 };

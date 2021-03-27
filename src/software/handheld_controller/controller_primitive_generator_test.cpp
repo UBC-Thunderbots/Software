@@ -59,7 +59,12 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input)
     double kick_speed =
         handheld_controller_config->getKickSpeedMetersPerSecond()->value();
     auto expected_kick_primitive =
-        *createKickPrimitive(Point(), Angle::zero(), kick_speed);
+        *createMovePrimitive(Point(), 0, Angle::zero(), DribblerMode::OFF,
+                             AutoChipOrKick{
+                                 AutoChipOrKickMode::AUTOKICK,
+                                 kick_speed,
+                             },
+                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_kick_primitive, actual_primitive));
 }
@@ -78,7 +83,12 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input1
 
     double chip_distance = handheld_controller_config->getChipDistanceMeters()->value();
     auto expected_chip_primitive =
-        *createChipPrimitive(Point(0, 0), Angle::zero(), chip_distance);
+        *createMovePrimitive(Point(), 0, Angle::zero(), DribblerMode::OFF,
+                             AutoChipOrKick{
+                                 AutoChipOrKickMode::AUTOCHIP,
+                                 chip_distance,
+                             },
+                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_chip_primitive, actual_primitive));
 }

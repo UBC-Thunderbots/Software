@@ -16,8 +16,12 @@ PhysBot app_physbot_create(const FirmwareRobot_t *robot, float *destination,
         .disp = dot2D(major_vec, dr), .vel = dot2D(major_vec, v), .accel = 0, .time = 0};
     const Component minor = {
         .disp = dot2D(minor_vec, dr), .vel = dot2D(minor_vec, v), .accel = 0, .time = 0};
-    const Component rot = {.disp = min_angle_delta(
-                               app_firmware_robot_getOrientation(robot), destination[2])};
+
+    // current orientation is directly subtracted from destination because we do not
+    // assume that the user wants the rotational displacement to be the min angle between
+    // the destination and current orientation
+    const Component rot = {.disp =
+                               destination[2] - app_firmware_robot_getOrientation(robot)};
     PhysBot pb          = {.rot = rot, .maj = major, .min = minor};
     for (unsigned i = 0; i < 2; i++)
     {

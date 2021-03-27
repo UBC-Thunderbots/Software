@@ -1,40 +1,42 @@
-#include "software/simulation/simulator_ball.h"
+#include "software/simulation/physics_simulator_ball.h"
 
 #include "software/logger/logger.h"
 
-SimulatorBall::SimulatorBall(std::weak_ptr<PhysicsBall> physics_ball)
+PhysicsSimulatorBall::PhysicsSimulatorBall(std::weak_ptr<PhysicsBall> physics_ball)
     : physics_ball(physics_ball)
 {
 }
 
-Point SimulatorBall::checkValidAndReturnPoint(
+Point PhysicsSimulatorBall::checkValidAndReturnPoint(
     std::function<Point(const std::shared_ptr<PhysicsBall>)> func) const
 {
     if (auto ball = physics_ball.lock())
     {
         return func(ball);
     }
-    LOG(WARNING) << "SimulatorBall being used with invalid PhysicsBall" << std::endl;
+    LOG(WARNING) << "PhysicsSimulatorBall being used with invalid PhysicsBall"
+                 << std::endl;
     return Point(0, 0);
 }
 
-Vector SimulatorBall::checkValidAndReturnVector(
+Vector PhysicsSimulatorBall::checkValidAndReturnVector(
     std::function<Vector(const std::shared_ptr<PhysicsBall>)> func) const
 {
     if (auto ball = physics_ball.lock())
     {
         return func(ball);
     }
-    LOG(WARNING) << "SimulatorBall being used with invalid PhysicsBall" << std::endl;
+    LOG(WARNING) << "PhysicsSimulatorBall being used with invalid PhysicsBall"
+                 << std::endl;
     return Vector(0, 0);
 }
 
-Point SimulatorBall::position() const
+Point PhysicsSimulatorBall::position() const
 {
     return checkValidAndReturnPoint([](auto ball) { return ball->position(); });
 }
 
-Vector SimulatorBall::velocity() const
+Vector PhysicsSimulatorBall::velocity() const
 {
     return checkValidAndReturnVector([](auto ball) { return ball->velocity(); });
 }
