@@ -46,8 +46,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Navigator::getAssignedPrimitives(
     // Plan paths
     Rectangle navigable_area = world.field().fieldBoundary();
     auto path_objectives     = createPathObjectives(world);
-    auto robot_id_to_path =
-        path_manager->getManagedPaths(path_objectives, navigable_area); //ai.cpp ensuring there are no collision
+    auto robot_id_to_path    = path_manager->getManagedPaths(
+        path_objectives, navigable_area);  // ai.cpp ensuring there are no collision
 
     // Add primitives from navigating intents
     auto &robot_primitives_map = *primitive_set_msg->mutable_robot_primitives();
@@ -56,22 +56,28 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Navigator::getAssignedPrimitives(
         unsigned int robot_id      = intent->getRobotId();
         auto robot_id_to_path_iter = robot_id_to_path.find(robot_id);
         if (robot_id_to_path_iter != robot_id_to_path.end() &&
-            robot_id_to_path_iter->second) // if robot_id_to_path_iter->second is not nollopt
+            robot_id_to_path_iter
+                ->second)  // if robot_id_to_path_iter->second is not nollopt
         {
-            planned_paths.push_back(robot_id_to_path_iter->second->getKnots()); // for visualization
+            planned_paths.push_back(
+                robot_id_to_path_iter->second->getKnots());  // for visualization
             robot_primitives_map[robot_id] =
                 NavigatingPrimitiveCreator(config).createNavigatingPrimitive(
                     *intent, *(robot_id_to_path_iter->second),
                     robot_navigation_obstacle_factory.createFromTeam(world.enemyTeam()));
-            /* Used for logging the final destination of robot at every tick to check for oscillation */
-            // LOG(INFO)<<"Robot " << robot_id << " destination: " << planned_paths.back().back() << std::endl;
+            /* Used for logging the final destination of robot at every tick to check for
+             * oscillation */
+            // LOG(INFO)<<"Robot " << robot_id << " destination: " <<
+            // planned_paths.back().back() << std::endl;
         }
-        else // error should be from pathplanner, if it returns nullopt theres is no path and log warning. no warnings in path planner it self
+        else  // error should be from pathplanner, if it returns nullopt theres is no path
+              // and log warning. no warnings in path planner it self
         {
             LOG(WARNING)
                 << "Navigator's path manager could not find a path for RobotId = "
                 << robot_id;
-            robot_primitives_map[robot_id] = *createStopPrimitive(false); // stop if no path
+            robot_primitives_map[robot_id] =
+                *createStopPrimitive(false);  // stop if no path
         }
     }
 

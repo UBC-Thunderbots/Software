@@ -26,11 +26,11 @@ TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_oscillation)
      *  - (1, 0)
      *  - (-2.5, 2)
      */
-    Point destination = Point(1, 0);
+    Point destination      = Point(1, 0);
     Point initial_position = Point(-3, 1.5);
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
     addFriendlyRobots(
-            TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position}));
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position}));
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({Point(1, 0)}));
 
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
@@ -44,14 +44,14 @@ TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_oscillation)
     setMotionConstraints(motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-            [destination, tactic](std::shared_ptr<World> world_ptr,
-                                  ValidationCoroutine::push_type& yield) {
-                while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
-                {
-                    yield("Timestamp not at 9.5s");
-                }
-                robotAtPosition(1, world_ptr, destination, 0.05, yield);
-            }};
+        [destination, tactic](std::shared_ptr<World> world_ptr,
+                              ValidationCoroutine::push_type& yield) {
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
+            {
+                yield("Timestamp not at 9.5s");
+            }
+            robotAtPosition(1, world_ptr, destination, 0.05, yield);
+        }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
