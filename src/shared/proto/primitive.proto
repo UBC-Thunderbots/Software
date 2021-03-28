@@ -9,30 +9,13 @@ message Primitive
     oneof primitive
     {
         EstopPrimitive estop                  = 1;
-        ChipPrimitive chip                    = 2;
-        KickPrimitive kick                    = 3;
-        MovePrimitive move                    = 4;
-        SpinningMovePrimitive spinning_move   = 5;
-        StopPrimitive stop                    = 6;
-        DirectControlPrimitive direct_control = 7;
+        MovePrimitive move                    = 2;
+        StopPrimitive stop                    = 3;
+        DirectControlPrimitive direct_control = 4;
     }
 }
 
 message EstopPrimitive {}
-
-message ChipPrimitive
-{
-    Point chip_origin          = 1;
-    Angle chip_direction       = 2;
-    float chip_distance_meters = 3;
-}
-
-message KickPrimitive
-{
-    Point kick_origin        = 1;
-    Angle kick_direction     = 2;
-    float kick_speed_m_per_s = 3;
-}
 
 message MovePrimitive
 {
@@ -51,14 +34,7 @@ message MovePrimitive
     float dribbler_speed_rpm         = 4;
     float max_speed_m_per_s          = 5;
     AutoChipOrKick auto_chip_or_kick = 6;
-}
-
-message SpinningMovePrimitive
-{
-    Point destination                = 1;
-    float final_speed_m_per_s        = 2;
-    AngularVelocity angular_velocity = 3;
-    float dribbler_speed_rpm         = 4;
+    float target_spin_rev_per_s      = 7;
 }
 
 message StopPrimitive

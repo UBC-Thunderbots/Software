@@ -75,6 +75,6 @@ void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     {
         yield(std::make_unique<MoveIntent>(
             robot->id(), destination, final_orientation, final_speed, dribbler_mode,
-            ball_collision_type, auto_chip_or_kick, max_allowed_speed_mode));
+            ball_collision_type, auto_chip_or_kick, max_allowed_speed_mode, 0.0));
     } while (robotCloseToDestination());
 }

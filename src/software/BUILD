@@ -62,3 +62,11 @@ cc_library(
     name = "constants",
     hdrs = ["constants.h"],
 )
+
+sh_binary(
+    name = "restart_on_crash",
+    srcs = ["restart_on_crash.sh"],
+    deps = [
+        "@bazel_tools//tools/bash/runfiles",
+    ],
+)

@@ -26,16 +26,6 @@ cc_test(
 )
 
 cc_test(
-    name = "kickoff_chip_tactic_test",
-    srcs = ["kickoff_chip_tactic_test.cpp"],
-    deps = [
-        ":kickoff_chip_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
     name = "penalty_setup_tactic_test",
     srcs = ["penalty_setup_tactic_test.cpp"],
     deps = [
@@ -327,8 +317,8 @@ cc_library(
         ":shoot_goal_tactic",
         ":tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
+        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
-        "//software/ai/hl/stp/tactic/get_possession:get_possession_tactic",
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",

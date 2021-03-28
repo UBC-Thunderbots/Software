@@ -38,9 +38,9 @@ namespace
                                             MotionConstraint::HALF_METER_AROUND_BALL,
                                             MotionConstraint::FRIENDLY_HALF})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new ChipTactic(world.ball(), true), std::set<MotionConstraint>({})),
+                new ChipTactic(true), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new KickoffChipTactic(world.ball(), true),
+                new KickoffChipTactic(true),
                 std::set<MotionConstraint>({MotionConstraint::CENTER_CIRCLE,
                                             MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
