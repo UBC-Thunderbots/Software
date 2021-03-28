@@ -10,22 +10,21 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedThetaStarOscillationTest : public SimulatedTacticTestFixture
+class SimulatedPathPlannerTest : public SimulatedTacticTestFixture
 {
 };
 
-TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_oscillation)
+TEST_F(SimulatedPathPlannerTest, test_no_path_found)
 {
     /*
-     * Known destinations that oscillate:
-     *  - (-2.5,-2.5)
-     *  - (2.5,-2.5)
+     * When a path is not found by path planner, a World tick takes 4-8x longer to finish.
+     * These tests are targeted to isolate when no path is found.
      *
-     * Known destinations that do not oscillate:
+     * Destinations of paths that result in no path being found:
      *  - (1, 0)
-     *  - (-2.5, 2)
+     *  In the 91st and 92nd ticks no path is found
      */
-    Point destination      = Point(-2.5,-2.5);
+    Point destination      = Point(1,0);
     Point initial_position = Point(-3, 1.5);
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
     addFriendlyRobots(
