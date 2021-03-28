@@ -70,11 +70,11 @@ void WifiBackend::joinMulticastChannel(int channel, const std::string& interface
 
     robot_status_input.reset(new ThreadedProtoUdpListener<TbotsProto::RobotStatus>(
         std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, ROBOT_STATUS_PORT,
-        boost::bind(&Backend::receiveRobotStatus, this, _1), true));
+        boost::bind(&Backend::receiveRobotStatus, this, _1)));
 
     robot_log_input.reset(new ThreadedProtoUdpListener<TbotsProto::RobotLog>(
         std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, ROBOT_LOGS_PORT,
-        boost::bind(&WifiBackend::receiveRobotLogs, this, _1), true));
+        boost::bind(&WifiBackend::receiveRobotLogs, this, _1)));
 
     defending_side_output.reset(new ThreadedProtoUdpSender<DefendingSideProto>(
         std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, DEFENDING_SIDE_PORT,

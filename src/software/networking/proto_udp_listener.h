@@ -10,23 +10,36 @@ class ProtoUdpListener
    public:
     /**
      * Creates an ProtoUdpListener that will listen for ReceiveProtoT packets from
-     * the network on the given address and port. For every ReceiveProtoT packet received,
-     * the receive_callback will be called to perform any operations desired by the caller
+     * the network on the multicast group of given address and port. For every
+     * ReceiveProtoT packet received, the receive_callback will be called to perform any
+     * operations desired by the caller
      *
      * @param io_service The io_service to use to service incoming ReceiveProtoT data
-     * @param ip_address The ip address to listen on for
+     * @param ip_address The ip address of the multicast group on which to listen on for
      * the given ReceiveProtoT packets (IPv4 in dotted decimal or IPv6 in hex string)
      *  example IPv4: 192.168.0.2
      *  example IPv6: ff02::c3d0:42d2:bb8%wlp4s0 (the interface is specified after %)
      * @param port The port on which to listen for ReceiveProtoT packets
      * @param receive_callback The function to run for every ReceiveProtoT packet received
      * from the network
-     * @param multicast If true, joins the multicast group of given ip_address
      */
     ProtoUdpListener(boost::asio::io_service& io_service, const std::string& ip_address,
                      unsigned short port,
-                     std::function<void(ReceiveProtoT&)> receive_callback,
-                     bool multicast);
+                     std::function<void(ReceiveProtoT&)> receive_callback);
+
+    /**
+     * Creates an ProtoUdpListener that will listen for ReceiveProtoT packets from
+     * the network on any local address with given port. For every ReceiveProtoT packet
+     * received, the receive_callback will be called to perform any operations desired by
+     * the caller
+     *
+     * @param io_service The io_service to use to service incoming ReceiveProtoT data
+     * @param port The port on which to listen for ReceiveProtoT packets
+     * @param receive_callback The function to run for every ReceiveProtoT packet received
+     * from the network
+     */
+    ProtoUdpListener(boost::asio::io_service& io_service, unsigned short port,
+                     std::function<void(ReceiveProtoT&)> receive_callback);
 
     virtual ~ProtoUdpListener();
 
@@ -39,6 +52,11 @@ class ProtoUdpListener
      */
     void handleDataReception(const boost::system::error_code& error,
                              size_t num_bytes_received);
+
+    /**
+     * Start listening for data
+     */
+    void start_listen();
 
     // A UDP socket that we listen on for ReceiveProtoT messages from the network
     boost::asio::ip::udp::socket socket_;

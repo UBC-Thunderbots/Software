@@ -7,8 +7,7 @@
 template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     boost::asio::io_service& io_service, const std::string& ip_address,
-    const unsigned short port, std::function<void(ReceiveProtoT&)> receive_callback,
-    bool multicast)
+    const unsigned short port, std::function<void(ReceiveProtoT&)> receive_callback)
     : socket_(io_service), receive_callback(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(
@@ -29,13 +28,43 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
                    << ip_address << ", port = " << port << ")" << std::endl;
     }
 
-    if (multicast)
+    // Join the multicast group.
+    socket_.set_option(boost::asio::ip::multicast::join_group(
+        boost::asio::ip::address::from_string(ip_address)));
+
+    start_listen();
+}
+
+template <class ReceiveProtoT>
+ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
+    boost::asio::io_service& io_service, const unsigned short port,
+    std::function<void(ReceiveProtoT&)> receive_callback)
+    : socket_(io_service), receive_callback(receive_callback)
+{
+    boost::asio::ip::udp::endpoint listen_endpoint(boost::asio::ip::udp::v6(), port);
+    socket_.open(listen_endpoint.protocol());
+    // Explicitly set the v6_only option to be false to accept both ipv4 and ipv6 packets
+    socket_.set_option(boost::asio::ip::v6_only(false));
+    try
     {
-        // Join the multicast group.
-        socket_.set_option(boost::asio::ip::multicast::join_group(
-            boost::asio::ip::address::from_string(ip_address)));
+        socket_.bind(listen_endpoint);
+    }
+    catch (const boost::exception& ex)
+    {
+        LOG(FATAL) << "UdpListener: There was an issue binding the socket to "
+                      "the listen_endpoint when trying to connect to the "
+                      "address. This may be due to another instance of the "
+                      "UdpListener running and using the port already. "
+                      "(port = "
+                   << port << ")" << std::endl;
     }
 
+    start_listen();
+}
+
+template <class ReceiveProtoT>
+void ProtoUdpListener<ReceiveProtoT>::start_listen()
+{
     // Start listening for data asynchronously
     // See here for a great explanation about asynchronous operations:
     // https://stackoverflow.com/questions/34680985/what-is-the-difference-between-asynchronous-programming-and-multithreading
@@ -58,20 +87,12 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
         receive_callback(packet_data);
 
         // Once we've handled the data, start listening again
-        socket_.async_receive_from(
-            boost::asio::buffer(raw_received_data_, MAX_BUFFER_LENGTH), sender_endpoint_,
-            boost::bind(&ProtoUdpListener::handleDataReception, this,
-                        boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred));
+        start_listen();
     }
     else
     {
         // Start listening again to receive the next data
-        socket_.async_receive_from(
-            boost::asio::buffer(raw_received_data_, MAX_BUFFER_LENGTH), sender_endpoint_,
-            boost::bind(&ProtoUdpListener::handleDataReception, this,
-                        boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred));
+        start_listen();
 
         LOG(WARNING)
             << "An unknown network error occurred when attempting to receive ReceiveProtoT Data. The boost system error code is "
