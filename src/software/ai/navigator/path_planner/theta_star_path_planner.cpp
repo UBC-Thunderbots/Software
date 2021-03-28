@@ -163,6 +163,7 @@ bool ThetaStarPathPlanner::updateVertex(const Coordinate &current, const Coordin
     return false;
 }
 
+// TODO (#1945): Add logs to various nullopts to make it more clear why no path is found.
 std::optional<Path> ThetaStarPathPlanner::findPath(
     const Point &start, const Point &end, const Rectangle &navigable_area,
     const std::vector<ObstaclePtr> &obstacles)
