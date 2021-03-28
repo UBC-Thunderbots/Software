@@ -17,7 +17,6 @@
 struct GoalieFSM
 {
     class PanicState;
-    class DribbleOutOfDangerState;
     class PositionToBlockState;
 
     struct ControlParams
@@ -152,7 +151,7 @@ struct GoalieFSM
         using namespace boost::sml;
 
         const auto panic_s = state<PanicState>;
-        const auto dribble_s = state<DribbleOutOfDangerState>;
+        const auto dribble_s = state<DribbleFSM>;
         const auto chip_s = state<ChipFSM>;
         const auto position_to_block_s = state<PositionToBlockState>;
 
@@ -214,7 +213,7 @@ struct GoalieFSM
             std::vector<Point> intersections =
                     getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(), event.common.world.field());
 
-            return event.common.world.ball().velocity().length() <= ball_speed_panic && intersections.empty() &&
+            return (event.common.world.ball().velocity().length() <= ball_speed_panic || intersections.empty()) &&
                    !event.common.world.field().pointInFriendlyDefenseArea(event.common.world.ball().position());
         };
 
@@ -225,8 +224,7 @@ struct GoalieFSM
          */
         const auto panic_and_block = [](auto event) {
             std::vector<Point> intersections =
-                    getIntersectionsBetweenBallVelocityAndFullGostd::vector<Point> intersections =
-                    getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(), event.common.world.field());alSegment(event.common.world.ball(), event.common.world.field());
+                    getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(), event.common.world.field());
             Point stop_ball_point = intersections[0];
             Point goalie_pos =
                     closestPoint(event.common.robot.position(), Segment(event.common.world.ball().position(), stop_ball_point));
@@ -262,10 +260,11 @@ struct GoalieFSM
          */
         const auto dribble = [](auto event, back::process<DribbleFSM::Update> processEvent) {
             DribbleFSM::ControlParams control_params{
-                .allow_excessive_dribbling = false,
-                .final_dribble_orientation = (event.common.world.ball().position() - event.common.world.field().friendlyGoalCenter()).orientation(),
                 // TODO: fix dribble destination so there is strategy behind it
-                .dribble_destination = event.common.world.ball().position() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0)};
+                .dribble_destination = event.common.world.ball().position() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0),
+                .final_dribble_orientation = (event.common.world.ball().position() -
+                        event.common.world.field().friendlyGoalCenter()).orientation(),
+                .allow_excessive_dribbling = false};
 
             // update the dribble fsm
             processEvent(DribbleFSM::Update(control_params, event.common));

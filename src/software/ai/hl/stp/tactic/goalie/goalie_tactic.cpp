@@ -12,7 +12,7 @@
 #include "software/geom/segment.h"
 
 GoalieTactic::GoalieTactic(bool loop_forever, std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config)
-    : Tactic(loop_forever, {RobotCapability::Move}),
+    : Tactic(loop_forever, {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Chip}),
       fsm(),
       goalie_tactic_config(goalie_tactic_config),
       control_params()
