@@ -5,18 +5,19 @@
 #include "software/ai/intent/move_intent.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/intent/stop_intent.h"
-#include "software/ai/intent/chip_intent.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/line.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
+#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 
 struct GoalieFSM
 {
     class PanicState;
-    class ChipIfSafeState;
+    class DribbleOutOfDangerState;
     class PositionToBlockState;
 
     struct ControlParams
@@ -136,12 +137,23 @@ struct GoalieFSM
         return intersection(ball_ray, full_goal_segment);
     }
 
+    /**
+     * Gets the "don't chip" rectangle inside the friendly defense area
+     *
+     * @param field the field to find the "don't chip" rectangle on
+     */
+    static Rectangle getDontChipRectangle(const Field &field) {
+        return Rectangle(field.friendlyGoalpostNeg(),
+                  field.friendlyGoalpostPos() +
+                  Vector(2 * ROBOT_MAX_RADIUS_METERS, 0));
+    }
+
     auto operator()() {
         using namespace boost::sml;
 
         const auto panic_s = state<PanicState>;
-        const auto chip_if_safe_s = state<ChipIfSafeState>;
-        //const auto chip_if_safe_s = state<ChipFSM>;
+        const auto dribble_s = state<DribbleOutOfDangerState>;
+        const auto chip_s = state<ChipFSM>;
         const auto position_to_block_s = state<PositionToBlockState>;
 
         const auto update_e = event<Update>;
@@ -155,9 +167,9 @@ struct GoalieFSM
          *
          * @param event GoalieFSM::Update
          *
-         * @return if the ball is moving faster than the time_to_panic threshold and has a clear path to the goal
+         * @return if the ball is moving faster than the panic threshold and has a clear path to the goal
          */
-        const auto time_to_panic = [](auto event) {
+        const auto panic = [](auto event) {
             double ball_speed_panic = event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
             std::vector<Point> intersections =
                     getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(), event.common.world.field());
@@ -173,10 +185,37 @@ struct GoalieFSM
          * @return if the ball is moving slower than the time_to_panic threshold and is
          * inside the friendly defense area
          */
-        const auto can_chip_ball = [](auto event) {
+        const auto can_chip = [](auto event) {
             double ball_speed_panic = event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
+
+            // if the ball is in the "don't chip rectangle" we do not chip the ball
+            // as we risk bumping the ball into our own net trying to move behind
+            // the ball
+            auto dont_chip_rectangle = getDontChipRectangle(event.common.world.field());
+
             return event.common.world.ball().velocity().length() <= ball_speed_panic &&
-                   event.common.world.field().pointInFriendlyDefenseArea(event.common.world.ball().position());
+                   event.common.world.field().pointInFriendlyDefenseArea(event.common.world.ball().position()) &&
+                   !contains(dont_chip_rectangle, event.common.world.ball().position());
+        };
+
+        const auto dont_chip = [](auto event) {
+            double ball_speed_panic = event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
+            // if the ball is in the "don't chip rectangle" we do not chip the ball
+            // as we risk bumping the ball into our own net trying to move behind
+            // the ball
+            auto dont_chip_rectangle = getDontChipRectangle(event.common.world.field());
+
+            return event.common.world.ball().velocity().length() <= ball_speed_panic &&
+                   contains(dont_chip_rectangle, event.common.world.ball().position());
+        };
+
+        const auto no_danger = [](auto event) {
+            double ball_speed_panic = event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
+            std::vector<Point> intersections =
+                    getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(), event.common.world.field());
+
+            return event.common.world.ball().velocity().length() <= ball_speed_panic && intersections.empty() &&
+                   !event.common.world.field().pointInFriendlyDefenseArea(event.common.world.ball().position());
         };
 
         /**
@@ -184,9 +223,10 @@ struct GoalieFSM
          *
          * @param event GoalieFSM::Update event
          */
-        const auto update_panic = [](auto event) {
+        const auto panic_and_block = [](auto event) {
             std::vector<Point> intersections =
-                    getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(), event.common.world.field());
+                    getIntersectionsBetweenBallVelocityAndFullGostd::vector<Point> intersections =
+                    getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(), event.common.world.field());alSegment(event.common.world.ball(), event.common.world.field());
             Point stop_ball_point = intersections[0];
             Point goalie_pos =
                     closestPoint(event.common.robot.position(), Segment(event.common.world.ball().position(), stop_ball_point));
@@ -195,35 +235,40 @@ struct GoalieFSM
             event.common.set_intent(std::make_unique<MoveIntent>(
                     event.common.robot.id(), goalie_pos, goalie_orientation, 0.0, DribblerMode::OFF,
                     BallCollisionType::ALLOW, AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-                    MaxAllowedSpeedMode::PHYSICAL_LIMIT));
+                    MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
         };
 
         /**
-         * Action that updates the ChipIntent if it's safe to chip the ball,
-         * or updates the StopIntent if it's not safe to chip the ball
+         * Action that updates the ChipFSM
          *
          * @param event GoalieFSM::Update event
+         * @param processEvent processes the ChipFSM::Update
          */
-        const auto update_chip_if_safe = [](auto event /*back::process<ChipFSM::Update> processEvent*/) {
-            // if the ball is in the "don't chip rectangle" we do not chip the ball
-            // as we risk bumping the ball into our own net trying to move behind
-            // the ball
-            auto dont_chip_rectangle =
-                    Rectangle(event.common.world.field().friendlyGoalpostNeg(),
-                              event.common.world.field().friendlyGoalpostPos() +
-                              Vector(2 * ROBOT_MAX_RADIUS_METERS, 0));
+        const auto chip = [](auto event, back::process<ChipFSM::Update> processEvent) {
+            ChipFSM::ControlParams control_params{
+                .chip_origin = event.common.world.ball().position(),
+                .chip_direction = (event.common.world.ball().position() - event.common.world.field().friendlyGoalCenter()).orientation(),
+                .chip_distance_meters = YEET_CHIP_DISTANCE_METERS};
 
-            // if the ball is slow but its not safe to chip it out, don't.
-            // TODO (#744) finesse the ball out of the goal using the dribbler.
-            // for now we just stop
-            if (contains(dont_chip_rectangle, event.common.world.ball().position())) {
-                event.common.set_intent(std::make_unique<StopIntent>(event.common.robot.id(), false));
-            } else {
-                event.common.set_intent(std::make_unique<ChipIntent>(event.common.robot.id(),
-                        event.common.world.ball().position(),
-                        (event.common.world.ball().position() - event.common.world.field().friendlyGoalCenter()).orientation(),
-                        YEET_CHIP_DISTANCE_METERS));
-            }
+            // update the chip fsm
+            processEvent(ChipFSM::Update(control_params, event.common));
+        };
+
+        /**
+         * ACtion that updates the DribbleFSM
+         *
+         * @param event GoalieFSM::Update event
+         * @param processEvent processes the DribbleFSM::Update
+         */
+        const auto dribble = [](auto event, back::process<DribbleFSM::Update> processEvent) {
+            DribbleFSM::ControlParams control_params{
+                .allow_excessive_dribbling = false,
+                .final_dribble_orientation = (event.common.world.ball().position() - event.common.world.field().friendlyGoalCenter()).orientation(),
+                // TODO: fix dribble destination so there is strategy behind it
+                .dribble_destination = event.common.world.ball().position() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0)};
+
+            // update the dribble fsm
+            processEvent(DribbleFSM::Update(control_params, event.common));
         };
 
         /**
@@ -231,7 +276,7 @@ struct GoalieFSM
         *
         * @param event GoalieFSM::Update event
         */
-        const auto update_position_to_block = [](auto event) {
+        const auto position_to_block = [](auto event) {
             // compute angle between two vectors, negative goal post to ball and positive
             // goal post to ball
             Angle block_cone_angle =
@@ -292,18 +337,24 @@ struct GoalieFSM
             event.common.set_intent(std::make_unique<MoveIntent>(
                     event.common.robot.id(), goalie_pos, goalie_orientation, goalie_final_speed, DribblerMode::OFF,
                     BallCollisionType::ALLOW, AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-                    MaxAllowedSpeedMode::PHYSICAL_LIMIT));
+                    MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
         };
 
         return make_transition_table(
-                *position_to_block_s + update_e[time_to_panic] / update_panic       = panic_s,
-                position_to_block_s + update_e[can_chip_ball] / update_chip_if_safe = chip_if_safe_s,
-                position_to_block_s + update_e / update_position_to_block,
-                panic_s + update_e[can_chip_ball] / update_chip_if_safe             = chip_if_safe_s,
-                chip_if_safe_s + update_e[time_to_panic] / update_panic             = panic_s,
-                panic_s + update_e[!time_to_panic]                                  = X,
-                chip_if_safe_s + update_e[!can_chip_ball]                           = X,
-                X + update_e / update_position_to_block                             = position_to_block_s);
+                *position_to_block_s + update_e[panic] / panic_and_block = panic_s,
+                position_to_block_s + update_e[can_chip] / chip          = chip_s,
+                position_to_block_s + update_e[dont_chip] / dribble      = dribble_s,
+                position_to_block_s + update_e / position_to_block,
+                panic_s + update_e[can_chip] / chip                      = chip_s,
+                panic_s + update_e[dont_chip] / dribble                  = dribble_s,
+                chip_s + update_e[panic] / panic_and_block               = panic_s,
+                chip_s + update_e[dont_chip] / dribble                   = dribble_s,
+                dribble_s + update_e[can_chip] / chip                    = chip_s,
+                dribble_s + update_e[dont_chip] / dribble,
+                dribble_s + update_e[panic] / panic_and_block            = panic_s,
+                panic_s + update_e[no_danger]                            = X,
+                chip_s + update_e[no_danger]                             = X,
+                X + update_e / position_to_block                         = position_to_block_s);
     }
 
 };
