@@ -220,7 +220,13 @@ bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_t
             return validation_functions_done;
         }
 
+        /* Logging how long each tick takes */
+        auto start_time = std::chrono::system_clock::now();
         updatePrimitives(*world_opt, simulator);
+        double duration_ms = ::TestUtil::millisecondsSince(start_time);
+        static int tick_count = 1;
+        LOG(INFO)<<"Tick: " << tick_count << ", " <<duration_ms<<"ms"<<std::endl;
+        tick_count++;
 
         if (run_simulation_in_realtime)
         {
