@@ -7,6 +7,6 @@ ChipIntent::ChipIntent(unsigned int robot_id, const Point &chip_origin,
           *createMovePrimitive(
               chip_origin, 0, chip_direction, DribblerMode::OFF,
               AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, chip_distance_meters},
-              MaxAllowedSpeedMode::PHYSICAL_LIMIT))
+              MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0))
 {
 }
