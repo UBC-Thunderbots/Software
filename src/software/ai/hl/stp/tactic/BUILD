@@ -133,32 +133,6 @@ cc_test(
 )
 
 cc_library(
-    name = "passer_tactic",
-    srcs = ["passer_tactic.cpp"],
-    hdrs = ["passer_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//software/ai/hl/stp/action:intercept_ball_action",
-        "//software/ai/hl/stp/action:kick_action",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/passing:pass",
-        "//software/logger",
-        "//software/world:ball",
-    ],
-)
-
-cc_test(
-    name = "passer_tactic_test",
-    srcs = ["passer_tactic_test.cpp"],
-    deps = [
-        ":passer_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "penalty_kick_tactic",
     srcs = ["penalty_kick_tactic.cpp"],
     hdrs = ["penalty_kick_tactic.h"],
