@@ -5,6 +5,22 @@ package(default_visibility = ["//visibility:public"])
 # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
 
 cc_library(
+    name = "ball_placement_play",
+    srcs = ["ball_placement_play.cpp"],
+    hdrs = ["ball_placement_play.h"],
+    deps = [
+        ":play",
+        "//shared:constants",
+        "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
+        "//software/logger",
+        "//software/util/design_patterns:generic_factory",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
     name = "corner_kick_play",
     srcs = ["corner_kick_play.cpp"],
     hdrs = ["corner_kick_play.h"],
@@ -477,6 +493,21 @@ cc_test(
         "//software/ai/hl/stp/play:penalty_kick_enemy_play",
         "//software/simulated_tests:simulated_play_test_fixture",
         "//software/simulated_tests:simulated_test_main",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/test_util",
+        "//software/time:duration",
+        "//software/world",
+    ],
+)
+
+cc_test(
+    name = "ball_placement_play_test",
+    srcs = ["ball_placement_play_test.cpp"],
+    deps = [
+        "//software/ai/hl/stp/play:ball_placement_play",
+        "//software/simulated_tests:simulated_play_test_fixture",
+        "//software/simulated_tests:simulated_test_main",
+        "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
