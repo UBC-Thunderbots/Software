@@ -18,13 +18,14 @@ TEST(PassEvaluation, best_pass_over_entire_field)
 
     for (EighteenZoneId zone_id : allValuesEighteenZoneId())
     {
-        passes_with_rating.emplace(zone_id,
-                                   PassWithRating{std::move(Pass(Point(0, 0), 0)), 0});
+        passes_with_rating.emplace(
+            zone_id, PassWithRating{std::move(Pass(Point(0, 0), Point(0, 0), 0)), 0});
     }
 
     // change zone 8 to have a score of 0.8, which should be the highest
-    passes_with_rating.emplace(EighteenZoneId::ZONE_8,
-                               PassWithRating{std::move(Pass(Point(0, 0), 0)), 0.8});
+    passes_with_rating.emplace(
+        EighteenZoneId::ZONE_8,
+        PassWithRating{std::move(Pass(Point(0, 0), Point(0, 0), 0)), 0.8});
 
     auto pass_eval = PassEvaluation<EighteenZoneId>(
         pitch_division, passes_with_rating, std::make_shared<const PassingConfig>(),
@@ -44,9 +45,9 @@ TEST(PassEvaluation, best_pass_in_zones)
 
     for (EighteenZoneId zone_id : allValuesEighteenZoneId())
     {
-        passes_with_rating.emplace(zone_id,
-                                   PassWithRating{std::move(Pass(Point(0, 0), 0)),
-                                                  0.05 * static_cast<unsigned>(zone_id)});
+        passes_with_rating.emplace(
+            zone_id, PassWithRating{std::move(Pass(Point(0, 0), Point(0, 0), 0)),
+                                    0.05 * static_cast<unsigned>(zone_id)});
     }
 
     auto pass_eval = PassEvaluation<EighteenZoneId>(
@@ -82,8 +83,8 @@ TEST(PassEvaluation, get_pitch_division_and_timestamp)
 
     for (EighteenZoneId zone_id : allValuesEighteenZoneId())
     {
-        passes_with_rating.emplace(zone_id,
-                                   PassWithRating{std::move(Pass(Point(0, 0), 0)), 0});
+        passes_with_rating.emplace(
+            zone_id, PassWithRating{std::move(Pass(Point(0, 0), Point(0, 0), 0)), 0});
     }
 
     auto pass_eval = PassEvaluation<EighteenZoneId>(

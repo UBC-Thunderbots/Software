@@ -47,8 +47,6 @@ class CherryPickTactic : public Tactic
 
     void accept(TacticVisitor& visitor) const override;
 
-    World getWorld() const;
-
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
 

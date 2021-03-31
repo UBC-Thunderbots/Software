@@ -13,6 +13,7 @@
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/geom/point.h"
 #include "software/time/timestamp.h"
+#include "software/world/world.h"
 
 template <class ZoneEnum>
 using ZonePassMap = std::unordered_map<ZoneEnum, PassWithRating>;
@@ -69,7 +70,7 @@ class PassEvaluation
      *
      * @return vector of ZoneEnums, with the highest quality zones first
      */
-    std::vector<ZoneEnum> getBestZonesToCherryPick(const Field& field,
+    std::vector<ZoneEnum> getBestZonesToCherryPick(const World& field,
                                                    const Point& position) const;
 
     /**

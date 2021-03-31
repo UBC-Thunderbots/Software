@@ -49,14 +49,14 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     while (ball.timestamp() < setup_time)
     {
         // The passer should be facing the receiver
-        auto passer_orientation = pass.passerOrientation(ball.position());
+        auto passer_orientation = pass.passerOrientation();
 
         // We want to wait just behind where the pass is supposed to start, so that the
         // ball is *almost* touching the kicker
         Vector ball_offset =
             Vector::createFromAngle(passer_orientation)
                 .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS * 2);
-        Point wait_position = ball.position() - ball_offset;
+        Point wait_position = pass.passerPoint() - ball_offset;
 
         move_action->updateControlParams(*robot_, wait_position, passer_orientation, 0,
                                          DribblerMode::OFF, BallCollisionType::AVOID);
@@ -76,7 +76,7 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 
         // We want to keep trying to kick until the ball is moving along the pass
         // vector with sufficient velocity
-        kick_direction = pass.passerOrientation(ball.position());
+        kick_direction = pass.passerOrientation();
 
     } while (!ball.hasBallBeenKicked(kick_direction));
 }
@@ -84,9 +84,4 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 void PasserTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
-}
-
-Ball PasserTactic::getBall() const
-{
-    return this->ball;
 }

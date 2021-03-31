@@ -18,18 +18,21 @@ class Pass
     /**
      * Create a pass with given parameters
      *
+     * @param passer_point The point the pass should start at
      * @param receiver_point The point the receiver should be at to receive the pass
      * @param pass_speed_m_per_s The speed of the pass, in meters/second
      */
-    Pass(Point receiver_point, double pass_speed_m_per_s);
+    Pass(Point passer_point, Point receiver_point, double pass_speed_m_per_s);
 
     /**
      * Create a pass from the given pass array
      *
+     * @param passer_point The location of the passer location
      * @param pass_array [receiver_point.x(), receiver_point.y(), pass_speed_m_per_s]
      * @return The Pass constructed from the pass array
      */
-    static Pass fromPassArray(const std::array<double, 3>& pass_array);
+    static Pass fromPassArray(Point passer_point,
+                              const std::array<double, 3>& pass_array);
 
     /**
      * Converts a pass to an array
@@ -38,6 +41,13 @@ class Pass
      * pass_speed_m_per_s]
      */
     std::array<double, 3> toPassArray() const;
+
+    /**
+     * Gets the value of the passer point
+     *
+     * @return The value of the passer point
+     */
+    Point passerPoint() const;
 
     /**
      * Gets the value of the receiver point
@@ -50,19 +60,17 @@ class Pass
      * Given the ball position, returns the angle the receiver should be
      * facing to receive the pass.
      *
-     * @param ball_position The position of the ball
      * @return The angle the receiver should be facing
      */
-    Angle receiverOrientation(const Point& ball_position) const;
+    Angle receiverOrientation() const;
 
     /**
      * Given the ball position, returns the angle the passer should be
      * facing to pass.
      *
-     * @param ball_position The position of the ball
      * @return The angle the passer should be facing
      */
-    Angle passerOrientation(const Point& ball_position) const;
+    Angle passerOrientation() const;
 
     /**
      * Gets the value of the pass speed
@@ -70,6 +78,15 @@ class Pass
      * @return The value of the pass speed, in meters/second
      */
     double speed() const;
+
+    /**
+     * Estimate how long the pass will take, from kicking to receiving
+     *
+     * This estimate does not account for friction on the ball
+     *
+     * @return An estimate of how long the pass will take, from kicking to receiving
+     */
+    Duration estimatePassDuration() const;
 
     /**
      * Implement the "<<" operator for printing
@@ -81,6 +98,9 @@ class Pass
     friend std::ostream& operator<<(std::ostream& output_stream, const Pass& pass);
 
    private:
+    // The location of the passer
+    Point passer_point;
+
     // The location of the receiver
     Point receiver_point;
 

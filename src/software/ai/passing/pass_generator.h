@@ -97,7 +97,7 @@ class PassGenerator
                                          const ZonePassMap<ZoneEnum>& initial_passes);
 
     /**
-     * Re-evaluates ratePass on the previous worlds passes and keeps the better pass
+     * Re-evaluates ratePass on the previous world's passes and keeps the better pass
      * w/ the higher score in current_best_passes_;
      *
      * @param The world

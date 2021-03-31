@@ -36,10 +36,9 @@ void CherryPickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
         true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
     do
     {
-        move_action->updateControlParams(
-            *robot_, pass_.receiverPoint(),
-            pass_.receiverOrientation(world_.ball().position()), 0, DribblerMode::OFF,
-            BallCollisionType::AVOID);
+        move_action->updateControlParams(*robot_, pass_.receiverPoint(),
+                                         pass_.receiverOrientation(), 0,
+                                         DribblerMode::OFF, BallCollisionType::AVOID);
         yield(move_action);
 
     } while (true);
@@ -48,9 +47,4 @@ void CherryPickTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 void CherryPickTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
-}
-
-World CherryPickTactic::getWorld() const
-{
-    return this->world_;
 }
