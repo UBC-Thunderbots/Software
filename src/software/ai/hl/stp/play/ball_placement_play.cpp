@@ -25,7 +25,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 {
     auto place_ball_tactic = std::make_shared<DribbleTactic>();
     place_ball_tactic->updateControlParams(world.gameState().getBallPlacementPoint(),
-                                           std::nullopt);
+                                           std::nullopt, true);
     // Create Stop Tactics that will loop forever
     auto stop_tactic_2 = std::make_shared<StopTactic>(false);
     auto stop_tactic_3 = std::make_shared<StopTactic>(false);
