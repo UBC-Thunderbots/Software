@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/play/ball_placement_play.h"
 
 #include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
+#include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
@@ -26,18 +27,36 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     auto place_ball_tactic = std::make_shared<DribbleTactic>();
     place_ball_tactic->updateControlParams(world.gameState().getBallPlacementPoint(),
                                            std::nullopt, true);
-    // Create Stop Tactics that will loop forever
-    auto stop_tactic_2 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_3 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_4 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_5 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_6 = std::make_shared<StopTactic>(false);
+
+    std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)};
+
+    // non goalie and non ball placing robots line up along a line just outside the
+    // friendly defense area to wait for ball placement to finish
+    Vector waiting_line_vector = world.field().friendlyDefenseArea().posXPosYCorner() -
+                                 world.field().friendlyDefenseArea().posXNegYCorner();
+    Point waiting_line_start_point =
+        world.field().friendlyDefenseArea().posXNegYCorner() +
+        Vector(ROBOT_MAX_RADIUS_METERS * 2, 0);
+    for (unsigned int i = 0; i < move_tactics.size(); i++)
+    {
+        Point waiting_destination =
+            waiting_line_start_point +
+            waiting_line_vector.normalize(waiting_line_vector.length() * i /
+                                          static_cast<double>(move_tactics.size() - 1));
+        move_tactics.at(i)->updateControlParams(waiting_destination, Angle::zero(), 0.0);
+    }
+
+    auto goalie_tactic = std::make_shared<GoalieTactic>(
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
+        play_config->getGoalieTacticConfig());
 
     do
     {
-        // yield the Tactics this Play wants to run, in order of priority
-        yield({place_ball_tactic, stop_tactic_2, stop_tactic_3, stop_tactic_4,
-               stop_tactic_5, stop_tactic_6});
+        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic, place_ball_tactic};
+        result.insert(result.end(), move_tactics.begin(), move_tactics.end());
+        yield(result);
     } while (true);
 }
 
