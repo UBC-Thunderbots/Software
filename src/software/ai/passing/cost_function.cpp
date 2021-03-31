@@ -40,12 +40,6 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 double rateZone(const Field& field, const Rectangle& zone, const Point& ball_position,
                 std::shared_ptr<const PassingConfig> passing_config)
 {
-    // If the zone contains the ball, its not a good place to receive a pass
-    if (contains(zone, ball_position))
-    {
-        return 0.0;
-    }
-
     // Zones with their centers in bad positions are not good
     double static_pass_quality =
         getStaticPositionQuality(field, zone.centre(), passing_config);
