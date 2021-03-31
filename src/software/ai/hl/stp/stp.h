@@ -124,7 +124,7 @@ class STP : public HL
     PlayInfo getPlayInfo() override;
 
     /**
-     * Given a vector of a vector of tactics and the current World, assigns robots
+     * Given a vector of vector of tactics and the current World, assigns robots
      * from the friendly team to each tactic
      *
      * Some tactics may not be assigned a robot, depending on if there is a robot
@@ -153,9 +153,9 @@ class STP : public HL
      * first 3 Tactics in the vectors would be assigned to robots and run. (In the example
      * above, only the goalie and crease_defenders would be assigned)
      *
-     * @param tactics The list of list of tactics that should be assigned a robot. Note
-     * that this function modifies tactics to make the correct assignments, because we
-     * need to modify the individual tactics _and_ possibly add/remove tactics
+     * @param tactics The vector of vector of tactics that should be assigned a robot.
+     * Note that this function modifies tactics to make the correct assignments, because
+     * we need to modify the individual tactics _and_ possibly add/remove tactics
      * @param world The state of the world, which contains the friendly Robots that will
      * be assigned to each tactic
      *

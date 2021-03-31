@@ -46,7 +46,7 @@ class STPTacticAssignmentTest : public ::testing::Test
      *         otherwise
      */
     bool allTacticsAssigned(
-        std::vector<std::shared_ptr<const Tactic>> tactics,
+        ConstTacticVector tactics,
         std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment)
     {
         bool all_tactics_have_robot_assigned = true;
@@ -86,7 +86,7 @@ TEST_F(STPTacticAssignmentTest,
     move_tactic_1->updateControlParams(Point(-1, 0));
     move_tactic_2->updateControlParams(Point(1, 0));
 
-    std::vector<std::shared_ptr<const Tactic>> tactics = {move_tactic_1, move_tactic_2};
+    ConstTacticVector tactics = {move_tactic_1, move_tactic_2};
 
     auto asst = stp.assignRobotsToTactics({tactics}, world);
 
@@ -108,7 +108,7 @@ TEST_F(STPTacticAssignmentTest,
     move_tactic_1->updateControlParams(Point(-1, 0));
     move_tactic_2->updateControlParams(Point(1, 0));
 
-    std::vector<std::shared_ptr<const Tactic>> tactics = {move_tactic_1, move_tactic_2};
+    ConstTacticVector tactics = {move_tactic_1, move_tactic_2};
 
     auto asst = stp.assignRobotsToTactics({tactics}, world);
 
@@ -131,7 +131,7 @@ TEST_F(STPTacticAssignmentTest,
 
     move_tactic_1->updateControlParams(Point(-1, 0));
 
-    std::vector<std::shared_ptr<const Tactic>> tactics = {move_tactic_1};
+    ConstTacticVector tactics = {move_tactic_1};
 
     auto asst = stp.assignRobotsToTactics({tactics}, world);
 
@@ -148,7 +148,7 @@ TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_robots
 
     move_tactic_1->updateControlParams(Point(-1, 0));
 
-    std::vector<std::shared_ptr<const Tactic>> tactics = {move_tactic_1};
+    ConstTacticVector tactics = {move_tactic_1};
 
     auto asst = stp.assignRobotsToTactics({tactics}, world);
 
@@ -169,7 +169,7 @@ TEST_F(STPTacticAssignmentTest,
 
     move_tactic_1->updateControlParams(Point(-1, 0));
 
-    std::vector<std::shared_ptr<const Tactic>> tactics = {move_tactic_1, stop_tactic_1};
+    ConstTacticVector tactics = {move_tactic_1, stop_tactic_1};
 
     // Both robots are now closest to move_tactic_1's destination. We do NOT want
     // robot_0 to be assigned to move_tactic_1, because then robot_1 has to move all the
@@ -199,7 +199,7 @@ TEST_F(STPTacticAssignmentTest, test_assigning_1_tactic_to_1_robot)
 
     move_tactic_1->updateControlParams(Point(2, -3.2));
 
-    std::vector<std::shared_ptr<const Tactic>> tactics = {move_tactic_1};
+    ConstTacticVector tactics = {move_tactic_1};
 
     auto asst = stp.assignRobotsToTactics({tactics}, world);
 
@@ -227,7 +227,7 @@ TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap)
     move_tactic_1->updateControlParams(Point(-1, 0));
     move_tactic_2->updateControlParams(Point(1, 0));
 
-    std::vector<std::shared_ptr<const Tactic>> tactics = {move_tactic_1, move_tactic_2};
+    ConstTacticVector tactics = {move_tactic_1, move_tactic_2};
 
     // Each robot is close to separate tactic destinations. They should each be trivially
     // assigned to the tactic with the destination closest to their position
@@ -267,7 +267,7 @@ TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_with_overla
     move_tactic_1->updateControlParams(Point(-1, 0));
     move_tactic_2->updateControlParams(Point(1, 0));
 
-    std::vector<std::shared_ptr<const Tactic>> tactics = {move_tactic_1, move_tactic_2};
+    ConstTacticVector tactics = {move_tactic_1, move_tactic_2};
 
     // Both robots are now closest to move_tactic_1's destination. We do NOT want
     // robot_0 to be assigned to move_tactic_1, because then robot_1 has to move all the
@@ -300,7 +300,7 @@ TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_2_tactics)
     move_tactic_1->updateControlParams(Point(-1, 0));
     move_tactic_2->updateControlParams(Point(1, 0));
 
-    std::vector<std::shared_ptr<const Tactic>> tactics = {move_tactic_1, move_tactic_2};
+    ConstTacticVector tactics = {move_tactic_1, move_tactic_2};
 
     // robot_2 should not be assigned since both robot_0 and robot_1 are more optimal
     // to assign to the tactics. robot_2 is too far away
@@ -330,8 +330,7 @@ TEST_F(STPTacticAssignmentTest,
     auto stop_tactic_2 = std::make_shared<StopTestTactic>();
     auto stop_tactic_3 = std::make_shared<StopTestTactic>();
 
-    std::vector<std::shared_ptr<const Tactic>> tactics = {stop_tactic_1, stop_tactic_2,
-                                                          stop_tactic_3};
+    ConstTacticVector tactics = {stop_tactic_1, stop_tactic_2, stop_tactic_3};
 
     // If all costs are equal, the robots and tactics are simply paired in order
     auto asst = stp.assignRobotsToTactics({tactics}, world);
@@ -366,8 +365,7 @@ TEST_F(STPTacticAssignmentTest,
     // stop_tactics
     move_tactic_1->updateControlParams(Point(0, 0));
 
-    std::vector<std::shared_ptr<const Tactic>> tactics = {stop_tactic_1, move_tactic_1,
-                                                          stop_tactic_2};
+    ConstTacticVector tactics = {stop_tactic_1, move_tactic_1, stop_tactic_2};
 
     auto asst = stp.assignRobotsToTactics({tactics}, world);
 
@@ -397,7 +395,7 @@ TEST_F(STPTacticAssignmentTest,
 
     move_tactic_1->updateControlParams(Point(0, 0));
 
-    std::vector<std::shared_ptr<const Tactic>> tactics = {move_tactic_1};
+    ConstTacticVector tactics = {move_tactic_1};
 
     auto asst = stp.assignRobotsToTactics({tactics}, world);
 
@@ -420,10 +418,9 @@ TEST_F(STPTacticAssignmentTest,
     friendly_team.updateRobots({robot_0, robot_1});
     world.updateFriendlyTeamState(friendly_team);
 
-    auto goalie_tactic_1 = std::make_shared<GoalieTestTactic>();
-    auto goalie_tactic_2 = std::make_shared<GoalieTestTactic>();
-    std::vector<std::shared_ptr<const Tactic>> tactics = {goalie_tactic_1,
-                                                          goalie_tactic_2};
+    auto goalie_tactic_1      = std::make_shared<GoalieTestTactic>();
+    auto goalie_tactic_2      = std::make_shared<GoalieTestTactic>();
+    ConstTacticVector tactics = {goalie_tactic_1, goalie_tactic_2};
 
     auto asst = stp.assignRobotsToTactics({tactics}, world);
 
@@ -449,8 +446,8 @@ TEST_F(STPTacticAssignmentTest,
     friendly_team.assignGoalie(0);
     world.updateFriendlyTeamState(friendly_team);
 
-    auto goalie_tactic_1 = std::make_shared<GoalieTestTactic>();
-    std::vector<std::shared_ptr<const Tactic>> tactics = {goalie_tactic_1};
+    auto goalie_tactic_1      = std::make_shared<GoalieTestTactic>();
+    ConstTacticVector tactics = {goalie_tactic_1};
 
     auto asst = stp.assignRobotsToTactics({tactics}, world);
 
@@ -485,10 +482,10 @@ TEST_F(STPTacticAssignmentTest,
 
     auto goalie_tactic_1 = std::make_shared<GoalieTestTactic>();
     auto goalie_tactic_2 = std::make_shared<GoalieTestTactic>();
-    std::vector<std::vector<std::shared_ptr<const Tactic>>> tactics = {
-        {goalie_tactic_1, goalie_tactic_2}};
 
-    auto asst = stp.assignRobotsToTactics({tactics}, world);
+    ConstPriorityTacticVector tactics = {{goalie_tactic_1, goalie_tactic_2}};
+
+    auto asst = stp.assignRobotsToTactics(tactics, world);
 
     ASSERT_TRUE(asst.find(goalie_tactic_1) != asst.end());
     EXPECT_FALSE(asst.find(goalie_tactic_2) != asst.end());
@@ -514,8 +511,8 @@ TEST_F(STPTacticAssignmentTest,
 
     move_tactic_1->updateControlParams(Point(-1, 0));
 
-    std::vector<std::shared_ptr<const Tactic>> tactics = {move_tactic_1};
-    std::vector<Robot> expected_robots_assigned        = {robot_0, robot_1, robot_2};
+    ConstTacticVector tactics                   = {move_tactic_1};
+    std::vector<Robot> expected_robots_assigned = {robot_0, robot_1, robot_2};
 
     auto asst = stp.assignRobotsToTactics({tactics}, world);
 
@@ -561,8 +558,7 @@ TEST_F(STPTacticAssignmentTest, test_greediness_of_tiered_assignment)
     move_tactic_0->updateControlParams(Point(0, 0));
     move_tactic_1->updateControlParams(Point(2, 0));
 
-    std::vector<std::vector<std::shared_ptr<const Tactic>>> normal_tactics = {
-        {move_tactic_0, move_tactic_1}};
+    ConstPriorityTacticVector normal_tactics = {{move_tactic_0, move_tactic_1}};
 
     auto asst = stp.assignRobotsToTactics(normal_tactics, world);
 
@@ -571,8 +567,7 @@ TEST_F(STPTacticAssignmentTest, test_greediness_of_tiered_assignment)
     EXPECT_EQ(asst.find(move_tactic_0)->second, robot_0);
     EXPECT_EQ(asst.find(move_tactic_1)->second, robot_1);
 
-    std::vector<std::vector<std::shared_ptr<const Tactic>>> greedy_tactics = {
-        {move_tactic_0}, {move_tactic_1}};
+    ConstPriorityTacticVector greedy_tactics = {{move_tactic_0}, {move_tactic_1}};
 
     asst = stp.assignRobotsToTactics(greedy_tactics, world);
 
@@ -601,8 +596,8 @@ TEST_F(STPTacticAssignmentTest, test_goalie_assigned_properly_with_tiered_assign
     auto move_tactic_0   = std::make_shared<MoveTestTactic>();
     auto move_tactic_1   = std::make_shared<MoveTestTactic>();
 
-    std::vector<std::vector<std::shared_ptr<const Tactic>>> request = {
-        {goalie_tactic_0}, {move_tactic_0, move_tactic_1}};
+    ConstPriorityTacticVector request = {{goalie_tactic_0},
+                                         {move_tactic_0, move_tactic_1}};
 
     auto asst = stp.assignRobotsToTactics(request, world);
 
