@@ -294,6 +294,7 @@ cc_library(
 cc_library(
     name = "all_plays",
     deps = [
+        ":ball_placement_play",
         ":corner_kick_play",
         ":defense_play",
         ":enemy_free_kick_play",
