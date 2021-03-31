@@ -17,15 +17,26 @@
  * @param pass The pass to rate
  * @param zone The zone this pass is constrained to
  * @param passing_config The passing config used for tuning
- * @param ignore_friendly_capability Whether or not to include ratePassFriendlyCapability
- *                                   in the total rating
  *
  * @return A value in [0,1] representing the quality of the pass, with 1 being an
  *         ideal pass, and 0 being the worst pass possible
  */
 double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
-                std::shared_ptr<const PassingConfig> passing_config,
-                bool ignore_friendly_capability);
+                std::shared_ptr<const PassingConfig> passing_config);
+
+/**
+ * Calculate the quality of a given zone
+ *
+ * @param field The field on which to rate the zone
+ * @param zone The zone to rate
+ * @param ball_position The position of the ball
+ * @param passing_config The passing config used for tuning
+ *
+ * @return A value in [0,1] representing the quality of the zone, with 1 being a
+ *         great zone to send a cherry picker to, and 0 being a zone to avoid.
+ */
+double rateZone(const Field& field, const Rectangle& zone, const Point& ball_position,
+                std::shared_ptr<const PassingConfig> passing_config);
 
 /**
  * Rate pass based on the probability of scoring once we receive the pass

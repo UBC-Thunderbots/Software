@@ -12,19 +12,13 @@
 #include "software/logger/logger.h"
 
 double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
-                std::shared_ptr<const PassingConfig> passing_config,
-                bool ignore_friendly_capability = false)
+                std::shared_ptr<const PassingConfig> passing_config)
 {
     double static_pass_quality =
         getStaticPositionQuality(world.field(), pass.receiverPoint(), passing_config);
 
-    double friendly_pass_rating = 1.0;
-
-    if (!ignore_friendly_capability)
-    {
-        friendly_pass_rating =
-            ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
-    }
+    double friendly_pass_rating =
+        ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
 
     double enemy_pass_rating = ratePassEnemyRisk(world.enemyTeam(), pass, passing_config);
 
@@ -41,6 +35,36 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 
     return static_pass_quality * friendly_pass_rating * enemy_pass_rating *
            shoot_pass_rating * pass_speed_quality * in_region_quality;
+}
+
+double rateZone(const Field& field, const Rectangle& zone, const Point& ball_position,
+                std::shared_ptr<const PassingConfig> passing_config)
+{
+    // If the zone contains the ball, its not a good place to receive a pass
+    if (contains(zone, ball_position))
+    {
+        return 0.0;
+    }
+
+    // Zones with their centers in bad positions are not good
+    double static_pass_quality =
+        getStaticPositionQuality(field, zone.centre(), passing_config);
+
+    // Rate zones that are up the field higher to encourage progress up the field
+    double pass_up_field_rating = zone.centre().x() / field.xLength();
+
+    // Rate zones that are _near_ the ideal pass distance higher
+    double avg_pass_distance = (ball_position - zone.centre()).length();
+
+    double pass_distance_sigmoid_width = 0.4;
+    double pass_distance_rating =
+        sigmoid(avg_pass_distance, passing_config->getIdealPassDistanceM()->value(),
+                pass_distance_sigmoid_width) *
+        (1 - sigmoid(avg_pass_distance,
+                     passing_config->getIdealPassDistanceM()->value() + 1.0,
+                     pass_distance_sigmoid_width));
+
+    return pass_up_field_rating + pass_distance_rating + static_pass_quality;
 }
 
 double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,

@@ -24,16 +24,17 @@ py::dict getPassingConfig()
 Pass createPassFromDict(py::dict pass_dict)
 {
     // unpack values from the py::dict and put them into a pass
+    Point passer_point = pass_dict["passer_point"].cast<Point>();
     Point receiver_point(pass_dict["receiver_point"].cast<Point>());
     auto pass_speed = pass_dict["pass_speed"].cast<double>();
-    return Pass(receiver_point, pass_speed);
+    return Pass(passer_point, receiver_point, pass_speed);
 }
 
 double ratePassWrapper(const World& world, py::dict pass_dict,
                        py::dict passing_config_dict)
 {
     auto pass = createPassFromDict(pass_dict);
-    return ratePass(world, pass, world.field().fieldLines(), passing_config);
+    return ratePass(world, pass, world.field().fieldLines(), passing_config, false);
 }
 
 double ratePassShootScoreWrapper(const World& world, py::dict pass_dict,
@@ -41,8 +42,7 @@ double ratePassShootScoreWrapper(const World& world, py::dict pass_dict,
 {
     auto pass = createPassFromDict(pass_dict);
     updatePassingConfigFromDict(passing_config_dict);
-    return ratePassShootScore(world.ball(), world.field(), world.enemyTeam(), pass,
-                              passing_config);
+    return ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
 }
 
 double ratePassEnemyRiskWrapper(const World& world, py::dict pass_dict,
@@ -50,7 +50,7 @@ double ratePassEnemyRiskWrapper(const World& world, py::dict pass_dict,
 {
     auto pass = createPassFromDict(pass_dict);
     updatePassingConfigFromDict(passing_config_dict);
-    return ratePassEnemyRisk(world.ball(), world.enemyTeam(), pass, passing_config);
+    return ratePassEnemyRisk(world.enemyTeam(), pass, passing_config);
 }
 
 double ratePassFriendlyCapabilityWrapper(const World& world, py::dict pass_dict,
@@ -58,8 +58,7 @@ double ratePassFriendlyCapabilityWrapper(const World& world, py::dict pass_dict,
 {
     auto pass = createPassFromDict(pass_dict);
     updatePassingConfigFromDict(passing_config_dict);
-    return ratePassFriendlyCapability(world.ball(), world.friendlyTeam(), pass,
-                                      passing_config);
+    return ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
 }
 
 PYBIND11_MODULE(passing, m)

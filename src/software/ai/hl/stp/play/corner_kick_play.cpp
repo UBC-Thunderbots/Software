@@ -113,23 +113,6 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
 
     using Zones = std::unordered_set<EighteenZoneId>;
 
-    //
-    //                FRIENDLY          ENEMY
-    //        ┌──────┬──────┬──────┬──────┬──────┬─────┐
-    //        │1     │4     │7     │10    │13    │16   │
-    //        │      │      │      │      │      │     │
-    //        │      │      │      │      │      │     │
-    //        ├──────┼──────┼──────┼──────┼──────┼─────┤
-    //      ┌─┤2     │5     │8     │11    │14    │17   ├─┐
-    //      │ │      │      │      │      │      │     │ │
-    //      │ │      │      │      │      │      │     │ │
-    //      └─┤      │      │      │      │      │     ├─┘
-    //        ├──────┼──────┼──────┼──────┼──────┼─────┤
-    //        │3     │6     │9     │12    │15    │18   │
-    //        │      │      │      │      │      │     │
-    //        │      │      │      │      │      │     │
-    //        └──────┴──────┴──────┴──────┴──────┴─────┘
-    //
     Zones cherry_pick_region_1 = {EighteenZoneId::ZONE_14};
     Zones cherry_pick_region_2 = {EighteenZoneId::ZONE_15, EighteenZoneId::ZONE_18};
 

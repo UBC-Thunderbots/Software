@@ -43,26 +43,6 @@ void PasserTactic::calculateNextAction(ActionCoroutine::push_type& yield)
     auto move_action = std::make_shared<MoveAction>(
         true, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle());
 
-    // We allow for a second of time for the receiver to move to their final position
-    auto setup_time = ball.timestamp() + Duration::fromSeconds(1.0);
-
-    while (ball.timestamp() < setup_time)
-    {
-        // The passer should be facing the receiver
-        auto passer_orientation = pass.passerOrientation();
-
-        // We want to wait just behind where the pass is supposed to start, so that the
-        // ball is *almost* touching the kicker
-        Vector ball_offset =
-            Vector::createFromAngle(passer_orientation)
-                .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS * 2);
-        Point wait_position = pass.passerPoint() - ball_offset;
-
-        move_action->updateControlParams(*robot_, wait_position, passer_orientation, 0,
-                                         DribblerMode::OFF, BallCollisionType::AVOID);
-        yield(move_action);
-    }
-
     Angle kick_direction;
 
     auto kick_action = std::make_shared<KickAction>();

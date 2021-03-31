@@ -67,3 +67,12 @@
      max: 1000
      value: 2 # TODO (#1987) find optimal iterations after tuning, for now 2 does the trick
      description: "The number of steps of gradient descent to perform in each iteration"
+ - double:
+     name: ideal_pass_distance_m
+     min: 0.0
+     max: 10.0
+     value: 3.5
+     description: >-
+        How far the passes should be. Note that we may try to take passes longer/shorter
+        than this, so this is more of a suggestion. It might be worth dialing this distance
+        down if enemys are intercepting our longer passes. 

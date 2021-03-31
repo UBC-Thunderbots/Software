@@ -100,10 +100,10 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         auto pass_eval = pass_generator.generatePassEvaluation(world);
 
-        Zones cherry_pick_region_1 = {pass_eval.getBestZonesToCherryPick(
-            world, best_pass_and_score_so_far.pass.receiverPoint())[0]};
-        Zones cherry_pick_region_2 = {pass_eval.getBestZonesToCherryPick(
-            world, best_pass_and_score_so_far.pass.receiverPoint())[1]};
+        auto ranked_zones = pass_eval.rankZonesForCherryPicking(
+            world, best_pass_and_score_so_far.pass.receiverPoint());
+        Zones cherry_pick_region_1 = {ranked_zones[0]};
+        Zones cherry_pick_region_2 = {ranked_zones[1]};
 
         auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(
             world, pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
@@ -154,11 +154,11 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     PassGenerator<EighteenZoneId> pass_generator(pitch_division,
                                                  play_config->getPassingConfig());
 
-    auto pass_eval             = pass_generator.generatePassEvaluation(world);
-    Zones cherry_pick_region_1 = {
-        pass_eval.getBestZonesToCherryPick(world, world.ball().position())[0]};
-    Zones cherry_pick_region_2 = {
-        pass_eval.getBestZonesToCherryPick(world, world.ball().position())[1]};
+    auto pass_eval = pass_generator.generatePassEvaluation(world);
+    auto ranked_zones =
+        pass_eval.rankZonesForCherryPicking(world, world.ball().position());
+    Zones cherry_pick_region_1 = {ranked_zones[0]};
+    Zones cherry_pick_region_2 = {ranked_zones[1]};
 
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 

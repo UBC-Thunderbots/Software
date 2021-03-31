@@ -26,7 +26,7 @@ template <class ZoneEnum>
 class PassGenerator
 {
     static_assert(std::is_enum<ZoneEnum>::value,
-                  "PassGenerator: ZoneEnum must be an zone id enum");
+                  "PassGenerator: ZoneEnum must be a zone id enum");
 
    public:
     /**
@@ -44,7 +44,9 @@ class PassGenerator
     /**
      * Creates a PassEvaluation given a world and a field pitch division.
      *
-     * NOTE: It is important that this function is able to run in 10ms.
+     * NOTE: If we want to run our AI at 30hz, it gives us 1/30 = 33ms between ticks.
+     * This function needs to run in less than 1/3 of that time (< 10ms) to allow
+     * for other modules in our AI to have enough time to run.
      *
      * Passes are evaluated on the provided world. If the evaluation takes longer than
      * the time between two vision frames, we will be evaluating on an outdated world.
@@ -63,7 +65,7 @@ class PassGenerator
 
    private:
     // The number of parameters (representing a pass) that we optimize
-    // (pass_start_x, pass_start_y, pass_speed)
+    // (receive_location_x, receive_location_y, pass_speed)
     static const int NUM_PARAMS_TO_OPTIMIZE = 3;
 
     // Weights used to normalize the parameters that we pass to GradientDescent
@@ -115,7 +117,7 @@ class PassGenerator
     // Pitch division
     std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division_;
 
-    // Pitch division
+    // Passing configuration
     std::shared_ptr<const PassingConfig> passing_config_;
 
     // A random number generator for use across the class

@@ -173,10 +173,10 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     auto pass_eval = pass_generator.generatePassEvaluation(world);
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
-    Zones cherry_pick_region_1 = {pass_eval.getBestZonesToCherryPick(
-        world, best_pass_and_score_so_far.pass.receiverPoint())[0]};
-    Zones cherry_pick_region_2 = {pass_eval.getBestZonesToCherryPick(
-        world, best_pass_and_score_so_far.pass.receiverPoint())[1]};
+    auto ranked_zones = pass_eval.rankZonesForCherryPicking(
+        world, best_pass_and_score_so_far.pass.receiverPoint());
+    Zones cherry_pick_region_1 = {ranked_zones[0]};
+    Zones cherry_pick_region_2 = {ranked_zones[1]};
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass

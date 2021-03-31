@@ -59,7 +59,7 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
         passes.emplace(
             zone_id,
             PassWithRating{pass, ratePass(world, pass, pitch_division_->getZone(zone_id),
-                                          passing_config_, false)});
+                                          passing_config_)});
     }
 
     return passes;
@@ -80,9 +80,9 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
         const auto objective_function =
             [this, &world,
              zone_id](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
-                return ratePass(
-                    world, Pass::fromPassArray(world.ball().position(), pass_array),
-                    pitch_division_->getZone(zone_id), passing_config_, false);
+                return ratePass(world,
+                                Pass::fromPassArray(world.ball().position(), pass_array),
+                                pitch_division_->getZone(zone_id), passing_config_);
             };
 
         auto pass_array = optimizer_.maximize(
@@ -90,8 +90,8 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
             passing_config_->getNumberOfGradientDescentStepsPerIter()->value());
 
         auto new_pass = Pass::fromPassArray(world.ball().position(), pass_array);
-        auto score    = ratePass(world, new_pass, pitch_division_->getZone(zone_id),
-                              passing_config_, false);
+        auto score =
+            ratePass(world, new_pass, pitch_division_->getZone(zone_id), passing_config_);
 
         optimized_passes.emplace(zone_id, PassWithRating{new_pass, score});
     }
@@ -110,8 +110,8 @@ void PassGenerator<ZoneEnum>::updatePasses(const World& world,
             world.ball().position(), current_best_passes_.at(zone_id).pass.toPassArray());
 
         if (ratePass(world, current_best_passes_.at(zone_id).pass,
-                     pitch_division_->getZone(zone_id), passing_config_,
-                     false) < optimized_passes.at(zone_id).rating)
+                     pitch_division_->getZone(zone_id),
+                     passing_config_) < optimized_passes.at(zone_id).rating)
         {
             current_best_passes_.at(zone_id) = optimized_passes.at(zone_id);
         }

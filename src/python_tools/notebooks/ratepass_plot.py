@@ -37,7 +37,7 @@ from python_tools.plotting.plot_heatmap import HeatmapPlotter
 
 output_notebook()
 
-fig = figure(plot_width=900, plot_height=900, match_aspect=True)
+fig = figure(plot_width=900, plot_height=900, match_aspect=True, output_backend="webgl")
 
 field_length = wrapper_proto_log[0].geometry.field.field_length / MM_PER_M
 field_width = wrapper_proto_log[0].geometry.field.field_width / MM_PER_M
@@ -60,10 +60,15 @@ rate_pass_friendly_heatmap_plotter = HeatmapPlotter(
     heatmap_grid_size,
     "ratePassFriendlyCapability",
 )
+rate_pass_shoot_score_plotter = HeatmapPlotter(
+    fig, heatmap_x_bounds, heatmap_y_bounds, heatmap_grid_size, "ratePassShootScore",
+)
 
 fig.legend.click_policy = "hide"
 
 heatmap_grid_size = 0.05
+
+config = passing.getPassingConfig()
 
 
 def plot_ssl_wrapper_at_idx(idx):
@@ -74,39 +79,33 @@ def plot_ssl_wrapper_at_idx(idx):
 
     the_world = world.World(wrapper_proto_log[idx].SerializeToString(), dict())
 
+    pass_dict = {
+        "passer_point": the_world.ball().position(),
+        "pass_speed": 3,
+    }
+
     def ratePassCost(x, y):
-        receiver_point = world.Point(x, y)
-        pass_dict = {
-            "passer_point": world.Point(4, 2),
-            "receiver_point": receiver_point,
-            "pass_speed": 5.0,
-            "receive_and_dribble": False,
-        }
-        return passing.ratePass(the_world, pass_dict)
+        pass_dict["receiver_point"] = world.Point(x, y)
+        return passing.ratePass(the_world, pass_dict, config)
 
     def ratePassEnemyRiskCost(x, y):
-        receiver_point = world.Point(x, y)
-        pass_dict = {
-            "passer_point": world.Point(4, 2),
-            "receiver_point": receiver_point,
-            "pass_speed": 5.0,
-            "receive_and_dribble": False,
-        }
-        return passing.ratePassEnemyRisk(the_world, pass_dict)
+        pass_dict["receiver_point"] = world.Point(x, y)
+        return passing.ratePassEnemyRisk(the_world, pass_dict, config)
 
     def ratePassFriendlyCapabilityCost(x, y):
+        pass_dict["receiver_point"] = world.Point(x, y)
+        return passing.ratePassFriendlyCapability(the_world, pass_dict, config)
+
+    def ratePassShootScoreCost(x, y):
         receiver_point = world.Point(x, y)
-        pass_dict = {
-            "passer_point": world.Point(4, 2),
-            "receiver_point": receiver_point,
-            "pass_speed": 5.0,
-            "receive_and_dribble": False,
-        }
-        return passing.ratePassFriendlyCapability(the_world, pass_dict)
+        pass_dict["receiver_point"] = world.Point(x, y)
+        return passing.ratePassShootScore(the_world, pass_dict, config)
 
     rate_pass_heatmap_plotter.plot_heatmap(ratePassCost)
     rate_pass_enemy_heatmap_plotter.plot_heatmap(ratePassEnemyRiskCost)
     rate_pass_friendly_heatmap_plotter.plot_heatmap(ratePassFriendlyCapabilityCost)
+    rate_pass_shoot_score_plotter.plot_heatmap(ratePassShootScoreCost)
+
     push_notebook()
 
 
