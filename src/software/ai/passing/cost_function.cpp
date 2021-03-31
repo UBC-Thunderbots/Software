@@ -100,6 +100,8 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
     // Receiver robots on the friendly side, almost always, need to rotate a full 180
     // degrees to shoot on net. So we relax that requirement for both receiver and ball
     // locations on the friendly side
+    //
+    // TODO (#1987) This creates a very steep slope, find a better way to do this
     if (pass.receiverPoint().x() < 0 || pass.passerPoint().x() < 0)
     {
         ideal_max_rotation_to_shoot_degrees = 180;
