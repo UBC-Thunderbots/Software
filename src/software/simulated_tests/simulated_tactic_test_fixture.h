@@ -46,7 +46,7 @@ class SimulatedTacticTestFixture : public SimulatedTestFixture
     void setMotionConstraints(const std::set<MotionConstraint>& motion_constraints);
 
    private:
-    void updatePrimitives(const World& world,
+    void updatePrimitives(World world,
                           std::shared_ptr<Simulator> simulator_to_update) override;
     std::optional<PlayInfo> getPlayInfo() override;
     AIDrawFunction getDrawFunctions() override;

@@ -7,6 +7,7 @@ SimulatedPlayTestFixture::SimulatedPlayTestFixture()
     : ai_config(mutable_thunderbots_config->getMutableAiConfig()),
       ai_control_config(mutable_thunderbots_config->getMutableAiControlConfig()),
       sensor_fusion_config(mutable_thunderbots_config->getMutableSensorFusionConfig()),
+      game_state(),
       ai(thunderbots_config->getAiConfig(), thunderbots_config->getAiControlConfig(),
          thunderbots_config->getPlayConfig())
 {
@@ -42,9 +43,23 @@ void SimulatedPlayTestFixture::setAIPlay(const std::string& ai_play)
     ai_control_config->getMutableCurrentAiPlay()->setValue(ai_play);
 }
 
-void SimulatedPlayTestFixture::updatePrimitives(
-    const World& world, std::shared_ptr<Simulator> simulator_to_update)
+void SimulatedPlayTestFixture::setRefereeCommand(
+    const RefereeCommand& current_referee_command,
+    const RefereeCommand& previous_referee_command)
 {
+    game_state.updateRefereeCommand(previous_referee_command);
+    game_state.updateRefereeCommand(current_referee_command);
+}
+
+void SimulatedPlayTestFixture::setGameState(const GameState& game_state_)
+{
+    game_state = game_state_;
+}
+
+void SimulatedPlayTestFixture::updatePrimitives(
+    World world, std::shared_ptr<Simulator> simulator_to_update)
+{
+    world.updateGameState(game_state);
     auto primitive_set_msg = ai.getPrimitives(world);
     simulator_to_update->setYellowRobotPrimitiveSet(
         createNanoPbPrimitiveSet(*primitive_set_msg));

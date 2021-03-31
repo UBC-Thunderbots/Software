@@ -11,9 +11,9 @@ cc_library(
     deps = [
         ":play",
         "//shared:constants",
+        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
-        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/logger",
         "//software/util/design_patterns:generic_factory",
     ],
