@@ -68,9 +68,10 @@ class PassEvaluation
     /**
      * Returns the best zones to send robots to cherry pick in
      *
+     * @param world The world to rank the zones for
      * @return vector of sorted ZoneEnums, with the highest quality zones first
      */
-    std::vector<ZoneEnum> rankZonesForCherryPicking(const World& field,
+    std::vector<ZoneEnum> rankZonesForCherryPicking(const World& world,
                                                     const Point& position) const;
 
     /**

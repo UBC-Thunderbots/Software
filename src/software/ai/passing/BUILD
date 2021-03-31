@@ -105,6 +105,7 @@ cc_library(
         "//software/geom:point",
         "//software/geom:rectangle",
         "//software/util/make_enum",
+        "//software/world",
     ],
 )
 

@@ -34,7 +34,7 @@ double ratePassWrapper(const World& world, py::dict pass_dict,
                        py::dict passing_config_dict)
 {
     auto pass = createPassFromDict(pass_dict);
-    return ratePass(world, pass, world.field().fieldLines(), passing_config, false);
+    return ratePass(world, pass, world.field().fieldLines(), passing_config);
 }
 
 double ratePassShootScoreWrapper(const World& world, py::dict pass_dict,

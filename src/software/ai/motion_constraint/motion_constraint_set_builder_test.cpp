@@ -12,7 +12,7 @@
 namespace
 {
     World world = ::TestUtil::createBlankTestingWorld();
-    Pass pass({1, 1}, 2.29);
+    Pass pass({1, 1}, {0.5, 0}, 2.29);
 
 
     // vector of pairs of Tactic and allowed MotionConstraints
