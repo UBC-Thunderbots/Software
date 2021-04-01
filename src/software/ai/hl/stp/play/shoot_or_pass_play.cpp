@@ -117,9 +117,9 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
             if (!passer->done())
             {
-                yield({goalie_tactic, passer, receiver, cherry_pick_tactic_1,
-                       std::get<0>(crease_defender_tactics),
-                       std::get<1>(crease_defender_tactics)});
+                yield({{goalie_tactic, passer, receiver},
+                       {cherry_pick_tactic_1, std::get<0>(crease_defender_tactics),
+                        std::get<1>(crease_defender_tactics)}});
             }
             else
             {
@@ -128,9 +128,10 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 cherry_pick_tactic_2->updateControlParams(
                     pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
-                yield({goalie_tactic, receiver, cherry_pick_tactic_1,
-                       cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
-                       std::get<1>(crease_defender_tactics)});
+                yield({{goalie_tactic, receiver},
+                       {cherry_pick_tactic_1, cherry_pick_tactic_2},
+                       {std::get<0>(crease_defender_tactics),
+                        std::get<1>(crease_defender_tactics)}});
             }
         } while (!receiver->done());
     }
@@ -185,9 +186,10 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.rating;
 
-        yield({goalie_tactic, shoot_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
-               std::get<0>(crease_defender_tactics),
-               std::get<1>(crease_defender_tactics)});
+        yield({{goalie_tactic},
+               {shoot_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
+                std::get<0>(crease_defender_tactics),
+                std::get<1>(crease_defender_tactics)}});
 
         pass_eval                  = pass_generator.generatePassEvaluation(world);
         best_pass_and_score_so_far = pass_eval.getBestPassOnField();

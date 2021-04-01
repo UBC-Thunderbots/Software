@@ -150,8 +150,8 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
         updateAlignToBallTactic(align_to_ball_tactic, world);
         update_cherry_pickers(pass_generator.generatePassEvaluation(world));
 
-        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
-               cherry_pick_tactic_2, bait_move_tactic_1, bait_move_tactic_2});
+        yield({{goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
+               cherry_pick_tactic_2, bait_move_tactic_1, bait_move_tactic_2}});
     }
 
 
@@ -166,8 +166,8 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
         updateAlignToBallTactic(align_to_ball_tactic, world);
         update_cherry_pickers(pass_generator.generatePassEvaluation(world));
 
-        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
-               cherry_pick_tactic_2, bait_move_tactic_1, bait_move_tactic_2});
+        yield({{goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
+               cherry_pick_tactic_2, bait_move_tactic_1, bait_move_tactic_2}});
 
     } while (!align_to_ball_tactic->done());
 
@@ -183,8 +183,8 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
         updateAlignToBallTactic(align_to_ball_tactic, world);
         update_cherry_pickers(pass_generator.generatePassEvaluation(world));
 
-        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
-               cherry_pick_tactic_2, bait_move_tactic_1, bait_move_tactic_2});
+        yield({{goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
+               cherry_pick_tactic_2, bait_move_tactic_1, bait_move_tactic_2}});
 
         best_pass_and_score_so_far =
             pass_generator.generatePassEvaluation(world).getBestPassOnField();
