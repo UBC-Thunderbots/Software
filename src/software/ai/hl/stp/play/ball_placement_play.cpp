@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/play/ball_placement_play.h"
 
+#include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
@@ -54,9 +55,9 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     do
     {
-        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic, place_ball_tactic};
+        TacticVector result = {goalie_tactic, place_ball_tactic};
         result.insert(result.end(), move_tactics.begin(), move_tactics.end());
-        yield(result);
+        yield({result});
     } while (true);
 }
 
