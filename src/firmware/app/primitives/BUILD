@@ -26,7 +26,6 @@ cc_library(
         ":move",
         ":primitive",
         ":direct_control",
-        ":spinning_move",
         ":stop",
         "//firmware/app/world:firmware_world",
     ] + select({
@@ -61,18 +60,6 @@ cc_library(
         "//firmware/shared:util",
         "//shared:constants",
         "//shared:robot_constants",
-    ],
-)
-
-cc_library(
-    name = "spinning_move",
-    srcs = ["spinning_move_primitive.c"],
-    hdrs = ["spinning_move_primitive.h"],
-    deps = [
-        ":primitive",
-        "//firmware/app/control",
-        "//firmware/app/control:bangbang",
-        "//firmware/shared:physics",
     ],
 )
 

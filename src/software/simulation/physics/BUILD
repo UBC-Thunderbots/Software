@@ -182,8 +182,6 @@ cc_library(
         ":physics_ball",
         ":physics_object_user_data",
         ":physics_robot",
-        "//software/simulation:simulator_ball",
-        "//software/simulation:simulator_robot",
         "@box2d",
     ],
 )

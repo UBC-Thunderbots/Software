@@ -36,7 +36,7 @@ ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
                                     AutoChipOrKickMode::AUTOKICK,
                                     kick_speed,
                                 },
-                                MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
         return move_with_kick_primitive;
     }
     else if (controller_input.isChipButtonPressed())
@@ -48,7 +48,7 @@ ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
                                     AutoChipOrKickMode::AUTOCHIP,
                                     chip_distance,
                                 },
-                                MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
         return move_with_chip_primitive;
     }
     else

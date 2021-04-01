@@ -5,8 +5,8 @@
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/firmware_object_deleter.h"
 #include "software/simulation/physics/physics_world.h"
-#include "software/simulation/simulator_ball.h"
-#include "software/simulation/simulator_robot.h"
+#include "software/simulation/physics_simulator_ball.h"
+#include "software/simulation/physics_simulator_robot.h"
 #include "software/world/field.h"
 #include "software/world/team_types.h"
 #include "software/world/world.h"
@@ -189,8 +189,8 @@ class Simulator
      */
     static void updateSimulatorRobots(
         const std::vector<std::weak_ptr<PhysicsRobot>>& physics_robots,
-        std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
-            simulator_robots,
+        std::map<std::shared_ptr<PhysicsSimulatorRobot>,
+                 std::shared_ptr<FirmwareWorld_t>>& simulator_robots,
         TeamColour team_colour);
 
     /**
@@ -204,15 +204,16 @@ class Simulator
      */
     static void setRobotPrimitive(
         RobotId id, const TbotsProto_Primitive& primitive_msg,
-        std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
-            simulator_robots,
-        const std::shared_ptr<SimulatorBall>& simulator_ball, FieldSide defending_side);
+        std::map<std::shared_ptr<PhysicsSimulatorRobot>,
+                 std::shared_ptr<FirmwareWorld_t>>& simulator_robots,
+        const std::shared_ptr<PhysicsSimulatorBall>& simulator_ball,
+        FieldSide defending_side);
 
     PhysicsWorld physics_world;
-    std::shared_ptr<SimulatorBall> simulator_ball;
-    std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
+    std::shared_ptr<PhysicsSimulatorBall> simulator_ball;
+    std::map<std::shared_ptr<PhysicsSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
         yellow_simulator_robots;
-    std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
+    std::map<std::shared_ptr<PhysicsSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
         blue_simulator_robots;
     FieldSide yellow_team_defending_side;
     FieldSide blue_team_defending_side;

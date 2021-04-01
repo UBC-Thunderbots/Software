@@ -1,11 +1,9 @@
 #pragma once
 
-#include <cinttypes>
 #include <memory>
+#include <optional>
 
 #include "software/simulation/firmware_object_deleter.h"
-#include "software/simulation/physics/physics_ball.h"
-#include "software/simulation/physics/physics_robot.h"
 
 extern "C"
 {
@@ -14,11 +12,7 @@ extern "C"
 }
 
 /**
- * The SimulatorRobot class acts as a wrapper for a PhysicsRobot that deals with more
- * logic-focused elements for simulation, such as whether or not autokick is enabled.
- *
- * All members of this class are intentionally protected or private to force this class
- * to only be controlled by the SimulatorRobotSingleton.
+ *  The SimulatorRobot is an abstract class for simulator robot implementations
  */
 class SimulatorRobot
 {
@@ -26,24 +20,16 @@ class SimulatorRobot
 
    public:
     /**
-     * Create a new SimulatorRobot given a PhysicsRobot
-     *
-     * @param physics_robot the PhysicsRobot to simulate and control
+     * Create a new SimulatorRobot
      */
-    explicit SimulatorRobot(std::weak_ptr<PhysicsRobot> physics_robot);
-    explicit SimulatorRobot() = delete;
+    explicit SimulatorRobot();
 
     /**
      * Returns the ID of this robot
      *
      * @return the ID of this robot
      */
-    unsigned int getRobotId();
-
-    /**
-     * Clears balls tracked as being in dribbler area
-     */
-    void clearBallInDribblerArea();
+    virtual unsigned int getRobotId() = 0;
 
    protected:
     /**
@@ -51,49 +37,49 @@ class SimulatorRobot
      *
      * @return the x-position of the robot, in global field coordinates, in meters
      */
-    float getPositionX();
+    virtual float getPositionX() = 0;
 
     /**
      * Returns the y-position of the robot, in global field coordinates, in meters
      *
      * @return the y-position of the robot, in global field coordinates, in meters
      */
-    float getPositionY();
+    virtual float getPositionY() = 0;
 
     /**
      * Returns the orientation of the robot, in global field coordinates, in radians
      *
      * @return the orientation of the robot, in global field coordinates, in radians
      */
-    float getOrientation();
+    virtual float getOrientation() = 0;
 
     /**
      * Returns the x-velocity of the robot, in global field coordinates, in m/s
      *
      * @return the x-velocity of the robot, in global field coordinates, in m/s
      */
-    float getVelocityX();
+    virtual float getVelocityX() = 0;
 
     /**
      * Returns the y-velocity of the robot, in global field coordinates, in m/s
      *
      * @return the y-velocity of the robot, in global field coordinates, in m/s
      */
-    float getVelocityY();
+    virtual float getVelocityY() = 0;
 
     /**
      * Returns the angular velocity of the robot, in rad/s
      *
      * @return the angular of the robot, in rad/s
      */
-    float getVelocityAngular();
+    virtual float getVelocityAngular() = 0;
 
     /**
      * Returns the battery voltage, in volts
      *
      * @return the battery voltage, in volts
      */
-    float getBatteryVoltage();
+    virtual float getBatteryVoltage() = 0;
 
     /**
      * Fires the kicker, kicking the ball in the direction the robot is facing
@@ -101,7 +87,7 @@ class SimulatorRobot
      *
      * @param speed_m_per_s How fast to kick the ball, in meters per second
      */
-    void kick(float speed_m_per_s);
+    virtual void kick(float speed_m_per_s) = 0;
 
     /**
      * Fires the chipper, chipping the ball in the direction the robot is facing
@@ -110,7 +96,7 @@ class SimulatorRobot
      * @param speed_m_per_s How far to chip the ball (the distance to the first bounce)
      * in meters
      */
-    void chip(float distance_m);
+    virtual void chip(float distance_m) = 0;
 
     /**
      * Enables autokick on the robot. If the ball touches the kicker, the robot will
@@ -119,7 +105,7 @@ class SimulatorRobot
      * @param speed_m_per_s How fast to kick the ball in meters per second when
      * the kicker is fired
      */
-    void enableAutokick(float speed_m_per_s);
+    virtual void enableAutokick(float speed_m_per_s) = 0;
 
     /**
      * Enables autochip on the robot. If the ball touches the chipper, the robot will
@@ -128,84 +114,84 @@ class SimulatorRobot
      * @param speed_m_per_s How far to chip the ball (distance to the first bounce)
      * when the chipper is fired
      */
-    void enableAutochip(float distance_m);
+    virtual void enableAutochip(float distance_m) = 0;
 
     /**
      * Disables autokick
      */
-    void disableAutokick();
+    virtual void disableAutokick() = 0;
 
     /**
      * Disables autochip
      */
-    void disableAutochip();
+    virtual void disableAutochip() = 0;
 
     /**
      * Returns true if autokick is enabled and false otherwise
      *
      * @return true if autokick is enabled and false otherwise
      */
-    bool isAutokickEnabled();
+    virtual bool isAutokickEnabled() = 0;
 
     /**
      * Returns true if autochip is enabled and false otherwise
      *
      * @return true if autochip is enabled and false otherwise
      */
-    bool isAutochipEnabled();
+    virtual bool isAutochipEnabled() = 0;
 
     /**
      * Sets the speed of the dribbler
      *
      * @param rpm The rpm to set for the dribbler
      */
-    void setDribblerSpeed(uint32_t rpm);
+    virtual void setDribblerSpeed(uint32_t rpm) = 0;
 
     /**
      * Makes the dribbler coast until another operation is applied to it
      */
-    void dribblerCoast();
+    virtual void dribblerCoast() = 0;
 
     /**
      * Returns the temperature of the dribbler, in degrees C
      *
      * @return the temperature of the dribbler, in degrees C
      */
-    unsigned int getDribblerTemperatureDegC();
+    virtual unsigned int getDribblerTemperatureDegC() = 0;
 
     /**
      * Applies the given force to the wheel
      *
      * @param force_in_newtons the force to apply to the wheel
      */
-    void applyWheelForceFrontLeft(float force_in_newtons);
-    void applyWheelForceBackLeft(float force_in_newtons);
-    void applyWheelForceBackRight(float force_in_newtons);
-    void applyWheelForceFrontRight(float force_in_newtons);
+    virtual void applyWheelForceFrontLeft(float force_in_newtons)  = 0;
+    virtual void applyWheelForceBackLeft(float force_in_newtons)   = 0;
+    virtual void applyWheelForceBackRight(float force_in_newtons)  = 0;
+    virtual void applyWheelForceFrontRight(float force_in_newtons) = 0;
 
     /**
      * Gets the motor speed for the wheel, in RPM
      */
-    float getMotorSpeedFrontLeft();
-    float getMotorSpeedBackLeft();
-    float getMotorSpeedBackRight();
-    float getMotorSpeedFrontRight();
+    virtual float getMotorSpeedFrontLeft()  = 0;
+    virtual float getMotorSpeedBackLeft()   = 0;
+    virtual float getMotorSpeedBackRight()  = 0;
+    virtual float getMotorSpeedFrontRight() = 0;
 
     /**
      * Sets the motor to coast (spin freely)
      */
-    void coastMotorBackLeft();
-    void coastMotorBackRight();
-    void coastMotorFrontLeft();
-    void coastMotorFrontRight();
+    virtual void coastMotorBackLeft()   = 0;
+    virtual void coastMotorBackRight()  = 0;
+    virtual void coastMotorFrontLeft()  = 0;
+    virtual void coastMotorFrontRight() = 0;
 
     /**
      * Sets the motor to brake (act against the current direction of rotation)
      */
-    void brakeMotorBackLeft();
-    void brakeMotorBackRight();
-    void brakeMotorFrontLeft();
-    void brakeMotorFrontRight();
+    virtual void brakeMotorBackLeft()   = 0;
+    virtual void brakeMotorBackRight()  = 0;
+    virtual void brakeMotorFrontLeft()  = 0;
+    virtual void brakeMotorFrontRight() = 0;
 
     /**
      * Sets the current primitive this robot is running to a new one
@@ -213,100 +199,17 @@ class SimulatorRobot
      * @param firmware_world The world to run the primitive in
      * @param primitive_msg The primitive to start
      */
-    void startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
-                           const TbotsProto_Primitive& primitive_msg);
+    virtual void startNewPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world,
+                                   const TbotsProto_Primitive& primitive_msg) = 0;
 
     /**
      * Runs the current primitive
      *
      * @param world The world to run the primitive in
      */
-    void runCurrentPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world);
+    virtual void runCurrentPrimitive(std::shared_ptr<FirmwareWorld_t> firmware_world) = 0;
 
-   private:
-    /**
-     * A function that is called during every physics step for as long as the ball
-     * is touching this robot's dribbler
-     *
-     * @param physics_robot The robot involved in the contact
-     * @param physics_ball The ball invovled in the contact
-     */
-    void onDribblerBallContact(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
-
-    /**
-     * A function that is called during once when the ball starts touching
-     * this robot's dribbler.
-     *
-     * @param physics_robot The robot involved in the contact
-     * @param physics_ball The ball invovled in the contact
-     */
-    void onDribblerBallStartContact(PhysicsRobot* physics_robot,
-                                    PhysicsBall* physics_ball);
-
-    /**
-     * A function that is called during once when the ball stops touching
-     * this robot's dribbler.
-     *
-     * @param physics_robot The robot involved in the contact
-     * @param physics_ball The ball invovled in the contact
-     */
-    void onDribblerBallEndContact(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
-
-    /**
-     * Helper functions that check if the current pointer to the physics_robot is valid
-     * before calling the given function. If the physics_robot is invalid, a warning is
-     * logged and a default value is returned.
-     *
-     * @param func The function to perform on the physics robot
-     */
-    void checkValidAndExecuteVoid(
-        std::function<void(std::shared_ptr<PhysicsRobot>)> func);
-    float checkValidAndReturnFloat(
-        std::function<float(std::shared_ptr<PhysicsRobot>)> func);
-    unsigned int checkValidAndReturnUint(
-        std::function<unsigned int(std::shared_ptr<PhysicsRobot>)> func);
-
-    /**
-     * Applies force to the physics ball to simulate it being dribbled by the
-     * physics robot.
-     *
-     * @param physics_robot The robot that should dribble the ball
-     * @param physics_ball The ball to be dribbled
-     */
-    void applyDribblerForce(PhysicsRobot* physics_robot, PhysicsBall* physics_ball);
-
-    std::weak_ptr<PhysicsRobot> physics_robot;
     std::optional<float> autokick_speed_m_per_s;
     std::optional<float> autochip_distance_m;
-    uint32_t dribbler_rpm;
-
-    typedef struct DribblerBall_t
-    {
-        PhysicsBall* ball;
-        // We keep track of whether or not the ball can be controlled
-        // in any way by the robot. This includes kicking, chipping,
-        // and dribbling. This extra information is used to
-        // prevent edge cases like the ball getting kicked/chipped
-        // multiple times, and to prevent the dribbler from affecting
-        // kicking
-        bool can_be_controlled;
-    } DribblerBall;
-
-    std::optional<DribblerBall> ball_in_dribbler_area;
-
     std::unique_ptr<PrimitiveManager, FirmwarePrimitiveManagerDeleter> primitive_manager;
-
-    // How much the dribbler damps the ball when they collide. Each component
-    // of the damping can be changed separately so we have the flexibility to tune
-    // this behavior to match real life. These values have been manually tuned
-    // such that the robots are able to hit one-time shots in simulation with
-    // sufficient accuracy.
-    static constexpr double DRIBBLER_HEAD_ON_DAMPING       = 0.7;
-    static constexpr double DRIBBLER_PERPENDICULAR_DAMPING = 0.61;
-    // A value in the range [0, 1] that indicates how much momentum is conserved when the
-    // ball is kicked. Higher values will cause the ball to be kicked with an even greater
-    // velocity if it had an initial non-zero velocity when being kicked.
-    // This value is a very rough estimate of real-world behaviour, so that the ball
-    // will be kicked slightly faster it it entered the kicker with some initial velocity.
-    static constexpr double MOMENTUM_CONSERVED_DURING_KICK = 0.1;
 };
