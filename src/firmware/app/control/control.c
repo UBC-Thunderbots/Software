@@ -121,7 +121,6 @@ void app_control_applyAccel(const FirmwareRobot_t* robot, Wheel_t* front_left_wh
         angular_accel *= scaling;
     }
 
-    // TODO: Do we need to make sure we need to check it's not NULL?
     ControllerState_t* controller_state = app_firmware_robot_getControllerState(robot);
     float prev_linear_accel_x           = controller_state->last_applied_acceleration_x;
     float prev_linear_accel_y           = controller_state->last_applied_acceleration_y;

@@ -40,6 +40,12 @@ typedef struct ControllerState
     float last_applied_acceleration_angular;
 } ControllerState_t;
 
+typedef enum
+{
+    FORCE_WHEEL,
+    VELOCITY_WHEEL
+} Robot_Wheel_Type;
+
 /**
  * Create a robot with the given hardware
  *
