@@ -123,8 +123,8 @@ void FreeKickPlay::chipAtGoalStage(
     {
         chip_tactic->updateControlParams(world.ball().position(), chip_target);
 
-        yield({goalie_tactic, chip_tactic, std::get<0>(crease_defender_tactics),
-               std::get<1>(crease_defender_tactics)});
+        yield({{goalie_tactic, chip_tactic, std::get<0>(crease_defender_tactics),
+                std::get<1>(crease_defender_tactics)}});
 
     } while (!chip_tactic->done());
 }
@@ -152,8 +152,8 @@ void FreeKickPlay::performPassStage(
         passer->updateControlParams(pass);
         receiver->updateControlParams(pass);
 
-        yield({goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
-               std::get<1>(crease_defender_tactics)});
+        yield({{goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
+                std::get<1>(crease_defender_tactics)}});
     } while (!receiver->done());
 }
 
@@ -200,9 +200,9 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         cherry_pick_tactic_2->updateControlParams(
             pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
-        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
-               cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
-               std::get<1>(crease_defender_tactics)});
+        yield({{goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
+                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
+                std::get<1>(crease_defender_tactics)}});
     }
 
 
@@ -223,9 +223,9 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         cherry_pick_tactic_2->updateControlParams(
             pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
-        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
-               cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
-               std::get<1>(crease_defender_tactics)});
+        yield({{goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
+                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
+                std::get<1>(crease_defender_tactics)}});
     } while (!align_to_ball_tactic->done());
 
     LOG(DEBUG) << "Finished aligning to ball";
@@ -248,9 +248,9 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         cherry_pick_tactic_2->updateControlParams(
             pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
-        yield({goalie_tactic, align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1,
-               cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
-               std::get<1>(crease_defender_tactics)});
+        yield({{goalie_tactic, align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1,
+                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
+                std::get<1>(crease_defender_tactics)}});
 
         best_pass_and_score_so_far =
             pass_generator.generatePassEvaluation(world).getBestPassOnField();

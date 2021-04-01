@@ -93,7 +93,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
         passer->updateControlParams(pass);
         receiver->updateControlParams(pass);
 
-        yield({goalie_tactic, passer, receiver, bait_move_tactic_1, bait_move_tactic_2});
+        yield(
+            {{goalie_tactic, passer, receiver, bait_move_tactic_1, bait_move_tactic_2}});
     } while (!receiver->done());
 
     LOG(DEBUG) << "Finished";
@@ -167,6 +168,7 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
                cherry_pick_tactic_2, bait_move_tactic_1, bait_move_tactic_2});
+
     } while (!align_to_ball_tactic->done());
 
     LOG(DEBUG) << "Finished aligning to ball";
