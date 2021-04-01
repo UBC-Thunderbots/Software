@@ -67,7 +67,7 @@ class KickTactic : public Tactic
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-    HFSM<KickFSM> fsm;
+    FSM<KickFSM> fsm;
 
     // Tactic parameters
     KickFSM::ControlParams control_params;
