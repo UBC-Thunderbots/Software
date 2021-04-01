@@ -2,6 +2,7 @@
 
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
+#include "software/ai/hl/stp/tactic/passer/passer_fsm.h"
 
 /**
  * This tactic is for a robot performing a pass. It should be used in conjunction with
@@ -48,16 +49,20 @@ class PasserTactic : public Tactic
     double calculateRobotCost(const Robot& robot, const World& world) const override;
 
     void accept(TacticVisitor& visitor) const override;
-
-    Ball getBall() const;
+    bool done() const override;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
+    void updateIntent(const TacticUpdate& tactic_update) override;
 
     // Tactic parameters
     Pass pass;
     Ball ball;
     Field field;
+
+    BaseFSM<PasserFSM> fsm;
+
+    PasserFSM::ControlParams control_params;
 
     // How fast the ball must be moving for the passer to try intercept it
     // before passing. This is primarily used to detect if we are passing in

@@ -105,7 +105,7 @@ function run_eof_new_line(){
 }
 
 # Run formatting
-run_code_spell
+#run_code_spell
 run_clang_format
 run_bazel_formatting
 run_black_formatting

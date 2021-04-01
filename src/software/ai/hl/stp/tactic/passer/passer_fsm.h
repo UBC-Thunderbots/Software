@@ -2,32 +2,17 @@
 
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
+#include "software/ai/passing/pass.h"
+
+#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
+#include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 
 struct PasserFSM
 {
-    // these classes define the states used in the transition table
-    // they are exposed so that tests can check if the FSM is in a particular state
-    class MoveState;
-    class DribbleState;
-
-    // this struct defines the unique control parameters that the MoveFSM requires in its
-    // update
     struct ControlParams
     {
-        // The point the robot is trying to move to
-        Point destination;
-        // The orientation the robot should have when it arrives at its destination
-        Angle final_orientation;
-        // The speed the robot should have when it arrives at its destination
-        double final_speed;
-        // How to run the dribbler
-        DribblerMode dribbler_mode;
-        // How to navigate around the ball
-        BallCollisionType ball_collision_type;
-        // The command to autochip or autokick
-        AutoChipOrKick auto_chip_or_kick;
-        // The maximum allowed speed mode
-        MaxAllowedSpeedMode max_allowed_speed_mode;
+        // The pass to execute
+        std::optional<Pass> pass;
     };
 
     // this struct defines the only event that the MoveFSM responds to
@@ -37,45 +22,55 @@ struct PasserFSM
     {
         using namespace boost::sml;
 
-        // move_s is the _state_ used in the transition table
-        const auto move_s = state<MoveState>;
-
-        // update_e is the _event_ that the MoveFSM responds to
-        const auto update_e = event<Update>;
+        const auto dribble_s = state<DribbleFSM>;
+        const auto kick_s    = state<KickFSM>;
+        const auto update_e  = event<Update>;
 
         /**
-         * This is an Action that sets the intent to a move intent corresponding to the
-         * update_e event
+         * Action that updates the DribbleFSM
          *
-         * @param event MoveFSM::Update event
+         * @param event DribbleFSM::Update event
+         * @param processEvent processes the DribbleFSM::Update
          */
-        const auto update_move = [](auto event) {
-            event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), event.control_params.destination,
-                event.control_params.final_orientation, event.control_params.final_speed,
-                event.control_params.dribbler_mode,
-                event.control_params.ball_collision_type,
-                event.control_params.auto_chip_or_kick,
-                event.control_params.max_allowed_speed_mode));
+        const auto update_dribble = [](auto event,
+                                       back::process<DribbleFSM::Update> processEvent) {
+            if (event.control_params.pass)
+            {
+                DribbleFSM::ControlParams control_params{
+                    .dribble_destination = event.control_params.pass->passerPoint(),
+                    .final_dribble_orientation =
+                        event.control_params.pass->passerOrientation(),
+                    .allow_excessive_dribbling = false,
+                };
+
+                // Update the dribble fsm
+                processEvent(DribbleFSM::Update(control_params, event.common));
+            }
         };
 
         /**
-         * This guard is used to check if the robot is done moving
+         * Action that updates the KickFSM
          *
-         * @param event MoveFSM::Update event
-         *
-         * @return if robot has reached the destination
+         * @param event KickFSM::Update event
+         * @param processEvent processes the KickFSM::Update
          */
-        const auto move_done = [](auto event) {
-            return robotReachedDestination(event.common.robot,
-                                           event.control_params.destination,
-                                           event.control_params.final_orientation);
+        const auto update_kick = [](auto event,
+                                    back::process<KickFSM::Update> processEvent) {
+            if (event.control_params.pass)
+            {
+                KickFSM::ControlParams control_params{
+                    .kick_origin    = event.control_params.pass->passerPoint(),
+                    .kick_direction = event.control_params.pass->passerOrientation(),
+                    .kick_speed_meters_per_second = event.control_params.pass->speed()};
+
+                // Update the kick fsm
+                processEvent(KickFSM::Update(control_params, event.common));
+            }
         };
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *move_s + update_e[!move_done] / update_move = move_s,
-            move_s + update_e[move_done] / update_move   = X,
-            X + update_e[!move_done] / update_move       = move_s);
+            *dribble_s + update_e / update_dribble, dribble_s = kick_s,
+            kick_s + update_e / update_kick, kick_s           = X);
     }
 };

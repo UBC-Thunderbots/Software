@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/passer_tactic.h"
+#include "software/ai/hl/stp/tactic/passer/passer_tactic.h"
 
 #include <gtest/gtest.h>
 
