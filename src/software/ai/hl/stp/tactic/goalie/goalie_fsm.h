@@ -3,16 +3,16 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
+#include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
+#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/ai/intent/stop_intent.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/line.h"
 #include "software/geom/algorithms/contains.h"
-#include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
+
 
 struct GoalieFSM
 {
@@ -154,7 +154,6 @@ struct GoalieFSM
         const auto dribble_s = state<DribbleFSM>;
         const auto chip_s = state<ChipFSM>;
         const auto position_to_block_s = state<PositionToBlockState>;
-
         const auto update_e = event<Update>;
 
         // Distance to chip the ball when trying to yeet it
@@ -242,7 +241,8 @@ struct GoalieFSM
          * @param event GoalieFSM::Update event
          * @param processEvent processes the ChipFSM::Update
          */
-        const auto chip = [](auto event, back::process<ChipFSM::Update> processEvent) {
+        const auto chip =
+            [](auto event, back::process<ChipFSM::Update> processEvent) {
             ChipFSM::ControlParams control_params{
                 .chip_origin = event.common.world.ball().position(),
                 .chip_direction = (event.common.world.ball().position() - event.common.world.field().friendlyGoalCenter()).orientation(),
@@ -253,12 +253,13 @@ struct GoalieFSM
         };
 
         /**
-         * ACtion that updates the DribbleFSM
+         * Action that updates the DribbleFSM
          *
          * @param event GoalieFSM::Update event
          * @param processEvent processes the DribbleFSM::Update
          */
-        const auto dribble = [](auto event, back::process<DribbleFSM::Update> processEvent) {
+        const auto dribble =
+            [](auto event, back::process<DribbleFSM::Update> processEvent) {
             DribbleFSM::ControlParams control_params{
                 // TODO: fix dribble destination so there is strategy behind it
                 .dribble_destination = event.common.world.ball().position() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0),

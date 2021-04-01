@@ -32,8 +32,7 @@ class GoalieTactic : public Tactic
      * tactic will be restarted every time it completes
      * @param goalie_tactic_config The config to fetch parameters from
      */
-    explicit GoalieTactic(bool loop_forever, std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config/* =
-            std::make_shared<const GoalieTacticConfig>()*/);
+    explicit GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config);
 
     GoalieTactic() = delete;
 
