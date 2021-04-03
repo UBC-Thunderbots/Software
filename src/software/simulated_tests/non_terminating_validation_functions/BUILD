@@ -6,6 +6,8 @@ cc_library(
     srcs = [
         "ball_in_play_or_scored_validation.cpp",
         "ball_never_moves_backward_validation.cpp",
+        "enemy_never_scores_validation.cpp",
+        "goalie_never_leaves_defense_area.cpp",
         "robot_not_excessively_dribbling_validation.cpp",
         "robots_avoid_ball_validation.cpp",
         "robots_in_friendly_half_validation.cpp",
@@ -15,6 +17,8 @@ cc_library(
     hdrs = [
         "ball_in_play_or_scored_validation.h",
         "ball_never_moves_backward_validation.h",
+        "enemy_never_scores_validation.h",
+        "goalie_never_leaves_defense_area.h",
         "robot_not_excessively_dribbling_validation.h",
         "robots_avoid_ball_validation.h",
         "robots_in_friendly_half_validation.h",

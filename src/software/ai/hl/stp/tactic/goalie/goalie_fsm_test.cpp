@@ -63,8 +63,8 @@ TEST(GoalieFSMTest, test_transitions)
     fsm.process_event(GoalieFSM::Update(
             control_params, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<ChipFSM>));
-    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallFSM>)>(
-            boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
+    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<ChipFSM>)>(
+            boost::sml::state<GetBehindBallFSM>));
 
     // Ball is now outside of the friendly defense area, away from danger
     world =
@@ -87,8 +87,8 @@ TEST(GoalieFSMTest, test_transitions)
             control_params, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
     // Transition to ChipFSM
     EXPECT_TRUE(fsm.is(boost::sml::state<ChipFSM>));
-    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallFSM>)>(
-            boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
+    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<ChipFSM>)>(
+            boost::sml::state<GetBehindBallFSM>));
 
     // Ball is now moving quickly towards the friendly goal
     world =
