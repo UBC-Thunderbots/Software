@@ -26,8 +26,6 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                        const World &world)
 {
     auto place_ball_tactic = std::make_shared<DribbleTactic>();
-    place_ball_tactic->updateControlParams(world.gameState().getBallPlacementPoint(),
-                                           std::nullopt, true);
 
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
@@ -55,6 +53,8 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     do
     {
+        place_ball_tactic->updateControlParams(world.gameState().getBallPlacementPoint(),
+                                               std::nullopt, true);
         TacticVector result = {goalie_tactic, place_ball_tactic};
         result.insert(result.end(), move_tactics.begin(), move_tactics.end());
         yield({result});
