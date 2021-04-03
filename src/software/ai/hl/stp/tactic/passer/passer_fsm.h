@@ -12,7 +12,7 @@ struct PasserFSM
     struct ControlParams
     {
         // The pass to execute
-        std::optional<Pass> pass;
+        std::optional<Pass> pass = std::nullopt;
     };
 
     // this struct defines the only event that the MoveFSM responds to
@@ -37,9 +37,10 @@ struct PasserFSM
             if (event.control_params.pass)
             {
                 DribbleFSM::ControlParams control_params{
-                    .dribble_destination = event.control_params.pass->passerPoint(),
-                    .final_dribble_orientation =
-                        event.control_params.pass->passerOrientation(),
+                    .dribble_destination = std::make_optional<Point>(
+                        event.control_params.pass->passerPoint()),
+                    .final_dribble_orientation = std::make_optional<Angle>(
+                        event.control_params.pass->passerOrientation()),
                     .allow_excessive_dribbling = false,
                 };
 
@@ -70,7 +71,7 @@ struct PasserFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *dribble_s + update_e / update_dribble, dribble_s = kick_s,
-            kick_s + update_e / update_kick, kick_s           = X);
+            *dribble_s + update_e / update_dribble = kick_s,
+            kick_s + update_e / update_kick = X);
     }
 };

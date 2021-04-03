@@ -8,26 +8,21 @@
 #include "software/logger/logger.h"
 #include "software/world/ball.h"
 
-PasserTactic::PasserTactic(Pass pass, const Ball& ball, const Field& field,
-                           bool loop_forever)
+PasserTactic::PasserTactic(Pass pass, bool loop_forever)
     : Tactic(loop_forever, {RobotCapability::Kick, RobotCapability::Move}),
       pass(std::move(pass)),
-      ball(ball),
-      field(field),
       fsm()
 {
 }
 
-void PasserTactic::updateWorldParams(const World& world)
-{
-    this->ball  = world.ball();
-    this->field = world.field();
-}
+void PasserTactic::updateWorldParams(const World& world) {}
 
 void PasserTactic::updateControlParams(const Pass& updated_pass)
 {
     // Update the control parameters stored by this Tactic
-    control_params.pass = std::make_optional(updated_pass);
+    control_params.pass = std::make_optional<Pass>(
+        Pass(updated_pass.passerPoint(), updated_pass.receiverPoint(),
+             updated_pass.speed(), updated_pass.startTime()));
 }
 
 void PasserTactic::updateIntent(const TacticUpdate &tactic_update)

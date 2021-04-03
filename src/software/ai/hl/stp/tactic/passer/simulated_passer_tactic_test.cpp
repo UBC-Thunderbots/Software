@@ -26,7 +26,6 @@ TEST_P(SimulatedPasserTacticTest, passer_test)
     BallState ball_state         = std::get<2>(GetParam());
 
     setBallState(ball_state);
-    setBallState(BallState(Point(4.5, -3), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)}));
     addFriendlyRobots({robot_state});
 
