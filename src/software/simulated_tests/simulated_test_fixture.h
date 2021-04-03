@@ -126,7 +126,7 @@ class SimulatedTestFixture : public ::testing::Test
      * @param world to update primitives with
      * @param simulator_to_update The simulator to update
      */
-    virtual void updatePrimitives(World world,
+    virtual void updatePrimitives(const World& world,
                                   std::shared_ptr<Simulator> simulator_to_update) = 0;
 
     /**

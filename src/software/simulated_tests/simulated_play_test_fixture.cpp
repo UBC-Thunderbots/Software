@@ -57,10 +57,11 @@ void SimulatedPlayTestFixture::setGameState(const GameState& game_state_)
 }
 
 void SimulatedPlayTestFixture::updatePrimitives(
-    World world, std::shared_ptr<Simulator> simulator_to_update)
+    const World& world, std::shared_ptr<Simulator> simulator_to_update)
 {
-    world.updateGameState(game_state);
-    auto primitive_set_msg = ai.getPrimitives(world);
+    auto world_with_updated_game_state = world;
+    world_with_updated_game_state.updateGameState(game_state);
+    auto primitive_set_msg = ai.getPrimitives(world_with_updated_game_state);
     simulator_to_update->setYellowRobotPrimitiveSet(
         createNanoPbPrimitiveSet(*primitive_set_msg));
 }

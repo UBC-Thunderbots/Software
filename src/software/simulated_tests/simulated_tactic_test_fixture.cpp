@@ -56,7 +56,7 @@ void SimulatedTacticTestFixture::setMotionConstraints(
 }
 
 void SimulatedTacticTestFixture::updatePrimitives(
-    World world, std::shared_ptr<Simulator> simulator_to_update)
+    const World& world, std::shared_ptr<Simulator> simulator_to_update)
 {
     std::vector<std::unique_ptr<Intent>> intents;
     if (!robot_id)
