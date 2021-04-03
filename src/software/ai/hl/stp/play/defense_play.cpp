@@ -87,12 +87,12 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         }
         shoot_goal_tactic->updateControlParams(std::nullopt);
 
-        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic, shoot_goal_tactic};
+        PriorityTacticVector result = {{goalie_tactic, shoot_goal_tactic}};
 
         // Update crease defenders
         for (auto crease_defender_tactic : crease_defender_tactics)
         {
-            result.emplace_back(crease_defender_tactic);
+            result[0].emplace_back(crease_defender_tactic);
         }
 
         // Assign ShadowEnemy tactics until we have every enemy covered. If there any
@@ -100,20 +100,20 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         if (enemy_threats.size() > 0)
         {
             defense_shadow_enemy_tactic->updateControlParams(enemy_threats.at(1));
-            result.emplace_back(defense_shadow_enemy_tactic);
+            result[0].emplace_back(defense_shadow_enemy_tactic);
         }
         else
         {
             auto swarm_ball_tactics = moveRobotsToSwarmEnemyWithBall(move_tactics, world);
-            result.insert(result.end(), swarm_ball_tactics.begin(),
-                          swarm_ball_tactics.end());
+            result[0].insert(result[0].end(), swarm_ball_tactics.begin(),
+                             swarm_ball_tactics.end());
         }
 
         if (enemy_threats.size() > 1)
         {
             shadow_enemy_tactic->updateControlParams(enemy_threats.at(0),
                                                      ROBOT_MAX_RADIUS_METERS * 3);
-            result.emplace_back(shadow_enemy_tactic);
+            result[0].emplace_back(shadow_enemy_tactic);
         }
         else
         {
@@ -127,7 +127,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
                         ROBOT_MAX_RADIUS_METERS * 3;
                 move_tactics[1]->updateControlParams(
                     block_point, nearest_enemy_robot->orientation() + Angle::half(), 0.0);
-                result.emplace_back(move_tactics[1]);
+                result[0].emplace_back(move_tactics[1]);
             }
             else
             {

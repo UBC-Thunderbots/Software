@@ -110,7 +110,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
-        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
+        PriorityTacticVector result = {{goalie_tactic}};
 
         // keeps track of the next defense position to assign
         int defense_position_index = 0;
@@ -130,7 +130,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 // anyway
                 shadow_enemy_tactics.at(i)->updateControlParams(enemy_threat,
                                                                 shadow_dist);
-                result.emplace_back(shadow_enemy_tactics.at(i));
+                result[0].emplace_back(shadow_enemy_tactics.at(i));
             }
             else
             {
@@ -140,7 +140,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 move_tactics.at(defense_position_index)
                     ->updateControlParams(defense_positions.at(defense_position_index),
                                           Angle::zero(), 0);
-                result.emplace_back(move_tactics.at(defense_position_index));
+                result[0].emplace_back(move_tactics.at(defense_position_index));
                 defense_position_index++;
             }
         }

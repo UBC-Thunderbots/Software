@@ -36,9 +36,6 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     do
     {
-        // goalie
-        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
-
         // Move all non-shooter robots to the center of the field
         move_tactic_2->updateControlParams(
             Point(0, 0), world.field().enemyGoalCenter().toVector().orientation(), 0);
@@ -56,8 +53,8 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
             world.field().enemyGoalCenter().toVector().orientation(), 0);
 
         // yield the Tactics this Play wants to run, in order of priority
-        yield({goalie_tactic, move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,
-               move_tactic_6});
+        yield({{goalie_tactic, move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,
+                move_tactic_6}});
     } while (true);
 }
 

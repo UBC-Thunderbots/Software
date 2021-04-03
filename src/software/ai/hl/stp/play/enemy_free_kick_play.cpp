@@ -72,17 +72,17 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
     do
     {
         // Create tactic vector (starting with Goalie)
-        std::vector<std::shared_ptr<Tactic>> tactics_to_run = {goalie_tactic};
+        PriorityTacticVector tactics_to_run = {{goalie_tactic}};
 
         // Get all enemy threats
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
         // Add Freekick shadower tactics
-        tactics_to_run.emplace_back(shadow_free_kicker_1);
-        tactics_to_run.emplace_back(shadow_free_kicker_2);
+        tactics_to_run[0].emplace_back(shadow_free_kicker_1);
+        tactics_to_run[0].emplace_back(shadow_free_kicker_2);
         // Add Crease defender tactic
-        tactics_to_run.emplace_back(crease_defender_tactic);
+        tactics_to_run[0].emplace_back(crease_defender_tactic);
 
 
         // Assign ShadowEnemy tactics until we have every enemy covered. If there are not
@@ -102,8 +102,8 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                     .orientation(),
                 0);
 
-            tactics_to_run.emplace_back(move_tactic_main);
-            tactics_to_run.emplace_back(move_tactic_secondary);
+            tactics_to_run[0].emplace_back(move_tactic_main);
+            tactics_to_run[0].emplace_back(move_tactic_secondary);
         }
         if (enemy_threats.size() == 1)
         {
@@ -116,8 +116,8 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                     .orientation(),
                 0);
 
-            tactics_to_run.emplace_back(shadow_tactic_main);
-            tactics_to_run.emplace_back(move_tactic_main);
+            tactics_to_run[0].emplace_back(shadow_tactic_main);
+            tactics_to_run[0].emplace_back(move_tactic_main);
         }
         if (enemy_threats.size() >= 2)
         {
@@ -126,8 +126,8 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             shadow_tactic_secondary->updateControlParams(enemy_threats.at(2),
                                                          ROBOT_MAX_RADIUS_METERS * 3);
 
-            tactics_to_run.emplace_back(shadow_tactic_main);
-            tactics_to_run.emplace_back(shadow_tactic_secondary);
+            tactics_to_run[0].emplace_back(shadow_tactic_main);
+            tactics_to_run[0].emplace_back(shadow_tactic_secondary);
         }
 
         // yield the Tactics this Play wants to run, in order of priority
