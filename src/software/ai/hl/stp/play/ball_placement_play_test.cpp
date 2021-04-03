@@ -28,7 +28,6 @@ TEST_F(BallPlacementPlayTest, test_ball_placement)
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(BallPlacementPlay));
     GameState game_state;
-    game_state.updateRefereeCommand(RefereeCommand::HALT);
     game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_US);
     game_state.setBallPlacementPoint(ball_placement_point);
     setGameState(game_state);
