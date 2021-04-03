@@ -2,6 +2,7 @@
 
 #include <utility>
 
+#include "software/ai/hl/stp/tactic/passer/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
@@ -70,10 +71,9 @@ TEST_F(SimulatedMoveTacticTest, test_autochip_move)
          field().enemyDefenseArea().negXPosYCorner()}));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
 
-    auto tactic = std::make_shared<MoveTactic>(false);
-    tactic->updateControlParams(
-        destination, Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::ALLOW,
-        {AutoChipOrKickMode::AUTOCHIP, 2.0}, MaxAllowedSpeedMode::TIPTOE);
+    Pass pass   = Pass(Point(0, 0), Point(0, 0), 10, Timestamp::fromMilliseconds(10));
+    auto tactic = std::make_shared<PasserTactic>(pass, false);
+    tactic->updateControlParams(pass);
     setTactic(tactic);
     setRobotId(1);
 

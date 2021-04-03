@@ -297,8 +297,8 @@ struct DribbleFSM
             get_possession_s + update_e[!have_possession] / get_possession,
             dribble_s + update_e[!have_possession] / get_possession = get_possession_s,
             dribble_s + update_e[!dribbling_done] / dribble,
-            dribble_s + update_e[dribbling_done] / dribble  = X,
-            X + update_e[!have_possession] / get_possession = get_possession_s,
-            X + update_e[!dribbling_done] / dribble = dribble_s, X + update_e / dribble);
+            dribble_s + update_e[dribbling_done] / dribble  = X);
+            //X + update_e[!have_possession] / get_possession = get_possession_s,
+            //X + update_e[!dribbling_done] / dribble = dribble_s, X + update_e / dribble);
     }
 };

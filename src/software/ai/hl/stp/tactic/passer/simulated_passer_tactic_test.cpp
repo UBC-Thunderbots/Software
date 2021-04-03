@@ -41,7 +41,7 @@ TEST_P(SimulatedPasserTacticTest, passer_test)
                        ValidationCoroutine::push_type& yield) {
             while (!tactic->done())
             {
-                yield("Tactic did not complete!");
+                yield("Passer tactic kicked ball but is not done");
             }
         }};
 

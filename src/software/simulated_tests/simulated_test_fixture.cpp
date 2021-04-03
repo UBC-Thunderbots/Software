@@ -222,7 +222,9 @@ bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_t
         updateSensorFusion();
     }
 
-    if (auto world_opt = sensor_fusion.getWorld())
+    auto world_opt = sensor_fusion.getWorld();
+
+    if (world_opt)
     {
         *world = world_opt.value();
 
