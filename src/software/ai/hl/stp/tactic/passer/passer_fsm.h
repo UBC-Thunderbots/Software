@@ -71,7 +71,7 @@ struct PasserFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *dribble_s + update_e / update_dribble = kick_s,
+            *dribble_s + update_e / update_dribble, dribble_s = kick_s,
             kick_s + update_e / update_kick = X);
     }
 };
