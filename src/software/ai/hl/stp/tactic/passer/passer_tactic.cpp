@@ -20,9 +20,7 @@ void PasserTactic::updateWorldParams(const World& world) {}
 void PasserTactic::updateControlParams(const Pass& updated_pass)
 {
     // Update the control parameters stored by this Tactic
-    control_params.pass = std::make_optional<Pass>(
-        Pass(updated_pass.passerPoint(), updated_pass.receiverPoint(),
-             updated_pass.speed(), updated_pass.startTime()));
+    control_params.pass = updated_pass;
 }
 
 void PasserTactic::updateIntent(const TacticUpdate &tactic_update)

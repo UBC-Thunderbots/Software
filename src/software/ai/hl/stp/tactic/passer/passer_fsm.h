@@ -15,7 +15,6 @@ struct PasserFSM
         std::optional<Pass> pass = std::nullopt;
     };
 
-    // this struct defines the only event that the MoveFSM responds to
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     auto operator()()

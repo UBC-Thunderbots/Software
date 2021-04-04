@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/receiver_tactic.h"
+#include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 
 #include <gtest/gtest.h>
 
