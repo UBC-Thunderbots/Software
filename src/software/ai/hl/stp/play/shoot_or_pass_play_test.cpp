@@ -20,7 +20,7 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
         Point(-4.5, 3.0),
         Point(-2, 1.5),
         Point(-2, 0.5),
-        //Point(-2, -1.7),
+        // Point(-2, -1.7),
         Point(-2, -1.5),
     }));
     setFriendlyGoalie(0);
