@@ -23,7 +23,7 @@ TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)
     Ball ball({1, 1}, {0, 0}, Timestamp::fromSeconds(0));
 
     Field field = Field::createSSLDivisionBField();
-    ReceiverTactic tactic(field, friendly_team, enemy_team, pass, ball, false);
+    ReceiverTactic tactic(pass, false);
 
     tactic.updateRobot(receiver);
 
