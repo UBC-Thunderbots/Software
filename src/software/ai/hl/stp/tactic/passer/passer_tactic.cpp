@@ -3,8 +3,8 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
-#include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/action/stop_action.h"
 #include "software/logger/logger.h"
 #include "software/world/ball.h"
 
@@ -20,12 +20,10 @@ void PasserTactic::updateWorldParams(const World& world) {}
 void PasserTactic::updateControlParams(const Pass& updated_pass)
 {
     // Update the control parameters stored by this Tactic
-    control_params.pass = std::make_optional<Pass>(
-        Pass(updated_pass.passerPoint(), updated_pass.receiverPoint(),
-             updated_pass.speed(), updated_pass.startTime()));
+    control_params.pass = updated_pass;
 }
 
-void PasserTactic::updateIntent(const TacticUpdate &tactic_update)
+void PasserTactic::updateIntent(const TacticUpdate& tactic_update)
 {
     fsm.process_event(PasserFSM::Update(control_params, tactic_update));
 }

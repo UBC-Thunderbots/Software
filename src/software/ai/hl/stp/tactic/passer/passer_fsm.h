@@ -1,11 +1,10 @@
 #pragma once
 
+#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
+#include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/ai/passing/pass.h"
-
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
-#include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 
 struct PasserFSM
 {

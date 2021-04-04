@@ -3,16 +3,18 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "passer_tactic",
     srcs = ["passer_tactic.cpp"],
-    hdrs = ["passer_tactic.h",
-            "passer_fsm.h"],
+    hdrs = [
+        "passer_fsm.h",
+        "passer_tactic.h",
+    ],
     deps = [
-        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
-        "//software/ai/hl/stp/tactic/kick:kick_tactic",
-        "//software/ai/hl/stp/tactic:tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:intercept_ball_action",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
+        "//software/ai/hl/stp/tactic",
+        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
+        "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/passing:pass",
         "//software/logger",
         "//software/world:ball",
