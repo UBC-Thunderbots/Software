@@ -34,7 +34,7 @@ class GoalieTactic : public Tactic
      */
     explicit GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config);
 
-    GoalieTactic() = delete;
+    //GoalieTactic() = delete;
 
     /*
      * Restrains the goalie to a rectangle, with the preferred point being the one

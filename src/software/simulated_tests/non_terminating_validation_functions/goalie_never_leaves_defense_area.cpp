@@ -12,7 +12,7 @@ void goalieNeverLeavesDefenseArea(RobotId goalie_id, std::shared_ptr<World> worl
         LOG(FATAL) << "There is no robot with ID: " + std::to_string(goalie_id);
     }
     Point position = robot_optional.value().position();
-    if(!contains(world_ptr->field().friendlyDefenseArea(), position))
+    if(!world_ptr->field().pointInFriendlyDefenseArea(position))
     {
         yield("The goalie is outside of the friendly defense area!");
     }
