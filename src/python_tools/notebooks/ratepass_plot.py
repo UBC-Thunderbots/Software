@@ -37,7 +37,7 @@ from python_tools.plotting.plot_heatmap import HeatmapPlotter
 
 output_notebook()
 
-fig = figure(plot_width=900, plot_height=900, match_aspect=True, output_backend="webgl")
+fig = figure(plot_width=900, plot_height=900, match_aspect=True)
 
 field_length = wrapper_proto_log[0].geometry.field.field_length / MM_PER_M
 field_width = wrapper_proto_log[0].geometry.field.field_width / MM_PER_M
@@ -97,7 +97,6 @@ def plot_ssl_wrapper_at_idx(idx):
         return passing.ratePassFriendlyCapability(the_world, pass_dict, config)
 
     def ratePassShootScoreCost(x, y):
-        receiver_point = world.Point(x, y)
         pass_dict["receiver_point"] = world.Point(x, y)
         return passing.ratePassShootScore(the_world, pass_dict, config)
 

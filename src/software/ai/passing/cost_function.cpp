@@ -286,8 +286,9 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
 
     // Create a sigmoid that goes to 0 as the time required to get to the reception
     // point exceeds the time we would need to get there by
-    return sigmoid(receive_time.toSeconds(),
-                   latest_time_to_reciever_state.toSeconds() + 0.25, 0.4);
+    double sigmoid_width = 0.4;
+    return sigmoid(receive_time.toSeconds(), latest_time_to_reciever_state.toSeconds(),
+                   sigmoid_width);
 }
 
 double getStaticPositionQuality(const Field& field, const Point& position,
