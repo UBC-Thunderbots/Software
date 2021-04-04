@@ -147,7 +147,7 @@ void FreeKickPlay::performPassStage(
 
     // Perform the pass and wait until the receiver is finished
     auto passer =
-        std::make_shared<PasserTactic>(pass, world.ball(), world.field(), false);
+        std::make_shared<PasserTactic>(pass, false);
     auto receiver =
         std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(),
                                          world.enemyTeam(), pass, world.ball(), false);

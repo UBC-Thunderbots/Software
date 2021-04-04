@@ -20,17 +20,6 @@ cc_library(
 )
 
 cc_test(
-    name = "passer_tactic_test",
-    srcs = ["passer_tactic_test.cpp"],
-    deps = [
-        ":passer_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-
-cc_test(
     name = "passer_fsm_test",
     srcs = ["passer_fsm_test.cpp"],
     deps = [

@@ -2,8 +2,8 @@
 
 #include <utility>
 
-#include "software/ai/hl/stp/tactic/passer/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
+#include "software/ai/hl/stp/tactic/passer/passer_tactic.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
@@ -60,23 +60,67 @@ TEST_P(SimulatedPasserTacticTest, passer_test)
 INSTANTIATE_TEST_CASE_P(
     PassEnvironment, SimulatedPasserTacticTest,
     ::testing::Values(
-        std::make_tuple(Pass(Point(0.0, 0.5), Point(0, 1), 5, Timestamp::fromSeconds(0)),
+        // Stationary Ball Tests
+        // Passer point != Balls location & Balls location != Robots Location
+        std::make_tuple(Pass(Point(0.0, 0.5), Point(0, 0), 5, Timestamp::fromSeconds(0)),
                         RobotStateWithId{
                             1, RobotState(Point(0, 0), Vector(0, 0),
                                           Angle::fromDegrees(0), Angle::fromDegrees(0))},
                         BallState(Point(0.5, 0.5), Vector(0, 0))),
-        std::make_tuple(Pass(Point(0.5, 0.5), Point(0, 1), 5, Timestamp::fromSeconds(0)),
+
+        // Passer point == Balls location & Balls location != Robots Location
+        std::make_tuple(
+            Pass(Point(-0.5, -0.5), Point(0, 0), 5, Timestamp::fromSeconds(0)),
+            RobotStateWithId{1, RobotState(Point(0, 0), Vector(0, 0),
+                                           Angle::fromDegrees(0), Angle::fromDegrees(0))},
+            BallState(Point(-0.5, -0.5), Vector(0, 0))),
+
+        // Passer point != Balls location & Balls location == Robots Location
+        std::make_tuple(Pass(Point(0.4, 0.4), Point(0, 1), 5, Timestamp::fromSeconds(0)),
+                        RobotStateWithId{
+                            1, RobotState(Point(0.5, 0.5), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))},
+                        BallState(Point(-0.4, 0.4), Vector(0, 0))),
+
+        // Passer point == Balls location & Balls location == Robots Location
+        std::make_tuple(Pass(Point(0.0, 0.0), Point(0, 0), 5, Timestamp::fromSeconds(0)),
                         RobotStateWithId{
                             1, RobotState(Point(0, 0), Vector(0, 0),
                                           Angle::fromDegrees(0), Angle::fromDegrees(0))},
-                        BallState(Point(0.5, 0.5), Vector(0, 0))),
-        std::make_tuple(Pass(Point(0.5, 0.5), Point(0, 1), 5, Timestamp::fromSeconds(0)),
+                        BallState(Point(0.0, 0.0), Vector(0, 0))),
+
+        // Passer point far away (not a normal use case, but just to sanity check)
+        std::make_tuple(Pass(Point(0.0, 0.0), Point(0, 0), 5, Timestamp::fromSeconds(0)),
                         RobotStateWithId{
-                            1, RobotState(Point(0, 0), Vector(0, 0),
+                            1, RobotState(Point(3.5, 2.5), Vector(0, 0),
                                           Angle::fromDegrees(0), Angle::fromDegrees(0))},
-                        BallState(Point(0.5, 0.5), Vector(0, 0))),
-        std::make_tuple(Pass(Point(0.5, 0.5), Point(0, 1), 5, Timestamp::fromSeconds(0)),
-                        RobotStateWithId{
-                            1, RobotState(Point(0, 0), Vector(0, 0),
-                                          Angle::fromDegrees(0), Angle::fromDegrees(0))},
-                        BallState(Point(0.5, 0.5), Vector(0, 0)))));
+                        BallState(Point(0.0, 0.0), Vector(0, 0))),
+
+    // Passer point != Balls location & Balls location != Robots Location
+    std::make_tuple(Pass(Point(0.0, 0.5), Point(0, 0), 5, Timestamp::fromSeconds(0)),
+                    RobotStateWithId{
+                        1, RobotState(Point(0, 0), Vector(0, 0), Angle::fromDegrees(0),
+                                      Angle::fromDegrees(0))},
+                    BallState(Point(0.5, 0.5), Vector(0, 0))),
+
+    // Moving Ball Tests
+    // Passer point == Balls location & Balls location != Robots Location
+    std::make_tuple(Pass(Point(-0.5, -0.5), Point(0, 0), 5, Timestamp::fromSeconds(0)),
+                    RobotStateWithId{
+                        1, RobotState(Point(0, 0), Vector(0, 0), Angle::fromDegrees(0),
+                                      Angle::fromDegrees(0))},
+                    BallState(Point(-0.5, -0.5), Vector(1, 0))),
+
+    // Passer point != Balls location & Balls location == Robots Location
+    std::make_tuple(Pass(Point(0.4, 0.4), Point(0, 1), 5, Timestamp::fromSeconds(0)),
+                    RobotStateWithId{
+                        1, RobotState(Point(0.5, 0.5), Vector(0, 0),
+                                      Angle::fromDegrees(0), Angle::fromDegrees(0))},
+                    BallState(Point(-0.4, 0.4), Vector(0, 1))),
+
+    // Passer point == Balls location & Balls location == Robots Location
+    std::make_tuple(Pass(Point(0.0, 0.0), Point(0, 0), 5, Timestamp::fromSeconds(0)),
+                    RobotStateWithId{
+                        1, RobotState(Point(0, 0), Vector(0, 0), Angle::fromDegrees(0),
+                                      Angle::fromDegrees(0))},
+                    BallState(Point(0.0, 0.0), Vector(1, 0)))));
