@@ -21,10 +21,12 @@ void robotAtPosition(RobotId robot_id, std::shared_ptr<World> world_ptr,
 
     while (!robot_at_destination(world_ptr))
     {
+        std::optional<Robot> robotOptional =
+            world_ptr->friendlyTeam().getRobotById(robot_id);
         std::stringstream ss;
-        ss << destination;
-        yield("Robot with ID " + std::to_string(robot_id) + " is not at position " +
-              ss.str());
+        ss << "Robot with ID " << robot_id << " is at position "
+           << robotOptional->position() << ", expected to be at " << destination;
+        yield(ss.str());
     }
 }
 

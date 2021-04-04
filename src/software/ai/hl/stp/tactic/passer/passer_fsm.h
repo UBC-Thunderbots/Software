@@ -36,7 +36,6 @@ struct PasserFSM
                                        back::process<DribbleFSM::Update> processEvent) {
             if (event.control_params.pass)
             {
-                std::cerr<<"updating dribble FSM"<<std::endl;
                 DribbleFSM::ControlParams control_params{
                     .dribble_destination = std::make_optional<Point>(
                         event.control_params.pass->passerPoint()),
@@ -58,7 +57,6 @@ struct PasserFSM
          */
         const auto update_kick = [](auto event,
                                     back::process<KickFSM::Update> processEvent) {
-            std::cerr<<"updating kick FSM"<<std::endl;
             if (event.control_params.pass)
             {
                 KickFSM::ControlParams control_params{
@@ -73,9 +71,7 @@ struct PasserFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *dribble_s + update_e / update_dribble,
-            dribble_s = kick_s,
-            kick_s + update_e / update_kick,
-            kick_s           = X);
+            *dribble_s + update_e / update_dribble, dribble_s = kick_s,
+            kick_s + update_e / update_kick, kick_s           = X);
     }
 };
