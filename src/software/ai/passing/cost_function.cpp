@@ -25,7 +25,7 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double shoot_pass_rating =
         ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
 
-    double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
+    double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.4);
 
     // Place strict limits on the ball speed
     double min_pass_speed     = passing_config->getMinPassSpeedMPerS()->value();
@@ -37,7 +37,8 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
            shoot_pass_rating * pass_speed_quality * in_region_quality;
 }
 
-double rateZone(const Field& field, const Rectangle& zone, const Point& ball_position,
+double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,
+                const Point& ball_position,
                 std::shared_ptr<const PassingConfig> passing_config)
 {
     // Zones with their centers in bad positions are not good
@@ -47,18 +48,30 @@ double rateZone(const Field& field, const Rectangle& zone, const Point& ball_pos
     // Rate zones that are up the field higher to encourage progress up the field
     double pass_up_field_rating = zone.centre().x() / field.xLength();
 
-    // Rate zones that are _near_ the ideal pass distance higher
-    double avg_pass_distance = (ball_position - zone.centre()).length();
+    double enemy_risk_rating =
+        (ratePassEnemyRisk(enemy_team,
+                           Pass(ball_position, zone.negXNegYCorner(),
+                                passing_config->getMaxPassSpeedMPerS()->value()),
+                           passing_config) +
+         ratePassEnemyRisk(enemy_team,
+                           Pass(ball_position, zone.negXPosYCorner(),
+                                passing_config->getMaxPassSpeedMPerS()->value()),
+                           passing_config) +
+         ratePassEnemyRisk(enemy_team,
+                           Pass(ball_position, zone.posXNegYCorner(),
+                                passing_config->getMaxPassSpeedMPerS()->value()),
+                           passing_config) +
+         ratePassEnemyRisk(enemy_team,
+                           Pass(ball_position, zone.posXPosYCorner(),
+                                passing_config->getMaxPassSpeedMPerS()->value()),
+                           passing_config) +
+         ratePassEnemyRisk(enemy_team,
+                           Pass(ball_position, zone.centre(),
+                                passing_config->getMaxPassSpeedMPerS()->value()),
+                           passing_config)) /
+        5.0;
 
-    double pass_distance_sigmoid_width = 0.4;
-    double pass_distance_rating =
-        sigmoid(avg_pass_distance, passing_config->getIdealPassDistanceM()->value(),
-                pass_distance_sigmoid_width) *
-        (1 - sigmoid(avg_pass_distance,
-                     passing_config->getIdealPassDistanceM()->value() + 1.0,
-                     pass_distance_sigmoid_width));
-
-    return pass_up_field_rating + pass_distance_rating + static_pass_quality;
+    return pass_up_field_rating * static_pass_quality * enemy_risk_rating;
 }
 
 double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,
@@ -92,7 +105,7 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
 
     // Create the shoot score by creating a sigmoid that goes to a large value as
     // the section of net we're shooting on approaches 100% (ie. completely open)
-    double shot_openness_score = sigmoid(net_percent_open, 0.2, 0.95);
+    double shot_openness_score = sigmoid(net_percent_open, 0.5, 0.95);
 
     // Prefer angles where the robot does not have to turn much after receiving the
     // pass to take the shot (or equivalently the shot deflection angle)

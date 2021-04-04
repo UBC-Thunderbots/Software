@@ -7,6 +7,10 @@
 #include "software/geom/point.h"
 #include "software/time/timestamp.h"
 
+// The number of parameters (representing a pass) that we optimize
+// (receive_location_x, receive_location_y, pass_speed)
+static const int NUM_PARAMS_TO_OPTIMIZE = 3;
+
 /**
  * This class represents a Pass, a receive point with a speed
  */

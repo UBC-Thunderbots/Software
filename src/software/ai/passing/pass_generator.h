@@ -64,10 +64,6 @@ class PassGenerator
 
 
    private:
-    // The number of parameters (representing a pass) that we optimize
-    // (receive_location_x, receive_location_y, pass_speed)
-    static const int NUM_PARAMS_TO_OPTIMIZE = 3;
-
     // Weights used to normalize the parameters that we pass to GradientDescent
     // (see the GradientDescent documentation for details)
     // These weights are *very* roughly the step that gradient descent will take
