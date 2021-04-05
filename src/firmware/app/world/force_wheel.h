@@ -105,4 +105,4 @@ void app_force_wheel_brake(const ForceWheel_t* wheel);
  *
  * @return The constants for the given wheel
  */
-ForceWheelConstants_t app_wheel_getWheelConstants(const ForceWheel_t* wheel);
+ForceWheelConstants_t app_force_wheel_getWheelConstants(const ForceWheel_t* wheel);
