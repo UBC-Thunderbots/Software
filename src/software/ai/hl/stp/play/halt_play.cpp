@@ -28,8 +28,8 @@ void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
     do
     {
         // yield the Tactics this Play wants to run, in order of priority
-        yield({stop_tactic_1, stop_tactic_2, stop_tactic_3, stop_tactic_4, stop_tactic_5,
-               stop_tactic_6});
+        yield({{stop_tactic_1, stop_tactic_2, stop_tactic_3, stop_tactic_4, stop_tactic_5,
+                stop_tactic_6}});
     } while (true);
 }
 
