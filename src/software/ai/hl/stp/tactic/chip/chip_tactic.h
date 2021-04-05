@@ -64,7 +64,7 @@ class ChipTactic : public Tactic
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-    HFSM<ChipFSM> fsm;
+    FSM<ChipFSM> fsm;
 
     // Tactic parameters
     ChipFSM::ControlParams control_params;

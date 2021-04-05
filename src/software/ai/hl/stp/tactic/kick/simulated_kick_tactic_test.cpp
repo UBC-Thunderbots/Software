@@ -29,8 +29,6 @@ TEST_P(SimulatedKickTacticTest, kick_test)
     addFriendlyRobots(
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position}));
 
-    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
-
     auto tactic = std::make_shared<KickTactic>(false);
     tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
                                 5);
