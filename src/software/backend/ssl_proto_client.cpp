@@ -9,10 +9,10 @@ SSLProtoClient::SSLProtoClient(
           std::make_unique<ThreadedProtoUdpListener<SSLProto::SSL_WrapperPacket>>(
               ssl_communication_config->getVisionIpv4Address()->value(),
               ssl_communication_config->getVisionPort()->value(),
-              received_vision_callback)),
+              received_vision_callback, true)),
       ssl_referee_listener(std::make_unique<ThreadedProtoUdpListener<SSLProto::Referee>>(
           ssl_communication_config->getGameControllerIpv4Address()->value(),
           ssl_communication_config->getGameControllerPort()->value(),
-          received_referee_callback))
+          received_referee_callback, true))
 {
 }

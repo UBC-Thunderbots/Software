@@ -11,20 +11,21 @@ class ThreadedProtoUdpListener
    public:
     /**
      * Creates a ThreadedProtoUdpListener that will listen for ReceiveProtoT packets
-     * from the network on the multicast group of given address and port. For every
+     * from the network of given address and port. For every
      * ReceiveProtoT packet received, the receive_callback will be called to perform any
      * operations desired by the caller.
      *
-     * @param ip_address The ip address of the multicast group on which to listen for
-     * the given ReceiveProtoT packets (IPv4 in dotted decimal or IPv6 in hex string)
-     *  example IPv4: 192.168.0.2
+     * @param ip_address The ip address on which to listen for the given ReceiveProtoT
+     * packets (IPv4 in dotted decimal or IPv6 in hex string) example IPv4: 192.168.0.2
      *  example IPv6: ff02::c3d0:42d2:bb8%wlp4s0 (the interface is specified after %)
      * @param port The port on which to listen for ReceiveProtoT packets
      * @param receive_callback The function to run for every ReceiveProtoT packet received
      * from the network
+     * @param multicast If true, joins the multicast group of given ip_address
      */
     ThreadedProtoUdpListener(const std::string& ip_address, unsigned short port,
-                             std::function<void(ReceiveProtoT)> receive_callback);
+                             std::function<void(ReceiveProtoT)> receive_callback,
+                             bool multicast);
 
     /**
      * Creates a ThreadedProtoUdpListener that will listen for ReceiveProtoT packets

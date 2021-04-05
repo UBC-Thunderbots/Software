@@ -7,7 +7,8 @@
 template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     boost::asio::io_service& io_service, const std::string& ip_address,
-    const unsigned short port, std::function<void(ReceiveProtoT&)> receive_callback)
+    const unsigned short port, std::function<void(ReceiveProtoT&)> receive_callback,
+    bool multicast)
     : socket_(io_service), receive_callback(receive_callback)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(
@@ -28,11 +29,14 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
                    << ip_address << ", port = " << port << ")" << std::endl;
     }
 
-    // Join the multicast group.
-    socket_.set_option(boost::asio::ip::multicast::join_group(
-        boost::asio::ip::address::from_string(ip_address)));
+    if (multicast)
+    {
+        // Join the multicast group.
+        socket_.set_option(boost::asio::ip::multicast::join_group(
+            boost::asio::ip::address::from_string(ip_address)));
+    }
 
-    start_listen();
+    startListen();
 }
 
 template <class ReceiveProtoT>
@@ -59,11 +63,11 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
                    << port << ")" << std::endl;
     }
 
-    start_listen();
+    startListen();
 }
 
 template <class ReceiveProtoT>
-void ProtoUdpListener<ReceiveProtoT>::start_listen()
+void ProtoUdpListener<ReceiveProtoT>::startListen()
 {
     // Start listening for data asynchronously
     // See here for a great explanation about asynchronous operations:
@@ -87,12 +91,12 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
         receive_callback(packet_data);
 
         // Once we've handled the data, start listening again
-        start_listen();
+        startListen();
     }
     else
     {
         // Start listening again to receive the next data
-        start_listen();
+        startListen();
 
         LOG(WARNING)
             << "An unknown network error occurred when attempting to receive ReceiveProtoT Data. The boost system error code is "

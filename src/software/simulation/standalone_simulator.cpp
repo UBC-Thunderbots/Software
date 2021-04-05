@@ -98,17 +98,17 @@ void StandaloneSimulator::setupNetworking(int blue_team_channel, int yellow_team
     yellow_team_primitive_listener.reset(
         new ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>(
             yellow_team_ip, PRIMITIVE_PORT,
-            boost::bind(&StandaloneSimulator::setYellowRobotPrimitives, this, _1)));
+            boost::bind(&StandaloneSimulator::setYellowRobotPrimitives, this, _1), true));
     blue_team_primitive_listener.reset(
         new ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>(
             blue_team_ip, PRIMITIVE_PORT,
-            boost::bind(&StandaloneSimulator::setBlueRobotPrimitives, this, _1)));
+            boost::bind(&StandaloneSimulator::setBlueRobotPrimitives, this, _1), true));
     yellow_team_side_listener.reset(new ThreadedProtoUdpListener<DefendingSideProto>(
         yellow_team_ip, DEFENDING_SIDE_PORT,
-        boost::bind(&StandaloneSimulator::setYellowTeamDefendingSide, this, _1)));
+        boost::bind(&StandaloneSimulator::setYellowTeamDefendingSide, this, _1), true));
     blue_team_side_listener.reset(new ThreadedProtoUdpListener<DefendingSideProto>(
         blue_team_ip, DEFENDING_SIDE_PORT,
-        boost::bind(&StandaloneSimulator::setBlueTeamDefendingSide, this, _1)));
+        boost::bind(&StandaloneSimulator::setBlueTeamDefendingSide, this, _1), true));
 }
 
 void StandaloneSimulator::setupInitialSimulationState()

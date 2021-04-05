@@ -15,17 +15,18 @@ class ProtoUdpListener
      * operations desired by the caller
      *
      * @param io_service The io_service to use to service incoming ReceiveProtoT data
-     * @param ip_address The ip address of the multicast group on which to listen on for
-     * the given ReceiveProtoT packets (IPv4 in dotted decimal or IPv6 in hex string)
-     *  example IPv4: 192.168.0.2
+     * @param ip_address The ip address of on which to listen for the given ReceiveProtoT
+     * packets (IPv4 in dotted decimal or IPv6 in hex string) example IPv4: 192.168.0.2
      *  example IPv6: ff02::c3d0:42d2:bb8%wlp4s0 (the interface is specified after %)
      * @param port The port on which to listen for ReceiveProtoT packets
      * @param receive_callback The function to run for every ReceiveProtoT packet received
      * from the network
+     * @param multicast If true, joins the multicast group of given ip_address
      */
     ProtoUdpListener(boost::asio::io_service& io_service, const std::string& ip_address,
                      unsigned short port,
-                     std::function<void(ReceiveProtoT&)> receive_callback);
+                     std::function<void(ReceiveProtoT&)> receive_callback,
+                     bool multicast);
 
     /**
      * Creates an ProtoUdpListener that will listen for ReceiveProtoT packets from
@@ -56,7 +57,7 @@ class ProtoUdpListener
     /**
      * Start listening for data
      */
-    void start_listen();
+    void startListen();
 
     // A UDP socket that we listen on for ReceiveProtoT messages from the network
     boost::asio::ip::udp::socket socket_;
