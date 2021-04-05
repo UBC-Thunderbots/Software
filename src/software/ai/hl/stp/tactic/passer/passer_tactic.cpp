@@ -8,8 +8,8 @@
 #include "software/logger/logger.h"
 #include "software/world/ball.h"
 
-PasserTactic::PasserTactic(Pass pass, bool loop_forever)
-    : Tactic(loop_forever, {RobotCapability::Kick, RobotCapability::Move}),
+PasserTactic::PasserTactic(Pass pass)
+    : Tactic(true, {RobotCapability::Kick, RobotCapability::Move}),
       pass(std::move(pass)),
       fsm()
 {

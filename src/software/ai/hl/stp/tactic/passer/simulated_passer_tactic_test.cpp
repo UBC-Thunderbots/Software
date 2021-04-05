@@ -31,7 +31,7 @@ TEST_P(SimulatedPasserTacticTest, passer_test)
 
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
 
-    auto tactic = std::make_shared<PasserTactic>(pass, false);
+    auto tactic = std::make_shared<PasserTactic>(pass);
     tactic->updateControlParams(pass);
     setTactic(tactic);
     setRobotId(1);

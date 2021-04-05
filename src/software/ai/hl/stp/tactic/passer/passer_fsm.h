@@ -28,7 +28,7 @@ struct PasserFSM
         /**
          * Action that updates the DribbleFSM
          *
-         * @param event DribbleFSM::Update event
+         * @param event PasserFSM::Update event
          * @param processEvent processes the DribbleFSM::Update
          */
         const auto update_dribble = [](auto event,
@@ -51,7 +51,7 @@ struct PasserFSM
         /**
          * Action that updates the KickFSM
          *
-         * @param event KickFSM::Update event
+         * @param event PasserFSM::Update event
          * @param processEvent processes the KickFSM::Update
          */
         const auto update_kick = [](auto event,

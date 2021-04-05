@@ -18,10 +18,9 @@ class PasserTactic : public Tactic
      * Creates a new PasserTactic
      *
      * @param pass The pass this tactic should try to execute
-     * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit PasserTactic(Pass pass, bool loop_forever);
+    explicit PasserTactic(Pass pass);
 
     PasserTactic() = delete;
 
