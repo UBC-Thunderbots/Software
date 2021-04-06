@@ -41,6 +41,7 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
                 const Point& ball_position,
                 std::shared_ptr<const PassingConfig> passing_config)
 {
+    // TODO (#2021) improve and implement tests
     // Zones with their centers in bad positions are not good
     double static_pass_quality =
         getStaticPositionQuality(field, zone.centre(), passing_config);
