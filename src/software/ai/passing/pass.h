@@ -35,8 +35,8 @@ class Pass
      * @param pass_array [receiver_point.x(), receiver_point.y(), pass_speed_m_per_s]
      * @return The Pass constructed from the pass array
      */
-    static Pass fromPassArray(Point passer_point,
-                              const std::array<double, 3>& pass_array);
+    static Pass fromPassArray(
+        Point passer_point, const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array);
 
     /**
      * Converts a pass to an array
@@ -44,7 +44,7 @@ class Pass
      * @returns the pass array: [receiver_point.x(), receiver_point.y(),
      * pass_speed_m_per_s]
      */
-    std::array<double, 3> toPassArray() const;
+    std::array<double, NUM_PARAMS_TO_OPTIMIZE> toPassArray() const;
 
     /**
      * Gets the value of the passer point
