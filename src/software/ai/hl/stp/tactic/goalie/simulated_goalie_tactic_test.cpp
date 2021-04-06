@@ -13,7 +13,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedGoalieTacticTest : public virtual SimulatedTacticTestFixture
+class SimulatedGoalieTacticTest : public SimulatedTacticTestFixture
 {
    protected:
     void SetUp() override
@@ -60,32 +60,3 @@ TEST_F(SimulatedGoalieTacticTest, test_stationary_ball_far_away)
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
-
-/*
-TEST_F(SimulatedGoalieTacticTest, test_stationary_ball_in_dont_chip_rectangle)
-{
-    Point initial_position = Point(field().friendlyGoalCenter());
-    setBallState(BallState(field().friendlyGoalpostNeg() +
-                           Vector(ROBOT_MAX_RADIUS_METERS, 2 * ROBOT_MAX_RADIUS_METERS), Vector(0,0)));
-    addFriendlyRobots(
-            TestUtil::createStationaryRobotStatesWithId({initial_position}));
-
-    auto tactic = std::make_shared<GoalieTactic>(std::make_shared<const GoalieTacticConfig>());
-    setTactic(tactic);
-    setRobotId(0);
-
-    std::vector<ValidationFunction> terminating_validation_functions = {
-            [this, tactic](std::shared_ptr<World> world_ptr,
-                           ValidationCoroutine::push_type& yield) {
-                while (!tactic->done())
-                {
-                    yield("Tactic not done");
-                }
-                // add terminating validation functions here
-            }};
-
-    std::vector<ValidationFunction> non_terminating_validation_functions = {};
-
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
-}*/
