@@ -28,13 +28,11 @@ class GoalieTactic : public Tactic
     /**
      * Creates a new GoalieTactic
      *
-     * @param loop_forever Whether or not this Tactic should never complete. If true, the
-     * tactic will be restarted every time it completes
      * @param goalie_tactic_config The config to fetch parameters from
      */
     explicit GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config);
 
-    //GoalieTactic() = delete;
+    GoalieTactic() = delete;
 
     /*
      * Restrains the goalie to a rectangle, with the preferred point being the one
@@ -56,44 +54,7 @@ class GoalieTactic : public Tactic
      */
     void updateControlParams();
 
-
     double calculateRobotCost(const Robot &robot, const World &world) const override;
-
-    /**
-     * Gets intersections between the ball velocity ray and the full goal segment
-     */
-    /*std::vector<Point> getIntersectionsBetweenBallVelocityAndFullGoalSegment();*/
-
-    /**
-     * Creates action to panic and stop the ball
-     *
-     * @param move_action The action to reuse
-     * @param stop_ball_point The point to the stop the ball
-     *
-     * @return the action to use to stop the ball
-     */
-    /*std::shared_ptr<Action> panicAndStopBall(std::shared_ptr<MoveAction> move_action,
-                                             const Point &stop_ball_point);*/
-
-    /**
-     * Chip ball if safe
-     *
-     * @param chip_action The chip action to reuse
-     * @param stop_action The stop action to reuse
-     *
-     * @return Action to chip the ball if it is safe to do so
-     */
-    /*std::shared_ptr<Action> chipBallIfSafe(std::shared_ptr<ChipAction> chip_action,
-                                           std::shared_ptr<StopAction> stop_action);*/
-
-    /**
-     * Position robot to block potential shots
-     *
-     * @param move_action The action to reuse
-     *
-     * @return The Action to position the robot to block the shot
-     */
-    /*std::shared_ptr<Action> positionToBlockShot(std::shared_ptr<MoveAction> move_action);*/
 
     bool isGoalieTactic() const override;
 
@@ -103,10 +64,6 @@ class GoalieTactic : public Tactic
    private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;
     void updateIntent(const TacticUpdate &tactic_update) override;
-
-    // Distance to chip the ball when trying to yeet it
-    // TODO (#1878): Replace this with a more intelligent chip distance system
-    static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
     // Tactic parameters
     HFSM<GoalieFSM> fsm;

@@ -3,16 +3,17 @@
 #include <utility>
 
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
+
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/simulated_tests/non_terminating_validation_functions/enemy_never_scores_validation.h"
-#include "software/simulated_tests/non_terminating_validation_functions/goalie_never_leaves_defense_area.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedGoalieTacticTest : public SimulatedTacticTestFixture
+class SimulatedGoalieTacticTest : public virtual SimulatedTacticTestFixture
 {
    protected:
     void SetUp() override
@@ -40,20 +41,19 @@ TEST_F(SimulatedGoalieTacticTest, test_stationary_ball_far_away)
     setRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-            /*[this, tactic](std::shared_ptr<World> world_ptr,
+            [this, tactic](std::shared_ptr<World> world_ptr,
                            ValidationCoroutine::push_type& yield) {
                 while (!tactic->done())
                 {
                     yield("Tactic not done");
                 }
                 // add terminating validation functions here
-            }*/};
+            }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
             [this, tactic](std::shared_ptr<World> world_ptr,
                             ValidationCoroutine::push_type& yield) {
                 enemyNeverScores(world_ptr, yield);
-                goalieNeverLeavesDefenseArea(1, world_ptr, yield);
             }
     };
 

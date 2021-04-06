@@ -221,7 +221,7 @@ struct GoalieFSM
          *
          * @param event GoalieFSM::Update event
          */
-        const auto panic_and_block = [](auto event) {
+        const auto panic_and_block = [this](auto event) {
             std::vector<Point> intersections =
                     getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(), event.common.world.field());
             Point stop_ball_point = intersections[0];
@@ -242,7 +242,7 @@ struct GoalieFSM
          * @param processEvent processes the ChipFSM::Update
          */
         const auto chip =
-            [](auto event, back::process<ChipFSM::Update> processEvent) {
+            [this](auto event, back::process<ChipFSM::Update> processEvent) {
             ChipFSM::ControlParams control_params{
                 .chip_origin = event.common.world.ball().position(),
                 .chip_direction = (event.common.world.ball().position() - event.common.world.field().friendlyGoalCenter()).orientation(),
@@ -259,9 +259,9 @@ struct GoalieFSM
          * @param processEvent processes the DribbleFSM::Update
          */
         const auto dribble =
-            [](auto event, back::process<DribbleFSM::Update> processEvent) {
+            [this](auto event, back::process<DribbleFSM::Update> processEvent) {
             DribbleFSM::ControlParams control_params{
-                // TODO: fix dribble destination so there is strategy behind it
+                // TODO: fix dribble destination so there is strategy behind it (move to center of goal area)
                 .dribble_destination = event.common.world.ball().position() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0),
                 .final_dribble_orientation = (event.common.world.ball().position() -
                         event.common.world.field().friendlyGoalCenter()).orientation(),
@@ -276,7 +276,7 @@ struct GoalieFSM
         *
         * @param event GoalieFSM::Update event
         */
-        const auto position_to_block = [](auto event) {
+        const auto position_to_block = [this](auto event) {
             // compute angle between two vectors, negative goal post to ball and positive
             // goal post to ball
             Angle block_cone_angle =

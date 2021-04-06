@@ -8,4 +8,8 @@ void enemyNeverScores(std::shared_ptr<World> world_ptr, ValidationCoroutine::pus
     {
         yield("The enemy team has scored!");
     }
+    else
+    {
+        yield("The enemy has not scored!");
+    }
 }
