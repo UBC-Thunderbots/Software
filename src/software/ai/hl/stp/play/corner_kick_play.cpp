@@ -111,7 +111,7 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
 
     auto zones_to_cherry_pick =
-        pass_eval.rankZonesForCherryPicking(world, world.ball().position());
+        pass_eval.rankZonesForReceiving(world, world.ball().position());
 
     // These tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass

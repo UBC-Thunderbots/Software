@@ -173,7 +173,7 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     auto pass_eval = pass_generator.generatePassEvaluation(world);
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
-    auto ranked_zones = pass_eval.rankZonesForCherryPicking(
+    auto ranked_zones = pass_eval.rankZonesForReceiving(
         world, best_pass_and_score_so_far.pass.receiverPoint());
     Zones cherry_pick_region_1 = {ranked_zones[0]};
     Zones cherry_pick_region_2 = {ranked_zones[1]};

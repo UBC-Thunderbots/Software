@@ -106,7 +106,7 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
 
     // Create the shoot score by creating a sigmoid that goes to a large value as
     // the section of net we're shooting on approaches 100% (ie. completely open)
-    double shot_openness_score = sigmoid(net_percent_open, 0.5, 0.95);
+    double shot_openness_score = sigmoid(net_percent_open, 0.45, 0.95);
 
     // Prefer angles where the robot does not have to turn much after receiving the
     // pass to take the shot (or equivalently the shot deflection angle)
