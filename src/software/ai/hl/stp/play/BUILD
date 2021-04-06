@@ -17,6 +17,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:passer_tactic",
         "//software/ai/hl/stp/tactic:receiver_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/ai/passing:pass_generator",
         "//software/logger",

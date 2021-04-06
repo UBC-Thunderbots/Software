@@ -68,17 +68,18 @@ Timestamp PassEvaluation<ZoneEnum>::getEvaluationTime() const
 
 template <class ZoneEnum>
 std::vector<ZoneEnum> PassEvaluation<ZoneEnum>::rankZonesForCherryPicking(
-    const World& world, const Point& position) const
+    const World& world, const Point& pass_position) const
 {
     std::vector<ZoneEnum> cherry_pick_zones = pitch_division_->getAllZoneIds();
 
-    std::sort(
-        cherry_pick_zones.begin(), cherry_pick_zones.end(),
-        [this, &world, &position](const ZoneEnum& z1, const ZoneEnum& z2) {
-            return rateZone(world.field(), world.enemyTeam(),
-                            pitch_division_->getZone(z1), position, passing_config_) >
-                   rateZone(world.field(), world.enemyTeam(),
-                            pitch_division_->getZone(z2), position, passing_config_);
-        });
+    std::sort(cherry_pick_zones.begin(), cherry_pick_zones.end(),
+              [this, &world, &pass_position](const ZoneEnum& z1, const ZoneEnum& z2) {
+                  return rateZone(world.field(), world.enemyTeam(),
+                                  pitch_division_->getZone(z1), pass_position,
+                                  passing_config_) >
+                         rateZone(world.field(), world.enemyTeam(),
+                                  pitch_division_->getZone(z2), pass_position,
+                                  passing_config_);
+              });
     return cherry_pick_zones;
 }

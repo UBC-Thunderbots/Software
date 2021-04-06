@@ -69,8 +69,7 @@ void MotionConstraintVisitor::visit(const ShootGoalTactic &tactic)
     });
 }
 
-void MotionConstraintVisitor::visit(const PasserTactic &tactic) {
-}
+void MotionConstraintVisitor::visit(const PasserTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const DefenseShadowEnemyTactic &tactic) {}
 
