@@ -101,20 +101,6 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_free_kick_play_test",
-    srcs = ["simulated_free_kick_play_test.cpp"],
-    deps = [
-        "//software/ai/hl/stp/play:free_kick_play",
-        "//software/simulated_tests:simulated_play_test_fixture",
-        "//software/simulated_tests:simulated_test_main",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-cc_test(
     name = "path_planner_test",
     srcs = ["path_planner_test.cpp"],
     deps = [
