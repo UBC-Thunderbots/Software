@@ -163,7 +163,7 @@ bool ThetaStarPathPlanner::updateVertex(const Coordinate &current, const Coordin
     return false;
 }
 
-// TODO (#1938): Add logs to various nullopts to make it more clear why no path is found.
+
 std::optional<Path> ThetaStarPathPlanner::findPath(
     const Point &start, const Point &end, const Rectangle &navigable_area,
     const std::vector<ObstaclePtr> &obstacles)
@@ -282,11 +282,6 @@ bool ThetaStarPathPlanner::adjustEndPointsAndCheckForNoPath(Coordinate &start_co
 
 bool ThetaStarPathPlanner::findPathToEnd(const Coordinate &end_coord)
 {
-    /* Logging how long each tick takes */
-    LOG(INFO) << "Size of open_list: " << open_list.size() << std::endl;
-//    auto start_time = std::chrono::system_clock::now();
-//    int count = 1;
-//    double avg_duration_of_visit_neighbours = 0;
     while (!open_list.empty())
     {
         Coordinate current_coord(open_list.begin()->second);
@@ -297,24 +292,12 @@ bool ThetaStarPathPlanner::findPathToEnd(const Coordinate &end_coord)
         // Add this vertex to the closed list
         closed_list.insert(current_coord);
 
-//        auto start_time_visit_neighbours = std::chrono::system_clock::now();
-//        if (current_coord == end_coord) return true; // Added for testing
-//        auto start_time_visit_neighbours = std::chrono::system_clock::now();
-        if (current_coord == end_coord) return true; // Added for testing
-        if (visitNeighbours(current_coord, end_coord))
+        // Check if current coordinate or its surrounding neighbours are at the destination
+        if (current_coord == end_coord || visitNeighbours(current_coord, end_coord))
         {
-//            double duration_ms    = ::TestUtil::millisecondsSince(start_time);
-//            LOG(INFO) << "loop ran for " << count << " iterations in " << duration_ms << "ms" << std::endl;
             return true;
         }
-//        avg_duration_of_visit_neighbours += ::TestUtil::millisecondsSince(start_time_visit_neighbours);
-//        count++;
     }
-//    if(count > 1) {
-//        double duration_ms = ::TestUtil::millisecondsSince(start_time);
-//        LOG(INFO) << "loop ran for " << count << " iterations in " << duration_ms << "ms" << std::endl;
-//        LOG(INFO) << "visitNeighbours took: " << (avg_duration_of_visit_neighbours / (double)count) << "ms on avg with total: " << avg_duration_of_visit_neighbours << std::endl;
-//    }
 
     // When the end CellHeuristic is not found and the open list is empty, then we
     // conclude that we failed to reach the end CellHeuristic. This may happen when the

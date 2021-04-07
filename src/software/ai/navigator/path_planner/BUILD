@@ -30,13 +30,10 @@ cc_test(
 
 cc_library(
     name = "theta_star_path_planner",
-    #    testonly = True,
     srcs = ["theta_star_path_planner.cpp"],
     hdrs = ["theta_star_path_planner.h"],
     deps = [
         ":path_planner",
-        # TODO: remove this dep, only added for testing purposes
-        #        "//software/test_util",
         "//software/geom/algorithms",
     ],
 )
