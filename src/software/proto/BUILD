@@ -25,6 +25,7 @@ proto_library(
         "ssl_simulation_error.proto",
         "ssl_simulation_robot_control.proto",
         "ssl_simulation_robot_feedback.proto",
+        "ssl_simulation_synchronous.proto",
     ],
     visibility = ["//visibility:private"],
     deps = [
