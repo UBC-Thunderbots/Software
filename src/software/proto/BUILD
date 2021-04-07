@@ -34,6 +34,11 @@ proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "ssl_simulation_cc_proto",
+    deps = [":ssl_simulation_proto"],
+)
+
 proto_library(
     name = "sensor_msg_proto",
     srcs = [
