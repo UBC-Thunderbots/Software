@@ -79,12 +79,11 @@ function run_code_spell(){
     fi
 
     printf "Fixing spelling...\n\n"
-    # -q=4 suppresses all warnings that aren't going to fixed by the provided dictionary
-    cd $CURR_DIR/../src/software && codespell -w -q=4 --skip="1,2,0" -D /tmp/dictionary.txt # Skip binaries
-    cd $CURR_DIR/../src/firmware_new && codespell -w -q=4 -D /tmp/dictionary.txt
-    cd $CURR_DIR/../src/firmware/app && codespell -w -q=4 -D /tmp/dictionary.txt
-    cd $CURR_DIR/../src/shared && codespell -w -q=4 -D /tmp/dictionary.txt
-    cd $CURR_DIR/../docs && codespell -w -q=4 --skip="*.png" -D /tmp/dictionary.txt # Skip images
+    cd $CURR_DIR/../src/software && codespell -w --skip="1,2,0" -D /tmp/dictionary.txt # Skip binaries
+    cd $CURR_DIR/../src/firmware_new && codespell -w -D /tmp/dictionary.txt
+    cd $CURR_DIR/../src/firmware/app && codespell -w -D /tmp/dictionary.txt
+    cd $CURR_DIR/../src/shared && codespell -w -D /tmp/dictionary.txt
+    cd $CURR_DIR/../docs && codespell -w --skip="*.png" -D /tmp/dictionary.txt # Skip images
 
     if [[ "$?" != 0 ]]; then
         printf "\n***Failed to fix spelling!***\n\n"
