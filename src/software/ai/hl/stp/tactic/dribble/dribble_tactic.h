@@ -51,6 +51,6 @@ class DribbleTactic : public Tactic
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-    BaseFSM<DribbleFSM> fsm;
+    FSM<DribbleFSM> fsm;
     DribbleFSM::ControlParams control_params;
 };

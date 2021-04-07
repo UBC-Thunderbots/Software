@@ -12,7 +12,7 @@ TEST(KickFSMTest, test_transitions)
                                           .kick_direction = Angle::threeQuarter(),
                                           .kick_speed_meters_per_second = 1.2};
 
-    HFSM<KickFSM> fsm;
+    FSM<KickFSM> fsm;
 
     // Start in GetBehindBallFSM state's GetBehindBallState
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));
