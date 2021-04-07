@@ -54,7 +54,7 @@ class PasserTactic : public Tactic
     // Tactic parameters
     Pass pass;
 
-    HFSM<PasserFSM> fsm;
+    FSM<PasserFSM> fsm;
 
     PasserFSM::ControlParams control_params;
 };

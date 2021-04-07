@@ -29,8 +29,6 @@ TEST_P(SimulatedPasserTacticTest, passer_test)
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)}));
     addFriendlyRobots({robot_state});
 
-    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
-
     auto tactic = std::make_shared<PasserTactic>(pass);
     tactic->updateControlParams(pass);
     setTactic(tactic);
@@ -39,16 +37,19 @@ TEST_P(SimulatedPasserTacticTest, passer_test)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [pass, tactic](std::shared_ptr<World> world_ptr,
                        ValidationCoroutine::push_type& yield) {
-            ballKicked(pass.passerOrientation(), world_ptr, yield);
+            // We check if the robot reaches the desired orientation, at the
+            // desired position before checking if the ball has been kicked.
+            //
+            // The tactic should "done" after kicking the ball.
             robotAtOrientation(1, world_ptr, pass.passerOrientation(),
                                Angle::fromDegrees(5), yield);
+            robotAtPosition(1, world_ptr, pass.passerPoint(), 0.1, yield);
+            ballKicked(pass.passerOrientation(), world_ptr, yield);
+
             while (!tactic->done())
             {
                 yield("Passer tactic kicked ball but is not done");
             }
-            robotAtOrientation(1, world_ptr, pass.passerOrientation(),
-                               Angle::fromDegrees(5), yield);
-            robotAtPosition(1, world_ptr, pass.passerPoint(), 0.1, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
