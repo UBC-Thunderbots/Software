@@ -18,6 +18,22 @@ proto_library(
 )
 
 proto_library(
+    name = "ssl_simulation_proto",
+    srcs = [
+        "ssl_simulation_config.proto",
+        "ssl_simulation_control.proto",
+        "ssl_simulation_error.proto",
+        "ssl_simulation_robot_control.proto",
+        "ssl_simulation_robot_feedback.proto",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        ":ssl_proto",
+        "@com_google_protobuf//:any_proto",
+    ],
+)
+
+proto_library(
     name = "sensor_msg_proto",
     srcs = [
         "sensor_msg.proto",
