@@ -74,7 +74,7 @@ function run_code_spell(){
     http_code=$(curl -sw '%{http_code}' https://raw.githubusercontent.com/codespell-project/codespell/v1.14.0/codespell_lib/data/dictionary.txt --output /tmp/dictionary.txt)
 
     if [[ "$http_code" != 200 ]]; then
-        printf "\n***Failed to download codespell dictionay!***\n\n"
+        printf "\n***Failed to download codespell dictionary!***\n\n"
         exit 1
     fi
 
