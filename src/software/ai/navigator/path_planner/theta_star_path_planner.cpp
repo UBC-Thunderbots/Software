@@ -5,7 +5,6 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
-//#include "software/test_util/test_util.h"
 
 ThetaStarPathPlanner::ThetaStarPathPlanner()
     : num_grid_rows(0),
@@ -164,6 +163,7 @@ bool ThetaStarPathPlanner::updateVertex(const Coordinate &current, const Coordin
     return false;
 }
 
+// TODO (#1938): Add logs to various nullopts to make it more clear why no path is found.
 std::optional<Path> ThetaStarPathPlanner::findPath(
     const Point &start, const Point &end, const Rectangle &navigable_area,
     const std::vector<ObstaclePtr> &obstacles)
@@ -176,7 +176,6 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
         (end.y() >= navigable_area.yMin()) && (end.y() <= navigable_area.yMax());
     if (!navigable_area_contains_start || !navigable_area_contains_end)
     {
-        LOG(WARNING) << "Start or Destination is not within navigable area; no path found" << std::endl;
         return std::nullopt;
     }
 
@@ -189,7 +188,6 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     bool no_path_exists = adjustEndPointsAndCheckForNoPath(start_coord, end_coord);
     if (no_path_exists)
     {
-        LOG(WARNING) << "No path exists; Start: " << start << " End: " << end << std::endl;
         return std::nullopt;
     }
 
@@ -209,13 +207,11 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     // Initialising the parameters of the starting cell
     cell_heuristics[start_coord.row()][start_coord.col()].update(start_coord, 0.0, 0.0);
     open_list.insert(std::make_pair(0.0, start_coord));
-    // is start and end point ^ actually unblocked? debug and call
-    LOG(INFO) << "closest end_coord is: " << end << std::endl;
+
     bool found_end = findPathToEnd(end_coord);
 
     if (found_end == false)
     {
-        LOG(WARNING) << "No path to end found; Start: " << start << " End: " << end << std::endl;
         return std::nullopt;
     }
 
@@ -301,6 +297,8 @@ bool ThetaStarPathPlanner::findPathToEnd(const Coordinate &end_coord)
         // Add this vertex to the closed list
         closed_list.insert(current_coord);
 
+//        auto start_time_visit_neighbours = std::chrono::system_clock::now();
+//        if (current_coord == end_coord) return true; // Added for testing
 //        auto start_time_visit_neighbours = std::chrono::system_clock::now();
         if (current_coord == end_coord) return true; // Added for testing
         if (visitNeighbours(current_coord, end_coord))

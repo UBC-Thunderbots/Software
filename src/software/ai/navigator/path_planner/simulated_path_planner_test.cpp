@@ -24,7 +24,7 @@ TEST_F(SimulatedPathPlannerTest, test_no_path_found)
      *  - (1, 0)
      *  In the 91st and 92nd ticks no path is found
      */
-    Point destination      = Point(1,0);
+    Point destination      = Point(1.0,0);
     Point initial_position = Point(-3, 1.5);
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
     addFriendlyRobots(
