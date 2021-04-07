@@ -348,25 +348,25 @@ TEST_F(TestThetaStarPathPlanner,
     EXPECT_EQ(dest, path->getEndPoint());
 }
 
-TEST_F(TestThetaStarPathPlanner,
-       test_theta_star_robot_in_obstacle)
+TEST_F(TestThetaStarPathPlanner, test_theta_star_robot_in_obstacle)
 {
     Field field = Field::createSSLDivisionBField();
-    Point start{1,0}, dest{1,0};
-//    Point start{0.96905413818359376, -0.26277551269531252}, dest{1,0};
+    Point start{1, 0}, dest{1, 0};
+    //    Point start{0.96905413818359376, -0.26277551269531252}, dest{1,0};
 
     std::vector<ObstaclePtr> obstacles = std::vector<ObstaclePtr>();
-    obstacles.emplace_back(std::make_shared<GeomObstacle<Circle>>(Circle(Point(1,0),0.27150299999999999)));
+    obstacles.emplace_back(
+        std::make_shared<GeomObstacle<Circle>>(Circle(Point(1, 0), 0.27150299999999999)));
 
     Rectangle navigable_area = field.fieldBoundary();
 
-    auto start_time = std::chrono::system_clock::now();
-    auto path = planner->findPath(start, dest, navigable_area, obstacles);
+    auto start_time    = std::chrono::system_clock::now();
+    auto path          = planner->findPath(start, dest, navigable_area, obstacles);
     double duration_ms = ::TestUtil::millisecondsSince(start_time);
-    std::cout<<duration_ms<<std::endl;
+    std::cout << duration_ms << std::endl;
 
     ASSERT_TRUE(path != std::nullopt);
 
     EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_EQ(dest, path->getEndPoint()); // should be in an unblocked point
+    EXPECT_EQ(dest, path->getEndPoint());  // should be in an unblocked point
 }

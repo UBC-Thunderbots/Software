@@ -236,12 +236,14 @@ bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_t
         /* Logging how long each tick takes */
         auto start_time = std::chrono::system_clock::now();
         updatePrimitives(*world_opt, simulator);
-        double duration_ms    = ::TestUtil::millisecondsSince(start_time);
-        static int tick_count = 1;
+        double duration_ms              = ::TestUtil::millisecondsSince(start_time);
+        static int tick_count           = 1;
         static double max_tick_duration = 0.0;
-        max_tick_duration = max_tick_duration > duration_ms ? max_tick_duration : duration_ms;
+        max_tick_duration =
+            max_tick_duration > duration_ms ? max_tick_duration : duration_ms;
         LOG(INFO) << "Tick: " << tick_count << ", " << duration_ms << "ms" << std::endl;
-        if (tick_count == 284) {
+        if (tick_count == 284)
+        {
             LOG(INFO) << "max_tick_duration: " << max_tick_duration << "ms" << std::endl;
         }
         tick_count++;

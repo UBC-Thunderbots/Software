@@ -25,7 +25,7 @@ TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_oscillation)
      *  - (1, 0)
      *  - (-2.5, 2)
      */
-    Point destination      = Point(-2.5,-2.5);
+    Point destination      = Point(-2.5, -2.5);
     Point initial_position = Point(-3, 1.5);
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
     addFriendlyRobots(
