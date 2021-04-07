@@ -71,14 +71,20 @@ function run_black_formatting () {
 }
 
 function run_code_spell(){
-    curl https://raw.githubusercontent.com/codespell-project/codespell/v1.14.0/codespell_lib/data/dictionary.txt --output /tmp/dictionary.txt
+    http_code=$(curl -sw '%{http_code}' https://raw.githubusercontent.com/codespell-project/codespell/v1.14.0/codespell_lib/data/dictionary.txt --output /tmp/dictionary.txt)
+
+    if [[ "$http_code" != 200 ]]; then
+        printf "\n***Failed to download codespell dictionay!***\n\n"
+        exit 1
+    fi
 
     printf "Fixing spelling...\n\n"
-    cd $CURR_DIR/../src/software && codespell -w --skip="1,2,0" -D /tmp/dictionary.txt # Skip binaries
-    cd $CURR_DIR/../src/firmware_new && codespell -w -D /tmp/dictionary.txt
-    cd $CURR_DIR/../src/firmware/app && codespell -w -D /tmp/dictionary.txt
-    cd $CURR_DIR/../src/shared && codespell -w -D /tmp/dictionary.txt
-    cd $CURR_DIR/../docs && codespell -w --skip="*.png" -D /tmp/dictionary.txt # Skip images
+    # -q=4 suppresses all warnings that aren't going to fixed by the provided dictionary
+    cd $CURR_DIR/../src/software && codespell -w -q=4 --skip="1,2,0" -D /tmp/dictionary.txt # Skip binaries
+    cd $CURR_DIR/../src/firmware_new && codespell -w -q=4 -D /tmp/dictionary.txt
+    cd $CURR_DIR/../src/firmware/app && codespell -w -q=4 -D /tmp/dictionary.txt
+    cd $CURR_DIR/../src/shared && codespell -w -q=4 -D /tmp/dictionary.txt
+    cd $CURR_DIR/../docs && codespell -w -q=4 --skip="*.png" -D /tmp/dictionary.txt # Skip images
 
     if [[ "$?" != 0 ]]; then
         printf "\n***Failed to fix spelling!***\n\n"
