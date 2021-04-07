@@ -13,7 +13,7 @@ TEST(DribbleFSMTest, test_transitions)
     world =
         ::TestUtil::setBallVelocity(world, Vector(0, -1), Timestamp::fromSeconds(123));
 
-    HFSM<DribbleFSM> fsm;
+    FSM<DribbleFSM> fsm;
 
     // Start in DribbleState
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM::GetPossessionState>));

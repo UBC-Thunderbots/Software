@@ -89,8 +89,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
         {
             passer->updateControlParams(pass);
             receiver->updateControlParams(pass);
-            yield({goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
-                   std::get<1>(crease_defender_tactics)});
+            yield({{goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
+                    std::get<1>(crease_defender_tactics)}});
         } while (!receiver->done());
     }
     else
@@ -158,9 +158,9 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.rating;
 
-        yield({goalie_tactic, shoot_tactic, std::get<0>(cherry_pick_tactics),
-               std::get<0>(crease_defender_tactics), std::get<1>(cherry_pick_tactics),
-               std::get<1>(crease_defender_tactics)});
+        yield({{goalie_tactic, shoot_tactic, std::get<0>(cherry_pick_tactics),
+                std::get<0>(crease_defender_tactics), std::get<1>(cherry_pick_tactics),
+                std::get<1>(crease_defender_tactics)}});
 
         best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
 

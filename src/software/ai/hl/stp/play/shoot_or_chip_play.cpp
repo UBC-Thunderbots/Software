@@ -77,7 +77,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     do
     {
-        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
+        PriorityTacticVector result = {{goalie_tactic}};
 
         // If we have any crease defenders, we don't want the goalie tactic to consider
         // them when deciding where to block
@@ -94,7 +94,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
         // Update crease defenders
         for (auto &crease_defender_tactic : crease_defender_tactics)
         {
-            result.emplace_back(crease_defender_tactic);
+            result[0].emplace_back(crease_defender_tactic);
         }
 
         // Update tactics moving to open areas
@@ -116,7 +116,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 Vector::createFromAngle(orientation).normalize(ROBOT_MAX_RADIUS_METERS);
             ;
             move_to_open_area_tactics[i]->updateControlParams(position, orientation, 0.0);
-            result.emplace_back(move_to_open_area_tactics[i]);
+            result[0].emplace_back(move_to_open_area_tactics[i]);
         }
 
         // Update chipper
@@ -128,7 +128,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
         shoot_or_chip_tactic->updateControlParams(chip_target);
 
         // We want this second in priority only to the goalie
-        result.insert(result.begin() + 1, shoot_or_chip_tactic);
+        result[0].insert(result[0].begin() + 1, shoot_or_chip_tactic);
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(result);

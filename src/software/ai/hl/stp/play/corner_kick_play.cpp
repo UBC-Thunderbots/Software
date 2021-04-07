@@ -91,7 +91,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
         passer->updateControlParams(pass);
         receiver->updateControlParams(pass);
 
-        yield({goalie_tactic, passer, receiver, bait_move_tactic_1, bait_move_tactic_2});
+        yield(
+            {{goalie_tactic, passer, receiver, bait_move_tactic_1, bait_move_tactic_2}});
     } while (!receiver->done());
 
     LOG(DEBUG) << "Finished";
@@ -152,8 +153,8 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
         updateAlignToBallTactic(align_to_ball_tactic, world);
         updatePassGenerator(pass_generator, world);
 
-        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
-               cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
+        yield({{goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
+                cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2}});
     }
 
 
@@ -169,8 +170,8 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
         updateAlignToBallTactic(align_to_ball_tactic, world);
         updatePassGenerator(pass_generator, world);
 
-        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
-               cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
+        yield({{goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
+                cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2}});
     } while (!align_to_ball_tactic->done());
 
     LOG(DEBUG) << "Finished aligning to ball";
@@ -185,8 +186,8 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
         updateAlignToBallTactic(align_to_ball_tactic, world);
         updatePassGenerator(pass_generator, world);
 
-        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
-               cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
+        yield({{goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
+                cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2}});
 
         best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
         LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;

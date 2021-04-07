@@ -97,7 +97,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
-        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
+        PriorityTacticVector result = {{goalie_tactic}};
 
         // set the requirement that Robot 1 must be able to kick and chip
         move_tactics.at(0)->mutableRobotCapabilityRequirements() = {
@@ -108,7 +108,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         {
             move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
                                                     Angle::zero(), 0);
-            result.emplace_back(move_tactics.at(i));
+            result[0].emplace_back(move_tactics.at(i));
         }
 
         // yield the Tactics this Play wants to run, in order of priority
@@ -121,14 +121,14 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
-        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
+        PriorityTacticVector result = {{goalie_tactic}};
 
         // TODO This needs to be adjusted post field testing, ball needs to land exactly
         // in the middle of the enemy field
         kickoff_chip_tactic->updateControlParams(
             world.ball().position(),
             world.field().centerPoint() + Vector(world.field().xLength() / 6, 0));
-        result.emplace_back(kickoff_chip_tactic);
+        result[0].emplace_back(kickoff_chip_tactic);
 
         // the robot at position 0 will be closest to the ball, so positions starting from
         // 1 will be assigned to the rest of the robots
@@ -136,7 +136,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         {
             move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
                                                     Angle::zero(), 0);
-            result.emplace_back(move_tactics.at(i));
+            result[0].emplace_back(move_tactics.at(i));
         }
 
         // yield the Tactics this Play wants to run, in order of priority
