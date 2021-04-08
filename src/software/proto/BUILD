@@ -17,6 +17,30 @@ proto_library(
     visibility = ["//visibility:private"],
 )
 
+# These proto files are based on the following commit:
+# https://github.com/RoboCup-SSL/ssl-simulation-protocol/commit/b455b4b8a1ed6f6aebaf8e8cd3721b7e130aa9ce
+proto_library(
+    name = "ssl_simulation_proto",
+    srcs = [
+        "ssl_simulation_config.proto",
+        "ssl_simulation_control.proto",
+        "ssl_simulation_error.proto",
+        "ssl_simulation_robot_control.proto",
+        "ssl_simulation_robot_feedback.proto",
+        "ssl_simulation_synchronous.proto",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        ":ssl_proto",
+        "@com_google_protobuf//:any_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "ssl_simulation_cc_proto",
+    deps = [":ssl_simulation_proto"],
+)
+
 proto_library(
     name = "sensor_msg_proto",
     srcs = [
