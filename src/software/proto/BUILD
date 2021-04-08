@@ -17,6 +17,8 @@ proto_library(
     visibility = ["//visibility:private"],
 )
 
+# These proto files are based on the following commit:
+# https://github.com/RoboCup-SSL/ssl-simulation-protocol/commit/b455b4b8a1ed6f6aebaf8e8cd3721b7e130aa9ce
 proto_library(
     name = "ssl_simulation_proto",
     srcs = [
