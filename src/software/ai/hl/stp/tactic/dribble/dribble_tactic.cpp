@@ -61,6 +61,7 @@ bool DribbleTactic::done() const
 void DribbleTactic::updateIntent(const TacticUpdate &tactic_update)
 {
     fsm.process_event(DribbleFSM::Update(control_params, tactic_update));
+    fsm.visit_current_states([](auto state) { std::cout << state.c_str() << std::endl; });
 }
 
 void DribbleTactic::accept(TacticVisitor &visitor) const

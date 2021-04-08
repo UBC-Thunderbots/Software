@@ -1,15 +1,13 @@
 #include "software/simulated_tests/non_terminating_validation_functions/enemy_never_scores_validation.h"
+
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 
 void enemyNeverScores(std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
 {
-    if(contains(world_ptr->field().friendlyGoal(), world_ptr->ball().position()))
+    while(!contains(world_ptr->field().friendlyGoal(), world_ptr->ball().position()))
     {
-        yield("The enemy team has scored!");
+        yield("");
     }
-    else
-    {
-        yield("The enemy has not scored!");
-    }
+    yield("The enemy has scored!");
 }

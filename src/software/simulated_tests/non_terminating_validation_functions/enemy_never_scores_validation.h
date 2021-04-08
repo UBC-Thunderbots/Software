@@ -1,7 +1,5 @@
 #pragma once
 
-#include <algorithm>
-
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/world/world.h"
 

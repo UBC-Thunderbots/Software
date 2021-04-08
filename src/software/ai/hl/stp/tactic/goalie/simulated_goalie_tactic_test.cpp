@@ -28,10 +28,10 @@ class SimulatedGoalieTacticTest : public SimulatedTacticTestFixture
 
 TEST_F(SimulatedGoalieTacticTest, test_stationary_ball_far_away)
 {
-    Point initial_position = field().friendlyGoalCenter();
-    setBallState(BallState(Point(-4,0), Vector(0, 0)));
+//    Point initial_position = field().friendlyGoalCenter();
+    setBallState(BallState(Point(0,0), Vector(-1, 0)));
     addFriendlyRobots(
-            TestUtil::createStationaryRobotStatesWithId({Point(-2,1), initial_position}));
+            TestUtil::createStationaryRobotStatesWithId({Point(-2,1), Point(-4,-1)}));
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config = std::make_shared<const GoalieTacticConfig>();
 
@@ -41,23 +41,23 @@ TEST_F(SimulatedGoalieTacticTest, test_stationary_ball_far_away)
     setRobotId(1);
 
 
-    std::vector<ValidationFunction> terminating_validation_functions = {
-            [this, tactic](std::shared_ptr<World> world_ptr,
-                           ValidationCoroutine::push_type& yield) {
-                while (!tactic->done())
-                {
-                    yield("Tactic not done");
-                }
-                // add terminating validation functions here
-            }};
+    std::vector<ValidationFunction> terminating_validation_functions = {};
+//            [this, tactic](std::shared_ptr<World> world_ptr,
+//                           ValidationCoroutine::push_type& yield) {
+//                while (!tactic->done())
+//                {
+//                    yield("Tactic not done");
+//                }
+//                // add terminating validation functions here
+//            }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-            [this, tactic](std::shared_ptr<World> world_ptr,
+            [](std::shared_ptr<World> world_ptr,
                             ValidationCoroutine::push_type& yield) {
                 enemyNeverScores(world_ptr, yield);
             }
     };
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(20));
 }
