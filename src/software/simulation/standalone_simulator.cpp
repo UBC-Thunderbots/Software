@@ -9,9 +9,9 @@ extern "C"
 
 StandaloneSimulator::StandaloneSimulator(
     std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config,
-    std::shared_ptr<SimulatorConfig> simulator_config)
+    std::shared_ptr<SimulatorConfig> simulator_config, const Field& field)
     : standalone_simulator_config(standalone_simulator_config),
-      simulator(Field::createSSLDivisionBField(), simulator_config),
+      simulator(field, simulator_config),
       most_recent_ssl_wrapper_packet(SSLProto::SSL_WrapperPacket())
 {
     standalone_simulator_config->getMutableBlueTeamChannel()->registerCallbackFunction(
@@ -113,7 +113,7 @@ void StandaloneSimulator::setupNetworking(int blue_team_channel, int yellow_team
         boost::bind(&StandaloneSimulator::setBlueTeamDefendingSide, this, _1)));
 }
 
-void StandaloneSimulator::setupInitialSimulationState()
+void StandaloneSimulator::setupInitialSimulationStateDivB()
 {
     RobotState blue_robot_state1(Point(3, 2.5), Vector(0, 0), Angle::half(),
                                  AngularVelocity::zero());
@@ -156,6 +156,57 @@ void StandaloneSimulator::setupInitialSimulationState()
         RobotStateWithId{.id = 3, .robot_state = yellow_robot_state4},
         RobotStateWithId{.id = 4, .robot_state = yellow_robot_state5},
         RobotStateWithId{.id = 5, .robot_state = yellow_robot_state6},
+    };
+    simulator.addYellowRobots(yellow_robot_states);
+}
+
+void StandaloneSimulator::setupInitialSimulationStateDivA()
+{
+    setupInitialSimulationStateDivB();
+
+    RobotState blue_robot_state6(Point(2, 2.5), Vector(0, 0), Angle::half(),
+                                 AngularVelocity::zero());
+    RobotState blue_robot_state7(Point(2, 1.5), Vector(0, 0), Angle::half(),
+                                 AngularVelocity::zero());
+    RobotState blue_robot_state8(Point(2, 0.5), Vector(0, 0), Angle::half(),
+                                 AngularVelocity::zero());
+    RobotState blue_robot_state9(Point(2, -0.5), Vector(0, 0), Angle::half(),
+                                 AngularVelocity::zero());
+    RobotState blue_robot_state10(Point(2, -1.5), Vector(0, 0), Angle::half(),
+                                  AngularVelocity::zero());
+    RobotState blue_robot_state11(Point(2, -2.5), Vector(0, 0), Angle::half(),
+                                  AngularVelocity::zero());
+
+    std::vector<RobotStateWithId> blue_robot_states = {
+        RobotStateWithId{.id = 6, .robot_state = blue_robot_state6},
+        RobotStateWithId{.id = 7, .robot_state = blue_robot_state7},
+        RobotStateWithId{.id = 8, .robot_state = blue_robot_state8},
+        RobotStateWithId{.id = 9, .robot_state = blue_robot_state9},
+        RobotStateWithId{.id = 10, .robot_state = blue_robot_state10},
+        RobotStateWithId{.id = 11, .robot_state = blue_robot_state11},
+    };
+    simulator.addBlueRobots(blue_robot_states);
+
+    RobotState yellow_robot_state6(Point(-2, 2.5), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero());
+    RobotState yellow_robot_state7(Point(-2, 1.5), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero());
+    RobotState yellow_robot_state8(Point(-2, 0.5), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero());
+    RobotState yellow_robot_state9(Point(-2, -0.5), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero());
+    RobotState yellow_robot_state10(Point(-2, -1.5), Vector(0, 0), Angle::zero(),
+                                    AngularVelocity::zero());
+    RobotState yellow_robot_state11(Point(-2, -2.5), Vector(0, 0), Angle::zero(),
+                                    AngularVelocity::zero());
+
+    std::vector<RobotStateWithId> yellow_robot_states = {
+        RobotStateWithId{.id = 6, .robot_state = yellow_robot_state6},
+        RobotStateWithId{.id = 7, .robot_state = yellow_robot_state7},
+        RobotStateWithId{.id = 8, .robot_state = yellow_robot_state8},
+        RobotStateWithId{.id = 9, .robot_state = yellow_robot_state9},
+        RobotStateWithId{.id = 10, .robot_state = yellow_robot_state10},
+        RobotStateWithId{.id = 11, .robot_state = yellow_robot_state11},
     };
     simulator.addYellowRobots(yellow_robot_states);
 }

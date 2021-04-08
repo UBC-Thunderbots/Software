@@ -41,10 +41,29 @@ int main(int argc, char **argv)
             ->getMutableRollingFrictionAcceleration()
             ->setValue(0.5);
 
-        auto standalone_simulator = std::make_shared<StandaloneSimulator>(
-            mutable_thunderbots_config->getMutableStandaloneSimulatorConfig(),
-            mutable_thunderbots_config->getMutableSimulatorConfig());
-        standalone_simulator->setupInitialSimulationState();
+        std::shared_ptr<StandaloneSimulator> standalone_simulator;
+
+        // Setup the field
+        if (args->getSslDivision()->value() == "div_a")
+        {
+            standalone_simulator = std::make_shared<StandaloneSimulator>(
+                mutable_thunderbots_config->getMutableStandaloneSimulatorConfig(),
+                mutable_thunderbots_config->getMutableSimulatorConfig(),
+                Field::createSSLDivisionAField());
+
+            standalone_simulator->setupInitialSimulationStateDivA();
+        }
+        else
+        {
+            standalone_simulator = std::make_shared<StandaloneSimulator>(
+                mutable_thunderbots_config->getMutableStandaloneSimulatorConfig(),
+                mutable_thunderbots_config->getMutableSimulatorConfig(),
+                Field::createSSLDivisionBField());
+
+            standalone_simulator->setupInitialSimulationStateDivB();
+        }
+
+        Field::createSSLDivisionAField();
 
         ThreadedStandaloneSimulatorGUI threaded_standalone_simulator_gui(
             standalone_simulator, mutable_thunderbots_config->getMutableSimulatorConfig(),

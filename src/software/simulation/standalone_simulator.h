@@ -28,10 +28,11 @@ class StandaloneSimulator
      *
      * @param standalone_simulator_config The config for the StandaloneSimulator
      * @param simulator_config The config for the Simulator
+     * @param field The field to simulate
      */
     explicit StandaloneSimulator(
         std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config,
-        std::shared_ptr<SimulatorConfig> simulator_config);
+        std::shared_ptr<SimulatorConfig> simulator_config, const Field& field);
     StandaloneSimulator() = delete;
 
     /**
@@ -47,7 +48,8 @@ class StandaloneSimulator
     /**
      * Adds robots to predefined locations on the field
      */
-    void setupInitialSimulationState();
+    void setupInitialSimulationStateDivA();
+    void setupInitialSimulationStateDivB();
 
     SSLProto::SSL_WrapperPacket getSSLWrapperPacket() const;
 

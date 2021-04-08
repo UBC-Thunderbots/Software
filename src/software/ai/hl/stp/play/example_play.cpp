@@ -26,6 +26,11 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     auto move_tactic_4 = std::make_shared<MoveTactic>(true);
     auto move_tactic_5 = std::make_shared<MoveTactic>(true);
     auto move_tactic_6 = std::make_shared<MoveTactic>(true);
+    auto move_tactic_7 = std::make_shared<MoveTactic>(true);
+    auto move_tactic_8 = std::make_shared<MoveTactic>(true);
+    auto move_tactic_9 = std::make_shared<MoveTactic>(true);
+    auto move_tactic_10 = std::make_shared<MoveTactic>(true);
+    auto move_tactic_11 = std::make_shared<MoveTactic>(true);
 
     // Continue to loop to demonstrate the example play indefinitely
     do
@@ -53,12 +58,28 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         move_tactic_6->updateControlParams(
             world.ball().position() + Vector::createFromAngle(angle_between_robots * 6),
             (angle_between_robots * 6) + Angle::half(), 0);
+        move_tactic_7->updateControlParams(
+            world.ball().position() + Vector::createFromAngle(angle_between_robots * 7),
+            (angle_between_robots * 7) + Angle::half(), 0);
+        move_tactic_8->updateControlParams(
+            world.ball().position() + Vector::createFromAngle(angle_between_robots * 8),
+            (angle_between_robots * 8) + Angle::half(), 0);
+        move_tactic_9->updateControlParams(
+            world.ball().position() + Vector::createFromAngle(angle_between_robots * 9),
+            (angle_between_robots * 9) + Angle::half(), 0);
+        move_tactic_10->updateControlParams(
+            world.ball().position() + Vector::createFromAngle(angle_between_robots * 10),
+            (angle_between_robots * 10) + Angle::half(), 0);
+        move_tactic_11->updateControlParams(
+            world.ball().position() + Vector::createFromAngle(angle_between_robots * 11),
+            (angle_between_robots * 11) + Angle::half(), 0);
 
         // yield the Tactics this Play wants to run, in order of priority
         // If there are fewer robots in play, robots at the end of the list will not be
         // assigned
         yield({{move_tactic_1, move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,
-                move_tactic_6}});
+                move_tactic_6, move_tactic_7, move_tactic_8, move_tactic_9,
+                move_tactic_10, move_tactic_11}});
     } while (true);
 }
 
