@@ -63,8 +63,6 @@ int main(int argc, char **argv)
             standalone_simulator->setupInitialSimulationStateDivB();
         }
 
-        Field::createSSLDivisionAField();
-
         ThreadedStandaloneSimulatorGUI threaded_standalone_simulator_gui(
             standalone_simulator, mutable_thunderbots_config->getMutableSimulatorConfig(),
             mutable_thunderbots_config->getMutableStandaloneSimulatorConfig());
