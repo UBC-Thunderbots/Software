@@ -1,16 +1,17 @@
 #pragma once
 
 template <class SendProto>
-ThreadedProtoMulticastSender<SendProto>::ThreadedProtoMulticastSender(
-    const std::string& ip_address, const unsigned short port)
+ThreadedProtoUdpSender<SendProto>::ThreadedProtoUdpSender(const std::string& ip_address,
+                                                          const unsigned short port,
+                                                          bool multicast)
     : io_service(),
-      multicast_sender(io_service, ip_address, port),
+      udp_sender(io_service, ip_address, port, multicast),
       io_service_thread([this]() { io_service.run(); })
 {
 }
 
 template <class SendProto>
-ThreadedProtoMulticastSender<SendProto>::~ThreadedProtoMulticastSender()
+ThreadedProtoUdpSender<SendProto>::~ThreadedProtoUdpSender()
 {
     // Stop the io_service. This is safe to call from another thread.
     // https://stackoverflow.com/questions/4808848/boost-asio-stopping-io-service
@@ -25,7 +26,7 @@ ThreadedProtoMulticastSender<SendProto>::~ThreadedProtoMulticastSender()
 }
 
 template <class SendProto>
-void ThreadedProtoMulticastSender<SendProto>::sendProto(const SendProto& message)
+void ThreadedProtoUdpSender<SendProto>::sendProto(const SendProto& message)
 {
-    multicast_sender.sendProto(message);
+    udp_sender.sendProto(message);
 }
