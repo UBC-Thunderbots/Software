@@ -20,15 +20,15 @@ bool ExamplePlay::invariantHolds(const World &world) const
 void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     // Create MoveTactics that will loop forever
-    auto move_tactic_1 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_2 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_3 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_4 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_5 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_6 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_7 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_8 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_9 = std::make_shared<MoveTactic>(true);
+    auto move_tactic_1  = std::make_shared<MoveTactic>(true);
+    auto move_tactic_2  = std::make_shared<MoveTactic>(true);
+    auto move_tactic_3  = std::make_shared<MoveTactic>(true);
+    auto move_tactic_4  = std::make_shared<MoveTactic>(true);
+    auto move_tactic_5  = std::make_shared<MoveTactic>(true);
+    auto move_tactic_6  = std::make_shared<MoveTactic>(true);
+    auto move_tactic_7  = std::make_shared<MoveTactic>(true);
+    auto move_tactic_8  = std::make_shared<MoveTactic>(true);
+    auto move_tactic_9  = std::make_shared<MoveTactic>(true);
     auto move_tactic_10 = std::make_shared<MoveTactic>(true);
     auto move_tactic_11 = std::make_shared<MoveTactic>(true);
 
