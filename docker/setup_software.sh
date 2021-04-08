@@ -71,9 +71,11 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     host_software_packages+=(clang)
     host_software_packages+=(llvm-6.0)
     host_software_packages+=(libclang-6.0-dev)
-    sudo apt-get -y install gcc-7 g++-7
-    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
-    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
+    apt-get -y install gcc-7 g++-7
+    echo "made it here"
+    sleep 10
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
+    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
     
     # This fixes missing headers by notifying the linker
     ldconfig
