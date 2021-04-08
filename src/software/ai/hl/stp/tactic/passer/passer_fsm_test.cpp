@@ -8,7 +8,7 @@ TEST(PasserFSMTest, test_transitions)
 {
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    Pass pass   = Pass(Point(0, 0), Point(2, 0), 5, Timestamp::fromSeconds(0));
+    Pass pass   = Pass(Point(0, 0), Point(2, 0), 5);
 
     PasserFSM::ControlParams control_params{.pass = std::make_optional<Pass>(pass)};
 
