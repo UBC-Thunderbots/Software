@@ -29,6 +29,8 @@ void MotionConstraintVisitor::visit(const MoveTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const ChipTactic &tactic) {}
 
+void MotionConstraintVisitor::visit(const KickTactic &tactic) {}
+
 void MotionConstraintVisitor::visit(const KickoffChipTactic &tactic)
 {
     current_allowed_constraints = std::set<MotionConstraint>({
@@ -76,6 +78,10 @@ void MotionConstraintVisitor::visit(const MoveTestTactic &tactic) {}
 void MotionConstraintVisitor::visit(const StopTestTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const GoalieTestTactic &tactic) {}
+
+void MotionConstraintVisitor::visit(const DribbleTactic &tactic) {}
+
+void MotionConstraintVisitor::visit(const GetBehindBallTactic &tactic) {}
 
 // clang-format on
 

@@ -33,7 +33,7 @@ struct PlannerTestCase
 };
 
 RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
-    DynamicParameters->getAIConfig()->getRobotNavigationObstacleFactoryConfig());
+    std::make_shared<const RobotNavigationObstacleFactoryConfig>());
 
 std::vector<PlannerTestCase>
     test_cases = {{.name               = "Empty field straight line",

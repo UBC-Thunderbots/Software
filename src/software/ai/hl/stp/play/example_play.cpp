@@ -1,7 +1,9 @@
 #include "software/ai/hl/stp/play/example_play.h"
 
-#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
+
+ExamplePlay::ExamplePlay(std::shared_ptr<const PlayConfig> config) : Play(config) {}
 
 bool ExamplePlay::isApplicable(const World &world) const
 {
@@ -55,10 +57,10 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         // yield the Tactics this Play wants to run, in order of priority
         // If there are fewer robots in play, robots at the end of the list will not be
         // assigned
-        yield({move_tactic_1, move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,
-               move_tactic_6});
+        yield({{move_tactic_1, move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,
+                move_tactic_6}});
     } while (true);
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ExamplePlay> factory;
+static TGenericFactory<std::string, Play, ExamplePlay, PlayConfig> factory;

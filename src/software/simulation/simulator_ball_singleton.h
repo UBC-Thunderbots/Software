@@ -1,5 +1,8 @@
 #pragma once
 
+#include <functional>
+#include <memory>
+
 #include "software/simulation/firmware_object_deleter.h"
 #include "software/simulation/simulator_ball.h"
 

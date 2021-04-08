@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cinttypes>
+#include <functional>
 #include <optional>
 
 #include "software/simulation/simulator_robot.h"

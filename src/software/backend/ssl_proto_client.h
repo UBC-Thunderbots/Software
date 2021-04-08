@@ -1,8 +1,8 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/constants.h"
 #include "software/networking/threaded_proto_multicast_listener.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_gc_referee_message.pb.h"
 
@@ -27,10 +27,10 @@ class SSLProtoClient
     explicit SSLProtoClient(
         std::function<void(SSLProto::SSL_WrapperPacket)> received_vision_callback,
         std::function<void(SSLProto::Referee)> received_referee_callback,
-        std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config);
+        std::shared_ptr<const SslCommunicationConfig> ssl_communication_config);
 
    private:
-    std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config;
+    std::shared_ptr<const SslCommunicationConfig> ssl_communication_config;
     std::unique_ptr<ThreadedProtoMulticastListener<SSLProto::SSL_WrapperPacket>>
         ssl_vision_listener;
     std::unique_ptr<ThreadedProtoMulticastListener<SSLProto::Referee>>

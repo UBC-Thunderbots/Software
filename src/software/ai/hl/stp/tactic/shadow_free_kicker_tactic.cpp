@@ -3,8 +3,8 @@
 #include <algorithm>
 
 #include "shared/constants.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/parameter/dynamic_parameters.h"
 
 ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadower,
                                                Team enemy_team, Ball ball, Field field,

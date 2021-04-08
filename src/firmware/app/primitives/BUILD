@@ -25,12 +25,7 @@ cc_library(
     deps = [
         ":move",
         ":primitive",
-        ":chip",
-        ":autochip_move",
-        ":autokick_move",
         ":direct_control",
-        ":kick",
-        ":spinning_move",
         ":stop",
         "//firmware/app/world:firmware_world",
     ] + select({
@@ -52,58 +47,9 @@ cc_library(
 )
 
 cc_library(
-    name = "chick_motion",
-    srcs = ["chick_motion.c"],
-    hdrs = ["chick_motion.h"],
-    deps = [
-        ":primitive",
-        "//firmware/app/control",
-        "//firmware/app/control:bangbang",
-        "//firmware/app/control:physbot",
-        "//firmware/app/control:trajectory_planner",
-        "//firmware/shared:physics",
-        "//firmware/shared:util",
-    ],
-)
-
-cc_library(
-    name = "chip",
-    srcs = [
-        "chip_primitive.c",
-    ],
-    hdrs = ["chip_primitive.h"],
-    deps = [
-        "chick_motion",
-        ":primitive",
-    ],
-)
-
-cc_library(
-    name = "kick",
-    srcs = ["kick_primitive.c"],
-    hdrs = ["kick_primitive.h"],
-    deps = [
-        "chick_motion",
-        ":primitive",
-    ],
-)
-
-cc_library(
-    name = "spinning_move",
-    srcs = ["spinning_move_primitive.c"],
-    hdrs = ["spinning_move_primitive.h"],
-    deps = [
-        ":primitive",
-        "//firmware/app/control",
-        "//firmware/app/control:bangbang",
-        "//firmware/shared:physics",
-    ],
-)
-
-cc_library(
-    name = "move_helper",
-    srcs = ["move_helper.c"],
-    hdrs = ["move_helper.h"],
+    name = "move",
+    srcs = ["move_primitive.c"],
+    hdrs = ["move_primitive.h"],
     deps = [
         ":primitive",
         "//firmware/app/control",
@@ -117,41 +63,11 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "move",
-    srcs = ["move_primitive.c"],
-    hdrs = ["move_primitive.h"],
-    deps = [
-        "move_helper",
-        ":primitive",
-    ],
-)
-
-cc_library(
-    name = "autokick_move",
-    srcs = ["autokick_move_primitive.c"],
-    hdrs = ["autokick_move_primitive.h"],
-    deps = [
-        "move_helper",
-        ":primitive",
-    ],
-)
-
-cc_library(
-    name = "autochip_move",
-    srcs = ["autochip_move_primitive.c"],
-    hdrs = ["autochip_move_primitive.h"],
-    deps = [
-        "move_helper",
-        ":primitive",
-    ],
-)
-
 cc_test(
-    name = "autochip_move_test",
-    srcs = ["autochip_move_primitive_test.cpp"],
+    name = "move_test",
+    srcs = ["move_primitive_test.cpp"],
     deps = [
-        ":autochip_move",
+        ":move",
         ":test_util_world",
     ],
 )

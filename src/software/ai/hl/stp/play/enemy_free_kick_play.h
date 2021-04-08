@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 
 /**
@@ -8,7 +9,7 @@
 class EnemyFreekickPlay : public Play
 {
    public:
-    EnemyFreekickPlay() = default;
+    EnemyFreekickPlay(std::shared_ptr<const PlayConfig> config);
 
     bool isApplicable(const World &world) const override;
 

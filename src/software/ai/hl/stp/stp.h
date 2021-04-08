@@ -1,11 +1,13 @@
 #pragma once
 
+#include <memory>
 #include <random>
+#include <vector>
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/hl.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/intent/intent.h"
-#include "software/parameter/dynamic_parameters.h"
 
 /**
  * The STP module is an implementation of the high-level logic Abstract class, that
@@ -81,12 +83,14 @@ class STP : public HL
      * @param default_play_constructor A function that constructs and returns a unique ptr
      * to a Play. This constructor will be used to return a Play if no other Play is
      * applicable during gameplay.
+     * @param control_config The Ai Control configuration
+     * @param play_config The Play configuration
      * @param random_seed The random seed used for STP's internal random number generator.
      * The default value is 0
      */
     explicit STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
-                 std::shared_ptr<const AIControlConfig> control_config,
-                 long random_seed = 0);
+                 std::shared_ptr<const AiControlConfig> control_config,
+                 std::shared_ptr<const PlayConfig> play_config, long random_seed = 0);
 
     std::vector<std::unique_ptr<Intent>> getIntents(const World &world) override;
 
@@ -120,61 +124,47 @@ class STP : public HL
     PlayInfo getPlayInfo() override;
 
     /**
-     * Given a list of tactics and the current World, assigns robots from the friendly
-     * team to each tactic
+     * Given a vector of vector of tactics and the current World, assigns robots
+     * from the friendly team to each tactic
      *
      * Some tactics may not be assigned a robot, depending on if there is a robot
      * capable of performing that tactic
      *
      * This will clear all assigned robots from all tactics
      *
-     * The order of the given tactics determines their priority, with the tactics as the
-     * beginning of the vector being a higher priority than those at the end. The priority
-     * determines which tactics will NOT be assigned if there are not enough robots on the
-     * field to assign them all. For example, if a Play returned 6 Tactics but there were
-     * only 4 robots on the field at the time, only the first 4 Tactics in the vector
-     * would be assigned to robots and run.
+     * The outer vector ranks the inner vector of tactics by priority. Tactics in
+     * lower indexes of the outer vector will be assigned first. For example:
      *
-     * @param tactics The list of tactics that should be assigned a robot. Note
-     * that this function modifies tactics to make the correct assignments, because we
-     * need to modify the individual tactics _and_ possibly add/remove tactics
+     * {
+     *      {goalie_tactic},
+     *      {crease_defender_1, crease_defender_2},
+     *      {move_tactic},
+     * }
+     *
+     * The cost of assigning a goalie_tactic will be minimized across all robots first,
+     * followed by both the crease_defender tactics. The move_tactic will be assigned
+     * last.
+     *
+     * The order of the given tactics in the inner vector also determines their priority,
+     * with the tactics at the beginning of the vector being a higher priority than those
+     * at the end. The priority determines which tactics will NOT be assigned if there are
+     * not enough robots on the field to assign them all. For example, if a Play returned
+     * 4 Tactics in total but there were only 3 robots on the field at the time, only the
+     * first 3 Tactics in the vectors would be assigned to robots and run. (In the example
+     * above, only the goalie and crease_defenders would be assigned)
+     *
+     * @param tactics The vector of vector of tactics that should be assigned a robot.
+     * Note that this function modifies tactics to make the correct assignments, because
+     * we need to modify the individual tactics _and_ possibly add/remove tactics
      * @param world The state of the world, which contains the friendly Robots that will
      * be assigned to each tactic
      *
      * @return map from assigned tactics to robot
      */
     std::map<std::shared_ptr<const Tactic>, Robot> assignRobotsToTactics(
-        std::vector<std::shared_ptr<const Tactic>> tactics, const World &world);
+        ConstPriorityTacticVector tactics, const World &world);
 
    private:
-    /**
-     * Assigns non goalie robots to each non goalie tactic
-     *
-     * Some tactics may not be assigned a robot, depending on if there is a robot
-     * capable of performing that tactic
-     *
-     * This will clear all assigned robots from all tactics
-     *
-     * The order of the given tactics determines their priority, with the tactics as the
-     * beginning of the vector being a higher priority than those at the end. The priority
-     * determines which tactics will NOT be assigned if there are not enough robots on the
-     * field to assign them all. For example, if a Play returned 6 Tactics but there were
-     * only 4 robots on the field at the time, only the first 4 Tactics in the vector
-     * would be assigned to robots and run.
-     *
-     * @param world The state of the world for calculating robot costs
-     * @param non_goalie_robots The non goalie robots to assign to tactics
-     * @param [in/out] non_goalie_tactics The list of tactics that should be assigned a
-     * robot. Note that this function modifies non_goalie_tactics to make the correct
-     * assignments, because we need to modify the individual tactics _and_ possibly
-     * add/remove tactics
-     *
-     * @return The list of tactics that were assigned to the robots
-     */
-    static std::map<std::shared_ptr<const Tactic>, Robot> assignNonGoalieRobotsToTactics(
-        const World &world, const std::vector<Robot> &non_goalie_robots,
-        std::vector<std::shared_ptr<const Tactic>> &non_goalie_tactics);
-
     /**
      * Updates the current STP state based on the state of the world
      *
@@ -218,7 +208,8 @@ class STP : public HL
     std::map<RobotId, std::string> readable_robot_tactic_assignment;
     // The random number generator
     std::mt19937 random_number_generator;
-    std::shared_ptr<const AIControlConfig> control_config;
+    std::shared_ptr<const AiControlConfig> control_config;
+    std::shared_ptr<const PlayConfig> play_config;
     std::string override_play_name;
     std::string previous_override_play_name;
     bool override_play;

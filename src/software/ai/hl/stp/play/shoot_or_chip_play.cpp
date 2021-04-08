@@ -6,15 +6,18 @@
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
-#include "software/ai/hl/stp/tactic/stop_tactic.h"
+#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
 
-ShootOrChipPlay::ShootOrChipPlay() : MIN_OPEN_ANGLE_FOR_SHOT(Angle::fromDegrees(4)) {}
+ShootOrChipPlay::ShootOrChipPlay(std::shared_ptr<const PlayConfig> config)
+    : Play(config), MIN_OPEN_ANGLE_FOR_SHOT(Angle::fromDegrees(4))
+{
+}
 
 bool ShootOrChipPlay::isApplicable(const World &world) const
 {
@@ -45,7 +48,8 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
      */
 
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
+        play_config->getGoalieTacticConfig());
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
@@ -68,11 +72,12 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     auto shoot_or_chip_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        MIN_OPEN_ANGLE_FOR_SHOT, fallback_chip_target, false);
+        MIN_OPEN_ANGLE_FOR_SHOT, fallback_chip_target, false,
+        play_config->getShootGoalTacticConfig());
 
     do
     {
-        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
+        PriorityTacticVector result = {{goalie_tactic}};
 
         // If we have any crease defenders, we don't want the goalie tactic to consider
         // them when deciding where to block
@@ -89,7 +94,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
         // Update crease defenders
         for (auto &crease_defender_tactic : crease_defender_tactics)
         {
-            result.emplace_back(crease_defender_tactic);
+            result[0].emplace_back(crease_defender_tactic);
         }
 
         // Update tactics moving to open areas
@@ -111,7 +116,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 Vector::createFromAngle(orientation).normalize(ROBOT_MAX_RADIUS_METERS);
             ;
             move_to_open_area_tactics[i]->updateControlParams(position, orientation, 0.0);
-            result.emplace_back(move_to_open_area_tactics[i]);
+            result[0].emplace_back(move_to_open_area_tactics[i]);
         }
 
         // Update chipper
@@ -123,7 +128,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
         shoot_or_chip_tactic->updateControlParams(chip_target);
 
         // We want this second in priority only to the goalie
-        result.insert(result.begin() + 1, shoot_or_chip_tactic);
+        result[0].insert(result[0].begin() + 1, shoot_or_chip_tactic);
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(result);
@@ -132,4 +137,4 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ShootOrChipPlay> factory;
+static TGenericFactory<std::string, Play, ShootOrChipPlay, PlayConfig> factory;

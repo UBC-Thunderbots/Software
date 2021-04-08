@@ -7,6 +7,8 @@
 #include "shared/proto/robot_log_msg.nanopb.h"
 #include "shared/proto/robot_log_msg.pb.h"
 #include "software/simulation/physics/physics_world.h"
+#include "software/simulation/physics_simulator_ball.h"
+#include "software/simulation/physics_simulator_robot.h"
 #include "software/simulation/simulator_ball.h"
 #include "software/simulation/simulator_robot.h"
 
@@ -16,6 +18,7 @@ extern "C"
 #include "firmware/app/world/firmware_robot.h"
 }
 
+#include "shared/test_util/test_util.h"
 #include "software/test_util/test_util.h"
 #include "software/world/robot.h"
 #include "software/world/world.h"
@@ -38,8 +41,8 @@ class SimulatorRobotSingletonTest : public testing::Test
     createWorldWithEnemyRobots(Robot robot, Ball ball,
                                std::vector<Point> enemy_robot_positions)
     {
-        auto physics_world =
-            std::make_shared<PhysicsWorld>(Field::createSSLDivisionBField());
+        auto physics_world = std::make_shared<PhysicsWorld>(
+            Field::createSSLDivisionBField(), std::make_shared<const SimulatorConfig>());
         physics_world->setBallState(ball.currentState());
         RobotStateWithId robot_state{.id          = robot.id(),
                                      .robot_state = robot.currentState()};
@@ -58,7 +61,7 @@ class SimulatorRobotSingletonTest : public testing::Test
         auto physics_robot = physics_world->getYellowPhysicsRobots().at(0);
         if (physics_robot.lock())
         {
-            simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
+            simulator_robot = std::make_shared<PhysicsSimulatorRobot>(physics_robot);
             SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, FieldSide::NEG_X);
         }
         else
@@ -72,7 +75,7 @@ class SimulatorRobotSingletonTest : public testing::Test
         auto physics_ball = physics_world->getPhysicsBall();
         if (physics_ball.lock())
         {
-            simulator_ball = std::make_shared<SimulatorBall>(physics_ball);
+            simulator_ball = std::make_shared<PhysicsSimulatorBall>(physics_ball);
         }
         else
         {
@@ -1410,8 +1413,9 @@ TEST_F(SimulatorRobotSingletonTest, test_brake_motors_when_robot_moving_and_spin
 
 TEST_F(SimulatorRobotSingletonTest, test_change_simulator_robot)
 {
-    auto physics_world = std::make_unique<PhysicsWorld>(Field::createSSLDivisionBField());
-    auto robot_states  = std::vector<RobotStateWithId>{
+    auto physics_world = std::make_unique<PhysicsWorld>(
+        Field::createSSLDivisionBField(), std::make_shared<const SimulatorConfig>());
+    auto robot_states = std::vector<RobotStateWithId>{
         RobotStateWithId{.id          = 7,
                          .robot_state = RobotState(Point(1.2, 0), Vector(-2.3, 0.2),
                                                    Angle::fromRadians(-1.2),
@@ -1425,7 +1429,7 @@ TEST_F(SimulatorRobotSingletonTest, test_change_simulator_robot)
     auto friendly_physics_robots = physics_world->getYellowPhysicsRobots();
     ASSERT_EQ(2, friendly_physics_robots.size());
     auto simulator_robot_7 =
-        std::make_shared<SimulatorRobot>(friendly_physics_robots.at(0));
+        std::make_shared<PhysicsSimulatorRobot>(friendly_physics_robots.at(0));
 
     SimulatorRobotSingleton::setSimulatorRobot(simulator_robot_7, FieldSide::NEG_X);
     auto firmware_robot_7 = SimulatorRobotSingleton::createFirmwareRobot();
@@ -1438,7 +1442,7 @@ TEST_F(SimulatorRobotSingletonTest, test_change_simulator_robot)
     // The firmware functions should now return the data for simulator_robot_2, even
     // though we didn't need to create a new FirmwareRobot_t
     auto simulator_robot_2 =
-        std::make_shared<SimulatorRobot>(friendly_physics_robots.at(1));
+        std::make_shared<PhysicsSimulatorRobot>(friendly_physics_robots.at(1));
     SimulatorRobotSingleton::setSimulatorRobot(simulator_robot_2, FieldSide::NEG_X);
     auto firmware_robot_2 = SimulatorRobotSingleton::createFirmwareRobot();
     EXPECT_FLOAT_EQ(0.0f, app_firmware_robot_getPositionX(firmware_robot_2.get()));

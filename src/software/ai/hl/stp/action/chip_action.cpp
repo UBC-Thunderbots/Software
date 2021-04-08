@@ -115,9 +115,10 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         // If we're not in position to chip, move into position
         if (!robot_behind_ball)
         {
-            yield(std::make_unique<MoveIntent>(robot->id(), point_behind_ball,
-                                               chip_direction, 0.0, DribblerMode::OFF,
-                                               BallCollisionType::ALLOW));
+            yield(std::make_unique<MoveIntent>(
+                robot->id(), point_behind_ball, chip_direction, 0.0, DribblerMode::OFF,
+                BallCollisionType::AVOID, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
         }
         else
         {

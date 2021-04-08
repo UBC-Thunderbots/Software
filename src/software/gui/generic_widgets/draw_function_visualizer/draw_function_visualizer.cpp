@@ -1,5 +1,8 @@
 #include "software/gui/generic_widgets/draw_function_visualizer/draw_function_visualizer.h"
 
+#include <QtWidgets/QMenu>
+#include <string>
+
 #include "software/gui/drawing/colors.h"
 #include "software/gui/geometry_conversion.h"
 #include "software/logger/logger.h"
@@ -7,7 +10,10 @@
 DrawFunctionVisualizer::DrawFunctionVisualizer(QWidget *parent)
     : ZoomableQGraphicsView(parent),
       graphics_scene(new QGraphicsScene(this)),
-      open_gl_widget(new QOpenGLWidget(this))
+      open_gl_widget(new QOpenGLWidget(this)),
+      // Placeholder Rectangle
+      last_view_area(Rectangle(Point(1, 1), Point(0, 0)))
+
 {
     setScene(graphics_scene);
 
@@ -71,5 +77,15 @@ void DrawFunctionVisualizer::clearAndDraw(const std::vector<DrawFunction> &draw_
 void DrawFunctionVisualizer::setViewArea(const Rectangle &view_area)
 {
     // Moves and scales the view to fit the view_area in the scene
+    last_view_area = view_area;
     fitInView(createQRectF(view_area), Qt::KeepAspectRatio);
+}
+
+void DrawFunctionVisualizer::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu menu(this);
+    menu.addAction("Reset View",
+                   [this]() { DrawFunctionVisualizer::setViewArea(last_view_area); });
+
+    menu.exec(event->globalPos());
 }

@@ -7,8 +7,9 @@
 #include "software/ai/navigator/path_manager/velocity_obstacle_path_manager.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
 
-AI::AI(std::shared_ptr<const AIConfig> ai_config,
-       std::shared_ptr<const AIControlConfig> control_config)
+AI::AI(std::shared_ptr<const AiConfig> ai_config,
+       std::shared_ptr<const AiControlConfig> control_config,
+       std::shared_ptr<const PlayConfig> play_config)
     : navigator(std::make_shared<Navigator>(
           std::make_unique<VelocityObstaclePathManager>(
               std::make_unique<ThetaStarPathPlanner>(),
@@ -19,7 +20,8 @@ AI::AI(std::shared_ptr<const AIConfig> ai_config,
           ai_config->getNavigatorConfig())),
       // We use the current time in nanoseconds to initialize STP with a "random" seed
       high_level(std::make_unique<STP>(
-          []() { return std::make_unique<HaltPlay>(); }, control_config,
+          [play_config]() { return std::make_unique<HaltPlay>(play_config); },
+          control_config, play_config,
           std::chrono::system_clock::now().time_since_epoch().count()))
 {
 }

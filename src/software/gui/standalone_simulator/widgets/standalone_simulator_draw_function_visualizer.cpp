@@ -9,7 +9,7 @@
 
 StandaloneSimulatorDrawFunctionVisualizer::StandaloneSimulatorDrawFunctionVisualizer(
     QWidget* parent)
-    : DrawFunctionVisualizer(parent)
+    : DrawFunctionVisualizer(parent), shift_clicked(false), ctrl_clicked(false)
 {
     // Let mouseMoveEvents be triggered even if a mouse button is not pressed
     this->setMouseTracking(true);
@@ -21,20 +21,43 @@ void StandaloneSimulatorDrawFunctionVisualizer::setStandaloneSimulator(
     standalone_simulator = simulator;
 }
 
+void StandaloneSimulatorDrawFunctionVisualizer::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_R)
+    {
+        r_clicked = true;
+    }
+}
+
+void StandaloneSimulatorDrawFunctionVisualizer::resetFlags()
+{
+    initial_click_point = Point(0, 0);
+    final_click_point   = Point(0, 0);
+    ctrl_clicked        = false;
+    shift_clicked       = false;
+    r_clicked           = false;
+}
+
 void StandaloneSimulatorDrawFunctionVisualizer::mousePressEvent(QMouseEvent* event)
 {
     // If Ctrl is pressed, place the ball where the user clicks
     if (event->modifiers() & Qt::ControlModifier && standalone_simulator)
     {
-        ctrl_clicked  = true;
-        initial_point = createPoint(mapToScene(event->pos()));
-        final_point   = createPoint(mapToScene(event->pos()));
-        standalone_simulator->setBallState(BallState(initial_point, Vector(0, 0)));
+        ctrl_clicked        = true;
+        initial_click_point = createPoint(mapToScene(event->pos()));
+        final_click_point   = createPoint(mapToScene(event->pos()));
+        standalone_simulator->setBallState(BallState(initial_click_point, Vector(0, 0)));
     }
     else if (event->modifiers() & Qt::ShiftModifier && standalone_simulator)
     {
+        shift_clicked        = true;
         Point point_in_scene = createPoint(mapToScene(event->pos()));
         robot                = standalone_simulator->getRobotAtPosition(point_in_scene);
+    }
+    else if (r_clicked && standalone_simulator)
+    {
+        initial_click_point = createPoint(mapToScene(event->pos()));
+        robot = standalone_simulator->getRobotAtPosition(initial_click_point);
     }
     else
     {
@@ -48,13 +71,12 @@ void StandaloneSimulatorDrawFunctionVisualizer::mouseReleaseEvent(QMouseEvent* e
     robot.reset();
     if (ctrl_clicked)
     {
-        final_point = createPoint(mapToScene(event->pos()));
+        final_click_point = createPoint(mapToScene(event->pos()));
         standalone_simulator->setBallState(
-            BallState(initial_point, initial_point - final_point));
-        initial_point = Point(0, 0);
-        final_point   = Point(0, 0);
-        ctrl_clicked  = false;
+            BallState(initial_click_point, initial_click_point - final_click_point));
     }
+
+    resetFlags();
 
     DrawFunctionVisualizer::mouseReleaseEvent(event);
 }
@@ -64,23 +86,52 @@ void StandaloneSimulatorDrawFunctionVisualizer::mouseMoveEvent(QMouseEvent* even
     auto physics_robot = robot.lock();
     if (physics_robot && standalone_simulator)
     {
-        Point point_in_scene = createPoint(mapToScene(event->pos()));
-        physics_robot->setPosition(point_in_scene);
+        if (shift_clicked)
+        {
+            Point point_in_scene = createPoint(mapToScene(event->pos()));
+            physics_robot->setPositionAndOrientation(point_in_scene,
+                                                     physics_robot->orientation());
+        }
+        else if (r_clicked)
+        {
+            final_click_point = createPoint(mapToScene(event->pos()));
+            Vector vec        = Vector(final_click_point.x() - initial_click_point.x(),
+                                final_click_point.y() - initial_click_point.y());
+            Angle angle       = vec.orientation();
+            physics_robot->setPositionAndOrientation(physics_robot->position(), angle);
+        }
     }
-    if (ctrl_clicked && standalone_simulator)
+    else if (ctrl_clicked && standalone_simulator)
     {
-        final_point = createPoint(mapToScene(event->pos()));
+        final_click_point = createPoint(mapToScene(event->pos()));
     }
+
     DrawFunctionVisualizer::mouseMoveEvent(event);
 }
 
 WorldDrawFunction StandaloneSimulatorDrawFunctionVisualizer::getDrawBallVelocityFunction()
 {
-    auto draw_function = [this](QGraphicsScene* scene) {
-        drawBallVelocity(scene, initial_point, initial_point - final_point,
-                         ball_speed_slow_color, ball_speed_fast_color);
-    };
-    return WorldDrawFunction(draw_function);
+    if (ctrl_clicked)
+    {
+        // Draw function will draw a line if the user is adding velocity to ball
+        auto draw_function = [this](QGraphicsScene* scene) {
+            drawBallVelocity(scene, initial_click_point,
+                             initial_click_point - final_click_point,
+                             ball_speed_slow_color, ball_speed_fast_color);
+        };
+        return WorldDrawFunction(draw_function);
+    }
+    else
+    {
+        // Draw function draws a vector of magnitude 0 if user is not manipulating the
+        // ball This is necessary to prevent a line being drawn on screen when
+        // manipulating the robots.
+        auto draw_function = [this](QGraphicsScene* scene) {
+            drawBallVelocity(scene, initial_click_point, Vector(0, 0),
+                             ball_speed_slow_color, ball_speed_fast_color);
+        };
+        return WorldDrawFunction(draw_function);
+    }
 }
 
 void StandaloneSimulatorDrawFunctionVisualizer::contextMenuEvent(QContextMenuEvent* event)
@@ -89,6 +140,8 @@ void StandaloneSimulatorDrawFunctionVisualizer::contextMenuEvent(QContextMenuEve
     auto robot_under_cursor = standalone_simulator->getRobotAtPosition(point_in_scene);
 
     QMenu menu(this);
+    menu.addAction("Reset View",
+                   [this]() { DrawFunctionVisualizer::setViewArea(last_view_area); });
     menu.addAction("Place Ball Here", [&]() {
         standalone_simulator->setBallState(BallState{
             .position_ = point_in_scene, .velocity_ = Vector(0, 0), .height_ = 0});

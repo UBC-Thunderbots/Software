@@ -2,8 +2,10 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
+
+StopPlay::StopPlay(std::shared_ptr<const PlayConfig> config) : Play(config) {}
 
 bool StopPlay::isApplicable(const World &world) const
 {
@@ -50,7 +52,8 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
         std::make_shared<MoveTactic>(true)};
 
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
+        play_config->getGoalieTacticConfig());
 
     // we want to find the radius of the semicircle in which the defense area can be
     // inscribed, this is so the robots can snap to that semicircle and not enter the
@@ -67,7 +70,7 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
-        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
+        PriorityTacticVector result = {{goalie_tactic}};
 
         // a unit vector from the center of the goal to the ball, this vector will be used
         // for positioning all the robots (excluding the goalie). The positioning vector
@@ -122,10 +125,10 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
             (world.ball().position() - ball_defense_point_right).orientation(), 0);
 
         // insert all the move tactics to the result
-        result.insert(result.end(), move_tactics.begin(), move_tactics.end());
+        result[0].insert(result[0].end(), move_tactics.begin(), move_tactics.end());
         yield(result);
     } while (true);
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, StopPlay> factory;
+static TGenericFactory<std::string, Play, StopPlay, PlayConfig> factory;
