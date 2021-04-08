@@ -14,7 +14,7 @@ TEST(GoalieFSMTest, test_transitions)
             ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(123));
     GoalieFSM::ControlParams control_params{.goalie_tactic_config   = std::make_shared<const GoalieTacticConfig>()};
 
-    HFSM<GoalieFSM> fsm;
+    FSM<GoalieFSM> fsm;
 
     // Start in GoalieFSM's PositionToBlockShotState
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlockState>));
@@ -24,7 +24,7 @@ TEST(GoalieFSMTest, test_transitions)
             ::TestUtil::setBallVelocity(world, Vector(1, 0), Timestamp::fromSeconds(123));
     fsm.process_event(GoalieFSM::Update(
             control_params, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
-    // Remain in PositionToBlockShotState
+    // GoalieFSM should remain in PositionToBlockShotState
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlockState>));
 
     // Ball is now moving slowly towards the friendly goal

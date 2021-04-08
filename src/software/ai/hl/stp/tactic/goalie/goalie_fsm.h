@@ -26,6 +26,10 @@ struct GoalieFSM
 
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
+    // Distance to chip the ball when trying to yeet it
+    // TODO (#1878): Replace this with a more intelligent chip distance system
+    static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
+
     /*
      * Restrains the goalie to a rectangle, with the preferred point being the one
      * that intersects the point the goalie wants to move to and the center of the
@@ -147,18 +151,16 @@ struct GoalieFSM
                   Vector(2 * ROBOT_MAX_RADIUS_METERS, 0));
     }
 
-    auto operator()() {
+    auto operator()()
+    {
         using namespace boost::sml;
 
         const auto panic_s = state<PanicState>;
         const auto dribble_s = state<DribbleFSM>;
         const auto chip_s = state<ChipFSM>;
         const auto position_to_block_s = state<PositionToBlockState>;
-        const auto update_e = event<Update>;
 
-        // Distance to chip the ball when trying to yeet it
-        // TODO (#1878): Replace this with a more intelligent chip distance system
-        static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
+        const auto update_e = event<Update>;
 
         /**
          * Guard that checks if the ball is moving faster than the time_to_panic threshold and has a clear path to the goal
@@ -221,7 +223,7 @@ struct GoalieFSM
          *
          * @param event GoalieFSM::Update event
          */
-        const auto panic_and_block = [this](auto event) {
+        const auto panic_and_block = [](auto event) {
             std::vector<Point> intersections =
                     getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(), event.common.world.field());
             Point stop_ball_point = intersections[0];
@@ -242,7 +244,7 @@ struct GoalieFSM
          * @param processEvent processes the ChipFSM::Update
          */
         const auto chip =
-            [this](auto event, back::process<ChipFSM::Update> processEvent) {
+            [](auto event, back::process<ChipFSM::Update> processEvent) {
             ChipFSM::ControlParams control_params{
                 .chip_origin = event.common.world.ball().position(),
                 .chip_direction = (event.common.world.ball().position() - event.common.world.field().friendlyGoalCenter()).orientation(),
@@ -259,7 +261,7 @@ struct GoalieFSM
          * @param processEvent processes the DribbleFSM::Update
          */
         const auto dribble =
-            [this](auto event, back::process<DribbleFSM::Update> processEvent) {
+            [](auto event, back::process<DribbleFSM::Update> processEvent) {
             DribbleFSM::ControlParams control_params{
                 // TODO: fix dribble destination so there is strategy behind it (move to center of goal area)
                 .dribble_destination = event.common.world.ball().position() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0),
@@ -276,7 +278,7 @@ struct GoalieFSM
         *
         * @param event GoalieFSM::Update event
         */
-        const auto position_to_block = [this](auto event) {
+        const auto position_to_block = [](auto event) {
             // compute angle between two vectors, negative goal post to ball and positive
             // goal post to ball
             Angle block_cone_angle =
@@ -341,20 +343,21 @@ struct GoalieFSM
         };
 
         return make_transition_table(
-                *position_to_block_s + update_e[panic] / panic_and_block = panic_s,
-                position_to_block_s + update_e[can_chip] / chip          = chip_s,
-                position_to_block_s + update_e[dont_chip] / dribble      = dribble_s,
-                position_to_block_s + update_e / position_to_block,
-                panic_s + update_e[can_chip] / chip                      = chip_s,
-                panic_s + update_e[dont_chip] / dribble                  = dribble_s,
-                chip_s + update_e[panic] / panic_and_block               = panic_s,
-                chip_s + update_e[dont_chip] / dribble                   = dribble_s,
-                dribble_s + update_e[can_chip] / chip                    = chip_s,
-                dribble_s + update_e[dont_chip] / dribble,
-                dribble_s + update_e[panic] / panic_and_block            = panic_s,
-                panic_s + update_e[no_danger]                            = X,
-                chip_s + update_e[no_danger]                             = X,
-                X + update_e / position_to_block                         = position_to_block_s);
+            // src_state + event [guard] / action = dest_state
+            *position_to_block_s + update_e[panic] / panic_and_block = panic_s,
+            position_to_block_s + update_e[can_chip] / chip          = chip_s,
+            position_to_block_s + update_e[dont_chip] / dribble      = dribble_s,
+            position_to_block_s + update_e / position_to_block,
+            panic_s + update_e[can_chip] / chip                      = chip_s,
+            panic_s + update_e[dont_chip] / dribble                  = dribble_s,
+            chip_s + update_e[panic] / panic_and_block               = panic_s,
+            chip_s + update_e[dont_chip] / dribble                   = dribble_s,
+            dribble_s + update_e[can_chip] / chip                    = chip_s,
+            dribble_s + update_e[dont_chip] / dribble,
+            dribble_s + update_e[panic] / panic_and_block            = panic_s,
+            panic_s + update_e[no_danger]                            = X,
+            chip_s + update_e[no_danger]                             = X,
+            X + update_e / position_to_block                         = position_to_block_s);
     }
 
 };

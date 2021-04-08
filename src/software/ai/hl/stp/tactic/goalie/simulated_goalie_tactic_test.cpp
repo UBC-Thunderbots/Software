@@ -19,7 +19,6 @@ class SimulatedGoalieTacticTest : public SimulatedTacticTestFixture
     void SetUp() override
     {
         SimulatedTacticTestFixture::SetUp();
-        setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
         addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
                 {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
                  field().enemyDefenseArea().negXNegYCorner(),
@@ -36,9 +35,11 @@ TEST_F(SimulatedGoalieTacticTest, test_stationary_ball_far_away)
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config = std::make_shared<const GoalieTacticConfig>();
 
-    auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
+    auto tactic = std::make_shared<GoalieTactic>();
+    tactic->updateControlParams(goalie_tactic_config);
     setTactic(tactic);
     setRobotId(1);
+
 
     std::vector<ValidationFunction> terminating_validation_functions = {
             [this, tactic](std::shared_ptr<World> world_ptr,
