@@ -20,19 +20,13 @@ bool ExamplePlay::invariantHolds(const World &world) const
 void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     // Create MoveTactics that will loop forever
-    TacticVector tactic_vector = {{
-        std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true),
-    }};
+    std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true)};
 
     // Continue to loop to demonstrate the example play indefinitely
     do
@@ -41,18 +35,22 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         Angle angle_between_robots =
             Angle::full() / static_cast<double>(world.friendlyTeam().numRobots());
 
-        for (int k = 0; k < tactic_vector[0].length(); k++)
+        for (size_t k = 0; k < move_tactics.size(); k++)
         {
-            tactic_vector[0]->updateControlParams(
+            move_tactics[k]->updateControlParams(
                 world.ball().position() +
-                    Vector::createFromAngle(angle_between_robots * (k + 1)),
-                (angle_between_robots * (k + 1)) + Angle::half(), 0);
+                    Vector::createFromAngle(angle_between_robots *
+                                            static_cast<double>(k + 1)),
+                (angle_between_robots * static_cast<double>(k + 1)) + Angle::half(), 0);
         }
 
         // yield the Tactics this Play wants to run, in order of priority
         // If there are fewer robots in play, robots at the end of the list will not be
         // assigned
-        yield(tactic_vector);
+        TacticVector result = {};
+        result.insert(result.end(), move_tactics.begin(), move_tactics.end());
+        yield({result});
+
     } while (true);
 }
 

@@ -115,48 +115,27 @@ void StandaloneSimulator::setupNetworking(int blue_team_channel, int yellow_team
 
 void StandaloneSimulator::setupInitialSimulationStateDivB()
 {
-    RobotState blue_robot_state1(Point(3, 2.5), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state2(Point(3, 1.5), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state3(Point(3, 0.5), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state4(Point(3, -0.5), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state5(Point(3, -1.5), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state6(Point(3, -2.5), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    std::vector<RobotStateWithId> blue_robot_states = {
-        RobotStateWithId{.id = 0, .robot_state = blue_robot_state1},
-        RobotStateWithId{.id = 1, .robot_state = blue_robot_state2},
-        RobotStateWithId{.id = 2, .robot_state = blue_robot_state3},
-        RobotStateWithId{.id = 3, .robot_state = blue_robot_state4},
-        RobotStateWithId{.id = 4, .robot_state = blue_robot_state5},
-        RobotStateWithId{.id = 5, .robot_state = blue_robot_state6},
-    };
-    simulator.addBlueRobots(blue_robot_states);
+    std::vector<RobotStateWithId> blue_robot_states;
+    std::vector<RobotStateWithId> yellow_robot_states;
 
-    RobotState yellow_robot_state1(Point(-3, 2.5), Vector(0, 0), Angle::zero(),
-                                   AngularVelocity::zero());
-    RobotState yellow_robot_state2(Point(-3, 1.5), Vector(0, 0), Angle::zero(),
-                                   AngularVelocity::zero());
-    RobotState yellow_robot_state3(Point(-3, 0.5), Vector(0, 0), Angle::zero(),
-                                   AngularVelocity::zero());
-    RobotState yellow_robot_state4(Point(-3, -0.5), Vector(0, 0), Angle::zero(),
-                                   AngularVelocity::zero());
-    RobotState yellow_robot_state5(Point(-3, -1.5), Vector(0, 0), Angle::zero(),
-                                   AngularVelocity::zero());
-    RobotState yellow_robot_state6(Point(-3, -2.5), Vector(0, 0), Angle::zero(),
-                                   AngularVelocity::zero());
-    std::vector<RobotStateWithId> yellow_robot_states = {
-        RobotStateWithId{.id = 0, .robot_state = yellow_robot_state1},
-        RobotStateWithId{.id = 1, .robot_state = yellow_robot_state2},
-        RobotStateWithId{.id = 2, .robot_state = yellow_robot_state3},
-        RobotStateWithId{.id = 3, .robot_state = yellow_robot_state4},
-        RobotStateWithId{.id = 4, .robot_state = yellow_robot_state5},
-        RobotStateWithId{.id = 5, .robot_state = yellow_robot_state6},
-    };
+    const double y_start   = 2.5;
+    const double y_spacing = 1.0;
+
+    for (unsigned i = 0; i < DIV_B_NUM_ROBOTS; i++)
+    {
+        blue_robot_states.emplace_back(RobotStateWithId{
+            .id          = i,
+            .robot_state = RobotState(Point(3, y_start - y_spacing * i), Vector(0, 0),
+                                      Angle::half(), AngularVelocity::zero()),
+        });
+        yellow_robot_states.emplace_back(RobotStateWithId{
+            .id          = i,
+            .robot_state = RobotState(Point(-3, y_start - y_spacing * i), Vector(0, 0),
+                                      Angle::full(), AngularVelocity::zero()),
+        });
+    }
+
+    simulator.addBlueRobots(blue_robot_states);
     simulator.addYellowRobots(yellow_robot_states);
 }
 
@@ -164,50 +143,32 @@ void StandaloneSimulator::setupInitialSimulationStateDivA()
 {
     setupInitialSimulationStateDivB();
 
-    RobotState blue_robot_state6(Point(2, 2.5), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state7(Point(2, 1.5), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state8(Point(2, 0.5), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state9(Point(2, -0.5), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state10(Point(2, -1.5), Vector(0, 0), Angle::half(),
-                                  AngularVelocity::zero());
-    RobotState blue_robot_state11(Point(2, -2.5), Vector(0, 0), Angle::half(),
-                                  AngularVelocity::zero());
+    std::vector<RobotStateWithId> blue_robot_states;
+    std::vector<RobotStateWithId> yellow_robot_states;
 
-    std::vector<RobotStateWithId> blue_robot_states = {
-        RobotStateWithId{.id = 6, .robot_state = blue_robot_state6},
-        RobotStateWithId{.id = 7, .robot_state = blue_robot_state7},
-        RobotStateWithId{.id = 8, .robot_state = blue_robot_state8},
-        RobotStateWithId{.id = 9, .robot_state = blue_robot_state9},
-        RobotStateWithId{.id = 10, .robot_state = blue_robot_state10},
-        RobotStateWithId{.id = 11, .robot_state = blue_robot_state11},
-    };
+    const double y_start      = 2.5;
+    const double y_spacing    = 1.0;
+    const int robot_id_offset = DIV_B_NUM_ROBOTS;
+
+    static_assert(DIV_A_NUM_ROBOTS > DIV_B_NUM_ROBOTS,
+                  "More robots in Div A than Div B!");
+
+    for (unsigned i = 0; i < DIV_A_NUM_ROBOTS - DIV_B_NUM_ROBOTS; i++)
+    {
+        blue_robot_states.emplace_back(RobotStateWithId{
+            .id          = i + robot_id_offset,
+            .robot_state = RobotState(Point(2, y_start - y_spacing * i), Vector(0, 0),
+                                      Angle::half(), AngularVelocity::zero()),
+        });
+        yellow_robot_states.emplace_back(RobotStateWithId{
+            .id          = i + robot_id_offset,
+            .robot_state = RobotState(Point(-2, y_start - y_spacing * i), Vector(0, 0),
+                                      Angle::full(), AngularVelocity::zero()),
+        });
+    }
+
+
     simulator.addBlueRobots(blue_robot_states);
-
-    RobotState yellow_robot_state6(Point(-2, 2.5), Vector(0, 0), Angle::zero(),
-                                   AngularVelocity::zero());
-    RobotState yellow_robot_state7(Point(-2, 1.5), Vector(0, 0), Angle::zero(),
-                                   AngularVelocity::zero());
-    RobotState yellow_robot_state8(Point(-2, 0.5), Vector(0, 0), Angle::zero(),
-                                   AngularVelocity::zero());
-    RobotState yellow_robot_state9(Point(-2, -0.5), Vector(0, 0), Angle::zero(),
-                                   AngularVelocity::zero());
-    RobotState yellow_robot_state10(Point(-2, -1.5), Vector(0, 0), Angle::zero(),
-                                    AngularVelocity::zero());
-    RobotState yellow_robot_state11(Point(-2, -2.5), Vector(0, 0), Angle::zero(),
-                                    AngularVelocity::zero());
-
-    std::vector<RobotStateWithId> yellow_robot_states = {
-        RobotStateWithId{.id = 6, .robot_state = yellow_robot_state6},
-        RobotStateWithId{.id = 7, .robot_state = yellow_robot_state7},
-        RobotStateWithId{.id = 8, .robot_state = yellow_robot_state8},
-        RobotStateWithId{.id = 9, .robot_state = yellow_robot_state9},
-        RobotStateWithId{.id = 10, .robot_state = yellow_robot_state10},
-        RobotStateWithId{.id = 11, .robot_state = yellow_robot_state11},
-    };
     simulator.addYellowRobots(yellow_robot_states);
 }
 
