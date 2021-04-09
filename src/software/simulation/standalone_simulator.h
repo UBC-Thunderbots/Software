@@ -47,9 +47,10 @@ class StandaloneSimulator
 
     /**
      * Adds robots to predefined locations on the field
+     *
+     * @param num_robots How many robots to setup
      */
-    void setupInitialSimulationStateDivA();
-    void setupInitialSimulationStateDivB();
+    void setupInitialSimulationState(unsigned num_robots);
 
     SSLProto::SSL_WrapperPacket getSSLWrapperPacket() const;
 

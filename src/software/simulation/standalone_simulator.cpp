@@ -113,60 +113,37 @@ void StandaloneSimulator::setupNetworking(int blue_team_channel, int yellow_team
         boost::bind(&StandaloneSimulator::setBlueTeamDefendingSide, this, _1)));
 }
 
-void StandaloneSimulator::setupInitialSimulationStateDivB()
+void StandaloneSimulator::setupInitialSimulationState(unsigned num_robots)
 {
     std::vector<RobotStateWithId> blue_robot_states;
     std::vector<RobotStateWithId> yellow_robot_states;
 
-    const double y_start   = 2.5;
-    const double y_spacing = 1.0;
+    // The angle between each robot spaced out in a circle around
+    // the two points on either side of the field.
+    Angle angle_between_robots     = Angle::full() / num_robots;
+    Point center_for_yellow_robots = Point(2, 0);
+    Point center_for_blue_robots   = Point(-2, 0);
 
-    for (unsigned i = 0; i < DIV_B_NUM_ROBOTS; i++)
+    for (unsigned i = 0; i < num_robots; i++)
     {
         blue_robot_states.emplace_back(RobotStateWithId{
-            .id          = i,
-            .robot_state = RobotState(Point(3, y_start - y_spacing * i), Vector(0, 0),
-                                      Angle::half(), AngularVelocity::zero()),
+            .id = i,
+            .robot_state =
+                RobotState(center_for_blue_robots +
+                               Vector::createFromAngle(angle_between_robots * i),
+                           Vector(0, 0), angle_between_robots * i + Angle::half(),
+                           AngularVelocity::zero()),
         });
+
         yellow_robot_states.emplace_back(RobotStateWithId{
-            .id          = i,
-            .robot_state = RobotState(Point(-3, y_start - y_spacing * i), Vector(0, 0),
-                                      Angle::full(), AngularVelocity::zero()),
+            .id = i,
+            .robot_state =
+                RobotState(center_for_yellow_robots +
+                               Vector::createFromAngle(angle_between_robots * i),
+                           Vector(0, 0), angle_between_robots * i + Angle::half(),
+                           AngularVelocity::zero()),
         });
     }
-
-    simulator.addBlueRobots(blue_robot_states);
-    simulator.addYellowRobots(yellow_robot_states);
-}
-
-void StandaloneSimulator::setupInitialSimulationStateDivA()
-{
-    setupInitialSimulationStateDivB();
-
-    std::vector<RobotStateWithId> blue_robot_states;
-    std::vector<RobotStateWithId> yellow_robot_states;
-
-    const double y_start      = 2.5;
-    const double y_spacing    = 1.0;
-    const int robot_id_offset = DIV_B_NUM_ROBOTS;
-
-    static_assert(DIV_A_NUM_ROBOTS > DIV_B_NUM_ROBOTS,
-                  "More robots in Div A than Div B!");
-
-    for (unsigned i = 0; i < DIV_A_NUM_ROBOTS - DIV_B_NUM_ROBOTS; i++)
-    {
-        blue_robot_states.emplace_back(RobotStateWithId{
-            .id          = i + robot_id_offset,
-            .robot_state = RobotState(Point(2, y_start - y_spacing * i), Vector(0, 0),
-                                      Angle::half(), AngularVelocity::zero()),
-        });
-        yellow_robot_states.emplace_back(RobotStateWithId{
-            .id          = i + robot_id_offset,
-            .robot_state = RobotState(Point(-2, y_start - y_spacing * i), Vector(0, 0),
-                                      Angle::full(), AngularVelocity::zero()),
-        });
-    }
-
 
     simulator.addBlueRobots(blue_robot_states);
     simulator.addYellowRobots(yellow_robot_states);

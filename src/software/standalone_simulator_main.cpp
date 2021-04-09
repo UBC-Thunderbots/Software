@@ -51,7 +51,7 @@ int main(int argc, char **argv)
                 mutable_thunderbots_config->getMutableSimulatorConfig(),
                 Field::createSSLDivisionAField());
 
-            standalone_simulator->setupInitialSimulationStateDivA();
+            standalone_simulator->setupInitialSimulationState(DIV_A_NUM_ROBOTS);
         }
         else
         {
@@ -60,7 +60,7 @@ int main(int argc, char **argv)
                 mutable_thunderbots_config->getMutableSimulatorConfig(),
                 Field::createSSLDivisionBField());
 
-            standalone_simulator->setupInitialSimulationStateDivB();
+            standalone_simulator->setupInitialSimulationState(DIV_B_NUM_ROBOTS);
         }
 
         ThreadedStandaloneSimulatorGUI threaded_standalone_simulator_gui(
