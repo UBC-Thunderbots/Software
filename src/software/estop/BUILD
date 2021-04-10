@@ -1,27 +1,63 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "estopManager",
-    srcs = ["estopManager.cpp"],
-    hdrs = ["estopManager.h"],
+    name = "threaded_estop_reader",
+    srcs = ["threaded_estop_reader.cpp"],
+    hdrs = ["threaded_estop_reader.h"],
     deps = [
-        "arduinoSerialWrapper",
+        "uart_communication_interface",
+        "//software/logger",
         "//software/util/make_enum",
+        "@boost//:asio",
     ],
 )
 
 cc_library(
-    name = "arduinoSerialWrapper",
-    srcs = ["UARTCommunication.cpp"],
-    hdrs = ["UARTCommunication.h"],
-    deps = ["@boost//:asio"],
+    name = "uart_communication_interface",
+    hdrs = ["uart_communication.h"],
 )
 
-cc_binary(
-    name = "estopMain",
-    srcs = ["estopMain.cpp"],
+cc_library(
+    name = "estop_manager",
+    srcs = ["estop_manager.cpp"],
+    hdrs = ["estop_manager.h"],
     deps = [
-        "arduinoSerialWrapper",
-        "estopManager",
+        "boost_uart_communication",
+        "threaded_estop_reader",
+        "//software/logger",
+    ],
+)
+
+cc_library(
+    name = "boost_uart_communication",
+    srcs = ["boost_uart_communication.cpp"],
+    hdrs = ["boost_uart_communication.h"],
+    deps = [
+        "uart_communication_interface",
+        "@boost//:asio",
+    ],
+)
+
+cc_test(
+    name = "estop_reader_test",
+    srcs = [
+        "mock_uart_communication.h",
+        "threaded_estop_reader_test.cpp",
+    ],
+    deps = [
+        ":threaded_estop_reader",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "estop_manager_test",
+    srcs = [
+        "estop_manager_test.cpp",
+        "mock_uart_communication.h",
+    ],
+    deps = [
+        ":estopManager",
+        "@gtest//:gtest_main",
     ],
 )
