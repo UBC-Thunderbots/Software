@@ -219,6 +219,14 @@ struct GoalieFSM
                    !event.common.world.field().pointInFriendlyDefenseArea(event.common.world.ball().position());
         };
 
+        const auto panic_done = [](auto event) {
+            double ball_speed_panic = event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
+            std::vector<Point> intersections =
+                    getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(), event.common.world.field());
+
+            return event.common.world.ball().velocity().length() <= ball_speed_panic || intersections.empty();
+        };
+
         /**
          * Action that updates the MoveIntent to time_to_panic and stop the ball
          *
@@ -352,8 +360,8 @@ struct GoalieFSM
             position_to_block_s + update_e / position_to_block,
             panic_s + update_e[can_chip] / chip                      = chip_s,
             panic_s + update_e[dont_chip] / dribble                  = dribble_s, // maybe remove this one
-            panic_s + update_e[no_danger]                            = X,
-            panic_s + update_e / panic_and_block,
+            panic_s + update_e[panic_done]                            = X,
+            panic_s + update_e / panic_and_block, //panic_s = X,
             dribble_s + update_e[can_chip] / chip                    = chip_s,
             dribble_s + update_e / dribble, //dribble_s = chip_s,
             chip_s + update_e[panic] / panic_and_block               = panic_s,

@@ -26,11 +26,9 @@ class SimulatedGoalieTacticTest : public SimulatedTacticTestFixture
     }
 };
 
-TEST_F(SimulatedGoalieTacticTest, test_stationary_ball_far_away)
+TEST_F(SimulatedGoalieTacticTest, test_ball_panic)
 {
-//    Point initial_position = field().friendlyGoalCenter();
-//    setBallState(BallState(field().friendlyGoalCenter() + Vector(0.1, 0.1), Vector(0, 0)));
-      setBallState(BallState(Point(0,0), Vector(-2,0)));
+      setBallState(BallState(Point(0,0), Vector(-3,0)));
       addFriendlyRobots(
             TestUtil::createStationaryRobotStatesWithId({Point(-2,1), Point(-4,-1)}));
 
