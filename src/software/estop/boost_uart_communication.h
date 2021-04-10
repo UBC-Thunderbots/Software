@@ -2,14 +2,14 @@
 
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
-#include "uart_communication_abstract.h"
+#include "uart_communication.h"
 
 /*
  * A boost::asio wrapper class that is used to synchronously communicate with a serial
  * device via UART
  */
 
-class BoostUartCommunication: UartCommunicationAbs
+class BoostUartCommunication: public UartCommunication
 {
     using IoService     = boost::asio::io_service;
     using SerialPortPtr = std::shared_ptr<boost::asio::serial_port>;
@@ -32,7 +32,7 @@ class BoostUartCommunication: UartCommunicationAbs
 
     BoostUartCommunication &operator=(const BoostUartCommunication &) = delete;
 
-    ~BoostUartCommunication();
+    ~BoostUartCommunication() override;
 
 
     /**
@@ -51,7 +51,7 @@ class BoostUartCommunication: UartCommunicationAbs
      * @return true upon success, false otherwise
      * @throws boost::exception upon error during write
      */
-    bool serialWrite(const std::vector<unsigned char> &write_val);
+    bool serialWrite(const std::vector<unsigned char> &write_val) override;
 
     /**
      * Reads a given number of bytes from serial port until num_read_bytes is read or
@@ -61,14 +61,14 @@ class BoostUartCommunication: UartCommunicationAbs
      * @return vector of size num_read_bytes with read data
      * @throws boost:exception upon error during read
      */
-    std::vector<unsigned char> serialRead(size_t num_read_bytes);
+    std::vector<unsigned char> serialRead(size_t num_read_bytes) override;
 
     /**
      * Flushes serial port data
      * @param flush_type enum that sets the data to be flushed (read, write, or both)
      * @return true upon success, false otherwise
      */
-    bool flushSerialPort(FlushType flush_type);
+    bool flushSerialPort(FlushType flush_type) override;
 
    private:
     /**
