@@ -67,6 +67,7 @@ cc_library(
     deps = [
         "//firmware/app/control:trajectory_planner",
         "//shared/proto:tbots_nanopb_proto",
+        ":firmware_robot_constants",
         ":charger",
         ":chicker",
         ":dribbler",
@@ -125,4 +126,9 @@ cc_test(
         ":wheel",
         "@gtest//:gtest_main",
     ],
+)
+
+cc_library(
+    name = "firmware_robot_constants",
+    hdrs = ["firmware_robot_constants.h"],
 )

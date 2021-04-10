@@ -71,12 +71,10 @@ float app_control_getMaximalTorqueScaling(const ForceWheel_t* wheels[4],
  *         accelerate the robot as fast as physically possible
  */
 float app_control_getMaximalAccelScaling(
-    const FirmwareRobot_t* robot, ForceWheel_t* front_left_wheel, ForceWheel_t* front_right_wheel,
+    const RobotConstants_t robot_constants, float battery_voltage, ForceWheel_t* front_left_wheel, ForceWheel_t* front_right_wheel,
     ForceWheel_t* back_left_wheel, ForceWheel_t* back_right_wheel, const float linear_accel_x,
     const float linear_accel_y, float angular_accel)
 {
-    const RobotConstants_t robot_constants = app_firmware_robot_getRobotConstants(robot);
-
     // first convert accelerations into consistent units
     // choose units of Force (N)
     float normed_force[3];
@@ -94,21 +92,17 @@ float app_control_getMaximalAccelScaling(
     wheels[2] = back_right_wheel;
     wheels[3] = front_right_wheel;
 
-    float battery_voltage = app_firmware_robot_getBatteryVoltage(robot);
-
     return app_control_getMaximalTorqueScaling(wheels, wheel_forces, battery_voltage);
 }
 
-void app_control_applyAccel(const FirmwareRobot_t* robot, ForceWheel_t* front_left_wheel,
-                            ForceWheel_t* front_right_wheel, ForceWheel_t* back_left_wheel,
-                            ForceWheel_t* back_right_wheel, float linear_accel_x,
+void app_control_applyAccel(RobotConstants_t robot_constants, ControllerState_t* controller_state, float battery_voltage,
+                            ForceWheel_t* front_left_wheel, ForceWheel_t* front_right_wheel, 
+                            ForceWheel_t* back_left_wheel, ForceWheel_t* back_right_wheel, float linear_accel_x,
                             float linear_accel_y, float angular_accel)
 {
-    const RobotConstants_t robot_constants = app_firmware_robot_getRobotConstants(robot);
-
     // check for max acceleration in direction of the vel difference
     float scaling = app_control_getMaximalAccelScaling(
-        robot, front_left_wheel, front_right_wheel, back_left_wheel, back_right_wheel,
+        robot_constants, battery_voltage, front_left_wheel, front_right_wheel, back_left_wheel, back_right_wheel,
         linear_accel_x, linear_accel_y, angular_accel);
 
     // if the (very naive) 1 tick acceleration violates the physical limits of the robot
@@ -121,7 +115,6 @@ void app_control_applyAccel(const FirmwareRobot_t* robot, ForceWheel_t* front_le
         angular_accel *= scaling;
     }
 
-    ControllerState_t* controller_state = app_firmware_robot_getControllerState(robot);
     float prev_linear_accel_x           = controller_state->last_applied_acceleration_x;
     float prev_linear_accel_y           = controller_state->last_applied_acceleration_y;
     float prev_angular_accel = controller_state->last_applied_acceleration_angular;
@@ -159,38 +152,4 @@ void app_control_applyAccel(const FirmwareRobot_t* robot, ForceWheel_t* front_le
     app_force_wheel_applyForce(front_right_wheel, wheel_force[3]);
     app_force_wheel_applyForce(back_left_wheel, wheel_force[1]);
     app_force_wheel_applyForce(back_right_wheel, wheel_force[2]);
-}
-
-void app_control_trackVelocityInRobotFrame(
-    FirmwareRobot_t* robot, ForceWheel_t* front_left_wheel, ForceWheel_t* front_right_wheel,
-    ForceWheel_t* back_left_wheel, ForceWheel_t* back_right_wheel, float linear_velocity_x,
-    float linear_velocity_y, float angular_velocity)
-{
-    float current_vx               = app_firmware_robot_getVelocityX(robot);
-    float current_vy               = app_firmware_robot_getVelocityY(robot);
-    float current_angular_velocity = app_firmware_robot_getVelocityAngular(robot);
-    float current_orientation      = app_firmware_robot_getOrientation(robot);
-
-    // Rotate the current_velocity vector from the world frame to the robot frame
-    float current_velocity[2];
-    current_velocity[0] = current_vx;
-    current_velocity[1] = current_vy;
-    rotate(current_velocity, -current_orientation);
-
-    // This is the "P" term in a PID controller. We essentially do proportional
-    // control of our acceleration based on velocity error
-    static const float VELOCITY_ERROR_GAIN = 10.0f;
-
-    float desired_acceleration[2];
-    desired_acceleration[0] =
-        (linear_velocity_x - current_velocity[0]) * VELOCITY_ERROR_GAIN;
-    desired_acceleration[1] =
-        (linear_velocity_y - current_velocity[1]) * VELOCITY_ERROR_GAIN;
-
-    float angular_acceleration =
-        (angular_velocity - current_angular_velocity) * VELOCITY_ERROR_GAIN;
-
-    app_control_applyAccel(robot, front_left_wheel, front_right_wheel, back_left_wheel,
-                           back_right_wheel, desired_acceleration[0],
-                           desired_acceleration[1], angular_acceleration);
 }

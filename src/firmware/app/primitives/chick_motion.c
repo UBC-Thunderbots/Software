@@ -82,6 +82,9 @@ void app_chick_motion_start(void *void_state_ptr, FirmwareWorld_t *world,
 void app_chick_motion_tick(void *void_state_ptr, FirmwareWorld_t *world)
 {
     const FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
+    const RobotConstants_t robot_constants = app_firmware_robot_getRobotConstants(robot);
+    ControllerState_t* controller_state = app_firmware_robot_getControllerState(robot);
+    float battery_voltage = app_firmware_robot_getBatteryVoltage(robot);
     ChickMotionState_t *state    = (ChickMotionState_t *)void_state_ptr;
 
     PhysBot pb =
@@ -102,5 +105,5 @@ void app_chick_motion_tick(void *void_state_ptr, FirmwareWorld_t *world)
                                                app_firmware_robot_getOrientation(robot),
                                                state->major_vec, state->minor_vec);
 
-    app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
+    app_control_applyAccel(robot_constants, controller_state, battery_voltage, accel[0], accel[1], accel[2]);
 }

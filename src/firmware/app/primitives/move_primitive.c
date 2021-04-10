@@ -242,7 +242,7 @@ static void app_move_primitive_tick(void* void_state_ptr, FirmwareWorld_t* world
     app_physbot_computeAccelInLocalCoordinates(
         accel, pb, app_firmware_robot_getOrientation(robot), major_vec, minor_vec);
 
-    app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
+    app_firmware_robot_applyAccel(robot, accel[0], accel[1], accel[2]);
 }
 
 /**

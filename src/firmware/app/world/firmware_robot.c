@@ -3,8 +3,6 @@
 #include <math.h>
 #include <stdlib.h>
 
-// #include "firmware/app/control/control.h"
-
 typedef void (*TrajectoryFollower_t)(FirmwareRobot_t*, PositionTrajectory_t);
 typedef void (*ApplyDirectPerWheelPower_t)(FirmwareRobot_t*, 
     TbotsProto_DirectControlPrimitive_DirectPerWheelControl);
@@ -64,10 +62,10 @@ FirmwareRobot_t* app_firmware_robot_velocity_wheels_create(
     new_robot->get_robot_velocity_y       = get_robot_velocity_y;
     new_robot->get_robot_velocity_angular = get_robot_velocity_angular;
     new_robot->get_battery_voltage        = get_battery_voltage;
-    new_robot->follow_pos_trajectory        = follow_pos_trajectory_velocity;
-    new_robot->apply_direct_per_wheel_power = apply_direct_per_velocity_wheel_velocity;
-    new_robot->set_local_velocity           = set_local_velocity_wheels_velocity;
-    new_robot->stop_robot                   = stop_velocity_wheels;
+    new_robot->follow_pos_trajectory        = velocity_wheels_followPosTrajectory;
+    new_robot->apply_direct_per_wheel_power = velocity_wheels_applyDirectPerWheelPower;
+    new_robot->set_local_velocity           = velocity_wheels_setLocalVelocity;
+    new_robot->stop_robot                   = velocity_wheels_stopRobot;
     new_robot->front_right_velocity_wheel            = front_right_wheel;
     new_robot->front_left_velocity_wheel             = front_left_wheel;
     new_robot->back_right_velocity_wheel             = back_right_wheel;
@@ -104,10 +102,10 @@ FirmwareRobot_t* app_firmware_robot_force_wheels_create(
     new_robot->get_robot_velocity_y       = get_robot_velocity_y;
     new_robot->get_robot_velocity_angular = get_robot_velocity_angular;
     new_robot->get_battery_voltage        = get_battery_voltage;
-    new_robot->follow_pos_trajectory        = follow_pos_trajectory_force;
-    new_robot->apply_direct_per_wheel_power = apply_direct_per_force_wheel_velocity;
-    new_robot->set_local_velocity           = set_local_force_wheels_velocity;
-    new_robot->stop_robot                   = stop_force_wheels;
+    new_robot->follow_pos_trajectory        = force_wheels_followPosTrajectory;
+    new_robot->apply_direct_per_wheel_power = force_wheels_applyDirectPerWheelPower;
+    new_robot->set_local_velocity           = force_wheels_setLocalVelocity;
+    new_robot->stop_robot                   = force_wheels_stopRobot;
     new_robot->front_right_velocity_wheel            = NULL;
     new_robot->front_left_velocity_wheel             = NULL;
     new_robot->back_right_velocity_wheel             = NULL;
@@ -195,12 +193,55 @@ ControllerState_t* app_firmware_robot_getControllerState(const FirmwareRobot_t* 
     return robot->controller_state;
 }
 
-void follow_pos_trajectory_force(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory)
+void app_firmware_robot_trackVelocityInRobotFrame(
+    FirmwareRobot_t* robot, float linear_velocity_x,
+    float linear_velocity_y, float angular_velocity)
+{
+    ForceWheel_t* front_right_wheel = robot->front_right_force_wheel;
+    ForceWheel_t* front_left_wheel = robot->front_left_force_wheel;
+    ForceWheel_t* back_right_wheel = robot->back_right_force_wheel;
+    ForceWheel_t* back_left_wheel = robot->back_left_force_wheel;
+
+    const RobotConstants_t robot_constants = app_firmware_robot_getRobotConstants(robot);
+    const ControllerState_t* controller_state = app_firmware_robot_getControllerState(robot);
+    float current_vx               = app_firmware_robot_getVelocityX(robot);
+    float current_vy               = app_firmware_robot_getVelocityY(robot);
+    float current_angular_velocity = app_firmware_robot_getVelocityAngular(robot);
+    float current_orientation      = app_firmware_robot_getOrientation(robot);
+
+    // Rotate the current_velocity vector from the world frame to the robot frame
+    float current_velocity[2];
+    current_velocity[0] = current_vx;
+    current_velocity[1] = current_vy;
+    rotate(current_velocity, -current_orientation);
+
+    // This is the "P" term in a PID controller. We essentially do proportional
+    // control of our acceleration based on velocity error
+    static const float VELOCITY_ERROR_GAIN = 10.0f;
+
+    float desired_acceleration[2];
+    desired_acceleration[0] =
+        (linear_velocity_x - current_velocity[0]) * VELOCITY_ERROR_GAIN;
+    desired_acceleration[1] =
+        (linear_velocity_y - current_velocity[1]) * VELOCITY_ERROR_GAIN;
+
+    float angular_acceleration =
+        (angular_velocity - current_angular_velocity) * VELOCITY_ERROR_GAIN;
+
+    app_control_applyAccel(robot_constants, controller_state, 
+                           front_left_wheel, front_right_wheel, 
+                           back_left_wheel, back_right_wheel,
+                           desired_acceleration[0], desired_acceleration[1], 
+                           angular_acceleration);
+}
+
+void force_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory)
 {
     // TODO: Implement with planner
 }
 
-void follow_pos_trajectory_velocity(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, size_t trajectory_index)
+void velocity_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, 
+    size_t trajectory_index, unsigned int num_elements)
 {
     VelocityWheel_t* front_right_wheel = robot->front_right_velocity_wheel;
     VelocityWheel_t* front_left_wheel = robot->front_left_velocity_wheel;
@@ -209,42 +250,42 @@ void follow_pos_trajectory_velocity(FirmwareRobot_t* robot, PositionTrajectory_t
 
     // Convert position trajectory to velocity trajectory
     VelocityTrajectory_t velocity_trajectory;    
-    // TODO: Extract # of elements properly    
-    unsigned int num_elements = 5;    
-    app_trajectory_planner_generateVelocityTrajectory(pos_trajectory,     
-        num_elements, velocity_trajectory);    
+    app_trajectory_planner_generateVelocityTrajectory(&pos_trajectory,     
+        num_elements, &velocity_trajectory);    
     
     // Get target velocity in next timestep     
-    // TODO: Original implementation compares vs current_time    
-    while (trajectory_index < num_elements - 1)    
-    {        
-        trajectory_index++;    
-    }    
     x_velocity = velocity_trajectory.x_velocity[trajectory_index];    
     y_velocity = velocity_trajectory.y_velocity[trajectory_index];    
     angular_velocity = velocity_trajectory.angular_velocity[trajectory_index];    
     
-    // TODO: Convert to per wheel velocity
+    // TODO: Take from `move_primitive.c`
 
-    // TODO: Probably need to convert from RPM to Force
-    app_velocity_wheel_setTargetVelocity(robot, front_left_wheel, front_left_wheel_velocity);
+    float front_left_wheel_velocity = 0;
+    float front_right_wheel_velocity = 0;
+    float back_right_wheel_velocity = 0;
+    float back_left_wheel_velocity = 0;
+
+    app_velocity_wheel_setTargetVelocity(front_left_wheel, front_left_wheel_velocity);
+    app_velocity_wheel_setTargetVelocity(front_right_wheel, front_right_wheel_velocity);
+    app_velocity_wheel_setTargetVelocity(back_right_wheel, back_right_wheel_velocity);
+    app_velocity_wheel_setTargetVelocity(back_left_wheel, back_left_wheel_velocity);
 }
 
-void apply_direct_per_force_wheel_velocity(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg)
+void force_wheels_applyDirectPerWheelPower(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg)
 {
     ForceWheel_t* front_right_wheel = robot->front_right_force_wheel;
     ForceWheel_t* front_left_wheel = robot->front_left_force_wheel;
     ForceWheel_t* back_right_wheel = robot->back_right_force_wheel;
     ForceWheel_t* back_left_wheel = robot->back_left_force_wheel;
 
-    // TODO: Convert RPM to force
+    // TODO (#1649): Fix passing rpm into an applyForce function
     app_force_wheel_applyForce(front_right_wheel, control_msg.front_right_wheel_rpm);
     app_force_wheel_applyForce(front_left_wheel, control_msg.front_left_wheel_rpm);
     app_force_wheel_applyForce(back_right_wheel, control_msg.back_right_wheel_rpm);
     app_force_wheel_applyForce(back_left_wheel, control_msg.back_left_wheel_rpm);
 }
 
-void apply_direct_per_velocity_wheel_velocity(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg)
+void velocity_wheels_applyDirectPerWheelPower(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg)
 {
     VelocityWheel_t* front_right_wheel = robot->front_right_velocity_wheel;
     VelocityWheel_t* front_left_wheel = robot->front_left_velocity_wheel;
@@ -257,7 +298,7 @@ void apply_direct_per_velocity_wheel_velocity(FirmwareRobot_t* robot, TbotsProto
     app_velocity_wheel_setTargetVelocity(back_left_wheel, control_msg.back_left_wheel_rpm);
 }
 
-void set_local_force_wheels_velocity(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg)
+void force_wheels_setLocalVelocity(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg)
 {
     ForceWheel_t* front_right_wheel = robot->front_right_force_wheel;
     ForceWheel_t* front_left_wheel = robot->front_left_force_wheel;
@@ -268,12 +309,20 @@ void set_local_force_wheels_velocity(FirmwareRobot_t* robot, TbotsProto_DirectCo
     float linear_velocity_y = control_msg.velocity.y_component_meters;
     float angular_velocity = control_msg.angular_velocity.radians_per_second;
 
-    app_control_trackVelocityInRobotFrame(robot, front_left_wheel, front_right_wheel,
-        back_left_wheel, back_right_wheel, linear_velocity_x, 
-        linear_velocity_y, angular_velocity);
+    float robot_force[3];
+    robot_force[0] = linear_velocity_x;
+    robot_force[1] = linear_velocity_y;
+    robot_force[2] = angular_velocity;
+    float wheel_force[4];
+    speed3_to_speed4(robot_force, wheel_force);
+
+    app_force_wheel_applyForce(front_left_wheel, wheel_force[0]);
+    app_force_wheel_applyForce(front_right_wheel, wheel_force[3]);
+    app_force_wheel_applyForce(back_left_wheel, wheel_force[1]);
+    app_force_wheel_applyForce(back_right_wheel, wheel_force[2]);
 }
 
-void set_local_velocity_wheels_velocity(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg)
+void velocity_wheels_setLocalVelocity(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg)
 {
     VelocityWheel_t* front_right_wheel = robot->front_right_velocity_wheel;
     VelocityWheel_t* front_left_wheel = robot->front_left_velocity_wheel;
@@ -284,10 +333,20 @@ void set_local_velocity_wheels_velocity(FirmwareRobot_t* robot, TbotsProto_Direc
     float linear_velocity_y = control_msg.velocity.y_component_meters;
     float angular_velocity = control_msg.angular_velocity.radians_per_second;
 
-    // TODO: Call `app_velocity_wheel_setTargetVelocity`
+    float robot_velocity[3];
+    robot_force[0] = linear_velocity_x;
+    robot_force[1] = linear_velocity_y;
+    robot_force[2] = angular_velocity;
+    float wheel_velocity[4];
+    speed3_to_speed4(robot_velocity, wheel_velocity);
+
+    app_velocity_wheel_setTargetVelocity(front_left_wheel, wheel_velocity[0]);
+    app_velocity_wheel_setTargetVelocity(front_right_wheel, wheel_velocity[3]);
+    app_velocity_wheel_setTargetVelocity(back_left_wheel, wheel_velocity[1]);
+    app_velocity_wheel_setTargetVelocity(back_right_wheel, wheel_velocity[2]);
 }
 
-void stop_force_wheels(FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopType stop_type)
+void force_wheels_stopRobot(FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopType stop_type)
 {
     ForceWheel_t* front_right_wheel = robot->front_right_force_wheel;
     ForceWheel_t* front_left_wheel = robot->front_left_force_wheel;
@@ -310,7 +369,7 @@ void stop_force_wheels(FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopType
     }
 }
 
-void stop_velocity_wheels(FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopType stop_type)
+void velocity_wheels_stopRobot(FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopType stop_type)
 {
     VelocityWheel_t* front_right_wheel = robot->front_right_velocity_wheel;
     VelocityWheel_t* front_left_wheel = robot->front_left_velocity_wheel;
@@ -333,42 +392,22 @@ void stop_velocity_wheels(FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopT
     }
 }
 
-void app_firmware_robot_follow_pos_trajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory)
+void app_firmware_robot_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory)
 {
-    if (wheel_type == FORCE_WHEEL) {
-        robot->follow_pos_trajectory_force(robot, pos_trajectory)
-    }
-    else {
-        robot->follow_pos_trajectory_velocity(robot, pos_trajectory)
-    }
+    robot->follow_pos_trajectory(robot, pos_trajectory);
 }
 
-void app_firmware_robot_apply_direct_per_wheel_power(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg)
+void app_firmware_robot_applyDirectPerWheelPower(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg)
 {
-    if (wheel_type == FORCE_WHEEL) {
-        robot->apply_direct_per_wheel_force(robot, control_msg)
-    }
-    else {
-        robot->apply_direct_per_wheel_velocity(robot, control_msg)
-    }
+    robot->apply_direct_per_wheel_power(robot, control_msg);
 }
 
-void app_firmware_robot_set_local_velocity(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg)
+void app_firmware_robot_setLocalVelocity(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg)
 {
-    if (wheel_type == FORCE_WHEEL) {
-        robot->set_local_force_wheels_velocity(robot, control_msg)
-    }
-    else {
-        robot->set_local_velocity_wheels_velocity(robot, control_msg)
-    }
+    robot->set_local_velocity(robot, control_msg);
 }
 
-void app_firmware_robot_stop(FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopType stop_type, Robot_Wheel_Type wheel_type)
+void app_firmware_robot_stopRobot(FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopType stop_type) 
 {
-    if (wheel_type == FORCE_WHEEL) {
-        robot->stop_force_wheels(robot, stop_type)
-    }
-    else {
-        robot->stop_velocity_wheels(robot, stop_type)
-    }
+    robot->stop_robot(robot, stop_type);
 }

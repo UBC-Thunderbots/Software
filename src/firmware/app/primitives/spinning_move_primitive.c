@@ -133,7 +133,7 @@ static void app_spinning_move_primitive_tick(void *void_state_ptr, FirmwareWorld
         y_accel,
     };
 
-    app_control_applyAccel(robot, linear_acc[0], linear_acc[1], a_accel);
+    app_firmware_robot_applyAccel(robot, linear_acc[0], linear_acc[1], a_accel);
 }
 
 /**

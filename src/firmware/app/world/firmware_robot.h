@@ -7,44 +7,12 @@
 #include "firmware/app/world/force_wheel.h"
 #include "firmware/app/world/velocity_wheel.h"
 #include "shared/proto/primitive.nanopb.h"
+#include "firmware/app/world/firmware_robot_constants.h"
 
 /**
  * This struct represents a robot from the perspective of firmware
  */
 typedef struct FirmwareRobot FirmwareRobot_t;
-
-/**
- * This struct represents robot constants
- */
-typedef struct RobotConstants
-{
-    // The mass of the entire robot [kg]
-    float mass;
-    // The moment of inertia of the entire robot [kg m^2]
-    float moment_of_inertia;
-    // The maximum radius of the robot [m]
-    float robot_radius;
-    // The maximum jerk this robot may safely undergo [m/s^3]
-    float jerk_limit;
-} RobotConstants_t;
-
-/**
- * This struct holds the state of the controller.
- * This is a carryover from legacy code, and should be deleted when the controller is
- * replaced.
- */
-typedef struct ControllerState
-{
-    float last_applied_acceleration_x;
-    float last_applied_acceleration_y;
-    float last_applied_acceleration_angular;
-} ControllerState_t;
-
-typedef enum
-{
-    FORCE_WHEEL,
-    VELOCITY_WHEEL
-} Robot_Wheel_Type;
 
 /**
  * Create a robot with the given hardware
@@ -221,14 +189,32 @@ RobotConstants_t app_firmware_robot_getRobotConstants(const FirmwareRobot_t* rob
  */
 ControllerState_t* app_firmware_robot_getControllerState(const FirmwareRobot_t* robot);
 
-// TODO: Add JavaDoc
-void app_firmware_robot_follow_pos_trajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory);
+// TODO: JavaDoc
+void app_firmware_robot_trackVelocityInRobotFrame(
+    FirmwareRobot_t* robot, float linear_velocity_x,
+    float linear_velocity_y, float angular_velocity);
 
-// TODO: Add JavaDoc
-void app_firmware_robot_apply_direct_per_wheel_power(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg);
+void force_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory);
 
-// TODO: Add JavaDoc
-void app_firmware_robot_set_local_velocity(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg);
+void velocity_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, 
+    size_t trajectory_index, unsigned int num_elements);
 
-// TODO: Add JavaDoc
-void app_firmware_robot_stop(FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopType stop_type);
+void force_wheels_applyDirectPerWheelPower(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg);
+
+void velocity_wheels_applyDirectPerWheelPower(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg);
+
+void force_wheels_setLocalVelocity(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg);
+
+void velocity_wheels_setLocalVelocity(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg);
+
+void force_wheels_stopRobot(FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopType stop_type);
+
+void velocity_wheels_stopRobot(FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopType stop_type);
+
+void app_firmware_robot_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory);
+
+void app_firmware_robot_applyDirectPerWheelPower(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg);
+
+void app_firmware_robot_setLocalVelocity(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg);
+
+void app_firmware_robot_stopRobot(FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopType stop_type);
