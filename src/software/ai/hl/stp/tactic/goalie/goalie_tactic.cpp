@@ -5,19 +5,20 @@
 #include "software/geom/point.h"
 #include "software/ai/hl/stp/action/stop_action.h"  // TODO (#1888): remove this dependency
 
-GoalieTactic::GoalieTactic()
+GoalieTactic::GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config)
     : Tactic(true, {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Chip}),
       fsm(),
-      control_params{GoalieFSM::ControlParams{.goalie_tactic_config = std::make_shared<const GoalieTacticConfig>()}}
+      goalie_tactic_config(goalie_tactic_config),
+      control_params{GoalieFSM::ControlParams{.goalie_tactic_config = goalie_tactic_config}}
 {
 }
 
 void GoalieTactic::updateWorldParams(const World &world) {}
 
-void GoalieTactic::updateControlParams(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config)
+void GoalieTactic::updateControlParams(std::shared_ptr<const GoalieTacticConfig> updated_goalie_tactic_config)
 {
     // Update the control parameters stored by this Tactic
-    control_params.goalie_tactic_config = goalie_tactic_config;
+    control_params.goalie_tactic_config = updated_goalie_tactic_config;
 }
 
 double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world) const

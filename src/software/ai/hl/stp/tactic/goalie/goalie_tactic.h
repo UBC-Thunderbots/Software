@@ -2,9 +2,8 @@
 
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-//#include "software/ai/intent/move_intent.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/ai/evaluation/enemy_threat.h"
+//#include "software/ai/evaluation/enemy_threat.h"
 
 /**
  * This tactic is used to defend the ball from going into the goal. The tactic
@@ -25,7 +24,9 @@ class GoalieTactic : public Tactic
      *
      * @param goalie_tactic_config The config to fetch parameters from
      */
-    explicit GoalieTactic();
+    explicit GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config);
+
+    GoalieTactic() = delete;
 
     void updateWorldParams(const World &world) override;
 
@@ -33,7 +34,7 @@ class GoalieTactic : public Tactic
      * Updates the params assuming that the max allowed speed mode is the physical limits
      *
      */
-    void updateControlParams(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config);
+    void updateControlParams(std::shared_ptr<const GoalieTacticConfig> updated_goalie_tactic_config);
 
     double calculateRobotCost(const Robot &robot, const World &world) const override;
 
@@ -45,6 +46,6 @@ class GoalieTactic : public Tactic
     void updateIntent(const TacticUpdate& tactic_update) override;
 
     FSM<GoalieFSM> fsm;
-    //std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
+    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
     GoalieFSM::ControlParams control_params;
 };

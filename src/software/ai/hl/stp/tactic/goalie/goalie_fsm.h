@@ -268,7 +268,8 @@ struct GoalieFSM
                 .dribble_destination = std::make_optional<Point>(event.common.world.field().friendlyGoalCenter() + Vector(0.5, 0)),
                 .final_dribble_orientation = std::make_optional<Angle>((event.common.world.ball().position() -
                                               event.common.world.field().friendlyGoalCenter()).orientation()),
-                .allow_excessive_dribbling = false};
+                .allow_excessive_dribbling = false,
+                };
 
             // update the dribble fsm
             processEvent(DribbleFSM::Update(control_params, event.common));

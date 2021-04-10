@@ -26,7 +26,7 @@ class SimulatedGoalieTacticTest : public SimulatedTacticTestFixture
     }
 };
 
-TEST_F(SimulatedGoalieTacticTest, DISABLED_test_stationary_ball_far_away)
+TEST_F(SimulatedGoalieTacticTest, test_stationary_ball_far_away)
 {
 //    Point initial_position = field().friendlyGoalCenter();
 //    setBallState(BallState(field().friendlyGoalCenter() + Vector(0.1, 0.1), Vector(0, 0)));
@@ -36,7 +36,7 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_stationary_ball_far_away)
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config = std::make_shared<const GoalieTacticConfig>();
 
-    auto tactic = std::make_shared<GoalieTactic>();
+    auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
     tactic->updateControlParams(goalie_tactic_config);
     setTactic(tactic);
     setRobotId(1);
@@ -70,7 +70,7 @@ TEST_F(SimulatedGoalieTacticTest, test_dribble_then_chip)
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config = std::make_shared<const GoalieTacticConfig>();
 
-    auto tactic = std::make_shared<GoalieTactic>();
+    auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
     tactic->updateControlParams(goalie_tactic_config);
     setTactic(tactic);
     setRobotId(1);
