@@ -19,10 +19,6 @@ TEST_F(SimulatedPathPlannerTest, test_no_path_found)
     /*
      * When a path is not found by path planner, a World tick takes 4-8x longer to finish.
      * These tests are targeted to isolate when no path is found.
-     *
-     * Destinations of paths that result in no path being found:
-     *  - (1, 0)
-     *  In the 91st and 92nd ticks no path is found
      */
     Point destination      = Point(1.0, 0);
     Point initial_position = Point(-3, 1.5);
