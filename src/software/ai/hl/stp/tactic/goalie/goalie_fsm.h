@@ -263,14 +263,11 @@ struct GoalieFSM
          */
         const auto dribble =
             [](auto event, back::process<DribbleFSM::Update> processEvent) {
-//            Point destination = event.common.world.field().friendlyGoalCenter();
-            Angle orientation = (event.common.world.ball().position() -
-                                 event.common.world.field().friendlyGoalCenter()).orientation();
-
             DribbleFSM::ControlParams control_params{
                 // TODO: fix dribble destination so there is strategy behind it (move to center of goal area)
-                .dribble_destination = event.common.world.ball().position() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0),
-                .final_dribble_orientation = orientation,
+                .dribble_destination = std::make_optional<Point>(event.common.world.field().friendlyGoalCenter() + Vector(0.5, 0)),
+                .final_dribble_orientation = std::make_optional<Angle>((event.common.world.ball().position() -
+                                              event.common.world.field().friendlyGoalCenter()).orientation()),
                 .allow_excessive_dribbling = false};
 
             // update the dribble fsm
@@ -353,15 +350,14 @@ struct GoalieFSM
             position_to_block_s + update_e[dont_chip] / dribble      = dribble_s,
             position_to_block_s + update_e / position_to_block,
             panic_s + update_e[can_chip] / chip                      = chip_s,
-            panic_s + update_e[dont_chip] / dribble                  = dribble_s,
-            chip_s + update_e[panic] / panic_and_block               = panic_s,
-            chip_s + update_e[dont_chip] / dribble                   = dribble_s,
-            dribble_s + update_e[can_chip] / chip                    = chip_s,
-            dribble_s + update_e[dont_chip] / dribble,
-            dribble_s + update_e[panic] / panic_and_block            = panic_s,
+            panic_s + update_e[dont_chip] / dribble                  = dribble_s, // maybe remove this one
             panic_s + update_e[no_danger]                            = X,
+            panic_s + update_e / panic_and_block,
+            dribble_s + update_e[can_chip] / chip                    = chip_s,
+            dribble_s + update_e / dribble, //dribble_s = chip_s,
+            chip_s + update_e[panic] / panic_and_block               = panic_s,
             chip_s + update_e[no_danger]                             = X,
+            chip_s + update_e / chip,
             X + update_e / position_to_block                         = position_to_block_s);
     }
-
 };

@@ -26,11 +26,12 @@ class SimulatedGoalieTacticTest : public SimulatedTacticTestFixture
     }
 };
 
-TEST_F(SimulatedGoalieTacticTest, test_stationary_ball_far_away)
+TEST_F(SimulatedGoalieTacticTest, DISABLED_test_stationary_ball_far_away)
 {
 //    Point initial_position = field().friendlyGoalCenter();
-    setBallState(BallState(field().friendlyGoalCenter() + Vector(0.1, 0.1), Vector(0, 0)));
-    addFriendlyRobots(
+//    setBallState(BallState(field().friendlyGoalCenter() + Vector(0.1, 0.1), Vector(0, 0)));
+      setBallState(BallState(Point(0,0), Vector(-2,0)));
+      addFriendlyRobots(
             TestUtil::createStationaryRobotStatesWithId({Point(-2,1), Point(-4,-1)}));
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config = std::make_shared<const GoalieTacticConfig>();
@@ -39,7 +40,6 @@ TEST_F(SimulatedGoalieTacticTest, test_stationary_ball_far_away)
     tactic->updateControlParams(goalie_tactic_config);
     setTactic(tactic);
     setRobotId(1);
-
 
     std::vector<ValidationFunction> terminating_validation_functions = {};
 //            [this, tactic](std::shared_ptr<World> world_ptr,
@@ -59,5 +59,40 @@ TEST_F(SimulatedGoalieTacticTest, test_stationary_ball_far_away)
     };
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(20));
+            Duration::fromSeconds(10));
 }
+
+TEST_F(SimulatedGoalieTacticTest, test_dribble_then_chip)
+{
+    setBallState(BallState(field().friendlyGoalCenter() + Vector(0.1, 0.1), Vector(0, 0)));
+    addFriendlyRobots(
+            TestUtil::createStationaryRobotStatesWithId({Point(-2,1), Point(-4,-1)}));
+
+    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config = std::make_shared<const GoalieTacticConfig>();
+
+    auto tactic = std::make_shared<GoalieTactic>();
+    tactic->updateControlParams(goalie_tactic_config);
+    setTactic(tactic);
+    setRobotId(1);
+
+    std::vector<ValidationFunction> terminating_validation_functions = {};
+//            [this, tactic](std::shared_ptr<World> world_ptr,
+//                           ValidationCoroutine::push_type& yield) {
+//                while (!tactic->done())
+//                {
+//                    yield("Tactic not done");
+//                }
+//                // add terminating validation functions here
+//            }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {
+            [](std::shared_ptr<World> world_ptr,
+               ValidationCoroutine::push_type& yield) {
+                enemyNeverScores(world_ptr, yield);
+            }
+    };
+
+    runTest(terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
+}
+
