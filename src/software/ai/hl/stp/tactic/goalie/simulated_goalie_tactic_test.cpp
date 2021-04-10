@@ -29,7 +29,7 @@ class SimulatedGoalieTacticTest : public SimulatedTacticTestFixture
 TEST_F(SimulatedGoalieTacticTest, test_stationary_ball_far_away)
 {
 //    Point initial_position = field().friendlyGoalCenter();
-    setBallState(BallState(Point(0,0), Vector(-1, 0)));
+    setBallState(BallState(field().friendlyGoalCenter() + Vector(0.1, 0.1), Vector(0, 0)));
     addFriendlyRobots(
             TestUtil::createStationaryRobotStatesWithId({Point(-2,1), Point(-4,-1)}));
 

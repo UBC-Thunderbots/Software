@@ -21,6 +21,7 @@ struct GoalieFSM
 
     struct ControlParams
     {
+        // the goalie tactic config
         std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
     };
 
@@ -262,11 +263,14 @@ struct GoalieFSM
          */
         const auto dribble =
             [](auto event, back::process<DribbleFSM::Update> processEvent) {
+//            Point destination = event.common.world.field().friendlyGoalCenter();
+            Angle orientation = (event.common.world.ball().position() -
+                                 event.common.world.field().friendlyGoalCenter()).orientation();
+
             DribbleFSM::ControlParams control_params{
                 // TODO: fix dribble destination so there is strategy behind it (move to center of goal area)
                 .dribble_destination = event.common.world.ball().position() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0),
-                .final_dribble_orientation = (event.common.world.ball().position() -
-                        event.common.world.field().friendlyGoalCenter()).orientation(),
+                .final_dribble_orientation = orientation,
                 .allow_excessive_dribbling = false};
 
             // update the dribble fsm
