@@ -54,24 +54,6 @@
      value: 5.5
      description: "The maximum pass speed (in m/s)"
  - double:
-     name: min_time_offset_for_pass_seconds
-     min: 0
-     max: 5
-     value: 0.7
-     description: >-
-       Minimum time into the future at which the pass should occur. This is
-       to ensure we have enough time to setup a robot to actually perform
-       the pass. This is in seconds.
- - double:
-     name: max_time_offset_for_pass_seconds
-     min: 0
-     max: 5
-     value: 4.0
-     description: >-
-       Maximum time into the future at which the pass should occur. This gives the
-       upper bound on the pass start time, relative to the current time. This is in
-       seconds.
- - double:
      name: enemy_reaction_time
      min: 0
      max: 3.0
@@ -80,40 +62,8 @@
        How long we think the enemy will take to recognize we're passing and start
        moving to intercept
  - int:
-     name: num_passes_to_optimize
-     min: 1
-     max: 1000
-     value: 15
-     description: "The number of passes to try to optimize at any given time"
- - int:
-     name: num_passes_to_keep_after_pruning
-     min: 1
-     max: 1000
-     value: 3
-     description: "The number of passes to keep after pruning"
- - int:
      name: number_of_gradient_descent_steps_per_iter
      min: 0
      max: 1000
-     value: 10
+     value: 2 # TODO (#1987) find optimal iterations after tuning, for now 2 does the trick
      description: "The number of steps of gradient descent to perform in each iteration"
- - double:
-     name: pass_equality_max_position_difference_meters
-     min: 0
-     max: 4
-     value: 0.05
-     description: >-
-       The maximum allowed difference between the receiver and passer
-       point of two passes for which they are considered equal
- - double:
-     name: pass_equality_max_start_time_difference_seconds
-     min: 0
-     max: 3
-     value: 0.1
-     description: "TODO: Add description as part of #149"
- - double:
-     name: pass_equality_max_speed_difference_meters_per_second
-     min: 0
-     max: 4
-     value: 0.3
-     description: "TODO: Add description as part of #149"

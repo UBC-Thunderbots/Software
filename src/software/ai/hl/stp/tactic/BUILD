@@ -8,20 +8,10 @@ cc_library(
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
-        "//software/ai/passing:pass_generator",
+        "//software/ai/passing:pass",
         "//software/geom/algorithms",
         "//software/logger",
         "//software/world",
-    ],
-)
-
-cc_test(
-    name = "cherry_pick_tactic_test",
-    srcs = ["cherry_pick_tactic_test.cpp"],
-    deps = [
-        ":cherry_pick_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -117,16 +107,6 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "passer_tactic_test",
-    srcs = ["passer_tactic_test.cpp"],
-    deps = [
-        ":passer_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
 cc_library(
     name = "penalty_kick_tactic",
     srcs = ["penalty_kick_tactic.cpp"],
@@ -178,17 +158,6 @@ cc_library(
         "//software/ai/passing:pass",
         "//software/geom/algorithms",
         "//software/logger",
-    ],
-)
-
-cc_test(
-    name = "receiver_tactic_test",
-    srcs = ["receiver_tactic_test.cpp"],
-    deps = [
-        ":receiver_tactic",
-        "//software/ai/intent:kick_intent",
-        "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 

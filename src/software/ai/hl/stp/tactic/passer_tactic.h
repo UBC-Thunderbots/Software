@@ -49,8 +49,6 @@ class PasserTactic : public Tactic
 
     void accept(TacticVisitor& visitor) const override;
 
-    Ball getBall() const;
-
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
 
