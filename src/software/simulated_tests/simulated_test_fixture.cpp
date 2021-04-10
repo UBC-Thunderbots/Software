@@ -184,8 +184,18 @@ void SimulatedTestFixture::runTest(
 
     // Tick one frame to aid with visualization
     bool validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);
+
+    // Logging duration of each tick starting at second tick
+    int tick_count                 = 2;
+    auto start_time                = std::chrono::system_clock::now();
+    double max_tick_duration       = 0.0;
+    double min_tick_duration       = 10000.0;
+
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
+        // Initialize tick durations
+        auto start_tick_time = std::chrono::system_clock::now();
+
         if (!thunderbots_config->getAiControlConfig()->getRunAi()->value())
         {
             auto ms_to_sleep = std::chrono::milliseconds(
@@ -194,7 +204,21 @@ void SimulatedTestFixture::runTest(
             continue;
         }
         validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);
+
+        // Calculate tick durations
+        double duration_ms = ::TestUtil::millisecondsSince(start_tick_time);
+        max_tick_duration =
+                max_tick_duration > duration_ms ? max_tick_duration : duration_ms;
+        min_tick_duration =
+                min_tick_duration < duration_ms ? min_tick_duration : duration_ms;
+        tick_count++;
     }
+    // Output the tick duration results
+    double total_simulation_duration = ::TestUtil::millisecondsSince(start_time);
+    double avg_tick_duration = total_simulation_duration / (double)tick_count;
+    LOG(INFO) << "max tick duration: " << max_tick_duration << "ms" << std::endl;
+    LOG(INFO) << "min tick duration: " << min_tick_duration << "ms" << std::endl;
+    LOG(INFO) << "avg tick duration: " << avg_tick_duration << "ms" << std::endl;
 
     if (!validation_functions_done && !terminating_validation_functions.empty())
     {
@@ -233,20 +257,7 @@ bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_t
             return validation_functions_done;
         }
 
-        /* Logging how long each tick takes */
-        auto start_time = std::chrono::system_clock::now();
         updatePrimitives(*world_opt, simulator);
-        double duration_ms              = ::TestUtil::millisecondsSince(start_time);
-        static int tick_count           = 1;
-        static double max_tick_duration = 0.0;
-        max_tick_duration =
-            max_tick_duration > duration_ms ? max_tick_duration : duration_ms;
-        LOG(INFO) << "Tick: " << tick_count << ", " << duration_ms << "ms" << std::endl;
-        if (tick_count == 284)
-        {
-            LOG(INFO) << "max_tick_duration: " << max_tick_duration << "ms" << std::endl;
-        }
-        tick_count++;
 
         if (run_simulation_in_realtime)
         {
