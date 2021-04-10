@@ -2,25 +2,19 @@
 
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
+#include "uart_communication_abstract.h"
 
 /*
  * A boost::asio wrapper class that is used to synchronously communicate with a serial
  * device via UART
  */
 
-class UartCommunication
+class BoostUartCommunication: UartCommunicationAbs
 {
     using IoService     = boost::asio::io_service;
     using SerialPortPtr = std::shared_ptr<boost::asio::serial_port>;
 
    public:
-    enum FlushType
-    {
-        flush_receive = TCIFLUSH,  // flushes data received but not read
-        flush_send    = TCOFLUSH,  // flushes data written but not transmitted
-        flush_both    = TCIOFLUSH  // flushes both data received but not read and data
-                                   // written but not transmitted
-    };
 
     /**
      * constructs and opens a serial connection with the given device port
@@ -31,14 +25,14 @@ class UartCommunication
      * @param device_serial_port the serial port that we want to communicate with
      * @throws boost::exception if port could not be opened
      */
-    UartCommunication(IoService &io_service, int baud_rate,
-                      std::string device_serial_port);
+    BoostUartCommunication(IoService &io_service, int baud_rate,
+                           std::string device_serial_port);
 
-    UartCommunication(const UartCommunication &) = delete;
+    BoostUartCommunication(const BoostUartCommunication &) = delete;
 
-    UartCommunication &operator=(const UartCommunication &) = delete;
+    BoostUartCommunication &operator=(const BoostUartCommunication &) = delete;
 
-    ~UartCommunication();
+    ~BoostUartCommunication();
 
 
     /**

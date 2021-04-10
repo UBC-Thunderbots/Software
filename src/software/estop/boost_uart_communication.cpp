@@ -4,13 +4,13 @@
 #include <boost/asio.hpp>
 #include <iostream>
 
-UartCommunication::UartCommunication(IoService& io_service, int baud_rate,
-                                     std::string device_serial_port)
+BoostUartCommunication::BoostUartCommunication(IoService& io_service, int baud_rate,
+                                               std::string device_serial_port)
 {
     openPort(io_service, baud_rate, device_serial_port);
 }
 
-std::vector<unsigned char> UartCommunication::serialRead(size_t num_read_bytes)
+std::vector<unsigned char> BoostUartCommunication::serialRead(size_t num_read_bytes)
 {
     std::vector<unsigned char> read_buffer(num_read_bytes);
 
@@ -19,21 +19,21 @@ std::vector<unsigned char> UartCommunication::serialRead(size_t num_read_bytes)
     return read_buffer;
 }
 
-bool UartCommunication::serialWrite(const std::vector<unsigned char>& write_val)
+bool BoostUartCommunication::serialWrite(const std::vector<unsigned char>& write_val)
 {
     size_t write_size = boost::asio::write(
         *serial_port, boost::asio::buffer(write_val, write_val.size()));
     return write_size == write_val.size();
 }
 
-bool UartCommunication::flushSerialPort(FlushType flush_type)
+bool BoostUartCommunication::flushSerialPort(FlushType flush_type)
 {
     int ret_val = tcflush(serial_port->lowest_layer().native_handle(), flush_type);
     return (ret_val == 0);
 }
 
-void UartCommunication::openPort(IoService& ioService, int baud_rate,
-                                 std::string device_serial_port)
+void BoostUartCommunication::openPort(IoService& ioService, int baud_rate,
+                                      std::string device_serial_port)
 {
     int uart_character_size_bits = 8;
     serial_port = SerialPortPtr(std::make_shared<boost::asio::serial_port>(
@@ -50,7 +50,7 @@ void UartCommunication::openPort(IoService& ioService, int baud_rate,
         boost::asio::serial_port::character_size(uart_character_size_bits)));
 }
 
-void UartCommunication::closePort()
+void BoostUartCommunication::closePort()
 {
     if (serial_port != nullptr && serial_port->is_open())
     {
@@ -58,12 +58,12 @@ void UartCommunication::closePort()
     }
 }
 
-bool UartCommunication::operator<<(const std::vector<unsigned char>& write_val)
+bool BoostUartCommunication::operator<<(const std::vector<unsigned char>& write_val)
 {
     return serialWrite(write_val);
 }
 
-UartCommunication::~UartCommunication()
+BoostUartCommunication::~BoostUartCommunication()
 {
     closePort();
 }
