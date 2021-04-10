@@ -79,21 +79,6 @@ Field SimulatedTestFixture::field() const
     return simulator->getField();
 }
 
-void SimulatedTestFixture::setRefereeCommand(
-    const RefereeCommand &current_referee_command,
-    const RefereeCommand &previous_referee_command)
-{
-    mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableOverrideRefereeCommand()
-        ->setValue(true);
-    mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableCurrentRefereeCommand()
-        ->setValue(toString(current_referee_command));
-    mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutablePreviousRefereeCommand()
-        ->setValue(toString(previous_referee_command));
-}
-
 void SimulatedTestFixture::enableVisualizer()
 {
     full_system_gui = std::make_shared<ThreadedFullSystemGUI>(mutable_thunderbots_config);

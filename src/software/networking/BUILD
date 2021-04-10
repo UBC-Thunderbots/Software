@@ -1,10 +1,10 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "proto_multicast_listener",
+    name = "proto_udp_listener",
     hdrs = [
-        "proto_multicast_listener.h",
-        "proto_multicast_listener.tpp",
+        "proto_udp_listener.h",
+        "proto_udp_listener.tpp",
     ],
     visibility = ["//visibility:private"],
     deps = [
@@ -14,10 +14,10 @@ cc_library(
 )
 
 cc_library(
-    name = "proto_multicast_sender",
+    name = "proto_udp_sender",
     hdrs = [
-        "proto_multicast_sender.h",
-        "proto_multicast_sender.tpp",
+        "proto_udp_sender.h",
+        "proto_udp_sender.tpp",
     ],
     visibility = ["//visibility:private"],
     deps = [
@@ -27,25 +27,25 @@ cc_library(
 )
 
 cc_library(
-    name = "threaded_proto_multicast_listener",
+    name = "threaded_proto_udp_listener",
     hdrs = [
-        "threaded_proto_multicast_listener.h",
-        "threaded_proto_multicast_listener.tpp",
+        "threaded_proto_udp_listener.h",
+        "threaded_proto_udp_listener.tpp",
     ],
     deps = [
-        ":proto_multicast_listener",
+        ":proto_udp_listener",
         "@boost//:asio",
     ],
 )
 
 cc_library(
-    name = "threaded_proto_multicast_sender",
+    name = "threaded_proto_udp_sender",
     hdrs = [
-        "threaded_proto_multicast_sender.h",
-        "threaded_proto_multicast_sender.tpp",
+        "threaded_proto_udp_sender.h",
+        "threaded_proto_udp_sender.tpp",
     ],
     deps = [
-        ":proto_multicast_sender",
+        ":proto_udp_sender",
         "@boost//:asio",
     ],
 )

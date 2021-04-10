@@ -10,36 +10,34 @@
 #include "software/world/team.h"
 #include "software/world/world.h"
 
-// The types of passes we can perform
-MAKE_ENUM(PassType,
-          // Receive the pass and keep possession by just dribbling it
-          RECEIVE_AND_DRIBBLE,
-          // One-touch shot where the receiving robot immediately takes a shot on net
-          ONE_TOUCH_SHOT, );
-
 /**
  * Calculate the quality of a given pass
  *
  * @param world The world in which to rate the pass
  * @param pass The pass to rate
- * @param target_region The area we want to pass to (if there is a specific area,
- *                      set to `std::nullopt` otherwise
- * @param passer_robot_id The id of the robot performing the pass. This will be used
- *                        when calculating friendly capability to ensure the passer
- *                        robot does not try to pass to itself. If `std::nullopt` is
- *                        given, it is assumed the passer robot is not on the
- *                        friendly team of the given world
- * @param pass_type The type of pass we're trying to rate this pass as (certain
- *                  types of passes have different characteristics we try to
- *                  optimize for)
+ * @param zone The zone this pass is constrained to
  * @param passing_config The passing config used for tuning
  *
  * @return A value in [0,1] representing the quality of the pass, with 1 being an
  *         ideal pass, and 0 being the worst pass possible
  */
-double ratePass(const World& world, const Pass& pass,
-                const std::optional<Rectangle>& target_region,
-                std::optional<unsigned int> passer_robot_id, PassType pass_type,
+double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
+                std::shared_ptr<const PassingConfig> passing_config);
+
+/**
+ * Calculate the quality of a given zone
+ *
+ * @param field The field on which to rate the zone
+ * @param enemy_team The enemy team
+ * @param zone The zone to rate
+ * @param ball_position The position of the ball
+ * @param passing_config The passing config used for tuning
+ *
+ * @return A value in [0,1] representing the quality of the zone, with 1 being a
+ *         great zone to send a cherry picker to, and 0 being a zone to avoid.
+ */
+double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,
+                const Point& ball_position,
                 std::shared_ptr<const PassingConfig> passing_config);
 
 /**
@@ -108,10 +106,6 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
  *
  * @param friendly_team The team of robots that might receive the given pass
  * @param pass The pass we want a robot to receive
- * @param passer_robot_id The id of the robot performing the pass. This will be used
- *                        to ensure the passer robot does not try to pass to itself.
- *                        If `std::nullopt` is given, it is assumed the passer robot
- *                        is not on `friendly_team`
  * @param passing_config The passing config used for tuning
  *
  * @return A value in [0,1] indicating how likely it would be for a robot on the
@@ -119,7 +113,6 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
  *         being impossible
  */
 double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
-                                  std::optional<unsigned int> passer_robot_id,
                                   std::shared_ptr<const PassingConfig> passing_config);
 
 /**

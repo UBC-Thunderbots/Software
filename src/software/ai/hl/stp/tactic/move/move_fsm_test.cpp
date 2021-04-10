@@ -18,7 +18,7 @@ TEST(MoveFSMTest, test_transitions)
         .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         .target_spin_rev_per_s  = 0.0};
 
-    BaseFSM<MoveFSM> fsm;
+    FSM<MoveFSM> fsm;
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::MoveState>));
 
     // robot far from destination

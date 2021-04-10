@@ -2,8 +2,8 @@
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
-#include "software/networking/threaded_proto_multicast_listener.h"
-#include "software/networking/threaded_proto_multicast_sender.h"
+#include "software/networking/threaded_proto_udp_listener.h"
+#include "software/networking/threaded_proto_udp_sender.h"
 #include "software/proto/defending_side_msg.pb.h"
 #include "software/simulation/threaded_simulator.h"
 
@@ -158,11 +158,11 @@ class StandaloneSimulator
                          std::string vision_ip_address);
 
     std::shared_ptr<const StandaloneSimulatorConfig> standalone_simulator_config;
-    std::unique_ptr<ThreadedProtoMulticastListener<TbotsProto::PrimitiveSet>>
+    std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>
         yellow_team_primitive_listener, blue_team_primitive_listener;
-    std::unique_ptr<ThreadedProtoMulticastSender<SSLProto::SSL_WrapperPacket>>
+    std::unique_ptr<ThreadedProtoUdpSender<SSLProto::SSL_WrapperPacket>>
         wrapper_packet_sender;
-    std::unique_ptr<ThreadedProtoMulticastListener<DefendingSideProto>>
+    std::unique_ptr<ThreadedProtoUdpListener<DefendingSideProto>>
         yellow_team_side_listener, blue_team_side_listener;
     ThreadedSimulator simulator;
 

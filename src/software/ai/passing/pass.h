@@ -7,9 +7,12 @@
 #include "software/geom/point.h"
 #include "software/time/timestamp.h"
 
+// The number of parameters (representing a pass) that we optimize
+// (receive_location_x, receive_location_y, pass_speed)
+static const int NUM_PARAMS_TO_OPTIMIZE = 3;
+
 /**
- * This class represents a Pass, with a given start position, end position,
- * speed, and start time
+ * This class represents a Pass, a receive point with a speed
  */
 class Pass
 {
@@ -22,32 +25,26 @@ class Pass
      * @param passer_point The point the pass should start at
      * @param receiver_point The point the receiver should be at to receive the pass
      * @param pass_speed_m_per_s The speed of the pass, in meters/second
-     * @param pass_start_time The time that the pass should start at (ie. the time
-     *                        that the ball should be kicked)
      */
-    Pass(Point passer_point, Point receiver_point, double pass_speed_m_per_s,
-         Timestamp pass_start_time);
+    Pass(Point passer_point, Point receiver_point, double pass_speed_m_per_s);
 
     /**
-     * Gets the value of the receiver point
+     * Create a pass from the given pass array
      *
-     * @return The value of the receiver point
+     * @param passer_point The location of the passer location
+     * @param pass_array [receiver_point.x(), receiver_point.y(), pass_speed_m_per_s]
+     * @return The Pass constructed from the pass array
      */
-    Point receiverPoint() const;
+    static Pass fromPassArray(
+        Point passer_point, const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array);
 
     /**
-     * Gets the angle the receiver should be facing to receive the pass
+     * Converts a pass to an array
      *
-     * @return The angle the receiver should be facing to receive the pass
+     * @returns the pass array: [receiver_point.x(), receiver_point.y(),
+     * pass_speed_m_per_s]
      */
-    Angle receiverOrientation() const;
-
-    /**
-     * Gets the angle the passer should be facing to perform the pass
-     *
-     * @return The angle the passer should be facing to perform the pass
-     */
-    Angle passerOrientation() const;
+    std::array<double, NUM_PARAMS_TO_OPTIMIZE> toPassArray() const;
 
     /**
      * Gets the value of the passer point
@@ -57,27 +54,34 @@ class Pass
     Point passerPoint() const;
 
     /**
+     * Gets the value of the receiver point
+     *
+     * @return The value of the receiver point
+     */
+    Point receiverPoint() const;
+
+    /**
+     * Given the ball position, returns the angle the receiver should be
+     * facing to receive the pass.
+     *
+     * @return The angle the receiver should be facing
+     */
+    Angle receiverOrientation() const;
+
+    /**
+     * Given the ball position, returns the angle the passer should be
+     * facing to pass.
+     *
+     * @return The angle the passer should be facing
+     */
+    Angle passerOrientation() const;
+
+    /**
      * Gets the value of the pass speed
      *
      * @return The value of the pass speed, in meters/second
      */
     double speed() const;
-
-    /**
-     * Gets the value of the pass start time
-     *
-     * @return The value of the pass start time
-     */
-    Timestamp startTime() const;
-
-    /**
-     * Estimate the time when the pass should be received
-     *
-     * This estimate does not account for friction on the ball
-     *
-     * @return An estimate of the time when the pass should be received
-     */
-    Timestamp estimateReceiveTime() const;
 
     /**
      * Estimate how long the pass will take, from kicking to receiving
@@ -98,15 +102,12 @@ class Pass
     friend std::ostream& operator<<(std::ostream& output_stream, const Pass& pass);
 
    private:
-    // The location of the receiver
-    Point receiver_point;
-
     // The location of the passer
     Point passer_point;
 
+    // The location of the receiver
+    Point receiver_point;
+
     // The speed of the pass in meters/second
     double pass_speed_m_per_s;
-
-    // The time to perform the pass at
-    Timestamp pass_start_time;
 };
