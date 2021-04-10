@@ -14,7 +14,7 @@
 #include "software/world/world.h"
 
 class SimulatedPasserTacticTest
-    : public virtual SimulatedTacticTestFixture,
+    : public SimulatedTacticTestFixture,
       public ::testing::WithParamInterface<std::tuple<Pass, RobotStateWithId, BallState>>
 {
 };
