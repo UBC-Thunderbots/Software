@@ -17,16 +17,6 @@ cc_library(
     hdrs = ["uart_communication.h"],
 )
 
-cc_library(
-    name = "estop_manager",
-    srcs = ["estop_manager.cpp"],
-    hdrs = ["estop_manager.h"],
-    deps = [
-        "boost_uart_communication",
-        "threaded_estop_reader",
-        "//software/logger",
-    ],
-)
 
 cc_library(
     name = "boost_uart_communication",
@@ -46,18 +36,6 @@ cc_test(
     ],
     deps = [
         ":threaded_estop_reader",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "estop_manager_test",
-    srcs = [
-        "estop_manager_test.cpp",
-        "mock_uart_communication.h",
-    ],
-    deps = [
-        ":estopManager",
         "@gtest//:gtest_main",
     ],
 )
