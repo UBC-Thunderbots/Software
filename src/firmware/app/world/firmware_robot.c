@@ -235,9 +235,55 @@ void app_firmware_robot_trackVelocityInRobotFrame(
                            angular_acceleration);
 }
 
-void force_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory)
+void force_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory,
+    size_t trajectory_index)
 {
-    // TODO: Implement with planner
+    const float dest_x = state->pos_trajectory.x_position[trajectory_index];
+    const float dest_y = state->pos_trajectory.y_position[trajectory_index];
+    const float dest_orientation =
+        state->pos_trajectory.orientation[trajectory_index];
+    float dest[3] = {dest_x, dest_y, dest_orientation};
+
+    const float curr_x = app_firmware_robot_getPositionX(robot);
+    const float curr_y = app_firmware_robot_getPositionY(robot);
+
+    const float dx = dest_x - curr_x;
+    const float dy = dest_y - curr_y;
+
+    float total_disp = sqrtf(dx * dx + dy * dy);
+    // Add a small number to avoid division by zero
+    float major_vec[2] = {dx / (total_disp + 1e-6f), dy / (total_disp + 1e-6f)};
+    float minor_vec[2] = {major_vec[0], major_vec[1]};
+    rotate(minor_vec, P_PI / 2);
+
+    PhysBot pb = app_physbot_create(robot, dest, major-vec, minor_vec);
+
+    const float dest_speed = state->pos_trajectory.linear_speed[trajectory_index];
+
+    // plan major axis movement
+    float max_major_a     = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
+    float max_major_v     = state->max_speed_m_per_s;
+    float major_params[3] = {dest_speed, max_major_a, max_major_v};
+    app_physbot_planMove(&pb.maj, major_params);
+
+    // plan minor axis movement
+    float max_minor_a = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / 2.0f;
+    float max_minor_v = state->max_speed_m_per_s / 2.0f;
+    float minor_params[3] = {0, max_minor_a, max_minor_v};
+    app_physbot_planMove(&pb.min, minor_params);
+
+    // plan rotation movement
+    plan_move_rotation(&pb, app_firmware_robot_getVelocityAngular(robot));
+
+    float accel[3] = {0, 0, pb.rot.accel};
+
+    // rotate the accel and apply it
+    app_physbot_computeAccelInLocalCoordinates(
+        accel, pb, app_firmware_robot_getOrientation(robot), major_vec, minor_vec);
+
+    // TODO: Requires force wheels
+    app_control_applyAccel(robot_constants, controller_state,
+                           battery_voltage, accel[0], accel[1], accel[2]);
 }
 
 void velocity_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, 
@@ -259,7 +305,6 @@ void velocity_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTraject
     angular_velocity = velocity_trajectory.angular_velocity[trajectory_index];    
     
     // TODO: Take from `move_primitive.c`
-
     float front_left_wheel_velocity = 0;
     float front_right_wheel_velocity = 0;
     float back_right_wheel_velocity = 0;

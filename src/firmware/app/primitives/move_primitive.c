@@ -189,6 +189,9 @@ static void app_move_primitive_tick(void* void_state_ptr, FirmwareWorld_t* world
 {
     MoveState_t* state           = (MoveState_t*)(void_state_ptr);
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
+    const RobotConstants_t robot_constants = app_firmware_robot_getRobotConstants(robot);
+    ControllerState_t* controller_state = app_firmware_robot_getControllerState(robot);
+    float battery_voltage = app_firmware_robot_getBatteryVoltage(robot);
 
     // Figure out the index of the trajectory element we should be executing
     size_t trajectory_index  = 1;
@@ -242,7 +245,9 @@ static void app_move_primitive_tick(void* void_state_ptr, FirmwareWorld_t* world
     app_physbot_computeAccelInLocalCoordinates(
         accel, pb, app_firmware_robot_getOrientation(robot), major_vec, minor_vec);
 
-    app_firmware_robot_applyAccel(robot, accel[0], accel[1], accel[2]);
+    // TODO: Requires force wheels
+    app_control_applyAccel(robot_constants, controller_state,
+                           battery_voltage, accel[0], accel[1], accel[2]);
 }
 
 /**

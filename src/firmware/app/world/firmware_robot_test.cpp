@@ -154,26 +154,6 @@ TEST_F(FirmwareRobotTest, getBatteryVoltage)
     EXPECT_EQ(14, app_firmware_robot_getBatteryVoltage(firmware_robot));
 }
 
-TEST_F(FirmwareRobotTest, getFrontRightWheel)
-{
-    EXPECT_EQ(front_right_wheel, app_firmware_robot_getFrontRightWheel(firmware_robot));
-}
-
-TEST_F(FirmwareRobotTest, getFrontLeftWheel)
-{
-    EXPECT_EQ(front_left_wheel, app_firmware_robot_getFrontLeftWheel(firmware_robot));
-}
-
-TEST_F(FirmwareRobotTest, getBackRightWheel)
-{
-    EXPECT_EQ(back_right_wheel, app_firmware_robot_getBackRightWheel(firmware_robot));
-}
-
-TEST_F(FirmwareRobotTest, getBackLeftWheel)
-{
-    EXPECT_EQ(back_left_wheel, app_firmware_robot_getBackLeftWheel(firmware_robot));
-}
-
 TEST_F(FirmwareRobotTest, getRobotConstants)
 {
     RobotConstants_t constants = app_firmware_robot_getRobotConstants(firmware_robot);

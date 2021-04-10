@@ -105,5 +105,6 @@ void app_chick_motion_tick(void *void_state_ptr, FirmwareWorld_t *world)
                                                app_firmware_robot_getOrientation(robot),
                                                state->major_vec, state->minor_vec);
 
+    // TODO: Requires force wheels
     app_control_applyAccel(robot_constants, controller_state, battery_voltage, accel[0], accel[1], accel[2]);
 }

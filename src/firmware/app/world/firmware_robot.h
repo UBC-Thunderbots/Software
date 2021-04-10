@@ -190,11 +190,10 @@ RobotConstants_t app_firmware_robot_getRobotConstants(const FirmwareRobot_t* rob
 ControllerState_t* app_firmware_robot_getControllerState(const FirmwareRobot_t* robot);
 
 // TODO: JavaDoc
-void app_firmware_robot_trackVelocityInRobotFrame(
-    FirmwareRobot_t* robot, float linear_velocity_x,
+void app_firmware_robot_trackVelocityInRobotFrame(FirmwareRobot_t* robot, float linear_velocity_x,
     float linear_velocity_y, float angular_velocity);
 
-void force_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory);
+void force_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, size_t trajectory_index);
 
 void velocity_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, 
     size_t trajectory_index, unsigned int num_elements);
