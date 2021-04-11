@@ -554,7 +554,7 @@ int main(int argc, char** argv)
     //    moveFromStackToHeapNMO(); // BAD
     //    moveFromHeapToStack(); // OK
 
-    /* Because vectors (and other resizeable containers) actually store
+    /* Because vectors (and other resizable containers) actually store
      * data on the heap, moving coroutines into vectors only works
      * in certain cases.
      *
@@ -573,7 +573,7 @@ int main(int argc, char** argv)
 
 
     // ~~~~~~~~~~ Conclusions ~~~~~~~~~~ //
-    /* - Whether a resizeable container is used or not, moving coroutines
+    /* - Whether a resizable container is used or not, moving coroutines
      *   between the stack and the heap results in inconsistent behaviour
      *   (it works in some cases but not others, without any obviously
      *   consistent rules). Therefore, coroutines should never be
@@ -590,7 +590,7 @@ int main(int argc, char** argv)
      * COROUTINES BEST PRACTICES
      * - Avoid moving coroutines. If the absolutely must be moved,
      *   make sure they are not moved between the stack and heap.
-     * - Avoid using coroutines with resizeable containers. If they
+     * - Avoid using coroutines with resizable containers. If they
      *   must be used, make sure that the coroutines are allocated
      *   on the heap.
      * - Pass data to the coroutine on creation as much as possible,
