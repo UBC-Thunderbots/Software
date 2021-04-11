@@ -1,8 +1,8 @@
 #pragma once
 
 
-#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
 #include "software/ai/evaluation/enemy_threat.h"
+#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
@@ -25,7 +25,8 @@ class ShadowEnemyTactic : public Tactic
      * distance between the center of the enemy robot and the center of the robot
      * shadowing it
      */
-    void updateControlParams(std::optional<EnemyThreat> enemy_threat, double shadow_distance);
+    void updateControlParams(std::optional<EnemyThreat> enemy_threat,
+                             double shadow_distance);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -45,8 +46,8 @@ class ShadowEnemyTactic : public Tactic
 
    private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;
-    void updateIntent(const TacticUpdate& tactic_update) override;
-     
-    BaseFSM<ShadowEnemyFSM> fsm;
+    void updateIntent(const TacticUpdate &tactic_update) override;
+
+    FSM<ShadowEnemyFSM> fsm;
     ShadowEnemyFSM::ControlParams control_params;
 };

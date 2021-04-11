@@ -210,12 +210,15 @@ cc_library(
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
-        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
+<<<<<<< HEAD
         "//software/ai/hl/stp/tactic/passer:passer_tactic",
+=======
+        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
+>>>>>>> shadow enemy tactic fsm test passes!
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
     ],
 )

@@ -23,7 +23,8 @@
 //     World world = World(field, ball, friendly_team, enemy_team);
 
 //     ShadowEnemyTactic tactic =
-//         ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, false, true);
+//         ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, false,
+//         true);
 //     tactic.updateRobot(friendly_robot);
 //     tactic.updateWorldParams(world);
 //     tactic.updateControlParams(enemy_threat, 0.5);
@@ -144,7 +145,8 @@
 //     World world = World(field, ball, friendly_team, enemy_team);
 
 //     ShadowEnemyTactic tactic =
-//         ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, true, true);
+//         ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, true,
+//         true);
 //     tactic.updateRobot(friendly_robot);
 //     tactic.updateWorldParams(world);
 //     tactic.updateControlParams(enemy_threat, 0.5);
