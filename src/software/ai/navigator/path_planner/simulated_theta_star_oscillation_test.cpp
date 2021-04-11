@@ -32,7 +32,6 @@ TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_oscillation)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position}));
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({Point(1, 0)}));
 
-    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
@@ -50,6 +49,41 @@ TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_oscillation)
                 yield("Timestamp not at 9.5s");
             }
         }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(15));
+}
+
+TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_zig_zag_test)
+{
+    Point destination      = Point(1, 0);
+    Point initial_position = Point(-1.6, 0.2);
+    setBallState(BallState(Point(0, -0.6), Vector(0, 0)));
+    addFriendlyRobots(
+            TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position}));
+    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({
+        Point(-1, 0.2), Point(-0.5, -0.2), Point(0, 0.2), Point(0.5, -0.2),
+        Point(-1, 0.7), Point(-0.7, -0.6), Point(0, 0.7)}));
+
+    auto tactic = std::make_shared<MoveTactic>(false);
+    tactic->updateControlParams(destination, Angle::zero(), 0);
+    setTactic(tactic);
+    setRobotId(1);
+
+    std::set<MotionConstraint> motion_constraints;
+    motion_constraints.insert(MotionConstraint::ENEMY_ROBOTS_COLLISION);
+    setMotionConstraints(motion_constraints);
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+            [destination, tactic](std::shared_ptr<World> world_ptr,
+                                  ValidationCoroutine::push_type& yield) {
+                while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
+                {
+                    yield("Timestamp not at 9.5s");
+                }
+            }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 

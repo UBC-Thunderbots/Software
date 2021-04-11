@@ -16,10 +16,6 @@ class SimulatedPathPlannerTest : public SimulatedTacticTestFixture
 
 TEST_F(SimulatedPathPlannerTest, test_no_path_found)
 {
-    /*
-     * When a path is not found by path planner, a World tick takes 4-8x longer to finish.
-     * These tests are targeted to isolate when no path is found.
-     */
     Point destination      = Point(1.0, 0);
     Point initial_position = Point(-3, 1.5);
     setBallState(BallState(Point(0, 0), Vector(0, 0)));
@@ -27,7 +23,6 @@ TEST_F(SimulatedPathPlannerTest, test_no_path_found)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position}));
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({Point(1, 0)}));
 
-    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
