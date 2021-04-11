@@ -54,12 +54,8 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
 
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                               world.friendlyTeam(), world.enemyTeam(),
-                                               CreaseDefenderTactic::LeftOrRight::LEFT),
-        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                               world.friendlyTeam(), world.enemyTeam(),
-                                               CreaseDefenderTactic::LeftOrRight::RIGHT),
+        std::make_shared<CreaseDefenderTactic>(CreaseDefenderAlignment::LEFT),
+        std::make_shared<CreaseDefenderTactic>(CreaseDefenderAlignment::RIGHT),
     };
 
     auto move_tactics = std::vector<std::shared_ptr<MoveTactic>>{

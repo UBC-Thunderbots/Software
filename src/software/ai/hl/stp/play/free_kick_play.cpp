@@ -54,12 +54,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 
     // Setup crease defenders to help the goalie
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                               world.friendlyTeam(), world.enemyTeam(),
-                                               CreaseDefenderTactic::LeftOrRight::LEFT),
-        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                               world.friendlyTeam(), world.enemyTeam(),
-                                               CreaseDefenderTactic::LeftOrRight::RIGHT),
+        std::make_shared<CreaseDefenderTactic>(CreaseDefenderAlignment::LEFT),
+        std::make_shared<CreaseDefenderTactic>(CreaseDefenderAlignment::RIGHT),
     };
 
     Angle min_open_angle_for_shot = Angle::fromDegrees(

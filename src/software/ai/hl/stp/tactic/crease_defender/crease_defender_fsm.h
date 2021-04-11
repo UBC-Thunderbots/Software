@@ -7,6 +7,7 @@
 #include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/ray.h"
+#include "software/logger/logger.h"
 
 // Which way the crease defender should be aligned
 MAKE_ENUM(CreaseDefenderAlignment, LEFT, RIGHT, CENTRE);
@@ -110,6 +111,11 @@ struct CreaseDefenderFSM
             if (block_threat_point)
             {
                 destination = block_threat_point.value();
+            }
+            else
+            {
+                LOG(WARNING)
+                    << "Could not find a point on the defense area to block a potential shot";
             }
             Angle face_threat_orientation = (event.control_params.enemy_threat_origin -
                                              event.common.world.ball().position())
