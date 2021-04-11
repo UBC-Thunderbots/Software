@@ -186,7 +186,7 @@ struct GoalieFSM
          * @return if the ball is moving slower than the time_to_panic threshold and is
          * inside the friendly defense area
          */
-        const auto can_chip = [](auto event) {
+        const auto chip = [](auto event) {
             double ball_speed_panic = event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
 
             // if the ball is in the "don't chip rectangle" we do not chip the ball
@@ -199,7 +199,7 @@ struct GoalieFSM
                    !contains(dont_chip_rectangle, event.common.world.ball().position());
         };
 
-        const auto dont_chip = [](auto event) {
+        const auto dribble = [](auto event) {
             double ball_speed_panic = event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
             // if the ball is in the "don't chip rectangle" we do not chip the ball
             // as we risk bumping the ball into our own net trying to move behind
@@ -210,7 +210,7 @@ struct GoalieFSM
                    contains(dont_chip_rectangle, event.common.world.ball().position());
         };
 
-        const auto no_danger = [](auto event) {
+        const auto chip_done = [](auto event) {
             double ball_speed_panic = event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
             std::vector<Point> intersections =
                     getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(), event.common.world.field());
@@ -232,7 +232,7 @@ struct GoalieFSM
          *
          * @param event GoalieFSM::Update event
          */
-        const auto panic_and_block = [](auto event) {
+        const auto update_panic = [](auto event) {
             std::vector<Point> intersections =
                     getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(), event.common.world.field());
             Point stop_ball_point = intersections[0];
@@ -252,7 +252,7 @@ struct GoalieFSM
          * @param event GoalieFSM::Update event
          * @param processEvent processes the ChipFSM::Update
          */
-        const auto chip =
+        const auto update_chip =
             [](auto event, back::process<ChipFSM::Update> processEvent) {
             ChipFSM::ControlParams control_params{
                 .chip_origin = event.common.world.ball().position(),
@@ -269,7 +269,7 @@ struct GoalieFSM
          * @param event GoalieFSM::Update event
          * @param processEvent processes the DribbleFSM::Update
          */
-        const auto dribble =
+        const auto update_dribble =
             [](auto event, back::process<DribbleFSM::Update> processEvent) {
             DribbleFSM::ControlParams control_params{
                 // TODO: fix dribble destination so there is strategy behind it (move to center of goal area)
@@ -288,7 +288,7 @@ struct GoalieFSM
         *
         * @param event GoalieFSM::Update event
         */
-        const auto position_to_block = [](auto event) {
+        const auto update_position_to_block = [](auto event) {
             // compute angle between two vectors, negative goal post to ball and positive
             // goal post to ball
             Angle block_cone_angle =
@@ -354,19 +354,18 @@ struct GoalieFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *position_to_block_s + update_e[panic] / panic_and_block = panic_s,
-            position_to_block_s + update_e[can_chip] / chip          = chip_s,
-            position_to_block_s + update_e[dont_chip] / dribble      = dribble_s,
-            position_to_block_s + update_e / position_to_block,
-            panic_s + update_e[can_chip] / chip                      = chip_s,
-            panic_s + update_e[dont_chip] / dribble                  = dribble_s, // maybe remove this one
-            panic_s + update_e[panic_done]                            = X,
-            panic_s + update_e / panic_and_block, //panic_s = X,
-            dribble_s + update_e[can_chip] / chip                    = chip_s,
-            dribble_s + update_e / dribble, //dribble_s = chip_s,
-            chip_s + update_e[panic] / panic_and_block               = panic_s,
-            chip_s + update_e[no_danger]                             = X,
-            chip_s + update_e / chip,
-            X + update_e / position_to_block                         = position_to_block_s);
+            *position_to_block_s + update_e[panic] / update_panic       = panic_s,
+            position_to_block_s + update_e[chip] / update_chip          = chip_s,
+            position_to_block_s + update_e[dribble] / update_dribble    = dribble_s,
+            position_to_block_s + update_e / update_position_to_block,
+            panic_s + update_e[chip] / update_chip                      = chip_s,
+            panic_s + update_e[panic_done]                              = X,
+            panic_s + update_e / update_panic,
+            dribble_s + update_e[chip] / update_chip                    = chip_s,
+            dribble_s + update_e / update_dribble,
+            chip_s + update_e[panic] / update_panic                     = panic_s,
+            chip_s + update_e[chip_done]                                = X,
+            chip_s + update_e / update_chip,
+            X + update_e / update_position_to_block                     = position_to_block_s);
     }
 };

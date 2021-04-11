@@ -43,6 +43,16 @@ TEST(GoalieFSMTest, test_transitions)
     // Transition to PanicState
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PanicState>));
 
+    // Ball is out of danger, transition to done
+    world = ::TestUtil::setBallVelocity(world, Vector(1,0), Timestamp::fromSeconds(123));
+    fsm.process_event(GoalieFSM::Update(
+            control_params, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::X));
+
+    fsm.process_event(GoalieFSM::Update(
+            control_params, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlockState>));
+
     // Ball is now stationary in the "don't-chip" rectangle
     world =
             ::TestUtil::setBallPosition(world, world.field().friendlyGoalpostNeg() +
