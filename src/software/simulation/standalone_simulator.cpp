@@ -93,24 +93,22 @@ void StandaloneSimulator::setupNetworking(int blue_team_channel, int yellow_team
     std::string blue_team_ip =
         std::string(MULTICAST_CHANNELS[blue_team_channel]) + "%" + network_interface;
 
-    wrapper_packet_sender.reset(
-        new ThreadedProtoMulticastSender<SSLProto::SSL_WrapperPacket>(
-            vision_ip_address, static_cast<unsigned short>(vision_port)));
+    wrapper_packet_sender.reset(new ThreadedProtoUdpSender<SSLProto::SSL_WrapperPacket>(
+        vision_ip_address, static_cast<unsigned short>(vision_port), true));
     yellow_team_primitive_listener.reset(
-        new ThreadedProtoMulticastListener<TbotsProto::PrimitiveSet>(
+        new ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>(
             yellow_team_ip, PRIMITIVE_PORT,
-            boost::bind(&StandaloneSimulator::setYellowRobotPrimitives, this, _1)));
+            boost::bind(&StandaloneSimulator::setYellowRobotPrimitives, this, _1), true));
     blue_team_primitive_listener.reset(
-        new ThreadedProtoMulticastListener<TbotsProto::PrimitiveSet>(
+        new ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>(
             blue_team_ip, PRIMITIVE_PORT,
-            boost::bind(&StandaloneSimulator::setBlueRobotPrimitives, this, _1)));
-    yellow_team_side_listener.reset(
-        new ThreadedProtoMulticastListener<DefendingSideProto>(
-            yellow_team_ip, DEFENDING_SIDE_PORT,
-            boost::bind(&StandaloneSimulator::setYellowTeamDefendingSide, this, _1)));
-    blue_team_side_listener.reset(new ThreadedProtoMulticastListener<DefendingSideProto>(
+            boost::bind(&StandaloneSimulator::setBlueRobotPrimitives, this, _1), true));
+    yellow_team_side_listener.reset(new ThreadedProtoUdpListener<DefendingSideProto>(
+        yellow_team_ip, DEFENDING_SIDE_PORT,
+        boost::bind(&StandaloneSimulator::setYellowTeamDefendingSide, this, _1), true));
+    blue_team_side_listener.reset(new ThreadedProtoUdpListener<DefendingSideProto>(
         blue_team_ip, DEFENDING_SIDE_PORT,
-        boost::bind(&StandaloneSimulator::setBlueTeamDefendingSide, this, _1)));
+        boost::bind(&StandaloneSimulator::setBlueTeamDefendingSide, this, _1), true));
 }
 
 void StandaloneSimulator::setupInitialSimulationState()

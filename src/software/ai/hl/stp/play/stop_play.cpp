@@ -70,7 +70,7 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
-        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
+        PriorityTacticVector result = {{goalie_tactic}};
 
         // a unit vector from the center of the goal to the ball, this vector will be used
         // for positioning all the robots (excluding the goalie). The positioning vector
@@ -125,7 +125,7 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
             (world.ball().position() - ball_defense_point_right).orientation(), 0);
 
         // insert all the move tactics to the result
-        result.insert(result.end(), move_tactics.begin(), move_tactics.end());
+        result[0].insert(result[0].end(), move_tactics.begin(), move_tactics.end());
         yield(result);
     } while (true);
 }

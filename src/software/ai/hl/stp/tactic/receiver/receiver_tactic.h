@@ -99,7 +99,7 @@ class ReceiverTactic : public Tactic
 
     Pass pass;
 
-    HFSM<ReceiverFSM> fsm;
+    FSM<ReceiverFSM> fsm;
 
     ReceiverFSM::ControlParams control_params;
 };

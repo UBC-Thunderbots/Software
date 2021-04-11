@@ -291,7 +291,7 @@ Coroutines are a complex feature, and the boost coroutines we use don't always b
 
 To summarize, the best practices are as follows:
 1. Avoid moving coroutines. If the absolutely must be moved, make sure they are not moved between the stack and heap.
-2. Avoid using coroutines with resizeable containers. If they must be used, make sure that the coroutines are allocated on the heap.
+2. Avoid using coroutines with resizable containers. If they must be used, make sure that the coroutines are allocated on the heap.
 3. Pass data to the coroutine on creation as much as possible, avoid using member variables.
 
 # Finite State Machines

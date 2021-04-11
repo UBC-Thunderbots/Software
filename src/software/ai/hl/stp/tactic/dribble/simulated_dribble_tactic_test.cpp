@@ -40,7 +40,6 @@ class SimulatedDribbleTacticTest : public SimulatedTacticTestFixture
         SimulatedTacticTestFixture::SetUp();
         setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION,
                               MotionConstraint::ENEMY_DEFENSE_AREA});
-        setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
         addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
              field().enemyDefenseArea().negXNegYCorner(),
