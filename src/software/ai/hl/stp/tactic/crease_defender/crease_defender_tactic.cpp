@@ -19,8 +19,22 @@ CreaseDefenderTactic::CreaseDefenderTactic(
       ball(ball),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
-      left_or_right(left_or_right)
+      left_or_right(left_or_right),
+      fsm(),
+      control_params()
 {
+    if (left_or_right == CreaseDefenderTactic::LeftOrRight::LEFT)
+    {
+        control_params.crease_defender_alignment = CreaseDefenderAlignment::LEFT;
+    }
+    else if (left_or_right == CreaseDefenderTactic::LeftOrRight::RIGHT)
+    {
+        control_params.crease_defender_alignment = CreaseDefenderAlignment::RIGHT;
+    }
+    else
+    {
+        control_params.crease_defender_alignment = CreaseDefenderAlignment::CENTRE;
+    }
 }
 
 void CreaseDefenderTactic::updateWorldParams(const World &world)
@@ -249,4 +263,10 @@ Team CreaseDefenderTactic::getEnemyTeam() const
 Team CreaseDefenderTactic::getFriendlyTeam() const
 {
     return this->friendly_team;
+}
+
+void CreaseDefenderTactic::updateIntent(const TacticUpdate &tactic_update)
+{
+    control_params.enemy_threat_origin = tactic_update.world.ball().position();
+    fsm.process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
 }

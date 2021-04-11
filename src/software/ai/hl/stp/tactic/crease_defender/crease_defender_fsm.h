@@ -68,7 +68,7 @@ struct CreaseDefenderFSM
         {
             angle_to_block = angle_to_positive_goalpost + shot_angle_increment * 1.0;
         }
-        else if (crease_defender_alignment == CreaseDefenderAlignment::LEFT)
+        else if (crease_defender_alignment == CreaseDefenderAlignment::RIGHT)
         {
             angle_to_block = angle_to_positive_goalpost + shot_angle_increment * 5.0;
         }
@@ -85,7 +85,6 @@ struct CreaseDefenderFSM
                 return intersections[0];
             }
         }
-
         return std::nullopt;
     }
 

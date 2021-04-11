@@ -66,6 +66,7 @@ class CreaseDefenderTactic : public Tactic
 
    private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;
+    void updateIntent(const TacticUpdate &tactic_update) override;
 
     /**
      * Calculate the position and orientation we would like the defender to be in
@@ -103,4 +104,6 @@ class CreaseDefenderTactic : public Tactic
     Team friendly_team;
     Team enemy_team;
     LeftOrRight left_or_right;
+    FSM<CreaseDefenderFSM> fsm;
+    CreaseDefenderFSM::ControlParams control_params;
 };
