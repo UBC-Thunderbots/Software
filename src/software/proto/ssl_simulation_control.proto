@@ -30,7 +30,7 @@ message TeleportBall
     // Instead of teleporting the ball, apply some force to make sure
     // the ball reaches the required position soon (velocity is ignored if true)
     // WARNING: A command with by_force stays active (the move will take some time)
-    // until cancled by another TeleportBall command with by_force = false.
+    // until canceled by another TeleportBall command with by_force = false.
     // To avoid teleporting the ball at the end and resetting its current spin,
     // do not set any of the optional fields in this message to end the force without
     // triggering an additional teleportation
@@ -61,7 +61,7 @@ message TeleportRobot
     // Instead of teleporting, apply some force to make sure
     // the robot reaches the required position soon (velocity is ignored if true)
     // WARNING: A command with by_force stays active (the move will take some time)
-    // until cancled by another TeleportRobot command for the same bot with by_force =
+    // until canceled by another TeleportRobot command for the same bot with by_force =
     // false. To avoid teleporting at the end, do not set any of the optional fields in
     // this message to end the force without triggering an additional teleportation
     optional bool by_force = 9 [default = false];

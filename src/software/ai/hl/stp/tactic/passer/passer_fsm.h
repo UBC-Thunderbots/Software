@@ -14,7 +14,6 @@ struct PasserFSM
         std::optional<Pass> pass = std::nullopt;
     };
 
-    // this struct defines the only event that the MoveFSM responds to
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     auto operator()()
@@ -40,8 +39,7 @@ struct PasserFSM
                         event.control_params.pass->passerPoint()),
                     .final_dribble_orientation = std::make_optional<Angle>(
                         event.control_params.pass->passerOrientation()),
-                    .allow_excessive_dribbling = false,
-                };
+                    .allow_excessive_dribbling = false};
 
                 // Update the dribble fsm
                 processEvent(DribbleFSM::Update(control_params, event.common));
