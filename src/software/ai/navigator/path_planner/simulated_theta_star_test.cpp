@@ -11,11 +11,11 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedThetaStarOscillationTest : public SimulatedTacticTestFixture
+class SimulatedThetaStarTest : public SimulatedTacticTestFixture
 {
 };
 
-TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_robot_and_dest_in_obstacle)
+TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_obstacle)
 {
     // Both initial_position and destination are in obstacle and in the same coordinate
     Point destination      = Point(1, 0);
@@ -48,7 +48,7 @@ TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_robot_and_dest_in_obst
             Duration::fromSeconds(15));
 }
 
-TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_dest_in_obstacle)
+TEST_F(SimulatedThetaStarTest, test_theta_star_dest_in_obstacle)
 {
     // Destination is in obstacle, but initial point is open
     Point destination      = Point(1, -0.1);
@@ -81,7 +81,7 @@ TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_dest_in_obstacle)
             Duration::fromSeconds(15));
 }
 
-TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_robot_in_obstacle)
+TEST_F(SimulatedThetaStarTest, test_theta_star_robot_in_obstacle)
 {
     // Destination is in a free point, but initial point is in an obstacle
     Point destination      = Point(0, 0);
@@ -114,7 +114,7 @@ TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_robot_in_obstacle)
             Duration::fromSeconds(15));
 }
 
-TEST_F(SimulatedThetaStarOscillationTest, test_theta_no_obstacle_straight_path)
+TEST_F(SimulatedThetaStarTest, test_theta_no_obstacle_straight_path)
 {
     Point destination      = Point(-2, 1);
     Point initial_position = Point(2, 1);
@@ -146,7 +146,7 @@ TEST_F(SimulatedThetaStarOscillationTest, test_theta_no_obstacle_straight_path)
             Duration::fromSeconds(15));
 }
 
-TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_zig_zag_test)
+TEST_F(SimulatedThetaStarTest, test_theta_star_zig_zag_test)
 {
     /* enemy robots placed so the friendly robot is forced to take a path which
      * zig-zags. (inspired by the 2021 SSL dribbling hardware challenge)
@@ -198,7 +198,7 @@ TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_zig_zag_test)
             Duration::fromSeconds(15));
 }
 
-TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_oscillation)
+TEST_F(SimulatedThetaStarTest, test_theta_star_oscillation)
 {
     /*
      * When DISTANCE_THRESHOLD (what determines if robot is close enough to destination)
