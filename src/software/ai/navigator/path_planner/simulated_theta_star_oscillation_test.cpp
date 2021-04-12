@@ -120,7 +120,7 @@ TEST_F(SimulatedThetaStarOscillationTest, test_theta_no_obstacle_straight_path)
     Point initial_position = Point(2, 1);
     setBallState(BallState(Point(0, -0.6), Vector(0, 0)));
     addFriendlyRobots(
-            TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position}));
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position}));
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({Point(1, 0)}));
 
     auto tactic = std::make_shared<MoveTactic>(false);
@@ -134,11 +134,11 @@ TEST_F(SimulatedThetaStarOscillationTest, test_theta_no_obstacle_straight_path)
 
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-            [destination, tactic](std::shared_ptr<World> world_ptr,
-                                  ValidationCoroutine::push_type& yield) {
-                Rectangle expectedFinalPosition(Point(2.015, 1.015), Point(1.985, 0.985));
-                robotInPolygon(1, expectedFinalPosition, world_ptr, yield);
-            }};
+        [destination, tactic](std::shared_ptr<World> world_ptr,
+                              ValidationCoroutine::push_type& yield) {
+            Rectangle expectedFinalPosition(Point(2.015, 1.015), Point(1.985, 0.985));
+            robotInPolygon(1, expectedFinalPosition, world_ptr, yield);
+        }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
@@ -157,9 +157,9 @@ TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_zig_zag_test)
     int front_wall_x = -1;
     // each gate refers to the center to center distance between each wall
     // The constant offsets can be tweaked to get different distances between each wall
-    int gate_1        = 1;
-    int gate_2        = gate_1 + 2;
-    int gate_3        = gate_2 + 1;
+    int gate_1 = 1;
+    int gate_2 = gate_1 + 2;
+    int gate_3 = gate_2 + 1;
 
     Point destination      = Point(front_wall_x + gate_3 + 0.5, 0);
     Point initial_position = Point(front_wall_x - 0.5, 0);
@@ -168,9 +168,11 @@ TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_zig_zag_test)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position}));
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(front_wall_x, 0.0), Point(front_wall_x, 0.5), Point(front_wall_x, 1),
-         Point(front_wall_x + gate_1, 0.0), Point(front_wall_x + gate_1, -0.5), Point(front_wall_x + gate_1, -1),
-         Point(front_wall_x + gate_2, 0.0), Point(front_wall_x + gate_2, 0.5), Point(front_wall_x + gate_2, 1),
-         Point(front_wall_x + gate_3, 0.0), Point(front_wall_x + gate_3, -0.5), Point(front_wall_x + gate_3, -1)}));
+         Point(front_wall_x + gate_1, 0.0), Point(front_wall_x + gate_1, -0.5),
+         Point(front_wall_x + gate_1, -1), Point(front_wall_x + gate_2, 0.0),
+         Point(front_wall_x + gate_2, 0.5), Point(front_wall_x + gate_2, 1),
+         Point(front_wall_x + gate_3, 0.0), Point(front_wall_x + gate_3, -0.5),
+         Point(front_wall_x + gate_3, -1)}));
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
@@ -184,7 +186,9 @@ TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_zig_zag_test)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
-            Rectangle expectedFinalPosition(Point(2.015, 1.015), Point(1.985, 0.985));
+            Rectangle expectedFinalPosition(
+                Point(destination.x() + 0.015, destination.y() + 0.015),
+                Point(destination.x() - 0.015, destination.y() - 0.015));
             robotInPolygon(1, expectedFinalPosition, world_ptr, yield);
         }};
 
@@ -197,9 +201,10 @@ TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_zig_zag_test)
 TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_oscillation)
 {
     /*
-     * When DISTANCE_THRESHOLD (what determines if we're close enough to destination)
+     * When DISTANCE_THRESHOLD (what determines if robot is close enough to destination)
      * in transition_condition.h is lowered (eg. to 0.02), the robot oscillates back
      * and forth and does not reach a steady state at the destination in some cases.
+     * This test is for visual purposes to check for this bug.
      * Known destinations that oscillate with DISTANCE_THRESHOLD = 0.02:
      *  - (-2.5,-2.5)
      *  - (2.5,-2.5)
