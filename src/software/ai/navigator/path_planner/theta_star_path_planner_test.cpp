@@ -352,18 +352,18 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_robot_and_dest_in_obstacle)
 {
     Field field = Field::createSSLDivisionBField();
     // Both start and dest are inside obstacle
-    Point start{0.96905413818359376, -0.26277551269531252}, dest{1,0};
+    Point start{0.96905413818359376, -0.26277551269531252}, dest{1, 0};
     // Point start{0.9, -0.2}, dest{1,0};
 
     Circle closest_bounding_free_circle = Circle(Point(1, -0.272), 0.1);
-    Circle obstacle = Circle(Point(1, 0), 0.27150299999999999);
-    std::vector<ObstaclePtr> obstacles = std::vector<ObstaclePtr>();
-    obstacles.emplace_back(
-        std::make_shared<GeomObstacle<Circle>>(obstacle));
+    Circle obstacle                     = Circle(Point(1, 0), 0.27150299999999999);
+    std::vector<ObstaclePtr> obstacles  = std::vector<ObstaclePtr>();
+    obstacles.emplace_back(std::make_shared<GeomObstacle<Circle>>(obstacle));
 
     Rectangle navigable_area = field.fieldBoundary();
 
-    // Output how long findPath takes to make sure it is efficient for finding path in obstacle
+    // Output how long findPath takes to make sure it is efficient for finding path in
+    // obstacle
     auto start_time    = std::chrono::system_clock::now();
     auto path          = planner->findPath(start, dest, navigable_area, obstacles);
     double duration_ms = ::TestUtil::millisecondsSince(start_time);
@@ -371,29 +371,31 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_robot_and_dest_in_obstacle)
 
     ASSERT_TRUE(path != std::nullopt);
 
-    std::cout << "end point: " << path->getEndPoint() << std::endl; // (0.969054, -0.262776) for debugging
-    std::cout << "size of path: " << path->getNumKnots() << std::endl; // (0.969054, -0.262776) for debugging
+    std::cout << "end point: " << path->getEndPoint()
+              << std::endl;  // (0.969054, -0.262776) for debugging
+    std::cout << "size of path: " << path->getNumKnots()
+              << std::endl;  // (0.969054, -0.262776) for debugging
     // Check that start is the same, and end point is not in obstacle and near end
     EXPECT_EQ(start, path->getStartPoint());
     EXPECT_TRUE(contains(closest_bounding_free_circle, path->getEndPoint()));
-    EXPECT_FALSE(contains(obstacle, path->getEndPoint())); // FAILS
+    EXPECT_FALSE(contains(obstacle, path->getEndPoint()));  // FAILS
 }
 
 TEST_F(TestThetaStarPathPlanner, test_theta_star_dest_in_obstacle)
 {
     Field field = Field::createSSLDivisionBField();
     // Start is free but dest is inside obstacle
-    Point start{0.8, -0.2}, dest{1,-0.2};
+    Point start{0.8, -0.2}, dest{1, -0.2};
 
     Circle closest_bounding_free_circle = Circle(Point(1, -0.272), 0.1);
-    Circle obstacle = Circle(Point(1, 0), 0.27150299999999999);
-    std::vector<ObstaclePtr> obstacles = std::vector<ObstaclePtr>();
-    obstacles.emplace_back(
-            std::make_shared<GeomObstacle<Circle>>(obstacle));
+    Circle obstacle                     = Circle(Point(1, 0), 0.27150299999999999);
+    std::vector<ObstaclePtr> obstacles  = std::vector<ObstaclePtr>();
+    obstacles.emplace_back(std::make_shared<GeomObstacle<Circle>>(obstacle));
 
     Rectangle navigable_area = field.fieldBoundary();
 
-    // Output how long findPath takes to make sure it is efficient for finding path in obstacle
+    // Output how long findPath takes to make sure it is efficient for finding path in
+    // obstacle
     auto start_time    = std::chrono::system_clock::now();
     auto path          = planner->findPath(start, dest, navigable_area, obstacles);
     double duration_ms = ::TestUtil::millisecondsSince(start_time);
@@ -414,14 +416,14 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_robot_in_obstacle)
     Point start{1, 0}, dest{0.8, -0.2};
 
     Circle closest_bounding_free_circle = Circle(Point(0.8, -0.2), 0.1);
-    Circle obstacle = Circle(Point(1, 0), 0.27150299999999999);
-    std::vector<ObstaclePtr> obstacles = std::vector<ObstaclePtr>();
-    obstacles.emplace_back(
-            std::make_shared<GeomObstacle<Circle>>(obstacle));
+    Circle obstacle                     = Circle(Point(1, 0), 0.27150299999999999);
+    std::vector<ObstaclePtr> obstacles  = std::vector<ObstaclePtr>();
+    obstacles.emplace_back(std::make_shared<GeomObstacle<Circle>>(obstacle));
 
     Rectangle navigable_area = field.fieldBoundary();
 
-    // Output how long findPath takes to make sure it is efficient for finding path in obstacle
+    // Output how long findPath takes to make sure it is efficient for finding path in
+    // obstacle
     auto start_time    = std::chrono::system_clock::now();
     auto path          = planner->findPath(start, dest, navigable_area, obstacles);
     double duration_ms = ::TestUtil::millisecondsSince(start_time);
@@ -429,11 +431,11 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_robot_in_obstacle)
 
     ASSERT_TRUE(path != std::nullopt);
 
-    std::cout << "end point: " << path->getEndPoint() << std::endl; // (1,0)
+    std::cout << "end point: " << path->getEndPoint() << std::endl;  // (1,0)
     // Check that start is the same, and end point is not in obstacle and near end
     EXPECT_EQ(start, path->getStartPoint());
-    EXPECT_TRUE(contains(closest_bounding_free_circle, path->getEndPoint())); // FAILS
-    EXPECT_FALSE(contains(obstacle, path->getEndPoint())); // FAILS
+    EXPECT_TRUE(contains(closest_bounding_free_circle, path->getEndPoint()));  // FAILS
+    EXPECT_FALSE(contains(obstacle, path->getEndPoint()));                     // FAILS
 }
 
 TEST_F(TestThetaStarPathPlanner, test_theta_star_straight_line_not_obstacle)
@@ -442,7 +444,7 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_straight_line_not_obstacle)
     Point start{1, 0}, dest{0.8, -0.2};
 
     Circle closest_bounding_free_circle = Circle(Point(0.8, -0.2), 0.1);
-    std::vector<ObstaclePtr> obstacles = {};
+    std::vector<ObstaclePtr> obstacles  = {};
 
     Rectangle navigable_area = field.fieldBoundary();
 
@@ -454,7 +456,7 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_straight_line_not_obstacle)
     ASSERT_TRUE(path != std::nullopt);
 
     // check if theres actually only 1 point in path array
-    std::cout << "end point: " << path->getEndPoint() << std::endl; // (1,0)
+    std::cout << "end point: " << path->getEndPoint() << std::endl;  // (1,0)
     EXPECT_EQ(start, path->getStartPoint());
     EXPECT_TRUE(contains(closest_bounding_free_circle, path->getEndPoint()));
 }
