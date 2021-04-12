@@ -152,14 +152,25 @@ TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_zig_zag_test)
      * zig-zags. (inspired by the 2021 SSL dribbling hardware challenge)
      * https://robocup-ssl.github.io/ssl-hardware-challenge-rules/rules.html#_challenge_3_dribbling
      */
-    Point destination      = Point(1, 0);
-    Point initial_position = Point(-1.6, 0.2);
+
+    // The x value of the wall in front of the friendly robot
+    int front_wall_x = -1;
+    // each gate refers to the center to center distance between each wall
+    // The constant offsets can be tweaked to get different distances between each wall
+    int gate_1        = 1;
+    int gate_2        = gate_1 + 2;
+    int gate_3        = gate_2 + 1;
+
+    Point destination      = Point(front_wall_x + gate_3 + 0.5, 0);
+    Point initial_position = Point(front_wall_x - 0.5, 0);
     setBallState(BallState(Point(0, -0.6), Vector(0, 0)));
     addFriendlyRobots(
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position}));
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(-1, 0.2), Point(-0.5, -0.2), Point(0, 0.2), Point(0.5, -0.2),
-         Point(-1, 0.7), Point(-0.7, -0.6), Point(0, 0.7)}));
+        {Point(front_wall_x, 0.0), Point(front_wall_x, 0.5), Point(front_wall_x, 1),
+         Point(front_wall_x + gate_1, 0.0), Point(front_wall_x + gate_1, -0.5), Point(front_wall_x + gate_1, -1),
+         Point(front_wall_x + gate_2, 0.0), Point(front_wall_x + gate_2, 0.5), Point(front_wall_x + gate_2, 1),
+         Point(front_wall_x + gate_3, 0.0), Point(front_wall_x + gate_3, -0.5), Point(front_wall_x + gate_3, -1)}));
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
@@ -173,10 +184,8 @@ TEST_F(SimulatedThetaStarOscillationTest, test_theta_star_zig_zag_test)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
-            {
-                yield("Timestamp not at 9.5s");
-            }
+            Rectangle expectedFinalPosition(Point(2.015, 1.015), Point(1.985, 0.985));
+            robotInPolygon(1, expectedFinalPosition, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
