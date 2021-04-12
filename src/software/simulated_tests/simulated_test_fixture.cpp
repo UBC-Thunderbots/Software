@@ -204,7 +204,7 @@ void SimulatedTestFixture::runTest(
     LOG(INFO) << "max tick duration: " << max_tick_duration << "ms" << std::endl;
     LOG(INFO) << "min tick duration: " << min_tick_duration << "ms" << std::endl;
     LOG(INFO) << "avg tick duration: " << avg_tick_duration
-              << "ms (Note: value not accurate if stop_ai_on_start flag was used)"
+              << "ms (Note: value is not accurate if stop_ai_on_start flag was used)"
               << std::endl;
 
     if (!validation_functions_done && !terminating_validation_functions.empty())
