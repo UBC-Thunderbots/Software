@@ -2,6 +2,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
+
 #include "uart_communication.h"
 
 /*
@@ -9,13 +10,12 @@
  * device via UART
  */
 
-class BoostUartCommunication: public UartCommunication
+class BoostUartCommunication : public UartCommunication
 {
     using IoService     = boost::asio::io_service;
     using SerialPortPtr = std::shared_ptr<boost::asio::serial_port>;
 
    public:
-
     /**
      * constructs and opens a serial connection with the given device port
      * settings used: 8 bit data, No flow control, No parity, 1 stop bit

@@ -17,7 +17,6 @@ cc_library(
     hdrs = ["uart_communication.h"],
 )
 
-
 cc_library(
     name = "boost_uart_communication",
     srcs = ["boost_uart_communication.cpp"],

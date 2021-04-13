@@ -1,51 +1,69 @@
 
-#include <cstdio>
-#include <cstring>
+#include "threaded_estop_reader.h"
 
-#include <thread>
 #include <boost/bind/bind.hpp>
 #include <boost/function.hpp>
+#include <cstdio>
+#include <cstring>
+#include <thread>
 #include <utility>
-#include "threaded_estop_reader.h"
+
 #include "software/logger/logger.h"
 
 
-ThreadedEstopReader::ThreadedEstopReader(int startup_ms, int interval_ms, std::unique_ptr<UartCommunication> uart_reader)
-        : startup_ms(startup_ms), interval_ms(interval_ms), timer(io_service, this->interval_ms), estop_msg(0), uart_reader(std::move(uart_reader)), estop_state(EstopState::STOP)
+ThreadedEstopReader::ThreadedEstopReader(int startup_ms, int interval_ms,
+                                         std::unique_ptr<UartCommunication> uart_reader)
+    : startup_ms(startup_ms),
+      interval_ms(interval_ms),
+      timer(io_service, this->interval_ms),
+      estop_msg(0),
+      uart_reader(std::move(uart_reader)),
+      estop_state(EstopState::STOP)
 {
     estop_thread = std::thread(boost::bind(&ThreadedEstopReader::continousRead, this));
 }
 
-void ThreadedEstopReader::continousRead() {
-    timer.async_wait(boost::bind( &ThreadedEstopReader::tick, this, boost::asio::placeholders::error));
+void ThreadedEstopReader::continousRead()
+{
+    timer.async_wait(
+        boost::bind(&ThreadedEstopReader::tick, this, boost::asio::placeholders::error));
     io_service.run();
 }
 
-EstopState ThreadedEstopReader::getEstopState() {
+EstopState ThreadedEstopReader::getEstopState()
+{
     return estop_state;
 }
 
-void ThreadedEstopReader::readEstop() {
+void ThreadedEstopReader::readEstop()
+{
     estop_msg = uart_reader->serialRead(ESTOP_MESSAGE_SIZE);
 
-    if(estop_msg.at(0) == 1){
+    if (estop_msg.at(0) == 1)
+    {
         estop_state = EstopState ::PLAY;
-    } else if (estop_msg.at(0) == 0){
+    }
+    else if (estop_msg.at(0) == 0)
+    {
         estop_state = EstopState::STOP;
-    } else{
+    }
+    else
+    {
         estop_state = EstopState::STATUS_ERROR;
-        LOG(WARNING)<<"read unexpected estop message";
+        LOG(WARNING) << "read unexpected estop message";
     }
 }
 
 void ThreadedEstopReader::tick(const boost::system::error_code& error)
 {
-
     in_destructor_mutex.lock();
-    if(in_destructor){
+    if (in_destructor)
+    {
         in_destructor_mutex.unlock();
         timer.cancel();
-    } else {
+    }
+    else
+    {
         in_destructor_mutex.unlock();
 
         readEstop();
@@ -53,7 +71,8 @@ void ThreadedEstopReader::tick(const boost::system::error_code& error)
         // Reschedule the timer for interval seconds in the future:
         timer.expires_at(timer.expires_at() + interval_ms);
         // Posts the timer event
-        timer.async_wait(boost::bind(&ThreadedEstopReader::tick, this, boost::asio::placeholders::error));
+        timer.async_wait(boost::bind(&ThreadedEstopReader::tick, this,
+                                     boost::asio::placeholders::error));
     }
 }
 
@@ -68,4 +87,3 @@ ThreadedEstopReader::~ThreadedEstopReader()
     // running we will segfault
     estop_thread.join();
 }
-

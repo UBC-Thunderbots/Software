@@ -8,8 +8,7 @@
  */
 class UartCommunication
 {
-
-public:
+   public:
     enum FlushType
     {
         flush_receive = TCIFLUSH,  // flushes data received but not read
@@ -41,12 +40,9 @@ public:
     virtual std::vector<unsigned char> serialRead(size_t num_read_bytes) = 0;
 
     /**
-    * Flushes serial port data
-    * @param flush_type enum that sets the data to be flushed (read, write, or both)
-    * @return true upon success, false otherwise
-    */
+     * Flushes serial port data
+     * @param flush_type enum that sets the data to be flushed (read, write, or both)
+     * @return true upon success, false otherwise
+     */
     virtual bool flushSerialPort(FlushType flush_type) = 0;
-
 };
-
-

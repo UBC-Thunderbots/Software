@@ -3,40 +3,41 @@
 #pragma once
 
 
-#include "uart_communication.h"
-#include <iostream>
 #include <boost/asio.hpp>
-#include <thread>
+#include <iostream>
 #include <mutex>
-#include "software/util/make_enum/make_enum.h"
+#include <thread>
 
-//enum that represents the possible states of estop
+#include "software/util/make_enum/make_enum.h"
+#include "uart_communication.h"
+
+// enum that represents the possible states of estop
 MAKE_ENUM(EstopState, PLAY, STOP, STATUS_ERROR);
 
 /*
  * class that reads status of estop at periodic intervals of time
-*/
+ */
 class ThreadedEstopReader
 {
-public:
-
+   public:
     /**
      * creates and starts a threadedEstopReader with the given parameters
      * @param startup_ms time in milliseconds to wait before first read
      * @param interval_ms time in milliseconds between reads
      * @param uart_reader the UART device acting as source of estop values
      */
-    ThreadedEstopReader(int startup_ms, int interval_ms, std::unique_ptr<UartCommunication> uart_reader);
+    ThreadedEstopReader(int startup_ms, int interval_ms,
+                        std::unique_ptr<UartCommunication> uart_reader);
 
     ~ThreadedEstopReader();
 
     /*
-    * returns the state of estop
-    */
+     * returns the state of estop
+     */
     EstopState getEstopState();
 
 
-private:
+   private:
     /*
      * reads value of Estop and updates estop state
      */
@@ -75,8 +76,4 @@ private:
     std::vector<unsigned char> estop_msg;
     std::unique_ptr<UartCommunication> uart_reader;
     enum EstopState estop_state;
-
 };
-
-
-
