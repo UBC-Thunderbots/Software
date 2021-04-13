@@ -13,7 +13,7 @@
 #include "software/world/world.h"
 
 class SimulatedKickTacticTest
-    : public virtual SimulatedTacticTestFixture,
+    : public SimulatedTacticTestFixture,
       public ::testing::WithParamInterface<std::tuple<Vector, Angle>>
 {
 };

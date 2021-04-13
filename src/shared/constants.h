@@ -137,3 +137,7 @@ const unsigned int MAX_ROBOT_IDS = 16;
 const float ROBOT_MAX_BATTERY_VOLTAGE = 16.0;
 
 const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;
+
+// How many robots are allowed in each division
+const unsigned DIV_A_NUM_ROBOTS = 11;
+const unsigned DIV_B_NUM_ROBOTS = 6;
