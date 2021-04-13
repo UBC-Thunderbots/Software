@@ -295,7 +295,7 @@ bool ThetaStarPathPlanner::findPathToEnd(const Coordinate &end_coord)
 
         // Check if current coordinate or its surrounding neighbours are at the
         // destination
-        if (current_coord == end_coord || visitNeighbours(current_coord, end_coord))
+        if (visitNeighbours(current_coord, end_coord))
         {
             return true;
         }

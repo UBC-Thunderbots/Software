@@ -171,10 +171,10 @@ void SimulatedTestFixture::runTest(
     bool validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);
 
     // Logging duration of each tick starting at second tick
-    int tick_count           = 2;
-    auto start_time          = std::chrono::system_clock::now();
-    double max_tick_duration = 0.0;
-    double min_tick_duration = 10000.0;
+    int tick_count             = 0;
+    double total_tick_duration = 0.0;
+    double max_tick_duration   = 0.0;
+    double min_tick_duration   = 10000.0;
 
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
@@ -192,20 +192,16 @@ void SimulatedTestFixture::runTest(
 
         // Calculate tick durations
         double duration_ms = ::TestUtil::millisecondsSince(start_tick_time);
-        max_tick_duration =
-            max_tick_duration > duration_ms ? max_tick_duration : duration_ms;
-        min_tick_duration =
-            min_tick_duration < duration_ms ? min_tick_duration : duration_ms;
+        total_tick_duration += duration_ms;
+        max_tick_duration = std::max(max_tick_duration, duration_ms);
+        min_tick_duration = std::min(min_tick_duration, duration_ms);
         tick_count++;
     }
     // Output the tick duration results
-    double total_simulation_duration = ::TestUtil::millisecondsSince(start_time);
-    double avg_tick_duration         = total_simulation_duration / (double)tick_count;
+    double avg_tick_duration = total_tick_duration / tick_count;
     LOG(INFO) << "max tick duration: " << max_tick_duration << "ms" << std::endl;
     LOG(INFO) << "min tick duration: " << min_tick_duration << "ms" << std::endl;
-    LOG(INFO) << "avg tick duration: " << avg_tick_duration
-              << "ms (Note: value is not accurate if stop_ai_on_start flag was used)"
-              << std::endl;
+    LOG(INFO) << "avg tick duration: " << avg_tick_duration << "ms" << std::endl;
 
     if (!validation_functions_done && !terminating_validation_functions.empty())
     {

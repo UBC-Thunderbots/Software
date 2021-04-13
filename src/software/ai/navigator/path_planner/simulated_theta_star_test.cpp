@@ -38,8 +38,8 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_obstacle)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
-            Rectangle expectedFinalPosition(Point(0.985, -0.26), Point(1.15, -0.3));
-            robotInPolygon(1, expectedFinalPosition, world_ptr, yield);
+            Rectangle expected_final_position(Point(0.985, -0.26), Point(1.15, -0.3));
+            robotInPolygon(1, expected_final_position, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
@@ -71,8 +71,8 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_dest_in_obstacle)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
-            Rectangle expectedFinalPosition(Point(0.985, -0.26), Point(1.15, -0.3));
-            robotInPolygon(1, expectedFinalPosition, world_ptr, yield);
+            Rectangle expected_final_position(Point(0.985, -0.26), Point(1.15, -0.3));
+            robotInPolygon(1, expected_final_position, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
@@ -104,8 +104,8 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_in_obstacle)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
-            Rectangle expectedFinalPosition(Point(0.015, 0.015), Point(-0.015, -0.015));
-            robotInPolygon(1, expectedFinalPosition, world_ptr, yield);
+            Rectangle expected_final_position(Point(0.015, 0.015), Point(-0.015, -0.015));
+            robotInPolygon(1, expected_final_position, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
@@ -136,8 +136,8 @@ TEST_F(SimulatedThetaStarTest, test_theta_no_obstacle_straight_path)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
-            Rectangle expectedFinalPosition(Point(2.015, 1.015), Point(1.985, 0.985));
-            robotInPolygon(1, expectedFinalPosition, world_ptr, yield);
+            Rectangle expected_final_position(Point(-2.015, 1.015), Point(-1.985, 0.985));
+            robotInPolygon(1, expected_final_position, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
@@ -155,8 +155,9 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_zig_zag_test)
 
     // The x value of the wall in front of the friendly robot
     int front_wall_x = -1;
-    // each gate refers to the center to center distance between each wall
-    // The constant offsets can be tweaked to get different distances between each wall
+    // each gate refers to the center to center distance between each wall and the front
+    // wall The constant offsets can be tweaked to get different distances between each
+    // wall
     int gate_1 = 1;
     int gate_2 = gate_1 + 2;
     int gate_3 = gate_2 + 1;
@@ -186,10 +187,10 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_zig_zag_test)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
-            Rectangle expectedFinalPosition(
+            Rectangle expected_final_position(
                 Point(destination.x() + 0.015, destination.y() + 0.015),
                 Point(destination.x() - 0.015, destination.y() - 0.015));
-            robotInPolygon(1, expectedFinalPosition, world_ptr, yield);
+            robotInPolygon(1, expected_final_position, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
