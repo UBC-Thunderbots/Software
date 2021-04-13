@@ -3,6 +3,11 @@
 #include <gmock/gmock.h>
 #include "uart_communication.h"
 
+
+/*
+ * A mock of UartCommunication class used for testing purposes
+ */
+
 class MockUart : public UartCommunication
 {
 public:

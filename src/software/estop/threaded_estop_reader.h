@@ -19,12 +19,19 @@ MAKE_ENUM(EstopState, PLAY, STOP, STATUS_ERROR);
 class ThreadedEstopReader
 {
 public:
+
+    /**
+     * creates and starts a threadedEstopReader with the given parameters
+     * @param startup_ms time in milliseconds to wait before first read
+     * @param interval_ms time in milliseconds between reads
+     * @param uart_reader the UART device acting as source of estop values
+     */
     ThreadedEstopReader(int startup_ms, int interval_ms, std::unique_ptr<UartCommunication> uart_reader);
 
     ~ThreadedEstopReader();
 
     /*
-    * returns whether estop is in PLAY state
+    * returns the state of estop
     */
     EstopState getEstopState();
 
@@ -36,9 +43,13 @@ private:
     void readEstop();
 
     /*
-     * handler method that is called everytime the timer expires.
+     * handler method that is called every time the timer expires.
      */
     void tick(const boost::system::error_code&);
+
+    /*
+     * method that initiates timer
+     */
     void continousRead();
 
     /*
@@ -59,11 +70,11 @@ private:
     std::thread estop_thread;
 
     std::mutex in_destructor_mutex;
-    bool inDestructor = false;
+    bool in_destructor = false;
 
-    std::vector<unsigned char> estopMsg;
+    std::vector<unsigned char> estop_msg;
     std::unique_ptr<UartCommunication> uart_reader;
-    enum EstopState estopState;
+    enum EstopState estop_state;
 
 };
 
