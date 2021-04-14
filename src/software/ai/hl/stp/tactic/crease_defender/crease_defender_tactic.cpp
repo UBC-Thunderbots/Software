@@ -11,11 +11,11 @@
 #include "software/geom/segment.h"
 #include "software/logger/logger.h"
 
-CreaseDefenderTactic::CreaseDefenderTactic(
-    CreaseDefenderAlignment crease_defender_alignment)
-    : Tactic(true, {RobotCapability::Move}), fsm(), control_params()
+CreaseDefenderTactic::CreaseDefenderTactic()
+    : Tactic(true, {RobotCapability::Move}),
+      fsm(),
+      control_params({Point(0, 0), CreaseDefenderAlignment::CENTRE})
 {
-    control_params.crease_defender_alignment = crease_defender_alignment;
 }
 
 void CreaseDefenderTactic::updateWorldParams(const World &world) {}
@@ -50,8 +50,14 @@ void CreaseDefenderTactic::accept(TacticVisitor &visitor) const
     visitor.visit(*this);
 }
 
+void CreaseDefenderTactic::updateControlParams(const Point &enemy_threat_origin,
+                                               const CreaseDefenderAlignment &alignment)
+{
+    control_params.enemy_threat_origin       = enemy_threat_origin;
+    control_params.crease_defender_alignment = alignment;
+}
+
 void CreaseDefenderTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    control_params.enemy_threat_origin = tactic_update.world.ball().position();
     fsm.process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
 }

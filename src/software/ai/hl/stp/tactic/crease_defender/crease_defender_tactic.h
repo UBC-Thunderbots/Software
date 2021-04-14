@@ -30,11 +30,19 @@ class CreaseDefenderTactic : public Tactic
     /**
      * Creates a new CreaseDefenderTactic
      */
-    explicit CreaseDefenderTactic(CreaseDefenderAlignment crease_defender_alignment);
-
-    CreaseDefenderTactic() = delete;
+    explicit CreaseDefenderTactic();
 
     void updateWorldParams(const World &world) override;
+
+
+    /**
+     * Update control params for this tactic
+     *
+     * @param enemy_threat_origin The origin of the enemy threat
+     * @param alignment The alignment for this crease defender
+     */
+    void updateControlParams(const Point &enemy_threat_origin,
+                             const CreaseDefenderAlignment &alignment);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

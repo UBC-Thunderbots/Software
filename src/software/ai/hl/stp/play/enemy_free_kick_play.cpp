@@ -35,8 +35,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         play_config->getGoalieTacticConfig());
 
     // Init a Crease Defender Tactic
-    auto crease_defender_tactic =
-        std::make_shared<CreaseDefenderTactic>(CreaseDefenderAlignment::RIGHT);
+    auto crease_defender_tactic = std::make_shared<CreaseDefenderTactic>();
 
     // Init FreeKickShadower tactics (these robots will both block the enemy robot taking
     // a free kick (at most we will have 2
@@ -81,6 +80,8 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         tactics_to_run[0].emplace_back(shadow_free_kicker_1);
         tactics_to_run[0].emplace_back(shadow_free_kicker_2);
         // Add Crease defender tactic
+        crease_defender_tactic->updateControlParams(world.ball().position(),
+                                                    CreaseDefenderAlignment::CENTRE);
         tactics_to_run[0].emplace_back(crease_defender_tactic);
 
 

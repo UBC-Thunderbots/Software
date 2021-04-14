@@ -52,8 +52,8 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
         play_config->getGoalieTacticConfig());
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(CreaseDefenderAlignment::LEFT),
-        std::make_shared<CreaseDefenderTactic>(CreaseDefenderAlignment::RIGHT),
+        std::make_shared<CreaseDefenderTactic>(),
+        std::make_shared<CreaseDefenderTactic>(),
     };
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {
@@ -75,23 +75,14 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
     {
         PriorityTacticVector result = {{goalie_tactic}};
 
-        // If we have any crease defenders, we don't want the goalie tactic to consider
-        // them when deciding where to block
-        Team friendly_team_for_goalie = world.friendlyTeam();
-        for (auto crease_defender_tactic : crease_defender_tactics)
-        {
-            if (crease_defender_tactic->getAssignedRobot())
-            {
-                friendly_team_for_goalie.removeRobotWithId(
-                    crease_defender_tactic->getAssignedRobot()->id());
-            }
-        }
-
         // Update crease defenders
-        for (auto &crease_defender_tactic : crease_defender_tactics)
-        {
-            result[0].emplace_back(crease_defender_tactic);
-        }
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        result[0].emplace_back(std::get<0>(crease_defender_tactics));
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
+        result[0].emplace_back(std::get<1>(crease_defender_tactics));
 
         // Update tactics moving to open areas
         std::vector<Point> enemy_robot_points;

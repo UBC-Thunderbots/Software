@@ -54,8 +54,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
         play_config->getGoalieTacticConfig());
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(CreaseDefenderAlignment::LEFT),
-        std::make_shared<CreaseDefenderTactic>(CreaseDefenderAlignment::RIGHT),
+        std::make_shared<CreaseDefenderTactic>(),
+        std::make_shared<CreaseDefenderTactic>(),
     };
 
     // Have a robot keep trying to take a shot
@@ -111,6 +111,12 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
             passer->updateControlParams(pass);
             receiver->updateControlParams(pass);
 
+            std::get<0>(crease_defender_tactics)
+                ->updateControlParams(world.ball().position(),
+                                      CreaseDefenderAlignment::LEFT);
+            std::get<1>(crease_defender_tactics)
+                ->updateControlParams(world.ball().position(),
+                                      CreaseDefenderAlignment::RIGHT);
             if (!passer->done())
             {
                 yield({{goalie_tactic, passer, receiver},
@@ -181,6 +187,11 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.rating;
 
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
         yield({{goalie_tactic},
                {shoot_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
                 std::get<0>(crease_defender_tactics),

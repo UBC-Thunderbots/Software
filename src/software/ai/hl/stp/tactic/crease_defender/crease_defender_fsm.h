@@ -117,9 +117,9 @@ struct CreaseDefenderFSM
                 LOG(WARNING)
                     << "Could not find a point on the defense area to block a potential shot";
             }
-            Angle face_threat_orientation = (event.control_params.enemy_threat_origin -
-                                             event.common.world.ball().position())
-                                                .orientation();
+            Angle face_threat_orientation =
+                (event.control_params.enemy_threat_origin - event.common.robot.position())
+                    .orientation();
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), destination, face_threat_orientation, 0.0,
                 DribblerMode::OFF, BallCollisionType::ALLOW,

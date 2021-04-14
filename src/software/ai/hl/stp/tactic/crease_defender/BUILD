@@ -19,15 +19,3 @@ cc_library(
         "//software/logger",
     ],
 )
-
-cc_test(
-    name = "crease_defender_tactic_test",
-    srcs = ["crease_defender_tactic_test.cpp"],
-    deps = [
-        ":crease_defender_tactic",
-        "//shared:constants",
-        "//software/ai/intent:move_intent",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
