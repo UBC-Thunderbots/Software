@@ -4,6 +4,7 @@
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/acute_angle.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/ray.h"
 #include "software/logger/logger.h"
@@ -26,6 +27,15 @@ struct CreaseDefenderFSM
     // this struct defines the only event that the CreaseDefenderFSM responds to
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
+    /**
+     * Finds the point to block the threat
+     *
+     * @param field The field
+     * @param enemy_threat_origin The origin of the threat to defend against
+     * @param crease_defender_alignment alignment of the crease defender
+     *
+     * @return The best point to block the threat if it exists
+     */
     static std::optional<Point> findBlockThreatPoint(
         const Field& field, const Point& enemy_threat_origin,
         const CreaseDefenderAlignment& crease_defender_alignment)
@@ -83,10 +93,15 @@ struct CreaseDefenderFSM
             Angle face_threat_orientation =
                 (event.control_params.enemy_threat_origin - event.common.robot.position())
                     .orientation();
+
+            // Chip to the enemy half of the field
+            double chip_distance = event.common.world.field().xLength() / 2.0 *
+                                   std::cos(face_threat_orientation.toRadians());
+
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), destination, face_threat_orientation, 0.0,
                 DribblerMode::OFF, BallCollisionType::ALLOW,
-                AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, 2.0},
+                AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, chip_distance},
                 MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
         };
 
@@ -97,16 +112,31 @@ struct CreaseDefenderFSM
          *
          * @return if robot has reached the destination
          */
-        const auto move_done = [](auto event) { return false; };
+        const auto ball_in_enemy_half = [](auto event) {
+            return contains(event.common.world.field().enemyHalf(),
+                            event.common.world.ball().position());
+        };
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *block_threat_s + update_e[!move_done] / block_threat = block_threat_s,
-            block_threat_s + update_e[move_done] / block_threat   = X,
-            X + update_e[!move_done] / block_threat               = block_threat_s);
+            *block_threat_s + update_e[!ball_in_enemy_half] / block_threat =
+                block_threat_s,
+            block_threat_s + update_e[ball_in_enemy_half] / block_threat = X,
+            X + update_e[!ball_in_enemy_half] / block_threat = block_threat_s);
     }
 
    private:
+    /**
+     * Finds the intersection with the front or sides of the defense area with the given
+     * ray
+     *
+     * @param field The field that has the friendly defense area
+     * @param ray The ray to intersect
+     *
+     * @return the intersection with the front or sides of the defense area, returns
+     * std::nullopt if there is no intersection or if the start point of the ray is inside
+     * or behind the defense area
+     */
     static std::optional<Point> findDefenseAreaIntersection(const Field& field,
                                                             const Ray& ray)
     {
@@ -129,7 +159,8 @@ struct CreaseDefenderFSM
         auto right_segment = Segment(inflated_defense_area.posXNegYCorner(),
                                      inflated_defense_area.negXNegYCorner());
         std::vector<Point> front_intersections = intersection(ray, front_segment);
-        if (!front_intersections.empty())
+        if (!front_intersections.empty() &&
+            ray.getStart().x() > front_segment.getStart().x())
         {
             return front_intersections[0];
         }
