@@ -37,7 +37,11 @@ TEST_F(SimulatedCreaseDefenderTacticChipTest, test_chip_ball)
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
 
-    auto tactic = std::make_shared<CreaseDefenderTactic>();
+    auto robot_navigation_obstacle_config =
+        std::make_shared<RobotNavigationObstacleConfig>();
+
+    auto tactic =
+        std::make_shared<CreaseDefenderTactic>(robot_navigation_obstacle_config);
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(tactic);
     setRobotId(0);
@@ -47,7 +51,7 @@ TEST_F(SimulatedCreaseDefenderTacticChipTest, test_chip_ball)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [tactic](std::shared_ptr<World> world_ptr,
                  ValidationCoroutine::push_type& yield) {
-            // TODO: check that ball was kicked
+            ballKicked(Angle::zero(), world_ptr, yield);
             while (!tactic->done())
             {
                 yield("Tactic not done");
@@ -74,7 +78,11 @@ TEST_P(SimulatedCreaseDefenderTacticPositionTest, crease_defender_test)
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
 
-    auto tactic = std::make_shared<CreaseDefenderTactic>();
+    auto robot_navigation_obstacle_config =
+        std::make_shared<RobotNavigationObstacleConfig>();
+
+    auto tactic =
+        std::make_shared<CreaseDefenderTactic>(robot_navigation_obstacle_config);
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(tactic);
     setRobotId(0);

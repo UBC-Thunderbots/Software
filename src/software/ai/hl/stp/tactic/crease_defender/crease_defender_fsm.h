@@ -22,6 +22,7 @@ struct CreaseDefenderFSM
     {
         Point enemy_threat_origin;
         CreaseDefenderAlignment crease_defender_alignment;
+        double robot_obstacle_inflation_factor;
     };
 
     // this struct defines the only event that the CreaseDefenderFSM responds to
@@ -33,12 +34,14 @@ struct CreaseDefenderFSM
      * @param field The field
      * @param enemy_threat_origin The origin of the threat to defend against
      * @param crease_defender_alignment alignment of the crease defender
+     * @param robot_obstacle_inflation_factor The robot obstacle inflation factor
      *
      * @return The best point to block the threat if it exists
      */
     static std::optional<Point> findBlockThreatPoint(
         const Field& field, const Point& enemy_threat_origin,
-        const CreaseDefenderAlignment& crease_defender_alignment)
+        const CreaseDefenderAlignment& crease_defender_alignment,
+        double robot_obstacle_inflation_factor)
     {
         Angle shot_angle_increment =
             acuteAngle(field.friendlyGoalpostPos(), enemy_threat_origin,
@@ -59,7 +62,7 @@ struct CreaseDefenderFSM
         // Shot ray to block
         Ray ray(enemy_threat_origin, angle_to_block);
 
-        return findDefenseAreaIntersection(field, ray);
+        return findDefenseAreaIntersection(field, ray, robot_obstacle_inflation_factor);
     }
 
     auto operator()()
@@ -80,7 +83,8 @@ struct CreaseDefenderFSM
             Point destination       = event.common.robot.position();
             auto block_threat_point = findBlockThreatPoint(
                 event.common.world.field(), event.control_params.enemy_threat_origin,
-                event.control_params.crease_defender_alignment);
+                event.control_params.crease_defender_alignment,
+                event.control_params.robot_obstacle_inflation_factor);
             if (block_threat_point)
             {
                 destination = block_threat_point.value();
@@ -95,8 +99,14 @@ struct CreaseDefenderFSM
                     .orientation();
 
             // Chip to the enemy half of the field
-            double chip_distance = event.common.world.field().xLength() / 2.0 *
-                                   std::cos(face_threat_orientation.toRadians());
+            double chip_distance = event.common.world.field().xLength() / 3.0;
+            // If enemy threat is on the sides, then chip to near the edge of the field
+            if (event.control_params.enemy_threat_origin.x() <
+                event.common.world.field().friendlyDefenseArea().xMax())
+            {
+                chip_distance = event.common.world.field().yLength() / 3.0 -
+                                event.common.world.field().friendlyDefenseArea().yMax();
+            }
 
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), destination, face_threat_orientation, 0.0,
@@ -132,19 +142,20 @@ struct CreaseDefenderFSM
      *
      * @param field The field that has the friendly defense area
      * @param ray The ray to intersect
+     * @param robot_obstacle_inflation_factor The robot obstacle inflation factor
      *
      * @return the intersection with the front or sides of the defense area, returns
      * std::nullopt if there is no intersection or if the start point of the ray is inside
      * or behind the defense area
      */
-    static std::optional<Point> findDefenseAreaIntersection(const Field& field,
-                                                            const Ray& ray)
+    static std::optional<Point> findDefenseAreaIntersection(
+        const Field& field, const Ray& ray, double robot_obstacle_inflation_factor)
     {
         // Return the segments that form the path around the crease that the
         // defenders must follow. It's basically the crease inflated by one robot radius
         // multiplied by a factor
-        // TODO: fix this 1.5 constant with a dynamic param
-        double robot_radius_expansion_amount = ROBOT_MAX_RADIUS_METERS * 2.0167;
+        double robot_radius_expansion_amount =
+            ROBOT_MAX_RADIUS_METERS * robot_obstacle_inflation_factor;
         Rectangle inflated_defense_area =
             field.friendlyDefenseArea()
                 .expand(Vector(-1, 0).normalize(robot_radius_expansion_amount))

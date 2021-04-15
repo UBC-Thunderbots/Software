@@ -11,10 +11,14 @@
 #include "software/geom/segment.h"
 #include "software/logger/logger.h"
 
-CreaseDefenderTactic::CreaseDefenderTactic()
+CreaseDefenderTactic::CreaseDefenderTactic(
+    std::shared_ptr<const RobotNavigationObstacleConfig> robot_navigation_obstacle_config)
     : Tactic(true, {RobotCapability::Move}),
       fsm(),
-      control_params({Point(0, 0), CreaseDefenderAlignment::CENTRE})
+      control_params(
+          {Point(0, 0), CreaseDefenderAlignment::CENTRE,
+           robot_navigation_obstacle_config->getRobotObstacleInflationFactor()->value()}),
+      robot_navigation_obstacle_config(robot_navigation_obstacle_config)
 {
 }
 
@@ -25,7 +29,8 @@ double CreaseDefenderTactic::calculateRobotCost(const Robot &robot,
 {
     auto block_point = CreaseDefenderFSM::findBlockThreatPoint(
         world.field(), control_params.enemy_threat_origin,
-        control_params.crease_defender_alignment);
+        control_params.crease_defender_alignment,
+        robot_navigation_obstacle_config->getRobotObstacleInflationFactor()->value());
     // Prefer robots closer to the crease defender desired position
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
@@ -68,5 +73,7 @@ bool CreaseDefenderTactic::done() const
 
 void CreaseDefenderTactic::updateIntent(const TacticUpdate &tactic_update)
 {
+    control_params.robot_obstacle_inflation_factor =
+        robot_navigation_obstacle_config->getRobotObstacleInflationFactor()->value();
     fsm.process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
 }

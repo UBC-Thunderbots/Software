@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
@@ -29,8 +30,13 @@ class CreaseDefenderTactic : public Tactic
    public:
     /**
      * Creates a new CreaseDefenderTactic
+     *
+     * @param robot_navigation_obstacle_config The config
      */
-    explicit CreaseDefenderTactic();
+    explicit CreaseDefenderTactic(std::shared_ptr<const RobotNavigationObstacleConfig>
+                                      robot_navigation_obstacle_config);
+
+    CreaseDefenderTactic() = delete;
 
     void updateWorldParams(const World &world) override;
     bool done() const override;
@@ -62,4 +68,5 @@ class CreaseDefenderTactic : public Tactic
     // Tactic parameters
     FSM<CreaseDefenderFSM> fsm;
     CreaseDefenderFSM::ControlParams control_params;
+    std::shared_ptr<const RobotNavigationObstacleConfig> robot_navigation_obstacle_config;
 };
