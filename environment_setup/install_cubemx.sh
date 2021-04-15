@@ -50,7 +50,14 @@ else
     echo -n "pushd /opt/STM32CubeMX_$CUBE_VERSION && ./STM32CubeMX && popd" >> cuberunner.sh
     
     curl -O $CUBE_LINK
-    unzip $CUBE_ZIP_FILENAME
+
+    if ! unzip $CUBE_ZIP_FILENAME ; then
+        echo "##############################################################"
+        echo "Error: Installing CubeMX failed"
+        echo "Could not unzip $CUBE_ZIP_FILENAME"
+        echo "##############################################################"
+        exit 1
+    fi
     
     sudo java -jar ./SetupSTM32CubeMX-$CUBE_VERSION auto-install.xml
     sudo cp ./cuberunner.sh /opt/STM32CubeMX_$CUBE_VERSION/cuberunner.sh
@@ -62,8 +69,15 @@ else
     sudo chmod +x cuberunner.sh
     sudo ln -sfn /opt/STM32CubeMX_$CUBE_VERSION/cuberunner.sh /usr/local/bin/STM32CubeMX 
 
-    echo "================================================================"
-    echo "Done Installing CubeMX to $CUBEMX_INSTALL_DIR"
-    echo "NOTE: if you are upgrading versions, you can delete older versions in the /opt directory"
-    echo "================================================================"
+    if [[ $? == 0 ]] ; then
+        echo "================================================================"
+        echo "Done Installing CubeMX to $CUBEMX_INSTALL_DIR"
+        echo "NOTE: if you are upgrading versions, you can delete older versions in the /opt directory"
+        echo "================================================================"
+    else
+        echo "##############################################################"
+        echo "Error: Installing CubeMX failed"
+        echo "##############################################################"
+        exit 1
+    fi
 fi
