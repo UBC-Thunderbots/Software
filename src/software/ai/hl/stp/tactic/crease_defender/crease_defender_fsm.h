@@ -119,8 +119,7 @@ struct CreaseDefenderFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *block_threat_s + update_e[!ball_in_enemy_half] / block_threat =
-                block_threat_s,
+            *block_threat_s + update_e[!ball_in_enemy_half] / block_threat,
             block_threat_s + update_e[ball_in_enemy_half] / block_threat = X,
             X + update_e[!ball_in_enemy_half] / block_threat             = block_threat_s,
             X + update_e[ball_in_enemy_half] / block_threat);
