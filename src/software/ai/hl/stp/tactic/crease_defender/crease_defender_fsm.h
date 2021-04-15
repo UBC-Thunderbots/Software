@@ -122,7 +122,8 @@ struct CreaseDefenderFSM
             *block_threat_s + update_e[!ball_in_enemy_half] / block_threat =
                 block_threat_s,
             block_threat_s + update_e[ball_in_enemy_half] / block_threat = X,
-            X + update_e[!ball_in_enemy_half] / block_threat = block_threat_s);
+            X + update_e[!ball_in_enemy_half] / block_threat             = block_threat_s,
+            X + update_e[ball_in_enemy_half] / block_threat);
     }
 
    private:
@@ -144,7 +145,7 @@ struct CreaseDefenderFSM
         // defenders must follow. It's basically the crease inflated by one robot radius
         // multiplied by a factor
         // TODO: fix this 1.5 constant with a dynamic param
-        double robot_radius_expansion_amount = ROBOT_MAX_RADIUS_METERS * 1.5;
+        double robot_radius_expansion_amount = ROBOT_MAX_RADIUS_METERS * 2.0167;
         Rectangle inflated_defense_area =
             field.friendlyDefenseArea()
                 .expand(Vector(-1, 0).normalize(robot_radius_expansion_amount))

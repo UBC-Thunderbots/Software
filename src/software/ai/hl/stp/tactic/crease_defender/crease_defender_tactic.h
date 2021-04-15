@@ -33,7 +33,7 @@ class CreaseDefenderTactic : public Tactic
     explicit CreaseDefenderTactic();
 
     void updateWorldParams(const World &world) override;
-
+    bool done() const override;
 
     /**
      * Update control params for this tactic

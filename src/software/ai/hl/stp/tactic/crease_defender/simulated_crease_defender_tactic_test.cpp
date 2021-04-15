@@ -13,18 +13,54 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedMoveTacticTest : public SimulatedTacticTestFixture
-{
-};
-
-class SimulatedCreaseDefenderTacticTest
+class SimulatedCreaseDefenderTacticPositionTest
     : public SimulatedTacticTestFixture,
       public ::testing::WithParamInterface<
           std::tuple<Point, CreaseDefenderAlignment, Rectangle>>
 {
 };
 
-TEST_P(SimulatedCreaseDefenderTacticTest, passer_test)
+class SimulatedCreaseDefenderTacticChipTest : public SimulatedTacticTestFixture
+{
+};
+
+TEST_F(SimulatedCreaseDefenderTacticChipTest, test_chip_ball)
+{
+    Point enemy_threat_point          = Point(-1.5, 0.5);
+    CreaseDefenderAlignment alignment = CreaseDefenderAlignment::CENTRE;
+
+    Point initial_position = Point(-3, 1.5);
+    setBallState(BallState(enemy_threat_point, Vector(-2, 0)));
+    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({initial_position}));
+    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
+        {Point(1, 0), Point(1, 2.5), Point(1, -1.5), field().enemyGoalCenter(),
+         field().enemyDefenseArea().negXNegYCorner(),
+         field().enemyDefenseArea().negXPosYCorner()}));
+
+    auto tactic = std::make_shared<CreaseDefenderTactic>();
+    tactic->updateControlParams(enemy_threat_point, alignment);
+    setTactic(tactic);
+    setRobotId(0);
+    setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                          MotionConstraint::FRIENDLY_DEFENSE_AREA});
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [tactic](std::shared_ptr<World> world_ptr,
+                 ValidationCoroutine::push_type& yield) {
+            // TODO: check that ball was kicked
+            while (!tactic->done())
+            {
+                yield("Tactic not done");
+            }
+        }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
+}
+
+TEST_P(SimulatedCreaseDefenderTacticPositionTest, crease_defender_test)
 {
     Point enemy_threat_point          = std::get<0>(GetParam());
     CreaseDefenderAlignment alignment = std::get<1>(GetParam());
@@ -42,7 +78,8 @@ TEST_P(SimulatedCreaseDefenderTacticTest, passer_test)
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(tactic);
     setRobotId(0);
-    setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION});
+    setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                          MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [target_defend_location, tactic](std::shared_ptr<World> world_ptr,
@@ -62,7 +99,7 @@ TEST_P(SimulatedCreaseDefenderTacticTest, passer_test)
 }
 
 INSTANTIATE_TEST_CASE_P(
-    CreaseDefenderEnvironment, SimulatedCreaseDefenderTacticTest,
+    CreaseDefenderEnvironment, SimulatedCreaseDefenderTacticPositionTest,
     ::testing::Values(
         // Enemy threat in front of crease, LEFT
         std::make_tuple(Point(1, 2.5), CreaseDefenderAlignment::LEFT,

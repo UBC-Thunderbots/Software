@@ -57,6 +57,11 @@ void CreaseDefenderTactic::updateControlParams(const Point &enemy_threat_origin,
     control_params.crease_defender_alignment = alignment;
 }
 
+bool CreaseDefenderTactic::done() const
+{
+    return fsm.is(boost::sml::X);
+}
+
 void CreaseDefenderTactic::updateIntent(const TacticUpdate &tactic_update)
 {
     fsm.process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
