@@ -1,0 +1,87 @@
+#include <gtest/gtest.h>
+
+#include <utility>
+
+#include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
+#include "software/geom/algorithms/contains.h"
+#include "software/simulated_tests/simulated_tactic_test_fixture.h"
+#include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
+#include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
+#include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
+#include "software/simulated_tests/validation/validation_function.h"
+#include "software/test_util/test_util.h"
+#include "software/time/duration.h"
+#include "software/world/world.h"
+
+class SimulatedMoveTacticTest : public SimulatedTacticTestFixture
+{
+};
+
+class SimulatedCreaseDefenderTacticTest
+    : public SimulatedTacticTestFixture,
+      public ::testing::WithParamInterface<
+          std::tuple<Point, CreaseDefenderAlignment, Rectangle>>
+{
+};
+
+TEST_P(SimulatedCreaseDefenderTacticTest, passer_test)
+{
+    Point enemy_threat_point          = std::get<0>(GetParam());
+    CreaseDefenderAlignment alignment = std::get<1>(GetParam());
+    Rectangle target_defend_location  = std::get<2>(GetParam());
+
+    Point initial_position = Point(-3, 1.5);
+    setBallState(BallState(Point(4.5, -3), Vector(0, 0)));
+    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({initial_position}));
+    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
+        {Point(1, 0), enemy_threat_point, Point(1, -1.5), field().enemyGoalCenter(),
+         field().enemyDefenseArea().negXNegYCorner(),
+         field().enemyDefenseArea().negXPosYCorner()}));
+
+    auto tactic = std::make_shared<CreaseDefenderTactic>();
+    tactic->updateControlParams(enemy_threat_point, alignment);
+    setTactic(tactic);
+    setRobotId(0);
+    setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION});
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [target_defend_location, tactic](std::shared_ptr<World> world_ptr,
+                                         ValidationCoroutine::push_type& yield) {
+            // Check that conditions hold for 1000 ticks
+            unsigned num_ticks = 1000;
+            for (unsigned i = 0; i < num_ticks; i++)
+            {
+                robotInPolygon(0, target_defend_location, world_ptr, yield);
+            }
+        }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
+}
+
+INSTANTIATE_TEST_CASE_P(
+    CreaseDefenderEnvironment, SimulatedCreaseDefenderTacticTest,
+    ::testing::Values(
+        // Enemy threat in front of crease, LEFT
+        std::make_tuple(Point(1, 2.5), CreaseDefenderAlignment::LEFT,
+                        Rectangle(Point(-3.5, 1), Point(-3.25, 0.8))),
+        // Enemy threat in front of crease, CENTRE
+        std::make_tuple(Point(1, -2.5), CreaseDefenderAlignment::CENTRE,
+                        Rectangle(Point(-3.5, -0.5), Point(-3.25, -0.7))),
+        // Enemy threat in front of crease, RIGHT
+        std::make_tuple(Point(1.5, 2), CreaseDefenderAlignment::RIGHT,
+                        Rectangle(Point(-3.25, 0.7), Point(-3, 0.5))),
+        // Enemy threat left side of crease, RIGHT
+        std::make_tuple(Point(-4.25, 2.5), CreaseDefenderAlignment::RIGHT,
+                        Rectangle(Point(-4.3, 1), Point(-4.5, 1.2))),
+        // Enemy threat left side of crease, CENTRE
+        std::make_tuple(Point(-4, 2.5), CreaseDefenderAlignment::CENTRE,
+                        Rectangle(Point(-4.2, 1), Point(-4.3, 1.2))),
+        // Enemy threat right side of crease, RIGHT
+        std::make_tuple(Point(-4, -2), CreaseDefenderAlignment::RIGHT,
+                        Rectangle(Point(-4.3, -1), Point(-4.1, -1.2))),
+        // Enemy threat right side of crease, LEFT
+        std::make_tuple(Point(-4.25, -2), CreaseDefenderAlignment::LEFT,
+                        Rectangle(Point(-4.3, -1), Point(-4.1, -1.2)))));

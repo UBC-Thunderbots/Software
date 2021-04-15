@@ -1,6 +1,5 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
 #include "software/ai/intent/move_intent.h"
@@ -27,34 +26,7 @@ struct CreaseDefenderFSM
     // this struct defines the only event that the CreaseDefenderFSM responds to
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
-    std::vector<Segment> getDefenseAreaSegments(Field field)
-    {
-        // Return the segments that form the path around the crease that the
-        // defenders must follow. It's basically the crease inflated by one robot radius
-        // multiplied by a factor
-        // TODO: fix this 1.5 constant with a dynamic param
-        double robot_radius_expansion_amount = ROBOT_MAX_RADIUS_METERS * 1.5;
-        Rectangle inflated_defense_area =
-            field.friendlyDefenseArea()
-                .expand(Vector(-1, 0).normalize(robot_radius_expansion_amount))
-                .expand(Vector(1, 0).normalize(robot_radius_expansion_amount))
-                .expand(Vector(0, -1).normalize(robot_radius_expansion_amount))
-                .expand(Vector(0, 1).normalize(robot_radius_expansion_amount));
-
-        return {
-            // +x segment
-            Segment(inflated_defense_area.posXPosYCorner(),
-                    inflated_defense_area.posXNegYCorner()),
-            // +y segment
-            Segment(inflated_defense_area.posXPosYCorner(),
-                    inflated_defense_area.negXPosYCorner()),
-            // -y segment
-            Segment(inflated_defense_area.posXNegYCorner(),
-                    inflated_defense_area.negXNegYCorner()),
-        };
-    }
-
-    std::optional<Point> findBlockThreatPoint(
+    static std::optional<Point> findBlockThreatPoint(
         const Field& field, const Point& enemy_threat_origin,
         const CreaseDefenderAlignment& crease_defender_alignment)
     {
@@ -77,16 +49,7 @@ struct CreaseDefenderFSM
         // Shot ray to block
         Ray ray(enemy_threat_origin, angle_to_block);
 
-        for (auto segment : getDefenseAreaSegments(field))
-        {
-            std::vector<Point> intersections = intersection(ray, segment);
-
-            if (!intersections.empty())
-            {
-                return intersections[0];
-            }
-        }
-        return std::nullopt;
+        return findDefenseAreaIntersection(field, ray);
     }
 
     auto operator()()
@@ -123,7 +86,7 @@ struct CreaseDefenderFSM
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), destination, face_threat_orientation, 0.0,
                 DribblerMode::OFF, BallCollisionType::ALLOW,
-                AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0},
+                AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, 2.0},
                 MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
         };
 
@@ -141,5 +104,54 @@ struct CreaseDefenderFSM
             *block_threat_s + update_e[!move_done] / block_threat = block_threat_s,
             block_threat_s + update_e[move_done] / block_threat   = X,
             X + update_e[!move_done] / block_threat               = block_threat_s);
+    }
+
+   private:
+    static std::optional<Point> findDefenseAreaIntersection(const Field& field,
+                                                            const Ray& ray)
+    {
+        // Return the segments that form the path around the crease that the
+        // defenders must follow. It's basically the crease inflated by one robot radius
+        // multiplied by a factor
+        // TODO: fix this 1.5 constant with a dynamic param
+        double robot_radius_expansion_amount = ROBOT_MAX_RADIUS_METERS * 1.5;
+        Rectangle inflated_defense_area =
+            field.friendlyDefenseArea()
+                .expand(Vector(-1, 0).normalize(robot_radius_expansion_amount))
+                .expand(Vector(1, 0).normalize(robot_radius_expansion_amount))
+                .expand(Vector(0, -1).normalize(robot_radius_expansion_amount))
+                .expand(Vector(0, 1).normalize(robot_radius_expansion_amount));
+
+        auto front_segment = Segment(inflated_defense_area.posXPosYCorner(),
+                                     inflated_defense_area.posXNegYCorner());
+        auto left_segment  = Segment(inflated_defense_area.posXPosYCorner(),
+                                    inflated_defense_area.negXPosYCorner());
+        auto right_segment = Segment(inflated_defense_area.posXNegYCorner(),
+                                     inflated_defense_area.negXNegYCorner());
+        std::vector<Point> front_intersections = intersection(ray, front_segment);
+        if (!front_intersections.empty())
+        {
+            return front_intersections[0];
+        }
+
+        if (ray.getStart().y() > 0)
+        {
+            // Check left segment if ray start point is in positive y half
+            std::vector<Point> left_intersections = intersection(ray, left_segment);
+            if (!left_intersections.empty())
+            {
+                return left_intersections[0];
+            }
+        }
+        else
+        {
+            // Check right segment if ray start point is in negative y half
+            std::vector<Point> right_intersections = intersection(ray, right_segment);
+            if (!right_intersections.empty())
+            {
+                return right_intersections[0];
+            }
+        }
+        return std::nullopt;
     }
 };
