@@ -54,8 +54,10 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
         play_config->getGoalieTacticConfig());
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(),
-        std::make_shared<CreaseDefenderTactic>(),
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
     };
 
     // Have a robot keep trying to take a shot

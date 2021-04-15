@@ -52,8 +52,10 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
         play_config->getGoalieTacticConfig());
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(),
-        std::make_shared<CreaseDefenderTactic>(),
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
     };
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {
