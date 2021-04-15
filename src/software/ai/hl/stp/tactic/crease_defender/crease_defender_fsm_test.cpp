@@ -93,49 +93,18 @@ TEST(CreaseDefenderFSMTest, test_find_block_threat_point_threat_in_crease)
 
 TEST(CreaseDefenderFSMTest, test_transitions)
 {
-    //    World world = ::TestUtil::createBlankTestingWorld();
-    //    Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
-    //    CreaseDefenderFSM::ControlParams control_params{
-    //        .enemy_threat_origin            = Point(2, 3),
-    //        .crease_defender_alignment      = CreaseDefenderAlignment::LEFT };
-    //
-    //    FSM<CreaseDefenderFSM> fsm;
-    //    EXPECT_TRUE(fsm.is(boost::sml::state<CreaseDefenderFSM::MoveState>));
-    //
-    //    // robot far from destination
-    //    fsm.process_event(CreaseDefenderFSM::Update(
-    //        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>)
-    //        {})));
-    //    EXPECT_TRUE(fsm.is(boost::sml::state<CreaseDefenderFSM::MoveState>));
-    //
-    //    // robot close to destination
-    //    robot = ::TestUtil::createRobotAtPos(Point(2, 2));
-    //    fsm.process_event(CreaseDefenderFSM::Update(
-    //        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>)
-    //        {})));
-    //    EXPECT_TRUE(fsm.is(boost::sml::state<CreaseDefenderFSM::MoveState>));
-    //
-    //    // robot at destination and facing the right way
-    //    robot.updateState(
-    //        RobotState(Point(2, 3), Vector(), Angle::half(), AngularVelocity::zero()),
-    //        Timestamp::fromSeconds(0));
-    //    fsm.process_event(CreaseDefenderFSM::Update(
-    //        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>)
-    //        {})));
-    //    EXPECT_TRUE(fsm.is(boost::sml::X));
-    //
-    //    // destination updated so robot needs to move to new destination
-    //    control_params = CreaseDefenderFSM::ControlParams{
-    //        .destination            = Point(1, -3),
-    //        .final_orientation      = Angle::half(),
-    //        .final_speed            = 0.0,
-    //        .dribbler_mode          = DribblerMode::OFF,
-    //        .ball_collision_type    = BallCollisionType::AVOID,
-    //        .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-    //        .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-    //        .target_spin_rev_per_s  = 0.0};
-    //    fsm.process_event(CreaseDefenderFSM::Update(
-    //        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>)
-    //        {})));
-    //    EXPECT_TRUE(fsm.is(boost::sml::state<CreaseDefenderFSM::MoveState>));
+        World world = ::TestUtil::createBlankTestingWorld();
+        Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
+        CreaseDefenderFSM::ControlParams control_params{
+            .enemy_threat_origin            = Point(2, 3),
+            .crease_defender_alignment      = CreaseDefenderAlignment::LEFT };
+    
+        FSM<CreaseDefenderFSM> fsm;
+        EXPECT_TRUE(fsm.is(boost::sml::state<CreaseDefenderFSM::BlockThreatState>));
+    
+        // robot far from destination
+        fsm.process_event(CreaseDefenderFSM::Update(
+            control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>)
+            {})));
+        EXPECT_TRUE(fsm.is(boost::sml::state<CreaseDefenderFSM::BlockThreatState>));
 }
