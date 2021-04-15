@@ -23,14 +23,18 @@ void CreaseDefenderTactic::updateWorldParams(const World &world) {}
 double CreaseDefenderTactic::calculateRobotCost(const Robot &robot,
                                                 const World &world) const
 {
+    auto block_point = CreaseDefenderFSM::findBlockThreatPoint(
+        world.field(), control_params.enemy_threat_origin,
+        control_params.crease_defender_alignment);
     // Prefer robots closer to the crease defender desired position
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
-    // TODO: fix this hack for the robot cost
-    double cost = 0;
-    cost = (robot.position() - world.field().friendlyDefenseArea().posXPosYCorner())
-               .length() /
-           world.field().totalXLength();
+    double cost = 1.0;
+    if (block_point)
+    {
+        cost = (robot.position() - block_point.value()).length() /
+               world.field().totalXLength();
+    }
     return std::clamp<double>(cost, 0, 1);
 }
 

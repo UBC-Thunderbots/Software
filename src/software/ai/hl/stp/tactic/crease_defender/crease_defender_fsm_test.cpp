@@ -13,19 +13,19 @@ TEST(CreaseDefenderFSMTest, test_find_block_threat_point_in_front_of_crease)
         field, enemy_threat_origin, CreaseDefenderAlignment::CENTRE);
     ASSERT_TRUE(threat_point);
     EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(*threat_point, Point(-3.365, 0.536), 1e-3));
+        TestUtil::equalWithinTolerance(threat_point.value(), Point(-3.365, 0.536), 1e-3));
 
     threat_point = CreaseDefenderFSM::findBlockThreatPoint(field, enemy_threat_origin,
                                                            CreaseDefenderAlignment::LEFT);
     ASSERT_TRUE(threat_point);
     EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(*threat_point, Point(-3.365, 0.805), 1e-3));
+        TestUtil::equalWithinTolerance(threat_point.value(), Point(-3.365, 0.805), 1e-3));
 
     threat_point = CreaseDefenderFSM::findBlockThreatPoint(
         field, enemy_threat_origin, CreaseDefenderAlignment::RIGHT);
     ASSERT_TRUE(threat_point);
     EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(*threat_point, Point(-3.365, 0.256), 1e-3));
+        TestUtil::equalWithinTolerance(threat_point.value(), Point(-3.365, 0.256), 1e-3));
 }
 
 TEST(CreaseDefenderFSMTest, test_find_block_threat_point_left_of_crease)
@@ -36,19 +36,19 @@ TEST(CreaseDefenderFSMTest, test_find_block_threat_point_left_of_crease)
         field, enemy_threat_origin, CreaseDefenderAlignment::CENTRE);
     ASSERT_TRUE(threat_point);
     EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(*threat_point, Point(-3.674, 1.135), 1e-3));
+        TestUtil::equalWithinTolerance(threat_point.value(), Point(-3.674, 1.135), 1e-3));
 
     threat_point = CreaseDefenderFSM::findBlockThreatPoint(field, enemy_threat_origin,
                                                            CreaseDefenderAlignment::LEFT);
     ASSERT_TRUE(threat_point);
     EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(*threat_point, Point(-3.840, 1.135), 1e-3));
+        TestUtil::equalWithinTolerance(threat_point.value(), Point(-3.840, 1.135), 1e-3));
 
     threat_point = CreaseDefenderFSM::findBlockThreatPoint(
         field, enemy_threat_origin, CreaseDefenderAlignment::RIGHT);
     ASSERT_TRUE(threat_point);
     EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(*threat_point, Point(-3.521, 1.135), 1e-3));
+        TestUtil::equalWithinTolerance(threat_point.value(), Point(-3.521, 1.135), 1e-3));
 }
 
 TEST(CreaseDefenderFSMTest, test_find_block_threat_point_right_of_crease)
@@ -58,20 +58,20 @@ TEST(CreaseDefenderFSMTest, test_find_block_threat_point_right_of_crease)
     auto threat_point         = CreaseDefenderFSM::findBlockThreatPoint(
         field, enemy_threat_origin, CreaseDefenderAlignment::CENTRE);
     ASSERT_TRUE(threat_point);
-    EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(*threat_point, Point(-4.365, -1.135), 1e-3));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(threat_point.value(),
+                                               Point(-4.365, -1.135), 1e-3));
 
     threat_point = CreaseDefenderFSM::findBlockThreatPoint(field, enemy_threat_origin,
                                                            CreaseDefenderAlignment::LEFT);
     ASSERT_TRUE(threat_point);
-    EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(*threat_point, Point(-4.346, -1.135), 1e-3));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(threat_point.value(),
+                                               Point(-4.346, -1.135), 1e-3));
 
     threat_point = CreaseDefenderFSM::findBlockThreatPoint(
         field, enemy_threat_origin, CreaseDefenderAlignment::RIGHT);
     ASSERT_TRUE(threat_point);
-    EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(*threat_point, Point(-4.384, -1.135), 1e-3));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(threat_point.value(),
+                                               Point(-4.384, -1.135), 1e-3));
 }
 
 TEST(CreaseDefenderFSMTest, test_find_block_threat_point_threat_in_crease)
