@@ -3,6 +3,11 @@
 #include <math.h>
 #include <stdlib.h>
 
+// these are set to decouple the 3 axis from each other
+// the idea is to clamp the maximum velocity and acceleration
+// so that the axes would never have to compete for resources
+#define TIME_HORIZON 0.05f  // s
+
 typedef void (*TrajectoryFollower_t)(FirmwareRobot_t*, PositionTrajectory_t, size_t);
 typedef void (*ApplyDirectPerWheelPower_t)(FirmwareRobot_t*, 
     TbotsProto_DirectControlPrimitive_DirectPerWheelControl);
@@ -26,6 +31,28 @@ typedef struct MoveState
     float max_speed_m_per_s;
 
 } MoveState_t;
+
+/**
+ * Determines the rotation acceleration after setup_bot has been used and
+ * plan_move has been done along the minor axis. The minor time from bangbang
+ * is used to determine the rotation time, and thus the rotation velocity and
+ * acceleration. The rotational acceleration is clamped under the MAX_T_A.
+ *
+ * @param pb [in/out] The PhysBot data container that should have minor axis time and
+ * will store the rotational information
+ * @param avel The rotational velocity of the bot
+ */
+void plan_move_rotation(PhysBot* pb, float avel);
+
+void plan_move_rotation(PhysBot* pb, float avel)
+{
+    pb->rot.time = (pb->min.time > TIME_HORIZON) ? pb->min.time : TIME_HORIZON;
+    // 1.4f is a magic constant to force the robot to rotate faster to its final
+    // orientation.
+    pb->rot.vel   = 1.4f * pb->rot.disp / pb->rot.time;
+    pb->rot.accel = (pb->rot.vel - avel) / TIME_HORIZON;
+    limit(&pb->rot.accel, MAX_T_A);
+}
 
 struct FirmwareRobot
 {
@@ -263,6 +290,8 @@ void force_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory
 
     const RobotConstants_t robot_constants = app_firmware_robot_getRobotConstants(robot);
     ControllerState_t* controller_state = app_firmware_robot_getControllerState(robot);
+
+    void* void_state_ptr;
     MoveState_t* state           = (MoveState_t*)(void_state_ptr);
     float battery_voltage = app_firmware_robot_getBatteryVoltage(robot);
     const float dest_x = state->position_trajectory.x_position[trajectory_index];

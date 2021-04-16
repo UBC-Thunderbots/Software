@@ -68,6 +68,7 @@ cc_library(
         "//firmware/app/control:trajectory_planner",
         "//firmware/app/control:control",
         "//firmware/app/control:physbot",
+        "//firmware/shared:util",
         "//shared/proto:tbots_nanopb_proto",
         "//shared:constants",
         "//firmware/shared:physics",

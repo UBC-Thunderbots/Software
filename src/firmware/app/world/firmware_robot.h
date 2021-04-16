@@ -11,6 +11,7 @@
 #include "shared/proto/primitive.nanopb.h"
 #include "shared/constants.h"
 #include "firmware/shared/physics.h"
+#include "firmware/shared/util.h"
 
 /**
  * This struct represents a robot from the perspective of firmware
