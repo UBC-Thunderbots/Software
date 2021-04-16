@@ -26,7 +26,7 @@ void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 
     do
     {
-        yield({stop_test_tactic_1, stop_test_tactic_2, stop_test_tactic_3});
+        yield({{stop_test_tactic_1, stop_test_tactic_2, stop_test_tactic_3}});
     } while (true);
 }
 

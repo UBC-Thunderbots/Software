@@ -9,9 +9,9 @@ extern "C"
 
 StandaloneSimulator::StandaloneSimulator(
     std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config,
-    std::shared_ptr<SimulatorConfig> simulator_config)
+    std::shared_ptr<SimulatorConfig> simulator_config, const Field& field)
     : standalone_simulator_config(standalone_simulator_config),
-      simulator(Field::createSSLDivisionBField(), simulator_config),
+      simulator(field, simulator_config),
       most_recent_ssl_wrapper_packet(SSLProto::SSL_WrapperPacket())
 {
     standalone_simulator_config->getMutableBlueTeamChannel()->registerCallbackFunction(
@@ -93,70 +93,57 @@ void StandaloneSimulator::setupNetworking(int blue_team_channel, int yellow_team
     std::string blue_team_ip =
         std::string(MULTICAST_CHANNELS[blue_team_channel]) + "%" + network_interface;
 
-    wrapper_packet_sender.reset(
-        new ThreadedProtoMulticastSender<SSLProto::SSL_WrapperPacket>(
-            vision_ip_address, static_cast<unsigned short>(vision_port)));
+    wrapper_packet_sender.reset(new ThreadedProtoUdpSender<SSLProto::SSL_WrapperPacket>(
+        vision_ip_address, static_cast<unsigned short>(vision_port), true));
     yellow_team_primitive_listener.reset(
-        new ThreadedProtoMulticastListener<TbotsProto::PrimitiveSet>(
+        new ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>(
             yellow_team_ip, PRIMITIVE_PORT,
-            boost::bind(&StandaloneSimulator::setYellowRobotPrimitives, this, _1)));
+            boost::bind(&StandaloneSimulator::setYellowRobotPrimitives, this, _1), true));
     blue_team_primitive_listener.reset(
-        new ThreadedProtoMulticastListener<TbotsProto::PrimitiveSet>(
+        new ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>(
             blue_team_ip, PRIMITIVE_PORT,
-            boost::bind(&StandaloneSimulator::setBlueRobotPrimitives, this, _1)));
-    yellow_team_side_listener.reset(
-        new ThreadedProtoMulticastListener<DefendingSideProto>(
-            yellow_team_ip, DEFENDING_SIDE_PORT,
-            boost::bind(&StandaloneSimulator::setYellowTeamDefendingSide, this, _1)));
-    blue_team_side_listener.reset(new ThreadedProtoMulticastListener<DefendingSideProto>(
+            boost::bind(&StandaloneSimulator::setBlueRobotPrimitives, this, _1), true));
+    yellow_team_side_listener.reset(new ThreadedProtoUdpListener<DefendingSideProto>(
+        yellow_team_ip, DEFENDING_SIDE_PORT,
+        boost::bind(&StandaloneSimulator::setYellowTeamDefendingSide, this, _1), true));
+    blue_team_side_listener.reset(new ThreadedProtoUdpListener<DefendingSideProto>(
         blue_team_ip, DEFENDING_SIDE_PORT,
-        boost::bind(&StandaloneSimulator::setBlueTeamDefendingSide, this, _1)));
+        boost::bind(&StandaloneSimulator::setBlueTeamDefendingSide, this, _1), true));
 }
 
-void StandaloneSimulator::setupInitialSimulationState()
+void StandaloneSimulator::setupInitialSimulationState(unsigned num_robots)
 {
-    RobotState blue_robot_state1(Point(3, 2.5), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state2(Point(3, 1.5), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state3(Point(3, 0.5), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state4(Point(3, -0.5), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state5(Point(3, -1.5), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    RobotState blue_robot_state6(Point(3, -2.5), Vector(0, 0), Angle::half(),
-                                 AngularVelocity::zero());
-    std::vector<RobotStateWithId> blue_robot_states = {
-        RobotStateWithId{.id = 0, .robot_state = blue_robot_state1},
-        RobotStateWithId{.id = 1, .robot_state = blue_robot_state2},
-        RobotStateWithId{.id = 2, .robot_state = blue_robot_state3},
-        RobotStateWithId{.id = 3, .robot_state = blue_robot_state4},
-        RobotStateWithId{.id = 4, .robot_state = blue_robot_state5},
-        RobotStateWithId{.id = 5, .robot_state = blue_robot_state6},
-    };
-    simulator.addBlueRobots(blue_robot_states);
+    std::vector<RobotStateWithId> blue_robot_states;
+    std::vector<RobotStateWithId> yellow_robot_states;
 
-    RobotState yellow_robot_state1(Point(-3, 2.5), Vector(0, 0), Angle::zero(),
-                                   AngularVelocity::zero());
-    RobotState yellow_robot_state2(Point(-3, 1.5), Vector(0, 0), Angle::zero(),
-                                   AngularVelocity::zero());
-    RobotState yellow_robot_state3(Point(-3, 0.5), Vector(0, 0), Angle::zero(),
-                                   AngularVelocity::zero());
-    RobotState yellow_robot_state4(Point(-3, -0.5), Vector(0, 0), Angle::zero(),
-                                   AngularVelocity::zero());
-    RobotState yellow_robot_state5(Point(-3, -1.5), Vector(0, 0), Angle::zero(),
-                                   AngularVelocity::zero());
-    RobotState yellow_robot_state6(Point(-3, -2.5), Vector(0, 0), Angle::zero(),
-                                   AngularVelocity::zero());
-    std::vector<RobotStateWithId> yellow_robot_states = {
-        RobotStateWithId{.id = 0, .robot_state = yellow_robot_state1},
-        RobotStateWithId{.id = 1, .robot_state = yellow_robot_state2},
-        RobotStateWithId{.id = 2, .robot_state = yellow_robot_state3},
-        RobotStateWithId{.id = 3, .robot_state = yellow_robot_state4},
-        RobotStateWithId{.id = 4, .robot_state = yellow_robot_state5},
-        RobotStateWithId{.id = 5, .robot_state = yellow_robot_state6},
-    };
+    // The angle between each robot spaced out in a circle around
+    // the two points on either side of the field.
+    Angle angle_between_robots     = Angle::full() / num_robots;
+    Point center_for_yellow_robots = Point(2, 0);
+    Point center_for_blue_robots   = Point(-2, 0);
+
+    for (unsigned i = 0; i < num_robots; i++)
+    {
+        blue_robot_states.emplace_back(RobotStateWithId{
+            .id = i,
+            .robot_state =
+                RobotState(center_for_blue_robots +
+                               Vector::createFromAngle(angle_between_robots * i),
+                           Vector(0, 0), angle_between_robots * i + Angle::half(),
+                           AngularVelocity::zero()),
+        });
+
+        yellow_robot_states.emplace_back(RobotStateWithId{
+            .id = i,
+            .robot_state =
+                RobotState(center_for_yellow_robots +
+                               Vector::createFromAngle(angle_between_robots * i),
+                           Vector(0, 0), angle_between_robots * i + Angle::half(),
+                           AngularVelocity::zero()),
+        });
+    }
+
+    simulator.addBlueRobots(blue_robot_states);
     simulator.addYellowRobots(yellow_robot_states);
 }
 

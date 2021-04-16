@@ -7,7 +7,7 @@
 #include "software/simulated_tests/non_terminating_validation_functions/robots_avoid_ball_validation.h"
 #include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
-#include "software/simulated_tests/terminating_validation_functions/robot_at_position_validation.h"
+#include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
@@ -48,11 +48,10 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
         [shooter_id](std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield) {
             // Wait 2 seconds for robots to start moving adequately far away from the ball
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
+            if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(2))
             {
-                yield();
+                robotsAvoidBall(1, {shooter_id}, world_ptr, yield);
             }
-            robotsAvoidBall(1, {shooter_id}, world_ptr, yield);
         }};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,

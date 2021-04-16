@@ -9,7 +9,7 @@ void ballNeverMovesBackward(std::shared_ptr<World> world_ptr,
     while ((current_x_pos = world_ptr->ball().position().x()) >= previous_x_pos)
     {
         previous_x_pos = world_ptr->ball().position().x();
-        yield();
+        yield("");
     }
-    FAIL() << "Ball has moved backward";
+    yield("Ball has moved backward");
 }

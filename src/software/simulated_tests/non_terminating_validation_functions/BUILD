@@ -6,6 +6,7 @@ cc_library(
     srcs = [
         "ball_in_play_or_scored_validation.cpp",
         "ball_never_moves_backward_validation.cpp",
+        "robot_not_excessively_dribbling_validation.cpp",
         "robots_avoid_ball_validation.cpp",
         "robots_in_friendly_half_validation.cpp",
         "robots_not_in_center_circle_validation.cpp",
@@ -14,6 +15,7 @@ cc_library(
     hdrs = [
         "ball_in_play_or_scored_validation.h",
         "ball_never_moves_backward_validation.h",
+        "robot_not_excessively_dribbling_validation.h",
         "robots_avoid_ball_validation.h",
         "robots_in_friendly_half_validation.h",
         "robots_not_in_center_circle_validation.h",
@@ -24,6 +26,5 @@ cc_library(
         "//software/simulated_tests/validation:validation_function",
         "//software/world",
         "@boost//:coroutine2",
-        "@gtest",
     ],
 )

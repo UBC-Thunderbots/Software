@@ -6,7 +6,6 @@
 #include <exception>
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/test_plays/halt_test_play.h"
 #include "software/ai/hl/stp/play/test_plays/move_test_play.h"
 #include "software/test_util/test_util.h"
@@ -16,57 +15,52 @@ class STPTest : public ::testing::Test
 {
    public:
     STPTest()
-        : mutable_ai_control_config(std::make_shared<AiControlConfig>()),
+        : world(::TestUtil::createBlankTestingWorld()),
+          mutable_ai_control_config(std::make_shared<AiControlConfig>()),
           ai_control_config(
               std::const_pointer_cast<const AiControlConfig>(mutable_ai_control_config)),
-          stp([]() { return nullptr; }, ai_control_config, 0)
+          play_config(std::make_shared<const ThunderbotsConfig>()->getPlayConfig()),
+          default_play_constructor([this]() -> std::unique_ptr<Play> {
+              return std::make_unique<HaltTestPlay>(play_config);
+          }),
+          // Give an explicit seed to STP so that our tests are deterministic
+          stp(default_play_constructor, ai_control_config, play_config, 123)
     {
+        std::cout << "Constructor called";
     }
 
    protected:
     void SetUp() override
     {
-        mutable_ai_control_config = std::make_shared<AiControlConfig>();
-        ai_control_config =
-            std::const_pointer_cast<const AiControlConfig>(mutable_ai_control_config);
-
-        auto default_play_constructor = []() -> std::unique_ptr<Play> {
-            return std::make_unique<HaltTestPlay>(
-                std::make_shared<const ThunderbotsConfig>()->getPlayConfig());
-        };
-        // Explicitly setting override AI Play to be false because we can't rely on
-        // default values
+        // Explicitly setting override AI Play to be false
         mutable_ai_control_config->getMutableOverrideAiPlay()->setValue(false);
-        // Give an explicit seed to STP so that our tests are deterministic
-        stp   = STP(default_play_constructor, ai_control_config, 0);
-        world = ::TestUtil::createBlankTestingWorld();
     }
 
-    World world = ::TestUtil::createBlankTestingWorld();
+    World world;
     std::shared_ptr<AiControlConfig> mutable_ai_control_config;
     std::shared_ptr<const AiControlConfig> ai_control_config;
+    std::shared_ptr<const PlayConfig> play_config;
+    std::function<std::unique_ptr<Play>()> default_play_constructor;
     STP stp;
 };
 
 TEST_F(STPTest, test_only_test_plays_are_registered_in_play_factory)
 {
     auto play_names = GenericFactory<std::string, Play, PlayConfig>::getRegisteredNames();
-    EXPECT_EQ(3, play_names.size());
+    EXPECT_EQ(2, play_names.size());
     EXPECT_EQ(std::count(play_names.begin(), play_names.end(), TYPENAME(MoveTestPlay)),
               1);
     EXPECT_EQ(std::count(play_names.begin(), play_names.end(), TYPENAME(HaltTestPlay)),
               1);
-    EXPECT_EQ(std::count(play_names.begin(), play_names.end(), TYPENAME(HaltPlay)), 1);
 }
 
 TEST_F(STPTest, test_exception_thrown_when_no_play_applicable)
 {
     // Put the ball where both its x and y coordinates are negative. Neither test Play
-    // is applicable in this case so we should see the HaltPlay being set
+    // is applicable in this case
     world = world =
         ::TestUtil::setBallPosition(world, Point(-1, -1), Timestamp::fromSeconds(0));
-
-    EXPECT_EQ(TYPENAME(*stp.calculateNewPlay(world)), TYPENAME(HaltPlay));
+    EXPECT_THROW(stp.calculateNewPlay(world), std::runtime_error);
 }
 
 TEST_F(STPTest, test_calculate_new_play_when_one_play_valid)
@@ -75,7 +69,7 @@ TEST_F(STPTest, test_calculate_new_play_when_one_play_valid)
     world = ::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
     auto play = stp.calculateNewPlay(world);
     EXPECT_TRUE(play);
-    EXPECT_EQ(TYPENAME(*play), TYPENAME(HaltTestPlay));
+    EXPECT_EQ(objectTypeName(*play), TYPENAME(HaltTestPlay));
 }
 
 TEST_F(STPTest, test_calculate_new_play_when_multiple_plays_valid)
@@ -92,13 +86,13 @@ TEST_F(STPTest, test_calculate_new_play_when_multiple_plays_valid)
     for (unsigned int i = 0; i < 10; i++)
     {
         play = stp.calculateNewPlay(world);
-        actual_play_names.emplace_back(TYPENAME(*play));
+        actual_play_names.emplace_back(objectTypeName(*play));
     }
 
     std::vector<std::string> expected_play_names = {
+        TYPENAME(MoveTestPlay), TYPENAME(MoveTestPlay), TYPENAME(HaltTestPlay),
         TYPENAME(HaltTestPlay), TYPENAME(HaltTestPlay), TYPENAME(MoveTestPlay),
-        TYPENAME(MoveTestPlay), TYPENAME(HaltTestPlay), TYPENAME(MoveTestPlay),
-        TYPENAME(HaltTestPlay), TYPENAME(MoveTestPlay), TYPENAME(HaltTestPlay),
+        TYPENAME(MoveTestPlay), TYPENAME(MoveTestPlay), TYPENAME(MoveTestPlay),
         TYPENAME(HaltTestPlay),
     };
 

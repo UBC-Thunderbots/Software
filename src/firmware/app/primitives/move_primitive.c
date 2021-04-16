@@ -36,76 +36,25 @@ typedef struct MoveState
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(MoveState_t);
 
 /**
- * Calculates the rotation time, velocity, and acceleration to be stored
- * in a PhysBot data container.
+ * Determines the rotation acceleration after setup_bot has been used and
+ * plan_move has been done along the minor axis. The minor time from bangbang
+ * is used to determine the rotation time, and thus the rotation velocity and
+ * acceleration. The rotational acceleration is clamped under the MAX_T_A.
  *
- * @param pb The data container that has information about major axis time
- * and will store the rotational information
- * @param avel The current rotational velocity of the bot
+ * @param pb [in/out] The PhysBot data container that should have minor axis time and
+ * will store the rotational information
+ * @param avel The rotational velocity of the bot
  */
 void plan_move_rotation(PhysBot* pb, float avel);
 
 void plan_move_rotation(PhysBot* pb, float avel)
 {
-    float time_target = (pb->maj.time > TIME_HORIZON) ? pb->maj.time : TIME_HORIZON;
-    if (time_target > 0.5f)
-    {
-        time_target = 0.5f;
-    }
-    pb->rot.time  = time_target;
-    pb->rot.vel   = pb->rot.disp / pb->rot.time;
+    pb->rot.time = (pb->min.time > TIME_HORIZON) ? pb->min.time : TIME_HORIZON;
+    // 1.4f is a magic constant to force the robot to rotate faster to its final
+    // orientation.
+    pb->rot.vel   = 1.4f * pb->rot.disp / pb->rot.time;
     pb->rot.accel = (pb->rot.vel - avel) / TIME_HORIZON;
     limit(&pb->rot.accel, MAX_T_A);
-}
-
-void start_motion(void* void_state_ptr, FirmwareWorld_t* world,
-                  TbotsProto_Point destination, float final_speed_m_per_s,
-                  float final_angle)
-{
-    MoveState_t* state = (MoveState_t*)void_state_ptr;
-
-    // Convert into m/s and rad/s because physics is in m and s
-    const float destination_x           = destination.x_meters;
-    const float destination_y           = destination.y_meters;
-    const float destination_orientation = final_angle;
-    const float speed_at_dest_m_per_s   = final_speed_m_per_s;
-
-    const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
-
-    const float current_x           = app_firmware_robot_getPositionX(robot);
-    const float current_y           = app_firmware_robot_getPositionY(robot);
-    const float current_orientation = app_firmware_robot_getOrientation(robot);
-    const float current_speed       = app_firmware_robot_getSpeedLinear(robot);
-
-    // Plan a trajectory to move to the target position/orientation
-    FirmwareRobotPathParameters_t path_parameters = {
-        .path = {.x = {.coefficients = {0, 0, destination_x - current_x, current_x}},
-                 .y = {.coefficients = {0, 0, destination_y - current_y, current_y}}},
-        .orientation_profile = {.coefficients = {0, 0,
-                                                 fmodf(destination_orientation -
-                                                           current_orientation,
-                                                       (float)(2 * M_PI)),
-                                                 current_orientation}},
-        .t_start             = 0,
-        .t_end               = 1.0f,
-        .num_elements        = 10,
-        .max_allowable_linear_acceleration =
-            (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-        .max_allowable_linear_speed = (float)ROBOT_MAX_SPEED_METERS_PER_SECOND,
-        .max_allowable_angular_acceleration =
-            (float)ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED,
-        .max_allowable_angular_speed = (float)ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-        .initial_linear_speed        = current_speed,
-        .final_linear_speed          = speed_at_dest_m_per_s};
-    state->num_trajectory_elems = path_parameters.num_elements;
-    app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
-        path_parameters, &(state->position_trajectory));
-
-    // NOTE: We set this after doing the trajectory generation in case the generation
-    //       took a while, since we're going to use this as our reference time when
-    //       tracking the trajectory, and so what it to be as close as possible to
-    //       the time that we actually start _executing_ the trajectory
-    state->primitive_start_time_seconds = app_firmware_world_getCurrentTime(world);
 }
 
 void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_state_ptr,
@@ -144,6 +93,7 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
     const float destination_y           = prim_msg.destination.y_meters;
     const float destination_orientation = prim_msg.final_angle.radians;
     const float speed_at_dest_m_per_s   = prim_msg.final_speed_m_per_s;
+    const float target_spin_rev_per_s   = prim_msg.target_spin_rev_per_s;
 
     float max_speed_m_per_s = prim_msg.max_speed_m_per_s;
     clamp(&max_speed_m_per_s, 0, (float)ROBOT_MAX_SPEED_METERS_PER_SECOND);
@@ -153,14 +103,24 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
     const float current_orientation = app_firmware_robot_getOrientation(robot);
     const float current_speed       = app_firmware_robot_getSpeedLinear(robot);
 
+    const float distance_to_destination =
+        sqrtf(powf(destination_x - current_x, 2) + powf(destination_y - current_y, 2));
+    // Number of revolutions to spin, assuming the time horizon is the simplistic
+    // distance_to_destination over max_speed_m_per_s
+    const int revolutions_to_spin =
+        (int)(distance_to_destination / max_speed_m_per_s * target_spin_rev_per_s);
+    // Change in orientation to reach destination orientation
+    const float net_change_in_orientation =
+        min_angle_delta(current_orientation, destination_orientation);
+
     // Plan a trajectory to move to the target position/orientation
     FirmwareRobotPathParameters_t path_parameters = {
         .path = {.x = {.coefficients = {0, 0, destination_x - current_x, current_x}},
                  .y = {.coefficients = {0, 0, destination_y - current_y, current_y}}},
         .orientation_profile = {.coefficients = {0, 0,
-                                                 fmodf(destination_orientation -
-                                                           current_orientation,
-                                                       (float)(2 * M_PI)),
+                                                 net_change_in_orientation +
+                                                     (float)revolutions_to_spin * 2.0f *
+                                                         (float)M_PI,
                                                  current_orientation}},
         .t_start             = 0,
         .t_end               = 1.0f,

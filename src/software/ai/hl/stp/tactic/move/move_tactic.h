@@ -34,12 +34,16 @@ class MoveTactic : public Tactic
      * @param dribbler_mode The dribbler mode
      * @param ball_collision_type how to navigate around the ball
      * @param auto_chip_or_kick The command to autochip or autokick
+     * @param max_allowed_speed_mode The mode of maximum speed allowed
+     * @param target_spin_rev_per_s The target spin while moving in revolutions per second
      */
     void updateControlParams(
         Point destination, Angle final_orientation, double final_speed,
-        DribblerMode dribbler_mode            = DribblerMode::OFF,
-        BallCollisionType ball_collision_type = BallCollisionType::AVOID,
-        AutoChipOrKick auto_chip_or_kick      = {AutoChipOrKickMode::OFF, 0});
+        DribblerMode dribbler_mode                 = DribblerMode::OFF,
+        BallCollisionType ball_collision_type      = BallCollisionType::AVOID,
+        AutoChipOrKick auto_chip_or_kick           = {AutoChipOrKickMode::OFF, 0},
+        MaxAllowedSpeedMode max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        double target_spin_rev_per_s               = 0.0);
 
     /**
      * Updates the params assuming that the dribbler and chicker and while avoiding the
@@ -73,7 +77,7 @@ class MoveTactic : public Tactic
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-    BaseFSM<MoveFSM> fsm;
+    FSM<MoveFSM> fsm;
 
     MoveFSM::ControlParams control_params;
 };

@@ -30,15 +30,26 @@ ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
     {
         double kick_speed =
             controller_input_config->getKickSpeedMetersPerSecond()->value();
-        auto kick_primitive = createKickPrimitive(Point(0, 0), Angle::zero(), kick_speed);
-        return kick_primitive;
+        auto move_with_kick_primitive =
+            createMovePrimitive(Point(), 0, Angle::zero(), DribblerMode::OFF,
+                                AutoChipOrKick{
+                                    AutoChipOrKickMode::AUTOKICK,
+                                    kick_speed,
+                                },
+                                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
+        return move_with_kick_primitive;
     }
     else if (controller_input.isChipButtonPressed())
     {
         double chip_distance = controller_input_config->getChipDistanceMeters()->value();
-        auto chip_primitive =
-            createChipPrimitive(Point(0, 0), Angle::zero(), chip_distance);
-        return chip_primitive;
+        auto move_with_chip_primitive =
+            createMovePrimitive(Point(), 0, Angle::zero(), DribblerMode::OFF,
+                                AutoChipOrKick{
+                                    AutoChipOrKickMode::AUTOCHIP,
+                                    chip_distance,
+                                },
+                                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
+        return move_with_chip_primitive;
     }
     else
     {

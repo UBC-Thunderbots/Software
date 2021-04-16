@@ -9,6 +9,8 @@
  *
  * This class will run the provided coroutine a single time and stop once it has
  * completed. The coroutine will NOT be restarted upon completion.
+ *
+ * Provides access to the most recent error message returned by the validation function
  */
 class TerminatingFunctionValidator
 {
@@ -36,6 +38,13 @@ class TerminatingFunctionValidator
      */
     bool executeAndCheckForSuccess();
 
+    /**
+     * Returns the current error message for the validator, empty string if no error
+     *
+     * @return the current error message
+     */
+    std::string currentErrorMessage() const;
+
    private:
     /**
      * A wrapper function for the validation_function.
@@ -59,4 +68,6 @@ class TerminatingFunctionValidator
 
     // The coroutine that will be given to the validation function
     ValidationCoroutine::pull_type validation_sequence;
+
+    std::string current_error_message;
 };

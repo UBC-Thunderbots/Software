@@ -6,6 +6,17 @@ cc_library(
     hdrs = ["simulator_robot.h"],
     deps = [
         ":firmware_object_deleter",
+        "//firmware/app/world:firmware_world",
+    ],
+)
+
+cc_library(
+    name = "physics_simulator_robot",
+    srcs = ["physics_simulator_robot.cpp"],
+    hdrs = ["physics_simulator_robot.h"],
+    deps = [
+        ":firmware_object_deleter",
+        ":simulator_robot",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
         "//software/geom/algorithms",
@@ -17,11 +28,11 @@ cc_library(
 )
 
 cc_test(
-    name = "simulator_robot_test",
-    srcs = ["simulator_robot_test.cpp"],
+    name = "physics_simulator_robot_test",
+    srcs = ["physics_simulator_robot_test.cpp"],
     deps = [
-        ":simulator_ball",
-        ":simulator_robot",
+        ":physics_simulator_ball",
+        ":physics_simulator_robot",
         "//software/simulation/physics:physics_world",
         "//software/test_util",
         "//software/world",
@@ -33,19 +44,29 @@ cc_test(
 
 cc_library(
     name = "simulator_ball",
-    srcs = ["simulator_ball.cpp"],
     hdrs = ["simulator_ball.h"],
     deps = [
+        "//software/geom:point",
+        "//software/geom:vector",
+    ],
+)
+
+cc_library(
+    name = "physics_simulator_ball",
+    srcs = ["physics_simulator_ball.cpp"],
+    hdrs = ["physics_simulator_ball.h"],
+    deps = [
+        ":simulator_ball",
         "//software/logger",
         "//software/simulation/physics:physics_ball",
     ],
 )
 
 cc_test(
-    name = "simulator_ball_test",
-    srcs = ["simulator_ball_test.cpp"],
+    name = "physics_simulator_ball_test",
+    srcs = ["physics_simulator_ball_test.cpp"],
     deps = [
-        ":simulator_ball",
+        ":physics_simulator_ball",
         "//software/simulation/physics:physics_ball",
         "//software/simulation/physics:physics_world",
         "//software/test_util",
@@ -77,6 +98,8 @@ cc_test(
     name = "simulator_robot_singleton_test",
     srcs = ["simulator_robot_singleton_test.cpp"],
     deps = [
+        ":physics_simulator_ball",
+        ":physics_simulator_robot",
         ":simulator_ball",
         ":simulator_robot",
         ":simulator_robot_singleton",
@@ -112,6 +135,7 @@ cc_test(
     name = "simulator_ball_singleton_test",
     srcs = ["simulator_ball_singleton_test.cpp"],
     deps = [
+        ":physics_simulator_ball",
         ":simulator_ball",
         ":simulator_ball_singleton",
         "//firmware/app/world:firmware_ball",
@@ -130,9 +154,9 @@ cc_library(
     hdrs = ["simulator.h"],
     deps = [
         ":firmware_object_deleter",
-        ":simulator_ball",
+        ":physics_simulator_ball",
+        ":physics_simulator_robot",
         ":simulator_ball_singleton",
-        ":simulator_robot",
         ":simulator_robot_singleton",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
@@ -194,8 +218,8 @@ cc_library(
         "//shared/parameter:cpp_configs",
         "//shared/proto:tbots_cc_proto",
         "//software/logger",
-        "//software/networking:threaded_proto_multicast_listener",
-        "//software/networking:threaded_proto_multicast_sender",
+        "//software/networking:threaded_proto_udp_listener",
+        "//software/networking:threaded_proto_udp_sender",
         "//software/proto:defending_side_msg_cc_proto",
         "//software/proto/message_translation:primitive_google_to_nanopb_converter",
         "//software/world:field",

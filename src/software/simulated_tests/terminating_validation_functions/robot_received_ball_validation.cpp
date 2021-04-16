@@ -21,6 +21,6 @@ void robotReceivedBall(RobotId robot_id, std::shared_ptr<World> world_ptr,
 
     while (!ball_near_dribbler(world_ptr))
     {
-        yield();
+        yield("Robot with ID " + std::to_string(robot_id) + " has not received the ball");
     }
 }
