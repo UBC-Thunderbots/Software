@@ -5,19 +5,19 @@
 
 #define TIME_HORIZON 0.05f  // s
 
-PhysBot app_physbot_create(const FirmwareRobot_t *robot, float *destination,
-                           float *major_vec, float *minor_vec)
+PhysBot app_physbot_create(float velocity_x, float velocity_y, float position_x, float position_y, float orientation,
+                           float *destination, float *major_vec, float *minor_vec)
 {
-    float v[2]            = {app_firmware_robot_getVelocityX(robot),
-                  app_firmware_robot_getVelocityY(robot)};
-    float dr[2]           = {destination[0] - app_firmware_robot_getPositionX(robot),
-                   destination[1] - app_firmware_robot_getPositionY(robot)};
+    float v[2]            = {velocity_x, velocity_y};
+    float dr[2]           = {destination[0] - position_x,
+                   destination[1] - position_y};
     const Component major = {
         .disp = dot2D(major_vec, dr), .vel = dot2D(major_vec, v), .accel = 0, .time = 0};
     const Component minor = {
         .disp = dot2D(minor_vec, dr), .vel = dot2D(minor_vec, v), .accel = 0, .time = 0};
-    const Component rot = {.disp = min_angle_delta(
-                               app_firmware_robot_getOrientation(robot), destination[2])};
+    // const Component rot = {.disp = min_angle_delta(
+    //                            app_firmware_robot_getOrientation(robot), destination[2])};
+    const Component rot = {.disp = min_angle_delta(orientation, destination[2])};
     PhysBot pb          = {.rot = rot, .maj = major, .min = minor};
     for (unsigned i = 0; i < 2; i++)
     {

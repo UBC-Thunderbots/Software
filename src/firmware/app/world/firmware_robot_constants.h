@@ -23,4 +23,4 @@ typedef struct ControllerState
     float last_applied_acceleration_x;
     float last_applied_acceleration_y;
     float last_applied_acceleration_angular;
-} ControllerState_t
+} ControllerState_t;

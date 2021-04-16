@@ -1,13 +1,16 @@
 #pragma once
 
 #include "firmware/app/control/trajectory_planner.h"
+#include "firmware/app/control/control.h"
+#include "firmware/app/control/physbot.h"
 #include "firmware/app/world/charger.h"
 #include "firmware/app/world/chicker.h"
 #include "firmware/app/world/dribbler.h"
 #include "firmware/app/world/force_wheel.h"
 #include "firmware/app/world/velocity_wheel.h"
 #include "shared/proto/primitive.nanopb.h"
-#include "firmware/app/world/firmware_robot_constants.h"
+#include "shared/constants.h"
+#include "firmware/shared/physics.h"
 
 /**
  * This struct represents a robot from the perspective of firmware
@@ -196,7 +199,7 @@ void app_firmware_robot_trackVelocityInRobotFrame(FirmwareRobot_t* robot, float 
 void force_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, size_t trajectory_index);
 
 void velocity_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, 
-    size_t trajectory_index, unsigned int num_elements);
+    size_t trajectory_index);
 
 void force_wheels_applyDirectPerWheelPower(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg);
 
@@ -210,7 +213,7 @@ void force_wheels_stopRobot(FirmwareRobot_t* robot, TbotsProto_StopPrimitive_Sto
 
 void velocity_wheels_stopRobot(FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopType stop_type);
 
-void app_firmware_robot_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory);
+void app_firmware_robot_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, size_t trajectory_index);
 
 void app_firmware_robot_applyDirectPerWheelPower(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg);
 

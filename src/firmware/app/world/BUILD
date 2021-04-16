@@ -66,8 +66,11 @@ cc_library(
     hdrs = ["firmware_robot.h"],
     deps = [
         "//firmware/app/control:trajectory_planner",
+        "//firmware/app/control:control",
+        "//firmware/app/control:physbot",
         "//shared/proto:tbots_nanopb_proto",
-        ":firmware_robot_constants",
+        "//shared:constants",
+        "//firmware/shared:physics",
         ":charger",
         ":chicker",
         ":dribbler",
