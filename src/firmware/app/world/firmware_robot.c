@@ -8,29 +8,12 @@
 // so that the axes would never have to compete for resources
 #define TIME_HORIZON 0.05f  // s
 
-typedef void (*TrajectoryFollower_t)(FirmwareRobot_t*, PositionTrajectory_t, size_t);
+typedef void (*TrajectoryFollower_t)(FirmwareRobot_t*, PositionTrajectory_t, size_t, float);
 typedef void (*ApplyDirectPerWheelPower_t)(FirmwareRobot_t*, 
     TbotsProto_DirectControlPrimitive_DirectPerWheelControl);
 typedef void (*SetLocalVelocity_t)(
     FirmwareRobot_t*, TbotsProto_DirectControlPrimitive_DirectVelocityControl);
 typedef void (*StopRobot_t)(FirmwareRobot_t*, TbotsProto_StopPrimitive_StopType);
-
-// TODO: Probably need to redo this part
-typedef struct MoveState
-{
-    // The trajectory we're tracking
-    PositionTrajectory_t position_trajectory;
-
-    // The number of elements in the trajectory we're tracking
-    size_t num_trajectory_elems;
-
-    // The start time of this primitive, in seconds
-    float primitive_start_time_seconds;
-
-    // The maximum speed of the move primitive
-    float max_speed_m_per_s;
-
-} MoveState_t;
 
 /**
  * Determines the rotation acceleration after setup_bot has been used and
@@ -281,7 +264,7 @@ void app_firmware_robot_trackVelocityInRobotFrame(
 }
 
 void force_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory,
-    size_t trajectory_index)
+    size_t trajectory_index, float max_speed_m_per_s)
 {
     ForceWheel_t* front_right_wheel = robot->front_right_force_wheel;
     ForceWheel_t* front_left_wheel = robot->front_left_force_wheel;
@@ -291,20 +274,21 @@ void force_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory
     const RobotConstants_t robot_constants = app_firmware_robot_getRobotConstants(robot);
     ControllerState_t* controller_state = app_firmware_robot_getControllerState(robot);
 
-    void* void_state_ptr;
-    MoveState_t* state           = (MoveState_t*)(void_state_ptr);
-    float battery_voltage = app_firmware_robot_getBatteryVoltage(robot);
-    const float dest_x = state->position_trajectory.x_position[trajectory_index];
-    const float dest_y = state->position_trajectory.y_position[trajectory_index];
-    const float dest_orientation =
-        state->position_trajectory.orientation[trajectory_index];
+    const float battery_voltage = app_firmware_robot_getBatteryVoltage(robot);
+    const float curr_vx = app_firmware_robot_getVelocityX(robot); 
+    const float curr_vy = app_firmware_robot_getVelocityY(robot); 
+    const float orientation = app_firmware_robot_getOrientation(robot);
+
+    const float dest_x = pos_trajectory.x_position[trajectory_index];
+    const float dest_y = pos_trajectory.y_position[trajectory_index];
+    const float dest_orientation = pos_trajectory.orientation[trajectory_index];
     float dest[3] = {dest_x, dest_y, dest_orientation};
 
-    const float current_dx = app_firmware_robot_getPositionX(robot);
-    const float current_dy = app_firmware_robot_getPositionY(robot);
+    const float curr_x = app_firmware_robot_getPositionX(robot);
+    const float curr_y = app_firmware_robot_getPositionY(robot);
 
-    const float dx = dest_x - current_dx;
-    const float dy = dest_y - current_dy;
+    const float dx = dest_x - curr_x;
+    const float dy = dest_y - curr_y;
 
     float total_disp = sqrtf(dx * dx + dy * dy);
     // Add a small number to avoid division by zero
@@ -312,24 +296,19 @@ void force_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory
     float minor_vec[2] = {major_vec[0], major_vec[1]};
     rotate(minor_vec, P_PI / 2);
 
-    float current_vx = app_firmware_robot_getVelocityX(robot);
-    float current_vy = app_firmware_robot_getVelocityY(robot);
-    float current_orientation = app_firmware_robot_getOrientation(robot);
+    PhysBot pb = app_physbot_create(curr_vx, curr_vy, curr_x, curr_y, orientation, dest, major_vec, minor_vec);
 
-    PhysBot pb = app_physbot_create(current_vx, current_vy, current_dx, current_dy, current_orientation,
-                                    dest, major_vec, minor_vec);
-
-    const float dest_speed = state->position_trajectory.linear_speed[trajectory_index];
+    const float dest_speed = pos_trajectory.linear_speed[trajectory_index];
 
     // plan major axis movement
-    float max_major_a     = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
-    float max_major_v     = state->max_speed_m_per_s;
+    float max_major_a = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
+    float max_major_v = max_speed_m_per_s;
     float major_params[3] = {dest_speed, max_major_a, max_major_v};
     app_physbot_planMove(&pb.maj, major_params);
 
     // plan minor axis movement
     float max_minor_a = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / 2.0f;
-    float max_minor_v = state->max_speed_m_per_s / 2.0f;
+    float max_minor_v = max_speed_m_per_s / 2.0f;
     float minor_params[3] = {0, max_minor_a, max_minor_v};
     app_physbot_planMove(&pb.min, minor_params);
 
@@ -349,7 +328,7 @@ void force_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory
 }
 
 void velocity_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, 
-    size_t trajectory_index)
+    size_t trajectory_index, float max_speed_m_per_s)
 {
     // Convert position trajectory to velocity trajectory
     // TODO: Implement this function
@@ -476,9 +455,9 @@ void velocity_wheels_stopRobot(FirmwareRobot_t* robot, TbotsProto_StopPrimitive_
     }
 }
 
-void app_firmware_robot_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, size_t trajectory_index)
+void app_firmware_robot_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, size_t trajectory_index, float max_speed_m_per_s)
 {
-    robot->follow_pos_trajectory(robot, pos_trajectory, trajectory_index);
+    robot->follow_pos_trajectory(robot, pos_trajectory, trajectory_index, max_speed_m_per_s);
 }
 
 void app_firmware_robot_applyDirectPerWheelPower(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg)

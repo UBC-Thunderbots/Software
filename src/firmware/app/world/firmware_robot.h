@@ -197,10 +197,9 @@ ControllerState_t* app_firmware_robot_getControllerState(const FirmwareRobot_t* 
 void app_firmware_robot_trackVelocityInRobotFrame(FirmwareRobot_t* robot, float linear_velocity_x,
     float linear_velocity_y, float angular_velocity);
 
-void force_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, size_t trajectory_index);
+void force_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, size_t trajectory_index, float max_speed_m_per_s);
 
-void velocity_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, 
-    size_t trajectory_index);
+void velocity_wheels_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, size_t trajectory_index, float max_speed_m_per_s);
 
 void force_wheels_applyDirectPerWheelPower(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg);
 
@@ -214,7 +213,7 @@ void force_wheels_stopRobot(FirmwareRobot_t* robot, TbotsProto_StopPrimitive_Sto
 
 void velocity_wheels_stopRobot(FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopType stop_type);
 
-void app_firmware_robot_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, size_t trajectory_index);
+void app_firmware_robot_followPosTrajectory(FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, size_t trajectory_index, float max_speed_m_per_s);
 
 void app_firmware_robot_applyDirectPerWheelPower(FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg);
 
