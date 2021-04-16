@@ -1,8 +1,8 @@
 /**
  ******************************************************************************
- * File Name          : CRC.c
- * Description        : This file provides code for the configuration
- *                      of the CRC instances.
+ * @file    crc.c
+ * @brief   This file provides code for the configuration
+ *          of the CRC instances.
  ******************************************************************************
  * @attention
  *
@@ -29,6 +29,13 @@ CRC_HandleTypeDef hcrc;
 /* CRC init function */
 void MX_CRC_Init(void)
 {
+    /* USER CODE BEGIN CRC_Init 0 */
+
+    /* USER CODE END CRC_Init 0 */
+
+    /* USER CODE BEGIN CRC_Init 1 */
+
+    /* USER CODE END CRC_Init 1 */
     hcrc.Instance                     = CRC;
     hcrc.Init.DefaultPolynomialUse    = DEFAULT_POLYNOMIAL_ENABLE;
     hcrc.Init.DefaultInitValueUse     = DEFAULT_INIT_VALUE_ENABLE;
@@ -39,6 +46,9 @@ void MX_CRC_Init(void)
     {
         Error_Handler();
     }
+    /* USER CODE BEGIN CRC_Init 2 */
+
+    /* USER CODE END CRC_Init 2 */
 }
 
 void HAL_CRC_MspInit(CRC_HandleTypeDef* crcHandle)
