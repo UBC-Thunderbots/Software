@@ -27,10 +27,13 @@
 #endif /* MDK ARM Compiler */
 #include <string.h>
 
+#include "ethernetif.h"
+
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
 /* Private function prototypes -----------------------------------------------*/
+static void ethernet_link_status_updated(struct netif *netif);
 /* ETH Variables initialization ----------------------------------------------*/
 void Error_Handler(void);
 
@@ -41,6 +44,10 @@ void Error_Handler(void);
 /* Variables Initialization */
 struct netif gnetif;
 ip6_addr_t ip6addr;
+/* USER CODE BEGIN OS_THREAD_ATTR_CMSIS_RTOS_V2 */
+#define INTERFACE_THREAD_STACK_SIZE (1024)
+osThreadAttr_t attributes;
+/* USER CODE END OS_THREAD_ATTR_CMSIS_RTOS_V2 */
 
 /* USER CODE BEGIN 2 */
 
@@ -76,6 +83,18 @@ void MX_LWIP_Init(void)
         netif_set_down(&gnetif);
     }
 
+    /* Set the link callback function, this function is called on change of link status*/
+    netif_set_link_callback(&gnetif, ethernet_link_status_updated);
+
+    /* Create the Ethernet link handler thread */
+    /* USER CODE BEGIN H7_OS_THREAD_NEW_CMSIS_RTOS_V2 */
+    memset(&attributes, 0x0, sizeof(osThreadAttr_t));
+    attributes.name       = "EthLink";
+    attributes.stack_size = INTERFACE_THREAD_STACK_SIZE;
+    attributes.priority   = osPriorityBelowNormal;
+    osThreadNew(ethernet_link_thread, &gnetif, &attributes);
+    /* USER CODE END H7_OS_THREAD_NEW_CMSIS_RTOS_V2 */
+
     /* USER CODE BEGIN 3 */
 
     /* USER CODE END 3 */
@@ -87,6 +106,25 @@ void MX_LWIP_Init(void)
 /* USER CODE BEGIN 4 */
 /* USER CODE END 4 */
 #endif
+
+/**
+ * @brief  Notify the User about the network interface config status
+ * @param  netif: the network interface
+ * @retval None
+ */
+static void ethernet_link_status_updated(struct netif *netif)
+{
+    if (netif_is_up(netif))
+    {
+        /* USER CODE BEGIN 5 */
+        /* USER CODE END 5 */
+    }
+    else /* netif is down */
+    {
+        /* USER CODE BEGIN 6 */
+        /* USER CODE END 6 */
+    }
+}
 
 #if defined(__CC_ARM) /* MDK ARM Compiler */
 /**
