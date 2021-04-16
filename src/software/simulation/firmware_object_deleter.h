@@ -7,7 +7,7 @@ extern "C"
 #include "firmware/app/world/dribbler.h"
 #include "firmware/app/world/firmware_robot.h"
 #include "firmware/app/world/firmware_world.h"
-#include "firmware/app/world/wheel.h"
+#include "firmware/app/world/force_wheel.h"
 #include "firmware/shared/physics.h"
 #include "shared/proto/primitive.nanopb.h"
 }
