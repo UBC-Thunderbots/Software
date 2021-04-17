@@ -24,8 +24,6 @@ class CSVSink
      * with "," and rows are separated with new line characters.
      *
      * @param log_entry the message received on a LOG() call
-     *
-     * @throws invalid_argument If the file name does not have .csv at the end
      */
     void appendToFile(g3::LogMessageMover log_entry);
 
