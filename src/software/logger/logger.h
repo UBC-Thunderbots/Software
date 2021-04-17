@@ -9,7 +9,15 @@
 #include <g3log/logworker.hpp>
 
 #include "software/logger/coloured_cout_sink.h"
+#include "software/logger/csv_sink.h"
 #include "software/logger/custom_logging_levels.h"
+
+#define LOG_SELECT(_1, _2, NAME, ...) NAME
+
+#undef LOG
+#define LOG(...) LOG_SELECT(__VA_ARGS__, LOG_2, LOG_1)(__VA_ARGS__)
+#define LOG_1(level) if(!g3::logLevel(level)) {} else INTERNAL_LOG_MESSAGE(level).stream()
+#define LOG_2(level, filename) if(level == CSV) { LOG_1(level) << filename; } else LOG_1(FATAL) << "illegal log call, level not defined"
 
 /**
  * This class acts as a Singleton that's responsible for initializing the logger.
@@ -52,6 +60,8 @@ class LoggerSingleton
         // arg. Note: log locations are defaulted to the bazel-out folder due to Bazel's
         // hermetic build principles
 
+        auto csv_sink_handle = logWorker->addSink(
+                std::make_unique<CSVSink>(log_directory), &CSVSink::appendToFile);
         // Sink for outputting logs to the terminal
         auto colour_cout_sink_handle = logWorker->addSink(
             std::make_unique<ColouredCoutSink>(), &ColouredCoutSink::displayColouredLog);
