@@ -144,7 +144,7 @@ cc_library(
     hdrs = ["ssl_simulation_robot_control.h"],
     deps = [
         "//software/proto:ssl_simulation_cc_proto",
-    ]
+    ],
 )
 
 cc_test(
