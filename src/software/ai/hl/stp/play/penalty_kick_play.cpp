@@ -26,7 +26,7 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                      const World &world)
 {
     auto penalty_shot_tactic = std::make_shared<PenaltyKickTactic>(
-        world.ball(), true);
+        world.ball(), true, world.enemyTeam().goalie());
 
     auto shooter_setup_move = std::make_shared<PenaltySetupTactic>(true);
 

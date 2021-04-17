@@ -22,6 +22,7 @@ struct DribbleFSM
         std::optional<Angle> final_dribble_orientation;
         // whether to allow excessive dribbling, i.e. more than 1 metre at a time
         bool allow_excessive_dribbling;
+        bool allow_orientation_changes_while_moving;
     };
 
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -148,7 +149,8 @@ struct DribbleFSM
     static std::tuple<Point, Angle> calculateNextDribbleDestinationAndOrientation(
         const Ball &ball, const Robot &robot,
         std::optional<Point> dribble_destination_opt,
-        std::optional<Angle> final_dribble_orientation_opt)
+        std::optional<Angle> final_dribble_orientation_opt,
+        bool allow_orientation_changes_while_moving)
     {
         Point dribble_destination =
             getDribbleBallDestination(ball.position(), dribble_destination_opt);
@@ -165,14 +167,20 @@ struct DribbleFSM
         if (!comparePoints(dribble_destination, ball.position(),
                            BALL_CLOSE_TO_DEST_THRESHOLD))
         {
-            // rotate to face the destination
-            target_orientation = to_destination_orientation;
+            if (!allow_orientation_changes_while_moving) {
+                // rotate to face the destination
+                target_orientation = to_destination_orientation;
+            }
             if (compareAngles(to_destination_orientation, robot.orientation(),
                               ROBOT_ORIENTATION_CLOSE_THRESHOLD))
             {
                 // dribble the ball towards ball destination
                 target_destination = robotPositionToFaceBall(dribble_destination,
                                                              to_destination_orientation);
+            }
+            else if (allow_orientation_changes_while_moving)
+            {
+                target_destination = robotPositionToFaceBall(dribble_destination, target_orientation);
             }
             else
             {
@@ -266,7 +274,8 @@ struct DribbleFSM
                 calculateNextDribbleDestinationAndOrientation(
                     event.common.world.ball(), event.common.robot,
                     event.control_params.dribble_destination,
-                    event.control_params.final_dribble_orientation);
+                    event.control_params.final_dribble_orientation,
+                    event.control_params.allow_orientation_changes_while_moving);
             AutoChipOrKick auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::OFF, 0};
 
             if (!event.control_params.allow_excessive_dribbling &&

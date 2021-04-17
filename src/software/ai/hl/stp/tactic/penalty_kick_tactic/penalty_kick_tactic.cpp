@@ -5,9 +5,10 @@
 
 PenaltyKickTactic::PenaltyKickTactic(const Ball& ball,
                                      bool loop_forever,
-                                     std::optional<Robot> enemy_goalie)
+                                     const std::optional<Robot> &enemy_goalie)
     : Tactic(loop_forever, {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
-        ball(ball), enemy_goalie(enemy_goalie)
+        ball(ball), enemy_goalie(enemy_goalie),
+        control_params({.enemy_goalie = enemy_goalie})
 {
 }
 
