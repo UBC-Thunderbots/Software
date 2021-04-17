@@ -10,8 +10,13 @@
 #include "software/ai/hl/stp/tactic/kick/kick_tactic.h"
 #include "software/ai/hl/stp/tactic/kickoff_chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
+<<<<<<< HEAD
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/penalty_kick_tactic/penalty_kick_tactic2.h"
+=======
+#include "software/ai/hl/stp/tactic/passer/passer_tactic.h"
+#include "software/ai/hl/stp/tactic/penalty_kick_tactic.h"
+>>>>>>> b5062d4d06f6406cb2de951a453739a10d3b1c12
 #include "software/ai/hl/stp/tactic/penalty_setup_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"

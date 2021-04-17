@@ -198,7 +198,7 @@ struct DribbleFSM
 
         const auto get_possession_s = state<GetPossessionState>;
         const auto dribble_s        = state<DribbleState>;
-        Point continuous_dribbling_start_point;
+        static Point continuous_dribbling_start_point;
 
         const auto update_e = event<Update>;
 
@@ -268,7 +268,7 @@ struct DribbleFSM
          *
          * @param event DribbleFSM::Update
          */
-        const auto dribble = [this, &continuous_dribbling_start_point](auto event) {
+        const auto dribble = [this](auto event) {
             Point ball_position = event.common.world.ball().position();
             auto [target_destination, target_orientation] =
                 calculateNextDribbleDestinationAndOrientation(
@@ -293,8 +293,7 @@ struct DribbleFSM
                 MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
         };
 
-        const auto start_dribble = [this, &continuous_dribbling_start_point,
-                                    dribble](auto event) {
+        const auto start_dribble = [this, dribble](auto event) {
             // update continuous_dribbling_start_point once we start dribbling
             continuous_dribbling_start_point = event.common.world.ball().position();
             dribble(event);

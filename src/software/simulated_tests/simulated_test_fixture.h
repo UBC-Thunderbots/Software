@@ -92,15 +92,6 @@ class SimulatedTestFixture : public ::testing::Test
     void addEnemyRobots(const std::vector<RobotStateWithId>& robots);
 
     /**
-     * Sets the Referee command to override for the simulated test
-     *
-     * @param current_referee_command The name of the current referee command to set
-     * @param previous_referee_command The name of the previous referee command to set
-     */
-    void setRefereeCommand(const RefereeCommand& current_referee_command,
-                           const RefereeCommand& previous_referee_command);
-
-    /**
      * Returns the field in the simulated test
      *
      * @return the field in the simulated test

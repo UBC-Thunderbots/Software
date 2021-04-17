@@ -42,7 +42,7 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     do
     {
-        std::vector<std::shared_ptr<Tactic>> tactics_to_run;
+        PriorityTacticVector tactics_to_run = {{}};
 
         Vector behind_ball_direction =
             (world.ball().position() - world.field().enemyGoalpostPos()).normalize();
@@ -73,19 +73,19 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         // If we are setting up for penalty kick, move our robots to position
         if (world.gameState().isSetupState())
         {
-            tactics_to_run.emplace_back(shooter_setup_move);
+            tactics_to_run[0].emplace_back(shooter_setup_move);
         }
         else if (world.gameState().isOurPenalty())
         {
-            tactics_to_run.emplace_back(penalty_shot_tactic);
+            tactics_to_run[0].emplace_back(penalty_shot_tactic);
         }
 
-        tactics_to_run.emplace_back(goalie_tactic);
+        tactics_to_run[0].emplace_back(goalie_tactic);
         // Move all non-shooter robots behind the ball
-        tactics_to_run.emplace_back(move_tactic_2);
-        tactics_to_run.emplace_back(move_tactic_3);
-        tactics_to_run.emplace_back(move_tactic_4);
-        tactics_to_run.emplace_back(move_tactic_5);
+        tactics_to_run[0].emplace_back(move_tactic_2);
+        tactics_to_run[0].emplace_back(move_tactic_3);
+        tactics_to_run[0].emplace_back(move_tactic_4);
+        tactics_to_run[0].emplace_back(move_tactic_5);
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(tactics_to_run);

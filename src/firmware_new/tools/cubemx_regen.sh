@@ -2,7 +2,7 @@
 #
 # This script allows the user to automatically generate cubemx
 # code into our filestructure
-CUBE_VERSION=5.6.1
+CUBE_VERSION=6.2.0
 
 # The directory this script is in
 CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")

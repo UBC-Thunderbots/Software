@@ -8,18 +8,20 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 
+using TacticVector              = std::vector<std::shared_ptr<Tactic>>;
+using PriorityTacticVector      = std::vector<TacticVector>;
+using ConstTacticVector         = std::vector<std::shared_ptr<const Tactic>>;
+using ConstPriorityTacticVector = std::vector<ConstTacticVector>;
+
 using RobotToTacticAssignmentFunction =
     std::function<std::map<std::shared_ptr<const Tactic>, Robot>(
-        const std::vector<std::shared_ptr<const Tactic>>&, const World&)>;
+        const ConstPriorityTacticVector&, const World&)>;
 
 using MotionConstraintBuildFunction =
     std::function<std::set<MotionConstraint>(const Tactic& tactic)>;
 
-// We typedef the coroutine return type to make it shorter, more descriptive,
-// and easier to work with.
-// This coroutine returns a list of shared_ptrs to Tactic objects
-typedef boost::coroutines2::coroutine<std::vector<std::shared_ptr<Tactic>>>
-    TacticCoroutine;
+// This coroutine returns a list of list of shared_ptrs to Tactic objects
+using TacticCoroutine = boost::coroutines2::coroutine<PriorityTacticVector>;
 
 /**
  * In the STP framework, a Play is a collection of tactics that represent some
@@ -121,7 +123,7 @@ class Play
      * @return A list of shared_ptrs to the Tactics the Play wants to run at this time, in
      * order of priority
      */
-    std::vector<std::shared_ptr<Tactic>> getTactics(const World& world);
+    PriorityTacticVector getTactics(const World& world);
 
     /**
      * A wrapper function for the getNextTactics function.
