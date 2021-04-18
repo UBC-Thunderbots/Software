@@ -25,18 +25,18 @@ struct FirmwareRobotDeleter
 {
     void operator()(FirmwareRobot_t* firmware_robot) const
     {
-        Wheel_t* front_left_wheel = app_firmware_robot_getFrontLeftWheel(firmware_robot);
-        app_wheel_destroy(front_left_wheel);
+        ForceWheel_t* front_left_wheel = app_firmware_robot_getFrontLeftWheel(firmware_robot);
+        app_force_wheel_destroy(front_left_wheel);
 
-        Wheel_t* back_left_wheel = app_firmware_robot_getBackLeftWheel(firmware_robot);
-        app_wheel_destroy(back_left_wheel);
+        ForceWheel_t* back_left_wheel = app_firmware_robot_getBackLeftWheel(firmware_robot);
+        app_force_wheel_destroy(back_left_wheel);
 
-        Wheel_t* back_right_wheel = app_firmware_robot_getBackRightWheel(firmware_robot);
-        app_wheel_destroy(back_right_wheel);
+        ForceWheel_t* back_right_wheel = app_firmware_robot_getBackRightWheel(firmware_robot);
+        app_force_wheel_destroy(back_right_wheel);
 
-        Wheel_t* front_right_wheel =
+        ForceWheel_t* front_right_wheel =
             app_firmware_robot_getFrontRightWheel(firmware_robot);
-        app_wheel_destroy(front_right_wheel);
+        app_force_wheel_destroy(front_right_wheel);
 
         Chicker_t* chicker = app_firmware_robot_getChicker(firmware_robot);
         app_chicker_destroy(chicker);

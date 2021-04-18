@@ -13,6 +13,11 @@
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
 
+// these are set to decouple the 3 axis from each other
+// the idea is to clamp the maximum velocity and acceleration
+// so that the axes would never have to compete for resources
+#define TIME_HORIZON 0.05f  // s
+
 typedef struct MoveState
 {
     // The trajectory we're tracking
@@ -29,6 +34,28 @@ typedef struct MoveState
 
 } MoveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(MoveState_t);
+
+/**
+ * Determines the rotation acceleration after setup_bot has been used and
+ * plan_move has been done along the minor axis. The minor time from bangbang
+ * is used to determine the rotation time, and thus the rotation velocity and
+ * acceleration. The rotational acceleration is clamped under the MAX_T_A.
+ *
+ * @param pb [in/out] The PhysBot data container that should have minor axis time and
+ * will store the rotational information
+ * @param avel The rotational velocity of the bot
+ */
+void plan_move_rotation(PhysBot* pb, float avel);
+
+void plan_move_rotation(PhysBot* pb, float avel)
+{
+    pb->rot.time = (pb->min.time > TIME_HORIZON) ? pb->min.time : TIME_HORIZON;
+    // 1.4f is a magic constant to force the robot to rotate faster to its final
+    // orientation.
+    pb->rot.vel   = 1.4f * pb->rot.disp / pb->rot.time;
+    pb->rot.accel = (pb->rot.vel - avel) / TIME_HORIZON;
+    limit(&pb->rot.accel, MAX_T_A);
+}
 
 void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_state_ptr,
                               FirmwareWorld_t* world)
@@ -122,9 +149,6 @@ static void app_move_primitive_tick(void* void_state_ptr, FirmwareWorld_t* world
 {
     MoveState_t* state           = (MoveState_t*)(void_state_ptr);
     const FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
-    const RobotConstants_t robot_constants = app_firmware_robot_getRobotConstants(robot);
-    ControllerState_t* controller_state = app_firmware_robot_getControllerState(robot);
-    float battery_voltage = app_firmware_robot_getBatteryVoltage(robot);
 
     // Figure out the index of the trajectory element we should be executing
     size_t trajectory_index  = 1;

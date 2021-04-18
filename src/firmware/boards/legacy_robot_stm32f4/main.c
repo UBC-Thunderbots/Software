@@ -497,17 +497,17 @@ static void run_normal(void)
         .motor_back_emf_per_rpm              = RPM_TO_VOLT,
         .motor_phase_resistance              = WHEEL_MOTOR_PHASE_RESISTANCE,
         .motor_current_per_unit_torque       = CURRENT_PER_TORQUE};
-    Wheel_t* front_right_wheel = app_wheel_create(
+    Wheel_t* front_right_wheel = app_force_wheel_create(
         apply_wheel_force_front_right, wheels_get_front_right_rpm,
         wheels_brake_front_right, wheels_coast_front_right, wheel_constants);
-    Wheel_t* front_left_wheel = app_wheel_create(
+    Wheel_t* front_left_wheel = app_force_wheel_create(
         apply_wheel_force_front_left, wheels_get_front_left_rpm, wheels_brake_front_left,
         wheels_coast_front_left, wheel_constants);
-    Wheel_t* back_right_wheel = app_wheel_create(
+    Wheel_t* back_right_wheel = app_force_wheel_create(
         apply_wheel_force_back_right, wheels_get_back_right_rpm, wheels_brake_back_right,
         wheels_coast_back_right, wheel_constants);
     Wheel_t* back_left_wheel =
-        app_wheel_create(apply_wheel_force_back_left, wheels_get_back_left_rpm,
+        app_force_wheel_create(apply_wheel_force_back_left, wheels_get_back_left_rpm,
                          wheels_brake_back_left, wheels_coast_back_left, wheel_constants);
     Charger_t* charger =
         app_charger_create(charger_charge, charger_discharge, charger_float);

@@ -59,7 +59,7 @@ class WheelTest : public testing::Test
 
 TEST_F(WheelTest, applyForce)
 {
-    app_wheel_applyForce(wheel, 13);
+    app_force_wheel_applyForce(wheel, 13);
 
     EXPECT_EQ(13, requested_wheel_force);
 }

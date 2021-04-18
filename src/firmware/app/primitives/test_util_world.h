@@ -171,22 +171,22 @@ class FirmwareTestUtilWorld : public testing::Test
                                        &(FirmwareTestUtil::get_temperature_deg_c));
 
         front_right_wheel =
-            app_wheel_create(&(FirmwareTestUtil::request_wheel_force_front_right),
+            app_force_wheel_create(&(FirmwareTestUtil::request_wheel_force_front_right),
                              &(FirmwareTestUtil::get_motor_speed_front_right),
                              &(FirmwareTestUtil::brake_front_right),
                              &(FirmwareTestUtil::coast_front_right), wheel_constants);
         front_left_wheel =
-            app_wheel_create(&(FirmwareTestUtil::request_wheel_force_front_left),
+            app_force_wheel_create(&(FirmwareTestUtil::request_wheel_force_front_left),
                              &(FirmwareTestUtil::get_motor_speed_front_left),
                              &(FirmwareTestUtil::brake_front_left),
                              &(FirmwareTestUtil::coast_front_left), wheel_constants);
         back_right_wheel =
-            app_wheel_create(&(FirmwareTestUtil::request_wheel_force_back_right),
+            app_force_wheel_create(&(FirmwareTestUtil::request_wheel_force_back_right),
                              &(FirmwareTestUtil::get_motor_speed_back_right),
                              &(FirmwareTestUtil::brake_back_right),
                              &(FirmwareTestUtil::coast_back_right), wheel_constants);
         back_left_wheel =
-            app_wheel_create(&(FirmwareTestUtil::request_wheel_force_back_left),
+            app_force_wheel_create(&(FirmwareTestUtil::request_wheel_force_back_left),
                              &(FirmwareTestUtil::get_motor_speed_back_left),
                              &(FirmwareTestUtil::brake_back_left),
                              &(FirmwareTestUtil::coast_back_left), wheel_constants);

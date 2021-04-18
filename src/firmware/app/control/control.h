@@ -6,7 +6,13 @@
 /**
  * Apply the given acceleration (in robot coordinates) to the given robot
  *
- * @param robot The robot to apply acceleration to
+ * @param robot_constants The robot constants representing the robot 
+ * @param controller_state The controller state representing the robot
+ * @param battery_voltage The robot's battery voltage 
+ * @param front_left_wheel The robot's front left wheel
+ * @param front_right_wheel The robot's front right wheel
+ * @param back_left_wheel The robot's back left wheel
+ * @param back_right_wheel The robot's back right wheel
  * @param linear_accel_x The linear acceleration, in robot coordinates, in the x
  *                       (forward/backwards) direction (m/s^2)
  * @param linear_accel_y The linear acceleration, in robot coordinates, in the y

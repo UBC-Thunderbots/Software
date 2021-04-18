@@ -10,15 +10,15 @@ void app_primitive_stopRobot(FirmwareWorld_t *world,
     // Disable chipper, kicker, dribbler
     app_chicker_disableAutochip(chicker);
     app_chicker_disableAutokick(chicker);
-    void (*wheel_op)(const Wheel_t *wheel);
+    void (*wheel_op)(const ForceWheel_t *wheel);
     if (stop_type == TbotsProto_StopPrimitive_StopType_COAST)
     {
-        wheel_op = app_wheel_coast;
+        wheel_op = app_force_wheel_coast;
         app_dribbler_coast(dribbler);
     }
     else
     {
-        wheel_op = app_wheel_brake;
+        wheel_op = app_force_wheel_brake;
         app_dribbler_setSpeed(dribbler, 0);
     }
 
