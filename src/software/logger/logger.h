@@ -23,13 +23,11 @@
     else                                                                                 \
         INTERNAL_LOG_MESSAGE(level).stream()
 #define LOG_2(level, filename)                                                           \
-    if (level == CSV)                                                                    \
+    if (level != CSV)                                                                    \
     {                                                                                    \
-        LOG_1(level) << filename;                                                        \
     }                                                                                    \
     else                                                                                 \
-        LOG_1(FATAL) << "illegal log call, level not defined"
-
+        LOG_1(level) << filename                                                         \
 /**
  * This class acts as a Singleton that's responsible for initializing the logger.
  * We use a singleton rather than a generic function in this namespace because
