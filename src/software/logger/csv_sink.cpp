@@ -18,10 +18,10 @@ void CSVSink::appendToFile(g3::LogMessageMover log_entry)
             std::ofstream csv_file(log_directory + "/" + file_name,
                                    std::ios::out | std::ios_base::app);
             csv_file << file_data;
-//            std::cout << csv_file.good() << std::endl;
-//            std::cout << csv_file.eof() << std::endl;
-//            std::cout << csv_file.fail() << std::endl;
-//            std::cout << csv_file.bad() << std::endl;
+            //            std::cout << csv_file.good() << std::endl;
+            //            std::cout << csv_file.eof() << std::endl;
+            //            std::cout << csv_file.fail() << std::endl;
+            //            std::cout << csv_file.bad() << std::endl;
             csv_file.close();
         }
     }
