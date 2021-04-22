@@ -75,7 +75,7 @@ struct CreaseDefenderFSM
         const auto update_e = event<Update>;
 
         /**
-         * This is an Action
+         * This is an Action that blocks the threat
          *
          * @param event CreaseDefenderFSM::Update event
          */
