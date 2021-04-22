@@ -260,7 +260,7 @@ class TestAutogenParameterList : public YamlLoadFixture
      * checks that the yaml was generated correctly into the expected
      * parameter.
      *
-     * Interally asserts and creates failures
+     * Internally asserts and creates failures
      */
     template <typename T>
     void assert_parameter(const std::shared_ptr<const Parameter<T>>& param,

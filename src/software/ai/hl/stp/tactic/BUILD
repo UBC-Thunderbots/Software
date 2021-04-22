@@ -92,22 +92,6 @@ cc_test(
 )
 
 cc_library(
-    name = "passer_tactic",
-    srcs = ["passer_tactic.cpp"],
-    hdrs = ["passer_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//software/ai/hl/stp/action:intercept_ball_action",
-        "//software/ai/hl/stp/action:kick_action",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/passing:pass",
-        "//software/logger",
-        "//software/world:ball",
-    ],
-)
-
-cc_library(
     name = "penalty_kick_tactic",
     srcs = ["penalty_kick_tactic.cpp"],
     hdrs = ["penalty_kick_tactic.h"],
@@ -246,7 +230,6 @@ cc_library(
         ":defense_shadow_enemy_tactic",
         ":goalie_tactic",
         ":kickoff_chip_tactic",
-        ":passer_tactic",
         ":penalty_kick_tactic",
         ":penalty_setup_tactic",
         ":receiver_tactic",
@@ -259,6 +242,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/hl/stp/tactic/passer:passer_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
     ],
 )

@@ -4,7 +4,7 @@
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/passer_tactic.h"
+#include "software/ai/hl/stp/tactic/passer/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
@@ -57,14 +57,12 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
      */
 
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
         play_config->getGoalieTacticConfig());
 
     Pass pass = setupPass(yield, goalie_tactic, world);
 
     // Perform the pass and wait until the receiver is finished
-    auto passer =
-        std::make_shared<PasserTactic>(pass, world.ball(), world.field(), false);
+    auto passer = std::make_shared<PasserTactic>(pass);
     auto receiver =
         std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(),
                                          world.enemyTeam(), pass, world.ball(), false);

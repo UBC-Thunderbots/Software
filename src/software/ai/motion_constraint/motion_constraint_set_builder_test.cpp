@@ -71,8 +71,7 @@ namespace
                                     std::make_shared<const ShootGoalTacticConfig>()),
                 std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new PasserTactic(pass, world.ball(), world.field(), false),
-                std::set<MotionConstraint>({})),
+                new PasserTactic(pass), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new StopTactic(false), std::set<MotionConstraint>({}))};
 
