@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/proto/ssl_simulation_robot_control.pb.h"
+#include "software/proto/ssl_simulation_robot_feedback.pb.h"
 
 /**
  * Creates a MoveWheelVelocity proto

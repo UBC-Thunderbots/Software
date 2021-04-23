@@ -14,8 +14,12 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(boost::asio::io_service& io_se
     boost::asio::ip::udp::endpoint listen_endpoint(
         boost::asio::ip::make_address(ip_address), port);
 
+    // We want to be able to send and receive on the same port/address so we enable those socket options. 
+    // Taken from here: https://gist.github.com/yueyoum/3cbb3b51e7306c7abf1f
+    size_t one = 1;
+    setsockopt(socket_.native_handle(), SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &one, sizeof(one));
     socket_.open(listen_endpoint.protocol());
-    socket_.set_option(boost::asio::socket_base::reuse_address(true));
+
     try
     {
         socket_.bind(listen_endpoint);
@@ -44,11 +48,12 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(boost::asio::io_service& io_se
     : socket_(io_service)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(boost::asio::ip::udp::v6(), port);
-    socket_.open(listen_endpoint.protocol());
 
     // Explicitly set the v6_only option to be false to accept both ipv4 and ipv6 packets
     socket_.set_option(boost::asio::ip::v6_only(false));
-    socket_.set_option(boost::asio::socket_base::reuse_address(true));
+    size_t one = 1;
+    setsockopt(socket_.native_handle(), SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &one, sizeof(one));
+    socket_.open(listen_endpoint.protocol());
 
     try
     {
