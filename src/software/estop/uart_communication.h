@@ -33,7 +33,7 @@ class UartCommunication
     virtual bool serialWrite(const std::vector<unsigned char> &write_val) = 0;
 
     /**
-     * reads a given numeber of bytes from UART receive buffer
+     * reads a given number of bytes from UART receive buffer
      * @param num_read_bytes the number of bytes to read
      * @return the values read
      */
