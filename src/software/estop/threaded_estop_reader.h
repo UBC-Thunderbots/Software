@@ -22,29 +22,26 @@ class ThreadedEstopReader
    public:
     /**
      * creates and starts a threadedEstopReader with the given parameters
-     * @param startup_ms time in milliseconds to wait before first read
-     * @param interval_ms time in milliseconds between reads
      * @param uart_reader the UART device acting as source of estop values
+     * @param startup_time_ms time in milliseconds to wait before making first read
+     * @param interval_ms periodic time in milliseconds between reads
      */
-    ThreadedEstopReader(int startup_ms, int interval_ms,
-                        std::unique_ptr<UartCommunication> uart_reader);
+    ThreadedEstopReader(std::unique_ptr<UartCommunication> uart_reader,
+                        unsigned int startup_time_ms,
+                        unsigned int regular_interval_time_ms);
 
     ~ThreadedEstopReader();
 
-    /*
-     * returns the state of estop
+    /**
+     * Returns true if estop is in play state and false otherwise
      */
-    EstopState getEstopState();
+    bool isEstopPlay();
 
 
    private:
     /*
-     * reads value of Estop and updates estop state
-     */
-    void readEstop();
-
-    /*
-     * handler method that is called every time the timer expires.
+     * handler method that is called every time the timer expires and a new read is
+     * requested
      */
     void tick(const boost::system::error_code&);
 
@@ -57,23 +54,40 @@ class ThreadedEstopReader
      * each estop message is one byte and is defined as follows
      * bit 0 (least significant bit): estop state, a value of 1 is play, 0 is stop
      * bit 1-7: set to 0
-     * any other message received is considred a STATUS_ERROR
+     * any other message received is considered a EstopState::STATUS_ERROR
      */
-    static constexpr int ESTOP_MESSAGE_SIZE = 1;
+    static constexpr int ESTOP_MESSAGE_SIZE_BYTES = 1;
+    static constexpr unsigned char ESTOP_PLAY     = 1;
+    static constexpr unsigned char ESTOP_STOP     = 0;
 
-    boost::asio::io_service io_service;
+    // In the case where we read an unknown message (not PLAY or STOP) we try again this
+    // number of times
+    static constexpr unsigned int MAXIMUM_CONSECUTIVE_STATUS_ERROR = 5;
 
-    boost::posix_time::milliseconds startup_ms;
-    boost::posix_time::milliseconds interval_ms;
-    boost::asio::deadline_timer timer;
+    // In the case where we read an unknown message (not PLAY or STOP) we try
+    // again with this time between reads
+    static constexpr int INTERVAL_BETWEEN_ERROR_READS_MS = 5;
 
     // thread that will periodically pull values from the buffer
     std::thread estop_thread;
+    std::atomic_bool in_destructor = false;
 
-    std::mutex in_destructor_mutex;
-    bool in_destructor = false;
+    // current state of estop
+    std::atomic<EstopState> estop_state;
 
-    std::vector<unsigned char> estop_msg;
+    // tracks the number of unknown messages received in a row
+    unsigned int num_consecutive_status_error = 0;
+
+    // Time between reads
+    unsigned int regular_read_interval_ms;
+
+
+    // boost construct for managing io operations
+    boost::asio::io_service io_service;
+
+    // timer that expires after every specified interval of time
+    boost::asio::deadline_timer timer;
+
+    // the UART device acting as source of estop values
     std::unique_ptr<UartCommunication> uart_reader;
-    enum EstopState estop_state;
 };

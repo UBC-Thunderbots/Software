@@ -19,7 +19,7 @@ class UartCommunication
 
     UartCommunication() = default;
 
-    virtual ~UartCommunication(){};
+    virtual ~UartCommunication() = default;
 
     UartCommunication(const UartCommunication &) = delete;
 
