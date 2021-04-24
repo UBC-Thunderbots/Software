@@ -12,3 +12,12 @@
  */
 void ballKicked(Angle angle, std::shared_ptr<World> world_ptr,
                 ValidationCoroutine::push_type& yield);
+
+/**
+ * Checks if the ball has been kicked away from the center of the friendly goal
+ * at any point in the test
+ * @param world_ptr the world pointer given by the simulator. Gets updated every tick
+ * @param yield yields control to the next routine (coroutines) with error message
+ */
+ void ballKickedAwayFromFriendlyGoal(std::shared_ptr<World> world_ptr,
+                                     ValidationCoroutine::push_type& yield);

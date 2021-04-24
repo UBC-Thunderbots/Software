@@ -18,6 +18,16 @@
 class SimulatedGoalieTacticTest : public SimulatedTacticTestFixture
 {
    protected:
+    void checkClearanceSuccess(std::shared_ptr<World> world_ptr,
+                               ValidationCoroutine::push_type& yield)
+    {
+        auto clearance_time = world_ptr->getMostRecentTimestamp();
+        while (world_ptr->getMostRecentTimestamp() <
+                clearance_time + Duration::fromSeconds(1))
+        {
+            yield("Waiting 1 second to see if clearance was successful and enemy did not score");
+        }
+    }
     void SetUp() override
     {
         SimulatedTacticTestFixture::SetUp();
@@ -28,14 +38,14 @@ class SimulatedGoalieTacticTest : public SimulatedTacticTestFixture
     }
 };
 
-TEST_F(SimulatedGoalieTacticTest, DISABLED_test_ball_panic)
+TEST_F(SimulatedGoalieTacticTest, test_ball_panic)
 {
       setBallState(BallState(Point(0,0), Vector(-3,0)));
       addFriendlyRobots(
             TestUtil::createStationaryRobotStatesWithId({Point(-2,1), Point(-4,-1)}));
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config = std::make_shared<const GoalieTacticConfig>();
-    Angle chip_angle = (field().enemyGoalCenter() - field().friendlyGoalCenter()).orientation();
+//    Angle chip_angle = (field().enemyGoalCenter() - field().friendlyGoalCenter()).orientation();
 
     auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
     tactic->updateControlParams(goalie_tactic_config);
@@ -43,14 +53,15 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_ball_panic)
     setRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-            [this, tactic, chip_angle](std::shared_ptr<World> world_ptr,
+            [this, tactic](std::shared_ptr<World> world_ptr,
                            ValidationCoroutine::push_type& yield) {
                 while (!tactic->done())
                 {
                     yield("Tactic not done");
                 }
                 // add terminating validation functions here
-                ballKicked(chip_angle, world_ptr, yield);
+                ballKickedAwayFromFriendlyGoal(world_ptr, yield);
+                checkClearanceSuccess(world_ptr, yield);
             }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
@@ -71,7 +82,6 @@ TEST_F(SimulatedGoalieTacticTest, test_slow_ball_chip)
             TestUtil::createStationaryRobotStatesWithId({Point(-2,1), Point(-4,0)}));
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config = std::make_shared<const GoalieTacticConfig>();
-//    Angle chip_angle = (field().enemyGoalCenter() - field().friendlyGoalCenter()).orientation();
 
     auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
     tactic->updateControlParams(goalie_tactic_config);
@@ -81,13 +91,15 @@ TEST_F(SimulatedGoalieTacticTest, test_slow_ball_chip)
     std::vector<ValidationFunction> terminating_validation_functions = {
             [this, tactic](std::shared_ptr<World> world_ptr,
                                        ValidationCoroutine::push_type& yield) {
-//                while (!tactic->done())
-//                {
-//                    yield("Tactic not done");
-//                }
-                // add terminating validation functions here
                 robotReceivedBall(1, world_ptr, yield);
-//                ballKicked(chip_angle, world_ptr, yield);
+                while (!tactic->done())
+                {
+                    yield("Tactic not done");
+                }
+//                 add terminating validation functions here
+//                Angle chip_angle = (world_ptr->ball().position() - field().friendlyGoalCenter()).orientation();
+                ballKickedAwayFromFriendlyGoal(world_ptr, yield);
+                checkClearanceSuccess(world_ptr, yield);
             }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
@@ -108,7 +120,7 @@ TEST_F(SimulatedGoalieTacticTest, test_dribble_then_chip)
             TestUtil::createStationaryRobotStatesWithId({Point(-2,1), Point(-4,-1)}));
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config = std::make_shared<const GoalieTacticConfig>();
-    Angle chip_angle = (field().enemyGoalCenter() - field().friendlyGoalCenter()).orientation();
+//    Angle chip_angle = (field().enemyGoalCenter() - field().friendlyGoalCenter()).orientation();
 
     auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
     tactic->updateControlParams(goalie_tactic_config);
@@ -116,15 +128,16 @@ TEST_F(SimulatedGoalieTacticTest, test_dribble_then_chip)
     setRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-            [this, chip_angle, tactic](std::shared_ptr<World> world_ptr,
+            [this, tactic](std::shared_ptr<World> world_ptr,
                            ValidationCoroutine::push_type& yield) {
-//                while (!tactic->done())
-//                {
-//                    yield("Tactic not done");
-//                }
-                // add terminating validation functions here
                 robotReceivedBall(1, world_ptr, yield);
-                ballKicked(chip_angle, world_ptr, yield);
+                while (!tactic->done())
+                {
+                    yield("Tactic not done");
+                }
+                // add terminating validation functions here
+                ballKickedAwayFromFriendlyGoal(world_ptr, yield);
+                checkClearanceSuccess(world_ptr, yield);
             }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
