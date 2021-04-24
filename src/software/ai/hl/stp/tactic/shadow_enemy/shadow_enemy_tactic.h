@@ -26,7 +26,8 @@ class ShadowEnemyTactic : public Tactic
      * shadowing it
      */
     void updateControlParams(std::optional<EnemyThreat> enemy_threat,
-                             double shadow_distance);
+                             double shadow_distance,
+                             double steal_and_chip_distance);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
