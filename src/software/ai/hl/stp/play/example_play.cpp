@@ -57,8 +57,8 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         // yield the Tactics this Play wants to run, in order of priority
         // If there are fewer robots in play, robots at the end of the list will not be
         // assigned
-        yield({move_tactic_1, move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,
-               move_tactic_6});
+        yield({{move_tactic_1, move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,
+                move_tactic_6}});
     } while (true);
 }
 

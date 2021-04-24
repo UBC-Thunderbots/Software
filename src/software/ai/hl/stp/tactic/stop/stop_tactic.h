@@ -43,7 +43,7 @@ class StopTactic : public Tactic
 
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-    BaseFSM<StopFSM> fsm;
+    FSM<StopFSM> fsm;
 
     // Whether or not the robot should coast to a stop
     bool coast;
