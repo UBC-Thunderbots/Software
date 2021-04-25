@@ -305,6 +305,7 @@ TEST_F(SimulatedGoalieTacticTest, test_ball_very_fast_misses_net)
                 while (!tactic->done())
                 {
                     yield("Tactic not done");
+                    // break from loop since tactic will never complete
                     break;
                 }
                 checkGoalieSuccess(5, world_ptr, yield);
@@ -339,6 +340,7 @@ TEST_F(SimulatedGoalieTacticTest, test_slow_ball_at_sharp_angle_to_friendly_goal
                 while (!tactic->done())
                 {
                     yield("Tactic not done");
+                    // break from loop since tactic will never complete
                     break;
                 }
                 checkGoalieSuccess(5, world_ptr, yield);
