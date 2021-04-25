@@ -25,7 +25,7 @@
 #include "main.h"
 
 /*-----------------------------------------------------------------------------*/
-/* Current version of LwIP supported by CubeMx: 2.0.3 -*/
+/* Current version of LwIP supported by CubeMx: 2.1.2 -*/
 /*-----------------------------------------------------------------------------*/
 
 /* Within 'USER CODE' section, code will be kept by default at each generation */
@@ -48,6 +48,8 @@ extern "C"
 
 /* LwIP Stack Parameters (modified compared to initialization value in opt.h) -*/
 /* Parameters set in STM32CubeMX LwIP Configuration GUI -*/
+/*----- Default value in ETH configuration GUI in CubeMx: 1524 -----*/
+#define ETH_RX_BUFFER_SIZE 1524
 /*----- Default Value for LWIP_IGMP: 0 ---*/
 #define LWIP_IGMP 1
 /*----- Default Value for MEMP_NUM_UDP_PCB: 4 ---*/
@@ -80,7 +82,7 @@ extern "C"
 #define LWIP_BROADCAST_PING 1
 /*----- Default Value for LWIP_MULTICAST_PING: 0 ---*/
 #define LWIP_MULTICAST_PING 1
-/*----- Value in opt.h for LWIP_MULTICAST_TX_OPTIONS: LWIP_IGMP -----*/
+/*----- Default Value for LWIP_MULTICAST_TX_OPTIONS: 1 ---*/
 #define LWIP_MULTICAST_TX_OPTIONS 0
 /*----- Value in opt.h for LWIP_DNS_SECURE: (LWIP_DNS_SECURE_RAND_XID |
  * LWIP_DNS_SECURE_NO_MULTIPLE_OUTSTANDING | LWIP_DNS_SECURE_RAND_SRC_PORT) -*/
@@ -96,6 +98,8 @@ extern "C"
 /*----- Value in opt.h for TCP_WND_UPDATE_THRESHOLD: LWIP_MIN(TCP_WND/4, TCP_MSS*4)
  * -----*/
 #define TCP_WND_UPDATE_THRESHOLD 536
+/*----- Value in opt.h for LWIP_NETIF_LINK_CALLBACK: 0 -----*/
+#define LWIP_NETIF_LINK_CALLBACK 1
 /*----- Value in opt.h for TCPIP_THREAD_STACKSIZE: 0 -----*/
 #define TCPIP_THREAD_STACKSIZE 1024
 /*----- Value in opt.h for TCPIP_THREAD_PRIO: 1 -----*/

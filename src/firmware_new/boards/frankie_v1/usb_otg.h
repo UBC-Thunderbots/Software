@@ -1,8 +1,8 @@
 /**
  ******************************************************************************
- * File Name          : USB_OTG.h
- * Description        : This file provides code for the configuration
- *                      of the USB_OTG instances.
+ * @file    usb_otg.h
+ * @brief   This file contains all the function prototypes for
+ *          the usb_otg.c file
  ******************************************************************************
  * @attention
  *
@@ -17,8 +17,9 @@
  ******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __usb_otg_H
-#define __usb_otg_H
+#ifndef __USB_OTG_H__
+#define __USB_OTG_H__
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -46,14 +47,7 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ usb_otg_H */
 
-/**
- * @}
- */
-
-/**
- * @}
- */
+#endif /* __USB_OTG_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
