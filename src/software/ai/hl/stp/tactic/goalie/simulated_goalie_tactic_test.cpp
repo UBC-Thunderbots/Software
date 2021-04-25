@@ -18,12 +18,12 @@
 class SimulatedGoalieTacticTest : public SimulatedTacticTestFixture
 {
    protected:
-    void checkClearanceSuccess(std::shared_ptr<World> world_ptr,
-                               ValidationCoroutine::push_type& yield)
+    void checkGoalieSuccess(std::shared_ptr<World> world_ptr,
+                            ValidationCoroutine::push_type& yield)
     {
-        auto clearance_time = world_ptr->getMostRecentTimestamp();
+        auto initial_time = world_ptr->getMostRecentTimestamp();
         while (world_ptr->getMostRecentTimestamp() <
-                clearance_time + Duration::fromSeconds(1))
+                initial_time + Duration::fromSeconds(1))
         {
             yield("Waiting 1 second to check that the enemy team did not score");
         }
@@ -38,7 +38,7 @@ class SimulatedGoalieTacticTest : public SimulatedTacticTestFixture
     }
 };
 
-TEST_F(SimulatedGoalieTacticTest, DISABLED_test_panic_ball_very_fast_in_straight_line)
+TEST_F(SimulatedGoalieTacticTest, test_panic_ball_very_fast_in_straight_line)
 {
       setBallState(BallState(Point(0,0), Vector(-3,0)));
       addFriendlyRobots(
@@ -47,19 +47,17 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_panic_ball_very_fast_in_straight
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config = std::make_shared<const GoalieTacticConfig>();
 
     auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
-//    tactic->updateControlParams(goalie_tactic_config);
     setTactic(tactic);
     setRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
             [this, tactic](std::shared_ptr<World> world_ptr,
                            ValidationCoroutine::push_type& yield) {
-                robotReceivedBall(0, world_ptr, yield);
                 while (!tactic->done())
                 {
                     yield("Tactic not done");
                 }
-                checkClearanceSuccess(world_ptr, yield);
+                checkGoalieSuccess(world_ptr, yield);
             }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
@@ -73,8 +71,7 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_panic_ball_very_fast_in_straight
             Duration::fromSeconds(10));
 }
 
-// clears ball but does not register it as "received"
-TEST_F(SimulatedGoalieTacticTest, DISABLED_test_panic_ball_very_fast_in_diagonal_line)
+TEST_F(SimulatedGoalieTacticTest, test_panic_ball_very_fast_in_diagonal_line)
 {
     setBallState(BallState(Point(0, 0), Vector(-4.5, 0.25)));
     addFriendlyRobots(
@@ -88,12 +85,11 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_panic_ball_very_fast_in_diagonal
     std::vector<ValidationFunction> terminating_validation_functions = {
             [this, tactic](std::shared_ptr<World> world_ptr,
                            ValidationCoroutine::push_type& yield) {
-//                robotReceivedBall(0, world_ptr, yield);
                 while (!tactic->done())
                 {
                     yield("Tactic not done");
                 }
-                checkClearanceSuccess(world_ptr, yield);
+                checkGoalieSuccess(world_ptr, yield);
             }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
@@ -107,7 +103,7 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_panic_ball_very_fast_in_diagonal
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedGoalieTacticTest, DISABLED_test_slow_ball_in_friendly_defense_area)
+TEST_F(SimulatedGoalieTacticTest, test_slow_ball_in_friendly_defense_area)
 {
     setBallState(BallState(Point(-4,0.8), Vector(-0.2, 0)));
     addFriendlyRobots(
@@ -130,7 +126,7 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_slow_ball_in_friendly_defense_ar
                     yield("Tactic not done");
                 }
                 ballKicked(clear_angle, world_ptr, yield);
-                checkClearanceSuccess(world_ptr, yield);
+                checkGoalieSuccess(world_ptr, yield);
             }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
@@ -144,7 +140,7 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_slow_ball_in_friendly_defense_ar
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedGoalieTacticTest, DISABLED_test_stationary_ball_in_friendly_defense_area)
+TEST_F(SimulatedGoalieTacticTest, test_stationary_ball_in_friendly_defense_area)
 {
     setBallState(BallState(Point(-4,0), Vector(0, 0)));
     addFriendlyRobots(
@@ -167,7 +163,7 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_stationary_ball_in_friendly_defe
                     yield("Tactic not done");
                 }
                 ballKicked(clear_angle, world_ptr, yield);
-                checkClearanceSuccess(world_ptr, yield);
+                checkGoalieSuccess(world_ptr, yield);
             }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
@@ -181,7 +177,7 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_stationary_ball_in_friendly_defe
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedGoalieTacticTest, DISABLED_test_stationary_ball_inside_no_chip_rectangle)
+TEST_F(SimulatedGoalieTacticTest, test_stationary_ball_inside_no_chip_rectangle)
 {
     setBallState(BallState(field().friendlyGoalCenter() + Vector(0.1, 0.1), Vector(0, 0)));
     addFriendlyRobots(
@@ -205,7 +201,7 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_stationary_ball_inside_no_chip_r
                     yield("Tactic not done");
                 }
                 ballKicked(clear_angle, world_ptr, yield);
-                checkClearanceSuccess(world_ptr, yield);
+                checkGoalieSuccess(world_ptr, yield);
             }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
@@ -219,7 +215,7 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_stationary_ball_inside_no_chip_r
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedGoalieTacticTest, DISABLED_test_fast_ball_inside_no_chip_rectangle)
+TEST_F(SimulatedGoalieTacticTest, test_fast_ball_inside_no_chip_rectangle)
 {
     setBallState(BallState(field().friendlyGoalCenter() + Vector(0.09, 0), Vector(0, -0.5)));
     addFriendlyRobots(
@@ -240,7 +236,7 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_fast_ball_inside_no_chip_rectang
                     yield("Tactic not done");
                 }
                 ballKicked((world_ptr->ball().position() - field().friendlyGoalCenter()).orientation(), world_ptr, yield);
-                checkClearanceSuccess(world_ptr, yield);
+                checkGoalieSuccess(world_ptr, yield);
             }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
@@ -254,7 +250,7 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_fast_ball_inside_no_chip_rectang
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedGoalieTacticTest, DISABLED_test_slow_ball_inside_no_chip_rectangle)
+TEST_F(SimulatedGoalieTacticTest, test_slow_ball_inside_no_chip_rectangle)
 {
     setBallState(BallState(field().friendlyGoalCenter() + Vector(0.1, 0), Vector(0.1, -0.1)));
     addFriendlyRobots(
@@ -277,7 +273,7 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_slow_ball_inside_no_chip_rectang
                     yield("Tactic not done");
                 }
                 ballKicked((world_ptr->ball().position() - field().friendlyGoalCenter()).orientation(), world_ptr, yield);
-                checkClearanceSuccess(world_ptr, yield);
+                checkGoalieSuccess(world_ptr, yield);
             }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
