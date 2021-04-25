@@ -107,39 +107,6 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_panic_ball_very_fast_in_diagonal
             Duration::fromSeconds(10));
 }
 
-// does not pass because never leaves position_to_block state
-TEST_F(SimulatedGoalieTacticTest, DISABLED_test_ball_very_fast_miss)
-{
-    setBallState(BallState(Point(0, 0), Vector(-4, 1)));
-    addFriendlyRobots(
-            TestUtil::createStationaryRobotStatesWithId({Point(-4.5,0)}));
-
-    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config = std::make_shared<const GoalieTacticConfig>();
-    auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
-    setTactic(tactic);
-    setRobotId(0);
-
-    std::vector<ValidationFunction> terminating_validation_functions = {
-            [this, tactic](std::shared_ptr<World> world_ptr,
-                           ValidationCoroutine::push_type& yield) {
-                while (!tactic->done())
-                {
-                    yield("Tactic not done");
-                }
-//                checkClearanceSuccess(world_ptr, yield);
-            }};
-
-    std::vector<ValidationFunction> non_terminating_validation_functions = {
-            [](std::shared_ptr<World> world_ptr,
-               ValidationCoroutine::push_type& yield) {
-                enemyNeverScores(world_ptr, yield);
-            }
-    };
-
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
-}
-
 TEST_F(SimulatedGoalieTacticTest, DISABLED_test_slow_ball_in_friendly_defense_area)
 {
     setBallState(BallState(Point(-4,0.8), Vector(-0.5, 0)));
@@ -177,7 +144,7 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_slow_ball_in_friendly_defense_ar
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedGoalieTacticTest, DISABLED_test_stationary_ball_chip)
+TEST_F(SimulatedGoalieTacticTest, DISABLED_test_stationary_ball_in_friendly_defense_area)
 {
     setBallState(BallState(Point(-4,0), Vector(0, 0)));
     addFriendlyRobots(
@@ -252,7 +219,7 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_stationary_ball_inside_no_chip_r
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedGoalieTacticTest, test_fast_ball_inside_no_chip_rectangle)
+TEST_F(SimulatedGoalieTacticTest, DISABLED_test_fast_ball_inside_no_chip_rectangle)
 {
     setBallState(BallState(field().friendlyGoalCenter() + Vector(0.09, 0), Vector(0, -0.5)));
     addFriendlyRobots(
@@ -287,7 +254,7 @@ TEST_F(SimulatedGoalieTacticTest, test_fast_ball_inside_no_chip_rectangle)
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedGoalieTacticTest, test_slow_ball_inside_no_chip_rectangle)
+TEST_F(SimulatedGoalieTacticTest, DISABLED_test_slow_ball_inside_no_chip_rectangle)
 {
     setBallState(BallState(field().friendlyGoalCenter() + Vector(0.1, 0), Vector(0.1, -0.1)));
     addFriendlyRobots(
@@ -324,8 +291,40 @@ TEST_F(SimulatedGoalieTacticTest, test_slow_ball_inside_no_chip_rectangle)
             Duration::fromSeconds(10));
 }
 
-// Fails for now because position to block state never completes the tactic
-TEST_F(SimulatedGoalieTacticTest, DISABLED_test_slow_ball_sharp_angle)
+// does not pass because never leaves position_to_block state
+TEST_F(SimulatedGoalieTacticTest, DISABLED_test_ball_very_fast_misses_net)
+{
+    setBallState(BallState(Point(0, 0), Vector(-4, 1)));
+    addFriendlyRobots(
+            TestUtil::createStationaryRobotStatesWithId({Point(-4.5,0)}));
+
+    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config = std::make_shared<const GoalieTacticConfig>();
+    auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
+    setTactic(tactic);
+    setRobotId(0);
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+            [this, tactic](std::shared_ptr<World> world_ptr,
+                           ValidationCoroutine::push_type& yield) {
+                while (!tactic->done())
+                {
+                    yield("Tactic not done");
+                }
+            }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {
+            [](std::shared_ptr<World> world_ptr,
+               ValidationCoroutine::push_type& yield) {
+                enemyNeverScores(world_ptr, yield);
+            }
+    };
+
+    runTest(terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
+}
+
+// does not pass because never leaves position_to_block state
+TEST_F(SimulatedGoalieTacticTest, DISABLED_test_slow_ball_at_sharp_angle_to_friendly_goal)
 {
     setBallState(BallState(Point(-4.5, -3), Vector(0, 0.1)));
     addFriendlyRobots(
@@ -333,7 +332,6 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_slow_ball_sharp_angle)
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config = std::make_shared<const GoalieTacticConfig>();
     auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
-//    tactic->updateControlParams(goalie_tactic_config);
     setTactic(tactic);
     setRobotId(0);
 

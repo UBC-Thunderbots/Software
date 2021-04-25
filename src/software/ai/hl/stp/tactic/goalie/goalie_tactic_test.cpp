@@ -206,6 +206,7 @@ TEST_F(GoalieTacticTest, ball_slow_outside_dont_chip_rectangle)
     expectChipAction(ball);
 }
 
+// illegal simulated world state
 TEST_F(GoalieTacticTest, ball_behind_net_and_moving_toward_net)
 {
     Ball ball = Ball(Point(-5.8, 0.3), Vector(0.5, 0.5), Timestamp::fromSeconds(0));
@@ -213,6 +214,7 @@ TEST_F(GoalieTacticTest, ball_behind_net_and_moving_toward_net)
     expectMoveAction(ball, Point(-4.5, 0.5 - ROBOT_MAX_RADIUS_METERS));
 }
 
+// done, doesn't pass but done
 TEST_F(GoalieTacticTest, ball_angle_very_sharp_and_low_velocity)
 {
     Ball ball = Ball(Point(-4.5, -3), Vector(0, 0.1), Timestamp::fromSeconds(0));
