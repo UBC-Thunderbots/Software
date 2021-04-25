@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/networking/proto_udp_listener.h"
+#include "software/networking/proto_udp_client.h"
 
 /**
  * A threaded listener that receives serialized ReceiveProtoT Proto's over the network
@@ -53,7 +53,7 @@ class ThreadedProtoUdpListener
     // The function to call on every received packet of ReceiveProtoT data
     std::function<void(ReceiveProtoT)> receive_callback;
 
-    ProtoUdpListener<ReceiveProtoT> udp_listener;
+    ProtoUdpClient<ReceiveProtoT, ReceiveProtoT> udp_listener;
 
     std::atomic_bool in_destructor;
 };
