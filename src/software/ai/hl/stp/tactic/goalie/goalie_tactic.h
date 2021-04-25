@@ -1,8 +1,8 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
 //#include "software/ai/evaluation/enemy_threat.h"
 
 /**
@@ -36,9 +36,10 @@ class GoalieTactic : public Tactic
      * @param clear_ball_origin the point where the goalie will clear the ball from
      * @param clear_ball_direction the direction which the goalie will clear the ball to
      */
-    void updateControlParams(std::shared_ptr<const GoalieTacticConfig> updated_goalie_tactic_config,
-                            std::optional<Point> clear_ball_origin,
-                            std::optional<Angle> clear_ball_direction);
+    void updateControlParams(
+        std::shared_ptr<const GoalieTacticConfig> updated_goalie_tactic_config,
+        std::optional<Point> clear_ball_origin,
+        std::optional<Angle> clear_ball_direction);
 
     double calculateRobotCost(const Robot &robot, const World &world) const override;
 
@@ -47,7 +48,7 @@ class GoalieTactic : public Tactic
 
    private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;
-    void updateIntent(const TacticUpdate& tactic_update) override;
+    void updateIntent(const TacticUpdate &tactic_update) override;
 
     FSM<GoalieFSM> fsm;
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;

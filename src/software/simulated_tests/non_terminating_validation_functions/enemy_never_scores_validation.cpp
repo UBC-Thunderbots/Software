@@ -3,9 +3,10 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 
-void enemyNeverScores(std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+void enemyNeverScores(std::shared_ptr<World> world_ptr,
+                      ValidationCoroutine::push_type& yield)
 {
-    while(!contains(world_ptr->field().friendlyGoal(), world_ptr->ball().position()))
+    while (!contains(world_ptr->field().friendlyGoal(), world_ptr->ball().position()))
     {
         yield("");
     }

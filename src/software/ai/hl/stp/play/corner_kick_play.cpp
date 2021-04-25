@@ -56,8 +56,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
      *
      */
 
-    auto goalie_tactic = std::make_shared<GoalieTactic>(
-        play_config->getGoalieTacticConfig());
+    auto goalie_tactic =
+        std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig());
 
     Pass pass = setupPass(yield, goalie_tactic, world);
 

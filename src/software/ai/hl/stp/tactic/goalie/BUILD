@@ -33,19 +33,6 @@ cc_test(
 )
 
 cc_test(
-    name = "goalie_tactic_test",
-    srcs = ["goalie_tactic_test.cpp"],
-    deps = [
-        ":goalie_tactic",
-        "//software/ai/hl/stp/action:chip_action",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/action:stop_action",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
     name = "simulated_goalie_tactic_test",
     srcs = ["simulated_goalie_tactic_test.cpp"],
     deps = [
