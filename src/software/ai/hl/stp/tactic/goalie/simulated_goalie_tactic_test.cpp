@@ -24,7 +24,7 @@ class SimulatedGoalieTacticTest : public SimulatedTacticTestFixture
         while (world_ptr->getMostRecentTimestamp() <
                initial_time + Duration::fromSeconds(seconds_to_wait))
         {
-            yield("Waiting 1 second to check that the enemy team did not score");
+            yield("Waiting " + std::to_string(seconds_to_wait) + " seconds to check that the enemy team did not score");
         }
     }
     void SetUp() override
