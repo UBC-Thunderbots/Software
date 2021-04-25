@@ -23,6 +23,8 @@ struct GoalieFSM
     {
         // the goalie tactic config
         std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
+        std::optional<Point> clear_ball_origin;
+        std::optional<Angle> clear_ball_direction;
     };
 
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -120,6 +122,58 @@ struct GoalieFSM
     }
 
     /**
+     * Gets the position for the goalie to move to, to best position itself between the ball and the friendly goal
+     *
+     */
+    static Point getGoaliePositionToBlock(const Ball &ball, const Field &field,
+            std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config)
+    {
+        // compute angle between two vectors, negative goal post to ball and positive
+        // goal post to ball
+        Angle block_cone_angle =
+                (ball.position() - field.friendlyGoalpostNeg())
+                        .orientation()
+                        .minDiff((ball.position() - field.friendlyGoalpostPos()).orientation());
+
+        // how far in should the goalie wedge itself into the block cone, to block
+        // balls
+        auto block_cone_radius = goalie_tactic_config->getBlockConeRadius()->value();
+        // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
+        // either side
+        Point goalie_pos = calculateBlockCone(
+                field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(), ball.position(),
+                block_cone_radius * block_cone_angle.toRadians());
+
+        // restrain the goalie in the defense area, if the goalie cannot be
+        // restrained or if there is no proper intersection, then we safely default to
+        // center of the goal
+        auto clamped_goalie_pos =
+                restrainGoalieInRectangle(field, goalie_pos, field.friendlyDefenseArea());
+
+        // if the goalie could not be restrained in the defense area,
+        // then the ball must be either on a really sharp angle to the net where
+        // its impossible to get a shot, or the ball is behind the net, in which
+        // case we snap to either post
+        if (!clamped_goalie_pos)
+        {
+            if (ball.position().y() > 0)
+            {
+                goalie_pos =
+                        field.friendlyGoalpostPos() + Vector(0, -ROBOT_MAX_RADIUS_METERS);
+            }
+            else
+            {
+                goalie_pos = field.friendlyGoalpostNeg() + Vector(0, ROBOT_MAX_RADIUS_METERS);
+            }
+        }
+        else
+        {
+            goalie_pos = *clamped_goalie_pos;
+        }
+        return goalie_pos;
+    }
+
+    /**
      * Gets intersections between the ball velocity ray and the full goal segment
      *
      * @param ball the ball to find interceptions with the full goal segment
@@ -150,6 +204,26 @@ struct GoalieFSM
         return Rectangle(field.friendlyGoalpostNeg(),
                   field.friendlyGoalpostPos() +
                   Vector(2 * ROBOT_MAX_RADIUS_METERS, 0));
+    }
+
+    static Point getClearOrigin(const Field &field, const Ball &ball, std::optional<Point> origin_opt)
+    {
+        Point clear_origin = field.friendlyGoalCenter() + Vector(0.5, 0);
+        if (origin_opt)
+        {
+            clear_origin = origin_opt.value();
+        }
+        return clear_origin;
+    }
+
+    static Angle getClearDirection(const Field &field, const Ball &ball, std::optional<Angle> direction_opt)
+    {
+        Angle clear_direction = (ball.position() - field.friendlyGoalCenter()).orientation();
+        if (direction_opt)
+        {
+            clear_direction = direction_opt.value();
+        }
+        return clear_direction;
     }
 
     auto operator()()
@@ -195,19 +269,21 @@ struct GoalieFSM
             auto dont_chip_rectangle = getDontChipRectangle(event.common.world.field());
 
             return event.common.world.ball().velocity().length() <= ball_speed_panic &&
-                   event.common.world.field().pointInFriendlyDefenseArea(event.common.world.ball().position()) &&
+                    event.common.world.field().pointInFriendlyDefenseArea(event.common.world.ball().position()) &&
                    !contains(dont_chip_rectangle, event.common.world.ball().position());
         };
 
         const auto dribble = [](auto event) {
             double ball_speed_panic = event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
+            std::vector<Point> intersections =
+                    getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(), event.common.world.field());
             // if the ball is in the "don't chip rectangle" we do not chip the ball
             // as we risk bumping the ball into our own net trying to move behind
             // the ball
             auto dont_chip_rectangle = getDontChipRectangle(event.common.world.field());
 
-            return event.common.world.ball().velocity().length() <= ball_speed_panic &&
-                   contains(dont_chip_rectangle, event.common.world.ball().position());
+            return (event.common.world.ball().velocity().length() <= ball_speed_panic || intersections.empty())
+                        && contains(dont_chip_rectangle, event.common.world.ball().position());
         };
 
         const auto chip_done = [](auto event) {
@@ -254,9 +330,11 @@ struct GoalieFSM
          */
         const auto update_chip =
             [](auto event, back::process<ChipFSM::Update> processEvent) {
+            Angle clear_direction = getClearDirection(event.common.world.field(), event.common.world.ball(), event.control_params.clear_ball_direction);
+
             ChipFSM::ControlParams control_params{
                 .chip_origin = event.common.world.ball().position(),
-                .chip_direction = (event.common.world.ball().position() - event.common.world.field().friendlyGoalCenter()).orientation(),
+                .chip_direction = clear_direction,
                 .chip_distance_meters = YEET_CHIP_DISTANCE_METERS};
 
             // update the chip fsm
@@ -271,11 +349,12 @@ struct GoalieFSM
          */
         const auto update_dribble =
             [](auto event, back::process<DribbleFSM::Update> processEvent) {
+            Point clear_origin = getClearOrigin(event.common.world.field(), event.common.world.ball(), event.control_params.clear_ball_origin);
+            Angle clear_direction = getClearDirection(event.common.world.field(), event.common.world.ball(), event.control_params.clear_ball_direction);
+
             DribbleFSM::ControlParams control_params{
-                // TODO: fix dribble destination so there is strategy behind it (move to center of goal area)
-                .dribble_destination = std::make_optional<Point>(event.common.world.field().friendlyGoalCenter() + Vector(0.5, 0)),
-                .final_dribble_orientation = std::make_optional<Angle>((event.common.world.ball().position() -
-                                              event.common.world.field().friendlyGoalCenter()).orientation()),
+                .dribble_destination = clear_origin,
+                .final_dribble_orientation = clear_direction,
                 .allow_excessive_dribbling = false,
                 };
 
@@ -289,57 +368,8 @@ struct GoalieFSM
         * @param event GoalieFSM::Update event
         */
         const auto update_position_to_block = [](auto event) {
-            // compute angle between two vectors, negative goal post to ball and positive
-            // goal post to ball
-            Angle block_cone_angle =
-                    (event.common.world.ball().position() - event.common.world.field().friendlyGoalpostNeg())
-                            .orientation()
-                            .minDiff((event.common.world.ball().position() - event.common.world.field().friendlyGoalpostPos()).orientation());
-
-            // how far in should the goalie wedge itself into the block cone, to block
-            // balls
-            auto block_cone_radius = event.control_params.goalie_tactic_config->getBlockConeRadius()->value();
-            // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
-            // either side
-            Point goalie_pos = calculateBlockCone(
-                    event.common.world.field().friendlyGoalpostNeg(), event.common.world.field().friendlyGoalpostPos(), event.common.world.ball().position(),
-                    block_cone_radius * block_cone_angle.toRadians());
-
-            // by how much should the defense area be decreased so the goalie stays close
-            // towards the net
-            /*auto defense_area_deflation =
-                    event.control_params.goalie_tactic_config->getDefenseAreaDeflation()->value();*/
-            // we want to restrict the block cone to the friendly crease, also potentially
-            // scaled by a defense_area_deflation_parameter
-            /*Rectangle deflated_defense_area = event.common.world.field().friendlyDefenseArea();
-            deflated_defense_area.inflate(-defense_area_deflation);*/
-
-            // restrain the goalie in the deflated defense area, if the goalie cannot be
-            // restrained or if there is no proper intersection, then we safely default to
-            // center of the goal
-            auto clamped_goalie_pos =
-                    restrainGoalieInRectangle(event.common.world.field(), goalie_pos, event.common.world.field().friendlyDefenseArea());
-
-            // if the goalie could not be restrained in the deflated defense area,
-            // then the ball must be either on a really sharp angle to the net where
-            // its impossible to get a shot, or the ball is behind the net, in which
-            // case we snap to either post
-            if (!clamped_goalie_pos)
-            {
-                if (event.common.world.ball().position().y() > 0)
-                {
-                    goalie_pos =
-                            event.common.world.field().friendlyGoalpostPos() + Vector(0, -ROBOT_MAX_RADIUS_METERS);
-                }
-                else
-                {
-                    goalie_pos = event.common.world.field().friendlyGoalpostNeg() + Vector(0, ROBOT_MAX_RADIUS_METERS);
-                }
-            }
-            else
-            {
-                goalie_pos = *clamped_goalie_pos;
-            }
+            Point goalie_pos = getGoaliePositionToBlock(event.common.world.ball(), event.common.world.field(),
+                    event.control_params.goalie_tactic_config);
             Angle goalie_orientation = (event.common.world.ball().position() - goalie_pos).orientation();
 
             // what should the final goalie speed be, so that the goalie accelerates
@@ -355,14 +385,15 @@ struct GoalieFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *position_to_block_s + update_e[panic] / update_panic       = panic_s,
-            position_to_block_s + update_e[chip] / update_chip          = chip_s,
             position_to_block_s + update_e[dribble] / update_dribble    = dribble_s,
+            position_to_block_s + update_e[chip] / update_chip          = chip_s,
             position_to_block_s + update_e / update_position_to_block,
             panic_s + update_e[chip] / update_chip                      = chip_s,
             panic_s + update_e[panic_done]                              = X,
             panic_s + update_e / update_panic,
-            dribble_s + update_e[chip] / update_chip                    = chip_s,
+//            dribble_s + update_e[chip] / update_chip                    = chip_s,
             dribble_s + update_e / update_dribble,
+            dribble_s                                                   = chip_s,
             chip_s + update_e[panic] / update_panic                     = panic_s,
             chip_s + update_e[chip_done]                                = X,
             chip_s + update_e / update_chip,

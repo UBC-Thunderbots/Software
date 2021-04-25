@@ -9,16 +9,22 @@ GoalieTactic::GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tact
     : Tactic(true, {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Chip}),
       fsm(),
       goalie_tactic_config(goalie_tactic_config),
-      control_params{GoalieFSM::ControlParams{.goalie_tactic_config = goalie_tactic_config}}
+      control_params{GoalieFSM::ControlParams{.goalie_tactic_config = goalie_tactic_config,
+              .clear_ball_origin = std::nullopt,
+              .clear_ball_direction = std::nullopt}}
 {
 }
 
 void GoalieTactic::updateWorldParams(const World &world) {}
 
-void GoalieTactic::updateControlParams(std::shared_ptr<const GoalieTacticConfig> updated_goalie_tactic_config)
+void GoalieTactic::updateControlParams(std::shared_ptr<const GoalieTacticConfig> updated_goalie_tactic_config,
+                                    std::optional<Point> clear_ball_origin,
+                                    std::optional<Angle> clear_ball_direction)
 {
     // Update the control parameters stored by this Tactic
     control_params.goalie_tactic_config = updated_goalie_tactic_config;
+    control_params.clear_ball_origin = clear_ball_origin;
+    control_params.clear_ball_direction = clear_ball_direction;
 }
 
 double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world) const

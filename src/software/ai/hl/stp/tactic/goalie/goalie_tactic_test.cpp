@@ -168,18 +168,21 @@ class GoalieTacticTest : public testing::Test
     }
 };
 
+// done
 TEST_F(GoalieTacticTest, ball_very_fast_in_straight_line)
 {
     Ball ball = Ball(Point(0, 0), Vector(-4, 0), Timestamp::fromSeconds(0));
     expectMoveAction(ball, Point(-4.5, 0));
 }
 
+//done
 TEST_F(GoalieTacticTest, ball_very_fast_in_diagonal_line)
 {
     Ball ball = Ball(Point(0, 0), Vector(-4.5, 0.25), Timestamp::fromSeconds(0));
     expectMoveAction(ball, Point(-4.5, 0.25));
 }
 
+// added but glitchy
 TEST_F(GoalieTacticTest, ball_very_fast_miss)
 {
     Ball ball = Ball(Point(0, 0), Vector(-4.5, 1), Timestamp::fromSeconds(0));
@@ -187,6 +190,7 @@ TEST_F(GoalieTacticTest, ball_very_fast_miss)
     expectMoveAction(ball, Point(-3.7, 0));
 }
 
+//done
 TEST_F(GoalieTacticTest, ball_slow_inside_dont_chip_rectangle)
 {
     Ball ball = Ball(Point(-4.5 + ROBOT_MAX_RADIUS_METERS, 0), Vector(-0.1, 0.1),
@@ -194,6 +198,7 @@ TEST_F(GoalieTacticTest, ball_slow_inside_dont_chip_rectangle)
     expectStopAction(ball);
 }
 
+// done
 TEST_F(GoalieTacticTest, ball_slow_outside_dont_chip_rectangle)
 {
     Ball ball = Ball(Point(-3.5, 0.5), Vector(-0.1, -0.1), Timestamp::fromSeconds(0));
@@ -215,6 +220,7 @@ TEST_F(GoalieTacticTest, ball_angle_very_sharp_and_low_velocity)
     expectMoveAction(ball, Point(-4.5, -0.5 + ROBOT_MAX_RADIUS_METERS));
 }
 
+//unnecessary
 TEST_F(GoalieTacticTest, ball_far_away_and_zero_velocity)
 {
     Ball ball = Ball(Point(4.5, 1), Vector(0, 0), Timestamp::fromSeconds(0));
@@ -224,6 +230,7 @@ TEST_F(GoalieTacticTest, ball_far_away_and_zero_velocity)
     expectMoveAction(ball, *goalie_intersection);
 }
 
+// unnecessary
 TEST_F(GoalieTacticTest, ball_outside_defense_area_and_zero_velocity)
 {
     Ball ball = Ball(Point(-3, -0.5), Vector(0, 0), Timestamp::fromSeconds(0));
@@ -233,6 +240,7 @@ TEST_F(GoalieTacticTest, ball_outside_defense_area_and_zero_velocity)
     expectMoveAction(ball, *goalie_intersection);
 }
 
+//done
 TEST_F(GoalieTacticTest, ball_in_defense_area_and_zero_velocity)
 {
     Ball ball = Ball(Point(-4, -0.5), Vector(0, 0), Timestamp::fromSeconds(0));

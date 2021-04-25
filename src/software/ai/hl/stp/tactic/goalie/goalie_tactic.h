@@ -32,9 +32,13 @@ class GoalieTactic : public Tactic
 
     /**
      * Updates the params assuming that the max allowed speed mode is the physical limits
-     *
+     * @param updated_goalie_tactic_config the updated goalie tactic config
+     * @param clear_ball_origin the point where the goalie will clear the ball from
+     * @param clear_ball_direction the direction which the goalie will clear the ball to
      */
-    void updateControlParams(std::shared_ptr<const GoalieTacticConfig> updated_goalie_tactic_config);
+    void updateControlParams(std::shared_ptr<const GoalieTacticConfig> updated_goalie_tactic_config,
+                            std::optional<Point> clear_ball_origin,
+                            std::optional<Angle> clear_ball_direction);
 
     double calculateRobotCost(const Robot &robot, const World &world) const override;
 
