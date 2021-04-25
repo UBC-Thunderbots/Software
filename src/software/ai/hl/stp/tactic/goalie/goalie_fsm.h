@@ -311,14 +311,14 @@ struct GoalieFSM
                         && contains(dont_chip_rectangle, event.common.world.ball().position());
         };
 
-        const auto chip_done = [](auto event) {
-            double ball_speed_panic = event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
-            std::vector<Point> intersections =
-                    getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(), event.common.world.field());
-
-            return (event.common.world.ball().velocity().length() <= ball_speed_panic || intersections.empty()) &&
-                   !event.common.world.field().pointInFriendlyDefenseArea(event.common.world.ball().position());
-        };
+//        const auto chip_done = [](auto event) {
+//            double ball_speed_panic = event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
+//            std::vector<Point> intersections =
+//                    getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(), event.common.world.field());
+//
+//            return (event.common.world.ball().velocity().length() <= ball_speed_panic || intersections.empty()) &&
+//                   !event.common.world.field().pointInFriendlyDefenseArea(event.common.world.ball().position());
+//        };
 
         const auto panic_done = [](auto event) {
             double ball_speed_panic = event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
@@ -419,8 +419,9 @@ struct GoalieFSM
             dribble_s + update_e / update_dribble,
             dribble_s                                                   = chip_s,
             chip_s + update_e[panic] / update_panic                     = panic_s,
-            chip_s + update_e[chip_done]                                = X,
+//            chip_s + update_e[chip_done]                                = X,
             chip_s + update_e / update_chip,
+            chip_s                                                      = X,
             X + update_e / update_position_to_block                     = position_to_block_s);
     }
 };

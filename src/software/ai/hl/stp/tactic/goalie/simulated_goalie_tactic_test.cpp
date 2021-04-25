@@ -109,7 +109,7 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_panic_ball_very_fast_in_diagonal
 
 TEST_F(SimulatedGoalieTacticTest, DISABLED_test_slow_ball_in_friendly_defense_area)
 {
-    setBallState(BallState(Point(-4,0.8), Vector(-0.5, 0)));
+    setBallState(BallState(Point(-4,0.8), Vector(-0.2, 0)));
     addFriendlyRobots(
             TestUtil::createStationaryRobotStatesWithId({Point(-4,0)}));
 
