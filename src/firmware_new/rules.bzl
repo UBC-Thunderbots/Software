@@ -3,14 +3,13 @@ def stm32h7_hal_library_files_genrule(name):
 
     # First download the firmware. We have this as a separate genrule in case we need to
     # debug later rules, don't want to have to re-download every time
-    # TODO: more descriptive name?
     native.genrule(
         name = "{}_download_stm32h7_firmware_zip".format(name),
         outs = ["fw.zip"],
         cmd = "\n".join([
             # Download the drivers and middlewares. We got this URL by running wireshark and
             # watching where STM32CubeMX tried to download files from when generating code
-            "curl -L http://sw-center.st.com/packs/resource/firmware/stm32cube_fw_h7_v170.zip -o fw.zip",
+            "curl -H 'Cache-Control: no-cache' -L http://sw-center.st.com/packs/resource/firmware/stm32cube_fw_h7_v170.zip -o fw.zip",
             "mv fw.zip $@",
         ]),
     )

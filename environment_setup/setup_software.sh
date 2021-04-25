@@ -116,7 +116,7 @@ echo "================================================================"
 
 # Adapted from https://docs.bazel.build/versions/master/install-ubuntu.html#install-on-ubuntu
 sudo apt-get install curl gnupg
-curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
+curl -H 'Cache-Control: no-cache' -L https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
 echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
 sudo apt-get update
 if ! sudo apt-get install bazel-3.7.2 -y ; then

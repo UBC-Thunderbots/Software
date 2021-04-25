@@ -49,7 +49,7 @@ else
     echo -n $'#!/bin/bash \n\n ' > cuberunner.sh
     echo -n "pushd /opt/STM32CubeMX_$CUBE_VERSION && ./STM32CubeMX && popd" >> cuberunner.sh
     
-    curl -O $CUBE_LINK
+    curl -H 'Cache-Control: no-cache' -OL $CUBE_LINK
 
     if ! unzip $CUBE_ZIP_FILENAME ; then
         echo "##############################################################"
