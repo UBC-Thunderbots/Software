@@ -4,12 +4,9 @@
 
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/geom/algorithms/contains.h"
-// #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
-// #include "software/simulated_tests/terminating_validation_functions/ball_at_point_validation.h"
-// #include "software/simulated_tests/terminating_validation_functions/robot_received_ball_validation.h"
+#include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
-// #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -27,31 +24,146 @@ class SimulatedShadowEnemyTacticTest : public SimulatedTacticTestFixture
 
 TEST_F(SimulatedShadowEnemyTacticTest, test_block_pass)
 {
-    Robot enemy(0, Point(0, 2), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
-                Timestamp::fromSeconds(0));
-    Robot shadowee (1, Point(0, -2), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
-            Timestamp::fromSeconds(0));
-    Robot shadower (2, Point(-2, 0),Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
+    Robot shadower (0, Point(-2, 0),Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
         Timestamp::fromSeconds(0));
+    Robot shadowee (1, Point(0, -2), Vector(0, 0), Angle::quarter(), AngularVelocity::zero(),
+        Timestamp::fromSeconds(0));
+    Robot enemy(2, Point(0, 2), Vector(0, 0), Angle::threeQuarter(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+
+
     
     EnemyThreat enemy_threat{shadowee,     false, Angle::zero(), std::nullopt,
                             std::nullopt, 1, enemy};
 
+    addFriendlyRobots({RobotStateWithId{
+        .id = 0,
+        .robot_state = shadower.currentState()}});
+    addEnemyRobots({RobotStateWithId{
+        .id = 1,
+        .robot_state = shadowee.currentState()},
+                    RobotStateWithId{
+        .id = 2,
+        .robot_state = enemy.currentState()}
+                    });
+
+
     setBallState(BallState(Point(0,2), Vector(0,0)));
     auto tactic = std::make_shared<ShadowEnemyTactic>();
-    tactic -> updateControlParams(enemy_threat, 2 ,0);
+    tactic -> updateControlParams(enemy_threat, 2 , 0);
     setTactic(tactic);
-   
+    setRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
     [this, tactic](std::shared_ptr<World> world_ptr,
                     ValidationCoroutine::push_type& yield) {
-        robotAtPosition(2, world_ptr, Point(0,0), 0, yield);
+        // As the shadowee is located at (0,-2) and the enemy robot that 
+        // has the ball is located at (0,2), we would like to block the pass
+        // with a shadow distance of 2
+        Point destination = Point (0,0);
+        robotAtPosition(0, world_ptr, destination, 0.01, yield);
     }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(5));
+}
 
+TEST_F(SimulatedShadowEnemyTacticTest, test_block_net)
+{
+    Robot shadower (0, Point(-2, 0),Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
+        Timestamp::fromSeconds(0));
+    Robot shadowee (1, Point(0, -2), Vector(0, 0), Angle::fromDegrees(135), AngularVelocity::zero(),
+        Timestamp::fromSeconds(0));
+    Robot enemy(2, Point(0, 2), Vector(0, 0), Angle::threeQuarter(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+
+   
+    EnemyThreat enemy_threat{shadowee,     true, Angle::zero(), std::nullopt,
+                            std::nullopt, 1, enemy};
+
+    addFriendlyRobots({RobotStateWithId{
+        .id = 0,
+        .robot_state = shadower.currentState()}});
+    addEnemyRobots({RobotStateWithId{
+        .id = 1,
+        .robot_state = shadowee.currentState()},
+                    RobotStateWithId{
+        .id = 2,
+        .robot_state = enemy.currentState()}
+                    });
+
+
+    setBallState(BallState(Point(0,-2), Vector(0,0)));
+    auto tactic = std::make_shared<ShadowEnemyTactic>();
+    tactic -> updateControlParams(enemy_threat, 2 , 0);
+    setTactic(tactic);
+    setRobotId(0);
+   
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+    [this, tactic, shadowee](std::shared_ptr<World> world_ptr,
+                    ValidationCoroutine::push_type& yield) {
+        // As the shadowee is located at (0,-2), we first find the shot
+        // vector to our net and then normalize this vector to a distance
+        // of 2 away from the shadowee
+        Vector shot = field().friendlyGoalCenter() - shadowee.position();       
+        Point destination = shadowee.position() + shot.normalize(2);
+        robotAtPosition(0, world_ptr, destination, 0.01, yield);
+    }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(5));
+}
+
+
+TEST_F(SimulatedShadowEnemyTacticTest, test_steal_and_chip)
+{
+    Robot shadower (0, Point(-2, 0),Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
+        Timestamp::fromSeconds(0));
+    Robot shadowee (1, Point(0, -2), Vector(0, 0), Angle::quarter(), AngularVelocity::zero(),
+        Timestamp::fromSeconds(0));
+    Robot enemy(2, Point(0, 2), Vector(0, 0), Angle::threeQuarter(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+
+   
+    EnemyThreat enemy_threat{shadowee,     true, Angle::zero(), std::nullopt,
+                            std::nullopt, 1, enemy};
+
+    addFriendlyRobots({RobotStateWithId{
+        .id = 0,
+        .robot_state = shadower.currentState()}});
+    addEnemyRobots({RobotStateWithId{
+        .id = 1,
+        .robot_state = shadowee.currentState()},
+                    RobotStateWithId{
+        .id = 2,
+        .robot_state = enemy.currentState()}
+                    });
+
+
+    setBallState(BallState(Point(0,-1.75), Vector(0,0)));
+    auto tactic = std::make_shared<ShadowEnemyTactic>();
+    tactic -> updateControlParams(enemy_threat, 2 , 100);
+    setTactic(tactic);
+    setRobotId(0);
+   
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+    [this, tactic, shadower](std::shared_ptr<World> world_ptr,
+                    ValidationCoroutine::push_type& yield) {
+        // As our friendly robot tries to steal and chip the ball,
+        // it should chip the ball in the same direction is it 
+        // heading towards the ball
+        Vector shot = Point(0,-1.75) - shadower.position();
+        ballKicked(shot.orientation(), world_ptr,yield);
+    }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(5));
 }

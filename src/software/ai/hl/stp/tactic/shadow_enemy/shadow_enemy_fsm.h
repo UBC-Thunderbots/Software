@@ -55,7 +55,6 @@ struct ShadowEnemyFSM
             {
                 return enemy_threat_opt.value().has_ball;
             };
-            // PLACEHOLDER (need to remove)
             return false;
         };
 
@@ -76,8 +75,6 @@ struct ShadowEnemyFSM
                                 event.common.robot.position()) <=
                        event.control_params.steal_and_chip_distance;
             };
-
-            // PLACEHOLDER (need to remove)
             return false;
         };
 
@@ -157,10 +154,9 @@ struct ShadowEnemyFSM
             auto ball_position = event.common.world.ball().position();
             auto face_ball_orientation =
                 (ball_position - event.common.robot.position()).orientation();
-
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), ball_position, face_ball_orientation, 0,
-                DribblerMode::MAX_FORCE, BallCollisionType::AVOID,
+                DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
                 AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
                 MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
         };
