@@ -25,7 +25,7 @@ class SimulatedGoalieTacticTest : public SimulatedTacticTestFixture
         while (world_ptr->getMostRecentTimestamp() <
                 clearance_time + Duration::fromSeconds(1))
         {
-            yield("Waiting 1 second to see if enemy did not score");
+            yield("Waiting 1 second to check that the enemy team did not score");
         }
     }
     void SetUp() override

@@ -23,7 +23,9 @@ struct GoalieFSM
     {
         // the goalie tactic config
         std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
+        // the point where the goalie will dribble to, to clear the ball from
         std::optional<Point> clear_ball_origin;
+        // the angle that the goalie will clear the ball with
         std::optional<Angle> clear_ball_direction;
     };
 
@@ -41,7 +43,7 @@ struct GoalieFSM
      * @param field the field to restrain the goalie on
      * @param goalie_desired_position The point the goalie would like to go to
      * @param goalie_restricted_area The rectangle that the goalie is to stay in
-     * @returns goalie_suggested_position That the goalie should go to
+     * @return goalie_suggested_position That the goalie should go to
      */
     static std::optional<Point> restrainGoalieInRectangle(
             const Field &field, Point goalie_desired_position, Rectangle goalie_restricted_area)
@@ -123,7 +125,11 @@ struct GoalieFSM
 
     /**
      * Gets the position for the goalie to move to, to best position itself between the ball and the friendly goal
+     * @param ball the ball to position the goalie relative to
+     * @param field the field to position the goalie on
+     * @param goalie_tactic_config the goalie tactic config
      *
+     * @return the position that the goalie should move to
      */
     static Point getGoaliePositionToBlock(const Ball &ball, const Field &field,
             std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config)
@@ -178,6 +184,8 @@ struct GoalieFSM
      *
      * @param ball the ball to find interceptions with the full goal segment
      * @param field the field to find interceptions on
+     *
+     * @return the intersections between the ball velocity ray and the full goal segment
      */
     static std::vector<Point> getIntersectionsBetweenBallVelocityAndFullGoalSegment(const Ball &ball, const Field &field)
     {
@@ -199,6 +207,8 @@ struct GoalieFSM
      * Gets the "don't chip" rectangle inside the friendly defense area
      *
      * @param field the field to find the "don't chip" rectangle on
+     *
+     * @return the "don't chip" rectangle
      */
     static Rectangle getDontChipRectangle(const Field &field) {
         return Rectangle(field.friendlyGoalpostNeg(),
@@ -206,7 +216,14 @@ struct GoalieFSM
                   Vector(2 * ROBOT_MAX_RADIUS_METERS, 0));
     }
 
-    static Point getClearOrigin(const Field &field, const Ball &ball, std::optional<Point> origin_opt)
+    /**
+     * Gets the point on the field from which the goalie should clear the ball
+     * @param field the field on which the goalie will clear the ball
+     * @param origin_opt the optional point to clear the ball from
+     *
+     * @return the position that the goalie should clear the ball from
+     */
+    static Point getClearOrigin(const Field &field, std::optional<Point> origin_opt)
     {
         Point clear_origin = field.friendlyGoalCenter() + Vector(0.5, 0);
         if (origin_opt)
@@ -216,6 +233,14 @@ struct GoalieFSM
         return clear_origin;
     }
 
+    /**
+     * Gets the angle with which the goalie should clear the ball
+     * @param field the field on which the goalie will clear the ball
+     * @param ball the ball to get the default clear direction from
+     * @param direction_opt the optional angle to clear the ball from
+     *
+     * @return the angle that the goalie should clear the ball with
+     */
     static Angle getClearDirection(const Field &field, const Ball &ball, std::optional<Angle> direction_opt)
     {
         Angle clear_direction = (ball.position() - field.friendlyGoalCenter()).orientation();
@@ -349,7 +374,7 @@ struct GoalieFSM
          */
         const auto update_dribble =
             [](auto event, back::process<DribbleFSM::Update> processEvent) {
-            Point clear_origin = getClearOrigin(event.common.world.field(), event.common.world.ball(), event.control_params.clear_ball_origin);
+            Point clear_origin = getClearOrigin(event.common.world.field(), event.control_params.clear_ball_origin);
             Angle clear_direction = getClearDirection(event.common.world.field(), event.common.world.ball(), event.control_params.clear_ball_direction);
 
             DribbleFSM::ControlParams control_params{
@@ -391,7 +416,6 @@ struct GoalieFSM
             panic_s + update_e[chip] / update_chip                      = chip_s,
             panic_s + update_e[panic_done]                              = X,
             panic_s + update_e / update_panic,
-//            dribble_s + update_e[chip] / update_chip                    = chip_s,
             dribble_s + update_e / update_dribble,
             dribble_s                                                   = chip_s,
             chip_s + update_e[panic] / update_panic                     = panic_s,
