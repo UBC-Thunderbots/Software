@@ -7,11 +7,9 @@ set -e
 CUBE_VERSION="6.2.0"
 CUBE_ZIP_FILENAME="en.stm32cubemx-lin_v6-2-0.zip"
 
-# this link can be found here: https://www.st.com/en/development-tools/stm32cubemx.html
-# use the guest download feature (i.e do NOT log in). ST will send out an email that has
-# a link that doesn't need to be authenticated
-CUBE_LINK="https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/53/ea/a1/95/91/ee/48/d5/stm32cubemx-lin_v6-2-0/files/stm32cubemx-lin_v6-2-0.zip/jcr:content/translations/en.stm32cubemx-lin_v6-2-0.zip"
+# The original zip file can be found here: https://www.st.com/en/development-tools/stm32cubemx.html
 
+CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
 CUBEMX_TMP_DIR="/tmp/cubemx"
 CUBEMX_INSTALL_DIR="/opt/STM32CubeMX_$CUBE_VERSION"
 
@@ -49,7 +47,14 @@ else
     echo -n $'#!/bin/bash \n\n ' > cuberunner.sh
     echo -n "pushd /opt/STM32CubeMX_$CUBE_VERSION && ./STM32CubeMX && popd" >> cuberunner.sh
     
-    curl -O $CUBE_LINK
+    cp "$CURR_DIR/stm32cubemx-6.2.0/xaa" .
+    cp "$CURR_DIR/stm32cubemx-6.2.0/xab" .
+    cp "$CURR_DIR/stm32cubemx-6.2.0/xac" .
+    cp "$CURR_DIR/stm32cubemx-6.2.0/xad" .
+    cp "$CURR_DIR/stm32cubemx-6.2.0/xae" .
+    cp "$CURR_DIR/stm32cubemx-6.2.0/xaf" .
+    cp "$CURR_DIR/stm32cubemx-6.2.0/xag" .
+    cat x* > en.stm32cubemx-lin_v6-2-0.zip
 
     if ! unzip $CUBE_ZIP_FILENAME ; then
         echo "##############################################################"
