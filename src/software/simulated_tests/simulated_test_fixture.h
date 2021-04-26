@@ -96,8 +96,7 @@ class SimulatedTestFixture : public ::testing::Test
      * @return if validation functions are done
      */
     bool tickTest(Duration simulation_time_step, Duration ai_time_step,
-                         std::shared_ptr<World> world,
-                         std::shared_ptr<Simulator> simulator);
+                  std::shared_ptr<World> world, std::shared_ptr<Simulator> simulator);
 
     /**
      * A helper function that updates SensorFusion with the latest data from the Simulator
@@ -155,8 +154,8 @@ class SimulatedTestFixture : public ::testing::Test
      * @param desired_wall_tick_time How long each simulation step should take
      * in wall-clock time
      */
-    static void sleep(const std::chrono::steady_clock::time_point& wall_start_time,
-                      const Duration& desired_wall_tick_time);
+    static void sleep(const std::chrono::steady_clock::time_point &wall_start_time,
+                      const Duration &desired_wall_tick_time);
 
     // The simulator needs to be a pointer so that we can destroy and re-create
     // the object in the SetUp function. Because the simulator has no

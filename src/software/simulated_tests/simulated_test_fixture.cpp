@@ -121,6 +121,10 @@ void SimulatedTestFixture::runTest(
 {
     std::shared_ptr<Simulator> simulator(std::make_shared<Simulator>(
         Field::createSSLDivisionBField(), thunderbots_config->getSimulatorConfig()));
+    simulator->setBallState(ball);
+    simulator->addYellowRobots(friendly_robots);
+    simulator->addBlueRobots(enemy_robots);
+
     updateSensorFusion(simulator);
     std::shared_ptr<World> world;
     if (auto world_opt = sensor_fusion.getWorld())
