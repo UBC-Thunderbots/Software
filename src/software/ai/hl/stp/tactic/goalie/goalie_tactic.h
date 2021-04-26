@@ -3,8 +3,6 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
 
-//#include "software/ai/evaluation/enemy_threat.h"
-
 /**
  * This tactic is used to defend the ball from going into the goal. The tactic
  * is assigned to the robot that is selected using a DynamicParameter, and stays
