@@ -6,7 +6,6 @@ cc_library(
         "proto_udp_client.h",
         "proto_udp_client.tpp",
     ],
-    visibility = ["//visibility:private"],
     deps = [
         "//software/logger",
         "//software/util/typename",

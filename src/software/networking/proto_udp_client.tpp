@@ -16,24 +16,29 @@ ProtoUdpClient<SendProtoT, ReceiveProtoT>::ProtoUdpClient(
     socket_.open(endpoint.protocol());
     socket_.set_option(boost::asio::socket_base::reuse_address(true));
 
-    try
-    {
-        socket_.bind(endpoint);
-    }
-    catch (const boost::exception& ex)
-    {
-        LOG(FATAL) << "ProtoUdpClient: There was an issue binding the socket to "
-                      "the endpoint when trying to connect to the "
-                      "address. This may be due to another instance of the "
-                      "ProtoUdpClient running and using the port already. "
-                      "(ip = "
-                   << ip_address << ", port = " << port << ")" << std::endl;
-    }
-
     if (multicast)
     {
+        try
+        {
+            // We need to bind to the multicast port to be able to send/listen to
+            // messages. We _should not_ bind to the endpoint in a unicast setting
+            // in case the server is running on the same computer (simulators)
+            //
+            // UDP is connectionless, and will work w/out a bind w/ just sendto and
+            // recvfrom
+            socket_.bind(boost::asio::ip::udp::endpoint(endpoint));
+        }
+        catch (const boost::exception& ex)
+        {
+            LOG(FATAL) << "ProtoUdpClient: There was an issue binding the socket to "
+                          "the endpoint when trying to connect to the "
+                          "address. This may be due to another instance of the "
+                          "ProtoUdpClient running and using the port already. "
+                          "(ip = "
+                       << ip_address << ", port = " << port << ")" << std::endl;
+        }
+
         socket_.set_option(boost::asio::ip::multicast::join_group(addr));
-        std::cerr << "sup" << std::endl;
     }
 }
 
@@ -47,8 +52,8 @@ void ProtoUdpClient<SendProtoT, ReceiveProtoT>::sendProto(const SendProtoT& mess
 template <class SendProtoT, class ReceiveProtoT>
 ReceiveProtoT ProtoUdpClient<SendProtoT, ReceiveProtoT>::receiveProto()
 {
-    size_t num_bytes_received =
-        socket_.receive(boost::asio::buffer(raw_received_data_, MAX_BUFFER_LENGTH));
+    size_t num_bytes_received = socket_.receive_from(
+        boost::asio::buffer(raw_received_data_, MAX_BUFFER_LENGTH), endpoint);
     auto packet_data = ReceiveProtoT();
 
     if (num_bytes_received > 0)
