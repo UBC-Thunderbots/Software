@@ -10,6 +10,7 @@
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/intersection.h"
+#include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/line.h"
 
 
@@ -138,10 +139,7 @@ struct GoalieFSM
     {
         // compute angle between two vectors, negative goal post to ball and positive
         // goal post to ball
-        Angle block_cone_angle =
-            (ball.position() - field.friendlyGoalpostNeg())
-                .orientation()
-                .minDiff((ball.position() - field.friendlyGoalpostPos()).orientation());
+        Angle block_cone_angle = acuteAngle(field.friendlyGoalpostNeg(), ball.position(), field.friendlyGoalpostPos());
 
         // how far in should the goalie wedge itself into the block cone, to block
         // balls
