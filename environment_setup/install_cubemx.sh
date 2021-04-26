@@ -8,6 +8,7 @@ CUBE_VERSION="6.2.0"
 CUBE_ZIP_FILENAME="en.stm32cubemx-lin_v6-2-0.zip"
 
 # The original zip file can be found here: https://www.st.com/en/development-tools/stm32cubemx.html
+# It was split using `split --bytes=49M zip_file`
 
 CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
 CUBEMX_TMP_DIR="/tmp/cubemx"
@@ -47,13 +48,7 @@ else
     echo -n $'#!/bin/bash \n\n ' > cuberunner.sh
     echo -n "pushd /opt/STM32CubeMX_$CUBE_VERSION && ./STM32CubeMX && popd" >> cuberunner.sh
     
-    cp "$CURR_DIR/stm32cubemx-6.2.0/xaa" .
-    cp "$CURR_DIR/stm32cubemx-6.2.0/xab" .
-    cp "$CURR_DIR/stm32cubemx-6.2.0/xac" .
-    cp "$CURR_DIR/stm32cubemx-6.2.0/xad" .
-    cp "$CURR_DIR/stm32cubemx-6.2.0/xae" .
-    cp "$CURR_DIR/stm32cubemx-6.2.0/xaf" .
-    cp "$CURR_DIR/stm32cubemx-6.2.0/xag" .
+    cp $CURR_DIR/stm32cubemx-6.2.0/* .
     cat x* > en.stm32cubemx-lin_v6-2-0.zip
 
     if ! unzip $CUBE_ZIP_FILENAME ; then
