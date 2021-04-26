@@ -10,7 +10,7 @@
 
 class ShootOrPassPlayTest : public SimulatedPlayTestFixture
 {
-   public:
+   protected:
     Field field = Field::createSSLDivisionBField();
 };
 

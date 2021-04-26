@@ -12,7 +12,7 @@
 
 class StopPlayTest : public SimulatedPlayTestFixture
 {
-   public:
+   protected:
     StopPlayTest() : stop_play_rules(initStopPlayRules()) {}
 
     std::vector<ValidationFunction> stop_play_rules;

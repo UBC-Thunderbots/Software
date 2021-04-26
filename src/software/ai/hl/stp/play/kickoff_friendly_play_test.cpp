@@ -16,7 +16,7 @@
 
 class KickoffFriendlyPlayTest : public SimulatedPlayTestFixture
 {
-   public:
+   protected:
     Field field = Field::createSSLDivisionBField();
 };
 
