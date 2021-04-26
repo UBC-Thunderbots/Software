@@ -1,8 +1,8 @@
 #pragma once
 
-#include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
+
 //#include "software/ai/evaluation/enemy_threat.h"
 
 /**
