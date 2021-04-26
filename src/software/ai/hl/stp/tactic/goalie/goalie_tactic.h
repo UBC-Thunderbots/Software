@@ -45,6 +45,7 @@ class GoalieTactic : public Tactic
 
     void accept(TacticVisitor &visitor) const override;
     bool done() const override;
+    bool isGoalieTactic() const override;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;

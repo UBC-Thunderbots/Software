@@ -278,7 +278,7 @@ struct GoalieFSM
          * @return if the ball is moving faster than the panic threshold and has a clear
          * path to the goal
          */
-        const auto panic = [](auto event) {
+        const auto should_panic = [](auto event) {
             double ball_speed_panic =
                 event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
             std::vector<Point> intersections =
@@ -289,15 +289,15 @@ struct GoalieFSM
         };
 
         /**
-         * Guard that checks if the ball is moving slower than the time_to_panic threshold
+         * Guard that checks if the ball is moving slower than the panic threshold
          * and is inside the friendly defense area
          *
          * @param event GoalieFSM::Update
          *
-         * @return if the ball is moving slower than the time_to_panic threshold and is
+         * @return if the ball is moving slower than the panic threshold and is
          * inside the friendly defense area
          */
-        const auto chip = [](auto event) {
+        const auto should_chip = [](auto event) {
             double ball_speed_panic =
                 event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
 
@@ -312,7 +312,7 @@ struct GoalieFSM
                    !contains(dont_chip_rectangle, event.common.world.ball().position());
         };
 
-        const auto dribble = [](auto event) {
+        const auto should_dribble = [](auto event) {
             double ball_speed_panic =
                 event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
             std::vector<Point> intersections =
@@ -434,14 +434,14 @@ struct GoalieFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *position_to_block_s + update_e[panic] / update_panic    = panic_s,
-            position_to_block_s + update_e[dribble] / update_dribble = dribble_s,
-            position_to_block_s + update_e[chip] / update_chip       = chip_s,
+            *position_to_block_s + update_e[should_panic] / update_panic    = panic_s,
+            position_to_block_s + update_e[should_dribble] / update_dribble = dribble_s,
+            position_to_block_s + update_e[should_chip] / update_chip       = chip_s,
             position_to_block_s + update_e / update_position_to_block,
-            panic_s + update_e[chip] / update_chip = chip_s,
+            panic_s + update_e[should_chip] / update_chip = chip_s,
             panic_s + update_e[panic_done]         = X, panic_s + update_e / update_panic,
             dribble_s + update_e / update_dribble, dribble_s = chip_s,
-            chip_s + update_e[panic] / update_panic = panic_s,
+            chip_s + update_e[should_panic] / update_panic = panic_s,
             chip_s + update_e / update_chip, chip_s = X,
             X + update_e / update_position_to_block = position_to_block_s);
     }

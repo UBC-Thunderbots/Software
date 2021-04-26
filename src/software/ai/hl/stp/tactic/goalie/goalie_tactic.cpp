@@ -52,6 +52,11 @@ bool GoalieTactic::done() const
     return fsm.is(boost::sml::X);
 }
 
+bool GoalieTactic::isGoalieTactic() const
+{
+    return true;
+}
+
 void GoalieTactic::updateIntent(const TacticUpdate &tactic_update)
 {
     fsm.process_event(GoalieFSM::Update(control_params, tactic_update));
