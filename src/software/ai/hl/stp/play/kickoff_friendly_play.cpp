@@ -1,13 +1,13 @@
 #include "software/ai/hl/stp/play/kickoff_friendly_play.h"
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/tactic/goalie_tactic.h"
+#include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/kickoff_chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 KickoffFriendlyPlay::KickoffFriendlyPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config)
+    : Play(config, true)
 {
 }
 
@@ -86,9 +86,6 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         std::make_shared<MoveTactic>(true)};
 
     // specific tactics
-    auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
-        play_config->getGoalieTacticConfig());
     auto kickoff_chip_tactic = std::make_shared<KickoffChipTactic>(true);
 
     // Part 1: setup state (move to key positions)
@@ -97,7 +94,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
-        PriorityTacticVector result = {{goalie_tactic}};
+        PriorityTacticVector result = {{}};
 
         // set the requirement that Robot 1 must be able to kick and chip
         move_tactics.at(0)->mutableRobotCapabilityRequirements() = {
@@ -121,7 +118,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
-        PriorityTacticVector result = {{goalie_tactic}};
+        PriorityTacticVector result = {{}};
 
         // TODO This needs to be adjusted post field testing, ball needs to land exactly
         // in the middle of the enemy field

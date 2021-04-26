@@ -2,7 +2,6 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
@@ -14,7 +13,10 @@
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/ball.h"
 
-CornerKickPlay::CornerKickPlay(std::shared_ptr<const PlayConfig> config) : Play(config) {}
+CornerKickPlay::CornerKickPlay(std::shared_ptr<const PlayConfig> config)
+    : Play(config, true)
+{
+}
 
 bool CornerKickPlay::isApplicable(const World &world) const
 {
@@ -56,11 +58,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
      *
      */
 
-    auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
-        play_config->getGoalieTacticConfig());
-
-    Pass pass = setupPass(yield, goalie_tactic, world);
+    Pass pass = setupPass(yield, world);
 
     // Perform the pass and wait until the receiver is finished
     auto passer = std::make_shared<PasserTactic>(pass);
@@ -81,22 +79,19 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
 
         if (!passer->done())
         {
-            yield({{goalie_tactic, passer, receiver, stop_tactic_1, stop_tactic_2,
-                    stop_tactic_3}});
+            yield({{passer, receiver, stop_tactic_1, stop_tactic_2, stop_tactic_3}});
         }
         else
         {
-            yield({{goalie_tactic, receiver, stop_tactic_1, stop_tactic_2, stop_tactic_3,
-                    stop_tactic_4}});
+            yield(
+                {{receiver, stop_tactic_1, stop_tactic_2, stop_tactic_3, stop_tactic_4}});
         }
     } while (!receiver->done());
 
     LOG(DEBUG) << "Finished";
 }
 
-Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
-                               std::shared_ptr<GoalieTactic> goalie_tactic,
-                               const World &world)
+Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &world)
 {
     auto pitch_division =
         std::make_shared<const EighteenZonePitchDivision>(world.field());
@@ -142,8 +137,8 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
         updateAlignToBallTactic(align_to_ball_tactic, world);
         update_cherry_pickers(pass_generator.generatePassEvaluation(world));
 
-        yield({{goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
-                cherry_pick_tactic_2, cherry_pick_tactic_3, cherry_pick_tactic_4}});
+        yield({{align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
+                cherry_pick_tactic_3, cherry_pick_tactic_4}});
     }
 
 
@@ -158,8 +153,8 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
         updateAlignToBallTactic(align_to_ball_tactic, world);
         update_cherry_pickers(pass_generator.generatePassEvaluation(world));
 
-        yield({{goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
-                cherry_pick_tactic_2, cherry_pick_tactic_3, cherry_pick_tactic_4}});
+        yield({{align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
+                cherry_pick_tactic_3, cherry_pick_tactic_4}});
 
     } while (!align_to_ball_tactic->done());
 
@@ -175,8 +170,8 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
         updateAlignToBallTactic(align_to_ball_tactic, world);
         update_cherry_pickers(pass_generator.generatePassEvaluation(world));
 
-        yield({{goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
-                cherry_pick_tactic_2, cherry_pick_tactic_3, cherry_pick_tactic_4}});
+        yield({{align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
+                cherry_pick_tactic_3, cherry_pick_tactic_4}});
 
         best_pass_and_score_so_far =
             pass_generator.generatePassEvaluation(world).getBestPassOnField();

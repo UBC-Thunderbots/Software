@@ -6,7 +6,8 @@
 #include "software/ai/hl/stp/tactic/penalty_setup_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-PenaltyKickPlay::PenaltyKickPlay(std::shared_ptr<const PlayConfig> config) : Play(config)
+PenaltyKickPlay::PenaltyKickPlay(std::shared_ptr<const PlayConfig> config)
+    : Play(config, true)
 {
 }
 
@@ -31,10 +32,6 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
     auto shooter_setup_move = std::make_shared<PenaltySetupTactic>(true);
 
     // Setup the goalie
-    auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
-        play_config->getGoalieTacticConfig());
-
     auto move_tactic_2 = std::make_shared<MoveTactic>(true);
     auto move_tactic_3 = std::make_shared<MoveTactic>(true);
     auto move_tactic_4 = std::make_shared<MoveTactic>(true);
@@ -80,7 +77,6 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             tactics_to_run[0].emplace_back(penalty_shot_tactic);
         }
 
-        tactics_to_run[0].emplace_back(goalie_tactic);
         // Move all non-shooter robots behind the ball
         tactics_to_run[0].emplace_back(move_tactic_2);
         tactics_to_run[0].emplace_back(move_tactic_3);

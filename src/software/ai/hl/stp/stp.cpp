@@ -75,8 +75,9 @@ void STP::updateAIPlay(const World& world)
 std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World& world)
 {
     return current_play->get(
-        [this](const ConstPriorityTacticVector& tactics, const World& world) {
-            return assignRobotsToTactics(tactics, world);
+        [this](const ConstPriorityTacticVector& tactics, const World& world,
+               bool automatically_assign_goalie) {
+            return assignRobotsToTactics(tactics, world, automatically_assign_goalie);
         },
         [this](const Tactic& tactic) {
             return buildMotionConstraintSet(current_game_state, tactic);
@@ -182,15 +183,24 @@ bool STP::overrideAIPlayIfApplicable()
 
 
 std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
-    ConstPriorityTacticVector tactics, const World& world)
+    ConstPriorityTacticVector tactics, const World& world,
+    bool automatically_assign_goalie)
 {
     std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment;
 
     std::optional<Robot> goalie_robot = world.friendlyTeam().goalie();
     std::vector<Robot> robots         = world.friendlyTeam().getAllRobots();
 
-    auto is_goalie_tactic = [](auto tactic) { return tactic->isGoalieTactic(); };
-    bool goalie_assigned  = false;
+    if (goalie_robot)
+    {
+        auto goalie_tactic = std::make_shared<GoalieTactic>(
+            world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
+            play_config->getGoalieTacticConfig());
+        robot_tactic_assignment.emplace(goalie_tactic, goalie_robot.value());
+
+        robots.erase(std::remove(robots.begin(), robots.end(), *goalie_robot),
+                     robots.end());
+    }
 
     // This functions optimizes the assignment of robots to tactics by minimizing
     // the total cost of assignment using the Hungarian algorithm
@@ -201,30 +211,6 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
     // algorithm that we use here
     for (auto tactic_vector : tactics)
     {
-        // We are only allowed to assign the pre-assigned goalie robot to the goalie
-        // tactic, so check if we have a goalie tactic in this tactic_vector and assign it
-        // to the goalie robot if it exists.
-        auto goalie_tactic =
-            std::find_if(tactic_vector.begin(), tactic_vector.end(), is_goalie_tactic);
-
-        if (goalie_tactic != tactic_vector.end())
-        {
-            if (goalie_robot && !goalie_assigned)
-            {
-                robot_tactic_assignment.emplace(*goalie_tactic, *goalie_robot);
-                goalie_assigned = true;
-
-                robots.erase(std::remove(robots.begin(), robots.end(), *goalie_robot),
-                             robots.end());
-            }
-
-            // remove all goalie tactics from the tactic_vector if they exist,
-            // we can only have 1 goalie
-            tactic_vector.erase(std::remove_if(tactic_vector.begin(), tactic_vector.end(),
-                                               is_goalie_tactic),
-                                tactic_vector.end());
-        }
-
         size_t num_tactics = tactic_vector.size();
 
         if (robots.size() < tactic_vector.size())

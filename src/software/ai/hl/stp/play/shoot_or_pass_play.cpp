@@ -17,7 +17,8 @@
 
 using Zones = std::unordered_set<EighteenZoneId>;
 
-ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config) : Play(config)
+ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config)
+    : Play(config, true)
 {
 }
 
@@ -49,10 +50,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
      *    two defenders continue to defend
      */
 
-    // Setup the goalie and crease defenders
-    auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
-        play_config->getGoalieTacticConfig());
+    // Setup crease defenders
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
                                                world.friendlyTeam(), world.enemyTeam(),
@@ -78,7 +76,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                                  play_config->getPassingConfig());
 
     PassWithRating best_pass_and_score_so_far = attemptToShootWhileLookingForAPass(
-        yield, goalie_tactic, crease_defender_tactics, shoot_tactic, world);
+        yield, crease_defender_tactics, shoot_tactic, world);
 
     // If the shoot tactic has not finished, then we need to pass, otherwise we are
     // done this play
@@ -116,7 +114,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
             if (!passer->done())
             {
-                yield({{goalie_tactic, passer, receiver},
+                yield({{passer, receiver},
                        {cherry_pick_tactic_1, std::get<0>(crease_defender_tactics),
                         std::get<1>(crease_defender_tactics)}});
             }
@@ -127,7 +125,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 cherry_pick_tactic_2->updateControlParams(
                     pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
-                yield({{goalie_tactic, receiver},
+                yield({{receiver},
                        {cherry_pick_tactic_1, cherry_pick_tactic_2},
                        {std::get<0>(crease_defender_tactics),
                         std::get<1>(crease_defender_tactics)}});
@@ -143,7 +141,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
-    TacticCoroutine::push_type &yield, std::shared_ptr<GoalieTactic> goalie_tactic,
+    TacticCoroutine::push_type &yield,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     std::shared_ptr<ShootGoalTactic> shoot_tactic, const World &world)
 
@@ -184,8 +182,7 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.rating;
 
-        yield({{goalie_tactic},
-               {shoot_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
+        yield({{shoot_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
                 std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
 

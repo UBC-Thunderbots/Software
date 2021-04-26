@@ -158,11 +158,14 @@ class STP : public HL
      * we need to modify the individual tactics _and_ possibly add/remove tactics
      * @param world The state of the world, which contains the friendly Robots that will
      * be assigned to each tactic
+     * @param automatically_assign_goalie whether or not to automatically assign a goalie
+     * tactic
      *
      * @return map from assigned tactics to robot
      */
     std::map<std::shared_ptr<const Tactic>, Robot> assignRobotsToTactics(
-        ConstPriorityTacticVector tactics, const World &world);
+        ConstPriorityTacticVector tactics, const World &world,
+        bool automatically_assign_goalie);
 
    private:
     /**
