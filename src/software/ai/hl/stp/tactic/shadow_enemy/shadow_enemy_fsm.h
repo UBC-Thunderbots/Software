@@ -94,7 +94,7 @@ struct ShadowEnemyFSM
             if (!event.control_params.enemy_threat.value().has_ball)
             {
                 Vector enemy_to_passer_vector =
-                    event.control_params.enemy_threat.value().passer.value().position() -
+                    ball_position -
                     event.control_params.enemy_threat.value().robot.position();
 
                 position_to_block =

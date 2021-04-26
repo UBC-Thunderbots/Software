@@ -6,7 +6,7 @@
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
+#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 KickoffEnemyPlay::KickoffEnemyPlay(std::shared_ptr<const PlayConfig> config)
@@ -127,8 +127,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 // We shadow assuming the robots do not pass so we do not try block passes
                 // while shadowing, since we can't go on the enemy side to block the pass
                 // anyway
-                shadow_enemy_tactics.at(i)->updateControlParams(enemy_threat,
-                                                                shadow_dist);
+                shadow_enemy_tactics.at(i)->updateControlParams(enemy_threat, shadow_dist,
+                                                                0);
                 result[0].emplace_back(shadow_enemy_tactics.at(i));
             }
             else

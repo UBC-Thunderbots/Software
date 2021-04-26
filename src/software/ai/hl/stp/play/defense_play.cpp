@@ -7,7 +7,7 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
+#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/logger/logger.h"
@@ -100,7 +100,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         if (enemy_threats.size() > 1)
         {
             shadow_enemy_tactic->updateControlParams(enemy_threats.at(0),
-                                                     ROBOT_MAX_RADIUS_METERS * 3);
+                                                     ROBOT_MAX_RADIUS_METERS * 3, 0);
             result[0].emplace_back(shadow_enemy_tactic);
         }
         else

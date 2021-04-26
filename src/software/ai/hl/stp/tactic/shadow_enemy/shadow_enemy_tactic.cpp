@@ -15,10 +15,11 @@ ShadowEnemyTactic::ShadowEnemyTactic()
 void ShadowEnemyTactic::updateWorldParams(const World &world) {}
 
 void ShadowEnemyTactic::updateControlParams(std::optional<EnemyThreat> enemy_threat,
-                                            double shadow_distance, double steal_and_chip_distance)
+                                            double shadow_distance,
+                                            double steal_and_chip_distance)
 {
-    control_params.enemy_threat    = enemy_threat;
-    control_params.shadow_distance = shadow_distance;
+    control_params.enemy_threat            = enemy_threat;
+    control_params.shadow_distance         = shadow_distance;
     control_params.steal_and_chip_distance = steal_and_chip_distance;
 }
 
