@@ -37,6 +37,9 @@ class GoalieTactic : public Tactic
                           const Team &enemy_team,
                           std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config);
 
+    // hack to make this work in before goalie tactic fsm goes in
+    explicit GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config);
+
     GoalieTactic() = delete;
 
     /*
@@ -95,11 +98,6 @@ class GoalieTactic : public Tactic
 
     void accept(TacticVisitor &visitor) const override;
 
-    Ball getBall() const;
-    Field getField() const;
-    Team getFriendlyTeam() const;
-    Team getEnemyTeam() const;
-
     // Distance to chip the ball when trying to yeet it
     // TODO (#1878): Replace this with a more intelligent chip distance system
     static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
@@ -108,9 +106,9 @@ class GoalieTactic : public Tactic
     void calculateNextAction(ActionCoroutine::push_type &yield) override;
 
     // Tactic parameters
-    Ball ball;
-    Field field;
-    Team friendly_team;
-    Team enemy_team;
+    std::optional<Ball> ball;
+    std::optional<Field> field;
+    std::optional<Team> friendly_team;
+    std::optional<Team> enemy_team;
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
 };

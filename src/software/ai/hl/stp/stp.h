@@ -218,4 +218,9 @@ class STP : public HL
     bool override_play;
     bool previous_override_play;
     GameState current_game_state;
+    // Goalie tactic if required by the play
+    std::shared_ptr<GoalieTactic> goalie_tactic;
+    // Robot-Tactic assignment from tactics created by STP
+    // Tactic is non-const so it can be used directly
+    std::map<std::shared_ptr<Tactic>, Robot> stp_robot_tactic_assignment;
 };
