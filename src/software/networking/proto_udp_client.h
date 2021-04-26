@@ -25,21 +25,6 @@ class ProtoUdpClient
 
     virtual ~ProtoUdpClient();
 
-    /*
-     * NOTE: The following functions utilize SFINAE (substitution failure is not an error)
-     *
-     * We want to be able to re-use these functions across all networking libraries,
-     * but we want to be able to compile out functions that that user doesn't need
-     * to prevent unintended use (we don't want "listeners" to be able to send)
-     * (the user should use the client library in that case)
-     *
-     * std::enable_if allows us to remove the function from the overload set if the
-     * substitution fails, allowing us to "turn on" and "turn off" different functions,
-     * based on the template arguments.
-     *
-     * https://stackoverflow.com/questions/6972368/stdenable-if-to-conditionally-compile-a-member-function
-     */
-
     /**
      * Sends a protobuf message to the initialized ip address and port
      * This function returns after the message has been sent.
@@ -48,7 +33,6 @@ class ProtoUdpClient
      *
      * @param message The protobuf message to send
      */
-    template <class = std::enable_if_t<!std::is_same<SendProtoT, void>::value>>
     void sendProto(const SendProtoT& message);
 
     /**
@@ -58,7 +42,6 @@ class ProtoUdpClient
      *
      * @returns ReceiveProtoT
      */
-    template <class = std::enable_if_t<!std::is_same<ReceiveProtoT, void>::value>>
     ReceiveProtoT receiveProto();
 
     /**
@@ -69,16 +52,14 @@ class ProtoUdpClient
      * @param message The protobuf message to send
      * @return ReceiveProtoT
      */
-    template <class = std::enable_if_t<!std::is_same<ReceiveProtoT, void>::value &&
-                                       !std::is_same<SendProtoT, void>::value>>
     ReceiveProtoT request(const SendProtoT& message);
 
    private:
     // A UDP socket to send data over
     boost::asio::ip::udp::socket socket_;
 
-    // The endpoint for the receiver
-    boost::asio::ip::udp::endpoint receiver_endpoint;
+    // The endpoint
+    boost::asio::ip::udp::endpoint endpoint;
 
     // Buffer to hold serialized protobuf data
     std::string data_buffer;

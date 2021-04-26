@@ -53,6 +53,8 @@ class ThreadedProtoUdpListener
     // The function to call on every received packet of ReceiveProtoT data
     std::function<void(ReceiveProtoT)> receive_callback;
 
+    // The threaded proto udp listener will never receive any messages, we just
+    // use the ReceiveProtoT type as a placeholder
     ProtoUdpClient<ReceiveProtoT, ReceiveProtoT> udp_listener;
 
     std::atomic_bool in_destructor;

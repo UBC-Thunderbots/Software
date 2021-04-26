@@ -11,27 +11,40 @@ ProtoUdpClient<SendProtoT, ReceiveProtoT>::ProtoUdpClient(
     : socket_(io_service)
 {
     boost::asio::ip::address addr = boost::asio::ip::make_address(ip_address);
-    receiver_endpoint             = boost::asio::ip::udp::endpoint(addr, port);
+    endpoint                      = boost::asio::ip::udp::endpoint(addr, port);
 
-    socket_.open(receiver_endpoint.protocol());
+    socket_.open(endpoint.protocol());
     socket_.set_option(boost::asio::socket_base::reuse_address(true));
+
+    try
+    {
+        socket_.bind(endpoint);
+    }
+    catch (const boost::exception& ex)
+    {
+        LOG(FATAL) << "ProtoUdpClient: There was an issue binding the socket to "
+                      "the endpoint when trying to connect to the "
+                      "address. This may be due to another instance of the "
+                      "ProtoUdpClient running and using the port already. "
+                      "(ip = "
+                   << ip_address << ", port = " << port << ")" << std::endl;
+    }
 
     if (multicast)
     {
         socket_.set_option(boost::asio::ip::multicast::join_group(addr));
+        std::cerr << "sup" << std::endl;
     }
 }
 
 template <class SendProtoT, class ReceiveProtoT>
-template <class>  // Needed for SFINAE
 void ProtoUdpClient<SendProtoT, ReceiveProtoT>::sendProto(const SendProtoT& message)
 {
     message.SerializeToString(&data_buffer);
-    socket_.send_to(boost::asio::buffer(data_buffer), receiver_endpoint);
+    socket_.send_to(boost::asio::buffer(data_buffer), endpoint);
 }
 
 template <class SendProtoT, class ReceiveProtoT>
-template <class>  // Needed for SFINAE
 ReceiveProtoT ProtoUdpClient<SendProtoT, ReceiveProtoT>::receiveProto()
 {
     size_t num_bytes_received =
@@ -62,7 +75,6 @@ ReceiveProtoT ProtoUdpClient<SendProtoT, ReceiveProtoT>::receiveProto()
 }
 
 template <class SendProtoT, class ReceiveProtoT>
-template <class>  // Needed for SFINAE
 ReceiveProtoT ProtoUdpClient<SendProtoT, ReceiveProtoT>::request(
     const SendProtoT& request)
 {
