@@ -15,17 +15,19 @@
 
 class PenaltyKickPlayTest : public SimulatedPlayTestFixture
 {
+   public:
+    Field field = Field::createSSLDivisionBField();
 };
 
 TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
 {
-    setBallState(BallState(field().friendlyPenaltyMark(), Vector(0, 0)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
+    BallState ball_state(field.friendlyPenaltyMark(), Vector(0, 0));
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(-2, -2), Point(-3, -1), Point(-3, 0), Point(-3, 1), Point(-3, 2),
-         Point(2, 2.5)}));
+         Point(2, 2.5)});
     setFriendlyGoalie(0);
-    addEnemyRobots(
-        TestUtil::createStationaryRobotStatesWithId({field().enemyGoalCenter()}));
+    auto enemy_robots =
+        TestUtil::createStationaryRobotStatesWithId({field.enemyGoalCenter()});
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(PenaltyKickPlay));
     setRefereeCommand(RefereeCommand::PREPARE_PENALTY_US, RefereeCommand::NORMAL_START);
@@ -54,27 +56,28 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
             }
         }};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(9.5));
 }
 
 TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
 {
     Vector behind_ball_direction =
-        (field().friendlyPenaltyMark() - field().enemyGoalpostPos()).normalize();
+        (field.friendlyPenaltyMark() - field.enemyGoalpostPos()).normalize();
 
-    Point behind_ball = field().friendlyPenaltyMark() +
+    Point behind_ball = field.friendlyPenaltyMark() +
                         behind_ball_direction.normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
                                                         BALL_MAX_RADIUS_METERS + 0.1);
-    double non_shooter_x_pos = field().friendlyPenaltyMark().x() - 1.5;
-    setBallState(BallState(field().friendlyPenaltyMark(), Vector(0, 0)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
+    double non_shooter_x_pos = field.friendlyPenaltyMark().x() - 1.5;
+    BallState ball_state(field.friendlyPenaltyMark(), Vector(0, 0));
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(-4, 0), behind_ball, Point(non_shooter_x_pos, 0),
          Point(non_shooter_x_pos, 1), Point(non_shooter_x_pos, -1),
-         Point(non_shooter_x_pos, 2)}));
+         Point(non_shooter_x_pos, 2)});
     setFriendlyGoalie(0);
-    Point goalie = Point(field().enemyGoalCenter().x(), 0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({goalie}));
+    Point goalie      = Point(field.enemyGoalCenter().x(), 0);
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({goalie});
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(PenaltyKickPlay));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_PENALTY_US);
@@ -91,6 +94,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
             robotsAvoidBall(1, {shooter_id}, world_ptr, yield);
         }};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }

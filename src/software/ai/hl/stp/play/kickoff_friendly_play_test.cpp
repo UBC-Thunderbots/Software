@@ -16,19 +16,21 @@
 
 class KickoffFriendlyPlayTest : public SimulatedPlayTestFixture
 {
+   public:
+    Field field = Field::createSSLDivisionBField();
 };
 
 TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
 {
-    setBallState(BallState(Point(0, 0), Vector(0, 0)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
+    BallState ball_state(Point(0, 0), Vector(0, 0));
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
-         Point(-3, -2.5)}));
+         Point(-3, -2.5)});
     setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-         field().enemyDefenseArea().negXNegYCorner(),
-         field().enemyDefenseArea().negXPosYCorner()}));
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
+        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
+         field.enemyDefenseArea().negXNegYCorner(),
+         field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(KickoffFriendlyPlay));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_US);
@@ -65,6 +67,7 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
             }
         }};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }

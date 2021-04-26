@@ -10,23 +10,25 @@
 
 class PenaltyKickEnemyPlayTest : public SimulatedPlayTestFixture
 {
+   public:
+    Field field = Field::createSSLDivisionBField();
 };
 
 TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play)
 {
-    setBallState(BallState(field().friendlyPenaltyMark(), Vector(0, 0)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
+    BallState ball_state(field.friendlyPenaltyMark(), Vector(0, 0));
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
-         Point(4.6, -3.1)}));
+         Point(4.6, -3.1)});
     setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({
-        field().enemyGoalCenter(),
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({
+        field.enemyGoalCenter(),
         Point(3, 2.5),
         Point(3.2, 2.5),
         Point(3.4, 2.5),
         Point(3, -2.5),
         Point(3.2, -2.5),
-    }));
+    });
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(PenaltyKickEnemyPlay));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_PENALTY_THEM);
@@ -45,6 +47,7 @@ TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }

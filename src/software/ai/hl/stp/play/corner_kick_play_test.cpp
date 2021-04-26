@@ -16,7 +16,7 @@
 class CornerKickPlayTest : public SimulatedPlayTestFixture
 {
    public:
-    Field field = Field::createSSLDivisionAField();
+    Field field = Field::createSSLDivisionBField();
 };
 
 TEST_F(CornerKickPlayTest, test_corner_kick_play_bottom_left)

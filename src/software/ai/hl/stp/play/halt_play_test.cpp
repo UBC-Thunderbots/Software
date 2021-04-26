@@ -10,19 +10,21 @@
 
 class HaltPlayTest : public SimulatedPlayTestFixture
 {
+   public:
+    Field field = Field::createSSLDivisionBField();
 };
 
 TEST_F(HaltPlayTest, test_halt_play)
 {
-    setBallState(BallState(Point(0, 0.5), Vector(0, 0)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
+    BallState ball_state(Point(0, 0.5), Vector(0, 0));
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
-         Point(4.6, -3.1)}));
+         Point(4.6, -3.1)});
     setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-         field().enemyDefenseArea().negXNegYCorner(),
-         field().enemyDefenseArea().negXPosYCorner()}));
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
+        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
+         field.enemyDefenseArea().negXNegYCorner(),
+         field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(HaltPlay));
     setRefereeCommand(RefereeCommand::HALT, RefereeCommand::HALT);
@@ -41,6 +43,7 @@ TEST_F(HaltPlayTest, test_halt_play)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }

@@ -10,24 +10,26 @@
 
 class ShootOrPassPlayTest : public SimulatedPlayTestFixture
 {
+   public:
+    Field field = Field::createSSLDivisionBField();
 };
 
 TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
 {
-    setBallState(BallState(Point(-4.4, 2.9), Vector(0, 0)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({
-        field().friendlyGoalCenter(),
+    BallState ball_state(Point(-4.4, 2.9), Vector(0, 0));
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({
+        field.friendlyGoalCenter(),
         Point(-4.5, 3.0),
         Point(-2, 1.5),
         Point(-2, 0.5),
         Point(-2, -1.7),
         Point(-2, -1.5),
-    }));
+    });
     setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-         field().enemyDefenseArea().negXNegYCorner(),
-         field().enemyDefenseArea().negXPosYCorner()}));
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
+        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
+         field.enemyDefenseArea().negXNegYCorner(),
+         field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(ShootOrPassPlay));
     setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::STOP);
@@ -46,6 +48,7 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
