@@ -208,7 +208,7 @@ class STP : public HL
     std::function<std::unique_ptr<Play>()> default_play_constructor;
     // The Play that is currently running
     std::unique_ptr<Play> current_play;
-    std::map<RobotId, std::string> readable_robot_tactic_assignment;
+    std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment;
     // The random number generator
     std::mt19937 random_number_generator;
     std::shared_ptr<const AiControlConfig> control_config;
@@ -218,9 +218,8 @@ class STP : public HL
     bool override_play;
     bool previous_override_play;
     GameState current_game_state;
-    // Goalie tactic if required by the play
+    // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;
-    // Robot-Tactic assignment from tactics created by STP
-    // Tactic is non-const so it can be used directly
-    std::map<std::shared_ptr<Tactic>, Robot> stp_robot_tactic_assignment;
+    // Stop tactic common to all plays for robots that don't have tactics assigned
+    TacticVector stop_tactics;
 };
