@@ -66,12 +66,6 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
         std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(),
                                          world.enemyTeam(), pass, world.ball(), false);
 
-    // TODO (#2020) Remove these placeholder stop tactics
-    auto stop_tactic_1 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_2 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_3 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_4 = std::make_shared<StopTactic>(false);
-
     do
     {
         passer->updateControlParams(pass);
@@ -79,12 +73,11 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
 
         if (!passer->done())
         {
-            yield({{passer, receiver, stop_tactic_1, stop_tactic_2, stop_tactic_3}});
+            yield({{passer, receiver}});
         }
         else
         {
-            yield(
-                {{receiver, stop_tactic_1, stop_tactic_2, stop_tactic_3, stop_tactic_4}});
+            yield({{receiver}});
         }
     } while (!receiver->done());
 

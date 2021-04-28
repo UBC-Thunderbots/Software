@@ -90,7 +90,7 @@ class STP : public HL
      */
     explicit STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
                  std::shared_ptr<const AiControlConfig> control_config,
-                 std::shared_ptr<const PlayConfig> play_config, long random_seed = 0);
+                 std::shared_ptr<const PlayConfig> play_config, long random_seed);
 
     std::vector<std::unique_ptr<Intent>> getIntents(const World &world) override;
 
@@ -136,14 +136,12 @@ class STP : public HL
      * lower indexes of the outer vector will be assigned first. For example:
      *
      * {
-     *      {goalie_tactic},
      *      {crease_defender_1, crease_defender_2},
      *      {move_tactic},
      * }
      *
-     * The cost of assigning a goalie_tactic will be minimized across all robots first,
-     * followed by both the crease_defender tactics. The move_tactic will be assigned
-     * last.
+     * The cost of assigning borth the crease_defender tactics will be minimized across
+     * all robots first, followed by the move_tactic.
      *
      * The order of the given tactics in the inner vector also determines their priority,
      * with the tactics at the beginning of the vector being a higher priority than those
