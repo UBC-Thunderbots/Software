@@ -4,6 +4,7 @@
 
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/stp.h"
+#include "software/ai/hl/stp/tactic/all_tactics.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/hl/stp/tactic/test_tactics/goalie_test_tactic.h"
 #include "software/ai/hl/stp/tactic/test_tactics/move_test_tactic.h"
@@ -88,7 +89,7 @@ TEST_F(STPTacticAssignmentTest,
 
     ConstTacticVector tactics = {move_tactic_1, move_tactic_2};
 
-    auto asst = stp.assignRobotsToTactics({tactics}, world, false);
+    auto asst = stp.assignRobotsToTactics({tactics}, world, true);
 
     EXPECT_TRUE(allTacticsAssigned(tactics, asst));
 }
@@ -418,14 +419,8 @@ TEST_F(STPTacticAssignmentTest,
     friendly_team.updateRobots({robot_0, robot_1});
     world.updateFriendlyTeamState(friendly_team);
 
-    auto goalie_tactic_1      = std::make_shared<GoalieTestTactic>();
-    auto goalie_tactic_2      = std::make_shared<GoalieTestTactic>();
-    ConstTacticVector tactics = {goalie_tactic_1, goalie_tactic_2};
-
-    auto asst = stp.assignRobotsToTactics({tactics}, world, false);
-
-    EXPECT_FALSE(asst.find(goalie_tactic_1) != asst.end());
-    EXPECT_FALSE(asst.find(goalie_tactic_2) != asst.end());
+    auto asst = stp.assignRobotsToTactics({}, world, true);
+    EXPECT_EQ(0, asst.size());
 }
 
 TEST_F(STPTacticAssignmentTest,
@@ -446,50 +441,27 @@ TEST_F(STPTacticAssignmentTest,
     friendly_team.assignGoalie(0);
     world.updateFriendlyTeamState(friendly_team);
 
-    auto goalie_tactic_1      = std::make_shared<GoalieTestTactic>();
-    ConstTacticVector tactics = {goalie_tactic_1};
+    auto asst = stp.assignRobotsToTactics({}, world, true);
 
-    auto asst = stp.assignRobotsToTactics({tactics}, world, false);
-
-    EXPECT_TRUE(allTacticsAssigned(tactics, asst));
-    ASSERT_TRUE(asst.find(goalie_tactic_1) != asst.end());
-    EXPECT_EQ(asst.find(goalie_tactic_1)->second, robot_0);
+    EXPECT_EQ(1, asst.size());
+    for (const auto& [tactic, robot] : asst)
+    {
+        UNUSED(tactic);
+        EXPECT_EQ(robot, robot_0);
+    }
 
     // Change the goalie and perform the same check in case we have a fluke bug
     friendly_team.assignGoalie(1);
     world.updateFriendlyTeamState(friendly_team);
 
-    asst = stp.assignRobotsToTactics({tactics}, world, false);
+    asst = stp.assignRobotsToTactics({}, world, true);
 
-    EXPECT_TRUE(allTacticsAssigned(tactics, asst));
-    ASSERT_TRUE(asst.find(goalie_tactic_1) != asst.end());
-    EXPECT_EQ(asst.find(goalie_tactic_1)->second.id(), robot_1.id());
-}
-
-TEST_F(STPTacticAssignmentTest,
-       test_assigning_multiple_robots_to_multiple_goalie_tactics_goalie_set_on_team)
-{
-    Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-0.5, 0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0));
-    // default is all capabilities, if not specified otherwise
-    Robot robot_1(1, Point(-0.5, -0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0));
-    friendly_team.updateRobots({robot_0, robot_1});
-
-    friendly_team.assignGoalie(0);
-    world.updateFriendlyTeamState(friendly_team);
-
-    auto goalie_tactic_1 = std::make_shared<GoalieTestTactic>();
-    auto goalie_tactic_2 = std::make_shared<GoalieTestTactic>();
-
-    ConstPriorityTacticVector tactics = {{goalie_tactic_1, goalie_tactic_2}};
-
-    auto asst = stp.assignRobotsToTactics({tactics}, world, false);
-
-    ASSERT_TRUE(asst.find(goalie_tactic_1) != asst.end());
-    EXPECT_FALSE(asst.find(goalie_tactic_2) != asst.end());
-    EXPECT_EQ(asst.find(goalie_tactic_1)->second, robot_0);
+    EXPECT_EQ(1, asst.size());
+    for (const auto& [tactic, robot] : asst)
+    {
+        UNUSED(tactic);
+        EXPECT_EQ(robot, robot_1);
+    }
 }
 
 TEST_F(STPTacticAssignmentTest,
@@ -592,27 +564,82 @@ TEST_F(STPTacticAssignmentTest, test_goalie_assigned_properly_with_tiered_assign
     friendly_team.assignGoalie(1);
     world.updateFriendlyTeamState(friendly_team);
 
-    auto goalie_tactic_0 = std::make_shared<GoalieTestTactic>();
-    auto move_tactic_0   = std::make_shared<MoveTestTactic>();
-    auto move_tactic_1   = std::make_shared<MoveTestTactic>();
+    auto move_tactic_0 = std::make_shared<MoveTestTactic>();
+    auto move_tactic_1 = std::make_shared<MoveTestTactic>();
 
-    ConstPriorityTacticVector request = {{goalie_tactic_0},
-                                         {move_tactic_0, move_tactic_1}};
+    ConstPriorityTacticVector request = {{move_tactic_0, move_tactic_1}};
 
-    auto asst = stp.assignRobotsToTactics(request, world, false);
+    auto asst = stp.assignRobotsToTactics(request, world, true);
 
-    ASSERT_TRUE(asst.find(goalie_tactic_0) != asst.end());
-    EXPECT_EQ(asst.find(goalie_tactic_0)->second, robot_1);
+    EXPECT_EQ(2, asst.size());
 
-    request = {{goalie_tactic_0, move_tactic_0}, {move_tactic_1}};
-    asst    = stp.assignRobotsToTactics(request, world, false);
+    {
+        bool has_goalie = false;
+        bool has_move_0 = false;
+        for (const auto& [tactic, robot] : asst)
+        {
+            if (objectTypeName(*tactic) == TYPENAME(GoalieTactic))
+            {
+                has_goalie = true;
+                EXPECT_EQ(robot_1, robot);
+            }
+            if (tactic == move_tactic_0)
+            {
+                has_move_0 = true;
+                EXPECT_EQ(robot_0, robot);
+            }
+        }
+        EXPECT_TRUE(has_goalie);
+        EXPECT_TRUE(has_move_0);
+    }
 
-    ASSERT_TRUE(asst.find(goalie_tactic_0) != asst.end());
-    EXPECT_EQ(asst.find(goalie_tactic_0)->second, robot_1);
+    request = {{move_tactic_0}, {move_tactic_1}};
+    asst    = stp.assignRobotsToTactics(request, world, true);
 
-    request = {{move_tactic_0, move_tactic_1}, {goalie_tactic_0}};
-    asst    = stp.assignRobotsToTactics(request, world, false);
+    EXPECT_EQ(2, asst.size());
 
-    ASSERT_TRUE(asst.find(goalie_tactic_0) != asst.end());
-    EXPECT_EQ(asst.find(goalie_tactic_0)->second, robot_1);
+    {
+        bool has_goalie = false;
+        bool has_move_0 = false;
+        for (const auto& [tactic, robot] : asst)
+        {
+            if (objectTypeName(*tactic) == TYPENAME(GoalieTactic))
+            {
+                has_goalie = true;
+                EXPECT_EQ(robot_1, robot);
+            }
+            if (tactic == move_tactic_0)
+            {
+                has_move_0 = true;
+                EXPECT_EQ(robot_0, robot);
+            }
+        }
+        EXPECT_TRUE(has_goalie);
+        EXPECT_TRUE(has_move_0);
+    }
+
+    request = {{move_tactic_1, move_tactic_0}};
+    asst    = stp.assignRobotsToTactics(request, world, true);
+
+    EXPECT_EQ(2, asst.size());
+
+    {
+        bool has_goalie = false;
+        bool has_move_1 = false;
+        for (const auto& [tactic, robot] : asst)
+        {
+            if (objectTypeName(*tactic) == TYPENAME(GoalieTactic))
+            {
+                has_goalie = true;
+                EXPECT_EQ(robot_1, robot);
+            }
+            if (tactic == move_tactic_1)
+            {
+                has_move_1 = true;
+                EXPECT_EQ(robot_0, robot);
+            }
+        }
+        EXPECT_TRUE(has_goalie);
+        EXPECT_TRUE(has_move_1);
+    }
 }
