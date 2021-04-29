@@ -171,7 +171,7 @@ void SimulatedTestFixture::runTest(
     bool validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);
 
     // Logging duration of each tick starting at second tick
-    int tick_count             = 0;
+    unsigned int tick_count    = 0;
     double total_tick_duration = 0.0;
     double max_tick_duration   = 0.0;
     double min_tick_duration   = 10000.0;

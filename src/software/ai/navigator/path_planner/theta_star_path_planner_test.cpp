@@ -6,7 +6,6 @@
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/geom/point.h"
-#include "software/test_util/test_util.h"
 #include "software/world/field.h"
 
 class TestThetaStarPathPlanner : public testing::Test
