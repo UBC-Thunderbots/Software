@@ -12,9 +12,23 @@ CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
 cd "$CURR_DIR" || exit
 ./install_openocd.sh
 
+if [[ $? != 0 ]] ; then
+    echo "##############################################################"
+    echo "Error: Setup Firmware installing OpenOCD failed"
+    echo "##############################################################"
+    exit 1
+fi
+
 # install cubemx
 cd "$CURR_DIR" || exit
 ./install_cubemx.sh
+
+if [[ $? != 0 ]] ; then
+    echo "##############################################################"
+    echo "Error: Setup Firmware installing CubeMX failed"
+    echo "##############################################################"
+    exit 1
+fi
 
 # Install dfu-util, the tool used to load the firmware onto devices
 sudo apt-get update

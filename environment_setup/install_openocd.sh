@@ -10,7 +10,7 @@ set -e
 OPENOCD_TMP_DIR="/tmp/openocd.git"
 
 # Install dependencies required to compile openocd
-sudo apt install -y libtool automake
+sudo apt-get install -y libtool automake
 
 # Setup a clean directory to install openocd in
 rm -rf $OPENOCD_TMP_DIR
