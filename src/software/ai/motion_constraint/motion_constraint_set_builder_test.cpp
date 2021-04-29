@@ -54,9 +54,7 @@ namespace
                                    pass, world.ball(), false),
                 std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new ShadowEnemyTactic(world.field(), world.friendlyTeam(),
-                                      world.enemyTeam(), true, world.ball(), 0.5, false,
-                                      true),
+                new ShadowEnemyTactic(),
                 std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new ShadowFreekickerTactic(ShadowFreekickerTactic::LEFT,

@@ -30,7 +30,52 @@ struct ShadowEnemyFSM
 
     // Distance to chip the ball when trying to yeet it
     // TODO (#1878): Replace this with a more intelligent chip distance system
-    static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
+    static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0; 
+
+
+    /**
+    * Calculates the point to block the pass to the robot we are shadowing
+    *
+    * @param ball_position The position of the ball
+    * @param shadowee The enemy robot we are shadowing
+    * @param shadow_distance The distance our friendly robot will position itself away from the shadowee
+    */
+    static Point findBlockPassPoint(const Point &ball_position, const Robot &shadowee,
+                                    const double &shadow_distance){
+        Vector enemy_to_shadowee_vector = ball_position - shadowee.position();
+
+        return shadowee.position() + enemy_to_shadowee_vector.normalize(shadow_distance);
+    }
+
+
+    /**
+    * Calculates the point to block the net from the robot we are shadowing
+    *
+    * @param robot The robot that is shadowing
+    * @param field The field to shadow on
+    * @param friendlyTeam The friendly team
+    * @param enemyTeam The enemy team
+    * @param shadowee The enemy robot we are shadowing
+    * @param shadow_distance The distance our friendly robot will position itself away from the shadowee
+    */
+    static Point findBlockNetPoint(const Robot &robot, const Field &field, const Team &friendlyTeam, 
+                                    const Team &enemyTeam, const Robot &shadowee,
+                                    const double &shadow_distance){
+        std::vector<Robot> robots_to_ignore = {robot};
+        if(friendlyTeam.goalie().has_value()){
+            robots_to_ignore.emplace_back(friendlyTeam.goalie().value());
+        }
+
+        auto best_enemy_shot_opt = calcBestShotOnGoal(field,friendlyTeam,enemyTeam,shadowee.position(),TeamType::FRIENDLY, robots_to_ignore);
+
+        Vector enemy_shot_vector = Vector(0, 0);
+        if (best_enemy_shot_opt){
+            enemy_shot_vector = best_enemy_shot_opt->getPointToShootAt() - shadowee.position();
+        }else{
+            enemy_shot_vector = field.friendlyGoalCenter() - shadowee.position();
+        }
+        return shadowee.position() + enemy_shot_vector.normalize(shadow_distance);
+    }
 
     auto operator()()
     {
@@ -93,47 +138,14 @@ struct ShadowEnemyFSM
             Point position_to_block;
             if (!event.control_params.enemy_threat.value().has_ball)
             {
-                Vector enemy_to_passer_vector =
-                    ball_position -
-                    event.control_params.enemy_threat.value().robot.position();
-
-                position_to_block =
-                    event.control_params.enemy_threat.value().robot.position() +
-                    enemy_to_passer_vector.normalize(
-                        event.control_params.shadow_distance);
+                position_to_block = findBlockPassPoint(ball_position, event.control_params.enemy_threat.value().robot,
+                event.control_params.shadow_distance);
             }
             else
             {
-                std::vector<Robot> robots_to_ignore = {event.common.robot};
-                if (event.common.world.friendlyTeam().goalie().has_value())
-                {
-                    robots_to_ignore.emplace_back(
-                        event.common.world.friendlyTeam().goalie().value());
-                }
-
-                auto best_enemy_shot_opt = calcBestShotOnGoal(
-                    event.common.world.field(), event.common.world.friendlyTeam(),
-                    event.common.world.enemyTeam(),
-                    event.control_params.enemy_threat.value().robot.position(),
-                    TeamType::FRIENDLY, robots_to_ignore);
-
-                Vector enemy_shot_vector = Vector(0, 0);
-                if (best_enemy_shot_opt)
-                {
-                    enemy_shot_vector =
-                        best_enemy_shot_opt->getPointToShootAt() -
-                        event.control_params.enemy_threat.value().robot.position();
-                }
-                else
-                {
-                    enemy_shot_vector =
-                        event.common.world.field().friendlyGoalCenter() -
-                        event.control_params.enemy_threat.value().robot.position();
-                }
-
-                position_to_block =
-                    event.control_params.enemy_threat.value().robot.position() +
-                    enemy_shot_vector.normalize(event.control_params.shadow_distance);
+                position_to_block = findBlockNetPoint(event.common.robot,event.common.world.field(),
+                event.common.world.friendlyTeam(),event.common.world.enemyTeam(),event.control_params.enemy_threat.value().robot,
+                event.control_params.shadow_distance);
             }
 
             event.common.set_intent(std::make_unique<MoveIntent>(

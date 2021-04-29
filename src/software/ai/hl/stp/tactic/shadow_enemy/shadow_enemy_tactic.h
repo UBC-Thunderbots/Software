@@ -24,6 +24,8 @@ class ShadowEnemyTactic : public Tactic
      * @param shadow_distance How far from the enemy the robot will shadow. This is the
      * distance between the center of the enemy robot and the center of the robot
      * shadowing it
+     * @param steal_and_chip_distance How close to the enemy before the robot will try
+     * to steal and chip the ball
      */
     void updateControlParams(std::optional<EnemyThreat> enemy_threat,
                              double shadow_distance, double steal_and_chip_distance);
