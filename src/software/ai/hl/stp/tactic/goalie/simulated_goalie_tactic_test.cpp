@@ -295,14 +295,8 @@ TEST_F(SimulatedGoalieTacticTest, test_ball_very_fast_misses_net)
     setRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [this, tactic](std::shared_ptr<World> world_ptr,
+        [this](std::shared_ptr<World> world_ptr,
                        ValidationCoroutine::push_type& yield) {
-            while (!tactic->done())
-            {
-                yield("Tactic not done");
-                // break from loop since tactic will never complete
-                break;
-            }
             checkGoalieSuccess(5, world_ptr, yield);
         }};
 
@@ -328,14 +322,8 @@ TEST_F(SimulatedGoalieTacticTest, test_slow_ball_at_sharp_angle_to_friendly_goal
     setRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [this, tactic](std::shared_ptr<World> world_ptr,
+        [this](std::shared_ptr<World> world_ptr,
                        ValidationCoroutine::push_type& yield) {
-            while (!tactic->done())
-            {
-                yield("Tactic not done");
-                // break from loop since tactic will never complete
-                break;
-            }
             checkGoalieSuccess(5, world_ptr, yield);
         }};
 

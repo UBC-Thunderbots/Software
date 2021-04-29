@@ -269,12 +269,12 @@ struct GoalieFSM
 
         /**
          * Guard that checks if the ball is moving faster than the time_to_panic threshold
-         * and has a clear path to the goal
+         * and has a clear path to the goal, if both are true then the goalie should panic
+         * and move to block the ball
          *
          * @param event GoalieFSM::Update
          *
-         * @return if the ball is moving faster than the panic threshold and has a clear
-         * path to the goal
+         * @return if the goalie should panic
          */
         const auto should_panic = [](auto event) {
             double ball_speed_panic =
@@ -288,12 +288,12 @@ struct GoalieFSM
 
         /**
          * Guard that checks if the ball is moving slower than the panic threshold
-         * and is inside the friendly defense area
+         * and is inside the friendly defense area, if true then the goalie should
+         * chip the ball out of the friendly defense area
          *
          * @param event GoalieFSM::Update
          *
-         * @return if the ball is moving slower than the panic threshold and is
-         * inside the friendly defense area
+         * @return if the goalie should chip the ball
          */
         const auto should_chip = [](auto event) {
             double ball_speed_panic =
@@ -310,6 +310,15 @@ struct GoalieFSM
                    !contains(dont_chip_rectangle, event.common.world.ball().position());
         };
 
+        /**
+         * Guard that checks if the ball is moving slower than the panic threshold
+         * or has no intersections with the friendly goal, and is inside the no-chip rectangle,
+         * if true then the goalie should dribble the ball
+         *
+         * @param event GoalieFSM::Update
+         *
+         * @return if the goalie should dribble the ball
+         */
         const auto should_dribble = [](auto event) {
             double ball_speed_panic =
                 event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
@@ -326,6 +335,15 @@ struct GoalieFSM
                    contains(dont_chip_rectangle, event.common.world.ball().position());
         };
 
+        /**
+         * Guard that checks if the ball is moving slower than the panic threshold
+         * or has no intersections with the friendly goal, if true then the goalie
+         * should stop panicking
+         *
+         * @param event GoalieFSM::Update
+         *
+         * @return if the goalie should stop panicking
+         */
         const auto panic_done = [](auto event) {
             double ball_speed_panic =
                 event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
