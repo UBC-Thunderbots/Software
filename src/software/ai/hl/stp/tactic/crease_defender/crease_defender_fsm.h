@@ -1,5 +1,6 @@
 #pragma once
 
+#include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
 #include "software/ai/intent/move_intent.h"
@@ -14,8 +15,6 @@ MAKE_ENUM(CreaseDefenderAlignment, LEFT, RIGHT, CENTRE);
 
 struct CreaseDefenderFSM
 {
-    class BlockThreatState;
-
     // this struct defines the unique control parameters that the CreaseDefenderFSM
     // requires in its update
     struct ControlParams
@@ -71,7 +70,7 @@ struct CreaseDefenderFSM
     {
         using namespace boost::sml;
 
-        const auto block_threat_s = state<BlockThreatState>;
+        const auto block_threat_s = state<MoveFSM>;
 
         // update_e is the _event_ that the CreaseDefenderFSM responds to
         const auto update_e = event<Update>;
@@ -81,7 +80,8 @@ struct CreaseDefenderFSM
          *
          * @param event CreaseDefenderFSM::Update event
          */
-        const auto block_threat = [this](auto event) {
+        const auto block_threat = [this](auto event,
+                                         back::process<MoveFSM::Update> processEvent) {
             Point destination       = event.common.robot.position();
             auto block_threat_point = findBlockThreatPoint(
                 event.common.world.field(), event.control_params.enemy_threat_origin,
@@ -110,31 +110,25 @@ struct CreaseDefenderFSM
                                 event.common.world.field().friendlyDefenseArea().yMax();
             }
 
-            event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), destination, face_threat_orientation, 0.0,
-                DribblerMode::OFF, BallCollisionType::ALLOW,
-                AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, chip_distance},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
-        };
+            MoveFSM::ControlParams control_params{
+                .destination         = destination,
+                .final_orientation   = face_threat_orientation,
+                .final_speed         = 0.0,
+                .dribbler_mode       = DribblerMode::OFF,
+                .ball_collision_type = BallCollisionType::ALLOW,
+                .auto_chip_or_kick =
+                    AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, chip_distance},
+                .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                .target_spin_rev_per_s  = 0.0};
 
-        /**
-         * This guard is used to check if the robot is done moving
-         *
-         * @param event CreaseDefenderFSM::Update event
-         *
-         * @return if robot has reached the destination
-         */
-        const auto ball_in_enemy_half = [](auto event) {
-            return contains(event.common.world.field().enemyHalf(),
-                            event.common.world.ball().position());
+            // Update the get behind ball fsm
+            processEvent(MoveFSM::Update(control_params, event.common));
         };
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *block_threat_s + update_e[!ball_in_enemy_half] / block_threat,
-            block_threat_s + update_e[ball_in_enemy_half] / block_threat = X,
-            X + update_e[!ball_in_enemy_half] / block_threat             = block_threat_s,
-            X + update_e[ball_in_enemy_half] / block_threat);
+            *block_threat_s + update_e / block_threat, block_threat_s = X,
+            X + update_e / block_threat = block_threat_s);
     }
 
    private:

@@ -142,17 +142,42 @@ TEST(CreaseDefenderFSMTest, test_transitions)
         .robot_obstacle_inflation_factor = robot_obstacle_inflation_factor};
 
     FSM<CreaseDefenderFSM> fsm;
-    EXPECT_TRUE(fsm.is(boost::sml::state<CreaseDefenderFSM::BlockThreatState>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 
     // robot far from destination, ball in friendly half
     fsm.process_event(CreaseDefenderFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<CreaseDefenderFSM::BlockThreatState>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 
-    // robot far from destination, ball in enemy half
-    world =
-        ::TestUtil::setBallPosition(world, Point(2.5, 0), Timestamp::fromSeconds(123));
+    auto block_point = CreaseDefenderFSM::findBlockThreatPoint(
+        world.field(), control_params.enemy_threat_origin,
+        control_params.crease_defender_alignment, robot_obstacle_inflation_factor);
+
+    ASSERT_TRUE(block_point.has_value());
+    robot.updateState(
+        RobotState(
+            block_point.value(), Vector(0, 0),
+            (control_params.enemy_threat_origin - block_point.value()).orientation(),
+            AngularVelocity::zero()),
+        Timestamp::fromSeconds(123));
+    // Set robot to the correct position to block the ball
     fsm.process_event(CreaseDefenderFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
+    // Check that the FSM stays done
+    fsm.process_event(CreaseDefenderFSM::Update(
+        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::X));
+
+    robot.updateState(
+        RobotState(
+            block_point.value(), Vector(0, 0),
+            (control_params.enemy_threat_origin - block_point.value()).orientation() +
+                Angle::half(),
+            AngularVelocity::zero()),
+        Timestamp::fromSeconds(123));
+    // change orientation to make the FSM not done
+    fsm.process_event(CreaseDefenderFSM::Update(
+        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 }
