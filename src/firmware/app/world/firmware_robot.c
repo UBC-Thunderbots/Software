@@ -147,8 +147,21 @@ FirmwareRobot_t* app_firmware_robot_force_wheels_create(
     return new_robot;
 }
 
-void app_firmware_robot_destroy(FirmwareRobot_t* robot)
+void app_firmware_robot_force_wheels_destroy(FirmwareRobot_t* robot)
 {
+    app_force_wheel_destroy(robot->front_left_force_wheel);
+    app_force_wheel_destroy(robot->front_right_force_wheel);
+    app_force_wheel_destroy(robot->back_left_force_wheel);
+    app_force_wheel_destroy(robot->back_right_force_wheel);
+    free(robot);
+}
+
+void app_firmware_robot_velocity_wheels_destroy(FirmwareRobot_t* robot)
+{
+    app_velocity_wheel_destroy(robot->front_left_velocity_wheel);
+    app_velocity_wheel_destroy(robot->front_right_velocity_wheel);
+    app_velocity_wheel_destroy(robot->back_left_velocity_wheel);
+    app_velocity_wheel_destroy(robot->back_right_velocity_wheel);
     free(robot);
 }
 
@@ -473,25 +486,4 @@ void app_firmware_robot_setLocalVelocity(const FirmwareRobot_t* robot, TbotsProt
 void app_firmware_robot_stopRobot(const FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopType stop_type) 
 {
     robot->stop_robot(robot, stop_type);
-}
-
-// TODO: Remove these functions
-ForceWheel_t* app_firmware_robot_getFrontRightWheel(const FirmwareRobot_t* robot)
-{
-    return robot->front_right_force_wheel;
-}
-
-ForceWheel_t* app_firmware_robot_getFrontLeftWheel(const FirmwareRobot_t* robot)
-{
-    return robot->front_left_force_wheel;
-}
-
-ForceWheel_t* app_firmware_robot_getBackRightWheel(const FirmwareRobot_t* robot)
-{
-    return robot->back_right_force_wheel;
-}
-
-ForceWheel_t* app_firmware_robot_getBackLeftWheel(const FirmwareRobot_t* robot)
-{
-    return robot->back_left_force_wheel;
 }

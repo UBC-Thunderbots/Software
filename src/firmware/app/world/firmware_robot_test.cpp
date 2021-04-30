@@ -25,7 +25,7 @@ class FirmwareRobotTest : public testing::Test
 
         app_logger_init(0, &TestUtil::handleTestRobotLog);
 
-        firmware_robot = app_firmware_wheels_robot_create(
+        firmware_robot = app_firmware_robot_force_wheels_create(
             charger, chicker, dribbler, &(this->returnEight), &(this->returnNine),
             &(this->returnTen), &(this->returnEleven), &(this->returnTwelve),
             &(this->returnThirteen), &(this->returnFourteen), front_right_wheel,
@@ -35,7 +35,7 @@ class FirmwareRobotTest : public testing::Test
 
     virtual void TearDown(void)
     {
-        app_firmware_robot_destroy(firmware_robot);
+        app_firmware_robot_force_wheels_destroy(firmware_robot);
     }
 
     Charger* charger = (Charger*)6;
@@ -89,10 +89,10 @@ class FirmwareRobotTest : public testing::Test
         return 16;
     }
 
-    Wheel* front_left_wheel  = (Wheel*)11;
-    Wheel* front_right_wheel = (Wheel*)12;
-    Wheel* back_left_wheel   = (Wheel*)13;
-    Wheel* back_right_wheel  = (Wheel*)14;
+    ForceWheel* front_left_wheel  = (ForceWheel*)11;
+    ForceWheel* front_right_wheel = (ForceWheel*)12;
+    ForceWheel* back_left_wheel   = (ForceWheel*)13;
+    ForceWheel* back_right_wheel  = (ForceWheel*)14;
 
     FirmwareRobot_t* firmware_robot;
     ControllerState_t controller_state;

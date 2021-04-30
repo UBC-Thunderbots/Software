@@ -124,10 +124,10 @@ cc_library(
 )
 
 cc_test(
-    name = "wheel_test",
-    srcs = ["wheel_test.cpp"],
+    name = "force_wheel_test",
+    srcs = ["force_wheel_test.cpp"],
     deps = [
-        ":wheel",
+        ":force_wheel",
         "@gtest//:gtest_main",
     ],
 )

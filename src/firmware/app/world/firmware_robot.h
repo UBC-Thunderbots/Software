@@ -105,14 +105,24 @@ FirmwareRobot_t* app_firmware_robot_force_wheels_create(
     RobotConstants_t robot_constants);
 
 /**
- * Destroy the given robot, freeing any memory allocated for it
+ * Destroy the given robot with force wheels, freeing any memory allocated for it
  *
  * NOTE: This will not destroy the values pointed to by any pointers passed to the
  *       `create` function
  *
  * @param robot The robot to destroy
  */
-void app_firmware_robot_destroy(FirmwareRobot_t* robot);
+void app_firmware_robot_force_wheels_destroy(FirmwareRobot_t* robot);
+
+/**
+ * Destroy the given robot with velocity wheels, freeing any memory allocated for it
+ *
+ * NOTE: This will not destroy the values pointed to by any pointers passed to the
+ *       `create` function
+ *
+ * @param robot The robot to destroy
+ */
+void app_firmware_robot_velocity_wheels_destroy(FirmwareRobot_t* robot);
 
 /**
  * Get the charger from the given robot
@@ -341,40 +351,3 @@ void app_firmware_robot_setLocalVelocity(const FirmwareRobot_t* robot, TbotsProt
  */
 
 void app_firmware_robot_stopRobot(const FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopType stop_type);
-
-// TODO: Remove these functions
-/**
- * Get the front right wheel from the given robot
- *
- * @param robot The robot to get the front right wheel from
- *
- * @return The front right wheel from the given robot
- */
-ForceWheel_t* app_firmware_robot_getFrontRightWheel(const FirmwareRobot_t* robot);
-
-/**
- * Get the front left wheel from the given robot
- *
- * @param robot The robot to get the front left wheel from
- *
- * @return The front left wheel from the given robot
- */
-ForceWheel_t* app_firmware_robot_getFrontLeftWheel(const FirmwareRobot_t* robot);
-
-/**
- * Get the back right wheel from the given robot
- *
- * @param robot The robot to get the back right wheel from
- *
- * @return The back right wheel from the given robot
- */
-ForceWheel_t* app_firmware_robot_getBackRightWheel(const FirmwareRobot_t* robot);
-
-/**
- * Get the back left wheel from the given robot
- *
- * @param robot The robot to get the back left wheel from
- *
- * @return The back left wheel from the given robot
- */
-ForceWheel_t* app_firmware_robot_getBackLeftWheel(const FirmwareRobot_t* robot);

@@ -79,7 +79,7 @@ namespace FirmwareTestUtil
 };  // namespace FirmwareTestUtil
 
 // Mock wheel state
-WheelConstants_t wheel_constants = {.motor_current_per_unit_torque       = 1.1f,
+ForceWheelConstants_t wheel_constants = {.motor_current_per_unit_torque       = 1.1f,
                                     .motor_phase_resistance              = 1.2f,
                                     .motor_back_emf_per_rpm              = 1.3f,
                                     .motor_max_voltage_before_wheel_slip = 1.4f,
@@ -191,7 +191,7 @@ class FirmwareTestUtilWorld : public testing::Test
                              &(FirmwareTestUtil::brake_back_left),
                              &(FirmwareTestUtil::coast_back_left), wheel_constants);
 
-        robot = app_firmware_wheels_robot_create(
+        robot = app_firmware_robot_force_wheels_create(
             charger, chicker, dribbler, &(FirmwareTestUtil::get_robot_property),
             &(FirmwareTestUtil::get_robot_property),
             &(FirmwareTestUtil::get_robot_property),
@@ -215,11 +215,11 @@ class FirmwareTestUtilWorld : public testing::Test
         app_charger_destroy(charger);
         app_chicker_destroy(chicker);
         app_dribbler_destroy(dribbler);
-        app_wheel_destroy(front_right_wheel);
-        app_wheel_destroy(front_left_wheel);
-        app_wheel_destroy(back_right_wheel);
-        app_wheel_destroy(back_left_wheel);
-        app_firmware_robot_destroy(robot);
+        app_force_wheel_destroy(front_right_wheel);
+        app_force_wheel_destroy(front_left_wheel);
+        app_force_wheel_destroy(back_right_wheel);
+        app_force_wheel_destroy(back_left_wheel);
+        app_firmware_robot_force_wheels_destroy(robot);
         app_firmware_ball_destroy(ball);
         app_firmware_world_destroy(firmware_world);
     }
@@ -228,10 +228,10 @@ class FirmwareTestUtilWorld : public testing::Test
     Charger_t* charger;
     Chicker_t* chicker;
     Dribbler_t* dribbler;
-    Wheel_t* front_right_wheel;
-    Wheel_t* front_left_wheel;
-    Wheel_t* back_right_wheel;
-    Wheel_t* back_left_wheel;
+    ForceWheel_t* front_right_wheel;
+    ForceWheel_t* front_left_wheel;
+    ForceWheel_t* back_right_wheel;
+    ForceWheel_t* back_left_wheel;
     FirmwareRobot_t* robot;
     FirmwareBall_t* ball;
 };

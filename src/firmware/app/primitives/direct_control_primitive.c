@@ -31,14 +31,7 @@ void app_direct_control_primitive_start(TbotsProto_DirectControlPrimitive prim_m
                 prim_msg.wheel_control.direct_per_wheel_control;
             state->direct_velocity = false;
             // TODO (#1649): Fix passing rpm into an applyForce function
-            app_force_wheel_applyForce(app_firmware_robot_getFrontLeftWheel(robot),
-                                 control_msg.front_left_wheel_rpm);
-            app_force_wheel_applyForce(app_firmware_robot_getBackLeftWheel(robot),
-                                 control_msg.back_left_wheel_rpm);
-            app_force_wheel_applyForce(app_firmware_robot_getBackRightWheel(robot),
-                                 control_msg.back_right_wheel_rpm);
-            app_force_wheel_applyForce(app_firmware_robot_getFrontRightWheel(robot),
-                                 control_msg.front_right_wheel_rpm);
+            app_firmware_robot_applyDirectPerWheelPower(robot, control_msg);
             break;
         }
         case TbotsProto_DirectControlPrimitive_direct_velocity_control_tag:
