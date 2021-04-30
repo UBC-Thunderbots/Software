@@ -43,20 +43,22 @@ struct CreaseDefenderFSM
         const CreaseDefenderAlignment& crease_defender_alignment,
         double robot_obstacle_inflation_factor)
     {
-        Angle shot_angle_increment =
+        // We increment the angle to positive goalpost by 1/6, 3/6, or 5/6 of the shot
+        // cone
+        Angle shot_angle_sixth =
             acuteAngle(field.friendlyGoalpostPos(), enemy_threat_origin,
                        field.friendlyGoalpostNeg()) /
             6.0;
         Angle angle_to_positive_goalpost =
             (field.friendlyGoalpostPos() - enemy_threat_origin).orientation();
-        Angle angle_to_block = angle_to_positive_goalpost + shot_angle_increment * 3.0;
+        Angle angle_to_block = angle_to_positive_goalpost + shot_angle_sixth * 3.0;
         if (crease_defender_alignment == CreaseDefenderAlignment::LEFT)
         {
-            angle_to_block = angle_to_positive_goalpost + shot_angle_increment * 1.0;
+            angle_to_block = angle_to_positive_goalpost + shot_angle_sixth * 1.0;
         }
         else if (crease_defender_alignment == CreaseDefenderAlignment::RIGHT)
         {
-            angle_to_block = angle_to_positive_goalpost + shot_angle_increment * 5.0;
+            angle_to_block = angle_to_positive_goalpost + shot_angle_sixth * 5.0;
         }
 
         // Shot ray to block
