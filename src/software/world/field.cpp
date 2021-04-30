@@ -1,3 +1,4 @@
+#include "shared/constants.h"
 #include "software/world/field.h"
 
 #include "software/geom/algorithms/contains.h"
@@ -181,6 +182,13 @@ Rectangle Field::enemyGoal() const
     Point enemy_goal_bottom_right(enemyGoalCenter().x() + goalXLength(),
                                   enemyGoalpostNeg().y());
     return Rectangle(enemy_goal_top_left, enemy_goal_bottom_right);
+}
+
+Rectangle Field::noChipRectangle() const
+{
+    return Rectangle(
+            friendlyGoalpostNeg(),
+            friendlyGoalpostPos() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0));
 }
 
 Point Field::friendlyPenaltyMark() const

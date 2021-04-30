@@ -1,8 +1,23 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
+#include "software/geom/algorithms/contains.h"
 
 #include <gtest/gtest.h>
 
 #include "software/test_util/test_util.h"
+
+TEST(GoalieFSMTest, test_restrain_goalie_in_rectangle)
+{
+    Field field               = Field::createSSLDivisionBField();
+    std::optional<Point> goalie_pos_outside_defense_area = GoalieFSM::restrainGoalieInRectangle(field, Point(0,0), field.friendlyDefenseArea());
+    ASSERT_TRUE(goalie_pos_outside_defense_area);
+    EXPECT_TRUE(contains(field.friendlyDefenseArea(), goalie_pos_outside_defense_area.value()));
+
+    std::optional<Point> goalie_pos_in_friendly_defense_area =
+            GoalieFSM::restrainGoalieInRectangle(field, Point(-4, 0), field.friendlyDefenseArea());
+    ASSERT_TRUE(goalie_pos_in_friendly_defense_area);
+    EXPECT_TRUE(contains(field.friendlyDefenseArea(), goalie_pos_in_friendly_defense_area.value()));
+
+}
 
 TEST(GoalieFSMTest, test_transitions)
 {
@@ -11,13 +26,11 @@ TEST(GoalieFSMTest, test_transitions)
 
     world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(123));
     world = ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(123));
-    Point clear_ball_origin    = world.field().friendlyGoalCenter() + Vector(0.5, 0);
+    Point clear_ball_origin    = Point(world.field().noChipRectangle().xMax(), 0);
     Angle clear_ball_direction = Angle::zero();
 
     GoalieFSM::ControlParams control_params{
-        .goalie_tactic_config = std::make_shared<const GoalieTacticConfig>(),
-        .clear_ball_origin    = clear_ball_origin,
-        .clear_ball_direction = clear_ball_direction};
+        .goalie_tactic_config = std::make_shared<const GoalieTacticConfig>()};
 
     FSM<GoalieFSM> fsm;
 
@@ -55,11 +68,8 @@ TEST(GoalieFSMTest, test_transitions)
         control_params, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlockState>));
 
-    // ball is now stationary in the "don't-chip" rectangle
-    world = ::TestUtil::setBallPosition(
-        world,
-        world.field().friendlyGoalpostNeg() +
-            Vector(ROBOT_MAX_RADIUS_METERS, 2 * ROBOT_MAX_RADIUS_METERS),
+    // ball is now stationary in the "no-chip" rectangle
+    world = ::TestUtil::setBallPosition(world, world.field().friendlyGoalCenter(),
         Timestamp::fromSeconds(123));
     world = ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(123));
 
@@ -75,20 +85,15 @@ TEST(GoalieFSMTest, test_transitions)
                                   AngularVelocity::zero()),
                        Timestamp::fromSeconds(123));
 
-    // process event once to fall through the DribbleFSM
-    fsm.process_event(GoalieFSM::Update(
-        control_params, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
-
     // goalie should transition to ChipFSM
     fsm.process_event(GoalieFSM::Update(
         control_params, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<ChipFSM>));
 
-    // ball is now chipped
     goalie = ::TestUtil::createRobotAtPos(clear_ball_origin + Vector(-0.2, 0));
     world  = ::TestUtil::setBallPosition(world, clear_ball_origin,
                                         Timestamp::fromSeconds(123));
+    // ball is now chipped
     world = ::TestUtil::setBallVelocity(world, Vector(1, 0), Timestamp::fromSeconds(123));
     EXPECT_TRUE(world.ball().hasBallBeenKicked(clear_ball_direction));
 
