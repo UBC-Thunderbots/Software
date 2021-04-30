@@ -59,7 +59,7 @@ SimulatorRobotSingleton::createFirmwareRobot()
     wheel_constants.motor_back_emf_per_rpm              = RPM_TO_VOLT;
     wheel_constants.motor_phase_resistance              = WHEEL_MOTOR_PHASE_RESISTANCE;
     wheel_constants.motor_current_per_unit_torque       = CURRENT_PER_TORQUE;
-    ForceWheel_t* front_left_wheel                           = app_force_wheel_create(
+    ForceWheel_t* front_left_wheel                      = app_force_wheel_create(
         &(SimulatorRobotSingleton::applyWheelForceFrontLeft),
         &(SimulatorRobotSingleton::getMotorSpeedFrontLeft),
         &(SimulatorRobotSingleton::brakeMotorFrontLeft),
@@ -69,11 +69,11 @@ SimulatorRobotSingleton::createFirmwareRobot()
         &(SimulatorRobotSingleton::getMotorSpeedFrontRight),
         &(SimulatorRobotSingleton::brakeMotorFrontRight),
         &(SimulatorRobotSingleton::coastMotorFrontRight), wheel_constants);
-    ForceWheel_t* back_left_wheel =
-        app_force_wheel_create(&(SimulatorRobotSingleton::applyWheelForceBackLeft),
-                         &(SimulatorRobotSingleton::getMotorSpeedBackLeft),
-                         &(SimulatorRobotSingleton::brakeMotorBackLeft),
-                         &(SimulatorRobotSingleton::coastMotorBackLeft), wheel_constants);
+    ForceWheel_t* back_left_wheel = app_force_wheel_create(
+        &(SimulatorRobotSingleton::applyWheelForceBackLeft),
+        &(SimulatorRobotSingleton::getMotorSpeedBackLeft),
+        &(SimulatorRobotSingleton::brakeMotorBackLeft),
+        &(SimulatorRobotSingleton::coastMotorBackLeft), wheel_constants);
     ForceWheel_t* back_right_wheel = app_force_wheel_create(
         &(SimulatorRobotSingleton::applyWheelForceBackRight),
         &(SimulatorRobotSingleton::getMotorSpeedBackRight),

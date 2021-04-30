@@ -80,11 +80,11 @@ namespace FirmwareTestUtil
 
 // Mock wheel state
 ForceWheelConstants_t wheel_constants = {.motor_current_per_unit_torque       = 1.1f,
-                                    .motor_phase_resistance              = 1.2f,
-                                    .motor_back_emf_per_rpm              = 1.3f,
-                                    .motor_max_voltage_before_wheel_slip = 1.4f,
-                                    .wheel_radius                        = 1.5f,
-                                    .wheel_rotations_per_motor_rotation  = 0.5f};
+                                         .motor_phase_resistance              = 1.2f,
+                                         .motor_back_emf_per_rpm              = 1.3f,
+                                         .motor_max_voltage_before_wheel_slip = 1.4f,
+                                         .wheel_radius                        = 1.5f,
+                                         .wheel_rotations_per_motor_rotation  = 0.5f};
 
 // Mock controller state
 ControllerState_t controller_state = {.last_applied_acceleration_x       = 2.33f,
@@ -170,26 +170,26 @@ class FirmwareTestUtilWorld : public testing::Test
                                        &(FirmwareTestUtil::enable_coast),
                                        &(FirmwareTestUtil::get_temperature_deg_c));
 
-        front_right_wheel =
-            app_force_wheel_create(&(FirmwareTestUtil::request_wheel_force_front_right),
-                             &(FirmwareTestUtil::get_motor_speed_front_right),
-                             &(FirmwareTestUtil::brake_front_right),
-                             &(FirmwareTestUtil::coast_front_right), wheel_constants);
-        front_left_wheel =
-            app_force_wheel_create(&(FirmwareTestUtil::request_wheel_force_front_left),
-                             &(FirmwareTestUtil::get_motor_speed_front_left),
-                             &(FirmwareTestUtil::brake_front_left),
-                             &(FirmwareTestUtil::coast_front_left), wheel_constants);
-        back_right_wheel =
-            app_force_wheel_create(&(FirmwareTestUtil::request_wheel_force_back_right),
-                             &(FirmwareTestUtil::get_motor_speed_back_right),
-                             &(FirmwareTestUtil::brake_back_right),
-                             &(FirmwareTestUtil::coast_back_right), wheel_constants);
+        front_right_wheel = app_force_wheel_create(
+            &(FirmwareTestUtil::request_wheel_force_front_right),
+            &(FirmwareTestUtil::get_motor_speed_front_right),
+            &(FirmwareTestUtil::brake_front_right),
+            &(FirmwareTestUtil::coast_front_right), wheel_constants);
+        front_left_wheel = app_force_wheel_create(
+            &(FirmwareTestUtil::request_wheel_force_front_left),
+            &(FirmwareTestUtil::get_motor_speed_front_left),
+            &(FirmwareTestUtil::brake_front_left), &(FirmwareTestUtil::coast_front_left),
+            wheel_constants);
+        back_right_wheel = app_force_wheel_create(
+            &(FirmwareTestUtil::request_wheel_force_back_right),
+            &(FirmwareTestUtil::get_motor_speed_back_right),
+            &(FirmwareTestUtil::brake_back_right), &(FirmwareTestUtil::coast_back_right),
+            wheel_constants);
         back_left_wheel =
             app_force_wheel_create(&(FirmwareTestUtil::request_wheel_force_back_left),
-                             &(FirmwareTestUtil::get_motor_speed_back_left),
-                             &(FirmwareTestUtil::brake_back_left),
-                             &(FirmwareTestUtil::coast_back_left), wheel_constants);
+                                   &(FirmwareTestUtil::get_motor_speed_back_left),
+                                   &(FirmwareTestUtil::brake_back_left),
+                                   &(FirmwareTestUtil::coast_back_left), wheel_constants);
 
         robot = app_firmware_robot_force_wheels_create(
             charger, chicker, dribbler, &(FirmwareTestUtil::get_robot_property),

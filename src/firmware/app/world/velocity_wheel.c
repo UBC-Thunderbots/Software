@@ -1,6 +1,6 @@
-#include <stdlib.h>
-
 #include "firmware/app/world/velocity_wheel.h"
+
+#include <stdlib.h>
 
 struct VelocityWheel
 {
@@ -13,10 +13,10 @@ struct VelocityWheel
 };
 
 VelocityWheel_t* app_velocity_wheel_create(void (*apply_wheel_force)(float),
-                                     void (*set_target_velocity)(float),
-                                     float (*get_motor_speed_rpm)(void),
-                                     void (*brake)(void), void (*coast)(void),
-                                     VelocityWheelConstants_t wheel_constants)
+                                           void (*set_target_velocity)(float),
+                                           float (*get_motor_speed_rpm)(void),
+                                           void (*brake)(void), void (*coast)(void),
+                                           VelocityWheelConstants_t wheel_constants)
 {
     VelocityWheel_t* new_wheel = malloc(sizeof(VelocityWheel_t));
 
@@ -66,7 +66,8 @@ void app_velocity_wheel_setTargetVelocity(VelocityWheel_t* wheel, float velocity
     wheel->set_target_velocity(velocity);
 }
 
-VelocityWheelConstants_t app_velocity_wheel_getWheelConstants(const VelocityWheel_t* wheel)
+VelocityWheelConstants_t app_velocity_wheel_getWheelConstants(
+    const VelocityWheel_t* wheel)
 {
     return wheel->wheel_constants;
 }

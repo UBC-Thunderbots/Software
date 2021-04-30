@@ -1,6 +1,6 @@
-#include <stdlib.h>
-
 #include "firmware/app/world/force_wheel.h"
+
+#include <stdlib.h>
 
 struct ForceWheel
 {

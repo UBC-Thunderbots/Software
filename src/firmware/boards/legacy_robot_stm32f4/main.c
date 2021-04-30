@@ -506,9 +506,9 @@ static void run_normal(void)
     ForceWheel_t* back_right_wheel = app_force_wheel_create(
         apply_wheel_force_back_right, wheels_get_back_right_rpm, wheels_brake_back_right,
         wheels_coast_back_right, wheel_constants);
-    ForceWheel_t* back_left_wheel =
-        app_force_wheel_create(apply_wheel_force_back_left, wheels_get_back_left_rpm,
-                         wheels_brake_back_left, wheels_coast_back_left, wheel_constants);
+    ForceWheel_t* back_left_wheel = app_force_wheel_create(
+        apply_wheel_force_back_left, wheels_get_back_left_rpm, wheels_brake_back_left,
+        wheels_coast_back_left, wheel_constants);
     Charger_t* charger =
         app_charger_create(charger_charge, charger_discharge, charger_float);
     Chicker_t* chicker = app_chicker_create(

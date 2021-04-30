@@ -1,17 +1,17 @@
 #pragma once
 
-#include "firmware/app/control/trajectory_planner.h"
 #include "firmware/app/control/control.h"
 #include "firmware/app/control/physbot.h"
+#include "firmware/app/control/trajectory_planner.h"
 #include "firmware/app/world/charger.h"
 #include "firmware/app/world/chicker.h"
 #include "firmware/app/world/dribbler.h"
 #include "firmware/app/world/force_wheel.h"
 #include "firmware/app/world/velocity_wheel.h"
-#include "shared/proto/primitive.nanopb.h"
-#include "shared/constants.h"
 #include "firmware/shared/physics.h"
 #include "firmware/shared/util.h"
+#include "shared/constants.h"
+#include "shared/proto/primitive.nanopb.h"
 
 /**
  * This struct represents a robot from the perspective of firmware
@@ -237,6 +237,42 @@ RobotConstants_t app_firmware_robot_getRobotConstants(const FirmwareRobot_t* rob
 ControllerState_t* app_firmware_robot_getControllerState(const FirmwareRobot_t* robot);
 
 /**
+ * Get the front left wheel speed
+ *
+ * @param robot The robot to get the speed for
+ *
+ * @return A pointer to the controller state for the given robot
+ */
+float app_firmware_robot_getFrontLeftWheelSpeedRPM(const FirmwareRobot_t* robot);
+
+/**
+ * Get the front right wheel speed
+ *
+ * @param robot The robot to get the speed for
+ *
+ * @return A pointer to the controller state for the given robot
+ */
+float app_firmware_robot_getFrontRightWheelSpeedRPM(const FirmwareRobot_t* robot);
+
+/**
+ * Get the back left wheel speed
+ *
+ * @param robot The robot to get the speed for
+ *
+ * @return A pointer to the controller state for the given robot
+ */
+float app_firmware_robot_getBackLeftWheelSpeedRPM(const FirmwareRobot_t* robot);
+
+/**
+ * Get the back right wheel speed
+ *
+ * @param robot The robot to get the speed for
+ *
+ * @return A pointer to the controller state for the given robot
+ */
+float app_firmware_robot_getBackRightWheelSpeedRPM(const FirmwareRobot_t* robot);
+
+/**
  * Drive the given robot at the given velocity in the robot coordinate frame
  *
  * @param robot The robot to move at the given velocity
@@ -246,8 +282,10 @@ ControllerState_t* app_firmware_robot_getControllerState(const FirmwareRobot_t* 
  *                          coordinate frame (m/s)
  * @param angular_velocity The angular velocity to move at (rad/s)
  */
-void app_firmware_robot_trackVelocityInRobotFrame(const FirmwareRobot_t* robot, float linear_velocity_x,
-    float linear_velocity_y, float angular_velocity);
+void app_firmware_robot_trackVelocityInRobotFrame(const FirmwareRobot_t* robot,
+                                                  float linear_velocity_x,
+                                                  float linear_velocity_y,
+                                                  float angular_velocity);
 
 /**
  * Follow a given position trajectory with force wheels
@@ -257,7 +295,9 @@ void app_firmware_robot_trackVelocityInRobotFrame(const FirmwareRobot_t* robot, 
  * @param trajectory_index The index to access the position trajectory params
  * @param max_speed_m_per_s The maximum speed of movement
  */
-void force_wheels_followPosTrajectory(const FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, size_t trajectory_index, float max_speed_m_per_s);
+void force_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
+                                      PositionTrajectory_t pos_trajectory,
+                                      size_t trajectory_index, float max_speed_m_per_s);
 
 /**
  * Follow a given position trajectory with velocity wheels
@@ -267,7 +307,10 @@ void force_wheels_followPosTrajectory(const FirmwareRobot_t* robot, PositionTraj
  * @param trajectory_index The index to access the position trajectory params
  * @param max_speed_m_per_s The maximum speed of movement
  */
-void velocity_wheels_followPosTrajectory(const FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, size_t trajectory_index, float max_speed_m_per_s);
+void velocity_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
+                                         PositionTrajectory_t pos_trajectory,
+                                         size_t trajectory_index,
+                                         float max_speed_m_per_s);
 
 /**
  * Apply direct per wheel power with force wheels
@@ -275,7 +318,9 @@ void velocity_wheels_followPosTrajectory(const FirmwareRobot_t* robot, PositionT
  * @param robot The robot to apply direct per wheel power to
  * @param control_msg The direct per wheel control message
  */
-void force_wheels_applyDirectPerWheelPower(const FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg);
+void force_wheels_applyDirectPerWheelPower(
+    const FirmwareRobot_t* robot,
+    TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg);
 
 /**
  * Apply direct per wheel power with velocity wheels
@@ -283,7 +328,9 @@ void force_wheels_applyDirectPerWheelPower(const FirmwareRobot_t* robot, TbotsPr
  * @param robot The robot to apply direct per wheel power to
  * @param control_msg The direct per wheel control message
  */
-void velocity_wheels_applyDirectPerWheelPower(const FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg);
+void velocity_wheels_applyDirectPerWheelPower(
+    const FirmwareRobot_t* robot,
+    TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg);
 
 /**
  * Set robot's local velocity with force wheels
@@ -291,7 +338,9 @@ void velocity_wheels_applyDirectPerWheelPower(const FirmwareRobot_t* robot, Tbot
  * @param robot The robot to set local velocity with
  * @param control_msg The direct velocity control message
  */
-void force_wheels_setLocalVelocity(const FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg);
+void force_wheels_setLocalVelocity(
+    const FirmwareRobot_t* robot,
+    TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg);
 
 /**
  * Set robot's local velocity with velocity wheels
@@ -299,7 +348,9 @@ void force_wheels_setLocalVelocity(const FirmwareRobot_t* robot, TbotsProto_Dire
  * @param robot The robot to set local velocity with
  * @param control_msg The direct velocity control message
  */
-void velocity_wheels_setLocalVelocity(const FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg);
+void velocity_wheels_setLocalVelocity(
+    const FirmwareRobot_t* robot,
+    TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg);
 
 /**
  * Stop robot with force wheels
@@ -307,7 +358,8 @@ void velocity_wheels_setLocalVelocity(const FirmwareRobot_t* robot, TbotsProto_D
  * @param robot The robot to stop
  * @param control_msg The stop message
  */
-void force_wheels_stopRobot(const FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopType stop_type);
+void force_wheels_stopRobot(const FirmwareRobot_t* robot,
+                            TbotsProto_StopPrimitive_StopType stop_type);
 
 /**
  * Stop robot with velocity wheels
@@ -315,7 +367,8 @@ void force_wheels_stopRobot(const FirmwareRobot_t* robot, TbotsProto_StopPrimiti
  * @param robot The robot to stop
  * @param control_msg The stop message
  */
-void velocity_wheels_stopRobot(const FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopType stop_type);
+void velocity_wheels_stopRobot(const FirmwareRobot_t* robot,
+                               TbotsProto_StopPrimitive_StopType stop_type);
 
 /**
  * Follow a given position trajectory for generic firmware robot
@@ -325,7 +378,10 @@ void velocity_wheels_stopRobot(const FirmwareRobot_t* robot, TbotsProto_StopPrim
  * @param trajectory_index The index to access the position trajectory params
  * @param max_speed_m_per_s The maximum speed of movement
  */
-void app_firmware_robot_followPosTrajectory(const FirmwareRobot_t* robot, PositionTrajectory_t pos_trajectory, size_t trajectory_index, float max_speed_m_per_s);
+void app_firmware_robot_followPosTrajectory(const FirmwareRobot_t* robot,
+                                            PositionTrajectory_t pos_trajectory,
+                                            size_t trajectory_index,
+                                            float max_speed_m_per_s);
 
 /**
  * Apply direct per wheel power to generic firmware robot
@@ -333,15 +389,19 @@ void app_firmware_robot_followPosTrajectory(const FirmwareRobot_t* robot, Positi
  * @param robot The robot to apply direct per wheel power to
  * @param control_msg The direct per wheel control message
  */
-void app_firmware_robot_applyDirectPerWheelPower(const FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg);
+void app_firmware_robot_applyDirectPerWheelPower(
+    const FirmwareRobot_t* robot,
+    TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg);
 
 /**
- * Set generic firmware robot's local velocity 
+ * Set generic firmware robot's local velocity
  *
  * @param robot The robot to set local velocity with
  * @param control_msg The direct velocity control message
  */
-void app_firmware_robot_setLocalVelocity(const FirmwareRobot_t* robot, TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg);
+void app_firmware_robot_setLocalVelocity(
+    const FirmwareRobot_t* robot,
+    TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg);
 
 /**
  * Stop generic firmware robot
@@ -350,4 +410,5 @@ void app_firmware_robot_setLocalVelocity(const FirmwareRobot_t* robot, TbotsProt
  * @param control_msg The stop message
  */
 
-void app_firmware_robot_stopRobot(const FirmwareRobot_t* robot, TbotsProto_StopPrimitive_StopType stop_type);
+void app_firmware_robot_stopRobot(const FirmwareRobot_t* robot,
+                                  TbotsProto_StopPrimitive_StopType stop_type);

@@ -14,15 +14,17 @@ class WheelTest : public testing::Test
         brake_called          = true;
         coast_called          = true;
 
-        ForceWheelConstants_t wheel_constants = {.motor_current_per_unit_torque       = 1.1f,
-                                            .motor_phase_resistance              = 1.2f,
-                                            .motor_back_emf_per_rpm              = 1.3f,
-                                            .motor_max_voltage_before_wheel_slip = 1.4f,
-                                            .wheel_radius                        = 1.5f,
-                                            .wheel_rotations_per_motor_rotation  = 0.5f};
+        ForceWheelConstants_t wheel_constants = {
+            .motor_current_per_unit_torque       = 1.1f,
+            .motor_phase_resistance              = 1.2f,
+            .motor_back_emf_per_rpm              = 1.3f,
+            .motor_max_voltage_before_wheel_slip = 1.4f,
+            .wheel_radius                        = 1.5f,
+            .wheel_rotations_per_motor_rotation  = 0.5f};
 
-        wheel = app_force_wheel_create(&(this->request_wheel_force), &(this->get_motor_speed),
-                                 brake, coast, wheel_constants);
+        wheel =
+            app_force_wheel_create(&(this->request_wheel_force), &(this->get_motor_speed),
+                                   brake, coast, wheel_constants);
     }
 
     virtual void TearDown(void)

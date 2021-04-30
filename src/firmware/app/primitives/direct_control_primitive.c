@@ -115,9 +115,9 @@ static void app_direct_control_primitive_tick(void* void_state_ptr,
     if (state->direct_velocity)
     {
         FirmwareRobot_t* robot = app_firmware_world_getRobot(world);
-        app_firmware_robot_trackVelocityInRobotFrame(robot, state->direct_target_velocity_x,
-                                              state->direct_target_velocity_y,
-                                              state->direct_target_velocity_angular);
+        app_firmware_robot_trackVelocityInRobotFrame(
+            robot, state->direct_target_velocity_x, state->direct_target_velocity_y,
+            state->direct_target_velocity_angular);
     }
 }
 

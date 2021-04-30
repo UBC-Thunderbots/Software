@@ -43,10 +43,10 @@ typedef struct VelocityWheelConstants
  * @return A pointer to the created wheel, ownership is given to the caller
  */
 VelocityWheel_t* app_velocity_wheel_create(void (*apply_wheel_force)(float),
-                                     void (*set_target_velocity)(float),
-                                     float (*get_motor_speed_rpm)(void),
-                                     void (*brake)(void), void (*coast)(void),
-                                     VelocityWheelConstants_t wheel_constants);
+                                           void (*set_target_velocity)(float),
+                                           float (*get_motor_speed_rpm)(void),
+                                           void (*brake)(void), void (*coast)(void),
+                                           VelocityWheelConstants_t wheel_constants);
 
 /**
  * Destroy the given wheel, freeing any memory allocated for it
@@ -109,4 +109,5 @@ void app_velocity_wheel_setTargetVelocity(VelocityWheel_t* wheel, float velocity
  *
  * @return The constants for the given wheel
  */
-VelocityWheelConstants_t app_velocity_wheel_getWheelConstants(const VelocityWheel_t* wheel);
+VelocityWheelConstants_t app_velocity_wheel_getWheelConstants(
+    const VelocityWheel_t* wheel);

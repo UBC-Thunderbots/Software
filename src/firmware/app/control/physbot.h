@@ -52,8 +52,9 @@ typedef struct
  * @param minor_vec the minor vector components on the global axis
  * @return a new PhysBot data container
  */
-PhysBot app_physbot_create(float velocity_x, float velocity_y, float position_x, float position_y, float orientation,
-                           float *destination, float *major_vec, float *minor_vec);
+PhysBot app_physbot_create(float velocity_x, float velocity_y, float position_x,
+                           float position_y, float orientation, float *destination,
+                           float *major_vec, float *minor_vec);
 
 /**
  * Creates the BBProfile for a component. It is assumed that the displacement,

@@ -838,12 +838,12 @@ TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_spinning_in_p
     while (app_firmware_robot_getVelocityAngular(firmware_robot.get()) < 4 * M_PI)
     {
         TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg;
-        control_msg.front_left_wheel_rpm = wheel_force;
-        control_msg.back_left_wheel_rpm = wheel_force;
+        control_msg.front_left_wheel_rpm  = wheel_force;
+        control_msg.back_left_wheel_rpm   = wheel_force;
         control_msg.front_right_wheel_rpm = wheel_force;
-        control_msg.back_right_wheel_rpm = wheel_force;
+        control_msg.back_right_wheel_rpm  = wheel_force;
 
-        app_firmware_robot_applyDirectPerWheelPower(robot, control_msg);
+        app_firmware_robot_applyDirectPerWheelPower(firmware_robot.get(), control_msg);
         world->stepSimulation(Duration::fromSeconds(1.0 / 120.0));
         wheel_force += 0.0001f;
     }
@@ -856,12 +856,12 @@ TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_spinning_in_p
     for (unsigned int i = 0; i < 120; i++)
     {
         TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg;
-        control_msg.front_left_wheel_rpm = wheel_force;
-        control_msg.back_left_wheel_rpm = wheel_force;
+        control_msg.front_left_wheel_rpm  = wheel_force;
+        control_msg.back_left_wheel_rpm   = wheel_force;
         control_msg.front_right_wheel_rpm = wheel_force;
-        control_msg.back_right_wheel_rpm = wheel_force;
+        control_msg.back_right_wheel_rpm  = wheel_force;
 
-        app_firmware_robot_applyDirectPerWheelPower(robot, control_msg);
+        app_firmware_robot_applyDirectPerWheelPower(firmware_robot.get(), control_msg);
         world->stepSimulation(Duration::fromSeconds(1.0 / 120.0));
     }
 
@@ -994,12 +994,12 @@ TEST_F(SimulatorRobotSingletonTest, test_robot_drive_forward)
     for (unsigned int i = 0; i < 60; i++)
     {
         TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg;
-        control_msg.front_left_wheel_rpm = -0.5;
-        control_msg.back_left_wheel_rpm = -0.5;
+        control_msg.front_left_wheel_rpm  = -0.5;
+        control_msg.back_left_wheel_rpm   = -0.5;
         control_msg.front_right_wheel_rpm = 0.5;
-        control_msg.back_right_wheel_rpm = 0.5;
+        control_msg.back_right_wheel_rpm  = 0.5;
 
-        app_firmware_robot_applyDirectPerWheelPower(robot, control_msg);
+        app_firmware_robot_applyDirectPerWheelPower(firmware_robot.get(), control_msg);
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
@@ -1027,12 +1027,12 @@ TEST_F(SimulatorRobotSingletonTest, test_robot_drive_backwards)
     for (unsigned int i = 0; i < 60; i++)
     {
         TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg;
-        control_msg.front_left_wheel_rpm = 0.5;
-        control_msg.back_left_wheel_rpm = 0.5;
+        control_msg.front_left_wheel_rpm  = 0.5;
+        control_msg.back_left_wheel_rpm   = 0.5;
         control_msg.front_right_wheel_rpm = -0.5;
-        control_msg.back_right_wheel_rpm = -0.5;
+        control_msg.back_right_wheel_rpm  = -0.5;
 
-        app_firmware_robot_applyDirectPerWheelPower(robot, control_msg);
+        app_firmware_robot_applyDirectPerWheelPower(firmware_robot.get(), control_msg);
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
@@ -1060,12 +1060,12 @@ TEST_F(SimulatorRobotSingletonTest, test_robot_spin_clockwise)
     for (unsigned int i = 0; i < 60; i++)
     {
         TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg;
-        control_msg.front_left_wheel_rpm = -0.5;
-        control_msg.back_left_wheel_rpm = -0.5;
+        control_msg.front_left_wheel_rpm  = -0.5;
+        control_msg.back_left_wheel_rpm   = -0.5;
         control_msg.front_right_wheel_rpm = -0.5;
-        control_msg.back_right_wheel_rpm = -0.5;
+        control_msg.back_right_wheel_rpm  = -0.5;
 
-        app_firmware_robot_applyDirectPerWheelPower(robot, control_msg);
+        app_firmware_robot_applyDirectPerWheelPower(firmware_robot.get(), control_msg);
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
@@ -1095,12 +1095,12 @@ TEST_F(SimulatorRobotSingletonTest, test_robot_spin_counterclockwise)
     for (unsigned int i = 0; i < 60; i++)
     {
         TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg;
-        control_msg.front_left_wheel_rpm = 0.5;
-        control_msg.back_left_wheel_rpm = 0.5;
+        control_msg.front_left_wheel_rpm  = 0.5;
+        control_msg.back_left_wheel_rpm   = 0.5;
         control_msg.front_right_wheel_rpm = 0.5;
-        control_msg.back_right_wheel_rpm = 0.5;
+        control_msg.back_right_wheel_rpm  = 0.5;
 
-        app_firmware_robot_applyDirectPerWheelPower(robot, control_msg);
+        app_firmware_robot_applyDirectPerWheelPower(firmware_robot.get(), control_msg);
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
@@ -1127,17 +1127,15 @@ TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_not_moving)
     Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
     auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
 
-    Wheel_t* front_left_wheel =
-        app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
-    float motor_speed_front_left = app_wheel_getMotorSpeedRPM(front_left_wheel);
-    Wheel_t* back_left_wheel = app_firmware_robot_getBackLeftWheel(firmware_robot.get());
-    float motor_speed_back_left = app_wheel_getMotorSpeedRPM(back_left_wheel);
-    Wheel_t* back_right_wheel =
-        app_firmware_robot_getBackRightWheel(firmware_robot.get());
-    float motor_speed_back_right = app_wheel_getMotorSpeedRPM(back_right_wheel);
-    Wheel_t* front_right_wheel =
-        app_firmware_robot_getFrontRightWheel(firmware_robot.get());
-    float motor_speed_front_right = app_wheel_getMotorSpeedRPM(front_right_wheel);
+    float motor_speed_front_left =
+        app_firmware_robot_getFrontLeftWheelSpeedRPM(firmware_robot.get());
+    float motor_speed_back_left =
+        app_firmware_robot_getBackLeftWheelSpeedRPM(firmware_robot.get());
+    float motor_speed_back_right =
+        app_firmware_robot_getBackRightWheelSpeedRPM(firmware_robot.get());
+    float motor_speed_front_right =
+        app_firmware_robot_getFrontRightWheelSpeedRPM(firmware_robot.get());
+
     EXPECT_EQ(motor_speed_front_left, 0.0);
     EXPECT_EQ(motor_speed_back_left, 0.0);
     EXPECT_EQ(motor_speed_back_right, 0.0);
@@ -1154,17 +1152,14 @@ TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_moving_forw
     Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
     auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
 
-    Wheel_t* front_left_wheel =
-        app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
-    float motor_speed_front_left = app_wheel_getMotorSpeedRPM(front_left_wheel);
-    Wheel_t* back_left_wheel = app_firmware_robot_getBackLeftWheel(firmware_robot.get());
-    float motor_speed_back_left = app_wheel_getMotorSpeedRPM(back_left_wheel);
-    Wheel_t* back_right_wheel =
-        app_firmware_robot_getBackRightWheel(firmware_robot.get());
-    float motor_speed_back_right = app_wheel_getMotorSpeedRPM(back_right_wheel);
-    Wheel_t* front_right_wheel =
-        app_firmware_robot_getFrontRightWheel(firmware_robot.get());
-    float motor_speed_front_right = app_wheel_getMotorSpeedRPM(front_right_wheel);
+    float motor_speed_front_left =
+        app_firmware_robot_getFrontLeftWheelSpeedRPM(firmware_robot.get());
+    float motor_speed_back_left =
+        app_firmware_robot_getBackLeftWheelSpeedRPM(firmware_robot.get());
+    float motor_speed_back_right =
+        app_firmware_robot_getBackRightWheelSpeedRPM(firmware_robot.get());
+    float motor_speed_front_right =
+        app_firmware_robot_getFrontRightWheelSpeedRPM(firmware_robot.get());
 
     EXPECT_LT(motor_speed_front_left, -1.0);
     EXPECT_LT(motor_speed_back_left, -1.0);
@@ -1191,17 +1186,14 @@ TEST_F(SimulatorRobotSingletonTest,
     Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
     auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
 
-    Wheel_t* front_left_wheel =
-        app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
-    float motor_speed_front_left = app_wheel_getMotorSpeedRPM(front_left_wheel);
-    Wheel_t* back_left_wheel = app_firmware_robot_getBackLeftWheel(firmware_robot.get());
-    float motor_speed_back_left = app_wheel_getMotorSpeedRPM(back_left_wheel);
-    Wheel_t* back_right_wheel =
-        app_firmware_robot_getBackRightWheel(firmware_robot.get());
-    float motor_speed_back_right = app_wheel_getMotorSpeedRPM(back_right_wheel);
-    Wheel_t* front_right_wheel =
-        app_firmware_robot_getFrontRightWheel(firmware_robot.get());
-    float motor_speed_front_right = app_wheel_getMotorSpeedRPM(front_right_wheel);
+    float motor_speed_front_left =
+        app_firmware_robot_getFrontLeftWheelSpeedRPM(firmware_robot.get());
+    float motor_speed_back_left =
+        app_firmware_robot_getBackLeftWheelSpeedRPM(firmware_robot.get());
+    float motor_speed_back_right =
+        app_firmware_robot_getBackRightWheelSpeedRPM(firmware_robot.get());
+    float motor_speed_front_right =
+        app_firmware_robot_getFrontRightWheelSpeedRPM(firmware_robot.get());
 
     EXPECT_NEAR(motor_speed_front_left, 0.0, 0.1);
     EXPECT_LT(motor_speed_back_left, -1.0);
@@ -1219,17 +1211,14 @@ TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_spinning)
     Ball ball(Point(10000, 10000), Vector(0, 0), Timestamp::fromSeconds(0));
     auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
 
-    Wheel_t* front_left_wheel =
-        app_firmware_robot_getFrontLeftWheel(firmware_robot.get());
-    float motor_speed_front_left = app_wheel_getMotorSpeedRPM(front_left_wheel);
-    Wheel_t* back_left_wheel = app_firmware_robot_getBackLeftWheel(firmware_robot.get());
-    float motor_speed_back_left = app_wheel_getMotorSpeedRPM(back_left_wheel);
-    Wheel_t* back_right_wheel =
-        app_firmware_robot_getBackRightWheel(firmware_robot.get());
-    float motor_speed_back_right = app_wheel_getMotorSpeedRPM(back_right_wheel);
-    Wheel_t* front_right_wheel =
-        app_firmware_robot_getFrontRightWheel(firmware_robot.get());
-    float motor_speed_front_right = app_wheel_getMotorSpeedRPM(front_right_wheel);
+    float motor_speed_front_left =
+        app_firmware_robot_getFrontLeftWheelSpeedRPM(firmware_robot.get());
+    float motor_speed_back_left =
+        app_firmware_robot_getBackLeftWheelSpeedRPM(firmware_robot.get());
+    float motor_speed_back_right =
+        app_firmware_robot_getBackRightWheelSpeedRPM(firmware_robot.get());
+    float motor_speed_front_right =
+        app_firmware_robot_getFrontRightWheelSpeedRPM(firmware_robot.get());
 
     EXPECT_GT(motor_speed_front_left, 1.0);
     EXPECT_GT(motor_speed_back_left, 1.0);
@@ -1250,7 +1239,8 @@ TEST_F(SimulatorRobotSingletonTest,
 
     for (unsigned int i = 0; i < 60; i++)
     {
-        app_firmware_robot_stopRobot(robot, TbotsProto_StopPrimitive_StopType_BRAKE);
+        app_firmware_robot_stopRobot(firmware_robot.get(),
+                                     TbotsProto_StopPrimitive_StopType_BRAKE);
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
@@ -1270,7 +1260,8 @@ TEST_F(SimulatorRobotSingletonTest,
 
     for (unsigned int i = 0; i < 60; i++)
     {
-        app_firmware_robot_stopRobot(robot, TbotsProto_StopPrimitive_StopType_BRAKE);
+        app_firmware_robot_stopRobot(firmware_robot.get(),
+                                     TbotsProto_StopPrimitive_StopType_BRAKE);
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
@@ -1289,7 +1280,8 @@ TEST_F(SimulatorRobotSingletonTest, test_brake_motors_when_robot_moving_linearly
 
     for (unsigned int i = 0; i < 240; i++)
     {
-        app_firmware_robot_stopRobot(robot, TbotsProto_StopPrimitive_StopType_BRAKE);
+        app_firmware_robot_stopRobot(firmware_robot.get(),
+                                     TbotsProto_StopPrimitive_StopType_BRAKE);
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 
@@ -1313,7 +1305,8 @@ TEST_F(SimulatorRobotSingletonTest, test_brake_motors_when_robot_moving_and_spin
 
     for (unsigned int i = 0; i < 240; i++)
     {
-        app_firmware_robot_stopRobot(robot, TbotsProto_StopPrimitive_StopType_BRAKE);
+        app_firmware_robot_stopRobot(firmware_robot.get(),
+                                     TbotsProto_StopPrimitive_StopType_BRAKE);
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
     }
 

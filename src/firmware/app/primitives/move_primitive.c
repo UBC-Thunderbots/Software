@@ -159,7 +159,8 @@ static void app_move_primitive_tick(void* void_state_ptr, FirmwareWorld_t* world
         trajectory_index++;
     }
 
-    app_firmware_robot_followPosTrajectory(robot, state->position_trajectory, trajectory_index, state->max_speed_m_per_s);
+    app_firmware_robot_followPosTrajectory(robot, state->position_trajectory,
+                                           trajectory_index, state->max_speed_m_per_s);
 }
 
 /**
