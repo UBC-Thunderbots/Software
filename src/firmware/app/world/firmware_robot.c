@@ -150,10 +150,10 @@ FirmwareRobot_t* app_firmware_robot_force_wheels_create(
 
 void app_firmware_robot_force_wheels_destroy(FirmwareRobot_t* robot)
 {
-    ForceWheel_t* front_left_wheel = robot->front_left_force_wheel;
+    ForceWheel_t* front_left_wheel  = robot->front_left_force_wheel;
     ForceWheel_t* front_right_wheel = robot->front_right_force_wheel;
-    ForceWheel_t* back_left_wheel = robot->back_left_force_wheel;
-    ForceWheel_t* back_right_wheel = robot->back_right_force_wheel;
+    ForceWheel_t* back_left_wheel   = robot->back_left_force_wheel;
+    ForceWheel_t* back_right_wheel  = robot->back_right_force_wheel;
 
     app_force_wheel_destroy(front_left_wheel);
     app_force_wheel_destroy(front_right_wheel);
@@ -164,16 +164,15 @@ void app_firmware_robot_force_wheels_destroy(FirmwareRobot_t* robot)
 
 void app_firmware_robot_velocity_wheels_destroy(FirmwareRobot_t* robot)
 {
-    VelocityWheel_t* front_left_wheel = robot->front_left_velocity_wheel;
+    VelocityWheel_t* front_left_wheel  = robot->front_left_velocity_wheel;
     VelocityWheel_t* front_right_wheel = robot->front_right_velocity_wheel;
-    VelocityWheel_t* back_left_wheel = robot->back_left_velocity_wheel;
-    VelocityWheel_t* back_right_wheel = robot->back_right_velocity_wheel;
+    VelocityWheel_t* back_left_wheel   = robot->back_left_velocity_wheel;
+    VelocityWheel_t* back_right_wheel  = robot->back_right_velocity_wheel;
 
-    app_force_wheel_destroy(front_left_wheel);
-    app_force_wheel_destroy(front_right_wheel);
-    app_force_wheel_destroy(back_left_wheel);
-    app_force_wheel_destroy(back_right_wheel)
-    free(robot);
+    app_velocity_wheel_destroy(front_left_wheel);
+    app_velocity_wheel_destroy(front_right_wheel);
+    app_velocity_wheel_destroy(back_left_wheel);
+    app_velocity_wheel_destroy(back_right_wheel) free(robot);
 }
 
 Charger_t* app_firmware_robot_getCharger(const FirmwareRobot_t* robot)
