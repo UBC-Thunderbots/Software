@@ -623,10 +623,10 @@ static void run_normal(void)
     app_firmware_robot_force_wheels_destroy(robot);
     app_dribbler_destroy(dribbler);
     app_chicker_destroy(chicker);
-    app_wheel_destroy(back_left_wheel);
-    app_wheel_destroy(back_right_wheel);
-    app_wheel_destroy(front_left_wheel);
-    app_wheel_destroy(front_right_wheel);
+    app_force_wheel_destroy(back_left_wheel);
+    app_force_wheel_destroy(back_right_wheel);
+    app_force_wheel_destroy(front_left_wheel);
+    app_force_wheel_destroy(front_right_wheel);
 
     // Kick the hardware watchdog to avoid timeouts. Chicker shutdown sometimes
     // takes up to three seconds, particularly if the board is not plugged in,
