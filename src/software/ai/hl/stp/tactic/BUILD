@@ -273,6 +273,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/hl/stp/tactic/passer:passer_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/ai/hl/stp/tactic/passer:passer_tactic",
     ],

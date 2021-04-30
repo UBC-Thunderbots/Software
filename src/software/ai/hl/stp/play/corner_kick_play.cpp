@@ -63,8 +63,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
     Pass pass = setupPass(yield, goalie_tactic, world);
 
     // Perform the pass and wait until the receiver is finished
-    auto passer =
-        std::make_shared<PasserTactic>(pass, false);
+    auto passer = std::make_shared<PasserTactic>(pass);
     auto receiver =
         std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(),
                                          world.enemyTeam(), pass, world.ball(), false);

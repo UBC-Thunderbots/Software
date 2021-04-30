@@ -1,11 +1,10 @@
 #pragma once
 
+#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
+#include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/ai/passing/pass.h"
-
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
-#include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 
 struct PasserFSM
 {
@@ -28,7 +27,7 @@ struct PasserFSM
         /**
          * Action that updates the DribbleFSM
          *
-         * @param event DribbleFSM::Update event
+         * @param event PasserFSM::Update event
          * @param processEvent processes the DribbleFSM::Update
          */
         const auto update_dribble = [](auto event,
@@ -40,8 +39,7 @@ struct PasserFSM
                         event.control_params.pass->passerPoint()),
                     .final_dribble_orientation = std::make_optional<Angle>(
                         event.control_params.pass->passerOrientation()),
-                    .allow_excessive_dribbling = false,
-                };
+                    .allow_excessive_dribbling = false};
 
                 // Update the dribble fsm
                 processEvent(DribbleFSM::Update(control_params, event.common));
@@ -51,7 +49,7 @@ struct PasserFSM
         /**
          * Action that updates the KickFSM
          *
-         * @param event KickFSM::Update event
+         * @param event PasserFSM::Update event
          * @param processEvent processes the KickFSM::Update
          */
         const auto update_kick = [](auto event,

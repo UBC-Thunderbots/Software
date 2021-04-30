@@ -92,8 +92,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                    << best_pass_and_score_so_far.rating;
 
         // Perform the pass and wait until the receiver is finished
-        auto passer =
-            std::make_shared<PasserTactic>(pass, false);
+        auto passer   = std::make_shared<PasserTactic>(pass);
         auto receiver = std::make_shared<ReceiverTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), pass, world.ball(),
             false);

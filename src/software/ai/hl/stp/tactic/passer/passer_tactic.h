@@ -1,8 +1,8 @@
 #pragma once
 
+#include "software/ai/hl/stp/tactic/passer/passer_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
-#include "software/ai/hl/stp/tactic/passer/passer_fsm.h"
 
 /**
  * This tactic is for a robot performing a pass. It should be used in conjunction with
@@ -18,10 +18,9 @@ class PasserTactic : public Tactic
      * Creates a new PasserTactic
      *
      * @param pass The pass this tactic should try to execute
-     * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit PasserTactic(Pass pass, bool loop_forever);
+    explicit PasserTactic(Pass pass);
 
     PasserTactic() = delete;
 
@@ -55,7 +54,7 @@ class PasserTactic : public Tactic
     // Tactic parameters
     Pass pass;
 
-    HFSM<PasserFSM> fsm;
+    FSM<PasserFSM> fsm;
 
     PasserFSM::ControlParams control_params;
 };
