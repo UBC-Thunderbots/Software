@@ -4,6 +4,7 @@
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
+#include "software/ai/evaluation/enemy_threat.h"
 
 StopPlay::StopPlay(std::shared_ptr<const PlayConfig> config) : Play(config) {}
 
@@ -51,9 +52,7 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
         std::make_shared<MoveTactic>(true)};
 
-    auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
-        play_config->getGoalieTacticConfig());
+    auto goalie_tactic = std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig());
 
     // we want to find the radius of the semicircle in which the defense area can be
     // inscribed, this is so the robots can snap to that semicircle and not enter the

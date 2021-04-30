@@ -48,9 +48,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
      */
 
     // Setup the goalie
-    auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
-        play_config->getGoalieTacticConfig());
+    auto goalie_tactic = std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig());
 
     // Setup crease defenders to help the goalie
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {

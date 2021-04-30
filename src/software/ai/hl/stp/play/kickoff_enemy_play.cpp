@@ -29,9 +29,7 @@ bool KickoffEnemyPlay::invariantHolds(const World &world) const
 void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                       const World &world)
 {
-    auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
-        play_config->getGoalieTacticConfig());
+    auto goalie_tactic = std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig());
 
     // 3 robots assigned to shadow enemies. Other robots will be assigned positions
     // on the field to be evenly spread out
