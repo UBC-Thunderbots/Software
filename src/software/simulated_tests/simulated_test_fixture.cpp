@@ -119,8 +119,8 @@ void SimulatedTestFixture::runTest(
     const std::vector<ValidationFunction> &non_terminating_validation_functions,
     const Duration &timeout)
 {
-    std::shared_ptr<Simulator> simulator(std::make_shared<Simulator>(
-        Field::createSSLDivisionBField(), thunderbots_config->getSimulatorConfig()));
+    std::shared_ptr<Simulator> simulator(
+        std::make_shared<Simulator>(field, thunderbots_config->getSimulatorConfig()));
     simulator->setBallState(ball);
     simulator->addYellowRobots(friendly_robots);
     simulator->addBlueRobots(enemy_robots);
