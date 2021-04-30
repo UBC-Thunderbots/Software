@@ -3,7 +3,6 @@ def stm32h7_hal_library_files_genrule(name):
 
     # First download the firmware. We have this as a separate genrule in case we need to
     # debug later rules, don't want to have to re-download every time
-    # TODO: more descriptive name?
     native.genrule(
         name = "{}_download_stm32h7_firmware_zip".format(name),
         outs = ["fw.zip"],

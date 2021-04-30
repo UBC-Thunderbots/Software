@@ -49,8 +49,8 @@
 #define IFNAME1 't'
 
 /* ETH Setting  */
-#define ETH_RX_BUFFER_SIZE (1536UL)
 #define ETH_DMA_TRANSMIT_TIMEOUT (20U)
+/* ETH_RX_BUFFER_SIZE parameter is defined in lwipopts.h */
 
 /* USER CODE BEGIN 1 */
 #define CORE_CM7 1
@@ -61,7 +61,7 @@
 /*
 @Note: This interface is implemented to operate in zero-copy mode only:
         - Rx buffers are allocated statically and passed directly to the LwIP stack
-          they will return back to DMA after been processed by the stack.
+          they will return back to ETH DMA after been processed by the stack.
         - Tx Buffers will be allocated from LwIP stack memory heap,
           then passed to ETH HAL driver.
 
@@ -76,6 +76,8 @@
   2.a. Rx Buffers number must be between ETH_RX_DESC_CNT and 2*ETH_RX_DESC_CNT
   2.b. Rx Buffers must have the same size: ETH_RX_BUFFER_SIZE, this value must
        passed to ETH DMA in the init field (heth.Init.RxBuffLen)
+  2.c  The RX Ruffers addresses and sizes must be properly defined to be aligned
+       to L1-CACHE line size (32 bytes).
 */
 
 #if defined(__ICCARM__) /*!< IAR Compiler */
@@ -273,7 +275,7 @@ void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
  */
 static void low_level_init(struct netif *netif)
 {
-    HAL_StatusTypeDef hal_eth_init_status;
+    HAL_StatusTypeDef hal_eth_init_status = HAL_OK;
     /* USER CODE BEGIN OS_THREAD_ATTR_CMSIS_RTOS_V2 */
     osThreadAttr_t attributes;
     /* USER CODE END OS_THREAD_ATTR_CMSIS_RTOS_V2 */
@@ -316,7 +318,6 @@ static void low_level_init(struct netif *netif)
 
     /* Pass all multicast frames: needed for IPv6 protocol*/
     heth.Instance->MACPFR |= ETH_MACPFR_PM;
-
 
 #if LWIP_ARP || LWIP_ETHERNET
 
@@ -446,7 +447,7 @@ static void low_level_init(struct netif *netif)
 
 static err_t low_level_output(struct netif *netif, struct pbuf *p)
 {
-    uint32_t i = 0, framelen = 0;
+    uint32_t i = 0;
     struct pbuf *q;
     err_t errval = ERR_OK;
     ETH_BufferTypeDef Txbuffer[ETH_TX_DESC_CNT];
@@ -460,7 +461,6 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
 
         Txbuffer[i].buffer = q->payload;
         Txbuffer[i].len    = q->len;
-        framelen += q->len;
 
         if (i > 0)
         {
@@ -475,7 +475,7 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
         i++;
     }
 
-    TxConfig.Length   = framelen;
+    TxConfig.Length   = p->tot_len;
     TxConfig.TxBuffer = Txbuffer;
 
     HAL_ETH_Transmit(&heth, &TxConfig, ETH_DMA_TRANSMIT_TIMEOUT);
@@ -494,11 +494,18 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
 static struct pbuf *low_level_input(struct netif *netif)
 {
     struct pbuf *p = NULL;
-    ETH_BufferTypeDef RxBuff;
-    uint32_t framelength = 0;
+    ETH_BufferTypeDef RxBuff[ETH_RX_DESC_CNT];
+    uint32_t framelength = 0, i = 0;
     struct pbuf_custom *custom_pbuf;
 
-    if (HAL_ETH_GetRxDataBuffer(&heth, &RxBuff) == HAL_OK)
+    memset(RxBuff, 0, ETH_RX_DESC_CNT * sizeof(ETH_BufferTypeDef));
+
+    for (i = 0; i < ETH_RX_DESC_CNT - 1; i++)
+    {
+        RxBuff[i].next = &RxBuff[i + 1];
+    }
+
+    if (HAL_ETH_GetRxDataBuffer(&heth, RxBuff) == HAL_OK)
     {
         HAL_ETH_GetRxDataLength(&heth, &framelength);
 
@@ -507,16 +514,17 @@ static struct pbuf *low_level_input(struct netif *netif)
 
 #if !defined(DUAL_CORE) || defined(CORE_CM7)
         /* Invalidate data cache for ETH Rx Buffers */
-        SCB_InvalidateDCache_by_Addr((uint32_t *)RxBuff.buffer, framelength);
+        SCB_InvalidateDCache_by_Addr((uint32_t *)RxBuff->buffer, framelength);
 #endif
 
         custom_pbuf = (struct pbuf_custom *)LWIP_MEMPOOL_ALLOC(RX_POOL);
-        custom_pbuf->custom_free_function = pbuf_free_custom;
-
-        p = pbuf_alloced_custom(PBUF_RAW, framelength, PBUF_REF, custom_pbuf,
-                                RxBuff.buffer, ETH_RX_BUFFER_SIZE);
+        if (custom_pbuf != NULL)
+        {
+            custom_pbuf->custom_free_function = pbuf_free_custom;
+            p = pbuf_alloced_custom(PBUF_RAW, framelength, PBUF_REF, custom_pbuf,
+                                    RxBuff->buffer, framelength);
+        }
     }
-
 
     return p;
 }
@@ -541,7 +549,6 @@ void ethernetif_input(void *argument)
         {
             do
             {
-                LOCK_TCPIP_CORE();
                 p = low_level_input(netif);
                 if (p != NULL)
                 {
@@ -550,7 +557,6 @@ void ethernetif_input(void *argument)
                         pbuf_free(p);
                     }
                 }
-                UNLOCK_TCPIP_CORE();
             } while (p != NULL);
         }
     }
@@ -610,7 +616,7 @@ err_t ethernetif_init(struct netif *netif)
 #if LWIP_ARP
     netif->output = etharp_output;
 #else
-    /* The user should write ist own code in low_level_output_arp_off function */
+    /* The user should write its own code in low_level_output_arp_off function */
     netif->output = low_level_output_arp_off;
 #endif /* LWIP_ARP */
 #endif /* LWIP_ARP || LWIP_ETHERNET */
@@ -636,11 +642,6 @@ err_t ethernetif_init(struct netif *netif)
 void pbuf_free_custom(struct pbuf *p)
 {
     struct pbuf_custom *custom_pbuf = (struct pbuf_custom *)p;
-
-#if !defined(DUAL_CORE) || defined(CORE_CM7)
-    /* Invalidate data cache: lwIP and/or application may have written into buffer */
-    SCB_InvalidateDCache_by_Addr((uint32_t *)p->payload, p->tot_len);
-#endif
 
     LWIP_MEMPOOL_FREE(RX_POOL, custom_pbuf);
 }
@@ -752,11 +753,10 @@ int32_t ETH_PHY_IO_GetTick(void)
 void ethernet_link_thread(void *argument)
 {
     ETH_MACConfigTypeDef MACConf;
-    uint32_t PHYLinkState;
+    int32_t PHYLinkState;
     uint32_t linkchanged = 0, speed = 0, duplex = 0;
 
     struct netif *netif = (struct netif *)argument;
-
     /* USER CODE BEGIN ETH link init */
 
     /* USER CODE END ETH link init */
