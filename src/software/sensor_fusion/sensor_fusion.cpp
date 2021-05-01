@@ -27,13 +27,12 @@ std::optional<World> SensorFusion::getWorld() const
 {
     if (field && ball)
     {
-        std::optional<World> new_world =
-            std::make_optional<World>(*field, *ball, friendly_team, enemy_team);
-        new_world->updateGameState(game_state);
-        new_world->setTeamWithPossession(team_with_possession);
+        World new_world(*field, *ball, friendly_team, enemy_team);
+        new_world.updateGameState(game_state);
+        new_world.setTeamWithPossession(team_with_possession);
         if (referee_stage)
         {
-            new_world->updateRefereeStage(*referee_stage);
+            new_world.updateRefereeStage(*referee_stage);
         }
         return new_world;
     }
