@@ -1,8 +1,8 @@
 /**
  ******************************************************************************
- * File Name          : I2C.c
- * Description        : This file provides code for the configuration
- *                      of the I2C instances.
+ * @file    i2c.c
+ * @brief   This file provides code for the configuration
+ *          of the I2C instances.
  ******************************************************************************
  * @attention
  *
@@ -30,6 +30,13 @@ SMBUS_HandleTypeDef hsmbus2;
 
 void MX_I2C2_SMBUS_Init(void)
 {
+    /* USER CODE BEGIN I2C2_Init 0 */
+
+    /* USER CODE END I2C2_Init 0 */
+
+    /* USER CODE BEGIN I2C2_Init 1 */
+
+    /* USER CODE END I2C2_Init 1 */
     hsmbus2.Instance                  = I2C2;
     hsmbus2.Init.Timing               = 0x10707DBC;
     hsmbus2.Init.AnalogFilter         = SMBUS_ANALOGFILTER_ENABLE;
@@ -59,16 +66,28 @@ void MX_I2C2_SMBUS_Init(void)
     {
         Error_Handler();
     }
+    /* USER CODE BEGIN I2C2_Init 2 */
+
+    /* USER CODE END I2C2_Init 2 */
 }
 
 void HAL_SMBUS_MspInit(SMBUS_HandleTypeDef* smbusHandle)
 {
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    GPIO_InitTypeDef GPIO_InitStruct             = {0};
+    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
     if (smbusHandle->Instance == I2C2)
     {
         /* USER CODE BEGIN I2C2_MspInit 0 */
 
         /* USER CODE END I2C2_MspInit 0 */
+        /** Initializes the peripherals clock
+         */
+        PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_I2C2;
+        PeriphClkInitStruct.I2c123ClockSelection = RCC_I2C123CLKSOURCE_D2PCLK1;
+        if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+        {
+            Error_Handler();
+        }
 
         __HAL_RCC_GPIOF_CLK_ENABLE();
         /**I2C2 GPIO Configuration
@@ -107,8 +126,11 @@ void HAL_SMBUS_MspDeInit(SMBUS_HandleTypeDef* smbusHandle)
         PF1     ------> I2C2_SCL
         PF2     ------> I2C2_SMBA
         */
-        HAL_GPIO_DeInit(GPIOF, power_monitor_I2C2_SDA_Pin | power_monitor_I2C2_SCL_Pin |
-                                   power_monitor_I2C2_SMBA_Pin);
+        HAL_GPIO_DeInit(power_monitor_I2C2_SDA_GPIO_Port, power_monitor_I2C2_SDA_Pin);
+
+        HAL_GPIO_DeInit(power_monitor_I2C2_SCL_GPIO_Port, power_monitor_I2C2_SCL_Pin);
+
+        HAL_GPIO_DeInit(power_monitor_I2C2_SMBA_GPIO_Port, power_monitor_I2C2_SMBA_Pin);
 
         /* USER CODE BEGIN I2C2_MspDeInit 1 */
 
