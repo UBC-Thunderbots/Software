@@ -14,12 +14,10 @@ void robotStationaryInPolygon(RobotId robot_id, Polygon polygon, unsigned int nu
             LOG(FATAL) << "There is no robot with ID: " + std::to_string(robot_id);
         }
 
-        Point position = robot_optional.value().position();
+        Point position  = robot_optional.value().position();
+        double velocity = robot_optional->velocity().length();
 
-        std::stringstream ss;
-        ss << polygon;
-        LOG(INFO) << "Robot with ID " + std::to_string(robot_id) + " is at " + std::to_string(position.x()) + ", " + std::to_string(position.y()) + " velocity  = " + std::to_string(robot_optional->velocity().length());
-        return contains(polygon, position) && robot_optional->velocity().length() == 0;
+        return contains(polygon, position) && velocity == 0;
     };
 
     for (unsigned int stationary_tick_count = 0; stationary_tick_count < num_ticks; stationary_tick_count++) {
@@ -34,7 +32,5 @@ void robotStationaryInPolygon(RobotId robot_id, Polygon polygon, unsigned int nu
             yield("Robot with ID " + std::to_string(robot_id) +
                   " is not stationary or has not entered the " + ss.str());
         }
-        LOG(INFO) << "Robot with ID " + std::to_string(robot_id) + " has been stationary in polygon for " + std::to_string(stationary_tick_count) + " ticks";
-        yield("Robot with ID " + std::to_string(robot_id) + " has been stationary in polygon for " + std::to_string(stationary_tick_count) + " ticks");
     }
 }

@@ -167,19 +167,22 @@ void SimulatedTestFixture::runTest(
     const Duration ai_time_step = Duration::fromSeconds(simulation_time_step.toSeconds() *
                                                         CAMERA_FRAMES_PER_AI_TICK);
 
+    auto start_tick_time = std::chrono::system_clock::now();
+
     // Tick one frame to aid with visualization
     bool validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);
 
-    // Logging duration of each tick starting at second tick
-    unsigned int tick_count    = 0;
-    double total_tick_duration = 0.0;
-    double max_tick_duration   = 0.0;
-    double min_tick_duration   = 10000.0;
+    // Logging duration of each tick
+    unsigned int tick_count    = 1;
+    double duration_ms         = ::TestUtil::millisecondsSince(start_tick_time);
+    double total_tick_duration = duration_ms;
+    double max_tick_duration   = duration_ms;
+    double min_tick_duration   = duration_ms;
 
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
-        // Initialize tick durations
-        auto start_tick_time = std::chrono::system_clock::now();
+        // Record starting time
+        start_tick_time = std::chrono::system_clock::now();
 
         if (!thunderbots_config->getAiControlConfig()->getRunAi()->value())
         {
@@ -191,7 +194,7 @@ void SimulatedTestFixture::runTest(
         validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);
 
         // Calculate tick durations
-        double duration_ms = ::TestUtil::millisecondsSince(start_tick_time);
+        duration_ms = ::TestUtil::millisecondsSince(start_tick_time);
         total_tick_duration += duration_ms;
         max_tick_duration = std::max(max_tick_duration, duration_ms);
         min_tick_duration = std::min(min_tick_duration, duration_ms);
