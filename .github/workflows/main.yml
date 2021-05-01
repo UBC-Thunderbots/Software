@@ -39,8 +39,7 @@ jobs:
           bazel test --show_timestamps\
             -- //... -//software/simulated_tests/... \
             -//software/ai/hl/stp/play/... \
-            -//software/ai/hl/stp/tactic/... \
-            -//firmware_new/...
+            -//software/ai/hl/stp/tactic/...
              
   firmware-tests:
     name: Firmware Tests
@@ -65,7 +64,7 @@ jobs:
       - name: New Robot Firmware Build
         run: |
          cd src
-         bazel build --cpu=stm32h7 //firmware_new/boards/frankie_v1:frankie_v1_main 
+         bazel build --cpu=stm32h7 //firmware/boards/frankie_stm32h7:frankie_stm32h7_main 
      
       - name: Old Robot Firmware Build
         run: |

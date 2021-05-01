@@ -1,4 +1,4 @@
-#include "firmware_new/boards/frankie_v1/io/allegro_a3931_motor_driver.h"
+#include "firmware/boards/frankie_stm32h7/io/allegro_a3931_motor_driver.h"
 
 #include <stdlib.h>
 

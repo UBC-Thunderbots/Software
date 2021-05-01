@@ -32,8 +32,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "firmware/app/logger/logger.h"
-#include "firmware_new/boards/frankie_v1/io/drivetrain.h"
-#include "firmware_new/boards/frankie_v1/io/uart_logger.h"
+#include "firmware/boards/frankie_stm32h7/io/drivetrain.h"
+#include "firmware/boards/frankie_stm32h7/io/uart_logger.h"
 
 /* USER CODE END Includes */
 

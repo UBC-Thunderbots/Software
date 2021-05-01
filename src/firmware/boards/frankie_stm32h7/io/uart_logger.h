@@ -1,7 +1,7 @@
 #pragma once
 #include "FreeRTOS.h"
 #include "cmsis_os.h"
-#include "firmware_new/boards/frankie_v1/usart.h"
+#include "firmware/boards/frankie_stm32h7/usart.h"
 #include "shared/proto/robot_log_msg.nanopb.h"
 
 /**

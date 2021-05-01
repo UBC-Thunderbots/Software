@@ -1,6 +1,6 @@
 #pragma once
 
-#include "firmware_new/boards/frankie_v1/io/drivetrain_unit.h"
+#include "firmware/boards/frankie_stm32h7/io/drivetrain_unit.h"
 
 /**
  * Initialize the IO layer for the Drivetrain

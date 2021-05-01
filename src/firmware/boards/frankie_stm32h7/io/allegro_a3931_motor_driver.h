@@ -3,9 +3,9 @@
  * This file is an abstraction around the Allegro A3931 Motor Driver
  */
 
-#include "firmware_new/boards/frankie_v1/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h"
-#include "firmware_new/boards/frankie_v1/io/gpio_pin.h"
-#include "firmware_new/boards/frankie_v1/io/pwm_pin.h"
+#include "firmware/boards/frankie_stm32h7/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h"
+#include "firmware/boards/frankie_stm32h7/io/gpio_pin.h"
+#include "firmware/boards/frankie_stm32h7/io/pwm_pin.h"
 
 typedef enum
 {

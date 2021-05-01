@@ -1,4 +1,4 @@
-#include "firmware_new/boards/frankie_v1/io/drivetrain.h"
+#include "firmware/boards/frankie_stm32h7/io/drivetrain.h"
 
 #include <assert.h>
 #include <stdbool.h>

@@ -8,7 +8,7 @@ cc_library(
     hdrs = ["gpio_pin.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
-        "//firmware_new/boards/frankie_v1:hal",
+        "//firmware/boards/frankie_stm32h7:hal",
     ],
 )
 
@@ -18,7 +18,7 @@ cc_library(
     hdrs = ["pwm_pin.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
-        "//firmware_new/boards/frankie_v1:hal",
+        "//firmware/boards/frankie_stm32h7:hal",
     ],
 )
 
@@ -43,7 +43,7 @@ cc_test(
     name = "infineon_TLE009_E1000_angle_sensor_test",
     srcs = ["infineon_TLE5009_E1000_angle_sensor_test.cpp"],
     deps = [
-        "//firmware_new/boards/frankie_v1/io:infineon_TLE009_E1000_angle_sensor",
+        "//firmware/boards/frankie_stm32h7/io:infineon_TLE009_E1000_angle_sensor",
         "@gtest//:gtest_main",
     ],
 )
@@ -77,8 +77,8 @@ cc_library(
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
         ":ublox_odinw262_communicator",
-        "//firmware_new/boards/frankie_v1:hal",
-        "//firmware_new/boards/frankie_v1:lwip",
+        "//firmware/boards/frankie_stm32h7:hal",
+        "//firmware/boards/frankie_stm32h7:lwip",
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
     ],
@@ -90,10 +90,10 @@ cc_library(
     hdrs = ["network_logger.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
-        "//firmware_new/boards/frankie_v1:hal",
-        "//firmware_new/boards/frankie_v1:lwip",
-        "//firmware_new/boards/frankie_v1:rtos",
-        "//firmware_new/boards/frankie_v1/io:proto_multicast_communication",
+        "//firmware/boards/frankie_stm32h7:hal",
+        "//firmware/boards/frankie_stm32h7:lwip",
+        "//firmware/boards/frankie_stm32h7:rtos",
+        "//firmware/boards/frankie_stm32h7/io:proto_multicast_communication",
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
     ],
@@ -106,9 +106,9 @@ cc_library(
     hdrs = ["uart_logger.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
-        "//firmware_new/boards/frankie_v1:hal",
-        "//firmware_new/boards/frankie_v1:rtos",
-        "//firmware_new/boards/frankie_v1:usart",
+        "//firmware/boards/frankie_stm32h7:hal",
+        "//firmware/boards/frankie_stm32h7:rtos",
+        "//firmware/boards/frankie_stm32h7:usart",
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
     ],
@@ -123,10 +123,10 @@ cc_library(
     deps = [
         ":gpio_pin",
         "//firmware/app/logger",
-        "//firmware_new/boards/frankie_v1:hal",
-        "//firmware_new/boards/frankie_v1:rtos",
-        "//firmware_new/boards/frankie_v1:usart",
-        "//firmware_new/boards/frankie_v1/io:ublox_odinw262_communicator_buffer_utils",
+        "//firmware/boards/frankie_stm32h7:hal",
+        "//firmware/boards/frankie_stm32h7:rtos",
+        "//firmware/boards/frankie_stm32h7:usart",
+        "//firmware/boards/frankie_stm32h7/io:ublox_odinw262_communicator_buffer_utils",
         "//shared:constants",
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
@@ -153,7 +153,7 @@ cc_test(
     srcs = ["ublox_odinw262_communicator_buffer_utils_test.cpp"],
     deps = [
         ":rapidcheck",
-        "//firmware_new/boards/frankie_v1/io:ublox_odinw262_communicator_buffer_utils",
+        "//firmware/boards/frankie_stm32h7/io:ublox_odinw262_communicator_buffer_utils",
         "@gtest//:gtest_main",
     ],
 )

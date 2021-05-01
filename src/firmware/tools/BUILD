@@ -15,7 +15,7 @@ sh_binary(
     name = "debug_firmware_on_stm32h7",
     srcs = ["debug_firmware_on_stm32h7.sh"],
     data = [
-        "//firmware_new/boards/frankie_v1:frankie_v1_main",
+        "//firmware/boards/frankie_stm32h7:frankie_stm32h7_main",
         "@arm_developer_gcc//:gdb",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],

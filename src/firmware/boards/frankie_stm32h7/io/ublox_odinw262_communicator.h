@@ -2,8 +2,8 @@
 
 #include <stdbool.h>
 
-#include "firmware_new/boards/frankie_v1/io/gpio_pin.h"
-#include "firmware_new/boards/frankie_v1/usart.h"
+#include "firmware/boards/frankie_stm32h7/io/gpio_pin.h"
+#include "firmware/boards/frankie_stm32h7/usart.h"
 
 /**
  * Connects the u-blox ODIN-W262 to wifi and makes sure the connection is maintained

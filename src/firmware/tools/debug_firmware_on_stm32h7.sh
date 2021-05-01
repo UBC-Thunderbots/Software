@@ -45,23 +45,23 @@ WORKSPACE_DIR="$CURR_DIR/../../"
 
 # Load everything we need from bazel
 path_to_arm_none_eabi_gdb=$(rlocation "__main__/external/arm_developer_gcc/bin/arm-none-eabi-gdb")
-path_to_frankie_v1_elf=$(rlocation "__main__/firmware_new/boards/frankie_v1/frankie_v1_main")
+path_to_frankie_stm32h7_elf=$(rlocation "__main__/firmware/boards/frankie_stm32h7/frankie_stm32h7_main")
 
 # ADD NEW DEPENDENCIES HERE: it's used for error checking, you'll thank yourself later
 EXPECTED_NUM_OF_BAZEL_DEPENDENCIES=2
 bazel_dependencies=(
   $path_to_arm_none_eabi_gdb
-  $path_to_frankie_v1_elf
+  $path_to_frankie_stm32h7_elf
 )
 
 # '.elf' files we want the user to be able to run
 elf_files=(
-  $path_to_frankie_v1_elf
+  $path_to_frankie_stm32h7_elf
 )
 
 # The correct board to give to 'openocd' for the given elf
 declare -A elf_to_board_map=(
-  [$path_to_frankie_v1_elf]="board/st_nucleo_h743zi.cfg"
+  [$path_to_frankie_stm32h7_elf]="board/st_nucleo_h743zi.cfg"
 )
 
 # Make sure we successfully set everything

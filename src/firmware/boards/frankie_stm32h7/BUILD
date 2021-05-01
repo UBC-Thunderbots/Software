@@ -1,9 +1,9 @@
 package(default_visibility = ["//visibility:public"])
 
-load("//firmware_new:rules.bzl", "stm32h7_hal_library_files_genrule")
+load("//firmware:rules.bzl", "stm32h7_hal_library_files_genrule")
 
 cc_binary(
-    name = "frankie_v1_main",
+    name = "frankie_stm32h7_main",
     srcs = [
         "freertos.c",
         "main.c",
@@ -13,7 +13,7 @@ cc_binary(
         "STM32H743xx",
     ],
     linkopts = [
-        "-T$(location //firmware_new/boards/frankie_v1:STM32H743ZITx_FLASH.ld)",
+        "-T$(location //firmware/boards/frankie_stm32h7:STM32H743ZITx_FLASH.ld)",
         "-specs=nano.specs",
         "-lc",
         "-lm",
@@ -23,22 +23,22 @@ cc_binary(
     deps = [
         ":STM32H743ZITx_FLASH.ld",
         ":dma",
-        ":frankie_v1_main_lib",
+        ":frankie_stm32h7_main_lib",
         ":gpio",
         ":lwip",
         "//firmware/app/logger",
-        "//firmware_new/boards/frankie_v1/io:drivetrain",
-        "//firmware_new/boards/frankie_v1/io:drivetrain_unit",
-        "//firmware_new/boards/frankie_v1/io:gpio_pin",
-        "//firmware_new/boards/frankie_v1/io:network_logger",
-        "//firmware_new/boards/frankie_v1/io:pwm_pin",
-        "//firmware_new/boards/frankie_v1/io:uart_logger",
-        "//firmware_new/boards/frankie_v1/io:ublox_odinw262_communicator",
+        "//firmware/boards/frankie_stm32h7/io:drivetrain",
+        "//firmware/boards/frankie_stm32h7/io:drivetrain_unit",
+        "//firmware/boards/frankie_stm32h7/io:gpio_pin",
+        "//firmware/boards/frankie_stm32h7/io:network_logger",
+        "//firmware/boards/frankie_stm32h7/io:pwm_pin",
+        "//firmware/boards/frankie_stm32h7/io:uart_logger",
+        "//firmware/boards/frankie_stm32h7/io:ublox_odinw262_communicator",
     ],
 )
 
 cc_library(
-    name = "frankie_v1_main_lib",
+    name = "frankie_stm32h7_main_lib",
     srcs = [
         "startup_stm32h743xx.s",
         "stm32h7xx_hal_msp.c",
@@ -63,8 +63,8 @@ cc_library(
         ":tim",
         ":usart",
         ":usb_otg",
-        "//firmware_new/boards/frankie_v1/io:proto_multicast_communication",
-        "//firmware_new/boards/frankie_v1/io:ublox_odinw262_communicator",
+        "//firmware/boards/frankie_stm32h7/io:proto_multicast_communication",
+        "//firmware/boards/frankie_stm32h7/io:ublox_odinw262_communicator",
         "//shared:constants",
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
