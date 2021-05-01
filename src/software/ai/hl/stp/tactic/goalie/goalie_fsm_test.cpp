@@ -5,19 +5,62 @@
 
 #include "software/test_util/test_util.h"
 
-//TEST(GoalieFSMTest, test_restrain_goalie_in_rectangle)
-//{
-//    Field field               = Field::createSSLDivisionBField();
-//    std::optional<Point> goalie_pos_outside_defense_area = GoalieFSM::restrainGoalieInRectangle(field, Point(0,0), field.friendlyDefenseArea());
-//    ASSERT_TRUE(goalie_pos_outside_defense_area);
-//    EXPECT_TRUE(contains(field.friendlyDefenseArea(), goalie_pos_outside_defense_area.value()));
-//
-//    std::optional<Point> goalie_pos_in_friendly_defense_area =
-//            GoalieFSM::restrainGoalieInRectangle(field, Point(-4, 0), field.friendlyDefenseArea());
-//    ASSERT_TRUE(goalie_pos_in_friendly_defense_area);
-//    EXPECT_TRUE(contains(field.friendlyDefenseArea(), goalie_pos_in_friendly_defense_area.value()));
-//
-//}
+TEST(GoalieFSMTest, test_get_goalie_position_to_block)
+{
+    Field field = Field::createSSLDivisionBField();
+    std::shared_ptr<GoalieTacticConfig> goalie_tactic_config = std::make_shared<GoalieTacticConfig>();
+
+    // ball at center field, goalie should position itself at the front of the friendly defense area
+    Ball ball = Ball(Point(0,0), Vector(0,0), Timestamp::fromSeconds(123));
+    Point goalie_pos = GoalieFSM::getGoaliePositionToBlock(ball, field, goalie_tactic_config);
+    EXPECT_TRUE(contains(field.friendlyDefenseArea(), goalie_pos));
+    EXPECT_EQ(Point(field.friendlyDefenseArea().xMax(), 0), goalie_pos);
+
+    // ball at positive friendly corner, goalie should snap to positive goal post
+    ball.updateState(BallState(field.friendlyCornerPos(),
+            Vector(0,0)), Timestamp::fromSeconds(123));
+    Point goalie_pos_corner_positive = GoalieFSM::getGoaliePositionToBlock(ball, field, goalie_tactic_config);
+    EXPECT_TRUE(contains(field.friendlyDefenseArea(), goalie_pos_corner_positive));
+    EXPECT_EQ(field.friendlyGoalpostPos() + Vector(0, -ROBOT_MAX_RADIUS_METERS), goalie_pos_corner_positive);
+
+    // ball at negative friendly corner, goalie should snap to negative goal post
+    ball.updateState(BallState(field.friendlyGoalpostNeg(),
+                               Vector(0,0)), Timestamp::fromSeconds(123));
+    Point goalie_pos_corner_negative = GoalieFSM::getGoaliePositionToBlock(ball, field, goalie_tactic_config);
+    EXPECT_TRUE(contains(field.friendlyDefenseArea(), goalie_pos_corner_negative));
+    EXPECT_EQ(field.friendlyGoalpostNeg() + Vector(0, ROBOT_MAX_RADIUS_METERS), goalie_pos_corner_negative);
+
+    // ball in friendly defense area
+    ball.updateState(BallState(Point(-4, 0),
+            Vector(0,0)), Timestamp::fromSeconds(123));
+    EXPECT_TRUE(contains(field.friendlyDefenseArea(), GoalieFSM::getGoaliePositionToBlock(ball, field, goalie_tactic_config)));
+
+    // ball on positive-y side of field
+    ball.updateState(BallState(Point(-4, 2),
+                               Vector(0,0)), Timestamp::fromSeconds(123));
+    EXPECT_TRUE(contains(field.friendlyDefenseArea(), GoalieFSM::getGoaliePositionToBlock(ball, field, goalie_tactic_config)));
+
+    // ball on negative-y side of field
+    ball.updateState(BallState(Point(-4, -2),
+                               Vector(0,0)), Timestamp::fromSeconds(123));
+    EXPECT_TRUE(contains(field.friendlyDefenseArea(), GoalieFSM::getGoaliePositionToBlock(ball, field, goalie_tactic_config)));
+}
+
+TEST(GoalieFSMTest, test_get_intersections_between_ball_velocity_and_full_goal_segment)
+{
+    Field field = Field::createSSLDivisionBField();
+
+    // ball has intersection with friendly goal
+    Ball ball = Ball(Point(0,0), Vector(-1,0), Timestamp::fromSeconds(123));
+    std::vector<Point> intersections = GoalieFSM::getIntersectionsBetweenBallVelocityAndFullGoalSegment(ball, field);
+    EXPECT_TRUE(contains(field.friendlyGoal(), intersections[0]));
+    EXPECT_EQ(field.friendlyGoalCenter(), intersections[0]);
+
+    // ball has no intersection with friendly goal
+    ball.updateState(BallState(Point(0,0), Vector(1,0)), Timestamp::fromSeconds(123));
+    intersections = GoalieFSM::getIntersectionsBetweenBallVelocityAndFullGoalSegment(ball, field);
+    EXPECT_TRUE(intersections.empty());
+}
 
 TEST(GoalieFSMTest, test_transitions)
 {
