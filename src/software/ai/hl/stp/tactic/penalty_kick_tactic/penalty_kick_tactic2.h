@@ -74,6 +74,6 @@ class PenaltyKickTactic : public Tactic
     // Tactic parameters
     Ball ball;
     std::optional<Robot> enemy_goalie;
-    HFSM<PenaltyKickTacticFSM> fsm;
+    FSM<PenaltyKickTacticFSM> fsm;
     PenaltyKickTacticFSM::ControlParams control_params;
 };

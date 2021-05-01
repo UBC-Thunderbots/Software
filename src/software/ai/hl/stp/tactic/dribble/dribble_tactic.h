@@ -31,8 +31,7 @@ class DribbleTactic : public Tactic
      */
     void updateControlParams(std::optional<Point> dribble_destination,
                              std::optional<Angle> final_dribble_orientation,
-                             bool allow_excessive_dribbling = false,
-                             bool allow_orientation_changes_while_moving = false);
+                             bool allow_excessive_dribbling = false);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

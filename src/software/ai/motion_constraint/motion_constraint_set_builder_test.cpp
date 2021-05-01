@@ -42,7 +42,7 @@ namespace
                 std::set<MotionConstraint>({MotionConstraint::CENTER_CIRCLE,
                                             MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new PenaltyKickTactic(world.ball(), world.field(), std::nullopt, true),
+                new PenaltyKickTactic(world.ball(), true, std::nullopt),
                 std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL,
                                             MotionConstraint::ENEMY_DEFENSE_AREA,
                                             MotionConstraint::ENEMY_HALF})),

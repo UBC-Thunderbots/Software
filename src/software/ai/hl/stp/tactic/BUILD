@@ -261,12 +261,7 @@ cc_library(
         ":defense_shadow_enemy_tactic",
         ":goalie_tactic",
         ":kickoff_chip_tactic",
-<<<<<<< HEAD
-        ":passer_tactic",
         "//software/ai/hl/stp/tactic/penalty_kick_tactic:penalty_kick_tactic2",
-=======
-        ":penalty_kick_tactic",
->>>>>>> b5062d4d06f6406cb2de951a453739a10d3b1c12
         ":penalty_setup_tactic",
         ":receiver_tactic",
         ":shadow_enemy_tactic",

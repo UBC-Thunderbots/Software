@@ -18,9 +18,8 @@ class PenaltyKickTactic : public Tactic
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit PenaltyKickTactic(const Ball &ball, const Field &field,
-                               const std::optional<Robot> &enemy_goalie,
-                               bool loop_forever);
+    explicit PenaltyKickTactic(const Ball& ball, bool loop_forever,
+                                const std::optional<Robot> &enemy_goalie);
 
     PenaltyKickTactic() = delete;
 

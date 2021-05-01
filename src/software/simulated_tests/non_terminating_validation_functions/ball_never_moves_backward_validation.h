@@ -14,3 +14,5 @@
  */
 void ballNeverMovesBackward(std::shared_ptr<World> world_ptr,
                             ValidationCoroutine::push_type& yield);
+
+static constexpr double TOLERANCE = 0.01;
