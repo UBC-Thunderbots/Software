@@ -94,12 +94,16 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
 
         MaxAllowedSpeedMode stop_mode = MaxAllowedSpeedMode::STOP_COMMAND;
 
+        goalie_tactic->updateControlParams(stop_mode);
+
         move_tactics.at(0)->updateControlParams(
             goal_defense_point_left,
-            (world.ball().position() - goal_defense_point_left).orientation(), 0, stop_mode);
+            (world.ball().position() - goal_defense_point_left).orientation(), 0,
+            stop_mode);
         move_tactics.at(1)->updateControlParams(
             goal_defense_point_right,
-            (world.ball().position() - goal_defense_point_right).orientation(), 0, stop_mode);
+            (world.ball().position() - goal_defense_point_right).orientation(), 0,
+            stop_mode);
 
         // ball_defense_point_center is a point on the circle around the ball that the
         // line from the center of the goal to the ball intersects. A robot will be placed
@@ -118,13 +122,16 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
 
         move_tactics.at(2)->updateControlParams(
             ball_defense_point_center,
-            (world.ball().position() - ball_defense_point_center).orientation(), 0, stop_mode);
+            (world.ball().position() - ball_defense_point_center).orientation(), 0,
+            stop_mode);
         move_tactics.at(3)->updateControlParams(
             ball_defense_point_left,
-            (world.ball().position() - ball_defense_point_left).orientation(), 0, stop_mode);
+            (world.ball().position() - ball_defense_point_left).orientation(), 0,
+            stop_mode);
         move_tactics.at(4)->updateControlParams(
             ball_defense_point_right,
-            (world.ball().position() - ball_defense_point_right).orientation(), 0, stop_mode);
+            (world.ball().position() - ball_defense_point_right).orientation(), 0,
+            stop_mode);
 
         // insert all the move tactics to the result
         result[0].insert(result[0].end(), move_tactics.begin(), move_tactics.end());

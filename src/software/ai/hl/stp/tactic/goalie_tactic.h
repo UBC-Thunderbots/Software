@@ -5,6 +5,7 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
+#include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
@@ -52,6 +53,14 @@ class GoalieTactic : public Tactic
                                                    Rectangle goalie_restricted_area);
 
     void updateWorldParams(const World &world) override;
+
+    /**
+     * Updates the params assuming that the dribbler and chicker and while avoiding the
+     * ball
+     *
+     * @param max_allowed_speed_mode The mode of maximum speed allowed
+     */
+    void updateControlParams(MaxAllowedSpeedMode max_allowed_speed_mode);
 
     double calculateRobotCost(const Robot &robot, const World &world) const override;
 
@@ -113,4 +122,9 @@ class GoalieTactic : public Tactic
     Team friendly_team;
     Team enemy_team;
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
+
+
+    FSM<MoveFSM> fsm;
+
+    MoveFSM::ControlParams control_params;
 };

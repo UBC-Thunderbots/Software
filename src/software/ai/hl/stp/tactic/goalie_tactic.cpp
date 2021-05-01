@@ -19,7 +19,8 @@ GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
       field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
-      goalie_tactic_config(goalie_tactic_config)
+      goalie_tactic_config(goalie_tactic_config),
+      fsm()
 {
 }
 
@@ -108,6 +109,17 @@ void GoalieTactic::updateWorldParams(const World &world)
     this->friendly_team = world.friendlyTeam();
     this->enemy_team    = world.enemyTeam();
 }
+
+void GoalieTactic::updateControlParams(MaxAllowedSpeedMode max_allowed_speed_mode)
+{
+    // Update the control parameters stored by this Tactic
+    control_params.dribbler_mode          = DribblerMode::OFF;
+    control_params.ball_collision_type    = BallCollisionType::AVOID;
+    control_params.auto_chip_or_kick      = {AutoChipOrKickMode::OFF, 0};
+    control_params.max_allowed_speed_mode = max_allowed_speed_mode;
+    control_params.target_spin_rev_per_s  = 0.0;
+}
+
 
 bool GoalieTactic::isGoalieTactic() const
 {
