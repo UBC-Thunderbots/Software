@@ -153,7 +153,7 @@ TEST_F(SimulatedGoalieTacticTest, test_slow_ball_at_sharp_angle_to_friendly_goal
             Duration::fromSeconds(10));
 }
 
-TEST_P(SimulatedGoalieTacticTest, goalie_dribble_or_chip_test)
+TEST_P(SimulatedGoalieTacticTest, goalie_test)
 {
     BallState ball_state         = std::get<0>(GetParam());
     RobotStateWithId robot_state = std::get<1>(GetParam());
