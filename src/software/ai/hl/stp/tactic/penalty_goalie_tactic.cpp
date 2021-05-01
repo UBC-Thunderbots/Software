@@ -11,6 +11,7 @@
 #include "software/geom/point.h"
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 
 PenaltyGoalieTactic::PenaltyGoalieTactic(const Ball &ball, const Field &field,
                            const Team &friendly_team, const Team &enemy_team,
@@ -24,7 +25,7 @@ PenaltyGoalieTactic::PenaltyGoalieTactic(const Ball &ball, const Field &field,
 {
 }
 
-Point PenaltyGoalieTactic::restrainPenaltyGoalieInGoalLine(Point goalie_desired_position)
+std::<optional>Point PenaltyGoalieTactic::restrainPenaltyGoalieInGoalLine(Point goalie_desired_position)
 {
     double upper_y_goal_line = field.friendlyGoalCenter().y() + field.goalYLength() / 2;
     double lower_y_goal_line = field.friendlyGoalCenter().y() - field.goalYLength() / 2;
@@ -44,25 +45,13 @@ Point PenaltyGoalieTactic::restrainPenaltyGoalieInGoalLine(Point goalie_desired_
         Line first = Line(goalie_desired_position, field.friendlyGoalCenter());
         Line second = Line(upper_point_goal_line, lower_point_goal_line);
 
-        // calculate intersection
-        double a1          = first.getCoeffs().a;
-        double b1          = first.getCoeffs().b;
-        double c1          = first.getCoeffs().c;
-        double a2          = second.getCoeffs().a;
-        double b2          = second.getCoeffs().b;
-        double c2          = second.getCoeffs().c;
-        double determinant = (a1 * b2) - (a2 * b1);
-
-        double x = ((b1 * c2) - (b2 * c1)) / determinant;
-        double y = ((a2 * c1) - (a1 * c2)) / determinant;
-
-        Point point_on_line = Point(x, y);
+        std::optional<Point> point_on_line = intersection(first, second);
 
         // set to nearest endpoint of goal line if point not on goal line
         if (y > upper_y_goal_line) {
-            point_on_line.set(x, upper_y_goal_line);
+            point_on_line->set(x, upper_y_goal_line);
         } else if (y < lower_y_goal_line) {
-            point_on_line.set(x, lower_y_goal_line);
+            point_on_line->set(x, lower_y_goal_line);
         }
 
         return point_on_line;
@@ -91,7 +80,7 @@ double PenaltyGoalieTactic::calculateRobotCost(const Robot &robot, const World &
 
 void PenaltyGoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    auto autochip_move_action = std::make_shared<AutochipMoveAction>(true);
+    auto autochip_move_action = std::make_shared<autochip_move_action>(true);
     auto chip_action          = std::make_shared<ChipAction>();
     auto stop_action          = std::make_shared<StopAction>(false);
 

@@ -18,14 +18,13 @@ class SimulatedPenaltyGoalieTacticTest : public SimulatedTacticTestFixture
 
 TEST_F(SimulatedPenaltyGoalieTacticTest, test_initial_position_on_goal_line) {
     // set ball on mid-line, 6 metres away from our goal
-    setBallState(BallState(Point(field().friendlyGoalCenter().x() + 6, 0),Vector(0, 0)));
-    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
-    Point intial = Point(0, 0);
+    setBallState(BallState(Point(field().friendlyGoalCenter().x() + 6, 0),Vector(-2, 0)));
+    Point initial = Point(0, 0);
     Point position = Point(field().friendlyGoalCenter().x(), 0);
 
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({intial}));
+    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({initial}));
 
-    auto tactic = std::make_shared<PenaltyGoalieTactic>(Ball(), field(), );
+    //auto tactic = std::make_shared<PenaltyGoalieTactic>(Ball(), field(), );
 
     setTactic(tactic);
     setRobotId(1);
