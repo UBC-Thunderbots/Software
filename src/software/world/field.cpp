@@ -1,6 +1,6 @@
-#include "shared/constants.h"
 #include "software/world/field.h"
 
+#include "shared/constants.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 

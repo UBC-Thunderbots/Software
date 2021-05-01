@@ -34,7 +34,8 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     bool enemy_team_can_pass =
         play_config->getEnemyCapabilityConfig()->getEnemyTeamCanPass()->value();
 
-    auto goalie_tactic = std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig());
+    auto goalie_tactic =
+        std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig());
 
     auto shoot_goal_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),

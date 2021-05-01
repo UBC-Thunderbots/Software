@@ -24,7 +24,8 @@ class SimulatedGoalieTacticTest : public SimulatedTacticTestFixture
         while (world_ptr->getMostRecentTimestamp() <
                initial_time + Duration::fromSeconds(seconds_to_wait))
         {
-            yield("Waiting " + std::to_string(seconds_to_wait) + " seconds to check that the enemy team did not score");
+            yield("Waiting " + std::to_string(seconds_to_wait) +
+                  " seconds to check that the enemy team did not score");
         }
     }
     void SetUp() override
@@ -107,19 +108,21 @@ TEST_F(SimulatedGoalieTacticTest, test_slow_ball_in_friendly_defense_area)
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
         std::make_shared<const GoalieTacticConfig>();
-    auto tactic       = std::make_shared<GoalieTactic>(goalie_tactic_config);
+    auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
     setTactic(tactic);
     setRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
-                                    ValidationCoroutine::push_type& yield) {
+                       ValidationCoroutine::push_type& yield) {
             robotReceivedBall(0, world_ptr, yield);
             while (!tactic->done())
             {
                 yield("Tactic not done");
             }
-            Angle clear_angle = (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter()).orientation();
+            Angle clear_angle =
+                (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
+                    .orientation();
             ballKicked(clear_angle, world_ptr, yield);
             checkGoalieSuccess(1, world_ptr, yield);
         }};
@@ -141,19 +144,21 @@ TEST_F(SimulatedGoalieTacticTest, test_stationary_ball_in_friendly_defense_area)
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
         std::make_shared<const GoalieTacticConfig>();
-    auto tactic       = std::make_shared<GoalieTactic>(goalie_tactic_config);
+    auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
     setTactic(tactic);
     setRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
-                                    ValidationCoroutine::push_type& yield) {
+                       ValidationCoroutine::push_type& yield) {
             robotReceivedBall(0, world_ptr, yield);
             while (!tactic->done())
             {
                 yield("Tactic not done");
             }
-            Angle clear_angle = (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter()).orientation();
+            Angle clear_angle =
+                (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
+                    .orientation();
             ballKicked(clear_angle, world_ptr, yield);
             checkGoalieSuccess(1, world_ptr, yield);
         }};
@@ -175,19 +180,21 @@ TEST_F(SimulatedGoalieTacticTest, test_stationary_ball_inside_no_chip_rectangle)
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
         std::make_shared<const GoalieTacticConfig>();
-    auto tactic        = std::make_shared<GoalieTactic>(goalie_tactic_config);
+    auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
     setTactic(tactic);
     setRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
-                                    ValidationCoroutine::push_type& yield) {
+                       ValidationCoroutine::push_type& yield) {
             robotReceivedBall(0, world_ptr, yield);
             while (!tactic->done())
             {
                 yield("Tactic not done");
             }
-            Angle clear_angle = (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter()).orientation();
+            Angle clear_angle =
+                (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
+                    .orientation();
             ballKicked(clear_angle, world_ptr, yield);
             checkGoalieSuccess(1, world_ptr, yield);
         }};
@@ -222,9 +229,10 @@ TEST_F(SimulatedGoalieTacticTest, test_fast_ball_inside_no_chip_rectangle)
             {
                 yield("Tactic not done");
             }
-            Angle clear_angle = (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter()).orientation();
-            ballKicked(clear_angle,
-                       world_ptr, yield);
+            Angle clear_angle =
+                (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
+                    .orientation();
+            ballKicked(clear_angle, world_ptr, yield);
             checkGoalieSuccess(1, world_ptr, yield);
         }};
 
@@ -245,7 +253,7 @@ TEST_F(SimulatedGoalieTacticTest, test_slow_ball_inside_no_chip_rectangle)
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
         std::make_shared<const GoalieTacticConfig>();
-    auto tactic       = std::make_shared<GoalieTactic>(goalie_tactic_config);
+    auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
     setTactic(tactic);
     setRobotId(0);
 
@@ -257,9 +265,10 @@ TEST_F(SimulatedGoalieTacticTest, test_slow_ball_inside_no_chip_rectangle)
             {
                 yield("Tactic not done");
             }
-            Angle clear_angle = (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter()).orientation();
-            ballKicked(clear_angle,
-                       world_ptr, yield);
+            Angle clear_angle =
+                (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
+                    .orientation();
+            ballKicked(clear_angle, world_ptr, yield);
             checkGoalieSuccess(1, world_ptr, yield);
         }};
 
@@ -285,8 +294,7 @@ TEST_F(SimulatedGoalieTacticTest, test_ball_very_fast_misses_net)
     setRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [this](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
+        [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             checkGoalieSuccess(5, world_ptr, yield);
         }};
 
@@ -312,8 +320,7 @@ TEST_F(SimulatedGoalieTacticTest, test_slow_ball_at_sharp_angle_to_friendly_goal
     setRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [this](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
+        [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             checkGoalieSuccess(5, world_ptr, yield);
         }};
 

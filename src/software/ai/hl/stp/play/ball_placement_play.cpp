@@ -47,7 +47,8 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
         move_tactics.at(i)->updateControlParams(waiting_destination, Angle::zero(), 0.0);
     }
 
-    auto goalie_tactic = std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig());
+    auto goalie_tactic =
+        std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig());
 
     do
     {

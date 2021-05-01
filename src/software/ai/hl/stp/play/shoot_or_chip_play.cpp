@@ -47,7 +47,8 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
      *   robot, it will chip to right in front of the robot in the largest open free area
      */
 
-    auto goalie_tactic = std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig());
+    auto goalie_tactic =
+        std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig());
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
