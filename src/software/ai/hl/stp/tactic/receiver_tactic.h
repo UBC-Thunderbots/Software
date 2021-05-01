@@ -80,11 +80,6 @@ class ReceiverTactic : public Tactic
 
     void accept(TacticVisitor& visitor) const override;
 
-    Ball getBall() const;
-    Field getField() const;
-    Team getEnemyTeam() const;
-    Team getFriendlyTeam() const;
-
    private:
     // The minimum proportion of open net we're shooting on vs the entire size of the net
     // that we require before attempting a shot
