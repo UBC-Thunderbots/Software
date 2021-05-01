@@ -264,13 +264,6 @@ class Field
     Rectangle enemyGoal() const;
 
     /**
-     * Gets the area within the friendly goalie's no-chip rectangle
-     *
-     * @return the area within the friendly goalie's no-chip rectangle
-     */
-     Rectangle noChipRectangle() const;
-
-    /**
      * Gets the position of the friendly team's penalty mark.
      *
      * @return the position of the penalty mark for the friendly team.

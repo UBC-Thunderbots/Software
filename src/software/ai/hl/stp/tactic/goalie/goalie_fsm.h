@@ -32,95 +32,6 @@ struct GoalieFSM
     // TODO (#1878): Replace this with a more intelligent chip distance system
     static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
-    /*
-     * Restrains the goalie to a rectangle, with the preferred point being the one
-     * that intersects the point the goalie wants to move to and the center of the
-     * goal
-     *
-     * @param field the field to restrain the goalie on
-     * @param goalie_desired_position The point the goalie would like to go to
-     * @param goalie_restricted_area The rectangle that the goalie is to stay in
-     * @return goalie_suggested_position That the goalie should go to
-     */
-    static std::optional<Point> restrainGoalieInRectangle(
-        const Field &field, Point goalie_desired_position,
-        Rectangle goalie_restricted_area)
-    {
-        //           NW    pos_side   NE
-        //            +---------------+
-        //            |               |
-        //            |               |
-        //            |               |
-        //       +----+               |
-        //       |    |               |
-        //       |    |               |
-        // goal  |    |               | width
-        //       |    |               |
-        //       |    |               |
-        //       |    |               |
-        //       +----+               |
-        //            |               |
-        //            |               |
-        //            |               |
-        //           ++---------------+
-        //           SW    neg_side   SE
-        //
-        // Given the goalies desired position and the restricted area,
-        // first find the 3 intersections with each side of the restricted area
-        // (width, pos_side, neg_side) and the line from the desired position to the
-        // center of the friendly goal
-        auto width_x_goal =
-            intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
-                         Line(goalie_restricted_area.posXPosYCorner(),
-                              goalie_restricted_area.posXNegYCorner()));
-        auto pos_side_x_goal =
-            intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
-                         Line(goalie_restricted_area.posXPosYCorner(),
-                              goalie_restricted_area.negXPosYCorner()));
-        auto neg_side_x_goal =
-            intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
-                         Line(goalie_restricted_area.posXNegYCorner(),
-                              goalie_restricted_area.negXNegYCorner()));
-
-        // if the goalie restricted area already contains the point, then we are
-        // safe to move there.
-        if (contains(goalie_restricted_area, goalie_desired_position))
-        {
-            return std::make_optional<Point>(goalie_desired_position);
-        }
-        // Due to the nature of the line intersection, its important to make sure the
-        // corners are included, if the goalies desired position intersects with width
-        // (see above), use those positions The last comparison is for the edge case when
-        // the ball is behind the net
-        else if (width_x_goal &&
-                 width_x_goal->y() <= goalie_restricted_area.posXPosYCorner().y() &&
-                 width_x_goal->y() >= goalie_restricted_area.posXNegYCorner().y() &&
-                 field.friendlyGoalCenter().x() <= goalie_desired_position.x())
-        {
-            return std::make_optional<Point>(*width_x_goal);
-        }
-
-        // if either two sides of the goal are intercepted, then use those positions
-        else if (pos_side_x_goal &&
-                 pos_side_x_goal->x() <= goalie_restricted_area.posXPosYCorner().x() &&
-                 pos_side_x_goal->x() >= goalie_restricted_area.negXPosYCorner().x())
-        {
-            return std::make_optional<Point>(*pos_side_x_goal);
-        }
-        else if (neg_side_x_goal &&
-                 neg_side_x_goal->x() <= goalie_restricted_area.posXNegYCorner().x() &&
-                 neg_side_x_goal->x() >= goalie_restricted_area.negXNegYCorner().x())
-        {
-            return std::make_optional<Point>(*neg_side_x_goal);
-        }
-
-        // if there are no intersections (ex. ball behind net), then we are out of luck
-        else
-        {
-            return std::nullopt;
-        }
-    }
-
     /**
      * Gets the position for the goalie to move to, to best position itself between the
      * ball and the friendly goal
@@ -197,6 +108,18 @@ struct GoalieFSM
         return intersection(ball_ray, full_goal_segment);
     }
 
+    /**
+     * Gets the area within the friendly goalie's no-chip rectangle
+     *
+     * @return the area within the friendly goalie's no-chip rectangle
+     */
+    static Rectangle getNoChipRectangle(const Field &field)
+    {
+        return Rectangle(
+                field.friendlyGoalpostNeg(),
+                field.friendlyGoalpostPos() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0));
+    }
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -243,7 +166,7 @@ struct GoalieFSM
             // if the ball is in the "no-chip rectangle" we do not chip the ball
             // as we risk bumping the ball into our own net trying to move behind
             // the ball
-            auto no_chip_rectangle = event.common.world.field().noChipRectangle();
+            auto no_chip_rectangle = getNoChipRectangle(event.common.world.field());
 
             return event.common.world.ball().velocity().length() <= ball_speed_panic &&
                    event.common.world.field().pointInFriendlyDefenseArea(
@@ -269,7 +192,7 @@ struct GoalieFSM
             // if the ball is in the "no-chip rectangle" we do not chip the ball
             // as we risk bumping the ball into our own net trying to move behind
             // the ball
-            auto no_chip_rectangle = event.common.world.field().noChipRectangle();
+            auto no_chip_rectangle = getNoChipRectangle(event.common.world.field());
 
             return (event.common.world.ball().velocity().length() <= ball_speed_panic ||
                     intersections.empty()) &&
@@ -348,7 +271,7 @@ struct GoalieFSM
         const auto update_dribble = [](auto event,
                                        back::process<DribbleFSM::Update> processEvent) {
 
-            double clear_origin_x = event.common.world.field().noChipRectangle().xMax() + ROBOT_MAX_RADIUS_METERS;
+            double clear_origin_x = getNoChipRectangle(event.common.world.field()).xMax() + ROBOT_MAX_RADIUS_METERS;
             Point clear_origin = Point(clear_origin_x, event.common.world.ball().position().y());
 
             Angle clear_direction =
@@ -400,5 +323,95 @@ struct GoalieFSM
             chip_s + update_e[should_panic] / update_panic = panic_s,
             chip_s + update_e / update_chip, chip_s = X,
             X + update_e / update_position_to_block = position_to_block_s);
+    }
+
+   private:
+    /*
+     * Restrains the goalie to a rectangle, with the preferred point being the one
+     * that intersects the point the goalie wants to move to and the center of the
+     * goal
+     *
+     * @param field the field to restrain the goalie on
+     * @param goalie_desired_position The point the goalie would like to go to
+     * @param goalie_restricted_area The rectangle that the goalie is to stay in
+     * @return goalie_suggested_position That the goalie should go to
+     */
+    static std::optional<Point> restrainGoalieInRectangle(
+            const Field &field, Point goalie_desired_position,
+            Rectangle goalie_restricted_area)
+    {
+        //           NW    pos_side   NE
+        //            +---------------+
+        //            |               |
+        //            |               |
+        //            |               |
+        //       +----+               |
+        //       |    |               |
+        //       |    |               |
+        // goal  |    |               | width
+        //       |    |               |
+        //       |    |               |
+        //       |    |               |
+        //       +----+               |
+        //            |               |
+        //            |               |
+        //            |               |
+        //           ++---------------+
+        //           SW    neg_side   SE
+        //
+        // Given the goalies desired position and the restricted area,
+        // first find the 3 intersections with each side of the restricted area
+        // (width, pos_side, neg_side) and the line from the desired position to the
+        // center of the friendly goal
+        auto width_x_goal =
+                intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
+                             Line(goalie_restricted_area.posXPosYCorner(),
+                                  goalie_restricted_area.posXNegYCorner()));
+        auto pos_side_x_goal =
+                intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
+                             Line(goalie_restricted_area.posXPosYCorner(),
+                                  goalie_restricted_area.negXPosYCorner()));
+        auto neg_side_x_goal =
+                intersection(Line(goalie_desired_position, field.friendlyGoalCenter()),
+                             Line(goalie_restricted_area.posXNegYCorner(),
+                                  goalie_restricted_area.negXNegYCorner()));
+
+        // if the goalie restricted area already contains the point, then we are
+        // safe to move there.
+        if (contains(goalie_restricted_area, goalie_desired_position))
+        {
+            return std::make_optional<Point>(goalie_desired_position);
+        }
+            // Due to the nature of the line intersection, its important to make sure the
+            // corners are included, if the goalies desired position intersects with width
+            // (see above), use those positions The last comparison is for the edge case when
+            // the ball is behind the net
+        else if (width_x_goal &&
+                 width_x_goal->y() <= goalie_restricted_area.posXPosYCorner().y() &&
+                 width_x_goal->y() >= goalie_restricted_area.posXNegYCorner().y() &&
+                 field.friendlyGoalCenter().x() <= goalie_desired_position.x())
+        {
+            return std::make_optional<Point>(*width_x_goal);
+        }
+
+            // if either two sides of the goal are intercepted, then use those positions
+        else if (pos_side_x_goal &&
+                 pos_side_x_goal->x() <= goalie_restricted_area.posXPosYCorner().x() &&
+                 pos_side_x_goal->x() >= goalie_restricted_area.negXPosYCorner().x())
+        {
+            return std::make_optional<Point>(*pos_side_x_goal);
+        }
+        else if (neg_side_x_goal &&
+                 neg_side_x_goal->x() <= goalie_restricted_area.posXNegYCorner().x() &&
+                 neg_side_x_goal->x() >= goalie_restricted_area.negXNegYCorner().x())
+        {
+            return std::make_optional<Point>(*neg_side_x_goal);
+        }
+
+            // if there are no intersections (ex. ball behind net), then we are out of luck
+        else
+        {
+            return std::nullopt;
+        }
     }
 };

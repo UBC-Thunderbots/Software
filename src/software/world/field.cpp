@@ -184,13 +184,6 @@ Rectangle Field::enemyGoal() const
     return Rectangle(enemy_goal_top_left, enemy_goal_bottom_right);
 }
 
-Rectangle Field::noChipRectangle() const
-{
-    return Rectangle(
-            friendlyGoalpostNeg(),
-            friendlyGoalpostPos() + Vector(2 * ROBOT_MAX_RADIUS_METERS, 0));
-}
-
 Point Field::friendlyPenaltyMark() const
 {
     return Point(enemyGoalCenter().x() - goal_centre_to_penalty_mark_,

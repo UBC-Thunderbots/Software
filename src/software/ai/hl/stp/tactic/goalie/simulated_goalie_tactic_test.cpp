@@ -37,7 +37,7 @@ class SimulatedGoalieTacticTest : public SimulatedTacticTestFixture
     }
 };
 
-TEST_F(SimulatedGoalieTacticTest, DISABLED_test_panic_ball_very_fast_in_straight_line)
+TEST_F(SimulatedGoalieTacticTest, test_panic_ball_very_fast_in_straight_line)
 {
     setBallState(BallState(Point(0, 0), Vector(-3, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({Point(-4, -1)}));
@@ -68,7 +68,7 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_panic_ball_very_fast_in_straight
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedGoalieTacticTest, DISABLED_test_panic_ball_very_fast_in_diagonal_line)
+TEST_F(SimulatedGoalieTacticTest, test_panic_ball_very_fast_in_diagonal_line)
 {
     setBallState(BallState(Point(0, 0), Vector(-4.5, 0.25)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
@@ -100,7 +100,7 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_panic_ball_very_fast_in_diagonal
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedGoalieTacticTest, DISABLED_test_slow_ball_in_friendly_defense_area)
+TEST_F(SimulatedGoalieTacticTest, test_slow_ball_in_friendly_defense_area)
 {
     setBallState(BallState(Point(-4, 0.8), Vector(-0.2, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({Point(-4, 0)}));
@@ -133,7 +133,7 @@ TEST_F(SimulatedGoalieTacticTest, DISABLED_test_slow_ball_in_friendly_defense_ar
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedGoalieTacticTest, DISABLED_test_stationary_ball_in_friendly_defense_area)
+TEST_F(SimulatedGoalieTacticTest, test_stationary_ball_in_friendly_defense_area)
 {
     setBallState(BallState(Point(-4, 0), Vector(0, 0)));
     addFriendlyRobots(
@@ -237,7 +237,7 @@ TEST_F(SimulatedGoalieTacticTest, test_fast_ball_inside_no_chip_rectangle)
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedGoalieTacticTest, DISABLED_test_slow_ball_inside_no_chip_rectangle)
+TEST_F(SimulatedGoalieTacticTest, test_slow_ball_inside_no_chip_rectangle)
 {
     setBallState(
         BallState(field().friendlyGoalCenter() + Vector(0.1, 0), Vector(0.1, -0.1)));
