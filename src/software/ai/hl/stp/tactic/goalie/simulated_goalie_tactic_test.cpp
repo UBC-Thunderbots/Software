@@ -11,11 +11,12 @@
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
-#include "software/world/world.h"
 #include "software/world/field.h"
+#include "software/world/world.h"
 
-class SimulatedGoalieTacticTest : public SimulatedTacticTestFixture,
-        public ::testing::WithParamInterface<std::tuple<BallState, RobotStateWithId>>
+class SimulatedGoalieTacticTest
+    : public SimulatedTacticTestFixture,
+      public ::testing::WithParamInterface<std::tuple<BallState, RobotStateWithId>>
 {
    protected:
     void checkGoalieSuccess(int seconds_to_wait, std::shared_ptr<World> world_ptr,
@@ -161,59 +162,74 @@ TEST_P(SimulatedGoalieTacticTest, goalie_dribble_or_chip_test)
     addFriendlyRobots({robot_state});
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
-            std::make_shared<const GoalieTacticConfig>();
+        std::make_shared<const GoalieTacticConfig>();
     auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
     setTactic(tactic);
     setRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-            [this, tactic](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                robotReceivedBall(0, world_ptr, yield);
-                while (!tactic->done()) {
-                    yield("Tactic not done");
-                }
-                Angle clear_angle =
-                        (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
-                                .orientation();
-                ballKicked(clear_angle, world_ptr, yield);
-                checkGoalieSuccess(1, world_ptr, yield);
-            }};
+        [this, tactic](std::shared_ptr<World> world_ptr,
+                       ValidationCoroutine::push_type& yield) {
+            robotReceivedBall(0, world_ptr, yield);
+            while (!tactic->done())
+            {
+                yield("Tactic not done");
+            }
+            Angle clear_angle =
+                (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
+                    .orientation();
+            ballKicked(clear_angle, world_ptr, yield);
+            checkGoalieSuccess(1, world_ptr, yield);
+        }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-            [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                enemyNeverScores(world_ptr, yield);
-            }};
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            enemyNeverScores(world_ptr, yield);
+        }};
 
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
 
 INSTANTIATE_TEST_CASE_P(
-        BallThreats, SimulatedGoalieTacticTest,
-        ::testing::Values(
-            // Ball threat Tests
+    BallThreats, SimulatedGoalieTacticTest,
+    ::testing::Values(
+        // Ball threat Tests
 
-            // ball slow inside friendly defense area
-            std::make_tuple(BallState(Point(-4, 0.8), Vector(-0.2, 0)),
-                RobotStateWithId{0, RobotState(Point(-4, 0), Vector(0, 0),
-                        Angle::fromDegrees(0), Angle::fromDegrees(0))}),
+        // ball slow inside friendly defense area
+        std::make_tuple(BallState(Point(-4, 0.8), Vector(-0.2, 0)),
+                        RobotStateWithId{
+                            0, RobotState(Point(-4, 0), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
 
-            // ball stationary inside friendly defense area
-            std::make_tuple(BallState(Point(-4, 0), Vector(0, 0)),
-                RobotStateWithId{0, RobotState(Field::createSSLDivisionBField().friendlyGoalpostPos(), Vector(0, 0),
-                        Angle::fromDegrees(0), Angle::fromDegrees(0))}),
+        // ball stationary inside friendly defense area
+        std::make_tuple(
+            BallState(Point(-4, 0), Vector(0, 0)),
+            RobotStateWithId{
+                0,
+                RobotState(Field::createSSLDivisionBField().friendlyGoalpostPos(),
+                           Vector(0, 0), Angle::fromDegrees(0), Angle::fromDegrees(0))}),
 
-            // ball stationary inside no-chip rectangle
-            std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() + Vector(0.1, 0.1), Vector(-0.2, 0)),
-                RobotStateWithId{0, RobotState(Point(-4, -1), Vector(0, 0),
-                        Angle::fromDegrees(0), Angle::fromDegrees(0))}),
+        // ball stationary inside no-chip rectangle
+        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() +
+                                      Vector(0.1, 0.1),
+                                  Vector(-0.2, 0)),
+                        RobotStateWithId{
+                            0, RobotState(Point(-4, -1), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
 
-            // ball fast inside no-chip rectangle but no intersection with goal
-            std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() + Vector(0.09, 0), Vector(0, -0.5)),
-                RobotStateWithId{0, RobotState(Point(-3.5, 1), Vector(0, 0),
-                        Angle::fromDegrees(0), Angle::fromDegrees(0))}),
+        // ball fast inside no-chip rectangle but no intersection with goal
+        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() +
+                                      Vector(0.09, 0),
+                                  Vector(0, -0.5)),
+                        RobotStateWithId{
+                            0, RobotState(Point(-3.5, 1), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
 
-            // ball slow inside no-chip rectangle
-            std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() + Vector(0.1, 0), Vector(0.1, -0.1)),
-                RobotStateWithId{0, RobotState(Point(-3.5, 1), Vector(0, 0),
-                        Angle::fromDegrees(0), Angle::fromDegrees(0))})));
+        // ball slow inside no-chip rectangle
+        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() +
+                                      Vector(0.1, 0),
+                                  Vector(0.1, -0.1)),
+                        RobotStateWithId{0, RobotState(Point(-3.5, 1), Vector(0, 0),
+                                                       Angle::fromDegrees(0),
+                                                       Angle::fromDegrees(0))})));
