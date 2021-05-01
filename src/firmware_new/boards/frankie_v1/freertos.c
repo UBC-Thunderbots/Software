@@ -70,7 +70,7 @@ static TbotsProto_RobotStatus robot_status_msg;
 static TbotsProto_RobotLog robot_log_msg;
 static TbotsProto_Primitive primitive_msg;
 /* Definitions for I2C INA226 Power Monitor */
-static I2C_HandleTypeDef I2c1Handle;
+static I2C_HandleTypeDef I2c2Handle;
 
 /* USER CODE END Variables */
 /* Definitions for NetStartTask */
@@ -268,8 +268,8 @@ void test_msg_update(void *argument)
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,
                                                               PROTO_UPDATED);
-        float power_monitor_val = INA226_getBusV(&I2c1Handle, INA226_ADDRESS);
-        TLOG_DEBUG("Power Monitor: %f", power_monitor_val);
+        float power_monitor_val = INA226_getBusV(&I2c2Handle, INA226_ADDRESS);
+        TLOG_DEBUG("Power Monitor: %d", (int)power_monitor_val);
         // run loop at 100hz
         osDelay((unsigned int)MILLISECONDS_PER_SECOND / 10);
     }
@@ -360,20 +360,22 @@ void initIoDrivetrain(void)
 }
 
 // TODO: put this in the IO layer
-void InitI2C1(void)
+void InitI2C2(void)
 {
-    I2c1Handle.Instance             = I2C1;
-    I2c1Handle.Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
-    I2c1Handle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-    I2c1Handle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-    I2c1Handle.Init.NoStretchMode   = I2C_NOSTRETCH_DISABLE;
-    I2c1Handle.Init.OwnAddress1     = 0x00;
-    I2c1Handle.Init.Timing          = 0x80200F73;
-    if (HAL_I2C_Init(&I2c1Handle) != HAL_OK)
-
-        HAL_I2CEx_AnalogFilter_Config(&I2c1Handle, I2C_ANALOGFILTER_ENABLED);
+    I2c2Handle.Instance             = I2C2;
+    I2c2Handle.Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
+    I2c2Handle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+    I2c2Handle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+    I2c2Handle.Init.NoStretchMode   = I2C_NOSTRETCH_DISABLE;
+    I2c2Handle.Init.OwnAddress1     = 0x00;
+    I2c2Handle.Init.Timing          = 0x80200F73;
+    if (HAL_I2C_Init(&I2c2Handle) != HAL_OK)
+    {
+        HAL_I2CEx_AnalogFilter_Config(&I2c2Handle, I2C_ANALOGFILTER_ENABLED);
+    }
+    TLOG_DEBUG("Initializing INA226");
     // TODO: put this in the IO layer
-    INA226_setConfig(&I2c1Handle, INA226_ADDRESS,
+    INA226_setConfig(&I2c2Handle, INA226_ADDRESS,
                      INA226_MODE_CONT_SHUNT_AND_BUS | INA226_VBUS_140uS |
                          INA226_VBUS_140uS | INA226_AVG_1024);
 }

@@ -60,7 +60,7 @@ extern "C"
     void initIoNetworking(void);
 
     // TODO: put this in the IO layer
-    void InitI2C1(void);
+    void InitI2C2(void);
 
 /* USER CODE END EFP */
 
