@@ -172,7 +172,8 @@ void app_firmware_robot_velocity_wheels_destroy(FirmwareRobot_t* robot)
     app_velocity_wheel_destroy(front_left_wheel);
     app_velocity_wheel_destroy(front_right_wheel);
     app_velocity_wheel_destroy(back_left_wheel);
-    app_velocity_wheel_destroy(back_right_wheel) free(robot);
+    app_velocity_wheel_destroy(back_right_wheel);
+    free(robot);
 }
 
 Charger_t* app_firmware_robot_getCharger(const FirmwareRobot_t* robot)
