@@ -23,6 +23,17 @@ sh_binary(
 )
 
 sh_binary(
+    name = "flash_firmware_on_stm32h7",
+    srcs = ["flash_firmware_on_stm32h7.sh"],
+    data = [
+        "//firmware/boards/frankie_stm32h7:frankie_stm32h7_main",
+        "@arm_developer_gcc//:gdb",
+    ],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = ["@bazel_tools//tools/bash/runfiles"],
+)
+
+sh_binary(
     name = "cubemx_regen",
     srcs = ["cubemx_regen.sh"],
     deps = ["@bazel_tools//tools/bash/runfiles"],
