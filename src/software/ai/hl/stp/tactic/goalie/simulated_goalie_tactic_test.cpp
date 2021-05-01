@@ -192,10 +192,8 @@ TEST_P(SimulatedGoalieTacticTest, goalie_test)
 }
 
 INSTANTIATE_TEST_CASE_P(
-    BallThreats, SimulatedGoalieTacticTest,
+    GoalieEnvironment, SimulatedGoalieTacticTest,
     ::testing::Values(
-        // Ball threat Tests
-
         // ball slow inside friendly defense area
         std::make_tuple(BallState(Point(-4, 0.8), Vector(-0.2, 0)),
                         RobotStateWithId{
@@ -220,7 +218,7 @@ INSTANTIATE_TEST_CASE_P(
 
         // ball fast inside no-chip rectangle but no intersection with goal
         std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() +
-                                      Vector(0.09, 0),
+                                      Vector(0.1, 0),
                                   Vector(0, -0.5)),
                         RobotStateWithId{
                             0, RobotState(Point(-3.5, 1), Vector(0, 0),
