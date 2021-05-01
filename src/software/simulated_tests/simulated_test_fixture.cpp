@@ -181,8 +181,6 @@ void SimulatedTestFixture::runTest(
 
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
-        // Record starting time
-        start_tick_time = std::chrono::system_clock::now();
 
         if (!thunderbots_config->getAiControlConfig()->getRunAi()->value())
         {
@@ -191,6 +189,10 @@ void SimulatedTestFixture::runTest(
             std::this_thread::sleep_for(ms_to_sleep);
             continue;
         }
+
+        // Record starting time
+        start_tick_time = std::chrono::system_clock::now();
+
         validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);
 
         // Calculate tick durations
