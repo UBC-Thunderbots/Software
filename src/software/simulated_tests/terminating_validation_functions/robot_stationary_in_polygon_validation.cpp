@@ -3,10 +3,12 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 
-void robotStationaryInPolygon(RobotId robot_id, Polygon polygon, unsigned int num_ticks, std::shared_ptr<World> world_ptr,
+void robotStationaryInPolygon(RobotId robot_id, Polygon polygon, unsigned int num_ticks,
+                              std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield)
 {
-    auto robot_stationary_in_polygon = [robot_id, polygon](std::shared_ptr<World> world_ptr) {
+    auto robot_stationary_in_polygon = [robot_id,
+                                        polygon](std::shared_ptr<World> world_ptr) {
         std::optional<Robot> robot_optional =
             world_ptr->friendlyTeam().getRobotById(robot_id);
         if (!robot_optional.has_value())
@@ -20,11 +22,13 @@ void robotStationaryInPolygon(RobotId robot_id, Polygon polygon, unsigned int nu
         return contains(polygon, position) && velocity == 0;
     };
 
-    for (unsigned int stationary_tick_count = 0; stationary_tick_count < num_ticks; stationary_tick_count++) {
+    for (unsigned int stationary_tick_count = 0; stationary_tick_count < num_ticks;
+         stationary_tick_count++)
+    {
         while (!robot_stationary_in_polygon(world_ptr))
         {
-            // If robot is not stationary in the polygon, reset the number of consecutive ticks the robot has
-            // been stationary in the polygon
+            // If robot is not stationary in the polygon, reset the number of consecutive
+            // ticks the robot has been stationary in the polygon
             stationary_tick_count = 0;
 
             std::stringstream ss;

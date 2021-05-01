@@ -181,7 +181,6 @@ void SimulatedTestFixture::runTest(
 
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
-
         if (!thunderbots_config->getAiControlConfig()->getRunAi()->value())
         {
             auto ms_to_sleep = std::chrono::milliseconds(
