@@ -29,7 +29,8 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
       goal_x_length_(goal_x_length),
       goal_y_length_(goal_y_length),
       boundary_buffer_size_(boundary_buffer_size),
-      center_circle_radius_(center_circle_radius)
+      center_circle_radius_(center_circle_radius),
+      goal_centre_to_penalty_mark_(field_x_length_ * 2 / 3)
 {
     if (field_x_length_ <= 0 || field_y_length <= 0 || defense_x_length_ <= 0 ||
         defense_y_length_ <= 0 || goal_x_length_ <= 0 || goal_y_length_ <= 0 ||
@@ -182,14 +183,15 @@ Rectangle Field::enemyGoal() const
     return Rectangle(enemy_goal_top_left, enemy_goal_bottom_right);
 }
 
-Point Field::penaltyEnemy() const
+Point Field::friendlyPenaltyMark() const
 {
-    return Point(enemyGoalCenter().x() - defenseAreaXLength(), enemyGoalCenter().y());
+    return Point(enemyGoalCenter().x() - goal_centre_to_penalty_mark_,
+                 enemyGoalCenter().y());
 }
 
-Point Field::penaltyFriendly() const
+Point Field::enemyPenaltyMark() const
 {
-    return Point(friendlyGoalCenter().x() + defenseAreaXLength(),
+    return Point(friendlyGoalCenter().x() + goal_centre_to_penalty_mark_,
                  friendlyGoalCenter().y());
 }
 

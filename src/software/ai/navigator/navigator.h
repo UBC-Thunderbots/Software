@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/ai/intent/all_intents.h"
 #include "software/ai/intent/intent.h"
@@ -7,7 +8,6 @@
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/ai/navigator/path_manager/path_manager.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/world/world.h"
 
 /**
@@ -62,8 +62,6 @@ class Navigator : public IntentVisitor
      */
     void visit(const DirectPrimitiveIntent &intent) override;
     void visit(const MoveIntent &intent) override;
-    void visit(const AutochipMoveIntent &intent) override;
-    void visit(const AutokickMoveIntent &intent) override;
 
    private:
     /**

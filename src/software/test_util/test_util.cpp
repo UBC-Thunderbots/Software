@@ -98,7 +98,7 @@ namespace TestUtil
     }
 
     std::vector<RobotStateWithId> createStationaryRobotStatesWithId(
-        const std::vector<Point> &positions, )
+        const std::vector<Point> &positions )
     {
         std::vector<RobotStateWithId> states;
         for (RobotId id = 0; id < static_cast<RobotId>(positions.size()); id++)
@@ -110,24 +110,6 @@ namespace TestUtil
         }
         return states;
     }
-
-    //ask about vector<Vector>
-    //std::vector<RobotStateWithId> createMovingRobotStatesWithId(
-    //    const std::vector<Point> &positions, const std::vector<Vector> &velocity,
-    //    const std::vector<Angle> &orientation, const std::vector<AngularVelocity> &angular_velocity))
-    //{
-    //    std::vector<RobotStateWithId> states;
-    //    for (RobotId id = 0; id < static_cast<RobotId>(positions.size()); id++)
-    //    {
-    //        states.push_back(RobotStateWithId{
-    //            .id          = id,
-    //            .robot_state = RobotState(positions[id], velocity[id], orientation[id],
-    //                                      angular_velocity[id]});
-    //    }
-    //    return states;
-    //}
-
-
 
     void handleTestRobotLog(TbotsProto_RobotLog robot_log)
     {

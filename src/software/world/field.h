@@ -264,18 +264,18 @@ class Field
     Rectangle enemyGoal() const;
 
     /**
-     * Gets the position of the penalty mark near the enemy goal.
+     * Gets the position of the friendly team's penalty mark.
      *
-     * @return the position of the penalty mark near the enemy goal
+     * @return the position of the penalty mark for the friendly team.
      */
-    Point penaltyEnemy() const;
+    Point friendlyPenaltyMark() const;
 
     /**
-     * Gets the position of the penalty mark near the friendly goal.
+     * Gets the position of the enemy team's penalty mark.
      *
-     * @return the position of the penalty mark near the friendly goal
+     * @return the position of the penalty mark for the enemy team.
      */
-    Point penaltyFriendly() const;
+    Point enemyPenaltyMark() const;
 
     /**
      * Gets the position of our corner with the positive y-axis
@@ -429,4 +429,6 @@ class Field
     double boundary_buffer_size_;
     // The radius of the center circle in metres
     double center_circle_radius_;
+    // The x-coordinate distance from the goal centre to the penalty mark
+    double goal_centre_to_penalty_mark_;
 };

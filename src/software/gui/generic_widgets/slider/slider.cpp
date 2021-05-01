@@ -41,7 +41,7 @@ std::function<void(double)> setupSliderLineEdit(
         else
         {
             // line_edit input is invalid so get value from slider
-            double value = slider->value() / slider_step_size;
+            value = slider->value() / slider_step_size;
             line_edit->setText(QString::number(value));
         }
         value_changed_callback(value);

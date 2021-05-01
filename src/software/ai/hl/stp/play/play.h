@@ -5,8 +5,8 @@
 #include <memory>
 #include <vector>
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/world/world.h"
 
 using RobotToTacticAssignmentFunction =
     std::function<std::map<std::shared_ptr<const Tactic>, Robot>(
@@ -49,8 +49,10 @@ class Play
    public:
     /**
      * Creates a new Play
+     *
+     * @param play_config The Play configuration
      */
-    explicit Play();
+    explicit Play(std::shared_ptr<const PlayConfig> play_config);
 
     /**
      * Returns whether or not this Play can be started. For example, the Enemy Team
@@ -98,6 +100,10 @@ class Play
         MotionConstraintBuildFunction motion_constraint_builder, const World& new_world);
 
     virtual ~Play() = default;
+
+   protected:
+    // The Play configuration
+    std::shared_ptr<const PlayConfig> play_config;
 
    private:
     /**

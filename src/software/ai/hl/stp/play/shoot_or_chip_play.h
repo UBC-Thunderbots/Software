@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 
 /**
@@ -9,7 +10,7 @@
 class ShootOrChipPlay : public Play
 {
    public:
-    ShootOrChipPlay();
+    ShootOrChipPlay(std::shared_ptr<const PlayConfig> config);
 
     bool isApplicable(const World &world) const override;
 
