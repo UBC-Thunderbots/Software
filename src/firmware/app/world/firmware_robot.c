@@ -347,6 +347,8 @@ void force_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
     const float dest_speed = pos_trajectory.linear_speed[trajectory_index];
 
     // plan major axis movement
+    // TODO: Should make this included on constants
+    const double ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.0;
     float max_major_a     = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
     float max_major_v     = max_speed_m_per_s;
     float major_params[3] = {dest_speed, max_major_a, max_major_v};

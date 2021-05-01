@@ -75,7 +75,6 @@ cc_library(
         "//firmware/app/control:trajectory_planner",
         "//firmware/shared:physics",
         "//firmware/shared:util",
-        "//shared:constants",
         "//shared/proto:tbots_nanopb_proto",
     ],
 )

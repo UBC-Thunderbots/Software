@@ -10,7 +10,7 @@
 #include "firmware/app/world/velocity_wheel.h"
 #include "firmware/shared/physics.h"
 #include "firmware/shared/util.h"
-#include "shared/constants.h"
+// #include "shared/constants.h"
 #include "shared/proto/primitive.nanopb.h"
 
 /**

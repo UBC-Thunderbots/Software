@@ -527,7 +527,7 @@ static void run_normal(void)
         .last_applied_acceleration_y       = 0,
         .last_applied_acceleration_angular = 0,
     };
-    FirmwareRobot_t* robot = app_firmware_wheels_robot_create(
+    FirmwareRobot_t* robot = app_firmware_robot_force_wheels_create(
         charger, chicker, dribbler, dr_get_robot_position_x, dr_get_robot_position_y,
         dr_get_robot_orientation, dr_get_robot_velocity_x, dr_get_robot_velocity_y,
         dr_get_robot_angular_velocity, adc_battery, front_right_wheel, front_left_wheel,
