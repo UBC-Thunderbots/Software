@@ -71,6 +71,7 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     host_software_packages+=(clang)
     host_software_packages+=(llvm-6.0)
     host_software_packages+=(libclang-6.0-dev)
+    host_software_packages+=(libncurses5)
     sudo apt-get -y install gcc-7 g++-7
     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
     sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
