@@ -12,7 +12,7 @@ TEST(ChipFSMTest, test_transitions)
                                           .chip_direction       = Angle::threeQuarter(),
                                           .chip_distance_meters = 1.2};
 
-    HFSM<ChipFSM> fsm;
+    FSM<ChipFSM> fsm;
     // Start in GetBehindBallFSM state's GetBehindBallState
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM>));
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<GetBehindBallFSM>)>(

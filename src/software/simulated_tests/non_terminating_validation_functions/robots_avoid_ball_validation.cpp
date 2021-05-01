@@ -1,7 +1,5 @@
 #include "software/simulated_tests/non_terminating_validation_functions/robots_avoid_ball_validation.h"
 
-#include <gtest/gtest.h>
-
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 
@@ -19,8 +17,8 @@ void robotsAvoidBall(double min_distance, std::vector<RobotId> excluded_robots,
             std::find(excluded_robots.begin(), excluded_robots.end(), robot.id()) ==
                 excluded_robots.end())
         {
-            FAIL() << "Robot " + std::to_string(robot.id()) + " is less than " +
-                          std::to_string(min_distance) + " m away from the ball!";
+            yield("Robot " + std::to_string(robot.id()) + " is less than " +
+                  std::to_string(min_distance) + " m away from the ball!");
         }
     }
 }

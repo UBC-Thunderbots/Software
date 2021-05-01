@@ -4,15 +4,12 @@
 
 #include "software/ai/hl/stp/action/kick_action.h"
 
-KickTactic::KickTactic(const Ball &ball, bool loop_forever)
-    : Tactic(loop_forever, {RobotCapability::Kick, RobotCapability::Move}), ball(ball)
+KickTactic::KickTactic(bool loop_forever)
+    : Tactic(loop_forever, {RobotCapability::Kick, RobotCapability::Move})
 {
 }
 
-void KickTactic::updateWorldParams(const World &world)
-{
-    this->ball = world.ball();
-}
+void KickTactic::updateWorldParams(const World &world) {}
 
 void KickTactic::updateControlParams(const Point &kick_origin,
                                      const Angle &kick_direction,
@@ -54,11 +51,6 @@ void KickTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 void KickTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
-}
-
-Ball KickTactic::getBall() const
-{
-    return this->ball;
 }
 
 bool KickTactic::done() const

@@ -92,15 +92,6 @@ class SimulatedTestFixture : public ::testing::Test
     void addEnemyRobots(const std::vector<RobotStateWithId>& robots);
 
     /**
-     * Sets the Referee command to override for the simulated test
-     *
-     * @param current_referee_command The name of the current referee command to set
-     * @param previous_referee_command The name of the previous referee command to set
-     */
-    void setRefereeCommand(const RefereeCommand& current_referee_command,
-                           const RefereeCommand& previous_referee_command);
-
-    /**
      * Returns the field in the simulated test
      *
      * @return the field in the simulated test
@@ -115,21 +106,14 @@ class SimulatedTestFixture : public ::testing::Test
     /**
      * Runs one tick of the test and checks if the validation function is done
      *
-     * @param terminating_validation_functions The terminating validation functions
-     * to check during the test
-     * @param non_terminating_validation_functions The non-terminating validation
-     * functions to check during the test
      * @param simulation_time_step time step for stepping the simulation
      * @param ai_time_step minimum time for one tick of AI
      * @param world the shared_ptr to the world that is updated by this function
      *
      * @return if validation functions are done
      */
-    bool tickTest(
-        const std::vector<ValidationFunction>& terminating_validation_functions,
-        const std::vector<ValidationFunction>& non_terminating_validation_functions,
-        Duration simulation_time_step, Duration ai_time_step,
-        std::shared_ptr<World> world);
+    bool tickTest(Duration simulation_time_step, Duration ai_time_step,
+                  std::shared_ptr<World> world);
 
     /**
      * A helper function that updates SensorFusion with the latest data from the Simulator

@@ -35,3 +35,17 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "simulated_chip_tactic_test",
+    srcs = ["simulated_chip_tactic_test.cpp"],
+    deps = [
+        ":chip_tactic",
+        "//software/simulated_tests:simulated_tactic_test_fixture",
+        "//software/simulated_tests:simulated_test_main",
+        "//software/simulated_tests/terminating_validation_functions",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)

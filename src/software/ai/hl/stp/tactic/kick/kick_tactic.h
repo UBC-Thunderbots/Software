@@ -20,7 +20,7 @@ class KickTactic : public Tactic
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit KickTactic(const Ball& ball, bool loop_forever);
+    explicit KickTactic(bool loop_forever);
 
     KickTactic() = delete;
 
@@ -61,17 +61,14 @@ class KickTactic : public Tactic
 
     void accept(TacticVisitor& visitor) const override;
 
-    Ball getBall() const;
-
     bool done() const override;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-    HFSM<KickFSM> fsm;
+    FSM<KickFSM> fsm;
 
     // Tactic parameters
-    Ball ball;
     KickFSM::ControlParams control_params;
 };

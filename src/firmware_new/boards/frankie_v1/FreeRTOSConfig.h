@@ -36,10 +36,10 @@
  * These definitions should be adjusted for your particular hardware and
  * application requirements.
  *
- * THESE PARAMETERS ARE DESCRIBED WITHIN THE 'CONFIGURATION' SECTION OF THE
- * FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE.
+ * These parameters and more are described within the 'configuration' section of the
+ * FreeRTOS API documentation available on the FreeRTOS.org web site.
  *
- * See http://www.freertos.org/a00110.html.
+ * See http://www.freertos.org/a00110.html
  *----------------------------------------------------------*/
 
 /* USER CODE BEGIN Includes */
@@ -52,6 +52,10 @@
 extern uint32_t SystemCoreClock;
 void xPortSysTickHandler(void);
 #endif
+#ifndef CMSIS_device_header
+#define CMSIS_device_header "stm32h7xx.h"
+#endif /* CMSIS_device_header */
+
 #define configENABLE_FPU 0
 #define configENABLE_MPU 0
 
@@ -89,6 +93,14 @@ void xPortSysTickHandler(void);
 #define configTIMER_QUEUE_LENGTH 10
 #define configTIMER_TASK_STACK_DEPTH 2048
 
+/* CMSIS-RTOS V2 flags */
+#define configUSE_OS2_THREAD_SUSPEND_RESUME 1
+#define configUSE_OS2_THREAD_ENUMERATE 1
+#define configUSE_OS2_EVENTFLAGS_FROM_ISR 1
+#define configUSE_OS2_THREAD_FLAGS 1
+#define configUSE_OS2_TIMER 1
+#define configUSE_OS2_MUTEX 1
+
 /* Set the following definitions to 1 to include the API function, or zero
 to exclude the API function. */
 #define INCLUDE_vTaskPrioritySet 1
@@ -102,6 +114,7 @@ to exclude the API function. */
 #define INCLUDE_xTimerPendFunctionCall 1
 #define INCLUDE_xQueueGetMutexHolder 1
 #define INCLUDE_uxTaskGetStackHighWaterMark 1
+#define INCLUDE_xTaskGetCurrentTaskHandle 1
 #define INCLUDE_eTaskGetState 1
 
 /*
@@ -154,11 +167,10 @@ standard names. */
 #define vPortSVCHandler SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
 
-/* IMPORTANT: This define is commented when used with STM32Cube firmware, when the
-   timebase source is SysTick, to prevent overwriting SysTick_Handler defined within
-   STM32Cube HAL */
+/* IMPORTANT: After 10.3.1 update, Systick_Handler comes from NVIC (if SYS timebase =
+ * systick), otherwise from cmsis_os2.c */
 
-/* #define xPortSysTickHandler SysTick_Handler */
+#define USE_CUSTOM_SYSTICK_HANDLER_IMPLEMENTATION 1
 
 /* USER CODE BEGIN Defines */
 /* Section where parameter definitions can be added (for instance, to override default

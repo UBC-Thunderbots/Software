@@ -17,7 +17,6 @@
  ******************************************************************************
  */
 /* USER CODE END Header */
-
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
@@ -166,9 +165,8 @@ int main(void)
  */
 void SystemClock_Config(void)
 {
-    RCC_OscInitTypeDef RCC_OscInitStruct         = {0};
-    RCC_ClkInitTypeDef RCC_ClkInitStruct         = {0};
-    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+    RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
     /** Supply configuration update enable
      */
@@ -180,7 +178,8 @@ void SystemClock_Config(void)
     while (!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY))
     {
     }
-    /** Initializes the CPU, AHB and APB busses clocks
+    /** Initializes the RCC Oscillators according to the specified parameters
+     * in the RCC_OscInitTypeDef structure.
      */
     RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
     RCC_OscInitStruct.HSEState       = RCC_HSE_BYPASS;
@@ -198,7 +197,7 @@ void SystemClock_Config(void)
     {
         Error_Handler();
     }
-    /** Initializes the CPU, AHB and APB busses clocks
+    /** Initializes the CPU, AHB and APB buses clocks
      */
     RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK |
                                   RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 |
@@ -215,19 +214,6 @@ void SystemClock_Config(void)
     {
         Error_Handler();
     }
-    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART3 |
-                                               RCC_PERIPHCLK_UART8 | RCC_PERIPHCLK_I2C2 |
-                                               RCC_PERIPHCLK_USB;
-    PeriphClkInitStruct.Usart234578ClockSelection = RCC_USART234578CLKSOURCE_D2PCLK1;
-    PeriphClkInitStruct.I2c123ClockSelection      = RCC_I2C123CLKSOURCE_D2PCLK1;
-    PeriphClkInitStruct.UsbClockSelection         = RCC_USBCLKSOURCE_PLL;
-    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    /** Enable USB Voltage detector
-     */
-    HAL_PWREx_EnableUSBVoltageDetector();
 }
 
 /* USER CODE BEGIN 4 */
@@ -259,32 +245,21 @@ void MPU_Config(void)
     HAL_MPU_ConfigRegion(&MPU_InitStruct);
     /** Initializes and configures the Region and the memory to be protected
      */
-    MPU_InitStruct.Enable           = MPU_REGION_ENABLE;
-    MPU_InitStruct.Number           = MPU_REGION_NUMBER1;
-    MPU_InitStruct.BaseAddress      = 0x30044000;
-    MPU_InitStruct.Size             = MPU_REGION_SIZE_16KB;
-    MPU_InitStruct.SubRegionDisable = 0x0;
-    MPU_InitStruct.TypeExtField     = MPU_TEX_LEVEL0;
-    MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
-    MPU_InitStruct.DisableExec      = MPU_INSTRUCTION_ACCESS_ENABLE;
-    MPU_InitStruct.IsShareable      = MPU_ACCESS_NOT_SHAREABLE;
-    MPU_InitStruct.IsCacheable      = MPU_ACCESS_CACHEABLE;
-    MPU_InitStruct.IsBufferable     = MPU_ACCESS_NOT_BUFFERABLE;
+    MPU_InitStruct.Number       = MPU_REGION_NUMBER1;
+    MPU_InitStruct.BaseAddress  = 0x30044000;
+    MPU_InitStruct.Size         = MPU_REGION_SIZE_16KB;
+    MPU_InitStruct.IsCacheable  = MPU_ACCESS_CACHEABLE;
+    MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
 
     HAL_MPU_ConfigRegion(&MPU_InitStruct);
     /** Initializes and configures the Region and the memory to be protected
      */
-    MPU_InitStruct.Enable           = MPU_REGION_ENABLE;
-    MPU_InitStruct.Number           = MPU_REGION_NUMBER2;
-    MPU_InitStruct.BaseAddress      = 0x24000000;
-    MPU_InitStruct.Size             = MPU_REGION_SIZE_512KB;
-    MPU_InitStruct.SubRegionDisable = 0x0;
-    MPU_InitStruct.TypeExtField     = MPU_TEX_LEVEL1;
-    MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
-    MPU_InitStruct.DisableExec      = MPU_INSTRUCTION_ACCESS_ENABLE;
-    MPU_InitStruct.IsShareable      = MPU_ACCESS_SHAREABLE;
-    MPU_InitStruct.IsCacheable      = MPU_ACCESS_CACHEABLE;
-    MPU_InitStruct.IsBufferable     = MPU_ACCESS_BUFFERABLE;
+    MPU_InitStruct.Number       = MPU_REGION_NUMBER2;
+    MPU_InitStruct.BaseAddress  = 0x24000000;
+    MPU_InitStruct.Size         = MPU_REGION_SIZE_512KB;
+    MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL1;
+    MPU_InitStruct.IsShareable  = MPU_ACCESS_SHAREABLE;
+    MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
 
     HAL_MPU_ConfigRegion(&MPU_InitStruct);
     /* Enables the MPU */

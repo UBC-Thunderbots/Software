@@ -7,6 +7,6 @@ void friendlyScored(std::shared_ptr<World> world_ptr,
 {
     while (!contains(world_ptr->field().enemyGoal(), world_ptr->ball().position()))
     {
-        yield();
+        yield("The friendly team has not scored");
     }
 }

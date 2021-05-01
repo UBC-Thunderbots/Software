@@ -16,18 +16,10 @@ SimulatedTestFixture::SimulatedTestFixture()
 
 void SimulatedTestFixture::SetUp()
 {
-    mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
-    thunderbots_config =
-        std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
-
     LoggerSingleton::initializeLogger(
         thunderbots_config->getStandaloneSimulatorMainCommandLineArgs()
             ->getLoggingDir()
             ->value());
-
-    simulator     = std::make_unique<Simulator>(Field::createSSLDivisionBField(),
-                                            thunderbots_config->getSimulatorConfig());
-    sensor_fusion = SensorFusion(thunderbots_config->getSensorFusionConfig());
 
     mutable_thunderbots_config->getMutableAiControlConfig()->getMutableRunAi()->setValue(
         !SimulatedTestFixture::stop_ai_on_start);
@@ -40,6 +32,19 @@ void SimulatedTestFixture::SetUp()
     mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableDefendingPositiveSide()
         ->setValue(false);
+
+    // Experimentally determined restitution value
+    mutable_thunderbots_config->getMutableSimulatorConfig()
+        ->getMutableBallRestitution()
+        ->setValue(0.8);
+    // Measured these values from fig. 9 on page 8 of
+    // https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
+    mutable_thunderbots_config->getMutableSimulatorConfig()
+        ->getMutableSlidingFrictionAcceleration()
+        ->setValue(6.9);
+    mutable_thunderbots_config->getMutableSimulatorConfig()
+        ->getMutableRollingFrictionAcceleration()
+        ->setValue(0.5);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always defending the "negative" side of the field. This is so that the
@@ -74,21 +79,6 @@ Field SimulatedTestFixture::field() const
     return simulator->getField();
 }
 
-void SimulatedTestFixture::setRefereeCommand(
-    const RefereeCommand &current_referee_command,
-    const RefereeCommand &previous_referee_command)
-{
-    mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableOverrideRefereeCommand()
-        ->setValue(true);
-    mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableCurrentRefereeCommand()
-        ->setValue(toString(current_referee_command));
-    mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutablePreviousRefereeCommand()
-        ->setValue(toString(previous_referee_command));
-}
-
 void SimulatedTestFixture::enableVisualizer()
 {
     full_system_gui = std::make_shared<ThreadedFullSystemGUI>(mutable_thunderbots_config);
@@ -101,7 +91,11 @@ bool SimulatedTestFixture::validateAndCheckCompletion(
 {
     for (auto &function_validator : non_terminating_function_validators)
     {
-        function_validator.executeAndCheckForFailures();
+        auto error_message = function_validator.executeAndCheckForFailures();
+        if (error_message)
+        {
+            ADD_FAILURE() << error_message.value();
+        }
     }
 
     bool validation_successful = std::all_of(
@@ -174,31 +168,36 @@ void SimulatedTestFixture::runTest(
                                                         CAMERA_FRAMES_PER_AI_TICK);
 
     // Tick one frame to aid with visualization
-    bool validation_functions_done =
-        tickTest(terminating_validation_functions, non_terminating_validation_functions,
-                 simulation_time_step, ai_time_step, world);
+    bool validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
         if (!thunderbots_config->getAiControlConfig()->getRunAi()->value())
         {
+            auto ms_to_sleep = std::chrono::milliseconds(
+                static_cast<int>(ai_time_step.toMilliseconds()));
+            std::this_thread::sleep_for(ms_to_sleep);
             continue;
         }
-        validation_functions_done = tickTest(terminating_validation_functions,
-                                             non_terminating_validation_functions,
-                                             simulation_time_step, ai_time_step, world);
+        validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);
     }
 
     if (!validation_functions_done && !terminating_validation_functions.empty())
     {
-        ADD_FAILURE()
-            << "Not all validation functions passed within the timeout duration";
+        std::string failure_message =
+            "Not all validation functions passed within the timeout duration:\n";
+        for (const auto &fun : terminating_function_validators)
+        {
+            if (fun.currentErrorMessage() != "")
+            {
+                failure_message += fun.currentErrorMessage() + std::string("\n");
+            }
+        }
+        ADD_FAILURE() << failure_message;
     }
 }
 
-bool SimulatedTestFixture::tickTest(
-    const std::vector<ValidationFunction> &terminating_validation_functions,
-    const std::vector<ValidationFunction> &non_terminating_validation_functions,
-    Duration simulation_time_step, Duration ai_time_step, std::shared_ptr<World> world)
+bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_time_step,
+                                    std::shared_ptr<World> world)
 {
     auto wall_start_time           = std::chrono::steady_clock::now();
     bool validation_functions_done = false;

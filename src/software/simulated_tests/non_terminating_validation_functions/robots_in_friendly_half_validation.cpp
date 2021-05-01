@@ -1,7 +1,5 @@
 #include "software/simulated_tests/non_terminating_validation_functions/robots_in_friendly_half_validation.h"
 
-#include <gtest/gtest.h>
-
 #include "software/logger/logger.h"
 
 void robotsInFriendlyHalf(std::shared_ptr<World> world_ptr,
@@ -11,7 +9,7 @@ void robotsInFriendlyHalf(std::shared_ptr<World> world_ptr,
     {
         if (!world_ptr->field().pointInFriendlyHalf(robot.position()))
         {
-            FAIL() << "Robot " + std::to_string(robot.id()) + " entered enemy half";
+            yield("Robot " + std::to_string(robot.id()) + " entered enemy half");
         }
     }
 }
@@ -28,6 +26,6 @@ void robotInFriendlyHalf(RobotId robot_id, std::shared_ptr<World> world_ptr,
     Point position = robot_optional.value().position();
     if (!world_ptr->field().pointInFriendlyHalf(position))
     {
-        FAIL() << "Robot " + std::to_string(robot_id) + " entered enemy half";
+        yield("Robot " + std::to_string(robot_id) + " entered enemy half");
     }
 }
