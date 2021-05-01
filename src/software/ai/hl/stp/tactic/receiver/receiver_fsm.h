@@ -4,11 +4,11 @@
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
-#include "software/geom/algorithms/closest_point.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/intent.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/ai/passing/pass.h"
+#include "software/geom/algorithms/closest_point.h"
 
 struct ReceiverFSM
 {
@@ -22,7 +22,8 @@ struct ReceiverFSM
 
     // The minimum proportion of open net we're shooting on vs the entire size of the net
     // that we require before attempting a shot
-    static constexpr double MIN_SHOT_NET_PERCENT_OPEN = 0.3;
+    static constexpr double MIN_SHOT_NET_PERCENT_OPEN    = 0.3;
+    static constexpr double MAX_SPEED_FOR_ONE_TOUCH_SHOT = 6.5;
 
     // The maximum deflection angle that we will attempt a one-touch kick towards the
     // enemy goal with
@@ -149,60 +150,102 @@ struct ReceiverFSM
     {
         using namespace boost::sml;
 
-        const auto move_s    = state<MoveFSM>;
-        const auto dribble_s = state<DribbleFSM>;
-        const auto update_e  = event<Update>;
+        const auto move_s     = state<MoveFSM>;
+        const auto receive_s  = state<MoveFSM>;
+        const auto onetouch_s = state<MoveFSM>;
+        const auto update_e   = event<Update>;
 
         /**
          * Action that updates the MoveFSM
          *
          * @param event MoveFSM::Update event
          */
-        const auto update_move = [](auto event,
-                                    back::process<MoveFSM::Update> processEvent) {
-            if (event.control_params.pass)
+        const auto update_onetouch = [](auto event,
+                                        back::process<MoveFSM::Update> processEvent) {
+            MoveFSM::ControlParams control_params;
+            std::cerr << "update_onetouch" << std::endl;
+
+            auto best_shot = findFeasibleShot(event.common.world, event.common.robot);
+
+            if (best_shot)
             {
-                MoveFSM::ControlParams control_params{
-                    .destination       = event.control_params.pass->receiverPoint(),
-                    .final_orientation = event.control_params.pass->receiverOrientation(),
-                    .final_speed       = 0.0,
-                    .dribbler_mode     = DribblerMode::OFF,
-                    .ball_collision_type = BallCollisionType::AVOID,
-                    .auto_chip_or_kick =
-                        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                                       event.control_params.pass->speed()},
+                Shot shot = getOneTimeShotPositionAndOrientation(
+                    event.common.robot, event.common.world.ball(),
+                    best_shot->getPointToShootAt());
+
+                control_params = MoveFSM::ControlParams{
+                    .destination            = event.control_params.pass->receiverPoint(),
+                    .final_orientation      = shot.getOpenAngle(),
+                    .final_speed            = 0.0,
+                    .dribbler_mode          = DribblerMode::OFF,
+                    .ball_collision_type    = BallCollisionType::ALLOW,
+                    .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                                                        MAX_SPEED_FOR_ONE_TOUCH_SHOT},
                     .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
                     .target_spin_rev_per_s  = 0.0,
                 };
-
+            }
+            if (event.control_params.pass)
+            {
                 // Update the dribble fsm
                 processEvent(MoveFSM::Update(control_params, event.common));
             }
         };
-        /**
-         * Action that updates the DribbleFSM
-         *
-         * @param event DribbleFSM::Update event
-         * @param processEvent processes the DribbleFSM::Update
-         */
-        const auto update_dribble = [](auto event,
-                                       back::process<DribbleFSM::Update> processEvent) {
+
+        const auto update_receive = [](auto event,
+                                       back::process<MoveFSM::Update> processEvent) {
+            MoveFSM::ControlParams control_params;
+            std::cerr << "update_move_to_receive" << std::endl;
+
             if (event.control_params.pass)
             {
-                DribbleFSM::ControlParams control_params{
-                    .dribble_destination       = std::nullopt,
-                    .final_dribble_orientation = std::nullopt,
-                    .allow_excessive_dribbling = false,
+                control_params = {
+                    .destination       = event.control_params.pass->receiverPoint(),
+                    .final_orientation = event.control_params.pass->receiverOrientation(),
+                    .final_speed       = 0.0,
+                    .dribbler_mode     = DribblerMode::OFF,
+                    .ball_collision_type    = BallCollisionType::ALLOW,
+                    .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                                                        MAX_SPEED_FOR_ONE_TOUCH_SHOT},
+                    .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                    .target_spin_rev_per_s  = 0.0,
                 };
-
-                // Update the dribble fsm
-                processEvent(DribbleFSM::Update(control_params, event.common));
             }
+
+            // Update the dribble fsm
+            processEvent(MoveFSM::Update(control_params, event.common));
         };
+
+        /**
+         * @param ReceiverFSM::Update
+         * @return true if the ball has started moving
+         */
+        const auto pass_started = [](auto event) {
+            return event.common.world.ball().velocity().length() > 0.5;
+        };
+
+        const auto pass_finished = [](auto event) {
+            return event.common.robot.isNearDribbler(
+                event.common.world.ball().position());
+        };
+
+        /**
+         * @param ReceiverFSM::Update
+         * @return true if a one touch shot is possible on net
+         */
+        const auto onetouch_possible = [](auto event) { return false; };
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *move_s + update_e / update_move, move_s         = X,
-            dribble_s + update_e / update_dribble, dribble_s = X);
+            *move_s + update_e[!pass_started && onetouch_possible] / update_onetouch =
+                onetouch_s,
+            move_s + update_e[!pass_started && !onetouch_possible] / update_receive =
+                receive_s,
+            receive_s + update_e[pass_started && !pass_finished] / update_receive =
+                receive_s,
+            onetouch_s + update_e[pass_started && !pass_finished] / update_onetouch =
+                onetouch_s,
+            receive_s + update_e[pass_finished] / update_receive   = X,
+            onetouch_s + update_e[pass_finished] / update_onetouch = X);
     }
 };

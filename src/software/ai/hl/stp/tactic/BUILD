@@ -162,21 +162,6 @@ cc_library(
 )
 
 cc_library(
-    name = "receiver_tactic",
-    srcs = ["receiver_tactic.cpp"],
-    hdrs = ["receiver_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//software/ai/evaluation:calc_best_shot",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/passing:pass",
-        "//software/geom/algorithms",
-        "//software/logger",
-    ],
-)
-
-cc_library(
     name = "shadow_enemy_tactic",
     srcs = ["shadow_enemy_tactic.cpp"],
     hdrs = ["shadow_enemy_tactic.h"],
@@ -263,7 +248,6 @@ cc_library(
         ":kickoff_chip_tactic",
         ":penalty_kick_tactic",
         ":penalty_setup_tactic",
-        ":receiver_tactic",
         ":shadow_enemy_tactic",
         ":shadow_free_kicker_tactic",
         ":shoot_goal_tactic",
@@ -274,8 +258,8 @@ cc_library(
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/passer:passer_tactic",
+        "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
-        "//software/ai/hl/stp/tactic/passer:passer_tactic",
     ],
 )
 

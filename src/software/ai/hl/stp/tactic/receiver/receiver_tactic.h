@@ -1,9 +1,9 @@
 #pragma once
 
 #include "software/ai/evaluation/shot.h"
+#include "software/ai/hl/stp/tactic/receiver/receiver_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
-#include "software/ai/hl/stp/tactic/receiver/receiver_fsm.h"
 #include "software/geom/ray.h"
 
 /**
@@ -23,7 +23,7 @@ class ReceiverTactic : public Tactic
      * @param loop_forever Whether or not this Tactic should never complete. If true,
      *                     the tactic will be restarted every time it completes
      */
-    explicit ReceiverTactic(const Pass pass, bool loop_forever);
+    explicit ReceiverTactic(const Pass pass);
 
     ReceiverTactic() = delete;
 

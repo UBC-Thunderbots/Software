@@ -27,11 +27,10 @@ TEST_P(SimulatedReceiverTacticTest, receiver_test)
 
     setBallState(ball_state);
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)}));
+    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({Point(4.5, 0)}));
     addFriendlyRobots({robot_state});
 
-    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
-
-    auto tactic = std::make_shared<ReceiverTactic>(pass, false);
+    auto tactic = std::make_shared<ReceiverTactic>(pass);
     tactic->updateControlParams(pass);
     setTactic(tactic);
     setRobotId(1);
@@ -62,8 +61,8 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Values(
         // Stationary Ball Tests
         // Passer point != Balls location & Balls location != Robots Location
-        std::make_tuple(Pass(Point(0.0, 0.5), Point(0, 0), 5, Timestamp::fromSeconds(0)),
+        std::make_tuple(Pass(Point(3.0, -0.5), Point(1.0, 1.0), 5),
                         RobotStateWithId{
-                            1, RobotState(Point(0, 0), Vector(0, 0),
+                            1, RobotState(Point(-1, -1), Vector(0, 0),
                                           Angle::fromDegrees(0), Angle::fromDegrees(0))},
-                        BallState(Point(0.5, 0.5), Vector(0, 0)))));
+                        BallState(Point(3.0, -0.5), Vector(0, 0)))));
