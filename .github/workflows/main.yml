@@ -124,7 +124,7 @@ jobs:
           cd src
           bazel test -c dbg  \
             --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
-            //firmware/...                 \
+            -- //firmware/...                 \
             -//firmware/boards/arduino_uno/...
             
       - name: Shared Memory Leak Check
