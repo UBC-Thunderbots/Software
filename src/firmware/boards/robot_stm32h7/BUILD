@@ -28,7 +28,7 @@ cc_binary(
         ":lwip",
         ":robot_stm32h7_main_lib",
         "//firmware/app/logger",
-        "//firmware/boards/robot_stm32h7/io:INA226_power_monitor",
+        "//firmware/boards/robot_stm32h7/io:INA226_power_monitor_driver",
         "//firmware/boards/robot_stm32h7/io:drivetrain",
         "//firmware/boards/robot_stm32h7/io:drivetrain_unit",
         "//firmware/boards/robot_stm32h7/io:gpio_pin",

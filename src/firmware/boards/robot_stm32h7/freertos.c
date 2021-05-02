@@ -28,7 +28,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "firmware/app/logger/logger.h"
-#include "firmware/boards/robot_stm32h7/io/INA226_power_monitor.h"
+#include "firmware/boards/robot_stm32h7/io/INA226_power_monitor_driver.h"
 #include "firmware/boards/robot_stm32h7/io/drivetrain.h"
 #include "firmware/boards/robot_stm32h7/io/network_logger.h"
 #include "firmware/boards/robot_stm32h7/io/proto_multicast_communication_profile.h"

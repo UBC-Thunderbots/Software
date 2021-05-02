@@ -12,7 +12,7 @@
     ******************************************************************************
     */
 
-#include "INA226_power_monitor.h"
+#include "INA226_power_monitor_driver.h"
 
 float32_t INA226_getBusV(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress)
 {
