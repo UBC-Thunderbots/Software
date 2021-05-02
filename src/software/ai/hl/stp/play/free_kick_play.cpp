@@ -54,12 +54,10 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 
     // Setup crease defenders to help the goalie
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                               world.friendlyTeam(), world.enemyTeam(),
-                                               CreaseDefenderTactic::LeftOrRight::LEFT),
-        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                               world.friendlyTeam(), world.enemyTeam(),
-                                               CreaseDefenderTactic::LeftOrRight::RIGHT),
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
     };
 
     Angle min_open_angle_for_shot = Angle::fromDegrees(
@@ -122,6 +120,11 @@ void FreeKickPlay::chipAtGoalStage(
     do
     {
         chip_tactic->updateControlParams(world.ball().position(), chip_target);
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
 
         yield({{goalie_tactic, chip_tactic, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
@@ -151,6 +154,11 @@ void FreeKickPlay::performPassStage(
         passer->updateControlParams(pass);
         receiver->updateControlParams(pass);
 
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
         yield({{goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
     } while (!receiver->done());
@@ -199,6 +207,12 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         cherry_pick_tactic_2->updateControlParams(
             pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
+
         yield({{goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
                 cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
@@ -222,6 +236,11 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         cherry_pick_tactic_2->updateControlParams(
             pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
         yield({{goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
                 cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
@@ -247,6 +266,11 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         cherry_pick_tactic_2->updateControlParams(
             pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
         yield({{goalie_tactic, align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1,
                 cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
