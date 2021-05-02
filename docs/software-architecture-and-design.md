@@ -306,7 +306,7 @@ We use the [Boost-Ext SML](https://github.com/boost-ext/sml), short for State Ma
 ```
 src_state + event [guard] / action = dest_state
 ```
-where the src\_state transitions to the dest\_state, while performing the _action_, only if the _event_ is processed and the _guard_ is true. Events are structs of new information that FSMs receive, so _guards_ and _actions_ take events as arguments. _Guards_ must return a boolean and _actions_ must return void. An asterix (\*) at the start of a row indicates that the state is an initial state.
+where the src\_state transitions to the dest\_state, while performing the _action_, only if the _event_ is processed and the _guard_ is true. Events are structs of new information that FSMs receive, so _guards_ and _actions_ take events as arguments. _Guards_ must return a boolean and _actions_ must return void. An asterix (\*) at the start of a row indicates that the state is an initial state. The rows of the transition table are processed in order and the first row to match is executed.
 
 The library also supports hierarchical FSMs. Sub-FSMs are treated as states where an unconditional transition occurs when the sub-FSM is in the terminal state, X.
 ```

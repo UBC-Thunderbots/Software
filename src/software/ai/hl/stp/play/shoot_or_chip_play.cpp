@@ -4,7 +4,7 @@
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/find_open_areas.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
+#include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
@@ -47,12 +47,10 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
      */
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                               world.friendlyTeam(), world.enemyTeam(),
-                                               CreaseDefenderTactic::LeftOrRight::LEFT),
-        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                               world.friendlyTeam(), world.enemyTeam(),
-                                               CreaseDefenderTactic::LeftOrRight::RIGHT),
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
     };
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {
@@ -74,23 +72,14 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
     {
         PriorityTacticVector result = {{}};
 
-        // If we have any crease defenders, we don't want the goalie tactic to consider
-        // them when deciding where to block
-        Team friendly_team_for_goalie = world.friendlyTeam();
-        for (auto crease_defender_tactic : crease_defender_tactics)
-        {
-            if (crease_defender_tactic->getAssignedRobot())
-            {
-                friendly_team_for_goalie.removeRobotWithId(
-                    crease_defender_tactic->getAssignedRobot()->id());
-            }
-        }
-
         // Update crease defenders
-        for (auto &crease_defender_tactic : crease_defender_tactics)
-        {
-            result[0].emplace_back(crease_defender_tactic);
-        }
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        result[0].emplace_back(std::get<0>(crease_defender_tactics));
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
+        result[0].emplace_back(std::get<1>(crease_defender_tactics));
 
         // Update tactics moving to open areas
         std::vector<Point> enemy_robot_points;

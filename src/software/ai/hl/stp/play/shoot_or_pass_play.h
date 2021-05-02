@@ -3,7 +3,7 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
-#include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
+#include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"

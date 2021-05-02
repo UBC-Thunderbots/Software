@@ -14,9 +14,8 @@ AI::AI(std::shared_ptr<const AiConfig> ai_config,
           std::make_unique<VelocityObstaclePathManager>(
               std::make_unique<ThetaStarPathPlanner>(),
               RobotNavigationObstacleFactory(
-                  ai_config->getRobotNavigationObstacleFactoryConfig())),
-          RobotNavigationObstacleFactory(
-              ai_config->getRobotNavigationObstacleFactoryConfig()),
+                  ai_config->getRobotNavigationObstacleConfig())),
+          RobotNavigationObstacleFactory(ai_config->getRobotNavigationObstacleConfig()),
           ai_config->getNavigatorConfig())),
       // We use the current time in nanoseconds to initialize STP with a "random" seed
       high_level(std::make_unique<STP>(
