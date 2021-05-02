@@ -35,7 +35,7 @@ class FirmwareRobotTest : public testing::Test
 
     virtual void TearDown(void)
     {
-        app_firmware_robot_force_wheels_destroy(firmware_robot);
+        app_firmware_robot_destroy(firmware_robot);
     }
 
     Charger* charger = (Charger*)6;

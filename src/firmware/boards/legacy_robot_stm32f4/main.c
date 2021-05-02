@@ -621,6 +621,7 @@ static void run_normal(void)
     app_firmware_world_destroy(world);
     app_firmware_ball_destroy(ball);
     app_firmware_robot_force_wheels_destroy(robot);
+    app_firmware_robot_destroy(robot);
     app_dribbler_destroy(dribbler);
     app_chicker_destroy(chicker);
 

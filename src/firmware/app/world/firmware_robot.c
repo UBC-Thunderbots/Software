@@ -148,6 +148,11 @@ FirmwareRobot_t* app_firmware_robot_force_wheels_create(
     return new_robot;
 }
 
+void app_firmware_robot_destroy(FirmwareRobot_t* robot)
+{
+    free(robot);
+}
+
 void app_firmware_robot_force_wheels_destroy(FirmwareRobot_t* robot)
 {
     ForceWheel_t* front_left_wheel  = robot->front_left_force_wheel;
@@ -159,7 +164,6 @@ void app_firmware_robot_force_wheels_destroy(FirmwareRobot_t* robot)
     app_force_wheel_destroy(front_right_wheel);
     app_force_wheel_destroy(back_left_wheel);
     app_force_wheel_destroy(back_right_wheel);
-    free(robot);
 }
 
 void app_firmware_robot_velocity_wheels_destroy(FirmwareRobot_t* robot)
@@ -173,7 +177,6 @@ void app_firmware_robot_velocity_wheels_destroy(FirmwareRobot_t* robot)
     app_velocity_wheel_destroy(front_right_wheel);
     app_velocity_wheel_destroy(back_left_wheel);
     app_velocity_wheel_destroy(back_right_wheel);
-    free(robot);
 }
 
 Charger_t* app_firmware_robot_getCharger(const FirmwareRobot_t* robot)
@@ -347,7 +350,6 @@ void force_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
     const float dest_speed = pos_trajectory.linear_speed[trajectory_index];
 
     // plan major axis movement
-    // TODO: Should make this included on constants
     const double ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.0;
     float max_major_a     = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
     float max_major_v     = max_speed_m_per_s;

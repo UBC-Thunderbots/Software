@@ -216,6 +216,7 @@ class FirmwareTestUtilWorld : public testing::Test
         app_chicker_destroy(chicker);
         app_dribbler_destroy(dribbler);
         app_firmware_robot_force_wheels_destroy(robot);
+        app_firmware_robot_destroy(robot);
         app_firmware_ball_destroy(ball);
         app_firmware_world_destroy(firmware_world);
     }
