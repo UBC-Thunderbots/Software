@@ -160,10 +160,22 @@ void app_firmware_robot_force_wheels_destroy(FirmwareRobot_t* robot)
     ForceWheel_t* back_left_wheel   = robot->back_left_force_wheel;
     ForceWheel_t* back_right_wheel  = robot->back_right_force_wheel;
 
-    app_force_wheel_destroy(front_left_wheel);
-    app_force_wheel_destroy(front_right_wheel);
-    app_force_wheel_destroy(back_left_wheel);
-    app_force_wheel_destroy(back_right_wheel);
+    if (front_left_wheel != NULL)
+    {
+        app_force_wheel_destroy(front_left_wheel);
+    }
+    if (front_right_wheel != NULL)
+    {
+        app_force_wheel_destroy(front_right_wheel);
+    }
+    if (back_left_wheel != NULL)
+    {
+        app_force_wheel_destroy(back_left_wheel);
+    }
+    if (back_right_wheel != NULL)
+    {
+        app_force_wheel_destroy(back_right_wheel);
+    }
 }
 
 void app_firmware_robot_velocity_wheels_destroy(FirmwareRobot_t* robot)
@@ -173,10 +185,22 @@ void app_firmware_robot_velocity_wheels_destroy(FirmwareRobot_t* robot)
     VelocityWheel_t* back_left_wheel   = robot->back_left_velocity_wheel;
     VelocityWheel_t* back_right_wheel  = robot->back_right_velocity_wheel;
 
-    app_velocity_wheel_destroy(front_left_wheel);
-    app_velocity_wheel_destroy(front_right_wheel);
-    app_velocity_wheel_destroy(back_left_wheel);
-    app_velocity_wheel_destroy(back_right_wheel);
+    if (front_left_wheel != NULL)
+    {
+        app_velocity_wheel_destroy(front_left_wheel);
+    }
+    if (front_right_wheel != NULL)
+    {
+        app_velocity_wheel_destroy(front_right_wheel);
+    }
+    if (back_left_wheel != NULL)
+    {
+        app_velocity_wheel_destroy(back_left_wheel);
+    }
+    if (back_right_wheel != NULL)
+    {
+        app_velocity_wheel_destroy(back_right_wheel);
+    }
 }
 
 Charger_t* app_firmware_robot_getCharger(const FirmwareRobot_t* robot)

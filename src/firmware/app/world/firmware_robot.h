@@ -10,7 +10,6 @@
 #include "firmware/app/world/velocity_wheel.h"
 #include "firmware/shared/physics.h"
 #include "firmware/shared/util.h"
-// #include "shared/constants.h"
 #include "shared/proto/primitive.nanopb.h"
 
 /**
@@ -122,7 +121,7 @@ void app_firmware_robot_destroy(FirmwareRobot_t* robot);
  *
  * @param robot The robot to destroy
  */
- void app_firmware_robot_force_wheels_destroy(FirmwareRobot_t* robot);
+void app_firmware_robot_force_wheels_destroy(FirmwareRobot_t* robot);
 
 /**
  * Destroy the given robot's velocity wheels, freeing any memory allocated for it
@@ -132,7 +131,7 @@ void app_firmware_robot_destroy(FirmwareRobot_t* robot);
  *
  * @param robot The robot to destroy
  */
- void app_firmware_robot_velocity_wheels_destroy(FirmwareRobot_t* robot);
+void app_firmware_robot_velocity_wheels_destroy(FirmwareRobot_t* robot);
 
 /**
  * Get the charger from the given robot
