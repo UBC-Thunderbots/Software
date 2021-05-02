@@ -99,7 +99,11 @@ void app_velocity_wheel_coast(const VelocityWheel_t* wheel);
  */
 void app_velocity_wheel_brake(const VelocityWheel_t* wheel);
 
-// TODO: Add JavaDoc
+/**
+ * Set wheel to the target velocity
+ *
+ * @param wheel The wheel to set target velocity with
+ */
 void app_velocity_wheel_setTargetVelocity(VelocityWheel_t* wheel, float velocity);
 
 /**
