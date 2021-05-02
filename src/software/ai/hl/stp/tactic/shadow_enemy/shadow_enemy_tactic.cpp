@@ -7,20 +7,17 @@ ShadowEnemyTactic::ShadowEnemyTactic()
     : Tactic(false, {RobotCapability::Move, RobotCapability::Kick}),
       fsm(),
       control_params{ShadowEnemyFSM::ControlParams{.enemy_threat    = std::nullopt,
-                                                   .shadow_distance = 0,
-                                                   .steal_and_chip_distance = 0}}
+                                                   .shadow_distance = 0}}
 {
 }
 
 void ShadowEnemyTactic::updateWorldParams(const World &world) {}
 
 void ShadowEnemyTactic::updateControlParams(std::optional<EnemyThreat> enemy_threat,
-                                            double shadow_distance,
-                                            double steal_and_chip_distance)
+                                            double shadow_distance)
 {
     control_params.enemy_threat            = enemy_threat;
     control_params.shadow_distance         = shadow_distance;
-    control_params.steal_and_chip_distance = steal_and_chip_distance;
 }
 
 double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &world) const

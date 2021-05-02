@@ -95,7 +95,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         if (enemy_threats.size() > 1)
         {
             shadow_enemy_tactic->updateControlParams(enemy_threats.at(0),
-                                                     ROBOT_MAX_RADIUS_METERS * 3, 0);
+                                                     ROBOT_MAX_RADIUS_METERS * 3);
             result[0].emplace_back(shadow_enemy_tactic);
         }
         else

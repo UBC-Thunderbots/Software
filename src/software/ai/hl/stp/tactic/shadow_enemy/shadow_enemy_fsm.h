@@ -8,7 +8,8 @@
 
 struct ShadowEnemyFSM
 {
-    class BlockState;
+    class BlockShotState;
+    class BlockPassState;
     class StealAndChipState;
 
     // this struct defines the unique control parameters that the ShadowEnemyFSM requires
@@ -20,9 +21,6 @@ struct ShadowEnemyFSM
 
         // How far from the enemy the robot will position itself to shadow
         double shadow_distance;
-
-        // How close to the enemy before the robot will try to steal and chip the ball
-        double steal_and_chip_distance;
     };
 
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -49,7 +47,7 @@ struct ShadowEnemyFSM
 
 
     /**
-    * Calculates the point to block the net from the robot we are shadowing
+    * Calculates the point to block the shot from the robot we are shadowing
     *
     * @param robot The robot that is shadowing
     * @param field The field to shadow on
@@ -58,7 +56,7 @@ struct ShadowEnemyFSM
     * @param shadowee The enemy robot we are shadowing
     * @param shadow_distance The distance our friendly robot will position itself away from the shadowee
     */
-    static Point findBlockNetPoint(const Robot &robot, const Field &field, const Team &friendlyTeam, 
+    static Point findBlockShotPoint(const Robot &robot, const Field &field, const Team &friendlyTeam, 
                                     const Team &enemyTeam, const Robot &shadowee,
                                     const double &shadow_distance){
         std::vector<Robot> robots_to_ignore = {robot};
@@ -81,7 +79,8 @@ struct ShadowEnemyFSM
     {
         using namespace boost::sml;
 
-        const auto block_s          = state<BlockState>;
+        const auto block_shot_s     = state<BlockShotState>;
+        const auto block_pass_s     = state<BlockPassState>;
         const auto steal_and_chip_s = state<StealAndChipState>;
 
         const auto update_e = event<Update>;
@@ -104,50 +103,61 @@ struct ShadowEnemyFSM
         };
 
         /**
-         * Guard that checks if the enemy threat is near
-         * our robot
+         * Guard that checks if the robot is done moving
+         * to the block shot point position calculated in 
+         * findBlockShotPoint()
          *
          * @param event ShadowEnemyFSM::Update
          *
-         * @return if the ball has been have_possession
+         * @return if the robot's current position matches the one
+         *         returned from findBlockShotPoint
          */
-        const auto enemy_threat_is_near = [](auto event) {
+        const auto is_blocking_shot = [](auto event) {
             std::optional<EnemyThreat> enemy_threat_opt =
                 event.control_params.enemy_threat;
             if (enemy_threat_opt.has_value())
             {
-                return distance(enemy_threat_opt.value().robot.position(),
-                                event.common.robot.position()) <=
-                       event.control_params.steal_and_chip_distance;
-            };
+                // We compare the length between the two points rather than using the equality operator
+                // for points as the robot does not end up in the exact position as findBlockShotPoint
+                return Segment(event.common.robot.position(),findBlockShotPoint(event.common.robot,event.common.world.field(),
+                event.common.world.friendlyTeam(),event.common.world.enemyTeam(),event.control_params.enemy_threat.value().robot,
+                event.control_params.shadow_distance)).length() < 0.01;
+            }
             return false;
         };
 
         /**
-         * Action to block the ball
+         * Action to block the pass to our shadowee
          *
-         * If the enemy can pass to the robot we are shadowing, block the pass.
-         * Else, block the net
          *
          * @param event ShadowEnemyFSM::Update
          */
-        const auto block_pass_or_net = [](auto event) {
+        const auto block_pass = [](auto event){
             auto ball_position = event.common.world.ball().position();
             auto face_ball_orientation =
                 (ball_position - event.common.robot.position()).orientation();
-            Point position_to_block;
-            if (!event.control_params.enemy_threat.value().has_ball)
-            {
-                position_to_block = findBlockPassPoint(ball_position, event.control_params.enemy_threat.value().robot,
+            Point position_to_block = findBlockPassPoint(ball_position, event.control_params.enemy_threat.value().robot,
                 event.control_params.shadow_distance);
-            }
-            else
-            {
-                position_to_block = findBlockNetPoint(event.common.robot,event.common.world.field(),
+            event.common.set_intent(std::make_unique<MoveIntent>(
+                event.common.robot.id(), position_to_block, face_ball_orientation, 0,
+                DribblerMode::OFF, BallCollisionType::AVOID,
+                AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+        };
+
+        /**
+         * Action to block the shot from our shadowee
+         *
+         *
+         * @param event ShadowEnemyFSM::Update
+         */
+        const auto block_shot = [](auto event){
+            auto ball_position = event.common.world.ball().position();
+            auto face_ball_orientation =
+                (ball_position - event.common.robot.position()).orientation();
+            Point position_to_block = findBlockShotPoint(event.common.robot,event.common.world.field(),
                 event.common.world.friendlyTeam(),event.common.world.enemyTeam(),event.control_params.enemy_threat.value().robot,
                 event.control_params.shadow_distance);
-            }
-
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), position_to_block, face_ball_orientation, 0,
                 DribblerMode::OFF, BallCollisionType::AVOID,
@@ -176,15 +186,15 @@ struct ShadowEnemyFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *block_s + update_e[!enemy_threat_has_ball] / block_pass_or_net,
-            block_s + update_e[!enemy_threat_is_near] / block_pass_or_net,
-            block_s + update_e[enemy_threat_is_near] / steal_and_chip = steal_and_chip_s,
+            *block_shot_s + update_e[!enemy_threat_has_ball] / block_pass = block_pass_s,
+            block_shot_s + update_e[is_blocking_shot] / steal_and_chip = steal_and_chip_s,
+            block_shot_s + update_e[!is_blocking_shot] / block_shot,
+            block_pass_s + update_e[!enemy_threat_has_ball] / block_pass,
+            block_pass_s + update_e[enemy_threat_has_ball] / block_shot = block_shot_s,
             steal_and_chip_s + update_e[enemy_threat_has_ball] / steal_and_chip,
-            steal_and_chip_s + update_e[!enemy_threat_has_ball] / block_pass_or_net = X,
-            X + update_e[!enemy_threat_has_ball] / block_pass_or_net = block_s,
-            X + update_e[!enemy_threat_is_near] / block_pass_or_net  = block_s,
-            X + update_e[enemy_threat_is_near] / steal_and_chip      = steal_and_chip_s
-
+            steal_and_chip_s + update_e[!enemy_threat_has_ball] / block_pass = X,
+            X + update_e[!enemy_threat_has_ball] / block_pass = block_pass_s,
+            X + update_e[enemy_threat_has_ball] / block_shot = block_shot_s
         );
     }
 };
