@@ -10,7 +10,7 @@
  * Note that this could scale the forces *down* if they exceed the physical capabilities
  * of the robot (ex. wheel slip).
  *
- * @param wheels Wheels to compute the maximum torque scaling from
+ * @param wheels Force wheels to compute the maximum torque scaling from
  * @param wheel_forces Forces to apply to each wheel
  * @param battery_voltage The current battery voltage
  *
@@ -62,7 +62,12 @@ float app_control_getMaximalTorqueScaling(const ForceWheel_t* wheels[4],
  * Note that this could scale the accelerations *down* if the given forces exceed the
  * physical capabilities of the robot (ex. wheel slip).
  *
- * @param robot The robot to compute the acceleration scaling constant for
+ * @param robot_constants The robot constants representing the robot
+ * @param battery_voltage The robot's battery voltage
+ * @param front_left_wheel The robot's front left wheel
+ * @param front_right_wheel The robot's front right wheel
+ * @param back_left_wheel The robot's back left wheel
+ * @param back_right_wheel The robot's back right wheel
  * @param linear_accel_x [m/s^2] The linear x acceleration to scale
  * @param linear_accel_y [m/s^2] The linear y acceleration to scale
  * @param angular_accel [rad/s^2] The angular acceleration to scale
