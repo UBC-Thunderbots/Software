@@ -139,6 +139,24 @@ cc_test(
 )
 
 cc_library(
+    name = "ssl_simulation_robot_control",
+    srcs = ["ssl_simulation_robot_control.cpp"],
+    hdrs = ["ssl_simulation_robot_control.h"],
+    deps = [
+        "//software/proto:ssl_simulation_cc_proto",
+    ],
+)
+
+cc_test(
+    name = "ssl_simulation_robot_control_test",
+    srcs = ["ssl_simulation_robot_control_test.cpp"],
+    deps = [
+        ":ssl_simulation_robot_control",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "primitive_google_to_nanopb_converter",
     srcs = ["primitive_google_to_nanopb_converter.cpp"],
     hdrs = ["primitive_google_to_nanopb_converter.h"],
