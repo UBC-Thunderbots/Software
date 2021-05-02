@@ -20,7 +20,7 @@ GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
       friendly_team(friendly_team),
       enemy_team(enemy_team),
       goalie_tactic_config(goalie_tactic_config),
-      fsm()
+      max_allowed_speed_mode(MaxAllowedSpeedMode::PHYSICAL_LIMIT)
 {
 }
 
@@ -112,12 +112,8 @@ void GoalieTactic::updateWorldParams(const World &world)
 
 void GoalieTactic::updateControlParams(MaxAllowedSpeedMode max_allowed_speed_mode)
 {
-    // Update the control parameters stored by this Tactic
-    control_params.dribbler_mode          = DribblerMode::OFF;
-    control_params.ball_collision_type    = BallCollisionType::AVOID;
-    control_params.auto_chip_or_kick      = {AutoChipOrKickMode::OFF, 0};
-    control_params.max_allowed_speed_mode = max_allowed_speed_mode;
-    control_params.target_spin_rev_per_s  = 0.0;
+    this->max_allowed_speed_mode = max_allowed_speed_mode;
+
 }
 
 
@@ -221,7 +217,7 @@ std::shared_ptr<Action> GoalieTactic::panicAndStopBall(
     move_action->updateControlParams(
         *robot_, goalie_pos, goalie_orientation, 0.0, DribblerMode::OFF,
         BallCollisionType::ALLOW,
-        {AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS});
+        {AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}, max_allowed_speed_mode);
     return move_action;
 }
 
@@ -316,7 +312,7 @@ std::shared_ptr<Action> GoalieTactic::positionToBlockShot(
     move_action->updateControlParams(
         *robot_, goalie_pos, goalie_orientation, goalie_final_speed, DribblerMode::OFF,
         BallCollisionType::ALLOW,
-        {AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS});
+        {AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS}, max_allowed_speed_mode);
     return move_action;
 }
 

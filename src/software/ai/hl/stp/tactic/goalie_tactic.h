@@ -9,7 +9,6 @@
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
-#include "software/ai/hl/stp/tactic/move/move_fsm.h"
 
 /**
  * This tactic is used to defend the ball from going into the goal. The tactic
@@ -22,9 +21,8 @@
  * distance either way to intercept a potential straight shot into the net.
  *
  */
-class GoalieTactic : public Tactic
-{
-   public:
+class GoalieTactic : public Tactic {
+public:
     /**
      * Creates a new GoalieTactic
      *
@@ -55,8 +53,7 @@ class GoalieTactic : public Tactic
     void updateWorldParams(const World &world) override;
 
     /**
-     * Updates the params assuming that the dribbler and chicker and while avoiding the
-     * ball
+     * Updates the max allowed speed mode of the goalie tactic
      *
      * @param max_allowed_speed_mode The mode of maximum speed allowed
      */
@@ -105,15 +102,18 @@ class GoalieTactic : public Tactic
     void accept(TacticVisitor &visitor) const override;
 
     Ball getBall() const;
+
     Field getField() const;
+
     Team getFriendlyTeam() const;
+
     Team getEnemyTeam() const;
 
     // Distance to chip the ball when trying to yeet it
     // TODO (#1878): Replace this with a more intelligent chip distance system
     static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
-   private:
+private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;
 
     // Tactic parameters
@@ -123,7 +123,5 @@ class GoalieTactic : public Tactic
     Team enemy_team;
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
 
-    FSM<MoveFSM> fsm;
-
-    MoveFSM::ControlParams control_params;
+    MaxAllowedSpeedMode max_allowed_speed_mode;
 };
