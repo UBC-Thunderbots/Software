@@ -127,6 +127,7 @@ if ! sudo apt-get install bazel-3.7.2 -y ; then
     echo "##############################################################"
     exit 1
 fi
+sudo ln -s /usr/bin/bazel-3.7.2 /usr/bin/bazel
 
 # Done
 echo "================================================================"
