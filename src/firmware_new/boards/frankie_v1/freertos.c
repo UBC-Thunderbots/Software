@@ -291,7 +291,7 @@ void test_msg_update(void *argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
-void initIoNetworking()
+void initIoNetworking(void)
 {
     // TODO channel and robot_id need to be hooked up to the dials on the robot, when
     // available https://github.com/UBC-Thunderbots/Software/issues/1517
@@ -372,9 +372,9 @@ void initIoDrivetrain(void)
                        drivetrain_unit_back_left, drivetrain_unit_back_right);
 }
 
-// TODO: put this in the IO layer
-void InitI2C2(void)
+void initPowerMonitor(void)
 {
+    // TODO: make app layer abstraction
     I2c2Handle.Instance             = I2C2;
     I2c2Handle.Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
     I2c2Handle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -387,29 +387,9 @@ void InitI2C2(void)
         HAL_I2CEx_AnalogFilter_Config(&I2c2Handle, I2C_ANALOGFILTER_ENABLED);
     }
     TLOG_DEBUG("Initializing INA226");
-    // TODO: put this in the IO layer
     INA226_setConfig(&I2c2Handle, INA226_ADDRESS,
                      INA226_MODE_CONT_SHUNT_AND_BUS | INA226_VBUS_140uS |
                          INA226_VBUS_140uS | INA226_AVG_1024);
-}
-
-// TODO: put this in the IO layer
-void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
-{
-    GPIO_InitTypeDef GPIO_InitStruct;
-
-    if (hi2c->Instance == I2C1)
-    {
-        __HAL_RCC_I2C1_CLK_ENABLE();
-        __HAL_RCC_GPIOB_CLK_ENABLE();
-
-        GPIO_InitStruct.Pin       = GPIO_PIN_8 | GPIO_PIN_9;
-        GPIO_InitStruct.Mode      = GPIO_MODE_AF_OD;
-        GPIO_InitStruct.Pull      = GPIO_NOPULL;
-        GPIO_InitStruct.Speed     = GPIO_SPEED_HIGH;
-        GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;
-        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-    }
 }
 
 /* USER CODE END Application */

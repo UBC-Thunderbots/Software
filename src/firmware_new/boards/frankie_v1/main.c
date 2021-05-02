@@ -77,8 +77,7 @@ static void initIoLayer(void)
 {
     initIoDrivetrain();
     initIoNetworking();
-
-    InitI2C2();
+    initPowerMonitor();
 }
 
 /* USER CODE END 0 */

@@ -56,11 +56,20 @@ extern "C"
 
     /* USER CODE BEGIN EFP */
 
+    /**
+     * Initializes the drivetrain
+     */
     void initIoDrivetrain(void);
+
+    /**
+     * Initializes the networking
+     */
     void initIoNetworking(void);
 
-    // TODO: put this in the IO layer
-    void InitI2C2(void);
+    /**
+     * Initializes the power monitor
+     */
+    void initPowerMonitor(void);
 
 /* USER CODE END EFP */
 
