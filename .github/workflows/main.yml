@@ -39,7 +39,8 @@ jobs:
           bazel test --show_timestamps\
             -- //... -//software/simulated_tests/... \
             -//software/ai/hl/stp/play/... \
-            -//software/ai/hl/stp/tactic/...
+            -//software/ai/hl/stp/tactic/... \
+            -//firmware/boards/arduino_uno/... # Arduino requires setup_firmware
              
   firmware-tests:
     name: Firmware Tests
@@ -61,17 +62,22 @@ jobs:
         run: |
           "${GITHUB_WORKSPACE}"/.github/check_cubemx_ci.sh
 
-      - name: New Robot Firmware Build
+      - name: Arduino Uno Firmware Build
+        run: |
+         cd src
+         bazel build --cpu=stm32h7 //firmware/boards/robot_stm32h7:robot_stm32h7_main 
+
+      - name: STM32H7 Robot Firmware Build
         run: |
          cd src
          bazel build --cpu=stm32h7 //firmware/boards/robot_stm32h7:robot_stm32h7_main 
      
-      - name: Old Robot Firmware Build
+      - name: Legacy STM32F4 Robot Firmware Build
         run: |
          cd src
          bazel build --cpu=stm32f4 //firmware/boards/legacy_robot_stm32f4:bin 
          
-      - name: Old Radio Dongle Firmware Build
+      - name: Legacy Radio Dongle Firmware Build
         run: |
          cd src
          bazel build --cpu=stm32f4 //firmware/boards/legacy_dongle_stm32f4:bin         
@@ -118,7 +124,8 @@ jobs:
           cd src
           bazel test -c dbg  \
             --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
-            //firmware/...
+            //firmware/...                 \
+            -//firmware/boards/arduino_uno/...
             
       - name: Shared Memory Leak Check
         run: |
