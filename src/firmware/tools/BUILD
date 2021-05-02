@@ -12,19 +12,8 @@ sh_binary(
 )
 
 sh_binary(
-    name = "debug_firmware_on_stm32h7",
-    srcs = ["debug_firmware_on_stm32h7.sh"],
-    data = [
-        "//firmware/boards/robot_stm32h7:robot_stm32h7_main",
-        "@arm_developer_gcc//:gdb",
-    ],
-    restricted_to = ["//cc_toolchain:stm32h7"],
-    deps = ["@bazel_tools//tools/bash/runfiles"],
-)
-
-sh_binary(
-    name = "flash_firmware_on_stm32h7",
-    srcs = ["flash_firmware_on_stm32h7.sh"],
+    name = "stm32h7_firmware",
+    srcs = ["stm32h7_firmware.sh"],
     data = [
         "//firmware/boards/robot_stm32h7:robot_stm32h7_main",
         "@arm_developer_gcc//:gdb",

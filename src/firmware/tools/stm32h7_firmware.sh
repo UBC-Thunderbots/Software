@@ -84,10 +84,10 @@ fi
 # are if they have not
 NUM_ARGS=$#
 NUM_ELF_FILES="${#elf_files[@]}"
-if [[ $NUM_ARGS -ne 1 ]] || [[ $1 =~ [^[:digit:]] ]] || [[ "$1" -ge "$NUM_ELF_FILES" ]]; then
-  if [ $NUM_ARGS -ne 1 ]; then
+if [[ $NUM_ARGS -ne 2 ]] || [[ $1 =~ [^[:digit:]] ]] || [[ "$1" -ge "$NUM_ELF_FILES" ]]; then
+  if [ $NUM_ARGS -ne 2 ]; then
     echo "Error: Incorrect number of arguments to script"
-    echo "Usage: $THIS_SCRIPT_FILENAME INDEX_FOR_ELF_FILE"
+    echo "Usage: $THIS_SCRIPT_FILENAME INDEX_FOR_ELF_FILE program or debug"
   else
     echo "Error: Invalid index for ELF file given: $1"
   fi
@@ -109,35 +109,44 @@ if [ $KILLED_OPENOCD = 0 ]; then
   sleep 2
 fi
 
-# Start openocd as a child process, and redirect all its output to /dev/null.
-# If we don't redirect the output it will overwrite the gdb window
-OPENOCD_CFG_FILE="${elf_to_board_map[$elf_file]}"
-echo "Starting openocd with config $OPENOCD_CFG_FILE"
-OPENOCD_RUN_CMD="openocd -f $OPENOCD_CFG_FILE"
-eval "$OPENOCD_RUN_CMD > /dev/null 2>&1 &"
-
-# Check that openocd is still running after a second. If it's not, that
-# probably means there was an issue starting it, so we exit
-sleep 1
-pgrep openocd
-OPENOCD_RUNNING=$?
-if [ $OPENOCD_RUNNING -ne 0 ]; then
-  echo "There was an issue running openocd, the command that failed was: '$OPENOCD_RUN_CMD'"
-  exit 1
+if  [[ $2 == "debug" ]]; then
+    # Start openocd as a child process, and redirect all its output to /dev/null.
+    # If we don't redirect the output it will overwrite the gdb window
+    OPENOCD_CFG_FILE="${elf_to_board_map[$elf_file]}"
+    echo "Starting openocd with config $OPENOCD_CFG_FILE"
+    OPENOCD_RUN_CMD="openocd -f $OPENOCD_CFG_FILE"
+    eval "$OPENOCD_RUN_CMD > /dev/null 2>&1 &"
+    
+    # Check that openocd is still running after a second. If it's not, that
+    # probably means there was an issue starting it, so we exit
+    sleep 1
+    pgrep openocd
+    OPENOCD_RUNNING=$?
+    if [ $OPENOCD_RUNNING -ne 0 ]; then
+      echo "There was an issue running openocd, the command that failed was: '$OPENOCD_RUN_CMD'"
+      exit 1
+    fi
+    
+    # Run gdb, then:
+    #   - connect to openocd
+    #   - find all the source files so you can view them in gdb
+    #   - load firmware onto the board
+    gdb_args=(
+      -ex \"target extended-remote :3333\"
+      -ex \"directory $WORKSPACE_DIR\"
+      -ex \"load\"
+      -tui
+      $elf_file
+    )
+    eval "$path_to_arm_none_eabi_gdb ${gdb_args[@]}"
+    
+    # When gdb is finished, cleanup by stopping openocd
+    pkill openocd
 fi
-
-# Run gdb, then:
-#   - connect to openocd
-#   - find all the source files so you can view them in gdb
-#   - load firmware onto the board
-gdb_args=(
-  -ex \"target extended-remote :3333\"
-  -ex \"directory $WORKSPACE_DIR\"
-  -ex \"load\"
-  -tui
-  $elf_file
-)
-eval "$path_to_arm_none_eabi_gdb ${gdb_args[@]}"
-
-# When gdb is finished, cleanup by stopping openocd
-pkill openocd
+if  [[ $2 == "program" ]]; then
+    # Flash firmware
+    OPENOCD_CFG_FILE="${elf_to_board_map[$elf_file]}"
+    echo "Flashing $elf_file on stm32h7 with config $OPENOCD_CFG_FILE"
+    OPENOCD_RUN_CMD='openocd -f $OPENOCD_CFG_FILE -c "program $elf_file verify reset exit"'
+    eval "$OPENOCD_RUN_CMD"
+fi

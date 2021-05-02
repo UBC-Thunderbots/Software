@@ -23,9 +23,9 @@ cc_binary(
     deps = [
         ":STM32H743ZITx_FLASH.ld",
         ":dma",
-        ":robot_stm32h7_main_lib",
         ":gpio",
         ":lwip",
+        ":robot_stm32h7_main_lib",
         "//firmware/app/logger",
         "//firmware/boards/robot_stm32h7/io:drivetrain",
         "//firmware/boards/robot_stm32h7/io:drivetrain_unit",
