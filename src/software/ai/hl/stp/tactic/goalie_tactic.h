@@ -21,8 +21,9 @@
  * distance either way to intercept a potential straight shot into the net.
  *
  */
-class GoalieTactic : public Tactic {
-public:
+class GoalieTactic : public Tactic
+{
+   public:
     /**
      * Creates a new GoalieTactic
      *
@@ -113,7 +114,7 @@ public:
     // TODO (#1878): Replace this with a more intelligent chip distance system
     static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
 
-private:
+   private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;
 
     // Tactic parameters
