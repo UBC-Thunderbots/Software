@@ -1,8 +1,8 @@
-#include "firmware/boards/frankie_stm32h7/io/gpio_pin.h"
+#include "firmware/boards/robot_stm32h7/io/gpio_pin.h"
 
 #include <stdlib.h>
 
-#include "firmware/boards/frankie_stm32h7/stm32h7xx_hal_conf.h"
+#include "firmware/boards/robot_stm32h7/stm32h7xx_hal_conf.h"
 
 typedef struct GpioPin
 {

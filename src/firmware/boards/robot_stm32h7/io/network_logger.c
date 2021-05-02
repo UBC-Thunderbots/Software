@@ -1,8 +1,8 @@
-#include "firmware/boards/frankie_stm32h7/io/network_logger.h"
+#include "firmware/boards/robot_stm32h7/io/network_logger.h"
 
 #include "FreeRTOS.h"
 #include "cmsis_os.h"
-#include "firmware/boards/frankie_stm32h7/io/proto_multicast_communication_profile.h"
+#include "firmware/boards/robot_stm32h7/io/proto_multicast_communication_profile.h"
 #include "main.h"
 #include "pb.h"
 #include "pb_common.h"

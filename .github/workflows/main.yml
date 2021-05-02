@@ -64,7 +64,7 @@ jobs:
       - name: New Robot Firmware Build
         run: |
          cd src
-         bazel build --cpu=stm32h7 //firmware/boards/frankie_stm32h7:frankie_stm32h7_main 
+         bazel build --cpu=stm32h7 //firmware/boards/robot_stm32h7:robot_stm32h7_main 
      
       - name: Old Robot Firmware Build
         run: |

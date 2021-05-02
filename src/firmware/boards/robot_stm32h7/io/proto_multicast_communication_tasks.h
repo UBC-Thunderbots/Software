@@ -39,7 +39,7 @@ void io_proto_multicast_listener_task(void* communication_profile);
  *
  * Cube forces us to generate this function, in main.c where we mark it as __weak and
  * define the implementation in this library (proto_multicast_communication). When the
- * proto communication library is linked w/ the main frankie_stm32h7 binary, the __weak
+ * proto communication library is linked w/ the main robot_stm32h7 binary, the __weak
  * reference is resolved to the "stronger" reference to the function defined below.
  *
  * We take over control so we can signal other networking tasks when MX_LWIP_Init()

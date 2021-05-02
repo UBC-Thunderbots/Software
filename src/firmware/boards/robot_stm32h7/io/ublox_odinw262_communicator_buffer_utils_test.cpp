@@ -1,6 +1,6 @@
 extern "C"
 {
-#include "firmware/boards/frankie_stm32h7/io/ublox_odinw262_communicator_buffer_utils.h"
+#include "firmware/boards/robot_stm32h7/io/ublox_odinw262_communicator_buffer_utils.h"
 }
 
 #include <gtest/gtest.h>

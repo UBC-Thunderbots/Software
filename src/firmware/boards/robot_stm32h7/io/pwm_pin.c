@@ -1,4 +1,4 @@
-#include "firmware/boards/frankie_stm32h7/io/pwm_pin.h"
+#include "firmware/boards/robot_stm32h7/io/pwm_pin.h"
 
 #include <assert.h>
 #include <stdlib.h>

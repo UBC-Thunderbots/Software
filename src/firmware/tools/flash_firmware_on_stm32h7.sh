@@ -40,22 +40,22 @@ THIS_SCRIPT_FILENAME=$(basename "$0")
 WORKSPACE_DIR="$CURR_DIR/../../"
 
 # Load everything we need from bazel
-path_to_frankie_stm32h7_elf=$(rlocation "__main__/firmware/boards/frankie_stm32h7/frankie_stm32h7_main")
+path_to_robot_stm32h7_elf=$(rlocation "__main__/firmware/boards/robot_stm32h7/robot_stm32h7_main")
 
 # ADD NEW DEPENDENCIES HERE: it's used for error checking, you'll thank yourself later
 EXPECTED_NUM_OF_BAZEL_DEPENDENCIES=1
 bazel_dependencies=(
-  $path_to_frankie_stm32h7_elf
+  $path_to_robot_stm32h7_elf
 )
 
 # '.elf' files we want the user to be able to run
 elf_files=(
-  $path_to_frankie_stm32h7_elf
+  $path_to_robot_stm32h7_elf
 )
 
 # The correct board to give to 'openocd' for the given elf
 declare -A elf_to_board_map=(
-  [$path_to_frankie_stm32h7_elf]="board/st_nucleo_h743zi.cfg"
+  [$path_to_robot_stm32h7_elf]="board/st_nucleo_h743zi.cfg"
 )
 
 # Make sure we successfully set everything

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "firmware/boards/frankie_stm32h7/io/allegro_a3931_motor_driver.h"
+#include "firmware/boards/robot_stm32h7/io/allegro_a3931_motor_driver.h"
 
 typedef struct DrivetrainUnit DrivetrainUnit_t;
 

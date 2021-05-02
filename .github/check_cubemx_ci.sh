@@ -12,7 +12,7 @@ echo " THIS SHOULD ONLY BE RUN IN CI, PLEASE DO NOT USE LOCALLY"
 echo "=========================================================="
 
 cd src
-bazel run --cpu=stm32h7 //firmware/tools:cubemx_regen firmware/boards/frankie_stm32h7
+bazel run --cpu=stm32h7 //firmware/tools:cubemx_regen firmware/boards/robot_stm32h7
 if [[ "$?" != 0 ]]; then
     echo "There was an regenerating cubemx, stopping now."
     exit 1

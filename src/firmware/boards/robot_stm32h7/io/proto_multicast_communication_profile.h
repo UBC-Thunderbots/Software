@@ -2,7 +2,7 @@
 
 #include <pb.h>
 
-#include "firmware/boards/frankie_stm32h7/io/proto_multicast_communication_profile.h"
+#include "firmware/boards/robot_stm32h7/io/proto_multicast_communication_profile.h"
 #include "lwip.h"
 #include "lwip/api.h"
 #include "lwip/inet.h"

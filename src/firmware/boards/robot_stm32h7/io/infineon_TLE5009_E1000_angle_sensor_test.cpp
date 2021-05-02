@@ -1,6 +1,6 @@
 extern "C"
 {
-#include "firmware/boards/frankie_stm32h7/io/infineon_TLE5009_E1000_angle_sensor.h"
+#include "firmware/boards/robot_stm32h7/io/infineon_TLE5009_E1000_angle_sensor.h"
 }
 
 #include <gtest/gtest.h>
