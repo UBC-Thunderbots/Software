@@ -28,8 +28,8 @@ void MoveTestPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
         move_test_tactic_enemy_goal->updateControlParams(world.field().enemyGoalCenter());
         move_test_tactic_center_field->updateControlParams(Point(0, 0));
 
-        yield({move_test_tactic_center_field, move_test_tactic_friendly_goal,
-               move_test_tactic_enemy_goal});
+        yield({{move_test_tactic_center_field, move_test_tactic_friendly_goal,
+                move_test_tactic_enemy_goal}});
     } while (!move_test_tactic_center_field->done());
 }
 

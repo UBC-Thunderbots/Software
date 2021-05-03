@@ -4,7 +4,7 @@
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/find_open_areas.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
+#include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
@@ -52,12 +52,10 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
         play_config->getGoalieTacticConfig());
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                               world.friendlyTeam(), world.enemyTeam(),
-                                               CreaseDefenderTactic::LeftOrRight::LEFT),
-        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                               world.friendlyTeam(), world.enemyTeam(),
-                                               CreaseDefenderTactic::LeftOrRight::RIGHT),
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
     };
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {
@@ -77,25 +75,16 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     do
     {
-        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
-
-        // If we have any crease defenders, we don't want the goalie tactic to consider
-        // them when deciding where to block
-        Team friendly_team_for_goalie = world.friendlyTeam();
-        for (auto crease_defender_tactic : crease_defender_tactics)
-        {
-            if (crease_defender_tactic->getAssignedRobot())
-            {
-                friendly_team_for_goalie.removeRobotWithId(
-                    crease_defender_tactic->getAssignedRobot()->id());
-            }
-        }
+        PriorityTacticVector result = {{goalie_tactic}};
 
         // Update crease defenders
-        for (auto &crease_defender_tactic : crease_defender_tactics)
-        {
-            result.emplace_back(crease_defender_tactic);
-        }
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        result[0].emplace_back(std::get<0>(crease_defender_tactics));
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
+        result[0].emplace_back(std::get<1>(crease_defender_tactics));
 
         // Update tactics moving to open areas
         std::vector<Point> enemy_robot_points;
@@ -116,7 +105,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 Vector::createFromAngle(orientation).normalize(ROBOT_MAX_RADIUS_METERS);
             ;
             move_to_open_area_tactics[i]->updateControlParams(position, orientation, 0.0);
-            result.emplace_back(move_to_open_area_tactics[i]);
+            result[0].emplace_back(move_to_open_area_tactics[i]);
         }
 
         // Update chipper
@@ -128,7 +117,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
         shoot_or_chip_tactic->updateControlParams(chip_target);
 
         // We want this second in priority only to the goalie
-        result.insert(result.begin() + 1, shoot_or_chip_tactic);
+        result[0].insert(result[0].begin() + 1, shoot_or_chip_tactic);
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(result);

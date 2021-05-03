@@ -41,7 +41,7 @@ void InterceptBallAction::interceptSlowBall(IntentCoroutine::push_type& yield)
             robot->id(), ball.position(), face_ball_orientation, 0,
             DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-            MaxAllowedSpeedMode::PHYSICAL_LIMIT));
+            MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
 
         // Restart the action if the ball's speed has sped up substantially.
         // The extra factor of 2 is to prevent being overly sensitive to restarts
@@ -83,7 +83,7 @@ void InterceptBallAction::interceptSlowBall(IntentCoroutine::push_type& yield)
             robot->id(), robot->position(), face_ball_orientation, 0,
             DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-            MaxAllowedSpeedMode::PHYSICAL_LIMIT));
+            MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
     } while (robot->velocity().length() > ROBOT_STOPPED_SPEED_M_PER_S);
 }
 
@@ -115,7 +115,7 @@ void InterceptBallAction::interceptFastBall(IntentCoroutine::push_type& yield)
             robot->id(), intercept_position, (-ball.velocity()).orientation(), 0,
             DribblerMode::MAX_FORCE, BallCollisionType::AVOID,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-            MaxAllowedSpeedMode::PHYSICAL_LIMIT));
+            MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
 
         // Restart the action if the ball's speed has slowed down substantially.
         // The extra factor of 2 is to prevent being overly sensitive to restarts
@@ -143,7 +143,7 @@ void InterceptBallAction::interceptFastBall(IntentCoroutine::push_type& yield)
             robot->id(), intercept_position, (-ball.velocity()).orientation(), 0,
             DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-            MaxAllowedSpeedMode::PHYSICAL_LIMIT));
+            MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
 
         if (!intercept_done &&
             ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD / 2.0)

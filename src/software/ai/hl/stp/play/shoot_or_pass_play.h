@@ -3,10 +3,11 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
-#include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
+#include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.h"
 
 /**
@@ -30,14 +31,6 @@ class ShootOrPassPlay : public Play
 
     // The speed each patrolling robot should be moving through its control point
     static constexpr double SPEED_AT_PATROL_POINTS = 0.0;
-
-    /**
-     * Updates the pass generator
-     *
-     * @param pass_generator
-     * @param world The current state of the world
-     */
-    void updatePassGenerator(PassGenerator &pass_generator, const World &world);
 
     /**
      * Sets up the pass for the corner kick: aligns the passer and positions the cherry

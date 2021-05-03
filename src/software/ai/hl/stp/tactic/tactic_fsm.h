@@ -13,14 +13,9 @@
  * for an example of how to implement a tactic using this framework
  */
 
-// alias for an FSM that has at least 2 levels of hierarchy, as in it uses at least one
-// sub-FSM
-template <class FSM>
-using HFSM = boost::sml::sm<FSM, boost::sml::process_queue<std::queue>>;
-
-// alias for FSMs that have no hierarchy, as in they have no sub fsms
-template <class FSM>
-using BaseFSM = boost::sml::sm<FSM>;
+// An alias for an FSM
+template <class T>
+using FSM = boost::sml::sm<T, boost::sml::process_queue<std::queue>>;
 
 // This callback is used to return an intent from the fsm
 using SetIntentCallback = std::function<void(std::unique_ptr<Intent>)>;

@@ -33,6 +33,19 @@ void SimulatedTestFixture::SetUp()
         ->getMutableDefendingPositiveSide()
         ->setValue(false);
 
+    // Experimentally determined restitution value
+    mutable_thunderbots_config->getMutableSimulatorConfig()
+        ->getMutableBallRestitution()
+        ->setValue(0.8);
+    // Measured these values from fig. 9 on page 8 of
+    // https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
+    mutable_thunderbots_config->getMutableSimulatorConfig()
+        ->getMutableSlidingFrictionAcceleration()
+        ->setValue(6.9);
+    mutable_thunderbots_config->getMutableSimulatorConfig()
+        ->getMutableRollingFrictionAcceleration()
+        ->setValue(0.5);
+
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always defending the "negative" side of the field. This is so that the
     // coordinates given when setting up tests is from the perspective of the friendly
@@ -64,21 +77,6 @@ void SimulatedTestFixture::addEnemyRobots(const std::vector<RobotStateWithId> &r
 Field SimulatedTestFixture::field() const
 {
     return simulator->getField();
-}
-
-void SimulatedTestFixture::setRefereeCommand(
-    const RefereeCommand &current_referee_command,
-    const RefereeCommand &previous_referee_command)
-{
-    mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableOverrideRefereeCommand()
-        ->setValue(true);
-    mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableCurrentRefereeCommand()
-        ->setValue(toString(current_referee_command));
-    mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutablePreviousRefereeCommand()
-        ->setValue(toString(previous_referee_command));
 }
 
 void SimulatedTestFixture::enableVisualizer()

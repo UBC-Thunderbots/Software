@@ -239,17 +239,18 @@ TEST_P(STPRefereeCommandPlaySelectionTest, test_play_selection_for_all_referee_c
     }
 }
 
-// TODO (Issue #1665): Include `BALL_PLACEMENT_US` and `BALL_PLACEMENT_THEM` when ball
-// placement states have plays
+// TODO (Issue #1999): Include `BALL_PLACEMENT_THEM` when ball placement states have plays
 
 // NORMAL_START is omitted since there is no preceding PREPARE state
 // GOAL_US and GOAL_THEM are omitted since selecting a play is not applicable
 INSTANTIATE_TEST_CASE_P(
     AllRefboxGameStates, STPRefereeCommandPlaySelectionTest,
-    ::testing::Values(
-        RefereeCommand::HALT, RefereeCommand::STOP, RefereeCommand::FORCE_START,
-        RefereeCommand::PREPARE_KICKOFF_US, RefereeCommand::PREPARE_KICKOFF_THEM,
-        RefereeCommand::PREPARE_PENALTY_US, RefereeCommand::PREPARE_PENALTY_THEM,
-        RefereeCommand::DIRECT_FREE_US, RefereeCommand::DIRECT_FREE_THEM,
-        RefereeCommand::INDIRECT_FREE_US, RefereeCommand::INDIRECT_FREE_THEM,
-        RefereeCommand::TIMEOUT_US, RefereeCommand::TIMEOUT_THEM));
+    ::testing::Values(RefereeCommand::HALT, RefereeCommand::STOP,
+                      RefereeCommand::FORCE_START, RefereeCommand::PREPARE_KICKOFF_US,
+                      RefereeCommand::PREPARE_KICKOFF_THEM,
+                      RefereeCommand::PREPARE_PENALTY_US,
+                      RefereeCommand::PREPARE_PENALTY_THEM,
+                      RefereeCommand::DIRECT_FREE_US, RefereeCommand::DIRECT_FREE_THEM,
+                      RefereeCommand::INDIRECT_FREE_US,
+                      RefereeCommand::INDIRECT_FREE_THEM, RefereeCommand::TIMEOUT_US,
+                      RefereeCommand::TIMEOUT_THEM, RefereeCommand::BALL_PLACEMENT_US));

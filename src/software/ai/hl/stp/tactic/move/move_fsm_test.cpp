@@ -15,9 +15,10 @@ TEST(MoveFSMTest, test_transitions)
         .dribbler_mode          = DribblerMode::OFF,
         .ball_collision_type    = BallCollisionType::AVOID,
         .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-        .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT};
+        .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        .target_spin_rev_per_s  = 0.0};
 
-    BaseFSM<MoveFSM> fsm;
+    FSM<MoveFSM> fsm;
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::MoveState>));
 
     // robot far from destination
@@ -47,7 +48,8 @@ TEST(MoveFSMTest, test_transitions)
         .dribbler_mode          = DribblerMode::OFF,
         .ball_collision_type    = BallCollisionType::AVOID,
         .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-        .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT};
+        .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        .target_spin_rev_per_s  = 0.0};
     fsm.process_event(MoveFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::MoveState>));

@@ -8,30 +8,10 @@ cc_library(
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
-        "//software/ai/passing:pass_generator",
+        "//software/ai/passing:pass",
         "//software/geom/algorithms",
         "//software/logger",
         "//software/world",
-    ],
-)
-
-cc_test(
-    name = "cherry_pick_tactic_test",
-    srcs = ["cherry_pick_tactic_test.cpp"],
-    deps = [
-        ":cherry_pick_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "kickoff_chip_tactic_test",
-    srcs = ["kickoff_chip_tactic_test.cpp"],
-    deps = [
-        ":kickoff_chip_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -54,34 +34,6 @@ cc_library(
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/logger",
-    ],
-)
-
-cc_library(
-    name = "crease_defender_tactic",
-    srcs = ["crease_defender_tactic.cpp"],
-    hdrs = ["crease_defender_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/action:stop_action",
-        "//software/geom/algorithms",
-        "//software/logger",
-    ],
-)
-
-cc_test(
-    name = "crease_defender_tactic_test",
-    srcs = ["crease_defender_tactic_test.cpp"],
-    deps = [
-        ":crease_defender_tactic",
-        "//shared:constants",
-        "//software/ai/intent:move_intent",
-        "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -143,32 +95,6 @@ cc_test(
 )
 
 cc_library(
-    name = "passer_tactic",
-    srcs = ["passer_tactic.cpp"],
-    hdrs = ["passer_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//software/ai/hl/stp/action:intercept_ball_action",
-        "//software/ai/hl/stp/action:kick_action",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/passing:pass",
-        "//software/logger",
-        "//software/world:ball",
-    ],
-)
-
-cc_test(
-    name = "passer_tactic_test",
-    srcs = ["passer_tactic_test.cpp"],
-    deps = [
-        ":passer_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "penalty_kick_tactic",
     srcs = ["penalty_kick_tactic.cpp"],
     hdrs = ["penalty_kick_tactic.h"],
@@ -219,17 +145,6 @@ cc_library(
         "//software/ai/passing:pass",
         "//software/geom/algorithms",
         "//software/logger",
-    ],
-)
-
-cc_test(
-    name = "receiver_tactic_test",
-    srcs = ["receiver_tactic_test.cpp"],
-    deps = [
-        ":receiver_tactic",
-        "//software/ai/intent:kick_intent",
-        "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -314,11 +229,9 @@ cc_library(
     hdrs = ["all_tactics.h"],
     deps = [
         ":cherry_pick_tactic",
-        ":crease_defender_tactic",
         ":defense_shadow_enemy_tactic",
         ":goalie_tactic",
         ":kickoff_chip_tactic",
-        ":passer_tactic",
         ":penalty_kick_tactic",
         ":penalty_setup_tactic",
         ":receiver_tactic",
@@ -327,10 +240,12 @@ cc_library(
         ":shoot_goal_tactic",
         ":tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
+        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
+        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
-        "//software/ai/hl/stp/tactic/get_possession:get_possession_tactic",
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/hl/stp/tactic/passer:passer_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
     ],
 )
