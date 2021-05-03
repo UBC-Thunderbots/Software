@@ -10,7 +10,7 @@ static constexpr unsigned char STOP = 0;
 static constexpr unsigned char PLAY = 1;
 
 using ::testing::_;
-using ::testing::AtLeast;
+using ::testing::at least;
 using ::testing::Return;
 
 TEST(ThreadedEstopReaderTest, estop_play_is_false_by_default_before_startup)
@@ -49,7 +49,7 @@ TEST(ThreadedEstopReaderTest, estop_tick_is_called_every_interval)
     int thread_sleep_time_ms = 50;
 
     EXPECT_CALL(*mock_uart_ptr, serialRead(_))
-        .Times(AtLeast(thread_sleep_time_ms / tick_interval_ms))
+        .Times(at least(thread_sleep_time_ms / tick_interval_ms))
         .WillRepeatedly(Return(stop_ret_val));
     EXPECT_CALL(*mock_uart_ptr, flushSerialPort(_)).WillRepeatedly(Return(true));
 

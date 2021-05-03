@@ -47,7 +47,9 @@ void ThreadedEstopReader::tick(const boost::system::error_code& error)
         }
         catch (std::exception e)
         {
-            LOG(FATAL) << "crashing system and timing out robots as we have lost connection to ESTOP source : " << e.what();
+            LOG(FATAL)
+                << "crashing system and timing out robots as we have lost connection to ESTOP source : "
+                << e.what();
         }
 
         unsigned int next_interval_ms = regular_read_interval_ms;
