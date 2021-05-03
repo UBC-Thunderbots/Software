@@ -348,6 +348,7 @@ struct GoalieFSM
      * @param goalie_restricted_area The rectangle that the goalie is to stay in
      * @return goalie_suggested_position That the goalie should go to
      */
+    // TODO: Refactor this function (#2045)
     static std::optional<Point> restrainGoalieInRectangle(
         const Field &field, Point goalie_desired_position,
         Rectangle goalie_restricted_area)
