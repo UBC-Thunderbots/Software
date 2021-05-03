@@ -98,7 +98,7 @@ namespace TestUtil
     }
 
     std::vector<RobotStateWithId> createStationaryRobotStatesWithId(
-        const std::vector<Point> &positions )
+        const std::vector<Point> &positions)
     {
         std::vector<RobotStateWithId> states;
         for (RobotId id = 0; id < static_cast<RobotId>(positions.size()); id++)
