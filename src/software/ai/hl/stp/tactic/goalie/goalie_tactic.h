@@ -28,13 +28,6 @@ class GoalieTactic : public Tactic
 
     void updateWorldParams(const World &world) override;
 
-    /**
-     * Updates the params assuming that the max allowed speed mode is the physical limits
-     * @param updated_goalie_tactic_config the updated goalie tactic config
-     */
-    void updateControlParams(
-        std::shared_ptr<const GoalieTacticConfig> updated_goalie_tactic_config);
-
     double calculateRobotCost(const Robot &robot, const World &world) const override;
 
     void accept(TacticVisitor &visitor) const override;

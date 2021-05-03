@@ -17,13 +17,6 @@ GoalieTactic::GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tact
 
 void GoalieTactic::updateWorldParams(const World &world) {}
 
-void GoalieTactic::updateControlParams(
-    std::shared_ptr<const GoalieTacticConfig> updated_goalie_tactic_config)
-{
-    // Update the control parameters stored by this Tactic
-    control_params.goalie_tactic_config = updated_goalie_tactic_config;
-}
-
 double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
     // We don't prefer any particular robot to be the goalie, as there should only
