@@ -49,7 +49,7 @@ class GetBehindBallTactic : public Tactic
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-    BaseFSM<GetBehindBallFSM> fsm;
+    FSM<GetBehindBallFSM> fsm;
 
     GetBehindBallFSM::ControlParams control_params;
 };

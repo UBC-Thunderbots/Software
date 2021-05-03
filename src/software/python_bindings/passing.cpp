@@ -21,54 +21,44 @@ py::dict getPassingConfig()
     return copyDynamicParametersConfigToDict(passing_config);
 }
 
-Pass createPassFromDict(py::dict pass_dict, Timestamp pass_start_time)
+Pass createPassFromDict(py::dict pass_dict)
 {
     // unpack values from the py::dict and put them into a pass
     Point passer_point = pass_dict["passer_point"].cast<Point>();
     Point receiver_point(pass_dict["receiver_point"].cast<Point>());
     auto pass_speed = pass_dict["pass_speed"].cast<double>();
-    return Pass(passer_point, receiver_point, pass_speed, pass_start_time);
+    return Pass(passer_point, receiver_point, pass_speed);
 }
 
 double ratePassWrapper(const World& world, py::dict pass_dict,
                        py::dict passing_config_dict)
 {
-    auto pass = createPassFromDict(pass_dict, world.getMostRecentTimestamp());
-    updatePassingConfigFromDict(passing_config_dict);
-
-    PassType pass_type = pass_dict.contains("receive_and_dribble") &&
-                                 pass_dict["receive_and_dribble"].cast<bool>()
-                             ? PassType::RECEIVE_AND_DRIBBLE
-                             : PassType::ONE_TOUCH_SHOT;
-    return ratePass(world, pass, std::nullopt, std::nullopt, pass_type, passing_config);
+    auto pass = createPassFromDict(pass_dict);
+    return ratePass(world, pass, world.field().fieldLines(), passing_config);
 }
 
 double ratePassShootScoreWrapper(const World& world, py::dict pass_dict,
                                  py::dict passing_config_dict)
 {
-    auto pass = createPassFromDict(pass_dict, world.getMostRecentTimestamp());
+    auto pass = createPassFromDict(pass_dict);
     updatePassingConfigFromDict(passing_config_dict);
-
     return ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
 }
 
 double ratePassEnemyRiskWrapper(const World& world, py::dict pass_dict,
                                 py::dict passing_config_dict)
 {
-    auto pass = createPassFromDict(pass_dict, world.getMostRecentTimestamp());
+    auto pass = createPassFromDict(pass_dict);
     updatePassingConfigFromDict(passing_config_dict);
-
     return ratePassEnemyRisk(world.enemyTeam(), pass, passing_config);
 }
 
 double ratePassFriendlyCapabilityWrapper(const World& world, py::dict pass_dict,
                                          py::dict passing_config_dict)
 {
-    auto pass = createPassFromDict(pass_dict, world.getMostRecentTimestamp());
+    auto pass = createPassFromDict(pass_dict);
     updatePassingConfigFromDict(passing_config_dict);
-
-    return ratePassFriendlyCapability(world.friendlyTeam(), pass, std::nullopt,
-                                      passing_config);
+    return ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
 }
 
 PYBIND11_MODULE(passing, m)

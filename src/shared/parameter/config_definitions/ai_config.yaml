@@ -3,7 +3,7 @@ include:
   - goalie_tactic_config.yaml
   - navigator_config.yaml
   - passing_config.yaml
-  - robot_navigation_obstacle_factory_config.yaml
+  - robot_navigation_obstacle_config.yaml
   - shoot_goal_tactic_config.yaml
   - shoot_or_pass_play_config.yaml
   - defense_shadow_enemy_tactic_config.yaml

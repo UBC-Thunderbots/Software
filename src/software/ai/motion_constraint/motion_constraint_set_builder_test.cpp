@@ -12,7 +12,7 @@
 namespace
 {
     World world = ::TestUtil::createBlankTestingWorld();
-    Pass pass({1, 1}, {0.5, 0}, 2.29, Timestamp::fromSeconds(5));
+    Pass pass({1, 1}, {0.5, 0}, 2.29);
 
 
     // vector of pairs of Tactic and allowed MotionConstraints
@@ -21,14 +21,11 @@ namespace
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new MoveTactic(false), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new CherryPickTactic(world, Rectangle({0, 0}, {1, 1}),
-                                     std::make_shared<const PassingConfig>()),
-                std::set<MotionConstraint>({})),
+                new CherryPickTactic(world, pass), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new CreaseDefenderTactic(world.field(), world.ball(),
-                                         world.friendlyTeam(), world.enemyTeam(),
-                                         CreaseDefenderTactic::LEFT),
-                std::set<MotionConstraint>({})),
+                new CreaseDefenderTactic(
+                    std::make_shared<const RobotNavigationObstacleConfig>()),
+                std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
                                  world.enemyTeam(),
@@ -75,8 +72,7 @@ namespace
                                     std::make_shared<const ShootGoalTacticConfig>()),
                 std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new PasserTactic(pass, world.ball(), world.field(), false),
-                std::set<MotionConstraint>({})),
+                new PasserTactic(pass), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new StopTactic(false), std::set<MotionConstraint>({}))};
 

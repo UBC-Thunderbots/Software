@@ -13,7 +13,7 @@
 #include "software/world/world.h"
 
 class SimulatedChipTacticTest
-    : public virtual SimulatedTacticTestFixture,
+    : public SimulatedTacticTestFixture,
       public ::testing::WithParamInterface<std::tuple<Vector, Angle>>
 {
 };
@@ -28,8 +28,6 @@ TEST_P(SimulatedChipTacticTest, chip_test)
 
     addFriendlyRobots(
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position}));
-
-    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
 
     auto tactic = std::make_shared<ChipTactic>(false);
     tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,

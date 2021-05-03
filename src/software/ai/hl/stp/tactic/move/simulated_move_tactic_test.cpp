@@ -27,7 +27,6 @@ TEST_F(SimulatedMoveTacticTest, test_move_across_field)
         {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
-    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
@@ -68,7 +67,6 @@ TEST_F(SimulatedMoveTacticTest, test_autochip_move)
         {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
-    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(
@@ -113,7 +111,6 @@ TEST_F(SimulatedMoveTacticTest, test_autokick_move)
         {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
          field().enemyDefenseArea().negXNegYCorner(),
          field().enemyDefenseArea().negXPosYCorner()}));
-    setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::FORCE_START);
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::threeQuarter(), 0, DribblerMode::OFF,

@@ -130,7 +130,7 @@ class ThetaStarPathPlanner : public PathPlanner
        private:
         /**
          * Calculate the key value given a pair of coordinates. The key of the coordinate
-         * with smaller row value, or smaller col value when row values are equal wil
+         * with smaller row value, or smaller col value when row values are equal will
          * occupy the low 32 bits in the key for this CoordinatePair. The key value of the
          * other coordinate will occupy the high 32 bits in the key for this
          * CoordinatePair.
