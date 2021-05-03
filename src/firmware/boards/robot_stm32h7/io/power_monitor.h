@@ -15,15 +15,11 @@ void io_power_monitor_init(I2C_TypeDef *i2c_instance, uint16_t dev_address,
 /**
  * Gets the battery voltage
  *
- * @param the power monitor to get voltage with
- *
- * @param the current voltage of the battery in volts
+ * @return the current voltage of the battery in volts
  */
 float io_power_monitor_getBatteryVoltage(void);
 
 /**
  * Destroy the monitor
- *
- * @param the power monitor to destroy
  */
 void io_power_monitor_destroy(void);
