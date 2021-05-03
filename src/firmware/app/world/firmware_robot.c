@@ -133,17 +133,20 @@ void force_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
     app_physbot_computeAccelInLocalCoordinates(
         accel, pb, app_firmware_robot_getOrientation(robot), major_vec, minor_vec);
 
+    ForceWheel_t* force_wheels[4];
+    force_wheels[0] = front_left_wheel;
+    force_wheels[1] = back_left_wheel;
+    force_wheels[2] = back_right_wheel;
+    force_wheels[3] = front_right_wheel;
     app_control_applyAccel(robot_constants, controller_state, battery_voltage,
-                           front_left_wheel, front_right_wheel, back_left_wheel,
-                           back_right_wheel, accel[0], accel[1], accel[2]);
+                           force_wheels, accel[0], accel[1], accel[2]);
 }
 
 void velocity_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
                                          PositionTrajectory_t pos_trajectory,
                                          size_t trajectory_index, float max_speed_m_per_s)
 {
-    // Convert position trajectory to velocity trajectory
-    // TODO: Implement this function
+    // TODO (#2044): Implement trajectory follower for velocity_wheels
 }
 
 void force_wheels_applyDirectPerWheelPower(
@@ -509,11 +512,6 @@ void app_firmware_robot_trackVelocityInRobotFrame(const FirmwareRobot_t* robot,
                                                   float linear_velocity_y,
                                                   float angular_velocity)
 {
-    ForceWheel_t* front_right_wheel = robot->front_right_force_wheel;
-    ForceWheel_t* front_left_wheel  = robot->front_left_force_wheel;
-    ForceWheel_t* back_right_wheel  = robot->back_right_force_wheel;
-    ForceWheel_t* back_left_wheel   = robot->back_left_force_wheel;
-
     const RobotConstants_t robot_constants = app_firmware_robot_getRobotConstants(robot);
     ControllerState_t* controller_state    = app_firmware_robot_getControllerState(robot);
     float current_vx                       = app_firmware_robot_getVelocityX(robot);
@@ -541,10 +539,15 @@ void app_firmware_robot_trackVelocityInRobotFrame(const FirmwareRobot_t* robot,
     float angular_acceleration =
         (angular_velocity - current_angular_velocity) * VELOCITY_ERROR_GAIN;
 
+    ForceWheel_t* force_wheels[4];
+    force_wheels[0] = robot->front_left_force_wheel;
+    force_wheels[1] = robot->back_left_force_wheel;
+    force_wheels[2] = robot->back_right_force_wheel;
+    force_wheels[3] = robot->front_right_force_wheel;
+
     app_control_applyAccel(robot_constants, controller_state, battery_voltage,
-                           front_left_wheel, front_right_wheel, back_left_wheel,
-                           back_right_wheel, desired_acceleration[0],
-                           desired_acceleration[1], angular_acceleration);
+                           force_wheels, desired_acceleration[0], desired_acceleration[1],
+                           angular_acceleration);
 }
 
 void app_firmware_robot_followPosTrajectory(const FirmwareRobot_t* robot,

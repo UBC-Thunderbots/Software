@@ -10,14 +10,14 @@
  * Note that this could scale the forces *down* if they exceed the physical capabilities
  * of the robot (ex. wheel slip).
  *
- * @param wheels Force wheels to compute the maximum torque scaling from
+ * @param force_wheels Force wheels to compute the maximum torque scaling from
  * @param wheel_forces Forces to apply to each wheel
  * @param battery_voltage The current battery voltage
  *
  * @return The amount by which to scale the force on each wheel to get the maximum
  *         torque possible while maintaining the same torque ratio between wheels
  */
-float app_control_getMaximalTorqueScaling(const ForceWheel_t* wheels[4],
+float app_control_getMaximalTorqueScaling(const ForceWheel_t* force_wheels[4],
                                           const float wheel_forces[4],
                                           float battery_voltage)
 {
@@ -26,7 +26,7 @@ float app_control_getMaximalTorqueScaling(const ForceWheel_t* wheels[4],
 
     for (long i = 0; i < 4; i++)
     {
-        const ForceWheel_t* wheel             = wheels[i];
+        const ForceWheel_t* wheel             = force_wheels[i];
         const ForceWheelConstants_t constants = app_force_wheel_getWheelConstants(wheel);
         float force                           = wheel_forces[i];
         float motor_torque =
@@ -64,10 +64,7 @@ float app_control_getMaximalTorqueScaling(const ForceWheel_t* wheels[4],
  *
  * @param robot_constants The robot constants representing the robot
  * @param battery_voltage The robot's battery voltage
- * @param front_left_wheel The robot's front left wheel
- * @param front_right_wheel The robot's front right wheel
- * @param back_left_wheel The robot's back left wheel
- * @param back_right_wheel The robot's back right wheel
+ * @param force_wheels The robot's force wheels
  * @param linear_accel_x [m/s^2] The linear x acceleration to scale
  * @param linear_accel_y [m/s^2] The linear y acceleration to scale
  * @param angular_accel [rad/s^2] The angular acceleration to scale
@@ -75,11 +72,11 @@ float app_control_getMaximalTorqueScaling(const ForceWheel_t* wheels[4],
  * @return The scaling constant to multiply the all acceleration values by in order to
  *         accelerate the robot as fast as physically possible
  */
-float app_control_getMaximalAccelScaling(
-    const RobotConstants_t robot_constants, float battery_voltage,
-    ForceWheel_t* front_left_wheel, ForceWheel_t* front_right_wheel,
-    ForceWheel_t* back_left_wheel, ForceWheel_t* back_right_wheel,
-    const float linear_accel_x, const float linear_accel_y, float angular_accel)
+float app_control_getMaximalAccelScaling(const RobotConstants_t robot_constants,
+                                         float battery_voltage,
+                                         const ForceWheel_t* force_wheels[4],
+                                         const float linear_accel_x,
+                                         const float linear_accel_y, float angular_accel)
 {
     // first convert accelerations into consistent units
     // choose units of Force (N)
@@ -92,27 +89,25 @@ float app_control_getMaximalAccelScaling(
     float wheel_forces[4];
     force3_to_force4(normed_force, wheel_forces);
 
-    const ForceWheel_t* wheels[4];
-    wheels[0] = front_left_wheel;
-    wheels[1] = back_left_wheel;
-    wheels[2] = back_right_wheel;
-    wheels[3] = front_right_wheel;
-
-    return app_control_getMaximalTorqueScaling(wheels, wheel_forces, battery_voltage);
+    return app_control_getMaximalTorqueScaling(force_wheels, wheel_forces,
+                                               battery_voltage);
 }
 
 void app_control_applyAccel(RobotConstants_t robot_constants,
                             ControllerState_t* controller_state, float battery_voltage,
-                            ForceWheel_t* front_left_wheel,
-                            ForceWheel_t* front_right_wheel,
-                            ForceWheel_t* back_left_wheel, ForceWheel_t* back_right_wheel,
-                            float linear_accel_x, float linear_accel_y,
-                            float angular_accel)
+                            ForceWheel_t* force_wheels[4], float linear_accel_x,
+                            float linear_accel_y, float angular_accel)
 {
+    const ForceWheel_t* wheels[4];
+    wheels[0] = force_wheels[0];
+    wheels[1] = force_wheels[1];
+    wheels[2] = force_wheels[2];
+    wheels[3] = force_wheels[3];
+
     // check for max acceleration in direction of the vel difference
-    float scaling = app_control_getMaximalAccelScaling(
-        robot_constants, battery_voltage, front_left_wheel, front_right_wheel,
-        back_left_wheel, back_right_wheel, linear_accel_x, linear_accel_y, angular_accel);
+    float scaling =
+        app_control_getMaximalAccelScaling(robot_constants, battery_voltage, wheels,
+                                           linear_accel_x, linear_accel_y, angular_accel);
 
     // if the (very naive) 1 tick acceleration violates the physical limits of the robot
     // scale it to maximum
@@ -157,8 +152,8 @@ void app_control_applyAccel(RobotConstants_t robot_constants,
     float wheel_force[4];
     speed3_to_speed4(robot_force, wheel_force);  // Convert to wheel coordinate system
 
-    app_force_wheel_applyForce(front_left_wheel, wheel_force[0]);
-    app_force_wheel_applyForce(front_right_wheel, wheel_force[3]);
-    app_force_wheel_applyForce(back_left_wheel, wheel_force[1]);
-    app_force_wheel_applyForce(back_right_wheel, wheel_force[2]);
+    app_force_wheel_applyForce(force_wheels[0], wheel_force[0]);
+    app_force_wheel_applyForce(force_wheels[3], wheel_force[3]);
+    app_force_wheel_applyForce(force_wheels[1], wheel_force[1]);
+    app_force_wheel_applyForce(force_wheels[2], wheel_force[2]);
 }
