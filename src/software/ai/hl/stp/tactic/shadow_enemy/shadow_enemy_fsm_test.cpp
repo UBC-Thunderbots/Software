@@ -4,37 +4,41 @@
 
 #include "software/test_util/test_util.h"
 
-TEST(ShadowEnemyFSMTest, test_findBlockPassPoint){
-    Point ball_position = Point(0,2);
-    Robot shadowee = Robot(0, Point(0,-2), Vector(0, 0),
-              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+TEST(ShadowEnemyFSMTest, test_findBlockPassPoint)
+{
+    Point ball_position    = Point(0, 2);
+    Robot shadowee         = Robot(0, Point(0, -2), Vector(0, 0), Angle::half(),
+                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
     double shadow_distance = 2;
-    Point block_pass_point = ShadowEnemyFSM::findBlockPassPoint(ball_position, shadowee, shadow_distance);
-    EXPECT_EQ(block_pass_point, Point(0,0));
+    Point block_pass_point =
+        ShadowEnemyFSM::findBlockPassPoint(ball_position, shadowee, shadow_distance);
+    EXPECT_EQ(block_pass_point, Point(0, 0));
 
-    ball_position = Point(0,2);
-    shadowee = Robot(0, Point(2,0), Vector(0, 0),
-              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    ball_position = Point(0, 2);
+    shadowee = Robot(0, Point(2, 0), Vector(0, 0), Angle::half(), AngularVelocity::zero(),
+                     Timestamp::fromSeconds(0));
     shadow_distance = 1;
-    block_pass_point = ShadowEnemyFSM::findBlockPassPoint(ball_position, shadowee, shadow_distance);
-    EXPECT_EQ(block_pass_point, Point(2-1/std::sqrt(2),1/std::sqrt(2)));
+    block_pass_point =
+        ShadowEnemyFSM::findBlockPassPoint(ball_position, shadowee, shadow_distance);
+    EXPECT_EQ(block_pass_point, Point(2 - 1 / std::sqrt(2), 1 / std::sqrt(2)));
 
 
-    ball_position = Point(2,0);
-    shadowee = Robot(0, Point(-2,0), Vector(0, 0),
-              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    ball_position   = Point(2, 0);
+    shadowee        = Robot(0, Point(-2, 0), Vector(0, 0), Angle::half(),
+                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
     shadow_distance = 0.25;
-    block_pass_point = ShadowEnemyFSM::findBlockPassPoint(ball_position, shadowee, shadow_distance);
-    EXPECT_EQ(block_pass_point, Point(-1.75,0));
+    block_pass_point =
+        ShadowEnemyFSM::findBlockPassPoint(ball_position, shadowee, shadow_distance);
+    EXPECT_EQ(block_pass_point, Point(-1.75, 0));
 }
 
-TEST(ShadowEnemyFSMTest, test_findBlockShotPoint){
-
-    Robot shadower = Robot(0, Point(0,1), Vector(0, 0),
-              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Robot shadowee = Robot(0, Point(2,0), Vector(0, 0),
-              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Field field               = Field::createSSLDivisionBField();
+TEST(ShadowEnemyFSMTest, test_findBlockShotPoint)
+{
+    Robot shadower    = Robot(0, Point(0, 1), Vector(0, 0), Angle::half(),
+                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot shadowee    = Robot(0, Point(2, 0), Vector(0, 0), Angle::half(),
+                           AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Field field       = Field::createSSLDivisionBField();
     Team friendlyTeam = Team(Duration::fromSeconds(1));
     friendlyTeam.updateRobots({shadower});
     Team enemyTeam = Team(Duration::fromSeconds(1));
@@ -42,21 +46,22 @@ TEST(ShadowEnemyFSMTest, test_findBlockShotPoint){
     double shadow_distance = 2;
 
 
-    Point block_shot_point = ShadowEnemyFSM::findBlockShotPoint(shadower, field, friendlyTeam, enemyTeam, 
-                shadowee, shadow_distance);  
-    EXPECT_EQ(block_shot_point, Point(0,0));
+    Point block_shot_point = ShadowEnemyFSM::findBlockShotPoint(
+        shadower, field, friendlyTeam, enemyTeam, shadowee, shadow_distance);
+    EXPECT_EQ(block_shot_point, Point(0, 0));
 
-    shadower = Robot(0, Point(0,1), Vector(0, 0),
-              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    shadowee = Robot(0, Point(1,2), Vector(0, 0),
-              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    shadower = Robot(0, Point(0, 1), Vector(0, 0), Angle::half(), AngularVelocity::zero(),
+                     Timestamp::fromSeconds(0));
+    shadowee = Robot(0, Point(1, 2), Vector(0, 0), Angle::half(), AngularVelocity::zero(),
+                     Timestamp::fromSeconds(0));
     friendlyTeam.updateRobots({shadower});
     enemyTeam.updateRobots({shadowee});
 
-    block_shot_point = ShadowEnemyFSM::findBlockShotPoint(shadower, field, friendlyTeam, enemyTeam, 
-                shadowee, shadow_distance);  
-    auto enemy_shot = field.friendlyGoalCenter()-shadowee.position();
-    EXPECT_EQ(block_shot_point, shadowee.position() + enemy_shot.normalize(shadow_distance));
+    block_shot_point = ShadowEnemyFSM::findBlockShotPoint(
+        shadower, field, friendlyTeam, enemyTeam, shadowee, shadow_distance);
+    auto enemy_shot = field.friendlyGoalCenter() - shadowee.position();
+    EXPECT_EQ(block_shot_point,
+              shadowee.position() + enemy_shot.normalize(shadow_distance));
 }
 
 
@@ -98,20 +103,21 @@ TEST(ShadowEnemyFSMTest, test_transitions)
         TacticUpdate(shadower, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::BlockShotState>));
 
-    // Shadowee still has possession of the ball and robot has arrived at block shot position
-    // Robot should try to steal and chip the ball
-    Point position_to_block = ShadowEnemyFSM::findBlockShotPoint(shadower, world.field(),world.friendlyTeam(), world.enemyTeam(),shadowee, 0.5);
+    // Shadowee still has possession of the ball and robot has arrived at block shot
+    // position Robot should try to steal and chip the ball
+    Point position_to_block = ShadowEnemyFSM::findBlockShotPoint(
+        shadower, world.field(), world.friendlyTeam(), world.enemyTeam(), shadowee, 0.5);
     shadower = ::TestUtil::createRobotAtPos(position_to_block);
     fsm.process_event(ShadowEnemyFSM::Update(
         {enemy_threat, 0.5},
         TacticUpdate(shadower, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::StealAndChipState>));
 
-    //Shadowee still has possession of the ball 
+    // Shadowee still has possession of the ball
     // Robot should continue to try and steal and chip the ball
     fsm.process_event(ShadowEnemyFSM::Update(
-    {enemy_threat, 0.5},
-    TacticUpdate(shadower, world, [](std::unique_ptr<Intent>) {})));
+        {enemy_threat, 0.5},
+        TacticUpdate(shadower, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<ShadowEnemyFSM::StealAndChipState>));
 
     // Either the ball has been stolen and chipped by our robot or the

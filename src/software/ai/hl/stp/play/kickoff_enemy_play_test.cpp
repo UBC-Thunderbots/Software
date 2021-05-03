@@ -33,13 +33,12 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-
             // Three friendly robots in position to shadow enemy robots. Rectangles are
             // chosen to be generally in the way of the the front 3 enemy robots and the
             // friendly goal, based on where the enemy robots are initialized in the test.
             Rectangle robotOneShadowingRect(Point(0, 1.5), Point(-0.4, 1.3));
             Rectangle robotFiveShadowingRect(Point(0, -1.5), Point(-0.4, -1.3));
-            Rectangle robotThreeShadowingRect(Point(-0.49, 0.1), Point(-0.75,-0.1));
+            Rectangle robotThreeShadowingRect(Point(-0.49, 0.1), Point(-0.75, -0.1));
             robotInPolygon(1, robotOneShadowingRect, world_ptr, yield);
             robotInPolygon(5, robotFiveShadowingRect, world_ptr, yield);
             robotInPolygon(3, robotThreeShadowingRect, world_ptr, yield);

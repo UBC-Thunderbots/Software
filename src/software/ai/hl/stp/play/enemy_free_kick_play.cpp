@@ -47,7 +47,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         true);
 
     // Init Shadow Enemy Tactics for extra robots
-    auto shadow_tactic_main = std::make_shared<ShadowEnemyTactic>();
+    auto shadow_tactic_main      = std::make_shared<ShadowEnemyTactic>();
     auto shadow_tactic_secondary = std::make_shared<ShadowEnemyTactic>();
 
     // Init Move Tactics for extra robots (These will be used if there are no robots to

@@ -133,7 +133,7 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
 
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [this, tactic,shadowee](std::shared_ptr<World> world_ptr,
+        [this, tactic, shadowee](std::shared_ptr<World> world_ptr,
                                  ValidationCoroutine::push_type& yield) {
             // As the shadowee is located at (0,-2), we first find the shot
             // vector to our net and then normalize this vector to a distance
@@ -147,7 +147,7 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
             // As our friendly robot tries to steal and chip the ball,
             // it should chip the ball in the same direction is it
             // heading towards the ball
-            Vector shot       = world_ptr->ball().position() - shadower.position();
+            Vector shot = world_ptr->ball().position() - shadower.position();
             ballKicked(shot.orientation(), world_ptr, yield);
         }};
 

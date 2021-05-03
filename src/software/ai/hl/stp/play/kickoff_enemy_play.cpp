@@ -35,8 +35,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     // 3 robots assigned to shadow enemies. Other robots will be assigned positions
     // on the field to be evenly spread out
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
-        std::make_shared<ShadowEnemyTactic>(),
-        std::make_shared<ShadowEnemyTactic>(),
+        std::make_shared<ShadowEnemyTactic>(), std::make_shared<ShadowEnemyTactic>(),
         std::make_shared<ShadowEnemyTactic>()};
 
     // these positions are picked according to the following slide
@@ -112,7 +111,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 // We shadow assuming the robots do not pass so we do not try block passes
                 // while shadowing, since we can't go on the enemy side to block the pass
                 // anyway
-                shadow_enemy_tactics.at(i)->updateControlParams(enemy_threat, shadow_dist);
+                shadow_enemy_tactics.at(i)->updateControlParams(enemy_threat,
+                                                                shadow_dist);
                 result[0].emplace_back(shadow_enemy_tactics.at(i));
             }
             else
