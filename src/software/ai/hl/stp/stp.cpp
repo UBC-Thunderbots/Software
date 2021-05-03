@@ -335,7 +335,12 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
                 {
                     robot_tactic_assignment.emplace(tactic_vector.at(col),
                                                     robots.at(row));
-                    remaining_robots.erase(remaining_robots.begin() + row);
+                    remaining_robots.erase(
+                        std::remove_if(remaining_robots.begin(), remaining_robots.end(),
+                                       [robots, row](const Robot& robot) {
+                                           return robot.id() == robots.at(row).id();
+                                       }),
+                        remaining_robots.end());
                     break;
                 }
             }
