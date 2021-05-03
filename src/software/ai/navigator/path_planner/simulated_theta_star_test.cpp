@@ -41,8 +41,8 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_obstacle)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
-            // Small rectangle around the destination point that the robot should be
-            // stationary within for 15 ticks
+            // Small rectangle near the destination point that is outside of the obstacle
+            // which the friendly robot should be stationary in for 15 ticks
             Rectangle expected_final_position(Point(0.985, -0.26), Point(1.15, -0.3));
             robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
         }};
@@ -76,8 +76,8 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_dest_in_obstacle)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
-            // Small rectangle around the destination point that the robot should be
-            // stationary within for 15 ticks
+            // Small rectangle near the destination point that is outside of the obstacle
+            // which the friendly robot should be stationary in for 15 ticks
             Rectangle expected_final_position(Point(0.985, -0.26), Point(1.15, -0.3));
             robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
         }};
