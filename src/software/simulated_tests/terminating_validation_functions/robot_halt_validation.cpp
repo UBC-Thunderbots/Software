@@ -3,7 +3,7 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 
-void robot_halt(std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+void robotHalt(std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
 {
     for (auto robot : world_ptr->friendlyTeam().getAllRobots())
     {

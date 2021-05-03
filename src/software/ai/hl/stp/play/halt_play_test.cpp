@@ -16,9 +16,11 @@ class HaltPlayTest : public SimulatedPlayTestFixture
 TEST_F(HaltPlayTest, test_halt_play)
 {
     setBallState(BallState(Point(0, 0.5), Vector(0, 0)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
+    addFriendlyRobots(TestUtil::createMovingRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
-         Point(4.6, -3.1)}));
+         Point(4.6, -3.1)},
+        {Vector(1, 1), Vector(2, 1), Vector(1, 2), Vector(2, 2), Vector(1, 1),
+         Vector(2, 1)}));
     setFriendlyGoalie(0);
     addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
@@ -31,10 +33,13 @@ TEST_F(HaltPlayTest, test_halt_play)
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough
         // time to settle into position and be observed with the Visualizer
-        // TODO: Implement proper validation
-        // https://github.com/UBC-Thunderbots/Software/issues/1971
+
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            robot_halt(world_ptr, yield);
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
+            {
+                yield("Timestamp not at 9.5s");
+            }
+            robotHalt(world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
