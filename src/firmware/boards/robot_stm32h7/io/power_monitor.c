@@ -32,7 +32,7 @@ void io_power_monitor_init(I2C_TypeDef* i2c_instance, uint16_t dev_address,
     }
     INA226_setConfig(i2c_handle, dev_address, INA226_config);
 
-    PowerMonitor_t* _power_monitor = (PowerMonitor_t*)malloc(sizeof(PowerMonitor_t));
+    _power_monitor = (PowerMonitor_t*)malloc(sizeof(PowerMonitor_t));
 
     _power_monitor->i2c_handle  = i2c_handle;
     _power_monitor->dev_address = dev_address;

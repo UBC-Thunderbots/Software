@@ -271,16 +271,18 @@ void test_msg_update(void *argument)
         // https://github.com/UBC-Thunderbots/Software/issues/1518
         robot_status_msg.time_sent.epoch_timestamp_seconds = sys_now();
 
+        robot_status_msg.power_status.battery_voltage =
+            io_power_monitor_getBatteryVoltage();
+
         // We change the power status values randomly so that robot diagnostics
         // can "see" this robot on the network. This is a stopgap until we have
         // actual values for RobotStatus
-        robot_status_msg.power_status.battery_voltage   = (float)(sys_now() % 100);
         robot_status_msg.power_status.capacitor_voltage = (float)(sys_now() % 100);
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,
                                                               PROTO_UPDATED);
-        float power_monitor_val = io_power_monitor_getBatteryVoltage();
-        TLOG_DEBUG("Power Monitor: %d", (int)power_monitor_val);
+        TLOG_DEBUG("Power Monitor: %d",
+                   (int)(robot_status_msg.power_status.battery_voltage * 1000.0f));
         // run loop at 100hz
         osDelay((unsigned int)MILLISECONDS_PER_SECOND / 10);
     }
@@ -372,7 +374,6 @@ void initIoDrivetrain(void)
 
 void initPowerMonitor(void)
 {
-    TLOG_DEBUG("Initializing INA226");
     io_power_monitor_init(I2C2, INA226_ADDRESS,
                           INA226_MODE_CONT_SHUNT_AND_BUS | INA226_VBUS_140uS |
                               INA226_VBUS_140uS | INA226_AVG_1024);
