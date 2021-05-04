@@ -7,7 +7,7 @@ extern "C"
 #include "firmware/app/world/dribbler.h"
 #include "firmware/app/world/firmware_robot.h"
 #include "firmware/app/world/firmware_world.h"
-#include "firmware/app/world/wheel.h"
+#include "firmware/app/world/force_wheel.h"
 #include "firmware/shared/physics.h"
 #include "shared/proto/primitive.nanopb.h"
 }
@@ -25,19 +25,6 @@ struct FirmwareRobotDeleter
 {
     void operator()(FirmwareRobot_t* firmware_robot) const
     {
-        Wheel_t* front_left_wheel = app_firmware_robot_getFrontLeftWheel(firmware_robot);
-        app_wheel_destroy(front_left_wheel);
-
-        Wheel_t* back_left_wheel = app_firmware_robot_getBackLeftWheel(firmware_robot);
-        app_wheel_destroy(back_left_wheel);
-
-        Wheel_t* back_right_wheel = app_firmware_robot_getBackRightWheel(firmware_robot);
-        app_wheel_destroy(back_right_wheel);
-
-        Wheel_t* front_right_wheel =
-            app_firmware_robot_getFrontRightWheel(firmware_robot);
-        app_wheel_destroy(front_right_wheel);
-
         Chicker_t* chicker = app_firmware_robot_getChicker(firmware_robot);
         app_chicker_destroy(chicker);
 
@@ -51,6 +38,7 @@ struct FirmwareRobotDeleter
             app_firmware_robot_getControllerState(firmware_robot);
         delete controller_state;
 
+        app_firmware_robot_force_wheels_destroy(firmware_robot);
         app_firmware_robot_destroy(firmware_robot);
     };
 };

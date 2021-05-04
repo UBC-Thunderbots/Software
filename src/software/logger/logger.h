@@ -9,17 +9,42 @@
 #include <g3log/logworker.hpp>
 
 #include "software/logger/coloured_cout_sink.h"
+#include "software/logger/csv_sink.h"
 #include "software/logger/custom_logging_levels.h"
 
-/**
- * This class acts as a Singleton that's responsible for initializing the logger.
- * We use a singleton rather than a generic function in this namespace because
- * the logWorker object must stay in scope, otherwise the logger is automatically
- * destroyed. So if an "init" function is used, the logWorker goes out of scope as
- * soon as the function returns, which destroys the logger right after creating it
- *
- * The Singleton class allows us to keep the logWorker in scope for the duration
- * of the program while still providing a single function to initialize the logger
+// This undefines LOG macro defined by g3log
+#undef LOG
+
+// These macros allows us to overload arguments.
+// https://stackoverflow.com/questions/11761703/overloading-macro-on-number-of-arguments
+#define LOG_SELECT(_1, _2, NAME, ...) NAME
+#define LOG(...) LOG_SELECT(__VA_ARGS__, LOG_2, LOG_1)(__VA_ARGS__)
+
+// Called when LOG() is called with 1 argument. This is a copy of g3log's LOG() macro
+// Note: curly braces are not used as we need to pipe log messages to the logger
+#define LOG_1(level)                                                                     \
+    if (!g3::logLevel(level))                                                            \
+    {                                                                                    \
+    }                                                                                    \
+    else                                                                                 \
+        INTERNAL_LOG_MESSAGE(level).stream()
+
+// Called when LOG() is called with 2 arguments
+#define LOG_2(level, filename)                                                           \
+    if (level != CSV)                                                                    \
+    {                                                                                    \
+    }                                                                                    \
+    else                                                                                 \
+        LOG_1(level) << filename                                                         \
+/**                                                                                      \
+ * This class acts as a Singleton that's responsible for initializing the logger.        \
+ * We use a singleton rather than a generic function in this namespace because           \
+ * the logWorker object must stay in scope, otherwise the logger is automatically        \
+ * destroyed. So if an "init" function is used, the logWorker goes out of scope as       \
+ * soon as the function returns, which destroys the logger right after creating it       \
+ *                                                                                       \
+ * The Singleton class allows us to keep the logWorker in scope for the duration         \
+ * of the program while still providing a single function to initialize the logger       \
  */
 class LoggerSingleton
 {
@@ -52,6 +77,8 @@ class LoggerSingleton
         // arg. Note: log locations are defaulted to the bazel-out folder due to Bazel's
         // hermetic build principles
 
+        auto csv_sink_handle = logWorker->addSink(
+            std::make_unique<CSVSink>(log_directory), &CSVSink::appendToFile);
         // Sink for outputting logs to the terminal
         auto colour_cout_sink_handle = logWorker->addSink(
             std::make_unique<ColouredCoutSink>(), &ColouredCoutSink::displayColouredLog);

@@ -71,22 +71,6 @@ double Rectangle::yMin() const
     return negXNegYCorner().y();
 }
 
-bool Rectangle::inflate(double amount)
-{
-    // Ensures rectangle cannot be shrunk to less than a point
-    if (xLength() < -2 * amount || yLength() < -2 * amount)
-    {
-        return false;
-    }
-
-    points_[0] = points_[0] + Vector(-amount, -amount);
-    points_[1] = points_[1] + Vector(-amount, amount);
-    points_[2] = points_[2] + Vector(amount, amount);
-    points_[3] = points_[3] + Vector(amount, -amount);
-
-    return true;
-}
-
 Rectangle Rectangle::expand(const Vector &v) const
 {
     Point negCorner = negXNegYCorner();

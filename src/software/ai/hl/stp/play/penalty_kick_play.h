@@ -2,7 +2,7 @@
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/tactic/goalie_tactic.h"
+#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 
 /**
  * Play for shooting penalty kicks

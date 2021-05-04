@@ -33,7 +33,7 @@ TEST_P(ColouredCoutSinkTest, testLogInfo)
     testing::internal::CaptureStdout();
 
     LOG(level) << test_str;
-    // wait for asynchronous cout
+    // wait for asynchronous logger
     sleep(1);
     std::string output = testing::internal::GetCapturedStdout();
 
@@ -50,4 +50,5 @@ INSTANTIATE_TEST_CASE_P(
         std::make_tuple<LEVELS, FG_Colour>(LEVELS(INFO), FG_Colour::WHITE),
         std::make_tuple<LEVELS, FG_Colour>(LEVELS(DEBUG), FG_Colour::GREEN),
         std::make_tuple<LEVELS, FG_Colour>(LEVELS(ROBOT_STATUS), FG_Colour::WHITE),
-        std::make_tuple<LEVELS, FG_Colour>(LEVELS(WARNING), FG_Colour::YELLOW)));
+        std::make_tuple<LEVELS, FG_Colour>(LEVELS(WARNING), FG_Colour::YELLOW),
+        std::make_tuple<LEVELS, FG_Colour>(LEVELS(CSV), FG_Colour::WHITE)));
