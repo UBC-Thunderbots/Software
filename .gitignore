@@ -57,6 +57,7 @@ src/external/external
 
 # Misc. Log Files
 *.log
+*.csv
 
 ### Node ###
 

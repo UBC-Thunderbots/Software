@@ -47,7 +47,6 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
      * - One robot is goalie
      */
 
-    // Setup the goalie
     // Setup crease defenders to help the goalie
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(

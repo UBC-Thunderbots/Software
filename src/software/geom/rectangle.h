@@ -107,21 +107,6 @@ class Rectangle : public ConvexPolygon
     Vector diagonal() const;
 
     /**
-     * Attempts to move all edges of the rectangle outwards or inwards towards
-     * the centre by an "amount" while maintaining the same location for the center of the
-     * rectangle. The rectangle will not shrink to anything smaller than a point.
-     *
-     * NOTE: this is a deprecated function that will be removed in #1331 or #1332
-     *
-     * @param amount The amount to expand or shrink the rectangle by on all sides, can be
-     * positive or negative
-     *
-     * @return bool Whether it was possible to expand/shrink the rectangle by
-     * amount requested, rectangle remains unchanged if impossible to expand/shrink
-     */
-    bool inflate(double amount);
-
-    /**
      * Returns the Rectangle expanded in the direction of v
      * To maintain the Rectangle invariant, this is done in two steps:
      * 1. The Rectangle is split in half perpendicular to v*(1,0) and points on the half
