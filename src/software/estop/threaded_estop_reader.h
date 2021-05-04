@@ -21,14 +21,13 @@ class ThreadedEstopReader
 {
    public:
     /**
-     * creates and starts a threadedEstopReader with the given parameters
+     * creates and starts a threadedEstopReader with the given parameters to read estop
+     * value every 5 milliseconds
      * @param uart_reader the UART device acting as source of estop values
      * @param startup_time_ms time in milliseconds to wait before making first read
-     * @param interval_ms periodic time in milliseconds between reads
      */
     ThreadedEstopReader(std::unique_ptr<UartCommunication> uart_reader,
-                        unsigned int startup_time_ms,
-                        unsigned int regular_interval_time_ms);
+                        unsigned int startup_time_ms);
 
     ~ThreadedEstopReader();
 
@@ -64,9 +63,8 @@ class ThreadedEstopReader
     // number of times
     static constexpr unsigned int MAXIMUM_CONSECUTIVE_STATUS_ERROR = 5;
 
-    // In the case where we read an unknown message (not PLAY or STOP) we try
-    // again with this time between reads
-    static constexpr int INTERVAL_BETWEEN_ERROR_READS_MS = 5;
+    // time between consecutive reads
+    static constexpr int INTERVAL_BETWEEN_READS_MS = 5;
 
     // thread that will periodically pull values from the buffer
     std::thread estop_thread;

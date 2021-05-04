@@ -9,10 +9,8 @@
 
 
 ThreadedEstopReader::ThreadedEstopReader(std::unique_ptr<UartCommunication> uart_reader,
-                                         unsigned int startup_time_ms,
-                                         unsigned int regular_interval_time_ms)
+                                         unsigned int startup_time_ms)
     : estop_state(EstopState::STOP),
-      regular_read_interval_ms(regular_interval_time_ms),
       timer(io_service, boost::posix_time::milliseconds(startup_time_ms)),
       uart_reader(std::move(uart_reader))
 {
@@ -52,7 +50,6 @@ void ThreadedEstopReader::tick(const boost::system::error_code& error)
                 << e.what();
         }
 
-        unsigned int next_interval_ms = regular_read_interval_ms;
         EstopState new_state;
 
         switch (estop_msg.at(0))
@@ -69,7 +66,6 @@ void ThreadedEstopReader::tick(const boost::system::error_code& error)
                 new_state = EstopState::STATUS_ERROR;
                 LOG(WARNING) << "read unexpected estop message";
                 num_consecutive_status_error++;
-                next_interval_ms = INTERVAL_BETWEEN_ERROR_READS_MS;
                 break;
         }
 
@@ -84,7 +80,7 @@ void ThreadedEstopReader::tick(const boost::system::error_code& error)
             LOG(FATAL) << "ESTOP Consecutive Unexpected messages";
         }
 
-        boost::posix_time::milliseconds next_interval(next_interval_ms);
+        boost::posix_time::milliseconds next_interval(INTERVAL_BETWEEN_READS_MS);
 
         // Reschedule the timer for interval seconds in the future:
         timer.expires_from_now(next_interval);
