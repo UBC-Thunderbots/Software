@@ -79,7 +79,7 @@ function run_code_spell(){
     fi
 
     printf "Fixing spelling...\n\n"
-    cd $CURR_DIR/../src/software && codespell -w --skip="1,2,0" -D /tmp/dictionary.txt # Skip binaries
+    cd $CURR_DIR/../src/software && codespell -w --ignore-words=codespell_allowed_words.txt --skip="1,2,0" -D /tmp/dictionary.txt # Skip binaries
     cd $CURR_DIR/../src/firmware_new && codespell -w -D /tmp/dictionary.txt
     cd $CURR_DIR/../src/firmware/app && codespell -w -D /tmp/dictionary.txt
     cd $CURR_DIR/../src/shared && codespell -w -D /tmp/dictionary.txt
