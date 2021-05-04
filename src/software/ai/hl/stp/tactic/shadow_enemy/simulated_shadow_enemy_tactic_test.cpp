@@ -140,7 +140,7 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
             // of 2 away from the shadowee
             Vector shot       = field().friendlyGoalCenter() - shadowee.position();
             Point destination = shadowee.position() + shot.normalize(2);
-            robotAtPosition(0, world_ptr, destination, 0.01, yield);
+            robotAtPosition(0, world_ptr, destination, 0.05, yield);
         },
         [this, tactic, shadower](std::shared_ptr<World> world_ptr,
                                  ValidationCoroutine::push_type& yield) {
