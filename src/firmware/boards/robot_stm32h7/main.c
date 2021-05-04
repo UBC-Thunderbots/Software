@@ -24,6 +24,7 @@
 #include "crc.h"
 #include "dma.h"
 #include "gpio.h"
+#include "i2c.h"
 #include "lwip.h"
 #include "tim.h"
 #include "usart.h"
@@ -76,6 +77,7 @@ static void initIoLayer(void)
 {
     initIoDrivetrain();
     initIoNetworking();
+    initPowerMonitor();
 }
 
 /* USER CODE END 0 */
@@ -122,6 +124,7 @@ int main(void)
     MX_USB_OTG_FS_PCD_Init();
     MX_CRC_Init();
     MX_TIM4_Init();
+    MX_I2C2_SMBUS_Init();
     MX_UART8_Init();
     /* USER CODE BEGIN 2 */
 

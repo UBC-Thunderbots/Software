@@ -142,11 +142,18 @@ if  [[ $2 == "debug" ]]; then
     
     # When gdb is finished, cleanup by stopping openocd
     pkill openocd
+    exit 0
 fi
+
 if  [[ $2 == "program" ]]; then
     # Flash firmware
     OPENOCD_CFG_FILE="${elf_to_board_map[$elf_file]}"
     echo "Flashing $elf_file on stm32h7 with config $OPENOCD_CFG_FILE"
     OPENOCD_RUN_CMD='openocd -f $OPENOCD_CFG_FILE -c "program $elf_file verify reset exit"'
     eval "$OPENOCD_RUN_CMD"
+    exit 0
 fi
+
+echo "Error: second argument isn't debug or program"
+echo "Usage: $THIS_SCRIPT_FILENAME INDEX_FOR_ELF_FILE program or debug"
+exit 1

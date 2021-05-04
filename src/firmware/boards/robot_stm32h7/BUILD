@@ -24,6 +24,7 @@ cc_binary(
         ":STM32H743ZITx_FLASH.ld",
         ":dma",
         ":gpio",
+        ":i2c",
         ":lwip",
         ":robot_stm32h7_main_lib",
         "//firmware/app/logger",
@@ -31,6 +32,7 @@ cc_binary(
         "//firmware/boards/robot_stm32h7/io:drivetrain_unit",
         "//firmware/boards/robot_stm32h7/io:gpio_pin",
         "//firmware/boards/robot_stm32h7/io:network_logger",
+        "//firmware/boards/robot_stm32h7/io:power_monitor",
         "//firmware/boards/robot_stm32h7/io:pwm_pin",
         "//firmware/boards/robot_stm32h7/io:uart_logger",
         "//firmware/boards/robot_stm32h7/io:ublox_odinw262_communicator",
@@ -196,6 +198,30 @@ cc_library(
 )
 
 cc_library(
+    name = "i2c",
+    srcs = [
+        "i2c.c",
+    ],
+    hdrs = [
+        "i2c.h",
+        "main.h",
+    ],
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
+        "-DSTM32H743xx",
+    ],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        ":hal",
+    ],
+    # This is _very_ important. If we don't do this, bazel will not link in the
+    # interrupt handling code, which *will not* cause an error, and *will* cause
+    # interrupts to stop working
+    alwayslink = True,
+)
+
+cc_library(
     name = "usart",
     srcs = [
         "usart.c",
@@ -249,6 +275,7 @@ cc_library(
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr_ex.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc_ex.c",
+        "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_smbus.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim_ex.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c",
@@ -289,6 +316,7 @@ cc_library(
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pwr_ex.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc_ex.h",
+        "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_smbus.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h",
@@ -318,6 +346,9 @@ cc_library(
     srcs = [
     ],
     hdrs = [
+        "Drivers/CMSIS/DSP/Include/arm_common_tables.h",
+        "Drivers/CMSIS/DSP/Include/arm_const_structs.h",
+        "Drivers/CMSIS/DSP/Include/arm_math.h",
         "Drivers/CMSIS/Include/cmsis_compiler.h",
         "Drivers/CMSIS/Include/cmsis_gcc.h",
         "Drivers/CMSIS/Include/cmsis_version.h",
@@ -330,9 +361,11 @@ cc_library(
     ],
     defines = [
         "STM32H743xx",
+        "ARM_MATH_CM7",
     ],
     includes = [
         "./",
+        "Drivers/CMSIS/DSP/Include/",
         "Drivers/CMSIS/Device/ST/STM32H7xx/Include/",
         "Drivers/CMSIS/Include/",
         "Drivers/CMSIS/RTOS2/Include/",

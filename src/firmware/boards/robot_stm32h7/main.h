@@ -56,20 +56,38 @@ extern "C"
 
     /* USER CODE BEGIN EFP */
 
+    /**
+     * Initializes the drivetrain
+     */
     void initIoDrivetrain(void);
+
+    /**
+     * Initializes the networking
+     */
     void initIoNetworking(void);
+
+    /**
+     * Initializes the power monitor
+     */
+    void initPowerMonitor(void);
 
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define wheel_motor_back_right_esf_Pin GPIO_PIN_3
+#define wheel_motor_back_right_esf_GPIO_Port GPIOE
+#define wheel_motor_front_right_reset_Pin GPIO_PIN_4
+#define wheel_motor_front_right_reset_GPIO_Port GPIOE
+#define wheel_motor_front_right_coast_Pin GPIO_PIN_5
+#define wheel_motor_front_right_coast_GPIO_Port GPIOE
 #define USER_Btn_Pin GPIO_PIN_13
 #define USER_Btn_GPIO_Port GPIOC
-#define wheel_motor_back_right_esf_Pin GPIO_PIN_0
-#define wheel_motor_back_right_esf_GPIO_Port GPIOF
-#define wheel_motor_front_right_reset_Pin GPIO_PIN_1
-#define wheel_motor_front_right_reset_GPIO_Port GPIOF
-#define wheel_motor_front_right_coast_Pin GPIO_PIN_2
-#define wheel_motor_front_right_coast_GPIO_Port GPIOF
+#define power_monitor_I2C2_SDA_Pin GPIO_PIN_0
+#define power_monitor_I2C2_SDA_GPIO_Port GPIOF
+#define power_monitor_I2C2_SCL_Pin GPIO_PIN_1
+#define power_monitor_I2C2_SCL_GPIO_Port GPIOF
+#define power_monitor_I2C2_SMBA_Pin GPIO_PIN_2
+#define power_monitor_I2C2_SMBA_GPIO_Port GPIOF
 #define wheel_motor_front_right_mode_Pin GPIO_PIN_3
 #define wheel_motor_front_right_mode_GPIO_Port GPIOF
 #define wheel_motor_front_right_direction_Pin GPIO_PIN_4
