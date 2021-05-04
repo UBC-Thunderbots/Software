@@ -2,7 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/penalty_kick_tactic/penalty_kick_tactic2.h"
+#include "software/ai/hl/stp/tactic/penalty_kick_tactic/penalty_kick_tactic.h"
 #include "software/ai/hl/stp/tactic/penalty_setup_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 

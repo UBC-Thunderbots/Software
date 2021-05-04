@@ -64,56 +64,6 @@ cc_test(
 )
 
 cc_library(
-<<<<<<< HEAD
-    name = "goalie_tactic",
-    srcs = ["goalie_tactic.cpp"],
-    hdrs = ["goalie_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:chip_action",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/action:stop_action",
-        "//software/geom:line",
-=======
-    name = "penalty_kick_tactic",
-    srcs = ["penalty_kick_tactic.cpp"],
-    hdrs = ["penalty_kick_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//software/ai/evaluation:calc_best_shot",
-        "//software/ai/hl/stp/action:kick_action",
-        "//software/ai/hl/stp/action:move_action",
->>>>>>> 35fc2309901ddd32e2e8649ea7b0a6a580e502e4
-        "//software/geom/algorithms",
-        "//software/logger",
-    ],
-)
-
-cc_test(
-<<<<<<< HEAD
-    name = "goalie_tactic_test",
-    srcs = ["goalie_tactic_test.cpp"],
-    deps = [
-        ":goalie_tactic",
-        "//software/ai/hl/stp/action:chip_action",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/action:stop_action",
-=======
-    name = "penalty_kick_tactic_test",
-    srcs = ["penalty_kick_tactic_test.cpp"],
-    deps = [
-        ":penalty_kick_tactic",
->>>>>>> 35fc2309901ddd32e2e8649ea7b0a6a580e502e4
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "penalty_setup_tactic",
     srcs = ["penalty_setup_tactic.cpp"],
     hdrs = ["penalty_setup_tactic.h"],
@@ -225,7 +175,7 @@ cc_library(
         ":cherry_pick_tactic",
         ":defense_shadow_enemy_tactic",
         ":kickoff_chip_tactic",
-        "//software/ai/hl/stp/tactic/penalty_kick_tactic:penalty_kick_tactic2",
+        "//software/ai/hl/stp/tactic/penalty_kick_tactic:penalty_kick_tactic",
         ":penalty_setup_tactic",
         ":receiver_tactic",
         ":shadow_enemy_tactic",

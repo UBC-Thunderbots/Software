@@ -17,7 +17,7 @@ class STPTest : public ::testing::Test
     STPTest()
         : world(::TestUtil::createBlankTestingWorld()),
           mutable_ai_control_config(std::make_shared<AiControlConfig>()),
-          ai_control_config(
+          ai_control_config
               std::const_pointer_cast<const AiControlConfig>(mutable_ai_control_config)),
           play_config(std::make_shared<const ThunderbotsConfig>()->getPlayConfig()),
           default_play_constructor([this]() -> std::unique_ptr<Play> {
@@ -26,7 +26,6 @@ class STPTest : public ::testing::Test
           // Give an explicit seed to STP so that our tests are deterministic
           stp(default_play_constructor, ai_control_config, play_config, 123)
     {
-        std::cout << "Constructor called";
     }
 
    protected:

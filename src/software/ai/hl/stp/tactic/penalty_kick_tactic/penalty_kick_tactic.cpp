@@ -1,7 +1,7 @@
 /**
  * Implementation of the PenaltyKickTactic
  */
-#include "software/ai/hl/stp/tactic/penalty_kick_tactic/penalty_kick_tactic2.h"
+#include "software/ai/hl/stp/tactic/penalty_kick_tactic/penalty_kick_tactic.h"
 
 PenaltyKickTactic::PenaltyKickTactic(const Ball& ball,
                                      bool loop_forever,

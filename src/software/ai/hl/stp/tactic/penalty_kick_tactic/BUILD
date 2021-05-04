@@ -1,10 +1,10 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "penalty_kick_tactic2",
+    name = "penalty_kick_tactic",
     srcs = ["penalty_kick_tactic.cpp"],
     hdrs = [
-        "penalty_kick_tactic2.h",
+        "penalty_kick_tactic.h",
         "penalty_kick_tactic_fsm.h",
     ],
     deps = [
@@ -29,6 +29,6 @@ cc_test(
     deps = [
         "@gtest//:gtest_main",
         "//software/test_util",
-        ":penalty_kick_tactic2",
+        ":penalty_kick_tactic",
     ]
 )
