@@ -154,9 +154,19 @@ void SimulatedTestFixture::runTest(
     const Duration ai_time_step = Duration::fromSeconds(simulation_time_step.toSeconds() *
                                                         CAMERA_FRAMES_PER_AI_TICK);
 
+    auto start_tick_time = std::chrono::system_clock::now();
+
     // Tick one frame to aid with visualization
     bool validation_functions_done =
         tickTest(simulation_time_step, ai_time_step, world, simulator);
+
+    // Logging duration of each tick
+    unsigned int tick_count    = 1;
+    double duration_ms         = ::TestUtil::millisecondsSince(start_tick_time);
+    double total_tick_duration = duration_ms;
+    double max_tick_duration   = duration_ms;
+    double min_tick_duration   = duration_ms;
+
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
         if (!thunderbots_config->getAiControlConfig()->getRunAi()->value())
@@ -166,9 +176,25 @@ void SimulatedTestFixture::runTest(
             std::this_thread::sleep_for(ms_to_sleep);
             continue;
         }
+
+        // Record starting time
+        start_tick_time = std::chrono::system_clock::now();
+
         validation_functions_done =
             tickTest(simulation_time_step, ai_time_step, world, simulator);
+
+        // Calculate tick durations
+        duration_ms = ::TestUtil::millisecondsSince(start_tick_time);
+        total_tick_duration += duration_ms;
+        max_tick_duration = std::max(max_tick_duration, duration_ms);
+        min_tick_duration = std::min(min_tick_duration, duration_ms);
+        tick_count++;
     }
+    // Output the tick duration results
+    double avg_tick_duration = total_tick_duration / tick_count;
+    LOG(INFO) << "max tick duration: " << max_tick_duration << "ms" << std::endl;
+    LOG(INFO) << "min tick duration: " << min_tick_duration << "ms" << std::endl;
+    LOG(INFO) << "avg tick duration: " << avg_tick_duration << "ms" << std::endl;
 
     if (!validation_functions_done && !terminating_validation_functions.empty())
     {

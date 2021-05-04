@@ -18,7 +18,7 @@
  */
 bool robotReachedDestination(const Robot& robot, const Point& destination,
                              const Angle& final_orientation,
-                             double DISTANCE_THRESHOLD    = 0.02,
+                             double DISTANCE_THRESHOLD    = 0.05,
                              const Angle& ANGLE_THRESHOLD = Angle::fromDegrees(2));
 
 /**

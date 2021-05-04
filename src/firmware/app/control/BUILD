@@ -75,7 +75,8 @@ cc_library(
     srcs = ["control.c"],
     hdrs = ["control.h"],
     deps = [
-        "//firmware/app/world:firmware_robot",
+        "//firmware/app/world:firmware_robot_constants",
+        "//firmware/app/world:force_wheel",
         "//firmware/shared:physics",
         "//firmware/shared:util",
     ],
@@ -87,7 +88,6 @@ cc_library(
     hdrs = ["physbot.h"],
     deps = [
         ":bangbang",
-        "//firmware/app/world:firmware_robot",
         "//firmware/shared:physics",
     ],
 )
