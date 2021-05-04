@@ -44,93 +44,76 @@ struct PenaltyKickTacticFSM
             return true;
         }
 
-        Point shot_intersection = evaluateNextShotPosition(enemy_goalie, field);
-        Segment ball_to_goal = Segment(ball.position(), shot_intersection);
-
-        // The value of a penalty shot is proportional to how far away the enemy goalie is
-        // from the current shot of the robot
-
-        // We will make a penalty shot if the enemy goalie cannot accelerate in time to block
-        // it
-        // Segment goal_line = Segment(field.enemyGoalpostPos(), field.enemyGoalpostNeg());
-
-        // Ray shot_ray =
-        //     Ray(ball.position(),
-        //                 Vector(robot_.orientation().cos(), robot_.orientation().sin()));
-
-        // std::vector<Point> intersections = intersection(shot_ray, goal_line);
-
         /**
-                    enemy goal +-------------------+
-                                \       (     ) goalie
-                                \      /-----
-                                B \   _/
-                                    \ /  A
-                                    C \
-                                    \
-                                    -----
-                                    ( bot )
-                                    -----
-            B is the line from the robot to the goal with the robot's orientation as the
-                direction
-            A is the perpendicular line from the goalie to the B line. It is the closest
-                distance the goalie must travel to intercept the shot.
-            C is the closest position at which the goalie can intercept the ball.
+        	    B
+        	   +--\----------------------------------+ goal line
+        	      \ 		      +-------+
+        	       \ 		    C |       |	enemy_goalie
+            	 	\ 		   ---+-------+
+            	 	 \	       ---/
+            	 	  \        ---/
+            	 	   \   ---/
+            	 	  A --/
+            	 	     \
+            	 	      \
+            	 	       \
+            	 		    \ D
+            	 	    +-------+
+            	 	    |       | bot
+        	       	    +-------+
+            Segment BD represents the ball's path to the goal
+            Segment AC is the smallest path required by the enemy to intercept BD
 
-            It returns true when the enemy goalie doesn't have enough time to block the
-        shot at C before the ball moves past that point.
+            This function returns true when the enemy goalie doesn't have enough time to block the
+                shot at A before the ball moves past that point.
         */
 
-        // if (!intersections.empty())
-        // {
-            // If we have an intersection, calculate if we have a viable shot
-            // const Segment ball_to_goal = Segment(intersections[0], ball.position());
+        //point B: ball intersection point on goal line
+        Point shot_intersection = evaluateNextShotPosition(enemy_goalie, field);
 
-            // point C in the diagram
-            const Point block_position = //intersections[0];
-                //evaluateNextShotPosition(event);
-                closestPoint(enemy_goalie.value().position(), ball_to_goal);
+        //segment BD: ball's path to goal
+        Segment ball_to_goal = Segment(ball.position(), shot_intersection);
 
-            // line A in the diagram
-            const Vector goalie_to_block_position =
-                (block_position - enemy_goalie.value().position());
+        // point A: closest point for goalie to intercept ball's path
+        const Point block_position =
+            closestPoint(enemy_goalie.value().position(), ball_to_goal);
 
-            // segment from the robot's position to point C
-            const Segment ball_to_block = Segment(ball.position(), block_position);
+        // Line AC: line from goalie to ball trajectory
+        const Vector goalie_to_block_position =
+            (block_position - enemy_goalie.value().position());
 
-            const double time_to_pass_keeper =
-                fabs(ball_to_block.length() / PENALTY_KICK_SHOT_SPEED) + SSL_VISION_DELAY;
+        // Segment AD: ball's path to potential goalie block point
+        const Segment ball_to_block = Segment(ball.position(), block_position);
 
-            // Based on constant acceleration -> // dX = init_vel*t + 0.5*a*t^2
-            const double max_enemy_movement_x =
-                enemy_goalie.value().velocity().x() * time_to_pass_keeper +
-                0.5 * std::copysign(1, goalie_to_block_position.x()) *
-                    PENALTY_KICK_GOALIE_MAX_ACC * pow(time_to_pass_keeper, 2);
-            const double max_enemy_movement_y =
-                enemy_goalie.value().velocity().y() * time_to_pass_keeper +
-                0.5 * std::copysign(1, goalie_to_block_position.y()) *
-                    PENALTY_KICK_GOALIE_MAX_ACC * pow(time_to_pass_keeper, 2);
+        const double time_to_pass_keeper =
+            fabs(ball_to_block.length() / PENALTY_KICK_SHOT_SPEED) + SSL_VISION_DELAY;
 
-            // If the maximum distance that the goalie can move is less than actual
-            // distance it must move to reach the ball, return true for a viable
-            // shot
-            // Not simplifying this if statement makes the code logic slightly
-            // easier to understand
-            if ((fabs(goalie_to_block_position.x()) > (fabs(max_enemy_movement_x) + ROBOT_MAX_RADIUS_METERS))
-                || (fabs(goalie_to_block_position.y()) > (fabs(max_enemy_movement_y) + ROBOT_MAX_RADIUS_METERS)))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
+        // Based on constant acceleration -> // dX = init_vel*t + 0.5*a*t^2
+        const double max_enemy_movement_x =
+            enemy_goalie.value().velocity().x() * time_to_pass_keeper +
+            0.5 * std::copysign(1, goalie_to_block_position.x()) *
+                PENALTY_KICK_GOALIE_MAX_ACC * pow(time_to_pass_keeper, 2);
+        const double max_enemy_movement_y =
+            enemy_goalie.value().velocity().y() * time_to_pass_keeper +
+            0.5 * std::copysign(1, goalie_to_block_position.y()) *
+                PENALTY_KICK_GOALIE_MAX_ACC * pow(time_to_pass_keeper, 2);
 
-            }
-        // }
-        // else
-        // {
-        //     return false;
-        // }
+        // If the maximum distance that the goalie can move is less than actual
+        // distance it must move to reach the ball, return true for a viable
+        // shot
+        // Not simplifying this if statement makes the code logic slightly
+        // easier to understand
+        if ((fabs(goalie_to_block_position.x()) > (fabs(max_enemy_movement_x) + ROBOT_MAX_RADIUS_METERS))
+            || (fabs(goalie_to_block_position.y()) > (fabs(max_enemy_movement_y) + ROBOT_MAX_RADIUS_METERS)))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+
+        }
+
     }
 
     static const Point evaluateNextShotPosition(std::optional<Robot> enemy_goalie, Field field)
@@ -159,11 +142,9 @@ struct PenaltyKickTacticFSM
     {
         using namespace boost::sml;
 
-        // const auto approach_ball_s      = state<GetBehindBallFSM>;
         const auto approach_keeper_s    = state<DribbleFSM>;
         const auto initial_s            = state<InitialState>;
         const auto shoot_s              = state<KickFSM>;
-        // const auto prepare_for_shot_s  = state<DribbleFSM>;
 
         const auto update_e = event<Update>;
 
