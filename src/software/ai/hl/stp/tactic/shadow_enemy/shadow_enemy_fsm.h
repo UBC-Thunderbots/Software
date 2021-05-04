@@ -4,11 +4,12 @@
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/distance.h"
+#include "software/logger/logger.h"
 
 struct ShadowEnemyFSM
 {
-    class BlockShotState;
     class BlockPassState;
     class StealAndChipState;
 
@@ -19,7 +20,9 @@ struct ShadowEnemyFSM
         // The Enemy Threat indicating which enemy to shadow
         std::optional<EnemyThreat> enemy_threat;
 
-        // How far from the enemy the robot will position itself to shadow
+        // How far from the enemy the robot will position itself to shadow. If the enemy
+        // threat has the ball, it will position itself to block the shot on goal.
+        // Otherwise it will try to block the pass to the enemy threat.
         double shadow_distance;
     };
 
@@ -73,15 +76,11 @@ struct ShadowEnemyFSM
             calcBestShotOnGoal(field, friendlyTeam, enemyTeam, shadowee.position(),
                                TeamType::FRIENDLY, robots_to_ignore);
 
-        Vector enemy_shot_vector = Vector(0, 0);
+        Vector enemy_shot_vector = field.friendlyGoalCenter() - shadowee.position();
         if (best_enemy_shot_opt)
         {
             enemy_shot_vector =
                 best_enemy_shot_opt->getPointToShootAt() - shadowee.position();
-        }
-        else
-        {
-            enemy_shot_vector = field.friendlyGoalCenter() - shadowee.position();
         }
         return shadowee.position() + enemy_shot_vector.normalize(shadow_distance);
     }
@@ -90,7 +89,7 @@ struct ShadowEnemyFSM
     {
         using namespace boost::sml;
 
-        const auto block_shot_s     = state<BlockShotState>;
+        const auto block_shot_s     = state<MoveFSM>;
         const auto block_pass_s     = state<BlockPassState>;
         const auto steal_and_chip_s = state<StealAndChipState>;
 
@@ -110,36 +109,8 @@ struct ShadowEnemyFSM
             {
                 return enemy_threat_opt.value().has_ball;
             };
-            return false;
-        };
-
-        /**
-         * Guard that checks if the robot is done moving
-         * to the block shot point position calculated in
-         * findBlockShotPoint()
-         *
-         * @param event ShadowEnemyFSM::Update
-         *
-         * @return if the robot's current position matches the one
-         *         returned from findBlockShotPoint
-         */
-        const auto is_blocking_shot = [](auto event) {
-            std::optional<EnemyThreat> enemy_threat_opt =
-                event.control_params.enemy_threat;
-            if (enemy_threat_opt.has_value())
-            {
-                // We compare the length between the two points rather than using the
-                // equality operator for points as the robot does not end up in the exact
-                // position as findBlockShotPoint
-                return Segment(event.common.robot.position(),
-                               findBlockShotPoint(
-                                   event.common.robot, event.common.world.field(),
-                                   event.common.world.friendlyTeam(),
-                                   event.common.world.enemyTeam(),
-                                   event.control_params.enemy_threat.value().robot,
-                                   event.control_params.shadow_distance))
-                           .length() < 0.01;
-            }
+            LOG(WARNING) << "Enemy threat not initialized for robot "
+                         << event.common.robot.id() << "\n";
             return false;
         };
 
@@ -150,12 +121,22 @@ struct ShadowEnemyFSM
          * @param event ShadowEnemyFSM::Update
          */
         const auto block_pass = [](auto event) {
+            std::optional<EnemyThreat> enemy_threat_opt =
+                event.control_params.enemy_threat;
             auto ball_position = event.common.world.ball().position();
             auto face_ball_orientation =
                 (ball_position - event.common.robot.position()).orientation();
-            Point position_to_block = findBlockPassPoint(
-                ball_position, event.control_params.enemy_threat.value().robot,
-                event.control_params.shadow_distance);
+            Point position_to_block =
+                ball_position +
+                (event.common.world.field().friendlyGoalCenter() - ball_position)
+                    .normalize(event.control_params.shadow_distance);
+            if (enemy_threat_opt.has_value())
+            {
+                position_to_block =
+                    findBlockPassPoint(ball_position, enemy_threat_opt.value().robot,
+                                       event.control_params.shadow_distance);
+            };
+
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), position_to_block, face_ball_orientation, 0,
                 DribblerMode::OFF, BallCollisionType::AVOID,
@@ -169,20 +150,36 @@ struct ShadowEnemyFSM
          *
          * @param event ShadowEnemyFSM::Update
          */
-        const auto block_shot = [](auto event) {
+        const auto block_shot = [this](auto event,
+                                       back::process<MoveFSM::Update> processEvent) {
+            std::optional<EnemyThreat> enemy_threat_opt =
+                event.control_params.enemy_threat;
             auto ball_position = event.common.world.ball().position();
             auto face_ball_orientation =
                 (ball_position - event.common.robot.position()).orientation();
-            Point position_to_block = findBlockShotPoint(
-                event.common.robot, event.common.world.field(),
-                event.common.world.friendlyTeam(), event.common.world.enemyTeam(),
-                event.control_params.enemy_threat.value().robot,
-                event.control_params.shadow_distance);
-            event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), position_to_block, face_ball_orientation, 0,
-                DribblerMode::OFF, BallCollisionType::AVOID,
-                AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+            Point position_to_block =
+                ball_position +
+                (event.common.world.field().friendlyGoalCenter() - ball_position)
+                    .normalize(event.control_params.shadow_distance);
+            if (enemy_threat_opt.has_value())
+            {
+                position_to_block = findBlockShotPoint(
+                    event.common.robot, event.common.world.field(),
+                    event.common.world.friendlyTeam(), event.common.world.enemyTeam(),
+                    enemy_threat_opt.value().robot, event.control_params.shadow_distance);
+            };
+
+            MoveFSM::ControlParams control_params{
+                .destination            = position_to_block,
+                .final_orientation      = face_ball_orientation,
+                .final_speed            = 0.0,
+                .dribbler_mode          = DribblerMode::OFF,
+                .ball_collision_type    = BallCollisionType::AVOID,
+                .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+                .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                .target_spin_rev_per_s  = 0.0};
+
+            processEvent(MoveFSM::Update(control_params, event.common));
         };
 
         /**
@@ -207,8 +204,7 @@ struct ShadowEnemyFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *block_shot_s + update_e[!enemy_threat_has_ball] / block_pass = block_pass_s,
-            block_shot_s + update_e[is_blocking_shot] / steal_and_chip = steal_and_chip_s,
-            block_shot_s + update_e[!is_blocking_shot] / block_shot,
+            block_shot_s + update_e / block_shot, block_shot_s = steal_and_chip_s,
             block_pass_s + update_e[!enemy_threat_has_ball] / block_pass,
             block_pass_s + update_e[enemy_threat_has_ball] / block_shot = block_shot_s,
             steal_and_chip_s + update_e[enemy_threat_has_ball] / steal_and_chip,

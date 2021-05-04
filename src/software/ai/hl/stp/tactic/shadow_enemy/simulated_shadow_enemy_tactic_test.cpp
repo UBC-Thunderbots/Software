@@ -156,3 +156,43 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
     runTest(terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(5));
 }
+
+TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_if_enemy_threat_is_null)
+{
+    Robot shadower(0, Point(-2, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
+                   Timestamp::fromSeconds(0));
+    Robot shadowee(1, Point(0, -2), Vector(0, 0), Angle::fromDegrees(135),
+                   AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot enemy(2, Point(0, 2), Vector(0, 0), Angle::threeQuarter(),
+                AngularVelocity::zero(), Timestamp::fromSeconds(0));
+
+    addFriendlyRobots(
+        {RobotStateWithId{.id = 0, .robot_state = shadower.currentState()}});
+    addEnemyRobots({RobotStateWithId{.id = 1, .robot_state = shadowee.currentState()},
+                    RobotStateWithId{.id = 2, .robot_state = enemy.currentState()}});
+
+
+    setBallState(BallState(Point(0, -1.75), Vector(0, 0)));
+    auto tactic = std::make_shared<ShadowEnemyTactic>();
+    tactic->updateControlParams(std::nullopt, 2);
+    setTactic(tactic);
+    setRobotId(0);
+
+
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [this, tactic, shadowee](std::shared_ptr<World> world_ptr,
+                                 ValidationCoroutine::push_type& yield) {
+            // As the shadowee is located at (0,-2), we first find the shot
+            // vector to our net and then normalize this vector to a distance
+            // of 2 away from the shadowee
+            Vector shot = field().friendlyGoalCenter() - world_ptr->ball().position();
+            Point destination = world_ptr->ball().position() + shot.normalize(2);
+            robotAtPosition(0, world_ptr, destination, 0.01, yield);
+        }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(5));
+}
