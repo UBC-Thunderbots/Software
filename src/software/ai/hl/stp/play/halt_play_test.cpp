@@ -35,11 +35,10 @@ TEST_F(HaltPlayTest, test_halt_play)
         // time to settle into position and be observed with the Visualizer
 
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
+            for (unsigned i = 0; i < 1000; i++)
             {
-                yield("Timestamp not at 9.5s");
+                robotHalt(world_ptr, yield);
             }
-            robotHalt(world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
