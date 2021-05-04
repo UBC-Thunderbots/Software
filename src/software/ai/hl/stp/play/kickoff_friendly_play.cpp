@@ -1,7 +1,8 @@
 #include "software/ai/hl/stp/play/kickoff_friendly_play.h"
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/tactic/goalie_tactic.h"
+#include "software/ai/evaluation/enemy_threat.h"
+#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/kickoff_chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
@@ -86,9 +87,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         std::make_shared<MoveTactic>(true)};
 
     // specific tactics
-    auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
-        play_config->getGoalieTacticConfig());
+    auto goalie_tactic =
+        std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig());
     auto kickoff_chip_tactic = std::make_shared<KickoffChipTactic>(true);
 
     // Part 1: setup state (move to key positions)
