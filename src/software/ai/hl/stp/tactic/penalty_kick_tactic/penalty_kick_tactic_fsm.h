@@ -28,9 +28,6 @@ struct PenaltyKickTacticFSM
     // expected maximum acceleration of the opposition goalie robot
     static constexpr double PENALTY_KICK_GOALIE_MAX_ACC = 1.5;
     static constexpr double SSL_VISION_DELAY            = 0.30;  // seconds
-    static constexpr double ALLOWED_SHOT_RANGE          = (double) 1;
-    // offset from the goal post in y direction when shooting
-
 
     // timeout that forces a shot after the robot approaches the ball and advances
     // towards the keeper
@@ -39,23 +36,16 @@ struct PenaltyKickTacticFSM
     static const inline Duration PENALTY_FINISH_APPROACH_TIMEOUT = Duration::fromSeconds(4);
 
     //returns true if we should shoot
-    const auto evaluatePenaltyShot(auto event)
+    static const auto evaluatePenaltyShot(std::optional<Robot> enemy_goalie, Field field, Ball ball, Robot robot)
     {
-        std::optional<Robot> enemy_goalie = event.control_params.enemy_goalie;
-        Field field = event.common.world.field();
-        Ball ball = event.common.world.ball();
-        Robot robot_ = event.common.robot;
         // If there is no goalie, the net is wide open
         if (!enemy_goalie.has_value())
         {
             return true;
         }
 
-        double min_x_dir_coord_before_shot = field.totalXLength() / 2 - field.totalXLength() * ALLOWED_SHOT_RANGE;
-        if (robot_.position().x() < min_x_dir_coord_before_shot)
-        {
-            return false;
-        }
+        Point shot_intersection = evaluateNextShotPosition(enemy_goalie, field);
+        Segment ball_to_goal = Segment(ball.position(), shot_intersection);
 
         // The value of a penalty shot is proportional to how far away the enemy goalie is
         // from the current shot of the robot
@@ -98,8 +88,8 @@ struct PenaltyKickTacticFSM
 
             // point C in the diagram
             const Point block_position = //intersections[0];
-                evaluateNextShotPosition(event);
-                //closestPoint(enemy_goalie.value().position(), ball_to_goal);
+                //evaluateNextShotPosition(event);
+                closestPoint(enemy_goalie.value().position(), ball_to_goal);
 
             // line A in the diagram
             const Vector goalie_to_block_position =
@@ -112,10 +102,10 @@ struct PenaltyKickTacticFSM
                 fabs(ball_to_block.length() / PENALTY_KICK_SHOT_SPEED) + SSL_VISION_DELAY;
 
             // Based on constant acceleration -> // dX = init_vel*t + 0.5*a*t^2
-            // const double max_enemy_movement_x =
-            //     enemy_goalie.value().velocity().x() * time_to_pass_keeper +
-            //     0.5 * std::copysign(1, goalie_to_block_position.x()) *
-            //         PENALTY_KICK_GOALIE_MAX_ACC * pow(time_to_pass_keeper, 2);
+            const double max_enemy_movement_x =
+                enemy_goalie.value().velocity().x() * time_to_pass_keeper +
+                0.5 * std::copysign(1, goalie_to_block_position.x()) *
+                    PENALTY_KICK_GOALIE_MAX_ACC * pow(time_to_pass_keeper, 2);
             const double max_enemy_movement_y =
                 enemy_goalie.value().velocity().y() * time_to_pass_keeper +
                 0.5 * std::copysign(1, goalie_to_block_position.y()) *
@@ -126,11 +116,8 @@ struct PenaltyKickTacticFSM
             // shot
             // Not simplifying this if statement makes the code logic slightly
             // easier to understand
-            // if ((fabs(goalie_to_block_position.x()) >
-            //     (fabs(max_enemy_movement_x) + ROBOT_MAX_RADIUS_METERS)))
-            //     ||
-            if ((fabs(goalie_to_block_position.y()) >
-                (fabs(max_enemy_movement_y) + ROBOT_MAX_RADIUS_METERS)))
+            if ((fabs(goalie_to_block_position.x()) > (fabs(max_enemy_movement_x) + ROBOT_MAX_RADIUS_METERS))
+                || (fabs(goalie_to_block_position.y()) > (fabs(max_enemy_movement_y) + ROBOT_MAX_RADIUS_METERS)))
             {
                 return true;
             }
@@ -146,10 +133,8 @@ struct PenaltyKickTacticFSM
         // }
     }
 
-    Point evaluateNextShotPosition(auto event)
+    static const Point evaluateNextShotPosition(std::optional<Robot> enemy_goalie, Field field)
     {
-        std::optional<Robot> enemy_goalie = event.control_params.enemy_goalie;
-        Field field = event.common.world.field();
 
         // Evaluate if the goalie is closer to the negative or positive goalpost
         if (enemy_goalie.has_value())
@@ -215,7 +200,9 @@ struct PenaltyKickTacticFSM
         const auto update_approach_keeper =
             [&]
             (auto event, back::process<DribbleFSM::Update> processEvent) {
-                const Point next_shot_position = evaluateNextShotPosition(event);
+                const Point next_shot_position = evaluateNextShotPosition(
+                    event.control_params.enemy_goalie,
+                    event.common.world.field());
                 shot_angle = (next_shot_position - event.common.world.ball().position()).orientation();
                 double time =
                     (event.common.world.getMostRecentTimestamp() - penalty_start_approaching_goalie).toSeconds();
@@ -233,7 +220,9 @@ struct PenaltyKickTacticFSM
         const auto adjust_orientation_for_shot =
             [this]
             (auto event, back::process<DribbleFSM::Update> processEvent) {
-                const Point next_shot_position = evaluateNextShotPosition(event);
+                const Point next_shot_position = evaluateNextShotPosition(
+                                                    event.control_params.enemy_goalie,
+                                                    event.common.world.field());
                 const Point final_position = event.common.robot.position();
                 shot_angle = (next_shot_position - final_position).orientation();
                 DribbleFSM::ControlParams control_params {
@@ -246,7 +235,11 @@ struct PenaltyKickTacticFSM
 
         const auto take_penalty_shot =
             [this] (auto event) {
-                bool shouldShoot = evaluatePenaltyShot(event);
+                bool shouldShoot = evaluatePenaltyShot(
+                    event.control_params.enemy_goalie,
+                    event.common.world.field(),
+                    event.common.world.ball(),
+                    event.common.robot);
                 return shouldShoot;
         };
 
