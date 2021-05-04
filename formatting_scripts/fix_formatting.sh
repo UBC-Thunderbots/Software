@@ -81,7 +81,7 @@ function run_code_spell(){
     sed "/atleast/d" /tmp/dictionary.txt > /tmp/edited_dictionary.txt #removing spell fixes that include the word 'atleast' from codespell dictionary 
 
     printf "Fixing spelling...\n\n"
-    cd $CURR_DIR/../src/software && codespell -w --skip="1,2,0" -D /tmp/dictionary_edited.txt # Skip binaries
+    cd $CURR_DIR/../src/software && codespell -w --skip="1,2,0" -D /tmp/edited_dictionary.txt # Skip binaries
     cd $CURR_DIR/../src/firmware_new && codespell -w -D /tmp/edited_dictionary.txt
     cd $CURR_DIR/../src/firmware/app && codespell -w -D /tmp/edited_dictionary.txt
     cd $CURR_DIR/../src/shared && codespell -w -D /tmp/edited_dictionary.txt
