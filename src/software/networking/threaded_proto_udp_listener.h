@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/networking/proto_udp_listener.h"
+#include "software/networking/proto_udp_client.h"
 
 /**
  * A threaded listener that receives serialized ReceiveProtoT Proto's over the network
@@ -45,10 +45,19 @@ class ThreadedProtoUdpListener
    private:
     // The io_service that will be used to service all network requests
     boost::asio::io_service io_service;
-    // The thread running the io_service in the background. This thread will run for the
-    // entire lifetime of the class
-    std::thread io_service_thread;
-    ProtoUdpListener<ReceiveProtoT> udp_listener;
+
+    // The thread running the io_service and receiving packets in the background.
+    // This thread will run for the entire lifetime of the class
+    std::thread networking_thread;
+
+    // The function to call on every received packet of ReceiveProtoT data
+    std::function<void(ReceiveProtoT)> receive_callback;
+
+    // The threaded proto udp listener will never receive any messages, we just
+    // use the ReceiveProtoT type as a placeholder
+    ProtoUdpClient<ReceiveProtoT, ReceiveProtoT> udp_listener;
+
+    std::atomic_bool in_destructor;
 };
 
 #include "software/networking/threaded_proto_udp_listener.tpp"

@@ -236,12 +236,13 @@ This will output the file at the _absolute_ path given via the `--callgrind-out-
 
 ## Flashing And Debugging A STM32H7 MCU
 1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies), and have a [NUCLEO-H743ZI](https://www.st.com/en/evaluation-tools/nucleo-h743zi.html) plugged into your computer.
-2. From the `src` folder, run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware_new/tools:debug_firmware_on_arm_board`. We specify `--cpu=stm32h7` because we want to compile code for the stm32h7 MCU (rather then a `x86_64` processor like you have in your computer), and `--compilation_mode=dbg` in order to build in the debug symbols required so you can step through the code and see what's going on. You'll be given a list of elf files to choose from.
-3. Assuming you choose 0 from the list in step (2), run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware_new/tools:debug_firmware_on_arm_board 0`. This will load the `.elf` file associated with (0) to the nucleo and put you into a gdb prompt.
+2. From the `src` folder, run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware/tools:stm32h7_firmware`. We specify `--cpu=stm32h7` because we want to compile code for the stm32h7 MCU (rather then a `x86_64` processor like you have in your computer), and `--compilation_mode=dbg` in order to build in the debug symbols required so you can step through the code and see what's going on. You'll be given a list of elf files to choose from.
+3. If you want just flash the firmware, go to step 5. Assuming you choose 0 from the list in step (2), run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware/tools:stm32h7_firmware 0 debug`. This will load the `.elf` file associated with (0) to the nucleo and put you into a gdb prompt.
 4. At this point you should be in a gdb window. Take a look at [this tutorial](https://www.cprogramming.com/gdb.html) for some basics.
+5. To flash the firmware without debugging, run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware/tools:stm32h7_firmware 0 program`
 
 ## Working with CubeMX to regenerate code
 1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies)
-2. To regenerate code from the `.ioc` file, run `bazel run //firmware_new/tools:cubemx_regen path/to/directory/with/.ioc`. The directory that is passed in as an argument must only contain 1 ioc file, which will be used to generate code into the same directory.
+2. To regenerate code from the `.ioc` file, run `bazel run //firmware/tools:cubemx_regen path/to/directory/with/.ioc`. The directory that is passed in as an argument must only contain 1 ioc file, which will be used to generate code into the same directory.
 
 To make sure we are all using the same cube version, run `STM32CubeMX` when editing the `.ioc` file.

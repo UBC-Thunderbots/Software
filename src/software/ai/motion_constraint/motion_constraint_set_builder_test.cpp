@@ -23,14 +23,11 @@ namespace
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new CherryPickTactic(world, pass), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new CreaseDefenderTactic(world.field(), world.ball(),
-                                         world.friendlyTeam(), world.enemyTeam(),
-                                         CreaseDefenderTactic::LEFT),
-                std::set<MotionConstraint>({})),
+                new CreaseDefenderTactic(
+                    std::make_shared<const RobotNavigationObstacleConfig>()),
+                std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
-                                 world.enemyTeam(),
-                                 std::make_shared<const GoalieTacticConfig>()),
+                new GoalieTactic(std::make_shared<const GoalieTacticConfig>()),
                 std::set<MotionConstraint>({MotionConstraint::FRIENDLY_DEFENSE_AREA,
                                             MotionConstraint::FRIENDLY_DEFENSE_AREA,
                                             MotionConstraint::HALF_METER_AROUND_BALL,

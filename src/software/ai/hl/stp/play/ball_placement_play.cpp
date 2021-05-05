@@ -2,7 +2,7 @@
 
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
-#include "software/ai/hl/stp/tactic/goalie_tactic.h"
+#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
@@ -47,9 +47,8 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
         move_tactics.at(i)->updateControlParams(waiting_destination, Angle::zero(), 0.0);
     }
 
-    auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
-        play_config->getGoalieTacticConfig());
+    auto goalie_tactic =
+        std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig());
 
     do
     {

@@ -1,7 +1,7 @@
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 
 RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
-    std::shared_ptr<const RobotNavigationObstacleFactoryConfig> config)
+    std::shared_ptr<const RobotNavigationObstacleConfig> config)
     : config(config),
       robot_radius_expansion_amount(config->getRobotObstacleInflationFactor()->value() *
                                     ROBOT_MAX_RADIUS_METERS)
