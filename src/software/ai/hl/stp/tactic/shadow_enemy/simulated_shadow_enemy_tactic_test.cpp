@@ -147,8 +147,8 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
             // As our friendly robot tries to steal and chip the ball,
             // it should chip the ball in the same direction is it
             // heading towards the ball
-            Vector shot = world_ptr->ball().position() - shadower.position();
-            ballKicked(shot.orientation(), world_ptr, yield);
+            Vector chip = world_ptr->ball().position() - shadower.position();
+            ballKicked(chip.orientation(), world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
