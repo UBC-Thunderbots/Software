@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <algorithm>
+#include <unordered_set>
 
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/stp.h"
@@ -405,26 +406,7 @@ TEST_F(STPTacticAssignmentTest,
 }
 
 TEST_F(STPTacticAssignmentTest,
-       test_assigning_multiple_robots_to_multiple_goalie_tactic_goalie_not_set_on_team)
-{
-    // Test that if there is no team goalie, the "goalie" tactic
-    // is not assigned a robot, even if there are enough robots
-
-    // Put two robots right in front of the friendly goal
-    Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-0.5, 0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(-0.5, -0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0));
-    friendly_team.updateRobots({robot_0, robot_1});
-    world.updateFriendlyTeamState(friendly_team);
-
-    auto asst = stp.assignRobotsToTactics({}, world, true);
-    EXPECT_EQ(0, asst.size());
-}
-
-TEST_F(STPTacticAssignmentTest,
-       test_assigning_multiple_robots_to_single_goalie_tactic_goalie_set_on_team)
+       test_assigning_multiple_robots_to_goalie_tactic_goalie_set_on_team)
 {
     // Test that only the robot set as the goalie on the team is assigned to the
     // goalie tactic
@@ -549,7 +531,7 @@ TEST_F(STPTacticAssignmentTest, test_greediness_of_tiered_assignment)
     EXPECT_EQ(asst.find(move_tactic_1)->second, robot_1);
 }
 
-TEST_F(STPTacticAssignmentTest, test_goalie_assigned_properly_with_tiered_assignment)
+TEST_F(STPTacticAssignmentTest, test_assignment_with_tiered_assignment)
 {
     // Regardless of how the play yields the tactics to be assigned,
     // the goalie should always be assigned to the goalie assigned to the team
@@ -642,4 +624,50 @@ TEST_F(STPTacticAssignmentTest, test_goalie_assigned_properly_with_tiered_assign
         EXPECT_TRUE(has_goalie);
         EXPECT_TRUE(has_move_1);
     }
+}
+
+TEST_F(STPTacticAssignmentTest, test_multi_tier_assignment_with_tiered_assignment)
+{
+    Team friendly_team;
+    friendly_team =
+        TestUtil::setRobotPositionsHelper(friendly_team,
+                                          {Point(-4, -2), Point(-3, -3), Point(-3.5, 2),
+                                           Point(2.2, 3), Point(0.6, 0.3), Point(4.5, 3)},
+                                          Timestamp::fromSeconds(323));
+    friendly_team.assignGoalie(0);
+    world.updateFriendlyTeamState(friendly_team);
+
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
+        std::make_shared<CreaseDefenderTactic>(
+            thunderbots_config->getPlayConfig()->getRobotNavigationObstacleConfig()),
+        std::make_shared<CreaseDefenderTactic>(
+            thunderbots_config->getPlayConfig()->getRobotNavigationObstacleConfig()),
+    };
+
+    Pass passer_pass(Point(2, 3), Point(0.5, 0.3), 2);
+    Pass cherry_pick_1_pass(Point(2, 3), Point(-1.3, 2), 2);
+    auto passer   = std::make_shared<PasserTactic>(passer_pass);
+    auto receiver = std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(),
+                                                     world.enemyTeam(), passer_pass,
+                                                     world.ball(), false);
+
+    auto cherry_pick_tactic_1 =
+        std::make_shared<CherryPickTactic>(world, cherry_pick_1_pass);
+    ConstPriorityTacticVector request = {
+        {passer, receiver},
+        {cherry_pick_tactic_1, std::get<0>(crease_defender_tactics),
+         std::get<1>(crease_defender_tactics)}};
+    auto asst = stp.assignRobotsToTactics(request, world, true);
+    EXPECT_EQ(6, asst.size());
+    std::unordered_set<RobotId> assigned_robot_ids;
+    for (const auto& [tactic, robot] : asst)
+    {
+        UNUSED(tactic);
+        assigned_robot_ids.insert(robot.id());
+    }
+    EXPECT_EQ(6, assigned_robot_ids.size());
+    EXPECT_TRUE(allTacticsAssigned(
+        {passer, receiver, cherry_pick_tactic_1, std::get<0>(crease_defender_tactics),
+         std::get<1>(crease_defender_tactics)},
+        asst));
 }
