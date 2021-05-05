@@ -61,8 +61,8 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Values(
         // Stationary Ball Tests
         // Passer point != Balls location & Balls location != Robots Location
-        std::make_tuple(Pass(Point(3.0, -0.5), Point(1.0, 1.0), 5),
+        std::make_tuple(Pass(Point(3.0, -0.5), Point(2.0, 2.0), 5),
                         RobotStateWithId{
-                            1, RobotState(Point(-1, -1), Vector(0, 0),
+                            1, RobotState(Point(-3, -1), Vector(0, 0),
                                           Angle::fromDegrees(0), Angle::fromDegrees(0))},
                         BallState(Point(3.0, -0.5), Vector(0, 0)))));

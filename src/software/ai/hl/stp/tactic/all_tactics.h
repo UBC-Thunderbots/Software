@@ -13,7 +13,7 @@
 #include "software/ai/hl/stp/tactic/passer/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/penalty_kick_tactic.h"
 #include "software/ai/hl/stp/tactic/penalty_setup_tactic.h"
-#include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
+#include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_free_kicker_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"

@@ -12,6 +12,10 @@
 
 struct ReceiverFSM
 {
+    class OneTouchShotState;
+    class ReceiveAndDribbleState;
+    class UndecidedState;
+
     struct ControlParams
     {
         // The pass to receive
@@ -24,7 +28,6 @@ struct ReceiverFSM
     // that we require before attempting a shot
     static constexpr double MIN_SHOT_NET_PERCENT_OPEN    = 0.3;
     static constexpr double MAX_SPEED_FOR_ONE_TOUCH_SHOT = 6.5;
-
     // The maximum deflection angle that we will attempt a one-touch kick towards the
     // enemy goal with
     static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(90);
@@ -150,76 +153,49 @@ struct ReceiverFSM
     {
         using namespace boost::sml;
 
-        const auto move_s     = state<MoveFSM>;
-        const auto receive_s  = state<MoveFSM>;
-        const auto onetouch_s = state<MoveFSM>;
-        const auto update_e   = event<Update>;
+        const auto undecided_s = state<UndecidedState>;
+        const auto receive_s   = state<ReceiveAndDribbleState>;
+        const auto onetouch_s  = state<OneTouchShotState>;
+        const auto update_e    = event<Update>;
 
-        /**
-         * Action that updates the MoveFSM
-         *
-         * @param event MoveFSM::Update event
-         */
-        const auto update_onetouch = [](auto event,
-                                        back::process<MoveFSM::Update> processEvent) {
-            MoveFSM::ControlParams control_params;
-            std::cerr << "update_onetouch" << std::endl;
-
+        const auto update_onetouch = [this](auto event) {
             auto best_shot = findFeasibleShot(event.common.world, event.common.robot);
+            auto one_touch = getOneTimeShotPositionAndOrientation(
+                event.common.robot, event.common.world.ball(),
+                best_shot->getPointToShootAt());
 
             if (best_shot)
             {
-                Shot shot = getOneTimeShotPositionAndOrientation(
-                    event.common.robot, event.common.world.ball(),
-                    best_shot->getPointToShootAt());
-
-                control_params = MoveFSM::ControlParams{
-                    .destination            = event.control_params.pass->receiverPoint(),
-                    .final_orientation      = shot.getOpenAngle(),
-                    .final_speed            = 0.0,
-                    .dribbler_mode          = DribblerMode::OFF,
-                    .ball_collision_type    = BallCollisionType::ALLOW,
-                    .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                                                        MAX_SPEED_FOR_ONE_TOUCH_SHOT},
-                    .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-                    .target_spin_rev_per_s  = 0.0,
-                };
-            }
-            if (event.control_params.pass)
-            {
-                // Update the dribble fsm
-                processEvent(MoveFSM::Update(control_params, event.common));
+                std::cerr << "1. moving to onetouch" << std::endl;
+                if (event.control_params.pass)
+                {
+                    std::cerr << "moving to onetouch" << std::endl;
+                    event.common.set_intent(std::make_unique<MoveIntent>(
+                        event.common.robot.id(),
+                        one_touch.getPointToShootAt(),
+                        one_touch.getOpenAngle(), 0, DribblerMode::OFF,
+                        BallCollisionType::ALLOW,
+                        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                                       MAX_SPEED_FOR_ONE_TOUCH_SHOT},
+                        MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+                }
             }
         };
 
-        const auto update_receive = [](auto event,
-                                       back::process<MoveFSM::Update> processEvent) {
-            MoveFSM::ControlParams control_params;
-            std::cerr << "update_move_to_receive" << std::endl;
-
+        const auto update_receive = [this](auto event) {
+            std::cerr << "2. moving to receiver" << std::endl;
             if (event.control_params.pass)
             {
-                control_params = {
-                    .destination       = event.control_params.pass->receiverPoint(),
-                    .final_orientation = event.control_params.pass->receiverOrientation(),
-                    .final_speed       = 0.0,
-                    .dribbler_mode     = DribblerMode::OFF,
-                    .ball_collision_type    = BallCollisionType::ALLOW,
-                    .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                                                        MAX_SPEED_FOR_ONE_TOUCH_SHOT},
-                    .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-                    .target_spin_rev_per_s  = 0.0,
-                };
+                std::cerr << "moving to receiver" << std::endl;
+                event.common.set_intent(std::make_unique<MoveIntent>(
+                    event.common.robot.id(), event.control_params.pass->receiverPoint(),
+                    event.control_params.pass->receiverOrientation(), 0,
+                    DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
+                    AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+                    MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
             }
-
-            // Update the dribble fsm
-            processEvent(MoveFSM::Update(control_params, event.common));
         };
 
-        /**
-         * @param ReceiverFSM::Update
-         * @return true if the ball has started moving
-         */
         const auto pass_started = [](auto event) {
             return event.common.world.ball().velocity().length() > 0.5;
         };
@@ -229,23 +205,18 @@ struct ReceiverFSM
                 event.common.world.ball().position());
         };
 
-        /**
-         * @param ReceiverFSM::Update
-         * @return true if a one touch shot is possible on net
-         */
-        const auto onetouch_possible = [](auto event) { return false; };
+        const auto onetouch_possible = [](auto event) {
+            return findFeasibleShot(event.common.world, event.common.robot) !=
+                   std::nullopt;
+        };
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *move_s + update_e[!pass_started && onetouch_possible] / update_onetouch =
-                onetouch_s,
-            move_s + update_e[!pass_started && !onetouch_possible] / update_receive =
-                receive_s,
-            receive_s + update_e[pass_started && !pass_finished] / update_receive =
-                receive_s,
-            onetouch_s + update_e[pass_started && !pass_finished] / update_onetouch =
-                onetouch_s,
-            receive_s + update_e[pass_finished] / update_receive   = X,
-            onetouch_s + update_e[pass_finished] / update_onetouch = X);
+            *undecided_s + update_e[onetouch_possible] / update_onetouch = onetouch_s,
+            undecided_s + update_e[!onetouch_possible] / update_receive  = receive_s,
+            receive_s + update_e[!pass_finished] / update_receive        = receive_s,
+            onetouch_s + update_e[!pass_finished] / update_onetouch      = onetouch_s,
+            receive_s + update_e[pass_started && pass_finished] / update_receive         = X,
+            onetouch_s + update_e[pass_started && pass_finished] / update_onetouch       = X);
     }
 };

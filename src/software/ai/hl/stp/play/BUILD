@@ -34,7 +34,6 @@ cc_library(
         "//software/ai/hl/stp/tactic:receiver_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/passer:passer_tactic",
-        "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/ai/passing:pass_generator",
@@ -134,19 +133,15 @@ cc_library(
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/tactic:cherry_pick_tactic",
-<<<<<<< HEAD
         "//software/ai/hl/stp/tactic:crease_defender_tactic",
         "//software/ai/hl/stp/tactic:goalie_tactic",
-=======
         "//software/ai/hl/stp/tactic:receiver_tactic",
->>>>>>> 35fc2309901ddd32e2e8649ea7b0a6a580e502e4
         "//software/ai/hl/stp/tactic:shoot_goal_tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/passer:passer_tactic",
-        "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
         "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/ai/passing:pass_generator",
         "//software/logger",
@@ -260,20 +255,15 @@ cc_library(
         "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:calc_best_shot",
         "//software/ai/evaluation:possession",
-        "//software/ai/hl/stp/tactic:cherry_pick_tactic",
-<<<<<<< HEAD
         "//software/ai/hl/stp/tactic:crease_defender_tactic",
         "//software/ai/hl/stp/tactic:goalie_tactic",
-=======
         "//software/ai/hl/stp/tactic:receiver_tactic",
->>>>>>> 35fc2309901ddd32e2e8649ea7b0a6a580e502e4
         "//software/ai/hl/stp/tactic:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic:shoot_goal_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/passer:passer_tactic",
-        "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
         "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/ai/passing:pass_generator",
         "//software/geom/algorithms",
