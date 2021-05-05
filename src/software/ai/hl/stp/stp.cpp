@@ -96,7 +96,9 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     updateSTPState(world);
     auto intents = getIntentsFromCurrentPlay(world);
 
-    for (auto tactic : stop_tactics)
+    auto all_tactics = stop_tactics;
+    all_tactics.push_back(goalie_tactic);
+    for (auto tactic : all_tactics)
     {
         auto iter = robot_tactic_assignment.find(tactic);
         if (iter != robot_tactic_assignment.end())
@@ -104,17 +106,6 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
             auto intent = tactic->get(iter->second, world);
             intent->setMotionConstraints(
                 buildMotionConstraintSet(current_game_state, *tactic));
-            intents.push_back(std::move(intent));
-        }
-    }
-
-    {
-        auto iter = robot_tactic_assignment.find(goalie_tactic);
-        if (iter != robot_tactic_assignment.end())
-        {
-            auto intent = goalie_tactic->get(iter->second, world);
-            intent->setMotionConstraints(
-                buildMotionConstraintSet(current_game_state, *goalie_tactic));
             intents.push_back(std::move(intent));
         }
     }
@@ -166,15 +157,10 @@ PlayInfo STP::getPlayInfo()
     std::string info_play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
     PlayInfo info              = PlayInfo(info_referee_command, info_play_name, {});
 
-    std::map<RobotId, std::string> readable_robot_tactic_assignment;
     for (const auto& [tactic, robot] : robot_tactic_assignment)
     {
-        readable_robot_tactic_assignment.emplace(robot.id(), objectTypeName(*tactic));
-    }
-
-    for (const auto& [robot_id, tactic_string] : readable_robot_tactic_assignment)
-    {
-        std::string s = "Robot " + std::to_string(robot_id) + "  -  " + tactic_string;
+        std::string s =
+            "Robot " + std::to_string(robot.id()) + "  -  " + objectTypeName(*tactic);
         info.addRobotTacticAssignment(s);
     }
 
