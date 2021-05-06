@@ -126,6 +126,10 @@ struct ShadowEnemyFSM
             auto ball_position = event.common.world.ball().position();
             auto face_ball_orientation =
                 (ball_position - event.common.robot.position()).orientation();
+
+            // If no enemy_threat is found, the robot will default to blocking
+            // the possible shot on net
+
             Point position_to_block =
                 ball_position +
                 (event.common.world.field().friendlyGoalCenter() - ball_position)
@@ -157,6 +161,10 @@ struct ShadowEnemyFSM
             auto ball_position = event.common.world.ball().position();
             auto face_ball_orientation =
                 (ball_position - event.common.robot.position()).orientation();
+
+            // If no enemy_threat is found, the robot will default to blocking
+            // the possible shot on net
+
             Point position_to_block =
                 ball_position +
                 (event.common.world.field().friendlyGoalCenter() - ball_position)
