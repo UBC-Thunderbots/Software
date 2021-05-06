@@ -144,9 +144,15 @@ void SimulatedTestFixture::updateSensorFusion()
     simulator_sensorproto_logger->onValueReceived(sensor_msg);
 
     sensor_fusion.processSensorProto(sensor_msg);
-    auto filtered_ssl_wrapper =
-        *createSSLWrapperPacket(sensor_fusion.getWorld().value(), TeamColour::YELLOW);
-    sensorfusion_wrapper_logger->onValueReceived(filtered_ssl_wrapper);
+
+    auto world_or_null = sensor_fusion.getWorld();
+
+    if (world_or_null)
+    {
+        auto filtered_ssl_wrapper =
+            *createSSLWrapperPacket(sensor_fusion.getWorld(), TeamColour::YELLOW);
+        sensorfusion_wrapper_logger->onValueReceived(filtered_ssl_wrapper);
+    }
 }
 
 void SimulatedTestFixture::sleep(
