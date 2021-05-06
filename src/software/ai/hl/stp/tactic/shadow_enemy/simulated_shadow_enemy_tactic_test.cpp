@@ -6,6 +6,7 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
+#include "software/simulated_tests/terminating_validation_functions/robot_blocking_shot.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
@@ -138,9 +139,7 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
             // As the shadowee is located at (0,-2), we first find the shot
             // vector to our net and then normalize this vector to a distance
             // of 2 away from the shadowee
-            Vector shot       = field().friendlyGoalCenter() - shadowee.position();
-            Point destination = shadowee.position() + shot.normalize(2);
-            robotAtPosition(0, world_ptr, destination, 0.05, yield);
+            robotBlockingShot(0, world_ptr, yield);
         },
         [this, tactic, shadower](std::shared_ptr<World> world_ptr,
                                  ValidationCoroutine::push_type& yield) {
@@ -186,9 +185,7 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_if_enemy_threat_is_null)
             // As the shadowee is located at (0,-2), we first find the shot
             // vector to our net and then normalize this vector to a distance
             // of 2 away from the shadowee
-            Vector shot = field().friendlyGoalCenter() - world_ptr->ball().position();
-            Point destination = world_ptr->ball().position() + shot.normalize(2);
-            robotAtPosition(0, world_ptr, destination, 0.01, yield);
+            robotBlockingShot(0, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
