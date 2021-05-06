@@ -35,7 +35,7 @@ TEST(PenaltyKickTacticFSM, test_transitions) {
 
     world = ::TestUtil::setBallPosition(world, world.field().enemyGoalCenter(), Timestamp::fromSeconds(2));
     world = ::TestUtil::setBallVelocity(world,
-        Vector(PenaltyKickTacticFSM::PENALTY_KICK_SHOT_SPEED, 0), Timestamp::fromSeconds(2));
+        Vector(5, 0), Timestamp::fromSeconds(2));
     fsm.process_event(PenaltyKickTacticFSM::Update(
         control_params,
         TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));

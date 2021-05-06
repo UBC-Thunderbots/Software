@@ -22,22 +22,20 @@ struct PenaltyKickTacticFSM
     };
 
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
-    static constexpr double PENALTY_KICK_POST_OFFSET = 0.02;
 
-    static constexpr double PENALTY_KICK_SHOT_SPEED = 5.0;
-    // expected maximum acceleration of the opposition goalie robot
-    static constexpr double PENALTY_KICK_GOALIE_MAX_ACC = 1.5;
-    static constexpr double SSL_VISION_DELAY            = 0.30;  // seconds
-
-    // timeout that forces a shot after the robot approaches the ball and advances
-    // towards the keeper
-    // these two timeouts together must be <= 9 seconds
-    static const inline Duration PENALTY_FORCE_SHOOT_TIMEOUT     = Duration::fromSeconds(4);
-    static const inline Duration PENALTY_FINISH_APPROACH_TIMEOUT = Duration::fromSeconds(4);
-
-    //returns true if we should shoot
-    static const auto evaluatePenaltyShot(std::optional<Robot> enemy_goalie, Field field, Ball ball, Robot robot)
-    {
+    /**
+     * Helper function that determines whether the shooter robot has a viable shot on net.
+     *
+     * @param enemy_goalie  the enemy goalie that we are scoring against
+     * @param field         the current field being played on
+     * @param ball          the ball being played on
+     * @param robot         the shooter robot
+     *
+     * @return true if the robot has a viable shot and false if the enemy goalkeeper will
+     * likely save the shot.
+     */
+     static const auto evaluatePenaltyShot(std::optional<Robot> enemy_goalie, Field field, Ball ball, Robot robot)
+     {
         // If there is no goalie, the net is wide open
         if (!enemy_goalie.has_value())
         {
@@ -116,6 +114,15 @@ struct PenaltyKickTacticFSM
 
     }
 
+    /**
+     * Helper function that returns the point on the enemy goal line where the shooter
+     * should aim at.
+     *
+     * @param enemy_goalie  the goalie that the shooter is scoring against
+     * @param field         the field being played on
+     *
+     * @return the Point on the enemy goal-line where the shooter robot should aim
+     */
     static const Point evaluateNextShotPosition(std::optional<Robot> enemy_goalie, Field field)
     {
 
@@ -155,6 +162,11 @@ struct PenaltyKickTacticFSM
         static Angle shot_angle;
         static Point current_robot_position;
 
+        /**
+        * Initializes the time-dependent quantities for the penalty kick.
+        *
+        * @param event PenaltyKickTacticFSM::Update event
+        */
         const auto initialize_start_keeper =
             [&](auto event) {
                 penalty_kick_start = event.common.world.getMostRecentTimestamp();
@@ -168,6 +180,12 @@ struct PenaltyKickTacticFSM
                 approach_keeper_speed = distance / time_till_end_penalty;
         };
 
+        /**
+        * Action that causes the shooter to shoot the ball.
+        *
+        * @param event          PenaltyKickTacticFSM::Update event
+        * @param processEvent   processes the KickFSM::Update
+        */
         const auto shoot =
             [this](auto event, back::process<KickFSM::Update> processEvent) {
                 KickFSM::ControlParams control_params {
@@ -178,6 +196,12 @@ struct PenaltyKickTacticFSM
                 processEvent(KickFSM::Update(control_params, event.common));
         };
 
+        /**
+        * Action that updates the shooter's approach to the opposition net.
+        *
+        * @param event          PenaltyKickTacticFSM::Update event
+        * @param processEvent   processes the DribbleFSM::Update
+        */
         const auto update_approach_keeper =
             [&]
             (auto event, back::process<DribbleFSM::Update> processEvent) {
@@ -198,6 +222,12 @@ struct PenaltyKickTacticFSM
                 processEvent(DribbleFSM::Update(control_params, event.common));
         };
 
+        /**
+        * Action that orients the shooter to prepare for a shot.
+        *
+        * @param event          PenaltyKickTacticFSM::Update
+        * @param processEvent   processes the DribbleFSM::Update
+        */
         const auto adjust_orientation_for_shot =
             [this]
             (auto event, back::process<DribbleFSM::Update> processEvent) {
@@ -214,16 +244,29 @@ struct PenaltyKickTacticFSM
                 processEvent(DribbleFSM::Update(control_params, event.common));
         };
 
+        /**
+        * Guard that returns true if the shooter has a good shot on goal or if it is forced to
+        * shoot due to the penalty timeout.
+        *
+        * @param event  PenaltyKickTacticFSM::Update
+        */
         const auto take_penalty_shot =
             [this] (auto event) {
+                Timestamp force_shoot_timestamp = complete_approach + PENALTY_FORCE_SHOOT_TIMEOUT;
                 bool shouldShoot = evaluatePenaltyShot(
                     event.control_params.enemy_goalie,
                     event.common.world.field(),
                     event.common.world.ball(),
-                    event.common.robot);
+                    event.common.robot)
+                    || event.common.world.getMostRecentTimestamp() >= force_shoot_timestamp;
                 return shouldShoot;
         };
 
+        /**
+        * Guard that checks whether the shooter shot the ball with a particular shot speed and orientation.
+        *
+        * @param event  PenaltyKickTacticFSM::Update
+        */
         const auto ball_kicked = [](auto event) {
             return event.common.world.ball().hasBallBeenKicked(
                 shot_angle, PENALTY_KICK_SHOT_SPEED);
@@ -239,4 +282,17 @@ struct PenaltyKickTacticFSM
             shoot_s + update_e[ball_kicked] = X);
     }
 
+    private :
+        static constexpr double PENALTY_KICK_POST_OFFSET = 0.02;
+
+        static constexpr double PENALTY_KICK_SHOT_SPEED = 5.0;
+        // expected maximum acceleration of the opposition goalie robot
+        static constexpr double PENALTY_KICK_GOALIE_MAX_ACC = 1.5;
+        static constexpr double SSL_VISION_DELAY            = 0.30;  // seconds
+
+        // timeout that forces a shot after the robot approaches the ball and advances
+        // towards the keeper
+        // these two timeouts together must be <= 9 seconds
+        static const inline Duration PENALTY_FORCE_SHOOT_TIMEOUT     = Duration::fromSeconds(4);
+        static const inline Duration PENALTY_FINISH_APPROACH_TIMEOUT = Duration::fromSeconds(4);
 };
