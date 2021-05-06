@@ -181,14 +181,6 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
 
     resetAndInitializeMemberVariables(navigable_area, obstacles);
 
-    // if the start and end points are close enough, then return a straightline path
-    if ((start - end).length() < CLOSE_TO_END_THRESHOLD ||
-        ((std::abs(start.x() - end.x()) < SIZE_OF_GRID_CELL_IN_METERS) &&
-         std::abs(start.y() - end.y()) < SIZE_OF_GRID_CELL_IN_METERS))
-    {
-        return Path(std::vector<Point>({start, end}));
-    }
-
     Point closest_end      = findClosestFreePoint(end);
     Coordinate start_coord = convertPointToCoord(start);
     Coordinate end_coord   = convertPointToCoord(closest_end);
@@ -199,6 +191,13 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
         return std::nullopt;
     }
 
+    // if the start and end points are close enough, then return a straightline path
+    if ((start - end).length() < CLOSE_TO_END_THRESHOLD ||
+        ((std::abs(start.x() - end.x()) < SIZE_OF_GRID_CELL_IN_METERS) &&
+         std::abs(start.y() - end.y()) < SIZE_OF_GRID_CELL_IN_METERS))
+    {
+        return Path(std::vector<Point>({start, end}));
+    }
     if ((start - closest_end).length() < CLOSE_TO_END_THRESHOLD ||
         start_coord == end_coord)
     {
