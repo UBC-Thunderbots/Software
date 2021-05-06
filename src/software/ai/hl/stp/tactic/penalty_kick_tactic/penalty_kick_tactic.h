@@ -1,12 +1,12 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/hl/stp/tactic/penalty_kick_tactic/penalty_kick_tactic_fsm.h"
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/kick_action.h"
-#include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/action/stop_action.h"
+#include "software/ai/hl/stp/tactic/penalty_kick_tactic/penalty_kick_tactic_fsm.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/logger/logger.h"
 
 
@@ -26,8 +26,8 @@ class PenaltyKickTactic : public Tactic
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit PenaltyKickTactic(const Ball& ball, bool loop_forever,
-                                const std::optional<Robot> &enemy_goalie);
+    explicit PenaltyKickTactic(const Ball &ball, bool loop_forever,
+                               const std::optional<Robot> &enemy_goalie);
 
     PenaltyKickTactic() = delete;
 
@@ -50,11 +50,11 @@ class PenaltyKickTactic : public Tactic
 
     Ball getBall() const;
 
-    //Point evaluateNextShotPosition();
+    // Point evaluateNextShotPosition();
 
    private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;
-    void updateIntent(const TacticUpdate& tactic_update) override;
+    void updateIntent(const TacticUpdate &tactic_update) override;
 
     // Tactic parameters
     Ball ball;

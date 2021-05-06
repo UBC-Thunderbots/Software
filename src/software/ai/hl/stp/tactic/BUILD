@@ -175,7 +175,6 @@ cc_library(
         ":cherry_pick_tactic",
         ":defense_shadow_enemy_tactic",
         ":kickoff_chip_tactic",
-        "//software/ai/hl/stp/tactic/penalty_kick_tactic:penalty_kick_tactic",
         ":penalty_setup_tactic",
         ":receiver_tactic",
         ":shadow_enemy_tactic",
@@ -190,6 +189,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/passer:passer_tactic",
+        "//software/ai/hl/stp/tactic/penalty_kick_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
     ],
 )

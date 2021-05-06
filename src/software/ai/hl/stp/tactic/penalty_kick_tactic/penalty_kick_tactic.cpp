@@ -3,20 +3,20 @@
  */
 #include "software/ai/hl/stp/tactic/penalty_kick_tactic/penalty_kick_tactic.h"
 
-PenaltyKickTactic::PenaltyKickTactic(const Ball& ball,
-                                     bool loop_forever,
-                                     const std::optional<Robot> &enemy_goalie)
-    : Tactic(loop_forever, {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
-        ball(ball), enemy_goalie(enemy_goalie),
-        control_params({.enemy_goalie = enemy_goalie})
+PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, bool loop_forever,
+                                     const std::optional<Robot>& enemy_goalie)
+    : Tactic(loop_forever,
+             {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
+      ball(ball),
+      enemy_goalie(enemy_goalie),
+      control_params({.enemy_goalie = enemy_goalie})
 {
 }
 
-void PenaltyKickTactic::updateWorldParams(const World& world)
-{
-}
+void PenaltyKickTactic::updateWorldParams(const World& world) {}
 
-void PenaltyKickTactic::updateControlParams() {
+void PenaltyKickTactic::updateControlParams()
+{
     control_params.enemy_goalie = enemy_goalie;
 }
 
@@ -55,7 +55,7 @@ bool PenaltyKickTactic::done() const
     return fsm.is(boost::sml::X);
 }
 
-void PenaltyKickTactic::updateIntent(const TacticUpdate &tactic_update)
+void PenaltyKickTactic::updateIntent(const TacticUpdate& tactic_update)
 {
     fsm.process_event(PenaltyKickTacticFSM::Update(control_params, tactic_update));
 }
