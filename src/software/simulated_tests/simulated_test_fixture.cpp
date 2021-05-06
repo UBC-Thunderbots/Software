@@ -10,7 +10,11 @@ SimulatedTestFixture::SimulatedTestFixture()
       simulator(std::make_unique<Simulator>(Field::createSSLDivisionBField(),
                                             thunderbots_config->getSimulatorConfig())),
       sensor_fusion(thunderbots_config->getSensorFusionConfig()),
-      run_simulation_in_realtime(false)
+      run_simulation_in_realtime(false),
+      tick_count(0),
+      total_tick_duration(0),
+      max_tick_duration(std::numeric_limits<double>::min()),
+      min_tick_duration(std::numeric_limits<double>::max())
 {
 }
 
@@ -167,17 +171,8 @@ void SimulatedTestFixture::runTest(
     const Duration ai_time_step = Duration::fromSeconds(simulation_time_step.toSeconds() *
                                                         CAMERA_FRAMES_PER_AI_TICK);
 
-    auto start_tick_time = std::chrono::system_clock::now();
-
     // Tick one frame to aid with visualization
     bool validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);
-
-    // Logging duration of each tick
-    unsigned int tick_count    = 1;
-    double duration_ms         = ::TestUtil::millisecondsSince(start_tick_time);
-    double total_tick_duration = duration_ms;
-    double max_tick_duration   = duration_ms;
-    double min_tick_duration   = duration_ms;
 
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
@@ -189,18 +184,9 @@ void SimulatedTestFixture::runTest(
             continue;
         }
 
-        // Record starting time
-        start_tick_time = std::chrono::system_clock::now();
-
         validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);
-
-        // Calculate tick durations
-        duration_ms = ::TestUtil::millisecondsSince(start_tick_time);
-        total_tick_duration += duration_ms;
-        max_tick_duration = std::max(max_tick_duration, duration_ms);
-        min_tick_duration = std::min(min_tick_duration, duration_ms);
-        tick_count++;
     }
+
     // Output the tick duration results
     double avg_tick_duration = total_tick_duration / tick_count;
     LOG(INFO) << "max tick duration: " << max_tick_duration << "ms" << std::endl;
@@ -244,7 +230,16 @@ bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_t
             return validation_functions_done;
         }
 
+        // Logging duration of updatePrimitives for every tick
+        tick_count++;
+        auto start_tick_time = std::chrono::system_clock::now();
+
         updatePrimitives(*world_opt, simulator);
+
+        double duration_ms = ::TestUtil::millisecondsSince(start_tick_time);
+        total_tick_duration += duration_ms;
+        max_tick_duration = std::max(max_tick_duration, duration_ms);
+        min_tick_duration = std::min(min_tick_duration, duration_ms);
 
         if (run_simulation_in_realtime)
         {
