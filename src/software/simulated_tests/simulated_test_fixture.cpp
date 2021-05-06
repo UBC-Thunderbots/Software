@@ -150,7 +150,7 @@ void SimulatedTestFixture::updateSensorFusion()
     if (world_or_null)
     {
         auto filtered_ssl_wrapper =
-            *createSSLWrapperPacket(sensor_fusion.getWorld(), TeamColour::YELLOW);
+            *createSSLWrapperPacket(*sensor_fusion.getWorld(), TeamColour::YELLOW);
         sensorfusion_wrapper_logger->onValueReceived(filtered_ssl_wrapper);
     }
 }
