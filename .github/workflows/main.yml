@@ -110,6 +110,7 @@ jobs:
           # we only care about the replay logs from the STP tests
           path: |
             src/bazel-out/k8-fastbuild/testlogs/software/ai/hl/stp
+            
   memory-leak-checks:
     name: Memory Leak Checks
     runs-on: ubuntu-18.04
