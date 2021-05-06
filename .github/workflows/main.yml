@@ -41,6 +41,12 @@ jobs:
             -//software/ai/hl/stp/play/... \
             -//software/ai/hl/stp/tactic/... \
             -//firmware/boards/arduino_uno/... # Arduino requires setup_firmware
+
+      - name: Archive test artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: software-test-outputs
+          path: src/bazel-out/k8-fastbuild/testlogs
              
   firmware-tests:
     name: Firmware Tests

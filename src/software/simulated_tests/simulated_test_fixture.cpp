@@ -1,6 +1,10 @@
 #include "software/simulated_tests/simulated_test_fixture.h"
 
+#include <cstdlib>
+#include <experimental/filesystem>
+
 #include "software/logger/logger.h"
+#include "software/proto/message_translation/ssl_wrapper.h"
 #include "software/test_util/test_util.h"
 
 SimulatedTestFixture::SimulatedTestFixture()
@@ -57,6 +61,7 @@ void SimulatedTestFixture::SetUp()
     {
         enableVisualizer();
     }
+    setupReplayLogging();
 }
 
 void SimulatedTestFixture::setBallState(const BallState &ball)
@@ -83,6 +88,30 @@ void SimulatedTestFixture::enableVisualizer()
 {
     full_system_gui = std::make_shared<ThreadedFullSystemGUI>(mutable_thunderbots_config);
     run_simulation_in_realtime = true;
+}
+
+void SimulatedTestFixture::setupReplayLogging()
+{
+    // get the name of the current test to name the replay output directory
+    auto test_name = ::testing::UnitTest::GetInstance()->current_test_info()->name();
+
+    namespace fs = std::experimental::filesystem;
+    static constexpr auto SIMULATED_TEST_OUTPUT_DIR_SUFFIX = "simulated_test_outputs";
+
+    fs::path bazel_test_outputs_dir(std::getenv("TEST_UNDECLARED_OUTPUTS_DIR"));
+    fs::path out_dir =
+        bazel_test_outputs_dir / SIMULATED_TEST_OUTPUT_DIR_SUFFIX / test_name;
+    fs::create_directories(out_dir);
+
+    LOG(INFO) << "Logging " << test_name << " replay to " << out_dir;
+
+    fs::path sensorproto_out_dir = out_dir / "Simulator_SensorProto";
+    fs::path ssl_wrapper_out_dir = out_dir / "SensorFusion_SSL_WrapperPacket";
+
+    simulator_sensorproto_logger =
+        std::make_shared<ProtoLogger<SensorProto>>(sensorproto_out_dir);
+    sensorfusion_wrapper_logger =
+        std::make_shared<ProtoLogger<SSLProto::SSL_WrapperPacket>>(ssl_wrapper_out_dir);
 }
 
 bool SimulatedTestFixture::validateAndCheckCompletion(
@@ -112,8 +141,12 @@ void SimulatedTestFixture::updateSensorFusion()
 
     auto sensor_msg                        = SensorProto();
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    simulator_sensorproto_logger->onValueReceived(sensor_msg);
 
     sensor_fusion.processSensorProto(sensor_msg);
+    auto filtered_ssl_wrapper =
+        *createSSLWrapperPacket(sensor_fusion.getWorld().value(), TeamColour::YELLOW);
+    sensorfusion_wrapper_logger->onValueReceived(filtered_ssl_wrapper);
 }
 
 void SimulatedTestFixture::sleep(

@@ -4,6 +4,7 @@
 
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
+#include "software/proto/logging/proto_logger.h"
 #include "software/sensor_fusion/sensor_fusion.h"
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
 #include "software/simulated_tests/validation/terminating_function_validator.h"
@@ -38,6 +39,13 @@ class SimulatedTestFixture : public ::testing::Test
      * want to show in the FullSystemGUI.
      */
     void enableVisualizer();
+
+    /**
+     * Creates a directory to output logs to in the directory at the
+     * TEST_UNDECLARED_OUTPUTS_DIR Bazel environment variable, and sets up some
+     * ProtoLoggers to log unfiltered and filtered data.
+     */
+    void setupReplayLogging();
 
     /**
      * Starts the simulation using the current state of the simulator, and runs
@@ -179,6 +187,10 @@ class SimulatedTestFixture : public ::testing::Test
     std::shared_ptr<Simulator> simulator;
     // The SensorFusion being tested and used in simulation
     SensorFusion sensor_fusion;
+
+    // ProtoLoggers for the simulator and SensorFusion, respectively
+    std::shared_ptr<ProtoLogger<SensorProto>> simulator_sensorproto_logger;
+    std::shared_ptr<ProtoLogger<SSLProto::SSL_WrapperPacket>> sensorfusion_wrapper_logger;
 
     std::vector<NonTerminatingFunctionValidator> non_terminating_function_validators;
     std::vector<TerminatingFunctionValidator> terminating_function_validators;
