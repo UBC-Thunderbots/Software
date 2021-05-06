@@ -8,15 +8,15 @@ Point::Point(const Point &p) : x_(p.x()), y_(p.y()) {}
 
 Point::Point(const Vector &v) : x_(v.x()), y_(v.y()) {}
 
-double Point::x() const
-{
-    return x_;
-}
-
-double Point::y() const
-{
-    return y_;
-}
+//inline double Point::x() const
+//{
+//    return x_;
+//}
+//
+//inline double Point::y() const
+//{
+//    return y_;
+//}
 
 void Point::set(double x, double y)
 {
