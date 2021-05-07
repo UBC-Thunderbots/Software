@@ -118,30 +118,6 @@ cc_library(
 )
 
 cc_library(
-    name = "shadow_enemy_tactic",
-    srcs = ["shadow_enemy_tactic.cpp"],
-    hdrs = ["shadow_enemy_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/action:stop_action",
-        "//software/logger",
-    ],
-)
-
-cc_test(
-    name = "shadow_enemy_tactic_test",
-    srcs = ["shadow_enemy_tactic_test.cpp"],
-    deps = [
-        ":shadow_enemy_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "shadow_free_kicker_tactic",
     srcs = ["shadow_free_kicker_tactic.cpp"],
     hdrs = ["shadow_free_kicker_tactic.h"],
@@ -203,7 +179,6 @@ cc_library(
         ":penalty_kick_tactic",
         ":penalty_setup_tactic",
         ":receiver_tactic",
-        ":shadow_enemy_tactic",
         ":shadow_free_kicker_tactic",
         ":shoot_goal_tactic",
         ":tactic",
@@ -215,6 +190,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/passer:passer_tactic",
+        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
     ],
 )
