@@ -136,9 +136,9 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic, shadowee](std::shared_ptr<World> world_ptr,
                                  ValidationCoroutine::push_type& yield) {
-            // As the shadowee is located at (0,-2), we first find the shot
-            // vector to our net and then normalize this vector to a distance
-            // of 2 away from the shadowee
+            // We compose a triangle consisting of the friendly goal posts
+            // and the ball position. If our robot is in this triangle, then
+            // it is blocking a possible shot on net
             Triangle shotTriangle{world_ptr->field().friendlyGoalpostPos(),
                                   world_ptr->field().friendlyGoalpostNeg(),
                                   world_ptr->ball().position()};
@@ -185,9 +185,9 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_if_enemy_threat_is_null)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic, shadowee](std::shared_ptr<World> world_ptr,
                                  ValidationCoroutine::push_type& yield) {
-            // As the shadowee is located at (0,-2), we first find the shot
-            // vector to our net and then normalize this vector to a distance
-            // of 2 away from the shadowee
+            // We compose a triangle consisting of the friendly goal posts
+            // and the ball position. If our robot is in this triangle, then
+            // it is blocking a possible shot on net
             Triangle shotTriangle{world_ptr->field().friendlyGoalpostPos(),
                                   world_ptr->field().friendlyGoalpostNeg(),
                                   world_ptr->ball().position()};
