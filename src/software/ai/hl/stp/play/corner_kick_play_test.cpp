@@ -19,6 +19,8 @@ class CornerKickPlayTest : public SimulatedPlayTestFixture
 
 TEST_F(CornerKickPlayTest, test_corner_kick_play_bottom_left)
 {
+    enableVisualizer();
+
     setBallState(BallState(Point(4.5, -3), Vector(0, 0)));
     addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),

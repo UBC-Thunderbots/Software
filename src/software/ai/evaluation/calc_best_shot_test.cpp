@@ -15,9 +15,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_no_obstacles)
     team.updateRobots({shooting_robot});
     world.updateFriendlyTeamState(team);
 
-    auto result =
-        calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                           shooting_robot.position(), TeamType::ENEMY, {shooting_robot});
+    auto result = calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot.position(), TeamType::ENEMY, {shooting_robot});
 
     // We expect to be able to find a shot
     ASSERT_TRUE(result);

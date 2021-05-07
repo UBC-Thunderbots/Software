@@ -99,6 +99,11 @@ Angle Vector::orientation() const
     return Angle::fromRadians(std::atan2(y_, x_));
 }
 
+double Vector::angleBetween(Vector &other) const
+{
+    return std::acos(dot(other) / (length() * other.length()));
+}
+
 Vector operator+(const Vector &u, const Vector &v)
 {
     return Vector(u.x() + v.x(), u.y() + v.y());

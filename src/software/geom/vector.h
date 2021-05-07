@@ -173,6 +173,8 @@ class Vector final
      */
     Angle orientation() const;
 
+    double angleBetween(Vector &other) const;
+
     /**
      * Assigns one Vector to another
      *
