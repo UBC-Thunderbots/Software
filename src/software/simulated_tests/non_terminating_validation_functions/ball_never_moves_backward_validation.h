@@ -9,10 +9,10 @@
 /**
  * Checks that the ball doesn't move backward.
  *
- * @param world_ptr the world pointer given by the simulator. Gets updated every tick
- * @param yield yields control to the next routine (coroutines)
+ * @param world_ptr     the world pointer given by the simulator. Gets updated every tick
+ * @param yield         yields control to the next routine (coroutines)
+ * @param tolerance     tolerance given to robot's x-coordinate changes
  */
 void ballNeverMovesBackward(std::shared_ptr<World> world_ptr,
-                            ValidationCoroutine::push_type& yield);
-
-static constexpr double TOLERANCE = 0.01;
+                            ValidationCoroutine::push_type& yield,
+                            double tolerance = 0.01);

@@ -4,6 +4,7 @@
 
 #include "software/simulated_tests/non_terminating_validation_functions/ball_in_play_or_scored_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/ball_never_moves_backward_validation.h"
+#include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robots_avoid_ball_validation.h"
 #include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
@@ -85,7 +86,15 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
 
     RobotId shooter_id                                                   = 1;
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        ballInPlay, ballNeverMovesBackward,
+        ballInPlay,
+        [shooter_id](std::shared_ptr<World> world_ptr,
+                     ValidationCoroutine::push_type& yield) {
+            ballNeverMovesBackward(world_ptr, yield);
+        },
+        [shooter_id](std::shared_ptr<World> world_ptr,
+                     ValidationCoroutine::push_type& yield) {
+            robotNotExcessivelyDribbling(shooter_id, world_ptr, yield);
+        },
         [shooter_id](std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield) {
             robotsAvoidBall(1, {shooter_id}, world_ptr, yield);
