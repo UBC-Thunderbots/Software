@@ -25,7 +25,6 @@ class StopPlayTest : public SimulatedPlayTestFixture
                 // Wait 2 seconds for robots that start too close to the ball to move away
                 if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(2))
                 {
-                    // TODO: (#1882) implement robots slow down for stop play
                     robotsSlowDown(1.5, world_ptr, yield);
                     robotsAvoidBall(0.5, {}, world_ptr, yield);
                 }
