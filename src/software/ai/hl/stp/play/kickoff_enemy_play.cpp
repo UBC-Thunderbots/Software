@@ -5,7 +5,7 @@
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
+#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 KickoffEnemyPlay::KickoffEnemyPlay(std::shared_ptr<const PlayConfig> config)
@@ -31,24 +31,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     // 3 robots assigned to shadow enemies. Other robots will be assigned positions
     // on the field to be evenly spread out
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
-        std::make_shared<ShadowEnemyTactic>(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            play_config->getDefenseShadowEnemyTacticConfig()
-                ->getBallStealSpeed()
-                ->value(),
-            false, true),
-        std::make_shared<ShadowEnemyTactic>(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            play_config->getDefenseShadowEnemyTacticConfig()
-                ->getBallStealSpeed()
-                ->value(),
-            false, true),
-        std::make_shared<ShadowEnemyTactic>(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            play_config->getDefenseShadowEnemyTacticConfig()
-                ->getBallStealSpeed()
-                ->value(),
-            false, true)};
+        std::make_shared<ShadowEnemyTactic>(), std::make_shared<ShadowEnemyTactic>(),
+        std::make_shared<ShadowEnemyTactic>()};
 
     // these positions are picked according to the following slide
     // https://images.slideplayer.com/32/9922349/slides/slide_2.jpg

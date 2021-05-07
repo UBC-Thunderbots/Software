@@ -30,20 +30,18 @@ class SimulatedGoalieTacticTest
                   " seconds to check that the enemy team did not score");
         }
     }
-    void SetUp() override
-    {
-        SimulatedTacticTestFixture::SetUp();
-        addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-            {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-             field().enemyDefenseArea().negXNegYCorner(),
-             field().enemyDefenseArea().negXPosYCorner()}));
-    }
+    Field field = Field::createSSLDivisionBField();
+    std::vector<RobotStateWithId> enemy_robots =
+        TestUtil::createStationaryRobotStatesWithId(
+            {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
+             field.enemyDefenseArea().negXNegYCorner(),
+             field.enemyDefenseArea().negXPosYCorner()});
 };
 
 TEST_F(SimulatedGoalieTacticTest, test_panic_ball_very_fast_in_straight_line)
 {
-    setBallState(BallState(Point(0, 0), Vector(-3, 0)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({Point(-4, -1)}));
+    BallState ball_state(Point(0, 0), Vector(-3, 0));
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-4, -1)});
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
         std::make_shared<const GoalieTacticConfig>();
@@ -67,15 +65,16 @@ TEST_F(SimulatedGoalieTacticTest, test_panic_ball_very_fast_in_straight_line)
             enemyNeverScores(world_ptr, yield);
         }};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
 
 TEST_F(SimulatedGoalieTacticTest, test_panic_ball_very_fast_in_diagonal_line)
 {
-    setBallState(BallState(Point(0, 0), Vector(-4.5, 0.25)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {field().friendlyGoalCenter() + Vector(0, -0.5)}));
+    BallState ball_state(Point(0, 0), Vector(-4.5, 0.25));
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
+        {field.friendlyGoalCenter() + Vector(0, -0.5)});
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
         std::make_shared<const GoalieTacticConfig>();
@@ -99,14 +98,15 @@ TEST_F(SimulatedGoalieTacticTest, test_panic_ball_very_fast_in_diagonal_line)
             enemyNeverScores(world_ptr, yield);
         }};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
 
 TEST_F(SimulatedGoalieTacticTest, test_ball_very_fast_misses_net)
 {
-    setBallState(BallState(Point(0, 0), Vector(-4, 1)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({Point(-4.5, 0)}));
+    BallState ball_state(Point(0, 0), Vector(-4, 1));
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-4.5, 0)});
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
         std::make_shared<const GoalieTacticConfig>();
@@ -124,14 +124,15 @@ TEST_F(SimulatedGoalieTacticTest, test_ball_very_fast_misses_net)
             enemyNeverScores(world_ptr, yield);
         }};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
 
 TEST_F(SimulatedGoalieTacticTest, test_slow_ball_at_sharp_angle_to_friendly_goal)
 {
-    setBallState(BallState(Point(-4.5, -3), Vector(0, 0.1)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({Point(-4.5, 0)}));
+    BallState ball_state(Point(-4.5, -3), Vector(0, 0.1));
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-4.5, 0)});
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
         std::make_shared<const GoalieTacticConfig>();
@@ -149,7 +150,8 @@ TEST_F(SimulatedGoalieTacticTest, test_slow_ball_at_sharp_angle_to_friendly_goal
             enemyNeverScores(world_ptr, yield);
         }};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
 
@@ -158,8 +160,7 @@ TEST_P(SimulatedGoalieTacticTest, goalie_test)
     BallState ball_state         = std::get<0>(GetParam());
     RobotStateWithId robot_state = std::get<1>(GetParam());
 
-    setBallState(ball_state);
-    addFriendlyRobots({robot_state});
+    auto friendly_robots = {robot_state};
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
         std::make_shared<const GoalieTacticConfig>();
@@ -187,7 +188,8 @@ TEST_P(SimulatedGoalieTacticTest, goalie_test)
             enemyNeverScores(world_ptr, yield);
         }};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
 

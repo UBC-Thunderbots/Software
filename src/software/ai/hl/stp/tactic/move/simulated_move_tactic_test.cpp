@@ -14,19 +14,21 @@
 
 class SimulatedMoveTacticTest : public SimulatedTacticTestFixture
 {
+   protected:
+    Field field = Field::createSSLDivisionBField();
 };
 
 TEST_F(SimulatedMoveTacticTest, test_move_across_field)
 {
     Point initial_position = Point(-3, 1.5);
     Point destination      = Point(2.5, -1.1);
-    setBallState(BallState(Point(4.5, -3), Vector(0, 0)));
-    addFriendlyRobots(
-        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position}));
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-         field().enemyDefenseArea().negXNegYCorner(),
-         field().enemyDefenseArea().negXPosYCorner()}));
+    BallState ball_state(Point(4.5, -3), Vector(0, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
+        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
+         field.enemyDefenseArea().negXNegYCorner(),
+         field.enemyDefenseArea().negXPosYCorner()});
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
@@ -52,7 +54,8 @@ TEST_F(SimulatedMoveTacticTest, test_move_across_field)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
 
@@ -60,13 +63,13 @@ TEST_F(SimulatedMoveTacticTest, test_autochip_move)
 {
     Point initial_position = Point(-3, 1.5);
     Point destination      = Point(0, 1.5);
-    setBallState(BallState(Point(0, 1.5), Vector(0, 0)));
-    addFriendlyRobots(
-        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position}));
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-         field().enemyDefenseArea().negXNegYCorner(),
-         field().enemyDefenseArea().negXPosYCorner()}));
+    BallState ball_state(Point(0, 1.5), Vector(0, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
+        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
+         field.enemyDefenseArea().negXNegYCorner(),
+         field.enemyDefenseArea().negXPosYCorner()});
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(
@@ -94,7 +97,8 @@ TEST_F(SimulatedMoveTacticTest, test_autochip_move)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
 
@@ -102,15 +106,15 @@ TEST_F(SimulatedMoveTacticTest, test_autokick_move)
 {
     Point initial_position = Point(-1, -0.5);
     Point destination      = Point(-1, -1);
-    setBallState(BallState(Point(-1, -1), Vector(0, 0)));
-    addFriendlyRobots({RobotStateWithId{
+    BallState ball_state(Point(-1, -1), Vector(0, 0));
+    auto friendly_robots = {RobotStateWithId{
         .id          = 1,
         .robot_state = RobotState(initial_position, Vector(0, 0), Angle::threeQuarter(),
-                                  AngularVelocity::zero())}});
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-         field().enemyDefenseArea().negXNegYCorner(),
-         field().enemyDefenseArea().negXPosYCorner()}));
+                                  AngularVelocity::zero())}};
+    auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId(
+        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
+         field.enemyDefenseArea().negXNegYCorner(),
+         field.enemyDefenseArea().negXPosYCorner()});
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::threeQuarter(), 0, DribblerMode::OFF,
@@ -139,7 +143,8 @@ TEST_F(SimulatedMoveTacticTest, test_autokick_move)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
 
@@ -147,11 +152,11 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_clockwise)
 {
     Point initial_position = Point(-4, 2);
     Point destination      = Point(4, 2);
-    setBallState(BallState(Point(1, 1), Vector(0, 0)));
-    addFriendlyRobots({RobotStateWithId{
+    BallState ball_state(Point(1, 1), Vector(0, 0));
+    auto friendly_robots = {RobotStateWithId{
         .id          = 1,
         .robot_state = RobotState(initial_position, Vector(0, 0), Angle::zero(),
-                                  AngularVelocity::quarter())}});
+                                  AngularVelocity::quarter())}};
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0, DribblerMode::OFF,
@@ -184,19 +189,19 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_clockwise)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(10));
 }
 
 TEST_F(SimulatedMoveTacticTest, test_spinning_move_counter_clockwise)
 {
     Point initial_position = Point(4, 2);
     Point destination      = Point(-4, 2);
-    setBallState(BallState(Point(1, 1), Vector(0, 0)));
-    addFriendlyRobots({RobotStateWithId{
+    BallState ball_state(Point(1, 1), Vector(0, 0));
+    auto friendly_robots = {RobotStateWithId{
         .id          = 1,
         .robot_state = RobotState(initial_position, Vector(0, 0), Angle::quarter(),
-                                  AngularVelocity::zero())}});
+                                  AngularVelocity::zero())}};
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::half(), 0, DribblerMode::OFF,
@@ -229,6 +234,6 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_counter_clockwise)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(10));
 }

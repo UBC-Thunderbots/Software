@@ -6,7 +6,7 @@
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
-#include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
+#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/logger/logger.h"
@@ -30,9 +30,6 @@ bool DefensePlay::invariantHolds(const World &world) const
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
-    bool enemy_team_can_pass =
-        play_config->getEnemyCapabilityConfig()->getEnemyTeamCanPass()->value();
-
     auto shoot_goal_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
         Angle::fromDegrees(5), std::nullopt, true,
@@ -43,9 +40,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         3 * ROBOT_MAX_RADIUS_METERS, play_config->getDefenseShadowEnemyTacticConfig());
 
     std::shared_ptr<ShadowEnemyTactic> shadow_enemy_tactic =
-        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true, world.ball(), 0.5,
-                                            enemy_team_can_pass, false);
+        std::make_shared<ShadowEnemyTactic>();
 
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
