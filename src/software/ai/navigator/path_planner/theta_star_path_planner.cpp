@@ -198,8 +198,7 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     {
         return Path(std::vector<Point>({start, end}));
     }
-    if ((start - closest_end).length() <
-            (CLOSE_TO_END_THRESHOLD * BLOCKED_END_OSCILLATION_MITIGATION) ||
+    if ((start - closest_end).length() < CLOSE_TO_END_THRESHOLD ||
         start_coord == end_coord)
     {
         return Path(std::vector<Point>({start, closest_end}));
