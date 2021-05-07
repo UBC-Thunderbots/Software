@@ -140,7 +140,7 @@ class STP : public HL
      *      {move_tactic},
      * }
      *
-     * The cost of assigning borth the crease_defender tactics will be minimized across
+     * The cost of assigning both the crease_defender tactics will be minimized across
      * all robots first, followed by the move_tactic.
      *
      * The order of the given tactics in the inner vector also determines their priority,
