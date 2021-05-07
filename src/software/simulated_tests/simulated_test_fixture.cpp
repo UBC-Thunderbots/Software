@@ -7,8 +7,6 @@ SimulatedTestFixture::SimulatedTestFixture()
     : mutable_thunderbots_config(std::make_shared<ThunderbotsConfig>()),
       thunderbots_config(
           std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config)),
-      simulator(std::make_unique<Simulator>(Field::createSSLDivisionBField(),
-                                            thunderbots_config->getSimulatorConfig())),
       sensor_fusion(thunderbots_config->getSensorFusionConfig()),
       run_simulation_in_realtime(false)
 {
@@ -59,26 +57,6 @@ void SimulatedTestFixture::SetUp()
     }
 }
 
-void SimulatedTestFixture::setBallState(const BallState &ball)
-{
-    simulator->setBallState(ball);
-}
-
-void SimulatedTestFixture::addFriendlyRobots(const std::vector<RobotStateWithId> &robots)
-{
-    simulator->addYellowRobots(robots);
-}
-
-void SimulatedTestFixture::addEnemyRobots(const std::vector<RobotStateWithId> &robots)
-{
-    simulator->addBlueRobots(robots);
-}
-
-Field SimulatedTestFixture::field() const
-{
-    return simulator->getField();
-}
-
 void SimulatedTestFixture::enableVisualizer()
 {
     full_system_gui = std::make_shared<ThreadedFullSystemGUI>(mutable_thunderbots_config);
@@ -105,7 +83,7 @@ bool SimulatedTestFixture::validateAndCheckCompletion(
     return terminating_function_validators.empty() ? false : validation_successful;
 }
 
-void SimulatedTestFixture::updateSensorFusion()
+void SimulatedTestFixture::updateSensorFusion(std::shared_ptr<Simulator> simulator)
 {
     auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
     assert(ssl_wrapper_packet);
@@ -134,11 +112,20 @@ void SimulatedTestFixture::sleep(
 }
 
 void SimulatedTestFixture::runTest(
+    const Field &field, const BallState &ball,
+    const std::vector<RobotStateWithId> &friendly_robots,
+    const std::vector<RobotStateWithId> &enemy_robots,
     const std::vector<ValidationFunction> &terminating_validation_functions,
     const std::vector<ValidationFunction> &non_terminating_validation_functions,
     const Duration &timeout)
 {
-    updateSensorFusion();
+    std::shared_ptr<Simulator> simulator(
+        std::make_shared<Simulator>(field, thunderbots_config->getSimulatorConfig()));
+    simulator->setBallState(ball);
+    simulator->addYellowRobots(friendly_robots);
+    simulator->addBlueRobots(enemy_robots);
+
+    updateSensorFusion(simulator);
     std::shared_ptr<World> world;
     if (auto world_opt = sensor_fusion.getWorld())
     {
@@ -170,7 +157,8 @@ void SimulatedTestFixture::runTest(
     auto start_tick_time = std::chrono::system_clock::now();
 
     // Tick one frame to aid with visualization
-    bool validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);
+    bool validation_functions_done =
+        tickTest(simulation_time_step, ai_time_step, world, simulator);
 
     // Logging duration of each tick
     unsigned int tick_count    = 1;
@@ -192,7 +180,8 @@ void SimulatedTestFixture::runTest(
         // Record starting time
         start_tick_time = std::chrono::system_clock::now();
 
-        validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);
+        validation_functions_done =
+            tickTest(simulation_time_step, ai_time_step, world, simulator);
 
         // Calculate tick durations
         duration_ms = ::TestUtil::millisecondsSince(start_tick_time);
@@ -223,14 +212,15 @@ void SimulatedTestFixture::runTest(
 }
 
 bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_time_step,
-                                    std::shared_ptr<World> world)
+                                    std::shared_ptr<World> world,
+                                    std::shared_ptr<Simulator> simulator)
 {
     auto wall_start_time           = std::chrono::steady_clock::now();
     bool validation_functions_done = false;
     for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
     {
         simulator->stepSimulation(simulation_time_step);
-        updateSensorFusion();
+        updateSensorFusion(simulator);
     }
 
     if (auto world_opt = sensor_fusion.getWorld())
