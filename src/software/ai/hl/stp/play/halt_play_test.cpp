@@ -20,7 +20,9 @@ TEST_F(HaltPlayTest, test_halt_play)
     BallState ball_state(Point(0, 0.5), Vector(0, 0));
     auto friendly_robots = TestUtil::createMovingRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
-         Point(4.6, -3.1)}, {Vector(1, 1), Vector(2, 1), Vector(1, 2), Vector(2,2), Vector(1, 1), Vector(2, 1)});
+         Point(4.6, -3.1)},
+        {Vector(1, 1), Vector(2, 1), Vector(1, 2), Vector(2, 2), Vector(1, 1),
+         Vector(2, 1)});
     setFriendlyGoalie(0);
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
