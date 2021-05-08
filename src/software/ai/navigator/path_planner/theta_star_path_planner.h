@@ -3,6 +3,7 @@
 #include <cassert>
 #include <map>
 #include <set>
+#include <unordered_map>
 
 #include "software/ai/navigator/path_planner/path_planner.h"
 
@@ -436,6 +437,18 @@ class ThetaStarPathPlanner : public PathPlanner
     // Declare a 2D array of structure to hold the details of that CellHeuristic
     std::vector<std::vector<CellHeuristic>> cell_heuristics;
 
+
+    class CoordinateHashFunction {
+    public:
+
+        // Use sum of lengths of first and last names
+        // as hash function.
+        size_t operator()(const Coordinate& coord) const
+        {
+            return coord.internalComparisonKey();
+        }
+    };
+
     // The following data structures improve performance by caching the results of
     // isUnblocked and lineOfSight.
     // Description of the Grid-
@@ -443,7 +456,8 @@ class ThetaStarPathPlanner : public PathPlanner
     // true --> The cell is not blocked
     // false --> The cell is blocked
     // We update this as we go to avoid updating cells we don't use
-    std::map<Coordinate, bool> unblocked_grid;
+    std::unordered_map<Coordinate, bool, CoordinateHashFunction> unblocked_grid; // TODO Could try making unblocked_grid and line_of_sight_cache an unordered_map, and test read times difference
+//    std::map<Coordinate, bool> unblocked_grid;
     // Cache of line of sight that maps a pair of
     // coordinates to whether those two Coordinates have line of sight between them
     std::map<CoordinatePair, bool> line_of_sight_cache;

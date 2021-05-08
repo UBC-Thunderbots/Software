@@ -8,12 +8,12 @@ Point::Point(const Point &p) : x_(p.x()), y_(p.y()) {}
 
 Point::Point(const Vector &v) : x_(v.x()), y_(v.y()) {}
 
-//inline double Point::x() const
+// inline double Point::x() const
 //{
 //    return x_;
 //}
 //
-//inline double Point::y() const
+// inline double Point::y() const
 //{
 //    return y_;
 //}
