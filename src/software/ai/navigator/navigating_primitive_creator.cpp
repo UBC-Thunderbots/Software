@@ -87,5 +87,9 @@ double NavigatingPrimitiveCreator::getEnemyObstacleProximityFactor(
 double NavigatingPrimitiveCreator::calculateTransitionSpeedBetweenSegments(
     const Point &p1, const Point &p2, const Point &p3, double final_speed)
 {
+    if (p1 == p2 || p2 == p3)
+    {
+        return final_speed;
+    }
     return final_speed * (p2 - p1).normalize().project((p3 - p2).normalize()).length();
 }
