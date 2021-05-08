@@ -33,8 +33,16 @@ public:
         return angle_0_max_;
     }
 
+    void setAngle0Max(double angle_0_max) {
+        this->angle_0_max_ = angle_0_max;
+    }
+
     double getAngle0Min() {
         return angle_0_min_;
+    }
+
+    void setAngle0Min(double angle_0_min) {
+        this->angle_0_min_ = angle_0_min;
     }
 
 private:
@@ -57,20 +65,37 @@ public:
         return this->angle_min;
     }
 
-    void addNonViableAngleSegment(AngleSegment &angle_seg) {
+    void addNonViableAngleSegment(AngleSegment &angle_seg)
+    {
         std::optional<AngleSegment> optional_overlap_seg = getAngleSegmentOverlap(angle_seg);
-        if (optional_overlap_seg.has_value()) {
+        if (optional_overlap_seg.has_value())
+        {
             AngleSegment overlap_seg = optional_overlap_seg.value();
 
-            angle_seg.setAngleMax(std::min(overlap_seg.getAngleMax(), angle_seg.getAngleMax()));
-            angle_seg.setAngleMin(std::max(overlap_seg.getAngleMin(), angle_seg.getAngleMin()));
+            if (overlap_seg.getAngleMax() < angle_seg.getAngleMax())
+            {
+                angle_seg.setAngleMax(overlap_seg.getAngleMax());
+                angle_seg.setAngle0Max(overlap_seg.getAngle0Max());
+            }
+
+            if (overlap_seg.getAngleMin() > angle_seg.getAngleMin())
+            {
+                angle_seg.setAngleMin(overlap_seg.getAngleMin());
+                angle_seg.setAngle0Min(overlap_seg.getAngle0Min());
+            }
         } else {
             this->taken_angle_segments.emplace_back(angle_seg);
         }
     }
 
     AngleSegment getBiggestViableAngleSegment() {
+
         AngleSegment biggest_viable_angle_seg = AngleSegment(0, 0, 0, 0);
+
+        if (this->taken_angle_segments.empty()) {
+            biggest_viable_angle_seg = AngleSegment(this->angle_max, this->angle_min, this->angle_0_max, this->angle_0_min);
+            return biggest_viable_angle_seg;
+        }
 
         AngleSegment first_taken_angle_seg = this->taken_angle_segments.front();
         if (first_taken_angle_seg.getAngleMax() > this->angle_max) {
@@ -144,7 +169,7 @@ std::optional<Shot> calcBestShotOnGoalExp(const Field &field, const Team &friend
 
             Vector one_end = perpendicular.normalize(ROBOT_MAX_RADIUS_METERS);
             Vector other_end = -perpendicular.normalize(ROBOT_MAX_RADIUS_METERS);
-            Segment obstacle = Segment(Point(one_end.x(), one_end.y()), Point(other_end.x(), other_end.y()));
+            Segment obstacle = Segment(Point(enemy_robot.position().x() + one_end.x(), enemy_robot.position().y() + one_end.y()), Point(enemy_robot.position().x() + other_end.x(), enemy_robot.position().y() + other_end.y()));
 
             obstacles.emplace_back(obstacle);
         }
@@ -160,7 +185,7 @@ std::optional<Shot> calcBestShotOnGoalExp(const Field &field, const Team &friend
 
             Vector one_end = perpendicular.normalize(ROBOT_MAX_RADIUS_METERS);
             Vector other_end = -perpendicular.normalize(ROBOT_MAX_RADIUS_METERS);
-            Segment obstacle = Segment(Point(one_end.x(), one_end.y()), Point(other_end.x(), other_end.y()));
+            Segment obstacle = Segment(Point(friendly_robot.position().x() + one_end.x(), friendly_robot.position().y() + one_end.y()), Point(friendly_robot.position().x() + other_end.x(), friendly_robot.position().y() + other_end.y()));
 
             obstacles.emplace_back(obstacle);
         }
@@ -168,13 +193,12 @@ std::optional<Shot> calcBestShotOnGoalExp(const Field &field, const Team &friend
 
     Vector top_post_vec = field.enemyGoalpostPos() - shot_origin;
     Vector bottom_post_vec = field.enemyGoalpostNeg() - shot_origin;
-    Vector reference = Vector(0, -1);
-    Vector reference0 = Vector(0, 0);
+    Vector reference = Vector(0, 1);
 
     double top_angle = std::abs((180 / M_PI) * top_post_vec.angleBetween(reference));
     double bottom_angle = std::abs((180 / M_PI) * bottom_post_vec.angleBetween(reference));
-    double top_angle_0 = (180 / M_PI) * top_post_vec.angleBetween(reference0);
-    double bottom_angle_0 = (180 / M_PI) * bottom_post_vec.angleBetween(reference0);
+    double top_angle_0 = top_post_vec.orientation().toDegrees();
+    double bottom_angle_0 = bottom_post_vec.orientation().toDegrees();
 
 
     std::sort(obstacles.begin(), obstacles.end(), [&shot_origin, &reference](const Segment &a, const Segment &b) -> int {
@@ -194,15 +218,26 @@ std::optional<Shot> calcBestShotOnGoalExp(const Field &field, const Team &friend
     AngleMap angleMap = AngleMap(top_angle, bottom_angle, top_angle_0, bottom_angle_0);
 
     for (const Segment& obstacle : obstacles) {
-        Vector top_vec = obstacle.getStart() - shot_origin;
+
+        Point start = obstacle.getStart();
+        Point end = obstacle.getEnd();
+
+        if (start.y() < 0) {
+            Point temp = start;
+            start = end;
+            end = temp;
+        }
+
+        Vector top_vec = start - shot_origin;
         double top_obstacle_angle = std::abs((180 / M_PI) * top_vec.angleBetween(reference));
-        double top_obstacle_angle_0 = (180 / M_PI) * top_vec.angleBetween(reference0);
+        double top_obstacle_angle_0 = top_vec.orientation().toDegrees();
 
-        Vector bottom_vec = obstacle.getEnd() - shot_origin;
+
+        Vector bottom_vec = end - shot_origin;
         double bottom_obstacle_angle = std::abs((180 / M_PI) * bottom_vec.angleBetween(reference));
-        double bottom_obstacle_angle_0 = (180 / M_PI) * bottom_vec.angleBetween(reference0);
+        double bottom_obstacle_angle_0 = bottom_vec.orientation().toDegrees();
 
-        if (bottom_obstacle_angle > angleMap.getAngleMax() || top_obstacle_angle < angleMap.getAngleMin()) {
+        if ((bottom_obstacle_angle > angleMap.getAngleMax() && bottom_obstacle_angle < angleMap.getAngleMin())  || (top_obstacle_angle < angleMap.getAngleMin() && top_obstacle_angle > angleMap.getAngleMax())) {
             AngleSegment non_viable_angle_seg = AngleSegment(top_obstacle_angle, bottom_obstacle_angle, top_obstacle_angle_0, bottom_obstacle_angle_0);
             angleMap.addNonViableAngleSegment(non_viable_angle_seg);
         }
@@ -210,10 +245,10 @@ std::optional<Shot> calcBestShotOnGoalExp(const Field &field, const Team &friend
 
     AngleSegment biggest_angle_seg = angleMap.getBiggestViableAngleSegment();
 
-    Ray top_ray = Ray(shot_origin, Angle::fromDegrees(biggest_angle_seg.getAngle0Max()));
-    Ray bottom_ray = Ray(shot_origin, Angle::fromDegrees(biggest_angle_seg.getAngle0Min()));
+    Ray mid_point_ray = Ray(shot_origin, Angle::fromDegrees(((biggest_angle_seg.getAngle0Max() - biggest_angle_seg.getAngle0Min()) /  2) + biggest_angle_seg.getAngle0Max()));
 
-    Segment available_shot_seg = Segment(intersection(top_ray, goal_seg).front(), intersection(bottom_ray, goal_seg).front());
+    std::vector<Point> intersections = intersection(mid_point_ray, goal_seg);
 
-    return std::make_optional(Shot(available_shot_seg.midPoint(), Angle::fromDegrees(biggest_angle_seg.getDelta())));
+    Angle open_angle = Angle::fromDegrees(biggest_angle_seg.getDelta());
+    return std::make_optional(Shot(intersections.front(), open_angle));
 }
