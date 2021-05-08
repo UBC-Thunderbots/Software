@@ -44,6 +44,10 @@ class SimulatedTestFixture : public ::testing::Test
      * Creates a directory to output logs to in the directory at the
      * TEST_UNDECLARED_OUTPUTS_DIR Bazel environment variable, and sets up some
      * ProtoLoggers to log unfiltered and filtered data.
+     *
+     * See
+     * https://docs.bazel.build/versions/master/test-encyclopedia.html#initial-conditions
+     * for an explanation of all the environment variables that Bazel passes to tests
      */
     void setupReplayLogging();
 
