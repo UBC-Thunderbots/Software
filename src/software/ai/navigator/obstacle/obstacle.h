@@ -43,6 +43,11 @@ class Obstacle
     virtual bool intersects(const Segment& segment) const = 0;
 
     /**
+     * Determines what coordinates on the field are blocked by this Obstacle
+     */
+    virtual std::set<Point> rasterize(double) const = 0;
+
+    /**
      * Output string to describe the obstacle
      *
      * @return string that describes the obstacle
@@ -75,6 +80,7 @@ class GeomObstacle : public Obstacle
     bool intersects(const Segment& segment) const override;
     std::string toString(void) const override;
     void accept(ObstacleVisitor& visitor) const override;
+    std::set<Point> rasterize(double) const override;
 
     /**
      * Gets the underlying GEOM_TYPE
@@ -85,6 +91,7 @@ class GeomObstacle : public Obstacle
 
    private:
     GEOM_TYPE geom_;
+
 };
 
 

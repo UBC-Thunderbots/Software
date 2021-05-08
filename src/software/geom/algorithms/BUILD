@@ -18,6 +18,7 @@ cc_library(
         "projection.cpp",
         "projection_impl.cpp",
         "projection_impl.h",  # Hiding implementation functions of projection
+        "rasterize.cpp",
         "voronoi_diagram.cpp",
     ],
     hdrs = [
@@ -34,6 +35,7 @@ cc_library(
         "intersects.h",
         "multiple_segments.h",
         "projection.h",
+        "rasterize.h",
         "voronoi_diagram.h",
     ],
     deps = [

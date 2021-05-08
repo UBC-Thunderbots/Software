@@ -4,6 +4,7 @@
 #include <map>
 #include <set>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "software/ai/navigator/path_planner/path_planner.h"
 
@@ -41,7 +42,6 @@ class ThetaStarPathPlanner : public PathPlanner
                                  const Rectangle &navigable_area,
                                  const std::vector<ObstaclePtr> &obstacles) override;
 
-   private:
     class Coordinate
     {
        public:
@@ -101,6 +101,15 @@ class ThetaStarPathPlanner : public PathPlanner
         unsigned int internal_comparison_key_;
     };
 
+    class CoordinateHashFunction {
+    public:
+        size_t operator()(const Coordinate& coord) const
+        {
+            return coord.internalComparisonKey();
+        }
+    };
+
+   private:
     class CoordinatePair
     {
        public:
@@ -246,6 +255,11 @@ class ThetaStarPathPlanner : public PathPlanner
      * @return true if cell is navigable
      */
     bool isCoordNavigable(const Coordinate &coord) const;
+
+    /**
+     * Calculates all of the coordinates that are blocked by an obstacle and stores it in blocked_grid
+     */
+    void findAllBlockedCoords();
 
     /**
      * Returns whether or not a cell is unblocked
@@ -437,18 +451,6 @@ class ThetaStarPathPlanner : public PathPlanner
     // Declare a 2D array of structure to hold the details of that CellHeuristic
     std::vector<std::vector<CellHeuristic>> cell_heuristics;
 
-
-    class CoordinateHashFunction {
-    public:
-
-        // Use sum of lengths of first and last names
-        // as hash function.
-        size_t operator()(const Coordinate& coord) const
-        {
-            return coord.internalComparisonKey();
-        }
-    };
-
     // The following data structures improve performance by caching the results of
     // isUnblocked and lineOfSight.
     // Description of the Grid-
@@ -457,6 +459,7 @@ class ThetaStarPathPlanner : public PathPlanner
     // false --> The cell is blocked
     // We update this as we go to avoid updating cells we don't use
     std::unordered_map<Coordinate, bool, CoordinateHashFunction> unblocked_grid; // TODO Could try making unblocked_grid and line_of_sight_cache an unordered_map, and test read times difference
+    std::unordered_set<Coordinate, CoordinateHashFunction> blocked_grid; // TODO Could try making unblocked_grid and line_of_sight_cache an unordered_map, and test read times difference
 //    std::map<Coordinate, bool> unblocked_grid;
     // Cache of line of sight that maps a pair of
     // coordinates to whether those two Coordinates have line of sight between them
