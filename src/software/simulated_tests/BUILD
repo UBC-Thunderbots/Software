@@ -17,6 +17,7 @@ cc_library(
         "//software/simulation:simulator",
         "//software/test_util",
         "//software/time:duration",
+        "//software/proto/logging:proto_logger",
         "@gtest",
         # TODO (#1889) Remove this dep after optional params are implemented
         "//software/ai/hl/stp/play:halt_play",
