@@ -191,8 +191,8 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
 
         auto pass_eval = pass_generator.generatePassEvaluation(world);
-        auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
-        auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
+        auto pass1     = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
+        auto pass2     = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
 
         cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
                                                   pass1.receiverOrientation(), 0.0,

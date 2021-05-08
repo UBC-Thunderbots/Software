@@ -121,7 +121,6 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield,
     auto cherry_pick_tactic_4 = std::make_shared<MoveTactic>(false);
 
     auto update_cherry_pickers = [&](PassEvaluation<EighteenZoneId> pass_eval) {
-
         auto pass1 = pass_eval.getBestPassInZones({zones_to_cherry_pick[0]}).pass;
         auto pass2 = pass_eval.getBestPassInZones({zones_to_cherry_pick[1]}).pass;
         auto pass3 = pass_eval.getBestPassInZones({zones_to_cherry_pick[2]}).pass;

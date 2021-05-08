@@ -103,10 +103,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
         Zones cherry_pick_region_1 = {ranked_zones[0]};
         Zones cherry_pick_region_2 = {ranked_zones[1]};
 
-        auto pass1 =
-            pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
-        auto pass2 =
-            pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
+        auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
+        auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
 
         auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
         auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
