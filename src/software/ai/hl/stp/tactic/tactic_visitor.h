@@ -5,7 +5,6 @@
 // because tactic.h includes tactic_visitor.h, and each individual library includes
 // tactic.h. Note: every subclass of this visitor must include all of the classes listed
 // below
-class CherryPickTactic;
 class ChipTactic;
 class CreaseDefenderTactic;
 class DefenseShadowEnemyTactic;
@@ -42,7 +41,6 @@ class TacticVisitor
      * @param tactic The tactic to visit
      */
 
-    virtual void visit(const CherryPickTactic &tactic)         = 0;
     virtual void visit(const ChipTactic &tactic)               = 0;
     virtual void visit(const CreaseDefenderTactic &tactic)     = 0;
     virtual void visit(const DefenseShadowEnemyTactic &tactic) = 0;
