@@ -157,3 +157,27 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "power_monitor",
+    srcs = ["power_monitor.c"],
+    hdrs = ["power_monitor.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [":INA226_power_monitor_driver"],
+)
+
+cc_library(
+    name = "INA226_power_monitor_driver",
+    srcs = ["INA226_power_monitor_driver.c"],
+    hdrs = ["INA226_power_monitor_driver.h"],
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        # This was adapted from: https://github.com/macgeorge/STM32-example-codes
+        "-Wno-error",
+    ],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        "//firmware/boards/robot_stm32h7:cmsis",
+        "//firmware/boards/robot_stm32h7:hal",
+    ],
+)

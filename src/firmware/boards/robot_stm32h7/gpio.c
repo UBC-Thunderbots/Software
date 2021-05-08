@@ -42,6 +42,7 @@ void MX_GPIO_Init(void)
     GPIO_InitTypeDef GPIO_InitStruct = {0};
 
     /* GPIO Ports Clock Enable */
+    __HAL_RCC_GPIOE_CLK_ENABLE();
     __HAL_RCC_GPIOC_CLK_ENABLE();
     __HAL_RCC_GPIOF_CLK_ENABLE();
     __HAL_RCC_GPIOH_CLK_ENABLE();
@@ -49,15 +50,18 @@ void MX_GPIO_Init(void)
     __HAL_RCC_GPIOB_CLK_ENABLE();
     __HAL_RCC_GPIOD_CLK_ENABLE();
     __HAL_RCC_GPIOG_CLK_ENABLE();
-    __HAL_RCC_GPIOE_CLK_ENABLE();
+
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(GPIOE,
+                      wheel_motor_back_right_esf_Pin | wheel_motor_front_right_reset_Pin |
+                          wheel_motor_front_right_coast_Pin,
+                      GPIO_PIN_RESET);
 
     /*Configure GPIO pin Output Level */
     HAL_GPIO_WritePin(
         GPIOF,
-        wheel_motor_back_right_esf_Pin | wheel_motor_front_right_reset_Pin |
-            wheel_motor_front_right_coast_Pin | wheel_motor_front_right_mode_Pin |
-            wheel_motor_front_right_direction_Pin | wheel_motor_front_right_brake_Pin |
-            wheel_motor_front_right_esf_Pin,
+        wheel_motor_front_right_mode_Pin | wheel_motor_front_right_direction_Pin |
+            wheel_motor_front_right_brake_Pin | wheel_motor_front_right_esf_Pin,
         GPIO_PIN_RESET);
 
     /*Configure GPIO pin Output Level */
@@ -90,19 +94,25 @@ void MX_GPIO_Init(void)
     HAL_GPIO_WritePin(GPIOD, ublox_reset_Pin | wheel_motor_back_right_mode_Pin,
                       GPIO_PIN_RESET);
 
+    /*Configure GPIO pins : PEPin PEPin PEPin */
+    GPIO_InitStruct.Pin = wheel_motor_back_right_esf_Pin |
+                          wheel_motor_front_right_reset_Pin |
+                          wheel_motor_front_right_coast_Pin;
+    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull  = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
     /*Configure GPIO pin : PtPin */
     GPIO_InitStruct.Pin  = USER_Btn_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(USER_Btn_GPIO_Port, &GPIO_InitStruct);
 
-    /*Configure GPIO pins : PFPin PFPin PFPin PFPin
-                             PFPin PFPin PFPin */
+    /*Configure GPIO pins : PFPin PFPin PFPin PFPin */
     GPIO_InitStruct.Pin =
-        wheel_motor_back_right_esf_Pin | wheel_motor_front_right_reset_Pin |
-        wheel_motor_front_right_coast_Pin | wheel_motor_front_right_mode_Pin |
-        wheel_motor_front_right_direction_Pin | wheel_motor_front_right_brake_Pin |
-        wheel_motor_front_right_esf_Pin;
+        wheel_motor_front_right_mode_Pin | wheel_motor_front_right_direction_Pin |
+        wheel_motor_front_right_brake_Pin | wheel_motor_front_right_esf_Pin;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

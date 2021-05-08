@@ -3,12 +3,12 @@
 /**
  * This struct represents a robot wheel/motor, from the perspective of firmware
  */
-typedef struct Wheel Wheel_t;
+typedef struct ForceWheel ForceWheel_t;
 
 /**
  * This struct holds wheel/motor constants
  */
-typedef struct WheelConstants
+typedef struct ForceWheelConstants
 {
     // The current per unit torque for the motor attached to this wheel [A/(N*m)]
     float motor_current_per_unit_torque;
@@ -29,7 +29,7 @@ typedef struct WheelConstants
     // The gear ratio between the motor shaft and wheel shaft
     // [# of wheel rotations / 1 motor rotation]
     float wheel_rotations_per_motor_rotation;
-} WheelConstants_t;
+} ForceWheelConstants_t;
 
 /**
  * Create a wheel object with functions for interacting with it
@@ -42,9 +42,10 @@ typedef struct WheelConstants
  *
  * @return A pointer to the created wheel, ownership is given to the caller
  */
-Wheel_t* app_wheel_create(void (*apply_wheel_force)(float),
-                          float (*get_motor_speed_rpm)(void), void (*brake)(void),
-                          void (*coast)(void), WheelConstants_t wheel_constants);
+ForceWheel_t* app_force_wheel_create(void (*apply_wheel_force)(float),
+                                     float (*get_motor_speed_rpm)(void),
+                                     void (*brake)(void), void (*coast)(void),
+                                     ForceWheelConstants_t wheel_constants);
 
 /**
  * Destroy the given wheel, freeing any memory allocated for it
@@ -54,7 +55,7 @@ Wheel_t* app_wheel_create(void (*apply_wheel_force)(float),
  *
  * @param wheel The wheel to destroy
  */
-void app_wheel_destroy(Wheel_t* wheel);
+void app_force_wheel_destroy(ForceWheel_t* wheel);
 
 /**
  * Apply the given force to the given wheel
@@ -63,7 +64,7 @@ void app_wheel_destroy(Wheel_t* wheel);
  *
  * @param force_in_newtons The force to apply to the wheel, in newtons
  */
-void app_wheel_applyForce(Wheel_t* wheel, float force_in_newtons);
+void app_force_wheel_applyForce(ForceWheel_t* wheel, float force_in_newtons);
 
 /**
  * Get the speed of the given wheel in RPM
@@ -72,7 +73,7 @@ void app_wheel_applyForce(Wheel_t* wheel, float force_in_newtons);
  *
  * @return The speed of the given wheel in RPM
  */
-float app_wheel_getWheelSpeedRPM(Wheel_t* wheel);
+float app_force_wheel_getWheelSpeedRPM(ForceWheel_t* wheel);
 
 /**
  * Get the speed of the motor attached to the given wheel
@@ -81,21 +82,21 @@ float app_wheel_getWheelSpeedRPM(Wheel_t* wheel);
  *
  * @return The speed of the motor attached to the given wheel, in RPM
  */
-float app_wheel_getMotorSpeedRPM(const Wheel_t* wheel);
+float app_force_wheel_getMotorSpeedRPM(const ForceWheel_t* wheel);
 
 /**
  * Allow this wheel to spin freely
  *
  * @param wheel The wheel to allow to spin freely
  */
-void app_wheel_coast(const Wheel_t* wheel);
+void app_force_wheel_coast(const ForceWheel_t* wheel);
 
 /**
  * Brake this wheel
  *
  * @param wheel The wheel to brake
  */
-void app_wheel_brake(const Wheel_t* wheel);
+void app_force_wheel_brake(const ForceWheel_t* wheel);
 
 /**
  * Get the constants for the given wheel
@@ -104,4 +105,4 @@ void app_wheel_brake(const Wheel_t* wheel);
  *
  * @return The constants for the given wheel
  */
-WheelConstants_t app_wheel_getWheelConstants(const Wheel_t* wheel);
+ForceWheelConstants_t app_force_wheel_getWheelConstants(const ForceWheel_t* wheel);

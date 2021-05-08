@@ -62,8 +62,25 @@ cc_test(
     deps = [
         ":theta_star_path_planner",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
+        "//software/test_util",
         "//software/world:field",
         "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "simulated_theta_star_test",
+    srcs = ["simulated_theta_star_test.cpp"],
+    deps = [
+        ":theta_star_path_planner",
+        "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/simulated_tests:simulated_tactic_test_fixture",
+        "//software/simulated_tests:simulated_test_main",
+        "//software/simulated_tests/terminating_validation_functions",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/test_util",
+        "//software/time:duration",
+        "//software/world",
     ],
 )
 

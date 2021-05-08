@@ -35,28 +35,6 @@ typedef struct MoveState
 } MoveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(MoveState_t);
 
-/**
- * Determines the rotation acceleration after setup_bot has been used and
- * plan_move has been done along the minor axis. The minor time from bangbang
- * is used to determine the rotation time, and thus the rotation velocity and
- * acceleration. The rotational acceleration is clamped under the MAX_T_A.
- *
- * @param pb [in/out] The PhysBot data container that should have minor axis time and
- * will store the rotational information
- * @param avel The rotational velocity of the bot
- */
-void plan_move_rotation(PhysBot* pb, float avel);
-
-void plan_move_rotation(PhysBot* pb, float avel)
-{
-    pb->rot.time = (pb->min.time > TIME_HORIZON) ? pb->min.time : TIME_HORIZON;
-    // 1.4f is a magic constant to force the robot to rotate faster to its final
-    // orientation.
-    pb->rot.vel   = 1.4f * pb->rot.disp / pb->rot.time;
-    pb->rot.accel = (pb->rot.vel - avel) / TIME_HORIZON;
-    limit(&pb->rot.accel, MAX_T_A);
-}
-
 void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_state_ptr,
                               FirmwareWorld_t* world)
 {
@@ -159,50 +137,8 @@ static void app_move_primitive_tick(void* void_state_ptr, FirmwareWorld_t* world
         trajectory_index++;
     }
 
-    const float dest_x = state->position_trajectory.x_position[trajectory_index];
-    const float dest_y = state->position_trajectory.y_position[trajectory_index];
-    const float dest_orientation =
-        state->position_trajectory.orientation[trajectory_index];
-    float dest[3] = {dest_x, dest_y, dest_orientation};
-
-    const float curr_x = app_firmware_robot_getPositionX(robot);
-    const float curr_y = app_firmware_robot_getPositionY(robot);
-
-    const float dx = dest_x - curr_x;
-    const float dy = dest_y - curr_y;
-
-    float total_disp = sqrtf(dx * dx + dy * dy);
-    // Add a small number to avoid division by zero
-    float major_vec[2] = {dx / (total_disp + 1e-6f), dy / (total_disp + 1e-6f)};
-    float minor_vec[2] = {major_vec[0], major_vec[1]};
-    rotate(minor_vec, P_PI / 2);
-
-    PhysBot pb = app_physbot_create(robot, dest, major_vec, minor_vec);
-
-    const float dest_speed = state->position_trajectory.linear_speed[trajectory_index];
-
-    // plan major axis movement
-    float max_major_a     = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
-    float max_major_v     = state->max_speed_m_per_s;
-    float major_params[3] = {dest_speed, max_major_a, max_major_v};
-    app_physbot_planMove(&pb.maj, major_params);
-
-    // plan minor axis movement
-    float max_minor_a = (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / 2.0f;
-    float max_minor_v = state->max_speed_m_per_s / 2.0f;
-    float minor_params[3] = {0, max_minor_a, max_minor_v};
-    app_physbot_planMove(&pb.min, minor_params);
-
-    // plan rotation movement
-    plan_move_rotation(&pb, app_firmware_robot_getVelocityAngular(robot));
-
-    float accel[3] = {0, 0, pb.rot.accel};
-
-    // rotate the accel and apply it
-    app_physbot_computeAccelInLocalCoordinates(
-        accel, pb, app_firmware_robot_getOrientation(robot), major_vec, minor_vec);
-
-    app_control_applyAccel(robot, accel[0], accel[1], accel[2]);
+    app_firmware_robot_followPosTrajectory(robot, state->position_trajectory,
+                                           trajectory_index, state->max_speed_m_per_s);
 }
 
 /**

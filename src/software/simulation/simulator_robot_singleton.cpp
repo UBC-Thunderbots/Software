@@ -10,7 +10,7 @@ extern "C"
 #include "firmware/app/world/charger.h"
 #include "firmware/app/world/chicker.h"
 #include "firmware/app/world/dribbler.h"
-#include "firmware/app/world/wheel.h"
+#include "firmware/app/world/force_wheel.h"
 }
 
 // TODO: The JERK_LIMIT is copied from firmware/main/control/control.h
@@ -52,29 +52,29 @@ SimulatorRobotSingleton::createFirmwareRobot()
                             &(SimulatorRobotSingleton::dribblerCoast),
                             &(SimulatorRobotSingleton::getDribblerTemperatureDegC));
 
-    WheelConstants_t wheel_constants;
+    ForceWheelConstants_t wheel_constants;
     wheel_constants.wheel_rotations_per_motor_rotation  = GEAR_RATIO;
     wheel_constants.wheel_radius                        = WHEEL_RADIUS;
     wheel_constants.motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT;
     wheel_constants.motor_back_emf_per_rpm              = RPM_TO_VOLT;
     wheel_constants.motor_phase_resistance              = WHEEL_MOTOR_PHASE_RESISTANCE;
     wheel_constants.motor_current_per_unit_torque       = CURRENT_PER_TORQUE;
-    Wheel_t* front_left_wheel                           = app_wheel_create(
+    ForceWheel_t* front_left_wheel                      = app_force_wheel_create(
         &(SimulatorRobotSingleton::applyWheelForceFrontLeft),
         &(SimulatorRobotSingleton::getMotorSpeedFrontLeft),
         &(SimulatorRobotSingleton::brakeMotorFrontLeft),
         &(SimulatorRobotSingleton::coastMotorFrontLeft), wheel_constants);
-    Wheel_t* front_right_wheel = app_wheel_create(
+    ForceWheel_t* front_right_wheel = app_force_wheel_create(
         &(SimulatorRobotSingleton::applyWheelForceFrontRight),
         &(SimulatorRobotSingleton::getMotorSpeedFrontRight),
         &(SimulatorRobotSingleton::brakeMotorFrontRight),
         &(SimulatorRobotSingleton::coastMotorFrontRight), wheel_constants);
-    Wheel_t* back_left_wheel =
-        app_wheel_create(&(SimulatorRobotSingleton::applyWheelForceBackLeft),
-                         &(SimulatorRobotSingleton::getMotorSpeedBackLeft),
-                         &(SimulatorRobotSingleton::brakeMotorBackLeft),
-                         &(SimulatorRobotSingleton::coastMotorBackLeft), wheel_constants);
-    Wheel_t* back_right_wheel = app_wheel_create(
+    ForceWheel_t* back_left_wheel = app_force_wheel_create(
+        &(SimulatorRobotSingleton::applyWheelForceBackLeft),
+        &(SimulatorRobotSingleton::getMotorSpeedBackLeft),
+        &(SimulatorRobotSingleton::brakeMotorBackLeft),
+        &(SimulatorRobotSingleton::coastMotorBackLeft), wheel_constants);
+    ForceWheel_t* back_right_wheel = app_force_wheel_create(
         &(SimulatorRobotSingleton::applyWheelForceBackRight),
         &(SimulatorRobotSingleton::getMotorSpeedBackRight),
         &(SimulatorRobotSingleton::brakeMotorBackRight),
@@ -91,7 +91,7 @@ SimulatorRobotSingleton::createFirmwareRobot()
         .last_applied_acceleration_y       = 0,
         .last_applied_acceleration_angular = 0,
     };
-    FirmwareRobot_t* firmware_robot = app_firmware_robot_create(
+    FirmwareRobot_t* firmware_robot = app_firmware_robot_force_wheels_create(
         charger, chicker, dribbler, &(SimulatorRobotSingleton::getPositionX),
         &(SimulatorRobotSingleton::getPositionY),
         &(SimulatorRobotSingleton::getOrientation),
