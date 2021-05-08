@@ -1,8 +1,8 @@
 /**
  ******************************************************************************
- * @file    tim.h
+ * @file    adc.h
  * @brief   This file contains all the function prototypes for
- *          the tim.c file
+ *          the adc.c file
  ******************************************************************************
  * @attention
  *
@@ -17,8 +17,8 @@
  ******************************************************************************
  */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __TIM_H__
-#define __TIM_H__
+#ifndef __ADC_H__
+#define __ADC_H__
 
 #ifdef __cplusplus
 extern "C"
@@ -32,25 +32,17 @@ extern "C"
 
     /* USER CODE END Includes */
 
-    extern TIM_HandleTypeDef htim1;
-    extern TIM_HandleTypeDef htim2;
-    extern TIM_HandleTypeDef htim3;
-    extern TIM_HandleTypeDef htim4;
-    extern TIM_HandleTypeDef htim8;
-    extern TIM_HandleTypeDef htim12;
+    extern ADC_HandleTypeDef hadc1;
+    extern ADC_HandleTypeDef hadc2;
+    extern ADC_HandleTypeDef hadc3;
 
     /* USER CODE BEGIN Private defines */
 
     /* USER CODE END Private defines */
 
-    void MX_TIM1_Init(void);
-    void MX_TIM2_Init(void);
-    void MX_TIM3_Init(void);
-    void MX_TIM4_Init(void);
-    void MX_TIM8_Init(void);
-    void MX_TIM12_Init(void);
-
-    void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+    void MX_ADC1_Init(void);
+    void MX_ADC2_Init(void);
+    void MX_ADC3_Init(void);
 
     /* USER CODE BEGIN Prototypes */
 
@@ -60,6 +52,6 @@ extern "C"
 }
 #endif
 
-#endif /* __TIM_H__ */
+#endif /* __ADC_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
