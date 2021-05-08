@@ -142,8 +142,8 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
 
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [this, tactic, shadowee](std::shared_ptr<World> world_ptr,
-                                 ValidationCoroutine::push_type& yield) {
+        [this, tactic](std::shared_ptr<World> world_ptr,
+                       ValidationCoroutine::push_type& yield) {
             // We compose a triangle consisting of the friendly goal posts
             // and the ball position. If our robot is in this triangle, then
             // it is blocking a possible shot on net
@@ -152,12 +152,13 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
                                   world_ptr->ball().position()};
             robotInPolygon(0, shotTriangle, world_ptr, yield);
         },
-        [this, tactic, shadower](std::shared_ptr<World> world_ptr,
-                                 ValidationCoroutine::push_type& yield) {
+        [this, tactic](std::shared_ptr<World> world_ptr,
+                       ValidationCoroutine::push_type& yield) {
             // As our friendly robot tries to steal and chip the ball,
             // it should chip the ball in the same direction is it
             // heading towards the ball
-            Vector chip = world_ptr->ball().position() - shadower.position();
+            Vector chip = world_ptr->ball().position() -
+                          world_ptr->friendlyTeam().getRobotById(0).value().position();
             ballKicked(chip.orientation(), world_ptr, yield);
         }};
 
@@ -193,8 +194,8 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_if_enemy_threat_is_null)
 
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [this, tactic, shadowee](std::shared_ptr<World> world_ptr,
-                                 ValidationCoroutine::push_type& yield) {
+        [this, tactic](std::shared_ptr<World> world_ptr,
+                       ValidationCoroutine::push_type& yield) {
             // We compose a triangle consisting of the friendly goal posts
             // and the ball position. If our robot is in this triangle, then
             // it is blocking a possible shot on net
