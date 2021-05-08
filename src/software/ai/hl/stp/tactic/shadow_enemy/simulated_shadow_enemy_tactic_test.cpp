@@ -14,6 +14,13 @@
 
 class SimulatedShadowEnemyTacticTest : public SimulatedTacticTestFixture
 {
+    void SetUp() override
+    {
+        SimulatedTacticTestFixture::SetUp();
+        setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION,
+                              MotionConstraint::ENEMY_DEFENSE_AREA});
+    }
+
    protected:
     Field field = Field::createSSLDivisionBField();
 };
