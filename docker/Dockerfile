@@ -2,10 +2,12 @@
 
 FROM robocupssl/ubuntu-vnc:latest
 
-# Creates a directory called scripts, copies
-# getRepo script and runs it to fetch the git
-# repository. Once the repository is fetched,
-# it runs setup_software
+# Fetches the repo from the repository and
+# places it in a folder called "Software" in the
+# containers home directory. Then runs setup_software.sh
+# and updates the alternatives to make sure correct
+# version of gcc is used.
+
 USER root
 RUN apt-get -qq update && apt-get -qq install -y git && apt-get -qq install sudo
 RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install tzdata
