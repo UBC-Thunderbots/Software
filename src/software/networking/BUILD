@@ -1,28 +1,14 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "proto_udp_listener",
+    name = "proto_udp_client",
     hdrs = [
-        "proto_udp_listener.h",
-        "proto_udp_listener.tpp",
+        "proto_udp_client.h",
+        "proto_udp_client.tpp",
     ],
-    visibility = ["//visibility:private"],
     deps = [
         "//software/logger",
         "//software/util/typename",
-    ],
-)
-
-cc_library(
-    name = "proto_udp_sender",
-    hdrs = [
-        "proto_udp_sender.h",
-        "proto_udp_sender.tpp",
-    ],
-    visibility = ["//visibility:private"],
-    deps = [
-        "//software/logger",
-        "@boost//:asio",
     ],
 )
 
@@ -33,7 +19,7 @@ cc_library(
         "threaded_proto_udp_listener.tpp",
     ],
     deps = [
-        ":proto_udp_listener",
+        ":proto_udp_client",
         "@boost//:asio",
     ],
 )
@@ -45,7 +31,7 @@ cc_library(
         "threaded_proto_udp_sender.tpp",
     ],
     deps = [
-        ":proto_udp_sender",
+        ":proto_udp_client",
         "@boost//:asio",
     ],
 )

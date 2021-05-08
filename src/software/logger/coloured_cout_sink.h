@@ -24,7 +24,7 @@ class ColouredCoutSink
      * This function is called on every call to LOG(). Displays coloured log messages in
      * the terminal
      *
-     * @params log_entry the Message received on a LOG() call
+     * @params log_entry the message received on a LOG() call
      */
     void displayColouredLog(g3::LogMessageMover log_entry);
 
