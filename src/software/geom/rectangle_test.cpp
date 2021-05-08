@@ -102,36 +102,6 @@ TEST(RectangleCornerTests, test_min_max_values)
     EXPECT_EQ(r.yMax(), 2);
 }
 
-TEST(RectangleExpandTests, test_expand_positive)
-{
-    Rectangle r = Rectangle(Point(2, -2), Point(-3, 5));
-    EXPECT_EQ(r.xLength(), 5);
-    EXPECT_EQ(r.yLength(), 7);
-    r.inflate(4);
-    EXPECT_EQ(r.xLength(), 13);
-    EXPECT_EQ(r.yLength(), 15);
-}
-
-TEST(RectangleExpandTests, test_expand_negative)
-{
-    Rectangle r = Rectangle(Point(-3, 3), Point(4, -5));
-    EXPECT_EQ(r.xLength(), 7);
-    EXPECT_EQ(r.yLength(), 8);
-    r.inflate(-2);
-    EXPECT_EQ(r.xLength(), 3);
-    EXPECT_EQ(r.yLength(), 4);
-}
-
-TEST(RectangleExpandTests, test_invalid_expand)
-{
-    Rectangle r = Rectangle(Point(-3, 3), Point(4, -5));
-    EXPECT_EQ(r.xLength(), 7);
-    EXPECT_EQ(r.yLength(), 8);
-    EXPECT_FALSE(r.inflate(-5));
-    EXPECT_EQ(r.xLength(), 7);
-    EXPECT_EQ(r.yLength(), 8);
-}
-
 TEST(RectangleEqualsTests, test_rectangles_equal)
 {
     Rectangle r = Rectangle(Point(0, 0), Point(5, 5));

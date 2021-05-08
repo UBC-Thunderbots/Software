@@ -23,7 +23,7 @@ class RobotNavigationObstacleFactory
      * @param config The configuration used to determine how obstacles should be generated
      */
     RobotNavigationObstacleFactory(
-        std::shared_ptr<const RobotNavigationObstacleFactoryConfig> config);
+        std::shared_ptr<const RobotNavigationObstacleConfig> config);
 
     /**
      * Create obstacles for the given motion constraints
@@ -102,7 +102,7 @@ class RobotNavigationObstacleFactory
     ObstaclePtr createFromShape(const Polygon &polygon) const;
 
    private:
-    std::shared_ptr<const RobotNavigationObstacleFactoryConfig> config;
+    std::shared_ptr<const RobotNavigationObstacleConfig> config;
     double robot_radius_expansion_amount;
 
     /**
