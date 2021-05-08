@@ -487,6 +487,10 @@ cc_library(
         "Middlewares/Third_Party/FreeRTOS/Source/timers.c",
     ],
     hdrs = [
+        "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h743xx.h",
+        "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h",
+        "Drivers/CMSIS/Device/ST/STM32H7xx/Include/system_stm32h7xx.h",
+        "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h",
         "FreeRTOSConfig.h",
         "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h",
         "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h",
@@ -507,10 +511,7 @@ cc_library(
         "Middlewares/Third_Party/FreeRTOS/Source/include/task.h",
         "Middlewares/Third_Party/FreeRTOS/Source/include/timers.h",
         "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/portmacro.h",
-        "stm32h743xx.h",
-        "stm32h7xx.h",
         "stm32h7xx_hal_conf.h",
-        "system_stm32h7xx.h",
     ],
     copts = [
         # We don't want to mark warnings as errors for 3rd party code
@@ -521,6 +522,8 @@ cc_library(
     ],
     includes = [
         "./",
+        "Drivers/CMSIS/Device/ST/STM32H7xx/Include/",
+        "Drivers/STM32H7xx_HAL_Driver/Inc/",
         "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/",
         "Middlewares/Third_Party/FreeRTOS/Source/include",
         "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1",
