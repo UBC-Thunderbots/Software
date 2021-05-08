@@ -20,65 +20,11 @@ bool ThetaStarPathPlanner::isCoordNavigable(const Coordinate &coord) const
     return (coord.row() < num_grid_rows) && (coord.col() < num_grid_cols);
 }
 
-void ThetaStarPathPlanner::findAllBlockedCoords(Circle& obstacle)
-{
-    int radius              = obstacle.radius();
-    Point center_point      = obstacle.origin();
-    Coordinate center_coord = convertPointToCoord(center_point);
-    int xc                  = center_coord.col();
-    int yc                  = center_coord.row();
-
-    int x = 0, y = radius;
-    int d = 3 - 2 * radius;
-
-    auto set_blocked_coordinates = [this, xc, yc](int x, int y){
-        blocked_grid.insert(Coordinate(xc+x, yc+y));
-        blocked_grid.insert(Coordinate(xc-x, yc+y));
-        blocked_grid.insert(Coordinate(xc+x, yc-y));
-        blocked_grid.insert(Coordinate(xc-x, yc-y));
-        blocked_grid.insert(Coordinate(xc+y, yc+x));
-        blocked_grid.insert(Coordinate(xc-y, yc+x));
-        blocked_grid.insert(Coordinate(xc+y, yc-x));
-        blocked_grid.insert(Coordinate(xc-y, yc-x));
-    };
-
-    set_blocked_coordinates(x, y);
-
-    while (y >= x)
-    {
-        x++;
-
-        if (d > 0)
-        {
-            y--;
-            d = d + 4 * (x - y) + 10;
-        }
-        else
-        {
-            d = d + 4 * x + 6;
-        }
-        set_blocked_coordinates(x, y);
-    }
-
-//    for(int y = center.y() - radius; y <= center.y() + radius; y++)
-//    {
-//
-//        for(int x=-radius; x<=radius; x++)
-//        {
-//            Point curr_point = Point(x, y);
-//            if((center - curr_point).length() <= radius)
-//            {
-//                blocked_grid.insert(convertPointToCoord(curr_point))
-//            }
-//        }
-//    }
-}
-
 void ThetaStarPathPlanner::findAllBlockedCoords()
 {
     for (auto &obstacle : obstacles)
     {
-        auto blocked_points = obstacle->findAllBlockedPoints(SIZE_OF_GRID_CELL_IN_METERS);
+        auto blocked_points = obstacle->rasterize(SIZE_OF_GRID_CELL_IN_METERS);
 
         for (Point blocked_point : blocked_points)
         {

@@ -28,7 +28,7 @@ bool GeomObstacle<GEOM_TYPE>::intersects(const Segment& segment) const
 }
 
 template <typename GEOM_TYPE>
-std::set<Point> GeomObstacle<GEOM_TYPE>::rasterize(double resolution_size) const
+std::vector<Point> GeomObstacle<GEOM_TYPE>::rasterize(double resolution_size) const
 {
     return ::rasterize(geom_, resolution_size);
 }

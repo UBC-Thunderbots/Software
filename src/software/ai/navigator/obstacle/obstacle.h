@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <sstream>
+#include <vector>
 
 #include "shared/constants.h"
 #include "software/ai/navigator/obstacle/obstacle_visitor.h"
@@ -45,7 +46,7 @@ class Obstacle
     /**
      * Determines what coordinates on the field are blocked by this Obstacle
      */
-    virtual std::set<Point> rasterize(double) const = 0;
+    virtual std::vector<Point> rasterize(double) const = 0;
 
     /**
      * Output string to describe the obstacle
@@ -80,7 +81,7 @@ class GeomObstacle : public Obstacle
     bool intersects(const Segment& segment) const override;
     std::string toString(void) const override;
     void accept(ObstacleVisitor& visitor) const override;
-    std::set<Point> rasterize(double) const override;
+    std::vector<Point> rasterize(double) const override;
 
     /**
      * Gets the underlying GEOM_TYPE
