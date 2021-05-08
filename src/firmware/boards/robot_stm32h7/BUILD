@@ -28,7 +28,6 @@ cc_binary(
         ":STM32H743ZITx_FLASH.ld",
         ":adc",
         ":dma",
-        ":fatfs",
         ":gpio",
         ":i2c",
         ":lwip",

@@ -12,7 +12,8 @@ typedef struct GpioPin GpioPin_t;
 typedef enum
 {
     ACTIVE_HIGH,
-    ACTIVE_LOW
+    ACTIVE_LOW,
+    INPUT,
 } GpioPinActiveState;
 
 /**
@@ -49,3 +50,5 @@ void io_gpio_pin_setActive(GpioPin_t* gpio_pin);
  * @param gpio_pin
  */
 void io_gpio_pin_setInactive(GpioPin_t* gpio_pin);
+
+uint32_t io_gpio_pin_getState(GpioPin_t* gpio_pin);
