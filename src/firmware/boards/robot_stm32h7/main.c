@@ -127,7 +127,7 @@ int main(void)
     MX_DMA_Init();
     MX_USART3_UART_Init();
     MX_ADC3_Init();
-    MX_I2C1_SMBUS_Init();
+    MX_I2C1_Init();
     MX_I2C2_Init();
     MX_SPI1_Init();
     MX_ADC1_Init();
