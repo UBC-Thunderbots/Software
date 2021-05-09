@@ -7,7 +7,7 @@ cc_library(
     srcs = ["gpio_pin.c"],
     hdrs = ["gpio_pin.h"],
     copts = [
-        # We don't want to mark warnings as errors for 3rd party code
+        # This library uses hal and includes ST headers, so we can't mark warnings as errors
         "-Wno-error",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
@@ -21,7 +21,7 @@ cc_library(
     srcs = ["pwm_pin.c"],
     hdrs = ["pwm_pin.h"],
     copts = [
-        # We don't want to mark warnings as errors for 3rd party code
+        # This library uses hal and includes ST headers, so we can't mark warnings as errors
         "-Wno-error",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
@@ -35,7 +35,7 @@ cc_library(
     srcs = ["allegro_a3931_motor_driver.c"],
     hdrs = ["allegro_a3931_motor_driver.h"],
     copts = [
-        # We don't want to mark warnings as errors for 3rd party code
+        # This library uses hal and includes ST headers, so we can't mark warnings as errors
         "-Wno-error",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
@@ -50,7 +50,7 @@ cc_library(
     srcs = ["infineon_TLE5009_E1000_angle_sensor.c"],
     hdrs = ["infineon_TLE5009_E1000_angle_sensor.h"],
     copts = [
-        # We don't want to mark warnings as errors for 3rd party code
+        # This library uses hal and includes ST headers, so we can't mark warnings as errors
         "-Wno-error",
     ],
 )
@@ -69,8 +69,7 @@ cc_library(
     srcs = ["drivetrain.c"],
     hdrs = ["drivetrain.h"],
     copts = [
-        # We don't want to mark warnings as errors for 3rd party code
-        # This was adapted from: https://github.com/macgeorge/STM32-example-codes
+        # This library uses hal and includes ST headers, so we can't mark warnings as errors
         "-Wno-error",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
@@ -82,8 +81,7 @@ cc_library(
     srcs = ["drivetrain_unit.c"],
     hdrs = ["drivetrain_unit.h"],
     copts = [
-        # We don't want to mark warnings as errors for 3rd party code
-        # This was adapted from: https://github.com/macgeorge/STM32-example-codes
+        # This library uses hal and includes ST headers, so we can't mark warnings as errors
         "-Wno-error",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
@@ -101,7 +99,7 @@ cc_library(
         "proto_multicast_communication_tasks.h",
     ],
     copts = [
-        # We don't want to mark warnings as errors for 3rd party code
+        # This library uses hal and includes ST headers, so we can't mark warnings as errors
         "-Wno-error",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
@@ -120,7 +118,7 @@ cc_library(
     srcs = ["network_logger.c"],
     hdrs = ["network_logger.h"],
     copts = [
-        # We don't want to mark warnings as errors for 3rd party code
+        # This library uses hal and includes ST headers, so we can't mark warnings as errors
         "-Wno-error",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
@@ -140,7 +138,7 @@ cc_library(
     srcs = ["uart_logger.c"],
     hdrs = ["uart_logger.h"],
     copts = [
-        # We don't want to mark warnings as errors for 3rd party code
+        # This library uses hal and includes ST headers, so we can't mark warnings as errors
         "-Wno-error",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
@@ -159,7 +157,7 @@ cc_library(
     srcs = ["ublox_odinw262_communicator.c"],
     hdrs = ["ublox_odinw262_communicator.h"],
     copts = [
-        # We don't want to mark warnings as errors for 3rd party code
+        # This library uses hal and includes ST headers, so we can't mark warnings as errors
         "-Wno-error",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
@@ -182,7 +180,7 @@ cc_library(
     srcs = ["ublox_odinw262_communicator_buffer_utils.c"],
     hdrs = ["ublox_odinw262_communicator_buffer_utils.h"],
     copts = [
-        # We don't want to mark warnings as errors for 3rd party code
+        # This library uses hal and includes ST headers, so we can't mark warnings as errors
         "-Wno-error",
     ],
     alwayslink = True,
@@ -199,7 +197,7 @@ cc_test(
     name = "ublox_odinw262_communicator_buffer_utils_test",
     srcs = ["ublox_odinw262_communicator_buffer_utils_test.cpp"],
     copts = [
-        # We don't want to mark warnings as errors for 3rd party code
+        # This library uses hal and includes ST headers, so we can't mark warnings as errors
         "-Wno-error",
     ],
     deps = [
@@ -214,7 +212,7 @@ cc_library(
     srcs = ["power_monitor.c"],
     hdrs = ["power_monitor.h"],
     copts = [
-        # We don't want to mark warnings as errors for 3rd party code
+        # This library uses hal and includes ST headers, so we can't mark warnings as errors
         "-Wno-error",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
@@ -226,7 +224,7 @@ cc_library(
     srcs = ["INA226_power_monitor_driver.c"],
     hdrs = ["INA226_power_monitor_driver.h"],
     copts = [
-        # We don't want to mark warnings as errors for 3rd party code
+        # This library uses hal and includes ST headers, so we can't mark warnings as errors
         # This was adapted from: https://github.com/macgeorge/STM32-example-codes
         "-Wno-error",
     ],
