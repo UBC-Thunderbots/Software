@@ -70,15 +70,6 @@ static TbotsProto_RobotStatus robot_status_msg;
 static TbotsProto_RobotLog robot_log_msg;
 static TbotsProto_Primitive primitive_msg;
 
-static GpioPin_t *user_led_2;
-static GpioPin_t *user_led_3;
-
-static GpioPin_t *breakbeam;
-
-static GpioPin_t *red_led;
-static GpioPin_t *blue_led;
-static GpioPin_t *green_led;
-
 /* USER CODE END Variables */
 /* Definitions for NetStartTask */
 osThreadId_t NetStartTaskHandle;
@@ -280,8 +271,8 @@ void test_msg_update(void *argument)
         // https://github.com/UBC-Thunderbots/Software/issues/1518
         robot_status_msg.time_sent.epoch_timestamp_seconds = sys_now();
 
-        /*robot_status_msg.power_status.battery_voltage =*/
-        /*io_power_monitor_getBatteryVoltage();*/
+        robot_status_msg.power_status.battery_voltage =
+            io_power_monitor_getBatteryVoltage();
 
         // We change the power status values randomly so that robot diagnostics
         // can "see" this robot on the network. This is a stopgap until we have
@@ -292,16 +283,8 @@ void test_msg_update(void *argument)
                                                               PROTO_UPDATED);
         TLOG_DEBUG("Power Monitor: %d",
                    (int)(robot_status_msg.power_status.battery_voltage * 1000.0f));
-
-        uint32_t breakbeam_state = io_gpio_pin_getState(breakbeam);
-        TLOG_DEBUG("Break beam %d", breakbeam_state);
-
-        TLOG_DEBUG("Spinning front left wheel for 2 seconds");
-        /*io_drivetrain_applyForceFrontLeftWheel(0.00);*/
-        osDelay((unsigned int)MILLISECONDS_PER_SECOND * 2);
-        TLOG_DEBUG("Turning off front left wheel for 2 seconds");
-        /*io_drivetrain_applyForceFrontLeftWheel(0.00);*/
-        osDelay((unsigned int)MILLISECONDS_PER_SECOND * 2);
+        // run loop at 100hz
+        osDelay((unsigned int)MILLISECONDS_PER_SECOND / 10);
     }
     /* USER CODE END test_msg_update */
 }
@@ -334,12 +317,10 @@ void initIoNetworking(void)
         &robot_log_msg, TbotsProto_RobotLog_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 
     // initialize ublox
-    //
-    // TODO enable this when we have a reset pin
-    // GpioPin_t *ublox_reset_pin =
-    //     io_gpio_pin_create(ublox_reset_GPIO_Port, ublox_reset_Pin, ACTIVE_LOW);
+    GpioPin_t *ublox_reset_pin =
+        io_gpio_pin_create(ublox_reset_GPIO_Port, ublox_reset_Pin, ACTIVE_LOW);
 
-    // io_ublox_odinw262_communicator_init(&huart4, ublox_reset_pin, 5);
+    io_ublox_odinw262_communicator_init(&huart8, ublox_reset_pin, 5);
 
     // initialize network logger
     io_network_logger_init(RobotLogProtoQHandle);
@@ -347,90 +328,45 @@ void initIoNetworking(void)
 
 void initIoDrivetrain(void)
 {
+    // Initialize a motor driver with the given suffix, on the given
+    // timer channel
+#define INIT_DRIVETRAIN_UNIT(MOTOR_NAME_SUFFIX, TIMER_CHANNEL)                           \
+    {                                                                                    \
+        GpioPin_t *reset_pin =                                                           \
+            io_gpio_pin_create(wheel_motor_##MOTOR_NAME_SUFFIX##_reset_GPIO_Port,        \
+                               wheel_motor_##MOTOR_NAME_SUFFIX##_reset_Pin, ACTIVE_LOW); \
+        GpioPin_t *coast_pin =                                                           \
+            io_gpio_pin_create(wheel_motor_##MOTOR_NAME_SUFFIX##_coast_GPIO_Port,        \
+                               wheel_motor_##MOTOR_NAME_SUFFIX##_coast_Pin, ACTIVE_LOW); \
+        GpioPin_t *mode_pin =                                                            \
+            io_gpio_pin_create(wheel_motor_##MOTOR_NAME_SUFFIX##_mode_GPIO_Port,         \
+                               wheel_motor_##MOTOR_NAME_SUFFIX##_mode_Pin, ACTIVE_HIGH); \
+        GpioPin_t *direction_pin = io_gpio_pin_create(                                   \
+            wheel_motor_##MOTOR_NAME_SUFFIX##_direction_GPIO_Port,                       \
+            wheel_motor_##MOTOR_NAME_SUFFIX##_direction_Pin, ACTIVE_HIGH);               \
+        GpioPin_t *brake_pin =                                                           \
+            io_gpio_pin_create(wheel_motor_##MOTOR_NAME_SUFFIX##_brake_GPIO_Port,        \
+                               wheel_motor_##MOTOR_NAME_SUFFIX##_brake_Pin, ACTIVE_LOW); \
+        GpioPin_t *esf_pin =                                                             \
+            io_gpio_pin_create(wheel_motor_##MOTOR_NAME_SUFFIX##_esf_GPIO_Port,          \
+                               wheel_motor_##MOTOR_NAME_SUFFIX##_esf_Pin, ACTIVE_HIGH);  \
+        PwmPin_t *pwm_pin = io_pwm_pin_create(&htim4, TIMER_CHANNEL);                    \
+                                                                                         \
+        AllegroA3931MotorDriver_t *motor_driver = io_allegro_a3931_motor_driver_create(  \
+            pwm_pin, reset_pin, coast_pin, mode_pin, direction_pin, brake_pin, esf_pin); \
+        io_allegro_a3931_motor_setPwmPercentage(motor_driver, 0.0);                      \
+        drivetrain_unit_##MOTOR_NAME_SUFFIX = io_drivetrain_unit_create(motor_driver);   \
+    }
+
     DrivetrainUnit_t *drivetrain_unit_front_left;
     DrivetrainUnit_t *drivetrain_unit_back_left;
     DrivetrainUnit_t *drivetrain_unit_back_right;
     DrivetrainUnit_t *drivetrain_unit_front_right;
 
-    // Initialize Front Left Motor
-    {
-        GpioPin_t *reset_pin = io_gpio_pin_create(
-            WHEEL_FRONT_LEFT_RESET_GPIO_Port, WHEEL_FRONT_LEFT_RESET_Pin, ACTIVE_HIGH);
-        io_gpio_pin_setActive(reset_pin);
-
-        GpioPin_t *direction_pin = io_gpio_pin_create(
-            WHEEL_FRONT_LEFT_DIR_GPIO_Port, WHEEL_FRONT_LEFT_DIR_Pin, ACTIVE_HIGH);
-
-        GpioPin_t *mode_pin = io_gpio_pin_create(WHEEL_FRONT_LEFT_MODE_GPIO_Port,
-                                                 WHEEL_FRONT_LEFT_MODE_Pin, ACTIVE_HIGH);
-        io_gpio_pin_setActive(mode_pin);
-
-        PwmPin_t *pwm_pin = io_pwm_pin_create(&htim1, TIM_CHANNEL_4);
-
-        AllegroA3931MotorDriver_t *motor_driver = io_allegro_a3931_motor_driver_create(
-            pwm_pin, reset_pin, mode_pin, direction_pin);
-
-        io_allegro_a3931_motor_setPwmPercentage(motor_driver, 0.0);
-
-        drivetrain_unit_front_left = io_drivetrain_unit_create(motor_driver);
-    }
-
-    // Initialize Front Right Motor
-    {
-        GpioPin_t *reset_pin = io_gpio_pin_create(
-            WHEEL_FRONT_RIGHT_RESET_GPIO_Port, WHEEL_FRONT_RIGHT_RESET_Pin, ACTIVE_HIGH);
-        io_gpio_pin_setInactive(reset_pin);
-
-        GpioPin_t *direction_pin = io_gpio_pin_create(
-            WHEEL_FRONT_RIGHT_DIR_GPIO_Port, WHEEL_FRONT_RIGHT_DIR_Pin, ACTIVE_HIGH);
-
-        PwmPin_t *pwm_pin = io_pwm_pin_create(&htim2, TIM_CHANNEL_3);
-
-        AllegroA3931MotorDriver_t *motor_driver =
-            io_allegro_a3931_motor_driver_create(pwm_pin, reset_pin, NULL, direction_pin);
-
-        io_allegro_a3931_motor_setPwmPercentage(motor_driver, 0.0);
-
-        drivetrain_unit_front_left = io_drivetrain_unit_create(motor_driver);
-    }
-
-    // Initialize Back Left Motor
-    {
-        GpioPin_t *reset_pin = io_gpio_pin_create(WHEEL_BACK_LEFT_RESET_GPIO_Port,
-                                                  WHEEL_BACK_LEFT_RESET_Pin, ACTIVE_HIGH);
-        io_gpio_pin_setInactive(reset_pin);
-
-        GpioPin_t *direction_pin = io_gpio_pin_create(
-            WHEEL_BACK_LEFT_DIR_GPIO_Port, WHEEL_BACK_LEFT_DIR_Pin, ACTIVE_HIGH);
-
-        PwmPin_t *pwm_pin = io_pwm_pin_create(&htim2, TIM_CHANNEL_1);
-
-        AllegroA3931MotorDriver_t *motor_driver =
-            io_allegro_a3931_motor_driver_create(pwm_pin, reset_pin, NULL, direction_pin);
-
-        io_allegro_a3931_motor_setPwmPercentage(motor_driver, 0.0);
-
-        drivetrain_unit_front_left = io_drivetrain_unit_create(motor_driver);
-    }
-
-    // Initialize Back Right Motor
-    {
-        GpioPin_t *reset_pin = io_gpio_pin_create(
-            WHEEL_BACK_RIGHT_RESET_GPIO_Port, WHEEL_BACK_RIGHT_RESET_Pin, ACTIVE_HIGH);
-
-        io_gpio_pin_setInactive(reset_pin);
-        GpioPin_t *direction_pin = io_gpio_pin_create(
-            WHEEL_BACK_RIGHT_DIR_GPIO_Port, WHEEL_BACK_RIGHT_DIR_Pin, ACTIVE_HIGH);
-
-        PwmPin_t *pwm_pin = io_pwm_pin_create(&htim1, TIM_CHANNEL_4);
-
-        AllegroA3931MotorDriver_t *motor_driver =
-            io_allegro_a3931_motor_driver_create(pwm_pin, reset_pin, NULL, direction_pin);
-
-        io_allegro_a3931_motor_setPwmPercentage(motor_driver, 0.0);
-
-        drivetrain_unit_front_left = io_drivetrain_unit_create(motor_driver);
-    }
+    INIT_DRIVETRAIN_UNIT(front_left, TIM_CHANNEL_1);
+    INIT_DRIVETRAIN_UNIT(back_left, TIM_CHANNEL_2);
+    INIT_DRIVETRAIN_UNIT(back_right, TIM_CHANNEL_3);
+    INIT_DRIVETRAIN_UNIT(front_right, TIM_CHANNEL_4);
 
     io_drivetrain_init(drivetrain_unit_front_left, drivetrain_unit_front_right,
                        drivetrain_unit_back_left, drivetrain_unit_back_right);
@@ -438,21 +374,11 @@ void initIoDrivetrain(void)
 
 void initPowerMonitor(void)
 {
-    // TODO enable
-    /*io_power_monitor_init(I2C2, INA226_ADDRESS,*/
-    /*INA226_MODE_CONT_SHUNT_AND_BUS | INA226_VBUS_140uS |*/
-    /*INA226_VBUS_140uS | INA226_AVG_1024);*/
+    io_power_monitor_init(I2C2, INA226_ADDRESS,
+                          INA226_MODE_CONT_SHUNT_AND_BUS | INA226_VBUS_140uS |
+                              INA226_VBUS_140uS | INA226_AVG_1024);
 }
 
-void initLeds(void)
-{
-    user_led_2 = io_gpio_pin_create(USER_LED_2_Pin, USER_LED_2_GPIO_Port, ACTIVE_LOW);
-    user_led_3 = io_gpio_pin_create(USER_LED_2_GPIO_Port, USER_LED_3_Pin, ACTIVE_LOW);
-    red_led    = io_gpio_pin_create(RED_IN_RGB_GPIO_Port, RED_IN_RGB_Pin, ACTIVE_LOW);
-    blue_led   = io_gpio_pin_create(BLUE_IN_RGB_GPIO_Port, BLUE_IN_RGB_Pin, ACTIVE_LOW);
-    green_led  = io_gpio_pin_create(GREEN_IN_RGB_GPIO_Port, GREEN_IN_RGB_Pin, ACTIVE_LOW);
-    breakbeam  = io_gpio_pin_create(BREAKBEAM_GPIO_Port, BREAKBEAM_Pin, INPUT);
-}
 /* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

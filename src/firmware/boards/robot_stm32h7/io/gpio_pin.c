@@ -47,8 +47,6 @@ void io_gpio_pin_setActive(GpioPin_t* gpio_pin)
         case ACTIVE_LOW:
             io_gpio_pin_setHALPinState(gpio_pin, GPIO_PIN_RESET);
             return;
-        case INPUT:
-            return;
     }
 }
 
@@ -62,17 +60,10 @@ void io_gpio_pin_setInactive(GpioPin_t* gpio_pin)
         case ACTIVE_LOW:
             io_gpio_pin_setHALPinState(gpio_pin, GPIO_PIN_SET);
             return;
-        case INPUT:
-            return;
     }
 }
 
 void io_gpio_pin_setHALPinState(GpioPin_t* gpio_pin, GPIO_PinState pin_state)
 {
     HAL_GPIO_WritePin(gpio_pin->gpio_handler, gpio_pin->gpio_pin_index, pin_state);
-}
-
-uint32_t io_gpio_pin_getState(GpioPin_t* gpio_pin)
-{
-    return HAL_GPIO_ReadPin(gpio_pin->gpio_handler, gpio_pin->gpio_pin_index);
 }
