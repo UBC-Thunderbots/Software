@@ -77,17 +77,9 @@ static void initIoLayer(void);
 
 static void initIoLayer(void)
 {
-    TLOG_DEBUG("Starting Drivetrain");
     initIoDrivetrain();
-
-    TLOG_DEBUG("Starting Networking");
     initIoNetworking();
-
-    TLOG_DEBUG("Starting Powermonitor");
     initPowerMonitor();
-
-    TLOG_DEBUG("Starting LEDs");
-    initLeds();
 }
 
 /* USER CODE END 0 */
