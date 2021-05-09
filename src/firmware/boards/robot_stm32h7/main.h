@@ -24,36 +24,37 @@
 #define __MAIN_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32h7xx_hal.h"
 
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
+    /* Private includes ----------------------------------------------------------*/
+    /* USER CODE BEGIN Includes */
 
-/* USER CODE END Includes */
+    /* USER CODE END Includes */
 
-/* Exported types ------------------------------------------------------------*/
-/* USER CODE BEGIN ET */
+    /* Exported types ------------------------------------------------------------*/
+    /* USER CODE BEGIN ET */
 
-/* USER CODE END ET */
+    /* USER CODE END ET */
 
-/* Exported constants --------------------------------------------------------*/
-/* USER CODE BEGIN EC */
+    /* Exported constants --------------------------------------------------------*/
+    /* USER CODE BEGIN EC */
 
-/* USER CODE END EC */
+    /* USER CODE END EC */
 
-/* Exported macro ------------------------------------------------------------*/
-/* USER CODE BEGIN EM */
+    /* Exported macro ------------------------------------------------------------*/
+    /* USER CODE BEGIN EM */
 
-/* USER CODE END EM */
+    /* USER CODE END EM */
 
-/* Exported functions prototypes ---------------------------------------------*/
-void Error_Handler(void);
+    /* Exported functions prototypes ---------------------------------------------*/
+    void Error_Handler(void);
 
-/* USER CODE BEGIN EFP */
+    /* USER CODE BEGIN EFP */
 
     /**
      * Initializes the drivetrain
@@ -177,8 +178,6 @@ void Error_Handler(void);
 #define WHEEL_BACK_RIGHT_DIR_GPIO_Port GPIOE
 #define WHEEL_BACK_RIGHT_TACHO_Pin GPIO_PIN_13
 #define WHEEL_BACK_RIGHT_TACHO_GPIO_Port GPIOE
-#define WHEEL_BACK_RIGHT_PWM_Pin GPIO_PIN_14
-#define WHEEL_BACK_RIGHT_PWM_GPIO_Port GPIOE
 #define WHEEL_BACK_RIGHT_FF1_Pin GPIO_PIN_15
 #define WHEEL_BACK_RIGHT_FF1_GPIO_Port GPIOE
 #define WHEEL_FRONT_RIGHT_PWM_Pin GPIO_PIN_10
@@ -201,10 +200,10 @@ void Error_Handler(void);
 #define WHEEL_BACK_RIGHT_FF2_GPIO_Port GPIOD
 #define DRIBBLER_RESET_Pin GPIO_PIN_11
 #define DRIBBLER_RESET_GPIO_Port GPIOD
-#define WHEEL_FRONT_LEFT_PWM_Pin GPIO_PIN_12
-#define WHEEL_FRONT_LEFT_PWM_GPIO_Port GPIOD
-#define WHEEL_FRONT_LEFT_TACHO_Pin GPIO_PIN_13
-#define WHEEL_FRONT_LEFT_TACHO_GPIO_Port GPIOD
+#define WHEEL_FRONT_LEFT_MODE_Pin GPIO_PIN_12
+#define WHEEL_FRONT_LEFT_MODE_GPIO_Port GPIOD
+#define WHEEL_FRONT_LEFT_DIR_Pin GPIO_PIN_13
+#define WHEEL_FRONT_LEFT_DIR_GPIO_Port GPIOD
 #define DRIBBLER_FF1_Pin GPIO_PIN_14
 #define DRIBBLER_FF1_GPIO_Port GPIOD
 #define DRIBBLER_FF2_Pin GPIO_PIN_15
@@ -237,8 +236,8 @@ void Error_Handler(void);
 #define WHEEL_FRONT_RIGHT_DIR_GPIO_Port GPIOA
 #define DRIBBLER_DIR_Pin GPIO_PIN_10
 #define DRIBBLER_DIR_GPIO_Port GPIOA
-#define WHEEL_FRONT_LEFT_DIR_Pin GPIO_PIN_11
-#define WHEEL_FRONT_LEFT_DIR_GPIO_Port GPIOA
+#define WHEEL_FRONT_LEFT_PWM_Pin GPIO_PIN_11
+#define WHEEL_FRONT_LEFT_PWM_GPIO_Port GPIOA
 #define WHEEL_BACK_LEFT_DIR_Pin GPIO_PIN_12
 #define WHEEL_BACK_LEFT_DIR_GPIO_Port GPIOA
 #define T_SWDIO_Pin GPIO_PIN_13
@@ -285,9 +284,9 @@ void Error_Handler(void);
 #define KICK_PWR_BRD_GPIO_Port GPIOB
 #define CHIP_PWR_BRD_Pin GPIO_PIN_9
 #define CHIP_PWR_BRD_GPIO_Port GPIOB
-/* USER CODE BEGIN Private defines */
+    /* USER CODE BEGIN Private defines */
 
-/* USER CODE END Private defines */
+    /* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }

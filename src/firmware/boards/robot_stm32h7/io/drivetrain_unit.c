@@ -35,5 +35,6 @@ void io_drivetrain_unit_applyForce(DrivetrainUnit_t* drive_train_unit,
                                                    COUNTERCLOCKWISE);
     }
 
-    io_allegro_a3931_motor_setPwmPercentage(drive_train_unit->motor_driver, force_newtons);
+    io_allegro_a3931_motor_setPwmPercentage(drive_train_unit->motor_driver,
+                                            force_newtons);
 }
