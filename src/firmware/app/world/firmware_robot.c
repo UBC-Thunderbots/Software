@@ -8,9 +8,9 @@
 // so that the axes would never have to compete for resources
 #define TIME_HORIZON 0.05f  // s
 
-// Have the robot follow the provided position trajectory
-typedef void (*TrajectoryFollower_t)(const FirmwareRobot_t*, PositionTrajectory_t, size_t,
-                                     float);
+// Function pointer definition for the robot to follow the provided position trajectory
+typedef void (*TrajectoryFollower_t)(const FirmwareRobot_t*, PositionTrajectory_t,
+                                     unsigned int, size_t, float);
 // Set the robot's per wheel power given the DirectPerWheelControl message
 typedef void (*ApplyDirectPerWheelPower_t)(
     const FirmwareRobot_t*, TbotsProto_DirectControlPrimitive_DirectPerWheelControl);
@@ -81,7 +81,8 @@ void plan_move_rotation(PhysBot* pb, float avel)
 
 void force_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
                                       PositionTrajectory_t pos_trajectory,
-                                      size_t trajectory_index, float max_speed_m_per_s)
+                                      unsigned int num_elements, size_t trajectory_index,
+                                      float max_speed_m_per_s)
 {
     ForceWheel_t* front_right_wheel = robot->front_right_force_wheel;
     ForceWheel_t* front_left_wheel  = robot->front_left_force_wheel;
@@ -151,10 +152,9 @@ void force_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
 
 void velocity_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
                                          PositionTrajectory_t pos_trajectory,
+                                         unsigned int num_elements,
                                          size_t trajectory_index, float max_speed_m_per_s)
 {
-    // TODO: pass num_elements in as an argument
-    unsigned int num_elements = 100;
     VelocityTrajectory_t velocity_trajectory;
     app_trajectory_planner_generateVelocityTrajectory(&pos_trajectory, num_elements,
                                                       &velocity_trajectory);
@@ -555,10 +555,11 @@ void app_firmware_robot_trackVelocityInRobotFrame(const FirmwareRobot_t* robot,
 
 void app_firmware_robot_followPosTrajectory(const FirmwareRobot_t* robot,
                                             PositionTrajectory_t pos_trajectory,
+                                            unsigned int num_elements,
                                             size_t trajectory_index,
                                             float max_speed_m_per_s)
 {
-    robot->follow_pos_trajectory(robot, pos_trajectory, trajectory_index,
+    robot->follow_pos_trajectory(robot, pos_trajectory, num_elements, trajectory_index,
                                  max_speed_m_per_s);
 }
 
