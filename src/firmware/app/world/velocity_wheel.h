@@ -34,6 +34,7 @@ typedef struct VelocityWheelConstants
 /**
  * Create a wheel object with functions for interacting with it
  *
+ * @param set_target_rpm Function pointer set the target rpm
  * @param get_motor_speed_rpm A function that we can call to get the speed of this wheel,
  *                            in RPM
  * @param wheel_constants Constants for this wheel
