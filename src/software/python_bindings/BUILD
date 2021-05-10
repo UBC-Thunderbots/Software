@@ -114,6 +114,7 @@ cc_library(
         "//software/world:field",
         "//software/world:robot",
         "//software/ai/passing:pass_generator",
+        "//software/geom:rectangle",
     ] + PYBIND_DEPS,
 )
 

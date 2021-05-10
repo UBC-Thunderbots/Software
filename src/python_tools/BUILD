@@ -49,6 +49,7 @@ py_binary(
         ":notebooks",
         "//software/python_bindings:passing.so",
         "//software/python_bindings:world.so",
+        "//software/python_bindings:pass_generator.so"
     ],
     deps = NOTEBOOK_DEPS,
 )

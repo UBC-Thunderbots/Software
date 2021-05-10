@@ -5,6 +5,7 @@
 #include "software/python_bindings/python_binding_utilities.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/python_bindings/pass_utilities.h"
+#include "software/geom/rectangle.h"
 
 namespace py = pybind11;
 
@@ -23,7 +24,7 @@ EighteenZonePassGenerator createEighteenZonePassGenerator(
     return EighteenZonePassGenerator(pitch_division, passing_config);
 }
 
-py::dict getBestPassesForAllZones(EighteenZonePassGenerator& generator, const World& world)
+py::list getBestPassesForAllZones(EighteenZonePassGenerator& generator, const World& world)
 {
     py::list result;
     auto evaluation = generator.generatePassEvaluation(world);
@@ -43,9 +44,29 @@ py::dict getBestPassesForAllZones(EighteenZonePassGenerator& generator, const Wo
     return result;
 }
 
+py::list getAllZones(const World& world)
+{
+    EighteenZonePitchDivision pitch_division(world.field());
+    py::list result;
+    for (auto zone_id = static_cast<int>(EighteenZoneId::ZONE_1);
+         zone_id <= static_cast<int>(EighteenZoneId::ZONE_18);
+         zone_id++)
+    {
+        result.append(pitch_division.getZone(static_cast<EighteenZoneId>(zone_id)));
+    }
+    return result;
+}
+
 PYBIND11_MODULE(pass_generator, m)
 {
+    py::class_<Rectangle>(m, "Rectangle")
+        .def(py::init<const Point&, const Point&>())
+        .def("centre", &Rectangle::centre)
+        .def("xLength", &Rectangle::xLength)
+        .def("yLength", &Rectangle::yLength);
+
     py::class_<EighteenZonePassGenerator>(m, "EighteenZonePassGenerator")
         .def(py::init(&createEighteenZonePassGenerator))
         .def("getBestPassesForAllZones", &getBestPassesForAllZones);
+    m.def("getAllZones", &getAllZones);
 }
