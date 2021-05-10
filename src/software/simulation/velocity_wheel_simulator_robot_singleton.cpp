@@ -1,11 +1,11 @@
-#include "software/simulation/force_wheel_simulator_robot_singleton.h"
+#include "software/simulation/velocity_wheel_simulator_robot_singleton.h"
 
 #include "shared/proto/robot_log_msg.pb.h"
 
 extern "C"
 {
 #include "firmware/app/logger/logger.h"
-#include "firmware/app/world/force_wheel.h"
+#include "firmware/app/world/velocity_wheel.h"
 }
 
 // TODO (#2066): The JERK_LIMIT is copied from firmware/main/control/control.h
@@ -17,18 +17,18 @@ extern "C"
 // We should inject it as a robot or control param instead.
 #define WHEEL_MOTOR_PHASE_RESISTANCE 1.2f  // ohms—EC45 datasheet
 
-std::shared_ptr<ForceWheelSimulatorRobot>
-    ForceWheelSimulatorRobotSingleton::force_wheel_simulator_robot = nullptr;
+std::shared_ptr<VelocityWheelSimulatorRobot>
+    VelocityWheelSimulatorRobotSingleton::velocity_wheel_simulator_robot = nullptr;
 
-void ForceWheelSimulatorRobotSingleton::setSimulatorRobot(
-    std::shared_ptr<ForceWheelSimulatorRobot> robot, FieldSide field_side)
+void VelocityWheelSimulatorRobotSingleton::setSimulatorRobot(
+    std::shared_ptr<VelocityWheelSimulatorRobot> robot, FieldSide field_side)
 {
-    force_wheel_simulator_robot = robot;
+    velocity_wheel_simulator_robot = robot;
     SimulatorRobotSingleton::setSimulatorRobot(robot, field_side);
 }
 
 std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>
-ForceWheelSimulatorRobotSingleton::createFirmwareRobot()
+VelocityWheelSimulatorRobotSingleton::createFirmwareRobot()
 {
     // Charger does nothing in sim
     Charger_t* charger = app_charger_create([]() {}, []() {}, []() {});
@@ -45,30 +45,30 @@ ForceWheelSimulatorRobotSingleton::createFirmwareRobot()
                             &(SimulatorRobotSingleton::dribblerCoast),
                             &(SimulatorRobotSingleton::getDribblerTemperatureDegC));
 
-    ForceWheelConstants_t wheel_constants;
+    VelocityWheelConstants_t wheel_constants;
     wheel_constants.wheel_rotations_per_motor_rotation  = GEAR_RATIO;
     wheel_constants.wheel_radius                        = WHEEL_RADIUS;
     wheel_constants.motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT;
     wheel_constants.motor_back_emf_per_rpm              = RPM_TO_VOLT;
     wheel_constants.motor_phase_resistance              = WHEEL_MOTOR_PHASE_RESISTANCE;
     wheel_constants.motor_current_per_unit_torque       = CURRENT_PER_TORQUE;
-    ForceWheel_t* front_left_wheel                      = app_force_wheel_create(
-        &(ForceWheelSimulatorRobotSingleton::applyWheelForceFrontLeft),
+    VelocityWheel_t* front_left_wheel                   = app_velocity_wheel_create(
+        &(VelocityWheelSimulatorRobotSingleton::setTargetRPMFrontLeft),
         &(SimulatorRobotSingleton::getMotorSpeedFrontLeft),
         &(SimulatorRobotSingleton::brakeMotorFrontLeft),
         &(SimulatorRobotSingleton::coastMotorFrontLeft), wheel_constants);
-    ForceWheel_t* front_right_wheel = app_force_wheel_create(
-        &(ForceWheelSimulatorRobotSingleton::applyWheelForceFrontRight),
+    VelocityWheel_t* front_right_wheel = app_velocity_wheel_create(
+        &(VelocityWheelSimulatorRobotSingleton::setTargetRPMFrontRight),
         &(SimulatorRobotSingleton::getMotorSpeedFrontRight),
         &(SimulatorRobotSingleton::brakeMotorFrontRight),
         &(SimulatorRobotSingleton::coastMotorFrontRight), wheel_constants);
-    ForceWheel_t* back_left_wheel = app_force_wheel_create(
-        &(ForceWheelSimulatorRobotSingleton::applyWheelForceBackLeft),
+    VelocityWheel_t* back_left_wheel = app_velocity_wheel_create(
+        &(VelocityWheelSimulatorRobotSingleton::setTargetRPMBackLeft),
         &(SimulatorRobotSingleton::getMotorSpeedBackLeft),
         &(SimulatorRobotSingleton::brakeMotorBackLeft),
         &(SimulatorRobotSingleton::coastMotorBackLeft), wheel_constants);
-    ForceWheel_t* back_right_wheel = app_force_wheel_create(
-        &(ForceWheelSimulatorRobotSingleton::applyWheelForceBackRight),
+    VelocityWheel_t* back_right_wheel = app_velocity_wheel_create(
+        &(VelocityWheelSimulatorRobotSingleton::setTargetRPMBackRight),
         &(SimulatorRobotSingleton::getMotorSpeedBackRight),
         &(SimulatorRobotSingleton::brakeMotorBackRight),
         &(SimulatorRobotSingleton::coastMotorBackRight), wheel_constants);
@@ -84,7 +84,7 @@ ForceWheelSimulatorRobotSingleton::createFirmwareRobot()
         .last_applied_acceleration_y       = 0,
         .last_applied_acceleration_angular = 0,
     };
-    FirmwareRobot_t* firmware_robot = app_firmware_robot_force_wheels_create(
+    FirmwareRobot_t* firmware_robot = app_firmware_robot_velocity_wheels_create(
         charger, chicker, dribbler, &(SimulatorRobotSingleton::getPositionX),
         &(SimulatorRobotSingleton::getPositionY),
         &(SimulatorRobotSingleton::getOrientation),
@@ -99,30 +99,22 @@ ForceWheelSimulatorRobotSingleton::createFirmwareRobot()
                                                                   FirmwareRobotDeleter());
 }
 
-void ForceWheelSimulatorRobotSingleton::applyWheelForceFrontLeft(float force_in_newtons)
+void VelocityWheelSimulatorRobotSingleton::setTargetRPMFrontLeft(float rpm)
 {
-    checkValidAndExecute<void>([force_in_newtons](auto robot) {
-        robot->applyWheelForceFrontLeft(force_in_newtons);
-    });
+    checkValidAndExecute<void>([rpm](auto robot) { robot->setTargetRPMFrontLeft(rpm); });
 }
 
-void ForceWheelSimulatorRobotSingleton::applyWheelForceBackLeft(float force_in_newtons)
+void VelocityWheelSimulatorRobotSingleton::setTargetRPMBackLeft(float rpm)
 {
-    checkValidAndExecute<void>([force_in_newtons](auto robot) {
-        robot->applyWheelForceBackLeft(force_in_newtons);
-    });
+    checkValidAndExecute<void>([rpm](auto robot) { robot->setTargetRPMBackLeft(rpm); });
 }
 
-void ForceWheelSimulatorRobotSingleton::applyWheelForceBackRight(float force_in_newtons)
+void VelocityWheelSimulatorRobotSingleton::setTargetRPMBackRight(float rpm)
 {
-    checkValidAndExecute<void>([force_in_newtons](auto robot) {
-        robot->applyWheelForceBackRight(force_in_newtons);
-    });
+    checkValidAndExecute<void>([rpm](auto robot) { robot->setTargetRPMBackRight(rpm); });
 }
 
-void ForceWheelSimulatorRobotSingleton::applyWheelForceFrontRight(float force_in_newtons)
+void VelocityWheelSimulatorRobotSingleton::setTargetRPMFrontRight(float rpm)
 {
-    checkValidAndExecute<void>([force_in_newtons](auto robot) {
-        robot->applyWheelForceFrontRight(force_in_newtons);
-    });
+    checkValidAndExecute<void>([rpm](auto robot) { robot->setTargetRPMFrontRight(rpm); });
 }
