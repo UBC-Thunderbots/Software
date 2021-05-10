@@ -62,17 +62,6 @@ class SimulatorRobotSingleton
                                   FieldSide field_side);
 
     /**
-     * Creates a FirmwareRobot_t with functions bound to the static functions in this
-     * class. Only one FirmwareRobot_t needs to be created to control all robots, since
-     * calling setSimulatorRobot will simply change the implementations of the bound
-     * functions to act as if the new robot was being controlled.
-     *
-     * @return a FirmwareRobot_t that is bound to whatever SimulatorRobot this Singleton
-     * is controlling
-     */
-    static std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter> createFirmwareRobot();
-
-    /**
      * Starts a new primitive on the SimulatorRobot currently being controlled by this
      * class
      *
@@ -216,38 +205,12 @@ class SimulatorRobotSingleton
     static unsigned int getDribblerTemperatureDegC();
 
     /**
-     * Applies the given force to the wheel
-     *
-     * @param force_in_newtons the force to apply to the wheel
-     */
-    static void applyWheelForceFrontLeft(float force_in_newtons);
-    static void applyWheelForceBackLeft(float force_in_newtons);
-    static void applyWheelForceBackRight(float force_in_newtons);
-    static void applyWheelForceFrontRight(float force_in_newtons);
-
-    /**
      * Gets the motor speed for the wheel, in RPM
      */
     static float getMotorSpeedFrontLeft();
     static float getMotorSpeedBackLeft();
     static float getMotorSpeedBackRight();
     static float getMotorSpeedFrontRight();
-
-    /**
-     * Sets the motor to coast (spin freely)
-     */
-    static void coastMotorBackLeft();
-    static void coastMotorBackRight();
-    static void coastMotorFrontLeft();
-    static void coastMotorFrontRight();
-
-    /**
-     * Sets the motor to brake (act against the current direction of rotation)
-     */
-    static void brakeMotorBackLeft();
-    static void brakeMotorBackRight();
-    static void brakeMotorFrontLeft();
-    static void brakeMotorFrontRight();
 
     /**
      * Helper functions that check if the pointer to the simulator_robot is valid before

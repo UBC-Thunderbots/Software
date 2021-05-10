@@ -160,38 +160,12 @@ class SimulatorRobot
     virtual unsigned int getDribblerTemperatureDegC() = 0;
 
     /**
-     * Applies the given force to the wheel
-     *
-     * @param force_in_newtons the force to apply to the wheel
-     */
-    virtual void applyWheelForceFrontLeft(float force_in_newtons)  = 0;
-    virtual void applyWheelForceBackLeft(float force_in_newtons)   = 0;
-    virtual void applyWheelForceBackRight(float force_in_newtons)  = 0;
-    virtual void applyWheelForceFrontRight(float force_in_newtons) = 0;
-
-    /**
      * Gets the motor speed for the wheel, in RPM
      */
     virtual float getMotorSpeedFrontLeft()  = 0;
     virtual float getMotorSpeedBackLeft()   = 0;
     virtual float getMotorSpeedBackRight()  = 0;
     virtual float getMotorSpeedFrontRight() = 0;
-
-    /**
-     * Sets the motor to coast (spin freely)
-     */
-    virtual void coastMotorBackLeft()   = 0;
-    virtual void coastMotorBackRight()  = 0;
-    virtual void coastMotorFrontLeft()  = 0;
-    virtual void coastMotorFrontRight() = 0;
-
-    /**
-     * Sets the motor to brake (act against the current direction of rotation)
-     */
-    virtual void brakeMotorBackLeft()   = 0;
-    virtual void brakeMotorBackRight()  = 0;
-    virtual void brakeMotorFrontLeft()  = 0;
-    virtual void brakeMotorFrontRight() = 0;
 
     /**
      * Sets the current primitive this robot is running to a new one

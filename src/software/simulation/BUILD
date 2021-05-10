@@ -11,12 +11,20 @@ cc_library(
 )
 
 cc_library(
+    name = "force_wheel_simulator_robot",
+    hdrs = ["force_wheel_simulator_robot.h"],
+    deps = [
+        ":simulator_robot",
+    ],
+)
+
+cc_library(
     name = "physics_simulator_robot",
     srcs = ["physics_simulator_robot.cpp"],
     hdrs = ["physics_simulator_robot.h"],
     deps = [
         ":firmware_object_deleter",
-        ":simulator_robot",
+        ":force_wheel_simulator_robot",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
         "//software/geom/algorithms",
