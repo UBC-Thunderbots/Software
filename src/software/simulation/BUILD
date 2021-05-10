@@ -172,10 +172,10 @@ cc_library(
     hdrs = ["simulator.h"],
     deps = [
         ":firmware_object_deleter",
+        ":force_wheel_simulator_robot_singleton",
         ":physics_simulator_ball",
         ":physics_simulator_robot",
         ":simulator_ball_singleton",
-        ":simulator_robot_singleton",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
         "//shared/parameter:cpp_configs",
