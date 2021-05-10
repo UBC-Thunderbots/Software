@@ -301,11 +301,13 @@ void app_firmware_robot_trackVelocityInRobotFrame(const FirmwareRobot_t* robot,
  *
  * @param robot The robot to move at the given velocity
  * @param pos_trajectory The position trajectory to follow
+ * @param num_elements The number of elements in the position trajectory
  * @param trajectory_index The index to access the position trajectory params
  * @param max_speed_m_per_s The maximum speed of movement
  */
 void app_firmware_robot_followPosTrajectory(const FirmwareRobot_t* robot,
                                             PositionTrajectory_t pos_trajectory,
+                                            unsigned int num_elements,
                                             size_t trajectory_index,
                                             float max_speed_m_per_s);
 
