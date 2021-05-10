@@ -132,14 +132,14 @@ cc_library(
 )
 
 cc_test(
-    name = "simulator_robot_singleton_test",
-    srcs = ["simulator_robot_singleton_test.cpp"],
+    name = "force_wheel_simulator_robot_singleton_test",
+    srcs = ["force_wheel_simulator_robot_singleton_test.cpp"],
     deps = [
+        ":force_wheel_simulator_robot_singleton",
         ":physics_simulator_ball",
         ":physics_simulator_robot",
         ":simulator_ball",
         ":simulator_robot",
-        ":simulator_robot_singleton",
         "//firmware/app/logger",
         "//firmware/app/world:firmware_robot",
         "//shared/proto:tbots_cc_proto",
