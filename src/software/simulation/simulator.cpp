@@ -248,7 +248,7 @@ void Simulator::stepSimulation(const Duration& time_step)
 World Simulator::getWorld() const
 {
     Timestamp timestamp = physics_world.getTimestamp();
-    Ball ball = Ball(Point(0, 0), Vector(0, 0), timestamp);
+    Ball ball           = Ball(Point(0, 0), Vector(0, 0), timestamp);
     if (physics_world.getBallState())
     {
         ball = Ball(BallState(physics_world.getBallState().value()), timestamp);

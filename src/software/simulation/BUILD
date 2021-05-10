@@ -19,14 +19,6 @@ cc_library(
 )
 
 cc_library(
-    name = "velocity_wheel_simulator_robot",
-    hdrs = ["velocity_wheel_simulator_robot.h"],
-    deps = [
-        ":simulator_robot",
-    ],
-)
-
-cc_library(
     name = "physics_simulator_robot",
     srcs = ["physics_simulator_robot.cpp"],
     hdrs = ["physics_simulator_robot.h"],
@@ -117,17 +109,6 @@ cc_library(
         ":force_wheel_simulator_robot",
         ":simulator_robot_singleton",
         "//firmware/app/world:force_wheel",
-    ],
-)
-
-cc_library(
-    name = "velocity_wheel_simulator_robot_singleton",
-    srcs = ["velocity_wheel_simulator_robot_singleton.cpp"],
-    hdrs = ["velocity_wheel_simulator_robot_singleton.h"],
-    deps = [
-        ":simulator_robot_singleton",
-        ":velocity_wheel_simulator_robot",
-        "//firmware/app/world:velocity_wheel",
     ],
 )
 
