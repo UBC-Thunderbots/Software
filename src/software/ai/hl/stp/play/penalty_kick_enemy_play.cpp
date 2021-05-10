@@ -1,12 +1,11 @@
 #include "software/ai/hl/stp/play/penalty_kick_enemy_play.h"
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config)
+    : Play(config, true)
 {
 }
 
@@ -24,9 +23,6 @@ bool PenaltyKickEnemyPlay::invariantHolds(const World &world) const
 void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                           const World &world)
 {
-    auto goalie_tactic =
-        std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig());
-
     auto move_tactic_2 = std::make_shared<MoveTactic>(true);
     auto move_tactic_3 = std::make_shared<MoveTactic>(true);
     auto move_tactic_4 = std::make_shared<MoveTactic>(true);
@@ -52,7 +48,7 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
             world.field().enemyGoalCenter().toVector().orientation(), 0);
 
         // yield the Tactics this Play wants to run, in order of priority
-        yield({{goalie_tactic, move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,
+        yield({{move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,
                 move_tactic_6}});
     } while (true);
 }
