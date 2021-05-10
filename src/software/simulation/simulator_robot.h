@@ -168,6 +168,22 @@ class SimulatorRobot
     virtual float getMotorSpeedFrontRight() = 0;
 
     /**
+     * Sets the motor to coast (spin freely)
+     */
+    virtual void coastMotorBackLeft()   = 0;
+    virtual void coastMotorBackRight()  = 0;
+    virtual void coastMotorFrontLeft()  = 0;
+    virtual void coastMotorFrontRight() = 0;
+
+    /**
+     * Sets the motor to brake (act against the current direction of rotation)
+     */
+    virtual void brakeMotorBackLeft()   = 0;
+    virtual void brakeMotorBackRight()  = 0;
+    virtual void brakeMotorFrontLeft()  = 0;
+    virtual void brakeMotorFrontRight() = 0;
+
+    /**
      * Sets the current primitive this robot is running to a new one
      *
      * @param firmware_world The world to run the primitive in

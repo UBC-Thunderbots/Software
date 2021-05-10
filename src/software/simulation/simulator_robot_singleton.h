@@ -215,6 +215,22 @@ class SimulatorRobotSingleton
     static float getMotorSpeedFrontRight();
 
     /**
+     * Sets the motor to coast (spin freely)
+     */
+    static void coastMotorBackLeft();
+    static void coastMotorBackRight();
+    static void coastMotorFrontLeft();
+    static void coastMotorFrontRight();
+
+    /**
+     * Sets the motor to brake (act against the current direction of rotation)
+     */
+    static void brakeMotorBackLeft();
+    static void brakeMotorBackRight();
+    static void brakeMotorFrontLeft();
+    static void brakeMotorFrontRight();
+
+    /**
      * Helper functions that check if the pointer to the simulator_robot is valid before
      * calling the given function. If the simulator_robot is invalid, a warning is logged
      * and a default value is returned.

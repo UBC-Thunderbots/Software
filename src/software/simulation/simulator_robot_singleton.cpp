@@ -181,6 +181,46 @@ float SimulatorRobotSingleton::getMotorSpeedFrontRight()
         [](auto robot) { return robot->getMotorSpeedFrontRight(); });
 }
 
+void SimulatorRobotSingleton::coastMotorFrontLeft()
+{
+    checkValidAndExecute<void>([](auto robot) { robot->coastMotorFrontLeft(); });
+}
+
+void SimulatorRobotSingleton::coastMotorBackLeft()
+{
+    checkValidAndExecute<void>([](auto robot) { robot->coastMotorBackLeft(); });
+}
+
+void SimulatorRobotSingleton::coastMotorBackRight()
+{
+    checkValidAndExecute<void>([](auto robot) { robot->coastMotorBackRight(); });
+}
+
+void SimulatorRobotSingleton::coastMotorFrontRight()
+{
+    checkValidAndExecute<void>([](auto robot) { robot->coastMotorFrontRight(); });
+}
+
+void SimulatorRobotSingleton::brakeMotorFrontLeft()
+{
+    checkValidAndExecute<void>([](auto robot) { robot->brakeMotorFrontLeft(); });
+}
+
+void SimulatorRobotSingleton::brakeMotorBackLeft()
+{
+    checkValidAndExecute<void>([](auto robot) { robot->brakeMotorBackLeft(); });
+}
+
+void SimulatorRobotSingleton::brakeMotorBackRight()
+{
+    checkValidAndExecute<void>([](auto robot) { robot->brakeMotorBackRight(); });
+}
+
+void SimulatorRobotSingleton::brakeMotorFrontRight()
+{
+    checkValidAndExecute<void>([](auto robot) { robot->brakeMotorFrontRight(); });
+}
+
 void SimulatorRobotSingleton::handleRobotLogProto(TbotsProto_RobotLog log,
                                                   const std::string& team_colour)
 {
