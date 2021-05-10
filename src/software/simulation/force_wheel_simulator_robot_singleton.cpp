@@ -38,8 +38,6 @@ ForceWheelSimulatorRobotSingleton::createFirmwareRobot()
     // Charger does nothing in sim
     Charger_t* charger = app_charger_create([]() {}, []() {}, []() {});
 
-    // TODO: Make sure all objects de-allocated properly
-    // See issue https://github.com/UBC-Thunderbots/Software/issues/1128
     Chicker_t* chicker = app_chicker_create(&(SimulatorRobotSingleton::kick),
                                             &(SimulatorRobotSingleton::chip),
                                             &(SimulatorRobotSingleton::enableAutokick),

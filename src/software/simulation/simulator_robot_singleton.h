@@ -19,7 +19,6 @@ extern "C"
 }
 
 /**
- * TODO: update these comments
  * This class acts as a wrapper around a SimulatorRobot so that the SimulatorRobot
  * can provide the interface of a FirmwareRobot.
  *
