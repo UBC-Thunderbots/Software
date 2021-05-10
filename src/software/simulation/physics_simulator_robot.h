@@ -3,9 +3,9 @@
 #include <cinttypes>
 #include <memory>
 
+#include "software/simulation/force_wheel_simulator_robot.h"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/physics/physics_robot.h"
-#include "software/simulation/force_wheel_simulator_robot.h"
 
 /**
  * The PhysicsSimulatorRobot class acts as a wrapper for a PhysicsRobot that deals with

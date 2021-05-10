@@ -4,7 +4,9 @@
 
 class ForceWheelSimulatorRobot : public SimulatorRobot
 {
-    protected:
+    friend class ForceWheelSimulatorRobotSingleton;
+
+   protected:
     /**
      * Applies the given force to the wheel
      *

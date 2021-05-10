@@ -19,6 +19,7 @@ extern "C"
 }
 
 /**
+ * TODO: update these comments
  * This class acts as a wrapper around a SimulatorRobot so that the SimulatorRobot
  * can provide the interface of a FirmwareRobot.
  *
@@ -90,7 +91,7 @@ class SimulatorRobotSingleton
     static void handleBlueRobotLogProto(TbotsProto_RobotLog log);
     static void handleYellowRobotLogProto(TbotsProto_RobotLog log);
 
-   private:
+   protected:
     /**
      * Returns the x-position of the robot, in global field coordinates, in meters
      *

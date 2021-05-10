@@ -102,6 +102,16 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "force_wheel_simulator_robot_singleton",
+    srcs = ["force_wheel_simulator_robot_singleton.cpp"],
+    hdrs = ["force_wheel_simulator_robot_singleton.h"],
+    deps = [
+        ":force_wheel_simulator_robot",
+        ":simulator_robot_singleton",
+    ],
+)
+
 cc_test(
     name = "simulator_robot_singleton_test",
     srcs = ["simulator_robot_singleton_test.cpp"],
