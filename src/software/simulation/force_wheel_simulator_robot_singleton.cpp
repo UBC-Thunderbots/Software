@@ -1,23 +1,18 @@
 #include "software/simulation/force_wheel_simulator_robot_singleton.h"
 
 #include "shared/proto/robot_log_msg.pb.h"
-#include "software/logger/logger.h"
-#include "software/world/field.h"
 
 extern "C"
 {
 #include "firmware/app/logger/logger.h"
-#include "firmware/app/world/charger.h"
-#include "firmware/app/world/chicker.h"
-#include "firmware/app/world/dribbler.h"
 #include "firmware/app/world/force_wheel.h"
 }
 
-// TODO: The JERK_LIMIT is copied from firmware/main/control/control.h
+// TODO (#2066): The JERK_LIMIT is copied from firmware/main/control/control.h
 // which we currently can't include directly because it relies on firmware IO.
 // We should inject it as a robot or control param instead.
 #define JERK_LIMIT 40.0f  //(m/s^3)
-// TODO: The WHEEL_MOTOR_PHASE_RESISTANCE is copied from firmware/main/io/wheels.h
+// TODO (#2066): The WHEEL_MOTOR_PHASE_RESISTANCE is copied from firmware/main/io/wheels.h
 // which we currently can't include directly because it is in firmware IO.
 // We should inject it as a robot or control param instead.
 #define WHEEL_MOTOR_PHASE_RESISTANCE 1.2f  // ohms—EC45 datasheet
@@ -104,111 +99,70 @@ ForceWheelSimulatorRobotSingleton::createFirmwareRobot()
                                                                   FirmwareRobotDeleter());
 }
 
-void ForceWheelSimulatorRobotSingleton::checkValidAndExecuteVoid(
-    std::function<void(std::shared_ptr<ForceWheelSimulatorRobot>)> func)
-{
-    if (force_wheel_simulator_robot)
-    {
-        func(force_wheel_simulator_robot);
-    }
-    else
-    {
-        LOG(WARNING)
-            << "ForceWheelSimulatorRobotSingleton called without setting the ForceWheelSimulatorRobot first"
-            << std::endl;
-    }
-}
-
-float ForceWheelSimulatorRobotSingleton::checkValidAndReturnFloat(
-    std::function<float(std::shared_ptr<ForceWheelSimulatorRobot>)> func)
-{
-    if (force_wheel_simulator_robot)
-    {
-        return func(force_wheel_simulator_robot);
-    }
-    LOG(WARNING)
-        << "ForceWheelSimulatorRobotSingleton called without setting the ForceWheelSimulatorRobot first"
-        << std::endl;
-    return 0.0f;
-}
-
-unsigned int ForceWheelSimulatorRobotSingleton::checkValidAndReturnUint(
-    std::function<unsigned int(std::shared_ptr<ForceWheelSimulatorRobot>)> func)
-{
-    if (force_wheel_simulator_robot)
-    {
-        return func(force_wheel_simulator_robot);
-    }
-    LOG(WARNING)
-        << "ForceWheelSimulatorRobotSingleton called without setting the ForceWheelSimulatorRobot first"
-        << std::endl;
-    return 0;
-}
-
 void ForceWheelSimulatorRobotSingleton::applyWheelForceFrontLeft(float force_in_newtons)
 {
-    checkValidAndExecuteVoid([force_in_newtons](auto robot) {
+    checkValidAndExecute<void>([force_in_newtons](auto robot) {
         robot->applyWheelForceFrontLeft(force_in_newtons);
     });
 }
 
 void ForceWheelSimulatorRobotSingleton::applyWheelForceBackLeft(float force_in_newtons)
 {
-    checkValidAndExecuteVoid([force_in_newtons](auto robot) {
+    checkValidAndExecute<void>([force_in_newtons](auto robot) {
         robot->applyWheelForceBackLeft(force_in_newtons);
     });
 }
 
 void ForceWheelSimulatorRobotSingleton::applyWheelForceBackRight(float force_in_newtons)
 {
-    checkValidAndExecuteVoid([force_in_newtons](auto robot) {
+    checkValidAndExecute<void>([force_in_newtons](auto robot) {
         robot->applyWheelForceBackRight(force_in_newtons);
     });
 }
 
 void ForceWheelSimulatorRobotSingleton::applyWheelForceFrontRight(float force_in_newtons)
 {
-    checkValidAndExecuteVoid([force_in_newtons](auto robot) {
+    checkValidAndExecute<void>([force_in_newtons](auto robot) {
         robot->applyWheelForceFrontRight(force_in_newtons);
     });
 }
 
 void ForceWheelSimulatorRobotSingleton::coastMotorFrontLeft()
 {
-    checkValidAndExecuteVoid([](auto robot) { robot->coastMotorFrontLeft(); });
+    checkValidAndExecute<void>([](auto robot) { robot->coastMotorFrontLeft(); });
 }
 
 void ForceWheelSimulatorRobotSingleton::coastMotorBackLeft()
 {
-    checkValidAndExecuteVoid([](auto robot) { robot->coastMotorBackLeft(); });
+    checkValidAndExecute<void>([](auto robot) { robot->coastMotorBackLeft(); });
 }
 
 void ForceWheelSimulatorRobotSingleton::coastMotorBackRight()
 {
-    checkValidAndExecuteVoid([](auto robot) { robot->coastMotorBackRight(); });
+    checkValidAndExecute<void>([](auto robot) { robot->coastMotorBackRight(); });
 }
 
 void ForceWheelSimulatorRobotSingleton::coastMotorFrontRight()
 {
-    checkValidAndExecuteVoid([](auto robot) { robot->coastMotorFrontRight(); });
+    checkValidAndExecute<void>([](auto robot) { robot->coastMotorFrontRight(); });
 }
 
 void ForceWheelSimulatorRobotSingleton::brakeMotorFrontLeft()
 {
-    checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorFrontLeft(); });
+    checkValidAndExecute<void>([](auto robot) { robot->brakeMotorFrontLeft(); });
 }
 
 void ForceWheelSimulatorRobotSingleton::brakeMotorBackLeft()
 {
-    checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorBackLeft(); });
+    checkValidAndExecute<void>([](auto robot) { robot->brakeMotorBackLeft(); });
 }
 
 void ForceWheelSimulatorRobotSingleton::brakeMotorBackRight()
 {
-    checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorBackRight(); });
+    checkValidAndExecute<void>([](auto robot) { robot->brakeMotorBackRight(); });
 }
 
 void ForceWheelSimulatorRobotSingleton::brakeMotorFrontRight()
 {
-    checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorFrontRight(); });
+    checkValidAndExecute<void>([](auto robot) { robot->brakeMotorFrontRight(); });
 }

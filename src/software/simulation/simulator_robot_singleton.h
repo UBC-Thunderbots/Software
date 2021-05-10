@@ -4,8 +4,10 @@
 #include <functional>
 #include <optional>
 
+#include "software/logger/logger.h"
 #include "software/simulation/simulator_robot.h"
 #include "software/world/field.h"
+
 extern "C"
 {
 #include "firmware/app/world/chicker.h"
@@ -219,12 +221,19 @@ class SimulatorRobotSingleton
      *
      * @param func The function to perform on the simulator robot
      */
-    static void checkValidAndExecuteVoid(
-        std::function<void(std::shared_ptr<SimulatorRobot>)> func);
-    static float checkValidAndReturnFloat(
-        std::function<float(std::shared_ptr<SimulatorRobot>)> func);
-    static unsigned int checkValidAndReturnUint(
-        std::function<unsigned int(std::shared_ptr<SimulatorRobot>)> func);
+    template <class T>
+    static T checkValidAndExecute(std::function<T(std::shared_ptr<SimulatorRobot>)> func)
+    {
+        if (simulator_robot)
+        {
+            return func(simulator_robot);
+        }
+        LOG(WARNING)
+            << "ForceWheelSimulatorRobotSingleton called without setting the ForceWheelSimulatorRobot first"
+            << std::endl;
+        return static_cast<T>(0);
+    }
+
 
     /**
      * A helper function that will negate the given value if needed

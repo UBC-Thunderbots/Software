@@ -59,18 +59,25 @@ class ForceWheelSimulatorRobotSingleton : public SimulatorRobotSingleton
     static void brakeMotorFrontRight();
 
     /**
-     * Helper functions that check if the pointer to the simulator_robot is valid before
+     * Helper function that checks if the pointer to the simulator_robot is valid before
      * calling the given function. If the simulator_robot is invalid, a warning is logged
      * and a default value is returned.
      *
      * @param func The function to perform on the simulator robot
      */
-    static void checkValidAndExecuteVoid(
-        std::function<void(std::shared_ptr<ForceWheelSimulatorRobot>)> func);
-    static float checkValidAndReturnFloat(
-        std::function<float(std::shared_ptr<ForceWheelSimulatorRobot>)> func);
-    static unsigned int checkValidAndReturnUint(
-        std::function<unsigned int(std::shared_ptr<ForceWheelSimulatorRobot>)> func);
+    template <class T>
+    static T checkValidAndExecute(
+        std::function<T(std::shared_ptr<ForceWheelSimulatorRobot>)> func)
+    {
+        if (force_wheel_simulator_robot)
+        {
+            return func(force_wheel_simulator_robot);
+        }
+        LOG(WARNING)
+            << "ForceWheelSimulatorRobotSingleton called without setting the ForceWheelSimulatorRobot first"
+            << std::endl;
+        return static_cast<T>(0);
+    }
 
     // The simulator robot being controlled by this class
     static std::shared_ptr<ForceWheelSimulatorRobot> force_wheel_simulator_robot;
