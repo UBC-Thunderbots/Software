@@ -68,7 +68,14 @@ cc_library(
         ":charger",
         ":chicker",
         ":dribbler",
-        ":wheel",
+        ":force_wheel",
+        ":velocity_wheel",
+        "//firmware/app/control",
+        "//firmware/app/control:physbot",
+        "//firmware/app/control:trajectory_planner",
+        "//firmware/shared:physics",
+        "//firmware/shared:util",
+        "//shared/proto:tbots_nanopb_proto",
     ],
 )
 
@@ -78,8 +85,8 @@ cc_test(
     deps = [
         ":firmware_robot",
         "//firmware/app/logger",
+        "//shared/test_util",
         "//software/logger",
-        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -104,16 +111,27 @@ cc_test(
 )
 
 cc_library(
-    name = "wheel",
-    srcs = ["wheel.c"],
-    hdrs = ["wheel.h"],
+    name = "force_wheel",
+    srcs = ["force_wheel.c"],
+    hdrs = ["force_wheel.h"],
+)
+
+cc_library(
+    name = "velocity_wheel",
+    srcs = ["velocity_wheel.c"],
+    hdrs = ["velocity_wheel.h"],
 )
 
 cc_test(
-    name = "wheel_test",
-    srcs = ["wheel_test.cpp"],
+    name = "force_wheel_test",
+    srcs = ["force_wheel_test.cpp"],
     deps = [
-        ":wheel",
+        ":force_wheel",
         "@gtest//:gtest_main",
     ],
+)
+
+cc_library(
+    name = "firmware_robot_constants",
+    hdrs = ["firmware_robot_constants.h"],
 )

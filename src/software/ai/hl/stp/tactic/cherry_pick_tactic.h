@@ -1,7 +1,10 @@
 #pragma once
 
+#include <optional>
+#include <unordered_set>
+
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/passing/pass_generator.h"
+#include "software/ai/passing/pass.h"
 #include "software/geom/rectangle.h"
 #include "software/world/world.h"
 
@@ -16,11 +19,19 @@ class CherryPickTactic : public Tactic
    public:
     /**
      * Creates a new CherryPickTactic
+     *
+     * @param world The world to initialize the cherry picker with
+     * @param pass The pass to initialize the cherry picker with
      */
-    explicit CherryPickTactic(const World& world, const Rectangle& target_region);
+    explicit CherryPickTactic(const World& world, const Pass& pass);
 
-    CherryPickTactic() = delete;
-
+    /**
+     * Updates the control parameters for this CherryPickTactic.
+     *
+     * @param pass The pass to cherry pick near. The play should update
+     *             this cherry picker with the pass to move near.
+     */
+    void updateControlParams(const Pass& pass);
     void updateWorldParams(const World& world) override;
 
     /**
@@ -35,22 +46,14 @@ class CherryPickTactic : public Tactic
     double calculateRobotCost(const Robot& robot, const World& world) const override;
 
     void accept(TacticVisitor& visitor) const override;
-    /**
-     *
-     * @return
-     */
-    World getWorld() const;
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
 
-    // The pass optimizer being used to figure out the best position for the robot
-    PassGenerator pass_generator;
-
     // Tactic parameters
     // The current state of the world
-    World world;
+    World world_;
 
-    // The region in which we want to position the cherry picking robot
-    Rectangle target_region;
+    // The pass to go to.
+    Pass pass_;
 };

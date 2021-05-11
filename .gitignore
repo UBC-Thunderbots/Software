@@ -57,6 +57,7 @@ src/external/external
 
 # Misc. Log Files
 *.log
+*.csv
 
 ### Node ###
 
@@ -141,3 +142,6 @@ src/core*
 # SSL GameController
 src/config
 *.stream
+
+# ipynb Jupyter Notebooks
+*.ipynb

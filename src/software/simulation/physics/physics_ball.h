@@ -4,9 +4,9 @@
 
 #include <optional>
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/time/duration.h"
 #include "software/world/ball_state.h"
 
@@ -29,8 +29,7 @@ class PhysicsBall
      */
     explicit PhysicsBall(std::shared_ptr<b2World> world, const BallState& ball_state,
                          const double mass_kg,
-                         std::shared_ptr<const SimulatorConfig> simulator_config =
-                             DynamicParameters->getSimulatorConfig());
+                         std::shared_ptr<const SimulatorConfig> simulator_config);
     PhysicsBall() = delete;
 
     // Delete the copy and assignment operators because copying this class causes

@@ -30,7 +30,8 @@ Simulator::Simulator(const Field& field,
 void Simulator::setBallState(const BallState& ball_state)
 {
     physics_world.setBallState(ball_state);
-    simulator_ball = std::make_shared<SimulatorBall>(physics_world.getPhysicsBall());
+    simulator_ball =
+        std::make_shared<PhysicsSimulatorBall>(physics_world.getPhysicsBall());
 
     for (auto& robot_pair : yellow_simulator_robots)
     {
@@ -65,13 +66,13 @@ void Simulator::addBlueRobots(const std::vector<RobotStateWithId>& robots)
 
 void Simulator::updateSimulatorRobots(
     const std::vector<std::weak_ptr<PhysicsRobot>>& physics_robots,
-    std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
+    std::map<std::shared_ptr<PhysicsSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
         simulator_robots,
     TeamColour team_colour)
 {
     for (const auto& physics_robot : physics_robots)
     {
-        auto simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
+        auto simulator_robot = std::make_shared<PhysicsSimulatorRobot>(physics_robot);
 
         // we initialize the logger with the appropriate logging function based
         // on the team color and the robot id to propagate any logs when creating
@@ -135,9 +136,9 @@ void Simulator::setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitiv
 
 void Simulator::setRobotPrimitive(
     RobotId id, const TbotsProto_Primitive& primitive_msg,
-    std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
+    std::map<std::shared_ptr<PhysicsSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
         simulator_robots,
-    const std::shared_ptr<SimulatorBall>& simulator_ball, FieldSide defending_side)
+    const std::shared_ptr<PhysicsSimulatorBall>& simulator_ball, FieldSide defending_side)
 {
     SimulatorBallSingleton::setSimulatorBall(simulator_ball, defending_side);
     auto simulator_robots_iter =

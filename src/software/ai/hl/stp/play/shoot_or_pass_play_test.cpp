@@ -20,7 +20,7 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
         Point(-4.5, 3.0),
         Point(-2, 1.5),
         Point(-2, 0.5),
-        Point(-2, -0.5),
+        Point(-2, -1.7),
         Point(-2, -1.5),
     }));
     setFriendlyGoalie(0);
@@ -36,11 +36,11 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
         // This will keep the test running for 9.5 seconds to give everything enough
         // time to settle into position and be observed with the Visualizer
         // TODO: Implement proper validation
-        // https://github.com/UBC-Thunderbots/Software/issues/1396
+        // https://github.com/UBC-Thunderbots/Software/issues/1971
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
             {
-                yield();
+                yield("Timestamp not at 9.5s");
             }
         }};
 

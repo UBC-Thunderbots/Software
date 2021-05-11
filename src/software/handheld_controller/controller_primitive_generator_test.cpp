@@ -4,10 +4,21 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/proto/primitive/primitive_msg_factory.h"
 
-TEST(ControllerPrimitiveGeneratorTest, test_create_direct_velocity)
+class ControllerPrimitiveGeneratorTest : public testing::Test
+{
+   protected:
+    virtual void SetUp(void)
+    {
+        handheld_controller_config = std::make_shared<const HandheldControllerConfig>();
+    }
+
+    std::shared_ptr<const HandheldControllerConfig> handheld_controller_config;
+};
+
+TEST_F(ControllerPrimitiveGeneratorTest, test_create_direct_velocity)
 {
     auto direct_velocity_primitive =
         ControllerPrimitiveGenerator::createDirectControlPrimitive(
@@ -33,7 +44,7 @@ TEST(ControllerPrimitiveGeneratorTest, test_create_direct_velocity)
 }
 
 
-TEST(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input)
+TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input)
 {
     // Tests if controller_primitive_generator returns a kick primitive if the
     // kick button is set to pressed
@@ -43,18 +54,22 @@ TEST(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input)
 
     auto actual_primitive =
         *ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
-            input, DynamicParameters->getHandheldControllerConfig());
+            input, handheld_controller_config);
 
-    double kick_speed = DynamicParameters->getHandheldControllerConfig()
-                            ->KickSpeedMetersPerSecond()
-                            ->value();
+    double kick_speed =
+        handheld_controller_config->getKickSpeedMetersPerSecond()->value();
     auto expected_kick_primitive =
-        *createKickPrimitive(Point(), Angle::zero(), kick_speed);
+        *createMovePrimitive(Point(), 0, Angle::zero(), DribblerMode::OFF,
+                             AutoChipOrKick{
+                                 AutoChipOrKickMode::AUTOKICK,
+                                 kick_speed,
+                             },
+                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_kick_primitive, actual_primitive));
 }
 
-TEST(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input1)
+TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input1)
 {
     // Tests if controller_primitive_generator returns a chip primitive if the
     // chip button is set to pressed
@@ -64,18 +79,22 @@ TEST(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input1)
 
     auto actual_primitive =
         *ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
-            input, DynamicParameters->getHandheldControllerConfig());
+            input, handheld_controller_config);
 
-    double chip_distance =
-        DynamicParameters->getHandheldControllerConfig()->ChipDistanceMeters()->value();
+    double chip_distance = handheld_controller_config->getChipDistanceMeters()->value();
     auto expected_chip_primitive =
-        *createChipPrimitive(Point(0, 0), Angle::zero(), chip_distance);
+        *createMovePrimitive(Point(), 0, Angle::zero(), DribblerMode::OFF,
+                             AutoChipOrKick{
+                                 AutoChipOrKickMode::AUTOCHIP,
+                                 chip_distance,
+                             },
+                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_chip_primitive, actual_primitive));
 }
 
 
-TEST(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input2)
+TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input2)
 {
     // Tests if controller_primitive_generator returns a correct direct velocity
     // primitive after the x/y/angular speed were set
@@ -88,21 +107,18 @@ TEST(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input2)
 
     auto actual_primitive =
         *ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
-            input, DynamicParameters->getHandheldControllerConfig());
+            input, handheld_controller_config);
 
     unsigned int dribbler_rpm =
         input.isDribblerButtonPressed()
-            ? DynamicParameters->getHandheldControllerConfig()->DribblerRpm()->value()
+            ? handheld_controller_config->getDribblerRpm()->value()
             : 0;
-    double x_velocity =
-        input.getLinearMotionX() *
-        DynamicParameters->getHandheldControllerConfig()->MaxLinearSpeed()->value();
-    double y_velocity =
-        input.getLinearMotionY() *
-        DynamicParameters->getHandheldControllerConfig()->MaxLinearSpeed()->value();
-    double angular_velocity =
-        input.getAngularMotion() *
-        DynamicParameters->getHandheldControllerConfig()->MaxAngularSpeed()->value();
+    double x_velocity = input.getLinearMotionX() *
+                        handheld_controller_config->getMaxLinearSpeed()->value();
+    double y_velocity = input.getLinearMotionY() *
+                        handheld_controller_config->getMaxLinearSpeed()->value();
+    double angular_velocity = input.getAngularMotion() *
+                              handheld_controller_config->getMaxAngularSpeed()->value();
     auto expected_direct_velocity_primitive =
         *ControllerPrimitiveGenerator::createDirectControlPrimitive(
             Vector(x_velocity, y_velocity),

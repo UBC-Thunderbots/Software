@@ -25,23 +25,10 @@ TbotsProto::Primitive NavigatingPrimitiveCreator::createNavigatingPrimitive(
 
 void NavigatingPrimitiveCreator::visit(const MoveIntent &intent)
 {
-    current_primitive =
-        *createMovePrimitive(new_destination, new_final_speed, intent.getFinalAngle(),
-                             intent.getDribblerMode());
-}
-
-void NavigatingPrimitiveCreator::visit(const AutochipMoveIntent &intent)
-{
-    current_primitive = *createAutochipMovePrimitive(
+    current_primitive = *createMovePrimitive(
         new_destination, new_final_speed, intent.getFinalAngle(),
-        intent.getDribblerMode(), intent.getChipDistance());
-}
-
-void NavigatingPrimitiveCreator::visit(const AutokickMoveIntent &intent)
-{
-    current_primitive = *createAutokickMovePrimitive(
-        new_destination, new_final_speed, intent.getFinalAngle(),
-        intent.getDribblerMode(), intent.getKickSpeed());
+        intent.getDribblerMode(), intent.getAutoChipOrKick(),
+        intent.getMaxAllowedSpeedMode(), intent.getTargetSpinRevPerS());
 }
 
 std::pair<Point, double> NavigatingPrimitiveCreator::calculateDestinationAndFinalSpeed(
@@ -61,8 +48,8 @@ std::pair<Point, double> NavigatingPrimitiveCreator::calculateDestinationAndFina
     else
     {
         // we are going to some intermediate point so we transition smoothly
-        double transition_final_speed =
-            ROBOT_MAX_SPEED_METERS_PER_SECOND * config->TransitionSpeedFactor()->value();
+        double transition_final_speed = ROBOT_MAX_SPEED_METERS_PER_SECOND *
+                                        config->getTransitionSpeedFactor()->value();
 
         desired_final_speed = calculateTransitionSpeedBetweenSegments(
             path_points[0], path_points[1], path_points[2], transition_final_speed);
@@ -80,7 +67,7 @@ std::pair<Point, double> NavigatingPrimitiveCreator::calculateDestinationAndFina
 double NavigatingPrimitiveCreator::getEnemyObstacleProximityFactor(
     const Point &p, const std::vector<ObstaclePtr> &enemy_robot_obstacles) const
 {
-    double robot_proximity_limit = config->EnemyRobotProximityLimit()->value();
+    double robot_proximity_limit = config->getEnemyRobotProximityLimit()->value();
 
     // find min dist between p and any robot
     double closest_dist = std::numeric_limits<double>::max();

@@ -22,7 +22,7 @@ Controller::~Controller()
 
 void Controller::eventLoop()
 {
-    std::string device_path        = controller_input_config->DevicePath()->value();
+    std::string device_path        = controller_input_config->getDevicePath()->value();
     int controller_file_descriptor = open(device_path.c_str(), O_RDONLY);
     if (controller_file_descriptor == -1)
     {

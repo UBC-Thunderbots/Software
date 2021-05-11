@@ -490,25 +490,25 @@ static void run_normal(void)
 
     // Setup the world that acts as the interface for the higher level firmware
     // (like primitives or the controller) to interface with the outside world
-    WheelConstants_t wheel_constants = {
+    ForceWheelConstants_t wheel_constants = {
         .wheel_rotations_per_motor_rotation  = GEAR_RATIO,
         .wheel_radius                        = WHEEL_RADIUS,
         .motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT,
         .motor_back_emf_per_rpm              = RPM_TO_VOLT,
         .motor_phase_resistance              = WHEEL_MOTOR_PHASE_RESISTANCE,
         .motor_current_per_unit_torque       = CURRENT_PER_TORQUE};
-    Wheel_t* front_right_wheel = app_wheel_create(
+    ForceWheel_t* front_right_wheel = app_force_wheel_create(
         apply_wheel_force_front_right, wheels_get_front_right_rpm,
         wheels_brake_front_right, wheels_coast_front_right, wheel_constants);
-    Wheel_t* front_left_wheel = app_wheel_create(
+    ForceWheel_t* front_left_wheel = app_force_wheel_create(
         apply_wheel_force_front_left, wheels_get_front_left_rpm, wheels_brake_front_left,
         wheels_coast_front_left, wheel_constants);
-    Wheel_t* back_right_wheel = app_wheel_create(
+    ForceWheel_t* back_right_wheel = app_force_wheel_create(
         apply_wheel_force_back_right, wheels_get_back_right_rpm, wheels_brake_back_right,
         wheels_coast_back_right, wheel_constants);
-    Wheel_t* back_left_wheel =
-        app_wheel_create(apply_wheel_force_back_left, wheels_get_back_left_rpm,
-                         wheels_brake_back_left, wheels_coast_back_left, wheel_constants);
+    ForceWheel_t* back_left_wheel = app_force_wheel_create(
+        apply_wheel_force_back_left, wheels_get_back_left_rpm, wheels_brake_back_left,
+        wheels_coast_back_left, wheel_constants);
     Charger_t* charger =
         app_charger_create(charger_charge, charger_discharge, charger_float);
     Chicker_t* chicker = app_chicker_create(
@@ -527,7 +527,7 @@ static void run_normal(void)
         .last_applied_acceleration_y       = 0,
         .last_applied_acceleration_angular = 0,
     };
-    FirmwareRobot_t* robot = app_firmware_robot_create(
+    FirmwareRobot_t* robot = app_firmware_robot_force_wheels_create(
         charger, chicker, dribbler, dr_get_robot_position_x, dr_get_robot_position_y,
         dr_get_robot_orientation, dr_get_robot_velocity_x, dr_get_robot_velocity_y,
         dr_get_robot_angular_velocity, adc_battery, front_right_wheel, front_left_wheel,
@@ -620,13 +620,10 @@ static void run_normal(void)
     app_primitive_manager_destroy(primitive_manager);
     app_firmware_world_destroy(world);
     app_firmware_ball_destroy(ball);
+    app_firmware_robot_force_wheels_destroy(robot);
     app_firmware_robot_destroy(robot);
     app_dribbler_destroy(dribbler);
     app_chicker_destroy(chicker);
-    app_wheel_destroy(back_left_wheel);
-    app_wheel_destroy(back_right_wheel);
-    app_wheel_destroy(front_left_wheel);
-    app_wheel_destroy(front_right_wheel);
 
     // Kick the hardware watchdog to avoid timeouts. Chicker shutdown sometimes
     // takes up to three seconds, particularly if the board is not plugged in,

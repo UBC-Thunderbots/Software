@@ -2,7 +2,6 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/action/autokick_move_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/algorithms/closest_point.h"
@@ -44,14 +43,13 @@ double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world
 
 void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 {
-    auto move_action          = std::make_shared<MoveAction>(true);
-    auto autokick_move_action = std::make_shared<AutokickMoveAction>(true);
+    auto move_action = std::make_shared<MoveAction>(true);
 
     // Setup for the pass. We want to use any free time before the pass starts putting
     // ourselves in the best position possible to take the pass
     // We wait for the ball to start moving at least a bit to make sure the passer
     // has actually started the pass
-    while (ball.timestamp() < pass.startTime() || ball.velocity().length() < 0.5)
+    while (ball.velocity().length() < 0.5)
     {
         // If there is a feasible shot we can take, we want to wait for the pass at the
         // halfway point between the angle required to receive the ball and the angle
@@ -102,10 +100,11 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
             Angle ideal_orientation = shot.getOpenAngle();
 
             // Kicking at less than ball max speed to make sure we don't break rules
-            autokick_move_action->updateControlParams(
+            move_action->updateControlParams(
                 *robot_, ideal_position, ideal_orientation, 0, DribblerMode::OFF,
-                BALL_MAX_SPEED_METERS_PER_SECOND - 1, BallCollisionType::ALLOW);
-            yield(autokick_move_action);
+                BallCollisionType::ALLOW,
+                {AutoChipOrKickMode::AUTOKICK, BALL_MAX_SPEED_METERS_PER_SECOND - 1});
+            yield(move_action);
 
             // Calculations to check for termination conditions
             ball_to_robot_vector = robot_->position() - ball.position();
@@ -242,24 +241,4 @@ Shot ReceiverTactic::getOneTimeShotPositionAndOrientation(const Robot& robot,
 void ReceiverTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
-}
-
-Ball ReceiverTactic::getBall() const
-{
-    return this->ball;
-}
-
-Field ReceiverTactic::getField() const
-{
-    return this->field;
-}
-
-Team ReceiverTactic::getEnemyTeam() const
-{
-    return this->enemy_team;
-}
-
-Team ReceiverTactic::getFriendlyTeam() const
-{
-    return this->friendly_team;
 }

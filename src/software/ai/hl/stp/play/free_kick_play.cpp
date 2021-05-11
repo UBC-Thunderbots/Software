@@ -3,16 +3,21 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/play/corner_kick_play.h"
-#include "software/ai/hl/stp/tactic/chip_tactic.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
-#include "software/ai/hl/stp/tactic/passer_tactic.h"
+#include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
+#include "software/ai/hl/stp/tactic/passer/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/ball.h"
 
-FreeKickPlay::FreeKickPlay() : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3)) {}
+FreeKickPlay::FreeKickPlay(std::shared_ptr<const PlayConfig> config)
+    : Play(config), MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
+{
+}
 
 bool FreeKickPlay::isApplicable(const World &world) const
 {
@@ -43,26 +48,23 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
      */
 
     // Setup the goalie
-    auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+    auto goalie_tactic =
+        std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig());
 
     // Setup crease defenders to help the goalie
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                               world.friendlyTeam(), world.enemyTeam(),
-                                               CreaseDefenderTactic::LeftOrRight::LEFT),
-        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                               world.friendlyTeam(), world.enemyTeam(),
-                                               CreaseDefenderTactic::LeftOrRight::RIGHT),
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
     };
 
-    Angle min_open_angle_for_shot = Angle::fromDegrees(DynamicParameters->getAIConfig()
-                                                           ->getShootOrPassPlayConfig()
-                                                           ->MinOpenAngleForShotDeg()
-                                                           ->value());
-    auto shoot_tactic             = std::make_shared<ShootGoalTactic>(
+    Angle min_open_angle_for_shot = Angle::fromDegrees(
+        play_config->getShootOrPassPlayConfig()->getMinOpenAngleForShotDeg()->value());
+    auto shoot_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        min_open_angle_for_shot, std::nullopt, false);
+        min_open_angle_for_shot, std::nullopt, false,
+        play_config->getShootGoalTacticConfig());
 
     PassWithRating best_pass_and_score_so_far = shootOrFindPassStage(
         yield, shoot_tactic, crease_defender_tactics, goalie_tactic, world);
@@ -101,18 +103,12 @@ void FreeKickPlay::updateAlignToBallTactic(
         ball_to_center_vec.orientation(), 0);
 }
 
-void FreeKickPlay::updatePassGenerator(PassGenerator &pass_generator, const World &world)
-{
-    pass_generator.setWorld(world);
-    pass_generator.setPasserPoint(world.ball().position());
-}
-
 void FreeKickPlay::chipAtGoalStage(
     TacticCoroutine::push_type &yield,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     std::shared_ptr<GoalieTactic> goalie_tactic, const World &world)
 {
-    auto chip_tactic = std::make_shared<ChipTactic>(world.ball(), false);
+    auto chip_tactic = std::make_shared<ChipTactic>(false);
 
     // Figure out where the fallback chip target is
     // This is exerimentally determined to be a reasonable value
@@ -123,9 +119,14 @@ void FreeKickPlay::chipAtGoalStage(
     do
     {
         chip_tactic->updateControlParams(world.ball().position(), chip_target);
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
 
-        yield({goalie_tactic, chip_tactic, std::get<0>(crease_defender_tactics),
-               std::get<1>(crease_defender_tactics)});
+        yield({{goalie_tactic, chip_tactic, std::get<0>(crease_defender_tactics),
+                std::get<1>(crease_defender_tactics)}});
 
     } while (!chip_tactic->done());
 }
@@ -143,8 +144,7 @@ void FreeKickPlay::performPassStage(
     LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.rating;
 
     // Perform the pass and wait until the receiver is finished
-    auto passer =
-        std::make_shared<PasserTactic>(pass, world.ball(), world.field(), false);
+    auto passer = std::make_shared<PasserTactic>(pass);
     auto receiver =
         std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(),
                                          world.enemyTeam(), pass, world.ball(), false);
@@ -153,8 +153,13 @@ void FreeKickPlay::performPassStage(
         passer->updateControlParams(pass);
         receiver->updateControlParams(pass);
 
-        yield({goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
-               std::get<1>(crease_defender_tactics)});
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
+        yield({{goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
+                std::get<1>(crease_defender_tactics)}});
     } while (!receiver->done());
 }
 
@@ -163,53 +168,57 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     std::shared_ptr<GoalieTactic> goalie_tactic, const World &world)
 {
-    // If the passing is coming from the friendly end, we split the cherry-pickers
-    // across the x-axis in the enemy half
-    Rectangle cherry_pick_1_target_region = world.field().enemyPositiveYQuadrant();
-    Rectangle cherry_pick_2_target_region = world.field().enemyNegativeYQuadrant();
+    auto pitch_division =
+        std::make_shared<const EighteenZonePitchDivision>(world.field());
 
-    // Otherwise, the pass is coming from the enemy end, put the two cherry-pickers
-    // on the opposite side of the x-axis to wherever the pass is coming from
-    if (world.ball().position().x() > -1)
-    {
-        double cherry_pick_region_y_length =
-            -std::copysign(world.field().yLength() / 2, world.ball().position().y());
-        cherry_pick_1_target_region = Rectangle(
-            Point(0, 0), Point(world.field().xLength() / 4, cherry_pick_region_y_length));
-        cherry_pick_2_target_region =
-            Rectangle(Point(world.field().xLength() / 4, 0),
-                      Point(world.field().xLength() / 2, cherry_pick_region_y_length));
-    }
+    PassGenerator<EighteenZoneId> pass_generator(pitch_division,
+                                                 play_config->getPassingConfig());
+
+    using Zones = std::unordered_set<EighteenZoneId>;
+
+    auto pass_eval = pass_generator.generatePassEvaluation(world);
+    PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
+
+    auto ranked_zones = pass_eval.rankZonesForReceiving(
+        world, best_pass_and_score_so_far.pass.receiverPoint());
+    Zones cherry_pick_region_1 = {ranked_zones[0]};
+    Zones cherry_pick_region_2 = {ranked_zones[1]};
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    auto cherry_pick_tactic_1 =
-        std::make_shared<CherryPickTactic>(world, cherry_pick_1_target_region);
-    auto cherry_pick_tactic_2 =
-        std::make_shared<CherryPickTactic>(world, cherry_pick_2_target_region);
+    auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(
+        world, pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+    auto cherry_pick_tactic_2 = std::make_shared<CherryPickTactic>(
+        world, pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
-
-    PassGenerator pass_generator(world, world.ball().position(),
-                                 PassType::RECEIVE_AND_DRIBBLE);
-    pass_generator.setTargetRegion(world.field().enemyHalf());
 
     // Wait for a robot to be assigned to aligned to the ball to pass
     while (!align_to_ball_tactic->getAssignedRobot())
     {
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
-        updateAlignToBallTactic(align_to_ball_tactic, world);
-        updatePassGenerator(pass_generator, world);
 
-        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
-               cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
-               std::get<1>(crease_defender_tactics)});
+        auto pass_eval = pass_generator.generatePassEvaluation(world);
+
+        cherry_pick_tactic_1->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+        cherry_pick_tactic_2->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
+
+        yield({{goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
+                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
+                std::get<1>(crease_defender_tactics)}});
     }
 
 
     // Set the passer on the pass generator
-    pass_generator.setPasserRobotId(align_to_ball_tactic->getAssignedRobot()->id());
     LOG(DEBUG) << "Aligning with robot " << align_to_ball_tactic->getAssignedRobot()->id()
                << "as the passer";
 
@@ -218,16 +227,28 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic, world);
-        updatePassGenerator(pass_generator, world);
 
-        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
-               cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
-               std::get<1>(crease_defender_tactics)});
+        auto pass_eval = pass_generator.generatePassEvaluation(world);
+
+        cherry_pick_tactic_1->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+        cherry_pick_tactic_2->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
+        yield({{goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
+                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
+                std::get<1>(crease_defender_tactics)}});
     } while (!align_to_ball_tactic->done());
 
     LOG(DEBUG) << "Finished aligning to ball";
 
-    PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
+    best_pass_and_score_so_far =
+        pass_generator.generatePassEvaluation(world).getBestPassOnField();
     // Align the kicker to pass and wait for a good pass
     // To get the best pass possible we start by aiming for a perfect one and then
     // decrease the minimum score over time
@@ -236,13 +257,25 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic, world);
-        updatePassGenerator(pass_generator, world);
 
-        yield({goalie_tactic, align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1,
-               cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
-               std::get<1>(crease_defender_tactics)});
+        auto pass_eval = pass_generator.generatePassEvaluation(world);
 
-        best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
+        cherry_pick_tactic_1->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+        cherry_pick_tactic_2->updateControlParams(
+            pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
+        yield({{goalie_tactic, align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1,
+                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
+                std::get<1>(crease_defender_tactics)}});
+
+        best_pass_and_score_so_far =
+            pass_generator.generatePassEvaluation(world).getBestPassOnField();
         LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
 
@@ -257,4 +290,4 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, FreeKickPlay> factory;
+static TGenericFactory<std::string, Play, FreeKickPlay, PlayConfig> factory;

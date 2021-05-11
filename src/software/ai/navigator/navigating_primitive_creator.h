@@ -1,11 +1,11 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "shared/proto/primitive.pb.h"
 #include "software/ai/intent/all_intents.h"
 #include "software/ai/intent/navigating_intent.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/navigator/path_planner/path_planner.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/world/world.h"
 
 /**
@@ -43,8 +43,6 @@ class NavigatingPrimitiveCreator : public NavigatingIntentVisitor
      * @param The NavigatingIntent to convert
      */
     void visit(const MoveIntent &intent) override;
-    void visit(const AutochipMoveIntent &intent) override;
-    void visit(const AutokickMoveIntent &intent) override;
 
     /**
      * Calculates the transition speed for the robot between two line segments

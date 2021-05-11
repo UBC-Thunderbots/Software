@@ -72,68 +72,7 @@ cc_test(
     srcs = ["move_intent_test.cpp"],
     deps = [
         ":move_intent",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "autochip_move_intent",
-    srcs = ["autochip_move_intent.cpp"],
-    hdrs = ["autochip_move_intent.h"],
-    deps = [
-        ":move_intent",
-        "//software/geom:angle",
-        "//software/geom:point",
-        "//software/util/make_enum",
-    ],
-)
-
-cc_test(
-    name = "autochip_move_intent_test",
-    srcs = ["autochip_move_intent_test.cpp"],
-    deps = [
-        ":autochip_move_intent",
         "//software/util/typename",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "autokick_move_intent",
-    srcs = ["autokick_move_intent.cpp"],
-    hdrs = ["autokick_move_intent.h"],
-    deps = [
-        ":move_intent",
-        "//software/geom:angle",
-        "//software/geom:point",
-        "//software/util/make_enum",
-    ],
-)
-
-cc_test(
-    name = "autokick_move_intent_test",
-    srcs = ["autokick_move_intent_test.cpp"],
-    deps = [
-        ":autokick_move_intent",
-        "//software/util/typename",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "spinning_move_intent",
-    srcs = ["spinning_move_intent.cpp"],
-    hdrs = ["spinning_move_intent.h"],
-    deps = [
-        ":direct_primitive_intent",
-    ],
-)
-
-cc_test(
-    name = "spinning_move_intent_test",
-    srcs = ["spinning_move_intent_test.cpp"],
-    deps = [
-        ":spinning_move_intent",
         "@gtest//:gtest_main",
     ],
 )
@@ -160,14 +99,11 @@ cc_library(
     name = "all_intents",
     hdrs = ["all_intents.h"],
     deps = [
-        ":autochip_move_intent",
-        ":autokick_move_intent",
         ":chip_intent",
         ":direct_primitive_intent",
         ":kick_intent",
         ":move_intent",
         ":navigating_intent",
-        ":spinning_move_intent",
         ":stop_intent",
     ],
 )
