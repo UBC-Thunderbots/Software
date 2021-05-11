@@ -25,10 +25,8 @@ TEST_P(SimulatedReceiverTacticTest, receiver_test)
     RobotStateWithId robot_state = std::get<1>(GetParam());
     BallState ball_state         = std::get<2>(GetParam());
 
-    setBallState(ball_state);
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)}));
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({Point(4.5, 0)}));
-    addFriendlyRobots({robot_state});
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
+    friendly_robots.emplace_back(robot_state);
 
     auto tactic = std::make_shared<ReceiverTactic>(pass);
     tactic->updateControlParams(pass);
@@ -38,22 +36,25 @@ TEST_P(SimulatedReceiverTacticTest, receiver_test)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [pass, tactic](std::shared_ptr<World> world_ptr,
                        ValidationCoroutine::push_type& yield) {
-            ballKicked(pass.passerOrientation(), world_ptr, yield);
+            // We check if the robot reaches the desired orientation, at the
+            // desired position before checking if the ball has been kicked.
+            //
+            // The tactic should "done" after kicking the ball.
             robotAtOrientation(1, world_ptr, pass.passerOrientation(),
                                Angle::fromDegrees(5), yield);
+            robotAtPosition(1, world_ptr, pass.passerPoint(), 0.1, yield);
+            ballKicked(pass.passerOrientation(), world_ptr, yield);
+
             while (!tactic->done())
             {
                 yield("Passer tactic kicked ball but is not done");
             }
-            robotAtOrientation(1, world_ptr, pass.passerOrientation(),
-                               Angle::fromDegrees(5), yield);
-            robotAtPosition(1, world_ptr, pass.passerPoint(), 0.1, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(5));
+    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(5));
 }
 
 INSTANTIATE_TEST_CASE_P(

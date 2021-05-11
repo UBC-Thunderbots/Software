@@ -214,9 +214,11 @@ struct ReceiverFSM
             // src_state + event [guard] / action = dest_state
             *undecided_s + update_e[onetouch_possible] / update_onetouch = onetouch_s,
             undecided_s + update_e[!onetouch_possible] / update_receive  = receive_s,
-            receive_s + update_e[!pass_finished] / update_receive        = receive_s,
-            onetouch_s + update_e[!pass_finished] / update_onetouch      = onetouch_s,
-            receive_s + update_e[pass_started && pass_finished] / update_receive         = X,
-            onetouch_s + update_e[pass_started && pass_finished] / update_onetouch       = X);
+            receive_s + update_e[pass_started && !pass_finished] / update_receive =
+                receive_s,
+            onetouch_s + update_e[pass_started && !pass_finished] / update_onetouch =
+                onetouch_s,
+            receive_s + update_e[pass_started && pass_finished] / update_receive   = X,
+            onetouch_s + update_e[pass_started && pass_finished] / update_onetouch = X);
     }
 };

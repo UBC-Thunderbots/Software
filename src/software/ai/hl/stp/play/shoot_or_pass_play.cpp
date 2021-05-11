@@ -7,7 +7,7 @@
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer/passer_tactic.h"
-#include "software/ai/hl/stp/tactic/receiver_tactic.h"
+#include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.h"
@@ -90,9 +90,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         // Perform the pass and wait until the receiver is finished
         auto passer   = std::make_shared<PasserTactic>(pass);
-        auto receiver = std::make_shared<ReceiverTactic>(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), pass, world.ball(),
-            false);
+        auto receiver = std::make_shared<ReceiverTactic>(pass);
 
         auto pass_eval = pass_generator.generatePassEvaluation(world);
 
