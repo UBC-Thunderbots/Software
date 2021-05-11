@@ -14,8 +14,8 @@ Pass createPassFromDict(py::dict pass_dict)
 pybind11::dict convertPassToDict(const Pass& pass)
 {
     pybind11::dict result;
-    result["passer_point"] = pass.passerPoint();
+    result["passer_point"]   = pass.passerPoint();
     result["receiver_point"] = pass.receiverPoint();
-    result["pass_speed"] = pass.speed();
+    result["pass_speed"]     = pass.speed();
     return result;
 }

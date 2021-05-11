@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.10.1
+#       jupytext_version: 1.11.2
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -18,7 +18,7 @@ from software.proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
 from python_tools.proto_log import ProtoLog
 import ipywidgets
 from IPython.display import display
-from software.python_bindings import world, passing
+from software.python_bindings import world, passing, pass_generator
 import numpy as np
 
 wrapper_proto_log = ProtoLog(
@@ -34,6 +34,7 @@ from bokeh.plotting import figure
 from bokeh.io import output_notebook, show, push_notebook
 from python_tools.plotting.plot_ssl_wrapper import SSLWrapperPlotter, MM_PER_M
 from python_tools.plotting.plot_heatmap import HeatmapPlotter
+from python_tools.plotting.plot_pass_generator import PassGeneratorPlotter
 
 output_notebook()
 
@@ -64,6 +65,8 @@ rate_pass_shoot_score_plotter = HeatmapPlotter(
     fig, heatmap_x_bounds, heatmap_y_bounds, heatmap_grid_size, "ratePassShootScore",
 )
 
+pass_generator_plotter = PassGeneratorPlotter(fig)
+
 fig.legend.click_policy = "hide"
 
 heatmap_grid_size = 0.05
@@ -78,6 +81,7 @@ def plot_ssl_wrapper_at_idx(idx):
     field_width = wrapper_proto_log[idx].geometry.field.field_width / 1000
 
     the_world = world.World(wrapper_proto_log[idx].SerializeToString(), dict())
+    generator = pass_generator.EighteenZonePassGenerator(the_world, config)
 
     pass_dict = {
         "passer_point": the_world.ball().position(),
@@ -105,6 +109,12 @@ def plot_ssl_wrapper_at_idx(idx):
     rate_pass_friendly_heatmap_plotter.plot_heatmap(ratePassFriendlyCapabilityCost)
     rate_pass_shoot_score_plotter.plot_heatmap(ratePassShootScoreCost)
 
+    zones = pass_generator.getAllZones(the_world)
+    pass_generator_plotter.plot_zones(zones)
+
+    passes = generator.getBestPassesForAllZones(the_world)
+    pass_generator_plotter.plot_passes(passes)
+
     push_notebook()
 
 
@@ -112,4 +122,3 @@ show(fig, notebook_handle=True)
 
 slider = ipywidgets.IntSlider(min=0, max=len(wrapper_proto_log) - 1)
 ipywidgets.interact(plot_ssl_wrapper_at_idx, idx=slider)
-# -
