@@ -32,7 +32,7 @@ struct MoveToGoalLineFSM
          */
         const auto move_to_goal_line = [this](auto event,
                                               back::process<MoveFSM::Update> processEvent) {
-            Field field = Field::createSSLDivisionBField();
+            Field field = event.common.world.field();
             Point destination       = field.friendlyGoalCenter();
             Angle face_center = Angle::zero();
             MoveFSM::ControlParams control_params{

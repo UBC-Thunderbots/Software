@@ -14,9 +14,7 @@ public:
      *
      * @param goalie_tactic_config The config to fetch parameters from
      */
-    explicit MoveToGoalLineTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config);
-
-    MoveToGoalLineTactic() = delete;
+    MoveToGoalLineTactic();
 
     void updateWorldParams(const World &world) override;
 
