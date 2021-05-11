@@ -158,7 +158,6 @@ cc_library(
     name = "all_tactics",
     hdrs = ["all_tactics.h"],
     deps = [
-        ":crease_defender_tactic",
         ":defense_shadow_enemy_tactic",
         ":kickoff_chip_tactic",
         ":penalty_kick_tactic",
