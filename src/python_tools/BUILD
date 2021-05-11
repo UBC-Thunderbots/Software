@@ -19,6 +19,12 @@ NOTEBOOK_DEPS = [
     "//software/proto:software_py_proto",
 ]
 
+PYTHON_BINDINGS = [
+    "//software/python_bindings:pass_generator.so",
+    "//software/python_bindings:passing.so",
+    "//software/python_bindings:world.so",
+]
+
 py_test(
     name = "test_hermetic_python_environment",
     srcs = ["test_hermetic_python_environment.py"],
@@ -48,10 +54,7 @@ py_binary(
     # glob all the notebooks in this directory
     data = [
         ":notebooks",
-        "//software/python_bindings:pass_generator.so",
-        "//software/python_bindings:passing.so",
-        "//software/python_bindings:world.so",
-    ],
+    ] + PYTHON_BINDINGS,
     deps = NOTEBOOK_DEPS,
 )
 
@@ -60,8 +63,6 @@ py_test(
     srcs = ["notebooks_test.py"],
     data = [
         ":notebooks",
-        "//software/python_bindings:passing.so",
-        "//software/python_bindings:world.so",
-    ],
+    ] + PYTHON_BINDINGS,
     deps = NOTEBOOK_DEPS,
 )
