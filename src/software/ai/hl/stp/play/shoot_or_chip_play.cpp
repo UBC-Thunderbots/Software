@@ -7,7 +7,7 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
+#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/logger/logger.h"

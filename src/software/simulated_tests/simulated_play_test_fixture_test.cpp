@@ -22,12 +22,14 @@
  */
 class SimulatedPlayTestFixtureTest : public SimulatedPlayTestFixture
 {
+   protected:
+    Field field = Field::createSSLDivisionBField();
 };
 
 TEST_F(SimulatedPlayTestFixtureTest,
        test_single_validation_function_passes_before_timeout)
 {
-    setBallState(BallState(Point(0, 0), Vector(0, 0)));
+    BallState ball_state(Point(0, 0), Vector(0, 0));
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -39,14 +41,14 @@ TEST_F(SimulatedPlayTestFixtureTest,
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(1.0));
+    runTest(field, ball_state, {}, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(1.0));
 }
 
 TEST_F(SimulatedPlayTestFixtureTest,
        test_single_validation_function_fails_if_it_times_out)
 {
-    setBallState(BallState(Point(0, 0), Vector(0, 0)));
+    BallState ball_state(Point(0, 0), Vector(0, 0));
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -59,15 +61,15 @@ TEST_F(SimulatedPlayTestFixtureTest,
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     EXPECT_NONFATAL_FAILURE(
-        runTest(terminating_validation_functions, non_terminating_validation_functions,
-                Duration::fromSeconds(0.5)),
+        runTest(field, ball_state, {}, {}, terminating_validation_functions,
+                non_terminating_validation_functions, Duration::fromSeconds(0.5)),
         "Waiting for timestamp of at least 1s");
 }
 
 TEST_F(SimulatedPlayTestFixtureTest,
        test_multiple_validation_function_pass_before_timeout)
 {
-    setBallState(BallState(Point(0, 0), Vector(0, 0)));
+    BallState ball_state(Point(0, 0), Vector(0, 0));
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -85,14 +87,14 @@ TEST_F(SimulatedPlayTestFixtureTest,
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(0.7));
+    runTest(field, ball_state, {}, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(0.7));
 }
 
 TEST_F(SimulatedPlayTestFixtureTest,
        test_should_fail_if_not_all_validation_functions_pass)
 {
-    setBallState(BallState(Point(0, 0), Vector(0, 0)));
+    BallState ball_state(Point(0, 0), Vector(0, 0));
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -111,15 +113,15 @@ TEST_F(SimulatedPlayTestFixtureTest,
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     EXPECT_NONFATAL_FAILURE(
-        runTest(terminating_validation_functions, non_terminating_validation_functions,
-                Duration::fromSeconds(0.6)),
+        runTest(field, ball_state, {}, {}, terminating_validation_functions,
+                non_terminating_validation_functions, Duration::fromSeconds(0.6)),
         "Waiting for timestamp of at least 0.8s");
 }
 
 TEST_F(SimulatedPlayTestFixtureTest,
        test_single_non_terminating_validation_function_passes)
 {
-    setBallState(BallState(Point(0, 0), Vector(0, 0)));
+    BallState ball_state(Point(0, 0), Vector(0, 0));
 
     std::vector<ValidationFunction> terminating_validation_functions = {};
 
@@ -131,14 +133,14 @@ TEST_F(SimulatedPlayTestFixtureTest,
             }
         }};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(0.5));
+    runTest(field, ball_state, {}, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(0.5));
 }
 
 TEST_F(SimulatedPlayTestFixtureTest,
        test_multiple_non_terminating_validation_function_passes)
 {
-    setBallState(BallState(Point(0, 0), Vector(0, 0)));
+    BallState ball_state(Point(0, 0), Vector(0, 0));
 
     std::vector<ValidationFunction> terminating_validation_functions = {};
 
@@ -156,14 +158,14 @@ TEST_F(SimulatedPlayTestFixtureTest,
             }
         }};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(0.5));
+    runTest(field, ball_state, {}, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(0.5));
 }
 
 TEST_F(SimulatedPlayTestFixtureTest,
        test_terminating_and_non_terminating_validation_functions_pass_together)
 {
-    setBallState(BallState(Point(0, 0), Vector(0, 0)));
+    BallState ball_state(Point(0, 0), Vector(0, 0));
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -188,14 +190,14 @@ TEST_F(SimulatedPlayTestFixtureTest,
             }
         }};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(0.5));
+    runTest(field, ball_state, {}, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(0.5));
 }
 
 TEST_F(SimulatedPlayTestFixtureTest,
        non_terminating_validation_functions_are_ignored_after_terminating_functions_pass)
 {
-    setBallState(BallState(Point(0, 0), Vector(0, 0)));
+    BallState ball_state(Point(0, 0), Vector(0, 0));
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -220,6 +222,6 @@ TEST_F(SimulatedPlayTestFixtureTest,
         }};
 
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(1.5));
+    runTest(field, ball_state, {}, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(1.5));
 }

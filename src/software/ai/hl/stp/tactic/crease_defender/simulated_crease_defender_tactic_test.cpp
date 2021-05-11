@@ -18,10 +18,14 @@ class SimulatedCreaseDefenderTacticPositionTest
       public ::testing::WithParamInterface<
           std::tuple<Point, CreaseDefenderAlignment, unsigned int>>
 {
+   protected:
+    Field field = Field::createSSLDivisionBField();
 };
 
 class SimulatedCreaseDefenderTacticChipTest : public SimulatedTacticTestFixture
 {
+   protected:
+    Field field = Field::createSSLDivisionBField();
 };
 
 TEST_F(SimulatedCreaseDefenderTacticChipTest, test_chip_ball)
@@ -30,12 +34,13 @@ TEST_F(SimulatedCreaseDefenderTacticChipTest, test_chip_ball)
     CreaseDefenderAlignment alignment = CreaseDefenderAlignment::CENTRE;
 
     Point initial_position = Point(-3, 1.5);
-    setBallState(BallState(enemy_threat_point, Vector(-2, 0)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({initial_position}));
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -1.5), field().enemyGoalCenter(),
-         field().enemyDefenseArea().negXNegYCorner(),
-         field().enemyDefenseArea().negXPosYCorner()}));
+    BallState ball_state(enemy_threat_point, Vector(-2, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
+        {Point(1, 0), Point(1, 2.5), Point(1, -1.5), field.enemyGoalCenter(),
+         field.enemyDefenseArea().negXNegYCorner(),
+         field.enemyDefenseArea().negXPosYCorner()});
 
     auto robot_navigation_obstacle_config =
         std::make_shared<RobotNavigationObstacleConfig>();
@@ -60,7 +65,8 @@ TEST_F(SimulatedCreaseDefenderTacticChipTest, test_chip_ball)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
 
@@ -72,12 +78,13 @@ TEST_P(SimulatedCreaseDefenderTacticPositionTest, crease_defender_test)
     ASSERT_LE(target_defend_region, 5);
 
     Point initial_position = Point(-3, 1.5);
-    setBallState(BallState(Point(4.5, -3), Vector(0, 0)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({initial_position}));
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), enemy_threat_point, Point(1, -1.5), field().enemyGoalCenter(),
-         field().enemyDefenseArea().negXNegYCorner(),
-         field().enemyDefenseArea().negXPosYCorner()}));
+    BallState ball_state(Point(4.5, -3), Vector(0, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
+        {Point(1, 0), enemy_threat_point, Point(1, -1.5), field.enemyGoalCenter(),
+         field.enemyDefenseArea().negXNegYCorner(),
+         field.enemyDefenseArea().negXPosYCorner()});
 
     auto robot_navigation_obstacle_config =
         std::make_shared<RobotNavigationObstacleConfig>();
@@ -90,20 +97,20 @@ TEST_P(SimulatedCreaseDefenderTacticPositionTest, crease_defender_test)
     setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION,
                           MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
-    Rectangle defense_area         = field().friendlyDefenseArea();
-    Rectangle field_lines          = field().fieldLines();
+    Rectangle defense_area         = field.friendlyDefenseArea();
+    Rectangle field_lines          = field.fieldLines();
     Vector defense_area_half_width = Vector(defense_area.xLength() / 2, 0);
 
     std::vector<Rectangle> defender_regions = {
-        Rectangle(field().friendlyCornerPos(),
+        Rectangle(field.friendlyCornerPos(),
                   defense_area.negXPosYCorner() + defense_area_half_width),
-        Rectangle(field().friendlyCornerPos() + defense_area_half_width,
+        Rectangle(field.friendlyCornerPos() + defense_area_half_width,
                   defense_area.posXPosYCorner()),
-        Rectangle(Point(defense_area.xMax(), field_lines.yMax()), field().centerPoint()),
-        Rectangle(Point(defense_area.xMax(), field_lines.yMin()), field().centerPoint()),
-        Rectangle(field().friendlyCornerNeg() + defense_area_half_width,
+        Rectangle(Point(defense_area.xMax(), field_lines.yMax()), field.centerPoint()),
+        Rectangle(Point(defense_area.xMax(), field_lines.yMin()), field.centerPoint()),
+        Rectangle(field.friendlyCornerNeg() + defense_area_half_width,
                   defense_area.posXNegYCorner()),
-        Rectangle(field().friendlyCornerNeg(),
+        Rectangle(field.friendlyCornerNeg(),
                   defense_area.negXNegYCorner() + defense_area_half_width),
     };
 
@@ -126,7 +133,8 @@ TEST_P(SimulatedCreaseDefenderTacticPositionTest, crease_defender_test)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
 
