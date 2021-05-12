@@ -41,7 +41,8 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
  */
 std::unique_ptr<SSLSimulationProto::RobotCommand> createRobotCommand(
     unsigned robot_id, std::unique_ptr<SSLSimulationProto::RobotMoveCommand> move_command,
-    double kick_speed, double kick_angle, double dribbler_speed);
+    std::optional<double> kick_speed, std::optional<double> kick_angle,
+    std::optional<double> dribbler_speed);
 
 /**
  * Creates a RobotControl proto
