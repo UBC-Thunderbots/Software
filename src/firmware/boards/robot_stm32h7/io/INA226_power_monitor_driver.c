@@ -12,7 +12,10 @@
     ******************************************************************************
     */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
 #include "INA226_power_monitor_driver.h"
+#pragma GCC diagnostic pop
 
 float32_t INA226_getBusV(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress)
 {
