@@ -141,3 +141,6 @@ const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;
 // How many robots are allowed in each division
 const unsigned DIV_A_NUM_ROBOTS = 11;
 const unsigned DIV_B_NUM_ROBOTS = 6;
+
+// UART baud rate used to communicate between system and arudino
+const unsigned int ARDUINO_BAUD_RATE = 115200;
