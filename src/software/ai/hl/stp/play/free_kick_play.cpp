@@ -15,7 +15,7 @@
 #include "software/world/ball.h"
 
 FreeKickPlay::FreeKickPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config), MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
+    : Play(config, true), MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
 {
 }
 
@@ -47,19 +47,12 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
      * - One robot is goalie
      */
 
-    // Setup the goalie
-    auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
-        play_config->getGoalieTacticConfig());
-
     // Setup crease defenders to help the goalie
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                               world.friendlyTeam(), world.enemyTeam(),
-                                               CreaseDefenderTactic::LeftOrRight::LEFT),
-        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                               world.friendlyTeam(), world.enemyTeam(),
-                                               CreaseDefenderTactic::LeftOrRight::RIGHT),
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
     };
 
     Angle min_open_angle_for_shot = Angle::fromDegrees(
@@ -69,8 +62,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
         min_open_angle_for_shot, std::nullopt, false,
         play_config->getShootGoalTacticConfig());
 
-    PassWithRating best_pass_and_score_so_far = shootOrFindPassStage(
-        yield, shoot_tactic, crease_defender_tactics, goalie_tactic, world);
+    PassWithRating best_pass_and_score_so_far =
+        shootOrFindPassStage(yield, shoot_tactic, crease_defender_tactics, world);
 
     if (shoot_tactic->done())
     {
@@ -78,8 +71,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
     }
     else if (best_pass_and_score_so_far.rating > MIN_ACCEPTABLE_PASS_SCORE)
     {
-        performPassStage(yield, crease_defender_tactics, goalie_tactic,
-                         best_pass_and_score_so_far, world);
+        performPassStage(yield, crease_defender_tactics, best_pass_and_score_so_far,
+                         world);
     }
     else
     {
@@ -87,7 +80,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
                    << " which is below our threshold of" << MIN_ACCEPTABLE_PASS_SCORE
                    << ", so chipping at enemy net";
 
-        chipAtGoalStage(yield, crease_defender_tactics, goalie_tactic, world);
+        chipAtGoalStage(yield, crease_defender_tactics, world);
     }
 
 
@@ -109,7 +102,7 @@ void FreeKickPlay::updateAlignToBallTactic(
 void FreeKickPlay::chipAtGoalStage(
     TacticCoroutine::push_type &yield,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-    std::shared_ptr<GoalieTactic> goalie_tactic, const World &world)
+    const World &world)
 {
     auto chip_tactic = std::make_shared<ChipTactic>(false);
 
@@ -122,8 +115,13 @@ void FreeKickPlay::chipAtGoalStage(
     do
     {
         chip_tactic->updateControlParams(world.ball().position(), chip_target);
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
 
-        yield({{goalie_tactic, chip_tactic, std::get<0>(crease_defender_tactics),
+        yield({{chip_tactic, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
 
     } while (!chip_tactic->done());
@@ -132,7 +130,6 @@ void FreeKickPlay::chipAtGoalStage(
 void FreeKickPlay::performPassStage(
     TacticCoroutine::push_type &yield,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-    std::shared_ptr<GoalieTactic> goalie_tactic,
     PassWithRating best_pass_and_score_so_far, const World &world)
 {
     // Commit to a pass
@@ -151,7 +148,12 @@ void FreeKickPlay::performPassStage(
         passer->updateControlParams(pass);
         receiver->updateControlParams(pass);
 
-        yield({{goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
+        yield({{passer, receiver, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
     } while (!receiver->done());
 }
@@ -159,7 +161,7 @@ void FreeKickPlay::performPassStage(
 PassWithRating FreeKickPlay::shootOrFindPassStage(
     TacticCoroutine::push_type &yield, std::shared_ptr<ShootGoalTactic> shoot_tactic,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-    std::shared_ptr<GoalieTactic> goalie_tactic, const World &world)
+    const World &world)
 {
     auto pitch_division =
         std::make_shared<const EighteenZonePitchDivision>(world.field());
@@ -199,8 +201,14 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         cherry_pick_tactic_2->updateControlParams(
             pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
-        yield({{goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
-                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
+
+        yield({{align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
+                std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
     }
 
@@ -222,8 +230,13 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         cherry_pick_tactic_2->updateControlParams(
             pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
-        yield({{goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
-                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
+        yield({{align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
+                std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
     } while (!align_to_ball_tactic->done());
 
@@ -247,7 +260,12 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         cherry_pick_tactic_2->updateControlParams(
             pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
 
-        yield({{goalie_tactic, align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1,
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
+        yield({{align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1,
                 cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
 

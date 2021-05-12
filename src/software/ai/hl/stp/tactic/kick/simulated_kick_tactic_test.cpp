@@ -16,6 +16,8 @@ class SimulatedKickTacticTest
     : public SimulatedTacticTestFixture,
       public ::testing::WithParamInterface<std::tuple<Vector, Angle>>
 {
+   protected:
+    Field field = Field::createSSLDivisionBField();
 };
 
 TEST_P(SimulatedKickTacticTest, kick_test)
@@ -24,10 +26,10 @@ TEST_P(SimulatedKickTacticTest, kick_test)
     Angle angle_to_kick_at        = std::get<1>(GetParam());
 
     Point robot_position = Point(0, 0);
-    setBallState(BallState(robot_position + ball_offset_from_robot, Vector(0, 0)));
+    BallState ball_state(robot_position + ball_offset_from_robot, Vector(0, 0));
 
-    addFriendlyRobots(
-        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position}));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position});
 
     auto tactic = std::make_shared<KickTactic>(false);
     tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
@@ -47,8 +49,8 @@ TEST_P(SimulatedKickTacticTest, kick_test)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(5));
+    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(5));
 }
 
 INSTANTIATE_TEST_CASE_P(BallLocations, SimulatedKickTacticTest,

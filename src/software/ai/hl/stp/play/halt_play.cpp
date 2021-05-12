@@ -3,7 +3,7 @@
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-HaltPlay::HaltPlay(std::shared_ptr<const PlayConfig> config) : Play(config) {}
+HaltPlay::HaltPlay(std::shared_ptr<const PlayConfig> config) : Play(config, false) {}
 
 bool HaltPlay::isApplicable(const World &world) const
 {

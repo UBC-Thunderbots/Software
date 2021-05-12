@@ -38,34 +38,6 @@ cc_library(
 )
 
 cc_library(
-    name = "crease_defender_tactic",
-    srcs = ["crease_defender_tactic.cpp"],
-    hdrs = ["crease_defender_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/action:stop_action",
-        "//software/geom/algorithms",
-        "//software/logger",
-    ],
-)
-
-cc_test(
-    name = "crease_defender_tactic_test",
-    srcs = ["crease_defender_tactic_test.cpp"],
-    deps = [
-        ":crease_defender_tactic",
-        "//shared:constants",
-        "//software/ai/intent:move_intent",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "defense_shadow_enemy_tactic",
     srcs = ["defense_shadow_enemy_tactic.cpp"],
     hdrs = ["defense_shadow_enemy_tactic.h"],
@@ -86,37 +58,6 @@ cc_test(
     srcs = ["defense_shadow_enemy_tactic_test.cpp"],
     deps = [
         ":defense_shadow_enemy_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "goalie_tactic",
-    srcs = ["goalie_tactic.cpp"],
-    hdrs = ["goalie_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:chip_action",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/action:stop_action",
-        "//software/geom:line",
-        "//software/geom/algorithms",
-        "//software/logger",
-    ],
-)
-
-cc_test(
-    name = "goalie_tactic_test",
-    srcs = ["goalie_tactic_test.cpp"],
-    deps = [
-        ":goalie_tactic",
-        "//software/ai/hl/stp/action:chip_action",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/action:stop_action",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
@@ -177,30 +118,6 @@ cc_library(
 )
 
 cc_library(
-    name = "shadow_enemy_tactic",
-    srcs = ["shadow_enemy_tactic.cpp"],
-    hdrs = ["shadow_enemy_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/action:stop_action",
-        "//software/logger",
-    ],
-)
-
-cc_test(
-    name = "shadow_enemy_tactic_test",
-    srcs = ["shadow_enemy_tactic_test.cpp"],
-    deps = [
-        ":shadow_enemy_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "shadow_free_kicker_tactic",
     srcs = ["shadow_free_kicker_tactic.cpp"],
     hdrs = ["shadow_free_kicker_tactic.h"],
@@ -257,23 +174,23 @@ cc_library(
     hdrs = ["all_tactics.h"],
     deps = [
         ":cherry_pick_tactic",
-        ":crease_defender_tactic",
         ":defense_shadow_enemy_tactic",
-        ":goalie_tactic",
         ":kickoff_chip_tactic",
         ":penalty_kick_tactic",
         ":penalty_setup_tactic",
         ":receiver_tactic",
-        ":shadow_enemy_tactic",
         ":shadow_free_kicker_tactic",
         ":shoot_goal_tactic",
         ":tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
+        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
+        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/passer:passer_tactic",
+        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
     ],
 )

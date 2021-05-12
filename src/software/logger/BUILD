@@ -8,6 +8,7 @@ cc_library(
     ],
     deps = [
         ":coloured_cout_sink",
+        ":csv_sink",
         "@g3log",
         "@g3sinks",
     ],
@@ -33,6 +34,30 @@ cc_library(
     ],
     deps = [
         "//software/util/make_enum",
+        "@g3log",
+    ],
+)
+
+cc_test(
+    name = "csv_sink_test",
+    srcs = ["csv_sink_test.cpp"],
+    deps = [
+        ":csv_sink",
+        ":logger",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "csv_sink",
+    srcs = [
+        "csv_sink.cpp",
+    ],
+    hdrs = [
+        "csv_sink.h",
+        "custom_logging_levels.h",
+    ],
+    deps = [
         "@g3log",
     ],
 )

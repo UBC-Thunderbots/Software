@@ -13,7 +13,7 @@ class TestThetaStarPathPlanner : public testing::Test
    public:
     TestThetaStarPathPlanner()
         : robot_navigation_obstacle_factory(
-              std::make_shared<const RobotNavigationObstacleFactoryConfig>()),
+              std::make_shared<const RobotNavigationObstacleConfig>()),
           planner(std::make_unique<ThetaStarPathPlanner>())
     {
     }
@@ -345,4 +345,26 @@ TEST_F(TestThetaStarPathPlanner,
 
     EXPECT_EQ(start, path->getStartPoint());
     EXPECT_EQ(dest, path->getEndPoint());
+}
+
+TEST_F(TestThetaStarPathPlanner,
+       test_theta_star_closest_dest_equals_penultimate_path_point)
+{
+    // This is a regression test for when closest dest equals the penultimate path point
+    Field field = Field::createSSLDivisionBField();
+    Point start{-1.4520030517578126, -1.3282811279296876},
+        dest{-1.3801560736390279, -2.5909120196973863};
+
+    std::vector<ObstaclePtr> obstacles = {std::make_shared<GeomObstacle<Circle>>(
+        Circle(Point(-1.48254052734375, -2.5885056152343751), 0.27150299999999999))};
+
+    Rectangle navigable_area = field.fieldBoundary();
+
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
+
+    ASSERT_TRUE(path != std::nullopt);
+
+    // Expect that the last two points are combined into one
+    EXPECT_EQ(2, path->getKnots().size());
+    EXPECT_EQ(start, path->getStartPoint());
 }

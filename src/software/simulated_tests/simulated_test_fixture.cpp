@@ -1,14 +1,16 @@
 #include "software/simulated_tests/simulated_test_fixture.h"
 
+#include <cstdlib>
+#include <experimental/filesystem>
+
 #include "software/logger/logger.h"
+#include "software/proto/message_translation/ssl_wrapper.h"
 #include "software/test_util/test_util.h"
 
 SimulatedTestFixture::SimulatedTestFixture()
     : mutable_thunderbots_config(std::make_shared<ThunderbotsConfig>()),
       thunderbots_config(
           std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config)),
-      simulator(std::make_unique<Simulator>(Field::createSSLDivisionBField(),
-                                            thunderbots_config->getSimulatorConfig())),
       sensor_fusion(thunderbots_config->getSensorFusionConfig()),
       run_simulation_in_realtime(false)
 {
@@ -57,32 +59,37 @@ void SimulatedTestFixture::SetUp()
     {
         enableVisualizer();
     }
-}
-
-void SimulatedTestFixture::setBallState(const BallState &ball)
-{
-    simulator->setBallState(ball);
-}
-
-void SimulatedTestFixture::addFriendlyRobots(const std::vector<RobotStateWithId> &robots)
-{
-    simulator->addYellowRobots(robots);
-}
-
-void SimulatedTestFixture::addEnemyRobots(const std::vector<RobotStateWithId> &robots)
-{
-    simulator->addBlueRobots(robots);
-}
-
-Field SimulatedTestFixture::field() const
-{
-    return simulator->getField();
+    setupReplayLogging();
 }
 
 void SimulatedTestFixture::enableVisualizer()
 {
     full_system_gui = std::make_shared<ThreadedFullSystemGUI>(mutable_thunderbots_config);
     run_simulation_in_realtime = true;
+}
+
+void SimulatedTestFixture::setupReplayLogging()
+{
+    // get the name of the current test to name the replay output directory
+    auto test_name = ::testing::UnitTest::GetInstance()->current_test_info()->name();
+
+    namespace fs = std::experimental::filesystem;
+    static constexpr auto SIMULATED_TEST_OUTPUT_DIR_SUFFIX = "simulated_test_outputs";
+
+    fs::path bazel_test_outputs_dir(std::getenv("TEST_UNDECLARED_OUTPUTS_DIR"));
+    fs::path out_dir =
+        bazel_test_outputs_dir / SIMULATED_TEST_OUTPUT_DIR_SUFFIX / test_name;
+    fs::create_directories(out_dir);
+
+    LOG(INFO) << "Logging " << test_name << " replay to " << out_dir;
+
+    fs::path sensorproto_out_dir = out_dir / "Simulator_SensorProto";
+    fs::path ssl_wrapper_out_dir = out_dir / "SensorFusion_SSL_WrapperPacket";
+
+    simulator_sensorproto_logger =
+        std::make_shared<ProtoLogger<SensorProto>>(sensorproto_out_dir);
+    sensorfusion_wrapper_logger =
+        std::make_shared<ProtoLogger<SSLProto::SSL_WrapperPacket>>(ssl_wrapper_out_dir);
 }
 
 bool SimulatedTestFixture::validateAndCheckCompletion(
@@ -105,15 +112,25 @@ bool SimulatedTestFixture::validateAndCheckCompletion(
     return terminating_function_validators.empty() ? false : validation_successful;
 }
 
-void SimulatedTestFixture::updateSensorFusion()
+void SimulatedTestFixture::updateSensorFusion(std::shared_ptr<Simulator> simulator)
 {
     auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
     assert(ssl_wrapper_packet);
 
     auto sensor_msg                        = SensorProto();
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
+    simulator_sensorproto_logger->onValueReceived(sensor_msg);
 
     sensor_fusion.processSensorProto(sensor_msg);
+
+    auto world_or_null = sensor_fusion.getWorld();
+
+    if (world_or_null)
+    {
+        auto filtered_ssl_wrapper =
+            *createSSLWrapperPacket(*sensor_fusion.getWorld(), TeamColour::YELLOW);
+        sensorfusion_wrapper_logger->onValueReceived(filtered_ssl_wrapper);
+    }
 }
 
 void SimulatedTestFixture::sleep(
@@ -134,11 +151,20 @@ void SimulatedTestFixture::sleep(
 }
 
 void SimulatedTestFixture::runTest(
+    const Field &field, const BallState &ball,
+    const std::vector<RobotStateWithId> &friendly_robots,
+    const std::vector<RobotStateWithId> &enemy_robots,
     const std::vector<ValidationFunction> &terminating_validation_functions,
     const std::vector<ValidationFunction> &non_terminating_validation_functions,
     const Duration &timeout)
 {
-    updateSensorFusion();
+    std::shared_ptr<Simulator> simulator(
+        std::make_shared<Simulator>(field, thunderbots_config->getSimulatorConfig()));
+    simulator->setBallState(ball);
+    simulator->addYellowRobots(friendly_robots);
+    simulator->addBlueRobots(enemy_robots);
+
+    updateSensorFusion(simulator);
     std::shared_ptr<World> world;
     if (auto world_opt = sensor_fusion.getWorld())
     {
@@ -167,8 +193,19 @@ void SimulatedTestFixture::runTest(
     const Duration ai_time_step = Duration::fromSeconds(simulation_time_step.toSeconds() *
                                                         CAMERA_FRAMES_PER_AI_TICK);
 
+    auto start_tick_time = std::chrono::system_clock::now();
+
     // Tick one frame to aid with visualization
-    bool validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);
+    bool validation_functions_done =
+        tickTest(simulation_time_step, ai_time_step, world, simulator);
+
+    // Logging duration of each tick
+    unsigned int tick_count    = 1;
+    double duration_ms         = ::TestUtil::millisecondsSince(start_tick_time);
+    double total_tick_duration = duration_ms;
+    double max_tick_duration   = duration_ms;
+    double min_tick_duration   = duration_ms;
+
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
         if (!thunderbots_config->getAiControlConfig()->getRunAi()->value())
@@ -178,8 +215,25 @@ void SimulatedTestFixture::runTest(
             std::this_thread::sleep_for(ms_to_sleep);
             continue;
         }
-        validation_functions_done = tickTest(simulation_time_step, ai_time_step, world);
+
+        // Record starting time
+        start_tick_time = std::chrono::system_clock::now();
+
+        validation_functions_done =
+            tickTest(simulation_time_step, ai_time_step, world, simulator);
+
+        // Calculate tick durations
+        duration_ms = ::TestUtil::millisecondsSince(start_tick_time);
+        total_tick_duration += duration_ms;
+        max_tick_duration = std::max(max_tick_duration, duration_ms);
+        min_tick_duration = std::min(min_tick_duration, duration_ms);
+        tick_count++;
     }
+    // Output the tick duration results
+    double avg_tick_duration = total_tick_duration / tick_count;
+    LOG(INFO) << "max tick duration: " << max_tick_duration << "ms" << std::endl;
+    LOG(INFO) << "min tick duration: " << min_tick_duration << "ms" << std::endl;
+    LOG(INFO) << "avg tick duration: " << avg_tick_duration << "ms" << std::endl;
 
     if (!validation_functions_done && !terminating_validation_functions.empty())
     {
@@ -197,14 +251,15 @@ void SimulatedTestFixture::runTest(
 }
 
 bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_time_step,
-                                    std::shared_ptr<World> world)
+                                    std::shared_ptr<World> world,
+                                    std::shared_ptr<Simulator> simulator)
 {
     auto wall_start_time           = std::chrono::steady_clock::now();
     bool validation_functions_done = false;
     for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
     {
         simulator->stepSimulation(simulation_time_step);
-        updateSensorFusion();
+        updateSensorFusion(simulator);
     }
 
     if (auto world_opt = sensor_fusion.getWorld())

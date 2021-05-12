@@ -4,13 +4,12 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
+#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 KickoffEnemyPlay::KickoffEnemyPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config)
+    : Play(config, true)
 {
 }
 
@@ -29,31 +28,11 @@ bool KickoffEnemyPlay::invariantHolds(const World &world) const
 void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                       const World &world)
 {
-    auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
-        play_config->getGoalieTacticConfig());
-
     // 3 robots assigned to shadow enemies. Other robots will be assigned positions
     // on the field to be evenly spread out
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
-        std::make_shared<ShadowEnemyTactic>(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            play_config->getDefenseShadowEnemyTacticConfig()
-                ->getBallStealSpeed()
-                ->value(),
-            false, true),
-        std::make_shared<ShadowEnemyTactic>(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            play_config->getDefenseShadowEnemyTacticConfig()
-                ->getBallStealSpeed()
-                ->value(),
-            false, true),
-        std::make_shared<ShadowEnemyTactic>(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            play_config->getDefenseShadowEnemyTacticConfig()
-                ->getBallStealSpeed()
-                ->value(),
-            false, true)};
+        std::make_shared<ShadowEnemyTactic>(), std::make_shared<ShadowEnemyTactic>(),
+        std::make_shared<ShadowEnemyTactic>()};
 
     // these positions are picked according to the following slide
     // https://images.slideplayer.com/32/9922349/slides/slide_2.jpg
@@ -110,7 +89,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
-        PriorityTacticVector result = {{goalie_tactic}};
+        PriorityTacticVector result = {{}};
 
         // keeps track of the next defense position to assign
         int defense_position_index = 0;
