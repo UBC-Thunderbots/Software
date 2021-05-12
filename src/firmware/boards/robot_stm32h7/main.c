@@ -16,6 +16,8 @@
  *
  ******************************************************************************
  */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -36,6 +38,7 @@
 #include "firmware/app/logger/logger.h"
 #include "firmware/boards/robot_stm32h7/io/drivetrain.h"
 #include "firmware/boards/robot_stm32h7/io/uart_logger.h"
+#pragma GCC diagnostic pop
 
 /* USER CODE END Includes */
 

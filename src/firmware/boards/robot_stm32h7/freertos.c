@@ -18,6 +18,8 @@
  */
 /* USER CODE END Header */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
 /* Includes ------------------------------------------------------------------*/
 #include "FreeRTOS.h"
 
@@ -27,6 +29,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#pragma GCC diagnostic pop
 #include "firmware/app/logger/logger.h"
 #include "firmware/boards/robot_stm32h7/io/drivetrain.h"
 #include "firmware/boards/robot_stm32h7/io/network_logger.h"

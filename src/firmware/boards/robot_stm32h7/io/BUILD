@@ -6,10 +6,6 @@ cc_library(
     name = "gpio_pin",
     srcs = ["gpio_pin.c"],
     hdrs = ["gpio_pin.h"],
-    copts = [
-        # This library uses hal and includes ST headers, so we can't mark warnings as errors
-        "-Wno-error",
-    ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
         "//firmware/boards/robot_stm32h7:hal",
@@ -20,10 +16,6 @@ cc_library(
     name = "pwm_pin",
     srcs = ["pwm_pin.c"],
     hdrs = ["pwm_pin.h"],
-    copts = [
-        # This library uses hal and includes ST headers, so we can't mark warnings as errors
-        "-Wno-error",
-    ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
         "//firmware/boards/robot_stm32h7:hal",
@@ -34,10 +26,6 @@ cc_library(
     name = "allegro_a3931_motor_driver",
     srcs = ["allegro_a3931_motor_driver.c"],
     hdrs = ["allegro_a3931_motor_driver.h"],
-    copts = [
-        # This library uses hal and includes ST headers, so we can't mark warnings as errors
-        "-Wno-error",
-    ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
         ":gpio_pin",
@@ -49,10 +37,6 @@ cc_library(
     name = "infineon_TLE009_E1000_angle_sensor",
     srcs = ["infineon_TLE5009_E1000_angle_sensor.c"],
     hdrs = ["infineon_TLE5009_E1000_angle_sensor.h"],
-    copts = [
-        # This library uses hal and includes ST headers, so we can't mark warnings as errors
-        "-Wno-error",
-    ],
 )
 
 cc_test(
@@ -68,10 +52,6 @@ cc_library(
     name = "drivetrain",
     srcs = ["drivetrain.c"],
     hdrs = ["drivetrain.h"],
-    copts = [
-        # This library uses hal and includes ST headers, so we can't mark warnings as errors
-        "-Wno-error",
-    ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [":drivetrain_unit"],
 )
@@ -80,10 +60,6 @@ cc_library(
     name = "drivetrain_unit",
     srcs = ["drivetrain_unit.c"],
     hdrs = ["drivetrain_unit.h"],
-    copts = [
-        # This library uses hal and includes ST headers, so we can't mark warnings as errors
-        "-Wno-error",
-    ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [":allegro_a3931_motor_driver"],
 )
@@ -97,10 +73,6 @@ cc_library(
     hdrs = [
         "proto_multicast_communication_profile.h",
         "proto_multicast_communication_tasks.h",
-    ],
-    copts = [
-        # This library uses hal and includes ST headers, so we can't mark warnings as errors
-        "-Wno-error",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
@@ -117,10 +89,6 @@ cc_library(
     name = "network_logger",
     srcs = ["network_logger.c"],
     hdrs = ["network_logger.h"],
-    copts = [
-        # This library uses hal and includes ST headers, so we can't mark warnings as errors
-        "-Wno-error",
-    ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
         "//firmware/boards/robot_stm32h7:hal",
@@ -137,10 +105,6 @@ cc_library(
     name = "uart_logger",
     srcs = ["uart_logger.c"],
     hdrs = ["uart_logger.h"],
-    copts = [
-        # This library uses hal and includes ST headers, so we can't mark warnings as errors
-        "-Wno-error",
-    ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
         "//firmware/boards/robot_stm32h7:hal",
@@ -156,10 +120,6 @@ cc_library(
     name = "ublox_odinw262_communicator",
     srcs = ["ublox_odinw262_communicator.c"],
     hdrs = ["ublox_odinw262_communicator.h"],
-    copts = [
-        # This library uses hal and includes ST headers, so we can't mark warnings as errors
-        "-Wno-error",
-    ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
         ":gpio_pin",
@@ -179,10 +139,6 @@ cc_library(
     name = "ublox_odinw262_communicator_buffer_utils",
     srcs = ["ublox_odinw262_communicator_buffer_utils.c"],
     hdrs = ["ublox_odinw262_communicator_buffer_utils.h"],
-    copts = [
-        # This library uses hal and includes ST headers, so we can't mark warnings as errors
-        "-Wno-error",
-    ],
     alwayslink = True,
 )
 
@@ -196,10 +152,6 @@ cmake_external(
 cc_test(
     name = "ublox_odinw262_communicator_buffer_utils_test",
     srcs = ["ublox_odinw262_communicator_buffer_utils_test.cpp"],
-    copts = [
-        # This library uses hal and includes ST headers, so we can't mark warnings as errors
-        "-Wno-error",
-    ],
     deps = [
         ":rapidcheck",
         "//firmware/boards/robot_stm32h7/io:ublox_odinw262_communicator_buffer_utils",
@@ -211,10 +163,6 @@ cc_library(
     name = "power_monitor",
     srcs = ["power_monitor.c"],
     hdrs = ["power_monitor.h"],
-    copts = [
-        # This library uses hal and includes ST headers, so we can't mark warnings as errors
-        "-Wno-error",
-    ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [":INA226_power_monitor_driver"],
 )
