@@ -15,7 +15,8 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       enemy_team_filter(),
       team_with_possession(TeamSide::ENEMY),
       friendly_goalie_id(0),
-      enemy_goalie_id(0)
+      enemy_goalie_id(0),
+      estop_enabled(false)
 {
     if (!sensor_fusion_config)
     {
@@ -30,10 +31,13 @@ std::optional<World> SensorFusion::getWorld() const
         World new_world(*field, *ball, friendly_team, enemy_team);
         new_world.updateGameState(game_state);
         new_world.setTeamWithPossession(team_with_possession);
+        new_world.setEstopEnabled(estop_enabled);
         if (referee_stage)
         {
             new_world.updateRefereeStage(*referee_stage);
         }
+
+
         return new_world;
     }
     else
@@ -156,6 +160,8 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 void SensorFusion::updateWorld(
     const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus> &robot_status_msgs)
 {
+
+    bool enable_estop_detected = false;
     for (auto &robot_status_msg : robot_status_msgs)
     {
         int robot_id = robot_status_msg.robot_id();
@@ -182,7 +188,14 @@ void SensorFusion::updateWorld(
             }
         }
         friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
+
+        std::cout<<"received robot status msg, estop = "<<robot_status_msg.estopenabled()<<std::endl;
+
+        enable_estop_detected = !enable_estop_detected && robot_status_msg.estopenabled();
+
     }
+
+    estop_enabled = enable_estop_detected;
 }
 
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)

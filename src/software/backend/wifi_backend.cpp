@@ -8,13 +8,18 @@
 #include "software/proto/message_translation/defending_side.h"
 #include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/util/design_patterns/generic_factory.h"
+#include "software/estop/boost_uart_communication.h"
+#include "software/estop/threaded_estop_reader.h"
+#include "software/proto/primitive/primitive_msg_factory.h"
+
 
 WifiBackend::WifiBackend(std::shared_ptr<const BackendConfig> config)
     : network_config(config->getWifiBackendConfig()->getNetworkConfig()),
       sensor_fusion_config(config->getWifiBackendConfig()->getSensorFusionConfig()),
       ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
                        boost::bind(&Backend::receiveSSLReferee, this, _1),
-                       network_config->getSslCommunicationConfig())
+                       network_config->getSslCommunicationConfig()),
+                       estop_reader(nullptr)
 {
     std::string network_interface = this->network_config->getNetworkInterface()->value();
     int channel                   = this->network_config->getChannel()->value();
@@ -31,7 +36,20 @@ WifiBackend::WifiBackend(std::shared_ptr<const BackendConfig> config)
 
 void WifiBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
+    //check if estop has been set
+    if(estop_reader != nullptr && !estop_reader->isEstopPlay()) {
+        auto robot_primitives_map = primitives.mutable_robot_primitives();
+
+        //override to stop primitive
+        for(auto &primitive : *robot_primitives_map){
+            primitive.second = *createStopPrimitive(false);
+        }
+
+        LOG(INFO)<<"sent: "<<primitives.DebugString();
+    }
+
     primitive_output->sendProto(primitives);
+
 
     if (sensor_fusion_config->getOverrideGameControllerDefendingSide()->value())
     {
@@ -48,6 +66,13 @@ void WifiBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 
 void WifiBackend::onValueReceived(World world)
 {
+    //handle estop option
+    if(world.isEstopEnabled() && estop_reader == nullptr){
+        boost::asio::io_service io_service;
+        std::unique_ptr<BoostUartCommunication> uartDevice = std::make_unique<BoostUartCommunication>( io_service, ARDUINO_BAUD_RATE, "/dev/ttyACM0");
+        estop_reader = std::make_unique<ThreadedEstopReader>(std::move(uartDevice), 0);
+    }
+
     vision_output->sendProto(*createVision(world));
 }
 
@@ -79,6 +104,8 @@ void WifiBackend::joinMulticastChannel(int channel, const std::string& interface
     defending_side_output.reset(new ThreadedProtoUdpSender<DefendingSideProto>(
         std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, DEFENDING_SIDE_PORT,
         true));
+
+    std::cout<<"joined channels"<<std::endl;
 }
 
 // Register this backend in the genericFactory

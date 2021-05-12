@@ -9,6 +9,7 @@
 #include "software/networking/threaded_proto_udp_listener.h"
 #include "software/networking/threaded_proto_udp_sender.h"
 #include "software/proto/defending_side_msg.pb.h"
+#include "software/estop/threaded_estop_reader.h"
 
 class WifiBackend : public Backend
 {
@@ -54,4 +55,6 @@ class WifiBackend : public Backend
     std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::RobotStatus>> robot_status_input;
     std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::RobotLog>> robot_log_input;
     std::unique_ptr<ThreadedProtoUdpSender<DefendingSideProto>> defending_side_output;
+
+    std::unique_ptr<ThreadedEstopReader> estop_reader;
 };

@@ -167,6 +167,10 @@ class World final
      */
     TeamSide getTeamWithPossession() const;
 
+    void setEstopEnabled(bool estop_enabled);
+
+    bool isEstopEnabled();
+
     /**
      * Defines the equality operator for a World. Worlds are equal if their field, ball
      * friendly_team, enemy_team and game_state are equal. The last update
@@ -208,4 +212,7 @@ class World final
     boost::circular_buffer<RefereeStage> referee_stage_history_;
     // which team has possession of the ball
     TeamSide team_with_possesion_;
+
+    bool estop_enabled;
+
 };

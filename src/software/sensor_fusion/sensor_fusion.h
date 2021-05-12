@@ -141,4 +141,6 @@ class SensorFusion
 
     unsigned int friendly_goalie_id;
     unsigned int enemy_goalie_id;
+
+    bool estop_enabled;
 };
