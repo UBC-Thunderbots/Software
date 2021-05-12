@@ -47,6 +47,27 @@ TEST(SSLSimulationProtoTest, test_create_robot_command)
     EXPECT_FLOAT_EQ(4.0, robot_command->move_command().wheel_velocity().back_right());
 }
 
+TEST(SSLSimulationProtoTest, test_create_robot_command_unset_optional_fields)
+{
+    auto move_wheel_velocity = createMoveWheelVelocity(1.0, 2.0, 3.0, 4.0);
+    auto move_command        = createRobotMoveCommand(std::move(move_wheel_velocity));
+    auto robot_command = createRobotCommand(1, std::move(move_command), std::nullopt,
+                                            std::nullopt, std::nullopt);
+
+    ASSERT_TRUE(robot_command);
+    ASSERT_TRUE(robot_command->has_move_command());
+
+    EXPECT_EQ(1, robot_command->id());
+    EXPECT_FALSE(robot_command->has_kick_speed());
+    EXPECT_FALSE(robot_command->has_kick_angle());
+    EXPECT_FALSE(robot_command->has_dribbler_speed());
+
+    EXPECT_FLOAT_EQ(1.0, robot_command->move_command().wheel_velocity().front_right());
+    EXPECT_FLOAT_EQ(2.0, robot_command->move_command().wheel_velocity().front_left());
+    EXPECT_FLOAT_EQ(3.0, robot_command->move_command().wheel_velocity().back_left());
+    EXPECT_FLOAT_EQ(4.0, robot_command->move_command().wheel_velocity().back_right());
+}
+
 TEST(SSLSimulationProtoTest, test_create_robot_control)
 {
     auto move_wheel_velocity_1 = createMoveWheelVelocity(1.0, 2.0, 3.0, 4.0);
