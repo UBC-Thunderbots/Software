@@ -1,6 +1,7 @@
 from bokeh.plotting import Figure
-from bokeh.models import ColumnDataSource
+from bokeh.models import ColumnDataSource, ColorBar, LinearColorMapper
 from bokeh.models.tools import HoverTool
+from bokeh.palettes import mpl
 import numpy as np
 
 
@@ -33,7 +34,7 @@ class PassGeneratorPlotter:
             pass_line_xs=[],
             pass_line_ys=[],
             pass_rating=[],
-            adjusted_pass_rating=[],
+            line_width=[],
         )
 
         for pass_and_rating_dict in passes:
@@ -50,9 +51,9 @@ class PassGeneratorPlotter:
             passes_dict["pass_line_ys"].append([passer_point.y(), receiver_point.y()])
 
             passes_dict["pass_rating"].append(rating)
-            # adjusted pass rating is only used to determine the alpha of the
-            # line segment between passer and receiver points
-            passes_dict["adjusted_pass_rating"].append(np.clip(rating * 2, 0, 1))
+
+            # line width is 1 + pass_rating
+            passes_dict["line_width"].append(1 + rating)
 
         self.passes_source.data.update(passes_dict)
 
@@ -85,19 +86,27 @@ class PassGeneratorPlotter:
                 pass_line_xs=[],
                 pass_line_ys=[],
                 pass_rating=[],
-                # adjusted pass rating is only used to determine the alpha of
-                # the line segment between passer and receiver points
-                adjusted_pass_rating=[],
+                line_width=[],
             )
         )
+
+        self.pass_color_mapper = LinearColorMapper(
+            palette=mpl["Plasma"][256], low=0, high=1
+        )
+        color_bar = ColorBar(
+            color_mapper=self.pass_color_mapper,
+            width=8,
+            height=400,
+            location="bottom_right",
+        )
+        self.fig.add_layout(color_bar, "right")
 
         self.fig.multi_line(
             source=self.passes_source,
             xs="pass_line_xs",
             ys="pass_line_ys",
-            line_color="red",
-            line_alpha="adjusted_pass_rating",
-            line_width="adjusted_pass_rating",
+            line_width="line_width",
+            line_color=dict(field="pass_rating", transform=self.pass_color_mapper),
         )
 
         receiver_point_glyph = self.fig.circle_cross(
@@ -109,7 +118,7 @@ class PassGeneratorPlotter:
             legend_label="Receiver points",
         )
 
-        pass_rating_tooltip = ("Pass quality", "@pass_rating")
+        pass_rating_tooltip = ("Pass rating", "@pass_rating")
         hover_tool = HoverTool(
             tooltips=[pass_rating_tooltip], renderers=[receiver_point_glyph]
         )

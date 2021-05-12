@@ -36,22 +36,21 @@ EighteenZonePassGenerator createEighteenZonePassGenerator(const World& world,
 /**
  * Gets the best pass for each of the 18 zones and returns them in a list of dicts
  * as per pass_utilities.cpp.
- * @param generator an EighteenZonePassGenerator
+ * @tparam ZoneEnum a ZoneEnum type corresponding to a pitch division
+ * @param generator a PassGenerator
  * @param world the world
  * @return a list of dicts describing the best pass in each of the zones.
  */
-py::list getBestPassesForAllZones(EighteenZonePassGenerator& generator,
-                                  const World& world)
+template <typename ZoneEnum>
+py::list getBestPassesForAllZones(PassGenerator<ZoneEnum>& generator, const World& world)
 {
     py::list result;
     auto evaluation = generator.generatePassEvaluation(world);
 
     // unfortunately this is tightly coupled to the 18 zone field division
-    for (auto zone_id = static_cast<int>(EighteenZoneId::ZONE_1);
-         zone_id <= static_cast<int>(EighteenZoneId::ZONE_18); zone_id++)
+    for (auto zone_id : evaluation.getFieldPitchDivsion()->getAllZoneIds())
     {
-        auto pass_with_rating =
-            evaluation.getBestPassInZones({static_cast<EighteenZoneId>(zone_id)});
+        auto pass_with_rating = evaluation.getBestPassInZones({zone_id});
         py::dict pass_with_rating_dict;
         pass_with_rating_dict["pass"]   = convertPassToDict(pass_with_rating.pass);
         pass_with_rating_dict["rating"] = pass_with_rating.rating;
@@ -69,10 +68,9 @@ py::list getAllZones(const World& world)
 {
     EighteenZonePitchDivision pitch_division(world.field());
     py::list result;
-    for (auto zone_id = static_cast<int>(EighteenZoneId::ZONE_1);
-         zone_id <= static_cast<int>(EighteenZoneId::ZONE_18); zone_id++)
+    for (auto zone_id : pitch_division.getAllZoneIds())
     {
-        result.append(pitch_division.getZone(static_cast<EighteenZoneId>(zone_id)));
+        result.append(pitch_division.getZone(zone_id));
     }
     return result;
 }
@@ -87,6 +85,6 @@ PYBIND11_MODULE(pass_generator, m)
 
     py::class_<EighteenZonePassGenerator>(m, "EighteenZonePassGenerator")
         .def(py::init(&createEighteenZonePassGenerator))
-        .def("getBestPassesForAllZones", &getBestPassesForAllZones);
+        .def("getBestPassesForAllZones", &getBestPassesForAllZones<EighteenZoneId>);
     m.def("getAllZones", &getAllZones);
 }

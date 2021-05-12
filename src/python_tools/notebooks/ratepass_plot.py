@@ -38,7 +38,8 @@ from python_tools.plotting.plot_pass_generator import PassGeneratorPlotter
 
 output_notebook()
 
-fig = figure(plot_width=900, plot_height=900, match_aspect=True)
+fig = figure(plot_width=1000, plot_height=900, match_aspect=True)
+fig.background_fill_color = "lightgrey"
 
 field_length = wrapper_proto_log[0].geometry.field.field_length / MM_PER_M
 field_width = wrapper_proto_log[0].geometry.field.field_width / MM_PER_M
@@ -104,10 +105,10 @@ def plot_ssl_wrapper_at_idx(idx):
         pass_dict["receiver_point"] = world.Point(x, y)
         return passing.ratePassShootScore(the_world, pass_dict, config)
 
-    rate_pass_heatmap_plotter.plot_heatmap(ratePassCost)
-    rate_pass_enemy_heatmap_plotter.plot_heatmap(ratePassEnemyRiskCost)
-    rate_pass_friendly_heatmap_plotter.plot_heatmap(ratePassFriendlyCapabilityCost)
-    rate_pass_shoot_score_plotter.plot_heatmap(ratePassShootScoreCost)
+    #     rate_pass_heatmap_plotter.plot_heatmap(ratePassCost)
+    #     rate_pass_enemy_heatmap_plotter.plot_heatmap(ratePassEnemyRiskCost)
+    #     rate_pass_friendly_heatmap_plotter.plot_heatmap(ratePassFriendlyCapabilityCost)
+    #     rate_pass_shoot_score_plotter.plot_heatmap(ratePassShootScoreCost)
 
     zones = pass_generator.getAllZones(the_world)
     pass_generator_plotter.plot_zones(zones)
