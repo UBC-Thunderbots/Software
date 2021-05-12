@@ -94,13 +94,23 @@ jobs:
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
 
       - name: Simulated Test
+        # make sure that replays are uploaded even if tests fail
+        continue-on-error: true
         run: |
           cd src
           bazel test --show_timestamps   \
             //software/simulated_tests/...   \
             //software/ai/hl/stp/play/...    \
             //software/ai/hl/stp/tactic/...
-          
+      
+      - name: Upload simulated test artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: simulated-test-outputs
+          # we only care about the replay logs from the STP tests
+          path: |
+            src/bazel-out/k8-fastbuild/testlogs/software/ai/hl/stp
+            
   memory-leak-checks:
     name: Memory Leak Checks
     runs-on: ubuntu-18.04

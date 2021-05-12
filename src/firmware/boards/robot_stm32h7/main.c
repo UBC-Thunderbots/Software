@@ -35,6 +35,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#pragma GCC diagnostic pop
+
 #include "firmware/app/logger/logger.h"
 #include "firmware/boards/robot_stm32h7/io/drivetrain.h"
 #include "firmware/boards/robot_stm32h7/io/uart_logger.h"
