@@ -21,3 +21,13 @@ cc_library(
         "//software/logger",
     ],
 )
+
+cc_test(
+    name = "move_to_goal_line_fms_test",
+    srcs = ["move_to_goal_line_fsm_test.cpp"],
+    deps = [
+        ":move_to_goal_line_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)

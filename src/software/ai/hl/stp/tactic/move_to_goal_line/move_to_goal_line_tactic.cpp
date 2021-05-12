@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/tactic/move_to_goal_line/move_to_goal_line_fsm.h"
 #include "software/ai/hl/stp/tactic/move_to_goal_line/move_to_goal_line_tactic.h"
+#include "software/ai/hl/stp/action/stop_action.h"
 
 #include <algorithm>
 
@@ -7,13 +8,6 @@ MoveToGoalLineTactic::MoveToGoalLineTactic(){
 }
 
 void MoveToGoalLineTactic::updateWorldParams(const World &world) {}
-
-void MoveToGoalLineTactic::updateControlParams(const Point &ball_location,
-                                              Angle chick_direction)
-{
-    control_params.ball_location   = ball_location;
-    control_params.chick_direction = chick_direction;
-}
 
 double MoveToGoalLineTactic::calculateRobotCost(const Robot &robot,
                                                const World &world) const
@@ -28,22 +22,12 @@ double MoveToGoalLineTactic::calculateRobotCost(const Robot &robot,
 
 void MoveToGoalLineTactic::calculateNextAction(ActionCoroutine::push_type &yield)
 {
-    double size_of_region_behind_ball = 4 * ROBOT_MAX_RADIUS_METERS;
-    auto move_action =
-            std::make_shared<MoveAction>(false, MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD,
-                                         MoveAction::ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD);
+    auto stop_action = std::make_shared<StopAction>(false);
     do
     {
-        Vector behind_ball =
-                Vector::createFromAngle(control_params.chick_direction + Angle::half());
-        Point point_behind_ball =
-                control_params.ball_location +
-                behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
-        move_action->updateControlParams(*robot_, point_behind_ball,
-                                         control_params.chick_direction, 0.0,
-                                         DribblerMode::OFF, BallCollisionType::AVOID);
-        yield(move_action);
-    } while (!move_action->done());
+        stop_action->updateControlParams(*robot_, false);
+        yield(stop_action);
+    } while (!stop_action->done());
 }
 
 bool MoveToGoalLineTactic::done() const
@@ -53,7 +37,7 @@ bool MoveToGoalLineTactic::done() const
 
 void MoveToGoalLineTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    fsm.process_event(GetBehindBallFSM::Update(control_params, tactic_update));
+    fsm.process_event(MoveToGoalLineFSM::Update(tactic_update));
 }
 
 void MoveToGoalLineTactic::accept(TacticVisitor &visitor) const
