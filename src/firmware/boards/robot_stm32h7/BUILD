@@ -66,6 +66,7 @@ cc_library(
         ":lwip",
         ":tim",
         ":usart",
+        "//firmware/app/logger",
         "//firmware/boards/robot_stm32h7/io:proto_multicast_communication",
         "//firmware/boards/robot_stm32h7/io:ublox_odinw262_communicator",
         "//shared:constants",

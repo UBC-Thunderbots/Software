@@ -27,6 +27,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdbool.h>
+#include "firmware/app/logger/logger.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -90,6 +91,76 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
     /* USER CODE BEGIN HardFault_IRQn 0 */
+    TLOG_FATAL(" ------------- HARD FAULT -------------- ");
+
+    if (SCB->CFSR & SCB_CFSR_IACCVIOL_Pos)
+    {
+        TLOG_FATAL("Instruction access violation flag");
+    }
+    if (SCB->CFSR & SCB_CFSR_MUNSTKERR_Pos)
+    {
+        TLOG_FATAL("Memory manager fault on unstacking for a return from exception");
+    }
+    if (SCB->CFSR & SCB_CFSR_MSTKERR_Pos)
+    {
+        TLOG_FATAL("Memory manager fault on stacking for exception entry.");
+    }
+    if (SCB->CFSR & SCB_CFSR_MMARVALID_Pos)
+    {
+        TLOG_FATAL("Memory Management Fault Address Register (MMAR) valid flag");
+    }
+    if (SCB->CFSR & SCB_CFSR_IBUSERR_Pos)
+    {
+        TLOG_FATAL("Instruction bus error");
+    };
+    if (SCB->CFSR & SCB_CFSR_PRECISERR_Pos)
+    {
+        TLOG_FATAL("Precise data bus error");
+    };
+    if (SCB->CFSR & SCB_CFSR_IMPRECISERR_Pos)
+    {
+        TLOG_FATAL("Precise data bus error");
+    };
+    if (SCB->CFSR & SCB_CFSR_UNSTKERR_Pos)
+    {
+        TLOG_FATAL("Bus fault on unstacking for a return from exception");
+    };
+    if (SCB->CFSR & SCB_CFSR_STKERR_Pos)
+    {
+        TLOG_FATAL("Bus fault on stacking for exception entry");
+    };
+    if (SCB->CFSR & SCB_CFSR_LSPERR_Pos)
+    {
+        TLOG_FATAL("Bus fault on floating-point lazy state preservation");
+    };
+    if (SCB->CFSR & SCB_CFSR_BFARVALID_Pos)
+    {
+        TLOG_FATAL("Bus Fault Address Register (BFAR) valid flag");
+    };
+    if (SCB->CFSR & SCB_CFSR_UNDEFINSTR_Pos)
+    {
+        TLOG_FATAL("Undefined instruction usage fault");
+    };
+    if (SCB->CFSR & SCB_CFSR_INVSTATE_Pos)
+    {
+        TLOG_FATAL("Invalid state usage fault");
+    };
+    if (SCB->CFSR & SCB_CFSR_INVPC_Pos)
+    {
+        TLOG_FATAL("Invalid PC load usage fault");
+    };
+    if (SCB->CFSR & SCB_CFSR_NOCP_Pos)
+    {
+        TLOG_FATAL("No coprocessor usage fault.");
+    };
+    if (SCB->CFSR & SCB_CFSR_UNALIGNED_Pos)
+    {
+        TLOG_FATAL("Unaligned access usage fault");
+    };
+    if (SCB->CFSR & SCB_CFSR_DIVBYZERO_Pos)
+    {
+        TLOG_FATAL("Divide by zero usage fault");
+    };
 
     /* USER CODE END HardFault_IRQn 0 */
     while (1)
