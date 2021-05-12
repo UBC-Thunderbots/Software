@@ -6,32 +6,38 @@
     save a LOT of time by using this tool: 
     https://github.com/ekalinin/github-markdown-toc
 -->
-* [Table Of Contents](#table-of-contents)
-* [Introduction](#introduction)
-* [Installation and Setup](#installation-and-setup)
-* [Operating Systems](#operating-systems)
-* [Getting the Code](#getting-the-code)
-* [Running the setup scripts](#running-the-setup-scripts)
-   * [Installing Software Dependencies](#installing-software-dependencies)
-   * [Installing Firmware Dependencies](#installing-firmware-dependencies)
-   * [Setting Up USB Permissions](#setting-up-usb-permissions)
-   * [Installing an IDE](#installing-an-ide)
-      * [CLion](#clion)
-         * [Getting your Student License](#getting-your-student-license)
-         * [Installing CLion](#installing-clion)
-      * [VSCode](#vscode)
-* [Building and Running the Code](#building-and-running-the-code)
-   * [Building from the command-line](#building-from-the-command-line)
-   * [Building with CLion](#building-with-clion)
-   * [Running our AI, Simulator, SimulatedTests or Robot Diagnostics](#running-our-ai-simulator-simulatedtests-or-robot-diagnostics)
-   * [Running AI vs AI](#running-ai-vs-ai)
-* [Debugging](#debugging)
-   * [Debugging with CLion](#debugging-with-clion)
-   * [Debugging from the Command line](#debugging-from-the-command-line)
-* [Profiling](#profiling)
-* [Flashing and Debugging A STM32F4 MCU](#flashing-and-debugging-a-stm32f4-mcu)
-* [Flashing and Debugging A STM32H7 MCU](#flashing-and-debugging-a-stm32h7-mcu)
-* [Flashing the Radio Dongle](#flashing-the-radio-dongle)
+- [Software Setup](#software-setup)
+  - [Table Of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Installation and Setup](#installation-and-setup)
+  - [Operating Systems](#operating-systems)
+  - [Getting the Code](#getting-the-code)
+  - [Running the setup scripts](#running-the-setup-scripts)
+    - [Installing Software Dependencies](#installing-software-dependencies)
+    - [Installing Firmware Dependencies](#installing-firmware-dependencies)
+    - [Setting Up USB Permissions](#setting-up-usb-permissions)
+    - [Installing an IDE](#installing-an-ide)
+      - [CLion](#clion)
+        - [Getting your Student License](#getting-your-student-license)
+        - [Installing CLion](#installing-clion)
+      - [VSCode](#vscode)
+  - [Building and Running the Code](#building-and-running-the-code)
+    - [Building from the command-line](#building-from-the-command-line)
+    - [Building with CLion](#building-with-clion)
+    - [With VSCode](#with-vscode)
+    - [Running our AI, Simulator, SimulatedTests or Robot Diagnostics](#running-our-ai-simulator-simulatedtests-or-robot-diagnostics)
+    - [Running AI vs AI](#running-ai-vs-ai)
+  - [Debugging](#debugging)
+    - [Debugging with CLion](#debugging-with-clion)
+    - [Debugging from the Command line](#debugging-from-the-command-line)
+  - [Profiling](#profiling)
+  - [Flashing And Debugging A STM32F4 MCU](#flashing-and-debugging-a-stm32f4-mcu)
+  - [Flashing the Radio Dongle](#flashing-the-radio-dongle)
+  - [Flashing And Debugging A STM32H7 MCU](#flashing-and-debugging-a-stm32h7-mcu)
+  - [Working with CubeMX to regenerate code](#working-with-cubemx-to-regenerate-code)
+  - [Setting up virtual robocup 2021](#setting-up-virtual-robocup-2021)
+    - [Setting up the SSL Simulation Environment](#setting-up-the-ssl-simulation-environment)
+    - [Pushing a Dockerfile to dockerhub](#pushing-a-dockerfile-to-dockerhub)
 
 ## Introduction
 These instructions assume that you have the following accounts setup:
@@ -245,3 +251,21 @@ This will output the file at the _absolute_ path given via the `--callgrind-out-
 2. To regenerate code from the `.ioc` file, run `bazel run //firmware_new/tools:cubemx_regen path/to/directory/with/.ioc`. The directory that is passed in as an argument must only contain 1 ioc file, which will be used to generate code into the same directory.
 
 To make sure we are all using the same cube version, run `STM32CubeMX` when editing the `.ioc` file.
+
+## Setting up virtual robocup 2021
+
+### Setting up the SSL Simulation Environment
+
+1. Fork the [SSL-Simulation-Setup](https://github.com/RoboCup-SSL/ssl-simulation-setup) repository.  
+2. Clone it.
+3. Follow these [instructions](https://github.com/RoboCup-SSL/ssl-simulation-setup/blob/master/Readme.md) to set up and run the repository.
+
+### Pushing a Dockerfile to dockerhub
+
+After editing the dockerfile, you build the image and push it to dockerhub with the following steps
+
+1. To build the image, make sure that you are in the same directory as your image, and then run `docker build -t ubcthunderbots/<image name>[:tag] .` Make sure that your chosen image name matches a repository in dockerhub. Here's an example with the robocup 2021 setup image: `docker build -t ubcthunderbots/tbots-software-env:0.0.1`
+2. Now, push your image to dockerhub. Get the credentials for the thunderbots dockerhub account from a software lead.
+   1. Log into the docker account with `docker login`. You will be prompted for a username and password
+   2. Now, you can push this image by its name: `docker push ubcthunderbots/<image name>[:tag]`
+
