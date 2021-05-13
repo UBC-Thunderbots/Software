@@ -4,7 +4,7 @@
  */
 
 #ifdef PLATFORMIO_BUILD
-#include "echo_library.h"  // PlatformIO sees and includes the library based on the file name ONLY
+#include "echo_library.h"  // PlatformIO sees and includes the library based on the bazel rule name ONLY
 #else
 #include "echo_library.h"  // actual path to file (in this example it is the same)
 #endif

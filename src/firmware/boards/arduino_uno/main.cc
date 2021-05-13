@@ -3,6 +3,7 @@
 #include <constants_platformio.h>  // PlatformIO sees and includes the library based on the bazel rule name ONLY
 #else
 #include "shared/constants.h" //actual path to the file
+#include <constants_platformio.h>
 #endif
 
 #include <Arduino.h>
@@ -14,7 +15,8 @@
 int input_pin = 7;
 
 void setup() {
-    Serial.begin(ARDUINO_BAUD_RATE);    // opens serial port, sets data rate to 9600 bps
+    Serial.begin(ARDUINO_BAUD_RATE);    // opens serial port, sets data rate
+    //Serial.begin(115200);
     pinMode(input_pin, INPUT_PULLUP);
 }
 
@@ -25,6 +27,5 @@ void loop() {
     //PLAY when connected to gnd, STOP when yanked out
     unsigned char estopVal = digitalRead(input_pin)==0 ? ESTOP_PLAY_MSG : ESTOP_STOP_MSG;
 
-    Serial.print(estopVal);
-
+    Serial.write(estopVal);
 }
