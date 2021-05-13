@@ -144,3 +144,6 @@ const unsigned DIV_B_NUM_ROBOTS = 6;
 
 // UART baud rate used to communicate between system and arudino
 const unsigned int ARDUINO_BAUD_RATE = 115200;
+
+const unsigned char ESTOP_PLAY_MSG = 1;
+const unsigned char ESTOP_STOP_MSG = 0;
