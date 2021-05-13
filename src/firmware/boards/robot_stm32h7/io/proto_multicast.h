@@ -2,6 +2,14 @@
 
 #include <pb.h>
 
+/**
+ * Initializes the proto_multicast library
+ *
+ * @param net_timeout_msg How long the receivers should wait before signaling
+ *        a timeout event in ms
+ */
+void io_proto_multicast_init(int net_timeout_ms);
+
 /***
  * TASKS:
  *
@@ -29,8 +37,8 @@
  *
  * NOTE: These functions must run as a new Task
  */
-void io_proto_multicast_sender_task(void* communication_profile);
-void io_proto_multicast_listener_task(void* communication_profile);
+void io_proto_multicast_senderTask(void* communication_profile);
+void io_proto_multicast_listenerTask(void* communication_profile);
 
 /**
  * LWIP automatically places MX_LWIP_Init() in a default task. That function
@@ -49,10 +57,3 @@ void io_proto_multicast_listener_task(void* communication_profile);
  */
 void io_proto_multicast_startNetworkingTask(void* unused);
 
-/**
- * Initializes the proto_multicast_communication library
- *
- * @param net_timeout_msg How long the receivers should wait before signaling
- *        a timeout event in ms
- */
-void io_proto_multicast_communication_init(int net_timeout_ms);

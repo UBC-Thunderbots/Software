@@ -1,8 +1,10 @@
-#include "firmware/boards/robot_stm32h7/io/proto_multicast_communication_tasks.h"
+#include "firmware/boards/robot_stm32h7/io/proto_multicast.h"
 
 #include <stdlib.h>
 
 #include "firmware/boards/robot_stm32h7/io/proto_multicast_communication_profile.h"
+#include <assert.h>
+#include "firmware/app/logger/logger.h"
 #include "firmware/boards/robot_stm32h7/io/ublox_odinw262_communicator.h"
 #include "lwip.h"
 #include "lwip/api.h"
@@ -29,13 +31,13 @@ static int network_timeout_ms;
 // this flag is set on the networking_event to indicate "link up"
 static uint32_t NETIF_CONFIGURED = 1 << 0;
 
-void io_proto_multicast_communication_init(int net_timeout_ms)
+void io_proto_multicast_init(int net_timeout_ms)
 {
     networking_event   = osEventFlagsNew(NULL);
     network_timeout_ms = net_timeout_ms;
 }
 
-void io_proto_multicast_sender_task(void* communication_profile)
+void io_proto_multicast_senderTask(void* communication_profile)
 {
     ProtoMulticastCommunicationProfile_t* profile =
         (ProtoMulticastCommunicationProfile_t*)communication_profile;
@@ -96,7 +98,7 @@ void io_proto_multicast_sender_task(void* communication_profile)
     netconn_delete(conn);
 }
 
-void io_proto_multicast_listener_task(void* communication_profile)
+void io_proto_multicast_listenerTask(void* communication_profile)
 {
     ProtoMulticastCommunicationProfile_t* profile =
         (ProtoMulticastCommunicationProfile_t*)communication_profile;
@@ -169,3 +171,4 @@ void io_proto_multicast_startNetworkingTask(void* unused)
     osEventFlagsSet(networking_event, NETIF_CONFIGURED);
     osThreadExit();
 }
+

@@ -32,6 +32,7 @@ cc_binary(
         "//firmware/app/logger",
         "//firmware/boards/robot_stm32h7/io:drivetrain",
         "//firmware/boards/robot_stm32h7/io:drivetrain_unit",
+        "//firmware/boards/robot_stm32h7/io:robot_status",
         "//firmware/boards/robot_stm32h7/io:gpio_pin",
         "//firmware/boards/robot_stm32h7/io:network_logger",
         "//firmware/boards/robot_stm32h7/io:power_monitor",
