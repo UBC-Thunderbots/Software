@@ -73,6 +73,7 @@ int main(int argc, char** argv)
         // Connect observers
         ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(backend);
         sensor_fusion->Subject<World>::registerObserver(ai);
+        sensor_fusion->Subject<World>::registerObserver(backend);
         backend->Subject<SensorProto>::registerObserver(sensor_fusion);
         if (!args->getHeadless()->value())
         {
