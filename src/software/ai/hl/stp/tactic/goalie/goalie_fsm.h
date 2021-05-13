@@ -24,6 +24,8 @@ struct GoalieFSM
     {
         // the goalie tactic config
         std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
+        // The maximum allowed speed mode
+        MaxAllowedSpeedMode max_allowed_speed_mode;
     };
 
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -246,7 +248,7 @@ struct GoalieFSM
                 event.common.robot.id(), goalie_pos, goalie_orientation, 0.0,
                 DribblerMode::OFF, BallCollisionType::ALLOW,
                 AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+                event.control_params.max_allowed_speed_mode, 0.0));
         };
 
         /**
@@ -320,7 +322,7 @@ struct GoalieFSM
                 event.common.robot.id(), goalie_pos, goalie_orientation,
                 goalie_final_speed, DribblerMode::OFF, BallCollisionType::ALLOW,
                 AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+                event.control_params.max_allowed_speed_mode, 0.0));
         };
 
         return make_transition_table(

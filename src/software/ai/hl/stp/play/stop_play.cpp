@@ -1,11 +1,11 @@
 #include "software/ai/hl/stp/play/stop_play.h"
 
 #include "shared/constants.h"
-#include "software/ai/evaluation/enemy_threat.h"
+#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-StopPlay::StopPlay(std::shared_ptr<const PlayConfig> config) : Play(config, true) {}
+StopPlay::StopPlay(std::shared_ptr<const PlayConfig> config) : Play(config, false) {}
 
 bool StopPlay::isApplicable(const World &world) const
 {
@@ -46,10 +46,15 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
     // 		+--------------------+--------------------+
 
 
+    MaxAllowedSpeedMode stop_mode = MaxAllowedSpeedMode::STOP_COMMAND;
+
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
         std::make_shared<MoveTactic>(true)};
+
+    auto goalie_tactic =
+        std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig(), stop_mode);
 
     // we want to find the radius of the semicircle in which the defense area can be
     // inscribed, this is so the robots can snap to that semicircle and not enter the
@@ -62,11 +67,7 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
 
     do
     {
-        // goalie tactic
-        auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
-                                                world.enemyTeam(), world.ball(), false);
-
-        PriorityTacticVector result = {{}};
+        PriorityTacticVector result = {{goalie_tactic}};
 
         // a unit vector from the center of the goal to the ball, this vector will be used
         // for positioning all the robots (excluding the goalie). The positioning vector
@@ -87,10 +88,6 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
         Point goal_defense_point_right =
             goal_defense_point_center -
             robot_positioning_unit_vector * 2 * ROBOT_MAX_RADIUS_METERS;
-
-        MaxAllowedSpeedMode stop_mode = MaxAllowedSpeedMode::STOP_COMMAND;
-
-        goalie_tactic->updateControlParams(stop_mode);
 
         move_tactics.at(0)->updateControlParams(
             goal_defense_point_left,
