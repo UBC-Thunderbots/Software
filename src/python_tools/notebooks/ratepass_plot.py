@@ -105,10 +105,10 @@ def plot_ssl_wrapper_at_idx(idx):
         pass_dict["receiver_point"] = world.Point(x, y)
         return passing.ratePassShootScore(the_world, pass_dict, config)
 
-    #     rate_pass_heatmap_plotter.plot_heatmap(ratePassCost)
-    #     rate_pass_enemy_heatmap_plotter.plot_heatmap(ratePassEnemyRiskCost)
-    #     rate_pass_friendly_heatmap_plotter.plot_heatmap(ratePassFriendlyCapabilityCost)
-    #     rate_pass_shoot_score_plotter.plot_heatmap(ratePassShootScoreCost)
+    rate_pass_heatmap_plotter.plot_heatmap(ratePassCost)
+    rate_pass_enemy_heatmap_plotter.plot_heatmap(ratePassEnemyRiskCost)
+    rate_pass_friendly_heatmap_plotter.plot_heatmap(ratePassFriendlyCapabilityCost)
+    rate_pass_shoot_score_plotter.plot_heatmap(ratePassShootScoreCost)
 
     zones = pass_generator.getAllZones(the_world)
     pass_generator_plotter.plot_zones(zones)
