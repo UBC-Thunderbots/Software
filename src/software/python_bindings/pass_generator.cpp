@@ -47,7 +47,6 @@ py::list getBestPassesForAllZones(PassGenerator<ZoneEnum>& generator, const Worl
     py::list result;
     auto evaluation = generator.generatePassEvaluation(world);
 
-    // unfortunately this is tightly coupled to the 18 zone field division
     for (auto zone_id : evaluation.getFieldPitchDivsion()->getAllZoneIds())
     {
         auto pass_with_rating = evaluation.getBestPassInZones({zone_id});

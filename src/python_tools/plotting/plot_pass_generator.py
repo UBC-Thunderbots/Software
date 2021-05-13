@@ -98,6 +98,7 @@ class PassGeneratorPlotter:
             width=8,
             height=400,
             location="bottom_right",
+            title="Pass rating",
         )
         self.fig.add_layout(color_bar, "right")
 
