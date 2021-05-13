@@ -77,6 +77,7 @@ cc_library(
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
         ":ublox_odinw262_communicator",
+        "//firmware/app/logger",
         "//firmware/boards/robot_stm32h7:hal",
         "//firmware/boards/robot_stm32h7:lwip",
         "//shared/proto:tbots_nanopb_proto",
@@ -171,7 +172,7 @@ cc_library(
     srcs = ["INA226_power_monitor_driver.c"],
     hdrs = ["INA226_power_monitor_driver.h"],
     copts = [
-        # We don't want to mark warnings as errors for 3rd party code
+        # This library uses hal and includes ST headers, so we can't mark warnings as errors
         # This was adapted from: https://github.com/macgeorge/STM32-example-codes
         "-Wno-error",
     ],

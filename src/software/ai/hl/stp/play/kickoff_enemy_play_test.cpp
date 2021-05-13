@@ -14,39 +14,36 @@
 
 class KickoffEnemyPlayTest : public SimulatedPlayTestFixture
 {
+   protected:
+    Field field = Field::createSSLDivisionBField();
 };
 
 TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
 {
-    setBallState(BallState(Point(0, 0), Vector(0, 0)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
+    BallState ball_state(Point(0, 0), Vector(0, 0));
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
-         Point(-3, -2.5)}));
+         Point(-3, -2.5)});
     setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-         field().enemyDefenseArea().negXNegYCorner(),
-         field().enemyDefenseArea().negXPosYCorner()}));
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
+        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
+         field.enemyDefenseArea().negXNegYCorner(),
+         field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(KickoffEnemyPlay));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_THEM);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            // TODO: Fix bug with robot three not shadowing the enemy kicker in
-            // kickoff_enemy_play
-            // https://github.com/UBC-Thunderbots/Software/issues/1945
-
             // Three friendly robots in position to shadow enemy robots. Rectangles are
             // chosen to be generally in the way of the the front 3 enemy robots and the
             // friendly goal, based on where the enemy robots are initialized in the test.
-            Rectangle robotOneShadowingRect(Point(0, 2.2), Point(-0.4, 1.8));
-            Rectangle robotFiveShadowingRect(Point(0, -2.2), Point(-0.4, -1.8));
-            // Rectangle robotThreeShadowingRect(Point(-0.49, 0.1), Point(-0.75,
-            // -0.1));
+            Rectangle robotOneShadowingRect(Point(0, 1.5), Point(-0.4, 1.3));
+            Rectangle robotFiveShadowingRect(Point(0, -1.5), Point(-0.4, -1.3));
+            Rectangle robotThreeShadowingRect(Point(-0.49, 0.1), Point(-0.75, -0.1));
             robotInPolygon(1, robotOneShadowingRect, world_ptr, yield);
             robotInPolygon(5, robotFiveShadowingRect, world_ptr, yield);
-            // robotInPolygon(3, robotThreeShadowingRect, world_ptr);
+            robotInPolygon(3, robotThreeShadowingRect, world_ptr, yield);
 
             // Two Friendly robots defending the exterior of defense box
             Rectangle robotsDefendingRect(Point(-3.2, 1.1), Point(-3.5, -1.1));
@@ -57,6 +54,7 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         robotsInFriendlyHalf, robotsNotInCenterCircle};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }

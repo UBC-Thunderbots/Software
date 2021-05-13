@@ -38,11 +38,9 @@ class CornerKickPlay : public Play
      * pickers
      *
      * @param yield The coroutine to yield
-     * @param goalie_tactic The goalie tactic to use
      * @param world The current state of the world
      *
      * @return the pass that was committed to
      */
-    Pass setupPass(TacticCoroutine::push_type &yield,
-                   std::shared_ptr<GoalieTactic> goalie_tactic, const World &world);
+    Pass setupPass(TacticCoroutine::push_type &yield, const World &world);
 };

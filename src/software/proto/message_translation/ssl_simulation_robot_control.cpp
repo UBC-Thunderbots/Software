@@ -25,14 +25,25 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
 
 std::unique_ptr<SSLSimulationProto::RobotCommand> createRobotCommand(
     unsigned robot_id, std::unique_ptr<SSLSimulationProto::RobotMoveCommand> move_command,
-    double kick_speed, double kick_angle, double dribbler_speed)
+    std::optional<double> kick_speed, std::optional<double> kick_angle,
+    std::optional<double> dribbler_speed)
 {
     auto robot_command = std::make_unique<SSLSimulationProto::RobotCommand>();
 
     robot_command->set_id(robot_id);
-    robot_command->set_kick_speed(static_cast<float>(kick_speed));
-    robot_command->set_kick_angle(static_cast<float>(kick_angle));
-    robot_command->set_dribbler_speed(static_cast<float>(dribbler_speed));
+
+    if (kick_speed.has_value())
+    {
+        robot_command->set_kick_speed(static_cast<float>(kick_speed.value()));
+    }
+    if (kick_angle.has_value())
+    {
+        robot_command->set_kick_angle(static_cast<float>(kick_angle.value()));
+    }
+    if (dribbler_speed.has_value())
+    {
+        robot_command->set_dribbler_speed(static_cast<float>(dribbler_speed.value()));
+    }
 
     *(robot_command->mutable_move_command()) = *move_command;
 
