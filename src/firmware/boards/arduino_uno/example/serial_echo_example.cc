@@ -3,8 +3,6 @@
  *
  */
 
-
-
 #ifdef PLATFORMIO_BUILD
 #include "echo_library.h"  // PlatformIO sees and includes the library based on the file name ONLY
 #else
