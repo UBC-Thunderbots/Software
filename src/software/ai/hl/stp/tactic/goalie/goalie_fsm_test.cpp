@@ -88,7 +88,8 @@ TEST(GoalieFSMTest, test_transitions)
     FSM<GoalieFSM> fsm;
 
     GoalieFSM::ControlParams control_params{
-        .goalie_tactic_config = std::make_shared<const GoalieTacticConfig>()};
+        .goalie_tactic_config   = std::make_shared<const GoalieTacticConfig>(),
+        .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT};
 
     // goalie starts in PositionToBlockState
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlockState>));
