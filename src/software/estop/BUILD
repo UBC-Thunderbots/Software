@@ -6,10 +6,10 @@ cc_library(
     hdrs = ["threaded_estop_reader.h"],
     deps = [
         "uart_communication_interface",
+        "//shared:constants",
         "//software/logger",
         "//software/util/make_enum",
         "@boost//:asio",
-        "//shared:constants"
     ],
 )
 

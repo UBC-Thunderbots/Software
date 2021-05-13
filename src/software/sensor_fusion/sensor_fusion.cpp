@@ -160,8 +160,6 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 void SensorFusion::updateWorld(
     const google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus> &robot_status_msgs)
 {
-
-    bool enable_estop_detected = false;
     for (auto &robot_status_msg : robot_status_msgs)
     {
         int robot_id = robot_status_msg.robot_id();
@@ -189,13 +187,9 @@ void SensorFusion::updateWorld(
         }
         friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
 
-        std::cout<<"received robot status msg, estop = "<<robot_status_msg.estopenabled()<<std::endl;
-
-        enable_estop_detected = !enable_estop_detected && robot_status_msg.estopenabled();
-
+        //estop_enabled set permanently when set
+        estop_enabled = !estop_enabled && robot_status_msg.estopenabled();
     }
-
-    estop_enabled = enable_estop_detected;
 }
 
 void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection_frame)

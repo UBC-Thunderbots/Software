@@ -167,8 +167,16 @@ class World final
      */
     TeamSide getTeamWithPossession() const;
 
+    /**
+     * Sets whether estop is enabled
+     * @param estop_enabled whether robots in this world are protected by estop
+     */
     void setEstopEnabled(bool estop_enabled);
 
+    /**
+     * Gets whether estop is enabled
+     * @return whether estop is enabled for robots in this world
+     */
     bool isEstopEnabled();
 
     /**

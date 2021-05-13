@@ -6,6 +6,11 @@
 #endif
 
 #include <Arduino.h>
+
+/**
+ * main code to be run on Arduino
+ */
+
 int input_pin = 7;
 
 void setup() {

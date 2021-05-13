@@ -44,8 +44,6 @@ void WifiBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
         for(auto &primitive : *robot_primitives_map){
             primitive.second = *createStopPrimitive(false);
         }
-
-        LOG(INFO)<<"sent: "<<primitives.DebugString();
     }
 
     primitive_output->sendProto(primitives);
@@ -69,8 +67,8 @@ void WifiBackend::onValueReceived(World world)
     //handle estop option
     if(world.isEstopEnabled() && estop_reader == nullptr){
         boost::asio::io_service io_service;
-        std::unique_ptr<BoostUartCommunication> uartDevice = std::make_unique<BoostUartCommunication>( io_service, ARDUINO_BAUD_RATE, "/dev/ttyACM0");
-        estop_reader = std::make_unique<ThreadedEstopReader>(std::move(uartDevice), 0);
+        std::unique_ptr<BoostUartCommunication> uart_device = std::make_unique<BoostUartCommunication>(io_service, ARDUINO_BAUD_RATE, "/dev/ttyACM0");
+        estop_reader = std::make_unique<ThreadedEstopReader>(std::move(uart_device), 0);
     }
 
     vision_output->sendProto(*createVision(world));
@@ -104,8 +102,6 @@ void WifiBackend::joinMulticastChannel(int channel, const std::string& interface
     defending_side_output.reset(new ThreadedProtoUdpSender<DefendingSideProto>(
         std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, DEFENDING_SIDE_PORT,
         true));
-
-    std::cout<<"joined channels"<<std::endl;
 }
 
 // Register this backend in the genericFactory
