@@ -9,6 +9,7 @@ cc_library(
         "//software/logger",
         "//software/util/make_enum",
         "@boost//:asio",
+        "//shared:constants"
     ],
 )
 

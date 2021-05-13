@@ -7,9 +7,9 @@
 #include <iostream>
 #include <mutex>
 #include <thread>
-
 #include "software/util/make_enum/make_enum.h"
 #include "uart_communication.h"
+#include "shared/constants.h"
 
 // enum that represents the possible states of estop
 MAKE_ENUM(EstopState, PLAY, STOP, STATUS_ERROR);
@@ -56,8 +56,8 @@ class ThreadedEstopReader
      * any other message received is considered a EstopState::STATUS_ERROR
      */
     static constexpr int ESTOP_MESSAGE_SIZE_BYTES = 1;
-    static constexpr unsigned char ESTOP_PLAY     = 1;
-    static constexpr unsigned char ESTOP_STOP     = 0;
+    static constexpr unsigned char ESTOP_PLAY     = ESTOP_PLAY_MSG;
+    static constexpr unsigned char ESTOP_STOP     = ESTOP_STOP_MSG;
 
     // In the case where we read an unknown message (not PLAY or STOP) we try again this
     // number of times
