@@ -427,36 +427,4 @@ struct GoalieFSM
             return std::nullopt;
         }
     }
-
-    std::optional<Point> RestrainGoalieToGoalLine(const Field &field, Point goalie_desired_position) {
-        double upper_y_goal_line = field.friendlyGoalCenter().y() + field.goalYLength() / 2;
-        double lower_y_goal_line = field.friendlyGoalCenter().y() - field.goalYLength() / 2;
-
-        Point upper_point_goal_line = Point(field.friendlyGoalCenter().x(), upper_y_goal_line);
-
-        Point lower_point_goal_line = Point(field.friendlyGoalCenter().x(), lower_y_goal_line);
-
-        Segment goal_line = Segment(upper_point_goal_line, lower_point_goal_line);
-
-        // if the goalie restricted area already contains the point, then we are
-        // safe to move there.
-        if (contains(goal_line, goalie_desired_position))
-        {
-            return Point(goalie_desired_position);
-        } else {
-            Line first = Line(goalie_desired_position, field.friendlyGoalCenter());
-            Line second = Line(upper_point_goal_line, lower_point_goal_line);
-
-            std::optional<Point> point_on_line = intersection(first, second);
-
-            // set to nearest endpoint of goal line if point not on goal line
-            if (point_on_line->y() > upper_y_goal_line) {
-                point_on_line->set(point_on_line->x(), upper_y_goal_line);
-            } else if (point_on_line->y() < lower_y_goal_line) {
-                point_on_line->set(point_on_line->x(), lower_y_goal_line);
-            }
-
-            return point_on_line;
-        }
-    }
 };

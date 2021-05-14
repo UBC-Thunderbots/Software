@@ -34,7 +34,6 @@ class ProtoLogger : public FirstInFirstOutThreadedObserver<MsgT>
 
     static constexpr int DEFAULT_MSGS_PER_CHUNK = 1000;
 
-   private:
     /**
      * Adds a MsgT to the current chunk. This will also save it to disk and clear the
      * chunk in memory, if the chunk contains `msgs_per_chunk` messages after the
@@ -44,6 +43,7 @@ class ProtoLogger : public FirstInFirstOutThreadedObserver<MsgT>
      */
     void onValueReceived(MsgT msg) override;
 
+   private:
     /**
      * Increments the chunk index of the file we are writing to.
      */

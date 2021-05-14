@@ -17,6 +17,8 @@ class SimulatedPasserTacticTest
     : public SimulatedTacticTestFixture,
       public ::testing::WithParamInterface<std::tuple<Pass, RobotStateWithId, BallState>>
 {
+   protected:
+    Field field = Field::createSSLDivisionBField();
 };
 
 TEST_P(SimulatedPasserTacticTest, passer_test)
@@ -25,9 +27,8 @@ TEST_P(SimulatedPasserTacticTest, passer_test)
     RobotStateWithId robot_state = std::get<1>(GetParam());
     BallState ball_state         = std::get<2>(GetParam());
 
-    setBallState(ball_state);
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)}));
-    addFriendlyRobots({robot_state});
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
+    friendly_robots.emplace_back(robot_state);
 
     auto tactic = std::make_shared<PasserTactic>(pass);
     tactic->updateControlParams(pass);
@@ -54,8 +55,8 @@ TEST_P(SimulatedPasserTacticTest, passer_test)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(5));
+    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(5));
 }
 
 INSTANTIATE_TEST_CASE_P(

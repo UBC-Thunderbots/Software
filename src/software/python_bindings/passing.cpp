@@ -4,6 +4,7 @@
 #include "software/ai/passing/cost_function.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/sensor_msg.pb.h"
+#include "software/python_bindings/pass_utilities.h"
 #include "software/python_bindings/python_binding_utilities.h"
 #include "software/sensor_fusion/sensor_fusion.h"
 
@@ -21,14 +22,6 @@ py::dict getPassingConfig()
     return copyDynamicParametersConfigToDict(passing_config);
 }
 
-Pass createPassFromDict(py::dict pass_dict)
-{
-    // unpack values from the py::dict and put them into a pass
-    Point passer_point = pass_dict["passer_point"].cast<Point>();
-    Point receiver_point(pass_dict["receiver_point"].cast<Point>());
-    auto pass_speed = pass_dict["pass_speed"].cast<double>();
-    return Pass(passer_point, receiver_point, pass_speed);
-}
 
 double ratePassWrapper(const World& world, py::dict pass_dict,
                        py::dict passing_config_dict)

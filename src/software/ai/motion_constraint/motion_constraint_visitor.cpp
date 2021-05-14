@@ -7,8 +7,6 @@
 // We disable clang-format here because it makes these lists borderline unreadable,
 // and certainly way more difficult to edit
 // clang-format off
-void MotionConstraintVisitor::visit(const CherryPickTactic &tactic) {}
-
 void MotionConstraintVisitor::visit(const ShadowFreekickerTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const GoalieTactic &tactic)
@@ -85,8 +83,6 @@ void MotionConstraintVisitor::visit(const GoalieTestTactic &tactic) {}
 void MotionConstraintVisitor::visit(const DribbleTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const GetBehindBallTactic &tactic) {}
-
-void MotionConstraintVisitor::visit(const MoveToGoalLineTactic &tactic) {}
 
 // clang-format on
 
