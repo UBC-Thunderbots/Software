@@ -4,10 +4,10 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/possession.h"
+#include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
-#include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
@@ -30,10 +30,8 @@ bool DefensePlay::invariantHolds(const World &world) const
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
-    auto shoot_goal_tactic = std::make_shared<ShootGoalTactic>(
-        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        Angle::fromDegrees(5), std::nullopt, true,
-        play_config->getShootGoalTacticConfig());
+    auto shoot_goal_tactic =
+        std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
 
     auto defense_shadow_enemy_tactic = std::make_shared<DefenseShadowEnemyTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), true,

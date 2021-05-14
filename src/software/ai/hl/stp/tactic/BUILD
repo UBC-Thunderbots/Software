@@ -128,33 +128,6 @@ cc_test(
 )
 
 cc_library(
-    name = "shoot_goal_tactic",
-    srcs = ["shoot_goal_tactic.cpp"],
-    hdrs = ["shoot_goal_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/evaluation:calc_best_shot",
-        "//software/ai/hl/stp/action:chip_action",
-        "//software/ai/hl/stp/action:intercept_ball_action",
-        "//software/ai/hl/stp/action:kick_action",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/logger",
-    ],
-)
-
-cc_test(
-    name = "shoot_goal_tactic_test",
-    srcs = ["shoot_goal_tactic_test.cpp"],
-    deps = [
-        ":shoot_goal_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "all_tactics",
     hdrs = ["all_tactics.h"],
     deps = [
@@ -164,8 +137,8 @@ cc_library(
         ":penalty_setup_tactic",
         ":receiver_tactic",
         ":shadow_free_kicker_tactic",
-        ":shoot_goal_tactic",
         ":tactic",
+        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
@@ -173,7 +146,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/passer:passer_tactic",
+        "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
         "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
     ],

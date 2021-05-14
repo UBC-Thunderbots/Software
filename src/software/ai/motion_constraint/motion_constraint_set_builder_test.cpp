@@ -59,13 +59,8 @@ namespace
                                            false),
                 std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new ShootGoalTactic(world.field(), world.friendlyTeam(),
-                                    world.enemyTeam(), world.ball(), Angle::zero(),
-                                    std::nullopt, false,
-                                    std::make_shared<const ShootGoalTacticConfig>()),
-                std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL})),
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new PasserTactic(pass), std::set<MotionConstraint>({})),
+                new AttackerTactic(std::make_shared<const AttackerTacticConfig>()),
+                std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new StopTactic(false), std::set<MotionConstraint>({}))};
 

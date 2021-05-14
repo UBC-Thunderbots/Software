@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/passer/passer_fsm.h"
+#include "software/ai/hl/stp/tactic/attacker/attacker_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
 
@@ -11,27 +11,36 @@
  * Note that this tactic does not take into account the time the pass should occur at,
  * it simply tries to move to the best position to take the pass as fast as possible
  */
-class PasserTactic : public Tactic
+class AttackerTactic : public Tactic
 {
    public:
     /**
-     * Creates a new PasserTactic
+     * Creates a new AttackerTactic
      *
-     * @param pass The pass this tactic should try to execute
-     * tactic will be restarted every time it completes
+     * @param attacker_tactic_config The config to fetch parameters from
      */
-    explicit PasserTactic(Pass pass);
+    explicit AttackerTactic(
+        std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config);
 
-    PasserTactic() = delete;
+    AttackerTactic() = delete;
 
     void updateWorldParams(const World& world) override;
 
     /**
-     * Updates the control parameters for this PasserTactic.
+     * Updates the control parameters for this AttackerTactic.
      *
      * @param updated_pass The pass to perform
      */
     void updateControlParams(const Pass& updated_pass);
+
+    /**
+     * Updates the control parameters for this AttackerTactic
+     *
+     * @param chip_target An optional point that the robot will chip towards when it is
+     * unable to shoot and is in danger of losing the ball to an enemy. If this value is
+     * not provided, the point defaults to the enemy goal
+     */
+    void updateControlParams(std::optional<Point> chip_target);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -51,10 +60,13 @@ class PasserTactic : public Tactic
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
-    // Tactic parameters
-    Pass pass;
+    FSM<AttackerFSM> fsm;
 
-    FSM<PasserFSM> fsm;
-
-    PasserFSM::ControlParams control_params;
+    // The pass to execute
+    std::optional<Pass> pass;
+    // The point the robot will chip towards if it is unable to shoot and is in danger
+    // or losing the ball to an enemy
+    std::optional<Point> chip_target;
+    // shoot goal config
+    std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config;
 };

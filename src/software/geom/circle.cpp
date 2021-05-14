@@ -39,6 +39,6 @@ bool operator!=(const Circle &c, const Circle &d)
 
 std::ostream &operator<<(std::ostream &os, const Circle &circle)
 {
-    os << "Circle at " << circle.origin() << " with radius " << circle.origin();
+    os << "Circle at " << circle.origin() << " with radius " << circle.radius();
     return os;
 }
