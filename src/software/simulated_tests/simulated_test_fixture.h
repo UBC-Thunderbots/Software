@@ -92,6 +92,8 @@ class SimulatedTestFixture : public ::testing::Test
         const std::vector<ValidationFunction> &non_terminating_validation_functions,
         const Duration &timeout);
 
+    void registerTickTime(double tick_time_ms);
+
     // The dynamic params being used in the tests
     std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config;
     std::shared_ptr<const ThunderbotsConfig> thunderbots_config;
@@ -189,6 +191,11 @@ class SimulatedTestFixture : public ::testing::Test
     // If true, introduces artificial delay so that simulation
     // time passes at the same speed a real life time
     bool run_simulation_in_realtime;
+
+    double total_tick_duration;
+    double max_tick_duration;
+    double min_tick_duration;
+    unsigned int tick_count;
 
     // The rate at which camera data will be simulated and given to SensorFusion.
     // Each sequential "camera frame" will be 1 / SIMULATED_CAMERA_FPS time step
