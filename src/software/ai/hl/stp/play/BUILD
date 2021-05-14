@@ -212,7 +212,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:penalty_setup_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/penalty_kick_tactic",
+        "//software/ai/hl/stp/tactic/penalty_kick:penalty_kick_tactic",
         "//software/logger",
         "//software/util/design_patterns:generic_factory",
     ],

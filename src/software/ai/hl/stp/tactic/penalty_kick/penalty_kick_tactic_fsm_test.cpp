@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/penalty_kick_tactic/penalty_kick_tactic_fsm.h"
+#include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic_fsm.h"
 
 #include <gtest/gtest.h>
 
@@ -14,7 +14,7 @@ TEST(PenaltyKickTacticFSM, test_transitions)
     FSM<PenaltyKickTacticFSM> fsm;
     EXPECT_TRUE(fsm.is(boost::sml::state<PenaltyKickTacticFSM::InitialState>));
 
-    PenaltyKickTacticFSM::ControlParams control_params{.enemy_goalie = std::nullopt};
+    PenaltyKickTacticFSM::ControlParams control_params{};
 
     fsm.process_event(PenaltyKickTacticFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
@@ -30,12 +30,22 @@ TEST(PenaltyKickTacticFSM, test_transitions)
     fsm.process_event(PenaltyKickTacticFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM>));
+    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<KickFSM>)>(
+        boost::sml::state<GetBehindBallFSM>));
+
+    world = ::TestUtil::setBallPosition(world, position + Vector(ROBOT_MAX_RADIUS_METERS, 0), Timestamp::fromSeconds(1));
+    fsm.process_event(PenaltyKickTacticFSM::Update(
+        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM>));
+    EXPECT_TRUE(fsm.is<decltype(boost::sml::state<KickFSM>)>(
+        boost::sml::state<KickFSM::KickState>));
 
     world = ::TestUtil::setBallPosition(world, world.field().enemyGoalCenter(),
                                         Timestamp::fromSeconds(2));
     world = ::TestUtil::setBallVelocity(world, Vector(5, 0), Timestamp::fromSeconds(2));
     fsm.process_event(PenaltyKickTacticFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+
     EXPECT_TRUE(fsm.is(boost::sml::X));
 }
 

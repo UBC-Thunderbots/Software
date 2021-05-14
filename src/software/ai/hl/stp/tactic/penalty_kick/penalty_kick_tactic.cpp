@@ -1,15 +1,10 @@
 /**
  * Implementation of the PenaltyKickTactic
  */
-#include "software/ai/hl/stp/tactic/penalty_kick_tactic/penalty_kick_tactic.h"
+#include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 
-PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, bool loop_forever,
-                                     const std::optional<Robot>& enemy_goalie)
-    : Tactic(loop_forever,
-             {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
-      ball(ball),
-      enemy_goalie(enemy_goalie),
-      control_params({.enemy_goalie = enemy_goalie})
+PenaltyKickTactic::PenaltyKickTactic()
+    : Tactic(false, {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick})
 {
 }
 
@@ -17,7 +12,6 @@ void PenaltyKickTactic::updateWorldParams(const World& world) {}
 
 void PenaltyKickTactic::updateControlParams()
 {
-    control_params.enemy_goalie = enemy_goalie;
 }
 
 double PenaltyKickTactic::calculateRobotCost(const Robot& robot, const World& world) const
@@ -45,11 +39,6 @@ void PenaltyKickTactic::accept(TacticVisitor& visitor) const
     visitor.visit(*this);
 }
 
-Ball PenaltyKickTactic::getBall() const
-{
-    return this->ball;
-}
-
 bool PenaltyKickTactic::done() const
 {
     return fsm.is(boost::sml::X);
@@ -57,5 +46,5 @@ bool PenaltyKickTactic::done() const
 
 void PenaltyKickTactic::updateIntent(const TacticUpdate& tactic_update)
 {
-    fsm.process_event(PenaltyKickTacticFSM::Update(control_params, tactic_update));
+    fsm.process_event(PenaltyKickTacticFSM::Update({}, tactic_update));
 }

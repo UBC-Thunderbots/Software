@@ -9,4 +9,5 @@ void friendlyScored(std::shared_ptr<World> world_ptr,
     {
         yield("The friendly team has not scored");
     }
+    std::cout << "Scored\n";
 }
