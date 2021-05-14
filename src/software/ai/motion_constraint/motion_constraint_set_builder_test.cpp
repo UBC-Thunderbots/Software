@@ -21,8 +21,6 @@ namespace
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new MoveTactic(false), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new CherryPickTactic(world, pass), std::set<MotionConstraint>({})),
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new CreaseDefenderTactic(
                     std::make_shared<const RobotNavigationObstacleConfig>()),
                 std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL})),

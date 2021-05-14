@@ -181,10 +181,8 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(
-        world, pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
-    auto cherry_pick_tactic_2 = std::make_shared<CherryPickTactic>(
-        world, pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
+    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
@@ -195,11 +193,15 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
 
         auto pass_eval = pass_generator.generatePassEvaluation(world);
+        auto pass1     = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
+        auto pass2     = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
 
-        cherry_pick_tactic_1->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
-        cherry_pick_tactic_2->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+        cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
+                                                  pass1.receiverOrientation(), 0.0,
+                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
+                                                  pass2.receiverOrientation(), 0.0,
+                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
@@ -225,10 +227,15 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 
         auto pass_eval = pass_generator.generatePassEvaluation(world);
 
-        cherry_pick_tactic_1->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
-        cherry_pick_tactic_2->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+        auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
+        auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
+
+        cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
+                                                  pass1.receiverOrientation(), 0.0,
+                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
+                                                  pass2.receiverOrientation(), 0.0,
+                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
@@ -255,10 +262,15 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 
         auto pass_eval = pass_generator.generatePassEvaluation(world);
 
-        cherry_pick_tactic_1->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
-        cherry_pick_tactic_2->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+        auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
+        auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
+
+        cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
+                                                  pass1.receiverOrientation(), 0.0,
+                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
+                                                  pass2.receiverOrientation(), 0.0,
+                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);

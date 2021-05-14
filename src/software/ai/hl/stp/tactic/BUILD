@@ -1,20 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "cherry_pick_tactic",
-    srcs = ["cherry_pick_tactic.cpp"],
-    hdrs = ["cherry_pick_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/passing:pass",
-        "//software/geom/algorithms",
-        "//software/logger",
-        "//software/world",
-    ],
-)
-
 cc_test(
     name = "penalty_setup_tactic_test",
     srcs = ["penalty_setup_tactic_test.cpp"],
@@ -173,7 +158,6 @@ cc_library(
     name = "all_tactics",
     hdrs = ["all_tactics.h"],
     deps = [
-        ":cherry_pick_tactic",
         ":defense_shadow_enemy_tactic",
         ":kickoff_chip_tactic",
         ":penalty_kick_tactic",

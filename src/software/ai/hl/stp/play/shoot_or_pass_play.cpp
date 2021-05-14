@@ -4,7 +4,6 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
@@ -100,10 +99,11 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
         Zones cherry_pick_region_1 = {ranked_zones[0]};
         Zones cherry_pick_region_2 = {ranked_zones[1]};
 
-        auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(
-            world, pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
-        auto cherry_pick_tactic_2 = std::make_shared<CherryPickTactic>(
-            world, pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+        auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
+        auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
+
+        auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
+        auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
 
         do
         {
@@ -125,9 +125,11 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
             else
             {
                 cherry_pick_tactic_1->updateControlParams(
-                    pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+                    pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
+                    MaxAllowedSpeedMode::PHYSICAL_LIMIT);
                 cherry_pick_tactic_2->updateControlParams(
-                    pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+                    pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
+                    MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
                 yield({{receiver},
                        {cherry_pick_tactic_1, cherry_pick_tactic_2},
@@ -165,10 +167,8 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(
-        world, pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
-    auto cherry_pick_tactic_2 = std::make_shared<CherryPickTactic>(
-        world, pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
+    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
 
     // Wait for a good pass by starting out only looking for "perfect" passes (with a
     // score of 1) and decreasing this threshold over time
@@ -198,10 +198,15 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         pass_eval                  = pass_generator.generatePassEvaluation(world);
         best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
-        cherry_pick_tactic_1->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
-        cherry_pick_tactic_2->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+        auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
+        auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
+
+        cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
+                                                  pass1.receiverOrientation(), 0.0,
+                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
+                                                  pass2.receiverOrientation(), 0.0,
+                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
         // We're ready to pass if we have a robot assigned in the PassGenerator as the
         // passer and the PassGenerator has found a pass above our current threshold
