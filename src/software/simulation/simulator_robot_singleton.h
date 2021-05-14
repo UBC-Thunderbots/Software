@@ -4,8 +4,10 @@
 #include <functional>
 #include <optional>
 
+#include "software/logger/logger.h"
 #include "software/simulation/simulator_robot.h"
 #include "software/world/field.h"
+
 extern "C"
 {
 #include "firmware/app/world/chicker.h"
@@ -62,17 +64,6 @@ class SimulatorRobotSingleton
                                   FieldSide field_side);
 
     /**
-     * Creates a FirmwareRobot_t with functions bound to the static functions in this
-     * class. Only one FirmwareRobot_t needs to be created to control all robots, since
-     * calling setSimulatorRobot will simply change the implementations of the bound
-     * functions to act as if the new robot was being controlled.
-     *
-     * @return a FirmwareRobot_t that is bound to whatever SimulatorRobot this Singleton
-     * is controlling
-     */
-    static std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter> createFirmwareRobot();
-
-    /**
      * Starts a new primitive on the SimulatorRobot currently being controlled by this
      * class
      *
@@ -101,7 +92,7 @@ class SimulatorRobotSingleton
     static void handleBlueRobotLogProto(TbotsProto_RobotLog log);
     static void handleYellowRobotLogProto(TbotsProto_RobotLog log);
 
-   private:
+   protected:
     /**
      * Returns the x-position of the robot, in global field coordinates, in meters
      *
@@ -216,16 +207,6 @@ class SimulatorRobotSingleton
     static unsigned int getDribblerTemperatureDegC();
 
     /**
-     * Applies the given force to the wheel
-     *
-     * @param force_in_newtons the force to apply to the wheel
-     */
-    static void applyWheelForceFrontLeft(float force_in_newtons);
-    static void applyWheelForceBackLeft(float force_in_newtons);
-    static void applyWheelForceBackRight(float force_in_newtons);
-    static void applyWheelForceFrontRight(float force_in_newtons);
-
-    /**
      * Gets the motor speed for the wheel, in RPM
      */
     static float getMotorSpeedFrontLeft();
@@ -256,12 +237,19 @@ class SimulatorRobotSingleton
      *
      * @param func The function to perform on the simulator robot
      */
-    static void checkValidAndExecuteVoid(
-        std::function<void(std::shared_ptr<SimulatorRobot>)> func);
-    static float checkValidAndReturnFloat(
-        std::function<float(std::shared_ptr<SimulatorRobot>)> func);
-    static unsigned int checkValidAndReturnUint(
-        std::function<unsigned int(std::shared_ptr<SimulatorRobot>)> func);
+    template <class T>
+    static T checkValidAndExecute(std::function<T(std::shared_ptr<SimulatorRobot>)> func)
+    {
+        if (simulator_robot)
+        {
+            return func(simulator_robot);
+        }
+        LOG(WARNING)
+            << "ForceWheelSimulatorRobotSingleton called without setting the ForceWheelSimulatorRobot first"
+            << std::endl;
+        return static_cast<T>(0);
+    }
+
 
     /**
      * A helper function that will negate the given value if needed
