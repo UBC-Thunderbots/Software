@@ -35,7 +35,7 @@
   - [Flashing the Radio Dongle](#flashing-the-radio-dongle)
   - [Flashing And Debugging A STM32H7 MCU](#flashing-and-debugging-a-stm32h7-mcu)
   - [Working with CubeMX to regenerate code](#working-with-cubemx-to-regenerate-code)
-  - [Setting up virtual robocup 2021](#setting-up-virtual-robocup-2021)
+  - [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
     - [Setting up the SSL Simulation Environment](#setting-up-the-ssl-simulation-environment)
     - [Pushing a Dockerfile to dockerhub](#pushing-a-dockerfile-to-dockerhub)
 
@@ -252,7 +252,7 @@ This will output the file at the _absolute_ path given via the `--callgrind-out-
 
 To make sure we are all using the same cube version, run `STM32CubeMX` when editing the `.ioc` file.
 
-## Setting up virtual robocup 2021
+## Setting up Virtual Robocup 2021
 
 ### Setting up the SSL Simulation Environment
 
@@ -262,10 +262,10 @@ To make sure we are all using the same cube version, run `STM32CubeMX` when edit
 
 ### Pushing a Dockerfile to dockerhub
 
-After editing the dockerfile, you build the image and push it to dockerhub with the following steps
+After editing the dockerfile, build the image and push it to dockerhub with the following steps
 
 1. To build the image, make sure that you are in the same directory as your image, and then run `docker build -t ubcthunderbots/<image name>[:tag] .` Make sure that your chosen image name matches a repository in dockerhub. Here's an example with the robocup 2021 setup image: `docker build -t ubcthunderbots/tbots-software-env:0.0.1`
 2. Now, push your image to dockerhub. Get the credentials for the thunderbots dockerhub account from a software lead.
    1. Log into the docker account with `docker login`. You will be prompted for a username and password
-   2. Now, you can push this image by its name: `docker push ubcthunderbots/<image name>[:tag]`
+   2. Now, push this image by its name: `docker push ubcthunderbots/<image name>[:tag]`
 
