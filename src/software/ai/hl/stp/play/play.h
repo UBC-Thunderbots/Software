@@ -15,7 +15,7 @@ using ConstPriorityTacticVector = std::vector<ConstTacticVector>;
 
 using RobotToTacticAssignmentFunction =
     std::function<std::map<std::shared_ptr<const Tactic>, Robot>(
-        const ConstPriorityTacticVector&, const World&)>;
+        const ConstPriorityTacticVector&, const World&, bool)>;
 
 using MotionConstraintBuildFunction =
     std::function<std::set<MotionConstraint>(const Tactic& tactic)>;
@@ -53,8 +53,9 @@ class Play
      * Creates a new Play
      *
      * @param play_config The Play configuration
+     * @param requires_goalie Whether this plays requires a goalie
      */
-    explicit Play(std::shared_ptr<const PlayConfig> play_config);
+    explicit Play(std::shared_ptr<const PlayConfig> play_config, bool requires_goalie);
 
     /**
      * Returns whether or not this Play can be started. For example, the Enemy Team
@@ -156,6 +157,9 @@ class Play
      */
     virtual void getNextTactics(TacticCoroutine::push_type& yield,
                                 const World& world) = 0;
+
+    // Whether this plays requires a goalie
+    const bool requires_goalie;
 
     // The coroutine that sequentially returns the Tactics the Play wants to run
     TacticCoroutine::pull_type tactic_sequence;

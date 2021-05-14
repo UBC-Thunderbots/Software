@@ -4,7 +4,6 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
-#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_free_kicker_tactic.h"
@@ -12,7 +11,7 @@
 #include "software/world/game_state.h"
 
 EnemyFreekickPlay::EnemyFreekickPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config)
+    : Play(config, true)
 {
 }
 
@@ -29,10 +28,6 @@ bool EnemyFreekickPlay::invariantHolds(const World &world) const
 void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                        const World &world)
 {
-    // Init our goalie tactic
-    auto goalie_tactic =
-        std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig());
-
     // Init a Crease Defender Tactic
     auto crease_defender_tactic = std::make_shared<CreaseDefenderTactic>(
         play_config->getRobotNavigationObstacleConfig());
@@ -58,7 +53,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
     do
     {
         // Create tactic vector (starting with Goalie)
-        PriorityTacticVector tactics_to_run = {{goalie_tactic}};
+        PriorityTacticVector tactics_to_run = {{}};
 
         // Get all enemy threats
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),

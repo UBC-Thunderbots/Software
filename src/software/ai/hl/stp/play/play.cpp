@@ -1,8 +1,10 @@
 #include "software/ai/hl/stp/play/play.h"
 
-Play::Play(std::shared_ptr<const PlayConfig> play_config)
+Play::Play(std::shared_ptr<const PlayConfig> play_config, bool requires_goalie)
     : play_config(play_config),
-      tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1))
+      requires_goalie(requires_goalie),
+      tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
+      world(std::nullopt)
 {
 }
 
@@ -59,8 +61,8 @@ std::vector<std::unique_ptr<Intent>> Play::get(
         const_priority_tactics.push_back(const_tactics);
     });
 
-    auto robot_tactic_assignment =
-        robot_to_tactic_assignment_algorithm(const_priority_tactics, new_world);
+    auto robot_tactic_assignment = robot_to_tactic_assignment_algorithm(
+        const_priority_tactics, new_world, requires_goalie);
 
     for (auto tactic_vec : priority_tactics)
     {
