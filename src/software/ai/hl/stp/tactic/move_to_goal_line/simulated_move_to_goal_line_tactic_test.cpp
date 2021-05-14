@@ -1,0 +1,68 @@
+#include <gtest/gtest.h>
+
+#include "software/geom/algorithms/contains.h"
+#include "software/simulated_tests/simulated_tactic_test_fixture.h"
+#include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
+#include "software/simulated_tests/validation/validation_function.h"
+#include "software/test_util/test_util.h"
+#include "software/time/duration.h"
+#include "software/world/world.h"
+#include "software/ai/hl/stp/tactic/move_to_goal_line/move_to_goal_line_tactic.h"
+
+class SimulatedMoveToGoalLineTacticTest
+        : public SimulatedTacticTestFixture,
+          public ::testing::WithParamInterface<RobotStateWithId>
+{
+};
+
+TEST_P(SimulatedMoveToGoalLineTacticTest, move_to_goal_line_test)
+{
+    RobotStateWithId robot_state = GetParam();
+
+    setBallState(BallState(Point(0.5, 0.5), Vector(0, 0)));
+
+    addFriendlyRobots({robot_state});
+
+    auto tactic = std::make_shared<MoveToGoalLineTactic>();
+    setTactic(tactic);
+    setRobotId(1);
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+            [tactic](std::shared_ptr<World> world_ptr,
+                           ValidationCoroutine::push_type& yield) {
+                // We check if the robot reaches the goal line center and faces the opponent
+                //
+                // The tactic should "done" after reaching the goal line and facing the opponent.
+                robotAtOrientation(1, world_ptr, Angle::zero(),
+                                   Angle::fromDegrees(5), yield);
+                robotAtPosition(1, world_ptr, world_ptr->field().friendlyGoalCenter(), 0.05, yield);
+
+                while (!tactic->done())
+                {
+                    yield("Move to goal line tactic not done");
+                }
+            }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(5));
+}
+
+INSTANTIATE_TEST_CASE_P(
+        PassEnvironment, SimulatedMoveToGoalLineTacticTest,
+        ::testing::Values(
+                // Robot not on goal line center, not facing opponent
+                RobotStateWithId{
+                        1, RobotState(Point(1, 2), Vector(1, 1),
+                                      Angle::fromDegrees(180), Angle::fromDegrees(10))},
+
+                // Robot already at goal line center, facing opponent, but moving
+                RobotStateWithId{
+                        1, RobotState(Field::createSSLDivisionBField().friendlyGoalCenter(), Vector(1, 1),
+                                      Angle::fromDegrees(0), Angle::fromDegrees(15))},
+
+                // Robot already at goal line center, facing opponent
+                RobotStateWithId{
+                        1, RobotState(Field::createSSLDivisionBField().friendlyGoalCenter(), Vector(0, 0),
+                                      Angle::fromDegrees(0), Angle::fromDegrees(0))}));

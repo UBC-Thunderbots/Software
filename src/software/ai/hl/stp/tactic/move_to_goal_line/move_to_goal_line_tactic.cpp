@@ -4,7 +4,8 @@
 
 #include <algorithm>
 
-MoveToGoalLineTactic::MoveToGoalLineTactic(){
+MoveToGoalLineTactic::MoveToGoalLineTactic(): Tactic(false,
+        {RobotCapability::Move}), fsm(){
 }
 
 void MoveToGoalLineTactic::updateWorldParams(const World &world) {}
@@ -37,7 +38,7 @@ bool MoveToGoalLineTactic::done() const
 
 void MoveToGoalLineTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    fsm.process_event(MoveToGoalLineFSM::Update(tactic_update));
+    fsm.process_event(MoveToGoalLineFSM::Update({}, tactic_update));
 }
 
 void MoveToGoalLineTactic::accept(TacticVisitor &visitor) const

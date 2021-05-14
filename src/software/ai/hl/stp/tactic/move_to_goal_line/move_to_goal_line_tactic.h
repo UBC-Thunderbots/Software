@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/goalie/goalie_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/move_to_goal_line/move_to_goal_line_fsm.h"
 
 /**
  * TODO: documentation
@@ -14,7 +14,7 @@ public:
      *
      * @param goalie_tactic_config The config to fetch parameters from
      */
-    MoveToGoalLineTactic();
+    explicit MoveToGoalLineTactic();
 
     void updateWorldParams(const World &world) override;
 
@@ -22,13 +22,10 @@ public:
 
     void accept(TacticVisitor &visitor) const override;
     bool done() const override;
-    bool isGoalieTactic() const override;
 
 private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;
     void updateIntent(const TacticUpdate &tactic_update) override;
 
-    FSM<GoalieFSM> fsm;
-    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
-    GoalieFSM::ControlParams control_params;
+    FSM<MoveToGoalLineFSM> fsm;
 };

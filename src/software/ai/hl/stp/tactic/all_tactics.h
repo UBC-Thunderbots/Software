@@ -19,3 +19,4 @@
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/move_to_goal_line/move_to_goal_line_tactic.h"

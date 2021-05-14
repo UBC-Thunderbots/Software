@@ -214,6 +214,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/hl/stp/tactic/move_to_goal_line",
         "//software/ai/hl/stp/tactic/passer:passer_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
     ],
