@@ -28,12 +28,3 @@ cc_library(
         "//software/ai/hl/stp/tactic",
     ],
 )
-
-cc_library(
-    name = "move_to_goal_line_test_tactic",
-    srcs = ["move_to_goal_line_test_tactic.cpp"],
-    hdrs = ["move_to_goal_line_test_tactic.h"],
-    deps = [
-        "//software/ai/hl/stp/tactic",
-    ],
-)
