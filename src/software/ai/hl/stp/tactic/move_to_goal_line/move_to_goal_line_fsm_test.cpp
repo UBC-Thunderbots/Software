@@ -12,7 +12,28 @@ TEST(MoveToGoalLineFSMTest, test_transitions)
                            AngularVelocity::zero()),
                 Timestamp::fromSeconds(123));
 
+    MoveToGoalLineFSM::ControlParams control_params{};
+
     FSM<MoveToGoalLineFSM> fsm;
-    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM::MoveState>));
-    fsm.process_event();
+    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
+
+    // robot far from goal center
+    fsm.process_event(MoveToGoalLineFSM::Update(
+            control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
+
+    // robot close to goal center
+    robot = ::TestUtil::createRobotAtPos(Point(world.field().friendlyGoalCenter().x() + 0.5,
+            world.field().friendlyGoalCenter().y() + 0.5));
+    fsm.process_event(MoveToGoalLineFSM::Update(
+            control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
+
+    // robot at goal center and facing the right way
+    robot.updateState(
+            RobotState(world.field().friendlyGoalCenter(), Vector(0,0), Angle::zero(), AngularVelocity::zero()),
+            Timestamp::fromSeconds(0));
+    fsm.process_event(MoveToGoalLineFSM::Update(
+            control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::X));
 }
