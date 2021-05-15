@@ -4,15 +4,14 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
- * TODO: documentation
+ * This tactic is for moving a robot closest to the goal line to the goal line. It will be
+ * used by the penalty kick goalie to position itself at the start of the penalty kick.
  */
 class MoveToGoalLineTactic : public Tactic
 {
    public:
     /**
      * Creates a new MoveToGoalLineTactic
-     *
-     * @param goalie_tactic_config The config to fetch parameters from
      */
     explicit MoveToGoalLineTactic();
 

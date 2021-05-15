@@ -40,7 +40,7 @@ struct MoveToGoalLineFSM
                     .final_orientation   = face_center,
                     .final_speed         = 0.0,
                     .dribbler_mode       = DribblerMode::OFF,
-                    .ball_collision_type = BallCollisionType::ALLOW,
+                    .ball_collision_type = BallCollisionType::AVOID,
                     .auto_chip_or_kick   = AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0},
                     .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
                     .target_spin_rev_per_s  = 0.0};
