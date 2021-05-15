@@ -67,8 +67,10 @@ void WifiBackend::onValueReceived(World world)
     //handle estop option
     if(world.isEstopEnabled() && estop_reader == nullptr){
         boost::asio::io_service io_service;
-        std::unique_ptr<BoostUartCommunication> uart_device = std::make_unique<BoostUartCommunication>(io_service, ARDUINO_BAUD_RATE, "/dev/ttyACM0");
+        std::unique_ptr<BoostUartCommunication> uart_device = std::make_unique<BoostUartCommunication>(io_service, ARDUINO_BAUD_RATE, ARDUINO_PORT);
         estop_reader = std::make_unique<ThreadedEstopReader>(std::move(uart_device), 0);
+    } else if(!world.isEstopEnabled() && estop_reader != nullptr){
+        LOG(WARNING)<<"Once enabled ESTOP cannot be disabled";
     }
 
     vision_output->sendProto(*createVision(world));

@@ -36,6 +36,7 @@ class WifiBackend : public Backend
      */
     void joinMulticastChannel(int channel, const std::string& interface);
 
+
     /**
      * Callback for the RobotLog listener
      *
@@ -56,5 +57,10 @@ class WifiBackend : public Backend
     std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::RobotLog>> robot_log_input;
     std::unique_ptr<ThreadedProtoUdpSender<DefendingSideProto>> defending_side_output;
 
+
     std::unique_ptr<ThreadedEstopReader> estop_reader;
+
+    //the port the arduino is connected to. Can be found by running the command
+    // "pio device list"
+    static constexpr auto ARDUINO_PORT = "/dev/ttyACM0";
 };
