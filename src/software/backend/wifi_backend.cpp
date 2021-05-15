@@ -4,13 +4,13 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "shared/proto/robot_log_msg.pb.h"
 #include "software/constants.h"
+#include "software/estop/boost_uart_communication.h"
+#include "software/estop/threaded_estop_reader.h"
 #include "software/logger/logger.h"
 #include "software/proto/message_translation/defending_side.h"
 #include "software/proto/message_translation/tbots_protobuf.h"
-#include "software/util/design_patterns/generic_factory.h"
-#include "software/estop/boost_uart_communication.h"
-#include "software/estop/threaded_estop_reader.h"
 #include "software/proto/primitive/primitive_msg_factory.h"
+#include "software/util/design_patterns/generic_factory.h"
 
 
 WifiBackend::WifiBackend(std::shared_ptr<const BackendConfig> config)
@@ -19,7 +19,7 @@ WifiBackend::WifiBackend(std::shared_ptr<const BackendConfig> config)
       ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
                        boost::bind(&Backend::receiveSSLReferee, this, _1),
                        network_config->getSslCommunicationConfig()),
-                       estop_reader(nullptr)
+      estop_reader(nullptr)
 {
     std::string network_interface = this->network_config->getNetworkInterface()->value();
     int channel                   = this->network_config->getChannel()->value();
@@ -36,12 +36,14 @@ WifiBackend::WifiBackend(std::shared_ptr<const BackendConfig> config)
 
 void WifiBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
-    //check if estop has been set
-    if(estop_reader != nullptr && !estop_reader->isEstopPlay()) {
+    // check if estop has been set
+    if (estop_reader != nullptr && !estop_reader->isEstopPlay())
+    {
         auto robot_primitives_map = primitives.mutable_robot_primitives();
 
-        //override to stop primitive
-        for(auto &primitive : *robot_primitives_map){
+        // override to stop primitive
+        for (auto& primitive : *robot_primitives_map)
+        {
             primitive.second = *createStopPrimitive(false);
         }
     }
@@ -64,13 +66,18 @@ void WifiBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 
 void WifiBackend::onValueReceived(World world)
 {
-    //handle estop option
-    if(world.isEstopEnabled() && estop_reader == nullptr){
+    // handle estop option
+    if (world.isEstopEnabled() && estop_reader == nullptr)
+    {
         boost::asio::io_service io_service;
-        std::unique_ptr<BoostUartCommunication> uart_device = std::make_unique<BoostUartCommunication>(io_service, ARDUINO_BAUD_RATE, ARDUINO_PORT);
+        std::unique_ptr<BoostUartCommunication> uart_device =
+            std::make_unique<BoostUartCommunication>(io_service, ARDUINO_BAUD_RATE,
+                                                     ARDUINO_PORT);
         estop_reader = std::make_unique<ThreadedEstopReader>(std::move(uart_device), 0);
-    } else if(!world.isEstopEnabled() && estop_reader != nullptr){
-        LOG(WARNING)<<"Once enabled ESTOP cannot be disabled";
+    }
+    else if (!world.isEstopEnabled() && estop_reader != nullptr)
+    {
+        LOG(WARNING) << "Once enabled ESTOP cannot be disabled";
     }
 
     vision_output->sendProto(*createVision(world));

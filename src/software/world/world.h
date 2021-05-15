@@ -222,5 +222,4 @@ class World final
     TeamSide team_with_possesion_;
 
     bool estop_enabled;
-
 };

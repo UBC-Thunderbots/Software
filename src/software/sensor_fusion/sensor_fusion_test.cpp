@@ -489,7 +489,7 @@ TEST_F(SensorFusionTest, test_estop_enabled_in_world)
 {
     SensorProto sensor_msg;
     auto ssl_wrapper_packet =
-            createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
+        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
     *(sensor_msg.add_robot_status_msgs())  = *robot_status_msg_estop_enabled;
     sensor_fusion.processSensorProto(sensor_msg);

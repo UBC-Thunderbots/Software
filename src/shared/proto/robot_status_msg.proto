@@ -17,7 +17,7 @@ message RobotStatus
     PowerStatus power_status                  = 9;
     TemperatureStatus temperature_status      = 10;
     Timestamp time_sent                       = 11;
-    bool estopEnabled = 12;
+    bool estopEnabled                         = 12;
 }
 
 /* Data about the status of the break beam */

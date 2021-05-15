@@ -169,11 +169,12 @@ TeamSide World::getTeamWithPossession() const
     return team_with_possesion_;
 }
 
-void World::setEstopEnabled(bool is_estop_enabled) {
+void World::setEstopEnabled(bool is_estop_enabled)
+{
     estop_enabled = is_estop_enabled;
 }
 
-bool World::isEstopEnabled() {
+bool World::isEstopEnabled()
+{
     return estop_enabled;
 }
-

@@ -6,10 +6,10 @@
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/backend/backend.h"
 #include "software/backend/ssl_proto_client.h"
+#include "software/estop/threaded_estop_reader.h"
 #include "software/networking/threaded_proto_udp_listener.h"
 #include "software/networking/threaded_proto_udp_sender.h"
 #include "software/proto/defending_side_msg.pb.h"
-#include "software/estop/threaded_estop_reader.h"
 
 class WifiBackend : public Backend
 {
@@ -60,7 +60,7 @@ class WifiBackend : public Backend
 
     std::unique_ptr<ThreadedEstopReader> estop_reader;
 
-    //the port the arduino is connected to. Can be found by running the command
+    // the port the arduino is connected to. Can be found by running the command
     // "pio device list"
     static constexpr auto ARDUINO_PORT = "/dev/ttyACM0";
 };
