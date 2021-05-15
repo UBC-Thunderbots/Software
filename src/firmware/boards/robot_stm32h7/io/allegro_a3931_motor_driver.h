@@ -35,9 +35,10 @@ typedef struct AllegroA3931MotorDriver AllegroA3931MotorDriver_t;
  *
  * @return A motor driver with the pwm percentage set to zero.
  */
-AllegroA3931MotorDriver_t* io_allegro_a3931_motor_driver_create(
-    PwmPin_t* pwm_pin, GpioPin_t* reset_pin, GpioPin_t* coast_pin, GpioPin_t* mode_pin,
-    GpioPin_t* direction_pin, GpioPin_t* brake_pin, GpioPin_t* esf_pin);
+AllegroA3931MotorDriver_t* io_allegro_a3931_motor_driver_create(PwmPin_t* pwm_pin,
+                                                                GpioPin_t* reset_pin,
+                                                                GpioPin_t* mode_pin,
+                                                                GpioPin_t* direction_pin);
 
 /**
  * Destroy the given motor driver

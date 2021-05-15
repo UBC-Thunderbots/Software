@@ -286,7 +286,7 @@ __weak void io_proto_multicast_startNetworkingTask(void *argument)
     /* Infinite loop */
     for (;;)
     {
-        osDelay(1);
+        osDelay(10000);
     }
   /* USER CODE END io_proto_multicast_startNetworkingTask */
 }
@@ -333,12 +333,43 @@ void initIoNetworking(void)
 
 void initIoDrivetrain(void)
 {
-    // TODO (#2063) the motor driver pins are not wired correctly on mainboard rev2.0
-    // We will not be trying to drive any motors until we have mainboard rev2.1 which
-    // addresses the board issues.
+    // Initialize a motor driver with the given suffix, on the given
+    // timer channel
+#define INIT_DRIVETRAIN_UNIT(MOTOR_NAME_SUFFIX, TIMER_PERIPHERAL, TIMER_CHANNEL)         \
+    {                                                                                    \
+        GpioPin_t *reset_pin =                                                           \
+            io_gpio_pin_create(MOTOR_NAME_SUFFIX##_RESET_GPIO_Port,                      \
+                               MOTOR_NAME_SUFFIX##_RESET_Pin, ACTIVE_HIGH);              \
+        GpioPin_t *mode_pin =                                                            \
+            io_gpio_pin_create(MOTOR_NAME_SUFFIX##_MODE_GPIO_Port,                       \
+                               MOTOR_NAME_SUFFIX##_MODE_Pin, ACTIVE_HIGH);               \
+        GpioPin_t *direction_pin =                                                       \
+            io_gpio_pin_create(MOTOR_NAME_SUFFIX##_DIR_GPIO_Port,                        \
+                               MOTOR_NAME_SUFFIX##_DIR_Pin, ACTIVE_HIGH);                \
+                                                                                         \
+        PwmPin_t *pwm_pin = io_pwm_pin_create(&TIMER_PERIPHERAL, TIMER_CHANNEL);         \
+                                                                                         \
+        AllegroA3931MotorDriver_t *motor_driver = io_allegro_a3931_motor_driver_create(  \
+            pwm_pin, reset_pin, mode_pin, direction_pin);                                \
+        io_allegro_a3931_motor_setPwmPercentage(motor_driver, 0.5);                      \
+        DRIVETRAIN_UNIT_##MOTOR_NAME_SUFFIX = io_drivetrain_unit_create(motor_driver);   \
+    }
+
+    DrivetrainUnit_t *DRIVETRAIN_UNIT_MOTOR_A;
+    DrivetrainUnit_t *DRIVETRAIN_UNIT_MOTOR_B;
+    DrivetrainUnit_t *DRIVETRAIN_UNIT_MOTOR_D;
+    DrivetrainUnit_t *DRIVETRAIN_UNIT_MOTOR_E;
+
+    INIT_DRIVETRAIN_UNIT(MOTOR_A, htim1, TIM_CHANNEL_1);
+    INIT_DRIVETRAIN_UNIT(MOTOR_B, htim1, TIM_CHANNEL_4);
+    INIT_DRIVETRAIN_UNIT(MOTOR_D, htim1, TIM_CHANNEL_3);
+    INIT_DRIVETRAIN_UNIT(MOTOR_E, htim1, TIM_CHANNEL_2);
+
+    io_drivetrain_init(DRIVETRAIN_UNIT_MOTOR_B, DRIVETRAIN_UNIT_MOTOR_E,
+                       DRIVETRAIN_UNIT_MOTOR_A, DRIVETRAIN_UNIT_MOTOR_D);
 }
 
-void initPowerMonitor(void)
+void initIoPowerMonitor(void)
 {
     io_power_monitor_init(I2C1, INA226_ADDRESS,
                           INA226_MODE_CONT_SHUNT_AND_BUS | INA226_VBUS_140uS |

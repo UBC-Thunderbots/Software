@@ -72,19 +72,10 @@ static void MPU_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 
-static void initIoLayer(void);
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-static void initIoLayer(void)
-{
-    initIoDrivetrain();
-    initIoNetworking();
-    initPowerMonitor();
-}
 
 /* USER CODE END 0 */
 
@@ -137,7 +128,6 @@ int main(void)
   MX_ADC1_Init();
   MX_ADC2_Init();
   MX_TIM1_Init();
-  MX_TIM2_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
   MX_TIM8_Init();
@@ -155,7 +145,73 @@ int main(void)
     app_logger_init(0, &io_uart_logger_handleRobotLog);
 
     TLOG_DEBUG("Initializing I/O Layer");
-    initIoLayer();
+
+    initIoDrivetrain();
+    initIoNetworking();
+    initIoPowerMonitor();
+
+    // Setup the world that acts as the interface for the higher level firmware
+    // (like primitives or the controller) to interface with the outside world
+    VelocityWheelConstants_t wheel_constants = {
+        .wheel_rotations_per_motor_rotation  = GEAR_RATIO,
+        .wheel_radius                        = WHEEL_RADIUS,
+        .motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT,
+        .motor_back_emf_per_rpm              = RPM_TO_VOLT,
+        .motor_phase_resistance              = WHEEL_MOTOR_PHASE_RESISTANCE,
+        .motor_current_per_unit_torque       = CURRENT_PER_TORQUE};
+
+    ForceWheel_t* front_right_wheel = app_force_wheel_create(
+        apply_wheel_force_front_right, wheels_get_front_right_rpm,
+        wheels_brake_front_right, wheels_coast_front_right, wheel_constants);
+
+    ForceWheel_t* front_left_wheel = app_force_wheel_create(
+        apply_wheel_force_front_left, wheels_get_front_left_rpm, wheels_brake_front_left,
+        wheels_coast_front_left, wheel_constants);
+
+    ForceWheel_t* back_right_wheel = app_force_wheel_create(
+        apply_wheel_force_back_right, wheels_get_back_right_rpm, wheels_brake_back_right,
+        wheels_coast_back_right, wheel_constants);
+
+    ForceWheel_t* back_left_wheel = app_force_wheel_create(
+        apply_wheel_force_back_left, wheels_get_back_left_rpm, wheels_brake_back_left,
+        wheels_coast_back_left, wheel_constants);
+
+    Charger_t* charger =
+        app_charger_create(charger_charge, charger_discharge, charger_float);
+
+    Chicker_t* chicker = app_chicker_create(
+        chicker_kick, chicker_chip, chicker_enable_auto_kick, chicker_enable_auto_chip,
+        chicker_auto_disarm, chicker_auto_disarm);
+
+    Dribbler_t* dribbler =
+        app_dribbler_create(dribbler_set_speed, dribbler_coast, dribbler_temperature);
+
+    const RobotConstants_t robot_constants = {
+        .mass              = ROBOT_POINT_MASS,
+        .moment_of_inertia = INERTIA,
+        .robot_radius      = ROBOT_RADIUS,
+        .jerk_limit        = JERK_LIMIT,
+    };
+
+    ControllerState_t controller_state = {
+        .last_applied_acceleration_x       = 0,
+        .last_applied_acceleration_y       = 0,
+        .last_applied_acceleration_angular = 0,
+    };
+
+    FirmwareRobot_t* robot = app_firmware_robot_force_wheels_create(
+        charger, chicker, dribbler, dr_get_robot_position_x, dr_get_robot_position_y,
+        dr_get_robot_orientation, dr_get_robot_velocity_x, dr_get_robot_velocity_y,
+        dr_get_robot_angular_velocity, adc_battery, front_right_wheel, front_left_wheel,
+        back_right_wheel, back_left_wheel, &controller_state, robot_constants);
+
+    FirmwareBall_t* ball =
+        app_firmware_ball_create(dr_get_ball_position_x, dr_get_ball_position_y,
+                                 dr_get_ball_velocity_x, dr_get_ball_velocity_y);
+    FirmwareWorld_t* world =
+        app_firmware_world_create(robot, ball, get_current_freertos_tick_time_seconds);
+
+    PrimitiveManager_t* primitive_manager = app_primitive_manager_create();
   /* USER CODE END 2 */
 
   /* Init scheduler */
