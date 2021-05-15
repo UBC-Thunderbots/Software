@@ -2,7 +2,6 @@
 
 #include <algorithm>
 
-#include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/tactic/move_to_goal_line/move_to_goal_line_fsm.h"
 
 MoveToGoalLineTactic::MoveToGoalLineTactic()
