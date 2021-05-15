@@ -141,7 +141,6 @@ cc_library(
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/logger",
-        "//software/parameter:dynamic_parameters",
     ],
 )
 

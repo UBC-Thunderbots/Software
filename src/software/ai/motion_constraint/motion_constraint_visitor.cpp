@@ -84,6 +84,8 @@ void MotionConstraintVisitor::visit(const DribbleTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const GetBehindBallTactic &tactic) {}
 
+void MotionConstraintVisitor::visit(const MoveToGoalLineTactic &tactic) {}
+
 // clang-format on
 
 std::set<MotionConstraint> MotionConstraintVisitor::getCurrentAllowedConstraints(
