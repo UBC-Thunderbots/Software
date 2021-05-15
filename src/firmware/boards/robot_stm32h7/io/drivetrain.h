@@ -27,3 +27,29 @@ void io_drivetrain_applyForceFrontLeftWheel(float force_newtons);
 void io_drivetrain_applyForceFrontRightWheel(float force_newtons);
 void io_drivetrain_applyForceBackLeftWheel(float force_newtons);
 void io_drivetrain_applyForceBackRightWheel(float force_newtons);
+
+/**
+ * Get the RPM of of the wheel in the drivetrain
+ *
+ * @returns the RPM of the wheel
+ */
+float io_drivetrain_getFrontLeftRpm(void);
+float io_drivetrain_getFrontRightRpm(void);
+float io_drivetrain_getBackLeftRpm(void);
+float io_drivetrain_getBackRightRpm(void);
+
+/**
+ * Stop the wheel immediately
+ */
+void io_drivetrain_brakeFrontLeft(void);
+void io_drivetrain_brakeFrontRight(void);
+void io_drivetrain_brakeBackLeft(void);
+void io_drivetrain_brakeBackRight(void);
+
+/**
+ * Kill power to the wheel, let it roll to a stop
+ */
+void io_drivetrain_coastFrontLeft(void);
+void io_drivetrain_coastFrontRight(void);
+void io_drivetrain_coastBackLeft(void);
+void io_drivetrain_coastBackRight(void);

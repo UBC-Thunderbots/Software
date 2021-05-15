@@ -152,7 +152,7 @@ int main(void)
 
     // Setup the world that acts as the interface for the higher level firmware
     // (like primitives or the controller) to interface with the outside world
-    VelocityWheelConstants_t wheel_constants = {
+    ForceWheelConstants_t wheel_constants = {
         .wheel_rotations_per_motor_rotation  = GEAR_RATIO,
         .wheel_radius                        = WHEEL_RADIUS,
         .motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT,
@@ -160,24 +160,24 @@ int main(void)
         .motor_phase_resistance              = WHEEL_MOTOR_PHASE_RESISTANCE,
         .motor_current_per_unit_torque       = CURRENT_PER_TORQUE};
 
-    ForceWheel_t* front_right_wheel = app_force_wheel_create(
-        apply_wheel_force_front_right, wheels_get_front_right_rpm,
-        wheels_brake_front_right, wheels_coast_front_right, wheel_constants);
-
     ForceWheel_t* front_left_wheel = app_force_wheel_create(
-        apply_wheel_force_front_left, wheels_get_front_left_rpm, wheels_brake_front_left,
-        wheels_coast_front_left, wheel_constants);
+        io_drivetrain_applyForceFrontLeftWheel, io_drivetrain_getFrontLeftRpm,
+        io_drivetrain_brakeFrontLeft, io_drivetrain_coastFrontLeft, wheel_constants);
+
+    ForceWheel_t* front_right_wheel = app_force_wheel_create(
+        io_drivetrain_applyForceFrontRightWheel, io_drivetrain_getFrontRightRpm,
+        io_drivetrain_brakeFrontRight, io_drivetrain_coastFrontRight, wheel_constants);
 
     ForceWheel_t* back_right_wheel = app_force_wheel_create(
-        apply_wheel_force_back_right, wheels_get_back_right_rpm, wheels_brake_back_right,
-        wheels_coast_back_right, wheel_constants);
+        io_drivetrain_applyForceBackRightWheel, io_drivetrain_getBackRightRpm,
+        io_drivetrain_brakeBackRight, io_drivetrain_coastBackRight, wheel_constants);
 
     ForceWheel_t* back_left_wheel = app_force_wheel_create(
-        apply_wheel_force_back_left, wheels_get_back_left_rpm, wheels_brake_back_left,
-        wheels_coast_back_left, wheel_constants);
+        io_drivetrain_applyForceBackLeftWheel, io_drivetrain_getBackLeftRpm,
+        io_drivetrain_brakeBackLeft, io_drivetrain_coastBackLeft, wheel_constants);
 
     Charger_t* charger =
-        app_charger_create(charger_charge, charger_discharge, charger_float);
+        app_charger_create(io_charger_charge, io_charger_discharge, io_charger_float);
 
     Chicker_t* chicker = app_chicker_create(
         chicker_kick, chicker_chip, chicker_enable_auto_kick, chicker_enable_auto_chip,
@@ -199,11 +199,15 @@ int main(void)
         .last_applied_acceleration_angular = 0,
     };
 
+    // clang-format off
     FirmwareRobot_t* robot = app_firmware_robot_force_wheels_create(
-        charger, chicker, dribbler, dr_get_robot_position_x, dr_get_robot_position_y,
-        dr_get_robot_orientation, dr_get_robot_velocity_x, dr_get_robot_velocity_y,
-        dr_get_robot_angular_velocity, adc_battery, front_right_wheel, front_left_wheel,
-        back_right_wheel, back_left_wheel, &controller_state, robot_constants);
+        charger, chicker, dribbler,
+        dr_get_robot_position_x, dr_get_robot_position_y, dr_get_robot_orientation,
+        dr_get_robot_velocity_x, dr_get_robot_velocity_y, dr_get_robot_angular_velocity,
+        adc_battery,
+        front_right_wheel, front_left_wheel, back_right_wheel, back_left_wheel,
+        &controller_state, robot_constants);
+    // clang-format on
 
     FirmwareBall_t* ball =
         app_firmware_ball_create(dr_get_ball_position_x, dr_get_ball_position_y,

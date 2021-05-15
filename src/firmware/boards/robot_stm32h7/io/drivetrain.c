@@ -46,3 +46,72 @@ void io_drivetrain_applyForceBackRightWheel(float force_newtons)
     assert(initialized);
     io_drivetrain_unit_applyForce(_back_right_drive_unit, force_newtons);
 }
+
+float io_drivetrain_getFrontLeftRpm(void)
+{
+    // TODO (#2063) implement this
+    assert(initialized);
+}
+
+float io_drivetrain_getFrontRightRpm(void)
+{
+    // TODO (#2063) implement this
+    assert(initialized);
+}
+
+float io_drivetrain_getBackLeftRpm(void)
+{
+    // TODO (#2063) implement this
+    assert(initialized);
+}
+
+float io_drivetrain_getBackRightRpm(void)
+{
+    // TODO (#2063) implement this
+    assert(initialized);
+}
+
+void io_drivetrain_brakeFrontLeft(void);
+{
+    // TODO (#2063) implement this
+    assert(initialized);
+}
+void io_drivetrain_brakeFrontRight(void);
+{
+    // TODO (#2063) implement this
+    assert(initialized);
+}
+void io_drivetrain_brakeBackLeft(void);
+{
+    // TODO (#2063) implement this
+    assert(initialized);
+}
+void io_drivetrain_brakeBackRight(void);
+{
+    // TODO (#2063) implement this
+    assert(initialized);
+}
+
+void io_drivetrain_coastFrontLeft(void)
+{
+    // TODO (#2063) implement this
+    assert(initialized);
+}
+
+void io_drivetrain_coastFrontRight(void)
+{
+    // TODO (#2063) implement this
+    assert(initialized);
+}
+
+void io_drivetrain_coastBackLeft(void)
+{
+    // TODO (#2063) implement this
+    assert(initialized);
+}
+
+void io_drivetrain_coastBackRight(void)
+{
+    // TODO (#2063) implement this
+    assert(initialized);
+}
