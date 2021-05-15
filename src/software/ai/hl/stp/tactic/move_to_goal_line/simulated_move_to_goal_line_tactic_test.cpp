@@ -48,23 +48,23 @@ TEST_P(SimulatedMoveToGoalLineTacticTest, move_to_goal_line_test)
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
-            non_terminating_validation_functions, Duration::fromSeconds(5));
+            non_terminating_validation_functions, Duration::fromSeconds(10));
 }
 
 INSTANTIATE_TEST_CASE_P(
         PassEnvironment, SimulatedMoveToGoalLineTacticTest,
         ::testing::Values(
-                // Robot not on goal line center, not facing opponent
+                // Robot on friendly half, not facing opponent
                 RobotStateWithId{
                         0, RobotState(Point(1, 2), Vector(1, 1),
                                       Angle::fromDegrees(180), Angle::fromDegrees(10))},
 
-                // Robot already at goal line center, facing opponent, but moving
+                // Robot on enemy goal line, facing opponent, moving
                 RobotStateWithId{
-                        0, RobotState(Field::createSSLDivisionBField().friendlyGoalCenter(), Vector(1, 1),
+                        0, RobotState(Point(4.5, 0), Vector(1, 1),
                                       Angle::fromDegrees(0), Angle::fromDegrees(15))},
 
                 // Robot already at goal line center, facing opponent
                 RobotStateWithId{
-                        0, RobotState(Field::createSSLDivisionBField().friendlyGoalCenter(), Vector(0, 0),
+                        0, RobotState(Field::createSSLDivisionBField().friendlyGoalCenter()+Vector(0.1,0), Vector(0, 0),
                                       Angle::fromDegrees(0), Angle::fromDegrees(0))}));
