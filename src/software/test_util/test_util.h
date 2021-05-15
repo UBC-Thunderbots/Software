@@ -123,10 +123,21 @@ namespace TestUtil
 
     /**
      * Creates a list of RobotStateWithId at given positions with 0 velocity, 0 angular
-     * velocity and 0 orientation The id is set as the index in the list of positions
+     * velocity and 0 orientation. The id is set as the index in the list of positions.
      *
      * @param positions The positions to create robots at
      */
     std::vector<RobotStateWithId> createStationaryRobotStatesWithId(
         const std::vector<Point> &positions);
+
+    /**
+     * Creates a list of RobotStateWithId at given positions with input velocity, 0
+     * angular velocity and 0 orientation. The id is set as the index in the list of
+     * positions.
+     *
+     * @param positions The positions to create robots at
+     * @param velocity The velocities given to each robot
+     */
+    std::vector<RobotStateWithId> createMovingRobotStatesWithId(
+        const std::vector<Point> &positions, const std::vector<Vector> &velocity);
 };  // namespace TestUtil
