@@ -44,18 +44,18 @@ void drawWorld(QGraphicsScene* scene, const World& world, TeamColour friendly_te
     drawBall(scene, world.ball().currentState());
     drawBallConeToFriendlyNet(scene, world.ball().position(), world.field());
 
-    std::pair<AngleSegment, std::pair<AngleMap, std::vector<Segment>>> pair =
+    std::pair<AngleSegment, std::pair<AngleMap, std::vector<AngleSegment>>> pair =
             calcBestShotOnGoalExpTest(world.field(), world.friendlyTeam(), world.enemyTeam(),
                                       world.ball().position(), TeamType::ENEMY, {});
     Segment leftseg = Segment(
             world.ball().position(),
             world.ball().position() +
-            10 * Vector::createFromAngle(Angle::fromDegrees(pair.second.first.getAngle0Max())));
+            10 * Vector::createFromAngle(pair.second.first.getAngleMax()));
 
     Segment rightseg = Segment(
             world.ball().position(),
             world.ball().position() +
-            10 * Vector::createFromAngle(Angle::fromDegrees(pair.second.first.getAngle0Min())));
+            10 * Vector::createFromAngle(pair.second.first.getAngleMin()));
 
     drawSegment(scene, leftseg, path_pen);
     drawSegment(scene, rightseg, path_pen);
@@ -63,12 +63,12 @@ void drawWorld(QGraphicsScene* scene, const World& world, TeamColour friendly_te
     Segment topangle = Segment(
             world.ball().position(),
             world.ball().position() +
-            10 * Vector::createFromAngle(Angle::fromDegrees(pair.first.getCartesianAngleMax())));
+            10 * Vector::createFromAngle(pair.first.getAngleMax()));
 
     Segment bottomangle = Segment(
             world.ball().position(),
             world.ball().position() +
-            10 * Vector::createFromAngle(Angle::fromDegrees(pair.first.getCartesianAngleMin())));
+            10 * Vector::createFromAngle(pair.first.getAngleMin()));
 
     path_pen.setColor(QColor::fromRgb(255, 255, 255));
     drawSegment(scene, topangle, path_pen);
@@ -76,9 +76,6 @@ void drawWorld(QGraphicsScene* scene, const World& world, TeamColour friendly_te
 
     path_pen.setStyle(Qt::SolidLine);
     path_pen.setColor(QColor::fromRgb(100, 123, 231));
-    for (const Segment& seg : pair.second.second) {
-        drawSegment(scene, seg, path_pen);
-    }
 }
 
 WorldDrawFunction getDrawWorldFunction(const World& world,
