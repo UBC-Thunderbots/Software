@@ -26,7 +26,6 @@ class StopTactic;
 class StopTestTactic;
 class DribbleTactic;
 class MoveToGoalLineTactic;
-class MoveToGoalLineTestTactic;
 
 /**
  * Refer to the docs about why we use the Visitor Design Pattern
