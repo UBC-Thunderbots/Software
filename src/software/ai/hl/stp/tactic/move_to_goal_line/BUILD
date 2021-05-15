@@ -20,7 +20,7 @@ cc_library(
 )
 
 cc_test(
-    name = "move_to_goal_line_fms_test",
+    name = "move_to_goal_line_fsm_test",
     srcs = ["move_to_goal_line_fsm_test.cpp"],
     deps = [
         ":move_to_goal_line_tactic",
