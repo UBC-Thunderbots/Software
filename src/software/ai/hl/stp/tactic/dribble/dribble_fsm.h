@@ -34,7 +34,7 @@ struct DribbleFSM
     static constexpr double DRIBBLE_KICK_SPEED = 0.05;
     // Maximum distance to continuously dribble the ball, slightly conservative to not
     // break the 1 meter rule
-    static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.9;
+    static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.87;
 
     /**
      * Converts the ball position to the robot's position given the direction that the

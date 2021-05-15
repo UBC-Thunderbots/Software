@@ -77,7 +77,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
          Point(non_shooter_x_pos, 1), Point(non_shooter_x_pos, -1),
          Point(non_shooter_x_pos, 2)});
     setFriendlyGoalie(0);
-    Point goalie      = Point(field.enemyGoalCenter().x(), 0);
+    Point goalie      = Point(field.enemyGoalpostNeg().x(), 0);
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({goalie});
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(PenaltyKickPlay));
