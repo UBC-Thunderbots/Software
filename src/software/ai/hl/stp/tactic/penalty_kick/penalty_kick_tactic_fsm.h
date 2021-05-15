@@ -268,7 +268,7 @@ struct PenaltyKickTacticFSM
                 std::cout << "approach position: " << final_position << '\n';
                 shot_angle = (next_shot_position - final_position).orientation();
                 DribbleFSM::ControlParams control_params{
-                    .dribble_destination       = std::nullopt,
+                    .dribble_destination       = std::optional<Point>(final_position),
                     .final_dribble_orientation = std::optional<Angle>(shot_angle),
                     .allow_excessive_dribbling = true
                 };
