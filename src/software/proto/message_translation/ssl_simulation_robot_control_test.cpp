@@ -63,7 +63,7 @@ TEST(SSLSimulationProtoTest, test_create_robot_wheel_velocity_move_command)
     EXPECT_FLOAT_EQ(4.0, move_command->wheel_velocity().back_right());
 }
 
-TEST(SSLSimulationProtoTest, test_create_robot_command)
+TEST(SSLSimulationProtoTest, test_create_wheel_velocity_robot_command)
 {
     auto move_wheel_velocity = createMoveWheelVelocity(1.0, 2.0, 3.0, 4.0);
     auto move_command        = createRobotMoveCommand(std::move(move_wheel_velocity));
@@ -81,6 +81,25 @@ TEST(SSLSimulationProtoTest, test_create_robot_command)
     EXPECT_FLOAT_EQ(2.0, robot_command->move_command().wheel_velocity().front_left());
     EXPECT_FLOAT_EQ(3.0, robot_command->move_command().wheel_velocity().back_left());
     EXPECT_FLOAT_EQ(4.0, robot_command->move_command().wheel_velocity().back_right());
+}
+
+TEST(SSLSimulationProtoTest, test_create_local_velocity_robot_command)
+{
+    auto move_local_velocity = createMoveLocalVelocity(60, -60, -60, 60);
+    auto move_command        = createRobotMoveCommand(std::move(move_local_velocity));
+    auto robot_command = createRobotCommand(1, std::move(move_command), 2.0, 3.0, 4.0);
+
+    ASSERT_TRUE(robot_command);
+    ASSERT_TRUE(robot_command->has_move_command());
+
+    EXPECT_EQ(1, robot_command->id());
+    EXPECT_FLOAT_EQ(2.0, robot_command->kick_speed());
+    EXPECT_FLOAT_EQ(3.0, robot_command->kick_angle());
+    EXPECT_FLOAT_EQ(4.0, robot_command->dribbler_speed());
+
+    EXPECT_GT(robot_command->move_command().local_velocity().forward(), 0.1);
+    EXPECT_NEAR(robot_command->move_command().local_velocity().left(), 0.0, 1e-5);
+    EXPECT_NEAR(robot_command->move_command().local_velocity().angular(), 0.0, 1e-5);
 }
 
 TEST(SSLSimulationProtoTest, test_create_robot_command_unset_optional_fields)

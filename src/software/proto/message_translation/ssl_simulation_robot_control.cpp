@@ -63,6 +63,16 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
     return move_command;
 }
 
+std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
+    std::unique_ptr<SSLSimulationProto::MoveLocalVelocity> move_local_velocity)
+{
+    auto move_command = std::make_unique<SSLSimulationProto::RobotMoveCommand>();
+
+    *(move_command->mutable_local_velocity()) = *move_local_velocity;
+
+    return move_command;
+}
+
 std::unique_ptr<SSLSimulationProto::RobotCommand> createRobotCommand(
     unsigned robot_id, std::unique_ptr<SSLSimulationProto::RobotMoveCommand> move_command,
     std::optional<double> kick_speed, std::optional<double> kick_angle,

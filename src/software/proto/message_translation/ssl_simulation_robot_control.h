@@ -42,7 +42,7 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
 /**
  * Creates a RobotMoveCommand proto
  *
- * @param move_wheel_velocity The move local velocity proto
+ * @param move_local_velocity The move local velocity proto
  *
  * @return RobotMoveCommand proto
  */
