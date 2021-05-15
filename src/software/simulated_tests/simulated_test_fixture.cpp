@@ -61,10 +61,13 @@ void SimulatedTestFixture::SetUp()
     }
     setupReplayLogging();
 
+    // Reset tick duration trackers
     total_tick_duration = 0.0;
-    max_tick_duration   = 0.0;
-    min_tick_duration   = std::numeric_limits<double>::max();
-    tick_count          = 0;
+    // all tick times should be greater than 0
+    max_tick_duration = 0.0;
+    // all tick times should be less than the max value of a double
+    min_tick_duration = std::numeric_limits<double>::max();
+    tick_count        = 0;
 }
 
 void SimulatedTestFixture::enableVisualizer()

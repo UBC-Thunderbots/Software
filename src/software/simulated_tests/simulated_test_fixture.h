@@ -92,6 +92,11 @@ class SimulatedTestFixture : public ::testing::Test
         const std::vector<ValidationFunction> &non_terminating_validation_functions,
         const Duration &timeout);
 
+    /**
+     * Registers a new tick time for calculating tick time statistics
+     *
+     * @param tick_time_ms The tick time in milliseconds
+     */
     void registerTickTime(double tick_time_ms);
 
     // The dynamic params being used in the tests
@@ -192,9 +197,14 @@ class SimulatedTestFixture : public ::testing::Test
     // time passes at the same speed a real life time
     bool run_simulation_in_realtime;
 
+    // These variables track tick time statistics
+    // Total duration of all ticks registered
     double total_tick_duration;
+    // The max tick duration registered
     double max_tick_duration;
+    // The min tick duration registered
     double min_tick_duration;
+    // Total number of ticks registered
     unsigned int tick_count;
 
     // The rate at which camera data will be simulated and given to SensorFusion.
