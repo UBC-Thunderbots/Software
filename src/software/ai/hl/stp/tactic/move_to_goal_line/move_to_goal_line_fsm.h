@@ -30,27 +30,26 @@ struct MoveToGoalLineFSM
          *
          * @param event MoveToGoalLineFSM::Update event
          */
-        const auto move_to_goal_line = [this](auto event,
-                                              back::process<MoveFSM::Update> processEvent) {
-            Field field = event.common.world.field();
-            Point destination       = field.friendlyGoalCenter();
-            Angle face_center = Angle::zero();
-            MoveFSM::ControlParams control_params{
+        const auto move_to_goal_line =
+            [this](auto event, back::process<MoveFSM::Update> processEvent) {
+                Field field       = event.common.world.field();
+                Point destination = field.friendlyGoalCenter();
+                Angle face_center = Angle::zero();
+                MoveFSM::ControlParams control_params{
                     .destination         = destination,
                     .final_orientation   = face_center,
                     .final_speed         = 0.0,
                     .dribbler_mode       = DribblerMode::OFF,
                     .ball_collision_type = BallCollisionType::ALLOW,
-                    .auto_chip_or_kick =
-                    AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0},
+                    .auto_chip_or_kick   = AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0},
                     .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
                     .target_spin_rev_per_s  = 0.0};
-            // Update the get behind ball fsm
-            processEvent(MoveFSM::Update(control_params, event.common));
-        };
+                // Update the get behind ball fsm
+                processEvent(MoveFSM::Update(control_params, event.common));
+            };
         return make_transition_table(
-                // src_state + event [guard] / action = dest_state
-                *move_to_goal_line_s + update_e / move_to_goal_line, move_to_goal_line_s = X,
-                X + update_e / move_to_goal_line = move_to_goal_line_s);
+            // src_state + event [guard] / action = dest_state
+            *move_to_goal_line_s + update_e / move_to_goal_line, move_to_goal_line_s = X,
+            X + update_e / move_to_goal_line = move_to_goal_line_s);
     }
 };

@@ -64,5 +64,5 @@ class TacticVisitor
     virtual void visit(const StopTestTactic &tactic)           = 0;
     virtual void visit(const DribbleTactic &tactic)            = 0;
     virtual void visit(const MoveToGoalLineTactic &tactic)     = 0;
-    virtual void visit(const MoveToGoalLineTestTactic &tactic)     = 0;
+    virtual void visit(const MoveToGoalLineTestTactic &tactic) = 0;
 };

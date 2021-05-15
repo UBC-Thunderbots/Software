@@ -1,14 +1,14 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/move_to_goal_line/move_to_goal_line_fsm.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
  * TODO: documentation
  */
 class MoveToGoalLineTactic : public Tactic
 {
-public:
+   public:
     /**
      * Creates a new MoveToGoalLineTactic
      *
@@ -23,7 +23,7 @@ public:
     void accept(TacticVisitor &visitor) const override;
     bool done() const override;
 
-private:
+   private:
     void calculateNextAction(ActionCoroutine::push_type &yield) override;
     void updateIntent(const TacticUpdate &tactic_update) override;
 

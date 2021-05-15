@@ -1,17 +1,19 @@
-#include "software/ai/hl/stp/tactic/move_to_goal_line/move_to_goal_line_fsm.h"
 #include "software/ai/hl/stp/tactic/move_to_goal_line/move_to_goal_line_tactic.h"
-#include "software/ai/hl/stp/action/stop_action.h"
 
 #include <algorithm>
 
-MoveToGoalLineTactic::MoveToGoalLineTactic(): Tactic(false,
-        {RobotCapability::Move}), fsm(){
+#include "software/ai/hl/stp/action/stop_action.h"
+#include "software/ai/hl/stp/tactic/move_to_goal_line/move_to_goal_line_fsm.h"
+
+MoveToGoalLineTactic::MoveToGoalLineTactic()
+    : Tactic(false, {RobotCapability::Move}), fsm()
+{
 }
 
 void MoveToGoalLineTactic::updateWorldParams(const World &world) {}
 
 double MoveToGoalLineTactic::calculateRobotCost(const Robot &robot,
-                                               const World &world) const
+                                                const World &world) const
 {
     // Prefer robots closer to the goal line
     // We normalize with the total field length so that robots that are within the
