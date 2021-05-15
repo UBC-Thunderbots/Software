@@ -51,42 +51,46 @@ float io_drivetrain_getFrontLeftRpm(void)
 {
     // TODO (#2063) implement this
     assert(initialized);
+    return 100;
 }
 
 float io_drivetrain_getFrontRightRpm(void)
 {
     // TODO (#2063) implement this
     assert(initialized);
+    return 100;
 }
 
 float io_drivetrain_getBackLeftRpm(void)
 {
     // TODO (#2063) implement this
     assert(initialized);
+    return 100;
 }
 
 float io_drivetrain_getBackRightRpm(void)
 {
     // TODO (#2063) implement this
     assert(initialized);
+    return 100;
 }
 
-void io_drivetrain_brakeFrontLeft(void);
+void io_drivetrain_brakeFrontLeft(void)
 {
     // TODO (#2063) implement this
     assert(initialized);
 }
-void io_drivetrain_brakeFrontRight(void);
+void io_drivetrain_brakeFrontRight(void)
 {
     // TODO (#2063) implement this
     assert(initialized);
 }
-void io_drivetrain_brakeBackLeft(void);
+void io_drivetrain_brakeBackLeft(void)
 {
     // TODO (#2063) implement this
     assert(initialized);
 }
-void io_drivetrain_brakeBackRight(void);
+void io_drivetrain_brakeBackRight(void)
 {
     // TODO (#2063) implement this
     assert(initialized);

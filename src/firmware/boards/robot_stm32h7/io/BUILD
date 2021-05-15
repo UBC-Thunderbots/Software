@@ -170,6 +170,34 @@ cc_library(
 )
 
 cc_library(
+    name = "charger",
+    srcs = ["charger.c"],
+    hdrs = ["charger.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+)
+
+cc_library(
+    name = "chicker",
+    srcs = ["chicker.c"],
+    hdrs = ["chicker.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+)
+
+cc_library(
+    name = "dribbler",
+    srcs = ["dribbler.c"],
+    hdrs = ["dribbler.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+)
+
+cc_library(
+    name = "vision",
+    srcs = ["vision.c"],
+    hdrs = ["vision.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+)
+
+cc_library(
     name = "power_monitor",
     srcs = ["power_monitor.c"],
     hdrs = ["power_monitor.h"],

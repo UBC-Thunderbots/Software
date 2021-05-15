@@ -3,7 +3,7 @@
 // There are different semaphore implementations depending on if we're on a x86 or arm
 // system, and we use typdefs here to switch between them
 #ifdef __arm__
-#include <FreeRTOS.h>
+#include "FreeRTOS.h"
 #include <semphr.h>
 #define static_assert _Static_assert
 #elif __unix__

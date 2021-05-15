@@ -31,7 +31,7 @@ struct DribbleFSM
     // Threshold to determine if the robot has the expected orientation
     static constexpr Angle ROBOT_ORIENTATION_CLOSE_THRESHOLD = Angle::fromDegrees(5);
     // Kick speed when breaking up continuous dribbling
-    static constexpr double DRIBBLE_KICK_SPEED = 0.05;
+    static constexpr double DRIBBLE_KICK_SPEED = 0.0;
     // Maximum distance to continuously dribble the ball, slightly conservative to not
     // break the 1 meter rule
     static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.9;
