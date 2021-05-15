@@ -1,6 +1,10 @@
 #pragma once
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
 #include "firmware/boards/robot_stm32h7/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h"
+#pragma GCC diagnostic pop
+
 
 typedef struct PwmPin PwmPin_t;
 

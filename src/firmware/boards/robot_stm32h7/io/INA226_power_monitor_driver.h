@@ -21,8 +21,13 @@
  * Adapted from: https://github.com/macgeorge/STM32-example-codes
  */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#pragma GCC diagnostic ignored "-Wconversion"
 #include "stm32h7xx_hal.h"
 #include "stm32h7xx_hal_i2c.h"
+#pragma GCC diagnostic pop
+
 
 // NOTE: arm_math.h must be included after stm32h7xx_hal.h because it depends on
 // __FPU_PRESENT being defined

@@ -4,7 +4,6 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
@@ -17,7 +16,8 @@
 
 using Zones = std::unordered_set<EighteenZoneId>;
 
-ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config) : Play(config)
+ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config)
+    : Play(config, true)
 {
 }
 
@@ -49,9 +49,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
      *    two defenders continue to defend
      */
 
-    // Setup the goalie and crease defenders
-    auto goalie_tactic =
-        std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig());
+    // Setup crease defenders
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
             play_config->getRobotNavigationObstacleConfig()),
@@ -75,7 +73,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                                  play_config->getPassingConfig());
 
     PassWithRating best_pass_and_score_so_far = attemptToShootWhileLookingForAPass(
-        yield, goalie_tactic, crease_defender_tactics, shoot_tactic, world);
+        yield, crease_defender_tactics, shoot_tactic, world);
 
     // If the shoot tactic has not finished, then we need to pass, otherwise we are
     // done this play
@@ -101,10 +99,11 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
         Zones cherry_pick_region_1 = {ranked_zones[0]};
         Zones cherry_pick_region_2 = {ranked_zones[1]};
 
-        auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(
-            world, pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
-        auto cherry_pick_tactic_2 = std::make_shared<CherryPickTactic>(
-            world, pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+        auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
+        auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
+
+        auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
+        auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
 
         do
         {
@@ -119,18 +118,20 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                       CreaseDefenderAlignment::RIGHT);
             if (!passer->done())
             {
-                yield({{goalie_tactic, passer, receiver},
+                yield({{passer, receiver},
                        {cherry_pick_tactic_1, std::get<0>(crease_defender_tactics),
                         std::get<1>(crease_defender_tactics)}});
             }
             else
             {
                 cherry_pick_tactic_1->updateControlParams(
-                    pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
+                    pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
+                    MaxAllowedSpeedMode::PHYSICAL_LIMIT);
                 cherry_pick_tactic_2->updateControlParams(
-                    pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+                    pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
+                    MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
-                yield({{goalie_tactic, receiver},
+                yield({{receiver},
                        {cherry_pick_tactic_1, cherry_pick_tactic_2},
                        {std::get<0>(crease_defender_tactics),
                         std::get<1>(crease_defender_tactics)}});
@@ -146,7 +147,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
-    TacticCoroutine::push_type &yield, std::shared_ptr<GoalieTactic> goalie_tactic,
+    TacticCoroutine::push_type &yield,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     std::shared_ptr<ShootGoalTactic> shoot_tactic, const World &world)
 
@@ -166,10 +167,8 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(
-        world, pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
-    auto cherry_pick_tactic_2 = std::make_shared<CherryPickTactic>(
-        world, pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
+    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
 
     // Wait for a good pass by starting out only looking for "perfect" passes (with a
     // score of 1) and decreasing this threshold over time
@@ -192,18 +191,22 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         std::get<1>(crease_defender_tactics)
             ->updateControlParams(world.ball().position(),
                                   CreaseDefenderAlignment::RIGHT);
-        yield({{goalie_tactic},
-               {shoot_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
+        yield({{shoot_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
                 std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
 
         pass_eval                  = pass_generator.generatePassEvaluation(world);
         best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
-        cherry_pick_tactic_1->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_1).pass);
-        cherry_pick_tactic_2->updateControlParams(
-            pass_eval.getBestPassInZones(cherry_pick_region_2).pass);
+        auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
+        auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
+
+        cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
+                                                  pass1.receiverOrientation(), 0.0,
+                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
+                                                  pass2.receiverOrientation(), 0.0,
+                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
         // We're ready to pass if we have a robot assigned in the PassGenerator as the
         // passer and the PassGenerator has found a pass above our current threshold

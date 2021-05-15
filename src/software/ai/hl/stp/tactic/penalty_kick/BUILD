@@ -38,11 +38,13 @@ cc_test(
     srcs = ["simulated_penalty_kick_tactic_test.cpp"],
     deps = [
         ":penalty_kick_tactic",
-        "//software/simulated_tests:simulated_test_main",
         "//software/simulated_tests:simulated_tactic_test_fixture",
-        "//software/world",
+        "//software/simulated_tests:simulated_test_main",
         "//software/simulated_tests/non_terminating_validation_functions",
         "//software/simulated_tests/terminating_validation_functions",
+        "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
+        "//software/time:duration",
+        "//software/world",
     ],
 )

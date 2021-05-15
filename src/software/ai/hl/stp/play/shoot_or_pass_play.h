@@ -2,9 +2,7 @@
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
-#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
@@ -37,7 +35,6 @@ class ShootOrPassPlay : public Play
      * pickers
      *
      * @param yield The coroutine to yield
-     * @param goalie_tactic The goalie tactic to use
      * @param crease_defender_tactics The crease defender tactics
      * @param shoot_tactic The shoot tactic
      * @param world The current state of the world
@@ -45,7 +42,7 @@ class ShootOrPassPlay : public Play
      * @return the best pass found
      */
     PassWithRating attemptToShootWhileLookingForAPass(
-        TacticCoroutine::push_type &yield, std::shared_ptr<GoalieTactic> goalie_tactic,
+        TacticCoroutine::push_type &yield,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
         std::shared_ptr<ShootGoalTactic> shoot_tactic, const World &world);
 };
