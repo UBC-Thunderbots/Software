@@ -93,8 +93,11 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     // to the same pass.
     for (int i = 0; i < 7; i++)
     {
+auto start_tick_time = std::chrono::system_clock::now();
         auto [pass, score] =
             pass_generator->generatePassEvaluation(world).getBestPassOnField();
+double duration_ms = ::TestUtil::millisecondsSince(start_tick_time);
+std::cout<<"Took "<<duration_ms<<"ms"<<std::endl;
 
         EXPECT_LE((best_pass.receiverPoint() - pass.receiverPoint()).length(), 0.7);
         EXPECT_LE(abs(best_pass.speed() - pass.speed()), 0.7);

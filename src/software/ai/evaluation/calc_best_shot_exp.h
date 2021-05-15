@@ -38,6 +38,18 @@ public:
         return std::abs((angle_min_ - angle_max_).toDegrees());
     }
 
+    bool operator==(const AngleSegment & other) const {
+        return other.angle_max_ == angle_max_;
+    }
+
+    bool operator<(const AngleSegment & other) const{
+        return angle_max_<other.angle_max_;
+    }
+
+    bool operator>(const AngleSegment & other) const{
+        return angle_max_>other.angle_max_;
+    }
+
 private:
     Angle angle_max_;
     Angle angle_min_;
@@ -45,7 +57,8 @@ private:
 
 class AngleMap {
 public:
-    explicit AngleMap(Angle angle_max, Angle angle_min, Angle angle_0_max, Angle angle_0_min) : angle_max(angle_max), angle_min(angle_min) {
+    explicit AngleMap(Angle angle_max, Angle angle_min, size_t max_num_obstacles) : angle_max(angle_max), angle_min(angle_min) {
+        this->taken_angle_segments.reserve(max_num_obstacles);
     }
 
     Angle getAngleMax() {
@@ -71,6 +84,21 @@ public:
 
     AngleSegment getBiggestViableAngleSegment() {
 
+        std::sort(this->taken_angle_segments.begin(), this->taken_angle_segments.end(), [](AngleSegment a, AngleSegment b) -> bool {
+            Angle a_angle = a.getAngleMax();
+            Angle b_angle = b.getAngleMax();
+
+            if (a_angle < b_angle) {
+                return false;
+            }
+            else if (a_angle > b_angle) {
+                return true;
+            }
+
+            return false;
+        });
+
+
         AngleSegment biggest_viable_angle_seg = AngleSegment(Angle::zero(), Angle::zero());
         if (this->taken_angle_segments.empty()) {
             biggest_viable_angle_seg = AngleSegment(this->angle_max, this->angle_min);
@@ -94,7 +122,6 @@ public:
             AngleSegment taken_angle_seg = i[0];
             AngleSegment next_taken_angle_seg = i[1];
             AngleSegment viable_angle_seg = AngleSegment(taken_angle_seg.getAngleMin(), next_taken_angle_seg.getAngleMax());
-
             if (viable_angle_seg.getDelta() > biggest_viable_angle_seg.getDelta()) {
                 biggest_viable_angle_seg = viable_angle_seg;
             }
@@ -156,3 +183,4 @@ std::pair<AngleSegment, std::pair<AngleMap, std::vector<AngleSegment>>> calcBest
                                        const Team &enemy_team, const Point &shot_origin,
                                        TeamType goal,
                                        const std::vector<Robot> &robots_to_ignore);
+
