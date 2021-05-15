@@ -345,13 +345,6 @@ void initPowerMonitor(void)
                               INA226_VBUS_140uS | INA226_AVG_1024);
 }
 
-void initPowerMonitor(void)
-{
-    io_power_monitor_init(I2C2, INA226_ADDRESS,
-                          INA226_MODE_CONT_SHUNT_AND_BUS | INA226_VBUS_140uS |
-                              INA226_VBUS_140uS | INA226_AVG_1024);
-}
-
 /* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
