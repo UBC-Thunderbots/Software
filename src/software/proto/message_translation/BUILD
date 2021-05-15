@@ -143,6 +143,7 @@ cc_library(
     srcs = ["ssl_simulation_robot_control.cpp"],
     hdrs = ["ssl_simulation_robot_control.h"],
     deps = [
+        "//firmware/shared:physics",
         "//software/proto:ssl_simulation_cc_proto",
     ],
 )

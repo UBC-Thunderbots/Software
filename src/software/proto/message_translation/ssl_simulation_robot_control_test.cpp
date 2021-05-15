@@ -13,7 +13,43 @@ TEST(SSLSimulationProtoTest, test_create_move_wheel_velocity)
     EXPECT_FLOAT_EQ(4.0, move_wheel_velocity->back_right());
 }
 
-TEST(SSLSimulationProtoTest, test_create_robot_move_command)
+TEST(SSLSimulationProtoTest, test_create_move_local_velocity_stationary)
+{
+    auto move_local_velocity = createMoveLocalVelocity(0, 0, 0, 0);
+    ASSERT_TRUE(move_local_velocity);
+
+    // Expect that the local velocity has some positive value, and that there is minimum
+    // left or angular velocity
+    EXPECT_NEAR(move_local_velocity->forward(), 0.0, 1e-5);
+    EXPECT_NEAR(move_local_velocity->left(), 0.0, 1e-5);
+    EXPECT_NEAR(move_local_velocity->angular(), 0.0, 1e-5);
+}
+
+TEST(SSLSimulationProtoTest, test_create_move_local_velocity_forward)
+{
+    auto move_local_velocity = createMoveLocalVelocity(60, -60, -60, 60);
+    ASSERT_TRUE(move_local_velocity);
+
+    // Expect that the local velocity has some positive value, and that there is minimum
+    // left or angular velocity
+    EXPECT_GT(move_local_velocity->forward(), 0.1);
+    EXPECT_NEAR(move_local_velocity->left(), 0.0, 1e-5);
+    EXPECT_NEAR(move_local_velocity->angular(), 0.0, 1e-5);
+}
+
+TEST(SSLSimulationProtoTest, test_create_move_local_velocity_backward)
+{
+    auto move_local_velocity = createMoveLocalVelocity(-60, 60, 60, -60);
+    ASSERT_TRUE(move_local_velocity);
+
+    // Expect that the local velocity has some positive value, and that there is minimum
+    // left or angular velocity
+    EXPECT_LT(move_local_velocity->forward(), -0.1);
+    EXPECT_NEAR(move_local_velocity->left(), 0.0, 1e-5);
+    EXPECT_NEAR(move_local_velocity->angular(), 0.0, 1e-5);
+}
+
+TEST(SSLSimulationProtoTest, test_create_robot_wheel_velocity_move_command)
 {
     auto move_wheel_velocity = createMoveWheelVelocity(1.0, 2.0, 3.0, 4.0);
     auto move_command        = createRobotMoveCommand(std::move(move_wheel_velocity));

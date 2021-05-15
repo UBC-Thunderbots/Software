@@ -1,14 +1,54 @@
 #include "software/proto/message_translation/ssl_simulation_robot_control.h"
 
+extern "C"
+{
+#include "firmware/shared/physics.h"
+}
+
 std::unique_ptr<SSLSimulationProto::MoveWheelVelocity> createMoveWheelVelocity(
     double front_right, double front_left, double back_left, double back_right)
 {
-    auto move_local_velocity = std::make_unique<SSLSimulationProto::MoveWheelVelocity>();
+    auto move_wheel_velocity = std::make_unique<SSLSimulationProto::MoveWheelVelocity>();
 
-    move_local_velocity->set_front_left(static_cast<float>(front_left));
-    move_local_velocity->set_front_right(static_cast<float>(front_right));
-    move_local_velocity->set_back_left(static_cast<float>(back_left));
-    move_local_velocity->set_back_right(static_cast<float>(back_right));
+    move_wheel_velocity->set_front_left(static_cast<float>(front_left));
+    move_wheel_velocity->set_front_right(static_cast<float>(front_right));
+    move_wheel_velocity->set_back_left(static_cast<float>(back_left));
+    move_wheel_velocity->set_back_right(static_cast<float>(back_right));
+
+    return move_wheel_velocity;
+}
+
+// Converts rpm and wheel_radius [m] to speed [m/s]
+float rpm_to_m_per_s(float rpm, float wheel_radius)
+{
+    return (2 * (float)M_PI * rpm * wheel_radius) / 60.0f;
+}
+
+std::unique_ptr<SSLSimulationProto::MoveLocalVelocity> createMoveLocalVelocity(
+    double front_right, double front_left, double back_left, double back_right)
+{
+    auto move_local_velocity = std::make_unique<SSLSimulationProto::MoveLocalVelocity>();
+
+    // Convert the units of wheel speeds to m/s
+    float front_left_m_per_s =
+        rpm_to_m_per_s(static_cast<float>(front_left), WHEEL_RADIUS);
+    float back_left_m_per_s = rpm_to_m_per_s(static_cast<float>(back_left), WHEEL_RADIUS);
+    float back_right_m_per_s =
+        rpm_to_m_per_s(static_cast<float>(back_right), WHEEL_RADIUS);
+    float front_right_m_per_s =
+        rpm_to_m_per_s(static_cast<float>(front_right), WHEEL_RADIUS);
+    float wheel_speeds[4]{front_left_m_per_s, back_left_m_per_s, back_right_m_per_s,
+                          front_right_m_per_s};
+    float robot_local_speed[3]{0.0, 0.0, 0.0};
+    speed4_to_speed3(wheel_speeds, robot_local_speed);
+
+    robot_local_speed[2] =
+        robot_local_speed[2] /
+        ROBOT_RADIUS;  // Convert speed [m/s] to angular velocity [rad/s]
+
+    move_local_velocity->set_forward(robot_local_speed[0]);
+    move_local_velocity->set_left(robot_local_speed[1]);
+    move_local_velocity->set_angular(robot_local_speed[2]);
 
     return move_local_velocity;
 }
