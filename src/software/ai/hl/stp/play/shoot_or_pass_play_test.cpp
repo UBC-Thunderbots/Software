@@ -42,7 +42,7 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(24.5))
             {
-                yield("Timestamp not at 9.5s");
+                yield("Timestamp not at 24.5s");
             }
         }};
 

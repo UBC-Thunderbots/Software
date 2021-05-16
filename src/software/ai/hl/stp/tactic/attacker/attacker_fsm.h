@@ -47,7 +47,7 @@ struct AttackerFSM
             {
                 chip_target = event.control_params.chip_target.value();
             }
-            // default to chiping the ball away
+            // default to chipping the ball away
             PivotKickFSM::ControlParams control_params{
                 .kick_origin    = ball_position,
                 .kick_direction = (chip_target - ball_position).orientation(),
@@ -80,14 +80,14 @@ struct AttackerFSM
         };
 
         /**
-         * Action that updates the DribbleFSM to chip away the ball
+         * Action that updates the DribbleFSM to keep the ball away
          *
          * @param event AttackerFSM::Update event
          * @param processEvent processes the DribbleFSM::Update
          */
         const auto keep_away = [](auto event,
                                   back::process<DribbleFSM::Update> processEvent) {
-            // Default to chipping away
+            // TODO (#2073): Implement a more effective keep away tactic
             DribbleFSM::ControlParams control_params{
                 .dribble_destination       = std::nullopt,
                 .final_dribble_orientation = std::nullopt,
@@ -115,7 +115,7 @@ struct AttackerFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *keep_away_s + update_e[should_kick] / pivot_kick = pivot_kick_s,
-            keep_away_s + update_e[!should_kick] / keep_away  = keep_away_s,
+            keep_away_s + update_e[!should_kick] / keep_away,
             pivot_kick_s + update_e / pivot_kick, pivot_kick_s = X);
     }
 };

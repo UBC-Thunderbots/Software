@@ -53,7 +53,8 @@ TEST(AttackerFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<PivotKickFSM>)>(
         boost::sml::state<PivotKickFSM::KickState>));
 
-    // FSM should be done now after 2 ticks
+    // FSM should be done now after 2 ticks, multiple ticks are required due to the
+    // subFSMs
     world = ::TestUtil::setBallVelocity(world, Vector(5, 0), Timestamp::fromSeconds(223));
     EXPECT_TRUE(world.ball().hasBallBeenKicked(pass.passerOrientation()));
     fsm.process_event(AttackerFSM::Update(
