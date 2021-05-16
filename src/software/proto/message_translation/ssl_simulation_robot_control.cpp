@@ -25,18 +25,20 @@ float rpm_to_m_per_s(float rpm, float wheel_radius)
 }
 
 std::unique_ptr<SSLSimulationProto::MoveLocalVelocity> createMoveLocalVelocity(
-    double front_right, double front_left, double back_left, double back_right)
+    double wheel_rpm_front_right, double wheel_rpm_front_left, double wheel_rpm_back_left,
+    double wheel_rpm_back_right)
 {
     auto move_local_velocity = std::make_unique<SSLSimulationProto::MoveLocalVelocity>();
 
     // Convert the units of wheel speeds to m/s
     float front_left_m_per_s =
-        rpm_to_m_per_s(static_cast<float>(front_left), WHEEL_RADIUS);
-    float back_left_m_per_s = rpm_to_m_per_s(static_cast<float>(back_left), WHEEL_RADIUS);
+        rpm_to_m_per_s(static_cast<float>(wheel_rpm_front_left), WHEEL_RADIUS);
+    float back_left_m_per_s =
+        rpm_to_m_per_s(static_cast<float>(wheel_rpm_back_left), WHEEL_RADIUS);
     float back_right_m_per_s =
-        rpm_to_m_per_s(static_cast<float>(back_right), WHEEL_RADIUS);
+        rpm_to_m_per_s(static_cast<float>(wheel_rpm_back_right), WHEEL_RADIUS);
     float front_right_m_per_s =
-        rpm_to_m_per_s(static_cast<float>(front_right), WHEEL_RADIUS);
+        rpm_to_m_per_s(static_cast<float>(wheel_rpm_front_right), WHEEL_RADIUS);
     float wheel_speeds[4]{front_left_m_per_s, back_left_m_per_s, back_right_m_per_s,
                           front_right_m_per_s};
     float robot_local_speed[3]{0.0, 0.0, 0.0};

@@ -19,15 +19,16 @@ std::unique_ptr<SSLSimulationProto::MoveWheelVelocity> createMoveWheelVelocity(
 /**
  * Creates a MoveLocalVelocity proto
  *
- * @param front_right Speed [rpm] of front right wheel
- * @param front_left Speed [rpm] of front left wheel
- * @param back_right Speed [rpm] of back right wheel
- * @param back_left Speed [rpm] of back left wheel
+ * @param wheel_rpm_front_right Speed [rpm] of front right wheel
+ * @param wheel_rpm_front_left Speed [rpm] of front left wheel
+ * @param wheel_rpm_back_right Speed [rpm] of back right wheel
+ * @param wheel_rpm_back_left Speed [rpm] of back left wheel
  *
  * @return MoveLocalVelocity proto
  */
 std::unique_ptr<SSLSimulationProto::MoveLocalVelocity> createMoveLocalVelocity(
-    double front_right, double front_left, double back_left, double back_right);
+    double wheel_rpm_front_right, double wheel_rpm_front_left, double wheel_rpm_back_left,
+    double wheel_rpm_back_right);
 
 /**
  * Creates a RobotMoveCommand proto
