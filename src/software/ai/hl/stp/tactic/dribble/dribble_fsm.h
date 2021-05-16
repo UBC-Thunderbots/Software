@@ -181,7 +181,6 @@ struct DribbleFSM
                     robotPositionToFaceBall(ball.position(), to_destination_orientation);
             }
         }
-        std::cout << "destination: " << target_destination << " w/ oritentation: " << target_orientation << "\n";
         return std::make_tuple(target_destination, target_orientation);
     }
 

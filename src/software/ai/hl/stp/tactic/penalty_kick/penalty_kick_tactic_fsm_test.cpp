@@ -12,7 +12,6 @@ TEST(PenaltyKickTacticFSM, test_transitions)
     Robot robot = ::TestUtil::createRobotAtPos(world.field().friendlyPenaltyMark());
 
     FSM<PenaltyKickTacticFSM> fsm;
-    EXPECT_TRUE(fsm.is(boost::sml::state<PenaltyKickTacticFSM::InitialState>));
 
     PenaltyKickTacticFSM::ControlParams control_params{};
 
@@ -22,18 +21,13 @@ TEST(PenaltyKickTacticFSM, test_transitions)
 
     Point position = world.field().enemyGoalCenter() + Vector(-1, 0);
     robot          = ::TestUtil::createRobotAtPos(position);
-    world = ::TestUtil::setBallPosition(world, position, Timestamp::fromSeconds(1));
-    fsm.process_event(PenaltyKickTacticFSM::Update(
-        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
-
+    world = ::TestUtil::setBallPosition(world, position + Vector(ROBOT_MAX_RADIUS_METERS, 0), Timestamp::fromSeconds(1));
     fsm.process_event(PenaltyKickTacticFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM>));
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<KickFSM>)>(
         boost::sml::state<GetBehindBallFSM>));
 
-    world = ::TestUtil::setBallPosition(world, position + Vector(ROBOT_MAX_RADIUS_METERS, 0), Timestamp::fromSeconds(1));
     fsm.process_event(PenaltyKickTacticFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM>));
@@ -52,13 +46,13 @@ TEST(PenaltyKickTacticFSM, test_transitions)
 TEST(PenaltyKickTacticFSMTest, no_enemy_goalie)
 {
     World world = ::TestUtil::createBlankTestingWorld();
-    world       = ::TestUtil::setBallPosition(world, world.field().friendlyPenaltyMark(),
+    world       = ::TestUtil::setBallPosition(world, Point(4, 0),
                                         Timestamp::fromSeconds(0));
     world = ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(0));
 
     Vector behind_ball_direction =
         -(world.ball().position() - world.field().enemyGoalCenter()).normalize();
-    Point behind_ball = world.field().friendlyPenaltyMark() +
+    Point behind_ball = Point(4, 0) -
                         behind_ball_direction.normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
                                                         BALL_MAX_RADIUS_METERS);
 
@@ -67,7 +61,7 @@ TEST(PenaltyKickTacticFSMTest, no_enemy_goalie)
               AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     EXPECT_TRUE(PenaltyKickTacticFSM::evaluatePenaltyShot(std::nullopt, world.field(),
-                                                          world.ball(), shooter));
+                                                          world.ball().position(), shooter));
 }
 
 TEST(PenaltyKickTacticFSMTest, enemy_goalie_offset_left_no_viable_shot)
@@ -97,7 +91,7 @@ TEST(PenaltyKickTacticFSMTest, enemy_goalie_offset_left_no_viable_shot)
     world.updateFriendlyTeamState(friendly);
 
     EXPECT_FALSE(PenaltyKickTacticFSM::evaluatePenaltyShot(
-        std::optional<Robot>(enemy_goalie), world.field(), world.ball(), shooter));
+        std::optional<Robot>(enemy_goalie), world.field(), world.ball().position(), shooter));
 }
 
 TEST(PenaltyKickTacticFSMTest, enemy_goalie_offset_right_no_viable_shot)
@@ -110,7 +104,7 @@ TEST(PenaltyKickTacticFSMTest, enemy_goalie_offset_right_no_viable_shot)
 
     Point enemy_goalie_pos = Point(world.field().enemyGoalCenter().x(), -0.2);
     Vector behind_ball_direction =
-        -(world.ball().position() - enemy_goalie_pos).normalize();
+        (world.ball().position() - enemy_goalie_pos).normalize();
     Point behind_ball = world.ball().position() +
                         behind_ball_direction.normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
                                                         BALL_MAX_RADIUS_METERS);
@@ -128,7 +122,7 @@ TEST(PenaltyKickTacticFSMTest, enemy_goalie_offset_right_no_viable_shot)
     world.updateFriendlyTeamState(friendly);
 
     EXPECT_FALSE(PenaltyKickTacticFSM::evaluatePenaltyShot(
-        std::optional<Robot>(enemy_goalie), world.field(), world.ball(), shooter));
+        std::optional<Robot>(enemy_goalie), world.field(), world.ball().position(), shooter));
 }
 
 TEST(PenaltyKickTacticFSMTest, enemy_goalie_right_viable_shot_left)
@@ -140,7 +134,7 @@ TEST(PenaltyKickTacticFSMTest, enemy_goalie_right_viable_shot_left)
     Point enemy_goalie_pos = Point(world.field().enemyGoalCenter().x(), +0.2);
     Vector behind_ball_direction =
         -(world.ball().position() - world.field().enemyGoalpostNeg()).normalize();
-    Point behind_ball = world.ball().position() +
+    Point behind_ball = world.ball().position() -
                         behind_ball_direction.normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
                                                         BALL_MAX_RADIUS_METERS);
 
@@ -157,7 +151,7 @@ TEST(PenaltyKickTacticFSMTest, enemy_goalie_right_viable_shot_left)
     world.updateFriendlyTeamState(friendly);
 
     EXPECT_TRUE(PenaltyKickTacticFSM::evaluatePenaltyShot(
-        std::optional<Robot>(enemy_goalie), world.field(), world.ball(), shooter));
+        std::optional<Robot>(enemy_goalie), world.field(), world.ball().position(), shooter));
 }
 
 TEST(PenaltyKickTacticFSMTest, enemy_goalie_left_viable_shot_right)
@@ -169,7 +163,7 @@ TEST(PenaltyKickTacticFSMTest, enemy_goalie_left_viable_shot_right)
     Point enemy_goalie_pos = Point(world.field().enemyGoalCenter().x(), -0.2);
     Vector behind_ball_direction =
         -(world.ball().position() - world.field().enemyGoalpostPos()).normalize();
-    Point behind_ball = world.ball().position() +
+    Point behind_ball = world.ball().position() -
                         behind_ball_direction.normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
                                                         BALL_MAX_RADIUS_METERS);
 
@@ -186,7 +180,7 @@ TEST(PenaltyKickTacticFSMTest, enemy_goalie_left_viable_shot_right)
     world.updateFriendlyTeamState(friendly);
 
     EXPECT_TRUE(PenaltyKickTacticFSM::evaluatePenaltyShot(
-        std::optional<Robot>(enemy_goalie), world.field(), world.ball(), shooter));
+        std::optional<Robot>(enemy_goalie), world.field(), world.ball().position(), shooter));
 }
 
 TEST(PenaltyKickTacticFSMTest, no_enemy_goalie_shot_position)

@@ -46,7 +46,8 @@ TEST_P(SimulatedPenaltyKickTacticTest, penalty_kick_test)
         },
         [](std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield) {
-            robotNotExcessivelyDribbling(shooter_id, world_ptr, yield);
+             // Uncomment following line when #2087 (https://github.com/UBC-Thunderbots/Software/pull/2087) goes in
+             // robotNotExcessivelyDribbling(shooter_id, world_ptr, yield);
         }
     };
 
@@ -76,7 +77,8 @@ TEST_F(SimulatedPenaltyKickTacticTest, penalty_no_goalie)
         },
         [](std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield) {
-            robotNotExcessivelyDribbling(shooter_id, world_ptr, yield);
+             // Uncomment following line when #2087 (https://github.com/UBC-Thunderbots/Software/pull/2087) goes in
+             // robotNotExcessivelyDribbling(shooter_id, world_ptr, yield);
         }
     };
 
@@ -87,18 +89,23 @@ TEST_F(SimulatedPenaltyKickTacticTest, penalty_no_goalie)
 
 INSTANTIATE_TEST_CASE_P(RobotLocations, SimulatedPenaltyKickTacticTest,
                         ::testing::Values(
+                            //enemy robot stationary at centre of goal
                             RobotStateWithId{
                                 0, RobotState(Field::createSSLDivisionBField().enemyGoalCenter(), Vector(0, 0),
-                                                Angle::zero(), Angle::zero())},
+                                                Angle::half(), Angle::zero())},
+                            //enemy robot stationary left of net
                             RobotStateWithId{
                                 0, RobotState(Field::createSSLDivisionBField().enemyGoalpostNeg(), Vector(0, 0),
-                                                Angle::zero(), Angle::zero())},
+                                                Angle::half(), Angle::zero())},
+                            //enemy robot stationary right of net
                             RobotStateWithId{
                                 0, RobotState(Field::createSSLDivisionBField().enemyGoalpostPos(), Vector(0, 0),
-                                                Angle::zero(), Angle::zero())},
+                                                Angle::half(), Angle::zero())},
+                            //enemy robot left of net but moving right
                             RobotStateWithId{
-                                0, RobotState(Field::createSSLDivisionBField().enemyGoalpostNeg(), Vector(0.1, 0),
-                                                Angle::zero(), Angle::zero())},
+                                0, RobotState(Field::createSSLDivisionBField().enemyGoalpostNeg(), Vector(0, 1.2),
+                                                Angle::half(), Angle::zero())},
+                            //enemy robot right of net but moving left
                             RobotStateWithId{
-                                0, RobotState(Field::createSSLDivisionBField().enemyGoalpostPos(), Vector(-0.1, 0),
-                                                Angle::zero(), Angle::zero())}));
+                                0, RobotState(Field::createSSLDivisionBField().enemyGoalpostPos(), Vector(0, -1.2),
+                                                Angle::half(), Angle::zero())}));
