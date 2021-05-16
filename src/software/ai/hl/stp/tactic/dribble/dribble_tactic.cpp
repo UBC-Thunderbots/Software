@@ -7,7 +7,7 @@
 DribbleTactic::DribbleTactic()
     : Tactic(false,
              {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
-      fsm(),
+      fsm(DribbleFSM(std::make_shared<Point>())),
       control_params{DribbleFSM::ControlParams{.dribble_destination       = std::nullopt,
                                                .final_dribble_orientation = std::nullopt,
                                                .allow_excessive_dribbling = false}}
