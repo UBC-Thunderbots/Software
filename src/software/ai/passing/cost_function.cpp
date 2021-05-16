@@ -78,12 +78,11 @@ double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zon
 double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,
                           std::shared_ptr<const PassingConfig> passing_config)
 {
-    double ideal_max_rotation_to_shoot_degrees =
-        passing_config->getIdealMaxRotationToShootDegrees()->value();
+    double ideal_max_rotation_to_shoot_degrees = passing_config->getIdealMaxRotationToShootDegrees()->value();
 
     // Figure out the range of angles for which we have an open shot to the goal after
     // receiving the pass
-    auto shot_opt = calcBestShotOnGoal(field, enemy_team, enemy_team, pass.receiverPoint(), TeamType::FRIENDLY, {}, 0);
+    auto shot_opt = calcBestShotOnGoal(Segment(field.enemyGoalpostPos(), field.enemyGoalpostNeg()), pass.receiverPoint(), enemy_team.getAllRobots());
 
     Angle open_angle_to_goal = Angle::zero();
     Point shot_target        = field.enemyGoalCenter();

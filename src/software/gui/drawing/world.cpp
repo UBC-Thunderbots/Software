@@ -6,7 +6,6 @@
 #include "software/gui/drawing/ball.h"
 #include "software/gui/drawing/field.h"
 #include "software/gui/drawing/team.h"
-#include "software/ai/evaluation/calc_best_shot_exp.h"
 
 void drawWorld(QGraphicsScene* scene, const World& world, TeamColour friendly_team_colour)
 {

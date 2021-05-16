@@ -19,36 +19,15 @@ cc_test(
     ],
 )
 
-#cc_library(
-#    name = "calc_best_shot",
-#    srcs = [
-#        "calc_best_shot.cpp",
-#        "calc_best_shot_impl.cpp",
-#        "calc_best_shot_impl.h",
-#    ],
-#    hdrs = [
-#        "calc_best_shot.h",
-#    ],
-#    deps = [
-#        ":shot",
-#        "//shared:constants",
-#        "//software/geom:segment",
-#        "//software/geom/algorithms",
-#        "//software/world",
-#    ],
-#)
-
 cc_library(
     name = "calc_best_shot",
     srcs = [
         "calc_best_shot.cpp",
-        "calc_best_shot.h",
-        "calc_best_shot_exp.cpp",
         "calc_best_shot_impl.cpp",
+        "calc_best_shot_impl.h",
     ],
     hdrs = [
-        "calc_best_shot_exp.h",
-        "calc_best_shot_impl.h",
+        "calc_best_shot.h",
     ],
     deps = [
         ":shot",
