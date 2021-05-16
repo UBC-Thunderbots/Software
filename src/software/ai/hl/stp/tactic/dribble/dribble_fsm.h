@@ -11,10 +11,10 @@
 
 struct DribbleFSM
 {
+   public:
     class GetPossessionState;
     class DribbleState;
 
-   public:
     explicit DribbleFSM(const std::shared_ptr<Point> &continuous_dribbling_start_point)
         : continuous_dribbling_start_point(continuous_dribbling_start_point)
     {
