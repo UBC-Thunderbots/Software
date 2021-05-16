@@ -4,15 +4,14 @@
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 
 PenaltyKickTactic::PenaltyKickTactic()
-    : Tactic(false, {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick})
+    : Tactic(false,
+             {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick})
 {
 }
 
 void PenaltyKickTactic::updateWorldParams(const World& world) {}
 
-void PenaltyKickTactic::updateControlParams()
-{
-}
+void PenaltyKickTactic::updateControlParams() {}
 
 double PenaltyKickTactic::calculateRobotCost(const Robot& robot, const World& world) const
 {

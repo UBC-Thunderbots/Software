@@ -21,7 +21,7 @@ class PenaltyKickTactic : public Tactic
      * Creates a new PenaltyKickTactic
      */
 
-     explicit PenaltyKickTactic();
+    explicit PenaltyKickTactic();
 
     void updateWorldParams(const World &world) override;
     void updateControlParams();
