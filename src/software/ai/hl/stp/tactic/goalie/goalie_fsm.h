@@ -21,13 +21,6 @@ struct GoalieFSM
     class PanicState;
     class PositionToBlockState;
 
-    explicit GoalieFSM(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config,
-                       MaxAllowedSpeedMode max_allowed_speed_mode)
-        : goalie_tactic_config(goalie_tactic_config),
-          max_allowed_speed_mode(max_allowed_speed_mode)
-    {
-    }
-
     struct ControlParams
     {
     };
@@ -37,6 +30,19 @@ struct GoalieFSM
     // Distance to chip the ball when trying to yeet it
     // TODO (#1878): Replace this with a more intelligent chip distance system
     static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
+
+    /**
+     * Constructor for GoalieFSM struct
+     *
+     * @param goalie_tactic_config The config to fetch parameters from
+     * @param max_allowed_speed_mode The maximum allowed speed mode
+     */
+    explicit GoalieFSM(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config,
+                       MaxAllowedSpeedMode max_allowed_speed_mode)
+        : goalie_tactic_config(goalie_tactic_config),
+          max_allowed_speed_mode(max_allowed_speed_mode)
+    {
+    }
 
     /**
      * Gets the position for the goalie to move to, to best position itself between the

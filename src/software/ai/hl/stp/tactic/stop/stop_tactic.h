@@ -46,5 +46,5 @@ class StopTactic : public Tactic
     FSM<StopFSM> fsm;
 
     // Whether or not the robot should coast to a stop
-    bool coast;
+    bool coast;  // TODO (#1888): remove this field
 };

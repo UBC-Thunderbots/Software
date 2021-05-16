@@ -15,6 +15,12 @@ struct DribbleFSM
     class GetPossessionState;
     class DribbleState;
 
+    /**
+     * Constructor for DribbleFSM
+     *
+     * @param continuous_dribbling_start_point A pointer to a Point to track the
+     * continuous dribbling start point
+     */
     explicit DribbleFSM(const std::shared_ptr<Point> &continuous_dribbling_start_point)
         : continuous_dribbling_start_point(continuous_dribbling_start_point)
     {
@@ -289,6 +295,11 @@ struct DribbleFSM
                 MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
         };
 
+        /**
+         * Start dribbling
+         *
+         * @param event DribbleFSM::Update
+         */
         const auto start_dribble = [this, dribble](auto event) {
             // update continuous_dribbling_start_point once we start dribbling
             *continuous_dribbling_start_point = event.common.world.ball().position();

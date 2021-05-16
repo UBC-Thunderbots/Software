@@ -14,10 +14,8 @@
 CreaseDefenderTactic::CreaseDefenderTactic(
     std::shared_ptr<const RobotNavigationObstacleConfig> robot_navigation_obstacle_config)
     : Tactic(true, {RobotCapability::Move}),
-      fsm(),
-      control_params(
-          {Point(0, 0), CreaseDefenderAlignment::CENTRE,
-           robot_navigation_obstacle_config->getRobotObstacleInflationFactor()->value()}),
+      fsm(CreaseDefenderFSM(robot_navigation_obstacle_config)),
+      control_params({Point(0, 0), CreaseDefenderAlignment::CENTRE}),
       robot_navigation_obstacle_config(robot_navigation_obstacle_config)
 {
 }
@@ -73,7 +71,5 @@ bool CreaseDefenderTactic::done() const
 
 void CreaseDefenderTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    control_params.robot_obstacle_inflation_factor =
-        robot_navigation_obstacle_config->getRobotObstacleInflationFactor()->value();
     fsm.process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
 }
