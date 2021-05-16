@@ -34,12 +34,11 @@
 #include "firmware/boards/robot_stm32h7/io/network_logger.h"
 #include "firmware/boards/robot_stm32h7/io/power_monitor.h"
 #include "firmware/boards/robot_stm32h7/io/proto_multicast.h"
-#include "firmware/boards/robot_stm32h7/io/robot_status.h"
 #include "firmware/boards/robot_stm32h7/io/proto_multicast_communication_profile.h"
+#include "firmware/boards/robot_stm32h7/io/robot_status.h"
 #include "firmware/boards/robot_stm32h7/io/ublox_odinw262_communicator.h"
 #include "firmware/boards/robot_stm32h7/tim.h"
 #include "firmware/boards/robot_stm32h7/usart.h"
-#include "shared/constants.h"
 #include "shared/proto/robot_log_msg.nanopb.h"
 #include "shared/proto/robot_status_msg.nanopb.h"
 #include "shared/proto/tbots_software_msgs.nanopb.h"
@@ -48,6 +47,38 @@
 /* Private typedef -----------------------------------------------------------*/
 typedef StaticTask_t osStaticThreadDef_t;
 /* USER CODE BEGIN PTD */
+// Networking
+// the IPv6 multicast address, only ff02 is important, the rest is random
+// see https://en.wikipedia.org/wiki/Solicited-node_multicast_address for why ff02 matters
+#define MAX_MULTICAST_CHANNELS 16
+#define MULTICAST_CHANNEL_LENGTH 21
+const char MULTICAST_CHANNELS[MAX_MULTICAST_CHANNELS][MULTICAST_CHANNEL_LENGTH] = {
+    "ff02::c3d0:42d2:bb01", "ff02::c3d0:42d2:bb02", "ff02::c3d0:42d2:bb03",
+    "ff02::c3d0:42d2:bb04", "ff02::c3d0:42d2:bb05", "ff02::c3d0:42d2:bb06",
+    "ff02::c3d0:42d2:bb07", "ff02::c3d0:42d2:bb08", "ff02::c3d0:42d2:bb09",
+    "ff02::c3d0:42d2:bb10", "ff02::c3d0:42d2:bb11", "ff02::c3d0:42d2:bb12",
+    "ff02::c3d0:42d2:bb13", "ff02::c3d0:42d2:bb14", "ff02::c3d0:42d2:bb15",
+    "ff02::c3d0:42d2:bb16",
+};
+
+// the port robots are listening to for vision and primitives
+const short unsigned int VISION_PORT    = 42069;
+const short unsigned int PRIMITIVE_PORT = 42070;
+
+// the port the AI receives msgs from the robot
+const short unsigned int ROBOT_STATUS_PORT = 42071;
+const short unsigned int ROBOT_LOGS_PORT   = 42072;
+
+// the port to listen to for what side of the field to defend
+const unsigned DEFENDING_SIDE_PORT = 42073;
+
+// the timeout to recv a network packet
+const int NETWORK_TIMEOUT_MS = 1000;
+
+// maximum transfer unit of the network interface
+// this is an int to avoid Wconversion with lwip
+const short unsigned int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
+
 
 /* USER CODE END PTD */
 
@@ -335,38 +366,21 @@ void initIoDrivetrain(void)
 {
     // Initialize a motor driver with the given suffix, on the given
     // timer channel
-#define INIT_DRIVETRAIN_UNIT(MOTOR_NAME_SUFFIX, TIMER_PERIPHERAL, TIMER_CHANNEL)         \
-    {                                                                                    \
-        GpioPin_t *reset_pin =                                                           \
-            io_gpio_pin_create(MOTOR_NAME_SUFFIX##_RESET_GPIO_Port,                      \
-                               MOTOR_NAME_SUFFIX##_RESET_Pin, ACTIVE_HIGH);              \
-        GpioPin_t *mode_pin =                                                            \
-            io_gpio_pin_create(MOTOR_NAME_SUFFIX##_MODE_GPIO_Port,                       \
-                               MOTOR_NAME_SUFFIX##_MODE_Pin, ACTIVE_HIGH);               \
-        GpioPin_t *direction_pin =                                                       \
-            io_gpio_pin_create(MOTOR_NAME_SUFFIX##_DIR_GPIO_Port,                        \
-                               MOTOR_NAME_SUFFIX##_DIR_Pin, ACTIVE_HIGH);                \
-                                                                                         \
-        PwmPin_t *pwm_pin = io_pwm_pin_create(&TIMER_PERIPHERAL, TIMER_CHANNEL);         \
-                                                                                         \
-        AllegroA3931MotorDriver_t *motor_driver = io_allegro_a3931_motor_driver_create(  \
-            pwm_pin, reset_pin, mode_pin, direction_pin);                                \
-        io_allegro_a3931_motor_setPwmPercentage(motor_driver, 0.5);                      \
-        DRIVETRAIN_UNIT_##MOTOR_NAME_SUFFIX = io_drivetrain_unit_create(motor_driver);   \
-    }
+    GpioPin_t *reset_pin =
+        io_gpio_pin_create(MOTOR_B_RESET_GPIO_Port, MOTOR_B_RESET_Pin, ACTIVE_HIGH);
 
-    DrivetrainUnit_t *DRIVETRAIN_UNIT_MOTOR_A;
-    DrivetrainUnit_t *DRIVETRAIN_UNIT_MOTOR_B;
-    DrivetrainUnit_t *DRIVETRAIN_UNIT_MOTOR_D;
-    DrivetrainUnit_t *DRIVETRAIN_UNIT_MOTOR_E;
+    GpioPin_t *mode_pin =
+        io_gpio_pin_create(MOTOR_B_MODE_GPIO_Port, MOTOR_B_MODE_Pin, ACTIVE_HIGH);
 
-    INIT_DRIVETRAIN_UNIT(MOTOR_A, htim1, TIM_CHANNEL_1);
-    INIT_DRIVETRAIN_UNIT(MOTOR_B, htim1, TIM_CHANNEL_4);
-    INIT_DRIVETRAIN_UNIT(MOTOR_D, htim1, TIM_CHANNEL_3);
-    INIT_DRIVETRAIN_UNIT(MOTOR_E, htim1, TIM_CHANNEL_2);
+    GpioPin_t *direction_pin =
+        io_gpio_pin_create(MOTOR_B_DIR_GPIO_Port, MOTOR_B_DIR_Pin, ACTIVE_HIGH);
 
-    io_drivetrain_init(DRIVETRAIN_UNIT_MOTOR_B, DRIVETRAIN_UNIT_MOTOR_E,
-                       DRIVETRAIN_UNIT_MOTOR_A, DRIVETRAIN_UNIT_MOTOR_D);
+    PwmPin_t *pwm_pin = io_pwm_pin_create(&htim1, TIM_CHANNEL_4);
+
+    AllegroA3931MotorDriver_t *motor_driver =
+        io_allegro_a3931_motor_driver_create(pwm_pin, reset_pin, mode_pin, direction_pin);
+
+    io_allegro_a3931_motor_setPwmPercentage(motor_driver, 0.8f);
 }
 
 void initIoPowerMonitor(void)

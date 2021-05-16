@@ -18,6 +18,7 @@ cc_library(
     hdrs = ["pwm_pin.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
+        "//firmware/app/logger",
         "//firmware/boards/robot_stm32h7:hal",
     ],
 )

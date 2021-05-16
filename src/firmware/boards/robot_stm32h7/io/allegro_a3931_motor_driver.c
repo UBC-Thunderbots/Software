@@ -27,8 +27,6 @@ AllegroA3931MotorDriver_t* io_allegro_a3931_motor_driver_create(PwmPin_t* pwm_pi
     io_gpio_pin_setActive(motor_driver->mode_pin);
     io_gpio_pin_setActive(motor_driver->direction_pin);
 
-    io_allegro_a3931_motor_setPwmPercentage(motor_driver, 0);
-
     return motor_driver;
 }
 

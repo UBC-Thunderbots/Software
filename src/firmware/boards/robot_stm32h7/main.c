@@ -233,6 +233,8 @@ int main(void)
     FirmwareWorld_t* world = app_firmware_world_create(robot, ball, sys_now_float);
 
     PrimitiveManager_t* primitive_manager = app_primitive_manager_create();
+    UNUSED(world);
+    UNUSED(primitive_manager);
   /* USER CODE END 2 */
 
   /* Init scheduler */

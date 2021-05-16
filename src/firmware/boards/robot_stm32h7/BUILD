@@ -37,6 +37,7 @@ cc_binary(
         "//firmware/boards/robot_stm32h7/io:drivetrain",
         "//firmware/boards/robot_stm32h7/io:drivetrain_unit",
         "//firmware/shared:physics",
+        "//shared:constants",
         "//firmware/boards/robot_stm32h7/io:robot_status",
         "//firmware/boards/robot_stm32h7/io:charger",
         "//firmware/boards/robot_stm32h7/io:chicker",
