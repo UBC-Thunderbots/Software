@@ -11,8 +11,6 @@
 
 struct PenaltyKickTacticFSM
 {
-    class InitialState;
-
     struct ControlParams
     {
     };
