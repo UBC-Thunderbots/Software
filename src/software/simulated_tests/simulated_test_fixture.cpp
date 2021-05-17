@@ -60,6 +60,14 @@ void SimulatedTestFixture::SetUp()
         enableVisualizer();
     }
     setupReplayLogging();
+
+    // Reset tick duration trackers
+    total_tick_duration = 0.0;
+    // all tick times should be greater than 0
+    max_tick_duration = 0.0;
+    // all tick times should be less than the max value of a double
+    min_tick_duration = std::numeric_limits<double>::max();
+    tick_count        = 0;
 }
 
 void SimulatedTestFixture::enableVisualizer()
@@ -193,18 +201,9 @@ void SimulatedTestFixture::runTest(
     const Duration ai_time_step = Duration::fromSeconds(simulation_time_step.toSeconds() *
                                                         CAMERA_FRAMES_PER_AI_TICK);
 
-    auto start_tick_time = std::chrono::system_clock::now();
-
     // Tick one frame to aid with visualization
     bool validation_functions_done =
         tickTest(simulation_time_step, ai_time_step, world, simulator);
-
-    // Logging duration of each tick
-    unsigned int tick_count    = 1;
-    double duration_ms         = ::TestUtil::millisecondsSince(start_tick_time);
-    double total_tick_duration = duration_ms;
-    double max_tick_duration   = duration_ms;
-    double min_tick_duration   = duration_ms;
 
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
@@ -216,18 +215,8 @@ void SimulatedTestFixture::runTest(
             continue;
         }
 
-        // Record starting time
-        start_tick_time = std::chrono::system_clock::now();
-
         validation_functions_done =
             tickTest(simulation_time_step, ai_time_step, world, simulator);
-
-        // Calculate tick durations
-        duration_ms = ::TestUtil::millisecondsSince(start_tick_time);
-        total_tick_duration += duration_ms;
-        max_tick_duration = std::max(max_tick_duration, duration_ms);
-        min_tick_duration = std::min(min_tick_duration, duration_ms);
-        tick_count++;
     }
     // Output the tick duration results
     double avg_tick_duration = total_tick_duration / tick_count;
@@ -248,6 +237,14 @@ void SimulatedTestFixture::runTest(
         }
         ADD_FAILURE() << failure_message;
     }
+}
+
+void SimulatedTestFixture::registerTickTime(double tick_time_ms)
+{
+    total_tick_duration += tick_time_ms;
+    max_tick_duration = std::max(max_tick_duration, tick_time_ms);
+    min_tick_duration = std::min(min_tick_duration, tick_time_ms);
+    tick_count++;
 }
 
 bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_time_step,
