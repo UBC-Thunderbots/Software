@@ -12,6 +12,7 @@ SimulatedTestFixture::SimulatedTestFixture()
       thunderbots_config(
           std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config)),
       sensor_fusion(thunderbots_config->getSensorFusionConfig()),
+      should_log_replay(false),
       run_simulation_in_realtime(false)
 {
 }
@@ -84,7 +85,14 @@ void SimulatedTestFixture::setupReplayLogging()
     namespace fs = std::experimental::filesystem;
     static constexpr auto SIMULATED_TEST_OUTPUT_DIR_SUFFIX = "simulated_test_outputs";
 
-    fs::path bazel_test_outputs_dir(std::getenv("TEST_UNDECLARED_OUTPUTS_DIR"));
+    const char *test_outputs_dir_or_null = std::getenv("TEST_UNDECLARED_OUTPUTS_DIR");
+    if (!test_outputs_dir_or_null)
+    {
+        // we're not running with the Bazel test env vars set, don't set up replay logging
+        return;
+    }
+
+    fs::path bazel_test_outputs_dir(test_outputs_dir_or_null);
     fs::path out_dir =
         bazel_test_outputs_dir / SIMULATED_TEST_OUTPUT_DIR_SUFFIX / test_name;
     fs::create_directories(out_dir);
@@ -98,6 +106,7 @@ void SimulatedTestFixture::setupReplayLogging()
         std::make_shared<ProtoLogger<SensorProto>>(sensorproto_out_dir);
     sensorfusion_wrapper_logger =
         std::make_shared<ProtoLogger<SSLProto::SSL_WrapperPacket>>(ssl_wrapper_out_dir);
+    should_log_replay = true;
 }
 
 bool SimulatedTestFixture::validateAndCheckCompletion(
@@ -127,17 +136,20 @@ void SimulatedTestFixture::updateSensorFusion(std::shared_ptr<Simulator> simulat
 
     auto sensor_msg                        = SensorProto();
     *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
-    simulator_sensorproto_logger->onValueReceived(sensor_msg);
 
     sensor_fusion.processSensorProto(sensor_msg);
 
-    auto world_or_null = sensor_fusion.getWorld();
-
-    if (world_or_null)
+    if (should_log_replay)
     {
-        auto filtered_ssl_wrapper =
-            *createSSLWrapperPacket(*sensor_fusion.getWorld(), TeamColour::YELLOW);
-        sensorfusion_wrapper_logger->onValueReceived(filtered_ssl_wrapper);
+        simulator_sensorproto_logger->onValueReceived(sensor_msg);
+        auto world_or_null = sensor_fusion.getWorld();
+
+        if (world_or_null)
+        {
+            auto filtered_ssl_wrapper =
+                *createSSLWrapperPacket(*sensor_fusion.getWorld(), TeamColour::YELLOW);
+            sensorfusion_wrapper_logger->onValueReceived(filtered_ssl_wrapper);
+        }
     }
 }
 

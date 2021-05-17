@@ -184,6 +184,10 @@ class SimulatedTestFixture : public ::testing::Test
     // The SensorFusion being tested and used in simulation
     SensorFusion sensor_fusion;
 
+    // whether we should log the filtered and unfiltered world states as replay logs
+    // this will only be set to true if the environment variable
+    // TEST_UNDECLARED_OUTPUTS_DIR is set, usually by running as a Bazel test
+    bool should_log_replay;
     // ProtoLoggers for the simulator and SensorFusion, respectively
     std::shared_ptr<ProtoLogger<SensorProto>> simulator_sensorproto_logger;
     std::shared_ptr<ProtoLogger<SSLProto::SSL_WrapperPacket>> sensorfusion_wrapper_logger;
