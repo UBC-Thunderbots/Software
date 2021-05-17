@@ -5,30 +5,17 @@ extern "C"
 #include "firmware/shared/physics.h"
 }
 
-std::unique_ptr<SSLSimulationProto::MoveWheelVelocity> createMoveWheelVelocity(
-    double front_right, double front_left, double back_left, double back_right)
-{
-    auto move_wheel_velocity = std::make_unique<SSLSimulationProto::MoveWheelVelocity>();
-
-    move_wheel_velocity->set_front_left(static_cast<float>(front_left));
-    move_wheel_velocity->set_front_right(static_cast<float>(front_right));
-    move_wheel_velocity->set_back_left(static_cast<float>(back_left));
-    move_wheel_velocity->set_back_right(static_cast<float>(back_right));
-
-    return move_wheel_velocity;
-}
-
 // Converts rpm and wheel_radius [m] to speed [m/s]
 float rpm_to_m_per_s(float rpm, float wheel_radius)
 {
     return (2 * (float)M_PI * rpm * wheel_radius) / 60.0f;
 }
 
-std::unique_ptr<SSLSimulationProto::MoveLocalVelocity> createMoveLocalVelocity(
+std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
     double wheel_rpm_front_right, double wheel_rpm_front_left, double wheel_rpm_back_left,
     double wheel_rpm_back_right)
 {
-    auto move_local_velocity = std::make_unique<SSLSimulationProto::MoveLocalVelocity>();
+    auto move_local_velocity = SSLSimulationProto::MoveLocalVelocity();
 
     // Convert the units of wheel speeds to m/s
     float front_left_m_per_s =
@@ -48,29 +35,13 @@ std::unique_ptr<SSLSimulationProto::MoveLocalVelocity> createMoveLocalVelocity(
         robot_local_speed[2] /
         ROBOT_RADIUS;  // Convert speed [m/s] to angular velocity [rad/s]
 
-    move_local_velocity->set_forward(robot_local_speed[0]);
-    move_local_velocity->set_left(robot_local_speed[1]);
-    move_local_velocity->set_angular(robot_local_speed[2]);
+    move_local_velocity.set_forward(robot_local_speed[0]);
+    move_local_velocity.set_left(robot_local_speed[1]);
+    move_local_velocity.set_angular(robot_local_speed[2]);
 
-    return move_local_velocity;
-}
-
-std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
-    std::unique_ptr<SSLSimulationProto::MoveWheelVelocity> move_wheel_velocity)
-{
     auto move_command = std::make_unique<SSLSimulationProto::RobotMoveCommand>();
 
-    *(move_command->mutable_wheel_velocity()) = *move_wheel_velocity;
-
-    return move_command;
-}
-
-std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
-    std::unique_ptr<SSLSimulationProto::MoveLocalVelocity> move_local_velocity)
-{
-    auto move_command = std::make_unique<SSLSimulationProto::RobotMoveCommand>();
-
-    *(move_command->mutable_local_velocity()) = *move_local_velocity;
+    *(move_command->mutable_local_velocity()) = move_local_velocity;
 
     return move_command;
 }

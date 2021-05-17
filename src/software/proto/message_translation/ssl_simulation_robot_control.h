@@ -4,51 +4,18 @@
 #include "software/proto/ssl_simulation_robot_feedback.pb.h"
 
 /**
- * Creates a MoveWheelVelocity proto
- *
- * @param front_right Velocity [m/s] of front right wheel
- * @param front_left Velocity [m/s] of front left wheel
- * @param back_right Velocity [m/s] of back right wheel
- * @param back_left Velocity [m/s] of back left wheel
- *
- * @return MoveWheelVelocity proto
- */
-std::unique_ptr<SSLSimulationProto::MoveWheelVelocity> createMoveWheelVelocity(
-    double front_right, double front_left, double back_left, double back_right);
-
-/**
- * Creates a MoveLocalVelocity proto
+ * Creates a RobotMoveCommand proto
  *
  * @param wheel_rpm_front_right Speed [rpm] of front right wheel
  * @param wheel_rpm_front_left Speed [rpm] of front left wheel
  * @param wheel_rpm_back_right Speed [rpm] of back right wheel
  * @param wheel_rpm_back_left Speed [rpm] of back left wheel
  *
- * @return MoveLocalVelocity proto
+ * @return RobotMoveCommand proto
  */
-std::unique_ptr<SSLSimulationProto::MoveLocalVelocity> createMoveLocalVelocity(
+std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
     double wheel_rpm_front_right, double wheel_rpm_front_left, double wheel_rpm_back_left,
     double wheel_rpm_back_right);
-
-/**
- * Creates a RobotMoveCommand proto
- *
- * @param move_wheel_velocity The move wheel velocity proto
- *
- * @return RobotMoveCommand proto
- */
-std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
-    std::unique_ptr<SSLSimulationProto::MoveWheelVelocity> move_wheel_velocity);
-
-/**
- * Creates a RobotMoveCommand proto
- *
- * @param move_local_velocity The move local velocity proto
- *
- * @return RobotMoveCommand proto
- */
-std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
-    std::unique_ptr<SSLSimulationProto::MoveLocalVelocity> move_local_velocity);
 
 /**
  * Creates a RobotCommand proto
