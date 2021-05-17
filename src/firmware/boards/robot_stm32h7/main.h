@@ -227,12 +227,6 @@ void Error_Handler(void);
 #define GENEVA_SPEED_GPIO_Port GPIOC
 #define SD_DAT0_Pin GPIO_PIN_8
 #define SD_DAT0_GPIO_Port GPIOC
-#define SD_DAT1_Pin GPIO_PIN_9
-#define SD_DAT1_GPIO_Port GPIOC
-#define MOTOR_A_DIR_Pin GPIO_PIN_8
-#define MOTOR_A_DIR_GPIO_Port GPIOA
-#define MOTOR_E_PWM_Pin GPIO_PIN_9
-#define MOTOR_E_PWM_GPIO_Port GPIOA
 #define MOTOR_B_PWM_Pin GPIO_PIN_11
 #define MOTOR_B_PWM_GPIO_Port GPIOA
 #define MOTOR_A_PWM_Pin GPIO_PIN_12

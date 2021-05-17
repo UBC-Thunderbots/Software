@@ -381,6 +381,27 @@ void initIoDrivetrain(void)
         io_allegro_a3931_motor_driver_create(pwm_pin, reset_pin, mode_pin, direction_pin);
 
     io_allegro_a3931_motor_setPwmPercentage(motor_driver, 0.8f);
+
+    TLOG_DEBUG("Starting PWM timers");
+
+    // TIMER 1
+    PwmPin_t *tim1_pwm_pin1 = io_pwm_pin_create(&htim1, TIM_CHANNEL_1);
+    PwmPin_t *tim1_pwm_pin2 = io_pwm_pin_create(&htim1, TIM_CHANNEL_2);
+    PwmPin_t *tim1_pwm_pin3 = io_pwm_pin_create(&htim1, TIM_CHANNEL_3);
+    PwmPin_t *tim1_pwm_pin4 = io_pwm_pin_create(&htim1, TIM_CHANNEL_4);
+
+    // TIMER 8
+    PwmPin_t *tim8_pwm_pin1 = io_pwm_pin_create(&htim8, TIM_CHANNEL_1);
+    PwmPin_t *tim8_pwm_pin2 = io_pwm_pin_create(&htim8, TIM_CHANNEL_4);
+
+    io_pwm_pin_setPwm(tim1_pwm_pin1, 0.5);
+    io_pwm_pin_setPwm(tim1_pwm_pin2, 0.5);
+    io_pwm_pin_setPwm(tim1_pwm_pin3, 0.5);
+    io_pwm_pin_setPwm(tim1_pwm_pin4, 0.5);
+    io_pwm_pin_setPwm(tim8_pwm_pin1, 0.5);
+    io_pwm_pin_setPwm(tim8_pwm_pin2, 0.5);
+
+    TLOG_DEBUG("DONZO");
 }
 
 void initIoPowerMonitor(void)
