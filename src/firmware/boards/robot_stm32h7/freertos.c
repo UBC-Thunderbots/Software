@@ -30,15 +30,24 @@
 /* USER CODE BEGIN Includes */
 #pragma GCC diagnostic pop
 #include "firmware/app/logger/logger.h"
+#include "firmware/app/primitives/primitive_manager.h"
+#include "firmware/app/world/firmware_robot.h"
+#include "firmware/app/world/firmware_world.h"
+#include "firmware/boards/robot_stm32h7/io/charger.h"
+#include "firmware/boards/robot_stm32h7/io/chicker.h"
+#include "firmware/boards/robot_stm32h7/io/dribbler.h"
 #include "firmware/boards/robot_stm32h7/io/drivetrain.h"
 #include "firmware/boards/robot_stm32h7/io/network_logger.h"
 #include "firmware/boards/robot_stm32h7/io/power_monitor.h"
 #include "firmware/boards/robot_stm32h7/io/proto_multicast.h"
 #include "firmware/boards/robot_stm32h7/io/proto_multicast_communication_profile.h"
 #include "firmware/boards/robot_stm32h7/io/robot_status.h"
+#include "firmware/boards/robot_stm32h7/io/uart_logger.h"
 #include "firmware/boards/robot_stm32h7/io/ublox_odinw262_communicator.h"
+#include "firmware/boards/robot_stm32h7/io/vision.h"
 #include "firmware/boards/robot_stm32h7/tim.h"
 #include "firmware/boards/robot_stm32h7/usart.h"
+#include "firmware/shared/physics.h"
 #include "shared/proto/robot_log_msg.nanopb.h"
 #include "shared/proto/robot_status_msg.nanopb.h"
 #include "shared/proto/tbots_software_msgs.nanopb.h"
@@ -103,7 +112,7 @@ ProtoMulticastCommunicationProfile_t *primitive_msg_listener_profile;
 static TbotsProto_Vision vision_msg;
 static TbotsProto_RobotStatus robot_status_msg;
 static TbotsProto_RobotLog robot_log_msg;
-static TbotsProto_Primitive primitive_msg;
+static TbotsProto_PrimitiveSet primitive_set_msg;
 
 /* USER CODE END Variables */
 /* Definitions for NetStartTask */
@@ -214,6 +223,18 @@ const osThreadAttr_t RobotStatusSend_attributes = {
   .stack_size = sizeof(RobotStatusSendBuffer),
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for RobotTask */
+osThreadId_t RobotTaskHandle;
+uint32_t PrimitiveManageBuffer[ 1024 ];
+osStaticThreadDef_t PrimitiveManageControlBlock;
+const osThreadAttr_t RobotTask_attributes = {
+  .name = "RobotTask",
+  .cb_mem = &PrimitiveManageControlBlock,
+  .cb_size = sizeof(PrimitiveManageControlBlock),
+  .stack_mem = &PrimitiveManageBuffer[0],
+  .stack_size = sizeof(PrimitiveManageBuffer),
+  .priority = (osPriority_t) osPriorityNormal,
+};
 /* Definitions for RobotLogProtoQ */
 osMessageQueueId_t RobotLogProtoQHandle;
 const osMessageQueueAttr_t RobotLogProtoQ_attributes = {
@@ -223,6 +244,12 @@ const osMessageQueueAttr_t RobotLogProtoQ_attributes = {
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
+// TODO (#2082) remove this as part of 
+float sys_now_float(void);
+float sys_now_float(void)
+{
+    return (float)sys_now();
+}
 /* USER CODE END FunctionPrototypes */
 
 void io_proto_multicast_startNetworkingTask(void *argument);
@@ -231,6 +258,7 @@ extern void io_proto_multicast_listenerTask(void *argument);
 extern void io_robot_status_task(void *argument);
 extern void io_network_logger_task(void *argument);
 extern void io_ublox_odinw262_communicator_task(void *argument);
+void RobotMain(void *argument);
 
 extern void MX_LWIP_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -293,6 +321,9 @@ void MX_FREERTOS_Init(void) {
   /* creation of RobotStatusSend */
   RobotStatusSendHandle = osThreadNew(io_proto_multicast_senderTask, (void*)robot_status_msg_sender_profile, &RobotStatusSend_attributes);
 
+  /* creation of RobotTask */
+  RobotTaskHandle = osThreadNew(RobotMain, (void *)primitive_msg_listener_profile , &RobotTask_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* USER CODE END RTOS_THREADS */
 
@@ -322,6 +353,129 @@ __weak void io_proto_multicast_startNetworkingTask(void *argument)
   /* USER CODE END io_proto_multicast_startNetworkingTask */
 }
 
+/* USER CODE BEGIN Header_RobotMain */
+/**
+* @brief Function implementing the RobotTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_RobotMain */
+void RobotMain(void *argument)
+{
+  /* USER CODE BEGIN RobotMain */
+
+  ProtoMulticastCommunicationProfile_t *comm_profile =
+      (ProtoMulticastCommunicationProfile_t *)argument;
+
+    // Setup the world that acts as the interface for the higher level firmware
+    // (like primitives or the controller) to interface with the outside world
+    //
+    // TODO (#2066) These constants are WRONG, replace with proper ones
+    ForceWheelConstants_t wheel_constants = {
+        .wheel_rotations_per_motor_rotation  = GEAR_RATIO,
+        .wheel_radius                        = WHEEL_RADIUS,
+        .motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT,
+        .motor_back_emf_per_rpm              = RPM_TO_VOLT,
+        .motor_phase_resistance              = 1,
+        .motor_current_per_unit_torque       = CURRENT_PER_TORQUE};
+
+    ForceWheel_t* front_left_wheel = app_force_wheel_create(
+        io_drivetrain_applyForceFrontLeftWheel, io_drivetrain_getFrontLeftRpm,
+        io_drivetrain_brakeFrontLeft, io_drivetrain_coastFrontLeft, wheel_constants);
+
+    ForceWheel_t* front_right_wheel = app_force_wheel_create(
+        io_drivetrain_applyForceFrontRightWheel, io_drivetrain_getFrontRightRpm,
+        io_drivetrain_brakeFrontRight, io_drivetrain_coastFrontRight, wheel_constants);
+
+    ForceWheel_t* back_right_wheel = app_force_wheel_create(
+        io_drivetrain_applyForceBackRightWheel, io_drivetrain_getBackRightRpm,
+        io_drivetrain_brakeBackRight, io_drivetrain_coastBackRight, wheel_constants);
+
+    ForceWheel_t* back_left_wheel = app_force_wheel_create(
+        io_drivetrain_applyForceBackLeftWheel, io_drivetrain_getBackLeftRpm,
+        io_drivetrain_brakeBackLeft, io_drivetrain_coastBackLeft, wheel_constants);
+
+    Charger_t* charger =
+        app_charger_create(io_charger_charge, io_charger_discharge, io_charger_float);
+
+    Chicker_t* chicker =
+        app_chicker_create(io_chicker_kick, io_chicker_chip, io_chicker_enable_auto_kick,
+                           io_chicker_enable_auto_chip, io_chicker_disable_auto_kick,
+                           io_chicker_disable_auto_chip);
+
+    Dribbler_t* dribbler = app_dribbler_create(io_dribbler_setSpeed, io_dribbler_coast,
+                                               io_dribbler_getTemperature);
+
+    const RobotConstants_t robot_constants = {
+        .mass              = ROBOT_POINT_MASS,
+        .moment_of_inertia = INERTIA,
+        .robot_radius      = ROBOT_RADIUS,
+        .jerk_limit        = JERK_LIMIT,
+    };
+
+    ControllerState_t controller_state = {
+        .last_applied_acceleration_x       = 0,
+        .last_applied_acceleration_y       = 0,
+        .last_applied_acceleration_angular = 0,
+    };
+
+    FirmwareRobot_t* robot = app_firmware_robot_force_wheels_create(
+        charger, chicker, dribbler, io_vision_getRobotPositionX,
+        io_vision_getRobotPositionY, io_vision_getRobotOrientation,
+        io_vision_getRobotVelocityX, io_vision_getRobotVelocityY,
+        io_vision_getRobotAngularVelocity, io_power_monitor_getBatteryVoltage,
+        front_right_wheel, front_left_wheel, back_right_wheel, back_left_wheel,
+        &controller_state, robot_constants);
+
+    FirmwareBall_t* ball =
+        app_firmware_ball_create(io_vision_getBallPositionX, io_vision_getBallPositionY,
+                                 io_vision_getBallVelocityX, io_vision_getBallVelocityY);
+
+    FirmwareWorld_t* world = app_firmware_world_create(robot, ball, sys_now_float);
+
+    PrimitiveManager_t *primitive_manager = app_primitive_manager_create();
+    UNUSED(world);
+    UNUSED(primitive_manager);
+
+    /* Infinite loop */
+    for (;;)
+    {
+        io_proto_multicast_communication_profile_blockUntilEvents(comm_profile,
+                                                                  RECEIVED_PROTO);
+
+        TbotsProto_Primitive primitive_msg =
+            (*(TbotsProto_PrimitiveSet *)
+                 io_proto_multicast_communication_profile_getProtoStruct(comm_profile))
+                .robot_primitives[0]
+                .value;
+
+        switch (primitive_msg.which_primitive)
+        {
+            case TbotsProto_Primitive_stop_tag:
+            {
+                break;
+            }
+            case TbotsProto_Primitive_move_tag:
+            {
+                break;
+            }
+            case TbotsProto_Primitive_direct_control_tag:
+            {
+                TLOG_INFO("GETTING DIRECT CONTROL");
+                break;
+            }
+            default:
+            {
+                // the estop case is handled here
+                app_primitive_makeRobotSafe(world);
+                return;
+            }
+        }
+        osDelay(100);
+  }
+  /* USER CODE END RobotMain */
+}
+
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
 void initIoNetworking(void)
@@ -335,7 +489,7 @@ void initIoNetworking(void)
 
     primitive_msg_listener_profile = io_proto_multicast_communication_profile_create(
         "primitive_msg_listener_profile", MULTICAST_CHANNELS[channel], PRIMITIVE_PORT,
-        &primitive_msg, TbotsProto_Primitive_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+        &primitive_set_msg, TbotsProto_PrimitiveSet_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 
     vision_msg_listener_profile = io_proto_multicast_communication_profile_create(
         "vision_msg_listener_profile", MULTICAST_CHANNELS[channel], VISION_PORT,
@@ -364,41 +518,59 @@ void initIoNetworking(void)
 
 void initIoDrivetrain(void)
 {
-    // Initialize a motor driver with the given suffix, on the given
-    // timer channel
-    GpioPin_t *reset_pin =
-        io_gpio_pin_create(MOTOR_E_RESET_GPIO_Port, MOTOR_E_RESET_Pin, ACTIVE_HIGH);
+    // MOTOR A
+    /*GpioPin_t *motor_a_reset_pin =*/
+        /*io_gpio_pin_create(MOTOR_A_RESET_GPIO_Port, MOTOR_A_RESET_Pin, ACTIVE_HIGH);*/
+    /*GpioPin_t *motor_a_mode_pin =*/
+        /*io_gpio_pin_create(MOTOR_A_MODE_GPIO_Port, MOTOR_A_MODE_Pin, ACTIVE_HIGH);*/
+    /*GpioPin_t *motor_a_dir_pin =*/
+        /*io_gpio_pin_create(MOTOR_A_DIR_GPIO_Port, MOTOR_A_DIR_Pin, ACTIVE_HIGH);*/
 
-    GpioPin_t *mode_pin =
-        io_gpio_pin_create(MOTOR_E_MODE_GPIO_Port, MOTOR_E_MODE_Pin, ACTIVE_HIGH);
+    /*// MOTOR B*/
+    /*GpioPin_t *motor_b_reset_pin =*/
+        /*io_gpio_pin_create(MOTOR_B_RESET_GPIO_Port, MOTOR_B_RESET_Pin, ACTIVE_HIGH);*/
+    /*GpioPin_t *motor_b_mode_pin =*/
+        /*io_gpio_pin_create(MOTOR_B_MODE_GPIO_Port, MOTOR_B_MODE_Pin, ACTIVE_HIGH);*/
+    /*GpioPin_t *motor_b_dir_pin =*/
+        /*io_gpio_pin_create(MOTOR_B_DIR_GPIO_Port, MOTOR_B_DIR_Pin, ACTIVE_HIGH);*/
 
-    io_gpio_pin_setActive(mode_pin);
-    io_gpio_pin_setActive(reset_pin);
+    /*// MOTOR D*/
+    /*GpioPin_t *motor_d_reset_pin =*/
+        /*io_gpio_pin_create(MOTOR_D_RESET_GPIO_Port, MOTOR_D_RESET_Pin, ACTIVE_HIGH);*/
+    /*GpioPin_t *motor_d_mode_pin =*/
+        /*io_gpio_pin_create(MOTOR_D_MODE_GPIO_Port, MOTOR_D_MODE_Pin, ACTIVE_HIGH);*/
+    /*GpioPin_t *motor_d_dir_pin =*/
+        /*io_gpio_pin_create(MOTOR_D_DIR_GPIO_Port, MOTOR_D_DIR_Pin, ACTIVE_HIGH);*/
 
-    TLOG_DEBUG("Starting PWM timers");
+    /*// MOTOR E*/
+    /*GpioPin_t *motor_e_reset_pin =*/
+        /*io_gpio_pin_create(MOTOR_E_RESET_GPIO_Port, MOTOR_E_RESET_Pin, ACTIVE_HIGH);*/
+    /*GpioPin_t *motor_e_mode_pin =*/
+        /*io_gpio_pin_create(MOTOR_E_MODE_GPIO_Port, MOTOR_E_MODE_Pin, ACTIVE_HIGH);*/
+    /*GpioPin_t *motor_e_dir_pin =*/
+        /*io_gpio_pin_create(MOTOR_E_DIR_GPIO_Port, MOTOR_E_DIR_Pin, ACTIVE_HIGH);*/
 
-    // TIMER 1
-    PwmPin_t *tim1_pwm_pin2 = io_pwm_pin_create(&htim1, TIM_CHANNEL_2);
-    /*osDelay(1000);*/
-    /*io_pwm_pin_setPwm(tim1_pwm_pin2, 0.00f);*/
-    /*osDelay(1000);*/
-    /*io_pwm_pin_setPwm(tim1_pwm_pin2, 0.25f);*/
-    /*osDelay(1000);*/
-    io_pwm_pin_setPwm(tim1_pwm_pin2, 0.00f);
-    /*osDelay(1000);*/
-    /*io_pwm_pin_setPwm(tim1_pwm_pin2, 0.75f);*/
-    /*osDelay(1000);*/
-    /*io_pwm_pin_setPwm(tim1_pwm_pin2, 0.99f);*/
-    /*osDelay(1000);*/
-    /*io_pwm_pin_setPwm(tim1_pwm_pin2, 0.75f);*/
-    /*osDelay(1000);*/
-    /*io_pwm_pin_setPwm(tim1_pwm_pin2, 0.50f);*/
-    /*osDelay(1000);*/
-    /*io_pwm_pin_setPwm(tim1_pwm_pin2, 0.25f);*/
-    /*osDelay(1000);*/
-    /*io_pwm_pin_setPwm(tim1_pwm_pin2, 0.00f);*/
+    PwmPin_t *motor_a_pwm_pin = io_pwm_pin_create(&htim15, TIM_CHANNEL_2);
+    PwmPin_t *motor_b_pwm_pin = io_pwm_pin_create(&htim3, TIM_CHANNEL_2);
+    PwmPin_t *motor_c_pwm_pin = io_pwm_pin_create(&htim1, TIM_CHANNEL_3);
+    PwmPin_t *motor_d_pwm_pin = io_pwm_pin_create(&htim8, TIM_CHANNEL_1);
+    PwmPin_t *motor_e_pwm_pin = io_pwm_pin_create(&htim1, TIM_CHANNEL_2);
 
-    TLOG_DEBUG("DONZO");
+
+    /*AllegroA3931MotorDriver_t *motor_a_driver = io_allegro_a3931_motor_driver_create(*/
+        /*motor_a_pwm_pin, motor_a_reset_pin, motor_a_mode_pin, motor_a_dir_pin);*/
+    /*AllegroA3931MotorDriver_t *motor_b_driver = io_allegro_a3931_motor_driver_create(*/
+        /*motor_b_pwm_pin, motor_b_reset_pin, motor_b_mode_pin, motor_b_dir_pin);*/
+    /*AllegroA3931MotorDriver_t *motor_d_driver = io_allegro_a3931_motor_driver_create(*/
+        /*motor_d_pwm_pin, motor_d_reset_pin, motor_d_mode_pin, motor_d_dir_pin);*/
+    /*AllegroA3931MotorDriver_t *motor_e_driver = io_allegro_a3931_motor_driver_create(*/
+        /*motor_e_pwm_pin, motor_e_reset_pin, motor_e_mode_pin, motor_e_dir_pin);*/
+
+    io_pwm_pin_setPwm(motor_a_pwm_pin, 0.5f);
+    io_pwm_pin_setPwm(motor_b_pwm_pin, 0.5f);
+    io_pwm_pin_setPwm(motor_c_pwm_pin, 0.5f);
+    io_pwm_pin_setPwm(motor_d_pwm_pin, 0.5f);
+    io_pwm_pin_setPwm(motor_e_pwm_pin, 0.5f);
 }
 
 void initIoPowerMonitor(void)

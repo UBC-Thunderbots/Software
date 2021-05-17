@@ -96,6 +96,39 @@ const double ANGLE_TO_ROBOT_FRONT_WHEELS_DEG = 57.945;
 const double ANGLE_TO_ROBOT_BACK_WHEELS_DEG  = 136.04;
 
 
+// Networking
+// the IPv6 multicast address, only ff02 is important, the rest is random
+// see https://en.wikipedia.org/wiki/Solicited-node_multicast_address for why ff02 matters
+#ifdef __unix__
+#define MAX_MULTICAST_CHANNELS 16
+#define MULTICAST_CHANNEL_LENGTH 21
+const char MULTICAST_CHANNELS[MAX_MULTICAST_CHANNELS][MULTICAST_CHANNEL_LENGTH] = {
+    "ff02::c3d0:42d2:bb01", "ff02::c3d0:42d2:bb02", "ff02::c3d0:42d2:bb03",
+    "ff02::c3d0:42d2:bb04", "ff02::c3d0:42d2:bb05", "ff02::c3d0:42d2:bb06",
+    "ff02::c3d0:42d2:bb07", "ff02::c3d0:42d2:bb08", "ff02::c3d0:42d2:bb09",
+    "ff02::c3d0:42d2:bb10", "ff02::c3d0:42d2:bb11", "ff02::c3d0:42d2:bb12",
+    "ff02::c3d0:42d2:bb13", "ff02::c3d0:42d2:bb14", "ff02::c3d0:42d2:bb15",
+    "ff02::c3d0:42d2:bb16",
+};
+
+// the port robots are listening to for vision and primitives
+const short unsigned int VISION_PORT    = 42069;
+const short unsigned int PRIMITIVE_PORT = 42070;
+
+// the port the AI receives msgs from the robot
+const short unsigned int ROBOT_STATUS_PORT = 42071;
+const short unsigned int ROBOT_LOGS_PORT   = 42072;
+
+// the port to listen to for what side of the field to defend
+const unsigned DEFENDING_SIDE_PORT = 42073;
+
+// the timeout to recv a network packet
+const int NETWORK_TIMEOUT_MS = 1000;
+
+// maximum transfer unit of the network interface
+// this is an int to avoid Wconversion with lwip
+const short unsigned int MAXIMUM_TRANSFER_UNIT_BYTES = 1500;
+
 // The total number of possible robot ids between two teams
 const unsigned int MAX_ROBOT_IDS = 16;
 
@@ -105,7 +138,4 @@ const unsigned int MAX_ROBOT_IDS = 16;
 const float ROBOT_MAX_BATTERY_VOLTAGE = 16.0;
 
 const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;
-
-// How many robots are allowed in each division
-const unsigned DIV_A_NUM_ROBOTS = 11;
-const unsigned DIV_B_NUM_ROBOTS = 6;
+#endif
