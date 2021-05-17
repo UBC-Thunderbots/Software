@@ -367,39 +367,36 @@ void initIoDrivetrain(void)
     // Initialize a motor driver with the given suffix, on the given
     // timer channel
     GpioPin_t *reset_pin =
-        io_gpio_pin_create(MOTOR_B_RESET_GPIO_Port, MOTOR_B_RESET_Pin, ACTIVE_HIGH);
+        io_gpio_pin_create(MOTOR_E_RESET_GPIO_Port, MOTOR_E_RESET_Pin, ACTIVE_HIGH);
 
     GpioPin_t *mode_pin =
-        io_gpio_pin_create(MOTOR_B_MODE_GPIO_Port, MOTOR_B_MODE_Pin, ACTIVE_HIGH);
+        io_gpio_pin_create(MOTOR_E_MODE_GPIO_Port, MOTOR_E_MODE_Pin, ACTIVE_HIGH);
 
-    GpioPin_t *direction_pin =
-        io_gpio_pin_create(MOTOR_B_DIR_GPIO_Port, MOTOR_B_DIR_Pin, ACTIVE_HIGH);
-
-    PwmPin_t *pwm_pin = io_pwm_pin_create(&htim1, TIM_CHANNEL_4);
-
-    AllegroA3931MotorDriver_t *motor_driver =
-        io_allegro_a3931_motor_driver_create(pwm_pin, reset_pin, mode_pin, direction_pin);
-
-    io_allegro_a3931_motor_setPwmPercentage(motor_driver, 0.8f);
+    io_gpio_pin_setActive(mode_pin);
+    io_gpio_pin_setActive(reset_pin);
 
     TLOG_DEBUG("Starting PWM timers");
 
     // TIMER 1
-    PwmPin_t *tim1_pwm_pin1 = io_pwm_pin_create(&htim1, TIM_CHANNEL_1);
     PwmPin_t *tim1_pwm_pin2 = io_pwm_pin_create(&htim1, TIM_CHANNEL_2);
-    PwmPin_t *tim1_pwm_pin3 = io_pwm_pin_create(&htim1, TIM_CHANNEL_3);
-    PwmPin_t *tim1_pwm_pin4 = io_pwm_pin_create(&htim1, TIM_CHANNEL_4);
-
-    // TIMER 8
-    PwmPin_t *tim8_pwm_pin1 = io_pwm_pin_create(&htim8, TIM_CHANNEL_1);
-    PwmPin_t *tim8_pwm_pin2 = io_pwm_pin_create(&htim8, TIM_CHANNEL_4);
-
-    io_pwm_pin_setPwm(tim1_pwm_pin1, 0.5);
-    io_pwm_pin_setPwm(tim1_pwm_pin2, 0.5);
-    io_pwm_pin_setPwm(tim1_pwm_pin3, 0.5);
-    io_pwm_pin_setPwm(tim1_pwm_pin4, 0.5);
-    io_pwm_pin_setPwm(tim8_pwm_pin1, 0.5);
-    io_pwm_pin_setPwm(tim8_pwm_pin2, 0.5);
+    /*osDelay(1000);*/
+    /*io_pwm_pin_setPwm(tim1_pwm_pin2, 0.00f);*/
+    /*osDelay(1000);*/
+    /*io_pwm_pin_setPwm(tim1_pwm_pin2, 0.25f);*/
+    /*osDelay(1000);*/
+    io_pwm_pin_setPwm(tim1_pwm_pin2, 0.00f);
+    /*osDelay(1000);*/
+    /*io_pwm_pin_setPwm(tim1_pwm_pin2, 0.75f);*/
+    /*osDelay(1000);*/
+    /*io_pwm_pin_setPwm(tim1_pwm_pin2, 0.99f);*/
+    /*osDelay(1000);*/
+    /*io_pwm_pin_setPwm(tim1_pwm_pin2, 0.75f);*/
+    /*osDelay(1000);*/
+    /*io_pwm_pin_setPwm(tim1_pwm_pin2, 0.50f);*/
+    /*osDelay(1000);*/
+    /*io_pwm_pin_setPwm(tim1_pwm_pin2, 0.25f);*/
+    /*osDelay(1000);*/
+    /*io_pwm_pin_setPwm(tim1_pwm_pin2, 0.00f);*/
 
     TLOG_DEBUG("DONZO");
 }

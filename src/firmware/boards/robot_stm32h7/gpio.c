@@ -37,6 +37,7 @@
      PH0-OSC_IN (PH0)   ------> RCC_OSC_IN
      PH1-OSC_OUT (PH1)   ------> RCC_OSC_OUT
      PC8   ------> SDMMC1_D0
+     PA12   ------> HRTIM_CHD2
      PA13 (JTMS/SWDIO)   ------> DEBUG_JTMS-SWDIO
      PA14 (JTCK/SWCLK)   ------> DEBUG_JTCK-SWCLK
      PC10   ------> SDMMC1_D2
@@ -62,7 +63,7 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, CHARGE_PWR_BRD_Pin|WHEEL_FRONT_RIGHT_FF1_Pin|IMU_INT1_Pin|USER_LED_2_Pin
-                          |USER_LED_3_Pin|MOTOR_D_DIR_Pin|MOTOR_D_MODE_Pin|WHEEL_BACK_RIGHT_FF1_Pin, GPIO_PIN_RESET);
+                          |USER_LED_3_Pin|MOTOR_D_DIR_Pin|WHEEL_BACK_RIGHT_FF1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(IMU_INT2_GPIO_Port, IMU_INT2_Pin, GPIO_PIN_RESET);
@@ -87,9 +88,9 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(MOTOR_A_MODE_GPIO_Port, MOTOR_A_MODE_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PEPin PEPin PEPin PEPin
-                           PEPin PEPin PEPin PEPin */
+                           PEPin PEPin PEPin */
   GPIO_InitStruct.Pin = CHARGE_PWR_BRD_Pin|WHEEL_FRONT_RIGHT_FF1_Pin|IMU_INT1_Pin|USER_LED_2_Pin
-                          |USER_LED_3_Pin|MOTOR_D_DIR_Pin|MOTOR_D_MODE_Pin|WHEEL_BACK_RIGHT_FF1_Pin;
+                          |USER_LED_3_Pin|MOTOR_D_DIR_Pin|WHEEL_BACK_RIGHT_FF1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -165,6 +166,14 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   GPIO_InitStruct.Alternate = GPIO_AF12_SDIO1;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PA12 */
+  GPIO_InitStruct.Pin = GPIO_PIN_12;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF2_HRTIM1;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = MOTOR_A_MODE_Pin;
