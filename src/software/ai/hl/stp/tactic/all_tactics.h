@@ -11,7 +11,7 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/move_to_goal_line/move_to_goal_line_tactic.h"
 #include "software/ai/hl/stp/tactic/passer/passer_tactic.h"
-#include "software/ai/hl/stp/tactic/penalty_kick_tactic.h"
+#include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 #include "software/ai/hl/stp/tactic/penalty_setup_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"

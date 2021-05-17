@@ -75,7 +75,7 @@ bool Ball::hasBallBeenKicked(const Angle &expected_kick_direction,
         velocity().orientation().minDiff(expected_kick_direction);
 
     return (kick_orientation_difference.abs() < MAX_ANGLE_DIFFERENCE &&
-            velocity().length() > min_kick_speed);
+            velocity().length() >= min_kick_speed);
 }
 
 bool Ball::operator==(const Ball &other) const
