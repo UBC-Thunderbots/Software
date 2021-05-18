@@ -37,22 +37,35 @@ class StandaloneSimulatorDrawFunctionVisualizer : public DrawFunctionVisualizer
     WorldDrawFunction getDrawBallVelocityFunction();
 
    private:
+    void keyPressEvent(QKeyEvent* event) override;
     void mousePressEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
     void contextMenuEvent(QContextMenuEvent* event) override;
 
+    /**
+     * Resets all the fields in the simulator to their default values. Meant to be used
+     * after a click to restore the flags and the points.
+     */
+    void resetFlags();
+
     // The robot currently being placed by the user, if any
     std::weak_ptr<PhysicsRobot> robot;
 
+    // Boolean to check if user shift clicked
+    bool shift_clicked;
+
     // Boolean to check if the user ctrl clicked
-    bool ctrl_clicked = false;
+    bool ctrl_clicked;
 
-    // The initial point when adding force to the ball, if any
-    Point initial_point;
+    // Boolean to check if user has r pressed
+    bool r_clicked;
 
-    // The final point when adding force to the ball, if any
-    Point final_point;
+    // The final point when adding force to the ball, or rotating robot, if any
+    Point initial_click_point;
+
+    // The final point when adding force to the ball, or rotating robot, if any
+    Point final_click_point;
 
     std::shared_ptr<StandaloneSimulator> standalone_simulator;
 };

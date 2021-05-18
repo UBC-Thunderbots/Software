@@ -50,12 +50,15 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
         ChipIntent chip_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
         EXPECT_EQ(0, chip_intent.getRobotId());
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-            chip_intent.getPrimitive().chip().chip_origin(),
+            chip_intent.getPrimitive().move().destination(),
             *createPointProto(Point(0, 0))));
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-            chip_intent.getPrimitive().chip().chip_direction(),
+            chip_intent.getPrimitive().move().final_angle(),
             *createAngleProto(Angle::zero())));
-        EXPECT_EQ(5.0, chip_intent.getPrimitive().chip().chip_distance_meters());
+        EXPECT_EQ(5.0, chip_intent.getPrimitive()
+                           .move()
+                           .auto_chip_or_kick()
+                           .autochip_distance_meters());
     }
     catch (...)
     {
@@ -87,12 +90,15 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_positive_y)
         ChipIntent chip_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
         EXPECT_EQ(0, chip_intent.getRobotId());
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-            chip_intent.getPrimitive().chip().chip_origin(),
+            chip_intent.getPrimitive().move().destination(),
             *createPointProto(Point(-2.5, 2.5))));
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-            chip_intent.getPrimitive().chip().chip_direction(),
+            chip_intent.getPrimitive().move().final_angle(),
             *createAngleProto(Angle::fromDegrees(105))));
-        EXPECT_EQ(5.0, chip_intent.getPrimitive().chip().chip_distance_meters());
+        EXPECT_EQ(5.0, chip_intent.getPrimitive()
+                           .move()
+                           .auto_chip_or_kick()
+                           .autochip_distance_meters());
     }
     catch (...)
     {
@@ -125,12 +131,15 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_negative_y)
         ChipIntent chip_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
         EXPECT_EQ(0, chip_intent.getRobotId());
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-            chip_intent.getPrimitive().chip().chip_origin(),
+            chip_intent.getPrimitive().move().destination(),
             *createPointProto(Point(-0.05, -0.2))));
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-            chip_intent.getPrimitive().chip().chip_direction(),
+            chip_intent.getPrimitive().move().final_angle(),
             *createAngleProto(Angle::fromDegrees(255))));
-        EXPECT_EQ(3.0, chip_intent.getPrimitive().chip().chip_distance_meters());
+        EXPECT_EQ(3.0, chip_intent.getPrimitive()
+                           .move()
+                           .auto_chip_or_kick()
+                           .autochip_distance_meters());
     }
     catch (...)
     {
@@ -162,12 +171,15 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_negative_y)
         ChipIntent chip_intent = dynamic_cast<ChipIntent &>(*intent_ptr);
         EXPECT_EQ(0, chip_intent.getRobotId());
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-            chip_intent.getPrimitive().chip().chip_origin(),
+            chip_intent.getPrimitive().move().destination(),
             *createPointProto(Point(0, 0))));
         EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
-            chip_intent.getPrimitive().chip().chip_direction(),
+            chip_intent.getPrimitive().move().final_angle(),
             *createAngleProto(Angle::fromDegrees(306))));
-        EXPECT_EQ(5.0, chip_intent.getPrimitive().chip().chip_distance_meters());
+        EXPECT_EQ(5.0, chip_intent.getPrimitive()
+                           .move()
+                           .auto_chip_or_kick()
+                           .autochip_distance_meters());
     }
     catch (...)
     {

@@ -4,6 +4,10 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/util/design_patterns/generic_factory.h"
 
+HaltTestPlay::HaltTestPlay(std::shared_ptr<const PlayConfig> config) : Play(config, false)
+{
+}
+
 bool HaltTestPlay::isApplicable(const World &world) const
 {
     return world.ball().position().y() >= 0;
@@ -24,9 +28,9 @@ void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 
     do
     {
-        yield({stop_test_tactic_1, stop_test_tactic_2, stop_test_tactic_3});
+        yield({{stop_test_tactic_1, stop_test_tactic_2, stop_test_tactic_3}});
     } while (true);
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, HaltTestPlay> factory;
+static TGenericFactory<std::string, Play, HaltTestPlay, PlayConfig> factory;

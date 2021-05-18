@@ -1,11 +1,14 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+
 cc_library(
-    name = "evaluation",
+    name = "cost_functions",
     srcs = ["cost_function.cpp"],
     hdrs = ["cost_function.h"],
     deps = [
         ":pass",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:pass",
         "//software/logger",
         "//software/math:math_functions",
@@ -18,7 +21,7 @@ cc_test(
     name = "evaluation_test",
     srcs = ["cost_function_test.cpp"],
     deps = [
-        ":evaluation",
+        ":cost_functions",
         "//software/math:math_functions",
         "//software/test_util",
         "@gtest//:gtest_main",
@@ -47,6 +50,7 @@ cc_test(
 
 cc_library(
     name = "pass_with_rating",
+    srcs = ["pass_with_rating.cpp"],
     hdrs = ["pass_with_rating.h"],
     deps = [
         ":pass",
@@ -54,12 +58,80 @@ cc_library(
 )
 
 cc_library(
-    name = "pass_generator",
-    srcs = ["pass_generator.cpp"],
-    hdrs = ["pass_generator.h"],
+    name = "field_pitch_division",
+    hdrs = ["field_pitch_division.h"],
     deps = [
-        ":evaluation",
+        "//software/geom:point",
+        "//software/geom:rectangle",
+        "//software/world:field",
+    ],
+)
+
+cc_library(
+    name = "eighteen_zone_pitch_division",
+    srcs = [
+        "eighteen_zone_pitch_division.cpp",
+    ],
+    hdrs = ["eighteen_zone_pitch_division.h"],
+    deps = [
+        ":field_pitch_division",
+        "//software/geom:point",
+        "//software/geom:rectangle",
+        "//software/util/make_enum",
+    ],
+)
+
+cc_test(
+    name = "eighteen_zone_pitch_division_test",
+    srcs = ["eighteen_zone_pitch_division_test.cpp"],
+    deps = [
+        ":eighteen_zone_pitch_division",
+        "//software/geom/algorithms",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "pass_evaluation",
+    hdrs = [
+        "pass_evaluation.h",
+        "pass_evaluation.tpp",
+    ],
+    deps = [
+        ":field_pitch_division",
         ":pass",
+        ":pass_with_rating",
+        "//shared/parameter:cpp_configs",
+        "//software/geom:point",
+        "//software/geom:rectangle",
+        "//software/util/make_enum",
+        "//software/world",
+    ],
+)
+
+cc_test(
+    name = "pass_evaluation_test",
+    srcs = ["pass_evaluation_test.cpp"],
+    deps = [
+        ":eighteen_zone_pitch_division",
+        ":pass",
+        ":pass_evaluation",
+        "//software/geom/algorithms",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "pass_generator",
+    hdrs = [
+        "pass_generator.h",
+        "pass_generator.tpp",
+    ],
+    deps = [
+        ":cost_functions",
+        ":eighteen_zone_pitch_division",
+        ":pass",
+        ":pass_evaluation",
         ":pass_with_rating",
         "//software/optimization:gradient_descent",
         "//software/world",
@@ -72,6 +144,7 @@ cc_test(
     deps = [
         ":pass_generator",
         "//software/test_util",
+        "//software/world",
         "@gtest//:gtest_main",
     ],
 )

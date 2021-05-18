@@ -31,7 +31,7 @@ class PathPlannerTestCaseFactory
     static std::vector<PlannerTestCase> getTestCases()
     {
         RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
-            DynamicParameters->getAIConfig()->getRobotNavigationObstacleFactoryConfig());
+            std::make_shared<const RobotNavigationObstacleConfig>());
 
         std::vector<ObstaclePtr> circle_obstacles_10 = {
             robot_navigation_obstacle_factory.createFromRobotPosition({0, 0}),

@@ -3,10 +3,11 @@
 #include <QtCore/QTimer>
 #include <QtWidgets/QApplication>
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/gui/drawing/world.h"
-#include "software/parameter/dynamic_parameters.h"
 
-ThreadedFullSystemGUI::ThreadedFullSystemGUI()
+ThreadedFullSystemGUI::ThreadedFullSystemGUI(
+    std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config)
     : FirstInFirstOutThreadedObserver<World>(),
       FirstInFirstOutThreadedObserver<AIDrawFunction>(),
       FirstInFirstOutThreadedObserver<PlayInfo>(),
@@ -27,7 +28,8 @@ ThreadedFullSystemGUI::ThreadedFullSystemGUI()
       primitives_sent_per_second_buffer(
           std::make_shared<ThreadSafeBuffer<double>>(DATA_PER_SECOND_BUFFER_SIZE, false)),
       application_shutting_down(false),
-      remaining_attempts_to_set_view_area(NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA)
+      remaining_attempts_to_set_view_area(NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA),
+      mutable_thunderbots_config(mutable_thunderbots_config)
 {
     run_full_system_gui_thread =
         std::thread(&ThreadedFullSystemGUI::createAndRunFullSystemGUI, this);
@@ -64,7 +66,7 @@ void ThreadedFullSystemGUI::createAndRunFullSystemGUI()
     FullSystemGUI* full_system_gui = new FullSystemGUI(
         world_draw_functions_buffer, ai_draw_functions_buffer, play_info_buffer,
         sensor_msg_buffer, view_area_buffer, worlds_received_per_second_buffer,
-        primitives_sent_per_second_buffer, MutableDynamicParameters);
+        primitives_sent_per_second_buffer, mutable_thunderbots_config);
     full_system_gui->show();
 
     // Run the QApplication and all windows / widgets. This function will block
@@ -84,10 +86,11 @@ void ThreadedFullSystemGUI::createAndRunFullSystemGUI()
 
 void ThreadedFullSystemGUI::onValueReceived(World world)
 {
-    auto friendly_team_colour =
-        DynamicParameters->getSensorFusionConfig()->FriendlyColorYellow()->value()
-            ? TeamColour::YELLOW
-            : TeamColour::BLUE;
+    auto friendly_team_colour = mutable_thunderbots_config->getSensorFusionConfig()
+                                        ->getFriendlyColorYellow()
+                                        ->value()
+                                    ? TeamColour::YELLOW
+                                    : TeamColour::BLUE;
     auto world_draw_function = getDrawWorldFunction(world, friendly_team_colour);
     world_draw_functions_buffer->push(world_draw_function);
 

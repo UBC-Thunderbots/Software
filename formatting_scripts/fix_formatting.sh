@@ -71,12 +71,20 @@ function run_black_formatting () {
 }
 
 function run_code_spell(){
+    http_code=$(curl -sw '%{http_code}' https://raw.githubusercontent.com/codespell-project/codespell/v1.14.0/codespell_lib/data/dictionary.txt --output /tmp/dictionary.txt)
+
+    if [[ "$http_code" != 200 ]]; then
+        printf "\n***Failed to download codespell dictionary!***\n\n"
+        exit 1
+    fi
+
+    sed "/atleast/d" /tmp/dictionary.txt > /tmp/edited_dictionary.txt #removing spell fixes that include the word 'atleast' from codespell dictionary 
+
     printf "Fixing spelling...\n\n"
-    cd $CURR_DIR/../src/software && codespell -w --skip="1,2,0" # Skip binaries
-    cd $CURR_DIR/../src/firmware_new && codespell -w
-    cd $CURR_DIR/../src/firmware/app && codespell -w
-    cd $CURR_DIR/../src/shared && codespell -w
-    cd $CURR_DIR/../docs && codespell -w --skip="*.png" # Skip images
+    cd $CURR_DIR/../src/software && codespell -w --skip="1,2,0" -D /tmp/edited_dictionary.txt # Skip binaries
+    cd $CURR_DIR/../src/firmware/app && codespell -w -D /tmp/edited_dictionary.txt
+    cd $CURR_DIR/../src/shared && codespell -w -D /tmp/edited_dictionary.txt
+    cd $CURR_DIR/../docs && codespell -w --skip="*.png" -D /tmp/edited_dictionary.txt # Skip images
 
     if [[ "$?" != 0 ]]; then
         printf "\n***Failed to fix spelling!***\n\n"
@@ -86,7 +94,7 @@ function run_code_spell(){
 
 function run_git_diff_check(){
     printf "Checking for merge conflict markers...\n\n"
-    cd $CURR_DIR && git --no-pager diff --check
+    cd $CURR_DIR && git -c "core.whitespace=-trailing-space" --no-pager diff --check
     if [[ "$?" != 0 ]]; then
         printf "***Please fix merge conflict markers!***\n\n"
         exit 1

@@ -57,6 +57,7 @@ host_software_packages=(
     tmux        # Used by AI vs AI script
     valgrind # Checks for memory leaks
     libsqlite3-dev # needed to build Python 3 with sqlite support
+    libffi-dev # needed to use _ctypes in Python3
     libssl-dev # needed to build Python 3 with ssl support
     openssl # possibly also necessary for ssl in Python 3
 )
@@ -70,6 +71,7 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     host_software_packages+=(clang)
     host_software_packages+=(llvm-6.0)
     host_software_packages+=(libclang-6.0-dev)
+    host_software_packages+=(libncurses5)
     sudo apt-get -y install gcc-7 g++-7
     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
     sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
@@ -92,8 +94,20 @@ if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
     exit 1
 fi
 
+# Upgrade python3 pip, which some pip packages require
 echo "================================================================"
-echo "Done Installing Newer Valgrind Version"
+echo "Upgrading Pip Version"
+echo "================================================================"
+
+if ! /usr/bin/python3 -m pip install --upgrade pip ; then
+    echo "##############################################################"
+    echo "Error: Upgrading pip version failed"
+    echo "##############################################################"
+    exit 1
+fi
+
+echo "================================================================"
+echo "Done Upgrading Pip Version"
 echo "================================================================"
 
 # Install Bazel
@@ -113,6 +127,7 @@ if ! sudo apt-get install bazel-3.7.2 -y ; then
     echo "##############################################################"
     exit 1
 fi
+sudo ln -s /usr/bin/bazel-3.7.2 /usr/bin/bazel
 
 # Done
 echo "================================================================"

@@ -1,9 +1,13 @@
 #include "software/ai/hl/stp/play/penalty_kick_enemy_play.h"
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/tactic/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
+
+PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(std::shared_ptr<const PlayConfig> config)
+    : Play(config, true)
+{
+}
 
 bool PenaltyKickEnemyPlay::isApplicable(const World &world) const
 {
@@ -19,9 +23,6 @@ bool PenaltyKickEnemyPlay::invariantHolds(const World &world) const
 void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                           const World &world)
 {
-    auto goalie_tactic = std::make_shared<GoalieTactic>(
-        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
-
     auto move_tactic_2 = std::make_shared<MoveTactic>(true);
     auto move_tactic_3 = std::make_shared<MoveTactic>(true);
     auto move_tactic_4 = std::make_shared<MoveTactic>(true);
@@ -30,9 +31,6 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     do
     {
-        // goalie
-        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
-
         // Move all non-shooter robots to the center of the field
         move_tactic_2->updateControlParams(
             Point(0, 0), world.field().enemyGoalCenter().toVector().orientation(), 0);
@@ -50,10 +48,10 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
             world.field().enemyGoalCenter().toVector().orientation(), 0);
 
         // yield the Tactics this Play wants to run, in order of priority
-        yield({goalie_tactic, move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,
-               move_tactic_6});
+        yield({{move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,
+                move_tactic_6}});
     } while (true);
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, PenaltyKickEnemyPlay> factory;
+static TGenericFactory<std::string, Play, PenaltyKickEnemyPlay, PlayConfig> factory;

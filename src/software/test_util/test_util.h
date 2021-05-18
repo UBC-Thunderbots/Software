@@ -123,7 +123,7 @@ namespace TestUtil
 
     /**
      * Creates a list of RobotStateWithId at given positions with 0 velocity, 0 angular
-     * velocity and 0 orientation The id is set as the index in the list of positions
+     * velocity and 0 orientation. The id is set as the index in the list of positions.
      *
      * @param positions The positions to create robots at
      */
@@ -131,10 +131,13 @@ namespace TestUtil
         const std::vector<Point> &positions);
 
     /**
-     * Takes a RobotLog proto and creates an INFO level g3log
+     * Creates a list of RobotStateWithId at given positions with input velocity, 0
+     * angular velocity and 0 orientation. The id is set as the index in the list of
+     * positions.
      *
-     * @param robot_log The RobotLog to log
+     * @param positions The positions to create robots at
+     * @param velocity The velocities given to each robot
      */
-    void handleTestRobotLog(TbotsProto_RobotLog robot_log);
-
+    std::vector<RobotStateWithId> createMovingRobotStatesWithId(
+        const std::vector<Point> &positions, const std::vector<Vector> &velocity);
 };  // namespace TestUtil

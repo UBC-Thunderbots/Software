@@ -130,7 +130,7 @@ class ThetaStarPathPlanner : public PathPlanner
        private:
         /**
          * Calculate the key value given a pair of coordinates. The key of the coordinate
-         * with smaller row value, or smaller col value when row values are equal wil
+         * with smaller row value, or smaller col value when row values are equal will
          * occupy the low 32 bits in the key for this CoordinatePair. The key value of the
          * other coordinate will occupy the high 32 bits in the key for this
          * CoordinatePair.
@@ -403,11 +403,6 @@ class ThetaStarPathPlanner : public PathPlanner
 
     // if close to end then return direct path to end point
     static constexpr double CLOSE_TO_END_THRESHOLD = 0.01;  // in metres
-
-    // TODO(Issue #1448): Test and revise this value and the associated approach
-    // increase in threshold to reduce oscillation for when the end of the path is blocked
-    static constexpr unsigned int BLOCKED_END_OSCILLATION_MITIGATION =
-        2;  // multiples of CLOSE_TO_END_THRESHOLD to ignore to control oscillation
 
     // resolution for searching for unblocked point around a blocked end
     static constexpr double BLOCKED_END_SEARCH_RESOLUTION =

@@ -7,7 +7,7 @@ extern "C"
 
 #include <gtest/gtest.h>
 
-#include "software/test_util/test_util.h"
+#include "shared/test_util/test_util.h"
 
 class FirmwareRobotTest : public testing::Test
 {
@@ -25,7 +25,7 @@ class FirmwareRobotTest : public testing::Test
 
         app_logger_init(0, &TestUtil::handleTestRobotLog);
 
-        firmware_robot = app_firmware_robot_create(
+        firmware_robot = app_firmware_robot_force_wheels_create(
             charger, chicker, dribbler, &(this->returnEight), &(this->returnNine),
             &(this->returnTen), &(this->returnEleven), &(this->returnTwelve),
             &(this->returnThirteen), &(this->returnFourteen), front_right_wheel,
@@ -89,10 +89,10 @@ class FirmwareRobotTest : public testing::Test
         return 16;
     }
 
-    Wheel* front_left_wheel  = (Wheel*)11;
-    Wheel* front_right_wheel = (Wheel*)12;
-    Wheel* back_left_wheel   = (Wheel*)13;
-    Wheel* back_right_wheel  = (Wheel*)14;
+    ForceWheel* front_left_wheel  = (ForceWheel*)11;
+    ForceWheel* front_right_wheel = (ForceWheel*)12;
+    ForceWheel* back_left_wheel   = (ForceWheel*)13;
+    ForceWheel* back_right_wheel  = (ForceWheel*)14;
 
     FirmwareRobot_t* firmware_robot;
     ControllerState_t controller_state;
@@ -152,26 +152,6 @@ TEST_F(FirmwareRobotTest, getVelocityAngular)
 TEST_F(FirmwareRobotTest, getBatteryVoltage)
 {
     EXPECT_EQ(14, app_firmware_robot_getBatteryVoltage(firmware_robot));
-}
-
-TEST_F(FirmwareRobotTest, getFrontRightWheel)
-{
-    EXPECT_EQ(front_right_wheel, app_firmware_robot_getFrontRightWheel(firmware_robot));
-}
-
-TEST_F(FirmwareRobotTest, getFrontLeftWheel)
-{
-    EXPECT_EQ(front_left_wheel, app_firmware_robot_getFrontLeftWheel(firmware_robot));
-}
-
-TEST_F(FirmwareRobotTest, getBackRightWheel)
-{
-    EXPECT_EQ(back_right_wheel, app_firmware_robot_getBackRightWheel(firmware_robot));
-}
-
-TEST_F(FirmwareRobotTest, getBackLeftWheel)
-{
-    EXPECT_EQ(back_left_wheel, app_firmware_robot_getBackLeftWheel(firmware_robot));
 }
 
 TEST_F(FirmwareRobotTest, getRobotConstants)

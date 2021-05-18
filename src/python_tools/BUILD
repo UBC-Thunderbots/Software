@@ -2,6 +2,29 @@ package(default_visibility = ["//visibility:public"])
 
 load("@python_tools_deps//:requirements.bzl", "requirement")
 
+NOTEBOOK_DEPS = [
+    requirement("jupyter"),
+    requirement("notebook"),
+    requirement("numpy"),
+    requirement("matplotlib"),
+    requirement("bokeh"),
+    requirement("ipywidgets"),
+    requirement("jupytext"),
+    ":proto_log",
+    ":sensor_proto_log",
+    "//python_tools/plotting:plot_heatmap",
+    "//python_tools/plotting:plot_ssl_wrapper",
+    "//python_tools/plotting:plot_pass_generator",
+    "//shared/proto:tbots_py_proto",
+    "//software/proto:software_py_proto",
+]
+
+PYTHON_BINDINGS = [
+    "//software/python_bindings:pass_generator.so",
+    "//software/python_bindings:passing.so",
+    "//software/python_bindings:world.so",
+]
+
 py_test(
     name = "test_hermetic_python_environment",
     srcs = ["test_hermetic_python_environment.py"],
@@ -29,18 +52,17 @@ py_binary(
     name = "jupyter",
     srcs = ["jupyter.py"],
     # glob all the notebooks in this directory
-    data = [":notebooks"],
-    deps = [
-        requirement("jupyter"),
-        requirement("notebook"),
-        requirement("numpy"),
-        requirement("matplotlib"),
-        requirement("bokeh"),
-        requirement("ipywidgets"),
-        ":proto_log",
-        ":sensor_proto_log",
-        "//python_tools/plotting:plot_ssl_wrapper",
-        "//shared/proto:tbots_py_proto",
-        "//software/proto:software_py_proto",
-    ],
+    data = [
+        ":notebooks",
+    ] + PYTHON_BINDINGS,
+    deps = NOTEBOOK_DEPS,
+)
+
+py_test(
+    name = "notebooks_test",
+    srcs = ["notebooks_test.py"],
+    data = [
+        ":notebooks",
+    ] + PYTHON_BINDINGS,
+    deps = NOTEBOOK_DEPS,
 )

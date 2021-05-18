@@ -18,7 +18,7 @@
  */
 bool robotReachedDestination(const Robot& robot, const Point& destination,
                              const Angle& final_orientation,
-                             double DISTANCE_THRESHOLD    = 0.02,
+                             double DISTANCE_THRESHOLD    = 0.05,
                              const Angle& ANGLE_THRESHOLD = Angle::fromDegrees(2));
 
 /**
@@ -30,3 +30,22 @@ bool robotReachedDestination(const Robot& robot, const Point& destination,
  * @return if robot is stopped
  */
 bool robotStopped(const Robot& robot, double SPEED_THRESHOLD = 0.05);
+
+/**
+ * Compares two points and returns true if within DISTANCE_THRESHOLD
+ *
+ * @param pt1 The first point
+ * @param pt2 The second point
+ * @param DISTANCE_THRESHOLD The threshold for how close the two points are
+ */
+bool comparePoints(const Point& pt1, const Point& pt2, double DISTANCE_THRESHOLD = 0.02);
+
+/**
+ * Compares two angles and returns true if within ANGLE_THRESHOLD
+ *
+ * @param angle1 The first angle
+ * @param angle2 The second angle
+ * @param ANGLE_THRESHOLD The threshold for how close the two angles are
+ */
+bool compareAngles(const Angle& angle1, const Angle& angle2,
+                   const Angle& ANGLE_THRESHOLD = Angle::fromDegrees(2));

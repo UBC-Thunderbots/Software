@@ -5,21 +5,23 @@
 #include <memory>
 #include <vector>
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/world/world.h"
+
+using TacticVector              = std::vector<std::shared_ptr<Tactic>>;
+using PriorityTacticVector      = std::vector<TacticVector>;
+using ConstTacticVector         = std::vector<std::shared_ptr<const Tactic>>;
+using ConstPriorityTacticVector = std::vector<ConstTacticVector>;
 
 using RobotToTacticAssignmentFunction =
     std::function<std::map<std::shared_ptr<const Tactic>, Robot>(
-        const std::vector<std::shared_ptr<const Tactic>>&, const World&)>;
+        const ConstPriorityTacticVector&, const World&, bool)>;
 
 using MotionConstraintBuildFunction =
     std::function<std::set<MotionConstraint>(const Tactic& tactic)>;
 
-// We typedef the coroutine return type to make it shorter, more descriptive,
-// and easier to work with.
-// This coroutine returns a list of shared_ptrs to Tactic objects
-typedef boost::coroutines2::coroutine<std::vector<std::shared_ptr<Tactic>>>
-    TacticCoroutine;
+// This coroutine returns a list of list of shared_ptrs to Tactic objects
+using TacticCoroutine = boost::coroutines2::coroutine<PriorityTacticVector>;
 
 /**
  * In the STP framework, a Play is a collection of tactics that represent some
@@ -49,8 +51,11 @@ class Play
    public:
     /**
      * Creates a new Play
+     *
+     * @param play_config The Play configuration
+     * @param requires_goalie Whether this plays requires a goalie
      */
-    explicit Play();
+    explicit Play(std::shared_ptr<const PlayConfig> play_config, bool requires_goalie);
 
     /**
      * Returns whether or not this Play can be started. For example, the Enemy Team
@@ -99,6 +104,10 @@ class Play
 
     virtual ~Play() = default;
 
+   protected:
+    // The Play configuration
+    std::shared_ptr<const PlayConfig> play_config;
+
    private:
     /**
      * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in
@@ -115,7 +124,7 @@ class Play
      * @return A list of shared_ptrs to the Tactics the Play wants to run at this time, in
      * order of priority
      */
-    std::vector<std::shared_ptr<Tactic>> getTactics(const World& world);
+    PriorityTacticVector getTactics(const World& world);
 
     /**
      * A wrapper function for the getNextTactics function.
@@ -148,6 +157,9 @@ class Play
      */
     virtual void getNextTactics(TacticCoroutine::push_type& yield,
                                 const World& world) = 0;
+
+    // Whether this plays requires a goalie
+    const bool requires_goalie;
 
     // The coroutine that sequentially returns the Tactics the Play wants to run
     TacticCoroutine::pull_type tactic_sequence;

@@ -1,10 +1,10 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/geom/point.h"
 #include "software/logger/logger.h"
-#include "software/parameter/dynamic_parameters.h"
 #include "software/world/world.h"
 
 /**
@@ -23,7 +23,7 @@ class RobotNavigationObstacleFactory
      * @param config The configuration used to determine how obstacles should be generated
      */
     RobotNavigationObstacleFactory(
-        std::shared_ptr<const RobotNavigationObstacleFactoryConfig> config);
+        std::shared_ptr<const RobotNavigationObstacleConfig> config);
 
     /**
      * Create obstacles for the given motion constraints
@@ -102,7 +102,7 @@ class RobotNavigationObstacleFactory
     ObstaclePtr createFromShape(const Polygon &polygon) const;
 
    private:
-    std::shared_ptr<const RobotNavigationObstacleFactoryConfig> config;
+    std::shared_ptr<const RobotNavigationObstacleConfig> config;
     double robot_radius_expansion_amount;
 
     /**

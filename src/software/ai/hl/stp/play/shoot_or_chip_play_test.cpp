@@ -10,33 +10,33 @@
 
 class ShootOrChipPlayTest : public SimulatedPlayTestFixture
 {
+   protected:
+    Field field = Field::createSSLDivisionBField();
 };
 
 TEST_F(ShootOrChipPlayTest, test_shoot_or_chip_play)
 {
-    setBallState(BallState(Point(-1.4, 2), Vector(0, 0)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId({
-        field().friendlyGoalCenter(),
+    BallState ball_state(Point(-1.4, 2), Vector(0, 0));
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({
+        field.friendlyGoalCenter(),
         Point(-1.5, 2),
         Point(-2, 1.5),
         Point(-2, 0.5),
         Point(-2, -0.5),
         Point(-2, -1.5),
-    }));
+    });
     setFriendlyGoalie(0);
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({
-        field().enemyGoalCenter(),
-        field().enemyDefenseArea().negXNegYCorner(),
-        field().enemyDefenseArea().negXPosYCorner(),
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({
+        field.enemyGoalCenter(),
+        field.enemyDefenseArea().negXNegYCorner(),
+        field.enemyDefenseArea().negXPosYCorner(),
         Point(-1, 0),
         Point(1, -2.5),
-    }));
-    addEnemyRobots({
-        RobotStateWithId{
-            .id          = 5,
-            .robot_state = RobotState(Point(1, 2), Vector(-4.6, 0), Angle::half(),
-                                      AngularVelocity::zero())},
     });
+    enemy_robots.emplace_back(RobotStateWithId{
+        .id          = 5,
+        .robot_state = RobotState(Point(1, 2), Vector(-4.6, 0), Angle::half(),
+                                  AngularVelocity::zero())});
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(ShootOrChipPlay));
     setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::STOP);
@@ -45,16 +45,17 @@ TEST_F(ShootOrChipPlayTest, test_shoot_or_chip_play)
         // This will keep the test running for 9.5 seconds to give everything enough
         // time to settle into position and be observed with the Visualizer
         // TODO: Implement proper validation
-        // https://github.com/UBC-Thunderbots/Software/issues/1396
+        // https://github.com/UBC-Thunderbots/Software/issues/1971
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
             {
-                yield();
+                yield("Timestamp not at 9.5s");
             }
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }

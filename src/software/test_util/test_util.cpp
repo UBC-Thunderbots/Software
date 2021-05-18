@@ -111,14 +111,18 @@ namespace TestUtil
         return states;
     }
 
-    void handleTestRobotLog(TbotsProto_RobotLog robot_log)
+    std::vector<RobotStateWithId> createMovingRobotStatesWithId(
+        const std::vector<Point> &positions, const std::vector<Vector> &velocity)
     {
-        LOG(INFO) << "[TEST ROBOT " << robot_log.robot_id << "]["
-                  << TbotsProto::LogLevel_Name(
-                         static_cast<TbotsProto::LogLevel>(robot_log.log_level))
-                  << "]"
-                  << "[" << robot_log.file_name << ":" << robot_log.line_number
-                  << "]: " << robot_log.log_msg;
+        std::vector<RobotStateWithId> states;
+        for (RobotId id = 0; id < static_cast<RobotId>(positions.size()); id++)
+        {
+            states.push_back(RobotStateWithId{
+                .id          = id,
+                .robot_state = RobotState(positions[id], velocity[id], Angle::zero(),
+                                          AngularVelocity::zero())});
+        }
+        return states;
     }
 
 };  // namespace TestUtil

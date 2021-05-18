@@ -1,14 +1,14 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/constants.h"
-#include "software/networking/threaded_proto_multicast_listener.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "software/networking/threaded_proto_udp_listener.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_gc_referee_message.pb.h"
 
 /**
- * This class encapsulates ProtoMulticastListener<SSLProto::SSL_WrapperPacket> and
- * ProtoMulticastListener<SSLProto::Referee> to abstract all ssl protobuf networking
+ * This class encapsulates ProtoUdpListener<SSLProto::SSL_WrapperPacket> and
+ * ProtoUdpListener<SSLProto::Referee> to abstract all ssl protobuf networking
  * operations behind a single interface.
  */
 class SSLProtoClient
@@ -27,12 +27,11 @@ class SSLProtoClient
     explicit SSLProtoClient(
         std::function<void(SSLProto::SSL_WrapperPacket)> received_vision_callback,
         std::function<void(SSLProto::Referee)> received_referee_callback,
-        std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config);
+        std::shared_ptr<const SslCommunicationConfig> ssl_communication_config);
 
    private:
-    std::shared_ptr<const SSLCommunicationConfig> ssl_communication_config;
-    std::unique_ptr<ThreadedProtoMulticastListener<SSLProto::SSL_WrapperPacket>>
+    std::shared_ptr<const SslCommunicationConfig> ssl_communication_config;
+    std::unique_ptr<ThreadedProtoUdpListener<SSLProto::SSL_WrapperPacket>>
         ssl_vision_listener;
-    std::unique_ptr<ThreadedProtoMulticastListener<SSLProto::Referee>>
-        ssl_referee_listener;
+    std::unique_ptr<ThreadedProtoUdpListener<SSLProto::Referee>> ssl_referee_listener;
 };

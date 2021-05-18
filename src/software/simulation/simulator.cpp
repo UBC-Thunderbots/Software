@@ -4,8 +4,8 @@
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
+#include "software/simulation/force_wheel_simulator_robot_singleton.h"
 #include "software/simulation/simulator_ball_singleton.h"
-#include "software/simulation/simulator_robot_singleton.h"
 
 extern "C"
 {
@@ -30,7 +30,8 @@ Simulator::Simulator(const Field& field,
 void Simulator::setBallState(const BallState& ball_state)
 {
     physics_world.setBallState(ball_state);
-    simulator_ball = std::make_shared<SimulatorBall>(physics_world.getPhysicsBall());
+    simulator_ball =
+        std::make_shared<PhysicsSimulatorBall>(physics_world.getPhysicsBall());
 
     for (auto& robot_pair : yellow_simulator_robots)
     {
@@ -65,13 +66,13 @@ void Simulator::addBlueRobots(const std::vector<RobotStateWithId>& robots)
 
 void Simulator::updateSimulatorRobots(
     const std::vector<std::weak_ptr<PhysicsRobot>>& physics_robots,
-    std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
+    std::map<std::shared_ptr<PhysicsSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
         simulator_robots,
     TeamColour team_colour)
 {
     for (const auto& physics_robot : physics_robots)
     {
-        auto simulator_robot = std::make_shared<SimulatorRobot>(physics_robot);
+        auto simulator_robot = std::make_shared<PhysicsSimulatorRobot>(physics_robot);
 
         // we initialize the logger with the appropriate logging function based
         // on the team color and the robot id to propagate any logs when creating
@@ -79,15 +80,16 @@ void Simulator::updateSimulatorRobots(
         if (team_colour == TeamColour::BLUE)
         {
             app_logger_init(simulator_robot->getRobotId(),
-                            &SimulatorRobotSingleton::handleBlueRobotLogProto);
+                            &ForceWheelSimulatorRobotSingleton::handleBlueRobotLogProto);
         }
         else if (team_colour == TeamColour::YELLOW)
         {
-            app_logger_init(simulator_robot->getRobotId(),
-                            &SimulatorRobotSingleton::handleYellowRobotLogProto);
+            app_logger_init(
+                simulator_robot->getRobotId(),
+                &ForceWheelSimulatorRobotSingleton::handleYellowRobotLogProto);
         }
 
-        auto firmware_robot = SimulatorRobotSingleton::createFirmwareRobot();
+        auto firmware_robot = ForceWheelSimulatorRobotSingleton::createFirmwareRobot();
         auto firmware_ball  = SimulatorBallSingleton::createFirmwareBall();
 
         FirmwareWorld_t* firmware_world_raw =
@@ -135,9 +137,9 @@ void Simulator::setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitiv
 
 void Simulator::setRobotPrimitive(
     RobotId id, const TbotsProto_Primitive& primitive_msg,
-    std::map<std::shared_ptr<SimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
+    std::map<std::shared_ptr<PhysicsSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
         simulator_robots,
-    const std::shared_ptr<SimulatorBall>& simulator_ball, FieldSide defending_side)
+    const std::shared_ptr<PhysicsSimulatorBall>& simulator_ball, FieldSide defending_side)
 {
     SimulatorBallSingleton::setSimulatorBall(simulator_ball, defending_side);
     auto simulator_robots_iter =
@@ -150,9 +152,10 @@ void Simulator::setRobotPrimitive(
     {
         auto simulator_robot = (*simulator_robots_iter).first;
         auto firmware_world  = (*simulator_robots_iter).second;
-        SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, defending_side);
-        SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(firmware_world,
-                                                                          primitive_msg);
+        ForceWheelSimulatorRobotSingleton::setSimulatorRobot(simulator_robot,
+                                                             defending_side);
+        ForceWheelSimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
+            firmware_world, primitive_msg);
     }
 }
 
@@ -205,13 +208,14 @@ void Simulator::stepSimulation(const Duration& time_step)
             auto firmware_world  = iter.second;
 
             app_logger_init(simulator_robot->getRobotId(),
-                            &SimulatorRobotSingleton::handleBlueRobotLogProto);
+                            &ForceWheelSimulatorRobotSingleton::handleBlueRobotLogProto);
 
-            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot,
-                                                       blue_team_defending_side);
+            ForceWheelSimulatorRobotSingleton::setSimulatorRobot(
+                simulator_robot, blue_team_defending_side);
             SimulatorBallSingleton::setSimulatorBall(simulator_ball,
                                                      blue_team_defending_side);
-            SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
+            ForceWheelSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
+                firmware_world);
         }
 
         for (auto& iter : yellow_simulator_robots)
@@ -219,14 +223,16 @@ void Simulator::stepSimulation(const Duration& time_step)
             auto simulator_robot = iter.first;
             auto firmware_world  = iter.second;
 
-            app_logger_init(simulator_robot->getRobotId(),
-                            &SimulatorRobotSingleton::handleYellowRobotLogProto);
+            app_logger_init(
+                simulator_robot->getRobotId(),
+                &ForceWheelSimulatorRobotSingleton::handleYellowRobotLogProto);
 
-            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot,
-                                                       yellow_team_defending_side);
+            ForceWheelSimulatorRobotSingleton::setSimulatorRobot(
+                simulator_robot, yellow_team_defending_side);
             SimulatorBallSingleton::setSimulatorBall(simulator_ball,
                                                      yellow_team_defending_side);
-            SimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(firmware_world);
+            ForceWheelSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
+                firmware_world);
         }
 
         // We take as many steps of `physics_time_step` as possible, and then
@@ -242,17 +248,12 @@ void Simulator::stepSimulation(const Duration& time_step)
 World Simulator::getWorld() const
 {
     Timestamp timestamp = physics_world.getTimestamp();
-    // The world currently must contain a ball. The ability to represent no ball
-    // will be fixed in https://github.com/UBC-Thunderbots/Software/issues/1325
-    Ball ball = Ball(Point(0, 0), Vector(0, 0), timestamp);
+    Ball ball           = Ball(Point(0, 0), Vector(0, 0), timestamp);
     if (physics_world.getBallState())
     {
         ball = Ball(BallState(physics_world.getBallState().value()), timestamp);
     }
 
-    // Note: The simulator currently makes the invariant that friendly robots
-    // are yellow robots, and enemies are blue. This will be fixed in
-    // https://github.com/UBC-Thunderbots/Software/issues/1325
     std::vector<Robot> friendly_team_robots;
     for (const auto& robot_state : physics_world.getYellowRobotStates())
     {

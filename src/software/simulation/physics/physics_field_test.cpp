@@ -21,7 +21,8 @@ class PhysicsFieldTest : public testing::Test
     virtual void SetUp()
     {
         b2Vec2 gravity(0, 0);
-        world = std::make_shared<b2World>(gravity);
+        world            = std::make_shared<b2World>(gravity);
+        simulator_config = std::make_shared<const SimulatorConfig>();
     }
 
     void simulateForDuration(const Duration& duration)
@@ -40,6 +41,7 @@ class PhysicsFieldTest : public testing::Test
     }
 
     std::shared_ptr<b2World> world;
+    std::shared_ptr<const SimulatorConfig> simulator_config;
 };
 
 TEST_F(PhysicsFieldTest, test_get_field)
@@ -98,7 +100,7 @@ TEST_F(PhysicsFieldTest, test_ball_bounces_off_field_boundary)
 
     BallState initial_ball_state(field_parameter.friendlyHalf().posXPosYCorner(),
                                  Vector(0, 2));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 0.1);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 0.1, simulator_config);
 
     simulateForDuration(Duration::fromSeconds(1));
 
@@ -113,7 +115,7 @@ TEST_F(PhysicsFieldTest, test_ball_bounces_off_enemy_goal)
 
     BallState initial_ball_state(field_parameter.enemyGoalCenter() + Vector(-1, 0),
                                  Vector(3.0, 0));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 0.1);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 0.1, simulator_config);
 
     simulateForDuration(Duration::fromSeconds(1));
 
@@ -128,7 +130,7 @@ TEST_F(PhysicsFieldTest, test_ball_bounces_off_friendly_goal)
 
     BallState initial_ball_state(field_parameter.friendlyGoalCenter() + Vector(1, 0),
                                  Vector(-3.0, 0));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 0.1);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 0.1, simulator_config);
 
     simulateForDuration(Duration::fromSeconds(1));
 

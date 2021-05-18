@@ -1,6 +1,12 @@
 #include "software/ai/hl/stp/play/play.h"
 
-Play::Play() : tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)) {}
+Play::Play(std::shared_ptr<const PlayConfig> play_config, bool requires_goalie)
+    : play_config(play_config),
+      requires_goalie(requires_goalie),
+      tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
+      world(std::nullopt)
+{
+}
 
 bool Play::done() const
 {
@@ -9,7 +15,7 @@ bool Play::done() const
     return !static_cast<bool>(tactic_sequence);
 }
 
-std::vector<std::shared_ptr<Tactic>> Play::getTactics(const World &world)
+PriorityTacticVector Play::getTactics(const World &world)
 {
     // Update the member variable that stores the world. This will be used by the
     // getNextTacticsWrapper function (inside the coroutine) to pass the World data to
@@ -36,7 +42,7 @@ std::vector<std::shared_ptr<Tactic>> Play::getTactics(const World &world)
     // If the coroutine "iterator" is done, the getNextTactics function has completed
     // and has no more work to do. Therefore, the Play is done so we return an empty
     // vector
-    return std::vector<std::shared_ptr<Tactic>>();
+    return PriorityTacticVector();
 }
 
 std::vector<std::unique_ptr<Intent>> Play::get(
@@ -44,22 +50,31 @@ std::vector<std::unique_ptr<Intent>> Play::get(
     MotionConstraintBuildFunction motion_constraint_builder, const World &new_world)
 {
     std::vector<std::unique_ptr<Intent>> intents;
-    auto tactics = getTactics(new_world);
-    std::vector<std::shared_ptr<const Tactic>> const_tactics;
-    const_tactics.reserve(tactics.size());
+    PriorityTacticVector priority_tactics = getTactics(new_world);
+    ConstPriorityTacticVector const_priority_tactics;
+
     // convert pointers to const pointers
-    std::transform(tactics.begin(), tactics.end(), std::back_inserter(const_tactics),
-                   [](std::shared_ptr<Tactic> tactic) { return tactic; });
-    auto robot_tactic_assignment =
-        robot_to_tactic_assignment_algorithm(const_tactics, new_world);
-    for (auto tactic : tactics)
+    std::for_each(priority_tactics.begin(), priority_tactics.end(), [&](auto &tactics) {
+        ConstTacticVector const_tactics = {};
+        std::transform(tactics.begin(), tactics.end(), std::back_inserter(const_tactics),
+                       [](std::shared_ptr<Tactic> tactic) { return tactic; });
+        const_priority_tactics.push_back(const_tactics);
+    });
+
+    auto robot_tactic_assignment = robot_to_tactic_assignment_algorithm(
+        const_priority_tactics, new_world, requires_goalie);
+
+    for (auto tactic_vec : priority_tactics)
     {
-        auto iter = robot_tactic_assignment.find(tactic);
-        if (iter != robot_tactic_assignment.end())
+        for (auto tactic : tactic_vec)
         {
-            auto intent = tactic->get(iter->second, new_world);
-            intent->setMotionConstraints(motion_constraint_builder(*tactic));
-            intents.push_back(std::move(intent));
+            auto iter = robot_tactic_assignment.find(tactic);
+            if (iter != robot_tactic_assignment.end())
+            {
+                auto intent = tactic->get(iter->second, new_world);
+                intent->setMotionConstraints(motion_constraint_builder(*tactic));
+                intents.push_back(std::move(intent));
+            }
         }
     }
     return intents;

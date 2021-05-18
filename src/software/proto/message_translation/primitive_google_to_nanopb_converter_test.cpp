@@ -15,30 +15,34 @@
 
 TEST(PrimitiveGoogleToNanoPbConverterTest, convert_move_primitive)
 {
-    TbotsProto::Primitive google_primitive =
-        *createMovePrimitive(Point(1, 2), 100, Angle::half(), DribblerMode::MAX_FORCE);
+    TbotsProto::Primitive google_primitive = *createMovePrimitive(
+        Point(1, 2), 100, Angle::half(), DribblerMode::MAX_FORCE,
+        {AutoChipOrKickMode::AUTOCHIP, 2.5}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
 
     TbotsProto_Primitive nanopb_primitive = createNanoPbPrimitive(google_primitive);
 
     ASSERT_EQ(nanopb_primitive.which_primitive, TbotsProto_Primitive_move_tag);
-    EXPECT_EQ(nanopb_primitive.primitive.move.position_params.destination.x_meters, 1.0f);
-    EXPECT_EQ(nanopb_primitive.primitive.move.position_params.destination.y_meters, 2.0f);
-    EXPECT_EQ(
-        nanopb_primitive.primitive.move.position_params.final_speed_meters_per_second,
-        100.0f);
+    EXPECT_EQ(nanopb_primitive.primitive.move.destination.x_meters, 1.0f);
+    EXPECT_EQ(nanopb_primitive.primitive.move.destination.y_meters, 2.0f);
+    EXPECT_EQ(nanopb_primitive.primitive.move.final_speed_m_per_s, 100.0f);
     EXPECT_EQ(nanopb_primitive.primitive.move.final_angle.radians,
               static_cast<float>(M_PI));
     EXPECT_EQ(nanopb_primitive.primitive.move.dribbler_speed_rpm, 16000);
+    EXPECT_EQ(nanopb_primitive.primitive.move.auto_chip_or_kick.auto_chip_or_kick
+                  .autochip_distance_meters,
+              2.5);
+    EXPECT_EQ(nanopb_primitive.primitive.move.max_speed_m_per_s,
+              ROBOT_MAX_SPEED_METERS_PER_SECOND);
 }
 
 TEST(PrimitiveGoogleToNanoPbConverterTest, convert_primitive_set)
 {
-    *createMovePrimitive(Point(1, 2), 100, Angle::half(), DribblerMode::MAX_FORCE);
-    *createMovePrimitive(Point(2, 4), 50, Angle::half(), DribblerMode::MAX_FORCE);
-    TbotsProto::Primitive google_primitive_1 =
-        *createMovePrimitive(Point(1, 2), 100, Angle::half(), DribblerMode::MAX_FORCE);
-    TbotsProto::Primitive google_primitive_2 =
-        *createMovePrimitive(Point(2, 4), 50, Angle::half(), DribblerMode::MAX_FORCE);
+    TbotsProto::Primitive google_primitive_1 = *createMovePrimitive(
+        Point(1, 2), 100, Angle::half(), DribblerMode::MAX_FORCE,
+        {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
+    TbotsProto::Primitive google_primitive_2 = *createMovePrimitive(
+        Point(2, 4), 50, Angle::half(), DribblerMode::MAX_FORCE,
+        {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
 
     auto google_primitive_set  = std::make_unique<TbotsProto::PrimitiveSet>();
     auto& robot_primitives_map = *google_primitive_set->mutable_robot_primitives();
@@ -58,15 +62,9 @@ TEST(PrimitiveGoogleToNanoPbConverterTest, convert_primitive_set)
         {
             EXPECT_EQ(nanopb_primitive_set.robot_primitives[i].key, 0);
             ASSERT_EQ(nanopb_primitive.which_primitive, TbotsProto_Primitive_move_tag);
-            EXPECT_EQ(
-                nanopb_primitive.primitive.move.position_params.destination.x_meters,
-                1.0f);
-            EXPECT_EQ(
-                nanopb_primitive.primitive.move.position_params.destination.y_meters,
-                2.0f);
-            EXPECT_EQ(nanopb_primitive.primitive.move.position_params
-                          .final_speed_meters_per_second,
-                      100.0f);
+            EXPECT_EQ(nanopb_primitive.primitive.move.destination.x_meters, 1.0f);
+            EXPECT_EQ(nanopb_primitive.primitive.move.destination.y_meters, 2.0f);
+            EXPECT_EQ(nanopb_primitive.primitive.move.final_speed_m_per_s, 100.0f);
             EXPECT_EQ(nanopb_primitive.primitive.move.final_angle.radians,
                       static_cast<float>(M_PI));
             EXPECT_EQ(nanopb_primitive.primitive.move.dribbler_speed_rpm, 16000);
@@ -76,15 +74,9 @@ TEST(PrimitiveGoogleToNanoPbConverterTest, convert_primitive_set)
             // Only other possible key is 2
             ASSERT_EQ(nanopb_primitive_set.robot_primitives[i].key, 2);
             ASSERT_EQ(nanopb_primitive.which_primitive, TbotsProto_Primitive_move_tag);
-            EXPECT_EQ(
-                nanopb_primitive.primitive.move.position_params.destination.x_meters,
-                2.0f);
-            EXPECT_EQ(
-                nanopb_primitive.primitive.move.position_params.destination.y_meters,
-                4.0f);
-            EXPECT_EQ(nanopb_primitive.primitive.move.position_params
-                          .final_speed_meters_per_second,
-                      50.0f);
+            EXPECT_EQ(nanopb_primitive.primitive.move.destination.x_meters, 2.0f);
+            EXPECT_EQ(nanopb_primitive.primitive.move.destination.y_meters, 4.0f);
+            EXPECT_EQ(nanopb_primitive.primitive.move.final_speed_m_per_s, 50.0f);
             EXPECT_EQ(nanopb_primitive.primitive.move.final_angle.radians,
                       static_cast<float>(M_PI));
             EXPECT_EQ(nanopb_primitive.primitive.move.dribbler_speed_rpm, 16000);

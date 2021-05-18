@@ -1,12 +1,12 @@
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 
 RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
-    std::shared_ptr<const RobotNavigationObstacleFactoryConfig> config)
+    std::shared_ptr<const RobotNavigationObstacleConfig> config)
     : config(config),
-      robot_radius_expansion_amount(config->RobotObstacleInflationFactor()->value() *
+      robot_radius_expansion_amount(config->getRobotObstacleInflationFactor()->value() *
                                     ROBOT_MAX_RADIUS_METERS)
 {
-    config->RobotObstacleInflationFactor()->registerCallbackFunction(
+    config->getRobotObstacleInflationFactor()->registerCallbackFunction(
         [&](double new_value) {
             robot_radius_expansion_amount = new_value * ROBOT_MAX_RADIUS_METERS;
         });
@@ -89,7 +89,7 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromRobot(const Robot &robot) 
     // vector in the direction of the velocity and proportional to the magnitude of the
     // velocity
     Vector expanded_velocity_vector = robot.velocity().normalize(
-        robot.velocity().length() * config->SpeedScalingFactor()->value() +
+        robot.velocity().length() * config->getSpeedScalingFactor()->value() +
         robot_radius_expansion_amount);
 
     /* If the robot is travelling slower than a threshold, then a stationary robot

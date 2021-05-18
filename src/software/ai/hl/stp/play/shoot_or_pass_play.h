@@ -1,11 +1,11 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
-#include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
-#include "software/ai/hl/stp/tactic/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
+#include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.h"
 
 /**
@@ -14,7 +14,7 @@
 class ShootOrPassPlay : public Play
 {
    public:
-    ShootOrPassPlay();
+    ShootOrPassPlay(std::shared_ptr<const PlayConfig> config);
 
     bool isApplicable(const World &world) const override;
 
@@ -31,19 +31,10 @@ class ShootOrPassPlay : public Play
     static constexpr double SPEED_AT_PATROL_POINTS = 0.0;
 
     /**
-     * Updates the pass generator
-     *
-     * @param pass_generator
-     * @param world The current state of the world
-     */
-    void updatePassGenerator(PassGenerator &pass_generator, const World &world);
-
-    /**
      * Sets up the pass for the corner kick: aligns the passer and positions the cherry
      * pickers
      *
      * @param yield The coroutine to yield
-     * @param goalie_tactic The goalie tactic to use
      * @param crease_defender_tactics The crease defender tactics
      * @param shoot_tactic The shoot tactic
      * @param world The current state of the world
@@ -51,7 +42,7 @@ class ShootOrPassPlay : public Play
      * @return the best pass found
      */
     PassWithRating attemptToShootWhileLookingForAPass(
-        TacticCoroutine::push_type &yield, std::shared_ptr<GoalieTactic> goalie_tactic,
+        TacticCoroutine::push_type &yield,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
         std::shared_ptr<ShootGoalTactic> shoot_tactic, const World &world);
 };

@@ -1,22 +1,19 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "shared/proto/robot_log_msg.pb.h"
 #include "shared/proto/robot_status_msg.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/backend/backend.h"
 #include "software/backend/ssl_proto_client.h"
-#include "software/networking/threaded_proto_multicast_listener.h"
-#include "software/networking/threaded_proto_multicast_sender.h"
-#include "software/parameter/dynamic_parameters.h"
+#include "software/networking/threaded_proto_udp_listener.h"
+#include "software/networking/threaded_proto_udp_sender.h"
 #include "software/proto/defending_side_msg.pb.h"
 
 class WifiBackend : public Backend
 {
    public:
-    WifiBackend(std::shared_ptr<const NetworkConfig> network_config =
-                    DynamicParameters->getNetworkConfig(),
-                std::shared_ptr<const SensorFusionConfig> sensor_fusion_config =
-                    DynamicParameters->getSensorFusionConfig());
+    WifiBackend(std::shared_ptr<const BackendConfig> config);
 
 
    private:
@@ -52,12 +49,9 @@ class WifiBackend : public Backend
     SSLProtoClient ssl_proto_client;
 
     // ProtoMulticast** to communicate with robots
-    std::unique_ptr<ThreadedProtoMulticastSender<TbotsProto::Vision>> vision_output;
-    std::unique_ptr<ThreadedProtoMulticastSender<TbotsProto::PrimitiveSet>>
-        primitive_output;
-    std::unique_ptr<ThreadedProtoMulticastListener<TbotsProto::RobotStatus>>
-        robot_status_input;
-    std::unique_ptr<ThreadedProtoMulticastListener<TbotsProto::RobotLog>> robot_log_input;
-    std::unique_ptr<ThreadedProtoMulticastSender<DefendingSideProto>>
-        defending_side_output;
+    std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::Vision>> vision_output;
+    std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::PrimitiveSet>> primitive_output;
+    std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::RobotStatus>> robot_status_input;
+    std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::RobotLog>> robot_log_input;
+    std::unique_ptr<ThreadedProtoUdpSender<DefendingSideProto>> defending_side_output;
 };

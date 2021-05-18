@@ -6,32 +6,38 @@
     save a LOT of time by using this tool: 
     https://github.com/ekalinin/github-markdown-toc
 -->
-* [Table Of Contents](#table-of-contents)
-* [Introduction](#introduction)
-* [Installation and Setup](#installation-and-setup)
-* [Operating Systems](#operating-systems)
-* [Getting the Code](#getting-the-code)
-* [Running the setup scripts](#running-the-setup-scripts)
-   * [Installing Software Dependencies](#installing-software-dependencies)
-   * [Installing Firmware Dependencies](#installing-firmware-dependencies)
-   * [Setting Up USB Permissions](#setting-up-usb-permissions)
-   * [Installing an IDE](#installing-an-ide)
-      * [CLion](#clion)
-         * [Getting your Student License](#getting-your-student-license)
-         * [Installing CLion](#installing-clion)
-      * [VSCode](#vscode)
-* [Building and Running the Code](#building-and-running-the-code)
-   * [Building from the command-line](#building-from-the-command-line)
-   * [Building with CLion](#building-with-clion)
-   * [Running our AI, Simulator, or Robot Diagnostics](#running-our-ai-simulator-or-robot-diagnostics)
-   * [Running AI vs AI](#running-ai-vs-ai)
-* [Debugging](#debugging)
-   * [Debugging with CLion](#debugging-with-clion)
-   * [Debugging from the Command line](#debugging-from-the-command-line)
-* [Profiling](#profiling)
-* [Flashing and Debugging A STM32F4 MCU](#flashing-and-debugging-a-stm32f4-mcu)
-* [Flashing and Debugging A STM32H7 MCU](#flashing-and-debugging-a-stm32h7-mcu)
-* [Flashing the Radio Dongle](#flashing-the-radio-dongle)
+- [Software Setup](#software-setup)
+  - [Table Of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Installation and Setup](#installation-and-setup)
+  - [Operating Systems](#operating-systems)
+  - [Getting the Code](#getting-the-code)
+  - [Running the setup scripts](#running-the-setup-scripts)
+    - [Installing Software Dependencies](#installing-software-dependencies)
+    - [Installing Firmware Dependencies](#installing-firmware-dependencies)
+    - [Setting Up USB Permissions](#setting-up-usb-permissions)
+    - [Installing an IDE](#installing-an-ide)
+      - [CLion](#clion)
+        - [Getting your Student License](#getting-your-student-license)
+        - [Installing CLion](#installing-clion)
+      - [VSCode](#vscode)
+  - [Building and Running the Code](#building-and-running-the-code)
+    - [Building from the command-line](#building-from-the-command-line)
+    - [Building with CLion](#building-with-clion)
+    - [With VSCode](#with-vscode)
+    - [Running our AI, Simulator, SimulatedTests or Robot Diagnostics](#running-our-ai-simulator-simulatedtests-or-robot-diagnostics)
+    - [Running AI vs AI](#running-ai-vs-ai)
+  - [Debugging](#debugging)
+    - [Debugging with CLion](#debugging-with-clion)
+    - [Debugging from the Command line](#debugging-from-the-command-line)
+  - [Profiling](#profiling)
+  - [Flashing And Debugging A STM32F4 MCU](#flashing-and-debugging-a-stm32f4-mcu)
+  - [Flashing the Radio Dongle](#flashing-the-radio-dongle)
+  - [Flashing And Debugging A STM32H7 MCU](#flashing-and-debugging-a-stm32h7-mcu)
+  - [Working with CubeMX to regenerate code](#working-with-cubemx-to-regenerate-code)
+  - [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
+    - [Setting up the SSL Simulation Environment](#setting-up-the-ssl-simulation-environment)
+    - [Pushing a Dockerfile to dockerhub](#pushing-a-dockerfile-to-dockerhub)
 
 ## Introduction
 These instructions assume that you have the following accounts setup:
@@ -177,19 +183,24 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 3. Run our AI: `bazel run //software:full_system -- --interface=[interface_here] --backend=WifiBackend`
     - This will launch the Visualizer, which displays what the AI is currently "seeing" and allows us to interact with the AI through the dynamic parameters.
     - The field should be empty, as we are currently not receiving SSL Vision packets.
-4. Run our Simulator: `bazel run //software/simulation:standalone_simulator_main -- --interface=[interface_here]`
+4. Run our Simulator: `bazel run //software:standalone_simulator_main -- --interface=[interface_here]`
     - The Simulator runs our firmware and Box2D (a physics engine) to simulate how our robots would behave on the field.
     - The Simulator outputs SSL Vision packets, which contain position information of all robots and the ball.
     - Our AI can now "see" the robots, and they should be displayed on the Visualizer.
     - You can use ctrl-click to move the ball around in the Simulator, and try changing the Play Override on the Visualizer to see the robots move!
-5. Run Robot Diagnostics: `bazel run //software/gui/robot_diagnostics:robot_diagnostics_main -- --interface=[interface_here] --backend=WifiBackend`
+5. Run Robot Diagnostics: `bazel run //software:robot_diagnostics:robot_diagnostics_main -- --interface=[interface_here] --backend=WifiBackend`
     - The Mechanical and Electrical sub-teams use Robot Diagnostics to test specific parts of the Robot.
-6. Run our SimulatedTests in the visualizer: `bazel test //software/simulated_tests:[some_target_here] --test_arg="--enable_visualizer"` or `bazel run //software/simulated_tests:[some_target_here] -- --enable_visualizer`
+6. Run our SimulatedPlayTests in the visualizer: `bazel test //software/ai/hl/stp/play:[some_target_here] --test_arg="--enable_visualizer"` or `bazel run //software/ai/hl/stp/play:[some_target_here] -- --enable_visualizer`
     - This will launch the visualizer and simulate AI Plays, allowing us to visually see the robots acting according to their roles.
+7. Run our SimulatedTacticTests in the visualizer: `bazel test //software/ai/hl/stp/tactic:[some_target_here] --test_arg="--enable_visualizer"` or `bazel run //software/ai/hl/stp/tactic:[some_target_here] -- --enable_visualizer`
+    - This will launch the visualizer and simulate AI Tactic on a single robot
+
+** NOTE: If you want to run SimulatedTests with the AI initially stopped, then use the `--stop_ai_on_start` flag ** 
 
 ### Running AI vs AI
 1. Open your terminal, `cd` into `Software/src`
 2. Run `./software/run_ai_vs_ai.sh interface_name`, using the same interface as from [above](#running-our-ai-simulator-or-robot-diagnostics)
+3. If AI vs AI is not running properly (eg. the visualizer does not respond after starting a play), closed ports are likely the cause. Run `sudo ufw disable` to disable UFW and allow traffic through the visualizer ports.
 
 ## Debugging
 Debugging from the command line is certainly possible, but debugging in a full IDE is *really* nice (plz trust us). 
@@ -198,7 +209,7 @@ Debugging from the command line is certainly possible, but debugging in a full I
 Debugging in CLion is as simple as running the above instructions for building CLion, but clicking the little green bug in the top right corner instead of the little green arrow!
 
 ### Debugging from the Command line
-`bazel run -c dbg --run_under="gdb" //some/target:here` will run the target in `gdb`. Please see (here)[https://www.cs.cmu.edu/~gilpin/tutorial/] for a tutorial on how to use `gdb` if you're not familiar with it.
+`bazel run -c dbg --run_under="gdb" //some/target:here` will run the target in `gdb`. Please see [here](https://www.cs.cmu.edu/~gilpin/tutorial/) for a tutorial on how to use `gdb` if you're not familiar with it.
 
 
 ## Profiling 
@@ -231,12 +242,31 @@ This will output the file at the _absolute_ path given via the `--callgrind-out-
 
 ## Flashing And Debugging A STM32H7 MCU
 1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies), and have a [NUCLEO-H743ZI](https://www.st.com/en/evaluation-tools/nucleo-h743zi.html) plugged into your computer.
-2. From the `src` folder, run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware_new/tools:debug_firmware_on_arm_board`. We specify `--cpu=stm32h7` because we want to compile code for the stm32h7 MCU (rather then a `x86_64` processor like you have in your computer), and `--compilation_mode=dbg` in order to build in the debug symbols required so you can step through the code and see what's going on. You'll be given a list of elf files to choose from.
-3. Assuming you choose 0 from the list in step (2), run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware_new/tools:debug_firmware_on_arm_board 0`. This will load the `.elf` file associated with (0) to the nucleo and put you into a gdb prompt.
+2. From the `src` folder, run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware/tools:stm32h7_firmware`. We specify `--cpu=stm32h7` because we want to compile code for the stm32h7 MCU (rather then a `x86_64` processor like you have in your computer), and `--compilation_mode=dbg` in order to build in the debug symbols required so you can step through the code and see what's going on. You'll be given a list of elf files to choose from.
+3. If you want just flash the firmware, go to step 5. Assuming you choose 0 from the list in step (2), run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware/tools:stm32h7_firmware 0 debug`. This will load the `.elf` file associated with (0) to the nucleo and put you into a gdb prompt.
 4. At this point you should be in a gdb window. Take a look at [this tutorial](https://www.cprogramming.com/gdb.html) for some basics.
+5. To flash the firmware without debugging, run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware/tools:stm32h7_firmware 0 program`
 
 ## Working with CubeMX to regenerate code
 1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies)
-2. To regenerate code from the `.ioc` file, run `bazel run //firmware_new/tools:cubemx_regen path/to/directory/with/.ioc`. The directory that is passed in as an argument must only contain 1 ioc file, which will be used to generate code into the same directory.
+2. To regenerate code from the `.ioc` file, run `bazel run //firmware/tools:cubemx_regen path/to/directory/with/.ioc`. The directory that is passed in as an argument must only contain 1 ioc file, which will be used to generate code into the same directory.
 
 To make sure we are all using the same cube version, run `STM32CubeMX` when editing the `.ioc` file.
+
+## Setting up Virtual Robocup 2021
+
+### Setting up the SSL Simulation Environment
+
+1. Fork the [SSL-Simulation-Setup](https://github.com/RoboCup-SSL/ssl-simulation-setup) repository.  
+2. Clone it.
+3. Follow these [instructions](https://github.com/RoboCup-SSL/ssl-simulation-setup/blob/master/Readme.md) to set up and run the repository.
+
+### Pushing a Dockerfile to dockerhub
+
+After editing the dockerfile, build the image and push it to dockerhub with the following steps
+
+1. To build the image, make sure that you are in the same directory as your image, and then run `docker build -t ubcthunderbots/<image name>[:tag] .` Make sure that your chosen image name matches a repository in dockerhub. Here's an example with the robocup 2021 setup image: `docker build -t ubcthunderbots/tbots-software-env:0.0.1`
+2. Now, push your image to dockerhub. Get the credentials for the thunderbots dockerhub account from a software lead.
+   1. Log into the docker account with `docker login`. You will be prompted for a username and password
+   2. Now, push this image by its name: `docker push ubcthunderbots/<image name>[:tag]`
+

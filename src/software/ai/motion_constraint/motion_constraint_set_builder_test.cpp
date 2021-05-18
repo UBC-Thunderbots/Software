@@ -12,7 +12,7 @@
 namespace
 {
     World world = ::TestUtil::createBlankTestingWorld();
-    Pass pass({1, 1}, {0.5, 0}, 2.29, Timestamp::fromSeconds(5));
+    Pass pass({1, 1}, {0.5, 0}, 2.29);
 
 
     // vector of pairs of Tactic and allowed MotionConstraints
@@ -21,28 +21,23 @@ namespace
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new MoveTactic(false), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new CherryPickTactic(world, Rectangle({0, 0}, {1, 1})),
-                std::set<MotionConstraint>({})),
+                new CreaseDefenderTactic(
+                    std::make_shared<const RobotNavigationObstacleConfig>()),
+                std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new CreaseDefenderTactic(world.field(), world.ball(),
-                                         world.friendlyTeam(), world.enemyTeam(),
-                                         CreaseDefenderTactic::LEFT),
-                std::set<MotionConstraint>({})),
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new GoalieTactic(world.ball(), world.field(), world.friendlyTeam(),
-                                 world.enemyTeam()),
+                new GoalieTactic(std::make_shared<const GoalieTacticConfig>()),
                 std::set<MotionConstraint>({MotionConstraint::FRIENDLY_DEFENSE_AREA,
                                             MotionConstraint::FRIENDLY_DEFENSE_AREA,
                                             MotionConstraint::HALF_METER_AROUND_BALL,
                                             MotionConstraint::FRIENDLY_HALF})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new ChipTactic(world.ball(), true), std::set<MotionConstraint>({})),
+                new ChipTactic(true), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new KickoffChipTactic(world.ball(), true),
+                new KickoffChipTactic(true),
                 std::set<MotionConstraint>({MotionConstraint::CENTER_CIRCLE,
                                             MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new PenaltyKickTactic(world.ball(), world.field(), std::nullopt, true),
+                new PenaltyKickTactic(),
                 std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL,
                                             MotionConstraint::ENEMY_DEFENSE_AREA,
                                             MotionConstraint::ENEMY_HALF})),
@@ -57,10 +52,7 @@ namespace
                                    pass, world.ball(), false),
                 std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new ShadowEnemyTactic(world.field(), world.friendlyTeam(),
-                                      world.enemyTeam(), true, world.ball(), 0.5, false,
-                                      true),
-                std::set<MotionConstraint>({})),
+                new ShadowEnemyTactic(), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new ShadowFreekickerTactic(ShadowFreekickerTactic::LEFT,
                                            world.enemyTeam(), world.ball(), world.field(),
@@ -69,11 +61,11 @@ namespace
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new ShootGoalTactic(world.field(), world.friendlyTeam(),
                                     world.enemyTeam(), world.ball(), Angle::zero(),
-                                    std::nullopt, false),
+                                    std::nullopt, false,
+                                    std::make_shared<const ShootGoalTacticConfig>()),
                 std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new PasserTactic(pass, world.ball(), world.field(), false),
-                std::set<MotionConstraint>({})),
+                new PasserTactic(pass), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new StopTactic(false), std::set<MotionConstraint>({}))};
 
