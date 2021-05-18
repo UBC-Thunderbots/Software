@@ -47,7 +47,7 @@ void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 10;
+  htim1.Init.Prescaler = 6;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim1.Init.Period = 400;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -119,7 +119,7 @@ void MX_TIM3_Init(void)
 
   /* USER CODE END TIM3_Init 1 */
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 10;
+  htim3.Init.Prescaler = 6;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim3.Init.Period = 400;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -212,7 +212,7 @@ void MX_TIM8_Init(void)
 
   /* USER CODE END TIM8_Init 1 */
   htim8.Instance = TIM8;
-  htim8.Init.Prescaler = 10;
+  htim8.Init.Prescaler = 6;
   htim8.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim8.Init.Period = 400;
   htim8.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -313,7 +313,7 @@ void MX_TIM15_Init(void)
 
   /* USER CODE END TIM15_Init 1 */
   htim15.Instance = TIM15;
-  htim15.Init.Prescaler = 10;
+  htim15.Init.Prescaler = 6;
   htim15.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim15.Init.Period = 400;
   htim15.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -506,7 +506,7 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
     */
     GPIO_InitStruct.Pin = MOTOR_B_PWM_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Pull = GPIO_PULLDOWN;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
     HAL_GPIO_Init(MOTOR_B_PWM_GPIO_Port, &GPIO_InitStruct);

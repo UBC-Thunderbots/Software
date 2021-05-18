@@ -461,19 +461,40 @@ void RobotMain(void *argument)
             }
             case TbotsProto_Primitive_direct_control_tag:
             {
-                TLOG_INFO("GETTING DIRECT CONTROL");
+                switch (primitive_msg.primitive.direct_control.which_wheel_control)
+                {
+                    case TbotsProto_DirectControlPrimitive_direct_per_wheel_control_tag:
+                    {
+                        TbotsProto_DirectControlPrimitive_DirectPerWheelControl
+                            control_msg = primitive_msg.primitive.direct_control
+                                              .wheel_control.direct_per_wheel_control;
+                        
+                        io_drivetrain_applyForceBackLeftWheel(
+                            control_msg.back_left_wheel_rpm / 100.0f);
+                        io_drivetrain_applyForceBackRightWheel(
+                            control_msg.back_right_wheel_rpm / 100.0f);
+                        io_drivetrain_applyForceFrontLeftWheel(
+                            control_msg.front_left_wheel_rpm / 100.0f);
+                        io_drivetrain_applyForceFrontRightWheel(
+                            control_msg.front_right_wheel_rpm / 100.0f);
+                        break;
+                    }
+                    case TbotsProto_DirectControlPrimitive_direct_velocity_control_tag:
+                    {
+                        break;
+                    }
+                    default:
+                    {
+                        // Do nothing
+                        TLOG_WARNING("Wheel control command is not a valid type");
+                    }
+                }
                 break;
             }
-            default:
-            {
-                // the estop case is handled here
-                app_primitive_makeRobotSafe(world);
-                return;
-            }
+                osDelay(1);
         }
-        osDelay(100);
-  }
-  /* USER CODE END RobotMain */
+        /* USER CODE END RobotMain */
+    }
 }
 
 /* Private application code --------------------------------------------------*/
@@ -519,58 +540,59 @@ void initIoNetworking(void)
 void initIoDrivetrain(void)
 {
     // MOTOR A
-    /*GpioPin_t *motor_a_reset_pin =*/
-        /*io_gpio_pin_create(MOTOR_A_RESET_GPIO_Port, MOTOR_A_RESET_Pin, ACTIVE_HIGH);*/
-    /*GpioPin_t *motor_a_mode_pin =*/
-        /*io_gpio_pin_create(MOTOR_A_MODE_GPIO_Port, MOTOR_A_MODE_Pin, ACTIVE_HIGH);*/
-    /*GpioPin_t *motor_a_dir_pin =*/
-        /*io_gpio_pin_create(MOTOR_A_DIR_GPIO_Port, MOTOR_A_DIR_Pin, ACTIVE_HIGH);*/
+    GpioPin_t *motor_a_reset_pin =
+        io_gpio_pin_create(MOTOR_A_RESET_GPIO_Port, MOTOR_A_RESET_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_a_mode_pin =
+        io_gpio_pin_create(MOTOR_A_MODE_GPIO_Port, MOTOR_A_MODE_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_a_dir_pin =
+        io_gpio_pin_create(MOTOR_A_DIR_GPIO_Port, MOTOR_A_DIR_Pin, ACTIVE_HIGH);
 
-    /*// MOTOR B*/
-    /*GpioPin_t *motor_b_reset_pin =*/
-        /*io_gpio_pin_create(MOTOR_B_RESET_GPIO_Port, MOTOR_B_RESET_Pin, ACTIVE_HIGH);*/
-    /*GpioPin_t *motor_b_mode_pin =*/
-        /*io_gpio_pin_create(MOTOR_B_MODE_GPIO_Port, MOTOR_B_MODE_Pin, ACTIVE_HIGH);*/
-    /*GpioPin_t *motor_b_dir_pin =*/
-        /*io_gpio_pin_create(MOTOR_B_DIR_GPIO_Port, MOTOR_B_DIR_Pin, ACTIVE_HIGH);*/
+    // MOTOR B
+    GpioPin_t *motor_b_reset_pin =
+        io_gpio_pin_create(MOTOR_B_RESET_GPIO_Port, MOTOR_B_RESET_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_b_mode_pin =
+        io_gpio_pin_create(MOTOR_B_MODE_GPIO_Port, MOTOR_B_MODE_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_b_dir_pin =
+        io_gpio_pin_create(MOTOR_B_DIR_GPIO_Port, MOTOR_B_DIR_Pin, ACTIVE_HIGH);
 
-    /*// MOTOR D*/
-    /*GpioPin_t *motor_d_reset_pin =*/
-        /*io_gpio_pin_create(MOTOR_D_RESET_GPIO_Port, MOTOR_D_RESET_Pin, ACTIVE_HIGH);*/
-    /*GpioPin_t *motor_d_mode_pin =*/
-        /*io_gpio_pin_create(MOTOR_D_MODE_GPIO_Port, MOTOR_D_MODE_Pin, ACTIVE_HIGH);*/
-    /*GpioPin_t *motor_d_dir_pin =*/
-        /*io_gpio_pin_create(MOTOR_D_DIR_GPIO_Port, MOTOR_D_DIR_Pin, ACTIVE_HIGH);*/
+    // MOTOR D
+    GpioPin_t *motor_d_reset_pin =
+        io_gpio_pin_create(MOTOR_D_RESET_GPIO_Port, MOTOR_D_RESET_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_d_mode_pin =
+        io_gpio_pin_create(MOTOR_D_MODE_GPIO_Port, MOTOR_D_MODE_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_d_dir_pin =
+        io_gpio_pin_create(MOTOR_D_DIR_GPIO_Port, MOTOR_D_DIR_Pin, ACTIVE_HIGH);
 
-    /*// MOTOR E*/
-    /*GpioPin_t *motor_e_reset_pin =*/
-        /*io_gpio_pin_create(MOTOR_E_RESET_GPIO_Port, MOTOR_E_RESET_Pin, ACTIVE_HIGH);*/
-    /*GpioPin_t *motor_e_mode_pin =*/
-        /*io_gpio_pin_create(MOTOR_E_MODE_GPIO_Port, MOTOR_E_MODE_Pin, ACTIVE_HIGH);*/
-    /*GpioPin_t *motor_e_dir_pin =*/
-        /*io_gpio_pin_create(MOTOR_E_DIR_GPIO_Port, MOTOR_E_DIR_Pin, ACTIVE_HIGH);*/
+    // MOTOR E
+    GpioPin_t *motor_e_reset_pin =
+        io_gpio_pin_create(MOTOR_E_RESET_GPIO_Port, MOTOR_E_RESET_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_e_mode_pin =
+        io_gpio_pin_create(MOTOR_E_MODE_GPIO_Port, MOTOR_E_MODE_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_e_dir_pin =
+        io_gpio_pin_create(MOTOR_E_DIR_GPIO_Port, MOTOR_E_DIR_Pin, ACTIVE_HIGH);
 
     PwmPin_t *motor_a_pwm_pin = io_pwm_pin_create(&htim15, TIM_CHANNEL_2);
     PwmPin_t *motor_b_pwm_pin = io_pwm_pin_create(&htim3, TIM_CHANNEL_2);
-    PwmPin_t *motor_c_pwm_pin = io_pwm_pin_create(&htim1, TIM_CHANNEL_3);
+    /*PwmPin_t *motor_c_pwm_pin = io_pwm_pin_create(&htim1, TIM_CHANNEL_3);*/
     PwmPin_t *motor_d_pwm_pin = io_pwm_pin_create(&htim8, TIM_CHANNEL_1);
     PwmPin_t *motor_e_pwm_pin = io_pwm_pin_create(&htim1, TIM_CHANNEL_2);
 
+    AllegroA3931MotorDriver_t *motor_a_driver = io_allegro_a3931_motor_driver_create(
+        motor_a_pwm_pin, motor_a_reset_pin, motor_a_mode_pin, motor_a_dir_pin);
+    AllegroA3931MotorDriver_t *motor_b_driver = io_allegro_a3931_motor_driver_create(
+        motor_b_pwm_pin, motor_b_reset_pin, motor_b_mode_pin, motor_b_dir_pin);
+    AllegroA3931MotorDriver_t *motor_d_driver = io_allegro_a3931_motor_driver_create(
+        motor_d_pwm_pin, motor_d_reset_pin, motor_d_mode_pin, motor_d_dir_pin);
+    AllegroA3931MotorDriver_t *motor_e_driver = io_allegro_a3931_motor_driver_create(
+        motor_e_pwm_pin, motor_e_reset_pin, motor_e_mode_pin, motor_e_dir_pin);
 
-    /*AllegroA3931MotorDriver_t *motor_a_driver = io_allegro_a3931_motor_driver_create(*/
-        /*motor_a_pwm_pin, motor_a_reset_pin, motor_a_mode_pin, motor_a_dir_pin);*/
-    /*AllegroA3931MotorDriver_t *motor_b_driver = io_allegro_a3931_motor_driver_create(*/
-        /*motor_b_pwm_pin, motor_b_reset_pin, motor_b_mode_pin, motor_b_dir_pin);*/
-    /*AllegroA3931MotorDriver_t *motor_d_driver = io_allegro_a3931_motor_driver_create(*/
-        /*motor_d_pwm_pin, motor_d_reset_pin, motor_d_mode_pin, motor_d_dir_pin);*/
-    /*AllegroA3931MotorDriver_t *motor_e_driver = io_allegro_a3931_motor_driver_create(*/
-        /*motor_e_pwm_pin, motor_e_reset_pin, motor_e_mode_pin, motor_e_dir_pin);*/
+    DrivetrainUnit_t* drivetrain_unit_motor_a = io_drivetrain_unit_create(motor_a_driver);
+    DrivetrainUnit_t* drivetrain_unit_motor_b = io_drivetrain_unit_create(motor_b_driver);
+    DrivetrainUnit_t* drivetrain_unit_motor_d = io_drivetrain_unit_create(motor_d_driver);
+    DrivetrainUnit_t* drivetrain_unit_motor_e = io_drivetrain_unit_create(motor_e_driver);
 
-    io_pwm_pin_setPwm(motor_a_pwm_pin, 0.5f);
-    io_pwm_pin_setPwm(motor_b_pwm_pin, 0.5f);
-    io_pwm_pin_setPwm(motor_c_pwm_pin, 0.5f);
-    io_pwm_pin_setPwm(motor_d_pwm_pin, 0.5f);
-    io_pwm_pin_setPwm(motor_e_pwm_pin, 0.5f);
+    io_drivetrain_init(drivetrain_unit_motor_b, drivetrain_unit_motor_d,
+                       drivetrain_unit_motor_a, drivetrain_unit_motor_e);
 }
 
 void initIoPowerMonitor(void)
