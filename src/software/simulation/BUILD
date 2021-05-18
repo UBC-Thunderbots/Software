@@ -11,12 +11,20 @@ cc_library(
 )
 
 cc_library(
+    name = "force_wheel_simulator_robot",
+    hdrs = ["force_wheel_simulator_robot.h"],
+    deps = [
+        ":simulator_robot",
+    ],
+)
+
+cc_library(
     name = "physics_simulator_robot",
     srcs = ["physics_simulator_robot.cpp"],
     hdrs = ["physics_simulator_robot.h"],
     deps = [
         ":firmware_object_deleter",
-        ":simulator_robot",
+        ":force_wheel_simulator_robot",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
         "//software/geom/algorithms",
@@ -86,7 +94,6 @@ cc_library(
         "//firmware/app/world:chicker",
         "//firmware/app/world:dribbler",
         "//firmware/app/world:firmware_robot",
-        "//firmware/app/world:force_wheel",
         "//firmware/shared:physics",
         "//shared/proto:tbots_cc_proto",
         "//software/logger",
@@ -94,15 +101,26 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "simulator_robot_singleton_test",
-    srcs = ["simulator_robot_singleton_test.cpp"],
+cc_library(
+    name = "force_wheel_simulator_robot_singleton",
+    srcs = ["force_wheel_simulator_robot_singleton.cpp"],
+    hdrs = ["force_wheel_simulator_robot_singleton.h"],
     deps = [
+        ":force_wheel_simulator_robot",
+        ":simulator_robot_singleton",
+        "//firmware/app/world:force_wheel",
+    ],
+)
+
+cc_test(
+    name = "force_wheel_simulator_robot_singleton_test",
+    srcs = ["force_wheel_simulator_robot_singleton_test.cpp"],
+    deps = [
+        ":force_wheel_simulator_robot_singleton",
         ":physics_simulator_ball",
         ":physics_simulator_robot",
         ":simulator_ball",
         ":simulator_robot",
-        ":simulator_robot_singleton",
         "//firmware/app/logger",
         "//firmware/app/world:firmware_robot",
         "//shared/proto:tbots_cc_proto",
@@ -154,10 +172,10 @@ cc_library(
     hdrs = ["simulator.h"],
     deps = [
         ":firmware_object_deleter",
+        ":force_wheel_simulator_robot_singleton",
         ":physics_simulator_ball",
         ":physics_simulator_robot",
         ":simulator_ball_singleton",
-        ":simulator_robot_singleton",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
         "//shared/parameter:cpp_configs",

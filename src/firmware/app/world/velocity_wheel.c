@@ -1,27 +1,25 @@
 #include "firmware/app/world/velocity_wheel.h"
 
+#include <math.h>
 #include <stdlib.h>
 
 struct VelocityWheel
 {
-    void (*apply_wheel_force)(float force_in_newtons);
-    void (*set_target_velocity)(float velocity);
+    void (*set_target_rpm)(float rpm);
     float (*get_motor_speed_rpm)(void);
     void (*brake)(void);
     void (*coast)(void);
     VelocityWheelConstants_t wheel_constants;
 };
 
-VelocityWheel_t* app_velocity_wheel_create(void (*apply_wheel_force)(float),
-                                           void (*set_target_velocity)(float),
+VelocityWheel_t* app_velocity_wheel_create(void (*set_target_rpm)(float),
                                            float (*get_motor_speed_rpm)(void),
                                            void (*brake)(void), void (*coast)(void),
                                            VelocityWheelConstants_t wheel_constants)
 {
     VelocityWheel_t* new_wheel = malloc(sizeof(VelocityWheel_t));
 
-    new_wheel->apply_wheel_force   = apply_wheel_force;
-    new_wheel->set_target_velocity = set_target_velocity;
+    new_wheel->set_target_rpm      = set_target_rpm;
     new_wheel->get_motor_speed_rpm = get_motor_speed_rpm;
     new_wheel->wheel_constants     = wheel_constants;
     new_wheel->brake               = brake;
@@ -33,11 +31,6 @@ VelocityWheel_t* app_velocity_wheel_create(void (*apply_wheel_force)(float),
 void app_velocity_wheel_destroy(VelocityWheel_t* wheel)
 {
     free(wheel);
-}
-
-void app_velocity_wheel_applyForce(VelocityWheel_t* wheel, float force_in_newtons)
-{
-    wheel->apply_wheel_force(force_in_newtons);
 }
 
 float app_velocity_wheel_getWheelSpeedRPM(VelocityWheel_t* wheel)
@@ -61,9 +54,16 @@ void app_velocity_wheel_brake(const VelocityWheel_t* wheel)
     wheel->brake();
 }
 
-void app_velocity_wheel_setTargetVelocity(VelocityWheel_t* wheel, float velocity)
+void app_velocity_wheel_setTargetVelocity(VelocityWheel_t* wheel, float velocity_m_per_s)
 {
-    wheel->set_target_velocity(velocity);
+    float rpm =
+        velocity_m_per_s * 60 / (2 * (float)M_PI * wheel->wheel_constants.wheel_radius);
+    wheel->set_target_rpm(rpm);
+}
+
+void app_velocity_wheel_setTargetRPM(VelocityWheel_t* wheel, float rpm)
+{
+    wheel->set_target_rpm(rpm);
 }
 
 VelocityWheelConstants_t app_velocity_wheel_getWheelConstants(

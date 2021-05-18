@@ -2,6 +2,7 @@
 
 #include "software/gui/drawing/navigator.h"
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
+#include "software/test_util/test_util.h"
 
 SimulatedPlayTestFixture::SimulatedPlayTestFixture()
     : ai_config(mutable_thunderbots_config->getMutableAiConfig()),
@@ -61,7 +62,12 @@ void SimulatedPlayTestFixture::updatePrimitives(
 {
     auto world_with_updated_game_state = world;
     world_with_updated_game_state.updateGameState(game_state);
+
+    auto start_tick_time = std::chrono::system_clock::now();
+
     auto primitive_set_msg = ai.getPrimitives(world_with_updated_game_state);
+    double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
+    registerTickTime(duration_ms);
     simulator_to_update->setYellowRobotPrimitiveSet(
         createNanoPbPrimitiveSet(*primitive_set_msg));
 }

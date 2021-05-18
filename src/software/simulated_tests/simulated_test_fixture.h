@@ -4,6 +4,7 @@
 
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
+#include "software/proto/logging/proto_logger.h"
 #include "software/sensor_fusion/sensor_fusion.h"
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
 #include "software/simulated_tests/validation/terminating_function_validator.h"
@@ -38,6 +39,17 @@ class SimulatedTestFixture : public ::testing::Test
      * want to show in the FullSystemGUI.
      */
     void enableVisualizer();
+
+    /**
+     * Creates a directory to output logs to in the directory at the
+     * TEST_UNDECLARED_OUTPUTS_DIR Bazel environment variable, and sets up some
+     * ProtoLoggers to log unfiltered and filtered data.
+     *
+     * See
+     * https://docs.bazel.build/versions/master/test-encyclopedia.html#initial-conditions
+     * for an explanation of all the environment variables that Bazel passes to tests
+     */
+    void setupReplayLogging();
 
     /**
      * Starts the simulation using the current state of the simulator, and runs
@@ -79,6 +91,13 @@ class SimulatedTestFixture : public ::testing::Test
         const std::vector<ValidationFunction> &terminating_validation_functions,
         const std::vector<ValidationFunction> &non_terminating_validation_functions,
         const Duration &timeout);
+
+    /**
+     * Registers a new tick time for calculating tick time statistics
+     *
+     * @param tick_time_ms The tick time in milliseconds
+     */
+    void registerTickTime(double tick_time_ms);
 
     // The dynamic params being used in the tests
     std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config;
@@ -165,6 +184,14 @@ class SimulatedTestFixture : public ::testing::Test
     // The SensorFusion being tested and used in simulation
     SensorFusion sensor_fusion;
 
+    // whether we should log the filtered and unfiltered world states as replay logs
+    // this will only be set to true if the environment variable
+    // TEST_UNDECLARED_OUTPUTS_DIR is set, usually by running as a Bazel test
+    bool should_log_replay;
+    // ProtoLoggers for the simulator and SensorFusion, respectively
+    std::shared_ptr<ProtoLogger<SensorProto>> simulator_sensorproto_logger;
+    std::shared_ptr<ProtoLogger<SSLProto::SSL_WrapperPacket>> sensorfusion_wrapper_logger;
+
     std::vector<NonTerminatingFunctionValidator> non_terminating_function_validators;
     std::vector<TerminatingFunctionValidator> terminating_function_validators;
 
@@ -173,6 +200,16 @@ class SimulatedTestFixture : public ::testing::Test
     // If true, introduces artificial delay so that simulation
     // time passes at the same speed a real life time
     bool run_simulation_in_realtime;
+
+    // These variables track tick time statistics
+    // Total duration of all ticks registered
+    double total_tick_duration;
+    // The max tick duration registered
+    double max_tick_duration;
+    // The min tick duration registered
+    double min_tick_duration;
+    // Total number of ticks registered
+    unsigned int tick_count;
 
     // The rate at which camera data will be simulated and given to SensorFusion.
     // Each sequential "camera frame" will be 1 / SIMULATED_CAMERA_FPS time step

@@ -3,16 +3,9 @@
 #include <cinttypes>
 #include <memory>
 
-#include "software/simulation/firmware_object_deleter.h"
+#include "software/simulation/force_wheel_simulator_robot.h"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/physics/physics_robot.h"
-#include "software/simulation/simulator_robot.h"
-
-extern "C"
-{
-#include "firmware/app/primitives/primitive_manager.h"
-#include "shared/proto/primitive.nanopb.h"
-}
 
 /**
  * The PhysicsSimulatorRobot class acts as a wrapper for a PhysicsRobot that deals with
@@ -21,7 +14,7 @@ extern "C"
  * All members of this class are intentionally protected or private to force this class
  * to only be controlled by the SimulatorRobotSingleton.
  */
-class PhysicsSimulatorRobot : public SimulatorRobot
+class PhysicsSimulatorRobot : public ForceWheelSimulatorRobot
 {
    public:
     /**

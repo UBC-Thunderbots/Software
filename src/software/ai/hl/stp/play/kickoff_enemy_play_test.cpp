@@ -35,20 +35,15 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            // TODO: Fix bug with robot three not shadowing the enemy kicker in
-            // kickoff_enemy_play
-            // https://github.com/UBC-Thunderbots/Software/issues/1945
-
             // Three friendly robots in position to shadow enemy robots. Rectangles are
             // chosen to be generally in the way of the the front 3 enemy robots and the
             // friendly goal, based on where the enemy robots are initialized in the test.
-            Rectangle robotOneShadowingRect(Point(0, 2.2), Point(-0.4, 1.8));
-            Rectangle robotFiveShadowingRect(Point(0, -2.2), Point(-0.4, -1.8));
-            // Rectangle robotThreeShadowingRect(Point(-0.49, 0.1), Point(-0.75,
-            // -0.1));
+            Rectangle robotOneShadowingRect(Point(0, 1.5), Point(-0.4, 1.3));
+            Rectangle robotFiveShadowingRect(Point(0, -1.5), Point(-0.4, -1.3));
+            Rectangle robotThreeShadowingRect(Point(-0.49, 0.1), Point(-0.75, -0.1));
             robotInPolygon(1, robotOneShadowingRect, world_ptr, yield);
             robotInPolygon(5, robotFiveShadowingRect, world_ptr, yield);
-            // robotInPolygon(3, robotThreeShadowingRect, world_ptr);
+            robotInPolygon(3, robotThreeShadowingRect, world_ptr, yield);
 
             // Two Friendly robots defending the exterior of defense box
             Rectangle robotsDefendingRect(Point(-3.2, 1.1), Point(-3.5, -1.1));
