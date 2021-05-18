@@ -1,6 +1,7 @@
 #include "firmware/app/control/trajectory_planner_impl.h"
 
 #include <assert.h>
+#include <float.h>
 #include <math.h>
 
 #include "firmware/app/control/trajectory_planner.h"
@@ -22,7 +23,11 @@ void app_trajectory_planner_impl_getMaximumSpeedProfile(
         const float radius_of_curvature =
             shared_polynomial2d_getCurvatureAtPositionOrder3(path, current_t);
 
-        const float max_speed = sqrtf(max_allowable_acceleration * radius_of_curvature);
+        float max_speed = FLT_MAX;
+        if (radius_of_curvature != FLT_MAX)
+        {
+            max_speed = sqrtf(max_allowable_acceleration * radius_of_curvature);
+        }
 
         max_allowable_speed_profile[i] = fminf(max_speed, speed_cap);
     }
