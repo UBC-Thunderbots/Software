@@ -25,8 +25,8 @@ cc_test(
     srcs = ["move_to_goal_line_fsm_test.cpp"],
     deps = [
         ":move_to_goal_line_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 

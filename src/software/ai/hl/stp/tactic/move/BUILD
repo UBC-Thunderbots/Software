@@ -21,8 +21,8 @@ cc_test(
     srcs = ["move_fsm_test.cpp"],
     deps = [
         ":move_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -31,8 +31,8 @@ cc_test(
     srcs = ["move_tactic_test.cpp"],
     deps = [
         ":move_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 

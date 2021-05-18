@@ -25,8 +25,8 @@ cc_test(
     srcs = ["shadow_enemy_fsm_test.cpp"],
     deps = [
         ":shadow_enemy_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 

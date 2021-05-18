@@ -13,8 +13,8 @@ cc_library(
         "//firmware/app/logger",
         "//shared/proto:tbots_cc_proto",
         "//shared/proto:tbots_nanopb_proto",
+        "//shared/test_util:tbots_gtest_main",
         "//software/logger",
-        "@gtest//:gtest_main",
     ],
 )
 

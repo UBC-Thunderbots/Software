@@ -23,8 +23,8 @@ cc_test(
     srcs = ["dribble_fsm_test.cpp"],
     deps = [
         ":dribble_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 

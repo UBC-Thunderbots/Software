@@ -21,8 +21,8 @@ cc_test(
     srcs = ["chip_fsm_test.cpp"],
     deps = [
         ":chip_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -31,8 +31,8 @@ cc_test(
     srcs = ["chip_tactic_test.cpp"],
     deps = [
         ":chip_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -46,6 +46,5 @@ cc_test(
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )

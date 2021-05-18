@@ -24,7 +24,7 @@ cc_test(
     srcs = ["straight_line_path_planner_test.cpp"],
     deps = [
         ":straight_line_path_planner",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -61,10 +61,10 @@ cc_test(
     srcs = ["theta_star_path_planner_test.cpp"],
     deps = [
         ":theta_star_path_planner",
+        "//shared/test_util:tbots_gtest_main",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/test_util",
         "//software/world:field",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -91,10 +91,10 @@ cc_test(
         ":path_planner",
         ":straight_line_path_planner",
         ":theta_star_path_planner",
+        "//shared/test_util:tbots_gtest_main",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/test_util",
         "//software/util/typename",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -105,9 +105,9 @@ cc_test(
         ":path_planner",
         ":straight_line_path_planner",
         ":theta_star_path_planner",
+        "//shared/test_util:tbots_gtest_main",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/test_util",
         "//software/util/typename",
-        "@gtest//:gtest_main",
     ],
 )

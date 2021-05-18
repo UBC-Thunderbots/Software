@@ -53,7 +53,7 @@ cc_test(
     deps = [
         ":wheel_controller",
         "//firmware/shared:circular_buffer",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -65,8 +65,8 @@ cc_test(
     ],
     deps = [
         ":trajectory_planner",
+        "//shared/test_util:tbots_gtest_main",
         "//software/geom:vector",
-        "@gtest//:gtest_main",
     ],
 )
 

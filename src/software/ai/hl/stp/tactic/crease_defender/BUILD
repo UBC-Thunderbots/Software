@@ -25,8 +25,8 @@ cc_test(
     srcs = ["crease_defender_fsm_test.cpp"],
     deps = [
         ":crease_defender_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 

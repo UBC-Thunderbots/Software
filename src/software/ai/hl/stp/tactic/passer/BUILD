@@ -26,8 +26,8 @@ cc_test(
     srcs = ["passer_fsm_test.cpp"],
     deps = [
         ":passer_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
