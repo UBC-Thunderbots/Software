@@ -12,38 +12,83 @@
 
 class AngleSegment {
 public:
-    explicit AngleSegment(Angle angle_top, Angle angle_bottom) : angle_top_(angle_top), angle_bottom_(angle_bottom) {
 
-    }
+    /**
+     * Constructs an AngleSegment represented by a top angle and bottom angle
+     * @param angle_top the most north angle
+     * @param angle_bottom the most south angle
+     */
+    AngleSegment(Angle angle_top, Angle angle_bottom) : angle_top_(angle_top), angle_bottom_(angle_bottom) {}
 
+    /**
+     * Gets the top (most north) angle of the angle segment
+     * @return the top angle of the angle segment
+     */
     Angle getAngleTop() {
         return angle_top_;
     }
 
+    /**
+     * Sets the top (most north) angle of the angle segment
+     * @param angle_top the top angle of the angle segment
+     */
     void setAngleTop(Angle angle_top) {
         this->angle_top_ = angle_top;
     }
 
+    /**
+     * Gets the bottom (most south) angle of the angle segment
+     * @return the bottom angle of the angle segment
+     */
     Angle getAngleBottom() {
         return angle_bottom_;
     }
 
+    /**
+     * Sets the bottom (most south) angle of the angle segment
+     * @param angle_bottom the bottom angle of the angle segment
+     */
     void setAngleBottom(Angle angle_bottom) {
         this->angle_bottom_ = angle_bottom;
     }
 
+    /**
+     * Gets the abs delta between the two angles that describe this angle segment
+     * @return the abs delta between the top and bottom angles
+     */
     double getDelta() {
         return (angle_bottom_ - angle_top_).abs().toDegrees();
     }
 
+    /**
+     * Compares another AngleSegment's top angle
+     * Used to make sorting more performant
+     *
+     * @param other the other AngleSegment
+     * @return true if both AngleSegment's top angles are equal
+     */
     bool operator==(const AngleSegment & other) const {
         return other.angle_top_ == angle_top_;
     }
 
+    /**
+     * Compares another AngleSegment's top angle
+     * Used to make sorting more performant
+     *
+     * @param other the other AngleSegment
+     * @return true if this top angle is less than the other's top angle
+     */
     bool operator<(const AngleSegment & other) const{
         return angle_top_ < other.angle_top_;
     }
 
+    /**
+     * Compares another AngleSegment's top angle
+     * Used to make sorting more performant
+     *
+     * @param other the other AngleSegment
+     * @return true if this top angle is greater than the other's top angle
+     */
     bool operator>(const AngleSegment & other) const{
         return angle_top_ > other.angle_top_;
     }
@@ -53,20 +98,48 @@ private:
     Angle angle_bottom_;
 };
 
+/**
+ *
+ */
 class AngleMap {
 public:
+    /**
+     * Constructs an AngleMap with a specified top angle, bottom angle, and max number of possible occupied AngleSegments within this map
+     * @param top_angle the top angle (most north) of the AngleSegment this map occupies
+     * @param bottom_angle the bottom angle (most south) of the AngleSegment this map occupies
+     * @param max_num_obstacles the max number of possible occupied AngleSegments within this map
+     */
     AngleMap(Angle top_angle, Angle bottom_angle, size_t max_num_obstacles) : AngleMap(AngleSegment(top_angle, bottom_angle), max_num_obstacles) {}
 
+    /**
+     * Constructs an AngleMap with a specified AngleSegment and max number of possible occupied AngleSegments within this map
+     * @param angle_seg the AngleSegment this map occupies
+     * @param max_num_obstacles the max number of possible occupied AngleSegments within this map
+     */
     AngleMap(AngleSegment angle_seg, size_t max_num_obstacles) : angle_seg(angle_seg) {
         this->taken_angle_segments.reserve(max_num_obstacles);
     }
 
+    /**
+     * Gets the AngleSegment that this AngleMap occupies
+     *
+     * @return the AngleSegment that this AngleMap occupies
+     */
     AngleSegment getAngleSegment() const {
         return this->angle_seg;
     }
 
+    /**
+     * Adds an AngleSegment to this map and marks it as occupied
+     * @param angleSegment the AngleSegment to mark as occupied
+     */
     virtual void addNonViableAngleSegment(AngleSegment &angleSegment) = 0;
 
+    /**
+     * Gets the biggest AngleSegment within the map that isn't occupied
+     *
+     * @return the biggest AngleSegment within the map that isn't occupied
+     */
     virtual AngleSegment getBiggestViableAngleSegment() = 0;
 
 protected:
@@ -74,6 +147,9 @@ protected:
     std::vector<AngleSegment> taken_angle_segments;
 };
 
+/**
+ * Represents an AngleMap that is for shooting on the enemy goal. The angles are described as going from pi -> 0 -> -pi
+ */
 class EnemyAngleMap : public AngleMap {
 public:
 
@@ -144,6 +220,9 @@ public:
     }
 };
 
+/**
+ * Represents an AngleMap that is for shooting on the friendly goal. The angles are described as going from 0 -> 2 * pi
+ */
 class FriendlyAngleMap : public AngleMap {
 public:
     FriendlyAngleMap(AngleSegment angle_seg, size_t max_num_obstacles) : AngleMap(angle_seg, max_num_obstacles) {}
@@ -223,6 +302,8 @@ public:
  * @param robot_obstacles The locations of any robots on the field that may obstruct
  * the shot. These are treated as circular obstacles, and are usually used to
  * represent robots on the field.
+ * @param goal The goal to shoot at
+ * @param radius The radius for the robot obstacles
  *
  * @return the best target to shoot at and the largest open angle interval for the
  * shot (this is the total angle between the obstacles on either side of the shot
@@ -251,7 +332,6 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
  * shot (this is the total angle between the obstacles on either side of the shot
  * vector). If no shot can be found, returns std::nullopt
  */
-
 std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_team,
                                        const Team &enemy_team, const Point &shot_origin,
                                        TeamType goal,
