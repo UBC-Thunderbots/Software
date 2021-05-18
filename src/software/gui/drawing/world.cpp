@@ -1,10 +1,10 @@
 #include "software/gui/drawing/world.h"
 
 #include <QtWidgets/QGraphicsSimpleTextItem>
-#include "software/gui/drawing/geom.h"
 
 #include "software/gui/drawing/ball.h"
 #include "software/gui/drawing/field.h"
+#include "software/gui/drawing/geom.h"
 #include "software/gui/drawing/team.h"
 
 void drawWorld(QGraphicsScene* scene, const World& world, TeamColour friendly_team_colour)

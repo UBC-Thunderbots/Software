@@ -10,53 +10,67 @@
 #include "software/world/team.h"
 #include "software/world/world.h"
 
-class AngleSegment {
-public:
-
+class AngleSegment
+{
+   public:
     /**
      * Constructs an AngleSegment represented by a top angle and bottom angle
+     *
      * @param angle_top the most north angle
      * @param angle_bottom the most south angle
      */
-    AngleSegment(Angle angle_top, Angle angle_bottom) : angle_top_(angle_top), angle_bottom_(angle_bottom) {}
+    AngleSegment(Angle angle_top, Angle angle_bottom)
+        : angle_top_(angle_top), angle_bottom_(angle_bottom)
+    {
+    }
 
     /**
      * Gets the top (most north) angle of the angle segment
+     *
      * @return the top angle of the angle segment
      */
-    Angle getAngleTop() {
+    Angle getAngleTop()
+    {
         return angle_top_;
     }
 
     /**
      * Sets the top (most north) angle of the angle segment
+     *
      * @param angle_top the top angle of the angle segment
      */
-    void setAngleTop(Angle angle_top) {
+    void setAngleTop(Angle angle_top)
+    {
         this->angle_top_ = angle_top;
     }
 
     /**
      * Gets the bottom (most south) angle of the angle segment
+     *
      * @return the bottom angle of the angle segment
      */
-    Angle getAngleBottom() {
+    Angle getAngleBottom()
+    {
         return angle_bottom_;
     }
 
     /**
      * Sets the bottom (most south) angle of the angle segment
+     *
      * @param angle_bottom the bottom angle of the angle segment
      */
-    void setAngleBottom(Angle angle_bottom) {
+    void setAngleBottom(Angle angle_bottom)
+    {
         this->angle_bottom_ = angle_bottom;
     }
 
     /**
      * Gets the abs delta between the two angles that describe this angle segment
+     *
      * @return the abs delta between the top and bottom angles
      */
-    double getDelta() {
+    double getDelta()
+    {
         return (angle_bottom_ - angle_top_).abs().toDegrees();
     }
 
@@ -67,7 +81,8 @@ public:
      * @param other the other AngleSegment
      * @return true if both AngleSegment's top angles are equal
      */
-    bool operator==(const AngleSegment & other) const {
+    bool operator==(const AngleSegment &other) const
+    {
         return other.angle_top_ == angle_top_;
     }
 
@@ -78,7 +93,8 @@ public:
      * @param other the other AngleSegment
      * @return true if this top angle is less than the other's top angle
      */
-    bool operator<(const AngleSegment & other) const{
+    bool operator<(const AngleSegment &other) const
+    {
         return angle_top_ < other.angle_top_;
     }
 
@@ -89,11 +105,12 @@ public:
      * @param other the other AngleSegment
      * @return true if this top angle is greater than the other's top angle
      */
-    bool operator>(const AngleSegment & other) const{
+    bool operator>(const AngleSegment &other) const
+    {
         return angle_top_ > other.angle_top_;
     }
 
-private:
+   private:
     Angle angle_top_;
     Angle angle_bottom_;
 };
@@ -101,22 +118,34 @@ private:
 /**
  *
  */
-class AngleMap {
-public:
+class AngleMap
+{
+   public:
     /**
-     * Constructs an AngleMap with a specified top angle, bottom angle, and max number of possible occupied AngleSegments within this map
+     * Constructs an AngleMap with a specified top angle, bottom angle, and max number of
+     * possible occupied AngleSegments within this map
+     *
      * @param top_angle the top angle (most north) of the AngleSegment this map occupies
-     * @param bottom_angle the bottom angle (most south) of the AngleSegment this map occupies
-     * @param max_num_obstacles the max number of possible occupied AngleSegments within this map
+     * @param bottom_angle the bottom angle (most south) of the AngleSegment this map
+     * occupies
+     * @param max_num_obstacles the max number of possible occupied AngleSegments within
+     * this map
      */
-    AngleMap(Angle top_angle, Angle bottom_angle, size_t max_num_obstacles) : AngleMap(AngleSegment(top_angle, bottom_angle), max_num_obstacles) {}
+    AngleMap(Angle top_angle, Angle bottom_angle, size_t max_num_obstacles)
+        : AngleMap(AngleSegment(top_angle, bottom_angle), max_num_obstacles)
+    {
+    }
 
     /**
-     * Constructs an AngleMap with a specified AngleSegment and max number of possible occupied AngleSegments within this map
+     * Constructs an AngleMap with a specified AngleSegment and max number of possible
+     * occupied AngleSegments within this map
+     *
      * @param angle_seg the AngleSegment this map occupies
-     * @param max_num_obstacles the max number of possible occupied AngleSegments within this map
+     * @param max_num_obstacles the max number of possible occupied AngleSegments within
+     * this map
      */
-    AngleMap(AngleSegment angle_seg, size_t max_num_obstacles) : angle_seg(angle_seg) {
+    AngleMap(AngleSegment angle_seg, size_t max_num_obstacles) : angle_seg(angle_seg)
+    {
         this->taken_angle_segments.reserve(max_num_obstacles);
     }
 
@@ -125,12 +154,14 @@ public:
      *
      * @return the AngleSegment that this AngleMap occupies
      */
-    AngleSegment getAngleSegment() const {
+    AngleSegment getAngleSegment() const
+    {
         return this->angle_seg;
     }
 
     /**
      * Adds an AngleSegment to this map and marks it as occupied
+     *
      * @param angleSegment the AngleSegment to mark as occupied
      */
     virtual void addNonViableAngleSegment(AngleSegment &angleSegment) = 0;
@@ -142,28 +173,39 @@ public:
      */
     virtual AngleSegment getBiggestViableAngleSegment() = 0;
 
-protected:
+   protected:
     AngleSegment angle_seg;
     std::vector<AngleSegment> taken_angle_segments;
 };
 
 /**
- * Represents an AngleMap that is for shooting on the enemy goal. The angles are described as going from pi -> 0 -> -pi
+ * Represents an AngleMap that is for shooting on the enemy goal. The angles are described
+ * as going from pi -> 0 -> -pi
  */
-class EnemyAngleMap : public AngleMap {
-public:
+class EnemyAngleMap : public AngleMap
+{
+   public:
+    EnemyAngleMap(AngleSegment angle_seg, size_t max_num_obstacles)
+        : AngleMap(angle_seg, max_num_obstacles)
+    {
+    }
 
-    EnemyAngleMap(AngleSegment angle_seg, size_t max_num_obstacles) : AngleMap(angle_seg, max_num_obstacles) {}
-
-    EnemyAngleMap(Angle top_angle, Angle bottom_angle,
-                           size_t max_num_obstacles) : AngleMap(top_angle, bottom_angle, max_num_obstacles) {}
+    EnemyAngleMap(Angle top_angle, Angle bottom_angle, size_t max_num_obstacles)
+        : AngleMap(top_angle, bottom_angle, max_num_obstacles)
+    {
+    }
 
     void addNonViableAngleSegment(AngleSegment &angle_seg) override
     {
-        for (AngleSegment &taken_angle_seg : taken_angle_segments) {
-            if (!(angle_seg.getAngleBottom() > taken_angle_seg.getAngleTop() || angle_seg.getAngleTop() < taken_angle_seg.getAngleBottom())) {
-                taken_angle_seg.setAngleTop(std::max(taken_angle_seg.getAngleTop(), angle_seg.getAngleTop()));
-                taken_angle_seg.setAngleBottom(std::min(taken_angle_seg.getAngleBottom(), angle_seg.getAngleBottom()));
+        for (AngleSegment &taken_angle_seg : taken_angle_segments)
+        {
+            if (!(angle_seg.getAngleBottom() > taken_angle_seg.getAngleTop() ||
+                  angle_seg.getAngleTop() < taken_angle_seg.getAngleBottom()))
+            {
+                taken_angle_seg.setAngleTop(
+                    std::max(taken_angle_seg.getAngleTop(), angle_seg.getAngleTop()));
+                taken_angle_seg.setAngleBottom(std::min(taken_angle_seg.getAngleBottom(),
+                                                        angle_seg.getAngleBottom()));
                 return;
             }
         }
@@ -171,47 +213,62 @@ public:
         this->taken_angle_segments.emplace_back(angle_seg);
     }
 
-    AngleSegment getBiggestViableAngleSegment() override {
+    AngleSegment getBiggestViableAngleSegment() override
+    {
+        std::sort(this->taken_angle_segments.begin(), this->taken_angle_segments.end(),
+                  [](AngleSegment a, AngleSegment b) -> bool {
+                      Angle a_angle = a.getAngleTop();
+                      Angle b_angle = b.getAngleTop();
 
-        std::sort(this->taken_angle_segments.begin(), this->taken_angle_segments.end(), [](AngleSegment a, AngleSegment b) -> bool {
-            Angle a_angle = a.getAngleTop();
-            Angle b_angle = b.getAngleTop();
+                      if (a_angle < b_angle)
+                      {
+                          return false;
+                      }
+                      else if (a_angle > b_angle)
+                      {
+                          return true;
+                      }
 
-            if (a_angle < b_angle) {
-                return false;
-            }
-            else if (a_angle > b_angle) {
-                return true;
-            }
-
-            return false;
-        });
+                      return false;
+                  });
 
 
-        AngleSegment biggest_viable_angle_seg = AngleSegment(Angle::zero(), Angle::zero());
-        if (this->taken_angle_segments.empty()) {
-            biggest_viable_angle_seg = AngleSegment(this->angle_seg.getAngleTop(), this->angle_seg.getAngleBottom());
+        AngleSegment biggest_viable_angle_seg =
+            AngleSegment(Angle::zero(), Angle::zero());
+        if (this->taken_angle_segments.empty())
+        {
+            biggest_viable_angle_seg = AngleSegment(this->angle_seg.getAngleTop(),
+                                                    this->angle_seg.getAngleBottom());
             return biggest_viable_angle_seg;
         }
 
         AngleSegment first_taken_angle_seg = this->taken_angle_segments.front();
-        if (first_taken_angle_seg.getAngleTop() < this->angle_seg.getAngleTop()) {
-            biggest_viable_angle_seg = AngleSegment(this->angle_seg.getAngleTop(), first_taken_angle_seg.getAngleTop());
+        if (first_taken_angle_seg.getAngleTop() < this->angle_seg.getAngleTop())
+        {
+            biggest_viable_angle_seg = AngleSegment(this->angle_seg.getAngleTop(),
+                                                    first_taken_angle_seg.getAngleTop());
         }
 
         AngleSegment last_taken_angle_seg = this->taken_angle_segments.back();
-        if (last_taken_angle_seg.getAngleBottom() > this->angle_seg.getAngleBottom()) {
-            AngleSegment viable_angle_seg = AngleSegment(last_taken_angle_seg.getAngleBottom(), this->angle_seg.getAngleBottom());
-            if (viable_angle_seg.getDelta() > biggest_viable_angle_seg.getDelta()) {
+        if (last_taken_angle_seg.getAngleBottom() > this->angle_seg.getAngleBottom())
+        {
+            AngleSegment viable_angle_seg = AngleSegment(
+                last_taken_angle_seg.getAngleBottom(), this->angle_seg.getAngleBottom());
+            if (viable_angle_seg.getDelta() > biggest_viable_angle_seg.getDelta())
+            {
                 biggest_viable_angle_seg = viable_angle_seg;
             }
         }
 
-        for (auto i = this->taken_angle_segments.begin(); i < this->taken_angle_segments.end() - 1; i++) {
-            AngleSegment taken_angle_seg = i[0];
+        for (auto i = this->taken_angle_segments.begin();
+             i < this->taken_angle_segments.end() - 1; i++)
+        {
+            AngleSegment taken_angle_seg      = i[0];
             AngleSegment next_taken_angle_seg = i[1];
-            AngleSegment viable_angle_seg = AngleSegment(taken_angle_seg.getAngleBottom(), next_taken_angle_seg.getAngleTop());
-            if (viable_angle_seg.getDelta() > biggest_viable_angle_seg.getDelta()) {
+            AngleSegment viable_angle_seg     = AngleSegment(
+                taken_angle_seg.getAngleBottom(), next_taken_angle_seg.getAngleTop());
+            if (viable_angle_seg.getDelta() > biggest_viable_angle_seg.getDelta())
+            {
                 biggest_viable_angle_seg = viable_angle_seg;
             }
         }
@@ -221,21 +278,33 @@ public:
 };
 
 /**
- * Represents an AngleMap that is for shooting on the friendly goal. The angles are described as going from 0 -> 2 * pi
+ * Represents an AngleMap that is for shooting on the friendly goal. The angles are
+ * described as going from 0 -> 2 * pi
  */
-class FriendlyAngleMap : public AngleMap {
-public:
-    FriendlyAngleMap(AngleSegment angle_seg, size_t max_num_obstacles) : AngleMap(angle_seg, max_num_obstacles) {}
+class FriendlyAngleMap : public AngleMap
+{
+   public:
+    FriendlyAngleMap(AngleSegment angle_seg, size_t max_num_obstacles)
+        : AngleMap(angle_seg, max_num_obstacles)
+    {
+    }
 
-    FriendlyAngleMap(Angle top_angle, Angle bottom_angle,
-            size_t max_num_obstacles) : AngleMap(top_angle, bottom_angle, max_num_obstacles) {}
+    FriendlyAngleMap(Angle top_angle, Angle bottom_angle, size_t max_num_obstacles)
+        : AngleMap(top_angle, bottom_angle, max_num_obstacles)
+    {
+    }
 
     void addNonViableAngleSegment(AngleSegment &angle_seg) override
     {
-        for (AngleSegment &taken_angle_seg : taken_angle_segments) {
-            if (!(angle_seg.getAngleBottom() < taken_angle_seg.getAngleTop() || angle_seg.getAngleTop() > taken_angle_seg.getAngleTop())) {
-                taken_angle_seg.setAngleTop(std::min(taken_angle_seg.getAngleTop(), angle_seg.getAngleTop()));
-                taken_angle_seg.setAngleBottom(std::max(taken_angle_seg.getAngleBottom(), angle_seg.getAngleBottom()));
+        for (AngleSegment &taken_angle_seg : taken_angle_segments)
+        {
+            if (!(angle_seg.getAngleBottom() < taken_angle_seg.getAngleTop() ||
+                  angle_seg.getAngleTop() > taken_angle_seg.getAngleTop()))
+            {
+                taken_angle_seg.setAngleTop(
+                    std::min(taken_angle_seg.getAngleTop(), angle_seg.getAngleTop()));
+                taken_angle_seg.setAngleBottom(std::max(taken_angle_seg.getAngleBottom(),
+                                                        angle_seg.getAngleBottom()));
                 return;
             }
         }
@@ -243,47 +312,62 @@ public:
         this->taken_angle_segments.emplace_back(angle_seg);
     }
 
-    AngleSegment getBiggestViableAngleSegment() override {
+    AngleSegment getBiggestViableAngleSegment() override
+    {
+        std::sort(this->taken_angle_segments.begin(), this->taken_angle_segments.end(),
+                  [](AngleSegment a, AngleSegment b) -> bool {
+                      Angle a_angle = a.getAngleTop();
+                      Angle b_angle = b.getAngleTop();
 
-        std::sort(this->taken_angle_segments.begin(), this->taken_angle_segments.end(), [](AngleSegment a, AngleSegment b) -> bool {
-            Angle a_angle = a.getAngleTop();
-            Angle b_angle = b.getAngleTop();
+                      if (a_angle > b_angle)
+                      {
+                          return false;
+                      }
+                      else if (a_angle < b_angle)
+                      {
+                          return true;
+                      }
 
-            if (a_angle > b_angle) {
-                return false;
-            }
-            else if (a_angle < b_angle) {
-                return true;
-            }
-
-            return false;
-        });
+                      return false;
+                  });
 
 
-        AngleSegment biggest_viable_angle_seg = AngleSegment(Angle::zero(), Angle::zero());
-        if (this->taken_angle_segments.empty()) {
-            biggest_viable_angle_seg = AngleSegment(this->angle_seg.getAngleTop(), this->angle_seg.getAngleBottom());
+        AngleSegment biggest_viable_angle_seg =
+            AngleSegment(Angle::zero(), Angle::zero());
+        if (this->taken_angle_segments.empty())
+        {
+            biggest_viable_angle_seg = AngleSegment(this->angle_seg.getAngleTop(),
+                                                    this->angle_seg.getAngleBottom());
             return biggest_viable_angle_seg;
         }
 
         AngleSegment first_taken_angle_seg = this->taken_angle_segments.front();
-        if (first_taken_angle_seg.getAngleTop() > this->angle_seg.getAngleTop()) {
-            biggest_viable_angle_seg = AngleSegment(this->angle_seg.getAngleTop(), first_taken_angle_seg.getAngleTop());
+        if (first_taken_angle_seg.getAngleTop() > this->angle_seg.getAngleTop())
+        {
+            biggest_viable_angle_seg = AngleSegment(this->angle_seg.getAngleTop(),
+                                                    first_taken_angle_seg.getAngleTop());
         }
 
         AngleSegment last_taken_angle_seg = this->taken_angle_segments.back();
-        if (last_taken_angle_seg.getAngleBottom() < this->angle_seg.getAngleBottom()) {
-            AngleSegment viable_angle_seg = AngleSegment(last_taken_angle_seg.getAngleBottom(), this->angle_seg.getAngleBottom());
-            if (viable_angle_seg.getDelta() > biggest_viable_angle_seg.getDelta()) {
+        if (last_taken_angle_seg.getAngleBottom() < this->angle_seg.getAngleBottom())
+        {
+            AngleSegment viable_angle_seg = AngleSegment(
+                last_taken_angle_seg.getAngleBottom(), this->angle_seg.getAngleBottom());
+            if (viable_angle_seg.getDelta() > biggest_viable_angle_seg.getDelta())
+            {
                 biggest_viable_angle_seg = viable_angle_seg;
             }
         }
 
-        for (auto i = this->taken_angle_segments.begin(); i < this->taken_angle_segments.end() - 1; i++) {
-            AngleSegment taken_angle_seg = i[0];
+        for (auto i = this->taken_angle_segments.begin();
+             i < this->taken_angle_segments.end() - 1; i++)
+        {
+            AngleSegment taken_angle_seg      = i[0];
             AngleSegment next_taken_angle_seg = i[1];
-            AngleSegment viable_angle_seg = AngleSegment(taken_angle_seg.getAngleBottom(), next_taken_angle_seg.getAngleTop());
-            if (viable_angle_seg.getDelta() > biggest_viable_angle_seg.getDelta()) {
+            AngleSegment viable_angle_seg     = AngleSegment(
+                taken_angle_seg.getAngleBottom(), next_taken_angle_seg.getAngleTop());
+            if (viable_angle_seg.getDelta() > biggest_viable_angle_seg.getDelta())
+            {
                 biggest_viable_angle_seg = viable_angle_seg;
             }
         }
@@ -311,7 +395,8 @@ public:
  */
 std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &shot_origin,
                                        const std::vector<Robot> &robot_obstacles,
-                                       TeamType goal, double radius = ROBOT_MAX_RADIUS_METERS);
+                                       TeamType goal,
+                                       double radius = ROBOT_MAX_RADIUS_METERS);
 /**
  * Finds the best shot on the specified goal, and returns the best target to shoot at
  * and the largest open angle interval for the shot (this is the total angle between
