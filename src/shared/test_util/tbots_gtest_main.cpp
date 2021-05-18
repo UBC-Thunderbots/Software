@@ -1,15 +1,17 @@
-#include <gtest/gtest.h>
+#include "shared/test_util/tbots_gtest_main.h"
+
+#include <fenv.h>
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/logger/logger.h"
-#include "software/simulated_tests/simulated_test_fixture.h"
 
-bool SimulatedTestFixture::enable_visualizer = false;
-bool SimulatedTestFixture::stop_ai_on_start  = false;
+bool TbotsGtestMain::enable_visualizer = false;
+bool TbotsGtestMain::stop_ai_on_start  = false;
 
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
+    feenableexcept(FE_INVALID | FE_OVERFLOW);
 
     // load command line arguments
     auto args           = std::make_shared<SimulatedTestMainCommandLineArgs>();
@@ -19,10 +21,10 @@ int main(int argc, char **argv)
 
     if (!help_requested)
     {
-        SimulatedTestFixture::enable_visualizer = args->getEnableVisualizer()->value();
-        if (SimulatedTestFixture::enable_visualizer)
+        TbotsGtestMain::enable_visualizer = args->getEnableVisualizer()->value();
+        if (TbotsGtestMain::enable_visualizer)
         {
-            SimulatedTestFixture::stop_ai_on_start = args->getStopAiOnStart()->value();
+            TbotsGtestMain::stop_ai_on_start = args->getStopAiOnStart()->value();
         }
     }
 

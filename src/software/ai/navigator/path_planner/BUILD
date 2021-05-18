@@ -73,9 +73,9 @@ cc_test(
     srcs = ["simulated_theta_star_test.cpp"],
     deps = [
         ":theta_star_path_planner",
+        "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/simulated_tests:simulated_tactic_test_fixture",
-        "//software/simulated_tests:simulated_test_main",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",

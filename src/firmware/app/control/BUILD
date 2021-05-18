@@ -31,8 +31,8 @@ cc_test(
     ],
     deps = [
         ":trajectory_planner",
+        "//shared/test_util:tbots_gtest_main",
         "//software/geom:vector",
-        "@gtest//:gtest_main",
     ],
 )
 

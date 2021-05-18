@@ -17,3 +17,15 @@ cc_library(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "tbots_gtest_main",
+    testonly = True,
+    srcs = ["tbots_gtest_main.cpp"],
+    hdrs = ["tbots_gtest_main.h"],
+    deps = [
+        "//shared/parameter:cpp_configs",
+        "//software/logger",
+        "@gtest",
+    ],
+)
