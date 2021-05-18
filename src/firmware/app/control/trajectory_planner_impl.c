@@ -193,7 +193,7 @@ app_trajectory_planner_impl_createForwardsContinuousSpeedProfile(
     {
         // 'i' represents the next speed, where [i-1] is the current speed
         const float speed        = speeds[i - 1];
-        const float displacement = segment_lengths[i - 1];
+        const float displacement = fabsf(segment_lengths[i - 1]);
 
         // Vf = sqrtf( Vi^2 + 2*constant_segment_length*max_acceleration)
         float temp_vel =
@@ -224,7 +224,7 @@ app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
     {
         const float current_speed  = speeds[i];
         const float previous_speed = speeds[i - 1];
-        const float segment_length = segment_lengths[i - 1];
+        const float segment_length = fabsf(segment_lengths[i - 1]);
 
         float temp_speed = shared_physics_getFinalSpeed(current_speed, segment_length,
                                                         max_allowable_acceleration);
