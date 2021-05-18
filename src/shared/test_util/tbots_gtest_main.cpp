@@ -5,19 +5,20 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/logger/logger.h"
 
-bool TbotsGtestMain::enable_visualizer = false;
-bool TbotsGtestMain::stop_ai_on_start  = false;
+bool TbotsGtestMain::enable_visualizer  = false;
+bool TbotsGtestMain::stop_ai_on_start   = false;
+std::string TbotsGtestMain::logging_dir = "";
 
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
-    feenableexcept(FE_INVALID | FE_OVERFLOW);
+    // feenableexcept(FE_INVALID | FE_OVERFLOW);
 
     // load command line arguments
     auto args           = std::make_shared<SimulatedTestMainCommandLineArgs>();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
-    LoggerSingleton::initializeLogger(args->getLoggingDir()->value());
+    TbotsGtestMain::logging_dir = args->getLoggingDir()->value();
 
     if (!help_requested)
     {

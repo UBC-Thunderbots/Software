@@ -12,4 +12,7 @@ struct TbotsGtestMain
     // Controls whether the AI will be stopped when the test starts only if
     // enable_visualizer is true and the test uses AI
     static bool stop_ai_on_start;
+
+    // Directory to send g3log logger logs
+    static std::string logging_dir;
 };

@@ -60,6 +60,7 @@ void SimulatedTestFixture::SetUp()
     {
         enableVisualizer();
     }
+    LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
     setupReplayLogging();
 
     // Reset tick duration trackers
