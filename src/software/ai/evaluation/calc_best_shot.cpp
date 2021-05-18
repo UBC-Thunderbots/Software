@@ -1,9 +1,9 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 
 std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &shot_origin,
-                                       const std::vector<Robot> &robot_obstacles, TeamType goal, double radius)
+                                       const std::vector<Robot> &robot_obstacles, TeamType team_type, double radius)
 {
-    if (goal == TeamType::ENEMY) {
+    if (team_type == TeamType::ENEMY) {
         Angle pos_post_angle = (goal_post.getStart() - shot_origin).orientation();
         Angle neg_post_angle = (goal_post.getEnd() - shot_origin).orientation();
 
@@ -27,16 +27,11 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
             Angle top_angle = top_vec.orientation();
             Angle bottom_angle = bottom_vec.orientation();
 
-            if (bottom_angle > angle_map.getAngleTop() || top_angle < angle_map.getAngleBottom()) {
+            if (bottom_angle > angle_map.getAngleSegment().getAngleTop() || top_angle < angle_map.getAngleSegment().getAngleBottom()) {
                 continue;
             }
 
             AngleSegment non_viable_angle_seg = AngleSegment(top_angle, bottom_angle);
-            angle_map.addNonViableAngleSegment(non_viable_angle_seg);
-        }
-
-        for (AngleSegment &obstacle : obstacles) {
-            AngleSegment non_viable_angle_seg = AngleSegment(obstacle.getAngleTop(), obstacle.getAngleBottom());
             angle_map.addNonViableAngleSegment(non_viable_angle_seg);
         }
 
@@ -91,7 +86,7 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
                 bottom_angle += Angle::fromRadians(2 * M_PI);
             }
 
-            if (bottom_angle < angle_map.getAngleTop() || top_angle > angle_map.getAngleBottom()) {
+            if (bottom_angle < angle_map.getAngleSegment().getAngleTop() || top_angle > angle_map.getAngleSegment().getAngleBottom()) {
                 continue;
             }
 
