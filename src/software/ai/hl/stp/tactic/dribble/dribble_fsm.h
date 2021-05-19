@@ -11,8 +11,20 @@
 
 struct DribbleFSM
 {
+   public:
     class GetPossessionState;
     class DribbleState;
+
+    /**
+     * Constructor for DribbleFSM
+     *
+     * @param continuous_dribbling_start_point A pointer to a Point to track the
+     * continuous dribbling start point
+     */
+    explicit DribbleFSM(const std::shared_ptr<Point> &continuous_dribbling_start_point)
+        : continuous_dribbling_start_point(continuous_dribbling_start_point)
+    {
+    }
 
     struct ControlParams
     {
@@ -194,7 +206,6 @@ struct DribbleFSM
 
         const auto get_possession_s = state<GetPossessionState>;
         const auto dribble_s        = state<DribbleState>;
-        static Point continuous_dribbling_start_point;
 
         const auto update_e = event<Update>;
 
@@ -274,7 +285,7 @@ struct DribbleFSM
             AutoChipOrKick auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::OFF, 0};
 
             if (!event.control_params.allow_excessive_dribbling &&
-                !comparePoints(ball_position, continuous_dribbling_start_point,
+                !comparePoints(ball_position, *continuous_dribbling_start_point,
                                MAX_CONTINUOUS_DRIBBLING_DISTANCE))
             {
                 // give the ball a little kick
@@ -288,9 +299,14 @@ struct DribbleFSM
                 MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
         };
 
+        /**
+         * Start dribbling
+         *
+         * @param event DribbleFSM::Update
+         */
         const auto start_dribble = [this, dribble](auto event) {
             // update continuous_dribbling_start_point once we start dribbling
-            continuous_dribbling_start_point = event.common.world.ball().position();
+            *continuous_dribbling_start_point = event.common.world.ball().position();
             dribble(event);
         };
 
@@ -304,4 +320,7 @@ struct DribbleFSM
             X + update_e[!have_possession] / get_possession = get_possession_s,
             X + update_e[!dribbling_done] / dribble = dribble_s, X + update_e / dribble);
     }
+
+   private:
+    std::shared_ptr<Point> continuous_dribbling_start_point;
 };

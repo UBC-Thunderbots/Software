@@ -16,7 +16,7 @@ TEST(AttackerFSMTest, test_transitions)
         .chip_target            = std::nullopt,
         .attacker_tactic_config = std::make_shared<AttackerTacticConfig>()};
 
-    FSM<AttackerFSM> fsm;
+    FSM<AttackerFSM> fsm(DribbleFSM(std::make_shared<Point>()));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
     // robot far from attacker point

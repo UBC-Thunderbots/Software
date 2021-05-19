@@ -14,7 +14,7 @@
 PivotKickTactic::PivotKickTactic()
     : Tactic(false, {RobotCapability::Move, RobotCapability::Kick, RobotCapability::Chip,
                      RobotCapability::Dribble}),
-      fsm(),
+      fsm(DribbleFSM(std::make_shared<Point>())),
       control_params(PivotKickFSM::ControlParams())
 {
 }

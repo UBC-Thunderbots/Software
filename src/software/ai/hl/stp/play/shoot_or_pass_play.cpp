@@ -96,6 +96,13 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
         auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
+        cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
+                                                  pass1.receiverOrientation(), 0.0,
+                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
+                                                  pass2.receiverOrientation(), 0.0,
+                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+
 
         do
         {
@@ -116,13 +123,6 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
             }
             else
             {
-                cherry_pick_tactic_1->updateControlParams(
-                    pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
-                    MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-                cherry_pick_tactic_2->updateControlParams(
-                    pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
-                    MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-
                 yield({{receiver},
                        {cherry_pick_tactic_1, cherry_pick_tactic_2},
                        {std::get<0>(crease_defender_tactics),
@@ -183,10 +183,6 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         std::get<1>(crease_defender_tactics)
             ->updateControlParams(world.ball().position(),
                                   CreaseDefenderAlignment::RIGHT);
-        yield({{attacker_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
-                std::get<0>(crease_defender_tactics),
-                std::get<1>(crease_defender_tactics)}});
-
         pass_eval                  = pass_generator.generatePassEvaluation(world);
         best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
@@ -199,6 +195,10 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
                                                   pass2.receiverOrientation(), 0.0,
                                                   MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+
+        yield({{attacker_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
+                std::get<0>(crease_defender_tactics),
+                std::get<1>(crease_defender_tactics)}});
 
         // We're ready to pass if we have a robot assigned in the PassGenerator as the
         // passer and the PassGenerator has found a pass above our current threshold

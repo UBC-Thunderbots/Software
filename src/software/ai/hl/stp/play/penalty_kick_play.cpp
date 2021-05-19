@@ -2,7 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/penalty_kick_tactic.h"
+#include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 #include "software/ai/hl/stp/tactic/penalty_setup_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
@@ -26,8 +26,7 @@ bool PenaltyKickPlay::invariantHolds(const World &world) const
 void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                      const World &world)
 {
-    auto penalty_shot_tactic = std::make_shared<PenaltyKickTactic>(
-        world.ball(), world.field(), world.enemyTeam().goalie(), true);
+    auto penalty_shot_tactic = std::make_shared<PenaltyKickTactic>();
 
     auto shooter_setup_move = std::make_shared<PenaltySetupTactic>(true);
 

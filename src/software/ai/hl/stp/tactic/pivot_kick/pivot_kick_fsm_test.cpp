@@ -13,7 +13,7 @@ TEST(PivotKickFSMTest, test_transitions)
         .kick_direction    = Angle::threeQuarter(),
         .auto_chip_or_kick = {AutoChipOrKickMode::AUTOKICK, 1.2}};
 
-    FSM<PivotKickFSM> fsm;
+    FSM<PivotKickFSM> fsm(DribbleFSM(std::make_shared<Point>()));
 
     // Start in DribbleFSM
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));

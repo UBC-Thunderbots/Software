@@ -5,16 +5,21 @@
 
 struct StopFSM
 {
+   public:
     class StopState;
 
     struct ControlParams
     {
-        // if the robot should coast or brake
-        bool coast;
     };
 
-
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+
+    /**
+     * Constructor for StopFSM struct
+     *
+     * @param coast whether or not the StopFSM should coast
+     */
+    explicit StopFSM(bool coast) : coast(coast) {}
 
     auto operator()()
     {
@@ -28,9 +33,9 @@ struct StopFSM
          *
          * @param event StopFSM::Update
          */
-        const auto update_stop = [](auto event) {
-            event.common.set_intent(std::make_unique<StopIntent>(
-                event.common.robot.id(), event.control_params.coast));
+        const auto update_stop = [this](auto event) {
+            event.common.set_intent(
+                std::make_unique<StopIntent>(event.common.robot.id(), coast));
         };
 
         /**
@@ -51,4 +56,8 @@ struct StopFSM
             X + update_e[!stop_done] / update_stop       = stop_s,
             X + update_e[stop_done] / update_stop        = X);
     }
+
+   private:
+    // Whether or not the robot should coast to a stop
+    bool coast;
 };
