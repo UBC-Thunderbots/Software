@@ -8,6 +8,7 @@
 
 struct PasserFSM
 {
+   public:
     struct ControlParams
     {
         // The pass to execute

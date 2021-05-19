@@ -6,6 +6,7 @@
 
 struct ChipFSM
 {
+   public:
     class ChipState;
 
     struct ControlParams
