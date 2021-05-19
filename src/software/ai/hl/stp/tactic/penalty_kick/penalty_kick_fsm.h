@@ -221,7 +221,9 @@ struct PenaltyKickFSM
                 DribbleFSM::ControlParams control_params{
                     .dribble_destination       = std::optional<Point>(position),
                     .final_dribble_orientation = std::optional<Angle>(shot_angle),
-                    .allow_excessive_dribbling = false};
+                    // TODO: change .allow_excessive_dribbling back to false once #2087
+                    // goes in
+                    .allow_excessive_dribbling = true};
                 processEvent(DribbleFSM::Update(control_params, event.common));
             };
 
@@ -272,11 +274,11 @@ struct PenaltyKickFSM
             std::optional<Robot> enemy_goalie = event.common.world.enemyTeam().goalie();
             Timestamp force_shoot_timestamp =
                 complete_approach.value() + PENALTY_FORCE_SHOOT_TIMEOUT;
-            bool shouldShoot =
+            bool should_shoot =
                 evaluatePenaltyShot(enemy_goalie, field, robot_shoot_position,
                                     event.common.robot) ||
                 (event.common.world.getMostRecentTimestamp() >= force_shoot_timestamp);
-            return shouldShoot;
+            return should_shoot;
         };
 
         /**
