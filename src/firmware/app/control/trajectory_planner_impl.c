@@ -77,7 +77,7 @@ void app_trajectory_planner_impl_generate2dSegmentNodesAndLengths(
         t_start, t_end, path_2d.y, num_elements, y_values, y_lengths);
 
     // total length is the root sum-squared of the individual values
-    for (unsigned int i = 0; i < num_elements; i++)
+    for (unsigned int i = 0; i < num_elements - 1; i++)
     {
         segment_lengths[i] = sqrtf(powf(x_lengths[i], 2) + powf(y_lengths[i], 2));
     }
@@ -90,7 +90,7 @@ void app_trajectory_planner_impl_generatePositionTrajectoryTimeProfile(
 {
     // Calculate the time required to move between the first and last nodes of a
     // trajectory segment
-    for (unsigned int i = 0; i < num_elements; i++)
+    for (unsigned int i = 0; i < num_elements - 1; i++)
     {
         // Delta-time over the length of the segment
         float delta_time = 0;
