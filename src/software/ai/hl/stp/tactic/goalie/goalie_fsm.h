@@ -52,21 +52,28 @@ struct GoalieFSM
         Angle block_cone_angle = acuteAngle(field.friendlyGoalpostNeg(), ball.position(),
                                             field.friendlyGoalpostPos());
 
-        // how far in should the goalie wedge itself into the block cone, to block
-        // balls
-        auto block_cone_radius = goalie_tactic_config->getBlockConeRadius()->value();
+        std::optional<Point> clamped_goalie_pos = std::nullopt;
 
-        // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
-        // either side
-        Point goalie_pos = calculateBlockCone(
-            field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(), ball.position(),
-            block_cone_radius * block_cone_angle.toRadians());
+        if (distanceSquared(field.friendlyGoalpostNeg(), ball.position()) > 0 &&
+            distanceSquared(field.friendlyGoalpostPos(), ball.position()) > 0 &&
+            block_cone_angle != Angle::zero())
+        {
+            // how far in should the goalie wedge itself into the block cone, to block
+            // balls
+            auto block_cone_radius = goalie_tactic_config->getBlockConeRadius()->value();
 
-        // restrain the goalie in the defense area, if the goalie cannot be
-        // restrained or if there is no proper intersection, then we safely default to
-        // center of the goal
-        auto clamped_goalie_pos =
-            restrainGoalieInRectangle(field, goalie_pos, field.friendlyDefenseArea());
+            // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
+            // either side
+            Point goalie_pos = calculateBlockCone(
+                field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(), ball.position(),
+                block_cone_radius * block_cone_angle.toRadians());
+
+            // restrain the goalie in the defense area, if the goalie cannot be
+            // restrained or if there is no proper intersection, then we safely default to
+            // center of the goal
+            clamped_goalie_pos =
+                restrainGoalieInRectangle(field, goalie_pos, field.friendlyDefenseArea());
+        }
 
         // if the goalie could not be restrained in the defense area,
         // then the ball must be either on a really sharp angle to the net where
@@ -76,20 +83,17 @@ struct GoalieFSM
         {
             if (ball.position().y() > 0)
             {
-                goalie_pos =
-                    field.friendlyGoalpostPos() + Vector(0, -ROBOT_MAX_RADIUS_METERS);
+                return field.friendlyGoalpostPos() + Vector(0, -ROBOT_MAX_RADIUS_METERS);
             }
             else
             {
-                goalie_pos =
-                    field.friendlyGoalpostNeg() + Vector(0, ROBOT_MAX_RADIUS_METERS);
+                return field.friendlyGoalpostNeg() + Vector(0, ROBOT_MAX_RADIUS_METERS);
             }
         }
         else
         {
-            goalie_pos = *clamped_goalie_pos;
+            return *clamped_goalie_pos;
         }
-        return goalie_pos;
     }
 
     /**
