@@ -21,18 +21,19 @@
 #ifndef __mx_lwip_H
 #define __mx_lwip_H
 #ifdef __cplusplus
- extern "C" {
+extern "C"
+{
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "lwip/opt.h"
+#include "ethernetif.h"
+#include "lwip/dhcp.h"
 #include "lwip/mem.h"
 #include "lwip/memp.h"
-#include "netif/etharp.h"
-#include "lwip/dhcp.h"
 #include "lwip/netif.h"
+#include "lwip/opt.h"
 #include "lwip/timeouts.h"
-#include "ethernetif.h"
+#include "netif/etharp.h"
 
 /* Includes for RTOS ---------------------------------------------------------*/
 #if WITH_RTOS
@@ -45,16 +46,16 @@
 // it ourselves here. This can be removed in the future if this flag shows up
 // in lwipopts.h
 #define SYS_LIGHTWEIGHT_PROT 1
-/* USER CODE END 0 */
+    /* USER CODE END 0 */
 
-/* Global Variables ----------------------------------------------------------*/
-extern ETH_HandleTypeDef heth;
+    /* Global Variables ----------------------------------------------------------*/
+    extern ETH_HandleTypeDef heth;
 
-/* LWIP init function */
-void MX_LWIP_Init(void);
+    /* LWIP init function */
+    void MX_LWIP_Init(void);
 
 #if !WITH_RTOS
-/* USER CODE BEGIN 1 */
+    /* USER CODE BEGIN 1 */
     /* Function defined in lwip.c to:
      *   - Read a received packet from the Ethernet buffers
      *   - Send it to the lwIP stack for handling
@@ -71,11 +72,11 @@ void MX_LWIP_Init(void);
 #endif /*__ mx_lwip_H */
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

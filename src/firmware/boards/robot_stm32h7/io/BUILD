@@ -68,12 +68,12 @@ cc_library(
 cc_library(
     name = "proto_multicast_communication",
     srcs = [
-        "proto_multicast_communication_profile.c",
         "proto_multicast.c",
+        "proto_multicast_communication_profile.c",
     ],
     hdrs = [
-        "proto_multicast_communication_profile.h",
         "proto_multicast.h",
+        "proto_multicast_communication_profile.h",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
@@ -165,9 +165,10 @@ cc_library(
     srcs = ["robot_status.c"],
     hdrs = ["robot_status.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
-    deps = [":power_monitor", 
-            ":proto_multicast_communication",
-            ],
+    deps = [
+        ":power_monitor",
+        ":proto_multicast_communication",
+    ],
 )
 
 cc_library(

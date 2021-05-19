@@ -1,10 +1,10 @@
 #include "firmware/boards/robot_stm32h7/io/proto_multicast.h"
 
+#include <assert.h>
 #include <stdlib.h>
 
-#include "firmware/boards/robot_stm32h7/io/proto_multicast_communication_profile.h"
-#include <assert.h>
 #include "firmware/app/logger/logger.h"
+#include "firmware/boards/robot_stm32h7/io/proto_multicast_communication_profile.h"
 #include "firmware/boards/robot_stm32h7/io/ublox_odinw262_communicator.h"
 #include "lwip.h"
 #include "lwip/api.h"
@@ -171,4 +171,3 @@ void io_proto_multicast_startNetworkingTask(void* unused)
     osEventFlagsSet(networking_event, NETIF_CONFIGURED);
     osThreadExit();
 }
-

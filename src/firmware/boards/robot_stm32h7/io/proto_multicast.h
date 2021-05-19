@@ -56,4 +56,3 @@ void io_proto_multicast_listenerTask(void* communication_profile);
  * @param unused
  */
 void io_proto_multicast_startNetworkingTask(void* unused);
-

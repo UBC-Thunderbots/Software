@@ -1,8 +1,9 @@
 #include "firmware/boards/robot_stm32h7/io/pwm_pin.h"
-#include "firmware/app/logger/logger.h"
 
 #include <assert.h>
 #include <stdlib.h>
+
+#include "firmware/app/logger/logger.h"
 
 typedef struct PwmPin
 {
