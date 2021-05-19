@@ -16,7 +16,6 @@ int input_pin = 7;
 
 void setup() {
     Serial.begin(ARDUINO_BAUD_RATE);    // opens serial port, sets data rate
-    //Serial.begin(115200);
     pinMode(input_pin, INPUT_PULLUP);
 }
 

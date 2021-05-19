@@ -50,16 +50,6 @@ class ThreadedEstopReader
      */
     void continousRead();
 
-    /*
-     * each estop message is one byte and is defined as follows
-     * bit 0 (least significant bit): estop state, a value of 1 is play, 0 is stop
-     * bit 1-7: set to 0
-     * any other message received is considered a EstopState::STATUS_ERROR
-     */
-    static constexpr int ESTOP_MESSAGE_SIZE_BYTES = 1;
-    static constexpr unsigned char ESTOP_PLAY     = ESTOP_PLAY_MSG;
-    static constexpr unsigned char ESTOP_STOP     = ESTOP_STOP_MSG;
-
     // In the case where we read an unknown message (not PLAY or STOP) we try again this
     // number of times
     static constexpr unsigned int MAXIMUM_CONSECUTIVE_STATUS_ERROR = 5;

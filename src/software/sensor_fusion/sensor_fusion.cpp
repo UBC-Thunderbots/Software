@@ -189,7 +189,9 @@ void SensorFusion::updateWorld(
         }
         friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
 
-        estop_enabled_in_msg = !estop_enabled_in_msg && robot_status_msg.estopenabled();
+        if(!estop_enabled_in_msg && robot_status_msg.estopenabled()){
+            estop_enabled_in_msg = true;
+        }
     }
     estop_enabled = estop_enabled_in_msg;
 }
