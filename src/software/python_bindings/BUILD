@@ -36,6 +36,7 @@ cc_library(
         "//software/proto:sensor_msg_cc_proto",
         "//software/proto:ssl_cc_proto",
         "//software/sensor_fusion",
+        ":pass_utilities",
     ] + PYBIND_DEPS,
 )
 
@@ -74,5 +75,52 @@ pybind_extension(
     name = "world",
     deps = [
         ":world_lib",
+    ],
+)
+
+cc_library(
+    name = "pass_utilities",
+    srcs = [
+        "pass_utilities.cpp",
+    ],
+    hdrs = [
+        "pass_utilities.h",
+    ],
+    deps = [
+        "//software/ai/passing:pass",
+    ] + PYBIND_DEPS,
+)
+
+cc_library(
+    name = "pass_generator_lib",
+    srcs = ["pass_generator.cpp"],
+    copts = ["-fexceptions"],
+    features = [
+        "-use_header_modules",
+        "-parse_headers",
+    ],
+    deps = [
+        ":python_binding_utilities",
+        ":pass_utilities",
+        "//software/geom:angle",
+        "//software/geom:point",
+        "//software/geom:vector",
+        "//shared/parameter:cpp_configs",
+        "//software/proto:sensor_msg_cc_proto",
+        "//software/proto:ssl_cc_proto",
+        "//software/sensor_fusion",
+        "//software/world",
+        "//software/world:ball",
+        "//software/world:field",
+        "//software/world:robot",
+        "//software/ai/passing:pass_generator",
+        "//software/geom:rectangle",
+    ] + PYBIND_DEPS,
+)
+
+pybind_extension(
+    name = "pass_generator",
+    deps = [
+        ":pass_generator_lib",
     ],
 )

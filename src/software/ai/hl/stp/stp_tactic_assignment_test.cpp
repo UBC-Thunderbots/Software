@@ -645,17 +645,15 @@ TEST_F(STPTacticAssignmentTest, test_multi_tier_assignment_with_tiered_assignmen
     };
 
     Pass passer_pass(Point(2, 3), Point(0.5, 0.3), 2);
-    Pass cherry_pick_1_pass(Point(2, 3), Point(-1.3, 2), 2);
     auto passer   = std::make_shared<PasserTactic>(passer_pass);
     auto receiver = std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(),
                                                      world.enemyTeam(), passer_pass,
                                                      world.ball(), false);
 
-    auto cherry_pick_tactic_1 =
-        std::make_shared<CherryPickTactic>(world, cherry_pick_1_pass);
+    auto move_tactic                  = std::make_shared<MoveTestTactic>();
     ConstPriorityTacticVector request = {
         {passer, receiver},
-        {cherry_pick_tactic_1, std::get<0>(crease_defender_tactics),
+        {move_tactic, std::get<0>(crease_defender_tactics),
          std::get<1>(crease_defender_tactics)}};
     auto asst = stp.assignRobotsToTactics(request, world, true);
     EXPECT_EQ(6, asst.size());
@@ -667,7 +665,7 @@ TEST_F(STPTacticAssignmentTest, test_multi_tier_assignment_with_tiered_assignmen
     }
     EXPECT_EQ(6, assigned_robot_ids.size());
     EXPECT_TRUE(allTacticsAssigned(
-        {passer, receiver, cherry_pick_tactic_1, std::get<0>(crease_defender_tactics),
+        {passer, receiver, move_tactic, std::get<0>(crease_defender_tactics),
          std::get<1>(crease_defender_tactics)},
         asst));
 }

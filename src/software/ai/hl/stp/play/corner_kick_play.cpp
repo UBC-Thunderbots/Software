@@ -103,24 +103,29 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
 
     // These tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(
-        world, pass_eval.getBestPassInZones({zones_to_cherry_pick[0]}).pass);
-    auto cherry_pick_tactic_2 = std::make_shared<CherryPickTactic>(
-        world, pass_eval.getBestPassInZones({zones_to_cherry_pick[1]}).pass);
-    auto cherry_pick_tactic_3 = std::make_shared<CherryPickTactic>(
-        world, pass_eval.getBestPassInZones({zones_to_cherry_pick[2]}).pass);
-    auto cherry_pick_tactic_4 = std::make_shared<CherryPickTactic>(
-        world, pass_eval.getBestPassInZones({zones_to_cherry_pick[3]}).pass);
+    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
+    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
+    auto cherry_pick_tactic_3 = std::make_shared<MoveTactic>(false);
+    auto cherry_pick_tactic_4 = std::make_shared<MoveTactic>(false);
 
     auto update_cherry_pickers = [&](PassEvaluation<EighteenZoneId> pass_eval) {
-        cherry_pick_tactic_1->updateControlParams(
-            pass_eval.getBestPassInZones({zones_to_cherry_pick[0]}).pass);
-        cherry_pick_tactic_2->updateControlParams(
-            pass_eval.getBestPassInZones({zones_to_cherry_pick[1]}).pass);
-        cherry_pick_tactic_3->updateControlParams(
-            pass_eval.getBestPassInZones({zones_to_cherry_pick[2]}).pass);
-        cherry_pick_tactic_4->updateControlParams(
-            pass_eval.getBestPassInZones({zones_to_cherry_pick[3]}).pass);
+        auto pass1 = pass_eval.getBestPassInZones({zones_to_cherry_pick[0]}).pass;
+        auto pass2 = pass_eval.getBestPassInZones({zones_to_cherry_pick[1]}).pass;
+        auto pass3 = pass_eval.getBestPassInZones({zones_to_cherry_pick[2]}).pass;
+        auto pass4 = pass_eval.getBestPassInZones({zones_to_cherry_pick[3]}).pass;
+
+        cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
+                                                  pass1.receiverOrientation(), 0.0,
+                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
+                                                  pass2.receiverOrientation(), 0.0,
+                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_3->updateControlParams(pass3.receiverPoint(),
+                                                  pass3.receiverOrientation(), 0.0,
+                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_4->updateControlParams(pass4.receiverPoint(),
+                                                  pass4.receiverOrientation(), 0.0,
+                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     };
 
     // Wait for a robot to be assigned to align to take the corner

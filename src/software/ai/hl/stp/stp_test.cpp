@@ -26,7 +26,6 @@ class STPTest : public ::testing::Test
           // Give an explicit seed to STP so that our tests are deterministic
           stp(default_play_constructor, ai_control_config, play_config, 123)
     {
-        std::cout << "Constructor called";
     }
 
    protected:

@@ -1,4 +1,4 @@
-#include "software/simulation/simulator_robot_singleton.h"
+#include "software/simulation/force_wheel_simulator_robot_singleton.h"
 
 #include <gtest/gtest.h>
 
@@ -24,7 +24,7 @@ extern "C"
 #include "software/world/world.h"
 
 
-class SimulatorRobotSingletonTest : public testing::Test
+class ForceWheelSimulatorRobotSingletonTest : public testing::Test
 {
    protected:
     void SetUp() override
@@ -57,12 +57,13 @@ class SimulatorRobotSingletonTest : public testing::Test
             physics_world->addBlueRobots({state});
         }
 
-        std::shared_ptr<SimulatorRobot> simulator_robot;
+        std::shared_ptr<ForceWheelSimulatorRobot> simulator_robot;
         auto physics_robot = physics_world->getYellowPhysicsRobots().at(0);
         if (physics_robot.lock())
         {
             simulator_robot = std::make_shared<PhysicsSimulatorRobot>(physics_robot);
-            SimulatorRobotSingleton::setSimulatorRobot(simulator_robot, FieldSide::NEG_X);
+            ForceWheelSimulatorRobotSingleton::setSimulatorRobot(simulator_robot,
+                                                                 FieldSide::NEG_X);
         }
         else
         {
@@ -85,7 +86,7 @@ class SimulatorRobotSingletonTest : public testing::Test
         }
 
         return std::make_tuple(physics_world,
-                               SimulatorRobotSingleton::createFirmwareRobot(),
+                               ForceWheelSimulatorRobotSingleton::createFirmwareRobot(),
                                simulator_ball);
     }
 
@@ -127,7 +128,7 @@ class SimulatorRobotSingletonTest : public testing::Test
         Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0));
 };
 
-TEST_F(SimulatorRobotSingletonTest, test_get_position)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_get_position)
 {
     auto [world, firmware_robot, simulator_ball] =
         createWorld(robot_non_zero_state, ball_zero_state);
@@ -137,7 +138,7 @@ TEST_F(SimulatorRobotSingletonTest, test_get_position)
     UNUSED(simulator_ball);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_get_orientation)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_get_orientation)
 {
     auto [world, firmware_robot, simulator_ball] =
         createWorld(robot_non_zero_state, ball_zero_state);
@@ -146,7 +147,7 @@ TEST_F(SimulatorRobotSingletonTest, test_get_orientation)
     UNUSED(simulator_ball);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_get_linear_velocity)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_get_linear_velocity)
 {
     auto [world, firmware_robot, simulator_ball] =
         createWorld(robot_non_zero_state, ball_zero_state);
@@ -156,7 +157,7 @@ TEST_F(SimulatorRobotSingletonTest, test_get_linear_velocity)
     UNUSED(simulator_ball);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_get_angular_velocity)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_get_angular_velocity)
 {
     auto [world, firmware_robot, simulator_ball] =
         createWorld(robot_non_zero_state, ball_zero_state);
@@ -165,7 +166,7 @@ TEST_F(SimulatorRobotSingletonTest, test_get_angular_velocity)
     UNUSED(simulator_ball);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_get_battery_voltage)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_get_battery_voltage)
 {
     auto [world, firmware_robot, simulator_ball] =
         createWorld(robot_non_zero_state, ball_zero_state);
@@ -174,7 +175,7 @@ TEST_F(SimulatorRobotSingletonTest, test_get_battery_voltage)
     UNUSED(simulator_ball);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_get_dribbler_temperature)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_get_dribbler_temperature)
 {
     auto [world, firmware_robot, simulator_ball] =
         createWorld(robot_non_zero_state, ball_zero_state);
@@ -184,12 +185,14 @@ TEST_F(SimulatorRobotSingletonTest, test_get_dribbler_temperature)
     UNUSED(simulator_ball);
 }
 
-class SimulatorRobotSingletonKickTest : public SimulatorRobotSingletonTest,
-                                        public ::testing::WithParamInterface<Angle>
+class ForceWheelSimulatorRobotSingletonKickTest
+    : public ForceWheelSimulatorRobotSingletonTest,
+      public ::testing::WithParamInterface<Angle>
 {
 };
 
-TEST_P(SimulatorRobotSingletonKickTest, test_kick_stationary_ball_with_stationary_robot)
+TEST_P(ForceWheelSimulatorRobotSingletonKickTest,
+       test_kick_stationary_ball_with_stationary_robot)
 {
     Angle robot_orientation = GetParam();
     Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
@@ -223,19 +226,21 @@ TEST_P(SimulatorRobotSingletonKickTest, test_kick_stationary_ball_with_stationar
               0.005);
 }
 
-INSTANTIATE_TEST_CASE_P(All, SimulatorRobotSingletonKickTest,
+INSTANTIATE_TEST_CASE_P(All, ForceWheelSimulatorRobotSingletonKickTest,
                         ::testing::Values(Angle::fromDegrees(0), Angle::fromDegrees(58),
                                           Angle::fromDegrees(110),
                                           Angle::fromDegrees(200),
                                           Angle::fromDegrees(331)));
 
 
-class SimulatorRobotSingletonChipTest : public SimulatorRobotSingletonTest,
-                                        public ::testing::WithParamInterface<Angle>
+class ForceWheelSimulatorRobotSingletonChipTest
+    : public ForceWheelSimulatorRobotSingletonTest,
+      public ::testing::WithParamInterface<Angle>
 {
 };
 
-TEST_P(SimulatorRobotSingletonChipTest, test_chip_stationary_ball_with_stationary_robot)
+TEST_P(ForceWheelSimulatorRobotSingletonChipTest,
+       test_chip_stationary_ball_with_stationary_robot)
 {
     Angle robot_orientation = GetParam();
     Robot robot(0, Point(0, 0), Vector(0, 0), robot_orientation, AngularVelocity::zero(),
@@ -269,19 +274,20 @@ TEST_P(SimulatorRobotSingletonChipTest, test_chip_stationary_ball_with_stationar
     EXPECT_LT(simulator_ball->velocity().length(), 5);
 }
 
-INSTANTIATE_TEST_CASE_P(All, SimulatorRobotSingletonChipTest,
+INSTANTIATE_TEST_CASE_P(All, ForceWheelSimulatorRobotSingletonChipTest,
                         ::testing::Values(Angle::fromDegrees(0), Angle::fromDegrees(58),
                                           Angle::fromDegrees(110),
                                           Angle::fromDegrees(200),
                                           Angle::fromDegrees(331)));
 
 
-class SimulatorRobotSingletonAutokickTest : public SimulatorRobotSingletonTest,
-                                            public ::testing::WithParamInterface<Angle>
+class ForceWheelSimulatorRobotSingletonAutokickTest
+    : public ForceWheelSimulatorRobotSingletonTest,
+      public ::testing::WithParamInterface<Angle>
 {
 };
 
-TEST_P(SimulatorRobotSingletonAutokickTest,
+TEST_P(ForceWheelSimulatorRobotSingletonAutokickTest,
        test_autokick_ball_moving_towards_stationary_robot)
 {
     Angle robot_orientation = GetParam();
@@ -307,7 +313,7 @@ TEST_P(SimulatorRobotSingletonAutokickTest,
     EXPECT_LT((simulator_ball->velocity() - expected_velocity).length(), 0.001);
 }
 
-TEST_P(SimulatorRobotSingletonAutokickTest,
+TEST_P(ForceWheelSimulatorRobotSingletonAutokickTest,
        test_autokick_ball_moving_towards_moving_robot)
 {
     Angle robot_orientation = GetParam();
@@ -334,13 +340,13 @@ TEST_P(SimulatorRobotSingletonAutokickTest,
     EXPECT_LT((simulator_ball->velocity() - expected_velocity).length(), 0.01);
 }
 
-INSTANTIATE_TEST_CASE_P(All, SimulatorRobotSingletonAutokickTest,
+INSTANTIATE_TEST_CASE_P(All, ForceWheelSimulatorRobotSingletonAutokickTest,
                         ::testing::Values(Angle::fromDegrees(0), Angle::fromDegrees(58),
                                           Angle::fromDegrees(110),
                                           Angle::fromDegrees(200),
                                           Angle::fromDegrees(331)));
 
-TEST_F(SimulatorRobotSingletonTest, autokick_ball_already_in_dribbler)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, autokick_ball_already_in_dribbler)
 {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -373,12 +379,13 @@ TEST_F(SimulatorRobotSingletonTest, autokick_ball_already_in_dribbler)
               0.01);
 }
 
-class SimulatorRobotSingletonAutochipTest : public SimulatorRobotSingletonTest,
-                                            public ::testing::WithParamInterface<Angle>
+class ForceWheelSimulatorRobotSingletonAutochipTest
+    : public ForceWheelSimulatorRobotSingletonTest,
+      public ::testing::WithParamInterface<Angle>
 {
 };
 
-TEST_P(SimulatorRobotSingletonAutochipTest,
+TEST_P(ForceWheelSimulatorRobotSingletonAutochipTest,
        test_autochip_ball_moving_towards_stationary_robot_with_no_obstacle)
 {
     Angle robot_orientation = GetParam();
@@ -405,7 +412,7 @@ TEST_P(SimulatorRobotSingletonAutochipTest,
     EXPECT_NEAR(3.53, simulator_ball->velocity().length(), 0.05);
 }
 
-TEST_P(SimulatorRobotSingletonAutochipTest,
+TEST_P(ForceWheelSimulatorRobotSingletonAutochipTest,
        test_autochip_ball_moving_towards_moving_robot_with_no_obstacle)
 {
     Angle robot_orientation = GetParam();
@@ -433,13 +440,13 @@ TEST_P(SimulatorRobotSingletonAutochipTest,
     EXPECT_NEAR(3.65, simulator_ball->velocity().length(), 0.05);
 }
 
-INSTANTIATE_TEST_CASE_P(All, SimulatorRobotSingletonAutochipTest,
+INSTANTIATE_TEST_CASE_P(All, ForceWheelSimulatorRobotSingletonAutochipTest,
                         ::testing::Values(Angle::fromDegrees(0), Angle::fromDegrees(58),
                                           Angle::fromDegrees(110),
                                           Angle::fromDegrees(200),
                                           Angle::fromDegrees(331)));
 
-TEST_F(SimulatorRobotSingletonTest, autochip_ball_already_in_dribbler)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, autochip_ball_already_in_dribbler)
 {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -471,7 +478,7 @@ TEST_F(SimulatorRobotSingletonTest, autochip_ball_already_in_dribbler)
     EXPECT_NEAR(3.53, simulator_ball->velocity().length(), 0.05);
 }
 
-TEST_F(SimulatorRobotSingletonTest,
+TEST_F(ForceWheelSimulatorRobotSingletonTest,
        test_robot_chips_ball_over_obstacle_and_lands_in_free_space)
 {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
@@ -507,7 +514,7 @@ TEST_F(SimulatorRobotSingletonTest,
     EXPECT_LT(simulator_ball->position().x(), 3.0);
 }
 
-TEST_F(SimulatorRobotSingletonTest,
+TEST_F(ForceWheelSimulatorRobotSingletonTest,
        test_robot_chips_ball_over_obstacle_and_lands_in_another_obstacle)
 {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
@@ -544,7 +551,8 @@ TEST_F(SimulatorRobotSingletonTest,
     EXPECT_LT(simulator_ball->position().x(), 3.0);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_ball_maintains_speed_throughout_chipping)
+TEST_F(ForceWheelSimulatorRobotSingletonTest,
+       test_ball_maintains_speed_throughout_chipping)
 {
     // This is a regression test to help catch future issues with chipping speed.
     // The original bug was that not all collisions were properly disabled while
@@ -592,7 +600,7 @@ TEST_F(SimulatorRobotSingletonTest, test_ball_maintains_speed_throughout_chippin
     }
 }
 
-TEST_F(SimulatorRobotSingletonTest,
+TEST_F(ForceWheelSimulatorRobotSingletonTest,
        test_robot_does_not_kick_or_chip_ball_when_autokick_and_autochip_disabled)
 {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
@@ -614,7 +622,7 @@ TEST_F(SimulatorRobotSingletonTest,
     EXPECT_LT(simulator_ball->velocity().length(), 0.25);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_disable_autokick)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_disable_autokick)
 {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -634,7 +642,7 @@ TEST_F(SimulatorRobotSingletonTest, test_disable_autokick)
     EXPECT_LT(simulator_ball->velocity().length(), 0.25);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_disable_autochip)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_disable_autochip)
 {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -654,7 +662,7 @@ TEST_F(SimulatorRobotSingletonTest, test_disable_autochip)
     EXPECT_LT(simulator_ball->velocity().length(), 0.25);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_enabling_autokick_disables_autochip)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_enabling_autokick_disables_autochip)
 {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -679,7 +687,7 @@ TEST_F(SimulatorRobotSingletonTest, test_enabling_autokick_disables_autochip)
     EXPECT_LT(simulator_ball->position().x(), 1.0);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_enabling_autochip_disables_autokick)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_enabling_autochip_disables_autokick)
 {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -704,7 +712,7 @@ TEST_F(SimulatorRobotSingletonTest, test_enabling_autochip_disables_autokick)
     EXPECT_GT(simulator_ball->position().x(), 1.0);
 }
 
-TEST_F(SimulatorRobotSingletonTest,
+TEST_F(ForceWheelSimulatorRobotSingletonTest,
        test_ball_does_not_bounce_off_front_of_robot_when_dribbler_on)
 {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
@@ -733,7 +741,7 @@ TEST_F(SimulatorRobotSingletonTest,
     EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_backwards)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_dribble_ball_while_moving_backwards)
 {
     Robot robot(0, Point(0, 0), Vector(-0.5, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -761,7 +769,7 @@ TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_backwards)
     EXPECT_LT((simulator_ball->position() - final_dribbling_point).length(), 0.01);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_losing_ball_while_zipping_backwards)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_losing_ball_while_zipping_backwards)
 {
     Robot robot(0, Point(0, 0), Vector(-4, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -784,7 +792,7 @@ TEST_F(SimulatorRobotSingletonTest, test_losing_ball_while_zipping_backwards)
     EXPECT_GT((simulator_ball->position() - final_dribbling_point).length(), 1);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_forwards)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_dribble_ball_while_moving_forwards)
 {
     Robot robot(0, Point(0, 0), Vector(0.5, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -811,7 +819,8 @@ TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_forwards)
     EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.01);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_spinning_in_place)
+TEST_F(ForceWheelSimulatorRobotSingletonTest,
+       test_dribble_ball_while_moving_spinning_in_place)
 {
     Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -869,7 +878,7 @@ TEST_F(SimulatorRobotSingletonTest, test_dribble_ball_while_moving_spinning_in_p
     EXPECT_LT((simulator_ball->position() - dribbling_point).length(), 0.015);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_dribbler_coast)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_dribbler_coast)
 {
     Point robot_position    = Point(0, 0);
     Angle robot_orientation = Angle::zero();
@@ -893,7 +902,7 @@ TEST_F(SimulatorRobotSingletonTest, test_dribbler_coast)
     EXPECT_GT((simulator_ball->position() - dribbling_point).length(), 0.1);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_dribbler_centers_the_ball)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_dribbler_centers_the_ball)
 {
     Point robot_position    = Point(0, 0);
     Angle robot_orientation = Angle::zero();
@@ -921,7 +930,7 @@ TEST_F(SimulatorRobotSingletonTest, test_dribbler_centers_the_ball)
     EXPECT_LT(simulator_ball->velocity().length(), 0.01);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_kick_while_dribbler_on)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_kick_while_dribbler_on)
 {
     Point robot_position    = Point(0, 0);
     Angle robot_orientation = Angle::zero();
@@ -955,7 +964,7 @@ TEST_F(SimulatorRobotSingletonTest, test_kick_while_dribbler_on)
     EXPECT_LT((simulator_ball->velocity() - Vector(5, 0)).length(), 0.1);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_angled_one_time_kick_while_dribbler_on)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_angled_one_time_kick_while_dribbler_on)
 {
     Point robot_position    = Point(0, -DIST_TO_FRONT_OF_ROBOT_METERS);
     Angle robot_orientation = Angle::zero();
@@ -983,7 +992,7 @@ TEST_F(SimulatorRobotSingletonTest, test_angled_one_time_kick_while_dribbler_on)
     EXPECT_NEAR(simulator_ball->velocity().x(), 5.0, 0.2);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_robot_drive_forward)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_robot_drive_forward)
 {
     Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::quarter(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -1016,7 +1025,7 @@ TEST_F(SimulatorRobotSingletonTest, test_robot_drive_forward)
     UNUSED(simulator_ball);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_robot_drive_backwards)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_robot_drive_backwards)
 {
     Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -1049,7 +1058,7 @@ TEST_F(SimulatorRobotSingletonTest, test_robot_drive_backwards)
     UNUSED(simulator_ball);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_robot_spin_clockwise)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_robot_spin_clockwise)
 {
     Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -1084,7 +1093,7 @@ TEST_F(SimulatorRobotSingletonTest, test_robot_spin_clockwise)
     UNUSED(simulator_ball);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_robot_spin_counterclockwise)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_robot_spin_counterclockwise)
 {
     Robot robot(0, Point(0, 0), Vector(0.0, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -1119,7 +1128,7 @@ TEST_F(SimulatorRobotSingletonTest, test_robot_spin_counterclockwise)
     UNUSED(simulator_ball);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_not_moving)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_not_moving)
 {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -1144,7 +1153,8 @@ TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_not_moving)
     UNUSED(simulator_ball);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_moving_forwards)
+TEST_F(ForceWheelSimulatorRobotSingletonTest,
+       test_get_motor_speeds_when_robot_moving_forwards)
 {
     Robot robot(0, Point(0, 0), Vector(1, 0), Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
@@ -1173,7 +1183,7 @@ TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_moving_forw
     UNUSED(simulator_ball);
 }
 
-TEST_F(SimulatorRobotSingletonTest,
+TEST_F(ForceWheelSimulatorRobotSingletonTest,
        test_get_motor_speeds_when_robot_moving_along_wheel_axis)
 {
     // Move along the axis of the front-left wheel. This means the front-left wheel is
@@ -1203,7 +1213,7 @@ TEST_F(SimulatorRobotSingletonTest,
     UNUSED(simulator_ball);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_spinning)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_spinning)
 {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
                 AngularVelocity::threeQuarter(), Timestamp::fromSeconds(0));
@@ -1228,7 +1238,7 @@ TEST_F(SimulatorRobotSingletonTest, test_get_motor_speeds_when_robot_spinning)
     UNUSED(simulator_ball);
 }
 
-TEST_F(SimulatorRobotSingletonTest,
+TEST_F(ForceWheelSimulatorRobotSingletonTest,
        test_brake_motors_when_robot_spinning_with_positive_angular_velocity)
 {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
@@ -1249,7 +1259,7 @@ TEST_F(SimulatorRobotSingletonTest,
     UNUSED(simulator_ball);
 }
 
-TEST_F(SimulatorRobotSingletonTest,
+TEST_F(ForceWheelSimulatorRobotSingletonTest,
        test_brake_motors_when_robot_spinning_with_negative_angular_velocity)
 {
     Robot robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
@@ -1270,7 +1280,8 @@ TEST_F(SimulatorRobotSingletonTest,
     UNUSED(simulator_ball);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_brake_motors_when_robot_moving_linearly)
+TEST_F(ForceWheelSimulatorRobotSingletonTest,
+       test_brake_motors_when_robot_moving_linearly)
 {
     Robot robot(0, Point(0, 0), Vector(2.5, 1.0), Angle::threeQuarter(),
                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -1295,7 +1306,8 @@ TEST_F(SimulatorRobotSingletonTest, test_brake_motors_when_robot_moving_linearly
     UNUSED(simulator_ball);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_brake_motors_when_robot_moving_and_spinning)
+TEST_F(ForceWheelSimulatorRobotSingletonTest,
+       test_brake_motors_when_robot_moving_and_spinning)
 {
     Robot robot(0, Point(0, 0), Vector(2.5, 1.0), Angle::threeQuarter(),
                 AngularVelocity::full(), Timestamp::fromSeconds(0));
@@ -1320,7 +1332,7 @@ TEST_F(SimulatorRobotSingletonTest, test_brake_motors_when_robot_moving_and_spin
     UNUSED(simulator_ball);
 }
 
-TEST_F(SimulatorRobotSingletonTest, test_change_simulator_robot)
+TEST_F(ForceWheelSimulatorRobotSingletonTest, test_change_simulator_robot)
 {
     auto physics_world = std::make_unique<PhysicsWorld>(
         Field::createSSLDivisionBField(), std::make_shared<const SimulatorConfig>());
@@ -1340,8 +1352,9 @@ TEST_F(SimulatorRobotSingletonTest, test_change_simulator_robot)
     auto simulator_robot_7 =
         std::make_shared<PhysicsSimulatorRobot>(friendly_physics_robots.at(0));
 
-    SimulatorRobotSingleton::setSimulatorRobot(simulator_robot_7, FieldSide::NEG_X);
-    auto firmware_robot_7 = SimulatorRobotSingleton::createFirmwareRobot();
+    ForceWheelSimulatorRobotSingleton::setSimulatorRobot(simulator_robot_7,
+                                                         FieldSide::NEG_X);
+    auto firmware_robot_7 = ForceWheelSimulatorRobotSingleton::createFirmwareRobot();
     EXPECT_FLOAT_EQ(1.2f, app_firmware_robot_getPositionX(firmware_robot_7.get()));
     EXPECT_FLOAT_EQ(0.0f, app_firmware_robot_getPositionY(firmware_robot_7.get()));
     EXPECT_FLOAT_EQ(-2.3f, app_firmware_robot_getVelocityX(firmware_robot_7.get()));
@@ -1352,8 +1365,9 @@ TEST_F(SimulatorRobotSingletonTest, test_change_simulator_robot)
     // though we didn't need to create a new FirmwareRobot_t
     auto simulator_robot_2 =
         std::make_shared<PhysicsSimulatorRobot>(friendly_physics_robots.at(1));
-    SimulatorRobotSingleton::setSimulatorRobot(simulator_robot_2, FieldSide::NEG_X);
-    auto firmware_robot_2 = SimulatorRobotSingleton::createFirmwareRobot();
+    ForceWheelSimulatorRobotSingleton::setSimulatorRobot(simulator_robot_2,
+                                                         FieldSide::NEG_X);
+    auto firmware_robot_2 = ForceWheelSimulatorRobotSingleton::createFirmwareRobot();
     EXPECT_FLOAT_EQ(0.0f, app_firmware_robot_getPositionX(firmware_robot_2.get()));
     EXPECT_FLOAT_EQ(-4.03f, app_firmware_robot_getPositionY(firmware_robot_2.get()));
     EXPECT_FLOAT_EQ(0.0f, app_firmware_robot_getVelocityX(firmware_robot_2.get()));
