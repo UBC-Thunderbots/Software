@@ -15,7 +15,7 @@ int main(int argc, char **argv)
     feenableexcept(FE_INVALID | FE_OVERFLOW);
 
     // load command line arguments
-    auto args           = std::make_shared<SimulatedTestMainCommandLineArgs>();
+    auto args           = std::make_shared<TbotsGtestMainCommandLineArgs>();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
     TbotsGtestMain::logging_dir = args->getLoggingDir()->value();

@@ -24,7 +24,11 @@ void app_trajectory_planner_impl_getMaximumSpeedProfile(
             shared_polynomial2d_getCurvatureAtPositionOrder3(path, current_t);
 
         float max_speed = FLT_MAX;
-        if (radius_of_curvature != FLT_MAX)
+        if (max_allowable_acceleration <= 1)
+        {
+            max_speed = sqrtf(max_allowable_acceleration * radius_of_curvature);
+        }
+        else if (radius_of_curvature < FLT_MAX / max_allowable_acceleration)
         {
             max_speed = sqrtf(max_allowable_acceleration * radius_of_curvature);
         }

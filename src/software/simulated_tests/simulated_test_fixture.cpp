@@ -19,10 +19,7 @@ SimulatedTestFixture::SimulatedTestFixture()
 
 void SimulatedTestFixture::SetUp()
 {
-    LoggerSingleton::initializeLogger(
-        thunderbots_config->getStandaloneSimulatorMainCommandLineArgs()
-            ->getLoggingDir()
-            ->value());
+    LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
 
     mutable_thunderbots_config->getMutableAiControlConfig()->getMutableRunAi()->setValue(
         !TbotsGtestMain::stop_ai_on_start);
@@ -60,7 +57,6 @@ void SimulatedTestFixture::SetUp()
     {
         enableVisualizer();
     }
-    LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
     setupReplayLogging();
 
     // Reset tick duration trackers
