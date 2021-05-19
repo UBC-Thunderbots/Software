@@ -9,11 +9,9 @@ GoalieTactic::GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tact
                            MaxAllowedSpeedMode max_allowed_speed_mode)
     : Tactic(true,
              {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Chip}),
-      fsm(),
-      goalie_tactic_config(goalie_tactic_config),
-      control_params{
-          GoalieFSM::ControlParams{.goalie_tactic_config   = goalie_tactic_config,
-                                   .max_allowed_speed_mode = max_allowed_speed_mode}}
+      fsm(DribbleFSM(std::make_shared<Point>()),
+          GoalieFSM(goalie_tactic_config, max_allowed_speed_mode)),
+      goalie_tactic_config(goalie_tactic_config)
 {
 }
 
@@ -54,7 +52,7 @@ bool GoalieTactic::isGoalieTactic() const
 
 void GoalieTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    fsm.process_event(GoalieFSM::Update(control_params, tactic_update));
+    fsm.process_event(GoalieFSM::Update({}, tactic_update));
 }
 
 void GoalieTactic::accept(TacticVisitor &visitor) const

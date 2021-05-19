@@ -4,8 +4,8 @@ cc_library(
     name = "penalty_kick_tactic",
     srcs = ["penalty_kick_tactic.cpp"],
     hdrs = [
+        "penalty_kick_fsm.h",
         "penalty_kick_tactic.h",
-        "penalty_kick_tactic_fsm.h",
     ],
     deps = [
         "//shared:constants",
@@ -24,8 +24,8 @@ cc_library(
 )
 
 cc_test(
-    name = "penalty_kick_tactic_fsm_test",
-    srcs = ["penalty_kick_tactic_fsm_test.cpp"],
+    name = "penalty_kick_fsm_test",
+    srcs = ["penalty_kick_fsm_test.cpp"],
     deps = [
         ":penalty_kick_tactic",
         "//shared/test_util:tbots_gtest_main",

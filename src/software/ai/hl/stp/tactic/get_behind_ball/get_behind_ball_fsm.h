@@ -7,6 +7,7 @@
 
 struct GetBehindBallFSM
 {
+   public:
     class GetBehindBallState;
 
     struct ControlParams

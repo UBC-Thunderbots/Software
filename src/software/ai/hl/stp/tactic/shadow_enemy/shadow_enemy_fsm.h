@@ -10,6 +10,7 @@
 
 struct ShadowEnemyFSM
 {
+   public:
     class BlockPassState;
     class StealAndChipState;
 
