@@ -9,8 +9,23 @@
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/intersection.h"
 
-struct PenaltyKickTacticFSM
+struct PenaltyKickFSM
 {
+    /**
+     * Constructor for DribbleFSM
+     *
+     * @param complete_approach pointer to complete approach timestamp
+     * @param robot_shoot_position position to shoot
+     * @param shot_angle angle to shoot at
+     */
+    explicit PenaltyKickFSM(std::optional<Timestamp> complete_approach,
+                            Point robot_shoot_position, Angle shot_angle)
+        : complete_approach(complete_approach),
+          robot_shoot_position(robot_shoot_position),
+          shot_angle(shot_angle)
+    {
+    }
+
     struct ControlParams
     {
     };
@@ -163,14 +178,10 @@ struct PenaltyKickTacticFSM
 
         const auto update_e = event<Update>;
 
-        static std::optional<Timestamp> complete_approach;
-        static Point robot_shoot_position;
-        static Angle shot_angle;
-
         /**
          * Action that causes the shooter to shoot the ball.
          *
-         * @param event          PenaltyKickTacticFSM::Update event
+         * @param event          PenaltyKickFSM::Update event
          * @param processEvent   processes the KickFSM::Update
          */
         const auto shoot = [this](auto event,
@@ -185,7 +196,7 @@ struct PenaltyKickTacticFSM
         /**
          * Action that updates the shooter's approach to the opposition net.
          *
-         * @param event          PenaltyKickTacticFSM::Update event
+         * @param event          PenaltyKickFSM::Update event
          * @param processEvent   processes the DribbleFSM::Update
          */
         const auto update_approach_keeper =
@@ -210,17 +221,14 @@ struct PenaltyKickTacticFSM
                 DribbleFSM::ControlParams control_params{
                     .dribble_destination       = std::optional<Point>(position),
                     .final_dribble_orientation = std::optional<Angle>(shot_angle),
-
-                    // TODO: change .allow_excessive_dribbling back to false once #2087
-                    // goes in
-                    .allow_excessive_dribbling = true};
+                    .allow_excessive_dribbling = false};
                 processEvent(DribbleFSM::Update(control_params, event.common));
             };
 
         /**
          * Action that orients the shooter to prepare for a shot.
          *
-         * @param event          PenaltyKickTacticFSM::Update
+         * @param event          PenaltyKickFSM::Update
          * @param processEvent   processes the DribbleFSM::Update
          */
         const auto adjust_orientation_for_shot =
@@ -244,7 +252,7 @@ struct PenaltyKickTacticFSM
          *
          * Requires complete approach to already be set.
          *
-         * @param event  PenaltyKickTacticFSM::Update
+         * @param event  PenaltyKickFSM::Update
          */
         const auto take_penalty_shot = [this](auto event) {
             Field field = event.common.world.field();
@@ -277,7 +285,7 @@ struct PenaltyKickTacticFSM
          *
          * Requires complete approach to already be set.
          *
-         * @param event PenaltyKickTacticFSM::Update
+         * @param event PenaltyKickFSM::Update
          */
         const auto time_out_approach = [this](auto event) {
             return event.common.world.getMostRecentTimestamp() > complete_approach;
@@ -310,4 +318,9 @@ struct PenaltyKickTacticFSM
     static const inline Duration PENALTY_FORCE_SHOOT_TIMEOUT = Duration::fromSeconds(4);
     static const inline Duration PENALTY_FINISH_APPROACH_TIMEOUT =
         Duration::fromSeconds(4);
+
+   private:
+    std::optional<Timestamp> complete_approach;
+    Point robot_shoot_position;
+    Angle shot_angle;
 };
