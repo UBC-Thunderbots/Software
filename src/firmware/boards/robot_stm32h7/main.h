@@ -73,8 +73,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define CHARGE_PWR_BRD_Pin GPIO_PIN_2
-#define CHARGE_PWR_BRD_GPIO_Port GPIOE
 #define FAULT_PWR_BRD_Pin GPIO_PIN_3
 #define FAULT_PWR_BRD_GPIO_Port GPIOE
 #define DONE_PWR_BRD_Pin GPIO_PIN_4
@@ -185,16 +183,16 @@ void Error_Handler(void);
 #define RMII_TXD1_GPIO_Port GPIOB
 #define MOTOR_C_DIR_Pin GPIO_PIN_14
 #define MOTOR_C_DIR_GPIO_Port GPIOB
-#define DRIBBLER_PWM_Pin GPIO_PIN_15
-#define DRIBBLER_PWM_GPIO_Port GPIOB
+#define MOTOR_C_MODE_Pin GPIO_PIN_15
+#define MOTOR_C_MODE_GPIO_Port GPIOB
 #define T_VCP_TX_Pin GPIO_PIN_8
 #define T_VCP_TX_GPIO_Port GPIOD
 #define T_VCP_RX_Pin GPIO_PIN_9
 #define T_VCP_RX_GPIO_Port GPIOD
 #define WHEEL_BACK_RIGHT_FF2_Pin GPIO_PIN_10
 #define WHEEL_BACK_RIGHT_FF2_GPIO_Port GPIOD
-#define DRIBBLER_RESET_Pin GPIO_PIN_11
-#define DRIBBLER_RESET_GPIO_Port GPIOD
+#define MOTOR_C_RESET_Pin GPIO_PIN_11
+#define MOTOR_C_RESET_GPIO_Port GPIOD
 #define MOTOR_B_MODE_Pin GPIO_PIN_12
 #define MOTOR_B_MODE_GPIO_Port GPIOD
 #define MOTOR_B_DIR_Pin GPIO_PIN_13
@@ -269,6 +267,8 @@ void Error_Handler(void);
 #define KICK_PWR_BRD_GPIO_Port GPIOB
 #define CHIP_PWR_BRD_Pin GPIO_PIN_9
 #define CHIP_PWR_BRD_GPIO_Port GPIOB
+#define CHARGE_PWR_BRD_Pin GPIO_PIN_1
+#define CHARGE_PWR_BRD_GPIO_Port GPIOE
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

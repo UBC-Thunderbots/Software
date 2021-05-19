@@ -209,7 +209,7 @@ const osThreadAttr_t UbloxOdinTask_attributes = {
   .cb_size = sizeof(UbloxOdinTaskControlBlock),
   .stack_mem = &UbloxOdinTaskBuffer[0],
   .stack_size = sizeof(UbloxOdinTaskBuffer),
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityNormal1,
 };
 /* Definitions for RobotStatusSend */
 osThreadId_t RobotStatusSendHandle;
@@ -437,6 +437,18 @@ void RobotMain(void *argument)
     UNUSED(world);
     UNUSED(primitive_manager);
 
+    GpioPin_t *charge_power_board =
+        io_gpio_pin_create(CHARGE_PWR_BRD_GPIO_Port, CHARGE_PWR_BRD_Pin, ACTIVE_HIGH);
+
+    TLOG_INFO("SETTING ACTIVE");
+    io_gpio_pin_setActive(charge_power_board);
+    osDelay(10000);
+    TLOG_INFO("SETTING INACTIVE");
+    io_gpio_pin_setInactive(charge_power_board);
+    osDelay(10000);
+    TLOG_INFO("SETTING ACTIVE");
+    io_gpio_pin_setActive(charge_power_board);
+
     /* Infinite loop */
     for (;;)
     {
@@ -493,8 +505,8 @@ void RobotMain(void *argument)
             }
                 osDelay(1);
         }
-        /* USER CODE END RobotMain */
     }
+  /* USER CODE END RobotMain */
 }
 
 /* Private application code --------------------------------------------------*/
@@ -528,11 +540,11 @@ void initIoNetworking(void)
     // so we can't enable the communicator. Uncomment this for mainboard rev 2.1
     // which should fix this issue.
     //
-    // GpioPin_t *ublox_reset_pin =
-    //     io_gpio_pin_create(ublox_reset_GPIO_Port, ublox_reset_Pin, ACTIVE_LOW);
-    //
-    // io_ublox_odinw262_communicator_init(&huart8, ublox_reset_pin, 5);
-    //
+    GpioPin_t *ublox_reset_pin =
+        io_gpio_pin_create(ID_SEL_4_GPIO_Port, ID_SEL_4_Pin, ACTIVE_LOW);
+
+    io_ublox_odinw262_communicator_init(&huart4, ublox_reset_pin, 5);
+
     // Initialize network logger
     io_network_logger_init(RobotLogProtoQHandle);
 }
@@ -555,6 +567,14 @@ void initIoDrivetrain(void)
     GpioPin_t *motor_b_dir_pin =
         io_gpio_pin_create(MOTOR_B_DIR_GPIO_Port, MOTOR_B_DIR_Pin, ACTIVE_HIGH);
 
+    // MOTOR C
+    GpioPin_t *motor_c_reset_pin =
+        io_gpio_pin_create(MOTOR_C_RESET_GPIO_Port, MOTOR_C_RESET_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_c_mode_pin =
+        io_gpio_pin_create(MOTOR_C_MODE_GPIO_Port, MOTOR_C_MODE_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_c_dir_pin =
+        io_gpio_pin_create(MOTOR_C_DIR_GPIO_Port, MOTOR_C_DIR_Pin, ACTIVE_HIGH);
+
     // MOTOR D
     GpioPin_t *motor_d_reset_pin =
         io_gpio_pin_create(MOTOR_D_RESET_GPIO_Port, MOTOR_D_RESET_Pin, ACTIVE_HIGH);
@@ -573,7 +593,7 @@ void initIoDrivetrain(void)
 
     PwmPin_t *motor_a_pwm_pin = io_pwm_pin_create(&htim15, TIM_CHANNEL_2);
     PwmPin_t *motor_b_pwm_pin = io_pwm_pin_create(&htim3, TIM_CHANNEL_2);
-    /*PwmPin_t *motor_c_pwm_pin = io_pwm_pin_create(&htim1, TIM_CHANNEL_3);*/
+    PwmPin_t *motor_c_pwm_pin = io_pwm_pin_create(&htim1, TIM_CHANNEL_3);
     PwmPin_t *motor_d_pwm_pin = io_pwm_pin_create(&htim8, TIM_CHANNEL_1);
     PwmPin_t *motor_e_pwm_pin = io_pwm_pin_create(&htim1, TIM_CHANNEL_2);
 
@@ -581,6 +601,8 @@ void initIoDrivetrain(void)
         motor_a_pwm_pin, motor_a_reset_pin, motor_a_mode_pin, motor_a_dir_pin);
     AllegroA3931MotorDriver_t *motor_b_driver = io_allegro_a3931_motor_driver_create(
         motor_b_pwm_pin, motor_b_reset_pin, motor_b_mode_pin, motor_b_dir_pin);
+    AllegroA3931MotorDriver_t *motor_c_driver = io_allegro_a3931_motor_driver_create(
+        motor_c_pwm_pin, motor_c_reset_pin, motor_c_mode_pin, motor_c_dir_pin);
     AllegroA3931MotorDriver_t *motor_d_driver = io_allegro_a3931_motor_driver_create(
         motor_d_pwm_pin, motor_d_reset_pin, motor_d_mode_pin, motor_d_dir_pin);
     AllegroA3931MotorDriver_t *motor_e_driver = io_allegro_a3931_motor_driver_create(
@@ -593,6 +615,9 @@ void initIoDrivetrain(void)
 
     io_drivetrain_init(drivetrain_unit_motor_b, drivetrain_unit_motor_d,
                        drivetrain_unit_motor_a, drivetrain_unit_motor_e);
+
+    io_allegro_a3931_motor_setPwmPercentage(motor_c_driver, 0.0f);
+
 }
 
 void initIoPowerMonitor(void)
@@ -600,6 +625,7 @@ void initIoPowerMonitor(void)
     io_power_monitor_init(I2C1, INA226_ADDRESS,
                           INA226_MODE_CONT_SHUNT_AND_BUS | INA226_VBUS_140uS |
                               INA226_VBUS_140uS | INA226_AVG_1024);
+
 }
 
 /* USER CODE END Application */

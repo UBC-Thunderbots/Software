@@ -16,8 +16,8 @@
 
 // TODO have a way of configuring these values externally
 // https://github.com/UBC-Thunderbots/Software/issues/1876
-#define WIFI_SSID "SHAW-E1C430"
-#define WIFI_PASS "aksr#1605"
+#define WIFI_SSID "tbots"
+#define WIFI_PASS "thunderbots"
 
 #define DMA_BUFFER __attribute__((section(".dma_buffer")))
 #define RX_BUFFER_LENGTH_BYTES 4096
@@ -76,12 +76,19 @@ void io_ublox_odinw262_communicator_task(void* arg)
 {
     assert(g_initialized);
 
-    io_ublox_odinw262_reset();
     io_ublox_odinw262_communicator_waitForBoot();
 
     // TODO check the response of io_ublox_odinw262_communicator_sendATCommand
     // and handle errors: https://github.com/UBC-Thunderbots/Software/issues/1875
-    io_ublox_odinw262_communicator_sendATCommand("AT+UMLA=2,00AAAAAAAA00\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UMLA=2,0080E1000000\r");
     io_ublox_odinw262_communicator_sendATCommand("AT&W\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+CPWROFF\r");
     io_ublox_odinw262_communicator_waitForBoot();
