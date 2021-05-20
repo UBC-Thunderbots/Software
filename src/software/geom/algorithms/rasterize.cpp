@@ -6,6 +6,26 @@
 
 std::vector<Point> rasterize(const Circle &circle, const double resolution_size)
 {
+    std::vector<Point> covered_points;
+
+    Point origin = circle.origin();
+    double radius = circle.radius();
+
+    // Added resolution_size to the max to ensure that when Points are rasterized, all
+    // Coordinates (including pixels that are not fully contained by rectangle) are
+    // taken into account.
+    for (double x_offset = -radius; x_offset < radius + resolution_size; x_offset += resolution_size)
+    {
+        for (double y_offset = -radius; y_offset < radius + resolution_size; y_offset += resolution_size)
+        {
+            if(x_offset * x_offset + y_offset * y_offset < radius * radius)
+            {
+                covered_points.emplace_back(Point(origin.x() + x_offset, origin.y() + y_offset));
+            }
+        }
+    }
+    return covered_points;
+
 //    std::set<Point> points_covered;
 //
 //    int radius              = circle.radius();
@@ -50,19 +70,19 @@ std::vector<Point> rasterize(const Circle &circle, const double resolution_size)
 
 std::vector<Point> rasterize(const Rectangle &rectangle, const double resolution_size)
 {
-    std::vector<Point> points_covered;
+    std::vector<Point> covered_points;
 
     // Added resolution_size to the max to ensure that when Points are rasterized, all
-    // Coordinates covering the entire image (including pixels that are not fully contained
-    // by rectangle.
+    // Coordinates (including pixels that are not fully contained by rectangle) are
+    // taken into account.
     for (double x = rectangle.xMin(); x < rectangle.xMax() + resolution_size; x += resolution_size)
     {
-        for (double y = rectangle.yMin(); x < rectangle.yMax() + resolution_size; x += resolution_size)
+        for (double y = rectangle.yMin(); y < rectangle.yMax() + resolution_size; y += resolution_size)
         {
-            points_covered.emplace_back(Point(x, y));
+            covered_points.emplace_back(Point(x, y));
         }
     }
-    return points_covered;
+    return covered_points;
 }
 
 std::vector<Point> rasterize(const Polygon &polygon, const double resolution_size)
@@ -104,7 +124,7 @@ std::vector<Point> rasterize(const Polygon &polygon, const double resolution_siz
             j = i;
         }
 
-        // TODO double check that the correct array is being sorted.
+        // TODO double check that the array is being sorted in correct order.
         std::sort(node_x.begin(), node_x.end());
 
         // Fill the pixels between node pairs
