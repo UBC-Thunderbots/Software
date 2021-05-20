@@ -3,7 +3,9 @@
 
 #include "software/geom/algorithms/contains.h"
 
-
+// TODO When rasterizing without knowing the relative positions of the pixels, you may be off by 1 pixel in each
+// axis. eg. A 1.5 x 1 rectangle may overlap with 2 or 3 pixels (assuming pixel dimension 1) depending on how it the rectangle
+// is positioned.
 std::vector<Point> rasterize(const Circle &circle, const double resolution_size)
 {
     std::vector<Point> covered_points;
