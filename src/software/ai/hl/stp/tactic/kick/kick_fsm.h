@@ -66,8 +66,7 @@ struct KickFSM
          */
         const auto ball_chicked = [](auto event) {
             return event.common.world.ball().hasBallBeenKicked(
-                event.control_params.kick_direction,
-                event.control_params.kick_speed_meters_per_second - 0.5);
+                event.control_params.kick_direction);
         };
 
         return make_transition_table(
