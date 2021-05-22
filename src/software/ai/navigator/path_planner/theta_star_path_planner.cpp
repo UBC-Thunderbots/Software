@@ -26,7 +26,7 @@ void ThetaStarPathPlanner::findAllBlockedCoords()
     {
         auto blocked_points = obstacle->rasterize(SIZE_OF_GRID_CELL_IN_METERS);
 
-        for (Point blocked_point : blocked_points)
+        for (Point &blocked_point : blocked_points)
         {
             blocked_grid.insert(convertPointToCoord(blocked_point));
         }
@@ -58,6 +58,12 @@ bool ThetaStarPathPlanner::isUnblocked(const Coordinate &coord)
     }
 
     return unblocked_grid_it->second;
+}
+
+bool ThetaStarPathPlanner::isBlocked(const Coordinate &coord)
+{
+    auto blocked_grid_it = blocked_grid.find(coord);
+    return blocked_grid_it != blocked_grid.end();
 }
 
 double ThetaStarPathPlanner::coordDistance(const Coordinate &coord1,
@@ -127,7 +133,7 @@ bool ThetaStarPathPlanner::updateVertex(const Coordinate &current, const Coordin
     {
         // If the successor is already on the closed list or if it is blocked, then ignore
         // it.  Else do the following
-        if (closed_list.find(next) == closed_list.end() && isUnblocked(next))
+        if (closed_list.find(next) == closed_list.end() && !isBlocked(next))
         {
             double updated_best_path_cost;
             Coordinate next_parent;
@@ -482,6 +488,7 @@ bool ThetaStarPathPlanner::isPointNavigableAndFreeOfObstacles(const Point &p)
         return false;
     }
 
+    // TODO is this checking isUnblocked?
     for (auto &obstacle : obstacles)
     {
         if (obstacle->contains(p))
@@ -545,6 +552,7 @@ void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
     // Reset data structures to path plan again
     open_list.clear();
     closed_list.clear();
+    blocked_grid.clear();
     unblocked_grid.clear();
     line_of_sight_cache.clear();
     cell_heuristics = std::vector<std::vector<CellHeuristic>>(

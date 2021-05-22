@@ -271,6 +271,15 @@ class ThetaStarPathPlanner : public PathPlanner
     bool isUnblocked(const Coordinate &coord);
 
     /**
+     * Returns whether or not a cell is blocked
+     *
+     * @param coord Coordinate to consider
+     *
+     * @return true if cell is blocked
+     */
+    bool isBlocked(const Coordinate &coord);
+
+    /**
      * Computes Euclidean distance from coord1 to coord2
      *
      * @param coord1 The first Coordinate
