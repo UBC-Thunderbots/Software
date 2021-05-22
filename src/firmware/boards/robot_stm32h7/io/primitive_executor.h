@@ -26,4 +26,4 @@ void io_primitive_executor_task(void* argument);
  *
  * @param argument Unused
  */
-void io_primitive_executor_task(void* argument);
+void io_primitive_starter_task(void* argument);

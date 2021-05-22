@@ -56,6 +56,7 @@
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
+typedef StaticTask_t osStaticThreadDef_t;
 /* USER CODE BEGIN PTD */
 // Networking
 // the IPv6 multicast address, only ff02 is important, the rest is random
@@ -118,66 +119,123 @@ static TbotsProto_PrimitiveSet primitive_set_msg;
 /* USER CODE END Variables */
 /* Definitions for NetStartTask */
 osThreadId_t NetStartTaskHandle;
+uint32_t NetStartTaskBuffer[1024];
+osStaticThreadDef_t NetStartTaskControlBlock;
 const osThreadAttr_t NetStartTask_attributes = {
     .name       = "NetStartTask",
-    .stack_size = 1024 * 4,
+    .cb_mem     = &NetStartTaskControlBlock,
+    .cb_size    = sizeof(NetStartTaskControlBlock),
+    .stack_mem  = &NetStartTaskBuffer[0],
+    .stack_size = sizeof(NetStartTaskBuffer),
     .priority   = (osPriority_t)osPriorityNormal,
+};
+/* Definitions for RobotStatusTask */
+osThreadId_t RobotStatusTaskHandle;
+uint32_t RobotStatusTaskBuffer[1024];
+osStaticThreadDef_t RobotStatusTaskControlBlock;
+const osThreadAttr_t RobotStatusTask_attributes = {
+    .name       = "RobotStatusTask",
+    .cb_mem     = &RobotStatusTaskControlBlock,
+    .cb_size    = sizeof(RobotStatusTaskControlBlock),
+    .stack_mem  = &RobotStatusTaskBuffer[0],
+    .stack_size = sizeof(RobotStatusTaskBuffer),
+    .priority   = (osPriority_t)osPriorityNormal1,
 };
 /* Definitions for VisionMsgTask */
 osThreadId_t VisionMsgTaskHandle;
+uint32_t VisionMsgTaskBuffer[1024];
+osStaticThreadDef_t VisionMsgTaskControlBlock;
 const osThreadAttr_t VisionMsgTask_attributes = {
     .name       = "VisionMsgTask",
-    .stack_size = 1024 * 4,
+    .cb_mem     = &VisionMsgTaskControlBlock,
+    .cb_size    = sizeof(VisionMsgTaskControlBlock),
+    .stack_mem  = &VisionMsgTaskBuffer[0],
+    .stack_size = sizeof(VisionMsgTaskBuffer),
     .priority   = (osPriority_t)osPriorityNormal,
 };
 /* Definitions for PrimMsgTask */
 osThreadId_t PrimMsgTaskHandle;
+uint32_t PrimMsgTaskBuffer[1024];
+osStaticThreadDef_t PrimMsgTaskControlBlock;
 const osThreadAttr_t PrimMsgTask_attributes = {
     .name       = "PrimMsgTask",
-    .stack_size = 1024 * 4,
+    .cb_mem     = &PrimMsgTaskControlBlock,
+    .cb_size    = sizeof(PrimMsgTaskControlBlock),
+    .stack_mem  = &PrimMsgTaskBuffer[0],
+    .stack_size = sizeof(PrimMsgTaskBuffer),
     .priority   = (osPriority_t)osPriorityNormal,
 };
 /* Definitions for RobotStatus */
 osThreadId_t RobotStatusHandle;
+uint32_t RobotStatusBuffer[1024];
+osStaticThreadDef_t RobotStatusControlBlock;
 const osThreadAttr_t RobotStatus_attributes = {
     .name       = "RobotStatus",
-    .stack_size = 1024 * 4,
+    .cb_mem     = &RobotStatusControlBlock,
+    .cb_size    = sizeof(RobotStatusControlBlock),
+    .stack_mem  = &RobotStatusBuffer[0],
+    .stack_size = sizeof(RobotStatusBuffer),
     .priority   = (osPriority_t)osPriorityNormal,
 };
 /* Definitions for RobotLogMsgSend */
 osThreadId_t RobotLogMsgSendHandle;
+uint32_t RobotLogMsgSendBuffer[1024];
+osStaticThreadDef_t RobotLogMsgSendControlBlock;
 const osThreadAttr_t RobotLogMsgSend_attributes = {
     .name       = "RobotLogMsgSend",
-    .stack_size = 1024 * 4,
+    .cb_mem     = &RobotLogMsgSendControlBlock,
+    .cb_size    = sizeof(RobotLogMsgSendControlBlock),
+    .stack_mem  = &RobotLogMsgSendBuffer[0],
+    .stack_size = sizeof(RobotLogMsgSendBuffer),
     .priority   = (osPriority_t)osPriorityNormal,
 };
 /* Definitions for NetworkRobotLog */
 osThreadId_t NetworkRobotLogHandle;
+uint32_t NetworkRobotLogBuffer[1024];
+osStaticThreadDef_t NetworkRobotLogControlBlock;
 const osThreadAttr_t NetworkRobotLog_attributes = {
     .name       = "NetworkRobotLog",
-    .stack_size = 1024 * 4,
+    .cb_mem     = &NetworkRobotLogControlBlock,
+    .cb_size    = sizeof(NetworkRobotLogControlBlock),
+    .stack_mem  = &NetworkRobotLogBuffer[0],
+    .stack_size = sizeof(NetworkRobotLogBuffer),
     .priority   = (osPriority_t)osPriorityNormal,
 };
 /* Definitions for RobotStatusSend */
 osThreadId_t RobotStatusSendHandle;
+uint32_t RobotStatusSendBuffer[1024];
+osStaticThreadDef_t RobotStatusSendControlBlock;
 const osThreadAttr_t RobotStatusSend_attributes = {
     .name       = "RobotStatusSend",
-    .stack_size = 1024 * 4,
+    .cb_mem     = &RobotStatusSendControlBlock,
+    .cb_size    = sizeof(RobotStatusSendControlBlock),
+    .stack_mem  = &RobotStatusSendBuffer[0],
+    .stack_size = sizeof(RobotStatusSendBuffer),
     .priority   = (osPriority_t)osPriorityNormal,
 };
-/* Definitions for PrimitiveStart */
-osThreadId_t PrimitiveStartHandle;
-const osThreadAttr_t PrimitiveStart_attributes = {
-    .name       = "PrimitiveStart",
-    .stack_size = 1024 * 4,
-    .priority   = (osPriority_t)osPriorityNormal,
+/* Definitions for PrimExectuor */
+osThreadId_t PrimExectuorHandle;
+uint32_t PrimExectuorBuffer[1024];
+osStaticThreadDef_t PrimExectuorControlBlock;
+const osThreadAttr_t PrimExectuor_attributes = {
+    .name       = "PrimExectuor",
+    .cb_mem     = &PrimExectuorControlBlock,
+    .cb_size    = sizeof(PrimExectuorControlBlock),
+    .stack_mem  = &PrimExectuorBuffer[0],
+    .stack_size = sizeof(PrimExectuorBuffer),
+    .priority   = (osPriority_t)osPriorityNormal1,
 };
-/* Definitions for PrimitiveExec */
-osThreadId_t PrimitiveExecHandle;
-const osThreadAttr_t PrimitiveExec_attributes = {
-    .name       = "PrimitiveExec",
-    .stack_size = 1024 * 4,
-    .priority   = (osPriority_t)osPriorityNormal,
+/* Definitions for PrimStarter */
+osThreadId_t PrimStarterHandle;
+uint32_t PrimStarterBuffer[1024];
+osStaticThreadDef_t PrimStarterControlBlock;
+const osThreadAttr_t PrimStarter_attributes = {
+    .name       = "PrimStarter",
+    .cb_mem     = &PrimStarterControlBlock,
+    .cb_size    = sizeof(PrimStarterControlBlock),
+    .stack_mem  = &PrimStarterBuffer[0],
+    .stack_size = sizeof(PrimStarterBuffer),
+    .priority   = (osPriority_t)osPriorityNormal2,
 };
 /* Definitions for RobotLogProtoQ */
 osMessageQueueId_t RobotLogProtoQHandle;
@@ -189,12 +247,12 @@ const osMessageQueueAttr_t RobotLogProtoQ_attributes = {.name = "RobotLogProtoQ"
 /* USER CODE END FunctionPrototypes */
 
 void io_proto_multicast_startNetworkingTask(void *argument);
+extern void io_proto_multicast_senderTask(void *argument);
 extern void io_proto_multicast_listenerTask(void *argument);
 extern void io_robot_status_task(void *argument);
-extern void io_proto_multicast_senderTask(void *argument);
 extern void io_network_logger_task(void *argument);
-extern void io_primitive_starter_task(void *argument);
 extern void io_primitive_executor_task(void *argument);
+extern void io_primitive_starter_task(void *argument);
 
 extern void MX_LWIP_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -236,6 +294,11 @@ void MX_FREERTOS_Init(void)
     NetStartTaskHandle = osThreadNew(io_proto_multicast_startNetworkingTask, NULL,
                                      &NetStartTask_attributes);
 
+    /* creation of RobotStatusTask */
+    RobotStatusTaskHandle =
+        osThreadNew(io_proto_multicast_senderTask,
+                    (void *)robot_status_msg_sender_profile, &RobotStatusTask_attributes);
+
     /* creation of VisionMsgTask */
     VisionMsgTaskHandle =
         osThreadNew(io_proto_multicast_listenerTask, (void *)vision_msg_listener_profile,
@@ -266,14 +329,14 @@ void MX_FREERTOS_Init(void)
         osThreadNew(io_proto_multicast_senderTask,
                     (void *)robot_status_msg_sender_profile, &RobotStatusSend_attributes);
 
-    /* creation of PrimitiveStart */
-    PrimitiveStartHandle =
-        osThreadNew(io_primitive_starter_task, (void *)primitive_msg_listener_profile,
-                    &PrimitiveStart_attributes);
+    /* creation of PrimExectuor */
+    PrimExectuorHandle =
+        osThreadNew(io_primitive_executor_task, NULL, &PrimExectuor_attributes);
 
-    /* creation of PrimitiveExec */
-    PrimitiveExecHandle =
-        osThreadNew(io_primitive_executor_task, NULL, &PrimitiveExec_attributes);
+    /* creation of PrimStarter */
+    PrimStarterHandle =
+        osThreadNew(io_primitive_starter_task, (void *)primitive_msg_listener_profile,
+                    &PrimStarter_attributes);
 
     /* USER CODE BEGIN RTOS_THREADS */
     /* USER CODE END RTOS_THREADS */

@@ -258,8 +258,6 @@ extern "C"
 #define GENEVA_DIR_GPIO_Port GPIOG
 #define T_SWO_Pin GPIO_PIN_3
 #define T_SWO_GPIO_Port GPIOB
-#define BUZZER_Pin GPIO_PIN_4
-#define BUZZER_GPIO_Port GPIOB
 #define PMS_ALERT_PWR_BRD_Pin GPIO_PIN_5
 #define PMS_ALERT_PWR_BRD_GPIO_Port GPIOB
 #define PMS_SCL_PWR_BRD_Pin GPIO_PIN_6
