@@ -25,78 +25,41 @@ PhysicsSimulatorRobot::PhysicsSimulatorRobot(std::weak_ptr<PhysicsRobot> physics
     }
 }
 
-void PhysicsSimulatorRobot::checkValidAndExecuteVoid(
-    std::function<void(std::shared_ptr<PhysicsRobot>)> func)
-{
-    if (auto robot = physics_robot.lock())
-    {
-        func(robot);
-    }
-    else
-    {
-        LOG(WARNING) << "PhysicsSimulatorRobot being used with invalid PhysicsRobot"
-                     << std::endl;
-    }
-}
-
-float PhysicsSimulatorRobot::checkValidAndReturnFloat(
-    std::function<float(std::shared_ptr<PhysicsRobot>)> func)
-{
-    if (auto robot = physics_robot.lock())
-    {
-        return func(robot);
-    }
-    LOG(WARNING) << "PhysicsSimulatorRobot being used with invalid PhysicsRobot"
-                 << std::endl;
-    return 0.0f;
-}
-
-unsigned int PhysicsSimulatorRobot::checkValidAndReturnUint(
-    std::function<unsigned int(std::shared_ptr<PhysicsRobot>)> func)
-{
-    if (auto robot = physics_robot.lock())
-    {
-        return func(robot);
-    }
-    LOG(WARNING) << "PhysicsSimulatorRobot being used with invalid PhysicsRobot"
-                 << std::endl;
-    return 0;
-}
-
 unsigned int PhysicsSimulatorRobot::getRobotId()
 {
-    return checkValidAndReturnUint([](auto robot) { return robot->getRobotId(); });
+    return checkValidAndExecute<unsigned int>(
+        [](auto robot) { return robot->getRobotId(); });
 }
 
 float PhysicsSimulatorRobot::getPositionX()
 {
-    return checkValidAndReturnFloat([](auto robot) { return robot->position().x(); });
+    return checkValidAndExecute<float>([](auto robot) { return robot->position().x(); });
 }
 
 float PhysicsSimulatorRobot::getPositionY()
 {
-    return checkValidAndReturnFloat([](auto robot) { return robot->position().y(); });
+    return checkValidAndExecute<float>([](auto robot) { return robot->position().y(); });
 }
 
 float PhysicsSimulatorRobot::getOrientation()
 {
-    return checkValidAndReturnFloat(
+    return checkValidAndExecute<float>(
         [](auto robot) { return robot->orientation().toRadians(); });
 }
 
 float PhysicsSimulatorRobot::getVelocityX()
 {
-    return checkValidAndReturnFloat([](auto robot) { return robot->velocity().x(); });
+    return checkValidAndExecute<float>([](auto robot) { return robot->velocity().x(); });
 }
 
 float PhysicsSimulatorRobot::getVelocityY()
 {
-    return checkValidAndReturnFloat([](auto robot) { return robot->velocity().y(); });
+    return checkValidAndExecute<float>([](auto robot) { return robot->velocity().y(); });
 }
 
 float PhysicsSimulatorRobot::getVelocityAngular()
 {
-    return checkValidAndReturnFloat(
+    return checkValidAndExecute<float>(
         [](auto robot) { return robot->angularVelocity().toRadians(); });
 }
 
@@ -107,7 +70,7 @@ float PhysicsSimulatorRobot::getBatteryVoltage()
 
 void PhysicsSimulatorRobot::kick(float speed_m_per_s)
 {
-    checkValidAndExecuteVoid([this, speed_m_per_s](auto robot) {
+    checkValidAndExecute<void>([this, speed_m_per_s](auto robot) {
         if (ball_in_dribbler_area && ball_in_dribbler_area->can_be_controlled)
         {
             auto ball = ball_in_dribbler_area->ball;
@@ -162,7 +125,7 @@ void PhysicsSimulatorRobot::kick(float speed_m_per_s)
 
 void PhysicsSimulatorRobot::chip(float distance_m)
 {
-    checkValidAndExecuteVoid([this, distance_m](auto robot) {
+    checkValidAndExecute<void>([this, distance_m](auto robot) {
         if (ball_in_dribbler_area && ball_in_dribbler_area->can_be_controlled)
         {
             auto ball        = ball_in_dribbler_area->ball;
@@ -246,53 +209,53 @@ void PhysicsSimulatorRobot::dribblerCoast()
 
 void PhysicsSimulatorRobot::applyWheelForceFrontLeft(float force_in_newtons)
 {
-    checkValidAndExecuteVoid([force_in_newtons](auto robot) {
+    checkValidAndExecute<void>([force_in_newtons](auto robot) {
         robot->applyWheelForceFrontLeft(force_in_newtons);
     });
 }
 
 void PhysicsSimulatorRobot::applyWheelForceBackLeft(float force_in_newtons)
 {
-    checkValidAndExecuteVoid([force_in_newtons](auto robot) {
+    checkValidAndExecute<void>([force_in_newtons](auto robot) {
         robot->applyWheelForceBackLeft(force_in_newtons);
     });
 }
 
 void PhysicsSimulatorRobot::applyWheelForceBackRight(float force_in_newtons)
 {
-    checkValidAndExecuteVoid([force_in_newtons](auto robot) {
+    checkValidAndExecute<void>([force_in_newtons](auto robot) {
         robot->applyWheelForceBackRight(force_in_newtons);
     });
 }
 
 void PhysicsSimulatorRobot::applyWheelForceFrontRight(float force_in_newtons)
 {
-    checkValidAndExecuteVoid([force_in_newtons](auto robot) {
+    checkValidAndExecute<void>([force_in_newtons](auto robot) {
         robot->applyWheelForceFrontRight(force_in_newtons);
     });
 }
 
 float PhysicsSimulatorRobot::getMotorSpeedFrontLeft()
 {
-    return checkValidAndReturnFloat(
+    return checkValidAndExecute<float>(
         [](auto robot) { return robot->getMotorSpeedFrontLeft(); });
 }
 
 float PhysicsSimulatorRobot::getMotorSpeedBackLeft()
 {
-    return checkValidAndReturnFloat(
+    return checkValidAndExecute<float>(
         [](auto robot) { return robot->getMotorSpeedBackLeft(); });
 }
 
 float PhysicsSimulatorRobot::getMotorSpeedBackRight()
 {
-    return checkValidAndReturnFloat(
+    return checkValidAndExecute<float>(
         [](auto robot) { return robot->getMotorSpeedBackRight(); });
 }
 
 float PhysicsSimulatorRobot::getMotorSpeedFrontRight()
 {
-    return checkValidAndReturnFloat(
+    return checkValidAndExecute<float>(
         [](auto robot) { return robot->getMotorSpeedFrontRight(); });
 }
 
@@ -318,22 +281,22 @@ void PhysicsSimulatorRobot::coastMotorFrontRight()
 
 void PhysicsSimulatorRobot::brakeMotorFrontLeft()
 {
-    checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorFrontLeft(); });
+    checkValidAndExecute<void>([](auto robot) { robot->brakeMotorFrontLeft(); });
 }
 
 void PhysicsSimulatorRobot::brakeMotorBackLeft()
 {
-    checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorBackLeft(); });
+    checkValidAndExecute<void>([](auto robot) { robot->brakeMotorBackLeft(); });
 }
 
 void PhysicsSimulatorRobot::brakeMotorBackRight()
 {
-    checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorBackRight(); });
+    checkValidAndExecute<void>([](auto robot) { robot->brakeMotorBackRight(); });
 }
 
 void PhysicsSimulatorRobot::brakeMotorFrontRight()
 {
-    checkValidAndExecuteVoid([](auto robot) { robot->brakeMotorFrontRight(); });
+    checkValidAndExecute<void>([](auto robot) { robot->brakeMotorFrontRight(); });
 }
 
 void PhysicsSimulatorRobot::onDribblerBallContact(PhysicsRobot *physics_robot,

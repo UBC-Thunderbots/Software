@@ -250,7 +250,6 @@ class SimulatorRobotSingleton
         return static_cast<T>(0);
     }
 
-
     /**
      * A helper function that will negate the given value if needed
      * in order for it to match our coordinate convention for the
