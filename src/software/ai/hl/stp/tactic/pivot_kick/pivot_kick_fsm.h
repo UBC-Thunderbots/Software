@@ -8,6 +8,7 @@
 struct PivotKickFSM
 {
     class KickState;
+    class StartState;
 
     struct ControlParams
     {
@@ -27,6 +28,7 @@ struct PivotKickFSM
         using namespace boost::sml;
 
         const auto get_possession_s = state<DribbleFSM>;
+        const auto start_s          = state<StartState>;
         const auto kick_ball_s      = state<KickState>;
 
         // update_e is the _event_ that the PivotKickFSM responds to
@@ -64,7 +66,8 @@ struct PivotKickFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *get_possession_s + update_e / get_possession, get_possession_s = kick_ball_s,
+            *start_s + update_e / get_possession = get_possession_s,
+            get_possession_s + update_e / get_possession, get_possession_s = kick_ball_s,
             kick_ball_s + update_e[!ball_kicked] / kick_ball,
             kick_ball_s + update_e[ball_kicked] = X);
     }

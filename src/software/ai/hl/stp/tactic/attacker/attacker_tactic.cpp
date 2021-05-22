@@ -10,7 +10,7 @@ AttackerTactic::AttackerTactic(
     std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config)
     : Tactic(false,
              {RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
-      fsm(DribbleFSM(std::make_shared<Point>()), PivotKickFSM(std::make_shared<Point>())),
+      fsm(DribbleFSM(std::make_shared<Point>())),
       pass(std::nullopt),
       chip_target(std::nullopt),
       attacker_tactic_config(attacker_tactic_config)
