@@ -119,13 +119,6 @@ void io_ublox_odinw262_communicator_task(void* arg)
     io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,300,0\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,301,0\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UWSCA=0,3\r");
-
-    // TODO implement WiFi watchdog, for now we just sleep indefinetly
-    // https://github.com/UBC-Thunderbots/Software/issues/1875
-    for (;;)
-    {
-        osDelay(1000);
-    }
 }
 
 void io_ublox_odinw262_communicator_handleIdleLine()

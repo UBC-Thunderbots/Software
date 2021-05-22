@@ -210,7 +210,7 @@ const osThreadAttr_t UbloxOdinTask_attributes = {
     .cb_size    = sizeof(UbloxOdinTaskControlBlock),
     .stack_mem  = &UbloxOdinTaskBuffer[0],
     .stack_size = sizeof(UbloxOdinTaskBuffer),
-    .priority   = (osPriority_t)osPriorityNormal1,
+    .priority   = (osPriority_t)osPriorityNormal2,
 };
 /* Definitions for RobotStatusSend */
 osThreadId_t RobotStatusSendHandle;
@@ -256,7 +256,7 @@ extern void io_proto_multicast_senderTask(void *argument);
 extern void io_proto_multicast_listenerTask(void *argument);
 extern void io_robot_status_task(void *argument);
 extern void io_network_logger_task(void *argument);
-extern void io_ublox_odinw262_communicator_task(void *argument);
+/*extern void io_ublox_odinw262_communicator_task(void *argument);*/
 void RobotMain(void *argument);
 
 extern void MX_LWIP_Init(void);
@@ -330,9 +330,6 @@ void MX_FREERTOS_Init(void)
                     &NetworkRobotLog_attributes);
 
     /* creation of UbloxOdinTask */
-    UbloxOdinTaskHandle =
-        osThreadNew(io_ublox_odinw262_communicator_task, NULL, &UbloxOdinTask_attributes);
-
     /* creation of RobotStatusSend */
     RobotStatusSendHandle =
         osThreadNew(io_proto_multicast_senderTask,
@@ -451,20 +448,6 @@ void RobotMain(void *argument)
     FirmwareWorld_t *world = app_firmware_world_create(robot, ball, sys_now_float);
 
     PrimitiveManager_t *primitive_manager = app_primitive_manager_create();
-    UNUSED(world);
-    UNUSED(primitive_manager);
-
-    GpioPin_t *charge_power_board =
-        io_gpio_pin_create(CHARGE_PWR_BRD_GPIO_Port, CHARGE_PWR_BRD_Pin, ACTIVE_HIGH);
-
-    TLOG_INFO("SETTING ACTIVE");
-    io_gpio_pin_setActive(charge_power_board);
-    osDelay(10000);
-    TLOG_INFO("SETTING INACTIVE");
-    io_gpio_pin_setInactive(charge_power_board);
-    osDelay(10000);
-    TLOG_INFO("SETTING ACTIVE");
-    io_gpio_pin_setActive(charge_power_board);
 
     /* Infinite loop */
     for (;;)
@@ -472,56 +455,15 @@ void RobotMain(void *argument)
         io_proto_multicast_communication_profile_blockUntilEvents(comm_profile,
                                                                   RECEIVED_PROTO);
 
+        // TODO (#1517) actually grab the primitive for _this_ robot id from the set
+        // For now, we assume only 1 primitive is being sent
         TbotsProto_Primitive primitive_msg =
             (*(TbotsProto_PrimitiveSet *)
                  io_proto_multicast_communication_profile_getProtoStruct(comm_profile))
                 .robot_primitives[0]
                 .value;
 
-        switch (primitive_msg.which_primitive)
-        {
-            case TbotsProto_Primitive_stop_tag:
-            {
-                break;
-            }
-            case TbotsProto_Primitive_move_tag:
-            {
-                break;
-            }
-            case TbotsProto_Primitive_direct_control_tag:
-            {
-                switch (primitive_msg.primitive.direct_control.which_wheel_control)
-                {
-                    case TbotsProto_DirectControlPrimitive_direct_per_wheel_control_tag:
-                    {
-                        TbotsProto_DirectControlPrimitive_DirectPerWheelControl
-                            control_msg = primitive_msg.primitive.direct_control
-                                              .wheel_control.direct_per_wheel_control;
-
-                        io_drivetrain_applyForceBackLeftWheel(
-                            control_msg.back_left_wheel_rpm / 100.0f);
-                        io_drivetrain_applyForceBackRightWheel(
-                            control_msg.back_right_wheel_rpm / 100.0f);
-                        io_drivetrain_applyForceFrontLeftWheel(
-                            control_msg.front_left_wheel_rpm / 100.0f);
-                        io_drivetrain_applyForceFrontRightWheel(
-                            control_msg.front_right_wheel_rpm / 100.0f);
-                        break;
-                    }
-                    case TbotsProto_DirectControlPrimitive_direct_velocity_control_tag:
-                    {
-                        break;
-                    }
-                    default:
-                    {
-                        // Do nothing
-                        TLOG_WARNING("Wheel control command is not a valid type");
-                    }
-                }
-                break;
-            }
-                osDelay(1);
-        }
+        app_primitive_manager_startNewPrimitive(primitive_manager, world, primitive_msg);
     }
     /* USER CODE END RobotMain */
 }
@@ -556,11 +498,11 @@ void initIoNetworking(void)
     // TODO (#2064) mainboard rev 2.0 doens't have a reset pin for the u-blox chip
     // so we can't enable the communicator. Uncomment this for mainboard rev 2.1
     // which should fix this issue.
-    //
     GpioPin_t *ublox_reset_pin =
         io_gpio_pin_create(ID_SEL_4_GPIO_Port, ID_SEL_4_Pin, ACTIVE_LOW);
 
-    io_ublox_odinw262_communicator_init(&huart4, ublox_reset_pin, 5);
+    // Initialize the ublox communicator
+    io_ublox_odinw262_communicator_init(&huart4, ublox_reset_pin, 2);
 
     // Initialize network logger
     io_network_logger_init(RobotLogProtoQHandle);
