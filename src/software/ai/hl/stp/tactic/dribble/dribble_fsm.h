@@ -48,6 +48,8 @@ struct DribbleFSM
     // Maximum distance to continuously dribble the ball, slightly conservative to not
     // break the 1 meter rule
     static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.9;
+    // robot speed at which the robot is done dribbling
+    static constexpr double ROBOT_DRIBBLING_DONE_SPEED = 0.2;  // m/s
 
     /**
      * Converts the ball position to the robot's position given the direction that the
@@ -218,7 +220,7 @@ struct DribbleFSM
                                      event.common.robot.position(),
                                      event.control_params.final_dribble_orientation),
                                  ROBOT_ORIENTATION_CLOSE_THRESHOLD) &&
-                   have_possession(event) && robotStopped(event.common.robot);
+                   have_possession(event) && robotStopped(event.common.robot, 0.2);
         };
 
         /**
@@ -268,7 +270,6 @@ struct DribbleFSM
                 auto_chip_or_kick =
                     AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, DRIBBLE_KICK_SPEED};
             }
-            std::cout << "Target destination: " << target_destination << std::endl;
 
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), target_destination, target_orientation, 0,
