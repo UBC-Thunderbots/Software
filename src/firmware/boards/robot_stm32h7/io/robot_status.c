@@ -13,8 +13,9 @@ void io_robot_status_task(void *argument)
 
     for (;;)
     {
-        // TODO enable SNTP sys_now is currently only time since reset
-        // https://github.com/UBC-Thunderbots/Software/issues/1518
+        osDelay(100);
+        continue;
+        // TODO (#1518) enable SNTP sys_now is currently only time since reset
         g_robot_status_msg.time_sent.epoch_timestamp_seconds = sys_now();
         g_robot_status_msg.robot_id                          = 0;
         g_robot_status_msg.firmware_status.fw_build_id       = 0;
@@ -46,9 +47,6 @@ void io_robot_status_task(void *argument)
         g_robot_status_msg.power_status =
             (TbotsProto_PowerStatus){.battery_voltage = 0.0f, .capacitor_voltage = 0.0f};
 
-        // We change the power status values randomly so that robot diagnostics
-        // can "see" this robot on the network. This is a stopgap until we have
-        // actual values for RobotStatus
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
 
         memcpy(io_proto_multicast_communication_profile_getProtoStruct(comm_profile),
@@ -57,7 +55,6 @@ void io_robot_status_task(void *argument)
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
         io_proto_multicast_communication_profile_notifyEvents(comm_profile,
                                                               PROTO_UPDATED);
-        // run loop at 10hz
         osDelay(100);
     }
 }

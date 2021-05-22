@@ -14,10 +14,9 @@
 #include "main.h"
 #include "task.h"
 
-// TODO have a way of configuring these values externally
-// https://github.com/UBC-Thunderbots/Software/issues/1876
-#define WIFI_SSID "tbots"
-#define WIFI_PASS "thunderbots"
+// TODO (#1876) have a way of configuring these values externally
+#define WIFI_SSID "SHAW-E1C430-5G"
+#define WIFI_PASS "hyd21#CHG@"
 
 #define DMA_BUFFER __attribute__((section(".dma_buffer")))
 #define RX_BUFFER_LENGTH_BYTES 4096

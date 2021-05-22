@@ -138,6 +138,7 @@ void HardFault_Handler(void)
     {
         TLOG_FATAL(
             "Bus Fault Address Register (BFAR) is valid, so probably an invalid mem access");
+        TLOG_FATAL("BFAR value: %x", SCB->BFAR);
     };
     if (SCB->CFSR & SCB_CFSR_UNDEFINSTR_Msk)
     {

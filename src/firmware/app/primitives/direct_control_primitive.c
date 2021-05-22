@@ -30,7 +30,6 @@ void app_direct_control_primitive_start(TbotsProto_DirectControlPrimitive prim_m
             TbotsProto_DirectControlPrimitive_DirectPerWheelControl control_msg =
                 prim_msg.wheel_control.direct_per_wheel_control;
             state->direct_velocity = false;
-            // TODO (#1649): Fix passing rpm into an applyForce function
             app_firmware_robot_applyDirectPerWheelPower(robot, control_msg);
             break;
         }
@@ -100,8 +99,8 @@ void app_direct_control_primitive_start(TbotsProto_DirectControlPrimitive prim_m
         }
         default:
         {
-            // Do nothing
-            TLOG_WARNING("Chick command is not a valid type");
+            // If we get here, then we currently don't have any chick command to execute
+            break;
         }
     }
 

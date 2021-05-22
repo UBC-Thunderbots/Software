@@ -42,6 +42,7 @@ cc_binary(
         "//firmware/boards/robot_stm32h7/io:gpio_pin",
         "//firmware/boards/robot_stm32h7/io:network_logger",
         "//firmware/boards/robot_stm32h7/io:power_monitor",
+        "//firmware/boards/robot_stm32h7/io:primitive_executor",
         "//firmware/boards/robot_stm32h7/io:pwm_pin",
         "//firmware/boards/robot_stm32h7/io:robot_status",
         "//firmware/boards/robot_stm32h7/io:uart_logger",

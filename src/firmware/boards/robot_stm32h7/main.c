@@ -46,10 +46,10 @@
 #include "firmware/boards/robot_stm32h7/io/dribbler.h"
 #include "firmware/boards/robot_stm32h7/io/drivetrain.h"
 #include "firmware/boards/robot_stm32h7/io/power_monitor.h"
+#include "firmware/boards/robot_stm32h7/io/primitive_executor.h"
 #include "firmware/boards/robot_stm32h7/io/uart_logger.h"
 #include "firmware/boards/robot_stm32h7/io/vision.h"
 #include "firmware/shared/physics.h"
-#pragma GCC diagnostic pop
 
 /* USER CODE END Includes */
 
@@ -86,6 +86,13 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+// TODO (#2082) remove this as part of
+float sys_now_float(void);
+float sys_now_float(void)
+{
+    return (float)sys_now();
+}
 
 /* USER CODE END 0 */
 
@@ -159,6 +166,77 @@ int main(void)
     initIoDrivetrain();
     initIoNetworking();
     initIoPowerMonitor();
+
+    // Setup the world that acts as the interface for the higher level firmware
+    // (like primitives or the controller) to interface with the outside world
+    //
+    // TODO (#2066) These constants are COMPLETELY WRONG, replace with proper ones
+    ForceWheelConstants_t wheel_constants = {
+        .wheel_rotations_per_motor_rotation  = GEAR_RATIO,
+        .wheel_radius                        = WHEEL_RADIUS,
+        .motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT,
+        .motor_back_emf_per_rpm              = RPM_TO_VOLT,
+        .motor_phase_resistance              = 1,
+        .motor_current_per_unit_torque       = CURRENT_PER_TORQUE};
+
+    ForceWheel_t *front_left_wheel = app_force_wheel_create(
+        io_drivetrain_applyForceFrontLeftWheel, io_drivetrain_getFrontLeftRpm,
+        io_drivetrain_brakeFrontLeft, io_drivetrain_coastFrontLeft, wheel_constants);
+
+    ForceWheel_t *front_right_wheel = app_force_wheel_create(
+        io_drivetrain_applyForceFrontRightWheel, io_drivetrain_getFrontRightRpm,
+        io_drivetrain_brakeFrontRight, io_drivetrain_coastFrontRight, wheel_constants);
+
+    ForceWheel_t *back_right_wheel = app_force_wheel_create(
+        io_drivetrain_applyForceBackRightWheel, io_drivetrain_getBackRightRpm,
+        io_drivetrain_brakeBackRight, io_drivetrain_coastBackRight, wheel_constants);
+
+    ForceWheel_t *back_left_wheel = app_force_wheel_create(
+        io_drivetrain_applyForceBackLeftWheel, io_drivetrain_getBackLeftRpm,
+        io_drivetrain_brakeBackLeft, io_drivetrain_coastBackLeft, wheel_constants);
+
+    Charger_t *charger =
+        app_charger_create(io_charger_charge, io_charger_discharge, io_charger_float);
+
+    Chicker_t *chicker =
+        app_chicker_create(io_chicker_kick, io_chicker_chip, io_chicker_enable_auto_kick,
+                           io_chicker_enable_auto_chip, io_chicker_disable_auto_kick,
+                           io_chicker_disable_auto_chip);
+
+    Dribbler_t *dribbler = app_dribbler_create(io_dribbler_setSpeed, io_dribbler_coast,
+                                               io_dribbler_getTemperature);
+
+    const RobotConstants_t robot_constants = {
+        .mass              = ROBOT_POINT_MASS,
+        .moment_of_inertia = INERTIA,
+        .robot_radius      = ROBOT_RADIUS,
+        .jerk_limit        = JERK_LIMIT,
+    };
+
+    ControllerState_t controller_state = {
+        .last_applied_acceleration_x       = 0,
+        .last_applied_acceleration_y       = 0,
+        .last_applied_acceleration_angular = 0,
+    };
+
+    FirmwareRobot_t *robot = app_firmware_robot_force_wheels_create(
+        charger, chicker, dribbler, io_vision_getRobotPositionX,
+        io_vision_getRobotPositionY, io_vision_getRobotOrientation,
+        io_vision_getRobotVelocityX, io_vision_getRobotVelocityY,
+        io_vision_getRobotAngularVelocity, io_power_monitor_getBatteryVoltage,
+        front_right_wheel, front_left_wheel, back_right_wheel, back_left_wheel,
+        &controller_state, robot_constants);
+
+    FirmwareBall_t *ball =
+        app_firmware_ball_create(io_vision_getBallPositionX, io_vision_getBallPositionY,
+                                 io_vision_getBallVelocityX, io_vision_getBallVelocityY);
+
+    FirmwareWorld_t *world = app_firmware_world_create(robot, ball, sys_now_float);
+
+    PrimitiveManager_t *primitive_manager = app_primitive_manager_create();
+
+    io_primitive_executor_init(world, primitive_manager);
+
     /* USER CODE END 2 */
 
     /* Init scheduler */

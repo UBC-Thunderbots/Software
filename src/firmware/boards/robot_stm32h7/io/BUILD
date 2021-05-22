@@ -24,6 +24,18 @@ cc_library(
 )
 
 cc_library(
+    name = "primitive_executor",
+    srcs = ["primitive_executor.c"],
+    hdrs = ["primitive_executor.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        "//firmware/app/primitives:primitive_manager",
+        "//firmware/app/world:firmware_robot",
+        "//firmware/boards/robot_stm32h7/io:proto_multicast_communication",
+    ],
+)
+
+cc_library(
     name = "allegro_a3931_motor_driver",
     srcs = ["allegro_a3931_motor_driver.c"],
     hdrs = ["allegro_a3931_motor_driver.h"],
@@ -183,6 +195,7 @@ cc_library(
     srcs = ["chicker.c"],
     hdrs = ["chicker.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = ["//firmware/app/logger"],
 )
 
 cc_library(
