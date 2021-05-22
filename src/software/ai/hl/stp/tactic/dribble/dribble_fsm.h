@@ -4,6 +4,7 @@
 #include "software/ai/evaluation/pass.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/transition_conditions.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/algorithms/contains.h"
@@ -51,6 +52,8 @@ struct DribbleFSM
     // Maximum distance to continuously dribble the ball, slightly conservative to not
     // break the 1 meter rule
     static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.9;
+    // robot speed at which the robot is done dribbling
+    static constexpr double ROBOT_DRIBBLING_DONE_SPEED = 0.2;  // m/s
 
     /**
      * Converts the ball position to the robot's position given the direction that the
@@ -168,8 +171,6 @@ struct DribbleFSM
     {
         Point dribble_destination =
             getDribbleBallDestination(ball.position(), dribble_destination_opt);
-        Angle to_destination_orientation =
-            (dribble_destination - ball.position()).orientation();
 
         // Default destination and orientation assume ball is at the destination
         // pivot to final face ball destination
@@ -178,25 +179,6 @@ struct DribbleFSM
         Point target_destination =
             robotPositionToFaceBall(dribble_destination, target_orientation);
 
-        if (!comparePoints(dribble_destination, ball.position(),
-                           BALL_CLOSE_TO_DEST_THRESHOLD))
-        {
-            // rotate to face the destination
-            target_orientation = to_destination_orientation;
-            if (compareAngles(to_destination_orientation, robot.orientation(),
-                              FACE_DESTINATION_CLOSE_THRESHOLD))
-            {
-                // dribble the ball towards ball destination
-                target_destination = robotPositionToFaceBall(dribble_destination,
-                                                             to_destination_orientation);
-            }
-            else
-            {
-                // pivot in place with the ball to the right orientation
-                target_destination =
-                    robotPositionToFaceBall(ball.position(), to_destination_orientation);
-            }
-        }
         return std::make_tuple(target_destination, target_orientation);
     }
 
@@ -242,7 +224,8 @@ struct DribbleFSM
                                      event.common.robot.position(),
                                      event.control_params.final_dribble_orientation),
                                  FINAL_DESTINATION_CLOSE_THRESHOLD) &&
-                   have_possession(event);
+                   have_possession(event) &&
+                   robotStopped(event.common.robot, ROBOT_DRIBBLING_DONE_SPEED);
         };
 
         /**

@@ -149,7 +149,7 @@ TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_dest)
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(15));
 }
 
 TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_orientation)
@@ -212,14 +212,10 @@ TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_dest_and_orientation
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(15));
+            Duration::fromSeconds(20));
 }
 
-// TODO (#2002): Re-enable this test once the dribbling robot is oriented forwards along
-// the dribbling path. The little kicks to prevent excessive dribbling is towards the
-// destination, which is causing the robot to lose control over the ball
-TEST_F(SimulatedDribbleTacticTest,
-       DISABLED_test_dribble_dest_and_orientation_around_rectangle)
+TEST_F(SimulatedDribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
 {
     Point initial_position    = Point(3, -3);
     Point dribble_destination = Point(4, 2.5);
@@ -249,7 +245,7 @@ TEST_F(SimulatedDribbleTacticTest,
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(15));
 }
 
 TEST_F(SimulatedDribbleTacticTest,

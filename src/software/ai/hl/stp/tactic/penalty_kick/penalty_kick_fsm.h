@@ -221,9 +221,7 @@ struct PenaltyKickFSM
                 DribbleFSM::ControlParams control_params{
                     .dribble_destination       = std::optional<Point>(position),
                     .final_dribble_orientation = std::optional<Angle>(shot_angle),
-                    // TODO: change .allow_excessive_dribbling back to false once #2087
-                    // goes in
-                    .allow_excessive_dribbling = true};
+                    .allow_excessive_dribbling = false};
                 processEvent(DribbleFSM::Update(control_params, event.common));
             };
 
