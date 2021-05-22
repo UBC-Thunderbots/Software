@@ -16,18 +16,17 @@ class PenaltyKickEnemyPlayTest : public SimulatedPlayTestFixture
 
 TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play)
 {
-    BallState ball_state(field.friendlyPenaltyMark(), Vector(0, 0));
+    BallState ball_state(field.enemyPenaltyMark(), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
          Point(4.6, -3.1)});
-    setFriendlyGoalie(0);
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({
-        field.enemyGoalCenter(),
-        Point(3, 2.5),
-        Point(3.2, 2.5),
-        Point(3.4, 2.5),
-        Point(3, -2.5),
-        Point(3.2, -2.5),
+        Point(field.enemyPenaltyMark().x() + 0.3, 0),
+        Point(field.enemyPenaltyMark().x() + 1, 0),
+        Point(field.enemyPenaltyMark().x() + 1, 4 * ROBOT_MAX_RADIUS_METERS),
+        Point(field.enemyPenaltyMark().x() + 1, 8 * ROBOT_MAX_RADIUS_METERS),
+        Point(field.enemyPenaltyMark().x() + 1, -4 * ROBOT_MAX_RADIUS_METERS),
+        Point(field.enemyPenaltyMark().x() + 1, -8 * ROBOT_MAX_RADIUS_METERS),
     });
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(PenaltyKickEnemyPlay));
