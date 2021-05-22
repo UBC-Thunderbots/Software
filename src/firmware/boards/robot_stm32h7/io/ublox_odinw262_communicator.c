@@ -15,8 +15,8 @@
 #include "task.h"
 
 // TODO (#1876) have a way of configuring these values externally
-#define WIFI_SSID "SHAW-E1C430-5G"
-#define WIFI_PASS "hyd21#CHG@"
+#define WIFI_SSID "tbots"
+#define WIFI_PASS "thunderbots"
 
 #define DMA_BUFFER __attribute__((section(".dma_buffer")))
 #define RX_BUFFER_LENGTH_BYTES 4096
