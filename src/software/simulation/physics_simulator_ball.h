@@ -33,18 +33,10 @@ class PhysicsSimulatorBall : public SimulatorBall
      *
      * @param func The function to perform on the physics ball
      */
-    template <class T>
-    T checkValidAndExecute(
-        std::function<T(const std::shared_ptr<PhysicsBall>)> func) const
-    {
-        if (auto ball = physics_ball.lock())
-        {
-            return func(ball);
-        }
-        LOG(WARNING) << "PhysicsSimulatorBall being used with invalid PhysicsBall"
-                     << std::endl;
-        return T();
-    }
+    Point checkValidAndReturnPoint(
+        std::function<Point(const std::shared_ptr<PhysicsBall>)> func) const;
+    Vector checkValidAndReturnVector(
+        std::function<Vector(const std::shared_ptr<PhysicsBall>)> func) const;
 
     std::weak_ptr<PhysicsBall> physics_ball;
 };

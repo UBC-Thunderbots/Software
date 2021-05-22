@@ -7,12 +7,36 @@ PhysicsSimulatorBall::PhysicsSimulatorBall(std::weak_ptr<PhysicsBall> physics_ba
 {
 }
 
+Point PhysicsSimulatorBall::checkValidAndReturnPoint(
+    std::function<Point(const std::shared_ptr<PhysicsBall>)> func) const
+{
+    if (auto ball = physics_ball.lock())
+    {
+        return func(ball);
+    }
+    LOG(WARNING) << "PhysicsSimulatorBall being used with invalid PhysicsBall"
+                 << std::endl;
+    return Point(0, 0);
+}
+
+Vector PhysicsSimulatorBall::checkValidAndReturnVector(
+    std::function<Vector(const std::shared_ptr<PhysicsBall>)> func) const
+{
+    if (auto ball = physics_ball.lock())
+    {
+        return func(ball);
+    }
+    LOG(WARNING) << "PhysicsSimulatorBall being used with invalid PhysicsBall"
+                 << std::endl;
+    return Vector(0, 0);
+}
+
 Point PhysicsSimulatorBall::position() const
 {
-    return checkValidAndExecute<Point>([](auto ball) { return ball->position(); });
+    return checkValidAndReturnPoint([](auto ball) { return ball->position(); });
 }
 
 Vector PhysicsSimulatorBall::velocity() const
 {
-    return checkValidAndExecute<Vector>([](auto ball) { return ball->velocity(); });
+    return checkValidAndReturnVector([](auto ball) { return ball->velocity(); });
 }

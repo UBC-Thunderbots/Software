@@ -3,7 +3,6 @@
 #include <cinttypes>
 #include <memory>
 
-#include "software/logger/logger.h"
 #include "software/simulation/force_wheel_simulator_robot.h"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/physics/physics_robot.h"
@@ -131,20 +130,12 @@ class PhysicsSimulatorRobot : public ForceWheelSimulatorRobot
      *
      * @param func The function to perform on the physics robot
      */
-    template <class T>
-    T checkValidAndExecute(std::function<T(std::shared_ptr<PhysicsRobot>)> func)
-    {
-        if (auto robot = physics_robot.lock())
-        {
-            return func(robot);
-        }
-        else
-        {
-            LOG(WARNING) << "PhysicsSimulatorRobot being used with invalid PhysicsRobot"
-                         << std::endl;
-            return static_cast<T>(0);
-        }
-    }
+    void checkValidAndExecuteVoid(
+        std::function<void(std::shared_ptr<PhysicsRobot>)> func);
+    float checkValidAndReturnFloat(
+        std::function<float(std::shared_ptr<PhysicsRobot>)> func);
+    unsigned int checkValidAndReturnUint(
+        std::function<unsigned int(std::shared_ptr<PhysicsRobot>)> func);
 
     /**
      * Applies force to the physics ball to simulate it being dribbled by the
