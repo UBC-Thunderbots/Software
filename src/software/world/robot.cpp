@@ -66,8 +66,6 @@ AngularVelocity Robot::angularVelocity() const
 
 bool Robot::isNearDribbler(const Point &test_point) const
 {
-    // 0.05 was experimentally derived to correctly detect when a point is near the
-    // dribbler
     static const double POSSESSION_THRESHOLD_METERS = ROBOT_MAX_RADIUS_METERS;
 
     Vector vector_to_test_point = test_point - position();

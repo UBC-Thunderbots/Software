@@ -232,12 +232,6 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
 
     if (path_points.size() > 2 && (path_points[0] - path_points[1]).length() < 0.05)
     {
-        std::cout << "Path: ";
-        for (const auto &pt : path_points)
-        {
-            std::cout << pt;
-        }
-        std::cout << std::endl;
         path_points.erase(path_points.begin() + 1);
     }
 
