@@ -93,10 +93,11 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_dest_in_obstacle)
 }
 
 
-TEST_F(SimulatedThetaStarTest, test_theta_star_stuck)
+TEST_F(SimulatedThetaStarTest,
+       test_theta_star_not_stuck_when_start_point_and_first_grid_point_is_close)
 {
     // Destination is in obstacle, but initial point is open
-    Point destination = Point(3.95608, 2.41973);
+    Point destination = Point(4, 2.4);
 
     Point initial_position = Point(3.21118, 1.06699);
     BallState ball_state(Point(0, -0.6), Vector(0, 0));
@@ -120,7 +121,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_stuck)
                               ValidationCoroutine::push_type& yield) {
             // Small rectangle near the destination point that is outside of the obstacle
             // which the friendly robot should be stationary in for 15 ticks
-            Rectangle expected_final_position(Point(0.985, -0.26), Point(1.15, -0.3));
+            Rectangle expected_final_position(Point(3.9, 2.3), Point(4.1, 2.5));
             robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
         }};
 

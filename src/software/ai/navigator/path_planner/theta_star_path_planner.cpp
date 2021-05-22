@@ -230,7 +230,8 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     path_points.erase(path_points.begin());
     path_points.insert(path_points.begin(), start);
 
-    if (path_points.size() > 2 && (path_points[0] - path_points[1]).length() < 0.05)
+    if (path_points.size() > 2 &&
+        (path_points[0] - path_points[1]).length() < SIZE_OF_GRID_CELL_IN_METERS)
     {
         path_points.erase(path_points.begin() + 1);
     }
