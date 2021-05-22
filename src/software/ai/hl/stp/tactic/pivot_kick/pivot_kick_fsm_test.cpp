@@ -16,7 +16,7 @@ TEST(PivotKickFSMTest, test_transitions)
     FSM<PivotKickFSM> fsm(DribbleFSM(std::make_shared<Point>()));
 
     // Start in DribbleFSM
-    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM::StartState>));
 
     fsm.process_event(PivotKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));

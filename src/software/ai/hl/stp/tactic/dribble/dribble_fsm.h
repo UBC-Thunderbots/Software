@@ -265,7 +265,6 @@ struct DribbleFSM
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
                 AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
                 MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
-            std::cout << "getting possession" << std::endl;
         };
 
         /**
@@ -309,7 +308,6 @@ struct DribbleFSM
             // update continuous_dribbling_start_point once we start dribbling
             *continuous_dribbling_start_point = event.common.world.ball().position();
             dribble(event);
-            std::cout << "starting dribbling" << std::endl;
         };
 
         return make_transition_table(
@@ -324,4 +322,5 @@ struct DribbleFSM
     }
 
    private:
+    std::shared_ptr<Point> continuous_dribbling_start_point;
 };

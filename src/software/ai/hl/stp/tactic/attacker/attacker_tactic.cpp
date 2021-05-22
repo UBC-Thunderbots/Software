@@ -43,8 +43,6 @@ void AttackerTactic::updateIntent(const TacticUpdate& tactic_update)
         // reject shots that have an open angle below the minimum
         shot = std::nullopt;
     }
-    std::cout << attacker_tactic_config->getMinOpenAngleForShotDeg()->value()
-              << std::endl;
 
     AttackerFSM::ControlParams control_params{
         .pass                   = pass,
