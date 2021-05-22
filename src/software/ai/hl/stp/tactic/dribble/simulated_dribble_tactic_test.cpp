@@ -149,7 +149,7 @@ TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_dest)
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(15));
 }
 
 TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_orientation)
@@ -212,7 +212,7 @@ TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_dest_and_orientation
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(15));
+            Duration::fromSeconds(20));
 }
 
 TEST_F(SimulatedDribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)

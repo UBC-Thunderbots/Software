@@ -46,7 +46,7 @@ struct DribbleFSM
     static constexpr double DRIBBLE_KICK_SPEED = 0.05;
     // Maximum distance to continuously dribble the ball, slightly conservative to not
     // break the 1 meter rule
-    static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.8;
+    static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.9;
 
     /**
      * Converts the ball position to the robot's position given the direction that the
@@ -164,8 +164,8 @@ struct DribbleFSM
     {
         Point dribble_destination =
             getDribbleBallDestination(ball.position(), dribble_destination_opt);
-        Angle to_destination_orientation =
-            (dribble_destination - ball.position()).orientation();
+        //        Angle to_destination_orientation =
+        //            (dribble_destination - ball.position()).orientation();
 
         // Default destination and orientation assume ball is at the destination
         // pivot to final face ball destination
@@ -174,25 +174,27 @@ struct DribbleFSM
         Point target_destination =
             robotPositionToFaceBall(dribble_destination, target_orientation);
 
-        if (!comparePoints(dribble_destination, ball.position(),
-                           BALL_CLOSE_TO_DEST_THRESHOLD))
-        {
-            // rotate to face the destination
-            target_orientation = to_destination_orientation;
-            if (compareAngles(to_destination_orientation, robot.orientation(),
-                              ROBOT_ORIENTATION_CLOSE_THRESHOLD))
-            {
-                // dribble the ball towards ball destination
-                target_destination = robotPositionToFaceBall(dribble_destination,
-                                                             to_destination_orientation);
-            }
-            else
-            {
-                // pivot in place with the ball to the right orientation
-                target_destination =
-                    robotPositionToFaceBall(ball.position(), to_destination_orientation);
-            }
-        }
+        //        if (!comparePoints(dribble_destination, ball.position(),
+        //                           BALL_CLOSE_TO_DEST_THRESHOLD))
+        //        {
+        //            // rotate to face the destination
+        //            target_orientation = to_destination_orientation;
+        //            if (compareAngles(to_destination_orientation, robot.orientation(),
+        //                              ROBOT_ORIENTATION_CLOSE_THRESHOLD))
+        //            {
+        //                // dribble the ball towards ball destination
+        //                target_destination =
+        //                robotPositionToFaceBall(dribble_destination,
+        //                                                             to_destination_orientation);
+        //            }
+        //            else
+        //            {
+        //                // pivot in place with the ball to the right orientation
+        //                target_destination =
+        //                    robotPositionToFaceBall(ball.position(),
+        //                    to_destination_orientation);
+        //            }
+        //        }
         return std::make_tuple(target_destination, target_orientation);
     }
 
