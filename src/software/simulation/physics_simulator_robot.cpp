@@ -148,7 +148,8 @@ void PhysicsSimulatorRobot::kick(float speed_m_per_s)
             // a higher kick speed than requested.
             Vector ball_head_on_momentum =
                 ball->momentum().project(robot_orientation_vector);
-            // TODO (#1798): remove this backspin hack
+            // TODO (#1798): This is a hack that makes kicking while the dribbler on
+            // slower
             ball->applyImpulse(robot_orientation_vector.normalize(
                 ball_head_on_momentum.length() *
                 (1 - (dribbler_rpm / MAX_FORCE_DRIBBLER_SPEED) / 2)));

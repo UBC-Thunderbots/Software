@@ -4,6 +4,7 @@
 #include "software/ai/evaluation/pass.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/transition_conditions.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/algorithms/contains.h"
@@ -217,8 +218,7 @@ struct DribbleFSM
                                      event.common.robot.position(),
                                      event.control_params.final_dribble_orientation),
                                  ROBOT_ORIENTATION_CLOSE_THRESHOLD) &&
-                   have_possession(event) &&
-                   event.common.robot.velocity().length() < 0.05;
+                   have_possession(event) && robotStopped(event.common.robot);
         };
 
         /**
