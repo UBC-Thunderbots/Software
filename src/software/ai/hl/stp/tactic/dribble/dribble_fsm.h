@@ -217,7 +217,8 @@ struct DribbleFSM
                                      event.common.robot.position(),
                                      event.control_params.final_dribble_orientation),
                                  ROBOT_ORIENTATION_CLOSE_THRESHOLD) &&
-                   have_possession(event);
+                   have_possession(event) &&
+                   event.common.robot.velocity().length() < 0.05;
         };
 
         /**
@@ -267,6 +268,7 @@ struct DribbleFSM
                 auto_chip_or_kick =
                     AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, DRIBBLE_KICK_SPEED};
             }
+            std::cout << "Target destination: " << target_destination << std::endl;
 
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), target_destination, target_orientation, 0,
