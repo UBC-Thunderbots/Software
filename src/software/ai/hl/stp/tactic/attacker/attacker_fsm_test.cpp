@@ -35,7 +35,7 @@ TEST(AttackerFSMTest, test_transitions)
         fsm.is<decltype(boost::sml::state<PivotKickFSM>)>(boost::sml::state<DribbleFSM>));
 
     // robot at attacker point and facing the right way
-    robot.updateState(RobotState(pass.passerPoint() - Vector(0.1, 0), Vector(),
+    robot.updateState(RobotState(pass.passerPoint() - Vector(0.05, 0), Vector(),
                                  pass.passerOrientation(), AngularVelocity::zero()),
                       Timestamp::fromSeconds(0));
 

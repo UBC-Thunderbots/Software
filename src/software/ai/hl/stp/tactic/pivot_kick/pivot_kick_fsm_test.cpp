@@ -23,7 +23,7 @@ TEST(PivotKickFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
     // Robot now has the ball at the right location and is pointing in the right direction
-    robot.updateState(RobotState(Point(-2, 1.6), Vector(), Angle::threeQuarter(),
+    robot.updateState(RobotState(Point(-2, 1.55), Vector(), Angle::threeQuarter(),
                                  AngularVelocity::zero()),
                       Timestamp::fromSeconds(123));
     world =
