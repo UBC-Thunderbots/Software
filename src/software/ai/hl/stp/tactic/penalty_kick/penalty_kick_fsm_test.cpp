@@ -21,28 +21,26 @@ TEST(PenaltyKickFSM, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
     double shot_x_position =
-        ((world.field().totalXLength() / 2) -
-         (world.field().totalXLength() * 1.0 / 3));
+        ((world.field().totalXLength() / 2) - (world.field().totalXLength() * 1.0 / 3));
 
-    Point position  = Point(shot_x_position - 0.1, 0);
-    robot           = ::TestUtil::createRobotAtPos(position);
-    world           = ::TestUtil::setBallPosition(
-        world, position, Timestamp::fromSeconds(1));
+    Point position = Point(shot_x_position - 0.1, 0);
+    robot          = ::TestUtil::createRobotAtPos(position);
+    world = ::TestUtil::setBallPosition(world, position, Timestamp::fromSeconds(1));
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
-    position        = Point(shot_x_position + 0.3, 0);
-    robot           = ::TestUtil::createRobotAtPos(position);
-    world           = ::TestUtil::setBallPosition(
-        world, position, Timestamp::fromSeconds(2));
+    position = Point(shot_x_position + 0.3, 0);
+    robot    = ::TestUtil::createRobotAtPos(position);
+    world    = ::TestUtil::setBallPosition(world, position, Timestamp::fromSeconds(2));
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM>));
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<KickFSM>)>(
         boost::sml::state<GetBehindBallFSM>));
 
-    world           = ::TestUtil::setBallPosition(world, position + Vector(0.1, 0), Timestamp::fromSeconds(2));
+    world = ::TestUtil::setBallPosition(world, position + Vector(0.1, 0),
+                                        Timestamp::fromSeconds(2));
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM>));

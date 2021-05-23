@@ -20,8 +20,7 @@ struct PenaltyKickFSM
      */
     explicit PenaltyKickFSM(std::optional<Timestamp> complete_approach,
                             Point robot_shoot_position, Angle shot_angle)
-        : complete_approach(complete_approach),
-          shot_angle(shot_angle)
+        : complete_approach(complete_approach), shot_angle(shot_angle)
     {
     }
 
@@ -263,7 +262,8 @@ struct PenaltyKickFSM
             Timestamp force_shoot_timestamp =
                 complete_approach.value() + PENALTY_FORCE_SHOOT_TIMEOUT;
             bool should_shoot =
-                evaluatePenaltyShot(enemy_goalie, field, event.common.world.ball().position(),
+                evaluatePenaltyShot(enemy_goalie, field,
+                                    event.common.world.ball().position(),
                                     event.common.robot) ||
                 (event.common.world.getMostRecentTimestamp() >= force_shoot_timestamp);
             return should_shoot;
