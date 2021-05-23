@@ -47,3 +47,53 @@ INSTANTIATE_TEST_CASE_P(
         // +/- x/y/theta
         std::make_tuple(2.0f, -1.0f, -2.0f), std::make_tuple(-1.0f, 3.0f, -2.0f),
         std::make_tuple(1.0f, -3.0f, 2.0f)));
+
+class PhysicsTestSpeed4Speed3Conversions
+    : public ::testing::TestWithParam<std::tuple<float, float, float, float>>
+{
+};
+
+TEST_P(PhysicsTestSpeed4Speed3Conversions, test_speed_4_speed_3_conversions_recovered)
+{
+    const float original_wheel_velocity[4] = {
+        std::get<0>(GetParam()), std::get<1>(GetParam()), std::get<2>(GetParam())};
+    float robot_velocity[3];
+    speed4_to_speed3(original_wheel_velocity, robot_velocity);
+    float recovered_wheel_velocity[3];
+    speed3_to_speed4(robot_velocity, recovered_wheel_velocity);
+    for (unsigned int i = 0; i < 4; i++)
+    {
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(original_wheel_velocity[i],
+                                                   recovered_wheel_velocity[i], 1e-3));
+    }
+}
+
+INSTANTIATE_TEST_CASE_P(velocities, PhysicsTestSpeed4Speed3Conversions,
+                        ::testing::Values(
+                            // wheel 0
+                            std::make_tuple(200.0f, 0.0f, 0.0f, 0.0f),
+                            std::make_tuple(-300.0f, 0.0f, 0.0f, 0.0f),
+                            // wheel 1
+                            std::make_tuple(0.0f, 400.0f, 0.0f, 0.0f),
+                            std::make_tuple(0.0f, -500.0f, 0.0f, 0.0f),
+                            // wheel 2
+                            std::make_tuple(0.0f, 0.0f, 100.0f, 0.0f),
+                            std::make_tuple(0.0f, 0.0f, -600.0f, 0.0f),
+                            // wheel 3
+                            std::make_tuple(0.0f, 0.0f, 0.0f, 340.0f),
+                            std::make_tuple(0.0f, 0.0f, 0.0f, -500.0f),
+                            // wheel 0/1
+                            std::make_tuple(200.0f, 230.0f, 0.0f, 0.0f),
+                            std::make_tuple(-300.0f, -110.0f, 0.0f, 0.0f),
+                            std::make_tuple(200.0f, -230.0f, 0.0f, 0.0f),
+                            std::make_tuple(-110.0f, 240.0f, 0.0f, 0.0f),
+                            // wheel 2/3
+                            std::make_tuple(0.0f, 0.0f, 200.0f, 230.0f),
+                            std::make_tuple(0.0f, 0.0f, -300.0f, -110.0f),
+                            std::make_tuple(0.0f, 0.0f, 200.0f, -230.0f),
+                            std::make_tuple(0.0f, 0.0f, -110.0f, 240.0f),
+                            // all wheels
+                            std::make_tuple(100.0f, -320.0f, 200.0f, 230.0f),
+                            std::make_tuple(280.0f, -620.0f, -300.0f, -110.0f),
+                            std::make_tuple(-100.0f, 320.0f, 200.0f, -230.0f),
+                            std::make_tuple(280.0f, -620.0f, -110.0f, 240.0f)));
