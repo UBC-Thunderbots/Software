@@ -13,8 +13,6 @@ void io_robot_status_task(void *argument)
 
     for (;;)
     {
-        osDelay(100);
-        continue;
         // TODO (#1518) enable SNTP sys_now is currently only time since reset
         g_robot_status_msg.time_sent.epoch_timestamp_seconds = sys_now();
         g_robot_status_msg.robot_id                          = 0;
