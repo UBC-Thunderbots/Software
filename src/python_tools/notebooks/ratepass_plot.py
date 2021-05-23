@@ -30,6 +30,23 @@ wrapper_proto_log = ProtoLog(
 world.getDefaultSensorFusionConfig()
 
 # +
+from bokeh.models import ColumnDataSource
+
+
+class PointsPlotter:
+    def __init__(fig, legend_label, glyph_fn_name, color, size=4):
+        self.fig = fig
+        self.points_source = ColumnDataSource(dict(xs=[], ys=[]))
+        getattr(self.fig, glyph_fn_name)(
+            source=self.points_source, x="xs", y="ys", fill_color=color, size=size
+        )
+
+    def plot_points(points):
+        data_dict = dict(xs=[pt.x() for pt in points], ys=[pt.y() for pt in points])
+        self.points_source.data.update(data_dict)
+
+
+# +
 from bokeh.plotting import figure
 from bokeh.io import output_notebook, show, push_notebook
 from python_tools.plotting.plot_ssl_wrapper import SSLWrapperPlotter, MM_PER_M
@@ -74,6 +91,9 @@ heatmap_grid_size = 0.05
 
 config = passing.getPassingConfig()
 
+# TODO: finish this shit
+keepaway_pt_plotter = PointsPlotter(fig, "keepaway point", "star", "red")
+
 
 def plot_ssl_wrapper_at_idx(idx):
     ssl_wrapper_plotter.plot_ssl_wrapper(wrapper_proto_log[idx])
@@ -81,7 +101,9 @@ def plot_ssl_wrapper_at_idx(idx):
     field_length = wrapper_proto_log[idx].geometry.field.field_length / 1000
     field_width = wrapper_proto_log[idx].geometry.field.field_width / 1000
 
-    the_world = world.World(wrapper_proto_log[idx].SerializeToString(), dict())
+    the_world = world.World(
+        wrapper_proto_log[idx].SerializeToString(), dict(friendly_color_yellow=False)
+    )
     generator = pass_generator.EighteenZonePassGenerator(the_world, config)
 
     pass_dict = {
@@ -106,9 +128,9 @@ def plot_ssl_wrapper_at_idx(idx):
         return passing.ratePassShootScore(the_world, pass_dict, config)
 
     rate_pass_heatmap_plotter.plot_heatmap(ratePassCost)
-    rate_pass_enemy_heatmap_plotter.plot_heatmap(ratePassEnemyRiskCost)
-    rate_pass_friendly_heatmap_plotter.plot_heatmap(ratePassFriendlyCapabilityCost)
-    rate_pass_shoot_score_plotter.plot_heatmap(ratePassShootScoreCost)
+    #     rate_pass_enemy_heatmap_plotter.plot_heatmap(ratePassEnemyRiskCost)
+    #     rate_pass_friendly_heatmap_plotter.plot_heatmap(ratePassFriendlyCapabilityCost)
+    #     rate_pass_shoot_score_plotter.plot_heatmap(ratePassShootScoreCost)
 
     zones = pass_generator.getAllZones(the_world)
     pass_generator_plotter.plot_zones(zones)
