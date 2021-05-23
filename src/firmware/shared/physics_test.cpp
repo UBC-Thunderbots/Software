@@ -56,7 +56,8 @@ class PhysicsTestSpeed4Speed3Conversions
 TEST_P(PhysicsTestSpeed4Speed3Conversions, test_speed_4_speed_3_conversions_recovered)
 {
     const float original_wheel_velocity[4] = {
-        std::get<0>(GetParam()), std::get<1>(GetParam()), std::get<2>(GetParam())};
+        std::get<0>(GetParam()), std::get<1>(GetParam()), std::get<2>(GetParam()),
+        std::get<3>(GetParam())};
     float robot_velocity[3];
     speed4_to_speed3(original_wheel_velocity, robot_velocity);
     float recovered_wheel_velocity[3];
@@ -65,6 +66,26 @@ TEST_P(PhysicsTestSpeed4Speed3Conversions, test_speed_4_speed_3_conversions_reco
     {
         EXPECT_TRUE(TestUtil::equalWithinTolerance(original_wheel_velocity[i],
                                                    recovered_wheel_velocity[i], 1e-3));
+    }
+}
+
+TEST_P(PhysicsTestSpeed4Speed3Conversions, test_speed_3_speed_4_conversions_recovered)
+{
+    // converts speed4 to speed 3 before checking if speed3tospeed4 and back is recovered
+    const float original_wheel_velocity[4] = {
+        std::get<0>(GetParam()), std::get<1>(GetParam()), std::get<2>(GetParam()),
+        std::get<3>(GetParam())};
+    float original_robot_velocity[3];
+    speed4_to_speed3(original_wheel_velocity, original_robot_velocity);
+
+    float wheel_velocity[4];
+    speed3_to_speed4(original_robot_velocity, wheel_velocity);
+    float recovered_robot_velocity[3];
+    speed4_to_speed3(wheel_velocity, recovered_robot_velocity);
+    for (unsigned int i = 0; i < 3; i++)
+    {
+        EXPECT_TRUE(TestUtil::equalWithinTolerance(original_robot_velocity[i],
+                                                   recovered_robot_velocity[i], 1));
     }
 }
 
