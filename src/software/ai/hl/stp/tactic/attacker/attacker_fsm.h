@@ -95,6 +95,14 @@ struct AttackerFSM
             processEvent(DribbleFSM::Update(control_params, event.common));
         };
 
+        /**
+         * Guard that checks if the ball should be kicked, which is when there's a nearby
+         * enemy or a good pass/shot
+         *
+         * @param event AttackerFSM::Update event
+         *
+         * @return if the ball should be kicked
+         */
         const auto should_kick = [](auto event) {
             // check for enemy threat
             Circle about_to_steal_danger_zone(event.common.robot.position(),
