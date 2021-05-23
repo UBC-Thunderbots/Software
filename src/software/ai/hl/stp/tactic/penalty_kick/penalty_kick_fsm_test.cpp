@@ -20,16 +20,29 @@ TEST(PenaltyKickFSM, test_transitions)
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
-    Point position = world.field().enemyGoalCenter() + Vector(-1, 0);
-    robot          = ::TestUtil::createRobotAtPos(position);
-    world          = ::TestUtil::setBallPosition(
-        world, position + Vector(ROBOT_MAX_RADIUS_METERS, 0), Timestamp::fromSeconds(1));
+    double shot_x_position =
+        ((world.field().totalXLength() / 2) -
+         (world.field().totalXLength() * 1.0 / 3));
+
+    Point position  = Point(shot_x_position - 0.1, 0);
+    robot           = ::TestUtil::createRobotAtPos(position);
+    world           = ::TestUtil::setBallPosition(
+        world, position, Timestamp::fromSeconds(1));
+    fsm.process_event(PenaltyKickFSM::Update(
+        control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
+    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
+
+    position        = Point(shot_x_position + 0.3, 0);
+    robot           = ::TestUtil::createRobotAtPos(position);
+    world           = ::TestUtil::setBallPosition(
+        world, position, Timestamp::fromSeconds(2));
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM>));
     EXPECT_TRUE(fsm.is<decltype(boost::sml::state<KickFSM>)>(
         boost::sml::state<GetBehindBallFSM>));
 
+    world           = ::TestUtil::setBallPosition(world, position + Vector(0.1, 0), Timestamp::fromSeconds(2));
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM>));
@@ -37,8 +50,8 @@ TEST(PenaltyKickFSM, test_transitions)
         boost::sml::state<KickFSM::KickState>));
 
     world = ::TestUtil::setBallPosition(world, world.field().enemyGoalCenter(),
-                                        Timestamp::fromSeconds(2));
-    world = ::TestUtil::setBallVelocity(world, Vector(5, 0), Timestamp::fromSeconds(2));
+                                        Timestamp::fromSeconds(4));
+    world = ::TestUtil::setBallVelocity(world, Vector(5, 0), Timestamp::fromSeconds(4));
     fsm.process_event(PenaltyKickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
 
