@@ -30,10 +30,10 @@ START_TEST(test_setup_bot)
 
     ck_assert_float_eq_tol(P_PI, pb.rot.disp, TOL);
 
-    ck_assert_float_eq_tol(dot2D(major_vec, dr), pb.maj.disp, TOL);
-    ck_assert_float_eq_tol(dot2D(major_vec, v), pb.maj.vel, TOL);
-    ck_assert_float_eq_tol(dot2D(minor_vec, dr), pb.min.disp, TOL);
-    ck_assert_float_eq_tol(dot2D(minor_vec, v), pb.min.vel, TOL);
+    ck_assert_float_eq_tol(shared_physics_dot2D(major_vec, dr), pb.maj.disp, TOL);
+    ck_assert_float_eq_tol(shared_physics_dot2D(major_vec, v), pb.maj.vel, TOL);
+    ck_assert_float_eq_tol(shared_physics_dot2D(minor_vec, dr), pb.min.disp, TOL);
+    ck_assert_float_eq_tol(shared_physics_dot2D(minor_vec, v), pb.min.vel, TOL);
 
     ck_assert_float_eq_tol(0, pb.maj.accel, TOL);
     ck_assert_float_eq_tol(0, pb.maj.time, TOL);

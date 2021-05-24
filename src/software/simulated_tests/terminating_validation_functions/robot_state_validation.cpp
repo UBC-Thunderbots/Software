@@ -35,26 +35,26 @@ void robotAtOrientation(RobotId robot_id, std::shared_ptr<World> world_ptr,
                         const Angle& close_to_orientation_threshold,
                         ValidationCoroutine::push_type& yield)
 {
-    auto robot_is_at_orientation = [robot_id, orientation,
-                                    close_to_orientation_threshold](
-                                       std::shared_ptr<World> world_ptr) {
-        std::optional<Robot> robot_optional =
-            world_ptr->friendlyTeam().getRobotById(robot_id);
+    std::optional<Robot> robot_optional =
+        world_ptr->friendlyTeam().getRobotById(robot_id);
+    if (!robot_optional.has_value())
+    {
+        LOG(FATAL) << "There is no robot with ID: " + std::to_string(robot_id);
+    }
+
+    while ((robot_optional->orientation().minDiff(orientation) >
+            close_to_orientation_threshold))
+    {
+        robot_optional = world_ptr->friendlyTeam().getRobotById(robot_id);
         if (!robot_optional.has_value())
         {
             LOG(FATAL) << "There is no robot with ID: " + std::to_string(robot_id);
         }
-
         Robot robot = robot_optional.value();
-        return robot.orientation().minDiff(orientation) < close_to_orientation_threshold;
-    };
-
-    while (!robot_is_at_orientation(world_ptr))
-    {
         std::stringstream ss;
-        ss << orientation;
-        yield("Robot " + std::to_string(robot_id) + " does not have orientation of " +
-              ss.str());
+        ss << "Robot " << std::to_string(robot_id) << " does not have orientation of "
+           << orientation << ", instead it has orientation of " << robot.orientation();
+        yield(ss.str());
     }
 }
 

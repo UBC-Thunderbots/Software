@@ -112,7 +112,7 @@ void force_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
     // Add a small number to avoid division by zero
     float major_vec[2] = {dx / (total_disp + 1e-6f), dy / (total_disp + 1e-6f)};
     float minor_vec[2] = {major_vec[0], major_vec[1]};
-    rotate(minor_vec, P_PI / 2);
+    shared_physics_rotate(minor_vec, P_PI / 2);
 
     PhysBot pb = app_physbot_create(curr_vx, curr_vy, curr_x, curr_y, orientation, dest,
                                     major_vec, minor_vec);
@@ -231,7 +231,7 @@ void velocity_wheels_setLocalVelocity(
     robot_velocity[1] = linear_velocity_y;
     robot_velocity[2] = angular_velocity;
     float wheel_velocity[4];
-    speed3_to_speed4(robot_velocity, wheel_velocity);
+    shared_physics_speed3ToSpeed4(robot_velocity, wheel_velocity);
 
     app_velocity_wheel_setTargetVelocity(front_left_wheel, wheel_velocity[0]);
     app_velocity_wheel_setTargetVelocity(front_right_wheel, wheel_velocity[3]);
@@ -527,7 +527,7 @@ void app_firmware_robot_trackVelocityInRobotFrame(const FirmwareRobot_t* robot,
     float current_velocity[2];
     current_velocity[0] = current_vx;
     current_velocity[1] = current_vy;
-    rotate(current_velocity, -current_orientation);
+    shared_physics_rotate(current_velocity, -current_orientation);
 
     // This is the "P" term in a PID controller. We essentially do proportional
     // control of our acceleration based on velocity error

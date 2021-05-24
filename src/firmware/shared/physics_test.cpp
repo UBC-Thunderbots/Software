@@ -18,9 +18,9 @@ TEST_P(PhysicsTestSpeed3Speed4Conversions, test_speed_3_speed_4_conversions_reco
     const float original_robot_velocity[3] = {
         std::get<0>(GetParam()), std::get<1>(GetParam()), std::get<2>(GetParam())};
     float wheel_velocity[4];
-    speed3_to_speed4(original_robot_velocity, wheel_velocity);
+    shared_physics_speed3ToSpeed4(original_robot_velocity, wheel_velocity);
     float recovered_robot_velocity[3];
-    speed4_to_speed3(wheel_velocity, recovered_robot_velocity);
+    shared_physics_speed4ToSpeed3(wheel_velocity, recovered_robot_velocity);
     for (unsigned int i = 0; i < 3; i++)
     {
         EXPECT_TRUE(TestUtil::equalWithinTolerance(original_robot_velocity[i],
@@ -55,19 +55,20 @@ class PhysicsTestSpeed4Speed3Conversions
 
 TEST_P(PhysicsTestSpeed4Speed3Conversions, test_speed_3_speed_4_conversions_recovered)
 {
-    // converts speed4 to speed 3 before checking if speed3_to_speed4 and back is
-    // recovered recovering speed4 after speed4_to_speed3 and speed3_to_speed4 doesn't
-    // work because there are many possible solutions to speed3_to_speed4
+    // converts speed4 to speed 3 before checking if shared_physics_speed3ToSpeed4 and
+    // back is recovered recovering speed4 after shared_physics_speed4ToSpeed3 and
+    // shared_physics_speed3ToSpeed4 doesn't work because there are many possible
+    // solutions to shared_physics_speed3ToSpeed4
     const float original_wheel_velocity[4] = {
         std::get<0>(GetParam()), std::get<1>(GetParam()), std::get<2>(GetParam()),
         std::get<3>(GetParam())};
     float original_robot_velocity[3];
-    speed4_to_speed3(original_wheel_velocity, original_robot_velocity);
+    shared_physics_speed4ToSpeed3(original_wheel_velocity, original_robot_velocity);
 
     float wheel_velocity[4];
-    speed3_to_speed4(original_robot_velocity, wheel_velocity);
+    shared_physics_speed3ToSpeed4(original_robot_velocity, wheel_velocity);
     float recovered_robot_velocity[3];
-    speed4_to_speed3(wheel_velocity, recovered_robot_velocity);
+    shared_physics_speed4ToSpeed3(wheel_velocity, recovered_robot_velocity);
     for (unsigned int i = 0; i < 3; i++)
     {
         EXPECT_TRUE(TestUtil::equalWithinTolerance(original_robot_velocity[i],

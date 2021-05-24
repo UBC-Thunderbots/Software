@@ -285,7 +285,7 @@ std::array<float, 4> PhysicsRobot::getMotorSpeeds() const
         robot_body->GetLocalVector(robot_body->GetLinearVelocity()).y,
         robot_body->GetAngularVelocity()};
     float wheel_speeds[4]{0.0, 0.0, 0.0, 0.0};
-    speed3_to_speed4(robot_local_speed, wheel_speeds);
+    shared_physics_speed3ToSpeed4(robot_local_speed, wheel_speeds);
     std::array<float, 4> motor_speeds = {0.0, 0.0, 0.0, 0.0};
     for (unsigned int i = 0; i < 4; i++)
     {

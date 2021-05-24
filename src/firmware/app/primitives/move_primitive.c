@@ -89,7 +89,7 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
         (int)(distance_to_destination / max_speed_m_per_s * target_spin_rev_per_s);
     // Change in orientation to reach destination orientation
     const float net_change_in_orientation =
-        min_angle_delta(current_orientation, destination_orientation);
+        shared_physics_minAngleDelta(current_orientation, destination_orientation);
 
     // Plan a trajectory to move to the target position/orientation
     FirmwareRobotPathParameters_t path_parameters = {

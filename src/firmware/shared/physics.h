@@ -83,26 +83,26 @@ extern const float MAX_VEL[3];
 // speed4 which is the listing of wheel speeds
 // and speed3 which is a speed in x,y,rotation in
 // robot relative coordinates
-void speed4_to_speed3(const float speed4[4], float speed3[3]);
-void speed3_to_speed4(const float speed3[3], float speed4[4]);
+void shared_physics_speed4ToSpeed3(const float speed4[4], float speed3[3]);
+void shared_physics_speed3ToSpeed4(const float speed3[3], float speed4[4]);
 
 // transformation matricies to convert forces in the
 // two different domains commonly used by the robot
 // force4 which is the listing of wheel forces
 // and force3 which is a force in x,y,rotation in
 // robot relative coordinates
-void force3_to_force4(float force3[3], float force4[4]);
+void shared_physics_force3ToForce4(float force3[3], float force4[4]);
 
-float min_angle_delta(float, float);
+float shared_physics_minAngleDelta(float, float);
 
-float norm2(float a1, float a2);
+float shared_physics_norm2(float a1, float a2);
 
 // rotate a velocity vector through angle
-void rotate(float speed3[2], float angle);
+void shared_physics_rotate(float speed3[2], float angle);
 
-float dot_product(const float vec1[], const float vec2[], const int size);
+float shared_physics_dotProduct(const float vec1[], const float vec2[], const int size);
 
-float dot2D(float vec1[2], float vec2[2]);
+float shared_physics_dot2D(float vec1[2], float vec2[2]);
 
 /**
  * Function calculates the final speed at the end of a displacement given an initial speed

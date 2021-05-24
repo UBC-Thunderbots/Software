@@ -71,7 +71,7 @@ void dr_tick(log_record_t *log)
     }
     // Todo: Check for wheel slippage
 
-    speed4_to_speed3(encoder_speeds, wheel_speeds);
+    shared_physics_speed4ToSpeed3(encoder_speeds, wheel_speeds);
     wheel_speeds[2] =
         wheel_speeds[2] / ROBOT_RADIUS;  // Convert to angular velocity (rad/s)
 
@@ -86,7 +86,7 @@ void dr_tick(log_record_t *log)
     add_to_circ_buff(past_wheel_speeds, SPEED_SIZE, wheel_speed_object);
 
     // Convert to global reference frame for state update
-    rotate(wheel_speeds, current_state.angle);
+    shared_physics_rotate(wheel_speeds, current_state.angle);
 
     // Update the current velocity to match wheel velocities
     current_state.vx   = wheel_speeds[0];
@@ -259,7 +259,7 @@ void dr_apply_cam(void)
         wheel_speeds[1] = wheel_speed.speed_y;
         wheel_speeds[2] = wheel_speed.speed_angle;
 
-        rotate(wheel_speeds, angle);
+        shared_physics_rotate(wheel_speeds, angle);
         x += wheel_speeds[0] * TICK_TIME;
         y += wheel_speeds[1] * TICK_TIME;
         angle += wheel_speeds[2] * TICK_TIME;

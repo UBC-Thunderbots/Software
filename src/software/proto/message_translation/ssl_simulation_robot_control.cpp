@@ -29,7 +29,7 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
     float wheel_speeds[4]{front_left_m_per_s, back_left_m_per_s, back_right_m_per_s,
                           front_right_m_per_s};
     float robot_local_speed[3]{0.0, 0.0, 0.0};
-    speed4_to_speed3(wheel_speeds, robot_local_speed);
+    shared_physics_speed4ToSpeed3(wheel_speeds, robot_local_speed);
 
     robot_local_speed[2] =
         robot_local_speed[2] /
