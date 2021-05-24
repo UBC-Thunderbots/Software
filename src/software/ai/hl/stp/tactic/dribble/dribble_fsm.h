@@ -220,7 +220,7 @@ struct DribbleFSM
                                      event.common.robot.position(),
                                      event.control_params.final_dribble_orientation),
                                  ROBOT_ORIENTATION_CLOSE_THRESHOLD) &&
-                   have_possession(event) && robotStopped(event.common.robot, 0.2);
+                   have_possession(event) && robotStopped(event.common.robot, ROBOT_DRIBBLING_DONE_SPEED);
         };
 
         /**
