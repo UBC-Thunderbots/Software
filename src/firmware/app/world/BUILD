@@ -11,7 +11,7 @@ cc_test(
     srcs = ["charger_test.cpp"],
     deps = [
         ":charger",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -26,7 +26,7 @@ cc_test(
     srcs = ["chicker_test.cpp"],
     deps = [
         ":chicker",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -41,7 +41,7 @@ cc_test(
     srcs = ["dribbler_test.cpp"],
     deps = [
         ":dribbler",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -56,7 +56,7 @@ cc_test(
     srcs = ["firmware_ball_test.cpp"],
     deps = [
         ":firmware_ball",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -86,8 +86,8 @@ cc_test(
         ":firmware_robot",
         "//firmware/app/logger",
         "//shared/test_util",
+        "//shared/test_util:tbots_gtest_main",
         "//software/logger",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -106,7 +106,7 @@ cc_test(
     srcs = ["firmware_world_test.cpp"],
     deps = [
         ":firmware_world",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -129,6 +129,6 @@ cc_test(
     srcs = ["force_wheel_test.cpp"],
     deps = [
         ":force_wheel",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )

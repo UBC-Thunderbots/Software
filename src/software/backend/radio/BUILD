@@ -17,7 +17,7 @@ cc_test(
     srcs = ["robot_status_test.cpp"],
     deps = [
         ":robot_status",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 

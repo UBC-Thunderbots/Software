@@ -16,6 +16,6 @@ cc_test(
     srcs = ["generic_factory_test.cpp"],
     deps = [
         ":generic_factory",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )

@@ -22,10 +22,10 @@ cc_test(
     srcs = ["sensor_fusion_test.cpp"],
     deps = [
         ":sensor_fusion",
+        "//shared/test_util:tbots_gtest_main",
         "//software/proto/message_translation:ssl_detection",
         "//software/proto/message_translation:ssl_geometry",
         "//software/proto/message_translation:ssl_wrapper",
-        "@gtest//:gtest_main",
     ],
 )
 

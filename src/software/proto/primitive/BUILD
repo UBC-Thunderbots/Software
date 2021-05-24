@@ -21,6 +21,6 @@ cc_test(
     srcs = ["primitive_msg_factory_test.cpp"],
     deps = [
         ":primitive_msg_factory",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
