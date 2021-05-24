@@ -39,9 +39,9 @@ cc_test(
     deps = [
         ":proto_log_reader",
         ":proto_logger",
+        "//shared/test_util:tbots_gtest_main",
         "//software/multithreading:subject",
         "//software/proto:repeated_any_msg_cc_proto",
         "//software/proto:sensor_msg_cc_proto",
-        "@gtest//:gtest_main",
     ],
 )

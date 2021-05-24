@@ -13,6 +13,6 @@ cc_test(
     deps = [
         ":logger",
         "//shared/proto:tbots_nanopb_proto",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )

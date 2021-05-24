@@ -46,8 +46,8 @@ cc_test(
     ],
     deps = [
         "//shared/parameter:c_configs",
+        "//shared/test_util:tbots_gtest_main",
         "@boost//:filesystem",
-        "@gtest//:gtest_main",
         "@libclang",
         "@yaml-cpp",
     ],
@@ -63,10 +63,10 @@ cc_test(
     ],
     deps = [
         "//shared/parameter:cpp_configs",
+        "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:halt_play",
         "//software/util/variant_visitor",
         "@boost//:filesystem",
-        "@gtest//:gtest_main",
         "@yaml-cpp",
     ],
 )
@@ -106,7 +106,7 @@ cc_test(
         ":enumerated_parameter",
         ":numeric_parameter",
         ":parameter",
+        "//shared/test_util:tbots_gtest_main",
         "//software/util/make_enum",
-        "@gtest//:gtest_main",
     ],
 )

@@ -26,12 +26,12 @@ cc_test(
     srcs = ["navigator_test.cpp"],
     deps = [
         ":navigator",
+        "//shared/test_util:tbots_gtest_main",
         "//software/ai/navigator/path_manager:velocity_obstacle_path_manager",
         "//software/ai/navigator/path_planner:no_path_test_path_planner",
         "//software/ai/navigator/path_planner:one_point_path_test_path_planner",
         "//software/ai/navigator/path_planner:theta_star_path_planner",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -59,7 +59,7 @@ cc_test(
     srcs = ["navigating_primitive_creator_test.cpp"],
     deps = [
         ":navigating_primitive_creator",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )

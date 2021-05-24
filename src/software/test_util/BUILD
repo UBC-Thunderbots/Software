@@ -16,6 +16,7 @@ cc_library(
         "//shared:constants",
         "//shared/proto:tbots_cc_proto",
         "//shared/proto:tbots_nanopb_proto",
+        "//shared/test_util:tbots_gtest_main",
         "//software/geom:angle",
         "//software/geom:angular_velocity",
         "//software/geom:geom_constants",
@@ -27,7 +28,6 @@ cc_library(
         "//software/simulation/physics:physics_world",
         "//software/world",
         "//software/world:robot_state",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -36,7 +36,7 @@ cc_test(
     srcs = ["test_util_test.cpp"],
     deps = [
         ":test_util",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -45,6 +45,6 @@ cc_test(
     srcs = ["equal_within_tolerance_test.cpp"],
     deps = [
         ":test_util",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
