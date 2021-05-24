@@ -183,10 +183,10 @@ SECTIONS
     . = ABSOLUTE(0x30040000);
     *(.RxDecripSection) 
     
-    . = ABSOLUTE(0x30040060);
+    . = ABSOLUTE(0x30040180);
     *(.TxDecripSection)
     
-    . = ABSOLUTE(0x30040200);
+    . = ABSOLUTE(0x30040400);
     *(.RxArraySection) 
   } >RAM_D2 AT> FLASH
 
