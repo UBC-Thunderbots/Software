@@ -132,8 +132,3 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
-
-cc_library(
-    name = "firmware_robot_constants",
-    hdrs = ["firmware_robot_constants.h"],
-)
