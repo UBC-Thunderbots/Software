@@ -21,8 +21,8 @@ cc_test(
     srcs = ["chip_action_test.cpp"],
     deps = [
         ":chip_action",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -48,12 +48,12 @@ cc_test(
     srcs = ["intercept_ball_action_test.cpp"],
     deps = [
         ":intercept_ball_action",
+        "//shared/test_util:tbots_gtest_main",
         "//software/ai/intent:move_intent",
         "//software/geom:segment",
         "//software/geom/algorithms",
         "//software/test_util",
         "//software/world:ball",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -77,8 +77,8 @@ cc_test(
     srcs = ["kick_action_test.cpp"],
     deps = [
         ":kick_action",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -97,7 +97,7 @@ cc_test(
     srcs = ["move_action_test.cpp"],
     deps = [
         ":move_action",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -116,7 +116,7 @@ cc_test(
     srcs = ["stop_action_test.cpp"],
     deps = [
         ":stop_action",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -149,8 +149,8 @@ cc_test(
     srcs = ["action_test.cpp"],
     deps = [
         ":action",
+        "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/action/test_actions:move_test_action",
         "//software/ai/intent:move_intent",
-        "@gtest//:gtest_main",
     ],
 )

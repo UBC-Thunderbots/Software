@@ -11,6 +11,6 @@ cc_test(
     srcs = [":make_enum_test.cpp"],
     deps = [
         ":make_enum",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
