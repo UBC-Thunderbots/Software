@@ -17,7 +17,7 @@ cc_test(
     deps = [
         ":physics",
         "//software/test_util",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
