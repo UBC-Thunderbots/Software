@@ -490,7 +490,7 @@ static void run_normal(void)
 
     // Setup the world that acts as the interface for the higher level firmware
     // (like primitives or the controller) to interface with the outside world
-    ForceWheelConstants_t wheel_constants = {
+    WheelConstants_t wheel_constants = {
         .wheel_rotations_per_motor_rotation  = GEAR_RATIO,
         .wheel_radius                        = WHEEL_RADIUS,
         .motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT,

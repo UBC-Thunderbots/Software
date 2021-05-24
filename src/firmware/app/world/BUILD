@@ -114,12 +114,14 @@ cc_library(
     name = "force_wheel",
     srcs = ["force_wheel.c"],
     hdrs = ["force_wheel.h"],
+    deps = ["//shared:robot_constants"],
 )
 
 cc_library(
     name = "velocity_wheel",
     srcs = ["velocity_wheel.c"],
     hdrs = ["velocity_wheel.h"],
+    deps = ["//shared:robot_constants"],
 )
 
 cc_test(

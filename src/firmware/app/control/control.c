@@ -26,9 +26,9 @@ float app_control_getMaximalTorqueScaling(const ForceWheel_t* force_wheels[4],
 
     for (long i = 0; i < 4; i++)
     {
-        const ForceWheel_t* wheel             = force_wheels[i];
-        const ForceWheelConstants_t constants = app_force_wheel_getWheelConstants(wheel);
-        float force                           = wheel_forces[i];
+        const ForceWheel_t* wheel        = force_wheels[i];
+        const WheelConstants_t constants = app_force_wheel_getWheelConstants(wheel);
+        float force                      = wheel_forces[i];
         float motor_torque =
             force * constants.wheel_radius * constants.wheel_rotations_per_motor_rotation;
         float curr_motor_rpm = app_force_wheel_getMotorSpeedRPM(wheel);

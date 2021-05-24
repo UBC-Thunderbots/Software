@@ -45,7 +45,7 @@ ForceWheelSimulatorRobotSingleton::createFirmwareRobot()
                             &(SimulatorRobotSingleton::dribblerCoast),
                             &(SimulatorRobotSingleton::getDribblerTemperatureDegC));
 
-    ForceWheelConstants_t wheel_constants;
+    WheelConstants_t wheel_constants;
     wheel_constants.wheel_rotations_per_motor_rotation  = GEAR_RATIO;
     wheel_constants.wheel_radius                        = WHEEL_RADIUS;
     wheel_constants.motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT;

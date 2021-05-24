@@ -79,12 +79,12 @@ namespace FirmwareTestUtil
 };  // namespace FirmwareTestUtil
 
 // Mock wheel state
-ForceWheelConstants_t wheel_constants = {.motor_current_per_unit_torque       = 1.1f,
-                                         .motor_phase_resistance              = 1.2f,
-                                         .motor_back_emf_per_rpm              = 1.3f,
-                                         .motor_max_voltage_before_wheel_slip = 1.4f,
-                                         .wheel_radius                        = 1.5f,
-                                         .wheel_rotations_per_motor_rotation  = 0.5f};
+WheelConstants_t wheel_constants = {.motor_current_per_unit_torque       = 1.1f,
+                                    .motor_phase_resistance              = 1.2f,
+                                    .motor_back_emf_per_rpm              = 1.3f,
+                                    .motor_max_voltage_before_wheel_slip = 1.4f,
+                                    .wheel_radius                        = 1.5f,
+                                    .wheel_rotations_per_motor_rotation  = 0.5f};
 
 // Mock controller state
 ControllerState_t controller_state = {.last_applied_acceleration_x       = 2.33f,
