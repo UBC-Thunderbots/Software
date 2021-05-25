@@ -23,6 +23,6 @@ void io_drivetrain_unit_applyForce(DrivetrainUnit_t* drive_train_unit,
 /**
  * Disable the wheels and allow the DrivetrainUnit to coast.
  *
- * @param [in] drive_train_unit The DrivetrainUnit to apply force to
+ * @param [in] drive_train_unit The DrivetrainUnit to coast
  */
 void io_drivetrain_unit_coast(DrivetrainUnit_t* drive_train_unit);

@@ -15,17 +15,6 @@ void io_primitive_executor_init(FirmwareWorld_t* world,
     g_primitive_manager = primitive_manager;
 }
 
-void io_primitive_executor_task(void* argument)
-{
-    (void)argument;
-
-    for (;;)
-    {
-        app_primitive_manager_runCurrentPrimitive(g_primitive_manager, g_world);
-        osDelay(10);
-    }
-}
-
 void io_primitive_starter_task(void* argument)
 {
     ProtoMulticastCommunicationProfile_t* comm_profile =
@@ -47,5 +36,16 @@ void io_primitive_starter_task(void* argument)
 
         app_primitive_manager_startNewPrimitive(g_primitive_manager, g_world,
                                                 primitive_msg);
+    }
+}
+
+void io_primitive_executor_task(void* argument)
+{
+    (void)argument;
+
+    for (;;)
+    {
+        app_primitive_manager_runCurrentPrimitive(g_primitive_manager, g_world);
+        osDelay(10);
     }
 }

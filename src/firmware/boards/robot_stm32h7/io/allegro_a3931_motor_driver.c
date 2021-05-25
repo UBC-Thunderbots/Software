@@ -64,7 +64,7 @@ void io_allegro_a3931_motor_setPwmPercentage(AllegroA3931MotorDriver_t* motor_dr
         motor_driver->enabled = true;
     }
 
-    io_pwm_pin_updatePwm(motor_driver->pwm_pin, pwm_percentage);
+    io_pwm_pin_setPwm(motor_driver->pwm_pin, pwm_percentage);
 }
 
 void io_allegro_a3931_motor_disable(AllegroA3931MotorDriver_t* motor_driver)

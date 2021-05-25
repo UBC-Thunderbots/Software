@@ -49,28 +49,28 @@ void io_drivetrain_applyForceBackRightWheel(float force_newtons)
 
 float io_drivetrain_getFrontLeftRpm(void)
 {
-    // TODO (#2063) implement this once we have tachometer
+    // TODO (#2063) implement this once we have tachometer support
     assert(initialized);
     return 100;
 }
 
 float io_drivetrain_getFrontRightRpm(void)
 {
-    // TODO (#2063) implement this once we have tachometer
+    // TODO (#2063) implement this once we have tachometer support
     assert(initialized);
     return 100;
 }
 
 float io_drivetrain_getBackLeftRpm(void)
 {
-    // TODO (#2063) implement this once we have tachometer
+    // TODO (#2063) implement this once we have tachometer support
     assert(initialized);
     return 100;
 }
 
 float io_drivetrain_getBackRightRpm(void)
 {
-    // TODO (#2063) implement this once we have tachometer
+    // TODO (#2063) implement this once we have tachometer support
     assert(initialized);
     return 100;
 }

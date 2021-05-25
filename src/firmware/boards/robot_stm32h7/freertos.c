@@ -390,21 +390,21 @@ void initIoNetworking(void)
 
 void initIoDrivetrain(void)
 {
-    // MOTOR A
-    GpioPin_t *motor_a_reset_pin =
-        io_gpio_pin_create(WHEEL_BACK_LEFT_RESET_GPIO_Port, WHEEL_BACK_LEFT_RESET_Pin, ACTIVE_HIGH);
-    GpioPin_t *motor_a_mode_pin =
-        io_gpio_pin_create(WHEEL_BACK_LEFT_MODE_GPIO_Port, WHEEL_BACK_LEFT_MODE_Pin, ACTIVE_HIGH);
-    GpioPin_t *motor_a_dir_pin =
-        io_gpio_pin_create(WHEEL_BACK_LEFT_DIR_GPIO_Port, WHEEL_BACK_LEFT_DIR_Pin, ACTIVE_HIGH);
+    // MOTOR WHEEL_BACK_LEFT
+    GpioPin_t *motor_a_reset_pin = io_gpio_pin_create(
+        WHEEL_BACK_LEFT_RESET_GPIO_Port, WHEEL_BACK_LEFT_RESET_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_a_mode_pin = io_gpio_pin_create(
+        WHEEL_BACK_LEFT_MODE_GPIO_Port, WHEEL_BACK_LEFT_MODE_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_a_dir_pin = io_gpio_pin_create(WHEEL_BACK_LEFT_DIR_GPIO_Port,
+                                                    WHEEL_BACK_LEFT_DIR_Pin, ACTIVE_HIGH);
 
-    // MOTOR B
-    GpioPin_t *motor_b_reset_pin =
-        io_gpio_pin_create(WHEEL_FRONT_LEFT_RESET_GPIO_Port, WHEEL_FRONT_LEFT_RESET_Pin, ACTIVE_HIGH);
-    GpioPin_t *motor_b_mode_pin =
-        io_gpio_pin_create(WHEEL_FRONT_LEFT_MODE_GPIO_Port, WHEEL_FRONT_LEFT_MODE_Pin, ACTIVE_HIGH);
-    GpioPin_t *motor_b_dir_pin =
-        io_gpio_pin_create(WHEEL_FRONT_LEFT_DIR_GPIO_Port, WHEEL_FRONT_LEFT_DIR_Pin, ACTIVE_HIGH);
+    // MOTOR WHEEL_FRONT
+    GpioPin_t *motor_b_reset_pin = io_gpio_pin_create(
+        WHEEL_FRONT_LEFT_RESET_GPIO_Port, WHEEL_FRONT_LEFT_RESET_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_b_mode_pin = io_gpio_pin_create(
+        WHEEL_FRONT_LEFT_MODE_GPIO_Port, WHEEL_FRONT_LEFT_MODE_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_b_dir_pin = io_gpio_pin_create(
+        WHEEL_FRONT_LEFT_DIR_GPIO_Port, WHEEL_FRONT_LEFT_DIR_Pin, ACTIVE_HIGH);
 
     // MOTOR C
     GpioPin_t *motor_c_reset_pin =
@@ -415,20 +415,20 @@ void initIoDrivetrain(void)
         io_gpio_pin_create(DRIBBLE_DIR_GPIO_Port, DRIBBLE_DIR_Pin, ACTIVE_HIGH);
 
     // MOTOR D
-    GpioPin_t *motor_d_reset_pin =
-        io_gpio_pin_create(WHEEL_BACK_RIGHT_RESET_GPIO_Port, WHEEL_BACK_RIGHT_RESET_Pin, ACTIVE_HIGH);
-    GpioPin_t *motor_d_mode_pin =
-        io_gpio_pin_create(WHEEL_BACK_RIGHT_MODE_GPIO_Port, WHEEL_BACK_RIGHT_MODE_Pin, ACTIVE_HIGH);
-    GpioPin_t *motor_d_dir_pin =
-        io_gpio_pin_create(WHEEL_BACK_RIGHT_DIR_GPIO_Port, WHEEL_BACK_RIGHT_DIR_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_d_reset_pin = io_gpio_pin_create(
+        WHEEL_BACK_RIGHT_RESET_GPIO_Port, WHEEL_BACK_RIGHT_RESET_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_d_mode_pin = io_gpio_pin_create(
+        WHEEL_BACK_RIGHT_MODE_GPIO_Port, WHEEL_BACK_RIGHT_MODE_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_d_dir_pin = io_gpio_pin_create(
+        WHEEL_BACK_RIGHT_DIR_GPIO_Port, WHEEL_BACK_RIGHT_DIR_Pin, ACTIVE_HIGH);
 
     // MOTOR E
-    GpioPin_t *motor_e_reset_pin =
-        io_gpio_pin_create(WHEEL_FRONT_RIGHT_RESET_GPIO_Port, WHEEL_FRONT_RIGHT_RESET_Pin, ACTIVE_HIGH);
-    GpioPin_t *motor_e_mode_pin =
-        io_gpio_pin_create(WHEEL_FRONT_RIGHT_MODE_GPIO_Port, WHEEL_FRONT_RIGHT_MODE_Pin, ACTIVE_HIGH);
-    GpioPin_t *motor_e_dir_pin =
-        io_gpio_pin_create(WHEEL_FRONT_RIGHT_DIR_GPIO_Port, WHEEL_FRONT_RIGHT_DIR_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_e_reset_pin = io_gpio_pin_create(
+        WHEEL_FRONT_RIGHT_RESET_GPIO_Port, WHEEL_FRONT_RIGHT_RESET_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_e_mode_pin = io_gpio_pin_create(
+        WHEEL_FRONT_RIGHT_MODE_GPIO_Port, WHEEL_FRONT_RIGHT_MODE_Pin, ACTIVE_HIGH);
+    GpioPin_t *motor_e_dir_pin = io_gpio_pin_create(
+        WHEEL_FRONT_RIGHT_DIR_GPIO_Port, WHEEL_FRONT_RIGHT_DIR_Pin, ACTIVE_HIGH);
 
     PwmPin_t *motor_a_pwm_pin = io_pwm_pin_create(&htim15, TIM_CHANNEL_2);
     PwmPin_t *motor_b_pwm_pin = io_pwm_pin_create(&htim3, TIM_CHANNEL_2);
@@ -460,9 +460,11 @@ void initIoDrivetrain(void)
 
 void initIoPowerMonitor(void)
 {
-    /*io_power_monitor_init(I2C1, INA226_ADDRESS,*/
-    /*INA226_MODE_CONT_SHUNT_AND_BUS | INA226_VBUS_140uS |*/
-    /*INA226_VBUS_140uS | INA226_AVG_1024);*/
+    // TODO (#2097) re-enable once the new mainboard and powerboard revs are in
+    //
+    // io_power_monitor_init(I2C1, INA226_ADDRESS,
+    //                       INA226_MODE_CONT_SHUNT_AND_BUS | INA226_VBUS_140uS |
+    //                           INA226_VBUS_140uS | INA226_AVG_1024);
 }
 
 /* USER CODE END Application */

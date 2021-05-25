@@ -26,8 +26,6 @@ void io_network_logger_task(void* communication_profile)
 
     for (;;)
     {
-        osDelay(100);
-        continue;
         status = osMessageQueueGet(log_message_queue_id_, &dequeued_robot_log_proto, NULL,
                                    osWaitForever);
         if (status == osOK)

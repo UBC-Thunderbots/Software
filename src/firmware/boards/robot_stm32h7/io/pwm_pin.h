@@ -36,4 +36,3 @@ void io_pwm_pin_destroy(PwmPin_t* pwm_pin);
  * @param pwm_percentage A value in [0,1] indicating the PWM percentage to apply
  */
 void io_pwm_pin_setPwm(PwmPin_t* pwm_pin, float pwm_percentage);
-void io_pwm_pin_updatePwm(PwmPin_t* pwm_pin, float pwm_percentage);

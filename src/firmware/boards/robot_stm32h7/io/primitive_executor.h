@@ -19,11 +19,11 @@ void io_primitive_executor_init(FirmwareWorld_t* world,
  *
  * @param argument Unused
  */
-void io_primitive_executor_task(void* argument);
+void io_primitive_starter_task(void* argument);
 
 /*
  * Ticks the primitive manager as fast as it will go.
  *
  * @param argument Unused
  */
-void io_primitive_starter_task(void* argument);
+void io_primitive_executor_task(void* argument);
