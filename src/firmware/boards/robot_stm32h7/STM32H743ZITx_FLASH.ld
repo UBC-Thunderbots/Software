@@ -179,15 +179,35 @@ SECTIONS
     . = ALIGN(8);
   } >RAM_D1
 
-  .lwip_sec (NOLOAD) : {
-    . = ABSOLUTE(0x30040000);
-    *(.RxDecripSection) 
-    
-    . = ABSOLUTE(0x30040180);
+  .EthRxBlock (NOLOAD) :
+  {
+    /* MPU region for the ETH rx buffers: 128KB at start of D2 region.
+     * Rationale: To conserve memory we want the rx buffers to be uncached.
+     * If they were cached, the starts and ends of each rx buffer must be
+     * cache-line aligned to avoid corrupting the pbuf part when the
+     * buffer's invalidated following DMA receive. */
+    . = ABSOLUTE(0x30000000);
+    *(.RxArraySection)
+  } >RAM_D2 AT> FLASH
+
+  .EthTxBlock (NOLOAD) :
+  {
+    /* Normal, cached memory for the LwIP heap: 16KB following EthRxBlock.
+     * Rationale: LwIP allocates ETH tx buffers on its heap, and so to position
+     * the tx buffers in the D2 domain we must relocate the entire heap. */
+    . = ABSOLUTE(0x30020000);
+    *(.TxArraySection)
+  } >RAM_D2 AT> FLASH
+
+  .EthDescriptorsBlock (NOLOAD) :
+  {
+    /* MPU region for the ETH rx and tx descriptors: 1KB following EthTxBlock.
+     * Rationale: to guarantee memory accesses complete in program order so
+     * memory barriers aren't necessary. */
+    . = ABSOLUTE(0x30024000);
+    *(.RxDecripSection)
     *(.TxDecripSection)
-    
-    . = ABSOLUTE(0x30040400);
-    *(.RxArraySection) 
+    . = ALIGN(1K);
   } >RAM_D2 AT> FLASH
 
    /* DMA1 and DMA2 are directly connected to D2 Domain so we allocate
