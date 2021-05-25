@@ -16,6 +16,7 @@
 WifiBackend::WifiBackend(std::shared_ptr<const BackendConfig> config)
     : network_config(config->getWifiBackendConfig()->getNetworkConfig()),
       sensor_fusion_config(config->getWifiBackendConfig()->getSensorFusionConfig()),
+      arduino_config(config->getWifiBackendConfig()->getArduinoConfig()),
       ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
                        boost::bind(&Backend::receiveSSLReferee, this, _1),
                        network_config->getSslCommunicationConfig()),
@@ -72,12 +73,8 @@ void WifiBackend::onValueReceived(World world)
         boost::asio::io_service io_service;
         std::unique_ptr<BoostUartCommunication> uart_device =
             std::make_unique<BoostUartCommunication>(io_service, ARDUINO_BAUD_RATE,
-                                                     ARDUINO_PORT);
+                                                     arduino_config->getArduinoPort()->value());
         estop_reader = std::make_unique<ThreadedEstopReader>(std::move(uart_device), 0);
-    }
-    else if (!world.isEstopEnabled() && estop_reader != nullptr)
-    {
-        LOG(WARNING) << "Once enabled ESTOP cannot be disabled";
     }
 
     vision_output->sendProto(*createVision(world));

@@ -46,6 +46,7 @@ class WifiBackend : public Backend
 
     const std::shared_ptr<const NetworkConfig> network_config;
     const std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
+    const std::shared_ptr<const ArduinoConfig> arduino_config;
 
     // Client to listen for SSL protobufs
     SSLProtoClient ssl_proto_client;

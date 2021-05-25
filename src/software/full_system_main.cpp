@@ -15,6 +15,7 @@
 #include "software/proto/message_translation/ssl_wrapper.h"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/design_patterns/generic_factory.h"
+#include "software/estop/arduino_util.h"
 
 // clang-format off
 std::string BANNER =
@@ -53,6 +54,16 @@ int main(int argc, char** argv)
             mutable_thunderbots_config->getMutableNetworkConfig()
                 ->getMutableNetworkInterface()
                 ->setValue(args->getInterface()->value());
+        }
+
+        //set Arduino port if given, otherwise try to find programmatically
+        if (!args->getArduinoDevicePort()->value().empty())
+        {
+            mutable_thunderbots_config->getMutableArduinoConfig()->getMutableArduinoPort()
+                    ->setValue(args->getArduinoDevicePort()->value());
+        } else {
+            mutable_thunderbots_config->getMutableArduinoConfig()->getMutableArduinoPort()
+                    ->setValue(ArduinoUtil::getArduinoPort().value_or(""));
         }
 
         if (args->getBackend()->value().empty())
