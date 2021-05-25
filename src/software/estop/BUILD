@@ -1,14 +1,10 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@rules_python//python:defs.bzl", "py_binary")
-load("@dynamic_parameter_deps//:requirements.bzl", "requirement")
-
 cc_library(
     name = "threaded_estop_reader",
     srcs = ["threaded_estop_reader.cpp"],
     hdrs = ["threaded_estop_reader.h"],
     deps = [
-        "arduino_util",
         "uart_communication_interface",
         "//shared:constants",
         "//software/logger",
@@ -40,17 +36,6 @@ cc_library(
         "//shared:constants",
         "@boost//:filesystem",
         "@boost//:format",
-    ],
-)
-
-cc_test(
-    name = "find_port_test",
-    srcs = [
-        "arduino_util_test.cpp",
-    ],
-    deps = [
-        ":arduino_util",
-        "@gtest//:gtest_main",
     ],
 )
 

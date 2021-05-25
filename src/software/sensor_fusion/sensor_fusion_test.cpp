@@ -299,7 +299,7 @@ class SensorFusionTest : public ::testing::Test
     std::unique_ptr<TbotsProto::RobotStatus> initEstopEnabled()
     {
         auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
-        robot_msg->set_estopenabled(true);
+        robot_msg->set_estop_enabled(true);
 
         return std::move(robot_msg);
     }
