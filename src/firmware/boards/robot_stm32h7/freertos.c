@@ -392,43 +392,43 @@ void initIoDrivetrain(void)
 {
     // MOTOR A
     GpioPin_t *motor_a_reset_pin =
-        io_gpio_pin_create(MOTOR_A_RESET_GPIO_Port, MOTOR_A_RESET_Pin, ACTIVE_HIGH);
+        io_gpio_pin_create(WHEEL_BACK_LEFT_RESET_GPIO_Port, WHEEL_BACK_LEFT_RESET_Pin, ACTIVE_HIGH);
     GpioPin_t *motor_a_mode_pin =
-        io_gpio_pin_create(MOTOR_A_MODE_GPIO_Port, MOTOR_A_MODE_Pin, ACTIVE_HIGH);
+        io_gpio_pin_create(WHEEL_BACK_LEFT_MODE_GPIO_Port, WHEEL_BACK_LEFT_MODE_Pin, ACTIVE_HIGH);
     GpioPin_t *motor_a_dir_pin =
-        io_gpio_pin_create(MOTOR_A_DIR_GPIO_Port, MOTOR_A_DIR_Pin, ACTIVE_HIGH);
+        io_gpio_pin_create(WHEEL_BACK_LEFT_DIR_GPIO_Port, WHEEL_BACK_LEFT_DIR_Pin, ACTIVE_HIGH);
 
     // MOTOR B
     GpioPin_t *motor_b_reset_pin =
-        io_gpio_pin_create(MOTOR_B_RESET_GPIO_Port, MOTOR_B_RESET_Pin, ACTIVE_HIGH);
+        io_gpio_pin_create(WHEEL_FRONT_LEFT_RESET_GPIO_Port, WHEEL_FRONT_LEFT_RESET_Pin, ACTIVE_HIGH);
     GpioPin_t *motor_b_mode_pin =
-        io_gpio_pin_create(MOTOR_B_MODE_GPIO_Port, MOTOR_B_MODE_Pin, ACTIVE_HIGH);
+        io_gpio_pin_create(WHEEL_FRONT_LEFT_MODE_GPIO_Port, WHEEL_FRONT_LEFT_MODE_Pin, ACTIVE_HIGH);
     GpioPin_t *motor_b_dir_pin =
-        io_gpio_pin_create(MOTOR_B_DIR_GPIO_Port, MOTOR_B_DIR_Pin, ACTIVE_HIGH);
+        io_gpio_pin_create(WHEEL_FRONT_LEFT_DIR_GPIO_Port, WHEEL_FRONT_LEFT_DIR_Pin, ACTIVE_HIGH);
 
     // MOTOR C
     GpioPin_t *motor_c_reset_pin =
-        io_gpio_pin_create(MOTOR_C_RESET_GPIO_Port, MOTOR_C_RESET_Pin, ACTIVE_HIGH);
+        io_gpio_pin_create(DRIBBLE_RESET_GPIO_Port, DRIBBLE_RESET_Pin, ACTIVE_HIGH);
     GpioPin_t *motor_c_mode_pin =
-        io_gpio_pin_create(MOTOR_C_MODE_GPIO_Port, MOTOR_C_MODE_Pin, ACTIVE_HIGH);
+        io_gpio_pin_create(DRIBBLE_MODE_GPIO_Port, DRIBBLE_MODE_Pin, ACTIVE_HIGH);
     GpioPin_t *motor_c_dir_pin =
-        io_gpio_pin_create(MOTOR_C_DIR_GPIO_Port, MOTOR_C_DIR_Pin, ACTIVE_HIGH);
+        io_gpio_pin_create(DRIBBLE_DIR_GPIO_Port, DRIBBLE_DIR_Pin, ACTIVE_HIGH);
 
     // MOTOR D
     GpioPin_t *motor_d_reset_pin =
-        io_gpio_pin_create(MOTOR_D_RESET_GPIO_Port, MOTOR_D_RESET_Pin, ACTIVE_HIGH);
+        io_gpio_pin_create(WHEEL_BACK_RIGHT_RESET_GPIO_Port, WHEEL_BACK_RIGHT_RESET_Pin, ACTIVE_HIGH);
     GpioPin_t *motor_d_mode_pin =
-        io_gpio_pin_create(MOTOR_D_MODE_GPIO_Port, MOTOR_D_MODE_Pin, ACTIVE_HIGH);
+        io_gpio_pin_create(WHEEL_BACK_RIGHT_MODE_GPIO_Port, WHEEL_BACK_RIGHT_MODE_Pin, ACTIVE_HIGH);
     GpioPin_t *motor_d_dir_pin =
-        io_gpio_pin_create(MOTOR_D_DIR_GPIO_Port, MOTOR_D_DIR_Pin, ACTIVE_HIGH);
+        io_gpio_pin_create(WHEEL_BACK_RIGHT_DIR_GPIO_Port, WHEEL_BACK_RIGHT_DIR_Pin, ACTIVE_HIGH);
 
     // MOTOR E
     GpioPin_t *motor_e_reset_pin =
-        io_gpio_pin_create(MOTOR_E_RESET_GPIO_Port, MOTOR_E_RESET_Pin, ACTIVE_HIGH);
+        io_gpio_pin_create(WHEEL_FRONT_RIGHT_RESET_GPIO_Port, WHEEL_FRONT_RIGHT_RESET_Pin, ACTIVE_HIGH);
     GpioPin_t *motor_e_mode_pin =
-        io_gpio_pin_create(MOTOR_E_MODE_GPIO_Port, MOTOR_E_MODE_Pin, ACTIVE_HIGH);
+        io_gpio_pin_create(WHEEL_FRONT_RIGHT_MODE_GPIO_Port, WHEEL_FRONT_RIGHT_MODE_Pin, ACTIVE_HIGH);
     GpioPin_t *motor_e_dir_pin =
-        io_gpio_pin_create(MOTOR_E_DIR_GPIO_Port, MOTOR_E_DIR_Pin, ACTIVE_HIGH);
+        io_gpio_pin_create(WHEEL_FRONT_RIGHT_DIR_GPIO_Port, WHEEL_FRONT_RIGHT_DIR_Pin, ACTIVE_HIGH);
 
     PwmPin_t *motor_a_pwm_pin = io_pwm_pin_create(&htim15, TIM_CHANNEL_2);
     PwmPin_t *motor_b_pwm_pin = io_pwm_pin_create(&htim3, TIM_CHANNEL_2);

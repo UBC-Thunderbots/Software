@@ -62,38 +62,38 @@ void MX_GPIO_Init(void)
     /*Configure GPIO pin Output Level */
     HAL_GPIO_WritePin(GPIOE,
                       WHEEL_FRONT_RIGHT_FF1_Pin | USER_LED_2_Pin | USER_LED_3_Pin |
-                          MOTOR_D_DIR_Pin | MOTOR_D_MODE_Pin | WHEEL_BACK_RIGHT_FF1_Pin |
+                          WHEEL_BACK_RIGHT_DIR_Pin | WHEEL_BACK_RIGHT_MODE_Pin | WHEEL_BACK_RIGHT_FF1_Pin |
                           CHARGE_PWR_BRD_Pin,
                       GPIO_PIN_RESET);
 
     /*Configure GPIO pin Output Level */
     HAL_GPIO_WritePin(GPIOF,
-                      MOTOR_E_RESET_Pin | WHEEL_FRONT_RIGHT_FF2_Pin | RED_IN_RGB_Pin |
+                      WHEEL_FRONT_RIGHT_RESET_Pin | WHEEL_FRONT_RIGHT_FF2_Pin | RED_IN_RGB_Pin |
                           BLUE_IN_RGB_Pin | GREEN_IN_RGB_Pin,
                       GPIO_PIN_RESET);
 
     /*Configure GPIO pin Output Level */
     HAL_GPIO_WritePin(GPIOB,
-                      MOTOR_E_DIR_Pin | MOTOR_D_RESET_Pin | MOTOR_E_MODE_Pin |
-                          MOTOR_C_DIR_Pin | MOTOR_C_MODE_Pin,
+                      WHEEL_FRONT_RIGHT_DIR_Pin | WHEEL_BACK_RIGHT_RESET_Pin | WHEEL_FRONT_RIGHT_MODE_Pin |
+                          DRIBBLE_DIR_Pin | DRIBBLE_MODE_Pin,
                       GPIO_PIN_RESET);
 
     /*Configure GPIO pin Output Level */
     HAL_GPIO_WritePin(GPIOD,
-                      MOTOR_C_RESET_Pin | MOTOR_B_MODE_Pin | MOTOR_B_DIR_Pin |
+                      DRIBBLE_RESET_Pin | WHEEL_FRONT_LEFT_MODE_Pin | WHEEL_FRONT_LEFT_DIR_Pin |
                           DRIBBLER_FF1_Pin | DRIBBLER_FF2_Pin,
                       GPIO_PIN_RESET);
 
     /*Configure GPIO pin Output Level */
     HAL_GPIO_WritePin(GPIOG,
-                      MOTOR_B_RESET_Pin | WHEEL_FRONT_LEFT_FF1_Pin |
-                          WHEEL_FRONT_LEFT_FF2_Pin | MOTOR_A_RESET_Pin |
+                      WHEEL_FRONT_LEFT_RESET_Pin | WHEEL_FRONT_LEFT_FF1_Pin |
+                          WHEEL_FRONT_LEFT_FF2_Pin | WHEEL_BACK_LEFT_RESET_Pin |
                           WHEEL_BACK_LEFT_FF1_Pin | WHEEL_BACK_LEFT_FF2_Pin |
                           GENEVA_END_STOP_2_Pin | GENEVA_END_STOP_1_Pin | GENEVA_DIR_Pin,
                       GPIO_PIN_RESET);
 
     /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(GPIOA, MOTOR_A_DIR_Pin | MOTOR_A_MODE_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOA, WHEEL_BACK_LEFT_DIR_Pin | WHEEL_BACK_LEFT_MODE_Pin, GPIO_PIN_RESET);
 
     /*Configure GPIO pins : PEPin PEPin PEPin */
     GPIO_InitStruct.Pin  = FAULT_PWR_BRD_Pin | DONE_PWR_BRD_Pin | CH_SEL_3_Pin;
@@ -104,7 +104,7 @@ void MX_GPIO_Init(void)
     /*Configure GPIO pins : PEPin PEPin PEPin PEPin
                              PEPin PEPin PEPin */
     GPIO_InitStruct.Pin = WHEEL_FRONT_RIGHT_FF1_Pin | USER_LED_2_Pin | USER_LED_3_Pin |
-                          MOTOR_D_DIR_Pin | MOTOR_D_MODE_Pin | WHEEL_BACK_RIGHT_FF1_Pin |
+                          WHEEL_BACK_RIGHT_DIR_Pin | WHEEL_BACK_RIGHT_MODE_Pin | WHEEL_BACK_RIGHT_FF1_Pin |
                           CHARGE_PWR_BRD_Pin;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
@@ -113,7 +113,7 @@ void MX_GPIO_Init(void)
 
     /*Configure GPIO pins : PFPin PFPin PFPin PFPin
                              PFPin */
-    GPIO_InitStruct.Pin = MOTOR_E_RESET_Pin | WHEEL_FRONT_RIGHT_FF2_Pin | RED_IN_RGB_Pin |
+    GPIO_InitStruct.Pin = WHEEL_FRONT_RIGHT_RESET_Pin | WHEEL_FRONT_RIGHT_FF2_Pin | RED_IN_RGB_Pin |
                           BLUE_IN_RGB_Pin | GREEN_IN_RGB_Pin;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
@@ -122,8 +122,8 @@ void MX_GPIO_Init(void)
 
     /*Configure GPIO pins : PBPin PBPin PBPin PBPin
                              PBPin */
-    GPIO_InitStruct.Pin = MOTOR_E_DIR_Pin | MOTOR_D_RESET_Pin | MOTOR_E_MODE_Pin |
-                          MOTOR_C_DIR_Pin | MOTOR_C_MODE_Pin;
+    GPIO_InitStruct.Pin = WHEEL_FRONT_RIGHT_DIR_Pin | WHEEL_BACK_RIGHT_RESET_Pin | WHEEL_FRONT_RIGHT_MODE_Pin |
+                          DRIBBLE_DIR_Pin | DRIBBLE_MODE_Pin;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -145,7 +145,7 @@ void MX_GPIO_Init(void)
 
     /*Configure GPIO pins : PDPin PDPin PDPin PDPin
                              PDPin */
-    GPIO_InitStruct.Pin = MOTOR_C_RESET_Pin | MOTOR_B_MODE_Pin | MOTOR_B_DIR_Pin |
+    GPIO_InitStruct.Pin = DRIBBLE_RESET_Pin | WHEEL_FRONT_LEFT_MODE_Pin | WHEEL_FRONT_LEFT_DIR_Pin |
                           DRIBBLER_FF1_Pin | DRIBBLER_FF2_Pin;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
@@ -155,8 +155,8 @@ void MX_GPIO_Init(void)
     /*Configure GPIO pins : PGPin PGPin PGPin PGPin
                              PGPin PGPin PGPin PGPin
                              PGPin */
-    GPIO_InitStruct.Pin = MOTOR_B_RESET_Pin | WHEEL_FRONT_LEFT_FF1_Pin |
-                          WHEEL_FRONT_LEFT_FF2_Pin | MOTOR_A_RESET_Pin |
+    GPIO_InitStruct.Pin = WHEEL_FRONT_LEFT_RESET_Pin | WHEEL_FRONT_LEFT_FF1_Pin |
+                          WHEEL_FRONT_LEFT_FF2_Pin | WHEEL_BACK_LEFT_RESET_Pin |
                           WHEEL_BACK_LEFT_FF1_Pin | WHEEL_BACK_LEFT_FF2_Pin |
                           GENEVA_END_STOP_2_Pin | GENEVA_END_STOP_1_Pin | GENEVA_DIR_Pin;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
@@ -165,7 +165,7 @@ void MX_GPIO_Init(void)
     HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
     /*Configure GPIO pins : PAPin PAPin */
-    GPIO_InitStruct.Pin   = MOTOR_A_DIR_Pin | MOTOR_A_MODE_Pin;
+    GPIO_InitStruct.Pin   = WHEEL_BACK_LEFT_DIR_Pin | WHEEL_BACK_LEFT_MODE_Pin;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
