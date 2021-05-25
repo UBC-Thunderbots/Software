@@ -147,10 +147,9 @@ extern "C"
         uint32_t InnerVlanTag; /*!< Sets Inner VLAN Tag only when Inner VLAN is enabled.
                                     This parameter can be a value from 0x0 to 0x3FFFF */
 
-        uint32_t
-            InnerVlanCtrl; /*!< Specifies Inner VLAN Tag insertion control only when Inner
-                              VLAN is enabled. This parameter can be a value of @ref
-                              ETH_Tx_Packet_Inner_VLAN_Control   */
+        uint32_t InnerVlanCtrl; /*!< Specifies Inner VLAN Tag insertion control only when
+                                   Inner VLAN is enabled. This parameter can be a value of
+                                   @ref ETH_Tx_Packet_Inner_VLAN_Control   */
 
     } ETH_TxPacketConfig;
     /**
@@ -244,19 +243,17 @@ extern "C"
      */
     typedef struct
     {
-        uint32_t
-            SourceAddrControl; /*!< Selects the Source Address Insertion or Replacement
-                                  Control. This parameter can be a value of @ref
-                                  ETH_Source_Addr_Control */
+        uint32_t SourceAddrControl; /*!< Selects the Source Address Insertion or
+                                       Replacement Control. This parameter can be a value
+                                       of @ref ETH_Source_Addr_Control */
 
         FunctionalState
             ChecksumOffload; /*!< Enables or Disable the checksum checking for received
                                 packet payloads TCP, UDP or ICMP headers */
 
-        uint32_t
-            InterPacketGapVal; /*!< Sets the minimum IPG between Packet during
-                                  transmission. This parameter can be a value of @ref
-                                  ETH_Inter_Packet_Gap */
+        uint32_t InterPacketGapVal; /*!< Sets the minimum IPG between Packet during
+                                       transmission. This parameter can be a value of @ref
+                                       ETH_Inter_Packet_Gap */
 
         FunctionalState GiantPacketSizeLimitControl; /*!< Enables or disables the Giant
                                                         Packet Size Limit Control. */
@@ -270,11 +267,10 @@ extern "C"
         FunctionalState AutomaticPadCRCStrip; /*!< Enables or disables  the Automatic MAC
                                                  Pad/CRC Stripping.*/
 
-        FunctionalState
-            Watchdog; /*!< Enables or disables the Watchdog timer on Rx path
-                                 When enabled, the MAC allows no more then 2048 bytes to
-                         be received. When disabled, the MAC can receive up to 16384
-                         bytes. */
+        FunctionalState Watchdog; /*!< Enables or disables the Watchdog timer on Rx path
+                                             When enabled, the MAC allows no more then
+                                     2048 bytes to be received. When disabled, the MAC can
+                                     receive up to 16384 bytes. */
 
         FunctionalState
             Jabber; /*!< Enables or disables Jabber timer on Tx path
@@ -289,10 +285,9 @@ extern "C"
         uint32_t Speed; /*!< Sets the Ethernet speed: 10/100 Mbps.
                                    This parameter can be a value of @ref ETH_Speed */
 
-        uint32_t
-            DuplexMode; /*!< Selects the MAC duplex mode: Half-Duplex or Full-Duplex mode
-                                   This parameter can be a value of @ref ETH_Duplex_Mode
-                         */
+        uint32_t DuplexMode; /*!< Selects the MAC duplex mode: Half-Duplex or Full-Duplex
+                                mode This parameter can be a value of @ref ETH_Duplex_Mode
+                              */
 
         FunctionalState LoopbackMode; /*!< Enables or disables the loopback mode */
 
@@ -350,10 +345,9 @@ extern "C"
         FunctionalState
             ProgrammableWatchdog; /*!< Enable or disables the Programmable Watchdog.*/
 
-        uint32_t
-            WatchdogTimeout; /*!< This field is used as watchdog timeout for a received
-                                packet This parameter can be a value of @ref
-                                ETH_Watchdog_Timeout */
+        uint32_t WatchdogTimeout; /*!< This field is used as watchdog timeout for a
+                                     received packet This parameter can be a value of @ref
+                                     ETH_Watchdog_Timeout */
 
         uint32_t PauseTime; /*!< This field holds the value to be used in the Pause Time
                                field in the transmit control packet. This parameter must
@@ -394,9 +388,8 @@ extern "C"
         FunctionalState
             ForwardRxErrorPacket; /*!< Enables or disables  forwarding Error Packets. */
 
-        FunctionalState
-            ForwardRxUndersizedGoodPacket; /*!< Enables or disables  forwarding Undersized
-                                              Good Packets.*/
+        FunctionalState ForwardRxUndersizedGoodPacket; /*!< Enables or disables forwarding
+                                                          Undersized Good Packets.*/
     } ETH_MACConfigTypeDef;
     /**
      *
@@ -546,15 +539,13 @@ extern "C"
                                        interrupt occurs This parameter can be a
                                        combination of @ref ETH_DMA_Status_Flags */
 
-        __IO
-            uint32_t MACErrorCode; /*!< Holds the MAC Rx Tx Error code when a MAC Rx or Tx
-                                      status interrupt occurs This parameter can be a
-                                      combination of @ref ETH_MAC_Rx_Tx_Status */
+        __IO uint32_t MACErrorCode; /*!< Holds the MAC Rx Tx Error code when a MAC Rx or
+                                       Tx status interrupt occurs This parameter can be a
+                                       combination of @ref ETH_MAC_Rx_Tx_Status */
 
-        __IO uint32_t
-            MACWakeUpEvent; /*!< Holds the Wake Up event when the MAC exit the power down
-                               mode This parameter can be a value of @ref
-                               ETH_MAC_Wake_Up_Event */
+        __IO uint32_t MACWakeUpEvent; /*!< Holds the Wake Up event when the MAC exit the
+                                         power down mode This parameter can be a value of
+                                         @ref ETH_MAC_Wake_Up_Event */
 
         __IO uint32_t
             MACLPIEvent; /*!< Holds the LPI event when the an LPI status interrupt occurs.
@@ -774,13 +765,12 @@ extern "C"
     ((uint32_t)0x00010000U) /*!< Only IP header checksum calculation and insertion are   \
                                enabled. */
 #define ETH_DMATXNDESCRF_CIC_IPHDR_PAYLOAD_INSERT                                        \
-    ((                                                                                   \
-        uint32_t)0x00020000U) /*!< IP header checksum and payload checksum calculation   \
-                                 and insertion are enabled, but pseudo header checksum                                                     \
-                                 is not calculated in hardware */
+    ((uint32_t)0x00020000U) /*!< IP header checksum and payload checksum calculation     \
+                               and insertion are enabled, but pseudo header checksum     \
+                               is not calculated in hardware */
 #define ETH_DMATXNDESCRF_CIC_IPHDR_PAYLOAD_INSERT_PHDR_CALC                              \
     ((uint32_t)0x00030000U) /*!< IP Header checksum and payload checksum calculation and \
-                               insertion are enabled, and pseudo header checksum is                                                  \
+                               insertion are enabled, and pseudo header checksum is      \
                                calculated in hardware. */
 #define ETH_DMATXNDESCRF_TPL ((uint32_t)0x0003FFFFU) /*!< TCP Payload Length */
 #define ETH_DMATXNDESCRF_FL ((uint32_t)0x00007FFFU)  /*!< Transmit End of Ring */
@@ -863,14 +853,16 @@ extern "C"
 /**
  * @brief  Bit definition of Tx context descriptor register 0
  */
-#define ETH_DMATXCDESC_TTSL ((uint32_t)0xFFFFFFFFU) /*!< Transmit Packet Timestamp Low   \
-                                                     */
+#define ETH_DMATXCDESC_TTSL                                                              \
+    ((uint32_t)0xFFFFFFFFU) /*!< Transmit Packet Timestamp Low                           \
+                             */
 
 /**
  * @brief  Bit definition of Tx context descriptor register 1
  */
-#define ETH_DMATXCDESC_TTSH ((uint32_t)0xFFFFFFFFU) /*!< Transmit Packet Timestamp High  \
-                                                     */
+#define ETH_DMATXCDESC_TTSH                                                              \
+    ((uint32_t)0xFFFFFFFFU) /*!< Transmit Packet Timestamp High                          \
+                             */
 
 /**
  * @brief  Bit definition of Tx context descriptor register 2
@@ -1047,24 +1039,28 @@ extern "C"
 /**
  * @brief  Bit definition of Rx normal descriptor register 3 write back format
  */
-#define ETH_DMARXNDESCWBF_OWN ((uint32_t)0x80000000U)  /*!< Own Bit */
-#define ETH_DMARXNDESCWBF_CTXT ((uint32_t)0x40000000U) /*!< Receive Context Descriptor   \
-                                                        */
-#define ETH_DMARXNDESCWBF_FD ((uint32_t)0x20000000U)   /*!< First Descriptor */
-#define ETH_DMARXNDESCWBF_LD ((uint32_t)0x10000000U)   /*!< Last Descriptor */
-#define ETH_DMARXNDESCWBF_RS2V ((uint32_t)0x08000000U) /*!< Receive Status RDES2 Valid   \
-                                                        */
-#define ETH_DMARXNDESCWBF_RS1V ((uint32_t)0x04000000U) /*!< Receive Status RDES1 Valid   \
-                                                        */
-#define ETH_DMARXNDESCWBF_RS0V ((uint32_t)0x02000000U) /*!< Receive Status RDES0 Valid   \
-                                                        */
-#define ETH_DMARXNDESCWBF_CE ((uint32_t)0x01000000U)   /*!< CRC Error */
-#define ETH_DMARXNDESCWBF_GP ((uint32_t)0x00800000U)   /*!< Giant Packet */
-#define ETH_DMARXNDESCWBF_RWT ((uint32_t)0x00400000U)  /*!< Receive Watchdog Timeout */
-#define ETH_DMARXNDESCWBF_OE ((uint32_t)0x00200000U)   /*!< Overflow Error */
-#define ETH_DMARXNDESCWBF_RE ((uint32_t)0x00100000U)   /*!< Receive Error */
-#define ETH_DMARXNDESCWBF_DE ((uint32_t)0x00080000U)   /*!< Dribble Bit Error */
-#define ETH_DMARXNDESCWBF_LT ((uint32_t)0x00070000U)   /*!< Length/Type Field */
+#define ETH_DMARXNDESCWBF_OWN ((uint32_t)0x80000000U) /*!< Own Bit */
+#define ETH_DMARXNDESCWBF_CTXT                                                           \
+    ((uint32_t)0x40000000U)                          /*!< Receive Context Descriptor     \
+                                                      */
+#define ETH_DMARXNDESCWBF_FD ((uint32_t)0x20000000U) /*!< First Descriptor */
+#define ETH_DMARXNDESCWBF_LD ((uint32_t)0x10000000U) /*!< Last Descriptor */
+#define ETH_DMARXNDESCWBF_RS2V                                                           \
+    ((uint32_t)0x08000000U) /*!< Receive Status RDES2 Valid                              \
+                             */
+#define ETH_DMARXNDESCWBF_RS1V                                                           \
+    ((uint32_t)0x04000000U) /*!< Receive Status RDES1 Valid                              \
+                             */
+#define ETH_DMARXNDESCWBF_RS0V                                                           \
+    ((uint32_t)0x02000000U)                           /*!< Receive Status RDES0 Valid    \
+                                                       */
+#define ETH_DMARXNDESCWBF_CE ((uint32_t)0x01000000U)  /*!< CRC Error */
+#define ETH_DMARXNDESCWBF_GP ((uint32_t)0x00800000U)  /*!< Giant Packet */
+#define ETH_DMARXNDESCWBF_RWT ((uint32_t)0x00400000U) /*!< Receive Watchdog Timeout */
+#define ETH_DMARXNDESCWBF_OE ((uint32_t)0x00200000U)  /*!< Overflow Error */
+#define ETH_DMARXNDESCWBF_RE ((uint32_t)0x00100000U)  /*!< Receive Error */
+#define ETH_DMARXNDESCWBF_DE ((uint32_t)0x00080000U)  /*!< Dribble Bit Error */
+#define ETH_DMARXNDESCWBF_LT ((uint32_t)0x00070000U)  /*!< Length/Type Field */
 #define ETH_DMARXNDESCWBF_LT_LP                                                          \
     ((uint32_t)0x00000000U) /*!< The packet is a length packet */
 #define ETH_DMARXNDESCWBF_LT_TP                                                          \
@@ -1103,8 +1099,9 @@ extern "C"
 /**
  * @brief  Bit definition of Rx context descriptor register 1
  */
-#define ETH_DMARXCDESC_RTSH ((uint32_t)0xFFFFFFFFU) /*!< Receive Packet Timestamp High   \
-                                                     */
+#define ETH_DMARXCDESC_RTSH                                                              \
+    ((uint32_t)0xFFFFFFFFU) /*!< Receive Packet Timestamp High                           \
+                             */
 
 /**
  * @brief  Bit definition of Rx context descriptor register 3

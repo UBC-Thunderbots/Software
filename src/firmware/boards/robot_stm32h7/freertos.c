@@ -129,18 +129,6 @@ const osThreadAttr_t NetStartTask_attributes = {
     .stack_size = sizeof(NetStartTaskBuffer),
     .priority   = (osPriority_t)osPriorityNormal,
 };
-/* Definitions for RobotStatusTask */
-osThreadId_t RobotStatusTaskHandle;
-uint32_t RobotStatusTaskBuffer[1024];
-osStaticThreadDef_t RobotStatusTaskControlBlock;
-const osThreadAttr_t RobotStatusTask_attributes = {
-    .name       = "RobotStatusTask",
-    .cb_mem     = &RobotStatusTaskControlBlock,
-    .cb_size    = sizeof(RobotStatusTaskControlBlock),
-    .stack_mem  = &RobotStatusTaskBuffer[0],
-    .stack_size = sizeof(RobotStatusTaskBuffer),
-    .priority   = (osPriority_t)osPriorityNormal1,
-};
 /* Definitions for VisionMsgTask */
 osThreadId_t VisionMsgTaskHandle;
 uint32_t VisionMsgTaskBuffer[1024];
@@ -247,9 +235,9 @@ const osMessageQueueAttr_t RobotLogProtoQ_attributes = {.name = "RobotLogProtoQ"
 /* USER CODE END FunctionPrototypes */
 
 void io_proto_multicast_startNetworkingTask(void *argument);
-extern void io_proto_multicast_senderTask(void *argument);
 extern void io_proto_multicast_listenerTask(void *argument);
 extern void io_robot_status_task(void *argument);
+extern void io_proto_multicast_senderTask(void *argument);
 extern void io_network_logger_task(void *argument);
 extern void io_primitive_executor_task(void *argument);
 extern void io_primitive_starter_task(void *argument);
@@ -293,11 +281,6 @@ void MX_FREERTOS_Init(void)
     /* creation of NetStartTask */
     NetStartTaskHandle = osThreadNew(io_proto_multicast_startNetworkingTask, NULL,
                                      &NetStartTask_attributes);
-
-    /* creation of RobotStatusTask */
-    RobotStatusTaskHandle =
-        osThreadNew(io_proto_multicast_senderTask,
-                    (void *)robot_status_msg_sender_profile, &RobotStatusTask_attributes);
 
     /* creation of VisionMsgTask */
     VisionMsgTaskHandle =
