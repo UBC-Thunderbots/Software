@@ -27,12 +27,6 @@ static const float shared_physics_local_vel_to_wheels_matrix[3][4] = {
     {0.3904f, -0.3904f, -0.3904f, 0.3904f},
     {0.2761f, 0.2239f, 0.2239f, 0.2761f}};
 
-// mass vector (consists linear robot mass and interial mass)
-const float ROBOT_MASS[3] = {ROBOT_POINT_MASS, ROBOT_POINT_MASS, ROT_MASS};
-
-const float MAX_VEL[3] = {MAX_X_V, MAX_Y_V, MAX_T_V* ROBOT_RADIUS};
-const float MAX_ACC[3] = {MAX_X_A, MAX_Y_A, MAX_T_A* ROBOT_RADIUS};
-
 /**
  * \ingroup Physics
  *

@@ -16,8 +16,8 @@ cc_test(
     srcs = ["physics_test.cpp"],
     deps = [
         ":physics",
-        "//software/test_util",
         "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ],
 )
 

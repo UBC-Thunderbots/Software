@@ -38,46 +38,6 @@
 #define GEAR_RATIO 0.5143f         // define as speed multiplication from motor to wheel
 #define WHEEL_RADIUS 0.0254f
 
-// constants for radial bangbang controller
-#define MAX_R_V 2.0f
-#define MAX_R_A 3.0f
-
-
-#define MAX_X_V 2.0f  // maximal linear velocity in the X direction
-#define MAX_Y_V 1.0f  // maximum linear velocity in the Y direction
-#define MAX_T_V 0.1f  // max robot rotation rate in radians per second
-
-extern const float MAX_VEL[3];
-
-// WRONG NUMBERS, POKE JON TO GET ACTUAL NUMBERS
-#define MAX_X_A 3.0f
-#define MAX_Y_A 3.0f
-#define MAX_T_A 30.0f
-
-//#define SLOW_MAX_X_A 1.2f
-//#define SLOW_MAX_Y_A 1.2f
-//#define SLOW_MAX_T_A 10.0f
-
-extern const float MAX_ACC[3];
-
-// gyro running at 2000/second and in integers such that 32767 is 2000
-// 61.0 millidegrees/second / LSB
-#define DEGREES_PER_GYRO (61.0f / 1000.0f)
-#define MS_PER_DEGREE (2.0f * (float)P_PI * ROBOT_RADIUS / 360.0f)
-#define MS_PER_GYRO (MS_PER_DEGREE * DEGREES_PER_GYRO)
-
-// Accelerometer is running at +/- 2G's, 32767 is 2G's
-// ~61.0 uG per accelerometer LSB
-#define GRAVITY 9.807f
-#define ACCEL_RANGE 2.0f
-#define NUM_DIVISIONS 32767
-#define G_PER_ACCEL (ACCEL_RANGE / NUM_DIVISIONS)
-#define M_S_2_PER_ACCEL (GRAVITY * G_PER_ACCEL)
-
-extern const float ROBOT_MASS[3];
-extern const float MAX_VEL[3];
-
-
 // transformation matricies to convert speeds in the
 // two different domains commonly used by the robot
 // speed4 which is the listing of wheel speeds

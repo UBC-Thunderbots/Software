@@ -3,6 +3,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include "shared/constants.h"
+
 // these are set to decouple the 3 axis from each other
 // the idea is to clamp the maximum velocity and acceleration
 // so that the axes would never have to compete for resources
@@ -61,7 +63,8 @@ void velocity_wheels_setLocalVelocity(
  * Determines the rotation acceleration after setup_bot has been used and
  * plan_move has been done along the minor axis. The minor time from bangbang
  * is used to determine the rotation time, and thus the rotation velocity and
- * acceleration. The rotational acceleration is clamped under the MAX_T_A.
+ * acceleration. The rotational acceleration is clamped under the
+ * ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED.
  *
  * @param pb [in/out] The PhysBot data container that should have minor axis time and
  * will store the rotational information
@@ -76,7 +79,7 @@ void plan_move_rotation(PhysBot* pb, float avel)
     // orientation.
     pb->rot.vel   = 1.4f * pb->rot.disp / pb->rot.time;
     pb->rot.accel = (pb->rot.vel - avel) / TIME_HORIZON;
-    limit(&pb->rot.accel, MAX_T_A);
+    limit(&pb->rot.accel, (float)ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 }
 
 void force_wheels_followPosTrajectory(const FirmwareRobot_t* robot,

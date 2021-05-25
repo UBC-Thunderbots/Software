@@ -76,7 +76,7 @@ typedef struct RobotConstants
 {
     // The mass of the entire robot [kg]
     float mass;
-    // The moment of inertia of the entire robot [kg m^1]
+    // The moment of inertia of the entire robot [kg m^2]
     float moment_of_inertia;
     // The maximum radius of the robot [m]
     float robot_radius;
@@ -110,10 +110,11 @@ typedef struct RobotConstants
     //    // The maximum angular speed achievable by our robots, in rad/sec
     //    double robot_max_ang_speed_rad_per_second;
     //    // The maximum acceleration achievable by our robots, in metres per seconds
-    //    squared. double robot_max_acceleration_meters_per_second_squared;
+    //    squared.
+    //    double robot_max_acceleration_meters_per_second_squared;
+    //
     //    // The maximum angular acceleration achievable by our robots, in radians per
-    //    second
-    //    // squared
+    //    second squared
     //    double robot_max_ang_acceleration_rad_per_second_squared;
     //
     //    // Indefinite dribbler mode sets a speed that can be maintained indefinitely
