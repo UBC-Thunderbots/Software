@@ -37,3 +37,9 @@
     description: >-
         The directory to output logs to. Absolute paths are recommended as the working directory
         is inside the bazel-out directory.
+
+- string:
+      name: arduino_device_port
+      value: ""
+      description: >-
+          The device port which the Arduino is connected to (can be found by running terminal command 'pio device list' )
