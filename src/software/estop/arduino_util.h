@@ -1,21 +1,22 @@
 #pragma once
-#include <string>
 #include <boost/filesystem.hpp>
+#include <string>
 
-class ArduinoUtil {
-    public:
+class ArduinoUtil
+{
+   public:
     /**
      * if an Arduino is connected, finds the port name of the device
      * @return device port in the form "/dev/tty*"
      */
     static std::optional<std::string> getArduinoPort();
 
-    private:
-
+   private:
     /**
      * internal struct used to pass around info from linux filesystem
      */
-    struct HwInfo {
+    struct HwInfo
+    {
         std::string vendor;
         std::string product;
     };
@@ -39,11 +40,4 @@ class ArduinoUtil {
      * @return the first line in the file
      */
     static std::optional<std::string> readFileLine(boost::filesystem::path path);
-
-
-
-
-
-
 };
-
