@@ -19,3 +19,10 @@ DrivetrainUnit_t* io_drivetrain_unit_create(AllegroA3931MotorDriver_t* motor_dri
  */
 void io_drivetrain_unit_applyForce(DrivetrainUnit_t* drive_train_unit,
                                    float force_newtons);
+
+/**
+ * Disable the wheels and allow the DrivetrainUnit to coast.
+ *
+ * @param [in] drive_train_unit The DrivetrainUnit to apply force to
+ */
+void io_drivetrain_unit_coast(DrivetrainUnit_t* drive_train_unit);

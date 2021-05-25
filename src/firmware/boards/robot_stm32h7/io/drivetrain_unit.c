@@ -40,3 +40,8 @@ void io_drivetrain_unit_applyForce(DrivetrainUnit_t* drive_train_unit,
     io_allegro_a3931_motor_setPwmPercentage(drive_train_unit->motor_driver,
                                             pwm_percentage);
 }
+
+void io_drivetrain_unit_coast(DrivetrainUnit_t* drive_train_unit)
+{
+    io_allegro_a3931_motor_disable(drive_train_unit->motor_driver);
+}

@@ -1,5 +1,6 @@
 #include "firmware/boards/robot_stm32h7/io/allegro_a3931_motor_driver.h"
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 typedef struct AllegroA3931MotorDriver
@@ -8,6 +9,7 @@ typedef struct AllegroA3931MotorDriver
     GpioPin_t* reset_pin;
     GpioPin_t* mode_pin;
     GpioPin_t* direction_pin;
+    bool enabled;
 } AllegroA3931MotorDriver_t;
 
 AllegroA3931MotorDriver_t* io_allegro_a3931_motor_driver_create(PwmPin_t* pwm_pin,
@@ -22,6 +24,7 @@ AllegroA3931MotorDriver_t* io_allegro_a3931_motor_driver_create(PwmPin_t* pwm_pi
     motor_driver->reset_pin     = reset_pin;
     motor_driver->mode_pin      = mode_pin;
     motor_driver->direction_pin = direction_pin;
+    motor_driver->enabled       = true;
 
     io_gpio_pin_setActive(motor_driver->reset_pin);
     io_gpio_pin_setActive(motor_driver->mode_pin);
@@ -55,5 +58,17 @@ void io_allegro_a3931_motor_driver_setDirection(
 void io_allegro_a3931_motor_setPwmPercentage(AllegroA3931MotorDriver_t* motor_driver,
                                              float pwm_percentage)
 {
+    if (!motor_driver->enabled)
+    {
+        io_gpio_pin_setActive(motor_driver->reset_pin);
+        motor_driver->enabled = true;
+    }
+
     io_pwm_pin_updatePwm(motor_driver->pwm_pin, pwm_percentage);
+}
+
+void io_allegro_a3931_motor_disable(AllegroA3931MotorDriver_t* motor_driver)
+{
+    io_gpio_pin_setInactive(motor_driver->reset_pin);
+    motor_driver->enabled = false;
 }

@@ -49,73 +49,73 @@ void io_drivetrain_applyForceBackRightWheel(float force_newtons)
 
 float io_drivetrain_getFrontLeftRpm(void)
 {
-    // TODO (#2063) implement this
+    // TODO (#2063) implement this once we have tachometer
     assert(initialized);
     return 100;
 }
 
 float io_drivetrain_getFrontRightRpm(void)
 {
-    // TODO (#2063) implement this
+    // TODO (#2063) implement this once we have tachometer
     assert(initialized);
     return 100;
 }
 
 float io_drivetrain_getBackLeftRpm(void)
 {
-    // TODO (#2063) implement this
+    // TODO (#2063) implement this once we have tachometer
     assert(initialized);
     return 100;
 }
 
 float io_drivetrain_getBackRightRpm(void)
 {
-    // TODO (#2063) implement this
+    // TODO (#2063) implement this once we have tachometer
     assert(initialized);
     return 100;
 }
 
 void io_drivetrain_brakeFrontLeft(void)
 {
-    // TODO (#2063) implement this
+    io_drivetrain_unit_applyForce(_front_left_drive_unit, 0.0f);
     assert(initialized);
 }
 void io_drivetrain_brakeFrontRight(void)
 {
-    // TODO (#2063) implement this
+    io_drivetrain_unit_applyForce(_front_right_drive_unit, 0.0f);
     assert(initialized);
 }
 void io_drivetrain_brakeBackLeft(void)
 {
-    // TODO (#2063) implement this
+    io_drivetrain_unit_applyForce(_back_left_drive_unit, 0.0f);
     assert(initialized);
 }
 void io_drivetrain_brakeBackRight(void)
 {
-    // TODO (#2063) implement this
+    io_drivetrain_unit_applyForce(_back_right_drive_unit, 0.0f);
     assert(initialized);
 }
 
 void io_drivetrain_coastFrontLeft(void)
 {
-    // TODO (#2063) implement this
+    io_drivetrain_unit_coast(_front_left_drive_unit);
     assert(initialized);
 }
 
 void io_drivetrain_coastFrontRight(void)
 {
-    // TODO (#2063) implement this
+    io_drivetrain_unit_coast(_front_right_drive_unit);
     assert(initialized);
 }
 
 void io_drivetrain_coastBackLeft(void)
 {
-    // TODO (#2063) implement this
+    io_drivetrain_unit_coast(_back_left_drive_unit);
     assert(initialized);
 }
 
 void io_drivetrain_coastBackRight(void)
 {
-    // TODO (#2063) implement this
+    io_drivetrain_unit_coast(_back_right_drive_unit);
     assert(initialized);
 }
