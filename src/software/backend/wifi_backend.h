@@ -60,8 +60,4 @@ class WifiBackend : public Backend
 
 
     std::unique_ptr<ThreadedEstopReader> estop_reader;
-
-    // the port the arduino is connected to. Can be found by running the command
-    // "pio device list"
-    static constexpr auto ARDUINO_PORT = "/dev/ttyACM0";
 };
