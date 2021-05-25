@@ -63,7 +63,7 @@ void io_allegro_a3931_motor_setPwmPercentage(AllegroA3931MotorDriver_t* motor_dr
                                              float pwm_percentage);
 
 /**
- * Disable the motor driver, allows the motors to be pushed freely
+ * Disable the motor driver, allows the motors to spin freely
  *
  * @param motor_driver
  */

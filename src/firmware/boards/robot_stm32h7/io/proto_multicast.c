@@ -168,7 +168,8 @@ void io_proto_multicast_listenerTask(void* communication_profile)
 void io_proto_multicast_startNetworkingTask(void* unused)
 {
     MX_LWIP_Init();
-    /*io_ublox_odinw262_communicator_task(unused);*/
+    io_ublox_odinw262_communicator_connectToWiFi();
+
     osEventFlagsSet(networking_event, NETIF_CONFIGURED);
     osThreadExit();
 }

@@ -20,7 +20,6 @@ void io_primitive_starter_task(void* argument)
     ProtoMulticastCommunicationProfile_t* comm_profile =
         (ProtoMulticastCommunicationProfile_t*)argument;
 
-    /* Infinite loop */
     for (;;)
     {
         io_proto_multicast_communication_profile_blockUntilEvents(comm_profile,
@@ -41,7 +40,7 @@ void io_primitive_starter_task(void* argument)
 
 void io_primitive_executor_task(void* argument)
 {
-    (void)argument;
+    UNUSED(argument);
 
     for (;;)
     {

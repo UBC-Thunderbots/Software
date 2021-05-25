@@ -2,15 +2,15 @@
 
 void io_charger_charge()
 {
-    // TODO #(2080) implement this
+    // TODO (#2080) implement this
 }
 
 void io_charger_discharge()
 {
-    // TODO #(2080) implement this
+    // TODO (#2080) implement this
 }
 
 void io_charger_float()
 {
-    // TODO #(2080) implement this
+    // TODO (#2080) implement this
 }

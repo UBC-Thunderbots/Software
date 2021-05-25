@@ -71,7 +71,7 @@ void io_ublox_odinw262_communicator_init(UART_HandleTypeDef* uart_handle,
     g_initialized = true;
 }
 
-void io_ublox_odinw262_communicator_connectToWiFi(void);
+void io_ublox_odinw262_communicator_connectToWiFi(void)
 {
     assert(g_initialized);
 
