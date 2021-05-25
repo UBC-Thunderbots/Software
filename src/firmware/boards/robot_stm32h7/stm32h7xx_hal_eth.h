@@ -1,5 +1,7 @@
 // override default version of stm32h7xx_hal_eth.h with version from
 // https://community.st.com/s/question/0D50X0000C6eNNSSQ2/bug-fixes-stm32h7-ethernet
+//
+// TODO (#2095) when the ethernet drivers for STM32H7 are fixed, remove this file
 
 /**
  ******************************************************************************
