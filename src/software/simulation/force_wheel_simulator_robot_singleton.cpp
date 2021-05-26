@@ -1,12 +1,12 @@
 #include "software/simulation/force_wheel_simulator_robot_singleton.h"
 
-#include "shared/2015_robot_constants.h"
 #include "shared/proto/robot_log_msg.pb.h"
 
 extern "C"
 {
 #include "firmware/app/logger/logger.h"
 #include "firmware/app/world/force_wheel.h"
+#include "shared/2015_robot_constants.h"
 }
 
 // TODO (#2066): The JERK_LIMIT is copied from firmware/main/control/control.h
