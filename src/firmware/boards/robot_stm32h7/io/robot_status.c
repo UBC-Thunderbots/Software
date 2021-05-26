@@ -29,29 +29,29 @@ void io_robot_status_task(void *argument)
 
         // TODO (#2098) update motor rpms
         g_robot_status_msg.drive_units.front_left = (TbotsProto_DriveUnit){
-            .wheel_ang_vel_rad_s = 0.0f, .wheel_position_rad = 0.0f};
+            .wheel_ang_vel_rad_s = 4.0f, .wheel_position_rad = 0.0f};
         g_robot_status_msg.drive_units.back_left = (TbotsProto_DriveUnit){
-            .wheel_ang_vel_rad_s = 0.0f, .wheel_position_rad = 0.0f};
+            .wheel_ang_vel_rad_s = 4.0f, .wheel_position_rad = 0.0f};
         g_robot_status_msg.drive_units.front_right = (TbotsProto_DriveUnit){
-            .wheel_ang_vel_rad_s = 0.0f, .wheel_position_rad = 0.0f};
+            .wheel_ang_vel_rad_s = 4.0f, .wheel_position_rad = 0.0f};
         g_robot_status_msg.drive_units.back_right = (TbotsProto_DriveUnit){
-            .wheel_ang_vel_rad_s = 0.0f, .wheel_position_rad = 0.0f};
+            .wheel_ang_vel_rad_s = 4.0f, .wheel_position_rad = 0.0f};
 
         // TODO (#2081) update with dribbler temp
         g_robot_status_msg.temperature_status = (TbotsProto_TemperatureStatus){
-            .dribbler_temperature = 0.0f, .board_temperature = 0.0f};
+            .dribbler_temperature = 100.0f, .board_temperature = 69.420f};
 
         // TODO (#2081) update with dribbler status
         g_robot_status_msg.dribbler_status =
-            (TbotsProto_DribblerStatus){.dribbler_rpm = 0.0f};
+            (TbotsProto_DribblerStatus){.dribbler_rpm = 1000.0f};
 
         // TODO (#1874) update with u-blox status
         g_robot_status_msg.network_status = (TbotsProto_NetworkStatus){
             .ms_since_last_vision_received = 0, .ms_since_last_primitive_received = 0};
 
         // TODO (#2097) update when power monitor has been fully integrated
-        g_robot_status_msg.power_status =
-            (TbotsProto_PowerStatus){.battery_voltage = 0.0f, .capacitor_voltage = 0.0f};
+        g_robot_status_msg.power_status = (TbotsProto_PowerStatus){
+            .battery_voltage = 200.0f, .capacitor_voltage = 0.0f};
 
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
 
