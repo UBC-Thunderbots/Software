@@ -3,6 +3,11 @@
 #include <cstdlib>
 #include <experimental/filesystem>
 
+extern "C"
+{
+#include "shared/2015_robot_constants.h"
+}
+
 #include "software/logger/logger.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
 #include "software/test_util/test_util.h"
@@ -175,8 +180,8 @@ void SimulatedTestFixture::runTest(
     const std::vector<ValidationFunction> &non_terminating_validation_functions,
     const Duration &timeout)
 {
-    std::shared_ptr<Simulator> simulator(
-        std::make_shared<Simulator>(field, thunderbots_config->getSimulatorConfig()));
+    std::shared_ptr<Simulator> simulator(std::make_shared<Simulator>(
+        field, create2015RobotConstants(), thunderbots_config->getSimulatorConfig()));
     simulator->setBallState(ball);
     simulator->addYellowRobots(friendly_robots);
     simulator->addBlueRobots(enemy_robots);

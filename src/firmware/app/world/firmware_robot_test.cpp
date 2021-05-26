@@ -14,10 +14,7 @@ class FirmwareRobotTest : public testing::Test
    protected:
     virtual void SetUp(void)
     {
-        RobotConstants_t robot_constants = {.mass              = 1.1f,
-                                            .moment_of_inertia = 1.2f,
-                                            .robot_radius      = 1.3f,
-                                            .jerk_limit        = 1.4f};
+        RobotConstants_t robot_constants = TestUtil::createMockRobotConstants();
 
         controller_state.last_applied_acceleration_x       = 2.33f;
         controller_state.last_applied_acceleration_y       = 1.22f;

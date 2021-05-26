@@ -29,10 +29,12 @@ class StandaloneSimulator
      * @param standalone_simulator_config The config for the StandaloneSimulator
      * @param simulator_config The config for the Simulator
      * @param field The field to simulate
+     * @param robot_constants The robot constants
      */
     explicit StandaloneSimulator(
         std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config,
-        std::shared_ptr<SimulatorConfig> simulator_config, const Field& field);
+        std::shared_ptr<SimulatorConfig> simulator_config, const Field& field,
+        RobotConstants_t robot_constants);
     StandaloneSimulator() = delete;
 
     /**

@@ -16,10 +16,10 @@ extern "C"
 #include "shared/proto/robot_log_msg.nanopb.h"
 }
 
-Simulator::Simulator(const Field& field,
+Simulator::Simulator(const Field& field, RobotConstants_t robot_constants,
                      std::shared_ptr<const SimulatorConfig> simulator_config,
                      const Duration& physics_time_step)
-    : physics_world(field, simulator_config),
+    : physics_world(field, robot_constants, simulator_config),
       yellow_team_defending_side(FieldSide::NEG_X),
       blue_team_defending_side(FieldSide::NEG_X),
       frame_number(0),

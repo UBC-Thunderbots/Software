@@ -18,6 +18,8 @@ extern "C"
 
 #include <gtest/gtest.h>
 
+#include "shared/test_util/test_util.h"
+
 /**
  * Initializing all the mock functions required for robot and world
  * Mocks with no return types or arguments:
@@ -92,8 +94,7 @@ ControllerState_t controller_state = {.last_applied_acceleration_x       = 2.33f
                                       .last_applied_acceleration_angular = 3.22f};
 
 // Mock robot constants
-RobotConstants_t robot_constants = {
-    .mass = 1.1f, .moment_of_inertia = 1.2f, .robot_radius = 1.3f, .jerk_limit = 1.4f};
+RobotConstants_t robot_constants = TestUtil::createMockRobotConstants();
 
 class FirmwareTestUtilWorld : public testing::Test
 {

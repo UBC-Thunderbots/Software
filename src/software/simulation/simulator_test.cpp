@@ -2,6 +2,11 @@
 
 #include <gtest/gtest.h>
 
+extern "C"
+{
+#include "shared/2015_robot_constants.h"
+}
+
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "software/proto/primitive/primitive_msg_factory.h"
 #include "software/test_util/test_util.h"
@@ -12,8 +17,9 @@ class SimulatorTest : public ::testing::Test
     void SetUp() override
     {
         simulator_config = std::make_shared<const SimulatorConfig>();
-        simulator        = std::make_shared<Simulator>(Field::createSSLDivisionBField(),
-                                                simulator_config);
+        simulator =
+            std::make_shared<Simulator>(Field::createSSLDivisionBField(),
+                                        create2015RobotConstants(), simulator_config);
     }
 
     std::shared_ptr<Simulator> simulator;

@@ -3,6 +3,11 @@
 #include <Box2D/Box2D.h>
 #include <gtest/gtest.h>
 
+extern "C"
+{
+#include "shared/2015_robot_constants.h"
+}
+
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/physics/physics_world.h"
 #include "software/test_util/test_util.h"
@@ -13,7 +18,8 @@ class PhysicsSimulatorBallTest : public testing::Test
     virtual void SetUp()
     {
         physics_world = std::make_unique<PhysicsWorld>(
-            Field::createSSLDivisionBField(), std::make_shared<const SimulatorConfig>());
+            Field::createSSLDivisionBField(), robot_constants,
+            std::make_shared<const SimulatorConfig>());
         physics_world->setBallState(BallState(Point(1.01, -0.4), Vector(0.02, -4.5)));
 
         auto physics_ball = physics_world->getPhysicsBall();
@@ -33,6 +39,7 @@ class PhysicsSimulatorBallTest : public testing::Test
 
    private:
     std::unique_ptr<PhysicsWorld> physics_world;
+    RobotConstants_t robot_constants = create2015RobotConstants();
 };
 
 TEST_F(PhysicsSimulatorBallTest, test_get_position)

@@ -24,9 +24,10 @@ class ThreadedSimulator
      * will have the given field, with no robots or ball.
      *
      * @param field The field to initialize the simulation with
+     * @param robot_constants The robot constants
      * @param simulator_config The config to fetch parameters from
      */
-    explicit ThreadedSimulator(const Field& field,
+    explicit ThreadedSimulator(const Field& field, RobotConstants_t robot_constants,
                                std::shared_ptr<const SimulatorConfig> simulator_config);
     ~ThreadedSimulator();
 
