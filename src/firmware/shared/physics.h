@@ -15,24 +15,11 @@
 
 #define QUARTERDEGREE_TO_VOLT (QUARTERDEGREE_TO_RPM * RPM_TO_VOLT)
 
-#define ROBOT_RADIUS 0.085f
 #define TICK_TIME (1.0f / (float)CONTROL_LOOP_HZ)
-#define ROBOT_POINT_MASS 2.48f
 #define WHEEL_SLIP_VOLTAGE_LIMIT 4.25f  // Voltage where wheel slips (acceleration cap)
-
-// Maximum safe jerk for the robot
-#define JERK_LIMIT 40.0f  //(m/s^3)
-
-// all the interial components of the robot
-// This one is a little strange as it is the effective rotational mass
-// The rotational mass * (ROBOT_RADIUS)^2 will give the conventional interia
-#define INERTIAL_FACTOR 0.37f
 
 // factor for steel motor mounts
 #define STEEL_INTERTIAL_FACTOR 0.3858f
-
-#define ROT_MASS (INERTIAL_FACTOR * ROBOT_POINT_MASS)
-#define INERTIA (ROT_MASS * ROBOT_RADIUS * ROBOT_RADIUS)
 
 #define CURRENT_PER_TORQUE 39.21f  // from motor data sheet (1/25.5 mNm)
 #define GEAR_RATIO 0.5143f         // define as speed multiplication from motor to wheel

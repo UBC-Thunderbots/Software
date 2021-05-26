@@ -16,6 +16,7 @@ cc_library(
         "robot_constants.h",
     ],
     deps = [
+        ":constants",
         "//firmware/shared/math:tbots_math",
     ],
 )

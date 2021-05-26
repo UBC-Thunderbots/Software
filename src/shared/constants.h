@@ -14,10 +14,6 @@ static const double ROBOT_MAX_HEIGHT_METERS = 0.15;
 static const double ROBOT_MAX_RADIUS_METERS = 0.09;
 // The distance from the center of the robot to the front face (the flat part), in meters
 static const double DIST_TO_FRONT_OF_ROBOT_METERS = 0.07;
-// The total width of the entire flat face on the front of the robot
-static const double FRONT_OF_ROBOT_WIDTH_METERS = 0.11;
-// The distance from one end of the dribbler to the other
-static const double DRIBBLER_WIDTH_METERS = 0.088;
 // The approximate radius of the ball according to the SSL rulebook
 static const double BALL_MAX_RADIUS_METERS = 0.0215;
 // According to the rules, 80% of the ball must be seen at all times. Robots may not
@@ -30,19 +26,6 @@ static const double BALL_MASS_KG = 0.004593;
 static const double STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND = 1.5;
 // The maximum number of robots we can communicate with over radio.
 static const unsigned MAX_ROBOTS_OVER_RADIO = 8;
-/* Robot Attributes */
-// The mass of a robot with a battery, in kg. Determined experimentally
-// by weighing the robot and battery
-static const double ROBOT_WITH_BATTERY_MASS_KG = 2.465;
-// The maximum speed achievable by our robots, in metres per second.
-static const double ROBOT_MAX_SPEED_METERS_PER_SECOND = 2.0;
-// The maximum angular speed achievable by our robots, in rad/sec
-static const double ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND = 4 * M_PI;
-// The maximum acceleration achievable by our robots, in metres per seconds squared.
-static const double ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.0;
-// The maximum angular acceleration achievable by our robots, in radians per second
-// squared
-static const double ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED = 30.0;
 
 // The maximum speed attainable by enemy robots
 static const double ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND = 3.0;
@@ -68,12 +51,6 @@ static const double MILLISECONDS_PER_SECOND      = 1000.0;
 static const double SECONDS_PER_MICROSECOND      = 1.0 / 1000000.0;
 static const double SECONDS_PER_MILLISECOND      = 1.0 / 1000.0;
 static const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
-
-// Indefinite dribbler mode sets a speed that can be maintained indefinitely
-static const double INDEFINITE_DRIBBLER_SPEED = 1000.0;
-// Max force dribbler mode sets the speed that applies the maximum amount of force on the
-// ball
-static const double MAX_FORCE_DRIBBLER_SPEED = 16000.0;
 
 static const double POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS = 10;
 

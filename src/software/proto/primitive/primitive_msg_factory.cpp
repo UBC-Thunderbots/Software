@@ -59,14 +59,15 @@ std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast)
     return stop_primitive_msg;
 }
 
-double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode)
+double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode,
+                                          RobotConstants_t robot_constants)
 {
     switch (dribbler_mode)
     {
         case DribblerMode::INDEFINITE:
-            return INDEFINITE_DRIBBLER_SPEED;
+            return robot_constants.indefinite_dribbler_speed;
         case DribblerMode::MAX_FORCE:
-            return MAX_FORCE_DRIBBLER_SPEED;
+            return robot_constants.max_force_dribbler_speed;
         case DribblerMode::OFF:
             return 0.0;
         default:
@@ -76,12 +77,12 @@ double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode)
 }
 
 double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
-    MaxAllowedSpeedMode max_allowed_speed_mode)
+    MaxAllowedSpeedMode max_allowed_speed_mode, RobotConstants_t robot_constants)
 {
     switch (max_allowed_speed_mode)
     {
         case MaxAllowedSpeedMode::PHYSICAL_LIMIT:
-            return ROBOT_MAX_SPEED_METERS_PER_SECOND;
+            return robot_constants.robot_max_speed_meters_per_second;
         case MaxAllowedSpeedMode::STOP_COMMAND:
             return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND;
         case MaxAllowedSpeedMode::TIPTOE:

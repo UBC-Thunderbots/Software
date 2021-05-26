@@ -2,6 +2,7 @@
 
 #include "shared/constants.h"
 #include "shared/proto/primitive.pb.h"
+#include "shared/robot_constants.h"
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"
 #include "software/geom/point.h"

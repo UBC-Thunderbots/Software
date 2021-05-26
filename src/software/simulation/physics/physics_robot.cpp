@@ -74,12 +74,16 @@ PhysicsRobot::~PhysicsRobot()
 
 void PhysicsRobot::setupRobotBodyFixtures(const RobotState&, const double mass_kg)
 {
-    b2PolygonShape* main_body_shape =
-        PhysicsRobotModel::getMainRobotBodyShape(TOTAL_DRIBBLER_DEPTH);
-    b2PolygonShape* front_left_body_shape =
-        PhysicsRobotModel::getRobotBodyShapeFrontLeft(TOTAL_DRIBBLER_DEPTH);
+    b2PolygonShape* main_body_shape = PhysicsRobotModel::getMainRobotBodyShape(
+        TOTAL_DRIBBLER_DEPTH, robot_constants.dribbler_width_meters,
+        robot_constants.front_of_robot_width_meters);
+    b2PolygonShape* front_left_body_shape = PhysicsRobotModel::getRobotBodyShapeFrontLeft(
+        TOTAL_DRIBBLER_DEPTH, robot_constants.dribbler_width_meters,
+        robot_constants.front_of_robot_width_meters);
     b2PolygonShape* front_right_body_shape =
-        PhysicsRobotModel::getRobotBodyShapeFrontRight(TOTAL_DRIBBLER_DEPTH);
+        PhysicsRobotModel::getRobotBodyShapeFrontRight(
+            TOTAL_DRIBBLER_DEPTH, robot_constants.dribbler_width_meters,
+            robot_constants.front_of_robot_width_meters);
 
     auto body_shapes = {main_body_shape, front_left_body_shape, front_right_body_shape};
     double total_shape_area = 0.0;
@@ -128,12 +132,14 @@ void PhysicsRobot::setupDribblerFixture(const RobotState&)
     // so we do not need to rotate the points to match the orientation of the robot.
     const unsigned int num_vertices              = 4;
     b2Vec2 dribbler_shape_vertices[num_vertices] = {
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS, DRIBBLER_WIDTH_METERS / 2.0)),
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS,
+                         robot_constants.dribbler_width_meters / 2.0)),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - DRIBBLER_DEPTH,
-                         DRIBBLER_WIDTH_METERS / 2.0)),
+                         robot_constants.dribbler_width_meters / 2.0)),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - DRIBBLER_DEPTH,
-                         -DRIBBLER_WIDTH_METERS / 2.0)),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS, -DRIBBLER_WIDTH_METERS / 2.0))};
+                         -robot_constants.dribbler_width_meters / 2.0)),
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS,
+                         -robot_constants.dribbler_width_meters / 2.0))};
     b2PolygonShape* dribbler_shape = new b2PolygonShape();
     dribbler_shape->Set(dribbler_shape_vertices, num_vertices);
     robot_dribbler_fixture_def.shape = dribbler_shape;
@@ -158,14 +164,14 @@ void PhysicsRobot::setupDribblerDamperFixture(const RobotState& robot_state)
     b2Vec2 dribbler_damper_shape_vertices[num_vertices] = {
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - TOTAL_DRIBBLER_DEPTH +
                              DRIBBLER_DAMPER_THICKNESS,
-                         DRIBBLER_WIDTH_METERS / 2.0)),
+                         robot_constants.dribbler_width_meters / 2.0)),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - TOTAL_DRIBBLER_DEPTH,
-                         DRIBBLER_WIDTH_METERS / 2.0)),
+                         robot_constants.dribbler_width_meters / 2.0)),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - TOTAL_DRIBBLER_DEPTH,
-                         -DRIBBLER_WIDTH_METERS / 2.0)),
+                         -robot_constants.dribbler_width_meters / 2.0)),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - TOTAL_DRIBBLER_DEPTH +
                              DRIBBLER_DAMPER_THICKNESS,
-                         -DRIBBLER_WIDTH_METERS / 2.0))};
+                         -robot_constants.dribbler_width_meters / 2.0))};
 
     b2PolygonShape* dribbler_damper_shape = new b2PolygonShape();
     dribbler_damper_shape->Set(dribbler_damper_shape_vertices, num_vertices);

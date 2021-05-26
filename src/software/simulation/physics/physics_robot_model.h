@@ -67,12 +67,21 @@ class PhysicsRobotModel
     /**
      * @param total_dribbler_depth The distance from the front face of the robot to the
      * back of the dribbler
+     * @param dribbler_width_meters The distance from one end of the dribbler to the other
+     * @param front_of_robot_width_meters The total width of the entire flat face on the
+     * front of the robot
      *
      * @return A b2PolygonShape for the corresponding part of the robot body
      */
-    static b2PolygonShape *getMainRobotBodyShape(double total_dribbler_depth);
-    static b2PolygonShape *getRobotBodyShapeFrontLeft(double total_dribbler_depth);
-    static b2PolygonShape *getRobotBodyShapeFrontRight(double total_dribbler_depth);
+    static b2PolygonShape *getMainRobotBodyShape(double total_dribbler_depth,
+                                                 double dribbler_width_meters,
+                                                 double front_of_robot_width_meters);
+    static b2PolygonShape *getRobotBodyShapeFrontLeft(double total_dribbler_depth,
+                                                      double dribbler_width_meters,
+                                                      double front_of_robot_width_meters);
+    static b2PolygonShape *getRobotBodyShapeFrontRight(
+        double total_dribbler_depth, double dribbler_width_meters,
+        double front_of_robot_width_meters);
 
    private:
     /**
@@ -84,8 +93,13 @@ class PhysicsRobotModel
      * @param robot_state The robot to create
      * @param total_dribbler_depth The distance from the front face of the robot to the
      * back of the dribbler
+     * @param dribbler_width_meters The distance from one end of the dribbler to the other
+     * @param front_of_robot_width_meters The total width of the entire flat face on the
+     * front of the robot
      *
      * @return The points that make up the front-left shape for the robot body
      */
-    static std::vector<Point> getRobotFrontLeftShapePoints(double total_dribbler_depth);
+    static std::vector<Point> getRobotFrontLeftShapePoints(
+        double total_dribbler_depth, double dribbler_width_meters,
+        double front_of_robot_width_meters);
 };

@@ -69,17 +69,19 @@ void velocity_wheels_setLocalVelocity(
  * @param pb [in/out] The PhysBot data container that should have minor axis time and
  * will store the rotational information
  * @param avel The rotational velocity of the bot
+ * @param robot_constants The robot constants
  */
-void plan_move_rotation(PhysBot* pb, float avel);
+void plan_move_rotation(PhysBot* pb, float avel, RobotConstants_t robot_constants);
 
-void plan_move_rotation(PhysBot* pb, float avel)
+void plan_move_rotation(PhysBot* pb, float avel, RobotConstants_t robot_constants)
 {
     pb->rot.time = (pb->min.time > TIME_HORIZON) ? pb->min.time : TIME_HORIZON;
     // 1.4f is a magic constant to force the robot to rotate faster to its final
     // orientation.
     pb->rot.vel   = 1.4f * pb->rot.disp / pb->rot.time;
     pb->rot.accel = (pb->rot.vel - avel) / TIME_HORIZON;
-    limit(&pb->rot.accel, (float)ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+    limit(&pb->rot.accel,
+          robot_constants.robot_max_ang_acceleration_rad_per_second_squared);
 }
 
 void force_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
@@ -136,7 +138,8 @@ void force_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
     app_physbot_planMove(&pb.min, minor_params);
 
     // plan rotation movement
-    plan_move_rotation(&pb, app_firmware_robot_getVelocityAngular(robot));
+    plan_move_rotation(&pb, app_firmware_robot_getVelocityAngular(robot),
+                       robot->robot_constants);
 
     float accel[3] = {0, 0, pb.rot.accel};
 
