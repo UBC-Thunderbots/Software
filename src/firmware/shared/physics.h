@@ -45,17 +45,17 @@
  * @param [in] speed4 which is the listing of wheel speeds
  * @param [out] speed3 which is a speed in x,y,rotation in
  * robot relative coordinates
- * @param front_wheel_angle_rad angle between each front wheel and the y axis of the robot
+ * @param front_wheel_angle_deg angle between each front wheel and the y axis of the robot
  * in radians
- * @param back_wheel_angle_rad angle between each back wheel and the y axis of the robot
+ * @param back_wheel_angle_deg angle between each back wheel and the y axis of the robot
  * in radians
  */
 void shared_physics_speed4ToSpeed3(const float speed4[4], float speed3[3],
-                                   float front_wheel_angle_rad,
-                                   float back_wheel_angle_rad);
+                                   float front_wheel_angle_deg,
+                                   float back_wheel_angle_deg);
 void shared_physics_speed3ToSpeed4(const float speed3[3], float speed4[4],
-                                   float front_wheel_angle_rad,
-                                   float back_wheel_angle_rad);
+                                   float front_wheel_angle_deg,
+                                   float back_wheel_angle_deg);
 
 /**
  * Transformation matricies to convert forces in the
@@ -64,14 +64,14 @@ void shared_physics_speed3ToSpeed4(const float speed3[3], float speed4[4],
  * @param [in] force4 which is the listing of wheel forces
  * @param [out] force3 which is a force in x,y,rotation in
  * robot relative coordinates
- * @param front_wheel_angle_rad angle between each front wheel and the y axis of the robot
+ * @param front_wheel_angle_deg angle between each front wheel and the y axis of the robot
  * in radians
- * @param back_wheel_angle_rad angle between each back wheel and the y axis of the robot
+ * @param back_wheel_angle_deg angle between each back wheel and the y axis of the robot
  * in radians
  */
 void shared_physics_force3ToForce4(float force3[3], float force4[4],
-                                   float front_wheel_angle_rad,
-                                   float back_wheel_angle_rad);
+                                   float front_wheel_angle_deg,
+                                   float back_wheel_angle_deg);
 
 /**
  * Min angle delta between the radians of two angles

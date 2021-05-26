@@ -68,10 +68,10 @@ typedef struct RobotConstants
     float jerk_limit;
 
     // angle between each front wheel and the y axis of the robot
-    float front_wheel_angle_rad;
+    float front_wheel_angle_deg;
 
     // angle between each back wheel and the y axis of the robot
-    float back_wheel_angle_rad;
+    float back_wheel_angle_deg;
 
     // The total width of the entire flat face on the front of the robot
     double front_of_robot_width_meters;

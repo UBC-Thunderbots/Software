@@ -87,7 +87,9 @@ float app_control_getMaximalAccelScaling(const RobotConstants_t robot_constants,
         angular_accel * robot_constants.moment_of_inertia / robot_constants.robot_radius;
 
     float wheel_forces[4];
-    shared_physics_force3ToForce4(normed_force, wheel_forces);
+    shared_physics_force3ToForce4(normed_force, wheel_forces,
+                                  robot_constants.front_wheel_angle_deg,
+                                  robot_constants.back_wheel_angle_deg);
 
     return app_control_getMaximalTorqueScaling(force_wheels, wheel_forces,
                                                battery_voltage);
@@ -150,8 +152,10 @@ void app_control_applyAccel(RobotConstants_t robot_constants,
     robot_force[2] =
         angular_accel * robot_constants.moment_of_inertia / robot_constants.robot_radius;
     float wheel_force[4];
-    shared_physics_speed3ToSpeed4(robot_force,
-                                  wheel_force);  // Convert to wheel coordinate system
+    // Convert to wheel coordinate system
+    shared_physics_speed3ToSpeed4(robot_force, wheel_force,
+                                  robot_constants.front_wheel_angle_deg,
+                                  robot_constants.back_wheel_angle_deg);
 
     app_force_wheel_applyForce(force_wheels[0], wheel_force[0]);
     app_force_wheel_applyForce(force_wheels[3], wheel_force[3]);

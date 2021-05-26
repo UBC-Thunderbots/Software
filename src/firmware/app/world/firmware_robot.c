@@ -234,7 +234,9 @@ void velocity_wheels_setLocalVelocity(
     robot_velocity[1] = linear_velocity_y;
     robot_velocity[2] = angular_velocity;
     float wheel_velocity[4];
-    shared_physics_speed3ToSpeed4(robot_velocity, wheel_velocity);
+    shared_physics_speed3ToSpeed4(robot_velocity, wheel_velocity,
+                                  robot->robot_constants.front_wheel_angle_deg,
+                                  robot->robot_constants.front_wheel_angle_deg);
 
     app_velocity_wheel_setTargetVelocity(front_left_wheel, wheel_velocity[0]);
     app_velocity_wheel_setTargetVelocity(front_right_wheel, wheel_velocity[3]);
