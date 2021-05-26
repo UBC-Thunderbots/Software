@@ -8,8 +8,12 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
+#include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
 
-class PenaltyKickEnemyPlayTest : public SimulatedPlayTestFixture
+class PenaltyKickEnemyPlayTest
+        : public SimulatedPlayTestFixture,
+          public ::testing::WithParamInterface<std::tuple<RefereeCommand, RefereeCommand,
+          std::vector<RobotStateWithId>>>
 {
    protected:
     Field field = Field::createSSLDivisionBField();
@@ -20,11 +24,6 @@ TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
     RefereeCommand current_command = std::get<0>(GetParam());
     RefereeCommand previous_command = std::get<1>(GetParam());
     BallState ball_state(field.enemyPenaltyMark(), Vector(0, 0));
-
-    //TODO: change to pass by params
-    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
-        {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
-         Point(4.6, -3.1)});
 
     std::vector<RobotStateWithId> friendly_robots = std::get<2>(GetParam());
 
@@ -40,15 +39,18 @@ TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(PenaltyKickEnemyPlay));
     setRefereeCommand(current_command, previous_command);
+    Polygon behind_ball = Polygon({Point(field.enemyPenaltyMark().x() + 1, field.yLength() / 2),
+                                   Point(field.enemyPenaltyMark().x() + 1, -field.yLength() / 2),
+                                   Point(field.xLength() / 2, field.yLength() / 2),
+                                   Point(-field.xLength() / 2, -field.yLength() / 2)});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [behind_ball](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             robotAtOrientation(0, world_ptr, Angle::zero(), Angle::fromDegrees(5), yield);
             robotAtPosition(0, world_ptr, world_ptr->field().friendlyGoalCenter(), 0.05,
                             yield);
-            for (int i = 1; i <= 6; i++) {
-                //TODO: add function for checking robot behind position?
-                robotAtPosition(i, world_ptr, world_ptr->field().enemyPenaltyMark())
+            for (unsigned int id = 1; id <= 6; id++) {
+                robotInPolygon(id, behind_ball, world_ptr, yield);
             }
         }};
 
@@ -61,7 +63,10 @@ TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
 
 INSTANTIATE_TEST_CASE_P(RobotPositions, PenaltyKickEnemyPlayTest,
                         ::testing::Values(
-                                std::make_tuple(RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::HALT),
+                                std::make_tuple(RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::HALT,
+                                        TestUtil::createStationaryRobotStatesWithId({Point(-1, -2), Point(1, 2),
+                                                                                     Point(-2.5, 3), Point(2, -1),
+                                                                                     Point(0, 3), Point(3, 0)})),
                                 std::make_tuple(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_PENALTY_THEM)));
 
 TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_goalie)

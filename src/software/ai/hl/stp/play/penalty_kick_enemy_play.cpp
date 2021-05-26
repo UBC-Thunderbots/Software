@@ -40,20 +40,21 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     do
     {
-        // Move all non-shooter robots to the center of the field TODO: move all 1 meter behind ball
+        // Move all non-shooter robots to the center of the field
         move_tactic_2->updateControlParams(
-            Point(0, 0), world.field().enemyGoalCenter().toVector().orientation(), 0);
+                Point(world.field().enemyPenaltyMark().x() + 1.5, 0),
+                world.field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_3->updateControlParams(
-            Point(0, 4 * ROBOT_MAX_RADIUS_METERS),
+                Point(world.field().enemyPenaltyMark().x() + 1.5, 4 * ROBOT_MAX_RADIUS_METERS),
             world.field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_4->updateControlParams(
-            Point(0, -4 * ROBOT_MAX_RADIUS_METERS),
+                Point(world.field().enemyPenaltyMark().x() + 1.5, -4 * ROBOT_MAX_RADIUS_METERS),
             world.field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_5->updateControlParams(
-            Point(0, 8 * ROBOT_MAX_RADIUS_METERS),
+                Point(world.field().enemyPenaltyMark().x() + 1.5, 8 * ROBOT_MAX_RADIUS_METERS),
             world.field().enemyGoalCenter().toVector().orientation(), 0);
         move_tactic_6->updateControlParams(
-            Point(0, -8 * ROBOT_MAX_RADIUS_METERS),
+                Point(world.field().enemyPenaltyMark().x() + 1.5, -8 * ROBOT_MAX_RADIUS_METERS),
             world.field().enemyGoalCenter().toVector().orientation(), 0);
 
         world.gameState().isPlaying() ? tactics_to_run[0][0] = goalie_tactic :
