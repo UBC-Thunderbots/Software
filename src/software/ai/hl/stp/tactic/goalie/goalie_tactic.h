@@ -43,5 +43,4 @@ class GoalieTactic : public Tactic
 
     FSM<GoalieFSM> fsm;
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
-    GoalieFSM::ControlParams control_params;
 };

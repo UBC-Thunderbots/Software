@@ -32,7 +32,7 @@ cc_test(
     deps = [
         ":motion_constraint_set_builder",
         ":motion_constraint_visitor",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )

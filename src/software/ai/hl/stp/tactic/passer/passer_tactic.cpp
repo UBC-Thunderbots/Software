@@ -11,7 +11,7 @@
 PasserTactic::PasserTactic(Pass pass)
     : Tactic(false, {RobotCapability::Kick, RobotCapability::Move}),
       pass(std::move(pass)),
-      fsm()
+      fsm(DribbleFSM(std::make_shared<Point>()))
 {
 }
 

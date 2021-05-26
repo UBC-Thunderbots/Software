@@ -23,8 +23,8 @@ cc_test(
     srcs = ["stop_fsm_test.cpp"],
     deps = [
         ":stop_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -33,7 +33,7 @@ cc_test(
     srcs = ["stop_tactic_test.cpp"],
     deps = [
         ":stop_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )

@@ -202,7 +202,7 @@ cc_test(
     ],
     deps = [
         ":angle",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -213,7 +213,7 @@ cc_test(
     ],
     deps = [
         ":line",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -224,7 +224,7 @@ cc_test(
     ],
     deps = [
         ":point",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -235,7 +235,7 @@ cc_test(
     ],
     deps = [
         ":polynomial1d",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -246,8 +246,8 @@ cc_test(
     ],
     deps = [
         ":polynomial2d",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -258,8 +258,8 @@ cc_test(
     ],
     deps = [
         ":ray",
+        "//shared/test_util:tbots_gtest_main",
         "//software/geom/algorithms",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -271,7 +271,7 @@ cc_test(
     deps = [
         ":point",
         ":vector",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -282,7 +282,7 @@ cc_test(
     ],
     deps = [
         ":circle",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -293,8 +293,8 @@ cc_test(
     ],
     deps = [
         ":polygon",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -305,8 +305,8 @@ cc_test(
     ],
     deps = [
         ":convex_polygon",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -317,7 +317,7 @@ cc_test(
     ],
     deps = [
         ":rectangle",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -328,7 +328,7 @@ cc_test(
     ],
     deps = [
         ":segment",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -339,7 +339,7 @@ cc_test(
     ],
     deps = [
         ":triangle",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -350,9 +350,9 @@ cc_test(
     ],
     deps = [
         ":linear_spline2d",
+        "//shared/test_util:tbots_gtest_main",
         "//software/geom/algorithms",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -361,9 +361,9 @@ cc_test(
     srcs = ["bezier_curve2d_test.cpp"],
     deps = [
         ":bezier_curve2d",
+        "//shared/test_util:tbots_gtest_main",
         "//software/geom/algorithms",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -372,7 +372,7 @@ cc_test(
     srcs = ["cubic_bezier_spline2d_test.cpp"],
     deps = [
         ":cubic_bezier_spline2d",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )

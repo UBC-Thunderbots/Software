@@ -96,9 +96,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
         },
         [shooter_id](std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield) {
-            // Uncomment following line when #2087
-            // (https://github.com/UBC-Thunderbots/Software/pull/2087) goes in
-            // robotNotExcessivelyDribbling(shooter_id, world_ptr, yield);
+            robotNotExcessivelyDribbling(shooter_id, world_ptr, yield);
         },
         [shooter_id](std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield) {
