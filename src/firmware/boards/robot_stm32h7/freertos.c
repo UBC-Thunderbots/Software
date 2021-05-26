@@ -310,11 +310,6 @@ __weak void io_proto_multicast_startNetworkingTask(void *argument)
     /* init code for LWIP */
     MX_LWIP_Init();
     /* USER CODE BEGIN io_proto_multicast_startNetworkingTask */
-    /* Infinite loop */
-    for (;;)
-    {
-        osDelay(10000);
-    }
     /* USER CODE END io_proto_multicast_startNetworkingTask */
 }
 
