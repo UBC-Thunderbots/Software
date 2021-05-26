@@ -8,6 +8,8 @@ static DrivetrainUnit_t *_front_right_drive_unit;
 static DrivetrainUnit_t *_back_left_drive_unit;
 static DrivetrainUnit_t *_back_right_drive_unit;
 
+// We want to make sure that the static pointers to the drivetrain units
+// are initialized before using them to prevent accessing invalid memory.
 static bool initialized = false;
 
 void io_drivetrain_init(DrivetrainUnit_t *front_left_drive_unit,
@@ -73,45 +75,45 @@ float io_drivetrain_getBackRightRpm(void)
 
 void io_drivetrain_brakeFrontLeft(void)
 {
-    io_drivetrain_unit_applyForce(_front_left_drive_unit, 0.0f);
     assert(initialized);
+    io_drivetrain_unit_applyForce(_front_left_drive_unit, 0.0f);
 }
 void io_drivetrain_brakeFrontRight(void)
 {
-    io_drivetrain_unit_applyForce(_front_right_drive_unit, 0.0f);
     assert(initialized);
+    io_drivetrain_unit_applyForce(_front_right_drive_unit, 0.0f);
 }
 void io_drivetrain_brakeBackLeft(void)
 {
-    io_drivetrain_unit_applyForce(_back_left_drive_unit, 0.0f);
     assert(initialized);
+    io_drivetrain_unit_applyForce(_back_left_drive_unit, 0.0f);
 }
 void io_drivetrain_brakeBackRight(void)
 {
-    io_drivetrain_unit_applyForce(_back_right_drive_unit, 0.0f);
     assert(initialized);
+    io_drivetrain_unit_applyForce(_back_right_drive_unit, 0.0f);
 }
 
 void io_drivetrain_coastFrontLeft(void)
 {
-    io_drivetrain_unit_coast(_front_left_drive_unit);
     assert(initialized);
+    io_drivetrain_unit_coast(_front_left_drive_unit);
 }
 
 void io_drivetrain_coastFrontRight(void)
 {
-    io_drivetrain_unit_coast(_front_right_drive_unit);
     assert(initialized);
+    io_drivetrain_unit_coast(_front_right_drive_unit);
 }
 
 void io_drivetrain_coastBackLeft(void)
 {
-    io_drivetrain_unit_coast(_back_left_drive_unit);
     assert(initialized);
+    io_drivetrain_unit_coast(_back_left_drive_unit);
 }
 
 void io_drivetrain_coastBackRight(void)
 {
-    io_drivetrain_unit_coast(_back_right_drive_unit);
     assert(initialized);
+    io_drivetrain_unit_coast(_back_right_drive_unit);
 }

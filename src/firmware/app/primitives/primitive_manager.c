@@ -5,10 +5,10 @@
 #ifdef __arm__
 
 // clang-format off
+// clang format re-orders these headers, we want FreeRTOS.h to come before semphr.h
 #include "FreeRTOS.h"
 #include <semphr.h>
 // clang-format on
-
 
 #define static_assert _Static_assert
 #elif __unix__

@@ -87,7 +87,7 @@ void MX_FREERTOS_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-// TODO (#2082) remove this as part of
+// TODO (#2082) remove this hack
 float sys_now_float(void);
 float sys_now_float(void)
 {

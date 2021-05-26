@@ -6,8 +6,9 @@
  * Initialize the primitive executor a pointer to the world and
  * the primitive manager
  *
- * @param world A pointer to the world
- * @param primitive_manager A pointer to the primitive manager
+ * @param world A pointer to the world in which primitives should be executed
+ * @param primitive_manager A pointer to the primitive manager which will execute
+ * primitives on the given world.
  *
  */
 void io_primitive_executor_init(FirmwareWorld_t* world,
