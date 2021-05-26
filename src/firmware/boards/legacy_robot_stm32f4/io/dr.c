@@ -8,6 +8,7 @@
 #include "io/dsp.h"
 #include "io/encoder.h"
 #include "io/sensors.h"
+#include "shared/constants.h"
 #include "util/circbuff.h"
 
 static dr_data_t current_state;
@@ -71,7 +72,7 @@ void dr_tick(log_record_t *log)
     }
     // Todo: Check for wheel slippage
 
-    shared_physics_speed4ToSpeed3(encoder_speeds, wheel_speeds);
+    shared_physics_legacySpeed4ToSpeed3(encoder_speeds, wheel_speeds);
     wheel_speeds[2] =
         wheel_speeds[2] / ROBOT_MAX_RADIUS_METERS;  // Convert to angular velocity (rad/s)
 

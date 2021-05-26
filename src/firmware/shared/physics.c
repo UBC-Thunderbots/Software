@@ -42,6 +42,12 @@ void shared_physics_speed4ToSpeed3(const float speed4[4], float speed3[3],
         speed3, 3, speed4, 4, shared_physics_local_vel_to_wheels_matrix);
 }
 
+void shared_physics_legacySpeed4ToSpeed3(const float speed4[4], float speed3[3])
+{
+    shared_physics_linear_algebra_matrixMultiply(
+        speed3, 3, speed4, 4, shared_physics_local_vel_to_wheels_matrix);
+}
+
 void shared_physics_speed3ToSpeed4(const float speed3[3], float speed4[4],
                                    float front_wheel_angle_deg,
                                    float back_wheel_angle_deg)

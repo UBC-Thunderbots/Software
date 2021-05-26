@@ -45,6 +45,17 @@ void shared_physics_speed3ToSpeed4(const float speed3[3], float speed4[4],
                                    float back_wheel_angle_deg);
 
 /**
+ * Transformation matricies to convert speeds in the two different domains commonly used
+ * by the robot NOTE: legacy conversion function that assumes that the angles are 55deg
+ * (front) and 45deg (back). Please use shared_physics_speed4ToSpeed3 instead
+ *
+ * @param [in] speed4 which is the listing of wheel speeds
+ * @param [out] speed3 which is a speed in x,y,rotation in
+ * robot relative coordinates
+ */
+void shared_physics_legacySpeed4ToSpeed3(const float speed4[4], float speed3[3]);
+
+/**
  * Transformation matricies to convert forces in the
  * two different domains commonly used by the robot
  *
