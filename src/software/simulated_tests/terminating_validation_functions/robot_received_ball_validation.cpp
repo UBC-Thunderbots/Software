@@ -7,16 +7,16 @@ void robotReceivedBall(RobotId robot_id, std::shared_ptr<World> world_ptr,
                        ValidationCoroutine::push_type& yield)
 {
     auto ball_near_dribbler = [robot_id](std::shared_ptr<World> world_ptr) {
-        std::optional<Robot> robotOptional =
+        std::optional<Robot> robot_optional =
             world_ptr->friendlyTeam().getRobotById(robot_id);
-        if (!robotOptional.has_value())
+        if (!robot_optional.has_value())
         {
             LOG(FATAL) << "There is no robot with ID: " + std::to_string(robot_id);
         }
 
-        Robot robot         = robotOptional.value();
+        Robot robot         = robot_optional.value();
         Point ball_position = world_ptr->ball().position();
-        return robot.isNearDribbler(ball_position);
+        return robot.isNearDribbler(ball_position, 0.05);
     };
 
     while (!ball_near_dribbler(world_ptr))
