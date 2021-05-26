@@ -1,5 +1,10 @@
 #pragma once
 
+extern "C"
+{
+#include "shared/2015_robot_constants.h"
+}
+
 #include "shared/constants.h"
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"
@@ -23,10 +28,12 @@ class RobotState
      * @param velocity The velocity of the robot, in metres per second
      * @param orientation The orientation of the robot
      * @param angular_velocity The angular velocity of the robot
+     * @param robot_constants The robot constants for this robot
      */
-    explicit RobotState(const Point &position, const Vector &velocity,
-                        const Angle &orientation,
-                        const AngularVelocity &angular_velocity);
+    explicit RobotState(
+        const Point &position, const Vector &velocity, const Angle &orientation,
+        const AngularVelocity &angular_velocity,
+        const RobotConstants_t &robot_constants = create2015RobotConstants());
 
     /**
      * Returns the position of the robot represented by this state
@@ -57,6 +64,13 @@ class RobotState
     AngularVelocity angularVelocity() const;
 
     /**
+     * Returns the robot constants for this robot state
+     *
+     * @return the robot constants for this robot
+     */
+    const RobotConstants_t &robotConstants() const;
+
+    /**
      * Defines the equality operator for a RobotState. RobotStates are equal if
      * all their members are equal
      *
@@ -82,6 +96,7 @@ class RobotState
     Vector velocity_;
     Angle orientation_;
     AngularVelocity angular_velocity_;
+    RobotConstants_t robot_constants_;
 };
 
 /**

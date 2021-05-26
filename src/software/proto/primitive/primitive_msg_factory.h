@@ -87,10 +87,12 @@ std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast);
  * Convert dribbler mode to dribbler speed
  *
  * @param dribbler_mode The DribblerMode
+ * @param robot_constants The robot constants
  *
  * @return the dribbler speed in RPM
  */
-double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode);
+double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode,
+                                          RobotConstants_t robot_constants);
 
 /**
  * Convert max allowed speed mode to max allowed speed
