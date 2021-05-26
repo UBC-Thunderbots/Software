@@ -27,48 +27,24 @@ static const float shared_physics_local_vel_to_wheels_matrix[3][4] = {
     {0.3904f, -0.3904f, -0.3904f, 0.3904f},
     {0.2761f, 0.2239f, 0.2239f, 0.2761f}};
 
-/**
- * \ingroup Physics
- *
- * \brief performs the unitless conversion of wheel speeds into robot speeds
- *
- * \param[in] the 4 wheel speeds
- * \param[out] the 3 robot speeds in the same units
- */
-void shared_physics_speed4ToSpeed3(const float speed4[4], float speed3[3])
+void shared_physics_speed4ToSpeed3(const float speed4[4], float speed3[3],
+                                   float front_wheel_angle_rad,
+                                   float back_wheel_angle_rad)
 {
     matrix_mult(speed3, 3, speed4, 4, shared_physics_local_vel_to_wheels_matrix);
 }
 
-/**
- * \ingroup Physics
- *
- * \brief performs the unitless conversion of the robots speeds into wheel speeds
- *
- * \param[in] the robot speeds in x,y,theta*R coordinates
- * \param[out] the robot wheel speeds in the same units as input
- */
-void shared_physics_speed3ToSpeed4(const float speed3[3], float speed4[4])
+void shared_physics_speed3ToSpeed4(const float speed3[3], float speed4[4],
+                                   float front_wheel_angle_rad,
+                                   float back_wheel_angle_rad)
 {
     matrix_mult_t(speed4, 4, speed3, 3,
                   shared_physics_wheels_to_local_vel_matrix_transpose);
 }
 
-/**
- * \ingroup Physics
- *
- * Implements the conversion between forces in the robot coordinate system and the
- * Force per wheel. This is nominally equal to the shared_physics_speed3ToSpeed4
- * conversion if the center of mass of the robot coincides with the wheel center, however
- * this is not the case and so when computing wheel forces this should be transform should
- * be used.
- *
- * \brief Implements the conversion from force in robot coordinates to Wheel force
- *
- * \param[in] force in robot coordinates
- * \param[out] force to exert per wheel
- */
-void shared_physics_force3ToForce4(float force3[3], float force4[4])
+void shared_physics_force3ToForce4(float force3[3], float force4[4],
+                                   float front_wheel_angle_rad,
+                                   float back_wheel_angle_rad)
 {
     matrix_mult_t(force4, 4, force3, 3, shared_physics_local_vel_to_wheels_matrix);
 }

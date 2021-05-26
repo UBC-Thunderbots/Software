@@ -38,30 +38,89 @@
 #define GEAR_RATIO 0.5143f         // define as speed multiplication from motor to wheel
 #define WHEEL_RADIUS 0.0254f
 
-// transformation matricies to convert speeds in the
-// two different domains commonly used by the robot
-// speed4 which is the listing of wheel speeds
-// and speed3 which is a speed in x,y,rotation in
-// robot relative coordinates
-void shared_physics_speed4ToSpeed3(const float speed4[4], float speed3[3]);
-void shared_physics_speed3ToSpeed4(const float speed3[3], float speed4[4]);
+/**
+ * Transformation matricies to convert speeds in the
+ * two different domains commonly used by the robot
+ *
+ * @param [in] speed4 which is the listing of wheel speeds
+ * @param [out] speed3 which is a speed in x,y,rotation in
+ * robot relative coordinates
+ * @param front_wheel_angle_rad angle between each front wheel and the y axis of the robot
+ * in radians
+ * @param back_wheel_angle_rad angle between each back wheel and the y axis of the robot
+ * in radians
+ */
+void shared_physics_speed4ToSpeed3(const float speed4[4], float speed3[3],
+                                   float front_wheel_angle_rad,
+                                   float back_wheel_angle_rad);
+void shared_physics_speed3ToSpeed4(const float speed3[3], float speed4[4],
+                                   float front_wheel_angle_rad,
+                                   float back_wheel_angle_rad);
 
-// transformation matricies to convert forces in the
-// two different domains commonly used by the robot
-// force4 which is the listing of wheel forces
-// and force3 which is a force in x,y,rotation in
-// robot relative coordinates
-void shared_physics_force3ToForce4(float force3[3], float force4[4]);
+/**
+ * Transformation matricies to convert forces in the
+ * two different domains commonly used by the robot
+ *
+ * @param [in] force4 which is the listing of wheel forces
+ * @param [out] force3 which is a force in x,y,rotation in
+ * robot relative coordinates
+ * @param front_wheel_angle_rad angle between each front wheel and the y axis of the robot
+ * in radians
+ * @param back_wheel_angle_rad angle between each back wheel and the y axis of the robot
+ * in radians
+ */
+void shared_physics_force3ToForce4(float force3[3], float force4[4],
+                                   float front_wheel_angle_rad,
+                                   float back_wheel_angle_rad);
 
-float shared_physics_minAngleDelta(float, float);
+/**
+ * Min angle delta between the radians of two angles
+ *
+ * @param angle1 the first angle in radians
+ * @param angle2 the second angle in radians
+ *
+ * @return the min angle difference in radians
+ */
+float shared_physics_minAngleDelta(float angle1, float angle2);
 
+/**
+ * Calculates the l2 norm between a1 and a2
+ *
+ * @param a1 The first number
+ * @param a2 The second number
+ *
+ * @return the l2 norm between the 2 numbers
+ */
 float shared_physics_norm2(float a1, float a2);
 
-// rotate a velocity vector through angle
+/**
+ * rotate a velocity vector through angle
+ *
+ * @param speed3 [in/out] the vector to rotate
+ * @param angle the angle to rotate through in radians
+ */
 void shared_physics_rotate(float speed3[2], float angle);
 
+/**
+ * Calculates the dot product between two vectors of the same size
+ *
+ * @param vec1 the first vector
+ * @param vec2 the second vector
+ * @param size the size of the vectors
+ *
+ * @return the dot product
+ */
 float shared_physics_dotProduct(const float vec1[], const float vec2[], const int size);
 
+/**
+ * Calculates the 2D dot product between two matrices of the same size
+ *
+ * @param vec1 the first vector
+ * @param vec2 the second vector
+ * @param size the size of the vectors
+ *
+ * @return the dot product
+ */
 float shared_physics_dot2D(float vec1[2], float vec2[2]);
 
 /**
