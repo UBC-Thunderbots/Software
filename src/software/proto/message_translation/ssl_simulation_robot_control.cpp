@@ -34,7 +34,7 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
 
     robot_local_speed[2] =
         robot_local_speed[2] /
-        ROBOT_RADIUS;  // Convert speed [m/s] to angular velocity [rad/s]
+        ROBOT_MAX_RADIUS_METERS;  // Convert speed [m/s] to angular velocity [rad/s]
 
     move_local_velocity.set_forward(robot_local_speed[0]);
     move_local_velocity.set_left(robot_local_speed[1]);

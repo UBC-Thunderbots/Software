@@ -73,7 +73,7 @@ void dr_tick(log_record_t *log)
 
     shared_physics_speed4ToSpeed3(encoder_speeds, wheel_speeds);
     wheel_speeds[2] =
-        wheel_speeds[2] / ROBOT_RADIUS;  // Convert to angular velocity (rad/s)
+        wheel_speeds[2] / ROBOT_MAX_RADIUS_METERS;  // Convert to angular velocity (rad/s)
 
     wheel_speeds_t wheel_speed_object;
     wheel_speed_object.speed_x     = wheel_speeds[0];

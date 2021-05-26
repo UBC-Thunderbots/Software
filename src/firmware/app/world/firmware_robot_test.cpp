@@ -157,7 +157,6 @@ TEST_F(FirmwareRobotTest, getRobotConstants)
 
     EXPECT_NEAR(1.1, constants.mass, 1e-5);
     EXPECT_NEAR(1.2, constants.moment_of_inertia, 1e-5);
-    EXPECT_NEAR(1.3, constants.robot_radius, 1e-5);
     EXPECT_NEAR(1.4, constants.jerk_limit, 1e-5);
 }
 

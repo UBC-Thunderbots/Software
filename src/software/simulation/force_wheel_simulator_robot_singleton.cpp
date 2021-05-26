@@ -76,13 +76,6 @@ ForceWheelSimulatorRobotSingleton::createFirmwareRobot()
 
     const RobotConstants_t robot_constants = create2015RobotConstants();
 
-    //        = {
-    //        .mass              = ROBOT_POINT_MASS,
-    //        .moment_of_inertia = INERTIA,
-    //        .robot_radius      = ROBOT_RADIUS,
-    //        .jerk_limit        = JERK_LIMIT,
-    //    };
-
     ControllerState_t* controller_state = new ControllerState_t{
         .last_applied_acceleration_x       = 0,
         .last_applied_acceleration_y       = 0,

@@ -519,7 +519,6 @@ static void run_normal(void)
     const RobotConstants_t robot_constants = {
         .mass              = ROBOT_POINT_MASS,
         .moment_of_inertia = INERTIA,
-        .robot_radius      = ROBOT_RADIUS,
         .jerk_limit        = JERK_LIMIT,
     };
     ControllerState_t controller_state = {

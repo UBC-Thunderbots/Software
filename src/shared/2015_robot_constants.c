@@ -48,7 +48,7 @@ static const float DRIBBLER_WIDTH_METERS = 0.088f;
 
 // all the interial components of the robot
 // This one is a little strange as it is the effective rotational mass
-// The rotational mass * (ROBOT_RADIUS)^2 will give the conventional interia
+// The rotational mass * (ROBOT_MAX_RADIUS_METERS)^2 will give the conventional interia
 #define INERTIAL_FACTOR (0.37f)
 #define ROBOT_POINT_MASS (2.48f)
 #define ROT_MASS (INERTIAL_FACTOR * ROBOT_POINT_MASS)

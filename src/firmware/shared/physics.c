@@ -16,7 +16,7 @@
 // This matrix is a unitless matrix which takes the force/speed exerted
 // on the floor by each of the four wheels and converts it into forces/speed
 // within the robot domain, the third component is is newtons and not
-// torque as the matrix is unitless (multiply by ROBOT_RADIUS to unnormalize)
+// torque as the matrix is unitless (multiply by ROBOT_MAX_RADIUS_METERS to unnormalize)
 // the transpose of this matrix is the velocity coupling matrix and can
 // convert speeds in the robot coordinates into linear wheel speeds
 static const float shared_physics_wheels_to_local_vel_matrix_transpose[3][4] = {
@@ -38,7 +38,8 @@ void shared_physics_speed4ToSpeed3(const float speed4[4], float speed3[3],
     // TODO (#2099): use wheel angles to implement this properly
     (void)front_wheel_angle_deg;
     (void)back_wheel_angle_deg;
-    matrix_mult(speed3, 3, speed4, 4, shared_physics_local_vel_to_wheels_matrix);
+    shared_physics_linear_algebra_matrixMultiply(
+        speed3, 3, speed4, 4, shared_physics_local_vel_to_wheels_matrix);
 }
 
 void shared_physics_speed3ToSpeed4(const float speed3[3], float speed4[4],
@@ -48,8 +49,8 @@ void shared_physics_speed3ToSpeed4(const float speed3[3], float speed4[4],
     // TODO (#2099): use wheel angles to implement this properly
     (void)front_wheel_angle_deg;
     (void)back_wheel_angle_deg;
-    matrix_mult_t(speed4, 4, speed3, 3,
-                  shared_physics_wheels_to_local_vel_matrix_transpose);
+    shared_physics_linear_algebra_matrixMultiplyTranspose(
+        speed4, 4, speed3, 3, shared_physics_wheels_to_local_vel_matrix_transpose);
 }
 
 void shared_physics_force3ToForce4(float force3[3], float force4[4],
@@ -59,7 +60,8 @@ void shared_physics_force3ToForce4(float force3[3], float force4[4],
     // TODO (#2099): use wheel angles to implement this properly
     (void)front_wheel_angle_deg;
     (void)back_wheel_angle_deg;
-    matrix_mult_t(force4, 4, force3, 3, shared_physics_local_vel_to_wheels_matrix);
+    shared_physics_linear_algebra_matrixMultiplyTranspose(
+        force4, 4, force3, 3, shared_physics_local_vel_to_wheels_matrix);
 }
 
 // return the minimum angle from angle1 to angle2

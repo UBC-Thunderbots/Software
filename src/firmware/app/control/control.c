@@ -2,6 +2,7 @@
 
 #include "firmware/shared/physics.h"
 #include "firmware/shared/util.h"
+#include "shared/constants.h"
 
 /**
  * Computes a scaling constant that can be used to maximize wheel force while obeying
@@ -83,8 +84,8 @@ float app_control_getMaximalAccelScaling(const RobotConstants_t robot_constants,
     float normed_force[3];
     normed_force[0] = linear_accel_x * robot_constants.mass;
     normed_force[1] = linear_accel_y * robot_constants.mass;
-    normed_force[2] =
-        angular_accel * robot_constants.moment_of_inertia / robot_constants.robot_radius;
+    normed_force[2] = angular_accel * robot_constants.moment_of_inertia /
+                      (float)ROBOT_MAX_RADIUS_METERS;
 
     float wheel_forces[4];
     shared_physics_force3ToForce4(normed_force, wheel_forces,
@@ -132,7 +133,7 @@ void app_control_applyAccel(RobotConstants_t robot_constants,
     const float jerk_limit                       = robot_constants.jerk_limit;
     const float linear_acceleration_change_limit = robot_constants.jerk_limit * TICK_TIME;
     const float angular_acceleration_change_limit =
-        jerk_limit / ROBOT_RADIUS * TICK_TIME * 5.0f;
+        jerk_limit / (float)ROBOT_MAX_RADIUS_METERS * TICK_TIME * 5.0f;
     limit(&linear_diff_x, linear_acceleration_change_limit);
     limit(&linear_diff_y, linear_acceleration_change_limit);
     limit(&angular_diff, angular_acceleration_change_limit);
@@ -149,8 +150,8 @@ void app_control_applyAccel(RobotConstants_t robot_constants,
     robot_force[0] = linear_accel_x * robot_constants.mass;
     robot_force[1] = linear_accel_y * robot_constants.mass;
     // input is angular acceleration so mass * Radius * radians/second^2 gives newtons
-    robot_force[2] =
-        angular_accel * robot_constants.moment_of_inertia / robot_constants.robot_radius;
+    robot_force[2] = angular_accel * robot_constants.moment_of_inertia /
+                     (float)ROBOT_MAX_RADIUS_METERS;
     float wheel_force[4];
     // Convert to wheel coordinate system
     shared_physics_speed3ToSpeed4(robot_force, wheel_force,

@@ -11,7 +11,7 @@
 // gyro running at 2000/second and in integers such that 32767 is 2000
 // 61.0 millidegrees/second / LSB
 #define DEGREES_PER_GYRO (61.0f / 1000.0f)
-#define MS_PER_DEGREE (2.0f * (float)P_PI * ROBOT_RADIUS / 360.0f)
+#define MS_PER_DEGREE (2.0f * (float)P_PI * ROBOT_MAX_RADIUS_METERS / 360.0f)
 #define MS_PER_GYRO (MS_PER_DEGREE * DEGREES_PER_GYRO)
 
 /**
