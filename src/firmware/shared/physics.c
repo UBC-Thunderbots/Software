@@ -9,6 +9,10 @@
 // these matrices may be derived as per omnidrive paper:
 // http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf
 
+
+// TODO (#2099): Remove these matrices once the conversion functions are based on the
+// wheel angles
+//
 // This matrix is a unitless matrix which takes the force/speed exerted
 // on the floor by each of the four wheels and converts it into forces/speed
 // within the robot domain, the third component is is newtons and not
@@ -31,6 +35,9 @@ void shared_physics_speed4ToSpeed3(const float speed4[4], float speed3[3],
                                    float front_wheel_angle_rad,
                                    float back_wheel_angle_rad)
 {
+    // TODO (#2099): use wheel angles to implement this properly
+    (void)front_wheel_angle_rad;
+    (void)back_wheel_angle_rad;
     matrix_mult(speed3, 3, speed4, 4, shared_physics_local_vel_to_wheels_matrix);
 }
 
@@ -38,6 +45,9 @@ void shared_physics_speed3ToSpeed4(const float speed3[3], float speed4[4],
                                    float front_wheel_angle_rad,
                                    float back_wheel_angle_rad)
 {
+    // TODO (#2099): use wheel angles to implement this properly
+    (void)front_wheel_angle_rad;
+    (void)back_wheel_angle_rad;
     matrix_mult_t(speed4, 4, speed3, 3,
                   shared_physics_wheels_to_local_vel_matrix_transpose);
 }
@@ -46,6 +56,9 @@ void shared_physics_force3ToForce4(float force3[3], float force4[4],
                                    float front_wheel_angle_rad,
                                    float back_wheel_angle_rad)
 {
+    // TODO (#2099): use wheel angles to implement this properly
+    (void)front_wheel_angle_rad;
+    (void)back_wheel_angle_rad;
     matrix_mult_t(force4, 4, force3, 3, shared_physics_local_vel_to_wheels_matrix);
 }
 
