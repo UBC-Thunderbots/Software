@@ -198,3 +198,18 @@ cc_library(
     hdrs = ["shot.h"],
     deps = ["//software/geom:point"],
 )
+
+cc_library(
+    name = "keep_away",
+    srcs = ["keep_away.cpp"],
+    hdrs = ["keep_away.h"],
+    deps = [
+        "//shared/parameter:cpp_configs",
+        "//software/ai/passing:cost_functions",
+        "//software/optimization:gradient_descent",
+        "//software/world",
+        "//software/world:ball",
+        "//software/world:field",
+        "//software/world:robot",
+    ],
+)

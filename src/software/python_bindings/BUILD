@@ -126,8 +126,8 @@ pybind_extension(
 )
 
 cc_library(
-    name = "optimization_keep_away_lib",
-    srcs = ["optimization_keep_away.cpp"],
+    name = "keep_away_lib",
+    srcs = ["keep_away.cpp"],
     copts = ["-fexceptions"],
     features = [
         "-use_header_modules",
@@ -136,25 +136,13 @@ cc_library(
     deps = [
         ":python_binding_utilities",
         ":pass_utilities",
-        "//software/geom:angle",
-        "//software/geom:point",
-        "//software/geom:vector",
-        "//shared/parameter:cpp_configs",
-        "//software/proto:sensor_msg_cc_proto",
-        "//software/proto:ssl_cc_proto",
-        "//software/sensor_fusion",
-        "//software/world",
-        "//software/world:ball",
-        "//software/world:field",
-        "//software/world:robot",
-        "//software/ai/passing:pass_generator",
-        "//software/geom:rectangle",
+        "//software/ai/evaluation:keep_away",
     ] + PYBIND_DEPS,
 )
 
 pybind_extension(
-    name = "optimization_keep_away",
+    name = "keep_away",
     deps = [
-        ":optimization_keep_away_lib",
+        ":keep_away_lib",
     ],
 )
