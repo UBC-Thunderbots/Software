@@ -67,7 +67,10 @@ INSTANTIATE_TEST_CASE_P(RobotPositions, PenaltyKickEnemyPlayTest,
                                         TestUtil::createStationaryRobotStatesWithId({Point(-1, -2), Point(1, 2),
                                                                                      Point(-2.5, 3), Point(2, -1),
                                                                                      Point(0, 3), Point(3, 0)})),
-                                std::make_tuple(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_PENALTY_THEM)));
+                                std::make_tuple(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_PENALTY_THEM,
+                                        TestUtil::createStationaryRobotStatesWithId({Point(-0.5, -2.1), Point(2.2, 1.2),
+                                                                                     Point(-2.5, 1.3), Point(1.2, -1.5),
+                                                                                     Point(0, 2), Point(1, 0)}))));
 
 TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_goalie)
 {
