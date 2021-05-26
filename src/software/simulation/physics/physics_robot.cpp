@@ -23,9 +23,10 @@ const double PhysicsRobot::DRIBBLER_DAMPER_THICKNESS = 0.005;
 const double PhysicsRobot::TOTAL_DRIBBLER_DEPTH =
     PhysicsRobot::DRIBBLER_DEPTH + PhysicsRobot::DRIBBLER_DAMPER_THICKNESS;
 
-PhysicsRobot::PhysicsRobot(RobotId id, std::shared_ptr<b2World> world,
-                           const RobotState& robot_state, const double mass_kg)
-    : robot_id(id)
+PhysicsRobot::PhysicsRobot(const RobotId id, std::shared_ptr<b2World> world,
+                           const RobotState& robot_state,
+                           const RobotConstants_t robot_constants)
+    : robot_id(id), robot_constants(robot_constants)
 {
     b2BodyDef robot_body_def;
     robot_body_def.type = b2_dynamicBody;
@@ -41,7 +42,7 @@ PhysicsRobot::PhysicsRobot(RobotId id, std::shared_ptr<b2World> world,
 
     robot_body = world->CreateBody(&robot_body_def);
 
-    setupRobotBodyFixtures(robot_state, mass_kg);
+    setupRobotBodyFixtures(robot_state, robot_constants.mass);
     setupDribblerFixture(robot_state);
     setupDribblerDamperFixture(robot_state);
 
@@ -285,7 +286,9 @@ std::array<float, 4> PhysicsRobot::getMotorSpeeds() const
         robot_body->GetLocalVector(robot_body->GetLinearVelocity()).y,
         robot_body->GetAngularVelocity()};
     float wheel_speeds[4]{0.0, 0.0, 0.0, 0.0};
-    shared_physics_speed3ToSpeed4(robot_local_speed, wheel_speeds);
+    shared_physics_speed3ToSpeed4(robot_local_speed, wheel_speeds,
+                                  robot_constants.front_wheel_angle_deg,
+                                  robot_constants.back_wheel_angle_deg);
     std::array<float, 4> motor_speeds = {0.0, 0.0, 0.0, 0.0};
     for (unsigned int i = 0; i < 4; i++)
     {

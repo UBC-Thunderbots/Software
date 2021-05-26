@@ -46,9 +46,9 @@
  * @param [out] speed3 which is a speed in x,y,rotation in
  * robot relative coordinates
  * @param front_wheel_angle_deg angle between each front wheel and the y axis of the robot
- * in radians
+ * in degrees
  * @param back_wheel_angle_deg angle between each back wheel and the y axis of the robot
- * in radians
+ * in degrees
  */
 void shared_physics_speed4ToSpeed3(const float speed4[4], float speed3[3],
                                    float front_wheel_angle_deg,

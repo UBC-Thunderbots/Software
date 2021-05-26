@@ -13,7 +13,7 @@ float rpm_to_m_per_s(float rpm, float wheel_radius)
 
 std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
     double wheel_rpm_front_right, double wheel_rpm_front_left, double wheel_rpm_back_left,
-    double wheel_rpm_back_right)
+    double wheel_rpm_back_right, float front_wheel_angle_deg, float back_wheel_angle_deg)
 {
     auto move_local_velocity = SSLSimulationProto::MoveLocalVelocity();
 
@@ -29,7 +29,8 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
     float wheel_speeds[4]{front_left_m_per_s, back_left_m_per_s, back_right_m_per_s,
                           front_right_m_per_s};
     float robot_local_speed[3]{0.0, 0.0, 0.0};
-    shared_physics_speed4ToSpeed3(wheel_speeds, robot_local_speed);
+    shared_physics_speed4ToSpeed3(wheel_speeds, robot_local_speed, front_wheel_angle_deg,
+                                  back_wheel_angle_deg);
 
     robot_local_speed[2] =
         robot_local_speed[2] /

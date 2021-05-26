@@ -1,5 +1,6 @@
 #include "software/simulation/force_wheel_simulator_robot_singleton.h"
 
+#include "shared/2015_robot_constants.h"
 #include "shared/proto/robot_log_msg.pb.h"
 
 extern "C"
@@ -73,12 +74,15 @@ ForceWheelSimulatorRobotSingleton::createFirmwareRobot()
         &(SimulatorRobotSingleton::brakeMotorBackRight),
         &(SimulatorRobotSingleton::coastMotorBackRight), wheel_constants);
 
-    const RobotConstants_t robot_constants = {
-        .mass              = ROBOT_POINT_MASS,
-        .moment_of_inertia = INERTIA,
-        .robot_radius      = ROBOT_RADIUS,
-        .jerk_limit        = JERK_LIMIT,
-    };
+    const RobotConstants_t robot_constants = create2015RobotConstants();
+
+    //        = {
+    //        .mass              = ROBOT_POINT_MASS,
+    //        .moment_of_inertia = INERTIA,
+    //        .robot_radius      = ROBOT_RADIUS,
+    //        .jerk_limit        = JERK_LIMIT,
+    //    };
+
     ControllerState_t* controller_state = new ControllerState_t{
         .last_applied_acceleration_x       = 0,
         .last_applied_acceleration_y       = 0,

@@ -55,7 +55,8 @@ typedef struct WheelConstants
  */
 typedef struct RobotConstants
 {
-    // The mass of the entire robot [kg]
+    // The mass of the entire robot including batteries [kg]
+    // Determined experimentally by weighing the robot and battery
     float mass;
 
     // The moment of inertia of the entire robot [kg m^2]
@@ -74,34 +75,30 @@ typedef struct RobotConstants
     float back_wheel_angle_deg;
 
     // The total width of the entire flat face on the front of the robot
-    double front_of_robot_width_meters;
+    float front_of_robot_width_meters;
 
     // The distance from one end of the dribbler to the other
-    double dribbler_width_meters;
-
-    // The mass of a robot with a battery, in kg. Determined experimentally by weighing
-    // the robot and battery
-    double robot_with_battery_mass_kg;
+    float dribbler_width_meters;
 
     // The maximum speed achievable by our robots, in metres per second.
-    double robot_max_speed_meters_per_second;
+    float robot_max_speed_meters_per_second;
 
     // The maximum angular speed achievable by our robots, in rad/sec
-    double robot_max_ang_speed_rad_per_second;
+    float robot_max_ang_speed_rad_per_second;
 
     // The maximum acceleration achievable by our robots, in metres per seconds squared.
-    double robot_max_acceleration_meters_per_second_squared;
+    float robot_max_acceleration_meters_per_second_squared;
 
     // The maximum angular acceleration achievable by our robots, in radians per second
     // squared
-    double robot_max_ang_acceleration_rad_per_second_squared;
+    float robot_max_ang_acceleration_rad_per_second_squared;
 
     // Indefinite dribbler mode sets a speed that can be maintained indefinitely
-    double indefinite_dribbler_speed;
+    float indefinite_dribbler_speed;
 
     // Max force dribbler mode sets the speed that applies the maximum amount of force on
     // the ball
-    double max_force_dribbler_speed;
+    float max_force_dribbler_speed;
 } RobotConstants_t;
 
 /**

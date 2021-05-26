@@ -3,6 +3,11 @@
 #include <Box2D/Box2D.h>
 #include <gtest/gtest.h>
 
+extern "C"
+{
+#include "shared/2015_robot_constants.h"
+}
+
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/physics/physics_object_user_data.h"
@@ -23,8 +28,8 @@ class SimulationContactListenerTest : public testing::Test
         physics_world    = std::make_shared<b2World>(gravity);
         physics_ball  = std::make_shared<PhysicsBall>(physics_world, ball.currentState(),
                                                      1.0, simulator_config);
-        physics_robot = std::make_shared<PhysicsRobot>(robot.id(), physics_world,
-                                                       robot.currentState(), 1.0);
+        physics_robot = std::make_shared<PhysicsRobot>(
+            robot.id(), physics_world, robot.currentState(), create2015RobotConstants());
 
         return std::make_tuple(physics_world, physics_robot, physics_ball);
     }
