@@ -18,7 +18,7 @@ cc_test(
     srcs = ["geometry_conversion_test.cpp"],
     deps = [
         ":geometry_conversion",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )

@@ -23,8 +23,8 @@ cc_test(
     srcs = ["attacker_fsm_test.cpp"],
     deps = [
         ":attacker_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -33,8 +33,8 @@ cc_test(
     srcs = ["simulated_attacker_tactic_passing_test.cpp"],
     deps = [
         ":attacker_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/simulated_tests:simulated_tactic_test_fixture",
-        "//software/simulated_tests:simulated_test_main",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
@@ -48,8 +48,8 @@ cc_test(
     srcs = ["simulated_attacker_tactic_shoot_goal_test.cpp"],
     deps = [
         ":attacker_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/simulated_tests:simulated_tactic_test_fixture",
-        "//software/simulated_tests:simulated_test_main",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",

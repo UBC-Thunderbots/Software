@@ -5,8 +5,8 @@ cc_test(
     srcs = ["penalty_setup_tactic_test.cpp"],
     deps = [
         ":penalty_setup_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -43,8 +43,8 @@ cc_test(
     srcs = ["defense_shadow_enemy_tactic_test.cpp"],
     deps = [
         ":defense_shadow_enemy_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -97,8 +97,8 @@ cc_test(
     srcs = ["shadow_free_kicker_tactic_test.cpp"],
     deps = [
         ":shadow_free_kicker_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -152,9 +152,9 @@ cc_test(
     srcs = ["tactic_test.cpp"],
     deps = [
         ":tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -167,12 +167,12 @@ cc_library(
     ],
 )
 
-cc_library(
+cc_test(
     name = "transition_conditions_test",
     srcs = ["transition_conditions_test.cpp"],
     deps = [
         ":tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )

@@ -439,9 +439,16 @@ inline constexpr double Angle::toDegrees() const
 
 inline constexpr Angle Angle::mod(Angle divisor) const
 {
-    return Angle::fromRadians(toRadians() - static_cast<double>(static_cast<long>(
-                                                toRadians() / divisor.toRadians())) *
-                                                divisor.toRadians());
+    if (divisor.toRadians() == 0)
+    {
+        return Angle::fromRadians(toRadians());
+    }
+    else
+    {
+        return Angle::fromRadians(toRadians() - static_cast<double>(static_cast<long>(
+                                                    toRadians() / divisor.toRadians())) *
+                                                    divisor.toRadians());
+    }
 }
 
 inline constexpr Angle Angle::remainder(const Angle &divisor) const
