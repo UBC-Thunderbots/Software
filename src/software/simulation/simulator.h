@@ -31,11 +31,13 @@ class Simulator
      *
      * @param field The field to initialize the simulation with
      * @param robot_constants The robot constants
+     * @param wheel_constants The wheel constants
      * @param simulator_config The config to fetch parameters from
      * @param physics_time_step The time step used to simulated physics
      * and robot primitives.
      */
     explicit Simulator(const Field& field, const RobotConstants_t& robot_constants,
+                       const WheelConstants& wheel_constants,
                        std::shared_ptr<const SimulatorConfig> simulator_config,
                        const Duration& physics_time_step =
                            Duration::fromSeconds(DEFAULT_PHYSICS_TIME_STEP_SECONDS));

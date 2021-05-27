@@ -126,7 +126,7 @@ class Robot
     std::set<RobotCapability> &getMutableRobotCapabilities();
 
     /**
-     * Returns the robot constants for this robot state
+     * Returns the robot constants for this robot
      *
      * @return the robot constants for this robot
      */

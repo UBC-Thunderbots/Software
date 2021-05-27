@@ -45,10 +45,12 @@ class PhysicsRobot
      * @param world A shared_ptr to a Box2D World
      * @param robot_state The initial robot state
      * @param robot_constants The robot constants
+     * @param wheel_constants The wheel constants
      */
     explicit PhysicsRobot(const RobotId id, std::shared_ptr<b2World> world,
                           const RobotState &robot_state,
-                          const RobotConstants_t robot_constants);
+                          const RobotConstants_t &robot_constants,
+                          const WheelConstants_t &wheel_constants);
 
     PhysicsRobot() = delete;
 
@@ -147,6 +149,20 @@ class PhysicsRobot
     AngularVelocity angularVelocity() const;
 
     /**
+     * Returns the robot constants for this physics robot
+     *
+     * @return the robot constants for this robot
+     */
+    const RobotConstants_t &robotConstants() const;
+
+    /**
+     * Returns the wheel constants for this physics robot
+     *
+     * @return the wheel constants for this robot
+     */
+    const WheelConstants_t &wheelConstants() const;
+
+    /**
      * Applies the given force to the wheel. Positive force spins the wheel
      * counter-clockwise, as viewed from inside the robot looking out
      * (ie. induces positive angular velocity and rotation to the robot).
@@ -190,13 +206,6 @@ class PhysicsRobot
      * @param force The force to apply
      */
     void applyForceToCenterOfMass(const Vector &force);
-
-    /**
-     * Returns the robot constants for this robot state
-     *
-     * @return the robot constants for this robot
-     */
-    const RobotConstants_t &robotConstants() const;
 
    protected:
     /**
@@ -291,6 +300,7 @@ class PhysicsRobot
     std::queue<std::function<void()>> post_physics_step_functions;
 
     RobotConstants_t robot_constants;
+    WheelConstants_t wheel_constants;
 
     // This is a somewhat arbitrary value for damping. We keep it relatively low
     // so that robots still coast a ways before stopping, but non-zero so that robots

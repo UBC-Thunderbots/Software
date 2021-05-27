@@ -10,9 +10,9 @@ extern "C"
 StandaloneSimulator::StandaloneSimulator(
     std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config,
     std::shared_ptr<SimulatorConfig> simulator_config, const Field& field,
-    const RobotConstants_t& robot_constants)
+    const RobotConstants_t& robot_constants, const WheelConstants& wheel_constants)
     : standalone_simulator_config(standalone_simulator_config),
-      simulator(field, robot_constants, simulator_config),
+      simulator(field, robot_constants, wheel_constants, simulator_config),
       most_recent_ssl_wrapper_packet(SSLProto::SSL_WrapperPacket()),
       robot_constants(robot_constants)
 {

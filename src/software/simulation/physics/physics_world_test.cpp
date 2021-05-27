@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 
 #include "shared/2015_robot_constants.h"
+#include "shared/2015_wheel_constants.h"
 #include "software/test_util/test_util.h"
 #include "software/world/field.h"
 
@@ -14,12 +15,14 @@ class PhysicsWorldTest : public ::testing::Test
     {
         simulator_config = std::make_shared<const SimulatorConfig>();
         physics_world = std::make_shared<PhysicsWorld>(Field::createSSLDivisionBField(),
-                                                       robot_constants, simulator_config);
+                                                       robot_constants, wheel_constants,
+                                                       simulator_config);
     }
 
     std::shared_ptr<const SimulatorConfig> simulator_config;
     std::shared_ptr<PhysicsWorld> physics_world;
     RobotConstants_t robot_constants = create2015RobotConstants();
+    WheelConstants_t wheel_constants = create2015WheelConstants();
 };
 
 // A matcher used to compare RobotStateWitId_t structs with enough tolerance

@@ -25,8 +25,9 @@ const double PhysicsRobot::TOTAL_DRIBBLER_DEPTH =
 
 PhysicsRobot::PhysicsRobot(const RobotId id, std::shared_ptr<b2World> world,
                            const RobotState& robot_state,
-                           const RobotConstants_t robot_constants)
-    : robot_id(id), robot_constants(robot_constants)
+                           const RobotConstants_t& robot_constants,
+                           const WheelConstants_t& wheel_constants)
+    : robot_id(id), robot_constants(robot_constants), wheel_constants(wheel_constants)
 {
     b2BodyDef robot_body_def;
     robot_body_def.type = b2_dynamicBody;
@@ -298,7 +299,8 @@ std::array<float, 4> PhysicsRobot::getMotorSpeeds() const
     std::array<float, 4> motor_speeds = {0.0, 0.0, 0.0, 0.0};
     for (unsigned int i = 0; i < 4; i++)
     {
-        motor_speeds[i] = wheel_speeds[i] / GEAR_RATIO;
+        motor_speeds[i] =
+            wheel_speeds[i] / wheel_constants.wheel_rotations_per_motor_rotation;
     }
     return motor_speeds;
 }
@@ -401,4 +403,9 @@ void PhysicsRobot::applyForceToCenterOfMass(const Vector& force)
 const RobotConstants_t& PhysicsRobot::robotConstants() const
 {
     return robot_constants;
+}
+
+const WheelConstants_t& PhysicsRobot::wheelConstants() const
+{
+    return wheel_constants;
 }

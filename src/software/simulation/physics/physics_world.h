@@ -27,9 +27,11 @@ class PhysicsWorld
      *
      * @param field The initial state of the field
      * @param robot_constants The robot constants
+     * @param wheel_constants The wheel constants
      * @param simulator_config The config to fetch parameters from
      */
-    explicit PhysicsWorld(const Field& field, const RobotConstants_t robot_constants,
+    explicit PhysicsWorld(const Field& field, const RobotConstants_t& robot_constants,
+                          const WheelConstants& wheel_constants,
                           std::shared_ptr<const SimulatorConfig> simulator_config);
     PhysicsWorld() = delete;
 
@@ -233,5 +235,6 @@ class PhysicsWorld
     std::vector<std::shared_ptr<PhysicsRobot>> yellow_physics_robots;
     std::vector<std::shared_ptr<PhysicsRobot>> blue_physics_robots;
     RobotConstants_t robot_constants;
+    WheelConstants_t wheel_constants;
     std::shared_ptr<const SimulatorConfig> simulator_config;
 };

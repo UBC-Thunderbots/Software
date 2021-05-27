@@ -8,22 +8,16 @@
 #define CONTROL_LOOP_HZ 200U
 #define QUARTERDEGREE_TO_MS (0.0000554f * CONTROL_LOOP_HZ)
 #define QUARTERDEGREE_TO_RPM                                                             \
-    (CONTROL_LOOP_HZ / 240.0f)       // encoder quarter of degree to motor RPM
-#define RPM_TO_VOLT (1.0f / 374.0f)  // motor RPM to back EMF
+    (CONTROL_LOOP_HZ / 240.0f)  // encoder quarter of degree to motor RPM
 
 #define HALL_PHASE_TO_MS (0.00171 * CONTROL_LOOP_HZ)
 
 #define QUARTERDEGREE_TO_VOLT (QUARTERDEGREE_TO_RPM * RPM_TO_VOLT)
 
 #define TICK_TIME (1.0f / (float)CONTROL_LOOP_HZ)
-#define WHEEL_SLIP_VOLTAGE_LIMIT 4.25f  // Voltage where wheel slips (acceleration cap)
 
 // factor for steel motor mounts
 #define STEEL_INTERTIAL_FACTOR 0.3858f
-
-#define CURRENT_PER_TORQUE 39.21f  // from motor data sheet (1/25.5 mNm)
-#define GEAR_RATIO 0.5143f         // define as speed multiplication from motor to wheel
-#define WHEEL_RADIUS 0.0254f
 
 /**
  * Transformation matricies to convert speeds in the

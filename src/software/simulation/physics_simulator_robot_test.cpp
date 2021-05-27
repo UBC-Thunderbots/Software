@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 
 #include "shared/2015_robot_constants.h"
+#include "shared/2015_wheel_constants.h"
 #include "shared/constants.h"
 #include "software/simulation/physics/physics_world.h"
 #include "software/simulation/physics_simulator_ball.h"
@@ -20,7 +21,7 @@ class PhysicsSimulatorRobotTest : public testing::Test
     {
         auto physics_world = std::make_shared<PhysicsWorld>(
             Field::createSSLDivisionBField(), create2015RobotConstants(),
-            std::make_shared<const SimulatorConfig>());
+            create2015WheelConstants(), std::make_shared<const SimulatorConfig>());
         physics_world->setBallState(ball.currentState());
         physics_world->addYellowRobots(
             {RobotStateWithId{.id = robot.id(), .robot_state = robot.currentState()}});

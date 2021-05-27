@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include "shared/2015_robot_constants.h"
+#include "shared/2015_wheel_constants.h"
 #include "shared/proto/robot_log_msg.nanopb.h"
 #include "shared/proto/robot_log_msg.pb.h"
 #include "software/simulation/physics/physics_world.h"
@@ -43,7 +44,7 @@ class ForceWheelSimulatorRobotSingletonTest : public testing::Test
                                std::vector<Point> enemy_robot_positions)
     {
         auto physics_world = std::make_shared<PhysicsWorld>(
-            Field::createSSLDivisionBField(), robot_constants,
+            Field::createSSLDivisionBField(), robot_constants, wheel_constants,
             std::make_shared<const SimulatorConfig>());
         physics_world->setBallState(ball.currentState());
         RobotStateWithId robot_state{.id          = robot.id(),
@@ -123,6 +124,7 @@ class ForceWheelSimulatorRobotSingletonTest : public testing::Test
         return dribbling_point;
     }
     RobotConstants_t robot_constants = create2015RobotConstants();
+    WheelConstants_t wheel_constants = create2015WheelConstants();
     const Robot robot_non_zero_state =
         Robot(7, Point(1.04, -0.8), Vector(-1.5, 0), Angle::fromRadians(2.12),
               AngularVelocity::fromRadians(-1.0), Timestamp::fromSeconds(0));
@@ -1341,7 +1343,7 @@ TEST_F(ForceWheelSimulatorRobotSingletonTest,
 TEST_F(ForceWheelSimulatorRobotSingletonTest, test_change_simulator_robot)
 {
     auto physics_world = std::make_unique<PhysicsWorld>(
-        Field::createSSLDivisionBField(), create2015RobotConstants(),
+        Field::createSSLDivisionBField(), robot_constants, wheel_constants,
         std::make_shared<const SimulatorConfig>());
     auto robot_states = std::vector<RobotStateWithId>{
         RobotStateWithId{.id          = 7,

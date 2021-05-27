@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 
 #include "shared/2015_robot_constants.h"
+#include "shared/2015_wheel_constants.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/physics/physics_object_user_data.h"
@@ -25,7 +26,8 @@ class SimulationContactListenerTest : public testing::Test
         physics_ball  = std::make_shared<PhysicsBall>(physics_world, ball.currentState(),
                                                      1.0, simulator_config);
         physics_robot = std::make_shared<PhysicsRobot>(
-            robot.id(), physics_world, robot.currentState(), create2015RobotConstants());
+            robot.id(), physics_world, robot.currentState(), create2015RobotConstants(),
+            create2015WheelConstants());
 
         return std::make_tuple(physics_world, physics_robot, physics_ball);
     }

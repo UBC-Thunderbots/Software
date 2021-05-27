@@ -145,6 +145,7 @@ cc_library(
     deps = [
         "//firmware/shared:physics",
         "//shared:constants",
+        "//shared:robot_constants",
         "//software/proto:ssl_simulation_cc_proto",
     ],
 )

@@ -6,7 +6,8 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 
-PhysicsWorld::PhysicsWorld(const Field& field, const RobotConstants_t robot_constants,
+PhysicsWorld::PhysicsWorld(const Field& field, const RobotConstants_t& robot_constants,
+                           const WheelConstants& wheel_constants,
                            std::shared_ptr<const SimulatorConfig> simulator_config)
     : b2_world(std::make_shared<b2World>(b2Vec2{0, 0})),
       current_timestamp(Timestamp::fromSeconds(0)),
@@ -16,6 +17,7 @@ PhysicsWorld::PhysicsWorld(const Field& field, const RobotConstants_t robot_cons
       yellow_physics_robots(),
       blue_physics_robots(),
       robot_constants(robot_constants),
+      wheel_constants(wheel_constants),
       simulator_config(simulator_config)
 {
     b2_world->SetContactListener(contact_listener.get());
@@ -95,7 +97,8 @@ void PhysicsWorld::addYellowRobots(const std::vector<RobotStateWithId>& robots)
         if (isRobotIdAvailable(state_with_id.id, TeamColour::YELLOW))
         {
             yellow_physics_robots.emplace_back(std::make_shared<PhysicsRobot>(
-                state_with_id.id, b2_world, state_with_id.robot_state, robot_constants));
+                state_with_id.id, b2_world, state_with_id.robot_state, robot_constants,
+                wheel_constants));
         }
         else
         {
@@ -114,7 +117,8 @@ void PhysicsWorld::addBlueRobots(const std::vector<RobotStateWithId>& robots)
         if (isRobotIdAvailable(state_with_id.id, TeamColour::BLUE))
         {
             blue_physics_robots.emplace_back(std::make_shared<PhysicsRobot>(
-                state_with_id.id, b2_world, state_with_id.robot_state, robot_constants));
+                state_with_id.id, b2_world, state_with_id.robot_state, robot_constants,
+                wheel_constants));
         }
         else
         {
