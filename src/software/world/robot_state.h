@@ -1,10 +1,6 @@
 #pragma once
 
-extern "C"
-{
 #include "shared/2015_robot_constants.h"
-}
-
 #include "shared/constants.h"
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"

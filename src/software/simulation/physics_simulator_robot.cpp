@@ -420,7 +420,8 @@ void PhysicsSimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot,
     physics_ball->applyForce(perp_force.normalize(perp_force_magnitude));
 
     double head_on_magnitude = sigmoid(head_on_dist_cm, 0.15, 0.2) * dribbler_rpm /
-                               MAX_FORCE_DRIBBLER_SPEED / 20;
+                               physics_robot->robotConstants().max_force_dribbler_speed /
+                               20;
     physics_ball->applyForce(head_on_force.normalize(head_on_magnitude));
 
     // Counteract the force pushing the ball into the robot so there is approximately 0

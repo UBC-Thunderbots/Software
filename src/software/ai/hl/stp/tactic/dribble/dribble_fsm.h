@@ -95,8 +95,9 @@ struct DribbleFSM
             Duration ball_time_to_position = Duration::fromSeconds(
                 distance(intercept_position, ball.position()) / ball.velocity().length());
             Duration robot_time_to_pos = getTimeToPositionForRobot(
-                robot.position(), intercept_position, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-                ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+                robot.position(), intercept_position,
+                robot.robotConstants().robot_max_speed_meters_per_second,
+                robot.robotConstants().robot_max_acceleration_meters_per_second_squared);
 
             if (robot_time_to_pos < ball_time_to_position)
             {

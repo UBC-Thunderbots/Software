@@ -1,10 +1,6 @@
 #include <boost/program_options.hpp>
 
-extern "C"
-{
 #include "shared/2015_robot_constants.h"
-}
-
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/gui/standalone_simulator/threaded_standalone_simulator_gui.h"
 #include "software/logger/logger.h"

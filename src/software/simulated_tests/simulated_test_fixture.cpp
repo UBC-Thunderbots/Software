@@ -3,11 +3,7 @@
 #include <cstdlib>
 #include <experimental/filesystem>
 
-extern "C"
-{
 #include "shared/2015_robot_constants.h"
-}
-
 #include "software/logger/logger.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
 #include "software/test_util/test_util.h"

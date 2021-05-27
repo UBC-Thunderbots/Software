@@ -4,6 +4,7 @@
 
 #include <cmath>
 
+#include "shared/2015_robot_constants.h"
 #include "software/simulation/physics/physics_world.h"
 #include "software/simulation/physics_simulator_ball.h"
 #include "software/simulation/simulator_ball.h"
@@ -13,7 +14,6 @@
 extern "C"
 {
 #include "firmware/app/world/firmware_ball.h"
-#include "shared/2015_robot_constants.h"
 }
 
 TEST(SimulatorBallSingletonTest, test_create_firmware_ball_with_single_simulator_ball)

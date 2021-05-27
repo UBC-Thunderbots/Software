@@ -4,6 +4,7 @@
 
 #include <cmath>
 
+#include "shared/2015_robot_constants.h"
 #include "shared/proto/robot_log_msg.nanopb.h"
 #include "shared/proto/robot_log_msg.pb.h"
 #include "software/simulation/physics/physics_world.h"
@@ -16,7 +17,6 @@ extern "C"
 {
 #include "firmware/app/logger/logger.h"
 #include "firmware/app/world/firmware_robot.h"
-#include "shared/2015_robot_constants.h"
 }
 
 #include "shared/test_util/test_util.h"
@@ -43,7 +43,7 @@ class ForceWheelSimulatorRobotSingletonTest : public testing::Test
                                std::vector<Point> enemy_robot_positions)
     {
         auto physics_world = std::make_shared<PhysicsWorld>(
-            Field::createSSLDivisionBField(), create2015RobotConstants(),
+            Field::createSSLDivisionBField(), robot_constants,
             std::make_shared<const SimulatorConfig>());
         physics_world->setBallState(ball.currentState());
         RobotStateWithId robot_state{.id          = robot.id(),
@@ -122,7 +122,7 @@ class ForceWheelSimulatorRobotSingletonTest : public testing::Test
                                             BALL_MAX_RADIUS_METERS - dribbler_depth);
         return dribbling_point;
     }
-
+    RobotConstants_t robot_constants = create2015RobotConstants();
     const Robot robot_non_zero_state =
         Robot(7, Point(1.04, -0.8), Vector(-1.5, 0), Angle::fromRadians(2.12),
               AngularVelocity::fromRadians(-1.0), Timestamp::fromSeconds(0));
@@ -753,7 +753,8 @@ TEST_F(ForceWheelSimulatorRobotSingletonTest, test_dribble_ball_while_moving_bac
 
     Dribbler_t* dribbler = app_firmware_robot_getDribbler(firmware_robot.get());
     // We use max force dribbler speed
-    app_dribbler_setSpeed(dribbler, MAX_FORCE_DRIBBLER_SPEED);
+    app_dribbler_setSpeed(
+        dribbler, static_cast<uint32_t>(robot_constants.max_force_dribbler_speed));
 
     // Simulate for 2 seconds
     for (unsigned int i = 0; i < 120; i++)
@@ -781,7 +782,8 @@ TEST_F(ForceWheelSimulatorRobotSingletonTest, test_losing_ball_while_zipping_bac
 
     Dribbler_t* dribbler = app_firmware_robot_getDribbler(firmware_robot.get());
     // We use max force dribbler speed
-    app_dribbler_setSpeed(dribbler, MAX_FORCE_DRIBBLER_SPEED);
+    app_dribbler_setSpeed(
+        dribbler, static_cast<uint32_t>(robot_constants.max_force_dribbler_speed));
 
     // Simulate for 2 seconds
     for (unsigned int i = 0; i < 120; i++)
@@ -831,7 +833,8 @@ TEST_F(ForceWheelSimulatorRobotSingletonTest,
 
     Dribbler_t* dribbler = app_firmware_robot_getDribbler(firmware_robot.get());
     // We use an arbitrarily large number here for speed
-    app_dribbler_setSpeed(dribbler, 1.5 * MAX_FORCE_DRIBBLER_SPEED);
+    app_dribbler_setSpeed(
+        dribbler, static_cast<uint32_t>(1.5 * robot_constants.max_force_dribbler_speed));
 
     // Simulate for 0.5 second so the ball makes contact with the dribbler
     for (unsigned int i = 0; i < 30; i++)
@@ -913,10 +916,11 @@ TEST_F(ForceWheelSimulatorRobotSingletonTest, test_dribbler_centers_the_ball)
                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
     // Start the ball at the side of the dribbler so that self-centering forces will be
     // applied
-    Point ball_position = dribbling_point + Vector::createFromAngle(robot.orientation())
-                                                .perpendicular()
-                                                .normalize(DRIBBLER_WIDTH_METERS / 2.1 -
-                                                           BALL_MAX_RADIUS_METERS);
+    Point ball_position =
+        dribbling_point + Vector::createFromAngle(robot.orientation())
+                              .perpendicular()
+                              .normalize(robot_constants.dribbler_width_meters / 2.1 -
+                                         BALL_MAX_RADIUS_METERS);
     Ball ball(ball_position, Vector(0, 0), Timestamp::fromSeconds(0));
     auto [world, firmware_robot, simulator_ball] = createWorld(robot, ball);
 

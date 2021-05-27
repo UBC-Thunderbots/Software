@@ -3,11 +3,7 @@
 #include <Box2D/Box2D.h>
 #include <gtest/gtest.h>
 
-extern "C"
-{
 #include "shared/2015_robot_constants.h"
-}
-
 #include "shared/constants.h"
 #include "software/simulation/physics/physics_world.h"
 #include "software/simulation/physics_simulator_ball.h"

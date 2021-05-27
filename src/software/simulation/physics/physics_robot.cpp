@@ -397,3 +397,8 @@ void PhysicsRobot::applyForceToCenterOfMass(const Vector& force)
     b2Vec2 force_vector = createVec2(force);
     robot_body->ApplyForceToCenter(force_vector, true);
 }
+
+const RobotConstants_t& PhysicsRobot::robotConstants() const
+{
+    return robot_constants;
+}

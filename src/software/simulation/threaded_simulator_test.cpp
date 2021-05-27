@@ -2,11 +2,7 @@
 
 #include <gtest/gtest.h>
 
-extern "C"
-{
 #include "shared/2015_robot_constants.h"
-}
-
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "software/proto/primitive/primitive_msg_factory.h"
 #include "software/test_util/test_util.h"
@@ -15,7 +11,7 @@ class ThreadedSimulatorTest : public ::testing::Test
 {
    protected:
     ThreadedSimulatorTest()
-        : threaded_simulator(Field::createSSLDivisionBField(), create2015RobotConstants(),
+        : threaded_simulator(Field::createSSLDivisionBField(), robot_constants,
                              std::make_shared<const SimulatorConfig>())
     {
     }
@@ -64,6 +60,7 @@ class ThreadedSimulatorTest : public ::testing::Test
         return Point(ball.x(), ball.y());
     }
 
+    RobotConstants_t robot_constants = create2015RobotConstants();
     ThreadedSimulator threaded_simulator;
     bool callback_called;
     std::optional<SSLProto::SSL_WrapperPacket> most_recent_wrapper_packet;
@@ -181,20 +178,24 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
     threaded_simulator.setBlueRobotPrimitive(
         1, createNanoPbPrimitive(*createMovePrimitive(
                Point(-1, -1), 0.0, Angle::zero(), DribblerMode::OFF,
-               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0)));
+               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+               robot_constants)));
     threaded_simulator.setBlueRobotPrimitive(
         2, createNanoPbPrimitive(*createMovePrimitive(
                Point(-3, 0), 0.0, Angle::half(), DribblerMode::OFF,
-               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0)));
+               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+               robot_constants)));
 
     threaded_simulator.setYellowRobotPrimitive(
         1, createNanoPbPrimitive(*createMovePrimitive(
                Point(1, 1), 0.0, Angle::zero(), DribblerMode::OFF,
-               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0)));
+               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+               robot_constants)));
     threaded_simulator.setYellowRobotPrimitive(
         2, createNanoPbPrimitive(*createMovePrimitive(
                Point(3, -2), 0.0, Angle::zero(), DribblerMode::OFF,
-               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0)));
+               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+               robot_constants)));
 
     std::this_thread::yield();
     std::this_thread::sleep_for(std::chrono::milliseconds(2500));

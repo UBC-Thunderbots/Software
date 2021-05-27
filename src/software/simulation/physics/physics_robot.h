@@ -191,6 +191,13 @@ class PhysicsRobot
      */
     void applyForceToCenterOfMass(const Vector &force);
 
+    /**
+     * Returns the robot constants for this robot state
+     *
+     * @return the robot constants for this robot
+     */
+    const RobotConstants_t &robotConstants() const;
+
    protected:
     /**
      * This functions runs any operations this PhysicsRobot wants to perform
