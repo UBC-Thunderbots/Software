@@ -115,7 +115,9 @@ void PhysicsSimulatorRobot::kick(float speed_m_per_s)
             // slower
             ball->applyImpulse(robot_orientation_vector.normalize(
                 ball_head_on_momentum.length() *
-                (1 - (dribbler_rpm / MAX_FORCE_DRIBBLER_SPEED) / 2)));
+                (1 - (static_cast<float>(dribbler_rpm) /
+                      robot->robotConstants().max_force_dribbler_speed) /
+                         2)));
             ball->applyImpulse(kick_impulse);
             ball->setInitialKickSpeed(speed_m_per_s);
 
