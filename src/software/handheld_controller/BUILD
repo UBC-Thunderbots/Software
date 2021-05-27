@@ -12,7 +12,7 @@ cc_test(
     srcs = ["controller_input_test.cpp"],
     deps = [
         ":controller_input",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -55,6 +55,6 @@ cc_test(
     deps = [
         ":controller_primitive_generator",
         "//shared/parameter:cpp_configs",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )

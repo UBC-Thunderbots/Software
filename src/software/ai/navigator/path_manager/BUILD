@@ -32,8 +32,8 @@ cc_test(
     srcs = ["velocity_obstacle_path_manager_test.cpp"],
     deps = [
         ":velocity_obstacle_path_manager",
+        "//shared/test_util:tbots_gtest_main",
         "//software/ai/navigator/path_planner:straight_line_path_planner",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
