@@ -20,9 +20,7 @@ struct PenaltyKickFSM
      */
     explicit PenaltyKickFSM(std::optional<Timestamp> complete_approach,
                             Point robot_shoot_position, Angle shot_angle)
-        : complete_approach(complete_approach),
-          robot_shoot_position(robot_shoot_position),
-          shot_angle(shot_angle)
+        : complete_approach(complete_approach), shot_angle(shot_angle)
     {
     }
 
@@ -52,8 +50,7 @@ struct PenaltyKickFSM
 
         // don't try to shoot if we're far from the net or we're in the middle of an
         // autokick
-        if (robot.position().x() < min_shot_x_position ||
-            !robot.isNearDribbler(ball_position))
+        if (robot.position().x() < min_shot_x_position)
         {
             return false;
         }
@@ -211,19 +208,10 @@ struct PenaltyKickFSM
                 Point position =
                     field.enemyGoalCenter() + Vector(-field.defenseAreaXLength(), 0);
 
-                // our "shoot position" is slightly further ahead of the current position
-                // so that we don't accidentally
-                //  move backward when we set up to shoot
-                // The vector value ahead of the current position was found using the
-                // simulator
-                robot_shoot_position = event.common.robot.position() + Vector(0.2, 0);
-
                 DribbleFSM::ControlParams control_params{
                     .dribble_destination       = std::optional<Point>(position),
-                    .final_dribble_orientation = std::optional<Angle>(shot_angle),
-                    // TODO: change .allow_excessive_dribbling back to false once #2087
-                    // goes in
-                    .allow_excessive_dribbling = true};
+                    .final_dribble_orientation = std::optional<Angle>(Angle::zero()),
+                    .allow_excessive_dribbling = false};
                 processEvent(DribbleFSM::Update(control_params, event.common));
             };
 
@@ -239,12 +227,12 @@ struct PenaltyKickFSM
                     event.common.world.enemyTeam().goalie();
                 const Point next_shot_position =
                     evaluateNextShotPosition(enemy_goalie, event.common.world.field());
-                Point final_position = robot_shoot_position;
+                Point final_position = event.common.world.ball().position();
                 shot_angle = (next_shot_position - final_position).orientation();
                 DribbleFSM::ControlParams control_params{
                     .dribble_destination       = std::optional<Point>(final_position),
                     .final_dribble_orientation = std::optional<Angle>(shot_angle),
-                    .allow_excessive_dribbling = true};
+                    .allow_excessive_dribbling = false};
                 processEvent(DribbleFSM::Update(control_params, event.common));
             };
 
@@ -269,13 +257,13 @@ struct PenaltyKickFSM
                     PENALTY_FINISH_APPROACH_TIMEOUT;
                 complete_approach =
                     std::optional<Timestamp>(future_approach_complete_time);
-                robot_shoot_position = field.friendlyGoalCenter();
             }
             std::optional<Robot> enemy_goalie = event.common.world.enemyTeam().goalie();
             Timestamp force_shoot_timestamp =
                 complete_approach.value() + PENALTY_FORCE_SHOOT_TIMEOUT;
             bool should_shoot =
-                evaluatePenaltyShot(enemy_goalie, field, robot_shoot_position,
+                evaluatePenaltyShot(enemy_goalie, field,
+                                    event.common.world.ball().position(),
                                     event.common.robot) ||
                 (event.common.world.getMostRecentTimestamp() >= force_shoot_timestamp);
             return should_shoot;
@@ -302,7 +290,7 @@ struct PenaltyKickFSM
     };
 
    private:
-    static constexpr double PENALTY_KICK_POST_OFFSET = 0.02;
+    static constexpr double PENALTY_KICK_POST_OFFSET = 0.03;
     static constexpr double PENALTY_KICK_SHOT_SPEED  = 5.0;
 
     // expected maximum acceleration of the opposition goalie robot
@@ -323,6 +311,5 @@ struct PenaltyKickFSM
 
    private:
     std::optional<Timestamp> complete_approach;
-    Point robot_shoot_position;
     Angle shot_angle;
 };
