@@ -119,7 +119,8 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
         else
         {
             yield(std::make_unique<KickIntent>(robot->id(), kick_origin, kick_direction,
-                                               kick_speed_meters_per_second));
+                                               kick_speed_meters_per_second,
+                                               robot->robotConstants()));
         }
     } while (!ball.hasBallBeenKicked(kick_direction));
 }

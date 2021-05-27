@@ -123,7 +123,8 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         else
         {
             yield(std::make_unique<ChipIntent>(robot->id(), chip_origin, chip_direction,
-                                               chip_distance_meters));
+                                               chip_distance_meters,
+                                               robot->robotConstants()));
         }
     } while (!ball.hasBallBeenKicked(chip_direction));
 }
