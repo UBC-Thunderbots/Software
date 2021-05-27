@@ -234,13 +234,13 @@ void velocity_wheels_setLocalVelocity(
     float angle                = app_firmware_robot_getOrientation(robot);
     float local_norm_vec[2][2] = {{cosf(angle), sinf(angle)},
                                   {cosf(angle + P_PI / 2), sinf(angle + P_PI / 2)}};
-    
+
     float local_robot_velocity[3];
     for (int i = 0; i < 2; i++)
     {
         local_robot_velocity[i] = dot2D(local_norm_vec[i], global_robot_velocity);
     }
-    
+
     local_robot_velocity[2] = angular_velocity * ROBOT_RADIUS;
 
     float wheel_velocity[4];
