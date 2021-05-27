@@ -15,7 +15,6 @@ PYBIND11_MODULE(keep_away, m)
               Pass best_pass_so_far = createPassFromDict(best_pass_so_far_dict);
               auto passing_config   = std::make_shared<PassingConfig>();
               updateDynamicParametersConfigFromDict(passing_config, passing_config_dict);
-              return findKeepAwayTargetPoint(possessor_position, best_pass_so_far, world,
-                                             passing_config);
+              return findKeepAwayTargetPoint(possessor_position, best_pass_so_far, world);
           });
 }
