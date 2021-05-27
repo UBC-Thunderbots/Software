@@ -1,7 +1,6 @@
 #include "firmware/app/world/firmware_robot.h"
 
 #include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 // these are set to decouple the 3 axis from each other
