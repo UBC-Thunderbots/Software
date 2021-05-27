@@ -328,6 +328,11 @@ void Simulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
     physics_world.removeRobot(robot);
 }
 
+void Simulator::resetCurrentFirmwareTime()
+{
+    current_firmware_time = Timestamp::fromSeconds(0);
+}
+
 float Simulator::getCurrentFirmwareTimeSeconds()
 {
     return static_cast<float>(current_firmware_time.toSeconds());
