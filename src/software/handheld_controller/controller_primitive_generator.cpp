@@ -4,8 +4,9 @@
 #include "software/proto/primitive/primitive_msg_factory.h"
 
 ControllerPrimitiveGenerator::ControllerPrimitiveGenerator(
-    std::shared_ptr<const HandheldControllerConfig> controller_input_config)
-    : controller_input_config(controller_input_config)
+    std::shared_ptr<const HandheldControllerConfig> controller_input_config,
+    const RobotConstants_t& robot_constants)
+    : controller_input_config(controller_input_config), robot_constants(robot_constants)
 {
 }
 
@@ -15,40 +16,41 @@ void ControllerPrimitiveGenerator::onValueReceived(ControllerInput controller_in
     auto primitive_set_msg = std::make_unique<TbotsProto::PrimitiveSet>();
     *(primitive_set_msg->mutable_time_sent()) = *createCurrentTimestamp();
 
-    auto &robot_primitives_map = *primitive_set_msg->mutable_robot_primitives();
-    robot_primitives_map[robot_id] =
-        *createPrimitiveFromControllerInput(controller_input, controller_input_config);
+    auto& robot_primitives_map     = *primitive_set_msg->mutable_robot_primitives();
+    robot_primitives_map[robot_id] = *createPrimitiveFromControllerInput(
+        controller_input, controller_input_config, robot_constants);
     Subject<TbotsProto::PrimitiveSet>::sendValueToObservers(*primitive_set_msg);
 }
 
 std::unique_ptr<TbotsProto::Primitive>
 ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
-    const ControllerInput &controller_input,
-    std::shared_ptr<const HandheldControllerConfig> controller_input_config)
+    const ControllerInput& controller_input,
+    std::shared_ptr<const HandheldControllerConfig> controller_input_config,
+    const RobotConstants_t& robot_constants)
 {
     if (controller_input.isKickButtonPressed())
     {
         double kick_speed =
             controller_input_config->getKickSpeedMetersPerSecond()->value();
-        auto move_with_kick_primitive =
-            createMovePrimitive(Point(), 0, Angle::zero(), DribblerMode::OFF,
-                                AutoChipOrKick{
-                                    AutoChipOrKickMode::AUTOKICK,
-                                    kick_speed,
-                                },
-                                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
+        auto move_with_kick_primitive = createMovePrimitive(
+            Point(), 0, Angle::zero(), DribblerMode::OFF,
+            AutoChipOrKick{
+                AutoChipOrKickMode::AUTOKICK,
+                kick_speed,
+            },
+            MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
         return move_with_kick_primitive;
     }
     else if (controller_input.isChipButtonPressed())
     {
         double chip_distance = controller_input_config->getChipDistanceMeters()->value();
-        auto move_with_chip_primitive =
-            createMovePrimitive(Point(), 0, Angle::zero(), DribblerMode::OFF,
-                                AutoChipOrKick{
-                                    AutoChipOrKickMode::AUTOCHIP,
-                                    chip_distance,
-                                },
-                                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
+        auto move_with_chip_primitive = createMovePrimitive(
+            Point(), 0, Angle::zero(), DribblerMode::OFF,
+            AutoChipOrKick{
+                AutoChipOrKickMode::AUTOCHIP,
+                chip_distance,
+            },
+            MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
         return move_with_chip_primitive;
     }
     else
@@ -72,7 +74,7 @@ ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
 
 std::unique_ptr<TbotsProto::Primitive>
 ControllerPrimitiveGenerator::createDirectControlPrimitive(
-    const Vector &velocity, AngularVelocity angular_velocity, double dribbler_speed_rpm)
+    const Vector& velocity, AngularVelocity angular_velocity, double dribbler_speed_rpm)
 {
     auto direct_control_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
