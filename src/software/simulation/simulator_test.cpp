@@ -2,11 +2,7 @@
 
 #include <gtest/gtest.h>
 
-extern "C"
-{
 #include "shared/2015_robot_constants.h"
-}
-
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "software/proto/primitive/primitive_msg_factory.h"
 #include "software/test_util/test_util.h"

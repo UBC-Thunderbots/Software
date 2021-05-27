@@ -4,11 +4,6 @@
 #include <gtest/gtest.h>
 #include <math.h>
 
-extern "C"
-{
-#include "shared/2015_robot_constants.h"
-}
-
 #include "shared/2015_robot_constants.h"
 #include "shared/constants.h"
 #include "software/simulation/physics/box2d_util.h"

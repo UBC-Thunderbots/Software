@@ -24,12 +24,14 @@ class Robot
      * @param timestamp The timestamp at which the robot was observed to be in the given
      * state
      * @param unavailable_capabilities The set of unavailable capabilities for this robot
+     * @param robot_constants The robot constants for this robot
      */
     explicit Robot(RobotId id, const Point &position, const Vector &velocity,
                    const Angle &orientation, const AngularVelocity &angular_velocity,
                    const Timestamp &timestamp,
                    const std::set<RobotCapability> &unavailable_capabilities =
-                       std::set<RobotCapability>());
+                       std::set<RobotCapability>(),
+                   const RobotConstants_t &robot_constants = create2015RobotConstants());
 
     /**
      * Creates a new robot with the given initial state
@@ -124,6 +126,13 @@ class Robot
     std::set<RobotCapability> &getMutableRobotCapabilities();
 
     /**
+     * Returns the robot constants for this robot state
+     *
+     * @return the robot constants for this robot
+     */
+    const RobotConstants_t &robotConstants() const;
+
+    /**
      * Decides if a point is near the dribbler of the robot
      *
      * @param test_point The point to check
@@ -178,4 +187,5 @@ class Robot
     // The hardware capabilities of the robot, generated from
     // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
     std::set<RobotCapability> unavailable_capabilities_;
+    RobotConstants_t robot_constants_;
 };
