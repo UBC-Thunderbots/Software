@@ -1,5 +1,7 @@
 #include "software/proto/message_translation/ssl_simulation_robot_control.h"
 
+#include "shared/constants.h"
+
 extern "C"
 {
 #include "firmware/shared/physics.h"
@@ -32,9 +34,9 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
     shared_physics_speed4ToSpeed3(wheel_speeds, robot_local_speed, front_wheel_angle_deg,
                                   back_wheel_angle_deg);
 
+    // Convert speed [m/s] to angular velocity [rad/s]
     robot_local_speed[2] =
-        robot_local_speed[2] /
-        ROBOT_MAX_RADIUS_METERS;  // Convert speed [m/s] to angular velocity [rad/s]
+        robot_local_speed[2] / static_cast<float>(ROBOT_MAX_RADIUS_METERS);
 
     move_local_velocity.set_forward(robot_local_speed[0]);
     move_local_velocity.set_left(robot_local_speed[1]);
