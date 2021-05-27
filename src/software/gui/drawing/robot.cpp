@@ -12,7 +12,7 @@
 
 void drawRobotVelocity(QGraphicsScene* scene, const Point& position,
                        const Vector& velocity, const QColor& slow_colour,
-                       const QColor& fast_colour)
+                       const QColor& fast_colour, const RobotConstants_t& robot_constants)
 {
     // A somewhat arbitrary value that we've determined looks nice in the GUI
     const double max_velocity_line_length = 0.5;
@@ -32,14 +32,16 @@ void drawRobotVelocity(QGraphicsScene* scene, const Point& position,
 
     double speed     = velocity.length();
     auto line_length = normalizeValueToRange<double>(
-        speed, 0, ROBOT_MAX_SPEED_METERS_PER_SECOND, 0.0, max_velocity_line_length);
+        speed, 0, robot_constants.robot_max_speed_meters_per_second, 0.0,
+        max_velocity_line_length);
 
     drawSegment(scene, Segment(position, position + velocity.normalize(line_length)),
                 pen);
 }
 
 void drawRobotAtPosition(QGraphicsScene* scene, const Point& position,
-                         const Angle& orientation, const QColor& color)
+                         const Angle& orientation, const QColor& color,
+                         const RobotConstants_t& robot_constants)
 {
     // The bounding box that defines the ellipse used for the main robot body
     Point robot_bounding_box_top_left =
@@ -49,10 +51,12 @@ void drawRobotAtPosition(QGraphicsScene* scene, const Point& position,
 
     // The front-left and right edges of the robot face (the front of the robot)
     Vector robot_face_front_left =
-        Vector(DIST_TO_FRONT_OF_ROBOT_METERS, FRONT_OF_ROBOT_WIDTH_METERS / 2.0)
+        Vector(DIST_TO_FRONT_OF_ROBOT_METERS,
+               robot_constants.front_of_robot_width_meters / 2.0)
             .rotate(orientation);
     Vector robot_face_front_right =
-        Vector(DIST_TO_FRONT_OF_ROBOT_METERS, -FRONT_OF_ROBOT_WIDTH_METERS / 2.0)
+        Vector(DIST_TO_FRONT_OF_ROBOT_METERS,
+               -robot_constants.front_of_robot_width_meters / 2.0)
             .rotate(orientation);
 
     // The front face of the robot
@@ -131,20 +135,22 @@ void drawRobotId(QGraphicsScene* scene, const Point& position, const RobotId id)
     scene->addItem(robot_id);
 }
 
-void drawRobot(QGraphicsScene* scene, const RobotStateWithId& robot, const QColor& color)
+void drawRobot(QGraphicsScene* scene, const RobotStateWithId& robot, const QColor& color,
+               const RobotConstants_t& robot_constants)
 {
     drawRobotAtPosition(scene, robot.robot_state.position(),
-                        robot.robot_state.orientation(), color);
+                        robot.robot_state.orientation(), color, robot_constants);
     drawRobotVelocity(scene, robot.robot_state.position(), robot.robot_state.velocity(),
-                      robot_speed_slow_color, color);
+                      robot_speed_slow_color, color, robot_constants);
     drawRobotId(scene, robot.robot_state.position(), robot.id);
 
     // TODO: Show robot charge state
     // https://github.com/UBC-Thunderbots/Software/issues/1492
 }
 
-void drawRobot(QGraphicsScene* scene, const RobotDetection& robot, const QColor& color)
+void drawRobot(QGraphicsScene* scene, const RobotDetection& robot, const QColor& color,
+               const RobotConstants_t& robot_constants)
 {
-    drawRobotAtPosition(scene, robot.position, robot.orientation, color);
+    drawRobotAtPosition(scene, robot.position, robot.orientation, color, robot_constants);
     drawRobotId(scene, robot.position, robot.id);
 }

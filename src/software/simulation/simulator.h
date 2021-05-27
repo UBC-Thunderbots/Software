@@ -35,7 +35,7 @@ class Simulator
      * @param physics_time_step The time step used to simulated physics
      * and robot primitives.
      */
-    explicit Simulator(const Field& field, RobotConstants_t robot_constants,
+    explicit Simulator(const Field& field, const RobotConstants_t& robot_constants,
                        std::shared_ptr<const SimulatorConfig> simulator_config,
                        const Duration& physics_time_step =
                            Duration::fromSeconds(DEFAULT_PHYSICS_TIME_STEP_SECONDS));

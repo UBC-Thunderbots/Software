@@ -1,7 +1,7 @@
 #include "software/simulation/threaded_simulator.h"
 
 ThreadedSimulator::ThreadedSimulator(
-    const Field &field, RobotConstants_t robot_constants,
+    const Field &field, const RobotConstants_t &robot_constants,
     std::shared_ptr<const SimulatorConfig> simulator_config)
     : simulator(field, robot_constants, simulator_config),
       simulation_thread_started(false),

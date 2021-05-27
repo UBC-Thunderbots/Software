@@ -16,7 +16,7 @@ extern "C"
 #include "shared/proto/robot_log_msg.nanopb.h"
 }
 
-Simulator::Simulator(const Field& field, RobotConstants_t robot_constants,
+Simulator::Simulator(const Field& field, const RobotConstants_t& robot_constants,
                      std::shared_ptr<const SimulatorConfig> simulator_config,
                      const Duration& physics_time_step)
     : physics_world(field, robot_constants, simulator_config),

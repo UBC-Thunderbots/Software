@@ -27,7 +27,8 @@ class ThreadedSimulator
      * @param robot_constants The robot constants
      * @param simulator_config The config to fetch parameters from
      */
-    explicit ThreadedSimulator(const Field& field, RobotConstants_t robot_constants,
+    explicit ThreadedSimulator(const Field& field,
+                               const RobotConstants_t& robot_constants,
                                std::shared_ptr<const SimulatorConfig> simulator_config);
     ~ThreadedSimulator();
 

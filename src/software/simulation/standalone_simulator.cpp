@@ -10,10 +10,11 @@ extern "C"
 StandaloneSimulator::StandaloneSimulator(
     std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config,
     std::shared_ptr<SimulatorConfig> simulator_config, const Field& field,
-    RobotConstants_t robot_constants)
+    const RobotConstants_t& robot_constants)
     : standalone_simulator_config(standalone_simulator_config),
       simulator(field, robot_constants, simulator_config),
-      most_recent_ssl_wrapper_packet(SSLProto::SSL_WrapperPacket())
+      most_recent_ssl_wrapper_packet(SSLProto::SSL_WrapperPacket()),
+      robot_constants(robot_constants)
 {
     standalone_simulator_config->getMutableBlueTeamChannel()->registerCallbackFunction(
         [this](int blue_team_channel) {
@@ -221,4 +222,9 @@ void StandaloneSimulator::setYellowTeamDefendingSide(
     const DefendingSideProto& defending_side_proto)
 {
     simulator.setYellowTeamDefendingSide(defending_side_proto);
+}
+
+const RobotConstants_t& StandaloneSimulator::getRobotConstants() const
+{
+    return robot_constants;
 }
