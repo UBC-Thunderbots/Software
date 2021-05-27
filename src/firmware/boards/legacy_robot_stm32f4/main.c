@@ -60,6 +60,7 @@
 #include "io/wheels.h"
 #include "priority.h"
 #include "shared/2015_robot_constants.h"
+#include "shared/2015_wheel_constants.h"
 #include "tick.h"
 #include "time.h"
 #include "upgrade/dfu.h"
@@ -491,14 +492,8 @@ static void run_normal(void)
 
     // Setup the world that acts as the interface for the higher level firmware
     // (like primitives or the controller) to interface with the outside world
-    WheelConstants_t wheel_constants = {
-        .wheel_rotations_per_motor_rotation  = GEAR_RATIO,
-        .wheel_radius                        = WHEEL_RADIUS,
-        .motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT,
-        .motor_back_emf_per_rpm              = RPM_TO_VOLT,
-        .motor_phase_resistance              = WHEEL_MOTOR_PHASE_RESISTANCE,
-        .motor_current_per_unit_torque       = CURRENT_PER_TORQUE};
-    ForceWheel_t* front_right_wheel = app_force_wheel_create(
+    const WheelConstants_t wheel_constants = create2015WheelConstants();
+    ForceWheel_t* front_right_wheel        = app_force_wheel_create(
         apply_wheel_force_front_right, wheels_get_front_right_rpm,
         wheels_brake_front_right, wheels_coast_front_right, wheel_constants);
     ForceWheel_t* front_left_wheel = app_force_wheel_create(

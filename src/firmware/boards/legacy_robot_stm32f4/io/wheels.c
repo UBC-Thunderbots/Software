@@ -43,6 +43,16 @@
 
 #define SWITCH_RESISTANCE 0.6f  // ohms—L6234 datasheet
 
+// Some of these are duplicated from 2015_wheel_constants.h since using those values
+// directly is too much effort for this legacy robot and build system
+#define CONTROL_LOOP_HZ 200U
+#define WHEEL_MOTOR_PHASE_RESISTANCE 1.2f  // ohms—EC45 datasheet
+#define RPM_TO_VOLT (1.0f / 374.0f)        // motor RPM to back EMF
+#define QUARTERDEGREE_TO_VOLT (QUARTERDEGREE_TO_RPM * RPM_TO_VOLT)
+#define CURRENT_PER_TORQUE 39.21f  // from motor data sheet (1/25.5 mNm)
+#define GEAR_RATIO 0.5143f         // define as speed multiplication from motor to wheel
+#define WHEEL_RADIUS 0.0254f
+
 /**
  * \brief The possible modes a wheel can be in.
  */
