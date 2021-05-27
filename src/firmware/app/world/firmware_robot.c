@@ -1,6 +1,7 @@
 #include "firmware/app/world/firmware_robot.h"
 
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 // these are set to decouple the 3 axis from each other
@@ -226,12 +227,24 @@ void velocity_wheels_setLocalVelocity(
     float linear_velocity_y = control_msg.velocity.y_component_meters;
     float angular_velocity  = control_msg.angular_velocity.radians_per_second;
 
-    float robot_velocity[3];
-    robot_velocity[0] = linear_velocity_x;
-    robot_velocity[1] = linear_velocity_y;
-    robot_velocity[2] = angular_velocity;
+    float global_robot_velocity[2];
+    global_robot_velocity[0] = linear_velocity_x;
+    global_robot_velocity[1] = linear_velocity_y;
+
+    float angle                = app_firmware_robot_getOrientation(robot);
+    float local_norm_vec[2][2] = {{cosf(angle), sinf(angle)},
+                                  {cosf(angle + P_PI / 2), sinf(angle + P_PI / 2)}};
+    
+    float local_robot_velocity[3];
+    for (int i = 0; i < 2; i++)
+    {
+        local_robot_velocity[i] = dot2D(local_norm_vec[i], global_robot_velocity);
+    }
+    
+    local_robot_velocity[2] = angular_velocity * ROBOT_RADIUS;
+
     float wheel_velocity[4];
-    speed3_to_speed4(robot_velocity, wheel_velocity);
+    speed3_to_speed4(local_robot_velocity, wheel_velocity);
 
     app_velocity_wheel_setTargetVelocity(front_left_wheel, wheel_velocity[0]);
     app_velocity_wheel_setTargetVelocity(front_right_wheel, wheel_velocity[3]);
