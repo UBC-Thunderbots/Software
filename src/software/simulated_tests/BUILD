@@ -6,7 +6,6 @@ cc_library(
     srcs = ["simulated_test_fixture.cpp"],
     hdrs = ["simulated_test_fixture.h"],
     deps = [
-        "//software/gui/drawing:navigator",
         "//software/gui/full_system:threaded_full_system_gui",
         "//software/logger",
         "//software/proto/message_translation:primitive_google_to_nanopb_converter",

@@ -17,8 +17,9 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     *(move_primitive_msg->mutable_move()->mutable_destination()) = *dest_msg;
     move_primitive_msg->mutable_move()->set_final_speed_m_per_s(
         static_cast<float>(final_speed_m_per_s));
-    move_primitive_msg->mutable_move()->set_max_speed_m_per_s(static_cast<float>(
-        convertMaxAllowedSpeedModeToMaxAllowedSpeed(max_allowed_speed_mode)));
+    move_primitive_msg->mutable_move()->set_max_speed_m_per_s(
+        static_cast<float>(convertMaxAllowedSpeedModeToMaxAllowedSpeed(
+            max_allowed_speed_mode, robot_constants)));
 
     move_primitive_msg->mutable_move()->set_dribbler_speed_rpm(static_cast<float>(
         convertDribblerModeToDribblerSpeed(dribbler_mode, robot_constants)));

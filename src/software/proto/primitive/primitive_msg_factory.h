@@ -100,8 +100,9 @@ double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode,
  * Convert max allowed speed mode to max allowed speed
  *
  * @param max_allowed_speed_mode The MaxAllowedSpeedMode
+ * @param robot_constants The robot constants
  *
  * @return the max allowed speed in m/s
  */
 double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
-    MaxAllowedSpeedMode max_allowed_speed_mode);
+    MaxAllowedSpeedMode max_allowed_speed_mode, RobotConstants_t robot_constants);
