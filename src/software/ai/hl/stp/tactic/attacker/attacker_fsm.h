@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
+#include "software/ai/evaluation/keep_away.h"
 #include "software/ai/evaluation/shot.h"
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
@@ -12,8 +13,10 @@ struct AttackerFSM
 {
     struct ControlParams
     {
-        // The pass to execute
-        std::optional<Pass> pass = std::nullopt;
+        // The best pass so far
+        Pass best_pass_so_far = Pass(Point(0, 0), Point(0, 0), 0.f);
+        // whether we have committed to the pass and will be taking it
+        bool pass_committed = false;
         // The shot to take
         std::optional<Shot> shot = std::nullopt;
         // The point the robot will chip towards if it is unable to shoot and is in danger
@@ -67,14 +70,16 @@ struct AttackerFSM
                         AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
                                        BALL_MAX_SPEED_METERS_PER_SECOND - 0.5}};
             }
-            else if (event.control_params.pass)
+            else if (event.control_params.pass_committed)
             {
+                // we have committed to passing, execute the pass
                 control_params = PivotKickFSM::ControlParams{
-                    .kick_origin    = event.control_params.pass->passerPoint(),
-                    .kick_direction = event.control_params.pass->passerOrientation(),
+                    .kick_origin = event.control_params.best_pass_so_far.passerPoint(),
+                    .kick_direction =
+                        event.control_params.best_pass_so_far.passerOrientation(),
                     .auto_chip_or_kick =
                         AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                                       event.control_params.pass->speed()}};
+                                       event.control_params.best_pass_so_far.speed()}};
             }
             processEvent(PivotKickFSM::Update(control_params, event.common));
         };
@@ -87,10 +92,18 @@ struct AttackerFSM
          */
         const auto keep_away = [](auto event,
                                   back::process<DribbleFSM::Update> processEvent) {
-            // TODO (#2073): Implement a more effective keep away tactic
+            // ball possession is threatened, get into a better position to take the
+            // best pass so far
+            auto best_pass_so_far      = event.control_params.best_pass_so_far;
+            auto keepaway_dribble_dest = findKeepAwayTargetPoint(
+                event.common.robot.position(), best_pass_so_far, event.common.world);
+            auto keepaway_final_heading_vec =
+                best_pass_so_far.receiverPoint() - best_pass_so_far.passerPoint();
+            auto keepaway_final_heading = Angle::fromRadians(std::atan2(
+                keepaway_final_heading_vec.x(), keepaway_final_heading_vec.y()));
             DribbleFSM::ControlParams control_params{
-                .dribble_destination       = std::nullopt,
-                .final_dribble_orientation = std::nullopt,
+                .dribble_destination       = keepaway_dribble_dest,
+                .final_dribble_orientation = keepaway_final_heading,
                 .allow_excessive_dribbling = true};
             processEvent(DribbleFSM::Update(control_params, event.common));
         };
@@ -116,8 +129,8 @@ struct AttackerFSM
                     return true;
                 }
             }
-            // otherwise check for shot or pass
-            return event.control_params.pass || event.control_params.shot;
+            // otherwise check for shot or pass committed
+            return event.control_params.pass_committed || event.control_params.shot;
         };
 
         return make_transition_table(
