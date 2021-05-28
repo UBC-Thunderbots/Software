@@ -29,7 +29,6 @@ void PassEndurancePlay::getNextTactics(TacticCoroutine::push_type &yield,
     do
     {
         TacticVector result = {};
-        // If we are setting up for penalty kick, move our robots to position
         if (world.gameState().isPlaying())
         {
             // TODO (#2109): replace this example play with an actual implementation of
