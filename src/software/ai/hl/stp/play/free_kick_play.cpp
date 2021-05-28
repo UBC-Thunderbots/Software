@@ -141,7 +141,7 @@ void FreeKickPlay::performPassStage(
                                          world.enemyTeam(), pass, world.ball(), false);
     do
     {
-        attacker->updateControlParams(pass);
+        attacker->updateControlParams(pass, true);
         receiver->updateControlParams(pass);
 
         std::get<0>(crease_defender_tactics)
