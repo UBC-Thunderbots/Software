@@ -14,7 +14,37 @@ class ScoringWithStaticDefendersPlayTest : public SimulatedPlayTestFixture
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_F(ScoringWithStaticDefendersPlayTest, test_scoring_with_static_defenders_play)
+TEST_F(ScoringWithStaticDefendersPlayTest,
+       test_scoring_with_static_defenders_play_stopped)
+{
+    BallState ball_state(Point(-0.8, 0), Vector(0, 0));
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
+        {Point(4, 0), Point(0.5, 0), Point(-3, 1)});
+    setFriendlyGoalie(0);
+    setAIPlay(TYPENAME(ScoringWithStaticDefendersPlay));
+
+    setRefereeCommand(RefereeCommand::STOP, RefereeCommand::HALT);
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        // This will keep the test running for 9.5 seconds to give everything enough
+        // time to settle into position and be observed with the Visualizer
+        // TODO: Implement proper validation
+        // https://github.com/UBC-Thunderbots/Software/issues/1971
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
+            {
+                yield("Timestamp not at 9.5s");
+            }
+        }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(10));
+}
+
+TEST_F(ScoringWithStaticDefendersPlayTest,
+       test_scoring_with_static_defenders_play_freekick)
 {
     BallState ball_state(Point(-0.8, 0), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
@@ -25,30 +55,14 @@ TEST_F(ScoringWithStaticDefendersPlayTest, test_scoring_with_static_defenders_pl
     setRefereeCommand(RefereeCommand::DIRECT_FREE_US, RefereeCommand::HALT);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
+        // This will keep the test running for 9.5 seconds to give everything enough
+        // time to settle into position and be observed with the Visualizer
+        // TODO: Implement proper validation
+        // https://github.com/UBC-Thunderbots/Software/issues/1971
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            auto friendly_robots_1_meter_from_ball =
-                [](std::shared_ptr<World> world_ptr) {
-                    Point ball_position = world_ptr->ball().position();
-                    for (const auto& robot : world_ptr->friendlyTeam().getAllRobots())
-                    {
-                        // Skips the robot assigned as goalie
-                        if (robot.id() == 0)
-                        {
-                            continue;
-                        }
-                        double abs_error =
-                            std::fabs((robot.position() - ball_position).length() - 1.0);
-                        if (abs_error > 0.05)
-                        {
-                            return false;
-                        }
-                    }
-                    return true;
-                };
-
-            while (!friendly_robots_1_meter_from_ball(world_ptr))
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
             {
-                yield("Friendly robots not 1 meter away from ball");
+                yield("Timestamp not at 9.5s");
             }
         }};
 
