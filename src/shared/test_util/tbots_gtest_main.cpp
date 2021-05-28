@@ -26,6 +26,7 @@ int main(int argc, char **argv)
         if (TbotsGtestMain::enable_visualizer)
         {
             TbotsGtestMain::stop_ai_on_start = args->getStopAiOnStart()->value();
+            feenableexcept(FE_INVALID | FE_OVERFLOW);
         }
     }
 
