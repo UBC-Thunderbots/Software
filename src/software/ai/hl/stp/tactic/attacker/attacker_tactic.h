@@ -63,7 +63,7 @@ class AttackerTactic : public Tactic
     FSM<AttackerFSM> fsm;
 
     // The pass to execute
-    Pass best_pass_so_far;
+    std::optional<Pass> best_pass_so_far;
     // whether we have committed to the above pass
     bool pass_committed;
     // The point the robot will chip towards if it is unable to shoot and is in danger
