@@ -53,7 +53,7 @@ TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
             robotAtOrientation(0, world_ptr, Angle::zero(), Angle::fromDegrees(5), yield);
             robotAtPosition(0, world_ptr, world_ptr->field().friendlyGoalCenter(), 0.05,
                             yield);
-            for (unsigned int id = 1; id <= 6; id++)
+            for (unsigned int id = 1; id <= 5; id++)
             {
                 robotInPolygon(id, behind_ball, world_ptr, yield);
             }
@@ -81,7 +81,7 @@ INSTANTIATE_TEST_CASE_P(
 
 TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_goalie)
 {
-    BallState ball_state(field.enemyPenaltyMark(), Vector(-0.5, 0.05));
+    BallState ball_state(field.enemyPenaltyMark(), Vector(-3, 0.2));
 
     // friendly robots already in position
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(

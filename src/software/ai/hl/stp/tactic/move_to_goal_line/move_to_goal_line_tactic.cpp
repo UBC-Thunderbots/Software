@@ -14,12 +14,14 @@ void MoveToGoalLineTactic::updateWorldParams(const World &world) {}
 double MoveToGoalLineTactic::calculateRobotCost(const Robot &robot,
                                                 const World &world) const
 {
-    // Prefer robots closer to the goal line
-    // We normalize with the total field length so that robots that are within the
-    // field have a cost less than 1
-    double cost = (robot.position() - world.field().friendlyGoalCenter()).length() /
-                  world.field().totalXLength();
-    return std::clamp<double>(cost, 0, 1);
+    if (world.friendlyTeam().getGoalieId() == robot.id())
+    {
+        return 0.0;
+    }
+    else
+    {
+        return 1.0;
+    }
 }
 
 void MoveToGoalLineTactic::calculateNextAction(ActionCoroutine::push_type &yield)

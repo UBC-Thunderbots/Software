@@ -87,7 +87,8 @@ void MotionConstraintVisitor::visit(const GetBehindBallTactic &tactic) {}
 void MotionConstraintVisitor::visit(const MoveToGoalLineTactic &tactic)
 {
     current_allowed_constraints = std::set<MotionConstraint>({
-        MotionConstraint::FRIENDLY_HALF
+        MotionConstraint::FRIENDLY_HALF,
+        MotionConstraint::FRIENDLY_DEFENSE_AREA
     });
 }
 
