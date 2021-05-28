@@ -35,7 +35,7 @@ TEST_P(SimulatedAttackerTacticPassingTest, attacker_test_passing)
     // force passing for this test by setting min acceptable shot angle very high
     attacker_tactic_config->getMutableMinOpenAngleForShotDeg()->setValue(90);
     auto tactic = std::make_shared<AttackerTactic>(attacker_tactic_config);
-    tactic->updateControlParams(pass);
+    tactic->updateControlParams(pass, true);
     setTactic(tactic);
     setRobotId(1);
 
