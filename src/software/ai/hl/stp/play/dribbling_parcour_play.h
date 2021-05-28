@@ -4,20 +4,16 @@
 #include "software/ai/hl/stp/play/play.h"
 
 /**
- * Play for scoring with static defenders play hardware challenge
+ * Play for the dribbling parcour hardware challenge
  */
-class ScoringWithStaticDefendersPlay : public Play
+class DribblingParcourPlay : public Play
 {
    public:
-    ScoringWithStaticDefendersPlay(std::shared_ptr<const PlayConfig> config);
+    DribblingParcourPlay(std::shared_ptr<const PlayConfig> config);
 
     bool isApplicable(const World &world) const override;
 
     bool invariantHolds(const World &world) const override;
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
-
-   private:
-    // 3 robots for this hardware challenge
-    const unsigned int NUM_ROBOTS = 3;
 };

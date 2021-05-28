@@ -12,14 +12,12 @@ ScoringWithStaticDefendersPlay::ScoringWithStaticDefendersPlay(
 
 bool ScoringWithStaticDefendersPlay::isApplicable(const World &world) const
 {
-    return (world.gameState().isReadyState() || world.gameState().isSetupState()) &&
-           world.gameState().isOurPenalty();
+    return false;
 }
 
 bool ScoringWithStaticDefendersPlay::invariantHolds(const World &world) const
 {
-    return world.gameState().isOurPenalty() && !world.gameState().isStopped() &&
-           !world.gameState().isHalted();
+    return false;
 }
 
 void ScoringWithStaticDefendersPlay::getNextTactics(TacticCoroutine::push_type &yield,
@@ -31,27 +29,23 @@ void ScoringWithStaticDefendersPlay::getNextTactics(TacticCoroutine::push_type &
 
     do
     {
-        PriorityTacticVector tactics_to_run = {{}};
-
-        double ball_position_x = world.field().centerPoint().x();
-
         TacticVector result = {};
-        // If we are setting up for penalty kick, move our robots to position
         if (world.gameState().isStopped())
         {
+            // line up along center line
             int initial_offset = static_cast<int>(-move_tactics.size() / 2 + 1);
             for (size_t k = 0; k < move_tactics.size(); k++)
             {
-                auto next_position =
-                    Point(ball_position_x, (initial_offset + static_cast<int>(k)) * 4 *
-                                               ROBOT_MAX_RADIUS_METERS);
+                auto next_position = Point(
+                    world.field().centerPoint().x(),
+                    (initial_offset + static_cast<int>(k)) * 4 * ROBOT_MAX_RADIUS_METERS);
                 move_tactics[k]->updateControlParams(next_position, Angle::zero(), 0);
             }
-
-            result.insert(result.end(), move_tactics.begin(), move_tactics.end());
         }
         else if (world.gameState().isOurFreeKick())
         {
+            // TODO (#2106): replace this example play with an actual implementation
+
             // The angle between each robot spaced out in a circle around the ball
             Angle angle_between_robots =
                 Angle::full() / static_cast<double>(move_tactics.size());
@@ -65,12 +59,8 @@ void ScoringWithStaticDefendersPlay::getNextTactics(TacticCoroutine::push_type &
                     (angle_between_robots * static_cast<double>(k + 1)) + Angle::half(),
                     0);
             }
-
-            // yield the Tactics this Play wants to run, in order of priority
-            // If there are fewer robots in play, robots at the end of the list will not
-            // be assigned
-            result.insert(result.end(), move_tactics.begin(), move_tactics.end());
         }
+        result.insert(result.end(), move_tactics.begin(), move_tactics.end());
         yield({result});
     } while (true);
 }

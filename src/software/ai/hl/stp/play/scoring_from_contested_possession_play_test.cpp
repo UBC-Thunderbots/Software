@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/scoring_with_static_defenders_play.h"
+#include "software/ai/hl/stp/play/scoring_from_contested_possession_play.h"
 
 #include <gtest/gtest.h>
 
@@ -8,27 +8,27 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class ScoringWithStaticDefendersPlayTest : public SimulatedPlayTestFixture
+class ScoringFromContestedPossessionPlayTest : public SimulatedPlayTestFixture
 {
    protected:
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_F(ScoringWithStaticDefendersPlayTest,
-       test_scoring_with_static_defenders_play_stopped)
+TEST_F(ScoringFromContestedPossessionPlayTest,
+       test_scoring_from_contested_possession_stopped)
 {
     BallState ball_state(Point(-0.8, 0), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(4, 0), Point(0.5, 0), Point(-3, 1)});
     setFriendlyGoalie(0);
-    setAIPlay(TYPENAME(ScoringWithStaticDefendersPlay));
+    setAIPlay(TYPENAME(ScoringFromContestedPossessionPlay));
 
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::HALT);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough
         // time to settle into position and be observed with the Visualizer
-        // TODO (#2106): Implement proper validation
+        // TODO (#2107): Implement proper validation
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
             {
@@ -42,21 +42,21 @@ TEST_F(ScoringWithStaticDefendersPlayTest,
             non_terminating_validation_functions, Duration::fromSeconds(10));
 }
 
-TEST_F(ScoringWithStaticDefendersPlayTest,
-       test_scoring_with_static_defenders_play_freekick)
+TEST_F(ScoringFromContestedPossessionPlayTest,
+       test_scoring_from_contested_possession_force_start)
 {
     BallState ball_state(Point(-0.8, 0), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(4, 0), Point(0.5, 0), Point(-3, 1)});
     setFriendlyGoalie(0);
-    setAIPlay(TYPENAME(ScoringWithStaticDefendersPlay));
+    setAIPlay(TYPENAME(ScoringFromContestedPossessionPlay));
 
-    setRefereeCommand(RefereeCommand::DIRECT_FREE_US, RefereeCommand::HALT);
+    setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         // This will keep the test running for 9.5 seconds to give everything enough
         // time to settle into position and be observed with the Visualizer
-        // TODO (#2106): Implement proper validation
+        // TODO (#2107): Implement proper validation
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
             {
