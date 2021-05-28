@@ -11,7 +11,7 @@ AttackerTactic::AttackerTactic(
     : Tactic(false,
              {RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
       fsm(DribbleFSM(std::make_shared<Point>())),
-      best_pass_so_far(Pass(Point(0, 0), Point(0, 0), 0)),
+      best_pass_so_far(std::nullopt),
       pass_committed(false),
       chip_target(std::nullopt),
       attacker_tactic_config(attacker_tactic_config)

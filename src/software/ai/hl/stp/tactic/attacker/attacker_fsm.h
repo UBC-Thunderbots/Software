@@ -14,7 +14,7 @@ struct AttackerFSM
     struct ControlParams
     {
         // The best pass so far
-        Pass best_pass_so_far = Pass(Point(0, 0), Point(0, 0), 0.f);
+        std::optional<Pass> best_pass_so_far = std::nullopt;
         // whether we have committed to the pass and will be taking it
         bool pass_committed = false;
         // The shot to take
@@ -74,12 +74,12 @@ struct AttackerFSM
             {
                 // we have committed to passing, execute the pass
                 control_params = PivotKickFSM::ControlParams{
-                    .kick_origin = event.control_params.best_pass_so_far.passerPoint(),
+                    .kick_origin = event.control_params.best_pass_so_far->passerPoint(),
                     .kick_direction =
-                        event.control_params.best_pass_so_far.passerOrientation(),
+                        event.control_params.best_pass_so_far->passerOrientation(),
                     .auto_chip_or_kick =
                         AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                                       event.control_params.best_pass_so_far.speed()}};
+                                       event.control_params.best_pass_so_far->speed()}};
             }
             processEvent(PivotKickFSM::Update(control_params, event.common));
         };
@@ -94,17 +94,33 @@ struct AttackerFSM
                                   back::process<DribbleFSM::Update> processEvent) {
             // ball possession is threatened, get into a better position to take the
             // best pass so far
-            auto best_pass_so_far      = event.control_params.best_pass_so_far;
-            auto keepaway_dribble_dest = findKeepAwayTargetPoint(
-                event.common.robot.position(), best_pass_so_far, event.common.world);
-            auto keepaway_final_heading_vec =
-                best_pass_so_far.receiverPoint() - best_pass_so_far.passerPoint();
-            auto keepaway_final_heading = Angle::fromRadians(std::atan2(
-                keepaway_final_heading_vec.x(), keepaway_final_heading_vec.y()));
-            DribbleFSM::ControlParams control_params{
-                .dribble_destination       = keepaway_dribble_dest,
-                .final_dribble_orientation = keepaway_final_heading,
-                .allow_excessive_dribbling = true};
+            DribbleFSM::ControlParams control_params;
+
+            if (event.control_params.best_pass_so_far)
+            {
+                auto best_pass_so_far = event.control_params.best_pass_so_far;
+                auto keepaway_dribble_dest =
+                    findKeepAwayTargetPoint(event.common.robot.position(),
+                                            best_pass_so_far.value(), event.common.world);
+                auto keepaway_final_heading_vec =
+                    best_pass_so_far->receiverPoint() - best_pass_so_far->passerPoint();
+                auto keepaway_final_heading = Angle::fromRadians(std::atan2(
+                    keepaway_final_heading_vec.y(), keepaway_final_heading_vec.x()));
+                control_params = {.dribble_destination       = keepaway_dribble_dest,
+                                  .final_dribble_orientation = keepaway_final_heading,
+                                  .allow_excessive_dribbling = true};
+            }
+            else
+            {
+                // something is *a little bit* wrong if we make it here, though this is
+                // usually on the tick that this FSM is constructed.
+                // doing nothing for 1 tick is not that bad in the grand scheme of things
+                control_params = {
+                    .dribble_destination       = event.common.robot.position(),
+                    .final_dribble_orientation = event.common.robot.orientation(),
+                    .allow_excessive_dribbling = true};
+            }
+
             processEvent(DribbleFSM::Update(control_params, event.common));
         };
 
