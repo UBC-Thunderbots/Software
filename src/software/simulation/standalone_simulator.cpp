@@ -120,19 +120,37 @@ void StandaloneSimulator::setupInitialSimulationState(unsigned num_robots)
     // the two points on either side of the field.
     Angle angle_between_robots     = Angle::full() / num_robots;
     Point center_for_yellow_robots = Point(2, 0);
-    Point center_for_blue_robots   = Point(-2, 0);
+
+    //Point(-3.29231, -0.215385), Point(-3.48021, 0.407988), Point(-3.31282, 0.882051), Point(-1.2, 1.86667), Point(-3.45938, 0.231164)
+
+    blue_robot_states.emplace_back(RobotStateWithId{
+        .id = 0,
+        .robot_state =
+                RobotState(Point(-3.29231, -0.215385), Vector(0,0), Angle::zero(), AngularVelocity::zero())
+    });
+    blue_robot_states.emplace_back(RobotStateWithId{
+            .id = 1,
+            .robot_state =
+            RobotState(Point(-3.48021, 0.407988), Vector(0,0), Angle::zero(), AngularVelocity::zero())
+    });
+    blue_robot_states.emplace_back(RobotStateWithId{
+            .id = 2,
+            .robot_state =
+            RobotState(Point(-3.31282, 0.882051), Vector(0,0), Angle::zero(), AngularVelocity::zero())
+    });
+    blue_robot_states.emplace_back(RobotStateWithId{
+            .id = 3,
+            .robot_state =
+            RobotState(Point(-1.2, 1.86667), Vector(0,0), Angle::zero(), AngularVelocity::zero())
+    });
+    blue_robot_states.emplace_back(RobotStateWithId{
+            .id = 4,
+            .robot_state =
+            RobotState(Point(-3.45938, 0.231164), Vector(0,0), Angle::zero(), AngularVelocity::zero())
+    });
 
     for (unsigned i = 0; i < num_robots; i++)
     {
-        blue_robot_states.emplace_back(RobotStateWithId{
-            .id = i,
-            .robot_state =
-                RobotState(center_for_blue_robots +
-                               Vector::createFromAngle(angle_between_robots * i),
-                           Vector(0, 0), angle_between_robots * i + Angle::half(),
-                           AngularVelocity::zero()),
-        });
-
         yellow_robot_states.emplace_back(RobotStateWithId{
             .id = i,
             .robot_state =
