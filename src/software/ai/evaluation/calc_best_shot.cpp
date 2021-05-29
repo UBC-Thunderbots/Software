@@ -6,8 +6,8 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
 {
     std::optional<AngleMap> angle_map;
 
-    Angle pos_post_angle = (goal_post.getStart() - shot_origin).orientation();
-    Angle neg_post_angle = (goal_post.getEnd() - shot_origin).orientation();
+    Angle pos_post_angle     = (goal_post.getStart() - shot_origin).orientation();
+    Angle neg_post_angle     = (goal_post.getEnd() - shot_origin).orientation();
     size_t max_obstacle_size = robot_obstacles.size();
 
     std::vector<ObstacleAngleSegment> obstacles;
