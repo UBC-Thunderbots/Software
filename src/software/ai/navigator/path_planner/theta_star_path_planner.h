@@ -428,11 +428,6 @@ class ThetaStarPathPlanner : public PathPlanner
     // if close to end then return direct path to end point
     static constexpr double CLOSE_TO_END_THRESHOLD = 0.01;  // in metres
 
-    // TODO(Issue #1448): Test and revise this value and the associated approach
-    // increase in threshold to reduce oscillation for when the end of the path is blocked
-    static constexpr unsigned int BLOCKED_END_OSCILLATION_MITIGATION =
-        2;  // multiples of CLOSE_TO_END_THRESHOLD to ignore to control oscillation
-
     // resolution for searching for unblocked point around a blocked end
     static constexpr double BLOCKED_END_SEARCH_RESOLUTION =
         50.0;  // number of fractions to divide 1m

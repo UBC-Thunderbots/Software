@@ -10,14 +10,16 @@
 
 class ExamplePlayTest : public SimulatedPlayTestFixture
 {
+   protected:
+    Field field = Field::createSSLDivisionBField();
 };
 
 TEST_F(ExamplePlayTest, test_example_play)
 {
-    setBallState(BallState(Point(-0.8, 0), Vector(0, 0)));
-    addFriendlyRobots(TestUtil::createStationaryRobotStatesWithId(
+    BallState ball_state(Point(-0.8, 0), Vector(0, 0));
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(4, 0), Point(0.5, 0), Point(-3, 1), Point(-1, -3), Point(2, 0),
-         Point(3.5, 3)}));
+         Point(3.5, 3)});
     setFriendlyGoalie(0);
     setAIPlay(TYPENAME(ExamplePlay));
 
@@ -53,6 +55,6 @@ TEST_F(ExamplePlayTest, test_example_play)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(8));
+    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(10));
 }

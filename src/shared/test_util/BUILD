@@ -13,7 +13,19 @@ cc_library(
         "//firmware/app/logger",
         "//shared/proto:tbots_cc_proto",
         "//shared/proto:tbots_nanopb_proto",
+        "//shared/test_util:tbots_gtest_main",
         "//software/logger",
-        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "tbots_gtest_main",
+    testonly = True,
+    srcs = ["tbots_gtest_main.cpp"],
+    hdrs = ["tbots_gtest_main.h"],
+    deps = [
+        "//shared/parameter:cpp_configs",
+        "//software/logger",
+        "@gtest",
     ],
 )

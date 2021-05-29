@@ -10,15 +10,15 @@ bool robotReachedDestination(const Robot& robot, const Point& destination,
 
 bool robotStopped(const Robot& robot, double SPEED_THRESHOLD)
 {
-    return robot.velocity().length() < SPEED_THRESHOLD;
+    return robot.velocity().length() <= SPEED_THRESHOLD;
 }
 
 bool comparePoints(const Point& pt1, const Point& pt2, double DISTANCE_THRESHOLD)
 {
-    return (pt1 - pt2).length() < DISTANCE_THRESHOLD;
+    return (pt1 - pt2).length() <= DISTANCE_THRESHOLD;
 }
 
 bool compareAngles(const Angle& angle1, const Angle& angle2, const Angle& ANGLE_THRESHOLD)
 {
-    return angle1.minDiff(angle2) < ANGLE_THRESHOLD;
+    return angle1.minDiff(angle2) <= ANGLE_THRESHOLD;
 }

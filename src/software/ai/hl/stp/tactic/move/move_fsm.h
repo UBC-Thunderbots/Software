@@ -5,6 +5,7 @@
 
 struct MoveFSM
 {
+   public:
     // these classes define the states used in the transition table
     // they are exposed so that tests can check if the FSM is in a particular state
     class MoveState;

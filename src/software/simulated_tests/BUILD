@@ -17,7 +17,8 @@ cc_library(
         "//software/simulation:simulator",
         "//software/test_util",
         "//software/time:duration",
-        "@gtest",
+        "//software/proto/logging:proto_logger",
+        "//shared/test_util:tbots_gtest_main",
         # TODO (#1889) Remove this dep after optional params are implemented
         "//software/ai/hl/stp/play:halt_play",
     ],
@@ -50,24 +51,11 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "simulated_test_main",
-    testonly = True,
-    srcs = ["simulated_test_main.cpp"],
-    deps = [
-        ":simulated_test_fixture",
-        "//shared/parameter:cpp_configs",
-        "//software/logger",
-        "@gtest",
-    ],
-)
-
 cc_test(
     name = "simulated_play_test_fixture_test",
     srcs = ["simulated_play_test_fixture_test.cpp"],
     deps = [
         ":simulated_play_test_fixture",
-        ":simulated_test_main",
         "//software/simulated_tests/validation:validation_function",
         "//software/time:duration",
         "//software/time:timestamp",

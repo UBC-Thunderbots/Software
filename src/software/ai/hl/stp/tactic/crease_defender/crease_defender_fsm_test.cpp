@@ -137,11 +137,11 @@ TEST(CreaseDefenderFSMTest, test_transitions)
     world =
         ::TestUtil::setBallPosition(world, Point(-0.5, 0), Timestamp::fromSeconds(123));
     CreaseDefenderFSM::ControlParams control_params{
-        .enemy_threat_origin             = Point(2, 3),
-        .crease_defender_alignment       = CreaseDefenderAlignment::LEFT,
-        .robot_obstacle_inflation_factor = robot_obstacle_inflation_factor};
+        .enemy_threat_origin       = Point(2, 3),
+        .crease_defender_alignment = CreaseDefenderAlignment::LEFT};
 
-    FSM<CreaseDefenderFSM> fsm;
+    FSM<CreaseDefenderFSM> fsm(
+        CreaseDefenderFSM(std::make_shared<RobotNavigationObstacleConfig>()));
     EXPECT_TRUE(fsm.is(boost::sml::state<MoveFSM>));
 
     // robot far from destination, ball in friendly half

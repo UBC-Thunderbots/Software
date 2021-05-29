@@ -13,6 +13,8 @@
 
 class SimulatedThetaStarTest : public SimulatedTacticTestFixture
 {
+   protected:
+    Field field = Field::createSSLDivisionBField();
 };
 
 TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_obstacle)
@@ -23,10 +25,10 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_obstacle)
     // destination. Values are chosen from a case which previously did not find a path.
     Point destination      = Point(1, 0);
     Point initial_position = Point(0.96905413818359376, -0.26277551269531252);
-    setBallState(BallState(Point(0, -0.6), Vector(0, 0)));
-    addFriendlyRobots(
-        TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position}));
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({Point(1, 0)}));
+    BallState ball_state(Point(0, -0.6), Vector(0, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(1, 0)});
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
@@ -49,7 +51,8 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_obstacle)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(15));
 }
 
@@ -58,10 +61,10 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_dest_in_obstacle)
     // Destination is in obstacle, but initial point is open
     Point destination      = Point(1, -0.1);
     Point initial_position = Point(1, 2);
-    setBallState(BallState(Point(0, -0.6), Vector(0, 0)));
-    addFriendlyRobots(
-        TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position}));
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({Point(1, 0)}));
+    BallState ball_state(Point(0, -0.6), Vector(0, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(1, 0)});
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
@@ -84,7 +87,48 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_dest_in_obstacle)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(15));
+}
+
+
+TEST_F(SimulatedThetaStarTest,
+       test_theta_star_not_stuck_when_start_point_and_first_grid_point_is_close)
+{
+    // Destination is in obstacle, but initial point is open
+    Point destination = Point(4, 2.4);
+
+    Point initial_position = Point(3.21118, 1.06699);
+    BallState ball_state(Point(0, -0.6), Vector(0, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
+        {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
+         field.enemyDefenseArea().negXNegYCorner(),
+         field.enemyDefenseArea().negXPosYCorner()});
+
+    auto tactic = std::make_shared<MoveTactic>(false);
+    tactic->updateControlParams(destination, Angle::zero(), 0);
+    setTactic(tactic);
+    setRobotId(1);
+
+    setMotionConstraints(
+        {MotionConstraint::ENEMY_ROBOTS_COLLISION, MotionConstraint::ENEMY_DEFENSE_AREA});
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [destination, tactic](std::shared_ptr<World> world_ptr,
+                              ValidationCoroutine::push_type& yield) {
+            // Small rectangle near the destination point that is outside of the obstacle
+            // which the friendly robot should be stationary in for 15 ticks
+            Rectangle expected_final_position(Point(3.9, 2.3), Point(4.1, 2.5));
+            robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
+        }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(15));
 }
 
@@ -93,10 +137,10 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_in_obstacle)
     // Destination is in a free point, but initial point is in an obstacle
     Point destination      = Point(0, 0);
     Point initial_position = Point(1, 0);
-    setBallState(BallState(Point(0, -0.6), Vector(0, 0)));
-    addFriendlyRobots(
-        TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position}));
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({Point(1, 0)}));
+    BallState ball_state(Point(0, -0.6), Vector(0, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(1, 0)});
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
@@ -119,7 +163,8 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_in_obstacle)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(15));
 }
 
@@ -127,10 +172,10 @@ TEST_F(SimulatedThetaStarTest, test_theta_no_obstacle_straight_path)
 {
     Point destination      = Point(-2, 1);
     Point initial_position = Point(2, 1);
-    setBallState(BallState(Point(0, -0.6), Vector(0, 0)));
-    addFriendlyRobots(
-        TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position}));
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({Point(1, 0)}));
+    BallState ball_state(Point(0, -0.6), Vector(0, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(1, 0)});
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
@@ -153,7 +198,8 @@ TEST_F(SimulatedThetaStarTest, test_theta_no_obstacle_straight_path)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(15));
 }
 
@@ -175,16 +221,16 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_zig_zag_test)
 
     Point destination      = Point(front_wall_x + gate_3 + 0.5, 0);
     Point initial_position = Point(front_wall_x - 0.5, 0);
-    setBallState(BallState(Point(0, -0.6), Vector(0, 0)));
-    addFriendlyRobots(
-        TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position}));
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
+    BallState ball_state(Point(0, -0.6), Vector(0, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(front_wall_x, 0.0), Point(front_wall_x, 0.5), Point(front_wall_x, 1),
          Point(front_wall_x + gate_1, 0.0), Point(front_wall_x + gate_1, -0.5),
          Point(front_wall_x + gate_1, -1), Point(front_wall_x + gate_2, 0.0),
          Point(front_wall_x + gate_2, 0.5), Point(front_wall_x + gate_2, 1),
          Point(front_wall_x + gate_3, 0.0), Point(front_wall_x + gate_3, -0.5),
-         Point(front_wall_x + gate_3, -1)}));
+         Point(front_wall_x + gate_3, -1)});
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
@@ -208,7 +254,8 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_zig_zag_test)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(15));
 }
 
@@ -225,10 +272,10 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_oscillation)
      */
     Point destination      = Point(-2.5, -2.5);
     Point initial_position = Point(-3, 1.5);
-    setBallState(BallState(Point(0, 0), Vector(0, 0)));
-    addFriendlyRobots(
-        TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position}));
-    addEnemyRobots(TestUtil::createStationaryRobotStatesWithId({Point(1, 0)}));
+    BallState ball_state(Point(0, 0), Vector(0, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(1, 0)});
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
@@ -250,6 +297,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_oscillation)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(15));
 }

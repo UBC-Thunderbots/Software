@@ -5,3 +5,4 @@ matplotlib==3.3.3
 protobuf==3.6.1
 bokeh==2.2.3
 ipywidgets==7.6.2
+jupytext==1.11.2

@@ -93,6 +93,28 @@ std::vector<Point> rasterize(const Polygon &polygon, const double resolution_siz
     // https://stackoverflow.com/a/31768384
 
     std::vector<Point> contained_points;
+    const auto& polygon_vertices = polygon.getPoints();
+
+    auto max_point_y = [](const Point& a, const Point& b) {
+       return a.y() < b.y();
+    };
+    auto max_point_x = [](const Point& a, const Point& b) {
+       return a.x() < b.x();
+    };
+
+    // Calculate the highest and lowest x and y points
+    double max_y = std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)->y();
+    double min_y  = std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)->y();
+    double max_x = std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)->x();
+    double min_x  = std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)->x();
+
+    //loop through rows of the image (i.e. polygon)
+    for (double y_coord = min_y; y_coord < max_y; y_coord += resolution_size)
+    {
+        //we create a line that intersects the polygon at this y coordinate
+        Line intersecting_line = Line(Point(0, y_coord), Point (1, y_coord));
+    }
+
 //    std::vector<double> node_x;
 //    const auto& points = polygon.getPoints();
 //

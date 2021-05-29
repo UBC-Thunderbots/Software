@@ -4,7 +4,9 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/util/design_patterns/generic_factory.h"
 
-HaltTestPlay::HaltTestPlay(std::shared_ptr<const PlayConfig> config) : Play(config) {}
+HaltTestPlay::HaltTestPlay(std::shared_ptr<const PlayConfig> config) : Play(config, false)
+{
+}
 
 bool HaltTestPlay::isApplicable(const World &world) const
 {

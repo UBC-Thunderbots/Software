@@ -5,9 +5,8 @@
 #include "software/ai/evaluation/find_open_areas.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
-#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
+#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/logger/logger.h"
@@ -15,7 +14,7 @@
 #include "software/world/game_state.h"
 
 ShootOrChipPlay::ShootOrChipPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config), MIN_OPEN_ANGLE_FOR_SHOT(Angle::fromDegrees(4))
+    : Play(config, true), MIN_OPEN_ANGLE_FOR_SHOT(Angle::fromDegrees(4))
 {
 }
 
@@ -47,9 +46,6 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
      *   robot, it will chip to right in front of the robot in the largest open free area
      */
 
-    auto goalie_tactic =
-        std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig());
-
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
             play_config->getRobotNavigationObstacleConfig()),
@@ -74,7 +70,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     do
     {
-        PriorityTacticVector result = {{goalie_tactic}};
+        PriorityTacticVector result = {{}};
 
         // Update crease defenders
         std::get<0>(crease_defender_tactics)

@@ -36,6 +36,15 @@
      PC15-OSC32_OUT (OSC32_OUT)   ------> RCC_OSC32_OUT
      PH0-OSC_IN (PH0)   ------> RCC_OSC_IN
      PH1-OSC_OUT (PH1)   ------> RCC_OSC_OUT
+     PC8   ------> SDMMC1_D0
+     PC9   ------> SDMMC1_D1
+     PA13 (JTMS/SWDIO)   ------> DEBUG_JTMS-SWDIO
+     PA14 (JTCK/SWCLK)   ------> DEBUG_JTCK-SWCLK
+     PC10   ------> SDMMC1_D2
+     PC11   ------> SDMMC1_D3
+     PC12   ------> SDMMC1_CK
+     PD2   ------> SDMMC1_CMD
+     PB3 (JTDO/TRACESWO)   ------> DEBUG_JTDO-SWO
 */
 void MX_GPIO_Init(void)
 {
@@ -48,128 +57,148 @@ void MX_GPIO_Init(void)
     __HAL_RCC_GPIOH_CLK_ENABLE();
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
-    __HAL_RCC_GPIOD_CLK_ENABLE();
     __HAL_RCC_GPIOG_CLK_ENABLE();
+    __HAL_RCC_GPIOD_CLK_ENABLE();
 
     /*Configure GPIO pin Output Level */
     HAL_GPIO_WritePin(GPIOE,
-                      wheel_motor_back_right_esf_Pin | wheel_motor_front_right_reset_Pin |
-                          wheel_motor_front_right_coast_Pin,
+                      CHARGE_PWR_BRD_Pin | WHEEL_FRONT_RIGHT_FF1_Pin | IMU_INT1_Pin |
+                          USER_LED_2_Pin | USER_LED_3_Pin | WHEEL_BACK_RIGHT_DIR_Pin |
+                          WHEEL_BACK_RIGHT_FF1_Pin,
+                      GPIO_PIN_RESET);
+
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(IMU_INT2_GPIO_Port, IMU_INT2_Pin, GPIO_PIN_RESET);
+
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(GPIOF,
+                      WHEEL_FRONT_RIGHT_RESET_Pin | WHEEL_FRONT_RIGHT_FF2_Pin |
+                          RED_IN_RGB_Pin | BLUE_IN_RGB_Pin | GREEN_IN_RGB_Pin,
+                      GPIO_PIN_RESET);
+
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(WHEEL_BACK_RIGHT_RESET_GPIO_Port, WHEEL_BACK_RIGHT_RESET_Pin,
+                      GPIO_PIN_RESET);
+
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(GPIOD,
+                      DRIBBLER_RESET_Pin | WHEEL_FRONT_LEFT_MODE_Pin |
+                          WHEEL_FRONT_LEFT_DIR_Pin | DRIBBLER_FF1_Pin | DRIBBLER_FF2_Pin,
+                      GPIO_PIN_RESET);
+
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(GPIOG,
+                      WHEEL_FRONT_LEFT_RESET_Pin | WHEEL_FRONT_LEFT_FF1_Pin |
+                          WHEEL_FRONT_LEFT_FF2_Pin | WHEEL_BACK_LEFT_RESET_Pin |
+                          WHEEL_BACK_LEFT_FF1_Pin | WHEEL_BACK_LEFT_FF2_Pin |
+                          GENEVA_END_STOP_2_Pin | GENEVA_END_STOP_1_Pin | GENEVA_DIR_Pin,
                       GPIO_PIN_RESET);
 
     /*Configure GPIO pin Output Level */
     HAL_GPIO_WritePin(
-        GPIOF,
-        wheel_motor_front_right_mode_Pin | wheel_motor_front_right_direction_Pin |
-            wheel_motor_front_right_brake_Pin | wheel_motor_front_right_esf_Pin,
+        GPIOA, WHEEL_FRONT_RIGHT_DIR_Pin | DRIBBLER_DIR_Pin | WHEEL_BACK_LEFT_DIR_Pin,
         GPIO_PIN_RESET);
 
-    /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(
-        GPIOC, wheel_motor_back_right_coast_Pin | wheel_motor_back_left_direction_Pin,
-        GPIO_PIN_RESET);
-
-    /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(GPIOA,
-                      wheel_motor_back_right_brake_Pin |
-                          wheel_motor_back_right_reset_Pin |
-                          wheel_motor_back_right_direction_Pin,
-                      GPIO_PIN_RESET);
-
-    /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(
-        GPIOB,
-        wheel_motor_back_left_brake_Pin | wheel_motor_back_left_esf_Pin |
-            wheel_motor_front_left_esf_Pin | wheel_motor_back_left_reset_Pin |
-            wheel_motor_back_left_coast_Pin | LD3_Pin | wheel_motor_back_left_mode_Pin |
-            wheel_motor_front_left_reset_Pin | wheel_motor_front_left_coast_Pin |
-            wheel_motor_front_left_mode_Pin | LD2_Pin |
-            wheel_motor_front_left_direction_Pin | wheel_motor_front_left_brake_Pin,
-        GPIO_PIN_RESET);
-
-    /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(USB_PowerSwitchOn_GPIO_Port, USB_PowerSwitchOn_Pin, GPIO_PIN_RESET);
-
-    /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(GPIOD, ublox_reset_Pin | wheel_motor_back_right_mode_Pin,
-                      GPIO_PIN_RESET);
-
-    /*Configure GPIO pins : PEPin PEPin PEPin */
-    GPIO_InitStruct.Pin = wheel_motor_back_right_esf_Pin |
-                          wheel_motor_front_right_reset_Pin |
-                          wheel_motor_front_right_coast_Pin;
+    /*Configure GPIO pins : PEPin PEPin PEPin PEPin
+                             PEPin PEPin PEPin */
+    GPIO_InitStruct.Pin = CHARGE_PWR_BRD_Pin | WHEEL_FRONT_RIGHT_FF1_Pin | IMU_INT1_Pin |
+                          USER_LED_2_Pin | USER_LED_3_Pin | WHEEL_BACK_RIGHT_DIR_Pin |
+                          WHEEL_BACK_RIGHT_FF1_Pin;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-    /*Configure GPIO pin : PtPin */
-    GPIO_InitStruct.Pin  = USER_Btn_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(USER_Btn_GPIO_Port, &GPIO_InitStruct);
-
-    /*Configure GPIO pins : PFPin PFPin PFPin PFPin */
+    /*Configure GPIO pins : PEPin PEPin PEPin PEPin */
     GPIO_InitStruct.Pin =
-        wheel_motor_front_right_mode_Pin | wheel_motor_front_right_direction_Pin |
-        wheel_motor_front_right_brake_Pin | wheel_motor_front_right_esf_Pin;
+        FAULT_PWR_BRD_Pin | DONE_PWR_BRD_Pin | CH_SEL_3_Pin | CH_SEL_4_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+    /*Configure GPIO pin : PtPin */
+    GPIO_InitStruct.Pin   = IMU_INT2_Pin;
+    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull  = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(IMU_INT2_GPIO_Port, &GPIO_InitStruct);
+
+    /*Configure GPIO pins : PFPin PFPin PFPin PFPin
+                             PFPin */
+    GPIO_InitStruct.Pin = WHEEL_FRONT_RIGHT_RESET_Pin | WHEEL_FRONT_RIGHT_FF2_Pin |
+                          RED_IN_RGB_Pin | BLUE_IN_RGB_Pin | GREEN_IN_RGB_Pin;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
-    /*Configure GPIO pins : PCPin PCPin */
-    GPIO_InitStruct.Pin =
-        wheel_motor_back_right_coast_Pin | wheel_motor_back_left_direction_Pin;
+    /*Configure GPIO pin : PtPin */
+    GPIO_InitStruct.Pin   = WHEEL_BACK_RIGHT_RESET_Pin;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(WHEEL_BACK_RIGHT_RESET_GPIO_Port, &GPIO_InitStruct);
+
+    /*Configure GPIO pins : PGPin PGPin PGPin */
+    GPIO_InitStruct.Pin  = CH_SEL_1_Pin | CH_SEL_2_Pin | BREAKBEAM_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+
+    /*Configure GPIO pins : PDPin PDPin PDPin PDPin
+                             PDPin */
+    GPIO_InitStruct.Pin = WHEEL_BACK_RIGHT_FF2_Pin | ID_SEL_1_Pin | ID_SEL_3_Pin |
+                          ID_SEL_2_Pin | ID_SEL_4_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+    /*Configure GPIO pins : PDPin PDPin PDPin PDPin
+                             PDPin */
+    GPIO_InitStruct.Pin = DRIBBLER_RESET_Pin | WHEEL_FRONT_LEFT_MODE_Pin |
+                          WHEEL_FRONT_LEFT_DIR_Pin | DRIBBLER_FF1_Pin | DRIBBLER_FF2_Pin;
+    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull  = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+    /*Configure GPIO pins : PGPin PGPin PGPin PGPin
+                             PGPin PGPin PGPin PGPin
+                             PGPin */
+    GPIO_InitStruct.Pin = WHEEL_FRONT_LEFT_RESET_Pin | WHEEL_FRONT_LEFT_FF1_Pin |
+                          WHEEL_FRONT_LEFT_FF2_Pin | WHEEL_BACK_LEFT_RESET_Pin |
+                          WHEEL_BACK_LEFT_FF1_Pin | WHEEL_BACK_LEFT_FF2_Pin |
+                          GENEVA_END_STOP_2_Pin | GENEVA_END_STOP_1_Pin | GENEVA_DIR_Pin;
+    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull  = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+
+    /*Configure GPIO pins : PCPin PCPin PCPin PCPin
+                             PCPin */
+    GPIO_InitStruct.Pin =
+        SD_DAT0_Pin | SD_DAT1_Pin | SD_DAT2_Pin | SD_DAT3_Pin | SD_CLK_Pin;
+    GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull      = GPIO_NOPULL;
+    GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF12_SDIO1;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
     /*Configure GPIO pins : PAPin PAPin PAPin */
-    GPIO_InitStruct.Pin = wheel_motor_back_right_brake_Pin |
-                          wheel_motor_back_right_reset_Pin |
-                          wheel_motor_back_right_direction_Pin;
+    GPIO_InitStruct.Pin =
+        WHEEL_FRONT_RIGHT_DIR_Pin | DRIBBLER_DIR_Pin | WHEEL_BACK_LEFT_DIR_Pin;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    /*Configure GPIO pins : PBPin PBPin PBPin PBPin
-                             PBPin PBPin PBPin PBPin
-                             PBPin PBPin PBPin PBPin
-                             PBPin */
-    GPIO_InitStruct.Pin =
-        wheel_motor_back_left_brake_Pin | wheel_motor_back_left_esf_Pin |
-        wheel_motor_front_left_esf_Pin | wheel_motor_back_left_reset_Pin |
-        wheel_motor_back_left_coast_Pin | LD3_Pin | wheel_motor_back_left_mode_Pin |
-        wheel_motor_front_left_reset_Pin | wheel_motor_front_left_coast_Pin |
-        wheel_motor_front_left_mode_Pin | LD2_Pin | wheel_motor_front_left_direction_Pin |
-        wheel_motor_front_left_brake_Pin;
-    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull  = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
     /*Configure GPIO pin : PtPin */
-    GPIO_InitStruct.Pin   = USB_PowerSwitchOn_Pin;
-    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull  = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(USB_PowerSwitchOn_GPIO_Port, &GPIO_InitStruct);
-
-    /*Configure GPIO pin : PtPin */
-    GPIO_InitStruct.Pin  = USB_OverCurrent_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(USB_OverCurrent_GPIO_Port, &GPIO_InitStruct);
-
-    /*Configure GPIO pins : PDPin PDPin */
-    GPIO_InitStruct.Pin   = ublox_reset_Pin | wheel_motor_back_right_mode_Pin;
-    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull  = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+    GPIO_InitStruct.Pin       = SD_CMD_Pin;
+    GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull      = GPIO_NOPULL;
+    GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF12_SDIO1;
+    HAL_GPIO_Init(SD_CMD_GPIO_Port, &GPIO_InitStruct);
 }
 
 /* USER CODE BEGIN 2 */

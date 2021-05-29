@@ -237,7 +237,7 @@ new_git_repository(
 
 git_repository(
     name = "rules_python",
-    commit = "c8c79aae9aa1b61d199ad03d5fe06338febd0774",
+    commit = "6f37aa9966f53e063c41b7509a386d53a9f156c3",
     remote = "https://github.com/bazelbuild/rules_python.git",
     shallow_since = "1602800469 +1100",
 )
@@ -275,10 +275,6 @@ cc_library(
 )
 
 register_toolchains("//:py_toolchain")
-
-load("@rules_python//python:repositories.bzl", "py_repositories")
-
-py_repositories()
 
 load("@rules_python//python:pip.bzl", "pip_install")
 

@@ -97,7 +97,7 @@ TEST_F(NavigatingPrimitiveCreatorTest,
     testp2      = Point(0, 1);
     testp3      = Point(1, 2);
     final_speed = -2.2;
-    EXPECT_FALSE(
+    EXPECT_TRUE(
         isnormal(navigating_primitive_creator.calculateTransitionSpeedBetweenSegments(
             testp1, testp2, testp3, final_speed)));
 
@@ -106,7 +106,7 @@ TEST_F(NavigatingPrimitiveCreatorTest,
     testp2      = Point(2, 0);
     testp3      = Point(2, 0);
     final_speed = 2.2;
-    EXPECT_FALSE(
+    EXPECT_TRUE(
         isnormal(navigating_primitive_creator.calculateTransitionSpeedBetweenSegments(
             testp1, testp2, testp3, final_speed)));
 }

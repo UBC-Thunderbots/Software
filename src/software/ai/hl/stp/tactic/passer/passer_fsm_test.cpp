@@ -12,7 +12,7 @@ TEST(PasserFSMTest, test_transitions)
 
     PasserFSM::ControlParams control_params{.pass = std::make_optional<Pass>(pass)};
 
-    FSM<PasserFSM> fsm;
+    FSM<PasserFSM> fsm(DribbleFSM(std::make_shared<Point>()));
     EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
 
     // robot far from passer point

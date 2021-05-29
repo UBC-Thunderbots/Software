@@ -24,7 +24,7 @@ typedef struct MoveState
     PositionTrajectory_t position_trajectory;
 
     // The number of elements in the trajectory we're tracking
-    size_t num_trajectory_elems;
+    unsigned int num_trajectory_elems;
 
     // The start time of this primitive, in seconds
     float primitive_start_time_seconds;
@@ -138,7 +138,8 @@ static void app_move_primitive_tick(void* void_state_ptr, FirmwareWorld_t* world
     }
 
     app_firmware_robot_followPosTrajectory(robot, state->position_trajectory,
-                                           trajectory_index, state->max_speed_m_per_s);
+                                           state->num_trajectory_elems, trajectory_index,
+                                           state->max_speed_m_per_s);
 }
 
 /**

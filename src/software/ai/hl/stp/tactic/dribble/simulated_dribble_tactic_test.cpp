@@ -40,19 +40,21 @@ class SimulatedDribbleTacticTest : public SimulatedTacticTestFixture
         SimulatedTacticTestFixture::SetUp();
         setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION,
                               MotionConstraint::ENEMY_DEFENSE_AREA});
-        addEnemyRobots(TestUtil::createStationaryRobotStatesWithId(
-            {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field().enemyGoalCenter(),
-             field().enemyDefenseArea().negXNegYCorner(),
-             field().enemyDefenseArea().negXPosYCorner()}));
     }
+    Field field = Field::createSSLDivisionBField();
+    std::vector<RobotStateWithId> enemy_robots =
+        TestUtil::createStationaryRobotStatesWithId(
+            {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
+             field.enemyDefenseArea().negXNegYCorner(),
+             field.enemyDefenseArea().negXPosYCorner()});
 };
 
 TEST_F(SimulatedDribbleTacticTest, test_intercept_ball_behind_enemy_robot)
 {
     Point initial_position = Point(-3, 1.5);
-    setBallState(BallState(Point(3, -2), Vector(-0.5, 1)));
-    addFriendlyRobots(
-        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position}));
+    BallState ball_state(Point(3, -2), Vector(-0.5, 1));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
     auto tactic = std::make_shared<DribbleTactic>();
     setTactic(tactic);
@@ -66,16 +68,17 @@ TEST_F(SimulatedDribbleTacticTest, test_intercept_ball_behind_enemy_robot)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
 
 TEST_F(SimulatedDribbleTacticTest, test_stopped_ball)
 {
     Point initial_position = Point(-3, 1.5);
-    setBallState(BallState(Point(-1, 1.5), Vector(0, 0)));
-    addFriendlyRobots(
-        TestUtil::createStationaryRobotStatesWithId({Point(3, 3), initial_position}));
+    BallState ball_state(Point(-1, 1.5), Vector(0, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(3, 3), initial_position});
 
     auto tactic = std::make_shared<DribbleTactic>();
     setTactic(tactic);
@@ -89,16 +92,17 @@ TEST_F(SimulatedDribbleTacticTest, test_stopped_ball)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
 
 TEST_F(SimulatedDribbleTacticTest, test_ball_bounce_off_of_enemy_robot)
 {
     Point initial_position = Point(-3, 1.5);
-    setBallState(BallState(Point(0, 0), Vector(2.5, 0)));
-    addFriendlyRobots(
-        TestUtil::createStationaryRobotStatesWithId({Point(3, 3), initial_position}));
+    BallState ball_state(Point(0, 0), Vector(2.5, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(3, 3), initial_position});
 
     auto tactic = std::make_shared<DribbleTactic>();
     setTactic(tactic);
@@ -112,7 +116,8 @@ TEST_F(SimulatedDribbleTacticTest, test_ball_bounce_off_of_enemy_robot)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
 
@@ -120,9 +125,9 @@ TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_dest)
 {
     Point initial_position    = Point(-3, 1.5);
     Point dribble_destination = Point(-3, 1);
-    setBallState(BallState(Point(3, -2), Vector(-1, 2)));
-    addFriendlyRobots(
-        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position}));
+    BallState ball_state(Point(3, -2), Vector(-1, 2));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
     auto tactic = std::make_shared<DribbleTactic>();
     tactic->updateControlParams(dribble_destination, std::nullopt);
@@ -142,17 +147,18 @@ TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_dest)
             robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(15));
 }
 
 TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_orientation)
 {
     Point initial_position    = Point(-3, 1.5);
     Angle dribble_orientation = Angle::quarter();
-    setBallState(BallState(Point(3, -2), Vector(-1, 2)));
-    addFriendlyRobots(
-        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position}));
+    BallState ball_state(Point(3, -2), Vector(-1, 2));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
     auto tactic = std::make_shared<DribbleTactic>();
     tactic->updateControlParams(std::nullopt, dribble_orientation);
@@ -170,7 +176,8 @@ TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_orientation)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
 
@@ -179,9 +186,9 @@ TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_dest_and_orientation
     Point initial_position    = Point(-2, 1.5);
     Point dribble_destination = Point(-1, 2);
     Angle dribble_orientation = Angle::zero();
-    setBallState(BallState(Point(2, -2), Vector(1, 2)));
-    addFriendlyRobots(
-        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position}));
+    BallState ball_state(Point(2, -2), Vector(1, 2));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
     auto tactic = std::make_shared<DribbleTactic>();
     tactic->updateControlParams(dribble_destination, dribble_orientation);
@@ -203,22 +210,19 @@ TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_dest_and_orientation
             robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(15));
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(20));
 }
 
-// TODO (#2002): Re-enable this test once the dribbling robot is oriented forwards along
-// the dribbling path. The little kicks to prevent excessive dribbling is towards the
-// destination, which is causing the robot to lose control over the ball
-TEST_F(SimulatedDribbleTacticTest,
-       DISABLED_test_dribble_dest_and_orientation_around_rectangle)
+TEST_F(SimulatedDribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
 {
     Point initial_position    = Point(3, -3);
     Point dribble_destination = Point(4, 2.5);
     Angle dribble_orientation = Angle::half();
-    setBallState(BallState(Point(4, -2.5), Vector(0, 0)));
-    addFriendlyRobots(
-        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position}));
+    BallState ball_state(Point(4, -2.5), Vector(0, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
     auto tactic = std::make_shared<DribbleTactic>();
     tactic->updateControlParams(dribble_destination, dribble_orientation);
     setTactic(tactic);
@@ -239,8 +243,9 @@ TEST_F(SimulatedDribbleTacticTest,
             robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(15));
 }
 
 TEST_F(SimulatedDribbleTacticTest,
@@ -249,9 +254,9 @@ TEST_F(SimulatedDribbleTacticTest,
     Point initial_position    = Point(3, -3);
     Point dribble_destination = Point(4, 2.5);
     Angle dribble_orientation = Angle::half();
-    setBallState(BallState(Point(4, -2.5), Vector(0, 0)));
-    addFriendlyRobots(
-        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position}));
+    BallState ball_state(Point(4, -2.5), Vector(0, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
     auto tactic = std::make_shared<DribbleTactic>();
     tactic->updateControlParams(dribble_destination, dribble_orientation, true);
     setTactic(tactic);
@@ -269,7 +274,8 @@ TEST_F(SimulatedDribbleTacticTest,
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
 
@@ -278,13 +284,13 @@ TEST_F(SimulatedDribbleTacticTest, test_running_into_enemy_robot_knocking_ball_a
     Point initial_position    = Point(-2, 1.5);
     Point dribble_destination = Point(-1, 2);
     Angle dribble_orientation = Angle::half();
-    setBallState(BallState(Point(2, -2), Vector(1, 2)));
-    addFriendlyRobots(
-        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position}));
-    addEnemyRobots({RobotStateWithId{
+    BallState ball_state(Point(2, -2), Vector(1, 2));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
+    enemy_robots.emplace_back(RobotStateWithId{
         .id          = 7,
         .robot_state = RobotState(Point(1, 1.1), Vector(), Angle::fromDegrees(-30),
-                                  AngularVelocity::zero())}});
+                                  AngularVelocity::zero())});
 
     auto tactic = std::make_shared<DribbleTactic>();
     tactic->updateControlParams(dribble_destination, dribble_orientation);
@@ -308,6 +314,7 @@ TEST_F(SimulatedDribbleTacticTest, test_running_into_enemy_robot_knocking_ball_a
             robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
 
-    runTest(terminating_validation_functions, non_terminating_validation_functions,
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(20));
 }

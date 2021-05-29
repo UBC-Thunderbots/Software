@@ -1,27 +1,12 @@
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "cherry_pick_tactic",
-    srcs = ["cherry_pick_tactic.cpp"],
-    hdrs = ["cherry_pick_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/passing:pass",
-        "//software/geom/algorithms",
-        "//software/logger",
-        "//software/world",
-    ],
-)
-
 cc_test(
     name = "penalty_setup_tactic_test",
     srcs = ["penalty_setup_tactic_test.cpp"],
     deps = [
         ":penalty_setup_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -58,33 +43,8 @@ cc_test(
     srcs = ["defense_shadow_enemy_tactic_test.cpp"],
     deps = [
         ":defense_shadow_enemy_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "penalty_kick_tactic",
-    srcs = ["penalty_kick_tactic.cpp"],
-    hdrs = ["penalty_kick_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//software/ai/evaluation:calc_best_shot",
-        "//software/ai/hl/stp/action:kick_action",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/geom/algorithms",
-        "//software/logger",
-    ],
-)
-
-cc_test(
-    name = "penalty_kick_tactic_test",
-    srcs = ["penalty_kick_tactic_test.cpp"],
-    deps = [
-        ":penalty_kick_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -118,30 +78,6 @@ cc_library(
 )
 
 cc_library(
-    name = "shadow_enemy_tactic",
-    srcs = ["shadow_enemy_tactic.cpp"],
-    hdrs = ["shadow_enemy_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/action:stop_action",
-        "//software/logger",
-    ],
-)
-
-cc_test(
-    name = "shadow_enemy_tactic_test",
-    srcs = ["shadow_enemy_tactic_test.cpp"],
-    deps = [
-        ":shadow_enemy_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "shadow_free_kicker_tactic",
     srcs = ["shadow_free_kicker_tactic.cpp"],
     hdrs = ["shadow_free_kicker_tactic.h"],
@@ -161,8 +97,8 @@ cc_test(
     srcs = ["shadow_free_kicker_tactic_test.cpp"],
     deps = [
         ":shadow_free_kicker_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -188,8 +124,8 @@ cc_test(
     srcs = ["shoot_goal_tactic_test.cpp"],
     deps = [
         ":shoot_goal_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -197,13 +133,10 @@ cc_library(
     name = "all_tactics",
     hdrs = ["all_tactics.h"],
     deps = [
-        ":cherry_pick_tactic",
         ":defense_shadow_enemy_tactic",
         ":kickoff_chip_tactic",
-        ":penalty_kick_tactic",
         ":penalty_setup_tactic",
         ":receiver_tactic",
-        ":shadow_enemy_tactic",
         ":shadow_free_kicker_tactic",
         ":shoot_goal_tactic",
         ":tactic",
@@ -214,7 +147,10 @@ cc_library(
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/hl/stp/tactic/move_to_goal_line:move_to_goal_line_tactic",
         "//software/ai/hl/stp/tactic/passer:passer_tactic",
+        "//software/ai/hl/stp/tactic/penalty_kick:penalty_kick_tactic",
+        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
     ],
 )
@@ -243,9 +179,9 @@ cc_test(
     srcs = ["tactic_test.cpp"],
     deps = [
         ":tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -258,12 +194,12 @@ cc_library(
     ],
 )
 
-cc_library(
+cc_test(
     name = "transition_conditions_test",
     srcs = ["transition_conditions_test.cpp"],
     deps = [
         ":tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )

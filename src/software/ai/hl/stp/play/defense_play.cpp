@@ -6,8 +6,7 @@
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
-#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
-#include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
+#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/logger/logger.h"
@@ -15,7 +14,7 @@
 #include "software/world/game_state.h"
 #include "software/world/team.h"
 
-DefensePlay::DefensePlay(std::shared_ptr<const PlayConfig> config) : Play(config) {}
+DefensePlay::DefensePlay(std::shared_ptr<const PlayConfig> config) : Play(config, true) {}
 
 bool DefensePlay::isApplicable(const World &world) const
 {
@@ -31,12 +30,6 @@ bool DefensePlay::invariantHolds(const World &world) const
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
-    bool enemy_team_can_pass =
-        play_config->getEnemyCapabilityConfig()->getEnemyTeamCanPass()->value();
-
-    auto goalie_tactic =
-        std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig());
-
     auto shoot_goal_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
         Angle::fromDegrees(5), std::nullopt, true,
@@ -47,9 +40,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         3 * ROBOT_MAX_RADIUS_METERS, play_config->getDefenseShadowEnemyTacticConfig());
 
     std::shared_ptr<ShadowEnemyTactic> shadow_enemy_tactic =
-        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true, world.ball(), 0.5,
-                                            enemy_team_can_pass, false);
+        std::make_shared<ShadowEnemyTactic>();
 
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
@@ -72,7 +63,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
 
         shoot_goal_tactic->updateControlParams(std::nullopt);
 
-        PriorityTacticVector result = {{goalie_tactic, shoot_goal_tactic}};
+        PriorityTacticVector result = {{shoot_goal_tactic}};
 
         // Update crease defenders
         std::get<0>(crease_defender_tactics)
