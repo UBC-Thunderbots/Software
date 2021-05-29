@@ -14,7 +14,7 @@ AngleSegment::AngleSegment(Angle angle_top, Angle angle_bottom)
     {
         throw std::invalid_argument("angle_top is less than angle_bottom");
     }
-    
+
     this->angle_top_ = angle_top;
     this->angle_bottom_ = angle_bottom;
 }

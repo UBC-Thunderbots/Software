@@ -4,17 +4,19 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
                                        const std::vector<Robot> &robot_obstacles,
                                        TeamType goal, double radius)
 {
+    std::optional<AngleMap> angle_map;
+
     Angle pos_post_angle = (goal_post.getStart() - shot_origin).orientation();
     Angle neg_post_angle = (goal_post.getEnd() - shot_origin).orientation();
-
     size_t max_obstacle_size = robot_obstacles.size();
-    AngleMap angle_map = AngleMap(pos_post_angle, neg_post_angle, max_obstacle_size);
 
     std::vector<ObstacleAngleSegment> obstacles;
     obstacles.reserve(max_obstacle_size);
 
     if (goal == TeamType::ENEMY)
     {
+        angle_map = AngleMap(pos_post_angle, neg_post_angle, max_obstacle_size);
+
         for (const Robot &robot_obstacle : robot_obstacles)
         {
             Point enemy_robot_pos    = robot_obstacle.position();
@@ -31,26 +33,23 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
             Angle top_angle    = top_vec.orientation();
             Angle bottom_angle = bottom_vec.orientation();
 
-            if (bottom_angle > angle_map.getAngleSegment().getAngleTop() ||
-                top_angle < angle_map.getAngleSegment().getAngleBottom())
+            if (bottom_angle > angle_map->getAngleSegment().getAngleTop() ||
+                top_angle < angle_map->getAngleSegment().getAngleBottom())
             {
                 continue;
             }
 
             ObstacleAngleSegment non_viable_angle_seg =
                 ObstacleAngleSegment(top_angle, bottom_angle);
-            angle_map.addObstacleAngleSegment(non_viable_angle_seg);
+            angle_map->addObstacleAngleSegment(non_viable_angle_seg);
         }
     }
     else
     {
-        pos_post_angle = (goal_post.getStart() - shot_origin).orientation();
         if (pos_post_angle.toRadians() < 0)
         {
             pos_post_angle += Angle::fromRadians(2 * M_PI);
         }
-
-        neg_post_angle = (goal_post.getEnd() - shot_origin).orientation();
         if (neg_post_angle.toRadians() < 0)
         {
             neg_post_angle += Angle::fromRadians(2 * M_PI);
@@ -83,19 +82,19 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
                 bottom_angle += Angle::fromRadians(2 * M_PI);
             }
 
-            if (bottom_angle > angle_map.getAngleSegment().getAngleTop() ||
-                top_angle < angle_map.getAngleSegment().getAngleBottom())
+            if (bottom_angle > angle_map->getAngleSegment().getAngleTop() ||
+                top_angle < angle_map->getAngleSegment().getAngleBottom())
             {
                 continue;
             }
 
             ObstacleAngleSegment non_viable_angle_seg =
                 ObstacleAngleSegment(top_angle, bottom_angle);
-            angle_map.addObstacleAngleSegment(non_viable_angle_seg);
+            angle_map->addObstacleAngleSegment(non_viable_angle_seg);
         }
     }
 
-    AngleSegment biggest_angle_seg = angle_map.getBiggestViableAngleSegment();
+    AngleSegment biggest_angle_seg = angle_map->getBiggestViableAngleSegment();
     if (biggest_angle_seg.getDelta() == 0)
     {
         return std::nullopt;
