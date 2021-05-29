@@ -7,6 +7,13 @@ cc_library(
 )
 
 cc_library(
+    name = "angle_segment",
+    srcs = ["angle_segment.cpp"],
+    hdrs = ["angle_segment.h"],
+    deps = [":angle"],
+)
+
+cc_library(
     name = "segment",
     srcs = ["segment.cpp"],
     hdrs = ["segment.h"],

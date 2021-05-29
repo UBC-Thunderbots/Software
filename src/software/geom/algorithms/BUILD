@@ -14,7 +14,6 @@ cc_library(
         "furthest_point.cpp",
         "intersection.cpp",
         "intersects.cpp",
-        "multiple_segments.cpp",
         "voronoi_diagram.cpp",
     ],
     hdrs = [
@@ -29,7 +28,6 @@ cc_library(
         "furthest_point.h",
         "intersection.h",
         "intersects.h",
-        "multiple_segments.h",
         "voronoi_diagram.h",
     ],
     deps = [

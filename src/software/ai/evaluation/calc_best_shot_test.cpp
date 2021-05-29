@@ -349,7 +349,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_best_shot_bottom_seg
     ASSERT_TRUE(result);
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        result->getPointToShootAt(), Point(world.field().friendlyGoalCenter().x(), -0.1),
+        result->getPointToShootAt(), Point(world.field().friendlyGoalCenter().x(), -0.16),
         0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 40, 1);
 }
@@ -377,7 +377,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_best_shot_bottom_segmen
     ASSERT_TRUE(result);
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
-        result->getPointToShootAt(), Point(world.field().enemyGoalCenter().x(), -0.1),
+        result->getPointToShootAt(), Point(world.field().enemyGoalCenter().x(), -0.16),
         0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 40, 1);
 }
@@ -550,4 +550,70 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_positive_y_ball_placeme
         result->getPointToShootAt(), Point(world.field().enemyGoalCenter().x(), 0.24),
         0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 21, 1);
+}
+
+TEST(AngleMapTest, add_obstacle_angle_segment_takes_entire_angle_map)
+{
+    Angle top_angle = Angle::half();
+    Angle bottom_angle = Angle::zero();
+    AngleMap angle_map = AngleMap(top_angle, bottom_angle, 1);
+
+    ObstacleAngleSegment obstacle_angle_seg = ObstacleAngleSegment(top_angle, bottom_angle);
+    angle_map.addObstacleAngleSegment(obstacle_angle_seg);
+
+    EXPECT_EQ(0, angle_map.getBiggestViableAngleSegment().getDelta());
+}
+
+TEST(AngleMapTest, add_obstacle_angle_segment_takes_lower_half_angle_map)
+{
+    Angle top_angle = Angle::half();
+    Angle bottom_angle = Angle::zero();
+    AngleMap angle_map = AngleMap(top_angle, bottom_angle, 1);
+
+    ObstacleAngleSegment obstacle_angle_seg = ObstacleAngleSegment(Angle::quarter(), Angle::zero());
+    angle_map.addObstacleAngleSegment(obstacle_angle_seg);
+
+    EXPECT_EQ(90, angle_map.getBiggestViableAngleSegment().getDelta());
+}
+
+TEST(AngleMapTest, add_obstacle_angle_segment_takes_upper_half_angle_map)
+{
+    Angle top_angle = Angle::half();
+    Angle bottom_angle = Angle::zero();
+    AngleMap angle_map = AngleMap(top_angle, bottom_angle, 1);
+
+    ObstacleAngleSegment obstacle_angle_seg = ObstacleAngleSegment(Angle::half(), Angle::quarter());
+    angle_map.addObstacleAngleSegment(obstacle_angle_seg);
+
+    EXPECT_EQ(90, angle_map.getBiggestViableAngleSegment().getDelta());
+}
+
+TEST(AngleMapTest, add_obstacle_angle_segment_contained_within_another)
+{
+    Angle top_angle = Angle::half();
+    Angle bottom_angle = Angle::zero();
+    AngleMap angle_map = AngleMap(top_angle, bottom_angle, 1);
+
+    ObstacleAngleSegment obstacle_angle_seg = ObstacleAngleSegment(Angle::quarter(), Angle::zero());
+    angle_map.addObstacleAngleSegment(obstacle_angle_seg);
+
+    ObstacleAngleSegment overlapping_angle_seg = ObstacleAngleSegment(Angle::fromDegrees(45), Angle::zero());
+    angle_map.addObstacleAngleSegment(overlapping_angle_seg);
+
+    EXPECT_EQ(90, angle_map.getBiggestViableAngleSegment().getDelta());
+}
+
+TEST(AngleMapTest, add_obstacle_angle_segment_overlaps_with_another)
+{
+    Angle top_angle = Angle::half();
+    Angle bottom_angle = Angle::zero();
+    AngleMap angle_map = AngleMap(top_angle, bottom_angle, 1);
+
+    ObstacleAngleSegment obstacle_angle_seg = ObstacleAngleSegment(Angle::quarter(), Angle::zero());
+    angle_map.addObstacleAngleSegment(obstacle_angle_seg);
+
+    ObstacleAngleSegment overlapping_angle_seg = ObstacleAngleSegment(Angle::fromDegrees(135), Angle::fromDegrees(45));
+    angle_map.addObstacleAngleSegment(overlapping_angle_seg);
+
+    EXPECT_EQ(45, angle_map.getBiggestViableAngleSegment().getDelta());
 }
