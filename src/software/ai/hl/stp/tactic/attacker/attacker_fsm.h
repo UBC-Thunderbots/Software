@@ -115,10 +115,11 @@ struct AttackerFSM
                 // something is *a little bit* wrong if we make it here, though this is
                 // usually on the tick that this FSM is constructed.
                 // doing nothing for 1 tick is not that bad in the grand scheme of things
+                LOG(WARNING) << "No best pass provided to AttackerFSM! Standing still.";
                 control_params = {
                     .dribble_destination       = event.common.robot.position(),
                     .final_dribble_orientation = event.common.robot.orientation(),
-                    .allow_excessive_dribbling = true};
+                    .allow_excessive_dribbling = false};
             }
 
             processEvent(DribbleFSM::Update(control_params, event.common));
@@ -132,6 +133,7 @@ struct AttackerFSM
          *
          * @return if the ball should be kicked
          */
+        // TODO: revisit this, we shouldn't "panic chip" unless we're completely boxed in!
         const auto should_kick = [](auto event) {
             // check for enemy threat
             Circle about_to_steal_danger_zone(event.common.robot.position(),
