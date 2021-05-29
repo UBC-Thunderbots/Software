@@ -58,3 +58,18 @@ cc_test(
         "//software/world",
     ],
 )
+
+cc_test(
+    name = "simulated_attacker_tactic_keep_away_test",
+    srcs = ["simulated_attacker_tactic_keep_away_test.cpp"],
+    deps = [
+        ":attacker_tactic",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/simulated_tests:simulated_tactic_test_fixture",
+        "//software/simulated_tests/terminating_validation_functions",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/test_util",
+        "//software/time:duration",
+        "//software/world",
+    ],
+)

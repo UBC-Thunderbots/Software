@@ -8,8 +8,13 @@
 Point findKeepAwayTargetPoint(const Point& ball_possessor_position,
                               const Pass& best_pass_so_far, const World& world)
 {
+    // the theory of this keepaway point is that the below constant is essentially the
+    // "step size" and the robot should always move in a "descent direction" until
+    // the play determines that we can pass, or we reach a local optimum of the
+    // enemy risk function
+    // the below constant must be set such that this "optimization" "converges"
     static constexpr auto KEEPAWAY_SEARCH_CIRCLE_RADIUS = 0.3;
-    static constexpr auto CIRCLE_SIGMOID_WIDTH          = 0.1;
+    static constexpr auto SIGMOID_WIDTH                 = 0.1;
 
     // the default values for these passing parameters
     // TODO: cleanup passing parameters as part of #1987
@@ -27,7 +32,8 @@ Point findKeepAwayTargetPoint(const Point& ball_possessor_position,
         Pass pass(passer_pt, best_pass_so_far.receiverPoint(), best_pass_so_far.speed());
         return ratePassEnemyRisk(world.enemyTeam(), pass, ENEMY_REACTION_TIME,
                                  ENEMY_PROXIMITY_IMPORTANCE) *
-               circleSigmoid(keepaway_search_region, passer_pt, CIRCLE_SIGMOID_WIDTH);
+               circleSigmoid(keepaway_search_region, passer_pt, SIGMOID_WIDTH) *
+               rectangleSigmoid(world.field().fieldLines(), passer_pt, SIGMOID_WIDTH);
     };
     GradientDescentOptimizer<2> optimizer;
     auto passer_pt_array = optimizer.maximize(
