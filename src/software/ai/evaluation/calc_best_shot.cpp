@@ -102,27 +102,31 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
     }
 
     Angle top_angle = biggest_angle_seg.getAngleTop();
-    if (goal == TeamType::FRIENDLY) {
-        if (top_angle.toRadians() > M_PI) {
+    if (goal == TeamType::FRIENDLY)
+    {
+        if (top_angle.toRadians() > M_PI)
+        {
             top_angle -= Angle::fromRadians(2 * M_PI);
         }
     }
 
     Angle bottom_angle = biggest_angle_seg.getAngleBottom();
-    if (goal == TeamType::FRIENDLY) {
-        if (bottom_angle.toRadians() > M_PI) {
+    if (goal == TeamType::FRIENDLY)
+    {
+        if (bottom_angle.toRadians() > M_PI)
+        {
             bottom_angle -= Angle::fromRadians(2 * M_PI);
         }
     }
 
     Point top_point    = Point(goal_post.getStart().x(),
-                               (top_angle.sin() / top_angle.cos()) *
-                               (goal_post.getStart().x() - shot_origin.x()) +
-                               shot_origin.y());
+                            (top_angle.sin() / top_angle.cos()) *
+                                    (goal_post.getStart().x() - shot_origin.x()) +
+                                shot_origin.y());
     Point bottom_point = Point(goal_post.getStart().x(),
                                (bottom_angle.sin() / bottom_angle.cos()) *
-                               (goal_post.getStart().x() - shot_origin.x()) +
-                               shot_origin.y());
+                                       (goal_post.getStart().x() - shot_origin.x()) +
+                                   shot_origin.y());
 
     Point shot_point = (top_point - bottom_point) / 2 + bottom_point;
 

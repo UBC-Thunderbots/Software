@@ -67,7 +67,8 @@ class AngleMap
      * Constructs an AngleMap with a specified top angle, bottom angle, and max number of
      * possible occupied AngleSegments within this map
      *
-     * @param top_angle the top angle (most positive) of the AngleSegment this map occupies
+     * @param top_angle the top angle (most positive) of the AngleSegment this map
+     * occupies
      * @param bottom_angle the bottom angle (most negative) of the AngleSegment this map
      * occupies
      * @param max_num_obstacles the max number of possible occupied ObstacleAngleSegments
@@ -133,11 +134,11 @@ class AngleMap
     AngleSegment getBiggestViableAngleSegment()
     {
         ObstacleAngleSegment biggest_viable_angle_seg =
-                ObstacleAngleSegment(Angle::zero(), Angle::zero());
+            ObstacleAngleSegment(Angle::zero(), Angle::zero());
         if (this->taken_angle_segments.empty())
         {
             biggest_viable_angle_seg = ObstacleAngleSegment(
-                    this->angle_seg.getAngleTop(), this->angle_seg.getAngleBottom());
+                this->angle_seg.getAngleTop(), this->angle_seg.getAngleBottom());
             return biggest_viable_angle_seg;
         }
 
