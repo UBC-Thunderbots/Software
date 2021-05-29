@@ -18,8 +18,8 @@ namespace TestUtil
 {
     /**
      * Checks if two durations are within tolerance of each other
-     * Two durations are within tolerance of each other if they are within tolerance of
-     * each other
+     * Two durations are within tolerance of each other if the absolute duration
+     * difference is less than the tolerance duration
      *
      * @param duration1, duration2 Durations to compare
      * @param tolerance tolerance to check equality with, default is 1 microsecond (1/1000

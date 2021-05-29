@@ -41,10 +41,46 @@ typedef struct RobotConstants
     // The maximum jerk this robot may safely undergo [m/s^3]
     float jerk_limit;
 
-    // angle between each front wheel and the y axis of the robot
+    // The front_wheel_angle_deg and back_wheel_angle_deg are measured as absolute angle
+    // to each of the wheels from the front y axis of the robot. In the ASCII art below,
+    // front_wheel_angle_deg = A and back_wheel_angle_deg = A + B. The angles are assumed
+    // to be left/right symmetrical
+    //
+    //                        ▲
+    //                        │
+    //                        │
+    //                        │
+    //                        │
+    //                        │
+    //                        │
+    //                        │
+    //                        │
+    //                        │
+    //           *#### ### ###│### ### ####*
+    //        *##             │              ##*
+    //      *##               │                ##*   wheel
+    //    *##                 │                  ##*   │
+    //   *##                  │                xx##*◄──┘
+    //  *##                   │   A         xxx   ##*
+    // *##                    │         xxxx       ##*
+    // *##                    │    xxxx            ##*
+    // *##                    │xxxx                ##*
+    // *##                     xx       B          ##*
+    // *##                       xx                ##*
+    // *##                         xx              ##*
+    //  *##                          xx           ##*
+    //   *##                           xx        ##*
+    //    *##                            xx     ##*
+    //      *##                            x  ##*
+    //        *##                           ##*◄──┐
+    //           *##                     ##*      │
+    //              *##               ##*       wheel
+    //                 *** ### ### ***
+
+    // angle between each front wheel and the front y axis of the robot
     float front_wheel_angle_deg;
 
-    // angle between each back wheel and the y axis of the robot
+    // angle between each back wheel and the front y axis of the robot
     float back_wheel_angle_deg;
 
     // The total width of the entire flat face on the front of the robot
