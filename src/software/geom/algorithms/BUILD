@@ -53,7 +53,7 @@ cc_test(
     ],
     deps = [
         ":algorithms",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -64,9 +64,9 @@ cc_test(
     ],
     deps = [
         ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
         "//software/geom:rectangle",
         "//software/geom:triangle",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -77,9 +77,9 @@ cc_test(
     ],
     deps = [
         ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
         "//software/geom:rectangle",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -90,7 +90,7 @@ cc_test(
     ],
     deps = [
         ":algorithms",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -101,7 +101,7 @@ cc_test(
     ],
     deps = [
         ":algorithms",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -112,8 +112,8 @@ cc_test(
     ],
     deps = [
         ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -124,8 +124,8 @@ cc_test(
     ],
     deps = [
         ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
         "//software/geom:rectangle",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -136,8 +136,8 @@ cc_test(
     ],
     deps = [
         ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -148,8 +148,8 @@ cc_test(
     ],
     deps = [
         ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -158,7 +158,7 @@ cc_test(
     srcs = ["furthest_point_test.cpp"],
     deps = [
         ":algorithms",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -167,7 +167,7 @@ cc_test(
     srcs = ["calculate_block_cone_test.cpp"],
     deps = [
         ":algorithms",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -176,15 +176,6 @@ cc_test(
     srcs = ["acute_angle_test.cpp"],
     deps = [
         ":algorithms",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "multiple_segments_test",
-    srcs = ["multiple_segments_test.cpp"],
-    deps = [
-        ":algorithms",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )

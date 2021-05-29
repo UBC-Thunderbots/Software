@@ -45,8 +45,9 @@ bool contains(const Polygon& container, const Point& contained)
         double pjx                 = points[j].x();
         double pjy                 = points[j].y();
         bool p_within_edge_y_range = (piy > py) != (pjy > py);
+        // check for pjy == piy to shortcircuit division by zero
         bool p_in_half_plane_to_left_of_extended_edge =
-            (px < (pjx - pix) * (py - piy) / (pjy - piy) + pix);
+            (pjy == piy) || (px < (pjx - pix) * (py - piy) / (pjy - piy) + pix);
 
         if (p_within_edge_y_range && p_in_half_plane_to_left_of_extended_edge)
         {

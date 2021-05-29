@@ -345,6 +345,21 @@ Boost-ext SML is a library that supports complex functionality with similarly co
 * Avoid self transitions, i.e. `src_state + event [guard] / action = src_state`: self transitions call entry and exit conditions, which complicates the FSM. If we want a state to stay in the same state while performing an action, then we should use an internal transition, i.e. `src_state + event [guard] / action`.
 * Avoid orthogonal regions: Multiple FSMs running in parallel is hard to reason about and isn't necessary for implementing single robot behaviour. Thus, only prefix one state with an asterix (\*)
 * Use callbacks in _events_ to return information from the FSM: Since the SML library cannot directly return information, we need to return information through callbacks. For example, if we want to return a double from an FSM, we can pass in `std::function<void(double)> callback` as part of the event and then make the _action_ call that function with the value we want returned.
+* When a variable needs to be shared between multiple states or can be initialized upon construction of the FSM, then define a private member and constructor in the FSM struct, and pass that in when constructing the FSM. Here's a code snippet:
+```
+(drive_forward_fsm.h)
+DriveForwardFSM
+{
+   public:
+    DriveForwardFSM(double max_speed): max_speed(max_speed){}
+   private:
+    double max_speed;
+}
+(drive_forward_tactic.h)
+    FSM<DriveForwardFSM> fsm;
+(drive_forward_tactic.cpp: constructor)
+    fsm(DriveForwardFSM(10.0))
+```
 
 # Conventions
 Various conventions we use and follow that you need to know.

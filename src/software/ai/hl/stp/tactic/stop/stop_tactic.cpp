@@ -4,7 +4,7 @@
 
 #include "software/ai/hl/stp/action/stop_action.h"  // TODO (#1888): remove this dependency
 
-StopTactic::StopTactic(bool coast) : Tactic(true, {}), coast(coast) {}
+StopTactic::StopTactic(bool coast) : Tactic(true, {}), fsm(StopFSM(coast)) {}
 
 double StopTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
@@ -32,8 +32,7 @@ bool StopTactic::done() const
 
 void StopTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    fsm.process_event(
-        StopFSM::Update(StopFSM::ControlParams{.coast = coast}, tactic_update));
+    fsm.process_event(StopFSM::Update({}, tactic_update));
 }
 
 void StopTactic::accept(TacticVisitor &visitor) const

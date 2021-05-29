@@ -1,6 +1,7 @@
 #include "firmware/app/control/trajectory_planner_impl.h"
 
 #include <assert.h>
+#include <float.h>
 #include <math.h>
 
 #include "firmware/app/control/trajectory_planner.h"
@@ -22,7 +23,15 @@ void app_trajectory_planner_impl_getMaximumSpeedProfile(
         const float radius_of_curvature =
             shared_polynomial2d_getCurvatureAtPositionOrder3(path, current_t);
 
-        const float max_speed = sqrtf(max_allowable_acceleration * radius_of_curvature);
+        float max_speed = FLT_MAX;
+        if (max_allowable_acceleration <= 1)
+        {
+            max_speed = sqrtf(max_allowable_acceleration * radius_of_curvature);
+        }
+        else if (radius_of_curvature < FLT_MAX / max_allowable_acceleration)
+        {
+            max_speed = sqrtf(max_allowable_acceleration * radius_of_curvature);
+        }
 
         max_allowable_speed_profile[i] = fminf(max_speed, speed_cap);
     }
@@ -72,7 +81,7 @@ void app_trajectory_planner_impl_generate2dSegmentNodesAndLengths(
         t_start, t_end, path_2d.y, num_elements, y_values, y_lengths);
 
     // total length is the root sum-squared of the individual values
-    for (unsigned int i = 0; i < num_elements; i++)
+    for (unsigned int i = 0; i < num_elements - 1; i++)
     {
         segment_lengths[i] = sqrtf(powf(x_lengths[i], 2) + powf(y_lengths[i], 2));
     }
@@ -85,7 +94,7 @@ void app_trajectory_planner_impl_generatePositionTrajectoryTimeProfile(
 {
     // Calculate the time required to move between the first and last nodes of a
     // trajectory segment
-    for (unsigned int i = 0; i < num_elements; i++)
+    for (unsigned int i = 0; i < num_elements - 1; i++)
     {
         // Delta-time over the length of the segment
         float delta_time = 0;
@@ -188,7 +197,7 @@ app_trajectory_planner_impl_createForwardsContinuousSpeedProfile(
     {
         // 'i' represents the next speed, where [i-1] is the current speed
         const float speed        = speeds[i - 1];
-        const float displacement = segment_lengths[i - 1];
+        const float displacement = fabsf(segment_lengths[i - 1]);
 
         // Vf = sqrtf( Vi^2 + 2*constant_segment_length*max_acceleration)
         float temp_vel =
@@ -219,7 +228,7 @@ app_trajectory_planner_impl_modifySpeedsToBeBackwardsContinuous(
     {
         const float current_speed  = speeds[i];
         const float previous_speed = speeds[i - 1];
-        const float segment_length = segment_lengths[i - 1];
+        const float segment_length = fabsf(segment_lengths[i - 1]);
 
         float temp_speed = shared_physics_getFinalSpeed(current_speed, segment_length,
                                                         max_allowable_acceleration);
