@@ -11,6 +11,10 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
+/**
+ * Simulated tests for adhering to penalty kick rules as specified in link:
+ * https://robocup-ssl.github.io/ssl-rules/sslrules.html#_penalty_kick
+ * */
 class PenaltyKickEnemyPlayTest
     : public SimulatedPlayTestFixture,
       public ::testing::WithParamInterface<
@@ -30,7 +34,7 @@ TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
 
     // enemy robots behind the penalty mark
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({
-        Point(field.enemyPenaltyMark().x() + 0.3, 0),
+        Point(field.enemyPenaltyMark().x() + 0.3, 0),  // kicker robot
         Point(field.enemyPenaltyMark().x() + 1, 0),
         Point(field.enemyPenaltyMark().x() + 1, 4 * ROBOT_MAX_RADIUS_METERS),
         Point(field.enemyPenaltyMark().x() + 1, 8 * ROBOT_MAX_RADIUS_METERS),
@@ -41,21 +45,21 @@ TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(PenaltyKickEnemyPlay));
     setRefereeCommand(current_command, previous_command);
-    Polygon behind_ball =
+    Polygon behind_ball_region =
         Polygon({Point(field.enemyPenaltyMark().x() + 1, field.yLength() / 2),
                  Point(field.enemyPenaltyMark().x() + 1, -field.yLength() / 2),
                  Point(field.xLength() / 2, field.yLength() / 2),
                  Point(-field.xLength() / 2, -field.yLength() / 2)});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [behind_ball](std::shared_ptr<World> world_ptr,
-                      ValidationCoroutine::push_type& yield) {
+        [behind_ball_region](std::shared_ptr<World> world_ptr,
+                             ValidationCoroutine::push_type& yield) {
             robotAtOrientation(0, world_ptr, Angle::zero(), Angle::fromDegrees(5), yield);
             robotAtPosition(0, world_ptr, world_ptr->field().friendlyGoalCenter(), 0.05,
                             yield);
             for (unsigned int id = 1; id <= 5; id++)
             {
-                robotInPolygon(id, behind_ball, world_ptr, yield);
+                robotInPolygon(id, behind_ball_region, world_ptr, yield);
             }
         }};
 
