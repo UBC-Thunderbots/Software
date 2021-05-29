@@ -37,7 +37,9 @@ class PassGeneratorPlotter:
             line_width=[],
         )
 
-        for pass_and_rating_dict in passes:
+        top_three = 3
+
+        for pass_and_rating_dict in sorted(passes, key=lambda x: x["rating"]):
             the_pass = pass_and_rating_dict["pass"]
             rating = pass_and_rating_dict["rating"]
 
@@ -54,6 +56,10 @@ class PassGeneratorPlotter:
 
             # line width is 1 + pass_rating
             passes_dict["line_width"].append(1 + rating)
+
+            top_three -= 1
+            if top_three <= 0:
+                break
 
         self.passes_source.data.update(passes_dict)
 

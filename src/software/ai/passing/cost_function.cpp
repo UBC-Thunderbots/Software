@@ -33,8 +33,13 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double pass_speed_quality = sigmoid(pass.speed(), min_pass_speed, 0.2) *
                                 (1 - sigmoid(pass.speed(), max_pass_speed, 0.2));
 
-    return static_pass_quality * friendly_pass_rating * enemy_pass_rating *
-           shoot_pass_rating * pass_speed_quality * in_region_quality;
+    // Rate zones that are up the field higher to encourage progress up the field
+    double pass_up_field_rating = pass.receiverPoint().x() / world.field().xLength();
+
+    // We want to rate a pass more highly if it is lower risk, so subtract from 1
+    return 10 * friendly_pass_rating + pass_up_field_rating + pass_speed_quality +
+           shoot_pass_rating + enemy_pass_rating + in_region_quality +
+           static_pass_quality;
 }
 
 double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,
@@ -108,18 +113,6 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
     // the section of net we're shooting on approaches 100% (ie. completely open)
     double shot_openness_score = sigmoid(net_percent_open, 0.45, 0.95);
 
-    // Prefer angles where the robot does not have to turn much after receiving the
-    // pass to take the shot (or equivalently the shot deflection angle)
-    //
-    // Receiver robots on the friendly side, almost always, need to rotate a full 180
-    // degrees to shoot on net. So we relax that requirement for both receiver and ball
-    // locations on the friendly side
-    //
-    // TODO (#1987) This creates a very steep slope, find a better way to do this
-    if (pass.receiverPoint().x() < 0 || pass.passerPoint().x() < 0)
-    {
-        ideal_max_rotation_to_shoot_degrees = 180;
-    }
     Angle rotation_to_shot_target_after_pass = pass.receiverOrientation().minDiff(
         (shot_target - pass.receiverPoint()).orientation());
     double required_rotation_for_shot_score =

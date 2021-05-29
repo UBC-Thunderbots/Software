@@ -22,7 +22,7 @@ from software.python_bindings import world, passing, pass_generator
 import numpy as np
 
 wrapper_proto_log = ProtoLog(
-    "test_data/SensorFusion_SSL_WrapperPacket", SSL_WrapperPacket,
+    "thunderbots_vs_ultron_20min_replay/SensorFusion_SSL_WrapperPacket", SSL_WrapperPacket,
 )
 # -
 
@@ -40,6 +40,7 @@ output_notebook()
 
 fig = figure(plot_width=1000, plot_height=900, match_aspect=True)
 fig.background_fill_color = "lightgrey"
+fig.legend.click_policy = "hide"
 
 field_length = wrapper_proto_log[0].geometry.field.field_length / MM_PER_M
 field_width = wrapper_proto_log[0].geometry.field.field_width / MM_PER_M
@@ -48,13 +49,23 @@ heatmap_y_bounds = (-field_width / 2, field_width / 2)
 heatmap_grid_size = 0.05
 
 ssl_wrapper_plotter = SSLWrapperPlotter(fig)
+# -
+
+# # Heatmaps
+#
+# Our cost functions can be nicely visualizer as heat maps.
+
+# +
+heatmap_grid_size = 0.05
 
 rate_pass_heatmap_plotter = HeatmapPlotter(
     fig, heatmap_x_bounds, heatmap_y_bounds, heatmap_grid_size, "ratePass"
 )
+
 rate_pass_enemy_heatmap_plotter = HeatmapPlotter(
     fig, heatmap_x_bounds, heatmap_y_bounds, heatmap_grid_size, "ratePassEnemyRisk"
 )
+
 rate_pass_friendly_heatmap_plotter = HeatmapPlotter(
     fig,
     heatmap_x_bounds,
@@ -62,18 +73,27 @@ rate_pass_friendly_heatmap_plotter = HeatmapPlotter(
     heatmap_grid_size,
     "ratePassFriendlyCapability",
 )
+
 rate_pass_shoot_score_plotter = HeatmapPlotter(
     fig, heatmap_x_bounds, heatmap_y_bounds, heatmap_grid_size, "ratePassShootScore",
 )
+# -
 
+# # Filters
+#
+# Our games don't have a lot of action unfortunately, the following filters sift through the proto, and grab the indexes of the frames that change the most.
+#
+
+action_only_indexes = []
+frame_score = 0
+from tqdm import tqdm
+for log in tqdm(wrapper_proto_log):
+    new_score = log.detection
+    # TODO actually filter, this does nothing
+
+# +
 pass_generator_plotter = PassGeneratorPlotter(fig)
-
-fig.legend.click_policy = "hide"
-
-heatmap_grid_size = 0.05
-
 config = passing.getPassingConfig()
-
 
 def plot_ssl_wrapper_at_idx(idx):
     ssl_wrapper_plotter.plot_ssl_wrapper(wrapper_proto_log[idx])
@@ -114,6 +134,8 @@ def plot_ssl_wrapper_at_idx(idx):
     pass_generator_plotter.plot_zones(zones)
 
     passes = generator.getBestPassesForAllZones(the_world)
+    passes = generator.getBestPassesForAllZones(the_world)
+    
     pass_generator_plotter.plot_passes(passes)
 
     push_notebook()
@@ -123,3 +145,10 @@ show(fig, notebook_handle=True)
 
 slider = ipywidgets.IntSlider(min=0, max=len(wrapper_proto_log) - 1)
 ipywidgets.interact(plot_ssl_wrapper_at_idx, idx=slider)
+# -
+
+
+
+
+
+

@@ -9,6 +9,7 @@ NOTEBOOK_DEPS = [
     requirement("matplotlib"),
     requirement("bokeh"),
     requirement("ipywidgets"),
+    requirement("tqdm"),
     requirement("jupytext"),
     ":proto_log",
     ":sensor_proto_log",

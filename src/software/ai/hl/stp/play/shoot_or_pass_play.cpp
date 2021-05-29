@@ -85,9 +85,9 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
             false);
 
         auto pass_eval = pass_generator.generatePassEvaluation(world);
-
         auto ranked_zones = pass_eval.rankZonesForReceiving(
             world, best_pass_and_score_so_far.pass.receiverPoint());
+
         Zones cherry_pick_region_1 = {ranked_zones[0]};
         Zones cherry_pick_region_2 = {ranked_zones[1]};
 
@@ -96,13 +96,13 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
         auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
+
         cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
                                                   pass1.receiverOrientation(), 0.0,
                                                   MaxAllowedSpeedMode::PHYSICAL_LIMIT);
         cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
                                                   pass2.receiverOrientation(), 0.0,
                                                   MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-
 
         do
         {
@@ -152,6 +152,7 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
 
     auto pass_eval    = pass_generator.generatePassEvaluation(world);
     auto ranked_zones = pass_eval.rankZonesForReceiving(world, world.ball().position());
+
     Zones cherry_pick_region_1 = {ranked_zones[0]};
     Zones cherry_pick_region_2 = {ranked_zones[1]};
 
@@ -166,6 +167,7 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     // score of 1) and decreasing this threshold over time
     double min_pass_score_threshold        = 1.0;
     Timestamp pass_optimization_start_time = world.getMostRecentTimestamp();
+
     // This boolean indicates if we're ready to perform a pass
     bool ready_to_pass = false;
 
