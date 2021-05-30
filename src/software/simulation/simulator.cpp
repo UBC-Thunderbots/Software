@@ -25,6 +25,7 @@ Simulator::Simulator(const Field& field,
       frame_number(0),
       physics_time_step(physics_time_step)
 {
+    this->resetCurrentFirmwareTime();
 }
 
 void Simulator::setBallState(const BallState& ball_state)
