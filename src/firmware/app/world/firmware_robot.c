@@ -80,8 +80,7 @@ void plan_move_rotation(PhysBot* pb, float avel, RobotConstants_t robot_constant
     // orientation.
     pb->rot.vel   = 1.4f * pb->rot.disp / pb->rot.time;
     pb->rot.accel = (pb->rot.vel - avel) / TIME_HORIZON;
-    limit(&pb->rot.accel,
-          robot_constants.robot_max_ang_acceleration_rad_per_second_squared);
+    limit(&pb->rot.accel, robot_constants.robot_max_ang_acceleration_rad_per_s_2);
 }
 
 void force_wheels_followPosTrajectory(const FirmwareRobot_t* robot,

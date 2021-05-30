@@ -97,8 +97,8 @@ void InterceptBallAction::interceptFastBall(IntentCoroutine::push_type& yield)
             distance(intercept_position, ball.position()) / ball.velocity().length());
         Duration robot_time_to_pos = getTimeToPositionForRobot(
             robot->position(), intercept_position,
-            robot->robotConstants().robot_max_speed_meters_per_second,
-            robot->robotConstants().robot_max_acceleration_meters_per_second_squared);
+            robot->robotConstants().robot_max_speed_m_per_s,
+            robot->robotConstants().robot_max_acceleration_m_per_s_2);
 
         if (robot_time_to_pos < ball_time_to_position)
         {

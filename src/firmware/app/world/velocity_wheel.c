@@ -56,8 +56,8 @@ void app_velocity_wheel_brake(const VelocityWheel_t* wheel)
 
 void app_velocity_wheel_setTargetVelocity(VelocityWheel_t* wheel, float velocity_m_per_s)
 {
-    float rpm =
-        velocity_m_per_s * 60 / (2 * (float)M_PI * wheel->wheel_constants.wheel_radius);
+    float rpm = velocity_m_per_s * 60 /
+                (2 * (float)M_PI * wheel->wheel_constants.wheel_radius_meters);
     wheel->set_target_rpm(rpm);
 }
 

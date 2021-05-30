@@ -18,12 +18,12 @@ extern "C"
     WheelConstants_t create2015WheelConstants(void)
     {
         WheelConstants_t wheel_constants = {
-            .wheel_rotations_per_motor_rotation  = GEAR_RATIO,
-            .wheel_radius                        = WHEEL_RADIUS,
-            .motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT,
-            .motor_back_emf_per_rpm              = RPM_TO_VOLT,
-            .motor_phase_resistance              = WHEEL_MOTOR_PHASE_RESISTANCE,
-            .motor_current_per_unit_torque       = CURRENT_PER_TORQUE,
+            .wheel_rotations_per_motor_rotation        = GEAR_RATIO,
+            .wheel_radius_meters                       = WHEEL_RADIUS,
+            .motor_max_voltage_before_wheel_slip       = WHEEL_SLIP_VOLTAGE_LIMIT,
+            .motor_back_emf_per_rpm                    = RPM_TO_VOLT,
+            .motor_phase_resistance_ohm                = WHEEL_MOTOR_PHASE_RESISTANCE,
+            .motor_current_amp_per_torque_newton_meter = CURRENT_PER_TORQUE,
         };
 
         return wheel_constants;

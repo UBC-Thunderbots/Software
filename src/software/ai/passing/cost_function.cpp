@@ -269,8 +269,8 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
     // Figure out how long it would take our robot to get there
     Duration min_robot_travel_time = getTimeToPositionForRobot(
         best_receiver.position(), pass.receiverPoint(),
-        best_receiver.robotConstants().robot_max_speed_meters_per_second,
-        best_receiver.robotConstants().robot_max_acceleration_meters_per_second_squared);
+        best_receiver.robotConstants().robot_max_speed_m_per_s,
+        best_receiver.robotConstants().robot_max_acceleration_m_per_s_2);
     Timestamp earliest_time_to_receive_point =
         best_receiver.timestamp() + min_robot_travel_time;
 
@@ -278,8 +278,8 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
     Angle receive_angle = (pass.passerPoint() - best_receiver.position()).orientation();
     Duration time_to_receive_angle = getTimeToOrientationForRobot(
         best_receiver.orientation(), receive_angle,
-        best_receiver.robotConstants().robot_max_ang_speed_rad_per_second,
-        best_receiver.robotConstants().robot_max_ang_acceleration_rad_per_second_squared);
+        best_receiver.robotConstants().robot_max_ang_speed_rad_per_s,
+        best_receiver.robotConstants().robot_max_ang_acceleration_rad_per_s_2);
     Timestamp earliest_time_to_receive_angle =
         best_receiver.timestamp() + time_to_receive_angle;
 

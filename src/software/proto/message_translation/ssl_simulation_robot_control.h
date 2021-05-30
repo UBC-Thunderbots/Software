@@ -14,14 +14,14 @@
  * in degrees
  * @param back_wheel_angle_deg angle between each back wheel and the y axis of the robot
  * in degrees
- * @param wheel_radius The radius of the wheel in meters
+ * @param wheel_radius_meters The radius of the wheel in meters
  *
  * @return RobotMoveCommand proto
  */
 std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
     double wheel_rpm_front_right, double wheel_rpm_front_left, double wheel_rpm_back_left,
     double wheel_rpm_back_right, float front_wheel_angle_deg, float back_wheel_angle_deg,
-    float wheel_radius);
+    float wheel_radius_meters);
 
 /**
  * Creates a RobotCommand proto

@@ -62,21 +62,21 @@ extern "C"
     RobotConstants_t create2015RobotConstants(void)
     {
         RobotConstants_t robot_constants = {
-            .mass                               = ROBOT_WITH_BATTERY_MASS_KG,
-            .moment_of_inertia                  = INERTIA,
-            .jerk_limit                         = JERK_LIMIT,
-            .front_wheel_angle_deg              = FRONT_WHEEL_ANGLE_DEG,
-            .back_wheel_angle_deg               = BACK_WHEEL_ANGLE_DEG,
-            .front_of_robot_width_meters        = FRONT_OF_ROBOT_WIDTH_METERS,
-            .dribbler_width_meters              = DRIBBLER_WIDTH_METERS,
-            .robot_max_speed_meters_per_second  = ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            .robot_max_ang_speed_rad_per_second = ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            .robot_max_acceleration_meters_per_second_squared =
+            .mass                          = ROBOT_WITH_BATTERY_MASS_KG,
+            .moment_of_inertia_kg_m_2      = INERTIA,
+            .jerk_limit_kg_m_per_s_3       = JERK_LIMIT,
+            .front_wheel_angle_deg         = FRONT_WHEEL_ANGLE_DEG,
+            .back_wheel_angle_deg          = BACK_WHEEL_ANGLE_DEG,
+            .front_of_robot_width_meters   = FRONT_OF_ROBOT_WIDTH_METERS,
+            .dribbler_width_meters         = DRIBBLER_WIDTH_METERS,
+            .robot_max_speed_m_per_s       = ROBOT_MAX_SPEED_METERS_PER_SECOND,
+            .robot_max_ang_speed_rad_per_s = ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            .robot_max_acceleration_m_per_s_2 =
                 ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            .robot_max_ang_acceleration_rad_per_second_squared =
+            .robot_max_ang_acceleration_rad_per_s_2 =
                 ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED,
-            .indefinite_dribbler_speed = INDEFINITE_DRIBBLER_SPEED,
-            .max_force_dribbler_speed  = MAX_FORCE_DRIBBLER_SPEED};
+            .indefinite_dribbler_speed_rpm = INDEFINITE_DRIBBLER_SPEED,
+            .max_force_dribbler_speed_rpm  = MAX_FORCE_DRIBBLER_SPEED};
         return robot_constants;
     }
 

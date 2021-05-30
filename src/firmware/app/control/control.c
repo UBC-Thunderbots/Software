@@ -30,13 +30,13 @@ float app_control_getMaximalTorqueScaling(const ForceWheel_t* force_wheels[4],
         const ForceWheel_t* wheel        = force_wheels[i];
         const WheelConstants_t constants = app_force_wheel_getWheelConstants(wheel);
         float force                      = wheel_forces[i];
-        float motor_torque =
-            force * constants.wheel_radius * constants.wheel_rotations_per_motor_rotation;
+        float motor_torque               = force * constants.wheel_radius_meters *
+                             constants.wheel_rotations_per_motor_rotation;
         float curr_motor_rpm = app_force_wheel_getMotorSpeedRPM(wheel);
 
-        float resistive_voltage_loss = motor_torque *
-                                       constants.motor_current_per_unit_torque *
-                                       constants.motor_phase_resistance;
+        float resistive_voltage_loss =
+            motor_torque * constants.motor_current_amp_per_torque_newton_meter *
+            constants.motor_phase_resistance_ohm;
         float back_emf          = curr_motor_rpm * constants.motor_back_emf_per_rpm;
         float effective_voltage = fabsf(resistive_voltage_loss + back_emf);
 
@@ -84,7 +84,7 @@ float app_control_getMaximalAccelScaling(const RobotConstants_t robot_constants,
     float normed_force[3];
     normed_force[0] = linear_accel_x * robot_constants.mass;
     normed_force[1] = linear_accel_y * robot_constants.mass;
-    normed_force[2] = angular_accel * robot_constants.moment_of_inertia /
+    normed_force[2] = angular_accel * robot_constants.moment_of_inertia_kg_m_2 /
                       (float)ROBOT_MAX_RADIUS_METERS;
 
     float wheel_forces[4];
@@ -130,10 +130,11 @@ void app_control_applyAccel(RobotConstants_t robot_constants,
     float linear_diff_y = linear_accel_y - prev_linear_accel_y;
     float angular_diff  = angular_accel - prev_angular_accel;
 
-    const float jerk_limit                       = robot_constants.jerk_limit;
-    const float linear_acceleration_change_limit = robot_constants.jerk_limit * TICK_TIME;
+    const float jerk_limit_kg_m_per_s_3 = robot_constants.jerk_limit_kg_m_per_s_3;
+    const float linear_acceleration_change_limit =
+        robot_constants.jerk_limit_kg_m_per_s_3 * TICK_TIME;
     const float angular_acceleration_change_limit =
-        jerk_limit / (float)ROBOT_MAX_RADIUS_METERS * TICK_TIME * 5.0f;
+        jerk_limit_kg_m_per_s_3 / (float)ROBOT_MAX_RADIUS_METERS * TICK_TIME * 5.0f;
     limit(&linear_diff_x, linear_acceleration_change_limit);
     limit(&linear_diff_y, linear_acceleration_change_limit);
     limit(&angular_diff, angular_acceleration_change_limit);
@@ -150,7 +151,7 @@ void app_control_applyAccel(RobotConstants_t robot_constants,
     robot_force[0] = linear_accel_x * robot_constants.mass;
     robot_force[1] = linear_accel_y * robot_constants.mass;
     // input is angular acceleration so mass * Radius * radians/second^2 gives newtons
-    robot_force[2] = angular_accel * robot_constants.moment_of_inertia /
+    robot_force[2] = angular_accel * robot_constants.moment_of_inertia_kg_m_2 /
                      (float)ROBOT_MAX_RADIUS_METERS;
     float wheel_force[4];
     // Convert to wheel coordinate system

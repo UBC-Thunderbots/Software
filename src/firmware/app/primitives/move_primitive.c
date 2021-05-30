@@ -76,7 +76,7 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
     RobotConstants_t robot_constants = app_firmware_robot_getRobotConstants(robot);
 
     float max_speed_m_per_s = prim_msg.max_speed_m_per_s;
-    clamp(&max_speed_m_per_s, 0, robot_constants.robot_max_speed_meters_per_second);
+    clamp(&max_speed_m_per_s, 0, robot_constants.robot_max_speed_m_per_s);
 
     const float current_x           = app_firmware_robot_getPositionX(robot);
     const float current_y           = app_firmware_robot_getPositionY(robot);
@@ -106,11 +106,11 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
         .t_end               = 1.0f,
         .num_elements        = 10,
         .max_allowable_linear_acceleration =
-            robot_constants.robot_max_acceleration_meters_per_second_squared,
+            robot_constants.robot_max_acceleration_m_per_s_2,
         .max_allowable_linear_speed = max_speed_m_per_s,
         .max_allowable_angular_acceleration =
-            robot_constants.robot_max_ang_acceleration_rad_per_second_squared,
-        .max_allowable_angular_speed = robot_constants.robot_max_ang_speed_rad_per_second,
+            robot_constants.robot_max_ang_acceleration_rad_per_s_2,
+        .max_allowable_angular_speed = robot_constants.robot_max_ang_speed_rad_per_s,
         .initial_linear_speed        = current_speed,
         .final_linear_speed          = speed_at_dest_m_per_s};
     state->num_trajectory_elems = path_parameters.num_elements;

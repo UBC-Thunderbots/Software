@@ -116,7 +116,7 @@ void PhysicsSimulatorRobot::kick(float speed_m_per_s)
             ball->applyImpulse(robot_orientation_vector.normalize(
                 ball_head_on_momentum.length() *
                 (1 - (static_cast<float>(dribbler_rpm) /
-                      robot->robotConstants().max_force_dribbler_speed) /
+                      robot->robotConstants().max_force_dribbler_speed_rpm) /
                          2)));
             ball->applyImpulse(kick_impulse);
             ball->setInitialKickSpeed(speed_m_per_s);
@@ -424,9 +424,9 @@ void PhysicsSimulatorRobot::applyDribblerForce(PhysicsRobot *physics_robot,
     double perp_force_magnitude = 0.5 * std::pow(perp_dist_cm, 2);
     physics_ball->applyForce(perp_force.normalize(perp_force_magnitude));
 
-    double head_on_magnitude = sigmoid(head_on_dist_cm, 0.15, 0.2) * dribbler_rpm /
-                               physics_robot->robotConstants().max_force_dribbler_speed /
-                               20;
+    double head_on_magnitude =
+        sigmoid(head_on_dist_cm, 0.15, 0.2) * dribbler_rpm /
+        physics_robot->robotConstants().max_force_dribbler_speed_rpm / 20;
     physics_ball->applyForce(head_on_force.normalize(head_on_magnitude));
 
     // Counteract the force pushing the ball into the robot so there is approximately 0

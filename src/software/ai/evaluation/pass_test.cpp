@@ -71,15 +71,14 @@ TEST_F(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity)
 
     double distance_to_dest = (robot_location - dest).length();
 
-    double acceleration_time =
-        robot_constants.robot_max_speed_meters_per_second /
-        robot_constants.robot_max_acceleration_meters_per_second_squared;
+    double acceleration_time = robot_constants.robot_max_speed_m_per_s /
+                               robot_constants.robot_max_acceleration_m_per_s_2;
     // x = v*t + 1/2*a*t^2, v = initial velocity = 0
-    double acceleration_distance =
-        0.5 * robot_constants.robot_max_acceleration_meters_per_second_squared *
-        std::pow(acceleration_time, 2);
+    double acceleration_distance = 0.5 *
+                                   robot_constants.robot_max_acceleration_m_per_s_2 *
+                                   std::pow(acceleration_time, 2);
     double time_at_max_vel = (distance_to_dest - 2 * acceleration_distance) /
-                             robot_constants.robot_max_speed_meters_per_second;
+                             robot_constants.robot_max_speed_m_per_s;
 
     double travel_time = 2 * acceleration_time + time_at_max_vel;
 
@@ -106,15 +105,14 @@ TEST_F(PassingEvaluationTest,
 
     double distance_to_dest = (robot_location - first_point_in_tolerance).length();
 
-    double acceleration_time =
-        robot_constants.robot_max_speed_meters_per_second /
-        robot_constants.robot_max_acceleration_meters_per_second_squared;
+    double acceleration_time = robot_constants.robot_max_speed_m_per_s /
+                               robot_constants.robot_max_acceleration_m_per_s_2;
     // x = v*t + 1/2*a*t^2, v = initial velocity = 0
-    double acceleration_distance =
-        0.5 * robot_constants.robot_max_acceleration_meters_per_second_squared *
-        std::pow(acceleration_time, 2);
+    double acceleration_distance = 0.5 *
+                                   robot_constants.robot_max_acceleration_m_per_s_2 *
+                                   std::pow(acceleration_time, 2);
     double time_at_max_vel = (distance_to_dest - 2 * acceleration_distance) /
-                             robot_constants.robot_max_speed_meters_per_second;
+                             robot_constants.robot_max_speed_m_per_s;
 
     double travel_time = 2 * acceleration_time + time_at_max_vel;
 

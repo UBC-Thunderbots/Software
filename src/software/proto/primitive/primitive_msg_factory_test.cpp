@@ -38,10 +38,10 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive)
     EXPECT_EQ(move_primitive->move().final_angle().radians(),
               static_cast<float>(Angle::threeQuarter().toRadians()));
     EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(),
-              robot_constants.indefinite_dribbler_speed);
+              robot_constants.indefinite_dribbler_speed_rpm);
     EXPECT_FALSE(move_primitive->move().has_auto_chip_or_kick());
     EXPECT_EQ(move_primitive->move().max_speed_m_per_s(),
-              robot_constants.robot_max_speed_meters_per_second);
+              robot_constants.robot_max_speed_m_per_s);
     EXPECT_EQ(move_primitive->move().target_spin_rev_per_s(), 5);
 }
 
@@ -59,11 +59,11 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autochip)
     EXPECT_EQ(move_primitive->move().final_angle().radians(),
               static_cast<float>(Angle::threeQuarter().toRadians()));
     EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(),
-              robot_constants.indefinite_dribbler_speed);
+              robot_constants.indefinite_dribbler_speed_rpm);
     ASSERT_TRUE(move_primitive->move().has_auto_chip_or_kick());
     EXPECT_EQ(move_primitive->move().auto_chip_or_kick().autochip_distance_meters(), 2.5);
     EXPECT_EQ(move_primitive->move().max_speed_m_per_s(),
-              robot_constants.robot_max_speed_meters_per_second);
+              robot_constants.robot_max_speed_m_per_s);
     EXPECT_EQ(move_primitive->move().target_spin_rev_per_s(), 0.0f);
 }
 
@@ -81,7 +81,7 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
     EXPECT_EQ(move_primitive->move().final_angle().radians(),
               static_cast<float>(Angle::threeQuarter().toRadians()));
     EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(),
-              robot_constants.indefinite_dribbler_speed);
+              robot_constants.indefinite_dribbler_speed_rpm);
     ASSERT_TRUE(move_primitive->move().has_auto_chip_or_kick());
     EXPECT_EQ(move_primitive->move().auto_chip_or_kick().autokick_speed_m_per_s(), 3.5);
     EXPECT_EQ(move_primitive->move().max_speed_m_per_s(),

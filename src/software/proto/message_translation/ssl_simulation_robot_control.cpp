@@ -7,28 +7,28 @@ extern "C"
 #include "firmware/shared/physics.h"
 }
 
-// Converts rpm and wheel_radius [m] to speed [m/s]
-float rpm_to_m_per_s(float rpm, float wheel_radius)
+// Converts rpm and wheel_radius_meters [m] to speed [m/s]
+float rpm_to_m_per_s(float rpm, float wheel_radius_meters)
 {
-    return (2 * (float)M_PI * rpm * wheel_radius) / 60.0f;
+    return (2 * (float)M_PI * rpm * wheel_radius_meters) / 60.0f;
 }
 
 std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
     double wheel_rpm_front_right, double wheel_rpm_front_left, double wheel_rpm_back_left,
     double wheel_rpm_back_right, float front_wheel_angle_deg, float back_wheel_angle_deg,
-    float wheel_radius)
+    float wheel_radius_meters)
 {
     auto move_local_velocity = SSLSimulationProto::MoveLocalVelocity();
 
     // Convert the units of wheel speeds to m/s
     float front_left_m_per_s =
-        rpm_to_m_per_s(static_cast<float>(wheel_rpm_front_left), wheel_radius);
+        rpm_to_m_per_s(static_cast<float>(wheel_rpm_front_left), wheel_radius_meters);
     float back_left_m_per_s =
-        rpm_to_m_per_s(static_cast<float>(wheel_rpm_back_left), wheel_radius);
+        rpm_to_m_per_s(static_cast<float>(wheel_rpm_back_left), wheel_radius_meters);
     float back_right_m_per_s =
-        rpm_to_m_per_s(static_cast<float>(wheel_rpm_back_right), wheel_radius);
+        rpm_to_m_per_s(static_cast<float>(wheel_rpm_back_right), wheel_radius_meters);
     float front_right_m_per_s =
-        rpm_to_m_per_s(static_cast<float>(wheel_rpm_front_right), wheel_radius);
+        rpm_to_m_per_s(static_cast<float>(wheel_rpm_front_right), wheel_radius_meters);
     float wheel_speeds[4]{front_left_m_per_s, back_left_m_per_s, back_right_m_per_s,
                           front_right_m_per_s};
     float robot_local_speed[3]{0.0, 0.0, 0.0};

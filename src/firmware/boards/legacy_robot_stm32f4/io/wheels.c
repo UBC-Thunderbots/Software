@@ -220,10 +220,10 @@ void wheels_tick(log_record_t *log)
                     wheels[i].power / 255.0f * adc_battery() -
                     encoder_speed(i) * WHEELS_VOLTS_PER_ENCODER_COUNT;
                 float current = applied_delta_voltage /
-                                (wheels[i].wheel_constants.motor_phase_resistance +
+                                (wheels[i].wheel_constants.motor_phase_resistance_ohm +
                                  SWITCH_RESISTANCE);
-                float power =
-                    current * current * wheels[i].wheel_constants.motor_phase_resistance;
+                float power = current * current *
+                              wheels[i].wheel_constants.motor_phase_resistance_ohm;
                 added_energy = power / CONTROL_LOOP_HZ;
                 break;
 
@@ -306,11 +306,13 @@ void apply_wheel_force(int wheel_index, float force_in_newtons)
 {
     float battery = adc_battery();
 
-    float torque = force_in_newtons * wheels[wheel_index].wheel_constants.wheel_radius *
+    float torque = force_in_newtons *
+                   wheels[wheel_index].wheel_constants.wheel_radius_meters *
                    wheels[wheel_index].wheel_constants.wheel_rotations_per_motor_rotation;
     float voltage =
-        torque * wheels[wheel_index].wheel_constants.motor_current_per_unit_torque *
-        wheels[wheel_index].wheel_constants.motor_phase_resistance;  // delta voltage
+        torque *
+        wheels[wheel_index].wheel_constants.motor_current_amp_per_torque_newton_meter *
+        wheels[wheel_index].wheel_constants.motor_phase_resistance_ohm;  // delta voltage
     float back_emf = (float)encoder_speed(wheel_index) * QUARTERDEGREE_TO_RPM *
                      wheels[wheel_index].wheel_constants.motor_back_emf_per_rpm;
     wheels_drive(wheel_index, (voltage + back_emf) / battery * 255);

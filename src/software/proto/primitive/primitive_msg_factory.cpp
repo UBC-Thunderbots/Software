@@ -67,9 +67,9 @@ double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode,
     switch (dribbler_mode)
     {
         case DribblerMode::INDEFINITE:
-            return robot_constants.indefinite_dribbler_speed;
+            return robot_constants.indefinite_dribbler_speed_rpm;
         case DribblerMode::MAX_FORCE:
-            return robot_constants.max_force_dribbler_speed;
+            return robot_constants.max_force_dribbler_speed_rpm;
         case DribblerMode::OFF:
             return 0.0;
         default:
@@ -84,7 +84,7 @@ double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
     switch (max_allowed_speed_mode)
     {
         case MaxAllowedSpeedMode::PHYSICAL_LIMIT:
-            return robot_constants.robot_max_speed_meters_per_second;
+            return robot_constants.robot_max_speed_m_per_s;
         case MaxAllowedSpeedMode::STOP_COMMAND:
             return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND;
         case MaxAllowedSpeedMode::TIPTOE:

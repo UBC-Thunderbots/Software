@@ -756,7 +756,7 @@ TEST_F(ForceWheelSimulatorRobotSingletonTest, test_dribble_ball_while_moving_bac
     Dribbler_t* dribbler = app_firmware_robot_getDribbler(firmware_robot.get());
     // We use max force dribbler speed
     app_dribbler_setSpeed(
-        dribbler, static_cast<uint32_t>(robot_constants.max_force_dribbler_speed));
+        dribbler, static_cast<uint32_t>(robot_constants.max_force_dribbler_speed_rpm));
 
     // Simulate for 2 seconds
     for (unsigned int i = 0; i < 120; i++)
@@ -785,7 +785,7 @@ TEST_F(ForceWheelSimulatorRobotSingletonTest, test_losing_ball_while_zipping_bac
     Dribbler_t* dribbler = app_firmware_robot_getDribbler(firmware_robot.get());
     // We use max force dribbler speed
     app_dribbler_setSpeed(
-        dribbler, static_cast<uint32_t>(robot_constants.max_force_dribbler_speed));
+        dribbler, static_cast<uint32_t>(robot_constants.max_force_dribbler_speed_rpm));
 
     // Simulate for 2 seconds
     for (unsigned int i = 0; i < 120; i++)
@@ -836,7 +836,8 @@ TEST_F(ForceWheelSimulatorRobotSingletonTest,
     Dribbler_t* dribbler = app_firmware_robot_getDribbler(firmware_robot.get());
     // We use an arbitrarily large number here for speed
     app_dribbler_setSpeed(
-        dribbler, static_cast<uint32_t>(1.5 * robot_constants.max_force_dribbler_speed));
+        dribbler,
+        static_cast<uint32_t>(1.5 * robot_constants.max_force_dribbler_speed_rpm));
 
     // Simulate for 0.5 second so the ball makes contact with the dribbler
     for (unsigned int i = 0; i < 30; i++)

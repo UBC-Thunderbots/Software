@@ -40,7 +40,7 @@ TEST_F(PrimitiveGoogleToNanoPbConverterTest, convert_move_primitive)
                   .autochip_distance_meters,
               2.5);
     EXPECT_EQ(nanopb_primitive.primitive.move.max_speed_m_per_s,
-              robot_constants.robot_max_speed_meters_per_second);
+              robot_constants.robot_max_speed_m_per_s);
 }
 
 TEST_F(PrimitiveGoogleToNanoPbConverterTest, convert_primitive_set)

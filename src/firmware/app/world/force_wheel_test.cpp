@@ -14,12 +14,13 @@ class WheelTest : public testing::Test
         brake_called          = true;
         coast_called          = true;
 
-        WheelConstants_t wheel_constants = {.motor_current_per_unit_torque       = 1.1f,
-                                            .motor_phase_resistance              = 1.2f,
-                                            .motor_back_emf_per_rpm              = 1.3f,
-                                            .motor_max_voltage_before_wheel_slip = 1.4f,
-                                            .wheel_radius                        = 1.5f,
-                                            .wheel_rotations_per_motor_rotation  = 0.5f};
+        WheelConstants_t wheel_constants = {
+            .motor_current_amp_per_torque_newton_meter = 1.1f,
+            .motor_phase_resistance_ohm                = 1.2f,
+            .motor_back_emf_per_rpm                    = 1.3f,
+            .motor_max_voltage_before_wheel_slip       = 1.4f,
+            .wheel_radius_meters                       = 1.5f,
+            .wheel_rotations_per_motor_rotation        = 0.5f};
 
         wheel =
             app_force_wheel_create(&(this->request_wheel_force), &(this->get_motor_speed),
@@ -95,10 +96,10 @@ TEST_F(WheelTest, getWheelConstants)
 {
     WheelConstants_t constants = app_force_wheel_getWheelConstants(wheel);
 
-    EXPECT_NEAR(1.1, constants.motor_current_per_unit_torque, 1e-4);
-    EXPECT_NEAR(1.2, constants.motor_phase_resistance, 1e-4);
+    EXPECT_NEAR(1.1, constants.motor_current_amp_per_torque_newton_meter, 1e-4);
+    EXPECT_NEAR(1.2, constants.motor_phase_resistance_ohm, 1e-4);
     EXPECT_NEAR(1.3, constants.motor_back_emf_per_rpm, 1e-4);
     EXPECT_NEAR(1.4, constants.motor_max_voltage_before_wheel_slip, 1e-4);
-    EXPECT_NEAR(1.5, constants.wheel_radius, 1e-4);
+    EXPECT_NEAR(1.5, constants.wheel_radius_meters, 1e-4);
     EXPECT_NEAR(0.5, constants.wheel_rotations_per_motor_rotation, 1e-4);
 }
