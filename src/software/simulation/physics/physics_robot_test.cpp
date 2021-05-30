@@ -5,7 +5,6 @@
 #include <math.h>
 
 #include "shared/2015_robot_constants.h"
-#include "shared/2015_wheel_constants.h"
 #include "shared/constants.h"
 #include "software/simulation/physics/box2d_util.h"
 #include "software/simulation/physics/physics_ball.h"

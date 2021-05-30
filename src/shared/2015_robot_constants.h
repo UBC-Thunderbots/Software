@@ -14,6 +14,13 @@ extern "C"
      */
     RobotConstants_t create2015RobotConstants(void);
 
+    /**
+     * Creates wheel constants for the 2015 robot
+     *
+     * @return wheel constants for the 2015 robot
+     */
+    WheelConstants_t create2015WheelConstants(void);
+
 #ifdef __cplusplus
 }
 #endif

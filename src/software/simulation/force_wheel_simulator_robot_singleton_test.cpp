@@ -5,7 +5,6 @@
 #include <cmath>
 
 #include "shared/2015_robot_constants.h"
-#include "shared/2015_wheel_constants.h"
 #include "shared/proto/robot_log_msg.nanopb.h"
 #include "shared/proto/robot_log_msg.pb.h"
 #include "software/simulation/physics/physics_world.h"

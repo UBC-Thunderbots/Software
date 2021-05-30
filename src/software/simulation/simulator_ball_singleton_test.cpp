@@ -5,7 +5,6 @@
 #include <cmath>
 
 #include "shared/2015_robot_constants.h"
-#include "shared/2015_wheel_constants.h"
 #include "software/simulation/physics/physics_world.h"
 #include "software/simulation/physics_simulator_ball.h"
 #include "software/simulation/simulator_ball.h"

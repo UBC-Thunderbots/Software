@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 
 #include "shared/2015_robot_constants.h"
-#include "shared/2015_wheel_constants.h"
 #include "software/test_util/test_util.h"
 #include "software/world/field.h"
 

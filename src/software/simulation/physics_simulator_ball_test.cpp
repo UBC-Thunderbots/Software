@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 
 #include "shared/2015_robot_constants.h"
-#include "shared/2015_wheel_constants.h"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/physics/physics_world.h"
 #include "software/test_util/test_util.h"

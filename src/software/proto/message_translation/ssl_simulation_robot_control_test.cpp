@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "shared/2015_wheel_constants.h"
+#include "shared/2015_robot_constants.h"
 
 class SSLSimulationProtoTest : public ::testing::Test
 {

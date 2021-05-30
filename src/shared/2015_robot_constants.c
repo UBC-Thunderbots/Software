@@ -37,6 +37,21 @@ extern "C"
         return robot_constants;
     }
 
+    WheelConstants_t create2015WheelConstants(void)
+    {
+        static WheelConstants_t wheel_constants = {
+            .wheel_rotations_per_motor_rotation  = 0.5143f,
+            .wheel_radius_meters                 = 0.0254f,
+            .motor_max_voltage_before_wheel_slip = 4.25f,
+            .motor_back_emf_per_rpm              = (1.0f / 374.0f),
+            .motor_phase_resistance_ohm          = 1.2f,  // ohms—EC45 datasheet
+            .motor_current_amp_per_torque_newton_meter =
+                39.21f,  // from motor data sheet (1/25.5 mNm)
+        };
+
+        return wheel_constants;
+    }
+
 #ifdef __cplusplus
 }
 #endif

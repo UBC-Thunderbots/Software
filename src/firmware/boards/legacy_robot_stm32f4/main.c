@@ -60,7 +60,6 @@
 #include "io/wheels.h"
 #include "priority.h"
 #include "shared/2015_robot_constants.h"
-#include "shared/2015_wheel_constants.h"
 #include "tick.h"
 #include "time.h"
 #include "upgrade/dfu.h"
