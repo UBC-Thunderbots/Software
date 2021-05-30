@@ -36,7 +36,8 @@ int main(int argc, char** argv)
     std::cout << BANNER << std::endl;
 
     // load command line arguments
-    auto args           = std::make_shared<FullSystemMainCommandLineArgs>();
+    auto arduinoConfig = std::make_shared<ArduinoConfig>();
+    auto args           = std::make_shared<FullSystemMainCommandLineArgs>(arduinoConfig);
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
     LoggerSingleton::initializeLogger(args->getLoggingDir()->value());
@@ -56,18 +57,16 @@ int main(int argc, char** argv)
                 ->setValue(args->getInterface()->value());
         }
 
-        // set Arduino port if given, otherwise try to find programmatically
-        if (!args->getArduinoDevicePort()->value().empty())
+        // override arduino port or try to find programmatically
+        if (!args->getArduinoConfig()->getPort()->value().empty())
         {
             mutable_thunderbots_config->getMutableArduinoConfig()
-                ->getMutableArduinoPort()
-                ->setValue(args->getArduinoDevicePort()->value());
-        }
-        else
-        {
+                    ->getMutablePort()
+                    ->setValue(args->getArduinoConfig()->getPort()->value());
+        } else{
             mutable_thunderbots_config->getMutableArduinoConfig()
-                ->getMutableArduinoPort()
-                ->setValue(ArduinoUtil::getArduinoPort().value_or(""));
+                    ->getMutablePort()
+                    ->setValue(ArduinoUtil::getArduinoPort().value_or("hi"));
         }
 
         if (args->getBackend()->value().empty())
