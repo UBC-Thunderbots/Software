@@ -102,10 +102,12 @@ class SimulatorBallSingleton
      * calling the given function. If the simulator_ball is invalid, a warning is logged
      * and a default value is returned.
      *
+     * @tparam RET_VAL the return value of the function to execute
      * @param func The function to perform on the simulator ball
      */
-    template <class T>
-    static T checkValidAndExecute(std::function<T(std::shared_ptr<SimulatorBall>)> func)
+    template <class RET_VAL>
+    static RET_VAL checkValidAndExecute(
+        std::function<RET_VAL(std::shared_ptr<SimulatorBall>)> func)
     {
         if (simulator_ball)
         {
@@ -114,7 +116,7 @@ class SimulatorBallSingleton
         LOG(WARNING)
             << "SimulatorBallSingleton called without setting the SimulatorBall first"
             << std::endl;
-        return static_cast<T>(0);
+        return static_cast<RET_VAL>(0);
     }
 
     /**

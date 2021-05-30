@@ -249,25 +249,25 @@ AngularVelocity PhysicsRobot::angularVelocity() const
 
 void PhysicsRobot::applyWheelForceFrontLeft(double force_in_newtons)
 {
-    Angle angle_to_wheel = Angle::fromDegrees(ANGLE_TO_ROBOT_FRONT_WHEELS_DEG);
+    Angle angle_to_wheel = Angle::fromDegrees(robot_constants.front_wheel_angle_deg);
     applyWheelForceAtAngle(angle_to_wheel, force_in_newtons);
 }
 
 void PhysicsRobot::applyWheelForceBackLeft(double force_in_newtons)
 {
-    Angle angle_to_wheel = Angle::fromDegrees(ANGLE_TO_ROBOT_BACK_WHEELS_DEG);
+    Angle angle_to_wheel = Angle::fromDegrees(robot_constants.back_wheel_angle_deg);
     applyWheelForceAtAngle(angle_to_wheel, force_in_newtons);
 }
 
 void PhysicsRobot::applyWheelForceBackRight(double force_in_newtons)
 {
-    Angle angle_to_wheel = Angle::fromDegrees(-ANGLE_TO_ROBOT_BACK_WHEELS_DEG);
+    Angle angle_to_wheel = Angle::fromDegrees(-robot_constants.back_wheel_angle_deg);
     applyWheelForceAtAngle(angle_to_wheel, force_in_newtons);
 }
 
 void PhysicsRobot::applyWheelForceFrontRight(double force_in_newtons)
 {
-    Angle angle_to_wheel = Angle::fromDegrees(-ANGLE_TO_ROBOT_FRONT_WHEELS_DEG);
+    Angle angle_to_wheel = Angle::fromDegrees(-robot_constants.front_wheel_angle_deg);
     applyWheelForceAtAngle(angle_to_wheel, force_in_newtons);
 }
 

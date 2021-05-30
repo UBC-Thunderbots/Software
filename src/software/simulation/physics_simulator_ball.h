@@ -31,11 +31,12 @@ class PhysicsSimulatorBall : public SimulatorBall
      * before calling the given function. If the physics_ball is invalid, a warning is
      * logged and a default value is returned;
      *
+     * @tparam RET_VAL the return value of the function to execute
      * @param func The function to perform on the physics ball
      */
-    template <class T>
-    T checkValidAndExecute(
-        std::function<T(const std::shared_ptr<PhysicsBall>)> func) const
+    template <class RET_VAL>
+    RET_VAL checkValidAndExecute(
+        std::function<RET_VAL(const std::shared_ptr<PhysicsBall>)> func) const
     {
         if (auto ball = physics_ball.lock())
         {
@@ -43,7 +44,7 @@ class PhysicsSimulatorBall : public SimulatorBall
         }
         LOG(WARNING) << "PhysicsSimulatorBall being used with invalid PhysicsBall"
                      << std::endl;
-        return T();
+        return RET_VAL();
     }
 
     std::weak_ptr<PhysicsBall> physics_ball;

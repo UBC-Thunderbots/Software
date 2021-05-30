@@ -718,8 +718,8 @@ TEST_F(PhysicsRobotTest, test_get_motor_speeds_when_robot_moving_along_wheel_axi
 
     // Move along the axis of the front-left wheel. This means the front-left wheel is
     // perpendicular to the direction of motion, and we don't expect it to be spinning
-    Vector robot_velocity =
-        Vector::createFromAngle(Angle::fromDegrees(ANGLE_TO_ROBOT_FRONT_WHEELS_DEG));
+    Vector robot_velocity = Vector::createFromAngle(
+        Angle::fromDegrees(robot_constants.front_wheel_angle_deg));
     RobotState initial_robot_state(Point(0, 0), robot_velocity, Angle::fromDegrees(0),
                                    AngularVelocity::zero());
     PhysicsRobot physics_robot(0, world, initial_robot_state, robot_constants,

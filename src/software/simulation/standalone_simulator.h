@@ -131,7 +131,7 @@ class StandaloneSimulator
     /**
      * Returns the robot constants for this robot state
      *
-     * @return the robot constants for this robot
+     * @return the robot constants for all robots in this simulator
      */
     const RobotConstants_t& getRobotConstants() const;
 

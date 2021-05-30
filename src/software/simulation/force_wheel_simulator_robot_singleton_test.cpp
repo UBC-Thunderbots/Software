@@ -1196,8 +1196,8 @@ TEST_F(ForceWheelSimulatorRobotSingletonTest,
 {
     // Move along the axis of the front-left wheel. This means the front-left wheel is
     // perpendicular to the direction of motion, and we don't expect it to be spinning
-    Vector robot_velocity =
-        Vector::createFromAngle(Angle::fromDegrees(ANGLE_TO_ROBOT_FRONT_WHEELS_DEG));
+    Vector robot_velocity = Vector::createFromAngle(
+        Angle::fromDegrees(robot_constants.front_wheel_angle_deg));
     Robot robot(0, Point(0, 0), robot_velocity, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
     // Put the ball very far away so it does not interfere

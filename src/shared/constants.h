@@ -52,27 +52,6 @@ static const double SECONDS_PER_MICROSECOND      = 1.0 / 1000000.0;
 static const double SECONDS_PER_MILLISECOND      = 1.0 / 1000.0;
 static const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
 
-static const double POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS = 10;
-
-/** absolute angle to each of the front wheels as
- * measured from the front of the robots in degrees
- * For 3rd generation robot 2015 CAD model
- * Last updated: Feb 3, 2018
- *
- * FW = ANGLE_TO_ROBOT_FRONT_WHEELS_DEG
- * BW = ANGLE_TO_ROBOT_BACK_WHEELS_DEG
- *
- * /-------------\
- * |FW    |   -FW|
- * |             |
- * |             |
- * |BW    |   -BW|
- * \-------------/
- */
-static const double ANGLE_TO_ROBOT_FRONT_WHEELS_DEG = 57.945;
-static const double ANGLE_TO_ROBOT_BACK_WHEELS_DEG  = 136.04;
-
-
 // Networking
 // the IPv6 multicast address, only ff02 is important, the rest is random
 // see https://en.wikipedia.org/wiki/Solicited-node_multicast_address for why ff02 matters
