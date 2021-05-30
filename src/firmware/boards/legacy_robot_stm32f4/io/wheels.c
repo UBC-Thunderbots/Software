@@ -14,6 +14,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "../../../shared/2015_wheel_constants.h"
 #include "io/adc.h"
 #include "io/encoder.h"
 #include "io/hall.h"
@@ -42,16 +43,6 @@
      THERMAL_CAPACITANCE)  // joules
 
 #define SWITCH_RESISTANCE 0.6f  // ohms—L6234 datasheet
-
-// Some of these are duplicated from 2015_wheel_constants.h since using those values
-// directly is too much effort for this legacy robot and build system
-#define CONTROL_LOOP_HZ 200U
-#define WHEEL_MOTOR_PHASE_RESISTANCE 1.2f  // ohms—EC45 datasheet
-#define RPM_TO_VOLT (1.0f / 374.0f)        // motor RPM to back EMF
-#define QUARTERDEGREE_TO_VOLT (QUARTERDEGREE_TO_RPM * RPM_TO_VOLT)
-#define CURRENT_PER_TORQUE 39.21f  // from motor data sheet (1/25.5 mNm)
-#define GEAR_RATIO 0.5143f         // define as speed multiplication from motor to wheel
-#define WHEEL_RADIUS 0.0254f
 
 /**
  * \brief The possible modes a wheel can be in.
@@ -93,6 +84,12 @@ typedef struct
      * \brief The most recent PWM value provided by a movement primitive.
      */
     int power;
+
+    /**
+     * \brief The wheel constants for this wheel
+     */
+    WheelConstants_t wheel_constants;
+
 } wheels_wheel_t;
 
 /**
@@ -107,8 +104,9 @@ void wheels_init(void)
 {
     for (unsigned int i = 0; i != WHEELS_NUM_WHEELS; ++i)
     {
-        wheels[i].energy = 0.0f;
-        wheels[i].mode   = WHEELS_MODE_COAST;
+        wheels[i].energy          = 0.0f;
+        wheels[i].mode            = WHEELS_MODE_COAST;
+        wheels[i].wheel_constants = create2015WheelConstants();
     }
 }
 
@@ -222,8 +220,10 @@ void wheels_tick(log_record_t *log)
                     wheels[i].power / 255.0f * adc_battery() -
                     encoder_speed(i) * WHEELS_VOLTS_PER_ENCODER_COUNT;
                 float current = applied_delta_voltage /
-                                (WHEEL_MOTOR_PHASE_RESISTANCE + SWITCH_RESISTANCE);
-                float power  = current * current * WHEEL_MOTOR_PHASE_RESISTANCE;
+                                (wheels[i].wheel_constants.motor_phase_resistance +
+                                 SWITCH_RESISTANCE);
+                float power =
+                    current * current * wheels[i].wheel_constants.motor_phase_resistance;
                 added_energy = power / CONTROL_LOOP_HZ;
                 break;
 
@@ -306,10 +306,13 @@ void apply_wheel_force(int wheel_index, float force_in_newtons)
 {
     float battery = adc_battery();
 
-    float torque = force_in_newtons * WHEEL_RADIUS * GEAR_RATIO;
+    float torque = force_in_newtons * wheels[wheel_index].wheel_constants.wheel_radius *
+                   wheels[wheel_index].wheel_constants.wheel_rotations_per_motor_rotation;
     float voltage =
-        torque * CURRENT_PER_TORQUE * WHEEL_MOTOR_PHASE_RESISTANCE;  // delta voltage
-    float back_emf = (float)encoder_speed(wheel_index) * QUARTERDEGREE_TO_VOLT;
+        torque * wheels[wheel_index].wheel_constants.motor_current_per_unit_torque *
+        wheels[wheel_index].wheel_constants.motor_phase_resistance;  // delta voltage
+    float back_emf = (float)encoder_speed(wheel_index) * QUARTERDEGREE_TO_RPM *
+                     wheels[wheel_index].wheel_constants.motor_back_emf_per_rpm;
     wheels_drive(wheel_index, (voltage + back_emf) / battery * 255);
 }
 
