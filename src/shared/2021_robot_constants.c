@@ -45,22 +45,15 @@ extern "C"
 
     WheelConstants_t create2021WheelConstants(void)
     {
+        // Motor constants from https://www.maxongroup.com/maxon/view/product/651611
         static WheelConstants_t wheel_constants = {
+            .wheel_rotations_per_motor_rotation = 17.0f / 60.0f,
+            .wheel_radius_meters                = 0.03f,
             // TODO (#2112): update this
-            .wheel_rotations_per_motor_rotation = 0.5143f,
-            // TODO (#2112): update this
-            .wheel_radius_meters = 0.0254f,
-            // TODO (#2112): update this
-            .motor_max_voltage_before_wheel_slip = 4.25f,
-            // TODO (#2112): update this
-            .motor_back_emf_per_rpm = (1.0f / 374.0f),
-            // TODO (#2112): update this
-            .motor_phase_resistance_ohm = 1.2f,  // ohms—EC45 datasheet
-
-            // TODO (#2112): update this
-            .motor_current_amp_per_torque_newton_meter =
-                39.21f,  // from motor data sheet (1/25.5 mNm)
-        };
+            .motor_max_voltage_before_wheel_slip       = 4.25f,
+            .motor_back_emf_per_rpm                    = 1.0f / 265.0f,
+            .motor_phase_resistance_ohm                = 0.942f,
+            .motor_current_amp_per_torque_newton_meter = 1000.0f / 36.0f};
 
         return wheel_constants;
     }
