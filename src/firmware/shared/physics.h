@@ -20,16 +20,17 @@
 #define STEEL_INTERTIAL_FACTOR 0.3858f
 
 /**
- * Transformation matricies to convert speeds in the
- * two different domains commonly used by the robot
+ * Convert a set of given wheel speeds into linear x,y, and angular rotation speed or vice
+ * versa. All arguments are unitless, i.e. the same units in and out, and don't depend on
+ * the wheel radius (i.e. angular speed)
  *
  * @param [in] speed4 which is the listing of wheel speeds
  * @param [out] speed3 which is a speed in x,y,rotation in
  * robot relative coordinates
- * @param front_wheel_angle_deg angle between each front wheel and the y axis of the robot
- * in degrees
- * @param back_wheel_angle_deg angle between each back wheel and the y axis of the robot
- * in degrees
+ * @param front_wheel_angle_deg absolute angle between each front wheel and the y axis of
+ * the robot in degrees
+ * @param back_wheel_angle_deg absolute angle between each back wheel and the y axis of
+ * the robot in degrees
  */
 void shared_physics_speed4ToSpeed3(const float speed4[4], float speed3[3],
                                    float front_wheel_angle_deg,
@@ -39,8 +40,9 @@ void shared_physics_speed3ToSpeed4(const float speed3[3], float speed4[4],
                                    float back_wheel_angle_deg);
 
 /**
- * Transformation matricies to convert speeds in the two different domains commonly used
- * by the robot
+ * Convert a set of given wheel speeds into linear x,y, and angular rotation speeds. All
+ * arguments are unitless, i.e. the same units in and out, and don't depend on the wheel
+ * radius (i.e. angular speed)
  *
  * NOTE: this legacy conversion function is deprecated and  assumes that the angles are
  * 55deg (front) and 45deg (back). Please use shared_physics_speed4ToSpeed3 instead
@@ -52,16 +54,17 @@ void shared_physics_speed3ToSpeed4(const float speed3[3], float speed4[4],
 void shared_physics_legacySpeed4ToSpeed3(const float speed4[4], float speed3[3]);
 
 /**
- * Transformation matricies to convert forces in the
- * two different domains commonly used by the robot
+ * Convert linear x,y, and angular rotation forces into a set of given wheel forces. All
+ * arguments are unitless, i.e. the same units in and out, and don't depend on the wheel
+ * radius (i.e. angular force)
  *
  * @param [in] force4 which is the listing of wheel forces
  * @param [out] force3 which is a force in x,y,rotation in
  * robot relative coordinates
  * @param front_wheel_angle_deg absolute angle between each front wheel and the y axis of
- * the robot in radians
+ * the robot in degrees
  * @param back_wheel_angle_deg absolute angle between each back wheel and the y axis of
- * the robot in radians
+ * the robot in degrees
  */
 void shared_physics_force3ToForce4(float force3[3], float force4[4],
                                    float front_wheel_angle_deg,
