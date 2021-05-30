@@ -82,8 +82,8 @@ float app_control_getMaximalAccelScaling(const RobotConstants_t robot_constants,
     // first convert accelerations into consistent units
     // choose units of Force (N)
     float normed_force[3];
-    normed_force[0] = linear_accel_x * robot_constants.mass;
-    normed_force[1] = linear_accel_y * robot_constants.mass;
+    normed_force[0] = linear_accel_x * robot_constants.mass_kg;
+    normed_force[1] = linear_accel_y * robot_constants.mass_kg;
     normed_force[2] = angular_accel * robot_constants.moment_of_inertia_kg_m_2 /
                       (float)ROBOT_MAX_RADIUS_METERS;
 
@@ -148,8 +148,8 @@ void app_control_applyAccel(RobotConstants_t robot_constants,
     controller_state->last_applied_acceleration_angular = angular_accel;
 
     float robot_force[3];
-    robot_force[0] = linear_accel_x * robot_constants.mass;
-    robot_force[1] = linear_accel_y * robot_constants.mass;
+    robot_force[0] = linear_accel_x * robot_constants.mass_kg;
+    robot_force[1] = linear_accel_y * robot_constants.mass_kg;
     // input is angular acceleration so mass * Radius * radians/second^2 gives newtons
     robot_force[2] = angular_accel * robot_constants.moment_of_inertia_kg_m_2 /
                      (float)ROBOT_MAX_RADIUS_METERS;

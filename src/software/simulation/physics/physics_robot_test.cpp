@@ -25,7 +25,7 @@ class PhysicsRobotTest : public testing::Test
    protected:
     virtual void SetUp()
     {
-        robot_constants.mass = 1.0f;
+        robot_constants.mass_kg = 1.0f;
         b2Vec2 gravity(0, 0);
         world = std::make_shared<b2World>(gravity);
     }

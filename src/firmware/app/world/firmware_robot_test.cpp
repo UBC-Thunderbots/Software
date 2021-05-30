@@ -155,7 +155,7 @@ TEST_F(FirmwareRobotTest, getRobotConstants)
 {
     RobotConstants_t constants = app_firmware_robot_getRobotConstants(firmware_robot);
 
-    EXPECT_NEAR(1.1, constants.mass, 1e-5);
+    EXPECT_NEAR(1.1, constants.mass_kg, 1e-5);
     EXPECT_NEAR(1.2, constants.moment_of_inertia_kg_m_2, 1e-5);
     EXPECT_NEAR(1.4, constants.jerk_limit_kg_m_per_s_3, 1e-5);
 }

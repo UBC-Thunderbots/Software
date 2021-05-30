@@ -18,7 +18,7 @@ namespace TestUtil
     RobotConstants_t createMockRobotConstants()
     {
         const RobotConstants_t robot_constants = {
-            .mass                                   = 1.1f,
+            .mass_kg                                = 1.1f,
             .moment_of_inertia_kg_m_2               = 1.2f,
             .jerk_limit_kg_m_per_s_3                = 1.4f,
             .front_wheel_angle_deg                  = 1.5f,

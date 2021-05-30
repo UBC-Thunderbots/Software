@@ -43,7 +43,7 @@ PhysicsRobot::PhysicsRobot(const RobotId id, std::shared_ptr<b2World> world,
 
     robot_body = world->CreateBody(&robot_body_def);
 
-    setupRobotBodyFixtures(robot_state, robot_constants.mass);
+    setupRobotBodyFixtures(robot_state, robot_constants.mass_kg);
     setupDribblerFixture(robot_state);
     setupDribblerDamperFixture(robot_state);
 

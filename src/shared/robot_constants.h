@@ -33,7 +33,7 @@ typedef struct RobotConstants
 {
     // The mass of the entire robot including batteries [kg]
     // Determined experimentally by weighing the robot and battery
-    float mass;
+    float mass_kg;
 
     // The moment of inertia of the entire robot [kg m^2]
     float moment_of_inertia_kg_m_2;
