@@ -56,6 +56,10 @@ void io_allegro_a3931_motor_driver_setDirection(
 
 /**
  * Set the PWM percentage for the given motor driver
+ *
+ * NOTE: The motor driver will be automatically enabled when the PWM
+ * is set.
+ *
  * @param motor_driver
  * @param pwm_percentage A value in [0,1] indicating the PWM percentage
  */
