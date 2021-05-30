@@ -24,7 +24,8 @@
  * versa. All arguments are unitless, i.e. the same units in and out, and don't depend on
  * the wheel radius (i.e. angular speed)
  *
- * @param [in] speed4 which is the listing of wheel speeds
+ * @param [in] speed4 which is the listing of wheel speeds, positive spins the wheel
+ * counter-clockwise, as viewed from inside the robot looking out
  * @param [out] speed3 which is a speed in x,y,rotation in
  * robot relative coordinates
  * @param front_wheel_angle_deg absolute angle between each front wheel and the y axis of
@@ -47,7 +48,8 @@ void shared_physics_speed3ToSpeed4(const float speed3[3], float speed4[4],
  * NOTE: this legacy conversion function is deprecated and  assumes that the angles are
  * 55deg (front) and 45deg (back). Please use shared_physics_speed4ToSpeed3 instead
  *
- * @param [in] speed4 which is the listing of wheel speeds
+ * @param [in] speed4 which is the listing of wheel speeds, positive spins the wheel
+ * counter-clockwise, as viewed from inside the robot looking out
  * @param [out] speed3 which is a speed in x,y,rotation in
  * robot relative coordinates
  */
@@ -58,7 +60,8 @@ void shared_physics_legacySpeed4ToSpeed3(const float speed4[4], float speed3[3])
  * arguments are unitless, i.e. the same units in and out, and don't depend on the wheel
  * radius (i.e. angular force)
  *
- * @param [in] force4 which is the listing of wheel forces
+ * @param [in] force4 which is the listing of wheel forces, positive spins the wheel
+ * counter-clockwise, as viewed from inside the robot looking out
  * @param [out] force3 which is a force in x,y,rotation in
  * robot relative coordinates
  * @param front_wheel_angle_deg absolute angle between each front wheel and the y axis of
