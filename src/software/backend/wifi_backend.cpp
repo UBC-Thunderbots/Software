@@ -72,8 +72,8 @@ void WifiBackend::onValueReceived(World world)
     {
         boost::asio::io_service io_service;
         std::unique_ptr<BoostUartCommunication> uart_device =
-            std::make_unique<BoostUartCommunication>(
-                io_service, ARDUINO_BAUD_RATE, arduino_config->getPort()->value());
+            std::make_unique<BoostUartCommunication>(io_service, ARDUINO_BAUD_RATE,
+                                                     arduino_config->getPort()->value());
         estop_reader = std::make_unique<ThreadedEstopReader>(std::move(uart_device), 0);
     }
 

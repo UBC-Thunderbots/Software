@@ -36,7 +36,7 @@ int main(int argc, char** argv)
     std::cout << BANNER << std::endl;
 
     // load command line arguments
-    auto arduinoConfig = std::make_shared<ArduinoConfig>();
+    auto arduinoConfig  = std::make_shared<ArduinoConfig>();
     auto args           = std::make_shared<FullSystemMainCommandLineArgs>(arduinoConfig);
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
@@ -61,12 +61,14 @@ int main(int argc, char** argv)
         if (!args->getArduinoConfig()->getPort()->value().empty())
         {
             mutable_thunderbots_config->getMutableArduinoConfig()
-                    ->getMutablePort()
-                    ->setValue(args->getArduinoConfig()->getPort()->value());
-        } else{
+                ->getMutablePort()
+                ->setValue(args->getArduinoConfig()->getPort()->value());
+        }
+        else
+        {
             mutable_thunderbots_config->getMutableArduinoConfig()
-                    ->getMutablePort()
-                    ->setValue(ArduinoUtil::getArduinoPort().value_or("hi"));
+                ->getMutablePort()
+                ->setValue(ArduinoUtil::getArduinoPort().value_or("hi"));
         }
 
         if (args->getBackend()->value().empty())
