@@ -1,6 +1,7 @@
+#include "shared/2021_robot_constants.h"
+
 #include <math.h>
 
-#include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
 
 #ifdef __cplusplus
@@ -58,7 +59,8 @@ extern "C"
             .motor_back_emf_per_rpm = (1.0f / 374.0f),
             // TODO (#2112): update this
             .motor_phase_resistance_ohm = 1.2f,  // ohms—EC45 datasheet
-                                                 // TODO (#2112): update this
+
+            // TODO (#2112): update this
             .motor_current_amp_per_torque_newton_meter =
                 39.21f,  // from motor data sheet (1/25.5 mNm)
         };
