@@ -17,8 +17,4 @@ class ShootOrChipPlay : public Play
     bool invariantHolds(const World &world) const override;
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
-
-   private:
-    // The minimum open net angle we will try to shoot at
-    const Angle MIN_OPEN_ANGLE_FOR_SHOT;
 };

@@ -41,8 +41,12 @@ struct DribbleFSM
 
     // Threshold to determine if the ball is at the destination determined experimentally
     static constexpr double BALL_CLOSE_TO_DEST_THRESHOLD = 0.1;
-    // Threshold to determine if the robot has the expected orientation
-    static constexpr Angle ROBOT_ORIENTATION_CLOSE_THRESHOLD = Angle::fromDegrees(5);
+    // Threshold to determine if the robot has the expected orientation when dribbling the
+    // ball
+    static constexpr Angle FACE_DESTINATION_CLOSE_THRESHOLD = Angle::fromDegrees(5);
+    // Threshold to determine if the robot has the expected orientation when completing
+    // the dribble
+    static constexpr Angle FINAL_DESTINATION_CLOSE_THRESHOLD = Angle::fromDegrees(1);
     // Kick speed when breaking up continuous dribbling
     static constexpr double DRIBBLE_KICK_SPEED = 0.05;
     // Maximum distance to continuously dribble the ball, slightly conservative to not
@@ -220,7 +224,7 @@ struct DribbleFSM
                                      event.common.world.ball().position(),
                                      event.common.robot.position(),
                                      event.control_params.final_dribble_orientation),
-                                 ROBOT_ORIENTATION_CLOSE_THRESHOLD) &&
+                                 FINAL_DESTINATION_CLOSE_THRESHOLD) &&
                    have_possession(event) &&
                    robotStopped(event.common.robot, ROBOT_DRIBBLING_DONE_SPEED);
         };
