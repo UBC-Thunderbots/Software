@@ -1,41 +1,40 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "passer_tactic",
-    srcs = ["passer_tactic.cpp"],
+    name = "pivot_kick_tactic",
+    srcs = ["pivot_kick_tactic.cpp"],
     hdrs = [
-        "passer_fsm.h",
-        "passer_tactic.h",
+        "pivot_kick_fsm.h",
+        "pivot_kick_tactic.h",
     ],
     deps = [
         "//shared:constants",
-        "//software/ai/hl/stp/action:intercept_ball_action",
-        "//software/ai/hl/stp/action:kick_action",
-        "//software/ai/hl/stp/action:move_action",
+        "//shared/parameter:cpp_configs",
+        "//software/ai/evaluation:enemy_threat",
+        "//software/ai/hl/stp/action:stop_action",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
-        "//software/ai/hl/stp/tactic/kick:kick_tactic",
-        "//software/ai/passing:pass",
+        "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/geom/algorithms",
         "//software/logger",
-        "//software/world:ball",
     ],
 )
 
 cc_test(
-    name = "passer_fsm_test",
-    srcs = ["passer_fsm_test.cpp"],
+    name = "pivot_kick_fsm_test",
+    srcs = ["pivot_kick_fsm_test.cpp"],
     deps = [
-        ":passer_tactic",
+        ":pivot_kick_tactic",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
     ],
 )
 
 cc_test(
-    name = "simulated_passer_tactic_test",
-    srcs = ["simulated_passer_tactic_test.cpp"],
+    name = "simulated_pivot_kick_tactic_test",
+    srcs = ["simulated_pivot_kick_tactic_test.cpp"],
     deps = [
-        ":passer_tactic",
+        ":pivot_kick_tactic",
         "//shared/test_util:tbots_gtest_main",
         "//software/simulated_tests:simulated_tactic_test_fixture",
         "//software/simulated_tests/terminating_validation_functions",
