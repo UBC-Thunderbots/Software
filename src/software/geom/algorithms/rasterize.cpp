@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 #include "software/geom/algorithms/rasterize.h"
 
 #include "software/geom/algorithms/contains.h"
@@ -77,11 +78,44 @@ std::vector<Point> rasterize(const Rectangle &rectangle, const double resolution
     // Added resolution_size to the max to ensure that when Points are rasterized, all
     // Coordinates (including pixels that are not fully contained by rectangle) are
     // taken into account.
-    for (double x = rectangle.xMin(); x < rectangle.xMax() + resolution_size; x += resolution_size)
+//    for (double x = rectangle.xMin(); x < rectangle.xMax() + resolution_size; x += resolution_size)
+//    {
+//        for (double y = rectangle.yMin(); y < rectangle.yMax() + resolution_size; y += resolution_size)
+//        {
+//            covered_points.emplace_back(Point(x, y));
+//        }
+//    }
+//    return covered_points;
+    int num_pixels_x = (int) std::ceil(rectangle.xLength() / resolution_size);
+    int num_pixels_y = (int) std::ceil(rectangle.yLength() / resolution_size);
+
+    for (int x_pixel = 0; x_pixel <= num_pixels_x; x_pixel++)
     {
-        for (double y = rectangle.yMin(); y < rectangle.yMax() + resolution_size; y += resolution_size)
+        // Adjust the last x and y pixels to be on the edge of the rectangle to make sure
+        // that the points cover the entire rectangle without going outside.
+        double x_offset;
+        if (x_pixel == num_pixels_x)
         {
-            covered_points.emplace_back(Point(x, y));
+            x_offset = rectangle.xMax();
+        }
+        else
+        {
+            x_offset = x_pixel * resolution_size;
+        }
+
+        for (int y_pixel = 0; y_pixel <= num_pixels_y; y_pixel++)
+        {
+            double y_offset;
+            if (y_pixel == num_pixels_y)
+            {
+                y_offset = rectangle.yMax();
+            }
+            else
+            {
+                y_offset = y_pixel * resolution_size;
+            }
+
+            covered_points.emplace_back(Point(rectangle.xMin() + x_offset, rectangle.yMin() + y_offset));
         }
     }
     return covered_points;
