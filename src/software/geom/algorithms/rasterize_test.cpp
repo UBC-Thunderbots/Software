@@ -3,13 +3,20 @@
 
 #include <gtest/gtest.h>
 
-
 //////////////////////////////////////////////////////
 ////              Testing Circles                 ////
 //////////////////////////////////////////////////////
 TEST(RasterizeTest, segment_in_circle)
 {
-//    Circle c({1.0, 1.0}, 4.0);
+    Circle circle({0, 0}, 1.5f);
+    double pixel_size = 1.f;
+    std::vector<Point> rasterized_points = rasterize(circle, pixel_size);
+
+    for(Point p : rasterized_points)
+    {
+        EXPECT_TRUE(contains(circle, p));
+    }
+    EXPECT_EQ(rasterized_points.size(), 9);
 }
 
 //////////////////////////////////////////////////////
@@ -17,7 +24,16 @@ TEST(RasterizeTest, segment_in_circle)
 //////////////////////////////////////////////////////
 TEST(RasterizeTest, test_polygon_triangle_contains_point)
 {
-//    Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{1.0f, 1.0f};
+    // Hexagon centered at origin with the following points
+    Polygon hexagon{{0.0f, 2.0f},    // top vertex
+                    {2.0f, 1.0f},    // top right vertex
+                    {2.0f, -1.0f},   // bottom right vertex
+                    {0.0f, -2.0f},   // bottom vertex
+                    {-2.0f, -1.0f},  // bottom left vertex
+                    {-2.0f, 1.0f}};  // top left vertex
+
+    double pixel_size = 1.f;
+    std::vector<Point> rasterized_points = rasterize(hexagon, pixel_size);
 }
 
 //////////////////////////////////////////////////////
