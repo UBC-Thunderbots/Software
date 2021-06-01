@@ -217,8 +217,7 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     {
         return Path(std::vector<Point>({start, end}));
     }
-    if ((start - closest_end).length() <
-            (CLOSE_TO_END_THRESHOLD * BLOCKED_END_OSCILLATION_MITIGATION) ||
+    if ((start - closest_end).length() < CLOSE_TO_END_THRESHOLD ||
         start_coord == end_coord)
     {
         return Path(std::vector<Point>({start, closest_end}));
@@ -242,7 +241,10 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     // The last point of path_points is the closest point on the grid to the end point, so
     // we need to replace that point with actual end point
     path_points.pop_back();
-    path_points.push_back(closest_end);
+    if (path_points.back() != closest_end)
+    {
+        path_points.push_back(closest_end);
+    }
 
     // The first point of path_points is the closest unblocked point on the grid to the
     // start point, so we need to replace that point with actual start point

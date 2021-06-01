@@ -17,13 +17,12 @@
 
 struct GoalieFSM
 {
+   public:
     class PanicState;
     class PositionToBlockState;
 
     struct ControlParams
     {
-        // the goalie tactic config
-        std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
     };
 
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -31,6 +30,19 @@ struct GoalieFSM
     // Distance to chip the ball when trying to yeet it
     // TODO (#1878): Replace this with a more intelligent chip distance system
     static constexpr double YEET_CHIP_DISTANCE_METERS = 2.0;
+
+    /**
+     * Constructor for GoalieFSM struct
+     *
+     * @param goalie_tactic_config The config to fetch parameters from
+     * @param max_allowed_speed_mode The maximum allowed speed mode
+     */
+    explicit GoalieFSM(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config,
+                       MaxAllowedSpeedMode max_allowed_speed_mode)
+        : goalie_tactic_config(goalie_tactic_config),
+          max_allowed_speed_mode(max_allowed_speed_mode)
+    {
+    }
 
     /**
      * Gets the position for the goalie to move to, to best position itself between the
@@ -147,9 +159,8 @@ struct GoalieFSM
          *
          * @return if the goalie should panic
          */
-        const auto should_panic = [](auto event) {
-            double ball_speed_panic =
-                event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
+        const auto should_panic = [this](auto event) {
+            double ball_speed_panic = goalie_tactic_config->getBallSpeedPanic()->value();
             std::vector<Point> intersections =
                 getIntersectionsBetweenBallVelocityAndFullGoalSegment(
                     event.common.world.ball(), event.common.world.field());
@@ -166,9 +177,8 @@ struct GoalieFSM
          *
          * @return if the goalie should chip the ball
          */
-        const auto should_chip = [](auto event) {
-            double ball_speed_panic =
-                event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
+        const auto should_chip = [this](auto event) {
+            double ball_speed_panic = goalie_tactic_config->getBallSpeedPanic()->value();
 
             // if the ball is in the "no-chip rectangle" we do not chip the ball
             // as we risk bumping the ball into our own net trying to move behind
@@ -190,9 +200,8 @@ struct GoalieFSM
          *
          * @return if the goalie should dribble the ball
          */
-        const auto should_dribble = [](auto event) {
-            double ball_speed_panic =
-                event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
+        const auto should_dribble = [this](auto event) {
+            double ball_speed_panic = goalie_tactic_config->getBallSpeedPanic()->value();
             std::vector<Point> intersections =
                 getIntersectionsBetweenBallVelocityAndFullGoalSegment(
                     event.common.world.ball(), event.common.world.field());
@@ -215,9 +224,8 @@ struct GoalieFSM
          *
          * @return if the goalie should stop panicking
          */
-        const auto panic_done = [](auto event) {
-            double ball_speed_panic =
-                event.control_params.goalie_tactic_config->getBallSpeedPanic()->value();
+        const auto panic_done = [this](auto event) {
+            double ball_speed_panic = goalie_tactic_config->getBallSpeedPanic()->value();
             std::vector<Point> intersections =
                 getIntersectionsBetweenBallVelocityAndFullGoalSegment(
                     event.common.world.ball(), event.common.world.field());
@@ -231,7 +239,7 @@ struct GoalieFSM
          *
          * @param event GoalieFSM::Update event
          */
-        const auto update_panic = [](auto event) {
+        const auto update_panic = [this](auto event) {
             std::vector<Point> intersections =
                 getIntersectionsBetweenBallVelocityAndFullGoalSegment(
                     event.common.world.ball(), event.common.world.field());
@@ -246,7 +254,7 @@ struct GoalieFSM
                 event.common.robot.id(), goalie_pos, goalie_orientation, 0.0,
                 DribblerMode::OFF, BallCollisionType::ALLOW,
                 AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+                max_allowed_speed_mode, 0.0));
         };
 
         /**
@@ -304,23 +312,23 @@ struct GoalieFSM
          *
          * @param event GoalieFSM::Update event
          */
-        const auto update_position_to_block = [](auto event) {
-            Point goalie_pos = getGoaliePositionToBlock(
-                event.common.world.ball(), event.common.world.field(),
-                event.control_params.goalie_tactic_config);
+        const auto update_position_to_block = [this](auto event) {
+            Point goalie_pos = getGoaliePositionToBlock(event.common.world.ball(),
+                                                        event.common.world.field(),
+                                                        goalie_tactic_config);
             Angle goalie_orientation =
                 (event.common.world.ball().position() - goalie_pos).orientation();
 
             // what should the final goalie speed be, so that the goalie accelerates
             // faster
             auto goalie_final_speed =
-                event.control_params.goalie_tactic_config->getGoalieFinalSpeed()->value();
+                goalie_tactic_config->getGoalieFinalSpeed()->value();
 
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), goalie_pos, goalie_orientation,
                 goalie_final_speed, DribblerMode::OFF, BallCollisionType::ALLOW,
                 AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+                max_allowed_speed_mode, 0.0));
         };
 
         return make_transition_table(
@@ -427,4 +435,10 @@ struct GoalieFSM
             return std::nullopt;
         }
     }
+
+   private:
+    // the goalie tactic config
+    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
+    // The maximum allowed speed mode
+    MaxAllowedSpeedMode max_allowed_speed_mode;
 };

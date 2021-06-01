@@ -3,6 +3,9 @@
 #include <pb.h>
 
 #include "firmware/boards/robot_stm32h7/io/proto_multicast_communication_profile.h"
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
 #include "lwip.h"
 #include "lwip/api.h"
 #include "lwip/inet.h"
@@ -13,6 +16,7 @@
 #include "lwip/sys.h"
 #include "lwip/tcp.h"
 #include "lwip/udp.h"
+#pragma GCC diagnostic pop
 
 typedef struct ProtoMulticastCommunicationProfile ProtoMulticastCommunicationProfile_t;
 

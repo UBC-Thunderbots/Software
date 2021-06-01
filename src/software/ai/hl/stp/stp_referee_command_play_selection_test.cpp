@@ -31,7 +31,8 @@ class STPRefereeCommandPlaySelectionTestWithPositions
                   return std::make_unique<HaltPlay>(
                       std::make_shared<const ThunderbotsConfig>()->getPlayConfig());
               },
-              std::make_shared<const AiControlConfig>(), 0)
+              std::make_shared<const AiControlConfig>(),
+              std::make_shared<const ThunderbotsConfig>()->getPlayConfig(), 0)
     {
     }
 
@@ -189,7 +190,8 @@ class STPRefereeCommandPlaySelectionTest
 {
    public:
     STPRefereeCommandPlaySelectionTest()
-        : stp([]() { return nullptr; }, std::make_shared<const AiControlConfig>(), 0)
+        : stp([]() { return nullptr; }, std::make_shared<const AiControlConfig>(),
+              std::make_shared<const ThunderbotsConfig>()->getPlayConfig(), 0)
     {
     }
 
@@ -201,7 +203,8 @@ class STPRefereeCommandPlaySelectionTest
                 std::make_shared<const ThunderbotsConfig>()->getPlayConfig());
         };
         // Give an explicit seed to STP so that our tests are deterministic
-        stp = STP(default_play_constructor, std::make_shared<const AiControlConfig>(), 0);
+        stp = STP(default_play_constructor, std::make_shared<const AiControlConfig>(),
+                  std::make_shared<const ThunderbotsConfig>()->getPlayConfig(), 0);
 
         Robot robot_0(0, Point(-1.1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                       Timestamp::fromSeconds(0));

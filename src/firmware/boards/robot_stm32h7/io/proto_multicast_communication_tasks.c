@@ -106,7 +106,6 @@ void io_proto_multicast_listener_task(void* communication_profile)
     // Bind the socket to the multicast address and port we then use that
     // communication profile to join the specified multicast group.
     struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
-    netconn_set_recvtimeout(conn, network_timeout_ms);
 
     netconn_bind(conn, io_proto_multicast_communication_profile_getAddress(profile),
                  io_proto_multicast_communication_profile_getPort(profile));

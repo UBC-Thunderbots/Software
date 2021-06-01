@@ -5,6 +5,7 @@
 #include "software/gui/drawing/navigator.h"
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "software/proto/message_translation/tbots_protobuf.h"
+#include "software/test_util/test_util.h"
 
 SimulatedTacticTestFixture::SimulatedTacticTestFixture()
     : motion_constraints(),
@@ -59,6 +60,8 @@ void SimulatedTacticTestFixture::updatePrimitives(
     const World& world, std::shared_ptr<Simulator> simulator_to_update)
 {
     std::vector<std::unique_ptr<Intent>> intents;
+    auto start_tick_time = std::chrono::system_clock::now();
+
     if (!robot_id)
     {
         LOG(FATAL) << "No robot id set" << std::endl;
@@ -75,6 +78,8 @@ void SimulatedTacticTestFixture::updatePrimitives(
     }
 
     auto primitive_set_msg = navigator->getAssignedPrimitives(world, intents);
+    double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
+    registerTickTime(duration_ms);
     simulator_to_update->setYellowRobotPrimitiveSet(
         createNanoPbPrimitiveSet(*primitive_set_msg));
 }

@@ -20,3 +20,12 @@ py_library(
         requirement("numpy"),
     ],
 )
+
+py_library(
+    name = "plot_pass_generator",
+    srcs = ["plot_pass_generator.py"],
+    deps = [
+        requirement("bokeh"),
+        requirement("numpy"),
+    ],
+)

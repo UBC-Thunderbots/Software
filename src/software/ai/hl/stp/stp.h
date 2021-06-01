@@ -90,7 +90,7 @@ class STP : public HL
      */
     explicit STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
                  std::shared_ptr<const AiControlConfig> control_config,
-                 std::shared_ptr<const PlayConfig> play_config, long random_seed = 0);
+                 std::shared_ptr<const PlayConfig> play_config, long random_seed);
 
     std::vector<std::unique_ptr<Intent>> getIntents(const World &world) override;
 
@@ -136,14 +136,12 @@ class STP : public HL
      * lower indexes of the outer vector will be assigned first. For example:
      *
      * {
-     *      {goalie_tactic},
      *      {crease_defender_1, crease_defender_2},
      *      {move_tactic},
      * }
      *
-     * The cost of assigning a goalie_tactic will be minimized across all robots first,
-     * followed by both the crease_defender tactics. The move_tactic will be assigned
-     * last.
+     * The cost of assigning both the crease_defender tactics will be minimized across
+     * all robots first, followed by the move_tactic.
      *
      * The order of the given tactics in the inner vector also determines their priority,
      * with the tactics at the beginning of the vector being a higher priority than those
@@ -158,11 +156,14 @@ class STP : public HL
      * we need to modify the individual tactics _and_ possibly add/remove tactics
      * @param world The state of the world, which contains the friendly Robots that will
      * be assigned to each tactic
+     * @param automatically_assign_goalie whether or not to automatically assign a goalie
+     * tactic
      *
      * @return map from assigned tactics to robot
      */
     std::map<std::shared_ptr<const Tactic>, Robot> assignRobotsToTactics(
-        ConstPriorityTacticVector tactics, const World &world);
+        ConstPriorityTacticVector tactics, const World &world,
+        bool automatically_assign_goalie);
 
    private:
     /**
@@ -205,7 +206,7 @@ class STP : public HL
     std::function<std::unique_ptr<Play>()> default_play_constructor;
     // The Play that is currently running
     std::unique_ptr<Play> current_play;
-    std::map<RobotId, std::string> readable_robot_tactic_assignment;
+    std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment;
     // The random number generator
     std::mt19937 random_number_generator;
     std::shared_ptr<const AiControlConfig> control_config;
@@ -215,4 +216,8 @@ class STP : public HL
     bool override_play;
     bool previous_override_play;
     GameState current_game_state;
+    // Goalie tactic common to all plays
+    std::shared_ptr<GoalieTactic> goalie_tactic;
+    // Stop tactic common to all plays for robots that don't have tactics assigned
+    TacticVector stop_tactics;
 };

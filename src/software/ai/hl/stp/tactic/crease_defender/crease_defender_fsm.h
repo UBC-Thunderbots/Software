@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
@@ -15,13 +16,15 @@ MAKE_ENUM(CreaseDefenderAlignment, LEFT, RIGHT, CENTRE);
 
 struct CreaseDefenderFSM
 {
+   public:
     // this struct defines the unique control parameters that the CreaseDefenderFSM
     // requires in its update
     struct ControlParams
     {
+        // The origin point of the enemy threat
         Point enemy_threat_origin;
+        // The crease defender alignment with respect to the enemy threat
         CreaseDefenderAlignment crease_defender_alignment;
-        double robot_obstacle_inflation_factor;
     };
 
     // this struct defines the only event that the CreaseDefenderFSM responds to
@@ -66,6 +69,17 @@ struct CreaseDefenderFSM
         return findDefenseAreaIntersection(field, ray, robot_obstacle_inflation_factor);
     }
 
+    /**
+     * Constructor for CreaseDefenderFSM struct
+     *
+     * @param robot_navigation_obstacle_config The config
+     */
+    explicit CreaseDefenderFSM(std::shared_ptr<const RobotNavigationObstacleConfig>
+                                   robot_navigation_obstacle_config)
+        : robot_navigation_obstacle_config(robot_navigation_obstacle_config)
+    {
+    }
+
     auto operator()()
     {
         using namespace boost::sml;
@@ -86,7 +100,8 @@ struct CreaseDefenderFSM
             auto block_threat_point = findBlockThreatPoint(
                 event.common.world.field(), event.control_params.enemy_threat_origin,
                 event.control_params.crease_defender_alignment,
-                event.control_params.robot_obstacle_inflation_factor);
+                robot_navigation_obstacle_config->getRobotObstacleInflationFactor()
+                    ->value());
             if (block_threat_point)
             {
                 destination = block_threat_point.value();
@@ -192,4 +207,7 @@ struct CreaseDefenderFSM
         }
         return std::nullopt;
     }
+
+   private:
+    std::shared_ptr<const RobotNavigationObstacleConfig> robot_navigation_obstacle_config;
 };
