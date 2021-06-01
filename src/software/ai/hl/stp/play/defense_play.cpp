@@ -59,8 +59,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
-        shoot_goal_tactic->updateControlParams(std::nullopt);
-
         PriorityTacticVector result = {{shoot_goal_tactic}};
 
         // Update crease defenders
