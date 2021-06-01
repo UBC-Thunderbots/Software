@@ -221,17 +221,4 @@ class SimulatedTestFixture : public ::testing::Test
     // that we will simulate 2 time steps (2 camera frames) before we give
     // the latest data to the AI and run it.
     static constexpr unsigned int CAMERA_FRAMES_PER_AI_TICK = 2;
-
-    // A set of member variables for measuring the current simulated tests performance.
-    // Note: The duration that updatePrimitives runs for is only measured to avoid also
-    // measuring the sleep durations when simulator is running in real time.
-    // Number of ticks the simulator has run for
-    unsigned int tick_count;
-    // Total duration the simulator has been running for in ms. Used for calculating
-    // the average tick duration
-    double total_tick_duration;
-    // Maximum duration which a tick took. Initialized as std::numeric_limits<T>::min
-    double max_tick_duration;
-    // Minimum duration which a tick took. Initialized as std::numeric_limits<T>::max
-    double min_tick_duration;
 };
