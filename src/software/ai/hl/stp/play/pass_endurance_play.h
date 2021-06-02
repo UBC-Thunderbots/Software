@@ -5,6 +5,7 @@
 
 /**
  * Play for the pass endurace hardware challenge
+ * https://robocup-ssl.github.io/ssl-hardware-challenge-rules/rules.html
  */
 class PassEndurancePlay : public Play
 {

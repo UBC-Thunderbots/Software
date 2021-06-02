@@ -5,6 +5,7 @@
 
 /**
  * Play for scoring with static defenders play hardware challenge
+ * https://robocup-ssl.github.io/ssl-hardware-challenge-rules/rules.html
  */
 class ScoringWithStaticDefendersPlay : public Play
 {

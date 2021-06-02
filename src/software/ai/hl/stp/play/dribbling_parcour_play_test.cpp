@@ -17,8 +17,7 @@ class DribblingParcourPlayTest : public SimulatedPlayTestFixture
 TEST_F(DribblingParcourPlayTest, test_dribbling_parcour_play_stopped)
 {
     BallState ball_state(Point(-0.8, 0), Vector(0, 0));
-    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
-        {Point(4, 0), Point(-2, -1), Point(-3, 1)});
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
     setFriendlyGoalie(0);
     setAIPlay(TYPENAME(DribblingParcourPlay));
 

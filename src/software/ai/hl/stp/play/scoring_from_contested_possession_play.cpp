@@ -13,6 +13,8 @@ ScoringFromContestedPossessionPlay::ScoringFromContestedPossessionPlay(
 
 bool ScoringFromContestedPossessionPlay::isApplicable(const World &world) const
 {
+    // This play is never applicable so it will never be chosen during gameplay
+    // This play can be run for hardware challenges by using the Play override
     return false;
 }
 

@@ -5,6 +5,7 @@
 
 /**
  * Play for the scoring from contested possession hardware challenge
+ * https://robocup-ssl.github.io/ssl-hardware-challenge-rules/rules.html
  */
 class ScoringFromContestedPossessionPlay : public Play
 {

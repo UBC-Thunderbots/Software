@@ -11,6 +11,8 @@ PassEndurancePlay::PassEndurancePlay(std::shared_ptr<const PlayConfig> config)
 
 bool PassEndurancePlay::isApplicable(const World &world) const
 {
+    // This play is never applicable so it will never be chosen during gameplay
+    // This play can be run for hardware challenges by using the Play override
     return false;
 }
 

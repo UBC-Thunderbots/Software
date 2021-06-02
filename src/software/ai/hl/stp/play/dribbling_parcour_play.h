@@ -5,6 +5,7 @@
 
 /**
  * Play for the dribbling parcour hardware challenge
+ * https://robocup-ssl.github.io/ssl-hardware-challenge-rules/rules.html
  */
 class DribblingParcourPlay : public Play
 {
