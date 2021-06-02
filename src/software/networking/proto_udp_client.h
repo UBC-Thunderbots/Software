@@ -36,8 +36,9 @@ class ProtoUdpClient
     void sendProto(const SendProtoT& message);
 
     /**
-     * Blocks until a ReceiveProtoT has been received, timesout after 500ms and returns
-     * a nullopt.
+     * Blocks until a ReceiveProtoT has been received, times-out after
+     * UDP_RECEIVE_TIMEOUT_MS and returns a nullopt. If we don't do this and block
+     * forever, the thread will never return preventing us from destroying the client.
      *
      * This function is only enabled if ReceiveProtoT is provided
      *
