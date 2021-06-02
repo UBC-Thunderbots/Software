@@ -648,9 +648,7 @@ TEST_F(STPTacticAssignmentTest, test_multi_tier_assignment_with_tiered_assignmen
     auto attacker =
         std::make_shared<AttackerTactic>(std::make_shared<const AttackerTacticConfig>());
     attacker->updateControlParams(passer_pass);
-    auto receiver = std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(),
-                                                     world.enemyTeam(), passer_pass,
-                                                     world.ball(), false);
+    auto receiver = std::make_shared<ReceiverTactic>(passer_pass);
 
     auto move_tactic                  = std::make_shared<MoveTestTactic>();
     ConstPriorityTacticVector request = {

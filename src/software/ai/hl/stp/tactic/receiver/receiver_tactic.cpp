@@ -23,7 +23,6 @@ void ReceiverTactic::updateControlParams(const Pass& updated_pass)
 
 void ReceiverTactic::updateIntent(const TacticUpdate& tactic_update)
 {
-    fsm.visit_current_states([](auto state) { std::cout << state.c_str() << std::endl; });
     fsm.process_event(ReceiverFSM::Update(control_params, tactic_update));
 }
 

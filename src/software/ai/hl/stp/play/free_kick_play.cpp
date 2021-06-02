@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/receiver_tactic.h"
+#include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
@@ -136,9 +136,7 @@ void FreeKickPlay::performPassStage(
     // Perform the pass and wait until the receiver is finished
     auto attacker =
         std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
-    auto receiver =
-        std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(),
-                                         world.enemyTeam(), pass, world.ball(), false);
+    auto receiver = std::make_shared<ReceiverTactic>(pass);
     do
     {
         attacker->updateControlParams(pass);

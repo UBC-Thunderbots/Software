@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
@@ -28,16 +29,17 @@ struct ReceiverFSM
     // that we require before attempting a shot
     static constexpr double MIN_SHOT_NET_PERCENT_OPEN    = 0.3;
     static constexpr double MAX_SPEED_FOR_ONE_TOUCH_SHOT = 6.5;
+
     // The maximum deflection angle that we will attempt a one-touch kick towards the
     // enemy goal with
     static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(90);
 
-
     /**
-     * TODO
+     * Given a shot and the ball, figures out the angle the robot should be facing
+     * to perform a one-touch shot.
      *
-     * @param shot
-     * @param ball
+     * @param shot The shot to take
+     * @param ball The ball on the field
      */
     static Angle getOneTimeShotDirection(const Ray& shot, const Ball& ball)
     {
@@ -69,10 +71,11 @@ struct ReceiverFSM
     }
 
     /**
+     * Figures out the location of the one-time shot and orientation the robot should face
      *
-     * @param robot
-     * @param ball
-     * @param best_shot_target
+     * @param robot The robot performing the one-touch
+     * @param ball The ball on the field
+     * @param best_shot_target The point to shoot at
      */
     static Shot getOneTimeShotPositionAndOrientation(const Robot& robot, const Ball& ball,
                                                      const Point& best_shot_target)
@@ -158,6 +161,26 @@ struct ReceiverFSM
         const auto onetouch_s  = state<OneTouchShotState>;
         const auto update_e    = event<Update>;
 
+        /**
+         * Checks if a one touch shot is possible
+         *
+         * @param event ReceiverFSM::Update event
+         * @return true if one-touch possible
+         */
+        const auto onetouch_possible = [](auto event) {
+            return findFeasibleShot(event.common.world, event.common.robot) !=
+                   std::nullopt;
+        };
+
+        /**
+         * If we have a shot on net, then update the receiver fsm
+         * to setup for a one-touch shot.
+         *
+         * NOTE: This must be used with the onetouch_possible guard,
+         * which checks for one-touch feasibility.
+         *
+         * @param event ReceiverFSM::Update event
+         */
         const auto update_onetouch = [this](auto event) {
             auto best_shot = findFeasibleShot(event.common.world, event.common.robot);
             auto one_touch = getOneTimeShotPositionAndOrientation(
@@ -166,13 +189,10 @@ struct ReceiverFSM
 
             if (best_shot)
             {
-                std::cerr << "1. moving to onetouch" << std::endl;
                 if (event.control_params.pass)
                 {
-                    std::cerr << "moving to onetouch" << std::endl;
                     event.common.set_intent(std::make_unique<MoveIntent>(
-                        event.common.robot.id(),
-                        one_touch.getPointToShootAt(),
+                        event.common.robot.id(), one_touch.getPointToShootAt(),
                         one_touch.getOpenAngle(), 0, DribblerMode::OFF,
                         BallCollisionType::ALLOW,
                         AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
@@ -182,32 +202,46 @@ struct ReceiverFSM
             }
         };
 
+        /**
+         * One touch shot is not possible, just receive ball as cleanly as possible.
+         *
+         * @param event ReceiverFSM::Update event
+         */
         const auto update_receive = [this](auto event) {
-            std::cerr << "2. moving to receiver" << std::endl;
             if (event.control_params.pass)
             {
-                std::cerr << "moving to receiver" << std::endl;
                 event.common.set_intent(std::make_unique<MoveIntent>(
                     event.common.robot.id(), event.control_params.pass->receiverPoint(),
                     event.control_params.pass->receiverOrientation(), 0,
-                    DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
+                    DribblerMode::OFF, BallCollisionType::ALLOW,
                     AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
                     MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
             }
         };
 
+        /**
+         * Check if the pass has started by checking if the ball is moving faster
+         * than a certain speed.
+         *
+         * @param event ReceiverFSM::Update event
+         * @return true if the pass has started
+         */
         const auto pass_started = [](auto event) {
             return event.common.world.ball().velocity().length() > 0.5;
         };
 
+        /**
+         * Check if the pass has finished by checking if we (the receiver) has
+         * the ball near the dribbler.
+         *
+         * @param event ReceiverFSM::Update event
+         * @return true if the ball is near a robots mouth
+         */
         const auto pass_finished = [](auto event) {
-            return event.common.robot.isNearDribbler(
-                event.common.world.ball().position());
-        };
-
-        const auto onetouch_possible = [](auto event) {
-            return findFeasibleShot(event.common.world, event.common.robot) !=
-                   std::nullopt;
+            // We tolerate imperfect passes that hit the edges of the robot,
+            // so that we can quickly transition out and grab the ball.
+            return event.common.robot.isNearDribbler(event.common.world.ball().position(),
+                                                     ROBOT_MAX_RADIUS_METERS);
         };
 
         return make_transition_table(
