@@ -36,13 +36,14 @@ class ProtoUdpClient
     void sendProto(const SendProtoT& message);
 
     /**
-     * Blocks until a ReceiveProtoT has been received
+     * Blocks until a ReceiveProtoT has been received, timesout after 500ms and returns
+     * a nullopt.
      *
      * This function is only enabled if ReceiveProtoT is provided
      *
-     * @returns ReceiveProtoT
+     * @returns optional ReceiveProtoT, somtimes we might not get anything
      */
-    ReceiveProtoT receiveProto();
+    std::optional<ReceiveProtoT> receiveProto();
 
     /**
      * Send a proto and block until we hear a response from the server
@@ -65,6 +66,7 @@ class ProtoUdpClient
     std::string data_buffer;
 
     static constexpr unsigned int MAX_BUFFER_LENGTH = 9000;
+    static constexpr unsigned int UDP_RECEIVE_TIMEOUT_MS = 100;
     std::array<char, MAX_BUFFER_LENGTH> raw_received_data_;
 };
 

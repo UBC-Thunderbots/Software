@@ -45,6 +45,8 @@ class ThreadedProtoUdpListener
    private:
     // The io_service that will be used to service all network requests
     boost::asio::io_service io_service;
+    boost::asio::io_service::work work;
+    std::thread io_service_thread;
 
     // The thread running the io_service and receiving packets in the background.
     // This thread will run for the entire lifetime of the class

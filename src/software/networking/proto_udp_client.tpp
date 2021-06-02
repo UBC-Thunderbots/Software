@@ -50,10 +50,20 @@ void ProtoUdpClient<SendProtoT, ReceiveProtoT>::sendProto(const SendProtoT& mess
 }
 
 template <class SendProtoT, class ReceiveProtoT>
-ReceiveProtoT ProtoUdpClient<SendProtoT, ReceiveProtoT>::receiveProto()
+std::optional<ReceiveProtoT> ProtoUdpClient<SendProtoT, ReceiveProtoT>::receiveProto()
 {
-    size_t num_bytes_received = socket_.receive_from(
-        boost::asio::buffer(raw_received_data_, MAX_BUFFER_LENGTH), endpoint);
+    std::future<std::size_t> recv_length =
+        socket_.async_receive_from(boost::asio::buffer(raw_received_data_),
+      endpoint,
+      boost::asio::use_future);
+
+    std::future_status status = recv_length.wait_for(std::chrono::milliseconds(UDP_RECEIVE_TIMEOUT_MS));
+    while (status != std::future_status::ready)
+    {
+        return std::nullopt;
+    }
+
+    size_t num_bytes_received = recv_length.get();
     auto packet_data = ReceiveProtoT();
 
     if (num_bytes_received > 0)
@@ -90,5 +100,6 @@ ReceiveProtoT ProtoUdpClient<SendProtoT, ReceiveProtoT>::request(
 template <class SendProtoT, class ReceiveProtoT>
 ProtoUdpClient<SendProtoT, ReceiveProtoT>::~ProtoUdpClient()
 {
+    socket_.cancel();
     socket_.close();
 }
