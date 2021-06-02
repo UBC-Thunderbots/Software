@@ -8,7 +8,7 @@
 
 /**
  * This tactic is for a robot receiving a pass. It should be used in conjunction with
- * the `PasserTactic` in order to complete the pass.
+ * the `AttackerTactic` in order to complete the pass.
  *
  * Note that this tactic does not take into account the time the pass should occur at,
  * it simply tries to move to the best position to receive the pass as possible

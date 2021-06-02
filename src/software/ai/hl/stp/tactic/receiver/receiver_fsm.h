@@ -29,6 +29,7 @@ struct ReceiverFSM
     // that we require before attempting a shot
     static constexpr double MIN_SHOT_NET_PERCENT_OPEN    = 0.3;
     static constexpr double MAX_SPEED_FOR_ONE_TOUCH_SHOT = 6.5;
+    static constexpr double MIN_PASS_START_SPEED         = 1.0;
 
     // The maximum deflection angle that we will attempt a one-touch kick towards the
     // enemy goal with
@@ -108,6 +109,14 @@ struct ReceiverFSM
         return Shot(ideal_position, ideal_orientation);
     }
 
+    /*
+     * Finds a shot that is greater than MIN_SHOT_NET_PERCENT_OPEN and
+     * respects MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT for the highest chance
+     * of scoring with a one-touch shot. If neither of those are true, return a nullopt
+     *
+     * @param world The world to find a feasible shot on
+     * @param assigned_robot The robot that will be performing the one-touch
+     */
     static std::optional<Shot> findFeasibleShot(const World& world,
                                                 const Robot& assigned_robot)
     {
@@ -221,18 +230,18 @@ struct ReceiverFSM
 
         /**
          * Check if the pass has started by checking if the ball is moving faster
-         * than a certain speed.
+         * than a minimum speed.
          *
          * @param event ReceiverFSM::Update event
          * @return true if the pass has started
          */
         const auto pass_started = [](auto event) {
-            return event.common.world.ball().velocity().length() > 0.5;
+            return event.common.world.ball().velocity().length() > MIN_PASS_START_SPEED;
         };
 
         /**
-         * Check if the pass has finished by checking if we (the receiver) has
-         * the ball near the dribbler.
+         * Check if the pass has finished by checking if we the robot has
+         * a ball near its dribbler.
          *
          * @param event ReceiverFSM::Update event
          * @return true if the ball is near a robots mouth
