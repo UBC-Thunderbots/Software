@@ -37,9 +37,10 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double pass_up_field_rating = pass.receiverPoint().x() / world.field().xLength();
 
     // We want to rate a pass more highly if it is lower risk, so subtract from 1
-    return 10 * friendly_pass_rating + pass_up_field_rating + pass_speed_quality +
-           shoot_pass_rating + enemy_pass_rating + in_region_quality +
-           static_pass_quality;
+    return (friendly_pass_rating) *
+           (pass_speed_quality + pass_up_field_rating + shoot_pass_rating +
+            enemy_pass_rating + in_region_quality + static_pass_quality) /
+           6;
 }
 
 double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,
