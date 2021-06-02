@@ -105,5 +105,5 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(20));
+            Duration::fromSeconds(10));
 }
