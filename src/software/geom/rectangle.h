@@ -31,7 +31,7 @@ class Rectangle : public ConvexPolygon
 
     /**
      * Returns the length along the y-axis of the rectangle
-     *
+    * 
      * @return The length along the y-axis of the rectangle
      */
     double yLength() const;

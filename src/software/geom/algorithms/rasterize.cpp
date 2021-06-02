@@ -1,7 +1,12 @@
 #include <algorithm>
 #include "software/geom/algorithms/rasterize.h"
-
+#include "software/geom/algorithms/intersection.h"
 #include "software/geom/algorithms/contains.h"
+
+
+bool isInPixel(const Point &a, const Point &b, double resolution_size);
+
+bool isAVertex(const Point& point, const Polygon& polygon, double resolution_size);
 
 // TODO When rasterizing without knowing the relative positions of the pixels, you may be off by 1 pixel in each
 // axis. eg. A 1.5 x 1 rectangle may overlap with 2 or 3 pixels (assuming pixel dimension 1) depending on how it the rectangle
@@ -93,26 +98,61 @@ std::vector<Point> rasterize(const Polygon &polygon, const double resolution_siz
     // https://stackoverflow.com/a/31768384
 
     std::vector<Point> contained_points;
-    const auto& polygon_vertices = polygon.getPoints();
+	const auto& polygon_vertices = polygon.getPoints();
 
     auto max_point_y = [](const Point& a, const Point& b) {
        return a.y() < b.y();
     };
+
     auto max_point_x = [](const Point& a, const Point& b) {
        return a.x() < b.x();
     };
 
     // Calculate the highest and lowest x and y points
-    double max_y = std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)->y();
     double min_y  = std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)->y();
-    double max_x = std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)->x();
     double min_x  = std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)->x();
+	double max_y  = std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)->y();
 
     //loop through rows of the image (i.e. polygon)
-    for (double y_coord = min_y; y_coord < max_y; y_coord += resolution_size)
+    for (double y_coord = min_y; y_coord <= max_y; y_coord += resolution_size)
     {
         //we create a line that intersects the polygon at this y coordinate
-        Line intersecting_line = Line(Point(0, y_coord), Point (1, y_coord));
+        Ray intersecting_ray = Ray(Point(min_x, y_coord), Vector(1, 0));
+
+		auto intersections_with_polygon = intersection(polygon, intersecting_ray);
+		std::vector<Point> sorted_intersections_with_polygon(intersections_with_polygon.begin(),
+															 intersections_with_polygon.end());
+		std::sort(sorted_intersections_with_polygon.begin(), sorted_intersections_with_polygon.end(),
+				  max_point_x);
+
+		auto num_of_intersections = sorted_intersections_with_polygon.size();
+		unsigned int intersection_index = 0;
+		double x_coord = min_x;
+		bool in_polygon = false;
+
+		while (intersection_index < num_of_intersections)
+		{
+			Point point = Point(x_coord, y_coord);
+			bool isCloseToIntersectionPoint = isInPixel(point,
+														sorted_intersections_with_polygon[intersection_index],
+														resolution_size);
+			if (isCloseToIntersectionPoint && !isAVertex(point, polygon, resolution_size))
+			{
+				in_polygon = !in_polygon;
+				intersection_index++;
+			}
+			else if (isCloseToIntersectionPoint)
+			{
+				intersection_index++;
+			}
+
+			if (isAVertex(point, polygon, resolution_size) || in_polygon)
+			{
+				contained_points.emplace_back(point);
+			}
+
+			x_coord += resolution_size;
+		}
     }
 
 //    std::vector<double> node_x;
@@ -167,4 +207,28 @@ std::vector<Point> rasterize(const Polygon &polygon, const double resolution_siz
 //    }
 
     return contained_points;
+}
+
+bool isInPixel(const Point &a, const Point &b, double resolution_size)
+{
+   	double min_x = a.x() - resolution_size / 2;
+   	double min_y = a.y() - resolution_size / 2;
+   	double max_x = a.x() + resolution_size / 2;
+   	double max_y = a.y() + resolution_size / 2;
+
+   	Rectangle pixel = Rectangle(Point(min_x, min_y), Point(max_x, max_y));
+   	return contains(pixel, b);
+}
+
+bool isAVertex(const Point& point, const Polygon& polygon, double resolution_size)
+{
+	const auto& polygon_vertices = polygon.getPoints();
+	for (auto i = polygon_vertices.begin(); i != polygon_vertices.end(); ++i)
+   	{
+	   	if (isInPixel(point, *i, resolution_size))
+		{
+			return true;
+   		}
+	}
+	return false;
 }

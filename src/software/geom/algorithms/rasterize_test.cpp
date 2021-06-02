@@ -264,3 +264,24 @@ TEST(RasterizeTest, test_offset_larger_than_rectangle)
     }
     EXPECT_EQ(rasterized_points.size(), 1);
 }
+
+TEST(RasterizeTest, test_rasterize_polygon)
+{
+	std::vector<Point> points = { Point(0, 5), Point(0, 0), Point(5, 0), Point(5, 5) };
+    double offset = 1;
+    Polygon polygon = Polygon(points);
+    std::vector<Point> rasterized_points = rasterize(polygon, offset);
+    std::vector<Point> expected_points = { Point(0, 0), Point(4, 3), Point(2, 1), Point(5, 5) };
+
+    for (Point p : expected_points)
+    {
+        EXPECT_NE(rasterized_points.end(),
+                    std::find(rasterized_points.begin(), rasterized_points.end(), p));
+    }
+
+    for (auto i = rasterized_points.begin(); i != rasterized_points.end(); ++i)
+    {
+        std::cout << *i << ", ";
+        std::cout << std::endl;
+    }
+}
