@@ -35,7 +35,7 @@ struct GetBehindBallFSM
         // obstacles and we risk colliding with something), but large enough we can
         // reasonably get in the region and chip/kick the ball successfully. This
         // value is 'X' in the ASCII art below
-        double size_of_region_behind_ball = 1.1 * ROBOT_MAX_RADIUS_METERS;
+        double size_of_region_behind_ball = 4 * ROBOT_MAX_RADIUS_METERS;
 
         // ASCII art showing the region behind the ball
         // Diagram not to scale
@@ -63,8 +63,9 @@ struct GetBehindBallFSM
         const auto update_move = [size_of_region_behind_ball](auto event) {
             Vector behind_ball = Vector::createFromAngle(
                 event.control_params.chick_direction + Angle::half());
-            Point point_behind_ball = event.control_params.ball_location +
-                                      behind_ball.normalize(size_of_region_behind_ball);
+            Point point_behind_ball =
+                event.control_params.ball_location +
+                behind_ball.normalize(size_of_region_behind_ball * 3 / 4);
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), point_behind_ball,
                 event.control_params.chick_direction, 0.0, DribblerMode::OFF,
@@ -80,13 +81,29 @@ struct GetBehindBallFSM
          * @return if the robot is behind the ball
          */
         const auto behind_ball = [size_of_region_behind_ball](auto event) {
+            // A vector in the direction opposite the chip (behind the ball)
             Vector behind_ball = Vector::createFromAngle(
                 event.control_params.chick_direction + Angle::half());
-            Point point_behind_ball = event.control_params.ball_location +
-                                      behind_ball.normalize(size_of_region_behind_ball);
 
-            return robotReachedDestination(event.common.robot, point_behind_ball,
-                                           event.control_params.chick_direction);
+
+            // The points below make up the triangle that defines the region we treat as
+            // "behind the ball". They correspond to the vertices labeled 'A', 'B', and
+            // 'C' in the ASCII diagram
+
+            // We make the region close enough to the ball so that the robot will still be
+            // inside it when taking the chip.
+            Point behind_ball_vertex_A = event.control_params.ball_location;
+            Point behind_ball_vertex_B =
+                behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
+                behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
+            Point behind_ball_vertex_C =
+                behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -
+                behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
+
+            Triangle behind_ball_region = Triangle(
+                behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C);
+
+            return contains(behind_ball_region, event.common.robot.position());
         };
 
         return make_transition_table(

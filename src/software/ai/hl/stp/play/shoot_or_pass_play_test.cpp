@@ -40,7 +40,7 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1971
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(20))
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
             {
                 yield("Timestamp not at 9.5s");
             }
@@ -50,5 +50,5 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(20));
+            Duration::fromSeconds(10));
 }
