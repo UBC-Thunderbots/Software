@@ -102,12 +102,24 @@ struct AttackerFSM
                 auto keepaway_dribble_dest =
                     findKeepAwayTargetPoint(event.common.robot.position(),
                                             best_pass_so_far.value(), event.common.world);
-                auto keepaway_final_heading_vec =
-                    best_pass_so_far->receiverPoint() - best_pass_so_far->passerPoint();
-                auto keepaway_final_heading = Angle::fromRadians(std::atan2(
-                    keepaway_final_heading_vec.y(), keepaway_final_heading_vec.x()));
+
+                const auto& enemy_team = event.common.world.enemyTeam();
+
+                auto final_dribble_orientation = best_pass_so_far->passerOrientation();
+
+                if (enemy_team.numRobots() > 0)
+                {
+                    // there is a robot on the enemy team, face away from the nearest one
+                    auto nearest_enemy_robot =
+                        *enemy_team.getNearestRobot(event.common.robot.position());
+                    auto dribble_orientation_vec =
+                        nearest_enemy_robot.position() - event.common.robot.position();
+                    final_dribble_orientation = Angle::fromRadians(std::atan2(
+                        dribble_orientation_vec.y(), dribble_orientation_vec.x()));
+                }
+
                 control_params = {.dribble_destination       = keepaway_dribble_dest,
-                                  .final_dribble_orientation = keepaway_final_heading,
+                                  .final_dribble_orientation = final_dribble_orientation,
                                   .allow_excessive_dribbling = true};
             }
             else
@@ -140,7 +152,7 @@ struct AttackerFSM
                                               event.control_params.attacker_tactic_config
                                                   ->getEnemyAboutToStealBallRadius()
                                                   ->value());
-            for (const auto &enemy : event.common.world.enemyTeam().getAllRobots())
+            for (const auto& enemy : event.common.world.enemyTeam().getAllRobots())
             {
                 if (contains(about_to_steal_danger_zone, enemy.position()))
                 {

@@ -4,6 +4,7 @@
 
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
+#include "software/ai/passing/cost_function.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
@@ -42,21 +43,39 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_keep_away)
     setTactic(tactic);
     setRobotId(1);
 
-    std::vector<ValidationFunction> terminating_validation_functions = {
-        [pass, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
-            // We check if the robot reaches the desired orientation, at the
-            // desired position before checking if the ball has been kicked.
-            //
-            // The tactic should "done" after kicking the ball.
-            robotAtOrientation(1, world_ptr, pass.passerOrientation(),
-                               Angle::fromDegrees(5), yield);
-            robotAtPosition(1, world_ptr, pass.passerPoint(), 0.1, yield);
-            ballKicked(pass.passerOrientation(), world_ptr, yield);
+    // we have to create a Team for the enemy here to evaluate the initial enemy risk
+    // score
+    std::vector<Robot> enemy_team_robots;
+    std::transform(enemy_robots.begin(), enemy_robots.end(),
+                   std::back_inserter(enemy_team_robots),
+                   [](const RobotStateWithId& robot_state) {
+                       return Robot(robot_state.id, robot_state.robot_state,
+                                    Timestamp::fromSeconds(0));
+                   });
+    Team enemy_team(enemy_team_robots);
 
-            while (!tactic->done())
+    // constants copypasted from software/ai/evaluation/keep_away.cpp for now
+    // TODO: cleanup passing parameters as part of #1987
+    static constexpr double ENEMY_PROXIMITY_IMPORTANCE = 0.5;
+    static const auto ENEMY_REACTION_TIME              = Duration::fromSeconds(0.4);
+
+    auto initial_enemy_risk_score = ratePassEnemyRisk(
+        enemy_team, pass, ENEMY_REACTION_TIME, ENEMY_PROXIMITY_IMPORTANCE);
+    (void)initial_enemy_risk_score;
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [initial_enemy_risk_score, pass](std::shared_ptr<World> world_ptr,
+                                         ValidationCoroutine::push_type& yield) {
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(1))
             {
-                yield("Attacker tactic kicked ball but is not done");
+                yield("Timestamp not at 3s");
+            }
+
+            while (ratePassEnemyRisk(world_ptr->enemyTeam(), pass, ENEMY_REACTION_TIME,
+                                     ENEMY_PROXIMITY_IMPORTANCE) <
+                   initial_enemy_risk_score)
+            {
+                yield("ratePassEnemyRisk score not improved!");
             }
         }};
 
@@ -64,7 +83,7 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_keep_away)
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(5));
+            Duration::fromSeconds(2));
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -73,9 +92,13 @@ INSTANTIATE_TEST_CASE_P(
         // Stationary Ball Tests
         // Attacker point != Balls location & Balls location != Robots Location
         std::make_tuple(
+            // the best pass so far to pass into the AttackerTactic
             Pass(Point(0.0, 0.0), Point(-3, 2.5), 5),
+            // the state of the friendly robot
             RobotStateWithId{1, RobotState(Point(0.25, 0), Vector(0, 0),
                                            Angle::fromDegrees(0), Angle::fromDegrees(0))},
+            // the state of the ball
             BallState(Point(0., 0.), Vector(0, 0)),
+            // the states of the enemy robots
             TestUtil::createStationaryRobotStatesWithId(
                 {Point(-0.6, 0.25), Point(0., 0.6), Point(0.6, 0), Point(0.6, -0.25)}))));
