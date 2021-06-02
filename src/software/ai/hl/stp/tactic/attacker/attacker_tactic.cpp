@@ -69,10 +69,9 @@ double AttackerTactic::calculateRobotCost(const Robot& robot, const World& world
         // field have a cost less than 1
         cost = (robot.position() -
                 DribbleFSM::findInterceptionPoint(robot, world.ball(), world.field()))
-                   .length() /
-               world.field().totalXLength();
+                   .lengthSquared();
     }
-    return std::clamp<double>(cost, 0, 1);
+    return cost;
 }
 
 void AttackerTactic::calculateNextAction(ActionCoroutine::push_type& yield)
