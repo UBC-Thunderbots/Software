@@ -41,7 +41,7 @@ class ProtoUdpClient
      *
      * This function is only enabled if ReceiveProtoT is provided
      *
-     * @returns optional ReceiveProtoT, somtimes we might not get anything
+     * @returns optional ReceiveProtoT, sometimes we might not get anything
      */
     std::optional<ReceiveProtoT> receiveProto();
 
@@ -65,7 +65,7 @@ class ProtoUdpClient
     // Buffer to hold serialized protobuf data
     std::string data_buffer;
 
-    static constexpr unsigned int MAX_BUFFER_LENGTH = 9000;
+    static constexpr unsigned int MAX_BUFFER_LENGTH      = 9000;
     static constexpr unsigned int UDP_RECEIVE_TIMEOUT_MS = 100;
     std::array<char, MAX_BUFFER_LENGTH> raw_received_data_;
 };

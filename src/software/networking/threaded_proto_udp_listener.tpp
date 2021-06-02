@@ -9,10 +9,8 @@ ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
       receive_callback(receive_callback),
       udp_listener(io_service, ip_address, port, multicast)
 {
-    in_destructor = false;
-    io_service_thread = std::thread([this]() {
-    io_service.run();
-    });
+    in_destructor     = false;
+    io_service_thread = std::thread([this]() { io_service.run(); });
     networking_thread = std::thread([this]() {
         while (!in_destructor)
         {
@@ -20,7 +18,6 @@ ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
             if (packet.has_value())
             {
                 this->receive_callback(packet.value());
-                std::cerr<<"------"<<std::endl;
             }
         }
     });
@@ -32,9 +29,7 @@ ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
     : io_service(), receive_callback(receive_callback), udp_listener(io_service, port)
 {
     in_destructor     = false;
-    io_service_thread = std::thread([this]() {
-    io_service.run();
-    });
+    io_service_thread = std::thread([this]() { io_service.run(); });
     networking_thread = std::thread([this]() {
         while (!in_destructor)
         {
@@ -42,7 +37,6 @@ ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
             if (packet.has_value())
             {
                 this->receive_callback(packet.value());
-                std::cerr<<"------"<<std::endl;
             }
         }
     });
