@@ -6,11 +6,39 @@
 //////////////////////////////////////////////////////
 ////              Testing Circles                 ////
 //////////////////////////////////////////////////////
-TEST(RasterizeTest, segment_in_circle)
+TEST(RasterizeTest, test_circle_with_pixel_size_not_a_multiple)
 {
     Circle circle({0, 0}, 1.5f);
     double pixel_size = 1.f;
     std::vector<Point> rasterized_points = rasterize(circle, pixel_size);
+
+    for(Point p : rasterized_points)
+    {
+        EXPECT_TRUE(contains(circle, p));
+    }
+    EXPECT_EQ(rasterized_points.size(), 9);
+}
+
+TEST(RasterizeTest, test_circle_with_actual_theta_star_values)
+{
+    double robot_obstacle = 2 * 0.085f;
+    Circle circle({0, 0}, robot_obstacle);
+    double theta_star_grid_square_size = 0.09;
+    std::vector<Point> rasterized_points = rasterize(circle, theta_star_grid_square_size);
+
+    for(Point p : rasterized_points)
+    {
+        EXPECT_TRUE(contains(circle, p));
+    }
+    EXPECT_EQ(rasterized_points.size(), 9);
+}
+
+TEST(RasterizeTest, test_large_circle)
+{
+    double robot_obstacle = 1.f;
+    Circle circle({0, 0}, robot_obstacle);
+    double theta_star_grid_square_size = 0.1f;
+    std::vector<Point> rasterized_points = rasterize(circle, theta_star_grid_square_size);
 
     for(Point p : rasterized_points)
     {

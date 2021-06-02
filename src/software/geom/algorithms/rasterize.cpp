@@ -9,29 +9,14 @@
 // is positioned.
 std::vector<Point> rasterize(const Circle &circle, const double resolution_size)
 {
-//    std::vector<Point> covered_points;
-//
-//    Point origin = circle.origin();
-//    double radius = circle.radius();
-//
-//    // Added resolution_size to the max to ensure that when Points are rasterized, all
-//    // Coordinates (including pixels that are not fully contained by rectangle) are
-//    // taken into account.
-//    for (double x_offset = -radius; x_offset < radius + resolution_size; x_offset += resolution_size)
-//    {
-//        for (double y_offset = -radius; y_offset < radius + resolution_size; y_offset += resolution_size)
-//        {
-//            if(x_offset * x_offset + y_offset * y_offset < radius * radius)
-//            {
-//                covered_points.emplace_back(Point(origin.x() + x_offset, origin.y() + y_offset));
-//            }
-//        }
-//    }
-
     std::vector<Point> covered_points;
 
-    double diameter = circle.radius() * 2;
+    // Using an approach to find the points on the edges using y = +-sqrt(r^2 - (x - k)^2) + h and filling in the rest
+    // Downside is using sqrt to calculate
+    double radius = circle.radius();
+    double diameter = radius * 2;
     Point origin = circle.origin();
+
     // max number of pixels in each dimension
     int max_num_pixels = (int) std::ceil(diameter / resolution_size);
 
@@ -51,32 +36,32 @@ std::vector<Point> rasterize(const Circle &circle, const double resolution_size)
             x_offset = x_pixel * resolution_size;
         }
 
-        double x_point = origin.x() - circle.radius() + x_offset;
+        double x_point = origin.x() - radius + x_offset;
+        double y_sqrt  = std::sqrt(radius * radius - (x_point - origin.x()) * (x_point - origin.x()));
+        double y_min   = -y_sqrt + origin.y();
+        double y_max   = y_sqrt + origin.y();
 
-        for (int y_pixel = 0; y_pixel <= max_num_pixels; y_pixel++)
+        int y_num_pixels = (int) std::ceil((y_max - y_min) / resolution_size);
+        for (int y_pixel = 0; y_pixel <= y_num_pixels; y_pixel++)
         {
             double y_offset;
-            if (y_pixel == max_num_pixels)
+            if (y_pixel == y_num_pixels)
             {
-                y_offset = diameter;
+                y_offset = y_max - y_min;
             }
             else
             {
                 y_offset = y_pixel * resolution_size;
             }
-            double y_point = origin.y() - circle.radius() + y_offset;
+            double y_point = y_min + y_offset;
 
-            // if point is inside circle
-            if((x_point - origin.x()) * (x_point - origin.x()) + (y_point - origin.y()) * (y_point - origin.y()) <= circle.radius() * circle.radius())
-            {
-                covered_points.emplace_back(Point(x_point, y_point));
-            }
+            covered_points.emplace_back(Point(x_point, y_point));
         }
     }
 
-    for (auto p = covered_points.begin(); p != covered_points.end(); ++p) // TODO Remove, added for testing
-        std::cout << *p << ", ";
-    std::cout << std::endl;
+//    for (auto p = covered_points.begin(); p != covered_points.end(); ++p) // TODO Remove, added for testing
+//        std::cout << *p << ", ";
+//    std::cout << std::endl;
 
     return covered_points;
 }
@@ -120,9 +105,9 @@ std::vector<Point> rasterize(const Rectangle &rectangle, const double resolution
         }
     }
 
-    for (auto p = covered_points.begin(); p != covered_points.end(); ++p) // TODO Remove, added for testing
-        std::cout << *p << ", ";
-    std::cout << std::endl;
+//    for (auto p = covered_points.begin(); p != covered_points.end(); ++p) // TODO Remove, added for testing
+//        std::cout << *p << ", ";
+//    std::cout << std::endl;
 
     return covered_points;
 }
