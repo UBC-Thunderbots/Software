@@ -6,14 +6,6 @@
 #include "firmware/boards/robot_stm32h7/usart.h"
 
 /**
- * Connects the u-blox ODIN-W262 to wifi and makes sure the connection is maintained
- * throughout the lifetime of the task.
- *
- * @param arg unused
- */
-void io_ublox_odinw262_communicator_task(void* arg);
-
-/**
  * Initializes the Ublox ODIN-W262 Communicator. This allows us to send AT Commands
  * according to the manual:
  *
@@ -27,6 +19,12 @@ void io_ublox_odinw262_communicator_task(void* arg);
 void io_ublox_odinw262_communicator_init(UART_HandleTypeDef* uart_handle,
                                          GpioPin_t* ublox_reset,
                                          uint32_t ublox_response_timeout);
+
+/**
+ * Connects the u-blox ODIN-W262 to WiFi
+ */
+void io_ublox_odinw262_communicator_connectToWiFi(void);
+
 /*
  * Reset the u-blox ODIN-W262
  *

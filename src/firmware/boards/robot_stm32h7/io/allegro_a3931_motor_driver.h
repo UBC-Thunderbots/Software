@@ -25,19 +25,15 @@ typedef struct AllegroA3931MotorDriver AllegroA3931MotorDriver_t;
  *                operate in the correct frequency range for the motor driver. Please
  *                talk to Elec. to determine this.
  * @param reset_pin A GPIO pin connected to the "reset" pin on the motor driver.
- * @param coast_pin A GPIO pin connected to the "coast" pin on the motor driver.
  * @param mode_pin A GPIO pin connected to the "mode" pin on the motor driver.
  * @param direction_pin A GPIO pin connected to the "direction" pin on the motor driver.
- * @param brake_pin A GPIO pin connected to the "brake" pin on the motor driver.
- * @param esf_pin A GPIO pin connected to the "ESF" pin on the motor driver.
- *                The "ESF" pin, when active, causes the motor driver to stop the
- *                motor if a short is detected.
  *
  * @return A motor driver with the pwm percentage set to zero.
  */
-AllegroA3931MotorDriver_t* io_allegro_a3931_motor_driver_create(
-    PwmPin_t* pwm_pin, GpioPin_t* reset_pin, GpioPin_t* coast_pin, GpioPin_t* mode_pin,
-    GpioPin_t* direction_pin, GpioPin_t* brake_pin, GpioPin_t* esf_pin);
+AllegroA3931MotorDriver_t* io_allegro_a3931_motor_driver_create(PwmPin_t* pwm_pin,
+                                                                GpioPin_t* reset_pin,
+                                                                GpioPin_t* mode_pin,
+                                                                GpioPin_t* direction_pin);
 
 /**
  * Destroy the given motor driver
@@ -60,8 +56,19 @@ void io_allegro_a3931_motor_driver_setDirection(
 
 /**
  * Set the PWM percentage for the given motor driver
+ *
+ * NOTE: The motor driver will be automatically enabled when the PWM
+ * is set.
+ *
  * @param motor_driver
  * @param pwm_percentage A value in [0,1] indicating the PWM percentage
  */
 void io_allegro_a3931_motor_setPwmPercentage(AllegroA3931MotorDriver_t* motor_driver,
                                              float pwm_percentage);
+
+/**
+ * Disable the motor driver, allows the motors to spin freely
+ *
+ * @param motor_driver
+ */
+void io_allegro_a3931_motor_disable(AllegroA3931MotorDriver_t* motor_driver);

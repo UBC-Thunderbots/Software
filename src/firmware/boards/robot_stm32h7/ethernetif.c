@@ -1,3 +1,7 @@
+// override default version of stm32h7xx_hal_eth.c with version from
+// https://community.st.com/s/question/0D50X0000C6eNNSSQ2/bug-fixes-stm32h7-ethernet
+//
+// TODO (#2095) when the ethernet drivers for STM32H7 are fixed, remove this file
 /**
  ******************************************************************************
  * File Name          : ethernetif.c
@@ -6,7 +10,7 @@
  ******************************************************************************
  * @attention
  *
- * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+ * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
  * All rights reserved.</center></h2>
  *
  * This software component is licensed by ST under Ultimate Liberty license
@@ -20,40 +24,80 @@
 /* Includes ------------------------------------------------------------------*/
 #include "ethernetif.h"
 
-#include <string.h>
-
-#include "cmsis_os.h"
-#include "lan8742.h"
 #include "lwip/ethip6.h"
 #include "lwip/opt.h"
-#include "lwip/tcpip.h"
 #include "lwip/timeouts.h"
 #include "main.h"
 #include "netif/etharp.h"
 #include "netif/ethernet.h"
+/* USER CODE BEGIN Include for User BSP */
+#include "lan8742.h"
+
+/* USER CODE END Include for User BSP */
+#include <string.h>
+
+#include "cmsis_os.h"
+#include "lwip/tcpip.h"
+#include "queue.h"
+#include "semphr.h"
 
 /* Within 'USER CODE' section, code will be kept by default at each generation */
 /* USER CODE BEGIN 0 */
+
 
 /* USER CODE END 0 */
 
 /* Private define ------------------------------------------------------------*/
 /* The time to block waiting for input. */
 #define TIME_WAITING_FOR_INPUT (portMAX_DELAY)
-/* USER CODE BEGIN OS_THREAD_STACK_SIZE_WITH_RTOS */
 /* Stack size of the interface thread */
-#define INTERFACE_THREAD_STACK_SIZE (350)
-/* USER CODE END OS_THREAD_STACK_SIZE_WITH_RTOS */
+#define INTERFACE_THREAD_STACK_SIZE (1024)
 /* Network interface name */
 #define IFNAME0 's'
 #define IFNAME1 't'
 
-/* ETH Setting  */
+
+/* ETH_RX_BUFFER_SIZE
+ *  - ETH_RX_BUFFER_SIZE should be a multiple of the cache line size. For STM32H7, cache
+ * lines are 32-bytes.
+ *  - The implementation is zero-copy. Packets are received directly to buffers. Buffers
+ * chain to receive packets larger than ETH_RX_BUFFER_SIZE.
+ *  - Is the length of the receive packets known? To conserve memory, ETH_RX_BUFFER_SIZE
+ * may be reduced to the expected maximum packet length.
+ *
+ * ETH_RX_BUFFER_COUNT
+ *  - ETH_RX_BUFFER_COUNT must be greater than or equal to ETH_RX_DESC_CNT.
+ *  - Is IP reassembly (lwipopts.h IP_REASSEMBLY) necessary? If it is, ETH_RX_BUFFER_COUNT
+ * should be much greater than ETH_RX_DESC_CNT because lwIP holds the buffers of
+ * fragmented packets until they're reassembled or timed out.
+ *  - If packets may arrive faster than they can be processed, ETH_RX_BUFFER_COUNT should
+ * increase with their burstiness.
+ */
+#define ETH_RX_BUFFER_COUNT                                                              \
+    125 /* This app buffers receive packets of its primary service                       \
+         * protocol for processing later. */
+#define ETH_RX_BUFFERS_ARE_CACHED                                                        \
+    0 /* To conserve memory, this app positions its Rx Buffers                           \
+       * (".RxArraySection" section) in a not-cacheable MPU region. */
+
+#define ETH_TX_BUFFER_MAX                                                                \
+    ((ETH_TX_DESC_CNT)*2)           /* HAL_ETH_Transmit(_IT) may attach two              \
+                                     * buffers per descriptor. */
+#define ETH_TX_BUFFERS_ARE_CACHED 1 /* Tx buffers are in normal, cached memory. */
+#define ETH_TX_QUEUE_ENABLE                                                              \
+    1 /* Queue to reduce tx-blocking. Only enable if you know the app                    \
+       * won't change pbufs after transmit. */
+#define ETH_TX_QUEUE_SIZE                                                                \
+    ((ETH_TX_DESC_CNT)-2) /* Dimension the tx queue slightly smaller than                \
+                           * the Tx Descriptor Count because, if the descriptors are     \
+                           * dimensioned well, it's less cycles wait for a previous      \
+                           * transmit to complete than for HAL_ETH_Transmit_IT to fail   \
+                           * because there aren't enough descriptors and to have to wait \
+                           * and re-try. */
+
 #define ETH_DMA_TRANSMIT_TIMEOUT (20U)
-/* ETH_RX_BUFFER_SIZE parameter is defined in lwipopts.h */
 
 /* USER CODE BEGIN 1 */
-#define CORE_CM7 1
 
 /* USER CODE END 1 */
 
@@ -61,7 +105,7 @@
 /*
 @Note: This interface is implemented to operate in zero-copy mode only:
         - Rx buffers are allocated statically and passed directly to the LwIP stack
-          they will return back to ETH DMA after been processed by the stack.
+          they will return back to DMA after been processed by the stack.
         - Tx Buffers will be allocated from LwIP stack memory heap,
           then passed to ETH HAL driver.
 
@@ -73,30 +117,68 @@
        to customize it please redefine ETH_TX_DESC_CNT in ETH GUI (Tx Descriptor Length)
        so that updated value will be generated in stm32xxxx_hal_conf.h
 
-  2.a. Rx Buffers number must be between ETH_RX_DESC_CNT and 2*ETH_RX_DESC_CNT
+  2.a. Rx Buffers number: ETH_RX_BUFFER_COUNT must be greater than ETH_RX_DESC_CNT.
   2.b. Rx Buffers must have the same size: ETH_RX_BUFFER_SIZE, this value must
        passed to ETH DMA in the init field (heth.Init.RxBuffLen)
-  2.c  The RX Ruffers addresses and sizes must be properly defined to be aligned
-       to L1-CACHE line size (32 bytes).
 */
+
+
+/* RxBuff_t is an Rx Buffer container for the ETH driver to zero-copy receive into.
+ * With lwIP, it contains a pbuf_custom and the buffer.
+ * In production code, D-cache would be enabled. So the Rx Buffer memory is either
+ * cached or in an MPU region configured not-cacheable or write-through.
+ *
+ * The Rx DMA writes direct to physical memory.
+ * The EthIfRxBuff array interleaves pbuf_customs and buffers in memory.
+ *
+ * If the Rx Buffer memory is cached:
+ *  - After Rx DMA has written a buffer, the buffer must be cache-invalidated before the
+ *    core reads it, but without invalidating the pbuf_customs part. So
+ *    - The EthIfRxBuff definition is cache-line aligned (perhaps in the link command
+ * file),
+ *    - The buffer offsets are cache-line aligned, and
+ *    - The buffer lengths are rounded up to a multiple of cache-line size.
+ *  - Cortex M7 cache lines are 32-bytes.
+ *  - The memory size is:
+ *      (ETH_RX_BUFFER_COUNT * (((sizeof(struct pbuf_custom) + 31) & ~31) +
+ *        ((ETH_RX_BUFFER_SIZE + 31) & ~31)))
+ *
+ * If the Rx Buffer memory is not-cacheable or write-through:
+ *  - The memory alignments may be relaxed, resulting a smaller Rx Buffer memory
+ * footprint.
+ *  - The memory size is:
+ *      (ETH_RX_BUFFER_COUNT * (((sizeof(struct pbuf_custom) + 3) & ~3) +
+ *        ((ETH_RX_BUFFER_SIZE + 3) & ~3)))
+ *  - The MPU region size should be the lowest power of two greater than or equal the
+ *    section's size, and its start address should be a multiple of its size.
+ */
+typedef struct
+{
+    struct pbuf_custom pbuf_custom;
+#if ETH_RX_BUFFERS_ARE_CACHED
+    uint8_t buff[(ETH_RX_BUFFER_SIZE + 31) & ~31] __ALIGNED(32);
+#else
+    uint8_t buff[(ETH_RX_BUFFER_SIZE + 3) & ~3] __ALIGNED(4);
+#endif
+} RxBuff_t;
 
 #if defined(__ICCARM__) /*!< IAR Compiler */
 
-#pragma location = 0x30040000
+#pragma location = 0x24000100
 ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
-#pragma location = 0x30040060
+#pragma location = 0x24000e38
 ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
-#pragma location = 0x30040200
-uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_RX_BUFFER_SIZE]; /* Ethernet Receive Buffers */
+#pragma location = 0x24002000
+RxBuff_t EthIfRxBuff[ETH_RX_BUFFER_COUNT]; /* Ethernet Rx Buffers */
 
 #elif defined(__CC_ARM) /* MDK ARM Compiler */
 
-__attribute__((at(0x30040000)))
+__attribute__((at(0x24000100)))
 ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
-__attribute__((at(0x30040060)))
+__attribute__((at(0x24000e38)))
 ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
-__attribute__((at(0x30040200)))
-uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_RX_BUFFER_SIZE]; /* Ethernet Receive Buffer */
+__attribute__((at(0x24002000)))
+RxBuff_t EthIfRxBuff[ETH_RX_BUFFER_COUNT]; /* Ethernet Rx Buffers */
 
 #elif defined(__GNUC__) /* GNU Compiler */
 
@@ -104,25 +186,60 @@ ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT]
     __attribute__((section(".RxDecripSection"))); /* Ethernet Rx DMA Descriptors */
 ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT]
     __attribute__((section(".TxDecripSection"))); /* Ethernet Tx DMA Descriptors */
-uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_RX_BUFFER_SIZE]
-    __attribute__((section(".RxArraySection"))); /* Ethernet Receive Buffers */
+RxBuff_t EthIfRxBuff[ETH_RX_BUFFER_COUNT]
+    __attribute__((aligned(32), section(".RxArraySection"))); /* Ethernet Rx Buffers */
 
 #endif
+
+
+/* LwIP Memory pool descriptor for EthIfRxBuff.
+ * This does the same as LWIP_MEMPOOL_DECLARE, except EthIfRxBuff's defined
+ * separately for special section placement. */
+#if MEMP_STATS
+static struct stats_mem memp_stats_EthIfRxBuff;
+#endif
+static struct memp *memp_tab_EthIfRxBuff;
+static const struct memp_desc memp_EthIfRxBuff = {
+#if defined(LWIP_DEBUG) || MEMP_OVERFLOW_CHECK || LWIP_STATS_DISPLAY
+    "RxBuff Pool",
+#endif /* LWIP_DEBUG || MEMP_OVERFLOW_CHECK || LWIP_STATS_DISPLAY */
+#if MEMP_STATS
+    &memp_stats_EthIfRxBuff,
+#endif
+    LWIP_MEM_ALIGN_SIZE(sizeof(RxBuff_t)),
+    ETH_RX_BUFFER_COUNT,
+    (uint8_t *)EthIfRxBuff,
+    &memp_tab_EthIfRxBuff};
+
+/* Flag when RxBuffAlloc exhausts the Rx Buffer Pool, so the next RxPktDiscard will
+ * repopulate the buffers of the Rx DMA Descriptors. */
+static uint8_t RxBuffEmpty;
+
+
+#if ETH_TX_QUEUE_ENABLE
+/* Queue for packet transmit. */
+typedef struct TxQueue_t
+{
+    struct TxQueue_t *next;
+    struct pbuf *p;
+} TxQueue_t;
+
+static TxQueue_t TxQueue[ETH_TX_QUEUE_SIZE];
+static TxQueue_t *TxQueueFree, *TxQueueHead, *TxQueueTail;
+#endif /* ETH_TX_QUEUE_ENABLE */
 
 /* USER CODE BEGIN 2 */
 
 /* USER CODE END 2 */
 
-osSemaphoreId RxPktSemaphore = NULL; /* Semaphore to signal incoming packets */
+TaskHandle_t EthIfThread;     /* Handle of the interface thread */
+QueueHandle_t TxPktSemaphore; /* Semaphore to signal transmit packet complete */
 
 /* Global Ethernet handle */
 ETH_HandleTypeDef heth;
 ETH_TxPacketConfig TxConfig;
+ETH_BufferTypeDef Txbuffer[ETH_TX_BUFFER_MAX];
 
-/* Memory Pool Declaration */
-LWIP_MEMPOOL_DECLARE(RX_POOL, 10, sizeof(struct pbuf_custom), "Zero-copy RX PBUF pool");
-
-/* Private function prototypes -----------------------------------------------*/
 int32_t ETH_PHY_IO_Init(void);
 int32_t ETH_PHY_IO_DeInit(void);
 int32_t ETH_PHY_IO_ReadReg(uint32_t DevAddr, uint32_t RegAddr, uint32_t *pRegVal);
@@ -133,11 +250,17 @@ lan8742_Object_t LAN8742;
 lan8742_IOCtx_t LAN8742_IOCtx = {ETH_PHY_IO_Init, ETH_PHY_IO_DeInit, ETH_PHY_IO_WriteReg,
                                  ETH_PHY_IO_ReadReg, ETH_PHY_IO_GetTick};
 
+
+/* Private function prototypes -----------------------------------------------*/
+/* USER CODE BEGIN Private function prototypes for User BSP */
+
+/* USER CODE END Private function prototypes for User BSP */
+
 /* USER CODE BEGIN 3 */
+
 /* USER CODE END 3 */
 
 /* Private functions ---------------------------------------------------------*/
-void pbuf_free_custom(struct pbuf *p);
 void Error_Handler(void);
 
 void HAL_ETH_MspInit(ETH_HandleTypeDef *ethHandle)
@@ -246,10 +369,200 @@ void HAL_ETH_MspDeInit(ETH_HandleTypeDef *ethHandle)
  */
 void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
 {
-    osSemaphoreRelease(RxPktSemaphore);
+    portBASE_TYPE taskWoken = pdFALSE;
+    vTaskNotifyGiveFromISR(EthIfThread, &taskWoken);
+    portYIELD_FROM_ISR(taskWoken);
 }
 
 /* USER CODE BEGIN 4 */
+
+#if ETH_TX_QUEUE_ENABLE
+/**
+ * @brief  Ethernet Tx Transfer completed callback
+ * @param  heth: ETH handle
+ * @retval None
+ */
+void HAL_ETH_TxCpltCallback(ETH_HandleTypeDef *heth)
+{
+    portBASE_TYPE taskWoken = pdFALSE;
+    xSemaphoreGiveFromISR(TxPktSemaphore, &taskWoken);
+    portYIELD_FROM_ISR(taskWoken);
+}
+#endif /* ETH_TX_QUEUE_ENABLE */
+
+/**
+ * @brief  Ethernet DMA transfer error callback
+ * @param  heth: ETH handle
+ * @retval None
+ */
+void HAL_ETH_DMAErrorCallback(ETH_HandleTypeDef *heth)
+{
+    /* If a receive buffer unavailable error occurred, signal the
+     * ethernetif_input task to call HAL_ETH_GetRxDataBuffer to rebuild the
+     * Rx Descriptors and restart receive. */
+    if (heth->DMAErrorCode & ETH_DMACSR_RBU)
+    {
+        portBASE_TYPE taskWoken = pdFALSE;
+        vTaskNotifyGiveFromISR(EthIfThread, &taskWoken);
+        portYIELD_FROM_ISR(taskWoken);
+    }
+}
+
+
+/**
+ * @brief  Custom free for the Rx Buffer Pool.
+ * @param  p Pointer to the packet buffer struct.
+ * @retval None
+ */
+static void RxPoolCustomFree(struct pbuf *p)
+{
+    LWIP_MEMPOOL_FREE(EthIfRxBuff, p);
+
+    /* If the Rx Buffer Pool was exhausted, signal the ethernetif_input task to
+     * call HAL_ETH_GetRxDataBuffer to rebuild the Rx descriptors. */
+    if (RxBuffEmpty)
+    {
+        xTaskNotifyGive(EthIfThread);
+        RxBuffEmpty = 0;
+    }
+}
+
+/**
+ * @brief  Callback function given to the ETH driver at init to allocate a
+ *         buffer.
+ * @retval Pointer to the buffer, or NULL if no buffers are available.
+ */
+static uint8_t *RxBuffAlloc(void)
+{
+    struct pbuf_custom *p = LWIP_MEMPOOL_ALLOC(EthIfRxBuff);
+    uint8_t *buff;
+
+    if (p)
+    {
+        /* Get the buff from the struct pbuf address. */
+        buff = (uint8_t *)p + offsetof(RxBuff_t, buff);
+
+        /* Initialize the struct pbuf.
+         * This must be performed whenever a buffer's allocated because it may be
+         * changed by lwIP or the app, e.g., pbuf_free decrements ref. */
+        pbuf_alloced_custom(PBUF_RAW, 0, PBUF_REF, p, buff, ETH_RX_BUFFER_SIZE);
+    }
+    else
+    {
+        /* Rx Buffer Pool is exhausted. */
+        RxBuffEmpty = 1;
+        buff        = NULL;
+    }
+
+    return buff;
+}
+
+/**
+ * @brief  Callback function given to the ETH driver at init to free a buffer.
+ * @param  buff Pointer to the buffer, or NULL if no buffers are available.
+ * @retval None
+ */
+static void RxBuffFree(uint8_t *buff)
+{
+    struct pbuf *p;
+
+    /* Get the struct pbuf from the buff address. */
+    p = (struct pbuf *)(buff - offsetof(RxBuff_t, buff));
+    RxPoolCustomFree(p);
+}
+
+/**
+ * @brief  Callback function given to the ETH driver at init to chain buffers
+ *         as a packet.
+ * @param  ppPktFirst Double-pointer to the first packet buffer struct of the
+ *         packet.
+ * @param  ppPktLast Double-pointer to the last packet buffer struct of the
+ *         packet.
+ * @param  buff Pointer to the buffer.
+ * @param  buffLength length of the buffer.
+ * @retval None
+ */
+static void RxPktAssemble(void **ppPktFirst, void **ppPktLast, uint8_t *buff,
+                          uint16_t buffLength)
+{
+    struct pbuf **ppFirst = (struct pbuf **)ppPktFirst;
+    struct pbuf **ppLast  = (struct pbuf **)ppPktLast;
+    struct pbuf *p;
+
+    /* Get the struct pbuf from the buff address. */
+    p          = (struct pbuf *)(buff - offsetof(RxBuff_t, buff));
+    p->next    = NULL;
+    p->tot_len = 0;
+    p->len     = buffLength;
+
+    /* Chain the buffer. */
+    if (!*ppFirst)
+    {
+        /* The first buffer of the packet. */
+        *ppFirst = p;
+    }
+    else
+    {
+        /* Chain the buffer to the end of the packet. */
+        (*ppLast)->next = p;
+    }
+    *ppLast = p;
+
+    /* Update the total length of all the buffers of the chain. Each pbuf in the chain
+     * should have its tot_len
+     * set to its own length, plus the length of all the following pbufs in the chain. */
+    for (p = *ppFirst; p != NULL; p = p->next)
+    {
+        p->tot_len += buffLength;
+    }
+
+    /* Invalidating cache isn't necessary if the rx buffers are in a not-cacheable or
+     * write-through MPU region. */
+#if ETH_RX_BUFFERS_ARE_CACHED
+    /* Invalidate data cache because Rx DMA's writing to physical memory makes it stale.
+     */
+    SCB_InvalidateDCache_by_Addr((uint32_t *)buff, buffLength);
+#endif
+}
+
+/**
+ * @brief  Callback function given to the ETH driver at init to discard a
+ *         packet.
+ * @param  pPkt Pointer to the packet buffer struct.
+ * @retval None
+ */
+static void RxPktDiscard(void *pPkt)
+{
+    struct pbuf *p = (struct pbuf *)pPkt;
+    struct pbuf *nextp;
+
+    while (p)
+    {
+        nextp = p->next;
+        RxPoolCustomFree(p);
+        p = nextp;
+    }
+}
+
+/**
+ * @brief  Initialize the Rx Buffer Pool.
+ * @retval None
+ */
+static void RxPoolInit(void)
+{
+    int k;
+
+    /* Initialize the custom_free_function of each pbuf_custom here to save
+     * cycles later. */
+    for (k = 0; k < ETH_RX_BUFFER_COUNT; k++)
+    {
+        EthIfRxBuff[k].pbuf_custom.custom_free_function = RxPoolCustomFree;
+    }
+
+    /* Initialize the Rx Buffer Pool. */
+    LWIP_MEMPOOL_INIT(EthIfRxBuff);
+}
+
 
 /* USER CODE END 4 */
 
@@ -265,14 +578,13 @@ void HAL_ETH_RxCpltCallback(ETH_HandleTypeDef *heth)
  */
 static void low_level_init(struct netif *netif)
 {
-    HAL_StatusTypeDef hal_eth_init_status = HAL_OK;
-    /* USER CODE BEGIN OS_THREAD_ATTR_CMSIS_RTOS_V2 */
+    HAL_StatusTypeDef hal_eth_init_status;
+    /* USER CODE BEGIN low_level_init Variables Intialization for User BSP */
     osThreadAttr_t attributes;
-    /* USER CODE END OS_THREAD_ATTR_CMSIS_RTOS_V2 */
-    uint32_t idx = 0;
     ETH_MACConfigTypeDef MACConf;
     int32_t PHYLinkState;
     uint32_t duplex, speed = 0;
+    /* USER CODE END low_level_init Variables Intialization for User BSP */
     /* Start ETH HAL Init */
 
     uint8_t MACAddr[6];
@@ -287,27 +599,43 @@ static void low_level_init(struct netif *netif)
     heth.Init.MediaInterface = HAL_ETH_RMII_MODE;
     heth.Init.TxDesc         = DMATxDscrTab;
     heth.Init.RxDesc         = DMARxDscrTab;
-    heth.Init.RxBuffLen      = 1524;
+    heth.Init.RxBuffLen      = ETH_RX_BUFFER_SIZE;
+    heth.Init.RxBuffAlloc    = RxBuffAlloc;
+    heth.Init.RxBuffFree     = RxBuffFree;
+    heth.Init.RxPktAssemble  = RxPktAssemble;
+    heth.Init.RxPktDiscard   = RxPktDiscard;
 
     /* USER CODE BEGIN MACADDRESS */
-    // TODO configure MAC address based on ROBOT ID
-    // https://github.com/UBC-Thunderbots/Software/issues/1517
+
     /* USER CODE END MACADDRESS */
+
+    /* Initialize the Rx Buffer Pool.
+     * This must occur prior to HAL_ETH_Init because HAL_ETH_Init uses the
+     * buffers to build the Rx DMA Descriptors. */
+    RxPoolInit();
 
     hal_eth_init_status = HAL_ETH_Init(&heth);
 
-    memset(&TxConfig, 0, sizeof(ETH_TxPacketConfig));
+    /* Configuration for HAL_ETH_Transmit(_IT). */
     TxConfig.Attributes   = ETH_TX_PACKETS_FEATURES_CSUM | ETH_TX_PACKETS_FEATURES_CRCPAD;
     TxConfig.ChecksumCtrl = ETH_CHECKSUM_IPHDR_PAYLOAD_INSERT_PHDR_CALC;
     TxConfig.CRCPadCtrl   = ETH_CRC_PAD_INSERT;
+    TxConfig.TxBuffer     = Txbuffer;
+
+#if ETH_TX_QUEUE_ENABLE
+    /* Initialize the Tx Packet Queue. */
+    for (int i = 0; i < ETH_TX_QUEUE_SIZE; i++)
+    {
+        TxQueue[i].next = TxQueueFree;
+        TxQueueFree     = &TxQueue[i];
+    }
+
+    /* Create a counting semaphore for signalling transmit packet complete
+     * Use raw FreeRTOS because CMSIS-RTOS API can't create a semaphore with zero count */
+    TxPktSemaphore = xSemaphoreCreateCounting(ETH_TX_QUEUE_SIZE, 0);
+#endif /* ETH_TX_QUEUE_ENABLE */
 
     /* End ETH HAL Init */
-
-    /* Initialize the RX POOL */
-    LWIP_MEMPOOL_INIT(RX_POOL);
-
-    /* Pass all multicast frames: needed for IPv6 protocol*/
-    heth.Instance->MACPFR |= ETH_MACPFR_PM;
 
 #if LWIP_ARP || LWIP_ETHERNET
 
@@ -329,37 +657,29 @@ static void low_level_init(struct netif *netif)
 /* don't set NETIF_FLAG_ETHARP if this device is not an ethernet one */
 #if LWIP_ARP
     netif->flags |= NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP;
+    netif->flags |= NETIF_FLAG_IGMP;
 #else
     netif->flags |= NETIF_FLAG_BROADCAST;
 #endif /* LWIP_ARP */
 
-    for (idx = 0; idx < ETH_RX_DESC_CNT; idx++)
-    {
-        HAL_ETH_DescAssignMemory(&heth, idx, Rx_Buff[idx], NULL);
-    }
-
-    /* create a binary semaphore used for informing ethernetif of frame reception */
-    RxPktSemaphore = osSemaphoreNew(1, 1, NULL);
-
-    /* create the task that handles the ETH_MAC */
-    /* USER CODE BEGIN OS_THREAD_NEW_CMSIS_RTOS_V2 */
+    /* Create the task that handles receiving packets from the ETH_MAC */
     memset(&attributes, 0x0, sizeof(osThreadAttr_t));
     attributes.name       = "EthIf";
     attributes.stack_size = INTERFACE_THREAD_STACK_SIZE;
     attributes.priority   = osPriorityRealtime;
-    osThreadNew(ethernetif_input, netif, &attributes);
-    /* USER CODE END OS_THREAD_NEW_CMSIS_RTOS_V2 */
-    /* USER CODE BEGIN PHY_PRE_CONFIG */
-
-    /* USER CODE END PHY_PRE_CONFIG */
+    EthIfThread           = osThreadNew(ethernetif_input, netif, &attributes);
+    /* USER CODE BEGIN low_level_init Code 1 for User BSP */
     /* Set PHY IO functions */
     LAN8742_RegisterBusIO(&LAN8742, &LAN8742_IOCtx);
 
     /* Initialize the LAN8742 ETH PHY */
     LAN8742_Init(&LAN8742);
 
+    /* USER CODE END low_level_init Code 1 for User BSP */
+
     if (hal_eth_init_status == HAL_OK)
     {
+        /* USER CODE BEGIN low_level_init Code 2 for User BSP */
         PHYLinkState = LAN8742_GetLinkState(&LAN8742);
 
         /* Get link state */
@@ -405,8 +725,10 @@ static void low_level_init(struct netif *netif)
             netif_set_link_up(netif);
 
             /* USER CODE BEGIN PHY_POST_CONFIG */
+
             /* USER CODE END PHY_POST_CONFIG */
         }
+        /* USER CODE END low_level_init Code 2 for User BSP */
     }
     else
     {
@@ -426,128 +748,166 @@ static void low_level_init(struct netif *netif)
  *
  * @param netif the lwip network interface structure for this ethernetif
  * @param p the MAC packet to send (e.g. IP packet including MAC addresses and type)
- * @return ERR_OK if the packet could be sent
- *         an err_t value if the packet couldn't be sent
+ * @return ERR_OK if the packet was sent, or ERR_IF if the packet was unable to be sent
  *
- * @note Returning ERR_MEM here if a DMA queue of your MAC is full can lead to
- *       strange results. You might consider waiting for space in the DMA queue
- *       to become available since the stack doesn't retry to send a packet
- *       dropped because of memory failure (except for the TCP timers).
+ * @note ERR_OK means the packet was sent (but not necessarily transmit complete),
+ * and ERR_IF means the packet has more chained buffers than the interface supports.
  */
-
 static err_t low_level_output(struct netif *netif, struct pbuf *p)
 {
-    uint32_t i = 0;
     struct pbuf *q;
-    err_t errval = ERR_OK;
-    ETH_BufferTypeDef Txbuffer[ETH_TX_DESC_CNT];
+    int i;
 
-    memset(Txbuffer, 0, ETH_TX_DESC_CNT * sizeof(ETH_BufferTypeDef));
-
-    for (q = p; q != NULL; q = q->next)
+    /* Prepare TxConfig for HAL_ETH_Transmit_IT. */
+    q = p;
+    for (i = 0;; i++)
     {
-        if (i >= ETH_TX_DESC_CNT)
+        if (i >= ETH_TX_BUFFER_MAX)
             return ERR_IF;
 
         Txbuffer[i].buffer = q->payload;
         Txbuffer[i].len    = q->len;
 
-        if (i > 0)
-        {
-            Txbuffer[i - 1].next = &Txbuffer[i];
-        }
-
-        if (q->next == NULL)
-        {
-            Txbuffer[i].next = NULL;
-        }
-
-        i++;
-    }
-
-    TxConfig.Length   = p->tot_len;
-    TxConfig.TxBuffer = Txbuffer;
-
-    HAL_ETH_Transmit(&heth, &TxConfig, ETH_DMA_TRANSMIT_TIMEOUT);
-
-    return errval;
-}
-
-/**
- * Should allocate a pbuf and transfer the bytes of the incoming
- * packet from the interface into the pbuf.
- *
- * @param netif the lwip network interface structure for this ethernetif
- * @return a pbuf filled with the received packet (including MAC header)
- *         NULL on memory error
- */
-static struct pbuf *low_level_input(struct netif *netif)
-{
-    struct pbuf *p = NULL;
-    ETH_BufferTypeDef RxBuff[ETH_RX_DESC_CNT];
-    uint32_t framelength = 0, i = 0;
-    struct pbuf_custom *custom_pbuf;
-
-    memset(RxBuff, 0, ETH_RX_DESC_CNT * sizeof(ETH_BufferTypeDef));
-
-    for (i = 0; i < ETH_RX_DESC_CNT - 1; i++)
-    {
-        RxBuff[i].next = &RxBuff[i + 1];
-    }
-
-    if (HAL_ETH_GetRxDataBuffer(&heth, RxBuff) == HAL_OK)
-    {
-        HAL_ETH_GetRxDataLength(&heth, &framelength);
-
-        /* Build Rx descriptor to be ready for next data reception */
-        HAL_ETH_BuildRxDescriptors(&heth);
-
-#if !defined(DUAL_CORE) || defined(CORE_CM7)
-        /* Invalidate data cache for ETH Rx Buffers */
-        SCB_InvalidateDCache_by_Addr((uint32_t *)RxBuff->buffer, framelength);
+        /* Cleaning cache isn't necessary if the tx buffers are in a not-cacheable MPU
+         * region. */
+#if ETH_TX_BUFFERS_ARE_CACHED
+        uint8_t *dataStart = q->payload;
+        uint8_t *lineStart = (uint8_t *)((uint32_t)dataStart & ~31);
+        SCB_CleanDCache_by_Addr((uint32_t *)lineStart, q->len + (dataStart - lineStart));
 #endif
 
-        custom_pbuf = (struct pbuf_custom *)LWIP_MEMPOOL_ALLOC(RX_POOL);
-        if (custom_pbuf != NULL)
+        q = q->next;
+        if (!q)
         {
-            custom_pbuf->custom_free_function = pbuf_free_custom;
-            p = pbuf_alloced_custom(PBUF_RAW, framelength, PBUF_REF, custom_pbuf,
-                                    RxBuff->buffer, framelength);
+            Txbuffer[i].next = NULL;
+            break;
+        }
+
+        Txbuffer[i].next = &Txbuffer[i + 1];
+    }
+    TxConfig.Length = p->tot_len;
+
+#if ETH_TX_QUEUE_ENABLE
+    TxQueue_t *txQ;
+    TickType_t blockTime;
+    HAL_StatusTypeDef halResult;
+
+    /* Loop until the transmit's started. */
+    while (p)
+    {
+        txQ = TxQueueFree;
+        if (txQ)
+        {
+            /* Queue available.
+             * Try to transmit.
+             * NOTE performance could be improved if HAL_ETH_Transmit_IT did this
+             * queuing as then we wouldn't "try" to transmit as we'd know how many
+             * descriptors are available and wouldn't start until we know there's
+             * enough. */
+            halResult = HAL_ETH_Transmit_IT(&heth, &TxConfig);
+            if (halResult == HAL_OK)
+            {
+                /* Transmit's started.
+                 * Queue the packet so its buffers may be freed in a later call of
+                 * low_level_output, after its transmit's complete. */
+                TxQueueFree = txQ->next;
+                txQ->next   = 0;
+                txQ->p      = p;
+                if (!TxQueueHead)
+                {
+                    TxQueueHead = txQ;
+                }
+                else
+                {
+                    TxQueueTail->next = txQ;
+                }
+                TxQueueTail = txQ;
+
+                /* Prevent lwIP freeing the packet before its transmit's complete. */
+                pbuf_ref(p);
+
+                p         = NULL;
+                blockTime = 0;
+            }
+            else
+            {
+                /* HAL_ETH_Transmit_IT error status means no Tx Descriptors available.
+                 * Wait for a previous transmit to complete, and try again. */
+                blockTime = portMAX_DELAY;
+            }
+        }
+        else
+        {
+            /* Queue full.
+             * Wait for a previous transmit to complete, and try again. */
+            blockTime = portMAX_DELAY;
+        }
+
+        /* Wait for previous transmits to complete.
+         * Free their packet buffers.
+         * Only block if we couldn't start transmit. */
+        while (xSemaphoreTake(TxPktSemaphore, blockTime) == pdPASS)
+        {
+            txQ         = TxQueueHead;
+            TxQueueHead = txQ->next;
+
+            pbuf_free(txQ->p);
+            txQ->next   = TxQueueFree;
+            TxQueueFree = txQ;
+
+            /* If we blocked, most likely we only need to free one queue position to start
+             * transmit.
+             * For performance, leave freeing any others to after the transmit's started.
+             */
+            if (blockTime)
+                break;
         }
     }
 
-    return p;
+#else
+    HAL_ETH_Transmit(&heth, &TxConfig, ETH_DMA_TRANSMIT_TIMEOUT);
+
+#endif
+    return ERR_OK;
 }
 
 /**
- * This function should be called when a packet is ready to be read
- * from the interface. It uses the function low_level_input() that
- * should handle the actual reception of bytes from the network
- * interface. Then the type of the received packet is determined and
- * the appropriate input function is called.
+ * This task should be signalled when a receive packet is ready to be read
+ * from the interface.
  *
- * @param netif the lwip network interface structure for this ethernetif
+ * @param argument the lwip network interface structure for this ethernetif
  */
 void ethernetif_input(void *argument)
 {
     struct pbuf *p;
     struct netif *netif = (struct netif *)argument;
+    uint32_t errorCode;
+    err_t result;
 
-    for (;;)
+    while (1)
     {
-        if (osSemaphoreAcquire(RxPktSemaphore, TIME_WAITING_FOR_INPUT) == osOK)
+        if (ulTaskNotifyTake(/* clear count */ pdTRUE, TIME_WAITING_FOR_INPUT) > 0)
         {
-            do
+            /* Loop while any there's any receive packet ready to avoid a receive
+             * buffer unavailable error from stalling receive. */
+            while (HAL_ETH_GetRxDataBuffer(&heth, (void **)&p) == HAL_OK)
             {
-                p = low_level_input(netif);
-                if (p != NULL)
+                /* Received a packet. */
+                /* Discard if errored. */
+                HAL_ETH_GetRxDataErrorCode(&heth, &errorCode);
+                if (errorCode)
                 {
-                    if (netif->input(p, netif) != ERR_OK)
+                    RxPktDiscard(p);
+                }
+                else
+                {
+                    result = netif->input(p, netif);
+                    if (result != ERR_OK)
                     {
-                        pbuf_free(p);
+                        RxPktDiscard(p);
                     }
                 }
-            } while (p != NULL);
+            }
         }
     }
 }
@@ -606,7 +966,7 @@ err_t ethernetif_init(struct netif *netif)
 #if LWIP_ARP
     netif->output = etharp_output;
 #else
-    /* The user should write its own code in low_level_output_arp_off function */
+    /* The user should write ist own code in low_level_output_arp_off function */
     netif->output = low_level_output_arp_off;
 #endif /* LWIP_ARP */
 #endif /* LWIP_ARP || LWIP_ETHERNET */
@@ -624,17 +984,6 @@ err_t ethernetif_init(struct netif *netif)
     return ERR_OK;
 }
 
-/**
- * @brief  Custom Rx pbuf free callback
- * @param  pbuf: pbuf to be freed
- * @retval None
- */
-void pbuf_free_custom(struct pbuf *p)
-{
-    struct pbuf_custom *custom_pbuf = (struct pbuf_custom *)p;
-
-    LWIP_MEMPOOL_FREE(RX_POOL, custom_pbuf);
-}
 
 /* USER CODE BEGIN 6 */
 
@@ -743,7 +1092,7 @@ int32_t ETH_PHY_IO_GetTick(void)
 void ethernet_link_thread(void *argument)
 {
     ETH_MACConfigTypeDef MACConf;
-    int32_t PHYLinkState;
+    uint32_t PHYLinkState;
     uint32_t linkchanged = 0, speed = 0, duplex = 0;
 
     struct netif *netif = (struct netif *)argument;
@@ -810,6 +1159,7 @@ void ethernet_link_thread(void *argument)
         osDelay(100);
     }
 }
+
 /* USER CODE BEGIN 8 */
 
 /* USER CODE END 8 */

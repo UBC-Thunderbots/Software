@@ -49,21 +49,27 @@ extern "C"
 /* LwIP Stack Parameters (modified compared to initialization value in opt.h) -*/
 /* Parameters set in STM32CubeMX LwIP Configuration GUI -*/
 /*----- Default value in ETH configuration GUI in CubeMx: 1524 -----*/
-#define ETH_RX_BUFFER_SIZE 1524
+#define ETH_RX_BUFFER_SIZE 1024
 /*----- Default Value for LWIP_IGMP: 0 ---*/
 #define LWIP_IGMP 1
 /*----- Value in opt.h for LWIP_TCP: 1 -----*/
 #define LWIP_TCP 0
+/*----- Default Value for LWIP_MPU_COMPATIBLE: 0 ---*/
+#define LWIP_MPU_COMPATIBLE 1
+/*----- Default Value for LWIP_TCPIP_CORE_LOCKING: 0 ---*/
+#define LWIP_TCPIP_CORE_LOCKING 1
+/*----- Default Value for LWIP_TCPIP_CORE_LOCKING_INPUT: 0 ---*/
+#define LWIP_TCPIP_CORE_LOCKING_INPUT 1
 /*----- Default Value for MEM_LIBC_MALLOC: 0 ---*/
 #define MEM_LIBC_MALLOC 1
-/*----- Default Value for MEMP_MEM_MALLOC: 0 ---*/
-#define MEMP_MEM_MALLOC 1
+/*----- Default Value for MEMP_MEM_INIT: 0 ---*/
+#define MEMP_MEM_INIT 1
 /*----- Value in opt.h for MEM_ALIGNMENT: 1 -----*/
 #define MEM_ALIGNMENT 4
 /*----- Default Value for MEM_SIZE: 1600 ---*/
-#define MEM_SIZE 32768
+#define MEM_SIZE 16000
 /*----- Default Value for H7 devices: 0x30044000 -----*/
-#define LWIP_RAM_HEAP_POINTER 0x30044000
+#define LWIP_RAM_HEAP_POINTER 0x30020000
 /*----- Value in opt.h for MEMP_NUM_SYS_TIMEOUT: (LWIP_TCP + IP_REASSEMBLY + LWIP_ARP +
  * (2*LWIP_DHCP) + LWIP_AUTOIP + LWIP_IGMP + LWIP_DNS + (PPP_SUPPORT*6*MEMP_NUM_PPP_PCB) +
  * (LWIP_IPV6 ? (1 + LWIP_IPV6_REASS + LWIP_IPV6_MLD) : 0)) -*/

@@ -3,8 +3,14 @@
 // There are different semaphore implementations depending on if we're on a x86 or arm
 // system, and we use typdefs here to switch between them
 #ifdef __arm__
-#include <FreeRTOS.h>
+
+// clang-format off
+// clang format re-orders these headers, we want FreeRTOS.h to come before semphr.h
+// otherwise we can't compile with error "include FreeRTOS.h" must appear in source files before "include semphr.h" 
+#include "FreeRTOS.h"
 #include <semphr.h>
+// clang-format on
+
 #define static_assert _Static_assert
 #elif __unix__
 #include <pthread.h>

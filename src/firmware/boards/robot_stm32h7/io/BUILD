@@ -18,7 +18,21 @@ cc_library(
     hdrs = ["pwm_pin.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
+        "//firmware/app/logger",
         "//firmware/boards/robot_stm32h7:hal",
+    ],
+)
+
+cc_library(
+    name = "primitive_executor",
+    srcs = ["primitive_executor.c"],
+    hdrs = ["primitive_executor.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        "//firmware/app/primitives:primitive_manager",
+        "//firmware/app/world:firmware_robot",
+        "//firmware/boards/robot_stm32h7:unused",
+        "//firmware/boards/robot_stm32h7/io:proto_multicast_communication",
     ],
 )
 
@@ -67,12 +81,12 @@ cc_library(
 cc_library(
     name = "proto_multicast_communication",
     srcs = [
+        "proto_multicast.c",
         "proto_multicast_communication_profile.c",
-        "proto_multicast_communication_tasks.c",
     ],
     hdrs = [
+        "proto_multicast.h",
         "proto_multicast_communication_profile.h",
-        "proto_multicast_communication_tasks.h",
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
@@ -157,6 +171,46 @@ cc_test(
         "//firmware/boards/robot_stm32h7/io:ublox_odinw262_communicator_buffer_utils",
         "//shared/test_util:tbots_gtest_main",
     ],
+)
+
+cc_library(
+    name = "robot_status",
+    srcs = ["robot_status.c"],
+    hdrs = ["robot_status.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        ":power_monitor",
+        ":proto_multicast_communication",
+    ],
+)
+
+cc_library(
+    name = "charger",
+    srcs = ["charger.c"],
+    hdrs = ["charger.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+)
+
+cc_library(
+    name = "chicker",
+    srcs = ["chicker.c"],
+    hdrs = ["chicker.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = ["//firmware/app/logger"],
+)
+
+cc_library(
+    name = "dribbler",
+    srcs = ["dribbler.c"],
+    hdrs = ["dribbler.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+)
+
+cc_library(
+    name = "vision",
+    srcs = ["vision.c"],
+    hdrs = ["vision.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
 )
 
 cc_library(

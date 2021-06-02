@@ -80,6 +80,13 @@ $CUBE_EXECUTABLE -s $TEMP_DIR/regen.stm32cube.script
 # the file does not have any "USER-CODE" sections, so this won't cause any problems
 echo "$(echo '// clang-format off'; cat ./Inc/stm32h7xx_hal_conf.h; echo '// clang-format on')" > ./Inc/stm32h7xx_hal_conf.h
 
-# move the generated files to the right path
+# ST's ethernet drivers are incredibly buggy, so we use a patched implementation from 
+# https://github.com/dgburr/H743ZI2-ethernet which is adapted from
+# https://community.st.com/s/question/0D50X0000C6eNNSSQ2/bug-fixes-stm32h7-ethernet
+# As a result, we do NOT want the auto generated ethernetif.c file
+#
+# TODO (#2095) Remove this when ethernet drivers are fixed in later HAL revisions
+rm $TEMP_DIR/Src/ethernetif.c
+
 mv $TEMP_DIR/Src/*.c $FIRMWARE_DIR/
 mv $TEMP_DIR/Inc/*.h $FIRMWARE_DIR/

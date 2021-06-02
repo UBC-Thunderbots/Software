@@ -30,7 +30,7 @@ void app_logger_init(unsigned robot_id,
 void app_logger_log(const char *file_name, unsigned line_number,
                     TbotsProto_LogLevel log_level, const char *format, ...)
 {
-    // TODO update timestamp: https://github.com/UBC-Thunderbots/Software/issues/1518
+    // TODO (#1518) update timestamp
     TbotsProto_RobotLog robot_log = TbotsProto_RobotLog_init_zero;
     robot_log.robot_id            = logger.robot_id;
     robot_log.log_level           = log_level;

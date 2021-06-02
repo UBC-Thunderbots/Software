@@ -38,8 +38,18 @@
 #pragma GCC diagnostic pop
 
 #include "firmware/app/logger/logger.h"
+#include "firmware/app/primitives/primitive_manager.h"
+#include "firmware/app/world/firmware_robot.h"
+#include "firmware/app/world/firmware_world.h"
+#include "firmware/boards/robot_stm32h7/io/charger.h"
+#include "firmware/boards/robot_stm32h7/io/chicker.h"
+#include "firmware/boards/robot_stm32h7/io/dribbler.h"
 #include "firmware/boards/robot_stm32h7/io/drivetrain.h"
+#include "firmware/boards/robot_stm32h7/io/power_monitor.h"
+#include "firmware/boards/robot_stm32h7/io/primitive_executor.h"
 #include "firmware/boards/robot_stm32h7/io/uart_logger.h"
+#include "firmware/boards/robot_stm32h7/io/vision.h"
+#include "firmware/shared/physics.h"
 
 /* USER CODE END Includes */
 
@@ -72,18 +82,16 @@ static void MPU_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 
-static void initIoLayer(void);
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-static void initIoLayer(void)
+// TODO (#2082) remove this hack
+float sys_now_float(void);
+float sys_now_float(void)
 {
-    initIoDrivetrain();
-    initIoNetworking();
-    initPowerMonitor();
+    return (float)sys_now();
 }
 
 /* USER CODE END 0 */
@@ -137,13 +145,12 @@ int main(void)
     MX_ADC1_Init();
     MX_ADC2_Init();
     MX_TIM1_Init();
-    MX_TIM2_Init();
     MX_TIM3_Init();
     MX_TIM4_Init();
     MX_TIM8_Init();
-    MX_TIM12_Init();
     MX_UART4_Init();
     MX_CRC_Init();
+    MX_TIM15_Init();
     /* USER CODE BEGIN 2 */
 
     //              ---- Initialize App/IO Layers ----
@@ -155,7 +162,81 @@ int main(void)
     app_logger_init(0, &io_uart_logger_handleRobotLog);
 
     TLOG_DEBUG("Initializing I/O Layer");
-    initIoLayer();
+
+    initIoDrivetrain();
+    initIoNetworking();
+    initIoPowerMonitor();
+
+    // Setup the world that acts as the interface for the higher level firmware
+    // (like primitives or the controller) to interface with the outside world
+    //
+    // TODO (#2066) These constants are COMPLETELY WRONG, replace with proper ones
+    ForceWheelConstants_t wheel_constants = {
+        .wheel_rotations_per_motor_rotation  = GEAR_RATIO,
+        .wheel_radius                        = WHEEL_RADIUS,
+        .motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT,
+        .motor_back_emf_per_rpm              = RPM_TO_VOLT,
+        .motor_phase_resistance              = 1,
+        .motor_current_per_unit_torque       = CURRENT_PER_TORQUE};
+
+    ForceWheel_t *front_left_wheel = app_force_wheel_create(
+        io_drivetrain_applyForceFrontLeftWheel, io_drivetrain_getFrontLeftRpm,
+        io_drivetrain_brakeFrontLeft, io_drivetrain_coastFrontLeft, wheel_constants);
+
+    ForceWheel_t *front_right_wheel = app_force_wheel_create(
+        io_drivetrain_applyForceFrontRightWheel, io_drivetrain_getFrontRightRpm,
+        io_drivetrain_brakeFrontRight, io_drivetrain_coastFrontRight, wheel_constants);
+
+    ForceWheel_t *back_right_wheel = app_force_wheel_create(
+        io_drivetrain_applyForceBackRightWheel, io_drivetrain_getBackRightRpm,
+        io_drivetrain_brakeBackRight, io_drivetrain_coastBackRight, wheel_constants);
+
+    ForceWheel_t *back_left_wheel = app_force_wheel_create(
+        io_drivetrain_applyForceBackLeftWheel, io_drivetrain_getBackLeftRpm,
+        io_drivetrain_brakeBackLeft, io_drivetrain_coastBackLeft, wheel_constants);
+
+    Charger_t *charger =
+        app_charger_create(io_charger_charge, io_charger_discharge, io_charger_float);
+
+    Chicker_t *chicker =
+        app_chicker_create(io_chicker_kick, io_chicker_chip, io_chicker_enable_auto_kick,
+                           io_chicker_enable_auto_chip, io_chicker_disable_auto_kick,
+                           io_chicker_disable_auto_chip);
+
+    Dribbler_t *dribbler = app_dribbler_create(io_dribbler_setSpeed, io_dribbler_coast,
+                                               io_dribbler_getTemperature);
+
+    const RobotConstants_t robot_constants = {
+        .mass              = ROBOT_POINT_MASS,
+        .moment_of_inertia = INERTIA,
+        .robot_radius      = ROBOT_RADIUS,
+        .jerk_limit        = JERK_LIMIT,
+    };
+
+    ControllerState_t controller_state = {
+        .last_applied_acceleration_x       = 0,
+        .last_applied_acceleration_y       = 0,
+        .last_applied_acceleration_angular = 0,
+    };
+
+    FirmwareRobot_t *robot = app_firmware_robot_force_wheels_create(
+        charger, chicker, dribbler, io_vision_getRobotPositionX,
+        io_vision_getRobotPositionY, io_vision_getRobotOrientation,
+        io_vision_getRobotVelocityX, io_vision_getRobotVelocityY,
+        io_vision_getRobotAngularVelocity, io_power_monitor_getBatteryVoltage,
+        front_right_wheel, front_left_wheel, back_right_wheel, back_left_wheel,
+        &controller_state, robot_constants);
+
+    FirmwareBall_t *ball =
+        app_firmware_ball_create(io_vision_getBallPositionX, io_vision_getBallPositionY,
+                                 io_vision_getBallVelocityX, io_vision_getBallVelocityY);
+
+    FirmwareWorld_t *world = app_firmware_world_create(robot, ball, sys_now_float);
+
+    PrimitiveManager_t *primitive_manager = app_primitive_manager_create();
+
+    io_primitive_executor_init(world, primitive_manager);
+
     /* USER CODE END 2 */
 
     /* Init scheduler */
@@ -205,13 +286,13 @@ void SystemClock_Config(void)
     RCC_OscInitStruct.HSEState       = RCC_HSE_ON;
     RCC_OscInitStruct.PLL.PLLState   = RCC_PLL_ON;
     RCC_OscInitStruct.PLL.PLLSource  = RCC_PLLSOURCE_HSE;
-    RCC_OscInitStruct.PLL.PLLM       = 1;
-    RCC_OscInitStruct.PLL.PLLN       = 24;
+    RCC_OscInitStruct.PLL.PLLM       = 2;
+    RCC_OscInitStruct.PLL.PLLN       = 12;
     RCC_OscInitStruct.PLL.PLLP       = 2;
     RCC_OscInitStruct.PLL.PLLQ       = 4;
     RCC_OscInitStruct.PLL.PLLR       = 2;
     RCC_OscInitStruct.PLL.PLLRGE     = RCC_PLL1VCIRANGE_3;
-    RCC_OscInitStruct.PLL.PLLVCOSEL  = RCC_PLL1VCOWIDE;
+    RCC_OscInitStruct.PLL.PLLVCOSEL  = RCC_PLL1VCOMEDIUM;
     RCC_OscInitStruct.PLL.PLLFRACN   = 0;
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
     {
@@ -247,9 +328,9 @@ void PeriphCommonClock_Config(void)
     /** Initializes the peripherals clock
      */
     PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC;
-    PeriphClkInitStruct.PLL2.PLL2M           = 1;
-    PeriphClkInitStruct.PLL2.PLL2N           = 19;
-    PeriphClkInitStruct.PLL2.PLL2P           = 3;
+    PeriphClkInitStruct.PLL2.PLL2M           = 2;
+    PeriphClkInitStruct.PLL2.PLL2N           = 12;
+    PeriphClkInitStruct.PLL2.PLL2P           = 2;
     PeriphClkInitStruct.PLL2.PLL2Q           = 2;
     PeriphClkInitStruct.PLL2.PLL2R           = 2;
     PeriphClkInitStruct.PLL2.PLL2RGE         = RCC_PLL2VCIRANGE_3;
@@ -278,33 +359,23 @@ void MPU_Config(void)
      */
     MPU_InitStruct.Enable           = MPU_REGION_ENABLE;
     MPU_InitStruct.Number           = MPU_REGION_NUMBER0;
-    MPU_InitStruct.BaseAddress      = 0x30040000;
-    MPU_InitStruct.Size             = MPU_REGION_SIZE_256B;
+    MPU_InitStruct.BaseAddress      = 0x30000000;
+    MPU_InitStruct.Size             = MPU_REGION_SIZE_128KB;
     MPU_InitStruct.SubRegionDisable = 0x0;
-    MPU_InitStruct.TypeExtField     = MPU_TEX_LEVEL0;
+    MPU_InitStruct.TypeExtField     = MPU_TEX_LEVEL1;
     MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
-    MPU_InitStruct.DisableExec      = MPU_INSTRUCTION_ACCESS_ENABLE;
+    MPU_InitStruct.DisableExec      = MPU_INSTRUCTION_ACCESS_DISABLE;
     MPU_InitStruct.IsShareable      = MPU_ACCESS_NOT_SHAREABLE;
     MPU_InitStruct.IsCacheable      = MPU_ACCESS_NOT_CACHEABLE;
-    MPU_InitStruct.IsBufferable     = MPU_ACCESS_BUFFERABLE;
+    MPU_InitStruct.IsBufferable     = MPU_ACCESS_NOT_BUFFERABLE;
 
     HAL_MPU_ConfigRegion(&MPU_InitStruct);
     /** Initializes and configures the Region and the memory to be protected
      */
     MPU_InitStruct.Number       = MPU_REGION_NUMBER1;
-    MPU_InitStruct.BaseAddress  = 0x30044000;
-    MPU_InitStruct.Size         = MPU_REGION_SIZE_16KB;
-    MPU_InitStruct.IsCacheable  = MPU_ACCESS_CACHEABLE;
-    MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
-
-    HAL_MPU_ConfigRegion(&MPU_InitStruct);
-    /** Initializes and configures the Region and the memory to be protected
-     */
-    MPU_InitStruct.Number       = MPU_REGION_NUMBER2;
-    MPU_InitStruct.BaseAddress  = 0x24000000;
-    MPU_InitStruct.Size         = MPU_REGION_SIZE_512KB;
-    MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL1;
-    MPU_InitStruct.IsShareable  = MPU_ACCESS_SHAREABLE;
+    MPU_InitStruct.BaseAddress  = 0x30024000;
+    MPU_InitStruct.Size         = MPU_REGION_SIZE_1KB;
+    MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
     MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
 
     HAL_MPU_ConfigRegion(&MPU_InitStruct);

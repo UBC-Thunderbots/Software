@@ -31,7 +31,6 @@ void app_dribbler_setSpeed(Dribbler_t* dribbler, uint32_t rpm)
     dribbler->set_speed(rpm);
 }
 
-
 void app_dribbler_coast(Dribbler_t* dribbler)
 {
     dribbler->coast();
