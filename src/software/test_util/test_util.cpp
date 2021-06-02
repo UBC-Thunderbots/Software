@@ -110,4 +110,19 @@ namespace TestUtil
         }
         return states;
     }
+
+    std::vector<RobotStateWithId> createMovingRobotStatesWithId(
+        const std::vector<Point> &positions, const std::vector<Vector> &velocity)
+    {
+        std::vector<RobotStateWithId> states;
+        for (RobotId id = 0; id < static_cast<RobotId>(positions.size()); id++)
+        {
+            states.push_back(RobotStateWithId{
+                .id          = id,
+                .robot_state = RobotState(positions[id], velocity[id], Angle::zero(),
+                                          AngularVelocity::zero())});
+        }
+        return states;
+    }
+
 };  // namespace TestUtil

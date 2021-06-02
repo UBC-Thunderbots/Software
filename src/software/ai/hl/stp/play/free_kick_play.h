@@ -2,11 +2,8 @@
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
-#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
 
 /**
@@ -35,27 +32,24 @@ class FreeKickPlay : public Play
      *
      * @param yield The coroutine to yield to
      * @param crease_defender_tactics The crease defender tactics to use
-     * @param goalie_tactic The goalie tactic to use
      * @param world The current state of the world
      */
     void chipAtGoalStage(
         TacticCoroutine::push_type &yield,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-        std::shared_ptr<GoalieTactic> goalie_tactic, const World &world);
+        const World &world);
 
     /**
      * Given a pass, coordinates and executes the pass with a Passer and Receiver
      *
      * @param yield The coroutine to yield
      * @param crease_defender_tactics The crease defender tactics to use
-     * @param goalie_tactic The goalie tactic to use
      * @param best_pass_and_score_so_far The Pass to execute
      * @param world The current state of the world
      */
     void performPassStage(
         TacticCoroutine::push_type &yield,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-        std::shared_ptr<GoalieTactic> goalie_tactic,
         PassWithRating best_pass_and_score_so_far, const World &world);
 
     /**
@@ -65,15 +59,15 @@ class FreeKickPlay : public Play
      *
      * @param yield The coroutine to yield to
      * @param crease_defender_tactics The crease defender tactics
-     * @param goalie_tactic The goalie tactic
+     * @param shoot_tactic The AttackerTactic to shoot with
      * @param world The current state of the world
      *
      * @return the pass that was found
      */
     PassWithRating shootOrFindPassStage(
-        TacticCoroutine::push_type &yield, std::shared_ptr<ShootGoalTactic> shoot_tactic,
+        TacticCoroutine::push_type &yield, std::shared_ptr<AttackerTactic> shoot_tactic,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-        std::shared_ptr<GoalieTactic> goalie_tactic, const World &world);
+        const World &world);
 
     /**
      * Update the tactic that aligns the robot to the ball in preparation to pass

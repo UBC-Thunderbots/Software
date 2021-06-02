@@ -22,9 +22,9 @@ cc_test(
     srcs = ["cost_function_test.cpp"],
     deps = [
         ":cost_functions",
+        "//shared/test_util:tbots_gtest_main",
         "//software/math:math_functions",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -43,8 +43,8 @@ cc_test(
     srcs = ["pass_test.cpp"],
     deps = [
         ":pass",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -86,8 +86,8 @@ cc_test(
     srcs = ["eighteen_zone_pitch_division_test.cpp"],
     deps = [
         ":eighteen_zone_pitch_division",
+        "//shared/test_util:tbots_gtest_main",
         "//software/geom/algorithms",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -116,8 +116,8 @@ cc_test(
         ":eighteen_zone_pitch_division",
         ":pass",
         ":pass_evaluation",
+        "//shared/test_util:tbots_gtest_main",
         "//software/geom/algorithms",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -143,8 +143,8 @@ cc_test(
     srcs = ["pass_generator_test.cpp"],
     deps = [
         ":pass_generator",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )

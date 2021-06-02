@@ -2,8 +2,8 @@
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
+#include "software/ai/passing/pass.h"
 
 /**
  * A Play for Corner Kicks
@@ -38,11 +38,9 @@ class CornerKickPlay : public Play
      * pickers
      *
      * @param yield The coroutine to yield
-     * @param goalie_tactic The goalie tactic to use
      * @param world The current state of the world
      *
      * @return the pass that was committed to
      */
-    Pass setupPass(TacticCoroutine::push_type &yield,
-                   std::shared_ptr<GoalieTactic> goalie_tactic, const World &world);
+    Pass setupPass(TacticCoroutine::push_type &yield, const World &world);
 };

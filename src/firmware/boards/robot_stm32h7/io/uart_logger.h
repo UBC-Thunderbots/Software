@@ -1,9 +1,13 @@
 #pragma once
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
 #include "FreeRTOS.h"
 #include "cmsis_os.h"
 #include "firmware/boards/robot_stm32h7/usart.h"
-#include "shared/proto/robot_log_msg.nanopb.h"
+#pragma GCC diagnostic pop
 
+#include "shared/proto/robot_log_msg.nanopb.h"
 /**
  * Initialize the UART logger
  *

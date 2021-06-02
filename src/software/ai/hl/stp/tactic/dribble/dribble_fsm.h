@@ -4,6 +4,7 @@
 #include "software/ai/evaluation/pass.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/transition_conditions.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/algorithms/contains.h"
@@ -11,8 +12,20 @@
 
 struct DribbleFSM
 {
+   public:
     class GetPossessionState;
     class DribbleState;
+
+    /**
+     * Constructor for DribbleFSM
+     *
+     * @param continuous_dribbling_start_point A pointer to a Point to track the
+     * continuous dribbling start point
+     */
+    explicit DribbleFSM(const std::shared_ptr<Point> &continuous_dribbling_start_point)
+        : continuous_dribbling_start_point(continuous_dribbling_start_point)
+    {
+    }
 
     struct ControlParams
     {
@@ -28,13 +41,19 @@ struct DribbleFSM
 
     // Threshold to determine if the ball is at the destination determined experimentally
     static constexpr double BALL_CLOSE_TO_DEST_THRESHOLD = 0.1;
-    // Threshold to determine if the robot has the expected orientation
-    static constexpr Angle ROBOT_ORIENTATION_CLOSE_THRESHOLD = Angle::fromDegrees(5);
+    // Threshold to determine if the robot has the expected orientation when dribbling the
+    // ball
+    static constexpr Angle FACE_DESTINATION_CLOSE_THRESHOLD = Angle::fromDegrees(5);
+    // Threshold to determine if the robot has the expected orientation when completing
+    // the dribble
+    static constexpr Angle FINAL_DESTINATION_CLOSE_THRESHOLD = Angle::fromDegrees(1);
     // Kick speed when breaking up continuous dribbling
     static constexpr double DRIBBLE_KICK_SPEED = 0.05;
     // Maximum distance to continuously dribble the ball, slightly conservative to not
     // break the 1 meter rule
     static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.9;
+    // robot speed at which the robot is done dribbling
+    static constexpr double ROBOT_DRIBBLING_DONE_SPEED = 0.2;  // m/s
 
     /**
      * Converts the ball position to the robot's position given the direction that the
@@ -152,8 +171,6 @@ struct DribbleFSM
     {
         Point dribble_destination =
             getDribbleBallDestination(ball.position(), dribble_destination_opt);
-        Angle to_destination_orientation =
-            (dribble_destination - ball.position()).orientation();
 
         // Default destination and orientation assume ball is at the destination
         // pivot to final face ball destination
@@ -162,25 +179,6 @@ struct DribbleFSM
         Point target_destination =
             robotPositionToFaceBall(dribble_destination, target_orientation);
 
-        if (!comparePoints(dribble_destination, ball.position(),
-                           BALL_CLOSE_TO_DEST_THRESHOLD))
-        {
-            // rotate to face the destination
-            target_orientation = to_destination_orientation;
-            if (compareAngles(to_destination_orientation, robot.orientation(),
-                              ROBOT_ORIENTATION_CLOSE_THRESHOLD))
-            {
-                // dribble the ball towards ball destination
-                target_destination = robotPositionToFaceBall(dribble_destination,
-                                                             to_destination_orientation);
-            }
-            else
-            {
-                // pivot in place with the ball to the right orientation
-                target_destination =
-                    robotPositionToFaceBall(ball.position(), to_destination_orientation);
-            }
-        }
         return std::make_tuple(target_destination, target_orientation);
     }
 
@@ -190,7 +188,6 @@ struct DribbleFSM
 
         const auto get_possession_s = state<GetPossessionState>;
         const auto dribble_s        = state<DribbleState>;
-        static Point continuous_dribbling_start_point;
 
         const auto update_e = event<Update>;
 
@@ -226,8 +223,9 @@ struct DribbleFSM
                                      event.common.world.ball().position(),
                                      event.common.robot.position(),
                                      event.control_params.final_dribble_orientation),
-                                 ROBOT_ORIENTATION_CLOSE_THRESHOLD) &&
-                   have_possession(event);
+                                 FINAL_DESTINATION_CLOSE_THRESHOLD) &&
+                   have_possession(event) &&
+                   robotStopped(event.common.robot, ROBOT_DRIBBLING_DONE_SPEED);
         };
 
         /**
@@ -270,7 +268,7 @@ struct DribbleFSM
             AutoChipOrKick auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::OFF, 0};
 
             if (!event.control_params.allow_excessive_dribbling &&
-                !comparePoints(ball_position, continuous_dribbling_start_point,
+                !comparePoints(ball_position, *continuous_dribbling_start_point,
                                MAX_CONTINUOUS_DRIBBLING_DISTANCE))
             {
                 // give the ball a little kick
@@ -284,9 +282,14 @@ struct DribbleFSM
                 MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
         };
 
+        /**
+         * Start dribbling
+         *
+         * @param event DribbleFSM::Update
+         */
         const auto start_dribble = [this, dribble](auto event) {
             // update continuous_dribbling_start_point once we start dribbling
-            continuous_dribbling_start_point = event.common.world.ball().position();
+            *continuous_dribbling_start_point = event.common.world.ball().position();
             dribble(event);
         };
 
@@ -300,4 +303,7 @@ struct DribbleFSM
             X + update_e[!have_possession] / get_possession = get_possession_s,
             X + update_e[!dribbling_done] / dribble = dribble_s, X + update_e / dribble);
     }
+
+   private:
+    std::shared_ptr<Point> continuous_dribbling_start_point;
 };

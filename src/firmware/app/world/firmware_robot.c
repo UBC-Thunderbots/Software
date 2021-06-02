@@ -8,9 +8,9 @@
 // so that the axes would never have to compete for resources
 #define TIME_HORIZON 0.05f  // s
 
-// Have the robot follow the provided position trajectory
-typedef void (*TrajectoryFollower_t)(const FirmwareRobot_t*, PositionTrajectory_t, size_t,
-                                     float);
+// Function pointer definition for the robot to follow the provided position trajectory
+typedef void (*TrajectoryFollower_t)(const FirmwareRobot_t*, PositionTrajectory_t,
+                                     unsigned int, size_t, float);
 // Set the robot's per wheel power given the DirectPerWheelControl message
 typedef void (*ApplyDirectPerWheelPower_t)(
     const FirmwareRobot_t*, TbotsProto_DirectControlPrimitive_DirectPerWheelControl);
@@ -50,6 +50,13 @@ struct FirmwareRobot
     RobotConstants_t robot_constants;
 };
 
+
+// Private declarations
+
+void velocity_wheels_setLocalVelocity(
+    const FirmwareRobot_t* robot,
+    TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg);
+
 /**
  * Determines the rotation acceleration after setup_bot has been used and
  * plan_move has been done along the minor axis. The minor time from bangbang
@@ -74,7 +81,8 @@ void plan_move_rotation(PhysBot* pb, float avel)
 
 void force_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
                                       PositionTrajectory_t pos_trajectory,
-                                      size_t trajectory_index, float max_speed_m_per_s)
+                                      unsigned int num_elements, size_t trajectory_index,
+                                      float max_speed_m_per_s)
 {
     ForceWheel_t* front_right_wheel = robot->front_right_force_wheel;
     ForceWheel_t* front_left_wheel  = robot->front_left_force_wheel;
@@ -144,9 +152,22 @@ void force_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
 
 void velocity_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
                                          PositionTrajectory_t pos_trajectory,
+                                         unsigned int num_elements,
                                          size_t trajectory_index, float max_speed_m_per_s)
 {
-    // TODO (#2044): Implement trajectory follower for velocity_wheels
+    VelocityTrajectory_t velocity_trajectory;
+    app_trajectory_planner_generateVelocityTrajectory(&pos_trajectory, num_elements,
+                                                      &velocity_trajectory);
+
+    TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg;
+    control_msg.velocity.x_component_meters =
+        velocity_trajectory.x_velocity[trajectory_index];
+    control_msg.velocity.y_component_meters =
+        velocity_trajectory.y_velocity[trajectory_index];
+    control_msg.angular_velocity.radians_per_second =
+        velocity_trajectory.angular_velocity[trajectory_index];
+
+    velocity_wheels_setLocalVelocity(robot, control_msg);
 }
 
 void force_wheels_applyDirectPerWheelPower(
@@ -174,14 +195,10 @@ void velocity_wheels_applyDirectPerWheelPower(
     VelocityWheel_t* back_right_wheel  = robot->back_right_velocity_wheel;
     VelocityWheel_t* back_left_wheel   = robot->back_left_velocity_wheel;
 
-    app_velocity_wheel_setTargetVelocity(front_right_wheel,
-                                         control_msg.front_right_wheel_rpm);
-    app_velocity_wheel_setTargetVelocity(front_left_wheel,
-                                         control_msg.front_left_wheel_rpm);
-    app_velocity_wheel_setTargetVelocity(back_right_wheel,
-                                         control_msg.back_right_wheel_rpm);
-    app_velocity_wheel_setTargetVelocity(back_left_wheel,
-                                         control_msg.back_left_wheel_rpm);
+    app_velocity_wheel_setTargetRPM(front_right_wheel, control_msg.front_right_wheel_rpm);
+    app_velocity_wheel_setTargetRPM(front_left_wheel, control_msg.front_left_wheel_rpm);
+    app_velocity_wheel_setTargetRPM(back_right_wheel, control_msg.back_right_wheel_rpm);
+    app_velocity_wheel_setTargetRPM(back_left_wheel, control_msg.back_left_wheel_rpm);
 }
 
 void force_wheels_setLocalVelocity(
@@ -538,10 +555,11 @@ void app_firmware_robot_trackVelocityInRobotFrame(const FirmwareRobot_t* robot,
 
 void app_firmware_robot_followPosTrajectory(const FirmwareRobot_t* robot,
                                             PositionTrajectory_t pos_trajectory,
+                                            unsigned int num_elements,
                                             size_t trajectory_index,
                                             float max_speed_m_per_s)
 {
-    robot->follow_pos_trajectory(robot, pos_trajectory, trajectory_index,
+    robot->follow_pos_trajectory(robot, pos_trajectory, num_elements, trajectory_index,
                                  max_speed_m_per_s);
 }
 

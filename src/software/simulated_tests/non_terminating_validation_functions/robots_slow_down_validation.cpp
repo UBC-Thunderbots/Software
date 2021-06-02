@@ -12,8 +12,9 @@ void robotsSlowDown(double max_speed, std::shared_ptr<World> world_ptr,
 
         if (speed > max_speed)
         {
-            yield("Robot " + std::to_string(robot.id()) + " is moving faster than " +
-                  std::to_string(max_speed) + " m/s!");
+            yield("Robot " + std::to_string(robot.id()) + " is moving at " +
+                  std::to_string(speed) + ", faster than " + std::to_string(max_speed) +
+                  " m/s!");
         }
     }
 }

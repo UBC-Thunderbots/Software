@@ -13,6 +13,6 @@ cc_test(
     srcs = ["gradient_descent_test.cpp"],
     deps = [
         ":gradient_descent",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )

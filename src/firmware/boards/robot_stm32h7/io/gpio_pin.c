@@ -2,7 +2,10 @@
 
 #include <stdlib.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
 #include "firmware/boards/robot_stm32h7/stm32h7xx_hal_conf.h"
+#pragma GCC diagnostic pop
 
 typedef struct GpioPin
 {

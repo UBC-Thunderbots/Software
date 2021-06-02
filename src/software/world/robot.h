@@ -127,10 +127,11 @@ class Robot
      * Decides if a point is near the dribbler of the robot
      *
      * @param test_point The point to check
+     * @param TOLERANCE The tolerance for the distance between the dribbler and the ball
      *
      * @return whether the test_point is near the dribbler of the robot
      */
-    bool isNearDribbler(const Point &test_point) const;
+    bool isNearDribbler(const Point &test_point, double TOLERANCE = 0.0) const;
 
     /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and

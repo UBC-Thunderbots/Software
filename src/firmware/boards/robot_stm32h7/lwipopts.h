@@ -52,8 +52,6 @@ extern "C"
 #define ETH_RX_BUFFER_SIZE 1524
 /*----- Default Value for LWIP_IGMP: 0 ---*/
 #define LWIP_IGMP 1
-/*----- Default Value for MEMP_NUM_UDP_PCB: 4 ---*/
-#define MEMP_NUM_UDP_PCB 10
 /*----- Value in opt.h for LWIP_TCP: 1 -----*/
 #define LWIP_TCP 0
 /*----- Default Value for MEM_LIBC_MALLOC: 0 ---*/
@@ -72,18 +70,10 @@ extern "C"
 #define MEMP_NUM_SYS_TIMEOUT 5
 /*----- Value supported for H7 devices: 1 -----*/
 #define LWIP_SUPPORT_CUSTOM_PBUF 1
-/*----- Default Value for ETHARP_SUPPORT_VLAN: 0 ---*/
-#define ETHARP_SUPPORT_VLAN 1
 /*----- Value in opt.h for LWIP_ETHERNET: LWIP_ARP || PPPOE_SUPPORT -*/
 #define LWIP_ETHERNET 1
 /*----- Default Value for LWIP_IPV4: 1 ---*/
 #define LWIP_IPV4 0
-/*----- Default Value for LWIP_BROADCAST_PING: 0 ---*/
-#define LWIP_BROADCAST_PING 1
-/*----- Default Value for LWIP_MULTICAST_PING: 0 ---*/
-#define LWIP_MULTICAST_PING 1
-/*----- Default Value for LWIP_MULTICAST_TX_OPTIONS: 1 ---*/
-#define LWIP_MULTICAST_TX_OPTIONS 0
 /*----- Value in opt.h for LWIP_DNS_SECURE: (LWIP_DNS_SECURE_RAND_XID |
  * LWIP_DNS_SECURE_NO_MULTIPLE_OUTSTANDING | LWIP_DNS_SECURE_RAND_SRC_PORT) -*/
 #define LWIP_DNS_SECURE 7
@@ -118,20 +108,10 @@ extern "C"
 #define DEFAULT_UDP_RECVMBOX_SIZE 6
 /*----- Value in opt.h for DEFAULT_ACCEPTMBOX_SIZE: 0 -----*/
 #define DEFAULT_ACCEPTMBOX_SIZE 6
-/*----- Value in opt.h for LWIP_SOCKET: 1 -----*/
-#define LWIP_SOCKET 0
-/*----- Default Value for LWIP_SO_RCVTIMEO: 0 ---*/
-#define LWIP_SO_RCVTIMEO 1
 /*----- Value in opt.h for RECV_BUFSIZE_DEFAULT: INT_MAX -----*/
 #define RECV_BUFSIZE_DEFAULT 2000000000
 /*----- Default Value for LWIP_IPV6: 0 ---*/
 #define LWIP_IPV6 1
-/*----- Default Value for LWIP_IPV6_NUM_ADDRESSES: 3 ---*/
-#define LWIP_IPV6_NUM_ADDRESSES 5
-/*----- Default Value for LWIP_IPV6_DUP_DETECT_ATTEMPTS: 1 ---*/
-#define LWIP_IPV6_DUP_DETECT_ATTEMPTS 3
-/*----- Default Value for MEMP_NUM_MLD6_GROUP: 4 ---*/
-#define MEMP_NUM_MLD6_GROUP 10
 /*----- Value in opt.h for LWIP_STATS: 1 -----*/
 #define LWIP_STATS 0
 /*----- Value in opt.h for CHECKSUM_GEN_IP: 1 -----*/

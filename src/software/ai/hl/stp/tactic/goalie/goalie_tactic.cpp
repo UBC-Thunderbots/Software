@@ -5,13 +5,13 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/point.h"
 
-GoalieTactic::GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config)
+GoalieTactic::GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config,
+                           MaxAllowedSpeedMode max_allowed_speed_mode)
     : Tactic(true,
              {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Chip}),
-      fsm(),
-      goalie_tactic_config(goalie_tactic_config),
-      control_params{
-          GoalieFSM::ControlParams{.goalie_tactic_config = goalie_tactic_config}}
+      fsm(DribbleFSM(std::make_shared<Point>()),
+          GoalieFSM(goalie_tactic_config, max_allowed_speed_mode)),
+      goalie_tactic_config(goalie_tactic_config)
 {
 }
 
@@ -19,9 +19,14 @@ void GoalieTactic::updateWorldParams(const World &world) {}
 
 double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
-    // We don't prefer any particular robot to be the goalie, as there should only
-    // ever be one robot that can act as the goalie
-    return 0.5;
+    if (world.friendlyTeam().getGoalieId() == robot.id())
+    {
+        return 0.0;
+    }
+    else
+    {
+        return 1.0;
+    }
 }
 
 void GoalieTactic::calculateNextAction(ActionCoroutine::push_type &yield)
@@ -47,7 +52,7 @@ bool GoalieTactic::isGoalieTactic() const
 
 void GoalieTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    fsm.process_event(GoalieFSM::Update(control_params, tactic_update));
+    fsm.process_event(GoalieFSM::Update({}, tactic_update));
 }
 
 void GoalieTactic::accept(TacticVisitor &visitor) const

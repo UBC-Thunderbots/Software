@@ -24,7 +24,7 @@ STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
          std::shared_ptr<const PlayConfig> play_config, long random_seed)
     : default_play_constructor(default_play_constructor),
       current_play(nullptr),
-      readable_robot_tactic_assignment(),
+      robot_tactic_assignment(),
       random_number_generator(random_seed),
       control_config(control_config),
       play_config(play_config),
@@ -32,8 +32,14 @@ STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
       previous_override_play_name(""),
       override_play(false),
       previous_override_play(false),
-      current_game_state()
+      current_game_state(),
+      goalie_tactic(std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig())),
+      stop_tactics()
 {
+    for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
+    {
+        stop_tactics.push_back(std::make_shared<StopTactic>(false));
+    }
 }
 
 void STP::updateSTPState(const World& world)
@@ -75,8 +81,9 @@ void STP::updateAIPlay(const World& world)
 std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World& world)
 {
     return current_play->get(
-        [this](const ConstPriorityTacticVector& tactics, const World& world) {
-            return assignRobotsToTactics(tactics, world);
+        [this](const ConstPriorityTacticVector& tactics, const World& world,
+               bool automatically_assign_goalie) {
+            return assignRobotsToTactics(tactics, world, automatically_assign_goalie);
         },
         [this](const Tactic& tactic) {
             return buildMotionConstraintSet(current_game_state, tactic);
@@ -87,7 +94,23 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
 std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 {
     updateSTPState(world);
-    return getIntentsFromCurrentPlay(world);
+    auto intents = getIntentsFromCurrentPlay(world);
+
+    auto all_tactics = stop_tactics;
+    all_tactics.push_back(goalie_tactic);
+    for (auto tactic : all_tactics)
+    {
+        auto iter = robot_tactic_assignment.find(tactic);
+        if (iter != robot_tactic_assignment.end())
+        {
+            auto intent = tactic->get(iter->second, world);
+            intent->setMotionConstraints(
+                buildMotionConstraintSet(current_game_state, *tactic));
+            intents.push_back(std::move(intent));
+        }
+    }
+
+    return intents;
 }
 
 std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
@@ -134,9 +157,10 @@ PlayInfo STP::getPlayInfo()
     std::string info_play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
     PlayInfo info              = PlayInfo(info_referee_command, info_play_name, {});
 
-    for (const auto& [robot_id, tactic_string] : readable_robot_tactic_assignment)
+    for (const auto& [tactic, robot] : robot_tactic_assignment)
     {
-        std::string s = "Robot " + std::to_string(robot_id) + "  -  " + tactic_string;
+        std::string s =
+            "Robot " + std::to_string(robot.id()) + "  -  " + objectTypeName(*tactic);
         info.addRobotTacticAssignment(s);
     }
 
@@ -182,15 +206,21 @@ bool STP::overrideAIPlayIfApplicable()
 
 
 std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
-    ConstPriorityTacticVector tactics, const World& world)
+    ConstPriorityTacticVector tactics, const World& world,
+    bool automatically_assign_goalie)
 {
-    std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment;
+    robot_tactic_assignment.clear();
 
     std::optional<Robot> goalie_robot = world.friendlyTeam().goalie();
     std::vector<Robot> robots         = world.friendlyTeam().getAllRobots();
 
-    auto is_goalie_tactic = [](auto tactic) { return tactic->isGoalieTactic(); };
-    bool goalie_assigned  = false;
+    if (goalie_robot && automatically_assign_goalie)
+    {
+        robot_tactic_assignment.emplace(goalie_tactic, goalie_robot.value());
+
+        robots.erase(std::remove(robots.begin(), robots.end(), goalie_robot.value()),
+                     robots.end());
+    }
 
     // This functions optimizes the assignment of robots to tactics by minimizing
     // the total cost of assignment using the Hungarian algorithm
@@ -201,30 +231,6 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
     // algorithm that we use here
     for (auto tactic_vector : tactics)
     {
-        // We are only allowed to assign the pre-assigned goalie robot to the goalie
-        // tactic, so check if we have a goalie tactic in this tactic_vector and assign it
-        // to the goalie robot if it exists.
-        auto goalie_tactic =
-            std::find_if(tactic_vector.begin(), tactic_vector.end(), is_goalie_tactic);
-
-        if (goalie_tactic != tactic_vector.end())
-        {
-            if (goalie_robot && !goalie_assigned)
-            {
-                robot_tactic_assignment.emplace(*goalie_tactic, *goalie_robot);
-                goalie_assigned = true;
-
-                robots.erase(std::remove(robots.begin(), robots.end(), *goalie_robot),
-                             robots.end());
-            }
-
-            // remove all goalie tactics from the tactic_vector if they exist,
-            // we can only have 1 goalie
-            tactic_vector.erase(std::remove_if(tactic_vector.begin(), tactic_vector.end(),
-                                               is_goalie_tactic),
-                                tactic_vector.end());
-        }
-
         size_t num_tactics = tactic_vector.size();
 
         if (robots.size() < tactic_vector.size())
@@ -238,9 +244,9 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
         else
         {
             // Assign rest of robots with StopTactic
-            for (auto i = tactic_vector.size(); i < robots.size(); i++)
+            for (unsigned int i = 0; i < (robots.size() - tactic_vector.size()); i++)
             {
-                tactic_vector.push_back(std::make_shared<StopTactic>(false));
+                tactic_vector.push_back(stop_tactics[i]);
             }
         }
 
@@ -315,20 +321,18 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
                 {
                     robot_tactic_assignment.emplace(tactic_vector.at(col),
                                                     robots.at(row));
-                    remaining_robots.erase(remaining_robots.begin() + row);
+                    remaining_robots.erase(
+                        std::remove_if(remaining_robots.begin(), remaining_robots.end(),
+                                       [robots, row](const Robot& robot) {
+                                           return robot.id() == robots.at(row).id();
+                                       }),
+                        remaining_robots.end());
                     break;
                 }
             }
         }
 
         robots = remaining_robots;
-    }
-
-    // store readable assignment map for PlayInfo
-    readable_robot_tactic_assignment.clear();
-    for (const auto& [tactic, robot] : robot_tactic_assignment)
-    {
-        readable_robot_tactic_assignment.emplace(robot.id(), objectTypeName(*tactic));
     }
 
     return robot_tactic_assignment;

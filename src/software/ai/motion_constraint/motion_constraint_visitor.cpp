@@ -7,8 +7,6 @@
 // We disable clang-format here because it makes these lists borderline unreadable,
 // and certainly way more difficult to edit
 // clang-format off
-void MotionConstraintVisitor::visit(const CherryPickTactic &tactic) {}
-
 void MotionConstraintVisitor::visit(const ShadowFreekickerTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const GoalieTactic &tactic)
@@ -33,6 +31,8 @@ void MotionConstraintVisitor::visit(const MoveTactic &tactic) {}
 void MotionConstraintVisitor::visit(const ChipTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const KickTactic &tactic) {}
+
+void MotionConstraintVisitor::visit(const PivotKickTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const KickoffChipTactic &tactic)
 {
@@ -65,14 +65,7 @@ void MotionConstraintVisitor::visit(const PenaltySetupTactic &tactic)
 
 void MotionConstraintVisitor::visit(const ReceiverTactic &tactic) {}
 
-void MotionConstraintVisitor::visit(const ShootGoalTactic &tactic)
-{
-    current_allowed_constraints = std::set<MotionConstraint>({
-        MotionConstraint::HALF_METER_AROUND_BALL
-    });
-}
-
-void MotionConstraintVisitor::visit(const PasserTactic &tactic) {}
+void MotionConstraintVisitor::visit(const AttackerTactic &tactic) { }
 
 void MotionConstraintVisitor::visit(const DefenseShadowEnemyTactic &tactic) {}
 
@@ -85,6 +78,8 @@ void MotionConstraintVisitor::visit(const GoalieTestTactic &tactic) {}
 void MotionConstraintVisitor::visit(const DribbleTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const GetBehindBallTactic &tactic) {}
+
+void MotionConstraintVisitor::visit(const MoveToGoalLineTactic &tactic) {}
 
 // clang-format on
 

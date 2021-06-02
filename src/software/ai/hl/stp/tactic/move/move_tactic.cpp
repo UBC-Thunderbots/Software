@@ -3,7 +3,16 @@
 #include <algorithm>
 
 MoveTactic::MoveTactic(bool loop_forever)
-    : Tactic(loop_forever, {RobotCapability::Move}), fsm()
+    : Tactic(loop_forever, {RobotCapability::Move}),
+      fsm(),
+      control_params{.destination            = Point(),
+                     .final_orientation      = Angle::zero(),
+                     .final_speed            = 0.0,
+                     .dribbler_mode          = DribblerMode::OFF,
+                     .ball_collision_type    = BallCollisionType::AVOID,
+                     .auto_chip_or_kick      = {AutoChipOrKickMode::OFF, 0},
+                     .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+                     .target_spin_rev_per_s  = 0.0}
 {
 }
 

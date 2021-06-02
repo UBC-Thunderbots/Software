@@ -19,7 +19,7 @@ cc_test(
     srcs = ["ball_test.cpp"],
     deps = [
         ":ball",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -38,7 +38,7 @@ cc_test(
     srcs = ["ball_state_test.cpp"],
     deps = [
         ":ball_state",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -61,7 +61,7 @@ cc_test(
     deps = [
         ":field",
         "//shared:constants",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -81,8 +81,8 @@ cc_test(
     srcs = ["game_state_test.cpp"],
     deps = [
         ":game_state",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -110,7 +110,7 @@ cc_test(
     srcs = ["robot_test.cpp"],
     deps = [
         ":robot",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -134,7 +134,7 @@ cc_test(
     srcs = ["robot_state_test.cpp"],
     deps = [
         ":robot_state",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -149,7 +149,7 @@ cc_test(
     srcs = ["robot_capabilities_test.cpp"],
     deps = [
         "robot_capabilities",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -168,7 +168,7 @@ cc_test(
     srcs = ["team_test.cpp"],
     deps = [
         ":team",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -191,7 +191,7 @@ cc_test(
     srcs = ["world_test.cpp"],
     deps = [
         ":world",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )

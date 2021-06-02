@@ -14,8 +14,15 @@ NOTEBOOK_DEPS = [
     ":sensor_proto_log",
     "//python_tools/plotting:plot_heatmap",
     "//python_tools/plotting:plot_ssl_wrapper",
+    "//python_tools/plotting:plot_pass_generator",
     "//shared/proto:tbots_py_proto",
     "//software/proto:software_py_proto",
+]
+
+PYTHON_BINDINGS = [
+    "//software/python_bindings:pass_generator.so",
+    "//software/python_bindings:passing.so",
+    "//software/python_bindings:world.so",
 ]
 
 py_test(
@@ -47,9 +54,7 @@ py_binary(
     # glob all the notebooks in this directory
     data = [
         ":notebooks",
-        "//software/python_bindings:passing.so",
-        "//software/python_bindings:world.so",
-    ],
+    ] + PYTHON_BINDINGS,
     deps = NOTEBOOK_DEPS,
 )
 
@@ -58,8 +63,6 @@ py_test(
     srcs = ["notebooks_test.py"],
     data = [
         ":notebooks",
-        "//software/python_bindings:passing.so",
-        "//software/python_bindings:world.so",
-    ],
+    ] + PYTHON_BINDINGS,
     deps = NOTEBOOK_DEPS,
 )

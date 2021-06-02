@@ -220,12 +220,21 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     // The last point of path_points is the closest point on the grid to the end point, so
     // we need to replace that point with actual end point
     path_points.pop_back();
-    path_points.push_back(closest_end);
+    if (path_points.back() != closest_end)
+    {
+        path_points.push_back(closest_end);
+    }
 
     // The first point of path_points is the closest unblocked point on the grid to the
     // start point, so we need to replace that point with actual start point
     path_points.erase(path_points.begin());
     path_points.insert(path_points.begin(), start);
+
+    if (path_points.size() > 2 &&
+        (path_points[0] - path_points[1]).length() < SIZE_OF_GRID_CELL_IN_METERS)
+    {
+        path_points.erase(path_points.begin() + 1);
+    }
 
     return Path(path_points);
 }
