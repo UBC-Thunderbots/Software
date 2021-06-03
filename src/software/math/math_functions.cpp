@@ -47,7 +47,7 @@ double sigmoid(const double& v, const double& offset, const double& sig_width)
     double sig_change_factor = 8 / sig_width;
 
     // TODO (#1985) there are much faster sigmoid implementations we can use
-    // even max(tanh((2/sig_width) * (offset-v))) because tanh is faster than exp
-
+    // even (tanh(-(4/sig_width) * (offset-v))+1)/2 because tanh is faster than exp
+    // check out https://www.desmos.com/calculator/wy93cwrhee for a vizualization
     return 1 / (1 + std::exp(sig_change_factor * (offset - v)));
 }

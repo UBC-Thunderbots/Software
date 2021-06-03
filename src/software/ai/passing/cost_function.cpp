@@ -28,19 +28,19 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
 
     // Place strict limits on the ball speed
-    double min_pass_speed     = passing_config->getMinPassSpeedMPerS()->value();
-    double max_pass_speed     = passing_config->getMaxPassSpeedMPerS()->value();
+    double min_pass_speed     = 4.5;
+    double max_pass_speed     = 6.5;
     double pass_speed_quality = sigmoid(pass.speed(), min_pass_speed, 0.2) *
                                 (1 - sigmoid(pass.speed(), max_pass_speed, 0.2));
 
     // Rate zones that are up the field higher to encourage progress up the field
-    double pass_up_field_rating = pass.receiverPoint().x() / world.field().xLength();
+    double pass_up_field_rating = zone.centre().x() / world.field().xLength();
 
     // We want to rate a pass more highly if it is lower risk, so subtract from 1
-    return (friendly_pass_rating) *
-           (pass_speed_quality + pass_up_field_rating + shoot_pass_rating +
-            enemy_pass_rating + in_region_quality + static_pass_quality) /
-           6;
+    return friendly_pass_rating * pass_up_field_rating *
+           ((pass_speed_quality + shoot_pass_rating + enemy_pass_rating +
+             in_region_quality + static_pass_quality) /
+            5);
 }
 
 double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,
@@ -281,8 +281,8 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
 
     // Create a sigmoid that goes to 0 as the time required to get to the reception
     // point exceeds the time we would need to get there by
-    double sigmoid_width                  = 0.4;
-    double time_to_receiver_state_slack_s = 0.25;
+    double sigmoid_width                  = 0.6;
+    double time_to_receiver_state_slack_s = 0.5;
 
     return sigmoid(
         receive_time.toSeconds(),
