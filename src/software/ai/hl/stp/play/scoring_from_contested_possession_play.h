@@ -4,13 +4,13 @@
 #include "software/ai/hl/stp/play/play.h"
 
 /**
- * The Defense Play tries to grab the ball from the enemy that has it, and all other
- * robots shadow the enemy robots in order of how threatening they are.
+ * Play for the scoring from contested possession hardware challenge
+ * https://robocup-ssl.github.io/ssl-hardware-challenge-rules/rules.html
  */
-class ShootOrChipPlay : public Play
+class ScoringFromContestedPossessionPlay : public Play
 {
    public:
-    ShootOrChipPlay(std::shared_ptr<const PlayConfig> config);
+    ScoringFromContestedPossessionPlay(std::shared_ptr<const PlayConfig> config);
 
     bool isApplicable(const World &world) const override;
 
