@@ -1,7 +1,6 @@
 #include "software/ai/passing/cost_function.h"
 
 #include <numeric>
-
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/../shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
