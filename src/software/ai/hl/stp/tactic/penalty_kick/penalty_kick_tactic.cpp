@@ -1,11 +1,10 @@
-/**
- * Implementation of the PenaltyKickTactic
- */
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 
 PenaltyKickTactic::PenaltyKickTactic()
     : Tactic(false,
-             {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick})
+             {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
+      fsm(DribbleFSM(std::make_shared<Point>()),
+          PenaltyKickFSM(std::nullopt, Point(), Angle()))
 {
 }
 
@@ -45,5 +44,5 @@ bool PenaltyKickTactic::done() const
 
 void PenaltyKickTactic::updateIntent(const TacticUpdate& tactic_update)
 {
-    fsm.process_event(PenaltyKickTacticFSM::Update({}, tactic_update));
+    fsm.process_event(PenaltyKickFSM::Update({}, tactic_update));
 }

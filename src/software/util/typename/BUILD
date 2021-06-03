@@ -11,6 +11,6 @@ cc_test(
     srcs = [":typename_test.cpp"],
     deps = [
         ":typename",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )

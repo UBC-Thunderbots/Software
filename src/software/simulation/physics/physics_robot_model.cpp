@@ -13,7 +13,7 @@ b2PolygonShape* PhysicsRobotModel::getMainRobotBodyShape(double total_dribbler_d
 
     // Assuming the robot is at (0, 0) and facing the +x axis (aka has an orientation of
     // 0) First find the y-coordinate of the front-left edge of the body by solving x^2 +
-    // y^2 = ROBOT_RADIUS^2
+    // y^2 = ROBOT_MAX_RADIUS_METERS^2
     double y =
         std::sqrt(std::pow(ROBOT_MAX_RADIUS_METERS, 2) -
                   std::pow(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth, 2));
@@ -96,7 +96,7 @@ std::vector<Point> PhysicsRobotModel::getRobotFrontLeftShapePoints(
 {
     // Assuming the robot is at (0, 0) and facing the +x axis (aka has an orientation of
     // 0) First find the y-coordinate of the front-left edge of the body by solving x^2 +
-    // y^2 = ROBOT_RADIUS^2
+    // y^2 = ROBOT_MAX_RADIUS_METERS^2
     double y =
         std::sqrt(std::pow(ROBOT_MAX_RADIUS_METERS, 2) -
                   std::pow(DIST_TO_FRONT_OF_ROBOT_METERS - total_dribbler_depth, 2));

@@ -42,6 +42,6 @@ cc_test(
     srcs = ["circular_buffer_test.cpp"],
     deps = [
         ":circular_buffer",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )

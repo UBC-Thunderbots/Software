@@ -5,8 +5,8 @@ cc_test(
     srcs = ["penalty_setup_tactic_test.cpp"],
     deps = [
         ":penalty_setup_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -43,8 +43,8 @@ cc_test(
     srcs = ["defense_shadow_enemy_tactic_test.cpp"],
     deps = [
         ":defense_shadow_enemy_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -97,35 +97,8 @@ cc_test(
     srcs = ["shadow_free_kicker_tactic_test.cpp"],
     deps = [
         ":shadow_free_kicker_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "shoot_goal_tactic",
-    srcs = ["shoot_goal_tactic.cpp"],
-    hdrs = ["shoot_goal_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/evaluation:calc_best_shot",
-        "//software/ai/hl/stp/action:chip_action",
-        "//software/ai/hl/stp/action:intercept_ball_action",
-        "//software/ai/hl/stp/action:kick_action",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/logger",
-    ],
-)
-
-cc_test(
-    name = "shoot_goal_tactic_test",
-    srcs = ["shoot_goal_tactic_test.cpp"],
-    deps = [
-        ":shoot_goal_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -138,8 +111,8 @@ cc_library(
         ":penalty_setup_tactic",
         ":receiver_tactic",
         ":shadow_free_kicker_tactic",
-        ":shoot_goal_tactic",
         ":tactic",
+        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
@@ -148,8 +121,8 @@ cc_library(
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/move_to_goal_line:move_to_goal_line_tactic",
-        "//software/ai/hl/stp/tactic/passer:passer_tactic",
         "//software/ai/hl/stp/tactic/penalty_kick:penalty_kick_tactic",
+        "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
         "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
     ],
@@ -179,9 +152,9 @@ cc_test(
     srcs = ["tactic_test.cpp"],
     deps = [
         ":tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -194,12 +167,12 @@ cc_library(
     ],
 )
 
-cc_library(
+cc_test(
     name = "transition_conditions_test",
     srcs = ["transition_conditions_test.cpp"],
     deps = [
         ":tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )

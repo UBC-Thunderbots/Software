@@ -69,7 +69,7 @@ cc_test(
     srcs = ["observer_test.cpp"],
     deps = [
         ":observer",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -78,7 +78,7 @@ cc_test(
     srcs = ["subject_test.cpp"],
     deps = [
         ":subject",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -89,7 +89,7 @@ cc_test(
         ":observer",
         ":observer_subject_adapter",
         ":subject",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -98,7 +98,7 @@ cc_test(
     srcs = ["thread_safe_buffer_test.cpp"],
     deps = [
         ":thread_safe_buffer",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -107,7 +107,7 @@ cc_test(
     srcs = ["first_in_first_out_threaded_observer_test.cpp"],
     deps = [
         ":threaded_observer",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -116,6 +116,6 @@ cc_test(
     srcs = ["last_in_first_out_threaded_observer_test.cpp"],
     deps = [
         ":threaded_observer",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )

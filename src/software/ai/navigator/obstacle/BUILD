@@ -36,9 +36,9 @@ cc_test(
     srcs = ["obstacle_test.cpp"],
     deps = [
         ":obstacle",
+        "//shared/test_util:tbots_gtest_main",
         "//software/geom:point",
         "//software/geom:rectangle",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -47,11 +47,11 @@ cc_test(
     srcs = ["robot_navigation_obstacle_factory_test.cpp"],
     deps = [
         ":robot_navigation_obstacle_factory",
+        "//shared/test_util:tbots_gtest_main",
         "//software/geom:point",
         "//software/geom:rectangle",
         "//software/test_util",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 

@@ -23,7 +23,7 @@ cc_test(
     srcs = ["get_behind_ball_fsm_test.cpp"],
     deps = [
         ":get_behind_ball_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
