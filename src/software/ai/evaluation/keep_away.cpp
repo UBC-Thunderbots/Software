@@ -8,11 +8,7 @@
 Point findKeepAwayTargetPoint(const Point& ball_possessor_position,
                               const Pass& best_pass_so_far, const World& world)
 {
-    // the intuition behind finding a keepaway point in this function is that the below
-    // constant is essentially the "step size" and the robot should always move in a
-    // "descent direction" until the play determines that we can pass, or we reach a local
-    // optimum of the enemy risk function
-    // the below constant must be set such that this "optimization" "converges"
+    // TODO: tweak this constant
     static constexpr auto KEEPAWAY_SEARCH_CIRCLE_RADIUS = 0.3;
 
     // the width of both the field boundary sigmoid and the circular search region sigmoid
@@ -20,8 +16,9 @@ Point findKeepAwayTargetPoint(const Point& ball_possessor_position,
 
     // the default values for these passing parameters
     // TODO: cleanup passing parameters as part of #1987
+    // TODO: tweak all of these constants to get better behaviour
     static constexpr double ENEMY_PROXIMITY_IMPORTANCE = 0.5;
-    static const auto ENEMY_REACTION_TIME              = Duration::fromSeconds(0.4);
+    static const auto ENEMY_REACTION_TIME              = Duration::fromSeconds(0);
     static constexpr auto GRADIENT_STEPS_PER_ITER      = 2;
 
     // the region to which the optimization is (effectively) constrained to
