@@ -228,6 +228,33 @@ struct ReceiverFSM
             }
         };
 
+        const auto adjust_receive = [this](auto event) {
+            auto ball      = event.common.world.ball();
+            auto robot_pos = event.common.robot.position();
+
+            if ((ball.position() - robot_pos).length() >
+                DIST_TO_FRONT_OF_ROBOT_METERS + 2 * BALL_MAX_RADIUS_METERS)
+            {
+                Point ball_receive_pos = ball.position();
+
+                if (ball.velocity().length() != 0)
+                {
+                    ball_receive_pos = closestPoint(
+                        robot_pos,
+                        Line(ball.position(), ball.position() + ball.velocity()));
+                }
+
+                Angle ball_receive_orientation =
+                    (ball.position() - robot_pos).orientation();
+
+                event.common.set_intent(std::make_unique<MoveIntent>(
+                    event.common.robot.id(), ball_receive_pos, ball_receive_orientation,
+                    0, DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
+                    AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+                    MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+            }
+        };
+
         /**
          * Check if the pass has started by checking if the ball is moving faster
          * than a minimum speed.
@@ -257,7 +284,9 @@ struct ReceiverFSM
             // src_state + event [guard] / action = dest_state
             *undecided_s + update_e[onetouch_possible] / update_onetouch = onetouch_s,
             undecided_s + update_e[!onetouch_possible] / update_receive  = receive_s,
-            receive_s + update_e[pass_started && !pass_finished] / update_receive =
+            receive_s + update_e[!pass_started] / update_receive         = receive_s,
+            onetouch_s + update_e[!pass_started] / update_onetouch       = onetouch_s,
+            receive_s + update_e[pass_started && !pass_finished] / adjust_receive =
                 receive_s,
             onetouch_s + update_e[pass_started && !pass_finished] / update_onetouch =
                 onetouch_s,
