@@ -304,20 +304,20 @@ void initIoNetworking(void)
     io_proto_multicast_communication_init(NETWORK_TIMEOUT_MS);
 
     primitive_msg_listener_profile = io_proto_multicast_communication_profile_create(
-        "primitive_msg_listener_profile", MULTICAST_CHANNELS[channel], PRIMITIVE_PORT,
-        &primitive_msg, TbotsProto_Primitive_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+            "primitive_msg_listener_profile", ROBOT_MULTICAST_CHANNELS[channel], PRIMITIVE_PORT,
+            &primitive_msg, TbotsProto_Primitive_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 
     vision_msg_listener_profile = io_proto_multicast_communication_profile_create(
-        "vision_msg_listener_profile", MULTICAST_CHANNELS[channel], VISION_PORT,
-        &vision_msg, TbotsProto_Vision_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+            "vision_msg_listener_profile", ROBOT_MULTICAST_CHANNELS[channel], VISION_PORT,
+            &vision_msg, TbotsProto_Vision_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 
     robot_status_msg_sender_profile = io_proto_multicast_communication_profile_create(
-        "robot_status_msg_sender", MULTICAST_CHANNELS[channel], ROBOT_STATUS_PORT,
-        &robot_status_msg, TbotsProto_RobotStatus_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+            "robot_status_msg_sender", ROBOT_MULTICAST_CHANNELS[channel], ROBOT_STATUS_PORT,
+            &robot_status_msg, TbotsProto_RobotStatus_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 
     robot_log_msg_sender_profile = io_proto_multicast_communication_profile_create(
-        "robot_log_msg_sender", MULTICAST_CHANNELS[channel], ROBOT_LOGS_PORT,
-        &robot_log_msg, TbotsProto_RobotLog_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
+            "robot_log_msg_sender", ROBOT_MULTICAST_CHANNELS[channel], ROBOT_LOGS_PORT,
+            &robot_log_msg, TbotsProto_RobotLog_fields, MAXIMUM_TRANSFER_UNIT_BYTES);
 
     // TODO (#2064) mainboard rev 2.0 doens't have a reset pin for the u-blox chip
     // so we can't enable the communicator. Uncomment this for mainboard rev 2.1
