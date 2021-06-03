@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/ai/evaluation/shot.h"
+#include "software/ai/hl/stp/tactic/receiver/receiver_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
 #include "software/geom/ray.h"
@@ -18,22 +19,15 @@ class ReceiverTactic : public Tactic
     /**
      * Creates a new ReceiverTactic
      *
-     * @param field The field the pass is running on
-     * @param friendly_team The friendly team
-     * @param enemy_team The enemy team
      * @param pass The pass this tactic should try to receive
-     * @param ball The ball being passed
      * @param loop_forever Whether or not this Tactic should never complete. If true,
      *                     the tactic will be restarted every time it completes
      */
-    explicit ReceiverTactic(const Field& field, const Team& friendly_team,
-                            const Team& enemy_team, const Pass pass, const Ball& ball,
-                            bool loop_forever);
+    explicit ReceiverTactic(const Pass pass);
 
     ReceiverTactic() = delete;
 
     void updateWorldParams(const World& world) override;
-
 
     /**
      * Updates the control parameters for this ReceiverTactic.
@@ -79,6 +73,7 @@ class ReceiverTactic : public Tactic
                                                      const Point& best_shot_target);
 
     void accept(TacticVisitor& visitor) const override;
+    bool done() const override;
 
    private:
     // The minimum proportion of open net we're shooting on vs the entire size of the net
@@ -90,6 +85,7 @@ class ReceiverTactic : public Tactic
     static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(90);
 
     void calculateNextAction(ActionCoroutine::push_type& yield) override;
+    void updateIntent(const TacticUpdate& tactic_update) override;
 
     /**
      * Finds a feasible shot for the robot, if any.
@@ -101,18 +97,9 @@ class ReceiverTactic : public Tactic
      */
     std::optional<Shot> findFeasibleShot();
 
-    // The field the pass is occurring on
-    Field field;
-
-    // The pass this tactic is executing
     Pass pass;
 
-    // The ball being passed
-    Ball ball;
+    FSM<ReceiverFSM> fsm;
 
-    // The friendly team
-    Team friendly_team;
-
-    // The enemy team
-    Team enemy_team;
+    ReceiverFSM::ControlParams control_params;
 };
