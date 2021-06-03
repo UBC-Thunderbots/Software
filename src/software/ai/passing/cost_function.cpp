@@ -33,52 +33,60 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double pass_speed_quality = sigmoid(pass.speed(), min_pass_speed, 0.2) *
                                 (1 - sigmoid(pass.speed(), max_pass_speed, 0.2));
 
-    // Rate zones that are up the field higher to encourage progress up the field
-    double pass_up_field_rating = zone.centre().x() / world.field().xLength();
-
     // We want to rate a pass more highly if it is lower risk, so subtract from 1
-    return friendly_pass_rating * pass_up_field_rating *
+    return friendly_pass_rating *
            ((pass_speed_quality + shoot_pass_rating + enemy_pass_rating +
              in_region_quality + static_pass_quality) /
             5);
 }
 
-double rateZone(const Field& field, const Team& enemy_team, const Rectangle& zone,
-                const Point& ball_position,
+double rateZone(const World& world, const Rectangle& zone, const Point& receive_position,
                 std::shared_ptr<const PassingConfig> passing_config)
 {
     // TODO (#2021) improve and implement tests
     // Zones with their centers in bad positions are not good
     double static_pass_quality =
-        getStaticPositionQuality(field, zone.centre(), passing_config);
+        getStaticPositionQuality(world.field(), zone.centre(), passing_config);
 
     // Rate zones that are up the field higher to encourage progress up the field
-    double pass_up_field_rating = zone.centre().x() / field.xLength();
+    double pass_up_field_rating = zone.centre().x() / world.field().xLength();
 
     double enemy_risk_rating =
-        (ratePassEnemyRisk(enemy_team,
-                           Pass(ball_position, zone.negXNegYCorner(),
+        (ratePassEnemyRisk(world.enemyTeam(),
+                           Pass(world.ball().position(), zone.negXNegYCorner(),
                                 passing_config->getMaxPassSpeedMPerS()->value()),
                            passing_config) +
-         ratePassEnemyRisk(enemy_team,
-                           Pass(ball_position, zone.negXPosYCorner(),
+         ratePassEnemyRisk(world.enemyTeam(),
+                           Pass(world.ball().position(), zone.negXPosYCorner(),
                                 passing_config->getMaxPassSpeedMPerS()->value()),
                            passing_config) +
-         ratePassEnemyRisk(enemy_team,
-                           Pass(ball_position, zone.posXNegYCorner(),
+         ratePassEnemyRisk(world.enemyTeam(),
+                           Pass(world.ball().position(), zone.posXNegYCorner(),
                                 passing_config->getMaxPassSpeedMPerS()->value()),
                            passing_config) +
-         ratePassEnemyRisk(enemy_team,
-                           Pass(ball_position, zone.posXPosYCorner(),
+         ratePassEnemyRisk(world.enemyTeam(),
+                           Pass(world.ball().position(), zone.posXPosYCorner(),
                                 passing_config->getMaxPassSpeedMPerS()->value()),
                            passing_config) +
-         ratePassEnemyRisk(enemy_team,
-                           Pass(ball_position, zone.centre(),
+         ratePassEnemyRisk(world.enemyTeam(),
+                           Pass(world.ball().position(), zone.centre(),
                                 passing_config->getMaxPassSpeedMPerS()->value()),
                            passing_config)) /
         5.0;
 
-    return pass_up_field_rating * static_pass_quality * enemy_risk_rating;
+    double ball_in_zone = 1.0;
+
+    if (contains(zone, receive_position))
+    {
+        ball_in_zone = 0.0;
+    }
+
+    if (contains(zone, world.ball().position()))
+    {
+        ball_in_zone = 0.0;
+    }
+
+    return pass_up_field_rating * static_pass_quality * enemy_risk_rating * ball_in_zone;
 }
 
 double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass& pass,

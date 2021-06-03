@@ -2,6 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
+#include "software/ai/evaluation/robot_cost.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/algorithms/closest_point.h"
@@ -33,12 +34,7 @@ void ReceiverTactic::updateControlParams(const Pass& updated_pass)
 
 double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world) const
 {
-    // Prefer robots closer to the pass receive position
-    // We normalize with the total field length so that robots that are within the field
-    // have a cost less than 1
-    double cost =
-        (robot.position() - pass.receiverPoint()).length() / world.field().totalXLength();
-    return cost;
+    return calculateRobotCostToDestination(robot, world, pass.receiverPoint());
 }
 
 void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)

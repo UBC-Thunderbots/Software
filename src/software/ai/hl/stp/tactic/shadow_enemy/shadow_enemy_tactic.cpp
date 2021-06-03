@@ -39,9 +39,7 @@ double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &wo
             robot, world.field(), world.friendlyTeam(), world.enemyTeam(),
             control_params.enemy_threat->robot, control_params.shadow_distance);
     }
-    double cost =
-        (robot.position() - block_point).length() / world.field().totalXLength();
-    return std::clamp<double>(cost, 0, 1);
+    return calculateRobotCostToDestination(robot, world, block_point);
 }
 
 void ShadowEnemyTactic::calculateNextAction(ActionCoroutine::push_type &yield)

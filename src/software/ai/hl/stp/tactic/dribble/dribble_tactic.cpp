@@ -34,12 +34,11 @@ double DribbleTactic::calculateRobotCost(const Robot &robot, const World &world)
         // Prefer robots closer to the interception point
         // We normalize with the total field length so that robots that are within the
         // field have a cost less than 1
-        cost = (robot.position() -
-                DribbleFSM::findInterceptionPoint(robot, world.ball(), world.field()))
-                   .length() /
-               world.field().totalXLength();
+        cost = calculateRobotCostToDestination(
+            robot, world,
+            DribbleFSM::findInterceptionPoint(robot, world.ball(), world.field()));
     }
-    return std::clamp<double>(cost, 0, 1);
+    return cost;
 }
 
 void DribbleTactic::calculateNextAction(ActionCoroutine::push_type &yield)

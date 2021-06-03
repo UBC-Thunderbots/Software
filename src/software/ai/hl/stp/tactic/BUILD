@@ -143,6 +143,7 @@ cc_library(
         "//software/ai/intent:stop_intent",
         "//software/util/typename",
         "//software/world",
+        "//software/ai/evaluation:robot_cost",
         "@sml",
     ],
 )

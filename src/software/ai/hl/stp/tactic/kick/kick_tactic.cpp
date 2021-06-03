@@ -30,10 +30,7 @@ void KickTactic::updateControlParams(const Point &kick_origin, const Point &kick
 double KickTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
     // the closer the robot is to a ball, the cheaper it is to perform the kick
-    double cost = (robot.position() - world.ball().position()).length() /
-                  world.field().totalXLength();
-
-    return std::clamp<double>(cost, 0, 1);
+    return calculateRobotCostToDestination(robot, world, world.ball().position());
 }
 
 void KickTactic::calculateNextAction(ActionCoroutine::push_type &yield)

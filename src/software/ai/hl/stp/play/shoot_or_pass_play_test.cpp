@@ -21,7 +21,7 @@ class ShootOrPassPlayTest : public SimulatedPlayTestFixture,
 
 TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
 {
-    std::uniform_real_distribution x_distribution(field.friendlyHalf().xMin(),
+    std::uniform_real_distribution x_distribution(field.friendlyHalf().xMin() + 0.5,
                                                   field.friendlyHalf().xMax());
     std::uniform_real_distribution y_distribution(field.friendlyHalf().yMin(),
                                                   field.friendlyHalf().yMax());
@@ -33,9 +33,9 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
         auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({
             field.friendlyGoalCenter(),
             Point(-4.5, 3.0),
-            Point(-2, 1.5),
-            Point(-2, 0.5),
-            Point(-2, -1.7),
+            Point(-4, 2.0),
+            Point(-3.5, 2.0),
+            Point(-2, -2.0),
             Point(-2, -1.5),
         });
 
@@ -59,6 +59,6 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
 
         runTest(field, ball_state, friendly_robots, enemy_robots,
                 terminating_validation_functions, non_terminating_validation_functions,
-                Duration::fromSeconds(10));
+                Duration::fromSeconds(30));
     }
 }

@@ -91,6 +91,11 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
         Zones cherry_pick_region_1 = {ranked_zones[0]};
         Zones cherry_pick_region_2 = {ranked_zones[1]};
 
+        for (auto zone : ranked_zones)
+        {
+            std::cerr << zone << std::endl;
+        }
+
         auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
         auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
 
@@ -117,15 +122,14 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                       CreaseDefenderAlignment::RIGHT);
             if (!attacker->done())
             {
-                yield({{attacker, receiver},
-                       {cherry_pick_tactic_1, std::get<0>(crease_defender_tactics),
+                yield({{attacker, receiver, cherry_pick_tactic_1,
+                        std::get<0>(crease_defender_tactics),
                         std::get<1>(crease_defender_tactics)}});
             }
             else
             {
-                yield({{receiver},
-                       {cherry_pick_tactic_1, cherry_pick_tactic_2},
-                       {std::get<0>(crease_defender_tactics),
+                yield({{receiver, cherry_pick_tactic_1, cherry_pick_tactic_2,
+                        std::get<0>(crease_defender_tactics),
                         std::get<1>(crease_defender_tactics)}});
             }
         } while (!receiver->done());
@@ -179,6 +183,7 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     {
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.rating;
+        LOG(DEBUG) << "    min pass thresh: " << min_pass_score_threshold;
 
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);

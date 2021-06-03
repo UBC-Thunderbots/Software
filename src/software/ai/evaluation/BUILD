@@ -17,8 +17,7 @@ cc_test(
         ":pass",
         "//shared/test_util:tbots_gtest_main",
     ],
-)
-
+) 
 cc_library(
     name = "calc_best_shot",
     srcs = [
@@ -197,4 +196,14 @@ cc_library(
     srcs = ["shot.cpp"],
     hdrs = ["shot.h"],
     deps = ["//software/geom:point"],
+)
+
+cc_library(
+    name = "robot_cost",
+    srcs = ["robot_cost.cpp"],
+    hdrs = ["robot_cost.h"],
+    deps = ["//software/geom:point",
+        "//software/world:robot",
+        "//software/world:world",
+            ],
 )

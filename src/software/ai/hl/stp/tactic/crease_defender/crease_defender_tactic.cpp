@@ -35,10 +35,9 @@ double CreaseDefenderTactic::calculateRobotCost(const Robot &robot,
     double cost = 1.0;
     if (block_point)
     {
-        cost = (robot.position() - block_point.value()).length() /
-               world.field().totalXLength();
+        cost = calculateRobotCostToDestination(robot, world, block_point.value());
     }
-    return std::clamp<double>(cost, 0, 1);
+    return cost;
 }
 
 void CreaseDefenderTactic::calculateNextAction(ActionCoroutine::push_type &yield)
