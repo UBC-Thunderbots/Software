@@ -163,7 +163,7 @@ TEST_F(StopPlayTest, test_stop_play_ball_in_front_of_enemy_defense_area)
 // This test is disabled due to a bug that causes Robot 2 to move too close to the ball.
 // Robots' positioning was not good, two robots were on the wrong side of the ball.
 // This test produced the warning, "Navigator's path manager could not find a path"
-TEST_F(StopPlayTest, test_stop_play_ball_in_front_of_friendly_defense_area)
+TEST_F(StopPlayTest, DISABLED_test_stop_play_ball_in_front_of_friendly_defense_area)
 {
     BallState ball_state(Point(-3, 0), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(

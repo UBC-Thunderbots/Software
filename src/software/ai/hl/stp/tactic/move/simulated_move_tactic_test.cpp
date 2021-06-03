@@ -157,6 +157,7 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_clockwise)
         .id          = 1,
         .robot_state = RobotState(initial_position, Vector(0, 0), Angle::zero(),
                                   AngularVelocity::quarter())}};
+    auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId({Point(-4, 0)});
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0, DribblerMode::OFF,
@@ -189,8 +190,9 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_clockwise)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
-            non_terminating_validation_functions, Duration::fromSeconds(10));
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
 }
 
 TEST_F(SimulatedMoveTacticTest, test_spinning_move_counter_clockwise)
@@ -202,6 +204,7 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_counter_clockwise)
         .id          = 1,
         .robot_state = RobotState(initial_position, Vector(0, 0), Angle::quarter(),
                                   AngularVelocity::zero())}};
+    auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId({Point(-4, 0)});
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::half(), 0, DribblerMode::OFF,
@@ -234,6 +237,7 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_counter_clockwise)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
-            non_terminating_validation_functions, Duration::fromSeconds(10));
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
 }

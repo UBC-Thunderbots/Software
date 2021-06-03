@@ -74,6 +74,7 @@ TEST_F(SimulatedCreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
     BallState ball_state(enemy_threat_point, Vector());
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
     auto robot_navigation_obstacle_config =
         std::make_shared<RobotNavigationObstacleConfig>();
@@ -101,8 +102,9 @@ TEST_F(SimulatedCreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
             robotsAvoidBall(0, {}, world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
-            non_terminating_validation_functions, Duration::fromSeconds(10));
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
 }
 
 TEST_P(SimulatedCreaseDefenderTacticTest, crease_defender_test)
