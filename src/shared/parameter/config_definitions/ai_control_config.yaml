@@ -14,19 +14,6 @@
 
 - string:
     name: current_ai_play
-    value: "Halt Play"
-    options:
-        - "Example Play"
-        - "Stop Play"
-        - "Halt Play"
-        - "Corner Kick Play"
-        - "Free Kick Play"
-        - "Defense Play"
-        - "KickoffEnemy Play"
-        - "KickoffFriendly Play"
-        - "Enemy Freekick Play"
-        - "Penalty Kick Play"
-        - "Penalty Kick Enemy Play"
-        - "ShootOrChip Play"
+    value: "HaltPlay"
     description: >-
         Specifies the ai play that should be in use
