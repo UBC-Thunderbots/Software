@@ -1,6 +1,7 @@
 #pragma once
 
-#include "shared/test_util/tbots_gtest_main.h"
+#include <gtest/gtest.h>
+
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/proto/logging/proto_logger.h"
@@ -19,6 +20,15 @@ class SimulatedTestFixture : public ::testing::Test
 {
    public:
     explicit SimulatedTestFixture();
+
+    // Controls whether the visualizer will be enabled during the simulated tests
+    // if false, visualizer does not run during simulated tests
+    // if true, running tests are displayed on the visualizer
+    static bool enable_visualizer;
+
+    // Controls whether the AI will be stopped when the simulated test starts
+    // only if enable_visualizer is true
+    static bool stop_ai_on_start;
 
    protected:
     void SetUp() override;
@@ -191,6 +201,16 @@ class SimulatedTestFixture : public ::testing::Test
     // time passes at the same speed a real life time
     bool run_simulation_in_realtime;
 
+    // These variables track tick time statistics
+    // Total duration of all ticks registered
+    double total_tick_duration;
+    // The max tick duration registered
+    double max_tick_duration;
+    // The min tick duration registered
+    double min_tick_duration;
+    // Total number of ticks registered
+    unsigned int tick_count;
+
     // The rate at which camera data will be simulated and given to SensorFusion.
     // Each sequential "camera frame" will be 1 / SIMULATED_CAMERA_FPS time step
     // ahead of the previous one
@@ -201,17 +221,4 @@ class SimulatedTestFixture : public ::testing::Test
     // that we will simulate 2 time steps (2 camera frames) before we give
     // the latest data to the AI and run it.
     static constexpr unsigned int CAMERA_FRAMES_PER_AI_TICK = 2;
-
-    // A set of member variables for measuring the current simulated tests performance.
-    // Note: The duration that updatePrimitives runs for is only measured to avoid also
-    // measuring the sleep durations when simulator is running in real time.
-    // Number of ticks the simulator has run for
-    unsigned int tick_count;
-    // Total duration the simulator has been running for in ms. Used for calculating
-    // the average tick duration
-    double total_tick_duration;
-    // Maximum duration which a tick took. Initialized as std::numeric_limits<T>::min
-    double max_tick_duration;
-    // Minimum duration which a tick took. Initialized as std::numeric_limits<T>::max
-    double min_tick_duration;
 };

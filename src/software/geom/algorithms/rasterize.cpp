@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 #include "software/geom/algorithms/rasterize.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/algorithms/contains.h"
@@ -15,80 +16,104 @@ std::vector<Point> rasterize(const Circle &circle, const double resolution_size)
 {
     std::vector<Point> covered_points;
 
-    Point origin = circle.origin();
+    // Using an approach to find the points on the edges using y = +-sqrt(r^2 - (x - k)^2) + h and filling in the rest
+    // Downside is using sqrt to calculate
     double radius = circle.radius();
+    double diameter = radius * 2;
+    Point origin = circle.origin();
 
-    // Added resolution_size to the max to ensure that when Points are rasterized, all
-    // Coordinates (including pixels that are not fully contained by rectangle) are
-    // taken into account.
-    for (double x_offset = -radius; x_offset < radius + resolution_size; x_offset += resolution_size)
+    // max number of pixels in each dimension
+    int max_num_pixels = (int) std::ceil(diameter / resolution_size);
+
+    for (int x_pixel = 0; x_pixel <= max_num_pixels; x_pixel++)
     {
-        for (double y_offset = -radius; y_offset < radius + resolution_size; y_offset += resolution_size)
+        // x and y offset from the top left corner of the rectangle
+        double x_offset;
+
+        // Adjust the last x and y pixels to be on the edge of the rectangle to make sure
+        // that the points cover the entire rectangle without going outside.
+        if (x_pixel == max_num_pixels)
         {
-            if(x_offset * x_offset + y_offset * y_offset < radius * radius)
+            x_offset = diameter;
+        }
+        else
+        {
+            x_offset = x_pixel * resolution_size;
+        }
+
+        double x_point = origin.x() - radius + x_offset;
+        double y_sqrt  = std::sqrt(radius * radius - (x_point - origin.x()) * (x_point - origin.x()));
+        double y_min   = -y_sqrt + origin.y();
+        double y_max   = y_sqrt + origin.y();
+
+        int y_num_pixels = (int) std::ceil((y_max - y_min) / resolution_size);
+        for (int y_pixel = 0; y_pixel <= y_num_pixels; y_pixel++)
+        {
+            double y_offset;
+            if (y_pixel == y_num_pixels)
             {
-                covered_points.emplace_back(Point(origin.x() + x_offset, origin.y() + y_offset));
+                y_offset = y_max - y_min;
             }
+            else
+            {
+                y_offset = y_pixel * resolution_size;
+            }
+            double y_point = y_min + y_offset;
+
+            covered_points.emplace_back(Point(x_point, y_point));
         }
     }
+
+//    for (auto p = covered_points.begin(); p != covered_points.end(); ++p) // TODO Remove, added for testing
+//        std::cout << *p << ", ";
+//    std::cout << std::endl;
+
     return covered_points;
-
-//    std::set<Point> points_covered;
-//
-//    int radius              = circle.radius();
-//    Point center_point      = circle.origin();
-//    double xc = center_point.x();
-//    double yc = center_point.y();
-//
-//    int x = 0, y = radius;
-//    int d = 3 - 2 * radius;
-//
-//    auto set_blocked_coordinates = [points_covered, xc, yc](double x, double y){
-//        points_covered.insert(Point(xc+x, yc+y));
-//        points_covered.insert(Point(xc-x, yc+y));
-//        points_covered.insert(Point(xc+x, yc-y));
-//        points_covered.insert(Point(xc-x, yc-y));
-//        points_covered.insert(Point(xc+y, yc+x));
-//        points_covered.insert(Point(xc-y, yc+x));
-//        points_covered.insert(Point(xc+y, yc-x));
-//        points_covered.insert(Point(xc-y, yc-x));
-//    };
-//
-//    set_blocked_coordinates(x, y);
-//
-//    while (y >= x)
-//    {
-//        x++;
-//
-//        if (d > 0)
-//        {
-//            y--;
-//            d = d + 4 * (x - y) + 10;
-//        }
-//        else
-//        {
-//            d = d + 4 * x + 6;
-//        }
-//        set_blocked_coordinates(x, y);
-//    }
-
-    return std::vector<Point>();
 }
 
 std::vector<Point> rasterize(const Rectangle &rectangle, const double resolution_size)
 {
     std::vector<Point> covered_points;
 
-    // Added resolution_size to the max to ensure that when Points are rasterized, all
-    // Coordinates (including pixels that are not fully contained by rectangle) are
-    // taken into account.
-    for (double x = rectangle.xMin(); x < rectangle.xMax() + resolution_size; x += resolution_size)
+    int num_pixels_x = (int) std::ceil(rectangle.xLength() / resolution_size);
+    int num_pixels_y = (int) std::ceil(rectangle.yLength() / resolution_size);
+
+    for (int x_pixel = 0; x_pixel <= num_pixels_x; x_pixel++)
     {
-        for (double y = rectangle.yMin(); y < rectangle.yMax() + resolution_size; y += resolution_size)
+        // x and y offset from the top left corner of the rectangle
+        double x_offset;
+
+        // Adjust the last x and y pixels to be on the edge of the rectangle to make sure
+        // that the points cover the entire rectangle without going outside.
+        if (x_pixel == num_pixels_x)
         {
-            covered_points.emplace_back(Point(x, y));
+            x_offset = rectangle.xLength();
+        }
+        else
+        {
+            x_offset = x_pixel * resolution_size;
+        }
+
+        for (int y_pixel = 0; y_pixel <= num_pixels_y; y_pixel++)
+        {
+            double y_offset;
+            if (y_pixel == num_pixels_y)
+            {
+                y_offset = rectangle.yLength();
+            }
+            else
+            {
+                y_offset = y_pixel * resolution_size;
+            }
+
+            covered_points.emplace_back(Point(rectangle.xMin() + x_offset, rectangle.yMin() + y_offset));
         }
     }
+
+//    for (auto p = covered_points.begin(); p != covered_points.end(); ++p) // TODO Remove, added for testing
+//        std::cout << *p << ", ";
+//    std::cout << std::endl;
+
     return covered_points;
 }
 
@@ -96,7 +121,6 @@ std::vector<Point> rasterize(const Polygon &polygon, const double resolution_siz
 {
     // Using even-odd rule algorithm to fill in polygon
     // https://stackoverflow.com/a/31768384
-
     std::vector<Point> contained_points;
 	const auto& polygon_vertices = polygon.getPoints();
 
