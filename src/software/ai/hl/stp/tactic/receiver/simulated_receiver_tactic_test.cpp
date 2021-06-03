@@ -45,10 +45,13 @@ TEST_P(SimulatedReceiverTacticTest, perfect_pass_receiver_test)
             // We check if the robot reaches the desired orientation, at the
             // desired position before checking if the ball has been received.
             //
-            // The tactic should "done" after kicking the ball.
+            // The tactic should "done" after receiving the ball.
             robotAtOrientation(1, world_ptr, pass.receiverOrientation(),
                                Angle::fromDegrees(5), yield);
-            robotAtPosition(1, world_ptr, pass.receiverPoint(), 0.1, yield);
+
+            // NOTE: we don't check robotAtPosition for receive and dribble
+            // because the robot is free to adjust itself to best receive
+            // the pass (and dribble). We only care if the robot received the ball.
             robotReceivedBall(1, world_ptr, yield);
 
             while (!tactic->done())
