@@ -12,11 +12,11 @@
 
 class SimulatorBackend : public Backend
 {
-public:
+   public:
     SimulatorBackend(std::shared_ptr<const BackendConfig> config);
 
 
-private:
+   private:
     void onValueReceived(TbotsProto::PrimitiveSet primitives) override;
     void onValueReceived(World world) override;
 

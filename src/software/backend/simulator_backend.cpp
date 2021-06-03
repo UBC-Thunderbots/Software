@@ -10,18 +10,18 @@
 #include "software/util/design_patterns/generic_factory.h"
 
 SimulatorBackend::SimulatorBackend(std::shared_ptr<const BackendConfig> config)
-        : network_config(config->getSimulatorBackendConfig()->getNetworkConfig()),
-          sensor_fusion_config(config->getSimulatorBackendConfig()->getSensorFusionConfig()),
-          ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
-                           boost::bind(&Backend::receiveSSLReferee, this, _1),
-                           network_config->getSslCommunicationConfig())
+    : network_config(config->getSimulatorBackendConfig()->getNetworkConfig()),
+      sensor_fusion_config(config->getSimulatorBackendConfig()->getSensorFusionConfig()),
+      ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
+                       boost::bind(&Backend::receiveSSLReferee, this, _1),
+                       network_config->getSslCommunicationConfig())
 {
     std::string network_interface = this->network_config->getNetworkInterface()->value();
     int channel                   = this->network_config->getChannel()->value();
 
     network_config->getChannel()->registerCallbackFunction([this](int new_channel) {
         std::string new_network_interface =
-                this->network_config->getNetworkInterface()->value();
+            this->network_config->getNetworkInterface()->value();
         joinMulticastChannel(new_channel, new_network_interface);
     });
 
@@ -36,7 +36,7 @@ void SimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
     if (sensor_fusion_config->getOverrideGameControllerDefendingSide()->value())
     {
         defending_side_output->sendProto(
-                *createDefendingSide(sensor_fusion_config->getDefendingPositiveSide()->value()
+            *createDefendingSide(sensor_fusion_config->getDefendingPositiveSide()->value()
                                      ? FieldSide::POS_X
                                      : FieldSide::NEG_X));
     }
@@ -62,23 +62,25 @@ void SimulatorBackend::receiveRobotLogs(TbotsProto::RobotLog log)
 void SimulatorBackend::joinMulticastChannel(int channel, const std::string& interface)
 {
     vision_output.reset(new ThreadedProtoUdpSender<TbotsProto::Vision>(
-            std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface, VISION_PORT, true));
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface, VISION_PORT,
+        true));
 
     primitive_output.reset(new ThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(
-            std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface, PRIMITIVE_PORT,
-            true));
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface,
+        PRIMITIVE_PORT, true));
 
     robot_status_input.reset(new ThreadedProtoUdpListener<TbotsProto::RobotStatus>(
-            std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface, ROBOT_STATUS_PORT,
-            boost::bind(&Backend::receiveRobotStatus, this, _1), true));
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface,
+        ROBOT_STATUS_PORT, boost::bind(&Backend::receiveRobotStatus, this, _1), true));
 
     robot_log_input.reset(new ThreadedProtoUdpListener<TbotsProto::RobotLog>(
-            std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface, ROBOT_LOGS_PORT,
-            boost::bind(&SimulatorBackend::receiveRobotLogs, this, _1), true));
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface,
+        ROBOT_LOGS_PORT, boost::bind(&SimulatorBackend::receiveRobotLogs, this, _1),
+        true));
 
     defending_side_output.reset(new ThreadedProtoUdpSender<DefendingSideProto>(
-            std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface, DEFENDING_SIDE_PORT,
-            true));
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface,
+        DEFENDING_SIDE_PORT, true));
 }
 
 // Register this backend in the genericFactory
