@@ -101,4 +101,5 @@ INSTANTIATE_TEST_CASE_P(
             BallState(Point(0., 0.), Vector(0, 0)),
             // the states of the enemy robots
             TestUtil::createStationaryRobotStatesWithId(
-                {Point(-0.6, 0.25), Point(0., 0.6), Point(0.6, 0), Point(0.6, -0.25)}))));
+                {Point(-0.6, 0.25), Point(0., 0.6), Point(-0.25, 0.5),
+                 Point(0.6, -0.25)}))));
