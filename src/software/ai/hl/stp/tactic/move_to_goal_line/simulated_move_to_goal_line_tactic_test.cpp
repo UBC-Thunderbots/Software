@@ -22,7 +22,7 @@ TEST_P(SimulatedMoveToGoalLineTacticTest, move_to_goal_line_test)
     RobotStateWithId robot_state = GetParam();
 
     std::vector<RobotStateWithId> friendly_robots = {robot_state};
-    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(-4, 0)});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
     BallState ball_state = BallState(Point(0.5, 0.5), Vector(0, 0));
 

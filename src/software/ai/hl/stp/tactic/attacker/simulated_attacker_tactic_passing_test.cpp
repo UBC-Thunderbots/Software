@@ -29,7 +29,7 @@ TEST_P(SimulatedAttackerTacticPassingTest, attacker_test_passing)
 
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
     friendly_robots.emplace_back(robot_state);
-    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(-4, 0)});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
     auto attacker_tactic_config = std::make_shared<AttackerTacticConfig>();
     // force passing for this test by setting min acceptable shot angle very high

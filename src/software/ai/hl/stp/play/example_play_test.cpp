@@ -20,7 +20,7 @@ TEST_F(ExamplePlayTest, test_example_play)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(4, 0), Point(0.5, 0), Point(-3, 1), Point(-1, -3), Point(2, 0),
          Point(3.5, 3)});
-    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(-4, 0)});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
     setFriendlyGoalie(0);
     setAIPlay(TYPENAME(ExamplePlay));
 
