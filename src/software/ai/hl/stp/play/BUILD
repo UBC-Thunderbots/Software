@@ -271,6 +271,7 @@ cc_library(
         ":play",
         "//shared:constants",
         "//software/ai/evaluation:enemy_threat",
+        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",

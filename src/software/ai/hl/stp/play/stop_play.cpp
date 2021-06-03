@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/play/stop_play.h"
 
 #include "shared/constants.h"
+#include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
@@ -50,20 +51,16 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
 
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
         std::make_shared<MoveTactic>(true)};
 
     auto goalie_tactic =
         std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig(), stop_mode);
-
-    // we want to find the radius of the semicircle in which the defense area can be
-    // inscribed, this is so the robots can snap to that semicircle and not enter the
-    // defense area. The full derivation can be found in the link below
-    //
-    // http://www.stumblingrobot.com/2015/10/06/
-    // find-the-largest-rectangle-that-can-be-inscribed-in-a-semicircle/
-    float semicircle_radius =
-        sqrtf(2) * static_cast<float>(world.field().friendlyDefenseArea().yLength());
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
+    };
 
     do
     {
@@ -75,28 +72,6 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
         Vector goal_to_ball_unit_vector =
             (world.field().friendlyGoalCenter() - world.ball().position()).normalize();
         Vector robot_positioning_unit_vector = goal_to_ball_unit_vector.perpendicular();
-
-        // goal_defense_point_center is a point on the semicircle around the friendly
-        // defense area, that can block the direct path from the ball to the net.
-        Point goal_defense_point_center = world.field().friendlyGoalCenter() -
-                                          semicircle_radius * goal_to_ball_unit_vector;
-
-        // position robots on either side of the "goal defense point"
-        Point goal_defense_point_left =
-            goal_defense_point_center +
-            robot_positioning_unit_vector * 2 * ROBOT_MAX_RADIUS_METERS;
-        Point goal_defense_point_right =
-            goal_defense_point_center -
-            robot_positioning_unit_vector * 2 * ROBOT_MAX_RADIUS_METERS;
-
-        move_tactics.at(0)->updateControlParams(
-            goal_defense_point_left,
-            (world.ball().position() - goal_defense_point_left).orientation(), 0,
-            stop_mode);
-        move_tactics.at(1)->updateControlParams(
-            goal_defense_point_right,
-            (world.ball().position() - goal_defense_point_right).orientation(), 0,
-            stop_mode);
 
         // ball_defense_point_center is a point on the circle around the ball that the
         // line from the center of the goal to the ball intersects. A robot will be placed
@@ -113,20 +88,29 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
             ball_defense_point_center +
             robot_positioning_unit_vector * 4 * ROBOT_MAX_RADIUS_METERS;
 
-        move_tactics.at(2)->updateControlParams(
+        move_tactics.at(0)->updateControlParams(
             ball_defense_point_center,
             (world.ball().position() - ball_defense_point_center).orientation(), 0,
             stop_mode);
-        move_tactics.at(3)->updateControlParams(
+        move_tactics.at(1)->updateControlParams(
             ball_defense_point_left,
             (world.ball().position() - ball_defense_point_left).orientation(), 0,
             stop_mode);
-        move_tactics.at(4)->updateControlParams(
+        move_tactics.at(2)->updateControlParams(
             ball_defense_point_right,
             (world.ball().position() - ball_defense_point_right).orientation(), 0,
             stop_mode);
 
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT,
+                                  stop_mode);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::RIGHT,
+                                  stop_mode);
+
         // insert all the move tactics to the result
+        result[0].emplace_back(std::get<0>(crease_defender_tactics));
+        result[0].emplace_back(std::get<1>(crease_defender_tactics));
         result[0].insert(result[0].end(), move_tactics.begin(), move_tactics.end());
         yield(result);
     } while (true);
