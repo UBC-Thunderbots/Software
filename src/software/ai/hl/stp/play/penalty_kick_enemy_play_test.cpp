@@ -18,7 +18,7 @@
 class PenaltyKickEnemyPlayTest
     : public SimulatedPlayTestFixture,
       public ::testing::WithParamInterface<
-          std::tuple<RefereeCommand, RefereeCommand, std::vector<RobotStateWithId>>>
+          std::tuple<RefereeCommand, RefereeCommand, std::vector<RobotStateWithId>, float>>
 {
    protected:
     Field field = Field::createSSLDivisionBField();
@@ -31,15 +31,16 @@ TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
     BallState ball_state(field.enemyPenaltyMark(), Vector(0, 0));
 
     std::vector<RobotStateWithId> friendly_robots = std::get<2>(GetParam());
+    float enemy_distance_behind_ball = std::get<3>(GetParam());
 
     // enemy robots behind the penalty mark
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({
         Point(field.enemyPenaltyMark().x() + 0.3, 0),  // kicker robot
-        Point(field.enemyPenaltyMark().x() + 1, 0),
-        Point(field.enemyPenaltyMark().x() + 1, 4 * ROBOT_MAX_RADIUS_METERS),
-        Point(field.enemyPenaltyMark().x() + 1, 8 * ROBOT_MAX_RADIUS_METERS),
-        Point(field.enemyPenaltyMark().x() + 1, -4 * ROBOT_MAX_RADIUS_METERS),
-        Point(field.enemyPenaltyMark().x() + 1, -8 * ROBOT_MAX_RADIUS_METERS),
+        Point(field.enemyPenaltyMark().x() + enemy_distance_behind_ball, 0),
+        Point(field.enemyPenaltyMark().x() + enemy_distance_behind_ball, 4 * ROBOT_MAX_RADIUS_METERS),
+        Point(field.enemyPenaltyMark().x() + enemy_distance_behind_ball, 8 * ROBOT_MAX_RADIUS_METERS),
+        Point(field.enemyPenaltyMark().x() + enemy_distance_behind_ball, -4 * ROBOT_MAX_RADIUS_METERS),
+        Point(field.enemyPenaltyMark().x() + enemy_distance_behind_ball, -8 * ROBOT_MAX_RADIUS_METERS),
     });
     setFriendlyGoalie(0);
     setEnemyGoalie(0);
@@ -76,12 +77,32 @@ INSTANTIATE_TEST_CASE_P(
         std::make_tuple(RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::HALT,
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(1, 2), Point(-1, -2), Point(-2.5, 3), Point(2, -1),
-                             Point(0, 3), Point(3, 0)})),
+                             Point(0, 3), Point(3, 0)}), 1),
         std::make_tuple(RefereeCommand::NORMAL_START,
                         RefereeCommand::PREPARE_PENALTY_THEM,
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(2.2, 1.2), Point(-0.5, -2.1), Point(-2.5, 1.3),
-                             Point(1.2, -1.5), Point(0, 2), Point(1, 0)}))));
+                             Point(1.2, -1.5), Point(0, 2), Point(1, 0)}), 1.3),
+        std::make_tuple(RefereeCommand::NORMAL_START,
+                        RefereeCommand::PREPARE_PENALTY_THEM,
+                        TestUtil::createStationaryRobotStatesWithId(
+                            {Point(2.2, 1.2), Point(-0.5, -2.1), Point(-2.5, 1.3),
+                            Point(1.2, -1.5), Point(0, 2), Point(1, 0)}), 1.4),
+        std::make_tuple(RefereeCommand::NORMAL_START,
+                        RefereeCommand::PREPARE_PENALTY_THEM,
+                        TestUtil::createStationaryRobotStatesWithId(
+                            {Point(2.2, 1.2), Point(-0.5, -2.1), Point(-2.5, 1.3),
+                             Point(1.2, -1.5), Point(0, 2), Point(1, 0)}), 1.45),
+        std::make_tuple(RefereeCommand::NORMAL_START,
+                        RefereeCommand::PREPARE_PENALTY_THEM,
+                        TestUtil::createStationaryRobotStatesWithId(
+                            {Point(2.2, 1.2), Point(-0.5, -2.1), Point(-2.5, 1.3),
+                             Point(1.2, -1.5), Point(0, 2), Point(1, 0)}), 1.5),
+        std::make_tuple(RefereeCommand::NORMAL_START,
+                        RefereeCommand::PREPARE_PENALTY_THEM,
+                        TestUtil::createStationaryRobotStatesWithId(
+                            {Point(2.2, 1.2), Point(-0.5, -2.1), Point(-2.5, 1.3),
+                             Point(1.2, -1.5), Point(0, 2), Point(1, 0)}), 1.6)));
 
 TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_goalie)
 {
