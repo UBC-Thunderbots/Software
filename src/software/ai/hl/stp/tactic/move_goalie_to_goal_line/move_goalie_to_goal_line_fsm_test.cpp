@@ -4,7 +4,7 @@
 
 #include "software/test_util/test_util.h"
 
-TEST(MoveToGoalLineFSMTest, test_transitions)
+TEST(MoveGoalieToGoalLineFSMTest, test_transitions)
 {
     World world = ::TestUtil::createBlankTestingWorld();
     Robot robot(

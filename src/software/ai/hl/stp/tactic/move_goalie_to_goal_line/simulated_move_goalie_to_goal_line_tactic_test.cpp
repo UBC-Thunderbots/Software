@@ -9,7 +9,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedMoveToGoalLineTacticTest
+class SimulatedMoveGoalieToGoalLineTacticTest
     : public SimulatedTacticTestFixture,
       public ::testing::WithParamInterface<RobotStateWithId>
 {
@@ -17,7 +17,7 @@ class SimulatedMoveToGoalLineTacticTest
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_P(SimulatedMoveToGoalLineTacticTest, move_to_goal_line_test)
+TEST_P(SimulatedMoveGoalieToGoalLineTacticTest, move_to_goal_line_test)
 {
     RobotStateWithId robot_state = GetParam();
 
@@ -53,7 +53,7 @@ TEST_P(SimulatedMoveToGoalLineTacticTest, move_to_goal_line_test)
 }
 
 INSTANTIATE_TEST_CASE_P(
-    PassEnvironment, SimulatedMoveToGoalLineTacticTest,
+    PassEnvironment, SimulatedMoveGoalieToGoalLineTacticTest,
     ::testing::Values(
         // Robot on friendly half, not facing opponent
         RobotStateWithId{0, RobotState(Point(1, 2), Vector(1, 1), Angle::fromDegrees(180),
