@@ -91,23 +91,24 @@ void WifiBackend::receiveRobotLogs(TbotsProto::RobotLog log)
 void WifiBackend::joinMulticastChannel(int channel, const std::string& interface)
 {
     vision_output.reset(new ThreadedProtoUdpSender<TbotsProto::Vision>(
-        std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, VISION_PORT, true));
+        std::string(ROBOT_MULTICAST_CHANNELS[channel]) + "%" + interface, VISION_PORT,
+        true));
 
     primitive_output.reset(new ThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(
-        std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, PRIMITIVE_PORT,
+        std::string(ROBOT_MULTICAST_CHANNELS[channel]) + "%" + interface, PRIMITIVE_PORT,
         true));
 
     robot_status_input.reset(new ThreadedProtoUdpListener<TbotsProto::RobotStatus>(
-        std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, ROBOT_STATUS_PORT,
-        boost::bind(&Backend::receiveRobotStatus, this, _1), true));
+        std::string(ROBOT_MULTICAST_CHANNELS[channel]) + "%" + interface,
+        ROBOT_STATUS_PORT, boost::bind(&Backend::receiveRobotStatus, this, _1), true));
 
     robot_log_input.reset(new ThreadedProtoUdpListener<TbotsProto::RobotLog>(
-        std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, ROBOT_LOGS_PORT,
+        std::string(ROBOT_MULTICAST_CHANNELS[channel]) + "%" + interface, ROBOT_LOGS_PORT,
         boost::bind(&WifiBackend::receiveRobotLogs, this, _1), true));
 
     defending_side_output.reset(new ThreadedProtoUdpSender<DefendingSideProto>(
-        std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, DEFENDING_SIDE_PORT,
-        true));
+        std::string(ROBOT_MULTICAST_CHANNELS[channel]) + "%" + interface,
+        DEFENDING_SIDE_PORT, true));
 }
 
 // Register this backend in the genericFactory

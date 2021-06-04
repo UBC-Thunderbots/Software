@@ -33,8 +33,8 @@ cc_test(
     srcs = ["ball_filter_test.cpp"],
     deps = [
         ":ball_filter",
+        "//shared/test_util:tbots_gtest_main",
         "//software/world:field",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -53,7 +53,7 @@ cc_test(
     srcs = ["robot_filter_test.cpp"],
     deps = [
         ":robot_filter",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -73,7 +73,7 @@ cc_test(
     srcs = ["robot_team_filter_test.cpp"],
     deps = [
         ":robot_team_filter",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 

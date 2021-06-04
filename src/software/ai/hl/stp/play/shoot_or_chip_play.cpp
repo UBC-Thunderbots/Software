@@ -4,17 +4,17 @@
 #include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/evaluation/find_open_areas.h"
 #include "software/ai/evaluation/possession.h"
+#include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
-#include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
 
 ShootOrChipPlay::ShootOrChipPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config, true), MIN_OPEN_ANGLE_FOR_SHOT(Angle::fromDegrees(4))
+    : Play(config, true)
 {
 }
 
@@ -63,10 +63,9 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
     Point fallback_chip_target =
         world.field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
 
-    auto shoot_or_chip_tactic = std::make_shared<ShootGoalTactic>(
-        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        MIN_OPEN_ANGLE_FOR_SHOT, fallback_chip_target, false,
-        play_config->getShootGoalTacticConfig());
+    auto attacker =
+        std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
+    attacker->updateControlParams(fallback_chip_target);
 
     do
     {
@@ -109,15 +108,15 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
         {
             chip_target = chip_targets[0].origin();
         }
-        shoot_or_chip_tactic->updateControlParams(chip_target);
+        attacker->updateControlParams(chip_target);
 
         // We want this second in priority only to the goalie
-        result[0].insert(result[0].begin() + 1, shoot_or_chip_tactic);
+        result[0].insert(result[0].begin() + 1, attacker);
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(result);
 
-    } while (!shoot_or_chip_tactic->done());
+    } while (!attacker->done());
 }
 
 // Register this play in the genericFactory

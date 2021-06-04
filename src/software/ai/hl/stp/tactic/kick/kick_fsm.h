@@ -6,6 +6,7 @@
 
 struct KickFSM
 {
+   public:
     class KickState;
 
     struct ControlParams

@@ -1,7 +1,6 @@
 #pragma once
 
-#include <gtest/gtest.h>
-
+#include "shared/test_util/tbots_gtest_main.h"
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/proto/logging/proto_logger.h"
@@ -20,15 +19,6 @@ class SimulatedTestFixture : public ::testing::Test
 {
    public:
     explicit SimulatedTestFixture();
-
-    // Controls whether the visualizer will be enabled during the simulated tests
-    // if false, visualizer does not run during simulated tests
-    // if true, running tests are displayed on the visualizer
-    static bool enable_visualizer;
-
-    // Controls whether the AI will be stopped when the simulated test starts
-    // only if enable_visualizer is true
-    static bool stop_ai_on_start;
 
    protected:
     void SetUp() override;
@@ -91,6 +81,13 @@ class SimulatedTestFixture : public ::testing::Test
         const std::vector<ValidationFunction> &terminating_validation_functions,
         const std::vector<ValidationFunction> &non_terminating_validation_functions,
         const Duration &timeout);
+
+    /**
+     * Registers a new tick time for calculating tick time statistics
+     *
+     * @param tick_time_ms The tick time in milliseconds
+     */
+    void registerTickTime(double tick_time_ms);
 
     // The dynamic params being used in the tests
     std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config;
@@ -177,6 +174,10 @@ class SimulatedTestFixture : public ::testing::Test
     // The SensorFusion being tested and used in simulation
     SensorFusion sensor_fusion;
 
+    // whether we should log the filtered and unfiltered world states as replay logs
+    // this will only be set to true if the environment variable
+    // TEST_UNDECLARED_OUTPUTS_DIR is set, usually by running as a Bazel test
+    bool should_log_replay;
     // ProtoLoggers for the simulator and SensorFusion, respectively
     std::shared_ptr<ProtoLogger<SensorProto>> simulator_sensorproto_logger;
     std::shared_ptr<ProtoLogger<SSLProto::SSL_WrapperPacket>> sensorfusion_wrapper_logger;
@@ -189,6 +190,16 @@ class SimulatedTestFixture : public ::testing::Test
     // If true, introduces artificial delay so that simulation
     // time passes at the same speed a real life time
     bool run_simulation_in_realtime;
+
+    // These variables track tick time statistics
+    // Total duration of all ticks registered
+    double total_tick_duration;
+    // The max tick duration registered
+    double max_tick_duration;
+    // The min tick duration registered
+    double min_tick_duration;
+    // Total number of ticks registered
+    unsigned int tick_count;
 
     // The rate at which camera data will be simulated and given to SensorFusion.
     // Each sequential "camera frame" will be 1 / SIMULATED_CAMERA_FPS time step

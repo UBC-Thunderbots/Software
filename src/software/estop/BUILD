@@ -47,6 +47,6 @@ cc_test(
     ],
     deps = [
         ":threaded_estop_reader",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )

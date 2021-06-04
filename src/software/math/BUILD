@@ -15,6 +15,6 @@ cc_test(
     srcs = ["math_functions_test.cpp"],
     deps = [
         ":math_functions",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )

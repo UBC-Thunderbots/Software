@@ -227,7 +227,7 @@ If you think some ASCII art will help explain something better, go for it! [asci
      * @param tactic The tactic to visit
      */
 
-    virtual void visit(CherryPickTactic &tactic)         = 0;
+    virtual void visit(MoveTactic &tactic)               = 0;
     virtual void visit(ShadowFreekickerTactic &tactic)   = 0;
     virtual void visit(GoalieTactic &tactic)             = 0;
     etc...

@@ -157,8 +157,6 @@ void ThreadedSimulator::runSimulationLoop()
             std::chrono::microseconds(
                 static_cast<unsigned int>(slow_motion_multiplier.load() *
                                           TIME_STEP_SECONDS * MICROSECONDS_PER_SECOND));
-        // TODO: Warn or indicate if we are running slower than real-time
-        // https://github.com/UBC-Thunderbots/Software/issues/1491
         std::this_thread::sleep_until(simulation_step_end_time);
     }
 }

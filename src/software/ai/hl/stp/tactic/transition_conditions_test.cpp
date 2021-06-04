@@ -36,5 +36,5 @@ TEST(TransitionConditionTest, test_compare_points)
     Point point2 = Point(1, 2);
     Point point3 = Point(2, 1);
     EXPECT_TRUE(comparePoints(point1, point2, 1.0));
-    EXPECT_FALSE(comparePoints(point1, point3, 1.0));
+    EXPECT_FALSE(comparePoints(point2, point3, 1.0));
 }

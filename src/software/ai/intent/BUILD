@@ -33,7 +33,7 @@ cc_test(
     srcs = ["chip_intent_test.cpp"],
     deps = [
         ":chip_intent",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -51,7 +51,7 @@ cc_test(
     srcs = ["kick_intent_test.cpp"],
     deps = [
         ":kick_intent",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -72,8 +72,8 @@ cc_test(
     srcs = ["move_intent_test.cpp"],
     deps = [
         ":move_intent",
+        "//shared/test_util:tbots_gtest_main",
         "//software/util/typename",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -91,7 +91,7 @@ cc_test(
     srcs = ["stop_intent_test.cpp"],
     deps = [
         ":stop_intent",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -129,7 +129,7 @@ cc_test(
     deps = [
         ":intent",
         ":stop_intent",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 

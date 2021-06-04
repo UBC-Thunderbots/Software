@@ -20,7 +20,7 @@ cc_test(
     deps = [
         ":coloured_cout_sink",
         ":logger",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -44,7 +44,7 @@ cc_test(
     deps = [
         ":csv_sink",
         ":logger",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 

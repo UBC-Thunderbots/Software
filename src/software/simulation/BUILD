@@ -11,12 +11,20 @@ cc_library(
 )
 
 cc_library(
+    name = "force_wheel_simulator_robot",
+    hdrs = ["force_wheel_simulator_robot.h"],
+    deps = [
+        ":simulator_robot",
+    ],
+)
+
+cc_library(
     name = "physics_simulator_robot",
     srcs = ["physics_simulator_robot.cpp"],
     hdrs = ["physics_simulator_robot.h"],
     deps = [
         ":firmware_object_deleter",
-        ":simulator_robot",
+        ":force_wheel_simulator_robot",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
         "//software/geom/algorithms",
@@ -33,12 +41,12 @@ cc_test(
     deps = [
         ":physics_simulator_ball",
         ":physics_simulator_robot",
+        "//shared/test_util:tbots_gtest_main",
         "//software/simulation/physics:physics_world",
         "//software/test_util",
         "//software/world",
         "//software/world:robot",
         "@box2d",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -67,11 +75,11 @@ cc_test(
     srcs = ["physics_simulator_ball_test.cpp"],
     deps = [
         ":physics_simulator_ball",
+        "//shared/test_util:tbots_gtest_main",
         "//software/simulation/physics:physics_ball",
         "//software/simulation/physics:physics_world",
         "//software/test_util",
         "@box2d",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -86,7 +94,6 @@ cc_library(
         "//firmware/app/world:chicker",
         "//firmware/app/world:dribbler",
         "//firmware/app/world:firmware_robot",
-        "//firmware/app/world:force_wheel",
         "//firmware/shared:physics",
         "//shared/proto:tbots_cc_proto",
         "//software/logger",
@@ -94,26 +101,37 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "simulator_robot_singleton_test",
-    srcs = ["simulator_robot_singleton_test.cpp"],
+cc_library(
+    name = "force_wheel_simulator_robot_singleton",
+    srcs = ["force_wheel_simulator_robot_singleton.cpp"],
+    hdrs = ["force_wheel_simulator_robot_singleton.h"],
     deps = [
+        ":force_wheel_simulator_robot",
+        ":simulator_robot_singleton",
+        "//firmware/app/world:force_wheel",
+    ],
+)
+
+cc_test(
+    name = "force_wheel_simulator_robot_singleton_test",
+    srcs = ["force_wheel_simulator_robot_singleton_test.cpp"],
+    deps = [
+        ":force_wheel_simulator_robot_singleton",
         ":physics_simulator_ball",
         ":physics_simulator_robot",
         ":simulator_ball",
         ":simulator_robot",
-        ":simulator_robot_singleton",
         "//firmware/app/logger",
         "//firmware/app/world:firmware_robot",
         "//shared/proto:tbots_cc_proto",
         "//shared/proto:tbots_nanopb_proto",
         "//shared/test_util",
+        "//shared/test_util:tbots_gtest_main",
         "//software/simulation/physics:physics_robot",
         "//software/simulation/physics:physics_world",
         "//software/test_util",
         "//software/world",
         "//software/world:robot",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -139,12 +157,12 @@ cc_test(
         ":simulator_ball",
         ":simulator_ball_singleton",
         "//firmware/app/world:firmware_ball",
+        "//shared/test_util:tbots_gtest_main",
         "//software/geom:point",
         "//software/geom:vector",
         "//software/simulation/physics:physics_world",
         "//software/time:timestamp",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -154,10 +172,10 @@ cc_library(
     hdrs = ["simulator.h"],
     deps = [
         ":firmware_object_deleter",
+        ":force_wheel_simulator_robot_singleton",
         ":physics_simulator_ball",
         ":physics_simulator_robot",
         ":simulator_ball_singleton",
-        ":simulator_robot_singleton",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
         "//shared/parameter:cpp_configs",
@@ -178,10 +196,10 @@ cc_test(
     srcs = ["simulator_test.cpp"],
     deps = [
         ":simulator",
+        "//shared/test_util:tbots_gtest_main",
         "//software/proto/primitive:primitive_msg_factory",
         "//software/test_util",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -201,11 +219,11 @@ cc_test(
     srcs = ["threaded_simulator_test.cpp"],
     deps = [
         ":threaded_simulator",
+        "//shared/test_util:tbots_gtest_main",
         "//software/proto/message_translation:tbots_protobuf",
         "//software/proto/primitive:primitive_msg_factory",
         "//software/test_util",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -217,6 +235,7 @@ cc_library(
         ":threaded_simulator",
         "//shared/parameter:cpp_configs",
         "//shared/proto:tbots_cc_proto",
+        "//software:constants",
         "//software/logger",
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",
