@@ -13,7 +13,7 @@ std::vector<Point> rasterize(const Circle &circle, const double resolution_size)
 
     // Using an approach to find the points on the edges using y = +-sqrt(r^2 - (x - k)^2) + h and filling in the rest
     // Downside is using sqrt to calculate
-    // Chosen to avoid points being outside of circle due to floating point error
+    // Chosen to avoid points being outside of circle due to floating point errors
     const double EPSILON = 0.0001;
     double radius = circle.radius() - EPSILON;
     double diameter = radius * 2;

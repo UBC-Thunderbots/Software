@@ -229,6 +229,9 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
 
     findAllBlockedCoords();
 
+    blocked_grid.erase(end_coord);
+
+    // Avoiding the situation where closest_end point is free but end_coord is blocked
     bool found_end = findPathToEnd(end_coord);
 
     if (found_end == false)
