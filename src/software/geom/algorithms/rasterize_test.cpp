@@ -35,17 +35,18 @@ TEST(RasterizeTest, test_circle_with_actual_theta_star_values)
 
 TEST(RasterizeTest, test_large_circle)
 {
-    double robot_obstacle = 1.f;
+    double robot_obstacle = 3.f;
     Circle circle({0, 0}, robot_obstacle);
     double theta_star_grid_square_size = 0.1f;
     std::vector<Point> rasterized_points = rasterize(circle, theta_star_grid_square_size);
 
     for(Point p : rasterized_points)
     {
-        EXPECT_TRUE(contains(circle, p));
+        EXPECT_TRUE(contains(circle, p)) << p;
     }
     EXPECT_EQ(rasterized_points.size(), 9);
 }
+
 
 //////////////////////////////////////////////////////
 ////              Testing Polygons                ////
