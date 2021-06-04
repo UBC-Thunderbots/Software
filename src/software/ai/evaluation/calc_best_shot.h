@@ -166,23 +166,6 @@ public:
             return biggest_viable_angle_seg;
         }
 
-        std::sort(this->taken_angle_segments.begin(), this->taken_angle_segments.end(),
-                  [](AngleSegment a, AngleSegment b) -> bool {
-                      Angle a_angle = a.getAngleTop();
-                      Angle b_angle = b.getAngleTop();
-
-                      if (a_angle < b_angle)
-                      {
-                          return false;
-                      }
-                      else if (a_angle > b_angle)
-                      {
-                          return true;
-                      }
-
-                      return false;
-                  });
-
         AngleSegment first_taken_angle_seg = this->taken_angle_segments.front();
         if (first_taken_angle_seg.getAngleTop() < this->angle_seg.getAngleTop())
         {
@@ -263,23 +246,6 @@ public:
                                                     this->angle_seg.getAngleBottom());
             return biggest_viable_angle_seg;
         }
-
-        std::sort(this->taken_angle_segments.begin(), this->taken_angle_segments.end(),
-                  [](AngleSegment a, AngleSegment b) -> bool {
-                      Angle a_angle = a.getAngleTop();
-                      Angle b_angle = b.getAngleTop();
-
-                      if (a_angle > b_angle)
-                      {
-                          return false;
-                      }
-                      else if (a_angle < b_angle)
-                      {
-                          return true;
-                      }
-
-                      return false;
-                  });
 
         AngleSegment first_taken_angle_seg = this->taken_angle_segments.front();
         if (first_taken_angle_seg.getAngleTop() > this->angle_seg.getAngleTop())
