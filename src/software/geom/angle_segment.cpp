@@ -8,10 +8,8 @@
  * @param angle_top the most north angle
  * @param angle_bottom the most south angle
  */
-AngleSegment::AngleSegment(Angle angle_top, Angle angle_bottom)
+AngleSegment::AngleSegment(Angle angle_top, Angle angle_bottom) : angle_top_(angle_top), angle_bottom_(angle_bottom)
 {
-    this->angle_top_    = angle_top;
-    this->angle_bottom_ = angle_bottom;
 }
 
 /**

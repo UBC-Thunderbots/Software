@@ -552,33 +552,33 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_positive_y_ball_placeme
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 21, 1);
 }
 
-//// https://i.imgur.com/KtrR6iP.png - reverse placements for enemy side
-//TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_outlier)
-//{
-//    World world = ::TestUtil::createBlankTestingWorld();
-//    Team team   = Team(Duration::fromSeconds(1));
-//
-//    Point shooting_robot_pos = Point(0.328205, 2.74872);
-//    Robot shooting_robot     = Robot(0, shooting_robot_pos, Vector(0, 0), Angle::zero(),
-//                                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
-//    team.updateRobots({shooting_robot});
-//    world.updateFriendwlyTeamState(team);
-//
-//    world = ::TestUtil::setEnemyRobotPositions(world, {Point(-3.29231, -0.215385), Point(-3.48021, 0.407988), Point(-3.31282, 0.882051), Point(-1.2, 1.86667), Point(-3.45938, 0.231164)},
-//                                               Timestamp::fromSeconds(0));
-//
-//    auto result =
-//            calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(),
-//                               shooting_robot.position(), TeamType::FRIENDLY, {shooting_robot});
-//
-//    // We should not be able to find a shot
-//    ASSERT_FALSE(result);
-//
-//    EXPECT_TRUE(TestUtil::equalWithinTolerance(
-//            result->getPointToShootAt(), Point(world.field().enemyGoalCenter().x(), 0.24),
-//            0.05));
-//    EXPECT_NEAR(result->getOpenAngle().toDegrees(), 21, 1);
-//}
+// https://i.imgur.com/KtrR6iP.png - reverse placements for enemy side
+TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_outlier)
+{
+    World world = ::TestUtil::createBlankTestingWorld();
+    Team team   = Team(Duration::fromSeconds(1));
+
+    Point shooting_robot_pos = Point(0.348718, 2.69744);
+    Robot shooting_robot     = Robot(0, shooting_robot_pos, Vector(0, 0), Angle::zero(),
+                                     AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    team.updateRobots({shooting_robot});
+    world.updateFriendlyTeamState(team);
+
+    world = ::TestUtil::setEnemyRobotPositions(world, {Point(-3.29231, -0.215385), Point(-3.48021, 0.407988), Point(-3.31282, 0.882051), Point(-1.2, 1.86667), Point(-3.45938, 0.231164)},
+                                               Timestamp::fromSeconds(0));
+
+    auto result =
+            calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                               shooting_robot.position(), TeamType::FRIENDLY, {shooting_robot});
+
+    // We should not be able to find a shot
+    ASSERT_FALSE(result);
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+            result->getPointToShootAt(), Point(world.field().enemyGoalCenter().x(), 0.24),
+            0.05));
+    EXPECT_NEAR(result->getOpenAngle().toDegrees(), 21, 1);
+}
 
 //TEST(AngleMapTest, add_obstacle_angle_segment_takes_entire_angle_map)
 //{
