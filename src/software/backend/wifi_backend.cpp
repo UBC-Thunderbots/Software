@@ -19,8 +19,7 @@ WifiBackend::WifiBackend(std::shared_ptr<const BackendConfig> config)
       arduino_config(config->getWifiBackendConfig()->getArduinoConfig()),
       ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
                        boost::bind(&Backend::receiveSSLReferee, this, _1),
-                       network_config->getSslCommunicationConfig()),
-      estop_reader(nullptr)
+                       network_config->getSslCommunicationConfig())
 {
     std::string network_interface = this->network_config->getNetworkInterface()->value();
     int channel                   = this->network_config->getChannel()->value();
@@ -30,6 +29,13 @@ WifiBackend::WifiBackend(std::shared_ptr<const BackendConfig> config)
             this->network_config->getNetworkInterface()->value();
         joinMulticastChannel(new_channel, new_network_interface);
     });
+
+    //setup estop
+    boost::asio::io_service io_service;
+    std::unique_ptr<BoostUartCommunication> uart_device =
+            std::make_unique<BoostUartCommunication>(io_service, ARDUINO_BAUD_RATE,
+                                                     arduino_config->getPort()->value());
+    estop_reader = std::make_unique<ThreadedEstopReader>(std::move(uart_device), 0);
 
     // connect to current channel
     joinMulticastChannel(channel, network_interface);
@@ -67,16 +73,6 @@ void WifiBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 
 void WifiBackend::onValueReceived(World world)
 {
-    // handle estop option
-    if (world.isEstopEnabled() && estop_reader == nullptr)
-    {
-        boost::asio::io_service io_service;
-        std::unique_ptr<BoostUartCommunication> uart_device =
-            std::make_unique<BoostUartCommunication>(io_service, ARDUINO_BAUD_RATE,
-                                                     arduino_config->getPort()->value());
-        estop_reader = std::make_unique<ThreadedEstopReader>(std::move(uart_device), 0);
-    }
-
     vision_output->sendProto(*createVision(world));
 }
 

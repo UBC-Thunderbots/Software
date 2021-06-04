@@ -14,8 +14,7 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
       // Store a small buffer of previous referee commands so we can filter out noise
       referee_command_history_(REFEREE_COMMAND_BUFFER_SIZE),
       referee_stage_history_(REFEREE_COMMAND_BUFFER_SIZE),
-      team_with_possesion_(TeamSide::ENEMY),
-      estop_enabled(false)
+      team_with_possesion_(TeamSide::ENEMY)
 {
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
@@ -167,14 +166,4 @@ void World::setTeamWithPossession(TeamSide team_with_possesion)
 TeamSide World::getTeamWithPossession() const
 {
     return team_with_possesion_;
-}
-
-void World::setEstopEnabled(bool is_estop_enabled)
-{
-    estop_enabled = is_estop_enabled;
-}
-
-bool World::isEstopEnabled()
-{
-    return estop_enabled;
 }

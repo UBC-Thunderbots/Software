@@ -68,7 +68,7 @@ int main(int argc, char** argv)
         {
             mutable_thunderbots_config->getMutableArduinoConfig()
                 ->getMutablePort()
-                ->setValue(ArduinoUtil::getArduinoPort().value_or("hi"));
+                ->setValue(ArduinoUtil::getArduinoPort().value_or(""));
         }
 
         if (args->getBackend()->value().empty())

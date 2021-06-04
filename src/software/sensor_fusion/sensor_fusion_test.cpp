@@ -25,7 +25,6 @@ class SensorFusionTest : public ::testing::Test
           robot_status_msg_dribble_motor_hot(initDribbleMotorHotErrorCode()),
           robot_status_msg_multiple_error_codes(initMultipleErrorCode()),
           robot_status_msg_no_error_code(initNoErrorCode()),
-          robot_status_msg_estop_enabled(initEstopEnabled()),
           referee_indirect_yellow(initRefereeIndirectYellow()),
           referee_indirect_blue(initRefereeIndirectBlue()),
           referee_normal_start(initRefereeNormalStart()),
@@ -54,7 +53,6 @@ class SensorFusionTest : public ::testing::Test
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_dribble_motor_hot;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_multiple_error_codes;
     std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_no_error_code;
-    std::unique_ptr<TbotsProto::RobotStatus> robot_status_msg_estop_enabled;
     std::unique_ptr<SSLProto::Referee> referee_indirect_yellow;
     std::unique_ptr<SSLProto::Referee> referee_indirect_blue;
     std::unique_ptr<SSLProto::Referee> referee_normal_start;
@@ -296,14 +294,6 @@ class SensorFusionTest : public ::testing::Test
         return std::move(robot_msg);
     }
 
-    std::unique_ptr<TbotsProto::RobotStatus> initEstopEnabled()
-    {
-        auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
-        robot_msg->set_estop_enabled(true);
-
-        return std::move(robot_msg);
-    }
-
     std::unique_ptr<SSLProto::Referee> initRefereeIndirectYellow()
     {
         auto ref_msg = std::make_unique<SSLProto::Referee>();
@@ -483,18 +473,6 @@ TEST_F(SensorFusionTest, test_emptying_robot_unavailable_capabilities_from_error
     std::set<RobotCapability> robot_unavailable_capabilities =
         robot.value().getUnavailableCapabilities();
     EXPECT_EQ(0, robot_unavailable_capabilities.size());
-}
-
-TEST_F(SensorFusionTest, test_estop_enabled_in_world)
-{
-    SensorProto sensor_msg;
-    auto ssl_wrapper_packet =
-        createSSLWrapperPacket(std::move(geom_data), initDetectionFrame());
-    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
-    *(sensor_msg.add_robot_status_msgs())  = *robot_status_msg_estop_enabled;
-    sensor_fusion.processSensorProto(sensor_msg);
-
-    ASSERT_TRUE(sensor_fusion.getWorld().value().isEstopEnabled());
 }
 
 TEST_F(SensorFusionTest, test_geom_wrapper_packet)
