@@ -4,7 +4,6 @@
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
 
 /**
@@ -60,12 +59,13 @@ class FreeKickPlay : public Play
      *
      * @param yield The coroutine to yield to
      * @param crease_defender_tactics The crease defender tactics
+     * @param shoot_tactic The AttackerTactic to shoot with
      * @param world The current state of the world
      *
      * @return the pass that was found
      */
     PassWithRating shootOrFindPassStage(
-        TacticCoroutine::push_type &yield, std::shared_ptr<ShootGoalTactic> shoot_tactic,
+        TacticCoroutine::push_type &yield, std::shared_ptr<AttackerTactic> shoot_tactic,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
         const World &world);
 

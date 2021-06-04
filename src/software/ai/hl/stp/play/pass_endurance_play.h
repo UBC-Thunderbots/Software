@@ -4,17 +4,21 @@
 #include "software/ai/hl/stp/play/play.h"
 
 /**
- * The Defense Play tries to grab the ball from the enemy that has it, and all other
- * robots shadow the enemy robots in order of how threatening they are.
+ * Play for the pass endurace hardware challenge
+ * https://robocup-ssl.github.io/ssl-hardware-challenge-rules/rules.html
  */
-class ShootOrChipPlay : public Play
+class PassEndurancePlay : public Play
 {
    public:
-    ShootOrChipPlay(std::shared_ptr<const PlayConfig> config);
+    PassEndurancePlay(std::shared_ptr<const PlayConfig> config);
 
     bool isApplicable(const World &world) const override;
 
     bool invariantHolds(const World &world) const override;
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+
+   private:
+    // 3 robots for this hardware challenge
+    const unsigned int NUM_ROBOTS = 3;
 };

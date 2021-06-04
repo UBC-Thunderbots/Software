@@ -32,6 +32,8 @@ void MotionConstraintVisitor::visit(const ChipTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const KickTactic &tactic) {}
 
+void MotionConstraintVisitor::visit(const PivotKickTactic &tactic) {}
+
 void MotionConstraintVisitor::visit(const KickoffChipTactic &tactic)
 {
     current_allowed_constraints = std::set<MotionConstraint>({
@@ -63,14 +65,7 @@ void MotionConstraintVisitor::visit(const PenaltySetupTactic &tactic)
 
 void MotionConstraintVisitor::visit(const ReceiverTactic &tactic) {}
 
-void MotionConstraintVisitor::visit(const ShootGoalTactic &tactic)
-{
-    current_allowed_constraints = std::set<MotionConstraint>({
-        MotionConstraint::HALF_METER_AROUND_BALL
-    });
-}
-
-void MotionConstraintVisitor::visit(const PasserTactic &tactic) {}
+void MotionConstraintVisitor::visit(const AttackerTactic &tactic) { }
 
 void MotionConstraintVisitor::visit(const DefenseShadowEnemyTactic &tactic) {}
 
