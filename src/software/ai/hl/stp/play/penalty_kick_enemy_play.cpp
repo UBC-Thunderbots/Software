@@ -3,7 +3,7 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/move_to_goal_line/move_to_goal_line_tactic.h"
+#include "software/ai/hl/stp/tactic/move_goalie_to_goal_line/move_goalie_to_goal_line_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(std::shared_ptr<const PlayConfig> config)
@@ -25,7 +25,7 @@ bool PenaltyKickEnemyPlay::invariantHolds(const World &world) const
 void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                           const World &world)
 {
-    auto move_to_goal_line_tactic = std::make_shared<MoveToGoalLineTactic>();
+    auto move_to_goal_line_tactic = std::make_shared<MoveGoalieToGoalLineTactic>();
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
         std::make_shared<const GoalieTacticConfig>();
     auto goalie_tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
