@@ -4,19 +4,19 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
                                        const std::vector<Robot> &robot_obstacles,
                                        TeamType goal, double radius)
 {
-    size_t max_obstacle_size = robot_obstacles.size();
+    size_t max_num_obstacles = robot_obstacles.empty() ? 1 : robot_obstacles.size();
 
     Angle pos_post_angle = (goal_post.getStart() - shot_origin).orientation();
     Angle neg_post_angle = (goal_post.getEnd() - shot_origin).orientation();
 
     std::vector<ObstacleAngleSegment> obstacles;
-    obstacles.reserve(max_obstacle_size - 1);
+    obstacles.reserve(max_num_obstacles);
 
     if (goal == TeamType::ENEMY)
     {
 
         EnemyAngleMap angle_map =
-                EnemyAngleMap(pos_post_angle, neg_post_angle, max_obstacle_size);
+                EnemyAngleMap(pos_post_angle, neg_post_angle, max_num_obstacles);
 
 
         for (const Robot &robot_obstacle : robot_obstacles)
@@ -94,7 +94,7 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
         }
 
         FriendlyAngleMap angle_map =
-                FriendlyAngleMap(pos_post_angle, neg_post_angle, max_obstacle_size);
+                FriendlyAngleMap(pos_post_angle, neg_post_angle, max_num_obstacles);
 
         for (const Robot &robot_obstacle : robot_obstacles)
         {
@@ -187,11 +187,12 @@ std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_
                                        double radius)
 {
     std::vector<Robot> obstacles;
-
     std::vector<Robot> all_robots;
-    all_robots.reserve(enemy_team.numRobots() + friendly_team.numRobots() - 1);
-    all_robots.insert(obstacles.begin(), enemy_team.getAllRobots().begin(), enemy_team.getAllRobots().end());
-    all_robots.insert(obstacles.begin(), friendly_team.getAllRobots().begin(), friendly_team.getAllRobots().end());
+
+    size_t max_num_robots = enemy_team.numRobots() + friendly_team.numRobots() - 1 == 0 ? 1 : enemy_team.numRobots() + friendly_team.numRobots() - 1;
+    all_robots.reserve(max_num_robots);
+    all_robots.insert(all_robots.begin(), enemy_team.getAllRobots().begin(), enemy_team.getAllRobots().end());
+    all_robots.insert(all_robots.begin(), friendly_team.getAllRobots().begin(), friendly_team.getAllRobots().end());
 
     for (const Robot &robot : all_robots) {
         if (std::count(robots_to_ignore.begin(), robots_to_ignore.end(), robot) == 0)
@@ -207,6 +208,8 @@ std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_
                     continue;
                 }
             }
+
+            obstacles.emplace_back(robot);
         }
     }
 
