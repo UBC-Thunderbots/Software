@@ -33,14 +33,16 @@ void SimulationContactListener::BeginContact(b2Contact *contact)
                 contact_callback(robot, ball);
             }
         }
-        if (auto ball_field_pair = isBallFieldWallContact(user_data_a, user_data_b)) {
-            // If the ball hits a wall it's out of bounds, so we stop it to make it easier to
-            // retrieve for ball placement (otherwise it will bounce around the field)
-            PhysicsBall *ball   = ball_field_pair->first;
-            // Apply an impulse to nearly stop the ball. It's preferable if it bounces away
-            // from a wall very slightly for realism, and it should make it easier to retrieve
-            // for ball placement
-            ball->applyImpulse(-ball->momentum().normalize(ball->momentum().length() * 0.95));
+        if (auto ball_field_pair = isBallFieldWallContact(user_data_a, user_data_b))
+        {
+            // If the ball hits a wall it's out of bounds, so we stop it to make it easier
+            // to retrieve for ball placement (otherwise it will bounce around the field)
+            PhysicsBall *ball = ball_field_pair->first;
+            // Apply an impulse to nearly stop the ball. It's preferable if it bounces
+            // away from a wall very slightly for realism, and it should make it easier to
+            // retrieve for ball placement
+            ball->applyImpulse(
+                -ball->momentum().normalize(ball->momentum().length() * 0.95));
         }
     }
 }
@@ -226,8 +228,10 @@ PhysicsBall *SimulationContactListener::isBallContact(PhysicsObjectUserData *use
 }
 
 
-std::optional<std::pair<PhysicsBall*, PhysicsField*>> SimulationContactListener::isBallFieldWallContact(PhysicsObjectUserData *user_data_a,
-                                                               PhysicsObjectUserData *user_data_b) {
+std::optional<std::pair<PhysicsBall *, PhysicsField *>>
+SimulationContactListener::isBallFieldWallContact(PhysicsObjectUserData *user_data_a,
+                                                  PhysicsObjectUserData *user_data_b)
+{
     if (!user_data_a || !user_data_b)
     {
         return std::nullopt;

@@ -3,9 +3,9 @@
 #include <Box2D/Box2D.h>
 
 #include "software/simulation/physics/physics_ball.h"
+#include "software/simulation/physics/physics_field.h"
 #include "software/simulation/physics/physics_object_user_data.h"
 #include "software/simulation/physics/physics_robot.h"
-#include "software/simulation/physics/physics_field.h"
 
 /**
  * This class implements a custom ContactListener for a Box2D world so that we
@@ -81,6 +81,6 @@ class SimulationContactListener : public b2ContactListener
      * was a contact point between a ball and field wall, and returns std::nullopt
      * otherwise
      */
-    static std::optional<std::pair<PhysicsBall*, PhysicsField*>> isBallFieldWallContact(PhysicsObjectUserData* user_data_a,
-                                      PhysicsObjectUserData* user_data_b);
+    static std::optional<std::pair<PhysicsBall*, PhysicsField*>> isBallFieldWallContact(
+        PhysicsObjectUserData* user_data_a, PhysicsObjectUserData* user_data_b);
 };

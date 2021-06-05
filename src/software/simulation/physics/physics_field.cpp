@@ -51,7 +51,8 @@ void PhysicsField::setupFieldBoundary(const Field &field)
     field_boundary_fixture_def.shape       = &field_boundary_shape;
     field_boundary_fixture_def.restitution = FIELD_WALL_RESTITUTION;
     field_boundary_fixture_def.friction    = FIELD_WALL_FRICTION;
-    field_boundary_fixture_def.userData = new PhysicsObjectUserData({PhysicsObjectType::FIELD_WALL, this});
+    field_boundary_fixture_def.userData =
+        new PhysicsObjectUserData({PhysicsObjectType::FIELD_WALL, this});
     field_body->CreateFixture(&field_boundary_fixture_def);
 }
 
@@ -67,7 +68,8 @@ void PhysicsField::setupEnemyGoal(const Field &field)
     enemy_goal_fixture_def.shape       = &enemy_goal_shape;
     enemy_goal_fixture_def.restitution = FIELD_WALL_RESTITUTION;
     enemy_goal_fixture_def.friction    = FIELD_WALL_FRICTION;
-    enemy_goal_fixture_def.userData = new PhysicsObjectUserData({PhysicsObjectType::FIELD_WALL, this});
+    enemy_goal_fixture_def.userData =
+        new PhysicsObjectUserData({PhysicsObjectType::FIELD_WALL, this});
     field_body->CreateFixture(&enemy_goal_fixture_def);
 }
 
@@ -83,7 +85,8 @@ void PhysicsField::setupFriendlyGoal(const Field &field)
     friendly_goal_fixture_def.shape       = &friendly_goal_shape;
     friendly_goal_fixture_def.restitution = FIELD_WALL_RESTITUTION;
     friendly_goal_fixture_def.friction    = FIELD_WALL_FRICTION;
-    friendly_goal_fixture_def.userData = new PhysicsObjectUserData({PhysicsObjectType::FIELD_WALL, this});
+    friendly_goal_fixture_def.userData =
+        new PhysicsObjectUserData({PhysicsObjectType::FIELD_WALL, this});
     field_body->CreateFixture(&friendly_goal_fixture_def);
 }
 
