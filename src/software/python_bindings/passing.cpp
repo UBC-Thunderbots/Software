@@ -54,17 +54,27 @@ double ratePassFriendlyCapabilityWrapper(const World& world, py::dict pass_dict,
     return ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
 }
 
+double getStaticPositionQualityWrapper(const World& world, py::dict pass_dict,
+                                         py::dict passing_config_dict)
+{
+    auto pass = createPassFromDict(pass_dict);
+    updatePassingConfigFromDict(passing_config_dict);
+    return getStaticPositionQuality(world.field(), pass.receiverPoint(), passing_config);
+}
+
 PYBIND11_MODULE(passing, m)
 {
     m.def("updatePassingConfigFromDict", &updatePassingConfigFromDict,
-          py::arg("pass_dict"));
+            py::arg("pass_dict"));
     m.def("getPassingConfig", &getPassingConfig);
     m.def("ratePass", &ratePassWrapper, py::arg("world"), py::arg("pass_dict"),
-          py::arg("passing_config_dict"));
+            py::arg("passing_config_dict"));
     m.def("ratePassShootScore", &ratePassShootScoreWrapper, py::arg("world"),
-          py::arg("pass_dict"), py::arg("passing_config_dict"));
+            py::arg("pass_dict"), py::arg("passing_config_dict"));
     m.def("ratePassEnemyRisk", &ratePassEnemyRiskWrapper, py::arg("world"),
-          py::arg("pass_dict"), py::arg("passing_config_dict"));
+            py::arg("pass_dict"), py::arg("passing_config_dict"));
     m.def("ratePassFriendlyCapability", &ratePassFriendlyCapabilityWrapper,
-          py::arg("world"), py::arg("pass_dict"), py::arg("passing_config_dict"));
+            py::arg("world"), py::arg("pass_dict"), py::arg("passing_config_dict"));
+    m.def("getStaticPositionQuality", &getStaticPositionQualityWrapper,
+            py::arg("world"), py::arg("pass_dict"), py::arg("passing_config_dict"));
 }

@@ -21,26 +21,24 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 
     double enemy_pass_rating = ratePassEnemyRisk(world.enemyTeam(), pass, passing_config);
 
-    double shoot_pass_rating =
-        ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
-
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
 
     // Place strict limits on the ball speed
-    double min_pass_speed     = 4.5;
+    double min_pass_speed     = 3.5;
     double max_pass_speed     = 6.5;
     double pass_speed_quality = sigmoid(pass.speed(), min_pass_speed, 0.2) *
                                 (1 - sigmoid(pass.speed(), max_pass_speed, 0.2));
 
-    // We want to rate a pass more highly if it is lower risk, so subtract from 1
-    return friendly_pass_rating *
-           ((pass_speed_quality + shoot_pass_rating + enemy_pass_rating +
-             in_region_quality + static_pass_quality) /
-            5);
+    // Rate zones that are up the field higher to encourage progress up the field
+    double pass_up_field_rating = zone.centre().x() / world.field().xLength();
+
+    return friendly_pass_rating * pass_up_field_rating * pass_speed_quality *
+        enemy_pass_rating *
+        in_region_quality * static_pass_quality;
 }
 
 double rateZone(const World& world, const Rectangle& zone, const Point& receive_position,
-                std::shared_ptr<const PassingConfig> passing_config)
+        std::shared_ptr<const PassingConfig> passing_config)
 {
     // TODO (#2021) improve and implement tests
     // Zones with their centers in bad positions are not good
@@ -53,24 +51,24 @@ double rateZone(const World& world, const Rectangle& zone, const Point& receive_
     double enemy_risk_rating =
         (ratePassEnemyRisk(world.enemyTeam(),
                            Pass(world.ball().position(), zone.negXNegYCorner(),
-                                passing_config->getMaxPassSpeedMPerS()->value()),
+                               passing_config->getMaxPassSpeedMPerS()->value()),
                            passing_config) +
          ratePassEnemyRisk(world.enemyTeam(),
-                           Pass(world.ball().position(), zone.negXPosYCorner(),
-                                passing_config->getMaxPassSpeedMPerS()->value()),
-                           passing_config) +
+             Pass(world.ball().position(), zone.negXPosYCorner(),
+                 passing_config->getMaxPassSpeedMPerS()->value()),
+             passing_config) +
          ratePassEnemyRisk(world.enemyTeam(),
-                           Pass(world.ball().position(), zone.posXNegYCorner(),
-                                passing_config->getMaxPassSpeedMPerS()->value()),
-                           passing_config) +
+             Pass(world.ball().position(), zone.posXNegYCorner(),
+                 passing_config->getMaxPassSpeedMPerS()->value()),
+             passing_config) +
          ratePassEnemyRisk(world.enemyTeam(),
-                           Pass(world.ball().position(), zone.posXPosYCorner(),
-                                passing_config->getMaxPassSpeedMPerS()->value()),
-                           passing_config) +
+             Pass(world.ball().position(), zone.posXPosYCorner(),
+                 passing_config->getMaxPassSpeedMPerS()->value()),
+             passing_config) +
          ratePassEnemyRisk(world.enemyTeam(),
-                           Pass(world.ball().position(), zone.centre(),
-                                passing_config->getMaxPassSpeedMPerS()->value()),
-                           passing_config)) /
+             Pass(world.ball().position(), zone.centre(),
+                 passing_config->getMaxPassSpeedMPerS()->value()),
+             passing_config)) /
         5.0;
 
     double ball_in_zone = 1.0;
@@ -119,7 +117,7 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
 
     // Create the shoot score by creating a sigmoid that goes to a large value as
     // the section of net we're shooting on approaches 100% (ie. completely open)
-    double shot_openness_score = sigmoid(net_percent_open, 0.45, 0.95);
+    double shot_openness_score = sigmoid(net_percent_open, 0.20, 0.30);
 
     Angle rotation_to_shot_target_after_pass = pass.receiverOrientation().minDiff(
         (shot_target - pass.receiverPoint()).orientation());
@@ -127,14 +125,15 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
         1 - sigmoid(rotation_to_shot_target_after_pass.abs().toDegrees(),
                     ideal_max_rotation_to_shoot_degrees, 4);
 
-    return shot_openness_score * required_rotation_for_shot_score;
+    double pass_up_field_rating = pass.receiverPoint().x() / field.xLength();
+
+    return (shot_openness_score * pass_up_field_rating)/2 + required_rotation_for_shot_score - required_rotation_for_shot_score;
 }
 
 double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
                          std::shared_ptr<const PassingConfig> passing_config)
 {
-    double enemy_proximity_importance =
-        passing_config->getEnemyProximityImportance()->value();
+    double enemy_proximity_importance = 10;
 
     // Calculate a risk score based on the distance of the enemy robots from the receive
     // point, based on an exponential function of the distance of each robot from the
@@ -151,11 +150,10 @@ double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
     {
         enemy_receiver_proximity_risk = 0;
     }
-
     double intercept_risk = calculateInterceptRisk(enemy_team, pass, passing_config);
 
     // We want to rate a pass more highly if it is lower risk, so subtract from 1
-    return 1 - std::max(intercept_risk, enemy_receiver_proximity_risk);
+    return intercept_risk;
 }
 
 double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
@@ -189,6 +187,7 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     // point on the pass to the enemy's current position
     Point closest_point_on_pass_to_robot = closestPoint(
         enemy_robot.position(), Segment(pass.passerPoint(), pass.receiverPoint()));
+
     Duration enemy_robot_time_to_closest_pass_point = getTimeToPositionForRobot(
         enemy_robot.position(), closest_point_on_pass_to_robot,
         ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
@@ -211,20 +210,77 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
         ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
 
-    Duration enemy_reaction_time =
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
-
     double robot_ball_time_diff_at_closest_pass_point =
-        ((enemy_robot_time_to_closest_pass_point + enemy_reaction_time) -
+        ((enemy_robot_time_to_closest_pass_point) -
          (ball_time_to_closest_pass_point))
-            .toSeconds();
+        .toSeconds();
+
     double robot_ball_time_diff_at_pass_receive_point =
-        ((enemy_robot_time_to_pass_receive_position + enemy_reaction_time) -
+        ((enemy_robot_time_to_pass_receive_position) -
          (ball_time_to_pass_receive_position))
-            .toSeconds();
+        .toSeconds();
 
     double min_time_diff = std::min(robot_ball_time_diff_at_closest_pass_point,
-                                    robot_ball_time_diff_at_pass_receive_point);
+            robot_ball_time_diff_at_pass_receive_point);
+
+    // Whether or not the enemy will be able to intercept the pass can be determined
+    // by whether or not they will be able to reach the pass receive position before
+    // the pass does. As such, we place the time difference between the robot and ball
+    // on a sigmoid that is centered at 0, and goes to 1 at positive values, 0 at
+    // negative values.
+    return 1 - sigmoid(min_time_diff, 0, 1);
+}
+
+double calculateChipInterceptRisk(const Robot& enemy_robot, const Pass& pass,
+                              std::shared_ptr<const PassingConfig> passing_config)
+{
+    // We estimate the intercept by the risk that the robot will get to the closest
+    // point on the pass before the ball, and by the risk that the robot will get to
+    // the reception point before the ball. We take the greater of these two risks.
+
+    // If the enemy cannot intercept the pass at BOTH the closest point on the pass and
+    // the receiver point for the pass, then it is guaranteed that it will not be
+    // able to intercept the pass anywhere.
+
+    // Figure out how long the enemy robot and ball will take to reach the closest
+    // point on the pass to the enemy's current position
+    Point closest_point_on_pass_to_robot = closestPoint(
+        enemy_robot.position(), Segment(pass.passerPoint(), pass.receiverPoint()));
+
+    Duration enemy_robot_time_to_closest_pass_point = getTimeToPositionForRobot(
+        enemy_robot.position(), closest_point_on_pass_to_robot,
+        ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
+        ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
+    Duration ball_time_to_closest_pass_point = Duration::fromSeconds(
+        (closest_point_on_pass_to_robot - pass.passerPoint()).length() / pass.speed());
+
+    // Check for division by 0
+    if (pass.speed() == 0)
+    {
+        ball_time_to_closest_pass_point =
+            Duration::fromSeconds(std::numeric_limits<int>::max());
+    }
+
+    // Figure out how long the enemy robot and ball will take to reach the receive point
+    // for the pass.
+    Duration enemy_robot_time_to_pass_receive_position = getTimeToPositionForRobot(
+        enemy_robot.position(), pass.receiverPoint(),
+        ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
+        ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
+    Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
+
+    double robot_ball_time_diff_at_closest_pass_point =
+        ((enemy_robot_time_to_closest_pass_point) -
+         (ball_time_to_closest_pass_point))
+        .toSeconds();
+
+    double robot_ball_time_diff_at_pass_receive_point =
+        ((enemy_robot_time_to_pass_receive_position) -
+         (ball_time_to_pass_receive_position))
+        .toSeconds();
+
+    double min_time_diff = std::min(robot_ball_time_diff_at_closest_pass_point,
+            robot_ball_time_diff_at_pass_receive_point);
 
     // Whether or not the enemy will be able to intercept the pass can be determined
     // by whether or not they will be able to reach the pass receive position before
@@ -289,7 +345,7 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
     // Create a sigmoid that goes to 0 as the time required to get to the reception
     // point exceeds the time we would need to get there by
     double sigmoid_width                  = 0.6;
-    double time_to_receiver_state_slack_s = 0.5;
+    double time_to_receiver_state_slack_s = 0.25;
 
     return sigmoid(
         receive_time.toSeconds(),
@@ -298,29 +354,29 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
 }
 
 double getStaticPositionQuality(const Field& field, const Point& position,
-                                std::shared_ptr<const PassingConfig> passing_config)
+        std::shared_ptr<const PassingConfig> passing_config)
 {
     // This constant is used to determine how steep the sigmoid slopes below are
-    static const double sig_width = 0.1;
+    static const double sig_width = 0.5;
 
     // The offset from the sides of the field for the center of the sigmoid functions
     double x_offset = passing_config->getStaticFieldPositionQualityXOffset()->value();
     double y_offset = passing_config->getStaticFieldPositionQualityYOffset()->value();
     double friendly_goal_weight =
         passing_config->getStaticFieldPositionQualityFriendlyGoalDistanceWeight()
-            ->value();
+        ->value();
 
     // Make a slightly smaller field, and positive weight values in this reduced field
     double half_field_length = field.xLength() / 2;
     double half_field_width  = field.yLength() / 2;
     Rectangle reduced_size_field(
-        Point(-half_field_length + x_offset, -half_field_width + y_offset),
-        Point(half_field_length - x_offset, half_field_width - y_offset));
+            Point(-half_field_length + x_offset, -half_field_width + y_offset),
+            Point(half_field_length - x_offset, half_field_width - y_offset));
     double on_field_quality = rectangleSigmoid(reduced_size_field, position, sig_width);
 
     // Add a negative weight for positions closer to our goal
     Vector vec_to_friendly_goal = Vector(field.friendlyGoalCenter().x() - position.x(),
-                                         field.friendlyGoalCenter().y() - position.y());
+            field.friendlyGoalCenter().y() - position.y());
     double distance_to_friendly_goal = vec_to_friendly_goal.length();
     double near_friendly_goal_quality =
         (1 -

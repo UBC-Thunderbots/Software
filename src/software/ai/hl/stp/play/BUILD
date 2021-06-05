@@ -91,6 +91,21 @@ cc_library(
 )
 
 cc_library(
+    name = "calibration_play",
+    srcs = ["calibration_play.cpp"],
+    hdrs = ["calibration_play.h"],
+    deps = [
+        ":play",
+        "//shared:constants",
+        "//shared/parameter:cpp_configs",
+        "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/logger",
+        "//software/util/design_patterns:generic_factory",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
     name = "example_play",
     srcs = ["example_play.cpp"],
     hdrs = ["example_play.h"],

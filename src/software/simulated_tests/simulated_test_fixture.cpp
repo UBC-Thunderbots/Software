@@ -85,6 +85,7 @@ void SimulatedTestFixture::setupReplayLogging()
     const char *test_outputs_dir_or_null = std::getenv("TEST_UNDECLARED_OUTPUTS_DIR");
     if (!test_outputs_dir_or_null)
     {
+	    std::cerr<<"YEEEEEEEEEEEEEEHAW"<<std::endl;
         // we're not running with the Bazel test env vars set, don't set up replay logging
         return;
     }

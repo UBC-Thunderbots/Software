@@ -21,9 +21,13 @@ class ShootOrPassPlayTest : public SimulatedPlayTestFixture,
 
 TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
 {
-    std::uniform_real_distribution x_distribution(field.friendlyHalf().xMin() + 0.5,
+    std::uniform_real_distribution x_distribution(field.enemyHalf().xMin(),
+                                                  field.enemyHalf().xMax());
+    std::uniform_real_distribution y_distribution(field.enemyHalf().yMin(),
+                                                  field.enemyHalf().yMax());
+    std::uniform_real_distribution x_other_side_distribution(field.friendlyHalf().xMin() + 0.6,
                                                   field.friendlyHalf().xMax());
-    std::uniform_real_distribution y_distribution(field.friendlyHalf().yMin(),
+    std::uniform_real_distribution y_other_side_distribution(field.friendlyHalf().yMin(),
                                                   field.friendlyHalf().yMax());
 
     BallState ball_state(Point(-4.4, 2.9), Vector(0, 0));
@@ -44,6 +48,20 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
             {Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
              Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
              Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
+             Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
+             Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
+             Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
+             Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
+             Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
+             Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
+             Point(x_other_side_distribution(random_num_gen_), y_other_side_distribution(random_num_gen_)),
+             Point(x_other_side_distribution(random_num_gen_), y_other_side_distribution(random_num_gen_)),
+             Point(x_other_side_distribution(random_num_gen_), y_other_side_distribution(random_num_gen_)),
+             Point(x_other_side_distribution(random_num_gen_), y_other_side_distribution(random_num_gen_)),
+             Point(x_other_side_distribution(random_num_gen_), y_other_side_distribution(random_num_gen_)),
+             Point(x_other_side_distribution(random_num_gen_), y_other_side_distribution(random_num_gen_)),
+             Point(x_other_side_distribution(random_num_gen_), y_other_side_distribution(random_num_gen_)),
+             Point(x_other_side_distribution(random_num_gen_), y_other_side_distribution(random_num_gen_)),
              field.enemyGoalCenter(), field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
         setEnemyGoalie(0);

@@ -173,10 +173,6 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     // This boolean indicates if we're ready to perform a pass
     bool ready_to_pass = false;
 
-    double abs_min_pass_score =
-        play_config->getShootOrPassPlayConfig()->getAbsMinPassScore()->value();
-    double pass_score_ramp_down_duration =
-        play_config->getShootOrPassPlayConfig()->getPassScoreRampDownDuration()->value();
     do
     {
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
@@ -212,12 +208,7 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         // If we've assigned a robot as the passer in the PassGenerator, we lower
         // our threshold based on how long the PassGenerator as been running since
         // we set it
-        Duration time_since_commit_stage_start =
-            world.getMostRecentTimestamp() - pass_optimization_start_time;
-        min_pass_score_threshold =
-            1 - std::min(time_since_commit_stage_start.toSeconds() /
-                             pass_score_ramp_down_duration,
-                         1.0 - abs_min_pass_score);
+        min_pass_score_threshold -= 0.01;
     } while (!ready_to_pass);
     return best_pass_and_score_so_far;
 }
