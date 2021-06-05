@@ -63,10 +63,10 @@ std::vector<Point> rasterize(const Circle &circle, const double resolution_size)
         }
     }
 
-    //    for (auto p = covered_points.begin(); p != covered_points.end(); ++p) // TODO
-    //    Remove, added for testing
-    //        std::cout << *p << ", ";
-    //    std::cout << std::endl;
+    for (auto p = covered_points.begin(); p != covered_points.end();
+         ++p)  // TODO Remove, added for testing
+        std::cout << *p << ", ";
+    std::cout << std::endl;
 
     return covered_points;
 }

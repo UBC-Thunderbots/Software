@@ -3,6 +3,36 @@
 #include <gtest/gtest.h>
 
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/distance.h"
+
+namespace TestUtil
+{
+    void checkPointsCloseToEachOther(std::vector<Point> all_points, double max_dist)
+    {
+        for (Point &p : all_points)
+        {
+            auto compare_based_on_distance_to_p = [p](const Point &a,
+                                                      const Point &b) -> bool {
+                return distance(a, p) < distance(b, p);
+            };
+
+            std::vector<Point> all_points_copy = all_points;
+            all_points_copy.erase(
+                std::remove(all_points_copy.begin(), all_points_copy.end(), p),
+                all_points_copy.end());
+            Point closest_p =
+                *std::min_element(all_points_copy.begin(), all_points_copy.end(),
+                                  compare_based_on_distance_to_p);
+            EXPECT_LE(distance(p, closest_p), max_dist);
+        }
+        //        LOG(INFO) << "[TEST ROBOT " << robot_log.robot_id << "]["
+        //                  << TbotsProto::LogLevel_Name(
+        //                          static_cast<TbotsProto::LogLevel>(robot_log.log_level))
+        //                  << "]"
+        //                  << "[" << robot_log.file_name << ":" << robot_log.line_number
+        //                  << "]: " << robot_log.log_msg;
+    }
+};  // namespace TestUtil
 
 //////////////////////////////////////////////////////
 ////              Testing Circles                 ////
@@ -17,7 +47,10 @@ TEST(RasterizeTest, test_circle_with_pixel_size_not_a_multiple)
     {
         EXPECT_TRUE(contains(circle, p));
     }
-    EXPECT_EQ(rasterized_points.size(), 9);
+    // sqrt(2) * pixel_size since the circle rasterize algorithm does not guarantee that
+    // the points are all aligned in x and y axis.
+    double max_dist = std::sqrt(2) * pixel_size;
+    TestUtil::checkPointsCloseToEachOther(rasterized_points, max_dist);
 }
 
 TEST(RasterizeTest, test_circle_with_actual_theta_star_values)
@@ -31,21 +64,27 @@ TEST(RasterizeTest, test_circle_with_actual_theta_star_values)
     {
         EXPECT_TRUE(contains(circle, p));
     }
-    EXPECT_EQ(rasterized_points.size(), 9);
+    // sqrt(2) * pixel_size since the circle rasterize algorithm does not guarantee that
+    // the points are all aligned in x and y axis.
+    double max_dist = std::sqrt(2) * theta_star_grid_square_size;
+    TestUtil::checkPointsCloseToEachOther(rasterized_points, max_dist);
 }
 
 TEST(RasterizeTest, test_large_circle)
 {
     double robot_obstacle = 3.f;
     Circle circle({0, 0}, robot_obstacle);
-    double theta_star_grid_square_size   = 0.1f;
-    std::vector<Point> rasterized_points = rasterize(circle, theta_star_grid_square_size);
+    double pixel_size                    = 0.1f;
+    std::vector<Point> rasterized_points = rasterize(circle, pixel_size);
 
     for (Point p : rasterized_points)
     {
         EXPECT_TRUE(contains(circle, p)) << p;
     }
-    EXPECT_EQ(rasterized_points.size(), 9);
+    // sqrt(2) * pixel_size since the circle rasterize algorithm does not guarantee that
+    // the points are all aligned in x and y axis.
+    double max_dist = std::sqrt(2) * pixel_size;
+    TestUtil::checkPointsCloseToEachOther(rasterized_points, max_dist);
 }
 
 
@@ -79,7 +118,7 @@ TEST(RasterizeTest, test_pixel_size_multiple_of_square_dimensions)
     {
         EXPECT_TRUE(contains(rectangle, p));
     }
-    EXPECT_EQ(rasterized_points.size(), 9);
+    TestUtil::checkPointsCloseToEachOther(rasterized_points, pixel_size);
 }
 
 TEST(RasterizeTest, test_pixel_size_larger_than_square)
@@ -92,8 +131,7 @@ TEST(RasterizeTest, test_pixel_size_larger_than_square)
     {
         EXPECT_TRUE(contains(rectangle, p));
     }
-    // Should always have atleast the 4 corners of the rectangle
-    EXPECT_EQ(rasterized_points.size(), 4);
+    TestUtil::checkPointsCloseToEachOther(rasterized_points, pixel_size);
 }
 
 TEST(RasterizeTest, test_pixel_size_not_a_multiple_of_square_dimensions)
@@ -108,7 +146,7 @@ TEST(RasterizeTest, test_pixel_size_not_a_multiple_of_square_dimensions)
     {
         EXPECT_TRUE(contains(rectangle, p));
     }
-    EXPECT_EQ(rasterized_points.size(), 36);
+    TestUtil::checkPointsCloseToEachOther(rasterized_points, pixel_size);
 }
 
 TEST(RasterizeTest, test_pixel_size_one_dimesnsion_not_multiple_of_rectangle_dimensions)
@@ -122,6 +160,6 @@ TEST(RasterizeTest, test_pixel_size_one_dimesnsion_not_multiple_of_rectangle_dim
     {
         EXPECT_TRUE(contains(rectangle, p));
     }
-    EXPECT_EQ(rasterized_points.size(), 6);
+    TestUtil::checkPointsCloseToEachOther(rasterized_points, pixel_size);
 }
 // TODO could check that the points are offsetted by pixel_size!?
