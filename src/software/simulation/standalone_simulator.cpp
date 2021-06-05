@@ -125,19 +125,19 @@ void StandaloneSimulator::setupInitialSimulationState(unsigned num_robots)
     for (unsigned i = 0; i < num_robots; i++)
     {
         blue_robot_states.emplace_back(RobotStateWithId{
-                .id = i,
-                .robot_state =
+            .id = i,
+            .robot_state =
                 RobotState(center_for_blue_robots +
-                           Vector::createFromAngle(angle_between_robots * i),
+                               Vector::createFromAngle(angle_between_robots * i),
                            Vector(0, 0), angle_between_robots * i + Angle::half(),
                            AngularVelocity::zero()),
         });
 
         yellow_robot_states.emplace_back(RobotStateWithId{
-                .id = i,
-                .robot_state =
+            .id = i,
+            .robot_state =
                 RobotState(center_for_yellow_robots +
-                           Vector::createFromAngle(angle_between_robots * i),
+                               Vector::createFromAngle(angle_between_robots * i),
                            Vector(0, 0), angle_between_robots * i + Angle::half(),
                            AngularVelocity::zero()),
         });
