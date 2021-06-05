@@ -822,6 +822,7 @@ cc_library(
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
+        "//firmware/app/logger",
         ":hal",
         ":rtos",
     ],
