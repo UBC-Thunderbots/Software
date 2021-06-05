@@ -62,6 +62,9 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
                                                          world.field().fieldLines(),
                                                          world.field().fieldBoundary()));
             break;
+        case MotionConstraint::BALL_PLACEMENT_ZONE:
+            obstacles.push_back(createFromBallPlacement(world.gameState().getBallPlacementPoint().value(),
+                                                        world.ball().position()));
     }
 
     return obstacles;
@@ -199,3 +202,54 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromFieldRectangle(
     return std::make_shared<GeomObstacle<Polygon>>(
         Rectangle(Point(xMin, yMin), Point(xMax, yMax)));
 }
+
+ObstaclePtr RobotNavigationObstacleFactory::createFromBallPlacement(const Point &placement_point,
+                                                                    const Point &ball_point) const
+{
+    /*   The Polygon is constructed as follows:
+     *
+     *         top_l           top_r
+     *           +-------+-------+
+     *           |               |
+     *           |    place_c    |
+     *           +-------+-------+ 
+     *           |               |
+     *           |               |
+     *           |               |
+     *           |     ball_c    |
+     *           +-------+-------+ 
+     *           |               |
+     *           |               |
+     *           +-------+-------+ 
+     *         bot_l           bot_r
+     */
+    double radius = ROBOT_MAX_RADIUS_METERS+0.5;
+    // Vector from place ---> ball
+    Vector place_to_ball = Vector(placement_point, ball_point);
+    // Vector from place <--- ball
+    Vector ball_to_place = Vector(ball_point, placement_point);
+
+    Vector bottom_vec = place_to_ball + place_to_ball.normalize(radius);
+    Vector bottom_vec_r = bottom_vec + bottom_vec.perpendicular().normalize(radius);
+    Vector bottom_vec_l = bottom_vec - bottom_vec.perpendicular().normalize(radius);
+
+    Point bot_r = bottom_vec_r.getPoint();
+    Point bot_l = bottom_vec_l.getPoint();
+
+    Vector top_vec = ball_to_place + ball_to_place.normalize(radius);
+    Vector top_vec_r = top_vec + top_vec.perpendicular().normalize(radius);
+    Vector top_vec_l = top_vec + top_vec.perpendicular().normalize(radius);
+
+    Point top_r = top_vec_r.getPoint();
+    Point top_l = top_vec_l.getPoint();
+
+    return createFromShape(Polygon({bot_l,bot_r,top_l,top_r}));
+
+    // Angle of the vector created by ball_c -> place_c
+    Angle orientation = Vector(placement_point.x() - ball_point.x(),
+                               placement_point.y() - ball_point.y()).orientation() - Angle::quarter();
+
+    
+}
+
+
