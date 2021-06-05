@@ -224,7 +224,7 @@ void SimulatorRobotSingleton::brakeMotorFrontRight()
 void SimulatorRobotSingleton::handleRobotLogProto(TbotsProto_RobotLog log,
                                                   const std::string& team_colour)
 {
-    // TODO #1804: we should be sending the RobotLog to the WifiBackend
+    // TODO #1804: we should be sending the RobotLog to the SimulatorBackend
     LOG(INFO) << "[" << team_colour << " ROBOT " << log.robot_id << " "
               << TbotsProto::LogLevel_Name(
                      static_cast<TbotsProto::LogLevel>(log.log_level))
