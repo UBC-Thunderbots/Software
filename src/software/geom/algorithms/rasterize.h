@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+
 #include "software/geom/circle.h"
 #include "software/geom/polygon.h"
 #include "software/geom/rectangle.h"
@@ -21,7 +22,7 @@ std::vector<Point> rasterize(const Circle &circle, double resolution_size);
 
 /**
  * Returns a set of points covered by a rectangle with a set resolution size
- * NOTE: the set of points are not gauranteed to be distributed equally throughout the
+ * NOTE: the set of points are not guaranteed to be distributed equally throughout the
  * rectangle if the rectangle width and height are not divisible by resolution_size
  *
  * @param rectangle rectangle being converted into a set of points

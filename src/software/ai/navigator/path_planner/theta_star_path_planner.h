@@ -101,9 +101,10 @@ class ThetaStarPathPlanner : public PathPlanner
         unsigned int internal_comparison_key_;
     };
 
-    class CoordinateHashFunction {
-    public:
-        size_t operator()(const Coordinate& coord) const
+    class CoordinateHashFunction
+    {
+       public:
+        size_t operator()(const Coordinate &coord) const
         {
             return coord.internalComparisonKey();
         }
@@ -257,7 +258,8 @@ class ThetaStarPathPlanner : public PathPlanner
     bool isCoordNavigable(const Coordinate &coord) const;
 
     /**
-     * Calculates all of the coordinates that are blocked by an obstacle and stores it in blocked_grid
+     * Calculates all of the coordinates that are blocked by an obstacle and stores it in
+     * blocked_grid
      */
     void findAllBlockedCoords();
 
@@ -462,9 +464,13 @@ class ThetaStarPathPlanner : public PathPlanner
     // true --> The cell is not blocked
     // false --> The cell is blocked
     // We update this as we go to avoid updating cells we don't use
-    std::unordered_map<Coordinate, bool, CoordinateHashFunction> unblocked_grid; // TODO Could try making unblocked_grid and line_of_sight_cache an unordered_map, and test read times difference
-    std::unordered_set<Coordinate, CoordinateHashFunction> blocked_grid; // TODO Could try making unblocked_grid and line_of_sight_cache an unordered_map, and test read times difference
-//    std::map<Coordinate, bool> unblocked_grid;
+    std::unordered_map<Coordinate, bool, CoordinateHashFunction>
+        unblocked_grid;  // TODO Could try making unblocked_grid and line_of_sight_cache
+                         // an unordered_map, and test read times difference
+    std::unordered_set<Coordinate, CoordinateHashFunction>
+        blocked_grid;  // TODO Could try making unblocked_grid and line_of_sight_cache an
+                       // unordered_map, and test read times difference
+                       //    std::map<Coordinate, bool> unblocked_grid;
     // Cache of line of sight that maps a pair of
     // coordinates to whether those two Coordinates have line of sight between them
     std::map<CoordinatePair, bool> line_of_sight_cache;
