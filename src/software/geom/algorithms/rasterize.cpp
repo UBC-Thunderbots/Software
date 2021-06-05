@@ -18,51 +18,51 @@ std::vector<Point> rasterize(const Circle &circle, const double resolution_size)
 
     // Using an approach to find the points on the edges using y = +-sqrt(r^2 - (x - k)^2) + h and filling in the rest
     // Downside is using sqrt to calculate
-    double radius = circle.radius();
-    double diameter = radius * 2;
-    Point origin = circle.origin();
-
-    // max number of pixels in each dimension
-    int max_num_pixels = (int) std::ceil(diameter / resolution_size);
-
-    for (int x_pixel = 0; x_pixel <= max_num_pixels; x_pixel++)
-    {
-        // x and y offset from the top left corner of the rectangle
-        double x_offset;
-
-        // Adjust the last x and y pixels to be on the edge of the rectangle to make sure
-        // that the points cover the entire rectangle without going outside.
-        if (x_pixel == max_num_pixels)
-        {
-            x_offset = diameter;
-        }
-        else
-        {
-            x_offset = x_pixel * resolution_size;
-        }
-
-        double x_point = origin.x() - radius + x_offset;
-        double y_sqrt  = std::sqrt(radius * radius - (x_point - origin.x()) * (x_point - origin.x()));
-        double y_min   = -y_sqrt + origin.y();
-        double y_max   = y_sqrt + origin.y();
-
-        int y_num_pixels = (int) std::ceil((y_max - y_min) / resolution_size);
-        for (int y_pixel = 0; y_pixel <= y_num_pixels; y_pixel++)
-        {
-            double y_offset;
-            if (y_pixel == y_num_pixels)
-            {
-                y_offset = y_max - y_min;
-            }
-            else
-            {
-                y_offset = y_pixel * resolution_size;
-            }
-            double y_point = y_min + y_offset;
-
-            covered_points.emplace_back(Point(x_point, y_point));
-        }
-    }
+    // double radius = circle.radius();
+    // double diameter = radius * 2;
+    // Point origin = circle.origin();
+    //
+    // // max number of pixels in each dimension
+    // int max_num_pixels = (int) std::ceil(diameter / resolution_size);
+    //
+    // for (int x_pixel = 0; x_pixel <= max_num_pixels; x_pixel++)
+    // {
+    //     // x and y offset from the top left corner of the rectangle
+    //     double x_offset;
+    //
+    //     // Adjust the last x and y pixels to be on the edge of the rectangle to make sure
+    //     // that the points cover the entire rectangle without going outside.
+    //     if (x_pixel == max_num_pixels)
+    //     {
+    //         x_offset = diameter;
+    //     }
+    //     else
+    //     {
+    //         x_offset = x_pixel * resolution_size;
+    //     }
+    //
+    //     double x_point = origin.x() - radius + x_offset;
+    //     double y_sqrt  = std::sqrt(radius * radius - (x_point - origin.x()) * (x_point - origin.x()));
+    //     double y_min   = -y_sqrt + origin.y();
+    //     double y_max   = y_sqrt + origin.y();
+    //
+    //     int y_num_pixels = (int) std::ceil((y_max - y_min) / resolution_size);
+    //     for (int y_pixel = 0; y_pixel <= y_num_pixels; y_pixel++)
+    //     {
+    //         double y_offset;
+    //         if (y_pixel == y_num_pixels)
+    //         {
+    //             y_offset = y_max - y_min;
+    //         }
+    //         else
+    //         {
+    //             y_offset = y_pixel * resolution_size;
+    //         }
+    //         double y_point = y_min + y_offset;
+    //
+    //         covered_points.emplace_back(Point(x_point, y_point));
+    //     }
+    // }
 
 //    for (auto p = covered_points.begin(); p != covered_points.end(); ++p) // TODO Remove, added for testing
 //        std::cout << *p << ", ";
@@ -175,7 +175,10 @@ std::vector<Point> rasterize(const Polygon &polygon, const double resolution_siz
 				contained_points.emplace_back(point);
 			}
 
-			x_coord += resolution_size;
+            if (!isInPixel(point, sorted_intersections_with_polygon[intersection_index], resolution_size))
+			{
+                x_coord += resolution_size;
+            }
 		}
     }
 
