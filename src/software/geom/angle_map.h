@@ -3,9 +3,8 @@
 #include "software/geom/angle_segment.h"
 
 /**
- * Represents an AngleMap that is confined to a top and bottom angle
- * Represents an AngleMap that is for shooting on the enemy goal. The angles are described
- * as going from pi -> 0 -> -pi
+ * Represents an AngleMap that is confined to a top and bottom angle, with angles
+ * described as going from pi -> 0 -> -pi
  */
 class AngleMap
 {
