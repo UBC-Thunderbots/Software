@@ -15,4 +15,8 @@ struct TbotsGtestMain
 
     // Directory to send g3log logger logs
     static std::string logging_dir;
+
+
+    // Controls the speed of the simulated test. Default value is 1.
+    static int speed_slow_down;
 };

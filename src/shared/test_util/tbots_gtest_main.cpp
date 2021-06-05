@@ -8,11 +8,14 @@
 bool TbotsGtestMain::enable_visualizer  = false;
 bool TbotsGtestMain::stop_ai_on_start   = false;
 std::string TbotsGtestMain::logging_dir = "";
+int TbotsGtestMain::speed_slow_down     = 1;
+
 
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
     feenableexcept(FE_INVALID | FE_OVERFLOW);
+
 
     // load command line arguments
     auto args           = std::make_shared<TbotsGtestMainCommandLineArgs>();
@@ -26,6 +29,7 @@ int main(int argc, char **argv)
         if (TbotsGtestMain::enable_visualizer)
         {
             TbotsGtestMain::stop_ai_on_start = args->getStopAiOnStart()->value();
+            TbotsGtestMain::speed_slow_down  = args->getSpeedSlowDown()->value();
         }
     }
 
