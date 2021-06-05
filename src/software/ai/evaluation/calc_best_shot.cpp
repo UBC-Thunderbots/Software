@@ -12,86 +12,82 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
     std::vector<AngleSegment> obstacles;
     obstacles.reserve(max_num_obstacles);
 
+    if (goal == TeamType::FRIENDLY)
     {
-        if (goal == TeamType::FRIENDLY)
-        {
-            auto tmp       = pos_post_angle;
-            pos_post_angle = (neg_post_angle + Angle::half()).clamp();
-            neg_post_angle = (tmp + Angle::half()).clamp();
-            // pos_post_angle  = (pos_post_angle + Angle::half()).clamp();
-            // neg_post_angle = (neg_post_angle + Angle::half()).clamp();
-        }
-        AngleMap angle_map(pos_post_angle, neg_post_angle, max_num_obstacles);
-
-
-        for (const Robot &robot_obstacle : robot_obstacles)
-        {
-            Point enemy_robot_pos    = robot_obstacle.position();
-            Vector perpendicular_vec = (enemy_robot_pos - shot_origin).perpendicular();
-
-            Vector one_end_vec = perpendicular_vec.normalize(radius);
-
-            Point one_end   = enemy_robot_pos + one_end_vec;
-            Point other_end = enemy_robot_pos - one_end_vec;
-
-            Vector top_vec    = one_end - shot_origin;
-            Vector bottom_vec = other_end - shot_origin;
-
-            Angle top_angle    = top_vec.orientation();
-            Angle bottom_angle = bottom_vec.orientation();
-            if (goal == TeamType::FRIENDLY)
-            {
-                top_angle    = (top_vec.orientation() + Angle::half()).clamp();
-                bottom_angle = (bottom_vec.orientation() + Angle::half()).clamp();
-            }
-
-            if (bottom_angle > angle_map.getAngleSegment().getAngleTop() ||
-                top_angle < angle_map.getAngleSegment().getAngleBottom())
-            {
-                continue;
-            }
-
-            AngleSegment non_viable_angle_seg = AngleSegment(top_angle, bottom_angle);
-            obstacles.emplace_back(non_viable_angle_seg);
-        }
-
-        std::sort(obstacles.begin(), obstacles.end(),
-                  [](AngleSegment &a, AngleSegment &b) -> bool { return a > b; });
-
-        for (AngleSegment &obstacle_angle_seg : obstacles)
-        {
-            angle_map.addNonViableAngleSegment(obstacle_angle_seg);
-        }
-
-        AngleSegment biggest_angle_seg = angle_map.getBiggestViableAngleSegment();
-        if (biggest_angle_seg.getDelta() == 0)
-        {
-            return std::nullopt;
-        }
-
-        Angle top_angle    = biggest_angle_seg.getAngleTop();
-        Angle bottom_angle = biggest_angle_seg.getAngleBottom();
-
-        if (goal == TeamType::FRIENDLY)
-        {
-            top_angle    = (top_angle + Angle::half()).clamp();
-            bottom_angle = (bottom_angle + Angle::half()).clamp();
-        }
-
-        Point top_point    = Point(goal_post.getStart().x(),
-                                (top_angle.sin() / top_angle.cos()) *
-                                        (goal_post.getStart().x() - shot_origin.x()) +
-                                    shot_origin.y());
-        Point bottom_point = Point(goal_post.getStart().x(),
-                                   (bottom_angle.sin() / bottom_angle.cos()) *
-                                           (goal_post.getStart().x() - shot_origin.x()) +
-                                       shot_origin.y());
-
-        Point shot_point = (top_point - bottom_point) / 2 + bottom_point;
-
-        Angle open_angle = Angle::fromDegrees(biggest_angle_seg.getDelta());
-        return std::make_optional(Shot(shot_point, open_angle));
+        auto tmp       = pos_post_angle;
+        pos_post_angle = (neg_post_angle + Angle::half()).clamp();
+        neg_post_angle = (tmp + Angle::half()).clamp();
     }
+    AngleMap angle_map(pos_post_angle, neg_post_angle, max_num_obstacles);
+
+
+    for (const Robot &robot_obstacle : robot_obstacles)
+    {
+        Point enemy_robot_pos    = robot_obstacle.position();
+        Vector perpendicular_vec = (enemy_robot_pos - shot_origin).perpendicular();
+
+        Vector one_end_vec = perpendicular_vec.normalize(radius);
+
+        Point one_end   = enemy_robot_pos + one_end_vec;
+        Point other_end = enemy_robot_pos - one_end_vec;
+
+        Vector top_vec    = one_end - shot_origin;
+        Vector bottom_vec = other_end - shot_origin;
+
+        Angle top_angle    = top_vec.orientation();
+        Angle bottom_angle = bottom_vec.orientation();
+        if (goal == TeamType::FRIENDLY)
+        {
+            top_angle    = (top_vec.orientation() + Angle::half()).clamp();
+            bottom_angle = (bottom_vec.orientation() + Angle::half()).clamp();
+        }
+
+        if (bottom_angle > angle_map.getAngleSegment().getAngleTop() ||
+            top_angle < angle_map.getAngleSegment().getAngleBottom())
+        {
+            continue;
+        }
+
+        AngleSegment non_viable_angle_seg = AngleSegment(top_angle, bottom_angle);
+        obstacles.emplace_back(non_viable_angle_seg);
+    }
+
+    std::sort(obstacles.begin(), obstacles.end(),
+              [](AngleSegment &a, AngleSegment &b) -> bool { return a > b; });
+
+    for (AngleSegment &obstacle_angle_seg : obstacles)
+    {
+        angle_map.addNonViableAngleSegment(obstacle_angle_seg);
+    }
+
+    AngleSegment biggest_angle_seg = angle_map.getBiggestViableAngleSegment();
+    if (biggest_angle_seg.getDelta() == 0)
+    {
+        return std::nullopt;
+    }
+
+    Angle top_angle    = biggest_angle_seg.getAngleTop();
+    Angle bottom_angle = biggest_angle_seg.getAngleBottom();
+
+    if (goal == TeamType::FRIENDLY)
+    {
+        top_angle    = (top_angle + Angle::half()).clamp();
+        bottom_angle = (bottom_angle + Angle::half()).clamp();
+    }
+
+    Point top_point    = Point(goal_post.getStart().x(),
+                            (top_angle.sin() / top_angle.cos()) *
+                                    (goal_post.getStart().x() - shot_origin.x()) +
+                                shot_origin.y());
+    Point bottom_point = Point(goal_post.getStart().x(),
+                               (bottom_angle.sin() / bottom_angle.cos()) *
+                                       (goal_post.getStart().x() - shot_origin.x()) +
+                                   shot_origin.y());
+
+    Point shot_point = (top_point - bottom_point) / 2 + bottom_point;
+
+    Angle open_angle = Angle::fromDegrees(biggest_angle_seg.getDelta());
+    return std::make_optional(Shot(shot_point, open_angle));
 }
 
 std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_team,

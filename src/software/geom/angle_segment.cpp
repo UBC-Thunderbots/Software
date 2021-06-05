@@ -1,10 +1,12 @@
-
-
 #include "software/geom/angle_segment.h"
+#include "software/logger/logger.h"
 
 AngleSegment::AngleSegment(Angle angle_top, Angle angle_bottom)
     : angle_top_(angle_top), angle_bottom_(angle_bottom)
 {
+    if (angle_top < angle_bottom) {
+        LOG(WARNING) << "Angle Top is less than Angle Bottom" << std::endl;
+    }
 }
 
 const Angle &AngleSegment::getAngleTop() const
