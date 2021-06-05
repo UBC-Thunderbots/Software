@@ -62,7 +62,7 @@ class ObstacleAngleSegment : public AngleSegment
  */
 class AngleMap
 {
-public:
+   public:
     /**
      * Constructs an AngleMap with a specified top angle, bottom angle, and max number of
      * possible occupied AngleSegments within this map
@@ -74,7 +74,7 @@ public:
      * this map
      */
     AngleMap(Angle top_angle, Angle bottom_angle, size_t max_num_obstacles)
-            : AngleMap(AngleSegment(top_angle, bottom_angle), max_num_obstacles)
+        : AngleMap(AngleSegment(top_angle, bottom_angle), max_num_obstacles)
     {
     }
 
@@ -115,7 +115,7 @@ public:
      */
     virtual AngleSegment getBiggestViableAngleSegment() = 0;
 
-protected:
+   protected:
     AngleSegment angle_seg;
     std::vector<ObstacleAngleSegment> taken_angle_segments;
 };
@@ -126,14 +126,14 @@ protected:
  */
 class EnemyAngleMap : public AngleMap
 {
-public:
+   public:
     EnemyAngleMap(AngleSegment angle_seg, size_t max_num_obstacles)
-            : AngleMap(angle_seg, max_num_obstacles)
+        : AngleMap(angle_seg, max_num_obstacles)
     {
     }
 
     EnemyAngleMap(Angle top_angle, Angle bottom_angle, size_t max_num_obstacles)
-            : AngleMap(top_angle, bottom_angle, max_num_obstacles)
+        : AngleMap(top_angle, bottom_angle, max_num_obstacles)
     {
     }
 
@@ -145,7 +145,7 @@ public:
                   angle_seg.getAngleTop() < taken_angle_seg.getAngleBottom()))
             {
                 taken_angle_seg.setAngleTop(
-                        std::max(taken_angle_seg.getAngleTop(), angle_seg.getAngleTop()));
+                    std::max(taken_angle_seg.getAngleTop(), angle_seg.getAngleTop()));
                 taken_angle_seg.setAngleBottom(std::min(taken_angle_seg.getAngleBottom(),
                                                         angle_seg.getAngleBottom()));
                 return;
@@ -158,7 +158,7 @@ public:
     AngleSegment getBiggestViableAngleSegment() override
     {
         AngleSegment biggest_viable_angle_seg =
-                AngleSegment(Angle::zero(), Angle::zero());
+            AngleSegment(Angle::zero(), Angle::zero());
         if (this->taken_angle_segments.empty())
         {
             biggest_viable_angle_seg = AngleSegment(this->angle_seg.getAngleTop(),
@@ -177,7 +177,7 @@ public:
         if (last_taken_angle_seg.getAngleBottom() > this->angle_seg.getAngleBottom())
         {
             AngleSegment viable_angle_seg = AngleSegment(
-                    last_taken_angle_seg.getAngleBottom(), this->angle_seg.getAngleBottom());
+                last_taken_angle_seg.getAngleBottom(), this->angle_seg.getAngleBottom());
             if (viable_angle_seg.getDelta() > biggest_viable_angle_seg.getDelta())
             {
                 biggest_viable_angle_seg = viable_angle_seg;
@@ -190,7 +190,7 @@ public:
             AngleSegment taken_angle_seg      = i[0];
             AngleSegment next_taken_angle_seg = i[1];
             AngleSegment viable_angle_seg     = AngleSegment(
-                    taken_angle_seg.getAngleBottom(), next_taken_angle_seg.getAngleTop());
+                taken_angle_seg.getAngleBottom(), next_taken_angle_seg.getAngleTop());
             if (viable_angle_seg.getDelta() > biggest_viable_angle_seg.getDelta())
             {
                 biggest_viable_angle_seg = viable_angle_seg;
@@ -207,14 +207,14 @@ public:
  */
 class FriendlyAngleMap : public AngleMap
 {
-public:
+   public:
     FriendlyAngleMap(AngleSegment angle_seg, size_t max_num_obstacles)
-            : AngleMap(angle_seg, max_num_obstacles)
+        : AngleMap(angle_seg, max_num_obstacles)
     {
     }
 
     FriendlyAngleMap(Angle top_angle, Angle bottom_angle, size_t max_num_obstacles)
-            : AngleMap(top_angle, bottom_angle, max_num_obstacles)
+        : AngleMap(top_angle, bottom_angle, max_num_obstacles)
     {
     }
 
@@ -226,7 +226,7 @@ public:
                   angle_seg.getAngleTop() > taken_angle_seg.getAngleBottom()))
             {
                 taken_angle_seg.setAngleTop(
-                        std::min(taken_angle_seg.getAngleTop(), angle_seg.getAngleTop()));
+                    std::min(taken_angle_seg.getAngleTop(), angle_seg.getAngleTop()));
                 taken_angle_seg.setAngleBottom(std::max(taken_angle_seg.getAngleBottom(),
                                                         angle_seg.getAngleBottom()));
                 return;
@@ -239,7 +239,7 @@ public:
     AngleSegment getBiggestViableAngleSegment() override
     {
         AngleSegment biggest_viable_angle_seg =
-                AngleSegment(Angle::zero(), Angle::zero());
+            AngleSegment(Angle::zero(), Angle::zero());
         if (this->taken_angle_segments.empty())
         {
             biggest_viable_angle_seg = AngleSegment(this->angle_seg.getAngleTop(),
@@ -258,7 +258,7 @@ public:
         if (last_taken_angle_seg.getAngleBottom() < this->angle_seg.getAngleBottom())
         {
             AngleSegment viable_angle_seg = AngleSegment(
-                    last_taken_angle_seg.getAngleBottom(), this->angle_seg.getAngleBottom());
+                last_taken_angle_seg.getAngleBottom(), this->angle_seg.getAngleBottom());
             if (viable_angle_seg.getDelta() > biggest_viable_angle_seg.getDelta())
             {
                 biggest_viable_angle_seg = viable_angle_seg;
@@ -271,8 +271,8 @@ public:
             AngleSegment taken_angle_seg      = i[0];
             AngleSegment next_taken_angle_seg = i[1];
 
-            AngleSegment viable_angle_seg     = AngleSegment(
-                    taken_angle_seg.getAngleBottom(), next_taken_angle_seg.getAngleTop());
+            AngleSegment viable_angle_seg = AngleSegment(
+                taken_angle_seg.getAngleBottom(), next_taken_angle_seg.getAngleTop());
             if (viable_angle_seg.getDelta() > biggest_viable_angle_seg.getDelta())
             {
                 biggest_viable_angle_seg = viable_angle_seg;

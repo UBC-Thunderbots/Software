@@ -14,9 +14,8 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
 
     if (goal == TeamType::ENEMY)
     {
-
         EnemyAngleMap angle_map =
-                EnemyAngleMap(pos_post_angle, neg_post_angle, max_num_obstacles);
+            EnemyAngleMap(pos_post_angle, neg_post_angle, max_num_obstacles);
 
 
         for (const Robot &robot_obstacle : robot_obstacles)
@@ -41,21 +40,27 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
                 continue;
             }
 
-            ObstacleAngleSegment non_viable_angle_seg = ObstacleAngleSegment(top_angle, bottom_angle);
+            ObstacleAngleSegment non_viable_angle_seg =
+                ObstacleAngleSegment(top_angle, bottom_angle);
             obstacles.emplace_back(non_viable_angle_seg);
         }
 
-        std::sort(obstacles.begin(), obstacles.end(), [](ObstacleAngleSegment &a, ObstacleAngleSegment &b) -> int {
-            if (a < b) {
-                return false;
-            } else if (a > b) {
-                return true;
-            }
+        std::sort(obstacles.begin(), obstacles.end(),
+                  [](ObstacleAngleSegment &a, ObstacleAngleSegment &b) -> int {
+                      if (a < b)
+                      {
+                          return false;
+                      }
+                      else if (a > b)
+                      {
+                          return true;
+                      }
 
-            return false;
-        });
+                      return false;
+                  });
 
-        for (ObstacleAngleSegment &obstacle_angle_seg : obstacles) {
+        for (ObstacleAngleSegment &obstacle_angle_seg : obstacles)
+        {
             angle_map.addNonViableAngleSegment(obstacle_angle_seg);
         }
 
@@ -65,17 +70,17 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
             return std::nullopt;
         }
 
-        Angle top_angle = biggest_angle_seg.getAngleTop();
+        Angle top_angle    = biggest_angle_seg.getAngleTop();
         Angle bottom_angle = biggest_angle_seg.getAngleBottom();
 
         Point top_point    = Point(goal_post.getStart().x(),
-                                   (top_angle.sin() / top_angle.cos()) *
-                                   (goal_post.getStart().x() - shot_origin.x()) +
-                                   shot_origin.y());
+                                (top_angle.sin() / top_angle.cos()) *
+                                        (goal_post.getStart().x() - shot_origin.x()) +
+                                    shot_origin.y());
         Point bottom_point = Point(goal_post.getStart().x(),
                                    (bottom_angle.sin() / bottom_angle.cos()) *
-                                   (goal_post.getStart().x() - shot_origin.x()) +
-                                   shot_origin.y());
+                                           (goal_post.getStart().x() - shot_origin.x()) +
+                                       shot_origin.y());
 
         Point shot_point = (top_point - bottom_point) / 2 + bottom_point;
 
@@ -94,7 +99,7 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
         }
 
         FriendlyAngleMap angle_map =
-                FriendlyAngleMap(pos_post_angle, neg_post_angle, max_num_obstacles);
+            FriendlyAngleMap(pos_post_angle, neg_post_angle, max_num_obstacles);
 
         for (const Robot &robot_obstacle : robot_obstacles)
         {
@@ -127,21 +132,27 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
                 continue;
             }
 
-            ObstacleAngleSegment non_viable_angle_seg = ObstacleAngleSegment(top_angle, bottom_angle);
+            ObstacleAngleSegment non_viable_angle_seg =
+                ObstacleAngleSegment(top_angle, bottom_angle);
             obstacles.emplace_back(non_viable_angle_seg);
         }
 
-        std::sort(obstacles.begin(), obstacles.end(), [](ObstacleAngleSegment &a, ObstacleAngleSegment &b) -> int {
-            if (a < b) {
-                return true;
-            } else if (a > b) {
-                return false;
-            }
+        std::sort(obstacles.begin(), obstacles.end(),
+                  [](ObstacleAngleSegment &a, ObstacleAngleSegment &b) -> int {
+                      if (a < b)
+                      {
+                          return true;
+                      }
+                      else if (a > b)
+                      {
+                          return false;
+                      }
 
-            return false;
-        });
+                      return false;
+                  });
 
-        for (ObstacleAngleSegment &obstacle_angle_seg : obstacles) {
+        for (ObstacleAngleSegment &obstacle_angle_seg : obstacles)
+        {
             angle_map.addNonViableAngleSegment(obstacle_angle_seg);
         }
 
@@ -165,13 +176,13 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
         }
 
         Point top_point    = Point(goal_post.getStart().x(),
-                                   (top_angle.sin() / top_angle.cos()) *
-                                   (goal_post.getStart().x() - shot_origin.x()) +
-                                   shot_origin.y());
+                                (top_angle.sin() / top_angle.cos()) *
+                                        (goal_post.getStart().x() - shot_origin.x()) +
+                                    shot_origin.y());
         Point bottom_point = Point(goal_post.getStart().x(),
                                    (bottom_angle.sin() / bottom_angle.cos()) *
-                                   (goal_post.getStart().x() - shot_origin.x()) +
-                                   shot_origin.y());
+                                           (goal_post.getStart().x() - shot_origin.x()) +
+                                       shot_origin.y());
 
         Point shot_point = (top_point - bottom_point) / 2 + bottom_point;
 
@@ -189,22 +200,30 @@ std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_
     std::vector<Robot> obstacles;
     std::vector<Robot> all_robots;
 
-    size_t max_num_robots = enemy_team.numRobots() + friendly_team.numRobots() - 1 == 0 ? 1 : enemy_team.numRobots() + friendly_team.numRobots() - 1;
+    size_t max_num_robots = enemy_team.numRobots() + friendly_team.numRobots() - 1 == 0
+                                ? 1
+                                : enemy_team.numRobots() + friendly_team.numRobots() - 1;
     all_robots.reserve(max_num_robots);
-    all_robots.insert(all_robots.begin(), enemy_team.getAllRobots().begin(), enemy_team.getAllRobots().end());
-    all_robots.insert(all_robots.begin(), friendly_team.getAllRobots().begin(), friendly_team.getAllRobots().end());
+    all_robots.insert(all_robots.begin(), enemy_team.getAllRobots().begin(),
+                      enemy_team.getAllRobots().end());
+    all_robots.insert(all_robots.begin(), friendly_team.getAllRobots().begin(),
+                      friendly_team.getAllRobots().end());
 
-    for (const Robot &robot : all_robots) {
+    for (const Robot &robot : all_robots)
+    {
         if (std::count(robots_to_ignore.begin(), robots_to_ignore.end(), robot) == 0)
         {
             if (goal == TeamType::ENEMY)
             {
-                if (robot.position().x() < shot_origin.x()) {
+                if (robot.position().x() < shot_origin.x())
+                {
                     continue;
                 }
-            } else
+            }
+            else
             {
-                if (robot.position().x() > shot_origin.x()) {
+                if (robot.position().x() > shot_origin.x())
+                {
                     continue;
                 }
             }
@@ -216,13 +235,13 @@ std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_
     if (goal == TeamType::FRIENDLY)
     {
         return calcBestShotOnGoal(
-                Segment(field.friendlyGoalpostPos(), field.friendlyGoalpostNeg()),
-                shot_origin, obstacles, goal, radius);
+            Segment(field.friendlyGoalpostPos(), field.friendlyGoalpostNeg()),
+            shot_origin, obstacles, goal, radius);
     }
     else
     {
         return calcBestShotOnGoal(
-                Segment(field.enemyGoalpostPos(), field.enemyGoalpostNeg()), shot_origin,
-                obstacles, goal, radius);
+            Segment(field.enemyGoalpostPos(), field.enemyGoalpostNeg()), shot_origin,
+            obstacles, goal, radius);
     }
 }
