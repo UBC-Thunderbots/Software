@@ -141,22 +141,8 @@ double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
                          const Duration& enemy_reaction_time,
                          double enemy_proximity_importance)
 {
-    // Calculate a risk score based on the distance of the enemy robots from the receive
-    // point, based on an exponential function of the distance of each robot from the
-    // receiver point
-    auto enemy_robots                    = enemy_team.getAllRobots();
-    double enemy_receiver_proximity_risk = 1;
-    for (const Robot& enemy : enemy_team.getAllRobots())
-    {
-        double dist = (pass.receiverPoint() - enemy.position()).length();
-        enemy_receiver_proximity_risk *=
-            enemy_proximity_importance * std::exp(-dist * dist);
-    }
-    if (enemy_robots.empty())
-    {
-        enemy_receiver_proximity_risk = 0;
-    }
-
+    double enemy_receiver_proximity_risk = calculateProximityRisk(
+        pass.receiverPoint(), enemy_team, enemy_proximity_importance);
     double intercept_risk = calculateInterceptRisk(enemy_team, pass, enemy_reaction_time);
 
     // We want to rate a pass more highly if it is lower risk, so subtract from 1
@@ -337,4 +323,24 @@ double getStaticPositionQuality(const Field& field, const Point& position,
         1 - rectangleSigmoid(field.enemyDefenseArea(), position, sig_width);
 
     return on_field_quality * near_friendly_goal_quality * in_enemy_defense_area_quality;
+}
+
+double calculateProximityRisk(const Point& point, const Team& enemy_team,
+                              double enemy_proximity_importance)
+{
+    // Calculate a risk score based on the distance of the enemy robots from the receive
+    // point, based on an exponential function of the distance of each robot from the
+    // receiver point
+    auto enemy_robots                 = enemy_team.getAllRobots();
+    double point_enemy_proximity_risk = 1;
+    for (const Robot& enemy : enemy_team.getAllRobots())
+    {
+        double dist = (point - enemy.position()).length();
+        point_enemy_proximity_risk *= enemy_proximity_importance * std::exp(-dist * dist);
+    }
+    if (enemy_robots.empty())
+    {
+        point_enemy_proximity_risk = 0;
+    }
+    return point_enemy_proximity_risk;
 }
