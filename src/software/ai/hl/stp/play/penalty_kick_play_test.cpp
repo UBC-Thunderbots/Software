@@ -65,7 +65,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
 TEST_F(PenaltyKickPlayTest, test_penalty_kick_take)
 {
     Vector behind_ball_direction =
-        (field.friendlyPenaltyMark() - field.enemyGoalpostPos()).normalize();
+        (field.friendlyPenaltyMark() - field.enemyGoalCenter()).normalize();
 
     Point behind_ball = field.friendlyPenaltyMark() +
                         behind_ball_direction.normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
