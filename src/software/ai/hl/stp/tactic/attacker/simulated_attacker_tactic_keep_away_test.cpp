@@ -102,4 +102,14 @@ INSTANTIATE_TEST_CASE_P(
             // the states of the enemy robots
             TestUtil::createStationaryRobotStatesWithId(
                 {Point(-0.6, 0.25), Point(0., 0.6), Point(-0.25, 0.5),
-                 Point(0.6, -0.25)}))));
+                 Point(0.6, -0.25)})),
+        std::make_tuple(
+            // the best pass so far to pass into the AttackerTactic
+            Pass(Point(0.0, 0.0), Point(-3, 2.5), 5),
+            // the state of the friendly robot
+            RobotStateWithId{1, RobotState(Point(0.25, 0), Vector(0, 0),
+                                           Angle::fromDegrees(0), Angle::fromDegrees(0))},
+            // the state of the ball
+            BallState(Point(0., 0.), Vector(0, 0)),
+            // the states of the enemy robots
+            TestUtil::createStationaryRobotStatesWithId({Point(-0.5, 0.5)}))));
