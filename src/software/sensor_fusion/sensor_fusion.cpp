@@ -184,7 +184,6 @@ void SensorFusion::updateWorld(
             }
         }
         friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
-
     }
 }
 

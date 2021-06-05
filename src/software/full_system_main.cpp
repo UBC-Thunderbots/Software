@@ -36,7 +36,7 @@ int main(int argc, char** argv)
     std::cout << BANNER << std::endl;
 
     // load command line arguments
-    auto arduino_config  = std::make_shared<ArduinoConfig>();
+    auto arduino_config = std::make_shared<ArduinoConfig>();
     auto args           = std::make_shared<FullSystemMainCommandLineArgs>(arduino_config);
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 

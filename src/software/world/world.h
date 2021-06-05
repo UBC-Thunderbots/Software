@@ -208,5 +208,4 @@ class World final
     boost::circular_buffer<RefereeStage> referee_stage_history_;
     // which team has possession of the ball
     TeamSide team_with_possesion_;
-
 };
