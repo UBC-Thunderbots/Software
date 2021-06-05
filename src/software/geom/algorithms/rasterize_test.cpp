@@ -174,6 +174,7 @@ TEST(RasterizeTest, test_rasterize_polygon)
     for (Point p : rasterized_points)
     {
         bool result = contains(polygon, p);
+        //TODO: remove this if statement
         if (!result)
         {
             std::cout << "FAILED: " << p << "\n";
@@ -192,6 +193,7 @@ TEST(RasterizeTest, test_rasterize_polygon_complex)
     for (Point p : rasterized_points)
     {
         bool result = contains(polygon, p);
+        //TODO: Remove std::cout
         if (!result)
         {
             std::cout << "FAILED: " << p << "\n";
