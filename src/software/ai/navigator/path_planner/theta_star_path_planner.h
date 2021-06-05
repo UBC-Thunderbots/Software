@@ -76,6 +76,14 @@ class ThetaStarPathPlanner : public PathPlanner
             return internal_comparison_key_ == other.internal_comparison_key_;
         }
 
+
+
+//        std::ostream &operator<<(std::ostream &os, const Coordinate &p) // TODO REMOVE, ADDED FOR TESTING
+//        {
+//            os << "(" << p.row() << ", " << p.col() << ")";
+//            return os;
+//        }
+
        private:
         /**
          * Calculate the key of this coordinate based on row and col for comparison. row

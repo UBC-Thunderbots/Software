@@ -215,6 +215,8 @@ cc_test(
     srcs = ["rasterize_test.cpp"],
     deps = [
         ":algorithms",
+        "//software/test_util",
+        "//software/time:duration",
         "@gtest//:gtest_main",
     ],
 )

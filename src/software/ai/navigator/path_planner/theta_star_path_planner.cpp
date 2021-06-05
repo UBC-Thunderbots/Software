@@ -237,6 +237,10 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
 
     if (found_end == false)
     {
+//        for (auto p = blocked_grid.begin(); p != blocked_grid.end(); ++p)  // TODO Remove, added for testing
+//            std::cout << *p << ", ";
+//        std::cout << std::endl;
+
         return std::nullopt;
     }
 

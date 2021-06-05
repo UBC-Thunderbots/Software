@@ -5,6 +5,9 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
 
+#include "software/test_util/test_util.h"
+#include "software/logger/logger.h"
+
 namespace TestUtil
 {
     void checkPointsCloseToEachOther(std::vector<Point> all_points, double max_dist)
@@ -81,24 +84,6 @@ TEST(RasterizeTest, test_large_circle)
     TestUtil::checkPointsCloseToEachOther(rasterized_points, max_dist);
 }
 
-
-//////////////////////////////////////////////////////
-////              Testing Polygons                ////
-//////////////////////////////////////////////////////
-TEST(RasterizeTest, test_polygon_triangle_contains_point)
-{
-    // Hexagon centered at origin with the following points
-    Polygon hexagon{{0.0f, 2.0f},    // top vertex
-                    {2.0f, 1.0f},    // top right vertex
-                    {2.0f, -1.0f},   // bottom right vertex
-                    {0.0f, -2.0f},   // bottom vertex
-                    {-2.0f, -1.0f},  // bottom left vertex
-                    {-2.0f, 1.0f}};  // top left vertex
-
-    double pixel_size                    = 1.f;
-    std::vector<Point> rasterized_points = rasterize(hexagon, pixel_size);
-}
-
 //////////////////////////////////////////////////////
 ////            Testing Rectangles                ////
 //////////////////////////////////////////////////////
@@ -157,6 +142,9 @@ TEST(RasterizeTest, test_pixel_size_one_dimesnsion_not_multiple_of_rectangle_dim
     TestUtil::checkPointsCloseToEachOther(rasterized_points, pixel_size);
 }
 
+//////////////////////////////////////////////////////
+////              Testing Polygons                ////
+//////////////////////////////////////////////////////
 // TODO could check that the points are offsetted by pixel_size!?
 TEST(RasterizeTest, test_rasterize_polygon)
 {
@@ -193,5 +181,48 @@ TEST(RasterizeTest, test_rasterize_polygon_complex)
             std::cout << "FAILED: " << p << "\n";
         }
         EXPECT_TRUE(contains(polygon, p));
+    }
+}
+
+TEST(RasterizeTest, test_speed_polygon)
+{
+    std::vector<Point> points = { Point(0, 5), Point(0, 0), Point(5, 0), Point(5, 5) };
+    double offset = 0.1f;
+    Polygon polygon = Polygon(points);
+    auto start_tick_time = std::chrono::system_clock::now();
+    std::vector<Point> rasterized_points = rasterize(polygon, offset);
+    double duration_ms         = ::TestUtil::millisecondsSince(start_tick_time);
+    LOG(WARNING) << "max tick duration: " << duration_ms << "ms" << std::endl;
+
+    for (Point p : rasterized_points)
+    {
+        bool result = contains(polygon, p);
+        //TODO: remove this if statement
+        if (!result)
+        {
+            std::cout << "FAILED: " << p << "\n";
+        }
+        EXPECT_TRUE(contains(polygon, p));
+    }
+}
+
+TEST(RasterizeTest, test_speed_rectangle)
+{
+    double offset = 0.1f;
+    Rectangle rectangle(Point(0,0), Point(5,5));
+    auto start_tick_time = std::chrono::system_clock::now();
+    std::vector<Point> rasterized_points = rasterize(rectangle, offset);
+    double duration_ms         = ::TestUtil::millisecondsSince(start_tick_time);
+    LOG(WARNING) << "max tick duration: " << duration_ms << "ms" << std::endl;
+
+    for (Point p : rasterized_points)
+    {
+        bool result = contains(rectangle, p);
+        //TODO: remove this if statement
+        if (!result)
+        {
+            std::cout << "FAILED: " << p << "\n";
+        }
+        EXPECT_TRUE(contains(rectangle, p));
     }
 }

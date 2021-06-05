@@ -133,11 +133,11 @@ std::vector<Point> rasterize(const Polygon &polygon, const double resolution_siz
 	const auto& polygon_vertices = polygon.getPoints();
 
     //TODO: remove later after debugging
-    std::cout << "Polygon vertices\n";
-    for (auto p = polygon_vertices.begin(); p != polygon_vertices.end();
-         ++p)  // TODO Remove, added for testing
-        std::cout << *p << ", ";
-    std::cout << std::endl;
+//    std::cout << "Polygon vertices\n";
+//    for (auto p = polygon_vertices.begin(); p != polygon_vertices.end();
+//         ++p)  // TODO Remove, added for testing
+//        std::cout << *p << ", ";
+//    std::cout << std::endl;
 
     auto max_point_y = [](const Point& a, const Point& b) {
        return a.y() < b.y();
@@ -197,10 +197,10 @@ std::vector<Point> rasterize(const Polygon &polygon, const double resolution_siz
     }
 
     //TODO: remove
-    for (auto p = contained_points.begin(); p != contained_points.end();
-         ++p)  // TODO Remove, added for testing
-        std::cout << *p << ", ";
-    std::cout << std::endl;
+//    for (auto p = contained_points.begin(); p != contained_points.end();
+//         ++p)  // TODO Remove, added for testing
+//        std::cout << *p << ", ";
+//    std::cout << std::endl;
 
     return contained_points;
 }
