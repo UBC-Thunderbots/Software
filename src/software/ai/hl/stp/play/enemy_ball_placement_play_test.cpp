@@ -11,17 +11,17 @@
 
 class EnemyBallPlacementPlayTest : public SimulatedPlayTestFixture
 {
-    protected:
+   protected:
     Field field = Field::createSSLDivisionBField();
 };
 
 TEST_F(EnemyBallPlacementPlayTest, test_ball_placement_center)
 {
-    Point ball_placement_point(1,0);
-    BallState ball_state(Point(0,0),Vector(0,0));
+    Point ball_placement_point(1, 0);
+    BallState ball_state(Point(0, 0), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
-        {Point(0,-1.5), Point(-1,0), Point(0,1.5), 
-         Point(-1.5,-1.5), Point(-1.5,0), Point(-1.5,1.5)});
+        {Point(0, -1.5), Point(-1, 0), Point(0, 1.5), Point(-1.5, -1.5), Point(-1.5, 0),
+         Point(-1.5, 1.5)});
     setFriendlyGoalie(0);
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),

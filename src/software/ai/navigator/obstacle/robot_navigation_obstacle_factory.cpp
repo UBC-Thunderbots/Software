@@ -63,8 +63,9 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
                                                          world.field().fieldBoundary()));
             break;
         case MotionConstraint::BALL_PLACEMENT_ZONE:
-            obstacles.push_back(createFromBallPlacement(world.gameState().getBallPlacementPoint().value(),
-                                                        world.ball().position()));
+            obstacles.push_back(
+                createFromBallPlacement(world.gameState().getBallPlacementPoint().value(),
+                                        world.ball().position()));
     }
 
     return obstacles;
@@ -203,8 +204,8 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromFieldRectangle(
         Rectangle(Point(xMin, yMin), Point(xMax, yMax)));
 }
 
-ObstaclePtr RobotNavigationObstacleFactory::createFromBallPlacement(const Point &placement_point,
-                                                                    const Point &ball_point) const
+ObstaclePtr RobotNavigationObstacleFactory::createFromBallPlacement(
+    const Point &placement_point, const Point &ball_point) const
 {
     /*   The Polygon is constructed as follows:
      *
@@ -212,38 +213,43 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromBallPlacement(const Point 
      *           +-------+-------+
      *           |               |
      *           |    place_c    |
-     *           +-------+-------+ 
+     *           +-------+-------+
      *           |               |
      *           |               |
      *           |               |
      *           |     ball_c    |
-     *           +-------+-------+ 
+     *           +-------+-------+
      *           |               |
      *           |               |
-     *           +-------+-------+ 
+     *           +-------+-------+
      *         bot_l           bot_r
      */
-    double radius = ROBOT_MAX_RADIUS_METERS+0.5;
+    double radius = ROBOT_MAX_RADIUS_METERS + 0.5;
     // Vector from place ---> ball
     Vector place_to_ball = Vector(ball_point.x() - placement_point.x(),
-                                    ball_point.y() - placement_point.y());
+                                  ball_point.y() - placement_point.y());
     // Vector from place <--- ball
     Vector ball_to_place = Vector(placement_point.x() - ball_point.x(),
-                                    placement_point.y() - ball_point.y());
+                                  placement_point.y() - ball_point.y());
 
-    Vector bottom_vec = place_to_ball + place_to_ball.normalize(radius);
+    Vector bottom_vec   = place_to_ball + place_to_ball.normalize(radius);
     Vector bottom_vec_r = bottom_vec + bottom_vec.perpendicular().normalize(radius);
     Vector bottom_vec_l = bottom_vec - bottom_vec.perpendicular().normalize(radius);
 
-    Point bot_r = Point(bottom_vec_r.x(),bottom_vec_r.y());
-    Point bot_l = Point(bottom_vec_l.x(),bottom_vec_l.y());
+    Point bot_r = Point(bottom_vec_r.x(), bottom_vec_r.y());
+    Point bot_l = Point(bottom_vec_l.x(), bottom_vec_l.y());
 
-    Vector top_vec = ball_to_place + ball_to_place.normalize(radius);
+    Vector top_vec   = ball_to_place + ball_to_place.normalize(radius);
     Vector top_vec_r = top_vec + top_vec.perpendicular().normalize(radius);
     Vector top_vec_l = top_vec - top_vec.perpendicular().normalize(radius);
 
-    Point top_r = Point(top_vec_r.x(),top_vec_r.y());
-    Point top_l = Point(top_vec_l.x(),top_vec_l.y());
+    Point top_r = Point(top_vec_r.x(), top_vec_r.y());
+    Point top_l = Point(top_vec_l.x(), top_vec_l.y());
 
-    return createFromShape(Polygon({bot_l,bot_r,top_l,top_r,}));
+    return createFromShape(Polygon({
+        bot_l,
+        bot_r,
+        top_l,
+        top_r,
+    }));
 }
