@@ -92,7 +92,6 @@ class GeomObstacle : public Obstacle
 
    private:
     GEOM_TYPE geom_;
-
 };
 
 

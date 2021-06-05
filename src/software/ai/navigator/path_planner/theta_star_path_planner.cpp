@@ -86,7 +86,8 @@ bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord1, const Coordinat
 
         for (const auto &obstacle : obstacles)
         {
-            if (obstacle->intersects(seg)) // TODO Could remove this after implementing findAllBlockedCoords
+            if (obstacle->intersects(seg))  // TODO Could remove this after implementing
+                                            // findAllBlockedCoords
             {
                 has_line_of_sight = false;
                 break;
@@ -229,9 +230,9 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
 
     findAllBlockedCoords();
 
+    // Avoiding the situation where closest_end point is free but end_coord is blocked
     blocked_grid.erase(end_coord);
 
-    // Avoiding the situation where closest_end point is free but end_coord is blocked
     bool found_end = findPathToEnd(end_coord);
 
     if (found_end == false)
