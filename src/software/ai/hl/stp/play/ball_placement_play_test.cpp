@@ -28,7 +28,7 @@ TEST_F(BallPlacementPlayTest, test_ball_placement)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(EnemyBallPlacementPlay));
+    setAIPlay(TYPENAME(BallPlacementPlay));
     GameState game_state;
     game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_US);
     game_state.setBallPlacementPoint(ball_placement_point);
