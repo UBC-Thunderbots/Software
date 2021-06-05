@@ -68,6 +68,30 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_keep_away)
                                          ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(1))
             {
+                yield("Timestamp not at 1s");
+            }
+
+            while (ratePassEnemyRisk(world_ptr->enemyTeam(), pass, ENEMY_REACTION_TIME,
+                                     ENEMY_PROXIMITY_IMPORTANCE) <
+                   initial_enemy_risk_score)
+            {
+                yield("ratePassEnemyRisk score not improved!");
+            }
+
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
+            {
+                yield("Timestamp not at 2s");
+            }
+
+            while (ratePassEnemyRisk(world_ptr->enemyTeam(), pass, ENEMY_REACTION_TIME,
+                                     ENEMY_PROXIMITY_IMPORTANCE) <
+                   initial_enemy_risk_score)
+            {
+                yield("ratePassEnemyRisk score not improved!");
+            }
+
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(3))
+            {
                 yield("Timestamp not at 3s");
             }
 
@@ -83,7 +107,7 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_keep_away)
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(2));
+            Duration::fromSeconds(4));
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -112,4 +136,15 @@ INSTANTIATE_TEST_CASE_P(
             // the state of the ball
             BallState(Point(0., 0.), Vector(0, 0)),
             // the states of the enemy robots
-            TestUtil::createStationaryRobotStatesWithId({Point(-0.5, 0.5)}))));
+            TestUtil::createStationaryRobotStatesWithId({Point(-0.5, 0.5)})),
+        std::make_tuple(
+            // the best pass so far to pass into the AttackerTactic
+            Pass(Point(0.0, 0.0), Point(-3, 2.5), 5),
+            // the state of the friendly robot
+            RobotStateWithId{1, RobotState(Point(0.25, 0), Vector(0, 0),
+                                           Angle::fromDegrees(0), Angle::fromDegrees(0))},
+            // the state of the ball
+            BallState(Point(0., 0.), Vector(0, 0)),
+            // the states of the enemy robots
+            TestUtil::createStationaryRobotStatesWithId({Point(-0.5, 0.5),
+                                                         Point(-0.5, 0)}))));

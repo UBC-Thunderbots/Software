@@ -137,6 +137,7 @@ cc_library(
         ":python_binding_utilities",
         ":pass_utilities",
         "//software/ai/evaluation:keep_away",
+        "//software/math:math_functions",
     ] + PYBIND_DEPS,
 )
 
