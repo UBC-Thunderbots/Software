@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "software/geom/angle.h"
-#include "software/geom/point.h"
+
 
 /**
  * A vector in 2D space.
@@ -35,14 +35,6 @@ class Vector final
     Vector(double x, double y);
 
     /**
-     * Creates a Vector from two points
-     * 
-     * @param a the first point
-     * @param b the second point
-     */
-    Vector(Point a, Point b);
-
-    /**
      * Creates a new Vector that is a copy of the given Vector
      *
      * @param the Vector to duplicate
@@ -62,13 +54,6 @@ class Vector final
      * @return the magnitude in the y-coordinate of this Vector
      */
     double y() const;
-
-    /**
-     * Returns the (x,y) coordinate of the vector
-     * 
-     * @return the coordinate that the vector points to
-     */
-    Point getPoint() const;
 
     /**
      * Sets the magnitudes of this vector to the new magnitudes
