@@ -5,6 +5,7 @@
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/physics/physics_object_user_data.h"
 #include "software/simulation/physics/physics_robot.h"
+#include "software/simulation/physics/physics_field.h"
 
 /**
  * This class implements a custom ContactListener for a Box2D world so that we
@@ -66,5 +67,20 @@ class SimulationContactListener : public b2ContactListener
      * otherwise
      */
     static PhysicsBall* isBallContact(PhysicsObjectUserData* user_data_a,
+                                      PhysicsObjectUserData* user_data_b);
+
+    /**
+     * Given the user data of 2 objects involved in a contact, returns a pair of
+     * pointers to the physics objects involved in the contact if there was a contact
+     * point between a ball and a field wall. Otherwise returns std::nullopt
+     *
+     * @param user_data_a The user data for the first object in the contact
+     * @param user_data_b The user data for the second object in the contact
+     *
+     * @return A pair of pointers to the physics objects involved in the constact if there
+     * was a contact point between a ball and field wall, and returns std::nullopt
+     * otherwise
+     */
+    static std::optional<std::pair<PhysicsBall*, PhysicsField*>> isBallFieldWallContact(PhysicsObjectUserData* user_data_a,
                                       PhysicsObjectUserData* user_data_b);
 };
