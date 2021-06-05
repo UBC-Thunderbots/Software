@@ -132,3 +132,6 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
  */
 double getStaticPositionQuality(const Field& field, const Point& position,
                                 std::shared_ptr<const PassingConfig> passing_config);
+
+double calculateProximityRisk(const Point& point, const Team& enemy_team,
+                              double enemy_proximity_importance);
