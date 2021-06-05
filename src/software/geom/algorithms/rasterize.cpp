@@ -68,7 +68,7 @@ std::vector<Point> rasterize(const Circle &circle, const double resolution_size)
             covered_points.emplace_back(Point(x_point, y_point));
         }
     }
-     
+
     // for (auto p = covered_points.begin(); p != covered_points.end();
     //      ++p)  // TODO Remove, added for testing
     //     std::cout << *p << ", ";
@@ -131,6 +131,11 @@ std::vector<Point> rasterize(const Polygon &polygon, const double resolution_siz
     // https://stackoverflow.com/a/31768384
     std::vector<Point> contained_points;
 	const auto& polygon_vertices = polygon.getPoints();
+    std::cout << "Polygon vertices\n";
+    for (auto p = polygon_vertices.begin(); p != polygon_vertices.end();
+         ++p)  // TODO Remove, added for testing
+        std::cout << *p << ", ";
+    std::cout << std::endl;
 
     auto max_point_y = [](const Point& a, const Point& b) {
        return a.y() < b.y();
@@ -145,7 +150,7 @@ std::vector<Point> rasterize(const Polygon &polygon, const double resolution_siz
     double min_x  = std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)->x();
 	double max_y  = std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)->y();
 
-    //loop through rows of the image (i.e. polygon)
+    // loop through rows of the image (i.e. polygon)
     for (double y_coord = min_y; y_coord <= max_y; y_coord += resolution_size)
     {
         //we create a line that intersects the polygon at this y coordinate
@@ -165,9 +170,8 @@ std::vector<Point> rasterize(const Polygon &polygon, const double resolution_siz
 		while (intersection_index < num_of_intersections)
 		{
 			Point point = Point(x_coord, y_coord);
-			bool isCloseToIntersectionPoint = isInPixel(point,
-														sorted_intersections_with_polygon[intersection_index],
-														resolution_size);
+			bool isCloseToIntersectionPoint = point.x() >= sorted_intersections_with_polygon[intersection_index].x();
+
 			if (isCloseToIntersectionPoint && !isAVertex(point, polygon, resolution_size))
 			{
 				in_polygon = !in_polygon;
@@ -178,12 +182,12 @@ std::vector<Point> rasterize(const Polygon &polygon, const double resolution_siz
 				intersection_index++;
 			}
 
-			if (isAVertex(point, polygon, resolution_size) || in_polygon)
+			if (in_polygon)
 			{
 				contained_points.emplace_back(point);
 			}
 
-            if (!isInPixel(point, sorted_intersections_with_polygon[intersection_index], resolution_size))
+            if (point.x() < sorted_intersections_with_polygon[intersection_index].x())
 			{
                 x_coord += resolution_size;
             }
@@ -240,6 +244,10 @@ std::vector<Point> rasterize(const Polygon &polygon, const double resolution_siz
 //
 //        }
 //    }
+    for (auto p = contained_points.begin(); p != contained_points.end();
+         ++p)  // TODO Remove, added for testing
+        std::cout << *p << ", ";
+    std::cout << std::endl;
 
     return contained_points;
 }

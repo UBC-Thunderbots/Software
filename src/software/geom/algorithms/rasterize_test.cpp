@@ -170,17 +170,32 @@ TEST(RasterizeTest, test_rasterize_polygon)
     double offset = 1;
     Polygon polygon = Polygon(points);
     std::vector<Point> rasterized_points = rasterize(polygon, offset);
-    std::vector<Point> expected_points = { Point(0, 0), Point(4, 3), Point(2, 1), Point(5, 5) };
 
-    for (Point p : expected_points)
+    for (Point p : rasterized_points)
     {
-        EXPECT_NE(rasterized_points.end(),
-                    std::find(rasterized_points.begin(), rasterized_points.end(), p));
+        bool result = contains(polygon, p);
+        if (!result)
+        {
+            std::cout << "FAILED: " << p << "\n";
+        }
+        EXPECT_TRUE(contains(polygon, p));
     }
+}
 
-    for (auto i = rasterized_points.begin(); i != rasterized_points.end(); ++i)
+TEST(RasterizeTest, test_rasterize_polygon_complex)
+{
+    std::vector<Point> points = {Point(3.018497, -1.481503), Point(3.018497, 1.481503),
+        Point(4.7999999999999998, 1.481503), Point(4.7999999999999998, -1.481503)};
+    Polygon polygon = Polygon(points);
+
+    std::vector<Point> rasterized_points = rasterize(polygon, 0.09);
+    for (Point p : rasterized_points)
     {
-        std::cout << *i << ", ";
-        std::cout << std::endl;
+        bool result = contains(polygon, p);
+        if (!result)
+        {
+            std::cout << "FAILED: " << p << "\n";
+        }
+        EXPECT_TRUE(contains(polygon, p));
     }
 }
