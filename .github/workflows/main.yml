@@ -136,7 +136,7 @@ jobs:
           bazel test -c dbg  \
             --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
             -- //firmware/...   \
-	    -//firmware/boards/estop_arduino_uno/... # Arduino requires setup_firmware              
+            -//firmware/boards/estop_arduino_uno/... # Arduino requires setup_firmware              
             
       - name: Shared Memory Leak Check
         run: |
