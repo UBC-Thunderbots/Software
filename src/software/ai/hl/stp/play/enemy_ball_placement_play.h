@@ -9,7 +9,7 @@
  */
 class EnemyBallPlacementPlay : public Play
 {
-public:
+   public:
     EnemyBallPlacementPlay(std::shared_ptr<const PlayConfig> config);
 
     bool isApplicable(const World &world) const override;
@@ -18,12 +18,14 @@ public:
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 
-private:
+   private:
+    void inAttackingZone(
+        TacticCoroutine::push_type &yield,
+        std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defender_tactics,
+        const World &world);
 
-    void inAttackingZone(TacticCoroutine::push_type &yield, std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defender_tactics,
-                         const World &world);
-
-    void inDefendingZone(TacticCoroutine::push_type &yield, std::array<std::shared_ptr<CreaseDefenderTactic>, 4> crease_defender_tactics,
-                         const World &world);
+    void inDefendingZone(
+        TacticCoroutine::push_type &yield,
+        std::array<std::shared_ptr<CreaseDefenderTactic>, 4> crease_defender_tactics,
+        const World &world);
 };
-
