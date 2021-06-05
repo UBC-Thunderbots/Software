@@ -10,10 +10,10 @@
 #include "software/networking/threaded_proto_udp_sender.h"
 #include "software/proto/defending_side_msg.pb.h"
 
-class WifiBackend : public Backend
+class SimulatorBackend : public Backend
 {
    public:
-    WifiBackend(std::shared_ptr<const BackendConfig> config);
+    SimulatorBackend(std::shared_ptr<const BackendConfig> config);
 
 
    private:
@@ -28,8 +28,8 @@ class WifiBackend : public Backend
      * NOTE: This will terminate the existing connection on the previous channel
      * if it exists.
      *
-     * @param channel The channel to join, index of ROBOT_MULTICAST_CHANNELS in
-     * shared/constants.h
+     * @param channel The channel to join, index of SIMULATOR_MULTICAST_CHANNELS in
+     * software/constants.h
      * @param interface The interface to join the multicast group on (lo, eth0, enp3s0f1,
      * etc.)
      */
