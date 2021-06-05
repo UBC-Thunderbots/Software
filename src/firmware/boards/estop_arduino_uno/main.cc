@@ -24,7 +24,7 @@ void loop() {
     //todo (#1953) write firmware based on estop board
 
     //PLAY when connected to gnd, STOP when yanked out
-    unsigned char estopVal = digitalRead(input_pin)==0 ? ESTOP_PLAY_MSG : ESTOP_STOP_MSG;
+    unsigned char estop_val = digitalRead(input_pin)==0 ? ESTOP_PLAY_MSG : ESTOP_STOP_MSG;
 
-    Serial.write(estopVal);
+    Serial.write(estop_val);
 }

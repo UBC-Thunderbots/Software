@@ -142,8 +142,6 @@ The `TbotsProto::RobotStatus` protobuf message contains information about the st
 * The capacitor charge on the robot
 * The temperature of the dribbler motor
 
-The message also contains information on whether [Estop](#estop) should be activated. 
-
 Information about the robot status is communicated and stored as `RobotStatus` protobuf messages. The [Visualizer](#visualizer) displays warnings from incoming `RobotStatus`es so we can take appropriate action. For example, during a game we may get a "Low battery warning" for a certain robot, and then we know to substitute it and replace the battery before it dies on the field.
 
 # Design Patterns
@@ -411,7 +409,7 @@ The `Backend` is responsible for all communication with the "outside world". The
   * Vision data about where the robots and ball are (typically from [SSL-Vision](#ssl-vision))
   * Referee commands (typically from the [SSL-Gamecontroller](#ssl-gamecontroller)
 
-* Upon receiving [Primitives](#primitives) from the [AI](#ai), `Backend` will send the primitives to the robots or the [Simulator](#simulator), unless `Estop State` from [Estop](#estop) is set to `STOP`. 
+* Upon receiving [Primitives](#primitives) from the [AI](#ai), `Backend` will send the primitives to the robots or the [Simulator](#simulator).
 
 The `Backend` was designed to be a simple interface that handles all communication with the "outside world", allowing for different implementations that can be swapped out in order to communicate with different hardware / protocols / programs.
 
@@ -533,9 +531,7 @@ Although we want to display information about the [AI](#ai) in the [Visualizer](
 A [DrawFunction](#draw_functions) is essentially a function that tells the [Visualizer](#visualizer) _how_ to draw something. When created, [DrawFunctions](#draw_functions) use [lazy-evaluation](https://www.tutorialspoint.com/functional_programming/functional_programming_lazy_evaluation.htm) to embed the data needed for drawing into the function itself. What is ultimately produced is a function that the [Visualizer](#visualizer) can call, with the data to draw (and the details of how to draw it) already included. This function can then be sent over the Observer system to the [Visualizer](#visualizer). The [Visualizer](#visualizer) can then run this function to perform the actual draw operation.
 
 # Estop
-`Estop` allows us to quickly and manually command robots to stop what they are doing, typically through a stateful switch connected to an Arduino. The switch state is communicated to the [Backend](#backend). When `Estop` is in a `STOP` state, the backend overrides the [Primitives](#primitives) sent to the robot to an `Estop primitive`. when it is in a `PLAY` state, primitives are communicated normally.
-
-Since in many cases we run our system without physical robots, the `Estop` system is not enabled until the [Backend](#backend) receives a [Robot Status](#robot-status) message specifically asking for `Estop` to be enabled. However, once it is enabled, `Estop` cannot be disabled. 
+`Estop` allows us to quickly and manually command physical robots to stop what they are doing, typically through a stateful switch connected to an Arduino. The switch state is communicated to the [Backend](#backend). When `Estop` is in a `STOP` state, the backend overrides the [Primitives](#primitives) sent to the robot to an `Estop primitive`. when it is in a `PLAY` state, primitives are communicated normally.
 
 # Simulator
 The `Simulator` is what we use for physics simulation to do testing when we don't have access to real field. In terms of the architecture, the `Simulator` "simulates" the following components' functionalities:

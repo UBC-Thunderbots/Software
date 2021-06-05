@@ -40,6 +40,7 @@ jobs:
             -- //... -//software/simulated_tests/... \
             -//software/ai/hl/stp/play/... \
             -//software/ai/hl/stp/tactic/... \
+            -//firmware/boards/arduino_uno/... # Arduino requires setup_firmware 
              
   firmware-tests:
     name: Firmware Tests
@@ -100,7 +101,8 @@ jobs:
           bazel test --show_timestamps   \
             //software/simulated_tests/...   \
             //software/ai/hl/stp/play/...    \
-            //software/ai/hl/stp/tactic/...
+            //software/ai/hl/stp/tactic/... 
+
       
       - name: Upload simulated test artifacts
         uses: actions/upload-artifact@v2

@@ -209,5 +209,4 @@ class World final
     // which team has possession of the ball
     TeamSide team_with_possesion_;
 
-    bool estop_enabled;
 };
