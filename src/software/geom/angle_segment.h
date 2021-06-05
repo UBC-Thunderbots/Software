@@ -49,7 +49,32 @@ class AngleSegment
      */
     double getDelta() const;
 
+    /**
+     * Compares another AngleSegment's top angle
+     * Used to make sorting more performant
+     *
+     * @param other the other AngleSegment to compare to
+     * @return true if both AngleSegment's top angles are equal
+     */
+    bool operator==(const AngleSegment &other) const;
 
+    /**
+     * Compares another AngleSegment's top angle
+     * Used to make sorting more performant
+     *
+     * @param other the other AngleSegment to compare to
+     * @return true if this top angle is less than the other's top angle
+     */
+    bool operator<(const AngleSegment &other) const;
+
+    /**
+     * Compares another AngleSegment's top angle
+     * Used to make sorting more performant
+     *
+     * @param other the other AngleSegment to compare to
+     * @return true if this top angle is greater than the other's top angle
+     */
+    bool operator>(const AngleSegment &other) const;
 
    private:
     Angle angle_top_;

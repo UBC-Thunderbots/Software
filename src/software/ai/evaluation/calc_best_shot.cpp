@@ -9,7 +9,7 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
     Angle pos_post_angle = (goal_post.getStart() - shot_origin).orientation();
     Angle neg_post_angle = (goal_post.getEnd() - shot_origin).orientation();
 
-    std::vector<ObstacleAngleSegment> obstacles;
+    std::vector<AngleSegment> obstacles;
     obstacles.reserve(max_num_obstacles);
 
     {
@@ -51,17 +51,14 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
                 continue;
             }
 
-            ObstacleAngleSegment non_viable_angle_seg =
-                ObstacleAngleSegment(top_angle, bottom_angle);
+            AngleSegment non_viable_angle_seg = AngleSegment(top_angle, bottom_angle);
             obstacles.emplace_back(non_viable_angle_seg);
         }
 
         std::sort(obstacles.begin(), obstacles.end(),
-                  [](ObstacleAngleSegment &a, ObstacleAngleSegment &b) -> bool {
-                      return a > b;
-                  });
+                  [](AngleSegment &a, AngleSegment &b) -> bool { return a > b; });
 
-        for (ObstacleAngleSegment &obstacle_angle_seg : obstacles)
+        for (AngleSegment &obstacle_angle_seg : obstacles)
         {
             angle_map.addNonViableAngleSegment(obstacle_angle_seg);
         }

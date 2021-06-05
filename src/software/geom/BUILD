@@ -14,6 +14,13 @@ cc_library(
 )
 
 cc_library(
+    name = "angle_map",
+    srcs = ["angle_map.cpp"],
+    hdrs = ["angle_map.h"],
+    deps = [":angle_segment"],
+)
+
+cc_library(
     name = "segment",
     srcs = ["segment.cpp"],
     hdrs = ["segment.h"],

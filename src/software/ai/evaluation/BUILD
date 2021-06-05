@@ -30,6 +30,7 @@ cc_library(
     deps = [
         ":shot",
         "//shared:constants",
+        "//software/geom:angle_map",
         "//software/geom:angle_segment",
         "//software/geom:segment",
         "//software/geom/algorithms",
