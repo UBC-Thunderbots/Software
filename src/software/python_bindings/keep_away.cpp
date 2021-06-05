@@ -2,6 +2,7 @@
 
 #include <pybind11/pybind11.h>
 
+#include "software/math/math_functions.h"
 #include "software/python_bindings/pass_utilities.h"
 #include "software/python_bindings/python_binding_utilities.h"
 
@@ -13,8 +14,13 @@ PYBIND11_MODULE(keep_away, m)
           [](const World& world, const Point& possessor_position,
              py::dict best_pass_so_far_dict, py::dict passing_config_dict) {
               Pass best_pass_so_far = createPassFromDict(best_pass_so_far_dict);
-              auto passing_config   = std::make_shared<PassingConfig>();
-              updateDynamicParametersConfigFromDict(passing_config, passing_config_dict);
               return findKeepAwayTargetPoint(possessor_position, best_pass_so_far, world);
           });
+    m.def("ratePasserPointForKeepAway", [](py::dict pass_dict, const World& world) {
+        Pass pass = createPassFromDict(pass_dict);
+        return ratePasserPointForKeepAway(pass, world.enemyTeam()) *
+               circleSigmoid(Circle(world.ball().position(), 0.5), pass.passerPoint(),
+                             0.05) *
+               rectangleSigmoid(world.field().fieldLines(), pass.passerPoint(), 0.05);
+    });
 }

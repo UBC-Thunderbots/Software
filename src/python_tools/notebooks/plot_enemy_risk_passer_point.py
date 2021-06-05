@@ -18,7 +18,7 @@ from software.proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
 from python_tools.proto_log import ProtoLog
 import ipywidgets
 from IPython.display import display
-from software.python_bindings import world, passing
+from software.python_bindings import world, passing, keep_away
 import numpy as np
 
 wrapper_proto_log = ProtoLog(
@@ -71,8 +71,12 @@ heatmap_grid_size = 0.05
 
 ssl_wrapper_plotter = SSLWrapperPlotter(fig)
 
-rate_pass_enemy_heatmap_plotter = HeatmapPlotter(
+enemy_risk_heatmap = HeatmapPlotter(
     fig, heatmap_x_bounds, heatmap_y_bounds, heatmap_grid_size, "ratePassEnemyRisk"
+)
+
+keep_away_heatmap = HeatmapPlotter(
+    fig, heatmap_x_bounds, heatmap_y_bounds, heatmap_grid_size, "keep away cost"
 )
 
 fig.legend.click_policy = "hide"
@@ -83,6 +87,8 @@ config = passing.getPassingConfig()
 display(config)
 config["enemy_reaction_time"] = 0
 config["enemy_proximity_importance"] = 0
+
+plotter = PointsPlotter(fig, "keep away point", "square", "red")
 
 
 def plot_ssl_wrapper_at_idx(idx):
@@ -104,7 +110,20 @@ def plot_ssl_wrapper_at_idx(idx):
         pass_dict["passer_point"] = world.Point(x, y)
         return passing.ratePassEnemyRisk(the_world, pass_dict, config)
 
-    rate_pass_enemy_heatmap_plotter.plot_heatmap(ratePassEnemyRiskCost)
+    def keepAwayCost(x, y):
+        pass_dict["passer_point"] = world.Point(x, y)
+        return keep_away.ratePasserPointForKeepAway(pass_dict, the_world)
+
+    enemy_risk_heatmap.plot_heatmap(ratePassEnemyRiskCost)
+    keep_away_heatmap.plot_heatmap(keepAwayCost)
+
+    plotter.plot_points(
+        [
+            keep_away.findKeepAwayTargetPosition(
+                the_world, the_world.ball().position(), pass_dict, dict()
+            )
+        ]
+    )
 
     push_notebook()
 
@@ -113,4 +132,3 @@ show(fig, notebook_handle=True)
 
 slider = ipywidgets.IntSlider(min=0, max=len(wrapper_proto_log) - 1)
 ipywidgets.interact(plot_ssl_wrapper_at_idx, idx=slider)
-# -

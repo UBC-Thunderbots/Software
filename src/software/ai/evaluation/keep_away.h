@@ -4,5 +4,7 @@
 #include "software/ai/passing/pass.h"
 #include "software/world/world.h"
 
+double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team);
+
 Point findKeepAwayTargetPoint(const Point& ball_possessor_point,
                               const Pass& best_pass_so_far, const World& world);
