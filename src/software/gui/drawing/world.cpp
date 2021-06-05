@@ -2,12 +2,12 @@
 
 #include <QtWidgets/QGraphicsSimpleTextItem>
 
+#include "software/ai/evaluation/calc_best_shot.h"
 #include "software/gui/drawing/ball.h"
 #include "software/gui/drawing/field.h"
 #include "software/gui/drawing/geom.h"
-#include "software/gui/drawing/team.h"
-#include "software/ai/evaluation/calc_best_shot.h"
 #include "software/gui/drawing/robot.h"
+#include "software/gui/drawing/team.h"
 
 void drawWorld(QGraphicsScene* scene, const World& world, TeamColour friendly_team_colour)
 {
@@ -45,21 +45,27 @@ void drawWorld(QGraphicsScene* scene, const World& world, TeamColour friendly_te
     drawBall(scene, world.ball().currentState());
     drawBallConeToFriendlyNet(scene, world.ball().position(), world.field());
 
-    //Point(-3.29231, -0.215385), Point(-3.48021, 0.407988), Point(-3.31282, 0.882051), Point(-1.2, 1.86667), Point(-3.45938, 0.231164)
+    // Point(-3.29231, -0.215385), Point(-3.48021, 0.407988), Point(-3.31282, 0.882051),
+    // Point(-1.2, 1.86667), Point(-3.45938, 0.231164)
 
     drawBallPosition(scene, Point(0.328205, 2.74872), 0, QColor(0, 0, 0));
 
-    auto shot = calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball().position(), TeamType::FRIENDLY);
-    if (shot.has_value()) {
-        drawSegment(scene, Segment(world.ball().position(), shot->getPointToShootAt()), path_pen);
+    auto shot = calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                                   world.ball().position(), TeamType::FRIENDLY);
+    if (shot.has_value())
+    {
+        drawSegment(scene, Segment(world.ball().position(), shot->getPointToShootAt()),
+                    path_pen);
     }
 
     std::cout << "-----------------------------\n";
-    std::cout << "ball, X: " << world.ball().position().x() << ", Y: " << world.ball().position().y() << "\n";
+    std::cout << "ball, X: " << world.ball().position().x()
+              << ", Y: " << world.ball().position().y() << "\n";
     std::cout << "-----------------------------\n";
     for (const Robot& robot : world.friendlyTeam().getAllRobots())
     {
-        std::cout << "X: " << robot.position().x() << ", Y: " << robot.position().y() << "\n";
+        std::cout << "X: " << robot.position().x() << ", Y: " << robot.position().y()
+                  << "\n";
     }
 }
 
