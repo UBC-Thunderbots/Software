@@ -24,4 +24,6 @@ MAKE_ENUM(MotionConstraint,
           // The enemy half of the field
           ENEMY_HALF,
           // The friendly half of the field
-          FRIENDLY_HALF);
+          FRIENDLY_HALF,
+          // Path between ball and placement point in ball placement
+          BALL_PLACEMENT_ZONE);

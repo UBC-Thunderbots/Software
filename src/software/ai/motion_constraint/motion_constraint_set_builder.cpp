@@ -61,6 +61,10 @@ std::set<MotionConstraint> buildMotionConstraintSetFromGameState(
                                    MotionConstraint::CENTER_CIRCLE,
                                    MotionConstraint::ENEMY_HALF});
     }
+    else if(game_state.isTheirBallPlacement())
+    {
+        motion_constraints.insert(MotionConstraint::BALL_PLACEMENT_ZONE);
+    }
     else
     {
         motion_constraints.insert(MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA);

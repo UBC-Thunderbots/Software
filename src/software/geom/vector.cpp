@@ -11,6 +11,8 @@ Vector::Vector() : x_(0.0), y_(0.0) {}
 
 Vector::Vector(double x, double y) : x_(x), y_(y) {}
 
+Vector::Vector(Point a, Point b) : x_(b.x() - a.x()), y_(b.y()-a.y()) {}
+
 Vector::Vector(const Vector &v) : x_(v.x()), y_(v.y()) {}
 
 double Vector::x() const
@@ -21,6 +23,11 @@ double Vector::x() const
 double Vector::y() const
 {
     return y_;
+}
+
+Point Vector::getPoint() const
+{
+    return Point(x_,y_);
 }
 
 void Vector::set(double x, double y)
