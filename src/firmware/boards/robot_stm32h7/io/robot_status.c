@@ -11,6 +11,7 @@ void io_robot_status_task(void *argument)
     ProtoMulticastCommunicationProfile_t *comm_profile =
         (ProtoMulticastCommunicationProfile_t *)argument;
 
+    unsigned count = 0;
     for (;;)
     {
         // TODO (#1518) enable SNTP sys_now is currently only time since reset
@@ -51,7 +52,7 @@ void io_robot_status_task(void *argument)
 
         // TODO (#2097) update when power monitor has been fully integrated
         g_robot_status_msg.power_status = (TbotsProto_PowerStatus){
-            .battery_voltage = 200.0f, .capacitor_voltage = 0.0f};
+            .battery_voltage = 200.0f, .capacitor_voltage = (float)(count++%100)};
 
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
 

@@ -97,7 +97,7 @@ void MX_LWIP_Init(void)
     memset(&attributes, 0x0, sizeof(osThreadAttr_t));
     attributes.name       = "EthLink";
     attributes.stack_size = INTERFACE_THREAD_STACK_SIZE;
-    attributes.priority   = osPriorityBelowNormal;
+    attributes.priority   = osPriorityAboveNormal;
     osThreadNew(ethernet_link_thread, &gnetif, &attributes);
 /* USER CODE END H7_OS_THREAD_NEW_CMSIS_RTOS_V2 */
 

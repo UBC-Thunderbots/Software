@@ -159,6 +159,7 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
         {
             // the estop case is handled here
             app_primitive_makeRobotSafe(world);
+            app_primitive_manager_unlockPrimitiveMutex(manager);
             return;
         }
     }

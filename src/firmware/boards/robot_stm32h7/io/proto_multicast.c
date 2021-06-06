@@ -149,10 +149,6 @@ void io_proto_multicast_listenerTask(void* communication_profile)
                 }
                 break;
             }
-            default:
-            {
-                netbuf_delete(rx_buf);
-            }
         }
     }
 

@@ -60,12 +60,18 @@
 #define LWIP_TCPIP_CORE_LOCKING 1
 /*----- Default Value for LWIP_TCPIP_CORE_LOCKING_INPUT: 0 ---*/
 #define LWIP_TCPIP_CORE_LOCKING_INPUT 1
+/*----- Default Value for MEM_LIBC_MALLOC: 0 ---*/
+#define MEM_LIBC_MALLOC 1
+/*----- Default Value for MEMP_MEM_INIT: 0 ---*/
+#define MEMP_MEM_INIT 1
 /*----- Value in opt.h for MEM_ALIGNMENT: 1 -----*/
 #define MEM_ALIGNMENT 4
 /*----- Default Value for MEM_SIZE: 1600 ---*/
 #define MEM_SIZE 16000
 /*----- Default Value for H7 devices: 0x30044000 -----*/
 #define LWIP_RAM_HEAP_POINTER 0x30020000
+/*----- Default Value for MEMP_NUM_NETBUF: 2 ---*/
+#define MEMP_NUM_NETBUF 20
 /*----- Value supported for H7 devices: 1 -----*/
 #define LWIP_SUPPORT_CUSTOM_PBUF 1
 /*----- Value in opt.h for LWIP_ETHERNET: LWIP_ARP || PPPOE_SUPPORT -*/
@@ -128,7 +134,6 @@
 #define IP6_DEBUG LWIP_DBG_ON
 /*-----------------------------------------------------------------------------*/
 /* USER CODE BEGIN 1 */
-#define	MEMP_NUM_NETBUF 100
 
 /* USER CODE END 1 */
 
