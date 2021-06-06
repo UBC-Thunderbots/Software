@@ -4,9 +4,8 @@
 
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
-
-#include "software/test_util/test_util.h"
 #include "software/logger/logger.h"
+#include "software/test_util/test_util.h"
 
 namespace TestUtil
 {
@@ -148,15 +147,15 @@ TEST(RasterizeTest, test_pixel_size_one_dimesnsion_not_multiple_of_rectangle_dim
 // TODO could check that the points are offsetted by pixel_size!?
 TEST(RasterizeTest, test_rasterize_polygon)
 {
-	std::vector<Point> points = { Point(0, 5), Point(0, 0), Point(5, 0), Point(5, 5) };
-    double offset = 1;
-    Polygon polygon = Polygon(points);
+    std::vector<Point> points = {Point(0, 5), Point(0, 0), Point(5, 0), Point(5, 5)};
+    double offset             = 1;
+    Polygon polygon           = Polygon(points);
     std::vector<Point> rasterized_points = rasterize(polygon, offset);
 
     for (Point p : rasterized_points)
     {
         bool result = contains(polygon, p);
-        //TODO: remove this if statement
+        // TODO: remove this if statement
         if (!result)
         {
             std::cout << "FAILED: " << p << "\n";
@@ -168,14 +167,15 @@ TEST(RasterizeTest, test_rasterize_polygon)
 TEST(RasterizeTest, test_rasterize_polygon_complex)
 {
     std::vector<Point> points = {Point(3.018497, -1.481503), Point(3.018497, 1.481503),
-        Point(4.7999999999999998, 1.481503), Point(4.7999999999999998, -1.481503)};
-    Polygon polygon = Polygon(points);
+                                 Point(4.7999999999999998, 1.481503),
+                                 Point(4.7999999999999998, -1.481503)};
+    Polygon polygon           = Polygon(points);
 
     std::vector<Point> rasterized_points = rasterize(polygon, 0.09);
     for (Point p : rasterized_points)
     {
         bool result = contains(polygon, p);
-        //TODO: Remove std::cout
+        // TODO: Remove std::cout
         if (!result)
         {
             std::cout << "FAILED: " << p << "\n";
@@ -186,18 +186,18 @@ TEST(RasterizeTest, test_rasterize_polygon_complex)
 
 TEST(RasterizeTest, test_speed_polygon)
 {
-    std::vector<Point> points = { Point(0, 5), Point(0, 0), Point(5, 0), Point(5, 5) };
-    double offset = 0.1f;
-    Polygon polygon = Polygon(points);
-    auto start_tick_time = std::chrono::system_clock::now();
+    std::vector<Point> points = {Point(0, 5), Point(0, 0), Point(5, 0), Point(5, 5)};
+    double offset             = 0.1f;
+    Polygon polygon           = Polygon(points);
+    auto start_tick_time      = std::chrono::system_clock::now();
     std::vector<Point> rasterized_points = rasterize(polygon, offset);
-    double duration_ms         = ::TestUtil::millisecondsSince(start_tick_time);
+    double duration_ms                   = ::TestUtil::millisecondsSince(start_tick_time);
     LOG(WARNING) << "max tick duration: " << duration_ms << "ms" << std::endl;
 
     for (Point p : rasterized_points)
     {
         bool result = contains(polygon, p);
-        //TODO: remove this if statement
+        // TODO: remove this if statement
         if (!result)
         {
             std::cout << "FAILED: " << p << "\n";
@@ -209,16 +209,16 @@ TEST(RasterizeTest, test_speed_polygon)
 TEST(RasterizeTest, test_speed_rectangle)
 {
     double offset = 0.1f;
-    Rectangle rectangle(Point(0,0), Point(5,5));
-    auto start_tick_time = std::chrono::system_clock::now();
+    Rectangle rectangle(Point(0, 0), Point(5, 5));
+    auto start_tick_time                 = std::chrono::system_clock::now();
     std::vector<Point> rasterized_points = rasterize(rectangle, offset);
-    double duration_ms         = ::TestUtil::millisecondsSince(start_tick_time);
+    double duration_ms                   = ::TestUtil::millisecondsSince(start_tick_time);
     LOG(WARNING) << "max tick duration: " << duration_ms << "ms" << std::endl;
 
     for (Point p : rasterized_points)
     {
         bool result = contains(rectangle, p);
-        //TODO: remove this if statement
+        // TODO: remove this if statement
         if (!result)
         {
             std::cout << "FAILED: " << p << "\n";

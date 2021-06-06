@@ -78,11 +78,12 @@ class ThetaStarPathPlanner : public PathPlanner
 
 
 
-//        std::ostream &operator<<(std::ostream &os, const Coordinate &p) // TODO REMOVE, ADDED FOR TESTING
-//        {
-//            os << "(" << p.row() << ", " << p.col() << ")";
-//            return os;
-//        }
+        //        std::ostream &operator<<(std::ostream &os, const Coordinate &p) // TODO
+        //        REMOVE, ADDED FOR TESTING
+        //        {
+        //            os << "(" << p.row() << ", " << p.col() << ")";
+        //            return os;
+        //        }
 
        private:
         /**
