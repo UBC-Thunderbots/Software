@@ -48,14 +48,14 @@ void io_proto_multicast_senderTask(void* communication_profile)
     // communication profile to join the specified multicast group.
     //
     // We use IP6_ADDR_ANY which will default to the ethernet interface on the STM32H7
-    struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
+    struct netconn* conn = netconn_new(NETCONN_UDP);
 
-    netconn_bind(conn, IP6_ADDR_ANY,
+    netconn_bind(conn, IP_ADDR_ANY,
                  io_proto_multicast_communication_profile_getPort(profile));
 
     netconn_join_leave_group(conn,
                              io_proto_multicast_communication_profile_getAddress(profile),
-                             IP6_ADDR_ANY, NETCONN_JOIN);
+                             IP_ADDR_ANY, NETCONN_JOIN);
 
     // this buffer is used to hold serialized proto
     uint8_t buffer[io_proto_multicast_communication_profile_getMaxProtoSize(profile)];
