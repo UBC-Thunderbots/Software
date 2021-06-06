@@ -134,11 +134,11 @@ std::vector<Point> rasterize(const Polygon& polygon, const double resolution_siz
     const auto& polygon_vertices = polygon.getPoints();
 
     // TODO: remove later after debugging
-    //    std::cout << "Polygon vertices\n";
-    //    for (auto p = polygon_vertices.begin(); p != polygon_vertices.end();
-    //         ++p)  // TODO Remove, added for testing
-    //        std::cout << *p << ", ";
-    //    std::cout << std::endl;
+       // std::cout << "Polygon vertices\n";
+       // for (auto p = polygon_vertices.begin(); p != polygon_vertices.end();
+       //      ++p)  // TODO Remove, added for testing
+       //     std::cout << *p << ", ";
+       // std::cout << std::endl;
 
     auto max_point_y = [](const Point& a, const Point& b) { return a.y() < b.y(); };
 
@@ -174,37 +174,42 @@ std::vector<Point> rasterize(const Polygon& polygon, const double resolution_siz
 
         while (intersection_index < num_of_intersections)
         {
+            Point intersection_point = sorted_intersections_with_polygon[intersection_index];
             Point point = Point(x_coord, y_coord);
-            bool isCloseToIntersectionPoint =
-                point.x() >= sorted_intersections_with_polygon[intersection_index].x();
-
-            if (isCloseToIntersectionPoint && !isAVertex(point, polygon, resolution_size))
+            if (!in_polygon)
             {
-                in_polygon = !in_polygon;
-                intersection_index++;
+                x_coord = min_x + resolution_size * std::ceil((intersection_point.x() - min_x) / resolution_size);
+                point = Point(x_coord, y_coord);
+                if (!isAVertex(point, polygon, resolution_size))
+                {
+                    contained_points.emplace_back(point);
+                    in_polygon = true;
+                }
+                intersection_index += 1;
             }
-            else if (isCloseToIntersectionPoint)
-            {
-                intersection_index++;
-            }
-
-            if (in_polygon)
-            {
-                contained_points.emplace_back(point);
-            }
-
-            if (point.x() < sorted_intersections_with_polygon[intersection_index].x())
+            else
             {
                 x_coord += resolution_size;
+                point = Point(x_coord, y_coord);
+                if (x_coord < intersection_point.x())
+                {
+                    contained_points.emplace_back(point);
+                }
+                else
+                {
+                    in_polygon = false;
+                    intersection_index += 1;
+                }
             }
+
         }
     }
 
     // TODO: remove
-    //    for (auto p = contained_points.begin(); p != contained_points.end();
-    //         ++p)  // TODO Remove, added for testing
-    //        std::cout << *p << ", ";
-    //    std::cout << std::endl;
+       // for (auto p = contained_points.begin(); p != contained_points.end();
+       //      ++p)  // TODO Remove, added for testing
+       //     std::cout << *p << ", ";
+       // std::cout << std::endl;
 
     return contained_points;
 }
