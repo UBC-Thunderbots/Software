@@ -12,11 +12,15 @@
  * @param [in] front_right_drive_unit
  * @param [in] back_left_drive_unit
  * @param [in] back_right_drive_unit
+ * @param [in] drivetrain_reset 
+ * @param [in] drivetrain_mode
  */
 void io_drivetrain_init(DrivetrainUnit_t* front_left_drive_unit,
-                        DrivetrainUnit_t* front_right_drive_unit,
-                        DrivetrainUnit_t* back_left_drive_unit,
-                        DrivetrainUnit_t* back_right_drive_unit);
+        DrivetrainUnit_t* front_right_drive_unit,
+        DrivetrainUnit_t* back_left_drive_unit,
+        DrivetrainUnit_t* back_right_drive_unit,
+        GpioPin_t* drivetrain_reset,
+        GpioPin_t* drivetrain_mode);
 
 /**
  * Apply force to a wheel in the drivetrain

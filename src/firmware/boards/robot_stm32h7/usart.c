@@ -138,25 +138,17 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     /* UART4 clock enable */
     __HAL_RCC_UART4_CLK_ENABLE();
 
-    __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOD_CLK_ENABLE();
     /**UART4 GPIO Configuration
-    PA0     ------> UART4_TX
     PD0     ------> UART4_RX
+    PD1     ------> UART4_TX
     */
-    GPIO_InitStruct.Pin = WIFI_TX_Pin;
+    GPIO_InitStruct.Pin = WIFI_RX_Pin|WIFI_TX_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF8_UART4;
-    HAL_GPIO_Init(WIFI_TX_GPIO_Port, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = WIFI_RX_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF8_UART4;
-    HAL_GPIO_Init(WIFI_RX_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
     /* UART4 DMA Init */
     /* UART4_RX Init */
@@ -235,12 +227,10 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
     __HAL_RCC_UART4_CLK_DISABLE();
 
     /**UART4 GPIO Configuration
-    PA0     ------> UART4_TX
     PD0     ------> UART4_RX
+    PD1     ------> UART4_TX
     */
-    HAL_GPIO_DeInit(WIFI_TX_GPIO_Port, WIFI_TX_Pin);
-
-    HAL_GPIO_DeInit(WIFI_RX_GPIO_Port, WIFI_RX_Pin);
+    HAL_GPIO_DeInit(GPIOD, WIFI_RX_Pin|WIFI_TX_Pin);
 
     /* UART4 DMA DeInit */
     HAL_DMA_DeInit(uartHandle->hdmarx);

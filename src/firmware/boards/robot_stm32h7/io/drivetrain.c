@@ -7,6 +7,8 @@ static DrivetrainUnit_t *_front_left_drive_unit;
 static DrivetrainUnit_t *_front_right_drive_unit;
 static DrivetrainUnit_t *_back_left_drive_unit;
 static DrivetrainUnit_t *_back_right_drive_unit;
+static GpioPin_t *_drivetrain_mode;
+static GpioPin_t *_drivetrain_reset;
 
 // We want to make sure that the static pointers to the drivetrain units
 // are initialized before using them to prevent accessing invalid memory.
@@ -15,12 +17,19 @@ static bool initialized = false;
 void io_drivetrain_init(DrivetrainUnit_t *front_left_drive_unit,
                         DrivetrainUnit_t *front_right_drive_unit,
                         DrivetrainUnit_t *back_left_drive_unit,
-                        DrivetrainUnit_t *back_right_drive_unit)
+                        DrivetrainUnit_t *back_right_drive_unit,
+                        GpioPin_t* drivetrain_reset,
+                        GpioPin_t* drivetrain_mode)
 {
     _front_left_drive_unit  = front_left_drive_unit;
     _front_right_drive_unit = front_right_drive_unit;
     _back_left_drive_unit   = back_left_drive_unit;
     _back_right_drive_unit  = back_right_drive_unit;
+    _drivetrain_mode = drivetrain_mode;
+    _drivetrain_reset = drivetrain_reset;
+
+    io_gpio_pin_setActive(_drivetrain_reset);
+    io_gpio_pin_setActive(_drivetrain_mode);
 
     initialized = true;
 }

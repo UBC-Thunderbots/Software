@@ -119,10 +119,12 @@ cc_library(
     name = "tim",
     srcs = [
         "tim.c",
+        "hrtim.c"
     ],
     hdrs = [
         "main.h",
         "tim.h",
+        "hrtim.h",
     ],
     copts = [
         # We don't want to mark warnings as errors for 3rd party code
@@ -358,6 +360,7 @@ cc_library(
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_eth_ex.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.c",
+        "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hrtim.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_gpio.c",
@@ -406,6 +409,7 @@ cc_library(
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma_ex.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_eth_ex.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_exti.h",
+        "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_hrtim.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash_ex.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio.h",

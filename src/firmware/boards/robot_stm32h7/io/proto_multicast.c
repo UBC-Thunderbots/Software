@@ -150,6 +150,7 @@ void io_proto_multicast_listenerTask(void* communication_profile)
                 break;
             }
         }
+        netbuf_delete(rx_buf);
     }
 
     // we should never get here

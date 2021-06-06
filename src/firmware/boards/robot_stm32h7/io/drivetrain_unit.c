@@ -43,5 +43,5 @@ void io_drivetrain_unit_applyForce(DrivetrainUnit_t* drive_train_unit,
 
 void io_drivetrain_unit_coast(DrivetrainUnit_t* drive_train_unit)
 {
-    io_allegro_a3931_motor_disable(drive_train_unit->motor_driver);
+    // TODO not implementated
 }

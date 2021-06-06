@@ -53,7 +53,7 @@
 /* #define HAL_SRAM_MODULE_ENABLED   */
 /* #define HAL_SDRAM_MODULE_ENABLED   */
 /* #define HAL_HASH_MODULE_ENABLED   */
-/* #define HAL_HRTIM_MODULE_ENABLED   */
+#define HAL_HRTIM_MODULE_ENABLED
 /* #define HAL_HSEM_MODULE_ENABLED   */
 /* #define HAL_GFXMMU_MODULE_ENABLED   */
 /* #define HAL_JPEG_MODULE_ENABLED   */
@@ -61,7 +61,7 @@
 /* #define HAL_OSPI_MODULE_ENABLED   */
 /* #define HAL_OSPI_MODULE_ENABLED   */
 /* #define HAL_I2S_MODULE_ENABLED   */
-/* #define HAL_SMBUS_MODULE_ENABLED   */
+#define HAL_SMBUS_MODULE_ENABLED
 /* #define HAL_IWDG_MODULE_ENABLED   */
 /* #define HAL_LPTIM_MODULE_ENABLED   */
 /* #define HAL_LTDC_MODULE_ENABLED   */
@@ -106,7 +106,7 @@
   *        (when HSE is used as system clock source, directly or through the PLL).
   */
 #if !defined  (HSE_VALUE)
-#define HSE_VALUE    (25000000UL) /*!< Value of the External oscillator in Hz : FPGA case fixed to 60MHZ */
+#define HSE_VALUE    (16000000UL) /*!< Value of the External oscillator in Hz : FPGA case fixed to 60MHZ */
 #endif /* HSE_VALUE */
 
 #if !defined  (HSE_STARTUP_TIMEOUT)

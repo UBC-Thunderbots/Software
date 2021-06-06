@@ -24,15 +24,11 @@ typedef struct AllegroA3931MotorDriver AllegroA3931MotorDriver_t;
  * @param pwm_pin The PWM pin to the driver. Note that this must be configured to
  *                operate in the correct frequency range for the motor driver. Please
  *                talk to Elec. to determine this.
- * @param reset_pin A GPIO pin connected to the "reset" pin on the motor driver.
- * @param mode_pin A GPIO pin connected to the "mode" pin on the motor driver.
  * @param direction_pin A GPIO pin connected to the "direction" pin on the motor driver.
  *
  * @return A motor driver with the pwm percentage set to zero.
  */
 AllegroA3931MotorDriver_t* io_allegro_a3931_motor_driver_create(PwmPin_t* pwm_pin,
-                                                                GpioPin_t* reset_pin,
-                                                                GpioPin_t* mode_pin,
                                                                 GpioPin_t* direction_pin);
 
 /**
@@ -65,10 +61,3 @@ void io_allegro_a3931_motor_driver_setDirection(
  */
 void io_allegro_a3931_motor_setPwmPercentage(AllegroA3931MotorDriver_t* motor_driver,
                                              float pwm_percentage);
-
-/**
- * Disable the motor driver, allows the motors to spin freely
- *
- * @param motor_driver
- */
-void io_allegro_a3931_motor_disable(AllegroA3931MotorDriver_t* motor_driver);
