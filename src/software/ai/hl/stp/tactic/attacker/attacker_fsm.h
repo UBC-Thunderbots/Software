@@ -104,6 +104,7 @@ struct AttackerFSM
                                             best_pass_so_far.value(), event.common.world);
 
                 const auto& enemy_team = event.common.world.enemyTeam();
+                const auto& ball       = event.common.world.ball();
 
                 auto final_dribble_orientation = best_pass_so_far->passerOrientation();
 
@@ -113,9 +114,8 @@ struct AttackerFSM
                     auto nearest_enemy_robot =
                         *enemy_team.getNearestRobot(event.common.robot.position());
                     auto dribble_orientation_vec =
-                        nearest_enemy_robot.position() - event.common.robot.position();
-                    final_dribble_orientation = Angle::fromRadians(std::atan2(
-                        dribble_orientation_vec.y(), dribble_orientation_vec.x()));
+                        ball.position() - nearest_enemy_robot.position();
+                    final_dribble_orientation = dribble_orientation_vec.orientation();
                 }
 
                 control_params = {.dribble_destination       = keepaway_dribble_dest,
