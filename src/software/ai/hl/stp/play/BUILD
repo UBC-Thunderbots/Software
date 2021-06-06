@@ -397,6 +397,8 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:enemy_free_kick_play",
         "//software/simulated_tests:simulated_play_test_fixture",
+        "//software/simulated_tests/non_terminating_validation_functions",
+        "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
