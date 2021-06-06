@@ -5,10 +5,8 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/passing/cost_function.h"
-#include "software/geom/algorithms/contains.h"
+#include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
-#include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
-#include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
@@ -43,6 +41,15 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_keep_away)
     setTactic(tactic);
     setRobotId(1);
 
+    // we use default parameters for testing ratePassEnemyRisk because that's (partially)
+    // what the play uses to determine pass/no pass. Keep away state should try to
+    // push the best pass in the play above the threshold to commit to passing.
+    auto passing_config = std::make_shared<PassingConfig>();
+    auto enemy_reaction_time =
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
+    auto enemy_proximity_importance =
+        passing_config->getEnemyProximityImportance()->value();
+
     // we have to create a Team for the enemy here to evaluate the initial enemy risk
     // score
     std::vector<Robot> enemy_team_robots;
@@ -54,60 +61,111 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_keep_away)
                    });
     Team enemy_team(enemy_team_robots);
 
-    // constants copypasted from software/ai/evaluation/keep_away.cpp for now
-    // TODO: cleanup passing parameters as part of #1987
-    static constexpr double ENEMY_PROXIMITY_IMPORTANCE = 0.5;
-    static const auto ENEMY_REACTION_TIME              = Duration::fromSeconds(0.4);
+    static const auto CHECK_SCORE_INTERVAL = Duration::fromSeconds(0.5);
+    static constexpr double RATING_DROP_TEST_FAIL_THRESHOLD = 0.2;
+    
+    std::vector<ValidationFunction> non_terminating_validation_functions = {
+        // test the proximity risk every CHECK_SCORE_INTERVAL time and make sure 
+        // it doesn't get substantially worse compared to the last check
+        // and that it is an improvement compared to the starting state
+        [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            // this value is copypasted from software/ai/evaluation/keep_away.cpp
+            static constexpr double PASSER_ENEMY_PROXIMITY_IMPORTANCE = 1.5;
 
-    auto initial_enemy_risk_score = ratePassEnemyRisk(
-        enemy_team, pass, ENEMY_REACTION_TIME, ENEMY_PROXIMITY_IMPORTANCE);
-    (void)initial_enemy_risk_score;
+            auto last_timestamp        = world_ptr->getMostRecentTimestamp();
+            auto initial_enemy_proximity_risk = calculateProximityRisk(world_ptr->ball().position(),
+            world_ptr->enemyTeam(), PASSER_ENEMY_PROXIMITY_IMPORTANCE);
+            auto last_enemy_proximity_risk = initial_enemy_proximity_risk;
 
-    std::vector<ValidationFunction> terminating_validation_functions = {
-        [initial_enemy_risk_score, pass](std::shared_ptr<World> world_ptr,
-                                         ValidationCoroutine::push_type& yield) {
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(1))
+            // test runs for #iterations * CHECK_SCORE_INTERVAL seconds
+            for (int i = 0; i < 4; i++)
             {
-                yield("Timestamp not at 1s");
-            }
+                // only check the enemy risk score every 0.5s to mitigate the "noise"
+                // inherent in the ratePass______ functions
+                while (world_ptr->getMostRecentTimestamp() - last_timestamp <
+                       CHECK_SCORE_INTERVAL)
+                {
+                    yield("");
+                }
+                last_timestamp = world_ptr->getMostRecentTimestamp();
 
-            while (ratePassEnemyRisk(world_ptr->enemyTeam(), pass, ENEMY_REACTION_TIME,
-                                     ENEMY_PROXIMITY_IMPORTANCE) <
-                   initial_enemy_risk_score)
-            {
-                yield("ratePassEnemyRisk score not improved!");
+                auto current_enemy_proximity_risk = calculateProximityRisk(
+                    world_ptr->ball().position(), world_ptr->enemyTeam(),
+                    PASSER_ENEMY_PROXIMITY_IMPORTANCE);
+                // lower is better for enemy proximity risk, make sure it didn't get
+                // substantially worse
+                if (current_enemy_proximity_risk - last_enemy_proximity_risk >
+                    RATING_DROP_TEST_FAIL_THRESHOLD)
+                {
+                    yield("enemy proximity risk got worse! went from" +
+                          std::to_string(last_enemy_proximity_risk) + " to " +
+                          std::to_string(current_enemy_proximity_risk));
+                }
+                // make sure we improved over the initial proximity risk score
+                if (current_enemy_proximity_risk >= initial_enemy_proximity_risk)
+                {
+                    yield("calculateProximityRisk didn't improve over initial! went from " +
+                        std::to_string(initial_enemy_proximity_risk) + " to "
+                        + std::to_string(current_enemy_proximity_risk));
+                }
+                last_enemy_proximity_risk = current_enemy_proximity_risk;
             }
+        },
+        // test the ratePassEnemyRisk every CHECK_SCORE_INTERVAL time and make sure 
+        // it doesn't get substantially worse compared to the last check
+        // and that it is an improvement compared to the starting state
+        [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            auto last_timestamp        = world_ptr->getMostRecentTimestamp();
+            auto initial_enemy_risk_score = ratePassEnemyRisk(
+                enemy_team, pass, enemy_reaction_time, enemy_proximity_importance);
+            auto last_enemy_risk_score = initial_enemy_risk_score;
 
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
+            // test runs for #iterations * CHECK_SCORE_INTERVAL seconds
+            for (int i = 0; i < 4; i++)
             {
-                yield("Timestamp not at 2s");
-            }
+                // only check the enemy risk score every 0.5s to mitigate the "noise"
+                // inherent in the ratePass______ functions
+                while (world_ptr->getMostRecentTimestamp() - last_timestamp <
+                       CHECK_SCORE_INTERVAL)
+                {
+                    yield("");
+                }
+                last_timestamp = world_ptr->getMostRecentTimestamp();
 
-            while (ratePassEnemyRisk(world_ptr->enemyTeam(), pass, ENEMY_REACTION_TIME,
-                                     ENEMY_PROXIMITY_IMPORTANCE) <
-                   initial_enemy_risk_score)
-            {
-                yield("ratePassEnemyRisk score not improved!");
-            }
+                // update the pass to reflect the new passer point, now that 
+                // the ball has (probably) moved
+                Pass new_pass(world_ptr->ball().position(), pass.receiverPoint(),
+                              pass.speed());
 
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(3))
-            {
-                yield("Timestamp not at 3s");
-            }
+                auto current_enemy_risk_score =
+                    ratePassEnemyRisk(enemy_team, new_pass, enemy_reaction_time,
+                                      enemy_proximity_importance);
+                // higher is better for ratePassEnemyRisk, make sure it didn't get
+                // substantially worse than the last time we checked
+                if (last_enemy_risk_score - current_enemy_risk_score >
+                    RATING_DROP_TEST_FAIL_THRESHOLD)
+                {
+                    yield("ratePassEnemyRisk got worse! went from " +
+                          std::to_string(last_enemy_risk_score) + " to " +
+                          std::to_string(current_enemy_risk_score));
+                }
+                // make sure we improved over the initial enemy risk score
+                if (current_enemy_risk_score <= initial_enemy_risk_score)
+                {
+                    yield("ratePassEnemyRisk didn't improve over initial! went from " +
+                        std::to_string(initial_enemy_risk_score) + " to "
+                        + std::to_string(current_enemy_risk_score));
+                }
 
-            while (ratePassEnemyRisk(world_ptr->enemyTeam(), pass, ENEMY_REACTION_TIME,
-                                     ENEMY_PROXIMITY_IMPORTANCE) <
-                   initial_enemy_risk_score)
-            {
-                yield("ratePassEnemyRisk score not improved!");
+                last_enemy_risk_score = current_enemy_risk_score;
             }
+        },
+        [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
 
-    std::vector<ValidationFunction> non_terminating_validation_functions = {};
-
-    runTest(field, ball_state, friendly_robots, enemy_robots,
-            terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(4));
+    runTest(field, ball_state, friendly_robots, enemy_robots, {},
+            non_terminating_validation_functions, Duration::fromSeconds(2));
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -144,7 +202,18 @@ INSTANTIATE_TEST_CASE_P(
             RobotStateWithId{1, RobotState(Point(0.25, 0), Vector(0, 0),
                                            Angle::fromDegrees(0), Angle::fromDegrees(0))},
             // the state of the ball
-            BallState(Point(0., 0.), Vector(0, 0)),
+            BallState(Point(0., 0.25), Vector(0, 0)),
             // the states of the enemy robots
             TestUtil::createStationaryRobotStatesWithId({Point(-0.5, 0.5),
-                                                         Point(-0.5, 0)}))));
+                                                         Point(-0.5, 0)})),
+        std::make_tuple(
+            // the best pass so far to pass into the AttackerTactic
+            Pass(Point(0.0, 0.0), Point(-3, 2.5), 5),
+            // the state of the friendly robot
+            RobotStateWithId{1, RobotState(Point(-3, 0), Vector(0, 0),
+                                           Angle::fromDegrees(0), Angle::fromDegrees(0))},
+            // the state of the ball
+            BallState(Point(-3, 0), Vector(0, 0)),
+            // the states of the enemy robots
+            TestUtil::createStationaryRobotStatesWithId({Point(-3, 1), Point(-2.75, 1),
+                                                         Point(-3.25, 1)}))));

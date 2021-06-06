@@ -120,7 +120,7 @@ struct AttackerFSM
 
                 control_params = {.dribble_destination       = keepaway_dribble_dest,
                                   .final_dribble_orientation = final_dribble_orientation,
-                                  .allow_excessive_dribbling = true};
+                                  .allow_excessive_dribbling = false};
             }
             else
             {
