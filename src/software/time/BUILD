@@ -35,7 +35,7 @@ cc_test(
     srcs = ["duration_test.cpp"],
     deps = [
         ":duration",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -44,6 +44,6 @@ cc_test(
     srcs = ["timestamp_test.cpp"],
     deps = [
         ":timestamp",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )

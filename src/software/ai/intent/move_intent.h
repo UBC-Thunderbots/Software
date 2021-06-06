@@ -18,6 +18,7 @@ class MoveIntent : public NavigatingIntent
      * @param auto_chip_or_kick The command to autochip or autokick
      * @param max_allowed_speed_mode The mode of maximum speed allowed
      * @param target_spin_rev_per_s The target spin while moving in revolutions per second
+     * @param robot_constants The robot constants
      */
     explicit MoveIntent(unsigned int robot_id, const Point& destination,
                         const Angle& final_angle, double final_speed,
@@ -25,7 +26,8 @@ class MoveIntent : public NavigatingIntent
                         const BallCollisionType& ball_collision_type,
                         const AutoChipOrKick& auto_chip_or_kick,
                         const MaxAllowedSpeedMode& max_allowed_speed_mode,
-                        double target_spin_rev_per_s);
+                        double target_spin_rev_per_s,
+                        const RobotConstants_t& robot_constants);
 
     MoveIntent() = delete;
 

@@ -7,6 +7,7 @@ cc_library(
     srcs = ["primitive_msg_factory.cpp"],
     hdrs = ["primitive_msg_factory.h"],
     deps = [
+        "//shared:robot_constants",
         "//shared/proto:tbots_cc_proto",
         "//software/geom:angle",
         "//software/geom:angular_velocity",
@@ -21,6 +22,6 @@ cc_test(
     srcs = ["primitive_msg_factory_test.cpp"],
     deps = [
         ":primitive_msg_factory",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )

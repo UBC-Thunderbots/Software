@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <experimental/filesystem>
 
+#include "shared/2015_robot_constants.h"
 #include "software/logger/logger.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
 #include "software/test_util/test_util.h"
@@ -19,13 +20,10 @@ SimulatedTestFixture::SimulatedTestFixture()
 
 void SimulatedTestFixture::SetUp()
 {
-    LoggerSingleton::initializeLogger(
-        thunderbots_config->getStandaloneSimulatorMainCommandLineArgs()
-            ->getLoggingDir()
-            ->value());
+    LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
 
     mutable_thunderbots_config->getMutableAiControlConfig()->getMutableRunAi()->setValue(
-        !SimulatedTestFixture::stop_ai_on_start);
+        !TbotsGtestMain::stop_ai_on_start);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always the yellow team
@@ -56,7 +54,7 @@ void SimulatedTestFixture::SetUp()
     mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableFriendlyColorYellow()
         ->setValue(true);
-    if (SimulatedTestFixture::enable_visualizer)
+    if (TbotsGtestMain::enable_visualizer)
     {
         enableVisualizer();
     }
@@ -178,8 +176,9 @@ void SimulatedTestFixture::runTest(
     const std::vector<ValidationFunction> &non_terminating_validation_functions,
     const Duration &timeout)
 {
-    std::shared_ptr<Simulator> simulator(
-        std::make_shared<Simulator>(field, thunderbots_config->getSimulatorConfig()));
+    std::shared_ptr<Simulator> simulator(std::make_shared<Simulator>(
+        field, create2015RobotConstants(), create2015WheelConstants(),
+        thunderbots_config->getSimulatorConfig()));
     simulator->setBallState(ball);
     simulator->addYellowRobots(friendly_robots);
     simulator->addBlueRobots(enemy_robots);

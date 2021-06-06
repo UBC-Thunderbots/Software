@@ -9,8 +9,21 @@
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/intersection.h"
 
-struct PenaltyKickTacticFSM
+struct PenaltyKickFSM
 {
+    /**
+     * Constructor for DribbleFSM
+     *
+     * @param complete_approach pointer to complete approach timestamp
+     * @param robot_shoot_position position to shoot
+     * @param shot_angle angle to shoot at
+     */
+    explicit PenaltyKickFSM(std::optional<Timestamp> complete_approach,
+                            Point robot_shoot_position, Angle shot_angle)
+        : complete_approach(complete_approach), shot_angle(shot_angle)
+    {
+    }
+
     struct ControlParams
     {
     };
@@ -37,8 +50,7 @@ struct PenaltyKickTacticFSM
 
         // don't try to shoot if we're far from the net or we're in the middle of an
         // autokick
-        if (robot.position().x() < min_shot_x_position ||
-            !robot.isNearDribbler(ball_position))
+        if (robot.position().x() < min_shot_x_position)
         {
             return false;
         }
@@ -163,14 +175,10 @@ struct PenaltyKickTacticFSM
 
         const auto update_e = event<Update>;
 
-        static std::optional<Timestamp> complete_approach;
-        static Point robot_shoot_position;
-        static Angle shot_angle;
-
         /**
          * Action that causes the shooter to shoot the ball.
          *
-         * @param event          PenaltyKickTacticFSM::Update event
+         * @param event          PenaltyKickFSM::Update event
          * @param processEvent   processes the KickFSM::Update
          */
         const auto shoot = [this](auto event,
@@ -185,7 +193,7 @@ struct PenaltyKickTacticFSM
         /**
          * Action that updates the shooter's approach to the opposition net.
          *
-         * @param event          PenaltyKickTacticFSM::Update event
+         * @param event          PenaltyKickFSM::Update event
          * @param processEvent   processes the DribbleFSM::Update
          */
         const auto update_approach_keeper =
@@ -200,27 +208,17 @@ struct PenaltyKickTacticFSM
                 Point position =
                     field.enemyGoalCenter() + Vector(-field.defenseAreaXLength(), 0);
 
-                // our "shoot position" is slightly further ahead of the current position
-                // so that we don't accidentally
-                //  move backward when we set up to shoot
-                // The vector value ahead of the current position was found using the
-                // simulator
-                robot_shoot_position = event.common.robot.position() + Vector(0.2, 0);
-
                 DribbleFSM::ControlParams control_params{
                     .dribble_destination       = std::optional<Point>(position),
-                    .final_dribble_orientation = std::optional<Angle>(shot_angle),
-
-                    // TODO: change .allow_excessive_dribbling back to false once #2087
-                    // goes in
-                    .allow_excessive_dribbling = true};
+                    .final_dribble_orientation = std::optional<Angle>(Angle::zero()),
+                    .allow_excessive_dribbling = false};
                 processEvent(DribbleFSM::Update(control_params, event.common));
             };
 
         /**
          * Action that orients the shooter to prepare for a shot.
          *
-         * @param event          PenaltyKickTacticFSM::Update
+         * @param event          PenaltyKickFSM::Update
          * @param processEvent   processes the DribbleFSM::Update
          */
         const auto adjust_orientation_for_shot =
@@ -229,12 +227,12 @@ struct PenaltyKickTacticFSM
                     event.common.world.enemyTeam().goalie();
                 const Point next_shot_position =
                     evaluateNextShotPosition(enemy_goalie, event.common.world.field());
-                Point final_position = robot_shoot_position;
+                Point final_position = event.common.world.ball().position();
                 shot_angle = (next_shot_position - final_position).orientation();
                 DribbleFSM::ControlParams control_params{
                     .dribble_destination       = std::optional<Point>(final_position),
                     .final_dribble_orientation = std::optional<Angle>(shot_angle),
-                    .allow_excessive_dribbling = true};
+                    .allow_excessive_dribbling = false};
                 processEvent(DribbleFSM::Update(control_params, event.common));
             };
 
@@ -244,7 +242,7 @@ struct PenaltyKickTacticFSM
          *
          * Requires complete approach to already be set.
          *
-         * @param event  PenaltyKickTacticFSM::Update
+         * @param event  PenaltyKickFSM::Update
          */
         const auto take_penalty_shot = [this](auto event) {
             Field field = event.common.world.field();
@@ -259,16 +257,16 @@ struct PenaltyKickTacticFSM
                     PENALTY_FINISH_APPROACH_TIMEOUT;
                 complete_approach =
                     std::optional<Timestamp>(future_approach_complete_time);
-                robot_shoot_position = field.friendlyGoalCenter();
             }
             std::optional<Robot> enemy_goalie = event.common.world.enemyTeam().goalie();
             Timestamp force_shoot_timestamp =
                 complete_approach.value() + PENALTY_FORCE_SHOOT_TIMEOUT;
-            bool shouldShoot =
-                evaluatePenaltyShot(enemy_goalie, field, robot_shoot_position,
+            bool should_shoot =
+                evaluatePenaltyShot(enemy_goalie, field,
+                                    event.common.world.ball().position(),
                                     event.common.robot) ||
                 (event.common.world.getMostRecentTimestamp() >= force_shoot_timestamp);
-            return shouldShoot;
+            return should_shoot;
         };
 
         /**
@@ -277,7 +275,7 @@ struct PenaltyKickTacticFSM
          *
          * Requires complete approach to already be set.
          *
-         * @param event PenaltyKickTacticFSM::Update
+         * @param event PenaltyKickFSM::Update
          */
         const auto time_out_approach = [this](auto event) {
             return event.common.world.getMostRecentTimestamp() > complete_approach;
@@ -292,7 +290,7 @@ struct PenaltyKickTacticFSM
     };
 
    private:
-    static constexpr double PENALTY_KICK_POST_OFFSET = 0.02;
+    static constexpr double PENALTY_KICK_POST_OFFSET = 0.03;
     static constexpr double PENALTY_KICK_SHOT_SPEED  = 5.0;
 
     // expected maximum acceleration of the opposition goalie robot
@@ -310,4 +308,8 @@ struct PenaltyKickTacticFSM
     static const inline Duration PENALTY_FORCE_SHOOT_TIMEOUT = Duration::fromSeconds(4);
     static const inline Duration PENALTY_FINISH_APPROACH_TIMEOUT =
         Duration::fromSeconds(4);
+
+   private:
+    std::optional<Timestamp> complete_approach;
+    Angle shot_angle;
 };

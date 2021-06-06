@@ -28,9 +28,9 @@ cc_test(
     deps = [
         ":terminating_function_validator",
         ":validation_function",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -52,8 +52,8 @@ cc_test(
     deps = [
         ":non_terminating_function_validator",
         ":validation_function",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )

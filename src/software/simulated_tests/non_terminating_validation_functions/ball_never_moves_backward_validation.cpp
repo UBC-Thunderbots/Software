@@ -12,5 +12,6 @@ void ballNeverMovesBackward(std::shared_ptr<World> world_ptr,
         previous_x_pos = world_ptr->ball().position().x();
         yield("");
     }
-    yield("Ball has moved backward");
+    yield("Ball has moved backward by " +
+          std::to_string(world_ptr->ball().position().x() - previous_x_pos));
 }

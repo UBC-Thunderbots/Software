@@ -11,7 +11,7 @@ cc_test(
     srcs = ["charger_test.cpp"],
     deps = [
         ":charger",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -26,7 +26,7 @@ cc_test(
     srcs = ["chicker_test.cpp"],
     deps = [
         ":chicker",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -41,7 +41,7 @@ cc_test(
     srcs = ["dribbler_test.cpp"],
     deps = [
         ":dribbler",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -56,7 +56,7 @@ cc_test(
     srcs = ["firmware_ball_test.cpp"],
     deps = [
         ":firmware_ball",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -75,6 +75,7 @@ cc_library(
         "//firmware/app/control:trajectory_planner",
         "//firmware/shared:physics",
         "//firmware/shared:util",
+        "//shared:constants",
         "//shared/proto:tbots_nanopb_proto",
     ],
 )
@@ -86,8 +87,8 @@ cc_test(
         ":firmware_robot",
         "//firmware/app/logger",
         "//shared/test_util",
+        "//shared/test_util:tbots_gtest_main",
         "//software/logger",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -106,7 +107,7 @@ cc_test(
     srcs = ["firmware_world_test.cpp"],
     deps = [
         ":firmware_world",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -114,12 +115,14 @@ cc_library(
     name = "force_wheel",
     srcs = ["force_wheel.c"],
     hdrs = ["force_wheel.h"],
+    deps = ["//shared:robot_constants"],
 )
 
 cc_library(
     name = "velocity_wheel",
     srcs = ["velocity_wheel.c"],
     hdrs = ["velocity_wheel.h"],
+    deps = ["//shared:robot_constants"],
 )
 
 cc_test(
@@ -127,11 +130,6 @@ cc_test(
     srcs = ["force_wheel_test.cpp"],
     deps = [
         ":force_wheel",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
-)
-
-cc_library(
-    name = "firmware_robot_constants",
-    hdrs = ["firmware_robot_constants.h"],
 )

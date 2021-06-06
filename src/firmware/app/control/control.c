@@ -2,6 +2,7 @@
 
 #include "firmware/shared/physics.h"
 #include "firmware/shared/util.h"
+#include "shared/constants.h"
 
 /**
  * Computes a scaling constant that can be used to maximize wheel force while obeying
@@ -26,16 +27,16 @@ float app_control_getMaximalTorqueScaling(const ForceWheel_t* force_wheels[4],
 
     for (long i = 0; i < 4; i++)
     {
-        const ForceWheel_t* wheel             = force_wheels[i];
-        const ForceWheelConstants_t constants = app_force_wheel_getWheelConstants(wheel);
-        float force                           = wheel_forces[i];
-        float motor_torque =
-            force * constants.wheel_radius * constants.wheel_rotations_per_motor_rotation;
+        const ForceWheel_t* wheel        = force_wheels[i];
+        const WheelConstants_t constants = app_force_wheel_getWheelConstants(wheel);
+        float force                      = wheel_forces[i];
+        float motor_torque               = force * constants.wheel_radius_meters *
+                             constants.wheel_rotations_per_motor_rotation;
         float curr_motor_rpm = app_force_wheel_getMotorSpeedRPM(wheel);
 
-        float resistive_voltage_loss = motor_torque *
-                                       constants.motor_current_per_unit_torque *
-                                       constants.motor_phase_resistance;
+        float resistive_voltage_loss =
+            motor_torque * constants.motor_current_amp_per_torque_newton_meter *
+            constants.motor_phase_resistance_ohm;
         float back_emf          = curr_motor_rpm * constants.motor_back_emf_per_rpm;
         float effective_voltage = fabsf(resistive_voltage_loss + back_emf);
 
@@ -81,13 +82,15 @@ float app_control_getMaximalAccelScaling(const RobotConstants_t robot_constants,
     // first convert accelerations into consistent units
     // choose units of Force (N)
     float normed_force[3];
-    normed_force[0] = linear_accel_x * robot_constants.mass;
-    normed_force[1] = linear_accel_y * robot_constants.mass;
-    normed_force[2] =
-        angular_accel * robot_constants.moment_of_inertia / robot_constants.robot_radius;
+    normed_force[0] = linear_accel_x * robot_constants.mass_kg;
+    normed_force[1] = linear_accel_y * robot_constants.mass_kg;
+    normed_force[2] = angular_accel * robot_constants.moment_of_inertia_kg_m_2 /
+                      (float)ROBOT_MAX_RADIUS_METERS;
 
     float wheel_forces[4];
-    force3_to_force4(normed_force, wheel_forces);
+    shared_physics_force3ToForce4(normed_force, wheel_forces,
+                                  robot_constants.front_wheel_angle_deg,
+                                  robot_constants.back_wheel_angle_deg);
 
     return app_control_getMaximalTorqueScaling(force_wheels, wheel_forces,
                                                battery_voltage);
@@ -127,10 +130,11 @@ void app_control_applyAccel(RobotConstants_t robot_constants,
     float linear_diff_y = linear_accel_y - prev_linear_accel_y;
     float angular_diff  = angular_accel - prev_angular_accel;
 
-    const float jerk_limit                       = robot_constants.jerk_limit;
-    const float linear_acceleration_change_limit = robot_constants.jerk_limit * TICK_TIME;
+    const float jerk_limit_kg_m_per_s_3 = robot_constants.jerk_limit_kg_m_per_s_3;
+    const float linear_acceleration_change_limit =
+        robot_constants.jerk_limit_kg_m_per_s_3 * TICK_TIME;
     const float angular_acceleration_change_limit =
-        jerk_limit / ROBOT_RADIUS * TICK_TIME * 5.0f;
+        jerk_limit_kg_m_per_s_3 / (float)ROBOT_MAX_RADIUS_METERS * TICK_TIME * 5.0f;
     limit(&linear_diff_x, linear_acceleration_change_limit);
     limit(&linear_diff_y, linear_acceleration_change_limit);
     limit(&angular_diff, angular_acceleration_change_limit);
@@ -144,13 +148,16 @@ void app_control_applyAccel(RobotConstants_t robot_constants,
     controller_state->last_applied_acceleration_angular = angular_accel;
 
     float robot_force[3];
-    robot_force[0] = linear_accel_x * robot_constants.mass;
-    robot_force[1] = linear_accel_y * robot_constants.mass;
+    robot_force[0] = linear_accel_x * robot_constants.mass_kg;
+    robot_force[1] = linear_accel_y * robot_constants.mass_kg;
     // input is angular acceleration so mass * Radius * radians/second^2 gives newtons
-    robot_force[2] =
-        angular_accel * robot_constants.moment_of_inertia / robot_constants.robot_radius;
+    robot_force[2] = angular_accel * robot_constants.moment_of_inertia_kg_m_2 /
+                     (float)ROBOT_MAX_RADIUS_METERS;
     float wheel_force[4];
-    speed3_to_speed4(robot_force, wheel_force);  // Convert to wheel coordinate system
+    // Convert to wheel coordinate system
+    shared_physics_speed3ToSpeed4(robot_force, wheel_force,
+                                  robot_constants.front_wheel_angle_deg,
+                                  robot_constants.back_wheel_angle_deg);
 
     app_force_wheel_applyForce(force_wheels[0], wheel_force[0]);
     app_force_wheel_applyForce(force_wheels[3], wheel_force[3]);

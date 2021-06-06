@@ -44,9 +44,7 @@ TEST_P(SimulatedPenaltyKickTacticTest, penalty_kick_test)
             ballNeverMovesBackward(world_ptr, yield);
         },
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            // Uncomment following line when #2087
-            // (https://github.com/UBC-Thunderbots/Software/pull/2087) goes in
-            // robotNotExcessivelyDribbling(shooter_id, world_ptr, yield);
+            robotNotExcessivelyDribbling(shooter_id, world_ptr, yield);
         }};
 
     runTest(field, ball, {shooter}, {enemy_robot}, terminating_validation_functions,
@@ -71,9 +69,7 @@ TEST_F(SimulatedPenaltyKickTacticTest, penalty_no_goalie)
             ballNeverMovesBackward(world_ptr, yield);
         },
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            // Uncomment following line when #2087
-            // (https://github.com/UBC-Thunderbots/Software/pull/2087) goes in
-            // robotNotExcessivelyDribbling(shooter_id, world_ptr, yield);
+            robotNotExcessivelyDribbling(shooter_id, world_ptr, yield);
         }};
 
     runTest(field, ball, {shooter}, {}, terminating_validation_functions,

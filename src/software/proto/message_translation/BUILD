@@ -44,7 +44,7 @@ cc_test(
     visibility = ["//visibility:public"],
     deps = [
         "tbots_geometry",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -65,8 +65,8 @@ cc_test(
     srcs = ["ssl_geometry_test.cpp"],
     deps = [
         ":ssl_geometry",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -89,8 +89,8 @@ cc_test(
     srcs = ["ssl_detection_test.cpp"],
     deps = [
         ":ssl_detection",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -112,8 +112,8 @@ cc_test(
     srcs = ["ssl_wrapper_test.cpp"],
     deps = [
         ":ssl_wrapper",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -134,7 +134,7 @@ cc_test(
     srcs = ["ssl_referee_test.cpp"],
     deps = [
         ":ssl_referee",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -144,6 +144,8 @@ cc_library(
     hdrs = ["ssl_simulation_robot_control.h"],
     deps = [
         "//firmware/shared:physics",
+        "//shared:constants",
+        "//shared:robot_constants",
         "//software/proto:ssl_simulation_cc_proto",
     ],
 )
@@ -153,7 +155,7 @@ cc_test(
     srcs = ["ssl_simulation_robot_control_test.cpp"],
     deps = [
         ":ssl_simulation_robot_control",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -176,7 +178,7 @@ cc_test(
     srcs = ["primitive_google_to_nanopb_converter_test.cpp"],
     deps = [
         ":primitive_google_to_nanopb_converter",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -195,6 +197,6 @@ cc_test(
     srcs = ["defending_side_test.cpp"],
     deps = [
         ":defending_side",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )

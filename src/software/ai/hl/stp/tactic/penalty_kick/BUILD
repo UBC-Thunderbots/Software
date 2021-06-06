@@ -4,8 +4,8 @@ cc_library(
     name = "penalty_kick_tactic",
     srcs = ["penalty_kick_tactic.cpp"],
     hdrs = [
+        "penalty_kick_fsm.h",
         "penalty_kick_tactic.h",
-        "penalty_kick_tactic_fsm.h",
     ],
     deps = [
         "//shared:constants",
@@ -24,12 +24,12 @@ cc_library(
 )
 
 cc_test(
-    name = "penalty_kick_tactic_fsm_test",
-    srcs = ["penalty_kick_tactic_fsm_test.cpp"],
+    name = "penalty_kick_fsm_test",
+    srcs = ["penalty_kick_fsm_test.cpp"],
     deps = [
         ":penalty_kick_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -38,8 +38,8 @@ cc_test(
     srcs = ["simulated_penalty_kick_tactic_test.cpp"],
     deps = [
         ":penalty_kick_tactic",
+        "//shared/test_util:tbots_gtest_main",
         "//software/simulated_tests:simulated_tactic_test_fixture",
-        "//software/simulated_tests:simulated_test_main",
         "//software/simulated_tests/non_terminating_validation_functions",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",

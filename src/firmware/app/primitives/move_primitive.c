@@ -73,8 +73,10 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
     const float speed_at_dest_m_per_s   = prim_msg.final_speed_m_per_s;
     const float target_spin_rev_per_s   = prim_msg.target_spin_rev_per_s;
 
+    RobotConstants_t robot_constants = app_firmware_robot_getRobotConstants(robot);
+
     float max_speed_m_per_s = prim_msg.max_speed_m_per_s;
-    clamp(&max_speed_m_per_s, 0, (float)ROBOT_MAX_SPEED_METERS_PER_SECOND);
+    clamp(&max_speed_m_per_s, 0, robot_constants.robot_max_speed_m_per_s);
 
     const float current_x           = app_firmware_robot_getPositionX(robot);
     const float current_y           = app_firmware_robot_getPositionY(robot);
@@ -89,7 +91,7 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
         (int)(distance_to_destination / max_speed_m_per_s * target_spin_rev_per_s);
     // Change in orientation to reach destination orientation
     const float net_change_in_orientation =
-        min_angle_delta(current_orientation, destination_orientation);
+        shared_physics_minAngleDelta(current_orientation, destination_orientation);
 
     // Plan a trajectory to move to the target position/orientation
     FirmwareRobotPathParameters_t path_parameters = {
@@ -104,11 +106,11 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
         .t_end               = 1.0f,
         .num_elements        = 10,
         .max_allowable_linear_acceleration =
-            (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            robot_constants.robot_max_acceleration_m_per_s_2,
         .max_allowable_linear_speed = max_speed_m_per_s,
         .max_allowable_angular_acceleration =
-            (float)ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED,
-        .max_allowable_angular_speed = (float)ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            robot_constants.robot_max_ang_acceleration_rad_per_s_2,
+        .max_allowable_angular_speed = robot_constants.robot_max_ang_speed_rad_per_s,
         .initial_linear_speed        = current_speed,
         .final_linear_speed          = speed_at_dest_m_per_s};
     state->num_trajectory_elems = path_parameters.num_elements;

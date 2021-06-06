@@ -58,7 +58,7 @@ cc_test(
     srcs = ["infineon_TLE5009_E1000_angle_sensor_test.cpp"],
     deps = [
         "//firmware/boards/robot_stm32h7/io:infineon_TLE009_E1000_angle_sensor",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -169,7 +169,7 @@ cc_test(
     deps = [
         ":rapidcheck",
         "//firmware/boards/robot_stm32h7/io:ublox_odinw262_communicator_buffer_utils",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 

@@ -15,7 +15,8 @@ cc_test(
     srcs = ["pass_test.cpp"],
     deps = [
         ":pass",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ],
 )
 
@@ -48,8 +49,8 @@ cc_test(
         ":calc_best_shot",
         ":shot",
         "//shared:constants",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -72,8 +73,8 @@ cc_test(
     deps = [
         ":deflect_off_enemy_target",
         ":shot",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -95,10 +96,10 @@ cc_test(
     deps = [
         ":detect_threat",
         ":shot",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
         "//software/time:timestamp",
         "//software/world:ball",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -123,9 +124,9 @@ cc_test(
     srcs = ["enemy_threat_test.cpp"],
     deps = [
         ":enemy_threat",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
         "//software/world:ball",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -162,8 +163,8 @@ cc_test(
     srcs = ["intercept_test.cpp"],
     deps = [
         ":intercept",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -187,8 +188,8 @@ cc_test(
     deps = [
         ":possession",
         "//shared:constants",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 

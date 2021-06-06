@@ -3,6 +3,7 @@
 #include <functional>
 #include <memory>
 
+#include "software/logger/logger.h"
 #include "software/simulation/firmware_object_deleter.h"
 #include "software/simulation/simulator_ball.h"
 
@@ -101,10 +102,22 @@ class SimulatorBallSingleton
      * calling the given function. If the simulator_ball is invalid, a warning is logged
      * and a default value is returned.
      *
+     * @tparam RET_VAL the return value of the function to execute
      * @param func The function to perform on the simulator ball
      */
-    static float checkValidAndReturnFloat(
-        std::function<float(std::shared_ptr<SimulatorBall>)> func);
+    template <class RET_VAL>
+    static RET_VAL checkValidAndExecute(
+        std::function<RET_VAL(std::shared_ptr<SimulatorBall>)> func)
+    {
+        if (simulator_ball)
+        {
+            return func(simulator_ball);
+        }
+        LOG(WARNING)
+            << "SimulatorBallSingleton called without setting the SimulatorBall first"
+            << std::endl;
+        return static_cast<RET_VAL>(0);
+    }
 
     /**
      * A helper function that will negate the given value if needed

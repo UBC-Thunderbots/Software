@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic_fsm.h"
+#include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/logger/logger.h"
 
@@ -45,5 +45,5 @@ class PenaltyKickTactic : public Tactic
     void updateIntent(const TacticUpdate &tactic_update) override;
 
     // Tactic parameters
-    FSM<PenaltyKickTacticFSM> fsm;
+    FSM<PenaltyKickFSM> fsm;
 };

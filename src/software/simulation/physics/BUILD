@@ -17,8 +17,8 @@ cc_test(
     srcs = ["box2d_util_test.cpp"],
     deps = [
         ":box2d_util",
+        "//shared/test_util:tbots_gtest_main",
         "@box2d",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -33,7 +33,7 @@ cc_test(
     srcs = ["physics_object_user_data_test.cpp"],
     deps = [
         ":physics_object_user_data",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -61,10 +61,10 @@ cc_test(
     srcs = ["physics_ball_test.cpp"],
     deps = [
         ":physics_ball",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
         "//software/world:ball",
         "@box2d",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -86,9 +86,9 @@ cc_test(
     deps = [
         ":physics_ball",
         ":physics_field",
+        "//shared/test_util:tbots_gtest_main",
         "//software/world:field",
         "@box2d",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -116,6 +116,7 @@ cc_library(
         ":physics_robot_model",
         "//firmware/shared:physics",
         "//shared:constants",
+        "//shared:robot_constants",
         "//software/geom:angle",
         "//software/geom:angular_velocity",
         "//software/geom:point",
@@ -132,11 +133,11 @@ cc_test(
     deps = [
         ":physics_ball",
         ":physics_robot",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
         "//software/time:duration",
         "//software/world:robot",
         "@box2d",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -168,9 +169,9 @@ cc_test(
     srcs = ["physics_world_test.cpp"],
     deps = [
         ":physics_world",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -192,10 +193,10 @@ cc_test(
     deps = [
         ":physics_object_user_data",
         ":simulation_contact_listener",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
         "//software/world:ball",
         "//software/world:robot",
         "@box2d",
-        "@gtest//:gtest_main",
     ],
 )
