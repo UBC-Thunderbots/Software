@@ -17,6 +17,8 @@ struct TbotsGtestMain
     static std::string logging_dir;
 
 
-    // Controls the speed of the simulated test. Default value is 1.
-    static int speed_slow_down;
+    // Controls the speed of the simulated test. Values from 0.1 to 0.9 are the slow down
+    // factor i.e 0.1 test_speed will play test 10X slower. Values from 1.1 to 10 will
+    // play test faster. Default value is 1.
+    static double test_speed;
 };

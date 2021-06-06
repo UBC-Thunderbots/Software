@@ -209,9 +209,9 @@ void SimulatedTestFixture::runTest(
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
 
 
-    int slowSpeed               = TbotsGtestMain::speed_slow_down;
+    double speed_factor         = 1 / (TbotsGtestMain::test_speed);
     const Duration ai_time_step = Duration::fromSeconds(
-        simulation_time_step.toSeconds() * CAMERA_FRAMES_PER_AI_TICK * slowSpeed);
+        simulation_time_step.toSeconds() * CAMERA_FRAMES_PER_AI_TICK * speed_factor);
 
     // Tick one frame to aid with visualization
     bool validation_functions_done =

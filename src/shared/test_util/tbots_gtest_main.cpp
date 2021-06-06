@@ -8,7 +8,7 @@
 bool TbotsGtestMain::enable_visualizer  = false;
 bool TbotsGtestMain::stop_ai_on_start   = false;
 std::string TbotsGtestMain::logging_dir = "";
-int TbotsGtestMain::speed_slow_down     = 1;
+double TbotsGtestMain::test_speed       = 1.0;
 
 
 int main(int argc, char **argv)
@@ -29,7 +29,7 @@ int main(int argc, char **argv)
         if (TbotsGtestMain::enable_visualizer)
         {
             TbotsGtestMain::stop_ai_on_start = args->getStopAiOnStart()->value();
-            TbotsGtestMain::speed_slow_down  = args->getSpeedSlowDown()->value();
+            TbotsGtestMain::test_speed       = args->getTestSpeed()->value();
         }
     }
 
