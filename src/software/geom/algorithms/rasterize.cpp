@@ -212,8 +212,9 @@ bool isInPixel(const Point &a, const Point &b, double resolution_size)
    	double max_x = a.x() + resolution_size / 2;
    	double max_y = a.y() + resolution_size / 2;
 
-   	Rectangle pixel = Rectangle(Point(min_x, min_y), Point(max_x, max_y));
-   	return contains(pixel, b);
+   	double b_x = b.x();
+   	double b_y = b.y();
+   	return (b_x >= min_x && b_x <= max_x) && (b_y >= min_y && b_y <= max_y);
 }
 
 bool isAVertex(const Point& point, const Polygon& polygon, double resolution_size)
