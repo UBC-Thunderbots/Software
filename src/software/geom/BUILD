@@ -224,6 +224,17 @@ cc_test(
 )
 
 cc_test(
+    name = "angle_map_test",
+    srcs = [
+        "angle_map.cpp",
+    ],
+    deps = [
+        ":angle_map",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
+cc_test(
     name = "line_test",
     srcs = [
         "line_test.cpp",
