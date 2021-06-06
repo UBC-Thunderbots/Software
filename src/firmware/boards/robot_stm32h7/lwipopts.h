@@ -71,7 +71,7 @@
 /*----- Default Value for H7 devices: 0x30044000 -----*/
 #define LWIP_RAM_HEAP_POINTER 0x30020000
 /*----- Default Value for MEMP_NUM_NETBUF: 2 ---*/
-#define MEMP_NUM_NETBUF 20
+#define MEMP_NUM_NETBUF 10
 /*----- Value supported for H7 devices: 1 -----*/
 #define LWIP_SUPPORT_CUSTOM_PBUF 1
 /*----- Value in opt.h for LWIP_ETHERNET: LWIP_ARP || PPPOE_SUPPORT -*/
