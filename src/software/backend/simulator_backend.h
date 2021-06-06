@@ -6,15 +6,14 @@
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/backend/backend.h"
 #include "software/backend/ssl_proto_client.h"
-#include "software/estop/threaded_estop_reader.h"
 #include "software/networking/threaded_proto_udp_listener.h"
 #include "software/networking/threaded_proto_udp_sender.h"
 #include "software/proto/defending_side_msg.pb.h"
 
-class WifiBackend : public Backend
+class SimulatorBackend : public Backend
 {
    public:
-    WifiBackend(std::shared_ptr<const BackendConfig> config);
+    SimulatorBackend(std::shared_ptr<const BackendConfig> config);
 
 
    private:
@@ -29,13 +28,12 @@ class WifiBackend : public Backend
      * NOTE: This will terminate the existing connection on the previous channel
      * if it exists.
      *
-     * @param channel The channel to join, index of ROBOT_MULTICAST_CHANNELS in
-     * shared/constants.h
+     * @param channel The channel to join, index of SIMULATOR_MULTICAST_CHANNELS in
+     * software/constants.h
      * @param interface The interface to join the multicast group on (lo, eth0, enp3s0f1,
      * etc.)
      */
     void joinMulticastChannel(int channel, const std::string& interface);
-
 
     /**
      * Callback for the RobotLog listener
@@ -46,7 +44,6 @@ class WifiBackend : public Backend
 
     const std::shared_ptr<const NetworkConfig> network_config;
     const std::shared_ptr<const SensorFusionConfig> sensor_fusion_config;
-    const std::shared_ptr<const ArduinoConfig> arduino_config;
 
     // Client to listen for SSL protobufs
     SSLProtoClient ssl_proto_client;
@@ -57,7 +54,4 @@ class WifiBackend : public Backend
     std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::RobotStatus>> robot_status_input;
     std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::RobotLog>> robot_log_input;
     std::unique_ptr<ThreadedProtoUdpSender<DefendingSideProto>> defending_side_output;
-
-
-    std::unique_ptr<ThreadedEstopReader> estop_reader;
 };

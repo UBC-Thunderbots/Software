@@ -180,7 +180,7 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 2. Pick the network interface you would like to use:
     1. If you are running things locally, you can pick any interface that is not `lo`
     2. If you would like to communicate with robots on the network, make sure to select the interface that is connected to the same network as the robots.
-3. Run our AI: `bazel run //software:full_system -- --interface=[interface_here] --backend=WifiBackend`
+3. Run our AI: `bazel run //software:full_system -- --interface=[interface_here] --backend=SimulatorBackend`
     - This will launch the Visualizer, which displays what the AI is currently "seeing" and allows us to interact with the AI through the dynamic parameters.
     - The field should be empty, as we are currently not receiving SSL Vision packets.
 4. Run our Simulator: `bazel run //software:standalone_simulator_main -- --interface=[interface_here]`
