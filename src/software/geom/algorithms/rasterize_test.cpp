@@ -68,9 +68,42 @@ TEST(RasterizeTest, test_circle_with_actual_theta_star_values)
 
 TEST(RasterizeTest, test_large_circle)
 {
-    double robot_obstacle = 3.f;
-    Circle circle({0, 0}, robot_obstacle);
+    Circle circle({0, 0}, 3.f);
     double pixel_size                    = 0.1f;
+    std::vector<Point> rasterized_points = rasterize(circle, pixel_size);
+
+    for (Point p : rasterized_points)
+    {
+        EXPECT_TRUE(contains(circle, p)) << p;
+    }
+    // sqrt(2) * pixel_size since the circle rasterize algorithm does not guarantee that
+    // the points are all aligned in x and y axis.
+    double max_dist = std::sqrt(2) * pixel_size;
+    TestUtil::checkPointsCloseToEachOther(rasterized_points, max_dist);
+}
+
+TEST(RasterizeTest, test_circle_not_at_origin)
+{
+    Circle circle({-2.f, -2.f}, 1.5f);
+    double pixel_size                    = 0.1f;
+    std::vector<Point> rasterized_points = rasterize(circle, pixel_size);
+
+    for (Point p : rasterized_points)
+    {
+        EXPECT_TRUE(contains(circle, p)) << p;
+    }
+    // sqrt(2) * pixel_size since the circle rasterize algorithm does not guarantee that
+    // the points are all aligned in x and y axis.
+    double max_dist = std::sqrt(2) * pixel_size;
+    TestUtil::checkPointsCloseToEachOther(rasterized_points, max_dist);
+}
+
+TEST(RasterizeTest, test_circle_with_complex_dimensions)
+{
+    // Long random floating point numbers are chosen to make sure that points do not
+    // exceed the boundary of the circle due to floating point error
+    Circle circle({4.6318964f, 7.4893115f}, 2.5498456f);
+    double pixel_size                    = 0.1562131f;
     std::vector<Point> rasterized_points = rasterize(circle, pixel_size);
 
     for (Point p : rasterized_points)
@@ -90,6 +123,19 @@ TEST(RasterizeTest, test_pixel_size_multiple_of_square_dimensions)
 {
     Rectangle rectangle(Point(0, 0), Point(1, 1));
     double pixel_size                    = 0.5f;
+    std::vector<Point> rasterized_points = rasterize(rectangle, pixel_size);
+
+    for (Point p : rasterized_points)
+    {
+        EXPECT_TRUE(contains(rectangle, p));
+    }
+    TestUtil::checkPointsCloseToEachOther(rasterized_points, pixel_size);
+}
+
+TEST(RasterizeTest, test_rectangle_not_at_origin)
+{
+    Rectangle rectangle(Point(-1, -1), Point(1, 1));
+    double pixel_size                    = 0.33f;
     std::vector<Point> rasterized_points = rasterize(rectangle, pixel_size);
 
     for (Point p : rasterized_points)
@@ -141,10 +187,24 @@ TEST(RasterizeTest, test_pixel_size_one_dimesnsion_not_multiple_of_rectangle_dim
     TestUtil::checkPointsCloseToEachOther(rasterized_points, pixel_size);
 }
 
+TEST(RasterizeTest, test_rectangle_with_complex_floating_dimensions)
+{
+    // Long random floating point numbers are chosen to make sure that points do not
+    // exceed the boundary of the rectangle due to floating point error
+    Rectangle rectangle(Point(-1.3245648f, 1.4895349f), Point(0.4563189f, 1.1234567f));
+    double pixel_size                    = 0.5489654f;
+    std::vector<Point> rasterized_points = rasterize(rectangle, pixel_size);
+
+    for (Point p : rasterized_points)
+    {
+        EXPECT_TRUE(contains(rectangle, p));
+    }
+    TestUtil::checkPointsCloseToEachOther(rasterized_points, pixel_size);
+}
+
 //////////////////////////////////////////////////////
 ////              Testing Polygons                ////
 //////////////////////////////////////////////////////
-// TODO could check that the points are offsetted by pixel_size!?
 TEST(RasterizeTest, test_rasterize_polygon)
 {
     std::vector<Point> points = {Point(0, 5), Point(0, 0), Point(5, 0), Point(5, 5)};
@@ -162,6 +222,7 @@ TEST(RasterizeTest, test_rasterize_polygon)
         }
         EXPECT_TRUE(contains(polygon, p));
     }
+    TestUtil::checkPointsCloseToEachOther(rasterized_points, offset);
 }
 
 TEST(RasterizeTest, test_rasterize_polygon_complex)
@@ -170,8 +231,9 @@ TEST(RasterizeTest, test_rasterize_polygon_complex)
                                  Point(4.7999999999999998, 1.481503),
                                  Point(4.7999999999999998, -1.481503)};
     Polygon polygon           = Polygon(points);
+    double offset             = 0.09f;
 
-    std::vector<Point> rasterized_points = rasterize(polygon, 0.09);
+    std::vector<Point> rasterized_points = rasterize(polygon, offset);
     for (Point p : rasterized_points)
     {
         bool result = contains(polygon, p);
@@ -182,6 +244,7 @@ TEST(RasterizeTest, test_rasterize_polygon_complex)
         }
         EXPECT_TRUE(contains(polygon, p));
     }
+    TestUtil::checkPointsCloseToEachOther(rasterized_points, offset);
 }
 
 TEST(RasterizeTest, test_speed_polygon)
@@ -204,6 +267,7 @@ TEST(RasterizeTest, test_speed_polygon)
         }
         EXPECT_TRUE(contains(polygon, p));
     }
+    TestUtil::checkPointsCloseToEachOther(rasterized_points, offset);
 }
 
 TEST(RasterizeTest, test_speed_rectangle)
@@ -225,4 +289,5 @@ TEST(RasterizeTest, test_speed_rectangle)
         }
         EXPECT_TRUE(contains(rectangle, p));
     }
+    TestUtil::checkPointsCloseToEachOther(rasterized_points, offset);
 }
