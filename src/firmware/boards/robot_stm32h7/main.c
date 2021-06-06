@@ -39,6 +39,7 @@
 #pragma GCC diagnostic pop
 
 #include "firmware/app/logger/logger.h"
+#include "shared/2021_robot_constants.h"
 #include "firmware/app/primitives/primitive_manager.h"
 #include "firmware/app/world/firmware_robot.h"
 #include "firmware/app/world/firmware_world.h"
@@ -172,15 +173,7 @@ int main(void)
 
     // Setup the world that acts as the interface for the higher level firmware
     // (like primitives or the controller) to interface with the outside world
-    //
-    // TODO (#2066) These constants are COMPLETELY WRONG, replace with proper ones
-    ForceWheelConstants_t wheel_constants = {
-        .wheel_rotations_per_motor_rotation  = GEAR_RATIO,
-        .wheel_radius                        = WHEEL_RADIUS,
-        .motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT,
-        .motor_back_emf_per_rpm              = RPM_TO_VOLT,
-        .motor_phase_resistance              = 1,
-        .motor_current_per_unit_torque       = CURRENT_PER_TORQUE};
+WheelConstants_t wheel_constants = create2021WheelConstants();
 
     ForceWheel_t *front_left_wheel = app_force_wheel_create(
         io_drivetrain_applyForceFrontLeftWheel, io_drivetrain_getFrontLeftRpm,
@@ -209,12 +202,7 @@ int main(void)
     Dribbler_t *dribbler = app_dribbler_create(io_dribbler_setSpeed, io_dribbler_coast,
                                                io_dribbler_getTemperature);
 
-    const RobotConstants_t robot_constants = {
-        .mass              = ROBOT_POINT_MASS,
-        .moment_of_inertia = INERTIA,
-        .robot_radius      = ROBOT_RADIUS,
-        .jerk_limit        = JERK_LIMIT,
-    };
+    const RobotConstants_t robot_constants = create2021RobotConstants();
 
     ControllerState_t controller_state = {
         .last_applied_acceleration_x       = 0,
