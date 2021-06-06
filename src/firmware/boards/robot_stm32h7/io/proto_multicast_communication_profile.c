@@ -53,7 +53,7 @@ ProtoMulticastCommunicationProfile_t* io_proto_multicast_communication_profile_c
     profile->protobuf_struct     = protobuf_struct;
     profile->profile_mutex       = osMutexNew(&mutex_attr);
     profile->communication_event = osEventFlagsNew(NULL);
-    ip6addr_aton(multicast_address, &profile->multicast_address);
+    ipaddr_aton(multicast_address, &profile->multicast_address);
 
     return profile;
 }

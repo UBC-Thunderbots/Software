@@ -720,6 +720,15 @@ static void low_level_init(struct netif *netif)
             MACConf.Speed      = speed;
             HAL_ETH_SetMACConfig(&heth, &MACConf);
 
+            ETH_MACFilterConfigTypeDef macFilter;
+            HAL_ETH_GetMACFilterConfig(&heth, &macFilter);
+            macFilter.PromiscuousMode = ENABLE;
+            macFilter.ReceiveAllMode = ENABLE;
+            macFilter.BroadcastFilter = DISABLE;
+            macFilter.PassAllMulticast = ENABLE;
+            macFilter.SrcAddrFiltering = DISABLE;
+            HAL_ETH_SetMACFilterConfig(&heth, &macFilter);
+
             HAL_ETH_Start_IT(&heth);
             netif_set_up(netif);
             netif_set_link_up(netif);

@@ -1,7 +1,5 @@
 // override default version of stm32h7xx_hal_eth.c with version from
 // https://community.st.com/s/question/0D50X0000C6eNNSSQ2/bug-fixes-stm32h7-ethernet
-//
-// TODO (#2095) when the ethernet drivers for STM32H7 are fixed, remove this file
 
 /**
   ******************************************************************************
@@ -78,7 +76,7 @@
          (##) HAL_ETH_ReadPHYRegister(): Read a register from an external PHY
          (##) HAL_ETH_WritePHYRegister(): Write data to an external RHY register
 
-      (#) Configure the Ethernet MAC after ETH peripheral initialization
+      (#) Configure the Ethernet MAC after ETH peripheral nitialization
           (##) HAL_ETH_GetMACConfig(): Get MAC actual configuration into
   ETH_MACConfigTypeDef
           (##) HAL_ETH_SetMACConfig(): Set MAC configuration based on ETH_MACConfigTypeDef

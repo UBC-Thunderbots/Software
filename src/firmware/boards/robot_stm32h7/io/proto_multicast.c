@@ -107,14 +107,9 @@ void io_proto_multicast_listenerTask(void* communication_profile)
 
     // Bind the socket to the multicast address and port we then use that
     // communication profile to join the specified multicast group.
-    struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
-
-    netconn_bind(conn, io_proto_multicast_communication_profile_getAddress(profile),
-                 io_proto_multicast_communication_profile_getPort(profile));
-
-    netconn_join_leave_group(conn,
-                             io_proto_multicast_communication_profile_getAddress(profile),
-                             IP6_ADDR_ANY, NETCONN_JOIN);
+    struct netconn* conn = netconn_new(NETCONN_UDP);
+    netconn_bind(conn, IP_ADDR_ANY,
+            io_proto_multicast_communication_profile_getPort(profile));
 
     struct netbuf* rx_buf = NULL;
     err_t network_err;

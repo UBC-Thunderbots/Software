@@ -41,6 +41,9 @@ void Error_Handler(void);
 
 /* Variables Initialization */
 struct netif gnetif;
+ip4_addr_t ipaddr;
+ip4_addr_t netmask;
+ip4_addr_t gw;
 ip6_addr_t ip6addr;
 /* USER CODE BEGIN OS_THREAD_ATTR_CMSIS_RTOS_V2 */
 #define INTERFACE_THREAD_STACK_SIZE (1024)
@@ -59,8 +62,13 @@ void MX_LWIP_Init(void)
   /* Initilialize the LwIP stack with RTOS */
   tcpip_init( NULL, NULL );
 
-  /* add the network interface (IPv6) with RTOS */
-  netif_add(&gnetif, NULL, &ethernetif_init, &tcpip_input);
+  /* IP addresses initialization with DHCP (IPv4) */
+  ipaddr.addr = 0;
+  netmask.addr = 0;
+  gw.addr = 0;
+
+  /* add the network interface (IPv4/IPv6) with RTOS */
+  netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
 
   /* Create IPv6 local address */
   netif_create_ip6_linklocal_address(&gnetif, 0);
@@ -92,6 +100,9 @@ void MX_LWIP_Init(void)
     attributes.priority   = osPriorityBelowNormal;
     osThreadNew(ethernet_link_thread, &gnetif, &attributes);
 /* USER CODE END H7_OS_THREAD_NEW_CMSIS_RTOS_V2 */
+
+  /* Start DHCP negotiation for a network interface (IPv4) */
+  dhcp_start(&gnetif);
 
 /* USER CODE BEGIN 3 */
 
