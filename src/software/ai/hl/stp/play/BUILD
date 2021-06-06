@@ -53,7 +53,6 @@ cc_library(
         "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:possession",
-        "//software/ai/hl/stp/tactic:defense_shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
