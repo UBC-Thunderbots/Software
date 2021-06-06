@@ -109,7 +109,7 @@ void io_proto_multicast_listenerTask(void* communication_profile)
     // communication profile to join the specified multicast group.
     struct netconn* conn = netconn_new(NETCONN_UDP);
     netconn_bind(conn, IP_ADDR_ANY,
-            io_proto_multicast_communication_profile_getPort(profile));
+                 io_proto_multicast_communication_profile_getPort(profile));
 
     struct netbuf* rx_buf = NULL;
     err_t network_err;

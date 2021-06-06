@@ -65,8 +65,7 @@ void WifiBackend::joinMulticastChannel(int channel, const std::string& interface
         std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, VISION_PORT, true));
 
     primitive_output.reset(new ThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(
-                "10.42.0.203", PRIMITIVE_PORT,
-                false));
+        "10.42.0.203", PRIMITIVE_PORT, false));
 
     robot_status_input.reset(new ThreadedProtoUdpListener<TbotsProto::RobotStatus>(
         std::string(MULTICAST_CHANNELS[channel]) + "%" + interface, ROBOT_STATUS_PORT,

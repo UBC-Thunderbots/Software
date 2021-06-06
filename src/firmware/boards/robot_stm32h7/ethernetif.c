@@ -722,9 +722,9 @@ static void low_level_init(struct netif *netif)
 
             ETH_MACFilterConfigTypeDef macFilter;
             HAL_ETH_GetMACFilterConfig(&heth, &macFilter);
-            macFilter.PromiscuousMode = ENABLE;
-            macFilter.ReceiveAllMode = ENABLE;
-            macFilter.BroadcastFilter = DISABLE;
+            macFilter.PromiscuousMode  = ENABLE;
+            macFilter.ReceiveAllMode   = ENABLE;
+            macFilter.BroadcastFilter  = DISABLE;
             macFilter.PassAllMulticast = ENABLE;
             macFilter.SrcAddrFiltering = DISABLE;
             HAL_ETH_SetMACFilterConfig(&heth, &macFilter);

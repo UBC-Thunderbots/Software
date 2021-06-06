@@ -52,7 +52,7 @@ void io_robot_status_task(void *argument)
 
         // TODO (#2097) update when power monitor has been fully integrated
         g_robot_status_msg.power_status = (TbotsProto_PowerStatus){
-            .battery_voltage = 200.0f, .capacitor_voltage = (float)(count++%100)};
+            .battery_voltage = 200.0f, .capacitor_voltage = (float)(count++ % 100)};
 
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
 

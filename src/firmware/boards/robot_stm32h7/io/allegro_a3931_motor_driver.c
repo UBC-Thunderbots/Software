@@ -11,7 +11,7 @@ typedef struct AllegroA3931MotorDriver
 } AllegroA3931MotorDriver_t;
 
 AllegroA3931MotorDriver_t* io_allegro_a3931_motor_driver_create(PwmPin_t* pwm_pin,
-        GpioPin_t* direction_pin)
+                                                                GpioPin_t* direction_pin)
 {
     AllegroA3931MotorDriver_t* motor_driver =
         (AllegroA3931MotorDriver_t*)malloc(sizeof(AllegroA3931MotorDriver_t));

@@ -19,11 +19,11 @@ PwmPin_t* io_pwm_pin_create(TIM_HandleTypeDef* timer, uint16_t timer_channel)
     pwm_pin->timer_channel = timer_channel;
 
     TIM_OC_InitTypeDef timer_config;
-    timer_config.OCMode     = TIM_OCMODE_PWM1;
-    timer_config.Pulse      = 0;  // Start with no PWM
-    timer_config.OCPolarity = TIM_OCPOLARITY_HIGH;
+    timer_config.OCMode      = TIM_OCMODE_PWM1;
+    timer_config.Pulse       = 0;  // Start with no PWM
+    timer_config.OCPolarity  = TIM_OCPOLARITY_HIGH;
     timer_config.OCNPolarity = TIM_OCNPOLARITY_HIGH;
-    timer_config.OCFastMode = TIM_OCFAST_DISABLE;
+    timer_config.OCFastMode  = TIM_OCFAST_DISABLE;
 
     HAL_TIM_PWM_ConfigChannel(pwm_pin->timer, &timer_config, pwm_pin->timer_channel);
     HAL_TIM_PWM_Start(pwm_pin->timer, pwm_pin->timer_channel);
