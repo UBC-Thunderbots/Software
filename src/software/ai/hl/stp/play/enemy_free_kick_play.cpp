@@ -65,14 +65,19 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         // Add Crease defender tactic on side of open enemy threats
         if (enemy_threats.size() >= 4)
         {
-            if (enemy_threats.at(3).robot.position().y() > 0) {
-                crease_defender_tactic->updateControlParams(world.ball().position(),
-                                                            CreaseDefenderAlignment::LEFT);
-            } else {
-                crease_defender_tactic->updateControlParams(world.ball().position(),
-                                                            CreaseDefenderAlignment::RIGHT);
+            if (enemy_threats.at(3).robot.position().y() > 0)
+            {
+                crease_defender_tactic->updateControlParams(
+                    world.ball().position(), CreaseDefenderAlignment::LEFT);
             }
-        } else {
+            else
+            {
+                crease_defender_tactic->updateControlParams(
+                    world.ball().position(), CreaseDefenderAlignment::RIGHT);
+            }
+        }
+        else
+        {
             crease_defender_tactic->updateControlParams(world.ball().position(),
                                                         CreaseDefenderAlignment::CENTRE);
         }
