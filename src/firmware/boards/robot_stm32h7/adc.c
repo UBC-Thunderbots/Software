@@ -157,17 +157,17 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
         PF11     ------> ADC1_INP2
         PF12     ------> ADC1_INP6
         */
-        GPIO_InitStruct.Pin  = WHEEL_BACK_RIGHT_CSOUT_Pin;
+        GPIO_InitStruct.Pin  = WHEEL_FRONT_RIGHT_CSOUT_Pin;
         GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
         GPIO_InitStruct.Pull = GPIO_NOPULL;
-        HAL_GPIO_Init(WHEEL_BACK_RIGHT_CSOUT_GPIO_Port, &GPIO_InitStruct);
+        HAL_GPIO_Init(WHEEL_FRONT_RIGHT_CSOUT_GPIO_Port, &GPIO_InitStruct);
 
-        GPIO_InitStruct.Pin  = WHEEL_FRONT_RIGHT_CSOUT_Pin | DRIBBLER_CSOUT_Pin;
+        GPIO_InitStruct.Pin  = WHEEL_BACK_RIGHT_CSOUT_Pin | DRIBBLER_CSOUT_Pin;
         GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
         GPIO_InitStruct.Pull = GPIO_NOPULL;
         HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-        GPIO_InitStruct.Pin  = WHEEL_FRONT_LEFT_CSOUT_Pin | WHEEL_BACK_LEFT_CSOUT_Pin;
+        GPIO_InitStruct.Pin  = WHEEL_BACK_LEFT_CSOUT_Pin | WHEEL_FRONT_LEFT_CSOUT_Pin;
         GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
         GPIO_InitStruct.Pull = GPIO_NOPULL;
         HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
@@ -200,9 +200,9 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
         PC2_C     ------> ADC3_INP0
         PC3_C     ------> ADC3_INP1
         */
-        GPIO_InitStruct.Pin = ENCODER_FRONT_LEFT_SIN_Pin | ENCODER_FRONT_LEFT_COS_Pin |
-                              ENCODER_BACK_LEFT_COS_Pin | ENCODER_BACK_LEFT_SIN_Pin |
-                              ENCODER_BACK_RIGHT_COS_Pin | ENCODER_BACK_RIGHT_SIN_Pin |
+        GPIO_InitStruct.Pin = ENCODER_BACK_LEFT_SIN_Pin | ENCODER_BACK_LEFT_COS_Pin |
+                              ENCODER_FRONT_LEFT_COS_Pin | ENCODER_FRONT_LEFT_SIN_Pin |
+                              ENCODER_FRONT_RIGHT_COS_Pin | ENCODER_FRONT_RIGHT_SIN_Pin |
                               HV_SENSE_PWR_BRD_Pin;
         GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
         GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -235,11 +235,11 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
         PF11     ------> ADC1_INP2
         PF12     ------> ADC1_INP6
         */
-        HAL_GPIO_DeInit(WHEEL_BACK_RIGHT_CSOUT_GPIO_Port, WHEEL_BACK_RIGHT_CSOUT_Pin);
+        HAL_GPIO_DeInit(WHEEL_FRONT_RIGHT_CSOUT_GPIO_Port, WHEEL_FRONT_RIGHT_CSOUT_Pin);
 
-        HAL_GPIO_DeInit(GPIOB, WHEEL_FRONT_RIGHT_CSOUT_Pin | DRIBBLER_CSOUT_Pin);
+        HAL_GPIO_DeInit(GPIOB, WHEEL_BACK_RIGHT_CSOUT_Pin | DRIBBLER_CSOUT_Pin);
 
-        HAL_GPIO_DeInit(GPIOF, WHEEL_FRONT_LEFT_CSOUT_Pin | WHEEL_BACK_LEFT_CSOUT_Pin);
+        HAL_GPIO_DeInit(GPIOF, WHEEL_BACK_LEFT_CSOUT_Pin | WHEEL_FRONT_LEFT_CSOUT_Pin);
 
         /* USER CODE BEGIN ADC1_MspDeInit 1 */
 
@@ -267,10 +267,11 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
         PC2_C     ------> ADC3_INP0
         PC3_C     ------> ADC3_INP1
         */
-        HAL_GPIO_DeInit(GPIOF, ENCODER_FRONT_LEFT_SIN_Pin | ENCODER_FRONT_LEFT_COS_Pin |
-                                   ENCODER_BACK_LEFT_COS_Pin | ENCODER_BACK_LEFT_SIN_Pin |
-                                   ENCODER_BACK_RIGHT_COS_Pin |
-                                   ENCODER_BACK_RIGHT_SIN_Pin | HV_SENSE_PWR_BRD_Pin);
+        HAL_GPIO_DeInit(GPIOF, ENCODER_BACK_LEFT_SIN_Pin | ENCODER_BACK_LEFT_COS_Pin |
+                                   ENCODER_FRONT_LEFT_COS_Pin |
+                                   ENCODER_FRONT_LEFT_SIN_Pin |
+                                   ENCODER_FRONT_RIGHT_COS_Pin |
+                                   ENCODER_FRONT_RIGHT_SIN_Pin | HV_SENSE_PWR_BRD_Pin);
 
         /* USER CODE BEGIN ADC3_MspDeInit 1 */
 

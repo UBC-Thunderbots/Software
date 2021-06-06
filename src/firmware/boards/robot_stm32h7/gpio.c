@@ -67,19 +67,20 @@ void MX_GPIO_Init(void)
                       GPIO_PIN_RESET);
 
     /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(WHEEL_BACK_RIGHT_DIR_GPIO_Port, WHEEL_BACK_RIGHT_DIR_Pin,
-                      GPIO_PIN_RESET);
-
-    /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(GPIOB, DRIVE_RESET_Pin | WHEEL_FRONT_LEFT_DIR_Pin, GPIO_PIN_RESET);
-
-    /*Configure GPIO pin Output Level */
     HAL_GPIO_WritePin(WHEEL_FRONT_RIGHT_DIR_GPIO_Port, WHEEL_FRONT_RIGHT_DIR_Pin,
                       GPIO_PIN_RESET);
 
     /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(GPIOB, DRIVE_RESET_Pin | WHEEL_BACK_LEFT_DIR_Pin, GPIO_PIN_RESET);
+
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(WHEEL_BACK_RIGHT_DIR_GPIO_Port, WHEEL_BACK_RIGHT_DIR_Pin,
+                      GPIO_PIN_RESET);
+
+    /*Configure GPIO pin Output Level */
     HAL_GPIO_WritePin(
-        GPIOD, WHEEL_BACK_LEFT_DIR_Pin | USER_LED_2_Pin | USER_LED_1_Pin | WIFI_RESET_Pin,
+        GPIOD,
+        WHEEL_FRONT_LEFT_DIR_Pin | USER_LED_2_Pin | USER_LED_1_Pin | WIFI_RESET_Pin,
         GPIO_PIN_RESET);
 
     /*Configure GPIO pin Output Level */
@@ -96,7 +97,7 @@ void MX_GPIO_Init(void)
 
     /*Configure GPIO pins : PEPin PEPin PEPin PEPin */
     GPIO_InitStruct.Pin =
-        IMU_INT1_Pin | WHEEL_FRONT_LEFT_FF1_Pin | WHEEL_FRONT_LEFT_FF2_Pin | ID_SEL_1_Pin;
+        IMU_INT1_Pin | WHEEL_BACK_LEFT_FF1_Pin | WHEEL_BACK_LEFT_FF2_Pin | ID_SEL_1_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
@@ -108,25 +109,11 @@ void MX_GPIO_Init(void)
     HAL_GPIO_Init(IMU_INT2_GPIO_Port, &GPIO_InitStruct);
 
     /*Configure GPIO pins : PFPin PFPin PFPin PFPin */
-    GPIO_InitStruct.Pin = WHEEL_BACK_RIGHT_FF1_Pin | WHEEL_BACK_RIGHT_FF2_Pin |
-                          WHEEL_FRONT_RIGHT_FF1_Pin | WHEEL_FRONT_RIGHT_FF2_Pin;
+    GPIO_InitStruct.Pin = WHEEL_FRONT_RIGHT_FF1_Pin | WHEEL_FRONT_RIGHT_FF2_Pin |
+                          WHEEL_BACK_RIGHT_FF1_Pin | WHEEL_BACK_RIGHT_FF2_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
-
-    /*Configure GPIO pin : PtPin */
-    GPIO_InitStruct.Pin   = WHEEL_BACK_RIGHT_DIR_Pin;
-    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull  = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(WHEEL_BACK_RIGHT_DIR_GPIO_Port, &GPIO_InitStruct);
-
-    /*Configure GPIO pins : PBPin PBPin */
-    GPIO_InitStruct.Pin   = DRIVE_RESET_Pin | WHEEL_FRONT_LEFT_DIR_Pin;
-    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull  = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
     /*Configure GPIO pin : PtPin */
     GPIO_InitStruct.Pin   = WHEEL_FRONT_RIGHT_DIR_Pin;
@@ -134,6 +121,20 @@ void MX_GPIO_Init(void)
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(WHEEL_FRONT_RIGHT_DIR_GPIO_Port, &GPIO_InitStruct);
+
+    /*Configure GPIO pins : PBPin PBPin */
+    GPIO_InitStruct.Pin   = DRIVE_RESET_Pin | WHEEL_BACK_LEFT_DIR_Pin;
+    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull  = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    /*Configure GPIO pin : PtPin */
+    GPIO_InitStruct.Pin   = WHEEL_BACK_RIGHT_DIR_Pin;
+    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull  = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(WHEEL_BACK_RIGHT_DIR_GPIO_Port, &GPIO_InitStruct);
 
     /*Configure GPIO pins : PGPin PGPin PGPin PGPin
                              PGPin PGPin PGPin PGPin
@@ -146,14 +147,14 @@ void MX_GPIO_Init(void)
     HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
     /*Configure GPIO pins : PDPin PDPin */
-    GPIO_InitStruct.Pin  = WHEEL_BACK_LEFT_FF1_Pin | WHEEL_BACK_LEFT_FF2_Pin;
+    GPIO_InitStruct.Pin  = WHEEL_FRONT_LEFT_FF1_Pin | WHEEL_FRONT_LEFT_FF2_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
     /*Configure GPIO pins : PDPin PDPin PDPin PDPin */
     GPIO_InitStruct.Pin =
-        WHEEL_BACK_LEFT_DIR_Pin | USER_LED_2_Pin | USER_LED_1_Pin | WIFI_RESET_Pin;
+        WHEEL_FRONT_LEFT_DIR_Pin | USER_LED_2_Pin | USER_LED_1_Pin | WIFI_RESET_Pin;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

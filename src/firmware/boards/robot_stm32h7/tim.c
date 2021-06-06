@@ -466,7 +466,7 @@ void HAL_TIM_IC_MspInit(TIM_HandleTypeDef* tim_icHandle)
         PD14     ------> TIM4_CH3
         */
         GPIO_InitStruct.Pin =
-            DRIBBLER_TACHO_Pin | WHEEL_FRONT_LEFT_TACHO_Pin | WHEEL_BACK_LEFT_TACHO_Pin;
+            DRIBBLER_TACHO_Pin | WHEEL_BACK_LEFT_TACHO_Pin | WHEEL_FRONT_LEFT_TACHO_Pin;
         GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
         GPIO_InitStruct.Pull      = GPIO_NOPULL;
         GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_LOW;
@@ -490,7 +490,7 @@ void HAL_TIM_IC_MspInit(TIM_HandleTypeDef* tim_icHandle)
         PB14     ------> TIM12_CH1
         PB15     ------> TIM12_CH2
         */
-        GPIO_InitStruct.Pin   = WHEEL_BACK_RIGHT_TACHO_Pin | WHEEL_FRONT_RIGHT_TACHO_Pin;
+        GPIO_InitStruct.Pin   = WHEEL_FRONT_RIGHT_TACHO_Pin | WHEEL_BACK_RIGHT_TACHO_Pin;
         GPIO_InitStruct.Mode  = GPIO_MODE_AF_PP;
         GPIO_InitStruct.Pull  = GPIO_NOPULL;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -543,8 +543,8 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
         PE13     ------> TIM1_CH3
         PE14     ------> TIM1_CH4
         */
-        GPIO_InitStruct.Pin = WHEEL_FRONT_RIGHT_PWM_Pin | DRIBBLER_PWM_Pin |
-                              WHEEL_FRONT_LEFT_PWM_Pin | WHEEL_BACK_LEFT_PWM_Pin;
+        GPIO_InitStruct.Pin = WHEEL_BACK_RIGHT_PWM_Pin | DRIBBLER_PWM_Pin |
+                              WHEEL_BACK_LEFT_PWM_Pin | WHEEL_FRONT_LEFT_PWM_Pin;
         GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
         GPIO_InitStruct.Pull      = GPIO_NOPULL;
         GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_LOW;
@@ -565,12 +565,12 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
         /**TIM2 GPIO Configuration
         PA0     ------> TIM2_CH1
         */
-        GPIO_InitStruct.Pin       = WHEEL_BACK_RIGHT_PWM_Pin;
+        GPIO_InitStruct.Pin       = WHEEL_FRONT_RIGHT_PWM_Pin;
         GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
         GPIO_InitStruct.Pull      = GPIO_NOPULL;
         GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_LOW;
         GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
-        HAL_GPIO_Init(WHEEL_BACK_RIGHT_PWM_GPIO_Port, &GPIO_InitStruct);
+        HAL_GPIO_Init(WHEEL_FRONT_RIGHT_PWM_GPIO_Port, &GPIO_InitStruct);
 
         /* USER CODE BEGIN TIM2_MspPostInit 1 */
 
@@ -679,8 +679,8 @@ void HAL_TIM_IC_MspDeInit(TIM_HandleTypeDef* tim_icHandle)
         PD13     ------> TIM4_CH2
         PD14     ------> TIM4_CH3
         */
-        HAL_GPIO_DeInit(GPIOD, DRIBBLER_TACHO_Pin | WHEEL_FRONT_LEFT_TACHO_Pin |
-                                   WHEEL_BACK_LEFT_TACHO_Pin);
+        HAL_GPIO_DeInit(GPIOD, DRIBBLER_TACHO_Pin | WHEEL_BACK_LEFT_TACHO_Pin |
+                                   WHEEL_FRONT_LEFT_TACHO_Pin);
 
         /* USER CODE BEGIN TIM4_MspDeInit 1 */
 
@@ -698,7 +698,7 @@ void HAL_TIM_IC_MspDeInit(TIM_HandleTypeDef* tim_icHandle)
         PB14     ------> TIM12_CH1
         PB15     ------> TIM12_CH2
         */
-        HAL_GPIO_DeInit(GPIOB, WHEEL_BACK_RIGHT_TACHO_Pin | WHEEL_FRONT_RIGHT_TACHO_Pin);
+        HAL_GPIO_DeInit(GPIOB, WHEEL_FRONT_RIGHT_TACHO_Pin | WHEEL_BACK_RIGHT_TACHO_Pin);
 
         /* USER CODE BEGIN TIM12_MspDeInit 1 */
 
