@@ -22,8 +22,7 @@ from software.python_bindings import world, passing, keep_away
 import numpy as np
 
 wrapper_proto_log = ProtoLog(
-    "test_data/SensorFusion_SSL_WrapperPacket",
-    SSL_WrapperPacket,
+    "test_data/SensorFusion_SSL_WrapperPacket", SSL_WrapperPacket,
 )
 # -
 
@@ -112,7 +111,7 @@ def plot_ssl_wrapper_at_idx(idx):
 
     def keepAwayCost(x, y):
         pass_dict["passer_point"] = world.Point(x, y)
-        return keep_away.ratePasserPointForKeepAway(pass_dict, the_world)
+        return keep_away.ratePasserPointForKeepAway(the_world, pass_dict)
 
     enemy_risk_heatmap.plot_heatmap(ratePassEnemyRiskCost)
     keep_away_heatmap.plot_heatmap(keepAwayCost)

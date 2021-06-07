@@ -11,10 +11,9 @@ namespace py = pybind11;
 PYBIND11_MODULE(keep_away, m)
 {
     m.def("findKeepAwayTargetPosition",
-          [](const World& world, const Point& possessor_position,
-             py::dict best_pass_so_far_dict, py::dict passing_config_dict) {
+          [](const World& world, py::dict best_pass_so_far_dict) {
               Pass best_pass_so_far = createPassFromDict(best_pass_so_far_dict);
-              return findKeepAwayTargetPoint(possessor_position, best_pass_so_far, world);
+              return findKeepAwayTargetPoint(world, best_pass_so_far);
           });
     m.def("ratePasserPointForKeepAway", [](py::dict pass_dict, const World& world) {
         Pass pass = createPassFromDict(pass_dict);

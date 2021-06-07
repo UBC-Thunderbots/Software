@@ -21,8 +21,7 @@ double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team)
 }
 
 
-Point findKeepAwayTargetPoint(const Point& ball_possessor_position,
-                              const Pass& best_pass_so_far, const World& world)
+Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far)
 {
     // TODO: tweak this constant
     static constexpr auto KEEPAWAY_SEARCH_CIRCLE_RADIUS = 0.75;
@@ -54,7 +53,7 @@ Point findKeepAwayTargetPoint(const Point& ball_possessor_position,
     GradientDescentOptimizer<2> optimizer{PARAM_WEIGHTS};
     auto passer_pt_array = optimizer.maximize(
         keepaway_point_cost,
-        std::array<double, 2>{ball_possessor_position.x(), ball_possessor_position.y()},
+        std::array<double, 2>{world.ball().position().x(), world.ball().position().y()},
         GRADIENT_STEPS_PER_ITER);
     return Point(std::get<0>(passer_pt_array), std::get<1>(passer_pt_array));
 }
