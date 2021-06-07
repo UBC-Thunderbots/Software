@@ -193,6 +193,18 @@ const osThreadAttr_t PrimStarter_attributes = {
   .stack_size = sizeof(PrimStarterBuffer),
   .priority = (osPriority_t) osPriorityNormal,
 };
+/* Definitions for Vision */
+osThreadId_t VisionHandle;
+uint32_t VisionBuffer[ 1024 ];
+osStaticThreadDef_t VisionControlBlock;
+const osThreadAttr_t Vision_attributes = {
+  .name = "Vision",
+  .cb_mem = &VisionControlBlock,
+  .cb_size = sizeof(VisionControlBlock),
+  .stack_mem = &VisionBuffer[0],
+  .stack_size = sizeof(VisionBuffer),
+  .priority = (osPriority_t) osPriorityNormal2,
+};
 /* Definitions for RobotLogProtoQ */
 osMessageQueueId_t RobotLogProtoQHandle;
 const osMessageQueueAttr_t RobotLogProtoQ_attributes = {
@@ -211,6 +223,7 @@ extern void io_proto_multicast_senderTask(void *argument);
 extern void io_network_logger_task(void *argument);
 extern void io_primitive_executor_task(void *argument);
 extern void io_primitive_starter_task(void *argument);
+extern void io_vision_task(void *argument);
 
 extern void MX_LWIP_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -272,6 +285,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of PrimStarter */
   PrimStarterHandle = osThreadNew(io_primitive_starter_task, (void *)primitive_msg_listener_profile, &PrimStarter_attributes);
+
+  /* creation of Vision */
+  VisionHandle = osThreadNew(io_vision_task, (void *)vision_msg_listener_profile, &Vision_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* USER CODE END RTOS_THREADS */

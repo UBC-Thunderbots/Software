@@ -13,7 +13,7 @@ message Vision
     Timestamp time_sent = 1;
 
     // Robot ID to RobotState map
-    map<uint32, RobotState> robot_states = 2;
+    map<uint32, RobotState> robot_states = 2 [(nanopb.fieldopt).max_count = 20];
 
     // Ball state
     BallState ball_state = 3;

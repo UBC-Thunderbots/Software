@@ -1,5 +1,10 @@
 #pragma once
 
+void io_vision_init(void);
+void io_vision_task(void * arg);
+void io_lock_vision();
+void io_unlock_vision();
+
 /*
  * @returns the x,y positions of the ball
  */
