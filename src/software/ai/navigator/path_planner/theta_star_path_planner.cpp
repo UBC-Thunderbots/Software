@@ -77,14 +77,14 @@ double ThetaStarPathPlanner::coordDistance(const Coordinate &coord1,
     return distance(p1, p2);
 }
 
-bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord1, const Coordinate &coord2)
+bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord0, const Coordinate &coord1)
 {
-//    CoordinatePair coord_pair(coord1, coord2);
+//    CoordinatePair coord_pair(coord0, coord1);
 //    // If we haven't checked this Coordinate pair for intersects before, check it now
 //    auto line_of_sight_cache_it = line_of_sight_cache.find(coord_pair);
 //    if (line_of_sight_cache_it == line_of_sight_cache.end())
 //    {
-//        Segment seg(convertCoordToPoint(coord1), convertCoordToPoint(coord2));
+//        Segment seg(convertCoordToPoint(coord0), convertCoordToPoint(coord1));
 //        bool has_line_of_sight = true;
 //
 //        for (const auto &obstacle : obstacles)
@@ -103,33 +103,155 @@ bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord1, const Coordinat
 //    }
 //
 //    return line_of_sight_cache_it->second;
-    unsigned int x0 = coord1.row();
-    unsigned int y0 = coord1.col();
-    unsigned int x1 = coord2.row();
-    unsigned int y1 = coord2.col();
+//    unsigned int x0 = coord0.row();
+//    unsigned int y0 = coord0.col();
+//    unsigned int x1 = coord1.row();
+//    unsigned int y1 = coord1.col();
+//
+//    int dx = x1 - x0;
+//    int dy = y1 - y0;
+//    int D = 2 * dy - dx;
+//    int y = y0;
+//
+//    for (unsigned int x = x0; x <= x1; x++) {
+//        if (isBlocked(Coordinate(x, y)))
+//        {
+//            // No line of sight since a coordinate in the path from coord0 to coord1 is blocked
+//            return false;
+//        }
+//
+//        if (D > 0)
+//        {
+//            y++;
+//            D = D - 2*dx;
+//        }
+//        D = D + 2*dy;
+//    }
+//
+//    return true;
 
+    unsigned int x0 = coord0.row();
+    unsigned int y0 = coord0.col();
+    unsigned int x1 = coord1.row();
+    unsigned int y1 = coord1.col();
     std::vector<Coordinate> line_of_sight_coords;
+
+    int dy = y1 - y0;
+    int dx = x1 - x0;
+
+    if (std::abs(dy) < std::abs(dx))
+    {
+        if (x0 > x1)
+        {
+            return checkLineLow(coord1, coord0);
+        } else
+        {
+            return checkLineLow(coord0, coord1);
+        }
+    }
+    else
+    {
+        if (y0 > y1)
+        {
+            return checkLineHigh(coord1, coord0);
+        } else
+        {
+            return checkLineHigh(coord0, coord1);
+        }
+    }
+
+//    int dx = x1 - x0;
+//    int dy = y1 - y0;
+//    int D = 2 * dy - dx;
+//    int y = y0;
+//
+//    for (unsigned int x = x0; x <= x1; x++) {
+//        if (isBlocked(Coordinate(x, y)))
+//        {
+//            // No line of sight since a coordinate in the path from coord0 to coord1 is blocked
+//            return false;
+//        }
+//
+//        if (D > 0)
+//        {
+//            y++;
+//            D = D - 2*dx;
+//        }
+//        D = D + 2*dy;
+//    }
+}
+
+bool ThetaStarPathPlanner::checkLineLow(const Coordinate &coord0,
+                                        const Coordinate &coord1) {
+    unsigned int x0 = coord0.row();
+    unsigned int y0 = coord0.col();
+    unsigned int x1 = coord1.row();
+    unsigned int y1 = coord1.col();
 
     int dx = x1 - x0;
     int dy = y1 - y0;
-    int D = 2 * dy - dx;
+    int yi = 1;
+
+    if (dy < 0)
+    {
+        yi = -1;
+        dy = -dy;
+    }
+    int D = (2 * dy) - dx;
     int y = y0;
 
     for (unsigned int x = x0; x <= x1; x++) {
         if (isBlocked(Coordinate(x, y)))
         {
-            // No line of sight since a coordinate in the path from coord1 to coord2 is blocked
+            // No line of sight since a coordinate in the path from coord0 to coord1 is blocked
             return false;
         }
-
         if (D > 0)
         {
-            y++;
-            D = D - 2*dx;
+            y += yi;
+            D += 2 * (dy - dx);
+        } else
+        {
+            D += 2 * dy;
         }
-        D = D + 2*dy;
     }
+    return true;
+}
 
+bool ThetaStarPathPlanner::checkLineHigh(const ThetaStarPathPlanner::Coordinate &coord0,
+                                         const ThetaStarPathPlanner::Coordinate &coord1) {
+    unsigned int x0 = coord0.row();
+    unsigned int y0 = coord0.col();
+    unsigned int x1 = coord1.row();
+    unsigned int y1 = coord1.col();
+
+    int dx = x1 - x0;
+    int dy = y1 - y0;
+    int xi = 1;
+
+    if (dx < 0)
+    {
+        xi = -1;
+        dx = -dx;
+    }
+    int D = (2 * dx) - dy;
+    int x = x0;
+
+    for (unsigned int y = y0; y <= y1; y++) {
+        if (isBlocked(Coordinate(x, y)))
+        {
+            // No line of sight since a coordinate in the path from coord0 to coord1 is blocked
+            return false;
+        }
+        if (D > 0)
+        {
+            x += xi;
+            D += 2 * (dx - dy);
+        } else
+        {
+            D += 2 * dx;
+        }
+    }
     return true;
 }
 

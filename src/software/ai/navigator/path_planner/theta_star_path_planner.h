@@ -317,12 +317,16 @@ class ThetaStarPathPlanner : public PathPlanner
     /**
      * Checks for line of sight between Coordinates
      *
-     * @param coord1 The first Coordinate
-     * @param coord2 The second Coordinate
+     * @param coord0 The first Coordinate
+     * @param coord1 The second Coordinate
      *
-     * @return true if line of sight from coord1 to coord2
+     * @return true if line of sight from coord0 to coord1
      */
-    bool lineOfSight(const Coordinate &coord1, const Coordinate &coord2);
+    bool lineOfSight(const Coordinate &coord0, const Coordinate &coord1);
+
+    bool checkLineLow(const Coordinate &coord0, const Coordinate &coord1);
+
+    bool checkLineHigh(const Coordinate &coord0, const Coordinate &coord1);
 
     /**
      * Finds closest unblocked cell to current_cell
