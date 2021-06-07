@@ -38,17 +38,8 @@ void ThreadedEstopReader::tick(const boost::system::error_code& error)
     else
     {
         std::vector<unsigned char> estop_msg;
-        try
-        {
             uart_reader->flushSerialPort(uart_reader->flush_receive);
             estop_msg = uart_reader->serialRead(ESTOP_MESSAGE_SIZE_BYTES);
-        }
-        catch (std::exception e)
-        {
-            LOG(FATAL)
-                << "crashing system and timing out robots as we have lost connection to ESTOP source : "
-                << e.what();
-        }
 
         EstopState new_state;
 

@@ -15,7 +15,7 @@ load(
 platformio_project(
     name = "main",
     src = "main.cc",
-    board = "uno",
+    board = "nanoatmega328new",
     framework = "arduino",
     deps = [
         "//shared:constants_platformio",

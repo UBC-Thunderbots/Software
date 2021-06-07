@@ -309,8 +309,8 @@ void initIoNetworking(void)
     io_proto_multicast_init(NETWORK_TIMEOUT_MS);
 
     primitive_msg_listener_profile = io_proto_multicast_communication_profile_create(
-        "primitive_msg_listener_profile", ROBOT_MULTICAST_CHANNELS[channel],
-        PRIMITIVE_PORT, &primitive_msg, TbotsProto_Primitive_fields,
+        "primitive_set_msg_listener_profile", ROBOT_MULTICAST_CHANNELS[channel],
+        PRIMITIVE_PORT, &primitive_set_msg, TbotsProto_PrimitiveSet_fields,
         MAXIMUM_TRANSFER_UNIT_BYTES);
 
     vision_msg_listener_profile = io_proto_multicast_communication_profile_create(
