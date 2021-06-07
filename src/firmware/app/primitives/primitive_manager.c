@@ -41,6 +41,9 @@ struct PrimitiveManager
 
     // A pointer to the state of the current primitive
     void *current_primitive_state;
+
+    // Tracks how many ticks the current primitive has been executed
+    unsigned int current_primitive_num_ticks_executed;
 };
 
 /**
@@ -87,8 +90,9 @@ PrimitiveManager_t *app_primitive_manager_create(void)
 #error "Could not determine what CPU this is being compiled for."
 #endif
 
-    manager->current_primitive       = NULL;
-    manager->current_primitive_state = NULL;
+    manager->current_primitive                    = NULL;
+    manager->current_primitive_state              = NULL;
+    manager->current_primitive_num_ticks_executed = 0;
 
     return manager;
 }
@@ -118,6 +122,8 @@ void app_primitive_manager_startNewPrimitive(PrimitiveManager_t *manager,
     app_primitive_manager_lockPrimitiveMutex(manager);
 
     app_primitive_manager_endCurrentPrimitive(manager, world);
+
+    manager->current_primitive_num_ticks_executed = 0;
 
     if (manager->current_primitive)
     {
@@ -180,8 +186,14 @@ void app_primitive_manager_runCurrentPrimitive(PrimitiveManager_t *manager,
 {
     app_primitive_manager_lockPrimitiveMutex(manager);
 
-    if (manager->current_primitive)
+    if (manager->current_primitive_num_ticks_executed > 100)
     {
+        app_primitive_makeRobotSafe(world);
+    }
+    else if (manager->current_primitive)
+    {
+        manager->current_primitive_num_ticks_executed++;
+
         manager->current_primitive->tick(manager->current_primitive_state, world);
     }
 
