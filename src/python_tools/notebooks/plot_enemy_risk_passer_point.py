@@ -22,7 +22,7 @@ from software.python_bindings import world, passing, keep_away
 import numpy as np
 
 wrapper_proto_log = ProtoLog(
-    "simulated_test_outputs/attacker_test_keep_away/0/SensorFusion_SSL_WrapperPacket",
+    "test_data/SensorFusion_SSL_WrapperPacket",
     SSL_WrapperPacket,
 )
 # -

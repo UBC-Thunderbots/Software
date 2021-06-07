@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <sstream>
 #include <utility>
 
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
@@ -49,6 +50,8 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_keep_away)
         Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
     auto enemy_proximity_importance =
         passing_config->getEnemyProximityImportance()->value();
+    // auto enemy_reaction_time = Duration::fromSeconds(0);
+    // auto enemy_proximity_importance = 0.;
 
     // we have to create a Team for the enemy here to evaluate the initial enemy risk
     // score
@@ -62,23 +65,29 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_keep_away)
     Team enemy_team(enemy_team_robots);
 
     static const auto CHECK_SCORE_INTERVAL = Duration::fromSeconds(0.5);
-    static constexpr double RATING_DROP_TEST_FAIL_THRESHOLD = 0.2;
-    
+    static constexpr auto NUM_CHECKS       = 5;
+
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        // test the proximity risk every CHECK_SCORE_INTERVAL time and make sure 
+        // test the proximity risk every CHECK_SCORE_INTERVAL time and make sure
         // it doesn't get substantially worse compared to the last check
         // and that it is an improvement compared to the starting state
         [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             // this value is copypasted from software/ai/evaluation/keep_away.cpp
             static constexpr double PASSER_ENEMY_PROXIMITY_IMPORTANCE = 1.5;
 
-            auto last_timestamp        = world_ptr->getMostRecentTimestamp();
-            auto initial_enemy_proximity_risk = calculateProximityRisk(world_ptr->ball().position(),
-            world_ptr->enemyTeam(), PASSER_ENEMY_PROXIMITY_IMPORTANCE);
-            auto last_enemy_proximity_risk = initial_enemy_proximity_risk;
+            auto initial_enemy_proximity_risk = calculateProximityRisk(
+                world_ptr->ball().position(), world_ptr->enemyTeam(),
+                PASSER_ENEMY_PROXIMITY_IMPORTANCE);
 
-            // test runs for #iterations * CHECK_SCORE_INTERVAL seconds
-            for (int i = 0; i < 4; i++)
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(1))
+            {
+                yield("");
+            }
+
+            auto last_timestamp = world_ptr->getMostRecentTimestamp();
+
+            // test runs for NUM_CHECKS * CHECK_SCORE_INTERVAL seconds
+            for (int i = 0; i < NUM_CHECKS; i++)
             {
                 // only check the enemy risk score every 0.5s to mitigate the "noise"
                 // inherent in the ratePass______ functions
@@ -92,36 +101,35 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_keep_away)
                 auto current_enemy_proximity_risk = calculateProximityRisk(
                     world_ptr->ball().position(), world_ptr->enemyTeam(),
                     PASSER_ENEMY_PROXIMITY_IMPORTANCE);
-                // lower is better for enemy proximity risk, make sure it didn't get
-                // substantially worse
-                if (current_enemy_proximity_risk - last_enemy_proximity_risk >
-                    RATING_DROP_TEST_FAIL_THRESHOLD)
-                {
-                    yield("enemy proximity risk got worse! went from" +
-                          std::to_string(last_enemy_proximity_risk) + " to " +
-                          std::to_string(current_enemy_proximity_risk));
-                }
+
                 // make sure we improved over the initial proximity risk score
                 if (current_enemy_proximity_risk >= initial_enemy_proximity_risk)
                 {
-                    yield("calculateProximityRisk didn't improve over initial! went from " +
-                        std::to_string(initial_enemy_proximity_risk) + " to "
-                        + std::to_string(current_enemy_proximity_risk));
+                    std::stringstream ss;
+                    ss << "At " << last_timestamp
+                       << " calculateProximityRisk didn't improve over initial! Went from "
+                       << initial_enemy_proximity_risk << " to "
+                       << current_enemy_proximity_risk;
+                    yield(ss.str());
                 }
-                last_enemy_proximity_risk = current_enemy_proximity_risk;
             }
         },
-        // test the ratePassEnemyRisk every CHECK_SCORE_INTERVAL time and make sure 
+        // test the ratePassEnemyRisk every CHECK_SCORE_INTERVAL time and make sure
         // it doesn't get substantially worse compared to the last check
         // and that it is an improvement compared to the starting state
         [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            auto last_timestamp        = world_ptr->getMostRecentTimestamp();
             auto initial_enemy_risk_score = ratePassEnemyRisk(
                 enemy_team, pass, enemy_reaction_time, enemy_proximity_importance);
-            auto last_enemy_risk_score = initial_enemy_risk_score;
 
-            // test runs for #iterations * CHECK_SCORE_INTERVAL seconds
-            for (int i = 0; i < 4; i++)
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(1))
+            {
+                yield("");
+            }
+
+            auto last_timestamp = world_ptr->getMostRecentTimestamp();
+
+            // test runs for NUM_CHECKS * CHECK_SCORE_INTERVAL seconds
+            for (int i = 0; i < NUM_CHECKS; i++)
             {
                 // only check the enemy risk score every 0.5s to mitigate the "noise"
                 // inherent in the ratePass______ functions
@@ -132,7 +140,7 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_keep_away)
                 }
                 last_timestamp = world_ptr->getMostRecentTimestamp();
 
-                // update the pass to reflect the new passer point, now that 
+                // update the pass to reflect the new passer point, now that
                 // the ball has (probably) moved
                 Pass new_pass(world_ptr->ball().position(), pass.receiverPoint(),
                               pass.speed());
@@ -140,24 +148,16 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_keep_away)
                 auto current_enemy_risk_score =
                     ratePassEnemyRisk(enemy_team, new_pass, enemy_reaction_time,
                                       enemy_proximity_importance);
-                // higher is better for ratePassEnemyRisk, make sure it didn't get
-                // substantially worse than the last time we checked
-                if (last_enemy_risk_score - current_enemy_risk_score >
-                    RATING_DROP_TEST_FAIL_THRESHOLD)
-                {
-                    yield("ratePassEnemyRisk got worse! went from " +
-                          std::to_string(last_enemy_risk_score) + " to " +
-                          std::to_string(current_enemy_risk_score));
-                }
+
                 // make sure we improved over the initial enemy risk score
                 if (current_enemy_risk_score <= initial_enemy_risk_score)
                 {
-                    yield("ratePassEnemyRisk didn't improve over initial! went from " +
-                        std::to_string(initial_enemy_risk_score) + " to "
-                        + std::to_string(current_enemy_risk_score));
+                    std::stringstream ss;
+                    ss << "At " << last_timestamp
+                       << " ratePassEnemyRisk didn't improve over initial! Went from "
+                       << initial_enemy_risk_score << " to " << current_enemy_risk_score;
+                    yield(ss.str());
                 }
-
-                last_enemy_risk_score = current_enemy_risk_score;
             }
         },
         [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -165,14 +165,12 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_keep_away)
         }};
 
     runTest(field, ball_state, friendly_robots, enemy_robots, {},
-            non_terminating_validation_functions, Duration::fromSeconds(2));
+            non_terminating_validation_functions, Duration::fromSeconds(3));
 }
 
 INSTANTIATE_TEST_CASE_P(
     PassEnvironment, SimulatedAttackerTacticKeepAwayTest,
     ::testing::Values(
-        // Stationary Ball Tests
-        // Attacker point != Balls location & Balls location != Robots Location
         std::make_tuple(
             // the best pass so far to pass into the AttackerTactic
             Pass(Point(0.0, 0.0), Point(-3, 2.5), 5),
@@ -194,26 +192,4 @@ INSTANTIATE_TEST_CASE_P(
             // the state of the ball
             BallState(Point(0., 0.), Vector(0, 0)),
             // the states of the enemy robots
-            TestUtil::createStationaryRobotStatesWithId({Point(-0.5, 0.5)})),
-        std::make_tuple(
-            // the best pass so far to pass into the AttackerTactic
-            Pass(Point(0.0, 0.0), Point(-3, 2.5), 5),
-            // the state of the friendly robot
-            RobotStateWithId{1, RobotState(Point(0.25, 0), Vector(0, 0),
-                                           Angle::fromDegrees(0), Angle::fromDegrees(0))},
-            // the state of the ball
-            BallState(Point(0., 0.25), Vector(0, 0)),
-            // the states of the enemy robots
-            TestUtil::createStationaryRobotStatesWithId({Point(-0.5, 0.5),
-                                                         Point(-0.5, 0)})),
-        std::make_tuple(
-            // the best pass so far to pass into the AttackerTactic
-            Pass(Point(0.0, 0.0), Point(-3, 2.5), 5),
-            // the state of the friendly robot
-            RobotStateWithId{1, RobotState(Point(-3, 0), Vector(0, 0),
-                                           Angle::fromDegrees(0), Angle::fromDegrees(0))},
-            // the state of the ball
-            BallState(Point(-3, 0), Vector(0, 0)),
-            // the states of the enemy robots
-            TestUtil::createStationaryRobotStatesWithId({Point(-3, 1), Point(-2.75, 1),
-                                                         Point(-3.25, 1)}))));
+            TestUtil::createStationaryRobotStatesWithId({Point(-0.5, 0.5)}))));
