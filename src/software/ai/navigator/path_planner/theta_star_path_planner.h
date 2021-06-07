@@ -78,12 +78,11 @@ class ThetaStarPathPlanner : public PathPlanner
 
 
 
-        //        std::ostream &operator<<(std::ostream &os, const Coordinate &p) // TODO
-        //        REMOVE, ADDED FOR TESTING
-        //        {
-        //            os << "(" << p.row() << ", " << p.col() << ")";
-        //            return os;
-        //        }
+//                std::ostream &operator<<(std::ostream &os, const Coordinate &p)
+//                {
+//                    os << "(" << p.row() << ", " << p.col() << ")";
+//                    return os;
+//                }
 
        private:
         /**
@@ -470,16 +469,22 @@ class ThetaStarPathPlanner : public PathPlanner
     // isUnblocked and lineOfSight.
     // Description of the Grid-
     // unblocked_grid is indexed with coordinate
-    // true --> The cell is not blocked
+    // true  --> The cell is not blocked
     // false --> The cell is blocked
     // We update this as we go to avoid updating cells we don't use
     std::unordered_map<Coordinate, bool, CoordinateHashFunction>
         unblocked_grid;  // TODO Could try making unblocked_grid and line_of_sight_cache
                          // an unordered_map, and test read times difference
-    std::unordered_set<Coordinate, CoordinateHashFunction>
-        blocked_grid;  // TODO Could try making unblocked_grid and line_of_sight_cache an
+//    std::unordered_set<Coordinate, CoordinateHashFunction>
+//        blocked_grid;  // TODO Could try making unblocked_grid and line_of_sight_cache an
                        // unordered_map, and test read times difference
                        //    std::map<Coordinate, bool> unblocked_grid;
+
+    // Declare a 2D array of structure to hold if a coordinate is blocked
+    // true  --> Coordinate is blocked
+    // false --> Coordinate is not blocked
+    std::vector<std::vector<bool>> coordinate_grid;
+
     // Cache of line of sight that maps a pair of
     // coordinates to whether those two Coordinates have line of sight between them
     std::map<CoordinatePair, bool> line_of_sight_cache;

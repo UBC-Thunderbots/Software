@@ -28,7 +28,11 @@ void ThetaStarPathPlanner::findAllBlockedCoords()
 
         for (Point &blocked_point : blocked_points)
         {
-            blocked_grid.insert(convertPointToCoord(blocked_point));
+            Coordinate blocked_coord = convertPointToCoord(blocked_point);
+            if (isCoordNavigable(blocked_coord))
+            {
+                coordinate_grid[blocked_coord.row()][blocked_coord.col()] = true;
+            }
         }
     }
 }
@@ -62,8 +66,9 @@ bool ThetaStarPathPlanner::isUnblocked(const Coordinate &coord)
 
 bool ThetaStarPathPlanner::isBlocked(const Coordinate &coord)
 {
-    auto blocked_grid_it = blocked_grid.find(coord);
-    return blocked_grid_it != blocked_grid.end();
+//    auto blocked_grid_it = blocked_grid.find(coord);
+//    return blocked_grid_it != blocked_grid.end();
+    return coordinate_grid[coord.row()][coord.col()];
 }
 
 double ThetaStarPathPlanner::coordDistance(const Coordinate &coord1,
@@ -231,17 +236,13 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     findAllBlockedCoords();
 
     // Avoiding the situation where closest_end point is free but end_coord is blocked
-    blocked_grid.erase(end_coord);
+//    blocked_grid.erase(end_coord);
+    coordinate_grid[end_coord.row()][end_coord.col()] = false;
 
     bool found_end = findPathToEnd(end_coord);
 
     if (found_end == false)
     {
-        //        for (auto p = blocked_grid.begin(); p != blocked_grid.end(); ++p)  //
-        //        TODO Remove, added for testing
-        //            std::cout << *p << ", ";
-        //        std::cout << std::endl;
-
         return std::nullopt;
     }
 
@@ -569,10 +570,13 @@ void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
     // Reset data structures to path plan again
     open_list.clear();
     closed_list.clear();
-    blocked_grid.clear();
+    // blocked_grid.clear();
     unblocked_grid.clear();
     line_of_sight_cache.clear();
     cell_heuristics = std::vector<std::vector<CellHeuristic>>(
         num_grid_rows,
         std::vector<CellHeuristic>(num_grid_cols, ThetaStarPathPlanner::CellHeuristic()));
+    coordinate_grid = std::vector<std::vector<bool>>(
+        num_grid_rows,
+        std::vector<bool>(num_grid_cols, false));
 }
