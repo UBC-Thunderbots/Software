@@ -213,3 +213,15 @@ cc_library(
         "//software/world:robot",
     ],
 )
+
+cc_test(
+    name = "keep_away_test",
+    srcs = ["keep_away_test.cpp"],
+    deps = [
+        ":keep_away",
+        "//shared:constants",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+        "//software/world",
+    ],
+)
