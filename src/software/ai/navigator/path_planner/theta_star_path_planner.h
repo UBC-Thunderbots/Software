@@ -76,14 +76,6 @@ class ThetaStarPathPlanner : public PathPlanner
             return internal_comparison_key_ == other.internal_comparison_key_;
         }
 
-
-
-//                std::ostream &operator<<(std::ostream &os, const Coordinate &p)
-//                {
-//                    os << "(" << p.row() << ", " << p.col() << ")";
-//                    return os;
-//                }
-
        private:
         /**
          * Calculate the key of this coordinate based on row and col for comparison. row
@@ -475,15 +467,11 @@ class ThetaStarPathPlanner : public PathPlanner
     std::unordered_map<Coordinate, bool, CoordinateHashFunction>
         unblocked_grid;  // TODO Could try making unblocked_grid and line_of_sight_cache
                          // an unordered_map, and test read times difference
-//    std::unordered_set<Coordinate, CoordinateHashFunction>
-//        blocked_grid;  // TODO Could try making unblocked_grid and line_of_sight_cache an
-                       // unordered_map, and test read times difference
-                       //    std::map<Coordinate, bool> unblocked_grid;
 
     // Declare a 2D array of structure to hold if a coordinate is blocked
     // true  --> Coordinate is blocked
     // false --> Coordinate is not blocked
-    std::vector<std::vector<bool>> coordinate_grid;
+    std::vector<std::vector<bool>> blocked_grid;
 
     // Cache of line of sight that maps a pair of
     // coordinates to whether those two Coordinates have line of sight between them

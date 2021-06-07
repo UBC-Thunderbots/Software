@@ -31,7 +31,7 @@ void ThetaStarPathPlanner::findAllBlockedCoords()
             Coordinate blocked_coord = convertPointToCoord(blocked_point);
             if (isCoordNavigable(blocked_coord))
             {
-                coordinate_grid[blocked_coord.row()][blocked_coord.col()] = true;
+                blocked_grid[blocked_coord.row()][blocked_coord.col()] = true;
             }
         }
     }
@@ -66,9 +66,7 @@ bool ThetaStarPathPlanner::isUnblocked(const Coordinate &coord)
 
 bool ThetaStarPathPlanner::isBlocked(const Coordinate &coord)
 {
-//    auto blocked_grid_it = blocked_grid.find(coord);
-//    return blocked_grid_it != blocked_grid.end();
-    return coordinate_grid[coord.row()][coord.col()];
+    return blocked_grid[coord.row()][coord.col()];
 }
 
 double ThetaStarPathPlanner::coordDistance(const Coordinate &coord1,
@@ -81,30 +79,58 @@ double ThetaStarPathPlanner::coordDistance(const Coordinate &coord1,
 
 bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord1, const Coordinate &coord2)
 {
-    CoordinatePair coord_pair(coord1, coord2);
-    // If we haven't checked this Coordinate pair for intersects before, check it now
-    auto line_of_sight_cache_it = line_of_sight_cache.find(coord_pair);
-    if (line_of_sight_cache_it == line_of_sight_cache.end())
-    {
-        Segment seg(convertCoordToPoint(coord1), convertCoordToPoint(coord2));
-        bool has_line_of_sight = true;
+//    CoordinatePair coord_pair(coord1, coord2);
+//    // If we haven't checked this Coordinate pair for intersects before, check it now
+//    auto line_of_sight_cache_it = line_of_sight_cache.find(coord_pair);
+//    if (line_of_sight_cache_it == line_of_sight_cache.end())
+//    {
+//        Segment seg(convertCoordToPoint(coord1), convertCoordToPoint(coord2));
+//        bool has_line_of_sight = true;
+//
+//        for (const auto &obstacle : obstacles)
+//        {
+//            if (obstacle->intersects(seg))  // TODO Could remove this after implementing
+//                                            // findAllBlockedCoords
+//            {
+//                has_line_of_sight = false;
+//                break;
+//            }
+//        }
+//
+//        // We use the opposite convention to indicate blocked or not
+//        line_of_sight_cache[coord_pair] = has_line_of_sight;
+//        return has_line_of_sight;
+//    }
+//
+//    return line_of_sight_cache_it->second;
+    unsigned int x0 = coord1.row();
+    unsigned int y0 = coord1.col();
+    unsigned int x1 = coord2.row();
+    unsigned int y1 = coord2.col();
 
-        for (const auto &obstacle : obstacles)
+    std::vector<Coordinate> line_of_sight_coords;
+
+    int dx = x1 - x0;
+    int dy = y1 - y0;
+    int D = 2 * dy - dx;
+    int y = y0;
+
+    for (unsigned int x = x0; x <= x1; x++) {
+        if (isBlocked(Coordinate(x, y)))
         {
-            if (obstacle->intersects(seg))  // TODO Could remove this after implementing
-                                            // findAllBlockedCoords
-            {
-                has_line_of_sight = false;
-                break;
-            }
+            // No line of sight since a coordinate in the path from coord1 to coord2 is blocked
+            return false;
         }
 
-        // We use the opposite convention to indicate blocked or not
-        line_of_sight_cache[coord_pair] = has_line_of_sight;
-        return has_line_of_sight;
+        if (D > 0)
+        {
+            y++;
+            D = D - 2*dx;
+        }
+        D = D + 2*dy;
     }
 
-    return line_of_sight_cache_it->second;
+    return true;
 }
 
 std::vector<Point> ThetaStarPathPlanner::tracePath(const Coordinate &end) const
@@ -236,8 +262,7 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     findAllBlockedCoords();
 
     // Avoiding the situation where closest_end point is free but end_coord is blocked
-//    blocked_grid.erase(end_coord);
-    coordinate_grid[end_coord.row()][end_coord.col()] = false;
+    blocked_grid[end_coord.row()][end_coord.col()] = false;
 
     bool found_end = findPathToEnd(end_coord);
 
@@ -570,13 +595,12 @@ void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
     // Reset data structures to path plan again
     open_list.clear();
     closed_list.clear();
-    // blocked_grid.clear();
     unblocked_grid.clear();
     line_of_sight_cache.clear();
     cell_heuristics = std::vector<std::vector<CellHeuristic>>(
         num_grid_rows,
         std::vector<CellHeuristic>(num_grid_cols, ThetaStarPathPlanner::CellHeuristic()));
-    coordinate_grid = std::vector<std::vector<bool>>(
+    blocked_grid = std::vector<std::vector<bool>>(
         num_grid_rows,
         std::vector<bool>(num_grid_cols, false));
 }
