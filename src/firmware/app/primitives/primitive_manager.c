@@ -188,6 +188,7 @@ void app_primitive_manager_runCurrentPrimitive(PrimitiveManager_t *manager,
 
     if (manager->current_primitive_num_ticks_executed > 100)
     {
+        app_primitive_manager_endCurrentPrimitive(manager, world);
         app_primitive_makeRobotSafe(world);
     }
     else if (manager->current_primitive)

@@ -356,19 +356,19 @@ void initIoDrivetrain(void)
 
     AllegroA3931MotorDriver_t *back_left_wheel_driver =
         io_allegro_a3931_motor_driver_create(back_left_wheel_pwm_pin,
-                                             back_left_wheel_dir_pin);
+                                             front_left_wheel_dir_pin);
 
     AllegroA3931MotorDriver_t *front_left_wheel_driver =
         io_allegro_a3931_motor_driver_create(front_left_wheel_pwm_pin,
-                                             front_left_wheel_dir_pin);
+                                             back_left_wheel_dir_pin);
 
     AllegroA3931MotorDriver_t *back_right_wheel_driver =
         io_allegro_a3931_motor_driver_create(back_right_wheel_pwm_pin,
-                                             back_right_wheel_dir_pin);
+                                             front_right_wheel_dir_pin);
 
     AllegroA3931MotorDriver_t *front_right_wheel_driver =
         io_allegro_a3931_motor_driver_create(front_right_wheel_pwm_pin,
-                                             front_right_wheel_dir_pin);
+                                             back_right_wheel_dir_pin);
 
     DrivetrainUnit_t *drivetrain_unit_back_left_wheel =
         io_drivetrain_unit_create(back_left_wheel_driver);
