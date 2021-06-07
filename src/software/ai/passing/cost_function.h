@@ -133,5 +133,13 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
 double getStaticPositionQuality(const Field& field, const Point& position,
                                 std::shared_ptr<const PassingConfig> passing_config);
 
+/**
+ * Returns a function that increases as the point approaches enemy robots.
+ *
+ * @param point a Point
+ * @param enemy_team the enemy team
+ * @param enemy_proximity_importance essentially a scaling factor for the result
+ * @return a measure of how close the point is to one or more enemy robots
+ */
 double calculateProximityRisk(const Point& point, const Team& enemy_team,
                               double enemy_proximity_importance);

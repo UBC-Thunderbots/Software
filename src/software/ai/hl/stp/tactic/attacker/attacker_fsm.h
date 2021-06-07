@@ -100,8 +100,7 @@ struct AttackerFSM
             {
                 auto best_pass_so_far = event.control_params.best_pass_so_far;
                 auto keepaway_dribble_dest =
-                    findKeepAwayTargetPoint(event.common.robot.position(),
-                                            best_pass_so_far.value(), event.common.world);
+                    findKeepAwayTargetPoint(event.common.world, best_pass_so_far.value());
 
                 const auto& enemy_team = event.common.world.enemyTeam();
                 const auto& ball       = event.common.world.ball();
