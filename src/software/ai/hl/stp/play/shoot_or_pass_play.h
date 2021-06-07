@@ -4,7 +4,6 @@
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.h"
 
@@ -36,7 +35,7 @@ class ShootOrPassPlay : public Play
      *
      * @param yield The coroutine to yield
      * @param crease_defender_tactics The crease defender tactics
-     * @param shoot_tactic The shoot tactic
+     * @param attacker_tactic The attacker tactic
      * @param world The current state of the world
      *
      * @return the best pass found
@@ -44,5 +43,5 @@ class ShootOrPassPlay : public Play
     PassWithRating attemptToShootWhileLookingForAPass(
         TacticCoroutine::push_type &yield,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-        std::shared_ptr<ShootGoalTactic> shoot_tactic, const World &world);
+        std::shared_ptr<AttackerTactic> attacker_tactic, const World &world);
 };

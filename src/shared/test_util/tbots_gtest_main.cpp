@@ -30,6 +30,9 @@ int main(int argc, char **argv)
         {
             TbotsGtestMain::stop_ai_on_start = args->getStopAiOnStart()->value();
             TbotsGtestMain::test_speed       = args->getTestSpeed()->value();
+            // disable floating point errors when using visualizer due to potential
+            // floating point errors in QT
+            fedisableexcept(FE_INVALID | FE_OVERFLOW);
         }
     }
 

@@ -28,7 +28,7 @@ class WifiBackend : public Backend
      * NOTE: This will terminate the existing connection on the previous channel
      * if it exists.
      *
-     * @param channel The channel to join, index of MULTICAST_CHANNELS in
+     * @param channel The channel to join, index of ROBOT_MULTICAST_CHANNELS in
      * shared/constants.h
      * @param interface The interface to join the multicast group on (lo, eth0, enp3s0f1,
      * etc.)
