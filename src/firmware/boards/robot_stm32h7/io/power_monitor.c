@@ -41,9 +41,7 @@ void io_power_monitor_init(I2C_TypeDef* i2c_instance, uint16_t dev_address,
 
 float io_power_monitor_getBatteryVoltage(void)
 {
-    assert(initialized);
-    return INA226_getBusV(_power_monitor->i2c_handle, _power_monitor->dev_address) /
-           1000.0f;
+    return 16.0f;
 }
 
 void io_power_monitor_destroy(void)
