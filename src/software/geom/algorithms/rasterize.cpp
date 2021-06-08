@@ -128,17 +128,19 @@ std::vector<Point> rasterize(const Rectangle& rectangle, const double resolution
 
 std::vector<Point> rasterize(const Polygon& polygon, const double resolution_size)
 {
+    
+
     // Using even-odd rule algorithm to fill in polygon
     // https://stackoverflow.com/a/31768384
     std::vector<Point> contained_points;
     const auto& polygon_vertices = polygon.getPoints();
 
     // TODO: remove later after debugging
-       // std::cout << "Polygon vertices\n";
-       // for (auto p = polygon_vertices.begin(); p != polygon_vertices.end();
-       //      ++p)  // TODO Remove, added for testing
-       //     std::cout << *p << ", ";
-       // std::cout << std::endl;
+    std::cout << "Polygon vertices\n";
+    for (auto p = polygon_vertices.begin(); p != polygon_vertices.end();
+        ++p)  // TODO Remove, added for testing
+       std::cout << *p << ", ";
+    std::cout << std::endl;
 
     auto max_point_y = [](const Point& a, const Point& b) { return a.y() < b.y(); };
 
@@ -154,12 +156,14 @@ std::vector<Point> rasterize(const Polygon& polygon, const double resolution_siz
     double max_y =
         std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
             ->y();
+    std::vector<Point> points_in_y_row;
+    double y_coord;
 
     // loop through rows of the image (i.e. polygon)
-    for (double y_coord = min_y; y_coord <= max_y; y_coord += resolution_size)
+    for (y_coord = min_y; y_coord <= max_y; y_coord += resolution_size)
     {
         // we create a line that intersects the polygon at this y coordinate
-        Ray intersecting_ray = Ray(Point(min_x, y_coord), Vector(1, 0));
+        Ray intersecting_ray = Ray(Point(min_x - 1, y_coord), Vector(1, 0));
 
         auto intersections_with_polygon = intersection(polygon, intersecting_ray);
         std::vector<Point> sorted_intersections_with_polygon(
@@ -171,6 +175,7 @@ std::vector<Point> rasterize(const Polygon& polygon, const double resolution_siz
         unsigned int intersection_index = 0;
         double x_coord                  = min_x;
         bool in_polygon                 = false;
+        points_in_y_row.clear();
 
         while (intersection_index < num_of_intersections)
         {
@@ -180,20 +185,17 @@ std::vector<Point> rasterize(const Polygon& polygon, const double resolution_siz
             {
                 x_coord = min_x + resolution_size * std::ceil((intersection_point.x() - min_x) / resolution_size);
                 point = Point(x_coord, y_coord);
-                if (!isAVertex(point, polygon, resolution_size))
-                {
-                    contained_points.emplace_back(point);
-                    in_polygon = true;
-                }
+                points_in_y_row.emplace_back(point);
                 intersection_index += 1;
+                in_polygon = true;
             }
             else
             {
                 x_coord += resolution_size;
                 point = Point(x_coord, y_coord);
-                if (x_coord < intersection_point.x())
+                if (x_coord < (intersection_point.x() + resolution_size))
                 {
-                    contained_points.emplace_back(point);
+                    points_in_y_row.emplace_back(point);
                 }
                 else
                 {
@@ -201,15 +203,24 @@ std::vector<Point> rasterize(const Polygon& polygon, const double resolution_siz
                     intersection_index += 1;
                 }
             }
+        }
+        contained_points.insert(contained_points.end(), points_in_y_row.begin(), points_in_y_row.end());
+    }
 
+    //double the top row if necessary
+    if (y_coord < (max_y + resolution_size))
+    {
+        for (auto p = points_in_y_row.begin(); p != points_in_y_row.end(); ++p)
+        {
+            contained_points.emplace_back(*p + Vector(0, resolution_size));
         }
     }
 
     // TODO: remove
-       // for (auto p = contained_points.begin(); p != contained_points.end();
-       //      ++p)  // TODO Remove, added for testing
-       //     std::cout << *p << ", ";
-       // std::cout << std::endl;
+    for (auto p = contained_points.begin(); p != contained_points.end();
+        ++p)  // TODO Remove, added for testing
+       std::cout << *p << ", ";
+    std::cout << std::endl;
 
     return contained_points;
 }
