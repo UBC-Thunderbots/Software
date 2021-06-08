@@ -246,3 +246,27 @@ TEST(RasterizeTest, test_rasterize_polygon_complex)
     }
     TestUtil::checkPointsCloseToEachOther(rasterized_points, offset);
 }
+
+TEST(RasterizeTest, test_hexagon)
+{
+    Polygon hexagon{{0.0f, 2.0f},    // top vertex
+                    {1.8f, 1.0f},    // top right vertex
+                    {1.8f, -1.0f},   // bottom right vertex
+                    {0.0f, -2.0f},   // bottom vertex
+                    {-2.0f, -1.0f},  // bottom left vertex
+                    {-2.0f, 1.0f}};  // top left vertex
+    double offset             = 0.5f;
+
+    std::vector<Point> rasterized_points = rasterize(hexagon, offset);
+    for (Point p : rasterized_points)
+    {
+        bool result = contains(hexagon, p);
+        // TODO: Remove std::cout
+        if (!result)
+        {
+            std::cout << "FAILED: " << p << "\n";
+        }
+        EXPECT_TRUE(contains(hexagon, p));
+    }
+    TestUtil::checkPointsCloseToEachOther(rasterized_points, offset);
+}

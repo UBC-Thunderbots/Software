@@ -44,20 +44,14 @@ class Point final
      *
      * @return the x coordinate of this Point
      */
-    inline double x() const
-    {
-        return x_;
-    }
+    double x() const;
 
     /**
      * Returns the y coordinate of this Point
      *
      * @return the y coordinate of this Point
      */
-    inline double y() const
-    {
-        return y_;
-    }
+    double y() const;
 
     /**
      * Sets the coordinates of this point to the new coordinates
