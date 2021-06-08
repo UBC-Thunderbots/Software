@@ -226,7 +226,7 @@ cc_test(
 cc_test(
     name = "angle_map_test",
     srcs = [
-        "angle_map.cpp",
+        "angle_map_test.cpp",
     ],
     deps = [
         ":angle_map",
