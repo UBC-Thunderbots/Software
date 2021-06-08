@@ -19,4 +19,5 @@ class ThreadedSensorFusion : public Subject<World>,
     void onValueReceived(SensorProto sensor_msg) override;
 
     SensorFusion sensor_fusion;
+    static constexpr size_t DIFFERENT_GRSIM_FRAMES_RECEIVED = 4;
 };

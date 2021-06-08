@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "software/ai/hl/stp/tactic/move_to_goal_line/move_to_goal_line_tactic.h"
+#include "software/ai/hl/stp/tactic/move_goalie_to_goal_line/move_goalie_to_goal_line_tactic.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
@@ -9,7 +9,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedMoveToGoalLineTacticTest
+class SimulatedMoveGoalieToGoalLineTacticTest
     : public SimulatedTacticTestFixture,
       public ::testing::WithParamInterface<RobotStateWithId>
 {
@@ -17,7 +17,7 @@ class SimulatedMoveToGoalLineTacticTest
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_P(SimulatedMoveToGoalLineTacticTest, move_to_goal_line_test)
+TEST_P(SimulatedMoveGoalieToGoalLineTacticTest, move_to_goal_line_test)
 {
     RobotStateWithId robot_state = GetParam();
 
@@ -25,7 +25,7 @@ TEST_P(SimulatedMoveToGoalLineTacticTest, move_to_goal_line_test)
 
     BallState ball_state = BallState(Point(0.5, 0.5), Vector(0, 0));
 
-    auto tactic = std::make_shared<MoveToGoalLineTactic>();
+    auto tactic = std::make_shared<MoveGoalieToGoalLineTactic>();
     setTactic(tactic);
     setRobotId(0);
 
@@ -53,7 +53,7 @@ TEST_P(SimulatedMoveToGoalLineTacticTest, move_to_goal_line_test)
 }
 
 INSTANTIATE_TEST_CASE_P(
-    PassEnvironment, SimulatedMoveToGoalLineTacticTest,
+    PassEnvironment, SimulatedMoveGoalieToGoalLineTacticTest,
     ::testing::Values(
         // Robot on friendly half, not facing opponent
         RobotStateWithId{0, RobotState(Point(1, 2), Vector(1, 1), Angle::fromDegrees(180),

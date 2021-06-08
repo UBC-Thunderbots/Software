@@ -1,11 +1,11 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "move_to_goal_line_tactic",
-    srcs = ["move_to_goal_line_tactic.cpp"],
+    name = "move_goalie_to_goal_line_tactic",
+    srcs = ["move_goalie_to_goal_line_tactic.cpp"],
     hdrs = [
-        "move_to_goal_line_fsm.h",
-        "move_to_goal_line_tactic.h",
+        "move_goalie_to_goal_line_fsm.h",
+        "move_goalie_to_goal_line_tactic.h",
     ],
     deps = [
         "//shared:constants",
@@ -21,20 +21,20 @@ cc_library(
 )
 
 cc_test(
-    name = "move_to_goal_line_fsm_test",
-    srcs = ["move_to_goal_line_fsm_test.cpp"],
+    name = "move_goalie_to_goal_line_fsm_test",
+    srcs = ["move_goalie_to_goal_line_fsm_test.cpp"],
     deps = [
-        ":move_to_goal_line_tactic",
+        ":move_goalie_to_goal_line_tactic",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
     ],
 )
 
 cc_test(
-    name = "simulated_move_to_goal_line_tactic_test",
-    srcs = ["simulated_move_to_goal_line_tactic_test.cpp"],
+    name = "simulated_move_goalie_to_goal_line_tactic_test",
+    srcs = ["simulated_move_goalie_to_goal_line_tactic_test.cpp"],
     deps = [
-        ":move_to_goal_line_tactic",
+        ":move_goalie_to_goal_line_tactic",
         "//shared/test_util:tbots_gtest_main",
         "//software/simulated_tests:simulated_tactic_test_fixture",
         "//software/simulated_tests/terminating_validation_functions",
