@@ -16,9 +16,12 @@
  * Now we have another angle segment:
  * c = 45 -> 90
  *
- * If c gets added to the map it will only merge with one of a or b, not both. Merging with the one that was placed in the map first
+ * If c gets added to the map it will only merge with one of a or b, not both. Merging
+ * with the one that was placed in the map first
  *
- * The map will still have two angle segments even though it should only have one since they all overlap. Sorting before hand solves this so they'll all be in an incremental order
+ * The map will still have two angle segments even though it should only have one since
+ * they all overlap. Sorting before hand solves this so they'll all be in an incremental
+ * order
  */
 class AngleMap
 {
