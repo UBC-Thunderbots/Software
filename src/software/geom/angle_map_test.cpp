@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
- TEST(AngleMapTest, add_obstacle_angle_segment_takes_entire_angle_map)
+TEST(AngleMapTest, add_obstacle_angle_segment_takes_entire_angle_map)
 {
     Angle top_angle    = Angle::half();
     Angle bottom_angle = Angle::zero();
@@ -14,40 +14,37 @@
     EXPECT_EQ(0, angle_map.getBiggestViableAngleSegment().getDelta());
 }
 
- TEST(AngleMapTest, add_obstacle_angle_segment_takes_lower_half_angle_map)
+TEST(AngleMapTest, add_obstacle_angle_segment_takes_lower_half_angle_map)
 {
     Angle top_angle    = Angle::half();
     Angle bottom_angle = Angle::zero();
     AngleMap angle_map = AngleMap(top_angle, bottom_angle, 1);
 
-    AngleSegment obstacle_angle_seg =
-        AngleSegment(Angle::quarter(), Angle::zero());
+    AngleSegment obstacle_angle_seg = AngleSegment(Angle::quarter(), Angle::zero());
     angle_map.addNonViableAngleSegment(obstacle_angle_seg);
 
     EXPECT_EQ(90, angle_map.getBiggestViableAngleSegment().getDelta());
 }
 
- TEST(AngleMapTest, add_obstacle_angle_segment_takes_upper_half_angle_map)
+TEST(AngleMapTest, add_obstacle_angle_segment_takes_upper_half_angle_map)
 {
     Angle top_angle    = Angle::half();
     Angle bottom_angle = Angle::zero();
     AngleMap angle_map = AngleMap(top_angle, bottom_angle, 1);
 
-    AngleSegment obstacle_angle_seg =
-        AngleSegment(Angle::half(), Angle::quarter());
+    AngleSegment obstacle_angle_seg = AngleSegment(Angle::half(), Angle::quarter());
     angle_map.addNonViableAngleSegment(obstacle_angle_seg);
 
     EXPECT_EQ(90, angle_map.getBiggestViableAngleSegment().getDelta());
 }
 
- TEST(AngleMapTest, add_obstacle_angle_segment_contained_within_another)
+TEST(AngleMapTest, add_obstacle_angle_segment_contained_within_another)
 {
     Angle top_angle    = Angle::half();
     Angle bottom_angle = Angle::zero();
     AngleMap angle_map = AngleMap(top_angle, bottom_angle, 1);
 
-    AngleSegment obstacle_angle_seg =
-        AngleSegment(Angle::quarter(), Angle::zero());
+    AngleSegment obstacle_angle_seg = AngleSegment(Angle::quarter(), Angle::zero());
     angle_map.addNonViableAngleSegment(obstacle_angle_seg);
 
     AngleSegment overlapping_angle_seg =
@@ -57,14 +54,13 @@
     EXPECT_EQ(90, angle_map.getBiggestViableAngleSegment().getDelta());
 }
 
- TEST(AngleMapTest, add_obstacle_angle_segment_overlaps_with_another)
+TEST(AngleMapTest, add_obstacle_angle_segment_overlaps_with_another)
 {
     Angle top_angle    = Angle::half();
     Angle bottom_angle = Angle::zero();
     AngleMap angle_map = AngleMap(top_angle, bottom_angle, 1);
 
-    AngleSegment obstacle_angle_seg =
-        AngleSegment(Angle::quarter(), Angle::zero());
+    AngleSegment obstacle_angle_seg = AngleSegment(Angle::quarter(), Angle::zero());
     angle_map.addNonViableAngleSegment(obstacle_angle_seg);
 
     AngleSegment overlapping_angle_seg =
@@ -94,7 +90,7 @@ TEST(AngleMapTest, add_obstacle_angle_segment_overlaps_with_two_others)
             AngleSegment(Angle::half(), Angle::fromDegrees(135));
     angle_map.addNonViableAngleSegment(second_obstacle_angle_seg);
 
-    AngleSegment overlapping_obstacle_angle_seg = AngleSegment(Angle::half(), Angle::quarter());
-    angle_map.addNonViableAngleSegment(overlapping_obstacle_angle_seg);
+    AngleSegment overlapping_obstacle_angle_seg = AngleSegment(Angle::half(),
+Angle::quarter()); angle_map.addNonViableAngleSegment(overlapping_obstacle_angle_seg);
 }
  */
