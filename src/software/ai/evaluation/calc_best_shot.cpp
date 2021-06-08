@@ -4,7 +4,7 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
                                        const std::vector<Robot> &robot_obstacles,
                                        TeamType goal, double radius)
 {
-    size_t max_num_obstacles = robot_obstacles.empty() ? 1 : robot_obstacles.size();
+    size_t max_num_obstacles = robot_obstacles.size();
 
     Angle pos_post_angle = (goal_post.getStart() - shot_origin).orientation();
     Angle neg_post_angle = (goal_post.getEnd() - shot_origin).orientation();
@@ -19,7 +19,6 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
         neg_post_angle = (tmp + Angle::half()).clamp();
     }
     AngleMap angle_map(pos_post_angle, neg_post_angle, max_num_obstacles);
-
 
     for (const Robot &robot_obstacle : robot_obstacles)
     {
@@ -99,10 +98,7 @@ std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_
     std::vector<Robot> obstacles;
     std::vector<Robot> all_robots;
 
-    size_t max_num_robots =
-        (enemy_team.numRobots() + friendly_team.numRobots()) <= 1
-            ? 1
-            : (enemy_team.numRobots() + friendly_team.numRobots() - 1);
+    size_t max_num_robots = enemy_team.numRobots() + friendly_team.numRobots();
     all_robots.reserve(max_num_robots);
     all_robots.insert(all_robots.begin(), enemy_team.getAllRobots().begin(),
                       enemy_team.getAllRobots().end());

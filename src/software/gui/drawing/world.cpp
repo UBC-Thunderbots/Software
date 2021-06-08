@@ -28,14 +28,6 @@ void drawWorld(QGraphicsScene* scene, const World& world, TeamColour friendly_te
     friendly_goal_colour.setAlpha(100);
     QColor enemy_goal_colour = enemy_team_colour_;
     enemy_goal_colour.setAlpha(100);
-    QPen path_pen(navigator_path_color);
-    // The cap style must be NOT be set to SquareCap. It can be set to anything else.
-    // Drawing a line of length 0 with the SquareCap style causes a large line to be
-    // drawn
-    path_pen.setCapStyle(Qt::PenCapStyle::RoundCap);
-    path_pen.setWidth(2);
-    path_pen.setCosmetic(true);
-    path_pen.setStyle(Qt::DashLine);
 
     drawField(scene, world.field());
     drawTeamGoalText(scene, world.field());

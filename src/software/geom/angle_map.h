@@ -5,6 +5,20 @@
 /**
  * Represents an AngleMap that is confined to a top and bottom angle, with angles
  * described as going from pi -> 0 -> -pi
+ *
+ * NOTE:
+ * If we have two angle segments:
+ * a = 0 -> 45
+ * b = 90 -> 180
+ *
+ * These two get added to the map
+ *
+ * Now we have another angle segment:
+ * c = 45 -> 90
+ *
+ * If c gets added to the map it will only merge with one of a or b, not both. Merging with the one that was placed in the map first
+ *
+ * The map will still have two angle segments even though it should only have one since they all overlap. Sorting before hand solves this so they'll all be in an incremental order
  */
 class AngleMap
 {
@@ -43,7 +57,7 @@ class AngleMap
      *
      * @param angleSegment the AngleSegment to mark as occupied
      */
-    void addNonViableAngleSegment(AngleSegment &angle_seg);
+    void addNonViableAngleSegment(AngleSegment &obstacle_angle_seg);
 
     /**
      * Gets the biggest AngleSegment within the map that isn't occupied

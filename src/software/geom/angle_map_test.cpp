@@ -69,28 +69,3 @@ TEST(AngleMapTest, add_obstacle_angle_segment_overlaps_with_another)
 
     EXPECT_EQ(45, angle_map.getBiggestViableAngleSegment().getDelta());
 }
-
-/**
- * Example of undefined behaviour
- * Two AngleSegment's not overlapping would be joined by the third ideally, but we
- * don't define this behaviour. This scenario can be solved by sorting before hand
- * instead
- *
-TEST(AngleMapTest, add_obstacle_angle_segment_overlaps_with_two_others)
-{
-    Angle top_angle    = Angle::half();
-    Angle bottom_angle = Angle::zero();
-    AngleMap angle_map = AngleMap(top_angle, bottom_angle, 1);
-
-    AngleSegment obstacle_angle_seg =
-            AngleSegment(Angle::quarter(), Angle::zero());
-    angle_map.addNonViableAngleSegment(obstacle_angle_seg);
-
-    AngleSegment second_obstacle_angle_seg =
-            AngleSegment(Angle::half(), Angle::fromDegrees(135));
-    angle_map.addNonViableAngleSegment(second_obstacle_angle_seg);
-
-    AngleSegment overlapping_obstacle_angle_seg = AngleSegment(Angle::half(),
-Angle::quarter()); angle_map.addNonViableAngleSegment(overlapping_obstacle_angle_seg);
-}
- */
