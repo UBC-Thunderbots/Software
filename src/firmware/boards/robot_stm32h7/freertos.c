@@ -171,7 +171,7 @@ const osThreadAttr_t RobotStatusSend_attributes = {
 };
 /* Definitions for PrimExectuor */
 osThreadId_t PrimExectuorHandle;
-uint32_t PrimExectuorBuffer[ 1024 ];
+uint32_t PrimExectuorBuffer[ 4096 ];
 osStaticThreadDef_t PrimExectuorControlBlock;
 const osThreadAttr_t PrimExectuor_attributes = {
   .name = "PrimExectuor",
@@ -351,6 +351,8 @@ void initIoNetworking(void)
 
     // Initialize network logger
     io_network_logger_init(RobotLogProtoQHandle);
+
+    io_vision_init();
 }
 
 void initIoDrivetrain(void)

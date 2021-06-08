@@ -83,43 +83,67 @@ float io_vision_getBallVelocityY(void)
 }
 float io_vision_getRobotPositionX(void)
 {
+    float temp = 0.0f;
     io_lock_vision();
-    float temp = vision.robot_states[0].value.global_position.x_meters;
+    if (vision.robot_states_count == 1)
+    {
+     temp = vision.robot_states[0].value.global_position.x_meters;
+    }
     io_unlock_vision();
     return temp;
 }
 float io_vision_getRobotPositionY(void)
 {
+    float temp = 0.0f;
     io_lock_vision();
-    float temp = vision.robot_states[0].value.global_position.y_meters;
+    if (vision.robot_states_count == 1)
+    {
+     temp = vision.robot_states[0].value.global_position.y_meters;
+    }
     io_unlock_vision();
     return temp;
 }
 float io_vision_getRobotOrientation(void)
 {
+    float temp = 0.0f;
     io_lock_vision();
-    float temp = vision.robot_states[0].value.global_orientation.radians;
+    if (vision.robot_states_count == 1)
+    {
+        temp = vision.robot_states[0].value.global_orientation.radians;
+    }
     io_unlock_vision();
     return temp;
 }
 float io_vision_getRobotVelocityX(void)
 {
+    float temp = 0.0f;
     io_lock_vision();
-    float temp = vision.robot_states[0].value.global_velocity.x_component_meters;
+    if (vision.robot_states_count == 1)
+    {
+     temp = vision.robot_states[0].value.global_velocity.x_component_meters;
+    }
     io_unlock_vision();
     return temp;
 }
 float io_vision_getRobotVelocityY(void)
 {
+    float temp = 0.0f;
     io_lock_vision();
-    float temp = vision.robot_states[0].value.global_velocity.y_component_meters;
+    if (vision.robot_states_count == 1)
+    {
+        temp = vision.robot_states[0].value.global_velocity.y_component_meters;
+    }
     io_unlock_vision();
     return temp;
 }
 float io_vision_getRobotAngularVelocity(void)
 {
+    float temp = 0.0f;
     io_lock_vision();
-    float temp = vision.robot_states[0].value.global_angular_velocity.radians_per_second;
+    if (vision.robot_states_count == 1)
+    {
+        temp = vision.robot_states[0].value.global_angular_velocity.radians_per_second;
+    }
     io_unlock_vision();
     return temp;
 }
