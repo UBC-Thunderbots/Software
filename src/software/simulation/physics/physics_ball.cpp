@@ -8,12 +8,12 @@
 
 PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_state,
                          const double mass_kg,
-                         std::shared_ptr<const SimulatorConfig> simulator_config)
+                         std::shared_ptr<const PhysicsConfig> physics_config)
     : in_flight_origin(std::nullopt),
       in_flight_distance_meters(0.0),
       flight_angle_of_departure(Angle::zero()),
       initial_kick_speed(std::nullopt),
-      simulator_config(simulator_config)
+      physics_config(physics_config)
 {
     // All the BodyDef must be defined before the body is created.
     // Changes made after aren't reflected
@@ -42,7 +42,7 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const BallState &ball_s
         static_cast<float>(M_PI * ball_shape.m_radius * ball_shape.m_radius);
     ball_fixture_def.density = static_cast<float>(mass_kg / ball_area);
     ball_fixture_def.restitution =
-        static_cast<float>(simulator_config->getBallRestitution()->value());
+        static_cast<float>(physics_config->getBallRestitution()->value());
     ball_fixture_def.friction = static_cast<float>(BALL_FRICTION);
     ball_fixture_def.userData =
         new PhysicsObjectUserData({PhysicsObjectType::BALL, this});
@@ -212,7 +212,7 @@ Vector PhysicsBall::calculateVelocityDeltaDueToFriction(const Duration &time_ste
     // where v1 is the initial rolling speed and v0 is the initial sliding speed
     static constexpr double SLIDING_ROLLING_TRANSITION_FACTOR = 5.0 / 7.0;
     const double rolling_friction_acceleration =
-        simulator_config->getRollingFrictionAcceleration()->value();
+        physics_config->getRollingFrictionAcceleration()->value();
 
     auto current_ball_state = getBallState();
 
@@ -243,9 +243,9 @@ Vector PhysicsBall::calculateFrictionBallModelFutureVelocity(
     const double seconds_in_future = duration_in_future.toSeconds();
     const double initial_speed     = initial_ball_velocity.length();
     const double sliding_friction_acceleration =
-        simulator_config->getSlidingFrictionAcceleration()->value();
+        physics_config->getSlidingFrictionAcceleration()->value();
     const double rolling_friction_acceleration =
-        simulator_config->getRollingFrictionAcceleration()->value();
+        physics_config->getRollingFrictionAcceleration()->value();
 
     // Figure out how long the ball will roll/slide, if at all
     // if sliding_friction_acceleration is 0 then max_sliding_duration_secs is inf,

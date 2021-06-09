@@ -25,11 +25,11 @@ class PhysicsBall
      * @param world A shared_ptr to a Box2D World
      * @param ball_state The initial state of the ball
      * @param mass_kg The mass of the ball in kg
-     * @param simulator_config The config to fetch parameters from
+     * @param physics_config The config to fetch parameters from
      */
     explicit PhysicsBall(std::shared_ptr<b2World> world, const BallState& ball_state,
                          const double mass_kg,
-                         std::shared_ptr<const SimulatorConfig> simulator_config);
+                         std::shared_ptr<const PhysicsConfig> physics_config);
     PhysicsBall() = delete;
 
     // Delete the copy and assignment operators because copying this class causes
@@ -186,5 +186,5 @@ class PhysicsBall
     // initial speed a ball is kicked to model friction behaviour
     std::optional<double> initial_kick_speed;  // m/s
 
-    std::shared_ptr<const SimulatorConfig> simulator_config;
+    std::shared_ptr<const PhysicsConfig> physics_config;
 };

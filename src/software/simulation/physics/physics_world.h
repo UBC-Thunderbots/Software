@@ -26,10 +26,10 @@ class PhysicsWorld
      * Creates a new PhysicsWorld that will contain no robots and no ball.
      *
      * @param field The initial state of the field
-     * @param simulator_config The config to fetch parameters from
+     * @param physics_config The config to fetch parameters from
      */
     explicit PhysicsWorld(const Field& field,
-                          std::shared_ptr<const SimulatorConfig> simulator_config);
+                          std::shared_ptr<const PhysicsConfig> physics_config);
     PhysicsWorld() = delete;
 
     // Delete the copy and assignment operators because copying this class causes
@@ -229,7 +229,7 @@ class PhysicsWorld
 
     PhysicsField physics_field;
     std::shared_ptr<PhysicsBall> physics_ball;
-    std::shared_ptr<const SimulatorConfig> simulator_config;
+    std::shared_ptr<const PhysicsConfig> physics_config;
     std::vector<std::shared_ptr<PhysicsRobot>> yellow_physics_robots;
     std::vector<std::shared_ptr<PhysicsRobot>> blue_physics_robots;
 };

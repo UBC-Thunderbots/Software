@@ -19,13 +19,16 @@ extern "C"
 Simulator::Simulator(const Field& field,
                      std::shared_ptr<const SimulatorConfig> simulator_config,
                      const Duration& physics_time_step)
-    : physics_world(field, simulator_config),
+    : physics_world(field, simulator_config->getPhysicsConfig()),
       yellow_team_defending_side(FieldSide::NEG_X),
       blue_team_defending_side(FieldSide::NEG_X),
       frame_number(0),
-      physics_time_step(physics_time_step)
+      physics_time_step(physics_time_step),
+      simulator_config(simulator_config)
 {
     this->resetCurrentFirmwareTime();
+    simulator_config->getSimulationRateHz()->registerCallbackFunction(
+        [this](double hz) { this->physics_time_step = Duration::fromSeconds(1.0 / hz); });
 }
 
 void Simulator::setBallState(const BallState& ball_state)

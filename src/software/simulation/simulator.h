@@ -226,7 +226,7 @@ class Simulator
     unsigned int frame_number;
 
     // The time step used to simulate physics and primitives
-    const Duration physics_time_step;
+    Duration physics_time_step;
 
     // The camera ID of all SSLDetectionFrames published by the simulator.
     // This simulates having a single camera that can see the entire field
@@ -244,4 +244,6 @@ class Simulator
     // The current time. This is static so that it may be used by the firmware,
     // and so must be set before each firmware tick
     static Timestamp current_firmware_time;
+
+    std::shared_ptr<const SimulatorConfig> simulator_config;
 };
