@@ -2,9 +2,10 @@
 
 #include <gtest/gtest.h>
 
-#include "software/simulated_tests/non_terminating_validation_functions/robots_avoid_ball_validation.h"
 #include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/non_terminating_validation_functions/robots_avoid_ball_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
+#include "software/simulated_tests/terminating_validation_functions/robot_halt_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
@@ -37,12 +38,8 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_play)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            // This will keep the test running for 9.5 seconds to give everything enough
-            // time to settle into position and be observed with the Visualizer
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
-            {
-                yield("Timestamp not at 9.5s");
-            }
+            // Wait for all robots to come to a halt
+            robotHalt(world_ptr, yield);
             // Two robots defending close to the enemy robot performing the free kick
             Rectangle shadowing_free_kicker_rect(Point(0, 3), Point(1, 2));
             robotInPolygon(1, shadowing_free_kicker_rect, world_ptr, yield);
@@ -101,12 +98,8 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_close_to_net)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            // This will keep the test running for 9.5 seconds to give everything enough
-            // time to settle into position and be observed with the Visualizer
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
-            {
-                yield("Timestamp not at 9.5s");
-            }
+            // Wait for all robots to come to a halt
+            robotHalt(world_ptr, yield);
             // Two robots defending close to the enemy robot performing the free kick
             Rectangle shadowing_free_kicker_rect(Point(-3.5, 1.25), Point(-2.75, 0.5));
             robotInPolygon(1, shadowing_free_kicker_rect, world_ptr, yield);
@@ -167,12 +160,8 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_chipper_robots_close_to_net)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            // This will keep the test running for 9.5 seconds to give everything enough
-            // time to settle into position and be observed with the Visualizer
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
-            {
-                yield("Timestamp not at 9.5s");
-            }
+            // Wait for all robots to come to a halt
+            robotHalt(world_ptr, yield);
             // Two robots defending close to the enemy robot performing the free kick
             Rectangle shadowing_free_kicker_rect(Point(-2, 2), Point(-1.5, 1.25));
             robotInPolygon(1, shadowing_free_kicker_rect, world_ptr, yield);
