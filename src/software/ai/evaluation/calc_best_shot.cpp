@@ -60,7 +60,7 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
     }
 
     AngleSegment biggest_angle_seg = angle_map.getBiggestViableAngleSegment();
-    if (biggest_angle_seg.getDelta() == 0)
+    if (biggest_angle_seg.getDeltaInDegrees() == 0)
     {
         return std::nullopt;
     }
@@ -86,7 +86,7 @@ std::optional<Shot> calcBestShotOnGoal(const Segment &goal_post, const Point &sh
     Point shot_point = (top_point - bottom_point) / 2 + bottom_point;
 
     return std::make_optional(
-        Shot(shot_point, Angle::fromDegrees(biggest_angle_seg.getDelta())));
+        Shot(shot_point, Angle::fromDegrees(biggest_angle_seg.getDeltaInDegrees())));
 }
 
 std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_team,

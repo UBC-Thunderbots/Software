@@ -4,7 +4,8 @@
 
 /**
  * NOTE:
- * The operators are for making sorting more performant
+ * We use the top angle for all operators. These custom operators allow us to make
+ * sorting for calcbestshot more performant.
  */
 class AngleSegment
 {
@@ -47,11 +48,11 @@ class AngleSegment
 
 
     /**
-     * Gets the abs delta angle between the two angles that describe this angle segment
+     * Gets the abs delta angle in degrees between the two angles that describe this angle segment
      *
-     * @return the abs delta angle between the top and bottom angles
+     * @return the abs delta angle in degrees between the top and bottom angles
      */
-    double getDelta() const;
+    double getDeltaInDegrees() const;
 
     /**
      * Compares another AngleSegment's top angle
