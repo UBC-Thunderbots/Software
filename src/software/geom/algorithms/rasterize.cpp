@@ -4,9 +4,9 @@
 #include <cmath>
 
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/distance.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/algorithms/rasterize.h"
-#include "software/geom/algorithms/distance.h"
 
 
 bool isInPixel(const Point& a, const Point& b, double resolution_size);
@@ -117,12 +117,13 @@ std::vector<Point> rasterize(const Rectangle& rectangle, const double resolution
 std::vector<Point> rasterize(const Polygon& polygon, const double resolution_size)
 {
     // Used to avoid points being outside of polygon due to floating point errors
-    const double EPSILON = 0.0001;
+    const double EPSILON         = 0.0001;
     const auto& polygon_vertices = polygon.getPoints();
     std::vector<Point> covered_points;
 
     // Fill the edges
-    for (unsigned int i = 0; i < polygon_vertices.size(); i++) {
+    for (unsigned int i = 0; i < polygon_vertices.size(); i++)
+    {
         Point curr_point = polygon_vertices[i];
         Point next_point;
 
@@ -130,25 +131,28 @@ std::vector<Point> rasterize(const Polygon& polygon, const double resolution_siz
         {
             // The next point of the last point is the first point
             next_point = polygon_vertices[0];
-        } else
+        }
+        else
         {
             next_point = polygon_vertices[i + 1];
         }
 
         // Skip if both points are the same
-        if (curr_point == next_point) continue;
+        if (curr_point == next_point)
+            continue;
 
-        int num_segments = (int)std::ceil(distance(curr_point, next_point) / resolution_size);
+        int num_segments =
+            (int)std::ceil(distance(curr_point, next_point) / resolution_size);
         double dy = (next_point.y() - curr_point.y()) / num_segments;
         double dx = (next_point.x() - curr_point.x()) / num_segments;
 
         for (int segment = 1; segment < num_segments; segment++)
         {
-            covered_points.emplace_back(Point(curr_point.x() + dx * segment, curr_point.y() + dy * segment));
+            covered_points.emplace_back(
+                Point(curr_point.x() + dx * segment, curr_point.y() + dy * segment));
         }
         // Don't add next_point as it will be added in the next iteration
         covered_points.emplace_back(curr_point);
-
     }
 
 
@@ -159,17 +163,17 @@ std::vector<Point> rasterize(const Polygon& polygon, const double resolution_siz
 
     // Calculate the highest and lowest x and y points
     double min_x =
-            std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)
-                    ->x();
+        std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)
+            ->x();
     double min_y =
-            std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
-                    ->y();
+        std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
+            ->y();
     double max_x =
-            std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)
-                    ->x();
+        std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)
+            ->x();
     double max_y =
-            std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
-                    ->y();
+        std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
+            ->y();
 
     int num_pixels_x = (int)std::ceil((max_x - min_x) / resolution_size);
     int num_pixels_y = (int)std::ceil((max_y - min_y) / resolution_size);
@@ -215,7 +219,7 @@ std::vector<Point> rasterize(const Polygon& polygon, const double resolution_siz
     return covered_points;
 }
 
-//std::vector<Point> rasterize(const Polygon& polygon, const double resolution_size)
+// std::vector<Point> rasterize(const Polygon& polygon, const double resolution_size)
 //{
 //    // Using even-odd rule algorithm to fill in polygon
 //    // https://stackoverflow.com/a/31768384
@@ -263,13 +267,13 @@ std::vector<Point> rasterize(const Polygon& polygon, const double resolution_siz
 //
 //        while (intersection_index < num_of_intersections)
 //        {
-//            Point intersection_point = sorted_intersections_with_polygon[intersection_index];
-//            Point point = Point(x_coord, y_coord);
-//            if (!in_polygon)
+//            Point intersection_point =
+//            sorted_intersections_with_polygon[intersection_index]; Point point =
+//            Point(x_coord, y_coord); if (!in_polygon)
 //            {
-//                x_coord = min_x + resolution_size * std::ceil((intersection_point.x() - min_x) / resolution_size);
-//                point = Point(x_coord, y_coord);
-//                if (!isAVertex(point, polygon, resolution_size))
+//                x_coord = min_x + resolution_size * std::ceil((intersection_point.x() -
+//                min_x) / resolution_size); point = Point(x_coord, y_coord); if
+//                (!isAVertex(point, polygon, resolution_size))
 //                {
 //                    contained_points.emplace_back(point);
 //                    in_polygon = true;
