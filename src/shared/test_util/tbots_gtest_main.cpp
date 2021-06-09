@@ -26,6 +26,9 @@ int main(int argc, char **argv)
         if (TbotsGtestMain::enable_visualizer)
         {
             TbotsGtestMain::stop_ai_on_start = args->getStopAiOnStart()->value();
+            // disable floating point errors when using visualizer due to potential
+            // floating point errors in QT
+            fedisableexcept(FE_INVALID | FE_OVERFLOW);
         }
     }
 

@@ -25,7 +25,7 @@ class ShadowEnemyTactic;
 class ShadowFreekickerTactic;
 class StopTactic;
 class StopTestTactic;
-class MoveToGoalLineTactic;
+class MoveGoalieToGoalLineTactic;
 
 /**
  * Refer to the docs about why we use the Visitor Design Pattern
@@ -42,25 +42,25 @@ class TacticVisitor
      * @param tactic The tactic to visit
      */
 
-    virtual void visit(const ChipTactic &tactic)               = 0;
-    virtual void visit(const CreaseDefenderTactic &tactic)     = 0;
-    virtual void visit(const DefenseShadowEnemyTactic &tactic) = 0;
-    virtual void visit(const DribbleTactic &tactic)            = 0;
-    virtual void visit(const GetBehindBallTactic &tactic)      = 0;
-    virtual void visit(const GoalieTactic &tactic)             = 0;
-    virtual void visit(const GoalieTestTactic &tactic)         = 0;
-    virtual void visit(const KickTactic &tactic)               = 0;
-    virtual void visit(const KickoffChipTactic &tactic)        = 0;
-    virtual void visit(const MoveTactic &tactic)               = 0;
-    virtual void visit(const MoveTestTactic &tactic)           = 0;
-    virtual void visit(const AttackerTactic &tactic)           = 0;
-    virtual void visit(const PenaltyKickTactic &tactic)        = 0;
-    virtual void visit(const PenaltySetupTactic &tactic)       = 0;
-    virtual void visit(const PivotKickTactic &tactic)          = 0;
-    virtual void visit(const ReceiverTactic &tactic)           = 0;
-    virtual void visit(const ShadowEnemyTactic &tactic)        = 0;
-    virtual void visit(const ShadowFreekickerTactic &tactic)   = 0;
-    virtual void visit(const StopTactic &tactic)               = 0;
-    virtual void visit(const StopTestTactic &tactic)           = 0;
-    virtual void visit(const MoveToGoalLineTactic &tactic)     = 0;
+    virtual void visit(const ChipTactic &tactic)                 = 0;
+    virtual void visit(const CreaseDefenderTactic &tactic)       = 0;
+    virtual void visit(const DefenseShadowEnemyTactic &tactic)   = 0;
+    virtual void visit(const DribbleTactic &tactic)              = 0;
+    virtual void visit(const GetBehindBallTactic &tactic)        = 0;
+    virtual void visit(const GoalieTactic &tactic)               = 0;
+    virtual void visit(const GoalieTestTactic &tactic)           = 0;
+    virtual void visit(const KickTactic &tactic)                 = 0;
+    virtual void visit(const KickoffChipTactic &tactic)          = 0;
+    virtual void visit(const MoveTactic &tactic)                 = 0;
+    virtual void visit(const MoveTestTactic &tactic)             = 0;
+    virtual void visit(const AttackerTactic &tactic)             = 0;
+    virtual void visit(const PenaltyKickTactic &tactic)          = 0;
+    virtual void visit(const PenaltySetupTactic &tactic)         = 0;
+    virtual void visit(const PivotKickTactic &tactic)            = 0;
+    virtual void visit(const ReceiverTactic &tactic)             = 0;
+    virtual void visit(const ShadowEnemyTactic &tactic)          = 0;
+    virtual void visit(const ShadowFreekickerTactic &tactic)     = 0;
+    virtual void visit(const StopTactic &tactic)                 = 0;
+    virtual void visit(const StopTestTactic &tactic)             = 0;
+    virtual void visit(const MoveGoalieToGoalLineTactic &tactic) = 0;
 };
