@@ -234,7 +234,12 @@ class Simulator
     static constexpr float FIELD_LINE_THICKNESS_METRES = 0.01f;
     // 200Hz is approximately how fast our robot firmware runs, so we
     // mimic that here for physics and primitive updates
-    static constexpr double DEFAULT_PHYSICS_TIME_STEP_SECONDS = 1.0 / 200.0;
+    // NOTE: We have doubled the speed because the TrajectoryPlanner and control
+    // firmware relies on our firmware and control running very fast in order to track
+    // short motions with very small timesteps. This could possibly be set back to 200
+    // once https://github.com/UBC-Thunderbots/Software/issues/2128 is complete if
+    // 400Hz is too much for people's computers
+    static constexpr double DEFAULT_PHYSICS_TIME_STEP_SECONDS = 1.0 / 400.0;
 
     // The current time. This is static so that it may be used by the firmware,
     // and so must be set before each firmware tick
