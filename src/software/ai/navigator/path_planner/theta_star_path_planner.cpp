@@ -326,7 +326,7 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
 
     // Avoiding the situation where closest_end point is free but end_coord is blocked
     blocked_grid[start_coord.row()][start_coord.col()] = false;
-    blocked_grid[end_coord.row()][end_coord.col()] = false;
+    blocked_grid[end_coord.row()][end_coord.col()]     = false;
 
     bool found_end = findPathToEnd(end_coord);
 
@@ -461,7 +461,8 @@ bool ThetaStarPathPlanner::visitNeighbours(const Coordinate &current_coord,
             next_coord = Coordinate(i + x_offset, j + y_offset);
 
             // Only check points in the navigable area
-            if (!isCoordNavigable(next_coord)) continue;
+            if (!isCoordNavigable(next_coord))
+                continue;
 
             // check for clipping obstacles
             if (lineOfSight(current_coord, next_coord))
