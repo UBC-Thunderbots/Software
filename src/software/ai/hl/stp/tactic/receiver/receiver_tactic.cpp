@@ -15,10 +15,11 @@ ReceiverTactic::ReceiverTactic(const Pass pass)
 
 void ReceiverTactic::updateWorldParams(const World& world) {}
 
-void ReceiverTactic::updateControlParams(const Pass& updated_pass)
+void ReceiverTactic::updateControlParams(const Pass& updated_pass, bool disable_one_touch)
 {
     // Update the control parameters stored by this Tactic
-    control_params.pass = updated_pass;
+    control_params.pass              = updated_pass;
+    control_params.disable_one_touch = disable_one_touch;
 }
 
 void ReceiverTactic::updateIntent(const TacticUpdate& tactic_update)

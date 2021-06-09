@@ -21,15 +21,17 @@ struct ReceiverFSM
     {
         // The pass to receive
         std::optional<Pass> pass = std::nullopt;
+
+        // If set to true, we will only receive and dribble
+        bool disable_one_touch = false;
     };
 
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     // The minimum proportion of open net we're shooting on vs the entire size of the net
     // that we require before attempting a shot
-    static constexpr double MIN_SHOT_NET_PERCENT_OPEN    = 0.3;
-    static constexpr double MAX_SPEED_FOR_ONE_TOUCH_SHOT = 6.5;
-    static constexpr double MIN_PASS_START_SPEED         = 1.0;
+    static constexpr double MIN_SHOT_NET_PERCENT_OPEN = 0.3;
+    static constexpr double MIN_PASS_START_SPEED = 1.0;
 
     // The maximum deflection angle that we will attempt a one-touch kick towards the
     // enemy goal with
@@ -42,7 +44,7 @@ struct ReceiverFSM
      * @param shot The shot to take
      * @param ball The ball on the field
      */
-    static Angle getOneTimeShotDirection(const Ray& shot, const Ball& ball)
+    static Angle getOneTouchShotDirection(const Ray& shot, const Ball& ball)
     {
         Vector shot_vector = shot.toUnitVector();
         Angle shot_dir     = shot.getDirection();
@@ -72,14 +74,16 @@ struct ReceiverFSM
     }
 
     /**
-     * Figures out the location of the one-time shot and orientation the robot should face
+     * Figures out the location of the one-touch shot and orientation the robot should
+     * face
      *
      * @param robot The robot performing the one-touch
      * @param ball The ball on the field
      * @param best_shot_target The point to shoot at
      */
-    static Shot getOneTimeShotPositionAndOrientation(const Robot& robot, const Ball& ball,
-                                                     const Point& best_shot_target)
+    static Shot getOneTouchShotPositionAndOrientation(const Robot& robot,
+                                                      const Ball& ball,
+                                                      const Point& best_shot_target)
     {
         double dist_to_ball_in_dribbler =
             DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS;
@@ -97,7 +101,7 @@ struct ReceiverFSM
         }
         Ray shot(closest_ball_pos, best_shot_target - closest_ball_pos);
 
-        Angle ideal_orientation      = getOneTimeShotDirection(shot, ball);
+        Angle ideal_orientation      = getOneTouchShotDirection(shot, ball);
         Vector ideal_orientation_vec = Vector::createFromAngle(ideal_orientation);
 
         // The best position is determined such that the robot stays in the ideal
@@ -130,8 +134,8 @@ struct ReceiverFSM
 
         // The angle the robot will have to deflect the ball to shoot
         Angle abs_angle_between_pass_and_shot_vectors;
+
         // The percentage of open net the robot would shoot on
-        double net_percent_open;
         if (best_shot_opt)
         {
             Vector robot_to_shot_target =
@@ -145,18 +149,21 @@ struct ReceiverFSM
                 acuteAngle(world.field().friendlyGoalpostPos(), assigned_robot.position(),
                            world.field().friendlyGoalpostNeg())
                     .abs();
-            net_percent_open =
+
+            double net_percent_open =
                 best_shot_opt->getOpenAngle().toDegrees() / goal_angle.toDegrees();
+
+            // If we have a shot with a sufficiently large enough opening, and the
+            // deflection angle that is reasonable, we should one-touch kick the ball
+            // towards the enemy net
+            if (net_percent_open > MIN_SHOT_NET_PERCENT_OPEN &&
+                abs_angle_between_pass_and_shot_vectors <
+                    MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT)
+            {
+                return best_shot_opt;
+            }
         }
 
-        // If we have a shot with a sufficiently large enough opening, and the
-        // deflection angle that is reasonable, we should one-touch kick the ball
-        // towards the enemy net
-        if (best_shot_opt && net_percent_open > MIN_SHOT_NET_PERCENT_OPEN &&
-            abs_angle_between_pass_and_shot_vectors < MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT)
-        {
-            return best_shot_opt;
-        }
         return std::nullopt;
     }
 
@@ -177,8 +184,9 @@ struct ReceiverFSM
          * @return true if one-touch possible
          */
         const auto onetouch_possible = [](auto event) {
-            return findFeasibleShot(event.common.world, event.common.robot) !=
-                   std::nullopt;
+            return !event.control_params.disable_one_touch &&
+                   (findFeasibleShot(event.common.world, event.common.robot) !=
+                    std::nullopt);
         };
 
         /**
@@ -192,7 +200,7 @@ struct ReceiverFSM
          */
         const auto update_onetouch = [this](auto event) {
             auto best_shot = findFeasibleShot(event.common.world, event.common.robot);
-            auto one_touch = getOneTimeShotPositionAndOrientation(
+            auto one_touch = getOneTouchShotPositionAndOrientation(
                 event.common.robot, event.common.world.ball(),
                 best_shot->getPointToShootAt());
 
@@ -205,14 +213,14 @@ struct ReceiverFSM
                         one_touch.getOpenAngle(), 0, DribblerMode::OFF,
                         BallCollisionType::ALLOW,
                         AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                                       MAX_SPEED_FOR_ONE_TOUCH_SHOT},
+                                       BALL_MAX_SPEED_METERS_PER_SECOND},
                         MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
                 }
             }
         };
 
         /**
-         * One touch shot is not possible, just receive ball as cleanly as possible.
+         * One-touch shot is not possible, just receive ball as cleanly as possible.
          *
          * @param event ReceiverFSM::Update event
          */
@@ -228,6 +236,14 @@ struct ReceiverFSM
             }
         };
 
+        /**
+         * Constantly adjust the receives position to be directly
+         * infront of the ball for better reception. This is especially
+         * useful for long passes where the ball might not end up
+         * exactly at the pass.receiverPoint()
+         *
+         * @param event ReceiverFSM::Update event
+         */
         const auto adjust_receive = [this](auto event) {
             auto ball      = event.common.world.ball();
             auto robot_pos = event.common.robot.position();
@@ -283,14 +299,11 @@ struct ReceiverFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *undecided_s + update_e[onetouch_possible] / update_onetouch = onetouch_s,
-            undecided_s + update_e[!onetouch_possible] / update_receive  = receive_s,
-            receive_s + update_e[!pass_started] / update_receive         = receive_s,
-            onetouch_s + update_e[!pass_started] / update_onetouch       = onetouch_s,
-            receive_s + update_e[pass_started && !pass_finished] / adjust_receive =
-                receive_s,
-            onetouch_s + update_e[pass_started && !pass_finished] / update_onetouch =
-                onetouch_s,
-            receive_s + update_e[pass_started && pass_finished] / update_receive   = X,
-            onetouch_s + update_e[pass_started && pass_finished] / update_onetouch = X);
+            undecided_s + update_e[!onetouch_possible] / update_receive = receive_s,
+            receive_s + update_e[!pass_started] / update_receive,
+            receive_s + update_e[pass_started && !pass_finished] / adjust_receive,
+            receive_s + update_e[pass_finished] / update_receive = X,
+            onetouch_s + update_e[!pass_finished] / update_onetouch,
+            onetouch_s + update_e[pass_finished] / update_onetouch = X);
     }
 };

@@ -6,11 +6,11 @@
 #include "software/geom/algorithms/distance.h"
 #include "software/test_util/test_util.h"
 
-class OneTimeShotDirectionTest
+class OneTouchShotDirectionTest
     : public ::testing::TestWithParam<std::tuple<Point, Point, double, double>>
 {
 };
-TEST_P(OneTimeShotDirectionTest, test_shot_towards_enemy_net)
+TEST_P(OneTouchShotDirectionTest, test_shot_towards_enemy_net)
 {
     Point robot_location     = std::get<0>(GetParam());
     Point ball_location      = std::get<1>(GetParam());
@@ -23,16 +23,16 @@ TEST_P(OneTimeShotDirectionTest, test_shot_towards_enemy_net)
     // Create a shot towards the enemy net
     Ray shot(robot_location, Vector(4.5, 0) - robot_location.toVector());
 
-    Angle robot_angle = ReceiverFSM::getOneTimeShotDirection(shot, ball);
+    Angle robot_angle = ReceiverFSM::getOneTouchShotDirection(shot, ball);
 
     EXPECT_GT(robot_angle.toDegrees(), min_angle_degrees);
     EXPECT_LT(robot_angle.toDegrees(), max_angle_degrees);
 }
-// Since the exact direction for one time shots is highly variable and depends a lot on
+// Since the exact direction for one touch shots is highly variable and depends a lot on
 // physical tests, we can't check the exact angles, but we can at least test that they're
 // in the right range
 INSTANTIATE_TEST_CASE_P(
-    All, OneTimeShotDirectionTest,
+    All, OneTouchShotDirectionTest,
     ::testing::Values(
         // Robot at the origin, ball coming at it from different directions
         std::make_tuple<Point, Point, double, double>({0, 0}, {1, 1}, 1, 20),
@@ -52,7 +52,7 @@ INSTANTIATE_TEST_CASE_P(
         // Corner kick, robot is close to the goal and directly in front of it
         std::make_tuple<Point, Point, double, double>({4, 0}, {4.5, -3}, -45, -1)));
 
-class OneTimeShotPositionTest
+class OneTouchShotPositionTest
     : public ::testing::TestWithParam<std::tuple<double, double, double, double, double>>
 {
 };
@@ -64,7 +64,7 @@ class OneTimeShotPositionTest
  * any strange edge cases in the logic that would cause the robot to move to the wrong
  * position
  */
-TEST_P(OneTimeShotPositionTest, test_receiver_moves_to_correct_one_time_shot_position)
+TEST_P(OneTouchShotPositionTest, test_receiver_moves_to_correct_one_touch_shot_position)
 {
     Point robot_position(std::get<0>(GetParam()), std::get<1>(GetParam()));
     Point ball_position(std::get<2>(GetParam()), std::get<3>(GetParam()));
@@ -89,7 +89,7 @@ TEST_P(OneTimeShotPositionTest, test_receiver_moves_to_correct_one_time_shot_pos
     Point best_shot_target = Point(4.5, 0);
 
     Shot shot =
-        ReceiverFSM::getOneTimeShotPositionAndOrientation(robot, ball, best_shot_target);
+        ReceiverFSM::getOneTouchShotPositionAndOrientation(robot, ball, best_shot_target);
     Point ideal_position    = shot.getPointToShootAt();
     Angle ideal_orientation = shot.getOpenAngle();
 
@@ -109,7 +109,7 @@ TEST_P(OneTimeShotPositionTest, test_receiver_moves_to_correct_one_time_shot_pos
 }
 
 INSTANTIATE_TEST_CASE_P(
-    All, OneTimeShotPositionTest,
+    All, OneTouchShotPositionTest,
     ::testing::Combine(testing::Values(-0.2),           // Robot x coordinate
                        testing::Values(0.0),            // Robot y coordinate
                        testing::Range(-3.0, 3.0, 0.5),  // Ball x coordinate
