@@ -48,7 +48,8 @@ class AngleSegment
 
 
     /**
-     * Gets the abs delta angle in degrees between the two angles that describe this angle segment
+     * Gets the abs delta angle in degrees between the two angles that describe this angle
+     * segment
      *
      * @return the abs delta angle in degrees between the top and bottom angles
      */

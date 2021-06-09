@@ -57,7 +57,8 @@ AngleSegment AngleMap::getBiggestViableAngleSegment()
     {
         AngleSegment viable_angle_seg = AngleSegment(
             last_taken_angle_seg.getAngleBottom(), angle_seg.getAngleBottom());
-        if (viable_angle_seg.getDeltaInDegrees() > biggest_viable_angle_seg.getDeltaInDegrees())
+        if (viable_angle_seg.getDeltaInDegrees() >
+            biggest_viable_angle_seg.getDeltaInDegrees())
         {
             biggest_viable_angle_seg = viable_angle_seg;
         }
@@ -69,7 +70,8 @@ AngleSegment AngleMap::getBiggestViableAngleSegment()
         AngleSegment next_taken_angle_seg = i[1];
         AngleSegment viable_angle_seg     = AngleSegment(taken_angle_seg.getAngleBottom(),
                                                      next_taken_angle_seg.getAngleTop());
-        if (viable_angle_seg.getDeltaInDegrees() > biggest_viable_angle_seg.getDeltaInDegrees())
+        if (viable_angle_seg.getDeltaInDegrees() >
+            biggest_viable_angle_seg.getDeltaInDegrees())
         {
             biggest_viable_angle_seg = viable_angle_seg;
         }
