@@ -30,8 +30,8 @@ class AngleMap
      * Constructs an AngleMap with a specified top angle, bottom angle, and max number of
      * possible occupied AngleSegments within this map
      *
-     * @param top_angle the top angle (most north) of the AngleSegment this map occupies
-     * @param bottom_angle the bottom angle (most south) of the AngleSegment this map
+     * @param top_angle the top angle (most positive) of the AngleSegment this map occupies
+     * @param bottom_angle the bottom angle (most negative) of the AngleSegment this map
      * occupies
      * @param max_num_obstacles the max number of possible occupied AngleSegments within
      * this map
