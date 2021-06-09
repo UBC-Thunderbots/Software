@@ -31,9 +31,9 @@ void AngleSegment::setAngleBottom(const Angle &angle_bottom)
     this->angle_bottom_ = angle_bottom;
 }
 
-Angle AngleSegment::getDelta() const
+double AngleSegment::getDelta() const
 {
-    return (angle_bottom_ - angle_top_).abs();
+    return (angle_bottom_ - angle_top_).abs().toDegrees();
 }
 
 bool AngleSegment::operator==(const AngleSegment &other) const

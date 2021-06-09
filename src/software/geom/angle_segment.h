@@ -47,7 +47,7 @@ class AngleSegment
      *
      * @return the abs delta angle between the top and bottom angles
      */
-    Angle getDelta() const;
+    double getDelta() const;
 
     /**
      * Compares another AngleSegment's top angle
