@@ -87,7 +87,8 @@ void setupTeamColourComboBox(
         team_colour_combo_box->setCurrentIndex(new_value ? 0 : 1);
         team_colour_combo_box->blockSignals(false);
     };
-    friendly_colour_yellow_parameter->registerCallbackFunction(on_parameter_value_changed);
+    friendly_colour_yellow_parameter->registerCallbackFunction(
+        on_parameter_value_changed);
 
     on_parameter_value_changed(friendly_colour_yellow_parameter->value());
 }
@@ -133,15 +134,21 @@ void setupDefendingSideComboBox(
         // trigger the `on_checkbox_value_changed` function, which would set the
         // parameter value again and deadlock on the parameter's internal mutex
         defending_side_combo_box->blockSignals(true);
-        if(defending_side_override_parameter->value()) {
-            defending_side_combo_box->setCurrentIndex(defending_positive_side_parameter->value() ? 1 : 2);
-        }else{
+        if (defending_side_override_parameter->value())
+        {
+            defending_side_combo_box->setCurrentIndex(
+                defending_positive_side_parameter->value() ? 1 : 2);
+        }
+        else
+        {
             defending_side_combo_box->setCurrentIndex(0);
         }
         defending_side_combo_box->blockSignals(false);
     };
-    defending_positive_side_parameter->registerCallbackFunction([=](bool unused){on_parameter_value_changed();});
-    defending_side_override_parameter->registerCallbackFunction([=](bool unused){on_parameter_value_changed();});
+    defending_positive_side_parameter->registerCallbackFunction(
+        [=](bool unused) { on_parameter_value_changed(); });
+    defending_side_override_parameter->registerCallbackFunction(
+        [=](bool unused) { on_parameter_value_changed(); });
 
     on_parameter_value_changed();
 }
@@ -181,15 +188,21 @@ void setupGameStateOverrideComboBox(
         // trigger the `on_checkbox_value_changed` function, which would set the
         // parameter value again and deadlock on the parameter's internal mutex
         game_state_override_combo_box->blockSignals(true);
-        if(game_state_override_parameter->value()) {
-            game_state_override_combo_box->setCurrentText(QString::fromStdString(current_game_state_parameter->value()));
-        }else {
+        if (game_state_override_parameter->value())
+        {
+            game_state_override_combo_box->setCurrentText(
+                QString::fromStdString(current_game_state_parameter->value()));
+        }
+        else
+        {
             game_state_override_combo_box->setCurrentText(gamecontroller_text);
         }
         game_state_override_combo_box->blockSignals(false);
     };
-    game_state_override_parameter->registerCallbackFunction([=](bool unused){on_parameter_value_changed();});
-    current_game_state_parameter->registerCallbackFunction([=](std::string unused){on_parameter_value_changed();}) ;
+    game_state_override_parameter->registerCallbackFunction(
+        [=](bool unused) { on_parameter_value_changed(); });
+    current_game_state_parameter->registerCallbackFunction(
+        [=](std::string unused) { on_parameter_value_changed(); });
 
     on_parameter_value_changed();
 }
@@ -234,15 +247,21 @@ void setupPlayOverrideComboBox(
         // trigger the `on_checkbox_value_changed` function, which would set the
         // parameter value again and deadlock on the parameter's internal mutex
         play_override_combo_box->blockSignals(true);
-        if(play_override_parameter->value()) {
-            play_override_combo_box->setCurrentText(QString::fromStdString(current_play_parameter->value()));
-        }else {
+        if (play_override_parameter->value())
+        {
+            play_override_combo_box->setCurrentText(
+                QString::fromStdString(current_play_parameter->value()));
+        }
+        else
+        {
             play_override_combo_box->setCurrentText(ai_selection_text);
         }
         play_override_combo_box->blockSignals(false);
     };
-    play_override_parameter->registerCallbackFunction([=](bool unused){on_parameter_value_changed();});
-    current_play_parameter->registerCallbackFunction([=](std::string unused){on_parameter_value_changed();}) ;
+    play_override_parameter->registerCallbackFunction(
+        [=](bool unused) { on_parameter_value_changed(); });
+    current_play_parameter->registerCallbackFunction(
+        [=](std::string unused) { on_parameter_value_changed(); });
 
     on_parameter_value_changed();
 }
@@ -273,7 +292,6 @@ void setupChannelSpinBox(QSpinBox *channel_spin_box,
         channel_spin_box->blockSignals(true);
         channel_spin_box->setValue(new_value);
         channel_spin_box->blockSignals(false);
-
     };
 
     on_parameter_value_changed(channel_parameter->value());
