@@ -134,7 +134,8 @@ bool ThetaStarPathPlanner::checkLineLow(const Coordinate &coord0,
 
     for (unsigned int x = x0; x <= x1; x++)
     {
-        if (isBlocked(Coordinate(x, y)))
+        Coordinate curr_coord(x, y);
+        if (isCoordNavigable(curr_coord) && isBlocked(curr_coord))
         {
             // No line of sight since a coordinate in the path from coord0 to coord1 is
             // blocked
@@ -175,7 +176,8 @@ bool ThetaStarPathPlanner::checkLineHigh(const ThetaStarPathPlanner::Coordinate 
 
     for (unsigned int y = y0; y <= y1; y++)
     {
-        if (isBlocked(Coordinate(x, y)))
+        Coordinate curr_coord(x, y);
+        if (isCoordNavigable(curr_coord) && isBlocked(curr_coord))
         {
             // No line of sight since a coordinate in the path from coord0 to coord1 is
             // blocked
@@ -323,6 +325,7 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     findAllBlockedCoords();
 
     // Avoiding the situation where closest_end point is free but end_coord is blocked
+    blocked_grid[start_coord.row()][start_coord.col()] = false;
     blocked_grid[end_coord.row()][end_coord.col()] = false;
 
     bool found_end = findPathToEnd(end_coord);
@@ -456,6 +459,10 @@ bool ThetaStarPathPlanner::visitNeighbours(const Coordinate &current_coord,
         for (int y_offset : {-1, 0, 1})
         {
             next_coord = Coordinate(i + x_offset, j + y_offset);
+
+            // Only check points in the navigable area
+            if (!isCoordNavigable(next_coord)) continue;
+
             // check for clipping obstacles
             if (lineOfSight(current_coord, next_coord))
             {
