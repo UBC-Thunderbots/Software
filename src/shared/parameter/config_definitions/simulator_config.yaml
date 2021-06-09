@@ -5,6 +5,13 @@ include:
     name: simulation_rate_hz
     min: 1
     max: 1000
+    # 200Hz is approximately how fast our robot firmware runs, so we
+    # mimic that here for physics and primitive updates
+    # NOTE: We have doubled the speed because the TrajectoryPlanner and control
+    # firmware relies on our firmware and control running very fast in order to track
+    # short motions with very small timesteps. This could possibly be set back to 200
+    # once https://github.com/UBC-Thunderbots/Software/issues/2128 is complete if
+    # 400Hz is too much for people's computers
     value: 400
     description: >-
         How fast to simulate physics and firmware, in Hz

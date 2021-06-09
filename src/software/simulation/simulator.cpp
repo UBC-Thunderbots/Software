@@ -17,13 +17,12 @@ extern "C"
 }
 
 Simulator::Simulator(const Field& field,
-                     std::shared_ptr<const SimulatorConfig> simulator_config,
-                     const Duration& physics_time_step)
+                     std::shared_ptr<const SimulatorConfig> simulator_config)
     : physics_world(field, simulator_config->getPhysicsConfig()),
       yellow_team_defending_side(FieldSide::NEG_X),
       blue_team_defending_side(FieldSide::NEG_X),
       frame_number(0),
-      physics_time_step(physics_time_step),
+      physics_time_step(Duration::fromSeconds(1.0 / simulator_config->getSimulationRateHz()->value())),
       simulator_config(simulator_config)
 {
     this->resetCurrentFirmwareTime();

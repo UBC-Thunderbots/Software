@@ -11,7 +11,7 @@ class SimulatorTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        simulator_config = std::make_shared<const SimulatorConfig>();
+        simulator_config = std::make_shared<const SimulatorConfig>(std::make_shared<PhysicsConfig>());
         simulator        = std::make_shared<Simulator>(Field::createSSLDivisionBField(),
                                                 simulator_config);
         simulator->resetCurrentFirmwareTime();

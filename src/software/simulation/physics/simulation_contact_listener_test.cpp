@@ -19,10 +19,10 @@ class SimulationContactListenerTest : public testing::Test
     createWorld(const Robot& robot, const Ball& ball)
     {
         b2Vec2 gravity(0, 0);
-        simulator_config = std::make_shared<const SimulatorConfig>();
+        physics_config = std::make_shared<const PhysicsConfig>();
         physics_world    = std::make_shared<b2World>(gravity);
         physics_ball  = std::make_shared<PhysicsBall>(physics_world, ball.currentState(),
-                                                     1.0, simulator_config);
+                                                      1.0, physics_config);
         physics_robot = std::make_shared<PhysicsRobot>(robot.id(), physics_world,
                                                        robot.currentState(), 1.0);
 
@@ -42,7 +42,7 @@ class SimulationContactListenerTest : public testing::Test
    private:
     std::shared_ptr<b2World> physics_world;
     std::shared_ptr<PhysicsBall> physics_ball;
-    std::shared_ptr<const SimulatorConfig> simulator_config;
+    std::shared_ptr<const PhysicsConfig> physics_config;
     std::shared_ptr<PhysicsRobot> physics_robot;
 };
 
