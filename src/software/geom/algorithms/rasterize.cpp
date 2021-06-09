@@ -6,15 +6,15 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/algorithms/rasterize.h"
+#include "software/geom/algorithms/distance.h"
 
 
 bool isInPixel(const Point& a, const Point& b, double resolution_size);
+std::optional<Point> isAVertex(const Point& point, const Polygon& polygon, double resolution_size);
+const Point& find_next_point_in_polygon(const Point& point, const Polygon& polygon);
+const Point& find_previous_point_in_polygon(const Point& point, const Polygon& polygon);
+bool is_special_vertex(const Point& point, const Polygon& polygon, const double resolution_size);
 
-bool isAVertex(const Point& point, const Polygon& polygon, double resolution_size);
-
-// TODO When rasterizing without knowing the relative positions of the pixels, you may be
-// off by 1 pixel in each axis. eg. A 1.5 x 1 rectangle may overlap with 2 or 3 pixels
-// (assuming pixel dimension 1) depending on how it the rectangle is positioned.
 std::vector<Point> rasterize(const Circle& circle, const double resolution_size)
 {
     std::vector<Point> covered_points;
@@ -70,11 +70,6 @@ std::vector<Point> rasterize(const Circle& circle, const double resolution_size)
         }
     }
 
-    // for (auto p = covered_points.begin(); p != covered_points.end();
-    //      ++p)  // TODO Remove, added for testing
-    //     std::cout << *p << ", ";
-    // std::cout << std::endl;
-
     return covered_points;
 }
 
@@ -118,111 +113,230 @@ std::vector<Point> rasterize(const Rectangle& rectangle, const double resolution
         }
     }
 
-    //    for (auto p = covered_points.begin(); p != covered_points.end(); ++p) // TODO
-    //    Remove, added for testing
-    //        std::cout << *p << ", ";
-    //    std::cout << std::endl;
-
     return covered_points;
 }
+//
+// std::vector<Point> rasterize(const Polygon& polygon, const double resolution_size)
+// {
+//     // Using even-odd rule algorithm to fill in polygon
+//     // https://stackoverflow.com/a/31768384
+//     std::vector<Point> contained_points;
+//     const auto& polygon_vertices = polygon.getPoints();
+//     const auto num_of_vertices = polygon_vertices.size();
+//
+//     std::vector<Point> covered_points;
+//
+//     // Fill the edges
+//     for (unsigned int i = 0; i < polygon_vertices.size(); i++) {
+//         Point curr_point = polygon_vertices[i];
+//         Point next_point;
+//
+//         if (i == polygon_vertices.size() - 1)
+//         {
+//             // The next point of the last point is the first point
+//             next_point = polygon_vertices[0];
+//         } else
+//         {
+//             next_point = polygon_vertices[i + 1];
+//         }
+//
+//         // Skip if both points are the same
+//         if (curr_point == next_point) continue;
+//
+//     // TODO: remove later after debugging
+//     std::cout << "Polygon vertices\n";
+//     for (auto p = polygon_vertices.begin(); p != polygon_vertices.end();
+//         ++p)  // TODO Remove, added for testing
+//        std::cout << *p << ", ";
+//     std::cout << std::endl;
+//
+//     // Fill inside
+//     auto max_point_y = [](const Point& a, const Point& b) { return a.y() < b.y(); };
+//
+//     auto max_point_x = [](const Point& a, const Point& b) { return a.x() < b.x(); };
+//
+//     // Calculate the highest and lowest x and y points
+//     double min_x =
+//             std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)
+//                     ->x();
+//     double min_y =
+//             std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
+//                     ->y();
+//     double max_x =
+//             std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)
+//                     ->x();
+//     double max_y =
+//         std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
+//             ->y();
+//     std::vector<Point> points_in_y_row;
+//     double y_coord;
+//
+//     // loop through rows of the image (i.e. polygon)
+//     for (y_coord = min_y; y_coord <= max_y; y_coord += resolution_size)
+//     {
+//         // we create a line that intersects the polygon at this y coordinate
+//         Ray intersecting_ray = Ray(Point(min_x - 1, y_coord), Vector(1, 0));
+//
+//     for (int x_pixel = 1; x_pixel <= num_pixels_x; x_pixel++)
+//     {
+//         // x and y offset from the top left corner of the rectangle
+//         double x_offset;
+//
+//         auto num_of_intersections       = sorted_intersections_with_polygon.size();
+//         unsigned int intersection_index = 0;
+//         double x_coord                  = min_x;
+//         bool in_polygon                 = false;
+//         points_in_y_row.clear();
+//
+//         for (int y_pixel = 0; y_pixel <= num_pixels_y; y_pixel++)
+//         {
+//             x_coord = min_x + resolution_size * std::ceil((intersection_point.x() - min_x) / resolution_size);
+//             point = Point(x_coord, y_coord);
+//             points_in_y_row.emplace_back(point);
+//             intersection_index += 1;
+//             if (!is_special_vertex(point))
+//             {
+//                 in_polygon = true;
+//             }
+//         }
+//             else
+//             {
+//                 x_coord += resolution_size;
+//                 point = Point(x_coord, y_coord);
+//                 if (x_coord < (intersection_point.x() + resolution_size))
+//                 {
+//                     points_in_y_row.emplace_back(point);
+//                 }
+//                 else if (is_special_vertex(point))
+//                 {
+//                     intersection_index += 1;
+//                 }
+//                 else
+//                 {
+//                     in_polygon = false;
+//                     intersection_index += 1;
+//                 }
+//             }
+//         }
+//         contained_points.insert(contained_points.end(), points_in_y_row.begin(), points_in_y_row.end());
+//     }
+//
+//     //double the top row if necessary
+//     if (y_coord < (max_y + resolution_size))
+//     {
+//         for (auto p = points_in_y_row.begin(); p != points_in_y_row.end(); ++p)
+//         {
+//             contained_points.emplace_back(*p + Vector(0, resolution_size));
+//         }
+//     }
+//
+//     // TODO: remove
+//     for (auto p = contained_points.begin(); p != contained_points.end();
+//         ++p)  // TODO Remove, added for testing
+//        std::cout << *p << ", ";
+//     std::cout << std::endl;
+//
+//     return contained_points;
+// }
 
 std::vector<Point> rasterize(const Polygon& polygon, const double resolution_size)
 {
-    
+   // Using even-odd rule algorithm to fill in polygon
+   // https://stackoverflow.com/a/31768384
+   std::vector<Point> contained_points;
+   const auto& polygon_vertices = polygon.getPoints();
 
-    // Using even-odd rule algorithm to fill in polygon
-    // https://stackoverflow.com/a/31768384
-    std::vector<Point> contained_points;
-    const auto& polygon_vertices = polygon.getPoints();
+   // TODO: remove later after debugging
+      std::cout << "Polygon vertices\n";
+      for (auto p = polygon_vertices.begin(); p != polygon_vertices.end();
+           ++p)  // TODO Remove, added for testing
+          std::cout << *p << ", ";
+      std::cout << std::endl;
 
-    // TODO: remove later after debugging
-    std::cout << "Polygon vertices\n";
-    for (auto p = polygon_vertices.begin(); p != polygon_vertices.end();
+   auto max_point_y = [](const Point& a, const Point& b) { return a.y() < b.y(); };
+
+   auto max_point_x = [](const Point& a, const Point& b) { return a.x() < b.x(); };
+
+   // Calculate the highest and lowest x and y points
+   double min_y =
+       std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
+           ->y();
+   double min_x =
+       std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)
+           ->x();
+   double max_y =
+       std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
+           ->y();
+
+   std::vector<Point> points_in_y_row;
+   double y_coord;
+
+   // loop through rows of the image (i.e. polygon)
+   for (y_coord = min_y; y_coord <= max_y; y_coord += resolution_size)
+   {
+       // we create a line that intersects the polygon at this y coordinate
+       Ray intersecting_ray = Ray(Point(min_x - 1, y_coord), Vector(1, 0));
+
+       auto intersections_with_polygon = intersection(polygon, intersecting_ray);
+       std::vector<Point> sorted_intersections_with_polygon(
+           intersections_with_polygon.begin(), intersections_with_polygon.end());
+       std::sort(sorted_intersections_with_polygon.begin(),
+                 sorted_intersections_with_polygon.end(), max_point_x);
+
+       auto num_of_intersections       = sorted_intersections_with_polygon.size();
+       unsigned int intersection_index = 0;
+       double x_coord                  = min_x;
+       bool in_polygon                 = false;
+       points_in_y_row.clear();
+
+       while (intersection_index < num_of_intersections)
+       {
+           Point intersection_point = sorted_intersections_with_polygon[intersection_index];
+           Point point = Point(x_coord, y_coord);
+           if (!in_polygon)
+           {
+               x_coord = min_x + resolution_size * std::ceil((intersection_point.x() - min_x) / resolution_size);
+               point = Point(x_coord, y_coord);
+               points_in_y_row.emplace_back(point);
+               points_in_y_row.emplace_back(point + Vector(0, resolution_size));
+               points_in_y_row.emplace_back(point + Vector(0, -resolution_size));
+               intersection_index += 1;
+               if (!is_special_vertex(point, polygon, resolution_size))
+               {
+                   in_polygon = true;
+               }
+           }
+           else
+           {
+               x_coord += resolution_size;
+               point = Point(x_coord, y_coord);
+               if (x_coord < (intersection_point.x() + resolution_size))
+               {
+                   points_in_y_row.emplace_back(point);
+                   points_in_y_row.emplace_back(point + Vector(0, resolution_size));
+                   points_in_y_row.emplace_back(point + Vector(0, -resolution_size));
+               }
+               else
+               {
+                   intersection_index += 1;
+                   if (!is_special_vertex(point, polygon, resolution_size))
+                   {
+                       in_polygon = false;
+                   }
+               }
+           }
+       }
+       contained_points.insert(contained_points.end(), points_in_y_row.begin(), points_in_y_row.end());
+   }
+
+   // TODO: remove
+   std::cout << "\n";
+   for (auto p = contained_points.begin(); p != contained_points.end();
         ++p)  // TODO Remove, added for testing
        std::cout << *p << ", ";
-    std::cout << std::endl;
+   std::cout << std::endl;
 
-    auto max_point_y = [](const Point& a, const Point& b) { return a.y() < b.y(); };
-
-    auto max_point_x = [](const Point& a, const Point& b) { return a.x() < b.x(); };
-
-    // Calculate the highest and lowest x and y points
-    double min_y =
-        std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
-            ->y();
-    double min_x =
-        std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)
-            ->x();
-    double max_y =
-        std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
-            ->y();
-    std::vector<Point> points_in_y_row;
-    double y_coord;
-
-    // loop through rows of the image (i.e. polygon)
-    for (y_coord = min_y; y_coord <= max_y; y_coord += resolution_size)
-    {
-        // we create a line that intersects the polygon at this y coordinate
-        Ray intersecting_ray = Ray(Point(min_x - 1, y_coord), Vector(1, 0));
-
-        auto intersections_with_polygon = intersection(polygon, intersecting_ray);
-        std::vector<Point> sorted_intersections_with_polygon(
-            intersections_with_polygon.begin(), intersections_with_polygon.end());
-        std::sort(sorted_intersections_with_polygon.begin(),
-                  sorted_intersections_with_polygon.end(), max_point_x);
-
-        auto num_of_intersections       = sorted_intersections_with_polygon.size();
-        unsigned int intersection_index = 0;
-        double x_coord                  = min_x;
-        bool in_polygon                 = false;
-        points_in_y_row.clear();
-
-        while (intersection_index < num_of_intersections)
-        {
-            Point intersection_point = sorted_intersections_with_polygon[intersection_index];
-            Point point = Point(x_coord, y_coord);
-            if (!in_polygon)
-            {
-                x_coord = min_x + resolution_size * std::ceil((intersection_point.x() - min_x) / resolution_size);
-                point = Point(x_coord, y_coord);
-                points_in_y_row.emplace_back(point);
-                intersection_index += 1;
-                in_polygon = true;
-            }
-            else
-            {
-                x_coord += resolution_size;
-                point = Point(x_coord, y_coord);
-                if (x_coord < (intersection_point.x() + resolution_size))
-                {
-                    points_in_y_row.emplace_back(point);
-                }
-                else
-                {
-                    in_polygon = false;
-                    intersection_index += 1;
-                }
-            }
-        }
-        contained_points.insert(contained_points.end(), points_in_y_row.begin(), points_in_y_row.end());
-    }
-
-    //double the top row if necessary
-    if (y_coord < (max_y + resolution_size))
-    {
-        for (auto p = points_in_y_row.begin(); p != points_in_y_row.end(); ++p)
-        {
-            contained_points.emplace_back(*p + Vector(0, resolution_size));
-        }
-    }
-
-    // TODO: remove
-    for (auto p = contained_points.begin(); p != contained_points.end();
-        ++p)  // TODO Remove, added for testing
-       std::cout << *p << ", ";
-    std::cout << std::endl;
-
-    return contained_points;
+   return contained_points;
 }
 
 bool isInPixel(const Point& a, const Point& b, double resolution_size)
@@ -237,15 +351,60 @@ bool isInPixel(const Point& a, const Point& b, double resolution_size)
     return (b_x >= min_x && b_x <= max_x) && (b_y >= min_y && b_y <= max_y);
 }
 
-bool isAVertex(const Point& point, const Polygon& polygon, double resolution_size)
+std::optional<Point> isAVertex(const Point& point, const Polygon& polygon, double resolution_size)
 {
     const auto& polygon_vertices = polygon.getPoints();
     for (auto i = polygon_vertices.begin(); i != polygon_vertices.end(); ++i)
     {
         if (isInPixel(point, *i, resolution_size))
         {
-            return true;
+            return std::optional<Point>(*i);
         }
     }
-    return false;
+    return std::nullopt;
+}
+
+const Point& find_next_point_in_polygon(const Point& point, const Polygon& polygon)
+{
+    const auto& polygon_vertices = polygon.getPoints();
+    auto index = std::find(polygon_vertices.begin(), polygon_vertices.end(), point) - polygon_vertices.begin();
+
+    if ((unsigned) index == (polygon_vertices.size() - 1))
+    {
+        return polygon_vertices[0];
+    }
+    else
+    {
+        return polygon_vertices[index + 1];
+    }
+}
+
+const Point& find_previous_point_in_polygon(const Point& point, const Polygon& polygon)
+{
+    const auto& polygon_vertices = polygon.getPoints();
+    auto index = std::find(polygon_vertices.begin(), polygon_vertices.end(), point) - polygon_vertices.begin();
+
+    if (index == 0)
+    {
+        return polygon_vertices[polygon_vertices.size() - 1];
+    }
+    else
+    {
+        return polygon_vertices[index - 1];
+    }
+}
+
+bool is_special_vertex(const Point& point, const Polygon& polygon, const double resolution_size)
+{
+    std::optional<Point> vertex = isAVertex(point, polygon, resolution_size);
+    if(vertex == std::nullopt)
+    {
+        return false;
+    }
+
+    Point prev_point = find_previous_point_in_polygon(vertex.value(), polygon);
+    Point next_point = find_next_point_in_polygon(vertex.value(), polygon);
+
+    return ((prev_point.y() > point.y() && (next_point.y() > point.y()))
+            || ((prev_point.y() < point.y()) && (next_point.y() < point.y())));
 }
