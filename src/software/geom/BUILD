@@ -235,6 +235,17 @@ cc_test(
 )
 
 cc_test(
+    name = "angle_segment_test",
+    srcs = [
+        "angle_segment_test.cpp",
+    ],
+    deps = [
+        ":angle_segment",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
+cc_test(
     name = "line_test",
     srcs = [
         "line_test.cpp",

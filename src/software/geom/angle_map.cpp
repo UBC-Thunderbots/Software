@@ -1,15 +1,15 @@
 
 #include "software/geom/angle_map.h"
 
-AngleMap::AngleMap(Angle top_angle, Angle bottom_angle, size_t max_num_obstacles)
-    : AngleMap(AngleSegment(top_angle, bottom_angle), max_num_obstacles)
+AngleMap::AngleMap(Angle top_angle, Angle bottom_angle, size_t reserved_num_obstacles)
+    : AngleMap(AngleSegment(top_angle, bottom_angle), reserved_num_obstacles)
 {
 }
 
-AngleMap::AngleMap(AngleSegment angle_seg, size_t max_num_obstacles)
+AngleMap::AngleMap(AngleSegment angle_seg, size_t reserved_num_obstacles)
     : angle_seg(angle_seg)
 {
-    taken_angle_segments.reserve(max_num_obstacles);
+    taken_angle_segments.reserve(reserved_num_obstacles);
 }
 
 const AngleSegment &AngleMap::getAngleSegment() const
@@ -41,22 +41,22 @@ AngleSegment AngleMap::getBiggestViableAngleSegment()
     if (taken_angle_segments.empty())
     {
         biggest_viable_angle_seg =
-            AngleSegment(this->angle_seg.getAngleTop(), this->angle_seg.getAngleBottom());
+            AngleSegment(angle_seg.getAngleTop(), angle_seg.getAngleBottom());
         return biggest_viable_angle_seg;
     }
 
     AngleSegment first_taken_angle_seg = taken_angle_segments.front();
-    if (first_taken_angle_seg.getAngleTop() < this->angle_seg.getAngleTop())
+    if (first_taken_angle_seg.getAngleTop() < angle_seg.getAngleTop())
     {
-        biggest_viable_angle_seg = AngleSegment(this->angle_seg.getAngleTop(),
+        biggest_viable_angle_seg = AngleSegment(angle_seg.getAngleTop(),
                                                 first_taken_angle_seg.getAngleTop());
     }
 
     AngleSegment last_taken_angle_seg = taken_angle_segments.back();
-    if (last_taken_angle_seg.getAngleBottom() > this->angle_seg.getAngleBottom())
+    if (last_taken_angle_seg.getAngleBottom() > angle_seg.getAngleBottom())
     {
         AngleSegment viable_angle_seg = AngleSegment(
-            last_taken_angle_seg.getAngleBottom(), this->angle_seg.getAngleBottom());
+            last_taken_angle_seg.getAngleBottom(), angle_seg.getAngleBottom());
         if (viable_angle_seg.getDelta() > biggest_viable_angle_seg.getDelta())
         {
             biggest_viable_angle_seg = viable_angle_seg;

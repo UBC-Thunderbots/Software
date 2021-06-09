@@ -43,11 +43,11 @@ class AngleSegment
 
 
     /**
-     * Gets the abs delta between the two angles that describe this angle segment
+     * Gets the abs delta angle between the two angles that describe this angle segment
      *
-     * @return the abs delta between the top and bottom angles
+     * @return the abs delta angle between the top and bottom angles
      */
-    double getDelta() const;
+    Angle getDelta() const;
 
     /**
      * Compares another AngleSegment's top angle
@@ -57,6 +57,15 @@ class AngleSegment
      * @return true if both AngleSegment's top angles are equal
      */
     bool operator==(const AngleSegment &other) const;
+
+    /**
+     * Compares another AngleSegment's top angle
+     * Used to make sorting more performant
+     *
+     * @param other the other AngleSegment to compare to
+     * @return true if both AngleSegment's top angles are not equal
+     */
+    bool operator!=(const AngleSegment &other) const;
 
     /**
      * Compares another AngleSegment's top angle

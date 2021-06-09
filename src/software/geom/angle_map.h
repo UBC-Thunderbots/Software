@@ -36,7 +36,7 @@ class AngleMap
      * @param max_num_obstacles the max number of possible occupied AngleSegments within
      * this map
      */
-    AngleMap(Angle top_angle, Angle bottom_angle, size_t max_num_obstacles);
+    AngleMap(Angle top_angle, Angle bottom_angle, size_t reserved_num_obstacles = 1);
 
     /**
      * Constructs an AngleMap with a specified AngleSegment and max number of possible
@@ -69,7 +69,7 @@ class AngleMap
      */
     AngleSegment getBiggestViableAngleSegment();
 
-   protected:
+  private:
     AngleSegment angle_seg;
     std::vector<AngleSegment> taken_angle_segments;
 };
