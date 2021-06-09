@@ -69,7 +69,7 @@ class AngleMap
      */
     AngleSegment getBiggestViableAngleSegment();
 
-  private:
+   private:
     AngleSegment angle_seg;
     std::vector<AngleSegment> taken_angle_segments;
 };

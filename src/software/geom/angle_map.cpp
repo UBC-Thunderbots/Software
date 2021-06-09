@@ -48,8 +48,8 @@ AngleSegment AngleMap::getBiggestViableAngleSegment()
     AngleSegment first_taken_angle_seg = taken_angle_segments.front();
     if (first_taken_angle_seg.getAngleTop() < angle_seg.getAngleTop())
     {
-        biggest_viable_angle_seg = AngleSegment(angle_seg.getAngleTop(),
-                                                first_taken_angle_seg.getAngleTop());
+        biggest_viable_angle_seg =
+            AngleSegment(angle_seg.getAngleTop(), first_taken_angle_seg.getAngleTop());
     }
 
     AngleSegment last_taken_angle_seg = taken_angle_segments.back();

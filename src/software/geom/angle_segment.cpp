@@ -51,6 +51,7 @@ bool AngleSegment::operator>(const AngleSegment &other) const
     return getAngleTop() > other.getAngleTop();
 }
 
-bool AngleSegment::operator!=(const AngleSegment &other) const {
+bool AngleSegment::operator!=(const AngleSegment &other) const
+{
     return getAngleTop() != other.getAngleTop();
 }
