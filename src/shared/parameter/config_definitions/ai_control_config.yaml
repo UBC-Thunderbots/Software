@@ -7,7 +7,7 @@
         the last commands they were given. DO NOT USE in place of the e-stop.
 - bool:
     name: override_ai_play
-    value: true
+    value: False
     description: >-
         Overrides the current play with the play
         specified by currentPlay parameter
