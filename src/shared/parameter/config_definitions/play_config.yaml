@@ -8,3 +8,4 @@ include:
     - shoot_or_pass_play_config.yaml
     - attacker_tactic_config.yaml
     - robot_navigation_obstacle_config.yaml
+    - defense_play_config.yaml
