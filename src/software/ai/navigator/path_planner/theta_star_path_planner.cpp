@@ -134,8 +134,7 @@ bool ThetaStarPathPlanner::checkLineLow(const Coordinate &coord0,
 
     for (unsigned int x = x0; x <= x1; x++)
     {
-        Coordinate curr_coord(x, y);
-        if (isCoordNavigable(curr_coord) && isBlocked(curr_coord))
+        if (isBlocked(Coordinate(x, y)))
         {
             // No line of sight since a coordinate in the path from coord0 to coord1 is
             // blocked
@@ -176,8 +175,7 @@ bool ThetaStarPathPlanner::checkLineHigh(const ThetaStarPathPlanner::Coordinate 
 
     for (unsigned int y = y0; y <= y1; y++)
     {
-        Coordinate curr_coord(x, y);
-        if (isCoordNavigable(curr_coord) && isBlocked(curr_coord))
+        if (isBlocked(Coordinate(x, y)))
         {
             // No line of sight since a coordinate in the path from coord0 to coord1 is
             // blocked
