@@ -74,6 +74,7 @@ int main(int argc, char** argv)
         ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(backend);
         sensor_fusion->Subject<World>::registerObserver(ai);
         backend->Subject<SensorProto>::registerObserver(sensor_fusion);
+        sensor_fusion->Subject<World>::registerObserver(backend);
         if (!args->getHeadless()->value())
         {
             visualizer =

@@ -296,7 +296,7 @@ TEST(RasterizeTest, test_hexagon)
                     {0.0f, -2.0f},   // bottom vertex
                     {-2.0f, -1.0f},  // bottom left vertex
                     {-2.0f, 1.0f}};  // top left vertex
-    double offset             = 0.5f;
+    double offset = 0.5f;
 
     std::vector<Point> rasterized_points = rasterize(hexagon, offset);
     auto max_point_y = [](const Point& a, const Point& b) { return a.y() < b.y(); };

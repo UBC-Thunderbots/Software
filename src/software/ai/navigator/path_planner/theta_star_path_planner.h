@@ -489,9 +489,7 @@ class ThetaStarPathPlanner : public PathPlanner
     // true  --> The cell is not blocked
     // false --> The cell is blocked
     // We update this as we go to avoid updating cells we don't use
-    std::unordered_map<Coordinate, bool, CoordinateHashFunction>
-        unblocked_grid;  // TODO Could try making unblocked_grid and line_of_sight_cache
-                         // an unordered_map, and test read times difference
+    std::unordered_map<Coordinate, bool, CoordinateHashFunction> unblocked_grid;
 
     // Declare a 2D array of structure to hold if a coordinate is blocked
     // true  --> Coordinate is blocked

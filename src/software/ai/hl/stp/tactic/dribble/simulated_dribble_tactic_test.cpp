@@ -245,7 +245,7 @@ TEST_F(SimulatedDribbleTacticTest, test_dribble_dest_and_orientation_around_rect
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(15));
+            Duration::fromSeconds(20));
 }
 
 TEST_F(SimulatedDribbleTacticTest,
