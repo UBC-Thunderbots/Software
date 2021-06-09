@@ -20,10 +20,10 @@ class SimulationContactListenerTest : public testing::Test
     {
         b2Vec2 gravity(0, 0);
         physics_config = std::make_shared<const PhysicsConfig>();
-        physics_world    = std::make_shared<b2World>(gravity);
-        physics_ball  = std::make_shared<PhysicsBall>(physics_world, ball.currentState(),
-                                                      1.0, physics_config);
-        physics_robot = std::make_shared<PhysicsRobot>(robot.id(), physics_world,
+        physics_world  = std::make_shared<b2World>(gravity);
+        physics_ball   = std::make_shared<PhysicsBall>(physics_world, ball.currentState(),
+                                                     1.0, physics_config);
+        physics_robot  = std::make_shared<PhysicsRobot>(robot.id(), physics_world,
                                                        robot.currentState(), 1.0);
 
         return std::make_tuple(physics_world, physics_robot, physics_ball);

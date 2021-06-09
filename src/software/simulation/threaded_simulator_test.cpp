@@ -10,8 +10,9 @@ class ThreadedSimulatorTest : public ::testing::Test
 {
    protected:
     ThreadedSimulatorTest()
-        : threaded_simulator(Field::createSSLDivisionBField(),
-                             std::make_shared<const SimulatorConfig>(std::make_shared<PhysicsConfig>()))
+        : threaded_simulator(
+              Field::createSSLDivisionBField(),
+              std::make_shared<const SimulatorConfig>(std::make_shared<PhysicsConfig>()))
     {
     }
 

@@ -34,15 +34,18 @@ void SimulatedTestFixture::SetUp()
         ->setValue(false);
 
     // Experimentally determined restitution value
-    mutable_thunderbots_config->getMutableSimulatorConfig()->getMutablePhysicsConfig()
+    mutable_thunderbots_config->getMutableSimulatorConfig()
+        ->getMutablePhysicsConfig()
         ->getMutableBallRestitution()
         ->setValue(0.8);
     // Measured these values from fig. 9 on page 8 of
     // https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
-    mutable_thunderbots_config->getMutableSimulatorConfig()->getMutablePhysicsConfig()
+    mutable_thunderbots_config->getMutableSimulatorConfig()
+        ->getMutablePhysicsConfig()
         ->getMutableSlidingFrictionAcceleration()
         ->setValue(6.9);
-    mutable_thunderbots_config->getMutableSimulatorConfig()->getMutablePhysicsConfig()
+    mutable_thunderbots_config->getMutableSimulatorConfig()
+        ->getMutablePhysicsConfig()
         ->getMutableRollingFrictionAcceleration()
         ->setValue(0.5);
 

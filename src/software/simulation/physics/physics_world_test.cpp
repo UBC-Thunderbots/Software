@@ -12,7 +12,7 @@ class PhysicsWorldTest : public ::testing::Test
     void SetUp() override
     {
         physics_config = std::make_shared<const PhysicsConfig>();
-        physics_world = std::make_shared<PhysicsWorld>(Field::createSSLDivisionBField(),
+        physics_world  = std::make_shared<PhysicsWorld>(Field::createSSLDivisionBField(),
                                                        physics_config);
     }
 
