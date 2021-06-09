@@ -2,6 +2,10 @@
 
 #include "software/geom/angle.h"
 
+/**
+ * NOTE:
+ * The operators are for making sorting more performant
+ */
 class AngleSegment
 {
    public:
@@ -51,7 +55,6 @@ class AngleSegment
 
     /**
      * Compares another AngleSegment's top angle
-     * Used to make sorting more performant
      *
      * @param other the other AngleSegment to compare to
      * @return true if both AngleSegment's top angles are equal
@@ -60,7 +63,6 @@ class AngleSegment
 
     /**
      * Compares another AngleSegment's top angle
-     * Used to make sorting more performant
      *
      * @param other the other AngleSegment to compare to
      * @return true if both AngleSegment's top angles are not equal
@@ -69,7 +71,6 @@ class AngleSegment
 
     /**
      * Compares another AngleSegment's top angle
-     * Used to make sorting more performant
      *
      * @param other the other AngleSegment to compare to
      * @return true if this top angle is less than the other's top angle
@@ -78,7 +79,6 @@ class AngleSegment
 
     /**
      * Compares another AngleSegment's top angle
-     * Used to make sorting more performant
      *
      * @param other the other AngleSegment to compare to
      * @return true if this top angle is greater than the other's top angle
