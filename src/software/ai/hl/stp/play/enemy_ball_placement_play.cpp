@@ -23,7 +23,7 @@ bool EnemyBallPlacementPlay::invariantHolds(const World &world) const
     return world.gameState().isTheirBallPlacement();
 }
 
-void EnemyBallPlacementPlay::inDefendingZone(
+void EnemyBallPlacementPlay::defendingBallPlacement(
     TacticCoroutine::push_type &yield,
     const World &world,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders,
@@ -85,7 +85,7 @@ void EnemyBallPlacementPlay::inDefendingZone(
     } while (true);
 }
 
-void EnemyBallPlacementPlay::inAttackingZone(
+void EnemyBallPlacementPlay::attackingBallPlacement(
     TacticCoroutine::push_type &yield,
     const World &world,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders,
@@ -170,7 +170,6 @@ void EnemyBallPlacementPlay::inAttackingZone(
 void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                             const World &world)
 {
-
     std::optional<Point> placement_point = world.gameState().getBallPlacementPoint();
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders = {
@@ -191,11 +190,11 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     {
         if(placement_point.value().x() > 0)
         {
-            inAttackingZone(yield,world,crease_defenders,move_tactics,placement_point.value());
+            attackingBallPlacement(yield,world,crease_defenders,move_tactics,placement_point.value());
         }
         else
         {
-            inDefendingZone(yield,world,crease_defenders,move_tactics,placement_point.value());
+            defendingBallPlacement(yield,world,crease_defenders,move_tactics,placement_point.value());
         }
     }
     //If there is no placement point, run a default version of the play where robots hang back
