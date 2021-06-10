@@ -1,21 +1,22 @@
 #include "firmware/boards/robot_stm32h7/io/vision.h"
 
-#include "FreeRTOS.h"
 #include <semphr.h>
+
+#include "FreeRTOS.h"
 #include "firmware/boards/robot_stm32h7/io/proto_multicast.h"
 #include "firmware/boards/robot_stm32h7/io/proto_multicast_communication_profile.h"
 #include "shared/proto/tbots_software_msgs.nanopb.h"
 
 static SemaphoreHandle_t vision_mutex;
 static TbotsProto_Vision vision;
- 
+
 void io_vision_init(void)
 {
     static StaticSemaphore_t primitive_mutex_storage;
     vision_mutex = xSemaphoreCreateMutexStatic(&primitive_mutex_storage);
 }
 
-void io_vision_task(void * arg)
+void io_vision_task(void* arg)
 {
     ProtoMulticastCommunicationProfile_t* comm_profile =
         (ProtoMulticastCommunicationProfile_t*)arg;
@@ -56,7 +57,7 @@ void io_unlock_vision()
 float io_vision_getBallPositionX(void)
 {
     io_lock_vision();
-    float temp =  vision.ball_state.global_position.x_meters;
+    float temp = vision.ball_state.global_position.x_meters;
     io_unlock_vision();
     return temp;
 }
@@ -87,7 +88,7 @@ float io_vision_getRobotPositionX(void)
     io_lock_vision();
     if (vision.robot_states_count == 1)
     {
-     temp = vision.robot_states[0].value.global_position.x_meters;
+        temp = vision.robot_states[0].value.global_position.x_meters;
     }
     io_unlock_vision();
     return temp;
@@ -98,7 +99,7 @@ float io_vision_getRobotPositionY(void)
     io_lock_vision();
     if (vision.robot_states_count == 1)
     {
-     temp = vision.robot_states[0].value.global_position.y_meters;
+        temp = vision.robot_states[0].value.global_position.y_meters;
     }
     io_unlock_vision();
     return temp;
@@ -120,7 +121,7 @@ float io_vision_getRobotVelocityX(void)
     io_lock_vision();
     if (vision.robot_states_count == 1)
     {
-     temp = vision.robot_states[0].value.global_velocity.x_component_meters;
+        temp = vision.robot_states[0].value.global_velocity.x_component_meters;
     }
     io_unlock_vision();
     return temp;

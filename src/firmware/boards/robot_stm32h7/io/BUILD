@@ -210,11 +210,11 @@ cc_library(
     name = "vision",
     srcs = ["vision.c"],
     hdrs = ["vision.h"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
         "//firmware/app/primitives:primitive_manager",
         "//firmware/boards/robot_stm32h7/io:proto_multicast_communication",
     ],
-    restricted_to = ["//cc_toolchain:stm32h7"],
 )
 
 cc_library(

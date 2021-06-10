@@ -50,12 +50,12 @@ void io_proto_multicast_senderTask(void* communication_profile)
     // We use IP6_ADDR_ANY which will default to the ethernet interface on the STM32H7
     struct netconn* conn = netconn_new(NETCONN_UDP);
 
-    netconn_bind(conn, IP_ADDR_ANY,
+    netconn_bind(conn, IP6_ADDR_ANY,
                  io_proto_multicast_communication_profile_getPort(profile));
 
     netconn_join_leave_group(conn,
                              io_proto_multicast_communication_profile_getAddress(profile),
-                             IP_ADDR_ANY, NETCONN_JOIN);
+                             IP6_ADDR_ANY, NETCONN_JOIN);
 
     // this buffer is used to hold serialized proto
     uint8_t buffer[io_proto_multicast_communication_profile_getMaxProtoSize(profile)];
@@ -107,9 +107,14 @@ void io_proto_multicast_listenerTask(void* communication_profile)
 
     // Bind the socket to the multicast address and port we then use that
     // communication profile to join the specified multicast group.
-    struct netconn* conn = netconn_new(NETCONN_UDP);
-    netconn_bind(conn, IP_ADDR_ANY,
+    struct netconn* conn = netconn_new(NETCONN_UDP_IPV6);
+
+    netconn_bind(conn, io_proto_multicast_communication_profile_getAddress(profile),
                  io_proto_multicast_communication_profile_getPort(profile));
+
+    netconn_join_leave_group(conn,
+                             io_proto_multicast_communication_profile_getAddress(profile),
+                             IP6_ADDR_ANY, NETCONN_JOIN);
 
     struct netbuf* rx_buf = NULL;
     err_t network_err;
@@ -163,5 +168,6 @@ void io_proto_multicast_startNetworkingTask(void* unused)
     /*io_ublox_odinw262_communicator_connectToWiFi();*/
 
     osEventFlagsSet(networking_event, NETIF_CONFIGURED);
+
     osThreadExit();
 }

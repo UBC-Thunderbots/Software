@@ -1,8 +1,9 @@
 #include "firmware/boards/robot_stm32h7/io/drivetrain_unit.h"
-#include "firmware/app/logger/logger.h"
 
 #include <math.h>
 #include <stdlib.h>
+
+#include "firmware/app/logger/logger.h"
 
 typedef struct DrivetrainUnit
 {

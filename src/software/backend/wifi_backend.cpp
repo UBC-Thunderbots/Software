@@ -87,10 +87,12 @@ void WifiBackend::receiveRobotLogs(TbotsProto::RobotLog log)
 void WifiBackend::joinMulticastChannel(int channel, const std::string& interface)
 {
     vision_output.reset(new ThreadedProtoUdpSender<TbotsProto::Vision>(
-        "192.168.0.101", VISION_PORT, false));
+        std::string(ROBOT_MULTICAST_CHANNELS[channel]) + "%" + interface, VISION_PORT,
+        true));
 
     primitive_output.reset(new ThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(
-        "192.168.0.101", PRIMITIVE_PORT, false));
+        std::string(ROBOT_MULTICAST_CHANNELS[channel]) + "%" + interface, PRIMITIVE_PORT,
+        true));
 
     robot_status_input.reset(new ThreadedProtoUdpListener<TbotsProto::RobotStatus>(
         std::string(ROBOT_MULTICAST_CHANNELS[channel]) + "%" + interface,

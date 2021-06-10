@@ -38,8 +38,8 @@ void ThreadedEstopReader::tick(const boost::system::error_code& error)
     else
     {
         std::vector<unsigned char> estop_msg;
-            uart_reader->flushSerialPort(uart_reader->flush_receive);
-            estop_msg = uart_reader->serialRead(ESTOP_MESSAGE_SIZE_BYTES);
+        uart_reader->flushSerialPort(uart_reader->flush_receive);
+        estop_msg = uart_reader->serialRead(ESTOP_MESSAGE_SIZE_BYTES);
 
         EstopState new_state;
 
