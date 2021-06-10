@@ -212,12 +212,12 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromBallPlacement(
      *         top_l           top_r
      *           +-------+-------+
      *           |               |
-     *           |    place_c    |
+     *           |    ball_c     |
      *           +-------+-------+
      *           |               |
      *           |               |
      *           |               |
-     *           |     ball_c    |
+     *           |     place_c   |
      *           +-------+-------+
      *           |               |
      *           |               |
