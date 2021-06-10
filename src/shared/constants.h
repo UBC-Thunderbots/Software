@@ -138,6 +138,16 @@ const float ROBOT_MAX_BATTERY_VOLTAGE = 16.0;
 
 const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;
 
+// The amount of distance we need to chip at ROBOT_CHIP_ANGLE_DEGREES to
+// clear robot within a robot radius away from the chipping robot.
+//
+// This number can probably be reduced after careful field testing.
+const double ROBOT_MIN_CHIP_CLEAR_DISTANCE = 1.0;
+
+// The chip_target distance should be scaled by this value so that
+// the ball can land and continue to roll to the target_distance
+const double CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO = 0.8;
+
 // How many robots are allowed in each division
 const unsigned DIV_A_NUM_ROBOTS = 11;
 const unsigned DIV_B_NUM_ROBOTS = 6;

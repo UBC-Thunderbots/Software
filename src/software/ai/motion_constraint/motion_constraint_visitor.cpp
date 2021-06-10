@@ -75,11 +75,22 @@ void MotionConstraintVisitor::visit(const StopTestTactic &tactic) {}
 
 void MotionConstraintVisitor::visit(const GoalieTestTactic &tactic) {}
 
-void MotionConstraintVisitor::visit(const DribbleTactic &tactic) {}
+void MotionConstraintVisitor::visit(const DribbleTactic &tactic)
+{
+    current_allowed_constraints = std::set<MotionConstraint>({
+            MotionConstraint::HALF_METER_AROUND_BALL
+    });
+}
 
 void MotionConstraintVisitor::visit(const GetBehindBallTactic &tactic) {}
 
-void MotionConstraintVisitor::visit(const MoveToGoalLineTactic &tactic) {}
+void MotionConstraintVisitor::visit(const MoveGoalieToGoalLineTactic &tactic)
+{
+    current_allowed_constraints = std::set<MotionConstraint>({
+        MotionConstraint::FRIENDLY_HALF,
+        MotionConstraint::FRIENDLY_DEFENSE_AREA
+    });
+}
 
 // clang-format on
 

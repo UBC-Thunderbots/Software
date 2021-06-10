@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/play/shoot_or_pass_play.h"
 
 #include <gtest/gtest.h>
+
 #include <random>
 
 #include "software/simulated_tests/simulated_play_test_fixture.h"
@@ -25,10 +26,10 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
                                                   field.enemyHalf().xMax());
     std::uniform_real_distribution y_distribution(field.enemyHalf().yMin(),
                                                   field.enemyHalf().yMax());
-    std::uniform_real_distribution x_other_side_distribution(field.friendlyHalf().xMin() + 0.6,
-                                                  field.friendlyHalf().xMax());
+    std::uniform_real_distribution x_other_side_distribution(
+        field.friendlyHalf().xMin() + 0.6, field.friendlyHalf().xMax());
     std::uniform_real_distribution y_other_side_distribution(field.friendlyHalf().yMin(),
-                                                  field.friendlyHalf().yMax());
+                                                             field.friendlyHalf().yMax());
 
     BallState ball_state(Point(-4.4, 2.9), Vector(0, 0));
 
@@ -45,24 +46,23 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
 
         setFriendlyGoalie(0);
         auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
-            {Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
+                {Point(-3.5, 2.5), Point(-3.5, 2.7),Point(-3.5, 2.9), Point(-3.5, 2.3), field.enemyGoalCenter(),
              Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
              Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
              Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
              Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
              Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
-             Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
-             Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
-             Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
-             Point(x_other_side_distribution(random_num_gen_), y_other_side_distribution(random_num_gen_)),
-             Point(x_other_side_distribution(random_num_gen_), y_other_side_distribution(random_num_gen_)),
-             Point(x_other_side_distribution(random_num_gen_), y_other_side_distribution(random_num_gen_)),
-             Point(x_other_side_distribution(random_num_gen_), y_other_side_distribution(random_num_gen_)),
-             Point(x_other_side_distribution(random_num_gen_), y_other_side_distribution(random_num_gen_)),
-             Point(x_other_side_distribution(random_num_gen_), y_other_side_distribution(random_num_gen_)),
-             Point(x_other_side_distribution(random_num_gen_), y_other_side_distribution(random_num_gen_)),
-             Point(x_other_side_distribution(random_num_gen_), y_other_side_distribution(random_num_gen_)),
-             field.enemyGoalCenter(), field.enemyDefenseArea().negXNegYCorner(),
+             Point(x_other_side_distribution(random_num_gen_),
+                   y_other_side_distribution(random_num_gen_)),
+             Point(x_other_side_distribution(random_num_gen_),
+                   y_other_side_distribution(random_num_gen_)),
+             Point(x_other_side_distribution(random_num_gen_),
+                   y_other_side_distribution(random_num_gen_)),
+             Point(x_other_side_distribution(random_num_gen_),
+                   y_other_side_distribution(random_num_gen_)),
+             Point(x_other_side_distribution(random_num_gen_),
+                   y_other_side_distribution(random_num_gen_)),
+             field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
         setEnemyGoalie(0);
         setAIPlay(TYPENAME(ShootOrPassPlay));

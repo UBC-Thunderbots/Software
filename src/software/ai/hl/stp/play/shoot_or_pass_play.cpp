@@ -7,6 +7,7 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
+#include "software/ai/passing/cost_function.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.h"
 #include "software/geom/algorithms/contains.h"
@@ -81,8 +82,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         // Perform the pass and wait until the receiver is finished
         auto receiver = std::make_shared<ReceiverTactic>(pass);
+        auto pass_eval    = pass_generator.generatePassEvaluation(world);
 
-        auto pass_eval = pass_generator.generatePassEvaluation(world);
         auto ranked_zones = pass_eval.rankZonesForReceiving(
             world, best_pass_and_score_so_far.pass.receiverPoint());
 
@@ -93,7 +94,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
         {
             std::cerr << zone << std::endl;
         }
-
+        std::cerr<<"-------------------------"<<std::endl;
         auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
         auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
 
@@ -107,6 +108,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                                   pass2.receiverOrientation(), 0.0,
                                                   MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
+        std::cerr<<"EXECUTING: "<<pass<<std::endl;
         do
         {
             attacker->updateControlParams(pass);
@@ -120,14 +122,15 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                       CreaseDefenderAlignment::RIGHT);
             if (!attacker->done())
             {
-                yield({{attacker, receiver, cherry_pick_tactic_1,
-                        std::get<0>(crease_defender_tactics),
+                yield({{attacker, receiver},
+                       {cherry_pick_tactic_1, std::get<0>(crease_defender_tactics),
                         std::get<1>(crease_defender_tactics)}});
             }
             else
             {
-                yield({{receiver, cherry_pick_tactic_1, cherry_pick_tactic_2,
-                        std::get<0>(crease_defender_tactics),
+                yield({{receiver},
+                       {cherry_pick_tactic_1, cherry_pick_tactic_2},
+                       {std::get<0>(crease_defender_tactics),
                         std::get<1>(crease_defender_tactics)}});
             }
         } while (!receiver->done());
@@ -155,6 +158,11 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     auto pass_eval    = pass_generator.generatePassEvaluation(world);
     auto ranked_zones = pass_eval.rankZonesForReceiving(world, world.ball().position());
 
+    for (auto zone : ranked_zones)
+    {
+        std::cerr << zone << std::endl;
+    }
+    std::cerr<<"-------------------------"<<std::endl;
     Zones cherry_pick_region_1 = {ranked_zones[0]};
     Zones cherry_pick_region_2 = {ranked_zones[1]};
 
@@ -173,6 +181,10 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     // This boolean indicates if we're ready to perform a pass
     bool ready_to_pass = false;
 
+    double abs_min_pass_score =
+        play_config->getShootOrPassPlayConfig()->getAbsMinPassScore()->value();
+    double pass_score_ramp_down_duration =
+        play_config->getShootOrPassPlayConfig()->getPassScoreRampDownDuration()->value();
     do
     {
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
@@ -204,11 +216,15 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         // We're ready to pass if we have a robot assigned in the PassGenerator as the
         // passer and the PassGenerator has found a pass above our current threshold
         ready_to_pass = best_pass_and_score_so_far.rating > min_pass_score_threshold;
-
         // If we've assigned a robot as the passer in the PassGenerator, we lower
         // our threshold based on how long the PassGenerator as been running since
         // we set it
-        min_pass_score_threshold -= 0.01;
+        Duration time_since_commit_stage_start =
+            world.getMostRecentTimestamp() - pass_optimization_start_time;
+        min_pass_score_threshold =
+            1 - std::min(time_since_commit_stage_start.toSeconds() /
+                             pass_score_ramp_down_duration,
+                         1.0 - abs_min_pass_score);
     } while (!ready_to_pass);
     return best_pass_and_score_so_far;
 }

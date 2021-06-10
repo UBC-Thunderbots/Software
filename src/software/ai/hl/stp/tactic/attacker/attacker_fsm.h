@@ -7,6 +7,7 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/ai/passing/pass.h"
+#include "software/geom/algorithms/intersects.h"
 
 struct AttackerFSM
 {
@@ -68,12 +69,32 @@ struct AttackerFSM
             }
             else if (event.control_params.pass)
             {
+                auto pass_segment = Segment(event.control_params.pass->passerPoint(),
+                                            event.control_params.pass->receiverPoint());
+
+                bool should_chip = false;
+
+                for (const Robot& enemy : event.common.world.enemyTeam().getAllRobots())
+                {
+                    if (intersects(Circle(enemy.position(), ROBOT_MAX_RADIUS_METERS),
+                                   pass_segment))
+                    {
+                        should_chip = true;
+                    }
+                }
+
                 control_params = PivotKickFSM::ControlParams{
                     .kick_origin    = event.control_params.pass->passerPoint(),
                     .kick_direction = event.control_params.pass->passerOrientation(),
                     .auto_chip_or_kick =
                         AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
                                        event.control_params.pass->speed()}};
+                if (should_chip)
+                {
+                    control_params.auto_chip_or_kick = AutoChipOrKick{
+                        AutoChipOrKickMode::AUTOCHIP,
+                        pass_segment.length() * CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO};
+                }
             }
             processEvent(PivotKickFSM::Update(control_params, event.common));
         };
@@ -108,7 +129,7 @@ struct AttackerFSM
                                               event.control_params.attacker_tactic_config
                                                   ->getEnemyAboutToStealBallRadius()
                                                   ->value());
-            for (const auto &enemy : event.common.world.enemyTeam().getAllRobots())
+            for (const auto& enemy : event.common.world.enemyTeam().getAllRobots())
             {
                 if (contains(about_to_steal_danger_zone, enemy.position()))
                 {

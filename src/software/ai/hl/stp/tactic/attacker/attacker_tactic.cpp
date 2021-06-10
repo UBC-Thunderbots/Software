@@ -62,6 +62,7 @@ double AttackerTactic::calculateRobotCost(const Robot& robot, const World& world
 {
     // Default 0 cost assuming ball is in dribbler
     double cost = 0.0;
+
     if (!robot.isNearDribbler(world.ball().position()))
     {
         // Prefer robots closer to the interception point

@@ -1,7 +1,8 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/evaluation/robot_cost.h"
 
 #include <algorithm>
+
+#include "software/ai/evaluation/robot_cost.h"
 
 MoveTactic::MoveTactic(bool loop_forever)
     : Tactic(loop_forever, {RobotCapability::Move}),

@@ -38,24 +38,40 @@ double ratePassShootScoreWrapper(const World& world, py::dict pass_dict,
     return ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
 }
 
-double ratePassEnemyRiskWrapper(const World& world, py::dict pass_dict,
-                                py::dict passing_config_dict)
+double rateKickPassEnemyRiskWrapper(const World& world, py::dict pass_dict,
+                                    py::dict passing_config_dict)
 {
     auto pass = createPassFromDict(pass_dict);
     updatePassingConfigFromDict(passing_config_dict);
-    return ratePassEnemyRisk(world.enemyTeam(), pass, passing_config);
+    return rateKickPassEnemyRisk(world.enemyTeam(), pass, passing_config);
 }
 
-double ratePassFriendlyCapabilityWrapper(const World& world, py::dict pass_dict,
-                                         py::dict passing_config_dict)
+double rateChipPassEnemyRiskWrapper(const World& world, py::dict pass_dict,
+                                    py::dict passing_config_dict)
 {
     auto pass = createPassFromDict(pass_dict);
     updatePassingConfigFromDict(passing_config_dict);
-    return ratePassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
+    return rateChipPassEnemyRisk(world.enemyTeam(), pass, passing_config);
+}
+
+double rateKickPassFriendlyCapabilityWrapper(const World& world, py::dict pass_dict,
+                                             py::dict passing_config_dict)
+{
+    auto pass = createPassFromDict(pass_dict);
+    updatePassingConfigFromDict(passing_config_dict);
+    return rateKickPassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
+}
+
+double rateChipPassFriendlyCapabilityWrapper(const World& world, py::dict pass_dict,
+                                             py::dict passing_config_dict)
+{
+    auto pass = createPassFromDict(pass_dict);
+    updatePassingConfigFromDict(passing_config_dict);
+    return rateChipPassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
 }
 
 double getStaticPositionQualityWrapper(const World& world, py::dict pass_dict,
-                                         py::dict passing_config_dict)
+                                       py::dict passing_config_dict)
 {
     auto pass = createPassFromDict(pass_dict);
     updatePassingConfigFromDict(passing_config_dict);
@@ -65,16 +81,20 @@ double getStaticPositionQualityWrapper(const World& world, py::dict pass_dict,
 PYBIND11_MODULE(passing, m)
 {
     m.def("updatePassingConfigFromDict", &updatePassingConfigFromDict,
-            py::arg("pass_dict"));
+          py::arg("pass_dict"));
     m.def("getPassingConfig", &getPassingConfig);
     m.def("ratePass", &ratePassWrapper, py::arg("world"), py::arg("pass_dict"),
-            py::arg("passing_config_dict"));
+          py::arg("passing_config_dict"));
     m.def("ratePassShootScore", &ratePassShootScoreWrapper, py::arg("world"),
-            py::arg("pass_dict"), py::arg("passing_config_dict"));
-    m.def("ratePassEnemyRisk", &ratePassEnemyRiskWrapper, py::arg("world"),
-            py::arg("pass_dict"), py::arg("passing_config_dict"));
-    m.def("ratePassFriendlyCapability", &ratePassFriendlyCapabilityWrapper,
-            py::arg("world"), py::arg("pass_dict"), py::arg("passing_config_dict"));
-    m.def("getStaticPositionQuality", &getStaticPositionQualityWrapper,
-            py::arg("world"), py::arg("pass_dict"), py::arg("passing_config_dict"));
+          py::arg("pass_dict"), py::arg("passing_config_dict"));
+    m.def("rateChipPassEnemyRisk", &rateChipPassEnemyRiskWrapper, py::arg("world"),
+          py::arg("pass_dict"), py::arg("passing_config_dict"));
+    m.def("rateKickPassEnemyRisk", &rateKickPassEnemyRiskWrapper, py::arg("world"),
+          py::arg("pass_dict"), py::arg("passing_config_dict"));
+    m.def("rateKickPassFriendlyCapability", &rateKickPassFriendlyCapabilityWrapper,
+          py::arg("world"), py::arg("pass_dict"), py::arg("passing_config_dict"));
+    m.def("rateChipPassFriendlyCapability", &rateChipPassFriendlyCapabilityWrapper,
+          py::arg("world"), py::arg("pass_dict"), py::arg("passing_config_dict"));
+    m.def("getStaticPositionQuality", &getStaticPositionQualityWrapper, py::arg("world"),
+          py::arg("pass_dict"), py::arg("passing_config_dict"));
 }

@@ -1,7 +1,7 @@
 #include "software/ai/evaluation/robot_cost.h"
 
-double calculateRobotCostToDestination(const Robot& rob, const World& wor,
-                                       const Point& po)
+double calculateRobotCostToDestination(const Robot& robot, const World& world,
+                                       const Point& point)
 {
-    return (rob.position() - po).length() / wor.field().xLength();
+    return (robot.position() - point).length() / world.field().totalXLength();
 }

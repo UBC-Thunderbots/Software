@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "shared/constants.h"
 #include "software/geom/point.h"
 #include "software/time/timestamp.h"
 

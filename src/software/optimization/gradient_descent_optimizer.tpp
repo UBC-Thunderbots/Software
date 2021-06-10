@@ -90,10 +90,10 @@ std::array<double, NUM_PARAMS> GradientDescentOptimizer<NUM_PARAMS>::followGradi
         {
             bias_corrected_past_gradient_averages.at(i) =
                 past_gradient_averages.at(i) /
-                (1 - std::pow(past_gradient_decay_rate, 2));
+                (1 - std::pow(past_gradient_decay_rate, iter + 1));
             bias_corrected_past_squared_gradient_averages.at(i) =
                 past_squared_gradient_averages.at(i) /
-                (1 - std::pow(past_squared_gradient_decay_rate, 2));
+                (1 - std::pow(past_squared_gradient_decay_rate, iter + 1));
         }
 
         // Step each param in the direction of the gradient using the operator

@@ -3,10 +3,10 @@
 #include <boost/coroutine2/all.hpp>  // TODO (#1888): remove this dependency
 #include <optional>                  // TODO (#1888): remove this dependency
 
+#include "software/ai/evaluation/robot_cost.h"
 #include "software/ai/hl/stp/action/action.h"  // TODO (#1888): remove this dependency
 #include "software/ai/hl/stp/tactic/tactic_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
-#include "software/ai/evaluation/robot_cost.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
 #include "software/ai/intent/intent.h"
 #include "software/world/world.h"

@@ -15,10 +15,11 @@ ReceiverTactic::ReceiverTactic(const Pass pass)
 
 void ReceiverTactic::updateWorldParams(const World& world) {}
 
-void ReceiverTactic::updateControlParams(const Pass& updated_pass)
+void ReceiverTactic::updateControlParams(const Pass& updated_pass, bool disable_one_touch)
 {
     // Update the control parameters stored by this Tactic
-    control_params.pass = updated_pass;
+    control_params.pass              = updated_pass;
+    control_params.disable_one_touch = disable_one_touch;
 }
 
 void ReceiverTactic::updateIntent(const TacticUpdate& tactic_update)
@@ -36,8 +37,8 @@ double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world
     // Prefer robots closer to the pass receive position
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
-    return 10*calculateRobotCostToDestination(robot, world,
-                                           control_params.pass->receiverPoint());
+    return calculateRobotCostToDestination(robot, world,
+                                                control_params.pass->receiverPoint());
 }
 
 void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)

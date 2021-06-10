@@ -64,8 +64,10 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
  *         to run without interference, and 0 indicating that the pass will certainly
  *         be interfered with (and so is very poor)
  */
-double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
-                         std::shared_ptr<const PassingConfig> passing_config);
+double rateKickPassEnemyRisk(const Team& enemy_team, const Pass& pass,
+                             std::shared_ptr<const PassingConfig> passing_config);
+double rateChipPassEnemyRisk(const Team& enemy_team, const Pass& pass,
+                             std::shared_ptr<const PassingConfig> passing_config);
 
 /**
  * Calculates the likelihood that the given pass will be intercepted
@@ -78,8 +80,8 @@ double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass,
  *         guaranteed to be intercepted, and 0 indicating it's impossible for the
  *         pass to be intercepted
  */
-double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
-                              std::shared_ptr<const PassingConfig> passing_config);
+double calculateKickInterceptRisk(const Team& enemy_team, const Pass& pass,
+                                  std::shared_ptr<const PassingConfig> passing_config);
 
 /**
  * Calculates the likelihood that the given pass will be intercepted by a given robot
@@ -92,9 +94,8 @@ double calculateInterceptRisk(const Team& enemy_team, const Pass& pass,
  *         be intercepted, and 0 indicating it's impossible for the pass to be
  *         intercepted
  */
-double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
-                              std::shared_ptr<const PassingConfig> passing_config);
-
+double calculateKickInterceptRisk(const Robot& enemy_robot, const Pass& pass,
+                                  std::shared_ptr<const PassingConfig> passing_config);
 
 /**
  * Calculate the probability of a friendly robot receiving the given pass
@@ -110,9 +111,15 @@ double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass,
  *         friendly team to receive the given pass, with 1 being very likely, 0
  *         being impossible
  */
-double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
-                                  std::shared_ptr<const PassingConfig> passing_config);
+double rateKickPassFriendlyCapability(
+    Team friendly_team, const Pass& pass,
+    std::shared_ptr<const PassingConfig> passing_config);
+double rateChipPassFriendlyCapability(
+    Team friendly_team, const Pass& pass,
+    std::shared_ptr<const PassingConfig> passing_config);
 
+double ratePassNextPassScore(const World& world, const Pass& pass,
+                             std::shared_ptr<const PassingConfig> passing_config);
 /**
  * Calculates the static position quality for a given position on a given field
  *

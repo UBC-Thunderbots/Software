@@ -20,8 +20,6 @@ class ReceiverTactic : public Tactic
      * Creates a new ReceiverTactic
      *
      * @param pass The pass this tactic should try to receive
-     * @param loop_forever Whether or not this Tactic should never complete. If true,
-     *                     the tactic will be restarted every time it completes
      */
     explicit ReceiverTactic(const Pass pass);
 
@@ -33,8 +31,10 @@ class ReceiverTactic : public Tactic
      * Updates the control parameters for this ReceiverTactic.
      *
      * @param updated_pass The pass this tactic should try to receive
+     * @param disable_one_touch If set to true, the receiver will not perform a one-touch
+     *        The robot will simply receive and dribble.
      */
-    void updateControlParams(const Pass& updated_pass);
+    void updateControlParams(const Pass& updated_pass, bool disable_one_touch = false);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

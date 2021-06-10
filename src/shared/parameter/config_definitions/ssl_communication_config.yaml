@@ -6,7 +6,7 @@
     name: vision_port
     min: 1
     max: 65535
-    value: 10006
+    value: 10020
     description: The port to listen on for vision data
 - string:
     name: game_controller_ipv4_address
