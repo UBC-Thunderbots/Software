@@ -225,25 +225,15 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromBallPlacement(
      *         bot_l           bot_r
      */
     const double RADIUS = 0.5;
-    // Vector from place ---> ball
-    Vector place_to_ball = Vector(ball_point.x() - placement_point.x(),
-                                  ball_point.y() - placement_point.y());
-    // Vector from place <--- ball
-    Vector ball_to_place = Vector(placement_point.x() - ball_point.x(),
-                                  placement_point.y() - ball_point.y());
 
-    Vector bottom_vec_r = Vector(ball_point.x(),ball_point.y()) + place_to_ball.normalize(RADIUS) + place_to_ball.normalize(RADIUS).perpendicular();
-    Vector bottom_vec_l = Vector(ball_point.x(),ball_point.y()) + place_to_ball.normalize(RADIUS) - place_to_ball.normalize(RADIUS).perpendicular();
-    // Vector bottom_vec_l = bottom_vec - bottom_vec.perpendicular().normalize(radius);
+    Vector place_to_ball = placement_point.toVector() - ball_point.toVector();
+    Vector ball_to_place = ball_point.toVector() - placement_point.toVector();
 
-    Point bot_r = Point(bottom_vec_r.x(), bottom_vec_r.y());
-    Point bot_l = Point(bottom_vec_l.x(), bottom_vec_l.y());
+    Point bot_l = placement_point + (place_to_ball.normalize(RADIUS) + place_to_ball.perpendicular().normalize(RADIUS));
+    Point bot_r = placement_point + (place_to_ball.normalize(RADIUS) - place_to_ball.perpendicular().normalize(RADIUS));
 
-    Vector top_vec_r = Vector(placement_point.x(),placement_point.y()) + ball_to_place.normalize(RADIUS) + ball_to_place.normalize(RADIUS).perpendicular();
-    Vector top_vec_l = Vector(placement_point.x(),placement_point.y()) + ball_to_place.normalize(RADIUS) - ball_to_place.normalize(RADIUS).perpendicular();
-
-    Point top_r = Point(top_vec_r.x(), top_vec_r.y());
-    Point top_l = Point(top_vec_l.x(), top_vec_l.y());
+    Point top_l = ball_point + (ball_to_place.normalize(RADIUS) + ball_to_place.perpendicular().normalize(RADIUS));
+    Point top_r = ball_point + (ball_to_place.normalize(RADIUS) - ball_to_place.perpendicular().normalize(RADIUS));
 
     return createFromShape(Polygon({
         bot_l,
