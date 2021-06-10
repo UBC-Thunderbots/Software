@@ -26,7 +26,7 @@ PhysicsField::~PhysicsField()
             if (f->GetUserData() != NULL)
             {
                 PhysicsObjectUserData *user_data =
-                        static_cast<PhysicsObjectUserData *>(f->GetUserData());
+                    static_cast<PhysicsObjectUserData *>(f->GetUserData());
                 delete user_data;
                 f->SetUserData(NULL);
             }
