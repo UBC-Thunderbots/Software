@@ -91,6 +91,7 @@ int main(int argc, char** argv)
         sensor_fusion->Subject<World>::registerObserver(ai);
         sensor_fusion->Subject<World>::registerObserver(backend);
         backend->Subject<SensorProto>::registerObserver(sensor_fusion);
+        sensor_fusion->Subject<World>::registerObserver(backend);
         if (!args->getHeadless()->value())
         {
             visualizer =

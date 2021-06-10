@@ -26,6 +26,7 @@ Simulator::Simulator(const Field& field, const RobotConstants_t& robot_constants
       frame_number(0),
       physics_time_step(physics_time_step)
 {
+    this->resetCurrentFirmwareTime();
 }
 
 void Simulator::setBallState(const BallState& ball_state)
@@ -327,6 +328,11 @@ void Simulator::addBlueRobot(const Point& position)
 void Simulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
 {
     physics_world.removeRobot(robot);
+}
+
+void Simulator::resetCurrentFirmwareTime()
+{
+    current_firmware_time = Timestamp::fromSeconds(0);
 }
 
 float Simulator::getCurrentFirmwareTimeSeconds()

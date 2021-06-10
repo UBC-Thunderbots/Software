@@ -13,9 +13,9 @@ class SimulatorTest : public ::testing::Test
     void SetUp() override
     {
         simulator_config = std::make_shared<const SimulatorConfig>();
-        simulator =
-            std::make_shared<Simulator>(Field::createSSLDivisionBField(), robot_constants,
-                                        wheel_constants, simulator_config);
+        simulator        = std::make_shared<Simulator>(Field::createSSLDivisionBField(),
+                                                simulator_config);
+        simulator->resetCurrentFirmwareTime();
     }
 
     std::shared_ptr<Simulator> simulator;

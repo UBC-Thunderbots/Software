@@ -96,7 +96,7 @@ struct GetBehindBallFSM
             Point behind_ball_vertex_A = event.control_params.ball_location;
             Point behind_ball_vertex_B =
                 behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
-                behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
+                behind_ball.perpendicular().normalize(size_of_region_behind_ball / 8);
             Point behind_ball_vertex_C =
                 behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -
                 behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);

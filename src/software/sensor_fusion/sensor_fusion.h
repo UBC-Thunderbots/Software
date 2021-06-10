@@ -141,4 +141,12 @@ class SensorFusion
 
     unsigned int friendly_goalie_id;
     unsigned int enemy_goalie_id;
+
+    // The number of "reset packets" we have received. These indicate that the
+    // vision time should be reset. Please see `checkForVisionReset` to see how
+    // this is defined.
+    unsigned int reset_time_vision_packets_detected;
+
+    // The timestamp, in seconds, of the most recently received vision packet
+    double last_t_capture;
 };

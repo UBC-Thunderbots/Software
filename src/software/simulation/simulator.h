@@ -171,6 +171,11 @@ class Simulator
      */
     void removeRobot(std::weak_ptr<PhysicsRobot> robot);
 
+    /**
+     * Resets the current firmware time to 0
+     */
+    static void resetCurrentFirmwareTime();
+
    private:
     /**
      * Get the current time.
