@@ -160,6 +160,8 @@ void app_control_applyAccel(RobotConstants_t robot_constants,
                                   robot_constants.front_wheel_angle_deg,
                                   robot_constants.back_wheel_angle_deg);
 
+    TLOG_INFO("%d,%d,%d,%d", (int)(wheel_force[0] * 100), (int)wheel_force[1]*100, (int)(wheel_force[2]*100), (int)(wheel_force[3]*100));
+
     app_force_wheel_applyForce(force_wheels[0], wheel_force[0]);
     app_force_wheel_applyForce(force_wheels[1], wheel_force[1]);
     app_force_wheel_applyForce(force_wheels[2], wheel_force[2]);

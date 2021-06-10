@@ -75,7 +75,9 @@ cc_library(
     srcs = ["drivetrain_unit.c"],
     hdrs = ["drivetrain_unit.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
-    deps = [":allegro_a3931_motor_driver"],
+    deps = [":allegro_a3931_motor_driver",
+        "//firmware/app/primitives:primitive_manager",
+            ],
 )
 
 cc_library(
