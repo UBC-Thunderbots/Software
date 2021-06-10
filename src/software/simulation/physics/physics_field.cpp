@@ -21,6 +21,16 @@ PhysicsField::~PhysicsField()
     b2World *field_world = field_body->GetWorld();
     if (bodyExistsInWorld(field_body, field_world))
     {
+        for (b2Fixture *f = field_body->GetFixtureList(); f != NULL; f = f->GetNext())
+        {
+            if (f->GetUserData() != NULL)
+            {
+                PhysicsObjectUserData *user_data =
+                        static_cast<PhysicsObjectUserData *>(f->GetUserData());
+                delete user_data;
+                f->SetUserData(NULL);
+            }
+        }
         field_world->DestroyBody(field_body);
     }
 }

@@ -25,7 +25,7 @@ struct PhysicsObjectUserData
         : type(type), physics_object(object_ptr)
     {
     }
-    PhysicsObjectUserData() = delete;
+//    PhysicsObjectUserData() = delete;
 
     PhysicsObjectType type;
     void* physics_object;
