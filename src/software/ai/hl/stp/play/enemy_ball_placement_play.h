@@ -19,14 +19,14 @@ class EnemyBallPlacementPlay : public Play
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 
    private:
-    void inDefendingZone(
+    void defendingBallPlacement(
         TacticCoroutine::push_type &yield,
         const World &world,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders,
         std::array<std::shared_ptr<MoveTactic>, 2> move_tactics,
         Point placement_point);
 
-    void inAttackingZone(
+    void attackingBallPlacement(
         TacticCoroutine::push_type &yield,
         const World &world,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders,
