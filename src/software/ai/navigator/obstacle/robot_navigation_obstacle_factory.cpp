@@ -209,7 +209,7 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromBallPlacement(
 {
     /*   The Polygon is constructed as follows:
      *
-     *         top_l           top_r
+     *         ball_l           ball_r
      *           +-------+-------+
      *           |               |
      *           |    ball_c     |
@@ -222,23 +222,23 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromBallPlacement(
      *           |               |
      *           |               |
      *           +-------+-------+
-     *         bot_l           bot_r
+     *        place_l          place_r
      */
     const double RADIUS = 0.5;
 
     Vector place_to_ball = placement_point.toVector() - ball_point.toVector();
     Vector ball_to_place = ball_point.toVector() - placement_point.toVector();
 
-    Point bot_l = placement_point + (place_to_ball.normalize(RADIUS) + place_to_ball.perpendicular().normalize(RADIUS));
-    Point bot_r = placement_point + (place_to_ball.normalize(RADIUS) - place_to_ball.perpendicular().normalize(RADIUS));
+    Point place_l = placement_point + (place_to_ball.normalize(RADIUS) + place_to_ball.perpendicular().normalize(RADIUS));
+    Point place_r = placement_point + (place_to_ball.normalize(RADIUS) - place_to_ball.perpendicular().normalize(RADIUS));
 
-    Point top_l = ball_point + (ball_to_place.normalize(RADIUS) + ball_to_place.perpendicular().normalize(RADIUS));
-    Point top_r = ball_point + (ball_to_place.normalize(RADIUS) - ball_to_place.perpendicular().normalize(RADIUS));
+    Point ball_l = ball_point + (ball_to_place.normalize(RADIUS) + ball_to_place.perpendicular().normalize(RADIUS));
+    Point ball_r = ball_point + (ball_to_place.normalize(RADIUS) - ball_to_place.perpendicular().normalize(RADIUS));
 
     return createFromShape(Polygon({
-        bot_l,
-        bot_r,
-        top_l,
-        top_r,
+        place_l,
+        place_r,
+        ball_l,
+        ball_r,
     }));
 }
