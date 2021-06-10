@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "firmware/app/logger/logger.h"
 #include "firmware/app/primitives/direct_control_primitive.h"
 #include "firmware/app/primitives/move_primitive.h"
 #include "firmware/app/primitives/primitive.h"
@@ -188,6 +189,7 @@ void app_primitive_manager_runCurrentPrimitive(PrimitiveManager_t *manager,
 
     if (manager->current_primitive_num_ticks_executed > 100)
     {
+        TLOG_WARNING("Robot hasn't recevied primitives for 100 tics, timing out");
         app_primitive_manager_endCurrentPrimitive(manager, world);
         app_primitive_makeRobotSafe(world);
     }

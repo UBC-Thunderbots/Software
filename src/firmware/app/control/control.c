@@ -2,6 +2,7 @@
 
 #include "firmware/shared/physics.h"
 #include "firmware/shared/util.h"
+#include "firmware/app/logger/logger.h"
 #include "shared/constants.h"
 
 /**
@@ -160,7 +161,7 @@ void app_control_applyAccel(RobotConstants_t robot_constants,
                                   robot_constants.back_wheel_angle_deg);
 
     app_force_wheel_applyForce(force_wheels[0], wheel_force[0]);
-    app_force_wheel_applyForce(force_wheels[3], wheel_force[3]);
     app_force_wheel_applyForce(force_wheels[1], wheel_force[1]);
     app_force_wheel_applyForce(force_wheels[2], wheel_force[2]);
+    app_force_wheel_applyForce(force_wheels[3], wheel_force[3]);
 }

@@ -26,7 +26,7 @@ void io_drivetrain_unit_applyForce(DrivetrainUnit_t* drive_train_unit,
     // NOTE: This is a placeholder implementation. With the new controller we will not
     //       control each wheel by applying "force" to it, but rather by directly
     //       applying voltage
-    float pwm_percentage = fminf(1.0f, fabsf(force_newtons) / 255.0f);
+    float pwm_percentage = fminf(1.0f, fabsf(force_newtons) / 15.0f);
 
     if (force_newtons > 0)
     {
@@ -38,8 +38,7 @@ void io_drivetrain_unit_applyForce(DrivetrainUnit_t* drive_train_unit,
         io_allegro_a3931_motor_driver_setDirection(drive_train_unit->motor_driver,
                                                    COUNTERCLOCKWISE);
     }
-
-    io_allegro_a3931_motor_setPwmPercentage(drive_train_unit->motor_driver,
+        io_allegro_a3931_motor_setPwmPercentage(drive_train_unit->motor_driver,
                                             pwm_percentage);
 }
 

@@ -52,6 +52,9 @@ static const double SECONDS_PER_MICROSECOND      = 1.0 / 1000000.0;
 static const double SECONDS_PER_MILLISECOND      = 1.0 / 1000.0;
 static const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
 
+static const double TICS_PER_MICROSECOND = 0.1;
+static const double MICROSECONDS_PER_TIC = 10.0;
+
 // Networking
 // the IPv6 multicast address, only ff02 is important, the rest is random
 // see https://en.wikipedia.org/wiki/Solicited-node_multicast_address for why ff02 matters

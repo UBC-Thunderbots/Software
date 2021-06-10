@@ -369,9 +369,6 @@ void initIoNetworking(void)
     // Initialize network logger
     io_network_logger_init(RobotLogProtoQHandle);
     io_vision_init();
-
-    TLOG_INFO("Switching to network logs");
-    app_logger_init(0, &io_network_logger_handleRobotLog);
 }
 
 void initIoDrivetrain(void)

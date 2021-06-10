@@ -5,7 +5,7 @@
 // This file contains all the physical constants of the robot
 // Dimensions and the like as well as
 
-#define CONTROL_LOOP_HZ 200U
+#define CONTROL_LOOP_HZ 100U
 #define QUARTERDEGREE_TO_MS (0.0000554f * CONTROL_LOOP_HZ)
 #define QUARTERDEGREE_TO_RPM                                                             \
     (CONTROL_LOOP_HZ / 240.0f)  // encoder quarter of degree to motor RPM

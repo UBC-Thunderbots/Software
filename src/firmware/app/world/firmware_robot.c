@@ -8,7 +8,7 @@
 // these are set to decouple the 3 axis from each other
 // the idea is to clamp the maximum velocity and acceleration
 // so that the axes would never have to compete for resources
-#define TIME_HORIZON 0.05f  // s
+#define TIME_HORIZON 0.25f  // s
 
 // Function pointer definition for the robot to follow the provided position trajectory
 typedef void (*TrajectoryFollower_t)(const FirmwareRobot_t*, PositionTrajectory_t,
@@ -160,31 +160,31 @@ void velocity_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
                                          unsigned int num_elements,
                                          size_t trajectory_index, float max_speed_m_per_s)
 {
-    VelocityTrajectory_t velocity_trajectory;
-    app_trajectory_planner_generateVelocityTrajectory(&pos_trajectory, num_elements,
-                                                      &velocity_trajectory);
+    /*VelocityTrajectory_t velocity_trajectory;*/
+    /*app_trajectory_planner_generateVelocityTrajectory(&pos_trajectory, num_elements,*/
+                                                      /*&velocity_trajectory);*/
 
-    float global_robot_velocity[2];
-    global_robot_velocity[0] = velocity_trajectory.x_velocity[trajectory_index];
-    global_robot_velocity[1] = velocity_trajectory.y_velocity[trajectory_index];
+    /*float global_robot_velocity[2];*/
+    /*global_robot_velocity[0] = velocity_trajectory.x_velocity[trajectory_index];*/
+    /*global_robot_velocity[1] = velocity_trajectory.y_velocity[trajectory_index];*/
 
-    float angle                = app_firmware_robot_getOrientation(robot);
-    float local_norm_vec[2][2] = {{cosf(angle), sinf(angle)},
-                                  {cosf(angle + P_PI / 2), sinf(angle + P_PI / 2)}};
+    /*float angle                = app_firmware_robot_getOrientation(robot);*/
+    /*float local_norm_vec[2][2] = {{cosf(angle), sinf(angle)},*/
+                                  /*{cosf(angle + P_PI / 2), sinf(angle + P_PI / 2)}};*/
 
-    float local_robot_velocity[2];
-    for (int i = 0; i < 2; i++)
-    {
-        local_robot_velocity[i] = dot2D(local_norm_vec[i], global_robot_velocity);
-    }
+    /*float local_robot_velocity[2];*/
+    /*for (int i = 0; i < 2; i++)*/
+    /*{*/
+        /*[>local_robot_velocity[i] = dot2D(local_norm_vec[i], global_robot_velocity);<]*/
+    /*}*/
 
-    TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg;
-    control_msg.velocity.x_component_meters = local_robot_velocity[0];
-    control_msg.velocity.y_component_meters = local_robot_velocity[1];
-    control_msg.angular_velocity.radians_per_second =
-        velocity_trajectory.angular_velocity[trajectory_index];
+    /*TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg;*/
+    /*control_msg.velocity.x_component_meters = local_robot_velocity[0];*/
+    /*control_msg.velocity.y_component_meters = local_robot_velocity[1];*/
+    /*control_msg.angular_velocity.radians_per_second =*/
+        /*velocity_trajectory.angular_velocity[trajectory_index];*/
 
-    velocity_wheels_setLocalVelocity(robot, control_msg);
+    /*velocity_wheels_setLocalVelocity(robot, control_msg);*/
 }
 
 void force_wheels_applyDirectPerWheelPower(
@@ -246,7 +246,7 @@ void velocity_wheels_setLocalVelocity(
     float robot_velocity[3];
     robot_velocity[0] = linear_velocity_x;
     robot_velocity[1] = linear_velocity_y;
-    robot_velocity[2] = angular_velocity * ROBOT_RADIUS;
+    robot_velocity[2] = angular_velocity * (float)ROBOT_MAX_RADIUS_METERS;
     float wheel_velocity[4];
     shared_physics_speed3ToSpeed4(robot_velocity, wheel_velocity,
                                   robot->robot_constants.front_wheel_angle_deg,

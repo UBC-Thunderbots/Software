@@ -7,7 +7,7 @@
 
 // The maximum size of the array containing trajectory elements. Assuming the
 // longest possible path is 9 meters with 1mm segments
-#define TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS 9000
+#define TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS 100
 
 typedef enum TrajectoryPlannerGenerationStatus
 {
