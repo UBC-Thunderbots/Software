@@ -40,7 +40,8 @@ include:
     description: >-
         The directory to output logs to. Absolute paths are recommended as the working directory
         is inside the bazel-out directory.
-- uint:
+
+- int:
       name: channel
       min: 0
       max: 15
