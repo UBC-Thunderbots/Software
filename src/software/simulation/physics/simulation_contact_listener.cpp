@@ -41,8 +41,8 @@ void SimulationContactListener::BeginContact(b2Contact *contact)
             // Apply an impulse to nearly stop the ball. It's preferable if it bounces
             // away from a wall very slightly for realism, and it should make it easier to
             // retrieve for ball placement
-            ball->applyImpulse(
-                -ball->momentum().normalize(ball->momentum().length() * 0.95));
+            ball->applyImpulse(-ball->momentum().normalize(
+                ball->momentum().length() * BALL_FIELD_WALL_COLLISION_DAMPING));
         }
     }
 }

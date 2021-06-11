@@ -83,4 +83,8 @@ class SimulationContactListener : public b2ContactListener
      */
     static std::optional<std::pair<PhysicsBall*, PhysicsField*>> isBallFieldWallContact(
         PhysicsObjectUserData* user_data_a, PhysicsObjectUserData* user_data_b);
+
+   private:
+    // Damping factor for ball collisions with field walls or goals
+    static constexpr double BALL_FIELD_WALL_COLLISION_DAMPING = 0.8;
 };
