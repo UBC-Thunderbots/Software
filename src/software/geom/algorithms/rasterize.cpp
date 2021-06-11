@@ -181,7 +181,7 @@ std::vector<Point> rasterize(const Polygon& polygon, const double resolution_siz
     int num_pixels_x = (int)std::ceil((max_x - min_x) / resolution_size);
     int num_pixels_y = (int)std::ceil((max_y - min_y) / resolution_size);
 
-    for (int x_pixel = 1; x_pixel <= num_pixels_x; x_pixel++)
+    for (int x_pixel = 0; x_pixel <= num_pixels_x; x_pixel++)
     {
         // x and y offset from the top left corner of the rectangle
         double x_offset;

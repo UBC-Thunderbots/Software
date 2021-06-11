@@ -39,29 +39,15 @@ void ThetaStarPathPlanner::findAllBlockedCoords()
 
 bool ThetaStarPathPlanner::isUnblocked(const Coordinate &coord)
 {
-    // If we haven't checked this Coordinate for obstacles before, check it now
-
-    auto unblocked_grid_it = unblocked_grid.find(coord);
-    if (unblocked_grid_it == unblocked_grid.end())
+    Point p = convertCoordToPoint(coord);
+    for (auto &obstacle : obstacles)
     {
-        bool blocked = false;
-
-        Point p = convertCoordToPoint(coord);
-        for (auto &obstacle : obstacles)
+        if (obstacle->contains(p))
         {
-            if (obstacle->contains(p))
-            {
-                blocked = true;
-                break;
-            }
+            return false;
         }
-
-        // We use the opposite convention to indicate blocked or not
-        unblocked_grid[coord] = !blocked;
-        return !blocked;
     }
-
-    return unblocked_grid_it->second;
+    return true;
 }
 
 bool ThetaStarPathPlanner::isBlocked(const Coordinate &coord)
@@ -661,7 +647,6 @@ void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
     // Reset data structures to path plan again
     open_list.clear();
     closed_list.clear();
-    unblocked_grid.clear();
     line_of_sight_cache.clear();
     cell_heuristics = std::vector<std::vector<CellHeuristic>>(
         num_grid_rows,

@@ -101,15 +101,6 @@ class ThetaStarPathPlanner : public PathPlanner
         unsigned int internal_comparison_key_;
     };
 
-    class CoordinateHashFunction
-    {
-       public:
-        size_t operator()(const Coordinate &coord) const
-        {
-            return coord.internalComparisonKey();
-        }
-    };
-
    private:
     class CoordinatePair
     {
@@ -265,6 +256,7 @@ class ThetaStarPathPlanner : public PathPlanner
 
     /**
      * Returns whether or not a cell is unblocked
+     * Searches all of the obstacles to see if any of them contains coord
      *
      * @param coord Coordinate to consider
      *
@@ -274,6 +266,7 @@ class ThetaStarPathPlanner : public PathPlanner
 
     /**
      * Returns whether or not a cell is blocked
+     * Checks blocked_grid to see if coord was set to blocked
      *
      * @param coord Coordinate to consider
      *
@@ -481,15 +474,6 @@ class ThetaStarPathPlanner : public PathPlanner
 
     // Declare a 2D array of structure to hold the details of that CellHeuristic
     std::vector<std::vector<CellHeuristic>> cell_heuristics;
-
-    // The following data structures improve performance by caching the results of
-    // isUnblocked and lineOfSight.
-    // Description of the Grid-
-    // unblocked_grid is indexed with coordinate
-    // true  --> The cell is not blocked
-    // false --> The cell is blocked
-    // We update this as we go to avoid updating cells we don't use
-    std::unordered_map<Coordinate, bool, CoordinateHashFunction> unblocked_grid;
 
     // Declare a 2D array of structure to hold if a coordinate is blocked
     // true  --> Coordinate is blocked
