@@ -131,3 +131,5 @@ double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
  */
 double getStaticPositionQuality(const Field& field, const Point& position,
                                 std::shared_ptr<const PassingConfig> passing_config);
+
+Duration estimateBallTimeToPosition(const Ball& ball, const Point& pos);
