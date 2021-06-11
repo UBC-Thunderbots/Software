@@ -10,6 +10,7 @@ cc_binary(
         "//software/ai/hl/stp:play_info",
         "//software/backend",
         "//software/backend:all_backends",
+        "//software/estop:arduino_util",
         "//software/gui/full_system:threaded_full_system_gui",
         "//software/logger",
         "//software/multithreading:observer_subject_adapter",
