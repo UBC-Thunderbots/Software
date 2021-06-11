@@ -341,9 +341,9 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     }
 
 
-    std::cout << "test (1, 2)" << isUnblocked(convertPointToCoord(Point(1, 2))) << "\n";
-    std::cout << "test (0.803, 1.903)" << isUnblocked(convertPointToCoord(Point(0.803, 1.903))) << "\n";
-    std::cout << "test (0.896, 1.775)" << isUnblocked(convertPointToCoord(Point(0.896, 1.775))) << "\n";
+    std::cout << "test (1.1186, 2.1815) " << isUnblocked(convertPointToCoord(Point(1.1186, 2.1815))) << "\n";
+    std::cout << "test (1.155, 2.1549) " << isUnblocked(convertPointToCoord(Point(1.155, 2.1549))) << "\n";
+    std::cout << "test (0.896, 1.775) " << isUnblocked(convertPointToCoord(Point(1.1815, 2.1355))) << "\n";
 
 
     return Path(path_points);
@@ -457,6 +457,7 @@ bool ThetaStarPathPlanner::visitNeighbours(const Coordinate &current_coord,
             // check for clipping obstacles
             if (lineOfSight(current_coord, next_coord))
             {
+                std::cout << convertCoordToPoint(next_coord) << ", ";
                 if (updateVertex(current_coord, next_coord, end_coord))
                 {
                     return true;
