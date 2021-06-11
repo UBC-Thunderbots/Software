@@ -339,13 +339,7 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     {
         path_points.erase(path_points.begin() + 1);
     }
-
-
-    std::cout << "test (1.1186, 2.1815) " << isUnblocked(convertPointToCoord(Point(1.1186, 2.1815))) << "\n";
-    std::cout << "test (1.155, 2.1549) " << isUnblocked(convertPointToCoord(Point(1.155, 2.1549))) << "\n";
-    std::cout << "test (0.896, 1.775) " << isUnblocked(convertPointToCoord(Point(1.1815, 2.1355))) << "\n";
-
-
+    
     return Path(path_points);
 }
 
