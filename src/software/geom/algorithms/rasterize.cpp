@@ -8,13 +8,6 @@
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/algorithms/rasterize.h"
 
-
-bool isInPixel(const Point& a, const Point& b, double resolution_size);
-std::optional<Point> isAVertex(const Point& point, const Polygon& polygon, double resolution_size);
-const Point& find_next_point_in_polygon(const Point& point, const Polygon& polygon);
-const Point& find_previous_point_in_polygon(const Point& point, const Polygon& polygon);
-bool is_special_vertex(const Point& point, const Polygon& polygon, const double resolution_size);
-
 std::vector<Point> rasterize(const Circle& circle, const double resolution_size)
 {
     // Iterating through the x values from left (origin - radius) to right (origin + radius) of the circle
@@ -231,74 +224,4 @@ std::vector<Point> rasterize(const Polygon& polygon, const double resolution_siz
     }
 
     return covered_points;
-}
-
-bool isInPixel(const Point& a, const Point& b, double resolution_size)
-{
-    double min_x = a.x() - resolution_size / 2;
-    double min_y = a.y() - resolution_size / 2;
-    double max_x = a.x() + resolution_size / 2;
-    double max_y = a.y() + resolution_size / 2;
-
-    double b_x = b.x();
-    double b_y = b.y();
-    return (b_x >= min_x && b_x <= max_x) && (b_y >= min_y && b_y <= max_y);
-}
-
-std::optional<Point> isAVertex(const Point& point, const Polygon& polygon, double resolution_size)
-{
-    const auto& polygon_vertices = polygon.getPoints();
-    for (auto i = polygon_vertices.begin(); i != polygon_vertices.end(); ++i)
-    {
-        if (isInPixel(point, *i, resolution_size))
-        {
-            return std::optional<Point>(*i);
-        }
-    }
-    return std::nullopt;
-}
-
-const Point& find_next_point_in_polygon(const Point& point, const Polygon& polygon)
-{
-    const auto& polygon_vertices = polygon.getPoints();
-    auto index = std::find(polygon_vertices.begin(), polygon_vertices.end(), point) - polygon_vertices.begin();
-
-    if ((unsigned) index == (polygon_vertices.size() - 1))
-    {
-        return polygon_vertices[0];
-    }
-    else
-    {
-        return polygon_vertices[index + 1];
-    }
-}
-
-const Point& find_previous_point_in_polygon(const Point& point, const Polygon& polygon)
-{
-    const auto& polygon_vertices = polygon.getPoints();
-    auto index = std::find(polygon_vertices.begin(), polygon_vertices.end(), point) - polygon_vertices.begin();
-
-    if (index == 0)
-    {
-        return polygon_vertices[polygon_vertices.size() - 1];
-    }
-    else
-    {
-        return polygon_vertices[index - 1];
-    }
-}
-
-bool is_special_vertex(const Point& point, const Polygon& polygon, const double resolution_size)
-{
-    std::optional<Point> vertex = isAVertex(point, polygon, resolution_size);
-    if(vertex == std::nullopt)
-    {
-        return false;
-    }
-
-    Point prev_point = find_previous_point_in_polygon(vertex.value(), polygon);
-    Point next_point = find_next_point_in_polygon(vertex.value(), polygon);
-
-    return ((prev_point.y() > point.y() && (next_point.y() > point.y()))
-            || ((prev_point.y() < point.y()) && (next_point.y() < point.y())));
 }

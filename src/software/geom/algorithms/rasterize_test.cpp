@@ -28,6 +28,34 @@ namespace TestUtil
             EXPECT_LE(distance(p, closest_p), max_dist);
         }
     }
+
+    void checkPolygonPointsInsideBoundingBox(Polygon polygon, std::vector<Point> all_points)
+    {
+        const std::vector<Point>& polygon_vertices = polygon.getPoints();
+        auto max_point_y = [](const Point& a, const Point& b) { return a.y() < b.y(); };
+
+        auto max_point_x = [](const Point& a, const Point& b) { return a.x() < b.x(); };
+
+        // Calculate the highest and lowest x and y points
+        double min_y =
+                std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
+                        ->y();
+        double min_x =
+                std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)
+                        ->x();
+        double max_y =
+                std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
+                        ->y();
+        double max_x =
+                std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)
+                        ->x();
+
+        Rectangle bounding_box = Rectangle(Point(min_x, min_y), Point(max_x, max_y));
+        for (Point p : all_points)
+        {
+            EXPECT_TRUE(contains(bounding_box, p));
+        }
+    }
 };  // namespace TestUtil
 
 //////////////////////////////////////////////////////
@@ -207,84 +235,24 @@ TEST(RasterizeTest, test_rectangle_with_complex_floating_dimensions)
 //////////////////////////////////////////////////////
 TEST(RasterizeTest, test_rasterize_polygon)
 {
-    std::vector<Point> points = {Point(0, 5), Point(0, 0), Point(5, 0), Point(5, 5)};
+    Polygon polygon{Point(0, 5), Point(0, 0), Point(5, 0), Point(5, 5)};
     double offset             = 1;
-    Polygon polygon           = Polygon(points);
     std::vector<Point> rasterized_points = rasterize(polygon, offset);
 
-    auto max_point_y = [](const Point& a, const Point& b) { return a.y() < b.y(); };
-
-    auto max_point_x = [](const Point& a, const Point& b) { return a.x() < b.x(); };
-
-    const std::vector<Point>& polygon_vertices = polygon.getPoints();
-    // Calculate the highest and lowest x and y points
-    double min_y =
-        std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
-            ->y() - offset;
-    double min_x =
-        std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)
-            ->x() - offset;
-    double max_y =
-        std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
-            ->y() + offset;
-    double max_x =
-        std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)
-        ->x() + offset;
-
-    Rectangle checking_box = Rectangle(Point(min_x, min_y), Point(max_x, max_y));
-    for (Point p : rasterized_points)
-    {
-        bool result = contains(checking_box, p);
-        // TODO: remove this if statement
-        if (!result)
-        {
-            std::cout << "FAILED: " << p << "\n";
-        }
-        EXPECT_TRUE(result);
-    }
+    TestUtil::checkPolygonPointsInsideBoundingBox(polygon, rasterized_points);
     TestUtil::checkPointsCloseToEachOther(rasterized_points, offset);
 }
 
 TEST(RasterizeTest, test_rasterize_polygon_complex)
 {
-    std::vector<Point> points = {Point(3.018497, -1.481503), Point(3.018497, 1.481503),
+    Polygon polygon{Point(3.018497, -1.481503), Point(3.018497, 1.481503),
                                  Point(4.7999999999999998, 1.481503),
                                  Point(4.7999999999999998, -1.481503)};
-    Polygon polygon           = Polygon(points);
     double offset             = 0.09f;
 
     std::vector<Point> rasterized_points = rasterize(polygon, offset);
-    const std::vector<Point>& polygon_vertices = polygon.getPoints();
-    auto max_point_y = [](const Point& a, const Point& b) { return a.y() < b.y(); };
 
-    auto max_point_x = [](const Point& a, const Point& b) { return a.x() < b.x(); };
-
-    // Calculate the highest and lowest x and y points
-    double min_y =
-        std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
-            ->y() - offset;
-    double min_x =
-        std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)
-            ->x() - offset;
-    double max_y =
-        std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
-            ->y() + offset;
-    double max_x =
-        std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)
-        ->x() + offset;
-
-    Rectangle checking_box = Rectangle(Point(min_x, min_y), Point(max_x, max_y));
-    for (Point p : rasterized_points)
-    {
-        bool result = contains(checking_box, p);
-        // TODO: remove this if statement
-        if (!result)
-        {
-            std::cout << "FAILED: " << p << "\n";
-        }
-        EXPECT_TRUE(result);
-    }
-
+    TestUtil::checkPolygonPointsInsideBoundingBox(polygon, rasterized_points);
     TestUtil::checkPointsCloseToEachOther(rasterized_points, offset);
 }
 
@@ -299,35 +267,18 @@ TEST(RasterizeTest, test_hexagon)
     double offset = 0.5f;
 
     std::vector<Point> rasterized_points = rasterize(hexagon, offset);
-    auto max_point_y = [](const Point& a, const Point& b) { return a.y() < b.y(); };
 
-    auto max_point_x = [](const Point& a, const Point& b) { return a.x() < b.x(); };
+    TestUtil::checkPolygonPointsInsideBoundingBox(hexagon, rasterized_points);
+    TestUtil::checkPointsCloseToEachOther(rasterized_points, offset);
+}
 
-    const std::vector<Point>& polygon_vertices = hexagon.getPoints();
-    // Calculate the highest and lowest x and y points
-    double min_y =
-        std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
-            ->y() - offset;
-    double min_x =
-        std::min_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)
-            ->x() - offset;
-    double max_y =
-        std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
-            ->y() + offset;
-    double max_x =
-        std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_x)
-        ->x() + offset;
+TEST(RasterizeTest, test_hexagon2)
+{
+    Polygon hexagon{{-1.1815,0.818497},{-1.1815,2.1815},{1.1815,2.1815},{1.1815,0.818497}};
+    double offset = 0.09f;
 
-    Rectangle checking_box = Rectangle(Point(min_x, min_y), Point(max_x, max_y));
-    for (Point p : rasterized_points)
-    {
-        bool result = contains(checking_box, p);
-        // TODO: remove this if statement
-        if (!result)
-        {
-            std::cout << "FAILED: " << p << "\n";
-        }
-        EXPECT_TRUE(result);
-    }
+    std::vector<Point> rasterized_points = rasterize(hexagon, offset);
+
+    TestUtil::checkPolygonPointsInsideBoundingBox(hexagon, rasterized_points);
     TestUtil::checkPointsCloseToEachOther(rasterized_points, offset);
 }
