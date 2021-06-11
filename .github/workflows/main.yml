@@ -40,7 +40,7 @@ jobs:
             -- //... -//software/simulated_tests/... \
             -//software/ai/hl/stp/play/... \
             -//software/ai/hl/stp/tactic/... \
-            -//firmware/boards/arduino_uno/... # Arduino requires setup_firmware
+            -//firmware/boards/estop_arduino_uno/... # Arduino requires setup_firmware 
              
   firmware-tests:
     name: Firmware Tests
@@ -65,7 +65,7 @@ jobs:
       - name: Arduino Uno Firmware Build
         run: |
          cd src
-         bazel build --cpu=stm32h7 //firmware/boards/robot_stm32h7:robot_stm32h7_main 
+         bazel build //firmware/boards/estop_arduino_uno:main 
 
       - name: STM32H7 Robot Firmware Build
         run: |
@@ -101,7 +101,8 @@ jobs:
           bazel test --show_timestamps   \
             //software/simulated_tests/...   \
             //software/ai/hl/stp/play/...    \
-            //software/ai/hl/stp/tactic/...
+            //software/ai/hl/stp/tactic/... 
+
       
       - name: Upload simulated test artifacts
         uses: actions/upload-artifact@v2
@@ -134,8 +135,8 @@ jobs:
           cd src
           bazel test -c dbg  \
             --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
-            -- //firmware/...                 \
-            -//firmware/boards/arduino_uno/...
+            -- //firmware/...   \
+            -//firmware/boards/estop_arduino_uno/... # Arduino requires setup_firmware              
             
       - name: Shared Memory Leak Check
         run: |

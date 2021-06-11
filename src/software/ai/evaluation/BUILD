@@ -23,8 +23,6 @@ cc_library(
     name = "calc_best_shot",
     srcs = [
         "calc_best_shot.cpp",
-        "calc_best_shot_impl.cpp",
-        "calc_best_shot_impl.h",
     ],
     hdrs = [
         "calc_best_shot.h",
@@ -32,6 +30,8 @@ cc_library(
     deps = [
         ":shot",
         "//shared:constants",
+        "//software/geom:angle_map",
+        "//software/geom:angle_segment",
         "//software/geom:segment",
         "//software/geom/algorithms",
         "//software/world",
@@ -41,7 +41,6 @@ cc_library(
 cc_test(
     name = "calc_best_shot_test",
     srcs = [
-        "calc_best_shot_impl.h",
         "calc_best_shot_test.cpp",
     ],
     deps = [

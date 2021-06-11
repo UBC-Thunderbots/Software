@@ -15,7 +15,9 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       enemy_team_filter(),
       team_with_possession(TeamSide::ENEMY),
       friendly_goalie_id(0),
-      enemy_goalie_id(0)
+      enemy_goalie_id(0),
+      reset_time_vision_packets_detected(0),
+      last_t_capture(0)
 {
     if (!sensor_fusion_config)
     {
@@ -34,6 +36,8 @@ std::optional<World> SensorFusion::getWorld() const
         {
             new_world.updateRefereeStage(*referee_stage);
         }
+
+
         return new_world;
     }
     else
@@ -326,9 +330,6 @@ bool SensorFusion::teamHasBall(const Team &team, const Ball &ball)
 
 void SensorFusion::checkForVisionReset(double t_capture)
 {
-    static unsigned int reset_time_vision_packets_detected = 0;
-    static double last_t_capture                           = 0;
-
     if (t_capture < last_t_capture && t_capture < VISION_PACKET_RESET_TIME_THRESHOLD)
     {
         reset_time_vision_packets_detected++;
