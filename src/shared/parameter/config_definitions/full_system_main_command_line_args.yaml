@@ -1,3 +1,6 @@
+include:
+    - arduino_config.yaml
+---
 - string:
     name: backend
     value: ""
@@ -37,3 +40,4 @@
     description: >-
         The directory to output logs to. Absolute paths are recommended as the working directory
         is inside the bazel-out directory.
+
