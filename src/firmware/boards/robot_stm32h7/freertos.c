@@ -180,7 +180,7 @@ const osThreadAttr_t PrimExectuor_attributes = {
     .cb_size    = sizeof(PrimExectuorControlBlock),
     .stack_mem  = &PrimExectuorBuffer[0],
     .stack_size = sizeof(PrimExectuorBuffer),
-    .priority   = (osPriority_t)osPriorityNormal1,
+    .priority   = (osPriority_t)osPriorityNormal2,
 };
 /* Definitions for PrimStarter */
 osThreadId_t PrimStarterHandle;
@@ -192,7 +192,7 @@ const osThreadAttr_t PrimStarter_attributes = {
     .cb_size    = sizeof(PrimStarterControlBlock),
     .stack_mem  = &PrimStarterBuffer[0],
     .stack_size = sizeof(PrimStarterBuffer),
-    .priority   = (osPriority_t)osPriorityNormal,
+    .priority   = (osPriority_t)osPriorityNormal1,
 };
 /* Definitions for Vision */
 osThreadId_t VisionHandle;
@@ -405,19 +405,21 @@ void initIoDrivetrain(void)
                                              back_right_wheel_dir_pin);
 
     DrivetrainUnit_t *drivetrain_unit_back_left_wheel =
-        io_drivetrain_unit_create(back_left_wheel_driver);
+        io_drivetrain_unit_create(back_left_wheel_driver, "Back Left Wheel");
     DrivetrainUnit_t *drivetrain_unit_front_left_wheel =
-        io_drivetrain_unit_create(front_left_wheel_driver);
+        io_drivetrain_unit_create(front_left_wheel_driver, "Front Left wheel");
     DrivetrainUnit_t *drivetrain_unit_back_right_wheel =
-        io_drivetrain_unit_create(back_right_wheel_driver);
+        io_drivetrain_unit_create(back_right_wheel_driver, "Back Right Wheel");
     DrivetrainUnit_t *drivetrain_unit_front_right_wheel =
-        io_drivetrain_unit_create(front_right_wheel_driver);
+        io_drivetrain_unit_create(front_right_wheel_driver, "Front Right Wheel");
 
     GpioPin_t *drive_reset_pin =
         io_gpio_pin_create(DRIVE_RESET_GPIO_Port, DRIVE_RESET_Pin, ACTIVE_HIGH);
 
     GpioPin_t *drive_mode_pin =
         io_gpio_pin_create(DRIVE_MODE_GPIO_Port, DRIVE_MODE_Pin, ACTIVE_HIGH);
+
+    io_gpio_pin_setActive(drive_mode_pin);
 
     io_drivetrain_init(drivetrain_unit_back_left_wheel, drivetrain_unit_back_right_wheel,
                        drivetrain_unit_front_left_wheel,

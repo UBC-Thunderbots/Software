@@ -36,24 +36,28 @@ void io_drivetrain_init(DrivetrainUnit_t *front_left_drive_unit,
 void io_drivetrain_applyForceFrontLeftWheel(float force_newtons)
 {
     assert(initialized);
+    io_gpio_pin_setActive(_drivetrain_reset);
     io_drivetrain_unit_applyForce(_front_left_drive_unit, force_newtons);
 }
 
 void io_drivetrain_applyForceFrontRightWheel(float force_newtons)
 {
     assert(initialized);
+    io_gpio_pin_setActive(_drivetrain_reset);
     io_drivetrain_unit_applyForce(_front_right_drive_unit, force_newtons);
 }
 
 void io_drivetrain_applyForceBackLeftWheel(float force_newtons)
 {
     assert(initialized);
+    io_gpio_pin_setActive(_drivetrain_reset);
     io_drivetrain_unit_applyForce(_back_left_drive_unit, force_newtons);
 }
 
 void io_drivetrain_applyForceBackRightWheel(float force_newtons)
 {
     assert(initialized);
+    io_gpio_pin_setActive(_drivetrain_reset);
     io_drivetrain_unit_applyForce(_back_right_drive_unit, force_newtons);
 }
 
@@ -85,43 +89,62 @@ void io_drivetrain_brakeFrontLeft(void)
 {
     assert(initialized);
     io_drivetrain_unit_applyForce(_front_left_drive_unit, 0.0f);
+    io_drivetrain_disable();
 }
 void io_drivetrain_brakeFrontRight(void)
 {
     assert(initialized);
     io_drivetrain_unit_applyForce(_front_right_drive_unit, 0.0f);
+    io_drivetrain_disable();
 }
 void io_drivetrain_brakeBackLeft(void)
 {
     assert(initialized);
     io_drivetrain_unit_applyForce(_back_left_drive_unit, 0.0f);
+    io_drivetrain_disable();
 }
 void io_drivetrain_brakeBackRight(void)
 {
     assert(initialized);
     io_drivetrain_unit_applyForce(_back_right_drive_unit, 0.0f);
+    io_drivetrain_disable();
 }
 
 void io_drivetrain_coastFrontLeft(void)
 {
     assert(initialized);
     io_drivetrain_unit_coast(_front_left_drive_unit);
+    io_drivetrain_disable();
 }
 
 void io_drivetrain_coastFrontRight(void)
 {
     assert(initialized);
     io_drivetrain_unit_coast(_front_right_drive_unit);
+    io_drivetrain_disable();
 }
 
 void io_drivetrain_coastBackLeft(void)
 {
     assert(initialized);
     io_drivetrain_unit_coast(_back_left_drive_unit);
+    io_drivetrain_disable();
 }
 
 void io_drivetrain_coastBackRight(void)
 {
     assert(initialized);
     io_drivetrain_unit_coast(_back_right_drive_unit);
+    io_drivetrain_disable();
+}
+
+void io_drivetrain_enable(void)
+{
+    assert(initialized);
+    io_gpio_pin_setActive(_drivetrain_reset);
+}
+void io_drivetrain_disable(void)
+{
+    assert(initialized);
+    io_gpio_pin_setInactive(_drivetrain_reset);
 }

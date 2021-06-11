@@ -1,11 +1,11 @@
 #include "firmware/boards/robot_stm32h7/io/primitive_executor.h"
 
 #include "cmsis_os.h"
+#include "firmware/app/logger/logger.h"
 #include "firmware/boards/robot_stm32h7/io/proto_multicast.h"
 #include "firmware/boards/robot_stm32h7/io/proto_multicast_communication_profile.h"
-#include "shared/proto/tbots_software_msgs.nanopb.h"
-#include "firmware/app/logger/logger.h"
 #include "shared/constants.h"
+#include "shared/proto/tbots_software_msgs.nanopb.h"
 
 static FirmwareWorld_t* g_world;
 static PrimitiveManager_t* g_primitive_manager;
@@ -51,10 +51,8 @@ void io_primitive_executor_task(void* argument)
 
     for (;;)
     {
-        uint32_t start_ticks = HAL_GetTick();
         app_primitive_manager_runCurrentPrimitive(g_primitive_manager, g_world);
-        uint32_t end_ticks = HAL_GetTick();
-        osDelay(10 - (end_ticks - start_ticks));
 
+        osDelay(10);
     }
 }

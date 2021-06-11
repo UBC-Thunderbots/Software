@@ -162,7 +162,7 @@ void velocity_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
 {
     /*VelocityTrajectory_t velocity_trajectory;*/
     /*app_trajectory_planner_generateVelocityTrajectory(&pos_trajectory, num_elements,*/
-                                                      /*&velocity_trajectory);*/
+    /*&velocity_trajectory);*/
 
     /*float global_robot_velocity[2];*/
     /*global_robot_velocity[0] = velocity_trajectory.x_velocity[trajectory_index];*/
@@ -170,19 +170,19 @@ void velocity_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
 
     /*float angle                = app_firmware_robot_getOrientation(robot);*/
     /*float local_norm_vec[2][2] = {{cosf(angle), sinf(angle)},*/
-                                  /*{cosf(angle + P_PI / 2), sinf(angle + P_PI / 2)}};*/
+    /*{cosf(angle + P_PI / 2), sinf(angle + P_PI / 2)}};*/
 
     /*float local_robot_velocity[2];*/
     /*for (int i = 0; i < 2; i++)*/
     /*{*/
-        /*[>local_robot_velocity[i] = dot2D(local_norm_vec[i], global_robot_velocity);<]*/
+    /*[>local_robot_velocity[i] = dot2D(local_norm_vec[i], global_robot_velocity);<]*/
     /*}*/
 
     /*TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg;*/
     /*control_msg.velocity.x_component_meters = local_robot_velocity[0];*/
     /*control_msg.velocity.y_component_meters = local_robot_velocity[1];*/
     /*control_msg.angular_velocity.radians_per_second =*/
-        /*velocity_trajectory.angular_velocity[trajectory_index];*/
+    /*velocity_trajectory.angular_velocity[trajectory_index];*/
 
     /*velocity_wheels_setLocalVelocity(robot, control_msg);*/
 }

@@ -74,6 +74,7 @@
 
 /* USER CODE BEGIN PV */
 
+ControllerState_t g_controller_state;
 
 /* USER CODE END PV */
 
@@ -204,7 +205,7 @@ int main(void)
 
     const RobotConstants_t robot_constants = create2021RobotConstants();
 
-    ControllerState_t controller_state = {
+    g_controller_state = (ControllerState_t){
         .last_applied_acceleration_x       = 0,
         .last_applied_acceleration_y       = 0,
         .last_applied_acceleration_angular = 0,
@@ -216,7 +217,7 @@ int main(void)
         io_vision_getRobotVelocityX, io_vision_getRobotVelocityY,
         io_vision_getRobotAngularVelocity, io_power_monitor_getBatteryVoltage,
         front_right_wheel, front_left_wheel, back_right_wheel, back_left_wheel,
-        &controller_state, robot_constants);
+        &g_controller_state, robot_constants);
 
     FirmwareBall_t *ball =
         app_firmware_ball_create(io_vision_getBallPositionX, io_vision_getBallPositionY,
