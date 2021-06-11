@@ -91,3 +91,10 @@ TEST(PrimitiveFactoryTest, test_create_stop_primitive_coast)
     ASSERT_TRUE(stop_primitive->has_stop());
     EXPECT_EQ(stop_primitive->stop().stop_type(), TbotsProto::StopPrimitive::COAST);
 }
+
+TEST(PrimitiveFactoryTest, test_create_estop_primitive)
+{
+    auto Estop_primitive = createEstopPrimitive();
+
+    ASSERT_TRUE(Estop_primitive->has_estop());
+}

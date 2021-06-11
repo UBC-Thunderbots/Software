@@ -36,6 +36,8 @@ std::optional<World> SensorFusion::getWorld() const
         {
             new_world.updateRefereeStage(*referee_stage);
         }
+
+
         return new_world;
     }
     else
