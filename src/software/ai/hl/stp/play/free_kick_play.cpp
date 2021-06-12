@@ -182,7 +182,7 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
     auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
 
     // Wait for a robot to be assigned to aligned to the ball to pass
-    while (!align_to_ball_tactic->getAssignedRobot())
+    while (!align_to_ball_tactic->done())
     {
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
         updateAlignToBallTactic(align_to_ball_tactic, world);
