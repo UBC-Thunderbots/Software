@@ -8,7 +8,6 @@ double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team)
 {
     // the default values for these passing parameters
     // TODO: cleanup passing parameters as part of #1987
-    // TODO: tweak all of these constants to get better behaviour
     static constexpr double PASSER_ENEMY_PROXIMITY_IMPORTANCE   = 1.5;
     static constexpr double RECEIVER_ENEMY_PROXIMITY_IMPORTANCE = 0.;
     static const auto ENEMY_REACTION_TIME = Duration::fromSeconds(0);
@@ -23,8 +22,7 @@ double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team)
 
 Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far)
 {
-    // TODO: tweak this constant
-    static constexpr auto KEEPAWAY_SEARCH_CIRCLE_RADIUS = 0.45;
+    static constexpr auto KEEPAWAY_SEARCH_CIRCLE_RADIUS = 0.75;
 
     // the width of both the field boundary sigmoid and the circular search region sigmoid
     static constexpr auto SIGMOID_WIDTH = 0.05;
