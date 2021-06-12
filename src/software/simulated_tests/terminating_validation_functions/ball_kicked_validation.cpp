@@ -11,7 +11,5 @@ void ballKicked(Angle angle, std::shared_ptr<World> world_ptr,
         std::stringstream ss;
         ss << angle;
         yield("Ball was not kicked at the angle " + ss.str());
-        std::cerr << world_ptr->ball().velocity().orientation().toDegrees() << std::endl;
     }
-    std::cerr << world_ptr->ball().velocity().orientation().toDegrees() << std::endl;
 }

@@ -159,11 +159,12 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     auto pass_eval    = pass_generator.generatePassEvaluation(world);
     auto ranked_zones = pass_eval.rankZonesForReceiving(world, world.ball().position());
 
+    LOG(DEBUG) << "Zone rankings (from best to worst)";
     for (auto zone : ranked_zones)
     {
-        std::cerr << zone << std::endl;
+        LOG(DEBUG) << zone;
     }
-    std::cerr<<"-------------------------"<<std::endl;
+
     Zones cherry_pick_region_1 = {ranked_zones[0]};
     Zones cherry_pick_region_2 = {ranked_zones[1]};
 
@@ -190,7 +191,6 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     {
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.rating;
-        LOG(DEBUG) << "    min pass thresh: " << min_pass_score_threshold;
 
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);

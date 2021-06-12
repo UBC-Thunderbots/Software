@@ -111,7 +111,6 @@ struct AttackerFSM
          */
         const auto keep_away = [](auto event,
                                   back::process<DribbleFSM::Update> processEvent) {
-            std::cerr<<"RUNNING KEEPAWAY"<<std::endl;
             // ball possession is threatened, get into a better position to take the
             // best pass so far
             DribbleFSM::ControlParams control_params;
@@ -164,23 +163,21 @@ struct AttackerFSM
          *
          * @return if the ball should be kicked
          */
-        // TODO: revisit this, we shouldn't "panic chip" unless we're completely boxed in!
         const auto should_kick = [](auto event) {
             // check for enemy threat
-            //Circle about_to_steal_danger_zone(event.common.robot.position(),
-                                              //event.control_params.attacker_tactic_config
-                                                  //->getEnemyAboutToStealBallRadius()
-                                                  //->value());
-            //for (const auto& enemy : event.common.world.enemyTeam().getAllRobots())
-            //{
-                //if (contains(about_to_steal_danger_zone, enemy.position()))
-                //{
-                    //return true;
-                //}
-            //}
+            // TODO: revisit this, we shouldn't "panic chip" unless we're completely boxed in!
+	    // Circle about_to_steal_danger_zone(event.common.robot.position(),
+	         			      //event.control_params.attacker_tactic_config
+	         				  //->getEnemyAboutToStealBallRadius()
+	         				  //->value());
+	    // for (const auto& enemy : event.common.world.enemyTeam().getAllRobots())
+	    // {
+	         //if (contains(about_to_steal_danger_zone, enemy.position()))
+	         //{
+	             //return true;
+	         //}
+	    // }
             // otherwise check for shot or pass committed
-            std::cerr << "Should Kick";
-            std::cerr << event.control_params.pass_committed << std::endl;
             return event.control_params.pass_committed || event.control_params.shot;
         };
 
