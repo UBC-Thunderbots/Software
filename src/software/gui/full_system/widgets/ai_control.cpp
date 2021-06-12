@@ -175,10 +175,8 @@ void setupPlayOverrideComboBox(
 
     play_override_combo_box->insertItem(0, "Use AI Selection");
     play_override_combo_box->insertItems(1, qt_play_names);
-    // TODO: this value is hardcoded and it should take the default value from dynamic
-    // parameters once https://github.com/UBC-Thunderbots/Software/issues/1299 is done and
-    // integrated
-    play_override_combo_box->setCurrentText(QString::fromStdString("HaltPlay"));
+    play_override_combo_box->setCurrentText(
+        QString::fromStdString(current_play_parameter->value()));
 
     auto on_play_changed = [play_override_parameter,
                             current_play_parameter](const QString &text) {

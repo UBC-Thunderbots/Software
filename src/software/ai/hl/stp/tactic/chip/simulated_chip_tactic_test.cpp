@@ -30,6 +30,7 @@ TEST_P(SimulatedChipTacticTest, chip_test)
 
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
     auto tactic = std::make_shared<ChipTactic>(false);
     tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
@@ -49,8 +50,9 @@ TEST_P(SimulatedChipTacticTest, chip_test)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
-            non_terminating_validation_functions, Duration::fromSeconds(5));
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(5));
 }
 
 INSTANTIATE_TEST_CASE_P(BallLocations, SimulatedChipTacticTest,

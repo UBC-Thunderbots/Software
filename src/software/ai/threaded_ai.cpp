@@ -8,7 +8,9 @@
 ThreadedAI::ThreadedAI(std::shared_ptr<const AiConfig> ai_config,
                        std::shared_ptr<const AiControlConfig> control_config,
                        std::shared_ptr<const PlayConfig> play_config)
-    : ai(ai_config, control_config, play_config), control_config(control_config)
+    : FirstInFirstOutThreadedObserver<World>(DEFAULT_BUFFER_SIZE, false),
+      ai(ai_config, control_config, play_config),
+      control_config(control_config)
 {
 }
 
