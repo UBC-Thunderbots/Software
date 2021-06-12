@@ -146,7 +146,7 @@ const double ROBOT_MIN_CHIP_CLEAR_DISTANCE = 1.0;
 
 // The chip_target distance should be scaled by this value so that
 // the ball can land and continue to roll to the target_distance
-const double CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO = 0.8;
+const double CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO = 0.75;
 
 // How many robots are allowed in each division
 const unsigned DIV_A_NUM_ROBOTS = 11;
