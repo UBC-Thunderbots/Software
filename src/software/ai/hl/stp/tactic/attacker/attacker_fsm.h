@@ -20,7 +20,7 @@ struct AttackerFSM
         // The shot to take
         std::optional<Shot> shot = std::nullopt;
         // The point the robot will chip towards if it is unable to shoot and is in danger
-        // or losing the ball to an enemy
+        // of losing the ball to an enemy
         std::optional<Point> chip_target;
         // shoot goal config
         std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config;
