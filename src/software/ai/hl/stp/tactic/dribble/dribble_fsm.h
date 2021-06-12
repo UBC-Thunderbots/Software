@@ -89,6 +89,7 @@ struct DribbleFSM
     {
         static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD   = 0.3;
         static constexpr double INTERCEPT_POSITION_SEARCH_INTERVAL = 0.1;
+        static constexpr double BALL_CONSTANT_ACCELERATION_MAGNITUDE = 0.5;
         if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
         {
             auto face_ball_vector = (ball.position() - robot.position());
@@ -99,8 +100,18 @@ struct DribbleFSM
         Point intercept_position = ball.position();
         while (contains(field.fieldLines(), intercept_position))
         {
+            Vector acceleration(ball.velocity().normalize(-1 * BALL_CONSTANT_ACCELERATION_MAGNITUDE));
+
+
+            //at constant acceleration, final_speed^2 = initial_speed^2 + (acceleration * displacement * 2)
+            double final_ball_speed_at_position = std::sqrt(std::pow(ball.velocity().length(),2) + (2 * ball.acceleration().length() * distance(intercept_position, ball.position())));
+
+            //at constant acceleration, t = final_speed - initial_speed / acceleration
             Duration ball_time_to_position = Duration::fromSeconds(
-                distance(intercept_position, ball.position()) / ball.velocity().length());
+                    (final_ball_speed_at_position - ball.velocity().length()) / ball.acceleration().length());
+
+//            Duration ball_time_to_position = Duration::fromSeconds(
+//                distance(intercept_position, ball.position()) / ball.velocity().length());
             Duration robot_time_to_pos = getTimeToPositionForRobot(
                 robot.position(), intercept_position, ROBOT_MAX_SPEED_METERS_PER_SECOND,
                 ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
@@ -255,6 +266,19 @@ struct DribbleFSM
             Point intercept_position =
                 findInterceptionPoint(event.common.robot, event.common.world.ball(),
                                       event.common.world.field());
+
+            for (const auto &enemy_robot : event.common.world.enemyTeam().getAllRobots())
+            {
+                if (enemy_robot.isNearDribbler(ball_position, 0.005))
+                {
+                    if (acuteAngle(enemy_robot.position(), event.common.robot.position(),
+                                   ball_position) < Angle::fromDegrees(150))
+                    {
+                        face_ball_orientation += Angle::fromDegrees(45);
+                        break;
+                    }
+                }
+            }
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), intercept_position, face_ball_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
@@ -292,7 +316,7 @@ struct DribbleFSM
                 if (enemy_robot.isNearDribbler(ball_position, 0.005))
                 {
                     if (acuteAngle(enemy_robot.position(), event.common.robot.position(),
-                                   ball_position) < Angle::fromDegrees(90))
+                                   ball_position) < Angle::fromDegrees(150))
                     {
                         target_orientation += Angle::fromDegrees(45);
                         break;
