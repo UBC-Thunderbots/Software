@@ -71,7 +71,7 @@ class Navigator : public IntentVisitor
      *
      * @return set of PathObjectives
      */
-    std::unordered_set<PathObjective> createPathObjectives(const World &world) const;
+    std::unordered_set<PathObjective> createPathObjectives(const World &world);
 
     std::shared_ptr<const NavigatorConfig> config;
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory;

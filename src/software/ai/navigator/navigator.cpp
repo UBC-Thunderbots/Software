@@ -77,7 +77,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Navigator::getAssignedPrimitives(
 }
 
 std::unordered_set<PathObjective> Navigator::createPathObjectives(
-    const World &world) const
+    const World &world) 
 {
     std::unordered_set<PathObjective> path_objectives;
     std::vector<ObstaclePtr> direct_primitive_intent_obstacles;
@@ -107,9 +107,13 @@ std::unordered_set<PathObjective> Navigator::createPathObjectives(
         // start with direct primitive intent robots and then add motion constraints
         auto obstacles = direct_primitive_intent_obstacles;
 
+        auto robot = world.friendlyTeam().getRobotById(robot_id);
+
+        if (robot)
+        {
         auto motion_constraint_obstacles =
             robot_navigation_obstacle_factory.createFromMotionConstraints(
-                intent->getMotionConstraints(), world);
+                intent->getMotionConstraints(), world, robot->velocity().length());
         obstacles.insert(obstacles.end(), motion_constraint_obstacles.begin(),
                          motion_constraint_obstacles.end());
 
@@ -118,10 +122,6 @@ std::unordered_set<PathObjective> Navigator::createPathObjectives(
             obstacles.push_back(ball_obstacle);
         }
 
-        auto robot = world.friendlyTeam().getRobotById(robot_id);
-
-        if (robot)
-        {
             Point start = robot->position();
             Point end   = intent->getDestination();
 
