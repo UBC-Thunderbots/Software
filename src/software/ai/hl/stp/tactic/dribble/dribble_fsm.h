@@ -200,7 +200,19 @@ struct DribbleFSM
          */
         const auto have_possession = [](auto event) {
             return event.common.robot.isNearDribbler(
-                event.common.world.ball().position());
+                event.common.world.ball().position(), 0.0);
+        };
+
+        /**
+         * Guard that checks if the robot has lost possession of the ball
+         *
+         * @param event DribbleFSM::Update
+         *
+         * @return if the ball has lost possession
+         */
+        const auto lost_possession = [](auto event) {
+            return !event.common.robot.isNearDribbler(
+                event.common.world.ball().position(), 0.01);
         };
 
         /**
@@ -297,7 +309,7 @@ struct DribbleFSM
             // src_state + event [guard] / action = dest_state
             *get_possession_s + update_e[have_possession] / start_dribble = dribble_s,
             get_possession_s + update_e[!have_possession] / get_possession,
-            dribble_s + update_e[!have_possession] / get_possession = get_possession_s,
+            dribble_s + update_e[lost_possession] / get_possession = get_possession_s,
             dribble_s + update_e[!dribbling_done] / dribble,
             dribble_s + update_e[dribbling_done] / dribble  = X,
             X + update_e[!have_possession] / get_possession = get_possession_s,
