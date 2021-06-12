@@ -96,42 +96,43 @@ struct AttackerFSM
             // best pass so far
             DribbleFSM::ControlParams control_params;
 
+            auto best_pass_so_far = Pass(event.common.robot.position(),
+                                         event.common.world.field().enemyGoalCenter(),
+                                         BALL_MAX_SPEED_METERS_PER_SECOND);
+
             if (event.control_params.best_pass_so_far)
             {
-                auto best_pass_so_far = event.control_params.best_pass_so_far;
-                auto keepaway_dribble_dest =
-                    findKeepAwayTargetPoint(event.common.world, best_pass_so_far.value());
-
-                const auto& enemy_team = event.common.world.enemyTeam();
-                const auto& ball       = event.common.world.ball();
-
-                auto final_dribble_orientation = best_pass_so_far->passerOrientation();
-
-                if (enemy_team.numRobots() > 0)
-                {
-                    // there is a robot on the enemy team, face away from the nearest one
-                    auto nearest_enemy_robot =
-                        *enemy_team.getNearestRobot(event.common.robot.position());
-                    auto dribble_orientation_vec =
-                        ball.position() - nearest_enemy_robot.position();
-                    final_dribble_orientation = dribble_orientation_vec.orientation();
-                }
-
-                control_params = {.dribble_destination       = keepaway_dribble_dest,
-                                  .final_dribble_orientation = final_dribble_orientation,
-                                  .allow_excessive_dribbling = false};
+                best_pass_so_far = *event.control_params.best_pass_so_far;
             }
             else
             {
-                // something is *a little bit* wrong if we make it here, though this is
-                // usually on the tick that this FSM is constructed.
-                // doing nothing for 1 tick is not that bad in the grand scheme of things
-                LOG(WARNING) << "No best pass provided to AttackerFSM! Standing still.";
-                control_params = {
-                    .dribble_destination       = event.common.robot.position(),
-                    .final_dribble_orientation = event.common.robot.orientation(),
-                    .allow_excessive_dribbling = false};
+                // we didn't get a best_pass_so_far, so we will be using the default pass.
+                LOG(INFO) << "Attacker FSM has no best pass so far, using default pass "
+                          << "to enemy goal center.";
             }
+
+            auto keepaway_dribble_dest =
+                findKeepAwayTargetPoint(event.common.world, best_pass_so_far);
+
+            const auto& enemy_team = event.common.world.enemyTeam();
+            const auto& ball       = event.common.world.ball();
+
+            auto final_dribble_orientation = best_pass_so_far.passerOrientation();
+
+            if (enemy_team.numRobots() > 0)
+            {
+                // there is a robot on the enemy team, face away from the nearest one
+                auto nearest_enemy_robot =
+                    *enemy_team.getNearestRobot(event.common.robot.position());
+                auto dribble_orientation_vec =
+                    ball.position() - nearest_enemy_robot.position();
+                final_dribble_orientation = dribble_orientation_vec.orientation();
+            }
+
+            control_params = {.dribble_destination       = keepaway_dribble_dest,
+                              .final_dribble_orientation = final_dribble_orientation,
+                              .allow_excessive_dribbling = false};
+
 
             processEvent(DribbleFSM::Update(control_params, event.common));
         };
