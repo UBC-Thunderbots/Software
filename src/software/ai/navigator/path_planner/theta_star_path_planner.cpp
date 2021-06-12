@@ -447,7 +447,6 @@ bool ThetaStarPathPlanner::visitNeighbours(const Coordinate &current_coord,
             // check for clipping obstacles
             if (lineOfSight(current_coord, next_coord))
             {
-                std::cout << convertCoordToPoint(next_coord) << ", ";
                 if (updateVertex(current_coord, next_coord, end_coord))
                 {
                     return true;
