@@ -292,7 +292,7 @@ struct DribbleFSM
                 if (enemy_robot.isNearDribbler(ball_position, 0.005))
                 {
                     if (acuteAngle(enemy_robot.position(), event.common.robot.position(),
-                                   ball_position) < Angle::fromDegrees(30))
+                                   ball_position) < Angle::fromDegrees(90))
                     {
                         target_orientation += Angle::fromDegrees(45);
                         break;
