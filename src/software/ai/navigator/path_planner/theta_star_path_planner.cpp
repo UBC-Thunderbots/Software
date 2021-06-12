@@ -440,7 +440,9 @@ bool ThetaStarPathPlanner::visitNeighbours(const Coordinate &current_coord,
 
             // Only check points in the navigable area
             if (!isCoordNavigable(next_coord))
+            {
                 continue;
+            }
 
             // check for clipping obstacles
             if (lineOfSight(current_coord, next_coord))
@@ -578,7 +580,6 @@ bool ThetaStarPathPlanner::isPointNavigableAndFreeOfObstacles(const Point &p)
         return false;
     }
 
-    // TODO is this checking isUnblocked?
     for (auto &obstacle : obstacles)
     {
         if (obstacle->contains(p))
