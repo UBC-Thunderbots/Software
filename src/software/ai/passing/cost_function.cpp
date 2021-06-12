@@ -69,13 +69,16 @@ double rateZone(const World& world, const Rectangle& zone, const Point& receive_
             Pass pass = Pass(Point(x, y), receive_position,
                              BALL_MAX_SPEED_METERS_PER_SECOND);
             zone_rating += rateChipPassEnemyRisk(world.enemyTeam(), pass, passing_config);
+            zone_rating += ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
+            zone_rating += rateKickPassEnemyRisk(world.enemyTeam(), pass,
+			     Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
+        		     passing_config->getEnemyProximityImportance()->value());
         }
     }
 
-    zone_rating /= (X_POINTS_TO_SAMPLE * Y_POINTS_TO_SAMPLE);
+    zone_rating /= (3 * X_POINTS_TO_SAMPLE * Y_POINTS_TO_SAMPLE);
 
-    double pass_up_field_rating =
-        (zone.centre().x() + world.field().totalXLength()/2) / world.field().totalXLength();
+    double pass_up_field_rating = zone.centre().x() / world.field().totalXLength();
 
     // These zones are meant for receiving the ball, if they are ridiculously close
     // to the ball or worse in the zone that the ball is in, then the passes will be very
@@ -131,7 +134,7 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
         1 - sigmoid(rotation_to_shot_target_after_pass.abs().toDegrees(),
                     ideal_max_rotation_to_shoot_degrees, 4);
 
-    return 0.75 * shot_openness_score + 0.25 * required_rotation_for_shot_score;
+    return 0.8 * shot_openness_score + 0.2 * required_rotation_for_shot_score;
 }
 
 double rateKickPassEnemyRisk(const Team& enemy_team, const Pass& pass,
