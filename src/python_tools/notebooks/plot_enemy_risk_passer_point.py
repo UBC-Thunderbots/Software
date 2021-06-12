@@ -107,7 +107,7 @@ def plot_ssl_wrapper_at_idx(idx):
 
     def ratePassEnemyRiskCost(x, y):
         pass_dict["passer_point"] = world.Point(x, y)
-        return passing.ratePassEnemyRisk(the_world, pass_dict, config)
+        return passing.rateKickPassEnemyRisk(the_world, pass_dict, config)
 
     def keepAwayCost(x, y):
         pass_dict["passer_point"] = world.Point(x, y)
@@ -125,3 +125,6 @@ show(fig, notebook_handle=True)
 
 slider = ipywidgets.IntSlider(min=0, max=len(wrapper_proto_log) - 1)
 ipywidgets.interact(plot_ssl_wrapper_at_idx, idx=slider)
+# -
+
+
