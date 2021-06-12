@@ -68,10 +68,7 @@ double rateZone(const World& world, const Rectangle& zone, const Point& receive_
         {
             Pass pass = Pass(Point(x, y), receive_position,
                              BALL_MAX_SPEED_METERS_PER_SECOND);
-            zone_rating += rateKickPassEnemyRisk(world.enemyTeam(), pass,
-			     Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
-        		     passing_config->getEnemyProximityImportance()->value())
-                + rateChipPassEnemyRisk(world.enemyTeam(), pass, passing_config);
+            zone_rating += rateChipPassEnemyRisk(world.enemyTeam(), pass, passing_config);
         }
     }
 
@@ -134,7 +131,7 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
         1 - sigmoid(rotation_to_shot_target_after_pass.abs().toDegrees(),
                     ideal_max_rotation_to_shoot_degrees, 4);
 
-    return (shot_openness_score + required_rotation_for_shot_score)/2;
+    return 0.75 * shot_openness_score + 0.25 * required_rotation_for_shot_score;
 }
 
 double rateKickPassEnemyRisk(const Team& enemy_team, const Pass& pass,

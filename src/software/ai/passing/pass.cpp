@@ -59,7 +59,9 @@ Duration Pass::estimatePassDuration() const
 
 std::ostream& operator<<(std::ostream& output_stream, const Pass& pass)
 {
-    output_stream << "Receiver Point: " << pass.receiver_point
+    output_stream 
+        << "Passer Point: " << pass.passer_point
+        << "Receiver Point: " << pass.receiver_point
                   << " w/ Speed (m/s): " << pass.pass_speed_m_per_s;
 
     return output_stream;
