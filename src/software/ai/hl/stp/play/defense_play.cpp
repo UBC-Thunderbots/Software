@@ -33,19 +33,16 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     auto shoot_goal_tactic =
         std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
 
-    auto defense_shadow_enemy_tactic = std::make_shared<DefenseShadowEnemyTactic>(
-        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), true,
-        3 * ROBOT_MAX_RADIUS_METERS, play_config->getDefenseShadowEnemyTacticConfig());
-
-    std::shared_ptr<ShadowEnemyTactic> shadow_enemy_tactic =
-        std::make_shared<ShadowEnemyTactic>();
-
-
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
             play_config->getRobotNavigationObstacleConfig()),
         std::make_shared<CreaseDefenderTactic>(
             play_config->getRobotNavigationObstacleConfig()),
+    };
+
+    std::array<std::shared_ptr<ShadowEnemyTactic>, 2> shadow_enemy_tactics = {
+            std::make_shared<ShadowEnemyTactic>(),
+            std::make_shared<ShadowEnemyTactic>(),
     };
 
     auto move_tactics = std::vector<std::shared_ptr<MoveTactic>>{
@@ -70,44 +67,55 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
                                   CreaseDefenderAlignment::RIGHT);
         result[0].emplace_back(std::get<1>(crease_defender_tactics));
 
-        // Assign ShadowEnemy tactics until we have every enemy covered. If there any
+        // Determine how many "immediate" enemy threats there are. If there is only one we have both shadow enemy tactics swarm and block the "immediate" threat.
+        // Otherwise we assign ShadowEnemy tactics for the next highest threats. If there any
         // extra friendly robots, have them perform a reasonable default defensive tactic
-        if (enemy_threats.size() > 0)
-        {
-            defense_shadow_enemy_tactic->updateControlParams(enemy_threats.at(1));
-            result[0].emplace_back(defense_shadow_enemy_tactic);
+        int immediate_enemy_threats = 0;
+        for (auto enemy_threat: enemy_threats) {
+            if (distance(world.field().friendlyGoal(), enemy_threat.robot.position()) < play_config->getDefensePlayConfig()->getImmediateThreatDistance()->value()) {
+                immediate_enemy_threats++;
+            }
         }
-        else
+
+        if (immediate_enemy_threats == 1)
         {
             auto swarm_ball_tactics = moveRobotsToSwarmEnemyWithBall(move_tactics, world);
             result[0].insert(result[0].end(), swarm_ball_tactics.begin(),
                              swarm_ball_tactics.end());
         }
-
-        if (enemy_threats.size() > 1)
-        {
-            shadow_enemy_tactic->updateControlParams(enemy_threats.at(0),
-                                                     ROBOT_MAX_RADIUS_METERS * 3);
-            result[0].emplace_back(shadow_enemy_tactic);
-        }
-        else
-        {
-            auto nearest_enemy_robot =
-                world.enemyTeam().getNearestRobot(world.ball().position());
-            if (nearest_enemy_robot)
+        else {
+            if (enemy_threats.size() > 0)
             {
-                Point block_point =
-                    nearest_enemy_robot->position() +
-                    Vector::createFromAngle(nearest_enemy_robot->orientation()) *
-                        ROBOT_MAX_RADIUS_METERS * 3;
-                move_tactics[1]->updateControlParams(
-                    block_point, nearest_enemy_robot->orientation() + Angle::half(), 0.0);
-                result[0].emplace_back(move_tactics[1]);
+                std::get<0>(shadow_enemy_tactics)
+                        ->updateControlParams(enemy_threats.at(0), ROBOT_MAX_RADIUS_METERS * 3);
+                result[0].emplace_back(std::get<0>(shadow_enemy_tactics));
+            } else {
+                result[0].emplace_back(move_tactics[0]);
             }
-            else
+
+            if (enemy_threats.size() > 1)
             {
-                LOG(WARNING)
-                    << "There are no enemy robots so a MoveTactic is not being assigned";
+                std::get<1>(shadow_enemy_tactics)
+                        ->updateControlParams(enemy_threats.at(1), ROBOT_MAX_RADIUS_METERS * 3);
+                result[0].emplace_back(std::get<1>(shadow_enemy_tactics));
+            } else {
+                auto nearest_enemy_robot =
+                        world.enemyTeam().getNearestRobot(world.ball().position());
+                if (nearest_enemy_robot)
+                {
+                    Point block_point =
+                            nearest_enemy_robot->position() +
+                            Vector::createFromAngle(nearest_enemy_robot->orientation()) *
+                            ROBOT_MAX_RADIUS_METERS * 3;
+                    move_tactics[1]->updateControlParams(
+                            block_point, nearest_enemy_robot->orientation() + Angle::half(), 0.0);
+                    result[0].emplace_back(move_tactics[1]);
+                }
+                else
+                {
+                    LOG(WARNING)
+                        << "There are no enemy robots so a MoveTactic is not being assigned";
+                }
             }
         }
 
