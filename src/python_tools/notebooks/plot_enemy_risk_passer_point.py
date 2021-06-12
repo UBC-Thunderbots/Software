@@ -93,8 +93,8 @@ plotter = PointsPlotter(fig, "keep away point", "square", "red")
 def plot_ssl_wrapper_at_idx(idx):
     ssl_wrapper_plotter.plot_ssl_wrapper(wrapper_proto_log[idx])
 
-    field_length = wrapper_proto_log[idx].geometry.field.field_length / 1000
-    field_width = wrapper_proto_log[idx].geometry.field.field_width / 1000
+    field_length = wrapper_proto_log[idx].geometry.field.field_length / MM_PER_M
+    field_width = wrapper_proto_log[idx].geometry.field.field_width / MM_PER_M
 
     the_world = world.World(
         wrapper_proto_log[idx].SerializeToString(), dict(friendly_color_yellow=True)
@@ -116,13 +116,7 @@ def plot_ssl_wrapper_at_idx(idx):
     enemy_risk_heatmap.plot_heatmap(ratePassEnemyRiskCost)
     keep_away_heatmap.plot_heatmap(keepAwayCost)
 
-    plotter.plot_points(
-        [
-            keep_away.findKeepAwayTargetPosition(
-                the_world, the_world.ball().position(), pass_dict, dict()
-            )
-        ]
-    )
+    plotter.plot_points([keep_away.findKeepAwayTargetPosition(the_world, pass_dict)])
 
     push_notebook()
 
