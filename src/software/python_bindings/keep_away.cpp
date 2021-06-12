@@ -15,7 +15,7 @@ PYBIND11_MODULE(keep_away, m)
               Pass best_pass_so_far = createPassFromDict(best_pass_so_far_dict);
               return findKeepAwayTargetPoint(world, best_pass_so_far);
           });
-    m.def("ratePasserPointForKeepAway", [](py::dict pass_dict, const World& world) {
+    m.def("ratePasserPointForKeepAway", [](const World& world, py::dict pass_dict) {
         Pass pass = createPassFromDict(pass_dict);
         return ratePasserPointForKeepAway(pass, world.enemyTeam()) *
                circleSigmoid(Circle(world.ball().position(), 0.5), pass.passerPoint(),
