@@ -47,7 +47,7 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 
     double pass_up_field_rating = (zone.centre().x() + world.field().totalXLength()/2) / world.field().totalXLength();
 
-    return static_pass_quality * kick_pass_rating * chip_pass_rating * pass_up_field_rating *
+    return static_pass_quality * kick_pass_rating * chip_pass_rating * pass_up_field_rating * 
            shoot_pass_rating * pass_speed_quality * in_region_quality;
 }
 
@@ -139,7 +139,7 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
         1 - sigmoid(rotation_to_shot_target_after_pass.abs().toDegrees(),
                     ideal_max_rotation_to_shoot_degrees, 4);
 
-    return (shot_openness_score + required_rotation_for_shot_score)/2;
+    return 0.30 * shot_openness_score + 0.7 * required_rotation_for_shot_score;
 }
 
 double rateKickPassEnemyRisk(const Team& enemy_team, const Pass& pass,

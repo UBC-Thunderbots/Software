@@ -210,8 +210,20 @@ struct DribbleFSM
          * @return if the ball has been have_possession
          */
         const auto have_possession = [](auto event) {
-            return event.common.robot.isNearDribbler(
-                event.common.world.ball().position());
+            return event.common.robot.isNearDribbler(event.common.world.ball().position(),
+                                                     0.0);
+        };
+
+        /**
+         * Guard that checks if the robot has lost possession of the ball
+         *
+         * @param event DribbleFSM::Update
+         *
+         * @return if the ball has lost possession
+         */
+        const auto lost_possession = [](auto event) {
+            return !event.common.robot.isNearDribbler(
+                event.common.world.ball().position(), 0.01);
         };
 
         /**
@@ -254,6 +266,19 @@ struct DribbleFSM
             Point intercept_position =
                 findInterceptionPoint(event.common.robot, event.common.world.ball(),
                                       event.common.world.field());
+
+            for (const auto &enemy_robot : event.common.world.enemyTeam().getAllRobots())
+            {
+                if (enemy_robot.isNearDribbler(ball_position, 0.005))
+                {
+                    if (acuteAngle(enemy_robot.position(), event.common.robot.position(),
+                                   ball_position) < Angle::fromDegrees(150))
+                    {
+                        face_ball_orientation += Angle::fromDegrees(45);
+                        break;
+                    }
+                }
+            }
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), intercept_position, face_ball_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
@@ -286,7 +311,18 @@ struct DribbleFSM
                 auto_chip_or_kick =
                     AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, DRIBBLE_KICK_SPEED};
             }
-
+            for (const auto &enemy_robot : event.common.world.enemyTeam().getAllRobots())
+            {
+                if (enemy_robot.isNearDribbler(ball_position, 0.005))
+                {
+                    if (acuteAngle(enemy_robot.position(), event.common.robot.position(),
+                                   ball_position) < Angle::fromDegrees(150))
+                    {
+                        target_orientation += Angle::fromDegrees(45);
+                        break;
+                    }
+                }
+            }
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), target_destination, target_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW, auto_chip_or_kick,
@@ -308,7 +344,7 @@ struct DribbleFSM
             // src_state + event [guard] / action = dest_state
             *get_possession_s + update_e[have_possession] / start_dribble = dribble_s,
             get_possession_s + update_e[!have_possession] / get_possession,
-            dribble_s + update_e[!have_possession] / get_possession = get_possession_s,
+            dribble_s + update_e[lost_possession] / get_possession = get_possession_s,
             dribble_s + update_e[!dribbling_done] / dribble,
             dribble_s + update_e[dribbling_done] / dribble  = X,
             X + update_e[!have_possession] / get_possession = get_possession_s,
