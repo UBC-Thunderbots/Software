@@ -20,13 +20,7 @@ FreeKickPlay::FreeKickPlay(std::shared_ptr<const PlayConfig> config)
 
 bool FreeKickPlay::isApplicable(const World &world) const
 {
-    double min_dist_to_corner =
-        std::min((world.field().enemyCornerPos() - world.ball().position()).length(),
-                 (world.field().enemyCornerNeg() - world.ball().position()).length());
-
-    // Make sure we don't interfere with the cornerkick play
-    return world.gameState().isOurFreeKick() &&
-           min_dist_to_corner >= CornerKickPlay::BALL_IN_CORNER_RADIUS;
+    return false;
 }
 
 bool FreeKickPlay::invariantHolds(const World &world) const
@@ -37,6 +31,10 @@ bool FreeKickPlay::invariantHolds(const World &world) const
 
 void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
+    while(true)
+    {
+        yield({});
+    }
     /**
      * This play is basically:
      * - One robot attempts to shoot first. If there is no good shot, it will attempt to
