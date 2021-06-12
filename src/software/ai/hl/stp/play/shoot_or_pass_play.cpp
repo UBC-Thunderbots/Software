@@ -219,7 +219,8 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
 
         // We're ready to pass if we have a robot assigned in the PassGenerator as the
         // passer and the PassGenerator has found a pass above our current threshold
-        ready_to_pass = best_pass_and_score_so_far.rating > min_pass_score_threshold;
+        ready_to_pass = best_pass_and_score_so_far.rating > min_pass_score_threshold &&
+                        world.ball().velocity().length() < 1;
         // If we've assigned a robot as the passer in the PassGenerator, we lower
         // our threshold based on how long the PassGenerator as been running since
         // we set it
