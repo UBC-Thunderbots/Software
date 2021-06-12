@@ -56,30 +56,34 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
 
         std::vector<Pass> in_zone_passes;
 
-        for (size_t num_pass = 0; num_pass < NUM_PASSES_TO_SAMPLE_IN_ZONE; num_pass ++)
+        for (size_t num_pass = 0; num_pass < NUM_PASSES_TO_SAMPLE_IN_ZONE; num_pass++)
         {
-            in_zone_passes.push_back(
-                    Pass(world.ball().position(),
-                    Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
-                    speed_distribution(random_num_gen_))
-            );
+            in_zone_passes.push_back(Pass(
+                world.ball().position(),
+                Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
+                speed_distribution(random_num_gen_)));
         }
 
-        auto best_sampled_pass = std::max_element(in_zone_passes.begin(), in_zone_passes.end(),
-                [&](const Pass& pass_a, const Pass& pass_b) { 
-                double pass_a_rating = 
-                rateKickPassFriendlyCapability(world.friendlyTeam(), pass_a, passing_config_) *
-                  rateChipPassFriendlyCapability(world.friendlyTeam(), pass_a, passing_config_);
-                double pass_b_rating = 
-                rateKickPassFriendlyCapability(world.friendlyTeam(), pass_b, passing_config_) *
-                  rateChipPassFriendlyCapability(world.friendlyTeam(), pass_b, passing_config_);
-                  return pass_a_rating < pass_b_rating;
-            });
+        auto best_sampled_pass =
+            std::max_element(in_zone_passes.begin(), in_zone_passes.end(),
+                             [&](const Pass& pass_a, const Pass& pass_b) {
+                                 double pass_a_rating =
+                                     rateKickPassFriendlyCapability(
+                                         world.friendlyTeam(), pass_a, passing_config_) *
+                                     rateChipPassFriendlyCapability(
+                                         world.friendlyTeam(), pass_a, passing_config_);
+                                 double pass_b_rating =
+                                     rateKickPassFriendlyCapability(
+                                         world.friendlyTeam(), pass_b, passing_config_) *
+                                     rateChipPassFriendlyCapability(
+                                         world.friendlyTeam(), pass_b, passing_config_);
+                                 return pass_a_rating < pass_b_rating;
+                             });
 
-        passes.emplace(
-                zone_id,
-                PassWithRating{*best_sampled_pass, ratePass(world, *best_sampled_pass, pitch_division_->getZone(zone_id),
-                        passing_config_)});
+        passes.emplace(zone_id, PassWithRating{*best_sampled_pass,
+                                               ratePass(world, *best_sampled_pass,
+                                                        pitch_division_->getZone(zone_id),
+                                                        passing_config_)});
     }
 
     return passes;

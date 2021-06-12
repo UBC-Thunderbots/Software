@@ -31,7 +31,7 @@ struct ReceiverFSM
     // The minimum proportion of open net we're shooting on vs the entire size of the net
     // that we require before attempting a shot
     static constexpr double MIN_SHOT_NET_PERCENT_OPEN = 0.3;
-    static constexpr double MIN_PASS_START_SPEED = 1.0;
+    static constexpr double MIN_PASS_START_SPEED      = 1.0;
 
     // The maximum deflection angle that we will attempt a one-touch kick towards the
     // enemy goal with
@@ -298,7 +298,8 @@ struct ReceiverFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *undecided_s + update_e[onetouch_possible && pass_started] / update_onetouch = onetouch_s,
+            *undecided_s + update_e[onetouch_possible && pass_started] / update_onetouch =
+                onetouch_s,
             undecided_s + update_e[!onetouch_possible] / update_receive = receive_s,
             receive_s + update_e[!pass_started] / update_receive,
             receive_s + update_e[pass_started && !pass_finished] / adjust_receive,

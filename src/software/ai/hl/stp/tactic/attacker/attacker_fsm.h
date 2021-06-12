@@ -72,8 +72,9 @@ struct AttackerFSM
             }
             else if (event.control_params.pass_committed)
             {
-                auto pass_segment = Segment(event.control_params.best_pass_so_far->passerPoint(),
-                                            event.control_params.best_pass_so_far->receiverPoint());
+                auto pass_segment =
+                    Segment(event.control_params.best_pass_so_far->passerPoint(),
+                            event.control_params.best_pass_so_far->receiverPoint());
 
                 bool should_chip = false;
 
@@ -166,18 +167,19 @@ struct AttackerFSM
          */
         const auto should_kick = [](auto event) {
             // check for enemy threat
-            // TODO: revisit this, we shouldn't "panic chip" unless we're completely boxed in!
-	    // Circle about_to_steal_danger_zone(event.common.robot.position(),
-	         			      //event.control_params.attacker_tactic_config
-	         				  //->getEnemyAboutToStealBallRadius()
-	         				  //->value());
-	    // for (const auto& enemy : event.common.world.enemyTeam().getAllRobots())
-	    // {
-	         //if (contains(about_to_steal_danger_zone, enemy.position()))
-	         //{
-	             //return true;
-	         //}
-	    // }
+            // TODO: revisit this, we shouldn't "panic chip" unless we're completely boxed
+            // in!
+            // Circle about_to_steal_danger_zone(event.common.robot.position(),
+            // event.control_params.attacker_tactic_config
+            //->getEnemyAboutToStealBallRadius()
+            //->value());
+            // for (const auto& enemy : event.common.world.enemyTeam().getAllRobots())
+            // {
+            // if (contains(about_to_steal_danger_zone, enemy.position()))
+            //{
+            // return true;
+            //}
+            // }
             // otherwise check for shot or pass committed
             return event.control_params.pass_committed || event.control_params.shot;
         };

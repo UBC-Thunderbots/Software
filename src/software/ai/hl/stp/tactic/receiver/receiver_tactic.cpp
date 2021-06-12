@@ -38,7 +38,7 @@ double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
     return calculateRobotCostToDestination(robot, world,
-                                                control_params.pass->receiverPoint());
+                                           control_params.pass->receiverPoint());
 }
 
 void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)

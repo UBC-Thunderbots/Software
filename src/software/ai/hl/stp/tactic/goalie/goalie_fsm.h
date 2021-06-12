@@ -148,7 +148,7 @@ struct GoalieFSM
         using namespace boost::sml;
 
         const auto panic_s             = state<PanicState>;
-        const auto pivot_kick_s           = state<PivotKickFSM>;
+        const auto pivot_kick_s        = state<PivotKickFSM>;
         const auto position_to_block_s = state<PositionToBlockState>;
 
         const auto update_e = event<Update>;
@@ -172,8 +172,8 @@ struct GoalieFSM
         };
 
         /**
-         * Guard that checks if the ball is moving slower than the panic threshold and is inside the no-chip
-         * rectangle, if true then the goalie should dribble the ball
+         * Guard that checks if the ball is moving slower than the panic threshold and is
+         * inside the no-chip rectangle, if true then the goalie should dribble the ball
          *
          * @param event GoalieFSM::Update
          *
@@ -182,7 +182,7 @@ struct GoalieFSM
         const auto should_pivot_chip = [this](auto event) {
             double ball_speed_panic = goalie_tactic_config->getBallSpeedPanic()->value();
             return event.common.world.ball().velocity().length() <= ball_speed_panic &&
-event.common.world.field().pointInFriendlyDefenseArea(
+                   event.common.world.field().pointInFriendlyDefenseArea(
                        event.common.world.ball().position());
         };
 
@@ -234,27 +234,28 @@ event.common.world.field().pointInFriendlyDefenseArea(
          * @param event GoalieFSM::Update event
          * @param processEvent processes the PivotKickFSM::Update
          */
-        const auto update_pivot_kick = [](auto event,
-                                       back::process<PivotKickFSM::Update> processEvent) {
-            double clear_origin_x =
-                getNoChipRectangle(event.common.world.field()).xMax() +
-                ROBOT_MAX_RADIUS_METERS;
-            Point clear_origin =
-                Point(clear_origin_x, event.common.world.ball().position().y());
+        const auto update_pivot_kick =
+            [](auto event, back::process<PivotKickFSM::Update> processEvent) {
+                double clear_origin_x =
+                    getNoChipRectangle(event.common.world.field()).xMax() +
+                    ROBOT_MAX_RADIUS_METERS;
+                Point clear_origin =
+                    Point(clear_origin_x, event.common.world.ball().position().y());
 
-            Angle clear_direction = (event.common.world.ball().position() -
-                                     event.common.world.field().friendlyGoalCenter())
-                                        .orientation();
+                Angle clear_direction = (event.common.world.ball().position() -
+                                         event.common.world.field().friendlyGoalCenter())
+                                            .orientation();
 
-            PivotKickFSM::ControlParams control_params{
-                .kick_origin       = clear_origin,
-                .kick_direction = clear_direction,
-                .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
+                PivotKickFSM::ControlParams control_params{
+                    .kick_origin       = clear_origin,
+                    .kick_direction    = clear_direction,
+                    .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
+                                                        YEET_CHIP_DISTANCE_METERS},
+                };
+
+                // update the dribble fsm
+                processEvent(PivotKickFSM::Update(control_params, event.common));
             };
-
-            // update the dribble fsm
-            processEvent(PivotKickFSM::Update(control_params, event.common));
-        };
 
         /**
          * Action that updates the MoveIntent to position the goalie in the best spot to
@@ -282,7 +283,8 @@ event.common.world.field().pointInFriendlyDefenseArea(
         };
 
         const auto ball_in_defense_area = [this](auto event) {
-            return contains(event.common.world.field().friendlyDefenseArea(), event.common.world.ball().position());
+            return contains(event.common.world.field().friendlyDefenseArea(),
+                            event.common.world.ball().position());
         };
 
         return make_transition_table(
@@ -294,7 +296,7 @@ event.common.world.field().pointInFriendlyDefenseArea(
             panic_s + update_e[should_pivot_chip] / update_pivot_kick = pivot_kick_s,
             panic_s + update_e[panic_done] = X, panic_s + update_e / update_panic,
             pivot_kick_s + update_e[ball_in_defense_area] / update_pivot_kick,
-            pivot_kick_s + update_e[!ball_in_defense_area] / update_position_to_block= X,
+            pivot_kick_s + update_e[!ball_in_defense_area] / update_position_to_block = X,
             X + update_e / update_position_to_block = position_to_block_s);
     }
 

@@ -23,10 +23,10 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double friendly_chip_pass_rating =
         rateChipPassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
 
-    double enemy_kick_pass_rating =
-        rateKickPassEnemyRisk(world.enemyTeam(), pass,
-			     Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
-        		     passing_config->getEnemyProximityImportance()->value());
+    double enemy_kick_pass_rating = rateKickPassEnemyRisk(
+        world.enemyTeam(), pass,
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
+        passing_config->getEnemyProximityImportance()->value());
 
     double enemy_chip_pass_rating =
         rateChipPassEnemyRisk(world.enemyTeam(), pass, passing_config);
@@ -45,7 +45,7 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double pass_speed_quality = sigmoid(pass.speed(), min_pass_speed, 0.2) *
                                 (1 - sigmoid(pass.speed(), max_pass_speed, 0.2));
 
-    return static_pass_quality * kick_pass_rating * chip_pass_rating  * shoot_pass_rating *
+    return static_pass_quality * kick_pass_rating * chip_pass_rating * shoot_pass_rating *
            pass_speed_quality * in_region_quality;
 }
 
@@ -66,13 +66,15 @@ double rateZone(const World& world, const Rectangle& zone, const Point& receive_
     {
         for (double y = zone.yMin(); y < zone.yMax(); y += y_step)
         {
-            Pass pass = Pass(Point(x, y), receive_position,
-                             BALL_MAX_SPEED_METERS_PER_SECOND);
+            Pass pass =
+                Pass(Point(x, y), receive_position, BALL_MAX_SPEED_METERS_PER_SECOND);
             zone_rating += rateChipPassEnemyRisk(world.enemyTeam(), pass, passing_config);
-            zone_rating += ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
-            zone_rating += rateKickPassEnemyRisk(world.enemyTeam(), pass,
-			     Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
-        		     passing_config->getEnemyProximityImportance()->value());
+            zone_rating += ratePassShootScore(world.field(), world.enemyTeam(), pass,
+                                              passing_config);
+            zone_rating += rateKickPassEnemyRisk(
+                world.enemyTeam(), pass,
+                Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
+                passing_config->getEnemyProximityImportance()->value());
         }
     }
 
@@ -83,14 +85,15 @@ double rateZone(const World& world, const Rectangle& zone, const Point& receive_
     // These zones are meant for receiving the ball, if they are ridiculously close
     // to the ball or worse in the zone that the ball is in, then the passes will be very
     // low quality.
-    // 
+    //
     // We don't enforce a max pass length, that is driven by the other cost functions,
     // but we create a cost "force field" around the ball to discourage selecting the
     // zone the ball is in (and maybe the neighbouring zone if its on the edge).
-    double zone_ball_proximity_rating =
-        sigmoid((receive_position - zone.centre()).length(), zone.xLength(), zone.xLength());
+    double zone_ball_proximity_rating = sigmoid(
+        (receive_position - zone.centre()).length(), zone.xLength(), zone.xLength());
 
-    double zone_quality = getStaticPositionQuality(world.field(), zone.centre(), passing_config);
+    double zone_quality =
+        getStaticPositionQuality(world.field(), zone.centre(), passing_config);
 
     return zone_rating * pass_up_field_rating * zone_ball_proximity_rating * zone_quality;
 }
@@ -138,12 +141,13 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
 }
 
 double rateKickPassEnemyRisk(const Team& enemy_team, const Pass& pass,
-                         const Duration& enemy_reaction_time,
-                         double enemy_proximity_importance)
+                             const Duration& enemy_reaction_time,
+                             double enemy_proximity_importance)
 {
     double enemy_receiver_proximity_risk = calculateProximityRisk(
         pass.receiverPoint(), enemy_team, enemy_proximity_importance);
-    double intercept_risk = calculateKickInterceptRisk(enemy_team, pass, enemy_reaction_time);
+    double intercept_risk =
+        calculateKickInterceptRisk(enemy_team, pass, enemy_reaction_time);
 
     // We want to rate a pass more highly if it is lower risk, so subtract from 1
     return 1 - std::max(intercept_risk, enemy_receiver_proximity_risk);
@@ -175,12 +179,13 @@ double rateChipPassEnemyRisk(const Team& enemy_team, const Pass& pass,
     }
     else
     {
-        return sigmoid((closest_enemy.position() - pass.receiverPoint()).length(), 0.5, 2.0);
+        return sigmoid((closest_enemy.position() - pass.receiverPoint()).length(), 0.5,
+                       2.0);
     }
 }
 
 double calculateKickInterceptRisk(const Team& enemy_team, const Pass& pass,
-                              const Duration& enemy_reaction_time)
+                                  const Duration& enemy_reaction_time)
 {
     // Return the highest risk for all the enemy robots, if there are any
     const std::vector<Robot>& enemy_robots = enemy_team.getAllRobots();
@@ -191,13 +196,14 @@ double calculateKickInterceptRisk(const Team& enemy_team, const Pass& pass,
     std::vector<double> enemy_intercept_risks(enemy_robots.size());
     std::transform(enemy_robots.begin(), enemy_robots.end(),
                    enemy_intercept_risks.begin(), [&](Robot robot) {
-                       return calculateKickInterceptRisk(robot, pass, enemy_reaction_time);
+                       return calculateKickInterceptRisk(robot, pass,
+                                                         enemy_reaction_time);
                    });
     return *std::max_element(enemy_intercept_risks.begin(), enemy_intercept_risks.end());
 }
 
 double calculateKickInterceptRisk(const Robot& enemy_robot, const Pass& pass,
-                              const Duration& enemy_reaction_time)
+                                  const Duration& enemy_reaction_time)
 {
     // We estimate the intercept by the risk that the robot will get to the closest
     // point on the pass before the ball, and by the risk that the robot will get to
