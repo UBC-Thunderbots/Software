@@ -10,13 +10,15 @@
 
 std::vector<Point> rasterize(const Circle& circle, const double resolution_size)
 {
-    // Iterating through the x values from left (origin - radius) to right (origin + radius) of the circle
-    // which are resolution_size apart. Then finding the min and max y values for each x value using:
+    // Iterating through the x values from left (origin - radius) to right (origin +
+    // radius) of the circle which are resolution_size apart. Then finding the min and max
+    // y values for each x value using:
     //             y = +-sqrt(r^2 - (x - k)^2) + h      (<== (y - h)^2 + (x - k)^2 = r^2)
     // and filling in the points resolution_size away from each other between them.
     std::vector<Point> covered_points;
 
-    // Offset for the radius to avoid points being outside of the circle due to floating point errors
+    // Offset for the radius to avoid points being outside of the circle due to floating
+    // point errors
     const double EPSILON = 0.0001;
     double radius        = circle.radius() - EPSILON;
     double diameter      = radius * 2;
@@ -61,7 +63,7 @@ std::vector<Point> rasterize(const Circle& circle, const double resolution_size)
             }
             double y_point = y_min + y_offset;
 
-			
+
             covered_points.emplace_back(Point(x_point, y_point));
         }
     }
@@ -71,9 +73,10 @@ std::vector<Point> rasterize(const Circle& circle, const double resolution_size)
 
 std::vector<Point> rasterize(const Rectangle& rectangle, const double resolution_size)
 {
-    // Loop through the length and the width of the rectangle and add points resolution_size
-    // away from each other. Also making sure that the edges are also filled with points if
-    // the dimensions of the rectangle are not divisible by resolution_size.
+    // Loop through the length and the width of the rectangle and add points
+    // resolution_size away from each other. Also making sure that the edges are also
+    // filled with points if the dimensions of the rectangle are not divisible by
+    // resolution_size.
     std::vector<Point> covered_points;
 
     int num_pixels_x = (int)std::ceil(rectangle.xLength() / resolution_size);
@@ -117,11 +120,13 @@ std::vector<Point> rasterize(const Rectangle& rectangle, const double resolution
 
 std::vector<Point> rasterize(const Polygon& polygon, const double resolution_size)
 {
-    // Draw a bounding box around the polygon and loop through it using a similar approach as
-    // rasterize for polygon and only add the points that are contained by the polygon.
+    // This rasterize function uses two steps to fully cover a polygon.
+    // 1. Draw a bounding box around the polygon and loop through it using a similar
+    // approach as rasterize for polygon and only add the points that are contained by the
+    // polygon.
     //                                     AND
-    // To ensure that the edges are covered, draw a line between two consecutive points and
-    // draw points on the line resolution_size or less away from each other.
+    // 2. To ensure that the edges are covered, draw a line between every two consecutive
+    // vertices and draw points on the line, resolution_size or less away from each other.
 
     // Used to avoid points being outside of polygon due to floating point errors
     const double EPSILON         = 0.0001;

@@ -339,7 +339,7 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     {
         path_points.erase(path_points.begin() + 1);
     }
-    
+
     return Path(path_points);
 }
 
