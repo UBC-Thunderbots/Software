@@ -90,11 +90,12 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
         Zones cherry_pick_region_1 = {ranked_zones[0]};
         Zones cherry_pick_region_2 = {ranked_zones[1]};
 
+        LOG(DEBUG) << "Zone rankings (from best to worst)";
         for (auto zone : ranked_zones)
         {
-            std::cerr << zone << std::endl;
+            LOG(DEBUG) << zone;
         }
-        std::cerr<<"-------------------------"<<std::endl;
+
         auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
         auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
 
@@ -108,7 +109,6 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                                   pass2.receiverOrientation(), 0.0,
                                                   MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
-        std::cerr<<"EXECUTING: "<<pass<<std::endl;
         do
         {
             // if we make it here then we have committed to the pass

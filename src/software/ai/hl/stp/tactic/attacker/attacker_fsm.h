@@ -58,7 +58,6 @@ struct AttackerFSM
                 .auto_chip_or_kick =
                     AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
                                    (chip_target - ball_position).length()}};
-
             if (event.control_params.shot)
             {
                 // shoot on net
@@ -80,7 +79,7 @@ struct AttackerFSM
 
                 for (const Robot& enemy : event.common.world.enemyTeam().getAllRobots())
                 {
-                    if (intersects(Circle(enemy.position(), ROBOT_MAX_RADIUS_METERS),
+                    if (intersects(Circle(enemy.position(), ROBOT_MAX_RADIUS_METERS * 3),
                                    pass_segment))
                     {
                         should_chip = true;
@@ -112,6 +111,7 @@ struct AttackerFSM
          */
         const auto keep_away = [](auto event,
                                   back::process<DribbleFSM::Update> processEvent) {
+            std::cerr<<"RUNNING KEEPAWAY"<<std::endl;
             // ball possession is threatened, get into a better position to take the
             // best pass so far
             DribbleFSM::ControlParams control_params;
@@ -167,18 +167,20 @@ struct AttackerFSM
         // TODO: revisit this, we shouldn't "panic chip" unless we're completely boxed in!
         const auto should_kick = [](auto event) {
             // check for enemy threat
-            Circle about_to_steal_danger_zone(event.common.robot.position(),
-                                              event.control_params.attacker_tactic_config
-                                                  ->getEnemyAboutToStealBallRadius()
-                                                  ->value());
-            for (const auto& enemy : event.common.world.enemyTeam().getAllRobots())
-            {
-                if (contains(about_to_steal_danger_zone, enemy.position()))
-                {
-                    return true;
-                }
-            }
+            //Circle about_to_steal_danger_zone(event.common.robot.position(),
+                                              //event.control_params.attacker_tactic_config
+                                                  //->getEnemyAboutToStealBallRadius()
+                                                  //->value());
+            //for (const auto& enemy : event.common.world.enemyTeam().getAllRobots())
+            //{
+                //if (contains(about_to_steal_danger_zone, enemy.position()))
+                //{
+                    //return true;
+                //}
+            //}
             // otherwise check for shot or pass committed
+            std::cerr << "Should Kick";
+            std::cerr << event.control_params.pass_committed << std::endl;
             return event.control_params.pass_committed || event.control_params.shot;
         };
 

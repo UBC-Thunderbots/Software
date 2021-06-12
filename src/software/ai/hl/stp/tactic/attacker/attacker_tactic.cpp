@@ -16,6 +16,7 @@ AttackerTactic::AttackerTactic(
       chip_target(std::nullopt),
       attacker_tactic_config(attacker_tactic_config)
 {
+    std::cerr<<"CREATED ATTACKER "<<std::endl;
 }
 
 void AttackerTactic::updateWorldParams(const World& world) {}
