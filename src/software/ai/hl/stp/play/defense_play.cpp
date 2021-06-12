@@ -40,11 +40,10 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
             play_config->getRobotNavigationObstacleConfig()),
     };
 
-    auto defense_shadow_enemy_tactic = std::make_shared<DefenseShadowEnemyTactic>(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), true,
-            3 * ROBOT_MAX_RADIUS_METERS, play_config->getDefenseShadowEnemyTacticConfig());
-    auto shadow_enemy_tactic =
-            std::make_shared<ShadowEnemyTactic>();
+    std::array<std::shared_ptr<ShadowEnemyTactic>, 2> shadow_enemy_tactics = {
+            std::make_shared<ShadowEnemyTactic>(),
+            std::make_shared<ShadowEnemyTactic>(),
+    };
 
     auto move_tactics = std::vector<std::shared_ptr<MoveTactic>>{
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)};
@@ -87,17 +86,18 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         else {
             if (enemy_threats.size() > 0)
             {
-                defense_shadow_enemy_tactic->updateControlParams(enemy_threats.at(1));
-                result[0].emplace_back(defense_shadow_enemy_tactic);
+                std::get<0>(shadow_enemy_tactics)
+                        ->updateControlParams(enemy_threats.at(0), ROBOT_MAX_RADIUS_METERS * 3);
+                result[0].emplace_back(std::get<0>(shadow_enemy_tactics));
             } else {
                 result[0].emplace_back(move_tactics[0]);
             }
 
             if (enemy_threats.size() > 1)
             {
-                shadow_enemy_tactic->updateControlParams(enemy_threats.at(2),
-                                                             ROBOT_MAX_RADIUS_METERS * 3);
-                result[0].emplace_back(shadow_enemy_tactic);
+                std::get<1>(shadow_enemy_tactics)
+                        ->updateControlParams(enemy_threats.at(1), ROBOT_MAX_RADIUS_METERS * 3);
+                result[0].emplace_back(std::get<1>(shadow_enemy_tactics));
             } else {
                 auto nearest_enemy_robot =
                         world.enemyTeam().getNearestRobot(world.ball().position());
