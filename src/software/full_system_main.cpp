@@ -60,6 +60,11 @@ int main(int argc, char** argv)
             LOG(FATAL) << "The option '--backend' is required but missing";
         }
 
+        // update command line arguments in BackendConfig
+        auto mutable_backend_config =
+            mutable_thunderbots_config->getMutableBackendConfig();
+        *mutable_backend_config->getMutableFullSystemMainCommandLineArgs() = *args;
+
         std::shared_ptr<Backend> backend =
             GenericFactory<std::string, Backend, BackendConfig>::create(
                 args->getBackend()->value(), thunderbots_config->getBackendConfig());
