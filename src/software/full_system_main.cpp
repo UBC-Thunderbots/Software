@@ -57,6 +57,19 @@ int main(int argc, char** argv)
                 ->setValue(args->getInterface()->value());
         }
 
+        mutable_thunderbots_config->getMutableSensorFusionConfig()
+            ->getMutableFriendlyColorYellow()
+            ->setValue(args->getTeamColor()->value() == "yellow");
+        mutable_thunderbots_config->getMutableSensorFusionConfig()
+            ->getMutableOverrideGameControllerDefendingSide()
+            ->setValue(args->getDefendingSide()->value() != "gamecontroller");
+        mutable_thunderbots_config->getMutableSensorFusionConfig()
+            ->getMutableDefendingPositiveSide()
+            ->setValue(args->getDefendingSide()->value() == "positive");
+        mutable_thunderbots_config->getMutableNetworkConfig()
+            ->getMutableChannel()
+            ->setValue(args->getChannel()->value());
+
         // override arduino port or try to find programmatically
         if (!args->getArduinoConfig()->getPort()->value().empty())
         {
