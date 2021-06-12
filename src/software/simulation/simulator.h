@@ -31,13 +31,9 @@ class Simulator
      *
      * @param field The field to initialize the simulation with
      * @param simulator_config The config to fetch parameters from
-     * @param physics_time_step The time step used to simulated physics
-     * and robot primitives.
      */
     explicit Simulator(const Field& field,
-                       std::shared_ptr<const SimulatorConfig> simulator_config,
-                       const Duration& physics_time_step =
-                           Duration::fromSeconds(DEFAULT_PHYSICS_TIME_STEP_SECONDS));
+                       std::shared_ptr<const SimulatorConfig> simulator_config);
     Simulator() = delete;
 
     /**
@@ -226,17 +222,16 @@ class Simulator
     unsigned int frame_number;
 
     // The time step used to simulate physics and primitives
-    const Duration physics_time_step;
+    Duration physics_time_step;
 
     // The camera ID of all SSLDetectionFrames published by the simulator.
     // This simulates having a single camera that can see the entire field
     static constexpr unsigned int CAMERA_ID            = 0;
     static constexpr float FIELD_LINE_THICKNESS_METRES = 0.01f;
-    // 200Hz is approximately how fast our robot firmware runs, so we
-    // mimic that here for physics and primitive updates
-    static constexpr double DEFAULT_PHYSICS_TIME_STEP_SECONDS = 1.0 / 200.0;
 
     // The current time. This is static so that it may be used by the firmware,
     // and so must be set before each firmware tick
     static Timestamp current_firmware_time;
+
+    std::shared_ptr<const SimulatorConfig> simulator_config;
 };

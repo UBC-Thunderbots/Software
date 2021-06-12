@@ -13,7 +13,7 @@ class PhysicsSimulatorBallTest : public testing::Test
     virtual void SetUp()
     {
         physics_world = std::make_unique<PhysicsWorld>(
-            Field::createSSLDivisionBField(), std::make_shared<const SimulatorConfig>());
+            Field::createSSLDivisionBField(), std::make_shared<const PhysicsConfig>());
         physics_world->setBallState(BallState(Point(1.01, -0.4), Vector(0.02, -4.5)));
 
         auto physics_ball = physics_world->getPhysicsBall();

@@ -21,8 +21,8 @@ class PhysicsBallTest : public testing::Test
     virtual void SetUp()
     {
         b2Vec2 gravity(0, 0);
-        world            = std::make_shared<b2World>(gravity);
-        simulator_config = std::make_shared<const SimulatorConfig>();
+        world          = std::make_shared<b2World>(gravity);
+        physics_config = std::make_shared<const PhysicsConfig>();
     }
 
     void simulateForDuration(const Duration& duration)
@@ -41,13 +41,13 @@ class PhysicsBallTest : public testing::Test
     }
 
     std::shared_ptr<b2World> world;
-    std::shared_ptr<const SimulatorConfig> simulator_config;
+    std::shared_ptr<const PhysicsConfig> physics_config;
 };
 
 TEST_F(PhysicsBallTest, test_get_position)
 {
     BallState initial_ball_state(Point(0.1, -0.04), Vector(1, -2));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     EXPECT_LT((initial_ball_state.position() - physics_ball.position()).length(), 1e-7);
 }
@@ -55,7 +55,7 @@ TEST_F(PhysicsBallTest, test_get_position)
 TEST_F(PhysicsBallTest, test_get_velocity)
 {
     BallState initial_ball_state(Point(0.1, -0.04), Vector(1, -2));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     EXPECT_LT((initial_ball_state.velocity() - physics_ball.velocity()).length(), 1e-7);
 }
@@ -63,7 +63,7 @@ TEST_F(PhysicsBallTest, test_get_velocity)
 TEST_F(PhysicsBallTest, test_get_momentum)
 {
     BallState initial_ball_state(Point(0.1, -0.04), Vector(1, -2));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     Vector expected_momentum = Vector(1, -2) * 1.0;
     EXPECT_LT((expected_momentum - physics_ball.momentum()).length(), 1e-6);
@@ -72,7 +72,7 @@ TEST_F(PhysicsBallTest, test_get_momentum)
 TEST_F(PhysicsBallTest, test_get_mass)
 {
     BallState initial_ball_state(Point(0.1, -0.04), Vector(1, -2));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     EXPECT_FLOAT_EQ(1.0f, physics_ball.massKg());
 }
@@ -80,7 +80,7 @@ TEST_F(PhysicsBallTest, test_get_mass)
 TEST_F(PhysicsBallTest, test_get_ball_state)
 {
     BallState initial_ball_state(Point(0.1, -0.04), Vector(1, -2));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
     auto ball_state   = physics_ball.getBallState();
 
     EXPECT_LT((initial_ball_state.position() - ball_state.position()).length(), 1e-7);
@@ -93,7 +93,7 @@ TEST_F(PhysicsBallTest, test_ball_added_to_physics_world_on_creation)
 
     EXPECT_EQ(0, world->GetBodyCount());
 
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     EXPECT_EQ(1, world->GetBodyCount());
 }
@@ -105,7 +105,7 @@ TEST_F(PhysicsBallTest, test_physics_ball_is_removed_from_world_when_destroyed)
 
         EXPECT_EQ(0, world->GetBodyCount());
 
-        auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+        auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
         EXPECT_EQ(1, world->GetBodyCount());
     }
@@ -118,7 +118,7 @@ TEST_F(PhysicsBallTest, test_physics_ball_is_removed_from_world_when_destroyed)
 TEST_F(PhysicsBallTest, test_ball_velocity_and_position_updates_during_simulation_step)
 {
     BallState initial_ball_state(Point(1, -1), Vector(1, -2));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     simulateForDuration(Duration::fromSeconds(1));
 
@@ -134,7 +134,7 @@ TEST_F(PhysicsBallTest,
     auto world = std::make_shared<b2World>(gravity);
 
     BallState initial_ball_state(Point(0, 0), Vector(0, 0));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     for (unsigned int i = 0; i < 60; i++)
     {
@@ -166,7 +166,7 @@ TEST_F(PhysicsBallTest, test_ball_reverses_direction_after_object_collision)
     wall_body->CreateFixture(&wall_fixture_def);
 
     BallState initial_ball_state(Point(0, 0), Vector(0.5, 0));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     simulateForDuration(Duration::fromSeconds(1));
 
@@ -196,7 +196,7 @@ TEST_F(PhysicsBallTest, test_ball_changes_direction_after_object_deflection)
     wall_body->CreateFixture(&wall_fixture_def);
 
     BallState initial_ball_state(Point(0, 0), Vector(1.0, 0));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     simulateForDuration(Duration::fromSeconds(2));
 
@@ -208,7 +208,7 @@ TEST_F(PhysicsBallTest, test_apply_force_to_stationary_ball)
 {
     // Apply force to a stationary ball
     BallState initial_ball_state(Point(0, 0), Vector(0, 0));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     // Apply force for 1 second
     // We have to take lots of small steps because a significant amount of accuracy
@@ -228,7 +228,7 @@ TEST_F(PhysicsBallTest, test_apply_force_to_reverse_direction_of_moving_ball)
 {
     // Apply force against a moving ball to reverse its direction
     BallState initial_ball_state(Point(0, 0), Vector(1, -2));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     // Apply force for 1 second
     // We have to take lots of small steps because a significant amount of accuracy
@@ -248,7 +248,7 @@ TEST_F(PhysicsBallTest, test_apply_force_to_change_direction_of_moving_ball)
 {
     // Apply force to change the direction of a moving ball
     BallState initial_ball_state(Point(0, 0), Vector(1, 0));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     // Apply force for 1 second
     // We have to take lots of small steps because a significant amount of accuracy
@@ -267,7 +267,7 @@ TEST_F(PhysicsBallTest, test_apply_force_to_change_direction_of_moving_ball)
 TEST_F(PhysicsBallTest, test_apply_impulse_to_stationary_ball)
 {
     BallState initial_ball_state(Point(0, 0), Vector(0, 0));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     physics_ball.applyImpulse(Vector(1, 2));
     world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
@@ -280,7 +280,7 @@ TEST_F(PhysicsBallTest, test_apply_impulse_to_stationary_ball)
 TEST_F(PhysicsBallTest, test_apply_impulse_to_stop_moving_ball)
 {
     BallState initial_ball_state(Point(0, 0), Vector(2, -1));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     physics_ball.applyImpulse(Vector(-2, 1));
     world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
@@ -293,7 +293,7 @@ TEST_F(PhysicsBallTest, test_apply_impulse_to_stop_moving_ball)
 TEST_F(PhysicsBallTest, test_apply_impulse_to_change_direction_of_moving_ball)
 {
     BallState initial_ball_state(Point(0, 0), Vector(-3, -0.5));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     physics_ball.applyImpulse(Vector(2, 0.5));
     world->Step(static_cast<float>(1.0 / 60.0), BOX2D_STEP_VELOCITY_ITERATIONS,
@@ -306,7 +306,7 @@ TEST_F(PhysicsBallTest, test_apply_impulse_to_change_direction_of_moving_ball)
 TEST_F(PhysicsBallTest, test_set_ball_in_flight_without_collisions)
 {
     BallState initial_ball_state(Point(0, 0), Vector(1, 0));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     EXPECT_FALSE(physics_ball.isInFlight());
     physics_ball.setInFlightForDistance(1.0f, Angle::fromDegrees(45));
@@ -334,7 +334,7 @@ TEST_F(PhysicsBallTest, test_set_ball_in_flight_without_collisions)
 TEST_F(PhysicsBallTest, test_set_ball_in_flight_with_collisions)
 {
     BallState initial_ball_state(Point(0, 0), Vector(1, 0));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     // Create a 1x1 box centered at (2, 0) in the world
     b2BodyDef obstacle_body_def;
@@ -387,7 +387,7 @@ TEST_F(PhysicsBallTest, test_set_ball_in_flight_with_collisions)
 TEST_F(PhysicsBallTest, get_height_when_ball_not_in_flight)
 {
     BallState initial_ball_state(Point(0.1, -0.04), Vector(1, -2));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     EXPECT_DOUBLE_EQ(0.0, physics_ball.getBallState().distanceFromGround());
 }
@@ -395,7 +395,7 @@ TEST_F(PhysicsBallTest, get_height_when_ball_not_in_flight)
 TEST_F(PhysicsBallTest, get_height_when_ball_in_flight)
 {
     BallState initial_ball_state(Point(0, 0), Vector(1, 0));
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
 
     EXPECT_FALSE(physics_ball.isInFlight());
     physics_ball.setInFlightForDistance(2.0f, Angle::fromDegrees(45));
@@ -437,12 +437,12 @@ class PhysicsBallFrictionTest : public PhysicsBallTest
     virtual void SetUp()
     {
         PhysicsBallTest::SetUp();
-        simulator_config = std::make_shared<SimulatorConfig>();
-        simulator_config->getMutableSlidingFrictionAcceleration()->setValue(5.0);
-        simulator_config->getMutableRollingFrictionAcceleration()->setValue(0.5);
+        physics_config = std::make_shared<PhysicsConfig>();
+        physics_config->getMutableSlidingFrictionAcceleration()->setValue(5.0);
+        physics_config->getMutableRollingFrictionAcceleration()->setValue(0.5);
     }
 
-    std::shared_ptr<SimulatorConfig> simulator_config;
+    std::shared_ptr<PhysicsConfig> physics_config;
 };
 
 TEST_F(PhysicsBallFrictionTest, test_no_friction_kick)
@@ -450,9 +450,9 @@ TEST_F(PhysicsBallFrictionTest, test_no_friction_kick)
     Point position(3, 5);
     Vector velocity(1, -1);
     BallState initial_ball_state(position, velocity);
-    simulator_config->getMutableSlidingFrictionAcceleration()->setValue(0);
-    simulator_config->getMutableRollingFrictionAcceleration()->setValue(0);
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    physics_config->getMutableSlidingFrictionAcceleration()->setValue(0);
+    physics_config->getMutableRollingFrictionAcceleration()->setValue(0);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
     physics_ball.setInitialKickSpeed(velocity.length());
     physics_ball.applyBallFrictionModel(Duration::fromSeconds(1.0));
     EXPECT_TRUE(TestUtil::equalWithinTolerance(velocity, physics_ball.velocity(), 0.01));
@@ -466,7 +466,7 @@ TEST_F(PhysicsBallFrictionTest, test_rolling_friction)
     Vector velocity(3, -2);
 
     BallState initial_ball_state(position, velocity);
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
     physics_ball.setInitialKickSpeed(velocity.length());
     physics_ball.applyBallFrictionModel(Duration::fromSeconds(1.0));
     EXPECT_TRUE(TestUtil::equalWithinTolerance(Vector(1.81, -1.21),
@@ -482,7 +482,7 @@ TEST_F(PhysicsBallFrictionTest, test_sliding_friction)
     Vector velocity(3, -2);
 
     BallState initial_ball_state(position, velocity);
-    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, simulator_config);
+    auto physics_ball = PhysicsBall(world, initial_ball_state, 1.0, physics_config);
     physics_ball.setInitialKickSpeed(velocity.length());
     physics_ball.applyBallFrictionModel(Duration::fromSeconds(1.0));
     EXPECT_TRUE(TestUtil::equalWithinTolerance(Vector(1.81, -1.21),

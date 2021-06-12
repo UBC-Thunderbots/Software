@@ -10,8 +10,9 @@ class ThreadedSimulatorTest : public ::testing::Test
 {
    protected:
     ThreadedSimulatorTest()
-        : threaded_simulator(Field::createSSLDivisionBField(),
-                             std::make_shared<const SimulatorConfig>())
+        : threaded_simulator(
+              Field::createSSLDivisionBField(),
+              std::make_shared<const SimulatorConfig>(std::make_shared<PhysicsConfig>()))
     {
     }
 
@@ -192,7 +193,7 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
                {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0)));
 
     std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
     threaded_simulator.stopSimulation();
 
     // TODO: These tests are currently very lenient, and don't test final velocities.
