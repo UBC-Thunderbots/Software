@@ -187,6 +187,7 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         play_config->getShootOrPassPlayConfig()->getAbsMinPassScore()->value();
     double pass_score_ramp_down_duration =
         play_config->getShootOrPassPlayConfig()->getPassScoreRampDownDuration()->value();
+
     do
     {
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;

@@ -37,7 +37,7 @@ double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world
     // Prefer robots closer to the pass receive position
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
-    return calculateRobotCostToDestination(robot, world,
+    return 10 * calculateRobotCostToDestination(robot, world,
                                            control_params.pass->receiverPoint());
 }
 

@@ -56,8 +56,9 @@ struct AttackerFSM
                 .kick_origin    = ball_position,
                 .kick_direction = (chip_target - ball_position).orientation(),
                 .auto_chip_or_kick =
-                    AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
-                                   (chip_target - ball_position).length()}};
+                    // TODO This should be turned on after the simulated games
+                    AutoChipOrKick{AutoChipOrKickMode::OFF, 0}};
+
             if (event.control_params.shot)
             {
                 // shoot on net
@@ -80,7 +81,7 @@ struct AttackerFSM
 
                 for (const Robot& enemy : event.common.world.enemyTeam().getAllRobots())
                 {
-                    if (intersects(Circle(enemy.position(), ROBOT_MAX_RADIUS_METERS * 3),
+                    if (intersects(Circle(enemy.position(), ROBOT_MAX_RADIUS_METERS * 2),
                                    pass_segment))
                     {
                         should_chip = true;
@@ -124,12 +125,13 @@ struct AttackerFSM
             {
                 best_pass_so_far = *event.control_params.best_pass_so_far;
             }
-            else
-            {
-                // we didn't get a best_pass_so_far, so we will be using the default pass.
-                LOG(INFO) << "Attacker FSM has no best pass so far, using default pass "
-                          << "to enemy goal center.";
-            }
+            // TODO too spammy, re-enable when fixed
+            // else
+            // {
+            //     // we didn't get a best_pass_so_far, so we will be using the default pass.
+            //     LOG(INFO) << "Attacker FSM has no best pass so far, using default pass "
+            //               << "to enemy goal center.";
+            // }
 
             auto keepaway_dribble_dest =
                 findKeepAwayTargetPoint(event.common.world, best_pass_so_far);

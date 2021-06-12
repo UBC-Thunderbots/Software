@@ -24,12 +24,6 @@ void drawSSLWrapperPacket(QGraphicsScene* scene,
     {
         const auto detection = ssl_wrapper_packet.detection();
 
-        auto ball_detections = createBallDetections({detection});
-        for (const auto& ball : ball_detections)
-        {
-            drawBall(scene, ball);
-        }
-
         auto yellow_robot_detections =
             createTeamDetection({detection}, TeamColour::YELLOW);
         for (const auto& robot : yellow_robot_detections)
@@ -41,6 +35,12 @@ void drawSSLWrapperPacket(QGraphicsScene* scene,
         for (const auto& robot : blue_robot_detections)
         {
             drawRobot(scene, robot, blue_robot_color);
+        }
+
+        auto ball_detections = createBallDetections({detection});
+        for (const auto& ball : ball_detections)
+        {
+            drawBall(scene, ball);
         }
     }
 }
