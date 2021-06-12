@@ -20,7 +20,7 @@ CornerKickPlay::CornerKickPlay(std::shared_ptr<const PlayConfig> config)
 
 bool CornerKickPlay::isApplicable(const World &world) const
 {
-    return world.gameState().isOurFreeKick() ;
+    return world.gameState().isOurFreeKick();
 }
 
 bool CornerKickPlay::invariantHolds(const World &world) const

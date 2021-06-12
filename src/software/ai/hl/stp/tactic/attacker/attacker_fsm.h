@@ -57,7 +57,7 @@ struct AttackerFSM
                 .kick_direction = (chip_target - ball_position).orientation(),
                 .auto_chip_or_kick =
                     // TODO This should be turned on after the simulated games
-                    AutoChipOrKick{AutoChipOrKickMode::OFF, 0}};
+                AutoChipOrKick{AutoChipOrKickMode::OFF, 0}};
 
             if (event.control_params.shot)
             {
@@ -128,8 +128,9 @@ struct AttackerFSM
             // TODO too spammy, re-enable when fixed
             // else
             // {
-            //     // we didn't get a best_pass_so_far, so we will be using the default pass.
-            //     LOG(INFO) << "Attacker FSM has no best pass so far, using default pass "
+            //     // we didn't get a best_pass_so_far, so we will be using the default
+            //     pass. LOG(INFO) << "Attacker FSM has no best pass so far, using default
+            //     pass "
             //               << "to enemy goal center.";
             // }
 

@@ -47,7 +47,6 @@ struct PivotKickFSM
                     .final_dribble_orientation = event.control_params.kick_direction,
                     .allow_excessive_dribbling = false};
 
-                std::cout<<"get_possession_and_pivot"<<std::endl;
                 processEvent(DribbleFSM::Update(control_params, event.common));
             };
 

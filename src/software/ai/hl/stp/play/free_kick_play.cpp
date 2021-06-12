@@ -31,7 +31,7 @@ bool FreeKickPlay::invariantHolds(const World &world) const
 
 void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
-    while(true)
+    while (true)
     {
         yield({});
     }
