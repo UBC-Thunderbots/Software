@@ -368,3 +368,39 @@ TEST_F(TestThetaStarPathPlanner,
     EXPECT_EQ(2, path->getKnots().size());
     EXPECT_EQ(start, path->getStartPoint());
 }
+
+TEST_F(TestThetaStarPathPlanner,
+        test_theta_star_check_obstacle_edge)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point start{0, 3}, dest{3, 3};
+
+    std::vector<ObstaclePtr> obstacles = {
+        robot_navigation_obstacle_factory.createFromShape(Rectangle(Point(1, 3), Point(2, 0)))};
+
+    Rectangle navigable_area = field.fieldBoundary();
+
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
+
+    ASSERT_TRUE(path != std::nullopt);
+
+    checkPathDoesNotIntersectObstacle(path->getKnots(), obstacles);
+}
+
+TEST_F(TestThetaStarPathPlanner,
+        test_theta_star_path_planner_straight_line_path_slightly_grazes_obstacle)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point start{1.2299999999999995, 2.0999999999999996}, end{0, 3};
+
+    std::vector<ObstaclePtr> obstacles = {
+        robot_navigation_obstacle_factory.createFromShape(
+            Rectangle(Point(-1, 1), Point(1, 2)))};
+
+    Rectangle navigable_area = field.fieldBoundary();
+
+    auto path = planner->findPath(start, end, navigable_area, obstacles);
+
+    ASSERT_TRUE(path != std::nullopt);
+    checkPathDoesNotIntersectObstacle(path->getKnots(), obstacles);
+}

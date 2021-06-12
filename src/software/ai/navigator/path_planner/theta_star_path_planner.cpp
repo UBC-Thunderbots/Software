@@ -339,7 +339,7 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     {
         path_points.erase(path_points.begin() + 1);
     }
-
+    
     return Path(path_points);
 }
 
@@ -451,6 +451,7 @@ bool ThetaStarPathPlanner::visitNeighbours(const Coordinate &current_coord,
             // check for clipping obstacles
             if (lineOfSight(current_coord, next_coord))
             {
+                std::cout << convertCoordToPoint(next_coord) << ", ";
                 if (updateVertex(current_coord, next_coord, end_coord))
                 {
                     return true;
