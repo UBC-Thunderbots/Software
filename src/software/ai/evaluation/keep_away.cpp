@@ -14,7 +14,7 @@ double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team)
     static const auto ENEMY_REACTION_TIME = Duration::fromSeconds(0);
 
 
-    return ratePassEnemyRisk(enemy_team, pass, ENEMY_REACTION_TIME,
+    return rateKickPassEnemyRisk(enemy_team, pass, ENEMY_REACTION_TIME,
                              RECEIVER_ENEMY_PROXIMITY_IMPORTANCE) *
            (1 - calculateProximityRisk(pass.passerPoint(), enemy_team,
                                        PASSER_ENEMY_PROXIMITY_IMPORTANCE));
@@ -24,7 +24,7 @@ double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team)
 Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far)
 {
     // TODO: tweak this constant
-    static constexpr auto KEEPAWAY_SEARCH_CIRCLE_RADIUS = 0.75;
+    static constexpr auto KEEPAWAY_SEARCH_CIRCLE_RADIUS = 0.45;
 
     // the width of both the field boundary sigmoid and the circular search region sigmoid
     static constexpr auto SIGMOID_WIDTH = 0.05;
