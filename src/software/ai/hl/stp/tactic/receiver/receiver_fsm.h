@@ -199,7 +199,6 @@ struct ReceiverFSM
          * @param event ReceiverFSM::Update event
          */
         const auto update_onetouch = [this](auto event) {
-            std::cerr<<"upding onetouch"<<std::endl;
             auto best_shot = findFeasibleShot(event.common.world, event.common.robot);
             auto one_touch = getOneTouchShotPositionAndOrientation(
                 event.common.robot, event.common.world.ball(),
@@ -246,7 +245,6 @@ struct ReceiverFSM
          * @param event ReceiverFSM::Update event
          */
         const auto adjust_receive = [this](auto event) {
-            std::cerr<<"ADJUSTING RECEIVE"<<std::endl;
             auto ball      = event.common.world.ball();
             auto robot_pos = event.common.robot.position();
 
