@@ -87,7 +87,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
             if (enemy_threats.size() > 0)
             {
                 std::get<0>(shadow_enemy_tactics)
-                        ->updateControlParams(enemy_threats.at(0), ROBOT_MAX_RADIUS_METERS * 3);
+                        ->updateControlParams(enemy_threats.at(1), ROBOT_MAX_RADIUS_METERS * 3);
                 result[0].emplace_back(std::get<0>(shadow_enemy_tactics));
             } else {
                 result[0].emplace_back(move_tactics[0]);
@@ -96,7 +96,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
             if (enemy_threats.size() > 1)
             {
                 std::get<1>(shadow_enemy_tactics)
-                        ->updateControlParams(enemy_threats.at(1), ROBOT_MAX_RADIUS_METERS * 3);
+                        ->updateControlParams(enemy_threats.at(2), ROBOT_MAX_RADIUS_METERS * 3);
                 result[0].emplace_back(std::get<1>(shadow_enemy_tactics));
             } else {
                 auto nearest_enemy_robot =

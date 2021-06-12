@@ -81,35 +81,31 @@ TEST_F(DefensePlayTest, test_defense_play_one_immediate_threat)
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
                 // Wait for all robots to come to a halt
                 robotHalt(world_ptr, yield);
-                // Two robots defending close to the enemy robot performing the free kick
-                Rectangle attacker_rect(Point(-3.5, 1.25), Point(-2.75, 0.5));
+                // Attacker in front of enemy with the ball
+                Rectangle attacker_rect(Point(-2.5, 0.5), Point(-1, -0.5));
                 robotInPolygon(1, attacker_rect, world_ptr, yield);
 
-                // Two friendly robots in position to shadow enemy robots. Rectangles are
-                // chosen to be generally in the way of the the front 2 enemy robots and the
-                // enemy robot performing the free kick, based on where the enemy robots are
-                // initialized in the test.
-                Rectangle robot_four_shadowing_rect(Point(-2, 0.5), Point(-1.5, 0));
-                Rectangle robot_five_shadowing_rect(Point(-2.75, -0.5), Point(-2.25, -1));
-                robotInPolygon(4, robot_four_shadowing_rect, world_ptr, yield);
-                robotInPolygon(5, robot_five_shadowing_rect, world_ptr, yield);
+                // Two friendly robots swarming around the immediate threat
+                Rectangle swarming_rect(Point(-2, 1), Point(0, -1));
+                robotInPolygon(4, swarming_rect, world_ptr, yield);
+                robotInPolygon(5, swarming_rect, world_ptr, yield);
 
-                // Two friendly robots should be close to the goalie
+                // Two friendly crease defenders should be close to the goalie
                 Point goalie_position = world_ptr->friendlyTeam().goalie()->position();
-                Rectangle crease_defender_rect(
-                        Point(goalie_position.x() - 0.3, goalie_position.y() + 0.3),
+                Rectangle left_crease_defender_rect(
+                        Point(goalie_position.x(), goalie_position.y() + 0.3),
+                        Point(goalie_position.x() + 0.3, goalie_position.y()));
+                Rectangle right_crease_defender_rect(
+                        Point(goalie_position.x(), goalie_position.y()),
                         Point(goalie_position.x() + 0.3, goalie_position.y() - 0.3));
-                robotInPolygon(2, crease_defender_rect, world_ptr, yield);
-                robotInPolygon(3, crease_defender_rect, world_ptr, yield);
+                robotInPolygon(2, left_crease_defender_rect, world_ptr, yield);
+                robotInPolygon(3, right_crease_defender_rect, world_ptr, yield);
             }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
                 ballInPlay(world_ptr, yield);
             }};
-
-    auto mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
-    mutable_thunderbots_config->getMutablePlayConfig()->getMutableAttackerTacticConfig()->getMutableMinOpenAngleForShotDeg()->setValue(90.0);
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
@@ -139,16 +135,16 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net) {
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
                 // Wait for all robots to come to a halt
                 robotHalt(world_ptr, yield);
-                // Two robots defending close to the enemy robot performing the free kick
-                Rectangle attacker_rect(Point(-3.5, 1.25), Point(-2.75, 0.5));
+                // Attacker in front of enemy with the ball
+                Rectangle attacker_rect(Point(-3.5, 1), Point(-2.3, 0));
                 robotInPolygon(1, attacker_rect, world_ptr, yield);
 
                 // Two friendly robots in position to shadow enemy robots. Rectangles are
                 // chosen to be generally in the way of the the front 2 enemy robots and the
                 // enemy robot performing the free kick, based on where the enemy robots are
                 // initialized in the test.
-                Rectangle robot_four_shadowing_rect(Point(-2, 0.5), Point(-1.5, 0));
-                Rectangle robot_five_shadowing_rect(Point(-2.75, -0.5), Point(-2.25, -1));
+                Rectangle robot_four_shadowing_rect(Point(-2.75, -0.5), Point(-2.25, -1));
+                Rectangle robot_five_shadowing_rect(Point(-2, 0.5), Point(-1.5, 0));
                 robotInPolygon(4, robot_four_shadowing_rect, world_ptr, yield);
                 robotInPolygon(5, robot_five_shadowing_rect, world_ptr, yield);
 
