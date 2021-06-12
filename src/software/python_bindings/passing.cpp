@@ -43,7 +43,12 @@ double rateKickPassEnemyRiskWrapper(const World& world, py::dict pass_dict,
 {
     auto pass = createPassFromDict(pass_dict);
     updatePassingConfigFromDict(passing_config_dict);
-    return rateKickPassEnemyRisk(world.enemyTeam(), pass, passing_config);
+    auto enemy_reaction_time =
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
+    auto enemy_proximity_importance =
+        passing_config->getEnemyProximityImportance()->value();
+    return rateKickPassEnemyRisk(world.enemyTeam(), pass, enemy_reaction_time,
+                             enemy_proximity_importance);
 }
 
 double rateChipPassEnemyRiskWrapper(const World& world, py::dict pass_dict,

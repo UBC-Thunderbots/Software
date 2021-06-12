@@ -208,3 +208,30 @@ cc_library(
         "//software/world:robot",
     ],
 )
+
+cc_library(
+    name = "keep_away",
+    srcs = ["keep_away.cpp"],
+    hdrs = ["keep_away.h"],
+    deps = [
+        "//shared/parameter:cpp_configs",
+        "//software/ai/passing:cost_functions",
+        "//software/optimization:gradient_descent",
+        "//software/world",
+        "//software/world:ball",
+        "//software/world:field",
+        "//software/world:robot",
+    ],
+)
+
+cc_test(
+    name = "keep_away_test",
+    srcs = ["keep_away_test.cpp"],
+    deps = [
+        ":keep_away",
+        "//shared:constants",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+        "//software/world",
+    ],
+)

@@ -139,7 +139,7 @@ void FreeKickPlay::performPassStage(
     auto receiver = std::make_shared<ReceiverTactic>(pass);
     do
     {
-        attacker->updateControlParams(pass);
+        attacker->updateControlParams(pass, true);
         receiver->updateControlParams(pass);
 
         std::get<0>(crease_defender_tactics)

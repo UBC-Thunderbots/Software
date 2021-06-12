@@ -24,7 +24,10 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
         rateChipPassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
 
     double enemy_kick_pass_rating =
-        rateKickPassEnemyRisk(world.enemyTeam(), pass, passing_config);
+        rateKickPassEnemyRisk(world.enemyTeam(), pass,
+			     Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
+        		     passing_config->getEnemyProximityImportance()->value());
+
     double enemy_chip_pass_rating =
         rateChipPassEnemyRisk(world.enemyTeam(), pass, passing_config);
 
@@ -65,7 +68,9 @@ double rateZone(const World& world, const Rectangle& zone, const Point& receive_
         {
             Pass pass = Pass(Point(x, y), receive_position,
                              BALL_MAX_SPEED_METERS_PER_SECOND);
-            zone_rating += rateKickPassEnemyRisk(world.enemyTeam(), pass, passing_config)
+            zone_rating += rateKickPassEnemyRisk(world.enemyTeam(), pass,
+			     Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
+        		     passing_config->getEnemyProximityImportance()->value())
                 + rateChipPassEnemyRisk(world.enemyTeam(), pass, passing_config);
         }
     }
@@ -133,28 +138,12 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
 }
 
 double rateKickPassEnemyRisk(const Team& enemy_team, const Pass& pass,
-                             std::shared_ptr<const PassingConfig> passing_config)
+                         const Duration& enemy_reaction_time,
+                         double enemy_proximity_importance)
 {
-    double enemy_proximity_importance =
-        passing_config->getEnemyProximityImportance()->value();
-
-    // Calculate a risk score based on the distance of the enemy robots from the receive
-    // point, based on an exponential function of the distance of each robot from the
-    // receiver point
-    auto enemy_robots                    = enemy_team.getAllRobots();
-    double enemy_receiver_proximity_risk = 1;
-    for (const Robot& enemy : enemy_team.getAllRobots())
-    {
-        double dist = (pass.receiverPoint() - enemy.position()).length();
-        enemy_receiver_proximity_risk *=
-            enemy_proximity_importance * std::exp(-dist * dist);
-    }
-    if (enemy_robots.empty())
-    {
-        enemy_receiver_proximity_risk = 0;
-    }
-
-    double intercept_risk = calculateKickInterceptRisk(enemy_team, pass, passing_config);
+    double enemy_receiver_proximity_risk = calculateProximityRisk(
+        pass.receiverPoint(), enemy_team, enemy_proximity_importance);
+    double intercept_risk = calculateKickInterceptRisk(enemy_team, pass, enemy_reaction_time);
 
     // We want to rate a pass more highly if it is lower risk, so subtract from 1
     return 1 - std::max(intercept_risk, enemy_receiver_proximity_risk);
@@ -191,7 +180,7 @@ double rateChipPassEnemyRisk(const Team& enemy_team, const Pass& pass,
 }
 
 double calculateKickInterceptRisk(const Team& enemy_team, const Pass& pass,
-                                  std::shared_ptr<const PassingConfig> passing_config)
+                              const Duration& enemy_reaction_time)
 {
     // Return the highest risk for all the enemy robots, if there are any
     const std::vector<Robot>& enemy_robots = enemy_team.getAllRobots();
@@ -202,13 +191,13 @@ double calculateKickInterceptRisk(const Team& enemy_team, const Pass& pass,
     std::vector<double> enemy_intercept_risks(enemy_robots.size());
     std::transform(enemy_robots.begin(), enemy_robots.end(),
                    enemy_intercept_risks.begin(), [&](Robot robot) {
-                       return calculateKickInterceptRisk(robot, pass, passing_config);
+                       return calculateKickInterceptRisk(robot, pass, enemy_reaction_time);
                    });
     return *std::max_element(enemy_intercept_risks.begin(), enemy_intercept_risks.end());
 }
 
 double calculateKickInterceptRisk(const Robot& enemy_robot, const Pass& pass,
-                                  std::shared_ptr<const PassingConfig> passing_config)
+                              const Duration& enemy_reaction_time)
 {
     // We estimate the intercept by the risk that the robot will get to the closest
     // point on the pass before the ball, and by the risk that the robot will get to
@@ -243,9 +232,6 @@ double calculateKickInterceptRisk(const Robot& enemy_robot, const Pass& pass,
         ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
         ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
-
-    Duration enemy_reaction_time =
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
 
     double robot_ball_time_diff_at_closest_pass_point =
         ((enemy_robot_time_to_closest_pass_point + enemy_reaction_time) -
@@ -428,4 +414,24 @@ double getStaticPositionQuality(const Field& field, const Point& position,
         1 - rectangleSigmoid(field.enemyDefenseArea(), position, sig_width);
 
     return on_field_quality * near_friendly_goal_quality * in_enemy_defense_area_quality;
+}
+
+double calculateProximityRisk(const Point& point, const Team& enemy_team,
+                              double enemy_proximity_importance)
+{
+    // Calculate a risk score based on the distance of the enemy robots from the receive
+    // point, based on an exponential function of the distance of each robot from the
+    // receiver point
+    auto enemy_robots                 = enemy_team.getAllRobots();
+    double point_enemy_proximity_risk = 1;
+    for (const Robot& enemy : enemy_team.getAllRobots())
+    {
+        double dist = (point - enemy.position()).length();
+        point_enemy_proximity_risk *= enemy_proximity_importance * std::exp(-dist * dist);
+    }
+    if (enemy_robots.empty())
+    {
+        point_enemy_proximity_risk = 0;
+    }
+    return point_enemy_proximity_risk;
 }

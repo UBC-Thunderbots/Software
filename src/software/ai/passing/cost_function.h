@@ -65,7 +65,8 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
  *         be interfered with (and so is very poor)
  */
 double rateKickPassEnemyRisk(const Team& enemy_team, const Pass& pass,
-                             std::shared_ptr<const PassingConfig> passing_config);
+                         const Duration& enemy_reaction_time,
+                         double enemy_proximity_importance);
 double rateChipPassEnemyRisk(const Team& enemy_team, const Pass& pass,
                              std::shared_ptr<const PassingConfig> passing_config);
 
@@ -81,7 +82,7 @@ double rateChipPassEnemyRisk(const Team& enemy_team, const Pass& pass,
  *         pass to be intercepted
  */
 double calculateKickInterceptRisk(const Team& enemy_team, const Pass& pass,
-                                  std::shared_ptr<const PassingConfig> passing_config);
+                              const Duration& enemy_reaction_time);
 
 /**
  * Calculates the likelihood that the given pass will be intercepted by a given robot
@@ -95,7 +96,7 @@ double calculateKickInterceptRisk(const Team& enemy_team, const Pass& pass,
  *         intercepted
  */
 double calculateKickInterceptRisk(const Robot& enemy_robot, const Pass& pass,
-                                  std::shared_ptr<const PassingConfig> passing_config);
+                              const Duration& enemy_reaction_time);
 
 /**
  * Calculate the probability of a friendly robot receiving the given pass
@@ -136,3 +137,14 @@ double ratePassNextPassScore(const World& world, const Pass& pass,
  */
 double getStaticPositionQuality(const Field& field, const Point& position,
                                 std::shared_ptr<const PassingConfig> passing_config);
+
+/**
+ * Returns a function that increases as the point approaches enemy robots.
+ *
+ * @param point a Point
+ * @param enemy_team the enemy team
+ * @param enemy_proximity_importance essentially a scaling factor for the result
+ * @return a measure of how close the point is to one or more enemy robots
+ */
+double calculateProximityRisk(const Point& point, const Team& enemy_team,
+                              double enemy_proximity_importance);

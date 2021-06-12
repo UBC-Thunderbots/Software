@@ -24,6 +24,7 @@ PYTHON_BINDINGS = [
     "//software/python_bindings:pass_generator.so",
     "//software/python_bindings:passing.so",
     "//software/python_bindings:world.so",
+    "//software/python_bindings:keep_away.so",
 ]
 
 py_test(
