@@ -347,7 +347,7 @@ struct GoalieFSM
             position_to_block_s + update_e / update_position_to_block,
             panic_s + update_e[should_chip] / update_chip = chip_s,
             panic_s + update_e[panic_done] = X, panic_s + update_e / update_panic,
-            dribble_s + update_e[!ball_in_defense_area] / update_dribble, dribble_s = chip_s,
+            dribble_s + update_e[ball_in_defense_area] / update_dribble, dribble_s = chip_s,
             chip_s + update_e[should_panic] / update_panic = panic_s,
             chip_s + update_e / update_chip, chip_s = X,
             X + update_e / update_position_to_block = position_to_block_s);
