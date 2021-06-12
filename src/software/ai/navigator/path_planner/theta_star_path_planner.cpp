@@ -65,18 +65,12 @@ double ThetaStarPathPlanner::coordDistance(const Coordinate &coord1,
 
 bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord0, const Coordinate &coord1)
 {
-    unsigned int x0 = coord0.row();
-    unsigned int y0 = coord0.col();
-    unsigned int x1 = coord1.row();
-    unsigned int y1 = coord1.col();
-    std::vector<Coordinate> line_of_sight_coords;
-
-    int dy = y1 - y0;
-    int dx = x1 - x0;
+    int dy = coord1.col() - coord0.col();
+    int dx = coord1.row() - coord0.row();
 
     if (std::abs(dy) < std::abs(dx))
     {
-        if (x0 > x1)
+        if (coord0.row() > coord1.row())
         {
             return checkLineLow(coord1, coord0);
         }
@@ -87,7 +81,7 @@ bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord0, const Coordinat
     }
     else
     {
-        if (y0 > y1)
+        if (coord0.col() > coord1.col())
         {
             return checkLineHigh(coord1, coord0);
         }
@@ -139,8 +133,8 @@ bool ThetaStarPathPlanner::checkLineLow(const Coordinate &coord0,
     return true;
 }
 
-bool ThetaStarPathPlanner::checkLineHigh(const ThetaStarPathPlanner::Coordinate &coord0,
-                                         const ThetaStarPathPlanner::Coordinate &coord1)
+bool ThetaStarPathPlanner::checkLineHigh(const Coordinate &coord0,
+                                         const Coordinate &coord1)
 {
     unsigned int x0 = coord0.row();
     unsigned int y0 = coord0.col();
