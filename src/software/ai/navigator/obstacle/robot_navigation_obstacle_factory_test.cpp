@@ -306,8 +306,8 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, inflated_enemy_defens
     EXPECT_EQ(1, obstacles.size());
     try
     {
-        Polygon expected({{3.083, -1.417}, {3.083, 1.417}, {4.8, 1.417}, {4.8, -1.417}});
-        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
+        Rectangle expected(Point(3.083, -1.417), Point(4.8, 1.417));
+        auto polygon_obstacle = dynamic_cast<GeomObstacle<Rectangle>&>(*obstacles[0]);
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
     }
@@ -324,9 +324,8 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, friendly_defense_area
     EXPECT_EQ(1, obstacles.size());
     try
     {
-        Polygon expected(
-            {{-4.8, -1.117}, {-4.8, 1.117}, {-3.383, 1.117}, {-3.383, -1.117}});
-        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
+        Rectangle expected(Point(-4.8, -1.117), Point(-3.383, 1.117));
+        auto polygon_obstacle = dynamic_cast<GeomObstacle<Rectangle>&>(*obstacles[0]);
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
     }
@@ -343,8 +342,8 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_defense_area)
     EXPECT_EQ(1, obstacles.size());
     try
     {
-        Polygon expected({{3.383, -1.117}, {3.383, 1.117}, {4.8, 1.117}, {4.8, -1.117}});
-        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
+        Rectangle expected(Point(3.383, -1.117), Point(4.8, 1.117));
+        auto polygon_obstacle = dynamic_cast<GeomObstacle<Rectangle>&>(*obstacles[0]);
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
     }
@@ -361,8 +360,8 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, friendly_half)
     EXPECT_EQ(1, obstacles.size());
     try
     {
-        Polygon expected({{-4.8, -3.3}, {-4.8, 3.3}, {0.117, 3.3}, {0.117, -3.3}});
-        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
+        Rectangle expected(Point(-4.8, -3.3), Point(0.117, 3.3));
+        auto polygon_obstacle = dynamic_cast<GeomObstacle<Rectangle>&>(*obstacles[0]);
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
     }
@@ -379,8 +378,8 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_half)
     EXPECT_EQ(1, obstacles.size());
     try
     {
-        Polygon expected({{-0.117, -3.3}, {-0.117, 3.3}, {4.8, 3.3}, {4.8, -3.3}});
-        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[0]);
+        Rectangle expected(Point(-0.117, -3.3), Point(4.8, 3.3));
+        auto polygon_obstacle = dynamic_cast<GeomObstacle<Rectangle>&>(*obstacles[0]);
         std::cout << 1.0 / 1000.0 << std::endl;
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));

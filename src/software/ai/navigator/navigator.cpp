@@ -76,8 +76,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Navigator::getAssignedPrimitives(
     return std::move(primitive_set_msg);
 }
 
-std::unordered_set<PathObjective> Navigator::createPathObjectives(
-    const World &world) 
+std::unordered_set<PathObjective> Navigator::createPathObjectives(const World &world)
 {
     std::unordered_set<PathObjective> path_objectives;
     std::vector<ObstaclePtr> direct_primitive_intent_obstacles;
@@ -111,16 +110,16 @@ std::unordered_set<PathObjective> Navigator::createPathObjectives(
 
         if (robot)
         {
-        auto motion_constraint_obstacles =
-            robot_navigation_obstacle_factory.createFromMotionConstraints(
-                intent->getMotionConstraints(), world, robot->velocity().length());
-        obstacles.insert(obstacles.end(), motion_constraint_obstacles.begin(),
-                         motion_constraint_obstacles.end());
+            auto motion_constraint_obstacles =
+                robot_navigation_obstacle_factory.createFromMotionConstraints(
+                    intent->getMotionConstraints(), world, robot->velocity().length());
+            obstacles.insert(obstacles.end(), motion_constraint_obstacles.begin(),
+                             motion_constraint_obstacles.end());
 
-        if (intent->getBallCollisionType() == BallCollisionType::AVOID)
-        {
-            obstacles.push_back(ball_obstacle);
-        }
+            if (intent->getBallCollisionType() == BallCollisionType::AVOID)
+            {
+                obstacles.push_back(ball_obstacle);
+            }
 
             Point start = robot->position();
             Point end   = intent->getDestination();

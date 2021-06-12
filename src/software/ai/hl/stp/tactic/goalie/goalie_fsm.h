@@ -4,7 +4,7 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
+#include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/acute_angle.h"
@@ -148,8 +148,7 @@ struct GoalieFSM
         using namespace boost::sml;
 
         const auto panic_s             = state<PanicState>;
-        const auto dribble_s           = state<DribbleFSM>;
-        const auto chip_s              = state<ChipFSM>;
+        const auto pivot_kick_s        = state<PivotKickFSM>;
         const auto position_to_block_s = state<PositionToBlockState>;
 
         const auto update_e = event<Update>;
@@ -173,50 +172,18 @@ struct GoalieFSM
         };
 
         /**
-         * Guard that checks if the ball is moving slower than the panic threshold
-         * and is inside the friendly defense area, if true then the goalie should
-         * chip the ball out of the friendly defense area
+         * Guard that checks if the ball is moving slower than the panic threshold and is
+         * inside the no-chip rectangle, if true then the goalie should dribble the ball
          *
          * @param event GoalieFSM::Update
          *
-         * @return if the goalie should chip the ball
+         * @return if the goalie should pivot chip the ball
          */
-        const auto should_chip = [this](auto event) {
+        const auto should_pivot_chip = [this](auto event) {
             double ball_speed_panic = goalie_tactic_config->getBallSpeedPanic()->value();
-
-            // if the ball is in the "no-chip rectangle" we do not chip the ball
-            // as we risk bumping the ball into our own net trying to move behind
-            // the ball
-            auto no_chip_rectangle = getNoChipRectangle(event.common.world.field());
-
             return event.common.world.ball().velocity().length() <= ball_speed_panic &&
                    event.common.world.field().pointInFriendlyDefenseArea(
-                       event.common.world.ball().position()) &&
-                   !contains(no_chip_rectangle, event.common.world.ball().position());
-        };
-
-        /**
-         * Guard that checks if the ball is moving slower than the panic threshold
-         * or has no intersections with the friendly goal, and is inside the no-chip
-         * rectangle, if true then the goalie should dribble the ball
-         *
-         * @param event GoalieFSM::Update
-         *
-         * @return if the goalie should dribble the ball
-         */
-        const auto should_dribble = [this](auto event) {
-            double ball_speed_panic = goalie_tactic_config->getBallSpeedPanic()->value();
-            std::vector<Point> intersections =
-                getIntersectionsBetweenBallVelocityAndFullGoalSegment(
-                    event.common.world.ball(), event.common.world.field());
-            // if the ball is in the "no-chip rectangle" we do not chip the ball
-            // as we risk bumping the ball into our own net trying to move behind
-            // the ball
-            auto no_chip_rectangle = getNoChipRectangle(event.common.world.field());
-
-            return (event.common.world.ball().velocity().length() <= ball_speed_panic ||
-                    intersections.empty()) &&
-                   contains(no_chip_rectangle, event.common.world.ball().position());
+                       event.common.world.ball().position());
         };
 
         /**
@@ -262,53 +229,33 @@ struct GoalieFSM
         };
 
         /**
-         * Action that updates the ChipFSM
+         * Action that updates the PivotKickFSM
          *
          * @param event GoalieFSM::Update event
-         * @param processEvent processes the ChipFSM::Update
+         * @param processEvent processes the PivotKickFSM::Update
          */
-        const auto update_chip = [](auto event,
-                                    back::process<ChipFSM::Update> processEvent) {
-            Angle clear_direction = (event.common.world.ball().position() -
-                                     event.common.world.field().friendlyGoalCenter())
-                                        .orientation();
+        const auto update_pivot_kick =
+            [](auto event, back::process<PivotKickFSM::Update> processEvent) {
+                double clear_origin_x =
+                    getNoChipRectangle(event.common.world.field()).xMax() +
+                    ROBOT_MAX_RADIUS_METERS;
+                Point clear_origin =
+                    Point(clear_origin_x, event.common.world.ball().position().y());
 
-            ChipFSM::ControlParams control_params{
-                .chip_origin          = event.common.world.ball().position(),
-                .chip_direction       = clear_direction,
-                .chip_distance_meters = YEET_CHIP_DISTANCE_METERS};
+                Angle clear_direction = (event.common.world.ball().position() -
+                                         event.common.world.field().friendlyGoalCenter())
+                                            .orientation();
 
-            // update the chip fsm
-            processEvent(ChipFSM::Update(control_params, event.common));
-        };
+                PivotKickFSM::ControlParams control_params{
+                    .kick_origin       = clear_origin,
+                    .kick_direction    = clear_direction,
+                    .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
+                                                        YEET_CHIP_DISTANCE_METERS},
+                };
 
-        /**
-         * Action that updates the DribbleFSM
-         *
-         * @param event GoalieFSM::Update event
-         * @param processEvent processes the DribbleFSM::Update
-         */
-        const auto update_dribble = [](auto event,
-                                       back::process<DribbleFSM::Update> processEvent) {
-            double clear_origin_x =
-                getNoChipRectangle(event.common.world.field()).xMax() +
-                ROBOT_MAX_RADIUS_METERS;
-            Point clear_origin =
-                Point(clear_origin_x, event.common.world.ball().position().y());
-
-            Angle clear_direction = (event.common.world.ball().position() -
-                                     event.common.world.field().friendlyGoalCenter())
-                                        .orientation();
-
-            DribbleFSM::ControlParams control_params{
-                .dribble_destination       = clear_origin,
-                .final_dribble_orientation = clear_direction,
-                .allow_excessive_dribbling = false,
+                // update the dribble fsm
+                processEvent(PivotKickFSM::Update(control_params, event.common));
             };
-
-            // update the dribble fsm
-            processEvent(DribbleFSM::Update(control_params, event.common));
-        };
 
         /**
          * Action that updates the MoveIntent to position the goalie in the best spot to
@@ -336,20 +283,20 @@ struct GoalieFSM
         };
 
         const auto ball_in_defense_area = [this](auto event) {
-            return contains(event.common.world.field().friendlyDefenseArea(), event.common.world.ball().position());
+            return contains(event.common.world.field().friendlyDefenseArea(),
+                            event.common.world.ball().position());
         };
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *position_to_block_s + update_e[should_panic] / update_panic    = panic_s,
-            position_to_block_s + update_e[should_dribble] / update_dribble = dribble_s,
-            position_to_block_s + update_e[should_chip] / update_chip       = chip_s,
+            *position_to_block_s + update_e[should_panic] / update_panic = panic_s,
+            position_to_block_s + update_e[should_pivot_chip] / update_pivot_kick =
+                pivot_kick_s,
             position_to_block_s + update_e / update_position_to_block,
-            panic_s + update_e[should_chip] / update_chip = chip_s,
+            panic_s + update_e[should_pivot_chip] / update_pivot_kick = pivot_kick_s,
             panic_s + update_e[panic_done] = X, panic_s + update_e / update_panic,
-            dribble_s + update_e[ball_in_defense_area] / update_dribble, dribble_s = chip_s,
-            chip_s + update_e[should_panic] / update_panic = panic_s,
-            chip_s + update_e / update_chip, chip_s = X,
+            pivot_kick_s + update_e[ball_in_defense_area] / update_pivot_kick,
+            pivot_kick_s + update_e[!ball_in_defense_area] / update_position_to_block = X,
             X + update_e / update_position_to_block = position_to_block_s);
     }
 

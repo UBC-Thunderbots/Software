@@ -15,7 +15,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
-        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
+        "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
         "//software/geom:line",
         "//software/geom/algorithms",
         "//software/logger",

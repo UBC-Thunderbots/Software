@@ -76,7 +76,8 @@ double AttackerTactic::calculateRobotCost(const Robot& robot, const World& world
             robot, world,
             DribbleFSM::findInterceptionPoint(robot, world.ball(), world.field()));
     }
-    return cost;
+    // TODO HACK
+    return 10 * cost;
 }
 
 void AttackerTactic::calculateNextAction(ActionCoroutine::push_type& yield)

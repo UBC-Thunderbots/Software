@@ -68,10 +68,11 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
 }
 
 std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraints(
-    const std::set<MotionConstraint> &motion_constraints, const World &world, double robot_speed)
+    const std::set<MotionConstraint> &motion_constraints, const World &world,
+    double robot_speed)
 {
     std::vector<ObstaclePtr> obstacles;
-    if(robot_speed<0.2)
+    if (robot_speed < 0.2)
     {
         robot_radius_expansion_amount = DIST_TO_FRONT_OF_ROBOT_METERS;
     }
@@ -81,8 +82,8 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
         obstacles.insert(obstacles.end(), new_obstacles.begin(), new_obstacles.end());
     }
 
-      robot_radius_expansion_amount=config->getRobotObstacleInflationFactor()->value() *
-                                    ROBOT_MAX_RADIUS_METERS;
+    robot_radius_expansion_amount =
+        config->getRobotObstacleInflationFactor()->value() * ROBOT_MAX_RADIUS_METERS;
     return obstacles;
 }
 
@@ -202,6 +203,6 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromFieldRectangle(
     yMax =
         (yMax == field_lines.yMax()) ? field_boundary.yMax() : (yMax + expansion_amount);
 
-    return std::make_shared<GeomObstacle<Polygon>>(
+    return std::make_shared<GeomObstacle<Rectangle>>(
         Rectangle(Point(xMin, yMin), Point(xMax, yMax)));
 }

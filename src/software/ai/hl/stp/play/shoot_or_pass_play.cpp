@@ -81,8 +81,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                    << best_pass_and_score_so_far.rating;
 
         // Perform the pass and wait until the receiver is finished
-        auto receiver = std::make_shared<ReceiverTactic>(pass);
-        auto pass_eval    = pass_generator.generatePassEvaluation(world);
+        auto receiver  = std::make_shared<ReceiverTactic>(pass);
+        auto pass_eval = pass_generator.generatePassEvaluation(world);
 
         auto ranked_zones = pass_eval.rankZonesForReceiving(
             world, best_pass_and_score_so_far.pass.receiverPoint());
@@ -187,6 +187,7 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         play_config->getShootOrPassPlayConfig()->getAbsMinPassScore()->value();
     double pass_score_ramp_down_duration =
         play_config->getShootOrPassPlayConfig()->getPassScoreRampDownDuration()->value();
+
     do
     {
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
@@ -219,7 +220,8 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
 
         // We're ready to pass if we have a robot assigned in the PassGenerator as the
         // passer and the PassGenerator has found a pass above our current threshold
-        ready_to_pass = best_pass_and_score_so_far.rating > min_pass_score_threshold;
+        ready_to_pass = best_pass_and_score_so_far.rating > min_pass_score_threshold &&
+                        world.ball().velocity().length() < 1;
         // If we've assigned a robot as the passer in the PassGenerator, we lower
         // our threshold based on how long the PassGenerator as been running since
         // we set it

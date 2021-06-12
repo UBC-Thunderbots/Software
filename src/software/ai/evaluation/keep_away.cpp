@@ -14,7 +14,7 @@ double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team)
 
 
     return rateKickPassEnemyRisk(enemy_team, pass, ENEMY_REACTION_TIME,
-                             RECEIVER_ENEMY_PROXIMITY_IMPORTANCE) *
+                                 RECEIVER_ENEMY_PROXIMITY_IMPORTANCE) *
            (1 - calculateProximityRisk(pass.passerPoint(), enemy_team,
                                        PASSER_ENEMY_PROXIMITY_IMPORTANCE));
 }
