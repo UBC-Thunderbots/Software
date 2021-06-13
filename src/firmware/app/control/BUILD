@@ -75,8 +75,8 @@ cc_library(
     srcs = ["control.c"],
     hdrs = ["control.h"],
     deps = [
+        "//firmware/app/logger",
         "//firmware/app/world:force_wheel",
-        "//firmware/app/logger:logger",
         "//firmware/shared:physics",
         "//firmware/shared:util",
         "//shared:robot_constants",

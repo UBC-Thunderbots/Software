@@ -40,6 +40,7 @@ cc_binary(
         "//firmware/boards/robot_stm32h7/io:drivetrain",
         "//firmware/boards/robot_stm32h7/io:drivetrain_unit",
         "//firmware/boards/robot_stm32h7/io:gpio_pin",
+        "//firmware/boards/robot_stm32h7/io:infineon_TLE009_E1000_angle_sensor",
         "//firmware/boards/robot_stm32h7/io:network_logger",
         "//firmware/boards/robot_stm32h7/io:power_monitor",
         "//firmware/boards/robot_stm32h7/io:primitive_executor",
@@ -266,9 +267,11 @@ cc_library(
 cc_library(
     name = "dma",
     srcs = [
+        "bdma.c",
         "dma.c",
     ],
     hdrs = [
+        "bdma.h",
         "dma.h",
         "main.h",
     ],

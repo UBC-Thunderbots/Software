@@ -1,8 +1,8 @@
 #include "firmware/app/control/control.h"
 
+#include "firmware/app/logger/logger.h"
 #include "firmware/shared/physics.h"
 #include "firmware/shared/util.h"
-#include "firmware/app/logger/logger.h"
 #include "shared/constants.h"
 
 /**

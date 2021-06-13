@@ -1,8 +1,8 @@
 #include "firmware/boards/robot_stm32h7/io/vision.h"
 
-#include "FreeRTOS.h"
 #include <semphr.h>
 
+#include "FreeRTOS.h"
 #include "firmware/boards/robot_stm32h7/io/proto_multicast.h"
 #include "firmware/boards/robot_stm32h7/io/proto_multicast_communication_profile.h"
 #include "shared/proto/tbots_software_msgs.nanopb.h"
@@ -24,13 +24,13 @@ void io_vision_task(void* arg)
     for (;;)
     {
         io_proto_multicast_communication_profile_blockUntilEvents(comm_profile,
-                RECEIVED_PROTO);
+                                                                  RECEIVED_PROTO);
 
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
 
         TbotsProto_Vision vision_copy_1 =
             (*(TbotsProto_Vision*)io_proto_multicast_communication_profile_getProtoStruct(
-                                                                                          comm_profile));
+                comm_profile));
 
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
 
