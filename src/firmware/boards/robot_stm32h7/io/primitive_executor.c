@@ -56,9 +56,10 @@ void io_primitive_executor_task(void* argument)
         app_primitive_manager_runCurrentPrimitive(g_primitive_manager, g_world);
         uint32_t tick_end = osKernelGetTickCount();
 
-        if (tick_end - tick_start > TICK_TIME)
+        // TODO pull 5 into a constant
+        if (tick_end - tick_start > 5)
         {
-            TLOG_WARNING("Primitive executor falling behind!!");
+            TLOG_WARNING("Primitive executor falling behind!! %d", tick_end - tick_start);
         }
     }
 }

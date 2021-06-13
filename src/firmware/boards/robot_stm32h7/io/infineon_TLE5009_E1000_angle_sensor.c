@@ -18,7 +18,7 @@ ADC_DMA_BUFFER static uint16_t g_dma_adc_receive_buffer[RX_BUFFER_LENGTH_BYTES];
 static ADC_HandleTypeDef* g_adc_handle;
 
 volatile float past_speeds[NUM_ENCODERS] = {0};
-volatile int16_t delta_speed[NUM_ENCODERS] = {0};
+volatile float delta_speed[NUM_ENCODERS] = {0};
 volatile uint32_t last_sampled_tick_time = 0u;
 
 struct InfineonTLE5009E1000AngleSensor
@@ -35,7 +35,6 @@ struct InfineonTLE5009E1000AngleSensor
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
-    uint32_t time_elapsed = 
     SCB_InvalidateDCache_by_Addr(
         (uint32_t*)(((uint32_t)g_dma_adc_receive_buffer) & ~(uint32_t)0x1F),
         RX_BUFFER_LENGTH_BYTES + 32);
@@ -73,12 +72,12 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
     past_speeds[FRONT_LEFT] = front_left;
     past_speeds[BACK_LEFT] = back_left;
 
-    /*int front_right_int = (int)(front_right * 100);*/
-    /*int front_left_int = (int)(front_left * 100);*/
-    /*int back_right_int = (int)(back_right * 100);*/
-    /*int back_left_int = (int)(back_left * 100);*/
+    int front_right_int = (int)(front_right * 100);
+    int front_left_int = (int)(front_left * 100);
+    int back_right_int = (int)(back_right * 100);
+    int back_left_int = (int)(back_left * 100);
 
-    /*TLOG_INFO("Radians x 100: FR: %d, FL: %d, BR: %d, BL: %d", front_right_int, front_left_int, back_right_int, back_left_int);*/
+    TLOG_INFO("Radians x 100: FR: %d, FL: %d, BR: %d, BL: %d", front_right_int, front_left_int, back_right_int, back_left_int);
 }
 void HAL_ADC_ErrorCallback(ADC_HandleTypeDef* hadc) {}
 
