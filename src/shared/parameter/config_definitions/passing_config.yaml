@@ -10,7 +10,7 @@
      name: static_field_position_quality_y_offset
      min: 0
      max: 1
-     value: 0.3
+     value: 0.4
      description: >-
                 The offset from the sides of the field to place the rectangular
                 sigmoid we use to determine what areas to pass to
@@ -18,7 +18,7 @@
      name: static_field_position_quality_friendly_goal_distance_weight
      min: 0
      max: 1
-     value: 0.3
+     value: 0.1
      description: >-
          The weight that being close to the goal will have on the static
          position quality. Lower, more negative weights result in the distance
@@ -61,9 +61,23 @@
      description: >-
        How long we think the enemy will take to recognize we're passing and start
        moving to intercept
+ - double:
+     name: enemy_reaction_time_scaling_time_diff
+     min: 0
+     max: 3.0
+     value: 0.5
+     description: >-
+       Enemy reaction time will scale from 0-1 as the initial estimated time to position increases to this value
  - int:
      name: number_of_gradient_descent_steps_per_iter
      min: 0
      max: 1000
      value: 2 # TODO (#1987) find optimal iterations after tuning, for now 2 does the trick
      description: "The number of steps of gradient descent to perform in each iteration"
+
+# - int:
+#     name: ball_deceleration_m_s
+#     min: 0
+#     max: 1
+#     value: 0.1
+#     description: "An estimate of the ball's linear deceleration, used for ball prediction"

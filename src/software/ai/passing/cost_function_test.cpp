@@ -164,7 +164,7 @@ TEST_F(PassingEvaluationTest, ratePass_one_friendly_marked_and_one_friendly_free
     world.updateEnemyTeamState(enemy_team);
 
     double pass_rating = ratePass(world, pass, *entire_field, passing_config);
-    EXPECT_GE(pass_rating, 0.65);
+    EXPECT_GE(pass_rating, 0.64);
     EXPECT_LE(pass_rating, 0.9);
 }
 
@@ -374,7 +374,7 @@ TEST_F(PassingEvaluationTest, ratePass_only_passer_on_field)
     Pass pass({0, 0}, {0.1, 0.1}, avg_desired_pass_speed);
 
     double pass_rating = ratePass(world, pass, *entire_field, passing_config);
-    EXPECT_DOUBLE_EQ(0, pass_rating);
+    EXPECT_LT(pass_rating, 1e-4);
 }
 
 // TODO (#1988) renable this test once ratePass is fixed. Currently, since the
@@ -866,3 +866,70 @@ TEST_F(PassingEvaluationTest, getStaticPositionQuality_near_enemy_goal_quality)
     EXPECT_NEAR(getStaticPositionQuality(f, Point(4.4, 1.9), passing_config), 0.0, 0.1);
     EXPECT_NEAR(getStaticPositionQuality(f, Point(4.4, -1.9), passing_config), 0.0, 0.1);
 }
+
+TEST_F(PassingEvaluationTest,
+       ratePassShootScore_some_one_receiver_near_friendly_goal_other_near_enemy_goal)
+{
+    Pass pass_towards_friendly_side({0, 2.9}, {-3, 0}, passing_config->getMaxPassSpeedMPerS()->value() - 0.2);
+    Pass pass_towards_enemy_side({0, 2.9}, {3, 0}, passing_config->getMaxPassSpeedMPerS()->value() - 0.2);
+
+    World world = ::TestUtil::createBlankTestingWorld();
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+                                       Robot(1, {-3, 0}, {0, 0}, pass_towards_friendly_side.receiverOrientation(),
+                                             AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+                                       Robot(2, {3, -0.1}, {0, 0}, pass_towards_enemy_side.receiverOrientation(),
+                                             AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+                               });
+    world.updateFriendlyTeamState(friendly_team);
+    Team enemy_team(Duration::fromSeconds(10));
+    enemy_team.updateRobots({
+//                                    Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+//                                          Timestamp::fromSeconds(0)),
+                            });
+    world.updateEnemyTeamState(enemy_team);
+
+    double pass_towards_friendly_side_rating = ratePass(world, pass_towards_friendly_side, *entire_field, passing_config);
+    double pass_towards_enemy_side_rating = ratePass(world, pass_towards_enemy_side, *entire_field, passing_config);
+    EXPECT_LT(pass_towards_friendly_side_rating, pass_towards_enemy_side_rating);
+//    EXPECT_LE(pass_rating, 0.1);
+}
+
+TEST_F(PassingEvaluationTest,
+       ratePassShootScore_pass_across_vs_back_to_friendly_half)
+{
+    Pass pass_towards_friendly_side({2, 2}, {-3, 1.5}, passing_config->getMaxPassSpeedMPerS()->value());
+    Pass pass_towards_enemy_side({2, 2}, {2, -1.5}, passing_config->getMaxPassSpeedMPerS()->value() - 0.2);
+
+    World world = ::TestUtil::createBlankTestingWorld();
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+                                       Robot(1, {-3, 1.5}, {0, 0}, pass_towards_friendly_side.receiverOrientation(),
+                                             AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+                                       Robot(2, {2, -1.5}, {0, 0}, pass_towards_enemy_side.receiverOrientation(),
+                                             AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+                               });
+    world.updateFriendlyTeamState(friendly_team);
+    Team enemy_team(Duration::fromSeconds(10));
+    enemy_team.updateRobots({
+//                                    Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+//                                          Timestamp::fromSeconds(0)),
+                            });
+    world.updateEnemyTeamState(enemy_team);
+
+    double pass_towards_friendly_side_rating = ratePass(world, pass_towards_friendly_side, *entire_field, passing_config);
+    double pass_towards_enemy_side_rating = ratePass(world, pass_towards_enemy_side, *entire_field, passing_config);
+    EXPECT_LT(pass_towards_friendly_side_rating, pass_towards_enemy_side_rating);
+//    EXPECT_LE(pass_rating, 0.1);
+}
+
+
+
+
+
+
+//TEST_F(PassingEvaluationTest,
+//       estimateBallTimeToPosition)
+//{
+//    Ball ball(Point(0, 0), Vector(0, 0))
+//}
