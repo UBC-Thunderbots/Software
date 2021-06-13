@@ -13,13 +13,15 @@
 #define FRONT_LEFT 1
 #define BACK_RIGHT 2
 #define FRONT_RIGHT 3
+#define TICS_TO_S 0.000270833f
 
 ADC_DMA_BUFFER static uint16_t g_dma_adc_receive_buffer[RX_BUFFER_LENGTH_BYTES];
 static ADC_HandleTypeDef* g_adc_handle;
+static TIM_HandleTypeDef* g_timer_handle;
 
-volatile float past_speeds[NUM_ENCODERS] = {0};
-volatile float delta_speed[NUM_ENCODERS] = {0};
-volatile uint32_t last_sampled_tick_time = 0u;
+volatile float last_sample_time = 0;
+volatile float last_sampled_angles[NUM_ENCODERS] = {0};
+volatile float current_angular_speed[NUM_ENCODERS] = {0};
 
 struct InfineonTLE5009E1000AngleSensor
 {
@@ -35,6 +37,17 @@ struct InfineonTLE5009E1000AngleSensor
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
+    float timer_value = (float)__HAL_TIM_GET_COUNTER(g_timer_handle);
+
+    float elapsed_time = (float)(timer_value - last_sample_time);
+
+    if (timer_value < last_sample_time)
+    {
+        elapsed_time = (65535.0f - last_sample_time) + timer_value;
+    }
+
+    last_sample_time += elapsed_time;
+
     SCB_InvalidateDCache_by_Addr(
         (uint32_t*)(((uint32_t)g_dma_adc_receive_buffer) & ~(uint32_t)0x1F),
         RX_BUFFER_LENGTH_BYTES + 32);
@@ -62,31 +75,40 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
             (float)(g_dma_adc_receive_buffer[4] - g_dma_adc_receive_buffer[8])
     );
 
-    delta_speed[FRONT_RIGHT] = past_speeds[FRONT_RIGHT] - front_right;
-    delta_speed[BACK_RIGHT] = past_speeds[BACK_RIGHT] - back_right;
-    delta_speed[FRONT_LEFT] = past_speeds[FRONT_LEFT] - front_left;
-    delta_speed[BACK_LEFT] = past_speeds[BACK_LEFT] - back_left;
+    // clock speed 240MHz
+    // prescalar 65000
+    // counter 65535
 
-    past_speeds[FRONT_RIGHT] = front_right;
-    past_speeds[BACK_RIGHT] = back_right;
-    past_speeds[FRONT_LEFT] = front_left;
-    past_speeds[BACK_LEFT] = back_left;
+    elapsed_time *= TICS_TO_S;
 
-    int front_right_int = (int)(front_right * 100);
-    int front_left_int = (int)(front_left * 100);
-    int back_right_int = (int)(back_right * 100);
-    int back_left_int = (int)(back_left * 100);
+    current_angular_speed[FRONT_RIGHT] = (last_sampled_angles[FRONT_RIGHT] - front_right) / elapsed_time;
+    current_angular_speed[BACK_RIGHT] = (last_sampled_angles[BACK_RIGHT] - back_right) / elapsed_time;
+    current_angular_speed[FRONT_LEFT] = (last_sampled_angles[FRONT_LEFT] - front_left) / elapsed_time;
+    current_angular_speed[BACK_LEFT] =  (last_sampled_angles[BACK_LEFT] - back_left) / elapsed_time;
 
-    TLOG_INFO("Radians x 100: FR: %d, FL: %d, BR: %d, BL: %d", front_right_int, front_left_int, back_right_int, back_left_int);
+    last_sampled_angles[FRONT_RIGHT] = front_right;
+    last_sampled_angles[BACK_RIGHT] = back_right;
+    last_sampled_angles[FRONT_LEFT] = front_left;
+    last_sampled_angles[BACK_LEFT] = back_left;
+
+    int a = (int)(current_angular_speed[FRONT_RIGHT] * 100);
+    int b = (int)(current_angular_speed[BACK_RIGHT] * 100);
+    int c = (int)(current_angular_speed[FRONT_LEFT] * 100);
+    int d = (int)(current_angular_speed[BACK_LEFT] * 100);
+
+    /*TLOG_INFO("%d", (int)timer_value);*/
+    TLOG_INFO("Radians x 100: FR: %d, FL: %d, BR: %d, BL: %d", a, b, c, d);
 }
 void HAL_ADC_ErrorCallback(ADC_HandleTypeDef* hadc) {}
 
 InfineonTLE5009E1000AngleSensor_t* io_infineon_TLE5009_E1000_create(
+    TIM_HandleTypeDef* timer,
     ADC_HandleTypeDef* adc, float x_max_value, float x_min_value, float y_max_value,
     float y_min_value, float x_magnitude_45_degrees, float y_magnitude_45_degrees,
     float x_magnitude_135_degrees, float y_magnitude_135_degrees)
 {
     g_adc_handle = adc;
+    g_timer_handle = timer;
 
     if (HAL_ADC_Init(g_adc_handle) != HAL_OK)
     {
@@ -101,6 +123,11 @@ InfineonTLE5009E1000AngleSensor_t* io_infineon_TLE5009_E1000_create(
     else
     {
         TLOG_INFO("Started ADC DMA in circular mode");
+    }
+
+    if (HAL_TIM_Base_Start(g_timer_handle) != HAL_OK)
+    {
+        TLOG_FATAL("You suck, timer broken");
     }
 
     // This function intentionally uses variable names identical to the sensor data-sheet

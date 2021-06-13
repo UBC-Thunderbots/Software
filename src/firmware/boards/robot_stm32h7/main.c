@@ -231,7 +231,7 @@ int main(void)
 
     io_primitive_executor_init(world, primitive_manager);
 
-    io_infineon_TLE5009_E1000_create(&hadc3, 1.0f, 0.1f, 1.0f, 0.1f, 10.0f, 10.0f, 10.0f,
+    io_infineon_TLE5009_E1000_create(&htim6, &hadc3, 1.0f, 0.1f, 1.0f, 0.1f, 10.0f, 10.0f, 10.0f,
                                      10.0f);
 
   /* USER CODE END 2 */

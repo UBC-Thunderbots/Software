@@ -56,6 +56,7 @@ cc_library(
         "//firmware/app/logger",
         "//firmware/boards/robot_stm32h7:adc",
         "//firmware/boards/robot_stm32h7:hal",
+        "//firmware/boards/robot_stm32h7:tim",
         "//firmware/boards/robot_stm32h7:rtos",
     ],
 )

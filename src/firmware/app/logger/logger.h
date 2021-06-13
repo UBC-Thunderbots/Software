@@ -28,10 +28,10 @@ void app_logger_log(const char *file_name, unsigned line_number,
 // `__LINE__` and `__FILE__` are predefined macros that the preprocessor will replace
 // with the line number and file name of where the log is located.
 #define TLOG_DEBUG(...)                                                                  \
-    app_logger_log(__FILE__, __LINE__, TbotsProto_LogLevel_DEBUG, __VA_ARGS__)
+    app_logger_log("TODO", __LINE__, TbotsProto_LogLevel_DEBUG, __VA_ARGS__)
 #define TLOG_INFO(...)                                                                   \
-    app_logger_log(__FILE__, __LINE__, TbotsProto_LogLevel_INFO, __VA_ARGS__)
+    app_logger_log("TODO", __LINE__, TbotsProto_LogLevel_INFO, __VA_ARGS__)
 #define TLOG_WARNING(...)                                                                \
-    app_logger_log(__FILE__, __LINE__, TbotsProto_LogLevel_WARNING, __VA_ARGS__)
+    app_logger_log("TODO", __LINE__, TbotsProto_LogLevel_WARNING, __VA_ARGS__)
 #define TLOG_FATAL(...)                                                                  \
-    app_logger_log(__FILE__, __LINE__, TbotsProto_LogLevel_FATAL, __VA_ARGS__)
+    app_logger_log("TODO", __LINE__, TbotsProto_LogLevel_FATAL, __VA_ARGS__)
