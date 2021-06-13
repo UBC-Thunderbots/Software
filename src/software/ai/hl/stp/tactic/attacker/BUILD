@@ -9,11 +9,13 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
+        "//software/ai/evaluation:find_open_areas",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
         "//software/ai/passing:pass",
         "//software/logger",
+        "//software/math:math_functions",
         "//software/world:ball",
     ],
 )

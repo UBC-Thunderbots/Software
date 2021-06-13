@@ -16,6 +16,7 @@ class ShootOrPassPlayTest : public SimulatedPlayTestFixture
 
 TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
 {
+    enableVisualizer();
     BallState ball_state(Point(-4.4, 2.9), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({
         field.friendlyGoalCenter(),
@@ -23,7 +24,7 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
         Point(-2, 1.5),
         Point(-2, 0.5),
         Point(-2, -1.7),
-        Point(-2, -1.5),
+        Point(3, -1.5),
     });
     setFriendlyGoalie(0);
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
