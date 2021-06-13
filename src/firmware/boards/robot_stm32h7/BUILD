@@ -267,11 +267,9 @@ cc_library(
 cc_library(
     name = "dma",
     srcs = [
-        "bdma.c",
         "dma.c",
     ],
     hdrs = [
-        "bdma.h",
         "dma.h",
         "main.h",
     ],
