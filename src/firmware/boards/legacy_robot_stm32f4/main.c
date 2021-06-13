@@ -492,6 +492,7 @@ static void run_normal(void)
     // Setup the world that acts as the interface for the higher level firmware
     // (like primitives or the controller) to interface with the outside world
     const WheelConstants_t wheel_constants = create2015WheelConstants();
+
     ForceWheel_t* front_right_wheel        = app_force_wheel_create(
         apply_wheel_force_front_right, wheels_get_front_right_rpm,
         wheels_brake_front_right, wheels_coast_front_right, wheel_constants);
@@ -511,7 +512,9 @@ static void run_normal(void)
         chicker_auto_disarm, chicker_auto_disarm);
     Dribbler_t* dribbler =
         app_dribbler_create(dribbler_set_speed, dribbler_coast, dribbler_temperature);
+
     const RobotConstants_t robot_constants = create2015RobotConstants();
+
     ControllerState_t controller_state     = {
         .last_applied_acceleration_x       = 0,
         .last_applied_acceleration_y       = 0,
