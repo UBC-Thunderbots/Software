@@ -14,7 +14,7 @@ double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team)
 
 
     return ratePassEnemyRisk(enemy_team, pass, ENEMY_REACTION_TIME,
-                                 RECEIVER_ENEMY_PROXIMITY_IMPORTANCE) *
+                             RECEIVER_ENEMY_PROXIMITY_IMPORTANCE) *
            (1 - std::max(0., calculateProximityRisk(pass.passerPoint(), enemy_team,
                                                     PASSER_ENEMY_PROXIMITY_IMPORTANCE)));
 }
