@@ -108,7 +108,7 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
             ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::RIGHT,
                                   stop_mode);
 
-        // insert all the move tactics to the result
+        // insert all the tactics to the result
         result[0].emplace_back(std::get<0>(crease_defender_tactics));
         result[0].emplace_back(std::get<1>(crease_defender_tactics));
         result[0].insert(result[0].end(), move_tactics.begin(), move_tactics.end());
