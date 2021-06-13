@@ -4,14 +4,19 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "shared/proto/robot_log_msg.pb.h"
 #include "software/constants.h"
+#include "software/estop/boost_uart_communication.h"
+#include "software/estop/threaded_estop_reader.h"
 #include "software/logger/logger.h"
 #include "software/proto/message_translation/defending_side.h"
 #include "software/proto/message_translation/tbots_protobuf.h"
+#include "software/proto/primitive/primitive_msg_factory.h"
 #include "software/util/design_patterns/generic_factory.h"
+
 
 WifiBackend::WifiBackend(std::shared_ptr<const BackendConfig> config)
     : network_config(config->getWifiBackendConfig()->getNetworkConfig()),
       sensor_fusion_config(config->getWifiBackendConfig()->getSensorFusionConfig()),
+      arduino_config(config->getWifiBackendConfig()->getArduinoConfig()),
       ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
                        boost::bind(&Backend::receiveSSLReferee, this, _1),
                        network_config->getSslCommunicationConfig())
@@ -25,13 +30,33 @@ WifiBackend::WifiBackend(std::shared_ptr<const BackendConfig> config)
         joinMulticastChannel(new_channel, new_network_interface);
     });
 
+    // setup estop
+    boost::asio::io_service io_service;
+    std::unique_ptr<BoostUartCommunication> uart_device =
+        std::make_unique<BoostUartCommunication>(io_service, ARDUINO_BAUD_RATE,
+                                                 arduino_config->getPort()->value());
+    estop_reader = std::make_unique<ThreadedEstopReader>(std::move(uart_device), 0);
+
     // connect to current channel
     joinMulticastChannel(channel, network_interface);
 }
 
 void WifiBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
+    // check if estop has been set
+    if (estop_reader != nullptr && !estop_reader->isEstopPlay())
+    {
+        auto robot_primitives_map = primitives.mutable_robot_primitives();
+
+        // override to stop primitive
+        for (auto& primitive : *robot_primitives_map)
+        {
+            primitive.second = *createEstopPrimitive();
+        }
+    }
+
     primitive_output->sendProto(primitives);
+
 
     if (sensor_fusion_config->getOverrideGameControllerDefendingSide()->value())
     {

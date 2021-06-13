@@ -7,6 +7,23 @@ cc_library(
 )
 
 cc_library(
+    name = "angle_segment",
+    srcs = ["angle_segment.cpp"],
+    hdrs = ["angle_segment.h"],
+    deps = [
+        ":angle",
+        "//software/logger",
+    ],
+)
+
+cc_library(
+    name = "angle_map",
+    srcs = ["angle_map.cpp"],
+    hdrs = ["angle_map.h"],
+    deps = [":angle_segment"],
+)
+
+cc_library(
     name = "segment",
     srcs = ["segment.cpp"],
     hdrs = ["segment.h"],
@@ -202,6 +219,28 @@ cc_test(
     ],
     deps = [
         ":angle",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
+cc_test(
+    name = "angle_map_test",
+    srcs = [
+        "angle_map_test.cpp",
+    ],
+    deps = [
+        ":angle_map",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
+cc_test(
+    name = "angle_segment_test",
+    srcs = [
+        "angle_segment_test.cpp",
+    ],
+    deps = [
+        ":angle_segment",
         "//shared/test_util:tbots_gtest_main",
     ],
 )
