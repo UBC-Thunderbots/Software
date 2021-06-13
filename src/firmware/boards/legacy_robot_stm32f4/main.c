@@ -493,7 +493,7 @@ static void run_normal(void)
     // (like primitives or the controller) to interface with the outside world
     const WheelConstants_t wheel_constants = create2015WheelConstants();
 
-    ForceWheel_t* front_right_wheel        = app_force_wheel_create(
+    ForceWheel_t* front_right_wheel = app_force_wheel_create(
         apply_wheel_force_front_right, wheels_get_front_right_rpm,
         wheels_brake_front_right, wheels_coast_front_right, wheel_constants);
     ForceWheel_t* front_left_wheel = app_force_wheel_create(
@@ -515,7 +515,7 @@ static void run_normal(void)
 
     const RobotConstants_t robot_constants = create2015RobotConstants();
 
-    ControllerState_t controller_state     = {
+    ControllerState_t controller_state = {
         .last_applied_acceleration_x       = 0,
         .last_applied_acceleration_y       = 0,
         .last_applied_acceleration_angular = 0,
