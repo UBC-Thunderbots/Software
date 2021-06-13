@@ -13,7 +13,7 @@
 #define FRONT_LEFT 1
 #define BACK_RIGHT 2
 #define FRONT_RIGHT 3
-#define TICS_TO_S 0.000270833f
+#define TICS_TO_MS 0.270833f
 
 ADC_DMA_BUFFER static uint16_t g_dma_adc_receive_buffer[RX_BUFFER_LENGTH_BYTES];
 static ADC_HandleTypeDef* g_adc_handle;
@@ -79,7 +79,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
     // prescalar 65000
     // counter 65535
 
-    elapsed_time *= TICS_TO_S;
+    elapsed_time *= TICS_TO_MS;
 
     current_angular_speed[FRONT_RIGHT] = (last_sampled_angles[FRONT_RIGHT] - front_right) / elapsed_time;
     current_angular_speed[BACK_RIGHT] = (last_sampled_angles[BACK_RIGHT] - back_right) / elapsed_time;
