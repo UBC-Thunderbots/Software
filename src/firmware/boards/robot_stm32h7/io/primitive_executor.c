@@ -51,9 +51,14 @@ void io_primitive_executor_task(void* argument)
 
     for (;;)
     {
-        uint32_t start_ticks = HAL_GetTick();
+
+        uint32_t tick_start = osKernelGetTickCount();
         app_primitive_manager_runCurrentPrimitive(g_primitive_manager, g_world);
-        uint32_t end_ticks = HAL_GetTick();
-        osDelay(10 - (end_ticks - start_ticks));
+        uint32_t tick_end = osKernelGetTickCount();
+
+        if (tick_end - tick_start > TICK_TIME)
+        {
+            TLOG_WARNING("Primitive executor falling behind!!");
+        }
     }
 }

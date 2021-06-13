@@ -24,36 +24,35 @@
 #define __MAIN_H
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32h7xx_hal.h"
 
-    /* Private includes ----------------------------------------------------------*/
-    /* USER CODE BEGIN Includes */
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 
-    /* USER CODE END Includes */
+/* USER CODE END Includes */
 
-    /* Exported types ------------------------------------------------------------*/
-    /* USER CODE BEGIN ET */
+/* Exported types ------------------------------------------------------------*/
+/* USER CODE BEGIN ET */
 
-    /* USER CODE END ET */
+/* USER CODE END ET */
 
-    /* Exported constants --------------------------------------------------------*/
-    /* USER CODE BEGIN EC */
+/* Exported constants --------------------------------------------------------*/
+/* USER CODE BEGIN EC */
 
-    /* USER CODE END EC */
+/* USER CODE END EC */
 
-    /* Exported macro ------------------------------------------------------------*/
-    /* USER CODE BEGIN EM */
-    /* USER CODE END EM */
+/* Exported macro ------------------------------------------------------------*/
+/* USER CODE BEGIN EM */
+/* USER CODE END EM */
 
-    /* Exported functions prototypes ---------------------------------------------*/
-    void Error_Handler(void);
+/* Exported functions prototypes ---------------------------------------------*/
+void Error_Handler(void);
 
-    /* USER CODE BEGIN EFP */
+/* USER CODE BEGIN EFP */
 
     /**
      * Initializes the drivetrain
@@ -97,14 +96,14 @@ extern "C"
 #define ENCODER_BACK_LEFT_SIN_GPIO_Port GPIOF
 #define ENCODER_BACK_LEFT_COS_Pin GPIO_PIN_4
 #define ENCODER_BACK_LEFT_COS_GPIO_Port GPIOF
-#define ENCODER_FRONT_LEFT_COS_Pin GPIO_PIN_5
-#define ENCODER_FRONT_LEFT_COS_GPIO_Port GPIOF
-#define ENCODER_FRONT_LEFT_SIN_Pin GPIO_PIN_6
+#define ENCODER_FRONT_LEFT_SIN_Pin GPIO_PIN_5
 #define ENCODER_FRONT_LEFT_SIN_GPIO_Port GPIOF
-#define ENCODER_FRONT_RIGHT_COS_Pin GPIO_PIN_7
-#define ENCODER_FRONT_RIGHT_COS_GPIO_Port GPIOF
-#define ENCODER_FRONT_RIGHT_SIN_Pin GPIO_PIN_8
-#define ENCODER_FRONT_RIGHT_SIN_GPIO_Port GPIOF
+#define ENCODER_FRONT_LEFT_COS_Pin GPIO_PIN_6
+#define ENCODER_FRONT_LEFT_COS_GPIO_Port GPIOF
+#define ENCODER_BACK_RIGHT_SIN_Pin GPIO_PIN_7
+#define ENCODER_BACK_RIGHT_SIN_GPIO_Port GPIOF
+#define ENCODER_BACK_RIGHT_COS_Pin GPIO_PIN_8
+#define ENCODER_BACK_RIGHT_COS_GPIO_Port GPIOF
 #define HV_SENSE_PWR_BRD_Pin GPIO_PIN_9
 #define HV_SENSE_PWR_BRD_GPIO_Port GPIOF
 #define WHEEL_FRONT_RIGHT_FF2_Pin GPIO_PIN_10
@@ -117,10 +116,10 @@ extern "C"
 #define WHEEL_FRONT_RIGHT_DIR_GPIO_Port GPIOC
 #define RMII_MDC_Pin GPIO_PIN_1
 #define RMII_MDC_GPIO_Port GPIOC
-#define ENCODER_BACK_RIGHT_SIN_Pin GPIO_PIN_2
-#define ENCODER_BACK_RIGHT_SIN_GPIO_Port GPIOC
-#define ENCODER_BACK_RIGHT_COS_Pin GPIO_PIN_3
-#define ENCODER_BACK_RIGHT_COS_GPIO_Port GPIOC
+#define ENCODER_FRONT_RIGHT_COS_Pin GPIO_PIN_2
+#define ENCODER_FRONT_RIGHT_COS_GPIO_Port GPIOC
+#define ENCODER_FRONT_RIGHT_SIN_Pin GPIO_PIN_3
+#define ENCODER_FRONT_RIGHT_SIN_GPIO_Port GPIOC
 #define WHEEL_FRONT_RIGHT_PWM_Pin GPIO_PIN_0
 #define WHEEL_FRONT_RIGHT_PWM_GPIO_Port GPIOA
 #define RMII_REF_CLK_Pin GPIO_PIN_1
@@ -279,9 +278,9 @@ extern "C"
 #define ID_SEL_1_GPIO_Port GPIOE
 #define FAULT_PWR_BRD_Pin GPIO_PIN_1
 #define FAULT_PWR_BRD_GPIO_Port GPIOE
-    /* USER CODE BEGIN Private defines */
+/* USER CODE BEGIN Private defines */
 
-    /* USER CODE END Private defines */
+/* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }

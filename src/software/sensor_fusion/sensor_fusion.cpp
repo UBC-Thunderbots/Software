@@ -83,19 +83,10 @@ void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
             sensor_fusion_config->getPreviousRefereeCommand()->value();
         std::string current_state_string =
             sensor_fusion_config->getCurrentRefereeCommand()->value();
-        try
-        {
-            RefereeCommand previous_state =
-                fromStringToRefereeCommand(previous_state_string);
-            game_state.updateRefereeCommand(previous_state);
-            RefereeCommand current_state =
-                fromStringToRefereeCommand(current_state_string);
-            game_state.updateRefereeCommand(current_state);
-        }
-        catch (std::invalid_argument e)
-        {
-            LOG(WARNING) << e.what();
-        }
+        RefereeCommand previous_state = fromStringToRefereeCommand(previous_state_string);
+        game_state.updateRefereeCommand(previous_state);
+        RefereeCommand current_state = fromStringToRefereeCommand(current_state_string);
+        game_state.updateRefereeCommand(current_state);
     }
 }
 

@@ -50,7 +50,7 @@ extern "C"
             .wheel_rotations_per_motor_rotation = 17.0f / 60.0f,
             .wheel_radius_meters                = 0.03f,
             // TODO (#2112): update this
-            .motor_max_voltage_before_wheel_slip       = 4.25f,
+            .motor_max_voltage_before_wheel_slip       = 2.00f,
             .motor_back_emf_per_rpm                    = 1.0f / 265.0f,
             .motor_phase_resistance_ohm                = 0.942f,
             .motor_current_amp_per_torque_newton_meter = 1000.0f / 36.0f};

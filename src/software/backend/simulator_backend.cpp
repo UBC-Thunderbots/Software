@@ -66,7 +66,7 @@ void SimulatorBackend::joinMulticastChannel(int channel, const std::string& inte
         true));
 
     primitive_output.reset(new ThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(
-        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface,
+        std::string(ROBOT_MULTICAST_CHANNELS[channel]) + "%" + interface,
         PRIMITIVE_PORT, true));
 
     robot_status_input.reset(new ThreadedProtoUdpListener<TbotsProto::RobotStatus>(

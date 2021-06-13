@@ -1,8 +1,8 @@
 #include "firmware/boards/robot_stm32h7/io/vision.h"
 
-#include <semphr.h>
 
 #include "FreeRTOS.h"
+#include <semphr.h>
 #include "firmware/boards/robot_stm32h7/io/proto_multicast.h"
 #include "firmware/boards/robot_stm32h7/io/proto_multicast_communication_profile.h"
 #include "shared/proto/tbots_software_msgs.nanopb.h"

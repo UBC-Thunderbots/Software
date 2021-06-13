@@ -1,14 +1,25 @@
 #include "firmware/boards/robot_stm32h7/io/infineon_TLE5009_E1000_angle_sensor.h"
 
 #include <stdlib.h>
+#include <math.h>
 
 #include "firmware/app/logger/logger.h"
 
 #define ADC_DMA_BUFFER __attribute__((section(".dma_buffer")))
-#define RX_BUFFER_LENGTH_BYTES 16
+#define RX_BUFFER_LENGTH_BYTES 18
+#define NUM_ENCODERS 4
+
+#define BACK_LEFT 0
+#define FRONT_LEFT 1
+#define BACK_RIGHT 2
+#define FRONT_RIGHT 3
 
 ADC_DMA_BUFFER static uint16_t g_dma_adc_receive_buffer[RX_BUFFER_LENGTH_BYTES];
 static ADC_HandleTypeDef* g_adc_handle;
+
+volatile float past_speeds[NUM_ENCODERS] = {0};
+volatile int16_t delta_speed[NUM_ENCODERS] = {0};
+volatile uint32_t last_sampled_tick_time = 0u;
 
 struct InfineonTLE5009E1000AngleSensor
 {
@@ -24,10 +35,50 @@ struct InfineonTLE5009E1000AngleSensor
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
+    uint32_t time_elapsed = 
     SCB_InvalidateDCache_by_Addr(
         (uint32_t*)(((uint32_t)g_dma_adc_receive_buffer) & ~(uint32_t)0x1F),
         RX_BUFFER_LENGTH_BYTES + 32);
-    TLOG_INFO("sup %d", g_dma_adc_receive_buffer[0]);
+
+    // TODO hack remove the VREF sampling later
+    g_dma_adc_receive_buffer[8] = 32768;
+
+    float front_right = atan2f(
+            (float)(g_dma_adc_receive_buffer[1] - g_dma_adc_receive_buffer[8]),
+            (float)(g_dma_adc_receive_buffer[0] - g_dma_adc_receive_buffer[8])
+    );
+
+    float back_right = atan2f(
+            (float)(g_dma_adc_receive_buffer[5] - g_dma_adc_receive_buffer[8]),
+            (float)(g_dma_adc_receive_buffer[2] - g_dma_adc_receive_buffer[8])
+    );
+
+    float front_left = atan2f(
+            (float)(g_dma_adc_receive_buffer[6] - g_dma_adc_receive_buffer[8]),
+            (float)(g_dma_adc_receive_buffer[3] - g_dma_adc_receive_buffer[8])
+    );
+
+    float back_left = atan2f(
+            (float)(g_dma_adc_receive_buffer[7] - g_dma_adc_receive_buffer[8]),
+            (float)(g_dma_adc_receive_buffer[4] - g_dma_adc_receive_buffer[8])
+    );
+
+    delta_speed[FRONT_RIGHT] = past_speeds[FRONT_RIGHT] - front_right;
+    delta_speed[BACK_RIGHT] = past_speeds[BACK_RIGHT] - back_right;
+    delta_speed[FRONT_LEFT] = past_speeds[FRONT_LEFT] - front_left;
+    delta_speed[BACK_LEFT] = past_speeds[BACK_LEFT] - back_left;
+
+    past_speeds[FRONT_RIGHT] = front_right;
+    past_speeds[BACK_RIGHT] = back_right;
+    past_speeds[FRONT_LEFT] = front_left;
+    past_speeds[BACK_LEFT] = back_left;
+
+    /*int front_right_int = (int)(front_right * 100);*/
+    /*int front_left_int = (int)(front_left * 100);*/
+    /*int back_right_int = (int)(back_right * 100);*/
+    /*int back_left_int = (int)(back_left * 100);*/
+
+    /*TLOG_INFO("Radians x 100: FR: %d, FL: %d, BR: %d, BL: %d", front_right_int, front_left_int, back_right_int, back_left_int);*/
 }
 void HAL_ADC_ErrorCallback(ADC_HandleTypeDef* hadc) {}
 
@@ -37,16 +88,6 @@ InfineonTLE5009E1000AngleSensor_t* io_infineon_TLE5009_E1000_create(
     float x_magnitude_135_degrees, float y_magnitude_135_degrees)
 {
     g_adc_handle = adc;
-
-    g_dma_adc_receive_buffer[0] = 65535;
-    g_dma_adc_receive_buffer[1] = 65535;
-    g_dma_adc_receive_buffer[2] = 65535;
-    g_dma_adc_receive_buffer[3] = 65535;
-    g_dma_adc_receive_buffer[4] = 65535;
-    g_dma_adc_receive_buffer[5] = 65535;
-    g_dma_adc_receive_buffer[6] = 65535;
-    g_dma_adc_receive_buffer[7] = 65535;
-    g_dma_adc_receive_buffer[8] = 65535;
 
     if (HAL_ADC_Init(g_adc_handle) != HAL_OK)
     {

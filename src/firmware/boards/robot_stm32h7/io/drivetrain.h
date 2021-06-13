@@ -56,3 +56,6 @@ void io_drivetrain_coastFrontLeft(void);
 void io_drivetrain_coastFrontRight(void);
 void io_drivetrain_coastBackLeft(void);
 void io_drivetrain_coastBackRight(void);
+
+void io_drivetrain_enable(void);
+void io_drivetrain_disable(void);

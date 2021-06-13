@@ -9,7 +9,8 @@ typedef struct DrivetrainUnit DrivetrainUnit_t;
  * @param [in] motor_driver The driver attached to the motor in this drivetrain unit
  * @return The created DrivetrainUnit
  */
-DrivetrainUnit_t* io_drivetrain_unit_create(AllegroA3931MotorDriver_t* motor_driver);
+DrivetrainUnit_t* io_drivetrain_unit_create(AllegroA3931MotorDriver_t* motor_driver,
+                                            const char* drivetrain_unit_name);
 
 /**
  * Apply the given force to the given DrivetrainUnit

@@ -212,6 +212,4 @@ void app_primitive_manager_endCurrentPrimitive(PrimitiveManager_t *manager,
         manager->current_primitive_state = NULL;
         manager->current_primitive       = NULL;
     }
-
-    app_primitive_stopRobot(world, false);
 }
