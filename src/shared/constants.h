@@ -57,13 +57,14 @@ static const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
 // see https://en.wikipedia.org/wiki/Solicited-node_multicast_address for why ff02 matters
 #define MAX_MULTICAST_CHANNELS 16
 #define MULTICAST_CHANNEL_LENGTH 21
-static const char MULTICAST_CHANNELS[MAX_MULTICAST_CHANNELS][MULTICAST_CHANNEL_LENGTH] = {
-    "ff02::c3d0:42d2:bb01", "ff02::c3d0:42d2:bb02", "ff02::c3d0:42d2:bb03",
-    "ff02::c3d0:42d2:bb04", "ff02::c3d0:42d2:bb05", "ff02::c3d0:42d2:bb06",
-    "ff02::c3d0:42d2:bb07", "ff02::c3d0:42d2:bb08", "ff02::c3d0:42d2:bb09",
-    "ff02::c3d0:42d2:bb10", "ff02::c3d0:42d2:bb11", "ff02::c3d0:42d2:bb12",
-    "ff02::c3d0:42d2:bb13", "ff02::c3d0:42d2:bb14", "ff02::c3d0:42d2:bb15",
-    "ff02::c3d0:42d2:bb16",
+static const char
+    ROBOT_MULTICAST_CHANNELS[MAX_MULTICAST_CHANNELS][MULTICAST_CHANNEL_LENGTH] = {
+        "ff02::c3d0:42d2:bb01", "ff02::c3d0:42d2:bb02", "ff02::c3d0:42d2:bb03",
+        "ff02::c3d0:42d2:bb04", "ff02::c3d0:42d2:bb05", "ff02::c3d0:42d2:bb06",
+        "ff02::c3d0:42d2:bb07", "ff02::c3d0:42d2:bb08", "ff02::c3d0:42d2:bb09",
+        "ff02::c3d0:42d2:bb10", "ff02::c3d0:42d2:bb11", "ff02::c3d0:42d2:bb12",
+        "ff02::c3d0:42d2:bb13", "ff02::c3d0:42d2:bb14", "ff02::c3d0:42d2:bb15",
+        "ff02::c3d0:42d2:bb16",
 };
 
 // the port robots are listening to for vision and primitives
@@ -97,3 +98,25 @@ static const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;
 // How many robots are allowed in each division
 static const unsigned DIV_A_NUM_ROBOTS = 11;
 static const unsigned DIV_B_NUM_ROBOTS = 6;
+
+// Arduino
+
+// UART baud rate used to communicate between system and arudino
+static const long ARDUINO_BAUD_RATE = 115200;
+
+/*
+ * each estop message is one byte and is defined as follows
+ * bit 0 (least significant bit): estop state, a value of 1 is play, 0 is stop
+ * bit 1-7: set to 0
+ * any other message received is considered a EstopState::STATUS_ERROR
+ */
+static const int ESTOP_MESSAGE_SIZE_BYTES = 1;
+
+static const unsigned char ESTOP_PLAY_MSG = 1;
+static const unsigned char ESTOP_STOP_MSG = 0;
+
+// product and vendor id for Arduino Uno Rev3 (retrieved from
+// http://www.linux-usb.org/usb.ids )
+#define ARDUINO_ID_LENGTH 5
+static const char ARDUINO_VENDOR_ID[ARDUINO_ID_LENGTH]  = "2341";
+static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";

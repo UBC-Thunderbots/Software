@@ -15,4 +15,10 @@ struct TbotsGtestMain
 
     // Directory to send g3log logger logs
     static std::string logging_dir;
+
+
+    // Controls the speed of the simulated test. Values in the range [0.1,1) are the slow
+    // down factor i.e 0.1 test_speed will play test 10X slower. Values in the range (1,
+    // 10] will play test faster. Default value is 1.
+    static double test_speed;
 };

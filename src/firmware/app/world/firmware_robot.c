@@ -164,11 +164,24 @@ void velocity_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
     app_trajectory_planner_generateVelocityTrajectory(&pos_trajectory, num_elements,
                                                       &velocity_trajectory);
 
+    float global_robot_velocity[2];
+    global_robot_velocity[0] = velocity_trajectory.x_velocity[trajectory_index];
+    global_robot_velocity[1] = velocity_trajectory.y_velocity[trajectory_index];
+
+    float angle                = app_firmware_robot_getOrientation(robot);
+    float local_norm_vec[2][2] = {{cosf(angle), sinf(angle)},
+                                  {cosf(angle + P_PI / 2), sinf(angle + P_PI / 2)}};
+
+    float local_robot_velocity[2];
+    for (int i = 0; i < 2; i++)
+    {
+        local_robot_velocity[i] =
+            shared_physics_dot2D(local_norm_vec[i], global_robot_velocity);
+    }
+
     TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg;
-    control_msg.velocity.x_component_meters =
-        velocity_trajectory.x_velocity[trajectory_index];
-    control_msg.velocity.y_component_meters =
-        velocity_trajectory.y_velocity[trajectory_index];
+    control_msg.velocity.x_component_meters = local_robot_velocity[0];
+    control_msg.velocity.y_component_meters = local_robot_velocity[1];
     control_msg.angular_velocity.radians_per_second =
         velocity_trajectory.angular_velocity[trajectory_index];
 
@@ -234,7 +247,7 @@ void velocity_wheels_setLocalVelocity(
     float robot_velocity[3];
     robot_velocity[0] = linear_velocity_x;
     robot_velocity[1] = linear_velocity_y;
-    robot_velocity[2] = angular_velocity;
+    robot_velocity[2] = angular_velocity * (float)ROBOT_MAX_RADIUS_METERS;
     float wheel_velocity[4];
     shared_physics_speed3ToSpeed4(robot_velocity, wheel_velocity,
                                   robot->robot_constants.front_wheel_angle_deg,

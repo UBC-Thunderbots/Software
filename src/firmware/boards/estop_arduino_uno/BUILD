@@ -12,18 +12,12 @@ load(
     "platformio_project",
 )
 
-platformio_library(
-    name = "echo_library",
-    src = "echo_library.cc",
-    hdr = "echo_library.h",
-)
-
 platformio_project(
-    name = "example_arduino_project",
-    src = "serial_echo_example.cc",
+    name = "main",
+    src = "main.cc",
     board = "uno",
     framework = "arduino",
     deps = [
-        ":echo_library",
+        "//shared:constants_platformio",
     ],
 )
