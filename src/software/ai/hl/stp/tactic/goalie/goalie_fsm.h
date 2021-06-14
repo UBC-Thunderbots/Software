@@ -173,7 +173,7 @@ struct GoalieFSM
 
         /**
          * Guard that checks if the ball is moving slower than the panic threshold and is
-         * inside the no-chip rectangle, if true then the goalie should dribble the ball
+         * inside the defense area, if true then the goalie should dribble and chip the ball
          *
          * @param event GoalieFSM::Update
          *
