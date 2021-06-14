@@ -2,8 +2,8 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/possession.h"
+#include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/passer/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
@@ -61,19 +61,20 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
     Pass pass = setupPass(yield, world);
 
     // Perform the pass and wait until the receiver is finished
-    auto passer = std::make_shared<PasserTactic>(pass);
+    auto attacker =
+        std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
     auto receiver =
         std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(),
                                          world.enemyTeam(), pass, world.ball(), false);
 
     do
     {
-        passer->updateControlParams(pass);
+        attacker->updateControlParams(pass);
         receiver->updateControlParams(pass);
 
-        if (!passer->done())
+        if (!attacker->done())
         {
-            yield({{passer, receiver}});
+            yield({{attacker, receiver}});
         }
         else
         {

@@ -19,7 +19,7 @@ cc_test(
     srcs = ["polynomial_1d_test.cpp"],
     deps = [
         ":polynomial_1d",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -28,7 +28,7 @@ cc_test(
     srcs = ["matrix_test.cpp"],
     deps = [
         ":matrix",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -47,7 +47,7 @@ cc_test(
     srcs = ["polynomial_2d_test.cpp"],
     deps = [
         ":polynomial_2d",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -68,6 +68,6 @@ cc_test(
     srcs = ["tbots_math_test.cpp"],
     deps = [
         ":tbots_math",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )

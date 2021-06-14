@@ -39,6 +39,33 @@ cc_library(
         "//shared:constants",
         "//shared/proto:tbots_cc_proto",
         "//software:constants",
+        "//software/estop:boost_uart_communication",
+        "//software/estop:threaded_estop_reader",
+        "//software/logger",
+        "//software/networking:threaded_proto_udp_listener",
+        "//software/networking:threaded_proto_udp_sender",
+        "//software/proto:defending_side_msg_cc_proto",
+        "//software/proto/message_translation:defending_side",
+        "//software/proto/message_translation:tbots_protobuf",
+        "//software/proto/primitive:primitive_msg_factory",
+        "//software/util/design_patterns:generic_factory",
+    ],
+    # We force linking so that the static variables required for the "factory"
+    # design pattern to work are linked in
+    # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
+    alwayslink = True,
+)
+
+cc_library(
+    name = "simulator_backend",
+    srcs = ["simulator_backend.cpp"],
+    hdrs = ["simulator_backend.h"],
+    deps = [
+        ":backend",
+        ":ssl_proto_client",
+        "//shared:constants",
+        "//shared/proto:tbots_cc_proto",
+        "//software:constants",
         "//software/logger",
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",
@@ -79,6 +106,7 @@ cc_library(
     deps = [
         ":radio_backend",
         ":replay_backend",
+        ":simulator_backend",
         ":wifi_backend",
     ],
 )

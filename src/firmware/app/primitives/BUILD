@@ -74,11 +74,12 @@ cc_test(
 
 cc_library(
     name = "test_util_world",
+    testonly = True,
     hdrs = ["test_util_world.h"],
     deps = [
         ":primitive_manager",
+        "//shared/test_util:tbots_gtest_main",
         "@fff",
-        "@gtest//:gtest_main",
     ],
 )
 

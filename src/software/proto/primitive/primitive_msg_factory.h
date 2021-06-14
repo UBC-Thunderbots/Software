@@ -82,6 +82,14 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
  */
 std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast);
 
+
+/**
+ * Create a Estop Primitive Message
+ *
+ * @return Pointer to Stop Primitive Message
+ */
+std::unique_ptr<TbotsProto::Primitive> createEstopPrimitive();
+
 /**
  * Convert dribbler mode to dribbler speed
  *

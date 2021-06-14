@@ -41,12 +41,12 @@ cc_test(
     deps = [
         ":physics_simulator_ball",
         ":physics_simulator_robot",
+        "//shared/test_util:tbots_gtest_main",
         "//software/simulation/physics:physics_world",
         "//software/test_util",
         "//software/world",
         "//software/world:robot",
         "@box2d",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -75,11 +75,11 @@ cc_test(
     srcs = ["physics_simulator_ball_test.cpp"],
     deps = [
         ":physics_simulator_ball",
+        "//shared/test_util:tbots_gtest_main",
         "//software/simulation/physics:physics_ball",
         "//software/simulation/physics:physics_world",
         "//software/test_util",
         "@box2d",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -126,12 +126,12 @@ cc_test(
         "//shared/proto:tbots_cc_proto",
         "//shared/proto:tbots_nanopb_proto",
         "//shared/test_util",
+        "//shared/test_util:tbots_gtest_main",
         "//software/simulation/physics:physics_robot",
         "//software/simulation/physics:physics_world",
         "//software/test_util",
         "//software/world",
         "//software/world:robot",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -157,12 +157,12 @@ cc_test(
         ":simulator_ball",
         ":simulator_ball_singleton",
         "//firmware/app/world:firmware_ball",
+        "//shared/test_util:tbots_gtest_main",
         "//software/geom:point",
         "//software/geom:vector",
         "//software/simulation/physics:physics_world",
         "//software/time:timestamp",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -196,10 +196,10 @@ cc_test(
     srcs = ["simulator_test.cpp"],
     deps = [
         ":simulator",
+        "//shared/test_util:tbots_gtest_main",
         "//software/proto/primitive:primitive_msg_factory",
         "//software/test_util",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -219,11 +219,11 @@ cc_test(
     srcs = ["threaded_simulator_test.cpp"],
     deps = [
         ":threaded_simulator",
+        "//shared/test_util:tbots_gtest_main",
         "//software/proto/message_translation:tbots_protobuf",
         "//software/proto/primitive:primitive_msg_factory",
         "//software/test_util",
         "//software/world",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -235,6 +235,7 @@ cc_library(
         ":threaded_simulator",
         "//shared/parameter:cpp_configs",
         "//shared/proto:tbots_cc_proto",
+        "//software:constants",
         "//software/logger",
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",

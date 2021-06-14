@@ -15,7 +15,7 @@ cc_test(
     srcs = ["pass_test.cpp"],
     deps = [
         ":pass",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -23,8 +23,6 @@ cc_library(
     name = "calc_best_shot",
     srcs = [
         "calc_best_shot.cpp",
-        "calc_best_shot_impl.cpp",
-        "calc_best_shot_impl.h",
     ],
     hdrs = [
         "calc_best_shot.h",
@@ -32,6 +30,8 @@ cc_library(
     deps = [
         ":shot",
         "//shared:constants",
+        "//software/geom:angle_map",
+        "//software/geom:angle_segment",
         "//software/geom:segment",
         "//software/geom/algorithms",
         "//software/world",
@@ -41,15 +41,14 @@ cc_library(
 cc_test(
     name = "calc_best_shot_test",
     srcs = [
-        "calc_best_shot_impl.h",
         "calc_best_shot_test.cpp",
     ],
     deps = [
         ":calc_best_shot",
         ":shot",
         "//shared:constants",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -72,8 +71,8 @@ cc_test(
     deps = [
         ":deflect_off_enemy_target",
         ":shot",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -95,10 +94,10 @@ cc_test(
     deps = [
         ":detect_threat",
         ":shot",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
         "//software/time:timestamp",
         "//software/world:ball",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -123,9 +122,9 @@ cc_test(
     srcs = ["enemy_threat_test.cpp"],
     deps = [
         ":enemy_threat",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
         "//software/world:ball",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -162,8 +161,8 @@ cc_test(
     srcs = ["intercept_test.cpp"],
     deps = [
         ":intercept",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -187,8 +186,8 @@ cc_test(
     deps = [
         ":possession",
         "//shared:constants",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 

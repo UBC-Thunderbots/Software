@@ -14,10 +14,6 @@ cc_library(
         "furthest_point.cpp",
         "intersection.cpp",
         "intersects.cpp",
-        "multiple_segments.cpp",
-        "projection.cpp",
-        "projection_impl.cpp",
-        "projection_impl.h",  # Hiding implementation functions of projection
         "voronoi_diagram.cpp",
     ],
     hdrs = [
@@ -32,8 +28,6 @@ cc_library(
         "furthest_point.h",
         "intersection.h",
         "intersects.h",
-        "multiple_segments.h",
-        "projection.h",
         "voronoi_diagram.h",
     ],
     deps = [
@@ -59,7 +53,7 @@ cc_test(
     ],
     deps = [
         ":algorithms",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -70,9 +64,9 @@ cc_test(
     ],
     deps = [
         ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
         "//software/geom:rectangle",
         "//software/geom:triangle",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -83,9 +77,9 @@ cc_test(
     ],
     deps = [
         ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
         "//software/geom:rectangle",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -96,7 +90,7 @@ cc_test(
     ],
     deps = [
         ":algorithms",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -107,7 +101,7 @@ cc_test(
     ],
     deps = [
         ":algorithms",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -118,8 +112,8 @@ cc_test(
     ],
     deps = [
         ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -130,8 +124,8 @@ cc_test(
     ],
     deps = [
         ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
         "//software/geom:rectangle",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -142,8 +136,8 @@ cc_test(
     ],
     deps = [
         ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -154,8 +148,8 @@ cc_test(
     ],
     deps = [
         ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-        "@gtest//:gtest_main",
     ],
 )
 
@@ -164,7 +158,7 @@ cc_test(
     srcs = ["furthest_point_test.cpp"],
     deps = [
         ":algorithms",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -173,7 +167,7 @@ cc_test(
     srcs = ["calculate_block_cone_test.cpp"],
     deps = [
         ":algorithms",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -182,28 +176,6 @@ cc_test(
     srcs = ["acute_angle_test.cpp"],
     deps = [
         ":algorithms",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "projection_test",
-    srcs = [
-        "projection_impl.h",
-        "projection_test.cpp",
-    ],
-    deps = [
-        ":algorithms",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "multiple_segments_test",
-    srcs = ["multiple_segments_test.cpp"],
-    deps = [
-        ":algorithms",
-        "@gtest//:gtest_main",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )

@@ -19,13 +19,10 @@ SimulatedTestFixture::SimulatedTestFixture()
 
 void SimulatedTestFixture::SetUp()
 {
-    LoggerSingleton::initializeLogger(
-        thunderbots_config->getStandaloneSimulatorMainCommandLineArgs()
-            ->getLoggingDir()
-            ->value());
+    LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
 
     mutable_thunderbots_config->getMutableAiControlConfig()->getMutableRunAi()->setValue(
-        !SimulatedTestFixture::stop_ai_on_start);
+        !TbotsGtestMain::stop_ai_on_start);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always the yellow team
@@ -56,7 +53,7 @@ void SimulatedTestFixture::SetUp()
     mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableFriendlyColorYellow()
         ->setValue(true);
-    if (SimulatedTestFixture::enable_visualizer)
+    if (TbotsGtestMain::enable_visualizer)
     {
         enableVisualizer();
     }
@@ -210,8 +207,11 @@ void SimulatedTestFixture::runTest(
     const Timestamp timeout_time = simulator->getTimestamp() + timeout;
     const Duration simulation_time_step =
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
-    const Duration ai_time_step = Duration::fromSeconds(simulation_time_step.toSeconds() *
-                                                        CAMERA_FRAMES_PER_AI_TICK);
+
+
+    double speed_factor         = 1 / (TbotsGtestMain::test_speed);
+    const Duration ai_time_step = Duration::fromSeconds(
+        simulation_time_step.toSeconds() * CAMERA_FRAMES_PER_AI_TICK * speed_factor);
 
     // Tick one frame to aid with visualization
     bool validation_functions_done =

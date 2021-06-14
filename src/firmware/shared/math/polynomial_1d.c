@@ -17,7 +17,7 @@ float shared_polynomial1d_getValue(const float* coefficients,
     for (size_t order = 0; order < num_coefficients; order++)
     {
         result +=
-            (float)(coefficients[num_coefficients - 1 - order] * pow(x, (double)order));
+            (float)(coefficients[num_coefficients - 1 - order] * powf(x, (float)order));
     }
     return result;
 }
