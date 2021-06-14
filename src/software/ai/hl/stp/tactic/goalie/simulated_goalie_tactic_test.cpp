@@ -7,6 +7,7 @@
 #include "software/simulated_tests/non_terminating_validation_functions/enemy_never_scores_validation.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
+#include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_received_ball_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
@@ -143,6 +144,11 @@ TEST_F(SimulatedGoalieTacticTest, test_slow_ball_at_sharp_angle_to_friendly_goal
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             checkGoalieSuccess(5, world_ptr, yield);
+            robotInPolygon(
+                0,
+                Rectangle(world_ptr->field().friendlyNegativeYQuadrant().expand(
+                    Vector(-0.2, 0))),
+                world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
@@ -224,6 +230,38 @@ INSTANTIATE_TEST_CASE_P(
                                   Vector(0, -0.5)),
                         RobotStateWithId{
                             0, RobotState(Point(-3.5, 1), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
+
+        // ball moving out from inside defense area
+        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() +
+                                      Vector(0.5, 0),
+                                  Vector(0.5, 0)),
+                        RobotStateWithId{
+                            0, RobotState(Point(-3.5, 0), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
+
+        // ball moving into goal from inside defense area
+        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() +
+                                      Vector(0.5, 0),
+                                  Vector(-0.5, 0)),
+                        RobotStateWithId{
+                            0, RobotState(Point(-3.5, 0), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
+
+        // ball moving up and out of defense area
+        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() +
+                                      Vector(0.3, 0),
+                                  Vector(0, 1)),
+                        RobotStateWithId{
+                            0, RobotState(Point(-3.5, 0), Vector(0, 0),
+                                          Angle::fromDegrees(0), Angle::fromDegrees(0))}),
+
+        // ball moving down and out goal from defense area
+        std::make_tuple(BallState(Field::createSSLDivisionBField().friendlyGoalCenter() +
+                                      Vector(0.3, 0),
+                                  Vector(0, -0.7)),
+                        RobotStateWithId{
+                            0, RobotState(Point(-3.5, 0), Vector(0, 0),
                                           Angle::fromDegrees(0), Angle::fromDegrees(0))}),
 
         // ball slow inside no-chip rectangle
