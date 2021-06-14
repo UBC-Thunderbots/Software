@@ -95,9 +95,9 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
     const float orientation_delta =
         net_change_in_orientation + (float)revolutions_to_spin * 2.0f * (float)M_PI;
 
-    const float estimated_time_delta =
-        fmaxf(fabsf(distance_to_destination) / (float)(ROBOT_MAX_SPEED_METERS_PER_SECOND),
-              fabsf(orientation_delta) / (float)(ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND));
+    const float estimated_time_delta = fmaxf(
+        fabsf(distance_to_destination) / (float)(ROBOT_MAX_SPEED_METERS_PER_SECOND),
+        fabsf(net_change_in_orientation) / (float)(ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND));
 
     // clamp num elements between 3 and TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
     const unsigned int num_elements = (unsigned int)fmaxf(
