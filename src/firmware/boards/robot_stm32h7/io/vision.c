@@ -185,7 +185,7 @@ void io_vision_task(void* arg)
         }
         else
         {
-            osDelay(5 - (tick_end - tick_start));
+            osDelay(8 - (tick_end - tick_start));
         }
     }
 }
