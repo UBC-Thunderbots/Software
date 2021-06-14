@@ -116,9 +116,6 @@ void io_proto_multicast_listenerTask(void* communication_profile)
                              io_proto_multicast_communication_profile_getAddress(profile),
                              IP6_ADDR_ANY, NETCONN_JOIN);
 
-    // TODO: This is a hack to work with vision, this should really be user configurable
-    netconn_set_recvtimeout(conn, 5);
-
     struct netbuf* rx_buf = NULL;
     err_t network_err;
     bool no_protobuf_err;

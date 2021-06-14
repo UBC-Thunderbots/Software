@@ -95,7 +95,7 @@ const osThreadAttr_t NetStartTask_attributes = {
   .cb_size = sizeof(NetStartTaskControlBlock),
   .stack_mem = &NetStartTaskBuffer[0],
   .stack_size = sizeof(NetStartTaskBuffer),
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityHigh7,
 };
 /* Definitions for VisionMsgTask */
 osThreadId_t VisionMsgTaskHandle;
@@ -107,7 +107,7 @@ const osThreadAttr_t VisionMsgTask_attributes = {
   .cb_size = sizeof(VisionMsgTaskControlBlock),
   .stack_mem = &VisionMsgTaskBuffer[0],
   .stack_size = sizeof(VisionMsgTaskBuffer),
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityRealtime,
 };
 /* Definitions for PrimMsgTask */
 osThreadId_t PrimMsgTaskHandle;
@@ -191,7 +191,7 @@ const osThreadAttr_t PrimStarter_attributes = {
   .cb_size = sizeof(PrimStarterControlBlock),
   .stack_mem = &PrimStarterBuffer[0],
   .stack_size = sizeof(PrimStarterBuffer),
-  .priority = (osPriority_t) osPriorityHigh,
+  .priority = (osPriority_t) osPriorityRealtime,
 };
 /* Definitions for Vision */
 osThreadId_t VisionHandle;

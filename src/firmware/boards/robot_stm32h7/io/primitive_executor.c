@@ -61,5 +61,7 @@ void io_primitive_executor_task(void* argument)
         {
             TLOG_WARNING("Primitive executor falling behind!! %d", tick_end - tick_start);
         }
+
+        osDelay(5 - (tick_end - tick_start));
     }
 }

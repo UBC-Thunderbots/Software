@@ -94,14 +94,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
     g_last_sampled_angles[BACK_RIGHT] = back_right;
     g_last_sampled_angles[FRONT_LEFT] = front_left;
     g_last_sampled_angles[BACK_LEFT] = back_left;
-
-    int a = (int)(g_current_angular_speed[FRONT_RIGHT] * 100);
-    int b = (int)(g_current_angular_speed[BACK_RIGHT] * 100);
-    int c = (int)(g_current_angular_speed[FRONT_LEFT] * 100);
-    int d = (int)(g_current_angular_speed[BACK_LEFT] * 100);
-
-    /*TLOG_INFO("%d", (int)timer_value);*/
-    TLOG_INFO("Radians x 100: FR: %d, FL: %d, BR: %d, BL: %d", a, b, c, d);
 }
 
 static SemaphoreHandle_t vision_mutex;
@@ -136,6 +128,7 @@ void io_vision_init(TIM_HandleTypeDef* timer,
 
     static StaticSemaphore_t primitive_mutex_storage;
     static StaticSemaphore_t dead_reckoning_mutex_storage;
+
     vision_mutex = xSemaphoreCreateMutexStatic(&primitive_mutex_storage);
     dead_reckoning_mutex = xSemaphoreCreateMutexStatic(&dead_reckoning_mutex_storage);
 
@@ -156,33 +149,44 @@ void io_vision_task(void* arg)
     ProtoMulticastCommunicationProfile_t* comm_profile =
         (ProtoMulticastCommunicationProfile_t*)arg;
 
+    TbotsProto_Vision vision_copy;
+
     for (;;)
     {
-        uint32_t event = io_proto_multicast_communication_profile_blockUntilEvents(comm_profile,
-                                                                  RECEIVED_PROTO || RECEIVE_TIMEOUT);
+        uint32_t tick_start = osKernelGetTickCount();
 
-        if(event == RECEIVED_PROTO)
-        {
-                io_proto_multicast_communication_profile_acquireLock(comm_profile);
+        io_proto_multicast_communication_profile_acquireLock(comm_profile);
 
-                TbotsProto_Vision vision_copy_1 =
-                    (*(TbotsProto_Vision*)io_proto_multicast_communication_profile_getProtoStruct(
+        vision_copy = (*(TbotsProto_Vision*)io_proto_multicast_communication_profile_getProtoStruct(
                         comm_profile));
 
-                io_proto_multicast_communication_profile_releaseLock(comm_profile);
+        io_proto_multicast_communication_profile_releaseLock(comm_profile);
 
-                // only update vision if we have atleast 1 robot state
-                if (vision_copy_1.robot_states_count == 1)
-                {
-                    io_lock_vision();
-                    vision = vision_copy_1;
-                    io_unlock_vision();
-                }
-
-                io_vision_applyVisionFrameToDeadReckoning(0);
+        if(memcmp(&vision_copy, &vision, sizeof(vision_copy)) != 0)
+        {
+            // only update vision if we have atleast 1 robot state
+            if (vision_copy.robot_states_count == 1)
+            {
+                io_lock_vision();
+                vision = vision_copy;
+                io_unlock_vision();
+            }
+            io_vision_applyVisionFrameToDeadReckoning(0);
         }
 
         io_vision_stepDeadReckoning();
+
+        uint32_t tick_end = osKernelGetTickCount();
+
+        // TODO pull 5 into a constant
+        if (tick_end - tick_start > 8)
+        {
+            TLOG_WARNING("Vision (dead reckoning) falling behind!! %d", tick_end - tick_start);
+        }
+        else
+        {
+            osDelay(5 - (tick_end - tick_start));
+        }
     }
 }
 
@@ -274,9 +278,9 @@ void io_vision_stepDeadReckoning()
     g_current_state.avel = wheel_speeds[2];
 
     // Update position by integrating velocities
-    g_current_state.x += g_current_state.vx * TICK_TIME;
-    g_current_state.y += g_current_state.vy * TICK_TIME;
-    g_current_state.angle += g_current_state.avel * TICK_TIME;
+    g_current_state.x += g_current_state.vx * DEAD_RECKONING_TICK_TIME_MS;
+    g_current_state.y += g_current_state.vy * DEAD_RECKONING_TICK_TIME_MS;
+    g_current_state.angle += g_current_state.avel * DEAD_RECKONING_TICK_TIME_MS;
 
     if (g_current_state.angle > P_PI)
     {
@@ -289,8 +293,14 @@ void io_vision_stepDeadReckoning()
     }
 
     // Update ball positions
-    g_current_ball_state.x += g_current_ball_state.vx * TICK_TIME;
-    g_current_ball_state.y += g_current_ball_state.vy * TICK_TIME;
+    g_current_ball_state.x += g_current_ball_state.vx * DEAD_RECKONING_TICK_TIME_MS;
+    g_current_ball_state.y += g_current_ball_state.vy * DEAD_RECKONING_TICK_TIME_MS;
+
+    TLOG_INFO("dead reckoning %d %d %d",
+             (int)(g_current_state.x * 100),
+             (int)(g_current_state.y * 100),
+             (int)(g_current_state.angle * 100)
+    );
 }
 
 void io_lock_vision()
