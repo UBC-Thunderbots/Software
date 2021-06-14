@@ -58,7 +58,7 @@ jobs:
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
           "${GITHUB_WORKSPACE}"/environment_setup/setup_firmware.sh
 
-          # Disable since it updater fails
+          # TODO (#2144): renable STM32CubeMX Code Generation check
           #      - name: STM32CubeMX Code Generation
           #        run: |
           #          "${GITHUB_WORKSPACE}"/.github/check_cubemx_ci.sh
