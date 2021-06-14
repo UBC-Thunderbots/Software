@@ -5,9 +5,9 @@ set -e
 
 # download version 6.2.0 (change the following three variables to change versions)
 CUBE_VERSION="6.2.0"
-CUBE_ZIP_FILENAME="en.stm32cubemx-lin_v6-2-0.zip"
 
 # The original zip file can be found here: https://www.st.com/en/development-tools/stm32cubemx.html
+# It was installed locally and opened once (to get updates) and then zipped up (See install_cubemx_from_source.sh)
 # It was split using `split --bytes=49M zip_file`
 
 CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
@@ -28,40 +28,19 @@ else
     mkdir -p $CUBEMX_TMP_DIR
     cd $CUBEMX_TMP_DIR
 
-    # create auto install xml
-    AUTO_INSTALL_XML="
-        <?xml version='1.0' encoding='UTF-8' standalone='no'?>
-        <AutomatedInstallation langpack='eng'>
-            <com.st.microxplorer.install.MXHTMLHelloPanel id='readme'/>
-            <com.st.microxplorer.install.MXLicensePanel id='licence.panel'/>
-            <com.st.microxplorer.install.MXTargetPanel id='target.panel'>
-            <installpath>$CUBEMX_INSTALL_DIR</installpath>
-            </com.st.microxplorer.install.MXTargetPanel>
-            <com.st.microxplorer.install.MXShortcutPanel id='shortcut.panel'/>
-            <com.st.microxplorer.install.MXInstallPanel id='install.panel'/>
-            <com.st.microxplorer.install.MXFinishPanel id='finish.panel'/>
-        </AutomatedInstallation>"
-    
-    echo -n $AUTO_INSTALL_XML > auto-install.xml
-
-    # create script to cd and run STM32CubeMX
-    echo -n $'#!/bin/bash \n\n ' > cuberunner.sh
-    echo -n "pushd /opt/STM32CubeMX_$CUBE_VERSION && ./STM32CubeMX && popd" >> cuberunner.sh
-    
     cp $CURR_DIR/stm32cubemx-6.2.0/* .
-    cat x* > en.stm32cubemx-lin_v6-2-0.zip
+    cat x* > STM32CubeMX_$CUBE_VERSION.zip
 
-    if ! unzip $CUBE_ZIP_FILENAME ; then
+    if ! unzip STM32CubeMX_$CUBE_VERSION.zip ; then
         echo "##############################################################"
         echo "Error: Installing CubeMX failed"
-        echo "Could not unzip $CUBE_ZIP_FILENAME"
+        echo "Could not unzip STM32CubeMX_$CUBE_VERSION.zip"
         echo "##############################################################"
         exit 1
     fi
-    
-    sudo java -jar ./SetupSTM32CubeMX-$CUBE_VERSION auto-install.xml
-    sudo cp ./cuberunner.sh /opt/STM32CubeMX_$CUBE_VERSION/cuberunner.sh
 
+    sudo cp -r STM32CubeMX_$CUBE_VERSION $CUBEMX_INSTALL_DIR
+    
     sudo chmod 777 -R /opt/STM32CubeMX_$CUBE_VERSION
 
     cd $CUBEMX_INSTALL_DIR
