@@ -59,6 +59,15 @@ std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast)
     return stop_primitive_msg;
 }
 
+std::unique_ptr<TbotsProto::Primitive> createEstopPrimitive()
+{
+    auto estop_primitive_msg = std::make_unique<TbotsProto::Primitive>();
+
+    estop_primitive_msg->mutable_estop();
+
+    return estop_primitive_msg;
+}
+
 double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode)
 {
     switch (dribbler_mode)

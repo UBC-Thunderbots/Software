@@ -14,6 +14,7 @@ class SimulatorTest : public ::testing::Test
         simulator_config = std::make_shared<const SimulatorConfig>();
         simulator        = std::make_shared<Simulator>(Field::createSSLDivisionBField(),
                                                 simulator_config);
+        simulator->resetCurrentFirmwareTime();
     }
 
     std::shared_ptr<Simulator> simulator;

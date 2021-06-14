@@ -235,6 +235,7 @@ cc_library(
         ":threaded_simulator",
         "//shared/parameter:cpp_configs",
         "//shared/proto:tbots_cc_proto",
+        "//software:constants",
         "//software/logger",
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",

@@ -101,7 +101,7 @@ const double ANGLE_TO_ROBOT_BACK_WHEELS_DEG  = 136.04;
 // see https://en.wikipedia.org/wiki/Solicited-node_multicast_address for why ff02 matters
 #define MAX_MULTICAST_CHANNELS 16
 #define MULTICAST_CHANNEL_LENGTH 21
-const char MULTICAST_CHANNELS[MAX_MULTICAST_CHANNELS][MULTICAST_CHANNEL_LENGTH] = {
+const char ROBOT_MULTICAST_CHANNELS[MAX_MULTICAST_CHANNELS][MULTICAST_CHANNEL_LENGTH] = {
     "ff02::c3d0:42d2:bb01", "ff02::c3d0:42d2:bb02", "ff02::c3d0:42d2:bb03",
     "ff02::c3d0:42d2:bb04", "ff02::c3d0:42d2:bb05", "ff02::c3d0:42d2:bb06",
     "ff02::c3d0:42d2:bb07", "ff02::c3d0:42d2:bb08", "ff02::c3d0:42d2:bb09",
@@ -141,3 +141,26 @@ const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;
 // How many robots are allowed in each division
 const unsigned DIV_A_NUM_ROBOTS = 11;
 const unsigned DIV_B_NUM_ROBOTS = 6;
+
+
+// Arduino
+
+// UART baud rate used to communicate between system and arudino
+const long ARDUINO_BAUD_RATE = 115200;
+
+/*
+ * each estop message is one byte and is defined as follows
+ * bit 0 (least significant bit): estop state, a value of 1 is play, 0 is stop
+ * bit 1-7: set to 0
+ * any other message received is considered a EstopState::STATUS_ERROR
+ */
+const int ESTOP_MESSAGE_SIZE_BYTES = 1;
+
+const unsigned char ESTOP_PLAY_MSG = 1;
+const unsigned char ESTOP_STOP_MSG = 0;
+
+// product and vendor id for Arduino Uno Rev3 (retrieved from
+// http://www.linux-usb.org/usb.ids )
+#define ARDUINO_ID_LENGTH 5
+const char ARDUINO_VENDOR_ID[ARDUINO_ID_LENGTH]  = "2341";
+const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";

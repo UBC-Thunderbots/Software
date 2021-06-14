@@ -16,3 +16,17 @@
     description: >-
         The directory to output logs to. Absolute paths are recommended as the working directory
         is inside the bazel-out directory.
+
+- double:
+    name: test_speed
+    value: 1.0
+    min: 0.1
+    max: 10.0
+    description: >-
+        The speed adjustment factor. Values in the range [0.1, 1) will play the test slower than realtime,
+        and values in the range (1, 10] will play the test faster than realtime i.e. 0.1 would be 10X slower
+        than realtime, and 10 would be 10X faster than realtime. Default value is 1.
+
+
+
+
