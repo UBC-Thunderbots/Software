@@ -11,7 +11,7 @@ static const double BALL_MAX_SPEED_METERS_PER_SECOND = 6.5;
 // The max allowed height of the robots, in metres
 static const double ROBOT_MAX_HEIGHT_METERS = 0.15;
 // The max allowed radius of the robots, in metres
-static const double ROBOT_MAX_RADIUS_METERS = 0.09;
+static const float ROBOT_MAX_RADIUS_METERS = 0.09f;
 // The distance from the center of the robot to the front face (the flat part), in meters
 static const double DIST_TO_FRONT_OF_ROBOT_METERS = 0.07;
 // The approximate radius of the ball according to the SSL rulebook

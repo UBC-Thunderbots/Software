@@ -96,6 +96,18 @@ filegroup(
     ],
 )
 
+cc_library(
+    name = "circular_buffer",
+    srcs = [
+        "util/circbuff.c"
+    ],
+    hdrs = [
+        "util/circbuff.h"
+    ],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+)
+
+
 legacy_shared_libs(
     name = "legacy_shared_libs",
     freertos_config_headers = ":freertos_config_headers",

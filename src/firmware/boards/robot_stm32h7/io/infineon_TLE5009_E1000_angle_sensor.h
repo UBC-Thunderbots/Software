@@ -1,10 +1,6 @@
 #pragma once
 
 #include <math.h>
-
-#include "firmware/boards/robot_stm32h7/adc.h"
-#include "firmware/boards/robot_stm32h7/tim.h"
-
 /**
  * This file is an abstraction around the Infineon TLE5009 E1000 GMR angle sensor
  *
@@ -14,8 +10,6 @@
  */
 
 typedef struct InfineonTLE5009E1000AngleSensor InfineonTLE5009E1000AngleSensor_t;
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc);
-void HAL_ADC_ErrorCallback(ADC_HandleTypeDef* hadc);
 
 /**
  * Creates an Infineon TLE5009 E1000 abstraction given the calibration parameters
@@ -44,8 +38,8 @@ void HAL_ADC_ErrorCallback(ADC_HandleTypeDef* hadc);
  * @return Infineon TLE5009E1000 abstraction
  */
 InfineonTLE5009E1000AngleSensor_t* io_infineon_TLE5009_E1000_create(
-    TIM_HandleTypeDef* timer, ADC_HandleTypeDef* adc, float x_max_value, float x_min_value, float y_max_value,
-    float y_min_value, float x_magnitude_45_degrees, float y_magnitude_45_degrees,
+    float x_max_value, float x_min_value, float y_max_value, float y_min_value,
+    float x_magnitude_45_degrees, float y_magnitude_45_degrees,
     float x_magnitude_135_degrees, float y_magnitude_135_degrees);
 
 /**

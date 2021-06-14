@@ -140,6 +140,7 @@
 #define IP6_DEBUG LWIP_DBG_ON
 /*-----------------------------------------------------------------------------*/
 /* USER CODE BEGIN 1 */
+#define LWIP_SO_RCVTIMEO 1
 
 /* USER CODE END 1 */
 

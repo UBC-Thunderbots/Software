@@ -1,9 +1,9 @@
 #include "circbuff.h"
 
 
-static unsigned int pos = 0;  // Keeps track of the latest element in the queue
+static int pos = 0;  // Keeps track of the latest element in the queue
 
-void circbuff_init(wheel_speeds_t queue[], unsigned int queueSize)
+void circbuff_init(wheel_speeds_t queue[], int queueSize)
 {
     wheel_speeds_t zero;
     zero.speed_x     = 0.0;
@@ -16,7 +16,7 @@ void circbuff_init(wheel_speeds_t queue[], unsigned int queueSize)
     }
 }
 
-void add_to_circ_buff(wheel_speeds_t queue[], unsigned int queueSize,
+void add_to_circ_buff(wheel_speeds_t queue[], int queueSize,
                       wheel_speeds_t value)
 {
     // If the stop pointer has made it all the way to the start pointer, we have added
@@ -30,8 +30,8 @@ void add_to_circ_buff(wheel_speeds_t queue[], unsigned int queueSize,
     queue[pos] = value;
 }
 
-wheel_speeds_t get_from_circ_buff(wheel_speeds_t queue[], unsigned int queueSize,
-                                  unsigned int index)
+wheel_speeds_t get_from_circ_buff(wheel_speeds_t queue[], int queueSize,
+                                  int index)
 {
     // Get array index of required element
     int idx = pos - index;

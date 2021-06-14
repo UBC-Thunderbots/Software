@@ -351,7 +351,7 @@ void initIoNetworking(void)
 
     // Initialize network logger
     io_network_logger_init(RobotLogProtoQHandle);
-    io_vision_init();
+    io_vision_init(&htim6, &hadc3);
 }
 
 void initIoDrivetrain(void)

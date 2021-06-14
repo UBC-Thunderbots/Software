@@ -11,6 +11,9 @@
 #include "shared/constants.h"
 #include "util/circbuff.h"
 
+#define SPEED_SIZE 100
+#define BASE_CAMERA_DELAY 3
+
 static dr_data_t current_state;
 static dr_ball_data_t current_ball_state;
 

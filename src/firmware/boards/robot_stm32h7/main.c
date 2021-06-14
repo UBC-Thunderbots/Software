@@ -46,7 +46,6 @@
 #include "firmware/boards/robot_stm32h7/io/chicker.h"
 #include "firmware/boards/robot_stm32h7/io/dribbler.h"
 #include "firmware/boards/robot_stm32h7/io/drivetrain.h"
-#include "firmware/boards/robot_stm32h7/io/infineon_TLE5009_E1000_angle_sensor.h"
 #include "firmware/boards/robot_stm32h7/io/power_monitor.h"
 #include "firmware/boards/robot_stm32h7/io/primitive_executor.h"
 #include "firmware/boards/robot_stm32h7/io/uart_logger.h"
@@ -230,9 +229,6 @@ int main(void)
     PrimitiveManager_t *primitive_manager = app_primitive_manager_create();
 
     io_primitive_executor_init(world, primitive_manager);
-
-    io_infineon_TLE5009_E1000_create(&htim6, &hadc3, 1.0f, 0.1f, 1.0f, 0.1f, 10.0f, 10.0f, 10.0f,
-                                     10.0f);
 
   /* USER CODE END 2 */
 
