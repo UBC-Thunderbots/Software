@@ -105,7 +105,7 @@ TEST_F(PrimitiveFactoryTest, test_create_stop_primitive_coast)
     EXPECT_EQ(stop_primitive->stop().stop_type(), TbotsProto::StopPrimitive::COAST);
 }
 
-TEST(PrimitiveFactoryTest, test_create_estop_primitive)
+TEST_F(PrimitiveFactoryTest, test_create_estop_primitive)
 {
     auto Estop_primitive = createEstopPrimitive();
 

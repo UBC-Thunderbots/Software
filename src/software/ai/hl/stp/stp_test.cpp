@@ -175,10 +175,12 @@ TEST_F(STPTest, test_get_play_info)
     expected_referee_command                                  = "HALT";
     expected_play_name                                        = "HaltTestPlay";
     std::vector<std::string> expected_robot_tactic_assignment = {
-        "Robot 0  -  StopTestTactic", "Robot 1  -  StopTestTactic"};
+        "Robot 1  -  StopTestTactic", "Robot 0  -  StopTestTactic"};
     PlayInfo expected_play_info = PlayInfo(expected_referee_command, expected_play_name,
                                            expected_robot_tactic_assignment);
     EXPECT_EQ(play_info.getRefereeCommandName(), expected_referee_command);
     EXPECT_EQ(play_info.getPlayName(), expected_play_name);
+    EXPECT_EQ(play_info.getRobotTacticAssignment(),
+              expected_play_info.getRobotTacticAssignment());
     EXPECT_EQ(play_info, expected_play_info);
 }
