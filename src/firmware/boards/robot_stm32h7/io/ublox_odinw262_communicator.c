@@ -98,7 +98,7 @@ void io_ublox_odinw262_communicator_connectToWiFi(void)
     io_ublox_odinw262_communicator_sendATCommand("AT+UBRGC=0,107,0\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UBRGCA=0,3\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=0,0\r");
-    io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=1,0\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=1,1\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=2,0\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=3,0\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UETHC=5,3\r");
@@ -111,6 +111,8 @@ void io_ublox_odinw262_communicator_connectToWiFi(void)
     io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,300,0\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UWSC=0,301,0\r");
     io_ublox_odinw262_communicator_sendATCommand("AT+UWSCA=0,3\r");
+    io_ublox_odinw262_communicator_sendATCommand("AT+UWCFG=1,0\r");
+
 }
 
 void io_ublox_odinw262_communicator_handleIdleLine()

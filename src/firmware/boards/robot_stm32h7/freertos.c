@@ -95,7 +95,7 @@ const osThreadAttr_t NetStartTask_attributes = {
   .cb_size = sizeof(NetStartTaskControlBlock),
   .stack_mem = &NetStartTaskBuffer[0],
   .stack_size = sizeof(NetStartTaskBuffer),
-  .priority = (osPriority_t) osPriorityHigh7,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for VisionMsgTask */
 osThreadId_t VisionMsgTaskHandle;
@@ -107,7 +107,7 @@ const osThreadAttr_t VisionMsgTask_attributes = {
   .cb_size = sizeof(VisionMsgTaskControlBlock),
   .stack_mem = &VisionMsgTaskBuffer[0],
   .stack_size = sizeof(VisionMsgTaskBuffer),
-  .priority = (osPriority_t) osPriorityRealtime,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for PrimMsgTask */
 osThreadId_t PrimMsgTaskHandle;
@@ -143,7 +143,7 @@ const osThreadAttr_t RobotLogMsgSend_attributes = {
   .cb_size = sizeof(RobotLogMsgSendControlBlock),
   .stack_mem = &RobotLogMsgSendBuffer[0],
   .stack_size = sizeof(RobotLogMsgSendBuffer),
-  .priority = (osPriority_t) osPriorityBelowNormal1,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for NetworkRobotLog */
 osThreadId_t NetworkRobotLogHandle;
@@ -155,7 +155,7 @@ const osThreadAttr_t NetworkRobotLog_attributes = {
   .cb_size = sizeof(NetworkRobotLogControlBlock),
   .stack_mem = &NetworkRobotLogBuffer[0],
   .stack_size = sizeof(NetworkRobotLogBuffer),
-  .priority = (osPriority_t) osPriorityBelowNormal,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for RobotStatusSend */
 osThreadId_t RobotStatusSendHandle;
@@ -179,7 +179,7 @@ const osThreadAttr_t PrimExectuor_attributes = {
   .cb_size = sizeof(PrimExectuorControlBlock),
   .stack_mem = &PrimExectuorBuffer[0],
   .stack_size = sizeof(PrimExectuorBuffer),
-  .priority = (osPriority_t) osPriorityRealtime,
+  .priority = (osPriority_t) osPriorityNormal1,
 };
 /* Definitions for PrimStarter */
 osThreadId_t PrimStarterHandle;
@@ -191,7 +191,7 @@ const osThreadAttr_t PrimStarter_attributes = {
   .cb_size = sizeof(PrimStarterControlBlock),
   .stack_mem = &PrimStarterBuffer[0],
   .stack_size = sizeof(PrimStarterBuffer),
-  .priority = (osPriority_t) osPriorityRealtime,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for Vision */
 osThreadId_t VisionHandle;
@@ -203,7 +203,7 @@ const osThreadAttr_t Vision_attributes = {
   .cb_size = sizeof(VisionControlBlock),
   .stack_mem = &VisionBuffer[0],
   .stack_size = sizeof(VisionBuffer),
-  .priority = (osPriority_t) osPriorityRealtime1,
+  .priority = (osPriority_t) osPriorityNormal2,
 };
 /* Definitions for RobotLogProtoQ */
 osMessageQueueId_t RobotLogProtoQHandle;
