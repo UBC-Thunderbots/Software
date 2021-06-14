@@ -18,7 +18,7 @@
 // so that the axes would never have to compete for resources
 #define TIME_HORIZON (0.05f)  // s
 // Number of times the control loop should tick per trajectory element
-#define NUM_TICKS_PER_TRAJECTORY_ELEMENT (2)
+#define NUM_TICKS_PER_TRAJECTORY_ELEMENT (4)
 
 typedef struct MoveState
 {
