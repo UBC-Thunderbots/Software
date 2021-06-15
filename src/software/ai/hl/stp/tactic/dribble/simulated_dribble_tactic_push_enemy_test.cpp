@@ -49,9 +49,37 @@ class SimulatedDribbleTacticPushEnemyTest : public SimulatedTacticTestFixture
              field.enemyDefenseArea().negXPosYCorner()});
 };
 
-TEST_F(SimulatedDribbleTacticPushEnemyTest, test_intercept_ball_behind_enemy_robot)
+TEST_F(SimulatedDribbleTacticPushEnemyTest, test_steal_ball_from_behind_enemy)
 {
-    Point initial_position = Point(-3, 1.5);
+    Point initial_position = Point(-3, 2.5);
+    BallState ball_state(Point(1 + DIST_TO_FRONT_OF_ROBOT_METERS, 2.5), Vector());
+    Point dribble_destination = Point(-1, 2);
+    Angle dribble_orientation = Angle::zero();
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, -2.5), initial_position});
+
+    auto tactic = std::make_shared<DribbleTactic>();
+    tactic->updateControlParams(dribble_destination, dribble_orientation);
+    setTactic(tactic);
+    setRobotId(1);
+    setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION});
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [this, tactic](std::shared_ptr<World> world_ptr,
+                       ValidationCoroutine::push_type& yield) {
+            checkPossession(tactic, world_ptr, yield);
+        }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
+}
+
+TEST_F(SimulatedDribbleTacticPushEnemyTest, test_steal_ball_from_front_of_enemy)
+{
+    Point initial_position = Point(4, 2.5);
     BallState ball_state(Point(1 + DIST_TO_FRONT_OF_ROBOT_METERS, 2.5), Vector());
     Point dribble_destination = Point(-1, 2);
     Angle dribble_orientation = Angle::zero();
