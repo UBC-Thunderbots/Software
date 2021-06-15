@@ -28,7 +28,7 @@ void Navigator::visit(const MoveIntent &intent)
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Navigator::getAssignedPrimitives(
-    const World &world, const std::vector<std::unique_ptr<Intent>> &intents) const
+    const World &world, const std::vector<std::unique_ptr<Intent>> &intents)
 {
     // Initialize variables
     navigating_intents.clear();
