@@ -56,6 +56,7 @@
   * [Visualizer](#visualizer)
     * [Diagram](#visualizer-diagram)
     * [Draw Functions](#draw-functions)
+  * [Estop](#estop)
 * [Simulator](#simulator)
   * [Standalone Simulator](#standalone-simulator)
   * [Simulated Tests](#simulated-tests)
@@ -529,6 +530,11 @@ Although we want to display information about the [AI](#ai) in the [Visualizer](
 
 A [DrawFunction](#draw_functions) is essentially a function that tells the [Visualizer](#visualizer) _how_ to draw something. When created, [DrawFunctions](#draw_functions) use [lazy-evaluation](https://www.tutorialspoint.com/functional_programming/functional_programming_lazy_evaluation.htm) to embed the data needed for drawing into the function itself. What is ultimately produced is a function that the [Visualizer](#visualizer) can call, with the data to draw (and the details of how to draw it) already included. This function can then be sent over the Observer system to the [Visualizer](#visualizer). The [Visualizer](#visualizer) can then run this function to perform the actual draw operation.
 
+# Estop
+`Estop` allows us to quickly and manually command physical robots to stop what they are doing. We have a couple of implementations of `Estop`, depending on which [Backend](#backend) is being used:
+
+* For `WifiBackend`, the `Estop` is a stateful switch connected to an Arduino. The switch state is communicated to the `WifiBackend` regularly. When `Estop` is in a `STOP` state, the `WifiBackend` overrides the [Primitives](#primitives) sent to the robot to an `Estop primitive`. when it is in a `PLAY` state, primitives are communicated normally.
+* For `RadioBackend`, The `Estop` switch is part of the Radio dongle, which is responsible for filtering out messages sent to the robots. 
 
 # Simulator
 The `Simulator` is what we use for physics simulation to do testing when we don't have access to real field. In terms of the architecture, the `Simulator` "simulates" the following components' functionalities:

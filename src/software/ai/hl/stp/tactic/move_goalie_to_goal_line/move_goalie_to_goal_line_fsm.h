@@ -10,25 +10,25 @@
 #include "software/logger/logger.h"
 
 // Which way the crease defender should be aligned
-struct MoveToGoalLineFSM
+struct MoveGoalieToGoalLineFSM
 {
-    // this struct defines the unique control parameters that the MoveToGoalLineFSM
+    // this struct defines the unique control parameters that the MoveGoalieToGoalLineFSM
     // requires in its update
     struct ControlParams
     {
     };
-    // this struct defines the only event that the MoveToGoalLineFSM responds to
+    // this struct defines the only event that the MoveGoalieToGoalLineFSM responds to
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
     auto operator()()
     {
         using namespace boost::sml;
         const auto move_to_goal_line_s = state<MoveFSM>;
-        // update_e is the event that the MoveToGoalLineFSM responds to
+        // update_e is the event that the MoveGoalieToGoalLineFSM responds to
         const auto update_e = event<Update>;
         /**
          * This is an Action that blocks the threat
          *
-         * @param event MoveToGoalLineFSM::Update event
+         * @param event MoveGoalieToGoalLineFSM::Update event
          */
         const auto move_to_goal_line =
             [this](auto event, back::process<MoveFSM::Update> processEvent) {

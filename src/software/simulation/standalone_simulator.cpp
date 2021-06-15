@@ -1,5 +1,6 @@
 #include "software/simulation/standalone_simulator.h"
 
+#include "software/constants.h"
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "software/world/field.h"
 extern "C"
@@ -89,9 +90,9 @@ void StandaloneSimulator::setupNetworking(int blue_team_channel, int yellow_team
                                           std::string vision_ip_address)
 {
     std::string yellow_team_ip =
-        std::string(MULTICAST_CHANNELS[yellow_team_channel]) + "%" + network_interface;
+        SIMULATOR_MULTICAST_CHANNELS[yellow_team_channel] + "%" + network_interface;
     std::string blue_team_ip =
-        std::string(MULTICAST_CHANNELS[blue_team_channel]) + "%" + network_interface;
+        SIMULATOR_MULTICAST_CHANNELS[blue_team_channel] + "%" + network_interface;
 
     wrapper_packet_sender.reset(new ThreadedProtoUdpSender<SSLProto::SSL_WrapperPacket>(
         vision_ip_address, static_cast<unsigned short>(vision_port), true));
