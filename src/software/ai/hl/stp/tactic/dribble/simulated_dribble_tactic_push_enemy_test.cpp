@@ -39,8 +39,7 @@ class SimulatedDribbleTacticPushEnemyTest : public SimulatedTacticTestFixture,
     void SetUp() override
     {
         SimulatedTacticTestFixture::SetUp();
-        setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION,
-                              MotionConstraint::ENEMY_DEFENSE_AREA});
+        setMotionConstraints({MotionConstraint::ENEMY_DEFENSE_AREA});
     }
     Field field = Field::createSSLDivisionBField();
     std::vector<RobotStateWithId> enemy_robots =
@@ -63,7 +62,6 @@ TEST_P(SimulatedDribbleTacticPushEnemyTest, test_steal_ball_from_behind_enemy)
     tactic->updateControlParams(dribble_destination, dribble_orientation);
     setTactic(tactic);
     setRobotId(1);
-    setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,

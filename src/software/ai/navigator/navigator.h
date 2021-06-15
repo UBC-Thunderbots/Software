@@ -39,7 +39,7 @@ class Navigator : public IntentVisitor
      * @return Primitives
      */
     std::unique_ptr<TbotsProto::PrimitiveSet> getAssignedPrimitives(
-        const World &world, const std::vector<std::unique_ptr<Intent>> &intents);
+        const World &world, const std::vector<std::unique_ptr<Intent>> &intents) const;
 
     /**
      * Get the planned paths for navigation

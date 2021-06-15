@@ -28,7 +28,7 @@ void Navigator::visit(const MoveIntent &intent)
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Navigator::getAssignedPrimitives(
-    const World &world, const std::vector<std::unique_ptr<Intent>> &intents)
+    const World &world, const std::vector<std::unique_ptr<Intent>> &intents) const
 {
     // Initialize variables
     navigating_intents.clear();
@@ -112,9 +112,15 @@ std::unordered_set<PathObjective> Navigator::createPathObjectives(const World &w
         {
             auto motion_constraint_obstacles =
                 robot_navigation_obstacle_factory.createFromMotionConstraints(
-                    intent->getMotionConstraints(), world, robot->velocity().length());
+                    intent->getMotionConstraints(), world);
             obstacles.insert(obstacles.end(), motion_constraint_obstacles.begin(),
                              motion_constraint_obstacles.end());
+
+            std::vector<ObstaclePtr> enemy_robot_obstacles =
+                robot_navigation_obstacle_factory.createEnemyCollisionAvoidance(
+                    world.enemyTeam(), robot->velocity().length());
+            obstacles.insert(obstacles.end(), enemy_robot_obstacles.begin(),
+                             enemy_robot_obstacles.end());
 
             if (intent->getBallCollisionType() == BallCollisionType::AVOID)
             {

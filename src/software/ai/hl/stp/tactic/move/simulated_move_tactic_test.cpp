@@ -34,7 +34,6 @@ TEST_F(SimulatedMoveTacticTest, test_move_across_field)
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
     setRobotId(1);
-    setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,

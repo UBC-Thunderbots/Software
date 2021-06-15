@@ -19,14 +19,6 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
 
     switch (motion_constraint)
     {
-        case MotionConstraint::ENEMY_ROBOTS_COLLISION:
-        {
-            std::vector<ObstaclePtr> enemy_robot_obstacles =
-                createFromTeam(world.enemyTeam());
-            obstacles.insert(obstacles.end(), enemy_robot_obstacles.begin(),
-                             enemy_robot_obstacles.end());
-        }
-        break;
         case MotionConstraint::CENTER_CIRCLE:
             obstacles.push_back(createFromShape(
                 Circle(world.field().centerPoint(), world.field().centerCircleRadius())));
@@ -68,22 +60,15 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
 }
 
 std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraints(
-    const std::set<MotionConstraint> &motion_constraints, const World &world,
-    double robot_speed)
+    const std::set<MotionConstraint> &motion_constraints, const World &world) const
 {
     std::vector<ObstaclePtr> obstacles;
-    if (robot_speed < config->getAllowedRobotCollisionSpeed()->value())
-    {
-        robot_radius_expansion_amount = DIST_TO_FRONT_OF_ROBOT_METERS;
-    }
     for (auto motion_constraint : motion_constraints)
     {
         auto new_obstacles = createFromMotionConstraint(motion_constraint, world);
         obstacles.insert(obstacles.end(), new_obstacles.begin(), new_obstacles.end());
     }
 
-    robot_radius_expansion_amount =
-        config->getRobotObstacleInflationFactor()->value() * ROBOT_MAX_RADIUS_METERS;
     return obstacles;
 }
 
@@ -155,6 +140,26 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromTeam(
         obstacles.push_back(createFromRobot(robot));
     }
     return obstacles;
+}
+
+std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createEnemyCollisionAvoidance(
+    const Team &enemy_team, double friendly_robot_speed) const
+{
+    if (friendly_robot_speed < config->getAllowedRobotCollisionSpeed()->value())
+    {
+        std::vector<ObstaclePtr> obstacles;
+        for (const auto &robot : enemy_team.getAllRobots())
+        {
+            obstacles.push_back(std::make_shared<GeomObstacle<Circle>>(
+                Circle(robot.position(),
+                       ROBOT_MAX_RADIUS_METERS + DIST_TO_FRONT_OF_ROBOT_METERS)));
+        }
+        return obstacles;
+    }
+    else
+    {
+        return createFromTeam(enemy_team);
+    }
 }
 
 ObstaclePtr RobotNavigationObstacleFactory::createFromBallPosition(

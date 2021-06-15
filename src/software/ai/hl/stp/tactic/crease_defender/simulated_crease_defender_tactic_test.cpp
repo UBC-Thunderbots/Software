@@ -44,8 +44,7 @@ TEST_F(SimulatedCreaseDefenderTacticTest, test_chip_ball)
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(tactic);
     setRobotId(0);
-    setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION,
-                          MotionConstraint::FRIENDLY_DEFENSE_AREA});
+    setMotionConstraints({MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [tactic](std::shared_ptr<World> world_ptr,
@@ -88,8 +87,7 @@ TEST_P(SimulatedCreaseDefenderTacticTest, crease_defender_test)
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(tactic);
     setRobotId(0);
-    setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION,
-                          MotionConstraint::FRIENDLY_DEFENSE_AREA});
+    setMotionConstraints({MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     Rectangle defense_area         = field.friendlyDefenseArea();
     Rectangle field_lines          = field.fieldLines();
