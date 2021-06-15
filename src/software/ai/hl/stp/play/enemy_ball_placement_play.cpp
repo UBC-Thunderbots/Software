@@ -23,12 +23,10 @@ bool EnemyBallPlacementPlay::invariantHolds(const World &world) const
     return world.gameState().isTheirBallPlacement();
 }
 
-void EnemyBallPlacementPlay::defendingBallPlacement(
-    TacticCoroutine::push_type &yield,
-    const World &world,
+void EnemyBallPlacementPlay::ballPlacementNoShadow(
+    TacticCoroutine::push_type &yield, const World &world,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders,
-    std::array<std::shared_ptr<MoveTactic>, 2> move_tactics,
-    Point placement_point)
+    std::array<std::shared_ptr<MoveTactic>, 2> move_tactics, Point placement_point)
 {
     /*
      * Set up 3 crease defenders to sit by crease, and put two robots behind the ball
@@ -48,61 +46,52 @@ void EnemyBallPlacementPlay::defendingBallPlacement(
 
     do
     {
-        std::optional<Point> ball_point = world.gameState().getBallPlacementPoint();
-
-        // Create tactic vector (starting with Goalie)
         PriorityTacticVector tactics_to_run = {{}};
 
-        if (ball_point.has_value())
-        {
-            crease_defenders[0]->updateControlParams(placement_point,
-                                                      CreaseDefenderAlignment::LEFT);
-            crease_defenders[1]->updateControlParams(placement_point,
-                                                       CreaseDefenderAlignment::RIGHT);
-            crease_defenders[2]->updateControlParams(placement_point,
-                                                        CreaseDefenderAlignment::CENTRE);
+        crease_defenders[0]->updateControlParams(placement_point,
+                                                 CreaseDefenderAlignment::LEFT);
+        crease_defenders[1]->updateControlParams(placement_point,
+                                                 CreaseDefenderAlignment::RIGHT);
+        crease_defenders[2]->updateControlParams(placement_point,
+                                                 CreaseDefenderAlignment::CENTRE);
 
-            tactics_to_run[0].emplace_back(crease_defenders[0]);
-            tactics_to_run[0].emplace_back(crease_defenders[1]);
-            tactics_to_run[0].emplace_back(crease_defenders[2]);
+        tactics_to_run[0].emplace_back(crease_defenders[0]);
+        tactics_to_run[0].emplace_back(crease_defenders[1]);
+        tactics_to_run[0].emplace_back(crease_defenders[2]);
 
 
-            move_tactics[0]->updateControlParams(
-                world.gameState().getBallPlacementPoint().value() +
-                    Vector(-0.75 - ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS),
-                Angle::zero(), 0);
-            move_tactics[1]->updateControlParams(
-                world.gameState().getBallPlacementPoint().value() +
-                    Vector(-0.75 - ROBOT_MAX_RADIUS_METERS, -ROBOT_MAX_RADIUS_METERS),
-                Angle::zero(), 0);
+        move_tactics[0]->updateControlParams(
+            world.gameState().getBallPlacementPoint().value() +
+                Vector(-0.75 - ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS),
+            Angle::zero(), 0);
+        move_tactics[1]->updateControlParams(
+            world.gameState().getBallPlacementPoint().value() +
+                Vector(-0.75 - ROBOT_MAX_RADIUS_METERS, -ROBOT_MAX_RADIUS_METERS),
+            Angle::zero(), 0);
 
-            tactics_to_run[0].emplace_back(move_tactics[0]);
-            tactics_to_run[0].emplace_back(move_tactics[1]);
-        }
-
+        tactics_to_run[0].emplace_back(move_tactics[0]);
+        tactics_to_run[0].emplace_back(move_tactics[1]);
         // yield the Tactics this Play wants to run, in order of priority
         yield(tactics_to_run);
     } while (true);
 }
 
-void EnemyBallPlacementPlay::attackingBallPlacement(
-    TacticCoroutine::push_type &yield,
-    const World &world,
+void EnemyBallPlacementPlay::ballPlacementWithShadow(
+    TacticCoroutine::push_type &yield, const World &world,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders,
-    std::array<std::shared_ptr<MoveTactic>, 2> move_tactics,
-    Point placement_point)
+    std::array<std::shared_ptr<MoveTactic>, 2> move_tactics, Point placement_point)
 {
     /*
      * Set up 3 crease defenders to sit by crease, and put two robots behind the ball
      * placement point
      *
-     *            
+     *
      *               placement point
      *                       +
-     *      
+     *
      *     Shadow enemy    o  x  enemy robot
-     * 
-     *      move robots      o   
+     *
+     *      move robots      o
      *
      * crease defenders  o   o   o
      *
@@ -113,55 +102,51 @@ void EnemyBallPlacementPlay::attackingBallPlacement(
 
     do
     {
-        std::optional<Point> ball_point = world.gameState().getBallPlacementPoint();
-
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
         // Create tactic vector (starting with Goalie)
         PriorityTacticVector tactics_to_run = {{}};
 
-        if (ball_point.has_value())
+        crease_defenders[0]->updateControlParams(placement_point,
+                                                 CreaseDefenderAlignment::LEFT);
+        crease_defenders[1]->updateControlParams(placement_point,
+                                                 CreaseDefenderAlignment::RIGHT);
+        crease_defenders[2]->updateControlParams(placement_point,
+                                                 CreaseDefenderAlignment::CENTRE);
+
+        tactics_to_run[0].emplace_back(crease_defenders[0]);
+        tactics_to_run[0].emplace_back(crease_defenders[1]);
+        tactics_to_run[0].emplace_back(crease_defenders[2]);
+
+        // if no threats, send two robots near placement point
+        if (enemy_threats.size() == 0)
         {
-            crease_defenders[0]->updateControlParams(placement_point,
-                                                      CreaseDefenderAlignment::LEFT);
-            crease_defenders[1]->updateControlParams(placement_point,
-                                                       CreaseDefenderAlignment::RIGHT);
-            crease_defenders[2]->updateControlParams(placement_point,
-                                                        CreaseDefenderAlignment::CENTRE);
-
-            tactics_to_run[0].emplace_back(crease_defenders[0]);
-            tactics_to_run[0].emplace_back(crease_defenders[1]);
-            tactics_to_run[0].emplace_back(crease_defenders[2]);
-
-            // if no threats, send two robots near placement point
-            if(enemy_threats.size() == 0)
-            {
-                move_tactics[0]->updateControlParams(
-                    placement_point + Vector(0.75 - ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS),
-                    Angle::zero(), 0);
-                move_tactics[0]->updateControlParams(
-                    placement_point + Vector(-0.75 - ROBOT_MAX_RADIUS_METERS, -ROBOT_MAX_RADIUS_METERS),
-                    Angle::zero(), 0);
-                tactics_to_run[0].emplace_back(move_tactics[0]);
-                tactics_to_run[0].emplace_back(move_tactics[1]);
-
-            } 
-
-            // if there are threats, send one robot to placement point, and one shadows
-            else
-            {
-                move_tactics[0]->updateControlParams(
-                    placement_point + Vector(0.75, ROBOT_MAX_RADIUS_METERS),
-                    Angle::zero(), 0);
-                shadow_enemy->updateControlParams(enemy_threats.at(1),
-                                                    ROBOT_MAX_RADIUS_METERS * 3);
-
-                tactics_to_run[0].emplace_back(move_tactics[0]);
-                tactics_to_run[0].emplace_back(shadow_enemy);
-            }
+            move_tactics[0]->updateControlParams(
+                placement_point +
+                    Vector(-0.75 - ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS),
+                Angle::zero(), 0);
+            move_tactics[1]->updateControlParams(
+                placement_point +
+                    Vector(-0.75 - ROBOT_MAX_RADIUS_METERS, -ROBOT_MAX_RADIUS_METERS),
+                Angle::zero(), 0);
+            tactics_to_run[0].emplace_back(move_tactics[0]);
+            tactics_to_run[0].emplace_back(move_tactics[1]);
         }
-        
+
+        // if there are threats, send one robot to placement point, and one shadows
+        else
+        {
+            move_tactics[0]->updateControlParams(
+                placement_point + Vector(-0.75 - ROBOT_MAX_RADIUS_METERS, 0),
+                Angle::zero(), 0);
+            shadow_enemy->updateControlParams(enemy_threats.at(1),
+                                              ROBOT_MAX_RADIUS_METERS * 3);
+
+            tactics_to_run[0].emplace_back(move_tactics[0]);
+            tactics_to_run[0].emplace_back(shadow_enemy);
+        }
+
         // yield the Tactics this Play wants to run, in order of priority
         yield(tactics_to_run);
     } while (true);
@@ -186,49 +171,26 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
         std::make_shared<MoveTactic>(true),
     };
 
-    if(placement_point.has_value())
+    if (placement_point.has_value())
     {
-        if(placement_point.value().x() > 0)
+        if (placement_point.value().x() > 0)
         {
-            attackingBallPlacement(yield,world,crease_defenders,move_tactics,placement_point.value());
+            ballPlacementWithShadow(yield, world, crease_defenders, move_tactics,
+                                    placement_point.value());
         }
         else
         {
-            defendingBallPlacement(yield,world,crease_defenders,move_tactics,placement_point.value());
+            ballPlacementNoShadow(yield, world, crease_defenders, move_tactics,
+                                  placement_point.value());
         }
     }
-    //If there is no placement point, run a default version of the play where robots hang back
+    // if there is no placement_point, set up at middle of field with two robots
     else
     {
-        PriorityTacticVector tactics_to_run = {{}};
-        auto move_left  = std::make_shared<MoveTactic>(true);
-        auto move_right = std::make_shared<MoveTactic>(true);
-        
-        do
-        {
-            crease_defenders[0]->updateControlParams(world.field().centerPoint(),
-                                                        CreaseDefenderAlignment::LEFT);
-            crease_defenders[1]->updateControlParams(world.field().centerPoint(),
-                                                        CreaseDefenderAlignment::RIGHT);
-            crease_defenders[2]->updateControlParams(world.field().centerPoint(),
-                                                        CreaseDefenderAlignment::CENTRE);
-
-            tactics_to_run[0].emplace_back(crease_defenders[0]);
-            tactics_to_run[0].emplace_back(crease_defenders[1]);
-            tactics_to_run[0].emplace_back(crease_defenders[2]);
-
-            move_left->updateControlParams(
-                world.field().centerPoint() +
-                    Vector(-0.75 - ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS),
-                Angle::zero(), 0);
-            move_right->updateControlParams(
-                world.field().centerPoint() +
-                    Vector(0.75 + ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS),
-                Angle::zero(), 0);
-
-            tactics_to_run[0].emplace_back(move_left);
-            tactics_to_run[0].emplace_back(move_right);
-        } while (true);
+        Point default_point =
+            Point(world.field().centerPoint().x() - 2, world.field().centerPoint().y());
+        ballPlacementNoShadow(yield, world, crease_defenders, move_tactics,
+                              default_point);
     }
 }
 

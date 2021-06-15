@@ -175,10 +175,7 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromShape(const Circle &circle
 ObstaclePtr RobotNavigationObstacleFactory::createFromShape(const Polygon &polygon) const
 {
     return std::make_shared<GeomObstacle<Polygon>>(
-        polygon.expand(Vector(-1, 0).normalize(robot_radius_expansion_amount))
-            .expand(Vector(1, 0).normalize(robot_radius_expansion_amount))
-            .expand(Vector(0, -1).normalize(robot_radius_expansion_amount))
-            .expand(Vector(0, 1).normalize(robot_radius_expansion_amount)));
+        polygon.expand(robot_radius_expansion_amount));
 }
 
 ObstaclePtr RobotNavigationObstacleFactory::createFromFieldRectangle(
@@ -229,11 +226,15 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromBallPlacement(
     Vector place_to_ball = placement_point.toVector() - ball_point.toVector();
     Vector ball_to_place = ball_point.toVector() - placement_point.toVector();
 
-    Point place_l = placement_point + (place_to_ball.normalize(RADIUS) + place_to_ball.perpendicular().normalize(RADIUS));
-    Point place_r = placement_point + (place_to_ball.normalize(RADIUS) - place_to_ball.perpendicular().normalize(RADIUS));
+    Point place_l = placement_point + (place_to_ball.normalize(RADIUS) +
+                                       place_to_ball.perpendicular().normalize(RADIUS));
+    Point place_r = placement_point + (place_to_ball.normalize(RADIUS) -
+                                       place_to_ball.perpendicular().normalize(RADIUS));
 
-    Point ball_l = ball_point + (ball_to_place.normalize(RADIUS) + ball_to_place.perpendicular().normalize(RADIUS));
-    Point ball_r = ball_point + (ball_to_place.normalize(RADIUS) - ball_to_place.perpendicular().normalize(RADIUS));
+    Point ball_l = ball_point + (ball_to_place.normalize(RADIUS) +
+                                 ball_to_place.perpendicular().normalize(RADIUS));
+    Point ball_r = ball_point + (ball_to_place.normalize(RADIUS) -
+                                 ball_to_place.perpendicular().normalize(RADIUS));
 
     return createFromShape(Polygon({
         place_l,
