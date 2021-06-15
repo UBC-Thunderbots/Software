@@ -14,8 +14,10 @@ ProtoLogger<MsgT>::ProtoLogger(
       current_chunk_idx(0),
       output_dir_path(output_directory),
       msgs_per_chunk(_msgs_per_chunk),
-      sort_comparator(message_sort_comparator)
+      sort_comparator(message_sort_comparator),
+      chunk_mutex()
 {
+    std::lock_guard<std::mutex> lock(chunk_mutex);
     // check if directory exists, if not make a directory
     if (std::experimental::filesystem::exists(output_dir_path))
     {
@@ -48,18 +50,27 @@ ProtoLogger<MsgT>::ProtoLogger(
 template <typename MsgT>
 ProtoLogger<MsgT>::~ProtoLogger()
 {
+    std::lock_guard<std::mutex> lock(chunk_mutex);
     saveCurrentChunk();
 }
 
 template <typename MsgT>
 void ProtoLogger<MsgT>::onValueReceived(MsgT msg)
 {
+    std::lock_guard<std::mutex> lock(chunk_mutex);
     current_chunk.add_messages()->PackFrom(std::move(msg));
     if (current_chunk.messages_size() >= msgs_per_chunk)
     {
-        saveCurrentChunk();
+        saveCurrentChunkHelper();
         nextChunk();
     }
+}
+
+template <typename MsgT>
+void ProtoLogger<MsgT>::saveCurrentChunk()
+{
+    std::lock_guard<std::mutex> lock(chunk_mutex);
+    saveCurrentChunkHelper();
 }
 
 template <typename MsgT>
@@ -70,7 +81,7 @@ void ProtoLogger<MsgT>::nextChunk()
 }
 
 template <typename MsgT>
-void ProtoLogger<MsgT>::saveCurrentChunk()
+void ProtoLogger<MsgT>::saveCurrentChunkHelper()
 {
     if (sort_comparator)
     {
