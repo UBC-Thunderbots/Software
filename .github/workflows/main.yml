@@ -94,7 +94,7 @@ jobs:
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
 
-      - name: Simulated Test
+      - name: Simulated Test (Continue on error)
         # make sure that replays are uploaded even if tests fail
         continue-on-error: true
         run: |
@@ -112,7 +112,7 @@ jobs:
           path: |
             src/bazel-out/k8-fastbuild/testlogs/software/ai/hl/stp
 
-      - name: Simulated Test
+      - name: Simulated Test (Check for errors)
         # Run Simulated Tests a second time to check for failures
         run: |
           cd src
