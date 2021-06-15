@@ -76,7 +76,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Navigator::getAssignedPrimitives(
     return std::move(primitive_set_msg);
 }
 
-std::unordered_set<PathObjective> Navigator::createPathObjectives(const World &world)
+std::unordered_set<PathObjective> Navigator::createPathObjectives(
+    const World &world) const
 {
     std::unordered_set<PathObjective> path_objectives;
     std::vector<ObstaclePtr> direct_primitive_intent_obstacles;
