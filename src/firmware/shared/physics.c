@@ -31,6 +31,27 @@ static const float shared_physics_local_vel_to_wheels_matrix[3][4] = {
     {0.3904f, -0.3904f, -0.3904f, 0.3904f},
     {0.2761f, 0.2239f, 0.2239f, 0.2761f}};
 
+
+// New Robot Transformation matrices
+//
+// phi is 57.95 deg
+// theta is 43.96
+static const float shared_physics_wheels_to_local_vel_matrix_transpose_new[3][4] = {
+    {-0.84758f, -0.84758f, 0.69416f, 0.69416f},
+    {0.53066f, -0.53066f, -0.71982f, 0.71982f},
+    {1.0000f, 1.0000f, 1.0000f, 1.0000f}};
+
+// computed on octave using
+//  pinv(
+//      [-0.84758, 0.53066, 1.0000; -0.84758, -0.53066, 1.0000;
+//       0.69416, -0.71982, 1.0000; 0.6 9416, 0.71982, 1.0000]
+//  )
+static const float shared_physics_local_vel_to_wheels_matrix_new[3][4] = {
+   {-0.32431f,  -0.32431f,   0.32431f,   0.32431f},
+   {0.33177f,  -0.33177f,  -0.45003f,   0.45003f},
+   {0.22512f,   0.22512f,   0.27488f,   0.27488f}
+};
+
 void shared_physics_speed4ToSpeed3(const float speed4[4], float speed3[3],
                                    float front_wheel_angle_deg,
                                    float back_wheel_angle_deg)
@@ -39,7 +60,7 @@ void shared_physics_speed4ToSpeed3(const float speed4[4], float speed3[3],
     (void)front_wheel_angle_deg;
     (void)back_wheel_angle_deg;
     shared_physics_linear_algebra_matrixMultiply(
-        speed3, 3, speed4, 4, shared_physics_local_vel_to_wheels_matrix);
+        speed3, 3, speed4, 4, shared_physics_local_vel_to_wheels_matrix_new);
 }
 
 void shared_physics_legacySpeed4ToSpeed3(const float speed4[4], float speed3[3])
@@ -56,7 +77,7 @@ void shared_physics_speed3ToSpeed4(const float speed3[3], float speed4[4],
     (void)front_wheel_angle_deg;
     (void)back_wheel_angle_deg;
     shared_physics_linear_algebra_matrixMultiplyTranspose(
-        speed4, 4, speed3, 3, shared_physics_wheels_to_local_vel_matrix_transpose);
+        speed4, 4, speed3, 3, shared_physics_wheels_to_local_vel_matrix_transpose_new);
 }
 
 void shared_physics_force3ToForce4(float force3[3], float force4[4],
