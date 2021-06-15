@@ -88,7 +88,6 @@ TEST_F(RobotNavigationObstacleFactoryTest, create_rectangle_obstacle)
     Rectangle rectangle(Point(1, 3), Point(5, 8));
     Polygon expected(
         Polygon({{0.883, 8.117}, {5.117, 8.117}, {5.117, 2.883}, {0.883, 2.883}}));
-    //    Polygon expected(Rectangle(Point(.883, 2.883), Point(5.117, 8.117)));
     ObstaclePtr obstacle = robot_navigation_obstacle_factory.createFromShape(rectangle);
     try
     {
