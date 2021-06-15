@@ -149,43 +149,27 @@ void io_vision_task(void* arg)
     ProtoMulticastCommunicationProfile_t* comm_profile =
         (ProtoMulticastCommunicationProfile_t*)arg;
 
-    TbotsProto_Vision vision_copy;
-
     for (;;)
     {
-        uint32_t tick_start = osKernelGetTickCount();
+        io_proto_multicast_communication_profile_blockUntilEvents(comm_profile,
+                                                                  RECEIVED_PROTO);
 
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
 
-        vision_copy = (*(TbotsProto_Vision*)io_proto_multicast_communication_profile_getProtoStruct(
-                        comm_profile));
+        TbotsProto_Vision vision_copy_1 =
+            (*(TbotsProto_Vision*)io_proto_multicast_communication_profile_getProtoStruct(
+                comm_profile));
 
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
 
-        if(memcmp(&vision_copy, &vision, sizeof(vision_copy)) != 0)
+        // only update vision if we have atleast 1 robot state
+        if (vision_copy_1.robot_states_count != 0)
         {
-            // only update vision if we have atleast 1 robot state
-            if (vision_copy.robot_states_count == 1)
-            {
-                io_lock_vision();
-                vision = vision_copy;
-                io_unlock_vision();
-            }
-            io_vision_applyVisionFrameToDeadReckoning(0);
-        }
-
-        io_vision_stepDeadReckoning();
-
-        uint32_t tick_end = osKernelGetTickCount();
-
-        // TODO pull 5 into a constant
-        if (tick_end - tick_start > 8)
-        {
-            TLOG_WARNING("Vision (dead reckoning) falling behind!! %d", tick_end - tick_start);
-        }
-        else
-        {
-            osDelay(8 - (tick_end - tick_start));
+            io_lock_vision();
+            static uint32_t count = 0;
+            TLOG_INFO("RECEIVED VISION %d", count++);
+            vision = vision_copy_1;
+            io_unlock_vision();
         }
     }
 }
@@ -296,11 +280,11 @@ void io_vision_stepDeadReckoning()
     g_current_ball_state.x += g_current_ball_state.vx * DEAD_RECKONING_TICK_TIME_MS;
     g_current_ball_state.y += g_current_ball_state.vy * DEAD_RECKONING_TICK_TIME_MS;
 
-    TLOG_INFO("dead reckoning %d %d %d",
-             (int)(g_current_state.x * 100),
-             (int)(g_current_state.y * 100),
-             (int)(g_current_state.angle * 100)
-    );
+    /*TLOG_INFO("dead reckoning %d %d %d",*/
+             /*(int)(g_current_state.x * 100),*/
+             /*(int)(g_current_state.y * 100),*/
+             /*(int)(g_current_state.angle * 100)*/
+    /*);*/
 }
 
 void io_lock_vision()
