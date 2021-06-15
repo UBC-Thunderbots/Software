@@ -26,6 +26,7 @@ class SimulatedAttackerTacticShootGoalTest
 
 TEST_P(SimulatedAttackerTacticShootGoalTest, attacker_test_shoot_goal)
 {
+    enableVisualizer();
     BallState ball_state         = std::get<0>(GetParam());
     Point initial_robot_point    = std::get<1>(GetParam());
     auto enemy_robots            = std::get<2>(GetParam());
@@ -66,7 +67,7 @@ INSTANTIATE_TEST_CASE_P(
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(2.4, 1), Point(3, 0.4), Point(3, 0.8), Point(3.1, 0.6),
                              Point(3.1, 1), Point(4.2, 1.2)}),
-                        Angle::fromDegrees(210)),
+                        Angle::fromDegrees(245)),
         // enemy goal blocked by enemy robots with enemy threat left
         std::make_tuple(BallState(Point(2, 1), Vector()), Point(1, 1),
                         TestUtil::createStationaryRobotStatesWithId(
@@ -90,4 +91,5 @@ INSTANTIATE_TEST_CASE_P(
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(2.5, -1.4), Point(3, 0.4), Point(3, 0.8),
                              Point(3.1, 0.6), Point(3.1, 1), Point(4.2, 1.2)}),
-                        Angle::fromDegrees(30))));
+                        Angle::fromDegrees(30))
+                        ));

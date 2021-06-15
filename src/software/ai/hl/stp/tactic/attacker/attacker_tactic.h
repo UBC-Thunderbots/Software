@@ -31,7 +31,7 @@ class AttackerTactic : public Tactic
      *
      * @param updated_pass The pass to perform
      */
-    void updateControlParams(const Pass& updated_pass);
+    void updateControlParams(const std::optional<Pass>& updated_pass);
 
     /**
      * Updates the control parameters for this AttackerTactic
@@ -55,6 +55,11 @@ class AttackerTactic : public Tactic
 
     void accept(TacticVisitor& visitor) const override;
     bool done() const override;
+
+    bool isShooting();
+    bool isKeepAway();
+
+//    AttackerFSMStates currentFsmState();
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;

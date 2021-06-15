@@ -59,83 +59,184 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
     auto attacker =
         std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
 
+    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
+    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
+
     auto pitch_division =
         std::make_shared<const EighteenZonePitchDivision>(world.field());
+
 
     PassGenerator<EighteenZoneId> pass_generator(pitch_division,
                                                  play_config->getPassingConfig());
 
-    PassWithRating best_pass_and_score_so_far = attemptToShootWhileLookingForAPass(
-        yield, crease_defender_tactics, attacker, world);
+//    PassWithRating best_pass_and_score_so_far = attemptToShootWhileLookingForAPass(
+//        yield, crease_defender_tactics, attacker, world);
 
-    // If the shoot tactic has not finished, then we need to pass, otherwise we are
-    // done this play
-    if (!attacker->done())
-    {
-        // Commit to a pass
-        Pass pass = best_pass_and_score_so_far.pass;
-
-        LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
-        LOG(DEBUG) << "Score of pass we committed to: "
-                   << best_pass_and_score_so_far.rating;
-
-        // Perform the pass and wait until the receiver is finished
-        auto receiver = std::make_shared<ReceiverTactic>(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), pass, world.ball(),
+    auto receiver = std::make_shared<ReceiverTactic>(
+            world.field(), world.friendlyTeam(), world.enemyTeam(), Pass(Point(0, 0), Point(0, 0), 0), world.ball(),
             false);
 
-        auto pass_eval = pass_generator.generatePassEvaluation(world);
+    std::optional<PassWithRating> current_committed_pass = std::nullopt;
 
-        auto ranked_zones = pass_eval.rankZonesForReceiving(
-            world, best_pass_and_score_so_far.pass.receiverPoint());
+    do {
+        auto pass_eval    = pass_generator.generatePassEvaluation(world);
+        auto best_pass_and_score_so_far = pass_eval.getBestPassOnField();
+        auto ranked_zones = pass_eval.rankZonesForReceiving(world, world.ball().position());
+
+//        std::vector<EighteenZoneId> bad_zones = {EighteenZoneId::ZONE_10, EighteenZoneId::ZONE_11,EighteenZoneId::ZONE_12,EighteenZoneId::ZONE_13,EighteenZoneId::ZONE_14,EighteenZoneId::ZONE_15};
+//        for(size_t i = 1; i < ranked_zones.size(); i++) {
+//            if(std::find(bad_zones.begin(), bad_zones.end(), ranked_zones[i]) != bad_zones.end()) {
+//                ranked_zones.erase(ranked_zones.begin() + i);
+//                i--;
+//            }
+//        }
+
+        if (contains(world.field().fieldLines(), world.ball().position())){
+            for(size_t i = 0; i < ranked_zones.size(); i++) {
+                if (contains(pitch_division->getZone(ranked_zones[i]), world.ball().position())) {
+                    ranked_zones.erase(ranked_zones.begin()+i);
+                    i--;
+                    break;
+                }
+            }
+        }
+
+        if (contains(world.field().fieldLines(),attacker->getAssignedRobot()->position())) {
+            std::vector<EighteenZoneId> attacker_adjacent_zones = pitch_division->getAdjacentZoneIds(pitch_division->getZoneId(attacker->getAssignedRobot()->position()));
+            for(size_t i = 1; i < ranked_zones.size(); i++) {
+                if(std::find(attacker_adjacent_zones.begin(), attacker_adjacent_zones.end(), ranked_zones[i]) != attacker_adjacent_zones.end()) {
+                    ranked_zones.erase(ranked_zones.begin() + i);
+                    i--;
+                }
+            }
+        }
+
         Zones cherry_pick_region_1 = {ranked_zones[0]};
+
+        std::vector<EighteenZoneId> adjacent_zones = pitch_division->getAdjacentZoneIds(ranked_zones[0]);
+        for(size_t i = 1; i < ranked_zones.size(); i++) {
+            if(std::find(adjacent_zones.begin(), adjacent_zones.end(), ranked_zones[i]) != adjacent_zones.end()) {
+                ranked_zones.erase(ranked_zones.begin() + i);
+                i--;
+            }
+        }
+
         Zones cherry_pick_region_2 = {ranked_zones[1]};
+
+
+        std::get<0>(crease_defender_tactics)
+                ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+                ->updateControlParams(world.ball().position(),
+                                      CreaseDefenderAlignment::RIGHT);
 
         auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
         auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
 
-        auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
-        auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
         cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
                                                   pass1.receiverOrientation(), 0.0,
                                                   MaxAllowedSpeedMode::PHYSICAL_LIMIT);
         cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
                                                   pass2.receiverOrientation(), 0.0,
-                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                                  MaxAllowedSpeedMode ::PHYSICAL_LIMIT);
 
+        auto min_score_to_commit_to_pass = play_config->getShootOrPassPlayConfig()->getAbsMinPassScore()->value();
+        if(current_committed_pass.has_value()) {
+            current_committed_pass->rating = ratePass(world, current_committed_pass->pass, world.field().fieldLines(), play_config->getPassingConfig());
+        }
+        if (!current_committed_pass.has_value() && best_pass_and_score_so_far.rating > min_score_to_commit_to_pass) {
+            current_committed_pass = best_pass_and_score_so_far;
+        }else if(!attacker->done() && current_committed_pass.has_value() && current_committed_pass->rating < 0.01) {
+            current_committed_pass = std::nullopt;
+        }
 
-        do
-        {
-            attacker->updateControlParams(pass);
-            receiver->updateControlParams(pass);
+        attacker->updateControlParams(current_committed_pass.has_value() ? current_committed_pass->pass : std::optional<Pass>());
+        if(current_committed_pass.has_value()) {
+            receiver->updateControlParams(current_committed_pass->pass);
+            yield({{receiver}, {attacker},
+                   {cherry_pick_tactic_2},
+                   {std::get<0>(crease_defender_tactics),
+                                          std::get<1>(crease_defender_tactics)}});
+        }else {
+            yield({{attacker, cherry_pick_tactic_1},
+                   {cherry_pick_tactic_2},
+                   {std::get<0>(crease_defender_tactics),
+                              std::get<1>(crease_defender_tactics)}});
+        }
 
-            std::get<0>(crease_defender_tactics)
-                ->updateControlParams(world.ball().position(),
-                                      CreaseDefenderAlignment::LEFT);
-            std::get<1>(crease_defender_tactics)
-                ->updateControlParams(world.ball().position(),
-                                      CreaseDefenderAlignment::RIGHT);
-            if (!attacker->done())
-            {
-                yield({{attacker, receiver},
-                       {cherry_pick_tactic_1, std::get<0>(crease_defender_tactics),
-                        std::get<1>(crease_defender_tactics)}});
-            }
-            else
-            {
-                yield({{receiver},
-                       {cherry_pick_tactic_1, cherry_pick_tactic_2},
-                       {std::get<0>(crease_defender_tactics),
-                        std::get<1>(crease_defender_tactics)}});
-            }
-        } while (!receiver->done());
-    }
-    else
-    {
-        LOG(DEBUG) << "Took shot";
-    }
+//        if(attacker->done()) {
+//            // Taken a pass. Receive
+//        }else {
+//
+//        }
 
-    LOG(DEBUG) << "Finished";
+    }while(!(current_committed_pass.has_value() && receiver->done()) || (!current_committed_pass.has_value() && attacker->done()));
+
+//    // If the shoot tactic has not finished, then we need to pass, otherwise we are
+//    // done this play
+//    if (!attacker->done())
+//    {
+//        // Commit to a pass
+//        Pass pass = best_pass_and_score_so_far.pass;
+//
+//        LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
+//        LOG(DEBUG) << "Score of pass we committed to: "
+//                   << best_pass_and_score_so_far.rating;
+//
+//        // Perform the pass and wait until the receiver is finished
+//
+//
+//        auto pass_eval = pass_generator.generatePassEvaluation(world);
+//
+//        auto ranked_zones = pass_eval.rankZonesForReceiving(
+//            world, best_pass_and_score_so_far.pass.receiverPoint());
+//        Zones cherry_pick_region_1 = {ranked_zones[0]};
+//        Zones cherry_pick_region_2 = {ranked_zones[1]};
+//
+//        auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
+//        auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
+//
+//
+//        cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
+//                                                  pass1.receiverOrientation(), 0.0,
+//                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+//        cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
+//                                                  pass2.receiverOrientation(), 0.0,
+//                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+//
+//
+//        do
+//        {
+//            attacker->updateControlParams(pass);
+//            receiver->updateControlParams(pass);
+//
+//            std::get<0>(crease_defender_tactics)
+//                ->updateControlParams(world.ball().position(),
+//                                      CreaseDefenderAlignment::LEFT);
+//            std::get<1>(crease_defender_tactics)
+//                ->updateControlParams(world.ball().position(),
+//                                      CreaseDefenderAlignment::RIGHT);
+//            if (!attacker->done())
+//            {
+//                yield({{attacker, receiver},
+//                       {cherry_pick_tactic_1, std::get<0>(crease_defender_tactics),
+//                        std::get<1>(crease_defender_tactics)}});
+//            }
+//            else
+//            {
+//                yield({{receiver},
+//                       {cherry_pick_tactic_1, cherry_pick_tactic_2},
+//                       {std::get<0>(crease_defender_tactics),
+//                        std::get<1>(crease_defender_tactics)}});
+//            }
+//        } while (!receiver->done());
+//    }
+//    else
+//    {
+//        LOG(DEBUG) << "Took shot";
+//    }
+//
+//    LOG(DEBUG) << "Finished";
 }
 
 PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
