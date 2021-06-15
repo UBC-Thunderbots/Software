@@ -14,7 +14,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedDribbleTacticTest : public SimulatedTacticTestFixture
+class SimulatedDribbleTacticPushEnemyTest : public SimulatedTacticTestFixture
 {
    protected:
     void checkPossession(std::shared_ptr<DribbleTactic> tactic,
@@ -49,14 +49,17 @@ class SimulatedDribbleTacticTest : public SimulatedTacticTestFixture
              field.enemyDefenseArea().negXPosYCorner()});
 };
 
-TEST_F(SimulatedDribbleTacticTest, test_intercept_ball_behind_enemy_robot)
+TEST_F(SimulatedDribbleTacticPushEnemyTest, test_intercept_ball_behind_enemy_robot)
 {
     Point initial_position = Point(-3, 1.5);
-    BallState ball_state(Point(3, -2), Vector(-0.5, 1));
+    BallState ball_state(Point(1 + DIST_TO_FRONT_OF_ROBOT_METERS, 2.5), Vector());
+    Point dribble_destination = Point(-1, 2);
+    Angle dribble_orientation = Angle::zero();
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
     auto tactic = std::make_shared<DribbleTactic>();
+    tactic->updateControlParams(dribble_destination, dribble_orientation);
     setTactic(tactic);
     setRobotId(1);
     setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION});
