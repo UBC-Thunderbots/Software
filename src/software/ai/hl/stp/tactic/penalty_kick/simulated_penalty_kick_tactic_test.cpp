@@ -72,7 +72,9 @@ TEST_F(SimulatedPenaltyKickTacticTest, penalty_no_goalie)
             robotNotExcessivelyDribbling(shooter_id, world_ptr, yield);
         }};
 
-    runTest(field, ball, {shooter}, {}, terminating_validation_functions,
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(0, -2.5)});
+
+    runTest(field, ball, {shooter}, enemy_robots, terminating_validation_functions,
             non_terminating_validation_functions, Duration::fromSeconds(10));
 }
 
