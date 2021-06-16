@@ -134,8 +134,7 @@ static void app_move_primitive_tick(void* void_state_ptr, FirmwareWorld_t* world
     size_t trajectory_index  = 1;
     const float current_time = app_firmware_world_getCurrentTime(world);
     while (trajectory_index < state->num_trajectory_elems - 1 &&
-           state->position_trajectory.time_profile[trajectory_index - 1] <
-               current_time - state->primitive_start_time_seconds)
+           state->position_trajectory.time_profile[trajectory_index - 1] < current_time)
     {
         trajectory_index++;
     }

@@ -1,5 +1,4 @@
 // clang-format off
-// clang-format off
 /**
   ******************************************************************************
   * @file    stm32h7xx_hal_conf.h
@@ -511,5 +510,4 @@
 #endif /* STM32H7xx_HAL_CONF_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-// clang-format on
 // clang-format on

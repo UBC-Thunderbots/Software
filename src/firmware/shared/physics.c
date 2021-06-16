@@ -19,10 +19,10 @@
 // torque as the matrix is unitless (multiply by ROBOT_MAX_RADIUS_METERS to unnormalize)
 // the transpose of this matrix is the velocity coupling matrix and can
 // convert speeds in the robot coordinates into linear wheel speeds
-static const float shared_physics_wheels_to_local_vel_matrix_transpose[3][4] = {
-    {-0.8192f, -0.7071f, 0.7071f, 0.8192f},
-    {0.5736f, -0.7071f, -0.7071f, 0.5736f},
-    {1.0000f, 1.0000f, 1.0000f, 1.0000f}};
+/*static const float shared_physics_wheels_to_local_vel_matrix_transpose[3][4] = {*/
+    /*{-0.8192f, -0.7071f, 0.7071f, 0.8192f},*/
+    /*{0.5736f, -0.7071f, -0.7071f, 0.5736f},*/
+    /*{1.0000f, 1.0000f, 1.0000f, 1.0000f}};*/
 
 // Transformation matrix to convert a 4 velocity/force to a 3 velocity/force (derived as
 // pinv(shared_physics_force4ToForce3^t)
