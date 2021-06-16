@@ -148,6 +148,7 @@ static void app_move_primitive_tick(void* void_state_ptr, FirmwareWorld_t* world
     while (trajectory_index < state->num_trajectory_elems - 1 &&
            state->position_trajectory.time_profile[trajectory_index - 1] <
                current_time - state->primitive_start_time_seconds)
+    {
         trajectory_index++;
     }
 
