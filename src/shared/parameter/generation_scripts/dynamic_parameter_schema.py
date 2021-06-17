@@ -6,7 +6,6 @@ OPTIONAL_KEY = "optional"
 SUPPORTED_TYPES = [
     "bool",
     "int",
-    "uint",
     "float",
     "double",
     "string",
@@ -53,25 +52,6 @@ PARAM_DEF_SCHEMA = {
                         "min": {"type": "integer"},
                         "max": {"type": "integer"},
                         "value": {"type": "integer"},
-                        "description": {"type": "string"},
-                        CONSTANT_KEY: {"type": "boolean"},
-                        OPTIONAL_KEY: {"type": "boolean"},
-                    },
-                    "required": ["name", "min", "max", "value", "description"],
-                    "additionalProperties": False,
-                }
-            },
-        },
-        {
-            "type": "object",
-            "properties": {
-                "uint": {
-                    "type": "object",
-                    "properties": {
-                        "name": {"type": "string"},
-                        "min": {"type": "integer", "minimum": 0},
-                        "max": {"type": "integer", "minimum": 0},
-                        "value": {"type": "integer", "minimum": 0},
                         "description": {"type": "string"},
                         CONSTANT_KEY: {"type": "boolean"},
                         OPTIONAL_KEY: {"type": "boolean"},

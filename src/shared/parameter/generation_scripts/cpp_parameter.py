@@ -71,7 +71,7 @@ class CppParameter(object):
 
     @staticmethod
     def is_numeric_type(param_type: str) -> bool:
-        return re.match("int|uint|double", param_type)
+        return re.match("int|double", param_type)
 
     @staticmethod
     def find_quote(param_type: str) -> str:
