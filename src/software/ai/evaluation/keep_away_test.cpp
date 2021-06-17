@@ -103,7 +103,7 @@ TEST(FindKeepAwayPointTest, test_keep_away_point_field_lines)
     auto keep_away_pt = findKeepAwayTargetPoint(world, pass);
     auto field_center = world.field().fieldLines().centre();
     // the keep away point should be closer to the field center
-    EXPECT_LE((keep_away_pt - field_center).length(),
+    EXPECT_LT((keep_away_pt - field_center).length(),
               (top_left_corner - field_center).length());
 }
 
@@ -117,6 +117,6 @@ TEST(FindKeepAwayPointTest, test_keep_away_point_field_lines_2)
     auto keep_away_pt = findKeepAwayTargetPoint(world, pass);
     auto field_center = world.field().fieldLines().centre();
     // the keep away point should be closer to the field center
-    EXPECT_LE((keep_away_pt - field_center).length(),
+    EXPECT_LT((keep_away_pt - field_center).length(),
               (top_mid_point - field_center).length());
 }
