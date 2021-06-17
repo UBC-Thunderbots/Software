@@ -31,11 +31,17 @@ double DribbleTactic::calculateRobotCost(const Robot &robot, const World &world)
     double cost = 0.0;
     if (!robot.isNearDribbler(world.ball().position()))
     {
-        // Prefer robots closer to the interception point
+        // Prefer robots closer to the interception point. If no interception point exists,
+        // prefer robots closer to ball
         // We normalize with the total field length so that robots that are within the
         // field have a cost less than 1
+
+        auto intercept_result =
+                findBestInterceptForBall(event.common.world.ball(),
+                                         event.common.world.field(), event.common.robot).value_or({event.common.world.ball().position(), Duration()});
+
         cost = (robot.position() -
-                DribbleFSM::findInterceptionPoint(robot, world.ball(), world.field()))
+                intercept_result.first
                    .length() /
                world.field().totalXLength();
     }
