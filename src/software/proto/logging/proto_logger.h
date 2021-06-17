@@ -45,7 +45,7 @@ class ProtoLogger : public FirstInFirstOutThreadedObserver<MsgT>
 
     /**
      * Safely save the current replay chunk into the output directory. Calls
-     * saveCurrentChunkHelper() *after* acquiring the chunk_mutex, this can be 
+     * saveCurrentChunkHelper() *after* acquiring the chunk_mutex, this can be
      * called from any thread.
      */
     void saveCurrentChunk();

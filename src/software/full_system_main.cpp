@@ -105,7 +105,7 @@ int main(int argc, char** argv)
         }
 
         // this function is a no-op if a proto log output path isn't set
-        std::function<void(void)> save_chunks = [](){/* do nothing */};
+        std::function<void(void)> save_protolog_chunks_fn = []() { /* do nothing */ };
 
         if (!args->getProtoLogOutputDir()->value().empty())
         {
@@ -151,7 +151,10 @@ int main(int argc, char** argv)
             sensor_fusion->registerObserver(world_to_vision_adapter);
             world_to_vision_adapter->registerObserver(vision_logger);
 
-            save_chunks = [sensor_msg_logger, primitive_set_logger, vision_logger] () {
+            // we are logging protologs, set the save_protologs_chunk_fn function 
+            // to save the in-progress protolog chunks
+            save_protolog_chunks_fn = [sensor_msg_logger, primitive_set_logger,
+                                       vision_logger]() {
                 sensor_msg_logger->saveCurrentChunk();
                 primitive_set_logger->saveCurrentChunk();
                 vision_logger->saveCurrentChunk();
@@ -173,7 +176,7 @@ int main(int argc, char** argv)
             std::promise<void>().get_future().wait();
         }
 
-        save_chunks();
+        save_protolog_chunks_fn();
     }
 
     return 0;
