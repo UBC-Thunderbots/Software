@@ -55,11 +55,23 @@ Vector Ball::acceleration() const
 
 BallState Ball::estimateFutureState(const Duration &duration_in_future) const
 {
+    Vector future_velocity = calculateFutureVelocity(
+            current_state_.velocity(), acceleration_, duration_in_future);
+
+    //since acceleration is due to friction, final velocity cannot be in the opposite direction to initial velocity.
+    //if that happens, we find a new velocity using a more realistic duration
+    Duration effective_duration(duration_in_future);
+
+    if(acceleration_.length() > 0 && (future_velocity - current_state_.velocity()).orientation() >= Angle::half()) {
+        double time = current_state_.velocity().length() / acceleration_.length();
+        effective_duration = Duration::fromSeconds(time);
+        future_velocity = calculateFutureVelocity(
+                current_state_.velocity(), acceleration_, effective_duration);
+    }
+
     const Point future_position =
         calculateFuturePosition(current_state_.position(), current_state_.velocity(),
-                                acceleration_, duration_in_future);
-    const Vector future_velocity = calculateFutureVelocity(
-        current_state_.velocity(), acceleration_, duration_in_future);
+                                acceleration_, effective_duration);
 
     return BallState(future_position, future_velocity);
 }

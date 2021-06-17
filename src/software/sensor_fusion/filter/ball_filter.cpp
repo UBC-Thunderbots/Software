@@ -137,9 +137,22 @@ std::optional<Ball> BallFilter::estimateBallStateFromBuffer(
         return std::nullopt;
     }
 
+    static constexpr double BALL_CONSTANT_ACCELERATION_MAGNITUDE = 0.5;
+    static constexpr double BALL_MIN_SPEED_FOR_ROLLING_ACCELERATION      = 0.2;
+
+    Vector acceleration;
+
+    if(estimated_velocity->average_velocity.length() > BALL_MIN_SPEED_FOR_ROLLING_ACCELERATION) {
+        // if ball is above threshold, assume rolling acceleration acting in opposite
+        // direction
+        acceleration = estimated_velocity->average_velocity.normalize(
+                -1 * BALL_CONSTANT_ACCELERATION_MAGNITUDE);
+
+    }
+
     BallState ball_state(filtered_position, estimated_velocity->average_velocity,
                          ball_detections.front().distance_from_ground);
-    return Ball(ball_state, ball_detections.front().timestamp);
+    return Ball(ball_state, ball_detections.front().timestamp, acceleration);
 }
 
 std::optional<size_t> BallFilter::getAdjustedBufferSize(
