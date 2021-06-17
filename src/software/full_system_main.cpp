@@ -169,7 +169,7 @@ int main(int argc, char** argv)
             sensor_fusion->registerObserver(world_to_vision_adapter);
             world_to_vision_adapter->registerObserver(vision_logger);
 
-            // we are logging protologs, set the save_protologs_chunk_fn function 
+            // we are logging protologs, set the save_protologs_chunk_fn function
             // to save the in-progress protolog chunks
             save_protolog_chunks_fn = [sensor_msg_logger, primitive_set_logger,
                                        vision_logger]() {
