@@ -57,6 +57,19 @@ int main(int argc, char** argv)
                 ->setValue(args->getInterface()->value());
         }
 
+        mutable_thunderbots_config->getMutableSensorFusionConfig()
+            ->getMutableFriendlyColorYellow()
+            ->setValue(args->getTeamColor()->value() == "yellow");
+        mutable_thunderbots_config->getMutableSensorFusionConfig()
+            ->getMutableOverrideGameControllerDefendingSide()
+            ->setValue(args->getDefendingSide()->value() != "gamecontroller");
+        mutable_thunderbots_config->getMutableSensorFusionConfig()
+            ->getMutableDefendingPositiveSide()
+            ->setValue(args->getDefendingSide()->value() == "positive");
+        mutable_thunderbots_config->getMutableNetworkConfig()
+            ->getMutableChannel()
+            ->setValue(args->getChannel()->value());
+
         // override arduino port or try to find programmatically
         if (!args->getArduinoConfig()->getPort()->value().empty())
         {
@@ -75,6 +88,11 @@ int main(int argc, char** argv)
         {
             LOG(FATAL) << "The option '--backend' is required but missing";
         }
+
+        // update command line arguments in BackendConfig
+        auto mutable_backend_config =
+            mutable_thunderbots_config->getMutableBackendConfig();
+        *mutable_backend_config->getMutableFullSystemMainCommandLineArgs() = *args;
 
         std::shared_ptr<Backend> backend =
             GenericFactory<std::string, Backend, BackendConfig>::create(
