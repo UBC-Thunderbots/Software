@@ -6,7 +6,6 @@
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
-#include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_free_kicker_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
@@ -100,7 +99,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
             {
                 std::get<0>(shadow_enemy_tactics)
                     ->updateControlParams(enemy_threats.at(0),
-                                          ROBOT_MAX_RADIUS_METERS * 3);
+                                          ROBOT_SHADOWING_DISTANCE_METERS);
                 result[0].emplace_back(std::get<0>(shadow_enemy_tactics));
             }
             else

@@ -23,32 +23,6 @@ cc_library(
 )
 
 cc_library(
-    name = "defense_shadow_enemy_tactic",
-    srcs = ["defense_shadow_enemy_tactic.cpp"],
-    hdrs = ["defense_shadow_enemy_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/evaluation:calc_best_shot",
-        "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/action:stop_action",
-        "//software/logger",
-    ],
-)
-
-cc_test(
-    name = "defense_shadow_enemy_tactic_test",
-    srcs = ["defense_shadow_enemy_tactic_test.cpp"],
-    deps = [
-        ":defense_shadow_enemy_tactic",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
-    ],
-)
-
-cc_library(
     name = "penalty_setup_tactic",
     srcs = ["penalty_setup_tactic.cpp"],
     hdrs = ["penalty_setup_tactic.h"],
@@ -106,7 +80,6 @@ cc_library(
     name = "all_tactics",
     hdrs = ["all_tactics.h"],
     deps = [
-        ":defense_shadow_enemy_tactic",
         ":kickoff_chip_tactic",
         ":penalty_setup_tactic",
         ":receiver_tactic",

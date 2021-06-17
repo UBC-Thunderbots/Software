@@ -6,6 +6,7 @@ cc_library(
     hdrs = ["threaded_estop_reader.h"],
     deps = [
         "uart_communication_interface",
+        "//shared:constants",
         "//software/logger",
         "//software/util/make_enum",
         "@boost//:asio",
@@ -24,6 +25,17 @@ cc_library(
     deps = [
         "uart_communication_interface",
         "@boost//:asio",
+    ],
+)
+
+cc_library(
+    name = "arduino_util",
+    srcs = ["arduino_util.cpp"],
+    hdrs = ["arduino_util.h"],
+    deps = [
+        "//shared:constants",
+        "@boost//:filesystem",
+        "@boost//:format",
     ],
 )
 
