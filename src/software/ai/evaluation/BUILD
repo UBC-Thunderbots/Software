@@ -161,6 +161,7 @@ cc_test(
     srcs = ["intercept_test.cpp"],
     deps = [
         ":intercept",
+        "//shared:constants",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
     ],
