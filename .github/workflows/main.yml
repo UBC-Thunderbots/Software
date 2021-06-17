@@ -58,9 +58,10 @@ jobs:
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
           "${GITHUB_WORKSPACE}"/environment_setup/setup_firmware.sh
 
-      - name: STM32CubeMX Code Generation
-        run: |
-          "${GITHUB_WORKSPACE}"/.github/check_cubemx_ci.sh
+          # TODO (#2144): renable STM32CubeMX Code Generation check
+          #      - name: STM32CubeMX Code Generation
+          #        run: |
+          #          "${GITHUB_WORKSPACE}"/.github/check_cubemx_ci.sh
 
       - name: Arduino Uno Firmware Build
         run: |
@@ -93,7 +94,7 @@ jobs:
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
 
-      - name: Simulated Test
+      - name: Simulated Test (Continue on error)
         # make sure that replays are uploaded even if tests fail
         continue-on-error: true
         run: |
@@ -103,7 +104,6 @@ jobs:
             //software/ai/hl/stp/play/...    \
             //software/ai/hl/stp/tactic/... 
 
-      
       - name: Upload simulated test artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -111,6 +111,16 @@ jobs:
           # we only care about the replay logs from the STP tests
           path: |
             src/bazel-out/k8-fastbuild/testlogs/software/ai/hl/stp
+
+      - name: Simulated Test (Check for errors)
+        # Run Simulated Tests a second time to check for failures
+        run: |
+          cd src
+          bazel test --show_timestamps   \
+            //software/simulated_tests/...   \
+            //software/ai/hl/stp/play/...    \
+            //software/ai/hl/stp/tactic/... 
+
             
   memory-leak-checks:
     name: Memory Leak Checks

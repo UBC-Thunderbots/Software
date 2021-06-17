@@ -22,6 +22,7 @@ TEST_P(SimulatedMoveGoalieToGoalLineTacticTest, move_to_goal_line_test)
     RobotStateWithId robot_state = GetParam();
 
     std::vector<RobotStateWithId> friendly_robots = {robot_state};
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
     BallState ball_state = BallState(Point(0.5, 0.5), Vector(0, 0));
 
@@ -48,8 +49,9 @@ TEST_P(SimulatedMoveGoalieToGoalLineTacticTest, move_to_goal_line_test)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
-            non_terminating_validation_functions, Duration::fromSeconds(10));
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
 }
 
 INSTANTIATE_TEST_CASE_P(
