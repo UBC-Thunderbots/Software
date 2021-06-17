@@ -70,7 +70,7 @@ TEST_F(SimulatedDribbleTacticTest, test_intercept_ball_behind_enemy_robot)
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(20));
 }
 
 TEST_F(SimulatedDribbleTacticTest, test_stopped_ball)
