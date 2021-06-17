@@ -138,7 +138,8 @@ TEST(CreaseDefenderFSMTest, test_transitions)
         ::TestUtil::setBallPosition(world, Point(-0.5, 0), Timestamp::fromSeconds(123));
     CreaseDefenderFSM::ControlParams control_params{
         .enemy_threat_origin       = Point(2, 3),
-        .crease_defender_alignment = CreaseDefenderAlignment::LEFT};
+        .crease_defender_alignment = CreaseDefenderAlignment::LEFT,
+        .max_allowed_speed_mode    = MaxAllowedSpeedMode::PHYSICAL_LIMIT};
 
     FSM<CreaseDefenderFSM> fsm(
         CreaseDefenderFSM(std::make_shared<RobotNavigationObstacleConfig>()));

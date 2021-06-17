@@ -90,6 +90,6 @@ class Parameter
 
    private:
     // mutexes are marked as mutable so that they can be acquired in a const function
-    mutable std::mutex value_mutex_;
-    mutable std::mutex callback_mutex_;
+    mutable std::recursive_mutex value_mutex_;
+    mutable std::recursive_mutex callback_mutex_;
 };

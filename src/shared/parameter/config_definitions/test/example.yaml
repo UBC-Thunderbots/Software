@@ -50,15 +50,6 @@ include:
     constant: true
     description: >-
       Can be any integer value in the range [min, max]
-- uint:
-    name: example_unsigned_int_param
-    min: 0 # Must be >= 0
-    max: 5
-    value: 3
-    constant: true
-    description: >-
-      Can be any integer value in the range [min, max].
-      The minimum value must be >= 0
 - float:
     name: example_float_param
     min: 1.1
