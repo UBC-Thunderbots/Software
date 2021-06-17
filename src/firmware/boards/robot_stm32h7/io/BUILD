@@ -223,14 +223,13 @@ cc_library(
     restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
         "//firmware/app/logger",
-        "//firmware/app/primitives:primitive_manager",
         "//firmware/shared:physics",
         "//firmware/boards/robot_stm32h7/io:proto_multicast_communication",
         "//firmware/boards/legacy_robot_stm32f4:circular_buffer",
         "//firmware/boards/robot_stm32h7:hal",
         "//firmware/boards/robot_stm32h7:adc",
         "//firmware/boards/robot_stm32h7:tim",
-    ],
+    ]
 )
 
 cc_library(

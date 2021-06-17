@@ -8,7 +8,7 @@
 // these are set to decouple the 3 axis from each other
 // the idea is to clamp the maximum velocity and acceleration
 // so that the axes would never have to compete for resources
-#define TIME_HORIZON 0.25f  // s
+#define TIME_HORIZON 0.05f  // s
 
 // Function pointer definition for the robot to follow the provided position trajectory
 typedef void (*TrajectoryFollower_t)(const FirmwareRobot_t*, PositionTrajectory_t,
@@ -146,10 +146,11 @@ void force_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
         accel, pb, app_firmware_robot_getOrientation(robot), major_vec, minor_vec);
 
     ForceWheel_t* force_wheels[4];
-    force_wheels[0] = front_right_wheel;
-    force_wheels[1] = front_left_wheel;
-    force_wheels[2] = back_left_wheel;
-    force_wheels[3] = back_right_wheel;
+    force_wheels[0] = front_left_wheel;
+    force_wheels[1] = back_left_wheel;
+    force_wheels[2] = back_right_wheel;
+    force_wheels[3] = front_right_wheel;
+ 
     app_control_applyAccel(robot_constants, controller_state, battery_voltage,
                            force_wheels, accel[0], accel[1], accel[2]);
 }
@@ -561,10 +562,10 @@ void app_firmware_robot_trackVelocityInRobotFrame(const FirmwareRobot_t* robot,
         (angular_velocity - current_angular_velocity) * VELOCITY_ERROR_GAIN;
 
     ForceWheel_t* force_wheels[4];
-    force_wheels[0] = robot->front_right_force_wheel;
-    force_wheels[1] = robot->front_left_force_wheel;
-    force_wheels[2] = robot->back_left_force_wheel;
-    force_wheels[3] = robot->back_right_force_wheel;
+    force_wheels[0] = robot->front_left_force_wheel;
+    force_wheels[1] = robot->back_left_force_wheel;
+    force_wheels[2] = robot->back_right_force_wheel;
+    force_wheels[3] = robot->front_right_force_wheel;
 
     app_control_applyAccel(robot_constants, controller_state, battery_voltage,
                            force_wheels, desired_acceleration[0], desired_acceleration[1],

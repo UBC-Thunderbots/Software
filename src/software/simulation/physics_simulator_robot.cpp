@@ -49,18 +49,17 @@ float PhysicsSimulatorRobot::getOrientation()
 
 float PhysicsSimulatorRobot::getVelocityX()
 {
-    return checkValidAndExecute<float>([](auto robot) { return robot->velocity().x(); });
+    return checkValidAndExecute<float>([](auto robot) { return 0.0f; });
 }
 
 float PhysicsSimulatorRobot::getVelocityY()
 {
-    return checkValidAndExecute<float>([](auto robot) { return robot->velocity().y(); });
+    return checkValidAndExecute<float>([](auto robot) { return 0.0f; });
 }
 
 float PhysicsSimulatorRobot::getVelocityAngular()
 {
-    return checkValidAndExecute<float>(
-        [](auto robot) { return robot->angularVelocity().toRadians(); });
+    return checkValidAndExecute<float>([](auto robot) { return 0.0f; });
 }
 
 float PhysicsSimulatorRobot::getBatteryVoltage()

@@ -59,13 +59,11 @@ cc_library(
     srcs = [
         "startup_stm32h743xx.s",
         "stm32h7xx_hal_msp.c",
-        "stm32h7xx_it.c",
         "system_stm32h7xx.c",
     ],
     hdrs = [
         "FreeRTOSConfig.h",
         "stm32h7xx_hal_conf.h",
-        "stm32h7xx_it.h",
     ],
     copts = [
         "-DSTM32H743xx",
@@ -79,10 +77,45 @@ cc_library(
         ":lwip",
         ":tim",
         ":usart",
+        ":interrupt_handlers",
         "//firmware/app/logger",
         "//firmware/boards/robot_stm32h7/io:proto_multicast_communication",
         "//firmware/boards/robot_stm32h7/io:ublox_odinw262_communicator",
         "//shared:constants",
+        "//shared/proto:tbots_nanopb_proto",
+        "@nanopb",
+    ],
+    # This is _very_ important. If we don't do this, bazel will not link in the
+    # interrupt handling code, which *will not* cause an error, and *will* cause
+    # interrupts to stop working
+    alwayslink = True,
+)
+cc_library(
+    name = "interrupt_handlers",
+    srcs = [
+        "stm32h7xx_it.c",
+    ],
+    hdrs = [
+        "stm32h7xx_it.h",
+        "main.h",
+    ],
+    copts = [
+        # We don't want to mark warnings as errors for 3rd party code
+        "-Wno-error",
+        "-DSTM32H743xx",
+    ],
+    restricted_to = ["//cc_toolchain:stm32h7"],
+    deps = [
+        ":crc",
+        ":hal",
+        ":lwip",
+        ":tim",
+        ":usart",
+        "//firmware/app/logger",
+        "//firmware/boards/robot_stm32h7/io:proto_multicast_communication",
+        "//firmware/boards/robot_stm32h7/io:ublox_odinw262_communicator",
+        "//shared:constants",
+        "//firmware/boards/robot_stm32h7/io:vision",
         "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
     ],

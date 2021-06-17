@@ -21,7 +21,7 @@
 #define FRONT_LEFT 1
 #define BACK_LEFT 2
 #define BACK_RIGHT 3
-#define TICS_TO_MS 0.0270833f
+#define TICS_TO_MS 0.025
 #define ADC_DMA_BUFFER __attribute__((section(".dma_buffer")))
 
 // Dead reckoning 
@@ -35,9 +35,11 @@ static ADC_HandleTypeDef* g_adc_handle;
 static TIM_HandleTypeDef* g_timer_handle;
 
 volatile uint32_t g_last_sample_time = 0;
-volatile float g_last_sampled_angles[NUM_ENCODERS] = {0};
-volatile float g_current_wheel_displacement[NUM_ENCODERS] = {0};
-static float robot_displacements[3];
+volatile uint32_t g_last_computed_velocity_time = 0;
+volatile double g_last_sampled_angles[NUM_ENCODERS] = {0};
+volatile double g_current_wheel_displacement[NUM_ENCODERS] = {0};
+volatile double g_current_wheel_speeds[NUM_ENCODERS] = {0};
+static float robot_speed[3];
 
 void HAL_ADC_ErrorCallback(ADC_HandleTypeDef* hadc) {}
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
@@ -56,27 +58,24 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
         (uint32_t*)(((uint32_t)g_dma_adc_receive_buffer) & ~(uint32_t)0x1F),
         RX_BUFFER_LENGTH_BYTES + 32);
 
-    // TODO hack remove the VREF sampling later
-    /*g_dma_adc_receive_buffer[8] = 32768;*/
-
-    float front_right = P_PI + atan2f(
-            (float)(g_dma_adc_receive_buffer[1] - g_dma_adc_receive_buffer[8]),
-            (float)(g_dma_adc_receive_buffer[0] - g_dma_adc_receive_buffer[8])
+    double front_right = P_PI + atan2(
+            (double)(g_dma_adc_receive_buffer[1] - g_dma_adc_receive_buffer[8]),
+            (double)(g_dma_adc_receive_buffer[0] - g_dma_adc_receive_buffer[8])
     );
 
-    float back_right = P_PI + atan2f(
-            (float)(g_dma_adc_receive_buffer[5] - g_dma_adc_receive_buffer[8]),
-            (float)(g_dma_adc_receive_buffer[2] - g_dma_adc_receive_buffer[8])
+    double back_right = P_PI + atan2(
+            (double)(g_dma_adc_receive_buffer[2] - g_dma_adc_receive_buffer[8]),
+            (double)(g_dma_adc_receive_buffer[5] - g_dma_adc_receive_buffer[8])
     );
 
-    float front_left = P_PI + atan2f(
-            (float)(g_dma_adc_receive_buffer[6] - g_dma_adc_receive_buffer[8]),
-            (float)(g_dma_adc_receive_buffer[3] - g_dma_adc_receive_buffer[8])
+    double front_left = P_PI + atan2(
+            (double)(g_dma_adc_receive_buffer[3] - g_dma_adc_receive_buffer[8]),
+            (double)(g_dma_adc_receive_buffer[6] - g_dma_adc_receive_buffer[8])
     );
 
-    float back_left = P_PI + atan2f(
-            (float)(g_dma_adc_receive_buffer[7] - g_dma_adc_receive_buffer[8]),
-            (float)(g_dma_adc_receive_buffer[4] - g_dma_adc_receive_buffer[8])
+    double back_left = P_PI + atan2(
+            (double)(g_dma_adc_receive_buffer[4] - g_dma_adc_receive_buffer[8]),
+            (double)(g_dma_adc_receive_buffer[7] - g_dma_adc_receive_buffer[8])
     );
 
     // clock speed 240MHz
@@ -156,7 +155,7 @@ void io_vision_init(TIM_HandleTypeDef* timer,
         TLOG_INFO("Started ADC DMA in circular mode");
     }
 
-    if (HAL_TIM_Base_Start(g_timer_handle) != HAL_OK)
+    if (HAL_TIM_Base_Start_IT(g_timer_handle) != HAL_OK)
     {
         TLOG_FATAL("You suck, timer broken");
     }
@@ -188,8 +187,7 @@ void io_vision_task(void* arg)
 
     for (;;)
     {
-        io_proto_multicast_communication_profile_blockUntilEvents(comm_profile,
-                                                                  RECEIVED_PROTO);
+        uint32_t tick_start = osKernelGetTickCount();
 
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
 
@@ -198,7 +196,8 @@ void io_vision_task(void* arg)
 
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
 
-
+        if(memcmp(&vision_copy, &vision, sizeof(vision_copy)) != 0)
+        {
             // only update vision if we have atleast 1 robot state
             if (vision_copy.robot_states_count == 1)
             {
@@ -206,47 +205,54 @@ void io_vision_task(void* arg)
                 vision = vision_copy;
                 io_unlock_vision();
             }
-        int x = (int)(vision.robot_states[0].value.global_position.x_meters * 100.0f);
-        int y = (int)(vision.robot_states[0].value.global_position.y_meters * 100.0f);
+            io_vision_applyVisionFrameToDeadReckoning(0);
+        }
 
-        TLOG_INFO("x %d, y %d", x,y);
-        /*io_vision_applyVisionFrameToDeadReckoning(0);*/
-        /*io_vision_stepDeadReckoning();*/
+        io_vision_getRobotVelocityX();
+        /*int y = (int)(io_vision_getRobotVelocityY() * 100.0);*/
+        /*int z = (int)(io_vision_getRobotAngularVelocity() * 100.0);*/
+
+        /*TLOG_INFO("dead reckoned speeds: %d %d %d", x, y, z);*/
+        uint32_t tick_end = osKernelGetTickCount();
 
         // TODO pull 5 into a constant
-        /*if (tick_end - tick_start > 8)*/
-        /*{*/
-            /*[>TLOG_WARNING("Vision (dead reckoning) falling behind!! %d", tick_end - tick_start);<]*/
-        /*}*/
-        /*else*/
-        /*{*/
-            /*osDelay(8 - (tick_end - tick_start));*/
-        /*}*/
+        if (tick_end - tick_start > 10)
+        {
+            TLOG_WARNING("Vision (dead reckoning) falling behind!! %d", tick_end - tick_start);
+        }
+        else
+        {
+            osDelay(10 - (tick_end - tick_start));
+        }
     }
 }
+
 void io_vision_applyVisionFrameToDeadReckoning(uint32_t robot_id)
 {
-    // TODO generalize this 
-    g_current_state.x     = vision.robot_states[robot_id].value.global_position.x_meters;
-    g_current_state.y     = vision.robot_states[robot_id].value.global_position.y_meters;
-    g_current_state.angle     = vision.robot_states[robot_id].value.global_orientation.radians;
-    g_current_wheel_displacement[FRONT_RIGHT]  = 0.0;
-    g_current_wheel_displacement[BACK_RIGHT] = 0.0;
-    g_current_wheel_displacement[FRONT_LEFT] = 0.0;
-    g_current_wheel_displacement[BACK_LEFT] = 0.0;
-}
+    // TODO generalize this
+    g_current_state.x = vision.robot_states[robot_id].value.global_position.x_meters;
+    g_current_state.y = vision.robot_states[robot_id].value.global_position.y_meters;
+    g_current_state.angle =
+        vision.robot_states[robot_id].value.global_orientation.radians;
 
+    g_current_wheel_displacement[FRONT_RIGHT] = 0.0;
+    g_current_wheel_displacement[BACK_RIGHT]  = 0.0;
+    g_current_wheel_displacement[FRONT_LEFT]  = 0.0;
+    g_current_wheel_displacement[BACK_LEFT]   = 0.0;
+}
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
 void io_vision_stepDeadReckoning()
 {
-    io_lock_vision();
-    float wheel_disps[4] = {
-        g_current_wheel_displacement[0],
-        g_current_wheel_displacement[1],
-        g_current_wheel_displacement[2],
-        g_current_wheel_displacement[3],
-    };
-    shared_physics_speed4ToSpeed3(wheel_disps, robot_displacements, 1, 1);
-    io_unlock_vision();
+    g_current_wheel_speeds[FRONT_RIGHT] = (g_current_wheel_displacement[FRONT_RIGHT]  / 0.001);
+    g_current_wheel_speeds[FRONT_LEFT] =  (g_current_wheel_displacement[FRONT_LEFT]  / 0.001);
+    g_current_wheel_speeds[BACK_LEFT] =   (g_current_wheel_displacement[BACK_LEFT]  / 0.001);
+    g_current_wheel_speeds[BACK_RIGHT] =  (g_current_wheel_displacement[BACK_RIGHT] / 0.001);
+    g_current_wheel_displacement[FRONT_RIGHT] = 0.0;
+    g_current_wheel_displacement[FRONT_LEFT] = 0.0;
+    g_current_wheel_displacement[BACK_LEFT] = 0.0f;
+    g_current_wheel_displacement[BACK_RIGHT] = 0.0f;
+
 }
 
 void io_lock_vision()
@@ -322,13 +328,56 @@ float io_vision_getRobotOrientation(void)
 }
 float io_vision_getRobotVelocityX(void)
 {
-    return 0.0f;
+    float temp = 0.0f;
+    io_lock_vision();
+    float wheel_speeds[4] = {
+        (float)g_current_wheel_speeds[0],
+        (float)g_current_wheel_speeds[1],
+        (float)g_current_wheel_speeds[2],
+        (float)g_current_wheel_speeds[3],
+    };
+    // wheel disps is wheel speed at this point
+    shared_physics_speed4ToSpeed3(wheel_speeds, robot_speed, 1, 1);
+    robot_speed[2] *= 123.1996f;
+    temp = (float)robot_speed[0];
+    TLOG_INFO("%d", (int)(100.0f * robot_speed[0]));
+    io_unlock_vision();
+    return temp;
 }
 float io_vision_getRobotVelocityY(void)
 {
-    return 0.0f;
+    float temp = 0.0f;
+    io_lock_vision();
+    TLOG_INFO("%d", (int)(100.0f * robot_speed[1]));
+    float wheel_speeds[4] = {
+        (float)g_current_wheel_speeds[0],
+        (float)g_current_wheel_speeds[1],
+        (float)g_current_wheel_speeds[2],
+        (float)g_current_wheel_speeds[3],
+    };
+    // wheel disps is wheel speed at this point
+    shared_physics_speed4ToSpeed3(wheel_speeds, robot_speed, 1, 1);
+    robot_speed[2] *= 123.1996f;
+    temp = (float)robot_speed[1];
+    io_unlock_vision();
+    return temp;
 }
 float io_vision_getRobotAngularVelocity(void)
 {
-    return 0.0f;
+    float temp = 0.0f;
+    io_lock_vision();
+    float wheel_speeds[4] = {
+        (float)g_current_wheel_speeds[0],
+        (float)g_current_wheel_speeds[1],
+        (float)g_current_wheel_speeds[2],
+        (float)g_current_wheel_speeds[3],
+    };
+    // wheel disps is wheel speed at this point
+    shared_physics_speed4ToSpeed3(wheel_speeds, robot_speed, 1, 1);
+    robot_speed[2] *= 123.1996f;
+    TLOG_INFO("%d", (int)(100.0f * robot_speed[2]));
+    temp = (float)robot_speed[2];
+    io_unlock_vision();
+    return temp;
 }
+#pragma GCC diagnostic pop

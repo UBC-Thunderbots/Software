@@ -19,38 +19,27 @@
 // torque as the matrix is unitless (multiply by ROBOT_MAX_RADIUS_METERS to unnormalize)
 // the transpose of this matrix is the velocity coupling matrix and can
 // convert speeds in the robot coordinates into linear wheel speeds
-static const float shared_physics_wheels_to_local_vel_matrix_transpose[3][4] =
-    {{-0.8192f, -0.7071f, 0.7071f, 0.8192f},
-    {0.5736f, -0.7071f, -0.7071f, 0.5736f},
-    {1.0000f, 1.0000f, 1.0000f, 1.0000f}};
+/*static const float shared_physics_wheels_to_local_vel_matrix_transpose[3][4] =*/
+    /*{{-0.8192f, -0.7071f, 0.7071f, 0.8192f},*/
+    /*{0.5736f, -0.7071f, -0.7071f, 0.5736f},*/
+    /*{1.0000f, 1.0000f, 1.0000f, 1.0000f}};*/
 
 
 // Transformation matrix to convert a 4 velocity/force to a 3 velocity/force (derived as
 // pinv(shared_physics_force4ToForce3^t)
-static const float shared_physics_local_vel_to_wheels_matrix[3][4] = {
-    {-0.3498f, -0.3019f, 0.3019f, 0.3498f},
-    {0.3904f, -0.3904f, -0.3904f, 0.3904f},
-    {0.2761f, 0.2239f, 0.2239f, 0.2761f}};
+static const float shared_physics_local_vel_to_wheels_matrix[3][4] =
+    {{-0.3998f,  -0.3998f,   0.3998f,   0.3998f},
+    {0.3531f,  -0.3531f,  -0.2892f,   0.2892f},
+    {0.2878f,   0.2878f,   0.2122f,   0.2122f}};
 
 /*// New Robot Transformation matrices*/
 /*//*/
 /*// phi is 57.95 deg*/
 /*// theta is 43.96*/
-/*static const float shared_physics_wheels_to_local_vel_matrix_transpose_new[3][4] = {*/
-    /*{-0.84758f, -0.84758f, 0.69416f, 0.69416f},*/
-    /*{0.53066f, -0.53066f, -0.71982f, 0.71982f},*/
-    /*{1.0000f, 1.0000f, 1.0000f, 1.0000f}};*/
-
-/*// computed on octave using*/
-/*//  pinv(*/
-/*//      [-0.84758, 0.53066, 1.0000; -0.84758, -0.53066, 1.0000;*/
-/*//       0.69416, -0.71982, 1.0000; 0.6 9416, 0.71982, 1.0000]*/
-/*//  )*/
-/*static const float shared_physics_local_vel_to_wheels_matrix_new[3][4] = {*/
-   /*{-0.32431f,  -0.32431f,   0.32431f,   0.32431f},*/
-   /*{0.33177f,  -0.33177f,  -0.45003f,   0.45003f},*/
-   /*{0.22512f,   0.22512f,   0.27488f,   0.27488f}*/
-/*};*/
+static const float shared_physics_wheels_to_local_vel_matrix_transpose[3][4] = 
+    {{-0.5308f, -0.5308f, 0.7198f, 0.7198f},
+     {0.8475f, -0.8475f, -0.6942f, 0.6942f},
+     {1.0000f, 1.0000f, 1.0000f, 1.0000f}};
 
 void shared_physics_speed4ToSpeed3(const float speed4[4], float speed3[3],
                                    float front_wheel_angle_deg,
