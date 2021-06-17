@@ -8,6 +8,7 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
+#include "software/ai/hl/stp/tactic/shadow_free_kicker_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
@@ -72,30 +73,33 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         // Otherwise we assign ShadowEnemy tactics for the next highest threats. If there
         // any extra friendly robots, have them perform a reasonable default defensive
         // tactic
-        int immediate_enemy_threats = 0;
-        for (auto enemy_threat : enemy_threats)
-        {
-            if (distance(world.field().friendlyGoal(), enemy_threat.robot.position()) <
-                play_config->getDefensePlayConfig()
-                    ->getImmediateThreatDistance()
-                    ->value())
-            {
-                immediate_enemy_threats++;
-            }
-        }
+        int immediate_enemy_threats = static_cast<int>(std::count_if(
+            enemy_threats.begin(), enemy_threats.end(), [this, world](auto enemy_threat) {
+                return distance(world.field().friendlyGoal(),
+                                enemy_threat.robot.position()) <
+                       play_config->getDefensePlayConfig()
+                           ->getImmediateThreatDistance()
+                           ->value();
+            }));
+
 
         if (immediate_enemy_threats == 1)
         {
-            auto swarm_ball_tactics = moveRobotsToSwarmEnemyWithBall(move_tactics, world);
-            result[0].insert(result[0].end(), swarm_ball_tactics.begin(),
-                             swarm_ball_tactics.end());
+            std::get<0>(shadow_enemy_tactics)
+                ->updateControlParams(enemy_threats.at(0),
+                                      ROBOT_SHADOWING_DISTANCE_METERS);
+            std::get<1>(shadow_enemy_tactics)
+                ->updateControlParams(enemy_threats.at(0),
+                                      ROBOT_SHADOWING_DISTANCE_METERS);
+            result[0].insert(result[0].end(), shadow_enemy_tactics.begin(),
+                             shadow_enemy_tactics.end());
         }
         else
         {
             if (enemy_threats.size() > 0)
             {
                 std::get<0>(shadow_enemy_tactics)
-                    ->updateControlParams(enemy_threats.at(1),
+                    ->updateControlParams(enemy_threats.at(0),
                                           ROBOT_MAX_RADIUS_METERS * 3);
                 result[0].emplace_back(std::get<0>(shadow_enemy_tactics));
             }
@@ -107,8 +111,8 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
             if (enemy_threats.size() > 1)
             {
                 std::get<1>(shadow_enemy_tactics)
-                    ->updateControlParams(enemy_threats.at(0),
-                                          ROBOT_MAX_RADIUS_METERS * 3);
+                    ->updateControlParams(enemy_threats.at(1),
+                                          ROBOT_SHADOWING_DISTANCE_METERS);
                 result[0].emplace_back(std::get<1>(shadow_enemy_tactics));
             }
             else
@@ -117,10 +121,11 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
                     world.enemyTeam().getNearestRobot(world.ball().position());
                 if (nearest_enemy_robot)
                 {
+                    // Blocks in front of where the closest enemy robot is
                     Point block_point =
                         nearest_enemy_robot->position() +
                         Vector::createFromAngle(nearest_enemy_robot->orientation()) *
-                            ROBOT_MAX_RADIUS_METERS * 3;
+                            ROBOT_SHADOWING_DISTANCE_METERS;
                     move_tactics[1]->updateControlParams(
                         block_point, nearest_enemy_robot->orientation() + Angle::half(),
                         0.0);
@@ -137,29 +142,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         // yield the Tactics this Play wants to run, in order of priority
         yield(result);
     } while (true);
-}
-
-std::vector<std::shared_ptr<MoveTactic>> DefensePlay::moveRobotsToSwarmEnemyWithBall(
-    std::vector<std::shared_ptr<MoveTactic>> move_tactics, const World &world)
-{
-    auto nearest_enemy_robot = world.enemyTeam().getNearestRobot(world.ball().position());
-    if (nearest_enemy_robot)
-    {
-        Point block_point = nearest_enemy_robot->position() +
-                            Vector::createFromAngle(nearest_enemy_robot->orientation()) *
-                                ROBOT_MAX_RADIUS_METERS * 3;
-        move_tactics[0]->updateControlParams(
-            block_point, nearest_enemy_robot->orientation() + Angle::half(), 0.0);
-        move_tactics[1]->updateControlParams(
-            block_point, nearest_enemy_robot->orientation() + Angle::half(), 0.0);
-        return move_tactics;
-    }
-    else
-    {
-        // somehow they have 0 robots
-        LOG(WARNING) << "0 enemy robots so we hit a very stupid fallback case";
-        return {};
-    }
 }
 
 // Register this play in the genericFactory
