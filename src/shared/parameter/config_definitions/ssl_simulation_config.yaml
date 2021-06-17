@@ -4,7 +4,7 @@
     max: 15
     value: 0
     description: >-
-      The multicast channel to use to communicate with the robots
+      The multicast channel to use to communicate with the friendly robots
       in the simulator.
 
 - string:
