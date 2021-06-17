@@ -75,36 +75,6 @@ struct DribbleFSM
     }
 
     /**
-     * Calculates the interception point for intercepting balls
-     *
-     * @param robot The robot to do the interception
-     * @param ball The ball to intercept
-     * @field The field to intercept on
-     *
-     * @return the best interception point
-     */
-    // TODO (#1968): Merge this functionality with findBestInterceptForBall in the
-    // evaluation folder
-    static Point findInterceptionPoint(const Robot &robot, const Ball &ball,
-                                       const Field &field)
-    {
-
-        Point intercept_position;
-
-        auto intercept_result =
-                findBestInterceptForBall(ball,
-                                         field, robot);
-
-        if(intercept_result.has_value()){
-            intercept_position = intercept_result.value().first;
-        } else{
-            intercept_position = ball.position();
-        }
-
-        return intercept_position;
-    }
-
-    /**
      * Gets the destination to dribble the ball to from the update event
      *
      * @param event DribbleFSM::Update
@@ -226,17 +196,23 @@ struct DribbleFSM
          * @param event DribbleFSM::Update
          */
         const auto get_possession = [this](auto event) {
-//            std::cout<<"called func"<<std::endl;
 
-            auto ball_position = event.common.world.ball().position();
             auto face_ball_orientation =
-                (ball_position - event.common.robot.position()).orientation();
+                (event.common.world.ball().position() - event.common.robot.position()).orientation();
 
+            Point intercept_position;
 
+            auto intercept_result =
+                    findBestInterceptForBall(event.common.world.ball(),
+                                             event.common.world.field(), event.common.robot);
 
-            Point intercept_position =
-                findInterceptionPoint(event.common.robot, event.common.world.ball(),
-                                      event.common.world.field());
+            if(intercept_result.has_value()){
+                intercept_position = intercept_result.value().first;
+            } else{
+                //default to chasing the ball if no intercept can be found
+                intercept_position = event.common.world.ball().position();
+            }
+
             event.common.set_intent(std::make_unique<MoveIntent>(
                     event.common.robot.id(), intercept_position, face_ball_orientation, 0,
                     DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
