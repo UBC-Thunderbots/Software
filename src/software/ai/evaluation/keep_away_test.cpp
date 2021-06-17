@@ -94,3 +94,29 @@ TEST(FindKeepAwayPointTest, test_keep_away_point_proximity)
         calculateProximityRisk(keep_away_pt, world.enemyTeam(),
                                PASSER_ENEMY_PROXIMITY_IMPORTANCE));
 }
+
+TEST(FindKeepAwayPointTest, test_keep_away_point_field_lines)
+{
+    auto world           = TestUtil::createBlankTestingWorld();
+    auto top_left_corner = world.field().fieldLines().negXPosYCorner();
+    Pass pass(top_left_corner, Point(0, 0), 5);
+    auto keep_away_pt = findKeepAwayTargetPoint(world, pass);
+    auto field_center = world.field().fieldLines().centre();
+    // the keep away point should be closer to the field center
+    EXPECT_LE((keep_away_pt - field_center).length(),
+              (top_left_corner - field_center).length());
+}
+
+TEST(FindKeepAwayPointTest, test_keep_away_point_field_lines_2)
+{
+    auto world           = TestUtil::createBlankTestingWorld();
+    auto top_left_corner = world.field().fieldLines().negXPosYCorner();
+    auto top_mid_point   = Point(0, top_left_corner.y());
+
+    Pass pass(top_mid_point, Point(0, 0), 5);
+    auto keep_away_pt = findKeepAwayTargetPoint(world, pass);
+    auto field_center = world.field().fieldLines().centre();
+    // the keep away point should be closer to the field center
+    EXPECT_LE((keep_away_pt - field_center).length(),
+              (top_mid_point - field_center).length());
+}
