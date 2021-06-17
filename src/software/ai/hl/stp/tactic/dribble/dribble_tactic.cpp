@@ -37,11 +37,12 @@ double DribbleTactic::calculateRobotCost(const Robot &robot, const World &world)
         // field have a cost less than 1
 
         auto intercept_result =
-                findBestInterceptForBall(event.common.world.ball(),
-                                         event.common.world.field(), event.common.robot).value_or({event.common.world.ball().position(), Duration()});
+                findBestInterceptForBall(world.ball(),
+                                         world.field(), robot).value_or(std::make_pair(world.ball().position(), Duration()));
+
 
         cost = (robot.position() -
-                intercept_result.first
+                intercept_result.first)
                    .length() /
                world.field().totalXLength();
     }

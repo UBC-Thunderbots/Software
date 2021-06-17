@@ -200,21 +200,12 @@ struct DribbleFSM
             auto face_ball_orientation =
                 (event.common.world.ball().position() - event.common.robot.position()).orientation();
 
-            Point intercept_position;
-
             auto intercept_result =
                     findBestInterceptForBall(event.common.world.ball(),
-                                             event.common.world.field(), event.common.robot);
-
-            if(intercept_result.has_value()){
-                intercept_position = intercept_result.value().first;
-            } else{
-                //default to chasing the ball if no intercept can be found
-                intercept_position = event.common.world.ball().position();
-            }
+                                             event.common.world.field(), event.common.robot).value_or(std::make_pair(event.common.world.ball().position(), Duration()));
 
             event.common.set_intent(std::make_unique<MoveIntent>(
-                    event.common.robot.id(), intercept_position, face_ball_orientation, 0,
+                    event.common.robot.id(), intercept_result.first, face_ball_orientation, 0,
                     DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
                     AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
                     MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));

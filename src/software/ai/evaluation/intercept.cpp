@@ -71,7 +71,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
 
         //use point infront of ball
         best_ball_intercept_pos =
-                ball.position() -
+                adjusted_ball_position -
                 Vector::createFromAngle(face_ball_vector.orientation())
                         .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
         best_ball_travel_duration = getTimeToPositionForRobot(
