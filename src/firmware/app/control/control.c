@@ -102,16 +102,14 @@ void app_control_applyAccel(RobotConstants_t robot_constants,
                             ForceWheel_t* force_wheels[4], float linear_accel_x,
                             float linear_accel_y, float angular_accel)
 {
-    const ForceWheel_t* wheels[4];
-    wheels[0] = force_wheels[0];
-    wheels[1] = force_wheels[1];
-    wheels[2] = force_wheels[2];
-    wheels[3] = force_wheels[3];
+    /*const ForceWheel_t* wheels[4];*/
+    /*wheels[0] = force_wheels[0];*/
+    /*wheels[1] = force_wheels[1];*/
+    /*wheels[2] = force_wheels[2];*/
+    /*wheels[3] = force_wheels[3];*/
 
     // check for max acceleration in direction of the vel difference
-    float scaling =
-        app_control_getMaximalAccelScaling(robot_constants, battery_voltage, wheels,
-                                           linear_accel_x, linear_accel_y, angular_accel);
+    float scaling = 1.0f;
 
     // if the (very naive) 1 tick acceleration violates the physical limits of the robot
     // scale it to maximum

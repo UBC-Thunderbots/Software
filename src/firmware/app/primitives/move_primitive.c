@@ -93,13 +93,13 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
         (int)(distance_to_destination / max_speed_m_per_s * target_spin_rev_per_s);
     // Change in orientation to reach destination orientation
     const float net_change_in_orientation =
-        min_angle_delta(current_orientation, destination_orientation);
+        shared_physics_minAngleDelta(current_orientation, destination_orientation);
     const float orientation_delta =
         net_change_in_orientation + (float)revolutions_to_spin * 2.0f * (float)M_PI;
 
     const float estimated_time_delta = fmaxf(
-        fabsf(distance_to_destination) / (float)(ROBOT_MAX_SPEED_METERS_PER_SECOND),
-        fabsf(net_change_in_orientation) / (float)(ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND));
+        fabsf(distance_to_destination) / (float)(4.5f),
+        fabsf(net_change_in_orientation) / (float)(20.0f));
 
     // clamp num elements between 3 (minimum number of trajectory elements) and
     // TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
@@ -125,6 +125,7 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
         .max_allowable_angular_speed = robot_constants.robot_max_ang_speed_rad_per_s,
         .initial_linear_speed        = current_speed,
         .final_linear_speed          = speed_at_dest_m_per_s};
+
     state->num_trajectory_elems = path_parameters.num_elements;
     app_trajectory_planner_generateConstantParameterizationPositionTrajectory(
         path_parameters, &(state->position_trajectory));
@@ -146,8 +147,7 @@ static void app_move_primitive_tick(void* void_state_ptr, FirmwareWorld_t* world
     size_t trajectory_index  = 1;
     const float current_time = app_firmware_world_getCurrentTime(world);
     while (trajectory_index < state->num_trajectory_elems - 1 &&
-           state->position_trajectory.time_profile[trajectory_index - 1] <
-               current_time - state->primitive_start_time_seconds)
+           state->position_trajectory.time_profile[trajectory_index - 1] < current_time)
     {
         trajectory_index++;
     }

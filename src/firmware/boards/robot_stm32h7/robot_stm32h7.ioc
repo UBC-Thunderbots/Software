@@ -1,6 +1,6 @@
 #MicroXplorer Configuration settings - do not modify
 ADC1.Channel-1\#ChannelRegularConversion=ADC_CHANNEL_2
-ADC1.ClockPrescaler=ADC_CLOCK_ASYNC_DIV32
+ADC1.ClockPrescaler=ADC_CLOCK_ASYNC_DIV12
 ADC1.IPParameters=Rank-1\#ChannelRegularConversion,Channel-1\#ChannelRegularConversion,SamplingTime-1\#ChannelRegularConversion,OffsetNumber-1\#ChannelRegularConversion,NbrOfConversionFlag,ClockPrescaler,master
 ADC1.NbrOfConversionFlag=1
 ADC1.OffsetNumber-1\#ChannelRegularConversion=ADC_OFFSET_NONE
@@ -16,7 +16,7 @@ ADC3.Channel-6\#ChannelRegularConversion=ADC_CHANNEL_4
 ADC3.Channel-7\#ChannelRegularConversion=ADC_CHANNEL_5
 ADC3.Channel-8\#ChannelRegularConversion=ADC_CHANNEL_7
 ADC3.Channel-9\#ChannelRegularConversion=ADC_CHANNEL_8
-ADC3.ClockPrescaler=ADC_CLOCK_ASYNC_DIV32
+ADC3.ClockPrescaler=ADC_CLOCK_ASYNC_DIV12
 ADC3.ContinuousConvMode=ENABLE
 ADC3.ConversionDataManagement=ADC_CONVERSIONDATA_DMA_CIRCULAR
 ADC3.DiscontinuousConvMode=DISABLE

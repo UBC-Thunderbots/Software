@@ -89,7 +89,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
     if ((g_last_sampled_angles[FRONT_RIGHT] - front_right) > 6 || 
         (g_last_sampled_angles[FRONT_RIGHT] - front_right) < -6)
     {
-        TLOG_INFO("WRAP AROUND FRONT RIGHT");
         g_last_sampled_angles[FRONT_RIGHT] = front_right;
         should_return = true;
     }
@@ -97,7 +96,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
     if ((g_last_sampled_angles[FRONT_LEFT] - front_left) > 6 || 
         (g_last_sampled_angles[FRONT_LEFT] - front_left) < -6)
     {
-        TLOG_INFO("WRAP AROUND");
         g_last_sampled_angles[FRONT_LEFT] = front_left;
         should_return = true;
     }
@@ -105,7 +103,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
     if ((g_last_sampled_angles[BACK_LEFT] - back_left) > 6 || 
         (g_last_sampled_angles[BACK_LEFT] - back_left) < -6)
     {
-        TLOG_INFO("WRAP AROUND");
         g_last_sampled_angles[BACK_LEFT] = back_left;
         should_return = true;
     }
@@ -113,7 +110,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
     if ((g_last_sampled_angles[BACK_RIGHT] - back_right) > 6 || 
         (g_last_sampled_angles[BACK_RIGHT] - back_right) < -6)
     {
-        TLOG_INFO("WRAP AROUND BACK RIGHT");
         g_last_sampled_angles[BACK_RIGHT] = back_right;
         should_return = true;
     }
@@ -192,7 +188,8 @@ void io_vision_task(void* arg)
 
     for (;;)
     {
-        uint32_t tick_start = osKernelGetTickCount();
+        io_proto_multicast_communication_profile_blockUntilEvents(comm_profile,
+                                                                  RECEIVED_PROTO);
 
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
 
@@ -201,8 +198,7 @@ void io_vision_task(void* arg)
 
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
 
-        if(memcmp(&vision_copy, &vision, sizeof(vision_copy)) != 0)
-        {
+
             // only update vision if we have atleast 1 robot state
             if (vision_copy.robot_states_count == 1)
             {
@@ -210,21 +206,22 @@ void io_vision_task(void* arg)
                 vision = vision_copy;
                 io_unlock_vision();
             }
-            io_vision_applyVisionFrameToDeadReckoning(0);
-        }
+        int x = (int)(vision.robot_states[0].value.global_position.x_meters * 100.0f);
+        int y = (int)(vision.robot_states[0].value.global_position.y_meters * 100.0f);
 
-        io_vision_stepDeadReckoning();
-        uint32_t tick_end = osKernelGetTickCount();
+        TLOG_INFO("x %d, y %d", x,y);
+        /*io_vision_applyVisionFrameToDeadReckoning(0);*/
+        /*io_vision_stepDeadReckoning();*/
 
         // TODO pull 5 into a constant
-        if (tick_end - tick_start > 8)
-        {
-            TLOG_WARNING("Vision (dead reckoning) falling behind!! %d", tick_end - tick_start);
-        }
-        else
-        {
-            osDelay(8 - (tick_end - tick_start));
-        }
+        /*if (tick_end - tick_start > 8)*/
+        /*{*/
+            /*[>TLOG_WARNING("Vision (dead reckoning) falling behind!! %d", tick_end - tick_start);<]*/
+        /*}*/
+        /*else*/
+        /*{*/
+            /*osDelay(8 - (tick_end - tick_start));*/
+        /*}*/
     }
 }
 void io_vision_applyVisionFrameToDeadReckoning(uint32_t robot_id)
@@ -249,12 +246,6 @@ void io_vision_stepDeadReckoning()
         g_current_wheel_displacement[3],
     };
     shared_physics_speed4ToSpeed3(wheel_disps, robot_displacements, 1, 1);
-    TLOG_INFO("%d %d %d %d",
-            (int)(100 * g_current_wheel_displacement[0]),
-            (int)(100 * g_current_wheel_displacement[1]),
-            (int)(100 * g_current_wheel_displacement[2]),
-            (int)(100 * g_current_wheel_displacement[3])
-            );
     io_unlock_vision();
 }
 
@@ -331,34 +322,13 @@ float io_vision_getRobotOrientation(void)
 }
 float io_vision_getRobotVelocityX(void)
 {
-    float temp = 0.0f;
-    io_lock_vision();
-            if (vision.robot_states_count == 1)
-            {
-             temp = vision.robot_states[0].value.global_velocity.x_component_meters;
-            }
-    io_unlock_vision();
-    return temp;
+    return 0.0f;
 }
 float io_vision_getRobotVelocityY(void)
 {
-    float temp = 0.0f;
-    io_lock_vision();
-            if (vision.robot_states_count == 1)
-            {
-             temp = vision.robot_states[0].value.global_velocity.y_component_meters;
-            }
-    io_unlock_vision();
-    return temp;
+    return 0.0f;
 }
 float io_vision_getRobotAngularVelocity(void)
 {
-    float temp = 0.0f;
-    io_lock_vision();
-            if (vision.robot_states_count == 1)
-            {
-             temp = vision.robot_states[0].value.global_angular_velocity.radians_per_second;
-            }
-    io_unlock_vision();
-    return temp;
+    return 0.0f;
 }

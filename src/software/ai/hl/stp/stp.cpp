@@ -80,6 +80,8 @@ void STP::updateAIPlay(const World& world)
 
 std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World& world)
 {
+    std::cerr<<"SENDING PRIMITIVE"<<std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(2));
     return current_play->get(
         [this](const ConstPriorityTacticVector& tactics, const World& world,
                bool automatically_assign_goalie) {

@@ -48,8 +48,9 @@ void SimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 
 void SimulatorBackend::onValueReceived(World world)
 {
-    vision_output->sendProto(*createVision(world));
-    vision_output->sendProto(*createVision(world));
+    static uint32_t count = 0;
+    LOG(WARNING) << "vision: " << count;
+    count+=2;
     vision_output->sendProto(*createVision(world));
     vision_output->sendProto(*createVision(world));
 }
@@ -65,15 +66,15 @@ void SimulatorBackend::receiveRobotLogs(TbotsProto::RobotLog log)
 void SimulatorBackend::joinMulticastChannel(int channel, const std::string& interface)
 {
     vision_output.reset(new ThreadedProtoUdpSender<TbotsProto::Vision>(
-        std::string(ROBOT_MULTICAST_CHANNELS[channel]) + "%" + interface, VISION_PORT,
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface, VISION_PORT,
         true));
 
     primitive_output.reset(new ThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(
-        std::string(ROBOT_MULTICAST_CHANNELS[channel]) + "%" + interface,
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface,
         PRIMITIVE_PORT, true));
 
     robot_status_input.reset(new ThreadedProtoUdpListener<TbotsProto::RobotStatus>(
-        std::string(ROBOT_MULTICAST_CHANNELS[channel]) + "%" + interface,
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface,
         ROBOT_STATUS_PORT, boost::bind(&Backend::receiveRobotStatus, this, _1), true));
 
     robot_log_input.reset(new ThreadedProtoUdpListener<TbotsProto::RobotLog>(
