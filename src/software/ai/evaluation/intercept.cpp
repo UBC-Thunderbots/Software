@@ -11,6 +11,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
                                                                    const Robot &robot)
 {
 
+    std::cout<<"in here"<<std::endl;
     static const double gradient_approx_step_size = 0.000001;
 
     // We use this to take a smooth absolute value in our objective function
@@ -67,13 +68,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
             adjusted_ball_position = ball.estimateFutureState(Duration::fromSeconds(time_difference)).position();
         }
 
-        auto face_ball_vector = (adjusted_ball_position - robot.position());
-
-        //use point infront of ball
-        best_ball_intercept_pos =
-                adjusted_ball_position -
-                Vector::createFromAngle(face_ball_vector.orientation())
-                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
+        best_ball_intercept_pos = adjusted_ball_position;
         best_ball_travel_duration = getTimeToPositionForRobot(
                 robot.position(), best_ball_intercept_pos, ROBOT_MAX_SPEED_METERS_PER_SECOND,
                 ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
@@ -111,11 +106,11 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
 
     // NOTE: if ball velocity is 0 then ball travel duration is infinite, so this
     // check isn't relevant in that case
-    if (ball.currentState().velocity().length() != 0 &&
-        std::abs(ball_robot_time_diff.toSeconds()) > descent_weight)
-    {
-        return std::nullopt;
-    }
+//    if (ball.currentState().velocity().length() != 0 &&
+//        std::abs(ball_robot_time_diff.toSeconds()) > descent_weight)
+//    {
+//        return std::nullopt;
+//    }
 
     // Check that the best intercept position is actually on the field
     if (!contains(field.fieldLines(), best_ball_intercept_pos))
