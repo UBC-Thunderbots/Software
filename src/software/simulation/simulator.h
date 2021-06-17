@@ -13,6 +13,7 @@
 
 extern "C"
 {
+#include "firmware/shared/physics.h"
 #include "shared/proto/primitive.nanopb.h"
 #include "shared/proto/tbots_software_msgs.nanopb.h"
 }
@@ -228,6 +229,8 @@ class Simulator
     // This simulates having a single camera that can see the entire field
     static constexpr unsigned int CAMERA_ID            = 0;
     static constexpr float FIELD_LINE_THICKNESS_METRES = 0.01f;
+    // We reuse the firmware tick rate to mimic real firmware
+    static constexpr double DEFAULT_PHYSICS_TIME_STEP_SECONDS = 1.0 / CONTROL_LOOP_HZ;
 
     // The current time. This is static so that it may be used by the firmware,
     // and so must be set before each firmware tick
