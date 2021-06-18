@@ -171,7 +171,6 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_clockwise)
                               ValidationCoroutine::push_type& yield) {
             robotAtAngularVelocity(0, world_ptr, AngularVelocity::fromDegrees(1 * 360),
                                    AngularVelocity::fromDegrees(50), yield);
-            robotAtOrientation(0, world_ptr, Angle::half(), Angle::fromDegrees(5), yield);
             robotAtPosition(0, world_ptr, destination, 0.05, yield);
             robotAtOrientation(0, world_ptr, Angle::zero(), Angle::fromDegrees(5), yield);
             while (!tactic->done())
@@ -218,7 +217,6 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_counter_clockwise)
                               ValidationCoroutine::push_type& yield) {
             robotAtAngularVelocity(0, world_ptr, AngularVelocity::fromDegrees(-4 * 360),
                                    AngularVelocity::fromDegrees(50), yield);
-            robotAtOrientation(0, world_ptr, Angle::zero(), Angle::fromDegrees(5), yield);
             robotAtPosition(0, world_ptr, destination, 0.05, yield);
             robotAtOrientation(0, world_ptr, Angle::half(), Angle::fromDegrees(5), yield);
             while (!tactic->done())
