@@ -138,7 +138,7 @@ TEST(ProtoLoggerLogReaderTest, test_save_current_chunk)
     }
 
     // write the read frames to another replay_logging directory
-    auto output_path = fs::current_path() / "replaytest";
+    auto output_path = fs::current_path() / "replaytest2";
     std::shared_ptr<ProtoLogger<SensorProto>> logger_ptr =
         std::make_shared<ProtoLogger<SensorProto>>(
             output_path, MSGS_PER_CHUNK,

@@ -50,7 +50,7 @@ ProtoLogger<MsgT>::ProtoLogger(
 template <typename MsgT>
 ProtoLogger<MsgT>::~ProtoLogger()
 {
-    std::lock_guard<std::mutex> lock(chunk_mutex);
+    // saveCurrentChunk will also take the chunk_mutex lock
     saveCurrentChunk();
 }
 
