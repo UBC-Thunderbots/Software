@@ -402,7 +402,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, ball_placement_rectan
     world.updateBall(new_ball);
     world.updateGameState(ball_placement_gs);
     auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
-        MotionConstraint::BALL_PLACEMENT_ZONE, world);
+        MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE, world);
     EXPECT_EQ(1, obstacles.size());
     try
     {
@@ -440,7 +440,7 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, ball_placement_rotate
     world.updateBall(new_ball);
     world.updateGameState(ball_placement_gs);
     auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
-        MotionConstraint::BALL_PLACEMENT_ZONE, world);
+        MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE, world);
     EXPECT_EQ(1, obstacles.size());
     try
     {
