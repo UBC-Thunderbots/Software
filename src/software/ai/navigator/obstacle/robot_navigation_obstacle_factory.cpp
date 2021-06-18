@@ -62,7 +62,7 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
                                                          world.field().fieldLines(),
                                                          world.field().fieldBoundary()));
             break;
-        case MotionConstraint::BALL_PLACEMENT_ZONE:
+        case MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:
             obstacles.push_back(
                 createFromBallPlacement(world.gameState().getBallPlacementPoint().value(),
                                         world.ball().position()));
