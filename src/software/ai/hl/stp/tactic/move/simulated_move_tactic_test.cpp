@@ -34,7 +34,6 @@ TEST_F(SimulatedMoveTacticTest, test_move_across_field)
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
     setRobotId(1);
-    setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -171,7 +170,6 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_clockwise)
                               ValidationCoroutine::push_type& yield) {
             robotAtAngularVelocity(0, world_ptr, AngularVelocity::fromDegrees(1 * 360),
                                    AngularVelocity::fromDegrees(50), yield);
-            robotAtOrientation(0, world_ptr, Angle::half(), Angle::fromDegrees(5), yield);
             robotAtPosition(0, world_ptr, destination, 0.05, yield);
             robotAtOrientation(0, world_ptr, Angle::zero(), Angle::fromDegrees(5), yield);
             while (!tactic->done())
@@ -218,7 +216,6 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_counter_clockwise)
                               ValidationCoroutine::push_type& yield) {
             robotAtAngularVelocity(0, world_ptr, AngularVelocity::fromDegrees(-4 * 360),
                                    AngularVelocity::fromDegrees(50), yield);
-            robotAtOrientation(0, world_ptr, Angle::zero(), Angle::fromDegrees(5), yield);
             robotAtPosition(0, world_ptr, destination, 0.05, yield);
             robotAtOrientation(0, world_ptr, Angle::half(), Angle::fromDegrees(5), yield);
             while (!tactic->done())

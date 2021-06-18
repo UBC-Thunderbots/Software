@@ -38,8 +38,7 @@ class SimulatedDribbleTacticTest : public SimulatedTacticTestFixture
     void SetUp() override
     {
         SimulatedTacticTestFixture::SetUp();
-        setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION,
-                              MotionConstraint::ENEMY_DEFENSE_AREA});
+        setMotionConstraints({MotionConstraint::ENEMY_DEFENSE_AREA});
     }
     Field field = Field::createSSLDivisionBField();
     std::vector<RobotStateWithId> enemy_robots =
