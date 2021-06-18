@@ -83,8 +83,7 @@ TEST_F(SimulatedCreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(tactic);
     setRobotId(0);
-    setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION,
-                          MotionConstraint::FRIENDLY_DEFENSE_AREA});
+    setMotionConstraints({MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [tactic](std::shared_ptr<World> world_ptr,
