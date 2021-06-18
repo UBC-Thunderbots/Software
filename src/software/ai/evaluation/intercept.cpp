@@ -19,10 +19,14 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     static const double smooth_abs_eps = 1000 * gradient_approx_step_size;
 
     // the speed at which we chase after the ball instead of intercepting
+    // we choose this number because its large enough to cover cases where
+    // vision is unreliable and the ball is actually not moving (meaning we
+    // need to go chase it)
     static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD   = 0.3;
 
     // the distance at which we chase after the ball instead of intercepting
-    static constexpr double BALL_MIN_DISTANCE_TO_CHASE   = 0.3;
+    // we use this because the object function behaves weirdly at small distances.
+    static constexpr double BALL_MIN_DISTANCE_TO_CHASE   = 0.8;
 
     Duration best_ball_travel_duration;
     Point best_ball_intercept_pos;
@@ -115,6 +119,13 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
         robot.position(), best_ball_intercept_pos, ROBOT_MAX_SPEED_METERS_PER_SECOND,
         ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     Duration ball_robot_time_diff = time_to_ball_pos - best_ball_travel_duration;
+    // NOTE: if ball velocity is 0 then ball travel duration is infinite, so this
+    // check isn't relevant in that case
+    if (ball.currentState().velocity().length() != 0 &&
+        std::abs(ball_robot_time_diff.toSeconds()) > descent_weight)
+    {
+        return std::nullopt;
+    }
 
     // Check that the best intercept position is actually on the field
     if (!contains(field.fieldLines(), best_ball_intercept_pos))
@@ -123,69 +134,4 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     }
 
     return std::make_pair(best_ball_intercept_pos, time_to_ball_pos);
-}
-
-//old implementation, will remove before pr
-std::optional<std::pair<Point, Duration>> findInterceptionPoint(const Ball &ball, const Field &field, const Robot &robot)
-{
-    static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD   = 0.3;
-    static constexpr double INTERCEPT_POSITION_SEARCH_INTERVAL = 0.1;
-
-
-    if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
-    {
-        auto face_ball_vector = (ball.position() - robot.position());
-
-        auto point_in_front_of_ball =
-                ball.position() -
-                Vector::createFromAngle(face_ball_vector.orientation())
-                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
-        Duration time_to_ball_pos = getTimeToPositionForRobot(
-                robot.position(), point_in_front_of_ball, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-                ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-
-        std::cout<<"early"<<std::endl;
-        return std::make_pair(point_in_front_of_ball, time_to_ball_pos);
-    }
-
-    Point intercept_position = ball.position();
-    Duration robot_time_to_pos;
-    Point previous_intercept;
-    while (contains(field.fieldLines(), intercept_position))
-    {
-        // at constant acceleration, final_speed^2 = initial_speed^2 + (acceleration *
-        // displacement * 2)
-        double final_ball_speed_at_position =
-                std::sqrt(std::pow(ball.velocity().length(), 2) +
-                          (2 * ball.acceleration().length() *
-                           distance(intercept_position, ball.position())));
-
-        // at constant acceleration, t = final_speed - initial_speed / acceleration
-        Duration ball_time_to_position = Duration::fromSeconds(
-                (final_ball_speed_at_position - ball.velocity().length()) /
-                ball.acceleration().length());
-
-//        Duration ball_time_to_position = Duration::fromSeconds(
-//                (intercept_position - ball.position()).length() / ball.velocity().length());
-        robot_time_to_pos = getTimeToPositionForRobot(
-                robot.position(), intercept_position, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-                ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-
-        if (robot_time_to_pos < ball_time_to_position)
-        {
-            break;
-        }
-        previous_intercept  = intercept_position;
-        intercept_position +=
-                ball.velocity().normalize(INTERCEPT_POSITION_SEARCH_INTERVAL);
-    }
-
-    // Check that the best intercept position is actually on the field
-    if (!contains(field.fieldLines(), intercept_position))
-    {
-        std::cout<<"returned null"<<std::endl;
-        std::make_pair(previous_intercept, robot_time_to_pos);
-    }
-
-    return std::make_pair(intercept_position, robot_time_to_pos);
 }
