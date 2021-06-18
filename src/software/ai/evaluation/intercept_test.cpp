@@ -135,6 +135,10 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_not_moving)
     Robot robot(0, {2, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
 
+    Point expected_position =
+        ball.position() - Vector(ball.position() - robot.position())
+                              .normalize(DIST_TO_FRONT_OF_ROBOT_METERS);
+
     // We should be able to find an intercept
     auto best_intercept = findBestInterceptForBall(ball, field, robot);
     ASSERT_TRUE(best_intercept);
@@ -144,8 +148,8 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_not_moving)
     // The expected time is the time it will take the robot to move to the destination.
     // This is dependent on robot constants, but should be in [0,5] seconds
     auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
-    EXPECT_DOUBLE_EQ(-2, intercept_pos.x());
-    EXPECT_DOUBLE_EQ(-1, intercept_pos.y());
+    EXPECT_DOUBLE_EQ(expected_position.x(), intercept_pos.x());
+    EXPECT_DOUBLE_EQ(expected_position.y(), intercept_pos.y());
     EXPECT_LE(0, robot_time_to_move_to_intercept.toSeconds());
     EXPECT_GE(5, robot_time_to_move_to_intercept.toSeconds());
 }
@@ -158,6 +162,10 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_moving_very_slowly)
     Robot robot(0, {2, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
 
+    Point expected_position =
+        ball.position() - Vector(ball.position() - robot.position())
+                              .normalize(DIST_TO_FRONT_OF_ROBOT_METERS);
+
     // We should be able to find an intercept
     auto best_intercept = findBestInterceptForBall(ball, field, robot);
     ASSERT_TRUE(best_intercept);
@@ -167,8 +175,8 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_moving_very_slowly)
     // The expected time is the time it will take the robot to move to the destination.
     // This is dependent on robot constants, but should be in [0,5] seconds
     auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
-    EXPECT_NEAR(-2, intercept_pos.x(), 0.02);
-    EXPECT_NEAR(-1, intercept_pos.y(), 0.02);
+    EXPECT_NEAR(expected_position.x(), intercept_pos.x(), 0.02);
+    EXPECT_NEAR(expected_position.y(), intercept_pos.y(), 0.02);
     EXPECT_LE(0, robot_time_to_move_to_intercept.toSeconds());
     EXPECT_GE(5, robot_time_to_move_to_intercept.toSeconds());
 }
@@ -187,11 +195,15 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_timestamp_ahead_of_
     auto best_intercept = findBestInterceptForBall(ball, field, robot);
     ASSERT_TRUE(best_intercept);
 
+    Point expected_position =
+        ball.position() - Vector(ball.position() - robot.position())
+                              .normalize(DIST_TO_FRONT_OF_ROBOT_METERS);
+
     // We expect that the best intercept is going to be somewhere between x=0 and x=2,
     // with y = 0, and will take the robot about 2 seconds
     auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
-    EXPECT_DOUBLE_EQ(0, intercept_pos.y());
-    EXPECT_DOUBLE_EQ(0, intercept_pos.x());
+    EXPECT_DOUBLE_EQ(expected_position.x(), intercept_pos.x());
+    EXPECT_DOUBLE_EQ(expected_position.y(), intercept_pos.y());
     EXPECT_LE(1, robot_time_to_move_to_intercept.toSeconds());
     EXPECT_GE(3, robot_time_to_move_to_intercept.toSeconds());
 }
@@ -205,6 +217,11 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_timestamp_ahead_of_r
     Robot robot(0, {2, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
 
+    Point expected_position =
+        ball.position() - Vector(ball.position() - robot.position())
+                              .normalize(DIST_TO_FRONT_OF_ROBOT_METERS);
+
+
     // We should be able to find an intercept
     auto best_intercept = findBestInterceptForBall(ball, field, robot);
     ASSERT_TRUE(best_intercept);
@@ -212,8 +229,8 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_timestamp_ahead_of_r
     // We expect that the best intercept is going to be somewhere between x=0 and x=2,
     // with y = 0, and will take the robot about 2 seconds
     auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
-    EXPECT_DOUBLE_EQ(0, intercept_pos.y());
-    EXPECT_DOUBLE_EQ(0, intercept_pos.x());
+    EXPECT_DOUBLE_EQ(expected_position.x(), intercept_pos.x());
+    EXPECT_DOUBLE_EQ(expected_position.y(), intercept_pos.y());
     EXPECT_LE(1, robot_time_to_move_to_intercept.toSeconds());
     EXPECT_GE(3, robot_time_to_move_to_intercept.toSeconds());
 }
@@ -227,6 +244,10 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_non_zero_robot_and_ball_t
     Robot robot(0, {2, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(7));
 
+    Point expected_position =
+        ball.position() - Vector(ball.position() - robot.position())
+                              .normalize(DIST_TO_FRONT_OF_ROBOT_METERS);
+
     // We should be able to find an intercept
     auto best_intercept = findBestInterceptForBall(ball, field, robot);
     ASSERT_TRUE(best_intercept);
@@ -234,8 +255,8 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_non_zero_robot_and_ball_t
     // We expect that the best intercept is going to be somewhere between x=0 and x=2,
     // with y = 0, and will take the robot about 2 seconds
     auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
-    EXPECT_DOUBLE_EQ(0, intercept_pos.y());
-    EXPECT_DOUBLE_EQ(0, intercept_pos.x());
+    EXPECT_DOUBLE_EQ(expected_position.x(), intercept_pos.x());
+    EXPECT_DOUBLE_EQ(expected_position.y(), intercept_pos.y());
     EXPECT_LE(1, robot_time_to_move_to_intercept.toSeconds());
     EXPECT_GE(3, robot_time_to_move_to_intercept.toSeconds());
 }

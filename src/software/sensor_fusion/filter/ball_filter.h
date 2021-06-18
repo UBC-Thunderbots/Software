@@ -43,11 +43,13 @@ class BallFilter
     static constexpr double MAX_BUFFER_SIZE_VELOCITY_MAGNITUDE = 4.0;
     // The extra amount beyond the ball's max speed that we treat ball detections as valid
     static constexpr double MAX_ACCEPTABLE_BALL_SPEED_BUFFER = 2.0;
+    // the speed after which we start to experience rolling friction
+    static constexpr double BALL_MIN_SPEED_FOR_ROLLING_ACCELERATION = 0.2;
 
     /**
      * Creates a new Ball Filter
      */
-    explicit BallFilter();
+    explicit BallFilter(double rolling_friction_acceleration);
 
     /**
      * Update the filter with the new ball detection data, and returns the new
@@ -85,6 +87,8 @@ class BallFilter
         double regression_error;
     };
 
+    double rolling_friction_acceleration;
+
     /**
      * Adds ball detections to the buffer stored by this filter. This function will ignore
      * data if:
@@ -109,7 +113,8 @@ class BallFilter
      * calculated, returns std::nullopt
      */
     static std::optional<Ball> estimateBallStateFromBuffer(
-        boost::circular_buffer<BallDetection> ball_detections);
+        boost::circular_buffer<BallDetection> ball_detections,
+        double friction_acceleration_magnitude = 0);
 
     /**
      * Returns how large the buffer of ball detections should be based on the ball's

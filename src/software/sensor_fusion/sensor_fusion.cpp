@@ -10,7 +10,7 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       enemy_team(),
       game_state(),
       referee_stage(std::nullopt),
-      ball_filter(),
+      ball_filter(sensor_fusion_config->getRollingFrictionAcceleration()->value()),
       friendly_team_filter(),
       enemy_team_filter(),
       team_with_possession(TeamSide::ENEMY),
@@ -372,13 +372,14 @@ void SensorFusion::checkForVisionReset(double t_capture)
 
 void SensorFusion::resetWorldComponents()
 {
-    field                = std::nullopt;
-    ball                 = std::nullopt;
-    friendly_team        = Team();
-    enemy_team           = Team();
-    game_state           = GameState();
-    referee_stage        = std::nullopt;
-    ball_filter          = BallFilter();
+    field         = std::nullopt;
+    ball          = std::nullopt;
+    friendly_team = Team();
+    enemy_team    = Team();
+    game_state    = GameState();
+    referee_stage = std::nullopt;
+    ball_filter =
+        BallFilter(sensor_fusion_config->getRollingFrictionAcceleration()->value());
     friendly_team_filter = RobotTeamFilter();
     enemy_team_filter    = RobotTeamFilter();
     team_with_possession = TeamSide::ENEMY;
