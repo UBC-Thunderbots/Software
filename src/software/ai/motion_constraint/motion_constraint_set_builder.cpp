@@ -36,7 +36,6 @@ std::set<MotionConstraint> buildMotionConstraintSetFromGameState(
 {
     std::set<MotionConstraint> motion_constraints;
     motion_constraints.insert(MotionConstraint::FRIENDLY_DEFENSE_AREA);
-    motion_constraints.insert(MotionConstraint::ENEMY_ROBOTS_COLLISION);
 
     if (game_state.stayAwayFromBall())
     {

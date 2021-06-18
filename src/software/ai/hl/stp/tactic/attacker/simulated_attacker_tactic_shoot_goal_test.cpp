@@ -39,8 +39,7 @@ TEST_P(SimulatedAttackerTacticShootGoalTest, attacker_test_shoot_goal)
     tactic->updateControlParams(Point(0, field.fieldLines().yMin()));
     setTactic(tactic);
     setRobotId(0);
-    setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION,
-                          MotionConstraint::FRIENDLY_DEFENSE_AREA});
+    setMotionConstraints({MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [tactic, expected_kick_direction](std::shared_ptr<World> world_ptr,
