@@ -44,7 +44,7 @@ class BallFilter
     // The extra amount beyond the ball's max speed that we treat ball detections as valid
     static constexpr double MAX_ACCEPTABLE_BALL_SPEED_BUFFER = 2.0;
     // the speed after which we start to experience rolling friction
-    static constexpr double BALL_MIN_SPEED_FOR_ROLLING_ACCELERATION      = 0.2;
+    static constexpr double BALL_MIN_SPEED_FOR_ROLLING_ACCELERATION = 0.2;
 
     /**
      * Creates a new Ball Filter
@@ -113,7 +113,8 @@ class BallFilter
      * calculated, returns std::nullopt
      */
     static std::optional<Ball> estimateBallStateFromBuffer(
-        boost::circular_buffer<BallDetection> ball_detections, double friction_acceleration_magnitude=0);
+        boost::circular_buffer<BallDetection> ball_detections,
+        double friction_acceleration_magnitude = 0);
 
     /**
      * Returns how large the buffer of ball detections should be based on the ball's

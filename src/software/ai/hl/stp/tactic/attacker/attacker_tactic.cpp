@@ -2,10 +2,10 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
+#include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/logger/logger.h"
 #include "software/world/ball.h"
-#include "software/ai/evaluation/intercept.h"
 
 AttackerTactic::AttackerTactic(
     std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config)
@@ -65,19 +65,16 @@ double AttackerTactic::calculateRobotCost(const Robot& robot, const World& world
     double cost = 0.0;
     if (!robot.isNearDribbler(world.ball().position()))
     {
-        // Prefer robots closer to the interception point. If no interception point exists,
-        // prefer robots closer to ball
-        // We normalize with the total field length so that robots that are within the
-        // field have a cost less than 1
+        // Prefer robots closer to the interception point. If no interception point
+        // exists, prefer robots closer to ball We normalize with the total field length
+        // so that robots that are within the field have a cost less than 1
 
         auto intercept_result =
-                findBestInterceptForBall(world.ball(),
-                                         world.field(), robot).value_or(std::make_pair(world.ball().position(), Duration()));
+            findBestInterceptForBall(world.ball(), world.field(), robot)
+                .value_or(std::make_pair(world.ball().position(), Duration()));
 
-        cost = (robot.position() -
-                intercept_result.first)
-                        .length() /
-                world.field().totalXLength();
+        cost = (robot.position() - intercept_result.first).length() /
+               world.field().totalXLength();
     }
     return std::clamp<double>(cost, 0, 1);
 }
