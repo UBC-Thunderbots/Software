@@ -15,8 +15,8 @@
 
 class SimulatedAttackerTacticKeepAwayTest
     : public SimulatedTacticTestFixture,
-      public ::testing::WithParamInterface<
-          std::tuple<Pass, RobotStateWithId, BallState, std::vector<RobotStateWithId>>>
+      public ::testing::WithParamInterface<std::tuple<
+          Pass, RobotStateWithId, BallState, std::vector<RobotStateWithId>, bool>>
 {
    protected:
     Field field = Field::createSSLDivisionBField();
@@ -28,6 +28,7 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_keep_away)
     RobotStateWithId robot_state = std::get<1>(GetParam());
     BallState ball_state         = std::get<2>(GetParam());
     auto enemy_robots            = std::get<3>(GetParam());
+    bool ignore_score_checks     = std::get<4>(GetParam());
 
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
     friendly_robots.emplace_back(robot_state);
@@ -72,6 +73,11 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_keep_away)
         // it doesn't get substantially worse compared to the last check
         // and that it is an improvement compared to the starting state
         [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            while (ignore_score_checks)
+            {
+                yield("");
+            }
+
             // this value is copypasted from software/ai/evaluation/keep_away.cpp
             static constexpr double PASSER_ENEMY_PROXIMITY_IMPORTANCE = 1.5;
 
@@ -118,6 +124,11 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_keep_away)
         // it doesn't get substantially worse compared to the last check
         // and that it is an improvement compared to the starting state
         [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            while (ignore_score_checks)
+            {
+                yield("");
+            }
+
             auto initial_enemy_risk_score = ratePassEnemyRisk(
                 enemy_team, pass, enemy_reaction_time, enemy_proximity_importance);
 
@@ -162,11 +173,24 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_keep_away)
         },
         [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             robotNotExcessivelyDribbling(1, world_ptr, yield);
+        },
+        [&](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            // test that the ball is always in the field boundaries
+            if (!contains(world_ptr->field().fieldLines(), world_ptr->ball().position()))
+            {
+                yield("Ball left the field boundaries!");
+            }
+            else
+            {
+                yield("");
+            }
         }};
 
     runTest(field, ball_state, friendly_robots, enemy_robots, {},
-            non_terminating_validation_functions, Duration::fromSeconds(3));
+            non_terminating_validation_functions, Duration::fromSeconds(3.0));
 }
+
+auto FIELD_TOP_LEFT = Field::createSSLDivisionBField().fieldLines().negXPosYCorner();
 
 INSTANTIATE_TEST_CASE_P(
     PassEnvironment, SimulatedAttackerTacticKeepAwayTest,
@@ -182,7 +206,9 @@ INSTANTIATE_TEST_CASE_P(
             // the states of the enemy robots
             TestUtil::createStationaryRobotStatesWithId(
                 {Point(-0.6, 0.25), Point(0., 0.6), Point(-0.25, 0.5),
-                 Point(0.6, -0.25)})),
+                 Point(0.6, -0.25)}),
+            // whether to ignore the intercept and proximity risk checks in the test
+            false),
         std::make_tuple(
             // the best pass so far to pass into the AttackerTactic
             Pass(Point(0.0, 0.0), Point(-3, 2.5), 5),
@@ -192,4 +218,23 @@ INSTANTIATE_TEST_CASE_P(
             // the state of the ball
             BallState(Point(0., 0.), Vector(0, 0)),
             // the states of the enemy robots
-            TestUtil::createStationaryRobotStatesWithId({Point(-0.5, 0.5)}))));
+            TestUtil::createStationaryRobotStatesWithId({Point(-0.5, 0.5)}),
+            // whether to ignore the intercept and proximity risk checks in the test
+            false),
+        std::make_tuple(
+            // the best pass so far to pass into the AttackerTactic
+            Pass(Point(FIELD_TOP_LEFT.x() + 0.05, FIELD_TOP_LEFT.y() - 0.05), Point(0, 0),
+                 5),
+            // the state of the friendly robot
+            RobotStateWithId{1, RobotState(FIELD_TOP_LEFT, Vector(0, 0),
+                                           Angle::fromDegrees(0), Angle::fromDegrees(0))},
+            // the state of the ball
+            BallState(Point(FIELD_TOP_LEFT.x() + 0.05, FIELD_TOP_LEFT.y() - 0.2),
+                      Vector(0, 0)),
+            // the states of the enemy robots
+            TestUtil::createStationaryRobotStatesWithId(
+                {Point(-4, 2), Point(-4, 2.25), Point(-4, 2.5), Point(-4, 2.75)}),
+            // whether to ignore the intercept and proximity risk checks in the test
+            // we ignore the score checks on this one because we need to make sure that we
+            // stay in field bounds, even if leaving the field bounds improves the score
+            true)));

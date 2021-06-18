@@ -1,6 +1,8 @@
 #include "software/ai/evaluation/keep_away.h"
 
 #include "software/ai/passing/cost_function.h"
+#include "software/geom/algorithms/closest_point.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/math/math_functions.h"
 #include "software/optimization/gradient_descent_optimizer.h"
 
@@ -64,5 +66,35 @@ Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far)
         keepaway_point_cost,
         std::array<double, 2>{world.ball().position().x(), world.ball().position().y()},
         GRADIENT_STEPS_PER_ITER);
-    return Point(std::get<0>(passer_pt_array), std::get<1>(passer_pt_array));
+    Point keepaway_target_point(std::get<0>(passer_pt_array),
+                                std::get<1>(passer_pt_array));
+
+    if (!contains(reduced_field_bounds, keepaway_target_point))
+    {
+        // the point reached by the optimization is outside the reduced field boundaries,
+        // project it onto the reduced field boundaries rectangle and return that
+        const auto& field_line_segments = reduced_field_bounds.getSegments();
+        std::vector<std::pair<Point, double>> closest_points_and_distances(
+            field_line_segments.size());
+        std::transform(field_line_segments.begin(), field_line_segments.end(),
+                       closest_points_and_distances.begin(),
+                       [keepaway_target_point](const Segment& seg) {
+                           auto closest_point = closestPoint(keepaway_target_point, seg);
+                           return std::make_pair(
+                               closest_point,
+                               (keepaway_target_point - closest_point).length());
+                       });
+        const auto& closest_field_line_seg_and_dist = *std::min_element(
+            closest_points_and_distances.begin(), closest_points_and_distances.end(),
+            [](const auto& lhs_point_and_dist, const auto& rhs_point_and_dist) {
+                // compare the distances
+                return lhs_point_and_dist.second < rhs_point_and_dist.second;
+            });
+        return closest_field_line_seg_and_dist.first;
+    }
+    else
+    {
+        // the point reached by the optimization is inside the field boundaries
+        return keepaway_target_point;
+    }
 }
