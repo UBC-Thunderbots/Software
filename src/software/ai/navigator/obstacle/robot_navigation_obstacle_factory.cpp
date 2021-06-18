@@ -224,7 +224,7 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromBallPlacement(
     const double RADIUS = 0.5;
 
     Vector place_to_ball = placement_point.toVector() - ball_point.toVector();
-    Vector ball_to_place = - place_to_ball;
+    Vector ball_to_place = -place_to_ball;
 
     Point place_l = placement_point + (place_to_ball.normalize(RADIUS) +
                                        place_to_ball.perpendicular().normalize(RADIUS));
