@@ -18,8 +18,8 @@ PYBIND11_MODULE(keep_away, m)
     m.def("ratePasserPointForKeepAway", [](const World& world, py::dict pass_dict) {
         Pass pass = createPassFromDict(pass_dict);
         return ratePasserPointForKeepAway(pass, world.enemyTeam()) *
-               circleSigmoid(Circle(world.ball().position(), 0.5), pass.passerPoint(),
+               circleSigmoid(Circle(world.ball().position(), 0.75), pass.passerPoint(),
                              0.05) *
-               rectangleSigmoid(world.field().fieldLines(), pass.passerPoint(), 0.05);
+               rectangleSigmoid(world.field().fieldLines(), pass.passerPoint(), 0.1);
     });
 }
