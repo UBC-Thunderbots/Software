@@ -27,9 +27,10 @@ PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
     {
         current_best_passes_ = generated_passes;
     }
-    auto optimized_passes = optimizePasses(world, generated_passes);
+    current_best_passes_ = optimizePasses(world, current_best_passes_);
+    auto optimized_new_passes = optimizePasses(world, generated_passes);
 
-    updatePasses(world, optimized_passes);
+    updatePasses(world, optimized_new_passes);
 
     return PassEvaluation<ZoneEnum>(pitch_division_, current_best_passes_,
                                     passing_config_, world.getMostRecentTimestamp());
@@ -54,14 +55,25 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
         std::uniform_real_distribution x_distribution(zone.xMin(), zone.xMax());
         std::uniform_real_distribution y_distribution(zone.yMin(), zone.yMax());
 
+        double curr_time = world.getMostRecentTimestamp().toSeconds();
+        double min_start_time_offset =
+            passing_config_->getMinTimeOffsetForPassSeconds()->value();
+        double max_start_time_offset =
+            passing_config_->getMaxTimeOffsetForPassSeconds()->value();
+        std::uniform_real_distribution start_time_distribution(
+            curr_time + min_start_time_offset, curr_time + max_start_time_offset);
+
         std::vector<Pass> in_zone_passes;
 
         for (size_t num_pass = 0; num_pass < NUM_PASSES_TO_SAMPLE_IN_ZONE; num_pass++)
         {
+            Timestamp start_time_offset =
+                Timestamp::fromSeconds(start_time_distribution(random_num_gen_));
+
             in_zone_passes.push_back(Pass(
                 world.ball().position(),
                 Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
-                speed_distribution(random_num_gen_)));
+                speed_distribution(random_num_gen_), start_time_offset));
         }
 
         auto best_sampled_pass =

@@ -38,7 +38,7 @@ double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world
     // have a cost less than 1
     double cost =
         (robot.position() - pass.receiverPoint()).length() / world.field().totalXLength();
-    return std::clamp<double>(cost, 0, 1);
+    return std::clamp<double>(cost, 0, 1) * 10;
 }
 
 void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)

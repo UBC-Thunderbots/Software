@@ -54,6 +54,24 @@
      value: 6.0
      description: "The maximum pass speed (in m/s)"
  - double:
+     name: min_time_offset_for_pass_seconds
+     min: 0
+     max: 5
+     value: 0.7
+     description: >-
+       Minimum time into the future at which the pass should occur. This is
+       to ensure we have enough time to setup a robot to actually perform
+       the pass. This is in seconds.
+ - double:
+     name: max_time_offset_for_pass_seconds
+     min: 0
+     max: 5
+     value: 4.0
+     description: >-
+       Maximum time into the future at which the pass should occur. This gives the
+       upper bound on the pass start time, relative to the current time. This is in
+       seconds.
+ - double:
      name: enemy_reaction_time
      min: 0
      max: 3.0
@@ -65,5 +83,5 @@
      name: number_of_gradient_descent_steps_per_iter
      min: 0
      max: 100
-     value: 8
+     value: 4
      description: "The number of steps of gradient descent to perform in each iteration"
