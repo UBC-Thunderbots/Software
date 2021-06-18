@@ -31,8 +31,7 @@ bool FreeKickPlay::isApplicable(const World &world) const
 
 bool FreeKickPlay::invariantHolds(const World &world) const
 {
-    return (world.gameState().isPlaying() || world.gameState().isReadyState()) &&
-           (world.getTeamWithPossession() == TeamSide::FRIENDLY);
+    return world.gameState().isOurFreeKick();
 }
 
 void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
