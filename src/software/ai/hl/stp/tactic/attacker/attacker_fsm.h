@@ -55,8 +55,8 @@ struct AttackerFSM
                 .kick_origin    = ball_position,
                 .kick_direction = (chip_target - ball_position).orientation(),
                 .auto_chip_or_kick =
-                    AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
-                                   (chip_target - ball_position).length()}};
+                    // TODO This should be turned on after the simulated games
+                AutoChipOrKick{AutoChipOrKickMode::OFF, 0}};
 
             if (event.control_params.shot)
             {
@@ -72,7 +72,21 @@ struct AttackerFSM
             }
             else if (event.control_params.pass_committed)
             {
-                // we have committed to passing, execute the pass
+                auto pass_segment =
+                    Segment(event.control_params.best_pass_so_far->passerPoint(),
+                            event.control_params.best_pass_so_far->receiverPoint());
+
+                bool should_chip = false;
+
+                for (const Robot& enemy : event.common.world.enemyTeam().getAllRobots())
+                {
+                    if (intersects(Circle(enemy.position(), ROBOT_MAX_RADIUS_METERS * 2),
+                                   pass_segment))
+                    {
+                        should_chip = true;
+                    }
+                }
+
                 control_params = PivotKickFSM::ControlParams{
                     .kick_origin = event.control_params.best_pass_so_far->passerPoint(),
                     .kick_direction =
@@ -80,6 +94,12 @@ struct AttackerFSM
                     .auto_chip_or_kick =
                         AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
                                        event.control_params.best_pass_so_far->speed()}};
+                if (should_chip)
+                {
+                    control_params.auto_chip_or_kick = AutoChipOrKick{
+                        AutoChipOrKickMode::AUTOCHIP,
+                        pass_segment.length() * CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO};
+                }
             }
             processEvent(PivotKickFSM::Update(control_params, event.common));
         };
@@ -147,20 +167,20 @@ struct AttackerFSM
          *
          * @return if the ball should be kicked
          */
-        // TODO: revisit this, we shouldn't "panic chip" unless we're completely boxed in!
         const auto should_kick = [](auto event) {
             // check for enemy threat
-            Circle about_to_steal_danger_zone(event.common.robot.position(),
-                                              event.control_params.attacker_tactic_config
-                                                  ->getEnemyAboutToStealBallRadius()
-                                                  ->value());
-            for (const auto& enemy : event.common.world.enemyTeam().getAllRobots())
-            {
-                if (contains(about_to_steal_danger_zone, enemy.position()))
-                {
-                    return true;
-                }
-            }
+            // TODO (ROBOCUP): revisit this, we shouldn't "panic chip" unless we're completely boxed in!
+            // Circle about_to_steal_danger_zone(event.common.robot.position(),
+            //                                   event.control_params.attacker_tactic_config
+            //                                       ->getEnemyAboutToStealBallRadius()
+            //                                       ->value());
+            // for (const auto& enemy : event.common.world.enemyTeam().getAllRobots())
+            // {
+            //     if (contains(about_to_steal_danger_zone, enemy.position()))
+            //     {
+            //         return true;
+            //     }
+            // }
             // otherwise check for shot or pass committed
             return event.control_params.pass_committed || event.control_params.shot;
         };
