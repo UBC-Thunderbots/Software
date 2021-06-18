@@ -3,12 +3,16 @@
 #include <gtest/gtest.h>
 
 #include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class ScoringWithStaticDefendersPlayTest : public SimulatedPlayTestFixture
+class ScoringWithStaticDefendersPlayTest
+    : public SimulatedPlayTestFixture,
+      public ::testing::WithParamInterface<
+          std::tuple<std::vector<RobotStateWithId>, Point>>
 {
    protected:
     Field field = Field::createSSLDivisionBField();
@@ -42,30 +46,57 @@ TEST_F(ScoringWithStaticDefendersPlayTest,
             non_terminating_validation_functions, Duration::fromSeconds(10));
 }
 
-TEST_F(ScoringWithStaticDefendersPlayTest,
+TEST_P(ScoringWithStaticDefendersPlayTest,
        test_scoring_with_static_defenders_play_freekick)
 {
-    BallState ball_state(Point(-0.8, 0), Vector(0, 0));
-    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
-        {Point(4, 0), Point(0.5, 0), Point(-3, 1)});
-    setFriendlyGoalie(0);
+    auto enemy_robots = std::get<0>(GetParam());
     setAIPlay(TYPENAME(ScoringWithStaticDefendersPlay));
+    BallState ball_state(std::get<1>(GetParam()), Vector(0, 0));
+
+    std::vector<Point> friendly_robot_positions = {
+        Point(0, ball_state.position().y()),
+        Point(0, ball_state.position().y() + 4 * ROBOT_MAX_RADIUS_METERS),
+        Point(0, ball_state.position().y() - 4 * ROBOT_MAX_RADIUS_METERS)};
+
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId(friendly_robot_positions);
 
     setRefereeCommand(RefereeCommand::DIRECT_FREE_US, RefereeCommand::HALT);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        // This will keep the test running for 9.5 seconds to give everything enough
-        // time to settle into position and be observed with the Visualizer
+        // Run the test for 20 seconds which is the specified time limit for this hardware
+        // challenge
         // TODO (#2106): Implement proper validation
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(20))
             {
-                yield("Timestamp not at 9.5s");
+                friendlyScored(world_ptr, yield);
+                yield("scoring from static defenders challenge countdown not finished!");
             }
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
-            non_terminating_validation_functions, Duration::fromSeconds(10));
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
 }
+
+INSTANTIATE_TEST_CASE_P(
+    RobotAndBallPositions, ScoringWithStaticDefendersPlayTest,
+    ::testing::Values(
+        std::make_tuple(TestUtil::createStationaryRobotStatesWithId(
+                            {Point(2.9, 0), Point(2, -0.75), Point(2, -0.55)}),
+                        Point(0.2, -1.8)),
+        std::make_tuple(TestUtil::createStationaryRobotStatesWithId(
+                            {Point(2.9, 0.175), Point(1.5, 0), Point(2, -0.175)}),
+                        Point(0.9, 0)),
+        // this test fails
+        std::make_tuple(
+            TestUtil::createStationaryRobotStatesWithId({Point(2.9, 0.175), Point(2, 0.5),
+                                                         Point(1, 0), Point(2, -0.5)}),
+            Point(0.2, 0)),
+        std::make_tuple(TestUtil::createStationaryRobotStatesWithId(
+                            {Point(2.9, 0), Point(1.95, 0), Point(1.95, 0.5),
+                             Point(1.95, -0.5)}),
+                        Point(-1.35, 0))));

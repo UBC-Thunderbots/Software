@@ -60,7 +60,7 @@ void ScoringWithStaticDefendersPlay::getNextTactics(TacticCoroutine::push_type &
         {
             TacticVector result = {};
             // line up along part of center line closest to ball
-            int initial_offset = world.ball().position().y();
+            double initial_offset = world.ball().position().y();
             for (size_t k = 0; k < move_tactics.size(); k++)
             {
                 auto next_position = Point(
