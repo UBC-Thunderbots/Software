@@ -5,6 +5,39 @@
 #include "software/util/typename/typename.h"
 
 template <class ReceiveProtoT>
+std::string ProtoUdpListener<ReceiveProtoT>::getInterfaceAddress(
+    const std::string& interfaceName)
+{
+    ifaddrs* firstNetIf = 0;
+    getifaddrs(&firstNetIf);
+
+    ifaddrs* netIf = 0;
+    for (netIf = firstNetIf; netIf != 0; netIf = netIf->ifa_next)
+    {
+        if (netIf->ifa_addr->sa_family == AF_INET &&
+            std::strncmp(netIf->ifa_name, interfaceName.c_str(),
+                         interfaceName.length()) == 0)
+        {
+            break;
+        }
+    }
+
+    unsigned long address =
+        netIf != 0 ? reinterpret_cast<sockaddr_in*>(netIf->ifa_addr)->sin_addr.s_addr : 0;
+
+    if (firstNetIf != 0)
+    {
+        freeifaddrs(firstNetIf);
+    }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+
+    return boost::asio::ip::address_v4(htonl(address)).to_string();
+}
+#pragma GCC diagnostic pop
+
+
+template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     boost::asio::io_service& io_service, const std::string& ip_address,
     const unsigned short port, std::function<void(ReceiveProtoT&)> receive_callback,
@@ -13,6 +46,7 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
 {
     boost::asio::ip::udp::endpoint listen_endpoint(
         boost::asio::ip::make_address(ip_address), port);
+
     socket_.open(listen_endpoint.protocol());
     socket_.set_option(boost::asio::socket_base::reuse_address(true));
     try
@@ -32,8 +66,19 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     if (multicast)
     {
         // Join the multicast group.
-        socket_.set_option(boost::asio::ip::multicast::join_group(
-            boost::asio::ip::address::from_string(ip_address)));
+
+        if (boost::asio::ip::address::from_string(ip_address).is_v4())
+        {
+            socket_.set_option(boost::asio::ip::multicast::join_group(
+                boost::asio::ip::address::from_string(ip_address).to_v4(),
+                boost::asio::ip::address::from_string(getInterfaceAddress("eth1"))
+                    .to_v4()));
+        }
+        else
+        {
+            socket_.set_option(boost::asio::ip::multicast::join_group(
+                boost::asio::ip::address::from_string(ip_address)));
+        }
     }
 
     startListen();

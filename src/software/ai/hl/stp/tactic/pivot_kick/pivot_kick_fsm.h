@@ -60,7 +60,8 @@ struct PivotKickFSM
                 event.common.robot.id(), event.control_params.kick_origin,
                 event.control_params.kick_direction, 0, DribblerMode::OFF,
                 BallCollisionType::ALLOW, event.control_params.auto_chip_or_kick,
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+                event.common.robot.robotConstants()));
         };
 
         /**

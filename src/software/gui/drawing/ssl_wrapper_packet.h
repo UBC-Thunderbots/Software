@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QGraphicsScene>
 
+#include "shared/robot_constants.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 
@@ -15,9 +16,11 @@
  *
  * @param scene The scene to draw on
  * @param ssl_wrapper_packet The packet who's contents should be drawn
+ * @param robot_constants The robot constants
  */
 void drawSSLWrapperPacket(QGraphicsScene* scene,
-                          const SSLProto::SSL_WrapperPacket& ssl_wrapper_packet);
+                          const SSLProto::SSL_WrapperPacket& ssl_wrapper_packet,
+                          const RobotConstants_t& robot_constants);
 
 /**
  * Returns a function that represents how to draw the provided SSL WrapperPacket.
@@ -25,8 +28,10 @@ void drawSSLWrapperPacket(QGraphicsScene* scene,
  * packet onto a QGraphicsScene.
  *
  * @param ssl_wrapper_packet The wrapper packet create a DrawFunctionWrapper for
+ * @param robot_constants The robot constants
  *
  * @return A function that represents how to draw the provided world.
  */
 WorldDrawFunction getDrawSSLWrapperPacketFunction(
-    const SSLProto::SSL_WrapperPacket& ssl_wrapper_packet);
+    const SSLProto::SSL_WrapperPacket& ssl_wrapper_packet,
+    const RobotConstants_t& robot_constants);

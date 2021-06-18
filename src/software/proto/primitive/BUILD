@@ -7,6 +7,7 @@ cc_library(
     srcs = ["primitive_msg_factory.cpp"],
     hdrs = ["primitive_msg_factory.h"],
     deps = [
+        "//shared:robot_constants",
         "//shared/proto:tbots_cc_proto",
         "//software/geom:angle",
         "//software/geom:angular_velocity",

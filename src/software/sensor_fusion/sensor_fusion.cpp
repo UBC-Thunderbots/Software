@@ -251,6 +251,27 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     {
         updateBall(*new_ball);
     }
+    // If we already have a ball, but miss the ball in the next frame
+    else if (ball)
+    {
+        std::optional<Robot> closest_enemy = enemy_team.getNearestRobot(ball->position());
+        std::optional<Robot> closest_friendly =
+            friendly_team.getNearestRobot(ball->position());
+        std::optional<Robot> closest_robot;
+
+        closest_robot = closest_enemy;
+
+        if ((closest_enemy->position() - ball->position()).length() >
+            (closest_friendly->position() - ball->position()).length())
+        {
+            closest_robot = closest_friendly;
+        }
+
+        ball = Ball(closest_robot->position() +
+                        ROBOT_MAX_RADIUS_METERS *
+                            Vector::createFromAngle(closest_robot->orientation()),
+                    Vector(0, 0), closest_robot->timestamp());
+    }
 
     if (ball)
     {

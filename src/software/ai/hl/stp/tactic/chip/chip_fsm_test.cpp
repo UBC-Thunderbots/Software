@@ -26,17 +26,13 @@ TEST(ChipFSMTest, test_transitions)
         boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
 
     // Robot is now behind ball
-    robot = Robot(0,
-                  RobotState(Point(-2, 1.8), Vector(), Angle::threeQuarter(),
-                             AngularVelocity::zero()),
-                  Timestamp::fromSeconds(123));
+    robot = ::TestUtil::createRobotAtPos(Point(-2, 1.7));
     fsm.process_event(ChipFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     // Transition to ChipState
     EXPECT_TRUE(fsm.is(boost::sml::state<ChipFSM::ChipState>));
 
     // Ball is now chipped
-    robot = ::TestUtil::createRobotAtPos(Point(-2, 1.8));
     world =
         ::TestUtil::setBallVelocity(world, Vector(0, -2.1), Timestamp::fromSeconds(123));
     EXPECT_TRUE(world.ball().hasBallBeenKicked(Angle::threeQuarter()));

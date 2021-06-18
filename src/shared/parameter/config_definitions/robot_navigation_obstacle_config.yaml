@@ -16,3 +16,11 @@
     type: "double"
     description: "Factor for robot obstacle size"
 
+
+- double:
+    name: allowed_robot_collision_speed
+    min: 0
+    max: 1
+    value: 0.2
+    type: "double"
+    description: "The allowed robot speed for collisions with enemy robots"
