@@ -47,7 +47,6 @@ class StopPlayTest : public SimulatedPlayTestFixture
              field.enemyDefenseArea().negXPosYCorner()});
 };
 
-// TODO: (#1948) fix warning message "No intent set for this tactic: MoveTactic"
 TEST_F(StopPlayTest, test_stop_play_ball_at_centre_robots_spread_out)
 {
     BallState ball_state(Point(0, 0), Vector(0, 0));
@@ -64,7 +63,6 @@ TEST_F(StopPlayTest, test_stop_play_ball_at_centre_robots_spread_out)
             Duration::fromSeconds(10));
 }
 
-// TODO: (#1948) fix warning message "No intent set for this tactic: MoveTactic"
 TEST_F(StopPlayTest, test_stop_play_friendly_half_robots_spread_out)
 {
     BallState ball_state(Point(-1, 0), Vector(0, 0));
@@ -81,8 +79,6 @@ TEST_F(StopPlayTest, test_stop_play_friendly_half_robots_spread_out)
             Duration::fromSeconds(10));
 }
 
-// TODO: (#1948) fix warning message "Navigator's path manager could not find a path" and
-// improve robot positioning
 TEST_F(StopPlayTest, test_stop_play_friendly_half_corner_robots_close_together)
 {
     BallState ball_state(Point(-4, -2.5), Vector(0, 0));
@@ -115,7 +111,6 @@ TEST_F(StopPlayTest, test_stop_play_enemy_half_robots_spread_out)
             Duration::fromSeconds(10));
 }
 
-// TODO: (#1948) fix warning message "Navigator's path manager could not find a path"
 TEST_F(StopPlayTest, test_stop_play_enemy_half_corner_robots_close_together)
 {
     BallState ball_state(Point(4, -2.5), Vector(0, 0));
@@ -148,7 +143,6 @@ TEST_F(StopPlayTest, test_stop_play_centre_robots_close_together)
             Duration::fromSeconds(10));
 }
 
-// TODO: #1948 fix warning message "Navigator's path manager could not find a path"
 TEST_F(StopPlayTest, test_stop_play_ball_in_front_of_enemy_defense_area)
 {
     BallState ball_state(Point(3, 0), Vector(0, 0));

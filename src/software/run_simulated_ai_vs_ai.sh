@@ -28,9 +28,9 @@ chmod +x /tmp/ssl-game-controller_v2.4.0_linux_amd64
 
 tmux new-session \; \
   set -g mouse on \; \
-  send-keys "bazel run //software:full_system -- --backend=SimulatorBackend --interface=$1" C-m \; \
+  send-keys "bazel run //software:full_system -- --backend=SimulatorBackend --channel=0 --team_color=yellow --defending_side=negative --interface=$1" C-m \; \
   split-window -h \; \
-  send-keys "bazel run //software:full_system -- --backend=SimulatorBackend --interface=$1" C-m \; \
+  send-keys "bazel run //software:full_system -- --backend=SimulatorBackend --channel=1 --team_color=blue --defending_side=positive --interface=$1" C-m \; \
   split-window -v \; \
   send-keys "/tmp/ssl-game-controller_v2.4.0_linux_amd64&" C-m \; \
   send-keys "xdg-open http://localhost:8081" C-m \; \
