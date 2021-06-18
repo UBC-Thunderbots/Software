@@ -11,13 +11,13 @@
 #include "software/math/math_functions.h"
 
 
-BallFilter::BallFilter() : ball_detection_buffer(MAX_BUFFER_SIZE) {}
+BallFilter::BallFilter(double rolling_friction_acceleration) : rolling_friction_acceleration(rolling_friction_acceleration), ball_detection_buffer(MAX_BUFFER_SIZE)  {}
 
 std::optional<Ball> BallFilter::estimateBallState(
     const std::vector<BallDetection> &new_ball_detections, const Rectangle &filter_area)
 {
     addNewDetectionsToBuffer(new_ball_detections, filter_area);
-    return estimateBallStateFromBuffer(ball_detection_buffer);
+    return estimateBallStateFromBuffer(ball_detection_buffer, rolling_friction_acceleration);
 }
 
 void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_detections,
@@ -100,7 +100,7 @@ void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_de
 }
 
 std::optional<Ball> BallFilter::estimateBallStateFromBuffer(
-    boost::circular_buffer<BallDetection> ball_detections)
+    boost::circular_buffer<BallDetection> ball_detections, double friction_acceleration_magnitude)
 {
     // Sort the detections in decreasing order before processing. This places the most
     // recent detections (with the largest timestamp) at the front of the buffer, and the
@@ -137,16 +137,13 @@ std::optional<Ball> BallFilter::estimateBallStateFromBuffer(
         return std::nullopt;
     }
 
-    static constexpr double BALL_CONSTANT_ACCELERATION_MAGNITUDE = 0.5;
-    static constexpr double BALL_MIN_SPEED_FOR_ROLLING_ACCELERATION      = 0.2;
-
     Vector acceleration;
 
     if(estimated_velocity->average_velocity.length() > BALL_MIN_SPEED_FOR_ROLLING_ACCELERATION) {
         // if ball is above threshold, assume rolling acceleration acting in opposite
         // direction
         acceleration = estimated_velocity->average_velocity.normalize(
-                -1 * BALL_CONSTANT_ACCELERATION_MAGNITUDE);
+                -1 * friction_acceleration_magnitude);
 
     }
 

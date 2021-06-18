@@ -62,7 +62,8 @@ BallState Ball::estimateFutureState(const Duration &duration_in_future) const
     //if that happens, we find a new velocity using a more realistic duration
     Duration effective_duration(duration_in_future);
 
-    if(acceleration_.length() > 0 && (future_velocity - current_state_.velocity()).orientation() >= Angle::half()) {
+    auto angle_difference = future_velocity.orientation() - current_state_.velocity().orientation();
+    if(acceleration_.length() > 0 && angle_difference == Angle::fromDegrees(180)) {
         double time = current_state_.velocity().length() / acceleration_.length();
         effective_duration = Duration::fromSeconds(time);
         future_velocity = calculateFutureVelocity(

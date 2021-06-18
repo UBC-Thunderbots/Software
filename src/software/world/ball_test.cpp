@@ -177,6 +177,17 @@ TEST_F(BallTest, estimate_future_state_friction)
               ball.estimateFutureState(Duration::fromSeconds(1.0)));
 }
 
+TEST_F(BallTest, estimate_future_state_friction_2)
+{
+    Ball ball = Ball(Point(2, -3), Vector(0.5, 1), current_time, Vector(-0.5, -1));
+    BallState expected_future_ball_state(Point(2.25, -2.5), Vector(0, 0));
+    BallState result = ball.estimateFutureState(Duration::fromSeconds(10.0));
+    std::cout<<result.position()<<std::endl;
+    EXPECT_EQ(expected_future_ball_state,
+              ball.estimateFutureState(Duration::fromSeconds(10.0)));
+}
+
+
 TEST(HasBallBeenKickedTest, ball_over_speed_threshold_and_no_direction_difference)
 {
     Ball ball({0, 0}, {5, 5}, Timestamp::fromSeconds(0));

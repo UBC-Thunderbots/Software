@@ -17,7 +17,7 @@ class BallFilterTest : public ::testing::Test
    protected:
     BallFilterTest()
         : field(Field::createSSLDivisionBField()),
-          ball_filter(),
+          ball_filter(0.5),
           current_timestamp(Timestamp::fromSeconds(123)),
           time_step(Duration::fromSeconds(1.0 / 60.0))
     {
