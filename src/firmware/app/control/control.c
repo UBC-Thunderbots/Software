@@ -42,6 +42,7 @@ float app_control_getMaximalTorqueScaling(const ForceWheel_t* force_wheels[4],
 
         float slip_ratio = constants.motor_max_voltage_before_wheel_slip /
                            (fabsf(resistive_voltage_loss) + 1e-6f);
+
         if (slip_ratio < slip_ratio_min)
         {
             slip_ratio_min = slip_ratio;

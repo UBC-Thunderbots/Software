@@ -43,6 +43,16 @@ class Polygon : public virtual Shape
     Polygon expand(const Vector& expansion_vector) const;
 
     /**
+     * Returns the Polygon expanded in all directions by the expansion_amount
+     *
+     * @param expansion_amount a non-negative expansion amount
+     * @throw std::invalid_argument if expansion_amount is negative
+     *
+     * @return a Polygon expanded in all directions by the expansion amount
+     */
+    Polygon expand(double expansion_amount) const;
+
+    /**
      * Returns the line segments that form this polygon.
      * @return the line segments that form this polygon.
      */
