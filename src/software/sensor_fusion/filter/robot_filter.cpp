@@ -76,7 +76,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
         filtered_data.timestamp = filtered_data.timestamp.fromMilliseconds(
             filtered_data.timestamp.toMilliseconds() / data_num);
 
-        static const double smoothing_factor = 0.7;
+        static const double smoothing_factor = 0.9;
 
         // velocity = position difference / time difference
         filtered_data.velocity =
