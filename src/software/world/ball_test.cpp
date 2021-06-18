@@ -177,12 +177,28 @@ TEST_F(BallTest, estimate_future_state_friction)
               ball.estimateFutureState(Duration::fromSeconds(1.0)));
 }
 
-TEST_F(BallTest, estimate_future_state_friction_2)
+TEST_F(BallTest, estimate_future_state_friction_cross_boundary)
 {
+    //test where velocity will reach 0 before end of duration
     Ball ball = Ball(Point(2, -3), Vector(0.5, 1), current_time, Vector(-0.5, -1));
     BallState expected_future_ball_state(Point(2.25, -2.5), Vector(0, 0));
-    BallState result = ball.estimateFutureState(Duration::fromSeconds(10.0));
-    std::cout<<result.position()<<std::endl;
+    EXPECT_EQ(expected_future_ball_state,
+              ball.estimateFutureState(Duration::fromSeconds(10.0)));
+}
+
+TEST_F(BallTest, estimate_future_state_friction_cross_boundary_2)
+{
+    Ball ball = Ball(Point(0, 0), Vector(0, 2), current_time, Vector(0, -1));
+    BallState expected_future_ball_state(Point(0, 2), Vector(0, 0));
+    EXPECT_EQ(expected_future_ball_state,
+              ball.estimateFutureState(Duration::fromSeconds(3.0)));
+}
+
+TEST_F(BallTest, estimate_future_state_stationary_with_friction_acceleration)
+{
+    //the acceleration should be ignored because the ball is not moving
+    Ball ball = Ball(Point(2, -3), Vector(0, 0), current_time, Vector(-0.5, -1));
+    BallState expected_future_ball_state(Point(2, -3), Vector(0, 0));
     EXPECT_EQ(expected_future_ball_state,
               ball.estimateFutureState(Duration::fromSeconds(10.0)));
 }
