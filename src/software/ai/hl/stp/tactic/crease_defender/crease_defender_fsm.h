@@ -25,8 +25,6 @@ struct CreaseDefenderFSM
         Point enemy_threat_origin;
         // The crease defender alignment with respect to the enemy threat
         CreaseDefenderAlignment crease_defender_alignment;
-        // The maximum allowed speed mode
-        MaxAllowedSpeedMode max_allowed_speed_mode;
     };
 
     // this struct defines the only event that the CreaseDefenderFSM responds to
@@ -127,22 +125,15 @@ struct CreaseDefenderFSM
                                 event.common.world.field().friendlyDefenseArea().yMax();
             }
 
-            BallCollisionType ball_collision_type = BallCollisionType::ALLOW;
-            if ((event.common.world.ball().position() - destination).length() <
-                (event.common.robot.position() - destination).length())
-            {
-                ball_collision_type = BallCollisionType::AVOID;
-            }
-
             MoveFSM::ControlParams control_params{
                 .destination         = destination,
                 .final_orientation   = face_threat_orientation,
                 .final_speed         = 0.0,
                 .dribbler_mode       = DribblerMode::OFF,
-                .ball_collision_type = ball_collision_type,
+                .ball_collision_type = BallCollisionType::ALLOW,
                 .auto_chip_or_kick =
                     AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, chip_distance},
-                .max_allowed_speed_mode = event.control_params.max_allowed_speed_mode,
+                .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
                 .target_spin_rev_per_s  = 0.0};
 
             // Update the get behind ball fsm

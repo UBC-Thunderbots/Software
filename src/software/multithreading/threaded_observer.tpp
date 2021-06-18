@@ -3,8 +3,8 @@
 #include "software/multithreading/threaded_observer.h"
 
 template <typename T>
-ThreadedObserver<T>::ThreadedObserver(size_t buffer_size, bool log_buffer_full)
-    : Observer<T>(buffer_size, log_buffer_full),
+ThreadedObserver<T>::ThreadedObserver(size_t buffer_size)
+    : Observer<T>(buffer_size),
       in_destructor(false),
       IN_DESTRUCTOR_CHECK_PERIOD(Duration::fromSeconds(0.1))
 {

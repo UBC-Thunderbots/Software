@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 
 #include "software/simulated_tests/validation/validation_function.h"
-#include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
@@ -25,10 +24,6 @@ class SimulatedPlayTestFixtureTest : public SimulatedPlayTestFixture
 {
    protected:
     Field field = Field::createSSLDivisionBField();
-    std::vector<RobotStateWithId> friendly_robots =
-        TestUtil::createStationaryRobotStatesWithId({Point(-4, 0)});
-    std::vector<RobotStateWithId> enemy_robots =
-        TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 };
 
 TEST_F(SimulatedPlayTestFixtureTest,
@@ -46,9 +41,8 @@ TEST_F(SimulatedPlayTestFixtureTest,
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
-            terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(1.0));
+    runTest(field, ball_state, {}, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(1.0));
 }
 
 TEST_F(SimulatedPlayTestFixtureTest,
@@ -67,9 +61,8 @@ TEST_F(SimulatedPlayTestFixtureTest,
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     EXPECT_NONFATAL_FAILURE(
-        runTest(field, ball_state, friendly_robots, enemy_robots,
-                terminating_validation_functions, non_terminating_validation_functions,
-                Duration::fromSeconds(0.5)),
+        runTest(field, ball_state, {}, {}, terminating_validation_functions,
+                non_terminating_validation_functions, Duration::fromSeconds(0.5)),
         "Waiting for timestamp of at least 1s");
 }
 
@@ -94,9 +87,8 @@ TEST_F(SimulatedPlayTestFixtureTest,
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
-            terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(0.7));
+    runTest(field, ball_state, {}, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(0.7));
 }
 
 TEST_F(SimulatedPlayTestFixtureTest,
@@ -121,9 +113,8 @@ TEST_F(SimulatedPlayTestFixtureTest,
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     EXPECT_NONFATAL_FAILURE(
-        runTest(field, ball_state, friendly_robots, enemy_robots,
-                terminating_validation_functions, non_terminating_validation_functions,
-                Duration::fromSeconds(0.6)),
+        runTest(field, ball_state, {}, {}, terminating_validation_functions,
+                non_terminating_validation_functions, Duration::fromSeconds(0.6)),
         "Waiting for timestamp of at least 0.8s");
 }
 
@@ -142,9 +133,8 @@ TEST_F(SimulatedPlayTestFixtureTest,
             }
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
-            terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(0.5));
+    runTest(field, ball_state, {}, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(0.5));
 }
 
 TEST_F(SimulatedPlayTestFixtureTest,
@@ -168,9 +158,8 @@ TEST_F(SimulatedPlayTestFixtureTest,
             }
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
-            terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(0.5));
+    runTest(field, ball_state, {}, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(0.5));
 }
 
 TEST_F(SimulatedPlayTestFixtureTest,
@@ -201,9 +190,8 @@ TEST_F(SimulatedPlayTestFixtureTest,
             }
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
-            terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(0.5));
+    runTest(field, ball_state, {}, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(0.5));
 }
 
 TEST_F(SimulatedPlayTestFixtureTest,
@@ -234,7 +222,6 @@ TEST_F(SimulatedPlayTestFixtureTest,
         }};
 
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
-            terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(1.5));
+    runTest(field, ball_state, {}, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(1.5));
 }

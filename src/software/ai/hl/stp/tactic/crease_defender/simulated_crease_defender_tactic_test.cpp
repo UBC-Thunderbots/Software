@@ -4,7 +4,6 @@
 
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/geom/algorithms/contains.h"
-#include "software/simulated_tests/non_terminating_validation_functions/robots_avoid_ball_validation.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
@@ -59,48 +58,6 @@ TEST_F(SimulatedCreaseDefenderTacticTest, test_chip_ball)
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
-
-    runTest(field, ball_state, friendly_robots, enemy_robots,
-            terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
-}
-
-TEST_F(SimulatedCreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
-{
-    Point enemy_threat_point          = Point(-1.5, 0.0);
-    CreaseDefenderAlignment alignment = CreaseDefenderAlignment::CENTRE;
-
-    Point initial_position = Point(0, 0);
-    BallState ball_state(enemy_threat_point, Vector());
-    auto friendly_robots =
-        TestUtil::createStationaryRobotStatesWithId({initial_position});
-    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
-
-    auto robot_navigation_obstacle_config =
-        std::make_shared<RobotNavigationObstacleConfig>();
-
-    auto tactic =
-        std::make_shared<CreaseDefenderTactic>(robot_navigation_obstacle_config);
-    tactic->updateControlParams(enemy_threat_point, alignment);
-    setTactic(tactic);
-    setRobotId(0);
-    setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION,
-                          MotionConstraint::FRIENDLY_DEFENSE_AREA});
-
-    std::vector<ValidationFunction> terminating_validation_functions = {
-        [tactic](std::shared_ptr<World> world_ptr,
-                 ValidationCoroutine::push_type& yield) {
-            while (!tactic->done())
-            {
-                yield("Tactic not done");
-            }
-        }};
-
-    std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [tactic](std::shared_ptr<World> world_ptr,
-                 ValidationCoroutine::push_type& yield) {
-            robotsAvoidBall(0, {}, world_ptr, yield);
-        }};
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,

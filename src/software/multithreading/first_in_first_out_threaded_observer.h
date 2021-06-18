@@ -14,17 +14,9 @@ class FirstInFirstOutThreadedObserver : public ThreadedObserver<T>
 {
    public:
     FirstInFirstOutThreadedObserver<T>() : ThreadedObserver<T>(){};
-
-    /**
-     * Creates a new FirstInFirstOutThreadedObserver
-     *
-     * @param buffer_size size of the buffer
-     * @param log_buffer_full whether or not to log when the buffer is full
-     */
-    explicit FirstInFirstOutThreadedObserver<T>(size_t buffer_size,
-                                                bool log_buffer_full = true)
-        : ThreadedObserver<T>(buffer_size, log_buffer_full){};
-    std::optional<T> getNextValue(const Duration& max_wait_time) final override;
+    explicit FirstInFirstOutThreadedObserver<T>(size_t buffer_size)
+        : ThreadedObserver<T>(buffer_size){};
+    std::optional<T> getNextValue(const Duration& max_wait_time) final;
 };
 
 template <typename T>

@@ -13,13 +13,7 @@ template <typename T>
 class Observer
 {
    public:
-    /**
-     * Creates a new Observer
-     *
-     * @param buffer_size size of the buffer
-     * @param log_buffer_full whether or not to log when the buffer is full
-     */
-    Observer(size_t buffer_size = DEFAULT_BUFFER_SIZE, bool log_buffer_full = true);
+    Observer(size_t buffer_size = DEFAULT_BUFFER_SIZE);
 
     /**
      * Add the given value to the internal buffer

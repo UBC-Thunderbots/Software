@@ -29,7 +29,6 @@ TEST_P(SimulatedAttackerTacticPassingTest, attacker_test_passing)
 
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
     friendly_robots.emplace_back(robot_state);
-    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
     auto attacker_tactic_config = std::make_shared<AttackerTacticConfig>();
     // force passing for this test by setting min acceptable shot angle very high
@@ -59,9 +58,8 @@ TEST_P(SimulatedAttackerTacticPassingTest, attacker_test_passing)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
-            terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(5));
+    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
+            non_terminating_validation_functions, Duration::fromSeconds(5));
 }
 
 INSTANTIATE_TEST_CASE_P(

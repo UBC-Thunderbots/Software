@@ -6,6 +6,7 @@
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
+#include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/logger/logger.h"
@@ -32,10 +33,13 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     auto shoot_goal_tactic =
         std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
 
-    std::array<std::shared_ptr<ShadowEnemyTactic>, 2> shadow_enemy_tactics = {
-        std::make_shared<ShadowEnemyTactic>(),
-        std::make_shared<ShadowEnemyTactic>(),
-    };
+    auto defense_shadow_enemy_tactic = std::make_shared<DefenseShadowEnemyTactic>(
+        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), true,
+        3 * ROBOT_MAX_RADIUS_METERS, play_config->getDefenseShadowEnemyTacticConfig());
+
+    std::shared_ptr<ShadowEnemyTactic> shadow_enemy_tactic =
+        std::make_shared<ShadowEnemyTactic>();
+
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
@@ -70,9 +74,8 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         // extra friendly robots, have them perform a reasonable default defensive tactic
         if (enemy_threats.size() > 0)
         {
-            std::get<0>(shadow_enemy_tactics)
-                ->updateControlParams(enemy_threats.at(0), ROBOT_MAX_RADIUS_METERS * 3);
-            result[0].emplace_back(std::get<0>(shadow_enemy_tactics));
+            defense_shadow_enemy_tactic->updateControlParams(enemy_threats.at(1));
+            result[0].emplace_back(defense_shadow_enemy_tactic);
         }
         else
         {
@@ -83,9 +86,9 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
 
         if (enemy_threats.size() > 1)
         {
-            std::get<1>(shadow_enemy_tactics)
-                ->updateControlParams(enemy_threats.at(1), ROBOT_MAX_RADIUS_METERS * 3);
-            result[0].emplace_back(std::get<1>(shadow_enemy_tactics));
+            shadow_enemy_tactic->updateControlParams(enemy_threats.at(0),
+                                                     ROBOT_MAX_RADIUS_METERS * 3);
+            result[0].emplace_back(shadow_enemy_tactic);
         }
         else
         {

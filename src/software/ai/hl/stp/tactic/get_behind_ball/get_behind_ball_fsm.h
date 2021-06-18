@@ -104,10 +104,7 @@ struct GetBehindBallFSM
             Triangle behind_ball_region = Triangle(
                 behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C);
 
-            return contains(behind_ball_region, event.common.robot.position()) &&
-                   compareAngles(event.common.robot.orientation(),
-                                 event.control_params.chick_direction,
-                                 Angle::fromDegrees(5));
+            return contains(behind_ball_region, event.common.robot.position());
         };
 
         return make_transition_table(
