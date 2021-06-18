@@ -3,6 +3,7 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/keep_away.h"
 #include "software/ai/evaluation/shot.h"
+#include "software/geom/algorithms/intersects.h"
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
