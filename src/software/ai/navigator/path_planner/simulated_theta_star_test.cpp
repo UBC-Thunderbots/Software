@@ -139,9 +139,9 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_in_obstacle)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
-            // Small rectangle around the destination point that the robot should be
-            // stationary within for 15 ticks
-            Rectangle expected_final_position(Point(0.03, 0.03), Point(-0.03, -0.03));
+            // Small rectangle the size of a grid square around the destination point that
+            // the robot should be stationary within for 15 ticks
+            Rectangle expected_final_position(Point(0.045, 0.045), Point(-0.045, -0.045));
             robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
         }};
 

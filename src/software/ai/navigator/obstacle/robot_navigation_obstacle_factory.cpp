@@ -209,7 +209,7 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromFieldRectangle(
     yMax =
         (yMax == field_lines.yMax()) ? field_boundary.yMax() : (yMax + expansion_amount);
 
-    return std::make_shared<GeomObstacle<Polygon>>(
+    return std::make_shared<GeomObstacle<Rectangle>>(
         Rectangle(Point(xMin, yMin), Point(xMax, yMax)));
 }
 
