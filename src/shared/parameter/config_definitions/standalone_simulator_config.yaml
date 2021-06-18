@@ -28,5 +28,5 @@
     name: vision_port
     min: 1
     max: 65535
-    value: 10020
+    value: 10006
     description: The port to send vision data to
