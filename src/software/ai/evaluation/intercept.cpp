@@ -10,10 +10,6 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
                                                                    const Field &field,
                                                                    const Robot &robot)
 {
-    if (false)
-    {
-        return findInterceptionPoint(ball, field, robot);
-    }
     static const double gradient_approx_step_size = 0.000001;
 
     // We use this to take a smooth absolute value in our objective function
