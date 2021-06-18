@@ -58,7 +58,7 @@ std::string toCamelCase(const std::string& snake_case_input)
  */
 bool isValidParamType(const std::string& str)
 {
-    const static std::set<std::string> types = {"bool",   "int",  "uint",   "double",
+    const static std::set<std::string> types = {"bool",   "int",  "double",
                                                 "string", "enum", "factory"};
     return types.find(str) != types.end();
 }
