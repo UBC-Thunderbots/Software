@@ -63,7 +63,7 @@ std::set<MotionConstraint> buildMotionConstraintSetFromGameState(
     }
     else if (game_state.isTheirBallPlacement())
     {
-        motion_constraints.insert(MotionConstraint::BALL_PLACEMENT_ZONE);
+        motion_constraints.insert(MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
     }
     else
     {

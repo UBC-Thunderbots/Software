@@ -315,7 +315,6 @@ cc_library(
         ":ball_placement_play",
         ":corner_kick_play",
         ":defense_play",
-        ":enemy_ball_placement_play",
         ":dribbling_parcour_play",
         ":enemy_ball_placement_play",
         ":enemy_free_kick_play",

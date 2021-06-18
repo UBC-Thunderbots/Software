@@ -40,7 +40,6 @@ class Polygon : public virtual Shape
      *
      * @return a Polygon expanded in the direction of expansion_vector
      */
-    Polygon expand(const Vector& expansion_vector, Point centroid_point) const;
     Polygon expand(const Vector& expansion_vector) const;
 
     /**
@@ -49,7 +48,7 @@ class Polygon : public virtual Shape
      * @param expansion_amount a non-negative expansion amount
      * @throw std::invalid_argument if expansion_amount is negative
      *
-     * @return a Polygon expanded in the direction of expansion_vector
+     * @return a Polygon expanded in all directions by the expansion amount
      */
     Polygon expand(double expansion_amount) const;
 

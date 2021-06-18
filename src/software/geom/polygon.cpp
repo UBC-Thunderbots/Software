@@ -51,12 +51,6 @@ Point Polygon::centroid() const
 
 Polygon Polygon::expand(const Vector& expansion_vector) const
 {
-    Point centroid_point = centroid();
-    return expand(expansion_vector, centroid_point);
-}
-
-Polygon Polygon::expand(const Vector& expansion_vector, Point centroid_point) const
-{
     // ASCII art showing an expanded Polygon
     //
     // Original Polygon:
@@ -79,6 +73,7 @@ Polygon Polygon::expand(const Vector& expansion_vector, Point centroid_point) co
     //            A'--------D'
     //
 
+    Point centroid_point = centroid();
     std::vector<Point> expanded_points;
 
     // left and right is with respect to the vector pointing straight up

@@ -69,7 +69,8 @@ namespace
         std::set<MotionConstraint>({MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
                                     MotionConstraint::ENEMY_ROBOTS_COLLISION,
                                     MotionConstraint::HALF_METER_AROUND_BALL,
-                                    MotionConstraint::FRIENDLY_DEFENSE_AREA});
+                                    MotionConstraint::FRIENDLY_DEFENSE_AREA,
+                                    MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE});
 
     auto gamestart_or_us_motion_constraints =
         std::set<MotionConstraint>({MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,

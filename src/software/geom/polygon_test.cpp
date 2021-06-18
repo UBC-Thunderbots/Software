@@ -128,3 +128,42 @@ TEST(PolygonExpandTest, test_four_points_0_vector)
     Vector expansion_vector({0, 0});
     EXPECT_EQ(poly.expand(expansion_vector), expected);
 }
+
+TEST(PolygonExpandTest, test_four_points_doubled)
+{
+    Polygon poly({{-1,1},{1,1},{1,-1},{-1,-1}});
+    Polygon expected({{2,2},{2,-2},{-2,-2},{-2,2}});
+    EXPECT_EQ(poly.expand(1),expected);
+}
+
+TEST(PolygonExpandTest, test_four_points_no_scale)
+{
+    Polygon poly({{-1,1},{1,1},{1,-1},{-1,-1}});
+    Polygon expected({{1,1},{1,-1},{-1,-1},{-1,1}});
+    EXPECT_EQ(poly.expand(0),expected);
+}
+
+
+TEST(PolygonExpandTest,test_four_points_slanted)
+{
+    // These points make a slanted 5 unit long square
+    Polygon poly({{3,4},{7,1},{4,-3},{0,0}});
+    // These points make a slanted 10 unit long square
+    Polygon expected({{10.5, 1.5}, {4.5, -6.5}, {-3.5, -0.5}, {2.5, 7.5}});
+    // To double the initial square, we need to add 2.5 units in all 4 directions
+    EXPECT_EQ(poly.expand(2.5),expected);
+}
+
+TEST(PolygonExpandTest,test_invalid_modifier)
+{
+    Polygon poly({{-1,1},{1,1},{1,-1},{-1,-1}});
+    Polygon expected({{-2,2},{2,2},{2,-2},{-2,-2}});
+    try {
+        EXPECT_EQ(poly.expand(-2),expected);
+        GTEST_FAIL();
+    }
+    catch (std::invalid_argument e)
+    {
+        GTEST_SUCCEED();
+    }
+}
