@@ -31,7 +31,7 @@ class AttackerTactic : public Tactic
      *
      * @param updated_pass The pass to perform
      */
-    void updateControlParams(const Pass& updated_pass);
+    void updateControlParams(const Pass& best_pass_so_far, bool pass_committed);
 
     /**
      * Updates the control parameters for this AttackerTactic
@@ -63,9 +63,11 @@ class AttackerTactic : public Tactic
     FSM<AttackerFSM> fsm;
 
     // The pass to execute
-    std::optional<Pass> pass;
+    std::optional<Pass> best_pass_so_far;
+    // whether we have committed to the above pass
+    bool pass_committed;
     // The point the robot will chip towards if it is unable to shoot and is in danger
-    // of losing the ball to an enemy
+    // or losing the ball to an enemy
     std::optional<Point> chip_target;
     // shoot goal config
     std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config;
