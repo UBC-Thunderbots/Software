@@ -98,7 +98,9 @@ struct AttackerFSM
 
             auto best_pass_so_far = Pass(event.common.robot.position(),
                                          event.common.world.field().enemyGoalCenter(),
-                                         BALL_MAX_SPEED_METERS_PER_SECOND);
+                                         BALL_MAX_SPEED_METERS_PER_SECOND,
+					 event.common.world.getMostRecentTimestamp()
+					 );
 
             if (event.control_params.best_pass_so_far)
             {

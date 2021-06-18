@@ -34,7 +34,7 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double chip_pass_rating = friendly_chip_pass_rating * enemy_chip_pass_rating;
     double kick_pass_rating = friendly_kick_pass_rating * enemy_kick_pass_rating;
 
-    double pass_rating = std::max(chip_pass_rating, kick_pass_rating); 
+    double pass_rating = chip_pass_rating * kick_pass_rating; 
 
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
 
@@ -42,15 +42,15 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
         ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
 
     // Place strict limits on pass start time
-    double min_pass_time_offset = passing_config->getMinTimeOffsetForPassSeconds()
-                                      ->value();
-    double max_pass_time_offset = passing_config->getMaxTimeOffsetForPassSeconds()
-                                      ->value();
-    double pass_time_offset_quality =
-        sigmoid(pass.startTime().toSeconds(),
-                min_pass_time_offset + world.getMostRecentTimestamp().toSeconds(), 0.5) *
-        (1 - sigmoid(pass.startTime().toSeconds(),
-                     max_pass_time_offset + world.ball().timestamp().toSeconds(), 0.5));
+    //double min_pass_time_offset = passing_config->getMinTimeOffsetForPassSeconds()
+                                      //->value();
+    //double max_pass_time_offset = passing_config->getMaxTimeOffsetForPassSeconds()
+                                      //->value();
+    //double pass_time_offset_quality =
+        //sigmoid(pass.startTime().toSeconds(),
+                //min_pass_time_offset + world.getMostRecentTimestamp().toSeconds(), 0.5) *
+        //(1 - sigmoid(pass.startTime().toSeconds(),
+                     //max_pass_time_offset + world.ball().timestamp().toSeconds(), 0.5));
 
     // Place strict limits on the ball speed
     double min_pass_speed     = passing_config->getMinPassSpeedMPerS()->value();
@@ -62,7 +62,7 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
         world.field().totalXLength();
 
     return static_pass_quality * pass_rating * pass_up_field_rating *
-           shoot_pass_rating * pass_speed_quality * pass_time_offset_quality * in_region_quality;
+           shoot_pass_rating * pass_speed_quality * in_region_quality;
 }
 
 double rateZone(const World& world, const Rectangle& zone, const Point& receive_position,
@@ -319,16 +319,18 @@ double rateKickPassFriendlyCapability(Team friendly_team, const Pass& pass,
 
     // Figure out how long it would take our robot to get there
     Duration min_robot_travel_time = getTimeToPositionForRobot(
-            best_receiver.position(), pass.receiverPoint(), ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+        best_receiver.position(), pass.receiverPoint(),
+        best_receiver.robotConstants().robot_max_speed_m_per_s,
+        best_receiver.robotConstants().robot_max_acceleration_m_per_s_2);
     Timestamp earliest_time_to_receive_point =
         best_receiver.timestamp() + min_robot_travel_time;
 
     // Figure out what angle the robot would have to be at to receive the ball
     Angle receive_angle = (pass.passerPoint() - best_receiver.position()).orientation();
     Duration time_to_receive_angle = getTimeToOrientationForRobot(
-            best_receiver.orientation(), receive_angle, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        best_receiver.orientation(), receive_angle,
+        best_receiver.robotConstants().robot_max_ang_speed_rad_per_s,
+        best_receiver.robotConstants().robot_max_ang_acceleration_rad_per_s_2);
     Timestamp earliest_time_to_receive_angle =
         best_receiver.timestamp() + time_to_receive_angle;
 

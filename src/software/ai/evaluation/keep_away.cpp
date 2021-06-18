@@ -15,7 +15,7 @@ double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team)
     static const auto ENEMY_REACTION_TIME = Duration::fromSeconds(0);
 
 
-    return ratePassEnemyRisk(enemy_team, pass, ENEMY_REACTION_TIME,
+    return rateKickPassEnemyRisk(enemy_team, pass, ENEMY_REACTION_TIME,
                              RECEIVER_ENEMY_PROXIMITY_IMPORTANCE) *
            (1 - std::max(0., calculateProximityRisk(pass.passerPoint(), enemy_team,
                                                     PASSER_ENEMY_PROXIMITY_IMPORTANCE)));
@@ -54,7 +54,7 @@ Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far)
     // the position rating function we want to maximize
     const auto keepaway_point_cost = [&](const std::array<double, 2>& passer_pt_array) {
         Point passer_pt(std::get<0>(passer_pt_array), std::get<1>(passer_pt_array));
-        Pass pass(passer_pt, best_pass_so_far.receiverPoint(), best_pass_so_far.speed());
+        Pass pass(passer_pt, best_pass_so_far.receiverPoint(), best_pass_so_far.speed(), best_pass_so_far.startTime());
         return ratePasserPointForKeepAway(pass, world.enemyTeam()) *
                // constrain the optimization to a circular area around the ball
                circleSigmoid(keepaway_search_region, passer_pt, SIGMOID_WIDTH) *
