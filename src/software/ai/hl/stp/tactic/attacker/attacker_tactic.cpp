@@ -5,6 +5,7 @@
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/logger/logger.h"
 #include "software/world/ball.h"
+#include "software/ai/evaluation/intercept.h"
 
 AttackerTactic::AttackerTactic(
     std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config)

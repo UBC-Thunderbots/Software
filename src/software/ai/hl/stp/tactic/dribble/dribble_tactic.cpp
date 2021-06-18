@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
 
 #include <algorithm>
-
+#include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/action/stop_action.h"  // TODO (#1888): remove this dependency
 
 DribbleTactic::DribbleTactic()
