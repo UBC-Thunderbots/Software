@@ -29,7 +29,7 @@ Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far)
     // the width of both the field boundary sigmoid and the circular search region sigmoid
     static constexpr auto SIGMOID_WIDTH = 0.1;
     // the inward offset of the field boundaries to use for the field lines sigmoid
-    static constexpr auto FIELD_SIZE_REDUCTION_M = 0.1;
+    static constexpr auto FIELD_SIZE_REDUCTION_M = 0.25;
 
     static constexpr auto GRADIENT_STEPS_PER_ITER = 2;
 
