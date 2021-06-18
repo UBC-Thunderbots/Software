@@ -205,6 +205,7 @@ cc_library(
     deps = [
         "//shared/parameter:cpp_configs",
         "//software/ai/passing:cost_functions",
+        "//software/geom/algorithms",
         "//software/optimization:gradient_descent",
         "//software/world",
         "//software/world:ball",
