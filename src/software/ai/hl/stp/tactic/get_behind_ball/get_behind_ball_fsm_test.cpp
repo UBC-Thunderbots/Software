@@ -24,7 +24,9 @@ TEST(GetBehindBallFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
 
     // robot behind ball and close enough
-    robot = ::TestUtil::createRobotAtPos(Point(2, 2.8));
+    robot = Robot(
+        0, RobotState(Point(2, 2.8), Vector(), Angle::quarter(), AngularVelocity::zero()),
+        Timestamp::fromSeconds(123));
     fsm.process_event(GetBehindBallFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
