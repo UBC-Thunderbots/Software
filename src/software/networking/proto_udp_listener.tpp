@@ -71,7 +71,7 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
         {
             socket_.set_option(boost::asio::ip::multicast::join_group(
                 boost::asio::ip::address::from_string(ip_address).to_v4(),
-                boost::asio::ip::address::from_string(getInterfaceAddress("wlp3s0"))
+                boost::asio::ip::address::from_string(getInterfaceAddress("eth1"))
                     .to_v4()));
         }
         else
