@@ -102,8 +102,9 @@ struct DribbleFSM
             Duration ball_time_to_position = Duration::fromSeconds(
                 distance(intercept_position, ball.position()) / ball.velocity().length());
             Duration robot_time_to_pos = getTimeToPositionForRobot(
-                robot.position(), intercept_position, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-                ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+                robot.position(), intercept_position,
+                robot.robotConstants().robot_max_speed_m_per_s,
+                robot.robotConstants().robot_max_acceleration_m_per_s_2);
 
             if (robot_time_to_pos < ball_time_to_position)
             {
@@ -247,7 +248,8 @@ struct DribbleFSM
                 event.common.robot.id(), intercept_position, face_ball_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
                 AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+                event.common.robot.robotConstants()));
         };
 
         /**
@@ -279,7 +281,8 @@ struct DribbleFSM
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), target_destination, target_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW, auto_chip_or_kick,
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+                event.common.robot.robotConstants()));
         };
 
         /**

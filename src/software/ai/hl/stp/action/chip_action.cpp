@@ -118,12 +118,13 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             yield(std::make_unique<MoveIntent>(
                 robot->id(), point_behind_ball, chip_direction, 0.0, DribblerMode::OFF,
                 BallCollisionType::AVOID, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot->robotConstants()));
         }
         else
         {
             yield(std::make_unique<ChipIntent>(robot->id(), chip_origin, chip_direction,
-                                               chip_distance_meters));
+                                               chip_distance_meters,
+                                               robot->robotConstants()));
         }
     } while (!ball.hasBallBeenKicked(chip_direction));
 }
