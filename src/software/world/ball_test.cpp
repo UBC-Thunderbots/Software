@@ -203,6 +203,15 @@ TEST_F(BallTest, estimate_future_state_stationary_with_friction_acceleration)
               ball.estimateFutureState(Duration::fromSeconds(10.0)));
 }
 
+TEST_F(BallTest, estimate_future_state_stationary_with_friction_acceleration_2)
+{
+    //the acceleration should be ignored because the ball is not moving
+    Ball ball = Ball(Point(2, -3), Vector(0, 0), current_time, Vector(-0.5, -1));
+    BallState expected_future_ball_state(Point(2, -3), Vector(0, 0));
+    EXPECT_EQ(expected_future_ball_state,
+              ball.estimateFutureState(Duration::fromSeconds(10.0)));
+}
+
 
 TEST(HasBallBeenKickedTest, ball_over_speed_threshold_and_no_direction_difference)
 {
