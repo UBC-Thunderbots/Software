@@ -61,7 +61,7 @@ TEST_P(SimulatedAttackerTacticPassingTest, attacker_test_passing)
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(5));
+            Duration::fromSeconds(8));
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -110,8 +110,8 @@ INSTANTIATE_TEST_CASE_P(
                                           Angle::fromDegrees(0), Angle::fromDegrees(0))},
                         BallState(Point(0.5, 0.5), Vector(0, 0))),
 
-        // Moving Ball Tests
-        // Attacker point == Balls location & Balls location != Robots Location
+//        // Moving Ball Tests
+//         Attacker point == Balls location & Balls location != Robots Location
         std::make_tuple(Pass(Point(-0.5, -0.5), Point(0, 0), 5),
                         RobotStateWithId{
                             1, RobotState(Point(0, 0), Vector(0, 0),

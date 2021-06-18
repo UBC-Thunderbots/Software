@@ -27,7 +27,7 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     Duration best_ball_travel_duration;
     Point best_ball_intercept_pos;
 
-    //at small enough speed and distance its more efficient to just move to the ball
+    //at small enough speed or distance its more efficient to just move to the ball
     if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD || distance(ball.position(), robot.position()) < BALL_MIN_DISTANCE_TO_CHASE)
     {
         Point adjusted_ball_position = ball.position();
@@ -37,8 +37,14 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
             auto time_difference = robot.timestamp().toSeconds() - ball.timestamp().toSeconds();
             adjusted_ball_position = ball.estimateFutureState(Duration::fromSeconds(time_difference)).position();
         }
+        auto face_ball_vector = (ball.position() - robot.position());
 
-        best_ball_intercept_pos = adjusted_ball_position;
+        auto point_in_front_of_ball =
+                adjusted_ball_position -
+                Vector::createFromAngle(face_ball_vector.orientation())
+                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS);
+
+        best_ball_intercept_pos = point_in_front_of_ball;
         best_ball_travel_duration = getTimeToPositionForRobot(
                 robot.position(), best_ball_intercept_pos, ROBOT_MAX_SPEED_METERS_PER_SECOND,
                 ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
@@ -104,9 +110,6 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     best_ball_intercept_pos =
         future_state.position();
 
-    std::cout<<"current velocity, position: "<<ball.velocity()<<" , "<<ball.position()<<std::endl;
-    std::cout<<"t, future state pos: "<<best_ball_travel_duration.toSeconds()<<" , "<<best_ball_intercept_pos<<std::endl;
-    std::cout<<"future velocity "<<future_state.velocity()<<std::endl;
 //     Check that we can get to the best position in time
     Duration time_to_ball_pos = getTimeToPositionForRobot(
         robot.position(), best_ball_intercept_pos, ROBOT_MAX_SPEED_METERS_PER_SECOND,
@@ -116,7 +119,6 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
     // Check that the best intercept position is actually on the field
     if (!contains(field.fieldLines(), best_ball_intercept_pos))
     {
-        std::cout<<"returned null"<<std::endl;
         return std::nullopt;
     }
 
