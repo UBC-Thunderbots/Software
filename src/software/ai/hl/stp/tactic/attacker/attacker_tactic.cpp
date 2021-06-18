@@ -80,7 +80,7 @@ double AttackerTactic::calculateRobotCost(const Robot& robot, const World& world
         cost = (robot.position() - intercept_result.first).length() /
                world.field().totalXLength();
     }
-    return std::clamp<double>(cost, 0, 1);
+    return std::clamp<double>(cost, 0, 1) * 10;
 }
 
 void AttackerTactic::calculateNextAction(ActionCoroutine::push_type& yield)

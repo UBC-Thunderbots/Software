@@ -1,10 +1,11 @@
+#include "software/ai/passing/pass_evaluation.h"
+
 #include <cstdlib>
 #include <iostream>
 #include <vector>
 
 #include "software/ai/passing/field_pitch_division.h"
 #include "software/ai/passing/pass.h"
-#include "software/ai/passing/pass_evaluation.h"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/geom/point.h"
 #include "software/time/timestamp.h"
@@ -74,11 +75,9 @@ std::vector<ZoneEnum> PassEvaluation<ZoneEnum>::rankZonesForReceiving(
 
     std::sort(cherry_pick_zones.begin(), cherry_pick_zones.end(),
               [this, &world, &pass_position](const ZoneEnum& z1, const ZoneEnum& z2) {
-                  return rateZone(world.field(), world.enemyTeam(),
-                                  pitch_division_->getZone(z1), pass_position,
+                  return rateZone(world, pitch_division_->getZone(z1), pass_position,
                                   passing_config_) >
-                         rateZone(world.field(), world.enemyTeam(),
-                                  pitch_division_->getZone(z2), pass_position,
+                         rateZone(world, pitch_division_->getZone(z2), pass_position,
                                   passing_config_);
               });
     return cherry_pick_zones;
