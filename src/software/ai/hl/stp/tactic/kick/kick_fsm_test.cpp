@@ -27,7 +27,10 @@ TEST(KickFSMTest, test_transitions)
         boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
 
     // Robot is now behind ball
-    robot = ::TestUtil::createRobotAtPos(Point(-2, 1.8));
+    robot = Robot(0,
+                  RobotState(Point(-2, 1.8), Vector(), Angle::threeQuarter(),
+                             AngularVelocity::zero()),
+                  Timestamp::fromSeconds(123));
     fsm.process_event(KickFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     // Transition to KickState

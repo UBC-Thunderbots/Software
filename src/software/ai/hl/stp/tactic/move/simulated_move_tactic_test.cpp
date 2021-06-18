@@ -108,7 +108,7 @@ TEST_F(SimulatedMoveTacticTest, test_autokick_move)
     Point destination      = Point(-1, -1);
     BallState ball_state(Point(-1, -1), Vector(0, 0));
     auto friendly_robots = {RobotStateWithId{
-        .id          = 1,
+        .id          = 0,
         .robot_state = RobotState(initial_position, Vector(0, 0), Angle::threeQuarter(),
                                   AngularVelocity::zero())}};
     auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId(
@@ -122,7 +122,7 @@ TEST_F(SimulatedMoveTacticTest, test_autokick_move)
                                 {AutoChipOrKickMode::AUTOKICK, 3.0},
                                 MaxAllowedSpeedMode::TIPTOE);
     setTactic(tactic);
-    setRobotId(1);
+    setRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -131,13 +131,13 @@ TEST_F(SimulatedMoveTacticTest, test_autokick_move)
             {
                 yield("Tactic not done");
             }
-            robotAtPosition(1, world_ptr, destination, 0.05, yield);
+            robotAtPosition(0, world_ptr, destination, 0.05, yield);
             ballKicked(Angle::threeQuarter(), world_ptr, yield);
             // Check that conditions hold for 1000 ticks
             unsigned num_ticks = 1000;
             for (unsigned i = 0; i < num_ticks; i++)
             {
-                robotAtPosition(1, world_ptr, destination, 0.05, yield);
+                robotAtPosition(0, world_ptr, destination, 0.05, yield);
             }
         }};
 
@@ -154,25 +154,25 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_clockwise)
     Point destination      = Point(4, 2);
     BallState ball_state(Point(1, 1), Vector(0, 0));
     auto friendly_robots = {RobotStateWithId{
-        .id          = 1,
+        .id          = 0,
         .robot_state = RobotState(initial_position, Vector(0, 0), Angle::zero(),
                                   AngularVelocity::quarter())}};
+    auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0, DribblerMode::OFF,
                                 BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
                                 MaxAllowedSpeedMode::PHYSICAL_LIMIT, 1.0);
     setTactic(tactic);
-    setRobotId(1);
+    setRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
-            robotAtAngularVelocity(1, world_ptr, AngularVelocity::fromDegrees(1 * 360),
+            robotAtAngularVelocity(0, world_ptr, AngularVelocity::fromDegrees(1 * 360),
                                    AngularVelocity::fromDegrees(50), yield);
-            robotAtOrientation(1, world_ptr, Angle::half(), Angle::fromDegrees(5), yield);
-            robotAtPosition(1, world_ptr, destination, 0.05, yield);
-            robotAtOrientation(1, world_ptr, Angle::zero(), Angle::fromDegrees(5), yield);
+            robotAtPosition(0, world_ptr, destination, 0.05, yield);
+            robotAtOrientation(0, world_ptr, Angle::zero(), Angle::fromDegrees(5), yield);
             while (!tactic->done())
             {
                 yield("Tactic is not done");
@@ -181,16 +181,17 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_clockwise)
             unsigned num_ticks = 1000;
             for (unsigned i = 0; i < num_ticks; i++)
             {
-                robotAtPosition(1, world_ptr, destination, 0.05, yield);
-                robotAtOrientation(1, world_ptr, Angle::zero(), Angle::fromDegrees(5),
+                robotAtPosition(0, world_ptr, destination, 0.05, yield);
+                robotAtOrientation(0, world_ptr, Angle::zero(), Angle::fromDegrees(5),
                                    yield);
             }
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
-            non_terminating_validation_functions, Duration::fromSeconds(10));
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
 }
 
 TEST_F(SimulatedMoveTacticTest, test_spinning_move_counter_clockwise)
@@ -199,25 +200,25 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_counter_clockwise)
     Point destination      = Point(-4, 2);
     BallState ball_state(Point(1, 1), Vector(0, 0));
     auto friendly_robots = {RobotStateWithId{
-        .id          = 1,
+        .id          = 0,
         .robot_state = RobotState(initial_position, Vector(0, 0), Angle::quarter(),
                                   AngularVelocity::zero())}};
+    auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::half(), 0, DribblerMode::OFF,
                                 BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
                                 MaxAllowedSpeedMode::PHYSICAL_LIMIT, -4.0);
     setTactic(tactic);
-    setRobotId(1);
+    setRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
-            robotAtAngularVelocity(1, world_ptr, AngularVelocity::fromDegrees(-4 * 360),
+            robotAtAngularVelocity(0, world_ptr, AngularVelocity::fromDegrees(-4 * 360),
                                    AngularVelocity::fromDegrees(50), yield);
-            robotAtOrientation(1, world_ptr, Angle::zero(), Angle::fromDegrees(5), yield);
-            robotAtPosition(1, world_ptr, destination, 0.05, yield);
-            robotAtOrientation(1, world_ptr, Angle::half(), Angle::fromDegrees(5), yield);
+            robotAtPosition(0, world_ptr, destination, 0.05, yield);
+            robotAtOrientation(0, world_ptr, Angle::half(), Angle::fromDegrees(5), yield);
             while (!tactic->done())
             {
                 yield("Tactic is not done");
@@ -226,14 +227,15 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_counter_clockwise)
             unsigned num_ticks = 1000;
             for (unsigned i = 0; i < num_ticks; i++)
             {
-                robotAtPosition(1, world_ptr, destination, 0.05, yield);
-                robotAtOrientation(1, world_ptr, Angle::half(), Angle::fromDegrees(5),
+                robotAtPosition(0, world_ptr, destination, 0.05, yield);
+                robotAtOrientation(0, world_ptr, Angle::half(), Angle::fromDegrees(5),
                                    yield);
             }
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
-            non_terminating_validation_functions, Duration::fromSeconds(10));
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
 }

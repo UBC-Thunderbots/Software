@@ -2,7 +2,7 @@
     name: interface
     value: ""
     description: >-
-        The interface to send and receive packets over (can be found through ifconfig)
+        The interface to send and receive packets over (can be found through ifconfig).
 
 - string:
     name: logging_dir
