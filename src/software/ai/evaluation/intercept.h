@@ -22,6 +22,3 @@
 std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &ball,
                                                                    const Field &field,
                                                                    const Robot &robot);
-
-std::optional<std::pair<Point, Duration>> findInterceptionPoint(const Robot &robot, const Ball &ball,
-                                                                const Field &field);
