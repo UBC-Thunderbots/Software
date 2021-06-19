@@ -429,7 +429,7 @@ void initIoDrivetrain(void)
 
     io_gpio_pin_setActive(drive_mode_pin);
 
-    io_dribbler_init(AllegroA3931MotorDriver_t* dribbler);
+    io_dribbler_init(dribbler_driver);
 
     io_drivetrain_init(drivetrain_unit_back_left_wheel, drivetrain_unit_back_right_wheel,
                        drivetrain_unit_front_left_wheel,

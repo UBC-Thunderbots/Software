@@ -219,6 +219,9 @@ cc_library(
     name = "dribbler",
     srcs = ["dribbler.c"],
     hdrs = ["dribbler.h"],
+    deps = [
+        ":allegro_a3931_motor_driver",
+        ],
     restricted_to = ["//cc_toolchain:stm32h7"],
 )
 

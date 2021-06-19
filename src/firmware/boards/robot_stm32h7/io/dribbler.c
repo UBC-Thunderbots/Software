@@ -1,4 +1,5 @@
 #include "firmware/boards/robot_stm32h7/io/dribbler.h"
+#include "firmware/boards/robot_stm32h7/io/allegro_a3931_motor_driver.h"
 
 static AllegroA3931MotorDriver_t* g_dribbler;
 
@@ -10,9 +11,10 @@ void io_dribbler_init(AllegroA3931MotorDriver_t* dribbler)
 
 void io_dribbler_setSpeed(uint32_t rpm)
 {
-    io_allegro_a3931_motor_setPwmPercentage(drive_train_unit->motor_driver,
-                                            pwm_percentage);
-    // TODO (#2081) implement me
+    float pwm = (float)(rpm & 0xFFFF);
+    pwm = fmaxf(pwm, 0.40f);
+
+    io_allegro_a3931_motor_setPwmPercentage(g_dribbler, pwm);
 }
 
 void io_dribbler_coast(void)
