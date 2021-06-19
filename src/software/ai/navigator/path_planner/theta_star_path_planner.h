@@ -316,7 +316,8 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return true if line of sight from coord0 to coord1
      */
-     std::optional<std::vector<ThetaStarPathPlanner::Coordinate>> lineOfSight(const Coordinate &coord0, const Coordinate &coord1);
+    std::optional<std::vector<ThetaStarPathPlanner::Coordinate>> lineOfSight(
+        const Coordinate &coord0, const Coordinate &coord1);
 
     /**
      * Supplementary method for lineOfSight to check for line of sight when the slope
@@ -328,7 +329,8 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return true if line of sight from coord0 to coord1
      */
-     std::optional<std::vector<ThetaStarPathPlanner::Coordinate>> checkLineLow(const Coordinate &coord0, const Coordinate &coord1);
+    std::optional<std::vector<ThetaStarPathPlanner::Coordinate>> checkLineLow(
+        const Coordinate &coord0, const Coordinate &coord1);
 
     /**
      * Supplementary method for lineOfSight to check for line of sight when the slope
@@ -340,7 +342,8 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return true if line of sight from coord0 to coord1
      */
-     std::optional<std::vector<ThetaStarPathPlanner::Coordinate>> checkLineHigh(const Coordinate &coord0, const Coordinate &coord1);
+    std::optional<std::vector<ThetaStarPathPlanner::Coordinate>> checkLineHigh(
+        const Coordinate &coord0, const Coordinate &coord1);
 
     /**
      * Finds closest unblocked cell to current_cell
@@ -350,7 +353,8 @@ class ThetaStarPathPlanner : public PathPlanner
      * @return          closest unblocked cell to current_cell
      *                  if none found, return nullopt
      */
-    std::optional<ThetaStarPathPlanner::Coordinate> findClosestUnblockedCell(const Coordinate &current_cell);
+    std::optional<ThetaStarPathPlanner::Coordinate> findClosestUnblockedCell(
+        const Coordinate &current_cell);
 
     /**
      * Finds closest navigable point that's not in an obstacle to p

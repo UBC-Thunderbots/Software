@@ -17,20 +17,22 @@ class PassingEvaluationTest : public testing::Test
     {
         entire_field =
             std::make_shared<Rectangle>(Field::createSSLDivisionBField().fieldLines());
-        passing_config         = std::make_shared<PassingConfig>();
-    // We get these values here so we can make these tests robust to change
-    min_pass_speed_param = passing_config->getMinPassSpeedMPerS()->value();
-    max_pass_speed_param = passing_config->getMaxPassSpeedMPerS()->value();
-    avg_desired_pass_speed =
+        passing_config = std::make_shared<PassingConfig>();
+        // We get these values here so we can make these tests robust to change
+        min_pass_speed_param = passing_config->getMinPassSpeedMPerS()->value();
+        max_pass_speed_param = passing_config->getMaxPassSpeedMPerS()->value();
+        avg_desired_pass_speed =
             (max_pass_speed_param - min_pass_speed_param) / 2 + min_pass_speed_param;
 
-    min_time_offset_for_pass_seconds_param = passing_config->getMinTimeOffsetForPassSeconds()->value();
-    max_time_offset_for_pass_seconds_param = passing_config->getMaxTimeOffsetForPassSeconds()->value();
-    avg_time_offset_for_pass_seconds = (min_time_offset_for_pass_seconds_param +
-                max_time_offset_for_pass_seconds_param) /
-            2;
+        min_time_offset_for_pass_seconds_param =
+            passing_config->getMinTimeOffsetForPassSeconds()->value();
+        max_time_offset_for_pass_seconds_param =
+            passing_config->getMaxTimeOffsetForPassSeconds()->value();
+        avg_time_offset_for_pass_seconds = (min_time_offset_for_pass_seconds_param +
+                                            max_time_offset_for_pass_seconds_param) /
+                                           2;
 
-    enemy_proximity_importance = 0.5;
+        enemy_proximity_importance = 0.5;
     }
 
     // We get these values here so we can make these tests robust to change
@@ -100,17 +102,16 @@ TEST_F(PassingEvaluationTest, DISABLED_ratePass_speed_test)
     std::uniform_real_distribution y_distribution(-world.field().yLength() / 2,
                                                   world.field().yLength() / 2);
 
-    double curr_time             = world.getMostRecentTimestamp().toSeconds();
-    double min_start_time_offset = passing_config->getMinTimeOffsetForPassSeconds()
-                                       ->value();
-    double max_start_time_offset = passing_config->getMaxTimeOffsetForPassSeconds()
-                                       ->value();
+    double curr_time = world.getMostRecentTimestamp().toSeconds();
+    double min_start_time_offset =
+        passing_config->getMinTimeOffsetForPassSeconds()->value();
+    double max_start_time_offset =
+        passing_config->getMaxTimeOffsetForPassSeconds()->value();
     std::uniform_real_distribution start_time_distribution(
         curr_time + min_start_time_offset, curr_time + max_start_time_offset);
-    std::uniform_real_distribution speed_distribution(passing_config->getMinPassSpeedMPerS()
-                                                          ->value(),
-                                                      passing_config->getMaxPassSpeedMPerS()
-                                                          ->value());
+    std::uniform_real_distribution speed_distribution(
+        passing_config->getMinPassSpeedMPerS()->value(),
+        passing_config->getMaxPassSpeedMPerS()->value());
     std::vector<Pass> passes;
 
     std::mt19937 random_num_gen;
@@ -148,7 +149,8 @@ TEST_F(PassingEvaluationTest, ratePass_enemy_directly_on_pass_trajectory)
     // A pass from halfway up the +y side of the field to the origin.
     // There is an enemy defender right on the pass trajectory
     //
-    // In this case, we should chip over the enemy, so the chip pass score should be higher
+    // In this case, we should chip over the enemy, so the chip pass score should be
+    // higher
     Pass pass({2, 2}, {0, 0}, max_pass_speed_param - 0.2,
               Timestamp::fromSeconds(min_time_offset_for_pass_seconds_param + 0.1));
 
@@ -328,8 +330,7 @@ TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_center_no_enemies)
     EXPECT_GE(1.0, pass_rating);
 }
 
-TEST_F(PassingEvaluationTest,
-       ratePass_corner_kick_to_marked_robot_at_field_center)
+TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_marked_robot_at_field_center)
 {
     // A corner kick from the +x, +y corner of the field to a robot on the +x axis part
     // way up the enemy half of the field. The receiver friendly is marked by an enemy,
@@ -594,7 +595,8 @@ TEST_F(PassingEvaluationTest, rateKickPassEnemyRisk_no_enemy_robots)
 {
     Team enemy_team(Duration::fromSeconds(10));
     Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(1));
-    double pass_rating = rateKickPassEnemyRisk(enemy_team, pass, Duration::fromSeconds(0.2), enemy_proximity_importance);
+    double pass_rating = rateKickPassEnemyRisk(
+        enemy_team, pass, Duration::fromSeconds(0.2), enemy_proximity_importance);
     EXPECT_EQ(1, pass_rating);
 }
 
@@ -609,7 +611,8 @@ TEST_F(PassingEvaluationTest, rateKickPassEnemyRisk_no_robots_near)
     });
     Pass pass({0, 0}, {10, 10}, 4, Timestamp::fromSeconds(0.1));
 
-    double pass_rating = rateKickPassEnemyRisk(enemy_team, pass, Duration::fromSeconds(0.2), enemy_proximity_importance);
+    double pass_rating = rateKickPassEnemyRisk(
+        enemy_team, pass, Duration::fromSeconds(0.2), enemy_proximity_importance);
     EXPECT_GE(pass_rating, 0.9);
     EXPECT_LE(pass_rating, 1.0);
 }
@@ -621,7 +624,8 @@ TEST_F(PassingEvaluationTest, rateKickPassEnemyRisk_one_robot_near_receiver_poin
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0))});
     Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(1));
 
-    double pass_rating = rateKickPassEnemyRisk(enemy_team, pass, Duration::fromSeconds(0.2), enemy_proximity_importance);
+    double pass_rating = rateKickPassEnemyRisk(
+        enemy_team, pass, Duration::fromSeconds(0.2), enemy_proximity_importance);
     EXPECT_LE(0, pass_rating);
     EXPECT_GE(0.1, pass_rating);
 }
@@ -633,7 +637,8 @@ TEST_F(PassingEvaluationTest, rateKickPassEnemyRisk_robot_near_center_of_pass)
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0))});
     Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(1));
 
-    double pass_rating = rateKickPassEnemyRisk(enemy_team, pass, Duration::fromSeconds(0.2), enemy_proximity_importance);
+    double pass_rating = rateKickPassEnemyRisk(
+        enemy_team, pass, Duration::fromSeconds(0.2), enemy_proximity_importance);
     EXPECT_LE(0, pass_rating);
     EXPECT_GE(0.1, pass_rating);
 }
@@ -648,7 +653,8 @@ TEST_F(PassingEvaluationTest,
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0))});
     Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(1));
 
-    double pass_rating = rateKickPassEnemyRisk(enemy_team, pass, Duration::fromSeconds(0.2), enemy_proximity_importance);
+    double pass_rating = rateKickPassEnemyRisk(
+        enemy_team, pass, Duration::fromSeconds(0.2), enemy_proximity_importance);
     EXPECT_LE(0, pass_rating);
     EXPECT_GE(0.1, pass_rating);
 }
@@ -658,7 +664,8 @@ TEST_F(PassingEvaluationTest, calculateKickInterceptRisk_for_team_no_robots)
     Team enemy_team(Duration::fromSeconds(10));
     Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(1));
 
-    double intercept_risk = calculateKickInterceptRisk(enemy_team, pass, Duration::fromSeconds(0.2));
+    double intercept_risk =
+        calculateKickInterceptRisk(enemy_team, pass, Duration::fromSeconds(0.2));
     EXPECT_EQ(0, intercept_risk);
 }
 
@@ -676,7 +683,8 @@ TEST_F(PassingEvaluationTest,
     });
     Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(1));
 
-    double intercept_risk = calculateKickInterceptRisk(enemy_team, pass, Duration::fromSeconds(0.2));
+    double intercept_risk =
+        calculateKickInterceptRisk(enemy_team, pass, Duration::fromSeconds(0.2));
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -695,12 +703,14 @@ TEST_F(PassingEvaluationTest,
     });
     Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(1));
 
-    double intercept_risk = calculateKickInterceptRisk(enemy_team, pass, Duration::fromSeconds(0.2));
+    double intercept_risk =
+        calculateKickInterceptRisk(enemy_team, pass, Duration::fromSeconds(0.2));
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
 
-TEST_F(PassingEvaluationTest, calculateKickInterceptRisk_for_robot_sitting_on_pass_trajectory)
+TEST_F(PassingEvaluationTest,
+       calculateKickInterceptRisk_for_robot_sitting_on_pass_trajectory)
 {
     // Test calculating the intercept risk for a robot that is located directly
     // along the trajectory of the pass
@@ -708,12 +718,14 @@ TEST_F(PassingEvaluationTest, calculateKickInterceptRisk_for_robot_sitting_on_pa
                       Timestamp::fromSeconds(0));
     Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(1));
 
-    double intercept_risk = calculateKickInterceptRisk(enemy_robot, pass, Duration::fromSeconds(0.2));
+    double intercept_risk =
+        calculateKickInterceptRisk(enemy_robot, pass, Duration::fromSeconds(0.2));
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
 
-TEST_F(PassingEvaluationTest, calculateKickInterceptRisk_for_robot_just_off_pass_trajectory)
+TEST_F(PassingEvaluationTest,
+       calculateKickInterceptRisk_for_robot_just_off_pass_trajectory)
 {
     // Test calculating the intercept risk for a robot that is located just off to the
     // side of the pass trajectory, but close enough that it will be able to move onto
@@ -722,12 +734,14 @@ TEST_F(PassingEvaluationTest, calculateKickInterceptRisk_for_robot_just_off_pass
                       Timestamp::fromSeconds(0));
     Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(1));
 
-    double intercept_risk = calculateKickInterceptRisk(enemy_robot, pass, Duration::fromSeconds(0.2));
+    double intercept_risk =
+        calculateKickInterceptRisk(enemy_robot, pass, Duration::fromSeconds(0.2));
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
 
-TEST_F(PassingEvaluationTest, calculateKickInterceptRisk_for_robot_far_away_from_trajectory)
+TEST_F(PassingEvaluationTest,
+       calculateKickInterceptRisk_for_robot_far_away_from_trajectory)
 {
     // Test calculating the intercept risk for a robot that is located far enough away
     // from the pass trajectory that there is no way it will be able to intercept it
@@ -735,7 +749,8 @@ TEST_F(PassingEvaluationTest, calculateKickInterceptRisk_for_robot_far_away_from
                       Timestamp::fromSeconds(0));
     Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(1));
 
-    double intercept_risk = calculateKickInterceptRisk(enemy_robot, pass, Duration::fromSeconds(0.2));
+    double intercept_risk =
+        calculateKickInterceptRisk(enemy_robot, pass, Duration::fromSeconds(0.2));
     EXPECT_LE(0, intercept_risk);
     EXPECT_GE(0.1, intercept_risk);
 }
@@ -748,7 +763,8 @@ TEST_F(PassingEvaluationTest, calculateKickInterceptRisk_robot_at_far_end_of_fie
                       Timestamp::fromSeconds(0));
     Pass pass({3, -3}, {3, 3}, 3, Timestamp::fromSeconds(0));
 
-    double intercept_risk = calculateKickInterceptRisk(enemy_robot, pass, Duration::fromSeconds(0.2));
+    double intercept_risk =
+        calculateKickInterceptRisk(enemy_robot, pass, Duration::fromSeconds(0.2));
     EXPECT_LE(0, intercept_risk);
     EXPECT_GE(0.1, intercept_risk);
 }
@@ -761,7 +777,8 @@ TEST_F(PassingEvaluationTest, calculateKickInterceptRisk_enemy_moving_far_away)
                       Timestamp::fromSeconds(0));
     Pass pass({1, 1}, {4, 4}, 2, Timestamp::fromSeconds(0));
 
-    double intercept_risk = calculateKickInterceptRisk(enemy_robot, pass, Duration::fromSeconds(0.2));
+    double intercept_risk =
+        calculateKickInterceptRisk(enemy_robot, pass, Duration::fromSeconds(0.2));
     EXPECT_LE(0, intercept_risk);
     EXPECT_GE(0.1, intercept_risk);
 }
@@ -778,7 +795,8 @@ TEST_F(PassingEvaluationTest,
                       Timestamp::fromSeconds(0));
     Pass pass({0, 0}, {0, 10}, 10, Timestamp::fromSeconds(2));
 
-    double intercept_risk = calculateKickInterceptRisk(enemy_robot, pass, Duration::fromSeconds(0.2));
+    double intercept_risk =
+        calculateKickInterceptRisk(enemy_robot, pass, Duration::fromSeconds(0.2));
     EXPECT_GE(intercept_risk, 0.95);
     EXPECT_LE(intercept_risk, 1);
 }
@@ -795,7 +813,8 @@ TEST_F(PassingEvaluationTest,
                       AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Pass pass({0, 0}, {0, 2}, 0.5, Timestamp::fromSeconds(0));
 
-    double intercept_risk = calculateKickInterceptRisk(enemy_robot, pass, Duration::fromSeconds(0.2));
+    double intercept_risk =
+        calculateKickInterceptRisk(enemy_robot, pass, Duration::fromSeconds(0.2));
     EXPECT_LE(0.5, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -860,7 +879,8 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_should_ignore_passer_ro
     Team team({passer, potential_receiver}, Duration::fromSeconds(10));
     Pass pass({2, -2}, {0, 0}, 10, Timestamp::fromSeconds(1));
 
-    double friendly_capability = rateKickPassFriendlyCapability(team, pass, passing_config);
+    double friendly_capability =
+        rateKickPassFriendlyCapability(team, pass, passing_config);
     EXPECT_GE(friendly_capability, 0);
     EXPECT_LE(friendly_capability, 0.05);
 }

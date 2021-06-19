@@ -3,12 +3,12 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/keep_away.h"
 #include "software/ai/evaluation/shot.h"
-#include "software/geom/algorithms/intersects.h"
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 #include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/ai/passing/pass.h"
+#include "software/geom/algorithms/intersects.h"
 
 struct AttackerFSM
 {
@@ -120,8 +120,7 @@ struct AttackerFSM
             auto best_pass_so_far = Pass(event.common.robot.position(),
                                          event.common.world.field().enemyGoalCenter(),
                                          BALL_MAX_SPEED_METERS_PER_SECOND,
-					 event.common.world.getMostRecentTimestamp()
-					 );
+                                         event.common.world.getMostRecentTimestamp());
 
             if (event.control_params.best_pass_so_far)
             {
@@ -170,8 +169,9 @@ struct AttackerFSM
          */
         const auto should_kick = [](auto event) {
             // check for enemy threat
-            // TODO (ROBOCUP): revisit this, we shouldn't "panic chip" unless we're completely boxed in!
-            // Circle about_to_steal_danger_zone(event.common.robot.position(),
+            // TODO (ROBOCUP): revisit this, we shouldn't "panic chip" unless we're
+            // completely boxed in! Circle
+            // about_to_steal_danger_zone(event.common.robot.position(),
             //                                   event.control_params.attacker_tactic_config
             //                                       ->getEnemyAboutToStealBallRadius()
             //                                       ->value());

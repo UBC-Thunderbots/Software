@@ -228,8 +228,7 @@ TEST_F(TestThetaStarPathPlanner,
 
     // Place a rectangle over our destination location
     std::vector<ObstaclePtr> obstacles = {
-        robot_navigation_obstacle_factory.createFromShape(
-            obstacle_shape)};
+        robot_navigation_obstacle_factory.createFromShape(obstacle_shape)};
 
     Rectangle navigable_area = field.fieldBoundary();
 
@@ -247,7 +246,7 @@ TEST_F(TestThetaStarPathPlanner,
     Rectangle bounding_box({-0.1, 1.35}, {3.1, -1.35});
 
     checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    checkPathDoesNotIntersectObstacle(path_points, { obstacle_shape });
+    checkPathDoesNotIntersectObstacle(path_points, {obstacle_shape});
 }
 
 TEST_F(TestThetaStarPathPlanner,
@@ -261,8 +260,7 @@ TEST_F(TestThetaStarPathPlanner,
 
     // Place a rectangle over our destination location
     std::vector<ObstaclePtr> obstacles = {
-        robot_navigation_obstacle_factory.createFromShape(
-            obstacle_shape)};
+        robot_navigation_obstacle_factory.createFromShape(obstacle_shape)};
 
     Rectangle navigable_area = field.fieldBoundary();
 
@@ -280,7 +278,7 @@ TEST_F(TestThetaStarPathPlanner,
     Rectangle bounding_box({1.3, -0.1}, {-1.3, 3.1});
     checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
-    checkPathDoesNotIntersectObstacle(path_points, { obstacle_shape });
+    checkPathDoesNotIntersectObstacle(path_points, {obstacle_shape});
 }
 
 TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
@@ -427,13 +425,12 @@ TEST_F(TestThetaStarPathPlanner,
     Polygon obstacle_shape = Rectangle(Point(-1, 1), Point(1, 2));
 
     std::vector<ObstaclePtr> obstacles = {
-        robot_navigation_obstacle_factory.createFromShape(
-            obstacle_shape)};
+        robot_navigation_obstacle_factory.createFromShape(obstacle_shape)};
 
     Rectangle navigable_area = field.fieldBoundary();
 
     auto path = planner->findPath(start, end, navigable_area, obstacles);
 
     ASSERT_TRUE(path != std::nullopt);
-    checkPathDoesNotIntersectObstacle(path->getKnots(), { obstacle_shape });
+    checkPathDoesNotIntersectObstacle(path->getKnots(), {obstacle_shape});
 }

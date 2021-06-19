@@ -14,7 +14,7 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       friendly_team_filter(),
       enemy_team_filter(),
       team_with_possession(TeamSide::ENEMY),
-gc_defending_positive_side(false),
+      gc_defending_positive_side(false),
       friendly_goalie_id(0),
       enemy_goalie_id(0),
       reset_time_vision_packets_detected(0),
@@ -132,7 +132,7 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::YELLOW));
         friendly_goalie_id = packet.yellow().goalkeeper();
         enemy_goalie_id    = packet.blue().goalkeeper();
-        if(packet.has_blue_team_on_positive_half())
+        if (packet.has_blue_team_on_positive_half())
         {
             gc_defending_positive_side = !packet.blue_team_on_positive_half();
         }
@@ -142,7 +142,7 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::BLUE));
         friendly_goalie_id = packet.blue().goalkeeper();
         enemy_goalie_id    = packet.yellow().goalkeeper();
-        if(packet.has_blue_team_on_positive_half())
+        if (packet.has_blue_team_on_positive_half())
         {
             gc_defending_positive_side = packet.blue_team_on_positive_half();
         }
@@ -213,9 +213,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     const bool defending_positive_side =
         sensor_fusion_config->getDefendingPositiveSide()->value();
     const bool should_invert_field =
-        (override_game_controller_defending_side && defending_positive_side)
-        ||(!override_game_controller_defending_side && gc_defending_positive_side)
-        ;
+        (override_game_controller_defending_side && defending_positive_side) ||
+        (!override_game_controller_defending_side && gc_defending_positive_side);
 
     bool friendly_team_is_yellow =
         sensor_fusion_config->getFriendlyColorYellow()->value();
@@ -272,7 +271,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
         closest_robot = closest_enemy;
 
-        if(closest_enemy && closest_friendly)
+        if (closest_enemy && closest_friendly)
         {
             if ((closest_enemy->position() - ball->position()).length() >
                 (closest_friendly->position() - ball->position()).length())

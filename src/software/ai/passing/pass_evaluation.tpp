@@ -1,11 +1,10 @@
-#include "software/ai/passing/pass_evaluation.h"
-
 #include <cstdlib>
 #include <iostream>
 #include <vector>
 
 #include "software/ai/passing/field_pitch_division.h"
 #include "software/ai/passing/pass.h"
+#include "software/ai/passing/pass_evaluation.h"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/geom/point.h"
 #include "software/time/timestamp.h"

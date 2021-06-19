@@ -4,7 +4,10 @@
 
 
 
-Backend::Backend(): FirstInFirstOutThreadedObserver<World>(Observer<World>::DEFAULT_BUFFER_SIZE, false){}
+Backend::Backend()
+    : FirstInFirstOutThreadedObserver<World>(Observer<World>::DEFAULT_BUFFER_SIZE, false)
+{
+}
 
 void Backend::receiveRobotStatus(TbotsProto::RobotStatus msg)
 {

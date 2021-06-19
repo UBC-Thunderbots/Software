@@ -94,8 +94,7 @@ ThetaStarPathPlanner::lineOfSight(const Coordinate &coord0, const Coordinate &co
 }
 
 std::optional<std::vector<ThetaStarPathPlanner::Coordinate>>
-ThetaStarPathPlanner::checkLineLow(const Coordinate &coord0,
-                                        const Coordinate &coord1)
+ThetaStarPathPlanner::checkLineLow(const Coordinate &coord0, const Coordinate &coord1)
 {
     std::vector<Coordinate> explored_points;
 
@@ -139,8 +138,7 @@ ThetaStarPathPlanner::checkLineLow(const Coordinate &coord0,
 }
 
 std::optional<std::vector<ThetaStarPathPlanner::Coordinate>>
-ThetaStarPathPlanner::checkLineHigh(const Coordinate &coord0,
-                                         const Coordinate &coord1)
+ThetaStarPathPlanner::checkLineHigh(const Coordinate &coord0, const Coordinate &coord1)
 {
     std::vector<Coordinate> explored_points;
 
@@ -466,7 +464,8 @@ bool ThetaStarPathPlanner::visitNeighbours(const Coordinate &current_coord,
     return false;
 }
 
-std::optional<ThetaStarPathPlanner::Coordinate> ThetaStarPathPlanner::findClosestUnblockedCell(const Coordinate &current_cell)
+std::optional<ThetaStarPathPlanner::Coordinate>
+ThetaStarPathPlanner::findClosestUnblockedCell(const Coordinate &current_cell)
 {
     // spiral out from current_cell looking for unblocked cells
     unsigned int i = current_cell.row();
