@@ -134,7 +134,7 @@ static void chipper_fire(unsigned int width)
 static unsigned int kicker_speedToPulseWidth(float speed_m_per_s)
 {
     // TODO (new): implement conversion from speed to pulse duration (time)
-    float kick_time = 0.008f; //expect single digit ms range
+    float kick_time = speed_m_per_s / 1000.0f;
     // TODO (new): programatically calculate pulse duration from RCC registers
     // utilizes the low level macro specific for OPM
     TIM16->CCR1 = 1;
