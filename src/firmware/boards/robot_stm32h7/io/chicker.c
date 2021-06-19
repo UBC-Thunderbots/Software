@@ -168,6 +168,7 @@ static void chicker_fire(ChickerDevice_t device, unsigned int width)
     // Activate the hardware.
     if (device == CHICKER_KICK)
     {
+        TLOG_INFO("kicking with width %d", width);
         kicker_fire(width);
     }
     else
