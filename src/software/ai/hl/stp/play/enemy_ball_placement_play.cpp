@@ -59,15 +59,17 @@ void EnemyBallPlacementPlay::ballPlacementNoShadow(
         tactics_to_run[0].emplace_back(crease_defenders[1]);
         tactics_to_run[0].emplace_back(crease_defenders[2]);
 
-
-        move_tactics[0]->updateControlParams(
-            world.gameState().getBallPlacementPoint().value() +
-                Vector(-0.75 - ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS),
-            Angle::zero(), 0);
-        move_tactics[1]->updateControlParams(
-            world.gameState().getBallPlacementPoint().value() +
-                Vector(-0.75 - ROBOT_MAX_RADIUS_METERS, -ROBOT_MAX_RADIUS_METERS),
-            Angle::zero(), 0);
+        if (world.gameState().getBallPlacementPoint().has_value())
+        {
+            move_tactics[0]->updateControlParams(
+                world.gameState().getBallPlacementPoint().value() +
+                    Vector(-0.75 - ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS),
+                Angle::zero(), 0);
+            move_tactics[1]->updateControlParams(
+                world.gameState().getBallPlacementPoint().value() +
+                    Vector(-0.75 - ROBOT_MAX_RADIUS_METERS, -ROBOT_MAX_RADIUS_METERS),
+                Angle::zero(), 0);
+        }
 
         tactics_to_run[0].emplace_back(move_tactics[0]);
         tactics_to_run[0].emplace_back(move_tactics[1]);

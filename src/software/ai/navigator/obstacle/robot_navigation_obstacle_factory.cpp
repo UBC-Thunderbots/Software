@@ -55,9 +55,12 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
                                                          world.field().fieldBoundary()));
             break;
         case MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:
-            obstacles.push_back(
-                createFromBallPlacement(world.gameState().getBallPlacementPoint().value(),
-                                        world.ball().position()));
+            if (world.gameState().getBallPlacementPoint().has_value())
+            {
+                obstacles.push_back(createFromBallPlacement(
+                    world.gameState().getBallPlacementPoint().value(),
+                    world.ball().position()));
+            }
     }
 
     return obstacles;
@@ -155,8 +158,7 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createEnemyCollisionAvo
         for (const auto &robot : enemy_team.getAllRobots())
         {
             obstacles.push_back(std::make_shared<GeomObstacle<Circle>>(
-                Circle(robot.position(),
-                       ROBOT_MAX_RADIUS_METERS + DIST_TO_FRONT_OF_ROBOT_METERS)));
+                Circle(robot.position(), 2 * DIST_TO_FRONT_OF_ROBOT_METERS)));
         }
         return obstacles;
     }
