@@ -54,6 +54,7 @@ void io_primitive_executor_task(void* argument)
     {
         uint32_t tick_start = osKernelGetTickCount();
         app_primitive_manager_runCurrentPrimitive(g_primitive_manager, g_world);
+        io_chicker_tick();
         uint32_t tick_end = osKernelGetTickCount();
 
         // TODO pull 5 into a constant

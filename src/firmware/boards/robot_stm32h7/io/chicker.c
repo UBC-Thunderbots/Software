@@ -15,7 +15,7 @@
 // The number of ticks for which no device should be activated because it would interfere
 // with an ongoing fire.
 
-#define COLLIDE_TIMEOUT 0u
+#define COLLIDE_TIMEOUT 1000u
 //#define COLLIDE_TIMEOUT 5000000U
 
 // TODO (new): make sure there's no datarace on this variable
@@ -68,7 +68,6 @@ void io_chicker_kick(float speed_m_per_s)
     osDelay(50);
 
     chicker_fire(CHICKER_KICK, kicker_speedToPulseWidth(speed_m_per_s));
-    osDelay(1000);
 }
 
 void io_chicker_chip(float distance_m)
@@ -79,7 +78,6 @@ void io_chicker_chip(float distance_m)
     osDelay(50);
 
     chicker_fire(CHICKER_CHIP, chipper_distanceToPulseWidth(distance_m));
-    osDelay(1000);
 }
 
 void io_chicker_enable_auto_kick(float speed_m_per_s)
