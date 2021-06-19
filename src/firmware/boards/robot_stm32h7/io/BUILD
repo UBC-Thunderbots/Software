@@ -31,6 +31,7 @@ cc_library(
     deps = [
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_robot",
+        ":chicker",
         "//firmware/boards/robot_stm32h7:unused",
         "//firmware/boards/robot_stm32h7/io:proto_multicast_communication",
     ],

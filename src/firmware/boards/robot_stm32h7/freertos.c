@@ -347,7 +347,11 @@ void initIoNetworking(void)
         io_gpio_pin_create(ID_SEL_4_GPIO_Port, ID_SEL_4_Pin, ACTIVE_LOW);
 
     GpioPin_t *charger =
-        io_gpio_pin_create(CHARGE_PWR_BRD_GPIO_Port, CHARGE_PWR_BRD_Pin, ACTIVE_LOW);
+        io_gpio_pin_create(CHARGE_PWR_BRD_GPIO_Port, CHARGE_PWR_BRD_Pin, ACTIVE_HIGH);
+
+    io_gpio_pin_setActive(charger);
+    io_gpio_pin_setInactive(charger);
+    io_gpio_pin_setActive(charger);
 
     // Initialize the ublox communicator
     io_ublox_odinw262_communicator_init(&huart4, ublox_reset_pin, 2);
@@ -421,7 +425,7 @@ void initIoDrivetrain(void)
     AllegroA3931MotorDriver_t *dribbler_driver =
         io_allegro_a3931_motor_driver_create(dribbler_pwm_pin, dribbler_dir);
 
-    io_allegro_a3931_motor_setPwmPercentage(dribbler_driver, 0.15f);
+    io_allegro_a3931_motor_setPwmPercentage(dribbler_driver, 0.25f);
 
     io_gpio_pin_setActive(drive_mode_pin);
 

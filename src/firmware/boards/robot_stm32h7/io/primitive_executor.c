@@ -3,6 +3,7 @@
 #include "cmsis_os.h"
 #include "firmware/app/logger/logger.h"
 #include "firmware/boards/robot_stm32h7/io/proto_multicast.h"
+#include "firmware/boards/robot_stm32h7/io/chicker.h"
 #include "firmware/boards/robot_stm32h7/io/proto_multicast_communication_profile.h"
 #include "shared/constants.h"
 #include "shared/proto/tbots_software_msgs.nanopb.h"
@@ -51,7 +52,6 @@ void io_primitive_executor_task(void* argument)
 
     for (;;)
     {
-
         uint32_t tick_start = osKernelGetTickCount();
         app_primitive_manager_runCurrentPrimitive(g_primitive_manager, g_world);
         uint32_t tick_end = osKernelGetTickCount();

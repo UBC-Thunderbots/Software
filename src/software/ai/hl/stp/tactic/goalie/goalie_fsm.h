@@ -257,7 +257,7 @@ struct GoalieFSM
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), goalie_pos, goalie_orientation, 0.0,
                 DribblerMode::OFF, BallCollisionType::ALLOW,
-                AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
+                AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, YEET_CHIP_DISTANCE_METERS},
                 max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
         };
 
@@ -331,7 +331,7 @@ struct GoalieFSM
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), goalie_pos, goalie_orientation,
                 goalie_final_speed, DribblerMode::OFF, BallCollisionType::ALLOW,
-                AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
+                AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, YEET_CHIP_DISTANCE_METERS},
                 max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
         };
 
