@@ -316,7 +316,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return true if line of sight from coord0 to coord1
      */
-     std::optional<std::vector<ThetaStarPathPlanner::Coordinate>> lineOfSight(const Coordinate &coord0, const Coordinate &coord1);
+     bool lineOfSight(const Coordinate &coord0, const Coordinate &coord1);
 
     /**
      * Supplementary method for lineOfSight to check for line of sight when the slope
@@ -328,7 +328,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return true if line of sight from coord0 to coord1
      */
-     std::optional<std::vector<ThetaStarPathPlanner::Coordinate>> checkLineLow(const Coordinate &coord0, const Coordinate &coord1);
+     bool checkLineLow(const Coordinate &coord0, const Coordinate &coord1);
 
     /**
      * Supplementary method for lineOfSight to check for line of sight when the slope
@@ -340,7 +340,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return true if line of sight from coord0 to coord1
      */
-     std::optional<std::vector<ThetaStarPathPlanner::Coordinate>> checkLineHigh(const Coordinate &coord0, const Coordinate &coord1);
+     bool checkLineHigh(const Coordinate &coord0, const Coordinate &coord1);
 
     /**
      * Finds closest unblocked cell to current_cell
@@ -453,7 +453,7 @@ class ThetaStarPathPlanner : public PathPlanner
         50.0;  // number of fractions to divide 1m
 
     const double SIZE_OF_GRID_CELL_IN_METERS =
-        ROBOT_MAX_RADIUS_METERS;  // this is the n in the O(n^2) algorithm :p
+        ROBOT_MAX_RADIUS_METERS / 3;  // this is the n in the O(n^2) algorithm :p
 
     std::vector<ObstaclePtr> obstacles;
     Point centre;

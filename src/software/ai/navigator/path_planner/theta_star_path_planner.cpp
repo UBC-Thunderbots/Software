@@ -63,8 +63,7 @@ double ThetaStarPathPlanner::coordDistance(const Coordinate &coord1,
     return distance(p1, p2);
 }
 
-std::optional<std::vector<ThetaStarPathPlanner::Coordinate>>
-ThetaStarPathPlanner::lineOfSight(const Coordinate &coord0, const Coordinate &coord1)
+bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord0, const Coordinate &coord1)
 {
     int dy = coord1.col() - coord0.col();
     int dx = coord1.row() - coord0.row();
@@ -93,12 +92,9 @@ ThetaStarPathPlanner::lineOfSight(const Coordinate &coord0, const Coordinate &co
     }
 }
 
-std::optional<std::vector<ThetaStarPathPlanner::Coordinate>>
-ThetaStarPathPlanner::checkLineLow(const Coordinate &coord0,
+bool ThetaStarPathPlanner::checkLineLow(const Coordinate &coord0,
                                         const Coordinate &coord1)
 {
-    std::vector<Coordinate> explored_points;
-
     unsigned int x0 = coord0.row();
     unsigned int y0 = coord0.col();
     unsigned int x1 = coord1.row();
@@ -122,7 +118,7 @@ ThetaStarPathPlanner::checkLineLow(const Coordinate &coord0,
         {
             // No line of sight since a coordinate in the path from coord0 to coord1 is
             // blocked
-            return std::nullopt;
+            return false;
         }
         if (D > 0)
         {
@@ -133,17 +129,13 @@ ThetaStarPathPlanner::checkLineLow(const Coordinate &coord0,
         {
             D += 2 * dy;
         }
-        explored_points.emplace_back(Coordinate(x, y));
     }
-    return std::optional<std::vector<Coordinate>>(explored_points);
+    return true;
 }
 
-std::optional<std::vector<ThetaStarPathPlanner::Coordinate>>
-ThetaStarPathPlanner::checkLineHigh(const Coordinate &coord0,
+bool ThetaStarPathPlanner::checkLineHigh(const Coordinate &coord0,
                                          const Coordinate &coord1)
 {
-    std::vector<Coordinate> explored_points;
-
     unsigned int x0 = coord0.row();
     unsigned int y0 = coord0.col();
     unsigned int x1 = coord1.row();
@@ -167,7 +159,7 @@ ThetaStarPathPlanner::checkLineHigh(const Coordinate &coord0,
         {
             // No line of sight since a coordinate in the path from coord0 to coord1 is
             // blocked
-            return std::nullopt;
+            return false;
         }
         if (D > 0)
         {
@@ -178,9 +170,8 @@ ThetaStarPathPlanner::checkLineHigh(const Coordinate &coord0,
         {
             D += 2 * dx;
         }
-        explored_points.emplace_back(Coordinate(x, y));
     }
-    return std::optional<std::vector<Coordinate>>(explored_points);
+    return true;
 }
 
 std::vector<Point> ThetaStarPathPlanner::tracePath(const Coordinate &end) const
@@ -220,7 +211,7 @@ bool ThetaStarPathPlanner::updateVertex(const Coordinate &current, const Coordin
             double updated_best_path_cost;
             Coordinate next_parent;
             Coordinate parent = cell_heuristics[current.row()][current.col()].parent();
-            if (lineOfSight(parent, next) != std::nullopt)
+            if (lineOfSight(parent, next))
             {
                 next_parent = parent;
                 updated_best_path_cost =
@@ -454,7 +445,7 @@ bool ThetaStarPathPlanner::visitNeighbours(const Coordinate &current_coord,
             }
 
             // check for clipping obstacles
-            if (lineOfSight(current_coord, next_coord) != std::nullopt)
+            if (lineOfSight(current_coord, next_coord))
             {
                 if (updateVertex(current_coord, next_coord, end_coord))
                 {
