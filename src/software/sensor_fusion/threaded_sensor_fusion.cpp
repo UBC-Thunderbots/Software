@@ -2,7 +2,7 @@
 
 ThreadedSensorFusion::ThreadedSensorFusion(
     std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
-    : FirstInFirstOutThreadedObserver<SensorProto>(DIFFERENT_GRSIM_FRAMES_RECEIVED),
+    : FirstInFirstOutThreadedObserver<SensorProto>(DIFFERENT_GRSIM_FRAMES_RECEIVED, false),
       sensor_fusion(sensor_fusion_config)
 {
     if (!sensor_fusion_config)
