@@ -1,5 +1,6 @@
 #include "firmware/boards/robot_stm32h7/io/charger.h"
 
+
 void io_charger_charge()
 {
     // TODO (#2080) implement this

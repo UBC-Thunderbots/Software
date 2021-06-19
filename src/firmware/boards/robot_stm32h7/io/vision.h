@@ -141,8 +141,7 @@ float io_vision_getRobotOrientation(void);
 float io_vision_getRobotAngularVelocity(void);
 
 // TODO DOCS DR
-void io_vision_init(TIM_HandleTypeDef* timer,
-                    ADC_HandleTypeDef* adc);
+void io_vision_init(ADC_HandleTypeDef* adc);
 void io_vision_task(void* arg);
 void io_lock_vision();
 void io_unlock_vision();

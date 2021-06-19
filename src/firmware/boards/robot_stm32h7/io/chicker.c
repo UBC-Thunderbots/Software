@@ -1,5 +1,6 @@
 #include "firmware/boards/robot_stm32h7/io/chicker.h"
 
+#include "cmsis_os.h"
 #include "firmware/app/logger/logger.h"
 #include "firmware/boards/robot_stm32h7/tim.h"
 #include "firmware/boards/robot_stm32h7/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_tim.h"
@@ -14,7 +15,7 @@
 // The number of ticks for which no device should be activated because it would interfere
 // with an ongoing fire.
 
-#define COLLIDE_TIMEOUT 500000U
+#define COLLIDE_TIMEOUT 0u
 //#define COLLIDE_TIMEOUT 5000000U
 
 // TODO (new): make sure there's no datarace on this variable
@@ -42,6 +43,14 @@ static unsigned int chipper_distanceToPulseWidth(float distance_meters);
 //static unsigned int kicker_timeToPulseWidth(float kick_pulse_time);
 //static unsigned int chipper_timeToPulseWidth(float chip_pulse_time);
 
+static GpioPin_t* g_charger;
+
+void io_chicker_init(GpioPin_t* charger)
+{
+    g_charger = charger;
+    io_gpio_pin_setActive(g_charger);
+}
+
 void io_chicker_tick()
 {
     // TODO (new): call this from a task
@@ -53,12 +62,24 @@ void io_chicker_tick()
 
 void io_chicker_kick(float speed_m_per_s)
 {
+    io_gpio_pin_setInactive(g_charger);
+    osDelay(1);
+    io_gpio_pin_setActive(g_charger);
+    osDelay(50);
+
     chicker_fire(CHICKER_KICK, kicker_speedToPulseWidth(speed_m_per_s));
+    osDelay(1000);
 }
 
 void io_chicker_chip(float distance_m)
 {
+    io_gpio_pin_setInactive(g_charger);
+    osDelay(1);
+    io_gpio_pin_setActive(g_charger);
+    osDelay(50);
+
     chicker_fire(CHICKER_CHIP, chipper_distanceToPulseWidth(distance_m));
+    osDelay(1000);
 }
 
 void io_chicker_enable_auto_kick(float speed_m_per_s)

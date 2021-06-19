@@ -32,7 +32,6 @@ static wheel_speeds_t g_past_wheel_speeds[SPEED_SIZE];
 // Encoder sampling
 ADC_DMA_BUFFER static uint16_t g_dma_adc_receive_buffer[RX_BUFFER_LENGTH_BYTES];
 static ADC_HandleTypeDef* g_adc_handle;
-static TIM_HandleTypeDef* g_timer_handle;
 
 volatile uint32_t g_last_sample_time = 0;
 volatile uint32_t g_last_computed_velocity_time = 0;
@@ -133,11 +132,9 @@ static SemaphoreHandle_t vision_mutex;
 static SemaphoreHandle_t dead_reckoning_mutex;
 static TbotsProto_Vision vision;
 
-void io_vision_init(TIM_HandleTypeDef* timer,
-                    ADC_HandleTypeDef* adc)
+void io_vision_init(ADC_HandleTypeDef* adc)
 {
     g_adc_handle = adc;
-    g_timer_handle = timer;
 
     if (HAL_ADC_Init(g_adc_handle) != HAL_OK)
     {
@@ -152,11 +149,6 @@ void io_vision_init(TIM_HandleTypeDef* timer,
     else
     {
         TLOG_INFO("Started ADC DMA in circular mode");
-    }
-
-    if (HAL_TIM_Base_Start_IT(g_timer_handle) != HAL_OK)
-    {
-        TLOG_FATAL("You suck, timer broken");
     }
 
     static StaticSemaphore_t primitive_mutex_storage;

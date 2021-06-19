@@ -346,12 +346,16 @@ void initIoNetworking(void)
     GpioPin_t *ublox_reset_pin =
         io_gpio_pin_create(ID_SEL_4_GPIO_Port, ID_SEL_4_Pin, ACTIVE_LOW);
 
+    GpioPin_t *charger =
+        io_gpio_pin_create(CHARGE_PWR_BRD_GPIO_Port, CHARGE_PWR_BRD_Pin, ACTIVE_LOW);
+
     // Initialize the ublox communicator
     io_ublox_odinw262_communicator_init(&huart4, ublox_reset_pin, 2);
 
     // Initialize network logger
     io_network_logger_init(RobotLogProtoQHandle);
-    io_vision_init(&htim6, &hadc3);
+    io_vision_init(&hadc3);
+    io_chicker_init(charger);
 }
 
 void initIoDrivetrain(void)
@@ -367,7 +371,7 @@ void initIoDrivetrain(void)
 
     PwmPin_t *back_left_wheel_pwm_pin  = io_pwm_pin_create(&htim1, TIM_CHANNEL_4);
     PwmPin_t *front_left_wheel_pwm_pin = io_pwm_pin_create(&htim1, TIM_CHANNEL_3);
-    // PwmPin_t *dribbler_pwm_pin          = io_pwm_pin_create(&htim1, TIM_CHANNEL_3);
+    PwmPin_t *dribbler_pwm_pin          = io_pwm_pin_create(&htim1, TIM_CHANNEL_2);
     PwmPin_t *back_right_wheel_pwm_pin  = io_pwm_pin_create(&htim2, TIM_CHANNEL_1);
     PwmPin_t *front_right_wheel_pwm_pin = io_pwm_pin_create(&htim1, TIM_CHANNEL_1);
 
@@ -401,6 +405,23 @@ void initIoDrivetrain(void)
 
     GpioPin_t *drive_mode_pin =
         io_gpio_pin_create(DRIVE_MODE_GPIO_Port, DRIVE_MODE_Pin, ACTIVE_HIGH);
+
+    GpioPin_t *dribbler_dir =
+        io_gpio_pin_create(CH_SEL_1_GPIO_Port, CH_SEL_1_Pin, ACTIVE_HIGH);
+
+    GpioPin_t *dribbler_reset_pin =
+        io_gpio_pin_create(DRIBBLER_RESET_GPIO_Port, DRIBBLER_RESET_Pin, ACTIVE_HIGH);
+
+    GpioPin_t *dribbler_mode_pin =
+        io_gpio_pin_create(DRIBBLER_MODE_GPIO_Port, DRIBBLER_MODE_Pin, ACTIVE_HIGH);
+
+    io_gpio_pin_setActive(dribbler_mode_pin);
+    io_gpio_pin_setActive(dribbler_reset_pin);
+
+    AllegroA3931MotorDriver_t *dribbler_driver =
+        io_allegro_a3931_motor_driver_create(dribbler_pwm_pin, dribbler_dir);
+
+    io_allegro_a3931_motor_setPwmPercentage(dribbler_driver, 0.15f);
 
     io_gpio_pin_setActive(drive_mode_pin);
 

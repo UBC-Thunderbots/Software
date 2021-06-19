@@ -156,7 +156,6 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM4_Init();
   MX_TIM12_Init();
-  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 
     //              ---- Initialize App/IO Layers ----

@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "firmware/app/control/control.h"
+#include "firmware/app/logger/logger.h"
 #include "firmware/app/control/physbot.h"
 #include "firmware/app/control/trajectory_planner.h"
 #include "firmware/shared/physics.h"
@@ -45,23 +46,34 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
     app_dribbler_setSpeed(dribbler, (uint32_t)prim_msg.dribbler_speed_rpm);
 
     Chicker_t* chicker = app_firmware_robot_getChicker(robot);
-    switch (prim_msg.auto_chip_or_kick.which_auto_chip_or_kick)
-    {
-        case TbotsProto_MovePrimitive_AutoChipOrKick_autochip_distance_meters_tag:
-        {
-            app_chicker_enableAutochip(
-                chicker,
-                prim_msg.auto_chip_or_kick.auto_chip_or_kick.autochip_distance_meters);
-            break;
-        }
-        case TbotsProto_MovePrimitive_AutoChipOrKick_autokick_speed_m_per_s_tag:
-        {
-            app_chicker_enableAutokick(
-                chicker,
-                prim_msg.auto_chip_or_kick.auto_chip_or_kick.autokick_speed_m_per_s);
-            break;
-        }
-    }
+
+     switch (prim_msg.auto_chip_or_kick.which_auto_chip_or_kick)
+     {
+         case TbotsProto_MovePrimitive_AutoChipOrKick_autochip_distance_meters_tag:
+         {
+         }
+         case TbotsProto_MovePrimitive_AutoChipOrKick_autokick_speed_m_per_s_tag:
+         {
+             FirmwareBall_t* ball = app_firmware_world_getBall(world);
+
+             float ball_x = app_firmware_ball_getPositionX(ball);
+             float ball_y = app_firmware_ball_getPositionY(ball);
+
+             float robot_x = app_firmware_robot_getPositionX(robot);
+             float robot_y = app_firmware_robot_getPositionY(robot);
+
+             static const float RADIUS_INFLATED = 0.10f;
+
+             if (ball_x < robot_x + RADIUS_INFLATED && ball_x > robot_x - RADIUS_INFLATED &&
+                ball_y < robot_y + RADIUS_INFLATED && ball_y > robot_y - RADIUS_INFLATED)
+
+             {
+                TLOG_INFO("Kick! Starting cooldown");
+                app_chicker_kick(chicker, 1.0);
+                TLOG_INFO("cooldown complete");
+             }
+         }
+     }
 
     /* Handle robot movement */
     MoveState_t* state = (MoveState_t*)void_state_ptr;
