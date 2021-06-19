@@ -56,8 +56,8 @@ cc_library(
         "//firmware/app/logger",
         "//firmware/boards/robot_stm32h7:adc",
         "//firmware/boards/robot_stm32h7:hal",
-        "//firmware/boards/robot_stm32h7:tim",
         "//firmware/boards/robot_stm32h7:rtos",
+        "//firmware/boards/robot_stm32h7:tim",
     ],
 )
 
@@ -83,9 +83,10 @@ cc_library(
     srcs = ["drivetrain_unit.c"],
     hdrs = ["drivetrain_unit.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
-    deps = [":allegro_a3931_motor_driver",
+    deps = [
+        ":allegro_a3931_motor_driver",
         "//firmware/app/primitives:primitive_manager",
-            ],
+    ],
 )
 
 cc_library(
@@ -206,7 +207,10 @@ cc_library(
     srcs = ["chicker.c"],
     hdrs = ["chicker.h"],
     restricted_to = ["//cc_toolchain:stm32h7"],
-    deps = ["//firmware/app/logger"],
+    deps = [
+        "//firmware/app/logger",
+        "//firmware/boards/robot_stm32h7:tim",
+    ],
 )
 
 cc_library(
@@ -225,11 +229,12 @@ cc_library(
         "//firmware/app/logger",
         "//firmware/shared:physics",
         "//firmware/boards/robot_stm32h7/io:proto_multicast_communication",
+        "//firmware/app/primitives:primitive_manager",
         "//firmware/boards/legacy_robot_stm32f4:circular_buffer",
-        "//firmware/boards/robot_stm32h7:hal",
         "//firmware/boards/robot_stm32h7:adc",
+        "//firmware/boards/robot_stm32h7:hal",
         "//firmware/boards/robot_stm32h7:tim",
-    ]
+    ],
 )
 
 cc_library(
