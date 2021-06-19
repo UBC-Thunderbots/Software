@@ -2,19 +2,20 @@
 
 #include "firmware/app/logger/logger.h"
 #include "firmware/boards/robot_stm32h7/tim.h"
-
+#include "firmware/boards/robot_stm32h7/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_tim.h"
 // Identify timers used for either KICK or CHIP
 #define KICK_TIM &htim16
 #define CHIP_TIM &htim17
 
 // This is a hard cap on the pulse_width to minimize capacitor bank discharging
 // This value is experimentally deduced from testing.
-#define KICKER_MAX_PULSE 32000U
+#define KICKER_MAX_PULSE 48000U
 
 // The number of ticks for which no device should be activated because it would interfere
 // with an ongoing fire.
-//
-#define COLLIDE_TIMEOUT 5000000U
+
+#define COLLIDE_TIMEOUT 500000U
+//#define COLLIDE_TIMEOUT 5000000U
 
 // TODO (new): make sure there's no datarace on this variable
 static unsigned int collide_timeout;
@@ -111,15 +112,18 @@ static void chipper_fire(unsigned int width)
 
 static unsigned int kicker_speedToPulseWidth(float speed_m_per_s)
 {
-/*    // TODO (new): implement conversion from speed to pulse duration (time)
-    float kick_time = 0.006f; //expect single digit ms range
+    // TODO (new): implement conversion from speed to pulse duration (time)
+    float kick_time = 0.008f; //expect single digit ms range
     // TODO (new): programatically calculate pulse duration from RCC registers
-    unsigned int pulse_width =
-            __LL_TIM_CALC_PULSE(120000000,
-                                __HAL_TIM_GET_ICPRESCALER(KICK_TIM, TIM_CHANNEL_1),
+    // utilizes the low level macro specific for OPM
+    TIM16->CCR1 = 1;
+    unsigned int pulse_width =__LL_TIM_CALC_PULSE(
+            240000000,                                              // APBx_clkspeed
+            LL_TIM_GetPrescaler(TIM16),                  // TIMx -> PSC
+            __HAL_TIM_GET_COMPARE(KICK_TIM, TIM_CHANNEL_1),         // TIMx -> CCR1 (delay in OPM)
+            (unsigned int) (kick_time*1000000));                               // us
 
-            )*/
-    return 30000;
+    return pulse_width;
 }
 
 static unsigned int chipper_distanceToPulseWidth(float distance_meters)
