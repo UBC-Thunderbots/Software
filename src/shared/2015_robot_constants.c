@@ -32,8 +32,8 @@ extern "C"
             .robot_max_ang_speed_rad_per_s          = 4.0f * M_PI,
             .robot_max_acceleration_m_per_s_2       = 3.0f,
             .robot_max_ang_acceleration_rad_per_s_2 = 30.0f,
-            .indefinite_dribbler_speed_rpm          = 10000.0f,
-            .max_force_dribbler_speed_rpm           = 16000.0f};
+            .indefinite_dribbler_speed_rpm          = 30.0f,
+            .max_force_dribbler_speed_rpm           = 40.0f};
         return robot_constants;
     }
 

@@ -12,7 +12,7 @@ void io_dribbler_init(AllegroA3931MotorDriver_t* dribbler)
 void io_dribbler_setSpeed(uint32_t rpm)
 {
     float pwm = (float)(rpm & 0xFFFF);
-    pwm = fmaxf(pwm, 0.40f);
+    pwm = fminf(pwm, 0.40f);
 
     io_allegro_a3931_motor_setPwmPercentage(g_dribbler, pwm);
 }
