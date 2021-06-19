@@ -38,7 +38,7 @@ void setupChicker(
     };
 
     setupSliderLineEdit(widget->lineEdit_chicker_power, widget->slider_chicker_power,
-                        chicker_power_changed_callback, 4.0, 10.0, 10.0);
+                        chicker_power_changed_callback, 0.1, 10.0, 10.0);
 
     setupChickerChargeRadioButtons(widget, charge_mode_changed_callback);
     setupChickerAutoChipOrKickRadioButtons(widget, chick_mode_changed_callback);

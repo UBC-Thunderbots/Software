@@ -425,9 +425,11 @@ void initIoDrivetrain(void)
     AllegroA3931MotorDriver_t *dribbler_driver =
         io_allegro_a3931_motor_driver_create(dribbler_pwm_pin, dribbler_dir);
 
-    io_allegro_a3931_motor_setPwmPercentage(dribbler_driver, 0.25f);
+    io_allegro_a3931_motor_setPwmPercentage(dribbler_driver, 0.00f);
 
     io_gpio_pin_setActive(drive_mode_pin);
+
+    io_dribbler_init(AllegroA3931MotorDriver_t* dribbler);
 
     io_drivetrain_init(drivetrain_unit_back_left_wheel, drivetrain_unit_back_right_wheel,
                        drivetrain_unit_front_left_wheel,
