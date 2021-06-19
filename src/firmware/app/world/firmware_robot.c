@@ -113,6 +113,8 @@ void force_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
     const float dy = dest_y - curr_y;
 
     float total_disp = sqrtf(dx * dx + dy * dy);
+    float total_angular_disp = fabsf(dest_orientation - orientation);
+
     // Add a small number to avoid division by zero
     float major_vec[2] = {dx / (total_disp + 1e-6f), dy / (total_disp + 1e-6f)};
     float minor_vec[2] = {major_vec[0], major_vec[1]};
@@ -152,7 +154,7 @@ void force_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
     force_wheels[3] = front_right_wheel;
  
     app_control_applyAccel(robot_constants, controller_state, battery_voltage,
-                           force_wheels, accel[0], accel[1], accel[2]);
+                           force_wheels, accel[0], accel[1], accel[2], total_disp, total_angular_disp);
 }
 
 void velocity_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
@@ -569,7 +571,7 @@ void app_firmware_robot_trackVelocityInRobotFrame(const FirmwareRobot_t* robot,
 
     app_control_applyAccel(robot_constants, controller_state, battery_voltage,
                            force_wheels, desired_acceleration[0], desired_acceleration[1],
-                           angular_acceleration);
+                           angular_acceleration, 1.0f, 1.0f);
 }
 
 void app_firmware_robot_followPosTrajectory(const FirmwareRobot_t* robot,

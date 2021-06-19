@@ -20,4 +20,4 @@
 void app_control_applyAccel(const RobotConstants_t robot_constants,
                             ControllerState_t* controller_state, float battery_voltage,
                             ForceWheel_t* force_wheels[4], float linear_accel_x,
-                            float linear_accel_y, float angular_accel);
+                            float linear_accel_y, float angular_accel, float distance_to_dest, float angular_diff);

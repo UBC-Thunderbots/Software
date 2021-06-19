@@ -21,41 +21,10 @@
  */
 float app_control_getMaximalTorqueScaling(const ForceWheel_t* force_wheels[4],
                                           const float wheel_forces[4],
-                                          float battery_voltage)
+                                          float battery_voltage, float distance_to_dest)
 {
-    float max_effective_motor_voltage = -INFINITY;
-    float slip_ratio_min              = INFINITY;
-
-    for (long i = 0; i < 4; i++)
-    {
-        const ForceWheel_t* wheel        = force_wheels[i];
-        const WheelConstants_t constants = app_force_wheel_getWheelConstants(wheel);
-        float force                      = wheel_forces[i];
-        float motor_torque               = force * constants.wheel_radius_meters *
-                             constants.wheel_rotations_per_motor_rotation;
-        float curr_motor_rpm = app_force_wheel_getMotorSpeedRPM(wheel);
-
-        float resistive_voltage_loss =
-            motor_torque * constants.motor_current_amp_per_torque_newton_meter *
-            constants.motor_phase_resistance_ohm;
-        float back_emf          = curr_motor_rpm * constants.motor_back_emf_per_rpm;
-        float effective_voltage = fabsf(resistive_voltage_loss + back_emf);
-
-        float slip_ratio =
-            constants.motor_max_voltage_before_wheel_slip / fabsf(resistive_voltage_loss);
-        if (slip_ratio < slip_ratio_min)
-        {
-            slip_ratio_min = slip_ratio;
-        }
-        if (effective_voltage > max_effective_motor_voltage)
-        {
-            max_effective_motor_voltage = effective_voltage;
-        }
-    }
-
-    float emf_ratio_min = battery_voltage / max_effective_motor_voltage;
-
-    return (emf_ratio_min > slip_ratio_min) ? slip_ratio_min : emf_ratio_min;
+    float leedle_scaling_factor = 1.0f - expf(-10.0f * distance_to_dest);
+    return leedle_scaling_factor;
 }
 
 /**
@@ -78,7 +47,7 @@ float app_control_getMaximalAccelScaling(const RobotConstants_t robot_constants,
                                          float battery_voltage,
                                          const ForceWheel_t* force_wheels[4],
                                          const float linear_accel_x,
-                                         const float linear_accel_y, float angular_accel)
+                                         const float linear_accel_y, float angular_accel, float distance_to_dest)
 {
     // first convert accelerations into consistent units
     // choose units of Force (N)
@@ -94,22 +63,26 @@ float app_control_getMaximalAccelScaling(const RobotConstants_t robot_constants,
                                   robot_constants.back_wheel_angle_deg);
 
     return app_control_getMaximalTorqueScaling(force_wheels, wheel_forces,
-                                               battery_voltage);
+                                               battery_voltage, distance_to_dest);
 }
 
 void app_control_applyAccel(RobotConstants_t robot_constants,
                             ControllerState_t* controller_state, float battery_voltage,
                             ForceWheel_t* force_wheels[4], float linear_accel_x,
-                            float linear_accel_y, float angular_accel)
+                            float linear_accel_y, float angular_accel, float distance_to_dest, float rotation_to_dest)
 {
-    /*const ForceWheel_t* wheels[4];*/
-    /*wheels[0] = force_wheels[0];*/
-    /*wheels[1] = force_wheels[1];*/
-    /*wheels[2] = force_wheels[2];*/
-    /*wheels[3] = force_wheels[3];*/
+    const ForceWheel_t* wheels[4];
+    wheels[0] = force_wheels[0];
+    wheels[1] = force_wheels[1];
+    wheels[2] = force_wheels[2];
+    wheels[3] = force_wheels[3];
 
     // check for max acceleration in direction of the vel difference
-    float scaling = 1.0f;
+    float scaling =
+        app_control_getMaximalAccelScaling(robot_constants, battery_voltage, wheels,
+                                           linear_accel_x, linear_accel_y, angular_accel, distance_to_dest);
+
+    float angular_scaling = 1.3f * rotation_to_dest;
 
     // if the (very naive) 1 tick acceleration violates the physical limits of the robot
     // scale it to maximum
@@ -118,7 +91,10 @@ void app_control_applyAccel(RobotConstants_t robot_constants,
     {
         linear_accel_x *= scaling;
         linear_accel_y *= scaling;
-        angular_accel *= scaling;
+    }
+    if (angular_scaling < 1.0f)
+    {
+        angular_accel *= angular_scaling;
     }
 
     float prev_linear_accel_x = controller_state->last_applied_acceleration_x;

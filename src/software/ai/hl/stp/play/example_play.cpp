@@ -41,6 +41,12 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
                                             static_cast<double>(k + 1)),
                 (angle_between_robots * static_cast<double>(k + 1)) + Angle::half(), 0);
         }
+        //for (size_t k = 0; k < move_tactics.size(); k++)
+        //{
+            //move_tactics[k]->updateControlParams(
+                    //Point(-1.5, 0),
+                //(world.ball().position()-Point(-1.5,0)).orientation(), 0);
+        //}
 
         // yield the Tactics this Play wants to run, in order of priority
         // If there are fewer robots in play, robots at the end of the list will not be

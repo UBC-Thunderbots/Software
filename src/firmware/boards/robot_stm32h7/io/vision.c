@@ -39,7 +39,6 @@ volatile uint32_t g_last_computed_velocity_time = 0;
 volatile double g_last_sampled_angles[NUM_ENCODERS] = {0};
 volatile double g_current_wheel_displacement[NUM_ENCODERS] = {0};
 volatile double g_current_wheel_speeds[NUM_ENCODERS] = {0};
-static float robot_speed[3];
 
 void HAL_ADC_ErrorCallback(ADC_HandleTypeDef* hadc) {}
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
@@ -189,30 +188,25 @@ void io_vision_task(void* arg)
     {
         uint32_t tick_start = osKernelGetTickCount();
 
+        io_proto_multicast_communication_profile_blockUntilEvents(comm_profile,
+                                                                  RECEIVED_PROTO);
+
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
 
-        vision_copy = (*(TbotsProto_Vision*)io_proto_multicast_communication_profile_getProtoStruct(
-                        comm_profile));
+        vision_copy =
+            (*(TbotsProto_Vision*)io_proto_multicast_communication_profile_getProtoStruct(
+                comm_profile));
 
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
 
-        if(memcmp(&vision_copy, &vision, sizeof(vision_copy)) != 0)
+        // only update vision if we have atleast 1 robot state
+        if (vision_copy.robot_states_count == 1)
         {
-            // only update vision if we have atleast 1 robot state
-            if (vision_copy.robot_states_count == 1)
-            {
-                io_lock_vision();
-                vision = vision_copy;
-                io_unlock_vision();
-            }
-            io_vision_applyVisionFrameToDeadReckoning(0);
+            io_lock_vision();
+            vision = vision_copy;
+            io_unlock_vision();
         }
 
-        io_vision_getRobotVelocityX();
-        /*int y = (int)(io_vision_getRobotVelocityY() * 100.0);*/
-        /*int z = (int)(io_vision_getRobotAngularVelocity() * 100.0);*/
-
-        /*TLOG_INFO("dead reckoned speeds: %d %d %d", x, y, z);*/
         uint32_t tick_end = osKernelGetTickCount();
 
         // TODO pull 5 into a constant
@@ -240,10 +234,10 @@ void io_vision_applyVisionFrameToDeadReckoning(uint32_t robot_id)
     g_current_wheel_displacement[FRONT_LEFT]  = 0.0;
     g_current_wheel_displacement[BACK_LEFT]   = 0.0;
 }
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wfloat-conversion"
+
 void io_vision_stepDeadReckoning()
 {
+    return;
     g_current_wheel_speeds[FRONT_RIGHT] = (g_current_wheel_displacement[FRONT_RIGHT]  / 0.001);
     g_current_wheel_speeds[FRONT_LEFT] =  (g_current_wheel_displacement[FRONT_LEFT]  / 0.001);
     g_current_wheel_speeds[BACK_LEFT] =   (g_current_wheel_displacement[BACK_LEFT]  / 0.001);
@@ -330,17 +324,10 @@ float io_vision_getRobotVelocityX(void)
 {
     float temp = 0.0f;
     io_lock_vision();
-    float wheel_speeds[4] = {
-        (float)g_current_wheel_speeds[0],
-        (float)g_current_wheel_speeds[1],
-        (float)g_current_wheel_speeds[2],
-        (float)g_current_wheel_speeds[3],
-    };
-    // wheel disps is wheel speed at this point
-    shared_physics_speed4ToSpeed3(wheel_speeds, robot_speed, 1, 1);
-    robot_speed[2] *= 123.1996f;
-    temp = (float)robot_speed[0];
-    TLOG_INFO("%d", (int)(100.0f * robot_speed[0]));
+            if (vision.robot_states_count == 1)
+            {
+             temp = vision.robot_states[0].value.global_velocity.x_component_meters;
+            }
     io_unlock_vision();
     return temp;
 }
@@ -348,17 +335,10 @@ float io_vision_getRobotVelocityY(void)
 {
     float temp = 0.0f;
     io_lock_vision();
-    TLOG_INFO("%d", (int)(100.0f * robot_speed[1]));
-    float wheel_speeds[4] = {
-        (float)g_current_wheel_speeds[0],
-        (float)g_current_wheel_speeds[1],
-        (float)g_current_wheel_speeds[2],
-        (float)g_current_wheel_speeds[3],
-    };
-    // wheel disps is wheel speed at this point
-    shared_physics_speed4ToSpeed3(wheel_speeds, robot_speed, 1, 1);
-    robot_speed[2] *= 123.1996f;
-    temp = (float)robot_speed[1];
+            if (vision.robot_states_count == 1)
+            {
+             temp = vision.robot_states[0].value.global_velocity.y_component_meters;
+            }
     io_unlock_vision();
     return temp;
 }
@@ -366,18 +346,10 @@ float io_vision_getRobotAngularVelocity(void)
 {
     float temp = 0.0f;
     io_lock_vision();
-    float wheel_speeds[4] = {
-        (float)g_current_wheel_speeds[0],
-        (float)g_current_wheel_speeds[1],
-        (float)g_current_wheel_speeds[2],
-        (float)g_current_wheel_speeds[3],
-    };
-    // wheel disps is wheel speed at this point
-    shared_physics_speed4ToSpeed3(wheel_speeds, robot_speed, 1, 1);
-    robot_speed[2] *= 123.1996f;
-    TLOG_INFO("%d", (int)(100.0f * robot_speed[2]));
-    temp = (float)robot_speed[2];
+            if (vision.robot_states_count == 1)
+            {
+             temp = vision.robot_states[0].value.global_angular_velocity.radians_per_second;
+            }
     io_unlock_vision();
     return temp;
 }
-#pragma GCC diagnostic pop

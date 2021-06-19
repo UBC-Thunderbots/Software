@@ -48,9 +48,8 @@ void SimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 
 void SimulatorBackend::onValueReceived(World world)
 {
-    static uint32_t count = 0;
-    LOG(WARNING) << "vision: " << count;
-    count+=2;
+    vision_output->sendProto(*createVision(world));
+    vision_output->sendProto(*createVision(world));
     vision_output->sendProto(*createVision(world));
     vision_output->sendProto(*createVision(world));
 }
