@@ -120,4 +120,4 @@ class PassGenerator
     std::mt19937 random_num_gen_;
 };
 
-#include "software/ai/passing/pass_generator.tpp"
+#include "software/ai/passing/pass_generator.hpp"

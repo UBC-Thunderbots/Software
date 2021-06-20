@@ -68,6 +68,7 @@ double rateKickPassEnemyRisk(const Team& enemy_team, const Pass& pass,
                              const Duration& enemy_reaction_time,
                              double enemy_proximity_importance);
 double rateChipPassEnemyRisk(const Team& enemy_team, const Pass& pass,
+                             const Duration& enemy_reaction_time,
                              std::shared_ptr<const PassingConfig> passing_config);
 
 /**
@@ -148,3 +149,11 @@ double getStaticPositionQuality(const Field& field, const Point& position,
  */
 double calculateProximityRisk(const Point& point, const Team& enemy_team,
                               double enemy_proximity_importance);
+
+/**
+ * Figures out the earliest timestamp the given robot cant receive the given pass.
+ *
+ * @param robot The robot to calculate the receive timestamp for
+ * @param pass The pass to receive
+ */
+Timestamp calculateEarliestTimeRobotCanReceive(const Robot& robot, const Pass& pass);

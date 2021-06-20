@@ -22,12 +22,13 @@ from software.python_bindings import world, passing, pass_generator
 import numpy as np
 
 wrapper_proto_log = ProtoLog(
-    "test_data/SensorFusion_SSL_WrapperPacket", SSL_WrapperPacket,
+    "/tmp/log/20062021_105643/SensorFusion_SSL_WrapperPacket", SSL_WrapperPacket,
 )
 # -
 
 
-world.getDefaultSensorFusionConfig()
+sensor_fusion_config = world.getDefaultSensorFusionConfig()
+
 
 # +
 from bokeh.plotting import figure
@@ -45,32 +46,45 @@ field_length = wrapper_proto_log[0].geometry.field.field_length / MM_PER_M
 field_width = wrapper_proto_log[0].geometry.field.field_width / MM_PER_M
 heatmap_x_bounds = (-field_length / 2, field_length / 2)
 heatmap_y_bounds = (-field_width / 2, field_width / 2)
-heatmap_grid_size = 0.05
+heatmap_grid_size = 0.2
 
 ssl_wrapper_plotter = SSLWrapperPlotter(fig)
 
 rate_pass_heatmap_plotter = HeatmapPlotter(
     fig, heatmap_x_bounds, heatmap_y_bounds, heatmap_grid_size, "ratePass"
 )
-rate_pass_enemy_heatmap_plotter = HeatmapPlotter(
-    fig, heatmap_x_bounds, heatmap_y_bounds, heatmap_grid_size, "ratePassEnemyRisk"
+rate_kick_pass_enemy_heatmap_plotter = HeatmapPlotter(
+    fig, heatmap_x_bounds, heatmap_y_bounds, heatmap_grid_size, "rateKickPassEnemyRisk"
 )
-rate_pass_friendly_heatmap_plotter = HeatmapPlotter(
+rate_chip_pass_enemy_heatmap_plotter = HeatmapPlotter(
+    fig, heatmap_x_bounds, heatmap_y_bounds, heatmap_grid_size, "rateChipPassEnemyRisk"
+)
+rate_kick_pass_friendly_heatmap_plotter = HeatmapPlotter(
     fig,
     heatmap_x_bounds,
     heatmap_y_bounds,
     heatmap_grid_size,
-    "ratePassFriendlyCapability",
+    "rateKickPassFriendlyCapability",
+)
+rate_chip_pass_friendly_heatmap_plotter = HeatmapPlotter(
+    fig,
+    heatmap_x_bounds,
+    heatmap_y_bounds,
+    heatmap_grid_size,
+    "rateChipPassFriendlyCapability",
 )
 rate_pass_shoot_score_plotter = HeatmapPlotter(
     fig, heatmap_x_bounds, heatmap_y_bounds, heatmap_grid_size, "ratePassShootScore",
+)
+static_pass_quality = HeatmapPlotter(
+    fig, heatmap_x_bounds, heatmap_y_bounds, heatmap_grid_size, "staticPassQuality",
 )
 
 pass_generator_plotter = PassGeneratorPlotter(fig)
 
 fig.legend.click_policy = "hide"
 
-heatmap_grid_size = 0.05
+heatmap_grid_size = 0.2
 
 config = passing.getPassingConfig()
 
@@ -81,34 +95,56 @@ def plot_ssl_wrapper_at_idx(idx):
     field_length = wrapper_proto_log[idx].geometry.field.field_length / 1000
     field_width = wrapper_proto_log[idx].geometry.field.field_width / 1000
 
-    the_world = world.World(wrapper_proto_log[idx].SerializeToString(), dict())
+    the_world = world.World(
+        wrapper_proto_log[idx].SerializeToString(), sensor_fusion_config
+    )
     generator = pass_generator.EighteenZonePassGenerator(the_world, config)
 
     pass_dict = {
         "passer_point": the_world.ball().position(),
-        "pass_speed": 3,
+        "pass_speed": 4.5,
+        "start_time" : 0.0,
     }
 
     def ratePassCost(x, y):
         pass_dict["receiver_point"] = world.Point(x, y)
         return passing.ratePass(the_world, pass_dict, config)
 
-    def ratePassEnemyRiskCost(x, y):
+    def rateKickPassEnemyRiskCost(x, y):
         pass_dict["receiver_point"] = world.Point(x, y)
-        return passing.ratePassEnemyRisk(the_world, pass_dict, config)
+        return passing.rateKickPassEnemyRisk(the_world, pass_dict, config)
 
-    def ratePassFriendlyCapabilityCost(x, y):
+    def rateKickPassFriendlyCapabilityCost(x, y):
         pass_dict["receiver_point"] = world.Point(x, y)
-        return passing.ratePassFriendlyCapability(the_world, pass_dict, config)
+        return passing.rateKickPassFriendlyCapability(the_world, pass_dict, config)
+
+    def rateChipPassEnemyRiskCost(x, y):
+        pass_dict["receiver_point"] = world.Point(x, y)
+        return passing.rateChipPassEnemyRisk(the_world, pass_dict, config)
+
+    def rateChipPassFriendlyCapabilityCost(x, y):
+        pass_dict["receiver_point"] = world.Point(x, y)
+        return passing.rateChipPassFriendlyCapability(the_world, pass_dict, config)
 
     def ratePassShootScoreCost(x, y):
         pass_dict["receiver_point"] = world.Point(x, y)
         return passing.ratePassShootScore(the_world, pass_dict, config)
 
+    def rateStaticPassQuality(x, y):
+        pass_dict["receiver_point"] = world.Point(x, y)
+        return passing.getStaticPositionQuality(the_world, pass_dict, config)
+
     rate_pass_heatmap_plotter.plot_heatmap(ratePassCost)
-    rate_pass_enemy_heatmap_plotter.plot_heatmap(ratePassEnemyRiskCost)
-    rate_pass_friendly_heatmap_plotter.plot_heatmap(ratePassFriendlyCapabilityCost)
+    rate_kick_pass_enemy_heatmap_plotter.plot_heatmap(rateKickPassEnemyRiskCost)
+    rate_kick_pass_friendly_heatmap_plotter.plot_heatmap(
+        rateKickPassFriendlyCapabilityCost
+    )
+    rate_chip_pass_enemy_heatmap_plotter.plot_heatmap(rateChipPassEnemyRiskCost)
+    rate_chip_pass_friendly_heatmap_plotter.plot_heatmap(
+        rateChipPassFriendlyCapabilityCost
+    )
     rate_pass_shoot_score_plotter.plot_heatmap(ratePassShootScoreCost)
+    static_pass_quality.plot_heatmap(rateStaticPassQuality)
 
     zones = pass_generator.getAllZones(the_world)
     pass_generator_plotter.plot_zones(zones)
@@ -123,3 +159,6 @@ show(fig, notebook_handle=True)
 
 slider = ipywidgets.IntSlider(min=0, max=len(wrapper_proto_log) - 1)
 ipywidgets.interact(plot_ssl_wrapper_at_idx, idx=slider)
+# -
+
+
