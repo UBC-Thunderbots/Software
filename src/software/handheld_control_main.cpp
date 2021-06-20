@@ -1,6 +1,7 @@
 #include <future>
 #include <iostream>
 
+#include "shared/2015_robot_constants.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/backend/radio_backend.h"
 #include "software/handheld_controller/controller_primitive_generator.h"
@@ -16,7 +17,7 @@ int main(int argc, char **argv)
     auto controller = std::make_shared<Xbox360Controller>(
         thunderbots_config->getHandheldControllerConfig());
     auto primitive_generator = std::make_shared<ControllerPrimitiveGenerator>(
-        thunderbots_config->getHandheldControllerConfig());
+        thunderbots_config->getHandheldControllerConfig(), create2015RobotConstants());
     auto backend = std::make_shared<RadioBackend>(thunderbots_config->getBackendConfig());
 
     controller->Subject<ControllerInput>::registerObserver(primitive_generator);

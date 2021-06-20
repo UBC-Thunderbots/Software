@@ -81,7 +81,9 @@ void StandaloneSimulatorGUI::draw()
     main_widget->simulation_graphics_view->clearAndDraw(
         {main_widget->simulation_graphics_view->getDrawBallVelocityFunction()
              .getDrawFunction(),
-         getDrawSSLWrapperPacketFunction(ssl_wrapper_packet).getDrawFunction()});
+         getDrawSSLWrapperPacketFunction(ssl_wrapper_packet,
+                                         standalone_simulator->getRobotConstants())
+             .getDrawFunction()});
 }
 
 void StandaloneSimulatorGUI::updateDrawViewArea()

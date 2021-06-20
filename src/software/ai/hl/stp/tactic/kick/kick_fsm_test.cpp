@@ -28,7 +28,7 @@ TEST(KickFSMTest, test_transitions)
 
     // Robot is now behind ball
     robot = Robot(0,
-                  RobotState(Point(-2, 1.8), Vector(), Angle::threeQuarter(),
+                  RobotState(Point(-2, 1.7), Vector(), Angle::threeQuarter(),
                              AngularVelocity::zero()),
                   Timestamp::fromSeconds(123));
     fsm.process_event(KickFSM::Update(
@@ -37,7 +37,6 @@ TEST(KickFSMTest, test_transitions)
     EXPECT_TRUE(fsm.is(boost::sml::state<KickFSM::KickState>));
 
     // Ball is now kicked
-    robot = ::TestUtil::createRobotAtPos(Point(-2, 1.8));
     world =
         ::TestUtil::setBallVelocity(world, Vector(0, -2.1), Timestamp::fromSeconds(123));
     EXPECT_TRUE(world.ball().hasBallBeenKicked(Angle::threeQuarter()));

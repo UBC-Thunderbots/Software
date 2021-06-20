@@ -435,17 +435,20 @@ Timestamp calculateEarliestTimeRobotCanReceive(const Robot& robot, const Pass& p
 {
     // Figure out how long it would take our robot to get there
     Duration min_robot_travel_time = getTimeToPositionForRobot(
-            robot.position(), pass.receiverPoint(), ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+        best_receiver.position(), pass.receiverPoint(),
+        best_receiver.robotConstants().robot_max_speed_m_per_s,
+        best_receiver.robotConstants().robot_max_acceleration_m_per_s_2);
+    Timestamp earliest_time_to_receive_point =
+        best_receiver.timestamp() + min_robot_travel_time;
 
     // Figure out what angle the robot would have to be at to receive the ball
-    Angle receive_angle = (pass.passerPoint() - robot.position()).orientation();
+    Angle receive_angle = (pass.passerPoint() - best_receiver.position()).orientation();
     Duration time_to_receive_angle = getTimeToOrientationForRobot(
-            robot.orientation(), receive_angle, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        best_receiver.orientation(), receive_angle,
+        best_receiver.robotConstants().robot_max_ang_speed_rad_per_s,
+        best_receiver.robotConstants().robot_max_ang_acceleration_rad_per_s_2);
+    Timestamp earliest_time_to_receive_angle =
+        best_receiver.timestamp() + time_to_receive_angle;
 
-    // Figure out if rotation or moving will take us longer and return the larger timestamp
-    return std::max(
-            robot.timestamp() + min_robot_travel_time,
-            robot.timestamp() + time_to_receive_angle);
+    return std::max(earliest_time_to_receive_angle, earliest_time_to_receive_point);
 }
