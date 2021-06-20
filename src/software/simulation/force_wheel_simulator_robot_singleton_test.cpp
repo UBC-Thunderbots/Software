@@ -587,6 +587,12 @@ TEST_F(ForceWheelSimulatorRobotSingletonTest,
     for (unsigned int i = 0; i < 200; i++)
     {
         world->stepSimulation(Duration::fromSeconds(1.0 / 60.0));
+        // Don't let the ball bounce off the field goals/boundaries since then we have no
+        // guarantee about the speed
+        if (simulator_ball->position().x() >= world->getField().enemyGoalCenter().x())
+        {
+            break;
+        }
         if (i == 0)
         {
             initial_chip_speed = simulator_ball->velocity().length();
