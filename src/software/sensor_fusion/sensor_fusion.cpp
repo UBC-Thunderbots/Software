@@ -199,7 +199,7 @@ void SensorFusion::updateWorld(
         if (robot_status_msg.has_break_beam_status() &&
             robot_status_msg.break_beam_status().ball_in_beam())
         {
-            friendly_robot_with_ball_in_dribbler = robot_id;
+            friendly_robot_id_with_ball_in_dribbler = robot_id;
         }
     }
 }
@@ -225,7 +225,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     bool friendly_team_is_yellow =
         sensor_fusion_config->getFriendlyColorYellow()->value();
 
-    std::optional<Ball> new_ball;
     auto ball_detections = createBallDetections({ssl_detection_frame}, min_valid_x,
                                                 max_valid_x, ignore_invalid_camera_data);
     auto yellow_team =
@@ -262,34 +261,54 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         enemy_team    = createEnemyTeam(yellow_team);
     }
 
-    new_ball = createBall(ball_detections);
-    if (new_ball)
+    std::optional<Robot> robot_with_ball_in_dribbler;
+    if (friendly_robot_id_with_ball_in_dribbler.has_value())
     {
-        updateBall(*new_ball);
+        robot_with_ball_in_dribbler =
+            friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
+        friendly_robot_id_with_ball_in_dribbler = std::nullopt;
     }
-    else if (ball)
+    if (robot_with_ball_in_dribbler.has_value())
     {
-        // If we already have a ball, but miss the ball in the next frame
-        std::optional<Robot> closest_enemy = enemy_team.getNearestRobot(ball->position());
-        std::optional<Robot> closest_friendly =
-            friendly_team.getNearestRobot(ball->position());
-
-        if (closest_friendly.has_value())
+        // use ball in dribbler information first since it's most precise
+        ball =
+            Ball(robot_with_ball_in_dribbler->position() +
+                     Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
+                         .normalize(DIST_TO_FRONT_OF_ROBOT_METERS),
+                 Vector(0, 0), robot_with_ball_in_dribbler->timestamp());
+    }
+    else
+    {
+        std::optional<Ball> new_ball = createBall(ball_detections);
+        if (new_ball)
         {
-            // it only makes sense to do anything if there are friendly robots
-            Robot closest_robot = closest_friendly.value();
+            updateBall(*new_ball);
+        }
+        else if (ball)
+        {
+            // If we already have a ball, but miss the ball in the next frame
+            std::optional<Robot> closest_enemy =
+                enemy_team.getNearestRobot(ball->position());
+            std::optional<Robot> closest_friendly =
+                friendly_team.getNearestRobot(ball->position());
 
-            if (closest_enemy.has_value() &&
-                (closest_enemy->position() - ball->position()).length() >
-                    (closest_friendly->position() - ball->position()).length())
+            if (closest_friendly.has_value())
             {
-                closest_robot = closest_enemy.value();
-            }
+                // it only makes sense to do anything if there are friendly robots
+                Robot closest_robot = closest_friendly.value();
 
-            ball = Ball(closest_robot.position() +
-                            Vector::createFromAngle(closest_robot.orientation())
-                                .normalize(DIST_TO_FRONT_OF_ROBOT_METERS),
-                        Vector(0, 0), closest_robot.timestamp());
+                if (closest_enemy.has_value() &&
+                    (closest_enemy->position() - ball->position()).length() <
+                        (closest_friendly->position() - ball->position()).length())
+                {
+                    closest_robot = closest_enemy.value();
+                }
+
+                ball = Ball(closest_robot.position() +
+                                Vector::createFromAngle(closest_robot.orientation())
+                                    .normalize(DIST_TO_FRONT_OF_ROBOT_METERS),
+                            Vector(0, 0), closest_robot.timestamp());
+            }
         }
     }
 
