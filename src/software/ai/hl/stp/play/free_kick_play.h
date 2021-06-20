@@ -34,7 +34,7 @@ class FreeKickPlay : public Play
      * @param crease_defender_tactics The crease defender tactics to use
      * @param world The current state of the world
      */
-    void chipAtGoalStage(
+    void lastResortChipStage(
         TacticCoroutine::push_type &yield,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
         const World &world);
