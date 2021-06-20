@@ -2,13 +2,11 @@ name: Tbots CI
 
 on:
   push:
-    branches: [ master ]
-    # TODO (2167): remove
-    branches: [ robocup_2021 ]
+    # TODO (2167): remove robocup_2021
+    branches: [ master, robocup_2021 ]
   pull_request:
-    branches: [ master ]
-    # TODO (2167): remove
-    branches: [ robocup_2021 ]
+    # TODO (2167): remove robocup_2021
+    branches: [ master, robocup_2021 ]
 
 jobs:
   formatting-check:
