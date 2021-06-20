@@ -1,5 +1,6 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
+#include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 
 SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
@@ -298,8 +299,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
                 Robot closest_robot = closest_friendly.value();
 
                 if (closest_enemy.has_value() &&
-                    (closest_enemy->position() - ball->position()).length() <
-                        (closest_friendly->position() - ball->position()).length())
+                    distanceSquared(closest_enemy->position(), ball->position()) <
+                        distanceSquared(closest_friendly->position(), ball->position()))
                 {
                     closest_robot = closest_enemy.value();
                 }
