@@ -195,6 +195,12 @@ void SensorFusion::updateWorld(
             }
         }
         friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
+
+        if (robot_status_msg.has_break_beam_status() &&
+            robot_status_msg.break_beam_status().ball_in_beam())
+        {
+            friendly_robot_with_ball_in_dribbler = robot_id;
+        }
     }
 }
 
@@ -260,6 +266,31 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     if (new_ball)
     {
         updateBall(*new_ball);
+    }
+    else if (ball)
+    {
+        // If we already have a ball, but miss the ball in the next frame
+        std::optional<Robot> closest_enemy = enemy_team.getNearestRobot(ball->position());
+        std::optional<Robot> closest_friendly =
+            friendly_team.getNearestRobot(ball->position());
+
+        if (closest_friendly.has_value())
+        {
+            // it only makes sense to do anything if there are friendly robots
+            Robot closest_robot = closest_friendly.value();
+
+            if (closest_enemy.has_value() &&
+                (closest_enemy->position() - ball->position()).length() >
+                    (closest_friendly->position() - ball->position()).length())
+            {
+                closest_robot = closest_enemy.value();
+            }
+
+            ball = Ball(closest_robot.position() +
+                            Vector::createFromAngle(closest_robot.orientation())
+                                .normalize(DIST_TO_FRONT_OF_ROBOT_METERS),
+                        Vector(0, 0), closest_robot.timestamp());
+        }
     }
 
     if (ball)

@@ -142,6 +142,8 @@ class SensorFusion
     // Whether the gamecontroller says we should defend positive side
     bool gc_defending_positive_side;
 
+    std::optional<RobotId> friendly_robot_with_ball_in_dribbler;
+
     unsigned int friendly_goalie_id;
     unsigned int enemy_goalie_id;
 
