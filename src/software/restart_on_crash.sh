@@ -12,9 +12,9 @@ THIS_SCRIPT_FILENAME=$(basename "$0")
 # The number of arguments passed to this script
 NUM_ARGS=$#
 
-if [ $NUM_ARGS -ne 1 ]; then
+if [ $NUM_ARGS -ne 4 ]; then
   echo "Error: Incorrect number of arguments to script"
-  echo "Usage: $THIS_SCRIPT_FILENAME [interface_name]"
+  echo "Usage: $THIS_SCRIPT_FILENAME [interface_name] [vision_port] [team_color] [channel]"
   echo "Choose from the following interfaces:"
   ls /sys/class/net
   exit 1
@@ -32,7 +32,7 @@ cd "$CURR_DIR" || exit
 bazel build //software:full_system
 cd "$BIN_DIR/../.." || exit
 
-until ./full_system --backend=WifiBackend --interface=$1; do
+until ./full_system --backend=SimulatorBackend --interface=$1 --vision_port=$2 --team_color=$3 --channel=$4 --defending_side=gamecontroller; do
     echo "Full System crashed with exit code $?.  Respawning.." >&2
-    sleep 1
+    sleep 0.1
 done
