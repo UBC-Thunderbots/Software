@@ -6,6 +6,7 @@ cc_library(
     hdrs = ["sensor_fusion.h"],
     deps = [
         "//shared/parameter:cpp_configs",
+        "//software/geom/algorithms",
         "//software/logger",
         "//software/proto:sensor_msg_cc_proto",
         "//software/proto/message_translation:ssl_detection",
