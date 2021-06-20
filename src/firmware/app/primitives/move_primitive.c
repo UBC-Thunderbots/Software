@@ -99,7 +99,8 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
 
     const float estimated_time_delta = fmaxf(
         fabsf(distance_to_destination) / (float)(robot_constants.robot_max_speed_m_per_s),
-        fabsf(net_change_in_orientation) / (float)(robot_constants.robot_max_ang_speed_rad_per_s));
+        fabsf(net_change_in_orientation) /
+            (float)(robot_constants.robot_max_ang_speed_rad_per_s));
 
     // clamp num elements between 3 (minimum number of trajectory elements) and
     // TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
