@@ -271,7 +271,15 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
         return std::nullopt;
     }
 
-    resetAndInitializeMemberVariables(navigable_area, obstacles);
+    std::vector<ObstaclePtr> obstacles_that_we_dont_start_in;
+    for (auto& obstacle : obstacles)
+    {
+        if (!obstacle->contains(start))
+        {
+            obstacles_that_we_dont_start_in.push_back(obstacle);
+        }
+    }
+    resetAndInitializeMemberVariables(navigable_area, obstacles_that_we_dont_start_in);
 
     Point closest_end      = findClosestFreePoint(end);
     Coordinate start_coord = convertPointToCoord(start);

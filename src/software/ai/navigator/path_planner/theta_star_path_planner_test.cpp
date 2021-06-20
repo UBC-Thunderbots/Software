@@ -455,3 +455,20 @@ TEST_F(TestThetaStarPathPlanner,
     ASSERT_TRUE(path != std::nullopt);
     checkPathDoesNotIntersectObstacle(path->getKnots(), smaller_obstacles);
 }
+
+TEST_F(TestThetaStarPathPlanner,
+       test_theta_star_path_planner_start_in_obstacle_end_outside)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point start{3, 3}, end{0, -3};
+
+    std::vector<ObstaclePtr> obstacles = {
+        robot_navigation_obstacle_factory.createFromShape(
+            field.enemyHalf())};
+
+    Rectangle navigable_area = field.fieldBoundary();
+
+    auto path = planner->findPath(start, end, navigable_area, obstacles);
+
+    ASSERT_TRUE(path != std::nullopt);
+}

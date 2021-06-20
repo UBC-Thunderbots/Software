@@ -65,7 +65,7 @@ TEST_F(SimulatedCreaseDefenderTacticTest, test_chip_ball)
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedCreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
+TEST_F(SimulatedCreaseDefenderTacticTest, DISTABLED_test_not_bumping_ball_towards_net)
 {
     Point enemy_threat_point          = Point(-1.5, 0.0);
     CreaseDefenderAlignment alignment = CreaseDefenderAlignment::CENTRE;

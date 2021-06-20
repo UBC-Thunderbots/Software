@@ -17,7 +17,7 @@ class SimulatedThetaStarTest : public SimulatedTacticTestFixture
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_obstacle)
+TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_robot_and_dest_in_obstacle)
 {
     // Both initial_position and destination are in obstacle.
     // The two points are not in the same coordinated initially, however after
@@ -56,7 +56,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_obstacle)
             Duration::fromSeconds(15));
 }
 
-TEST_F(SimulatedThetaStarTest, test_theta_star_dest_in_obstacle)
+TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_dest_in_obstacle)
 {
     // Destination is in obstacle, but initial point is open
     Point destination      = Point(1, -0.1);
@@ -94,7 +94,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_dest_in_obstacle)
 
 
 TEST_F(SimulatedThetaStarTest,
-       test_theta_star_not_stuck_when_start_point_and_first_grid_point_is_close)
+       DISABLED_test_theta_star_not_stuck_when_start_point_and_first_grid_point_is_close)
 {
     // Destination is in obstacle, but initial point is open
     Point destination = Point(4, 2.4);
@@ -132,7 +132,7 @@ TEST_F(SimulatedThetaStarTest,
             Duration::fromSeconds(15));
 }
 
-TEST_F(SimulatedThetaStarTest, test_theta_star_robot_in_obstacle)
+TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_robot_in_obstacle)
 {
     // Destination is in a free point, but initial point is in an obstacle
     Point destination      = Point(0, 0);
@@ -168,7 +168,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_in_obstacle)
             Duration::fromSeconds(15));
 }
 
-TEST_F(SimulatedThetaStarTest, test_theta_no_obstacle_straight_path)
+TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_no_obstacle_straight_path)
 {
     Point destination      = Point(-2, 1);
     Point initial_position = Point(2, 1);
@@ -203,7 +203,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_no_obstacle_straight_path)
             Duration::fromSeconds(15));
 }
 
-TEST_F(SimulatedThetaStarTest, test_theta_star_zig_zag_test)
+TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_zig_zag_test)
 {
     /* enemy robots placed so the friendly robot is forced to take a path which
      * zig-zags. (inspired by the 2021 SSL dribbling hardware challenge)
@@ -259,7 +259,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_zig_zag_test)
             Duration::fromSeconds(15));
 }
 
-TEST_F(SimulatedThetaStarTest, test_theta_star_oscillation)
+TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_oscillation)
 {
     /*
      * When DISTANCE_THRESHOLD (what determines if robot is close enough to destination)
@@ -292,6 +292,52 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_oscillation)
             // Small rectangle around the destination point that the robot should be
             // stationary within for 15 ticks
             Rectangle expected_final_position(Point(-2.55, -2.55), Point(-2.45, -2.45));
+            robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
+        }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(15));
+}
+
+TEST_F(SimulatedThetaStarTest, test_theta_star_find_path_through_enemy_half_when_it_is_an_obstacle)
+{
+    /*
+     * When DISTANCE_THRESHOLD (what determines if robot is close enough to destination)
+     * in transition_condition.h is lowered (eg. to 0.02), the robot oscillates back
+     * and forth and does not reach a steady state at the destination in some cases.
+     * This test is for visual purposes to check for this bug.
+     * Known destinations that oscillate with DISTANCE_THRESHOLD = 0.02:
+     *  - (-2.5,-2.5)
+     *  - (2.5,-2.5)
+     */
+    Point destination      = Point(-2.5, -2.5);
+    Point initial_position = field.enemyGoalCenter();
+    BallState ball_state(Point(0, 0), Vector(0, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({field.friendlyGoalCenter(), initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(1, 0), Point(2, 3), Point(3, -1), Point(4, 2),
+        Point(2, 3.2), Point(-1.7, 3.8)});
+
+    auto tactic = std::make_shared<MoveTactic>(false);
+    tactic->updateControlParams(destination, Angle::zero(), 0);
+    setTactic(tactic);
+    setRobotId(1);
+
+    std::set<MotionConstraint> motion_constraints;
+    motion_constraints.insert(MotionConstraint::ENEMY_ROBOTS_COLLISION);
+    motion_constraints.insert(MotionConstraint::ENEMY_HALF);
+    setMotionConstraints(motion_constraints);
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [destination, tactic](std::shared_ptr<World> world_ptr,
+                              ValidationCoroutine::push_type& yield) {
+            // Small rectangle around the destination point that the robot should be
+            // stationary within for 15 ticks
+            Rectangle expected_final_position(Point(destination.x() - 0.5, destination.y() - 0.5),
+                                                Point(destination.x() + 0.5, destination.y() + 0.5));
             robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
         }};
 

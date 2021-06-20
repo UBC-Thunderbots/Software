@@ -461,6 +461,7 @@ class ThetaStarPathPlanner : public PathPlanner
     unsigned int num_grid_cols;
     double max_navigable_x_coord;
     double max_navigable_y_coord;
+    Coordinate start_motion_coord;
 
     // open_list represents Coordinates that we'd like to visit. Elements are pairs of
     // start_to_end_cost_estimate and Coordinate, so the set is implicitly ordered by
