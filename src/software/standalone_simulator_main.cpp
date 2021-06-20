@@ -1,6 +1,6 @@
 #include <boost/program_options.hpp>
 
-#include "shared/2015_robot_constants.h"
+#include "shared/2021_robot_constants.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/gui/standalone_simulator/threaded_standalone_simulator_gui.h"
 #include "software/logger/logger.h"
@@ -50,8 +50,8 @@ int main(int argc, char **argv)
             standalone_simulator = std::make_shared<StandaloneSimulator>(
                 mutable_thunderbots_config->getMutableStandaloneSimulatorConfig(),
                 mutable_thunderbots_config->getMutableSimulatorConfig(),
-                Field::createSSLDivisionAField(), create2015RobotConstants(),
-                create2015WheelConstants());
+                Field::createSSLDivisionAField(), create2021RobotConstants(),
+                create2021WheelConstants());
 
             standalone_simulator->setupInitialSimulationState(DIV_A_NUM_ROBOTS);
         }
