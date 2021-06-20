@@ -19,7 +19,7 @@ class Backend : public Subject<SensorProto>,
                 public FirstInFirstOutThreadedObserver<TbotsProto::PrimitiveSet>
 {
    public:
-    Backend() = default;
+    Backend();
 
     virtual ~Backend() = default;
 

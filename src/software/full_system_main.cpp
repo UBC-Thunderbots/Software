@@ -70,6 +70,9 @@ int main(int argc, char** argv)
         mutable_thunderbots_config->getMutableNetworkConfig()
             ->getMutableChannel()
             ->setValue(args->getChannel()->value());
+        mutable_thunderbots_config->getMutableSslCommunicationConfig()
+            ->getMutableVisionPort()
+            ->setValue(args->getVisionPort()->value());
 
         // override arduino port or try to find programmatically
         if (!args->getArduinoConfig()->getPort()->value().empty())
