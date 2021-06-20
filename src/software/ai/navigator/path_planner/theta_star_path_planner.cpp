@@ -272,7 +272,7 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     }
 
     // if we delete obstacles that we start in, we might accidentally delete an enemy robot and collide with it
-    
+
     // std::vector<ObstaclePtr> obstacles_that_we_dont_start_in;
     // for (auto& obstacle : obstacles)
     // {
