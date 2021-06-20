@@ -122,6 +122,9 @@ int main(int argc, char** argv)
             backend->Subject<SensorProto>::registerObserver(visualizer);
         }
 
+        // this function is a no-op if a proto log output path isn't set
+        std::function<void(void)> save_protolog_chunks_fn = []() { /* do nothing */ };
+
         if (!args->getProtoLogOutputDir()->value().empty())
         {
             namespace fs = std::experimental::filesystem;
@@ -165,6 +168,16 @@ int main(int argc, char** argv)
                 world_to_ssl_wrapper_conversion_fn);
             sensor_fusion->registerObserver(world_to_vision_adapter);
             world_to_vision_adapter->registerObserver(vision_logger);
+
+            // we are logging protologs, set the save_protologs_chunk_fn function
+            // to save the in-progress protolog chunks
+            save_protolog_chunks_fn = [sensor_msg_logger, primitive_set_logger,
+                                       vision_logger]() {
+                sensor_msg_logger->saveCurrentChunk();
+                primitive_set_logger->saveCurrentChunk();
+                vision_logger->saveCurrentChunk();
+                LOG(DEBUG) << "Saved in-progress ProtoLog chunks.";
+            };
         }
 
         // Wait for termination
@@ -180,6 +193,8 @@ int main(int argc, char** argv)
             // This blocks forever without using the CPU
             std::promise<void>().get_future().wait();
         }
+
+        save_protolog_chunks_fn();
     }
 
     return 0;

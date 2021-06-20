@@ -120,3 +120,68 @@ TEST(ProtoLoggerLogReaderTest, test_read_and_write_proto_log)
         EXPECT_TRUE(eq);
     }
 }
+
+TEST(ProtoLoggerLogReaderTest, test_save_current_chunk)
+{
+    // unfortunately due to the unavailablity of ordering tests and functions that
+    // generate test files that actually work, we have to read recorded replays back,
+    // write them, and then read them again in the same test
+
+    static constexpr size_t MSGS_PER_CHUNK = 1000;
+
+    std::vector<SensorProto> read_replay_msgs;
+
+    ProtoLogReader reader(fs::current_path() / REPLAY_TEST_PATH_SUFFIX);
+    while (auto frame = reader.getNextMsg<SensorProto>())
+    {
+        read_replay_msgs.emplace_back(*frame);
+    }
+
+    // write the read frames to another replay_logging directory
+    auto output_path = fs::current_path() / "replaytest2";
+    std::shared_ptr<ProtoLogger<SensorProto>> logger_ptr =
+        std::make_shared<ProtoLogger<SensorProto>>(
+            output_path, MSGS_PER_CHUNK,
+            [](const SensorProto& lhs, const SensorProto& rhs) {
+                return lhs.backend_received_time().epoch_timestamp_seconds() <
+                       rhs.backend_received_time().epoch_timestamp_seconds();
+            });
+    TestSubject subject;
+    subject.registerObserver(
+        std::dynamic_pointer_cast<Observer<SensorProto>>(logger_ptr));
+
+    // unfortunately we have to do this due to the performance of the CI node since
+    // the sort that happens right before a chunk is saved to disk is time consuming
+    // and there's still messages in the buffer left to process
+    // divide the replay messages amount by 2 so that we end up with an incomplete chunk
+    // in the ProtoLogger
+    for (size_t i = 0; i < read_replay_msgs.size() / 2; i++)
+    {
+        auto& msg = read_replay_msgs[i];
+        subject.sendValue(msg);
+        LOG(INFO) << "Sent message with timestamp "
+                  << msg.backend_received_time().epoch_timestamp_seconds();
+
+        if (i % MSGS_PER_CHUNK == MSGS_PER_CHUNK - 1)
+        {
+            // we just sent the last message in a chunk, sleep for longer
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        }
+        else
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    }
+    logger_ptr->saveCurrentChunk();
+
+    // test that 2 files named "0", "1" are created in the output directory
+    std::unordered_set<std::string> created_filenames;
+    const std::unordered_set<std::string> expected_filenames = {"0", "1"};
+
+    for (const auto& dir_entry : fs::directory_iterator(output_path))
+    {
+        created_filenames.emplace(dir_entry.path().filename());
+    }
+
+    EXPECT_EQ(created_filenames, expected_filenames);
+}
