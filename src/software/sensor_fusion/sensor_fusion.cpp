@@ -1,5 +1,6 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 
+#include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 
 SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusion_config)
@@ -195,6 +196,12 @@ void SensorFusion::updateWorld(
             }
         }
         friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
+
+        if (robot_status_msg.has_break_beam_status() &&
+            robot_status_msg.break_beam_status().ball_in_beam())
+        {
+            friendly_robot_id_with_ball_in_dribbler = robot_id;
+        }
     }
 }
 
@@ -219,7 +226,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     bool friendly_team_is_yellow =
         sensor_fusion_config->getFriendlyColorYellow()->value();
 
-    std::optional<Ball> new_ball;
     auto ball_detections = createBallDetections({ssl_detection_frame}, min_valid_x,
                                                 max_valid_x, ignore_invalid_camera_data);
     auto yellow_team =
@@ -256,10 +262,58 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         enemy_team    = createEnemyTeam(yellow_team);
     }
 
-    new_ball = createBall(ball_detections);
-    if (new_ball)
+    std::optional<Robot> robot_with_ball_in_dribbler;
+    if (friendly_robot_id_with_ball_in_dribbler.has_value())
     {
-        updateBall(*new_ball);
+        robot_with_ball_in_dribbler =
+            friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
+        friendly_robot_id_with_ball_in_dribbler = std::nullopt;
+    }
+    if (robot_with_ball_in_dribbler.has_value())
+    {
+        // Use ball in dribbler information first since it's most precise
+        ball =
+            Ball(robot_with_ball_in_dribbler->position() +
+                     Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
+                         .normalize(DIST_TO_FRONT_OF_ROBOT_METERS),
+                 Vector(0, 0), robot_with_ball_in_dribbler->timestamp());
+    }
+    else
+    {
+        std::optional<Ball> new_ball = createBall(ball_detections);
+        if (new_ball)
+        {
+            // If vision detected a new ball, then use that one
+            updateBall(*new_ball);
+        }
+        else if (ball)
+        {
+            // If we already have a ball from a previous frame, but is occluded this frame
+            std::optional<Robot> closest_enemy =
+                enemy_team.getNearestRobot(ball->position());
+            std::optional<Robot> closest_friendly =
+                friendly_team.getNearestRobot(ball->position());
+
+            if (closest_friendly.has_value())
+            {
+                // it only makes sense to do anything if there are friendly robots
+                Robot closest_robot = closest_friendly.value();
+
+                if (closest_enemy.has_value() &&
+                    distanceSquared(closest_enemy->position(), ball->position()) <
+                        distanceSquared(closest_friendly->position(), ball->position()))
+                {
+                    closest_robot = closest_enemy.value();
+                }
+
+                // Assume that the robot has the ball in dribbler since that's the worst
+                // case scenario, i.e. they could shoot or pass
+                ball = Ball(closest_robot.position() +
+                                Vector::createFromAngle(closest_robot.orientation())
+                                    .normalize(DIST_TO_FRONT_OF_ROBOT_METERS),
+                            Vector(0, 0), closest_robot.timestamp());
+            }
+        }
     }
 
     if (ball)
