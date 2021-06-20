@@ -62,6 +62,7 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
             Duration::fromSeconds(9.5));
 }
 
+// TODO (#2167): disabled due to physics simulator bug causing failure
 TEST_F(PenaltyKickPlayTest, DISABLED_test_penalty_kick_take)
 {
     Vector behind_ball_direction =

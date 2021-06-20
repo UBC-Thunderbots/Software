@@ -81,8 +81,8 @@ TEST_F(SimulatedPenaltyKickTacticTest, penalty_no_goalie)
 INSTANTIATE_TEST_CASE_P(
     RobotLocations, SimulatedPenaltyKickTacticTest,
     ::testing::Values(
-        // DISABLING test for the duration of robocup
-        // enemy robot stationary at centre of goal
+        // TODO (#2167): DISABLING test due to physics simulator bug that's causing
+        // failure enemy robot stationary at centre of goal
         //        RobotStateWithId{0,
         //        RobotState(Field::createSSLDivisionBField().enemyGoalCenter(),
         //                                       Vector(0, 0), Angle::half(),
