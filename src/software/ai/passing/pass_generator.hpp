@@ -1,5 +1,3 @@
-#include <omp.h>
-
 #include <algorithm>
 #include <chrono>
 #include <numeric>
@@ -7,6 +5,27 @@
 #include "software/ai/passing/cost_function.h"
 #include "software/ai/passing/pass_evaluation.h"
 #include "software/ai/passing/pass_generator.h"
+
+template <class TimeT = std::chrono::milliseconds,
+          class ClockT = std::chrono::steady_clock>
+class Timer
+{
+    using timep_t = typename ClockT::time_point;
+    timep_t _start = ClockT::now(), _end = {};
+
+public:
+    void tick() { 
+        _end = timep_t{}; 
+        _start = ClockT::now(); 
+    }
+    
+    void tock() { _end = ClockT::now(); }
+    
+    template <class TT = TimeT> 
+    TT duration() const { 
+        return std::chrono::duration_cast<TT>(_end - _start); 
+    }
+};
 
 template <class ZoneEnum>
 PassGenerator<ZoneEnum>::PassGenerator(
@@ -23,6 +42,9 @@ template <class ZoneEnum>
 PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
     const World& world)
 {
+    Timer clock;
+
+    clock.tick();
     auto generated_passes = samplePasses(world);
     if (current_best_passes_.empty())
     {
@@ -32,6 +54,9 @@ PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
     auto optimized_new_passes = optimizePasses(world, generated_passes);
 
     updatePasses(world, optimized_new_passes);
+    clock.tock();
+
+    LOG(DEBUG) << "Pass evaluation took = " << clock.duration().count() << " ms to generate\n";
 
     return PassEvaluation<ZoneEnum>(pitch_division_, current_best_passes_,
                                     passing_config_, world.getMostRecentTimestamp());
@@ -88,10 +113,6 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
     // of iterations
     ZonePassMap<ZoneEnum> optimized_passes;
 
-#pragma omp parallel
-    {
-#pragma omp single
-        {
             for (ZoneEnum zone_id : pitch_division_->getAllZoneIds())
             {
                 // The objective function we minimize in gradient descent to improve each
@@ -105,15 +126,10 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
                             pitch_division_->getZone(zone_id), passing_config_);
                     };
 
-                auto pass_array = generated_passes.at(zone_id).pass.toPassArray();
-
-#pragma omp task
-                {
-                    pass_array = optimizer_.maximize(
-                        objective_function, pass_array,
+                auto pass_array = optimizer_.maximize(
+                        objective_function, generated_passes.at(zone_id).pass.toPassArray(),
                         passing_config_->getNumberOfGradientDescentStepsPerIter()
                             ->value());
-                }
 
                 auto new_pass = Pass::fromPassArray(world.ball().position(), pass_array);
                 auto score = ratePass(world, new_pass, pitch_division_->getZone(zone_id),
@@ -121,8 +137,6 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
 
                 optimized_passes.emplace(zone_id, PassWithRating{new_pass, score});
             }
-        }
-    }
 
 
     return optimized_passes;

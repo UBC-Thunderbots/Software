@@ -83,7 +83,7 @@
      name: number_of_gradient_descent_steps_per_iter
      min: 0
      max: 100
-     value: 4
+     value: 2
      description: "The number of steps of gradient descent to perform in each iteration"
  - bool:
      name: debug_rate_pass
