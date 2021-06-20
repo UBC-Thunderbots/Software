@@ -139,6 +139,9 @@ class SensorFusion
 
     TeamSide team_with_possession;
 
+    // Whether the gamecontroller says we should defend positive side
+    bool gc_defending_positive_side;
+
     unsigned int friendly_goalie_id;
     unsigned int enemy_goalie_id;
 
