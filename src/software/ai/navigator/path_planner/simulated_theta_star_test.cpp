@@ -17,7 +17,7 @@ class SimulatedThetaStarTest : public SimulatedTacticTestFixture
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_robot_and_dest_in_obstacle)
+TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_obstacle)
 {
     // Both initial_position and destination are in obstacle.
     // The two points are not in the same coordinated initially, however after
@@ -51,7 +51,7 @@ TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_robot_and_dest_in_obstac
             Duration::fromSeconds(15));
 }
 
-TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_dest_in_obstacle)
+TEST_F(SimulatedThetaStarTest, test_theta_star_dest_in_obstacle)
 {
     // Destination is in obstacle, but initial point is open
     Point destination      = Point(1, -0.1);
@@ -84,7 +84,7 @@ TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_dest_in_obstacle)
 
 
 TEST_F(SimulatedThetaStarTest,
-       DISABLED_test_theta_star_not_stuck_when_start_point_and_first_grid_point_is_close)
+       test_theta_star_not_stuck_when_start_point_and_first_grid_point_is_close)
 {
     // Destination is in obstacle, but initial point is open
     Point destination = Point(4, 2.4);
@@ -121,7 +121,7 @@ TEST_F(SimulatedThetaStarTest,
             Duration::fromSeconds(15));
 }
 
-TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_robot_in_obstacle)
+TEST_F(SimulatedThetaStarTest, test_theta_star_robot_in_obstacle)
 {
     // Destination is in a free point, but initial point is in an obstacle
     Point destination      = Point(0, 0);
@@ -152,7 +152,7 @@ TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_robot_in_obstacle)
             Duration::fromSeconds(15));
 }
 
-TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_no_obstacle_straight_path)
+TEST_F(SimulatedThetaStarTest, test_theta_no_obstacle_straight_path)
 {
     Point destination      = Point(-2, 1);
     Point initial_position = Point(2, 1);
@@ -182,7 +182,7 @@ TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_no_obstacle_straight_path)
             Duration::fromSeconds(15));
 }
 
-TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_zig_zag_test)
+TEST_F(SimulatedThetaStarTest, test_theta_star_zig_zag_test)
 {
     /* enemy robots placed so the friendly robot is forced to take a path which
      * zig-zags. (inspired by the 2021 SSL dribbling hardware challenge)
@@ -234,7 +234,7 @@ TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_zig_zag_test)
             Duration::fromSeconds(15));
 }
 
-TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_oscillation)
+TEST_F(SimulatedThetaStarTest, test_theta_star_oscillation)
 {
     /*
      * When DISTANCE_THRESHOLD (what determines if robot is close enough to destination)
@@ -297,9 +297,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_find_path_through_enemy_half_when
     setTactic(tactic);
     setRobotId(1);
 
-    std::set<MotionConstraint> motion_constraints;
-    motion_constraints.insert(MotionConstraint::ENEMY_ROBOTS_COLLISION);
-    motion_constraints.insert(MotionConstraint::ENEMY_HALF);
+    std::set<MotionConstraint> motion_constraints = { MotionConstraint::ENEMY_HALF };
     setMotionConstraints(motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

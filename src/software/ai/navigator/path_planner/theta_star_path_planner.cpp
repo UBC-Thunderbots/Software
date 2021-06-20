@@ -271,6 +271,7 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
         return std::nullopt;
     }
 
+    //remove obstacles that contain the start point so that we can navigate out
     std::vector<ObstaclePtr> obstacles_that_we_dont_start_in;
     for (auto& obstacle : obstacles)
     {
