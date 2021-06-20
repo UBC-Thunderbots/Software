@@ -36,7 +36,8 @@ class Pass
      * Create a pass from the given pass array
      *
      * @param passer_point The location of the passer location
-     * @param pass_array [receiver_point.x(), receiver_point.y(), pass_speed_m_per_s, start_time_offset]
+     * @param pass_array [receiver_point.x(), receiver_point.y(), pass_speed_m_per_s,
+     * start_time_offset]
      * @return The Pass constructed from the pass array
      */
     static Pass fromPassArray(

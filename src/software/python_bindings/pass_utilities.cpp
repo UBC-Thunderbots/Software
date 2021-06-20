@@ -9,7 +9,8 @@ Pass createPassFromDict(py::dict pass_dict)
     Point receiver_point(pass_dict["receiver_point"].cast<Point>());
     auto pass_speed = pass_dict["pass_speed"].cast<double>();
     auto start_time = pass_dict["start_time"].cast<double>();
-    return Pass(passer_point, receiver_point, pass_speed, Timestamp::fromSeconds(start_time));
+    return Pass(passer_point, receiver_point, pass_speed,
+                Timestamp::fromSeconds(start_time));
 }
 
 pybind11::dict convertPassToDict(const Pass& pass)

@@ -106,7 +106,10 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         do
         {
-            attacker->updateControlParams(pass);
+            if (pass.startTime() >= world.getMostRecentTimestamp())
+            {
+                attacker->updateControlParams(pass);
+            }
             receiver->updateControlParams(pass);
 
             std::get<0>(crease_defender_tactics)

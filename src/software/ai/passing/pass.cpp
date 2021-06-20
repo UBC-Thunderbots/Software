@@ -48,12 +48,14 @@ Timestamp Pass::startTime() const
 Pass Pass::fromPassArray(Point passer_point,
                          const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& array)
 {
-    return Pass(passer_point, Point(array.at(0), array.at(1)), array.at(2), Timestamp::fromSeconds(array.at(3)));
+    return Pass(passer_point, Point(array.at(0), array.at(1)), array.at(2),
+                Timestamp::fromSeconds(array.at(3)));
 }
 
 std::array<double, NUM_PARAMS_TO_OPTIMIZE> Pass::toPassArray() const
 {
-    return {receiver_point.x(), receiver_point.y(), pass_speed_m_per_s, pass_start_time.toSeconds()};
+    return {receiver_point.x(), receiver_point.y(), pass_speed_m_per_s,
+            pass_start_time.toSeconds()};
 }
 
 Timestamp Pass::estimateReceiveTime() const

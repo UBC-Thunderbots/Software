@@ -22,7 +22,7 @@ class FirstInFirstOutThreadedObserver : public ThreadedObserver<T>
      * @param log_buffer_full whether or not to log when the buffer is full
      */
     explicit FirstInFirstOutThreadedObserver<T>(size_t buffer_size,
-                                                bool log_buffer_full = true)
+                                                bool log_buffer_full = false)
         : ThreadedObserver<T>(buffer_size, log_buffer_full){};
     std::optional<T> getNextValue(const Duration& max_wait_time) final override;
 };

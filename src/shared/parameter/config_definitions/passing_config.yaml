@@ -85,3 +85,7 @@
      max: 100
      value: 4
      description: "The number of steps of gradient descent to perform in each iteration"
+ - bool:
+     name: debug_rate_pass
+     value: false
+     description: "Logs the costs that go into rate pass, Robocup 2021 hack that should be removed TODO (#2167)"

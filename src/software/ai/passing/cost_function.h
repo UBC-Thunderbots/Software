@@ -114,11 +114,11 @@ double calculateKickInterceptRisk(const Robot& enemy_robot, const Pass& pass,
  *         being impossible
  */
 double rateKickPassFriendlyCapability(
-        Team friendly_team, const Pass& pass,
-        std::shared_ptr<const PassingConfig> passing_config);
+    Team friendly_team, const Pass& pass,
+    std::shared_ptr<const PassingConfig> passing_config);
 double rateChipPassFriendlyCapability(
-        Team friendly_team, const Pass& pass,
-        std::shared_ptr<const PassingConfig> passing_config);
+    Team friendly_team, const Pass& pass,
+    std::shared_ptr<const PassingConfig> passing_config);
 
 double ratePassNextPassScore(const World& world, const Pass& pass,
                              std::shared_ptr<const PassingConfig> passing_config);
@@ -151,7 +151,7 @@ double calculateProximityRisk(const Point& point, const Team& enemy_team,
                               double enemy_proximity_importance);
 
 /**
- * Figures out the earliest timestamp the given robot cant receive the given pass.
+ * Figures out the earliest timestamp the given robot can't receive the given pass.
  *
  * @param robot The robot to calculate the receive timestamp for
  * @param pass The pass to receive
