@@ -1,0 +1,27 @@
+- int:
+    name: team_channel
+    min: 0
+    max: 15
+    value: 0
+    description: >-
+      The multicast channel to use to communicate with the friendly robots
+      in the simulator.
+
+- string:
+    name: network_interface
+    value: "wlp3s0"
+    description: >-
+      The network interface to use for multicast network communication.
+      Can be found using the `ifconfig` command.
+
+- string:
+    name: ssl_simulator_ip_address
+    value: "0.0.0.0"
+    description: The ip to send robot control to.
+
+- int:
+    name: ssl_simulator_port
+    min: 1
+    max: 65535
+    value: 10302
+    description: The port to send robot control to.

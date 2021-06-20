@@ -26,7 +26,10 @@ TEST(ChipFSMTest, test_transitions)
         boost::sml::state<GetBehindBallFSM::GetBehindBallState>));
 
     // Robot is now behind ball
-    robot = ::TestUtil::createRobotAtPos(Point(-2, 1.7));
+    robot = Robot(0,
+                  RobotState(Point(-2, 1.7), Vector(), Angle::threeQuarter(),
+                             AngularVelocity::zero()),
+                  Timestamp::fromSeconds(123));
     fsm.process_event(ChipFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));
     // Transition to ChipState

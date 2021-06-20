@@ -69,7 +69,7 @@
       with EnemyGoalieId parameter
 - bool:
     name: override_referee_command
-    value: true
+    value: false
     description: >-
       Overrides the current referee command with the play 
       specified by CurrentRefereeCommand and PreviousRefereeCommand

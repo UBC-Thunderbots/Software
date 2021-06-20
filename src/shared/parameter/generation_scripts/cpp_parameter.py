@@ -28,7 +28,7 @@ PARAMETER_PRIVATE_ENTRY = (
 
 PARAMETER_CONSTRUCTOR_ENTRY = '{param_variable_name} = std::make_shared<Parameter<{type}>>("{param_name}", {quote}{value}{quote});'
 NUMERIC_PARAMETER_CONSTRUCTOR_ENTRY = '{param_variable_name} = std::make_shared<NumericParameter<{type}>>("{param_name}", {value}, {min_value}, {max_value});'
-ENUMERATED_PARAMETER_CONSTRUCTOR_ENTRY = 'class {forward_declare}; {param_variable_name} = std::make_shared<EnumeratedParameter<{type}>>("{param_name}", {quote}{value}{quote}, {allowed_values});'
+ENUMERATED_PARAMETER_CONSTRUCTOR_ENTRY = '{param_variable_name} = std::make_shared<EnumeratedParameter<{type}>>("{param_name}", {quote}{value}{quote}, {allowed_values});'
 
 IMMUTABLE_PARAMETER_LIST_PARAMETER_ENTRY = (
     "std::const_pointer_cast<const {param_class}<{type}>>({param_variable_name})"
@@ -71,7 +71,7 @@ class CppParameter(object):
 
     @staticmethod
     def is_numeric_type(param_type: str) -> bool:
-        return re.match("int|uint|double", param_type)
+        return re.match("int|double", param_type)
 
     @staticmethod
     def find_quote(param_type: str) -> str:

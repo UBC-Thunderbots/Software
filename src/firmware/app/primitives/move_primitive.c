@@ -16,7 +16,9 @@
 // these are set to decouple the 3 axis from each other
 // the idea is to clamp the maximum velocity and acceleration
 // so that the axes would never have to compete for resources
-#define TIME_HORIZON 0.05f  // s
+#define TIME_HORIZON (0.05f)  // s
+// Number of times the control loop should tick per trajectory element
+#define NUM_TICKS_PER_TRAJECTORY_ELEMENT (4)
 
 typedef struct MoveState
 {
@@ -92,19 +94,29 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
     // Change in orientation to reach destination orientation
     const float net_change_in_orientation =
         shared_physics_minAngleDelta(current_orientation, destination_orientation);
+    const float orientation_delta =
+        net_change_in_orientation + (float)revolutions_to_spin * 2.0f * (float)M_PI;
+
+    const float estimated_time_delta = fmaxf(
+        fabsf(distance_to_destination) / (float)(robot_constants.robot_max_speed_m_per_s),
+        fabsf(net_change_in_orientation) / (float)(robot_constants.robot_max_ang_speed_rad_per_s));
+
+    // clamp num elements between 3 (minimum number of trajectory elements) and
+    // TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
+    const unsigned int num_elements = (unsigned int)fmaxf(
+        fminf((estimated_time_delta * CONTROL_LOOP_HZ / NUM_TICKS_PER_TRAJECTORY_ELEMENT),
+              TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS),
+        3);
 
     // Plan a trajectory to move to the target position/orientation
     FirmwareRobotPathParameters_t path_parameters = {
         .path = {.x = {.coefficients = {0, 0, destination_x - current_x, current_x}},
                  .y = {.coefficients = {0, 0, destination_y - current_y, current_y}}},
-        .orientation_profile = {.coefficients = {0, 0,
-                                                 net_change_in_orientation +
-                                                     (float)revolutions_to_spin * 2.0f *
-                                                         (float)M_PI,
+        .orientation_profile = {.coefficients = {0, 0, orientation_delta,
                                                  current_orientation}},
         .t_start             = 0,
         .t_end               = 1.0f,
-        .num_elements        = 10,
+        .num_elements        = num_elements,
         .max_allowable_linear_acceleration =
             robot_constants.robot_max_acceleration_m_per_s_2,
         .max_allowable_linear_speed = max_speed_m_per_s,
