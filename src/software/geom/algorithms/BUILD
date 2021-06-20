@@ -14,6 +14,7 @@ cc_library(
         "furthest_point.cpp",
         "intersection.cpp",
         "intersects.cpp",
+        "rasterize.cpp",
         "voronoi_diagram.cpp",
     ],
     hdrs = [
@@ -28,6 +29,7 @@ cc_library(
         "furthest_point.h",
         "intersection.h",
         "intersects.h",
+        "rasterize.h",
         "voronoi_diagram.h",
     ],
     deps = [
@@ -177,5 +179,15 @@ cc_test(
     deps = [
         ":algorithms",
         "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
+cc_test(
+    name = "rasterize_test",
+    srcs = ["rasterize_test.cpp"],
+    deps = [
+        ":algorithms",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ],
 )

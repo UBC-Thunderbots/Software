@@ -167,14 +167,14 @@ class Field
      *
      * @return defense area of the friendly team
      */
-    Rectangle friendlyDefenseArea() const;
+    const Rectangle &friendlyDefenseArea() const;
 
     /**
      * Gets the enemy defense area as a Rectangle.
      *
      * @return defense area of the enemy team
      */
-    Rectangle enemyDefenseArea() const;
+    const Rectangle &enemyDefenseArea() const;
 
     /**
      * Gets the friendly half of the field within field lines
@@ -224,7 +224,7 @@ class Field
      *
      * @return The area within the field lines as a rectangle
      */
-    Rectangle fieldLines() const;
+    const Rectangle &fieldLines() const;
 
     /**
      * Gets the area within the field boundary (the physical walls surrounding the Field).
@@ -254,14 +254,14 @@ class Field
      *
      * @return the area within the friendly goal.
      */
-    Rectangle friendlyGoal() const;
+    const Rectangle &friendlyGoal() const;
 
     /**
      * Gets the area within the enemy goal.
      *
      * @return the area within the enemy goal.
      */
-    Rectangle enemyGoal() const;
+    const Rectangle &enemyGoal() const;
 
     /**
      * Gets the position of the friendly team's penalty mark.
@@ -431,4 +431,10 @@ class Field
     double center_circle_radius_;
     // The x-coordinate distance from the goal centre to the penalty mark
     double goal_centre_to_penalty_mark_;
+    // The following are used for caching to improve performance
+    Rectangle enemy_defense_area;
+    Rectangle friendly_defense_area;
+    Rectangle field_lines;
+    Rectangle enemy_goal;
+    Rectangle friendly_goal;
 };

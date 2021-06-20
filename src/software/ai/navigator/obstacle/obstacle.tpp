@@ -2,6 +2,7 @@
 
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/rasterize.h"
 
 template <typename GEOM_TYPE>
 GeomObstacle<GEOM_TYPE>::GeomObstacle(const GEOM_TYPE& geom) : geom_(geom)
@@ -24,6 +25,12 @@ template <typename GEOM_TYPE>
 bool GeomObstacle<GEOM_TYPE>::intersects(const Segment& segment) const
 {
     return ::intersects(geom_, segment);
+}
+
+template <typename GEOM_TYPE>
+std::vector<Point> GeomObstacle<GEOM_TYPE>::rasterize(const double resolution_size) const
+{
+    return ::rasterize(geom_, resolution_size);
 }
 
 template <typename GEOM_TYPE>

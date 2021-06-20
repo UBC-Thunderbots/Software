@@ -14,3 +14,8 @@ void ObstacleArtist::visit(const GeomObstacle<Polygon>& geom_obstacle)
 {
     drawPolygon(scene_, geom_obstacle.getGeom(), pen_);
 }
+
+void ObstacleArtist::visit(const GeomObstacle<Rectangle>& geom_obstacle)
+{
+    drawPolygon(scene_, geom_obstacle.getGeom(), pen_);
+}

@@ -31,7 +31,20 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
       goal_y_length_(goal_y_length),
       boundary_buffer_size_(boundary_buffer_size),
       center_circle_radius_(center_circle_radius),
-      goal_centre_to_penalty_mark_(field_x_length_ * 2 / 3)
+      goal_centre_to_penalty_mark_(field_x_length_ * 2 / 3),
+      enemy_defense_area(
+          Point(field_x_length_ * 0.5, defense_y_length_ / 2.0),
+          Point(field_x_length_ * 0.5 - defense_x_length_, -defense_y_length_ / 2.0)),
+      friendly_defense_area(Rectangle(
+          Point(-field_x_length_ * 0.5, defense_y_length_ / 2.0),
+          Point(-field_x_length_ * 0.5 + defense_x_length_, -defense_y_length_ / 2.0))),
+      field_lines(Rectangle(friendlyCornerNeg(), enemyCornerPos())),
+      enemy_goal(Rectangle(
+          Point(enemyGoalCenter().x(), enemyGoalpostPos().y()),
+          Point(enemyGoalCenter().x() + goalXLength(), enemyGoalpostNeg().y()))),
+      friendly_goal(Rectangle(
+          Point(friendlyGoalCenter().x() - goalXLength(), friendlyGoalpostPos().y()),
+          Point(friendlyGoalCenter().x(), friendlyGoalpostNeg().y())))
 {
     if (field_x_length_ <= 0 || field_y_length <= 0 || defense_x_length_ <= 0 ||
         defense_y_length_ <= 0 || goal_x_length_ <= 0 || goal_y_length_ <= 0 ||
@@ -82,18 +95,14 @@ double Field::defenseAreaXLength() const
     return defense_x_length_;
 }
 
-Rectangle Field::friendlyDefenseArea() const
+const Rectangle &Field::friendlyDefenseArea() const
 {
-    return Rectangle(
-        Point(-field_x_length_ * 0.5, defense_y_length_ / 2.0),
-        Point(-field_x_length_ * 0.5 + defense_x_length_, -defense_y_length_ / 2.0));
+    return friendly_defense_area;
 }
 
-Rectangle Field::enemyDefenseArea() const
+const Rectangle &Field::enemyDefenseArea() const
 {
-    return Rectangle(
-        Point(field_x_length_ * 0.5, defense_y_length_ / 2.0),
-        Point(field_x_length_ * 0.5 - defense_x_length_, -defense_y_length_ / 2.0));
+    return enemy_defense_area;
 }
 
 Rectangle Field::friendlyHalf() const
@@ -126,9 +135,9 @@ Rectangle Field::enemyNegativeYQuadrant() const
     return Rectangle(centerPoint(), enemyCornerNeg());
 }
 
-Rectangle Field::fieldLines() const
+const Rectangle &Field::fieldLines() const
 {
-    return Rectangle(friendlyCornerNeg(), enemyCornerPos());
+    return field_lines;
 }
 
 Rectangle Field::fieldBoundary() const
@@ -168,20 +177,14 @@ Point Field::enemyGoalCenter() const
     return Point(xLength() / 2.0, 0.0);
 }
 
-Rectangle Field::friendlyGoal() const
+const Rectangle &Field::friendlyGoal() const
 {
-    Point friendly_goal_top_left(friendlyGoalCenter().x() - goalXLength(),
-                                 friendlyGoalpostPos().y());
-    Point friendly_goal_bottom_right(friendlyGoalCenter().x(), friendlyGoalpostNeg().y());
-    return Rectangle(friendly_goal_top_left, friendly_goal_bottom_right);
+    return friendly_goal;
 }
 
-Rectangle Field::enemyGoal() const
+const Rectangle &Field::enemyGoal() const
 {
-    Point enemy_goal_top_left(enemyGoalCenter().x(), enemyGoalpostPos().y());
-    Point enemy_goal_bottom_right(enemyGoalCenter().x() + goalXLength(),
-                                  enemyGoalpostNeg().y());
-    return Rectangle(enemy_goal_top_left, enemy_goal_bottom_right);
+    return enemy_goal;
 }
 
 Point Field::friendlyPenaltyMark() const
