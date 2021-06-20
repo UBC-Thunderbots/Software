@@ -17,7 +17,14 @@ template <typename T>
 class ThreadedObserver : public Observer<T>
 {
    public:
-    explicit ThreadedObserver(size_t buffer_size = Observer<T>::DEFAULT_BUFFER_SIZE);
+    /**
+     * Creates a new ThreadedObserver
+     *
+     * @param buffer_size size of the buffer
+     * @param log_buffer_full whether or not to log when the buffer is full
+     */
+    explicit ThreadedObserver(size_t buffer_size   = Observer<T>::DEFAULT_BUFFER_SIZE,
+                              bool log_buffer_full = true);
 
     ~ThreadedObserver() override;
 
@@ -55,6 +62,10 @@ class ThreadedObserver : public Observer<T>
 
     /**
      * This function will return the next value from the internal buffer.
+     *
+     * @param max_wait_time The maximum wait time for getting the value
+     *
+     * @return the next value if found before max_wait_time
      */
     virtual std::optional<T> getNextValue(const Duration& max_wait_time);
 

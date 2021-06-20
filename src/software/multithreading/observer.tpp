@@ -1,8 +1,8 @@
 #pragma once
 
 template <typename T>
-Observer<T>::Observer(size_t buffer_size)
-    : buffer(buffer_size), receive_time_buffer(TIME_BUFFER_SIZE)
+Observer<T>::Observer(size_t buffer_size, bool log_buffer_full)
+    : buffer(buffer_size, log_buffer_full), receive_time_buffer(TIME_BUFFER_SIZE)
 {
 }
 

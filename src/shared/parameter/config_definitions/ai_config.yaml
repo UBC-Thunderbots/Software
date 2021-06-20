@@ -6,4 +6,3 @@ include:
   - robot_navigation_obstacle_config.yaml
   - attacker_tactic_config.yaml
   - shoot_or_pass_play_config.yaml
-  - defense_shadow_enemy_tactic_config.yaml
