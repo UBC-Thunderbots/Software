@@ -11,6 +11,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "physics_test",
+    srcs = ["physics_test.cpp"],
+    deps = [
+        ":physics",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
 cc_library(
     name = "physics_linear_alebra",
     srcs = ["physics_linear_algebra.c"],

@@ -114,12 +114,13 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
             yield(std::make_unique<MoveIntent>(
                 robot->id(), point_behind_ball, kick_direction, 0.0, DribblerMode::OFF,
                 BallCollisionType::AVOID, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot->robotConstants()));
         }
         else
         {
             yield(std::make_unique<KickIntent>(robot->id(), kick_origin, kick_direction,
-                                               kick_speed_meters_per_second));
+                                               kick_speed_meters_per_second,
+                                               robot->robotConstants()));
         }
     } while (!ball.hasBallBeenKicked(kick_direction));
 }

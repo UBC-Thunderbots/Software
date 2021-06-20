@@ -75,10 +75,10 @@ cc_library(
     srcs = ["control.c"],
     hdrs = ["control.h"],
     deps = [
-        "//firmware/app/world:firmware_robot_constants",
         "//firmware/app/world:force_wheel",
         "//firmware/shared:physics",
         "//firmware/shared:util",
+        "//shared:robot_constants",
     ],
 )
 

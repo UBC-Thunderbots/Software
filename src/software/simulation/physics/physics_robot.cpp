@@ -23,9 +23,11 @@ const double PhysicsRobot::DRIBBLER_DAMPER_THICKNESS = 0.005;
 const double PhysicsRobot::TOTAL_DRIBBLER_DEPTH =
     PhysicsRobot::DRIBBLER_DEPTH + PhysicsRobot::DRIBBLER_DAMPER_THICKNESS;
 
-PhysicsRobot::PhysicsRobot(RobotId id, std::shared_ptr<b2World> world,
-                           const RobotState& robot_state, const double mass_kg)
-    : robot_id(id)
+PhysicsRobot::PhysicsRobot(const RobotId id, std::shared_ptr<b2World> world,
+                           const RobotState& robot_state,
+                           const RobotConstants_t& robot_constants,
+                           const WheelConstants_t& wheel_constants)
+    : robot_id(id), robot_constants(robot_constants), wheel_constants(wheel_constants)
 {
     b2BodyDef robot_body_def;
     robot_body_def.type = b2_dynamicBody;
@@ -41,7 +43,7 @@ PhysicsRobot::PhysicsRobot(RobotId id, std::shared_ptr<b2World> world,
 
     robot_body = world->CreateBody(&robot_body_def);
 
-    setupRobotBodyFixtures(robot_state, mass_kg);
+    setupRobotBodyFixtures(robot_state, robot_constants.mass_kg);
     setupDribblerFixture(robot_state);
     setupDribblerDamperFixture(robot_state);
 
@@ -73,12 +75,16 @@ PhysicsRobot::~PhysicsRobot()
 
 void PhysicsRobot::setupRobotBodyFixtures(const RobotState&, const double mass_kg)
 {
-    b2PolygonShape* main_body_shape =
-        PhysicsRobotModel::getMainRobotBodyShape(TOTAL_DRIBBLER_DEPTH);
-    b2PolygonShape* front_left_body_shape =
-        PhysicsRobotModel::getRobotBodyShapeFrontLeft(TOTAL_DRIBBLER_DEPTH);
+    b2PolygonShape* main_body_shape = PhysicsRobotModel::getMainRobotBodyShape(
+        TOTAL_DRIBBLER_DEPTH, robot_constants.dribbler_width_meters,
+        robot_constants.front_of_robot_width_meters);
+    b2PolygonShape* front_left_body_shape = PhysicsRobotModel::getRobotBodyShapeFrontLeft(
+        TOTAL_DRIBBLER_DEPTH, robot_constants.dribbler_width_meters,
+        robot_constants.front_of_robot_width_meters);
     b2PolygonShape* front_right_body_shape =
-        PhysicsRobotModel::getRobotBodyShapeFrontRight(TOTAL_DRIBBLER_DEPTH);
+        PhysicsRobotModel::getRobotBodyShapeFrontRight(
+            TOTAL_DRIBBLER_DEPTH, robot_constants.dribbler_width_meters,
+            robot_constants.front_of_robot_width_meters);
 
     auto body_shapes = {main_body_shape, front_left_body_shape, front_right_body_shape};
     double total_shape_area = 0.0;
@@ -127,12 +133,14 @@ void PhysicsRobot::setupDribblerFixture(const RobotState&)
     // so we do not need to rotate the points to match the orientation of the robot.
     const unsigned int num_vertices              = 4;
     b2Vec2 dribbler_shape_vertices[num_vertices] = {
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS, DRIBBLER_WIDTH_METERS / 2.0)),
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS,
+                         robot_constants.dribbler_width_meters / 2.0)),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - DRIBBLER_DEPTH,
-                         DRIBBLER_WIDTH_METERS / 2.0)),
+                         robot_constants.dribbler_width_meters / 2.0)),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - DRIBBLER_DEPTH,
-                         -DRIBBLER_WIDTH_METERS / 2.0)),
-        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS, -DRIBBLER_WIDTH_METERS / 2.0))};
+                         -robot_constants.dribbler_width_meters / 2.0)),
+        createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS,
+                         -robot_constants.dribbler_width_meters / 2.0))};
     b2PolygonShape* dribbler_shape = new b2PolygonShape();
     dribbler_shape->Set(dribbler_shape_vertices, num_vertices);
     robot_dribbler_fixture_def.shape = dribbler_shape;
@@ -157,14 +165,14 @@ void PhysicsRobot::setupDribblerDamperFixture(const RobotState& robot_state)
     b2Vec2 dribbler_damper_shape_vertices[num_vertices] = {
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - TOTAL_DRIBBLER_DEPTH +
                              DRIBBLER_DAMPER_THICKNESS,
-                         DRIBBLER_WIDTH_METERS / 2.0)),
+                         robot_constants.dribbler_width_meters / 2.0)),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - TOTAL_DRIBBLER_DEPTH,
-                         DRIBBLER_WIDTH_METERS / 2.0)),
+                         robot_constants.dribbler_width_meters / 2.0)),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - TOTAL_DRIBBLER_DEPTH,
-                         -DRIBBLER_WIDTH_METERS / 2.0)),
+                         -robot_constants.dribbler_width_meters / 2.0)),
         createVec2(Point(DIST_TO_FRONT_OF_ROBOT_METERS - TOTAL_DRIBBLER_DEPTH +
                              DRIBBLER_DAMPER_THICKNESS,
-                         -DRIBBLER_WIDTH_METERS / 2.0))};
+                         -robot_constants.dribbler_width_meters / 2.0))};
 
     b2PolygonShape* dribbler_damper_shape = new b2PolygonShape();
     dribbler_damper_shape->Set(dribbler_damper_shape_vertices, num_vertices);
@@ -241,25 +249,25 @@ AngularVelocity PhysicsRobot::angularVelocity() const
 
 void PhysicsRobot::applyWheelForceFrontLeft(double force_in_newtons)
 {
-    Angle angle_to_wheel = Angle::fromDegrees(ANGLE_TO_ROBOT_FRONT_WHEELS_DEG);
+    Angle angle_to_wheel = Angle::fromDegrees(robot_constants.front_wheel_angle_deg);
     applyWheelForceAtAngle(angle_to_wheel, force_in_newtons);
 }
 
 void PhysicsRobot::applyWheelForceBackLeft(double force_in_newtons)
 {
-    Angle angle_to_wheel = Angle::fromDegrees(ANGLE_TO_ROBOT_BACK_WHEELS_DEG);
+    Angle angle_to_wheel = Angle::fromDegrees(robot_constants.back_wheel_angle_deg);
     applyWheelForceAtAngle(angle_to_wheel, force_in_newtons);
 }
 
 void PhysicsRobot::applyWheelForceBackRight(double force_in_newtons)
 {
-    Angle angle_to_wheel = Angle::fromDegrees(-ANGLE_TO_ROBOT_BACK_WHEELS_DEG);
+    Angle angle_to_wheel = Angle::fromDegrees(-robot_constants.back_wheel_angle_deg);
     applyWheelForceAtAngle(angle_to_wheel, force_in_newtons);
 }
 
 void PhysicsRobot::applyWheelForceFrontRight(double force_in_newtons)
 {
-    Angle angle_to_wheel = Angle::fromDegrees(-ANGLE_TO_ROBOT_FRONT_WHEELS_DEG);
+    Angle angle_to_wheel = Angle::fromDegrees(-robot_constants.front_wheel_angle_deg);
     applyWheelForceAtAngle(angle_to_wheel, force_in_newtons);
 }
 
@@ -285,11 +293,14 @@ std::array<float, 4> PhysicsRobot::getMotorSpeeds() const
         robot_body->GetLocalVector(robot_body->GetLinearVelocity()).y,
         robot_body->GetAngularVelocity()};
     float wheel_speeds[4]{0.0, 0.0, 0.0, 0.0};
-    speed3_to_speed4(robot_local_speed, wheel_speeds);
+    shared_physics_speed3ToSpeed4(robot_local_speed, wheel_speeds,
+                                  robot_constants.front_wheel_angle_deg,
+                                  robot_constants.back_wheel_angle_deg);
     std::array<float, 4> motor_speeds = {0.0, 0.0, 0.0, 0.0};
     for (unsigned int i = 0; i < 4; i++)
     {
-        motor_speeds[i] = wheel_speeds[i] / GEAR_RATIO;
+        motor_speeds[i] =
+            wheel_speeds[i] / wheel_constants.wheel_rotations_per_motor_rotation;
     }
     return motor_speeds;
 }
@@ -387,4 +398,14 @@ void PhysicsRobot::applyForceToCenterOfMass(const Vector& force)
 {
     b2Vec2 force_vector = createVec2(force);
     robot_body->ApplyForceToCenter(force_vector, true);
+}
+
+const RobotConstants_t& PhysicsRobot::robotConstants() const
+{
+    return robot_constants;
+}
+
+const WheelConstants_t& PhysicsRobot::wheelConstants() const
+{
+    return wheel_constants;
 }
