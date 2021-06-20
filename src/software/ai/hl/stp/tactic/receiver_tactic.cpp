@@ -38,6 +38,12 @@ double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world
     // have a cost less than 1
     double cost =
         (robot.position() - pass.receiverPoint()).length() / world.field().totalXLength();
+
+    // TODO (#2167) robocup 2021 hack: prevents oscillating tactic assignments that give up the ball
+    //
+    // The attacker and receiver are the two tactics that need the ball/try to get the ball.
+    // We want these tactics to be the most expensive, so that the munkres algorithm
+    // minimizes the overal cost by assinging these tactics to the robots nearest to the ball.
     return std::clamp<double>(cost, 0, 1) * 10;
 }
 

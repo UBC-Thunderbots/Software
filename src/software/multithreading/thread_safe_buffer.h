@@ -30,7 +30,7 @@ class ThreadSafeBuffer
      * @param buffer_size size of the buffer
      * @param log_buffer_full whether or not to log when the buffer is full
      */
-    explicit ThreadSafeBuffer(std::size_t buffer_size, bool log_buffer_full = false);
+    explicit ThreadSafeBuffer(std::size_t buffer_size, bool log_buffer_full = true);
 
     // Copying this class is not permitted
     ThreadSafeBuffer(const ThreadSafeBuffer&) = delete;
