@@ -1,7 +1,9 @@
 #pragma once
 
 #include "shared/2015_robot_constants.h"
+#include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
+#include "shared/robot_constants.h"
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"
 #include "software/geom/point.h"
