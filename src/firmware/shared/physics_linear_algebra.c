@@ -1,7 +1,8 @@
 #include "firmware/shared/physics_linear_algebra.h"
 
-void matrix_mult(float* lhs, int lhs_len, const float* rhs, int rhs_len,
-                 const float matrix[lhs_len][rhs_len])
+void shared_physics_linear_algebra_matrixMultiply(float* lhs, int lhs_len,
+                                                  const float* rhs, int rhs_len,
+                                                  const float matrix[lhs_len][rhs_len])
 {
     for (int j = 0; j < lhs_len; ++j)
     {
@@ -13,8 +14,9 @@ void matrix_mult(float* lhs, int lhs_len, const float* rhs, int rhs_len,
     }
 }
 
-void matrix_mult_t(float* lhs, int lhs_len, const float* rhs, int rhs_len,
-                   const float matrix[rhs_len][lhs_len])
+void shared_physics_linear_algebra_matrixMultiplyTranspose(
+    float* lhs, int lhs_len, const float* rhs, int rhs_len,
+    const float matrix[rhs_len][lhs_len])
 {
     for (int j = 0; j < lhs_len; ++j)
     {

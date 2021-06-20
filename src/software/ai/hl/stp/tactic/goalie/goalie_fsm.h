@@ -226,7 +226,7 @@ struct GoalieFSM
                 event.common.robot.id(), goalie_pos, goalie_orientation, 0.0,
                 DribblerMode::OFF, BallCollisionType::ALLOW,
                 AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-                max_allowed_speed_mode, 0.0));
+                max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
         };
 
         /**
@@ -280,7 +280,7 @@ struct GoalieFSM
                 event.common.robot.id(), goalie_pos, goalie_orientation,
                 goalie_final_speed, DribblerMode::OFF, BallCollisionType::ALLOW,
                 AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-                max_allowed_speed_mode, 0.0));
+                max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
         };
 
         const auto ball_in_defense_area = [this](auto event) {

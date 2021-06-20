@@ -204,15 +204,17 @@ void RobotDiagnosticsGUI::setChickCommandPrimitiveFromUI(
 
 void RobotDiagnosticsGUI::setupWidgets()
 {
+    RobotConstants_t robot_constants = create2015RobotConstants();
     setupChicker(main_widget, boost::bind(&RobotDiagnosticsGUI::onChickerStateChanged,
                                           this, _1, _2, _3));
     setupDribbler(main_widget,
-                  boost::bind(&RobotDiagnosticsGUI::onDribblerRPMChanged, this, _1));
+                  boost::bind(&RobotDiagnosticsGUI::onDribblerRPMChanged, this, _1),
+                  robot_constants);
     setupDrive(
         main_widget,
         boost::bind(&RobotDiagnosticsGUI::onDirectPerWheelPowerChanged, this, _1, _2),
         boost::bind(&RobotDiagnosticsGUI::onDirectVelocityPowerChanged, this, _1, _2));
-    setupSensorStatus(main_widget);
+    setupSensorStatus(main_widget, robot_constants);
     setupLEDs(main_widget, led_mode);
     setupRobotSelection(main_widget, robot_selection);
     setupRobotStatusTable(main_widget->robot_status_table_widget);

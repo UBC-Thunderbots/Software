@@ -15,9 +15,11 @@ class KickIntent : public DirectPrimitiveIntent
      * @param final_angle The final angle the robot should have at the end of the movement
      * @param final_speed The final speed the robot should have when it arrives at its
      * destination
+     * @param robot_constants The robot constants
      */
     explicit KickIntent(unsigned int robot_id, const Point& dest,
-                        const Angle& final_angle, double final_speed);
+                        const Angle& final_angle, double final_speed,
+                        RobotConstants_t robot_constants);
 
     KickIntent() = delete;
 };
