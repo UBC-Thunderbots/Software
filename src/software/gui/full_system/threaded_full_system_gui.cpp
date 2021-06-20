@@ -11,7 +11,7 @@ ThreadedFullSystemGUI::ThreadedFullSystemGUI(
     : FirstInFirstOutThreadedObserver<World>(Observer<World>::DEFAULT_BUFFER_SIZE, false),
       FirstInFirstOutThreadedObserver<AIDrawFunction>(),
       FirstInFirstOutThreadedObserver<PlayInfo>(),
-      FirstInFirstOutThreadedObserver<SensorProto>(SENSOR_MSG_BUFFER_SIZE,false),
+      FirstInFirstOutThreadedObserver<SensorProto>(SENSOR_MSG_BUFFER_SIZE, false),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       world_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<WorldDrawFunction>>(
           WORLD_DRAW_FUNCTIONS_BUFFER_SIZE, false)),
