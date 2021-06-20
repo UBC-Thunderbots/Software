@@ -551,3 +551,23 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_positive_y_ball_placeme
         0.05));
     EXPECT_NEAR(result->getOpenAngle().toDegrees(), 21, 1);
 }
+
+TEST(CalcBestShotTest, calc_best_shot_out_of_field_bounds)
+{
+    World world = ::TestUtil::createBlankTestingWorld();
+    Team team   = Team(Duration::fromSeconds(1));
+
+    Point shooting_robot_pos =
+        Point(world.field().enemyCornerPos().x() + 2, world.field().enemyCornerPos().y());
+    Robot shooting_robot = Robot(0, shooting_robot_pos, Vector(0, 0), Angle::zero(),
+                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    team.updateRobots({shooting_robot});
+    world.updateFriendlyTeamState(team);
+
+    auto result =
+        calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                           shooting_robot.position(), TeamType::ENEMY, {shooting_robot});
+
+    // We should not be able to find a shot
+    ASSERT_FALSE(result);
+}
