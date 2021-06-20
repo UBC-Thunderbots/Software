@@ -370,6 +370,16 @@ def _make_common_features(ctx):
         ],
     )
 
+    result["pragmaomp"] = feature(
+        name = "pragmaomp",
+        flag_sets = [
+            flag_set(
+                actions = ALL_CPP_ACTIONS,
+                flag_groups = [flag_group(flags = ["-fopenmp"])],
+            ),
+        ],
+    )
+
     result["no-exceptions"] = feature(
         name = "no-exceptions",
         flag_sets = [
@@ -556,6 +566,7 @@ def _linux_gcc_impl(ctx):
             "lld",
             "frame-pointer",
             "static_link_cpp_runtimes",
+            "pragmaomp",
         ],
     )
 

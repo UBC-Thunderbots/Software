@@ -127,6 +127,7 @@ cc_library(
         "pass_generator.h",
         "pass_generator.hpp",
     ],
+    linkopts = ["-fopenmp"],
     deps = [
         ":cost_functions",
         ":eighteen_zone_pitch_division",

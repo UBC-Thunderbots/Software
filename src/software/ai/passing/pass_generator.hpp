@@ -1,3 +1,5 @@
+#include <omp.h>
+
 #include <algorithm>
 #include <chrono>
 #include <numeric>
@@ -86,28 +88,42 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
     // of iterations
     ZonePassMap<ZoneEnum> optimized_passes;
 
-    for (ZoneEnum zone_id : pitch_division_->getAllZoneIds())
+#pragma omp parallel
     {
-        // The objective function we minimize in gradient descent to improve each pass
-        // that we're optimizing
-        const auto objective_function =
-            [this, &world,
-             zone_id](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
-                return ratePass(world,
-                                Pass::fromPassArray(world.ball().position(), pass_array),
-                                pitch_division_->getZone(zone_id), passing_config_);
-            };
+#pragma omp single
+        {
+            for (ZoneEnum zone_id : pitch_division_->getAllZoneIds())
+            {
+                // The objective function we minimize in gradient descent to improve each
+                // pass that we're optimizing
+                const auto objective_function =
+                    [this, &world, zone_id](
+                        const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
+                        return ratePass(
+                            world,
+                            Pass::fromPassArray(world.ball().position(), pass_array),
+                            pitch_division_->getZone(zone_id), passing_config_);
+                    };
 
-        auto pass_array = optimizer_.maximize(
-            objective_function, generated_passes.at(zone_id).pass.toPassArray(),
-            passing_config_->getNumberOfGradientDescentStepsPerIter()->value());
+                auto pass_array = generated_passes.at(zone_id).pass.toPassArray();
 
-        auto new_pass = Pass::fromPassArray(world.ball().position(), pass_array);
-        auto score =
-            ratePass(world, new_pass, pitch_division_->getZone(zone_id), passing_config_);
+#pragma omp task
+                {
+                    pass_array = optimizer_.maximize(
+                        objective_function, pass_array,
+                        passing_config_->getNumberOfGradientDescentStepsPerIter()
+                            ->value());
+                }
 
-        optimized_passes.emplace(zone_id, PassWithRating{new_pass, score});
+                auto new_pass = Pass::fromPassArray(world.ball().position(), pass_array);
+                auto score = ratePass(world, new_pass, pitch_division_->getZone(zone_id),
+                                      passing_config_);
+
+                optimized_passes.emplace(zone_id, PassWithRating{new_pass, score});
+            }
+        }
     }
+
 
     return optimized_passes;
 }
