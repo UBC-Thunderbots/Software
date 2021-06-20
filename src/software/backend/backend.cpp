@@ -5,6 +5,7 @@
 
 
 Backend::Backend()
+    // TODO (#2167): is there better way to remove warnings
     : FirstInFirstOutThreadedObserver<World>(Observer<World>::DEFAULT_BUFFER_SIZE, false)
 {
 }

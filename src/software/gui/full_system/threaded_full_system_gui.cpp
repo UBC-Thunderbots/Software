@@ -8,9 +8,11 @@
 
 ThreadedFullSystemGUI::ThreadedFullSystemGUI(
     std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config)
+    // TODO (#2167): is there better way to remove warnings
     : FirstInFirstOutThreadedObserver<World>(Observer<World>::DEFAULT_BUFFER_SIZE, false),
       FirstInFirstOutThreadedObserver<AIDrawFunction>(),
       FirstInFirstOutThreadedObserver<PlayInfo>(),
+      // TODO (#2167): is there better way to remove warnings
       FirstInFirstOutThreadedObserver<SensorProto>(SENSOR_MSG_BUFFER_SIZE, false),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       world_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<WorldDrawFunction>>(
@@ -20,6 +22,7 @@ ThreadedFullSystemGUI::ThreadedFullSystemGUI(
       play_info_buffer(
           std::make_shared<ThreadSafeBuffer<PlayInfo>>(PLAY_INFO_BUFFER_SIZE, false)),
       sensor_msg_buffer(
+          // TODO (#2167): is there better way to remove warnings
           std::make_shared<ThreadSafeBuffer<SensorProto>>(SENSOR_MSG_BUFFER_SIZE, false)),
       view_area_buffer(
           std::make_shared<ThreadSafeBuffer<Rectangle>>(VIEW_AREA_BUFFER_SIZE, false)),
