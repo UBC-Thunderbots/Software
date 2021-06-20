@@ -9,8 +9,6 @@
  * used for constraining navigation
  */
 MAKE_ENUM(MotionConstraint,
-          // Avoid collision with enemy robots above a certain speed
-          ENEMY_ROBOTS_COLLISION,
           // The box around the friendly goal
           FRIENDLY_DEFENSE_AREA,
           // The box around the enemy goal
