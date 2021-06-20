@@ -33,7 +33,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         play_config->getRobotNavigationObstacleConfig());
 
     // Init FreeKickShadower tactics (these robots will both block the enemy robot taking
-    // a free kick (at most we will have 2
+    // a free kick, at most we will have 2)
     auto shadow_free_kicker_1 = std::make_shared<ShadowFreekickerTactic>(
         ShadowFreekickerTactic::LEFT, world.enemyTeam(), world.ball(), world.field(),
         true);
@@ -62,9 +62,26 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         // Add Freekick shadower tactics
         tactics_to_run[0].emplace_back(shadow_free_kicker_1);
         tactics_to_run[0].emplace_back(shadow_free_kicker_2);
-        // Add Crease defender tactic
-        crease_defender_tactic->updateControlParams(world.ball().position(),
-                                                    CreaseDefenderAlignment::CENTRE);
+        // Add Crease defender tactic on side of open enemy threats
+        if (enemy_threats.size() >= 4)
+        {
+            if (enemy_threats.at(3).robot.position().y() > 0)
+            {
+                crease_defender_tactic->updateControlParams(
+                    world.ball().position(), CreaseDefenderAlignment::LEFT);
+            }
+            else
+            {
+                crease_defender_tactic->updateControlParams(
+                    world.ball().position(), CreaseDefenderAlignment::RIGHT);
+            }
+        }
+        else
+        {
+            crease_defender_tactic->updateControlParams(world.ball().position(),
+                                                        CreaseDefenderAlignment::CENTRE);
+        }
+
         tactics_to_run[0].emplace_back(crease_defender_tactic);
 
 
