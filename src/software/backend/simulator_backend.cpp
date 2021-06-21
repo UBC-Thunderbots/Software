@@ -62,25 +62,21 @@ void SimulatorBackend::receiveRobotLogs(TbotsProto::RobotLog log)
 void SimulatorBackend::joinMulticastChannel(int channel, const std::string& interface)
 {
     vision_output.reset(new ThreadedProtoUdpSender<TbotsProto::Vision>(
-        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface, VISION_PORT,
-        true));
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]), VISION_PORT, true));
 
     primitive_output.reset(new ThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(
-        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface,
-        PRIMITIVE_PORT, true));
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]), PRIMITIVE_PORT, true));
 
     robot_status_input.reset(new ThreadedProtoUdpListener<TbotsProto::RobotStatus>(
-        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface,
-        ROBOT_STATUS_PORT, boost::bind(&Backend::receiveRobotStatus, this, _1), true));
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]), ROBOT_STATUS_PORT,
+        boost::bind(&Backend::receiveRobotStatus, this, _1), true));
 
     robot_log_input.reset(new ThreadedProtoUdpListener<TbotsProto::RobotLog>(
-        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface,
-        ROBOT_LOGS_PORT, boost::bind(&SimulatorBackend::receiveRobotLogs, this, _1),
-        true));
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]), ROBOT_LOGS_PORT,
+        boost::bind(&SimulatorBackend::receiveRobotLogs, this, _1), true));
 
     defending_side_output.reset(new ThreadedProtoUdpSender<DefendingSideProto>(
-        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface,
-        DEFENDING_SIDE_PORT, true));
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]), DEFENDING_SIDE_PORT, true));
 }
 
 // Register this backend in the genericFactory

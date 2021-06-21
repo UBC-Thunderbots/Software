@@ -129,6 +129,7 @@ cc_library(
         "//shared:constants",
         "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
+        "//software/ai/evaluation:find_open_areas",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",

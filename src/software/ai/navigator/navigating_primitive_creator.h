@@ -85,12 +85,14 @@ class NavigatingPrimitiveCreator : public NavigatingIntentVisitor
      * @param final_speed The final speed
      * @param path path to make primitive for
      * @param enemy_robot_obstacles list of enemy robot obstacles to watch out for
+     * @param robot_constants The robot constants
      *
      * @return the final destination and speed
      */
     std::pair<Point, double> calculateDestinationAndFinalSpeed(
         double final_speed, Path path,
-        const std::vector<ObstaclePtr> &enemy_robot_obstacles) const;
+        const std::vector<ObstaclePtr> &enemy_robot_obstacles,
+        const RobotConstants_t &robot_constants) const;
 
     std::shared_ptr<const NavigatorConfig> config;
     std::optional<TbotsProto::Primitive> current_primitive;

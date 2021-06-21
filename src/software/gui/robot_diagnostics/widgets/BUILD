@@ -42,6 +42,7 @@ qt_cc_library(
     hdr = "dribbler.h",
     deps = [
         "//shared:constants",
+        "//shared:robot_constants",
         "//software/gui/generic_widgets/slider",
         "//software/gui/robot_diagnostics/ui:main_widget",
         "@qt//:qt_widgets",
@@ -67,6 +68,7 @@ qt_cc_library(
     deps = [
         ":decimal_progress_bar",
         "//shared:constants",
+        "//shared:robot_constants",
         "//software/gui/robot_diagnostics/ui:main_widget",
         "//software/proto:sensor_msg_cc_proto",
         "@qt//:qt_widgets",
@@ -89,6 +91,7 @@ qt_cc_library(
     hdr = "robot_selection.h",
     deps = [
         "//shared:constants",
+        "//shared:robot_constants",
         "//software/gui/robot_diagnostics/ui:main_widget",
         "//software/logger",
         "@qt//:qt_widgets",

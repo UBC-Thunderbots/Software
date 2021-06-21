@@ -14,10 +14,7 @@ class FirmwareRobotTest : public testing::Test
    protected:
     virtual void SetUp(void)
     {
-        RobotConstants_t robot_constants = {.mass              = 1.1f,
-                                            .moment_of_inertia = 1.2f,
-                                            .robot_radius      = 1.3f,
-                                            .jerk_limit        = 1.4f};
+        RobotConstants_t robot_constants = TestUtil::createMockRobotConstants();
 
         controller_state.last_applied_acceleration_x       = 2.33f;
         controller_state.last_applied_acceleration_y       = 1.22f;
@@ -158,10 +155,9 @@ TEST_F(FirmwareRobotTest, getRobotConstants)
 {
     RobotConstants_t constants = app_firmware_robot_getRobotConstants(firmware_robot);
 
-    EXPECT_NEAR(1.1, constants.mass, 1e-5);
-    EXPECT_NEAR(1.2, constants.moment_of_inertia, 1e-5);
-    EXPECT_NEAR(1.3, constants.robot_radius, 1e-5);
-    EXPECT_NEAR(1.4, constants.jerk_limit, 1e-5);
+    EXPECT_NEAR(1.1, constants.mass_kg, 1e-5);
+    EXPECT_NEAR(1.2, constants.moment_of_inertia_kg_m_2, 1e-5);
+    EXPECT_NEAR(1.4, constants.jerk_limit_kg_m_per_s_3, 1e-5);
 }
 
 TEST_F(FirmwareRobotTest, getAndModifyControllerState)
