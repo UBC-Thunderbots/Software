@@ -72,6 +72,8 @@ namespace
         std::set<MotionConstraint>({MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
                                     MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
+    auto ball_placement_us_motion_constraints = std::set<MotionConstraint>({});
+
     auto kickoff_motion_constraints = std::set<MotionConstraint>(
         {MotionConstraint::FRIENDLY_DEFENSE_AREA, MotionConstraint::CENTER_CIRCLE,
          MotionConstraint::HALF_METER_AROUND_BALL, MotionConstraint::ENEMY_HALF});
@@ -164,6 +166,16 @@ TEST_P(CheckMotionConstraints, CycleGameStartOrUsGameStatesTest)
     game_state.updateRefereeCommand(RefereeCommand::INDIRECT_FREE_US);
     EXPECT_EQ(correct_motion_constraints,
               buildMotionConstraintSet(game_state, *GetParam().first));
+}
+
+TEST_P(CheckMotionConstraints, CycleBallPlacementUsGameStatesTest)
+{
+    correct_motion_constraints = ball_placement_us_motion_constraints;
+
+    for (MotionConstraint c : GetParam().second)
+    {
+        correct_motion_constraints.erase(c);
+    }
 
     game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_US);
     EXPECT_EQ(correct_motion_constraints,
