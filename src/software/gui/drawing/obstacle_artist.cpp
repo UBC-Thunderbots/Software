@@ -7,10 +7,10 @@ ObstacleArtist::ObstacleArtist(QGraphicsScene* scene, const QPen& pen)
 
 void ObstacleArtist::visit(const GeomObstacle<Circle>& geom_obstacle)
 {
-    // drawCircle(scene_, geom_obstacle.getGeom(), pen_);
+    drawCircle(scene_, geom_obstacle.getGeom(), pen_);
 }
 
 void ObstacleArtist::visit(const GeomObstacle<Polygon>& geom_obstacle)
 {
-    // drawPolygon(scene_, geom_obstacle.getGeom(), pen_);
+    drawPolygon(scene_, geom_obstacle.getGeom(), pen_);
 }
