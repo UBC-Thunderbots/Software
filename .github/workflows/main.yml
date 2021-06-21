@@ -165,10 +165,9 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v2
-
-      - name: Checkout submodules
-        run: git submodule update --init --recursive
+      - uses: actions/checkout@v1
+        with:
+          submodules: true
         
       - name: Environment Setup
         run: |
