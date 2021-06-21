@@ -25,8 +25,6 @@ class ReceiverTactic : public Tactic
 
     ReceiverTactic() = delete;
 
-    void updateWorldParams(const World& world) override;
-
     /**
      * Updates the control parameters for this ReceiverTactic.
      *

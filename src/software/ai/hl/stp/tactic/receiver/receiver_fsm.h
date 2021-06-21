@@ -38,6 +38,12 @@ struct ReceiverFSM
     // enemy goal with
     static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(90);
 
+    // The minimum angle between a ball's trajectory and the ball-receiver_point vector
+    // for which we can consider a pass to be stray
+    static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(90);
+
+    // the minimum speed required for a pass to be considered stray
+    static constexpr double MIN_STRAY_PASS_SPEED = 0.3;
     /**
      * Given a shot and the ball, figures out the angle the robot should be facing
      * to perform a one-touch shot.
@@ -294,10 +300,27 @@ struct ReceiverFSM
          * @return true if the ball is near a robots mouth
          */
         const auto pass_finished = [](auto event) {
+            auto ball_position = event.common.world.ball().position();
+
+            Vector ball_receiver_point_vector(
+                event.control_params.pass->receiverPoint().x() - ball_position.x(),
+                event.control_params.pass->receiverPoint().y() - ball_position.y());
+
+            auto orientation_difference =
+                event.common.world.ball().velocity().orientation() -
+                ball_receiver_point_vector.orientation();
+
+            // if pass has strayed far from its intended destination (ex it was deflected)
+            // we consider the pass finished
+            bool stray_pass =
+                event.common.world.ball().velocity().length() > MIN_STRAY_PASS_SPEED &&
+                orientation_difference > MIN_STRAY_PASS_ANGLE;
+
             // We tolerate imperfect passes that hit the edges of the robot,
             // so that we can quickly transition out and grab the ball.
-            return event.common.robot.isNearDribbler(event.common.world.ball().position(),
-                                                     ROBOT_MAX_RADIUS_METERS);
+            bool near_dribbler = event.common.robot.isNearDribbler(
+                event.common.world.ball().position(), ROBOT_MAX_RADIUS_METERS);
+            return stray_pass || near_dribbler;
         };
 
         return make_transition_table(

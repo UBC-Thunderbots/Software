@@ -17,8 +17,6 @@ ReceiverTactic::ReceiverTactic(const Pass pass)
 {
 }
 
-void ReceiverTactic::updateWorldParams(const World& world) {}
-
 void ReceiverTactic::updateControlParams(const Pass& updated_pass, bool disable_one_touch)
 {
     // Update the control parameters stored by this Tactic
