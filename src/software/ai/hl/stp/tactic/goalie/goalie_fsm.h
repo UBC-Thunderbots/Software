@@ -72,17 +72,32 @@ struct GoalieFSM
             // balls
             auto block_cone_radius = goalie_tactic_config->getBlockConeRadius()->value();
 
+            //how much we should deflate the friendly box to restrain the box
+            auto deflation = goalie_tactic_config->getDefenseAreaDeflation()->value();
+
             // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
             // either side
             Point goalie_pos = calculateBlockCone(
                 field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(), ball.position(),
                 block_cone_radius * block_cone_angle.toRadians());
 
+            auto restrain_rect_neg_x = field.friendlyDefenseArea().negXNegYCorner().x();
+            auto restrain_rect_pos_x = field.friendlyDefenseArea().posXPosYCorner().x() - (deflation);
+
+            //since deflation in the y coordinate is happening from both sides, we divide by 2
+            auto restrain_rect_neg_y = field.friendlyDefenseArea().negXNegYCorner().y() + (deflation * 1/2);
+            auto restrain_rect_pos_y = field.friendlyDefenseArea().posXPosYCorner().y() - (deflation * 1/2);
+
+
+            Rectangle restrain_rectangle(Point(restrain_rect_neg_x, restrain_rect_neg_y), Point(restrain_rect_pos_x, restrain_rect_pos_y));
+
+
             // restrain the goalie in the defense area, if the goalie cannot be
             // restrained or if there is no proper intersection, then we safely default to
             // center of the goal
             clamped_goalie_pos =
-                restrainGoalieInRectangle(field, goalie_pos, field.friendlyDefenseArea());
+                restrainGoalieInRectangle(field, goalie_pos, restrain_rectangle);
+
         }
 
         // if the goalie could not be restrained in the defense area,
