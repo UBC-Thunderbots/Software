@@ -5,7 +5,7 @@
 
 void robotHaltWithDelay(std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
 {
-    while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
+    while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
     {
         // stop test from passing immediately
     }

@@ -74,9 +74,9 @@ TEST_F(EnemyBallPlacementPlayTest, test_ball_placement_diagonal)
     setGameState(game_state);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            robotHaltWithDelay(world_ptr,yield);
-        }};
+            [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+                robotHaltWithDelay(world_ptr,yield);
+            }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
