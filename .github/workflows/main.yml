@@ -160,8 +160,8 @@ jobs:
             //shared/parameter/...
             
             
-  build-full-system-and-ssl-binaries:
-    name: Build and upload binaries
+  build-full-system:
+    name: Build and upload full_system
     runs-on: ubuntu-18.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
@@ -171,15 +171,15 @@ jobs:
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
           
-      - name: Build full_system and ssl_simulation_main
+      - name: Build full_system
         run: |
           cd src
           bazel build //software:full_system
           
-      - name: Upload binaries
+      - name: Upload full_system binary
         uses: actions/upload-artifact@v2
         with:
-          name: binaries
+          name: full_system
           path: |
             src/bazel-out/k8-fastbuild/bin/software/full_system
 
