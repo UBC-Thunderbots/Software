@@ -33,6 +33,17 @@ void SimulationContactListener::BeginContact(b2Contact *contact)
                 contact_callback(robot, ball);
             }
         }
+        if (auto ball_field_pair = isBallFieldWallContact(user_data_a, user_data_b))
+        {
+            // If the ball hits a wall it's out of bounds, so we stop it to make it easier
+            // to retrieve for ball placement (otherwise it will bounce around the field)
+            PhysicsBall *ball = ball_field_pair->first;
+            // Apply an impulse to nearly stop the ball. It's preferable if it bounces
+            // away from a wall very slightly for realism, and it should make it easier to
+            // retrieve for ball placement
+            ball->applyImpulse(-ball->momentum().normalize(
+                ball->momentum().length() * BALL_FIELD_WALL_COLLISION_DAMPING));
+        }
     }
 }
 
@@ -214,4 +225,46 @@ PhysicsBall *SimulationContactListener::isBallContact(PhysicsObjectUserData *use
     }
 
     return ball;
+}
+
+
+std::optional<std::pair<PhysicsBall *, PhysicsField *>>
+SimulationContactListener::isBallFieldWallContact(PhysicsObjectUserData *user_data_a,
+                                                  PhysicsObjectUserData *user_data_b)
+{
+    if (!user_data_a || !user_data_b)
+    {
+        return std::nullopt;
+    }
+
+    // NOTE: Box2D intelligently reports only one contact when 2 objects collide
+    // (ie. Does not report a contact for ObjectA touching ObjectB, and another
+    // contact for ObjectB touching ObjectA), which is why we do not need to worry
+    // about only detecting one contact per pair of colliding objects.
+    PhysicsBall *ball = nullptr;
+    if (user_data_a->type == PhysicsObjectType::BALL)
+    {
+        ball = static_cast<PhysicsBall *>(user_data_a->physics_object);
+    }
+    if (user_data_b->type == PhysicsObjectType::BALL)
+    {
+        ball = static_cast<PhysicsBall *>(user_data_b->physics_object);
+    }
+
+    PhysicsField *field = nullptr;
+    if (user_data_a->type == PhysicsObjectType::FIELD_WALL)
+    {
+        field = static_cast<PhysicsField *>(user_data_a->physics_object);
+    }
+    if (user_data_b->type == PhysicsObjectType::FIELD_WALL)
+    {
+        field = static_cast<PhysicsField *>(user_data_b->physics_object);
+    }
+
+    if (ball && field)
+    {
+        return std::make_pair(ball, field);
+    }
+
+    return std::nullopt;
 }

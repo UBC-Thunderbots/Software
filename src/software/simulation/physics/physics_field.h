@@ -94,8 +94,9 @@ class PhysicsField
     b2ChainShape friendly_goal_shape;
     b2FixtureDef friendly_goal_fixture_def;
 
-    // We set the field restitution to 0 so that behaviour of bouncing off walls is
-    // completely determined by the ball's restitution
+    // These values are somewhat arbitrary since the restitution and friction of the ball
+    // also affects any collision behavior. We implement custom collision logic in the
+    // contact listener to handle ball-field collisions
     static constexpr float FIELD_WALL_RESTITUTION = 0.0f;
     static constexpr float FIELD_WALL_FRICTION    = 0.0f;
 
