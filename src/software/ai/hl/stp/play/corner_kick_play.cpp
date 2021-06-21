@@ -68,7 +68,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
 
     do
     {
-        attacker->updateControlParams(pass);
+        attacker->updateControlParams(pass, true);
         receiver->updateControlParams(pass);
 
         if (!attacker->done())
