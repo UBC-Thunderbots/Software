@@ -8,6 +8,7 @@ cc_library(
         "//shared:constants",
         "//software/geom:point",
         "//software/geom:vector",
+        "//software/geom/algorithms",
         "//software/physics",
         "//software/time:timestamp",
         "//software/world:ball_state",
