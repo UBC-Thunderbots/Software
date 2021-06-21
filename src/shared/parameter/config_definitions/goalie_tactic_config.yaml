@@ -28,4 +28,4 @@
     max: 1
     value: 0.8
     description: >-
-      How much to deflate the defense area by, larger value means closer to the net
+      The factor by which to deflate the defense area by, larger value means closer to the net
