@@ -4,7 +4,7 @@
 
 #include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_at_point_validation.h"
-#include "software/simulated_tests/terminating_validation_functions/robot_halt_with_delay_validation.h"
+#include "software/simulated_tests/terminating_validation_functions/robot_halt_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
@@ -35,16 +35,13 @@ TEST_F(EnemyBallPlacementPlayTest, test_ball_placement_center)
     game_state.setBallPlacementPoint(ball_placement_point);
     setGameState(game_state);
 
-//    std::vector<ValidationFunction> terminating_validation_functions = {
-//        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-//            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
-//            {
-//                yield("Timestamp not at 9.5s");
-//            }
-//        }};
     std::vector<ValidationFunction> terminating_validation_functions = {
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                robotHaltWithDelay(world_ptr,yield);
+                while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
+                {
+                    yield("");
+                }
+                robotHalt(world_ptr,yield);
             }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
@@ -75,7 +72,11 @@ TEST_F(EnemyBallPlacementPlayTest, test_ball_placement_diagonal)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                robotHaltWithDelay(world_ptr,yield);
+                while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
+                {
+                    yield("");
+                }
+                robotHalt(world_ptr,yield);
             }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
@@ -135,18 +136,15 @@ TEST_F(EnemyBallPlacementPlayTest, test_no_placement)
     game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
     setGameState(game_state);
 
-//    std::vector<ValidationFunction> terminating_validation_functions = {
-//        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-//            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(9.5))
-//            {
-//                yield("Timestamp not at 9.5s");
-//            }
-//        }};
-
     std::vector<ValidationFunction> terminating_validation_functions = {
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                robotHaltWithDelay(world_ptr,yield);
+                while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
+                {
+                    yield("");
+                }
+                robotHalt(world_ptr,yield);
             }};
+
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
