@@ -155,14 +155,14 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
             // Wait for all robots to come to a halt
             robotHalt(world_ptr, yield);
             // Attacker in front of enemy with the ball
-            Rectangle attacker_rect(Point(-3.5, 1), Point(-2.3, 0));
-            robotInPolygon(1, attacker_rect, world_ptr, yield);
+//            Rectangle attacker_rect(Point(-3.5, 1), Point(-2.3, 0));
+//            robotInPolygon(4, attacker_rect, world_ptr, yield);
 
             // Two friendly robots in position to shadow enemy robots. One is on the enemy
             // with the ball and the other is on the next highest threat
-            Rectangle robot_four_shadowing_rect(Point(-2.75, 0.75), Point(-2.25, 0.25));
+            Rectangle robot_four_shadowing_rect(Point(-3.10, 1), Point(-2.25, 0.25));
             Rectangle robot_five_shadowing_rect(Point(-2.75, -0.5), Point(-2.25, -1));
-            robotInPolygon(4, robot_four_shadowing_rect, world_ptr, yield);
+            robotInPolygon(1, robot_four_shadowing_rect, world_ptr, yield);
             robotInPolygon(5, robot_five_shadowing_rect, world_ptr, yield);
 
             // Two friendly crease defenders should be close to the goalie
