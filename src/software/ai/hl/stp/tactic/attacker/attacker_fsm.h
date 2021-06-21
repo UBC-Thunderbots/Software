@@ -7,6 +7,7 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/ai/passing/pass.h"
+#include "software/geom/algorithms/intersects.h"
 
 struct AttackerFSM
 {
@@ -42,18 +43,17 @@ struct AttackerFSM
         const auto pivot_kick = [](auto event,
                                    back::process<PivotKickFSM::Update> processEvent) {
             auto ball_position = event.common.world.ball().position();
-            Point chip_target  = event.common.world.field().enemyGoalCenter();
-            if (event.control_params.chip_target)
-            {
-                chip_target = event.control_params.chip_target.value();
-            }
-            // default to chipping the ball away
+            // Default to do nothing, fix later TODO (#2167)
+            //
+            //  Point chip_target  = event.common.world.field().enemyGoalCenter();
+            //  if (event.control_params.chip_target)
+            //  {
+            // chip_target = event.control_params.chip_target.value();
+            //  }
             PivotKickFSM::ControlParams control_params{
-                .kick_origin    = ball_position,
-                .kick_direction = (chip_target - ball_position).orientation(),
-                .auto_chip_or_kick =
-                    AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
-                                   (chip_target - ball_position).length()}};
+                .kick_origin       = event.common.robot.position(),
+                .kick_direction    = event.common.robot.orientation(),
+                .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}};
 
             if (event.control_params.shot)
             {
@@ -69,12 +69,32 @@ struct AttackerFSM
             }
             else if (event.control_params.pass)
             {
+                auto pass_segment = Segment(event.control_params.pass->passerPoint(),
+                                            event.control_params.pass->receiverPoint());
+
+                bool should_chip = false;
+
+                for (const Robot& enemy : event.common.world.enemyTeam().getAllRobots())
+                {
+                    if (intersects(Circle(enemy.position(), ROBOT_MAX_RADIUS_METERS * 2),
+                                   pass_segment))
+                    {
+                        should_chip = true;
+                    }
+                }
+
                 control_params = PivotKickFSM::ControlParams{
                     .kick_origin    = event.control_params.pass->passerPoint(),
                     .kick_direction = event.control_params.pass->passerOrientation(),
                     .auto_chip_or_kick =
                         AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
                                        event.control_params.pass->speed()}};
+                if (should_chip)
+                {
+                    control_params.auto_chip_or_kick = AutoChipOrKick{
+                        AutoChipOrKickMode::AUTOCHIP,
+                        pass_segment.length() * CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO};
+                }
             }
             processEvent(PivotKickFSM::Update(control_params, event.common));
         };
@@ -109,7 +129,7 @@ struct AttackerFSM
                                               event.control_params.attacker_tactic_config
                                                   ->getEnemyAboutToStealBallRadius()
                                                   ->value());
-            for (const auto &enemy : event.common.world.enemyTeam().getAllRobots())
+            for (const auto& enemy : event.common.world.enemyTeam().getAllRobots())
             {
                 if (contains(about_to_steal_danger_zone, enemy.position()))
                 {

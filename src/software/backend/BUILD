@@ -104,7 +104,6 @@ cc_library(
 cc_library(
     name = "all_backends",
     deps = [
-        ":radio_backend",
         ":replay_backend",
         ":simulator_backend",
         ":wifi_backend",

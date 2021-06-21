@@ -95,6 +95,26 @@ static const float ROBOT_MAX_BATTERY_VOLTAGE = 16.0;
 
 static const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;
 
+
+// TODO (#2167) we should properly integrate chip passing into our passing
+// stack and get rid of these constants which work but are ultimately "hacks".
+//
+// These constants are a direct side-effect of our chipping abstraction taking
+// a target-distance rather than a chip speed (which is what our passing stack needs).
+//
+// The amount of distance we need to chip at ROBOT_CHIP_ANGLE_DEGREES to
+// clear robot within a robot radius away from the chipping robot.
+//
+// This number can probably be reduced after careful field testing.
+static const double ROBOT_MIN_CHIP_CLEAR_DISTANCE_METERS = 0.4;
+
+// The chip_target distance should be scaled by this value so that
+// the ball can land and continue to roll to the target_distance
+static const double CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO = 0.75;
+
+// The linear speed of the ball after it lands proportional to the distance
+static const double CHIP_PASS_TARGET_DISTANCE_TO_SPEED_RATIO = 0.25;
+
 // How many robots are allowed in each division
 static const unsigned DIV_A_NUM_ROBOTS = 11;
 static const unsigned DIV_B_NUM_ROBOTS = 6;
