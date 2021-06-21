@@ -19,9 +19,10 @@ class ProtoUdpClient
      *  example IPv6: ff02::c3d0:42d2:bb8%wlp4s0 (the interface is specified after %)
      * @param port The port to send SendProtoT data to
      * @param multicast If true, joins the multicast group of given ip_address
+     * @param enable_timeout If true, sets a timeout value of 100ms for receiving proto
      */
-    ProtoUdpClient(boost::asio::io_service& io_service, const std::string& ip_address,
-                   unsigned short port, bool multicast);
+    ProtoUdpClient(const std::string& ip_address, unsigned short port, bool multicast,
+                   bool enable_timeout = false);
 
     virtual ~ProtoUdpClient();
 
@@ -55,6 +56,8 @@ class ProtoUdpClient
     ReceiveProtoT request(const SendProtoT& message);
 
    private:
+    boost::asio::io_service io_service;
+
     // A UDP socket to send data over
     boost::asio::ip::udp::socket socket_;
 
@@ -66,6 +69,10 @@ class ProtoUdpClient
 
     static constexpr unsigned int MAX_BUFFER_LENGTH = 9000;
     std::array<char, MAX_BUFFER_LENGTH> raw_received_data_;
+
+    boost::asio::io_service::work work;
+    bool enable_timeout;
+    std::thread io_service_thread;
 };
 
 #include "software/networking/proto_udp_client.tpp"
