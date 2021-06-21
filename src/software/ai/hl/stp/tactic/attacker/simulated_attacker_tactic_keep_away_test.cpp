@@ -219,9 +219,9 @@ INSTANTIATE_TEST_CASE_P(
             // the state of the ball
             BallState(Point(0., 0.), Vector(0, 0)),
             // the states of the enemy robots
-            TestUtil::createStationaryRobotStatesWithId({Point(-0.5, 0.5)}),
+            TestUtil::createStationaryRobotStatesWithId({Point(-0.3, 0.8)}),
             // whether to ignore the intercept and proximity risk checks in the test
-            false),
+            true),
         std::make_tuple(
             // the best pass so far to pass into the AttackerTactic
             Pass(Point(FIELD_TOP_LEFT.x() + 0.05, FIELD_TOP_LEFT.y() - 0.05), Point(0, 0),
@@ -238,4 +238,5 @@ INSTANTIATE_TEST_CASE_P(
             // whether to ignore the intercept and proximity risk checks in the test
             // we ignore the score checks on this one because we need to make sure that we
             // stay in field bounds, even if leaving the field bounds improves the score
-            true)));
+            true))
+            );
