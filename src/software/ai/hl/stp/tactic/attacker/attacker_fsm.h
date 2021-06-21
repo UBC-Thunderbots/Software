@@ -72,8 +72,8 @@ struct AttackerFSM
             }
             else if (event.control_params.pass_committed)
             {
-                auto pass_segment = Segment(event.control_params.pass->passerPoint(),
-                                            event.control_params.pass->receiverPoint());
+                auto pass_segment = Segment(event.control_params.best_pass_so_far->passerPoint(),
+                                            event.control_params.best_pass_so_far->receiverPoint());
 
                 bool should_chip = false;
 
@@ -93,7 +93,7 @@ struct AttackerFSM
                         event.control_params.best_pass_so_far->passerOrientation(),
                     .auto_chip_or_kick =
                         AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                                       event.control_params.pass->speed()}};
+                                       event.control_params.best_pass_so_far->speed()}};
                 if (should_chip)
                 {
                     control_params.auto_chip_or_kick = AutoChipOrKick{
