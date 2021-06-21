@@ -62,7 +62,7 @@ std::set<MotionConstraint> buildMotionConstraintSetFromGameState(
     }
     else if (game_state.isOurBallPlacement())
     {
-        motion_constraints.erase(MotionConstraint::FRIENDLY_DEFENSE_AREA);
+        motion_constraints = std::set<MotionConstraint>();
     }
     else
     {

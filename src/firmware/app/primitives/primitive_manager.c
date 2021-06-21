@@ -38,7 +38,8 @@ struct PrimitiveManager
     // A pointer to the state of the current primitive
     void *current_primitive_state;
 
-    // Tracks how many ticks the current primitive has been executed
+    // Tracks how many ticks the current primitive has been executed since the primitive
+    // was started
     unsigned int current_primitive_num_ticks_executed;
 };
 

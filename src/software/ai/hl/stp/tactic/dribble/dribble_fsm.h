@@ -201,7 +201,7 @@ struct DribbleFSM
          */
         const auto have_possession = [](auto event) {
             return event.common.robot.isNearDribbler(
-                // avoid cases where ball is exactly on the edge fo the robot
+                // avoid cases where ball is exactly on the edge of the robot
                 event.common.world.ball().position(), 0.001);
         };
 
