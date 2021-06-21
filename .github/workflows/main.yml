@@ -166,8 +166,9 @@ jobs:
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
-        with:
-          submodules: recursive
+
+      - name: Checkout submodules
+        run: git submodule update --init --recursive
         
       - name: Environment Setup
         run: |
