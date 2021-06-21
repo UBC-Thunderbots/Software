@@ -60,8 +60,8 @@ int main(int argc, char **argv)
             standalone_simulator = std::make_shared<StandaloneSimulator>(
                 mutable_thunderbots_config->getMutableStandaloneSimulatorConfig(),
                 mutable_thunderbots_config->getMutableSimulatorConfig(),
-                Field::createSSLDivisionBField(), create2015RobotConstants(),
-                create2015WheelConstants());
+                Field::createSSLDivisionBField(), create2021RobotConstants(),
+                create2021WheelConstants());
 
             standalone_simulator->setupInitialSimulationState(DIV_B_NUM_ROBOTS);
         }

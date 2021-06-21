@@ -22,7 +22,7 @@ from software.python_bindings import world, passing, pass_generator
 import numpy as np
 
 wrapper_proto_log = ProtoLog(
-    "/tmp/log/20062021_105643/SensorFusion_SSL_WrapperPacket", SSL_WrapperPacket,
+    "test_data/SensorFusion_SSL_WrapperPacket", SSL_WrapperPacket,
 )
 # -
 
@@ -102,8 +102,7 @@ def plot_ssl_wrapper_at_idx(idx):
 
     pass_dict = {
         "passer_point": the_world.ball().position(),
-        "pass_speed": 6.0,
-        "start_time": 1.0,
+        "pass_speed": 4.0,
     }
 
     def ratePassCost(x, y):

@@ -77,15 +77,6 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
         passing_config_->getMinPassSpeedMPerS()->value(),
         passing_config_->getMaxPassSpeedMPerS()->value());
 
-    double curr_time = world.getMostRecentTimestamp().toSeconds();
-    double min_start_time_offset =
-        passing_config_->getMinTimeOffsetForPassSeconds()->value();
-    double max_start_time_offset =
-        passing_config_->getMaxTimeOffsetForPassSeconds()->value();
-
-    std::uniform_real_distribution start_time_distribution(
-        curr_time + min_start_time_offset, curr_time + max_start_time_offset);
-
     ZonePassMap<ZoneEnum> passes;
 
     // Randomly sample a pass in each zone
@@ -96,13 +87,10 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::samplePasses(const World& world)
         std::uniform_real_distribution x_distribution(zone.xMin(), zone.xMax());
         std::uniform_real_distribution y_distribution(zone.yMin(), zone.yMax());
 
-        Timestamp start_time_offset =
-            Timestamp::fromSeconds(start_time_distribution(random_num_gen_));
-
         auto pass =
             Pass(world.ball().position(),
                  Point(x_distribution(random_num_gen_), y_distribution(random_num_gen_)),
-                 speed_distribution(random_num_gen_), start_time_offset);
+                 speed_distribution(random_num_gen_));
 
         passes.emplace(
             zone_id,

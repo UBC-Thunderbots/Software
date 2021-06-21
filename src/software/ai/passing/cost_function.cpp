@@ -40,18 +40,6 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double shoot_pass_rating =
         ratePassShootScore(world.field(), world.enemyTeam(), pass, passing_config);
 
-    // Place strict limits on pass start time
-    double min_pass_time_offset =
-        passing_config->getMinTimeOffsetForPassSeconds()->value();
-    double max_pass_time_offset =
-        passing_config->getMaxTimeOffsetForPassSeconds()->value();
-
-    double pass_time_offset_quality =
-        sigmoid(pass.startTime().toSeconds(),
-                min_pass_time_offset + world.getMostRecentTimestamp().toSeconds(), 0.5) *
-        (1 - sigmoid(pass.startTime().toSeconds(),
-                     max_pass_time_offset + world.ball().timestamp().toSeconds(), 0.5));
-
     // Place strict limits on the ball speed
     double min_pass_speed     = passing_config->getMinPassSpeedMPerS()->value();
     double max_pass_speed     = passing_config->getMaxPassSpeedMPerS()->value();
@@ -62,7 +50,7 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
                                   world.field().totalXLength();
 
     return static_pass_quality * kick_pass_rating * chip_pass_rating * pass_up_field_rating * 
-        shoot_pass_rating * pass_speed_quality * in_region_quality * pass_time_offset_quality;
+        shoot_pass_rating * pass_speed_quality * in_region_quality;
 }
 
 double rateZone(const World& world, const Rectangle& zone, const Point& receive_position,
@@ -84,10 +72,7 @@ double rateZone(const World& world, const Rectangle& zone, const Point& receive_
         for (double y = zone.yMin(); y < zone.yMax(); y += y_step)
         {
             Pass pass =
-                Pass(Point(x, y), receive_position, BALL_MAX_SPEED_METERS_PER_SECOND,
-                     world.getMostRecentTimestamp() +
-                         Duration::fromSeconds(
-                             passing_config->getEnemyReactionTime()->value()));
+                Pass(Point(x, y), receive_position, BALL_MAX_SPEED_METERS_PER_SECOND);
 
             zone_rating += ratePassShootScore(world.field(), world.enemyTeam(), pass,
                                               passing_config);
@@ -238,8 +223,8 @@ double rateChipPassEnemyRisk(const Team& enemy_team, const Pass& pass,
     // and evaluate the likely hood of an enemy intercepting that pass.
     double enemy_risk_near_receiver_point = calculateKickInterceptRisk(
             enemy_team, Pass(chip_landing_point, pass.receiverPoint(),
-                pass_vector.length() * CHIP_PASS_TARGET_DISTANCE_TO_SPEED_RATIO,
-                pass.startTime()), enemy_reaction_time);
+                pass_vector.length() * CHIP_PASS_TARGET_DISTANCE_TO_SPEED_RATIO
+                ), enemy_reaction_time);
 
     return 1.0 - enemy_risk_near_passer_point * enemy_risk_near_receiver_point;
 }
@@ -339,7 +324,7 @@ double rateKickPassFriendlyCapability(Team friendly_team, const Pass& pass,
     // We need at least one robot to pass to and the pass should have a speed,
     // and the past must be evaluated for now or the future, not in the past.
     //
-    if (pass.speed() == 0 || pass.startTime() < friendly_team.getMostRecentTimestamp())
+    if (pass.speed() == 0)
     {
         return 0;
     }

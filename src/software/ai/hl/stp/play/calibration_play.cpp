@@ -48,7 +48,6 @@ void CalibrationPlay::getNextTactics(TacticCoroutine::push_type &yield,
     const Point chip_start                    = Point(-4, 3);
     const Angle angle_to_face                 = Angle::fromDegrees(-45);
     const double max_chip_distance            = 10.0;
-    const double BALL_MIN_DISTANCE_OFF_GROUND = 0.05;
 
     for (double chip_distance = ROBOT_MIN_CHIP_CLEAR_DISTANCE_METERS;
          chip_distance < max_chip_distance; chip_distance += 0.5)
@@ -76,25 +75,8 @@ void CalibrationPlay::getNextTactics(TacticCoroutine::push_type &yield,
         LOG(DEBUG) << "Ball chipped with initial velocity: "
                    << world.ball().velocity().length();
 
-        while (world.ball().currentState().distanceFromGround() <
-               BALL_MIN_DISTANCE_OFF_GROUND)
-        {
-            yield({{chip_tactic}});
-        }
-
-        // wait for ball to land on the ground
-        while (world.ball().currentState().distanceFromGround() != 0.0)
-        {
-            yield({{chip_tactic}});
-        }
-
-        Duration hang_time = world.getMostRecentTimestamp() - start_time;
-
-        LOG(DEBUG) << "Ball hang time " << hang_time << " for chip dist "
-                   << chip_distance;
-
         // wait for ball to stop rolling
-        while (world.ball().velocity().length() != 0)
+        while (world.ball().velocity().length() <= 0.01)
         {
             yield({{chip_tactic}});
         }
