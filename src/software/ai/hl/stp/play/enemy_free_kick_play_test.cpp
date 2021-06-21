@@ -58,8 +58,8 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_play)
             // the goalie
             Point goalie_position = world_ptr->friendlyTeam().goalie()->position();
             Rectangle crease_defender_rect(
-                goalie_position,
-                Point(goalie_position.x() + 0.2, goalie_position.y() - 0.2));
+                    Point(goalie_position.x() - 0.5, goalie_position.y() - 0.5),
+                    Point(goalie_position.x() + 0.7, goalie_position.y() + 0.7));
             robotInPolygon(3, crease_defender_rect, world_ptr, yield);
         }};
 
@@ -118,8 +118,8 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_close_to_net)
             // goalie
             Point goalie_position = world_ptr->friendlyTeam().goalie()->position();
             Rectangle crease_defender_rect(
-                Point(goalie_position.x(), goalie_position.y() + 0.3),
-                Point(goalie_position.x() + 0.3, goalie_position.y()));
+                    Point(goalie_position.x() - 0.5, goalie_position.y() - 0.5),
+                    Point(goalie_position.x() + 0.7, goalie_position.y() + 0.7));
             robotInPolygon(2, crease_defender_rect, world_ptr, yield);
         }};
 
@@ -180,8 +180,8 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_chipper_robots_close_to_net)
             // goalie
             Point goalie_position = world_ptr->friendlyTeam().goalie()->position();
             Rectangle crease_defender_rect(
-                Point(goalie_position.x(), goalie_position.y() + 0.5),
-                Point(goalie_position.x() + 0.3, goalie_position.y()));
+                    Point(goalie_position.x() - 0.5, goalie_position.y() - 0.5),
+                    Point(goalie_position.x() + 0.7, goalie_position.y() + 0.7));
             robotInPolygon(2, crease_defender_rect, world_ptr, yield);
         }};
 
