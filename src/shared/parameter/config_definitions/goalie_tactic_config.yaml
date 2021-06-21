@@ -25,7 +25,7 @@
 - double:
     name: defense_area_deflation
     min: 0.1
-    max: 1
-    value: 0.8
+    max: 1.0
+    value: 0.5
     description: >-
-      The factor by which to deflate the defense area by, larger value means closer to the net
+      The amount by which to deflate the defense area by, larger value means closer to the net
