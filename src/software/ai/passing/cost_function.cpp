@@ -34,7 +34,7 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 
     double chip_pass_rating = friendly_chip_pass_rating * enemy_chip_pass_rating;
     double kick_pass_rating = friendly_kick_pass_rating * enemy_kick_pass_rating;
-    double pass_rating = std::max(chip_pass_rating, kick_pass_rating);
+    double pass_rating      = std::max(chip_pass_rating, kick_pass_rating);
 
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
 
@@ -50,8 +50,8 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double pass_up_field_rating = (zone.centre().x() + world.field().totalXLength() / 2) /
                                   world.field().totalXLength();
 
-    return static_pass_quality * pass_rating * pass_up_field_rating * 
-        shoot_pass_rating * pass_speed_quality * in_region_quality;
+    return static_pass_quality * pass_rating * pass_up_field_rating * shoot_pass_rating *
+           pass_speed_quality * in_region_quality;
 }
 
 double rateZone(const World& world, const Rectangle& zone, const Point& receive_position,
@@ -201,31 +201,35 @@ double rateChipPassEnemyRisk(const Team& enemy_team, const Pass& pass,
         return 0;
     }
 
-    // The sigmoid with of 2.0 meters is somewhat abritrary but it discourages really short
-    // chips that can be easily intercepted, as the ball doesn't roll as fast after landing.
-    double sigmoid_width  = 2.0;
+    // The sigmoid with of 2.0 meters is somewhat arbitrary but it discourages really
+    // short chips that can be easily intercepted, as the ball doesn't roll as fast after
+    // landing.
+    double sigmoid_width = 2.0;
 
     // This should figure out if the pass will clear the enemy.
     double enemy_risk_near_passer_point =
         sigmoid((closest_enemy_to_passer->position() - pass.passerPoint()).length(),
                 ROBOT_MIN_CHIP_CLEAR_DISTANCE_METERS, sigmoid_width);
 
-    // Now we just need to figure out where we have landed, since we don't have chip speed as
-    // mentioned above, we use CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO to get an estimate
-    // of where we might have landed.
+    // Now we just need to figure out where we have landed, since we don't have chip speed
+    // as mentioned above, we use CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO to get an
+    // estimate of where we might have landed.
     auto pass_vector = pass.receiverPoint() - pass.passerPoint();
 
-    // NOTE: The robot performing the pass should also use CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO
-    // if it would like to chip.
-    auto chip_landing_point = pass.passerPoint() + pass_vector.normalize(
-            CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO * pass_vector.length());
+    // NOTE: The robot performing the pass should also use
+    // CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO if it would like to chip.
+    auto chip_landing_point =
+        pass.passerPoint() +
+        pass_vector.normalize(CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO *
+                              pass_vector.length());
 
     // Create a "virtual" kick pass from the chip landing point and the receive point
     // and evaluate the likely hood of an enemy intercepting that pass.
     double enemy_risk_near_receiver_point = calculateKickInterceptRisk(
-            enemy_team, Pass(chip_landing_point, pass.receiverPoint(),
-                pass_vector.length() * CHIP_PASS_TARGET_DISTANCE_TO_SPEED_RATIO
-                ), enemy_reaction_time);
+        enemy_team,
+        Pass(chip_landing_point, pass.receiverPoint(),
+             pass_vector.length() * CHIP_PASS_TARGET_DISTANCE_TO_SPEED_RATIO),
+        enemy_reaction_time);
 
     return 1.0 - enemy_risk_near_passer_point * enemy_risk_near_receiver_point;
 }

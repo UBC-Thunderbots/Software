@@ -64,16 +64,11 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play_chip_pass)
         Point(-2, -1.7),
         Point(-2, -1.5),
     });
-    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({
-        field.friendlyGoalCenter(),
-        Point(-4.4, 3.0),
-        Point(-4.3, 2.8),
-        Point(-4.3, 2.6),
-        Point(-4.4, 2.4),
-        Point(-4.3, 2.2),
-        field.enemyGoalCenter(),
-        field.enemyDefenseArea().negXNegYCorner(),
-        field.enemyDefenseArea().negXPosYCorner()});
+    auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId(
+        {field.friendlyGoalCenter(), Point(-4.4, 3.0), Point(-4.3, 2.8), Point(-4.3, 2.6),
+         Point(-4.4, 2.4), Point(-4.3, 2.2), field.enemyGoalCenter(),
+         field.enemyDefenseArea().negXNegYCorner(),
+         field.enemyDefenseArea().negXPosYCorner()});
     setFriendlyGoalie(0);
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(ShootOrPassPlay));

@@ -45,9 +45,9 @@ void CalibrationPlay::getNextTactics(TacticCoroutine::push_type &yield,
      * constants.
      */
 
-    const Point chip_start                    = Point(-4, 3);
-    const Angle angle_to_face                 = Angle::fromDegrees(-45);
-    const double max_chip_distance            = 10.0;
+    const Point chip_start         = Point(-4, 3);
+    const Angle angle_to_face      = Angle::fromDegrees(-45);
+    const double max_chip_distance = 10.0;
 
     for (double chip_distance = ROBOT_MIN_CHIP_CLEAR_DISTANCE_METERS;
          chip_distance < max_chip_distance; chip_distance += 0.5)
