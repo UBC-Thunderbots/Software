@@ -156,4 +156,31 @@ jobs:
           bazel test -c dbg  \
             --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
             //shared/parameter/...
+  build-full-system-and-ssl-binaries:
+    name: Build and upload binaries
+    runs-on: ubuntu-18.04
+    steps:
+      # checks-out the repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
+
+      - name: Environment Setup
+        run: |
+          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+          
+      - name: Build full_system and ssl_simulation_main
+        run: |
+          cd src \
+          bazel build //software:full_system \
+          //software/simulation/ssl_simulation_protocol:ssl_simulation_main \
+      
+      - name: Upload binaries
+        uses: actions/upload-artifact@v2
+        with:
+          name: binaries
+          path: |
+            src/bazel-out/k8-fastbuild/bin/software/full_system
+            src/bazel-out/k8-fastbuild/bin/software/simulation/ssl_simulation_protocol/ssl_simulation_main
+
+
+          
 
