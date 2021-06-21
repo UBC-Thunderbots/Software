@@ -238,5 +238,4 @@ INSTANTIATE_TEST_CASE_P(
             // whether to ignore the intercept and proximity risk checks in the test
             // we ignore the score checks on this one because we need to make sure that we
             // stay in field bounds, even if leaving the field bounds improves the score
-            true))
-            );
+            true)));
