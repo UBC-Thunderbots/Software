@@ -6,8 +6,10 @@ on:
     branches: [ master, robocup_2021 ]
   pull_request:
     # TODO (2167): remove robocup_2021
-    branches: [ master, robocup_2021 ]
-
+    branches: 
+      - '**'
+      
+    
 jobs:
   formatting-check:
     name: Formatting Check
