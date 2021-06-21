@@ -9,6 +9,6 @@ void drawTeam(QGraphicsScene* scene, const Team& team, QColor color)
     {
         auto robot_state =
             RobotStateWithId{.id = robot.id(), .robot_state = robot.currentState()};
-        drawRobot(scene, robot_state, color);
+        drawRobot(scene, robot_state, color, robot.robotConstants());
     }
 }

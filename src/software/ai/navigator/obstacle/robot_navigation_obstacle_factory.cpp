@@ -162,9 +162,9 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createEnemyCollisionAvo
         std::vector<ObstaclePtr> obstacles;
         for (const auto &robot : enemy_team.getAllRobots())
         {
+            // allow collisions where friendly and enemy robots can be face to face
             obstacles.push_back(std::make_shared<GeomObstacle<Circle>>(
-                Circle(robot.position(),
-                       ROBOT_MAX_RADIUS_METERS + DIST_TO_FRONT_OF_ROBOT_METERS)));
+                Circle(robot.position(), 2 * DIST_TO_FRONT_OF_ROBOT_METERS)));
         }
         return obstacles;
     }

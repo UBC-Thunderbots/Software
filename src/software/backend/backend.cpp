@@ -2,6 +2,14 @@
 
 #include "software/proto/message_translation/tbots_protobuf.h"
 
+
+
+Backend::Backend()
+    // TODO (#2167): is there better way to remove warnings
+    : FirstInFirstOutThreadedObserver<World>(Observer<World>::DEFAULT_BUFFER_SIZE, false)
+{
+}
+
 void Backend::receiveRobotStatus(TbotsProto::RobotStatus msg)
 {
     SensorProto sensor_msg;

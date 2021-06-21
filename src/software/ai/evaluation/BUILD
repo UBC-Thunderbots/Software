@@ -16,6 +16,7 @@ cc_test(
     deps = [
         ":pass",
         "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ],
 )
 

@@ -1,35 +1,11 @@
 #pragma once
 
+#include "shared/robot_constants.h"
+
 /**
  * This struct represents a robot wheel/motor, from the perspective of firmware
  */
 typedef struct VelocityWheel VelocityWheel_t;
-
-/**
- * This struct holds wheel/motor constants
- */
-typedef struct VelocityWheelConstants
-{
-    // The current per unit torque for the motor attached to this wheel [A/(N*m)]
-    float motor_current_per_unit_torque;
-
-    // The phase resistance for the motor attached to this wheel [Ohms]
-    float motor_phase_resistance;
-
-    // The back emf per motor rpm for the motor attached to this wheel [volt / rpm]
-    float motor_back_emf_per_rpm;
-
-    // The maximum voltage change that can be exerted on the motor attached to this
-    // wheel before the wheel will slip [Volts]
-    float motor_max_voltage_before_wheel_slip;
-
-    // The radius of the wheel, in meters
-    float wheel_radius;
-
-    // The gear ratio between the motor shaft and wheel shaft
-    // [# of wheel rotations / 1 motor rotation]
-    float wheel_rotations_per_motor_rotation;
-} VelocityWheelConstants_t;
 
 /**
  * Create a wheel object with functions for interacting with it
@@ -44,7 +20,7 @@ typedef struct VelocityWheelConstants
 VelocityWheel_t* app_velocity_wheel_create(void (*set_target_rpm)(float),
                                            float (*get_motor_speed_rpm)(void),
                                            void (*brake)(void), void (*coast)(void),
-                                           VelocityWheelConstants_t wheel_constants);
+                                           WheelConstants_t wheel_constants);
 
 /**
  * Destroy the given wheel, freeing any memory allocated for it
@@ -115,5 +91,4 @@ void app_velocity_wheel_setTargetRPM(VelocityWheel_t* wheel, float rpm);
  *
  * @return The constants for the given wheel
  */
-VelocityWheelConstants_t app_velocity_wheel_getWheelConstants(
-    const VelocityWheel_t* wheel);
+WheelConstants_t app_velocity_wheel_getWheelConstants(const VelocityWheel_t* wheel);

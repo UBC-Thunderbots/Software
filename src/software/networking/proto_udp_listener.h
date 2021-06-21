@@ -1,7 +1,10 @@
 #pragma once
 
+#include <ifaddrs.h>
+
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <cstring>
 #include <string>
 
 template <class ReceiveProtoT>
@@ -53,6 +56,8 @@ class ProtoUdpListener
      */
     void handleDataReception(const boost::system::error_code& error,
                              size_t num_bytes_received);
+
+    std::string getInterfaceAddress(const std::string& interfaceName);
 
     /**
      * Start listening for data

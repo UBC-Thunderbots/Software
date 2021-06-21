@@ -15,4 +15,5 @@ RUN git clone https://github.com/UBC-Thunderbots/Software.git /Software
 RUN /Software/environment_setup/setup_software.sh
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
 RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
+RUN apt-get -qq update && apt-get -y install net-tools curl tcpdump firefox
 USER default

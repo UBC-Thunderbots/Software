@@ -4,6 +4,22 @@
 
 namespace TestUtil
 {
+    ::testing::AssertionResult equalWithinTolerance(const Duration &duration1,
+                                                    const Duration &duration2,
+                                                    const Duration &tolerance)
+    {
+        if (std::abs((duration1 - duration2).toMilliseconds()) <
+            std::abs(tolerance.toMilliseconds()))
+        {
+            return ::testing::AssertionSuccess();
+        }
+        else
+        {
+            return ::testing::AssertionFailure()
+                   << "Duration 1 was " << duration1 << ", duration 2 was " << duration2;
+        }
+    }
+
     ::testing::AssertionResult equalWithinTolerance(const Polygon &poly1,
                                                     const Polygon &poly2,
                                                     double tolerance)

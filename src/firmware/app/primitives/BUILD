@@ -78,6 +78,7 @@ cc_library(
     hdrs = ["test_util_world.h"],
     deps = [
         ":primitive_manager",
+        "//shared/test_util",
         "//shared/test_util:tbots_gtest_main",
         "@fff",
     ],

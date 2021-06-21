@@ -19,17 +19,5 @@ class DefensePlay : public Play
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 
-   private:
-    /**
-     * Moves up to 2 robots to block the enemy closest from the ball from being
-     * able to shoot at the friendly net
-     *
-     * @param move_tactics The move tactics to use
-     * @param world The current state of the world
-     *
-     * @return Updated move tactics that will block the closest enemy to the ball
-     * from being able to shoot at the friendly net
-     */
-    std::vector<std::shared_ptr<MoveTactic>> moveRobotsToSwarmEnemyWithBall(
-        std::vector<std::shared_ptr<MoveTactic>> move_tactics, const World &world);
+    const double ROBOT_SHADOWING_DISTANCE_METERS = ROBOT_MAX_RADIUS_METERS * 3;
 };

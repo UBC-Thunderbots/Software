@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "shared/2015_robot_constants.h"
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "software/proto/primitive/primitive_msg_factory.h"
 #include "software/test_util/test_util.h"
@@ -10,8 +11,8 @@ class ThreadedSimulatorTest : public ::testing::Test
 {
    protected:
     ThreadedSimulatorTest()
-        : threaded_simulator(Field::createSSLDivisionBField(),
-                             std::make_shared<const SimulatorConfig>())
+        : threaded_simulator(Field::createSSLDivisionBField(), robot_constants,
+                             wheel_constants, std::make_shared<const SimulatorConfig>())
     {
     }
 
@@ -59,6 +60,8 @@ class ThreadedSimulatorTest : public ::testing::Test
         return Point(ball.x(), ball.y());
     }
 
+    RobotConstants_t robot_constants = create2015RobotConstants();
+    WheelConstants wheel_constants   = create2015WheelConstants();
     ThreadedSimulator threaded_simulator;
     bool callback_called;
     std::optional<SSLProto::SSL_WrapperPacket> most_recent_wrapper_packet;
@@ -146,7 +149,7 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
     threaded_simulator.startSimulation();
     // yield and sleep to give the simulation thread the best chance of running
     std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
     // Simulate multiple robots with primitives to sanity check that everything is
     // connected properly and we can properly simulate multiple instances of the robot
@@ -176,23 +179,27 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
     threaded_simulator.setBlueRobotPrimitive(
         1, createNanoPbPrimitive(*createMovePrimitive(
                Point(-1, -1), 0.0, Angle::zero(), DribblerMode::OFF,
-               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0)));
+               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+               robot_constants)));
     threaded_simulator.setBlueRobotPrimitive(
         2, createNanoPbPrimitive(*createMovePrimitive(
                Point(-3, 0), 0.0, Angle::half(), DribblerMode::OFF,
-               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0)));
+               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+               robot_constants)));
 
     threaded_simulator.setYellowRobotPrimitive(
         1, createNanoPbPrimitive(*createMovePrimitive(
                Point(1, 1), 0.0, Angle::zero(), DribblerMode::OFF,
-               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0)));
+               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+               robot_constants)));
     threaded_simulator.setYellowRobotPrimitive(
         2, createNanoPbPrimitive(*createMovePrimitive(
                Point(3, -2), 0.0, Angle::zero(), DribblerMode::OFF,
-               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0)));
+               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+               robot_constants)));
 
     std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     threaded_simulator.stopSimulation();
 
     // TODO: These tests are currently very lenient, and don't test final velocities.
