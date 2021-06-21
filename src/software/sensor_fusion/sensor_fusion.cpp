@@ -271,7 +271,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     }
     if (robot_with_ball_in_dribbler.has_value())
     {
-        // Use ball in dribbler information first since it's most precise
+        // use ball in dribbler information first since it's most precise
         ball =
             Ball(robot_with_ball_in_dribbler->position() +
                      Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
