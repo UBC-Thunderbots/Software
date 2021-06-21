@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/play/free_kick_play.h"
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/find_open_areas.h"
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/play/corner_kick_play.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
@@ -31,8 +32,7 @@ bool FreeKickPlay::isApplicable(const World &world) const
 
 bool FreeKickPlay::invariantHolds(const World &world) const
 {
-    return (world.gameState().isPlaying() || world.gameState().isReadyState()) &&
-           (world.getTeamWithPossession() == TeamSide::FRIENDLY);
+    return world.gameState().isOurFreeKick();
 }
 
 void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
@@ -75,7 +75,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
                    << " which is below our threshold of" << MIN_ACCEPTABLE_PASS_SCORE
                    << ", so chipping at enemy net";
 
-        chipAtGoalStage(yield, crease_defender_tactics, world);
+        lastResortChipStage(yield, crease_defender_tactics, world);
     }
 
 
@@ -94,7 +94,7 @@ void FreeKickPlay::updateAlignToBallTactic(
         ball_to_center_vec.orientation(), 0);
 }
 
-void FreeKickPlay::chipAtGoalStage(
+void FreeKickPlay::lastResortChipStage(
     TacticCoroutine::push_type &yield,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     const World &world)
@@ -103,9 +103,9 @@ void FreeKickPlay::chipAtGoalStage(
 
     // Figure out where the fallback chip target is
     // This is exerimentally determined to be a reasonable value
-    double fallback_chip_target_x_offset = 1.5;
-    Point chip_target =
-        world.field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
+
+    std::vector<Circle> chip_targets = findGoodChipTargets(world);
+    Point chip_target                = chip_targets[0].origin();
 
     do
     {
