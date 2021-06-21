@@ -9,7 +9,11 @@
 #include "software/logger/logger.h"
 
 ReceiverTactic::ReceiverTactic(const Pass pass)
-    : Tactic(false, {RobotCapability::Move}), pass(std::move(pass)), fsm()
+    : Tactic(false, {RobotCapability::Move}),
+      pass(std::move(pass)),
+      fsm(),
+      control_params(
+          {ReceiverFSM::ControlParams{.pass = std::nullopt, .disable_one_touch = false}})
 {
 }
 
