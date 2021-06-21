@@ -97,17 +97,20 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
     const float orientation_delta =
         net_change_in_orientation + (float)revolutions_to_spin * 2.0f * (float)M_PI;
 
-    const float estimated_time_delta = fmaxf(
-        fabsf(distance_to_destination) / (float)(robot_constants.robot_max_speed_m_per_s),
-        fabsf(net_change_in_orientation) /
-            (float)(robot_constants.robot_max_ang_speed_rad_per_s));
+    // TODO (#2167) 3 works best, fix after robocup
+    // const float estimated_time_delta = fminf(
+    //     fabsf(distance_to_destination) / (float)(robot_constants.robot_max_speed_m_per_s),
+    //     fabsf(net_change_in_orientation) /
+    //         (float)(robot_constants.robot_max_ang_speed_rad_per_s));
 
     // clamp num elements between 3 (minimum number of trajectory elements) and
     // TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
-    const unsigned int num_elements = (unsigned int)fmaxf(
-        fminf((estimated_time_delta * CONTROL_LOOP_HZ / NUM_TICKS_PER_TRAJECTORY_ELEMENT),
-              TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS),
-        3);
+    // const unsigned int num_elements = (unsigned int)fmaxf(
+    //     fminf((estimated_time_delta * CONTROL_LOOP_HZ / NUM_TICKS_PER_TRAJECTORY_ELEMENT),
+    //           TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS),
+    //     3);
+    //
+    const unsigned int num_elements = 3;
 
     // Plan a trajectory to move to the target position/orientation
     FirmwareRobotPathParameters_t path_parameters = {

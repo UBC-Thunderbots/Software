@@ -34,6 +34,7 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 
     double chip_pass_rating = friendly_chip_pass_rating * enemy_chip_pass_rating;
     double kick_pass_rating = friendly_kick_pass_rating * enemy_kick_pass_rating;
+    double pass_rating = std::max(chip_pass_rating, kick_pass_rating);
 
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
 
@@ -49,7 +50,7 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double pass_up_field_rating = (zone.centre().x() + world.field().totalXLength() / 2) /
                                   world.field().totalXLength();
 
-    return static_pass_quality * kick_pass_rating * chip_pass_rating * pass_up_field_rating * 
+    return static_pass_quality * pass_rating * pass_up_field_rating * 
         shoot_pass_rating * pass_speed_quality * in_region_quality;
 }
 
