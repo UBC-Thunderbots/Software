@@ -120,8 +120,6 @@ double rateChipPassFriendlyCapability(
     Team friendly_team, const Pass& pass,
     std::shared_ptr<const PassingConfig> passing_config);
 
-double ratePassNextPassScore(const World& world, const Pass& pass,
-                             std::shared_ptr<const PassingConfig> passing_config);
 /**
  * Calculates the static position quality for a given position on a given field
  *

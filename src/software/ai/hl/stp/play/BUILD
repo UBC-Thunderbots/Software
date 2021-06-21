@@ -90,6 +90,23 @@ cc_library(
 )
 
 cc_library(
+    name = "calibration_play",
+    srcs = ["calibration_play.cpp"],
+    hdrs = ["calibration_play.h"],
+    deps = [
+        ":play",
+        "//shared:constants",
+        "//shared/parameter:cpp_configs",
+        "//software/ai/hl/stp/tactic/chip:chip_tactic",
+        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
+        "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/logger",
+        "//software/util/design_patterns:generic_factory",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
     name = "example_play",
     srcs = ["example_play.cpp"],
     hdrs = ["example_play.h"],
@@ -296,6 +313,7 @@ cc_library(
     name = "all_plays",
     deps = [
         ":ball_placement_play",
+        ":calibration_play",
         ":corner_kick_play",
         ":defense_play",
         ":dribbling_parcour_play",

@@ -6,6 +6,8 @@
 #include "software/ai/passing/pass_evaluation.h"
 #include "software/ai/passing/pass_generator.h"
 
+
+// TODO Remove (#2167)
 template <class TimeT  = std::chrono::milliseconds,
           class ClockT = std::chrono::steady_clock>
 class Timer
@@ -121,8 +123,8 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
 
     for (ZoneEnum zone_id : pitch_division_->getAllZoneIds())
     {
-        // The objective function we minimize in gradient descent to improve each
-        // pass that we're optimizing
+        // The objective function we minimize in gradient descent to improve each pass
+        // that we're optimizing
         const auto objective_function =
             [this, &world,
              zone_id](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
@@ -141,7 +143,6 @@ ZonePassMap<ZoneEnum> PassGenerator<ZoneEnum>::optimizePasses(
 
         optimized_passes.emplace(zone_id, PassWithRating{new_pass, score});
     }
-
 
     return optimized_passes;
 }

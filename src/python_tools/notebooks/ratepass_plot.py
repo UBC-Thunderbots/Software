@@ -102,8 +102,8 @@ def plot_ssl_wrapper_at_idx(idx):
 
     pass_dict = {
         "passer_point": the_world.ball().position(),
-        "pass_speed": 4.5,
-        "start_time": 0.0,
+        "pass_speed": 6.0,
+        "start_time": 1.0,
     }
 
     def ratePassCost(x, y):
@@ -160,3 +160,5 @@ show(fig, notebook_handle=True)
 slider = ipywidgets.IntSlider(min=0, max=len(wrapper_proto_log) - 1)
 ipywidgets.interact(plot_ssl_wrapper_at_idx, idx=slider)
 # -
+
+

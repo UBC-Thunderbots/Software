@@ -79,6 +79,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
         LOG(DEBUG) << "Score of pass we committed to: "
                    << best_pass_and_score_so_far.rating;
 
+        ratePass(world, pass, world.field().fieldLines(), play_config->getPassingConfig());
         // Perform the pass and wait until the receiver is finished
         auto receiver = std::make_shared<ReceiverTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), pass, world.ball(),
@@ -106,10 +107,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         do
         {
-            if (pass.startTime() >= world.getMostRecentTimestamp())
-            {
-                attacker->updateControlParams(pass);
-            }
+            attacker->updateControlParams(pass);
             receiver->updateControlParams(pass);
 
             std::get<0>(crease_defender_tactics)
