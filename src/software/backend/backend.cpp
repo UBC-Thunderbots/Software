@@ -13,6 +13,7 @@ Backend::Backend()
 void Backend::receiveRobotStatus(TbotsProto::RobotStatus msg)
 {
     SensorProto sensor_msg;
+    // TODO: add rate limiting here to clump robot statuses together
     *(sensor_msg.add_robot_status_msgs())         = msg;
     *(sensor_msg.mutable_backend_received_time()) = *createCurrentTimestamp();
     Subject<SensorProto>::sendValueToObservers(sensor_msg);
