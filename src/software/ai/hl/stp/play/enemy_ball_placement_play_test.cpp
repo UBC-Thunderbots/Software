@@ -36,13 +36,13 @@ TEST_F(EnemyBallPlacementPlayTest, test_ball_placement_center)
     setGameState(game_state);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-            [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
-                {
-                    yield("");
-                }
-                robotHalt(world_ptr,yield);
-            }};
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
+            {
+                yield("");
+            }
+            robotHalt(world_ptr, yield);
+        }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
@@ -71,13 +71,13 @@ TEST_F(EnemyBallPlacementPlayTest, test_ball_placement_diagonal)
     setGameState(game_state);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-            [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
-                {
-                    yield("");
-                }
-                robotHalt(world_ptr,yield);
-            }};
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
+            {
+                yield("");
+            }
+            robotHalt(world_ptr, yield);
+        }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
@@ -137,13 +137,13 @@ TEST_F(EnemyBallPlacementPlayTest, test_no_placement)
     setGameState(game_state);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-            [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
-                {
-                    yield("");
-                }
-                robotHalt(world_ptr,yield);
-            }};
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
+            {
+                yield("");
+            }
+            robotHalt(world_ptr, yield);
+        }};
 
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
