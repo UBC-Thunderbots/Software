@@ -60,18 +60,18 @@ BallState Ball::estimateFutureState(const Duration &duration_in_future) const
     Vector future_velocity = calculateFutureVelocity(current_state_.velocity(),
                                                      acceleration_, duration_in_future);
 
-    // since acceleration is due to friction, the ball will slow down until it stops and will not move backwards.
-    // This means final velocity cannot be in the opposite
+    // since acceleration is due to friction, the ball will slow down until it stops and
+    // will not move backwards. This means final velocity cannot be in the opposite
     // direction to initial velocity. if that happens, we find a new velocity using a more
     // realistic Duration
     Duration effective_duration(duration_in_future);
 
-    bool velocities_in_opposite_direction = almostEqual(future_velocity.rotate(Angle::half()).orientation().toRadians(),
+    bool velocities_in_opposite_direction =
+        almostEqual(future_velocity.rotate(Angle::half()).orientation().toRadians(),
                     current_state_.velocity().orientation().toRadians(), FIXED_EPSILON,
                     ULPS_EPSILON_TEN);
 
-    if (acceleration_.length() > 0 &&
-        velocities_in_opposite_direction)
+    if (acceleration_.length() > 0 && velocities_in_opposite_direction)
     {
         // this is the time it takes for velocity to accelerate to 0
         double time        = current_state_.velocity().length() / acceleration_.length();
