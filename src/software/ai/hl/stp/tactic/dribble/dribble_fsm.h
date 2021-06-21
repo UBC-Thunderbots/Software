@@ -74,6 +74,7 @@ struct DribbleFSM
                    .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
     }
 
+
     /**
      * Gets the destination to dribble the ball to from the update event
      *
@@ -210,7 +211,8 @@ struct DribbleFSM
                 event.common.robot.id(), intercept_result.first, face_ball_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
                 AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+                event.common.robot.robotConstants()));
         };
 
         /**
@@ -242,7 +244,8 @@ struct DribbleFSM
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), target_destination, target_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW, auto_chip_or_kick,
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+                event.common.robot.robotConstants()));
         };
 
         /**

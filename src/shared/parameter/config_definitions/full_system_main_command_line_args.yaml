@@ -67,3 +67,11 @@ include:
           - "positive"
       description: >-
           Which side to defend
+
+- int:
+      name: vision_port
+      value: "10006"
+      min: 1
+      max: 65535
+      description: >-
+          Which port to connect to to receive vision

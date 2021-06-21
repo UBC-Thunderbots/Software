@@ -4,6 +4,21 @@
 
 #include <algorithm>
 
+TEST(TestUtilsTest, duration_check_if_equal_within_tolerance)
+{
+    Duration duration1 = Duration::fromMilliseconds(100.01);
+    Duration duration2 = Duration::fromMilliseconds(100.21);
+    Duration duration3 = Duration::fromMilliseconds(100.2101);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(duration1, duration2,
+                                               Duration::fromMilliseconds(1)));
+    EXPECT_FALSE(TestUtil::equalWithinTolerance(duration1, duration2,
+                                                Duration::fromMilliseconds(0.01)));
+    EXPECT_FALSE(TestUtil::equalWithinTolerance(duration2, duration3,
+                                                Duration::fromMilliseconds(0.0001)));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(duration2, duration3,
+                                               Duration::fromMilliseconds(0.001)));
+}
+
 TEST(TestUtilsTest, polygon_check_if_equal_within_tolerance)
 {
     Polygon poly1({Point(2.323, 2.113), Point(4.567, 1.069), Point(9.245, 1.227)});

@@ -61,7 +61,7 @@ TEST_P(SimulatedAttackerTacticPassingTest, attacker_test_passing)
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(8));
+            Duration::fromSeconds(5));
 }
 
 INSTANTIATE_TEST_CASE_P(

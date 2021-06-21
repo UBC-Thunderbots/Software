@@ -51,8 +51,8 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
 
         best_ball_intercept_pos   = point_in_front_of_ball;
         best_ball_travel_duration = getTimeToPositionForRobot(
-            robot.position(), best_ball_intercept_pos, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+            robot.position(), best_ball_intercept_pos, robot.robotConstants().robot_max_speed_m_per_s,
+            robot.robotConstants().robot_max_acceleration_m_per_s_2);
 
         return std::make_pair(best_ball_intercept_pos, best_ball_travel_duration);
     }
@@ -79,8 +79,9 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
 
         // Figure out how long it will take the robot to get to the new ball position
         Duration time_to_ball_pos = getTimeToPositionForRobot(
-            robot.position(), new_ball_pos, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+            robot.position(), new_ball_pos,
+            robot.robotConstants().robot_max_speed_m_per_s,
+            robot.robotConstants().robot_max_acceleration_m_per_s_2);
 
 
         // Figure out when the robot will reach the new ball position relative to the
@@ -116,8 +117,9 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
 
     //     Check that we can get to the best position in time
     Duration time_to_ball_pos = getTimeToPositionForRobot(
-        robot.position(), best_ball_intercept_pos, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-        ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+        robot.position(), best_ball_intercept_pos,
+        robot.robotConstants().robot_max_speed_m_per_s,
+        robot.robotConstants().robot_max_acceleration_m_per_s_2);
     Duration ball_robot_time_diff = time_to_ball_pos - best_ball_travel_duration;
     // NOTE: if ball velocity is 0 then ball travel duration is infinite, so this
     // check isn't relevant in that case
