@@ -62,6 +62,7 @@ void ThreadedStandaloneSimulatorGUI::createAndRunStandaloneSimulatorGUI(
                           [&]() { application_shutting_down = true; });
     StandaloneSimulatorGUI* standalone_simulator_gui = new StandaloneSimulatorGUI(
         simulator, mutable_simulator_config, mutable_standalone_simulator_config);
+    full_system_gui->setWindowState(Qt::WindowMaximized);
     standalone_simulator_gui->show();
 
     // Run the QApplication and all windows / widgets. This function will block
