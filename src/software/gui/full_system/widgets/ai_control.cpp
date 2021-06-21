@@ -312,7 +312,7 @@ void setupGoalieIdComboBox(QComboBox *id_comboBox,
     // TODO: this value is hardcoded and it should take the default value from dynamic
     // parameters once https://github.com/UBC-Thunderbots/Software/issues/1299 is done and
     // integrated
-    id_comboBox->setCurrentText(QString::fromStdString("0"));
+    id_comboBox->setCurrentText(QString::fromStdString("Use GameController"));
 
     auto on_goalie_id_changed = [override_goalie_id_parameter, goalie_id_parameter,
                                  robot_ids](const QString &text) {
