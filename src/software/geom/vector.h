@@ -5,6 +5,7 @@
 
 #include "software/geom/angle.h"
 
+
 /**
  * A vector in 2D space.
  */
