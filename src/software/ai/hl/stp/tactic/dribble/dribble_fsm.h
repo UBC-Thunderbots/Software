@@ -242,10 +242,9 @@ struct DribbleFSM
         const auto get_possession = [this](auto event) {
             static constexpr auto SLOW_DOWN_RADIUS = 0.3;
 
+            auto ball_position = event.common.world.ball().position();
             auto face_ball_orientation =
-                (event.common.world.ball().position() - event.common.robot.position())
-                    .orientation();
-
+                (ball_position - event.common.robot.position()).orientation();
             Point intercept_position =
                 findInterceptionPoint(event.common.robot, event.common.world.ball(),
                                       event.common.world.field());
@@ -259,12 +258,25 @@ struct DribbleFSM
                 speed_mode = MaxAllowedSpeedMode::STOP_COMMAND;
             }
 
+            for (const auto &enemy_robot : event.common.world.enemyTeam().getAllRobots())
+            {
+                if (enemy_robot.isNearDribbler(ball_position, 0.005))
+                {
+                    if (acuteAngle(enemy_robot.position(), event.common.robot.position(),
+                                   ball_position) < Angle::fromDegrees(150))
+                    {
+                        face_ball_orientation += Angle::fromDegrees(45);
+                        break;
+                    }
+                }
+            }
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), intercept_position, face_ball_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
                 AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, speed_mode, 0.0,
                 event.common.robot.robotConstants()));
         };
+
 
         /**
          * Action to dribble the ball
