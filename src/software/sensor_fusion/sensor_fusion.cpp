@@ -283,11 +283,12 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         std::optional<Ball> new_ball = createBall(ball_detections);
         if (new_ball)
         {
+            // If vision detected a new ball, then use that one
             updateBall(*new_ball);
         }
         else if (ball)
         {
-            // If we already have a ball, but miss the ball in the next frame
+            // If we already have a ball from a previous frame, but is occluded this frame
             std::optional<Robot> closest_enemy =
                 enemy_team.getNearestRobot(ball->position());
             std::optional<Robot> closest_friendly =
@@ -305,6 +306,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
                     closest_robot = closest_enemy.value();
                 }
 
+                // Assume that the robot has the ball in dribbler since that's the worst
+                // case scenario, i.e. they could shoot or pass
                 ball = Ball(closest_robot.position() +
                                 Vector::createFromAngle(closest_robot.orientation())
                                     .normalize(DIST_TO_FRONT_OF_ROBOT_METERS),
