@@ -43,7 +43,12 @@ double ratePassEnemyRiskWrapper(const World& world, py::dict pass_dict,
 {
     auto pass = createPassFromDict(pass_dict);
     updatePassingConfigFromDict(passing_config_dict);
-    return ratePassEnemyRisk(world.enemyTeam(), pass, passing_config);
+    auto enemy_reaction_time =
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
+    auto enemy_proximity_importance =
+        passing_config->getEnemyProximityImportance()->value();
+    return ratePassEnemyRisk(world.enemyTeam(), pass, enemy_reaction_time,
+                             enemy_proximity_importance);
 }
 
 double ratePassFriendlyCapabilityWrapper(const World& world, py::dict pass_dict,
