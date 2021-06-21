@@ -57,7 +57,7 @@
       Yellow if selected, Blue if unselected
 - bool:
     name: override_game_controller_friendly_goalie_id
-    value: true
+    value: false
     description: >-
       Overrides the friendly goalie id provided by the game controller,
       with FriendlyGoalieId parameter
