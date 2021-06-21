@@ -54,11 +54,11 @@ void ThreadedEstopReader::tick(const boost::system::error_code& error)
 
         switch (estop_msg.at(0))
         {
-            case ESTOP_PLAY:
+            case ESTOP_PLAY_MSG:
                 new_state                    = EstopState::PLAY;
                 num_consecutive_status_error = 0;
                 break;
-            case ESTOP_STOP:
+            case ESTOP_STOP_MSG:
                 new_state                    = EstopState::STOP;
                 num_consecutive_status_error = 0;
                 break;

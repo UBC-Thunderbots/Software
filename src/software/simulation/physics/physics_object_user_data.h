@@ -8,7 +8,8 @@ enum class PhysicsObjectType
     ROBOT_CHICKER,
     ROBOT_DRIBBLER,
     ROBOT_BODY,
-    BALL
+    BALL,
+    FIELD_WALL,
 };
 
 /**
@@ -24,7 +25,6 @@ struct PhysicsObjectUserData
         : type(type), physics_object(object_ptr)
     {
     }
-    PhysicsObjectUserData() = delete;
 
     PhysicsObjectType type;
     void* physics_object;

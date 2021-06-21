@@ -20,6 +20,7 @@ TEST_F(ExamplePlayTest, test_example_play)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(4, 0), Point(0.5, 0), Point(-3, 1), Point(-1, -3), Point(2, 0),
          Point(3.5, 3)});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
     setFriendlyGoalie(0);
     setAIPlay(TYPENAME(ExamplePlay));
 
@@ -55,6 +56,7 @@ TEST_F(ExamplePlayTest, test_example_play)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
-            non_terminating_validation_functions, Duration::fromSeconds(10));
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(10));
 }

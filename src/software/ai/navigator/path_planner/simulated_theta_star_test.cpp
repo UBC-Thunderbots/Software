@@ -35,17 +35,12 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_obstacle)
     setTactic(tactic);
     setRobotId(1);
 
-    std::set<MotionConstraint> motion_constraints;
-    motion_constraints.insert(MotionConstraint::ENEMY_ROBOTS_COLLISION);
-    setMotionConstraints(motion_constraints);
-
-
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
             // Small rectangle near the destination point that is outside of the obstacle
             // which the friendly robot should be stationary in for 15 ticks
-            Rectangle expected_final_position(Point(0.985, -0.26), Point(1.15, -0.3));
+            Rectangle expected_final_position(Point(0.9, -0.1), Point(1.1, 0.1));
             robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
         }};
 
@@ -71,17 +66,12 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_dest_in_obstacle)
     setTactic(tactic);
     setRobotId(1);
 
-    std::set<MotionConstraint> motion_constraints;
-    motion_constraints.insert(MotionConstraint::ENEMY_ROBOTS_COLLISION);
-    setMotionConstraints(motion_constraints);
-
-
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
             // Small rectangle near the destination point that is outside of the obstacle
             // which the friendly robot should be stationary in for 15 ticks
-            Rectangle expected_final_position(Point(0.985, -0.26), Point(1.15, -0.3));
+            Rectangle expected_final_position(Point(0.9, -0.2), Point(1.1, 0.0));
             robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
         }};
 
@@ -113,8 +103,7 @@ TEST_F(SimulatedThetaStarTest,
     setTactic(tactic);
     setRobotId(1);
 
-    setMotionConstraints(
-        {MotionConstraint::ENEMY_ROBOTS_COLLISION, MotionConstraint::ENEMY_DEFENSE_AREA});
+    setMotionConstraints({MotionConstraint::ENEMY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -147,11 +136,6 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_in_obstacle)
     setTactic(tactic);
     setRobotId(1);
 
-    std::set<MotionConstraint> motion_constraints;
-    motion_constraints.insert(MotionConstraint::ENEMY_ROBOTS_COLLISION);
-    setMotionConstraints(motion_constraints);
-
-
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
@@ -181,11 +165,6 @@ TEST_F(SimulatedThetaStarTest, test_theta_no_obstacle_straight_path)
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
     setRobotId(1);
-
-    std::set<MotionConstraint> motion_constraints;
-    motion_constraints.insert(MotionConstraint::ENEMY_ROBOTS_COLLISION);
-    setMotionConstraints(motion_constraints);
-
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -237,10 +216,6 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_zig_zag_test)
     setTactic(tactic);
     setRobotId(1);
 
-    std::set<MotionConstraint> motion_constraints;
-    motion_constraints.insert(MotionConstraint::ENEMY_ROBOTS_COLLISION);
-    setMotionConstraints(motion_constraints);
-
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
                               ValidationCoroutine::push_type& yield) {
@@ -281,10 +256,6 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_oscillation)
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
     setRobotId(1);
-
-    std::set<MotionConstraint> motion_constraints;
-    motion_constraints.insert(MotionConstraint::ENEMY_ROBOTS_COLLISION);
-    setMotionConstraints(motion_constraints);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,

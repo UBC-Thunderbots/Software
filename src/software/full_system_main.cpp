@@ -8,6 +8,7 @@
 #include "software/ai/threaded_ai.h"
 #include "software/backend/backend.h"
 #include "software/constants.h"
+#include "software/estop/arduino_util.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/logger/logger.h"
 #include "software/multithreading/observer_subject_adapter.h"
@@ -35,7 +36,8 @@ int main(int argc, char** argv)
     std::cout << BANNER << std::endl;
 
     // load command line arguments
-    auto args           = std::make_shared<FullSystemMainCommandLineArgs>();
+    auto arduino_config = std::make_shared<ArduinoConfig>();
+    auto args           = std::make_shared<FullSystemMainCommandLineArgs>(arduino_config);
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
     LoggerSingleton::initializeLogger(args->getLoggingDir()->value());
@@ -55,10 +57,42 @@ int main(int argc, char** argv)
                 ->setValue(args->getInterface()->value());
         }
 
+        mutable_thunderbots_config->getMutableSensorFusionConfig()
+            ->getMutableFriendlyColorYellow()
+            ->setValue(args->getTeamColor()->value() == "yellow");
+        mutable_thunderbots_config->getMutableSensorFusionConfig()
+            ->getMutableOverrideGameControllerDefendingSide()
+            ->setValue(args->getDefendingSide()->value() != "gamecontroller");
+        mutable_thunderbots_config->getMutableSensorFusionConfig()
+            ->getMutableDefendingPositiveSide()
+            ->setValue(args->getDefendingSide()->value() == "positive");
+        mutable_thunderbots_config->getMutableNetworkConfig()
+            ->getMutableChannel()
+            ->setValue(args->getChannel()->value());
+
+        // override arduino port or try to find programmatically
+        if (!args->getArduinoConfig()->getPort()->value().empty())
+        {
+            mutable_thunderbots_config->getMutableArduinoConfig()
+                ->getMutablePort()
+                ->setValue(args->getArduinoConfig()->getPort()->value());
+        }
+        else
+        {
+            mutable_thunderbots_config->getMutableArduinoConfig()
+                ->getMutablePort()
+                ->setValue(ArduinoUtil::getArduinoPort().value_or(""));
+        }
+
         if (args->getBackend()->value().empty())
         {
             LOG(FATAL) << "The option '--backend' is required but missing";
         }
+
+        // update command line arguments in BackendConfig
+        auto mutable_backend_config =
+            mutable_thunderbots_config->getMutableBackendConfig();
+        *mutable_backend_config->getMutableFullSystemMainCommandLineArgs() = *args;
 
         std::shared_ptr<Backend> backend =
             GenericFactory<std::string, Backend, BackendConfig>::create(
@@ -73,6 +107,7 @@ int main(int argc, char** argv)
         // Connect observers
         ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(backend);
         sensor_fusion->Subject<World>::registerObserver(ai);
+        sensor_fusion->Subject<World>::registerObserver(backend);
         backend->Subject<SensorProto>::registerObserver(sensor_fusion);
         sensor_fusion->Subject<World>::registerObserver(backend);
         if (!args->getHeadless()->value())
@@ -86,6 +121,9 @@ int main(int argc, char** argv)
             ai->Subject<PlayInfo>::registerObserver(visualizer);
             backend->Subject<SensorProto>::registerObserver(visualizer);
         }
+
+        // this function is a no-op if a proto log output path isn't set
+        std::function<void(void)> save_protolog_chunks_fn = []() { /* do nothing */ };
 
         if (!args->getProtoLogOutputDir()->value().empty())
         {
@@ -130,6 +168,16 @@ int main(int argc, char** argv)
                 world_to_ssl_wrapper_conversion_fn);
             sensor_fusion->registerObserver(world_to_vision_adapter);
             world_to_vision_adapter->registerObserver(vision_logger);
+
+            // we are logging protologs, set the save_protologs_chunk_fn function
+            // to save the in-progress protolog chunks
+            save_protolog_chunks_fn = [sensor_msg_logger, primitive_set_logger,
+                                       vision_logger]() {
+                sensor_msg_logger->saveCurrentChunk();
+                primitive_set_logger->saveCurrentChunk();
+                vision_logger->saveCurrentChunk();
+                LOG(DEBUG) << "Saved in-progress ProtoLog chunks.";
+            };
         }
 
         // Wait for termination
@@ -145,6 +193,8 @@ int main(int argc, char** argv)
             // This blocks forever without using the CPU
             std::promise<void>().get_future().wait();
         }
+
+        save_protolog_chunks_fn();
     }
 
     return 0;

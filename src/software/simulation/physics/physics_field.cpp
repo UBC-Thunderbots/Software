@@ -1,6 +1,7 @@
 #include "software/simulation/physics/physics_field.h"
 
 #include "software/simulation/physics/box2d_util.h"
+#include "software/simulation/physics/physics_object_user_data.h"
 
 PhysicsField::PhysicsField(std::shared_ptr<b2World> world, const Field &field)
     : field(field)
@@ -20,6 +21,16 @@ PhysicsField::~PhysicsField()
     b2World *field_world = field_body->GetWorld();
     if (bodyExistsInWorld(field_body, field_world))
     {
+        for (b2Fixture *f = field_body->GetFixtureList(); f != NULL; f = f->GetNext())
+        {
+            if (f->GetUserData() != NULL)
+            {
+                PhysicsObjectUserData *user_data =
+                    static_cast<PhysicsObjectUserData *>(f->GetUserData());
+                delete user_data;
+                f->SetUserData(NULL);
+            }
+        }
         field_world->DestroyBody(field_body);
     }
 }
@@ -50,6 +61,8 @@ void PhysicsField::setupFieldBoundary(const Field &field)
     field_boundary_fixture_def.shape       = &field_boundary_shape;
     field_boundary_fixture_def.restitution = FIELD_WALL_RESTITUTION;
     field_boundary_fixture_def.friction    = FIELD_WALL_FRICTION;
+    field_boundary_fixture_def.userData =
+        new PhysicsObjectUserData({PhysicsObjectType::FIELD_WALL, this});
     field_body->CreateFixture(&field_boundary_fixture_def);
 }
 
@@ -65,6 +78,8 @@ void PhysicsField::setupEnemyGoal(const Field &field)
     enemy_goal_fixture_def.shape       = &enemy_goal_shape;
     enemy_goal_fixture_def.restitution = FIELD_WALL_RESTITUTION;
     enemy_goal_fixture_def.friction    = FIELD_WALL_FRICTION;
+    enemy_goal_fixture_def.userData =
+        new PhysicsObjectUserData({PhysicsObjectType::FIELD_WALL, this});
     field_body->CreateFixture(&enemy_goal_fixture_def);
 }
 
@@ -80,6 +95,8 @@ void PhysicsField::setupFriendlyGoal(const Field &field)
     friendly_goal_fixture_def.shape       = &friendly_goal_shape;
     friendly_goal_fixture_def.restitution = FIELD_WALL_RESTITUTION;
     friendly_goal_fixture_def.friction    = FIELD_WALL_FRICTION;
+    friendly_goal_fixture_def.userData =
+        new PhysicsObjectUserData({PhysicsObjectType::FIELD_WALL, this});
     field_body->CreateFixture(&friendly_goal_fixture_def);
 }
 
