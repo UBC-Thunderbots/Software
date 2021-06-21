@@ -69,9 +69,9 @@ struct DribbleFSM
     static Point robotPositionToFaceBall(const Point &ball_position,
                                          const Angle &face_ball_angle)
     {
-        return ball_position -
-               Vector::createFromAngle(face_ball_angle)
-                   .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
+        return ball_position - Vector::createFromAngle(face_ball_angle)
+                                   .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
+                                              BALL_MAX_RADIUS_METERS - 0.005);
     }
 
     /**
@@ -88,7 +88,7 @@ struct DribbleFSM
     static Point findInterceptionPoint(const Robot &robot, const Ball &ball,
                                        const Field &field)
     {
-        static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD   = 0.3;
+        static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD   = 0.5;
         static constexpr double INTERCEPT_POSITION_SEARCH_INTERVAL = 0.1;
         if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
         {
@@ -103,7 +103,8 @@ struct DribbleFSM
             Duration ball_time_to_position = Duration::fromSeconds(
                 distance(intercept_position, ball.position()) / ball.velocity().length());
             Duration robot_time_to_pos = getTimeToPositionForRobot(
-                robot.position(), intercept_position, robot.robotConstants().robot_max_speed_m_per_s,
+                robot.position(), intercept_position,
+                robot.robotConstants().robot_max_speed_m_per_s,
                 robot.robotConstants().robot_max_acceleration_m_per_s_2);
 
             if (robot_time_to_pos < ball_time_to_position)

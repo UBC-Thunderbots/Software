@@ -76,17 +76,26 @@ std::optional<Robot> RobotFilter::getFilteredData(
         filtered_data.timestamp = filtered_data.timestamp.fromMilliseconds(
             filtered_data.timestamp.toMilliseconds() / data_num);
 
+        const double smoothing_factor = 0.85;
+
         // velocity = position difference / time difference
         filtered_data.velocity =
             (filtered_data.position - current_robot_state.position()) /
             (filtered_data.timestamp.toSeconds() -
              current_robot_state.timestamp().toSeconds());
 
+        filtered_data.velocity = (1 - smoothing_factor) * current_robot_state.velocity() +
+                                 smoothing_factor * filtered_data.velocity;
+
         // angular_velocity = orientation difference / time difference
         filtered_data.angular_velocity =
             (filtered_data.orientation - current_robot_state.orientation()) /
             (filtered_data.timestamp.toSeconds() -
              current_robot_state.timestamp().toSeconds());
+
+        filtered_data.angular_velocity =
+            (1 - smoothing_factor) * current_robot_state.angularVelocity() +
+            smoothing_factor * filtered_data.angular_velocity;
 
         // update current_robot_state
         this->current_robot_state =

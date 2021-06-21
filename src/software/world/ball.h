@@ -102,7 +102,7 @@ class Ball final
      * otherwise
      */
     bool hasBallBeenKicked(const Angle &expected_kick_direction,
-                           double min_kick_speed = 0.5) const;
+                           double min_kick_speed = 1.0) const;
 
     /**
      * Defines the equality operator for a Ball. Balls are equal if their positions and

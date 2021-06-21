@@ -5,7 +5,7 @@ void app_primitive_stopRobot(FirmwareWorld_t *world,
 {
     FirmwareRobot_t *robot = app_firmware_world_getRobot(world);
     Chicker_t *chicker     = app_firmware_robot_getChicker(robot);
-    Dribbler_t *dribbler   = app_firmware_robot_getDribbler(robot);
+    // Dribbler_t *dribbler   = app_firmware_robot_getDribbler(robot);
 
     // Disable chipper, kicker, dribbler
     app_chicker_disableAutochip(chicker);
@@ -13,12 +13,12 @@ void app_primitive_stopRobot(FirmwareWorld_t *world,
     if (stop_type == TbotsProto_StopPrimitive_StopType_COAST)
     {
         app_firmware_robot_stopRobot(robot, TbotsProto_StopPrimitive_StopType_COAST);
-        app_dribbler_coast(dribbler);
+        // app_dribbler_coast(dribbler);
     }
     else
     {
         app_firmware_robot_stopRobot(robot, TbotsProto_StopPrimitive_StopType_BRAKE);
-        app_dribbler_setSpeed(dribbler, 0);
+        // app_dribbler_setSpeed(dribbler, 0);
     }
 }
 

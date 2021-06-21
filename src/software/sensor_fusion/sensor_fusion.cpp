@@ -271,12 +271,22 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     }
     if (robot_with_ball_in_dribbler.has_value())
     {
-        // use ball in dribbler information first since it's most precise
-        ball =
-            Ball(robot_with_ball_in_dribbler->position() +
-                     Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
-                         .normalize(DIST_TO_FRONT_OF_ROBOT_METERS),
-                 Vector(0, 0), robot_with_ball_in_dribbler->timestamp());
+        std::vector<BallDetection> dribbler_in_ball_detection = {
+
+            BallDetection{
+                .position =
+                    robot_with_ball_in_dribbler->position() +
+                    Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
+                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS - 0.01),
+                .distance_from_ground = 0,
+                .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
+                .confidence = 1}};
+        std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
+        if (new_ball)
+        {
+            // If vision detected a new ball, then use that one
+            updateBall(*new_ball);
+        }
     }
     else
     {
@@ -308,10 +318,22 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
                 // Assume that the robot has the ball in dribbler since that's the worst
                 // case scenario, i.e. they could shoot or pass
-                ball = Ball(closest_robot.position() +
-                                Vector::createFromAngle(closest_robot.orientation())
-                                    .normalize(DIST_TO_FRONT_OF_ROBOT_METERS),
-                            Vector(0, 0), closest_robot.timestamp());
+                std::vector<BallDetection> dribbler_in_ball_detection = {
+
+                    BallDetection{
+                        .position = closest_robot.position() +
+                                    Vector::createFromAngle(closest_robot.orientation())
+                                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS - 0.01),
+                        .distance_from_ground = 0,
+                        .timestamp =
+                            Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
+                        .confidence = 1}};
+                std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
+                if (new_ball)
+                {
+                    // If vision detected a new ball, then use that one
+                    updateBall(*new_ball);
+                }
             }
         }
     }
