@@ -154,9 +154,6 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             // Wait for all robots to come to a halt
             robotHalt(world_ptr, yield);
-            // Attacker in front of enemy with the ball
-            //            Rectangle attacker_rect(Point(-3.5, 1), Point(-2.3, 0));
-            //            robotInPolygon(4, attacker_rect, world_ptr, yield);
 
             // Two friendly robots in position to shadow enemy robots. One is on the enemy
             // with the ball and the other is on the next highest threat
