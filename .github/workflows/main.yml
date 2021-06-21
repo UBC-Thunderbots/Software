@@ -156,6 +156,8 @@ jobs:
           bazel test -c dbg  \
             --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
             //shared/parameter/...
+            
+            
   build-full-system-and-ssl-binaries:
     name: Build and upload binaries
     runs-on: ubuntu-18.04
@@ -169,9 +171,9 @@ jobs:
           
       - name: Build full_system and ssl_simulation_main
         run: |
-          cd src \
+          cd src
           bazel build //software:full_system \
-          //software/simulation/ssl_simulation_protocol:ssl_simulation_main \
+          //software/simulation/ssl_simulation_protocol:ssl_simulation_main
       
       - name: Upload binaries
         uses: actions/upload-artifact@v2
