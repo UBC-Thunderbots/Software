@@ -75,16 +75,17 @@ struct AttackerFSM
                 auto pass_segment = Segment(event.control_params.best_pass_so_far->passerPoint(),
                                             event.control_params.best_pass_so_far->receiverPoint());
 
+                // TODO HACK: re-enable once chip passing is calibrated
                 bool should_chip = false;
 
-                for (const Robot& enemy : event.common.world.enemyTeam().getAllRobots())
-                {
-                    if (intersects(Circle(enemy.position(), ROBOT_MAX_RADIUS_METERS * 2),
-                                   pass_segment))
-                    {
-                        should_chip = true;
-                    }
-                }
+                // for (const Robot& enemy : event.common.world.enemyTeam().getAllRobots())
+                // {
+                     //if (intersects(Circle(enemy.position(), ROBOT_MAX_RADIUS_METERS * 2),
+                                    //pass_segment))
+                     //{
+                         //should_chip = true;
+                     //}
+                // }
 
                 // we have committed to passing, execute the pass
                 control_params = PivotKickFSM::ControlParams{
