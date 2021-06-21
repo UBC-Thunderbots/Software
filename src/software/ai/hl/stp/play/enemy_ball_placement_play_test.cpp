@@ -39,7 +39,7 @@ TEST_F(EnemyBallPlacementPlayTest, test_ball_placement_center)
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
             {
-                yield("");
+                yield("Allow robots to start moving");
             }
             robotHalt(world_ptr, yield);
         }};
@@ -74,7 +74,7 @@ TEST_F(EnemyBallPlacementPlayTest, test_ball_placement_diagonal)
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
             {
-                yield("");
+                yield("Allow robots to start moving");
             }
             robotHalt(world_ptr, yield);
         }};
@@ -140,7 +140,7 @@ TEST_F(EnemyBallPlacementPlayTest, test_no_placement)
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
             {
-                yield("");
+                yield("Allow robots to start moving");
             }
             robotHalt(world_ptr, yield);
         }};
