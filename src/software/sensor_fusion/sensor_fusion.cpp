@@ -50,6 +50,10 @@ std::optional<World> SensorFusion::getWorld() const
 
 void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
 {
+    // process robot status msgs first to since breakbeam info is relevant to sensor
+    // fusion with vision
+    updateWorld(sensor_msg.robot_status_msgs());
+
     if (sensor_msg.has_ssl_vision_msg())
     {
         updateWorld(sensor_msg.ssl_vision_msg());
@@ -59,8 +63,6 @@ void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
     {
         updateWorld(sensor_msg.ssl_referee_msg());
     }
-
-    updateWorld(sensor_msg.robot_status_msgs());
 
     friendly_team.assignGoalie(friendly_goalie_id);
     enemy_team.assignGoalie(enemy_goalie_id);
