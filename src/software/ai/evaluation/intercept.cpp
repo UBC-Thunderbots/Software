@@ -51,8 +51,8 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &b
 
         best_ball_intercept_pos   = point_in_front_of_ball;
         best_ball_travel_duration = getTimeToPositionForRobot(
-            robot.position(), best_ball_intercept_pos, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+            robot.position(), best_ball_intercept_pos, robot.robotConstants().robot_max_speed_m_per_s,
+            robot.robotConstants().robot_max_acceleration_m_per_s_2);
 
         return std::make_pair(best_ball_intercept_pos, best_ball_travel_duration);
     }
