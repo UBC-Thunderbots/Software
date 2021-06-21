@@ -12,7 +12,8 @@ AttackerTactic::AttackerTactic(
     : Tactic(false,
              {RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
       fsm(DribbleFSM(std::make_shared<Point>())),
-      pass(std::nullopt),
+      best_pass_so_far(std::nullopt),
+      pass_committed(false),
       chip_target(std::nullopt),
       attacker_tactic_config(attacker_tactic_config)
 {
@@ -20,10 +21,12 @@ AttackerTactic::AttackerTactic(
 
 void AttackerTactic::updateWorldParams(const World& world) {}
 
-void AttackerTactic::updateControlParams(const Pass& updated_pass)
+void AttackerTactic::updateControlParams(const Pass& best_pass_so_far,
+                                         bool pass_committed)
 {
     // Update the control parameters stored by this Tactic
-    this->pass = updated_pass;
+    this->best_pass_so_far = best_pass_so_far;
+    this->pass_committed   = pass_committed;
 }
 
 void AttackerTactic::updateControlParams(std::optional<Point> chip_target)
@@ -46,7 +49,8 @@ void AttackerTactic::updateIntent(const TacticUpdate& tactic_update)
     }
 
     AttackerFSM::ControlParams control_params{
-        .pass                   = pass,
+        .best_pass_so_far       = best_pass_so_far,
+        .pass_committed         = pass_committed,
         .shot                   = shot,
         .chip_target            = chip_target,
         .attacker_tactic_config = attacker_tactic_config};
