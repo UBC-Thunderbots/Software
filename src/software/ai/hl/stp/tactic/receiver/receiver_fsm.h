@@ -215,7 +215,8 @@ struct ReceiverFSM
                         BallCollisionType::ALLOW,
                         AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
                                        BALL_MAX_SPEED_METERS_PER_SECOND},
-                    MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, event.common.robot.robotConstants()));
+                        MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+                        event.common.robot.robotConstants()));
                 }
             }
         };
@@ -233,7 +234,8 @@ struct ReceiverFSM
                     event.control_params.pass->receiverOrientation(), 0,
                     DribblerMode::OFF, BallCollisionType::ALLOW,
                     AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                    MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, event.common.robot.robotConstants()));
+                    MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+                    event.common.robot.robotConstants()));
             }
         };
 
@@ -268,7 +270,8 @@ struct ReceiverFSM
                     event.common.robot.id(), ball_receive_pos, ball_receive_orientation,
                     0, DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
                     AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                    MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, event.common.robot.robotConstants()));
+                    MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+                    event.common.robot.robotConstants()));
             }
         };
 

@@ -20,19 +20,19 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 
     double friendly_kick_pass_rating =
         rateKickPassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
-    //double friendly_chip_pass_rating =
-        //rateChipPassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
+    // double friendly_chip_pass_rating =
+    // rateChipPassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
 
     double enemy_kick_pass_rating = rateKickPassEnemyRisk(
         world.enemyTeam(), pass,
         Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
         passing_config->getEnemyProximityImportance()->value());
-    //double enemy_chip_pass_rating = rateChipPassEnemyRisk(
-        //world.enemyTeam(), pass,
-        //Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
-        //passing_config);
+    // double enemy_chip_pass_rating = rateChipPassEnemyRisk(
+    // world.enemyTeam(), pass,
+    // Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
+    // passing_config);
 
-    //double chip_pass_rating = friendly_chip_pass_rating * enemy_chip_pass_rating;
+    // double chip_pass_rating = friendly_chip_pass_rating * enemy_chip_pass_rating;
     double kick_pass_rating = friendly_kick_pass_rating * enemy_kick_pass_rating;
     double pass_rating      = kick_pass_rating;
 

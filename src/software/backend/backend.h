@@ -33,6 +33,6 @@ class Backend : public Subject<SensorProto>,
     void receiveSSLWrapperPacket(SSLProto::SSL_WrapperPacket msg);
     void receiveSSLReferee(SSLProto::Referee msg);
 
-    google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus>
+    std::unique_ptr<google::protobuf::RepeatedPtrField<TbotsProto::RobotStatus>>
         accumulated_robot_statuses;
 };
