@@ -21,7 +21,10 @@ void Backend::receiveSSLWrapperPacket(SSLProto::SSL_WrapperPacket msg)
 {
     SensorProto sensor_msg;
     // TODO (#2167): Only send robot status only upon receiving vision
-    *(sensor_msg.mutable_robot_status_msgs())     = accumulated_robot_statuses;
+    if (!accumulated_robot_statuses.empty())
+    {
+        *(sensor_msg.mutable_robot_status_msgs()) = accumulated_robot_statuses;
+    }
     *(sensor_msg.mutable_ssl_vision_msg())        = msg;
     *(sensor_msg.mutable_backend_received_time()) = *createCurrentTimestamp();
     Subject<SensorProto>::sendValueToObservers(sensor_msg);
