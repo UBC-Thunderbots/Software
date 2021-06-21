@@ -49,8 +49,8 @@ void CalibrationPlay::getNextTactics(TacticCoroutine::push_type &yield,
     const Angle angle_to_face      = Angle::fromDegrees(-45);
     const double max_chip_distance = 10.0;
 
-    for (double chip_speed = 0.5;
-         chip_speed < max_chip_distance; chip_speed += 0.5)
+    for (double chip_distance = 0.5;
+         chip_distance < max_chip_distance; chip_distance += 0.5)
     {
         auto dribble_tactic = std::make_shared<DribbleTactic>();
         auto chip_tactic    = std::make_shared<ChipTactic>(false);
@@ -62,7 +62,7 @@ void CalibrationPlay::getNextTactics(TacticCoroutine::push_type &yield,
             yield({{dribble_tactic}});
         }
 
-        chip_tactic->updateControlParams(chip_start, angle_to_face, chip_speed);
+        chip_tactic->updateControlParams(chip_start, angle_to_face, chip_distance);
 
         Timestamp start_time = world.getMostRecentTimestamp();
 
@@ -75,7 +75,7 @@ void CalibrationPlay::getNextTactics(TacticCoroutine::push_type &yield,
         LOG(DEBUG) << "Ball chipped with initial velocity: "
                    << world.ball().velocity().length();
 
-        LOG(DEBUG) << "Expected : " << Vector::createFromAngle(Angle::fromDegrees(45)).normalize(chip_speed).length();
+        LOG(DEBUG) << "Expected : " << Vector::createFromAngle(Angle::fromDegrees(45)).normalize(chip_distance).length();
 
         // wait for ball to stop rolling
         while (world.ball().velocity().length() <= 0.01)
