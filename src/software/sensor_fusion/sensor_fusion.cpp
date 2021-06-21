@@ -172,7 +172,7 @@ void SensorFusion::updateWorld(
 {
     for (auto &robot_status_msg : robot_status_msgs)
     {
-        int robot_id = robot_status_msg.robot_id();
+        RobotId robot_id = robot_status_msg.robot_id();
         std::set<RobotCapability> unavailableCapabilities;
 
         for (const auto &error_code_msg : robot_status_msg.error_code())
@@ -201,6 +201,13 @@ void SensorFusion::updateWorld(
             robot_status_msg.break_beam_status().ball_in_beam())
         {
             friendly_robot_id_with_ball_in_dribbler = robot_id;
+        }
+        if ((!robot_status_msg.has_break_beam_status() ||
+             !robot_status_msg.break_beam_status().ball_in_beam()) &&
+            friendly_robot_id_with_ball_in_dribbler.has_value() &&
+            friendly_robot_id_with_ball_in_dribbler.value() == robot_id)
+        {
+            friendly_robot_id_with_ball_in_dribbler = std::nullopt;
         }
     }
 }
