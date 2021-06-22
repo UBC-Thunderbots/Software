@@ -88,7 +88,7 @@ struct DribbleFSM
     static Point findInterceptionPoint(const Robot &robot, const Ball &ball,
                                        const Field &field)
     {
-        static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD   = 0.5;
+        static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD   = 0.3;
         static constexpr double INTERCEPT_POSITION_SEARCH_INTERVAL = 0.1;
         if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
         {
@@ -240,7 +240,7 @@ struct DribbleFSM
          * @param event DribbleFSM::Update
          */
         const auto get_possession = [this](auto event) {
-            static constexpr auto SLOW_DOWN_RADIUS = 0.3;
+            static constexpr auto SLOW_DOWN_RADIUS = 0.6;
 
             auto face_ball_orientation =
                 (event.common.world.ball().position() - event.common.robot.position())
@@ -250,17 +250,17 @@ struct DribbleFSM
                 findInterceptionPoint(event.common.robot, event.common.world.ball(),
                                       event.common.world.field());
 
-            auto speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT;
+             auto speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT;
 
             if ((intercept_position - event.common.robot.position()).length() <
                 SLOW_DOWN_RADIUS)
             {
                 // we are near the ball but not behind it, move slower
-                speed_mode = MaxAllowedSpeedMode::STOP_COMMAND;
+                speed_mode = MaxAllowedSpeedMode::TIPTOE;
             }
 
             event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), intercept_position, face_ball_orientation, 0,
+                event.common.robot.id(), event.common.world.ball().position(), face_ball_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
                 AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, speed_mode, 0.0,
                 event.common.robot.robotConstants()));

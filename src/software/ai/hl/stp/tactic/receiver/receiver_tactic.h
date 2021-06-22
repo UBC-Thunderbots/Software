@@ -22,6 +22,7 @@ class ReceiverTactic : public Tactic
      * @param pass The pass this tactic should try to receive
      */
     explicit ReceiverTactic(const Pass pass);
+    void updateWorldParams(const World &world);
 
     ReceiverTactic() = delete;
 

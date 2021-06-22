@@ -46,17 +46,18 @@ struct AttackerFSM
         const auto pivot_kick = [](auto event,
                                    back::process<PivotKickFSM::Update> processEvent) {
             auto ball_position = event.common.world.ball().position();
-            // Default to do nothing, fix later TODO (#2167)
-            //
-            //  Point chip_target  = event.common.world.field().enemyGoalCenter();
-            //  if (event.control_params.chip_target)
-            //  {
-            // chip_target = event.control_params.chip_target.value();
-            //  }
+            Point chip_target  = event.common.world.field().enemyGoalCenter();
+            if (event.control_params.chip_target)
+            {
+              chip_target = event.control_params.chip_target.value();
+            }
+            // default to chipping the ball away
             PivotKickFSM::ControlParams control_params{
                 .kick_origin       = event.common.robot.position(),
                 .kick_direction    = event.common.robot.orientation(),
-                .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}};
+                .auto_chip_or_kick =
+                    // TODO This should be turned on after the simulated games
+                AutoChipOrKick{AutoChipOrKickMode::OFF, 0}};
 
             if (event.control_params.shot)
             {
@@ -76,18 +77,16 @@ struct AttackerFSM
                     Segment(event.control_params.best_pass_so_far->passerPoint(),
                             event.control_params.best_pass_so_far->receiverPoint());
 
-                // TODO HACK: re-enable once chip passing is calibrated
                 bool should_chip = false;
 
-                // for (const Robot& enemy :
-                // event.common.world.enemyTeam().getAllRobots())
-                // {
-                // if (intersects(Circle(enemy.position(), ROBOT_MAX_RADIUS_METERS * 2),
-                // pass_segment))
-                //{
-                // should_chip = true;
-                //}
-                // }
+                for (const Robot& enemy : event.common.world.enemyTeam().getAllRobots())
+                {
+                    if (intersects(Circle(enemy.position(), ROBOT_MAX_RADIUS_METERS * 2),
+                                   pass_segment))
+                    {
+                        should_chip = true;
+                    }
+                }
 
                 // we have committed to passing, execute the pass
                 control_params = PivotKickFSM::ControlParams{
@@ -129,9 +128,10 @@ struct AttackerFSM
             }
             else
             {
+                // TODO too spammy, re-enable when fixed
                 // we didn't get a best_pass_so_far, so we will be using the default pass.
-                LOG(INFO) << "Attacker FSM has no best pass so far, using default pass "
-                          << "to enemy goal center.";
+                // LOG(INFO) << "Attacker FSM has no best pass so far, using default pass "
+                //           << "to enemy goal center.";
             }
 
             auto keepaway_dribble_dest =
@@ -179,6 +179,7 @@ struct AttackerFSM
             {
                 if (contains(about_to_steal_danger_zone, enemy.position()))
                 {
+                    LOG(DEBUG) << "Attacker Chipping: NOT a chip pass";
                     return true;
                 }
             }
