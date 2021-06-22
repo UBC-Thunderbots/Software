@@ -258,18 +258,6 @@ struct DribbleFSM
                 speed_mode = MaxAllowedSpeedMode::STOP_COMMAND;
             }
 
-            for (const auto &enemy_robot : event.common.world.enemyTeam().getAllRobots())
-            {
-                if (enemy_robot.isNearDribbler(ball_position, 0.005))
-                {
-                    if (acuteAngle(enemy_robot.position(), event.common.robot.position(),
-                                   ball_position) < Angle::fromDegrees(150))
-                    {
-                        face_ball_orientation += Angle::fromDegrees(45);
-                        break;
-                    }
-                }
-            }
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), intercept_position, face_ball_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
@@ -302,6 +290,19 @@ struct DribbleFSM
                 // give the ball a little kick
                 auto_chip_or_kick =
                     AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, DRIBBLE_KICK_SPEED};
+            }
+
+            for (const auto &enemy_robot : event.common.world.enemyTeam().getAllRobots())
+            {
+                if (enemy_robot.isNearDribbler(ball_position, 0.005))
+                {
+                    if (acuteAngle(enemy_robot.position(), event.common.robot.position(),
+                                   ball_position) < Angle::fromDegrees(90))
+                    {
+                        target_orientation += Angle::fromDegrees(45);
+                        break;
+                    }
+                }
             }
 
             event.common.set_intent(std::make_unique<MoveIntent>(
