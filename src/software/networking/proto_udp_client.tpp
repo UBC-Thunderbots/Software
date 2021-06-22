@@ -68,8 +68,8 @@ ReceiveProtoT ProtoUdpClient<SendProtoT, ReceiveProtoT>::receiveProto()
             boost::asio::use_future);
 
         // Timeout occurs
-        if (read_result.wait_for(std::chrono::milliseconds(25)) ==
-            std::future_status::timeout)
+        if (read_result.wait_for(std::chrono::milliseconds(10)) ==
+                std::future_status::timeout)
         {
             socket_.cancel();
             return ReceiveProtoT();

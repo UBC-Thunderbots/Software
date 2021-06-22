@@ -1,5 +1,8 @@
 #include "software/proto/message_translation/ssl_referee.h"
 
+#include "software/logger/logger.h"
+#include "shared/constants.h"
+
 // this maps a protobuf SSLProto::Referee_Command enum to its equivalent internal type
 // this map is used when we are on the blue team
 const static std::unordered_map<SSLProto::Referee::Command, RefereeCommand>
@@ -66,12 +69,23 @@ RefereeCommand createRefereeCommand(const SSLProto::Referee &packet,
 {
     if (team_colour == TeamColour::YELLOW)
     {
-        return yellow_team_command_map.at(packet.command());
+        auto iter = yellow_team_command_map.find(packet.command());
+        if (iter != yellow_team_command_map.end())
+        {
+            return iter->second;
+        }
     }
     else
     {
-        return blue_team_command_map.at(packet.command());
+        auto iter = blue_team_command_map.find(packet.command());
+        if (iter != blue_team_command_map.end())
+        {
+            return iter->second;
+        }
     }
+    LOG(WARNING) << "Could not find SSL Referee Command" << packet.DebugString()
+                 << std::endl;
+    return RefereeCommand::HALT;
 }
 
 // this maps a protobuf SSLProto::Referee_Stage enum to its RefereeStage equivalent
@@ -99,15 +113,22 @@ const static std::unordered_map<SSLProto::Referee::Stage, RefereeStage>
 
 RefereeStage createRefereeStage(const SSLProto::Referee &packet)
 {
-    return referee_stage_map.at(packet.stage());
+    auto iter = referee_stage_map.find(packet.stage());
+    if (iter != referee_stage_map.end())
+    {
+        return iter->second;
+    }
+    LOG(WARNING) << "Could not find SSL Referee Command" << packet.DebugString()
+                 << std::endl;
+    return RefereeStage::POST_GAME;
 }
 
 std::optional<Point> getBallPlacementPoint(const SSLProto::Referee &packet)
 {
     if (packet.has_designated_position())
     {
-        return Point(static_cast<double>(packet.designated_position().x()),
-                     static_cast<double>(packet.designated_position().y()));
+        return Point(static_cast<double>(packet.designated_position().x()*METERS_PER_MILLIMETER),
+                     static_cast<double>(packet.designated_position().y()*METERS_PER_MILLIMETER));
     }
     else
     {

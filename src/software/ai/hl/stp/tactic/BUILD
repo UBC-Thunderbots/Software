@@ -18,6 +18,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
+        "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/logger",
     ],
 )

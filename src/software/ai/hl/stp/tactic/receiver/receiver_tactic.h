@@ -22,10 +22,9 @@ class ReceiverTactic : public Tactic
      * @param pass The pass this tactic should try to receive
      */
     explicit ReceiverTactic(const Pass pass);
+    void updateWorldParams(const World &world);
 
     ReceiverTactic() = delete;
-
-    void updateWorldParams(const World& world) override;
 
     /**
      * Updates the control parameters for this ReceiverTactic.
@@ -71,6 +70,12 @@ class ReceiverTactic : public Tactic
      */
     static Shot getOneTimeShotPositionAndOrientation(const Robot& robot, const Ball& ball,
                                                      const Point& best_shot_target);
+
+    /**
+     * Returns the name of the FSM state
+     * @return the name of the fsm state
+     */
+    std::string getAdditionalInfo() const override;
 
     void accept(TacticVisitor& visitor) const override;
     bool done() const override;

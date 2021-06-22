@@ -18,7 +18,6 @@ ReceiverTactic::ReceiverTactic(const Pass pass)
 }
 
 void ReceiverTactic::updateWorldParams(const World& world) {}
-
 void ReceiverTactic::updateControlParams(const Pass& updated_pass, bool disable_one_touch)
 {
     // Update the control parameters stored by this Tactic
@@ -58,4 +57,11 @@ void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
 void ReceiverTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
+}
+
+std::string ReceiverTactic::getAdditionalInfo() const
+{
+    std::stringstream ss;
+    fsm.visit_current_states([&ss](auto state) { ss << TYPENAME(state); });
+    return ss.str();
 }

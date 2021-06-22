@@ -2,9 +2,9 @@
 
 #include <algorithm>
 
-#include "software/ai/hl/stp/action/chip_action.h"
+#include "software/ai/hl/stp/action/kick_action.h"
 
-KickoffChipTactic::KickoffChipTactic(bool loop_forever) : ChipTactic(loop_forever) {}
+KickoffChipTactic::KickoffChipTactic(bool loop_forever) : KickTactic(loop_forever) {}
 
 void KickoffChipTactic::updateWorldParams(const World& world) {}
 
