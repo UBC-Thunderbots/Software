@@ -22,7 +22,7 @@ from software.python_bindings import world, passing, pass_generator
 import numpy as np
 
 wrapper_proto_log = ProtoLog(
-    "/tmp/passingissues/21062021_155501/SensorFusion_SSL_WrapperPacket", SSL_WrapperPacket,
+    "test_data/SensorFusion_SSL_WrapperPacket", SSL_WrapperPacket,
 )
 # -
 
@@ -159,5 +159,3 @@ show(fig, notebook_handle=True)
 slider = ipywidgets.IntSlider(min=0, max=len(wrapper_proto_log) - 1)
 ipywidgets.interact(plot_ssl_wrapper_at_idx, idx=slider)
 # -
-
-

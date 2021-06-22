@@ -88,7 +88,7 @@ struct DribbleFSM
     static Point findInterceptionPoint(const Robot &robot, const Ball &ball,
                                        const Field &field)
     {
-        static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD   = 0.3;
+        static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD   = 0.5;
         static constexpr double INTERCEPT_POSITION_SEARCH_INTERVAL = 0.1;
         if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
         {
