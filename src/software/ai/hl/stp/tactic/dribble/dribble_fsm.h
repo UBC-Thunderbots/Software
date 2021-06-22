@@ -55,6 +55,13 @@ struct DribbleFSM
     static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.9;
     // robot speed at which the robot is done dribbling
     static constexpr double ROBOT_DRIBBLING_DONE_SPEED = 0.2;  // m/s
+    // lost possession threshold
+    static constexpr double ROBOT_LOST_POSSESSION_THRESHOLD = 0.01;
+    // when we think the ball is moving slow enough that we should go directly to it
+    static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD = 0.3;
+    // if we are close to ball don't intercept
+    static constexpr auto INTERCEPT_BALL_RADIUS = 0.4;
+
 
     /**
      * Converts the ball position to the robot's position given the direction that the
@@ -88,7 +95,6 @@ struct DribbleFSM
     static Point findInterceptionPoint(const Robot &robot, const Ball &ball,
                                        const Field &field)
     {
-        static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD   = 0.5;
         static constexpr double INTERCEPT_POSITION_SEARCH_INTERVAL = 0.1;
         if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
         {
@@ -207,6 +213,19 @@ struct DribbleFSM
         };
 
         /**
+         * Guard that checks if the robot has lost possession of the ball
+         *
+         * @param event DribbleFSM::Update
+         *
+         * @return if the ball possession has been lost
+         */
+        const auto lost_possession = [](auto event) {
+            return !event.common.robot.isNearDribbler(
+                // avoid cases where ball is exactly on the edge fo the robot
+                event.common.world.ball().position(), ROBOT_LOST_POSSESSION_THRESHOLD);
+        };
+
+        /**
          * Guard that checks if the ball is at the dribble_destination and robot is facing
          * the right direction with possession of the ball
          *
@@ -240,8 +259,6 @@ struct DribbleFSM
          * @param event DribbleFSM::Update
          */
         const auto get_possession = [this](auto event) {
-            static constexpr auto INTERCEPT_BALL_RADIUS = 0.4;
-
             auto face_ball_orientation =
                 (event.common.world.ball().position() - event.common.robot.position())
                     .orientation();
@@ -250,7 +267,7 @@ struct DribbleFSM
                 findInterceptionPoint(event.common.robot, event.common.world.ball(),
                                       event.common.world.field());
 
-             auto speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT;
+            auto speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT;
 
              if ((event.common.world.ball().position() - event.common.robot.position()).length() <
                      INTERCEPT_BALL_RADIUS)
@@ -261,7 +278,7 @@ struct DribbleFSM
             }
 
             event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), event.common.world.ball().position(), face_ball_orientation, 0,
+                event.common.robot.id(), intercept_position, face_ball_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
                 AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, speed_mode, 0.0,
                 event.common.robot.robotConstants()));
@@ -328,7 +345,7 @@ struct DribbleFSM
             // src_state + event [guard] / action = dest_state
             *get_possession_s + update_e[have_possession] / start_dribble = dribble_s,
             get_possession_s + update_e[!have_possession] / get_possession,
-            dribble_s + update_e[!have_possession] / get_possession = get_possession_s,
+            dribble_s + update_e[lost_possession] / get_possession = get_possession_s,
             dribble_s + update_e[!dribbling_done] / dribble,
             dribble_s + update_e[dribbling_done] / dribble  = X,
             X + update_e[!have_possession] / get_possession = get_possession_s,
