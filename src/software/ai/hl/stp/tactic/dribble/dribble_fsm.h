@@ -81,6 +81,22 @@ struct DribbleFSM
                                               BALL_MAX_RADIUS_METERS - 0.005);
     }
 
+	/**
+	 * Returns true if the ball is far enough that we can register a new continuous dribble start position.
+	 *
+	 * @param ball_position The ball position
+	 * @param robot The robot
+	 *
+	 * @return true if the ball is sufficiently far enough for us to consider the ball to be considered in
+	 *         a new start position
+	 */
+	static bool isRobotFarFromBall(const Point &ball_position,
+								   const Robot &robot)
+	{
+		double distance_robot_ball = (ball_position - robot.position()).length();
+		return distance_robot_ball >= LOSE_BALL_POSSESSION_THRESHOLD;
+	}
+
     /**
      * Calculates the interception point for intercepting balls
      *
@@ -259,6 +275,8 @@ struct DribbleFSM
          * @param event DribbleFSM::Update
          */
         const auto get_possession = [this](auto event) {
+            auto ball_position = event.common.world.ball().position();
+			double robot_ball_distance = (ball_position - event.common.robot.position()).length();
             auto face_ball_orientation =
                 (event.common.world.ball().position() - event.common.robot.position())
                     .orientation();
@@ -266,6 +284,16 @@ struct DribbleFSM
             Point intercept_position =
                 findInterceptionPoint(event.common.robot, event.common.world.ball(),
                                       event.common.world.field());
+			if (isRobotFarFromBall(ball_position, event.common.robot))
+			{
+				continuous_dribbling_start_point = nullptr;
+			}
+			
+			bool is_close_to_ball = robot_ball_distance <= ROBOT_MAX_RADIUS_METERS;
+			if (continuous_dribbling_start_point == nullptr && is_close_to_ball)
+			{
+				continuous_dribbling_start_point = std::make_shared<Point>(ball_position);
+			}
 
             auto speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT;
 
@@ -336,8 +364,11 @@ struct DribbleFSM
          * @param event DribbleFSM::Update
          */
         const auto start_dribble = [this, dribble](auto event) {
-            // update continuous_dribbling_start_point once we start dribbling
-            *continuous_dribbling_start_point = event.common.world.ball().position();
+			if (continuous_dribbling_start_point == nullptr)
+			{
+				// update continuous_dribbling_start_point once we start dribbling
+				continuous_dribbling_start_point = std::make_shared<Point>(event.common.world.ball().position());
+			}
             dribble(event);
         };
 
@@ -355,3 +386,4 @@ struct DribbleFSM
    private:
     std::shared_ptr<Point> continuous_dribbling_start_point;
 };
+
