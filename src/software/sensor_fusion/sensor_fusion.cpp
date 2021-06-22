@@ -128,6 +128,11 @@ void SensorFusion::updateWorld(const SSLProto::SSL_GeometryData &geometry_packet
 
 void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 {
+    // reset the ball filter when we transition to STOP referee command
+    if (packet.command() == SSLProto::Referee_Command_STOP && !game_state.isStopped()) {
+        resetBallFilter();
+    }
+
     if (sensor_fusion_config->getFriendlyColorYellow()->value())
     {
         game_state.updateRefereeCommand(createRefereeCommand(packet, TeamColour::YELLOW));
@@ -443,4 +448,9 @@ void SensorFusion::resetWorldComponents()
     friendly_team_filter = RobotTeamFilter();
     enemy_team_filter    = RobotTeamFilter();
     team_with_possession = TeamSide::ENEMY;
+}
+
+void SensorFusion::resetBallFilter() {
+    ball_filter =
+        BallFilter(sensor_fusion_config->getRollingFrictionAcceleration()->value());
 }
