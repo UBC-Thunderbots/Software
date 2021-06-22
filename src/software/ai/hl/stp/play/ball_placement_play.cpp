@@ -13,7 +13,7 @@ BallPlacementPlay::BallPlacementPlay(std::shared_ptr<const PlayConfig> config)
 
 bool BallPlacementPlay::isApplicable(const World &world) const
 {
-    return world.gameState().isOurBallPlacement();
+    return world.gameState().isOurBallPlacement() && distanceSquared(world.ball().position(), world.gameState().getBallPlacementPoint().value()) > 0.005;
 }
 
 bool BallPlacementPlay::invariantHolds(const World &world) const

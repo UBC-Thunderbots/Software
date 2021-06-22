@@ -48,9 +48,7 @@ namespace
                                             MotionConstraint::FRIENDLY_HALF,
                                             MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new ReceiverTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                                   pass, world.ball(), false),
-                std::set<MotionConstraint>({})),
+                new ReceiverTactic(pass), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new ShadowEnemyTactic(), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
@@ -73,6 +71,8 @@ namespace
     auto gamestart_or_us_motion_constraints =
         std::set<MotionConstraint>({MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
                                     MotionConstraint::FRIENDLY_DEFENSE_AREA});
+
+    auto ball_placement_us_motion_constraints = std::set<MotionConstraint>({});
 
     auto kickoff_motion_constraints = std::set<MotionConstraint>(
         {MotionConstraint::FRIENDLY_DEFENSE_AREA, MotionConstraint::CENTER_CIRCLE,
@@ -167,6 +167,16 @@ TEST_P(CheckMotionConstraints, CycleGameStartOrUsGameStatesTest)
     game_state.updateRefereeCommand(RefereeCommand::INDIRECT_FREE_US);
     EXPECT_EQ(correct_motion_constraints,
               buildMotionConstraintSet(game_state, *GetParam().first));
+}
+
+TEST_P(CheckMotionConstraints, CycleBallPlacementUsGameStatesTest)
+{
+    correct_motion_constraints = ball_placement_us_motion_constraints;
+
+    for (MotionConstraint c : GetParam().second)
+    {
+        correct_motion_constraints.erase(c);
+    }
 
     game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_US);
     EXPECT_EQ(correct_motion_constraints,

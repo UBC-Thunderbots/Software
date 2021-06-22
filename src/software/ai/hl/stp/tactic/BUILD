@@ -18,6 +18,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
+        "//software/ai/hl/stp/tactic/kick:kick_tactic",
         "//software/logger",
     ],
 )
@@ -32,21 +33,6 @@ cc_library(
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
-    ],
-)
-
-cc_library(
-    name = "receiver_tactic",
-    srcs = ["receiver_tactic.cpp"],
-    hdrs = ["receiver_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//software/ai/evaluation:calc_best_shot",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/passing:pass",
-        "//software/geom/algorithms",
         "//software/logger",
     ],
 )
@@ -82,7 +68,6 @@ cc_library(
     deps = [
         ":kickoff_chip_tactic",
         ":penalty_setup_tactic",
-        ":receiver_tactic",
         ":shadow_free_kicker_tactic",
         ":tactic",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
@@ -96,6 +81,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/move_goalie_to_goal_line:move_goalie_to_goal_line_tactic",
         "//software/ai/hl/stp/tactic/penalty_kick:penalty_kick_tactic",
         "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
+        "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
         "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
     ],

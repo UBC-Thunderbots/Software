@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
+#include "software/ai/hl/stp/tactic/kick/kick_tactic.h"
 
 /**
  * The KickoffChipTactic will move the assigned robot to the given chip origin and then
@@ -8,7 +8,7 @@
  * centre circle and near the ball during kickoff.
  */
 
-class KickoffChipTactic : public ChipTactic
+class KickoffChipTactic : public KickTactic
 {
    public:
     /**

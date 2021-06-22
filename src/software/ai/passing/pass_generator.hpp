@@ -6,6 +6,34 @@
 #include "software/ai/passing/pass_evaluation.h"
 #include "software/ai/passing/pass_generator.h"
 
+
+// TODO Remove (#2167)
+template <class TimeT  = std::chrono::milliseconds,
+          class ClockT = std::chrono::steady_clock>
+class Timer
+{
+    using timep_t  = typename ClockT::time_point;
+    timep_t _start = ClockT::now(), _end = {};
+
+   public:
+    void tick()
+    {
+        _end   = timep_t{};
+        _start = ClockT::now();
+    }
+
+    void tock()
+    {
+        _end = ClockT::now();
+    }
+
+    template <class TT = TimeT>
+    TT duration() const
+    {
+        return std::chrono::duration_cast<TT>(_end - _start);
+    }
+};
+
 template <class ZoneEnum>
 PassGenerator<ZoneEnum>::PassGenerator(
     std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division,
@@ -21,14 +49,22 @@ template <class ZoneEnum>
 PassEvaluation<ZoneEnum> PassGenerator<ZoneEnum>::generatePassEvaluation(
     const World& world)
 {
+    Timer clock;
+
+    clock.tick();
     auto generated_passes = samplePasses(world);
     if (current_best_passes_.empty())
     {
         current_best_passes_ = generated_passes;
     }
-    auto optimized_passes = optimizePasses(world, generated_passes);
+    current_best_passes_      = optimizePasses(world, current_best_passes_);
+    auto optimized_new_passes = optimizePasses(world, generated_passes);
 
-    updatePasses(world, optimized_passes);
+    updatePasses(world, optimized_new_passes);
+    clock.tock();
+
+    LOG(DEBUG) << "Pass evaluation took = " << clock.duration().count()
+               << " ms to generate\n";
 
     return PassEvaluation<ZoneEnum>(pitch_division_, current_best_passes_,
                                     passing_config_, world.getMostRecentTimestamp());

@@ -46,3 +46,10 @@ void PenaltyKickTactic::updateIntent(const TacticUpdate& tactic_update)
 {
     fsm.process_event(PenaltyKickFSM::Update({}, tactic_update));
 }
+
+std::string PenaltyKickTactic::getAdditionalInfo() const
+{
+    std::stringstream ss;
+    fsm.visit_current_states([&ss](auto state) { ss << TYPENAME(state); });
+    return ss.str();
+}
