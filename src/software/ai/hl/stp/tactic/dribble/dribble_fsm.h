@@ -292,6 +292,19 @@ struct DribbleFSM
                     AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, DRIBBLE_KICK_SPEED};
             }
 
+            for (const auto &enemy_robot : event.common.world.enemyTeam().getAllRobots())
+            {
+                if (enemy_robot.isNearDribbler(ball_position, 0.005))
+                {
+                    if (acuteAngle(enemy_robot.position(), event.common.robot.position(),
+                                   ball_position) < Angle::fromDegrees(90))
+                    {
+                        target_orientation += Angle::fromDegrees(45);
+                        break;
+                    }
+                }
+            }
+
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), target_destination, target_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW, auto_chip_or_kick,
