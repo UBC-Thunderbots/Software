@@ -49,7 +49,7 @@ struct DribbleFSM
     // the dribble
     static constexpr Angle FINAL_DESTINATION_CLOSE_THRESHOLD = Angle::fromDegrees(1);
     // Kick speed when breaking up continuous dribbling
-    static constexpr double DRIBBLE_KICK_SPEED = 0.05;
+    static constexpr double DRIBBLE_KICK_SPEED = 0.15;
     // Maximum distance to continuously dribble the ball, slightly conservative to not
     // break the 1 meter rule
     static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.9;
@@ -240,31 +240,31 @@ struct DribbleFSM
          * @param event DribbleFSM::Update
          */
         const auto get_possession = [this](auto event) {
-            static constexpr auto SLOW_DOWN_RADIUS = 0.3;
+            static constexpr auto SLOW_DOWN_RADIUS = 0.6;
 
-            auto ball_position = event.common.world.ball().position();
             auto face_ball_orientation =
-                (ball_position - event.common.robot.position()).orientation();
+                (event.common.world.ball().position() - event.common.robot.position())
+                    .orientation();
+
             Point intercept_position =
                 findInterceptionPoint(event.common.robot, event.common.world.ball(),
                                       event.common.world.field());
 
-            auto speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT;
+             auto speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT;
 
             if ((intercept_position - event.common.robot.position()).length() <
                 SLOW_DOWN_RADIUS)
             {
                 // we are near the ball but not behind it, move slower
-                speed_mode = MaxAllowedSpeedMode::STOP_COMMAND;
+                speed_mode = MaxAllowedSpeedMode::TIPTOE;
             }
 
             event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), intercept_position, face_ball_orientation, 0,
+                event.common.robot.id(), event.common.world.ball().position(), face_ball_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
                 AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, speed_mode, 0.0,
                 event.common.robot.robotConstants()));
         };
-
 
         /**
          * Action to dribble the ball

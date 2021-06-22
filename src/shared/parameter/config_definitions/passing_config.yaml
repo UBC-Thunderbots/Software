@@ -45,13 +45,13 @@
      name: min_pass_speed_m_per_s
      min: 0
      max: 5
-     value: 4.5
+     value: 3.8
      description: "The minimum pass speed (in m/s)"
  - double:
      name: max_pass_speed_m_per_s
      min: 0
      max: 10
-     value: 6.0
+     value: 5.2
      description: "The maximum pass speed (in m/s)"
  - double:
      name: min_time_offset_for_pass_seconds
