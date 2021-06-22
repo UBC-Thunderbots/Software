@@ -55,8 +55,8 @@ struct DribbleFSM
     static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.9;
     // robot speed at which the robot is done dribbling
     static constexpr double ROBOT_DRIBBLING_DONE_SPEED = 0.2;  // m/s
-    // lost possession threshold
-    static constexpr double ROBOT_LOST_POSSESSION_THRESHOLD = 0.01;
+    // if ball and front of robot are separated by this amount, then we've lost possession
+    static constexpr double LOSE_BALL_POSSESSION_THRESHOLD = 0.01;
     // when we think the ball is moving slow enough that we should go directly to it
     static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD = 0.3;
     // if we are close to ball don't intercept
@@ -222,7 +222,7 @@ struct DribbleFSM
         const auto lost_possession = [](auto event) {
             return !event.common.robot.isNearDribbler(
                 // avoid cases where ball is exactly on the edge fo the robot
-                event.common.world.ball().position(), ROBOT_LOST_POSSESSION_THRESHOLD);
+                event.common.world.ball().position(), LOSE_BALL_POSSESSION_THRESHOLD);
         };
 
         /**
