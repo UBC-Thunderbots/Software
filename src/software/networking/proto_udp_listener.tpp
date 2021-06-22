@@ -125,10 +125,10 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
 {
     if (!error)
     {
-        auto packet_data = ReceiveProtoT();
-        packet_data.ParseFromArray(raw_received_data_.data(),
-                                   static_cast<int>(num_bytes_received));
-        receive_callback(packet_data);
+        auto packet_data = std::make_unique<ReceiveProtoT>();
+        packet_data->ParseFromArray(raw_received_data_.data(),
+                                    static_cast<int>(num_bytes_received));
+        receive_callback(*packet_data);
 
         // Once we've handled the data, start listening again
         startListen();

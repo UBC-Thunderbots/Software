@@ -12,7 +12,7 @@
     name: robot_obstacle_inflation_factor
     min: 0
     max: 10
-    value: 2.0167
+    value: 2.12
     type: "double"
     description: "Factor for robot obstacle size"
 
@@ -21,6 +21,6 @@
     name: allowed_robot_collision_speed
     min: 0
     max: 1
-    value: 0.2
+    value: 0.3
     type: "double"
     description: "The allowed robot speed for collisions with enemy robots"

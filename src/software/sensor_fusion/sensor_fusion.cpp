@@ -11,7 +11,7 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       enemy_team(),
       game_state(),
       referee_stage(std::nullopt),
-      ball_filter(),
+      ball_filter(sensor_fusion_config->getRollingFrictionAcceleration()->value()),
       friendly_team_filter(),
       enemy_team_filter(),
       team_with_possession(TeamSide::ENEMY),
@@ -149,7 +149,7 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
         }
     }
 
-    if (game_state.isOurBallPlacement())
+    if (game_state.isBallPlacement())
     {
         auto pt = getBallPlacementPoint(packet);
         if (pt)
@@ -172,7 +172,7 @@ void SensorFusion::updateWorld(
 {
     for (auto &robot_status_msg : robot_status_msgs)
     {
-        int robot_id = robot_status_msg.robot_id();
+        RobotId robot_id = robot_status_msg.robot_id();
         std::set<RobotCapability> unavailableCapabilities;
 
         for (const auto &error_code_msg : robot_status_msg.error_code())
@@ -201,6 +201,13 @@ void SensorFusion::updateWorld(
             robot_status_msg.break_beam_status().ball_in_beam())
         {
             friendly_robot_id_with_ball_in_dribbler = robot_id;
+        }
+        if ((!robot_status_msg.has_break_beam_status() ||
+             !robot_status_msg.break_beam_status().ball_in_beam()) &&
+            friendly_robot_id_with_ball_in_dribbler.has_value() &&
+            friendly_robot_id_with_ball_in_dribbler.value() == robot_id)
+        {
+            friendly_robot_id_with_ball_in_dribbler = std::nullopt;
         }
     }
 }
@@ -262,24 +269,48 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         enemy_team    = createEnemyTeam(yellow_team);
     }
 
-    std::optional<Robot> robot_with_ball_in_dribbler;
+    // TODO don't make this hacky with statics
+    static std::optional<Robot> robot_with_ball_in_dribbler;
+    static const int NUM_DROPPED_DETECTIONS_BEFORE_BALL_NOT_IN_DRIBBLER = 3;
+
     if (friendly_robot_id_with_ball_in_dribbler.has_value())
     {
         robot_with_ball_in_dribbler =
             friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
         friendly_robot_id_with_ball_in_dribbler = std::nullopt;
+        ball_in_dribbler_timeout = NUM_DROPPED_DETECTIONS_BEFORE_BALL_NOT_IN_DRIBBLER;
     }
-    if (robot_with_ball_in_dribbler.has_value())
+
+    if (ball_in_dribbler_timeout > 0)
     {
-        // Use ball in dribbler information first since it's most precise
-        ball =
-            Ball(robot_with_ball_in_dribbler->position() +
-                     Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
-                         .normalize(DIST_TO_FRONT_OF_ROBOT_METERS),
-                 Vector(0, 0), robot_with_ball_in_dribbler->timestamp());
+        // robot_with_ball_in_dribbler so lets decrement the counter so that we timeout properly
+        ball_in_dribbler_timeout--;
+
+        if (robot_with_ball_in_dribbler.has_value())
+        {
+            std::vector<BallDetection> dribbler_in_ball_detection = {
+                    BallDetection{
+                        .position =
+                            robot_with_ball_in_dribbler->position() +
+                            Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
+                                .normalize(DIST_TO_FRONT_OF_ROBOT_METERS - 0.01),
+                        .distance_from_ground = 0,
+                        .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
+                        .confidence = 1}};
+
+            std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
+
+            if (new_ball)
+            {
+                updateBall(*new_ball);
+            }
+        }
     }
     else
     {
+        // If we got here, we timedout on ball in dribbler msgs
+        robot_with_ball_in_dribbler = std::nullopt;
+
         std::optional<Ball> new_ball = createBall(ball_detections);
         if (new_ball)
         {
@@ -291,27 +322,13 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
             // If we already have a ball from a previous frame, but is occluded this frame
             std::optional<Robot> closest_enemy =
                 enemy_team.getNearestRobot(ball->position());
-            std::optional<Robot> closest_friendly =
-                friendly_team.getNearestRobot(ball->position());
 
-            if (closest_friendly.has_value())
+            if (closest_enemy.has_value())
             {
-                // it only makes sense to do anything if there are friendly robots
-                Robot closest_robot = closest_friendly.value();
-
-                if (closest_enemy.has_value() &&
-                    distanceSquared(closest_enemy->position(), ball->position()) <
-                        distanceSquared(closest_friendly->position(), ball->position()))
-                {
-                    closest_robot = closest_enemy.value();
-                }
-
-                // Assume that the robot has the ball in dribbler since that's the worst
-                // case scenario, i.e. they could shoot or pass
-                ball = Ball(closest_robot.position() +
-                                Vector::createFromAngle(closest_robot.orientation())
+                ball = Ball(closest_enemy->position() +
+                                Vector::createFromAngle(closest_enemy->orientation())
                                     .normalize(DIST_TO_FRONT_OF_ROBOT_METERS),
-                            Vector(0, 0), closest_robot.timestamp());
+                            Vector(0, 0), closest_enemy->timestamp());
             }
         }
     }
@@ -415,13 +432,14 @@ void SensorFusion::checkForVisionReset(double t_capture)
 
 void SensorFusion::resetWorldComponents()
 {
-    field                = std::nullopt;
-    ball                 = std::nullopt;
-    friendly_team        = Team();
-    enemy_team           = Team();
-    game_state           = GameState();
-    referee_stage        = std::nullopt;
-    ball_filter          = BallFilter();
+    field         = std::nullopt;
+    ball          = std::nullopt;
+    friendly_team = Team();
+    enemy_team    = Team();
+    game_state    = GameState();
+    referee_stage = std::nullopt;
+    ball_filter =
+        BallFilter(sensor_fusion_config->getRollingFrictionAcceleration()->value());
     friendly_team_filter = RobotTeamFilter();
     enemy_team_filter    = RobotTeamFilter();
     team_with_possession = TeamSide::ENEMY;

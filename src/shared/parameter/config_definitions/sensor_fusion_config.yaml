@@ -57,7 +57,7 @@
       Yellow if selected, Blue if unselected
 - bool:
     name: override_game_controller_friendly_goalie_id
-    value: true
+    value: false
     description: >-
       Overrides the friendly goalie id provided by the game controller,
       with FriendlyGoalieId parameter
@@ -89,3 +89,10 @@
       then `isOurRestart()` will be `true`, while 
       `PREPARE_KICKOFF_THEM` followed by `NORMAL_START` will set 
       `isOurRestart()` to `false`
+- double:
+    name: rolling_friction_acceleration
+    min: 0
+    max: 1
+    value: 0.5
+    description: >-
+      the assumed constant acceleration due to rolling friction between the ball and field

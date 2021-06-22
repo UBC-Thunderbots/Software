@@ -102,7 +102,7 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
         fabsf(net_change_in_orientation) /
             (float)(robot_constants.robot_max_ang_speed_rad_per_s));
 
-    // clamp num elements between 3 (minimum number of trajectory elements) and
+    // Clamp num elements between 3 (minimum number of trajectory elements) and
     // TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
     const unsigned int num_elements = (unsigned int)fmaxf(
         fminf((estimated_time_delta * CONTROL_LOOP_HZ / NUM_TICKS_PER_TRAJECTORY_ELEMENT),

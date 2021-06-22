@@ -63,3 +63,10 @@ void GetBehindBallTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }
+
+std::string GetBehindBallTactic::getAdditionalInfo() const
+{
+    std::stringstream ss;
+    fsm.visit_current_states([&ss](auto state) { ss << TYPENAME(state); });
+    return ss.str();
+}

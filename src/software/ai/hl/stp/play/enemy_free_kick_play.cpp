@@ -87,7 +87,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         // Assign ShadowEnemy tactics until we have every enemy covered. If there are not
         // enough threats to shadow, move our robots to block the friendly net
-        if (enemy_threats.size() == 0)
+        if (enemy_threats.size() <= 1)
         {
             move_tactic_main->updateControlParams(
                 world.field().friendlyGoalCenter() +
@@ -105,7 +105,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             tactics_to_run[0].emplace_back(move_tactic_main);
             tactics_to_run[0].emplace_back(move_tactic_secondary);
         }
-        if (enemy_threats.size() == 1)
+        if (enemy_threats.size() == 2)
         {
             shadow_tactic_main->updateControlParams(enemy_threats.at(1),
                                                     ROBOT_MAX_RADIUS_METERS * 3);
@@ -119,7 +119,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             tactics_to_run[0].emplace_back(shadow_tactic_main);
             tactics_to_run[0].emplace_back(move_tactic_main);
         }
-        if (enemy_threats.size() >= 2)
+        if (enemy_threats.size() >= 3)
         {
             shadow_tactic_main->updateControlParams(enemy_threats.at(1),
                                                     ROBOT_MAX_RADIUS_METERS * 3);

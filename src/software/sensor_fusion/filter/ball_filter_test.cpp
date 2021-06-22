@@ -14,10 +14,12 @@
 
 class BallFilterTest : public ::testing::Test
 {
+    static constexpr double ROLLING_FRICTION_ACCELERATION_MAGNITUDE = 0.5;
+
    protected:
     BallFilterTest()
         : field(Field::createSSLDivisionBField()),
-          ball_filter(),
+          ball_filter(ROLLING_FRICTION_ACCELERATION_MAGNITUDE),
           current_timestamp(Timestamp::fromSeconds(123)),
           time_step(Duration::fromSeconds(1.0 / 60.0))
     {
@@ -233,6 +235,22 @@ class BallFilterTest : public ::testing::Test
 
             // Make sure the timestamps are always increasing
             EXPECT_GE(filtered_ball->timestamp(), current_timestamp);
+
+            // assert that acceleration is either 0 or in opposite direction
+            auto acceleration = filtered_ball->acceleration();
+            if (filtered_ball->velocity().length() <
+                ball_filter.BALL_MIN_SPEED_FOR_ROLLING_ACCELERATION)
+            {
+                EXPECT_EQ(acceleration, Vector());
+            }
+            else
+            {
+                auto mag_difference =
+                    acceleration.length() - ROLLING_FRICTION_ACCELERATION_MAGNITUDE;
+                EXPECT_LT(mag_difference, ROLLING_FRICTION_ACCELERATION_MAGNITUDE);
+                EXPECT_EQ(acceleration.orientation(),
+                          filtered_ball->velocity().rotate(Angle::half()).orientation());
+            }
         }
     }
 

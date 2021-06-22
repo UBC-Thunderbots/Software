@@ -45,25 +45,47 @@
      name: min_pass_speed_m_per_s
      min: 0
      max: 5
-     value: 3.5
+     value: 3.8
      description: "The minimum pass speed (in m/s)"
  - double:
      name: max_pass_speed_m_per_s
      min: 0
      max: 10
-     value: 5.5
+     value: 5.2
      description: "The maximum pass speed (in m/s)"
+ - double:
+     name: min_time_offset_for_pass_seconds
+     min: 0
+     max: 5
+     value: 0.7
+     description: >-
+       Minimum time into the future at which the pass should occur. This is
+       to ensure we have enough time to setup a robot to actually perform
+       the pass. This is in seconds.
+ - double:
+     name: max_time_offset_for_pass_seconds
+     min: 0
+     max: 5
+     value: 4.0
+     description: >-
+       Maximum time into the future at which the pass should occur. This gives the
+       upper bound on the pass start time, relative to the current time. This is in
+       seconds.
  - double:
      name: enemy_reaction_time
      min: 0
      max: 3.0
-     value: 0.4
+     value: 0.2
      description: >-
        How long we think the enemy will take to recognize we're passing and start
        moving to intercept
  - int:
      name: number_of_gradient_descent_steps_per_iter
      min: 0
-     max: 1000
-     value: 2 # TODO (#1987) find optimal iterations after tuning, for now 2 does the trick
+     max: 100
+     value: 2
      description: "The number of steps of gradient descent to perform in each iteration"
+ - bool:
+     name: debug_rate_pass
+     value: false
+     description: "Logs the costs that go into rate pass, Robocup 2021 hack that should be removed TODO (#2167)"

@@ -32,10 +32,10 @@ extern "C"
             .front_of_robot_width_meters = 0.11f,
             // TODO (#2112): update this
             .dribbler_width_meters                  = 0.088f,
-            .robot_max_speed_m_per_s                = 4.825f,
-            .robot_max_ang_speed_rad_per_s          = 56.76f,
-            .robot_max_acceleration_m_per_s_2       = 3.28f,
-            .robot_max_ang_acceleration_rad_per_s_2 = 38.57f,
+            .robot_max_speed_m_per_s                = 3.700f,
+            .robot_max_ang_speed_rad_per_s          = 26.2,
+            .robot_max_acceleration_m_per_s_2       = 4.7,
+            .robot_max_ang_acceleration_rad_per_s_2 = 50.8,
             // TODO (#2112): update this
             .indefinite_dribbler_speed_rpm = 10000.0f,
             // TODO (#2112): update this
