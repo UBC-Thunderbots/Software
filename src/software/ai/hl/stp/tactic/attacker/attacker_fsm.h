@@ -54,10 +54,11 @@ struct AttackerFSM
             }
             // default to chipping the ball away
             OneTouchKickFSM::ControlParams control_params{
-                .kick_origin       = event.common.robot.position(),
-                .kick_direction    = event.common.robot.orientation(),
+                .kick_origin    = ball_position,
+                .kick_direction = (chip_target - ball_position).orientation(),
                 .auto_chip_or_kick =
-                AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, 5}};
+                    AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
+                                   (chip_target - ball_position).length()}};
 
             if (event.control_params.shot)
             {
