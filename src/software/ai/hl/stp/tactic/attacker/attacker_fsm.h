@@ -56,8 +56,8 @@ struct AttackerFSM
                 .kick_origin       = event.common.robot.position(),
                 .kick_direction    = event.common.robot.orientation(),
                 .auto_chip_or_kick =
-                    // TODO This should be turned on after the simulated games
-                AutoChipOrKick{AutoChipOrKickMode::OFF, 0}};
+                    AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
+                                   (chip_target - ball_position).length()}};
 
             if (event.control_params.shot)
             {
