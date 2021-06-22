@@ -8,6 +8,7 @@
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
 #include "software/ai/intent/intent.h"
+#include "software/util/typename/typename.h"
 #include "software/world/world.h"
 
 // TODO (#1888): remove this typedef
@@ -131,6 +132,11 @@ class Tactic
      * @return the next intent
      */
     std::unique_ptr<Intent> get(const Robot &robot, const World &world);
+
+    /**
+     * Gets additional text from the tactic to display in the playinfo box.
+     */
+    virtual std::string getAdditionalInfo() const;
 
     /**
      * Accepts a Tactic Visitor and calls the visit function on itself

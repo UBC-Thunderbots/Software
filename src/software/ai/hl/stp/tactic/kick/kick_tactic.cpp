@@ -62,3 +62,10 @@ void KickTactic::updateIntent(const TacticUpdate &tactic_update)
 {
     fsm.process_event(KickFSM::Update(control_params, tactic_update));
 }
+
+std::string KickTactic::getAdditionalInfo() const
+{
+    std::stringstream ss;
+    fsm.visit_current_states([&ss](auto state) { ss << TYPENAME(state); });
+    return ss.str();
+}
