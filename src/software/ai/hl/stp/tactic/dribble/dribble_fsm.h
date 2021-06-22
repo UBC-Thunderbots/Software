@@ -49,7 +49,7 @@ struct DribbleFSM
     // the dribble
     static constexpr Angle FINAL_DESTINATION_CLOSE_THRESHOLD = Angle::fromDegrees(1);
     // Kick speed when breaking up continuous dribbling
-    static constexpr double DRIBBLE_KICK_SPEED = 0.05;
+    static constexpr double DRIBBLE_KICK_SPEED = 0.15;
     // Maximum distance to continuously dribble the ball, slightly conservative to not
     // break the 1 meter rule
     static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.9;

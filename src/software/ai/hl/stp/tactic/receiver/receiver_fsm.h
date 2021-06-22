@@ -238,7 +238,7 @@ struct ReceiverFSM
                 event.common.set_intent(std::make_unique<MoveIntent>(
                     event.common.robot.id(), event.control_params.pass->receiverPoint(),
                     event.control_params.pass->receiverOrientation(), 0,
-                    DribblerMode::OFF, BallCollisionType::ALLOW,
+                    DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
                     AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
                     MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
                     event.common.robot.robotConstants()));
