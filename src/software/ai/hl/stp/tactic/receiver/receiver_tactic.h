@@ -71,6 +71,12 @@ class ReceiverTactic : public Tactic
     static Shot getOneTimeShotPositionAndOrientation(const Robot& robot, const Ball& ball,
                                                      const Point& best_shot_target);
 
+    /**
+     * Returns the name of the FSM state
+     * @return the name of the fsm state
+     */
+    std::string getAdditionalInfo() const override;
+
     void accept(TacticVisitor& visitor) const override;
     bool done() const override;
 
