@@ -240,7 +240,7 @@ struct DribbleFSM
          * @param event DribbleFSM::Update
          */
         const auto get_possession = [this](auto event) {
-            static constexpr auto SLOW_DOWN_RADIUS = 0.6;
+            static constexpr auto INTERCEPT_BALL_RADIUS = 0.4;
 
             auto face_ball_orientation =
                 (event.common.world.ball().position() - event.common.robot.position())
@@ -252,11 +252,12 @@ struct DribbleFSM
 
              auto speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT;
 
-            if ((intercept_position - event.common.robot.position()).length() <
-                SLOW_DOWN_RADIUS)
-            {
+             if ((event.common.world.ball().position() - event.common.robot.position()).length() <
+                     INTERCEPT_BALL_RADIUS)
+             {
                 // we are near the ball but not behind it, move slower
-                speed_mode = MaxAllowedSpeedMode::TIPTOE;
+                speed_mode = MaxAllowedSpeedMode::STOP_COMMAND;
+                intercept_position = event.common.world.ball().position();
             }
 
             event.common.set_intent(std::make_unique<MoveIntent>(

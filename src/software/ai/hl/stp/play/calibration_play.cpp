@@ -1,6 +1,6 @@
 #include "software/ai/hl/stp/play/calibration_play.h"
 
-#include "software/ai/hl/stp/tactic/chip/chip_tactic.h"
+#include "software/ai/hl/stp/tactic/kick/kick_tactic.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"

@@ -271,8 +271,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
     // TODO don't make this hacky with statics
     static std::optional<Robot> robot_with_ball_in_dribbler;
-    static int ball_in_dribbler_timeout = 0;
-    static int NUM_DROPPED_DETECTIONS_BEFORE_BALL_NOT_IN_DRIBBLER = 3;
+    static const int NUM_DROPPED_DETECTIONS_BEFORE_BALL_NOT_IN_DRIBBLER = 3;
 
     if (friendly_robot_id_with_ball_in_dribbler.has_value())
     {
@@ -326,24 +325,10 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
             if (closest_enemy.has_value())
             {
-                // Assume that the robot has the ball in dribbler since that's the worst
-                // case scenario, i.e. they could shoot or pass
-                std::vector<BallDetection> dribbler_in_ball_detection = {
-
-                    BallDetection{
-                        .position = closest_enemy->position() +
-                                    Vector::createFromAngle(closest_enemy->orientation())
-                                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS - 0.01),
-                        .distance_from_ground = 0,
-                        .timestamp =
-                            Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
-                        .confidence = 1}};
-                std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
-                if (new_ball)
-                {
-                    // If vision detected a new ball, then use that one
-                    updateBall(*new_ball);
-                }
+                ball = Ball(closest_enemy->position() +
+                                Vector::createFromAngle(closest_enemy->orientation())
+                                    .normalize(DIST_TO_FRONT_OF_ROBOT_METERS),
+                            Vector(0, 0), closest_enemy->timestamp());
             }
         }
     }

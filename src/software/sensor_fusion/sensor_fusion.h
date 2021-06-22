@@ -146,6 +146,7 @@ class SensorFusion
 
     unsigned int friendly_goalie_id;
     unsigned int enemy_goalie_id;
+    int ball_in_dribbler_timeout = 0;
 
     // The number of "reset packets" we have received. These indicate that the
     // vision time should be reset. Please see `checkForVisionReset` to see how
