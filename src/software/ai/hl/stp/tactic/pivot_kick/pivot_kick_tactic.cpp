@@ -66,3 +66,10 @@ void PivotKickTactic::updateIntent(const TacticUpdate &tactic_update)
 {
     fsm.process_event(PivotKickFSM::Update(control_params, tactic_update));
 }
+
+std::string PivotKickTactic::getAdditionalInfo() const
+{
+    std::stringstream ss;
+    fsm.visit_current_states([&ss](auto state) { ss << TYPENAME(state); });
+    return ss.str();
+}

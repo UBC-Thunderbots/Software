@@ -37,6 +37,14 @@ class PenaltyKickTactic : public Tactic
      */
     double calculateRobotCost(const Robot &robot, const World &world) const override;
 
+    /**
+     * Returns the name of the FSM state
+     * @return the name of the fsm state
+     */
+    std::string getAdditionalInfo() const override;
+
+
+
     bool done() const override;
     void accept(TacticVisitor &visitor) const override;
 

@@ -142,3 +142,8 @@ void Tactic::updateIntent(const TacticUpdate &tactic_update)
         tactic_update.set_intent(action->getNextIntent());
     }
 }
+std::string Tactic::getAdditionalInfo() const
+{
+    // do nothing by default
+    return "";
+}
