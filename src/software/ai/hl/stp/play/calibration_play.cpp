@@ -53,9 +53,9 @@ void CalibrationPlay::getNextTactics(TacticCoroutine::push_type &yield,
          chip_distance < max_chip_distance; chip_distance += 0.5)
     {
         auto dribble_tactic = std::make_shared<DribbleTactic>();
-        auto chip_tactic    = std::make_shared<ChipTactic>(false);
+        auto chip_tactic    = std::make_shared<KickTactic>(false);
 
-        dribble_tactic->updateControlParams(chip_start, angle_to_face, true);
+        dribble_tactic->updateControlParams(chip_start, angle_to_face, false);
 
         while (!dribble_tactic->done())
         {
