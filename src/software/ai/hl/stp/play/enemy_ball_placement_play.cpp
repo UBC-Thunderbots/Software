@@ -69,7 +69,7 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         Vector placement_to_net = (placement_point - world.field().friendlyGoalCenter())
                                       .normalize(-0.75 - ROBOT_MAX_RADIUS_METERS);
         // if no threats, send two robots near placement point
-        if (enemy_threats.size() == 0)
+        if (enemy_threats.size() < 2)
         {
             move_tactics[0]->updateControlParams(
                 placement_point + placement_to_net +
