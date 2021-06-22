@@ -115,6 +115,8 @@ class SensorFusion
      */
     void resetWorldComponents();
 
+    void resetBallFilter();
+
     /**
      * Determines if the team has control over the given ball
      *
