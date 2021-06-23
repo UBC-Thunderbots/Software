@@ -154,12 +154,27 @@ void SensorFusion::updateWorld(const SSLProto::Referee &packet)
         }
     }
 
+    const bool override_game_controller_defending_side =
+        sensor_fusion_config->getOverrideGameControllerDefendingSide()->value();
+    const bool defending_positive_side =
+        sensor_fusion_config->getDefendingPositiveSide()->value();
+    const bool should_invert_field =
+        (override_game_controller_defending_side && defending_positive_side) ||
+        (!override_game_controller_defending_side && gc_defending_positive_side);
+
     if (game_state.isBallPlacement())
     {
         auto pt = getBallPlacementPoint(packet);
         if (pt)
         {
-            game_state.setBallPlacementPoint(*pt);
+            if (should_invert_field)
+            {
+                game_state.setBallPlacementPoint(Point(-pt->x(), -pt->y()));
+            }
+            else
+            {
+                game_state.setBallPlacementPoint(*pt);
+            }
         }
         else
         {
