@@ -42,9 +42,6 @@ struct DribbleFSM
 
     // Threshold to determine if the ball is at the destination determined experimentally
     static constexpr double BALL_CLOSE_TO_DEST_THRESHOLD = 0.1;
-    // Threshold to determine if the robot has the expected orientation when dribbling the
-    // ball
-    static constexpr Angle FACE_DESTINATION_CLOSE_THRESHOLD = Angle::fromDegrees(5);
     // Threshold to determine if the robot has the expected orientation when completing
     // the dribble
     static constexpr Angle FINAL_DESTINATION_CLOSE_THRESHOLD = Angle::fromDegrees(1);
@@ -256,14 +253,6 @@ struct DribbleFSM
                     .value_or(
                         std::make_pair(event.common.world.ball().position(), Duration()));
             auto intercept_position = intercept_result.first;
-
-             if ((event.common.world.ball().position() - event.common.robot.position()).length() <
-                     INTERCEPT_BALL_RADIUS)
-             {
-                // we are near the ball but not behind it, move slower
-                speed_mode = MaxAllowedSpeedMode::STOP_COMMAND;
-                intercept_position = event.common.world.ball().position();
-            }
 
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), intercept_position, face_ball_orientation, 0,
