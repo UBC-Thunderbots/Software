@@ -8,9 +8,7 @@
 #include "shared/constants.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
-#include "software/geom/algorithms/distance.h"
 #include "software/math/math_functions.h"
-#include "software/logger/logger.h"
 
 
 BallFilter::BallFilter(double rolling_friction_acceleration)
@@ -34,37 +32,6 @@ void BallFilter::addNewDetectionsToBuffer(std::vector<BallDetection> new_ball_de
     // detections (with the smallest timestamp) at the front of the buffer, and the most
     // recent detections (largest timestamp) at the end of the buffer.
     std::sort(new_ball_detections.begin(), new_ball_detections.end());
-
-    // reject a single high residual detection if we have multiple detections and
-    // enough information to reliably reject it
-    // do-while loop so we can early out when we need to
-    if (ball_detection_buffer.size() >= MIN_BUFFER_SIZE && new_ball_detections.size() > 1)
-    {
-        boost::circular_buffer<BallDetection> all_detections(
-            ball_detection_buffer.size() + new_ball_detections.size(), BallDetection());
-        auto next_it = std::copy(ball_detection_buffer.begin(),
-                                 ball_detection_buffer.end(), all_detections.begin());
-        std::copy(new_ball_detections.begin(), new_ball_detections.end(), next_it);
-        auto regression_results = calculateLinearRegression(all_detections);
-        auto velocity_estimate =
-            estimateBallVelocity(all_detections, regression_results.regression_line);
-        if (velocity_estimate && velocity_estimate->average_velocity.length() < 1.0)
-        {
-            // find the highest residual detection out of the new ones
-            auto highest_residual_it =
-                std::max_element(new_ball_detections.begin(), new_ball_detections.end(),
-                                 [&regression_results](const auto &lhs_detection,
-                                                       const auto &rhs_detection) {
-                                     return distance(lhs_detection.position,
-                                                     regression_results.regression_line) <
-                                            distance(rhs_detection.position,
-                                                     regression_results.regression_line);
-                                 });
-            // erase it
-            LOG(DEBUG) << "Ball filter rejected a spurious multiple detection.";
-            new_ball_detections.erase(highest_residual_it);
-        }
-    }
 
     for (const auto &detection : new_ball_detections)
     {

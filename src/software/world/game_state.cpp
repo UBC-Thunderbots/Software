@@ -268,7 +268,6 @@ void GameState::updateBall(const Ball& ball)
         {
             // Once the ball has moved enough, the restart is finished
             setRestartCompleted();
-            LOG(INFO) << "Ball moved, restart completed";
             ball_state_ = std::nullopt;
         }
     }
