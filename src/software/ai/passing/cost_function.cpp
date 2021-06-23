@@ -62,7 +62,7 @@ double rateZone(const World& world, const Rectangle& zone, const Point& receive_
     // of what our pass scores would be if we sent a robot there.
     const size_t X_POINTS_TO_SAMPLE         = 5;
     const size_t Y_POINTS_TO_SAMPLE         = 5;
-    const size_t NUM_COST_FUNCTIONS_SAMPLED = 3;
+    const size_t NUM_COST_FUNCTIONS_SAMPLED = 2;
 
     double zone_rating = 0.0;
     double x_step      = zone.xLength() / X_POINTS_TO_SAMPLE;
@@ -77,9 +77,6 @@ double rateZone(const World& world, const Rectangle& zone, const Point& receive_
 
             zone_rating += ratePassShootScore(world.field(), world.enemyTeam(), pass,
                                               passing_config);
-            zone_rating += rateChipPassEnemyRisk(
-                    world.enemyTeam(), pass,
-                    Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
             zone_rating += rateKickPassEnemyRisk(
                     world.enemyTeam(), pass,
                     Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
@@ -405,7 +402,7 @@ double rateChipPassFriendlyCapability(Team friendly_team, const Pass& pass,
     // Create a sigmoid that goes to 0 as the time required to get to the reception
     // point exceeds the time we would need to get there by
     double sigmoid_width                  = 0.4;
-    double time_to_receiver_state_slack_s = 0.05;
+    double time_to_receiver_state_slack_s = 0.10;
 
     return sigmoid(
         receive_time.toSeconds(),
