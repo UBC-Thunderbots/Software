@@ -4,8 +4,7 @@
 #include "software/ai/evaluation/keep_away.h"
 #include "software/ai/evaluation/shot.h"
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
-#include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
-#include "software/ai/hl/stp/tactic/attacker/one_touch_kick_fsm.h"
+#include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/ai/passing/pass.h"
@@ -34,18 +33,18 @@ struct AttackerFSM
     {
         using namespace boost::sml;
 
-        const auto one_touch_kick_s = state<OneTouchKickFSM>;
+        const auto pivot_kick_s = state<PivotKickFSM>;
         const auto keep_away_s  = state<DribbleFSM>;
         const auto update_e     = event<Update>;
 
         /**
-         * Action that updates the OneTouchKickFSM to shoot or pass
+         * Action that updates the PivotKickFSM to shoot or pass
          *
          * @param event AttackerFSM::Update event
-         * @param processEvent processes the OneTouchKickFSM::Update
+         * @param processEvent processes the PivotKickFSM::Update
          */
-        const auto one_touch_kick = [](auto event,
-                                   back::process<OneTouchKickFSM::Update> processEvent) {
+        const auto pivot_kick = [](auto event,
+                                   back::process<PivotKickFSM::Update> processEvent) {
             auto ball_position = event.common.world.ball().position();
             Point chip_target  = event.common.world.field().enemyGoalCenter();
             if (event.control_params.chip_target)
@@ -53,17 +52,17 @@ struct AttackerFSM
               chip_target = event.control_params.chip_target.value();
             }
             // default to chipping the ball away
-            OneTouchKickFSM::ControlParams control_params{
-                .kick_origin    = ball_position,
-                .kick_direction = (chip_target - ball_position).orientation(),
+            PivotKickFSM::ControlParams control_params{
+                .kick_origin       = event.common.robot.position(),
+                .kick_direction    = event.common.robot.orientation(),
                 .auto_chip_or_kick =
-                    AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
-                                   (chip_target - ball_position).length()}};
+                    // TODO This should be turned on after the simulated games
+                AutoChipOrKick{AutoChipOrKickMode::OFF, 0}};
 
             if (event.control_params.shot)
             {
                 // shoot on net
-                control_params = OneTouchKickFSM::ControlParams{
+                control_params = PivotKickFSM::ControlParams{
                     .kick_origin = ball_position,
                     .kick_direction =
                         (event.control_params.shot->getPointToShootAt() - ball_position)
@@ -90,7 +89,7 @@ struct AttackerFSM
                 }
 
                 // we have committed to passing, execute the pass
-                control_params = OneTouchKickFSM::ControlParams{
+                control_params = PivotKickFSM::ControlParams{
                     .kick_origin = event.control_params.best_pass_so_far->passerPoint(),
                     .kick_direction =
                         event.control_params.best_pass_so_far->passerOrientation(),
@@ -104,7 +103,7 @@ struct AttackerFSM
                         pass_segment.length() * CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO};
                 }
             }
-            processEvent(OneTouchKickFSM::Update(control_params, event.common));
+            processEvent(PivotKickFSM::Update(control_params, event.common));
         };
 
         /**
@@ -190,8 +189,8 @@ struct AttackerFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *keep_away_s + update_e[should_kick] / one_touch_kick = one_touch_kick_s,
+            *keep_away_s + update_e[should_kick] / pivot_kick = pivot_kick_s,
             keep_away_s + update_e[!should_kick] / keep_away,
-            one_touch_kick_s + update_e / one_touch_kick, one_touch_kick_s = X);
+            pivot_kick_s + update_e / pivot_kick, pivot_kick_s = X);
     }
 };

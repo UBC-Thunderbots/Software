@@ -6,14 +6,12 @@ cc_library(
     hdrs = [
         "attacker_fsm.h",
         "attacker_tactic.h",
-        "one_touch_kick_fsm.h",
     ],
     deps = [
         "//shared:constants",
         "//software/ai/evaluation:keep_away",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
-        "//software/ai/intent:kick_intent",
         "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
         "//software/ai/passing:pass",
         "//software/logger",
