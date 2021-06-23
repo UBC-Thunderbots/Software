@@ -50,8 +50,6 @@ std::set<MotionConstraint> buildMotionConstraintSetFromGameState(
         }
         else
         {
-            // Is their penalty
-            motion_constraints.insert(MotionConstraint::FRIENDLY_HALF);
         }
     }
     else if (game_state.isKickoff())
