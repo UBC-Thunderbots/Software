@@ -71,7 +71,6 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     do
     {
-        LOG (DEBUG) << "MOVING";
         if (robot.has_value())
         {
             move_away_tactic->updateRobot(robot.value());
