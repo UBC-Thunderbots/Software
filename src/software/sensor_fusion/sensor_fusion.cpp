@@ -220,23 +220,9 @@ void SensorFusion::updateWorld(
         }
         friendly_team.setUnavailableRobotCapabilities(robot_id, unavailableCapabilities);
 
-        if (robot_status_msg.has_break_beam_status() &&
-            robot_status_msg.break_beam_status().ball_in_beam())
-        {
-            friendly_robot_id_with_ball_in_dribbler = robot_id;
-            breakbeam_statuses[robot_id]            = true;
-        }
-        else
-        {
-            breakbeam_statuses[robot_id] = false;
-        }
-        if ((!robot_status_msg.has_break_beam_status() ||
-             !robot_status_msg.break_beam_status().ball_in_beam()) &&
-            friendly_robot_id_with_ball_in_dribbler.has_value() &&
-            friendly_robot_id_with_ball_in_dribbler.value() == robot_id)
-        {
-            friendly_robot_id_with_ball_in_dribbler = std::nullopt;
-        }
+        breakbeam_statuses[robot_id] =
+            robot_status_msg.has_break_beam_status() &&
+            robot_status_msg.break_beam_status().ball_in_beam();
     }
 }
 
@@ -307,67 +293,49 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     }
     friendly_team.updateRobots(friendly_team_robots);
 
-    // TODO don't make this hacky with statics
-    static std::optional<Robot> robot_with_ball_in_dribbler;
-    static const int NUM_DROPPED_DETECTIONS_BEFORE_BALL_NOT_IN_DRIBBLER = 3;
+    auto robot_with_ball_in_dribbler_it =
+        std::find_if(friendly_team.getAllRobots().begin(), friendly_team.getAllRobots().end(),
+                     [](const Robot& robot) {return robot.currentState().breakbeamStatus();});
 
-    if (friendly_robot_id_with_ball_in_dribbler.has_value())
+
+    std::optional<Ball> new_ball = createBall(ball_detections);
+    if (new_ball)
     {
-        robot_with_ball_in_dribbler =
-            friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
-        friendly_robot_id_with_ball_in_dribbler = std::nullopt;
-        ball_in_dribbler_timeout = NUM_DROPPED_DETECTIONS_BEFORE_BALL_NOT_IN_DRIBBLER;
+        // If vision detected a new ball, then use that one
+        updateBall(*new_ball);
     }
-
-    if (ball_in_dribbler_timeout > 0)
+    else if (robot_with_ball_in_dribbler_it != friendly_team.getAllRobots().end())
     {
-        // robot_with_ball_in_dribbler so lets decrement the counter so that we timeout
-        // properly
-        ball_in_dribbler_timeout--;
+        BallDetection dribbler_in_ball_detection = BallDetection{
+            .position =
+            robot_with_ball_in_dribbler_it->position() +
+            Vector::createFromAngle(robot_with_ball_in_dribbler_it->orientation())
+                .normalize(DIST_TO_FRONT_OF_ROBOT_METERS - 0.01),
+            .distance_from_ground = 0,
+            .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
+            .confidence = 1};
 
-        if (robot_with_ball_in_dribbler.has_value())
+        ball_detections.emplace_back(dribbler_in_ball_detection);
+        // try to create a ball again and update it if it exists
+        std::optional<Ball> new_ball_with_dribbler_dets = createBall(ball_detections);
+        if (new_ball_with_dribbler_dets)
         {
-            std::vector<BallDetection> dribbler_in_ball_detection = {BallDetection{
-                .position =
-                    robot_with_ball_in_dribbler->position() +
-                    Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
-                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS - 0.01),
-                .distance_from_ground = 0,
-                .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
-                .confidence = 1}};
-
-            std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
-
-            if (new_ball)
-            {
-                updateBall(*new_ball);
-            }
+            updateBall(*new_ball_with_dribbler_dets);
         }
     }
-    else
+    else if (ball)
     {
-        // If we got here, we timedout on ball in dribbler msgs
-        robot_with_ball_in_dribbler = std::nullopt;
+        // If we already have a ball from a previous frame, but is occluded this frame
+        std::optional<Robot> closest_enemy =
+            enemy_team.getNearestRobot(ball->position());
 
-        std::optional<Ball> new_ball = createBall(ball_detections);
-        if (new_ball)
+        // ball is occluded by an enemy, snap the ball to the dribbler of that robot
+        if (closest_enemy.has_value())
         {
-            // If vision detected a new ball, then use that one
-            updateBall(*new_ball);
-        }
-        else if (ball)
-        {
-            // If we already have a ball from a previous frame, but is occluded this frame
-            std::optional<Robot> closest_enemy =
-                enemy_team.getNearestRobot(ball->position());
-
-            if (closest_enemy.has_value())
-            {
-                ball = Ball(closest_enemy->position() +
-                                Vector::createFromAngle(closest_enemy->orientation())
-                                    .normalize(DIST_TO_FRONT_OF_ROBOT_METERS),
-                            Vector(0, 0), closest_enemy->timestamp());
-            }
+            ball = Ball(closest_enemy->position() +
+                            Vector::createFromAngle(closest_enemy->orientation())
+                                .normalize(DIST_TO_FRONT_OF_ROBOT_METERS),
+                        Vector(0, 0), closest_enemy->timestamp());
         }
     }
 
