@@ -282,9 +282,16 @@ struct DribbleFSM
                 !comparePoints(ball_position, *continuous_dribbling_start_point,
                                MAX_CONTINUOUS_DRIBBLING_DISTANCE))
             {
+                auto kick_speed = DRIBBLE_KICK_SPEED;
+                if (acuteAngle(event.common.robot.velocity(),
+                               ball_position - event.common.robot.position()) <
+                    Angle::quarter())
+                {
+                    kick_speed *= 2;
+                }
                 // give the ball a little kick
                 auto_chip_or_kick =
-                    AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, DRIBBLE_KICK_SPEED};
+                    AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, kick_speed};
             }
 
             for (const auto &enemy_robot : event.common.world.enemyTeam().getAllRobots())
