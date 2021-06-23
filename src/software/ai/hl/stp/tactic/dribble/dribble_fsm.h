@@ -53,7 +53,7 @@ struct DribbleFSM
     // robot speed at which the robot is done dribbling
     static constexpr double ROBOT_DRIBBLING_DONE_SPEED = 0.2;  // m/s
     // if ball and front of robot are separated by this amount, then we've lost possession
-    static constexpr double LOSE_BALL_POSSESSION_THRESHOLD = 0.01;
+    static constexpr double LOSE_BALL_POSSESSION_THRESHOLD = 0.02;
     // when we think the ball is moving slow enough that we should go directly to it
     static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD = 0.3;
     // if we are close to ball don't intercept
