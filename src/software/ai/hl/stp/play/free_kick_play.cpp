@@ -36,6 +36,21 @@ bool FreeKickPlay::invariantHolds(const World &world) const
     return world.gameState().isOurFreeKick();
 }
 
+std::vector<CircleWithColor> FreeKickPlay::getCirclesWithColorToDraw()
+{
+    if (best_pass.has_value())
+    {
+        if (committed_to_pass)
+        {
+            return {std::make_pair<Circle, std::string>(
+                Circle(best_pass->receiverPoint(), 0.2), "blue")};
+        }
+        return {std::make_pair<Circle, std::string>(
+            Circle(best_pass->receiverPoint(), 0.2), "pink")};
+    }
+    return {};
+}
+
 void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     /**
@@ -93,7 +108,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
     do {
         align_to_ball_tactic->updateControlParams(
                 world.ball().position() -
-                ball_to_enemy_goal_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2.5),
+                ball_to_enemy_goal_vec.normalize(ROBOT_MAX_RADIUS_METERS * 3.5),
                 ball_to_enemy_goal_vec.orientation(), 0);
 
 
@@ -163,6 +178,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 
         best_pass_and_score_so_far =
                 pass_generator.generatePassEvaluation(world).getBestPassOnField();
+        best_pass = std::make_optional<Pass>(best_pass_and_score_so_far.pass);
         LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
 
@@ -173,6 +189,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
                                  1.0);
     } while (best_pass_and_score_so_far.rating < min_score);
 
+    committed_to_pass = true;
     if (best_pass_and_score_so_far.rating > MIN_ACCEPTABLE_PASS_SCORE)
     {
         std::cout <<"performing pass" << std::endl;

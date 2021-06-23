@@ -40,7 +40,7 @@ struct ReceiverFSM
 
     // The minimum angle between a ball's trajectory and the ball-receiver_point vector
     // for which we can consider a pass to be stray
-    static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(90);
+    static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(10);
 
     // the minimum speed required for a pass to be considered stray
     static constexpr double MIN_STRAY_PASS_SPEED = 0.3;
