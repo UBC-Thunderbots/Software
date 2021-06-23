@@ -293,9 +293,9 @@ struct ReceiverFSM
             // with keepaway, we don't face the orientation immediately after the receiver
             // receives the pass to execute
             bool friendly_robot_has_ball = false;
-            for(auto robot : event.common.world().getAllRobots())
+            for(auto robot : event.common.world.getAllRobots())
             {
-                if (robot.isNearDribbler(event.common.world().ball().position()))
+                if (robot.isNearDribbler(event.common.world.ball().position()))
                 {
                     friendly_robot_has_ball = true;
                 }
