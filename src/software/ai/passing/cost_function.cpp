@@ -30,12 +30,11 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
         passing_config->getEnemyProximityImportance()->value());
     double enemy_chip_pass_rating = rateChipPassEnemyRisk(
         world.enemyTeam(), pass,
-        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
-        passing_config);
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
 
     double chip_pass_rating = friendly_chip_pass_rating * enemy_chip_pass_rating;
     double kick_pass_rating = friendly_kick_pass_rating * enemy_kick_pass_rating;
-    double pass_rating      = kick_pass_rating * chip_pass_rating;
+    double pass_rating      = std::max(kick_pass_rating , chip_pass_rating);
 
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
 
@@ -80,8 +79,7 @@ double rateZone(const World& world, const Rectangle& zone, const Point& receive_
                                               passing_config);
             zone_rating += rateChipPassEnemyRisk(
                     world.enemyTeam(), pass,
-                    Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
-                    passing_config);
+                    Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
             zone_rating += rateKickPassEnemyRisk(
                     world.enemyTeam(), pass,
                     Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
@@ -149,11 +147,13 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
     // pass to take the shot (or equivalently the shot deflection angle)
     Angle rotation_to_shot_target_after_pass = pass.receiverOrientation().minDiff(
         (shot_target - pass.receiverPoint()).orientation());
+
+    double width = (Angle::half()-Angle::fromDegrees(ideal_max_rotation_to_shoot_degrees)).toDegrees();
     double required_rotation_for_shot_score =
         1 - sigmoid(rotation_to_shot_target_after_pass.abs().toDegrees(),
-                    ideal_max_rotation_to_shoot_degrees, 4);
+                Angle::fromDegrees(ideal_max_rotation_to_shoot_degrees).toDegrees() + width/2.0, width);
 
-    return (shot_openness_score + required_rotation_for_shot_score) / 2;
+    return shot_openness_score * required_rotation_for_shot_score;
 }
 
 double rateKickPassEnemyRisk(const Team& enemy_team, const Pass& pass,
@@ -170,13 +170,18 @@ double rateKickPassEnemyRisk(const Team& enemy_team, const Pass& pass,
 }
 
 double rateChipPassEnemyRisk(const Team& enemy_team, const Pass& pass,
-                             const Duration& enemy_reaction_time,
-                             std::shared_ptr<const PassingConfig> passing_config)
+                             const Duration& enemy_reaction_time)
 {
     /**
-     * This cost function has been calibrated to work with the er-force simulator
+     *  We assume the chip trajectory will clear robots for the initial portion
+     *  of the chip, and then roll for the remainder.
      *
-     * We assume a fixed chip angle of 45 degrees with control over speed.
+     *
+     *                            .---.                    x = chip landing point
+     *                           /     \
+     *                          /       \
+     *                (passer) /         \x_______ (receiver)
+     *                            CHIP      ROLL
      *
      *  So, we only need to calculate the risk of the enemy robot closest to the passer
      *  point, and then the risk of enemies intercepting the pass after it starts rolling.
@@ -381,22 +386,26 @@ double rateChipPassFriendlyCapability(Team friendly_team, const Pass& pass,
     // the speed of the chip, making it harder for us to predict _when_ the ball will
     // land.
     //
-    // Running the CalibrationPlay shows that our hangtime is usually greater than 1
-    // second.
-    //
-    // TODO (#2167) robocup hack, we should really compute this from kick angle and kick
-    // speed rather than approximating hang time (but the current chipping abstractions
-    // don't support this so we make do with this value)
-    Duration ball_hang_time = Duration::fromSeconds(1.00);
+    // TODO (#2167) robocup hack, we know the kick angle is fixed, and we get perfect
+    // speed through ssl_simulator_robot.cpp, so we can compute the ball hang time
+    // with some basic kinematics
+    Angle chip_angle = Angle::fromDegrees(ROBOT_CHIP_ANGLE_DEGREES);
+    double range = (pass.receiverPoint() - pass.passerPoint()).length() *
+                                        CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO;
+    double numerator = range * ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED;
+    double denominator = 2.0 * (chip_angle * 2.0).sin();
+    double chip_speed  = std::sqrt(numerator / denominator);
+    double hang_time = (2 * Vector::createFromAngle(chip_angle).normalize(chip_speed).y())/
+        ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED;
 
-    const Timestamp receive_time = best_receiver->timestamp() + ball_hang_time;
+    const Timestamp receive_time = best_receiver->timestamp() + Duration::fromSeconds(hang_time);
     Timestamp latest_time_to_reciever_state =
         calculateEarliestTimeRobotCanReceive(best_receiver.value(), pass);
 
     // Create a sigmoid that goes to 0 as the time required to get to the reception
     // point exceeds the time we would need to get there by
     double sigmoid_width                  = 0.4;
-    double time_to_receiver_state_slack_s = 0.25;
+    double time_to_receiver_state_slack_s = 0.05;
 
     return sigmoid(
         receive_time.toSeconds(),

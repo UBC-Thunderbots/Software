@@ -31,7 +31,7 @@ struct ReceiverFSM
     // The minimum proportion of open net we're shooting on vs the entire size of the net
     // that we require before attempting a shot
     static constexpr double MIN_SHOT_NET_PERCENT_OPEN = 0.3;
-    static constexpr double MIN_PASS_START_SPEED      = 1.0;
+    static constexpr double MIN_PASS_START_SPEED      = 0.4;
     static constexpr double BALL_MIN_MOVEMENT_SPEED   = 0.05;
 
     // The maximum deflection angle that we will attempt a one-touch kick towards the
@@ -289,7 +289,20 @@ struct ReceiverFSM
          * @return true if the pass has started
          */
         const auto pass_started = [](auto event) {
-            return event.common.world.ball().velocity().length() > MIN_PASS_START_SPEED;
+            auto passer_bot = event.common.world.friendlyTeam().getNearestRobot(
+                    event.control_params.pass->passerPoint());
+            if (!passer_bot.has_value())
+            {
+                // pass can't start if we don't have a passer bot
+                return false;
+            }
+
+            // the pass starts when the passing robot is facing the proper orientation
+            // with keepaway, we don't face the orientation immediately after the receiver
+            // receives the pass to execute
+            return (event.common.world.ball().velocity().length() > MIN_PASS_START_SPEED) &&
+                passer_bot->orientation().minDiff(event.control_params.pass->passerOrientation()) <
+                Angle::fromDegrees(5);
         };
 
         /**

@@ -66,84 +66,81 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
     PassGenerator<EighteenZoneId> pass_generator(pitch_division,
                                                  play_config->getPassingConfig());
 
+    PassWithRating best_pass_and_score_so_far = attemptToShootWhileLookingForAPass(
+        yield, crease_defender_tactics, attacker, world);
 
-    while (true)
+    committed_to_pass = true;
+
+    // If the shoot tactic has not finished, then we need to pass, otherwise we are
+    // done this play
+    if (!attacker->done())
     {
-        PassWithRating best_pass_and_score_so_far = attemptToShootWhileLookingForAPass(
-            yield, crease_defender_tactics, attacker, world);
+        // Commit to a pass
+        Pass pass = best_pass_and_score_so_far.pass;
 
-        // If the shoot tactic has not finished, then we need to pass, otherwise we are
-        // done this play
-        if (!attacker->done())
+        LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
+        LOG(DEBUG) << "Score of pass we committed to: "
+                   << best_pass_and_score_so_far.rating;
+
+        ratePass(world, pass, world.field().fieldLines(),
+                 play_config->getPassingConfig());
+        // Perform the pass and wait until the receiver is finished
+        auto receiver = std::make_shared<ReceiverTactic>(pass);
+
+        auto pass_eval = pass_generator.generatePassEvaluation(world);
+
+        auto ranked_zones = pass_eval.rankZonesForReceiving(
+            world, best_pass_and_score_so_far.pass.receiverPoint());
+        Zones cherry_pick_region_1 = {ranked_zones[0]};
+        Zones cherry_pick_region_2 = {ranked_zones[1]};
+
+        auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
+        auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
+
+        auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
+        auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
+        cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
+                                                  pass1.receiverOrientation(), 0.0,
+                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
+                                                  pass2.receiverOrientation(), 0.0,
+                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+
+
+        do
         {
-            // Commit to a pass
-            Pass pass = best_pass_and_score_so_far.pass;
+            // if we make it here then we have committed to the pass
+            attacker->updateControlParams(pass, true);
+            receiver->updateControlParams(pass);
 
-            LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
-            LOG(DEBUG) << "Score of pass we committed to: "
-                       << best_pass_and_score_so_far.rating;
-
-            committed_to_pass = true;
-
-            ratePass(world, pass, world.field().fieldLines(),
-                     play_config->getPassingConfig());
-            // Perform the pass and wait until the receiver is finished
-            auto receiver = std::make_shared<ReceiverTactic>(pass);
-
-            auto pass_eval = pass_generator.generatePassEvaluation(world);
-
-            auto ranked_zones = pass_eval.rankZonesForReceiving(
-                world, best_pass_and_score_so_far.pass.receiverPoint());
-            Zones cherry_pick_region_1 = {ranked_zones[0]};
-            Zones cherry_pick_region_2 = {ranked_zones[1]};
-
-            auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
-            auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
-
-            auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
-            auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
-            cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
-                                                      pass1.receiverOrientation(), 0.0,
-                                                      MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-            cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
-                                                      pass2.receiverOrientation(), 0.0,
-                                                      MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-
-
-            do
+            std::get<0>(crease_defender_tactics)
+                ->updateControlParams(world.ball().position(),
+                                      CreaseDefenderAlignment::LEFT);
+            std::get<1>(crease_defender_tactics)
+                ->updateControlParams(world.ball().position(),
+                                      CreaseDefenderAlignment::RIGHT);
+            if (!attacker->done())
             {
-                // if we make it here then we have committed to the pass
-                attacker->updateControlParams(pass, true);
-                receiver->updateControlParams(pass);
-
-                std::get<0>(crease_defender_tactics)
-                    ->updateControlParams(world.ball().position(),
-                                          CreaseDefenderAlignment::LEFT);
-                std::get<1>(crease_defender_tactics)
-                    ->updateControlParams(world.ball().position(),
-                                          CreaseDefenderAlignment::RIGHT);
-                if (!attacker->done())
-                {
-                    yield({{attacker, receiver},
-                           {std::get<0>(crease_defender_tactics),
-                            std::get<1>(crease_defender_tactics)},
-                           {cherry_pick_tactic_1}});
-                }
-                else
-                {
-                    yield({{receiver},
-                           {std::get<0>(crease_defender_tactics),
-                            std::get<1>(crease_defender_tactics)},
-                           {cherry_pick_tactic_1, cherry_pick_tactic_2}});
-                }
-            } while (!receiver->done());
-        }
-        else
-        {
-            LOG(DEBUG) << "Took shot";
-        }
-        LOG(DEBUG) << "Finished: looping back";
+                yield({{attacker, receiver},
+                       {std::get<0>(crease_defender_tactics),
+                        std::get<1>(crease_defender_tactics)},
+                       {cherry_pick_tactic_1}});
+            }
+            else
+            {
+                yield({{receiver},
+                       {std::get<0>(crease_defender_tactics),
+                        std::get<1>(crease_defender_tactics)},
+                       {cherry_pick_tactic_1, cherry_pick_tactic_2}});
+            }
+        } while (!receiver->done());
     }
+    else
+    {
+        LOG(DEBUG) << "Took shot";
+    }
+
+    LOG(DEBUG) << "Finished";
 }
 
 std::vector<CircleWithColor> ShootOrPassPlay::getCirclesWithColorToDraw()

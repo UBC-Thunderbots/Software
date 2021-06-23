@@ -61,15 +61,15 @@ struct AttackerFSM
 
             if (event.control_params.shot)
             {
-                // shoot on net
-                control_params = PivotKickFSM::ControlParams{
-                    .kick_origin = ball_position,
-                    .kick_direction =
-                        (event.control_params.shot->getPointToShootAt() - ball_position)
-                            .orientation(),
-                    .auto_chip_or_kick =
-                        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                                       BALL_MAX_SPEED_METERS_PER_SECOND - 0.5}};
+                //// shoot on net
+                //control_params = PivotKickFSM::ControlParams{
+                    //.kick_origin = ball_position,
+                    //.kick_direction =
+                        //(event.control_params.shot->getPointToShootAt() - ball_position)
+                            //.orientation(),
+                    //.auto_chip_or_kick =
+                        //AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                                       //BALL_MAX_SPEED_METERS_PER_SECOND - 0.5}};
             }
             else if (event.control_params.pass_committed)
             {
