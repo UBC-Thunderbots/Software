@@ -37,6 +37,8 @@ class StopTactic : public Tactic
 
     void accept(TacticVisitor& visitor) const override;
     bool done() const override;
+    std::string getAdditionalInfo() const override;
+
 
    private:
     void calculateNextAction(ActionCoroutine::push_type& yield) override;

@@ -147,3 +147,29 @@ std::string Tactic::getAdditionalInfo() const
     // do nothing by default
     return "";
 }
+
+std::string Tactic::parseCondensedFsmState(std::string fsm_state)const
+{
+    auto start_angle_bracket_pos = fsm_state.find_last_of('<');
+    if (start_angle_bracket_pos == std::string::npos)
+    {
+        start_angle_bracket_pos = 0;
+    }
+    auto end_angle_bracket_pos = fsm_state.find_first_of('>');
+    if (end_angle_bracket_pos == std::string::npos)
+    {
+        end_angle_bracket_pos = fsm_state.size() - 1;
+    }
+    auto inside_innermost_angle_brackets_str = fsm_state.substr(
+        start_angle_bracket_pos + 1, end_angle_bracket_pos - start_angle_bracket_pos - 1);
+    auto last_colon_pos = inside_innermost_angle_brackets_str.find_last_of(':');
+    if (last_colon_pos == std::string::npos)
+    {
+        return inside_innermost_angle_brackets_str;
+    }
+    else
+    {
+        auto ret_str = inside_innermost_angle_brackets_str.substr(last_colon_pos + 1);
+        return ret_str;
+    }
+}
