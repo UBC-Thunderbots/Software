@@ -54,10 +54,10 @@ struct AttackerFSM
             // default to chipping the ball away
             PivotKickFSM::ControlParams control_params{
                 .kick_origin    = event.common.robot.position(),
-                .kick_direction = event.common.robot.orientation(),
+                .kick_direction = (chip_target - ball_position).orientation(),
                 .auto_chip_or_kick =
-                    // TODO This should be turned on after the simulated games
-                AutoChipOrKick{AutoChipOrKickMode::OFF, 0}};
+                    AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
+                                   (chip_target - ball_position).length()}};
 
             if (event.control_params.shot)
             {
@@ -171,6 +171,14 @@ struct AttackerFSM
          */
         // TODO: revisit this, we shouldn't "panic chip" unless we're completely boxed in!
         const auto should_kick = [](auto event) {
+            Polygon inflated_friendly_defense_area =
+                static_cast<Polygon>(event.common.world.field().friendlyDefenseArea())
+                    .expand(1.5);
+            if (contains(inflated_friendly_defense_area, event.common.robot.position()))
+            {
+                return true;
+            }
+
             // check for enemy threat
             Circle about_to_steal_danger_zone(event.common.robot.position(),
                                               event.control_params.attacker_tactic_config

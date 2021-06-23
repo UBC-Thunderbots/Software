@@ -165,16 +165,7 @@ PlayInfo STP::getPlayInfo()
         auto additional_info_str = tactic->getAdditionalInfo();
         if (additional_info_str.length() > 0)
         {
-            // ROBOCUP HACK - ideally we'd put this in getAdditionalInfo()
-            auto angle_bracket_it =
-                std::find(additional_info_str.begin(), additional_info_str.end(), '<');
-            if (angle_bracket_it != additional_info_str.end())
-            {
-                additional_info_str =
-                    std::string(angle_bracket_it, additional_info_str.end());
-            }
-
-            s += '-' + additional_info_str;
+            s += "-> " + additional_info_str;
         }
 
         info.addRobotTacticAssignment(s);

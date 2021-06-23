@@ -122,15 +122,16 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
             if (!attacker->done())
             {
                 yield({{attacker, receiver},
-                       {cherry_pick_tactic_1, std::get<0>(crease_defender_tactics),
-                        std::get<1>(crease_defender_tactics)}});
+                       {std::get<0>(crease_defender_tactics),
+                        std::get<1>(crease_defender_tactics)},
+                       {cherry_pick_tactic_1}});
             }
             else
             {
                 yield({{receiver},
-                       {cherry_pick_tactic_1, cherry_pick_tactic_2},
                        {std::get<0>(crease_defender_tactics),
-                        std::get<1>(crease_defender_tactics)}});
+                        std::get<1>(crease_defender_tactics)},
+                       {cherry_pick_tactic_1, cherry_pick_tactic_2}});
             }
         } while (!receiver->done());
     }
@@ -219,9 +220,10 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         // update the best pass in the attacker tactic
         attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
 
-        yield({{attacker_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
-                std::get<0>(crease_defender_tactics),
-                std::get<1>(crease_defender_tactics)}});
+        yield(
+            {{attacker_tactic},
+             {std::get<0>(crease_defender_tactics), std::get<1>(crease_defender_tactics)},
+             {cherry_pick_tactic_1, cherry_pick_tactic_2}});
 
         // We're ready to pass if we have a robot assigned in the PassGenerator as the
         // passer and the PassGenerator has found a pass above our current threshold

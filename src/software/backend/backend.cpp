@@ -12,10 +12,10 @@ Backend::Backend()
 
 void Backend::receiveRobotStatus(TbotsProto::RobotStatus msg)
 {
-    SensorProto sensor_msg;
-    *(sensor_msg.add_robot_status_msgs())         = msg;
-    *(sensor_msg.mutable_backend_received_time()) = *createCurrentTimestamp();
-    Subject<SensorProto>::sendValueToObservers(sensor_msg);
+    std::unique_ptr<SensorProto> sensor_msg        = std::make_unique<SensorProto>();
+    *(sensor_msg->add_robot_status_msgs())         = msg;
+    *(sensor_msg->mutable_backend_received_time()) = *createCurrentTimestamp();
+    Subject<SensorProto>::sendValueToObservers(*sensor_msg);
 }
 
 void Backend::receiveSSLWrapperPacket(SSLProto::SSL_WrapperPacket msg)

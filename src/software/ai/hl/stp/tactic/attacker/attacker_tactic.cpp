@@ -80,14 +80,7 @@ double AttackerTactic::calculateRobotCost(const Robot& robot, const World& world
         cost = (robot.position() - intercept_result.first).length() /
                world.field().totalXLength();
     }
-    // TODO (#2167) robocup 2021 hack: prevents oscillating tactic assignments that give
-    // up the ball
-    //
-    // The attacker and receiver are the two tactics that need the ball/try to get the
-    // ball. We want these tactics to be the most expensive, so that the munkres algorithm
-    // minimizes the overal cost by assinging these tactics to the robots nearest to the
-    // ball.
-    return std::clamp<double>(cost, 0, 1) * 10;
+    return std::clamp<double>(cost, 0, 1);
 }
 
 void AttackerTactic::calculateNextAction(ActionCoroutine::push_type& yield)
@@ -105,5 +98,5 @@ std::string AttackerTactic::getAdditionalInfo() const
 {
     std::stringstream ss;
     fsm.visit_current_states([&ss](auto state) { ss << TYPENAME(state); });
-    return ss.str();
+    return parseCondensedFsmState(ss.str());
 }
