@@ -61,15 +61,15 @@ struct AttackerFSM
 
             if (event.control_params.shot)
             {
-                //// shoot on net
-                //control_params = PivotKickFSM::ControlParams{
-                    //.kick_origin = ball_position,
-                    //.kick_direction =
-                        //(event.control_params.shot->getPointToShootAt() - ball_position)
-                            //.orientation(),
-                    //.auto_chip_or_kick =
-                        //AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                                       //BALL_MAX_SPEED_METERS_PER_SECOND - 0.5}};
+                // shoot on net
+                control_params = PivotKickFSM::ControlParams{
+                    .kick_origin = ball_position,
+                    .kick_direction =
+                        (event.control_params.shot->getPointToShootAt() - ball_position)
+                            .orientation(),
+                    .auto_chip_or_kick =
+                        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                                       BALL_MAX_SPEED_METERS_PER_SECOND - 0.5}};
             }
             else if (event.control_params.pass_committed)
             {
@@ -195,23 +195,10 @@ struct AttackerFSM
             return event.control_params.pass_committed || event.control_params.shot;
         };
 
-        /**
-         * Guard that checks if the robot has possession of the ball
-         *
-         * @param event AttackerFSM::Update
-         *
-         * @return if the ball has been have_possession
-         */
-        const auto have_possession = [](auto event) {
-            return event.common.robot.isNearDribbler(
-                event.common.world.ball().position());
-        };
-
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *keep_away_s + update_e[should_kick] / pivot_kick = pivot_kick_s,
             keep_away_s + update_e[!should_kick] / keep_away,
-            pivot_kick_s + update_e / pivot_kick, pivot_kick_s = X,
-            X + update_e[have_possession] / keep_away = keep_away_s);
+            pivot_kick_s + update_e / pivot_kick, pivot_kick_s = X);
     }
 };
