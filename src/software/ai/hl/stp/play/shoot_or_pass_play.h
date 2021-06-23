@@ -19,6 +19,8 @@ class ShootOrPassPlay : public Play
 
     bool invariantHolds(const World &world) const override;
 
+    std::vector<CircleWithColor> getCirclesWithColorToDraw() override;
+
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 
    private:
@@ -28,6 +30,9 @@ class ShootOrPassPlay : public Play
 
     // The speed each patrolling robot should be moving through its control point
     static constexpr double SPEED_AT_PATROL_POINTS = 0.0;
+
+    std::optional<Pass> best_pass;
+    bool committed_to_pass = false;
 
     /**
      * Sets up the pass for the corner kick: aligns the passer and positions the cherry

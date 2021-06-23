@@ -49,12 +49,12 @@ struct AttackerFSM
             Point chip_target  = event.common.world.field().enemyGoalCenter();
             if (event.control_params.chip_target)
             {
-              chip_target = event.control_params.chip_target.value();
+                chip_target = event.control_params.chip_target.value();
             }
             // default to chipping the ball away
             PivotKickFSM::ControlParams control_params{
-                .kick_origin       = event.common.robot.position(),
-                .kick_direction    = event.common.robot.orientation(),
+                .kick_origin    = event.common.robot.position(),
+                .kick_direction = event.common.robot.orientation(),
                 .auto_chip_or_kick =
                     // TODO This should be turned on after the simulated games
                 AutoChipOrKick{AutoChipOrKickMode::OFF, 0}};
@@ -130,7 +130,8 @@ struct AttackerFSM
             {
                 // TODO too spammy, re-enable when fixed
                 // we didn't get a best_pass_so_far, so we will be using the default pass.
-                // LOG(INFO) << "Attacker FSM has no best pass so far, using default pass "
+                // LOG(INFO) << "Attacker FSM has no best pass so far, using default pass
+                // "
                 //           << "to enemy goal center.";
             }
 

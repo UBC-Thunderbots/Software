@@ -183,6 +183,15 @@ PlayInfo STP::getPlayInfo()
     return info;
 }
 
+std::vector<CircleWithColor> STP::getCirclesWithColorToDraw()
+{
+    if (current_play)
+    {
+        return current_play->getCirclesWithColorToDraw();
+    }
+    return {};
+}
+
 bool STP::overrideAIPlayIfApplicable()
 {
     previous_override_play           = override_play;

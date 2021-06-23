@@ -8,9 +8,9 @@
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/pass.h"
 #include "software/geom/algorithms/acute_angle.h"
-#include "software/geom/algorithms/intersects.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/algorithms/intersects.h"
 #include "software/logger/logger.h"
 
 double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
@@ -21,17 +21,17 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 
     double friendly_kick_pass_rating =
         rateKickPassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
-     double friendly_chip_pass_rating =
+    double friendly_chip_pass_rating =
         rateChipPassFriendlyCapability(world.friendlyTeam(), pass, passing_config);
 
     double enemy_kick_pass_rating = rateKickPassEnemyRisk(
         world.enemyTeam(), pass,
         Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
         passing_config->getEnemyProximityImportance()->value());
-     double enemy_chip_pass_rating = rateChipPassEnemyRisk(
-     world.enemyTeam(), pass,
-     Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
-     passing_config);
+    double enemy_chip_pass_rating = rateChipPassEnemyRisk(
+        world.enemyTeam(), pass,
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
+        passing_config);
 
     double chip_pass_rating = friendly_chip_pass_rating * enemy_chip_pass_rating;
     double kick_pass_rating = friendly_kick_pass_rating * enemy_kick_pass_rating;
@@ -249,8 +249,8 @@ double calculateKickInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     auto pass_segment = Segment(pass.passerPoint(), pass.receiverPoint());
 
     // If the robot is already blocking the pass, exit out early.
-    if(intersects(Circle(enemy_robot.position(),
-                    ROBOT_MAX_RADIUS_METERS * 2), pass_segment))
+    if (intersects(Circle(enemy_robot.position(), ROBOT_MAX_RADIUS_METERS * 2),
+                   pass_segment))
     {
         return 0.0;
     }
@@ -264,8 +264,8 @@ double calculateKickInterceptRisk(const Robot& enemy_robot, const Pass& pass,
 
     // Figure out how long the enemy robot and ball will take to reach the closest
     // point on the pass to the enemy's current position
-    Point closest_point_on_pass_to_robot = closestPoint(
-        enemy_robot.position(), pass_segment);
+    Point closest_point_on_pass_to_robot =
+        closestPoint(enemy_robot.position(), pass_segment);
     Duration enemy_robot_time_to_closest_pass_point = getTimeToPositionForRobot(
         enemy_robot.position(), closest_point_on_pass_to_robot,
         ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,

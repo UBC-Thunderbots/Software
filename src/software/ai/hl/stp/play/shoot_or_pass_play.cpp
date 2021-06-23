@@ -10,6 +10,7 @@
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/geom/circle.h"
 #include "software/logger/logger.h"
 #include "software/util/design_patterns/generic_factory.h"
 
@@ -79,6 +80,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
         LOG(DEBUG) << "Score of pass we committed to: "
                    << best_pass_and_score_so_far.rating;
 
+        committed_to_pass = true;
+
         ratePass(world, pass, world.field().fieldLines(),
                  play_config->getPassingConfig());
         // Perform the pass and wait until the receiver is finished
@@ -139,6 +142,21 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
     LOG(DEBUG) << "Finished";
 }
 
+std::vector<CircleWithColor> ShootOrPassPlay::getCirclesWithColorToDraw()
+{
+    if (best_pass.has_value())
+    {
+        if (committed_to_pass)
+        {
+            return {std::make_pair<Circle, std::string>(
+                Circle(best_pass->receiverPoint(), 0.2), "blue")};
+        }
+        return {std::make_pair<Circle, std::string>(
+            Circle(best_pass->receiverPoint(), 0.20), "pink")};
+    }
+    return {};
+}
+
 PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
     TacticCoroutine::push_type &yield,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
@@ -186,6 +204,7 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
                                   CreaseDefenderAlignment::RIGHT);
         pass_eval                  = pass_generator.generatePassEvaluation(world);
         best_pass_and_score_so_far = pass_eval.getBestPassOnField();
+        best_pass = std::make_optional<Pass>(best_pass_and_score_so_far.pass);
 
         auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
         auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;

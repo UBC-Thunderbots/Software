@@ -7,11 +7,15 @@
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/geom/circle.h"
 
 using TacticVector              = std::vector<std::shared_ptr<Tactic>>;
 using PriorityTacticVector      = std::vector<TacticVector>;
 using ConstTacticVector         = std::vector<std::shared_ptr<const Tactic>>;
 using ConstPriorityTacticVector = std::vector<ConstTacticVector>;
+
+// TODO (#2167) generalize this
+using CircleWithColor = std::pair<Circle, std::string>;
 
 using RobotToTacticAssignmentFunction =
     std::function<std::map<std::shared_ptr<const Tactic>, Robot>(
@@ -101,6 +105,14 @@ class Play
     std::vector<std::unique_ptr<Intent>> get(
         RobotToTacticAssignmentFunction robot_to_tactic_assignment_algorithm,
         MotionConstraintBuildFunction motion_constraint_builder, const World& new_world);
+
+    /**
+     * The play might want to highlight specific points that are important
+     * marked with a label.
+     *
+     * @return CircleWithColor vector
+     */
+    virtual std::vector<CircleWithColor> getCirclesWithColorToDraw();
 
     virtual ~Play() = default;
 

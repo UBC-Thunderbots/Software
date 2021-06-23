@@ -158,4 +158,3 @@ show(fig, notebook_handle=True)
 
 slider = ipywidgets.IntSlider(min=0, max=len(wrapper_proto_log) - 1)
 ipywidgets.interact(plot_ssl_wrapper_at_idx, idx=slider)
-# -
