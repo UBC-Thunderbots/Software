@@ -262,15 +262,16 @@ struct GoalieFSM
                 Point clear_origin =
                     Point(clear_origin_x, event.common.world.ball().position().y());
 
-                Angle clear_direction = (event.common.world.ball().position() -
-                                         event.common.world.field().friendlyGoalCenter())
+                Angle clear_direction = (event.common.world.field().enemyGoalCenter() -
+                                         event.common.world.ball().position())
                                             .orientation();
 
                 PivotKickFSM::ControlParams control_params{
-                    .kick_origin       = clear_origin,
-                    .kick_direction    = clear_direction,
-                    .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
-                                                        YEET_CHIP_DISTANCE_METERS},
+                    .kick_origin    = clear_origin,
+                    .kick_direction = clear_direction,
+                    .auto_chip_or_kick =
+                        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
+                                       event.common.world.field().xLength() - 1},
                 };
 
                 // update the pivotkick fsm

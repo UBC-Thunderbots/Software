@@ -89,3 +89,10 @@ void MoveTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }
+
+std::string MoveTactic::getAdditionalInfo() const
+{
+    std::stringstream ss;
+    fsm.visit_current_states([&ss](auto state) { ss << TYPENAME(state); });
+    return parseCondensedFsmState(ss.str());
+}

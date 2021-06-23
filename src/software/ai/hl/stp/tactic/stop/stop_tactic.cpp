@@ -39,3 +39,9 @@ void StopTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }
+std::string StopTactic::getAdditionalInfo() const
+{
+    std::stringstream ss;
+    fsm.visit_current_states([&ss](auto state) { ss << TYPENAME(state); });
+    return parseCondensedFsmState(ss.str());
+}
