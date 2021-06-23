@@ -281,10 +281,12 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
     // update breakbeam status
     auto friendly_team_robots = friendly_team.getAllRobots();
-    for (auto friendly_robot : friendly_team_robots) {
+    for (auto& friendly_robot : friendly_team_robots) {
         auto robot_state = friendly_robot.currentState();
         robot_state.setBreakbeamStatus(breakbeam_statuses[friendly_robot.id()]);
+        friendly_robot.updateState(robot_state, friendly_robot.timestamp());
     }
+    friendly_team.updateRobots(friendly_team_robots);
 
     // TODO don't make this hacky with statics
     static std::optional<Robot> robot_with_ball_in_dribbler;

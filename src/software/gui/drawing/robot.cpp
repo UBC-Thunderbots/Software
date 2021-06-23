@@ -9,6 +9,7 @@
 #include "software/gui/drawing/geom.h"
 #include "software/gui/geometry_conversion.h"
 #include "software/math/math_functions.h"
+#include "software/logger/logger.h"
 
 void drawRobotVelocity(QGraphicsScene* scene, const Point& position,
                        const Vector& velocity, const QColor& slow_colour,
@@ -142,6 +143,15 @@ void drawRobot(QGraphicsScene* scene, const RobotStateWithId& robot, const QColo
     drawRobotVelocity(scene, robot.robot_state.position(), robot.robot_state.velocity(),
                       robot_speed_slow_color, color, robot_constants);
     drawRobotId(scene, robot.robot_state.position(), robot.id);
+
+    if (robot.robot_state.breakbeamStatus()) {
+        QPen red_pen(Qt::red);
+        red_pen.setWidth(2);
+        red_pen.setCosmetic(true);
+        Circle breakbeam_hot_circle(robot.robot_state.position(), ROBOT_MAX_RADIUS_METERS * 2);
+        drawCircle(scene, breakbeam_hot_circle, red_pen);
+    }
+
 
     // TODO: Show robot charge state
     // https://github.com/UBC-Thunderbots/Software/issues/1492
