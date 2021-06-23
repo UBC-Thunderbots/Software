@@ -152,7 +152,7 @@ int main(int argc, char** argv)
             // log incoming SensorMsg
             auto sensor_msg_logger = std::make_shared<ProtoLogger<SensorProto>>(
                 proto_log_output_dir / "Backend_SensorProto",
-                ProtoLogger<SensorProto>::DEFAULT_MSGS_PER_CHUNK,
+                10000,
                 [](const SensorProto& lhs, const SensorProto& rhs) {
                     return lhs.backend_received_time().epoch_timestamp_seconds() <
                            rhs.backend_received_time().epoch_timestamp_seconds();
@@ -160,7 +160,7 @@ int main(int argc, char** argv)
             // log outgoing PrimitiveSet
             auto primitive_set_logger =
                 std::make_shared<ProtoLogger<TbotsProto::PrimitiveSet>>(
-                    proto_log_output_dir / "AI_PrimitiveSet");
+                    proto_log_output_dir / "AI_PrimitiveSet", 10000);
             backend->Subject<SensorProto>::registerObserver(sensor_msg_logger);
             ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(primitive_set_logger);
 
@@ -178,7 +178,8 @@ int main(int argc, char** argv)
 
             auto vision_logger =
                 std::make_shared<ProtoLogger<SSLProto::SSL_WrapperPacket>>(
-                    proto_log_output_dir / "SensorFusion_SSL_WrapperPacket");
+                    proto_log_output_dir / "SensorFusion_SSL_WrapperPacket",
+                    10000);
             auto world_to_vision_adapter = std::make_shared<
                 ObserverSubjectAdapter<World, SSLProto::SSL_WrapperPacket>>(
                 world_to_ssl_wrapper_conversion_fn);
