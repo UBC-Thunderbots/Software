@@ -62,7 +62,7 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                   -8 * ROBOT_MAX_RADIUS_METERS),
             world.field().enemyGoalCenter().toVector().orientation(), 0);
 
-        world.gameState().isPlaying() ? tactics_to_run[0][0] = goalie_tactic
+        (world.gameState().isPlaying()||world.gameState().isReadyState()) ? tactics_to_run[0][0] = goalie_tactic
                                       : tactics_to_run[0][0] = move_to_goal_line_tactic;
 
         // yield the Tactics this Play wants to run, in order of priority
