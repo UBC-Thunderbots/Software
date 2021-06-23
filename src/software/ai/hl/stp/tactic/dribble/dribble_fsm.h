@@ -53,7 +53,7 @@ struct DribbleFSM
     // robot speed at which the robot is done dribbling
     static constexpr double ROBOT_DRIBBLING_DONE_SPEED = 0.2;  // m/s
     // if ball and front of robot are separated by this amount, then we've lost possession
-    static constexpr double LOSE_BALL_POSSESSION_THRESHOLD = 0.02;
+    static constexpr double LOSE_BALL_POSSESSION_THRESHOLD = 0.01;
     // when we think the ball is moving slow enough that we should go directly to it
     static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD = 0.3;
     // if we are close to ball don't intercept
@@ -93,6 +93,48 @@ struct DribbleFSM
 		double distance_robot_ball = (ball_position - robot.position()).length();
 		return distance_robot_ball >= LOSE_BALL_POSSESSION_THRESHOLD;
 	}
+
+    /**
+     * Calculates the interception point for intercepting balls
+     *
+     * @param robot The robot to do the interception
+     * @param ball The ball to intercept
+     * @field The field to intercept on
+     *
+     * @return the best interception point
+     */
+    // TODO (#1968): Merge this functionality with findBestInterceptForBall in the
+    // evaluation folder
+    static Point findInterceptionPoint(const Robot &robot, const Ball &ball,
+                                       const Field &field)
+    {
+        static constexpr double INTERCEPT_POSITION_SEARCH_INTERVAL = 0.1;
+        if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
+        {
+            auto face_ball_vector = (ball.position() - robot.position());
+            auto point_in_front_of_ball =
+                robotPositionToFaceBall(ball.position(), face_ball_vector.orientation());
+            return point_in_front_of_ball;
+        }
+        Point intercept_position = ball.position();
+        while (contains(field.fieldLines(), intercept_position))
+        {
+            Duration ball_time_to_position = Duration::fromSeconds(
+                distance(intercept_position, ball.position()) / ball.velocity().length());
+            Duration robot_time_to_pos = getTimeToPositionForRobot(
+                robot.position(), intercept_position,
+                robot.robotConstants().robot_max_speed_m_per_s,
+                robot.robotConstants().robot_max_acceleration_m_per_s_2);
+
+            if (robot_time_to_pos < ball_time_to_position)
+            {
+                break;
+            }
+            intercept_position +=
+                ball.velocity().normalize(INTERCEPT_POSITION_SEARCH_INTERVAL);
+        }
+        return intercept_position;
+    }
 
     /**
      * Gets the destination to dribble the ball to from the update event
@@ -179,6 +221,7 @@ struct DribbleFSM
          */
         const auto have_possession = [](auto event) {
             return event.common.robot.isNearDribbler(
+                // avoid cases where ball is exactly on the edge fo the robot
                 event.common.world.ball().position());
         };
 
@@ -234,6 +277,10 @@ struct DribbleFSM
             auto face_ball_orientation =
                 (ball_position - event.common.robot.position())
                     .orientation();
+
+            Point intercept_position =
+                findInterceptionPoint(event.common.robot, event.common.world.ball(),
+                                      event.common.world.field());
 			if (isRobotFarFromBall(ball_position, event.common.robot))
 			{
 				continuous_dribbling_start_point = nullptr;
@@ -247,12 +294,13 @@ struct DribbleFSM
 
             auto speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT;
 
-            auto intercept_result =
-                findBestInterceptForBall(event.common.world.ball(),
-                                         event.common.world.field(), event.common.robot)
-                    .value_or(
-                        std::make_pair(event.common.world.ball().position(), Duration()));
-            auto intercept_position = intercept_result.first;
+             if ((event.common.world.ball().position() - event.common.robot.position()).length() <
+                     INTERCEPT_BALL_RADIUS)
+             {
+                // we are near the ball but not behind it, move slower
+                speed_mode = MaxAllowedSpeedMode::STOP_COMMAND;
+                intercept_position = event.common.world.ball().position();
+            }
 
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), intercept_position, face_ball_orientation, 0,
