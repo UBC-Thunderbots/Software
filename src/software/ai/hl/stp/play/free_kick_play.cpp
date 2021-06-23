@@ -88,13 +88,13 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 
     // We want the kicker to get into position behind the ball facing the center
     // of the field
-    Vector ball_to_center_vec = world.field().enemyGoalCenter().toVector() - world.ball().position().toVector();
+    Vector ball_to_enemy_goal_vec = world.field().enemyGoalCenter().toVector() - world.ball().position().toVector();
 
     do {
         align_to_ball_tactic->updateControlParams(
                 world.ball().position() -
-                ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2.5),
-                ball_to_center_vec.orientation(), 0);
+                ball_to_enemy_goal_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2.5),
+                ball_to_enemy_goal_vec.orientation(), 0);
 
 
         auto pass_eval = pass_generator.generatePassEvaluation(world);

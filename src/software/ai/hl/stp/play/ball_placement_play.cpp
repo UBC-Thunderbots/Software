@@ -13,7 +13,7 @@ BallPlacementPlay::BallPlacementPlay(std::shared_ptr<const PlayConfig> config)
 
 bool BallPlacementPlay::isApplicable(const World &world) const
 {
-    return world.gameState().isOurBallPlacement() && distanceSquared(world.ball().position(), world.gameState().getBallPlacementPoint().value()) > 0.005;
+    return world.gameState().isOurBallPlacement();
 }
 
 bool BallPlacementPlay::invariantHolds(const World &world) const
@@ -25,6 +25,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                        const World &world)
 {
     auto place_ball_tactic = std::make_shared<DribbleTactic>();
+    auto move_away_tactic = std::make_shared<MoveTactic>(false);
 
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
@@ -53,7 +54,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
         TacticVector result = {place_ball_tactic};
         result.insert(result.end(), move_tactics.begin(), move_tactics.end());
         yield({result});
-    } while (true);
+    } while (!place_ball_tactic->done());
 }
 
 // Register this play in the genericFactory
