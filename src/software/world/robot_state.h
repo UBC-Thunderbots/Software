@@ -29,7 +29,8 @@ class RobotState
      */
     explicit RobotState(const Point &position, const Vector &velocity,
                         const Angle &orientation,
-                        const AngularVelocity &angular_velocity);
+                        const AngularVelocity &angular_velocity,
+                        bool breakbeam_status = false);
 
     /**
      * Returns the position of the robot represented by this state
@@ -80,11 +81,15 @@ class RobotState
      */
     bool operator!=(const RobotState &other) const;
 
+    void setBreakbeamStatus(bool breakbeam_status) {this->breakbeam_status = breakbeam_status;};
+    bool breakbeamStatus() const {return breakbeam_status;};
+
    private:
     Point position_;
     Vector velocity_;
     Angle orientation_;
     AngularVelocity angular_velocity_;
+    bool breakbeam_status;
 };
 
 /**

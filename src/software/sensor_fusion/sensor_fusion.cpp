@@ -19,7 +19,9 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       friendly_goalie_id(0),
       enemy_goalie_id(0),
       reset_time_vision_packets_detected(0),
-      last_t_capture(0)
+      last_t_capture(0),
+      // there is no way we have more than 32 robot ids
+      breakbeam_statuses(32, false)
 {
     if (!sensor_fusion_config)
     {
@@ -221,6 +223,9 @@ void SensorFusion::updateWorld(
             robot_status_msg.break_beam_status().ball_in_beam())
         {
             friendly_robot_id_with_ball_in_dribbler = robot_id;
+            breakbeam_statuses[robot_id] = true;
+        } else {
+            breakbeam_statuses[robot_id] = false;
         }
         if ((!robot_status_msg.has_break_beam_status() ||
              !robot_status_msg.break_beam_status().ball_in_beam()) &&
@@ -288,6 +293,15 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         friendly_team = createFriendlyTeam(blue_team);
         enemy_team    = createEnemyTeam(yellow_team);
     }
+
+    // update breakbeam status
+    auto friendly_team_robots = friendly_team.getAllRobots();
+    for (auto& friendly_robot : friendly_team_robots) {
+        auto robot_state = friendly_robot.currentState();
+        robot_state.setBreakbeamStatus(breakbeam_statuses[friendly_robot.id()]);
+        friendly_robot.updateState(robot_state, friendly_robot.timestamp());
+    }
+    friendly_team.updateRobots(friendly_team_robots);
 
     // TODO don't make this hacky with statics
     static std::optional<Robot> robot_with_ball_in_dribbler;

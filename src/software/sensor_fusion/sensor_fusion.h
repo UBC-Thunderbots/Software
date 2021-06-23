@@ -157,4 +157,6 @@ class SensorFusion
 
     // The timestamp, in seconds, of the most recently received vision packet
     double last_t_capture;
+
+    std::vector<bool> breakbeam_statuses;
 };
