@@ -12,3 +12,5 @@ const QColor blue_robot_color(0, 75, 255, 255);
 const QColor robot_speed_slow_color(Qt::black);
 const QColor navigator_path_color = Qt::gray;
 const QColor navigator_obstacle_color(70, 70, 70, 255);
+const QColor blue(0, 0, 255, 255);
+const QColor pink(255, 0, 255, 255);

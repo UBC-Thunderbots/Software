@@ -2,6 +2,7 @@
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
+#include "software/geom/circle.h"
 
 /**
  * A calibration play that performs a sequence of operations and outputs
@@ -11,6 +12,8 @@ class CalibrationPlay : public Play
 {
    public:
     explicit CalibrationPlay(std::shared_ptr<const PlayConfig> config);
+
+    std::vector<CircleWithColor> getCirclesWithColorToDraw() override;
 
     /**
      * This function returns whether the play is applicable
@@ -33,4 +36,7 @@ class CalibrationPlay : public Play
     bool invariantHolds(const World &world) const override;
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+
+   private:
+    std::optional<Circle> circle_to_draw;
 };

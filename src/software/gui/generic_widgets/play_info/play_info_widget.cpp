@@ -13,8 +13,8 @@ void PlayInfoWidget::updatePlayInfo(const PlayInfo& play_info)
         QString("Play Name: %1").arg(QString::fromStdString(play_info.getPlayName()));
     QString tactics_string = QString("Tactics:\n");
 
-auto asst = play_info.getRobotTacticAssignment();
-std::sort(asst.begin(), asst.end());
+    auto asst = play_info.getRobotTacticAssignment();
+    std::sort(asst.begin(), asst.end());
     for (const auto& tactic_string : asst)
     {
         tactics_string.append(QString::fromStdString(tactic_string)).append("\n");

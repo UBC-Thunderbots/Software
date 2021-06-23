@@ -123,8 +123,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         // TODO This needs to be adjusted post field testing, ball needs to land exactly
         // in the middle of the enemy field
         kickoff_chip_tactic->updateControlParams(
-            world.ball().position(),
-Vector(world.field().xLength(), 0).orientation(), BALL_MAX_SPEED_METERS_PER_SECOND - 1);
+            world.ball().position(), Vector(world.field().xLength(), 0).orientation(),
+            BALL_MAX_SPEED_METERS_PER_SECOND - 1);
         result[0].emplace_back(kickoff_chip_tactic);
 
         // the robot at position 0 will be closest to the ball, so positions starting from

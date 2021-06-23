@@ -153,13 +153,14 @@ class Tactic
     std::optional<Robot> robot_;
 
     /**
-     * Given an FSM state string with a boost::SML template string in front, returns a string with the state parsed out
+     * Given an FSM state string with a boost::SML template string in front, returns a
+     * string with the state parsed out
      *
      * @param fsm_state long fsm string
      *
      * @return condensed fsm state
      */
-    std::string parseCondensedFsmState(std::string fsm_state)const;
+    std::string parseCondensedFsmState(std::string fsm_state) const;
 
    private:
     // TODO (#1888): remove this function

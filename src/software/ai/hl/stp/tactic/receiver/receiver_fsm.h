@@ -31,7 +31,7 @@ struct ReceiverFSM
     // The minimum proportion of open net we're shooting on vs the entire size of the net
     // that we require before attempting a shot
     static constexpr double MIN_SHOT_NET_PERCENT_OPEN = 0.3;
-    static constexpr double MIN_PASS_START_SPEED      = 1.0;
+    static constexpr double MIN_PASS_START_SPEED      = 0.4;
     static constexpr double BALL_MIN_MOVEMENT_SPEED   = 0.05;
 
     // The maximum deflection angle that we will attempt a one-touch kick towards the
@@ -40,7 +40,7 @@ struct ReceiverFSM
 
     // The minimum angle between a ball's trajectory and the ball-receiver_point vector
     // for which we can consider a pass to be stray
-    static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(90);
+    static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(10);
 
     // the minimum speed required for a pass to be considered stray
     static constexpr double MIN_STRAY_PASS_SPEED = 0.3;
@@ -289,7 +289,18 @@ struct ReceiverFSM
          * @return true if the pass has started
          */
         const auto pass_started = [](auto event) {
-            return event.common.world.ball().velocity().length() > MIN_PASS_START_SPEED;
+            // the pass starts when the passing robot is facing the proper orientation
+            // with keepaway, we don't face the orientation immediately after the receiver
+            // receives the pass to execute
+            bool friendly_robot_has_ball = false;
+            for(auto robot : event.common.world.friendlyTeam().getAllRobots())
+            {
+                if (robot.isNearDribbler(event.common.world.ball().position()))
+                {
+                    friendly_robot_has_ball = true;
+                }
+            }
+            return (event.common.world.ball().velocity().length() > MIN_PASS_START_SPEED && !friendly_robot_has_ball);
         };
 
         /**

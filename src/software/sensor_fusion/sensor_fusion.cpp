@@ -131,7 +131,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_GeometryData &geometry_packet
 void SensorFusion::updateWorld(const SSLProto::Referee &packet)
 {
     // reset the ball filter when we transition to STOP referee command
-    if (packet.command() == SSLProto::Referee_Command_STOP && !game_state.isStopped()) {
+    if (packet.command() == SSLProto::Referee_Command_STOP && !game_state.isStopped())
+    {
         resetBallFilter();
     }
 
@@ -223,8 +224,10 @@ void SensorFusion::updateWorld(
             robot_status_msg.break_beam_status().ball_in_beam())
         {
             friendly_robot_id_with_ball_in_dribbler = robot_id;
-            breakbeam_statuses[robot_id] = true;
-        } else {
+            breakbeam_statuses[robot_id]            = true;
+        }
+        else
+        {
             breakbeam_statuses[robot_id] = false;
         }
         if ((!robot_status_msg.has_break_beam_status() ||
@@ -296,7 +299,8 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
     // update breakbeam status
     auto friendly_team_robots = friendly_team.getAllRobots();
-    for (auto& friendly_robot : friendly_team_robots) {
+    for (auto &friendly_robot : friendly_team_robots)
+    {
         auto robot_state = friendly_robot.currentState();
         robot_state.setBreakbeamStatus(breakbeam_statuses[friendly_robot.id()]);
         friendly_robot.updateState(robot_state, friendly_robot.timestamp());
@@ -317,20 +321,20 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
     if (ball_in_dribbler_timeout > 0)
     {
-        // robot_with_ball_in_dribbler so lets decrement the counter so that we timeout properly
+        // robot_with_ball_in_dribbler so lets decrement the counter so that we timeout
+        // properly
         ball_in_dribbler_timeout--;
 
         if (robot_with_ball_in_dribbler.has_value())
         {
-            std::vector<BallDetection> dribbler_in_ball_detection = {
-                    BallDetection{
-                        .position =
-                            robot_with_ball_in_dribbler->position() +
-                            Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
-                                .normalize(DIST_TO_FRONT_OF_ROBOT_METERS - 0.01),
-                        .distance_from_ground = 0,
-                        .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
-                        .confidence = 1}};
+            std::vector<BallDetection> dribbler_in_ball_detection = {BallDetection{
+                .position =
+                    robot_with_ball_in_dribbler->position() +
+                    Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
+                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS - 0.01),
+                .distance_from_ground = 0,
+                .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
+                .confidence = 1}};
 
             std::optional<Ball> new_ball = createBall(dribbler_in_ball_detection);
 
@@ -484,7 +488,8 @@ void SensorFusion::resetWorldComponents()
     team_with_possession = TeamSide::ENEMY;
 }
 
-void SensorFusion::resetBallFilter() {
+void SensorFusion::resetBallFilter()
+{
     ball_filter =
         BallFilter(sensor_fusion_config->getRollingFrictionAcceleration()->value());
 }

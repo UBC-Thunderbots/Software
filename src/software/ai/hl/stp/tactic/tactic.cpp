@@ -148,7 +148,7 @@ std::string Tactic::getAdditionalInfo() const
     return "";
 }
 
-std::string Tactic::parseCondensedFsmState(std::string fsm_state)const
+std::string Tactic::parseCondensedFsmState(std::string fsm_state) const
 {
     auto start_angle_bracket_pos = fsm_state.find_last_of('<');
     if (start_angle_bracket_pos == std::string::npos)

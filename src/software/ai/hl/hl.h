@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 
+#include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/intent/intent.h"
 #include "software/world/world.h"
@@ -38,6 +39,16 @@ class HL
      * @return information about the currently running plays and tactics
      */
     virtual PlayInfo getPlayInfo() = 0;
+
+    /**
+     * The circles with labels to draw, useful for plays that want to
+     * point out certain spots on the field with a text label.
+     *
+     * TODO HACK for robocup (#2067)
+     *
+     * @return vector of CircleWithColors to draw
+     */
+    virtual std::vector<CircleWithColor> getCirclesWithColorToDraw() = 0;
 
     virtual ~HL() = default;
 };

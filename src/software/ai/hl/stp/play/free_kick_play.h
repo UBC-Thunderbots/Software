@@ -20,9 +20,13 @@ class FreeKickPlay : public Play
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 
+    std::vector<CircleWithColor> getCirclesWithColorToDraw() override;
+
    private:
     // The maximum time that we will wait before committing to a pass
     const Duration MAX_TIME_TO_COMMIT_TO_PASS;
+    std::optional<Pass> best_pass;
+    bool committed_to_pass = false;
 
     // The minimum pass score we will attempt
     static constexpr double MIN_ACCEPTABLE_PASS_SCORE = 0.05;

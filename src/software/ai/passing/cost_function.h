@@ -68,8 +68,7 @@ double rateKickPassEnemyRisk(const Team& enemy_team, const Pass& pass,
                              const Duration& enemy_reaction_time,
                              double enemy_proximity_importance);
 double rateChipPassEnemyRisk(const Team& enemy_team, const Pass& pass,
-                             const Duration& enemy_reaction_time,
-                             std::shared_ptr<const PassingConfig> passing_config);
+                             const Duration& enemy_reaction_time);
 
 /**
  * Calculates the likelihood that the given pass will be intercepted

@@ -15,6 +15,11 @@ bool Play::done() const
     return !static_cast<bool>(tactic_sequence);
 }
 
+std::vector<CircleWithColor> Play::getCirclesWithColorToDraw()
+{
+    return {};
+}
+
 PriorityTacticVector Play::getTactics(const World &world)
 {
     // Update the member variable that stores the world. This will be used by the
