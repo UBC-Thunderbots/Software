@@ -1,11 +1,13 @@
 #include "software/world/robot_state.h"
 
 RobotState::RobotState(const Point &position, const Vector &velocity,
-                       const Angle &orientation, const AngularVelocity &angular_velocity)
+                       const Angle &orientation, const AngularVelocity &angular_velocity,
+                       bool breakbeam_status)
     : position_(position),
       velocity_(velocity),
       orientation_(orientation),
-      angular_velocity_(angular_velocity)
+      angular_velocity_(angular_velocity),
+      breakbeam_status(breakbeam_status)
 {
 }
 
