@@ -13,7 +13,7 @@ BallPlacementPlay::BallPlacementPlay(std::shared_ptr<const PlayConfig> config)
 
 bool BallPlacementPlay::isApplicable(const World &world) const
 {
-    return world.gameState().isOurBallPlacement();
+    return world.gameState().isOurBallPlacement() && world.gameState().getBallPlacementPoint().has_value() && distance(world.ball().position(), world.gameState().getBallPlacementPoint().value()) > 0.1;
 }
 
 bool BallPlacementPlay::invariantHolds(const World &world) const
@@ -38,23 +38,51 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     Point waiting_line_start_point =
         world.field().friendlyDefenseArea().posXNegYCorner() +
         Vector(ROBOT_MAX_RADIUS_METERS * 2, 0);
-    for (unsigned int i = 0; i < move_tactics.size(); i++)
-    {
+    for (unsigned int i = 0; i < move_tactics.size(); i++) {
         Point waiting_destination =
-            waiting_line_start_point +
-            waiting_line_vector.normalize(waiting_line_vector.length() * i /
-                                          static_cast<double>(move_tactics.size() - 1));
+                waiting_line_start_point +
+                waiting_line_vector.normalize(waiting_line_vector.length() * i /
+                                              static_cast<double>(move_tactics.size() - 1));
         move_tactics.at(i)->updateControlParams(waiting_destination, Angle::zero(), 0.0);
+    }
+
+    std::optional<Robot> robot;
+    if (world.gameState().getBallPlacementPoint().has_value())
+    {
+        robot = world.friendlyTeam().getNearestRobot(world.gameState().getBallPlacementPoint().value());
     }
 
     do
     {
-        place_ball_tactic->updateControlParams(world.gameState().getBallPlacementPoint(),
-                                               std::nullopt, true);
-        TacticVector result = {place_ball_tactic};
-        result.insert(result.end(), move_tactics.begin(), move_tactics.end());
-        yield({result});
+        if (robot.has_value()) {
+            place_ball_tactic->updateRobot(robot.value());
+            place_ball_tactic->updateControlParams(world.gameState().getBallPlacementPoint(),
+                                                     std::nullopt, true);
+            TacticVector result = {place_ball_tactic};
+            result.insert(result.end(), move_tactics.begin(), move_tactics.end());
+            yield({result});
+        } else
+        {
+            if (world.gameState().getBallPlacementPoint().has_value()) {
+                robot = world.friendlyTeam().getNearestRobot(world.gameState().getBallPlacementPoint().value());
+            }
+        }
     } while (!place_ball_tactic->done());
+
+    do
+    {
+        LOG (DEBUG) << "MOVING";
+        if (robot.has_value())
+        {
+            move_away_tactic->updateRobot(robot.value());
+            move_away_tactic->updateControlParams(
+                    world.ball().position() -
+                    Vector::createFromAngle(robot->orientation()).normalize(ROBOT_MAX_RADIUS_METERS * 2.5), robot->orientation(), 0.0);
+            TacticVector result = {move_away_tactic};
+            result.insert(result.end(), move_tactics.begin(), move_tactics.end());
+            yield({result});
+        }
+    } while (!move_away_tactic->done());
 }
 
 // Register this play in the genericFactory
