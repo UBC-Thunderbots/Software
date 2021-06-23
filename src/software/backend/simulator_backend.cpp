@@ -33,17 +33,19 @@ void SimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
     primitive_output->sendProto(primitives);
 
-    if (sensor_fusion_config->getOverrideGameControllerDefendingSide()->value())
-    {
-        defending_side_output->sendProto(
-            *createDefendingSide(sensor_fusion_config->getDefendingPositiveSide()->value()
-                                     ? FieldSide::POS_X
-                                     : FieldSide::NEG_X));
-    }
-    else
-    {
-        defending_side_output->sendProto(*createDefendingSide(FieldSide::NEG_X));
-    }
+    // For some reason: defending_side is segfaulting
+    // TODO (#2167) fix networking stuff and figure out why proto is broken
+    // if (sensor_fusion_config->getOverrideGameControllerDefendingSide()->value())
+    // {
+    //     defending_side_output->sendProto(
+    //         *createDefendingSide(sensor_fusion_config->getDefendingPositiveSide()->value()
+    //                                  ? FieldSide::POS_X
+    //                                  : FieldSide::NEG_X));
+    // }
+    // else
+    // {
+    //     defending_side_output->sendProto(*createDefendingSide(FieldSide::NEG_X));
+    // }
 }
 
 void SimulatorBackend::onValueReceived(World world)
@@ -75,8 +77,9 @@ void SimulatorBackend::joinMulticastChannel(int channel, const std::string& inte
         std::string(SIMULATOR_MULTICAST_CHANNELS[channel]), ROBOT_LOGS_PORT,
         boost::bind(&SimulatorBackend::receiveRobotLogs, this, _1), true));
 
-    defending_side_output.reset(new ThreadedProtoUdpSender<DefendingSideProto>(
-        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]), DEFENDING_SIDE_PORT, true));
+    // For some reason
+    // defending_side_output.reset(new ThreadedProtoUdpSender<DefendingSideProto>(
+    //     std::string(SIMULATOR_MULTICAST_CHANNELS[channel]), DEFENDING_SIDE_PORT, true));
 }
 
 // Register this backend in the genericFactory

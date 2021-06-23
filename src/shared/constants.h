@@ -7,7 +7,7 @@
 
 /* Game Rules */
 // The max allowed speed of the ball, in metres per second
-static const double BALL_MAX_SPEED_METERS_PER_SECOND = 5.5;
+static const double BALL_MAX_SPEED_METERS_PER_SECOND = 6.5;
 // The max allowed height of the robots, in metres
 static const double ROBOT_MAX_HEIGHT_METERS = 0.15;
 // The max allowed radius of the robots, in metres
@@ -106,7 +106,7 @@ static const unsigned int ROBOT_CHIP_ANGLE_DEGREES = 45;
 // clear robot within a robot radius away from the chipping robot.
 //
 // This number can probably be reduced after careful field testing.
-static const double ROBOT_MIN_CHIP_CLEAR_DISTANCE_METERS = 0.4;
+static const double ROBOT_MIN_CHIP_CLEAR_DISTANCE_METERS = 0.8;
 
 // The chip_target distance should be scaled by this value so that
 // the ball can land and continue to roll to the target_distance

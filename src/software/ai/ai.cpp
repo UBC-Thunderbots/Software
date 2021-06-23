@@ -32,6 +32,11 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World &world) 
     return navigator->getAssignedPrimitives(world, assigned_intents);
 }
 
+std::vector<CircleWithColor> AI::getCirclesWithColorToDraw()
+{
+    return high_level->getCirclesWithColorToDraw();
+}
+
 PlayInfo AI::getPlayInfo() const
 {
     return high_level->getPlayInfo();

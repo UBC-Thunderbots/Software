@@ -1,7 +1,7 @@
 #include "software/proto/message_translation/ssl_referee.h"
 
-#include "software/logger/logger.h"
 #include "shared/constants.h"
+#include "software/logger/logger.h"
 
 // this maps a protobuf SSLProto::Referee_Command enum to its equivalent internal type
 // this map is used when we are on the blue team
@@ -127,8 +127,10 @@ std::optional<Point> getBallPlacementPoint(const SSLProto::Referee &packet)
 {
     if (packet.has_designated_position())
     {
-        return Point(static_cast<double>(packet.designated_position().x()*METERS_PER_MILLIMETER),
-                     static_cast<double>(packet.designated_position().y()*METERS_PER_MILLIMETER));
+        return Point(
+            static_cast<double>(packet.designated_position().x() * METERS_PER_MILLIMETER),
+            static_cast<double>(packet.designated_position().y() *
+                                METERS_PER_MILLIMETER));
     }
     else
     {

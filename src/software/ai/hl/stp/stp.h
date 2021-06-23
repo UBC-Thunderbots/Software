@@ -124,6 +124,14 @@ class STP : public HL
     PlayInfo getPlayInfo() override;
 
     /**
+     * The circles with labels to draw, useful for plays that want to
+     * point out certain spots on the field with a text label.
+     *
+     * @return vector of CircleWithColors to draw
+     */
+    std::vector<CircleWithColor> getCirclesWithColorToDraw() override;
+
+    /**
      * Given a vector of vector of tactics and the current World, assigns robots
      * from the friendly team to each tactic
      *

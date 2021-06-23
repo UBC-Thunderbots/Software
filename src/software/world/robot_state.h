@@ -28,8 +28,7 @@ class RobotState
      * @param angular_velocity The angular velocity of the robot
      */
     explicit RobotState(const Point &position, const Vector &velocity,
-                        const Angle &orientation,
-                        const AngularVelocity &angular_velocity,
+                        const Angle &orientation, const AngularVelocity &angular_velocity,
                         bool breakbeam_status = false);
 
     /**
@@ -81,8 +80,14 @@ class RobotState
      */
     bool operator!=(const RobotState &other) const;
 
-    void setBreakbeamStatus(bool breakbeam_status) {this->breakbeam_status = breakbeam_status;};
-    bool breakbeamStatus() const {return breakbeam_status;};
+    void setBreakbeamStatus(bool breakbeam_status)
+    {
+        this->breakbeam_status = breakbeam_status;
+    };
+    bool breakbeamStatus() const
+    {
+        return breakbeam_status;
+    };
 
    private:
     Point position_;

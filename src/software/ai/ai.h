@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/ai/hl/hl.h"
+#include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/navigator/navigator.h"
 #include "software/time/timestamp.h"
@@ -42,6 +43,16 @@ class AI final
      * @return information about the currently running plays and tactics
      */
     PlayInfo getPlayInfo() const;
+
+    /**
+     * The circles with labels to draw, useful for plays that want to
+     * point out certain spots on the field with a text label.
+     *
+     * TODO HACK for robocup (#2067)
+     *
+     * @return vector of CircleWithColors to draw
+     */
+    std::vector<CircleWithColor> getCirclesWithColorToDraw();
 
     std::shared_ptr<Navigator> getNavigator() const;
 
