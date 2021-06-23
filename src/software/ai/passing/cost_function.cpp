@@ -63,7 +63,7 @@ double rateZone(const World& world, const Rectangle& zone, const Point& receive_
     // of what our pass scores would be if we sent a robot there.
     const size_t X_POINTS_TO_SAMPLE         = 5;
     const size_t Y_POINTS_TO_SAMPLE         = 5;
-    const size_t NUM_COST_FUNCTIONS_SAMPLED = 2;
+    const size_t NUM_COST_FUNCTIONS_SAMPLED = 3;
 
     double zone_rating = 0.0;
     double x_step      = zone.xLength() / X_POINTS_TO_SAMPLE;
@@ -78,10 +78,14 @@ double rateZone(const World& world, const Rectangle& zone, const Point& receive_
 
             zone_rating += ratePassShootScore(world.field(), world.enemyTeam(), pass,
                                               passing_config);
+            zone_rating += rateChipPassEnemyRisk(
+                    world.enemyTeam(), pass,
+                    Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
+                    passing_config);
             zone_rating += rateKickPassEnemyRisk(
-                world.enemyTeam(), pass,
-                Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
-                passing_config->getEnemyProximityImportance()->value());
+                    world.enemyTeam(), pass,
+                    Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
+                    passing_config->getEnemyProximityImportance()->value());
         }
     }
 
@@ -248,13 +252,6 @@ double calculateKickInterceptRisk(const Robot& enemy_robot, const Pass& pass,
 {
     auto pass_segment = Segment(pass.passerPoint(), pass.receiverPoint());
 
-    // If the robot is already blocking the pass, exit out early.
-    if (intersects(Circle(enemy_robot.position(), ROBOT_MAX_RADIUS_METERS * 2),
-                   pass_segment))
-    {
-        return 0.0;
-    }
-
     // We estimate the intercept by the risk that the robot will get to the closest
     // point on the pass before the ball, and by the risk that the robot will get to the
     // reception point before the ball. We take the greater of these two risks. If the
@@ -288,12 +285,23 @@ double calculateKickInterceptRisk(const Robot& enemy_robot, const Pass& pass,
         ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
 
+    // FUTURE TODO (#2167): IMPORTANT!!!
+    // Previously we were always just adding the enemy reaction time to the estimated time to destination. This meant
+    // that even if there was a robot right in front of the passer, we would think we could get the ball past them
+    // before they could intercept (which is obviously wrong). REMOVE THIS FIX, MAKE A TEST FAIL, AND ADD A PROPER REGRESSION TEST
+    const double REACTION_TIME_SCALING_FACTOR = 3.0;
+    double scaled_enemy_reaction_time_closest_pass_point = std::clamp(enemy_robot_time_to_closest_pass_point.toSeconds() /
+                        REACTION_TIME_SCALING_FACTOR, 0.0, enemy_reaction_time.toSeconds());
+
     double robot_ball_time_diff_at_closest_pass_point =
-        ((enemy_robot_time_to_closest_pass_point + enemy_reaction_time) -
+        ((enemy_robot_time_to_closest_pass_point + Duration::fromSeconds(scaled_enemy_reaction_time_closest_pass_point)) -
          (ball_time_to_closest_pass_point))
-            .toSeconds();
+        .toSeconds();
+
+    double scaled_enemy_reaction_time_receive_point = std::clamp(enemy_robot_time_to_pass_receive_position.toSeconds() /
+            REACTION_TIME_SCALING_FACTOR, 0.0, enemy_reaction_time.toSeconds());
     double robot_ball_time_diff_at_pass_receive_point =
-        ((enemy_robot_time_to_pass_receive_position + enemy_reaction_time) -
+        ((enemy_robot_time_to_pass_receive_position + Duration::fromSeconds(scaled_enemy_reaction_time_receive_point)) -
          (ball_time_to_pass_receive_position))
             .toSeconds();
 
@@ -305,7 +313,7 @@ double calculateKickInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     // the pass does. As such, we place the time difference between the robot and ball
     // on a sigmoid that is centered at 0, and goes to 1 at positive values, 0 at
     // negative values.
-    return 1 - sigmoid(min_time_diff, 0, 1);
+    return 1 - sigmoid(min_time_diff, 0.4, 1);
 }
 
 double rateKickPassFriendlyCapability(Team friendly_team, const Pass& pass,

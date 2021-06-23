@@ -49,7 +49,7 @@ struct DribbleFSM
     // the dribble
     static constexpr Angle FINAL_DESTINATION_CLOSE_THRESHOLD = Angle::fromDegrees(1);
     // Kick speed when breaking up continuous dribbling
-    static constexpr double DRIBBLE_KICK_SPEED = 0.15;
+    static constexpr double DRIBBLE_KICK_SPEED = 0.01;
     // Maximum distance to continuously dribble the ball, slightly conservative to not
     // break the 1 meter rule
     static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.9;
@@ -262,8 +262,17 @@ struct DribbleFSM
                     .length() < INTERCEPT_BALL_RADIUS)
             {
                 // we are near the ball but not behind it, move slower
-                speed_mode         = MaxAllowedSpeedMode::STOP_COMMAND;
+                speed_mode         = MaxAllowedSpeedMode::PHYSICAL_LIMIT;
                 intercept_position = event.common.world.ball().position();
+            }
+
+            if (event.common.world.ball().velocity().orientation().minDiff(
+                        event.common.robot.velocity().orientation()) < Angle::fromDegrees(5))
+            {
+                // If we are already facing the ball, lets run into it faster to get possession
+                // faster
+                // TODO (#2167) This exploits er-force sims "dribbler works as long as you touch it"
+                intercept_position += event.common.world.ball().velocity().normalize(1.0);
             }
 
             event.common.set_intent(std::make_unique<MoveIntent>(
