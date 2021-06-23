@@ -9,7 +9,7 @@ template <typename MsgT>
 ProtoLogger<MsgT>::ProtoLogger(
     const std::string& output_directory, int _msgs_per_chunk,
     std::optional<std::function<bool(const MsgT&, const MsgT&)>> message_sort_comparator)
-    : FirstInFirstOutThreadedObserver<MsgT>(2000),
+    : FirstInFirstOutThreadedObserver<MsgT>(_msgs_per_chunk),
       current_chunk(),
       current_chunk_idx(0),
       output_dir_path(output_directory),
