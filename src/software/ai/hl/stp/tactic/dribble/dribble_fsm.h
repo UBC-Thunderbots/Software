@@ -83,22 +83,6 @@ struct DribbleFSM
                                               BALL_MAX_RADIUS_METERS +additional_offset);
     }
 
-	/**
-	 * Returns true if the ball is far enough that we can register a new continuous dribble start position.
-	 *
-	 * @param ball_position The ball position
-	 * @param robot The robot
-	 *
-	 * @return true if the ball is sufficiently far enough for us to consider the ball to be considered in
-	 *         a new start position
-	 */
-	static bool isRobotFarFromBall(const Point &ball_position,
-								   const Robot &robot)
-	{
-		double distance_robot_ball = (ball_position - robot.position()).length();
-		return distance_robot_ball >= LOSE_BALL_POSSESSION_THRESHOLD;
-	}
-
     /**
      * Gets the destination to dribble the ball to from the update event
      *
@@ -255,16 +239,6 @@ struct DribbleFSM
             auto face_ball_orientation =
                 (ball_position - event.common.robot.position())
                     .orientation();
-			if (isRobotFarFromBall(ball_position, event.common.robot))
-			{
-				continuous_dribbling_start_point = nullptr;
-			}
-			
-			bool is_close_to_ball = robot_ball_distance <= ROBOT_MAX_RADIUS_METERS;
-			if (continuous_dribbling_start_point == nullptr && is_close_to_ball)
-			{
-				continuous_dribbling_start_point = std::make_shared<Point>(ball_position);
-			}
 
             auto speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT;
 
@@ -347,11 +321,9 @@ struct DribbleFSM
          * @param event DribbleFSM::Update
          */
         const auto start_dribble = [this, dribble](auto event) {
-			if (continuous_dribbling_start_point == nullptr)
-			{
-				// update continuous_dribbling_start_point once we start dribbling
-				continuous_dribbling_start_point = std::make_shared<Point>(event.common.world.ball().position());
-			}
+            // update continuous_dribbling_start_point once we start dribbling
+            continuous_dribbling_start_point =
+                std::make_shared<Point>(event.common.world.ball().position());
             dribble(event);
         };
 
