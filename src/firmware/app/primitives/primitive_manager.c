@@ -21,7 +21,7 @@
 #include "firmware/app/primitives/primitive.h"
 #include "firmware/app/primitives/stop_primitive.h"
 
-#define PRIMTIVE_MANAGER_TIMEOUT_NUM_TICKS (100)
+#define PRIMTIVE_MANAGER_TIMEOUT_NUM_TICKS (1000)
 
 struct PrimitiveManager
 {
@@ -185,6 +185,7 @@ void app_primitive_manager_runCurrentPrimitive(PrimitiveManager_t *manager,
     if (manager->current_primitive_num_ticks_executed >
         PRIMTIVE_MANAGER_TIMEOUT_NUM_TICKS)
     {
+        printf("timeout \n");
         app_primitive_manager_endCurrentPrimitive(manager, world);
         app_primitive_makeRobotSafe(world);
     }
@@ -208,5 +209,5 @@ void app_primitive_manager_endCurrentPrimitive(PrimitiveManager_t *manager,
         manager->current_primitive       = NULL;
     }
 
-    app_primitive_stopRobot(world, false);
+    /*app_primitive_stopRobot(world, false);*/
 }
