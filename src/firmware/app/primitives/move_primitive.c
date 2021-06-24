@@ -54,6 +54,7 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
             app_chicker_enableAutochip(
                 chicker,
                 prim_msg.auto_chip_or_kick.auto_chip_or_kick.autochip_distance_meters);
+            printf("AUTOKICK!!\n");
             break;
         }
         case TbotsProto_MovePrimitive_AutoChipOrKick_autokick_speed_m_per_s_tag:
@@ -61,6 +62,7 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
             app_chicker_enableAutokick(
                 chicker,
                 prim_msg.auto_chip_or_kick.auto_chip_or_kick.autokick_speed_m_per_s);
+            printf("AUTOCHIP!!\n");
             break;
         }
     }
