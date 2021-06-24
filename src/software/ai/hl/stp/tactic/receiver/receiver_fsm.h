@@ -330,7 +330,7 @@ struct ReceiverFSM
             // We tolerate imperfect passes that hit the edges of the robot,
             // so that we can quickly transition out and grab the ball.
             bool near_dribbler = event.common.robot.isNearDribbler(
-                event.common.world.ball().position(), ROBOT_MAX_RADIUS_METERS);
+                event.common.world.ball().position(), 0.01);
             return stray_pass || near_dribbler;
         };
 
