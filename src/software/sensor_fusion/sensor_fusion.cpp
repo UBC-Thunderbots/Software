@@ -379,7 +379,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
         if (friendly_team_has_ball && !enemy_team_has_ball)
         {
-            if(team_with_possession == TeamSide::FRIENDLY)
+            if (team_with_possession == TeamSide::FRIENDLY)
             {
                 team_with_possession_confidence += CONFIDENCE_INCREMENT;
             }
@@ -393,7 +393,7 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
         if (enemy_team_has_ball)
         {
-            if(team_with_possession == TeamSide::ENEMY)
+            if (team_with_possession == TeamSide::ENEMY)
             {
                 team_with_possession_confidence += CONFIDENCE_INCREMENT;
             }

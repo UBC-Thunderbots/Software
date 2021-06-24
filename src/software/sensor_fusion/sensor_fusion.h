@@ -161,5 +161,5 @@ class SensorFusion
 
     std::vector<bool> breakbeam_statuses;
 
-    static constexpr double CONFIDENCE_INCREMENT = 0.2;
+    static constexpr double CONFIDENCE_INCREMENT = 0.25;
 };
