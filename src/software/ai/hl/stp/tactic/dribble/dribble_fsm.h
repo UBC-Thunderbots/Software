@@ -235,7 +235,6 @@ struct DribbleFSM
          */
         const auto get_possession = [this](auto event) {
             auto ball_position = event.common.world.ball().position();
-			double robot_ball_distance = (ball_position - event.common.robot.position()).length();
             auto face_ball_orientation =
                 (ball_position - event.common.robot.position())
                     .orientation();
