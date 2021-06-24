@@ -97,6 +97,26 @@ Rectangle Rectangle::expand(const Vector &v) const
     return Rectangle(negCorner, posCorner);
 }
 
+Segment Rectangle::getTop() const
+{
+    return Segment(negXPosYCorner(), posXPosYCorner());
+}
+
+Segment Rectangle::getBottom() const
+{
+    return Segment(negXNegYCorner(), posXNegYCorner());
+}
+
+Segment Rectangle::getLeft() const
+{
+    return Segment(negXPosYCorner(), negXNegYCorner());
+}
+
+Segment Rectangle::getRight() const
+{
+    return Segment(posXPosYCorner(), posXNegYCorner());
+}
+
 bool Rectangle::operator==(const Rectangle &p) const
 {
     return negXNegYCorner() == p.negXNegYCorner() && diagonal() == p.diagonal();
