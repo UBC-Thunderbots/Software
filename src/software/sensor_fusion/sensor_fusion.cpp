@@ -315,9 +315,9 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
             .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
             .confidence = 1};
 
-        ball_detections.emplace_back(dribbler_in_ball_detection);
         // try to create a ball again and update it if it exists
-        std::optional<Ball> new_ball_with_dribbler_dets = createBall(ball_detections);
+        std::optional<Ball> new_ball_with_dribbler_dets =
+            createBall({dribbler_in_ball_detection});
         if (new_ball_with_dribbler_dets)
         {
             updateBall(*new_ball_with_dribbler_dets);
