@@ -183,55 +183,39 @@ double rateChipPassEnemyRisk(const Team& enemy_team, const Pass& pass,
      *                (passer) /         \x_______ (receiver)
      *                            CHIP      ROLL
      *
-     *  So, we only need to calculate the risk of the enemy robot closest to the passer
-     *  point, and then the risk of enemies intercepting the pass after it starts rolling.
-     *
      *  We also assume that the ROLL distance is proportional to the CHIP distance by
      *  CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO. The further we chip, the further we
      *  roll.
      *
      *  So, to figure out the risk of the enemy interfering, we just make sure
-     *
      */
-    auto closest_enemy_to_passer   = enemy_team.getNearestRobot(pass.passerPoint());
     auto closest_enemy_to_receiver = enemy_team.getNearestRobot(pass.receiverPoint());
 
-    if (!closest_enemy_to_passer.has_value() || !closest_enemy_to_receiver.has_value())
+    if (!closest_enemy_to_receiver.has_value())
     {
         return 0;
     }
 
-    // The sigmoid with of 2.0 meters is somewhat arbitrary but it discourages really
-    // short chips that can be easily intercepted, as the ball doesn't roll as fast after
-    // landing.
-    double sigmoid_width = 2.0;
+    double enemy_risk_rating = 1.0;
 
-    // This should figure out if the pass will clear the enemy.
-    double enemy_risk_near_passer_point =
-        sigmoid((closest_enemy_to_passer->position() - pass.passerPoint()).length(),
-                ROBOT_MIN_CHIP_CLEAR_DISTANCE_METERS, sigmoid_width);
+    for (auto enemy : enemy_team.getAllRobots())
+    {
+        Vector vector_to_receive_point = pass.receiverPoint() - enemy.position();
 
-    // Now we just need to figure out where we have landed, since we don't have chip speed
-    // as mentioned above, we use CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO to get an
-    // estimate of where we might have landed.
-    auto pass_vector = pass.receiverPoint() - pass.passerPoint();
+        if (vector_to_receive_point.length() > ROBOT_MIN_CHIP_CLEAR_DISTANCE_METERS)
+        {
+            enemy_risk_rating += 1.0;
+        }
+        else
+        {
+            // check that ball is in a 90-degree cone in front of the robot
+            auto receive_point_to_enemy_angle =
+                orientation().minDiff(vector_to_receive_point.orientation());
+            enemy_risk_rating += std::max(receive_point_to_enemy_angle.toDegrees()/45.0, 1.0);
+        }
+    }
 
-    // NOTE: The robot performing the pass should also use
-    // CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO if it would like to chip.
-    auto chip_landing_point =
-        pass.passerPoint() +
-        pass_vector.normalize(CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO *
-                              pass_vector.length());
-
-    // Create a "virtual" kick pass from the chip landing point and the receive point
-    // and evaluate the likely hood of an enemy intercepting that pass.
-    double enemy_risk_near_receiver_point = calculateKickInterceptRisk(
-        enemy_team,
-        Pass(chip_landing_point, pass.receiverPoint(),
-             pass_vector.length() * CHIP_PASS_TARGET_DISTANCE_TO_SPEED_RATIO),
-        enemy_reaction_time);
-
-    return 1.0 - enemy_risk_near_passer_point * enemy_risk_near_receiver_point;
+    return 1.0;
 }
 
 double calculateKickInterceptRisk(const Team& enemy_team, const Pass& pass,
