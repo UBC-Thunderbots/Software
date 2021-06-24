@@ -15,6 +15,7 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       friendly_team_filter(),
       enemy_team_filter(),
       team_with_possession(TeamSide::ENEMY),
+      team_with_possession_confidence(0.0),
       gc_defending_positive_side(false),
       friendly_goalie_id(0),
       enemy_goalie_id(0),
@@ -35,7 +36,7 @@ std::optional<World> SensorFusion::getWorld() const
     {
         World new_world(*field, *ball, friendly_team, enemy_team);
         new_world.updateGameState(game_state);
-        new_world.setTeamWithPossession(team_with_possession);
+        new_world.setTeamWithPossession(team_with_possession, team_with_possession_confidence);
         if (referee_stage)
         {
             new_world.updateRefereeStage(*referee_stage);
@@ -378,12 +379,28 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
 
         if (friendly_team_has_ball && !enemy_team_has_ball)
         {
+            if(team_with_possession == TeamSide::FRIENDLY)
+            {
+                team_with_possession_confidence += CONFIDENCE_INCREMENT;
+            }
+            else
+            {
+                team_with_possession_confidence = CONFIDENCE_INCREMENT;
+            }
             // take defensive view of exclusive possession for friendly possession
             team_with_possession = TeamSide::FRIENDLY;
         }
 
         if (enemy_team_has_ball)
         {
+            if(team_with_possession == TeamSide::ENEMY)
+            {
+                team_with_possession_confidence += CONFIDENCE_INCREMENT;
+            }
+            else
+            {
+                team_with_possession_confidence = CONFIDENCE_INCREMENT;
+            }
             team_with_possession = TeamSide::ENEMY;
         }
     }

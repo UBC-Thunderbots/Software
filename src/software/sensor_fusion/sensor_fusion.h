@@ -140,6 +140,7 @@ class SensorFusion
     RobotTeamFilter enemy_team_filter;
 
     TeamSide team_with_possession;
+    double  team_with_possession_confidence;
 
     // Whether the gamecontroller says we should defend positive side
     bool gc_defending_positive_side;
@@ -159,4 +160,6 @@ class SensorFusion
     double last_t_capture;
 
     std::vector<bool> breakbeam_statuses;
+
+    static constexpr double CONFIDENCE_INCREMENT = 0.2;
 };
