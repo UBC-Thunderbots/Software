@@ -18,13 +18,15 @@ DefensePlay::DefensePlay(std::shared_ptr<const PlayConfig> config) : Play(config
 bool DefensePlay::isApplicable(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           (world.getTeamWithPossession() == TeamSide::ENEMY);
+           world.getTeamWithPossession() == TeamSide::ENEMY &&
+           world.getTeamWithPossessionConfidence() >= 1.0;
 }
 
 bool DefensePlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           (world.getTeamWithPossession() == TeamSide::ENEMY);
+           world.getTeamWithPossession() == TeamSide::ENEMY &&
+           world.getTeamWithPossessionConfidence() >= 1.0;
 }
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
