@@ -24,13 +24,15 @@ ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config)
 bool ShootOrPassPlay::isApplicable(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           (world.getTeamWithPossession() == TeamSide::FRIENDLY);
+           (world.getTeamWithPossession() == TeamSide::FRIENDLY ||
+            world.getTeamWithPossessionConfidence() < 1.0);
 }
 
 bool ShootOrPassPlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           (world.getTeamWithPossession() == TeamSide::FRIENDLY);
+           (world.getTeamWithPossession() == TeamSide::FRIENDLY ||
+            world.getTeamWithPossessionConfidence() < 1.0);
 }
 
 
