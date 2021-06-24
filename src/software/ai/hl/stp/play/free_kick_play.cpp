@@ -258,7 +258,7 @@ void FreeKickPlay::performPassStage(
                                   CreaseDefenderAlignment::RIGHT);
         yield({{kicker, receiver, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
-    } while (!kicker->done());
+    } while (!receiver->done());
 }
 
 
