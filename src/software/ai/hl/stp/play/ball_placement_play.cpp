@@ -38,11 +38,13 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     Point waiting_line_start_point =
         world.field().friendlyDefenseArea().posXNegYCorner() +
         Vector(ROBOT_MAX_RADIUS_METERS * 2, 0);
+
+    Point last_waiting_point = waiting_line_start_point + waiting_line_vector.normalize(waiting_line_vector.length() * static_cast<int>(move_tactics.size()) / static_cast<double>(move_tactics.size()));
     for (unsigned int i = 0; i < move_tactics.size(); i++) {
         Point waiting_destination =
                 waiting_line_start_point +
                 waiting_line_vector.normalize(waiting_line_vector.length() * i /
-                                              static_cast<double>(move_tactics.size() - 1));
+                                              static_cast<double>(move_tactics.size()));
         move_tactics.at(i)->updateControlParams(waiting_destination, Angle::zero(), 0.0);
     }
 
@@ -81,6 +83,24 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
             result.insert(result.end(), move_tactics.begin(), move_tactics.end());
             yield({result});
         }
+    } while (!move_away_tactic->done());
+
+    do {
+        if (robot.has_value()) {
+            if (world.gameState().getBallPlacementPoint().has_value() && distance(world.ball().position(), world.gameState().getBallPlacementPoint().value()) > 0.1)
+            {
+                TacticVector result = {place_ball_tactic};
+                result.insert(result.end(), move_tactics.begin(), move_tactics.end());
+                yield({result});
+                continue;
+            }
+
+            move_away_tactic->updateRobot(robot.value());
+            move_away_tactic->updateControlParams(last_waiting_point, Angle::zero(), 0.0);
+        }
+        TacticVector result = {move_away_tactic};
+        result.insert(result.end(), move_tactics.begin(), move_tactics.end());
+        yield({result});
     } while (!move_away_tactic->done());
 }
 
