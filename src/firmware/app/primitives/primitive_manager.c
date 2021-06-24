@@ -208,6 +208,5 @@ void app_primitive_manager_endCurrentPrimitive(PrimitiveManager_t *manager,
         manager->current_primitive       = NULL;
     }
 
-    // TODO Maybe revert this after testing
-    // app_primitive_stopRobot(world, false);
+    app_primitive_stopRobot(world, false);
 }
