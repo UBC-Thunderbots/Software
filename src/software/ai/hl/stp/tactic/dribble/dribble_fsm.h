@@ -46,7 +46,7 @@ struct DribbleFSM
     // the dribble
     static constexpr Angle FINAL_DESTINATION_CLOSE_THRESHOLD = Angle::fromDegrees(1);
     // Kick speed when breaking up continuous dribbling
-    static constexpr double DRIBBLE_KICK_SPEED = 0.05;
+    static constexpr double DRIBBLE_KICK_SPEED = 0.15;
     // Maximum distance to continuously dribble the ball, slightly conservative to not
     // break the 1 meter rule
     static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.7;
@@ -278,14 +278,20 @@ struct DribbleFSM
                     event.control_params.final_dribble_orientation);
             AutoChipOrKick auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::OFF, 0};
 
-            auto dribbler_force = DribblerMode::MAX_FORCE;
-
             if (!event.control_params.allow_excessive_dribbling &&
                 !comparePoints(ball_position, *continuous_dribbling_start_point,
                                MAX_CONTINUOUS_DRIBBLING_DISTANCE))
             {
-                // release the ball
-                dribbler_force = DribblerMode::OFF;
+                auto kick_speed = DRIBBLE_KICK_SPEED;
+                if (acuteAngle(event.common.robot.velocity(),
+                               ball_position - event.common.robot.position()) <
+                    Angle::quarter())
+                {
+                    kick_speed *= 2;
+                }
+                // give the ball a little kick
+                auto_chip_or_kick =
+                    AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, kick_speed};
             }
 
             for (const auto &enemy_robot : event.common.world.enemyTeam().getAllRobots())
@@ -303,7 +309,7 @@ struct DribbleFSM
 
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), target_destination, target_orientation, 0,
-                dribbler_force, BallCollisionType::ALLOW, auto_chip_or_kick,
+                DribblerMode::MAX_FORCE, BallCollisionType::ALLOW, auto_chip_or_kick,
                 MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
                 event.common.robot.robotConstants()));
         };

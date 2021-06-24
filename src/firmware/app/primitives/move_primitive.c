@@ -54,7 +54,6 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
             app_chicker_enableAutochip(
                 chicker,
                 prim_msg.auto_chip_or_kick.auto_chip_or_kick.autochip_distance_meters);
-            printf("AUTOKICK!!\n");
             break;
         }
         case TbotsProto_MovePrimitive_AutoChipOrKick_autokick_speed_m_per_s_tag:
@@ -62,7 +61,6 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
             app_chicker_enableAutokick(
                 chicker,
                 prim_msg.auto_chip_or_kick.auto_chip_or_kick.autokick_speed_m_per_s);
-            printf("AUTOCHIP!!\n");
             break;
         }
     }
@@ -107,9 +105,9 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
     // Clamp num elements between 3 (minimum number of trajectory elements) and
     // TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
     const unsigned int num_elements = (unsigned int)fmaxf(
-        fminf((estimated_time_delta * CONTROL_LOOP_HZ / NUM_TICKS_PER_TRAJECTORY_ELEMENT),
-              TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS),
-        15);
+		    fminf((estimated_time_delta * CONTROL_LOOP_HZ / NUM_TICKS_PER_TRAJECTORY_ELEMENT),
+			    TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS),
+		    15);
 
     // Plan a trajectory to move to the target position/orientation
     FirmwareRobotPathParameters_t path_parameters = {
