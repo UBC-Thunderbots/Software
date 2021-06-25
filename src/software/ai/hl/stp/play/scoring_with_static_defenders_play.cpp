@@ -27,15 +27,16 @@ bool ScoringWithStaticDefendersPlay::invariantHolds(const World &world) const
 }
 
 void ScoringWithStaticDefendersPlay::updateAlignToBallTactic(
-        std::shared_ptr<MoveTactic> align_to_ball_tactic, Pass pass, const World &world)
+    std::shared_ptr<MoveTactic> align_to_ball_tactic, Pass pass, const World &world)
 {
-    Vector ball_to_center_vec = Vector(pass.receiverPoint().toVector()) - world.ball().position().toVector();
+    Vector ball_to_center_vec =
+        Vector(pass.receiverPoint().toVector()) - world.ball().position().toVector();
     // We want the kicker to get into position behind the ball facing the center
     // of the field
     align_to_ball_tactic->updateControlParams(
-            world.ball().position() -
+        world.ball().position() -
             ball_to_center_vec.normalize(ROBOT_MAX_RADIUS_METERS * 2),
-            ball_to_center_vec.orientation(), 0);
+        ball_to_center_vec.orientation(), 0);
 }
 
 void ScoringWithStaticDefendersPlay::getNextTactics(TacticCoroutine::push_type &yield,
@@ -54,19 +55,19 @@ void ScoringWithStaticDefendersPlay::getNextTactics(TacticCoroutine::push_type &
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
     auto ranked_zones = pass_eval.rankZonesForReceiving(
-            world, best_pass_and_score_so_far.pass.receiverPoint());
+        world, best_pass_and_score_so_far.pass.receiverPoint());
 
-    using Zones = std::unordered_set<EighteenZoneId>;
+    using Zones              = std::unordered_set<EighteenZoneId>;
     Zones cherry_pick_region = {ranked_zones[0]};
 
-    // These two tactics will set robots to roam around the field, trying to put
-    // themselves into a good position to receive a pass
+    // set 1 robot to get in position to receive good pass
     auto cherry_pick_tactic = std::make_shared<MoveTactic>(false);
 
     // This tactic will move a robot into position to initially pass the ball
     auto align_to_pass_tactic = std::make_shared<MoveTactic>(false);
     Vector ball_to_receiver_vector =
-        best_pass_and_score_so_far.pass.receiverPoint().toVector() - world.ball().position().toVector();
+        best_pass_and_score_so_far.pass.receiverPoint().toVector() -
+        world.ball().position().toVector();
     align_to_pass_tactic->updateControlParams(
         world.ball().position() -
             ball_to_receiver_vector.normalize(ROBOT_MAX_RADIUS_METERS * 2),
@@ -94,13 +95,12 @@ void ScoringWithStaticDefendersPlay::getNextTactics(TacticCoroutine::push_type &
         {
             while (!align_to_pass_tactic->getAssignedRobot())
             {
-
                 pass_eval = pass_generator.generatePassEvaluation(world);
-                pass     = pass_eval.getBestPassInZones(cherry_pick_region).pass;
+                pass      = pass_eval.getBestPassInZones(cherry_pick_region).pass;
 
-                cherry_pick_tactic->updateControlParams(pass.receiverPoint(),
-                                                          pass.receiverOrientation(), 0.0,
-                                                          MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                cherry_pick_tactic->updateControlParams(
+                    pass.receiverPoint(), pass.receiverOrientation(), 0.0,
+                    MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
                 updateAlignToBallTactic(align_to_pass_tactic, pass, world);
 

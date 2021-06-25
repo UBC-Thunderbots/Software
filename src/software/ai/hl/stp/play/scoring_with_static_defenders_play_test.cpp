@@ -15,7 +15,7 @@ class ScoringWithStaticDefendersPlayTest
           std::tuple<std::vector<RobotStateWithId>, Point>>
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+    Field field = Field::createHardwareChallengeField();
 };
 
 TEST_F(ScoringWithStaticDefendersPlayTest,
@@ -84,11 +84,34 @@ INSTANTIATE_TEST_CASE_P(
         std::make_tuple(TestUtil::createStationaryRobotStatesWithId(
                             {Point(2.9, 0.175), Point(1.5, 0), Point(2, -0.175)}),
                         Point(0.9, 0)),
-        std::make_tuple(
-            TestUtil::createStationaryRobotStatesWithId({Point(2.9, 0.175), Point(2, 0.5),
-                                                         Point(1, 0), Point(2, -0.5)}),
-            Point(0.2, 0)),
         std::make_tuple(TestUtil::createStationaryRobotStatesWithId(
-                            {Point(2.9, 0), Point(1.95, 0), Point(1.95, 0.5),
-                             Point(1.95, -0.5)}),
-                        Point(-1.35, 0))));
+                            {Point(2.9, 0), Point(2, 0.5), Point(1, 0), Point(2, -0.5)}),
+                        Point(0.2, 0)),
+        std::make_tuple(TestUtil::createStationaryRobotStatesWithId(
+                            {Point(2.9, 0), Point(1.95, 0), Point(1.95, -0.5),
+                             Point(1.95, 0.5)}),
+                        Point(1.35, 0)),
+        std::make_tuple(TestUtil::createStationaryRobotStatesWithId(
+                            {Point(2.9, 0.2), Point(2.85, 1.1), Point(2, 0.5),
+                             Point(2, 0), Point(1.45, 1.75)}),
+                        Point(2.85, 1.75)),
+        std::make_tuple(TestUtil::createStationaryRobotStatesWithId(
+                            {Point(2.9, 0), Point(2.4, 1.25), Point(2, 0.95),
+                             Point(2, 0.36), Point(1.45, -1.21)}),
+                        Point(0.95, -1.55)),
+        std::make_tuple(TestUtil::createStationaryRobotStatesWithId(
+                            {Point(2.91, -0.3), Point(2.6, 1.2), Point(2, 0.3),
+                             Point(1.7, -0.35), Point(2.3, -1.3)}),
+                        Point(2.8, -1.8)),
+        std::make_tuple(TestUtil::createStationaryRobotStatesWithId(
+                            {Point(2.9, 0.1), Point(2.25, 1.2), Point(2.05, 0.8),
+                             Point(2.05, 0.4), Point(2.05, -0.4), Point(2.05, -0.8)}),
+                        Point(0.2, -1.8)),
+        std::make_tuple(TestUtil::createStationaryRobotStatesWithId(
+                            {Point(2.9, -0.3), Point(2.05, 1.05), Point(2.2, -1.2),
+                             Point(1.55, -0.6), Point(1.35, 0.35), Point(0.8, 1)}),
+                        Point(2.8, -1.75)),
+        std::make_tuple(TestUtil::createStationaryRobotStatesWithId(
+                            {Point(2.9, -0.15), Point(2.4, 1.25), Point(2, 0.45),
+                             Point(1.85, -0.3), Point(2, -0.9), Point(1.3, 0)}),
+                        Point(1.3, 0.65))));

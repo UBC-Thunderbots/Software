@@ -20,6 +20,12 @@ Field Field::createSSLDivisionAField()
     return field;
 }
 
+Field Field::createHardwareChallengeField()
+{
+    Field field = Field(6.0, 4.0, 0.8, 2.0, 0.18, 0.7, 0.3, 0.5);
+    return field;
+}
+
 Field::Field(double field_x_length, double field_y_length, double defense_x_length,
              double defense_y_length, double goal_x_length, double goal_y_length,
              double boundary_buffer_size, double center_circle_radius)

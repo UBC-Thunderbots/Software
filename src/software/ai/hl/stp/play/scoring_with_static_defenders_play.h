@@ -29,6 +29,6 @@ class ScoringWithStaticDefendersPlay : public Play
      * @param align_to_ball_tactic
      * @param world The current state of the world
      */
-    void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic, Pass pass,
-                                 const World &world);
+    void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic,
+                                 Pass pass, const World &world);
 };
