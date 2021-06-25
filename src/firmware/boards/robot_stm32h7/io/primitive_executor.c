@@ -8,6 +8,8 @@
 #include "shared/constants.h"
 #include "shared/proto/tbots_software_msgs.nanopb.h"
 
+#define ROBOT_ID (1)
+
 static FirmwareWorld_t* g_world;
 static PrimitiveManager_t* g_primitive_manager;
 
@@ -31,18 +33,24 @@ void io_primitive_starter_task(void* argument)
 
         io_proto_multicast_communication_profile_acquireLock(comm_profile);
 
-        // TODO (#1517) actually grab the primitive for _this_ robot id from the set
-        // For now, we assume only 1 primitive is being sent
-        TbotsProto_Primitive primitive_msg =
-            (*(TbotsProto_PrimitiveSet*)
-                 io_proto_multicast_communication_profile_getProtoStruct(comm_profile))
-                .robot_primitives[0]
-                .value;
+        TbotsProto_PrimitiveSet* primitive_set = (TbotsProto_PrimitiveSet*)
+            io_proto_multicast_communication_profile_getProtoStruct(comm_profile);
 
         io_proto_multicast_communication_profile_releaseLock(comm_profile);
 
-        app_primitive_manager_startNewPrimitive(g_primitive_manager, g_world,
-                                                primitive_msg);
+
+        for (pb_size_t i = 0; i < primitive_set->robot_primitives_count; i++)
+        {
+            if (primitive_set->robot_primitives[i].key == ROBOT_ID)
+            {
+                TbotsProto_Primitive primitive_msg =
+
+                    primitive_set->robot_primitives[i].value;
+                app_primitive_manager_startNewPrimitive(g_primitive_manager, g_world,
+                                                        primitive_msg);
+                break;
+            }
+        }
     }
 }
 
