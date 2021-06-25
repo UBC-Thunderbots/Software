@@ -136,7 +136,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
             }
         } while (!align_to_ball_tactic->done());
 
-        Point ball_pull_position = world.ball().position() - intersecting_dir.normalize(ROBOT_MAX_RADIUS_METERS * 4);
+        Point ball_pull_position = world.ball().position() - intersecting_dir.normalize(ROBOT_MAX_RADIUS_METERS * 5);
         pull_point = ball_pull_position;
         do {
             if (robot.has_value()) {
