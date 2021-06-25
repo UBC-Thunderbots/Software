@@ -126,6 +126,8 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                         world.ball().position() - intersecting_dir.normalize(ROBOT_MAX_RADIUS_METERS * 2),
                         intersecting_dir.orientation(), 0.0);
 
+
+                LOG (DEBUG) << "aligning";
                 CIRCLE_SHIT_YIELD({align_to_ball_tactic});
             } else {
                 if (world.gameState().getBallPlacementPoint().has_value()) {
@@ -143,6 +145,8 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                                        intersecting_dir.orientation(), true);
 
                 CIRCLE_SHIT_YIELD({place_ball_tactic});
+
+                LOG (DEBUG) << "dribbling 1";
             } else {
                 if (world.gameState().getBallPlacementPoint().has_value()) {
                     robot = world.friendlyTeam().getNearestRobot(world.gameState().getBallPlacementPoint().value());
@@ -157,8 +161,9 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 move_away_tactic->updateRobot(robot.value());
                 move_away_tactic->updateControlParams(
                         world.ball().position() -
-                        Vector::createFromAngle(robot->orientation()).normalize(ROBOT_MAX_RADIUS_METERS), robot->orientation(), 0.0);
+                        Vector::createFromAngle(robot->orientation()).normalize(ROBOT_MAX_RADIUS_METERS * 4), robot->orientation(), 0.0);
 
+                LOG (DEBUG) << "moving away 1";
                 CIRCLE_SHIT_YIELD({move_away_tactic});
             }
         } while (!move_away_tactic->done());
@@ -171,12 +176,16 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 if (world.gameState().getBallPlacementPoint().has_value()) {
                     if (distance(world.ball().position(), world.gameState().getBallPlacementPoint().value()) < 0.1) {
                         LOG (DEBUG) << "DJOEIWAJW";
+
+                        LOG (DEBUG) << "moving away 2";
                         move_away_tactic->updateRobot(robot.value());
                         move_away_tactic->updateControlParams(last_waiting_point, Angle::zero(), 0.0);
 
                         CIRCLE_SHIT_YIELD({move_away_tactic});
                     } else if (distance(world.ball().position(), world.gameState().getBallPlacementPoint().value()) < 1) {
                         do {
+
+                            LOG (DEBUG) << "dribbling 2";
                             place_ball_tactic->updateRobot(robot.value());
                             place_ball_tactic->updateControlParams(world.gameState().getBallPlacementPoint().value(),
                                                                    std::nullopt, true);
@@ -244,6 +253,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                     place_ball_tactic->updateControlParams(pull_point.value(),
                                                            intersecting_dir.orientation(), true);
 
+                    LOG (DEBUG) << "dribbling 3";
                     CIRCLE_SHIT_YIELD({place_ball_tactic});
                 } else {
                     if (world.gameState().getBallPlacementPoint().has_value()) {
@@ -303,7 +313,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                         receiver_tactic->updateRobot(receiver_robot.value());
                         receiver_tactic->updateControlParams(pass, true);
 
-                        //LOG (DEBUG) << "stuck passing";
+                        LOG (DEBUG) << "stuck passing";
                         TacticVector tactics = {receiver_tactic, pass_ball_tactic};
                         CIRCLE_SHIT_YIELD(tactics);
                     } else {
@@ -317,6 +327,8 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                         place_ball_tactic->updateControlParams(pass.receiverPoint(),
                                                                std::nullopt, true);
 
+
+                        LOG (DEBUG) << "dribble 4";
                         CIRCLE_SHIT_YIELD({ place_ball_tactic });
                     } else {
                         if (world.gameState().getBallPlacementPoint().has_value()) {
