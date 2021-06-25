@@ -28,6 +28,17 @@ struct ReceiverFSM
         bool disable_one_touch = false;
     };
 
+    /**
+     * Constructor for ReceiverFSM
+     *
+     * @param pass_start_time: updated by the play when the pass starts
+     *
+     */
+    explicit ReceiverFSM(const std::shared_ptr<Timestamp> &pass_start_timestamp)
+        : pass_start_timestamp(pass_start_timestamp)
+    {
+    }
+
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     // The minimum proportion of open net we're shooting on vs the entire size of the net
@@ -187,28 +198,6 @@ struct ReceiverFSM
         const auto onetouch_s  = state<OneTouchDribbleState>;
         const auto update_e    = event<Update>;
         const auto waiting_for_pass_s = state<WaitingForPassState>;
-        const auto shoot_s           = state<KickFSM>;
-
-        // COMP HACK 2021 revert with #2176
-        const auto shoot = [this](auto event,
-                                  back::process<KickFSM::Update> processEvent) {
-            auto best_shot = findFeasibleShot(event.common.world, event.common.robot);
-            auto one_touch = getOneTouchShotPositionAndOrientation(
-                event.common.robot, event.common.world.ball(),
-                best_shot->getPointToShootAt(), event.control_params.pass.value());
-
-            if (best_shot)
-            {
-                if (event.control_params.pass)
-                {
-                    KickFSM::ControlParams control_params{
-                        .kick_origin                  = one_touch.getPointToShootAt(),
-                        .kick_direction               = one_touch.getOpenAngle(),
-                        .kick_speed_meters_per_second = BALL_MAX_SPEED_METERS_PER_SECOND};
-                    processEvent(KickFSM::Update(control_params, event.common));
-                }
-            }
-        };
 
         /**
          * Checks if a one touch shot is possible
@@ -243,13 +232,28 @@ struct ReceiverFSM
                 {
                     event.common.set_intent(std::make_unique<MoveIntent>(
                         event.common.robot.id(), one_touch.getPointToShootAt(),
-                        one_touch.getOpenAngle(), 0, DribblerMode::MAX_FORCE,
+			            one_touch.getOpenAngle(), 0, DribblerMode::MAX_FORCE,
                         BallCollisionType::ALLOW,
-                        AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0},
+			            AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, BALL_MAX_SPEED_METERS_PER_SECOND},
                         MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
                         event.common.robot.robotConstants()));
                 }
             }
+        };
+
+        /**
+         * We want to jot down the time the pass started, so we can
+         * cancel the pass if it takes longer than expected.
+         *
+         * This is so that we can protect ourselves from passes
+         * that are bonked by other robots and leave the nominal pass trajectory.
+         *
+         * @param event ReceiverFSM::Update event
+         */
+        const auto log_pass_start_time = [this](auto event)
+        {
+            pass_start_timestamp =
+                std::make_shared<Timestamp>(event.common.world.getMostRecentTimestamp());
         };
 
         /**
@@ -319,6 +323,30 @@ struct ReceiverFSM
         };
 
         /**
+         * Guard that checks if the pass has been borked/bonked
+         *
+         * @param event PivotKickFSM::Update event
+         *
+         * @return if the ball has been kicked
+         */
+        const auto pass_borked = [this](auto event) {
+
+            if (!pass_start_timestamp)
+            {
+                // we don't have a pass start time, which is already borked
+                return true;
+            }
+
+            bool borked = event.common.world.getMostRecentTimestamp() + Duration::fromSeconds(1)
+                   > (*pass_start_timestamp + event.control_params.pass->estimatePassDuration());
+            if (borked)
+            {
+                std::cerr<<"PASSSSSSS BORKED";
+            }
+            return borked;
+        };
+
+        /**
          * Check if the pass has finished by checking if we the robot has
          * a ball near its dribbler.
          *
@@ -348,16 +376,19 @@ struct ReceiverFSM
             return stray_pass || near_dribbler;
         };
 
-        
         return make_transition_table(
-            // src_state + event [guard] / action = dest_state
-            *waiting_for_pass_s + update_e[!pass_started] / update_receive,
-            waiting_for_pass_s + update_e[pass_started && onetouch_possible] / update_onetouch = onetouch_s,
-            waiting_for_pass_s + update_e[pass_started && !onetouch_possible] / update_receive  = receive_s,
-            receive_s + update_e[!pass_finished] / adjust_receive,
-            receive_s + update_e[pass_finished] / update_receive = X,
-            onetouch_s + update_e[!pass_finished] / update_onetouch,
-            onetouch_s + update_e[pass_finished] / update_onetouch = shoot_s,
-            shoot_s + update_e / shoot, shoot_s = X);
+                // src_state + event [guard] / action = dest_state
+                *waiting_for_pass_s + update_e[!pass_started] / update_receive,
+                waiting_for_pass_s + update_e[pass_started && onetouch_possible] / log_pass_start_time = onetouch_s,
+                waiting_for_pass_s + update_e[pass_started && !onetouch_possible] / log_pass_start_time  = receive_s,
+                receive_s + update_e[!pass_finished && !pass_borked] / adjust_receive,
+                onetouch_s + update_e[!pass_finished && !pass_borked] / update_onetouch,
+                receive_s + update_e[!pass_finished && pass_borked] = X,
+                onetouch_s + update_e[!pass_finished && pass_borked] = X,
+                receive_s + update_e[pass_finished] / adjust_receive = X,
+                onetouch_s + update_e[pass_finished] / update_onetouch = X);
     }
+
+   private:
+    std::shared_ptr<Timestamp> pass_start_timestamp;
 };
