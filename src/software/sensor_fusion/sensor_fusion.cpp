@@ -34,6 +34,12 @@ std::optional<World> SensorFusion::getWorld() const
 {
     if (field && ball)
     {
+        static unsigned count = 0;
+        if (count++ >= 100)
+        {
+            std::cout << "Ball velocity: " << ball.value().velocity().length() << "\n"; 
+            count = 0;
+        }
         World new_world(*field, *ball, friendly_team, enemy_team);
         new_world.updateGameState(game_state);
         new_world.setTeamWithPossession(team_with_possession, team_with_possession_confidence);
