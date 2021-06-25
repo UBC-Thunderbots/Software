@@ -232,7 +232,7 @@ struct ReceiverFSM
                 {
                     event.common.set_intent(std::make_unique<MoveIntent>(
                         event.common.robot.id(), one_touch.getPointToShootAt(),
-			            one_touch.getOpenAngle(), 0, DribblerMode::MAX_FORCE,
+			            one_touch.getOpenAngle(), 0, DribblerMode::OFF,
                         BallCollisionType::ALLOW,
 			            AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, BALL_MAX_SPEED_METERS_PER_SECOND},
                         MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
@@ -315,6 +315,12 @@ struct ReceiverFSM
          * @return true if the ball is near a robots mouth
          */
         const auto pass_finished = [](auto event) {
+            // We tolerate imperfect passes that hit the edges of the robot,
+            // so that we can quickly transition out and grab the ball.
+            return event.common.robot.isNearDribbler(event.common.world.ball().position());
+        };
+
+        const auto stray_pass = [](auto event) {
             auto ball_position = event.common.world.ball().position();
 
             Vector ball_receiver_point_vector(
@@ -331,10 +337,7 @@ struct ReceiverFSM
                 event.common.world.ball().velocity().length() > MIN_STRAY_PASS_SPEED &&
                 orientation_difference > MIN_STRAY_PASS_ANGLE;
 
-            // We tolerate imperfect passes that hit the edges of the robot,
-            // so that we can quickly transition out and grab the ball.
-            bool near_dribbler = event.common.robot.isNearDribbler(event.common.world.ball().position());
-            return stray_pass || near_dribbler;
+            return stray_pass;
         };
 
         return make_transition_table(
@@ -343,7 +346,8 @@ struct ReceiverFSM
                 waiting_for_pass_s + update_e[pass_started && onetouch_possible] / update_receive = onetouch_s,
                 waiting_for_pass_s + update_e[pass_started && !onetouch_possible] / update_onetouch  = receive_s,
                 receive_s + update_e[!pass_finished] / adjust_receive,
-                onetouch_s + update_e[!pass_finished] / update_onetouch,
+                onetouch_s + update_e[!pass_finished && !stray_pass] / update_onetouch,
+                onetouch_s + update_e[!pass_finished && stray_pass] / adjust_receive = receive_s,
                 receive_s + update_e[pass_finished] / adjust_receive = X,
                 onetouch_s + update_e[pass_finished] / update_onetouch = X);
     }
