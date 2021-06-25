@@ -89,14 +89,17 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     };
 
     int num_intersections = 0;
-    int intersecting_field_bound = -1;
+    double closest = 10000.0;
+    int closest_intersecting_field_bound = -1;
     for (std::size_t i = 0; i < field_boundary_segments.size(); i++)
     {
         const Segment &field_bound = field_boundary_segments[i];
         if (intersects(field_bound, inflated_ball))
         {
             num_intersections++;
-            intersecting_field_bound = static_cast<int>(i);
+            if (distance(world.ball().position(), field_bound) < closest) {
+                closest_intersecting_field_bound = static_cast<int>(i);
+            }
         }
     }
 
@@ -104,14 +107,14 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     Vector intersecting_dir = world.ball().position().toVector();
 
     //TODO please actually write this properly, this is so bad please don't look beyond this point
-    if (num_intersections == 1) {
-        if (intersecting_field_bound == 0) {
+    if (num_intersections >= 1) {
+        if (closest_intersecting_field_bound == 0) {
             intersecting_dir = Vector(0, 1);
-        } else if (intersecting_field_bound == 1) {
+        } else if (closest_intersecting_field_bound == 1) {
             intersecting_dir = Vector(0, -1);
-        } else if (intersecting_field_bound == 2) {
+        } else if (closest_intersecting_field_bound == 2) {
             intersecting_dir = Vector(1, 0);
-        } else if (intersecting_field_bound == 3) {
+        } else if (closest_intersecting_field_bound == 3) {
             intersecting_dir = Vector(-1, 0);
         }
 
