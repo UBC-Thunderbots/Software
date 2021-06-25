@@ -33,17 +33,19 @@ bool FreeKickPlay::isApplicable(const World &world) const
 
 bool FreeKickPlay::invariantHolds(const World &world) const
 {
-	bool receiver_done = false;
+    bool receiver_done = false;
 
-	if (receiver)
-	{
-		receiver_done = receiver->done();
-	}
-    std::cerr<<"FREEKICK"<<world.gameState().isOurFreeKick()<<std::endl;
-    bool invariant = (receiver_done ||
-                    world.gameState().isHalted() ||
-                    world.gameState().isStopped() ||
-                    !world.gameState().isOurFreeKick());
+    if (receiver)
+    {
+        receiver_done = receiver->done();
+    }
+
+    bool invariant = (
+            receiver_done ||
+            world.gameState().isHalted() ||
+            world.gameState().isStopped()||
+            !world.gameState().isOurFreeKick());
+
     return !invariant;
 }
 
@@ -253,7 +255,8 @@ void FreeKickPlay::performPassStage(
     LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
     LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.rating;
 
-    auto receiver = std::make_shared<ReceiverTactic>(pass);
+    receiver = std::make_shared<ReceiverTactic>(pass);
+
     auto kicker = std::make_shared<KickTactic>(false);
     auto chipper = std::make_shared<ChipTactic>(false);
 

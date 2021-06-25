@@ -31,7 +31,7 @@ bool KickoffFriendlyPlay::invariantHolds(const World &world) const
     }
     
     return (!world.gameState().isStopped() && !world.gameState().isHalted())
-        && !receiver_done;
+        && !receiver_done && world.gameState().isPlaying();
 }
 
 void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,

@@ -102,6 +102,9 @@ class Pass
     friend std::ostream& operator<<(std::ostream& output_stream, const Pass& pass);
 
    private:
+
+    bool pass_started;
+
     // The location of the passer
     Point passer_point;
 

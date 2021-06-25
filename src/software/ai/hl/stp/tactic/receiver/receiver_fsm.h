@@ -42,7 +42,7 @@ struct ReceiverFSM
 
     // The minimum angle between a ball's trajectory and the ball-receiver_point vector
     // for which we can consider a pass to be stray
-    static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(90);
+    static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(70);
 
     // the minimum speed required for a pass to be considered stray
     static constexpr double MIN_STRAY_PASS_SPEED = 0.3;
@@ -267,7 +267,7 @@ struct ReceiverFSM
             {
                 Point ball_receive_pos = ball.position();
 
-                if (ball.velocity().length() != 0)
+                if (ball.velocity().length() < MIN_PASS_START_SPEED)
                 {
                     ball_receive_pos = closestPoint(
                         robot_pos,
@@ -284,6 +284,18 @@ struct ReceiverFSM
                     MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
                     event.common.robot.robotConstants()));
             }
+        };
+
+        /**
+         * Guard that checks if the ball has been kicked
+         *
+         * @param event PivotKickFSM::Update event
+         *
+         * @return if the ball has been kicked
+         */
+        const auto pass_started = [](auto event) {
+            return event.common.world.ball().hasBallBeenKicked(
+                    event.control_params.pass->passerOrientation());
         };
 
         /**
@@ -315,14 +327,7 @@ struct ReceiverFSM
             bool near_dribbler = event.common.robot.isNearDribbler(
                     event.common.world.ball().position(), DIST_TO_FRONT_OF_ROBOT_METERS +
                     BALL_MAX_RADIUS_METERS);
-            if (stray_pass)
-            {
-                LOG(FATAL) << "Receive done because of stray pass";
-            }
-            if (near_dribbler)
-            {
-                LOG(FATAL) << "Receive done because receiver received the ball";
-            }
+
             return stray_pass || near_dribbler;
         };
 
@@ -337,32 +342,17 @@ struct ReceiverFSM
             }
             return friendly_robot_has_ball;
         };
-
-
-        const auto face_ball = [this](auto event) {
-            event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), 
-                event.control_params.pass.value().receiverPoint(),
-                event.control_params.pass.value().receiverOrientation(),
-                0, DribblerMode::OFF, BallCollisionType::ALLOW,
-                AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-                event.common.robot.robotConstants()));
-        };
         
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *undecided_s + update_e[kicker_has_ball] / face_ball = waiting_for_pass_s,
-            undecided_s + update_e[!kicker_has_ball] / face_ball,
-            waiting_for_pass_s + update_e[kicker_has_ball] / face_ball,
-            waiting_for_pass_s + update_e[onetouch_possible] / update_onetouch = onetouch_s,
-            waiting_for_pass_s + update_e[!onetouch_possible] / update_receive  = receive_s,
-//            undecided_s + update_e[onetouch_possible] / update_onetouch = onetouch_s,
-//            undecided_s + update_e[!onetouch_possible] / update_receive  = receive_s,
-            receive_s + update_e[!kicker_has_ball] / update_receive,
-            receive_s + update_e[!kicker_has_ball && !pass_finished] / adjust_receive,
+            *undecided_s + update_e[kicker_has_ball] / update_receive = waiting_for_pass_s,
+            undecided_s + update_e[!kicker_has_ball] / update_receive,
+            waiting_for_pass_s + update_e[kicker_has_ball] / update_receive,
+            waiting_for_pass_s + update_e[pass_started && onetouch_possible] / update_onetouch = onetouch_s,
+            waiting_for_pass_s + update_e[pass_started && !onetouch_possible] / update_receive  = receive_s,
+            receive_s + update_e[pass_started && !pass_finished] / adjust_receive,
+            onetouch_s + update_e[pass_started && !pass_finished] / update_onetouch,
             receive_s + update_e[pass_finished] / update_receive = X,
-            onetouch_s + update_e[!pass_finished] / update_onetouch,
             onetouch_s + update_e[pass_finished] / update_onetouch = X);
     }
 };
