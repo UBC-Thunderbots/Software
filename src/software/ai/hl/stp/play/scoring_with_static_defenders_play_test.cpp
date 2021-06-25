@@ -64,21 +64,15 @@ TEST_P(ScoringWithStaticDefendersPlayTest,
     setRefereeCommand(RefereeCommand::DIRECT_FREE_US, RefereeCommand::HALT);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        // Run the test for 20 seconds which is the specified time limit for this hardware
-        // challenge
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(20))
-            {
-                friendlyScored(world_ptr, yield);
-                yield("scoring from static defenders challenge countdown not finished!");
-            }
+            friendlyScored(world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(20));
 }
 
 INSTANTIATE_TEST_CASE_P(
