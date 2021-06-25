@@ -66,7 +66,6 @@ TEST_P(ScoringWithStaticDefendersPlayTest,
     std::vector<ValidationFunction> terminating_validation_functions = {
         // Run the test for 20 seconds which is the specified time limit for this hardware
         // challenge
-        // TODO (#2106): Implement proper validation
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(20))
             {
@@ -91,7 +90,6 @@ INSTANTIATE_TEST_CASE_P(
         std::make_tuple(TestUtil::createStationaryRobotStatesWithId(
                             {Point(2.9, 0.175), Point(1.5, 0), Point(2, -0.175)}),
                         Point(0.9, 0)),
-        // this test fails
         std::make_tuple(
             TestUtil::createStationaryRobotStatesWithId({Point(2.9, 0.175), Point(2, 0.5),
                                                          Point(1, 0), Point(2, -0.5)}),

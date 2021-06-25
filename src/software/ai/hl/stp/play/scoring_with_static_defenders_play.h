@@ -2,6 +2,7 @@
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
+#include "software/ai/passing/pass.h"
 
 /**
  * Play for scoring with static defenders play hardware challenge
@@ -21,4 +22,13 @@ class ScoringWithStaticDefendersPlay : public Play
    private:
     // 3 robots for this hardware challenge
     const unsigned int NUM_ROBOTS = 3;
+
+    /**
+     * Update the tactic that aligns the robot to the ball in preparation to pass
+     *
+     * @param align_to_ball_tactic
+     * @param world The current state of the world
+     */
+    void updateAlignToBallTactic(std::shared_ptr<MoveTactic> align_to_ball_tactic, Pass pass,
+                                 const World &world);
 };
