@@ -16,6 +16,7 @@ struct ReceiverFSM
     class OneTouchShotState;
     class ReceiveAndDribbleState;
     class UndecidedState;
+    class WaitingForPassState;
 
     struct ControlParams
     {
@@ -31,8 +32,8 @@ struct ReceiverFSM
     // The minimum proportion of open net we're shooting on vs the entire size of the net
     // that we require before attempting a shot
     static constexpr double MIN_SHOT_NET_PERCENT_OPEN = 0.3;
-    static constexpr double MIN_PASS_START_SPEED      = 0.4;
-    static constexpr double BALL_MIN_MOVEMENT_SPEED   = 0.05;
+    static constexpr double MIN_PASS_START_SPEED      = 0.04;
+    static constexpr double BALL_MIN_MOVEMENT_SPEED   = 0.04;
 
     // The maximum deflection angle that we will attempt a one-touch kick towards the
     // enemy goal with
@@ -90,7 +91,8 @@ struct ReceiverFSM
      */
     static Shot getOneTouchShotPositionAndOrientation(const Robot& robot,
                                                       const Ball& ball,
-                                                      const Point& best_shot_target)
+                                                      const Point& best_shot_target,
+                                                     const Pass pass)
     {
         double dist_to_ball_in_dribbler =
             DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS;
@@ -104,7 +106,8 @@ struct ReceiverFSM
         {
             closest_ball_pos =
                 closestPoint(ball_contact_point,
-                             Line(ball.position(), ball.position() + ball.velocity()));
+                             Line(ball.position(), 
+                                  ball.position() + ball.velocity()));
         }
         Ray shot(closest_ball_pos, best_shot_target - closest_ball_pos);
 
@@ -183,6 +186,7 @@ struct ReceiverFSM
         const auto receive_s   = state<ReceiveAndDribbleState>;
         const auto onetouch_s  = state<OneTouchShotState>;
         const auto update_e    = event<Update>;
+        const auto waiting_for_pass_s = state<WaitingForPassState>;
 
         /**
          * Checks if a one touch shot is possible
@@ -206,10 +210,11 @@ struct ReceiverFSM
          * @param event ReceiverFSM::Update event
          */
         const auto update_onetouch = [this](auto event) {
+            std::cout <<"updating one touch\n";
             auto best_shot = findFeasibleShot(event.common.world, event.common.robot);
             auto one_touch = getOneTouchShotPositionAndOrientation(
                 event.common.robot, event.common.world.ball(),
-                best_shot->getPointToShootAt());
+                best_shot->getPointToShootAt(), event.control_params.pass.value());
 
             if (best_shot)
             {
@@ -288,20 +293,22 @@ struct ReceiverFSM
          * @param event ReceiverFSM::Update event
          * @return true if the pass has started
          */
-        const auto pass_started = [](auto event) {
+//        const auto pass_started = [](auto event) {
             // the pass starts when the passing robot is facing the proper orientation
             // with keepaway, we don't face the orientation immediately after the receiver
             // receives the pass to execute
-            bool friendly_robot_has_ball = false;
-            for(auto robot : event.common.world.friendlyTeam().getAllRobots())
-            {
-                if (robot.isNearDribbler(event.common.world.ball().position()))
-                {
-                    friendly_robot_has_ball = true;
-                }
-            }
-            return (event.common.world.ball().velocity().length() > MIN_PASS_START_SPEED && !friendly_robot_has_ball);
-        };
+//            bool friendly_robot_has_ball = false;
+//            for(auto robot : event.common.world.friendlyTeam().getAllRobots())
+//            {
+//                if (robot.isNearDribbler(event.common.world.ball().position()))
+//                {
+//                    friendly_robot_has_ball = true;
+//                }
+//            }
+//            if (event.common.world.ball().velocity().length() > MIN_PASS_START_SPEED)
+//                std::cout << "Started a pass!\n";
+//            return (event.common.world.ball().velocity().length() > MIN_PASS_START_SPEED);
+//        };
 
         /**
          * Check if the pass has finished by checking if we the robot has
@@ -330,16 +337,49 @@ struct ReceiverFSM
             // We tolerate imperfect passes that hit the edges of the robot,
             // so that we can quickly transition out and grab the ball.
             bool near_dribbler = event.common.robot.isNearDribbler(
-                event.common.world.ball().position(), ROBOT_MAX_RADIUS_METERS);
+                event.common.world.ball().position(), 0.01);
             return stray_pass || near_dribbler;
         };
+        
+//        const auto transition_to_one_touch = [this](auto event) {
+//            std::cout << "transition to one touch\n";
+//        };
+        
+        const auto kicker_has_ball = [](auto event) {
+            bool friendly_robot_has_ball = false;
+            for(auto robot : event.common.world.friendlyTeam().getAllRobots())
+            {
+                if (robot.isNearDribbler(event.common.world.ball().position(), 0.05))
+                {
+                    friendly_robot_has_ball = true;
+                }
+            }
+            return friendly_robot_has_ball;
+        };
 
+
+        const auto face_ball = [this](auto event) {
+            event.common.set_intent(std::make_unique<MoveIntent>(
+                event.common.robot.id(), 
+                event.control_params.pass.value().receiverPoint(),
+                event.control_params.pass.value().receiverOrientation(),
+                0, DribblerMode::OFF, BallCollisionType::ALLOW,
+                AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+                event.common.robot.robotConstants()));
+        };
+        
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *undecided_s + update_e[onetouch_possible] / update_onetouch = onetouch_s,
-            undecided_s + update_e[!onetouch_possible] / update_receive  = receive_s,
-            receive_s + update_e[!pass_started] / update_receive,
-            receive_s + update_e[pass_started && !pass_finished] / adjust_receive,
+            *undecided_s + update_e[kicker_has_ball] / face_ball = waiting_for_pass_s,
+            undecided_s + update_e[!kicker_has_ball] / face_ball,
+            waiting_for_pass_s + update_e[kicker_has_ball] / face_ball,
+            waiting_for_pass_s + update_e[onetouch_possible] / update_onetouch = onetouch_s,
+            waiting_for_pass_s + update_e[!onetouch_possible] / update_receive  = receive_s,
+//            undecided_s + update_e[onetouch_possible] / update_onetouch = onetouch_s,
+//            undecided_s + update_e[!onetouch_possible] / update_receive  = receive_s,
+            receive_s + update_e[!kicker_has_ball] / update_receive,
+            receive_s + update_e[kicker_has_ball && !pass_finished] / adjust_receive,
             receive_s + update_e[pass_finished] / update_receive = X,
             onetouch_s + update_e[!pass_finished] / update_onetouch,
             onetouch_s + update_e[pass_finished] / update_onetouch = X);

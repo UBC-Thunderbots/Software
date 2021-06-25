@@ -232,7 +232,8 @@ struct PenaltyKickFSM
                 DribbleFSM::ControlParams control_params{
                     .dribble_destination       = std::optional<Point>(final_position),
                     .final_dribble_orientation = std::optional<Angle>(shot_angle),
-                    .allow_excessive_dribbling = false};
+                    //we minimize the chance of awful autokicks just as we're about to shoot
+                    .allow_excessive_dribbling = true};
                 processEvent(DribbleFSM::Update(control_params, event.common));
             };
 

@@ -38,7 +38,16 @@ void MotionConstraintVisitor::visit(const KickoffChipTactic &tactic)
 {
     current_allowed_constraints = std::set<MotionConstraint>({
         MotionConstraint::CENTER_CIRCLE,
-        MotionConstraint::HALF_METER_AROUND_BALL
+        MotionConstraint::HALF_METER_AROUND_BALL,
+        MotionConstraint::ENEMY_HALF
+    });
+}
+
+void MotionConstraintVisitor::visit(const KickoffMoveTactic &tactic)
+{
+    current_allowed_constraints = std::set<MotionConstraint>({
+        MotionConstraint::CENTER_CIRCLE,
+        MotionConstraint::ENEMY_HALF
     });
 }
 
