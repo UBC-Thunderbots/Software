@@ -24,4 +24,10 @@ MAKE_ENUM(MotionConstraint,
           // The friendly half of the field
           FRIENDLY_HALF,
           // Path between ball and placement point in ball placement
-          AVOID_BALL_PLACEMENT_INTERFERENCE);
+          AVOID_BALL_PLACEMENT_INTERFERENCE,
+          // HACK: Needs to be fixed later
+          // In KickoffFriendlyPlay, we cannot allow a CENTER_CIRCLE motion constraint but also 
+          // have a ENEMY_HALF motion constraint at the same time
+          // This is a custom constraint that roughly draws the enemy half without the centre 
+          // circle
+          ENEMY_HALF_EXCEPT_CENTRE_CIRCLE);

@@ -30,13 +30,15 @@ bool KickoffFriendlyPlay::invariantHolds(const World &world) const
         receiver_done = receiver->done();
     }
     
-    return (!world.gameState().isStopped() && !world.gameState().isHalted())
-        && !receiver_done && world.gameState().isPlaying();
+    return (!world.gameState().isHalted() &&
+            !world.gameState().isStopped() && world.gameState().isOurKickoff() && !world.gameState().isPlaying()) && !receiver_done;
 }
 
 void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                          const World &world)
 {
+    using Zones = EighteenZoneId;
+    
     // Since we only have 6 robots at the maximum, the number one priority
     // is the robot doing the kickoff up front. The goalie is the second most
     // important, followed by 3 and 4 setup for offense. 5 and 6 will stay
@@ -61,14 +63,14 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     //
     // This is a two part play:
     //      Part 1: Get into position, but don't touch the ball (ref kickoff)
-    //      Part 2: Chip the ball over the defender (ref normal start)
+    //      Part 2: Pass the ball to a winger robot (ref normal start)
 
     // the following positions are in the same order as the positions shown above,
     // excluding the goalie for part 1 of this play
     std::vector<Point> kickoff_setup_positions = {
         // Robot 1
         Point(world.field().centerPoint() +
-              Vector(-world.field().centerCircleRadius(), 0)),
+              Vector(-world.field().centerCircleRadius() + 0.1, 0)),
         // Robot 2
         // Goalie positions will be handled by the goalie tactic
         // Robot 3
@@ -95,10 +97,18 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
         std::make_shared<MoveTactic>(true)};
 
-    // specific tactics
+    // specific tactics for kickoff robots (special motion constraints for moving in centre circle)
     auto kickoff_move_tactic = std::make_shared<KickoffMoveTactic>(true);
     auto kickoff_chip_tactic = std::make_shared<KickoffChipTactic>(true);
 
+        
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
+    };
+    
     // Part 1: setup state (move to key positions)
     while (world.gameState().isSetupState())
     {
@@ -107,44 +117,47 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         // set the requirement that Robot 1 must be able to kick and chip
         kickoff_move_tactic->mutableRobotCapabilityRequirements() = {
             RobotCapability::Kick, RobotCapability::Chip};
-        kickoff_move_tactic->updateControlParams(kickoff_setup_positions.at(0),
-                                                Angle::zero(), 0);
-        result[0].emplace_back(kickoff_move_tactic);
         
         // setup 5 kickoff positions in order of priority
-        for (unsigned i = 1; i < kickoff_setup_positions.size(); i++)
+        for (unsigned i = 0; i < kickoff_setup_positions.size() - 2; i++)
         {
             move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
                                                     Angle::zero(), 0);
             result[0].emplace_back(move_tactics.at(i));
         }
-
+        
+        result[0].emplace_back(crease_defender_tactics[0]);
+        result[0].emplace_back(crease_defender_tactics[1]);
+        
         // yield the Tactics this Play wants to run, in order of priority
         yield(result);
     }
     
     // These two tactics will set robots to roam around the wings, trying to put
     // themselves into a good position to receive a pass
-    std::array<std::shared_ptr<MoveTactic>, 2> cherry_picker_tactics = {
+    std::array<std::shared_ptr<MoveTactic>, 2> winger_tactics = {
         std::make_shared<MoveTactic>(false),
         std::make_shared<MoveTactic>(false),
     };
     
     std::vector<EighteenZoneId> kickoff_pass_zones = {  EighteenZoneId::ZONE_7, 
-                                                        EighteenZoneId::ZONE_9 };
+                                                        EighteenZoneId::ZONE_10,
+                                                        EighteenZoneId::ZONE_9,
+                                                        EighteenZoneId::ZONE_12
+                                                        };
     
-    auto update_cherry_pickers = [&](Pass pass1, Pass pass2)
+    auto update_wingers = [&](Pass left, Pass right)
     {        
-        std::get<0>(cherry_picker_tactics)->updateControlParams(pass1.receiverPoint(),
-                                                                pass1.receiverOrientation(), 0.0,
+        std::get<0>(winger_tactics)->updateControlParams(left.receiverPoint(),
+                                                                left.receiverOrientation(), 0.0,
                                                                 MaxAllowedSpeedMode::PHYSICAL_LIMIT);
         
-        std::get<1>(cherry_picker_tactics)->updateControlParams(pass2.receiverPoint(),
-                                                                pass2.receiverOrientation(), 0.0,
+        std::get<1>(winger_tactics)->updateControlParams(right.receiverPoint(),
+                                                                right.receiverOrientation(), 0.0,
                                                                 MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     };
     
-    // Wait for a good pass
+    // Part 2: Wait for a good pass
     // To get the best pass possible we start by aiming for a perfect one and then
     // decrease the minimum score over time
     double min_score                  = 1.0;
@@ -154,17 +167,19 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     PassGenerator<EighteenZoneId> pass_generator(pitch_division,
                                                  play_config->getPassingConfig());
     auto pass_eval = pass_generator.generatePassEvaluation(world);
-    PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
-    best_pass = best_pass_and_score_so_far.pass;
-    
+    PassWithRating best_pass_and_score_so_far = 
+        pass_eval.getBestPassInZones(std::unordered_set<Zones>(kickoff_pass_zones.begin(), 
+                                                               kickoff_pass_zones.end()));
+
     do
     {
         PassWithRating pass1 = 
-            pass_generator.generatePassEvaluation(world).getBestPassInZones({kickoff_pass_zones[0]});
+            pass_generator.generatePassEvaluation(world).getBestPassInZones({kickoff_pass_zones[0], kickoff_pass_zones[1]});
         PassWithRating pass2 = 
-            pass_generator.generatePassEvaluation(world).getBestPassInZones({kickoff_pass_zones[1]});
-        update_cherry_pickers(pass1.pass, pass2.pass);
-        best_pass_and_score_so_far = (pass1.rating >= pass2.rating) ? pass1 : pass2;
+            pass_generator.generatePassEvaluation(world).getBestPassInZones({kickoff_pass_zones[2], kickoff_pass_zones[3]});
+        update_wingers(pass1.pass, pass2.pass);
+        
+        auto current_best_pass_with_rating = (pass1.rating >= pass2.rating) ? pass1 : pass2;
 
         LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
@@ -177,30 +192,31 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                          ->value(),
                                  1.0);
         
+        
+        // to prevent the kicker from being paralyzed at kickoff, we accept a pass threshold
+        // where we lock on to a less favourable pass
+        if ((best_pass_and_score_so_far.rating + BETTER_PASS_RATING_THRESHOLD) 
+            >= current_best_pass_with_rating.rating)
+        {
+            best_pass_and_score_so_far = current_best_pass_with_rating;
+        }
         best_pass = best_pass_and_score_so_far.pass;
+        
         Vector ball_to_passer = best_pass.value().receiverPoint() - world.ball().position();
         kickoff_move_tactic->updateControlParams(
-            world.ball().position() - ball_to_passer.normalize(ROBOT_MAX_RADIUS_METERS * 1.5),
+            world.ball().position() - ball_to_passer.normalize(ROBOT_MAX_RADIUS_METERS),
             ball_to_passer.orientation(), 0);
-        
         yield({{kickoff_move_tactic, 
-                std::get<0>(cherry_picker_tactics), 
-                std::get<1>(cherry_picker_tactics)}});
+                std::get<0>(winger_tactics), 
+                std::get<1>(winger_tactics)}});
     } while (best_pass_and_score_so_far.rating < min_score);
 
+    // part 2: we are ready to pass, let's make one now
     receiver   = std::make_shared<ReceiverTactic>(best_pass.value());
-    
-    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(
-            play_config->getRobotNavigationObstacleConfig()),
-        std::make_shared<CreaseDefenderTactic>(
-            play_config->getRobotNavigationObstacleConfig()),
-    };
     
     committed_to_pass = true;
     do
     {
-        std::cout << "Yielding receiver\n";
         kickoff_chip_tactic->updateControlParams(best_pass.value().passerPoint(),
                                                 best_pass.value().passerOrientation(),
                                                 best_pass.value().speed());
@@ -213,35 +229,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         yield({{kickoff_chip_tactic, receiver, std::get<0>(crease_defender_tactics),
                std::get<1>(crease_defender_tactics)}});
     } while (!receiver->done());
-    
-    
-    // Part 2: not normal play, currently ready state (chip the ball)
-//    while (!world.gameState().isPlaying())
-//    {  
-        
-
-        
-//        // TODO This needs to be adjusted post field testing, ball needs to land exactly
-//        // in the middle of the enemy field
-//        kickoff_chip_tactic->updateControlParams(
-//            world.ball().position(), Vector(world.field().xLength(), 0).orientation(),
-//            BALL_MAX_SPEED_METERS_PER_SECOND - 1);
-//        result[0].emplace_back(kickoff_chip_tactic);
-//
-//        // the robot at position 0 will be closest to the ball, so positions starting from
-//        // 1 will be assigned to the rest of the robots
-//        for (unsigned i = 1; i < kickoff_setup_positions.size(); i++)
-//        {
-//            move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
-//                                                    Angle::zero(), 0);
-//            result[0].emplace_back(move_tactics.at(i));
-//        }
-
-        // yield the Tactics this Play wants to run, in order of priority
-//        yield(result);
-//    }
 }
-
 
 std::vector<CircleWithColor> KickoffFriendlyPlay::getCirclesWithColorToDraw()
 {
