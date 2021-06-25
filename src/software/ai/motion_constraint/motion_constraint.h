@@ -24,4 +24,5 @@ MAKE_ENUM(MotionConstraint,
           // The friendly half of the field
           FRIENDLY_HALF,
           // Path between ball and placement point in ball placement
-          AVOID_BALL_PLACEMENT_INTERFERENCE);
+          AVOID_BALL_PLACEMENT_INTERFERENCE,
+          ENEMY_HALF_EXCEPT_CENTRE_CIRCLE);

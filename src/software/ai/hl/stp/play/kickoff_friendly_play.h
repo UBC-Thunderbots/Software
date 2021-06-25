@@ -28,5 +28,5 @@ class KickoffFriendlyPlay : public Play
     
     private :
         std::shared_ptr<ReceiverTactic> receiver;
-        
+        static double constexpr BETTER_PASS_RATING_THRESHOLD = 0.1;
 };

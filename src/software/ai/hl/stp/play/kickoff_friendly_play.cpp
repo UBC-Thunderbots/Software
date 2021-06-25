@@ -131,7 +131,10 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     };
     
     std::vector<EighteenZoneId> kickoff_pass_zones = {  EighteenZoneId::ZONE_7, 
-                                                        EighteenZoneId::ZONE_9 };
+                                                        EighteenZoneId::ZONE_10,
+                                                        EighteenZoneId::ZONE_9,
+                                                        EighteenZoneId::ZONE_12
+                                                        };
     
     auto update_cherry_pickers = [&](Pass pass1, Pass pass2)
     {        
@@ -160,11 +163,11 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     do
     {
         PassWithRating pass1 = 
-            pass_generator.generatePassEvaluation(world).getBestPassInZones({kickoff_pass_zones[0]});
+            pass_generator.generatePassEvaluation(world).getBestPassInZones({kickoff_pass_zones[0], kickoff_pass_zones[1]});
         PassWithRating pass2 = 
-            pass_generator.generatePassEvaluation(world).getBestPassInZones({kickoff_pass_zones[1]});
+            pass_generator.generatePassEvaluation(world).getBestPassInZones({kickoff_pass_zones[2], kickoff_pass_zones[3]});
         update_cherry_pickers(pass1.pass, pass2.pass);
-        best_pass_and_score_so_far = (pass1.rating >= pass2.rating) ? pass1 : pass2;
+        best_pass_and_score_so_far = ((pass1.rating + BETTER_PASS_RATING_THRESHOLD) >= pass2.rating) ? pass1 : pass2;
 
         LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
@@ -180,7 +183,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         best_pass = best_pass_and_score_so_far.pass;
         Vector ball_to_passer = best_pass.value().receiverPoint() - world.ball().position();
         kickoff_move_tactic->updateControlParams(
-            world.ball().position() - ball_to_passer.normalize(ROBOT_MAX_RADIUS_METERS * 1.5),
+            world.ball().position() - ball_to_passer.normalize(ROBOT_MAX_RADIUS_METERS),
             ball_to_passer.orientation(), 0);
         
         yield({{kickoff_move_tactic, 
@@ -200,7 +203,6 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     committed_to_pass = true;
     do
     {
-        std::cout << "Yielding receiver\n";
         kickoff_chip_tactic->updateControlParams(best_pass.value().passerPoint(),
                                                 best_pass.value().passerOrientation(),
                                                 best_pass.value().speed());
