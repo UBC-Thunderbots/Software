@@ -47,6 +47,13 @@ class Field
      */
     static Field createSSLDivisionAField();
 
+    /**
+     * Creates a field with the standard Hardware Challenge field dimensions
+     *
+     * @return a field with the standard Hardware Challenge field dimensions
+     */
+    static Field createHardwareChallengeField();
+
     Field() = delete;
 
     /**
