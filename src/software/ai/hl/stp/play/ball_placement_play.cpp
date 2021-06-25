@@ -22,7 +22,11 @@
             angle += Angle::fromDegrees(0.1);\
             if (!center.has_value())\
             {\
-                center = Point(0, -2);\
+                center = Point(-2, 0);\
+            }\
+            if (world.gameState().getBallPlacementPoint().has_value() && world.gameState().getBallPlacementPoint()->x() < -2)\
+            {\
+                center = Point(-2, 0);\
             }\
             TacticVector result1 = circleCenter(move_tactics, center.value(), angle, tactic_vector);\
             yield({result1});\
@@ -96,9 +100,11 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
         }
     }
 
+    std::optional<Point> pull_point;
+    Vector intersecting_dir = world.ball().position().toVector();
+
     //TODO please actually write this properly, this is so bad please don't look beyond this point
     if (num_intersections == 1) {
-        Vector intersecting_dir = world.ball().position().toVector();
         if (intersecting_field_bound == 0) {
             intersecting_dir = Vector(0, 1);
         } else if (intersecting_field_bound == 1) {
@@ -114,7 +120,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
             if (robot.has_value()) {
                 align_to_ball_tactic->updateRobot(robot.value());
                 align_to_ball_tactic->updateControlParams(
-                        world.ball().position() - intersecting_dir.normalize(ROBOT_MAX_RADIUS_METERS * 4),
+                        world.ball().position() - intersecting_dir.normalize(ROBOT_MAX_RADIUS_METERS * 2),
                         intersecting_dir.orientation(), 0.0);
 
                 CIRCLE_SHIT_YIELD({align_to_ball_tactic});
@@ -126,6 +132,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
         } while (!align_to_ball_tactic->done());
 
         Point ball_pull_position = world.ball().position() - intersecting_dir.normalize(ROBOT_MAX_RADIUS_METERS * 4);
+        pull_point = ball_pull_position;
         do {
             if (robot.has_value()) {
                 place_ball_tactic->updateRobot(robot.value());
@@ -147,7 +154,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 move_away_tactic->updateRobot(robot.value());
                 move_away_tactic->updateControlParams(
                         world.ball().position() -
-                        Vector::createFromAngle(robot->orientation()).normalize(ROBOT_MAX_RADIUS_METERS * 4), robot->orientation(), 0.0);
+                        Vector::createFromAngle(robot->orientation()).normalize(ROBOT_MAX_RADIUS_METERS), robot->orientation(), 0.0);
 
                 CIRCLE_SHIT_YIELD({move_away_tactic});
             }
@@ -160,12 +167,9 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
             if (robot.has_value()) {
                 if (world.gameState().getBallPlacementPoint().has_value()) {
                     if (distance(world.ball().position(), world.gameState().getBallPlacementPoint().value()) < 0.1) {
+                        LOG (DEBUG) << "DJOEIWAJW";
                         move_away_tactic->updateRobot(robot.value());
-                        move_away_tactic->updateControlParams(last_waiting_point, Angle::zero(), 0.0,
-                                DribblerMode::OFF,
-                                BallCollisionType::AVOID,
-                                {AutoChipOrKickMode::OFF, 0},
-                                MaxAllowedSpeedMode::TIPTOE);
+                        move_away_tactic->updateControlParams(last_waiting_point, Angle::zero(), 0.0);
 
                         CIRCLE_SHIT_YIELD({move_away_tactic});
                     } else if (distance(world.ball().position(), world.gameState().getBallPlacementPoint().value()) < 1) {
@@ -177,22 +181,28 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                             CIRCLE_SHIT_YIELD({place_ball_tactic});
                         } while (!place_ball_tactic->done());
 
-                        do {
-                            if (distance(world.ball().position(), world.gameState().getBallPlacementPoint().value()) > 0.1)
-                            {
-                                break;
-                            }
-                            if (robot.has_value()) {
+                        Point move_away_point = world.ball().position() -
+                                                Vector::createFromAngle(robot->orientation()).normalize(
+                                                        ROBOT_MAX_RADIUS_METERS);
+                        if (!(contains(world.field().fieldBoundary(), move_away_point) && !contains(world.field().fieldLines(), move_away_point))) {
+                            do {
                                 LOG (DEBUG) << "breaking away 1";
-                                move_away_tactic->updateRobot(robot.value());
-                                move_away_tactic->updateControlParams(
-                                        world.ball().position() -
-                                        Vector::createFromAngle(robot->orientation()).normalize(
-                                                ROBOT_MAX_RADIUS_METERS), robot->orientation(), 0.0);
+                                if (robot.has_value()) {
+                                    move_away_tactic->updateRobot(robot.value());
+                                    move_away_tactic->updateControlParams(world.ball().position() -
+                                                                          Vector::createFromAngle(
+                                                                                  robot->orientation()).normalize(
+                                                                                  ROBOT_MAX_RADIUS_METERS),
+                                                                          robot->orientation(), 0.0,
+                                                                          DribblerMode::OFF,
+                                                                          BallCollisionType::AVOID,
+                                                                          {AutoChipOrKickMode::OFF, 0},
+                                                                          MaxAllowedSpeedMode::TIPTOE);
 
-                                CIRCLE_SHIT_YIELD({move_away_tactic});
-                            }
-                        } while (!move_away_tactic->done());
+                                    CIRCLE_SHIT_YIELD({ move_away_tactic });
+                                }
+                            } while (!move_away_tactic->done());
+                        }
 
                         do
                         {
@@ -203,7 +213,11 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                             LOG (DEBUG) << "breaking away 2";
                             if (robot.has_value()) {
                                 move_away_tactic->updateRobot(robot.value());
-                                move_away_tactic->updateControlParams(last_waiting_point, Angle::zero(), 0.0);
+                                move_away_tactic->updateControlParams(last_waiting_point, Angle::zero(), 0.0,
+                                                                      DribblerMode::OFF,
+                                                                      BallCollisionType::AVOID,
+                                                                      {AutoChipOrKickMode::OFF, 0},
+                                                                      MaxAllowedSpeedMode::TIPTOE);
 
                                 CIRCLE_SHIT_YIELD({move_away_tactic});
                             }
@@ -222,62 +236,13 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
         } while (!place_ball_tactic->done() && !move_away_tactic->done());
     }
     else {
-
-        LOG (DEBUG) << "stuck1";
-        if (world.gameState().getBallPlacementPoint().has_value()) {
-            auto move_receiver_tactic = std::make_shared<MoveTactic>(false);
-            auto move_passer_tactic = std::make_shared<MoveTactic>(false);
-
-            Pass pass = Pass(world.ball().position(), world.gameState().getBallPlacementPoint().value(),
-                             4.5);
-
-            std::optional<Robot> receiver_robot = world.friendlyTeam().getNearestRobot(pass.receiverPoint());
-            do {
-                pass = Pass(world.ball().position(), world.gameState().getBallPlacementPoint().value(),
-                            4.5);
-                TacticVector tactics = {};
-                if (robot.has_value()) {
-                    move_passer_tactic->updateRobot(robot.value());
-                    move_passer_tactic->updateControlParams(pass.passerPoint() -
-                                                            Vector::createFromAngle(pass.passerOrientation()).normalize(
-                                                                    ROBOT_MAX_RADIUS_METERS * 2),
-                                                            pass.passerOrientation(), 0.0);
-                    tactics.emplace_back(move_passer_tactic);
-                }
-                if (receiver_robot.has_value()) {
-                    move_receiver_tactic->updateRobot(receiver_robot.value());
-                    move_receiver_tactic->updateControlParams(pass.receiverPoint(), pass.receiverOrientation(), 0.0);
-                    tactics.emplace_back(move_receiver_tactic);
-                }
-
-                LOG (DEBUG) << "stuck2";
-
-
-                CIRCLE_SHIT_YIELD(tactics);
-            } while (!move_receiver_tactic->done() || !move_passer_tactic->done());
-
-            auto receiver_tactic = std::make_shared<ReceiverTactic>(pass);
-            do {
-                if (robot.has_value() && receiver_robot.has_value()) {
-                    pass_ball_tactic->updateRobot(robot.value());
-                    pass_ball_tactic->updateControlParams(pass.passerPoint(), pass.receiverPoint(),
-                                                          pass.speed());
-                    receiver_tactic->updateRobot(receiver_robot.value());
-                    receiver_tactic->updateControlParams(pass, true);
-
-                    LOG (DEBUG) << "stuck passing";
-                    TacticVector tactics = {receiver_tactic, pass_ball_tactic};
-                    CIRCLE_SHIT_YIELD(tactics);
-                } else {
-                    break;
-                }
-            } while (!receiver_tactic->done());
-
+        if (pull_point.has_value() && distance(world.ball().position(), pull_point.value()) > 0.1)
+        {
             do {
                 if (robot.has_value()) {
                     place_ball_tactic->updateRobot(robot.value());
-                    place_ball_tactic->updateControlParams(pass.receiverPoint(),
-                                                           std::nullopt, true);
+                    place_ball_tactic->updateControlParams(pull_point.value(),
+                                                           intersecting_dir.orientation(), true);
 
                     CIRCLE_SHIT_YIELD({place_ball_tactic});
                 } else {
@@ -286,21 +251,91 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                     }
                 }
             } while (!place_ball_tactic->done());
+        } else {
+            if (world.gameState().getBallPlacementPoint().has_value()) {
+                auto move_receiver_tactic = std::make_shared<MoveTactic>(false);
+                auto move_passer_tactic = std::make_shared<MoveTactic>(false);
 
-            do
-            {
-                if (distance(world.ball().position(), world.gameState().getBallPlacementPoint().value()) > 0.1)
-                {
-                    break;
-                }
-                if (robot.has_value()) {
-                    move_away_tactic->updateRobot(robot.value());
-                    move_away_tactic->updateControlParams(last_waiting_point, Angle::zero(), 0.0);
+                Pass pass = Pass(world.ball().position(), world.gameState().getBallPlacementPoint().value(),
+                                 4.5);
 
-                    CIRCLE_SHIT_YIELD({move_away_tactic});
-                    LOG (DEBUG) << "breaking away 4";
-                }
-            } while (!move_away_tactic->done());
+                std::optional<Robot> receiver_robot = world.friendlyTeam().getNearestRobot(pass.receiverPoint());
+                do {
+                    pass = Pass(world.ball().position(), world.gameState().getBallPlacementPoint().value(),
+                                4.5);
+                    TacticVector tactics = {};
+                    if (robot.has_value()) {
+                        move_passer_tactic->updateRobot(robot.value());
+                        move_passer_tactic->updateControlParams(pass.passerPoint() -
+                                                                Vector::createFromAngle(
+                                                                        pass.passerOrientation()).normalize(
+                                                                        ROBOT_MAX_RADIUS_METERS * 4),
+                                                                pass.passerOrientation(), 0.0);
+                        tactics.emplace_back(move_passer_tactic);
+                    }
+                    if (receiver_robot.has_value()) {
+                        move_receiver_tactic->updateRobot(receiver_robot.value());
+                        move_receiver_tactic->updateControlParams(pass.receiverPoint(), pass.receiverOrientation(),
+                                                                  0.0);
+                        tactics.emplace_back(move_receiver_tactic);
+                    }
+
+                    if (move_receiver_tactic->done()) {
+                        LOG (DEBUG) << "receiver not done";
+                    }
+                    if (move_passer_tactic->done()) {
+                        LOG (DEBUG) << "passer not done";
+                    }
+
+
+                    CIRCLE_SHIT_YIELD(tactics);
+                } while (!move_receiver_tactic->done() || !move_passer_tactic->done());
+
+                auto receiver_tactic = std::make_shared<ReceiverTactic>(pass);
+                do {
+                    if (robot.has_value() && receiver_robot.has_value()) {
+                        pass_ball_tactic->updateRobot(robot.value());
+                        pass_ball_tactic->updateControlParams(pass.passerPoint(), pass.receiverPoint(),
+                                                              pass.speed());
+                        receiver_tactic->updateRobot(receiver_robot.value());
+                        receiver_tactic->updateControlParams(pass, true);
+
+                        //LOG (DEBUG) << "stuck passing";
+                        TacticVector tactics = {receiver_tactic, pass_ball_tactic};
+                        CIRCLE_SHIT_YIELD(tactics);
+                    } else {
+                        break;
+                    }
+                } while (!receiver_tactic->done());
+
+                do {
+                    if (robot.has_value()) {
+                        place_ball_tactic->updateRobot(robot.value());
+                        place_ball_tactic->updateControlParams(pass.receiverPoint(),
+                                                               std::nullopt, true);
+
+                        CIRCLE_SHIT_YIELD({ place_ball_tactic });
+                    } else {
+                        if (world.gameState().getBallPlacementPoint().has_value()) {
+                            robot = world.friendlyTeam().getNearestRobot(
+                                    world.gameState().getBallPlacementPoint().value());
+                        }
+                    }
+                } while (!place_ball_tactic->done());
+
+                do {
+                    if (distance(world.ball().position(), world.gameState().getBallPlacementPoint().value()) > 0.1) {
+                        break;
+                    }
+                    if (robot.has_value()) {
+                        move_away_tactic->updateRobot(robot.value());
+                        move_away_tactic->updateControlParams(last_waiting_point, Angle::zero(), 0.0);
+
+                        CIRCLE_SHIT_YIELD({ move_away_tactic });
+                        LOG (DEBUG) << "breaking away 4";
+                    }
+                } while (!move_away_tactic->done());
+            }
         }
     }
 }
