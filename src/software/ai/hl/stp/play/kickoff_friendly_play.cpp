@@ -29,7 +29,7 @@ bool KickoffFriendlyPlay::invariantHolds(const World &world) const
     {
         receiver_done = receiver->done();
     }
-    
+
     return (!world.gameState().isHalted() &&
             !world.gameState().isStopped() && world.gameState().isOurKickoff() && !world.gameState().isPlaying()) && !receiver_done;
 }

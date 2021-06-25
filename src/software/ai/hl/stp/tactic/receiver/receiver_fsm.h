@@ -53,7 +53,7 @@ struct ReceiverFSM
 
     // The minimum angle between a ball's trajectory and the ball-receiver_point vector
     // for which we can consider a pass to be stray
-    static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(70);
+    static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(60);
 
     // the minimum speed required for a pass to be considered stray
     static constexpr double MIN_STRAY_PASS_SPEED = 0.3;
@@ -242,21 +242,6 @@ struct ReceiverFSM
         };
 
         /**
-         * We want to jot down the time the pass started, so we can
-         * cancel the pass if it takes longer than expected.
-         *
-         * This is so that we can protect ourselves from passes
-         * that are bonked by other robots and leave the nominal pass trajectory.
-         *
-         * @param event ReceiverFSM::Update event
-         */
-        const auto log_pass_start_time = [this](auto event)
-        {
-            pass_start_timestamp =
-                std::make_shared<Timestamp>(event.common.world.getMostRecentTimestamp());
-        };
-
-        /**
          * One-touch shot is not possible, just receive ball as cleanly as possible.
          *
          * @param event ReceiverFSM::Update event
@@ -323,30 +308,6 @@ struct ReceiverFSM
         };
 
         /**
-         * Guard that checks if the pass has been borked/bonked
-         *
-         * @param event PivotKickFSM::Update event
-         *
-         * @return if the ball has been kicked
-         */
-        const auto pass_borked = [this](auto event) {
-
-            if (!pass_start_timestamp)
-            {
-                // we don't have a pass start time, which is already borked
-                return true;
-            }
-
-            bool borked = event.common.world.getMostRecentTimestamp() + Duration::fromSeconds(1)
-                   > (*pass_start_timestamp + event.control_params.pass->estimatePassDuration());
-            if (borked)
-            {
-                std::cerr<<"PASSSSSSS BORKED";
-            }
-            return borked;
-        };
-
-        /**
          * Check if the pass has finished by checking if we the robot has
          * a ball near its dribbler.
          *
@@ -379,12 +340,10 @@ struct ReceiverFSM
         return make_transition_table(
                 // src_state + event [guard] / action = dest_state
                 *waiting_for_pass_s + update_e[!pass_started] / update_receive,
-                waiting_for_pass_s + update_e[pass_started && onetouch_possible] / log_pass_start_time = onetouch_s,
-                waiting_for_pass_s + update_e[pass_started && !onetouch_possible] / log_pass_start_time  = receive_s,
-                receive_s + update_e[!pass_finished && !pass_borked] / adjust_receive,
-                onetouch_s + update_e[!pass_finished && !pass_borked] / update_onetouch,
-                receive_s + update_e[!pass_finished && pass_borked] = X,
-                onetouch_s + update_e[!pass_finished && pass_borked] = X,
+                waiting_for_pass_s + update_e[pass_started && onetouch_possible] / update_receive = onetouch_s,
+                waiting_for_pass_s + update_e[pass_started && !onetouch_possible] / update_onetouch  = receive_s,
+                receive_s + update_e[!pass_finished] / adjust_receive,
+                onetouch_s + update_e[!pass_finished] / update_onetouch,
                 receive_s + update_e[pass_finished] / adjust_receive = X,
                 onetouch_s + update_e[pass_finished] / update_onetouch = X);
     }
