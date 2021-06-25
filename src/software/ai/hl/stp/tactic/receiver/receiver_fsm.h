@@ -210,7 +210,6 @@ struct ReceiverFSM
          * @param event ReceiverFSM::Update event
          */
         const auto update_onetouch = [this](auto event) {
-            std::cout <<"updating one touch\n";
             auto best_shot = findFeasibleShot(event.common.world, event.common.robot);
             auto one_touch = getOneTouchShotPositionAndOrientation(
                 event.common.robot, event.common.world.ball(),
@@ -287,30 +286,6 @@ struct ReceiverFSM
         };
 
         /**
-         * Check if the pass has started by checking if the ball is moving faster
-         * than a minimum speed.
-         *
-         * @param event ReceiverFSM::Update event
-         * @return true if the pass has started
-         */
-//        const auto pass_started = [](auto event) {
-            // the pass starts when the passing robot is facing the proper orientation
-            // with keepaway, we don't face the orientation immediately after the receiver
-            // receives the pass to execute
-//            bool friendly_robot_has_ball = false;
-//            for(auto robot : event.common.world.friendlyTeam().getAllRobots())
-//            {
-//                if (robot.isNearDribbler(event.common.world.ball().position()))
-//                {
-//                    friendly_robot_has_ball = true;
-//                }
-//            }
-//            if (event.common.world.ball().velocity().length() > MIN_PASS_START_SPEED)
-//                std::cout << "Started a pass!\n";
-//            return (event.common.world.ball().velocity().length() > MIN_PASS_START_SPEED);
-//        };
-
-        /**
          * Check if the pass has finished by checking if we the robot has
          * a ball near its dribbler.
          *
@@ -341,10 +316,13 @@ struct ReceiverFSM
             return stray_pass || near_dribbler;
         };
         
-//        const auto transition_to_one_touch = [this](auto event) {
-//            std::cout << "transition to one touch\n";
-//        };
-        
+        /**
+        * Check if the kicker robot has the ball. This is analogous to if the pass hasn't 
+        * started yet.
+        * 
+        * @param event ReceiverFSM::Update event
+        * @return true if we see a friendly robot has the ball
+        */
         const auto kicker_has_ball = [](auto event) {
             bool friendly_robot_has_ball = false;
             for(auto robot : event.common.world.friendlyTeam().getAllRobots())
@@ -358,6 +336,11 @@ struct ReceiverFSM
         };
 
 
+        /**
+        * Orients the ball to face the ball and move toward the pass' receiver point.
+        *
+        * @param event ReceiverFSM::Update event
+        */
         const auto face_ball = [this](auto event) {
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), 
@@ -376,8 +359,6 @@ struct ReceiverFSM
             waiting_for_pass_s + update_e[kicker_has_ball] / face_ball,
             waiting_for_pass_s + update_e[onetouch_possible] / update_onetouch = onetouch_s,
             waiting_for_pass_s + update_e[!onetouch_possible] / update_receive  = receive_s,
-//            undecided_s + update_e[onetouch_possible] / update_onetouch = onetouch_s,
-//            undecided_s + update_e[!onetouch_possible] / update_receive  = receive_s,
             receive_s + update_e[!kicker_has_ball] / update_receive,
             receive_s + update_e[kicker_has_ball && !pass_finished] / adjust_receive,
             receive_s + update_e[pass_finished] / update_receive = X,

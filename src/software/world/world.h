@@ -157,8 +157,9 @@ class World final
      * Sets the team with possession
      *
      * @param team_with_possesion The team with possession
+     * @param confidence The confidence in team with possession judgement, from 0.0 to 1.0
      */
-    void setTeamWithPossession(TeamSide team_with_possesion);
+    void setTeamWithPossession(TeamSide team_with_possesion, double confidence = 1.0);
 
     /**
      * Gets the team with possession
@@ -166,6 +167,13 @@ class World final
      * @return The team with possession
      */
     TeamSide getTeamWithPossession() const;
+
+    /**
+     * Gets the team with possession confidence
+     *
+     * @return The team with possession confidence
+     */
+    double getTeamWithPossessionConfidence() const;
 
     /**
      * Defines the equality operator for a World. Worlds are equal if their field, ball
@@ -208,4 +216,6 @@ class World final
     boost::circular_buffer<RefereeStage> referee_stage_history_;
     // which team has possession of the ball
     TeamSide team_with_possesion_;
+    // how much confidence we have in judging which team has possession
+    double team_with_possesion_confidence_;
 };

@@ -58,8 +58,7 @@ double rateChipPassEnemyRiskWrapper(const World& world, py::dict pass_dict,
     auto enemy_reaction_time =
         Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
     updatePassingConfigFromDict(passing_config_dict);
-    return rateChipPassEnemyRisk(world.enemyTeam(), pass, enemy_reaction_time,
-                                 passing_config);
+    return rateChipPassEnemyRisk(world.enemyTeam(), pass, enemy_reaction_time);
 }
 
 double rateKickPassFriendlyCapabilityWrapper(const World& world, py::dict pass_dict,
