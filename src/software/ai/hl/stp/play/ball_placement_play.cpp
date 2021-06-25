@@ -154,15 +154,20 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
             }
         } while (!place_ball_tactic->done());
 
+        Point move_away_point = world.ball().position() -
+                                Vector::createFromAngle(robot->orientation()).normalize(
+                                        ROBOT_MAX_RADIUS_METERS * 4);
         do
         {
             if (robot.has_value())
             {
                 move_away_tactic->updateRobot(robot.value());
-                move_away_tactic->updateControlParams(
-                        world.ball().position() -
-                        Vector::createFromAngle(robot->orientation()).normalize(ROBOT_MAX_RADIUS_METERS * 4), robot->orientation(), 0.0);
-
+                move_away_tactic->updateControlParams(move_away_point,
+                                                      robot->orientation(), 0.0,
+                                                      DribblerMode::OFF,
+                                                      BallCollisionType::ALLOW,
+                                                      {AutoChipOrKickMode::OFF, 0},
+                                                      MaxAllowedSpeedMode::PHYSICAL_LIMIT);
                 LOG (DEBUG) << "moving away 1";
                 CIRCLE_SHIT_YIELD({move_away_tactic});
             }
@@ -204,9 +209,9 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                     move_away_tactic->updateControlParams(move_away_point,
                                                                           robot->orientation(), 0.0,
                                                                           DribblerMode::OFF,
-                                                                          BallCollisionType::AVOID,
+                                                                          BallCollisionType::ALLOW,
                                                                           {AutoChipOrKickMode::OFF, 0},
-                                                                          MaxAllowedSpeedMode::TIPTOE);
+                                                                          MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
                                     CIRCLE_SHIT_YIELD({ move_away_tactic });
                                 }
@@ -271,7 +276,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
                 std::optional<Robot> receiver_robot = world.friendlyTeam().getNearestRobot(pass.receiverPoint());
                 do {
-                    if (pull_point.has_value() && distance(world.ball().position(), pull_point.value()) > 0.1) {
+                    if (pull_point.has_value() && distance(world.ball().position(), pull_point.value()) > 0.1 || world.ball().velocity().length() < ) {
                         break;
                     }
                     pass = Pass(world.ball().position(), world.gameState().getBallPlacementPoint().value(),
