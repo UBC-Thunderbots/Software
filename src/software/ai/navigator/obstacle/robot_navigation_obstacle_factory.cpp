@@ -81,7 +81,7 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
                  field.enemyCornerPos() });
             obstacles.push_back(createFromShape(centre_circle_and_enemy_half));
 			obstacles.push_back(createFromShape(Circle(world.ball().position(),
-                                                       ROBOT_MAX_RADIUS_METERS - 0.1)));
+                                                       ROBOT_MAX_RADIUS_METERS / 1.3)));
             break;
     }
 

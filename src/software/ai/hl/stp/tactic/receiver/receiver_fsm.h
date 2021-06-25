@@ -14,9 +14,9 @@
 
 struct ReceiverFSM
 {
+    class OneTouchDribbleState;
     class OneTouchShotState;
     class ReceiveAndDribbleState;
-    class UndecidedState;
     class WaitingForPassState;
 
     struct ControlParams
@@ -33,7 +33,7 @@ struct ReceiverFSM
     // The minimum proportion of open net we're shooting on vs the entire size of the net
     // that we require before attempting a shot
     static constexpr double MIN_SHOT_NET_PERCENT_OPEN = 0.3;
-    static constexpr double MIN_PASS_START_SPEED      = 0.04;
+    static constexpr double MIN_PASS_START_SPEED      = 0.02;
     static constexpr double BALL_MIN_MOVEMENT_SPEED   = 0.04;
 
     // The maximum deflection angle that we will attempt a one-touch kick towards the
@@ -183,11 +183,32 @@ struct ReceiverFSM
     {
         using namespace boost::sml;
 
-        const auto undecided_s = state<UndecidedState>;
         const auto receive_s   = state<ReceiveAndDribbleState>;
-        const auto onetouch_s  = state<OneTouchShotState>;
+        const auto onetouch_s  = state<OneTouchDribbleState>;
         const auto update_e    = event<Update>;
         const auto waiting_for_pass_s = state<WaitingForPassState>;
+        const auto shoot_s           = state<KickFSM>;
+
+        // COMP HACK 2021 revert with #2176
+        const auto shoot = [this](auto event,
+                                  back::process<KickFSM::Update> processEvent) {
+            auto best_shot = findFeasibleShot(event.common.world, event.common.robot);
+            auto one_touch = getOneTouchShotPositionAndOrientation(
+                event.common.robot, event.common.world.ball(),
+                best_shot->getPointToShootAt(), event.control_params.pass.value());
+
+            if (best_shot)
+            {
+                if (event.control_params.pass)
+                {
+                    KickFSM::ControlParams control_params{
+                        .kick_origin                  = one_touch.getPointToShootAt(),
+                        .kick_direction               = one_touch.getOpenAngle(),
+                        .kick_speed_meters_per_second = BALL_MAX_SPEED_METERS_PER_SECOND};
+                    processEvent(KickFSM::Update(control_params, event.common));
+                }
+            }
+        };
 
         /**
          * Checks if a one touch shot is possible
@@ -222,10 +243,9 @@ struct ReceiverFSM
                 {
                     event.common.set_intent(std::make_unique<MoveIntent>(
                         event.common.robot.id(), one_touch.getPointToShootAt(),
-                        one_touch.getOpenAngle(), 0, DribblerMode::OFF,
+                        one_touch.getOpenAngle(), 0, DribblerMode::MAX_FORCE,
                         BallCollisionType::ALLOW,
-                        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                                       BALL_MAX_SPEED_METERS_PER_SECOND},
+                        AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0},
                         MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
                         event.common.robot.robotConstants()));
                 }
@@ -267,7 +287,7 @@ struct ReceiverFSM
             {
                 Point ball_receive_pos = ball.position();
 
-                if (ball.velocity().length() < MIN_PASS_START_SPEED)
+                if (ball.velocity().length() > MIN_PASS_START_SPEED)
                 {
                     ball_receive_pos = closestPoint(
                         robot_pos,
@@ -324,35 +344,20 @@ struct ReceiverFSM
 
             // We tolerate imperfect passes that hit the edges of the robot,
             // so that we can quickly transition out and grab the ball.
-            bool near_dribbler = event.common.robot.isNearDribbler(
-                    event.common.world.ball().position(), DIST_TO_FRONT_OF_ROBOT_METERS +
-                    BALL_MAX_RADIUS_METERS);
-
+            bool near_dribbler = event.common.robot.isNearDribbler(event.common.world.ball().position());
             return stray_pass || near_dribbler;
         };
 
-        const auto kicker_has_ball = [](auto event) {
-            bool friendly_robot_has_ball = false;
-            for(auto robot : event.common.world.friendlyTeam().getAllRobots())
-            {
-                if (robot.isNearDribbler(event.common.world.ball().position(), 0.05))
-                {
-                    friendly_robot_has_ball = true;
-                }
-            }
-            return friendly_robot_has_ball;
-        };
         
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *undecided_s + update_e[kicker_has_ball] / update_receive = waiting_for_pass_s,
-            undecided_s + update_e[!kicker_has_ball] / update_receive,
-            waiting_for_pass_s + update_e[kicker_has_ball] / update_receive,
+            *waiting_for_pass_s + update_e[!pass_started] / update_receive,
             waiting_for_pass_s + update_e[pass_started && onetouch_possible] / update_onetouch = onetouch_s,
             waiting_for_pass_s + update_e[pass_started && !onetouch_possible] / update_receive  = receive_s,
-            receive_s + update_e[pass_started && !pass_finished] / adjust_receive,
-            onetouch_s + update_e[pass_started && !pass_finished] / update_onetouch,
+            receive_s + update_e[!pass_finished] / adjust_receive,
             receive_s + update_e[pass_finished] / update_receive = X,
-            onetouch_s + update_e[pass_finished] / update_onetouch = X);
+            onetouch_s + update_e[!pass_finished] / update_onetouch,
+            onetouch_s + update_e[pass_finished] / update_onetouch = shoot_s,
+            shoot_s + update_e / shoot, shoot_s = X);
     }
 };

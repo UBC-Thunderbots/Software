@@ -16,9 +16,9 @@ KickoffFriendlyPlay::KickoffFriendlyPlay(std::shared_ptr<const PlayConfig> confi
 
 bool KickoffFriendlyPlay::isApplicable(const World &world) const
 {    
-    return world.gameState().isOurKickoff()
-        && (world.gameState().isSetupState())
-        && !world.gameState().isHalted() && !world.gameState().isStopped();
+    return ((world.gameState().isReadyState() || world.gameState().isSetupState()) &&
+            world.gameState().isOurKickoff()) &&
+           !world.gameState().isHalted() && !world.gameState().isStopped();
 }
 
 bool KickoffFriendlyPlay::invariantHolds(const World &world) const
