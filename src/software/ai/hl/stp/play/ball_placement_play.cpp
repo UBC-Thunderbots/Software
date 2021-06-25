@@ -213,15 +213,13 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
             auto move_receiver_tactic = std::make_shared<MoveTactic>(false);
             auto move_passer_tactic = std::make_shared<MoveTactic>(false);
 
-            //TODO change so we dont use goalie tactic config LOL
             Pass pass = Pass(world.ball().position(), world.gameState().getBallPlacementPoint().value(),
-                             play_config->getGoalieTacticConfig()->getBlockConeRadius()->value() * 10);
+                             4.5);
 
             std::optional<Robot> receiver_robot = world.friendlyTeam().getNearestRobot(pass.receiverPoint());
             do {
-                //TODO change so we dont use goalie tactic config LOL
                 pass = Pass(world.ball().position(), world.gameState().getBallPlacementPoint().value(),
-                            play_config->getGoalieTacticConfig()->getBlockConeRadius()->value() * 10);
+                            4.5);
                 TacticVector result = {};
                 if (robot.has_value()) {
                     move_passer_tactic->updateRobot(robot.value());
