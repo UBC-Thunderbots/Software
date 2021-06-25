@@ -37,11 +37,11 @@ struct ReceiverFSM
 
     // The maximum deflection angle that we will attempt a one-touch kick towards the
     // enemy goal with
-    static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(90);
+    static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(75);
 
     // The minimum angle between a ball's trajectory and the ball-receiver_point vector
     // for which we can consider a pass to be stray
-    static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(10);
+    static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(20);
 
     // the minimum speed required for a pass to be considered stray
     static constexpr double MIN_STRAY_PASS_SPEED = 0.3;
@@ -337,7 +337,8 @@ struct ReceiverFSM
             // We tolerate imperfect passes that hit the edges of the robot,
             // so that we can quickly transition out and grab the ball.
             bool near_dribbler = event.common.robot.isNearDribbler(
-                event.common.world.ball().position(), 0.01);
+                    event.common.world.ball().position(), DIST_TO_FRONT_OF_ROBOT_METERS +
+                    BALL_MAX_RADIUS_METERS);
             return stray_pass || near_dribbler;
         };
         

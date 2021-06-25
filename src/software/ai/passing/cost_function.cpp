@@ -444,8 +444,11 @@ double getStaticPositionQuality(const Field& field, const Point& position,
 
     // Add a strong negative weight for positions within the enemy defense area, as we
     // cannot pass there
+    // 
+    // TODO (#2167) For the virutal robocup, 
     double in_enemy_defense_area_quality =
-        1 - rectangleSigmoid(field.enemyDefenseArea(), position, sig_width);
+        1 - rectangleSigmoid(field.enemyDefenseArea().expand(
+                    Vector(ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS)), position, sig_width);
 
     return on_field_quality * near_friendly_goal_quality * in_enemy_defense_area_quality;
 }

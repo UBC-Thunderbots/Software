@@ -22,7 +22,9 @@ class FreeKickPlay : public Play
 
     std::vector<CircleWithColor> getCirclesWithColorToDraw() override;
 
+
    private:
+    std::shared_ptr<ReceiverTactic> receiver;
     // The maximum time that we will wait before committing to a pass
     const Duration MAX_TIME_TO_COMMIT_TO_PASS;
     std::optional<Pass> best_pass;

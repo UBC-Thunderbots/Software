@@ -30,6 +30,7 @@ bool ShootOrPassPlay::isApplicable(const World &world) const
 
 bool ShootOrPassPlay::invariantHolds(const World &world) const
 {
+    std::cerr<<"SHOOTORPASS"<<world.gameState().isOurFreeKick()<<std::endl;
     return world.gameState().isPlaying() &&
            (world.getTeamWithPossession() == TeamSide::FRIENDLY ||
             world.getTeamWithPossessionConfidence() < 1.0);
