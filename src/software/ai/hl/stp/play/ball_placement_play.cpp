@@ -183,16 +183,13 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
                         Point move_away_point = world.ball().position() -
                                                 Vector::createFromAngle(robot->orientation()).normalize(
-                                                        ROBOT_MAX_RADIUS_METERS);
+                                                        ROBOT_MAX_RADIUS_METERS * 4);
                         if (!(contains(world.field().fieldBoundary(), move_away_point) && !contains(world.field().fieldLines(), move_away_point))) {
                             do {
                                 LOG (DEBUG) << "breaking away 1";
                                 if (robot.has_value()) {
                                     move_away_tactic->updateRobot(robot.value());
-                                    move_away_tactic->updateControlParams(world.ball().position() -
-                                                                          Vector::createFromAngle(
-                                                                                  robot->orientation()).normalize(
-                                                                                  ROBOT_MAX_RADIUS_METERS),
+                                    move_away_tactic->updateControlParams(move_away_point,
                                                                           robot->orientation(), 0.0,
                                                                           DribblerMode::OFF,
                                                                           BallCollisionType::AVOID,
@@ -261,6 +258,9 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
                 std::optional<Robot> receiver_robot = world.friendlyTeam().getNearestRobot(pass.receiverPoint());
                 do {
+                    if (pull_point.has_value() && distance(world.ball().position(), pull_point.value()) > 0.1) {
+                        break;
+                    }
                     pass = Pass(world.ball().position(), world.gameState().getBallPlacementPoint().value(),
                                 4.5);
                     TacticVector tactics = {};
