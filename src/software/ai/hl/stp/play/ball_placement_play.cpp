@@ -114,7 +114,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
             if (robot.has_value()) {
                 align_to_ball_tactic->updateRobot(robot.value());
                 align_to_ball_tactic->updateControlParams(
-                        world.ball().position() - intersecting_dir.normalize(ROBOT_MAX_RADIUS_METERS * 2),
+                        world.ball().position() - intersecting_dir.normalize(ROBOT_MAX_RADIUS_METERS * 4),
                         intersecting_dir.orientation(), 0.0);
 
                 CIRCLE_SHIT_YIELD({align_to_ball_tactic});
@@ -160,9 +160,12 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
             if (robot.has_value()) {
                 if (world.gameState().getBallPlacementPoint().has_value()) {
                     if (distance(world.ball().position(), world.gameState().getBallPlacementPoint().value()) < 0.1) {
-                        LOG (DEBUG) << "DJOEIWAJW";
                         move_away_tactic->updateRobot(robot.value());
-                        move_away_tactic->updateControlParams(last_waiting_point, Angle::zero(), 0.0);
+                        move_away_tactic->updateControlParams(last_waiting_point, Angle::zero(), 0.0,
+                                DribblerMode::OFF,
+                                BallCollisionType::AVOID,
+                                {AutoChipOrKickMode::OFF, 0},
+                                MaxAllowedSpeedMode::TIPTOE);
 
                         CIRCLE_SHIT_YIELD({move_away_tactic});
                     } else if (distance(world.ball().position(), world.gameState().getBallPlacementPoint().value()) < 1) {

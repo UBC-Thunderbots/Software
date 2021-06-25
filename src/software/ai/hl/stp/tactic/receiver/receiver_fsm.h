@@ -317,11 +317,11 @@ struct ReceiverFSM
                     BALL_MAX_RADIUS_METERS);
             if (stray_pass)
             {
-                LOG(DEBUG) << "Receive done because of stray pass";
+                LOG(FATAL) << "Receive done because of stray pass";
             }
             if (near_dribbler)
             {
-                LOG(DEBUG) << "Receive done because receiver received the ball";
+                LOG(FATAL) << "Receive done because receiver received the ball";
             }
             return stray_pass || near_dribbler;
         };

@@ -33,7 +33,18 @@ bool FreeKickPlay::isApplicable(const World &world) const
 
 bool FreeKickPlay::invariantHolds(const World &world) const
 {
-    return true;
+	bool receiver_done = false;
+
+	if (receiver)
+	{
+		receiver_done = receiver->done();
+	}
+    std::cerr<<"FREEKICK"<<world.gameState().isOurFreeKick()<<std::endl;
+    bool invariant = (receiver_done ||
+                    world.gameState().isHalted() ||
+                    world.gameState().isStopped() ||
+                    !world.gameState().isOurFreeKick());
+    return !invariant;
 }
 
 std::vector<CircleWithColor> FreeKickPlay::getCirclesWithColorToDraw()
