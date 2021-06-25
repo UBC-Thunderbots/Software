@@ -276,7 +276,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
                 std::optional<Robot> receiver_robot = world.friendlyTeam().getNearestRobot(pass.receiverPoint());
                 do {
-                    if (pull_point.has_value() && distance(world.ball().position(), pull_point.value()) > 0.1 || world.ball().velocity().length() < ) {
+                    if (pull_point.has_value() && distance(world.ball().position(), pull_point.value()) > 0.1 || world.ball().velocity().length() > 1) {
                         break;
                     }
                     pass = Pass(world.ball().position(), world.gameState().getBallPlacementPoint().value(),
