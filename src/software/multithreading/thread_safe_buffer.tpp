@@ -47,8 +47,9 @@ void ThreadSafeBuffer<T>::push(const T& value)
     std::scoped_lock<std::mutex> buffer_lock(buffer_mutex);
     if (log_buffer_full && buffer.full())
     {
-        LOG(WARNING) << "Pushing to a full ThreadSafeBuffer of type: " << TYPENAME(T)
-                     << std::endl;
+    // TOOD (#2167)
+    //    LOG(WARNING) << "Pushing to a full ThreadSafeBuffer of type: " << TYPENAME(T)
+    //                 << std::endl;
     }
     buffer.push_back(value);
     received_new_value.notify_all();

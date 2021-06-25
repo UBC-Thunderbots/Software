@@ -33,18 +33,7 @@ bool FreeKickPlay::isApplicable(const World &world) const
 
 bool FreeKickPlay::invariantHolds(const World &world) const
 {
-	bool receiver_done = false;
-
-	if (receiver)
-	{
-		receiver_done = receiver->done();
-	}
-    std::cerr<<"FREEKICK"<<world.gameState().isOurFreeKick()<<std::endl;
-    bool invariant = (receiver_done ||
-                    world.gameState().isHalted() ||
-                    world.gameState().isStopped() ||
-                    !world.gameState().isOurFreeKick());
-    return !invariant;
+    return true;
 }
 
 std::vector<CircleWithColor> FreeKickPlay::getCirclesWithColorToDraw()
@@ -201,9 +190,9 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
     } while (best_pass_and_score_so_far.rating < min_score);
 
     committed_to_pass = true;
+
     if (best_pass_and_score_so_far.rating > MIN_ACCEPTABLE_PASS_SCORE)
     {
-        std::cout <<"performing pass" << std::endl;
         performPassStage(yield, crease_defender_tactics, best_pass_and_score_so_far,
                          world);
     }

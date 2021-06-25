@@ -147,7 +147,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 move_away_tactic->updateRobot(robot.value());
                 move_away_tactic->updateControlParams(
                         world.ball().position() -
-                        Vector::createFromAngle(robot->orientation()).normalize(ROBOT_MAX_RADIUS_METERS), robot->orientation(), 0.0);
+                        Vector::createFromAngle(robot->orientation()).normalize(ROBOT_MAX_RADIUS_METERS * 4), robot->orientation(), 0.0);
 
                 CIRCLE_SHIT_YIELD({move_away_tactic});
             }
@@ -283,19 +283,6 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                     }
                 }
             } while (!place_ball_tactic->done());
-
-            do {
-                if (receiver_robot.has_value()) {
-                    move_away_tactic->updateRobot(receiver_robot.value());
-                    move_away_tactic->updateControlParams(
-                            world.ball().position() -
-                            Vector::createFromAngle(receiver_robot->orientation()).normalize(
-                                    ROBOT_MAX_RADIUS_METERS * 2), receiver_robot->orientation(), 0.0);
-
-                    CIRCLE_SHIT_YIELD({move_away_tactic});
-                    LOG (DEBUG) << "breaking away 3";
-                }
-            } while (!move_away_tactic->done());
 
             do
             {

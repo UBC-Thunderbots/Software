@@ -9,6 +9,7 @@
 #include "software/ai/intent/intent.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/ai/passing/pass.h"
+#include "software/logger/logger.h"
 #include "software/geom/algorithms/closest_point.h"
 
 struct ReceiverFSM
@@ -41,7 +42,7 @@ struct ReceiverFSM
 
     // The minimum angle between a ball's trajectory and the ball-receiver_point vector
     // for which we can consider a pass to be stray
-    static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(20);
+    static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(90);
 
     // the minimum speed required for a pass to be considered stray
     static constexpr double MIN_STRAY_PASS_SPEED = 0.3;
@@ -210,7 +211,6 @@ struct ReceiverFSM
          * @param event ReceiverFSM::Update event
          */
         const auto update_onetouch = [this](auto event) {
-            std::cout <<"updating one touch\n";
             auto best_shot = findFeasibleShot(event.common.world, event.common.robot);
             auto one_touch = getOneTouchShotPositionAndOrientation(
                 event.common.robot, event.common.world.ball(),
@@ -287,30 +287,6 @@ struct ReceiverFSM
         };
 
         /**
-         * Check if the pass has started by checking if the ball is moving faster
-         * than a minimum speed.
-         *
-         * @param event ReceiverFSM::Update event
-         * @return true if the pass has started
-         */
-//        const auto pass_started = [](auto event) {
-            // the pass starts when the passing robot is facing the proper orientation
-            // with keepaway, we don't face the orientation immediately after the receiver
-            // receives the pass to execute
-//            bool friendly_robot_has_ball = false;
-//            for(auto robot : event.common.world.friendlyTeam().getAllRobots())
-//            {
-//                if (robot.isNearDribbler(event.common.world.ball().position()))
-//                {
-//                    friendly_robot_has_ball = true;
-//                }
-//            }
-//            if (event.common.world.ball().velocity().length() > MIN_PASS_START_SPEED)
-//                std::cout << "Started a pass!\n";
-//            return (event.common.world.ball().velocity().length() > MIN_PASS_START_SPEED);
-//        };
-
-        /**
          * Check if the pass has finished by checking if we the robot has
          * a ball near its dribbler.
          *
@@ -339,13 +315,17 @@ struct ReceiverFSM
             bool near_dribbler = event.common.robot.isNearDribbler(
                     event.common.world.ball().position(), DIST_TO_FRONT_OF_ROBOT_METERS +
                     BALL_MAX_RADIUS_METERS);
+            if (stray_pass)
+            {
+                LOG(DEBUG) << "Receive done because of stray pass";
+            }
+            if (near_dribbler)
+            {
+                LOG(DEBUG) << "Receive done because receiver received the ball";
+            }
             return stray_pass || near_dribbler;
         };
-        
-//        const auto transition_to_one_touch = [this](auto event) {
-//            std::cout << "transition to one touch\n";
-//        };
-        
+
         const auto kicker_has_ball = [](auto event) {
             bool friendly_robot_has_ball = false;
             for(auto robot : event.common.world.friendlyTeam().getAllRobots())
@@ -380,7 +360,7 @@ struct ReceiverFSM
 //            undecided_s + update_e[onetouch_possible] / update_onetouch = onetouch_s,
 //            undecided_s + update_e[!onetouch_possible] / update_receive  = receive_s,
             receive_s + update_e[!kicker_has_ball] / update_receive,
-            receive_s + update_e[kicker_has_ball && !pass_finished] / adjust_receive,
+            receive_s + update_e[!kicker_has_ball && !pass_finished] / adjust_receive,
             receive_s + update_e[pass_finished] / update_receive = X,
             onetouch_s + update_e[!pass_finished] / update_onetouch,
             onetouch_s + update_e[pass_finished] / update_onetouch = X);
