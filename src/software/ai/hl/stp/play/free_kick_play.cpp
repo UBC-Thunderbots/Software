@@ -159,7 +159,6 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 
         if (shot.has_value())
         {
-            std::cout << shot->getOpenAngle() << std::endl;
             while (shot->getOpenAngle() >= Angle::fromDegrees(6)) {
                 shoot_tactic->updateControlParams(world.ball().position(), shot->getPointToShootAt(), BALL_MAX_SPEED_METERS_PER_SECOND - 0.5);
                 yield({{shoot_tactic, std::get<0>(cherry_picker_tactics),
