@@ -88,6 +88,9 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
             field_boundary.getLeft(),
     };
 
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
     int num_intersections = 0;
     double closest = 10000.0;
     int closest_intersecting_field_bound = -1;
@@ -159,6 +162,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                         ROBOT_MAX_RADIUS_METERS * 4);
         do
         {
+            begin = std::chrono::steady_clock::now();
             if (robot.has_value())
             {
                 move_away_tactic->updateRobot(robot.value());
@@ -170,8 +174,9 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
                 LOG (DEBUG) << "moving away 1";
                 CIRCLE_SHIT_YIELD({move_away_tactic});
+                end = std::chrono::steady_clock::now();
             }
-        } while (!move_away_tactic->done());
+        } while (!move_away_tactic->done() && std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() < 2);
     }
 
     //TODO DONT LOOK PLEASE
@@ -198,10 +203,13 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                             CIRCLE_SHIT_YIELD({place_ball_tactic});
                         } while (!place_ball_tactic->done());
 
+
                         Point move_away_point = world.ball().position() -
                                                 Vector::createFromAngle(robot->orientation()).normalize(
                                                         ROBOT_MAX_RADIUS_METERS * 4);
                         if (!(contains(world.field().fieldBoundary(), move_away_point) && !contains(world.field().fieldLines(), move_away_point))) {
+
+                            begin = std::chrono::steady_clock::now();
                             do {
                                 LOG (DEBUG) << "breaking away 1";
                                 if (robot.has_value()) {
@@ -215,7 +223,8 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
                                     CIRCLE_SHIT_YIELD({ move_away_tactic });
                                 }
-                            } while (!move_away_tactic->done());
+                                end = std::chrono::steady_clock::now();
+                            } while (!move_away_tactic->done() && std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() < 2);
                         }
 
                         do
@@ -305,11 +314,11 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                         LOG (DEBUG) << "passer not done";
                     }
 
-
                     CIRCLE_SHIT_YIELD(tactics);
                 } while (!move_receiver_tactic->done() || !move_passer_tactic->done());
 
                 auto receiver_tactic = std::make_shared<ReceiverTactic>(pass);
+                begin = std::chrono::steady_clock::now();
                 do {
                     if (robot.has_value() && receiver_robot.has_value()) {
                         pass_ball_tactic->updateRobot(robot.value());
@@ -324,7 +333,8 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                     } else {
                         break;
                     }
-                } while (!receiver_tactic->done());
+                    end = std::chrono::steady_clock::now();
+                } while (!receiver_tactic->done() && std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() < 2);
 
                 do {
                     if (robot.has_value()) {
