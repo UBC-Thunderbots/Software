@@ -154,7 +154,20 @@ struct CreaseDefenderFSM
          * @return if the ball is threatening
          */
         const auto ball_is_threatening = [this](auto event) {
-            return contains(static_cast<Polygon>(event.common.world.field().friendlyDefenseArea()).expand(1.0),event.common.world.ball().position()) ;
+            bool friendly_has_ball = false;
+            for (const auto& robot : event.common.world.friendlyTeam().getAllRobots())
+            {
+                if (robot.id() != event.common.robot.id() &&robot.isNearDribbler(event.common.world.ball().position()))
+                {
+                    friendly_has_ball = true;
+                    break;
+                }
+            }
+            return contains(static_cast<Polygon>(
+                                event.common.world.field().friendlyDefenseArea())
+                                .expand(1.0),
+                            event.common.world.ball().position()) &&
+                   !friendly_has_ball;
         };
 
         /**
