@@ -137,13 +137,13 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
 
                 LOG (DEBUG) << "aligning";
+                end = std::chrono::steady_clock::now();
                 CIRCLE_SHIT_YIELD({align_to_ball_tactic});
             } else {
                 if (world.gameState().getBallPlacementPoint().has_value()) {
                     robot = world.friendlyTeam().getNearestRobot(world.gameState().getBallPlacementPoint().value());
                 }
             }
-            end = std::chrono::steady_clock::now();
         } while (!align_to_ball_tactic->done() && std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() < 6);
 
         Point ball_pull_position = world.ball().position() - intersecting_dir.normalize(ROBOT_MAX_RADIUS_METERS * 5);
