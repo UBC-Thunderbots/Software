@@ -196,7 +196,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         // to prevent the kicker from being paralyzed at kickoff, we accept a pass threshold
         // where we lock on to a less favourable pass
         if ((best_pass_and_score_so_far.rating + BETTER_PASS_RATING_THRESHOLD) 
-            >= current_best_pass_with_rating.rating)
+            < current_best_pass_with_rating.rating)
         {
             best_pass_and_score_so_far = current_best_pass_with_rating;
         }
