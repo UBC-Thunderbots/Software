@@ -94,7 +94,7 @@ class ThreadedFullSystemGUI
     // offset). This is set to an arbitrary value that is small enough the
     // user doesn't notice they don't have control on startup, but
     // successfully sets the area.
-    static constexpr int NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA = 50;
+    static constexpr int NUM_ATTEMPTS_TO_SET_INITIAL_VIEW_AREA = 150;
 
     std::atomic_bool application_shutting_down;
     int remaining_attempts_to_set_view_area;
