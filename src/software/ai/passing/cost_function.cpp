@@ -50,8 +50,8 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double pass_up_field_rating = (zone.centre().x() + world.field().totalXLength() / 2) /
                                   world.field().totalXLength();
 
-    return static_pass_quality * pass_rating * pass_up_field_rating * shoot_pass_rating *
-           pass_speed_quality * in_region_quality;
+    return static_pass_quality * pass_rating * pass_up_field_rating *
+           shoot_pass_rating * pass_speed_quality * in_region_quality;
 }
 
 double rateZone(const World& world, const Rectangle& zone, const Point& receive_position,
@@ -202,20 +202,10 @@ double rateChipPassEnemyRisk(const Team& enemy_team, const Pass& pass,
 
     if (!closest_enemy_to_passer.has_value() || !closest_enemy_to_receiver.has_value())
     {
-        return 0;
+        return 0.0;
     }
 
-    // The sigmoid with of 2.0 meters is somewhat arbitrary but it discourages really
-    // short chips that can be easily intercepted, as the ball doesn't roll as fast after
-    // landing.
-    double sigmoid_width = 2.0;
-
-    // This should figure out if the pass will clear the enemy.
-    double enemy_risk_near_passer_point =
-        sigmoid((closest_enemy_to_passer->position() - pass.passerPoint()).length(),
-                ROBOT_MIN_CHIP_CLEAR_DISTANCE_METERS, sigmoid_width);
-
-    // Now we just need to figure out where we have landed, since we don't have chip speed
+    // We just need to figure out where we have landed, since we don't have chip speed
     // as mentioned above, we use CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO to get an
     // estimate of where we might have landed.
     auto pass_vector = pass.receiverPoint() - pass.passerPoint();
@@ -225,17 +215,28 @@ double rateChipPassEnemyRisk(const Team& enemy_team, const Pass& pass,
     auto chip_landing_point =
         pass.passerPoint() +
         pass_vector.normalize(CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO *
-                              pass_vector.length());
+                pass_vector.length());
+
+    // Figure out the chip speed
+    Angle chip_angle = Angle::fromDegrees(ROBOT_CHIP_ANGLE_DEGREES);
+    double range     = (pass.receiverPoint() - pass.passerPoint()).length() *
+                   CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO;
+    double numerator   = range * ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED;
+    double denominator = 2.0 * (chip_angle * 2.0).sin();
+    double chip_speed  = std::sqrt(numerator / denominator);
 
     // Create a "virtual" kick pass from the chip landing point and the receive point
-    // and evaluate the likely hood of an enemy intercepting that pass.
+    // and evaluate the likely-hood of an enemy intercepting that pass that effectively
+    // starts from the rolling point described above.
+    //
+    // We assume that the speed doesn't change along the x direction.
     double enemy_risk_near_receiver_point = calculateKickInterceptRisk(
         enemy_team,
         Pass(chip_landing_point, pass.receiverPoint(),
-             pass_vector.length() * CHIP_PASS_TARGET_DISTANCE_TO_SPEED_RATIO),
+              Vector::createFromAngle(chip_angle).normalize(chip_speed).x()),
         enemy_reaction_time);
 
-    return 1.0 - enemy_risk_near_passer_point * enemy_risk_near_receiver_point;
+    return 1.0 - enemy_risk_near_receiver_point;
 }
 
 double calculateKickInterceptRisk(const Team& enemy_team, const Pass& pass,
@@ -417,12 +418,11 @@ double rateChipPassFriendlyCapability(Team friendly_team, const Pass& pass,
 
     // Create a sigmoid that goes to 0 as the time required to get to the reception
     // point exceeds the time we would need to get there by
-    double sigmoid_width                  = 0.4;
-    double time_to_receiver_state_slack_s = 0.10;
+    double sigmoid_width                  = 0.8;
 
     return sigmoid(
         receive_time.toSeconds(),
-        latest_time_to_reciever_state.toSeconds() + time_to_receiver_state_slack_s,
+        latest_time_to_reciever_state.toSeconds(),
         sigmoid_width);
 }
 
@@ -459,11 +459,33 @@ double getStaticPositionQuality(const Field& field, const Point& position,
     // cannot pass there
     //
     // TODO (#2167) For the virtual robocup, we inflated the defense area
-    double in_enemy_defense_area_quality =
-        1 - rectangleSigmoid(field.enemyDefenseArea().expand(
-                                 Vector(ROBOT_MAX_RADIUS_METERS * 2.3 + 0.3,
-                                        ROBOT_MAX_RADIUS_METERS * 2.3 + 0.3)),
-                             position, sig_width);
+    static std::optional<Rectangle> rect = std::nullopt;
+
+    if (!rect.has_value())
+    {
+        auto field_boundary = field.fieldBoundary();
+        auto field_lines = field.fieldLines();
+        auto field_rectangle = field.enemyDefenseArea();
+
+        double xMin             = field_rectangle.xMin();
+        double xMax             = field_rectangle.xMax();
+        double yMin             = field_rectangle.yMin();
+        double yMax             = field_rectangle.yMax();
+        double expansion_amount = ROBOT_MAX_RADIUS_METERS * 2.2 + 0.3;
+
+        xMin =
+            (xMin == field_lines.xMin()) ? field_boundary.xMin() : (xMin - expansion_amount);
+        xMax =
+            (xMax == field_lines.xMax()) ? field_boundary.xMax() : (xMax + expansion_amount);
+        yMin =
+            (yMin == field_lines.yMin()) ? field_boundary.yMin() : (yMin - expansion_amount);
+        yMax =
+            (yMax == field_lines.yMax()) ? field_boundary.yMax() : (yMax + expansion_amount);
+
+        rect = Rectangle(Point(xMin, yMin), Point(xMax, yMax));
+    }
+
+    double in_enemy_defense_area_quality = 1 - rectangleSigmoid(rect.value(), position, sig_width);
 
     return on_field_quality * near_friendly_goal_quality * in_enemy_defense_area_quality;
 }

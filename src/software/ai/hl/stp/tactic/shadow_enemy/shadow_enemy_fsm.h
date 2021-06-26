@@ -144,7 +144,7 @@ struct ShadowEnemyFSM
 
             event.common.set_intent(std::make_unique<MoveIntent>(
                 event.common.robot.id(), position_to_block, face_ball_orientation, 0,
-                DribblerMode::OFF, BallCollisionType::AVOID,
+                DribblerMode::OFF, BallCollisionType::ALLOW,
                 AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
                 MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
                 event.common.robot.robotConstants()));
@@ -184,7 +184,7 @@ struct ShadowEnemyFSM
                 .final_orientation      = face_ball_orientation,
                 .final_speed            = 0.0,
                 .dribbler_mode          = DribblerMode::OFF,
-                .ball_collision_type    = BallCollisionType::AVOID,
+                .ball_collision_type    = BallCollisionType::ALLOW,
                 .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
                 .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
                 .target_spin_rev_per_s  = 0.0};
