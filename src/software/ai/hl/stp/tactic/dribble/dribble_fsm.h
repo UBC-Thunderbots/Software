@@ -59,7 +59,8 @@ struct DribbleFSM
     static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD = 0.3;
     // if we are close to ball don't intercept
     static constexpr auto INTERCEPT_BALL_RADIUS = 0.2;
-    // we move away from the ball at some factor of the LOSE_BALL_POSSESSION_THRESHOLD to lose possession to avoid excessive dribbling
+    // we move away from the ball at some factor of the LOSE_BALL_POSSESSION_THRESHOLD to
+    // lose possession to avoid excessive dribbling
     static constexpr double MOVE_AWAY_FROM_BALL_FACTOR = 1.3;
 
 
@@ -76,11 +77,12 @@ struct DribbleFSM
      * the ball
      */
     static Point robotPositionToFaceBall(const Point &ball_position,
-                                         const Angle &face_ball_angle, double additional_offset)
+                                         const Angle &face_ball_angle,
+                                         double additional_offset)
     {
         return ball_position - Vector::createFromAngle(face_ball_angle)
                                    .normalize(DIST_TO_FRONT_OF_ROBOT_METERS +
-                                              BALL_MAX_RADIUS_METERS +additional_offset);
+                                              BALL_MAX_RADIUS_METERS + additional_offset);
     }
 
     /**
@@ -186,7 +188,8 @@ struct DribbleFSM
         };
 
         /**
-         * Guard that checks if the the robot should lose possession to avoid excessive dribbling
+         * Guard that checks if the the robot should lose possession to avoid excessive
+         * dribbling
          *
          * @param event DribbleFSM::Update
          *
@@ -236,8 +239,7 @@ struct DribbleFSM
         const auto get_possession = [this](auto event) {
             auto ball_position = event.common.world.ball().position();
             auto face_ball_orientation =
-                (ball_position - event.common.robot.position())
-                    .orientation();
+                (ball_position - event.common.robot.position()).orientation();
 
             auto speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT;
 
