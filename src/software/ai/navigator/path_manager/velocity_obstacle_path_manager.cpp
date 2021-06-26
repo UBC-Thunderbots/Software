@@ -50,7 +50,7 @@ const std::map<RobotId, std::optional<Path>> VelocityObstaclePathManager::getMan
                                   Angle::zero(), AngularVelocity::zero(),
                                   Timestamp::fromSeconds(0));
             current_velocity_obstacles.emplace_back(
-                robot_navigation_obstacle_factory.createFromRobot(mock_path_robot));
+                robot_navigation_obstacle_factory.createFromFriendlyRobot(mock_path_robot));
         }
     }
 
@@ -73,7 +73,7 @@ VelocityObstaclePathManager::getObstaclesAroundStartOfOtherObjectives(
         if (obj != current_objective)
         {
             obstacles.push_back(
-                robot_navigation_obstacle_factory.createFromRobotPosition(obj.start));
+                robot_navigation_obstacle_factory.createFromFriendlyRobot(obj.start, obj.current_speed));
         }
     }
     return obstacles;

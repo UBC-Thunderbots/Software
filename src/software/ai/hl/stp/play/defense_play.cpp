@@ -31,7 +31,7 @@ bool DefensePlay::invariantHolds(const World &world) const
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
-    auto shoot_goal_tactic =
+    auto attacker_tactic =
         std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
@@ -59,6 +59,13 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
 
         PriorityTacticVector result = {{}};
 
+        if (attacker_tactic->done())
+        {
+            attacker_tactic =
+                std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
+        }
+        result[0].emplace_back(attacker_tactic);
+
         // Update crease defenders
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
@@ -67,7 +74,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
             ->updateControlParams(world.ball().position(),
                                   CreaseDefenderAlignment::RIGHT);
         result[0].emplace_back(std::get<1>(crease_defender_tactics));
-        result[0].emplace_back(shoot_goal_tactic);
 
         // Determine how many "immediate" enemy threats there are. If there is only one we
         // have both shadow enemy tactics swarm and block the "immediate" threat.
