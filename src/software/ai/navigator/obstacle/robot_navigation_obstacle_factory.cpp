@@ -17,7 +17,7 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
 {
     std::vector<ObstaclePtr> obstacles;
     Field field = world.field();
-
+    
     switch (motion_constraint)
     {
         case MotionConstraint::CENTER_CIRCLE:
