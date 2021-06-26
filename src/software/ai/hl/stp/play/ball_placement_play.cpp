@@ -164,26 +164,27 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
             }
         } while (!place_ball_tactic->done());
 
-        Point move_away_point = world.ball().position() -
-                                Vector::createFromAngle(robot->orientation()).normalize(
-                                        ROBOT_MAX_RADIUS_METERS * 2);
-        do
-        {
-            begin = std::chrono::steady_clock::now();
-            if (robot.has_value())
-            {
-                move_away_tactic->updateRobot(robot.value());
-                move_away_tactic->updateControlParams(move_away_point,
-                                                      robot->orientation(), 0.0,
-                                                      DribblerMode::OFF,
-                                                      BallCollisionType::ALLOW,
-                                                      {AutoChipOrKickMode::OFF, 0},
-                                                      MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-                LOG (DEBUG) << "moving away 1";
-                CIRCLE_SHIT_YIELD({move_away_tactic});
-                end = std::chrono::steady_clock::now();
-            }
-        } while (!move_away_tactic->done() && std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() < 2);
+        if (robot.has_value()) {
+            Point move_away_point = world.ball().position() -
+                                    Vector::createFromAngle(robot->orientation()).normalize(
+                                            ROBOT_MAX_RADIUS_METERS * 2);
+            do {
+                begin = std::chrono::steady_clock::now();
+                if (robot.has_value()) {
+                    move_away_tactic->updateRobot(robot.value());
+                    move_away_tactic->updateControlParams(move_away_point,
+                                                          robot->orientation(), 0.0,
+                                                          DribblerMode::OFF,
+                                                          BallCollisionType::ALLOW,
+                                                          {AutoChipOrKickMode::OFF, 0},
+                                                          MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                    LOG (DEBUG) << "moving away 1";
+                    CIRCLE_SHIT_YIELD({ move_away_tactic });
+                    end = std::chrono::steady_clock::now();
+                }
+            } while (!move_away_tactic->done() &&
+                     std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() < 2);
+        }
     }
 
     //TODO DONT LOOK PLEASE
