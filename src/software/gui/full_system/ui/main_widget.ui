@@ -300,24 +300,11 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="RobotStatusTable" name="robot_status_table_widget">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-     </widget>
     </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>RobotStatusTable</class>
-   <extends>QTableWidget</extends>
-   <header>software/gui/generic_widgets/robot_status/robot_status_table.h</header>
-  </customwidget>
   <customwidget>
    <class>DrawFunctionVisualizer</class>
    <extends>QGraphicsView</extends>

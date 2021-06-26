@@ -27,17 +27,9 @@ bool FreeKickPlay::isApplicable(const World &world) const
 
 bool FreeKickPlay::invariantHolds(const World &world) const
 {
-    bool receiver_done = false;
-
-    if (receiver)
-    {
-        receiver_done = receiver->done();
-    }
-
-    bool invariant =
-        (receiver_done || world.gameState().isHalted() || world.gameState().isStopped());
-
-    return !invariant;
+    return world.gameState().isPlaying() &&
+           (world.getTeamWithPossession() == TeamSide::FRIENDLY ||
+            world.getTeamWithPossessionConfidence() < 1.0);
 }
 
 std::vector<CircleWithColor> FreeKickPlay::getCirclesWithColorToDraw()

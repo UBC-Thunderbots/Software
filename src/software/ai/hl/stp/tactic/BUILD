@@ -24,17 +24,6 @@ cc_library(
 )
 
 cc_library(
-    name = "kickoff_move_tactic",
-    srcs = ["kickoff_move_tactic.cpp"],
-    hdrs = ["kickoff_move_tactic.h"],
-    deps = [
-        "//shared:constants",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
-    ],
-)
-
-cc_library(
     name = "penalty_setup_tactic",
     srcs = ["penalty_setup_tactic.cpp"],
     hdrs = ["penalty_setup_tactic.h"],
@@ -78,7 +67,6 @@ cc_library(
     hdrs = ["all_tactics.h"],
     deps = [
         ":kickoff_chip_tactic",
-        ":kickoff_move_tactic",
         ":penalty_setup_tactic",
         ":shadow_free_kicker_tactic",
         ":tactic",

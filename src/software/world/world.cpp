@@ -161,6 +161,7 @@ const RefereeStage &World::getRefereeStage() const
 void World::setTeamWithPossession(TeamSide team_with_possesion, double confidence)
 {
     team_with_possesion_ = team_with_possesion;
+    team_with_possesion_confidence_ = confidence;
 }
 
 TeamSide World::getTeamWithPossession() const

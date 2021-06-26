@@ -15,7 +15,7 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       friendly_team_filter(),
       enemy_team_filter(),
       team_with_possession(TeamSide::ENEMY),
-      team_with_possession_confidence(0.0),
+      team_with_possession_confidence(0.25),
       gc_defending_positive_side(false),
       friendly_goalie_id(0),
       enemy_goalie_id(0),
