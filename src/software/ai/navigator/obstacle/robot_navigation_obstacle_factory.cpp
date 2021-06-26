@@ -17,7 +17,7 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
 {
     std::vector<ObstaclePtr> obstacles;
     Field field = world.field();
-
+    
     switch (motion_constraint)
     {
         case MotionConstraint::CENTER_CIRCLE:
@@ -98,7 +98,7 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
     return obstacles;
 }
 
-ObstaclePtr RobotNavigationObstacleFactory::createFromRobot(const Robot &robot) const
+ObstaclePtr RobotNavigationObstacleFactory::createFromFriendlyRobot(const Robot &robot) const
 {
     // radius of a hexagonal approximation of a robot
     double robot_hexagon_radius =
@@ -153,19 +153,23 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromRobot(const Robot &robot) 
     }
     else
     {
-        return createFromRobotPosition(robot.position());
+        return std::make_shared<GeomObstacle<Circle>>(
+                Circle(robot.position(), 2 * ROBOT_MAX_RADIUS_METERS));
     }
 }
 
-std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromTeam(
-    const Team &team) const
+    ObstaclePtr RobotNavigationObstacleFactory::createFromFriendlyRobot(const Point &position, double speed) const
 {
-    std::vector<ObstaclePtr> obstacles;
-    for (const auto &robot : team.getAllRobots())
+    if (speed < config->getAllowedRobotCollisionSpeed()->value())
     {
-        obstacles.push_back(createFromRobot(robot));
+return std::make_shared<GeomObstacle<Circle>>(
+                Circle(position, 2 * ROBOT_MAX_RADIUS_METERS));
     }
-    return obstacles;
+    else
+    {
+ return std::make_shared<GeomObstacle<Circle>>(
+                Circle(position, robot_radius_expansion_amount));
+    }
 }
 
 std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createEnemyCollisionAvoidance(
@@ -184,7 +188,14 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createEnemyCollisionAvo
     }
     else
     {
-        return createFromTeam(enemy_team);
+        std::vector<ObstaclePtr> obstacles;
+        for (const auto &robot : enemy_team.getAllRobots())
+        {
+            // allow collisions where friendly and enemy robots can be face to face
+            obstacles.push_back(std::make_shared<GeomObstacle<Circle>>(
+                Circle(robot.position(), robot_radius_expansion_amount)));
+        }
+        return obstacles;
     }
 }
 

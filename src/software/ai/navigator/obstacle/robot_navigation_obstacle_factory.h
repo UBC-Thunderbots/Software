@@ -59,19 +59,8 @@ class RobotNavigationObstacleFactory
      *
      * @return An obstacle representing the given robot
      */
-    ObstaclePtr createFromRobot(const Robot &robot) const;
-
-    /**
-     * Create a list of obstacles representing the given team
-     *
-     * These obstacles take into account the velocity of the robot to extend the
-     * created obstacle in the robot's direction of travel.
-     *
-     * @param team The team to get representative obstacles for
-     *
-     * @return A list of obstacles representing the given team
-     */
-    std::vector<ObstaclePtr> createFromTeam(const Team &team) const;
+    ObstaclePtr createFromFriendlyRobot(const Robot &robot) const;
+    ObstaclePtr createFromFriendlyRobot(const Point &position, double speed) const;
 
     /**
      * Create a list of obstacles that stop enemy robot collision. These obstacles are

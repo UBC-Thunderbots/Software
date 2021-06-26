@@ -62,7 +62,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Navigator::getAssignedPrimitives(
             robot_primitives_map[robot_id] =
                 NavigatingPrimitiveCreator(config).createNavigatingPrimitive(
                     *intent, *(robot_id_to_path_iter->second),
-                    robot_navigation_obstacle_factory.createFromTeam(world.enemyTeam()));
+                    robot_navigation_obstacle_factory.createEnemyCollisionAvoidance(world.enemyTeam(), 5.0));
         }
         else
         {
@@ -90,7 +90,7 @@ std::unordered_set<PathObjective> Navigator::createPathObjectives(
         if (robot)
         {
             auto robot_obstacle =
-                robot_navigation_obstacle_factory.createFromRobot(*robot);
+                robot_navigation_obstacle_factory.createFromFriendlyRobot(*robot);
             direct_primitive_intent_obstacles.push_back(robot_obstacle);
         }
         else
