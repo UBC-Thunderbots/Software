@@ -34,7 +34,7 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 
     double chip_pass_rating = friendly_chip_pass_rating * enemy_chip_pass_rating;
     double kick_pass_rating = friendly_kick_pass_rating * enemy_kick_pass_rating;
-    double pass_rating      = kick_pass_rating * chip_pass_rating;
+    double pass_rating      = std::max(kick_pass_rating, chip_pass_rating);
 
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
 
@@ -75,13 +75,13 @@ double rateZone(const World& world, const Rectangle& zone, const Point& receive_
             Pass pass =
                 Pass(Point(x, y), receive_position, BALL_MAX_SPEED_METERS_PER_SECOND);
 
-            zone_rating *= ratePassShootScore(world.field(), world.enemyTeam(), pass,
+            zone_rating += ratePassShootScore(world.field(), world.enemyTeam(), pass,
                                               passing_config);
-            zone_rating *= rateKickPassEnemyRisk(
+            zone_rating += rateKickPassEnemyRisk(
                 world.enemyTeam(), pass,
                 Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
                 passing_config->getEnemyProximityImportance()->value());
-            zone_rating *= rateChipPassEnemyRisk(
+            zone_rating += rateChipPassEnemyRisk(
                 world.enemyTeam(), pass,
                 Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
         }
