@@ -37,6 +37,9 @@ bool DefensePlay::invariantHolds(const World &world) const
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
+    auto attacker_tactic =
+        std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
+
     std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
             play_config->getRobotNavigationObstacleConfig()),
@@ -84,6 +87,13 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
             ->updateControlParams(world.ball().position(),
                                   CreaseDefenderAlignment::CENTRE);
             result[0].emplace_back(std::get<2>(crease_defender_tactics));
+        } else {
+            if (attacker_tactic->done())
+            {
+                attacker_tactic =
+                    std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
+            }
+            result[1].emplace_back(attacker_tactic);
         }
 
         // Determine how many "immediate" enemy threats there are. If there is only one we
