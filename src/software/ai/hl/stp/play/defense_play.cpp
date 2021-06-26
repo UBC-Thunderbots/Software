@@ -17,16 +17,20 @@ DefensePlay::DefensePlay(std::shared_ptr<const PlayConfig> config) : Play(config
 
 bool DefensePlay::isApplicable(const World &world) const
 {
-    return world.gameState().isPlaying() &&
+    return (world.gameState().isPlaying() &&
            world.getTeamWithPossession() == TeamSide::ENEMY &&
-           world.getTeamWithPossessionConfidence() >= 1.0;
+           world.getTeamWithPossessionConfidence() >= 1.0)
+           || (play_config->getDefensePlayConfig()->getDefenseCheeseEnabled()->value() 
+                && world.friendlyTeam().numRobots() < 6);
 }
 
 bool DefensePlay::invariantHolds(const World &world) const
 {
-    return world.gameState().isPlaying() &&
+    return (world.gameState().isPlaying() &&
            world.getTeamWithPossession() == TeamSide::ENEMY &&
-           world.getTeamWithPossessionConfidence() >= 1.0;
+           world.getTeamWithPossessionConfidence() >= 1.0)
+           || (play_config->getDefensePlayConfig()->getDefenseCheeseEnabled()->value() 
+                && world.friendlyTeam().numRobots() < 6);
 }
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
@@ -34,7 +38,14 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     auto shoot_goal_tactic =
         std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
 
-    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
+    // whether we should run 3 crease defenders
+    const bool is_defense_cheesing = 
+        (play_config->getDefensePlayConfig()->getDefenseCheeseEnabled()->value() 
+                    && world.friendlyTeam().numRobots() < 6);
+
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defender_tactics = {
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
         std::make_shared<CreaseDefenderTactic>(
             play_config->getRobotNavigationObstacleConfig()),
         std::make_shared<CreaseDefenderTactic>(
@@ -57,7 +68,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
-        PriorityTacticVector result = {{}};
+        PriorityTacticVector result = {{}, {}};
 
         // Update crease defenders
         std::get<0>(crease_defender_tactics)
@@ -67,7 +78,17 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
             ->updateControlParams(world.ball().position(),
                                   CreaseDefenderAlignment::RIGHT);
         result[0].emplace_back(std::get<1>(crease_defender_tactics));
-        result[0].emplace_back(shoot_goal_tactic);
+
+        if (is_defense_cheesing)
+        {
+            // 3 crease defenders
+            std::get<2>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::CENTRE);
+            result[0].emplace_back(std::get<2>(crease_defender_tactics));
+        }
+
+        result[1].emplace_back(shoot_goal_tactic);
 
         // Determine how many "immediate" enemy threats there are. If there is only one we
         // have both shadow enemy tactics swarm and block the "immediate" threat.
@@ -92,7 +113,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
             std::get<1>(shadow_enemy_tactics)
                 ->updateControlParams(enemy_threats.at(0),
                                       ROBOT_SHADOWING_DISTANCE_METERS);
-            result[0].insert(result[0].end(), shadow_enemy_tactics.begin(),
+            result[1].insert(result[0].end(), shadow_enemy_tactics.begin(),
                              shadow_enemy_tactics.end());
         }
         else
@@ -102,11 +123,11 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
                 std::get<0>(shadow_enemy_tactics)
                     ->updateControlParams(enemy_threats.at(0),
                                           ROBOT_SHADOWING_DISTANCE_METERS);
-                result[0].emplace_back(std::get<0>(shadow_enemy_tactics));
+                result[1].emplace_back(std::get<0>(shadow_enemy_tactics));
             }
             else
             {
-                result[0].emplace_back(move_tactics[0]);
+                result[1].emplace_back(move_tactics[0]);
             }
 
             if (enemy_threats.size() > 1)
@@ -114,7 +135,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
                 std::get<1>(shadow_enemy_tactics)
                     ->updateControlParams(enemy_threats.at(1),
                                           ROBOT_SHADOWING_DISTANCE_METERS);
-                result[0].emplace_back(std::get<1>(shadow_enemy_tactics));
+                result[1].emplace_back(std::get<1>(shadow_enemy_tactics));
             }
             else
             {
@@ -130,7 +151,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
                     move_tactics[1]->updateControlParams(
                         block_point, nearest_enemy_robot->orientation() + Angle::half(),
                         0.0);
-                    result[0].emplace_back(move_tactics[1]);
+                    result[1].emplace_back(move_tactics[1]);
                 }
                 else
                 {
