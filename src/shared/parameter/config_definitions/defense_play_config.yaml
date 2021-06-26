@@ -4,3 +4,8 @@
     max: 9.5
     value: 6
     description: The distance at which a threat is considered "immediate" if there is only 1 "immediate" threat the defense play will swarm that robot with shadowers
+- bool:
+    name: defense_cheese_enabled
+    value: true
+    description: >-
+        Run defense play all the time w/ 3 crease defenders if we're down a robot.
