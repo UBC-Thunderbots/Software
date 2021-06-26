@@ -110,7 +110,7 @@ static const double ROBOT_MIN_CHIP_CLEAR_DISTANCE_METERS = 0.7;
 
 // The chip_target distance should be scaled by this value so that
 // the ball can land and continue to roll to the target_distance
-static const double CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO = 0.65;
+static const double CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO = 0.70;
 
 // The linear speed of the ball after it lands proportional to the distance
 static const double CHIP_PASS_TARGET_DISTANCE_TO_SPEED_RATIO = 0.25;

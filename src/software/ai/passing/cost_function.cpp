@@ -34,7 +34,7 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 
     double chip_pass_rating = friendly_chip_pass_rating * enemy_chip_pass_rating;
     double kick_pass_rating = friendly_kick_pass_rating * enemy_kick_pass_rating;
-    double pass_rating      = std::max(kick_pass_rating, chip_pass_rating);
+    double pass_rating      = kick_pass_rating * chip_pass_rating;
 
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
 
@@ -50,8 +50,8 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
     double pass_up_field_rating = (zone.centre().x() + world.field().totalXLength() / 2) /
                                   world.field().totalXLength();
 
-    return static_pass_quality * pass_rating * pass_up_field_rating * shoot_pass_rating *
-           pass_speed_quality * in_region_quality;
+    return static_pass_quality * pass_rating * pass_up_field_rating *
+           shoot_pass_rating * pass_speed_quality * in_region_quality;
 }
 
 double rateZone(const World& world, const Rectangle& zone, const Point& receive_position,
@@ -75,13 +75,13 @@ double rateZone(const World& world, const Rectangle& zone, const Point& receive_
             Pass pass =
                 Pass(Point(x, y), receive_position, BALL_MAX_SPEED_METERS_PER_SECOND);
 
-            zone_rating += ratePassShootScore(world.field(), world.enemyTeam(), pass,
+            zone_rating *= ratePassShootScore(world.field(), world.enemyTeam(), pass,
                                               passing_config);
-            zone_rating += rateKickPassEnemyRisk(
+            zone_rating *= rateKickPassEnemyRisk(
                 world.enemyTeam(), pass,
                 Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
                 passing_config->getEnemyProximityImportance()->value());
-            zone_rating += rateChipPassEnemyRisk(
+            zone_rating *= rateChipPassEnemyRisk(
                 world.enemyTeam(), pass,
                 Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
         }
@@ -202,20 +202,10 @@ double rateChipPassEnemyRisk(const Team& enemy_team, const Pass& pass,
 
     if (!closest_enemy_to_passer.has_value() || !closest_enemy_to_receiver.has_value())
     {
-        return 0;
+        return 0.0;
     }
 
-    // The sigmoid with of 2.0 meters is somewhat arbitrary but it discourages really
-    // short chips that can be easily intercepted, as the ball doesn't roll as fast after
-    // landing.
-    double sigmoid_width = 2.0;
-
-    // This should figure out if the pass will clear the enemy.
-    double enemy_risk_near_passer_point =
-        sigmoid((closest_enemy_to_passer->position() - pass.passerPoint()).length(),
-                ROBOT_MIN_CHIP_CLEAR_DISTANCE_METERS, sigmoid_width);
-
-    // Now we just need to figure out where we have landed, since we don't have chip speed
+    // We just need to figure out where we have landed, since we don't have chip speed
     // as mentioned above, we use CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO to get an
     // estimate of where we might have landed.
     auto pass_vector = pass.receiverPoint() - pass.passerPoint();
@@ -225,17 +215,28 @@ double rateChipPassEnemyRisk(const Team& enemy_team, const Pass& pass,
     auto chip_landing_point =
         pass.passerPoint() +
         pass_vector.normalize(CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO *
-                              pass_vector.length());
+                pass_vector.length());
+
+    // Figure out the chip speed
+    Angle chip_angle = Angle::fromDegrees(ROBOT_CHIP_ANGLE_DEGREES);
+    double range     = (pass.receiverPoint() - pass.passerPoint()).length() *
+                   CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO;
+    double numerator   = range * ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED;
+    double denominator = 2.0 * (chip_angle * 2.0).sin();
+    double chip_speed  = std::sqrt(numerator / denominator);
 
     // Create a "virtual" kick pass from the chip landing point and the receive point
-    // and evaluate the likely hood of an enemy intercepting that pass.
+    // and evaluate the likely-hood of an enemy intercepting that pass that effectively
+    // starts from the rolling point described above.
+    //
+    // We assume that the speed doesn't change along the x direction.
     double enemy_risk_near_receiver_point = calculateKickInterceptRisk(
         enemy_team,
         Pass(chip_landing_point, pass.receiverPoint(),
-             pass_vector.length() * CHIP_PASS_TARGET_DISTANCE_TO_SPEED_RATIO),
+              Vector::createFromAngle(chip_angle).normalize(chip_speed).x()),
         enemy_reaction_time);
 
-    return 1.0 - enemy_risk_near_passer_point * enemy_risk_near_receiver_point;
+    return 1.0 - enemy_risk_near_receiver_point;
 }
 
 double calculateKickInterceptRisk(const Team& enemy_team, const Pass& pass,
@@ -417,12 +418,11 @@ double rateChipPassFriendlyCapability(Team friendly_team, const Pass& pass,
 
     // Create a sigmoid that goes to 0 as the time required to get to the reception
     // point exceeds the time we would need to get there by
-    double sigmoid_width                  = 0.4;
-    double time_to_receiver_state_slack_s = 0.10;
+    double sigmoid_width                  = 0.8;
 
     return sigmoid(
         receive_time.toSeconds(),
-        latest_time_to_reciever_state.toSeconds() + time_to_receiver_state_slack_s,
+        latest_time_to_reciever_state.toSeconds(),
         sigmoid_width);
 }
 
