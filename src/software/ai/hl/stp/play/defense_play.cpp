@@ -20,8 +20,8 @@ bool DefensePlay::isApplicable(const World &world) const
     return (world.gameState().isPlaying() &&
            world.getTeamWithPossession() == TeamSide::ENEMY &&
            world.getTeamWithPossessionConfidence() >= 1.0)
-           || (play_config->getDefensePlayConfig()->getDefenseCheeseEnabled()->value() 
-                && world.friendlyTeam().numRobots() < 6);
+           || (play_config->getDefensePlayConfig()->getDefenseCheeseEnabled()->value()
+               && world.friendlyTeam().numRobots() < world.enemyTeam().numRobots());
 }
 
 bool DefensePlay::invariantHolds(const World &world) const
@@ -29,19 +29,14 @@ bool DefensePlay::invariantHolds(const World &world) const
     return (world.gameState().isPlaying() &&
            world.getTeamWithPossession() == TeamSide::ENEMY &&
            world.getTeamWithPossessionConfidence() >= 1.0)
-           || (play_config->getDefensePlayConfig()->getDefenseCheeseEnabled()->value() 
-                && world.friendlyTeam().numRobots() < 6);
+           || (play_config->getDefensePlayConfig()->getDefenseCheeseEnabled()->value()
+               && world.friendlyTeam().numRobots() < world.enemyTeam().numRobots());
 }
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     auto shoot_goal_tactic =
         std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
-
-    // whether we should run 3 crease defenders
-    const bool is_defense_cheesing = 
-        (play_config->getDefensePlayConfig()->getDefenseCheeseEnabled()->value() 
-                    && world.friendlyTeam().numRobots() < 6);
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
@@ -67,6 +62,10 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     {
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
+        // whether we should run 3 crease defenders
+        const bool is_defense_cheesing =
+            (play_config->getDefensePlayConfig()->getDefenseCheeseEnabled()->value()
+             && world.friendlyTeam().numRobots() < world.enemyTeam().numRobots());
 
         PriorityTacticVector result = {{}, {}};
 
