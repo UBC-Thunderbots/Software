@@ -27,9 +27,10 @@ bool FreeKickPlay::isApplicable(const World &world) const
 
 bool FreeKickPlay::invariantHolds(const World &world) const
 {
-    return world.gameState().isPlaying() &&
-           (world.getTeamWithPossession() == TeamSide::FRIENDLY ||
-            world.getTeamWithPossessionConfidence() < 1.0);
+    LOG(DEBUG) << world.getTeamWithPossessionConfidence() << " : " << world.getTeamWithPossession();
+
+    return !world.gameState().isPlaying() && !world.gameState().isHalted()
+        && (world.getTeamWithPossession() == TeamSide::FRIENDLY || world.getTeamWithPossessionConfidence() < 10.0);
 }
 
 std::vector<CircleWithColor> FreeKickPlay::getCirclesWithColorToDraw()
@@ -173,7 +174,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
             ->updateControlParams(world.ball().position(),
                                   CreaseDefenderAlignment::RIGHT);
         yield({{align_to_ball_tactic, std::get<0>(cherry_picker_tactics),
-                std::get<1>(cherry_picker_tactics), std::get<0>(crease_defender_tactics),
+                std::get<0>(crease_defender_tactics), std::get<1>(cherry_picker_tactics),
                 std::get<1>(crease_defender_tactics)}});
 
         best_pass_and_score_so_far =
@@ -253,7 +254,7 @@ void FreeKickPlay::performPassStage(
 
     for (const Robot &enemy : world.enemyTeam().getAllRobots())
     {
-        if (intersects(Circle(enemy.position(), ROBOT_MAX_RADIUS_METERS * 2),
+        if (intersects(Circle(enemy.position(), ROBOT_MAX_RADIUS_METERS * 3),
                        pass_segment))
         {
             should_chip = true;

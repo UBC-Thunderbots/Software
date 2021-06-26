@@ -15,7 +15,7 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       friendly_team_filter(),
       enemy_team_filter(),
       team_with_possession(TeamSide::ENEMY),
-      team_with_possession_confidence(0.25),
+      team_with_possession_confidence(0.0),
       gc_defending_positive_side(false),
       friendly_goalie_id(0),
       enemy_goalie_id(0),
@@ -36,8 +36,7 @@ std::optional<World> SensorFusion::getWorld() const
     {
         World new_world(*field, *ball, friendly_team, enemy_team);
         new_world.updateGameState(game_state);
-        new_world.setTeamWithPossession(team_with_possession,
-                                        team_with_possession_confidence);
+        new_world.setTeamWithPossession(team_with_possession, team_with_possession_confidence);
         if (referee_stage)
         {
             new_world.updateRefereeStage(*referee_stage);
@@ -418,8 +417,13 @@ std::optional<Ball> SensorFusion::createBall(
 {
     if (field)
     {
+        Rectangle ball_filter_area(field.value().fieldBoundary());
+        if (game_state.isTheirFreeKick() && !game_state.isPlaying()) {
+            ball_filter_area = field.value().fieldLines();
+        }
+
         std::optional<Ball> new_ball =
-            ball_filter.estimateBallState(ball_detections, field.value().fieldBoundary());
+            ball_filter.estimateBallState(ball_detections, ball_filter_area);
         return new_ball;
     }
     return std::nullopt;
