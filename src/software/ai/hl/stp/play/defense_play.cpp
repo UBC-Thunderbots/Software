@@ -69,7 +69,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
             (play_config->getDefensePlayConfig()->getDefenseCheeseEnabled()->value()
              && world.friendlyTeam().numRobots() < world.enemyTeam().numRobots());
         // priority is crease defenders, shadowers
-        PriorityTacticVector result = {{}, {}};
+        PriorityTacticVector result = {{}, {}, {}};
 
         // Update crease defenders
         std::get<0>(crease_defender_tactics)
@@ -87,14 +87,14 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
             ->updateControlParams(world.ball().position(),
                                   CreaseDefenderAlignment::CENTRE);
             result[0].emplace_back(std::get<2>(crease_defender_tactics));
-        } else {
-            if (attacker_tactic->done())
-            {
-                attacker_tactic =
-                    std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
-            }
-            result[1].emplace_back(attacker_tactic);
         }
+        if (attacker_tactic->done())
+        {
+            attacker_tactic =
+                std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
+        }
+        result[1].emplace_back(attacker_tactic);
+
 
         // Determine how many "immediate" enemy threats there are. If there is only one we
         // have both shadow enemy tactics swarm and block the "immediate" threat.
@@ -133,7 +133,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
             }
             else
             {
-                result[1].emplace_back(move_tactics[0]);
+                result[2].emplace_back(move_tactics[0]);
             }
 
             if (enemy_threats.size() > 1)
@@ -154,10 +154,10 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
                         nearest_enemy_robot->position() +
                         Vector::createFromAngle(nearest_enemy_robot->orientation()) *
                             ROBOT_SHADOWING_DISTANCE_METERS;
-                    move_tactics[1]->updateControlParams(
+                    move_tactics[2]->updateControlParams(
                         block_point, nearest_enemy_robot->orientation() + Angle::half(),
                         0.0);
-                    result[1].emplace_back(move_tactics[1]);
+                    result[2].emplace_back(move_tactics[1]);
                 }
                 else
                 {
