@@ -15,6 +15,7 @@ cc_library(
         "//software/ai/hl/stp/action:stop_action",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/hl/stp/tactic/pivot_kick:pivot_kick_tactic",
         "//software/geom/algorithms",
         "//software/logger",
     ],

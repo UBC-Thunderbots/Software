@@ -211,6 +211,7 @@ cc_library(
         "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/tactic:kickoff_chip_tactic",
+        "//software/ai/hl/stp/tactic:kickoff_move_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
