@@ -126,8 +126,15 @@ void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
     if (!error)
     {
         auto packet_data = std::make_unique<ReceiveProtoT>();
-        packet_data->ParseFromArray(raw_received_data_.data(),
+        bool success = packet_data->ParseFromArray(raw_received_data_.data(),
                                     static_cast<int>(num_bytes_received));
+
+        if (!success) {
+            LOG(WARNING) << "Failed to parse " << TYPENAME(ReceiveProtoT)
+                         << " from received data";
+            *packet_data = ReceiveProtoT();
+        }
+
         receive_callback(*packet_data);
 
         // Once we've handled the data, start listening again

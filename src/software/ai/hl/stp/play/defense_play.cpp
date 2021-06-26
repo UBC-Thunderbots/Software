@@ -18,26 +18,25 @@ DefensePlay::DefensePlay(std::shared_ptr<const PlayConfig> config) : Play(config
 bool DefensePlay::isApplicable(const World &world) const
 {
     return (world.gameState().isPlaying() &&
-           world.getTeamWithPossession() == TeamSide::ENEMY &&
-           world.getTeamWithPossessionConfidence() >= 1.0)
-           || (play_config->getDefensePlayConfig()->getDefenseCheeseEnabled()->value()
-               && world.friendlyTeam().numRobots() < world.enemyTeam().numRobots());
+            world.getTeamWithPossession() == TeamSide::ENEMY &&
+            world.getTeamWithPossessionConfidence() >= 1.0) ||
+           (world.gameState().isPlaying() &&
+            play_config->getDefensePlayConfig()->getDefenseCheeseEnabled()->value() &&
+            world.friendlyTeam().numRobots() < world.enemyTeam().numRobots());
 }
 
 bool DefensePlay::invariantHolds(const World &world) const
 {
     return (world.gameState().isPlaying() &&
-           world.getTeamWithPossession() == TeamSide::ENEMY &&
-           world.getTeamWithPossessionConfidence() >= 1.0)
-           || (play_config->getDefensePlayConfig()->getDefenseCheeseEnabled()->value()
-               && world.friendlyTeam().numRobots() < world.enemyTeam().numRobots());
+            world.getTeamWithPossession() == TeamSide::ENEMY &&
+            world.getTeamWithPossessionConfidence() >= 1.0) ||
+           (world.gameState().isPlaying() &&
+            play_config->getDefensePlayConfig()->getDefenseCheeseEnabled()->value() &&
+            world.friendlyTeam().numRobots() < world.enemyTeam().numRobots());
 }
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
-    auto shoot_goal_tactic =
-        std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
-
     std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
             play_config->getRobotNavigationObstacleConfig()),
@@ -66,7 +65,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
         const bool is_defense_cheesing =
             (play_config->getDefensePlayConfig()->getDefenseCheeseEnabled()->value()
              && world.friendlyTeam().numRobots() < world.enemyTeam().numRobots());
-
+        // priority is crease defenders, shadowers
         PriorityTacticVector result = {{}, {}};
 
         // Update crease defenders
@@ -86,8 +85,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
                                   CreaseDefenderAlignment::CENTRE);
             result[0].emplace_back(std::get<2>(crease_defender_tactics));
         }
-
-        result[1].emplace_back(shoot_goal_tactic);
 
         // Determine how many "immediate" enemy threats there are. If there is only one we
         // have both shadow enemy tactics swarm and block the "immediate" threat.
@@ -112,7 +109,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
             std::get<1>(shadow_enemy_tactics)
                 ->updateControlParams(enemy_threats.at(0),
                                       ROBOT_SHADOWING_DISTANCE_METERS);
-            result[1].insert(result[0].end(), shadow_enemy_tactics.begin(),
+            result[1].insert(result[1].end(), shadow_enemy_tactics.begin(),
                              shadow_enemy_tactics.end());
         }
         else
