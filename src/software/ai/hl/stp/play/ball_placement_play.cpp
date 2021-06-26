@@ -123,6 +123,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         do
         {
+            begin = std::chrono::steady_clock::now();
             if (robot.has_value()) {
                 align_to_ball_tactic->updateRobot(robot.value());
                 align_to_ball_tactic->updateControlParams(
@@ -137,6 +138,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                     robot = world.friendlyTeam().getNearestRobot(world.gameState().getBallPlacementPoint().value());
                 }
             }
+            end = std::chrono::steady_clock::now();
         } while (!align_to_ball_tactic->done());
 
         Point ball_pull_position = world.ball().position() - intersecting_dir.normalize(ROBOT_MAX_RADIUS_METERS * 5);
@@ -155,7 +157,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                     robot = world.friendlyTeam().getNearestRobot(world.gameState().getBallPlacementPoint().value());
                 }
             }
-        } while (!place_ball_tactic->done());
+        } while (!place_ball_tactic->done() && std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() < 2);
 
         Point move_away_point = world.ball().position() -
                                 Vector::createFromAngle(robot->orientation()).normalize(
