@@ -38,7 +38,20 @@ void MotionConstraintVisitor::visit(const KickoffChipTactic &tactic)
 {
     current_allowed_constraints = std::set<MotionConstraint>({
         MotionConstraint::CENTER_CIRCLE,
-        MotionConstraint::HALF_METER_AROUND_BALL
+        MotionConstraint::HALF_METER_AROUND_BALL,
+        MotionConstraint::ENEMY_HALF_EXCEPT_CENTRE_CIRCLE,
+        MotionConstraint::ENEMY_HALF
+    });
+}
+
+void MotionConstraintVisitor::visit(const KickoffMoveTactic &tactic)
+{
+    current_allowed_constraints = std::set<MotionConstraint>({
+        MotionConstraint::CENTER_CIRCLE,
+        MotionConstraint::HALF_METER_AROUND_BALL,
+        // enemy half constraint is allowed, but we still have an 
+        // ENEMY_HALF_WITHOUT_CENTRE_CIRCLE
+        MotionConstraint::ENEMY_HALF
     });
 }
 

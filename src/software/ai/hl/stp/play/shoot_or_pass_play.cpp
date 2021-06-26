@@ -24,13 +24,15 @@ ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config)
 bool ShootOrPassPlay::isApplicable(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           (world.getTeamWithPossession() == TeamSide::FRIENDLY);
+           (world.getTeamWithPossession() == TeamSide::FRIENDLY ||
+            world.getTeamWithPossessionConfidence() < 1.0);
 }
 
 bool ShootOrPassPlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           (world.getTeamWithPossession() == TeamSide::FRIENDLY);
+           (world.getTeamWithPossession() == TeamSide::FRIENDLY ||
+            world.getTeamWithPossessionConfidence() < 1.0);
 }
 
 
@@ -82,8 +84,6 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
         LOG(DEBUG) << "Score of pass we committed to: "
                    << best_pass_and_score_so_far.rating;
 
-        ratePass(world, pass, world.field().fieldLines(),
-                 play_config->getPassingConfig());
         // Perform the pass and wait until the receiver is finished
         auto receiver = std::make_shared<ReceiverTactic>(pass);
 

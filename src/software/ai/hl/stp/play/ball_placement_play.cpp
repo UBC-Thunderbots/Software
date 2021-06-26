@@ -139,7 +139,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 }
             }
             end = std::chrono::steady_clock::now();
-        } while (!align_to_ball_tactic->done() && std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() < 2);
+        } while (!align_to_ball_tactic->done() && std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() < 6);
 
         Point ball_pull_position = world.ball().position() - intersecting_dir.normalize(ROBOT_MAX_RADIUS_METERS * 5);
         pull_point = ball_pull_position;
@@ -161,7 +161,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         Point move_away_point = world.ball().position() -
                                 Vector::createFromAngle(robot->orientation()).normalize(
-                                        ROBOT_MAX_RADIUS_METERS * 4);
+                                        ROBOT_MAX_RADIUS_METERS * 2);
         do
         {
             begin = std::chrono::steady_clock::now();
@@ -208,7 +208,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
                         Point move_away_point = world.ball().position() -
                                                 Vector::createFromAngle(robot->orientation()).normalize(
-                                                        ROBOT_MAX_RADIUS_METERS * 4);
+                                                        ROBOT_MAX_RADIUS_METERS * 2);
                         if (!(contains(world.field().fieldBoundary(), move_away_point) && !contains(world.field().fieldLines(), move_away_point))) {
 
                             begin = std::chrono::steady_clock::now();
@@ -298,7 +298,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                         move_passer_tactic->updateControlParams(pass.passerPoint() -
                                                                 Vector::createFromAngle(
                                                                         pass.passerOrientation()).normalize(
-                                                                        ROBOT_MAX_RADIUS_METERS * 4),
+                                                                        ROBOT_MAX_RADIUS_METERS * 2),
                                                                 pass.passerOrientation(), 0.0);
                         tactics.emplace_back(move_passer_tactic);
                     }
@@ -336,7 +336,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                         break;
                     }
                     end = std::chrono::steady_clock::now();
-                } while (!receiver_tactic->done() && std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() < 2);
+                } while (!receiver_tactic->done() && std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() < 6);
 
                 do {
                     if (robot.has_value()) {

@@ -21,7 +21,7 @@
 #include "firmware/app/primitives/primitive.h"
 #include "firmware/app/primitives/stop_primitive.h"
 
-#define PRIMTIVE_MANAGER_TIMEOUT_NUM_TICKS (100)
+#define PRIMTIVE_MANAGER_TIMEOUT_NUM_TICKS (500u)
 
 struct PrimitiveManager
 {

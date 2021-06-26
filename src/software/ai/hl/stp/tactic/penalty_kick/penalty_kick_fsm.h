@@ -221,20 +221,21 @@ struct PenaltyKickFSM
          * @param event          PenaltyKickFSM::Update
          * @param processEvent   processes the DribbleFSM::Update
          */
-        const auto adjust_orientation_for_shot =
-            [this](auto event, back::process<DribbleFSM::Update> processEvent) {
-                std::optional<Robot> enemy_goalie =
-                    event.common.world.enemyTeam().goalie();
-                const Point next_shot_position =
-                    evaluateNextShotPosition(enemy_goalie, event.common.world.field());
-                Point final_position = event.common.world.ball().position();
-                shot_angle = (next_shot_position - final_position).orientation();
-                DribbleFSM::ControlParams control_params{
-                    .dribble_destination       = std::optional<Point>(final_position),
-                    .final_dribble_orientation = std::optional<Angle>(shot_angle),
-                    .allow_excessive_dribbling = false};
-                processEvent(DribbleFSM::Update(control_params, event.common));
-            };
+        const auto adjust_orientation_for_shot = [this](auto event,
+                                                        back::process<DribbleFSM::Update>
+                                                            processEvent) {
+            std::optional<Robot> enemy_goalie = event.common.world.enemyTeam().goalie();
+            const Point next_shot_position =
+                evaluateNextShotPosition(enemy_goalie, event.common.world.field());
+            Point final_position = event.common.world.ball().position();
+            shot_angle           = (next_shot_position - final_position).orientation();
+            DribbleFSM::ControlParams control_params{
+                .dribble_destination       = std::optional<Point>(final_position),
+                .final_dribble_orientation = std::optional<Angle>(shot_angle),
+                // we minimize the chance of awful autokicks just as we're about to shoot
+                .allow_excessive_dribbling = true};
+            processEvent(DribbleFSM::Update(control_params, event.common));
+        };
 
         /**
          * Guard that returns true if the shooter has a good shot on goal or if it is
