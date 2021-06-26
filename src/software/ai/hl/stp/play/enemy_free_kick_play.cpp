@@ -22,7 +22,8 @@ bool EnemyFreekickPlay::isApplicable(const World &world) const
 
 bool EnemyFreekickPlay::invariantHolds(const World &world) const
 {
-    return world.gameState().isTheirFreeKick();
+    return world.gameState().isTheirFreeKick() &&
+                    world.ball().velocity().length() < 1.0;
 }
 
 void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
