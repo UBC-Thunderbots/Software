@@ -46,7 +46,6 @@ void ColouredCoutSink::resetColour()
 
 void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
 {
-    return;
     auto level  = log_entry.get()._level;
     auto colour = colourToString(getColour(level));
 
