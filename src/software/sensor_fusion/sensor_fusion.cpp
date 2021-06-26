@@ -417,8 +417,13 @@ std::optional<Ball> SensorFusion::createBall(
 {
     if (field)
     {
+        Rectangle ball_filter_area(field.value().fieldBoundary());
+        if (game_state.isTheirFreeKick() && !game_state.isPlaying()) {
+            ball_filter_area = field.value().fieldLines();
+        }
+
         std::optional<Ball> new_ball =
-            ball_filter.estimateBallState(ball_detections, field.value().fieldBoundary());
+            ball_filter.estimateBallState(ball_detections, ball_filter_area);
         return new_ball;
     }
     return std::nullopt;
