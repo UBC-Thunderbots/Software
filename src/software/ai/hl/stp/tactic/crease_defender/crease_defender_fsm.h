@@ -2,9 +2,9 @@
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
+#include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
-#include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/intersection.h"
@@ -87,6 +87,7 @@ struct CreaseDefenderFSM
         using namespace boost::sml;
 
         const auto block_threat_s = state<MoveFSM>;
+        const auto chip_away_s = state<PivotKickFSM>;
 
         // update_e is the _event_ that the CreaseDefenderFSM responds to
         const auto update_e = event<Update>;
@@ -128,13 +129,8 @@ struct CreaseDefenderFSM
                                 event.common.world.field().friendlyDefenseArea().yMax();
             }
 
-            BallCollisionType ball_collision_type = BallCollisionType::ALLOW;
-            if ((event.common.world.ball().position() - destination).length() <
-                (event.common.robot.position() - destination).length())
-            {
-                ball_collision_type = BallCollisionType::AVOID;
-            }
 
+            BallCollisionType ball_collision_type = BallCollisionType::ALLOW;
             MoveFSM::ControlParams control_params{
                 .destination         = destination,
                 .final_orientation   = face_threat_orientation,
@@ -150,9 +146,49 @@ struct CreaseDefenderFSM
             processEvent(MoveFSM::Update(control_params, event.common));
         };
 
+        /**
+         * Guard that checks if the ball is threatening
+         *
+         * @param event CreaseDefenderFSM::Update event
+         *
+         * @return if the ball is threatening
+         */
+        const auto ball_is_threatening = [this](auto event) {
+            return contains(static_cast<Polygon>(event.common.world.field().friendlyDefenseArea()).expand(0.5),event.common.world.ball().position()) ;
+        };
+
+        /**
+         * This is an Action that chips the ball away
+         *
+         * @param event CreaseDefenderFSM::Update event
+         */
+        const auto chip_away = [this](auto event,
+                                         back::process<PivotKickFSM::Update> processEvent) {
+            
+                Angle clear_direction = (event.common.world.field().enemyGoalCenter() -
+                                         event.common.world.ball().position())
+                                            .orientation();
+
+                PivotKickFSM::ControlParams control_params{
+                    .kick_origin    = event.common.world.ball().position(),
+                    .kick_direction = clear_direction,
+                    .auto_chip_or_kick =
+                        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP,
+                                       event.common.world.field().xLength() - 1},
+                };
+
+                // update the pivotkick fsm
+                processEvent(PivotKickFSM::Update(control_params, event.common));
+
+        };
+
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *block_threat_s + update_e / block_threat, block_threat_s = X,
+            *block_threat_s + update_e / block_threat,
+            block_threat_s + update_e[ball_is_threatening] / chip_away = chip_away_s,
+            chip_away_s + update_e[ball_is_threatening] / chip_away,
+            chip_away_s + update_e[!ball_is_threatening] / block_threat = X,
+            block_threat_s = X,
             X + update_e / block_threat = block_threat_s);
     }
 
