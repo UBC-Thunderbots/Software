@@ -22,7 +22,9 @@ class FreeKickPlay : public Play
 
     std::vector<CircleWithColor> getCirclesWithColorToDraw() override;
 
+
    private:
+    std::shared_ptr<ReceiverTactic> receiver;
     // The maximum time that we will wait before committing to a pass
     const Duration MAX_TIME_TO_COMMIT_TO_PASS;
     std::optional<Pass> best_pass;
@@ -54,7 +56,7 @@ class FreeKickPlay : public Play
     void performPassStage(
         TacticCoroutine::push_type &yield,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-        const PassWithRating& best_pass_and_score_so_far, const World &world);
+        const PassWithRating &best_pass_and_score_so_far, const World &world);
 
     /**
      * Tries to find a good pass on the field. This function starts with a high threshold

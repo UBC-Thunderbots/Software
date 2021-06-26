@@ -52,11 +52,12 @@ std::set<MotionConstraint> buildMotionConstraintSetFromGameState(
         {
         }
     }
-    else if (game_state.isKickoff())
+    else if (game_state.isKickoff() && !game_state.isPlaying())
     {
         motion_constraints.insert({MotionConstraint::HALF_METER_AROUND_BALL,
                                    MotionConstraint::CENTER_CIRCLE,
-                                   MotionConstraint::ENEMY_HALF});
+                                   MotionConstraint::ENEMY_HALF,
+                                   MotionConstraint::ENEMY_HALF_EXCEPT_CENTRE_CIRCLE});
     }
     else if (game_state.isOurBallPlacement())
     {
@@ -64,7 +65,9 @@ std::set<MotionConstraint> buildMotionConstraintSetFromGameState(
     }
     else if (game_state.isTheirBallPlacement())
     {
-        motion_constraints.insert(MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
+        motion_constraints.insert({MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE,
+                                   MotionConstraint::HALF_METER_AROUND_BALL,
+                                   MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA});
     }
     else
     {

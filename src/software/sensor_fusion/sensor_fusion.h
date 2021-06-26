@@ -140,7 +140,7 @@ class SensorFusion
     RobotTeamFilter enemy_team_filter;
 
     TeamSide team_with_possession;
-    double  team_with_possession_confidence;
+    double team_with_possession_confidence;
 
     // Whether the gamecontroller says we should defend positive side
     bool gc_defending_positive_side;

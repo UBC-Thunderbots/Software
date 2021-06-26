@@ -10,12 +10,14 @@
 #include "software/ai/intent/move_intent.h"
 #include "software/ai/passing/pass.h"
 #include "software/geom/algorithms/closest_point.h"
+#include "software/logger/logger.h"
 
 struct ReceiverFSM
 {
+    class OneTouchDribbleState;
     class OneTouchShotState;
     class ReceiveAndDribbleState;
-    class UndecidedState;
+    class WaitingForPassState;
 
     struct ControlParams
     {
@@ -26,21 +28,32 @@ struct ReceiverFSM
         bool disable_one_touch = false;
     };
 
+    /**
+     * Constructor for ReceiverFSM
+     *
+     * @param pass_start_time: updated by the play when the pass starts
+     *
+     */
+    explicit ReceiverFSM(const std::shared_ptr<Timestamp>& pass_start_timestamp)
+        : pass_start_timestamp(pass_start_timestamp)
+    {
+    }
+
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     // The minimum proportion of open net we're shooting on vs the entire size of the net
     // that we require before attempting a shot
     static constexpr double MIN_SHOT_NET_PERCENT_OPEN = 0.3;
-    static constexpr double MIN_PASS_START_SPEED      = 0.4;
-    static constexpr double BALL_MIN_MOVEMENT_SPEED   = 0.05;
+    static constexpr double MIN_PASS_START_SPEED      = 0.02;
+    static constexpr double BALL_MIN_MOVEMENT_SPEED   = 0.04;
 
     // The maximum deflection angle that we will attempt a one-touch kick towards the
     // enemy goal with
-    static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(90);
+    static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(75);
 
     // The minimum angle between a ball's trajectory and the ball-receiver_point vector
     // for which we can consider a pass to be stray
-    static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(10);
+    static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(60);
 
     // the minimum speed required for a pass to be considered stray
     static constexpr double MIN_STRAY_PASS_SPEED = 0.3;
@@ -90,7 +103,8 @@ struct ReceiverFSM
      */
     static Shot getOneTouchShotPositionAndOrientation(const Robot& robot,
                                                       const Ball& ball,
-                                                      const Point& best_shot_target)
+                                                      const Point& best_shot_target,
+                                                      const Pass pass)
     {
         double dist_to_ball_in_dribbler =
             DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS;
@@ -179,10 +193,10 @@ struct ReceiverFSM
     {
         using namespace boost::sml;
 
-        const auto undecided_s = state<UndecidedState>;
-        const auto receive_s   = state<ReceiveAndDribbleState>;
-        const auto onetouch_s  = state<OneTouchShotState>;
-        const auto update_e    = event<Update>;
+        const auto receive_s          = state<ReceiveAndDribbleState>;
+        const auto onetouch_s         = state<OneTouchDribbleState>;
+        const auto update_e           = event<Update>;
+        const auto waiting_for_pass_s = state<WaitingForPassState>;
 
         /**
          * Checks if a one touch shot is possible
@@ -209,7 +223,7 @@ struct ReceiverFSM
             auto best_shot = findFeasibleShot(event.common.world, event.common.robot);
             auto one_touch = getOneTouchShotPositionAndOrientation(
                 event.common.robot, event.common.world.ball(),
-                best_shot->getPointToShootAt());
+                best_shot->getPointToShootAt(), event.control_params.pass.value());
 
             if (best_shot)
             {
@@ -262,7 +276,7 @@ struct ReceiverFSM
             {
                 Point ball_receive_pos = ball.position();
 
-                if (ball.velocity().length() != 0)
+                if (ball.velocity().length() > MIN_PASS_START_SPEED)
                 {
                     ball_receive_pos = closestPoint(
                         robot_pos,
@@ -282,25 +296,15 @@ struct ReceiverFSM
         };
 
         /**
-         * Check if the pass has started by checking if the ball is moving faster
-         * than a minimum speed.
+         * Guard that checks if the ball has been kicked
          *
-         * @param event ReceiverFSM::Update event
-         * @return true if the pass has started
+         * @param event PivotKickFSM::Update event
+         *
+         * @return if the ball has been kicked
          */
         const auto pass_started = [](auto event) {
-            // the pass starts when the passing robot is facing the proper orientation
-            // with keepaway, we don't face the orientation immediately after the receiver
-            // receives the pass to execute
-            bool friendly_robot_has_ball = false;
-            for(auto robot : event.common.world.friendlyTeam().getAllRobots())
-            {
-                if (robot.isNearDribbler(event.common.world.ball().position()))
-                {
-                    friendly_robot_has_ball = true;
-                }
-            }
-            return (event.common.world.ball().velocity().length() > MIN_PASS_START_SPEED && !friendly_robot_has_ball);
+            return event.common.world.ball().hasBallBeenKicked(
+                event.control_params.pass->passerOrientation());
         };
 
         /**
@@ -311,6 +315,13 @@ struct ReceiverFSM
          * @return true if the ball is near a robots mouth
          */
         const auto pass_finished = [](auto event) {
+            // We tolerate imperfect passes that hit the edges of the robot,
+            // so that we can quickly transition out and grab the ball.
+            return event.common.robot.isNearDribbler(
+                event.common.world.ball().position());
+        };
+
+        const auto stray_pass = [](auto event) {
             auto ball_position = event.common.world.ball().position();
 
             Vector ball_receiver_point_vector(
@@ -327,21 +338,24 @@ struct ReceiverFSM
                 event.common.world.ball().velocity().length() > MIN_STRAY_PASS_SPEED &&
                 orientation_difference > MIN_STRAY_PASS_ANGLE;
 
-            // We tolerate imperfect passes that hit the edges of the robot,
-            // so that we can quickly transition out and grab the ball.
-            bool near_dribbler = event.common.robot.isNearDribbler(
-                event.common.world.ball().position(), ROBOT_MAX_RADIUS_METERS);
-            return stray_pass || near_dribbler;
+            return stray_pass;
         };
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *undecided_s + update_e[onetouch_possible] / update_onetouch = onetouch_s,
-            undecided_s + update_e[!onetouch_possible] / update_receive  = receive_s,
-            receive_s + update_e[!pass_started] / update_receive,
-            receive_s + update_e[pass_started && !pass_finished] / adjust_receive,
-            receive_s + update_e[pass_finished] / update_receive = X,
-            onetouch_s + update_e[!pass_finished] / update_onetouch,
+            *waiting_for_pass_s + update_e[!pass_started] / update_receive,
+            waiting_for_pass_s +
+                update_e[pass_started && onetouch_possible] / update_receive = onetouch_s,
+            waiting_for_pass_s + update_e[pass_started && !onetouch_possible] /
+                                     update_onetouch = receive_s,
+            receive_s + update_e[!pass_finished] / adjust_receive,
+            onetouch_s + update_e[!pass_finished && !stray_pass] / update_onetouch,
+            onetouch_s + update_e[!pass_finished && stray_pass] / adjust_receive =
+                receive_s,
+            receive_s + update_e[pass_finished] / adjust_receive   = X,
             onetouch_s + update_e[pass_finished] / update_onetouch = X);
     }
+
+   private:
+    std::shared_ptr<Timestamp> pass_start_timestamp;
 };

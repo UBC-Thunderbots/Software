@@ -77,9 +77,9 @@ void SimulatorBackend::joinMulticastChannel(int channel, const std::string& inte
         std::string(SIMULATOR_MULTICAST_CHANNELS[channel]), ROBOT_LOGS_PORT,
         boost::bind(&SimulatorBackend::receiveRobotLogs, this, _1), true));
 
-    // For some reason
-    // defending_side_output.reset(new ThreadedProtoUdpSender<DefendingSideProto>(
-    //     std::string(SIMULATOR_MULTICAST_CHANNELS[channel]), DEFENDING_SIDE_PORT, true));
+    defending_side_output.reset(new ThreadedProtoUdpSender<DefendingSideProto>(
+	 std::string(SIMULATOR_MULTICAST_CHANNELS[channel]), DEFENDING_SIDE_PORT,
+	 true));
 }
 
 // Register this backend in the genericFactory
