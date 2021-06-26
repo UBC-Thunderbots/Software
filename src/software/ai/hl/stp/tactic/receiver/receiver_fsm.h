@@ -234,7 +234,7 @@ struct ReceiverFSM
                         one_touch.getOpenAngle(), 0, DribblerMode::OFF,
                         BallCollisionType::ALLOW,
                         AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                                       BALL_MAX_SPEED_METERS_PER_SECOND},
+                                       BALL_MAX_SPEED_METERS_PER_SECOND - 0.6},
                         MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
                         event.common.robot.robotConstants()));
                 }
