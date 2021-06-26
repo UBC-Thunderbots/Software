@@ -20,12 +20,7 @@ CornerKickPlay::CornerKickPlay(std::shared_ptr<const PlayConfig> config)
 
 bool CornerKickPlay::isApplicable(const World &world) const
 {
-    double min_dist_to_corner =
-        std::min((world.field().enemyCornerPos() - world.ball().position()).length(),
-                 (world.field().enemyCornerNeg() - world.ball().position()).length());
-
-    return world.gameState().isOurFreeKick() &&
-           min_dist_to_corner <= BALL_IN_CORNER_RADIUS;
+    return false;
 }
 
 bool CornerKickPlay::invariantHolds(const World &world) const
