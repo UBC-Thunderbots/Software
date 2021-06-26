@@ -29,8 +29,8 @@ bool FreeKickPlay::invariantHolds(const World &world) const
 {
     LOG(DEBUG) << world.getTeamWithPossessionConfidence() << " : " << world.getTeamWithPossession();
 
-    return !world.gameState().isPlaying() && !world.gameState().isHalted()
-        && (world.getTeamWithPossession() == TeamSide::FRIENDLY || world.getTeamWithPossessionConfidence() < 10.0);
+    return !world.gameState().isStopped() && !world.gameState().isHalted()
+        && !(world.getTeamWithPossession() == TeamSide::ENEMY && world.getTeamWithPossessionConfidence() > 1.0);
 }
 
 std::vector<CircleWithColor> FreeKickPlay::getCirclesWithColorToDraw()
