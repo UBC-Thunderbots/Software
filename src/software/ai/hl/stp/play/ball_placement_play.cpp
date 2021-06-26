@@ -24,7 +24,7 @@
             {\
                 center = Point(-2, 0);\
             }\
-            if (world.gameState().getBallPlacementPoint().has_value() && world.gameState().getBallPlacementPoint()->x() < -2)\
+            if (((world.gameState().getBallPlacementPoint().has_value()) && (world.gameState().getBallPlacementPoint()->x() < -2)) || move_out)\
             {\
                 center = Point(-2, 0);\
             }\
@@ -72,6 +72,11 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     Point last_waiting_point = waiting_line_start_point + waiting_line_vector.normalize(waiting_line_vector.length() * static_cast<int>(move_tactics.size()) / static_cast<double>(move_tactics.size()));
 
     Angle angle = Angle::fromDegrees(0);
+    bool move_out = false;
+    if (world.ball().position().x() < -2)
+    {
+        move_out = true;
+    }
 
     std::optional<Robot> robot;
     if (world.gameState().getBallPlacementPoint().has_value())
@@ -127,7 +132,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
             if (robot.has_value()) {
                 align_to_ball_tactic->updateRobot(robot.value());
                 align_to_ball_tactic->updateControlParams(
-                        world.ball().position() - intersecting_dir.normalize(ROBOT_MAX_RADIUS_METERS * 2),
+                        world.ball().position() - intersecting_dir.normalize(ROBOT_MAX_RADIUS_METERS * 4),
                         intersecting_dir.orientation(), 0.0);
 
 
@@ -242,7 +247,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                                                       DribblerMode::OFF,
                                                                       BallCollisionType::AVOID,
                                                                       {AutoChipOrKickMode::OFF, 0},
-                                                                      MaxAllowedSpeedMode::TIPTOE);
+                                                                      MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
                                 CIRCLE_SHIT_YIELD({move_away_tactic});
                             }
@@ -298,7 +303,7 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                         move_passer_tactic->updateControlParams(pass.passerPoint() -
                                                                 Vector::createFromAngle(
                                                                         pass.passerOrientation()).normalize(
-                                                                        ROBOT_MAX_RADIUS_METERS * 2),
+                                                                        ROBOT_MAX_RADIUS_METERS * 4),
                                                                 pass.passerOrientation(), 0.0);
                         tactics.emplace_back(move_passer_tactic);
                     }
@@ -354,6 +359,27 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
                         }
                     }
                 } while (!place_ball_tactic->done());
+
+                if (robot.has_value()) {
+                    Point move_away_point = world.ball().position() -
+                                            Vector::createFromAngle(robot->orientation()).normalize(
+                                                    ROBOT_MAX_RADIUS_METERS * 2);
+                    if (!(contains(world.field().fieldBoundary(), move_away_point) &&
+                          !contains(world.field().fieldLines(), move_away_point))) {
+                        do {
+                            LOG (DEBUG) << "breaking away 8";
+                            if (robot.has_value()) {
+                                move_away_point = world.ball().position() -
+                                                  Vector::createFromAngle(robot->orientation()).normalize(
+                                                          ROBOT_MAX_RADIUS_METERS * 2);
+                                move_away_tactic->updateRobot(robot.value());
+                                move_away_tactic->updateControlParams(move_away_point, robot->orientation(), 0.0);
+
+                                CIRCLE_SHIT_YIELD({ move_away_tactic });
+                            }
+                        } while (!move_away_tactic->done());
+                    }
+                }
 
                 do {
                     if (distance(world.ball().position(), world.gameState().getBallPlacementPoint().value()) > 0.1) {
