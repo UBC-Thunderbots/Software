@@ -154,7 +154,7 @@ struct CreaseDefenderFSM
          * @return if the ball is threatening
          */
         const auto ball_is_threatening = [this](auto event) {
-            return contains(static_cast<Polygon>(event.common.world.field().friendlyDefenseArea()).expand(0.5),event.common.world.ball().position()) ;
+            return contains(static_cast<Polygon>(event.common.world.field().friendlyDefenseArea()).expand(1.0),event.common.world.ball().position()) ;
         };
 
         /**
@@ -184,11 +184,10 @@ struct CreaseDefenderFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *block_threat_s + update_e / block_threat,
+            *block_threat_s + update_e[!ball_is_threatening] / block_threat,
             block_threat_s + update_e[ball_is_threatening] / chip_away = chip_away_s,
             chip_away_s + update_e[ball_is_threatening] / chip_away,
             chip_away_s + update_e[!ball_is_threatening] / block_threat = X,
-            block_threat_s = X,
             X + update_e / block_threat = block_threat_s);
     }
 
