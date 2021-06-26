@@ -41,7 +41,8 @@ FullSystemGUI::FullSystemGUI(
     // https://www.qtcentre.org/threads/41128-Need-to-implement-in-place-line-edit-unable-to-get-lose-focus-of-QLineEdit
     setFocusPolicy(Qt::StrongFocus);
 
-    setupRobotStatusTable(main_widget->robot_status_table_widget);
+    // TODO (#2167)
+    //setupRobotStatusTable(main_widget->robot_status_table_widget);
     main_widget->dynamic_parameter_widget->setupParameters(config);
     // This ignores the vertical size hint so that the widget can shrink vertically
     main_widget->dynamic_parameter_widget->setSizePolicy(QSizePolicy::Preferred,
@@ -94,13 +95,14 @@ void FullSystemGUI::updatePlayInfo()
 
 void FullSystemGUI::updateSensorProto()
 {
-    while (auto sensor_msg = sensor_msg_buffer->popLeastRecentlyAddedValue())
-    {
-        for (const auto& robot_msg : sensor_msg->robot_status_msgs())
-        {
-            main_widget->robot_status_table_widget->updateRobotStatus(robot_msg);
-        }
-    }
+    // TODO (#2167)
+    // while (auto sensor_msg = sensor_msg_buffer->popLeastRecentlyAddedValue())
+    // {
+    //     for (const auto& robot_msg : sensor_msg->robot_status_msgs())
+    //     {
+    //         main_widget->robot_status_table_widget->updateRobotStatus(robot_msg);
+    //     }
+    // }
 }
 
 void FullSystemGUI::updateDrawViewArea()

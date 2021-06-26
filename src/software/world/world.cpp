@@ -14,7 +14,8 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
       // Store a small buffer of previous referee commands so we can filter out noise
       referee_command_history_(REFEREE_COMMAND_BUFFER_SIZE),
       referee_stage_history_(REFEREE_COMMAND_BUFFER_SIZE),
-      team_with_possesion_(TeamSide::ENEMY)
+      team_with_possesion_(TeamSide::ENEMY),
+      team_with_possesion_confidence_(0.25)
 {
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
@@ -161,6 +162,7 @@ const RefereeStage &World::getRefereeStage() const
 void World::setTeamWithPossession(TeamSide team_with_possesion, double confidence)
 {
     team_with_possesion_ = team_with_possesion;
+    team_with_possesion_confidence_ = confidence;
 }
 
 TeamSide World::getTeamWithPossession() const
