@@ -459,11 +459,33 @@ double getStaticPositionQuality(const Field& field, const Point& position,
     // cannot pass there
     //
     // TODO (#2167) For the virtual robocup, we inflated the defense area
-    double in_enemy_defense_area_quality =
-        1 - rectangleSigmoid(field.enemyDefenseArea().expand(
-                                 Vector(ROBOT_MAX_RADIUS_METERS * 2.3 + 0.3,
-                                        ROBOT_MAX_RADIUS_METERS * 2.3 + 0.3)),
-                             position, sig_width);
+    static std::optional<Rectangle> rect = std::nullopt;
+
+    if (!rect.has_value())
+    {
+        auto field_boundary = field.fieldBoundary();
+        auto field_lines = field.fieldLines();
+        auto field_rectangle = field.enemyDefenseArea();
+
+        double xMin             = field_rectangle.xMin();
+        double xMax             = field_rectangle.xMax();
+        double yMin             = field_rectangle.yMin();
+        double yMax             = field_rectangle.yMax();
+        double expansion_amount = ROBOT_MAX_RADIUS_METERS * 2.2 + 0.3;
+
+        xMin =
+            (xMin == field_lines.xMin()) ? field_boundary.xMin() : (xMin - expansion_amount);
+        xMax =
+            (xMax == field_lines.xMax()) ? field_boundary.xMax() : (xMax + expansion_amount);
+        yMin =
+            (yMin == field_lines.yMin()) ? field_boundary.yMin() : (yMin - expansion_amount);
+        yMax =
+            (yMax == field_lines.yMax()) ? field_boundary.yMax() : (yMax + expansion_amount);
+
+        rect = Rectangle(Point(xMin, yMin), Point(xMax, yMax));
+    }
+
+    double in_enemy_defense_area_quality = 1 - rectangleSigmoid(rect.value(), position, sig_width);
 
     return on_field_quality * near_friendly_goal_quality * in_enemy_defense_area_quality;
 }
