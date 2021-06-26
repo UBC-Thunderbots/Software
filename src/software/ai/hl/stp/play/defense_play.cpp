@@ -24,6 +24,7 @@ bool DefensePlay::isApplicable(const World &world) const
 
 bool DefensePlay::invariantHolds(const World &world) const
 {
+    LOG(INFO) << "DEFENSE PLAY CONFIDENCE: "<<world.getTeamWithPossessionConfidence();
     return world.gameState().isPlaying() &&
            world.getTeamWithPossession() == TeamSide::ENEMY &&
            world.getTeamWithPossessionConfidence() >= 1.0;
