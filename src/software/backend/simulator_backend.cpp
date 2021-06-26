@@ -79,7 +79,8 @@ void SimulatorBackend::joinMulticastChannel(int channel, const std::string& inte
 
     // For some reason
     // defending_side_output.reset(new ThreadedProtoUdpSender<DefendingSideProto>(
-    //     std::string(SIMULATOR_MULTICAST_CHANNELS[channel]), DEFENDING_SIDE_PORT, true));
+    //     std::string(SIMULATOR_MULTICAST_CHANNELS[channel]), DEFENDING_SIDE_PORT,
+    //     true));
 }
 
 // Register this backend in the genericFactory

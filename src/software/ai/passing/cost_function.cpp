@@ -34,7 +34,7 @@ double ratePass(const World& world, const Pass& pass, const Rectangle& zone,
 
     double chip_pass_rating = friendly_chip_pass_rating * enemy_chip_pass_rating;
     double kick_pass_rating = friendly_kick_pass_rating * enemy_kick_pass_rating;
-    double pass_rating      = std::max(kick_pass_rating , chip_pass_rating);
+    double pass_rating      = std::max(kick_pass_rating, chip_pass_rating);
 
     double in_region_quality = rectangleSigmoid(zone, pass.receiverPoint(), 0.2);
 
@@ -78,12 +78,12 @@ double rateZone(const World& world, const Rectangle& zone, const Point& receive_
             zone_rating += ratePassShootScore(world.field(), world.enemyTeam(), pass,
                                               passing_config);
             zone_rating += rateKickPassEnemyRisk(
-                    world.enemyTeam(), pass,
-                    Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
-                    passing_config->getEnemyProximityImportance()->value());
+                world.enemyTeam(), pass,
+                Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()),
+                passing_config->getEnemyProximityImportance()->value());
             zone_rating += rateChipPassEnemyRisk(
-                    world.enemyTeam(), pass,
-                    Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
+                world.enemyTeam(), pass,
+                Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
         }
     }
 
@@ -148,10 +148,14 @@ double ratePassShootScore(const Field& field, const Team& enemy_team, const Pass
     Angle rotation_to_shot_target_after_pass = pass.receiverOrientation().minDiff(
         (shot_target - pass.receiverPoint()).orientation());
 
-    double width = (Angle::half()-Angle::fromDegrees(ideal_max_rotation_to_shoot_degrees)).toDegrees();
+    double width =
+        (Angle::half() - Angle::fromDegrees(ideal_max_rotation_to_shoot_degrees))
+            .toDegrees();
     double required_rotation_for_shot_score =
         1 - sigmoid(rotation_to_shot_target_after_pass.abs().toDegrees(),
-                Angle::fromDegrees(ideal_max_rotation_to_shoot_degrees).toDegrees() + width/2.0, width);
+                    Angle::fromDegrees(ideal_max_rotation_to_shoot_degrees).toDegrees() +
+                        width / 2.0,
+                    width);
 
     return shot_openness_score * required_rotation_for_shot_score;
 }
@@ -291,22 +295,29 @@ double calculateKickInterceptRisk(const Robot& enemy_robot, const Pass& pass,
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
 
     // FUTURE TODO (#2167): IMPORTANT!!!
-    // Previously we were always just adding the enemy reaction time to the estimated time to destination. This meant
-    // that even if there was a robot right in front of the passer, we would think we could get the ball past them
-    // before they could intercept (which is obviously wrong). REMOVE THIS FIX, MAKE A TEST FAIL, AND ADD A PROPER REGRESSION TEST
-    const double REACTION_TIME_SCALING_FACTOR = 3.0;
-    double scaled_enemy_reaction_time_closest_pass_point = std::clamp(enemy_robot_time_to_closest_pass_point.toSeconds() /
-                        REACTION_TIME_SCALING_FACTOR, 0.0, enemy_reaction_time.toSeconds());
+    // Previously we were always just adding the enemy reaction time to the estimated time
+    // to destination. This meant that even if there was a robot right in front of the
+    // passer, we would think we could get the ball past them before they could intercept
+    // (which is obviously wrong). REMOVE THIS FIX, MAKE A TEST FAIL, AND ADD A PROPER
+    // REGRESSION TEST
+    const double REACTION_TIME_SCALING_FACTOR            = 3.0;
+    double scaled_enemy_reaction_time_closest_pass_point = std::clamp(
+        enemy_robot_time_to_closest_pass_point.toSeconds() / REACTION_TIME_SCALING_FACTOR,
+        0.0, enemy_reaction_time.toSeconds());
 
     double robot_ball_time_diff_at_closest_pass_point =
-        ((enemy_robot_time_to_closest_pass_point + Duration::fromSeconds(scaled_enemy_reaction_time_closest_pass_point)) -
+        ((enemy_robot_time_to_closest_pass_point +
+          Duration::fromSeconds(scaled_enemy_reaction_time_closest_pass_point)) -
          (ball_time_to_closest_pass_point))
-        .toSeconds();
+            .toSeconds();
 
-    double scaled_enemy_reaction_time_receive_point = std::clamp(enemy_robot_time_to_pass_receive_position.toSeconds() /
-            REACTION_TIME_SCALING_FACTOR, 0.0, enemy_reaction_time.toSeconds());
+    double scaled_enemy_reaction_time_receive_point =
+        std::clamp(enemy_robot_time_to_pass_receive_position.toSeconds() /
+                       REACTION_TIME_SCALING_FACTOR,
+                   0.0, enemy_reaction_time.toSeconds());
     double robot_ball_time_diff_at_pass_receive_point =
-        ((enemy_robot_time_to_pass_receive_position + Duration::fromSeconds(scaled_enemy_reaction_time_receive_point)) -
+        ((enemy_robot_time_to_pass_receive_position +
+          Duration::fromSeconds(scaled_enemy_reaction_time_receive_point)) -
          (ball_time_to_pass_receive_position))
             .toSeconds();
 
@@ -390,15 +401,17 @@ double rateChipPassFriendlyCapability(Team friendly_team, const Pass& pass,
     // speed through ssl_simulator_robot.cpp, so we can compute the ball hang time
     // with some basic kinematics
     Angle chip_angle = Angle::fromDegrees(ROBOT_CHIP_ANGLE_DEGREES);
-    double range = (pass.receiverPoint() - pass.passerPoint()).length() *
-                                        CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO;
-    double numerator = range * ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED;
+    double range     = (pass.receiverPoint() - pass.passerPoint()).length() *
+                   CHIP_PASS_TARGET_DISTANCE_TO_ROLL_RATIO;
+    double numerator   = range * ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED;
     double denominator = 2.0 * (chip_angle * 2.0).sin();
     double chip_speed  = std::sqrt(numerator / denominator);
-    double hang_time = (2 * Vector::createFromAngle(chip_angle).normalize(chip_speed).y())/
+    double hang_time =
+        (2 * Vector::createFromAngle(chip_angle).normalize(chip_speed).y()) /
         ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED;
 
-    const Timestamp receive_time = best_receiver->timestamp() + Duration::fromSeconds(hang_time);
+    const Timestamp receive_time =
+        best_receiver->timestamp() + Duration::fromSeconds(hang_time);
     Timestamp latest_time_to_reciever_state =
         calculateEarliestTimeRobotCanReceive(best_receiver.value(), pass);
 
@@ -444,11 +457,13 @@ double getStaticPositionQuality(const Field& field, const Point& position,
 
     // Add a strong negative weight for positions within the enemy defense area, as we
     // cannot pass there
-    // 
-    // TODO (#2167) For the virutal robocup, we inflated the defense area
+    //
+    // TODO (#2167) For the virtual robocup, we inflated the defense area
     double in_enemy_defense_area_quality =
         1 - rectangleSigmoid(field.enemyDefenseArea().expand(
-                    Vector(ROBOT_MAX_RADIUS_METERS * 2.3 + 0.3, ROBOT_MAX_RADIUS_METERS * 2.3 + 0.3)), position, sig_width);
+                                 Vector(ROBOT_MAX_RADIUS_METERS * 2.3 + 0.3,
+                                        ROBOT_MAX_RADIUS_METERS * 2.3 + 0.3)),
+                             position, sig_width);
 
     return on_field_quality * near_friendly_goal_quality * in_enemy_defense_area_quality;
 }

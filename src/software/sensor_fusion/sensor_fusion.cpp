@@ -36,7 +36,8 @@ std::optional<World> SensorFusion::getWorld() const
     {
         World new_world(*field, *ball, friendly_team, enemy_team);
         new_world.updateGameState(game_state);
-        new_world.setTeamWithPossession(team_with_possession, team_with_possession_confidence);
+        new_world.setTeamWithPossession(team_with_possession,
+                                        team_with_possession_confidence);
         if (referee_stage)
         {
             new_world.updateRefereeStage(*referee_stage);

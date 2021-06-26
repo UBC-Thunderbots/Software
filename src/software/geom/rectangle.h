@@ -119,30 +119,38 @@ class Rectangle : public ConvexPolygon
     Rectangle expand(const Vector &v) const;
 
     /**
-     * Returns the top (+y) segment represented by the top left (-x,+y) and top right (+x,+y) corners
+     * Returns the top (+y) segment represented by the top left (-x,+y) and top right
+     * (+x,+y) corners
      *
-     * @return the top (+y) segment represented by the top left (-x,+y) and top right (+x,+y) corners
+     * @return the top (+y) segment represented by the top left (-x,+y) and top right
+     * (+x,+y) corners
      */
     Segment getTop() const;
 
     /**
-     * Returns the bottom (-y) segment represented by the bottom left (-x,-y) and bottom right (+x,-y) corners
+     * Returns the bottom (-y) segment represented by the bottom left (-x,-y) and bottom
+     * right (+x,-y) corners
      *
-     * @return the bottom (-y) segment represented by the bottom left (-x,-y) and bottom right (+x,-y) corners
+     * @return the bottom (-y) segment represented by the bottom left (-x,-y) and bottom
+     * right (+x,-y) corners
      */
     Segment getBottom() const;
 
     /**
-     * Returns the left (-x) segment represented by the top left (-x,+y) and bottom left (-x,-y) corners
+     * Returns the left (-x) segment represented by the top left (-x,+y) and bottom left
+     * (-x,-y) corners
      *
-     * @return the left (-x) segment represented by the top left (-x,+y) and bottom left (-x,-y) corners
+     * @return the left (-x) segment represented by the top left (-x,+y) and bottom left
+     * (-x,-y) corners
      */
     Segment getLeft() const;
 
     /**
-     * Returns the right (+x) segment represented by the top right (+x,+y) and bottom right (+x,-y) corners
+     * Returns the right (+x) segment represented by the top right (+x,+y) and bottom
+     * right (+x,-y) corners
      *
-     * @return the right (+x) segment represented by the top right (+x,+y) and bottom right (+x,-y) corners
+     * @return the right (+x) segment represented by the top right (+x,+y) and bottom
+     * right (+x,-y) corners
      */
     Segment getRight() const;
 

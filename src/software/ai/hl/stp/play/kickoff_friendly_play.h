@@ -2,9 +2,8 @@
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
-
-#include "software/ai/passing/pass_generator.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
+#include "software/ai/passing/pass_generator.h"
 
 /**
  * A play that runs when its currently the friendly kick off,
@@ -20,13 +19,13 @@ class KickoffFriendlyPlay : public Play
     bool invariantHolds(const World &world) const override;
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
-    
+
     std::vector<CircleWithColor> getCirclesWithColorToDraw() override;
-    
+
     std::optional<Pass> best_pass;
     bool committed_to_pass = false;
-    
-    private :
-     std::shared_ptr<ReceiverTactic> receiver;
-     static double constexpr BETTER_PASS_RATING_THRESHOLD = 0.1;
+
+   private:
+    std::shared_ptr<ReceiverTactic> receiver;
+    static double constexpr BETTER_PASS_RATING_THRESHOLD = 0.1;
 };

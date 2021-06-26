@@ -17,7 +17,7 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
 {
     std::vector<ObstaclePtr> obstacles;
     Field field = world.field();
-    
+
     switch (motion_constraint)
     {
         case MotionConstraint::CENTER_CIRCLE:
@@ -70,18 +70,15 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
             break;
         case MotionConstraint::ENEMY_HALF_EXCEPT_CENTRE_CIRCLE:
             double larger_radius = field.centerCircleRadius() + 0.2;
-            Polygon centre_circle_and_enemy_half = 
-                Polygon({ Point(0, field.yLength() / 2),
-                 Point(0, larger_radius),
-                 Point(larger_radius, larger_radius),
-                 Point(larger_radius, -larger_radius),
-                 Point(0, -larger_radius),
-                 Point(0, -field.yLength() / 2),
-                 field.enemyCornerNeg(),
-                 field.enemyCornerPos() });
+            Polygon centre_circle_and_enemy_half =
+                Polygon({Point(0, field.yLength() / 2), Point(0, larger_radius),
+                         Point(larger_radius, larger_radius),
+                         Point(larger_radius, -larger_radius), Point(0, -larger_radius),
+                         Point(0, -field.yLength() / 2), field.enemyCornerNeg(),
+                         field.enemyCornerPos()});
             obstacles.push_back(createFromShape(centre_circle_and_enemy_half));
-			obstacles.push_back(createFromShape(Circle(world.ball().position(),
-                                                       ROBOT_MAX_RADIUS_METERS / 1.3)));
+            obstacles.push_back(createFromShape(
+                Circle(world.ball().position(), ROBOT_MAX_RADIUS_METERS / 1.3)));
             break;
     }
 

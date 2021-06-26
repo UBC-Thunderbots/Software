@@ -56,7 +56,7 @@ class FreeKickPlay : public Play
     void performPassStage(
         TacticCoroutine::push_type &yield,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-        const PassWithRating& best_pass_and_score_so_far, const World &world);
+        const PassWithRating &best_pass_and_score_so_far, const World &world);
 
     /**
      * Tries to find a good pass on the field. This function starts with a high threshold

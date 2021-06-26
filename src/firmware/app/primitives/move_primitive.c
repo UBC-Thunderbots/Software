@@ -105,9 +105,9 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
     // Clamp num elements between 3 (minimum number of trajectory elements) and
     // TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
     const unsigned int num_elements = (unsigned int)fmaxf(
-		    fminf((estimated_time_delta * CONTROL_LOOP_HZ / NUM_TICKS_PER_TRAJECTORY_ELEMENT),
-			    TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS),
-		    10);
+        fminf((estimated_time_delta * CONTROL_LOOP_HZ / NUM_TICKS_PER_TRAJECTORY_ELEMENT),
+              TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS),
+        10);
 
     // Plan a trajectory to move to the target position/orientation
     FirmwareRobotPathParameters_t path_parameters = {

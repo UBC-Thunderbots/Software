@@ -15,9 +15,9 @@ std::vector<CircleWithColor> CalibrationPlay::getCirclesWithColorToDraw()
 {
     if (circle_to_draw.has_value())
     {
-        return {
-            std::make_pair<Circle, std::string>(Circle(circle_to_draw.value().origin(), circle_to_draw.value().radius()), "blue")
-        };
+        return {std::make_pair<Circle, std::string>(
+            Circle(circle_to_draw.value().origin(), circle_to_draw.value().radius()),
+            "blue")};
     }
     return {};
 }
@@ -39,29 +39,30 @@ void CalibrationPlay::getNextTactics(TacticCoroutine::push_type &yield,
 {
     LOG(INFO) << "Starting kick calibration";
 
-    Point start_point = Point(0,0);
+    Point start_point = Point(0, 0);
 
     Angle angle_to_face = Angle::fromDegrees(0);
-    Angle angle_to_add = Angle::fromDegrees(45);
+    Angle angle_to_add  = Angle::fromDegrees(45);
 
     for (int k = 0; k < 8; k++)
     {
         auto dribble_tactic = std::make_shared<DribbleTactic>();
-        auto kick_tactic = std::make_shared<KickTactic>(false);
+        auto kick_tactic    = std::make_shared<KickTactic>(false);
 
-        dribble_tactic->updateControlParams(start_point, angle_to_face + k * angle_to_add, true);
+        dribble_tactic->updateControlParams(start_point, angle_to_face + k * angle_to_add,
+                                            true);
 
-        do 
+        do
         {
             yield({{dribble_tactic}});
-        } while(!dribble_tactic->done());
+        } while (!dribble_tactic->done());
 
-        kick_tactic->updateControlParams(
-                start_point, angle_to_face + k * angle_to_add, 2.0);
-        do 
+        kick_tactic->updateControlParams(start_point, angle_to_face + k * angle_to_add,
+                                         2.0);
+        do
         {
             yield({{kick_tactic}});
-        } while(!kick_tactic->done());
+        } while (!kick_tactic->done());
     }
 }
 

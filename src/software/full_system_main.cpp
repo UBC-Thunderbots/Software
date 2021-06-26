@@ -151,8 +151,7 @@ int main(int argc, char** argv)
 
             // log incoming SensorMsg
             auto sensor_msg_logger = std::make_shared<ProtoLogger<SensorProto>>(
-                proto_log_output_dir / "Backend_SensorProto",
-                10000,
+                proto_log_output_dir / "Backend_SensorProto", 10000,
                 [](const SensorProto& lhs, const SensorProto& rhs) {
                     return lhs.backend_received_time().epoch_timestamp_seconds() <
                            rhs.backend_received_time().epoch_timestamp_seconds();
@@ -178,8 +177,7 @@ int main(int argc, char** argv)
 
             auto vision_logger =
                 std::make_shared<ProtoLogger<SSLProto::SSL_WrapperPacket>>(
-                    proto_log_output_dir / "SensorFusion_SSL_WrapperPacket",
-                    10000);
+                    proto_log_output_dir / "SensorFusion_SSL_WrapperPacket", 10000);
             auto world_to_vision_adapter = std::make_shared<
                 ObserverSubjectAdapter<World, SSLProto::SSL_WrapperPacket>>(
                 world_to_ssl_wrapper_conversion_fn);

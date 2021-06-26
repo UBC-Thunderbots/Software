@@ -9,8 +9,8 @@
 #include "software/ai/intent/intent.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/ai/passing/pass.h"
-#include "software/logger/logger.h"
 #include "software/geom/algorithms/closest_point.h"
+#include "software/logger/logger.h"
 
 struct ReceiverFSM
 {
@@ -34,7 +34,7 @@ struct ReceiverFSM
      * @param pass_start_time: updated by the play when the pass starts
      *
      */
-    explicit ReceiverFSM(const std::shared_ptr<Timestamp> &pass_start_timestamp)
+    explicit ReceiverFSM(const std::shared_ptr<Timestamp>& pass_start_timestamp)
         : pass_start_timestamp(pass_start_timestamp)
     {
     }
@@ -104,7 +104,7 @@ struct ReceiverFSM
     static Shot getOneTouchShotPositionAndOrientation(const Robot& robot,
                                                       const Ball& ball,
                                                       const Point& best_shot_target,
-                                                     const Pass pass)
+                                                      const Pass pass)
     {
         double dist_to_ball_in_dribbler =
             DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS;
@@ -118,8 +118,7 @@ struct ReceiverFSM
         {
             closest_ball_pos =
                 closestPoint(ball_contact_point,
-                             Line(ball.position(), 
-                                  ball.position() + ball.velocity()));
+                             Line(ball.position(), ball.position() + ball.velocity()));
         }
         Ray shot(closest_ball_pos, best_shot_target - closest_ball_pos);
 
@@ -194,9 +193,9 @@ struct ReceiverFSM
     {
         using namespace boost::sml;
 
-        const auto receive_s   = state<ReceiveAndDribbleState>;
-        const auto onetouch_s  = state<OneTouchDribbleState>;
-        const auto update_e    = event<Update>;
+        const auto receive_s          = state<ReceiveAndDribbleState>;
+        const auto onetouch_s         = state<OneTouchDribbleState>;
+        const auto update_e           = event<Update>;
         const auto waiting_for_pass_s = state<WaitingForPassState>;
 
         /**
@@ -232,9 +231,10 @@ struct ReceiverFSM
                 {
                     event.common.set_intent(std::make_unique<MoveIntent>(
                         event.common.robot.id(), one_touch.getPointToShootAt(),
-			            one_touch.getOpenAngle(), 0, DribblerMode::OFF,
+                        one_touch.getOpenAngle(), 0, DribblerMode::OFF,
                         BallCollisionType::ALLOW,
-			            AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, BALL_MAX_SPEED_METERS_PER_SECOND},
+                        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                                       BALL_MAX_SPEED_METERS_PER_SECOND},
                         MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
                         event.common.robot.robotConstants()));
                 }
@@ -304,7 +304,7 @@ struct ReceiverFSM
          */
         const auto pass_started = [](auto event) {
             return event.common.world.ball().hasBallBeenKicked(
-                    event.control_params.pass->passerOrientation());
+                event.control_params.pass->passerOrientation());
         };
 
         /**
@@ -317,7 +317,8 @@ struct ReceiverFSM
         const auto pass_finished = [](auto event) {
             // We tolerate imperfect passes that hit the edges of the robot,
             // so that we can quickly transition out and grab the ball.
-            return event.common.robot.isNearDribbler(event.common.world.ball().position());
+            return event.common.robot.isNearDribbler(
+                event.common.world.ball().position());
         };
 
         const auto stray_pass = [](auto event) {
@@ -341,15 +342,18 @@ struct ReceiverFSM
         };
 
         return make_transition_table(
-                // src_state + event [guard] / action = dest_state
-                *waiting_for_pass_s + update_e[!pass_started] / update_receive,
-                waiting_for_pass_s + update_e[pass_started && onetouch_possible] / update_receive = onetouch_s,
-                waiting_for_pass_s + update_e[pass_started && !onetouch_possible] / update_onetouch  = receive_s,
-                receive_s + update_e[!pass_finished] / adjust_receive,
-                onetouch_s + update_e[!pass_finished && !stray_pass] / update_onetouch,
-                onetouch_s + update_e[!pass_finished && stray_pass] / adjust_receive = receive_s,
-                receive_s + update_e[pass_finished] / adjust_receive = X,
-                onetouch_s + update_e[pass_finished] / update_onetouch = X);
+            // src_state + event [guard] / action = dest_state
+            *waiting_for_pass_s + update_e[!pass_started] / update_receive,
+            waiting_for_pass_s +
+                update_e[pass_started && onetouch_possible] / update_receive = onetouch_s,
+            waiting_for_pass_s + update_e[pass_started && !onetouch_possible] /
+                                     update_onetouch = receive_s,
+            receive_s + update_e[!pass_finished] / adjust_receive,
+            onetouch_s + update_e[!pass_finished && !stray_pass] / update_onetouch,
+            onetouch_s + update_e[!pass_finished && stray_pass] / adjust_receive =
+                receive_s,
+            receive_s + update_e[pass_finished] / adjust_receive   = X,
+            onetouch_s + update_e[pass_finished] / update_onetouch = X);
     }
 
    private:
