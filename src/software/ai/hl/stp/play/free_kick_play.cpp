@@ -42,7 +42,7 @@ bool FreeKickPlay::invariantHolds(const World &world) const
 
     bool invariant = (
             receiver_done || world.gameState().isHalted() ||
-            world.gameState().isStopped()|| !world.gameState().isOurFreeKick());
+            world.gameState().isStopped());
 
     return !invariant;
 }

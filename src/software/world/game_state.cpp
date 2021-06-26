@@ -287,6 +287,7 @@ const RefereeCommand& GameState::getRefereeCommand() const
 void GameState::setRestartCompleted()
 {
     play_state_     = PLAYING;
+    restart_reason_ = NONE;
 }
 
 bool GameState::operator==(const GameState& other) const
