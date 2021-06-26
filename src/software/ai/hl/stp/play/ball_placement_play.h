@@ -17,6 +17,4 @@ class BallPlacementPlay : public Play
     bool invariantHolds(const World &world) const override;
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
-
-    TacticVector circleCenter(std::vector<std::shared_ptr<MoveTactic>> move_tactics, const Point& rotating_point, Angle angle, TacticVector current);
 };
