@@ -8,7 +8,7 @@
 #include "shared/constants.h"
 #include "shared/proto/tbots_software_msgs.nanopb.h"
 
-#define ROBOT_ID (1)
+#define ROBOT_ID (9)
 
 static FirmwareWorld_t* g_world;
 static PrimitiveManager_t* g_primitive_manager;

@@ -35,6 +35,10 @@ typedef struct MoveState
     // The maximum speed of the move primitive
     float max_speed_m_per_s;
 
+    TbotsProto_MovePrimitive prim_msg;
+
+    float threshold_increment;
+
 } MoveState_t;
 DEFINE_PRIMITIVE_STATE_CREATE_AND_DESTROY_FUNCTIONS(MoveState_t);
 
@@ -56,28 +60,16 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
          }
          case TbotsProto_MovePrimitive_AutoChipOrKick_autokick_speed_m_per_s_tag:
          {
-             FirmwareBall_t* ball = app_firmware_world_getBall(world);
-
-             float ball_x = app_firmware_ball_getPositionX(ball);
-             float ball_y = app_firmware_ball_getPositionY(ball);
-
-             float robot_x = app_firmware_robot_getPositionX(robot);
-             float robot_y = app_firmware_robot_getPositionY(robot);
-
-             static const float RADIUS_INFLATED = 0.090f;
-
-             if (ball_x < robot_x + RADIUS_INFLATED && ball_x > robot_x - RADIUS_INFLATED &&
-                ball_y < robot_y + RADIUS_INFLATED && ball_y > robot_y - RADIUS_INFLATED)
-             {
                 TLOG_INFO("Kick! Starting cooldown");
                 app_chicker_kick(chicker, 1.0);
                 TLOG_INFO("cooldown complete");
-             }
          }
      }
 
     /* Handle robot movement */
     MoveState_t* state = (MoveState_t*)void_state_ptr;
+    state->prim_msg = prim_msg;
+    state->threshold_increment = 0;
 
     // parameters from the primitive message
     const float destination_x           = prim_msg.destination.x_meters;
