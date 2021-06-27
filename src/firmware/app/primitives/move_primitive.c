@@ -64,7 +64,7 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
              float robot_x = app_firmware_robot_getPositionX(robot);
              float robot_y = app_firmware_robot_getPositionY(robot);
 
-             static const float RADIUS_INFLATED = 0.084f;
+             static const float RADIUS_INFLATED = 0.090f;
 
              if (ball_x < robot_x + RADIUS_INFLATED && ball_x > robot_x - RADIUS_INFLATED &&
                 ball_y < robot_y + RADIUS_INFLATED && ball_y > robot_y - RADIUS_INFLATED)
