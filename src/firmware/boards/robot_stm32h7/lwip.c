@@ -28,7 +28,6 @@
 #include <string.h>
 
 /* USER CODE BEGIN 0 */
-
 /* USER CODE END 0 */
 /* Private function prototypes -----------------------------------------------*/
 static void ethernet_link_status_updated(struct netif *netif);
@@ -120,6 +119,7 @@ static void ethernet_link_status_updated(struct netif *netif)
   else /* netif is down */
   {
 /* USER CODE BEGIN 6 */
+    HAL_NVIC_SystemReset();
 /* USER CODE END 6 */
   }
 }

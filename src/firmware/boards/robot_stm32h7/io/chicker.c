@@ -15,7 +15,7 @@
 // The number of ticks for which no device should be activated because it would interfere
 // with an ongoing fire.
 
-#define COLLIDE_TIMEOUT 1000u
+#define COLLIDE_TIMEOUT 500u
 //#define COLLIDE_TIMEOUT 5000000U
 
 // TODO (new): make sure there's no datarace on this variable
@@ -162,6 +162,7 @@ static void chicker_fire(ChickerDevice_t device, unsigned int width)
     // We can only fire if we will not interfere with a previous fire.
     if (collide_timeout != 0)
     {
+        TLOG_WARNING("not kicking, u sneaky bitch");
         return;
     }
 

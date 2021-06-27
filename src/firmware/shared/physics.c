@@ -36,10 +36,10 @@ static const float shared_physics_local_vel_to_wheels_matrix[3][4] =
 /*//*/
 /*// phi is 57.95 deg*/
 /*// theta is 43.96*/
-static const float shared_physics_wheels_to_local_vel_matrix_transpose[3][4] = 
-    {{-0.5308f, -0.5308f, 0.7198f, 0.7198f},
-     {0.8475f, -0.8475f, -0.6942f, 0.6942f},
-     {1.0000f, 1.0000f, 1.0000f, 1.0000f}};
+static const float shared_physics_wheels_to_local_vel_matrix_transpose[3][4] = {
+    {-0.5308f, -0.7198f, 0.7198f, 0.5308f},
+    {0.8475f, -0.6942f, -0.6942f, 0.8475f},
+    {1.0000f, 1.0000f, 1.0000f, 1.0000f}};
 
 void shared_physics_speed4ToSpeed3(const float speed4[4], float speed3[3],
                                    float front_wheel_angle_deg,

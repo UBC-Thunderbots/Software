@@ -66,13 +66,13 @@ void io_primitive_executor_task(void* argument)
         uint32_t tick_end = osKernelGetTickCount();
 
         // TODO pull 5 into a constant
-        if (tick_end - tick_start > 5)
+        if (tick_end - tick_start > 1)
         {
             TLOG_WARNING("Primitive executor falling behind!! %d", tick_end - tick_start);
         }
         else
         {
-            osDelay(5 - (tick_end - tick_start));
+            osDelay(1);
         }
     }
 }
