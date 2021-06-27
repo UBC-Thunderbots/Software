@@ -88,8 +88,12 @@ ReceiveProtoT ProtoUdpClient<SendProtoT, ReceiveProtoT>::receiveProto()
 
     if (num_bytes_received > 0)
     {
-        packet_data.ParseFromArray(raw_received_data_.data(),
-                                   static_cast<int>(num_bytes_received));
+        bool success = packet_data.ParseFromArray(raw_received_data_.data(), static_cast<int>(num_bytes_received));
+        if (!success) {
+            LOG(WARNING) << "Failed to parse " << TYPENAME(ReceiveProtoT)
+                         << " from received data";
+            return ReceiveProtoT();
+        }
     }
     else
     {
