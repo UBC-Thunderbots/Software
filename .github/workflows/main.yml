@@ -6,8 +6,10 @@ on:
     branches: [ master, robocup_2021 ]
   pull_request:
     # TODO (2167): remove robocup_2021
-    branches: [ master, robocup_2021 ]
-
+    branches: 
+      - '**'
+      
+    
 jobs:
   formatting-check:
     name: Formatting Check
@@ -156,4 +158,31 @@ jobs:
           bazel test -c dbg  \
             --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
             //shared/parameter/...
+            
+            
+  build-full-system:
+    name: Build and upload full_system
+    runs-on: ubuntu-18.04
+    steps:
+      # checks-out the repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
+        
+      - name: Environment Setup
+        run: |
+          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+          
+      - name: Build full_system
+        run: |
+          cd src
+          bazel build //software:full_system
+          
+      - name: Upload full_system binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: full_system
+          path: |
+            src/bazel-out/k8-fastbuild/bin/software/full_system
+
+
+          
 
