@@ -93,6 +93,7 @@ class LoggerSingleton
             &LogRotateWithFilter::save);
 
         g3::initializeLogging(logWorker.get());
+        g3::log_levels::setHighest(INFO);
     }
 
     // levels is this vector are filtered out of the filtered log rotate sink
