@@ -176,30 +176,32 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
     };
     threaded_simulator.addYellowRobots(yellow_robot_states);
 
-    threaded_simulator.setBlueRobotPrimitive(
-        1, createNanoPbPrimitive(*createMovePrimitive(
-               Point(-1, -1), 0.0, Angle::zero(), DribblerMode::OFF,
-               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-               robot_constants)));
-    threaded_simulator.setBlueRobotPrimitive(
-        2, createNanoPbPrimitive(*createMovePrimitive(
-               Point(-3, 0), 0.0, Angle::half(), DribblerMode::OFF,
-               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-               robot_constants)));
-
-    threaded_simulator.setYellowRobotPrimitive(
-        1, createNanoPbPrimitive(*createMovePrimitive(
-               Point(1, 1), 0.0, Angle::zero(), DribblerMode::OFF,
-               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-               robot_constants)));
-    threaded_simulator.setYellowRobotPrimitive(
-        2, createNanoPbPrimitive(*createMovePrimitive(
-               Point(3, -2), 0.0, Angle::zero(), DribblerMode::OFF,
-               {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-               robot_constants)));
-
     std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+    for (unsigned int i = 0; i < 30; i++)
+    {
+        threaded_simulator.setBlueRobotPrimitive(
+            1, createNanoPbPrimitive(*createMovePrimitive(
+                   Point(-1, -1), 0.0, Angle::zero(), DribblerMode::OFF,
+                   {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+                   robot_constants)));
+        threaded_simulator.setBlueRobotPrimitive(
+            2, createNanoPbPrimitive(*createMovePrimitive(
+                   Point(-3, 0), 0.0, Angle::half(), DribblerMode::OFF,
+                   {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+                   robot_constants)));
+
+        threaded_simulator.setYellowRobotPrimitive(
+            1, createNanoPbPrimitive(*createMovePrimitive(
+                   Point(1, 1), 0.0, Angle::zero(), DribblerMode::OFF,
+                   {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+                   robot_constants)));
+        threaded_simulator.setYellowRobotPrimitive(
+            2, createNanoPbPrimitive(*createMovePrimitive(
+                   Point(3, -2), 0.0, Angle::zero(), DribblerMode::OFF,
+                   {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+                   robot_constants)));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
     threaded_simulator.stopSimulation();
 
     // TODO: These tests are currently very lenient, and don't test final velocities.

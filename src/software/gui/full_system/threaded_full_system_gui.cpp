@@ -70,6 +70,7 @@ void ThreadedFullSystemGUI::createAndRunFullSystemGUI()
         world_draw_functions_buffer, ai_draw_functions_buffer, play_info_buffer,
         sensor_msg_buffer, view_area_buffer, worlds_received_per_second_buffer,
         primitives_sent_per_second_buffer, mutable_thunderbots_config);
+    full_system_gui->setWindowState(Qt::WindowMaximized);
     full_system_gui->show();
 
     // Run the QApplication and all windows / widgets. This function will block
