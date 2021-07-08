@@ -115,10 +115,10 @@ jobs:
         # Run Simulated Tests a second time to check for failures
         run: |
           cd src
-          bazel test --show_timestamps   \
+          bazel test --show_timestamps       \
+            //software:full_system           \
             //software/simulated_tests/...   \
-            //software/ai/hl/stp/play/...    \
-            //software/ai/hl/stp/tactic/... 
+            //software/ai/hl/...
 
             
   memory-leak-checks:
