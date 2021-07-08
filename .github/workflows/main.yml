@@ -39,8 +39,7 @@ jobs:
           bazel test --show_timestamps       \
             -- //... -//software:full_system \
             -//software/simulated_tests/...  \
-            -//software/ai/hl/stp/play/...   \
-            -//software/ai/hl/stp/tactic/... \
+            -//software/ai/...
             -//firmware/boards/estop_arduino_uno/... # Arduino requires setup_firmware 
              
   firmware-tests:
@@ -102,8 +101,7 @@ jobs:
           bazel test --show_timestamps       \
             //software:full_system           \
             //software/simulated_tests/...   \
-            //software/ai/hl/stp/play/...    \
-            //software/ai/hl/stp/tactic/... 
+            //software/ai/...
 
       - name: Upload simulated test artifacts
         uses: actions/upload-artifact@v2
