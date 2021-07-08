@@ -36,9 +36,10 @@ jobs:
       - name: Software Test
         run: |
           cd src
-          bazel test --show_timestamps\
-            -- //... -//software/simulated_tests/... \
-            -//software/ai/hl/stp/play/... \
+          bazel test --show_timestamps       \
+            -- //... -//software:full_system \
+            -//software/simulated_tests/...  \
+            -//software/ai/hl/stp/play/...   \
             -//software/ai/hl/stp/tactic/... \
             -//firmware/boards/estop_arduino_uno/... # Arduino requires setup_firmware 
              
@@ -58,10 +59,9 @@ jobs:
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
           "${GITHUB_WORKSPACE}"/environment_setup/setup_firmware.sh
 
-          # TODO (#2144): renable STM32CubeMX Code Generation check
-          #      - name: STM32CubeMX Code Generation
-          #        run: |
-          #          "${GITHUB_WORKSPACE}"/.github/check_cubemx_ci.sh
+      - name: STM32CubeMX Code Generation
+        run: |
+          "${GITHUB_WORKSPACE}"/.github/check_cubemx_ci.sh
 
       - name: Arduino Uno Firmware Build
         run: |
@@ -99,7 +99,8 @@ jobs:
         continue-on-error: true
         run: |
           cd src
-          bazel test --show_timestamps   \
+          bazel test --show_timestamps       \
+            //software:full_system           \
             //software/simulated_tests/...   \
             //software/ai/hl/stp/play/...    \
             //software/ai/hl/stp/tactic/... 
