@@ -2,7 +2,6 @@
 
 #include <boost/bind.hpp>
 #include <boost/coroutine2/all.hpp>
-#include <memory>
 #include <vector>
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
