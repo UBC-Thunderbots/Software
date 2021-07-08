@@ -13,11 +13,6 @@ cpp_dynamic_parameters(
 )
 
 cc_library(
-    name = "c_configs",
-    hdrs = [":c_params"],
-)
-
-cc_library(
     name = "cpp_configs",
     srcs = [
         ":cpp_params",
@@ -33,24 +28,6 @@ cc_library(
         "//software/util/design_patterns:generic_factory",
         "//software/world:game_state",
         "//software/world:team_colour",
-    ],
-)
-
-cc_test(
-    name = "c_config_test",
-    srcs = [
-        "config_test.cpp",
-    ],
-    data = [
-        "c_parameters.h",
-        "//shared/parameter/config_definitions:parameter_configs",
-    ],
-    deps = [
-        "//shared/parameter:c_configs",
-        "//shared/test_util:tbots_gtest_main",
-        "@boost//:filesystem",
-        "@libclang",
-        "@yaml-cpp",
     ],
 )
 

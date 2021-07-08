@@ -48,4 +48,3 @@ struct AutoChipOrKick
  * TIPTOE maximum speed allowed that does not bump the ball to kick speed
  */
 MAKE_ENUM(MaxAllowedSpeedMode, PHYSICAL_LIMIT, STOP_COMMAND, TIPTOE);
-

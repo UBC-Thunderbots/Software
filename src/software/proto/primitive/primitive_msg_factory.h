@@ -2,10 +2,10 @@
 
 #include "shared/constants.h"
 #include "shared/proto/primitive.pb.h"
-#include "software/proto/primitive/primitive_types.h"
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"
 #include "software/geom/point.h"
+#include "software/proto/primitive/primitive_types.h"
 #include "software/util/make_enum/make_enum.h"
 
 /**
