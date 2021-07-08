@@ -257,7 +257,6 @@ class CppWriter(object):
             source_file.write(
                 CONFIG_CPP.format(
                     autogen_warning=AUTOGEN_WARNING,
-                    # TODO: this shouldn't be hardcoded
                     declaration_header=INCLUDE_HEADER.format(
                         header_file=declaration_header
                     ),

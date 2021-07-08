@@ -1,4 +1,4 @@
-load(":parameter.bzl", "c_dynamic_parameters", "cpp_dynamic_parameters")
+load(":parameter.bzl", "cpp_dynamic_parameters")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -10,12 +10,6 @@ cpp_dynamic_parameters(
     ],
     generated_parameter_header = "cpp_dynamic_parameters.h",
     generated_parameter_source = "cpp_dynamic_parameters.cpp",
-)
-
-c_dynamic_parameters(
-    name = "c_params",
-    generated_parameter_header = "c_parameters.h",
-    generated_parameter_source = "c_parameters.c",
 )
 
 cc_library(

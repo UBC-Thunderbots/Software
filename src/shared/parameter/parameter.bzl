@@ -5,7 +5,6 @@ def _generate_dynamic_parameters_impl(ctx):
     args = ctx.actions.args()
     args.add("--output_header", output_header)
     args.add("--output_source", output_source)
-    args.add("-{}".format(ctx.attr.output_language))
 
     # Retrieve paths to the header files directly listed in each enum_dep
     # These paths are relative to the bazel WORKSPACE root
@@ -33,20 +32,8 @@ generate_dynamic_parameters = rule(
         ),
         "generated_parameter_header": attr.output(mandatory = True),
         "generated_parameter_source": attr.output(mandatory = True),
-        "output_language": attr.string(
-            mandatory = True,
-            values = ["c", "cpp"],
-        ),
     },
 )
-
-def c_dynamic_parameters(name, generated_parameter_header, generated_parameter_source):
-    generate_dynamic_parameters(
-        name = name,
-        generated_parameter_header = generated_parameter_header,
-        generated_parameter_source = generated_parameter_source,
-        output_language = "c",
-    )
 
 def cpp_dynamic_parameters(name, generated_parameter_header, generated_parameter_source, enum_deps = []):
     generate_dynamic_parameters(
@@ -54,5 +41,4 @@ def cpp_dynamic_parameters(name, generated_parameter_header, generated_parameter
         generated_parameter_header = generated_parameter_header,
         generated_parameter_source = generated_parameter_source,
         enum_deps = enum_deps,
-        output_language = "cpp",
     )
