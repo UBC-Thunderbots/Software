@@ -25,6 +25,9 @@ cc_library(
 
 cc_library(
     name = "cpp_configs",
+    srcs = [
+        ":cpp_params",
+    ],
     hdrs = [
         ":cpp_params",
     ],

@@ -20,17 +20,19 @@ PARAMETER_TEST_CONFIG_PATH = Path(
 )
 
 
-def generate_dynamic_parameters(output_header, output_source, include_headers, generate_for_cpp):
+def generate_dynamic_parameters(
+    output_header, output_source, include_headers, generate_for_cpp
+):
     if generate_for_cpp:
 
         yamls = list(PARAMETER_CONFIG_PATH.glob("*.yaml"))
         config_metadata = ConfigYamlLoader.get_config_metadata(yamls)
 
-        CppWriter.write_config_metadata(
+        CppWriter.write_config_metadata_header(
             output_header, include_headers, "ThunderbotsConfig", config_metadata
         )
-        CppWriter.write_config_metadata(
-            output_source, include_headers, "ThunderbotsConfig", config_metadata
+        CppWriter.write_config_metadata_source(
+            output_source, output_header, "ThunderbotsConfig", config_metadata
         )
     else:
         # Genernate this properly as part of https://github.com/UBC-Thunderbots/Software/issues/1731
@@ -83,7 +85,10 @@ def main():
 
     args = parser.parse_args()
     generate_dynamic_parameters(
-        args.output_header, args.output_source, args.include_headers, args.generate_for_cpp
+        args.output_header,
+        args.output_source,
+        args.include_headers,
+        args.generate_for_cpp,
     )
 
 
