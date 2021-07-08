@@ -69,7 +69,7 @@ INSTANTIATE_TEST_CASE_P(
         // enemy goal blocked by enemy robots with enemy threat left
         std::make_tuple(BallState(Point(2, 1), Vector()), Point(1, 1),
                         TestUtil::createStationaryRobotStatesWithId(
-                            {Point(1.6, 1), Point(3, 0.4), Point(3, 0.8), Point(3.1, 0.6),
+                            {Point(1.5, 1), Point(3, 0.4), Point(3, 0.8), Point(3.1, 0.6),
                              Point(3.1, 1), Point(4.2, 1.2)}),
                         Angle::fromDegrees(210)),
         // small opening in enemy formation
