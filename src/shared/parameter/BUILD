@@ -8,12 +8,14 @@ cpp_dynamic_parameters(
         "//software/world:game_state",
         "//software/world:team_colour",
     ],
-    generated_parameter_file = "cpp_dynamic_parameters.h",
+    generated_parameter_header = "cpp_dynamic_parameters.h",
+    generated_parameter_source = "cpp_dynamic_parameters.cpp",
 )
 
 c_dynamic_parameters(
     name = "c_params",
-    generated_parameter_file = "c_parameters.h",
+    generated_parameter_header = "c_parameters.h",
+    generated_parameter_source = "c_parameters.c",
 )
 
 cc_library(
