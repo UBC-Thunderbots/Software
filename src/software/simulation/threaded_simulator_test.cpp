@@ -146,7 +146,7 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
     threaded_simulator.startSimulation();
     // yield and sleep to give the simulation thread the best chance of running
     std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
     // Simulate multiple robots with primitives to sanity check that everything is
     // connected properly and we can properly simulate multiple instances of the robot
@@ -192,7 +192,7 @@ TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running
                {AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0)));
 
     std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     threaded_simulator.stopSimulation();
 
     // TODO: These tests are currently very lenient, and don't test final velocities.
