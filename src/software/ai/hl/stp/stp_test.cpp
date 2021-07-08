@@ -160,7 +160,7 @@ TEST_F(STPTest, test_fallback_play_assigned_when_no_new_plays_are_applicable)
     EXPECT_EQ(*(stp.getCurrentPlayName()), TYPENAME(HaltTestPlay));
 }
 
-TEST_F(STPTest, test_get_play_info)
+TEST_F(STPTest, DISABLED_test_get_play_info)
 {
     // Only the HaltTestPlay should be applicable
     world = ::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));

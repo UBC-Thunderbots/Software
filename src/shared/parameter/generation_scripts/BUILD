@@ -6,12 +6,10 @@ package(default_visibility = ["//visibility:private"])
 py_binary(
     name = "generate_dynamic_parameters",
     srcs = [
-        ":c_config.py",
-        ":c_parameter.py",
-        ":c_writer.py",
         ":case_conversion.py",
-        ":cpp_config.py",
+        ":cpp_header_config.py",
         ":cpp_parameter.py",
+        ":cpp_source_config.py",
         ":cpp_writer.py",
         ":generate_dynamic_parameters.py",
         ":type_map.py",

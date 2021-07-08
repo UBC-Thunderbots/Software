@@ -3,12 +3,11 @@
 #include <set>
 #include <string>
 
-#include "shared/proto/primitive.pb.h"
 #include "software/ai/intent/intent_visitor.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
-#include "software/proto/primitive/primitive_msg_factory.h"
+#include "software/proto/primitive/primitive_types.h"
 
 MAKE_ENUM(BallCollisionType, AVOID, ALLOW);
 
