@@ -516,7 +516,13 @@ TEST_F(PassingEvaluationTest, ratePassEnemyRisk_no_enemy_robots)
     Team enemy_team(Duration::fromSeconds(10));
     Pass pass({0, 0}, {10, 10}, 3);
 
-    double pass_rating = ratePassEnemyRisk(enemy_team, pass, passing_config);
+    auto enemy_reaction_time =
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
+    auto enemy_proximity_importance =
+        passing_config->getEnemyProximityImportance()->value();
+
+    double pass_rating = ratePassEnemyRisk(enemy_team, pass, enemy_reaction_time,
+                                           enemy_proximity_importance);
     EXPECT_EQ(1, pass_rating);
 }
 
@@ -531,7 +537,13 @@ TEST_F(PassingEvaluationTest, ratePassEnemyRisk_no_robots_near)
     });
     Pass pass({0, 0}, {10, 10}, 4);
 
-    double pass_rating = ratePassEnemyRisk(enemy_team, pass, passing_config);
+    auto enemy_reaction_time =
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
+    auto enemy_proximity_importance =
+        passing_config->getEnemyProximityImportance()->value();
+
+    double pass_rating = ratePassEnemyRisk(enemy_team, pass, enemy_reaction_time,
+                                           enemy_proximity_importance);
     EXPECT_GE(pass_rating, 0.9);
     EXPECT_LE(pass_rating, 1.0);
 }
@@ -543,7 +555,13 @@ TEST_F(PassingEvaluationTest, ratePassEnemyRisk_one_robot_near_receiver_point)
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0))});
     Pass pass({0, 0}, {10, 10}, 3);
 
-    double pass_rating = ratePassEnemyRisk(enemy_team, pass, passing_config);
+    auto enemy_reaction_time =
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
+    auto enemy_proximity_importance =
+        passing_config->getEnemyProximityImportance()->value();
+
+    double pass_rating = ratePassEnemyRisk(enemy_team, pass, enemy_reaction_time,
+                                           enemy_proximity_importance);
     EXPECT_LE(0, pass_rating);
     EXPECT_GE(0.1, pass_rating);
 }
@@ -555,7 +573,13 @@ TEST_F(PassingEvaluationTest, ratePassEnemyRisk_robot_near_center_of_pass)
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0))});
     Pass pass({0, 0}, {10, 10}, 3);
 
-    double pass_rating = ratePassEnemyRisk(enemy_team, pass, passing_config);
+    auto enemy_reaction_time =
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
+    auto enemy_proximity_importance =
+        passing_config->getEnemyProximityImportance()->value();
+
+    double pass_rating = ratePassEnemyRisk(enemy_team, pass, enemy_reaction_time,
+                                           enemy_proximity_importance);
     EXPECT_LE(0, pass_rating);
     EXPECT_GE(0.1, pass_rating);
 }
@@ -570,7 +594,13 @@ TEST_F(PassingEvaluationTest,
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0))});
     Pass pass({0, 0}, {10, 10}, 3);
 
-    double pass_rating = ratePassEnemyRisk(enemy_team, pass, passing_config);
+    auto enemy_reaction_time =
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
+    auto enemy_proximity_importance =
+        passing_config->getEnemyProximityImportance()->value();
+
+    double pass_rating = ratePassEnemyRisk(enemy_team, pass, enemy_reaction_time,
+                                           enemy_proximity_importance);
     EXPECT_LE(0, pass_rating);
     EXPECT_GE(0.1, pass_rating);
 }
@@ -580,7 +610,9 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_team_no_robots)
     Team enemy_team(Duration::fromSeconds(10));
     Pass pass({0, 0}, {10, 10}, 3);
 
-    double intercept_risk = calculateInterceptRisk(enemy_team, pass, passing_config);
+    double intercept_risk = calculateInterceptRisk(
+        enemy_team, pass,
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
     EXPECT_EQ(0, intercept_risk);
 }
 
@@ -598,7 +630,9 @@ TEST_F(PassingEvaluationTest,
     });
     Pass pass({0, 0}, {10, 10}, 3);
 
-    double intercept_risk = calculateInterceptRisk(enemy_team, pass, passing_config);
+    double intercept_risk = calculateInterceptRisk(
+        enemy_team, pass,
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -617,7 +651,9 @@ TEST_F(PassingEvaluationTest,
     });
     Pass pass({0, 0}, {10, 10}, 3);
 
-    double intercept_risk = calculateInterceptRisk(enemy_team, pass, passing_config);
+    double intercept_risk = calculateInterceptRisk(
+        enemy_team, pass,
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -630,7 +666,9 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_sitting_on_pass_t
                       Timestamp::fromSeconds(0));
     Pass pass({0, 0}, {10, 10}, 3);
 
-    double intercept_risk = calculateInterceptRisk(enemy_robot, pass, passing_config);
+    double intercept_risk = calculateInterceptRisk(
+        enemy_robot, pass,
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -644,7 +682,9 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_just_off_pass_tra
                       Timestamp::fromSeconds(0));
     Pass pass({0, 0}, {10, 10}, 3);
 
-    double intercept_risk = calculateInterceptRisk(enemy_robot, pass, passing_config);
+    double intercept_risk = calculateInterceptRisk(
+        enemy_robot, pass,
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
     EXPECT_LE(0.9, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }
@@ -657,7 +697,9 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_far_away_from_tra
                       Timestamp::fromSeconds(0));
     Pass pass({0, 0}, {10, 10}, 3);
 
-    double intercept_risk = calculateInterceptRisk(enemy_robot, pass, passing_config);
+    double intercept_risk = calculateInterceptRisk(
+        enemy_robot, pass,
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
     EXPECT_LE(0, intercept_risk);
     EXPECT_GE(0.1, intercept_risk);
 }
@@ -670,7 +712,9 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_robot_at_far_end_of_field)
                       Timestamp::fromSeconds(0));
     Pass pass({3, -3}, {3, 3}, 3);
 
-    double intercept_risk = calculateInterceptRisk(enemy_robot, pass, passing_config);
+    double intercept_risk = calculateInterceptRisk(
+        enemy_robot, pass,
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
     EXPECT_LE(0, intercept_risk);
     EXPECT_GE(0.1, intercept_risk);
 }
@@ -683,7 +727,9 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_enemy_moving_far_away)
                       Timestamp::fromSeconds(0));
     Pass pass({1, 1}, {4, 4}, 2);
 
-    double intercept_risk = calculateInterceptRisk(enemy_robot, pass, passing_config);
+    double intercept_risk = calculateInterceptRisk(
+        enemy_robot, pass,
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
     EXPECT_LE(0, intercept_risk);
     EXPECT_GE(0.1, intercept_risk);
 }
@@ -700,7 +746,9 @@ TEST_F(PassingEvaluationTest,
                       AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Pass pass({0, 0}, {0, 2}, 0.5);
 
-    double intercept_risk = calculateInterceptRisk(enemy_robot, pass, passing_config);
+    double intercept_risk = calculateInterceptRisk(
+        enemy_robot, pass,
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value()));
     EXPECT_LE(0.5, intercept_risk);
     EXPECT_GE(1, intercept_risk);
 }

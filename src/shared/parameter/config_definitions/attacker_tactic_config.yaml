@@ -2,7 +2,7 @@
     name: enemy_about_to_steal_ball_radius
     min: 0.0
     max: 4.0
-    value: 0.5
+    value: 0.1
     description: >-
         The radius of the circle around a friendly robot around which
         we think an enemy is about to steal the ball

@@ -11,7 +11,8 @@ TEST(AttackerFSMTest, test_transitions)
     Pass pass   = Pass(Point(0, 0), Point(2, 0), 5);
 
     AttackerFSM::ControlParams control_params{
-        .pass                   = std::make_optional<Pass>(pass),
+        .best_pass_so_far       = pass,
+        .pass_committed         = true,
         .shot                   = std::nullopt,
         .chip_target            = std::nullopt,
         .attacker_tactic_config = std::make_shared<AttackerTacticConfig>()};
