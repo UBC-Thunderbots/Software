@@ -149,7 +149,6 @@ class CppHeaderConfig(object):
             )
 
         # top level config has access to all configs, so no need to recursively add options
-        # if not self.is_top_level_config:
         for included_config in config.configs:
             self.dfs_helper(included_config, arg_prefix, load_dependency)
 

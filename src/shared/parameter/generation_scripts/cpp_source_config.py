@@ -157,7 +157,7 @@ class CppSourceConfig(object):
 
         :param config: the current CppSourceConfig object
         :param arg_prefix: the prefix for accessing the arg struct
-        :param load_depndency: the prefix for accessing the actual parameter
+        :param load_dependency: the prefix for accessing the actual parameter
         """
         arg_prefix = (
             to_snake_case(config.config_name)

@@ -67,7 +67,7 @@ class CppWriter(object):
         """Takes the config metadata loaded by config_yaml_loader, and converts it to a list of CppHeaderConfig objects;
         this includes setting the dependency graphs needed for the configs.
 
-        :param top_leve_config_name: the name of the top level config
+        :param top_level_config_name: the name of the top level config
         :param config_metadata: the dictionary containing the config metadata
         :return: list of CppHeaderConfig objects
         """
