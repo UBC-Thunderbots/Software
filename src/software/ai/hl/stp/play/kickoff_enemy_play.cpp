@@ -68,31 +68,22 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 -world.field().defenseAreaYLength() / 2.0 + 4 * ROBOT_MAX_RADIUS_METERS),
         Point(world.field().friendlyGoalpostNeg().x() +
                 world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-                -world.field().defenseAreaYLength() / 2.0 + 8 * ROBOT_MAX_RADIUS_METERS),
-        Point(world.field().friendlyGoalpostNeg().x() +
-                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
                 -world.field().defenseAreaYLength() / 2.0 + 12 * ROBOT_MAX_RADIUS_METERS),
-        Point(world.field().friendlyGoalpostNeg().x() +
-                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-                -world.field().defenseAreaYLength() / 2.0 + 16 * ROBOT_MAX_RADIUS_METERS),
         Point(world.field().friendlyGoalpostNeg().x() +
                 world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
                 -world.field().defenseAreaYLength() / 2.0 + 20 * ROBOT_MAX_RADIUS_METERS),
         Point(world.field().friendlyGoalpostNeg().x() +
                 world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-                -world.field().defenseAreaYLength() / 2.0 + 24 * ROBOT_MAX_RADIUS_METERS),
-        Point(world.field().friendlyGoalpostNeg().x() +
-                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
                 -world.field().defenseAreaYLength() / 2.0 + 28 * ROBOT_MAX_RADIUS_METERS),
-        Point(world.field().friendlyGoalpostNeg().x() +
-                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-                -world.field().defenseAreaYLength() / 2.0 + 32 * ROBOT_MAX_RADIUS_METERS),
         Point(world.field().friendlyGoalpostNeg().x() +
                 world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
                 -world.field().defenseAreaYLength() / 2.0 + 36 * ROBOT_MAX_RADIUS_METERS),
         Point(world.field().friendlyGoalpostNeg().x() +
                 world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-                -world.field().defenseAreaYLength() / 2.0 + 40 * ROBOT_MAX_RADIUS_METERS),
+                -world.field().defenseAreaYLength() / 2.0 + 44 * ROBOT_MAX_RADIUS_METERS),
+        Point(world.field().friendlyGoalpostNeg().x() +
+                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                -world.field().defenseAreaYLength() / 2.0 + 52 * ROBOT_MAX_RADIUS_METERS),
     };
 
     // these move tactics will be used to go to those positions

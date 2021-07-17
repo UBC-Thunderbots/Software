@@ -71,8 +71,6 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         // Robot 1
         Point(world.field().centerPoint() +
               Vector(-world.field().centerCircleRadius() + 0.1, 0)),
-        // Robot 2
-        // Goalie positions will be handled by the goalie tactic
         // Robot 3
         Point(world.field().centerPoint() +
               Vector(-world.field().centerCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
@@ -81,18 +79,42 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         Point(world.field().centerPoint() +
               Vector(-world.field().centerCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
                      1.0 / 3.0 * world.field().yLength())),
-        // Robot 5
-        Point(world.field().friendlyGoalpostPos().x() +
-                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-              world.field().friendlyGoalpostPos().y()),
-        // Robot 6
+
         Point(world.field().friendlyGoalpostNeg().x() +
-                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-              world.field().friendlyGoalpostNeg().y()),
+                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                -world.field().defenseAreaYLength() / 2.0 + 4 * ROBOT_MAX_RADIUS_METERS),
+
+        Point(world.field().friendlyGoalpostNeg().x() +
+                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                -world.field().defenseAreaYLength() / 2.0 + 12 * ROBOT_MAX_RADIUS_METERS),
+
+        Point(world.field().friendlyGoalpostNeg().x() +
+                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                -world.field().defenseAreaYLength() / 2.0 + 20 * ROBOT_MAX_RADIUS_METERS),
+
+        Point(world.field().friendlyGoalpostNeg().x() +
+                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                -world.field().defenseAreaYLength() / 2.0 + 28 * ROBOT_MAX_RADIUS_METERS),
+
+        Point(world.field().friendlyGoalpostNeg().x() +
+                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                -world.field().defenseAreaYLength() / 2.0 + 36 * ROBOT_MAX_RADIUS_METERS),
+
+        Point(world.field().friendlyGoalpostNeg().x() +
+                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                -world.field().defenseAreaYLength() / 2.0 + 44 * ROBOT_MAX_RADIUS_METERS),
+
+        Point(world.field().friendlyGoalpostNeg().x() +
+                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                -world.field().defenseAreaYLength() / 2.0 + 52 * ROBOT_MAX_RADIUS_METERS),
     };
 
     // move tactics to use to move to positions defined above
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
         std::make_shared<MoveTactic>(true)};
