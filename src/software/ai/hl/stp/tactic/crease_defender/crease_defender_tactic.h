@@ -50,7 +50,7 @@ class CreaseDefenderTactic : public Tactic
      */
     void updateControlParams(
         const Point &enemy_threat_origin, const CreaseDefenderAlignment &alignment,
-        MaxAllowedSpeedMode max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        MaxAllowedSpeedMode max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT, double robot_radius_expansion_amount_factor = 1.0);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

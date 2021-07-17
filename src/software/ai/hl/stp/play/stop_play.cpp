@@ -157,7 +157,7 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
         {
             secondary_crease_defender_tactics[i]->updateControlParams(
                 enemy_threats[i].robot.position(), CreaseDefenderAlignment::CENTRE,
-                stop_mode);
+                stop_mode, 2.0);
         }
 
         // insert all the tactics to the result

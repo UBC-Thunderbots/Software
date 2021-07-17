@@ -27,6 +27,7 @@ struct CreaseDefenderFSM
         CreaseDefenderAlignment crease_defender_alignment;
         // The maximum allowed speed mode
         MaxAllowedSpeedMode max_allowed_speed_mode;
+double robot_radius_expansion_amount_factor;
     };
 
     // this struct defines the only event that the CreaseDefenderFSM responds to
@@ -104,7 +105,7 @@ struct CreaseDefenderFSM
                 event.common.world.field(), event.control_params.enemy_threat_origin,
                 event.control_params.crease_defender_alignment,
                 robot_navigation_obstacle_config->getRobotObstacleInflationFactor()
-                    ->value());
+                    ->value() * event.control_params.robot_radius_expansion_amount_factor);
             if (block_threat_point)
             {
                 destination = block_threat_point.value();

@@ -16,7 +16,7 @@ CreaseDefenderTactic::CreaseDefenderTactic(
     : Tactic(true, {RobotCapability::Move}),
       fsm(CreaseDefenderFSM(robot_navigation_obstacle_config), DribbleFSM(std::make_shared<Point>())),
       control_params({Point(0, 0), CreaseDefenderAlignment::CENTRE,
-                      MaxAllowedSpeedMode::PHYSICAL_LIMIT}),
+                      MaxAllowedSpeedMode::PHYSICAL_LIMIT, 1.0}),
       robot_navigation_obstacle_config(robot_navigation_obstacle_config)
 {
 }
@@ -60,11 +60,12 @@ void CreaseDefenderTactic::accept(TacticVisitor &visitor) const
 
 void CreaseDefenderTactic::updateControlParams(const Point &enemy_threat_origin,
                                                const CreaseDefenderAlignment &alignment,
-                                               MaxAllowedSpeedMode max_allowed_speed_mode)
+                                               MaxAllowedSpeedMode max_allowed_speed_mode, double robot_radius_expansion_amount_factor)
 {
     control_params.enemy_threat_origin       = enemy_threat_origin;
     control_params.crease_defender_alignment = alignment;
     control_params.max_allowed_speed_mode    = max_allowed_speed_mode;
+    control_params.robot_radius_expansion_amount_factor    = robot_radius_expansion_amount_factor;
 }
 
 bool CreaseDefenderTactic::done() const
