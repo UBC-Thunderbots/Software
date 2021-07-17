@@ -24,7 +24,7 @@ bool DefensePlay::isApplicable(const World &world) const
 
 bool DefensePlay::invariantHolds(const World &world) const
 {
-    LOG(INFO) << "DEFENSE PLAY CONFIDENCE: "<<world.getTeamWithPossessionConfidence();
+    LOG(INFO) << "DEFENSE PLAY CONFIDENCE: " << world.getTeamWithPossessionConfidence();
     return world.gameState().isPlaying() &&
            world.getTeamWithPossession() == TeamSide::ENEMY &&
            world.getTeamWithPossessionConfidence() >= 1.0;
@@ -35,20 +35,25 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     auto attacker_tactic =
         std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
 
-    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defender_tactics = {
+        std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig()),
         std::make_shared<CreaseDefenderTactic>(
             play_config->getRobotNavigationObstacleConfig()),
         std::make_shared<CreaseDefenderTactic>(
             play_config->getRobotNavigationObstacleConfig()),
     };
 
-    std::array<std::shared_ptr<ShadowEnemyTactic>, 2> shadow_enemy_tactics = {
-        std::make_shared<ShadowEnemyTactic>(),
-        std::make_shared<ShadowEnemyTactic>(),
+    std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
+        std::make_shared<ShadowEnemyTactic>(), std::make_shared<ShadowEnemyTactic>(),
+        std::make_shared<ShadowEnemyTactic>(), std::make_shared<ShadowEnemyTactic>(),
+        std::make_shared<ShadowEnemyTactic>(), std::make_shared<ShadowEnemyTactic>(),
     };
 
     auto move_tactics = std::vector<std::shared_ptr<MoveTactic>>{
-        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)};
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true)};
 
     std::vector<std::shared_ptr<StopTactic>> stop_tactics = {
         std::make_shared<StopTactic>(false), std::make_shared<StopTactic>(false)};
@@ -93,58 +98,69 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
 
         if (immediate_enemy_threats == 1)
         {
-            std::get<0>(shadow_enemy_tactics)
-                ->updateControlParams(enemy_threats.at(0),
-                                      ROBOT_SHADOWING_DISTANCE_METERS);
-            std::get<1>(shadow_enemy_tactics)
-                ->updateControlParams(enemy_threats.at(0),
-                                      ROBOT_SHADOWING_DISTANCE_METERS);
+            shadow_enemy_tactics[0]->updateControlParams(enemy_threats.at(0),
+                                                         ROBOT_SHADOWING_DISTANCE_METERS);
+            shadow_enemy_tactics[1]->updateControlParams(enemy_threats.at(0),
+                                                         ROBOT_SHADOWING_DISTANCE_METERS);
             result[0].insert(result[0].end(), shadow_enemy_tactics.begin(),
                              shadow_enemy_tactics.end());
+            std::get<2>(crease_defender_tactics)
+                ->updateControlParams(world.ball().position(),
+                                      CreaseDefenderAlignment::CENTRE);
+            result[0].emplace_back(std::get<2>(crease_defender_tactics));
+        }
+        else if (enemy_threats.size() > 0)
+        {
+            shadow_enemy_tactics[0]->updateControlParams(enemy_threats.at(0),
+                                                         ROBOT_SHADOWING_DISTANCE_METERS);
+            result[0].emplace_back(shadow_enemy_tactics[0]);
+        }
+
+        if (enemy_threats.size() > 1)
+        {
+            shadow_enemy_tactics[1]->updateControlParams(enemy_threats.at(1),
+                                                         ROBOT_SHADOWING_DISTANCE_METERS);
+            result[0].emplace_back(shadow_enemy_tactics[1]);
+            std::get<2>(crease_defender_tactics)
+                ->updateControlParams(world.ball().position(),
+                                      CreaseDefenderAlignment::CENTRE);
+            result[0].emplace_back(std::get<2>(crease_defender_tactics));
+            for (unsigned int i = 2;
+                 i < std::min(enemy_threats.size(), shadow_enemy_tactics.size()); i++)
+            {
+                shadow_enemy_tactics[i]->updateControlParams(
+                    enemy_threats.at(i), ROBOT_SHADOWING_DISTANCE_METERS);
+                result[0].emplace_back(shadow_enemy_tactics[i]);
+            }
+        }
+        auto nearest_enemy_robot =
+            world.enemyTeam().getNearestRobot(world.ball().position());
+        if (nearest_enemy_robot)
+        {
+            // Blocks in front of where the closest enemy robot is
+            Point block_point =
+                nearest_enemy_robot->position() +
+                Vector::createFromAngle(nearest_enemy_robot->orientation()) *
+                    ROBOT_SHADOWING_DISTANCE_METERS;
+            move_tactics[0]->updateControlParams(
+                block_point, nearest_enemy_robot->orientation() + Angle::half(), 0.0);
+            result[0].emplace_back(move_tactics[0]);
         }
         else
         {
-            if (enemy_threats.size() > 0)
-            {
-                std::get<0>(shadow_enemy_tactics)
-                    ->updateControlParams(enemy_threats.at(0),
-                                          ROBOT_SHADOWING_DISTANCE_METERS);
-                result[0].emplace_back(std::get<0>(shadow_enemy_tactics));
-            }
-            else
-            {
-                result[0].emplace_back(move_tactics[0]);
-            }
+            LOG(WARNING)
+                << "There are no enemy robots so a MoveTactic is not being assigned";
+        }
 
-            if (enemy_threats.size() > 1)
-            {
-                std::get<1>(shadow_enemy_tactics)
-                    ->updateControlParams(enemy_threats.at(1),
-                                          ROBOT_SHADOWING_DISTANCE_METERS);
-                result[0].emplace_back(std::get<1>(shadow_enemy_tactics));
-            }
-            else
-            {
-                auto nearest_enemy_robot =
-                    world.enemyTeam().getNearestRobot(world.ball().position());
-                if (nearest_enemy_robot)
-                {
-                    // Blocks in front of where the closest enemy robot is
-                    Point block_point =
-                        nearest_enemy_robot->position() +
-                        Vector::createFromAngle(nearest_enemy_robot->orientation()) *
-                            ROBOT_SHADOWING_DISTANCE_METERS;
-                    move_tactics[1]->updateControlParams(
-                        block_point, nearest_enemy_robot->orientation() + Angle::half(),
-                        0.0);
-                    result[0].emplace_back(move_tactics[1]);
-                }
-                else
-                {
-                    LOG(WARNING)
-                        << "There are no enemy robots so a MoveTactic is not being assigned";
-                }
-            }
+        for (unsigned int i = 1; i < move_tactics.size(); i++)
+        {
+            move_tactics[i]->updateControlParams(
+                world.field().friendlyDefenseArea().posXNegYCorner() + Vector(1, 0) +
+                    (world.field().friendlyDefenseArea().posXPosYCorner() -
+                     world.field().friendlyDefenseArea().posXNegYCorner()) *
+                        (i - 1) / 3.0,
+                Angle::zero(), 0.0);
+            result[0].emplace_back(move_tactics[i]);
         }
 
         // yield the Tactics this Play wants to run, in order of priority
