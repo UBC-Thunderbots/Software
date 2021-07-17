@@ -18,4 +18,6 @@ class StopPlay : public Play
     bool invariantHolds(const World &world) const override;
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+
+    const double ROBOT_SHADOWING_DISTANCE_METERS = ROBOT_MAX_RADIUS_METERS * 3;
 };

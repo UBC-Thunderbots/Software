@@ -17,19 +17,15 @@ bool HaltPlay::invariantHolds(const World &world) const
 
 void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
-    // Create Stop Tactics that will loop forever
-    auto stop_tactic_1 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_2 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_3 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_4 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_5 = std::make_shared<StopTactic>(false);
-    auto stop_tactic_6 = std::make_shared<StopTactic>(false);
+    std::vector<std::shared_ptr<StopTactic>> stop_tactics(DIV_A_NUM_ROBOTS);
+    std::generate(stop_tactics.begin(), stop_tactics.end(),
+                  []() { return std::make_shared<StopTactic>(false); });
 
     do
     {
-        // yield the Tactics this Play wants to run, in order of priority
-        yield({{stop_tactic_1, stop_tactic_2, stop_tactic_3, stop_tactic_4, stop_tactic_5,
-                stop_tactic_6}});
+        TacticVector result = {};
+        result.insert(result.end(), stop_tactics.begin(), stop_tactics.end());
+        yield({result});
     } while (true);
 }
 
