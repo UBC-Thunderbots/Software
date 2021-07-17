@@ -26,7 +26,8 @@ bool EnemyBallPlacementPlay::invariantHolds(const World &world) const
 void EnemyBallPlacementPlay::ballPlacementWithShadow(
     TacticCoroutine::push_type &yield, const World &world,
     std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders,
-    std::array<std::shared_ptr<MoveTactic>, 2> move_tactics, Point placement_point)
+    std::array<std::shared_ptr<MoveTactic>, 2> move_tactics, Point placement_point,
+    std::vector<std::shared_ptr<MoveTactic>> in_front_of_goal_move_tactics)
 {
     /*
      * Set up 3 crease defenders to sit by crease, and put two robots behind the ball
@@ -98,6 +99,18 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
             tactics_to_run[0].emplace_back(shadow_enemy);
         }
 
+        for (unsigned int i = 0; i < in_front_of_goal_move_tactics.size(); i++)
+        {
+            in_front_of_goal_move_tactics[i]->updateControlParams(
+                world.field().friendlyDefenseArea().posXNegYCorner() + Vector(1, 0) +
+                    (world.field().friendlyDefenseArea().posXPosYCorner() -
+                     world.field().friendlyDefenseArea().posXNegYCorner()) *
+                        i / 4.0,
+                Angle::zero(), 0.0);
+            tactics_to_run[0].emplace_back(in_front_of_goal_move_tactics[i]);
+        }
+
+
         // yield the Tactics this Play wants to run, in order of priority
         yield(tactics_to_run);
     } while (true);
@@ -122,16 +135,21 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
         std::make_shared<MoveTactic>(true),
     };
 
+    auto in_front_of_goal_move_tactics = std::vector<std::shared_ptr<MoveTactic>>{
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true)};
+
     if (placement_point.has_value())
     {
         ballPlacementWithShadow(yield, world, crease_defenders, move_tactics,
-                                placement_point.value());
+                                placement_point.value(), in_front_of_goal_move_tactics);
     }
     // if there is no placement_point, use the ball position
     else
     {
         ballPlacementWithShadow(yield, world, crease_defenders, move_tactics,
-                                world.ball().position());
+                                world.ball().position(), in_front_of_goal_move_tactics);
     }
 }
 

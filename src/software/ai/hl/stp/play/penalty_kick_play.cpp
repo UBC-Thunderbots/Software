@@ -35,6 +35,11 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
     auto move_tactic_3 = std::make_shared<MoveTactic>(true);
     auto move_tactic_4 = std::make_shared<MoveTactic>(true);
     auto move_tactic_5 = std::make_shared<MoveTactic>(true);
+    auto move_tactic_6 = std::make_shared<MoveTactic>(true);
+    auto move_tactic_7 = std::make_shared<MoveTactic>(true);
+    auto move_tactic_8 = std::make_shared<MoveTactic>(true);
+    auto move_tactic_9 = std::make_shared<MoveTactic>(true);
+    auto move_tactic_10 = std::make_shared<MoveTactic>(true);
 
     do
     {
@@ -63,6 +68,21 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         move_tactic_5->updateControlParams(
             Point(ball_position_x - 1.25, 8 * ROBOT_MAX_RADIUS_METERS),
             world.field().enemyGoalCenter().toVector().orientation(), 0);
+        move_tactic_6->updateControlParams(
+            Point(ball_position_x - 1.75, 0),
+            world.field().enemyGoalCenter().toVector().orientation(), 0);
+        move_tactic_7->updateControlParams(
+            Point(ball_position_x - 1.75, 4 * ROBOT_MAX_RADIUS_METERS),
+            world.field().enemyGoalCenter().toVector().orientation(), 0);
+        move_tactic_8->updateControlParams(
+            Point(ball_position_x - 1.75, -4 * ROBOT_MAX_RADIUS_METERS),
+            world.field().enemyGoalCenter().toVector().orientation(), 0);
+        move_tactic_9->updateControlParams(
+            Point(ball_position_x - 1.75, 8 * ROBOT_MAX_RADIUS_METERS),
+            world.field().enemyGoalCenter().toVector().orientation(), 0);
+        move_tactic_10->updateControlParams(
+            Point(ball_position_x - 2.25, 0),
+            world.field().enemyGoalCenter().toVector().orientation(), 0);
 
         shooter_setup_move->updateControlParams(behind_ball, shoot_angle, 0.0);
 
@@ -81,6 +101,11 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         tactics_to_run[0].emplace_back(move_tactic_3);
         tactics_to_run[0].emplace_back(move_tactic_4);
         tactics_to_run[0].emplace_back(move_tactic_5);
+        tactics_to_run[0].emplace_back(move_tactic_6);
+        tactics_to_run[0].emplace_back(move_tactic_7);
+        tactics_to_run[0].emplace_back(move_tactic_8);
+        tactics_to_run[0].emplace_back(move_tactic_9);
+        tactics_to_run[0].emplace_back(move_tactic_10);
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(tactics_to_run);

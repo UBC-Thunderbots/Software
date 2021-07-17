@@ -28,37 +28,62 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     auto move_to_goal_line_tactic = std::make_shared<MoveGoalieToGoalLineTactic>();
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
         std::make_shared<const GoalieTacticConfig>();
-    auto goalie_tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
-    auto move_tactic_2 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_3 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_4 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_5 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_6 = std::make_shared<MoveTactic>(true);
+    auto goalie_tactic  = std::make_shared<GoalieTactic>(goalie_tactic_config);
+    auto move_tactic_1  = std::make_shared<MoveTactic>(true);
+    auto move_tactic_2  = std::make_shared<MoveTactic>(true);
+    auto move_tactic_3  = std::make_shared<MoveTactic>(true);
+    auto move_tactic_4  = std::make_shared<MoveTactic>(true);
+    auto move_tactic_5  = std::make_shared<MoveTactic>(true);
+    auto move_tactic_6  = std::make_shared<MoveTactic>(true);
+    auto move_tactic_7  = std::make_shared<MoveTactic>(true);
+    auto move_tactic_8  = std::make_shared<MoveTactic>(true);
+    auto move_tactic_9  = std::make_shared<MoveTactic>(true);
+    auto move_tactic_10 = std::make_shared<MoveTactic>(true);
 
-    PriorityTacticVector tactics_to_run = {{move_to_goal_line_tactic, move_tactic_2,
-                                            move_tactic_3, move_tactic_4, move_tactic_5,
-                                            move_tactic_6}};
+    PriorityTacticVector tactics_to_run = {
+        {move_to_goal_line_tactic, move_tactic_1, move_tactic_2, move_tactic_3,
+         move_tactic_4, move_tactic_5, move_tactic_6, move_tactic_7, move_tactic_8,
+         move_tactic_9, move_tactic_10}};
 
     do
     {
         // Move all non-shooter robots to the center of the field
-        move_tactic_2->updateControlParams(
+        move_tactic_1->updateControlParams(
             Point(world.field().enemyPenaltyMark().x() + 1.5, 0),
             world.field().enemyGoalCenter().toVector().orientation(), 0);
-        move_tactic_3->updateControlParams(
+        move_tactic_2->updateControlParams(
             Point(world.field().enemyPenaltyMark().x() + 1.5,
                   4 * ROBOT_MAX_RADIUS_METERS),
             world.field().enemyGoalCenter().toVector().orientation(), 0);
-        move_tactic_4->updateControlParams(
+        move_tactic_3->updateControlParams(
             Point(world.field().enemyPenaltyMark().x() + 1.5,
                   -4 * ROBOT_MAX_RADIUS_METERS),
             world.field().enemyGoalCenter().toVector().orientation(), 0);
-        move_tactic_5->updateControlParams(
+        move_tactic_4->updateControlParams(
             Point(world.field().enemyPenaltyMark().x() + 1.5,
                   8 * ROBOT_MAX_RADIUS_METERS),
             world.field().enemyGoalCenter().toVector().orientation(), 0);
-        move_tactic_6->updateControlParams(
+        move_tactic_5->updateControlParams(
             Point(world.field().enemyPenaltyMark().x() + 1.5,
+                  -8 * ROBOT_MAX_RADIUS_METERS),
+            world.field().enemyGoalCenter().toVector().orientation(), 0);
+        move_tactic_6->updateControlParams(
+            Point(world.field().enemyPenaltyMark().x() + 2.0, 0),
+            world.field().enemyGoalCenter().toVector().orientation(), 0);
+        move_tactic_7->updateControlParams(
+            Point(world.field().enemyPenaltyMark().x() + 2.0,
+                  4 * ROBOT_MAX_RADIUS_METERS),
+            world.field().enemyGoalCenter().toVector().orientation(), 0);
+        move_tactic_8->updateControlParams(
+            Point(world.field().enemyPenaltyMark().x() + 2.0,
+                  -4 * ROBOT_MAX_RADIUS_METERS),
+            world.field().enemyGoalCenter().toVector().orientation(), 0);
+        move_tactic_9->updateControlParams(
+            Point(world.field().enemyPenaltyMark().x() + 2.0,
+                  8 * ROBOT_MAX_RADIUS_METERS),
+            world.field().enemyGoalCenter().toVector().orientation(), 0);
+        move_tactic_10->updateControlParams(
+            Point(world.field().enemyPenaltyMark().x() + 2.0,
                   -8 * ROBOT_MAX_RADIUS_METERS),
             world.field().enemyGoalCenter().toVector().orientation(), 0);
 
