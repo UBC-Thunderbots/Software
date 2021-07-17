@@ -64,7 +64,7 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
             play_config->getRobotNavigationObstacleConfig()),
     };
 
-    std::array<std::shared_ptr<CreaseDefenderTactic>, 3>
+    std::vector<std::shared_ptr<CreaseDefenderTactic>>
         secondary_crease_defender_tactics = {
             std::make_shared<CreaseDefenderTactic>(
                 play_config->getRobotNavigationObstacleConfig()),
@@ -72,12 +72,11 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
                 play_config->getRobotNavigationObstacleConfig()),
             std::make_shared<CreaseDefenderTactic>(
                 play_config->getRobotNavigationObstacleConfig()),
+            std::make_shared<CreaseDefenderTactic>(
+                play_config->getRobotNavigationObstacleConfig()),
+            std::make_shared<CreaseDefenderTactic>(
+                play_config->getRobotNavigationObstacleConfig()),
         };
-
-    std::array<std::shared_ptr<ShadowEnemyTactic>, 2> shadow_enemy_tactics = {
-        std::make_shared<ShadowEnemyTactic>(),
-        std::make_shared<ShadowEnemyTactic>(),
-    };
 
     std::array<std::shared_ptr<MoveTactic>, 2> backup_move_tactics = {
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)};
@@ -129,99 +128,45 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
                                   stop_mode);
 
         // assign default behaviour for crease defenders
-        std::get<0>(secondary_crease_defender_tactics)
+        secondary_crease_defender_tactics[0]
             ->updateControlParams(world.field().enemyGoalCenter(),
                                   CreaseDefenderAlignment::CENTRE, stop_mode);
-        std::get<1>(secondary_crease_defender_tactics)
+        secondary_crease_defender_tactics[1]
             ->updateControlParams(
                 world.field().friendlyDefenseArea().expand(Vector(1, 0)).posXNegYCorner(),
                 CreaseDefenderAlignment::CENTRE, stop_mode);
-        std::get<2>(secondary_crease_defender_tactics)
+        secondary_crease_defender_tactics[2]
             ->updateControlParams(
                 world.field().friendlyDefenseArea().expand(Vector(1, 0)).posXPosYCorner(),
                 CreaseDefenderAlignment::CENTRE, stop_mode);
+        secondary_crease_defender_tactics[3]
+            ->updateControlParams(
+                world.field().friendlyDefenseArea().expand(Vector(1, 1)).posXPosYCorner(),
+                CreaseDefenderAlignment::CENTRE, stop_mode);
+        secondary_crease_defender_tactics[4]
+            ->updateControlParams(
+                world.field().friendlyDefenseArea().expand(Vector(1, -1)).posXPosYCorner(),
+                CreaseDefenderAlignment::CENTRE, stop_mode);
 
-        // Look for enemy threats to assign shadow_enemy_tactics and
-        // secondary_crease_defender_tactics
+        // Look for enemy threats to assign secondary_crease_defender_tactics
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
-        if (enemy_threats.size() >= 3)
+        for(unsigned int i = 0; i<enemy_threats.size(); i++)
         {
-            std::get<0>(secondary_crease_defender_tactics)
-                ->updateControlParams(enemy_threats[0].robot.position(),
+secondary_crease_defender_tactics[i]
+                ->updateControlParams(enemy_threats[i].robot.position(),
                                       CreaseDefenderAlignment::CENTRE, stop_mode);
-            std::get<1>(secondary_crease_defender_tactics)
-                ->updateControlParams(enemy_threats[1].robot.position(),
-                                      CreaseDefenderAlignment::CENTRE, stop_mode);
-            std::get<2>(secondary_crease_defender_tactics)
-                ->updateControlParams(enemy_threats[2].robot.position(),
-                                      CreaseDefenderAlignment::CENTRE, stop_mode);
-
-            std::get<0>(shadow_enemy_tactics)
-                ->updateControlParams(enemy_threats.at(0),
-                                      ROBOT_SHADOWING_DISTANCE_METERS);
-            std::get<1>(shadow_enemy_tactics)
-                ->updateControlParams(enemy_threats.at(1),
-                                      ROBOT_SHADOWING_DISTANCE_METERS);
-
-            result[0].emplace_back(std::get<0>(shadow_enemy_tactics));
-            result[0].emplace_back(std::get<1>(shadow_enemy_tactics));
         }
-        else if (enemy_threats.size() == 2)
-        {
-            std::get<0>(secondary_crease_defender_tactics)
-                ->updateControlParams(enemy_threats[0].robot.position(),
-                                      CreaseDefenderAlignment::CENTRE, stop_mode);
-            std::get<1>(secondary_crease_defender_tactics)
-                ->updateControlParams(enemy_threats[1].robot.position(),
-                                      CreaseDefenderAlignment::CENTRE, stop_mode);
-
-            std::get<0>(shadow_enemy_tactics)
-                ->updateControlParams(enemy_threats.at(0),
-                                      ROBOT_SHADOWING_DISTANCE_METERS);
-            std::get<1>(shadow_enemy_tactics)
-                ->updateControlParams(enemy_threats.at(1),
-                                      ROBOT_SHADOWING_DISTANCE_METERS);
-
-            result[0].emplace_back(std::get<0>(shadow_enemy_tactics));
-            result[0].emplace_back(std::get<1>(shadow_enemy_tactics));
-        }
-        else if (enemy_threats.size() == 1)
-        {
-            std::get<0>(secondary_crease_defender_tactics)
-                ->updateControlParams(enemy_threats[0].robot.position(),
-                                      CreaseDefenderAlignment::CENTRE, stop_mode);
-
-            std::get<0>(shadow_enemy_tactics)
-                ->updateControlParams(enemy_threats.at(0),
-                                      ROBOT_SHADOWING_DISTANCE_METERS);
-
-            std::get<0>(backup_move_tactics)
-                ->updateControlParams(Point(1, 0), Angle::zero(), 0, stop_mode);
-
-            result[0].emplace_back(std::get<0>(shadow_enemy_tactics));
-            result[0].emplace_back(std::get<0>(backup_move_tactics));
-        }
-        else
-        {
-            std::get<0>(backup_move_tactics)
-                ->updateControlParams(Point(1, 0), Angle::zero(), 0, stop_mode);
-            std::get<0>(backup_move_tactics)
-                ->updateControlParams(Point(-1, 0), Angle::zero(), 0, stop_mode);
-
-            result[0].emplace_back(std::get<0>(backup_move_tactics));
-            result[0].emplace_back(std::get<1>(backup_move_tactics));
-        }
-
-
 
         // insert all the tactics to the result
         result[0].emplace_back(std::get<0>(main_crease_defender_tactics));
         result[0].emplace_back(std::get<1>(main_crease_defender_tactics));
-        result[0].emplace_back(std::get<0>(secondary_crease_defender_tactics));
-        result[0].emplace_back(std::get<1>(secondary_crease_defender_tactics));
-        result[0].emplace_back(std::get<2>(secondary_crease_defender_tactics));
+        result[0].emplace_back(secondary_crease_defender_tactics[0]);
+        result[0].emplace_back(secondary_crease_defender_tactics[1]);
+        result[0].emplace_back(secondary_crease_defender_tactics[2]);
+        result[0].emplace_back(secondary_crease_defender_tactics[3]);
+        result[0].emplace_back(secondary_crease_defender_tactics[4]);
         result[0].insert(result[0].end(), move_tactics.begin(), move_tactics.end());
         yield(result);
     } while (true);

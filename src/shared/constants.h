@@ -23,7 +23,7 @@ static const double MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT = 0.2;
 static const double BALL_MASS_KG = 0.004593;
 // The max allowed speed of the robot when the stop command is issued, in meters per
 // second
-static const double STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND = 1.5;
+static const double STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND = 1.3;
 // The maximum number of robots we can communicate with over radio.
 static const unsigned MAX_ROBOTS_OVER_RADIO = 8;
 
