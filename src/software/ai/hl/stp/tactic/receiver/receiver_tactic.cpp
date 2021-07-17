@@ -50,7 +50,7 @@ double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world
     // ball. We want these tactics to be the most expensive, so that the munkres algorithm
     // minimizes the overal cost by assinging these tactics to the robots nearest to the
     // ball.
-    return std::clamp<double>(cost, 0, 1) * 10;
+    return std::clamp<double>(cost, 0, 1) * 100;
 }
 
 void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)

@@ -89,3 +89,23 @@
      name: debug_rate_pass
      value: false
      description: "Logs the costs that go into rate pass, Robocup 2021 hack that should be removed TODO (#2167)"
+ - double:
+     name: receiver_x_position
+     min: -6.0
+     max: 6.0
+     value: 0.0
+     description: >-
+       How long we think the enemy will take to recognize we're passing and start
+       moving to intercept
+ - double:
+     name: receiver_y_position
+     min: -4.5
+     max: 4.5
+     value: 0.2
+     description: >-
+       How long we think the enemy will take to recognize we're passing and start
+       moving to intercept
+ - bool:
+     name: execute_pass
+     value: false
+     description: "Logs the costs that go into rate pass, Robocup 2021 hack that should be removed TODO (#2167)"
