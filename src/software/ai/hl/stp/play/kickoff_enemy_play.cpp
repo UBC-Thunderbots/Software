@@ -32,7 +32,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     // on the field to be evenly spread out
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
         std::make_shared<ShadowEnemyTactic>(), std::make_shared<ShadowEnemyTactic>(),
-        std::make_shared<ShadowEnemyTactic>()};
+        std::make_shared<ShadowEnemyTactic>(), std::make_shared<ShadowEnemyTactic>(),
+        std::make_shared<ShadowEnemyTactic>(), std::make_shared<ShadowEnemyTactic>()};
 
     // these positions are picked according to the following slide
     // https://images.slideplayer.com/32/9922349/slides/slide_2.jpg
@@ -63,21 +64,42 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     std::vector<Point> defense_positions = {
         Point(world.field().friendlyGoalpostNeg().x() +
-                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-              -world.field().defenseAreaYLength() / 2.0),
-        Point(world.field().friendlyGoalpostPos().x() +
-                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-              world.field().defenseAreaYLength() / 2.0),
-        Point(world.field().friendlyGoalCenter().x() +
-                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-              world.field().friendlyGoalCenter().y()),
-        Point(-(world.field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
-              world.field().defenseAreaYLength() / 2.0),
-        Point(-(world.field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
-              -world.field().defenseAreaYLength() / 2.0),
+                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                -world.field().defenseAreaYLength() / 2.0 + 4 * ROBOT_MAX_RADIUS_METERS),
+        Point(world.field().friendlyGoalpostNeg().x() +
+                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                -world.field().defenseAreaYLength() / 2.0 + 8 * ROBOT_MAX_RADIUS_METERS),
+        Point(world.field().friendlyGoalpostNeg().x() +
+                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                -world.field().defenseAreaYLength() / 2.0 + 12 * ROBOT_MAX_RADIUS_METERS),
+        Point(world.field().friendlyGoalpostNeg().x() +
+                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                -world.field().defenseAreaYLength() / 2.0 + 16 * ROBOT_MAX_RADIUS_METERS),
+        Point(world.field().friendlyGoalpostNeg().x() +
+                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                -world.field().defenseAreaYLength() / 2.0 + 20 * ROBOT_MAX_RADIUS_METERS),
+        Point(world.field().friendlyGoalpostNeg().x() +
+                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                -world.field().defenseAreaYLength() / 2.0 + 24 * ROBOT_MAX_RADIUS_METERS),
+        Point(world.field().friendlyGoalpostNeg().x() +
+                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                -world.field().defenseAreaYLength() / 2.0 + 28 * ROBOT_MAX_RADIUS_METERS),
+        Point(world.field().friendlyGoalpostNeg().x() +
+                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                -world.field().defenseAreaYLength() / 2.0 + 32 * ROBOT_MAX_RADIUS_METERS),
+        Point(world.field().friendlyGoalpostNeg().x() +
+                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                -world.field().defenseAreaYLength() / 2.0 + 36 * ROBOT_MAX_RADIUS_METERS),
+        Point(world.field().friendlyGoalpostNeg().x() +
+                world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+                -world.field().defenseAreaYLength() / 2.0 + 40 * ROBOT_MAX_RADIUS_METERS),
     };
+
     // these move tactics will be used to go to those positions
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
         std::make_shared<MoveTactic>(true)};
@@ -95,7 +117,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         int defense_position_index = 0;
         for (unsigned i = 0; i < defense_positions.size(); ++i)
         {
-            if (i < 3 && i < enemy_threats.size())
+            if (i < 6 && i < enemy_threats.size())
             {
                 // Assign the first 3 robots to shadow enemies, if the enemies exist
                 auto enemy_threat = enemy_threats.at(i);
