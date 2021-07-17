@@ -152,11 +152,12 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
-        for(unsigned int i = 0; i<enemy_threats.size(); i++)
+        for (unsigned int i = 0;
+             i < std::min(enemy_threats.size(), secondary_crease_defender_tactics.size()); i++)
         {
-secondary_crease_defender_tactics[i]
-                ->updateControlParams(enemy_threats[i].robot.position(),
-                                      CreaseDefenderAlignment::CENTRE, stop_mode);
+            secondary_crease_defender_tactics[i]->updateControlParams(
+                enemy_threats[i].robot.position(), CreaseDefenderAlignment::CENTRE,
+                stop_mode);
         }
 
         // insert all the tactics to the result
