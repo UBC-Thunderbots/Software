@@ -9,6 +9,7 @@
 #include "software/ai/hl/stp/tactic/shadow_free_kicker_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/game_state.h"
+static const double ROBOT_SHADOWING_DISTANCE_METERS = ROBOT_MAX_RADIUS_METERS * 3;
 
 EnemyFreekickPlay::EnemyFreekickPlay(std::shared_ptr<const PlayConfig> config)
     : Play(config, true)
@@ -29,9 +30,10 @@ bool EnemyFreekickPlay::invariantHolds(const World &world) const
 void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                        const World &world)
 {
-    // Init a Crease Defender Tactic
-    auto crease_defender_tactic = std::make_shared<CreaseDefenderTactic>(
-        play_config->getRobotNavigationObstacleConfig());
+    auto crease_defender_tactic_1 = std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig());
+    auto crease_defender_tactic_2 = std::make_shared<CreaseDefenderTactic>(
+            play_config->getRobotNavigationObstacleConfig());
 
     // Init FreeKickShadower tactics (these robots will both block the enemy robot taking
     // a free kick, at most we will have 2)
@@ -43,13 +45,12 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         true);
 
     // Init Shadow Enemy Tactics for extra robots
-    auto shadow_tactic_main      = std::make_shared<ShadowEnemyTactic>();
-    auto shadow_tactic_secondary = std::make_shared<ShadowEnemyTactic>();
-
-    // Init Move Tactics for extra robots (These will be used if there are no robots to
-    // shadow)
-    auto move_tactic_main      = std::make_shared<MoveTactic>(true);
-    auto move_tactic_secondary = std::make_shared<MoveTactic>(true);
+    auto shadow_1 = std::make_shared<ShadowEnemyTactic>();
+    auto shadow_2 = std::make_shared<ShadowEnemyTactic>();
+    auto shadow_3 = std::make_shared<ShadowEnemyTactic>();
+    auto shadow_4 = std::make_shared<ShadowEnemyTactic>();
+    auto shadow_5 = std::make_shared<ShadowEnemyTactic>();
+    auto shadow_6 = std::make_shared<ShadowEnemyTactic>();
 
     do
     {
@@ -60,76 +61,71 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
-        // Add Freekick shadower tactics
         tactics_to_run[0].emplace_back(shadow_free_kicker_1);
         tactics_to_run[0].emplace_back(shadow_free_kicker_2);
-        // Add Crease defender tactic on side of open enemy threats
-        if (enemy_threats.size() >= 4)
-        {
-            if (enemy_threats.at(3).robot.position().y() > 0)
+
+        crease_defender_tactic_1->updateControlParams(
+                world.ball().position(), CreaseDefenderAlignment::LEFT);
+        crease_defender_tactic_2->updateControlParams(
+                world.ball().position(), CreaseDefenderAlignment::RIGHT);
+
+        tactics_to_run[0].emplace_back(crease_defender_tactic_1);
+        tactics_to_run[0].emplace_back(crease_defender_tactic_2);
+
+            // LOL can this be jankier
+            if (enemy_threats.size() > 1)
             {
-                crease_defender_tactic->updateControlParams(
-                    world.ball().position(), CreaseDefenderAlignment::LEFT);
+                shadow_1
+                    ->updateControlParams(enemy_threats.at(0),
+                            ROBOT_SHADOWING_DISTANCE_METERS);
             }
-            else
+
+            // LOL can this be jankier
+            if (enemy_threats.size() > 1)
             {
-                crease_defender_tactic->updateControlParams(
-                    world.ball().position(), CreaseDefenderAlignment::RIGHT);
+                shadow_2
+                    ->updateControlParams(enemy_threats.at(1),
+                            ROBOT_SHADOWING_DISTANCE_METERS);
             }
-        }
-        else
-        {
-            crease_defender_tactic->updateControlParams(world.ball().position(),
-                                                        CreaseDefenderAlignment::CENTRE);
-        }
 
-        tactics_to_run[0].emplace_back(crease_defender_tactic);
+            // LOL can this be jankier
+            if (enemy_threats.size() > 2)
+            {
+                shadow_3
+                    ->updateControlParams(enemy_threats.at(2),
+                            ROBOT_SHADOWING_DISTANCE_METERS);
+            }
 
+            // LOL can this be jankier
+            if (enemy_threats.size() > 3)
+            {
+                shadow_4
+                    ->updateControlParams(enemy_threats.at(3),
+                            ROBOT_SHADOWING_DISTANCE_METERS);
+            }
 
-        // Assign ShadowEnemy tactics until we have every enemy covered. If there are not
-        // enough threats to shadow, move our robots to block the friendly net
-        if (enemy_threats.size() <= 1)
-        {
-            move_tactic_main->updateControlParams(
-                world.field().friendlyGoalCenter() +
-                    Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
-                (world.ball().position() - world.field().friendlyGoalCenter())
-                    .orientation(),
-                0);
-            move_tactic_main->updateControlParams(
-                world.field().friendlyGoalCenter() +
-                    Vector(0, -2 * ROBOT_MAX_RADIUS_METERS),
-                (world.ball().position() - world.field().friendlyGoalCenter())
-                    .orientation(),
-                0);
+            // LOL can this be jankier
+            if (enemy_threats.size() > 4)
+            {
+                shadow_5
+                    ->updateControlParams(enemy_threats.at(4),
+                            ROBOT_SHADOWING_DISTANCE_METERS);
+            }
 
-            tactics_to_run[0].emplace_back(move_tactic_main);
-            tactics_to_run[0].emplace_back(move_tactic_secondary);
-        }
-        if (enemy_threats.size() == 2)
-        {
-            shadow_tactic_main->updateControlParams(enemy_threats.at(1),
-                                                    ROBOT_MAX_RADIUS_METERS * 3);
-            move_tactic_main->updateControlParams(
-                world.field().friendlyGoalCenter() +
-                    Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
-                (world.ball().position() - world.field().friendlyGoalCenter())
-                    .orientation(),
-                0);
+            // LOL can this be jankier
+            if (enemy_threats.size() > 5)
+            {
+                shadow_6
+                    ->updateControlParams(enemy_threats.at(5),
+                            ROBOT_SHADOWING_DISTANCE_METERS);
+            }
 
-            tactics_to_run[0].emplace_back(shadow_tactic_main);
-            tactics_to_run[0].emplace_back(move_tactic_main);
-        }
-        if (enemy_threats.size() >= 3)
-        {
-            shadow_tactic_main->updateControlParams(enemy_threats.at(1),
-                                                    ROBOT_MAX_RADIUS_METERS * 3);
-            shadow_tactic_secondary->updateControlParams(enemy_threats.at(2),
-                                                         ROBOT_MAX_RADIUS_METERS * 3);
-
-            tactics_to_run[0].emplace_back(shadow_tactic_main);
-            tactics_to_run[0].emplace_back(shadow_tactic_secondary);
-        }
+            tactics_to_run[0].emplace_back(shadow_1);
+            tactics_to_run[0].emplace_back(shadow_2);
+            tactics_to_run[0].emplace_back(shadow_3);
+            tactics_to_run[0].emplace_back(shadow_4);
+            tactics_to_run[0].emplace_back(shadow_5);
+            tactics_to_run[0].emplace_back(shadow_6);
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(tactics_to_run);

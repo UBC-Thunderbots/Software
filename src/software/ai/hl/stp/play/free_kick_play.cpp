@@ -12,8 +12,11 @@
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
+#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/world/ball.h"
+
+static const double ROBOT_SHADOWING_DISTANCE_METERS = ROBOT_MAX_RADIUS_METERS * 3;
 
 FreeKickPlay::FreeKickPlay(std::shared_ptr<const PlayConfig> config)
     : Play(config, true), MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
@@ -83,13 +86,38 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 
     Zones cherry_pick_region_1 = {ranked_zones[0]};
     Zones cherry_pick_region_2 = {ranked_zones[1]};
+    Zones cherry_pick_region_3 = {ranked_zones[2]};
+    Zones cherry_pick_region_4 = {ranked_zones[3]};
+    best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    std::array<std::shared_ptr<MoveTactic>, 2> cherry_picker_tactics = {
-        std::make_shared<MoveTactic>(false),
-        std::make_shared<MoveTactic>(false),
-    };
+    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
+    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
+    auto cherry_pick_tactic_3 = std::make_shared<MoveTactic>(false);
+    auto cherry_pick_tactic_4 = std::make_shared<MoveTactic>(false);
+
+    auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
+    auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
+    auto pass3 = pass_eval.getBestPassInZones(cherry_pick_region_3).pass;
+    auto pass4 = pass_eval.getBestPassInZones(cherry_pick_region_4).pass;
+
+    cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
+            pass1.receiverOrientation(), 0.0,
+            MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+    cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
+            pass2.receiverOrientation(), 0.0,
+            MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+    cherry_pick_tactic_3->updateControlParams(pass3.receiverPoint(),
+            pass3.receiverOrientation(), 0.0,
+            MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+    cherry_pick_tactic_4->updateControlParams(pass4.receiverPoint(),
+            pass4.receiverOrientation(), 0.0,
+            MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+
+    auto shadow_tactic_1 = std::make_shared<ShadowEnemyTactic>();
+    auto shadow_tactic_2 = std::make_shared<ShadowEnemyTactic>();
+    auto shadow_tactic_3 = std::make_shared<ShadowEnemyTactic>();
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
@@ -110,27 +138,57 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
                 ball_to_enemy_goal_vec.normalize(ROBOT_MAX_RADIUS_METERS * 3.5),
             ball_to_enemy_goal_vec.orientation(), 0);
 
+        auto enemy_threats = getAllEnemyThreats(
+                world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
+
+            // LOL can this be jankier
+            if (enemy_threats.size() > 1)
+            {
+                shadow_tactic_1
+                    ->updateControlParams(enemy_threats.at(0),
+                            ROBOT_SHADOWING_DISTANCE_METERS);
+            }
+            if (enemy_threats.size() > 2)
+            {
+                shadow_tactic_2
+                    ->updateControlParams(enemy_threats.at(1),
+                            ROBOT_SHADOWING_DISTANCE_METERS);
+            }
+            if (enemy_threats.size() > 3)
+            {
+                shadow_tactic_3
+                    ->updateControlParams(enemy_threats.at(2),
+                            ROBOT_SHADOWING_DISTANCE_METERS);
+            }
 
         auto pass_eval = pass_generator.generatePassEvaluation(world);
 
         auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
         auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
+        auto pass3 = pass_eval.getBestPassInZones(cherry_pick_region_3).pass;
+        auto pass4 = pass_eval.getBestPassInZones(cherry_pick_region_4).pass;
 
-        std::get<0>(cherry_picker_tactics)
-            ->updateControlParams(pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
-                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-        std::get<1>(cherry_picker_tactics)
-            ->updateControlParams(pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
-                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_3->updateControlParams(pass3.receiverPoint(), pass3.receiverOrientation(), 0.0,
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_4->updateControlParams(pass4.receiverPoint(), pass4.receiverOrientation(), 0.0,
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
         std::get<0>(crease_defender_tactics)
             ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
         std::get<1>(crease_defender_tactics)
             ->updateControlParams(world.ball().position(),
                                   CreaseDefenderAlignment::RIGHT);
-        yield({{align_to_ball_tactic, std::get<0>(cherry_picker_tactics),
-                std::get<1>(cherry_picker_tactics), std::get<0>(crease_defender_tactics),
-                std::get<1>(crease_defender_tactics)}});
+        yield({{align_to_ball_tactic,
+                std::get<0>(crease_defender_tactics),
+                std::get<1>(crease_defender_tactics)},
+                {cherry_pick_tactic_1, cherry_pick_tactic_2,
+                cherry_pick_tactic_3, cherry_pick_tactic_4},
+                {shadow_tactic_1, shadow_tactic_2, shadow_tactic_3}});
+
     } while (!align_to_ball_tactic->done());
 
     Timestamp commit_stage_start_time = world.getMostRecentTimestamp();
@@ -138,9 +196,48 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
     double min_score;
     do
     {
+        auto pass_eval = pass_generator.generatePassEvaluation(world);
+
+        auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
+        auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
+        auto pass3 = pass_eval.getBestPassInZones(cherry_pick_region_3).pass;
+        auto pass4 = pass_eval.getBestPassInZones(cherry_pick_region_4).pass;
+
+        cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_3->updateControlParams(pass3.receiverPoint(), pass3.receiverOrientation(), 0.0,
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_4->updateControlParams(pass4.receiverPoint(), pass4.receiverOrientation(), 0.0,
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+
         std::optional<Shot> shot =
             calcBestShotOnGoal(world.field(), world.friendlyTeam(), world.enemyTeam(),
                                world.ball().position(), TeamType::ENEMY);
+
+        auto enemy_threats = getAllEnemyThreats(
+                world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
+
+            // LOL can this be jankier
+            if (enemy_threats.size() > 1)
+            {
+                shadow_tactic_1
+                    ->updateControlParams(enemy_threats.at(0),
+                            ROBOT_SHADOWING_DISTANCE_METERS);
+            }
+            if (enemy_threats.size() > 2)
+            {
+                shadow_tactic_2
+                    ->updateControlParams(enemy_threats.at(1),
+                            ROBOT_SHADOWING_DISTANCE_METERS);
+            }
+            if (enemy_threats.size() > 3)
+            {
+                shadow_tactic_3
+                    ->updateControlParams(enemy_threats.at(2),
+                            ROBOT_SHADOWING_DISTANCE_METERS);
+            }
 
         if (shot.has_value())
         {
@@ -149,37 +246,26 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
                 shoot_tactic->updateControlParams(world.ball().position(),
                                                   shot->getPointToShootAt(),
                                                   BALL_MAX_SPEED_METERS_PER_SECOND - 0.5);
-                yield({{shoot_tactic, std::get<0>(cherry_picker_tactics),
-                        std::get<1>(cherry_picker_tactics),
+                yield({{shoot_tactic,
                         std::get<0>(crease_defender_tactics),
-                        std::get<1>(crease_defender_tactics)}});
+                        std::get<1>(crease_defender_tactics)},
+                        {cherry_pick_tactic_1, cherry_pick_tactic_2,
+                        cherry_pick_tactic_3, cherry_pick_tactic_4},
+                        {shadow_tactic_1, shadow_tactic_2, shadow_tactic_3}});
             }
         }
 
-        auto pass_eval = pass_generator.generatePassEvaluation(world);
-
-        auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
-        auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
-
-        std::get<0>(cherry_picker_tactics)
-            ->updateControlParams(pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
-                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-        std::get<1>(cherry_picker_tactics)
-            ->updateControlParams(pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
-                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-
-        std::get<0>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
-        std::get<1>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
-                                  CreaseDefenderAlignment::RIGHT);
-        yield({{align_to_ball_tactic, std::get<0>(cherry_picker_tactics),
-                std::get<0>(crease_defender_tactics), std::get<1>(cherry_picker_tactics),
-                std::get<1>(crease_defender_tactics)}});
+        yield({{align_to_ball_tactic,
+                std::get<0>(crease_defender_tactics),
+                std::get<1>(crease_defender_tactics)},
+                {cherry_pick_tactic_1, cherry_pick_tactic_2,
+                cherry_pick_tactic_3, cherry_pick_tactic_4},
+                {shadow_tactic_1, shadow_tactic_2, shadow_tactic_3}});
 
         best_pass_and_score_so_far =
             pass_generator.generatePassEvaluation(world).getBestPassOnField();
         best_pass = std::make_optional<Pass>(best_pass_and_score_so_far.pass);
+
         LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
 
