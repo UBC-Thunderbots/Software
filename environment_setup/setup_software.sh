@@ -37,7 +37,7 @@ host_software_packages=(
     codespell # Fixes typos
     curl
     default-jdk # Needed for Bazel to run properly
-    gcc-7 # We use gcc 7.4.0
+    gcc-10 # We use gcc 10
     git # required for build
     kcachegrind # This lets us view the profiles output by callgrind
     libeigen3-dev # A math / numerical library used for things like linear regression
@@ -72,9 +72,9 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     host_software_packages+=(llvm-6.0)
     host_software_packages+=(libclang-6.0-dev)
     host_software_packages+=(libncurses5)
-    sudo apt-get -y install gcc-7 g++-7
-    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
-    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
+    sudo apt-get -y install gcc-10 g++-10
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10
+    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
     
     # This fixes missing headers by notifying the linker
     ldconfig
