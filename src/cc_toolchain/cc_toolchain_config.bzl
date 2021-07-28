@@ -350,12 +350,12 @@ def _make_common_features(ctx):
         ],
     )
 
-    result["cpp17_feature"] = feature(
-        name = "c++17",
+    result["cpp20_feature"] = feature(
+        name = "c++20",
         flag_sets = [
             flag_set(
                 actions = ALL_CPP_ACTIONS,
-                flag_groups = [flag_group(flags = ["-std=c++17"])],
+                flag_groups = [flag_group(flags = ["-std=c++20"])],
             ),
         ],
     )
@@ -545,7 +545,7 @@ def _linux_gcc_impl(ctx):
         name = "common",
         implies = [
             "builtin_include_directories",
-            "c++17",
+            "c++20",
             "colour",
             "determinism",
             "warnings_as_errors",
@@ -722,7 +722,7 @@ def _stm32_impl(ctx):
         name = "common",
         implies = [
             "stdlib",
-            "c++17",
+            "c++20",
             "colour",
             "warnings_as_errors",
             "determinism",
