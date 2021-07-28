@@ -154,7 +154,6 @@ jobs:
             --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
             //shared/parameter/...
 
-jobs:
   formatting-check-18:
     name: Formatting Check
     runs-on: ubuntu-18.04
