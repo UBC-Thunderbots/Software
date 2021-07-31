@@ -272,3 +272,47 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_oscillation)
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(15));
 }
+
+TEST_F(SimulatedThetaStarTest, test_theta_star_find_path_through_enemy_half_when_it_is_an_obstacle)
+{
+    /*
+     * When DISTANCE_THRESHOLD (what determines if robot is close enough to destination)
+     * in transition_condition.h is lowered (eg. to 0.02), the robot oscillates back
+     * and forth and does not reach a steady state at the destination in some cases.
+     * This test is for visual purposes to check for this bug.
+     * Known destinations that oscillate with DISTANCE_THRESHOLD = 0.02:
+     *  - (-2.5,-2.5)
+     *  - (2.5,-2.5)
+     */
+    Point destination      = Point(-2.5, -2.5);
+    Point initial_position = field.enemyGoalCenter();
+    BallState ball_state(Point(0, 0), Vector(0, 0));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({field.friendlyGoalCenter(), initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(1, 0), Point(2, 3), Point(3, -1), Point(4, 2),
+        Point(2, 3.2), Point(-1.7, 3.8)});
+
+    auto tactic = std::make_shared<MoveTactic>(false);
+    tactic->updateControlParams(destination, Angle::zero(), 0);
+    setTactic(tactic);
+    setRobotId(1);
+
+    std::set<MotionConstraint> motion_constraints = { MotionConstraint::ENEMY_HALF };
+    setMotionConstraints(motion_constraints);
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [destination, tactic](std::shared_ptr<World> world_ptr,
+                              ValidationCoroutine::push_type& yield) {
+            // Small rectangle around the destination point that the robot should be
+            // stationary within for 15 ticks
+            Rectangle expected_final_position(Point(destination.x() - 0.5, destination.y() - 0.5),
+                                                Point(destination.x() + 0.5, destination.y() + 0.5));
+            robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
+        }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(15));
+}
