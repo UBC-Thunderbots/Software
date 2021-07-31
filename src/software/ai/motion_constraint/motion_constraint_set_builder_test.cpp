@@ -67,28 +67,23 @@ namespace
     // sets of motion constraints for each type of game state
     auto stoppage_or_them_motion_constraints =
         std::set<MotionConstraint>({MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
-                                    MotionConstraint::ENEMY_ROBOTS_COLLISION,
                                     MotionConstraint::HALF_METER_AROUND_BALL,
                                     MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     auto gamestart_or_us_motion_constraints =
         std::set<MotionConstraint>({MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA,
-                                    MotionConstraint::ENEMY_ROBOTS_COLLISION,
                                     MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     auto kickoff_motion_constraints = std::set<MotionConstraint>(
         {MotionConstraint::FRIENDLY_DEFENSE_AREA, MotionConstraint::CENTER_CIRCLE,
-         MotionConstraint::HALF_METER_AROUND_BALL, MotionConstraint::ENEMY_HALF,
-         MotionConstraint::ENEMY_ROBOTS_COLLISION});
+         MotionConstraint::HALF_METER_AROUND_BALL, MotionConstraint::ENEMY_HALF});
 
     auto our_penalty_motion_constraints = std::set<MotionConstraint>(
-        {MotionConstraint::FRIENDLY_DEFENSE_AREA, MotionConstraint::ENEMY_HALF,
-         MotionConstraint::ENEMY_ROBOTS_COLLISION});
+        {MotionConstraint::FRIENDLY_DEFENSE_AREA, MotionConstraint::ENEMY_HALF});
 
     auto them_penalty_motion_constraints = std::set<MotionConstraint>(
         {MotionConstraint::FRIENDLY_DEFENSE_AREA,
-         MotionConstraint::HALF_METER_AROUND_BALL, MotionConstraint::FRIENDLY_HALF,
-         MotionConstraint::ENEMY_ROBOTS_COLLISION});
+         MotionConstraint::HALF_METER_AROUND_BALL, MotionConstraint::FRIENDLY_HALF});
 }  // namespace
 
 class CheckMotionConstraints

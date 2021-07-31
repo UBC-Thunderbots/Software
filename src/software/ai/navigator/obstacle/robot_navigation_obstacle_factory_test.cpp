@@ -228,41 +228,6 @@ TEST_F(RobotNavigationObstacleFactoryTest, another_fast_moving_robot_obstacle)
     }
 }
 
-TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_robots_collision)
-{
-    auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(
-        MotionConstraint::ENEMY_ROBOTS_COLLISION, world);
-    EXPECT_EQ(2, obstacles.size());
-    try
-    {
-        Circle expected({0.5, -2.5}, 0.207);
-        auto circle_obstacle = dynamic_cast<GeomObstacle<Circle>&>(*obstacles[0]);
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, circle_obstacle.getGeom(),
-                                                   METERS_PER_MILLIMETER));
-    }
-    catch (std::bad_cast&)
-    {
-        ADD_FAILURE() << "Circle Obstacle was not created for stationary enemy robot";
-    }
-
-    try
-    {
-        Polygon expected({{-0.237, -0.030},
-                          {-0.092, -0.220},
-                          {0.144, -0.191},
-                          {0.237, 0.0296},
-                          {0.123, 0.946},
-                          {-0.352, 0.886}});
-        auto polygon_obstacle = dynamic_cast<GeomObstacle<Polygon>&>(*obstacles[1]);
-        EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
-                                                   METERS_PER_MILLIMETER));
-    }
-    catch (std::bad_cast&)
-    {
-        ADD_FAILURE() << "Polygon Obstacle was not created for a fast moving robot";
-    }
-}
-
 TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, centre_circle)
 {
     auto obstacles = robot_navigation_obstacle_factory.createFromMotionConstraint(

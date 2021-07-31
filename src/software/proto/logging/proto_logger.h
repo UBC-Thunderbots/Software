@@ -43,6 +43,13 @@ class ProtoLogger : public FirstInFirstOutThreadedObserver<MsgT>
      */
     void onValueReceived(MsgT msg) override;
 
+    /**
+     * Safely save the current replay chunk into the output directory. Calls
+     * saveCurrentChunkHelper() *after* acquiring the chunk_mutex, this can be
+     * called from any thread.
+     */
+    void saveCurrentChunk();
+
    private:
     /**
      * Increments the chunk index of the file we are writing to.
@@ -53,13 +60,15 @@ class ProtoLogger : public FirstInFirstOutThreadedObserver<MsgT>
      * Saves the current chunk to a file in the output directory with a filename that is
      * the index of the chunk.
      */
-    void saveCurrentChunk();
+    void saveCurrentChunkHelper();
 
     RepeatedAnyMsg current_chunk;
     size_t current_chunk_idx;
     std::experimental::filesystem::path output_dir_path;
     const int msgs_per_chunk;
     std::optional<std::function<bool(MsgT, MsgT)>> sort_comparator;
+    // this allows us to save ProtoLog's from the main thread
+    std::mutex chunk_mutex;
 };
 
 
