@@ -17,7 +17,7 @@ class SimulatedThetaStarTest : public SimulatedTacticTestFixture
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_obstacle)
+TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_same_obstacle)
 {
     // Both initial_position and destination are in obstacle.
     // The two points are not in the same coordinated initially, however after
@@ -51,6 +51,40 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_obstacle)
             Duration::fromSeconds(15));
 }
 
+TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_different_obstacle)
+{
+    // Both initial_position and destination are in obstacle.
+    // The two points are not in the same coordinated initially, however after
+    // initial_position is moved to a free point, it is in the same coordinate as
+    // destination. Values are chosen from a case which previously did not find a path.
+    Point destination      = Point(3, 0);
+    Point initial_position = Point(0.96905413818359376, -0.26277551269531252);
+    BallState ball_state(Point(0, -0.6), Vector(0, 0));
+    auto friendly_robots =
+            TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(1, 0), Point(3, 0)});
+
+    auto tactic = std::make_shared<MoveTactic>(false);
+    tactic->updateControlParams(destination, Angle::zero(), 0);
+    setTactic(tactic);
+    setRobotId(1);
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+            [destination, tactic](std::shared_ptr<World> world_ptr,
+                                  ValidationCoroutine::push_type& yield) {
+                // Small rectangle near the destination point that is outside of the obstacle
+                // which the friendly robot should be stationary in for 15 ticks
+                Rectangle expected_final_position(Point(0.9, -0.1), Point(1.1, 0.1));
+                robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
+            }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(15));
+}
+
 TEST_F(SimulatedThetaStarTest, test_theta_star_dest_in_obstacle)
 {
     // Destination is in obstacle, but initial point is open
@@ -71,7 +105,9 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_dest_in_obstacle)
                               ValidationCoroutine::push_type& yield) {
             // Small rectangle near the destination point that is outside of the obstacle
             // which the friendly robot should be stationary in for 15 ticks
-            Rectangle expected_final_position(Point(0.9, -0.2), Point(1.1, 0.0));
+            float threshold = 0.05f;
+            Rectangle expected_final_position(Point(destination.x() - threshold, destination.y() - threshold),
+                                              Point(destination.x() + threshold, destination.y() + threshold));
             robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
         }};
 
@@ -110,7 +146,9 @@ TEST_F(SimulatedThetaStarTest,
                               ValidationCoroutine::push_type& yield) {
             // Small rectangle near the destination point that is outside of the obstacle
             // which the friendly robot should be stationary in for 15 ticks
-            Rectangle expected_final_position(Point(3.9, 2.3), Point(4.1, 2.5));
+            float threshold = 0.05f;
+            Rectangle expected_final_position(Point(destination.x() - threshold, destination.y() - threshold),
+                                              Point(destination.x() + threshold, destination.y() + threshold));
             robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
         }};
 
@@ -141,7 +179,9 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_in_obstacle)
                               ValidationCoroutine::push_type& yield) {
             // Small rectangle the size of a grid square around the destination point that
             // the robot should be stationary within for 15 ticks
-            Rectangle expected_final_position(Point(0.045, 0.045), Point(-0.045, -0.045));
+            float threshold = 0.05f;
+            Rectangle expected_final_position(Point(destination.x() - threshold, destination.y() - threshold),
+                                              Point(destination.x() + threshold, destination.y() + threshold));
             robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
         }};
 
@@ -171,7 +211,9 @@ TEST_F(SimulatedThetaStarTest, test_theta_no_obstacle_straight_path)
                               ValidationCoroutine::push_type& yield) {
             // Small rectangle around the destination point that the robot should be
             // stationary within for 15 ticks
-            Rectangle expected_final_position(Point(-2.04, 1.04), Point(-1.96, 0.96));
+            float threshold = 0.05f;
+            Rectangle expected_final_position(Point(destination.x() - threshold, destination.y() - threshold),
+                                              Point(destination.x() + threshold, destination.y() + threshold));
             robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
         }};
 
@@ -221,9 +263,10 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_zig_zag_test)
                               ValidationCoroutine::push_type& yield) {
             // Small rectangle around the destination point that the robot should be
             // stationary within for 15 ticks
+            float threshold = 0.05f;
             Rectangle expected_final_position(
-                Point(destination.x() + 0.04, destination.y() + 0.04),
-                Point(destination.x() - 0.04, destination.y() - 0.04));
+                Point(destination.x() - threshold, destination.y() - threshold),
+            Point(destination.x() + threshold, destination.y() + threshold));
             robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
         }};
 
@@ -262,7 +305,9 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_oscillation)
                               ValidationCoroutine::push_type& yield) {
             // Small rectangle around the destination point that the robot should be
             // stationary within for 15 ticks
-            Rectangle expected_final_position(Point(-2.55, -2.55), Point(-2.45, -2.45));
+            float threshold = 0.05f;
+            Rectangle expected_final_position(Point(destination.x() - threshold, destination.y() - threshold),
+                                              Point(destination.x() + threshold, destination.y() + threshold));
             robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
         }};
 
@@ -275,15 +320,6 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_oscillation)
 
 TEST_F(SimulatedThetaStarTest, test_theta_star_find_path_through_enemy_half_when_it_is_an_obstacle)
 {
-    /*
-     * When DISTANCE_THRESHOLD (what determines if robot is close enough to destination)
-     * in transition_condition.h is lowered (eg. to 0.02), the robot oscillates back
-     * and forth and does not reach a steady state at the destination in some cases.
-     * This test is for visual purposes to check for this bug.
-     * Known destinations that oscillate with DISTANCE_THRESHOLD = 0.02:
-     *  - (-2.5,-2.5)
-     *  - (2.5,-2.5)
-     */
     Point destination      = Point(-2.5, -2.5);
     Point initial_position = field.enemyGoalCenter();
     BallState ball_state(Point(0, 0), Vector(0, 0));
@@ -305,8 +341,9 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_find_path_through_enemy_half_when
                               ValidationCoroutine::push_type& yield) {
             // Small rectangle around the destination point that the robot should be
             // stationary within for 15 ticks
-            Rectangle expected_final_position(Point(destination.x() - 0.5, destination.y() - 0.5),
-                                                Point(destination.x() + 0.5, destination.y() + 0.5));
+            float threshold = 0.05f;
+            Rectangle expected_final_position(Point(destination.x() - threshold, destination.y() - threshold),
+                                                Point(destination.x() + threshold, destination.y() + threshold));
             robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
         }};
 

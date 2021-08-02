@@ -471,33 +471,28 @@ bool ThetaStarPathPlanner::visitNeighbours(const Coordinate &current_coord,
 
 std::optional<ThetaStarPathPlanner::Coordinate> ThetaStarPathPlanner::findClosestUnblockedCell(const Coordinate &current_cell)
 {
-    // spiral out from current_cell looking for unblocked cells
+    // Check the horizontal and vertical cells relative to current_cell for the nearest unblocked cell
     unsigned int i = current_cell.row();
     unsigned int j = current_cell.col();
     Coordinate test_coord;
-    unsigned next_index, curr_index = 3;
-    int next_increment[4] = {1, 0, -1, 0};
+    int depth_sign = 1;
     for (unsigned int depth = 1; depth < num_grid_rows; depth++)
     {
-        next_index = (curr_index + 1) % 4;
-        i += next_increment[next_index] * depth;
-        j += next_increment[curr_index] * depth;
-        test_coord = Coordinate(i, j);
+        test_coord = Coordinate(i + depth * depth_sign, j);
         if (isCoordNavigable(test_coord) && isUnblocked(test_coord))
         {
             return test_coord;
         }
-        curr_index = next_index;
+        std::cout << test_coord.row() << ", " << test_coord.col() << std::endl;
 
-        next_index = (curr_index + 1) % 4;
-        i += next_increment[next_index] * depth;
-        j += next_increment[curr_index] * depth;
-        test_coord = Coordinate(i, j);
+        test_coord = Coordinate(i, j + depth * depth_sign);
         if (isCoordNavigable(test_coord) && isUnblocked(test_coord))
         {
             return test_coord;
         }
-        curr_index = next_index;
+        std::cout << test_coord.row() << ", " << test_coord.col() << std::endl;
+
+        depth_sign *= -1;
     }
 
     return std::nullopt;
