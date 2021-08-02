@@ -806,3 +806,233 @@ cc_toolchain_config_stm32 = rule(
     provides = [CcToolchainConfigInfo],
     executable = True,
 )
+
+def _jetson_nano_impl(ctx):
+    host_system_name = "k8"
+
+    action_configs = []
+
+    common = _make_common_features(ctx)
+
+    stdlib_feature = feature(
+        name = "stdlib",
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [flag_group(flags = [
+                    "-Wl,--start-group",
+                    "-lstdc++",
+                    "-lsupc++",
+                    "-lm",
+                    "-lc",
+                    "-lgcc",
+                    "-Wl,--end-group",
+                ])],
+            ),
+        ],
+    )
+
+    opt_feature = feature(
+        name = "opt",
+        flag_sets = [
+            flag_set(
+                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            "-g",
+                            "-Os",
+                            "-ffunction-sections",
+                            "-fdata-sections",
+                        ],
+                    ),
+                ],
+            ),
+            flag_set(
+                actions = [
+                    ACTION_NAMES.cpp_link_dynamic_library,
+                    ACTION_NAMES.cpp_link_nodeps_dynamic_library,
+                    ACTION_NAMES.cpp_link_executable,
+                ],
+                flag_groups = [flag_group(flags = ["-Wl,--gc-sections"])],
+            ),
+        ],
+        implies = ["common"],
+    )
+
+    jetson_nano_feature = feature(
+        name = "jetson_nano",
+        flag_sets = [
+            flag_set(
+                actions = ALL_COMPILE_ACTIONS + ALL_LINK_ACTIONS,
+#                flag_groups = [flag_group(flags = [
+##                    "-mthumb",
+##                    "-mfloat-abi=softfp",
+#                     "-march=arm64",
+#                ])],
+            ),
+        ],
+        implies = [
+#            "common",
+            "no-canonical-system-headers",
+#            "no-rtti",
+#            "no-exceptions",
+        ],
+    )
+
+#    stm32f4_feature = feature(
+#        name = "stm32f4",
+#        flag_sets = [
+#            flag_set(
+#                actions = ALL_COMPILE_ACTIONS + ALL_LINK_ACTIONS,
+#                flag_groups = [flag_group(flags = [
+#                    "-mcpu=cortex-m4",
+#                    "-mfpu=fpv4-sp-d16",
+#                ])],
+#            ),
+#        ],
+#        implies = ["stm32"],
+#    )
+
+#    stm32h7_feature = feature(
+#        name = "stm32h7",
+#        flag_sets = [
+#            flag_set(
+#                actions = ALL_COMPILE_ACTIONS + ALL_LINK_ACTIONS,
+#                flag_groups = [flag_group(flags = [
+#                    "-mcpu=cortex-m7",
+#                    "-mfpu=fpv5-d16",
+#                ])],
+#            ),
+#        ],
+#        implies = ["stm32"],
+#    )
+
+    common_feature = feature(
+        name = "common",
+        implies = [
+            "stdlib",
+            "c++17",
+            "colour",
+            "warnings_as_errors",
+            "determinism",
+            "no-canonical-prefixes",
+        ] + ([ctx.attr.cpu] if ctx.attr.cpu in [
+            "jetson_nano",
+        ] else []),
+    )
+
+    pic_feature = feature(
+        name = "pic",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
+                flag_groups = [
+                    flag_group(flags = ["-fPIC"]),
+                ],
+            ),
+        ],
+    )
+
+    supports_pic_feature = feature(name = "supports_pic", enabled = True)
+
+    static_libgcc = feature(
+        name = "static-libgcc",
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [
+                    flag_group(flags = ["-static-libgcc"]),
+                ],
+            ),
+        ],
+    )
+
+    lld_feature = feature(
+        name = "lld",
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [flag_group(flags = [
+                    "-fuse-ld=gold",
+                ])],
+            ),
+        ],
+    )
+
+
+    features = common.values() + [
+        lld_feature,
+        static_libgcc,
+        stdlib_feature,
+        pic_feature,
+        supports_pic_feature,
+        common_feature,
+        opt_feature,
+        jetson_nano_feature,
+    ]
+
+    cxx_builtin_include_directories = ctx.attr.builtin_include_directories
+
+    tool_paths = [
+        tool_path(name = "gcc", path = ctx.attr.host_compiler_path),
+        tool_path(name = "ar", path = ctx.attr.host_compiler_prefix + "/jetson-nano-ar"),
+        tool_path(name = "compat-ld", path = ctx.attr.host_compiler_prefix + "/jetson-nano-ld"),
+        tool_path(name = "cpp", path = ctx.attr.host_compiler_prefix + "/jetson-nano-cpp"),
+        tool_path(name = "gcov", path = ctx.attr.host_compiler_prefix + "/jetson-nano-gcov"),
+        tool_path(name = "ld", path = ctx.attr.host_compiler_prefix + "/jetson-nano-ld"),
+        tool_path(name = "nm", path = ctx.attr.host_compiler_prefix + "/jetson-nano-nm"),
+        tool_path(name = "objcopy", path = ctx.attr.host_compiler_prefix + "/jetson-nano-objcopy"),
+        tool_path(name = "objdump", path = ctx.attr.host_compiler_prefix + "/jetson-nano-objdump"),
+        tool_path(name = "strip", path = ctx.attr.host_compiler_prefix + "/jetson-nano-strip"),
+    ]
+
+    out = ctx.actions.declare_file(ctx.label.name)
+    ctx.actions.write(out, "Fake executable")
+
+    return [
+        cc_common.create_cc_toolchain_config_info(
+            ctx = ctx,
+            features = features,
+            action_configs = action_configs,
+            artifact_name_patterns = [],
+            cxx_builtin_include_directories = cxx_builtin_include_directories,
+            toolchain_identifier = ctx.attr.toolchain_identifier,
+            host_system_name = host_system_name,
+            target_system_name = ctx.attr.target_system_name,
+            target_cpu = ctx.attr.target_cpu,
+            target_libc = "libc",
+            compiler = "gcc",
+            abi_version = "local",
+            abi_libc_version = "local",
+            tool_paths = tool_paths,
+            make_variables = [],
+            builtin_sysroot = None,
+            cc_target_os = None,
+        ),
+        DefaultInfo(
+            executable = out,
+        ),
+    ]
+
+cc_toolchain_config_jetson_nano = rule(
+    implementation = _jetson_nano_impl,
+    attrs = {
+        "cpu": attr.string(mandatory = True, values = [
+            "jetson_nano",
+        ]),
+        "builtin_include_directories": attr.string_list(),
+        "extra_no_canonical_prefixes_flags": attr.string_list(),
+        "host_compiler_path": attr.string(),
+        "host_compiler_prefix": attr.string(),
+        "host_compiler_warnings": attr.string_list(),
+        "host_unfiltered_compile_flags": attr.string_list(),
+        "target_cpu": attr.string(),
+        "target_system_name": attr.string(),
+        "toolchain_identifier": attr.string(),
+        "extra_features": attr.string_list(),
+    },
+    provides = [CcToolchainConfigInfo],
+    executable = True,
+)

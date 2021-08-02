@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(":cc_toolchain_config.bzl", "cc_toolchain_config_k8", "cc_toolchain_config_stm32")
+load(":cc_toolchain_config.bzl", "cc_toolchain_config_k8", "cc_toolchain_config_stm32", "cc_toolchain_config_jetson_nano")
 
 # Create environments for each CPU this toolchain supports
 environment(name = "k8")
@@ -9,15 +9,19 @@ environment(name = "stm32f4")
 
 environment(name = "stm32h7")
 
+environment(name = "jetson_nano")
+
 environment_group(
     name = "cpus",
     defaults = [
         ":k8",
+        ":jetson_nano",
         ":stm32h7",
         ":stm32f4",
     ],
     environments = [
         ":k8",
+        ":jetson_nano",
         ":stm32h7",
         ":stm32f4",
     ],
@@ -38,6 +42,11 @@ config_setting(
     values = {"cpu": "stm32h7"},
 )
 
+config_setting(
+    name = "cpu_jetson_nano",
+    values = {"cpu": "jetson_nano"},
+)
+
 # This represents a mapping of CPU -> Compiler To Use
 # The CPU can be chosen by using `--cpu` as a bazel flag (ex. `--cpu=stm32h7`)
 # otherwise it will default to using whatever CPU is in the system doing the compiling
@@ -53,6 +62,9 @@ cc_toolchain_suite(
         # stm32h7 MCU
         "stm32h7": "cc_toolchain_stm32h7",
         "stm32h7|compiler": "cc_toolchain_stm32h7",
+        # jetson nano 4GB system
+        "jetson_nano": "cc_toolchain_jetson_nano",
+        "jetson_nano|compiler": "cc_toolchain_jetson_nano",
     },
 )
 
@@ -66,6 +78,13 @@ filegroup(
     srcs = [
         "@arm_developer_gcc//:everything",
     ] + glob(["wrapper/arm-none-eabi-*"]),
+)
+
+filegroup(
+    name = "jetson_nano_everything",
+    srcs = [
+        "@jetson_nano_gcc//:everything",
+    ] + glob(["wrapper/jetson-nano-*"]) + glob(["wrapper/jetson_nano_*"]),
 )
 
 filegroup(
@@ -191,4 +210,37 @@ cc_toolchain(
     tags = ["no-ide"],
     toolchain_config = ":gcc-stm32h7",
     toolchain_identifier = "gcc-stm32h7",
+)
+
+cc_toolchain(
+    name = "cc_toolchain_jetson_nano",
+    all_files = ":jetson_nano_everything",
+    ar_files = ":jetson_nano_everything",
+    as_files = ":jetson_nano_everything",
+    compiler_files = ":jetson_nano_everything",
+    dwp_files = ":empty",
+    linker_files = ":jetson_nano_everything",
+    objcopy_files = ":empty",
+    strip_files = ":empty",
+    supports_param_files = 0,
+    # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
+    # when possible
+    # https://github.com/bazelbuild/intellij/issues/486
+    tags = ["no-ide"],
+    toolchain_config = ":gcc-jetson_nano",
+    toolchain_identifier = "gcc-jetson_nano",
+)
+
+cc_toolchain_config_jetson_nano(
+    name = "gcc-jetson_nano",
+    builtin_include_directories = [
+        "external/jetson_nano_gcc/include/",
+        "external/jetson_nano_gcc/aarch64-linux-gnu/include/",
+        "external/jetson_nano_gcc/aarch64-linux-gnu/libc/lib/",
+        "external/jetson_nano_gcc/aarch64-linux-gnu/libc/usr/include/",
+    ],
+    cpu = "jetson_nano",
+    host_compiler_path = "wrapper/jetson_nano_gcc",
+    host_compiler_prefix = "wrapper",
+    toolchain_identifier = "gcc-jetson_nano",
 )

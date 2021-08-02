@@ -163,6 +163,16 @@ http_archive(
     ],
 )
 
+http_archive(
+    name = "jetson_nano_gcc",
+    build_file = "@//external:jetson_nano_gcc.BUILD",
+    sha256 = "73eed74e593e2267504efbcf3678918bb22409ab7afa3dc7c135d2c6790c2345",
+    strip_prefix = "gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu",
+    urls = [
+        "http://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz",
+    ],
+)
+
 # We use our own fork of Box2D as we have made a few small modifications
 # See the repository readme for details
 new_git_repository(
