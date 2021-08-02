@@ -19,8 +19,8 @@ class SimulatedThetaStarTest : public SimulatedTacticTestFixture
 
 TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_same_obstacle)
 {
-    // Both initial_position and destination are in obstacle.
-    // The two points are not in the same coordinated initially, however after
+    // Both initial_position and destination are in the same obstacle (enemy robot).
+    // The two points are not in the same coordinate initially, however after
     // initial_position is moved to a free point, it is in the same coordinate as
     // destination. Values are chosen from a case which previously did not find a path.
     Point destination      = Point(1, 0);
@@ -40,7 +40,9 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_same_obstacle)
                               ValidationCoroutine::push_type& yield) {
             // Small rectangle near the destination point that is outside of the obstacle
             // which the friendly robot should be stationary in for 15 ticks
-            Rectangle expected_final_position(Point(0.9, -0.1), Point(1.1, 0.1));
+            float threshold = 0.05f;
+            Rectangle expected_final_position(Point(destination.x() - threshold, destination.y() - threshold),
+                                              Point(destination.x() + threshold, destination.y() + threshold));
             robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
         }};
 
@@ -54,9 +56,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_same_obstacle)
 TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_different_obstacle)
 {
     // Both initial_position and destination are in obstacle.
-    // The two points are not in the same coordinated initially, however after
-    // initial_position is moved to a free point, it is in the same coordinate as
-    // destination. Values are chosen from a case which previously did not find a path.
+    // The two points are placed in different obstacles (enemy robots)
     Point destination      = Point(3, 0);
     Point initial_position = Point(0.96905413818359376, -0.26277551269531252);
     BallState ball_state(Point(0, -0.6), Vector(0, 0));
@@ -74,7 +74,9 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_different_obsta
                                   ValidationCoroutine::push_type& yield) {
                 // Small rectangle near the destination point that is outside of the obstacle
                 // which the friendly robot should be stationary in for 15 ticks
-                Rectangle expected_final_position(Point(0.9, -0.1), Point(1.1, 0.1));
+                float threshold = 0.05f;
+                Rectangle expected_final_position(Point(destination.x() - threshold, destination.y() - threshold),
+                                                  Point(destination.x() + threshold, destination.y() + threshold));
                 robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
             }};
 
@@ -346,6 +348,43 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_find_path_through_enemy_half_when
                                                 Point(destination.x() + threshold, destination.y() + threshold));
             robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
         }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(15));
+}
+
+TEST_F(SimulatedThetaStarTest, test_theta_star_find_path_through_inflated_enemy_defense_area)
+{
+    // Start in the inflated enemy defense area (at the bottom), and navigate to the top of the
+    // inflated enemy defense area.
+    Point destination      = Point(4.4, 1.5);
+    Point initial_position = Point(4.4, -1.3);
+    BallState ball_state(Point(0, 0), Vector(0, 0));
+    auto friendly_robots =
+            TestUtil::createStationaryRobotStatesWithId({field.friendlyGoalCenter(), initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(0,0)});
+
+    auto tactic = std::make_shared<MoveTactic>(false);
+    tactic->updateControlParams(destination, Angle::zero(), 0);
+    setTactic(tactic);
+    setRobotId(1);
+
+    std::set<MotionConstraint> motion_constraints = { MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA };
+    setMotionConstraints(motion_constraints);
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+            [destination, tactic](std::shared_ptr<World> world_ptr,
+                                  ValidationCoroutine::push_type& yield) {
+                // Small rectangle around the destination point that the robot should be
+                // stationary within for 15 ticks
+                float threshold = 0.05f;
+                Rectangle expected_final_position(Point(destination.x() - threshold, destination.y() - threshold),
+                                                  Point(destination.x() + threshold, destination.y() + threshold));
+                robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
+            }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 

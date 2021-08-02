@@ -271,19 +271,7 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
         return std::nullopt;
     }
 
-    // if we delete obstacles that we start in, we might accidentally delete an enemy robot and collide with it
-
-    // std::vector<ObstaclePtr> obstacles_that_we_dont_start_in;
-    // for (auto& obstacle : obstacles)
-    // {
-    //     if (!obstacle.contains(start))
-    //     {
-    //         obstacles_that_we_dont_start_in.push_back(obstacle);
-    //     }
-    // }
-    // resetAndInitializeMemberVariables(navigable_area, obstacles_that_we_dont_start_in);
     resetAndInitializeMemberVariables(navigable_area, obstacles);
-
 
     Point closest_end      = findClosestFreePoint(end);
     Coordinate start_coord = convertPointToCoord(start);
@@ -483,14 +471,12 @@ std::optional<ThetaStarPathPlanner::Coordinate> ThetaStarPathPlanner::findCloses
         {
             return test_coord;
         }
-        std::cout << test_coord.row() << ", " << test_coord.col() << std::endl;
 
         test_coord = Coordinate(i, j + depth * depth_sign);
         if (isCoordNavigable(test_coord) && isUnblocked(test_coord))
         {
             return test_coord;
         }
-        std::cout << test_coord.row() << ", " << test_coord.col() << std::endl;
 
         depth_sign *= -1;
     }

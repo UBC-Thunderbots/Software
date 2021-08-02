@@ -459,8 +459,9 @@ TEST_F(TestThetaStarPathPlanner,
 TEST_F(TestThetaStarPathPlanner,
        test_theta_star_path_planner_start_in_obstacle_end_outside)
 {
+    // Start and end point both in enemy half (obstacle)
+    Point start{4, 3}, end{0, -2.9};
     Field field = Field::createSSLDivisionBField();
-    Point start{3, 3}, end{0, -3};
 
     std::vector<ObstaclePtr> obstacles = {
         robot_navigation_obstacle_factory.createFromShape(
