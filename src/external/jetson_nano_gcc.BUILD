@@ -6,21 +6,29 @@ filegroup(
 )
 
 filegroup(
-    name = "gcc",
-    srcs = ["bin/aarch64-linux-gnu-gcc"],
+    name = "includes",
+    srcs = glob([
+        "include/**",
+        "aarch64-linux-gnu/include/**",
+        "aarch64-linux-gnu/7.3.1/include/**",
+        "aarch64-linux-gnu/libc/usr/include/**",
+    ]),
 )
 
 filegroup(
-    name = "cpp",
-    srcs = ["bin/aarch64-linux-gnu-cpp"],
+    name = "runtime_libs",
+    srcs = glob([
+        "aarch64-linux-gnu/libc/lib/*.so*",
+        "aarch64-linux-gnu/libc/usr/lib/*.so*",
+        "aarch64-linux-gnu/lib/*.so*",
+    ]),
 )
 
 filegroup(
-    name = "objcopy",
-    srcs = ["bin/aarch64-linux-gnu-objcopy"],
-)
-
-filegroup(
-    name = "gdb",
-    srcs = ["bin/aarch64-linux-gnu-gdb"],
+    name = "static_libs",
+    srcs = [
+        "aarch64-linux-gnu/libc/lib/*.a",
+        "aarch64-linux-gnu/libc/usr/lib/*.a",
+        "aarch64-linux-gnu/lib/*.a",
+    ],
 )

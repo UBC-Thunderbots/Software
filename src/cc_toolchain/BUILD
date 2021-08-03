@@ -63,8 +63,8 @@ cc_toolchain_suite(
         "stm32h7": "cc_toolchain_stm32h7",
         "stm32h7|compiler": "cc_toolchain_stm32h7",
         # jetson nano 4GB system
-        "jetson_nano": "cc_toolchain_jetson_nano",
-        "jetson_nano|compiler": "cc_toolchain_jetson_nano",
+        "jetson_nano": "cc_toolchain_jetson_nano_gcc",
+        "jetson_nano|compiler": "cc_toolchain_jetson_nano_gcc",
     },
 )
 
@@ -212,35 +212,52 @@ cc_toolchain(
     toolchain_identifier = "gcc-stm32h7",
 )
 
-cc_toolchain(
-    name = "cc_toolchain_jetson_nano",
-    all_files = ":jetson_nano_everything",
-    ar_files = ":jetson_nano_everything",
-    as_files = ":jetson_nano_everything",
-    compiler_files = ":jetson_nano_everything",
-    dwp_files = ":empty",
-    linker_files = ":jetson_nano_everything",
-    objcopy_files = ":empty",
-    strip_files = ":empty",
-    supports_param_files = 0,
-    # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
-    # when possible
-    # https://github.com/bazelbuild/intellij/issues/486
-    tags = ["no-ide"],
-    toolchain_config = ":gcc-jetson_nano",
-    toolchain_identifier = "gcc-jetson_nano",
-)
-
 cc_toolchain_config_jetson_nano(
-    name = "gcc-jetson_nano",
+    name = "linux_gcc-jetson_nano",
     builtin_include_directories = [
         "external/jetson_nano_gcc/include/",
         "external/jetson_nano_gcc/aarch64-linux-gnu/include/",
         "external/jetson_nano_gcc/aarch64-linux-gnu/libc/lib/",
+        "external/jetson_nano_gcc/aarch64-linux-gnu/libc/usr/lib/",
+        "external/jetson_nano_gcc/aarch64-linux-gnu/lib/",
         "external/jetson_nano_gcc/aarch64-linux-gnu/libc/usr/include/",
     ],
     cpu = "jetson_nano",
-    host_compiler_path = "wrapper/jetson_nano_gcc",
-    host_compiler_prefix = "wrapper",
-    toolchain_identifier = "gcc-jetson_nano",
+    target_cpu = "jetson_nano",
+    target_system_name = "jetson_nano",
+    tool_paths = {
+        "ar": "external/jetson_nano_gcc/bin/aarch64-linux-gnu-ar",
+        "cpp": "external/jetson_nano_gcc/bin/aarch64-linux-gnu-cpp",
+        "dwp": "external/jetson_nano_gcc/bin/aarch64-linux-gnu-dwp",
+        "gcc": "wrapper/jetson_nano_gcc",
+        "gcov": "external/jetson_nano_gcc/bin/aarch64-linux-gnu-gcov",
+        "ld": "external/jetson_nano_gcc/bin/aarch64-linux-gnu-ld",
+        "nm": "external/jetson_nano_gcc/bin/aarch64-linux-gnu-nm",
+        "objcopy": "external/jetson_nano_gcc/bin/aarch64-linux-gnu-objcopy",
+        "objdump": "external/jetson_nano_gcc/bin/aarch64-linux-gnu-objdump",
+        "strip": "external/jetson_nano_gcc/bin/aarch64-linux-gnu-strip",
+    },
+    toolchain_identifier = "linux_gcc-jetson_nano",
 )
+
+cc_toolchain(
+    name = "cc_toolchain_jetson_nano_gcc",
+    all_files = ":jetson_nano_everything",
+    ar_files = ":jetson_nano_everything",
+    as_files = ":jetson_nano_everything",
+    compiler_files = ":jetson_nano_everything",
+    dwp_files = ":jetson_nano_everything",
+    dynamic_runtime_lib = "@jetson_nano_gcc//:runtime_libs",
+    linker_files = ":jetson_nano_everything",
+    objcopy_files = ":jetson_nano_everything",
+    static_runtime_lib = "@jetson_nano_gcc//:static_libs",
+    strip_files = ":jetson_nano_everything",
+    supports_param_files = True,
+    # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
+    # when possible
+    # https://github.com/bazelbuild/intellij/issues/486
+    tags = ["no-ide"],
+    toolchain_config = ":linux_gcc-jetson_nano",
+    toolchain_identifier = "gcc_jetson_nano",
+)
+
