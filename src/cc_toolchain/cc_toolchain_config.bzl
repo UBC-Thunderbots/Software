@@ -909,18 +909,6 @@ def _jetson_nano_gcc_impl(ctx):
         ],
     )
 
-    nostdinc_feature = feature(
-        name = "nostdinc",
-        flag_sets = [
-            flag_set(
-                actions = ALL_LINK_ACTIONS,
-                flag_groups = [flag_group(flags = [
-                    "-nostdinc",
-                ])],
-            ),
-        ],
-    )
-
     opt_feature = feature(
         name = "opt",
         flag_sets = [
@@ -972,42 +960,18 @@ def _jetson_nano_gcc_impl(ctx):
         provides = ["profile"],
     )
 
-    # This feature is not required for the code to build, but it is required
-    # in order for the bazel plugin we use for CLion to function correctly. This was
-    # prompted by the following comment in the plugin itself:
-    # https://github.com/bazelbuild/intellij/blob/e76fdadb0bdabbe2be913cba03d9014eb2366374/cpp/src/com/google/idea/blaze/cpp/SysrootFlagsProcessor.java#L70
-    # An issue has been filed (https://github.com/bazelbuild/intellij/issues/1368) to
-    # hopefully correct this so we don't need this feature in the future, or confirm
-    # if this is expected behavior.
-    builtin_include_directories_feature = feature(
-        name = "builtin_include_directories",
-        flag_sets = [
-            flag_set(
-                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
-                flag_groups = [flag_group(
-                    flags = [
-                        "-I{}".format(dir)
-                        for dir in ctx.attr.builtin_include_directories
-                    ],
-                )],
-            ),
-        ],
-    )
-
     common_feature = feature(
         name = "common",
         implies = [
-            "builtin_include_directories",
             "c++17",
             "colour",
             "determinism",
             "warnings_as_errors",
             #"hardening",
             "build-id",
-            #"no-canonical-prefixes",
+            "no-canonical-prefixes",
             #"stdlib",
             "lld",
-            "nostdinc",
             "frame-pointer",
             "static_link_cpp_runtimes",
         ],
@@ -1017,10 +981,8 @@ def _jetson_nano_gcc_impl(ctx):
         static_libgcc,
         pic_feature,
         supports_pic_feature,
-        builtin_include_directories_feature,
-        nostdinc_feature,
         common_feature,
-        stdlib_feature,
+        #stdlib_feature,
         lld_feature,
         coverage_feature,
         opt_feature,
@@ -1047,7 +1009,7 @@ def _jetson_nano_gcc_impl(ctx):
             abi_libc_version = "local",
             tool_paths = tool_paths,
             make_variables = [],
-            builtin_sysroot = None,
+            builtin_sysroot = "external/jetson_nano_gcc/aarch64-linux-gnu/libc",
             cc_target_os = None,
         ),
         DefaultInfo(

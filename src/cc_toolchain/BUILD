@@ -83,6 +83,9 @@ filegroup(
 filegroup(
     name = "jetson_nano_everything",
     srcs = [
+        "@jetson_nano_gcc//:includes",
+        "@jetson_nano_gcc//:runtime_libs",
+        "@jetson_nano_gcc//:static_libs",
         "@jetson_nano_gcc//:everything",
     ] + glob(["wrapper/jetson-nano-*"]) + glob(["wrapper/jetson_nano_*"]),
 )
@@ -214,14 +217,7 @@ cc_toolchain(
 
 cc_toolchain_config_jetson_nano(
     name = "linux_gcc-jetson_nano",
-    builtin_include_directories = [
-        "external/jetson_nano_gcc/include/",
-        "external/jetson_nano_gcc/aarch64-linux-gnu/include/",
-        "external/jetson_nano_gcc/aarch64-linux-gnu/libc/lib/",
-        "external/jetson_nano_gcc/aarch64-linux-gnu/libc/usr/lib/",
-        "external/jetson_nano_gcc/aarch64-linux-gnu/lib/",
-        "external/jetson_nano_gcc/aarch64-linux-gnu/libc/usr/include/",
-    ],
+    builtin_include_directories = [],
     cpu = "jetson_nano",
     target_cpu = "jetson_nano",
     target_system_name = "jetson_nano",
@@ -260,4 +256,3 @@ cc_toolchain(
     toolchain_config = ":linux_gcc-jetson_nano",
     toolchain_identifier = "gcc_jetson_nano",
 )
-
