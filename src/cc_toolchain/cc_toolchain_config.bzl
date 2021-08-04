@@ -860,18 +860,6 @@ def _jetson_nano_impl(ctx):
         implies = ["common"],
     )
 
-    jetson_nano_feature = feature(
-        name = "jetson_nano",
-        flag_sets = [
-            flag_set(
-                actions = ALL_COMPILE_ACTIONS + ALL_LINK_ACTIONS,
-            ),
-        ],
-        implies = [
-            "no-canonical-system-headers",
-        ],
-    )
-
     common_feature = feature(
         name = "common",
         implies = [
@@ -879,11 +867,10 @@ def _jetson_nano_impl(ctx):
             "c++17",
             "colour",
             "warnings_as_errors",
+            "no-canonical-system-headers",
             "determinism",
             "no-canonical-prefixes",
-        ] + ([ctx.attr.cpu] if ctx.attr.cpu in [
-            "jetson_nano",
-        ] else []),
+        ],
     )
 
     pic_feature = feature(
@@ -934,22 +921,21 @@ def _jetson_nano_impl(ctx):
         supports_pic_feature,
         common_feature,
         opt_feature,
-        jetson_nano_feature,
     ]
 
     cxx_builtin_include_directories = ctx.attr.builtin_include_directories
 
     tool_paths = [
         tool_path(name = "gcc", path = ctx.attr.host_compiler_path),
-        tool_path(name = "ar", path = ctx.attr.host_compiler_prefix + "/jetson-nano-ar"),
-        tool_path(name = "compat-ld", path = ctx.attr.host_compiler_prefix + "/jetson-nano-ld"),
-        tool_path(name = "cpp", path = ctx.attr.host_compiler_prefix + "/jetson-nano-cpp"),
-        tool_path(name = "gcov", path = ctx.attr.host_compiler_prefix + "/jetson-nano-gcov"),
-        tool_path(name = "ld", path = ctx.attr.host_compiler_prefix + "/jetson-nano-ld"),
-        tool_path(name = "nm", path = ctx.attr.host_compiler_prefix + "/jetson-nano-nm"),
-        tool_path(name = "objcopy", path = ctx.attr.host_compiler_prefix + "/jetson-nano-objcopy"),
-        tool_path(name = "objdump", path = ctx.attr.host_compiler_prefix + "/jetson-nano-objdump"),
-        tool_path(name = "strip", path = ctx.attr.host_compiler_prefix + "/jetson-nano-strip"),
+        tool_path(name = "ar", path = ctx.attr.host_compiler_prefix + "/jetson_nano_ar"),
+        tool_path(name = "compat-ld", path = ctx.attr.host_compiler_prefix + "/jetson_nano_ld"),
+        tool_path(name = "cpp", path = ctx.attr.host_compiler_prefix + "/jetson_nano_cpp"),
+        tool_path(name = "gcov", path = ctx.attr.host_compiler_prefix + "/jetson_nano_gcov"),
+        tool_path(name = "ld", path = ctx.attr.host_compiler_prefix + "/jetson_nano_ld"),
+        tool_path(name = "nm", path = ctx.attr.host_compiler_prefix + "/jetson_nano_nm"),
+        tool_path(name = "objcopy", path = ctx.attr.host_compiler_prefix + "/jetson_nano_objcopy"),
+        tool_path(name = "objdump", path = ctx.attr.host_compiler_prefix + "/jetson_nano_objdump"),
+        tool_path(name = "strip", path = ctx.attr.host_compiler_prefix + "/jetson_nano_strip"),
     ]
 
     out = ctx.actions.declare_file(ctx.label.name)
