@@ -468,18 +468,6 @@ def _linux_gcc_impl(ctx):
         ],
     )
 
-    nostdinc_feature = feature(
-        name = "nostdinc",
-        flag_sets = [
-            flag_set(
-                actions = ALL_LINK_ACTIONS,
-                flag_groups = [flag_group(flags = [
-                    "-nostdinc",
-                ])],
-            ),
-        ],
-    )
-
     opt_feature = feature(
         name = "opt",
         flag_sets = [
@@ -566,7 +554,6 @@ def _linux_gcc_impl(ctx):
             "no-canonical-prefixes",
             "stdlib",
             "lld",
-            "nostdinc",
             "frame-pointer",
             "static_link_cpp_runtimes",
         ],
@@ -580,7 +567,6 @@ def _linux_gcc_impl(ctx):
         common_feature,
         stdlib_feature,
         lld_feature,
-        nostdinc_feature,
         coverage_feature,
         opt_feature,
         runtime_library_search_directories,
@@ -821,63 +807,12 @@ cc_toolchain_config_stm32 = rule(
     executable = True,
 )
 
-def _jetson_nano_gcc_impl(ctx):
+def _jetson_nano_impl(ctx):
     host_system_name = "k8"
 
     action_configs = []
 
-    tool_paths = [
-        tool_path(name = name, path = path)
-        for name, path in ctx.attr.tool_paths.items()
-    ]
-
     common = _make_common_features(ctx)
-
-    runtime_library_search_directories = feature(
-        name = "runtime_library_search_directories",
-        enabled = True,
-        flag_sets = [
-            flag_set(
-                actions = ALL_LINK_ACTIONS,
-                flag_groups = [
-                    flag_group(
-                        flags = [
-                            "-Wl,-rpath,$ORIGIN/%{runtime_library_search_directories}",
-                        ],
-                        iterate_over = "runtime_library_search_directories",
-                        expand_if_available = "runtime_library_search_directories",
-                    ),
-                ],
-            ),
-        ],
-    )
-
-    static_libgcc = feature(
-        name = "static-libgcc",
-        flag_sets = [
-            flag_set(
-                actions = ALL_LINK_ACTIONS,
-                flag_groups = [
-                    flag_group(flags = ["-static-libgcc"]),
-                ],
-            ),
-        ],
-    )
-
-    pic_feature = feature(
-        name = "pic",
-        enabled = True,
-        flag_sets = [
-            flag_set(
-                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
-                flag_groups = [
-                    flag_group(flags = ["-fPIC"]),
-                ],
-            ),
-        ],
-    )
-
-    supports_pic_feature = feature(name = "supports_pic", enabled = True)
 
     stdlib_feature = feature(
         name = "stdlib",
@@ -897,18 +832,6 @@ def _jetson_nano_gcc_impl(ctx):
         ],
     )
 
-    lld_feature = feature(
-        name = "lld",
-        flag_sets = [
-            flag_set(
-                actions = ALL_LINK_ACTIONS,
-                flag_groups = [flag_group(flags = [
-                    "-fuse-ld=gold",
-                ])],
-            ),
-        ],
-    )
-
     opt_feature = feature(
         name = "opt",
         flag_sets = [
@@ -917,8 +840,8 @@ def _jetson_nano_gcc_impl(ctx):
                 flag_groups = [
                     flag_group(
                         flags = [
-                            "-ggdb",
-                            "-O3",
+                            "-g",
+                            "-Os",
                             "-ffunction-sections",
                             "-fdata-sections",
                         ],
@@ -937,56 +860,96 @@ def _jetson_nano_gcc_impl(ctx):
         implies = ["common"],
     )
 
-    coverage_feature = feature(
-        name = "coverage",
+    jetson_nano_feature = feature(
+        name = "jetson_nano",
         flag_sets = [
             flag_set(
-                actions = ALL_COMPILE_ACTIONS,
-                flag_groups = [
-                    flag_group(
-                        flags = ["--coverage"],
-                    ),
-                ],
-            ),
-            flag_set(
-                actions = ALL_LINK_ACTIONS,
-                flag_groups = [
-                    flag_group(
-                        flags = ["--coverage"],
-                    ),
-                ],
+                actions = ALL_COMPILE_ACTIONS + ALL_LINK_ACTIONS,
             ),
         ],
-        provides = ["profile"],
+        implies = [
+            "no-canonical-system-headers",
+        ],
     )
 
     common_feature = feature(
         name = "common",
         implies = [
+            "stdlib",
             "c++17",
             "colour",
-            "determinism",
             "warnings_as_errors",
-            #"hardening",
-            "build-id",
+            "determinism",
             "no-canonical-prefixes",
-            #"stdlib",
-            "lld",
-            "frame-pointer",
-            "static_link_cpp_runtimes",
+        ] + ([ctx.attr.cpu] if ctx.attr.cpu in [
+            "jetson_nano",
+        ] else []),
+    )
+
+    pic_feature = feature(
+        name = "pic",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
+                flag_groups = [
+                    flag_group(flags = ["-fPIC"]),
+                ],
+            ),
         ],
     )
 
+    supports_pic_feature = feature(name = "supports_pic", enabled = True)
+
+    static_libgcc = feature(
+        name = "static-libgcc",
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [
+                    flag_group(flags = ["-static-libgcc"]),
+                ],
+            ),
+        ],
+    )
+
+    lld_feature = feature(
+        name = "lld",
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [flag_group(flags = [
+                    "-fuse-ld=gold",
+                ])],
+            ),
+        ],
+    )
+
+
     features = common.values() + [
+        lld_feature,
         static_libgcc,
+        stdlib_feature,
         pic_feature,
         supports_pic_feature,
         common_feature,
-        #stdlib_feature,
-        lld_feature,
-        coverage_feature,
         opt_feature,
-        runtime_library_search_directories,
+        jetson_nano_feature,
+    ]
+
+    cxx_builtin_include_directories = ctx.attr.builtin_include_directories
+
+    tool_paths = [
+        tool_path(name = "gcc", path = ctx.attr.host_compiler_path),
+        tool_path(name = "ar", path = ctx.attr.host_compiler_prefix + "/jetson-nano-ar"),
+        tool_path(name = "compat-ld", path = ctx.attr.host_compiler_prefix + "/jetson-nano-ld"),
+        tool_path(name = "cpp", path = ctx.attr.host_compiler_prefix + "/jetson-nano-cpp"),
+        tool_path(name = "gcov", path = ctx.attr.host_compiler_prefix + "/jetson-nano-gcov"),
+        tool_path(name = "ld", path = ctx.attr.host_compiler_prefix + "/jetson-nano-ld"),
+        tool_path(name = "nm", path = ctx.attr.host_compiler_prefix + "/jetson-nano-nm"),
+        tool_path(name = "objcopy", path = ctx.attr.host_compiler_prefix + "/jetson-nano-objcopy"),
+        tool_path(name = "objdump", path = ctx.attr.host_compiler_prefix + "/jetson-nano-objdump"),
+        tool_path(name = "strip", path = ctx.attr.host_compiler_prefix + "/jetson-nano-strip"),
     ]
 
     out = ctx.actions.declare_file(ctx.label.name)
@@ -998,7 +961,7 @@ def _jetson_nano_gcc_impl(ctx):
             features = features,
             action_configs = action_configs,
             artifact_name_patterns = [],
-            cxx_builtin_include_directories = ctx.attr.builtin_include_directories,
+            cxx_builtin_include_directories = cxx_builtin_include_directories,
             toolchain_identifier = ctx.attr.toolchain_identifier,
             host_system_name = host_system_name,
             target_system_name = ctx.attr.target_system_name,
@@ -1009,7 +972,7 @@ def _jetson_nano_gcc_impl(ctx):
             abi_libc_version = "local",
             tool_paths = tool_paths,
             make_variables = [],
-            builtin_sysroot = "external/jetson_nano_gcc/aarch64-linux-gnu/libc",
+            builtin_sysroot = None,
             cc_target_os = None,
         ),
         DefaultInfo(
@@ -1018,18 +981,21 @@ def _jetson_nano_gcc_impl(ctx):
     ]
 
 cc_toolchain_config_jetson_nano = rule(
-    implementation = _jetson_nano_gcc_impl,
+    implementation = _jetson_nano_impl,
     attrs = {
+        "cpu": attr.string(mandatory = True, values = [
+            "jetson_nano",
+        ]),
         "builtin_include_directories": attr.string_list(),
-        "cpu": attr.string(mandatory = True, values = ["jetson_nano"]),
-        "extra_features": attr.string_list(),
         "extra_no_canonical_prefixes_flags": attr.string_list(),
+        "host_compiler_path": attr.string(),
+        "host_compiler_prefix": attr.string(),
         "host_compiler_warnings": attr.string_list(),
         "host_unfiltered_compile_flags": attr.string_list(),
         "target_cpu": attr.string(),
         "target_system_name": attr.string(),
-        "tool_paths": attr.string_dict(),
         "toolchain_identifier": attr.string(),
+        "extra_features": attr.string_list(),
     },
     provides = [CcToolchainConfigInfo],
     executable = True,

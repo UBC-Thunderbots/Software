@@ -6,37 +6,21 @@ filegroup(
 )
 
 filegroup(
-    name = "includes",
-    srcs = glob([
-        "include/**",
-        "aarch64-linux-gnu/include/**",
-        "lib/gcc/aarch64-linux-gnu/7.3.1/include/**",
-        "lib/gcc/aarch64-linux-gnu/7.3.1/include-fixed/**",
-        "aarch64-linux-gnu/libc/usr/include/**",
-        "include",
-        "aarch64-linux-gnu/include",
-        "aarch64-linux-gnu/7.3.1/include",
-        "aarch64-linux-gnu/libc/usr/include",
-    ]),
+    name = "gcc",
+    srcs = ["bin/aarch64-linux-gnu-gcc"],
 )
 
 filegroup(
-    name = "runtime_libs",
-    srcs = glob([
-        "aarch64-linux-gnu/libc/lib/*.so.*",
-        "aarch64-linux-gnu/libc/usr/lib/*.so.*",
-        "aarch64-linux-gnu/lib/*.so.*",
-        "aarch64-linux-gnu/libc/lib/*.so",
-        "aarch64-linux-gnu/libc/usr/lib/*.so",
-        "aarch64-linux-gnu/lib/*.so",
-    ]),
+    name = "cpp",
+    srcs = ["bin/aarch64-linux-gnu-cpp"],
 )
 
 filegroup(
-    name = "static_libs",
-    srcs = glob([
-        "aarch64-linux-gnu/libc/lib/*.a",
-        "aarch64-linux-gnu/libc/usr/lib/*.a",
-        "aarch64-linux-gnu/lib/*.a",
-    ]),
+    name = "objcopy",
+    srcs = ["bin/aarch64-linux-gnu-objcopy"],
+)
+
+filegroup(
+    name = "gdb",
+    srcs = ["bin/aarch64-linux-gnu-gdb"],
 )
