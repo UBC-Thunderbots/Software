@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(":cc_toolchain_config.bzl", "cc_toolchain_config_k8", "cc_toolchain_config_stm32", "cc_toolchain_config_jetson_nano")
+load(":cc_toolchain_config.bzl", "cc_toolchain_config_jetson_nano", "cc_toolchain_config_k8", "cc_toolchain_config_stm32")
 
 # Create environments for each CPU this toolchain supports
 environment(name = "k8")
