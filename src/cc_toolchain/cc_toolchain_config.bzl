@@ -111,49 +111,6 @@ def _make_common_features(ctx):
         name = "static_link_cpp_runtimes",
     )
 
-    result["static"] = feature(
-        name = "static-libgcc",
-        flag_sets = [
-            flag_set(
-                actions = ALL_LINK_ACTIONS,
-                flag_groups = [
-                    flag_group(flags = ["-static-libgcc"]),
-                ],
-            ),
-        ],
-    )
-
-    result["pic"] = feature(
-        name = "pic",
-        enabled = True,
-        flag_sets = [
-            flag_set(
-                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
-                flag_groups = [
-                    flag_group(flags = ["-fPIC"]),
-                ],
-            ),
-        ],
-    )
-
-    result["arm_stdlib"] = feature(
-        name = "arm_stdlib",
-        flag_sets = [
-            flag_set(
-                actions = ALL_LINK_ACTIONS,
-                flag_groups = [flag_group(flags = [
-                    "-Wl,--start-group",
-                    "-lstdc++",
-                    "-lsupc++",
-                    "-lm",
-                    "-lc",
-                    "-lgcc",
-                    "-Wl,--end-group",
-                ])],
-            ),
-        ],
-    )
-
     result["unfiltered_compile_flags_feature"] = feature(
         name = "unfiltered_compile_flags",
         flag_sets = ([
@@ -423,18 +380,6 @@ def _make_common_features(ctx):
         ],
     )
 
-    result["lld"] = feature(
-        name = "lld",
-        flag_sets = [
-            flag_set(
-                actions = ALL_LINK_ACTIONS,
-                flag_groups = [flag_group(flags = [
-                    "-fuse-ld=gold",
-                ])],
-            ),
-        ],
-    )
-
     return result
 
 def _linux_gcc_impl(ctx):
@@ -468,6 +413,31 @@ def _linux_gcc_impl(ctx):
         ],
     )
 
+    static_libgcc = feature(
+        name = "static-libgcc",
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [
+                    flag_group(flags = ["-static-libgcc"]),
+                ],
+            ),
+        ],
+    )
+
+    pic_feature = feature(
+        name = "pic",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
+                flag_groups = [
+                    flag_group(flags = ["-fPIC"]),
+                ],
+            ),
+        ],
+    )
+
     supports_pic_feature = feature(name = "supports_pic", enabled = True)
 
     stdlib_feature = feature(
@@ -481,6 +451,18 @@ def _linux_gcc_impl(ctx):
                     "-ldl",
                     "-lrt",
                     "-lstdc++fs",
+                ])],
+            ),
+        ],
+    )
+
+    lld_feature = feature(
+        name = "lld",
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [flag_group(flags = [
+                    "-fuse-ld=gold",
                 ])],
             ),
         ],
@@ -574,17 +556,17 @@ def _linux_gcc_impl(ctx):
             "lld",
             "frame-pointer",
             "static_link_cpp_runtimes",
-            "lld",
-            "static_libgcc",
-            "pic",
         ],
     )
 
     features = common.values() + [
+        static_libgcc,
+        pic_feature,
         supports_pic_feature,
         builtin_include_directories_feature,
         common_feature,
         stdlib_feature,
+        lld_feature,
         coverage_feature,
         opt_feature,
         runtime_library_search_directories,
@@ -642,6 +624,25 @@ def _stm32_impl(ctx):
     action_configs = []
 
     common = _make_common_features(ctx)
+
+    stdlib_feature = feature(
+        name = "stdlib",
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [flag_group(flags = [
+                    "-Wl,--start-group",
+                    "-lstdc++",
+                    "-lsupc++",
+                    "-lm",
+                    "-lc",
+                    "-lgcc",
+                    "-lnosys",
+                    "-Wl,--end-group",
+                ])],
+            ),
+        ],
+    )
 
     opt_feature = feature(
         name = "opt",
@@ -720,7 +721,7 @@ def _stm32_impl(ctx):
     common_feature = feature(
         name = "common",
         implies = [
-            "arm_stdlib",
+            "stdlib",
             "c++17",
             "colour",
             "warnings_as_errors",
@@ -733,6 +734,7 @@ def _stm32_impl(ctx):
     )
 
     features = common.values() + [
+        stdlib_feature,
         common_feature,
         opt_feature,
         stm32_feature,
@@ -812,6 +814,24 @@ def _jetson_nano_impl(ctx):
 
     common = _make_common_features(ctx)
 
+    stdlib_feature = feature(
+        name = "stdlib",
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [flag_group(flags = [
+                    "-Wl,--start-group",
+                    "-lstdc++",
+                    "-lsupc++",
+                    "-lm",
+                    "-lc",
+                    "-lgcc",
+                    "-Wl,--end-group",
+                ])],
+            ),
+        ],
+    )
+
     opt_feature = feature(
         name = "opt",
         flag_sets = [
@@ -820,8 +840,8 @@ def _jetson_nano_impl(ctx):
                 flag_groups = [
                     flag_group(
                         flags = [
-                            "-ggdb",
-                            "-O3",
+                            "-g",
+                            "-Os",
                             "-ffunction-sections",
                             "-fdata-sections",
                         ],
@@ -843,22 +863,61 @@ def _jetson_nano_impl(ctx):
     common_feature = feature(
         name = "common",
         implies = [
-            "arm_stdlib",
+            "stdlib",
             "c++17",
             "colour",
             "warnings_as_errors",
             "no-canonical-system-headers",
             "determinism",
             "no-canonical-prefixes",
-            "lld",
-            "static_libgcc",
-            "pic",
+        ],
+    )
+
+    pic_feature = feature(
+        name = "pic",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
+                flag_groups = [
+                    flag_group(flags = ["-fPIC"]),
+                ],
+            ),
         ],
     )
 
     supports_pic_feature = feature(name = "supports_pic", enabled = True)
 
+    static_libgcc = feature(
+        name = "static-libgcc",
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [
+                    flag_group(flags = ["-static-libgcc"]),
+                ],
+            ),
+        ],
+    )
+
+    lld_feature = feature(
+        name = "lld",
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [flag_group(flags = [
+                    "-fuse-ld=gold",
+                ])],
+            ),
+        ],
+    )
+
+
     features = common.values() + [
+        lld_feature,
+        static_libgcc,
+        stdlib_feature,
+        pic_feature,
         supports_pic_feature,
         common_feature,
         opt_feature,

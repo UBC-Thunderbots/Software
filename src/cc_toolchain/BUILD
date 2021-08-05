@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load(":cc_toolchain_config.bzl", "cc_toolchain_config_jetson_nano", "cc_toolchain_config_k8", "cc_toolchain_config_stm32")
+load(":cc_toolchain_config.bzl", "cc_toolchain_config_k8", "cc_toolchain_config_stm32", "cc_toolchain_config_jetson_nano")
 
 # Create environments for each CPU this toolchain supports
 environment(name = "k8")
@@ -84,7 +84,7 @@ filegroup(
     name = "jetson_nano_everything",
     srcs = [
         "@jetson_nano_gcc//:everything",
-    ] + glob(["wrapper/jetson-nano-*"]) + glob(["wrapper/jetson_nano_*"]),
+    ] + glob(["wrapper/jetson_nano_*"]),
 )
 
 filegroup(
