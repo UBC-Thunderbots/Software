@@ -912,7 +912,6 @@ def _jetson_nano_impl(ctx):
         ],
     )
 
-
     features = common.values() + [
         lld_feature,
         static_libgcc,
