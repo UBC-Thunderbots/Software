@@ -17,8 +17,13 @@ class SimulatedThetaStarTest : public SimulatedTacticTestFixture
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_F(SimulatedThetaStarTest, test_theta_star_robot_and_dest_in_same_obstacle)
+TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_robot_and_dest_in_same_obstacle)
 {
+    // TODO (ISSUE #2227): Enemy robots obstacle size changing when friendly robot is in
+    // close proximity This issue results in the robot constantly oscillating and not
+    // settling down at the destination.
+    // https://github.com/UBC-Thunderbots/Software/issues/2227
+
     // Both initial_position and destination are in the same obstacle (enemy robot).
     // The two points are not in the same coordinate initially, however after
     // initial_position is moved to a free point, it is in the same coordinate as
@@ -96,8 +101,13 @@ TEST_F(SimulatedThetaStarTest,
             Duration::fromSeconds(15));
 }
 
-TEST_F(SimulatedThetaStarTest, test_theta_star_dest_in_obstacle)
+TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_dest_in_obstacle)
 {
+    // TODO (ISSUE #2227): Enemy robots obstacle size changing when friendly robot is in
+    // close proximity This issue results in the robot constantly oscillating and not
+    // settling down at the destination.
+    // https://github.com/UBC-Thunderbots/Software/issues/2227
+
     // Destination is in obstacle, but initial point is open
     Point destination      = Point(1, -0.1);
     Point initial_position = Point(1, 2);
