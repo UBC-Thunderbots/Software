@@ -380,6 +380,18 @@ def _make_common_features(ctx):
         ],
     )
 
+    result["lld"] = feature(
+        name = "lld",
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [flag_group(flags = [
+                    "-fuse-ld=gold",
+                ])],
+            ),
+        ],
+    )
+
     return result
 
 def _linux_gcc_impl(ctx):
@@ -451,18 +463,6 @@ def _linux_gcc_impl(ctx):
                     "-ldl",
                     "-lrt",
                     "-lstdc++fs",
-                ])],
-            ),
-        ],
-    )
-
-    lld_feature = feature(
-        name = "lld",
-        flag_sets = [
-            flag_set(
-                actions = ALL_LINK_ACTIONS,
-                flag_groups = [flag_group(flags = [
-                    "-fuse-ld=gold",
                 ])],
             ),
         ],
@@ -556,6 +556,7 @@ def _linux_gcc_impl(ctx):
             "lld",
             "frame-pointer",
             "static_link_cpp_runtimes",
+            "lld",
         ],
     )
 
@@ -566,7 +567,6 @@ def _linux_gcc_impl(ctx):
         builtin_include_directories_feature,
         common_feature,
         stdlib_feature,
-        lld_feature,
         coverage_feature,
         opt_feature,
         runtime_library_search_directories,
@@ -870,6 +870,7 @@ def _jetson_nano_impl(ctx):
             "no-canonical-system-headers",
             "determinism",
             "no-canonical-prefixes",
+            "lld",
         ],
     )
 
@@ -900,21 +901,7 @@ def _jetson_nano_impl(ctx):
         ],
     )
 
-    lld_feature = feature(
-        name = "lld",
-        flag_sets = [
-            flag_set(
-                actions = ALL_LINK_ACTIONS,
-                flag_groups = [flag_group(flags = [
-                    "-fuse-ld=gold",
-                ])],
-            ),
-        ],
-    )
-
-
     features = common.values() + [
-        lld_feature,
         static_libgcc,
         stdlib_feature,
         pic_feature,
