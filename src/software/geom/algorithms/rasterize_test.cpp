@@ -281,12 +281,6 @@ TEST(RasterizeTest, test_rasterize_complex_self_intersecting_polygon)
 
     std::vector<Point> rasterized_points = rasterize(intersecting_poly, offset);
 
-    for (Point p : rasterized_points)
-    {
-        std::cout << p << ",";
-    }
-    std::cout << std::endl;
-
     TestUtil::checkPolygonPointsInsideBoundingBox(intersecting_poly, rasterized_points);
     TestUtil::checkPointsCloseToEachOther(rasterized_points, offset);
 }

@@ -457,9 +457,11 @@ bool ThetaStarPathPlanner::visitNeighbours(const Coordinate &current_coord,
     return false;
 }
 
-std::optional<ThetaStarPathPlanner::Coordinate> ThetaStarPathPlanner::findClosestUnblockedCell(const Coordinate &current_cell)
+std::optional<ThetaStarPathPlanner::Coordinate>
+ThetaStarPathPlanner::findClosestUnblockedCell(const Coordinate &current_cell)
 {
-    // Check the horizontal and vertical cells relative to current_cell for the nearest unblocked cell
+    // Check the horizontal and vertical cells relative to current_cell for the nearest
+    // unblocked cell
     unsigned int i = current_cell.row();
     unsigned int j = current_cell.col();
     Coordinate test_coord;
