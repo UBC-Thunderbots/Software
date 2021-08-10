@@ -1,0 +1,9 @@
+syntax = 'proto3';
+
+message PlayInfoProto
+{
+  string referee_command_name = 1;
+  string play_name = 2;
+  map<string, uint32> robot_tactic_assignment = 3;
+  string tactic_fsm_state = 4;
+}
