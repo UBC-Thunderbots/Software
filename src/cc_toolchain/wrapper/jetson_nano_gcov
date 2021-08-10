@@ -1,0 +1,3 @@
+#!/bin/bash --norc
+
+exec external/jetson_nano_gcc/bin/aarch64-linux-gnu-gcov "$@"
