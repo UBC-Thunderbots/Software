@@ -85,6 +85,14 @@ proto_library(
     ],
 )
 
+proto_library(
+    name = "play_info_msg_proto",
+    srcs = [
+        "play_info_msg.proto",
+    ],
+    visibility = ["//visibility:private"],
+)
+
 cc_proto_library(
     name = "ssl_cc_proto",
     deps = [":ssl_proto"],
@@ -108,6 +116,11 @@ cc_proto_library(
 cc_proto_library(
     name = "repeated_any_msg_cc_proto",
     deps = [":repeated_any_msg_proto"],
+)
+
+cc_proto_library(
+    name = "play_info_msg_cc_proto",
+    deps = [":play_info_msg_proto"],
 )
 
 py_proto_library(
