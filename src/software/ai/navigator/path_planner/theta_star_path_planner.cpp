@@ -37,19 +37,6 @@ void ThetaStarPathPlanner::findAllBlockedCoords()
     }
 }
 
-bool ThetaStarPathPlanner::isUnblocked(const Coordinate &coord)
-{
-    Point p = convertCoordToPoint(coord);
-    for (auto &obstacle : obstacles)
-    {
-        if (obstacle->contains(p))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
 bool ThetaStarPathPlanner::isBlocked(const Coordinate &coord)
 {
     return blocked_grid[coord.row()][coord.col()];
