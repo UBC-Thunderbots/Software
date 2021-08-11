@@ -444,7 +444,7 @@ class ThetaStarPathPlanner : public PathPlanner
         50.0;  // number of fractions to divide 1m
 
     const double SIZE_OF_GRID_CELL_IN_METERS =
-        ROBOT_MAX_RADIUS_METERS / 2;  // this is the n in the O(n^2) algorithm :p
+        ROBOT_MAX_RADIUS_METERS;  // this is the n in the O(n^2) algorithm :p
 
     std::vector<ObstaclePtr> obstacles;
     Point centre;
