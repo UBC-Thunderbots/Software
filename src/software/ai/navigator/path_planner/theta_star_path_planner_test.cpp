@@ -479,7 +479,8 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_through_corner_of_rectangl
 
     std::vector<ObstaclePtr> obstacles = {
         robot_navigation_obstacle_factory.createFromShape(
-            Polygon{Point(-0.5, -0.5), Point(-0.5, 0), Point(0, 0), Point(0, -0.5)})};
+            Polygon{Point(-0.5, -0.5), Point(-0.5, -0.151503f),
+                    Point(-0.166503f, -0.151503f), Point(-0.166503f, -0.5)})};
 
     Rectangle navigable_area = field.fieldBoundary();
 

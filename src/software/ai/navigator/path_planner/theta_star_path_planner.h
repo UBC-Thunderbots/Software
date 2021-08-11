@@ -255,16 +255,6 @@ class ThetaStarPathPlanner : public PathPlanner
     void findAllBlockedCoords();
 
     /**
-     * Returns whether or not a cell is unblocked
-     * Searches all of the obstacles to see if any of them contains coord
-     *
-     * @param coord Coordinate to consider
-     *
-     * @return true if cell is unblocked
-     */
-    bool isUnblocked(const Coordinate &coord);
-
-    /**
      * Returns whether or not a cell is blocked
      * Checks blocked_grid to see if coord was set to blocked
      *

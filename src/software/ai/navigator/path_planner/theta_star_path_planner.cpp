@@ -273,6 +273,8 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
 
     resetAndInitializeMemberVariables(navigable_area, obstacles);
 
+    findAllBlockedCoords();
+
     Point closest_end      = findClosestFreePoint(end);
     Coordinate start_coord = convertPointToCoord(start);
     Coordinate end_coord   = convertPointToCoord(closest_end);
@@ -299,8 +301,6 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     // Initialising the parameters of the starting cell
     cell_heuristics[start_coord.row()][start_coord.col()].update(start_coord, 0.0, 0.0);
     open_list.insert(std::make_pair(0.0, start_coord));
-
-    findAllBlockedCoords();
 
     // Avoiding the situation where closest_end point is free but end_coord is blocked
     blocked_grid[start_coord.row()][start_coord.col()] = false;
@@ -343,21 +343,21 @@ bool ThetaStarPathPlanner::adjustEndPointsAndCheckForNoPath(Coordinate &start_co
     bool ret_no_path = false;
 
     // If the source is out of range
-    if (isCoordNavigable(start_coord) == false)
+    if (!isCoordNavigable(start_coord))
     {
         LOG(WARNING) << "Source is not within navigable area; no path found" << std::endl;
         ret_no_path = true;
     }
 
     // If the end is out of range
-    if (isCoordNavigable(end_coord) == false)
+    if (!isCoordNavigable(end_coord))
     {
         LOG(WARNING) << "End is not within navigable area; no path found" << std::endl;
         ret_no_path = true;
     }
 
     // The source is blocked
-    if (isUnblocked(start_coord) == false)
+    if (isBlocked(start_coord))
     {
         auto closest_start_coord = findClosestUnblockedCell(start_coord);
         if (closest_start_coord)
@@ -371,7 +371,7 @@ bool ThetaStarPathPlanner::adjustEndPointsAndCheckForNoPath(Coordinate &start_co
     }
 
     // The end is blocked
-    if (isUnblocked(end_coord) == false)
+    if (isBlocked(end_coord))
     {
         auto closest_end_coord = findClosestUnblockedCell(end_coord);
         if (closest_end_coord)
@@ -469,13 +469,13 @@ ThetaStarPathPlanner::findClosestUnblockedCell(const Coordinate &current_cell)
     for (unsigned int depth = 1; depth < num_grid_rows; depth++)
     {
         test_coord = Coordinate(i + depth * depth_sign, j);
-        if (isCoordNavigable(test_coord) && isUnblocked(test_coord))
+        if (isCoordNavigable(test_coord) && !isBlocked(test_coord))
         {
             return test_coord;
         }
 
         test_coord = Coordinate(i, j + depth * depth_sign);
-        if (isCoordNavigable(test_coord) && isUnblocked(test_coord))
+        if (isCoordNavigable(test_coord) && !isBlocked(test_coord))
         {
             return test_coord;
         }
@@ -573,12 +573,10 @@ bool ThetaStarPathPlanner::isPointNavigableAndFreeOfObstacles(const Point &p)
         return false;
     }
 
-    for (auto &obstacle : obstacles)
+    Coordinate test_coord = convertPointToCoord(p);
+    if (isBlocked(test_coord))
     {
-        if (obstacle->contains(p))
-        {
-            return false;
-        }
+        return false;
     }
 
     return true;
