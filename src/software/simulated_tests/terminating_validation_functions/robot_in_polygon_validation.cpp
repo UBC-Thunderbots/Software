@@ -20,9 +20,11 @@ void robotInPolygon(RobotId robot_id, Polygon polygon, std::shared_ptr<World> wo
 
     while (!robot_in_polygon(world_ptr))
     {
+        std::optional<Robot> robot_optional =
+                world_ptr->friendlyTeam().getRobotById(robot_id);
         std::stringstream ss;
         ss << polygon;
         yield("Robot with ID " + std::to_string(robot_id) +
-              " has not entered the polygon " + ss.str());
+              " has not entered the polygon " + ss.str() + ". Actual position is " + std::to_string(robot_optional.value().position().x()) + "," + std::to_string(robot_optional.value().position().y()));
     }
 }
