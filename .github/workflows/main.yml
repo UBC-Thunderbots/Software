@@ -81,6 +81,11 @@ jobs:
         run: |
          cd src
          bazel build --cpu=stm32f4 //firmware/boards/legacy_dongle_stm32f4:bin         
+
+      - name: Jetson Nano Build
+        run: |
+         cd src
+         bazel build --cpu=jetson_nano //software/simulation/... //firmware/app/...
              
   simulated-gameplay-tests:
     name: Simulated Gameplay Tests
