@@ -68,12 +68,12 @@ std::vector<Point> rasterize(const Circle& circle, const double resolution_size)
         }
     }
 
-    // Draw points resolution_size away (arclength) from each other over the radius of obstacle
-    double delta_theta = resolution_size / radius;
+    // Draw points resolution_size away (arclength) from each other over the circumference
+    double delta_theta     = resolution_size / radius;
     int num_theta_sections = (int)std::ceil(M_PI / delta_theta);
     for (int section = 0; section < num_theta_sections; section++)
     {
-        double theta = section * delta_theta;
+        double theta    = section * delta_theta;
         double x_offset = std::cos(theta) * radius;
         double y_offset = std::sin(theta) * radius;
 
