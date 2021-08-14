@@ -155,7 +155,7 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
             // Wait for all robots to come to a halt
             robotHalt(world_ptr, yield);
             // Attacker in front of enemy with the ball
-            Rectangle attacker_rect(Point(-3.5, 1), Point(-2.3, 0));
+            Rectangle attacker_rect(Point(-3.5, 1.2), Point(-2.3, 0.2));
             robotInPolygon(1, attacker_rect, world_ptr, yield);
 
             // The rectangle for the right crease defender and one of the shadowing robots
@@ -166,10 +166,10 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
             Point goalie_position = world_ptr->friendlyTeam().goalie()->position();
             Rectangle left_crease_defender_rect(
                 Point(goalie_position.x(), goalie_position.y() + 0.45),
-                Point(goalie_position.x() + 0.45, goalie_position.y()));
+                Point(goalie_position.x() + 0.55, goalie_position.y()));
             Rectangle right_crease_defender_and_shadow_rect(
                 Point(goalie_position.x(), goalie_position.y()),
-                Point(goalie_position.x() + 1.2, goalie_position.y() - 0.3));
+                Point(goalie_position.x() + 1.0, goalie_position.y() - 0.3));
             robotInPolygon(2, left_crease_defender_rect, world_ptr, yield);
             robotInPolygon(3, right_crease_defender_and_shadow_rect, world_ptr, yield);
 
