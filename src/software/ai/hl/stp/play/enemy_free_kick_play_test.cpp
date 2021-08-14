@@ -88,7 +88,7 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_close_to_net)
         field.enemyGoalCenter(),
         Point(-2.3, 1.05),
         Point(-3.5, 2),
-        Point(-1.5, 0),
+        Point(-1.2, 0),
         Point(-2.3, -1),
         Point(-3.8, -2),
     });
@@ -110,7 +110,7 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_close_to_net)
             // enemy robot performing the free kick, based on where the enemy robots are
             // initialized in the test.
             Rectangle robot_four_shadowing_rect(Point(-2.5, -0.5), Point(-2, -1));
-            Rectangle robot_five_shadowing_rect(Point(-2, 0.5), Point(-1.5, 0));
+            Rectangle robot_five_shadowing_rect(Point(-1.8, 0.5), Point(-1.2, 0));
             robotInPolygon(4, robot_four_shadowing_rect, world_ptr, yield);
             robotInPolygon(5, robot_five_shadowing_rect, world_ptr, yield);
 

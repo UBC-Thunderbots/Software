@@ -158,23 +158,26 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
             Rectangle attacker_rect(Point(-3.5, 1), Point(-2.3, 0));
             robotInPolygon(1, attacker_rect, world_ptr, yield);
 
-            // Two friendly robots in position to shadow enemy robots. One is on the enemy
-            // with the ball and the other is on the next highest threat
-            Rectangle robot_four_shadowing_rect(Point(-2.75, 0.75), Point(-2.25, 0.25));
-            Rectangle robot_five_shadowing_rect(Point(-2.75, -0.5), Point(-2.25, -1));
-            robotInPolygon(4, robot_four_shadowing_rect, world_ptr, yield);
-            robotInPolygon(5, robot_five_shadowing_rect, world_ptr, yield);
+            // The rectangle for the right crease defender and one of the shadowing robots
+            // is shared to make the test less brittle since the AI may assign different
+            // friendly robots to the to each tactic.
 
             // Two friendly crease defenders should be close to the goalie
             Point goalie_position = world_ptr->friendlyTeam().goalie()->position();
             Rectangle left_crease_defender_rect(
-                Point(goalie_position.x(), goalie_position.y() + 0.3),
-                Point(goalie_position.x() + 0.3, goalie_position.y()));
-            Rectangle right_crease_defender_rect(
+                Point(goalie_position.x(), goalie_position.y() + 0.45),
+                Point(goalie_position.x() + 0.45, goalie_position.y()));
+            Rectangle right_crease_defender_and_shadow_rect(
                 Point(goalie_position.x(), goalie_position.y()),
-                Point(goalie_position.x() + 0.3, goalie_position.y() - 0.3));
+                Point(goalie_position.x() + 1.2, goalie_position.y() - 0.3));
             robotInPolygon(2, left_crease_defender_rect, world_ptr, yield);
-            robotInPolygon(3, right_crease_defender_rect, world_ptr, yield);
+            robotInPolygon(3, right_crease_defender_and_shadow_rect, world_ptr, yield);
+
+            // Two friendly robots in position to shadow enemy robots. One is on the enemy
+            // with the ball and the other is on the next highest threat
+            Rectangle robot_five_shadowing_rect(Point(-2.75, -0.5), Point(-2.25, -1));
+            robotInPolygon(4, right_crease_defender_and_shadow_rect, world_ptr, yield);
+            robotInPolygon(5, robot_five_shadowing_rect, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
