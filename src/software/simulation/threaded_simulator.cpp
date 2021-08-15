@@ -72,14 +72,6 @@ void ThreadedSimulator::setBallState(const BallState &ball_state)
     updateCallbacks();
 }
 
-void ThreadedSimulator::removeBall()
-{
-    simulator_mutex.lock();
-    simulator.removeBall();
-    simulator_mutex.unlock();
-    updateCallbacks();
-}
-
 void ThreadedSimulator::addYellowRobots(const std::vector<RobotStateWithId> &robots)
 {
     simulator_mutex.lock();

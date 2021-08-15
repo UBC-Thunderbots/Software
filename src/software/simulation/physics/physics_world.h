@@ -88,11 +88,6 @@ class PhysicsWorld
     void setBallState(const BallState& ball_state);
 
     /**
-     * Removes the ball from the physics world
-     */
-    void removeBall();
-
-    /**
      * Adds robots to the yellow team with the given initial states.
      *
      * @pre The robot IDs must not be duplicated and must not match the ID

@@ -59,24 +59,6 @@ TEST_F(PhysicsWorldTest, test_set_ball_state_when_ball_already_exists)
     EXPECT_EQ(ball_state2, physics_world->getBallState().value());
 }
 
-TEST_F(PhysicsWorldTest, test_remove_existing_ball)
-{
-    BallState ball_state(Point(1, -2), Vector(0, 0.5));
-    physics_world->setBallState(ball_state);
-
-    EXPECT_TRUE(physics_world->getBallState());
-
-    physics_world->removeBall();
-
-    EXPECT_FALSE(physics_world->getBallState());
-}
-
-TEST_F(PhysicsWorldTest, test_remove_nonexistant_ball)
-{
-    physics_world->removeBall();
-    EXPECT_FALSE(physics_world->getBallState());
-}
-
 TEST_F(PhysicsWorldTest, test_add_zero_yellow_robots)
 {
     physics_world->addYellowRobots({});

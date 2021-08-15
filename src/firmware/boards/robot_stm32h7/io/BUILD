@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@rules_foreign_cc//tools/build_defs:cmake.bzl", "cmake_external")
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 
 cc_library(
     name = "gpio_pin",
@@ -143,10 +143,10 @@ cc_library(
 )
 
 # external cmake repo for property based testing
-cmake_external(
+cmake(
     name = "rapidcheck",
     lib_source = "@rapidcheck//:all",
-    static_libraries = ["librapidcheck.a"],
+    out_static_libs = ["librapidcheck.a"],
 )
 
 cc_test(

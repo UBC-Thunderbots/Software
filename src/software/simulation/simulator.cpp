@@ -27,7 +27,6 @@ Simulator::Simulator(const Field& field,
       frame_number(0),
       physics_time_step(physics_time_step)
 {
-    (void)SIMULATOR_SCALE;
     this->resetCurrentFirmwareTime();
 }
 
@@ -46,12 +45,6 @@ void Simulator::setBallState(const BallState& ball_state)
     {
         robot_pair.first->clearBallInDribblerArea();
     }
-}
-
-void Simulator::removeBall()
-{
-    simulator_ball.reset();
-    physics_world.removeBall();
 }
 
 void Simulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
