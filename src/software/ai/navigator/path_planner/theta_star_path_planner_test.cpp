@@ -224,20 +224,24 @@ TEST_F(TestThetaStarPathPlanner,
     Field field = Field::createSSLDivisionBField();
     Point start{0, 0}, dest{3, 0};
 
+    // Robot navigation obstacle factory expands the obstacle by the robot radius plus a
+    // constant offset. To make sure that the robot does not collide with the actual
+    // obstacle we will scale the obstacle by the robot radius and check collision with
+    // that.
     Polygon obstacle_shape = Rectangle(Point(1, -1), Point(2, 1));
 
-    std::vector<ObstaclePtr> smaller_obstacles = {
-        robot_navigation_obstacle_factory.createFromShape(obstacle_shape)};
+    std::vector<ObstaclePtr> expanded_obstacles = {
+            robot_navigation_obstacle_factory.createFromShape(obstacle_shape)};
 
-    std::vector<ObstaclePtr> larger_obstacles = {
-        robot_navigation_obstacle_factory.createFromShape(
+    std::vector<Polygon> actual_obstacles = {
             obstacle_shape.expand(Vector(-1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
-                .expand(Vector(1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
-                .expand(Vector(0, -1).normalize(ROBOT_MAX_RADIUS_METERS))
-                .expand(Vector(0, 1).normalize(ROBOT_MAX_RADIUS_METERS)))};
+                    .expand(Vector(1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
+                    .expand(Vector(0, -1).normalize(ROBOT_MAX_RADIUS_METERS))
+                    .expand(Vector(0, 1).normalize(ROBOT_MAX_RADIUS_METERS))};
+
     Rectangle navigable_area = field.fieldBoundary();
 
-    auto path = planner->findPath(start, dest, navigable_area, larger_obstacles);
+    auto path = planner->findPath(start, dest, navigable_area, expanded_obstacles);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -251,7 +255,7 @@ TEST_F(TestThetaStarPathPlanner,
     Rectangle bounding_box({-0.1, 1.35}, {3.1, -1.35});
 
     checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    checkPathDoesNotIntersectObstacle(path_points, smaller_obstacles);
+    checkPathDoesNotIntersectObstacle(path_points, actual_obstacles);
 }
 
 TEST_F(TestThetaStarPathPlanner,
