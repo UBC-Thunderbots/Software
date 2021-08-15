@@ -231,13 +231,13 @@ TEST_F(TestThetaStarPathPlanner,
     Polygon obstacle_shape = Rectangle(Point(1, -1), Point(2, 1));
 
     std::vector<ObstaclePtr> expanded_obstacles = {
-            robot_navigation_obstacle_factory.createFromShape(obstacle_shape)};
+        robot_navigation_obstacle_factory.createFromShape(obstacle_shape)};
 
     std::vector<Polygon> actual_obstacles = {
-            obstacle_shape.expand(Vector(-1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
-                    .expand(Vector(1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
-                    .expand(Vector(0, -1).normalize(ROBOT_MAX_RADIUS_METERS))
-                    .expand(Vector(0, 1).normalize(ROBOT_MAX_RADIUS_METERS))};
+        obstacle_shape.expand(Vector(-1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
+            .expand(Vector(1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
+            .expand(Vector(0, -1).normalize(ROBOT_MAX_RADIUS_METERS))
+            .expand(Vector(0, 1).normalize(ROBOT_MAX_RADIUS_METERS))};
 
     Rectangle navigable_area = field.fieldBoundary();
 
