@@ -189,6 +189,7 @@ cc_library(
         "//software/world:field",
         "//software/world:team_colour",
         "@er_force_sim//src/amun/simulator",
+        #"@er_force_sim//src/core",
     ],
 )
 

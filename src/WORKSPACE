@@ -75,7 +75,7 @@ boost_deps()
 
 git_repository(
     name = "er_force_sim",
-    commit = "a73b38bd307c8222b01d890c730add1566a24964",
+    commit = "c9060a2dcb1d0f72c5812c19f3963ad67a2c05f4",
     remote = "https://github.com/jonathanlew/er_force_sim",
 )
 
