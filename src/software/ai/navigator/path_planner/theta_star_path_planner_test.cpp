@@ -262,17 +262,19 @@ TEST_F(TestThetaStarPathPlanner,
     Point start{0, 0}, dest{0, 3};
 
     // Robot navigation obstacle factory expands the obstacle by the robot radius plus a
-    // constant offset. To make sure that the robot does not collide with the actual obstacle
-    // we will scale the obstacle by the robot radius and check collision with that.
+    // constant offset. To make sure that the robot does not collide with the actual
+    // obstacle we will scale the obstacle by the robot radius and check collision with
+    // that.
     Polygon obstacle_shape = Rectangle(Point(-1, 1), Point(1, 2));
 
     std::vector<ObstaclePtr> expanded_obstacles = {
-            robot_navigation_obstacle_factory.createFromShape(obstacle_shape)};
+        robot_navigation_obstacle_factory.createFromShape(obstacle_shape)};
 
-    std::vector<Polygon> actual_obstacles = {obstacle_shape.expand(Vector(-1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
-                                                     .expand(Vector(1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
-                                                     .expand(Vector(0, -1).normalize(ROBOT_MAX_RADIUS_METERS))
-                                                     .expand(Vector(0, 1).normalize(ROBOT_MAX_RADIUS_METERS))};
+    std::vector<Polygon> actual_obstacles = {
+        obstacle_shape.expand(Vector(-1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
+            .expand(Vector(1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
+            .expand(Vector(0, -1).normalize(ROBOT_MAX_RADIUS_METERS))
+            .expand(Vector(0, 1).normalize(ROBOT_MAX_RADIUS_METERS))};
 
     Rectangle navigable_area = field.fieldBoundary();
 
@@ -434,17 +436,19 @@ TEST_F(TestThetaStarPathPlanner,
     Point start{1.2299999999999995, 2.0999999999999996}, end{0, 3};
 
     // Robot navigation obstacle factory expands the obstacle by the robot radius plus a
-    // constant offset. To make sure that the robot does not collide with the actual obstacle
-    // we will scale the obstacle by the robot radius and check collision with that.
+    // constant offset. To make sure that the robot does not collide with the actual
+    // obstacle we will scale the obstacle by the robot radius and check collision with
+    // that.
     Polygon obstacle_shape = Rectangle(Point(-1, 1), Point(1, 2));
 
     std::vector<ObstaclePtr> expanded_obstacles = {
         robot_navigation_obstacle_factory.createFromShape(obstacle_shape)};
 
-    std::vector<Polygon> actual_obstacles = {obstacle_shape.expand(Vector(-1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
-                                            .expand(Vector(1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
-                                            .expand(Vector(0, -1).normalize(ROBOT_MAX_RADIUS_METERS))
-                                            .expand(Vector(0, 1).normalize(ROBOT_MAX_RADIUS_METERS))};
+    std::vector<Polygon> actual_obstacles = {
+        obstacle_shape.expand(Vector(-1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
+            .expand(Vector(1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
+            .expand(Vector(0, -1).normalize(ROBOT_MAX_RADIUS_METERS))
+            .expand(Vector(0, 1).normalize(ROBOT_MAX_RADIUS_METERS))};
 
     Rectangle navigable_area = field.fieldBoundary();
 
@@ -454,8 +458,7 @@ TEST_F(TestThetaStarPathPlanner,
     checkPathDoesNotIntersectObstacle(path->getKnots(), actual_obstacles);
 }
 
-TEST_F(TestThetaStarPathPlanner,
-       test_theta_star_path_planner_start_in_enemy_half)
+TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_start_in_enemy_half)
 {
     // Start in enemy half (obstacle)
     Point start{4, 3}, end{-0.1, -2.9};
