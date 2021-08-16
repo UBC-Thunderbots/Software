@@ -1,5 +1,3 @@
-load("@bazel_rules_qt//:qt.bzl", "qt_cc_library")
-
 package(default_visibility = ["//visibility:public"])
 
 cc_library(

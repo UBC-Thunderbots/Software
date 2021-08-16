@@ -1,13 +1,12 @@
 #include "software/simulation/simulator.h"
 
-#include <simulator.h>
-
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
 #include "software/simulation/force_wheel_simulator_robot_singleton.h"
 #include "software/simulation/simulator_ball_singleton.h"
+#include "src/amun/simulator/simulator.h"
 
 extern "C"
 {
@@ -27,6 +26,7 @@ Simulator::Simulator(const Field& field,
       frame_number(0),
       physics_time_step(physics_time_step)
 {
+    (void)SUB_TIMESTEP;
     this->resetCurrentFirmwareTime();
 }
 

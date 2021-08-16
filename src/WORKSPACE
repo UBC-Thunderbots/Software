@@ -75,7 +75,7 @@ boost_deps()
 
 git_repository(
     name = "er_force_sim",
-    commit = "c9060a2dcb1d0f72c5812c19f3963ad67a2c05f4",
+    commit = "1717eb2ee7f25abb753d9cf62490bdb54e6fd992",
     remote = "https://github.com/jonathanlew/er_force_sim",
 )
 
@@ -127,7 +127,7 @@ git_repository(
 # Qt bazel rules from https://github.com/justbuchanan/bazel_rules_qt
 git_repository(
     name = "bazel_rules_qt",
-    commit = "3f949bf4b5dcae2941ba3b71b3ddeb5d39637907",
+    commit = "7665177f47bf514176d5f8575a7334f030203e3d",
     remote = "https://github.com/justbuchanan/bazel_rules_qt.git",
     shallow_since = "1549966854 -0800",
 )
