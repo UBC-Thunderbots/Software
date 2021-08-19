@@ -6,7 +6,6 @@
 #include "software/proto/message_translation/ssl_wrapper.h"
 #include "software/simulation/force_wheel_simulator_robot_singleton.h"
 #include "software/simulation/simulator_ball_singleton.h"
-#include "src/amun/simulator/simulator.h"
 
 extern "C"
 {
@@ -24,9 +23,11 @@ Simulator::Simulator(const Field& field,
       yellow_team_defending_side(FieldSide::NEG_X),
       blue_team_defending_side(FieldSide::NEG_X),
       frame_number(0),
-      physics_time_step(physics_time_step)
+      physics_time_step(physics_time_step),
+      er_force_sim_timer(),
+      er_force_sim_setup(),
+      er_force_sim(&er_force_sim_timer, er_force_sim_setup)
 {
-    (void)SUB_TIMESTEP;
     this->resetCurrentFirmwareTime();
 }
 

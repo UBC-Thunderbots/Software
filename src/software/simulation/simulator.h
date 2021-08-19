@@ -10,6 +10,8 @@
 #include "software/world/field.h"
 #include "software/world/team_types.h"
 #include "software/world/world.h"
+#include "src/amun/simulator/simulator.h"
+#include "src/core/timer.h"
 
 extern "C"
 {
@@ -233,4 +235,8 @@ class Simulator
     // The current time. This is static so that it may be used by the firmware,
     // and so must be set before each firmware tick
     static Timestamp current_firmware_time;
+
+    Timer er_force_sim_timer;
+    amun::SimulatorSetup er_force_sim_setup;
+    camun::simulator::Simulator er_force_sim;
 };
