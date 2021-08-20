@@ -82,6 +82,8 @@ bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord0, const Coordinat
 bool ThetaStarPathPlanner::checkLine(const Coordinate &coord0, const Coordinate &coord1,
                                      const bool isLineLow)
 {
+    // Main represents the axis that is being incremented (x if line is low)
+    // Sec represents the secondary axis that is dependent on Main axis (y if line is low)
     int main0;
     int sec0;
     int main1;
@@ -101,8 +103,6 @@ bool ThetaStarPathPlanner::checkLine(const Coordinate &coord0, const Coordinate 
         main1 = static_cast<int>(coord1.col());
     }
 
-    // Main represents the axis that is being incremented
-    // Sec represents the secondary axis that is dependent on Main axis
     int d_main = main1 - main0;
     int d_sec  = sec1 - sec0;
     int sec_i  = 1;
