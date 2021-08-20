@@ -2,7 +2,8 @@ import tftpy, hashlib, os, argparse, pathlib, shutil
 
 TEMP = os.path.join(os.getcwd(), '.temp')
 
-def verify_checksum(file_path, checksum) :
+def verify_checksum(file_path: str, 
+                    checksum: str) -> bool :
     try :
         file_hash = encode_sha256_checksum(file_path)
     except Exception :
@@ -10,7 +11,7 @@ def verify_checksum(file_path, checksum) :
     
     return file_hash == checksum
 
-def encode_sha256_checksum(file_path) :
+def encode_sha256_checksum(file_path: str) -> str:
     # make hash
     hash = hashlib.sha256()
     with open(file_path, "rb") as f:
@@ -24,7 +25,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("-f", required=True, type=pathlib.Path,
                help="path to the file to be transferred")
 ap.add_argument("-p", required=True, type=int,
-               help="outbound tftp port to be used")
+               help="outbound tftp port to be used", default=69)
 
 ap.add_argument("-ip", "--ip_address", required=True, type=str,
                help="ip address of outbound connection")
