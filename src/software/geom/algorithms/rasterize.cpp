@@ -5,8 +5,7 @@
 
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/distance.h"
-#include "software/geom/algorithms/intersection.h"
-#include "software/geom/algorithms/rasterize.h"
+#include "software/geom/geom_constants.h"
 
 std::vector<Point> rasterize(const Circle& circle, const double resolution_size)
 {
@@ -19,13 +18,12 @@ std::vector<Point> rasterize(const Circle& circle, const double resolution_size)
 
     // Offset for the radius to avoid points being outside of the circle due to floating
     // point errors
-    const double EPSILON = 0.0001;
-    double radius        = circle.radius() - EPSILON;
-    double diameter      = radius * 2;
-    Point origin         = circle.origin();
+    double radius   = circle.radius() - FIXED_EPSILON;
+    double diameter = radius * 2;
+    Point origin    = circle.origin();
 
     // max number of pixels in each dimension
-    int max_num_pixels = (int)std::ceil(diameter / resolution_size);
+    int max_num_pixels = static_cast<int>(std::ceil(diameter / resolution_size));
 
     for (int x_pixel = 0; x_pixel <= max_num_pixels; x_pixel++)
     {
@@ -49,7 +47,7 @@ std::vector<Point> rasterize(const Circle& circle, const double resolution_size)
         double y_min = -y_sqrt + origin.y();
         double y_max = y_sqrt + origin.y();
 
-        int y_num_pixels = (int)std::ceil((y_max - y_min) / resolution_size);
+        int y_num_pixels = static_cast<int>(std::ceil((y_max - y_min) / resolution_size));
         for (int y_pixel = 0; y_pixel <= y_num_pixels; y_pixel++)
         {
             double y_offset;
@@ -70,7 +68,7 @@ std::vector<Point> rasterize(const Circle& circle, const double resolution_size)
 
     // Draw points resolution_size away (arclength) from each other over the circumference
     double delta_theta     = resolution_size / radius;
-    int num_theta_sections = (int)std::ceil(M_PI / delta_theta);
+    int num_theta_sections = static_cast<int>(std::ceil(M_PI / delta_theta));
     for (int section = 0; section < num_theta_sections; section++)
     {
         double theta    = section * delta_theta;
@@ -92,8 +90,8 @@ std::vector<Point> rasterize(const Rectangle& rectangle, const double resolution
     // resolution_size.
     std::vector<Point> covered_points;
 
-    int num_pixels_x = (int)std::ceil(rectangle.xLength() / resolution_size);
-    int num_pixels_y = (int)std::ceil(rectangle.yLength() / resolution_size);
+    int num_pixels_x = static_cast<int>(std::ceil(rectangle.xLength() / resolution_size));
+    int num_pixels_y = static_cast<int>(std::ceil(rectangle.yLength() / resolution_size));
 
     for (int x_pixel = 0; x_pixel <= num_pixels_x; x_pixel++)
     {
@@ -142,7 +140,6 @@ std::vector<Point> rasterize(const Polygon& polygon, const double resolution_siz
     // vertices and draw points on the line, resolution_size or less away from each other.
 
     // Used to avoid points being outside of polygon due to floating point errors
-    const double EPSILON         = 0.0001;
     const auto& polygon_vertices = polygon.getPoints();
     std::vector<Point> covered_points;
 
@@ -166,8 +163,8 @@ std::vector<Point> rasterize(const Polygon& polygon, const double resolution_siz
         if (curr_point == next_point)
             continue;
 
-        int num_segments =
-            (int)std::ceil(distance(curr_point, next_point) / resolution_size);
+        int num_segments = static_cast<int>(
+            std::ceil(distance(curr_point, next_point) / resolution_size));
         double dy = (next_point.y() - curr_point.y()) / num_segments;
         double dx = (next_point.x() - curr_point.x()) / num_segments;
 
@@ -200,8 +197,8 @@ std::vector<Point> rasterize(const Polygon& polygon, const double resolution_siz
         std::max_element(polygon_vertices.begin(), polygon_vertices.end(), max_point_y)
             ->y();
 
-    int num_pixels_x = (int)std::ceil((max_x - min_x) / resolution_size);
-    int num_pixels_y = (int)std::ceil((max_y - min_y) / resolution_size);
+    int num_pixels_x = static_cast<int>(std::ceil((max_x - min_x) / resolution_size));
+    int num_pixels_y = static_cast<int>(std::ceil((max_y - min_y) / resolution_size));
 
     for (int x_pixel = 0; x_pixel <= num_pixels_x; x_pixel++)
     {
@@ -212,26 +209,26 @@ std::vector<Point> rasterize(const Polygon& polygon, const double resolution_siz
         // that the points cover the entire rectangle without going outside.
         if (x_pixel == num_pixels_x)
         {
-            x_offset = max_x - min_x - EPSILON;
+            x_offset = max_x - min_x - FIXED_EPSILON;
         }
         else
         {
             x_offset = x_pixel * resolution_size;
         }
-        double x_coord = min_x + x_offset + EPSILON;
+        double x_coord = min_x + x_offset + FIXED_EPSILON;
 
         for (int y_pixel = 0; y_pixel <= num_pixels_y; y_pixel++)
         {
             double y_offset;
             if (y_pixel == num_pixels_y)
             {
-                y_offset = max_y - min_y - EPSILON;
+                y_offset = max_y - min_y - FIXED_EPSILON;
             }
             else
             {
                 y_offset = y_pixel * resolution_size;
             }
-            double y_coord = min_y + y_offset + EPSILON;
+            double y_coord = min_y + y_offset + FIXED_EPSILON;
 
             Point curr_point(x_coord, y_coord);
             if (contains(polygon, curr_point))
