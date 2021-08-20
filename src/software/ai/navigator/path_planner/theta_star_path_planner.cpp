@@ -59,24 +59,82 @@ bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord0, const Coordinat
     {
         if (coord0.row() > coord1.row())
         {
-            return checkLineLow(coord1, coord0);
+            return checkLine(coord1, coord0, true);
         }
         else
         {
-            return checkLineLow(coord0, coord1);
+            return checkLine(coord0, coord1, true);
         }
     }
     else
     {
         if (coord0.col() > coord1.col())
         {
-            return checkLineHigh(coord1, coord0);
+            return checkLine(coord1, coord0, false);
         }
         else
         {
-            return checkLineHigh(coord0, coord1);
+            return checkLine(coord0, coord1, false);
         }
     }
+}
+
+bool ThetaStarPathPlanner::checkLine(const Coordinate &coord0, const Coordinate &coord1,
+                                     const bool isLineLow)
+{
+    int main0;
+    int sec0;
+    int main1;
+    int sec1;
+    if (isLineLow)
+    {
+        main0 = static_cast<int>(coord0.row());
+        sec0  = static_cast<int>(coord0.col());
+        main1 = static_cast<int>(coord1.row());
+        sec1  = static_cast<int>(coord1.col());
+    }
+    else
+    {
+        sec0  = static_cast<int>(coord0.row());
+        main0 = static_cast<int>(coord0.col());
+        sec1  = static_cast<int>(coord1.row());
+        main1 = static_cast<int>(coord1.col());
+    }
+
+    // Main represents the axis that is being incremented
+    // Sec represents the secondary axis that is dependent on Main axis
+    int d_main = main1 - main0;
+    int d_sec  = sec1 - sec0;
+    int sec_i  = 1;
+
+    if (d_sec < 0)
+    {
+        sec_i = -1;
+        d_sec = -d_sec;
+    }
+    int D   = (2 * d_sec) - d_main;
+    int sec = sec0;
+
+    for (int main = main0; main <= main1; main++)
+    {
+        Coordinate curr_coord = isLineLow ? Coordinate(main, sec) : Coordinate(sec, main);
+        if (isBlocked(curr_coord))
+        {
+            // No line of sight since a coordinate in the path from coord0 to coord1 is
+            // blocked
+            return false;
+        }
+        if (D > 0)
+        {
+            sec += sec_i;
+            D += 2 * (d_sec - d_main);
+        }
+        else
+        {
+            D += 2 * d_sec;
+        }
+    }
+    return true;
 }
 
 bool ThetaStarPathPlanner::checkLineLow(const Coordinate &coord0,

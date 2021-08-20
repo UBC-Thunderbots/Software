@@ -309,28 +309,19 @@ class ThetaStarPathPlanner : public PathPlanner
     bool lineOfSight(const Coordinate &coord0, const Coordinate &coord1);
 
     /**
-     * Supplementary method for lineOfSight to check for line of sight when the slope
-     * between the two coordinates is between 0 and 1
+     * Supplementary method for lineOfSight to check for line of sight depending on
+     * if the line is low or high.
      * https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm#All_cases
      *
      * @param coord0 The first Coordinate
      * @param coord1 The second Coordinate
+     * @param isLineLow Is the slope of the line between 0 and 1. Should be false if
+     * the slope of the line is greater or equal to 1
      *
      * @return true if line of sight from coord0 to coord1
      */
-    bool checkLineLow(const Coordinate &coord0, const Coordinate &coord1);
-
-    /**
-     * Supplementary method for lineOfSight to check for line of sight when the slope
-     * between the two coordinates is 1 or greater
-     * https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm#All_cases
-     *
-     * @param coord0 The first Coordinate
-     * @param coord1 The second Coordinate
-     *
-     * @return true if line of sight from coord0 to coord1
-     */
-    bool checkLineHigh(const Coordinate &coord0, const Coordinate &coord1);
+    bool checkLine(const Coordinate &coord0, const Coordinate &coord1,
+                   const bool isLineLow);
 
     /**
      * Finds closest unblocked cell to current_cell
