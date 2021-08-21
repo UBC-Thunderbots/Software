@@ -182,13 +182,6 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromShape(const Circle &circle
 
 ObstaclePtr RobotNavigationObstacleFactory::createFromShape(const Polygon &polygon) const
 {
-    // modified for debugging
-    auto poly = polygon.expand(Vector(-1, 0).normalize(robot_radius_expansion_amount))
-                    .expand(Vector(1, 0).normalize(robot_radius_expansion_amount))
-                    .expand(Vector(0, -1).normalize(robot_radius_expansion_amount))
-                    .expand(Vector(0, 1).normalize(robot_radius_expansion_amount));
-    std::cout << "Expanded poly" << std::endl;
-    std::cout << poly << std::endl;
     return std::make_shared<GeomObstacle<Polygon>>(
         polygon.expand(Vector(-1, 0).normalize(robot_radius_expansion_amount))
             .expand(Vector(1, 0).normalize(robot_radius_expansion_amount))

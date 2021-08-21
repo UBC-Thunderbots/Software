@@ -345,7 +345,6 @@ TEST_F(RobotNavigationObstacleFactoryMotionConstraintTest, enemy_half)
     {
         Rectangle expected(Point(-0.117, -3.3), Point(4.8, 3.3));
         auto polygon_obstacle = dynamic_cast<GeomObstacle<Rectangle>&>(*obstacles[0]);
-        std::cout << 1.0 / 1000.0 << std::endl;
         EXPECT_TRUE(TestUtil::equalWithinTolerance(expected, polygon_obstacle.getGeom(),
                                                    METERS_PER_MILLIMETER));
     }
