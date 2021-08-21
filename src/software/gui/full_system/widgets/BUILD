@@ -13,6 +13,7 @@ qt_cc_library(
         "//software/gui/full_system/ui:main_widget",
         "//software/gui/generic_widgets/robot_status",
         "//software/multithreading:thread_safe_buffer",
+        "//software/proto:play_info_msg_cc_proto",
         "//software/proto:sensor_msg_cc_proto",
         "//software/time:duration",
         "@qt//:qt_widgets",

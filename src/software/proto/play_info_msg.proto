@@ -19,4 +19,6 @@ message PlayInfoProto
   }
 
   map<uint32, Tactic> robot_tactic_assignment = 1;
+  GameState game_state = 2;
+  Play play = 3;
 }

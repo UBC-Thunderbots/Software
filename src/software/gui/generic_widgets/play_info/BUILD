@@ -8,6 +8,7 @@ qt_cc_library(
     hdr = "play_info_widget.h",
     deps = [
         "//software/ai/hl/stp:play_info",
+        "//software/proto:play_info_msg_cc_proto",
         "@qt//:qt_widgets",
     ],
 )

@@ -13,6 +13,7 @@ cc_library(
         "//software/gui/full_system/widgets:full_system_gui",
         "//software/multithreading:thread_safe_buffer",
         "//software/multithreading:threaded_observer",
+        "//software/proto:play_info_msg_cc_proto",
         "//software/proto:sensor_msg_cc_proto",
         "//software/world",
         "@qt//:qt_widgets",

@@ -33,7 +33,7 @@ class FullSystemGUI : public QMainWindow
      * @param world_draw_functions_buffer The buffer used to receive new
      * WorldDrawFunctions
      * @param ai_draw_functions_buffer The buffer used to receive new AIDrawFunctions
-     * @param play_info_buffer The buffer used to receive new PlayInfo
+     * @param play_info_msg_buffer The buffer used to receive new PlayInfoProto
      * @param sensor_msg_buffer The buffer used to receive new SensorProtos
      * @param view_area_buffer The buffer used to receive Rectangles that specify the area
      * of the world to display in the view
@@ -41,7 +41,6 @@ class FullSystemGUI : public QMainWindow
     explicit FullSystemGUI(
         std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer,
         std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer,
-//        std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer,
         std::shared_ptr<ThreadSafeBuffer<PlayInfoProto>> play_info_msg_buffer,
         std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer,
         std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer,
@@ -66,7 +65,6 @@ class FullSystemGUI : public QMainWindow
     /**
      * Updates and displays newly provided PlayInfoProto
      */
-//    void updatePlayInfo();
     void updatePlayInfoProto();
 
     /**
@@ -93,7 +91,6 @@ class FullSystemGUI : public QMainWindow
 
     std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer;
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer;
-//    std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer;
     std::shared_ptr<ThreadSafeBuffer<PlayInfoProto>> play_info_msg_buffer;
     std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer;
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer;
