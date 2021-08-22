@@ -59,7 +59,8 @@ struct MoveFSM
                 event.control_params.ball_collision_type,
                 event.control_params.auto_chip_or_kick,
                 event.control_params.max_allowed_speed_mode,
-                event.control_params.target_spin_rev_per_s));
+                event.control_params.target_spin_rev_per_s,
+                event.common.robot.robotConstants()));
         };
 
         /**

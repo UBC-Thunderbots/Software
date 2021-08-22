@@ -3,73 +3,91 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
+#include "shared/2015_robot_constants.h"
 #include "software/proto/primitive/primitive_msg_factory.h"
 #include "software/util/typename/typename.h"
 
+class MoveIntentTest : public ::testing::Test
+{
+   protected:
+    RobotConstants_t robot_constants = create2015RobotConstants();
+};
+
+class AutochipMoveIntentTest : public MoveIntentTest
+{
+};
+
 // For equality operators, we only check for cases not covered in the Primitive tests,
 // since Intents inherit from Primitives
-TEST(MoveIntentTest, test_equality_operator_intents_equal)
+TEST_F(MoveIntentTest, test_equality_operator_intents_equal)
 {
-    MoveIntent move_intent = MoveIntent(
-        0, Point(), Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID,
-        {AutoChipOrKickMode::OFF, 2}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
-    MoveIntent move_intent_other = MoveIntent(
-        0, Point(), Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID,
-        {AutoChipOrKickMode::OFF, 4}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
+    MoveIntent move_intent =
+        MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+                   BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 2},
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
+    MoveIntent move_intent_other =
+        MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+                   BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 4},
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
     EXPECT_EQ(move_intent, move_intent_other);
 
-    move_intent       = MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+    move_intent = MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
                              BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOKICK, 3},
-                             MaxAllowedSpeedMode::STOP_COMMAND, -2.0);
-    move_intent_other = MoveIntent(
-        0, Point(), Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID,
-        {AutoChipOrKickMode::AUTOKICK, 3}, MaxAllowedSpeedMode::STOP_COMMAND, -2.0);
+                             MaxAllowedSpeedMode::STOP_COMMAND, -2.0, robot_constants);
+    move_intent_other =
+        MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+                   BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOKICK, 3},
+                   MaxAllowedSpeedMode::STOP_COMMAND, -2.0, robot_constants);
     EXPECT_EQ(move_intent, move_intent_other);
 }
 
-TEST(MoveIntentTest, test_equality_operator_intents_not_equal)
+TEST_F(MoveIntentTest, test_equality_operator_intents_not_equal)
 {
-    MoveIntent move_intent = MoveIntent(
-        0, Point(), Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID,
-        {AutoChipOrKickMode::AUTOCHIP, 1.5}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 6.0);
-    MoveIntent move_intent_other = MoveIntent(
-        0, Point(), Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID,
-        {AutoChipOrKickMode::AUTOCHIP, 3.5}, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 6.0);
+    MoveIntent move_intent =
+        MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+                   BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOCHIP, 1.5},
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, 6.0, robot_constants);
+    MoveIntent move_intent_other =
+        MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+                   BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOCHIP, 3.5},
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, 6.0, robot_constants);
     EXPECT_NE(move_intent, move_intent_other);
 
-    move_intent       = MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+    move_intent = MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
                              BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOCHIP, 20},
-                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
-    move_intent_other = MoveIntent(
-        0, Point(), Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID,
-        {AutoChipOrKickMode::AUTOCHIP, 20}, MaxAllowedSpeedMode::STOP_COMMAND, 0.0);
+                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
+    move_intent_other =
+        MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+                   BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOCHIP, 20},
+                   MaxAllowedSpeedMode::STOP_COMMAND, 0.0, robot_constants);
     EXPECT_NE(move_intent, move_intent_other);
 
-    move_intent       = MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+    move_intent = MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
                              BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOCHIP, 20},
-                             MaxAllowedSpeedMode::STOP_COMMAND, 0.0);
-    move_intent_other = MoveIntent(
-        0, Point(), Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID,
-        {AutoChipOrKickMode::AUTOCHIP, 20}, MaxAllowedSpeedMode::STOP_COMMAND, 7.0);
+                             MaxAllowedSpeedMode::STOP_COMMAND, 0.0, robot_constants);
+    move_intent_other =
+        MoveIntent(0, Point(), Angle::zero(), 0, DribblerMode::OFF,
+                   BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOCHIP, 20},
+                   MaxAllowedSpeedMode::STOP_COMMAND, 7.0, robot_constants);
     EXPECT_NE(move_intent, move_intent_other);
 }
 
-TEST(MoveIntentTest, test_get_destination_ball_collision)
+TEST_F(MoveIntentTest, test_get_destination_ball_collision)
 {
     MoveIntent move_intent =
         MoveIntent(0, Point(1, 2), Angle::quarter(), 2.3, DribblerMode::OFF,
                    BallCollisionType::AVOID, {AutoChipOrKickMode::OFF, 0},
-                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
     EXPECT_EQ(move_intent.getDestination(), Point(1, 2));
     EXPECT_EQ(move_intent.getBallCollisionType(), BallCollisionType::AVOID);
 }
 
-TEST(AutochipMoveIntentTest, test_get_destination_ball_collision_chip)
+TEST_F(AutochipMoveIntentTest, test_get_destination_ball_collision_chip)
 {
     MoveIntent intent =
         MoveIntent(0, Point(1, 2), Angle::quarter(), 2.3, DribblerMode::OFF,
                    BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOCHIP, 3.2},
-                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
     EXPECT_EQ(intent.getDestination(), Point(1, 2));
     ASSERT_TRUE(intent.getAutoChipOrKick().auto_chip_kick_mode ==
                 AutoChipOrKickMode::AUTOCHIP);
@@ -81,21 +99,21 @@ TEST(AutochipMoveIntentTest, test_get_destination_ball_collision_chip)
     EXPECT_EQ(intent.getTargetSpinRevPerS(), 0.0);
 }
 
-TEST(AutochipMoveIntentTest, test_intent_pointer)
+TEST_F(AutochipMoveIntentTest, test_intent_pointer)
 {
     std::shared_ptr<Intent> intent = std::make_shared<MoveIntent>(
         MoveIntent(0, Point(1, 2), Angle::quarter(), 2.3, DribblerMode::OFF,
                    BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOCHIP, 3.2},
-                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+                   MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants));
     EXPECT_EQ("MoveIntent", objectTypeName(*intent));
 }
 
-TEST(MoveIntentTest, test_get_destination_ball_collision_kick_stop_command_spin_speed)
+TEST_F(MoveIntentTest, test_get_destination_ball_collision_kick_stop_command_spin_speed)
 {
     MoveIntent intent =
         MoveIntent(0, Point(1, 2), Angle::quarter(), 2.3, DribblerMode::OFF,
                    BallCollisionType::AVOID, {AutoChipOrKickMode::AUTOKICK, 3.2},
-                   MaxAllowedSpeedMode::STOP_COMMAND, 4.5);
+                   MaxAllowedSpeedMode::STOP_COMMAND, 4.5, robot_constants);
     EXPECT_EQ(intent.getDestination(), Point(1, 2));
     ASSERT_EQ(intent.getAutoChipOrKick().auto_chip_kick_mode,
               AutoChipOrKickMode::AUTOKICK);

@@ -2,6 +2,7 @@
 
 #include "software/ai/intent/intent.h"
 #include "software/ai/intent/navigating_intent_visitor.h"
+#include "shared/robot_constants.h"
 
 /**
  * A NavigatingIntent is an Intent that requires navigation to a destination
@@ -17,11 +18,12 @@ class NavigatingIntent : public Intent
      * @param final_speed The final speed the robot should have when it arrives at its
      * destination
      * @param ball_collision_type how to navigate around the ball
+     * @param robot_constants The robot constants
      * @param max_allowed_speed_mode The mode of maximum speed allowed
      */
     explicit NavigatingIntent(
         unsigned int robot_id, Point destination, double final_speed,
-        BallCollisionType ball_collision_type,
+        BallCollisionType ball_collision_type, const RobotConstants_t& robot_constants,
         MaxAllowedSpeedMode max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     NavigatingIntent() = delete;
@@ -62,6 +64,13 @@ class NavigatingIntent : public Intent
     const BallCollisionType& getBallCollisionType() const;
 
     /**
+     * Returns the robot constants for this robot state
+     *
+     * @return the robot constants for this robot
+     */
+    const RobotConstants_t& getRobotConstants() const;
+
+    /**
      * Compares NavigatingIntents for equality. NavigatingIntents are considered
      * equal if all their member variables are equal.
      *
@@ -84,5 +93,6 @@ class NavigatingIntent : public Intent
     Point destination;
     double final_speed;
     BallCollisionType ball_collision_type;
+    RobotConstants_t robot_constants;
     MaxAllowedSpeedMode max_allowed_speed_mode;
 };

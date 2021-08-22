@@ -4,6 +4,7 @@
 
 #include <functional>
 
+#include "shared/robot_constants.h"
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"
 #include "software/geom/point.h"
@@ -43,10 +44,13 @@ class PhysicsRobot
      * @param id The id of the robot
      * @param world A shared_ptr to a Box2D World
      * @param robot_state The initial robot state
-     * @param mass_kg The mass of the robot in kg
+     * @param robot_constants The robot constants
+     * @param wheel_constants The wheel constants
      */
     explicit PhysicsRobot(const RobotId id, std::shared_ptr<b2World> world,
-                          const RobotState &robot_state, const double mass_kg);
+                          const RobotState &robot_state,
+                          const RobotConstants_t &robot_constants,
+                          const WheelConstants_t &wheel_constants);
 
     PhysicsRobot() = delete;
 
@@ -143,6 +147,20 @@ class PhysicsRobot
      * @return the current angular velocity of the robot, in global field coordinates
      */
     AngularVelocity angularVelocity() const;
+
+    /**
+     * Returns the robot constants for this physics robot
+     *
+     * @return the robot constants for this robot
+     */
+    const RobotConstants_t &robotConstants() const;
+
+    /**
+     * Returns the wheel constants for this physics robot
+     *
+     * @return the wheel constants for this robot
+     */
+    const WheelConstants_t &wheelConstants() const;
 
     /**
      * Applies the given force to the wheel. Positive force spins the wheel
@@ -280,6 +298,9 @@ class PhysicsRobot
         dribbler_damper_ball_contact_callbacks;
 
     std::queue<std::function<void()>> post_physics_step_functions;
+
+    RobotConstants_t robot_constants;
+    WheelConstants_t wheel_constants;
 
     // This is a somewhat arbitrary value for damping. We keep it relatively low
     // so that robots still coast a ways before stopping, but non-zero so that robots

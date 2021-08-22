@@ -9,13 +9,13 @@ struct VelocityWheel
     float (*get_motor_speed_rpm)(void);
     void (*brake)(void);
     void (*coast)(void);
-    VelocityWheelConstants_t wheel_constants;
+    WheelConstants_t wheel_constants;
 };
 
 VelocityWheel_t* app_velocity_wheel_create(void (*set_target_rpm)(float),
                                            float (*get_motor_speed_rpm)(void),
                                            void (*brake)(void), void (*coast)(void),
-                                           VelocityWheelConstants_t wheel_constants)
+                                           WheelConstants_t wheel_constants)
 {
     VelocityWheel_t* new_wheel = malloc(sizeof(VelocityWheel_t));
 
@@ -56,8 +56,8 @@ void app_velocity_wheel_brake(const VelocityWheel_t* wheel)
 
 void app_velocity_wheel_setTargetVelocity(VelocityWheel_t* wheel, float velocity_m_per_s)
 {
-    float rpm =
-        velocity_m_per_s * 60 / (2 * (float)M_PI * wheel->wheel_constants.wheel_radius);
+    float rpm = velocity_m_per_s * 60 /
+                (2 * (float)M_PI * wheel->wheel_constants.wheel_radius_meters);
     wheel->set_target_rpm(rpm);
 }
 
@@ -66,8 +66,7 @@ void app_velocity_wheel_setTargetRPM(VelocityWheel_t* wheel, float rpm)
     wheel->set_target_rpm(rpm);
 }
 
-VelocityWheelConstants_t app_velocity_wheel_getWheelConstants(
-    const VelocityWheel_t* wheel)
+WheelConstants_t app_velocity_wheel_getWheelConstants(const VelocityWheel_t* wheel)
 {
     return wheel->wheel_constants;
 }
