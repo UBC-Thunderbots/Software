@@ -1,8 +1,8 @@
 #pragma once
 
+#include "shared/robot_constants.h"
 #include "software/ai/intent/intent.h"
 #include "software/ai/intent/navigating_intent_visitor.h"
-#include "shared/robot_constants.h"
 
 /**
  * A NavigatingIntent is an Intent that requires navigation to a destination
