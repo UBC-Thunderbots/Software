@@ -188,8 +188,32 @@ cc_library(
         "//software/world",
         "//software/world:field",
         "//software/world:team_colour",
+    ],
+)
+
+cc_library(
+    name = "er_force_simulator",
+    srcs = ["er_force_simulator.cpp"],
+    hdrs = ["er_force_simulator.h"],
+    deps = [
+        ":firmware_object_deleter",
+        ":force_wheel_simulator_robot_singleton",
+        ":physics_simulator_ball",
+        ":physics_simulator_robot",
+        ":simulator_ball_singleton",
+        "//firmware/app/primitives:primitive_manager",
+        "//firmware/app/world:firmware_world",
+        "//shared/parameter:cpp_configs",
+        "//software/proto:defending_side_msg_cc_proto",
+        "//software/proto/message_translation:primitive_google_to_nanopb_converter",
+        "//software/proto/message_translation:ssl_detection",
+        "//software/proto/message_translation:ssl_geometry",
+        "//software/proto/message_translation:ssl_wrapper",
+        "//software/simulation/physics:physics_world",
+        "//software/world",
+        "//software/world:field",
+        "//software/world:team_colour",
         "@er_force_sim//src/amun/simulator",
-        #"@er_force_sim//src/core",
     ],
 )
 

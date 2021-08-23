@@ -1,4 +1,4 @@
-#include "software/simulation/simulator.h"
+#include "software/simulation/er_force_simulator.h"
 
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "software/proto/message_translation/ssl_detection.h"
@@ -23,7 +23,10 @@ Simulator::Simulator(const Field& field,
       yellow_team_defending_side(FieldSide::NEG_X),
       blue_team_defending_side(FieldSide::NEG_X),
       frame_number(0),
-      physics_time_step(physics_time_step)
+      physics_time_step(physics_time_step),
+      er_force_sim_timer(),
+      er_force_sim_setup(),
+      er_force_sim(&er_force_sim_timer, er_force_sim_setup)
 {
     this->resetCurrentFirmwareTime();
 }
