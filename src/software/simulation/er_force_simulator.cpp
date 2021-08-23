@@ -339,3 +339,98 @@ float Simulator::getCurrentFirmwareTimeSeconds()
 // We must give this variable a value here, as non-const static variables must be
 // initialized out-of-line
 Timestamp Simulator::current_firmware_time = Timestamp::fromSeconds(0);
+
+//float io_vision_getBallPositionX(void)
+//{
+//    io_lock_vision();
+//    float temp = vision.ball_state.global_position.x_meters;
+//    io_unlock_vision();
+//    return temp;
+//}
+//float io_vision_getBallPositionY(void)
+//{
+//    io_lock_vision();
+//    float temp = vision.ball_state.global_position.y_meters;
+//    io_unlock_vision();
+//    return temp;
+//}
+//float io_vision_getBallVelocityX(void)
+//{
+//    io_lock_vision();
+//    float temp = vision.ball_state.global_velocity.x_component_meters;
+//    io_unlock_vision();
+//    return temp;
+//}
+//float io_vision_getBallVelocityY(void)
+//{
+//    io_lock_vision();
+//    float temp = vision.ball_state.global_velocity.y_component_meters;
+//    io_unlock_vision();
+//    return temp;
+//}
+//float io_vision_getRobotPositionX(void)
+//{
+//    float temp = 0.0f;
+//    io_lock_vision();
+//            if (vision.robot_states_count == 1)
+//            {
+//             temp = vision.robot_states[0].value.global_position.x_meters;
+//            }
+//    io_unlock_vision();
+//    return temp;
+//}
+//float io_vision_getRobotPositionY(void)
+//{
+//    float temp = 0.0f;
+//    io_lock_vision();
+//            if (vision.robot_states_count == 1)
+//            {
+//             temp = vision.robot_states[0].value.global_position.y_meters;
+//            }
+//    io_unlock_vision();
+//    return temp;
+//}
+//float io_vision_getRobotOrientation(void)
+//{
+//    float temp = 0.0f;
+//    io_lock_vision();
+//            if (vision.robot_states_count == 1)
+//            {
+//             temp = vision.robot_states[0].value.global_orientation.radians;
+//            }
+//    io_unlock_vision();
+//    return temp;
+//}
+//float io_vision_getRobotVelocityX(void)
+//{
+//    float temp = 0.0f;
+//    io_lock_vision();
+//            if (vision.robot_states_count == 1)
+//            {
+//             temp = vision.robot_states[0].value.global_velocity.x_component_meters;
+//            }
+//    io_unlock_vision();
+//    return temp;
+//}
+//float io_vision_getRobotVelocityY(void)
+//{
+//    float temp = 0.0f;
+//    io_lock_vision();
+//            if (vision.robot_states_count == 1)
+//            {
+//             temp = vision.robot_states[0].value.global_velocity.y_component_meters;
+//            }
+//    io_unlock_vision();
+//    return temp;
+//}
+//float io_vision_getRobotAngularVelocity(void)
+//{
+//    float temp = 0.0f;
+//    io_lock_vision();
+//            if (vision.robot_states_count == 1)
+//            {
+//             temp = vision.robot_states[0].value.global_angular_velocity.radians_per_second;
+//            }
+//    io_unlock_vision();
+//    return temp;
+//}
