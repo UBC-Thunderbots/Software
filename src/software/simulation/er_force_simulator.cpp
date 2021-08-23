@@ -115,7 +115,7 @@ void Simulator::setBlueRobotPrimitive(RobotId id,
 }
 
 void Simulator::setYellowRobotPrimitiveSet(
-    const TbotsProto_PrimitiveSet& primitive_set_msg)
+    const TbotsProto_PrimitiveSet& primitive_set_msg, TbotsProto_Vision vision_msg)
 {
     for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {
@@ -124,7 +124,7 @@ void Simulator::setYellowRobotPrimitiveSet(
     }
 }
 
-void Simulator::setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg)
+void Simulator::setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg, TbotsProto_Vision vision_msg)
 {
     for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {

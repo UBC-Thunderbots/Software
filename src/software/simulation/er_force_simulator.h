@@ -80,20 +80,11 @@ class Simulator
      * Sets the primitive being simulated by the robot on the corresponding team
      * in simulation
      *
-     * @param id The id of the robot to set the primitive for
-     * @param primitive_msg The primitive to run on the robot
-     */
-    void setYellowRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
-    void setBlueRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
-
-    /**
-     * Sets the primitive being simulated by the robot on the corresponding team
-     * in simulation
-     *
      * @param primitive_set_msg The set of primitives to run on the robot
+     * @param vision_msg The vision message
      */
-    void setYellowRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg);
-    void setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg);
+    void setYellowRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg, TbotsProto_Vision vision_msg);
+    void setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg, TbotsProto_Vision vision_msg);
 
     /**
      * Sets which side of the field the corresponding team is defending.
@@ -194,6 +185,16 @@ class Simulator
         std::map<std::shared_ptr<PhysicsSimulatorRobot>,
                  std::shared_ptr<FirmwareWorld_t>>& simulator_robots,
         TeamColour team_colour);
+
+    /**
+     * Sets the primitive being simulated by the robot on the corresponding team
+     * in simulation
+     *
+     * @param id The id of the robot to set the primitive for
+     * @param primitive_msg The primitive to run on the robot
+     */
+    void setYellowRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
+    void setBlueRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
 
     /**
      * Sets the primitive being simulated by the robot in simulation
