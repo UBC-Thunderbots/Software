@@ -85,7 +85,7 @@ void SimulatedTacticTestFixture::updatePrimitives(
 }
 
 
-std::optional<PlayInfo> SimulatedTacticTestFixture::getPlayInfo()
+std::optional<PlayInfoProto> SimulatedTacticTestFixture::getPlayInfoProto()
 {
     return std::nullopt;
 }

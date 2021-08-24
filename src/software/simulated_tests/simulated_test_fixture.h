@@ -124,11 +124,11 @@ class SimulatedTestFixture : public ::testing::Test
                                   std::shared_ptr<Simulator> simulator_to_update) = 0;
 
     /**
-     * Gets play info for displaying on the FullSystemGUI
+     * Gets play info message for displaying on the FullSystemGUI
      *
-     * @return play info to display, if any
+     * @return play info message to display, if any
      */
-    virtual std::optional<PlayInfo> getPlayInfo() = 0;
+    virtual std::optional<PlayInfoProto> getPlayInfoProto() = 0;
 
     /**
      * Gets draw functions for visualizing on the FullSystemGUI

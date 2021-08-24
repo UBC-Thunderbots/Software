@@ -121,7 +121,7 @@ class STP : public HL
      *
      * @return information about the currently running plays and tactics
      */
-    PlayInfo getPlayInfo() override;
+    PlayInfoProto getPlayInfoProto() override;
 
     /**
      * Given a vector of vector of tactics and the current World, assigns robots

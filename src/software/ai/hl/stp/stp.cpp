@@ -11,6 +11,7 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play_info.h"
+#include "software/proto/play_info_msg.pb.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/stop_intent.h"
@@ -151,17 +152,19 @@ std::optional<std::string> STP::getCurrentPlayName() const
     return std::nullopt;
 }
 
-PlayInfo STP::getPlayInfo()
+PlayInfoProto STP::getPlayInfoProto()
 {
     std::string info_referee_command = toString(current_game_state.getRefereeCommand());
     std::string info_play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
-    PlayInfo info              = PlayInfo(info_referee_command, info_play_name, {});
+    PlayInfoProto info = PlayInfoProto();
+    info.mutable_game_state()->set_referee_command_name(info_referee_command);
+    info.mutable_play()->set_play_name(info_play_name);
 
     for (const auto& [tactic, robot] : robot_tactic_assignment)
     {
-        std::string s =
-            "Robot " + std::to_string(robot.id()) + "  -  " + objectTypeName(*tactic);
-        info.addRobotTacticAssignment(s);
+        PlayInfoProto_Tactic tactic_msg = PlayInfoProto_Tactic();
+        tactic_msg.set_tactic_name(toString(tactic));
+        (*info.mutable_robot_tactic_assignment())[robot.id()] = tactic_msg;
     }
 
     return info;

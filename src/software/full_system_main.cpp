@@ -5,6 +5,7 @@
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play_info.h"
+#include "software/proto/play_info_msg.pb.h"
 #include "software/ai/threaded_ai.h"
 #include "software/backend/backend.h"
 #include "software/constants.h"
@@ -118,7 +119,7 @@ int main(int argc, char** argv)
             sensor_fusion->Subject<World>::registerObserver(visualizer);
             ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(visualizer);
             ai->Subject<AIDrawFunction>::registerObserver(visualizer);
-            ai->Subject<PlayInfo>::registerObserver(visualizer);
+            ai->Subject<PlayInfoProto>::registerObserver(visualizer);
             backend->Subject<SensorProto>::registerObserver(visualizer);
         }
 

@@ -51,7 +51,7 @@ class SimulatedPlayTestFixture : public SimulatedTestFixture
      */
     void setGameState(const GameState& game_state_);
 
-    std::optional<PlayInfo> getPlayInfo() override;
+    std::optional<PlayInfoProto> getPlayInfoProto() override;
     AIDrawFunction getDrawFunctions() override;
 
    private:

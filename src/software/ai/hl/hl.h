@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "software/ai/hl/stp/play_info.h"
+#include "software/proto/play_info_msg.pb.h"
 #include "software/ai/intent/intent.h"
 #include "software/world/world.h"
 
@@ -37,7 +38,7 @@ class HL
      *
      * @return information about the currently running plays and tactics
      */
-    virtual PlayInfo getPlayInfo() = 0;
+    virtual PlayInfoProto getPlayInfoProto() = 0;
 
     virtual ~HL() = default;
 };
