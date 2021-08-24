@@ -21,11 +21,11 @@ extern "C"
 }
 
 /**
- * The Simulator abstracts away the physics simulation of all objects in the world,
+ * The ErForceSimulator abstracts away the physics simulation of all objects in the world,
  * as well as the firmware simulation for the robots. This provides a simple interface
  * to setup, run, and query the current state of the simulation.
  */
-class Simulator
+class ErForceSimulator
 {
    public:
     /**
@@ -37,11 +37,11 @@ class Simulator
      * @param physics_time_step The time step used to simulated physics
      * and robot primitives.
      */
-    explicit Simulator(const Field& field,
-                       std::shared_ptr<const SimulatorConfig> simulator_config,
-                       const Duration& physics_time_step =
-                           Duration::fromSeconds(DEFAULT_PHYSICS_TIME_STEP_SECONDS));
-    Simulator() = delete;
+    explicit ErForceSimulator(const Field& field,
+                              std::shared_ptr<const SimulatorConfig> simulator_config,
+                              const Duration& physics_time_step = Duration::fromSeconds(
+                                  DEFAULT_PHYSICS_TIME_STEP_SECONDS));
+    ErForceSimulator() = delete;
 
     /**
      * Sets the state of the ball in the simulation. No more than 1 ball may exist
@@ -83,8 +83,10 @@ class Simulator
      * @param primitive_set_msg The set of primitives to run on the robot
      * @param vision_msg The vision message
      */
-    void setYellowRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg, TbotsProto_Vision vision_msg);
-    void setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg, TbotsProto_Vision vision_msg);
+    void setYellowRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg,
+                                    const TbotsProto_Vision vision_msg);
+    void setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg,
+                                  const TbotsProto_Vision vision_msg);
 
     /**
      * Sets which side of the field the corresponding team is defending.

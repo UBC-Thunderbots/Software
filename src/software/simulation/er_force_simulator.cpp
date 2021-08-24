@@ -16,9 +16,9 @@ extern "C"
 #include "shared/proto/robot_log_msg.nanopb.h"
 }
 
-Simulator::Simulator(const Field& field,
-                     std::shared_ptr<const SimulatorConfig> simulator_config,
-                     const Duration& physics_time_step)
+ErForceSimulator::ErForceSimulator(
+    const Field& field, std::shared_ptr<const SimulatorConfig> simulator_config,
+    const Duration& physics_time_step)
     : physics_world(field, simulator_config),
       yellow_team_defending_side(FieldSide::NEG_X),
       blue_team_defending_side(FieldSide::NEG_X),
@@ -31,7 +31,7 @@ Simulator::Simulator(const Field& field,
     this->resetCurrentFirmwareTime();
 }
 
-void Simulator::setBallState(const BallState& ball_state)
+void ErForceSimulator::setBallState(const BallState& ball_state)
 {
     physics_world.setBallState(ball_state);
     simulator_ball =
@@ -48,21 +48,21 @@ void Simulator::setBallState(const BallState& ball_state)
     }
 }
 
-void Simulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
+void ErForceSimulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
 {
     physics_world.addYellowRobots(robots);
     updateSimulatorRobots(physics_world.getYellowPhysicsRobots(), yellow_simulator_robots,
                           TeamColour::YELLOW);
 }
 
-void Simulator::addBlueRobots(const std::vector<RobotStateWithId>& robots)
+void ErForceSimulator::addBlueRobots(const std::vector<RobotStateWithId>& robots)
 {
     physics_world.addBlueRobots(robots);
     updateSimulatorRobots(physics_world.getBluePhysicsRobots(), blue_simulator_robots,
                           TeamColour::BLUE);
 }
 
-void Simulator::updateSimulatorRobots(
+void ErForceSimulator::updateSimulatorRobots(
     const std::vector<std::weak_ptr<PhysicsRobot>>& physics_robots,
     std::map<std::shared_ptr<PhysicsSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
         simulator_robots,
@@ -92,7 +92,7 @@ void Simulator::updateSimulatorRobots(
 
         FirmwareWorld_t* firmware_world_raw =
             app_firmware_world_create(firmware_robot.release(), firmware_ball.release(),
-                                      &(Simulator::getCurrentFirmwareTimeSeconds));
+                                      &(ErForceSimulator::getCurrentFirmwareTimeSeconds));
         auto firmware_world =
             std::shared_ptr<FirmwareWorld_t>(firmware_world_raw, FirmwareWorldDeleter());
 
@@ -100,22 +100,22 @@ void Simulator::updateSimulatorRobots(
     }
 }
 
-void Simulator::setYellowRobotPrimitive(RobotId id,
-                                        const TbotsProto_Primitive& primitive_msg)
+void ErForceSimulator::setYellowRobotPrimitive(RobotId id,
+                                               const TbotsProto_Primitive& primitive_msg)
 {
     setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball,
                       yellow_team_defending_side);
 }
 
-void Simulator::setBlueRobotPrimitive(RobotId id,
-                                      const TbotsProto_Primitive& primitive_msg)
+void ErForceSimulator::setBlueRobotPrimitive(RobotId id,
+                                             const TbotsProto_Primitive& primitive_msg)
 {
     setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball,
                       blue_team_defending_side);
 }
 
-void Simulator::setYellowRobotPrimitiveSet(
-    const TbotsProto_PrimitiveSet& primitive_set_msg, TbotsProto_Vision vision_msg)
+void ErForceSimulator::setYellowRobotPrimitiveSet(
+    const TbotsProto_PrimitiveSet& primitive_set_msg, const TbotsProto_Vision vision_msg)
 {
     for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {
@@ -124,7 +124,8 @@ void Simulator::setYellowRobotPrimitiveSet(
     }
 }
 
-void Simulator::setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg, TbotsProto_Vision vision_msg)
+void ErForceSimulator::setBlueRobotPrimitiveSet(
+    const TbotsProto_PrimitiveSet& primitive_set_msg, const TbotsProto_Vision vision_msg)
 {
     for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {
@@ -133,7 +134,7 @@ void Simulator::setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitiv
     }
 }
 
-void Simulator::setRobotPrimitive(
+void ErForceSimulator::setRobotPrimitive(
     RobotId id, const TbotsProto_Primitive& primitive_msg,
     std::map<std::shared_ptr<PhysicsSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
         simulator_robots,
@@ -157,7 +158,8 @@ void Simulator::setRobotPrimitive(
     }
 }
 
-void Simulator::setYellowTeamDefendingSide(const DefendingSideProto& defending_side_proto)
+void ErForceSimulator::setYellowTeamDefendingSide(
+    const DefendingSideProto& defending_side_proto)
 {
     switch (defending_side_proto.defending_side())
     {
@@ -173,7 +175,8 @@ void Simulator::setYellowTeamDefendingSide(const DefendingSideProto& defending_s
     }
 }
 
-void Simulator::setBlueTeamDefendingSide(const DefendingSideProto& defending_side_proto)
+void ErForceSimulator::setBlueTeamDefendingSide(
+    const DefendingSideProto& defending_side_proto)
 {
     switch (defending_side_proto.defending_side())
     {
@@ -189,7 +192,7 @@ void Simulator::setBlueTeamDefendingSide(const DefendingSideProto& defending_sid
     }
 }
 
-void Simulator::stepSimulation(const Duration& time_step)
+void ErForceSimulator::stepSimulation(const Duration& time_step)
 {
     // Set the ball being referenced in each firmware_world.
     // We only need to do this a single time since all robots
@@ -243,7 +246,7 @@ void Simulator::stepSimulation(const Duration& time_step)
     frame_number++;
 }
 
-World Simulator::getWorld() const
+World ErForceSimulator::getWorld() const
 {
     Timestamp timestamp = physics_world.getTimestamp();
     Ball ball           = Ball(Point(0, 0), Vector(0, 0), timestamp);
@@ -272,7 +275,7 @@ World Simulator::getWorld() const
     return world;
 }
 
-std::unique_ptr<SSLProto::SSL_WrapperPacket> Simulator::getSSLWrapperPacket() const
+std::unique_ptr<SSLProto::SSL_WrapperPacket> ErForceSimulator::getSSLWrapperPacket() const
 {
     auto ball_state  = physics_world.getBallState();
     auto ball_states = ball_state.has_value()
@@ -288,22 +291,22 @@ std::unique_ptr<SSLProto::SSL_WrapperPacket> Simulator::getSSLWrapperPacket() co
     return wrapper_packet;
 }
 
-Field Simulator::getField() const
+Field ErForceSimulator::getField() const
 {
     return physics_world.getField();
 }
 
-Timestamp Simulator::getTimestamp() const
+Timestamp ErForceSimulator::getTimestamp() const
 {
     return physics_world.getTimestamp();
 }
 
-std::weak_ptr<PhysicsRobot> Simulator::getRobotAtPosition(const Point& position)
+std::weak_ptr<PhysicsRobot> ErForceSimulator::getRobotAtPosition(const Point& position)
 {
     return physics_world.getRobotAtPosition(position);
 }
 
-void Simulator::addYellowRobot(const Point& position)
+void ErForceSimulator::addYellowRobot(const Point& position)
 {
     RobotId id = physics_world.getAvailableYellowRobotId();
     auto state =
@@ -312,7 +315,7 @@ void Simulator::addYellowRobot(const Point& position)
     addYellowRobots({state_with_id});
 }
 
-void Simulator::addBlueRobot(const Point& position)
+void ErForceSimulator::addBlueRobot(const Point& position)
 {
     RobotId id = physics_world.getAvailableBlueRobotId();
     auto state =
@@ -321,54 +324,54 @@ void Simulator::addBlueRobot(const Point& position)
     addBlueRobots({state_with_id});
 }
 
-void Simulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
+void ErForceSimulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
 {
     physics_world.removeRobot(robot);
 }
 
-void Simulator::resetCurrentFirmwareTime()
+void ErForceSimulator::resetCurrentFirmwareTime()
 {
     current_firmware_time = Timestamp::fromSeconds(0);
 }
 
-float Simulator::getCurrentFirmwareTimeSeconds()
+float ErForceSimulator::getCurrentFirmwareTimeSeconds()
 {
     return static_cast<float>(current_firmware_time.toSeconds());
 }
 
 // We must give this variable a value here, as non-const static variables must be
 // initialized out-of-line
-Timestamp Simulator::current_firmware_time = Timestamp::fromSeconds(0);
+Timestamp ErForceSimulator::current_firmware_time = Timestamp::fromSeconds(0);
 
-//float io_vision_getBallPositionX(void)
+// float io_vision_getBallPositionX(void)
 //{
 //    io_lock_vision();
 //    float temp = vision.ball_state.global_position.x_meters;
 //    io_unlock_vision();
 //    return temp;
 //}
-//float io_vision_getBallPositionY(void)
+// float io_vision_getBallPositionY(void)
 //{
 //    io_lock_vision();
 //    float temp = vision.ball_state.global_position.y_meters;
 //    io_unlock_vision();
 //    return temp;
 //}
-//float io_vision_getBallVelocityX(void)
+// float io_vision_getBallVelocityX(void)
 //{
 //    io_lock_vision();
 //    float temp = vision.ball_state.global_velocity.x_component_meters;
 //    io_unlock_vision();
 //    return temp;
 //}
-//float io_vision_getBallVelocityY(void)
+// float io_vision_getBallVelocityY(void)
 //{
 //    io_lock_vision();
 //    float temp = vision.ball_state.global_velocity.y_component_meters;
 //    io_unlock_vision();
 //    return temp;
 //}
-//float io_vision_getRobotPositionX(void)
+// float io_vision_getRobotPositionX(void)
 //{
 //    float temp = 0.0f;
 //    io_lock_vision();
@@ -379,7 +382,7 @@ Timestamp Simulator::current_firmware_time = Timestamp::fromSeconds(0);
 //    io_unlock_vision();
 //    return temp;
 //}
-//float io_vision_getRobotPositionY(void)
+// float io_vision_getRobotPositionY(void)
 //{
 //    float temp = 0.0f;
 //    io_lock_vision();
@@ -390,7 +393,7 @@ Timestamp Simulator::current_firmware_time = Timestamp::fromSeconds(0);
 //    io_unlock_vision();
 //    return temp;
 //}
-//float io_vision_getRobotOrientation(void)
+// float io_vision_getRobotOrientation(void)
 //{
 //    float temp = 0.0f;
 //    io_lock_vision();
@@ -401,7 +404,7 @@ Timestamp Simulator::current_firmware_time = Timestamp::fromSeconds(0);
 //    io_unlock_vision();
 //    return temp;
 //}
-//float io_vision_getRobotVelocityX(void)
+// float io_vision_getRobotVelocityX(void)
 //{
 //    float temp = 0.0f;
 //    io_lock_vision();
@@ -412,7 +415,7 @@ Timestamp Simulator::current_firmware_time = Timestamp::fromSeconds(0);
 //    io_unlock_vision();
 //    return temp;
 //}
-//float io_vision_getRobotVelocityY(void)
+// float io_vision_getRobotVelocityY(void)
 //{
 //    float temp = 0.0f;
 //    io_lock_vision();
@@ -423,13 +426,14 @@ Timestamp Simulator::current_firmware_time = Timestamp::fromSeconds(0);
 //    io_unlock_vision();
 //    return temp;
 //}
-//float io_vision_getRobotAngularVelocity(void)
+// float io_vision_getRobotAngularVelocity(void)
 //{
 //    float temp = 0.0f;
 //    io_lock_vision();
 //            if (vision.robot_states_count == 1)
 //            {
-//             temp = vision.robot_states[0].value.global_angular_velocity.radians_per_second;
+//             temp =
+//             vision.robot_states[0].value.global_angular_velocity.radians_per_second;
 //            }
 //    io_unlock_vision();
 //    return temp;
