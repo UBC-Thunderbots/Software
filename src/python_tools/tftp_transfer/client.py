@@ -3,6 +3,7 @@ import tftpy, hashlib, os, argparse, pathlib, logging
 # TODO (#2237): following dependency isn't necessary when checksum is obtained from announcements
 import tempfile
 
+
 def verify_checksum(file_path: str, checksum: str) -> bool:
     """
     Compare the SHA-256 checksum of a given file and verify that it is the same as a given checksum.
@@ -38,7 +39,7 @@ def encode_sha256_checksum(file_path: str) -> str:
     return hash.hexdigest()
 
 
-def main() :
+def main():
     # get command line arguments
     ap = argparse.ArgumentParser()
     ap.add_argument(
@@ -78,9 +79,9 @@ def main() :
         #       of the redownloaded file is the same. When we have announcements, the
         #       checksum will be reported by the robot and we just compare the hash from the
         #       announcement
-        with tempfile.TemporaryDirectory() as tmpdirname :
+        with tempfile.TemporaryDirectory() as tmpdirname:
             transferred_file_path = os.path.join(tmpdirname, file_name)
-            client.download(file_name, transferred_file_path)   
+            client.download(file_name, transferred_file_path)
 
             if verify_checksum(transferred_file_path, transfer_file_hash):
                 print("Checksum verified")
@@ -90,6 +91,7 @@ def main() :
                 print("Checksum verification failed")
                 print("Retrying...")
                 client.upload(file_name, file_path)
-    
-if __name__ == "__main__" :
+
+
+if __name__ == "__main__":
     main()

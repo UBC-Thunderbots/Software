@@ -1,6 +1,7 @@
 import tftpy, argparse
 
-def main() :
+
+def main():
     # parse command line arguments
     ap = argparse.ArgumentParser()
     ap.add_argument("-p", "--port", type=int, help="listening port", required=True)
@@ -19,7 +20,10 @@ def main() :
     try:
         server.listen(listenport=port)
     except PermissionError:
-        print("Elevated privilege is required to open a port < 1024. Retry with another port.")
-        
-if __name__ == "__main__" :
+        print(
+            "Elevated privilege is required to open a port < 1024. Retry with another port."
+        )
+
+
+if __name__ == "__main__":
     main()
