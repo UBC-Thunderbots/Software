@@ -7,9 +7,8 @@ extern "C"
 #include "firmware/app/logger/logger.h"
 #include "firmware/app/world/charger.h"
 #include "firmware/app/world/velocity_wheel.h"
+#include "shared/proto/tbots_software_msgs.nanopb.h"
 }
-
-FieldSide ErForceSimulatorRobotSingleton::field_side_ = FieldSide::NEG_X;
 
 // TODO (#2066): The JERK_LIMIT is copied from firmware/main/control/control.h
 // which we currently can't include directly because it relies on firmware IO.
@@ -49,56 +48,30 @@ void ErForceSimulatorRobotSingleton::handleYellowRobotLogProto(TbotsProto_RobotL
     ErForceSimulatorRobotSingleton::handleRobotLogProto(log, "YELLOW");
 }
 
-float ErForceSimulatorRobotSingleton::invertValueToMatchFieldSide(float value)
-{
-    switch (field_side_)
-    {
-        case FieldSide::NEG_X:
-            return value;
-        case FieldSide::POS_X:
-            return -value;
-        default:
-            throw std::invalid_argument("Unhandled value of FieldSide");
-    }
-}
-
 float ErForceSimulatorRobotSingleton::getPositionX()
 {
-    return checkValidAndExecute<float>(
-        [](auto robot) { return invertValueToMatchFieldSide(robot->getPositionX()); });
+    return checkValidAndExecute<float>([](auto robot) { return robot->getPositionX(); });
 }
 
 float ErForceSimulatorRobotSingleton::getPositionY()
 {
-    return checkValidAndExecute<float>(
-        [](auto robot) { return invertValueToMatchFieldSide(robot->getPositionY()); });
+    return checkValidAndExecute<float>([](auto robot) { return robot->getPositionY(); });
 }
 
 float ErForceSimulatorRobotSingleton::getOrientation()
 {
-    return checkValidAndExecute<float>([](auto robot) {
-        switch (field_side_)
-        {
-            case FieldSide::NEG_X:
-                return robot->getOrientation();
-            case FieldSide::POS_X:
-                return robot->getOrientation() + static_cast<float>(M_PI);
-            default:
-                throw std::invalid_argument("Unhandled value of FieldSide");
-        }
-    });
+    return checkValidAndExecute<float>(
+        [](auto robot) { return robot->getOrientation(); });
 }
 
 float ErForceSimulatorRobotSingleton::getVelocityX()
 {
-    return checkValidAndExecute<float>(
-        [](auto robot) { return invertValueToMatchFieldSide(robot->getVelocityX()); });
+    return checkValidAndExecute<float>([](auto robot) { return robot->getVelocityX(); });
 }
 
 float ErForceSimulatorRobotSingleton::getVelocityY()
 {
-    return checkValidAndExecute<float>(
-        [](auto robot) { return invertValueToMatchFieldSide(robot->getVelocityY()); });
+    return checkValidAndExecute<float>([](auto robot) { return robot->getVelocityY(); });
 }
 
 float ErForceSimulatorRobotSingleton::getVelocityAngular()
@@ -238,10 +211,9 @@ void ErForceSimulatorRobotSingleton::handleRobotLogProto(TbotsProto_RobotLog log
 }
 
 void ErForceSimulatorRobotSingleton::setSimulatorRobot(
-    std::shared_ptr<ErForceSimulatorRobot> robot, FieldSide field_side)
+    std::shared_ptr<ErForceSimulatorRobot> robot)
 {
     er_force_simulator_robot = robot;
-    field_side_              = field_side;
 }
 
 std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>

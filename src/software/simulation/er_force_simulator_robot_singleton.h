@@ -206,20 +206,6 @@ class ErForceSimulatorRobotSingleton
     static void brakeMotorFrontRight();
 
     /**
-     * A helper function that will negate the given value if needed
-     * in order for it to match our coordinate convention for the
-     * current value of field_side
-     *
-     * @param value The value to invert
-     *
-     * @throws std::invalid_argument if there is an unhandled value of FieldSide
-     *
-     * @return value if field_side_ is NEG_X, and -value if field_side_
-     * is POS_X
-     */
-    static float invertValueToMatchFieldSide(float value);
-
-    /**
      * Helper function for handling robot logs with given team color string
      *
      * @param log The nanopb RobotLog proto logged by a robot
@@ -228,18 +214,12 @@ class ErForceSimulatorRobotSingleton
     static void handleRobotLogProto(TbotsProto_RobotLog log,
                                     const std::string& robot_colour);
 
-    // The simulator robot being controlled by this class
-    static FieldSide field_side_;
-
     /**
      * Sets the ErForceSimulatorRobot being controlled by this class
      *
      * @param robot The ErForceSimulatorRobot being controlled by this class
-     * @param field_side The side of the field being defended by the robots using
-     * this class
      */
-    static void setSimulatorRobot(std::shared_ptr<ErForceSimulatorRobot> robot,
-                                  FieldSide field_side);
+    static void setSimulatorRobot(std::shared_ptr<ErForceSimulatorRobot> robot);
 
     /**
      * Creates a FirmwareRobot_t with functions bound to the static functions in this
