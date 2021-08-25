@@ -4,7 +4,7 @@
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
-#include "software/simulation/force_wheel_simulator_robot_singleton.h"
+#include "software/simulation/er_force_simulator_robot_singleton.h"
 #include "software/simulation/simulator_ball_singleton.h"
 
 extern "C"
@@ -33,33 +33,17 @@ ErForceSimulator::ErForceSimulator(
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
 {
-    physics_world.setBallState(ball_state);
-    simulator_ball =
-        std::make_shared<PhysicsSimulatorBall>(physics_world.getPhysicsBall());
-
-    for (auto& robot_pair : yellow_simulator_robots)
-    {
-        robot_pair.first->clearBallInDribblerArea();
-    }
-
-    for (auto& robot_pair : blue_simulator_robots)
-    {
-        robot_pair.first->clearBallInDribblerArea();
-    }
+    er_force_sim.safelyTeleportBall(ball_state.position().x(), ball_state.position().y());
 }
 
 void ErForceSimulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
 {
-    physics_world.addYellowRobots(robots);
-    updateSimulatorRobots(physics_world.getYellowPhysicsRobots(), yellow_simulator_robots,
-                          TeamColour::YELLOW);
+    // TODO: add robots
 }
 
 void ErForceSimulator::addBlueRobots(const std::vector<RobotStateWithId>& robots)
 {
-    physics_world.addBlueRobots(robots);
-    updateSimulatorRobots(physics_world.getBluePhysicsRobots(), blue_simulator_robots,
-                          TeamColour::BLUE);
+    // TODO: add robots
 }
 
 void ErForceSimulator::updateSimulatorRobots(
@@ -78,16 +62,15 @@ void ErForceSimulator::updateSimulatorRobots(
         if (team_colour == TeamColour::BLUE)
         {
             app_logger_init(simulator_robot->getRobotId(),
-                            &ForceWheelSimulatorRobotSingleton::handleBlueRobotLogProto);
+                            &ErForceSimulatorRobotSingleton::handleBlueRobotLogProto);
         }
         else if (team_colour == TeamColour::YELLOW)
         {
-            app_logger_init(
-                simulator_robot->getRobotId(),
-                &ForceWheelSimulatorRobotSingleton::handleYellowRobotLogProto);
+            app_logger_init(simulator_robot->getRobotId(),
+                            &ErForceSimulatorRobotSingleton::handleYellowRobotLogProto);
         }
 
-        auto firmware_robot = ForceWheelSimulatorRobotSingleton::createFirmwareRobot();
+        auto firmware_robot = ErForceSimulatorRobotSingleton::createFirmwareRobot();
         auto firmware_ball  = SimulatorBallSingleton::createFirmwareBall();
 
         FirmwareWorld_t* firmware_world_raw =
@@ -140,22 +123,23 @@ void ErForceSimulator::setRobotPrimitive(
         simulator_robots,
     const std::shared_ptr<PhysicsSimulatorBall>& simulator_ball, FieldSide defending_side)
 {
-    SimulatorBallSingleton::setSimulatorBall(simulator_ball, defending_side);
-    auto simulator_robots_iter =
-        std::find_if(simulator_robots.begin(), simulator_robots.end(),
-                     [id](const auto& robot_world_pair) {
-                         return robot_world_pair.first->getRobotId() == id;
-                     });
-
-    if (simulator_robots_iter != simulator_robots.end())
-    {
-        auto simulator_robot = (*simulator_robots_iter).first;
-        auto firmware_world  = (*simulator_robots_iter).second;
-        ForceWheelSimulatorRobotSingleton::setSimulatorRobot(simulator_robot,
-                                                             defending_side);
-        ForceWheelSimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
-            firmware_world, primitive_msg);
-    }
+    // TODO: update simulator robot to be ErForceSimulatorRobot
+    //    SimulatorBallSingleton::setSimulatorBall(simulator_ball, defending_side);
+    //    auto simulator_robots_iter =
+    //        std::find_if(simulator_robots.begin(), simulator_robots.end(),
+    //                     [id](const auto& robot_world_pair) {
+    //                         return robot_world_pair.first->getRobotId() == id;
+    //                     });
+    //
+    //    if (simulator_robots_iter != simulator_robots.end())
+    //    {
+    //        auto simulator_robot = (*simulator_robots_iter).first;
+    //        auto firmware_world  = (*simulator_robots_iter).second;
+    //        ErForceSimulatorRobotSingleton::setSimulatorRobot(simulator_robot,
+    //                                                             defending_side);
+    //        ErForceSimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
+    //            firmware_world, primitive_msg);
+    //    }
 }
 
 void ErForceSimulator::setYellowTeamDefendingSide(
@@ -198,81 +182,54 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     // We only need to do this a single time since all robots
     // can see and interact with the same ball
 
-    Duration remaining_time = time_step;
-    while (remaining_time > Duration::fromSeconds(0))
-    {
-        current_firmware_time = physics_world.getTimestamp();
+    // TODO: update simulator robot to be ErForceSimulatorRobot
+    // Duration remaining_time = time_step;
+    // while (remaining_time > Duration::fromSeconds(0))
+    //{
+    //    current_firmware_time = physics_world.getTimestamp();
 
-        for (auto& iter : blue_simulator_robots)
-        {
-            auto simulator_robot = iter.first;
-            auto firmware_world  = iter.second;
+    //    for (auto& iter : blue_simulator_robots)
+    //    {
+    //        auto simulator_robot = iter.first;
+    //        auto firmware_world  = iter.second;
 
-            app_logger_init(simulator_robot->getRobotId(),
-                            &ForceWheelSimulatorRobotSingleton::handleBlueRobotLogProto);
+    //        app_logger_init(simulator_robot->getRobotId(),
+    //                        &ErForceSimulatorRobotSingleton::handleBlueRobotLogProto);
 
-            ForceWheelSimulatorRobotSingleton::setSimulatorRobot(
-                simulator_robot, blue_team_defending_side);
-            SimulatorBallSingleton::setSimulatorBall(simulator_ball,
-                                                     blue_team_defending_side);
-            ForceWheelSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
-                firmware_world);
-        }
+    //        ErForceSimulatorRobotSingleton::setSimulatorRobot(
+    //            simulator_robot, blue_team_defending_side);
+    //        SimulatorBallSingleton::setSimulatorBall(simulator_ball,
+    //                                                 blue_team_defending_side);
+    //        ErForceSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
+    //            firmware_world);
+    //    }
 
-        for (auto& iter : yellow_simulator_robots)
-        {
-            auto simulator_robot = iter.first;
-            auto firmware_world  = iter.second;
+    //    for (auto& iter : yellow_simulator_robots)
+    //    {
+    //        auto simulator_robot = iter.first;
+    //        auto firmware_world  = iter.second;
 
-            app_logger_init(
-                simulator_robot->getRobotId(),
-                &ForceWheelSimulatorRobotSingleton::handleYellowRobotLogProto);
+    //        app_logger_init(
+    //            simulator_robot->getRobotId(),
+    //            &ErForceSimulatorRobotSingleton::handleYellowRobotLogProto);
 
-            ForceWheelSimulatorRobotSingleton::setSimulatorRobot(
-                simulator_robot, yellow_team_defending_side);
-            SimulatorBallSingleton::setSimulatorBall(simulator_ball,
-                                                     yellow_team_defending_side);
-            ForceWheelSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
-                firmware_world);
-        }
+    //        ErForceSimulatorRobotSingleton::setSimulatorRobot(
+    //            simulator_robot, yellow_team_defending_side);
+    //        SimulatorBallSingleton::setSimulatorBall(simulator_ball,
+    //                                                 yellow_team_defending_side);
+    //        ErForceSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
+    //            firmware_world);
+    //    }
 
-        // We take as many steps of `physics_time_step` as possible, and then
-        // simulate the remainder of the time
-        Duration dt = std::min(remaining_time, physics_time_step);
-        physics_world.stepSimulation(dt);
-        remaining_time = remaining_time - physics_time_step;
-    }
+    //    // We take as many steps of `physics_time_step` as possible, and then
+    //    // simulate the remainder of the time
+    //    // TODO: replace this
+    //    // Duration dt = std::min(remaining_time, physics_time_step);
+    //    // physics_world.stepSimulation(dt);
+    //    // remaining_time = remaining_time - physics_time_step;
+    //}
 
     frame_number++;
-}
-
-World ErForceSimulator::getWorld() const
-{
-    Timestamp timestamp = physics_world.getTimestamp();
-    Ball ball           = Ball(Point(0, 0), Vector(0, 0), timestamp);
-    if (physics_world.getBallState())
-    {
-        ball = Ball(BallState(physics_world.getBallState().value()), timestamp);
-    }
-
-    std::vector<Robot> friendly_team_robots;
-    for (const auto& robot_state : physics_world.getYellowRobotStates())
-    {
-        Robot robot(robot_state.id, robot_state.robot_state, timestamp);
-        friendly_team_robots.emplace_back(robot);
-    }
-    std::vector<Robot> enemy_team_robots;
-    for (const auto& robot_state : physics_world.getBlueRobotStates())
-    {
-        Robot robot(robot_state.id, robot_state.robot_state, timestamp);
-        enemy_team_robots.emplace_back(robot);
-    }
-
-    Team friendly_team(friendly_team_robots, Duration::fromSeconds(0.5));
-    Team enemy_team(enemy_team_robots, Duration::fromSeconds(0.5));
-
-    World world(physics_world.getField(), ball, friendly_team, enemy_team);
-    return world;
 }
 
 std::unique_ptr<SSLProto::SSL_WrapperPacket> ErForceSimulator::getSSLWrapperPacket() const
@@ -301,32 +258,14 @@ Timestamp ErForceSimulator::getTimestamp() const
     return physics_world.getTimestamp();
 }
 
-std::weak_ptr<PhysicsRobot> ErForceSimulator::getRobotAtPosition(const Point& position)
-{
-    return physics_world.getRobotAtPosition(position);
-}
-
 void ErForceSimulator::addYellowRobot(const Point& position)
 {
-    RobotId id = physics_world.getAvailableYellowRobotId();
-    auto state =
-        RobotState(position, Vector(0, 0), Angle::zero(), AngularVelocity::zero());
-    auto state_with_id = RobotStateWithId{.id = id, .robot_state = state};
-    addYellowRobots({state_with_id});
+    // TODO: implement
 }
 
 void ErForceSimulator::addBlueRobot(const Point& position)
 {
-    RobotId id = physics_world.getAvailableBlueRobotId();
-    auto state =
-        RobotState(position, Vector(0, 0), Angle::zero(), AngularVelocity::zero());
-    auto state_with_id = RobotStateWithId{.id = id, .robot_state = state};
-    addBlueRobots({state_with_id});
-}
-
-void ErForceSimulator::removeRobot(std::weak_ptr<PhysicsRobot> robot)
-{
-    physics_world.removeRobot(robot);
+    // TODO: implement
 }
 
 void ErForceSimulator::resetCurrentFirmwareTime()

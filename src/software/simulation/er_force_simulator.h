@@ -114,7 +114,8 @@ class ErForceSimulator
      *
      * @return the current state of the world in the simulation
      */
-    World getWorld() const;
+    // TODO: return the real world
+    // World getWorld() const;
 
     /**
      * Returns an SSLProto::SSL_WrapperPacket representing the most recent state
@@ -149,14 +150,16 @@ class ErForceSimulator
      * @return a weak_ptr to the PhysicsRobot at the given position if one exists,
      * otherwise returns an empty pointer
      */
-    std::weak_ptr<PhysicsRobot> getRobotAtPosition(const Point& position);
+    // TODO: implement
+    // std::weak_ptr<PhysicsRobot> getRobotAtPosition(const Point& position);
 
     /**
      * Removes the given PhysicsRobot from the PhysicsWorld, if it exists.
      *
      * @param robot The robot to be removed
      */
-    void removeRobot(std::weak_ptr<PhysicsRobot> robot);
+    // TODO: implement
+    // void removeRobot(std::weak_ptr<PhysicsRobot> robot);
 
     /**
      * Resets the current firmware time to 0

@@ -20,8 +20,8 @@ FieldSide ErForceSimulatorRobotSingleton::field_side_ = FieldSide::NEG_X;
 // We should inject it as a robot or control param instead.
 #define WHEEL_MOTOR_PHASE_RESISTANCE 1.2f  // ohms—EC45 datasheet
 
-std::shared_ptr<VelocityWheelSimulatorRobot>
-    ErForceSimulatorRobotSingleton::velocity_wheel_simulator_robot = nullptr;
+std::shared_ptr<ErForceSimulatorRobot>
+    ErForceSimulatorRobotSingleton::er_force_simulator_robot = nullptr;
 
 void ErForceSimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
     std::shared_ptr<FirmwareWorld_t> firmware_world,
@@ -238,10 +238,10 @@ void ErForceSimulatorRobotSingleton::handleRobotLogProto(TbotsProto_RobotLog log
 }
 
 void ErForceSimulatorRobotSingleton::setSimulatorRobot(
-    std::shared_ptr<VelocityWheelSimulatorRobot> robot, FieldSide field_side)
+    std::shared_ptr<ErForceSimulatorRobot> robot, FieldSide field_side)
 {
-    velocity_wheel_simulator_robot = robot;
-    field_side_                    = field_side;
+    er_force_simulator_robot = robot;
+    field_side_              = field_side;
 }
 
 std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter>

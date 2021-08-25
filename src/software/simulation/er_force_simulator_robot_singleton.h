@@ -5,7 +5,7 @@
 #include <optional>
 
 #include "software/logger/logger.h"
-#include "software/simulation/velocity_wheel_simulator_robot.h"
+#include "software/simulation/er_force_simulator_robot.h"
 #include "software/world/field.h"
 
 extern "C"
@@ -68,7 +68,6 @@ class ErForceSimulatorRobotSingleton
     static void handleBlueRobotLogProto(TbotsProto_RobotLog log);
     static void handleYellowRobotLogProto(TbotsProto_RobotLog log);
 
-   protected:
     /**
      * Returns the x-position of the robot, in global field coordinates, in meters
      *
@@ -233,13 +232,13 @@ class ErForceSimulatorRobotSingleton
     static FieldSide field_side_;
 
     /**
-     * Sets the VelocityWheelSimulatorRobot being controlled by this class
+     * Sets the ErForceSimulatorRobot being controlled by this class
      *
-     * @param robot The VelocityWheelSimulatorRobot being controlled by this class
+     * @param robot The ErForceSimulatorRobot being controlled by this class
      * @param field_side The side of the field being defended by the robots using
      * this class
      */
-    static void setSimulatorRobot(std::shared_ptr<VelocityWheelSimulatorRobot> robot,
+    static void setSimulatorRobot(std::shared_ptr<ErForceSimulatorRobot> robot,
                                   FieldSide field_side);
 
     /**
@@ -248,7 +247,7 @@ class ErForceSimulatorRobotSingleton
      * calling setSimulatorRobot will simply change the implementations of the bound
      * functions to act as if the new robot was being controlled.
      *
-     * @return a FirmwareRobot_t that is bound to whatever VelocityWheelSimulatorRobot
+     * @return a FirmwareRobot_t that is bound to whatever ErForceSimulatorRobot
      * this Singleton is controlling
      */
     static std::unique_ptr<FirmwareRobot_t, FirmwareRobotDeleter> createFirmwareRobot();
@@ -273,18 +272,18 @@ class ErForceSimulatorRobotSingleton
      */
     template <class T>
     static T checkValidAndExecute(
-        std::function<T(std::shared_ptr<VelocityWheelSimulatorRobot>)> func)
+        std::function<T(std::shared_ptr<ErForceSimulatorRobot>)> func)
     {
-        if (velocity_wheel_simulator_robot)
+        if (er_force_simulator_robot)
         {
-            return func(velocity_wheel_simulator_robot);
+            return func(er_force_simulator_robot);
         }
         LOG(WARNING)
-            << "VelocityWheelSimulatorRobotSingleton called without setting the VelocityWheelSimulatorRobot first"
+            << "ErForceSimulatorRobotSingleton called without setting the ErForceSimulatorRobot first"
             << std::endl;
         return static_cast<T>(0);
     }
 
     // The simulator robot being controlled by this class
-    static std::shared_ptr<VelocityWheelSimulatorRobot> velocity_wheel_simulator_robot;
+    static std::shared_ptr<ErForceSimulatorRobot> er_force_simulator_robot;
 };

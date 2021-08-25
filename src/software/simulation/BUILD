@@ -102,10 +102,15 @@ cc_library(
 )
 
 cc_library(
-    name = "velocity_wheel_simulator_robot",
-    hdrs = ["velocity_wheel_simulator_robot.h"],
+    name = "er_force_simulator_robot",
+    srcs = ["er_force_simulator_robot.cpp"],
+    hdrs = ["er_force_simulator_robot.h"],
     deps = [
+        "//shared:constants",
+        "//software/proto:ssl_simulation_cc_proto",
+        "//software/proto/message_translation:ssl_simulation_robot_control",
         "//software/simulation:simulator_robot",
+        "//software/world:robot_state",
     ],
 )
 
@@ -114,9 +119,9 @@ cc_library(
     srcs = ["er_force_simulator_robot_singleton.cpp"],
     hdrs = ["er_force_simulator_robot_singleton.h"],
     deps = [
+        ":er_force_simulator_robot",
         ":firmware_object_deleter",
         ":simulator_robot",
-        ":velocity_wheel_simulator_robot",
         "//firmware/app/logger",
         "//firmware/app/world:chicker",
         "//firmware/app/world:dribbler",
@@ -223,8 +228,8 @@ cc_library(
     srcs = ["er_force_simulator.cpp"],
     hdrs = ["er_force_simulator.h"],
     deps = [
+        ":er_force_simulator_robot_singleton",
         ":firmware_object_deleter",
-        ":force_wheel_simulator_robot_singleton",
         ":physics_simulator_ball",
         ":physics_simulator_robot",
         ":simulator_ball_singleton",
