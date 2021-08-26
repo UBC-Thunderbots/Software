@@ -3,10 +3,10 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/proto/defending_side_msg.pb.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
+#include "software/simulation/er_force_simulator_ball.h"
 #include "software/simulation/er_force_simulator_robot.h"
 #include "software/simulation/firmware_object_deleter.h"
 #include "software/simulation/physics/physics_world.h"
-#include "software/simulation/physics_simulator_ball.h"
 #include "software/world/field.h"
 #include "software/world/team_types.h"
 #include "software/world/world.h"
@@ -84,9 +84,9 @@ class ErForceSimulator
      * @param vision_msg The vision message
      */
     void setYellowRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg,
-                                    const TbotsProto_Vision vision_msg);
+                                    const TbotsProto_Vision& vision_msg);
     void setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg,
-                                  const TbotsProto_Vision vision_msg);
+                                  const TbotsProto_Vision& vision_msg);
 
     /**
      * Advances the simulation by the given time step. This will simulate
@@ -95,14 +95,6 @@ class ErForceSimulator
      * @param time_step how much to advance the simulation by
      */
     void stepSimulation(const Duration& time_step);
-
-    /**
-     * Returns the current state of the world in the simulation
-     *
-     * @return the current state of the world in the simulation
-     */
-    // TODO: return the real world
-    // World getWorld() const;
 
     /**
      * Returns an SSLProto::SSL_WrapperPacket representing the most recent state
@@ -128,27 +120,6 @@ class ErForceSimulator
     Timestamp getTimestamp() const;
 
     /**
-     * Returns the PhysicsRobot at the given position. This function accounts
-     * for robot radius, so a robot will be returned if the given position is
-     * within the robot's radius from its position.
-     *
-     * @param position The position at which to check for a robot
-     *
-     * @return a weak_ptr to the PhysicsRobot at the given position if one exists,
-     * otherwise returns an empty pointer
-     */
-    // TODO: implement
-    // std::weak_ptr<PhysicsRobot> getRobotAtPosition(const Point& position);
-
-    /**
-     * Removes the given PhysicsRobot from the PhysicsWorld, if it exists.
-     *
-     * @param robot The robot to be removed
-     */
-    // TODO: implement
-    // void removeRobot(std::weak_ptr<PhysicsRobot> robot);
-
-    /**
      * Resets the current firmware time to 0
      */
     static void resetCurrentFirmwareTime();
@@ -172,8 +143,10 @@ class ErForceSimulator
      * @param id The id of the robot to set the primitive for
      * @param primitive_msg The primitive to run on the robot
      */
-    void setYellowRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
-    void setBlueRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
+    void setYellowRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg,
+                                 const TbotsProto_Vision& vision_msg);
+    void setBlueRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg,
+                               const TbotsProto_Vision& vision_msg);
 
     /**
      * Sets the primitive being simulated by the robot in simulation
@@ -188,11 +161,11 @@ class ErForceSimulator
         RobotId id, const TbotsProto_Primitive& primitive_msg,
         std::map<std::shared_ptr<ErForceSimulatorRobot>,
                  std::shared_ptr<FirmwareWorld_t>>& simulator_robots,
-        const std::shared_ptr<PhysicsSimulatorBall>& simulator_ball,
+        const std::shared_ptr<ErForceSimulatorBall>& simulator_ball,
         FieldSide defending_side);
 
     PhysicsWorld physics_world;
-    std::shared_ptr<PhysicsSimulatorBall> simulator_ball;
+    std::shared_ptr<ErForceSimulatorBall> simulator_ball;
     std::map<std::shared_ptr<ErForceSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
         yellow_simulator_robots;
     std::map<std::shared_ptr<ErForceSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>

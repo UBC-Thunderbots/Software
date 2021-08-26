@@ -228,6 +228,7 @@ cc_library(
     srcs = ["er_force_simulator.cpp"],
     hdrs = ["er_force_simulator.h"],
     deps = [
+        ":er_force_simulator_ball",
         ":er_force_simulator_robot_singleton",
         ":firmware_object_deleter",
         ":physics_simulator_ball",
@@ -315,5 +316,19 @@ cc_library(
         "//firmware/app/world:force_wheel",
         "//firmware/shared:physics",
         "//software/logger",
+    ],
+)
+
+cc_library(
+    name = "er_force_simulator_ball",
+    srcs = [
+        "er_force_simulator_ball.cpp",
+    ],
+    hdrs = [
+        "er_force_simulator_ball.h",
+    ],
+    deps = [
+        "//software/simulation:simulator_ball",
+        "//software/world:ball_state",
     ],
 )

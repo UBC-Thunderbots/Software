@@ -47,36 +47,38 @@ void ErForceSimulator::addBlueRobots(const std::vector<RobotStateWithId>& robots
 }
 
 void ErForceSimulator::setYellowRobotPrimitive(RobotId id,
-                                               const TbotsProto_Primitive& primitive_msg)
+                                               const TbotsProto_Primitive& primitive_msg,
+                                               const TbotsProto_Vision& vision_msg)
 {
     setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball,
                       yellow_team_defending_side);
 }
 
 void ErForceSimulator::setBlueRobotPrimitive(RobotId id,
-                                             const TbotsProto_Primitive& primitive_msg)
+                                             const TbotsProto_Primitive& primitive_msg,
+                                             const TbotsProto_Vision& vision_msg)
 {
     setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball,
                       blue_team_defending_side);
 }
 
 void ErForceSimulator::setYellowRobotPrimitiveSet(
-    const TbotsProto_PrimitiveSet& primitive_set_msg, const TbotsProto_Vision vision_msg)
+    const TbotsProto_PrimitiveSet& primitive_set_msg, const TbotsProto_Vision& vision_msg)
 {
     for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {
         setYellowRobotPrimitive(primitive_set_msg.robot_primitives[i].key,
-                                primitive_set_msg.robot_primitives[i].value);
+                                primitive_set_msg.robot_primitives[i].value, vision_msg);
     }
 }
 
 void ErForceSimulator::setBlueRobotPrimitiveSet(
-    const TbotsProto_PrimitiveSet& primitive_set_msg, const TbotsProto_Vision vision_msg)
+    const TbotsProto_PrimitiveSet& primitive_set_msg, const TbotsProto_Vision& vision_msg)
 {
     for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {
         setBlueRobotPrimitive(primitive_set_msg.robot_primitives[i].key,
-                              primitive_set_msg.robot_primitives[i].value);
+                              primitive_set_msg.robot_primitives[i].value, vision_msg);
     }
 }
 
@@ -84,9 +86,9 @@ void ErForceSimulator::setRobotPrimitive(
     RobotId id, const TbotsProto_Primitive& primitive_msg,
     std::map<std::shared_ptr<ErForceSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>&
         simulator_robots,
-    const std::shared_ptr<PhysicsSimulatorBall>& simulator_ball, FieldSide defending_side)
+    const std::shared_ptr<ErForceSimulatorBall>& simulator_ball, FieldSide defending_side)
 {
-    // TODO: update simulator robot to be ErForceSimulatorRobot
+    // TODO: make sure simulator_ball is updated with the right BallState
     SimulatorBallSingleton::setSimulatorBall(simulator_ball, defending_side);
     auto simulator_robots_iter =
         std::find_if(simulator_robots.begin(), simulator_robots.end(),
@@ -126,8 +128,8 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 
             // TODO: make sure simulator_robot is updated with the right RobotState
             ErForceSimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-            SimulatorBallSingleton::setSimulatorBall(simulator_ball,
-                                                     blue_team_defending_side);
+            // TODO: make sure simulator_ball is updated with the right BallState
+            SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
             ErForceSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
                 firmware_world);
         }
@@ -142,8 +144,8 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 
             // TODO: make sure simulator_robot is updated with the right RobotState
             ErForceSimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-            SimulatorBallSingleton::setSimulatorBall(simulator_ball,
-                                                     yellow_team_defending_side);
+            // TODO: make sure simulator_ball is updated with the right BallState
+            SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
             ErForceSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
                 firmware_world);
         }
