@@ -111,6 +111,7 @@ cc_library(
         "//software/proto/message_translation:ssl_simulation_robot_control",
         "//software/simulation:simulator_robot",
         "//software/world:robot_state",
+        "@er_force_sim//src/amun/simulator",
     ],
 )
 

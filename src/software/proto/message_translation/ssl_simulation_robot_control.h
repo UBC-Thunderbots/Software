@@ -1,6 +1,7 @@
 #pragma once
 
 #include "software/proto/ssl_simulation_robot_control.pb.h"
+#include "src/amun/simulator/simulator.h"
 #include "software/proto/ssl_simulation_robot_feedback.pb.h"
 
 /**
@@ -13,7 +14,7 @@
  *
  * @return RobotMoveCommand proto
  */
-std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
+std::unique_ptr<sslsim::RobotMoveCommand> createRobotMoveCommand(
     double wheel_rpm_front_right, double wheel_rpm_front_left, double wheel_rpm_back_left,
     double wheel_rpm_back_right);
 
@@ -28,8 +29,8 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
  *
  * @return RobotCommand proto
  */
-std::unique_ptr<SSLSimulationProto::RobotCommand> createRobotCommand(
-    unsigned robot_id, std::unique_ptr<SSLSimulationProto::RobotMoveCommand> move_command,
+std::unique_ptr<sslsim::RobotCommand> createRobotCommand(
+    unsigned robot_id, std::unique_ptr<sslsim::RobotMoveCommand> move_command,
     std::optional<double> kick_speed, std::optional<double> kick_angle,
     std::optional<double> dribbler_speed);
 
@@ -40,5 +41,5 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> createRobotCommand(
  *
  * @return RobotControl proto
  */
-std::unique_ptr<SSLSimulationProto::RobotControl> createRobotControl(
-    std::vector<std::unique_ptr<SSLSimulationProto::RobotCommand>> robot_commands);
+std::unique_ptr<sslsim::RobotControl> createRobotControl(
+    std::vector<std::unique_ptr<sslsim::RobotCommand>> robot_commands);

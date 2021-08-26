@@ -11,11 +11,11 @@ float rpm_to_m_per_s(float rpm, float wheel_radius)
     return (2 * (float)M_PI * rpm * wheel_radius) / 60.0f;
 }
 
-std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
+std::unique_ptr<sslsim::RobotMoveCommand> createRobotMoveCommand(
     double wheel_rpm_front_right, double wheel_rpm_front_left, double wheel_rpm_back_left,
     double wheel_rpm_back_right)
 {
-    auto move_local_velocity = SSLSimulationProto::MoveLocalVelocity();
+    auto move_local_velocity = sslsim::MoveLocalVelocity();
 
     // Convert the units of wheel speeds to m/s
     float front_left_m_per_s =
@@ -39,19 +39,19 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
     move_local_velocity.set_left(robot_local_speed[1]);
     move_local_velocity.set_angular(robot_local_speed[2]);
 
-    auto move_command = std::make_unique<SSLSimulationProto::RobotMoveCommand>();
+    auto move_command = std::make_unique<sslsim::RobotMoveCommand>();
 
     *(move_command->mutable_local_velocity()) = move_local_velocity;
 
     return move_command;
 }
 
-std::unique_ptr<SSLSimulationProto::RobotCommand> createRobotCommand(
-    unsigned robot_id, std::unique_ptr<SSLSimulationProto::RobotMoveCommand> move_command,
+std::unique_ptr<sslsim::RobotCommand> createRobotCommand(
+    unsigned robot_id, std::unique_ptr<sslsim::RobotMoveCommand> move_command,
     std::optional<double> kick_speed, std::optional<double> kick_angle,
     std::optional<double> dribbler_speed)
 {
-    auto robot_command = std::make_unique<SSLSimulationProto::RobotCommand>();
+    auto robot_command = std::make_unique<sslsim::RobotCommand>();
 
     robot_command->set_id(robot_id);
 
@@ -73,10 +73,10 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> createRobotCommand(
     return robot_command;
 }
 
-std::unique_ptr<SSLSimulationProto::RobotControl> createRobotControl(
-    std::vector<std::unique_ptr<SSLSimulationProto::RobotCommand>> robot_commands)
+std::unique_ptr<sslsim::RobotControl> createRobotControl(
+    std::vector<std::unique_ptr<sslsim::RobotCommand>> robot_commands)
 {
-    auto robot_control = std::make_unique<SSLSimulationProto::RobotControl>();
+    auto robot_control = std::make_unique<sslsim::RobotControl>();
 
     for (auto&& robot_command : robot_commands)
     {

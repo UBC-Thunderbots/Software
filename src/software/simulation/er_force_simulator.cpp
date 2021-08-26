@@ -26,7 +26,7 @@ ErForceSimulator::ErForceSimulator(
       physics_time_step(physics_time_step),
       er_force_sim_timer(),
       er_force_sim_setup(),
-      er_force_sim(&er_force_sim_timer, er_force_sim_setup)
+      er_force_sim(&er_force_sim_timer, er_force_sim_setup, true)
 {
     this->resetCurrentFirmwareTime();
 }
@@ -136,6 +136,9 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     {
         current_firmware_time = physics_world.getTimestamp();
 
+    SSLSimRobotControl yellow_robot_control{new sslsim::RobotControl};
+    SSLSimRobotControl blue_robot_control{new sslsim::RobotControl};
+
         for (auto& iter : blue_simulator_robots)
         {
             auto simulator_robot = iter.first;
@@ -182,6 +185,7 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
             SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
             ErForceSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
                 firmware_world);
+    *(blue_robot_control->mutable_robot_commands()->Add()) = *(simulator_robot->getRobotCommand());
         }
 
         for (auto& iter : yellow_simulator_robots)
@@ -230,7 +234,12 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
             SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
             ErForceSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
                 firmware_world);
+
+    *(yellow_robot_control->mutable_robot_commands()->Add()) = *(simulator_robot->getRobotCommand());
         }
+
+            er_force_sim.handleRadioCommands( yellow_robot_control ,false, er_force_sim_timer.currentTime());
+            er_force_sim.handleRadioCommands( blue_robot_control ,true, er_force_sim_timer.currentTime());
 
         // We take as many steps of `physics_time_step` as possible, and then
         // simulate the remainder of the time

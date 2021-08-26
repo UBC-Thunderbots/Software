@@ -20,7 +20,7 @@ void ErForceSimulatorRobot::setRobotState(const RobotState& robot_state)
     this->robot_state = robot_state;
 }
 
-std::unique_ptr<SSLSimulationProto::RobotCommand> ErForceSimulatorRobot::getRobotCommand()
+std::unique_ptr<sslsim::RobotCommand> ErForceSimulatorRobot::getRobotCommand()
 {
     auto move_command =
         createRobotMoveCommand(wheel_speed_front_right, wheel_speed_front_left,

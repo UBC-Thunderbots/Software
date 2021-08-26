@@ -145,6 +145,7 @@ cc_library(
     deps = [
         "//firmware/shared:physics",
         "//software/proto:ssl_simulation_cc_proto",
+        "@er_force_sim//src/amun/simulator",
     ],
 )
 
