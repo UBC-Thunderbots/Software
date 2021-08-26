@@ -128,3 +128,10 @@ py_proto_library(
         "//shared/proto:tbots_py_proto",
     ],
 )
+
+py_proto_library(
+    name = "announcement_proto",
+    srcs = [
+        "announcement.proto",
+    ],
+)

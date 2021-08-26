@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+message Announcement
+{
+    required uint32 robot_id = 1;
+    required string ip_addr  = 2;
+    required string mac_addr = 3;
+}
