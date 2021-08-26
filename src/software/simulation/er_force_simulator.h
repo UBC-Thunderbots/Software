@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
+#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/proto/defending_side_msg.pb.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/er_force_simulator_ball.h"
@@ -84,9 +85,9 @@ class ErForceSimulator
      * @param vision_msg The vision message
      */
     void setYellowRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg,
-                                    const TbotsProto_Vision& vision_msg);
+                                    const TbotsProto::Vision& vision_msg);
     void setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg,
-                                  const TbotsProto_Vision& vision_msg);
+                                  const TbotsProto::Vision& vision_msg);
 
     /**
      * Advances the simulation by the given time step. This will simulate
@@ -142,11 +143,10 @@ class ErForceSimulator
      *
      * @param id The id of the robot to set the primitive for
      * @param primitive_msg The primitive to run on the robot
+     * @param vision_msg The vision message
      */
-    void setYellowRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg,
-                                 const TbotsProto_Vision& vision_msg);
-    void setBlueRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg,
-                               const TbotsProto_Vision& vision_msg);
+    void setYellowRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
+    void setBlueRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
 
     /**
      * Sets the primitive being simulated by the robot in simulation
@@ -155,14 +155,14 @@ class ErForceSimulator
      * @param primitive_msg The primitive to run on the robot
      * @param simulator_robots The robots to set the primitives on
      * @param simulator_ball The simulator ball to use in the primitives
-     * @param defending_side The side of the field the robot is defending
+     * @param vision_msg The vision message
      */
     static void setRobotPrimitive(
         RobotId id, const TbotsProto_Primitive& primitive_msg,
         std::map<std::shared_ptr<ErForceSimulatorRobot>,
                  std::shared_ptr<FirmwareWorld_t>>& simulator_robots,
-        const std::shared_ptr<ErForceSimulatorBall>& simulator_ball,
-        FieldSide defending_side);
+        std::shared_ptr<ErForceSimulatorBall> simulator_ball,
+        const TbotsProto::Vision& vision_msg);
 
     PhysicsWorld physics_world;
     std::shared_ptr<ErForceSimulatorBall> simulator_ball;
@@ -170,8 +170,8 @@ class ErForceSimulator
         yellow_simulator_robots;
     std::map<std::shared_ptr<ErForceSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
         blue_simulator_robots;
-    FieldSide yellow_team_defending_side;
-    FieldSide blue_team_defending_side;
+    TbotsProto::Vision yellow_team_vision_msg;
+    TbotsProto::Vision blue_team_vision_msg;
 
     unsigned int frame_number;
 
