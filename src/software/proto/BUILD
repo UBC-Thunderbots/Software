@@ -130,6 +130,6 @@ py_proto_library(
 )
 
 py_proto_library(
-    name = "announcement_proto",
+    name = "announcement_py_proto",
     srcs = ["announcement.proto"],
 )
