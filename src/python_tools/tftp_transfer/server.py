@@ -21,7 +21,9 @@ def main():
         server.listen(listenport=port)
     except PermissionError:
         print(
-            "Elevated privilege is required to open port " + str(port) + ". Retry with a port >= 1024."
+            "Elevated privilege is required to open port "
+            + str(port)
+            + ". Retry with a port >= 1024."
         )
 
 
