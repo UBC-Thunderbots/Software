@@ -17,7 +17,9 @@ def verify_checksum(file_path: str, checksum: str) -> bool:
     try:
         file_hash = encode_sha256_checksum(file_path)
     except Exception:
-        logging.exception("Unexpected error when handling checksum verification.")
+        logging.getLogger("Tftp transfer").exception(
+            "Unexpected error when handling checksum verification."
+        )
         return False
 
     return file_hash == checksum
