@@ -3,8 +3,8 @@ package(default_visibility = ["//visibility:public"])
 load("@python_tools_deps//:requirements.bzl", "requirement")
 
 py_binary(
-    name = "host",
-    srcs = ["host.py"],
+    name = "server",
+    srcs = ["server.py"],
     deps = [
         requirement("tftpy"),
     ],
