@@ -70,11 +70,11 @@ py_test(
 py_binary(
     name = "robot_broadcast_receiver",
     srcs = ["robot_broadcast_receiver.py"],
-    deps = ["//software/proto:announcement_proto"],
+    deps = ["//software/proto:announcement_py_proto"],
 )
 
 py_binary(
     name = "robot_broadcast_sender",
     srcs = ["robot_broadcast_sender.py"],
-    deps = ["//software/proto:announcement_proto"],
+    deps = ["//software/proto:announcement_py_proto"],
 )
