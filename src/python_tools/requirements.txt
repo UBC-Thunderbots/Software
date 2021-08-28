@@ -6,3 +6,4 @@ protobuf==3.6.1
 bokeh==2.2.3
 ipywidgets==7.6.2
 jupytext==1.11.2
+tftpy==0.8.1
