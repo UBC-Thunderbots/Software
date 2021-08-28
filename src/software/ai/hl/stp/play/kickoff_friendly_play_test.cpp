@@ -44,7 +44,7 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
 
 
             // Two Friendly robots defending the exterior of defense box and one goalie
-            Rectangle robotsDefensiveRect(Point(-3.2, 1.1), Point(-3.5, -1.1));
+            Rectangle robotsDefensiveRect(Point(-3.2, 1.1), Point(-3.51, -1.1));
             robotInPolygon(0, robotsDefensiveRect, world_ptr, yield);
             robotInPolygon(2, robotsDefensiveRect, world_ptr, yield);
             robotInPolygon(3, robotsDefensiveRect, world_ptr, yield);
