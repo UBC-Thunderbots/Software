@@ -3,6 +3,8 @@
 #include <cassert>
 #include <map>
 #include <set>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "software/ai/navigator/path_planner/path_planner.h"
 
@@ -40,7 +42,6 @@ class ThetaStarPathPlanner : public PathPlanner
                                  const Rectangle &navigable_area,
                                  const std::vector<ObstaclePtr> &obstacles) override;
 
-   private:
     class Coordinate
     {
        public:
@@ -100,6 +101,7 @@ class ThetaStarPathPlanner : public PathPlanner
         unsigned int internal_comparison_key_;
     };
 
+   private:
     class CoordinatePair
     {
        public:
@@ -247,13 +249,20 @@ class ThetaStarPathPlanner : public PathPlanner
     bool isCoordNavigable(const Coordinate &coord) const;
 
     /**
-     * Returns whether or not a cell is unblocked
+     * Calculates all of the coordinates that are blocked by an obstacle and stores it in
+     * blocked_grid
+     */
+    void findAllBlockedCoords();
+
+    /**
+     * Returns whether or not a cell is blocked
+     * Checks blocked_grid to see if coord was set to blocked
      *
      * @param coord Coordinate to consider
      *
-     * @return true if cell is unblocked
+     * @return true if cell is blocked
      */
-    bool isUnblocked(const Coordinate &coord);
+    bool isBlocked(const Coordinate &coord);
 
     /**
      * Computes Euclidean distance from coord1 to coord2
@@ -289,14 +298,30 @@ class ThetaStarPathPlanner : public PathPlanner
                       const Coordinate &end);
 
     /**
-     * Checks for line of sight between Coordinates
+     * Checks for line of sight between Coordinates using Bresenham's Line Algorithm
+     * https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
      *
-     * @param coord1 The first Coordinate
-     * @param coord2 The second Coordinate
+     * @param coord0 The first Coordinate
+     * @param coord1 The second Coordinate
      *
-     * @return true if line of sight from coord1 to coord2
+     * @return true if line of sight from coord0 to coord1
      */
-    bool lineOfSight(const Coordinate &coord1, const Coordinate &coord2);
+    bool lineOfSight(const Coordinate &coord0, const Coordinate &coord1);
+
+    /**
+     * Supplementary method for lineOfSight to check for line of sight depending on
+     * if the line is low or high.
+     * https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm#All_cases
+     *
+     * @param coord0 The first Coordinate
+     * @param coord1 The second Coordinate
+     * @param isLineLow Is the slope of the line between 0 and 1. Should be false if
+     * the slope of the line is greater or equal to 1
+     *
+     * @return true if line of sight from coord0 to coord1
+     */
+    bool checkLine(const Coordinate &coord0, const Coordinate &coord1,
+                   const bool isLineLow);
 
     /**
      * Finds closest unblocked cell to current_cell
@@ -306,7 +331,8 @@ class ThetaStarPathPlanner : public PathPlanner
      * @return          closest unblocked cell to current_cell
      *                  if none found, return nullopt
      */
-    std::optional<Coordinate> findClosestUnblockedCell(const Coordinate &current_cell);
+    std::optional<ThetaStarPathPlanner::Coordinate> findClosestUnblockedCell(
+        const Coordinate &current_cell);
 
     /**
      * Finds closest navigable point that's not in an obstacle to p
@@ -417,6 +443,7 @@ class ThetaStarPathPlanner : public PathPlanner
     unsigned int num_grid_cols;
     double max_navigable_x_coord;
     double max_navigable_y_coord;
+    Coordinate start_motion_coord;
 
     // open_list represents Coordinates that we'd like to visit. Elements are pairs of
     // start_to_end_cost_estimate and Coordinate, so the set is implicitly ordered by
@@ -431,14 +458,11 @@ class ThetaStarPathPlanner : public PathPlanner
     // Declare a 2D array of structure to hold the details of that CellHeuristic
     std::vector<std::vector<CellHeuristic>> cell_heuristics;
 
-    // The following data structures improve performance by caching the results of
-    // isUnblocked and lineOfSight.
-    // Description of the Grid-
-    // unblocked_grid is indexed with coordinate
-    // true --> The cell is not blocked
-    // false --> The cell is blocked
-    // We update this as we go to avoid updating cells we don't use
-    std::map<Coordinate, bool> unblocked_grid;
+    // Declare a 2D array of structure to hold if a coordinate is blocked
+    // true  --> Coordinate is blocked
+    // false --> Coordinate is not blocked
+    std::vector<std::vector<bool>> blocked_grid;
+
     // Cache of line of sight that maps a pair of
     // coordinates to whether those two Coordinates have line of sight between them
     std::map<CoordinatePair, bool> line_of_sight_cache;
