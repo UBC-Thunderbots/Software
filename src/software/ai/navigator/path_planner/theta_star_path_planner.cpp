@@ -20,31 +20,26 @@ bool ThetaStarPathPlanner::isCoordNavigable(const Coordinate &coord) const
     return (coord.row() < num_grid_rows) && (coord.col() < num_grid_cols);
 }
 
-bool ThetaStarPathPlanner::isUnblocked(const Coordinate &coord)
+void ThetaStarPathPlanner::findAllBlockedCoords()
 {
-    // If we haven't checked this Coordinate for obstacles before, check it now
-
-    auto unblocked_grid_it = unblocked_grid.find(coord);
-    if (unblocked_grid_it == unblocked_grid.end())
+    for (auto &obstacle : obstacles)
     {
-        bool blocked = false;
+        auto blocked_points = obstacle->rasterize(SIZE_OF_GRID_CELL_IN_METERS);
 
-        Point p = convertCoordToPoint(coord);
-        for (auto &obstacle : obstacles)
+        for (Point &blocked_point : blocked_points)
         {
-            if (obstacle->contains(p))
+            Coordinate blocked_coord = convertPointToCoord(blocked_point);
+            if (isCoordNavigable(blocked_coord))
             {
-                blocked = true;
-                break;
+                blocked_grid[blocked_coord.row()][blocked_coord.col()] = true;
             }
         }
-
-        // We use the opposite convention to indicate blocked or not
-        unblocked_grid[coord] = !blocked;
-        return !blocked;
     }
+}
 
-    return unblocked_grid_it->second;
+bool ThetaStarPathPlanner::isBlocked(const Coordinate &coord)
+{
+    return blocked_grid[coord.row()][coord.col()];
 }
 
 double ThetaStarPathPlanner::coordDistance(const Coordinate &coord1,
@@ -55,31 +50,91 @@ double ThetaStarPathPlanner::coordDistance(const Coordinate &coord1,
     return distance(p1, p2);
 }
 
-bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord1, const Coordinate &coord2)
+bool ThetaStarPathPlanner::lineOfSight(const Coordinate &coord0, const Coordinate &coord1)
 {
-    CoordinatePair coord_pair(coord1, coord2);
-    // If we haven't checked this Coordinate pair for intersects before, check it now
-    auto line_of_sight_cache_it = line_of_sight_cache.find(coord_pair);
-    if (line_of_sight_cache_it == line_of_sight_cache.end())
+    int dy = coord1.col() - coord0.col();
+    int dx = coord1.row() - coord0.row();
+
+    if (std::abs(dy) < std::abs(dx))
     {
-        Segment seg(convertCoordToPoint(coord1), convertCoordToPoint(coord2));
-        bool has_line_of_sight = true;
-
-        for (const auto &obstacle : obstacles)
+        if (coord0.row() > coord1.row())
         {
-            if (obstacle->intersects(seg))
-            {
-                has_line_of_sight = false;
-                break;
-            }
+            return checkLine(coord1, coord0, true);
         }
+        else
+        {
+            return checkLine(coord0, coord1, true);
+        }
+    }
+    else
+    {
+        if (coord0.col() > coord1.col())
+        {
+            return checkLine(coord1, coord0, false);
+        }
+        else
+        {
+            return checkLine(coord0, coord1, false);
+        }
+    }
+}
 
-        // We use the opposite convention to indicate blocked or not
-        line_of_sight_cache[coord_pair] = has_line_of_sight;
-        return has_line_of_sight;
+bool ThetaStarPathPlanner::checkLine(const Coordinate &coord0, const Coordinate &coord1,
+                                     const bool isLineLow)
+{
+    // Main represents the axis that is being incremented (x if line is low)
+    // Sec represents the secondary axis that is dependent on Main axis (y if line is low)
+    int main0;
+    int sec0;
+    int main1;
+    int sec1;
+    if (isLineLow)
+    {
+        main0 = static_cast<int>(coord0.row());
+        sec0  = static_cast<int>(coord0.col());
+        main1 = static_cast<int>(coord1.row());
+        sec1  = static_cast<int>(coord1.col());
+    }
+    else
+    {
+        sec0  = static_cast<int>(coord0.row());
+        main0 = static_cast<int>(coord0.col());
+        sec1  = static_cast<int>(coord1.row());
+        main1 = static_cast<int>(coord1.col());
     }
 
-    return line_of_sight_cache_it->second;
+    int d_main = main1 - main0;
+    int d_sec  = sec1 - sec0;
+    int sec_i  = 1;
+
+    if (d_sec < 0)
+    {
+        sec_i = -1;
+        d_sec = -d_sec;
+    }
+    int D   = (2 * d_sec) - d_main;
+    int sec = sec0;
+
+    for (int main = main0; main <= main1; main++)
+    {
+        Coordinate curr_coord = isLineLow ? Coordinate(main, sec) : Coordinate(sec, main);
+        if (isBlocked(curr_coord))
+        {
+            // No line of sight since a coordinate in the path from coord0 to coord1 is
+            // blocked
+            return false;
+        }
+        if (D > 0)
+        {
+            sec += sec_i;
+            D += 2 * (d_sec - d_main);
+        }
+        else
+        {
+            D += 2 * d_sec;
+        }
+    }
+    return true;
 }
 
 std::vector<Point> ThetaStarPathPlanner::tracePath(const Coordinate &end) const
@@ -114,7 +169,7 @@ bool ThetaStarPathPlanner::updateVertex(const Coordinate &current, const Coordin
     {
         // If the successor is already on the closed list or if it is blocked, then ignore
         // it.  Else do the following
-        if (closed_list.find(next) == closed_list.end() && isUnblocked(next))
+        if (closed_list.find(next) == closed_list.end() && !isBlocked(next))
         {
             double updated_best_path_cost;
             Coordinate next_parent;
@@ -181,6 +236,8 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
 
     resetAndInitializeMemberVariables(navigable_area, obstacles);
 
+    findAllBlockedCoords();
+
     Point closest_end      = findClosestFreePoint(end);
     Coordinate start_coord = convertPointToCoord(start);
     Coordinate end_coord   = convertPointToCoord(closest_end);
@@ -207,6 +264,10 @@ std::optional<Path> ThetaStarPathPlanner::findPath(
     // Initialising the parameters of the starting cell
     cell_heuristics[start_coord.row()][start_coord.col()].update(start_coord, 0.0, 0.0);
     open_list.insert(std::make_pair(0.0, start_coord));
+
+    // Avoiding the situation where closest_end point is free but end_coord is blocked
+    blocked_grid[start_coord.row()][start_coord.col()] = false;
+    blocked_grid[end_coord.row()][end_coord.col()]     = false;
 
     bool found_end = findPathToEnd(end_coord);
 
@@ -245,21 +306,21 @@ bool ThetaStarPathPlanner::adjustEndPointsAndCheckForNoPath(Coordinate &start_co
     bool ret_no_path = false;
 
     // If the source is out of range
-    if (isCoordNavigable(start_coord) == false)
+    if (!isCoordNavigable(start_coord))
     {
         LOG(WARNING) << "Source is not within navigable area; no path found" << std::endl;
         ret_no_path = true;
     }
 
     // If the end is out of range
-    if (isCoordNavigable(end_coord) == false)
+    if (!isCoordNavigable(end_coord))
     {
         LOG(WARNING) << "End is not within navigable area; no path found" << std::endl;
         ret_no_path = true;
     }
 
     // The source is blocked
-    if (isUnblocked(start_coord) == false)
+    if (isBlocked(start_coord))
     {
         auto closest_start_coord = findClosestUnblockedCell(start_coord);
         if (closest_start_coord)
@@ -273,7 +334,7 @@ bool ThetaStarPathPlanner::adjustEndPointsAndCheckForNoPath(Coordinate &start_co
     }
 
     // The end is blocked
-    if (isUnblocked(end_coord) == false)
+    if (isBlocked(end_coord))
     {
         auto closest_end_coord = findClosestUnblockedCell(end_coord);
         if (closest_end_coord)
@@ -319,7 +380,6 @@ bool ThetaStarPathPlanner::visitNeighbours(const Coordinate &current_coord,
 {
     /*
         Generating all the 8 successor of this CellHeuristic
-
         Popped Cell --> (i, j)
         <0,+y>      --> (i-1, j)
         <0,-y>      --> (i+1, j)
@@ -340,6 +400,13 @@ bool ThetaStarPathPlanner::visitNeighbours(const Coordinate &current_coord,
         for (int y_offset : {-1, 0, 1})
         {
             next_coord = Coordinate(i + x_offset, j + y_offset);
+
+            // Only check points in the navigable area
+            if (!isCoordNavigable(next_coord))
+            {
+                continue;
+            }
+
             // check for clipping obstacles
             if (lineOfSight(current_coord, next_coord))
             {
@@ -356,33 +423,27 @@ bool ThetaStarPathPlanner::visitNeighbours(const Coordinate &current_coord,
 std::optional<ThetaStarPathPlanner::Coordinate>
 ThetaStarPathPlanner::findClosestUnblockedCell(const Coordinate &current_cell)
 {
-    // spiral out from current_cell looking for unblocked cells
+    // Check the horizontal and vertical cells relative to current_cell for the nearest
+    // unblocked cell
     unsigned int i = current_cell.row();
     unsigned int j = current_cell.col();
     Coordinate test_coord;
-    unsigned next_index, curr_index = 3;
-    int next_increment[4] = {1, 0, -1, 0};
+    int depth_sign = 1;
     for (unsigned int depth = 1; depth < num_grid_rows; depth++)
     {
-        next_index = (curr_index + 1) % 4;
-        i += next_increment[next_index] * depth;
-        j += next_increment[curr_index] * depth;
-        test_coord = Coordinate(i, j);
-        if (isCoordNavigable(test_coord) && isUnblocked(test_coord))
+        test_coord = Coordinate(i + depth * depth_sign, j);
+        if (isCoordNavigable(test_coord) && !isBlocked(test_coord))
         {
             return test_coord;
         }
-        curr_index = next_index;
 
-        next_index = (curr_index + 1) % 4;
-        i += next_increment[next_index] * depth;
-        j += next_increment[curr_index] * depth;
-        test_coord = Coordinate(i, j);
-        if (isCoordNavigable(test_coord) && isUnblocked(test_coord))
+        test_coord = Coordinate(i, j + depth * depth_sign);
+        if (isCoordNavigable(test_coord) && !isBlocked(test_coord))
         {
             return test_coord;
         }
-        curr_index = next_index;
+
+        depth_sign *= -1;
     }
 
     return std::nullopt;
@@ -475,12 +536,10 @@ bool ThetaStarPathPlanner::isPointNavigableAndFreeOfObstacles(const Point &p)
         return false;
     }
 
-    for (auto &obstacle : obstacles)
+    Coordinate test_coord = convertPointToCoord(p);
+    if (isBlocked(test_coord))
     {
-        if (obstacle->contains(p))
-        {
-            return false;
-        }
+        return false;
     }
 
     return true;
@@ -538,9 +597,10 @@ void ThetaStarPathPlanner::resetAndInitializeMemberVariables(
     // Reset data structures to path plan again
     open_list.clear();
     closed_list.clear();
-    unblocked_grid.clear();
     line_of_sight_cache.clear();
     cell_heuristics = std::vector<std::vector<CellHeuristic>>(
         num_grid_rows,
         std::vector<CellHeuristic>(num_grid_cols, ThetaStarPathPlanner::CellHeuristic()));
+    blocked_grid = std::vector<std::vector<bool>>(
+        num_grid_rows, std::vector<bool>(num_grid_cols, false));
 }
