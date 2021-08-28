@@ -131,9 +131,6 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     // We only need to do this a single time since all robots
     // can see and interact with the same ball
 
-    Duration remaining_time = time_step;
-    while (remaining_time > Duration::fromSeconds(0))
-    {
         current_firmware_time = physics_world.getTimestamp();
 
     SSLSimRobotControl yellow_robot_control{new sslsim::RobotControl};
@@ -240,14 +237,8 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 
             er_force_sim.handleRadioCommands( yellow_robot_control ,false, er_force_sim_timer.currentTime());
             er_force_sim.handleRadioCommands( blue_robot_control ,true, er_force_sim_timer.currentTime());
-
-        // We take as many steps of `physics_time_step` as possible, and then
-        // simulate the remainder of the time
-        // TODO: replace this
-        // Duration dt = std::min(remaining_time, physics_time_step);
-        // physics_world.stepSimulation(dt);
-        // remaining_time = remaining_time - physics_time_step;
-    }
+            std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(time_step.toMilliseconds())));
+            er_force_sim.process();
 
     frame_number++;
 }
@@ -276,16 +267,6 @@ Field ErForceSimulator::getField() const
 Timestamp ErForceSimulator::getTimestamp() const
 {
     return physics_world.getTimestamp();
-}
-
-void ErForceSimulator::addYellowRobot(const Point& position)
-{
-    // TODO: implement
-}
-
-void ErForceSimulator::addBlueRobot(const Point& position)
-{
-    // TODO: implement
 }
 
 void ErForceSimulator::resetCurrentFirmwareTime()
