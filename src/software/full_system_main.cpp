@@ -5,7 +5,6 @@
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play_info.h"
-#include "software/proto/play_info_msg.pb.h"
 #include "software/ai/threaded_ai.h"
 #include "software/backend/backend.h"
 #include "software/constants.h"
@@ -15,6 +14,7 @@
 #include "software/multithreading/observer_subject_adapter.h"
 #include "software/proto/logging/proto_logger.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
+#include "software/proto/play_info_msg.pb.h"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/design_patterns/generic_factory.h"
 

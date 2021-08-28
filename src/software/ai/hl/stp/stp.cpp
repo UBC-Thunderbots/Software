@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/stp.h"
 
+#include <google/protobuf/map.h>
 #include <munkres/munkres.h>
 
 #include <algorithm>
@@ -11,14 +12,12 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play_info.h"
-#include "software/proto/play_info_msg.pb.h"
-#include <google/protobuf/map.h>
-
 #include "software/ai/hl/stp/tactic/all_tactics.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/stop_intent.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
+#include "software/proto/play_info_msg.pb.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/util/typename/typename.h"
 
@@ -158,7 +157,7 @@ PlayInfoProto STP::getPlayInfoProto()
 {
     std::string info_referee_command = toString(current_game_state.getRefereeCommand());
     std::string info_play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
-    PlayInfoProto info = PlayInfoProto();
+    PlayInfoProto info         = PlayInfoProto();
     info.mutable_game_state()->set_referee_command_name(info_referee_command);
     info.mutable_play()->set_play_name(info_play_name);
 
@@ -167,7 +166,8 @@ PlayInfoProto STP::getPlayInfoProto()
         PlayInfoProto_Tactic tactic_msg = PlayInfoProto_Tactic();
         tactic_msg.set_tactic_name(toString(tactic));
         info.mutable_robot_tactic_assignment();
-        (*info.mutable_robot_tactic_assignment())[robot.id()].set_tactic_name(toString(tactic));
+        (*info.mutable_robot_tactic_assignment())[robot.id()].set_tactic_name(
+            toString(tactic));
     }
 
     return info;

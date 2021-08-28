@@ -173,21 +173,25 @@ TEST_F(STPTest, DISABLED_test_get_play_info)
     auto play_info_msg = stp.getPlayInfoProto();
 
     std::string expected_referee_command, expected_play_name, expected_tactic_name;
-    expected_referee_command                                  = "HALT";
-    expected_play_name                                        = "HaltTestPlay";
-    expected_tactic_name                                      = "StopTestTactic";
+    expected_referee_command = "HALT";
+    expected_play_name       = "HaltTestPlay";
+    expected_tactic_name     = "StopTestTactic";
 
     PlayInfoProto expected_play_info_msg = PlayInfoProto();
-    expected_play_info_msg.mutable_game_state()->set_referee_command_name(expected_referee_command);
+    expected_play_info_msg.mutable_game_state()->set_referee_command_name(
+        expected_referee_command);
     expected_play_info_msg.mutable_play()->set_play_name(expected_play_name);
     PlayInfoProto_Tactic expected_tactic = PlayInfoProto_Tactic();
     expected_tactic.set_tactic_name(expected_tactic_name);
     (*expected_play_info_msg.mutable_robot_tactic_assignment())[0] = expected_tactic;
     (*expected_play_info_msg.mutable_robot_tactic_assignment())[1] = expected_tactic;
 
-    EXPECT_EQ(play_info_msg.game_state().referee_command_name(), expected_referee_command);
+    EXPECT_EQ(play_info_msg.game_state().referee_command_name(),
+              expected_referee_command);
     EXPECT_EQ(play_info_msg.play().play_name(), expected_play_name);
     EXPECT_EQ(play_info_msg.robot_tactic_assignment_size(), 2);
-    EXPECT_EQ((*play_info_msg.mutable_robot_tactic_assignment())[0].tactic_name(), expected_tactic.tactic_name());
-    EXPECT_EQ((*play_info_msg.mutable_robot_tactic_assignment())[1].tactic_name(), expected_tactic.tactic_name());
+    EXPECT_EQ((*play_info_msg.mutable_robot_tactic_assignment())[0].tactic_name(),
+              expected_tactic.tactic_name());
+    EXPECT_EQ((*play_info_msg.mutable_robot_tactic_assignment())[1].tactic_name(),
+              expected_tactic.tactic_name());
 }
