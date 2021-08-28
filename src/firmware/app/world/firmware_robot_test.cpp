@@ -155,9 +155,19 @@ TEST_F(FirmwareRobotTest, getRobotConstants)
 {
     RobotConstants_t constants = app_firmware_robot_getRobotConstants(firmware_robot);
 
-    EXPECT_NEAR(1.1, constants.mass_kg, 1e-5);
-    EXPECT_NEAR(1.2, constants.moment_of_inertia_kg_m_2, 1e-5);
-    EXPECT_NEAR(1.4, constants.jerk_limit_kg_m_per_s_3, 1e-5);
+    EXPECT_NEAR(1.1f, constants.mass_kg, 1e-5);
+    EXPECT_NEAR(1.2f, constants.moment_of_inertia_kg_m_2, 1e-5);
+    EXPECT_NEAR(1.4f, constants.jerk_limit_kg_m_per_s_3, 1e-5);
+    EXPECT_NEAR(1.5f, constants.front_wheel_angle_deg, 1e-5);
+    EXPECT_NEAR(1.6f, constants.back_wheel_angle_deg, 1e-5);
+    EXPECT_NEAR(1.7f, constants.front_of_robot_width_meters, 1e-5);
+    EXPECT_NEAR(1.8f, constants.dribbler_width_meters, 1e-5);
+    EXPECT_NEAR(1.9f, constants.robot_max_speed_m_per_s, 1e-5);
+    EXPECT_NEAR(2.0f, constants.robot_max_ang_speed_rad_per_s, 1e-5);
+    EXPECT_NEAR(2.1f, constants.robot_max_acceleration_m_per_s_2, 1e-5);
+    EXPECT_NEAR(2.2f, constants.robot_max_ang_acceleration_rad_per_s_2, 1e-5);
+    EXPECT_NEAR(2.3f, constants.indefinite_dribbler_speed_rpm, 1e-5);
+    EXPECT_NEAR(2.4f, constants.max_force_dribbler_speed_rpm, 1e-5);
 }
 
 TEST_F(FirmwareRobotTest, getAndModifyControllerState)
