@@ -1,4 +1,4 @@
-from software.proto.announcement_pb3 import Announcement
+from software.proto.announcement_pb2 import Announcement
 import socket
 import errno
 from time import time, sleep
