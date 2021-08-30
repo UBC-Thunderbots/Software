@@ -14,6 +14,18 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "network_logger",
+    hdrs = [
+        "network_logger.h",
+    ],
+    deps = [
+        ":network_sinc",
+        "@g3log",
+        "@g3sinks",
+    ],
+)
+
 cc_test(
     name = "coloured_cout_sink_test",
     srcs = ["coloured_cout_sink_test.cpp"],
@@ -59,5 +71,31 @@ cc_library(
     ],
     deps = [
         "@g3log",
+    ],
+)
+
+cc_library(
+    name = "network_sinc",
+    srcs = [
+        "network_sink.cpp",
+    ],
+    hdrs = [
+        "network_sink.h",
+    ],
+    deps = [
+        "//shared/proto:tbots_cc_proto",
+        "//software:constants",
+        "//software/networking:threaded_proto_udp_sender",
+        "@g3log",
+    ],
+)
+
+cc_test(
+    name = "network_sinc_test",
+    srcs = ["network_sink_test.cpp"],
+    deps = [
+        ":network_logger",
+        ":network_sinc",
+        "//shared/test_util:tbots_gtest_main",
     ],
 )
