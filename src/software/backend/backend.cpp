@@ -12,6 +12,7 @@ void Backend::receiveRobotStatus(TbotsProto::RobotStatus msg)
 
 void Backend::receiveSSLWrapperPacket(SSLProto::SSL_WrapperPacket msg)
 {
+    std::cout<<"received ssl"<<std::endl;
     SensorProto sensor_msg;
     *(sensor_msg.mutable_ssl_vision_msg())        = msg;
     *(sensor_msg.mutable_backend_received_time()) = *createCurrentTimestamp();
