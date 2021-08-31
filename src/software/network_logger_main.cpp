@@ -18,7 +18,6 @@ void helper(TbotsProto::Primitive log){
 //    LOG(INFO) << "[ROBOT " << log.robot_id() << " " << LogLevel_Name(log.log_level())
 //              << "]"
 //              << "]: " << log.log_msg() << std::endl;
-    std::cout<<"received"<<std::endl;
 }
 //std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::RobotLog>> log_input;
 
@@ -29,7 +28,7 @@ int main(int argc, char **argv)
     auto args           = std::make_shared<NetworkLoggerMainCommandLineArgs>();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
-    NetworkLoggerSingleton::initializeLogger(0,"wlp2s0",0);
+// NetworkLoggerSingleton::initializeLogger(0,"wlp2s0",0);
 
 
     if (!help_requested)
@@ -59,11 +58,15 @@ int main(int argc, char **argv)
 
         std::cout<<std::string(NETWORK_LOGGING_MULTICAST_CHANNELS[channel]) + "%" + interface<<std::endl;
 
-        LOG(INFO) << "logger listenting on channel and interface "<<channel<<" , "<<interface;
+//        LOG(INFO) << "logger listenting on channel and interface "<<channel<<" , "<<interface;
 
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        for(int i = 0; i < 3; i++){
+            log_output->sendProto(test_primitive_msg);
+        }
         while(true){
             //do nothing
-            log_output->sendProto(test_primitive_msg);
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
         // This blocks forever without using the CPU
