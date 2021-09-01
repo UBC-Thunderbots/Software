@@ -32,9 +32,9 @@ def get_mac_address(ifname: str) -> str:
     """
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     info = fcntl.ioctl(
-        s.fileno(), 
+        s.fileno(),
         0x8927,  # SIOCGIFHWADDR
-        struct.pack("256s", bytes(ifname, "utf-8")[:15])
+        struct.pack("256s", bytes(ifname, "utf-8")[:15]),
     )
     return ":".join("%02x" % b for b in info[18:24])
 
@@ -43,7 +43,13 @@ def main():
     # get command line args
     ap = argparse.ArgumentParser()
     ap.add_argument("-p", "--port", required=True, type=int, help="port to send on")
-    ap.add_argument("-if", "--ifname", required=True, type=str, help="interface to use to get ip and mac addr")
+    ap.add_argument(
+        "-if",
+        "--ifname",
+        required=True,
+        type=str,
+        help="interface to use to get ip and mac addr",
+    )
     args = vars(ap.parse_args())
 
     interface = args["ifname"]
