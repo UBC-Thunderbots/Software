@@ -131,114 +131,118 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     // We only need to do this a single time since all robots
     // can see and interact with the same ball
 
-        current_firmware_time = physics_world.getTimestamp();
+    current_firmware_time = physics_world.getTimestamp();
 
     SSLSimRobotControl yellow_robot_control{new sslsim::RobotControl};
     SSLSimRobotControl blue_robot_control{new sslsim::RobotControl};
 
-        for (auto& iter : blue_simulator_robots)
-        {
-            auto simulator_robot = iter.first;
-            auto firmware_world  = iter.second;
+    for (auto& iter : blue_simulator_robots)
+    {
+        auto simulator_robot = iter.first;
+        auto firmware_world  = iter.second;
 
-            app_logger_init(simulator_robot->getRobotId(),
-                            &ErForceSimulatorRobotSingleton::handleBlueRobotLogProto);
+        app_logger_init(simulator_robot->getRobotId(),
+                        &ErForceSimulatorRobotSingleton::handleBlueRobotLogProto);
 
-            simulator_robot->setRobotState(RobotState(
-                Point(blue_team_vision_msg.robot_states()
-                          .at(simulator_robot->getRobotId())
-                          .global_position()
-                          .x_meters(),
-                      blue_team_vision_msg.robot_states()
-                          .at(simulator_robot->getRobotId())
-                          .global_position()
-                          .y_meters()),
-                Vector(blue_team_vision_msg.robot_states()
-                           .at(simulator_robot->getRobotId())
-                           .global_velocity()
-                           .x_component_meters(),
-                       blue_team_vision_msg.robot_states()
-                           .at(simulator_robot->getRobotId())
-                           .global_velocity()
-                           .x_component_meters()),
-                Angle::fromRadians(blue_team_vision_msg.robot_states()
-                                       .at(simulator_robot->getRobotId())
-                                       .global_orientation()
-                                       .radians()),
-                AngularVelocity::fromRadians(blue_team_vision_msg.robot_states()
-                                                 .at(simulator_robot->getRobotId())
-                                                 .global_angular_velocity()
-                                                 .radians_per_second())));
-            ErForceSimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-            simulator_ball->setState(BallState(
-                Point(blue_team_vision_msg.ball_state().global_position().x_meters(),
-                      blue_team_vision_msg.ball_state().global_position().y_meters()),
-                Vector(blue_team_vision_msg.ball_state()
-                           .global_velocity()
-                           .x_component_meters(),
-                       blue_team_vision_msg.ball_state()
-                           .global_velocity()
-                           .x_component_meters())));
-            SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
-            ErForceSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
-                firmware_world);
-    *(blue_robot_control->mutable_robot_commands()->Add()) = *(simulator_robot->getRobotCommand());
-        }
+        simulator_robot->setRobotState(
+            RobotState(Point(blue_team_vision_msg.robot_states()
+                                 .at(simulator_robot->getRobotId())
+                                 .global_position()
+                                 .x_meters(),
+                             blue_team_vision_msg.robot_states()
+                                 .at(simulator_robot->getRobotId())
+                                 .global_position()
+                                 .y_meters()),
+                       Vector(blue_team_vision_msg.robot_states()
+                                  .at(simulator_robot->getRobotId())
+                                  .global_velocity()
+                                  .x_component_meters(),
+                              blue_team_vision_msg.robot_states()
+                                  .at(simulator_robot->getRobotId())
+                                  .global_velocity()
+                                  .x_component_meters()),
+                       Angle::fromRadians(blue_team_vision_msg.robot_states()
+                                              .at(simulator_robot->getRobotId())
+                                              .global_orientation()
+                                              .radians()),
+                       AngularVelocity::fromRadians(blue_team_vision_msg.robot_states()
+                                                        .at(simulator_robot->getRobotId())
+                                                        .global_angular_velocity()
+                                                        .radians_per_second())));
+        ErForceSimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
+        simulator_ball->setState(BallState(
+            Point(blue_team_vision_msg.ball_state().global_position().x_meters(),
+                  blue_team_vision_msg.ball_state().global_position().y_meters()),
+            Vector(
+                blue_team_vision_msg.ball_state().global_velocity().x_component_meters(),
+                blue_team_vision_msg.ball_state()
+                    .global_velocity()
+                    .x_component_meters())));
+        SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
+        ErForceSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
+            firmware_world);
+        *(blue_robot_control->mutable_robot_commands()->Add()) =
+            *(simulator_robot->getRobotCommand());
+    }
 
-        for (auto& iter : yellow_simulator_robots)
-        {
-            auto simulator_robot = iter.first;
-            auto firmware_world  = iter.second;
+    for (auto& iter : yellow_simulator_robots)
+    {
+        auto simulator_robot = iter.first;
+        auto firmware_world  = iter.second;
 
-            app_logger_init(simulator_robot->getRobotId(),
-                            &ErForceSimulatorRobotSingleton::handleYellowRobotLogProto);
+        app_logger_init(simulator_robot->getRobotId(),
+                        &ErForceSimulatorRobotSingleton::handleYellowRobotLogProto);
 
-            simulator_robot->setRobotState(RobotState(
-                Point(yellow_team_vision_msg.robot_states()
-                          .at(simulator_robot->getRobotId())
-                          .global_position()
-                          .x_meters(),
-                      yellow_team_vision_msg.robot_states()
-                          .at(simulator_robot->getRobotId())
-                          .global_position()
-                          .y_meters()),
-                Vector(yellow_team_vision_msg.robot_states()
-                           .at(simulator_robot->getRobotId())
-                           .global_velocity()
-                           .x_component_meters(),
-                       yellow_team_vision_msg.robot_states()
-                           .at(simulator_robot->getRobotId())
-                           .global_velocity()
-                           .x_component_meters()),
-                Angle::fromRadians(yellow_team_vision_msg.robot_states()
-                                       .at(simulator_robot->getRobotId())
-                                       .global_orientation()
-                                       .radians()),
-                AngularVelocity::fromRadians(yellow_team_vision_msg.robot_states()
-                                                 .at(simulator_robot->getRobotId())
-                                                 .global_angular_velocity()
-                                                 .radians_per_second())));
-            ErForceSimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-            simulator_ball->setState(BallState(
-                Point(yellow_team_vision_msg.ball_state().global_position().x_meters(),
-                      yellow_team_vision_msg.ball_state().global_position().y_meters()),
-                Vector(yellow_team_vision_msg.ball_state()
-                           .global_velocity()
-                           .x_component_meters(),
-                       yellow_team_vision_msg.ball_state()
-                           .global_velocity()
-                           .x_component_meters())));
-            SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
-            ErForceSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
-                firmware_world);
+        simulator_robot->setRobotState(
+            RobotState(Point(yellow_team_vision_msg.robot_states()
+                                 .at(simulator_robot->getRobotId())
+                                 .global_position()
+                                 .x_meters(),
+                             yellow_team_vision_msg.robot_states()
+                                 .at(simulator_robot->getRobotId())
+                                 .global_position()
+                                 .y_meters()),
+                       Vector(yellow_team_vision_msg.robot_states()
+                                  .at(simulator_robot->getRobotId())
+                                  .global_velocity()
+                                  .x_component_meters(),
+                              yellow_team_vision_msg.robot_states()
+                                  .at(simulator_robot->getRobotId())
+                                  .global_velocity()
+                                  .x_component_meters()),
+                       Angle::fromRadians(yellow_team_vision_msg.robot_states()
+                                              .at(simulator_robot->getRobotId())
+                                              .global_orientation()
+                                              .radians()),
+                       AngularVelocity::fromRadians(yellow_team_vision_msg.robot_states()
+                                                        .at(simulator_robot->getRobotId())
+                                                        .global_angular_velocity()
+                                                        .radians_per_second())));
+        ErForceSimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
+        simulator_ball->setState(BallState(
+            Point(yellow_team_vision_msg.ball_state().global_position().x_meters(),
+                  yellow_team_vision_msg.ball_state().global_position().y_meters()),
+            Vector(yellow_team_vision_msg.ball_state()
+                       .global_velocity()
+                       .x_component_meters(),
+                   yellow_team_vision_msg.ball_state()
+                       .global_velocity()
+                       .x_component_meters())));
+        SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
+        ErForceSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
+            firmware_world);
 
-    *(yellow_robot_control->mutable_robot_commands()->Add()) = *(simulator_robot->getRobotCommand());
-        }
+        *(yellow_robot_control->mutable_robot_commands()->Add()) =
+            *(simulator_robot->getRobotCommand());
+    }
 
-            er_force_sim.handleRadioCommands( yellow_robot_control ,false, er_force_sim_timer.currentTime());
-            er_force_sim.handleRadioCommands( blue_robot_control ,true, er_force_sim_timer.currentTime());
-            std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(time_step.toMilliseconds())));
-            er_force_sim.process();
+    er_force_sim.handleRadioCommands(yellow_robot_control, false,
+                                     er_force_sim_timer.currentTime());
+    er_force_sim.handleRadioCommands(blue_robot_control, true,
+                                     er_force_sim_timer.currentTime());
+    std::this_thread::sleep_for(
+        std::chrono::milliseconds(static_cast<int>(time_step.toMilliseconds())));
+    er_force_sim.process();
 
     frame_number++;
 }

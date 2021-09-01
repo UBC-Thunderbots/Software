@@ -7,8 +7,8 @@
 #include "software/proto/ssl_simulation_robot_feedback.pb.h"
 #include "software/simulation/firmware_object_deleter.h"
 #include "software/simulation/simulator_robot.h"
-#include "src/amun/simulator/simulator.h"
 #include "software/world/robot_state.h"
+#include "src/amun/simulator/simulator.h"
 
 extern "C"
 {
