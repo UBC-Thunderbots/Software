@@ -44,3 +44,8 @@ py_proto_library(
         "@nanopb//:nanopb_options_py_proto",
     ],
 )
+
+py_proto_library(
+    name = "announcement_py_proto",
+    srcs = ["announcement.proto"],
+)
