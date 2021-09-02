@@ -8,7 +8,6 @@ qt_cc_library(
     hdr = "full_system_gui.h",
     deps = [
         ":ai_control",
-        "//software/ai/hl/stp:play_info",
         "//software/gui:geometry_conversion",
         "//software/gui/full_system/ui:main_widget",
         "//software/gui/generic_widgets/robot_status",
