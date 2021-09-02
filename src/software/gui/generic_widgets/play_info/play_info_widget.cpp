@@ -15,7 +15,7 @@ void PlayInfoWidget::updatePlayInfo(const PlayInfoProto& play_info)
     {
         tactics_string.append(
             QString::fromStdString(std::to_string(tactic_string.first))
-                .append(", ")
+                .append("- ")
                 .append(QString::fromStdString(tactic_string.second.tactic_name()))
                 .append("\n"));
     }

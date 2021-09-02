@@ -7,7 +7,6 @@
 #include <thread>
 
 #include "shared/proto/tbots_software_msgs.pb.h"
-//#include "software/ai/hl/stp/play_info.h"
 #include "software/geom/rectangle.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/gui/full_system/widgets/full_system_gui.h"

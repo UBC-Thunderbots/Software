@@ -6,7 +6,6 @@
 FullSystemGUI::FullSystemGUI(
     std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer,
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer,
-    //    std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer,
     std::shared_ptr<ThreadSafeBuffer<PlayInfoProto>> play_info_msg_buffer,
     std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer,
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer,
@@ -19,7 +18,6 @@ FullSystemGUI::FullSystemGUI(
       data_per_second_timer(new QTimer(this)),
       world_draw_functions_buffer(world_draw_functions_buffer),
       ai_draw_functions_buffer(ai_draw_functions_buffer),
-      //      play_info_buffer(play_info_buffer),
       play_info_msg_buffer(play_info_msg_buffer),
       sensor_msg_buffer(sensor_msg_buffer),
       view_area_buffer(view_area_buffer),
