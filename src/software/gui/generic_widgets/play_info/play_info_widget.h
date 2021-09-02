@@ -3,7 +3,6 @@
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QWidget>
 
-#include "software/ai/hl/stp/play_info.h"
 #include "software/proto/play_info_msg.pb.h"
 
 /**

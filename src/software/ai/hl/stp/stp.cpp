@@ -11,7 +11,6 @@
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/play_info.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/stop_intent.h"
