@@ -164,9 +164,8 @@ PlayInfoProto STP::getPlayInfoProto()
     for (const auto& [tactic, robot] : robot_tactic_assignment)
     {
         PlayInfoProto_Tactic tactic_msg = PlayInfoProto_Tactic();
-        tactic_msg.set_tactic_name(toString(tactic));
-        (*info.mutable_robot_tactic_assignment())[robot.id()].set_tactic_name(
-            toString(tactic));
+        tactic_msg.set_tactic_name(objectTypeName(*tactic));
+        (*info.mutable_robot_tactic_assignment())[robot.id()] = tactic_msg;
     }
 
     return info;
