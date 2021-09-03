@@ -5,6 +5,8 @@ import socket
 import struct
 from time import sleep
 
+BROADCAST_INTERVAL_SECONDS = 2
+
 
 def get_ip_address(ifname: str) -> str:
     """
@@ -69,7 +71,7 @@ def main():
     while True:
         sender.sendto(announcement.SerializeToString(), ("<broadcast>", port))
         print(announcement)
-        sleep(2)
+        sleep(BROADCAST_INTERVAL_SECONDS)
 
 
 if __name__ == "__main__":

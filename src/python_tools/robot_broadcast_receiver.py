@@ -3,7 +3,8 @@ import socket
 import argparse
 from time import time
 
-RECEIVE_TIMEOUT = 0.2
+RECEIVE_TIMEOUT_SECONDS = 0.2
+RECEIVE_DURATION_SECONDS = 4
 
 
 def receive_announcements(port: int) -> [Announcement]:
@@ -14,15 +15,15 @@ def receive_announcements(port: int) -> [Announcement]:
     """
     receiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     receiver.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    receiver.settimeout(RECEIVE_TIMEOUT)
+    receiver.settimeout(RECEIVE_TIMEOUT_SECONDS)
     receiver.bind(("", port))
 
     announcements = []
-    timeout = time() + 4  # 4s
+    timeout = time() + RECEIVE_DURATION_SECONDS
     while time() < timeout:
         try:
             data = receiver.recv(1024)
-        except socket.timeout:  # Ignore timeout errors
+        except socket.timeout:  # ignore timeout errors
             continue
         else:
             # parse announcement protobuf
