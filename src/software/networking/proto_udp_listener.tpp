@@ -3,7 +3,7 @@
 #include "software/logger/logger.h"
 #include "software/networking/proto_udp_listener.h"
 #include "software/util/typename/typename.h"
-
+#include <boost/exception/diagnostic_information.hpp>
 template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     boost::asio::io_service& io_service, const std::string& ip_address,
@@ -69,7 +69,6 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
 template <class ReceiveProtoT>
 void ProtoUdpListener<ReceiveProtoT>::startListen()
 {
-    std::cout<<"began listening"<<std::endl;
 
     // Start listening for data asynchronously
     // See here for a great explanation about asynchronous operations:
@@ -85,12 +84,9 @@ template <class ReceiveProtoT>
 void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
     const boost::system::error_code& error, size_t num_bytes_received)
 {
-    std::cout<<"received"<<std::endl;
 
     if (!error)
     {
-        std::cout<<"received"<<std::endl;
-
         auto packet_data = ReceiveProtoT();
         packet_data.ParseFromArray(raw_received_data_.data(),
                                    static_cast<int>(num_bytes_received));

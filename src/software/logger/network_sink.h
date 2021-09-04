@@ -10,20 +10,23 @@
 
 /**
  * This class acts as a custom sink for g3log. In particular, it allows us to log to multicast channels
+ * from robots
  */
 class NetworkSinc
 {
    public:
     /**
-     * Creates a CSVSink that logs to the directory specified
+     * Creates a NetworkSinc that sends udp packets to the channel provided
      *
-     * @param log_directory the directory to save files to
+     * @param channel The channel to join, index of NETWORK_LOGGING_MULTICAST_CHANNELS in
+     * software/constants.h
+     * @param interface The interface to join the multicast group on (lo, eth0, enp3s0f1,
+     * etc.)
+     * @param robot_id id of the robot sending the logs
      */
     NetworkSinc(int channel, const std::string& interface, int robot_id);
     /**
-     * This function is called on every call to LOG(CSV, filename). It appends to the
-     * specified file the message in log_entry. Note for .csv files: columns are separated
-     * with "," and rows are separated with new line characters.
+     * This function is called on every call to LOG(). It sends a RobotLog proto on the network
      *
      * @param log_entry the message received on a LOG() call
      */

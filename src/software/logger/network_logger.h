@@ -7,7 +7,9 @@
 
 #include "software/logger/network_sink.h"
 
-
+/**
+ * This class acts as a Singleton that's responsible for initializing the logger.
+ */
 class NetworkLoggerSingleton
 {
 public:

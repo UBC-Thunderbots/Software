@@ -32,4 +32,4 @@ static const std::string NETWORK_LOGGING_MULTICAST_CHANNELS[MAX_SIMULATOR_MULTIC
         "ff02::c3d0:42d3:cc16",
     };
 
-const short unsigned int NETWORK_LOGS_PORT   = 42069;
+const short unsigned int NETWORK_LOGS_PORT   = 42079;

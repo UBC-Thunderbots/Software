@@ -9,23 +9,26 @@ NetworkSinc(int channel, const std::string& interface, int robot_id) {
 
     robot_id_ = robot_id;
     log_output.reset(new ThreadedProtoUdpSender<TbotsProto::RobotLog>(
-            std::string(NETWORK_LOGGING_MULTICAST_CHANNELS[channel]) + "%" + interface, NETWORK_LOGS_PORT,
+            std::string(NETWORK_LOGGING_MULTICAST_CHANNELS[channel]) + "%" + "interface", NETWORK_LOGS_PORT,
             true));
-    std::cout<<std::string(NETWORK_LOGGING_MULTICAST_CHANNELS[channel]) + "%" + interface<<std::endl;
 }
 
 void NetworkSinc::sendToNetwork(g3::LogMessageMover log_entry)
 {
-    auto log = log_entry.get().toString();
-    auto log_msg_to_send = std::make_unique<TbotsProto::RobotLog>();
-//auto log_level = std::make_unique<TbotsProto::LogLevel>();
+    auto log_msg_proto = std::make_unique<TbotsProto::RobotLog>();
+    TbotsProto::LogLevel log_level_proto;
 
-    log_msg_to_send->set_log_msg(log);
-    log_msg_to_send->set_robot_id(robot_id_);
-//log_msg->set_log_level(log_entry.get()._level.value);
-//    log_msg->set_log_level("DEBUG");
+    if(TbotsProto::LogLevel_Parse(log_entry.get().level(), &log_level_proto)){
+
+        log_msg_proto->set_log_msg(log_entry.get().message());
+        log_msg_proto->set_robot_id(robot_id_);
+        log_msg_proto->set_log_level(log_level_proto);
+        log_msg_proto->set_file_name(log_entry.get().file());
+        log_msg_proto->set_line_number(static_cast<uint32_t>(std::stoul(log_entry.get().line())));
+
+        log_output->sendProto(*log_msg_proto);
+    }
 
 
-    log_output->sendProto(*log_msg_to_send);
-    std::cout<<log_msg_to_send->log_msg()<<std::endl;
+
 }
