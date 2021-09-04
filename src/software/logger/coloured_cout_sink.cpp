@@ -1,6 +1,8 @@
 #include "software/logger/coloured_cout_sink.h"
 
-ColouredCoutSink::ColouredCoutSink(bool print_detailed) : print_detailed(print_detailed) {}
+ColouredCoutSink::ColouredCoutSink(bool print_detailed) : print_detailed(print_detailed)
+{
+}
 
 std::string ColouredCoutSink::colourToString(const FG_Colour colour)
 {
@@ -52,9 +54,12 @@ void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
     auto colour = colourToString(getColour(level));
 
     std::ostringstream oss;
-    if(print_detailed){
+    if (print_detailed)
+    {
         oss << "\033[" << colour << "m" << log_entry.get().toString() << "\033[m";
-    } else{
+    }
+    else
+    {
         oss << "\033[" << colour << "m" << log_entry.get().message() << "\033[m";
     }
     std::cout << oss.str() << std::flush;

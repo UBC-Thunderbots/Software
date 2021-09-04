@@ -79,8 +79,9 @@ class LoggerSingleton
         auto csv_sink_handle = logWorker->addSink(
             std::make_unique<CSVSink>(log_directory), &CSVSink::appendToFile);
         // Sink for outputting logs to the terminal
-        auto colour_cout_sink_handle = logWorker->addSink(
-            std::make_unique<ColouredCoutSink>(true), &ColouredCoutSink::displayColouredLog);
+        auto colour_cout_sink_handle =
+            logWorker->addSink(std::make_unique<ColouredCoutSink>(true),
+                               &ColouredCoutSink::displayColouredLog);
         // Sink for storing a file of all logs
         auto log_rotate_sink_handle = logWorker->addSink(
             std::make_unique<LogRotate>(log_name, log_directory), &LogRotate::save);

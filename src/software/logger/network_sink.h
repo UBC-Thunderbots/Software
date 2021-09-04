@@ -3,14 +3,14 @@
 #include <g3log/logmessage.hpp>
 #include <iostream>
 
+#include "shared/proto/robot_log_msg.pb.h"
 #include "software/logger/custom_logging_levels.h"
 #include "software/networking/threaded_proto_udp_sender.h"
-#include "shared/proto/robot_log_msg.pb.h"
 
 
 /**
- * This class acts as a custom sink for g3log. In particular, it allows us to log to multicast channels
- * from robots
+ * This class acts as a custom sink for g3log. In particular, it allows us to log to
+ * multicast channels from robots
  */
 class NetworkSinc
 {
@@ -26,7 +26,8 @@ class NetworkSinc
      */
     NetworkSinc(int channel, const std::string& interface, int robot_id);
     /**
-     * This function is called on every call to LOG(). It sends a RobotLog proto on the network
+     * This function is called on every call to LOG(). It sends a RobotLog proto on the
+     * network
      *
      * @param log_entry the message received on a LOG() call
      */
@@ -35,5 +36,4 @@ class NetworkSinc
    private:
     std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotLog>> log_output;
     int robot_id_;
-
 };

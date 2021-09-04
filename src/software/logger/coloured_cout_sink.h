@@ -11,7 +11,6 @@ MAKE_ENUM(FG_Colour, YELLOW, RED, GREEN, WHITE);
 class ColouredCoutSink
 {
    public:
-
     ColouredCoutSink(bool print_detailed);
     /**
      * This is a helper function for mapping the FG_Colour enum to its relative

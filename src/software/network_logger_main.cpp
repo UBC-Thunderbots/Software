@@ -13,19 +13,24 @@
  * and prints them
  */
 
-void robotLogReceiver(TbotsProto::RobotLog log){
+void robotLogReceiver(TbotsProto::RobotLog log)
+{
     LEVELS level(INFO);
 
-    if(TbotsProto::LogLevel_Name(log.log_level())=="DEBUG"){
+    if (TbotsProto::LogLevel_Name(log.log_level()) == "DEBUG")
+    {
         level = DEBUG;
-    } else if(TbotsProto::LogLevel_Name(log.log_level())=="WARNING" || TbotsProto::LogLevel_Name(log.log_level())=="FATAL"){
-        level=WARNING;
+    }
+    else if (TbotsProto::LogLevel_Name(log.log_level()) == "WARNING" ||
+             TbotsProto::LogLevel_Name(log.log_level()) == "FATAL")
+    {
+        level = WARNING;
     }
 
     LOG(level) << "[ROBOT " << log.robot_id() << " " << LogLevel_Name(log.log_level())
-              << "]"
-              << "[" << log.file_name() << ":" << log.line_number()
-              << "]: " << log.log_msg() << std::endl;
+               << "]"
+               << "[" << log.file_name() << ":" << log.line_number()
+               << "]: " << log.log_msg() << std::endl;
 }
 
 int main(int argc, char **argv)
@@ -34,28 +39,28 @@ int main(int argc, char **argv)
     auto args           = std::make_shared<NetworkLoggerMainCommandLineArgs>();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
-    auto logWorker = g3::LogWorker::createLogWorker();
+    auto logWorker               = g3::LogWorker::createLogWorker();
     auto colour_cout_sink_handle = logWorker->addSink(
-            std::make_unique<ColouredCoutSink>(false), &ColouredCoutSink::displayColouredLog);
+        std::make_unique<ColouredCoutSink>(false), &ColouredCoutSink::displayColouredLog);
     g3::initializeLogging(logWorker.get());
 
     if (!help_requested)
     {
-        int channel = args->getChannel()->value();
+        int channel           = args->getChannel()->value();
         std::string interface = args->getInterface()->value();
 
 
-        auto log_input =
-                std::make_unique<ThreadedProtoUdpListener<TbotsProto::RobotLog>>(
-                        std::string(NETWORK_LOGGING_MULTICAST_CHANNELS[channel]) + "%" + interface, NETWORK_LOGS_PORT,
-                        std::function(robotLogReceiver), true);
+        auto log_input = std::make_unique<ThreadedProtoUdpListener<TbotsProto::RobotLog>>(
+            std::string(NETWORK_LOGGING_MULTICAST_CHANNELS[channel]) + "%" + interface,
+            NETWORK_LOGS_PORT, std::function(robotLogReceiver), true);
 
 
-        LOG(INFO) << "Network logger listenting on channel "<<NETWORK_LOGGING_MULTICAST_CHANNELS[channel]<<" and interface "<<interface<<std::endl;
+        LOG(INFO) << "Network logger listenting on channel "
+                  << NETWORK_LOGGING_MULTICAST_CHANNELS[channel] << " and interface "
+                  << interface << std::endl;
 
         // This blocks forever without using the CPU
         std::promise<void>().get_future().wait();
-
     }
 
     return 0;
