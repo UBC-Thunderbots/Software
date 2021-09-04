@@ -3,6 +3,8 @@ import argparse
 import fcntl
 import socket
 import struct
+import os
+import sys
 from time import sleep
 
 BROADCAST_INTERVAL_SECONDS = 2
@@ -52,16 +54,33 @@ def main():
         type=str,
         help="interface to use to get ip and mac addr",
     )
+    ap.add_argument(
+        "-q",
+        "--quiet",
+        required=False,
+        default=False,
+        type=bool,
+        help="whether to print to terminal or not",
+    )
     args = vars(ap.parse_args())
 
     interface = args["ifname"]
     port = args["port"]
+    quiet = args["quiet"]
+
+    # silence printing by piping stdout and stderr to dev/null
+    if quiet:
+        sys.stdout = open(os.devnull, "a")
+        sys.stderr = open(os.devnull, "a")
 
     # construct a announcement protobuf
     announcement = Announcement()
-    announcement.robot_id = 1
+    announcement.robot_id = 1  # TODO (#2229): read this value from the key-value store
     announcement.ip_addr = get_ip_address(interface)
     announcement.mac_addr = get_mac_address(interface)
+    announcement.sha256_checksum = (
+        ""  # TODO (#2229): read this value from the key-value store
+    )
 
     # send the announcement protobuf on the broadcast ip and specified port
     sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
