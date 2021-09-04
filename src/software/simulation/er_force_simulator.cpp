@@ -6,6 +6,7 @@
 #include "software/proto/message_translation/ssl_wrapper.h"
 #include "software/simulation/er_force_simulator_robot_singleton.h"
 #include "software/simulation/simulator_ball_singleton.h"
+#include "src/protobuf/robot.h"
 
 extern "C"
 {
@@ -26,8 +27,11 @@ ErForceSimulator::ErForceSimulator(
       physics_time_step(physics_time_step),
       er_force_sim_timer(),
       er_force_sim_setup(),
-      er_force_sim(&er_force_sim_timer, er_force_sim_setup, true)
+      er_force_sim(&er_force_sim_timer, er_force_sim_setup, true),
+      wrapper_packet()
 {
+    QObject::connect(&er_force_sim, &camun::simulator::Simulator::gotPacket, this,
+                     &ErForceSimulator::setWrapperPacket);
     this->resetCurrentFirmwareTime();
 }
 
@@ -38,7 +42,23 @@ void ErForceSimulator::setBallState(const BallState& ball_state)
 
 void ErForceSimulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
 {
-    // TODO: add robots
+    Command c{new amun::Command};
+
+    // start with default robots, take ER-Force specs.
+    robot::Specs ERForce;
+    robotSetDefault(&ERForce);
+
+    auto* teamBlue   = c->mutable_set_team_blue();
+    auto* teamYellow = c->mutable_set_team_yellow();
+    for (auto* team : {teamBlue, teamYellow})
+    {
+        for (int i = 0; i < 11; ++i)
+        {
+            auto* robot = team->add_robot();
+            robot->CopyFrom(ERForce);
+            robot->set_id(i);
+        }
+    }
 }
 
 void ErForceSimulator::addBlueRobots(const std::vector<RobotStateWithId>& robots)
@@ -249,18 +269,7 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 
 std::unique_ptr<SSLProto::SSL_WrapperPacket> ErForceSimulator::getSSLWrapperPacket() const
 {
-    auto ball_state  = physics_world.getBallState();
-    auto ball_states = ball_state.has_value()
-                           ? std::vector<BallState>({ball_state.value()})
-                           : std::vector<BallState>();
-    auto detection_frame = createSSLDetectionFrame(
-        CAMERA_ID, physics_world.getTimestamp(), frame_number, ball_states,
-        physics_world.getYellowRobotStates(), physics_world.getBlueRobotStates());
-    auto geometry_data =
-        createGeometryData(physics_world.getField(), FIELD_LINE_THICKNESS_METRES);
-    auto wrapper_packet =
-        createSSLWrapperPacket(std::move(geometry_data), std::move(detection_frame));
-    return wrapper_packet;
+    return std::make_unique<SSLProto::SSL_WrapperPacket>(wrapper_packet);
 }
 
 Field ErForceSimulator::getField() const

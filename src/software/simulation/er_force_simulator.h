@@ -26,8 +26,12 @@ extern "C"
  * as well as the firmware simulation for the robots. This provides a simple interface
  * to setup, run, and query the current state of the simulation.
  */
-class ErForceSimulator
+class ErForceSimulator : public QObject
 {
+    Q_OBJECT
+   public slots:
+    void setWrapperPacket(const QByteArray& data, qint64 time, QString sender);
+
    public:
     /**
      * Creates a new Simulator. The starting state of the simulation
@@ -183,4 +187,5 @@ class ErForceSimulator
     Timer er_force_sim_timer;
     amun::SimulatorSetup er_force_sim_setup;
     camun::simulator::Simulator er_force_sim;
+    SSLProto::SSL_WrapperPacket wrapper_packet;
 };
