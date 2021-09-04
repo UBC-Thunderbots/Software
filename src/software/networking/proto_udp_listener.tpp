@@ -69,6 +69,8 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
 template <class ReceiveProtoT>
 void ProtoUdpListener<ReceiveProtoT>::startListen()
 {
+    std::cout<<"began listening"<<std::endl;
+
     // Start listening for data asynchronously
     // See here for a great explanation about asynchronous operations:
     // https://stackoverflow.com/questions/34680985/what-is-the-difference-between-asynchronous-programming-and-multithreading
@@ -83,6 +85,8 @@ template <class ReceiveProtoT>
 void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
     const boost::system::error_code& error, size_t num_bytes_received)
 {
+    std::cout<<"received"<<std::endl;
+
     if (!error)
     {
         std::cout<<"received"<<std::endl;
