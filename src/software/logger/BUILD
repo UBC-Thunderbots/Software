@@ -26,6 +26,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "coloured_cout_sink_test",
+    srcs = ["coloured_cout_sink_test.cpp"],
+    deps = [
+        ":coloured_cout_sink",
+        ":logger",
+        "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
 cc_library(
     name = "coloured_cout_sink",
     srcs = [
@@ -77,15 +87,5 @@ cc_library(
         "//software:constants",
         "//software/networking:threaded_proto_udp_sender",
         "@g3log",
-    ],
-)
-
-cc_test(
-    name = "network_sinc_test",
-    srcs = ["network_sink_test.cpp"],
-    deps = [
-        ":network_logger",
-        ":network_sinc",
-        "//shared/test_util:tbots_gtest_main",
     ],
 )

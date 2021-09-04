@@ -3,6 +3,7 @@
 #include "software/logger/logger.h"
 #include "software/networking/proto_udp_listener.h"
 #include "software/util/typename/typename.h"
+
 template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     boost::asio::io_service& io_service, const std::string& ip_address,
