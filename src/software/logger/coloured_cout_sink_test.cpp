@@ -21,8 +21,6 @@ const std::string reset_colour_suffix = "\n\033[m\x1B[37m \x1B[m";
 
 TEST_P(ColouredCoutSinkTest, testLogInfo)
 {
-    std::cout<<"finish test"<<std::endl;
-
     std::unique_ptr<g3::LogWorker> logWorker = g3::LogWorker::createLogWorker();
     auto colour_cout_sink_handle             = logWorker->addSink(
         std::make_unique<ColouredCoutSink>(), &ColouredCoutSink::displayColouredLog);

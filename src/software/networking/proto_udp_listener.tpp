@@ -3,7 +3,6 @@
 #include "software/logger/logger.h"
 #include "software/networking/proto_udp_listener.h"
 #include "software/util/typename/typename.h"
-#include <boost/exception/diagnostic_information.hpp>
 template <class ReceiveProtoT>
 ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
     boost::asio::io_service& io_service, const std::string& ip_address,
@@ -69,7 +68,6 @@ ProtoUdpListener<ReceiveProtoT>::ProtoUdpListener(
 template <class ReceiveProtoT>
 void ProtoUdpListener<ReceiveProtoT>::startListen()
 {
-
     // Start listening for data asynchronously
     // See here for a great explanation about asynchronous operations:
     // https://stackoverflow.com/questions/34680985/what-is-the-difference-between-asynchronous-programming-and-multithreading
@@ -84,7 +82,6 @@ template <class ReceiveProtoT>
 void ProtoUdpListener<ReceiveProtoT>::handleDataReception(
     const boost::system::error_code& error, size_t num_bytes_received)
 {
-
     if (!error)
     {
         auto packet_data = ReceiveProtoT();
