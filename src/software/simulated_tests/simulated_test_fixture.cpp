@@ -96,7 +96,7 @@ void SimulatedTestFixture::setupReplayLogging()
 
     LOG(INFO) << "Logging " << test_name << " replay to " << out_dir;
 
-    fs::path sensorproto_out_dir = out_dir / "Simulator_SensorProto";
+    fs::path sensorproto_out_dir = out_dir / "ErForceSimulator_SensorProto";
     fs::path ssl_wrapper_out_dir = out_dir / "SensorFusion_SSL_WrapperPacket";
 
     simulator_sensorproto_logger =
@@ -126,7 +126,7 @@ bool SimulatedTestFixture::validateAndCheckCompletion(
     return terminating_function_validators.empty() ? false : validation_successful;
 }
 
-void SimulatedTestFixture::updateSensorFusion(std::shared_ptr<Simulator> simulator)
+void SimulatedTestFixture::updateSensorFusion(std::shared_ptr<ErForceSimulator> simulator)
 {
     auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
     assert(ssl_wrapper_packet);
@@ -175,8 +175,8 @@ void SimulatedTestFixture::runTest(
     const std::vector<ValidationFunction> &non_terminating_validation_functions,
     const Duration &timeout)
 {
-    std::shared_ptr<Simulator> simulator(
-        std::make_shared<Simulator>(field, thunderbots_config->getSimulatorConfig()));
+    std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
+        field, thunderbots_config->getSimulatorConfig()));
     simulator->setBallState(ball);
     simulator->addYellowRobots(friendly_robots);
     simulator->addBlueRobots(enemy_robots);
@@ -261,7 +261,7 @@ void SimulatedTestFixture::registerTickTime(double tick_time_ms)
 
 bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_time_step,
                                     std::shared_ptr<World> world,
-                                    std::shared_ptr<Simulator> simulator)
+                                    std::shared_ptr<ErForceSimulator> simulator)
 {
     auto wall_start_time           = std::chrono::steady_clock::now();
     bool validation_functions_done = false;

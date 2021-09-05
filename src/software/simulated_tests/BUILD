@@ -15,6 +15,7 @@ cc_library(
         "//software/simulated_tests/validation:non_terminating_function_validator",
         "//software/simulated_tests/validation:terminating_function_validator",
         "//software/simulation:simulator",
+        "//software/simulation:er_force_simulator",
         "//software/test_util",
         "//software/time:duration",
         "//software/proto/logging:proto_logger",

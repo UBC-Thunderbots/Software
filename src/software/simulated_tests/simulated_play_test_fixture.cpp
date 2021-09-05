@@ -2,6 +2,7 @@
 
 #include "software/gui/drawing/navigator.h"
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
+#include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/test_util/test_util.h"
 
 SimulatedPlayTestFixture::SimulatedPlayTestFixture()
@@ -58,7 +59,7 @@ void SimulatedPlayTestFixture::setGameState(const GameState& game_state_)
 }
 
 void SimulatedPlayTestFixture::updatePrimitives(
-    const World& world, std::shared_ptr<Simulator> simulator_to_update)
+    const World& world, std::shared_ptr<ErForceSimulator> simulator_to_update)
 {
     auto world_with_updated_game_state = world;
     world_with_updated_game_state.updateGameState(game_state);
@@ -69,7 +70,8 @@ void SimulatedPlayTestFixture::updatePrimitives(
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
     registerTickTime(duration_ms);
     simulator_to_update->setYellowRobotPrimitiveSet(
-        createNanoPbPrimitiveSet(*primitive_set_msg));
+        createNanoPbPrimitiveSet(*primitive_set_msg),
+        *createVision(world_with_updated_game_state));
 }
 
 std::optional<PlayInfo> SimulatedPlayTestFixture::getPlayInfo()

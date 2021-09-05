@@ -30,20 +30,8 @@ ErForceSimulator::ErForceSimulator(
       er_force_sim(&er_force_sim_timer, er_force_sim_setup, true),
       wrapper_packet()
 {
-    QObject::connect(&er_force_sim, &camun::simulator::Simulator::gotPacket, this,
-                     &ErForceSimulator::setWrapperPacket);
-    this->resetCurrentFirmwareTime();
-}
-
-void ErForceSimulator::setBallState(const BallState& ball_state)
-{
-    er_force_sim.safelyTeleportBall(ball_state.position().x(), ball_state.position().y());
-}
-
-void ErForceSimulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
-{
+    er_force_sim_timer.setTime(1234, 1.0);
     Command c{new amun::Command};
-
     // start with default robots, take ER-Force specs.
     robot::Specs ERForce;
     robotSetDefault(&ERForce);
@@ -59,7 +47,27 @@ void ErForceSimulator::addYellowRobots(const std::vector<RobotStateWithId>& robo
             robot->set_id(i);
         }
     }
+    er_force_sim.handleCommand(c);
+
+    QObject::connect(&er_force_sim, &camun::simulator::Simulator::gotPacket, this,
+                     &ErForceSimulator::setWrapperPacket);
+    this->resetCurrentFirmwareTime();
+
+    Team friendly_team = Team(Duration::fromMilliseconds(1000));
+    Team enemy_team    = Team(Duration::fromMilliseconds(1000));
+    Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
+
+    World world = World(field, ball, friendly_team, enemy_team);
+
+    wrapper_packet = *createSSLWrapperPacket(world, TeamColour::YELLOW);
 }
+
+void ErForceSimulator::setBallState(const BallState& ball_state)
+{
+    er_force_sim.safelyTeleportBall(ball_state.position().x(), ball_state.position().y());
+}
+
+void ErForceSimulator::addYellowRobots(const std::vector<RobotStateWithId>& robots) {}
 
 void ErForceSimulator::addBlueRobots(const std::vector<RobotStateWithId>& robots)
 {
@@ -292,102 +300,14 @@ float ErForceSimulator::getCurrentFirmwareTimeSeconds()
     return static_cast<float>(current_firmware_time.toSeconds());
 }
 
+void ErForceSimulator::setWrapperPacket(const QByteArray& data, qint64 time,
+                                        QString sender)
+{
+    auto packet_data = SSLProto::SSL_WrapperPacket();
+    packet_data.ParseFromArray(data.data(), data.size());
+    wrapper_packet = packet_data;
+}
+
 // We must give this variable a value here, as non-const static variables must be
 // initialized out-of-line
 Timestamp ErForceSimulator::current_firmware_time = Timestamp::fromSeconds(0);
-
-// float io_vision_getBallPositionX(void)
-//{
-//    io_lock_vision();
-//    float temp = vision.ball_state.global_position.x_meters;
-//    io_unlock_vision();
-//    return temp;
-//}
-// float io_vision_getBallPositionY(void)
-//{
-//    io_lock_vision();
-//    float temp = vision.ball_state.global_position.y_meters;
-//    io_unlock_vision();
-//    return temp;
-//}
-// float io_vision_getBallVelocityX(void)
-//{
-//    io_lock_vision();
-//    float temp = vision.ball_state.global_velocity.x_component_meters;
-//    io_unlock_vision();
-//    return temp;
-//}
-// float io_vision_getBallVelocityY(void)
-//{
-//    io_lock_vision();
-//    float temp = vision.ball_state.global_velocity.y_component_meters;
-//    io_unlock_vision();
-//    return temp;
-//}
-// float io_vision_getRobotPositionX(void)
-//{
-//    float temp = 0.0f;
-//    io_lock_vision();
-//            if (vision.robot_states_count == 1)
-//            {
-//             temp = vision.robot_states[0].value.global_position.x_meters;
-//            }
-//    io_unlock_vision();
-//    return temp;
-//}
-// float io_vision_getRobotPositionY(void)
-//{
-//    float temp = 0.0f;
-//    io_lock_vision();
-//            if (vision.robot_states_count == 1)
-//            {
-//             temp = vision.robot_states[0].value.global_position.y_meters;
-//            }
-//    io_unlock_vision();
-//    return temp;
-//}
-// float io_vision_getRobotOrientation(void)
-//{
-//    float temp = 0.0f;
-//    io_lock_vision();
-//            if (vision.robot_states_count == 1)
-//            {
-//             temp = vision.robot_states[0].value.global_orientation.radians;
-//            }
-//    io_unlock_vision();
-//    return temp;
-//}
-// float io_vision_getRobotVelocityX(void)
-//{
-//    float temp = 0.0f;
-//    io_lock_vision();
-//            if (vision.robot_states_count == 1)
-//            {
-//             temp = vision.robot_states[0].value.global_velocity.x_component_meters;
-//            }
-//    io_unlock_vision();
-//    return temp;
-//}
-// float io_vision_getRobotVelocityY(void)
-//{
-//    float temp = 0.0f;
-//    io_lock_vision();
-//            if (vision.robot_states_count == 1)
-//            {
-//             temp = vision.robot_states[0].value.global_velocity.y_component_meters;
-//            }
-//    io_unlock_vision();
-//    return temp;
-//}
-// float io_vision_getRobotAngularVelocity(void)
-//{
-//    float temp = 0.0f;
-//    io_lock_vision();
-//            if (vision.robot_states_count == 1)
-//            {
-//             temp =
-//             vision.robot_states[0].value.global_angular_velocity.radians_per_second;
-//            }
-//    io_unlock_vision();
-//    return temp;
-//}

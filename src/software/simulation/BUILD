@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@bazel_rules_qt//:qt.bzl", "qt_cc_library")
+
 cc_library(
     name = "simulator_robot",
     srcs = ["simulator_robot.cpp"],
@@ -224,12 +226,43 @@ cc_library(
     ],
 )
 
+qt_cc_library(
+    name = "er_force_simulator_qt",
+    srcs = ["er_force_simulator.cpp"],
+    hdrs = ["er_force_simulator.h"],
+    deps = [
+        ":er_force_simulator_ball",
+        ":er_force_simulator_robot_singleton",
+        ":firmware_object_deleter",
+        ":physics_simulator_ball",
+        ":physics_simulator_robot",
+        ":simulator_ball_singleton",
+        "//firmware/app/primitives:primitive_manager",
+        "//firmware/app/world:firmware_world",
+        "//shared/parameter:cpp_configs",
+        "//software/proto:defending_side_msg_cc_proto",
+        "//software/proto/message_translation:primitive_google_to_nanopb_converter",
+        "//software/proto/message_translation:ssl_detection",
+        "//software/proto/message_translation:ssl_geometry",
+        "//software/proto/message_translation:ssl_wrapper",
+        "//software/simulation/physics:physics_world",
+        "//software/world",
+        "//software/world:field",
+        "//software/world:team_colour",
+        "@er_force_sim//src/amun/simulator",
+        "@qt//:qt_core",
+        "@qt//:qt_gui",
+        "@qt//:qt_widgets",
+    ],
+)
+
 cc_library(
     name = "er_force_simulator",
     srcs = ["er_force_simulator.cpp"],
     hdrs = ["er_force_simulator.h"],
     deps = [
         ":er_force_simulator_ball",
+        ":er_force_simulator_qt",
         ":er_force_simulator_robot_singleton",
         ":firmware_object_deleter",
         ":physics_simulator_ball",

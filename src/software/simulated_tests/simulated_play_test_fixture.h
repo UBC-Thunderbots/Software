@@ -56,7 +56,7 @@ class SimulatedPlayTestFixture : public SimulatedTestFixture
 
    private:
     void updatePrimitives(const World& world,
-                          std::shared_ptr<Simulator> simulator_to_update) override;
+                          std::shared_ptr<ErForceSimulator> simulator_to_update) override;
     // The configs being used in simulation
     std::shared_ptr<AiConfig> ai_config;
     std::shared_ptr<AiControlConfig> ai_control_config;
