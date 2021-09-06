@@ -292,7 +292,7 @@ bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_t
         if (full_system_gui)
         {
             full_system_gui->onValueReceived(*world);
-            if (auto play_info_msg = getPlayInfoProto())
+            if (auto play_info_msg = getPlayInfo())
             {
                 full_system_gui->onValueReceived(*play_info_msg);
             }

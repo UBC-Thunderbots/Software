@@ -128,7 +128,7 @@ class SimulatedTestFixture : public ::testing::Test
      *
      * @return play info message to display, if any
      */
-    virtual std::optional<PlayInfoProto> getPlayInfoProto() = 0;
+    virtual std::optional<PlayInfo> getPlayInfo() = 0;
 
     /**
      * Gets draw functions for visualizing on the FullSystemGUI

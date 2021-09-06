@@ -10,14 +10,14 @@ ThreadedFullSystemGUI::ThreadedFullSystemGUI(
     std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config)
     : FirstInFirstOutThreadedObserver<World>(),
       FirstInFirstOutThreadedObserver<AIDrawFunction>(),
-      FirstInFirstOutThreadedObserver<PlayInfoProto>(),
+      FirstInFirstOutThreadedObserver<PlayInfo>(),
       FirstInFirstOutThreadedObserver<SensorProto>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       world_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<WorldDrawFunction>>(
           WORLD_DRAW_FUNCTIONS_BUFFER_SIZE, false)),
       ai_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<AIDrawFunction>>(
           AI_DRAW_FUNCTIONS_BUFFER_SIZE, false)),
-      play_info_msg_buffer(std::make_shared<ThreadSafeBuffer<PlayInfoProto>>(
+      play_info_msg_buffer(std::make_shared<ThreadSafeBuffer<PlayInfo>>(
           PLAY_INFO_MSG_BUFFER_SIZE, false)),
       sensor_msg_buffer(
           std::make_shared<ThreadSafeBuffer<SensorProto>>(SENSOR_MSG_BUFFER_SIZE)),
@@ -108,7 +108,7 @@ void ThreadedFullSystemGUI::onValueReceived(AIDrawFunction draw_function)
     ai_draw_functions_buffer->push(draw_function);
 }
 
-void ThreadedFullSystemGUI::onValueReceived(PlayInfoProto play_info_msg)
+void ThreadedFullSystemGUI::onValueReceived(PlayInfo play_info_msg)
 {
     play_info_msg_buffer->push(play_info_msg);
 }

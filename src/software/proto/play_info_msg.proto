@@ -1,7 +1,7 @@
 syntax = 'proto3';
 
 
-message PlayInfoProto
+message PlayInfo
 {
     message Play
     {

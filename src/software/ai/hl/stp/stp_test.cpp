@@ -170,18 +170,18 @@ TEST_F(STPTest, test_get_play_info)
     stp.getIntents(world);
     EXPECT_EQ(*(stp.getCurrentPlayName()), TYPENAME(HaltTestPlay));
 
-    auto play_info_msg = stp.getPlayInfoProto();
+    auto play_info_msg = stp.getPlayInfo();
 
     std::string expected_referee_command, expected_play_name, expected_tactic_name;
     expected_referee_command = "HALT";
     expected_play_name       = "HaltTestPlay";
     expected_tactic_name     = "StopTestTactic";
 
-    PlayInfoProto expected_play_info_msg = PlayInfoProto();
+    PlayInfo expected_play_info_msg = PlayInfo();
     expected_play_info_msg.mutable_game_state()->set_referee_command_name(
         expected_referee_command);
     expected_play_info_msg.mutable_play()->set_play_name(expected_play_name);
-    PlayInfoProto_Tactic expected_tactic = PlayInfoProto_Tactic();
+    PlayInfo_Tactic expected_tactic = PlayInfo_Tactic();
     expected_tactic.set_tactic_name(expected_tactic_name);
     (*expected_play_info_msg.mutable_robot_tactic_assignment())[0] = expected_tactic;
     (*expected_play_info_msg.mutable_robot_tactic_assignment())[1] = expected_tactic;

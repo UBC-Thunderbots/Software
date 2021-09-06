@@ -40,7 +40,7 @@ class AI final
      *
      * @return information about the currently running plays and tactics
      */
-    PlayInfoProto getPlayInfoProto() const;
+    PlayInfo getPlayInfo() const;
 
     std::shared_ptr<Navigator> getNavigator() const;
 

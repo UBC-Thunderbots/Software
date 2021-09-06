@@ -152,17 +152,17 @@ std::optional<std::string> STP::getCurrentPlayName() const
     return std::nullopt;
 }
 
-PlayInfoProto STP::getPlayInfoProto()
+PlayInfo STP::getPlayInfo()
 {
     std::string info_referee_command = toString(current_game_state.getRefereeCommand());
     std::string info_play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
-    PlayInfoProto info         = PlayInfoProto();
+    PlayInfo info         = PlayInfo();
     info.mutable_game_state()->set_referee_command_name(info_referee_command);
     info.mutable_play()->set_play_name(info_play_name);
 
     for (const auto& [tactic, robot] : robot_tactic_assignment)
     {
-        PlayInfoProto_Tactic tactic_msg = PlayInfoProto_Tactic();
+        PlayInfo_Tactic tactic_msg = PlayInfo_Tactic();
         tactic_msg.set_tactic_name(objectTypeName(*tactic));
         (*info.mutable_robot_tactic_assignment())[robot.id()] = tactic_msg;
     }

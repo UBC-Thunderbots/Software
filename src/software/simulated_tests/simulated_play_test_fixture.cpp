@@ -72,9 +72,9 @@ void SimulatedPlayTestFixture::updatePrimitives(
         createNanoPbPrimitiveSet(*primitive_set_msg));
 }
 
-std::optional<PlayInfoProto> SimulatedPlayTestFixture::getPlayInfoProto()
+std::optional<PlayInfo> SimulatedPlayTestFixture::getPlayInfo()
 {
-    return ai.getPlayInfoProto();
+    return ai.getPlayInfo();
 }
 
 AIDrawFunction SimulatedPlayTestFixture::getDrawFunctions()

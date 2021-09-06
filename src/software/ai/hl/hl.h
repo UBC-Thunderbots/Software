@@ -37,7 +37,7 @@ class HL
      *
      * @return information about the currently running plays and tactics
      */
-    virtual PlayInfoProto getPlayInfoProto() = 0;
+    virtual PlayInfo getPlayInfo() = 0;
 
     virtual ~HL() = default;
 };

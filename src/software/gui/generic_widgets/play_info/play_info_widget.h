@@ -20,5 +20,5 @@ class PlayInfoWidget : public QTextEdit
      *
      * @param play_info The new PlayInfo to display
      */
-    void updatePlayInfo(const PlayInfoProto& play_info);
+    void updatePlayInfo(const PlayInfo& play_info);
 };

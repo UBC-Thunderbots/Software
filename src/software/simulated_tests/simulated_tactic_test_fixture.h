@@ -48,7 +48,7 @@ class SimulatedTacticTestFixture : public SimulatedTestFixture
    private:
     void updatePrimitives(const World& world,
                           std::shared_ptr<Simulator> simulator_to_update) override;
-    std::optional<PlayInfoProto> getPlayInfoProto() override;
+    std::optional<PlayInfo> getPlayInfo() override;
     AIDrawFunction getDrawFunctions() override;
 
     std::shared_ptr<Tactic> tactic;
