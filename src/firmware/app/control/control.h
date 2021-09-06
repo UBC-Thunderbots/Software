@@ -1,7 +1,7 @@
 #pragma once
 
-#include "firmware/app/world/firmware_robot_constants.h"
 #include "firmware/app/world/force_wheel.h"
+#include "shared/robot_constants.h"
 
 /**
  * Apply the given acceleration (in robot coordinates) to the given robot

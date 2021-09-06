@@ -1,5 +1,6 @@
 #include "software/simulation/force_wheel_simulator_robot_singleton.h"
 
+#include "shared/2015_robot_constants.h"
 #include "shared/proto/robot_log_msg.pb.h"
 
 extern "C"
@@ -45,14 +46,8 @@ ForceWheelSimulatorRobotSingleton::createFirmwareRobot()
                             &(SimulatorRobotSingleton::dribblerCoast),
                             &(SimulatorRobotSingleton::getDribblerTemperatureDegC));
 
-    ForceWheelConstants_t wheel_constants;
-    wheel_constants.wheel_rotations_per_motor_rotation  = GEAR_RATIO;
-    wheel_constants.wheel_radius                        = WHEEL_RADIUS;
-    wheel_constants.motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT;
-    wheel_constants.motor_back_emf_per_rpm              = RPM_TO_VOLT;
-    wheel_constants.motor_phase_resistance              = WHEEL_MOTOR_PHASE_RESISTANCE;
-    wheel_constants.motor_current_per_unit_torque       = CURRENT_PER_TORQUE;
-    ForceWheel_t* front_left_wheel                      = app_force_wheel_create(
+    WheelConstants_t wheel_constants = create2015WheelConstants();
+    ForceWheel_t* front_left_wheel   = app_force_wheel_create(
         &(ForceWheelSimulatorRobotSingleton::applyWheelForceFrontLeft),
         &(SimulatorRobotSingleton::getMotorSpeedFrontLeft),
         &(SimulatorRobotSingleton::brakeMotorFrontLeft),
@@ -73,12 +68,8 @@ ForceWheelSimulatorRobotSingleton::createFirmwareRobot()
         &(SimulatorRobotSingleton::brakeMotorBackRight),
         &(SimulatorRobotSingleton::coastMotorBackRight), wheel_constants);
 
-    const RobotConstants_t robot_constants = {
-        .mass              = ROBOT_POINT_MASS,
-        .moment_of_inertia = INERTIA,
-        .robot_radius      = ROBOT_RADIUS,
-        .jerk_limit        = JERK_LIMIT,
-    };
+    const RobotConstants_t robot_constants = create2015RobotConstants();
+
     ControllerState_t* controller_state = new ControllerState_t{
         .last_applied_acceleration_x       = 0,
         .last_applied_acceleration_y       = 0,

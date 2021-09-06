@@ -1,7 +1,5 @@
 #include "software/simulation/simulator_ball_singleton.h"
 
-#include "software/logger/logger.h"
-
 std::shared_ptr<SimulatorBall> SimulatorBallSingleton::simulator_ball = nullptr;
 FieldSide SimulatorBallSingleton::field_side_                         = FieldSide::NEG_X;
 
@@ -27,19 +25,6 @@ SimulatorBallSingleton::createFirmwareBall()
                                                                 FirmwareBallDeleter());
 }
 
-float SimulatorBallSingleton::checkValidAndReturnFloat(
-    std::function<float(std::shared_ptr<SimulatorBall>)> func)
-{
-    if (simulator_ball)
-    {
-        return func(simulator_ball);
-    }
-    LOG(WARNING)
-        << "SimulatorBallSingleton called without setting the SimulatorBall first"
-        << std::endl;
-    return 0.0f;
-}
-
 float SimulatorBallSingleton::invertValueToMatchFieldSide(double value)
 {
     switch (field_side_)
@@ -55,24 +40,24 @@ float SimulatorBallSingleton::invertValueToMatchFieldSide(double value)
 
 float SimulatorBallSingleton::getBallPositionX()
 {
-    return checkValidAndReturnFloat(
+    return checkValidAndExecute<float>(
         [](auto ball) { return invertValueToMatchFieldSide(ball->position().x()); });
 }
 
 float SimulatorBallSingleton::getBallPositionY()
 {
-    return checkValidAndReturnFloat(
+    return checkValidAndExecute<float>(
         [](auto ball) { return invertValueToMatchFieldSide(ball->position().y()); });
 }
 
 float SimulatorBallSingleton::getBallVelocityX()
 {
-    return checkValidAndReturnFloat(
+    return checkValidAndExecute<float>(
         [](auto ball) { return invertValueToMatchFieldSide(ball->velocity().x()); });
 }
 
 float SimulatorBallSingleton::getBallVelocityY()
 {
-    return checkValidAndReturnFloat(
+    return checkValidAndExecute<float>(
         [](auto ball) { return invertValueToMatchFieldSide(ball->velocity().y()); });
 }

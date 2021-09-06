@@ -8,7 +8,8 @@
 #include "software/proto/message_translation/ssl_geometry.h"
 
 void drawSSLWrapperPacket(QGraphicsScene* scene,
-                          const SSLProto::SSL_WrapperPacket& ssl_wrapper_packet)
+                          const SSLProto::SSL_WrapperPacket& ssl_wrapper_packet,
+                          const RobotConstants_t& robot_constants)
 {
     if (ssl_wrapper_packet.has_geometry())
     {
@@ -34,22 +35,23 @@ void drawSSLWrapperPacket(QGraphicsScene* scene,
             createTeamDetection({detection}, TeamColour::YELLOW);
         for (const auto& robot : yellow_robot_detections)
         {
-            drawRobot(scene, robot, yellow_robot_color);
+            drawRobot(scene, robot, yellow_robot_color, robot_constants);
         }
 
         auto blue_robot_detections = createTeamDetection({detection}, TeamColour::BLUE);
         for (const auto& robot : blue_robot_detections)
         {
-            drawRobot(scene, robot, blue_robot_color);
+            drawRobot(scene, robot, blue_robot_color, robot_constants);
         }
     }
 }
 
 WorldDrawFunction getDrawSSLWrapperPacketFunction(
-    const SSLProto::SSL_WrapperPacket& ssl_wrapper_packet)
+    const SSLProto::SSL_WrapperPacket& ssl_wrapper_packet,
+    const RobotConstants_t& robot_constants)
 {
-    auto draw_function = [ssl_wrapper_packet](QGraphicsScene* scene) {
-        drawSSLWrapperPacket(scene, ssl_wrapper_packet);
+    auto draw_function = [ssl_wrapper_packet, robot_constants](QGraphicsScene* scene) {
+        drawSSLWrapperPacket(scene, ssl_wrapper_packet, robot_constants);
     };
     return WorldDrawFunction(draw_function);
 }
