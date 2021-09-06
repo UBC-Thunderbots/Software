@@ -1,5 +1,12 @@
 #include "software/simulation/er_force_simulator.h"
 
+#include <google/protobuf/message.h>
+#include <google/protobuf/text_format.h>
+
+#include <QtCore/QFile>
+#include <QtCore/QString>
+#include <iostream>
+
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
@@ -17,6 +24,32 @@ extern "C"
 #include "shared/proto/robot_log_msg.nanopb.h"
 }
 
+inline bool loadConfiguration(const QString& configFile,
+                              google::protobuf::Message* message, bool allowPartial)
+{
+    QString fullFilename = QString("software/simulation/config/") + configFile + ".txt";
+    QFile file(fullFilename);
+    if (!file.open(QFile::ReadOnly))
+    {
+        std::cout << "Could not open configuration file " << fullFilename.toStdString()
+                  << std::endl;
+        return false;
+    }
+    QString str = file.readAll();
+    file.close();
+    std::string s = qPrintable(str);
+
+    google::protobuf::TextFormat::Parser parser;
+    parser.AllowPartialMessage(allowPartial);
+    parser.ParseFromString(s, message);
+    return true;
+}
+
+ErForceSimulator::~ErForceSimulator()
+{
+    delete er_force_sim;
+}
+
 ErForceSimulator::ErForceSimulator(
     const Field& field, std::shared_ptr<const SimulatorConfig> simulator_config,
     const Duration& physics_time_step)
@@ -26,15 +59,29 @@ ErForceSimulator::ErForceSimulator(
       frame_number(0),
       physics_time_step(physics_time_step),
       er_force_sim_timer(),
-      er_force_sim_setup(),
-      er_force_sim(&er_force_sim_timer, er_force_sim_setup, true),
+      //      er_force_sim_setup(),
+      //      er_force_sim(&er_force_sim_timer, er_force_sim_setup, true),
       wrapper_packet()
 {
-    er_force_sim_timer.setTime(1234, 1.0);
+    loadConfiguration("simulator/2020", &er_force_sim_setup, false);
+    er_force_sim =
+        new camun::simulator::Simulator(&er_force_sim_timer, er_force_sim_setup, true),
+
+    // er_force_sim_timer.setTime(1234, 1.0);
+        std::cout << "er_force_sim_timer.currentTime(): "
+                  << er_force_sim_timer.currentTime() << std::endl;
     Command c{new amun::Command};
+    c->mutable_simulator()->set_enable(true);
     // start with default robots, take ER-Force specs.
     robot::Specs ERForce;
     robotSetDefault(&ERForce);
+
+    Team friendly_team = Team();
+    Team enemy_team    = Team();
+    Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
+
+    World world    = World(field, ball, friendly_team, enemy_team);
+    wrapper_packet = *createSSLWrapperPacket(world, TeamColour::YELLOW);
 
     auto* teamBlue   = c->mutable_set_team_blue();
     auto* teamYellow = c->mutable_set_team_yellow();
@@ -47,24 +94,21 @@ ErForceSimulator::ErForceSimulator(
             robot->set_id(i);
         }
     }
-    er_force_sim.handleCommand(c);
+    er_force_sim->handleCommand(c);
 
-    QObject::connect(&er_force_sim, &camun::simulator::Simulator::gotPacket, this,
+    QObject::connect(er_force_sim, &camun::simulator::Simulator::gotPacket, this,
                      &ErForceSimulator::setWrapperPacket);
     this->resetCurrentFirmwareTime();
 
-    Team friendly_team = Team(Duration::fromMilliseconds(1000));
-    Team enemy_team    = Team(Duration::fromMilliseconds(1000));
-    Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
-
-    World world = World(field, ball, friendly_team, enemy_team);
-
-    wrapper_packet = *createSSLWrapperPacket(world, TeamColour::YELLOW);
+    er_force_sim->process();
+    // er_force_sim_timer.setTime(1235, 1.0);
+    //    er_force_sim->process();
 }
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
 {
-    er_force_sim.safelyTeleportBall(ball_state.position().x(), ball_state.position().y());
+    er_force_sim->safelyTeleportBall(ball_state.position().x(),
+                                     ball_state.position().y());
 }
 
 void ErForceSimulator::addYellowRobots(const std::vector<RobotStateWithId>& robots) {}
@@ -119,7 +163,7 @@ void ErForceSimulator::setRobotPrimitive(
     std::shared_ptr<ErForceSimulatorBall> simulator_ball,
     const TbotsProto::Vision& vision_msg)
 {
-    simulator_ball->setState(BallState(
+    simulator_ball = std::make_shared<ErForceSimulatorBall>(BallState(
         Point(vision_msg.ball_state().global_position().x_meters(),
               vision_msg.ball_state().global_position().y_meters()),
         Vector(vision_msg.ball_state().global_velocity().x_component_meters(),
@@ -198,7 +242,7 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
                                                         .global_angular_velocity()
                                                         .radians_per_second())));
         ErForceSimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-        simulator_ball->setState(BallState(
+        simulator_ball = std::make_shared<ErForceSimulatorBall>(BallState(
             Point(blue_team_vision_msg.ball_state().global_position().x_meters(),
                   blue_team_vision_msg.ball_state().global_position().y_meters()),
             Vector(
@@ -247,7 +291,7 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
                                                         .global_angular_velocity()
                                                         .radians_per_second())));
         ErForceSimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-        simulator_ball->setState(BallState(
+        simulator_ball = std::make_shared<ErForceSimulatorBall>(BallState(
             Point(yellow_team_vision_msg.ball_state().global_position().x_meters(),
                   yellow_team_vision_msg.ball_state().global_position().y_meters()),
             Vector(yellow_team_vision_msg.ball_state()
@@ -264,13 +308,14 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
             *(simulator_robot->getRobotCommand());
     }
 
-    er_force_sim.handleRadioCommands(yellow_robot_control, false,
-                                     er_force_sim_timer.currentTime());
-    er_force_sim.handleRadioCommands(blue_robot_control, true,
-                                     er_force_sim_timer.currentTime());
+    er_force_sim->handleRadioCommands(yellow_robot_control, false,
+                                      er_force_sim_timer.currentTime());
+    // er_force_sim->process();
+    er_force_sim->handleRadioCommands(blue_robot_control, true,
+                                      er_force_sim_timer.currentTime());
     std::this_thread::sleep_for(
         std::chrono::milliseconds(static_cast<int>(time_step.toMilliseconds())));
-    er_force_sim.process();
+    er_force_sim->process();
 
     frame_number++;
 }
@@ -305,7 +350,20 @@ void ErForceSimulator::setWrapperPacket(const QByteArray& data, qint64 time,
 {
     auto packet_data = SSLProto::SSL_WrapperPacket();
     packet_data.ParseFromArray(data.data(), data.size());
+    std::cout << "ErForceSimulator packet_data.detection().t_capture()"
+              << packet_data.detection().t_capture() << std::endl;
+    std::cout << "ErForceSimulator packet_data.detection().robots_blue_size()"
+              << packet_data.detection().robots_blue_size() << std::endl;
+    std::cout << "ErForceSimulator packet_data.detection().robots_yellow_size()"
+              << packet_data.detection().robots_yellow_size() << std::endl;
+    std::cout << "ErForceSimulator packet_data.detection().t_capture() rem"
+              << static_cast<int>(packet_data.detection().t_capture()) % 100 << std::endl;
     wrapper_packet = packet_data;
+    std::cout << "ErForceSimulator wrapper_packet.detection().t_capture()"
+              << wrapper_packet.detection().t_capture() << std::endl;
+    std::cout << "ErForceSimulator wrapper_packet.detection().t_capture() rem"
+              << static_cast<int>(wrapper_packet.detection().t_capture()) % 100
+              << std::endl;
 }
 
 // We must give this variable a value here, as non-const static variables must be

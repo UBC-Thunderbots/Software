@@ -1,0 +1,88 @@
+time-acquisition-mode: ci
+network:
+  publish-address:
+  vision-address:
+  tracker-address:
+  skip-interfaces: []
+server:
+  auto-ref:
+    address: :-1
+    address-tls: :-1
+    trusted-keys-dir: config/trusted_keys/auto_ref
+  team:
+    address: :-1
+    address-tls: :-1
+    trusted-keys-dir: config/trusted_keys/team
+  remote-control:
+    address: :-1
+    address-tls: :-1
+    trusted-keys-dir: config/trusted_keys/remote-control
+  ci:
+    address: :10009
+engine:
+  config-filename: config/engine.yaml
+game:
+  state-store-file: data/state-store.json.stream
+  yellow-card-duration: 2m
+  yellow-card-bot-removal-time: 10s
+  multiple-card-step: 2
+  multiple-foul-step: 30000
+  multiple-placement-failures: 5
+  auto-ref-proposal-timeout: 1s
+  default-division: DIV_A
+  prepare-timeout: 10s
+  free-kick-timeout:
+    DIV_A: 5s
+    DIV_B: 10s
+  no-progress-timeout:
+    DIV_A: 5s
+    DIV_B: 10s
+  ball-placement-time: 30s
+  ball-placement-time-top-up: 10s
+  ball-placement-required-distance: 1.0
+  ball-placement-tolerance: 0.15
+  ball-placement-min-distance-to-defense-area: 0.7
+  ball-placement-min-robot-distance: 0.05
+  distance-to-ball-in-stop: 0.5
+  auto-approve-goals: true
+  challenge-flags: 3
+  emergency-stop-grace-period: 10s
+  normal:
+    half-duration: 5m
+    half-time-duration: 5m
+    timeout-duration: 5m
+    timeouts: 4
+    break-after: 5m
+  overtime:
+    half-duration: 2m30s
+    half-time-duration: 2m
+    timeout-duration: 2m30s
+    timeouts: 2
+    break-after: 2m
+  team-choice-timeout: 200ms
+  default-geometry:
+    DIV_A:
+      field-length: 12.0
+      field-width: 9.0
+      defense-area-depth: 1.8
+      defense-area-width: 3.6
+      penalty-kick-dist-to-goal: 8.0
+      goal-width: 1.8
+      placement-offset-touch-line: 0.2
+      placement-offset-goal-line: 0.2
+      placement-offset-goal-line-goal-kick: 1.0
+      placement-offset-defense-area: 1.0
+    DIV_B:
+      field-length: 9.0
+      field-width: 6.0
+      defense-area-depth: 1.0
+      defense-area-width: 2.0
+      penalty-kick-dist-to-goal: 6.0
+      goal-width: 1.0
+      placement-offset-touch-line: 0.2
+      placement-offset-goal-line: 0.2
+      placement-offset-goal-line-goal-kick: 1.0
+      placement-offset-defense-area: 1.0
+  max-bots:
+    DIV_A: 11
+    DIV_B: 6

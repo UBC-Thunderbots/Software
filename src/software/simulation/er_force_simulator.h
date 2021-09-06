@@ -47,6 +47,7 @@ class ErForceSimulator : public QObject
                               const Duration& physics_time_step = Duration::fromSeconds(
                                   DEFAULT_PHYSICS_TIME_STEP_SECONDS));
     ErForceSimulator() = delete;
+    ~ErForceSimulator();
 
     /**
      * Sets the state of the ball in the simulation. No more than 1 ball may exist
@@ -186,6 +187,6 @@ class ErForceSimulator : public QObject
 
     Timer er_force_sim_timer;
     amun::SimulatorSetup er_force_sim_setup;
-    camun::simulator::Simulator er_force_sim;
+    camun::simulator::Simulator* er_force_sim;
     SSLProto::SSL_WrapperPacket wrapper_packet;
 };

@@ -52,7 +52,7 @@ void SimulatedTestFixture::SetUp()
     // team
     mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableFriendlyColorYellow()
-        ->setValue(true);
+        ->setValue(false);
     if (TbotsGtestMain::enable_visualizer)
     {
         enableVisualizer();
@@ -274,6 +274,10 @@ bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_t
     if (auto world_opt = sensor_fusion.getWorld())
     {
         *world = world_opt.value();
+        std::cout << "world->friendlyTeam().numRobots(): "
+                  << world->friendlyTeam().numRobots() << std::endl;
+        std::cout << "world->enemyTeam().numRobots(): " << world->enemyTeam().numRobots()
+                  << std::endl;
 
         validation_functions_done = validateAndCheckCompletion(
             terminating_function_validators, non_terminating_function_validators);

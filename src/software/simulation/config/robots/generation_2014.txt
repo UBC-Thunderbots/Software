@@ -1,0 +1,101 @@
+default {
+  generation: 3
+  year: 2014
+  id: 0
+  type: Regular
+  radius: 0.089
+  height: 0.138
+  mass: 1.5
+  angle: 0.98291
+  v_max: 3
+  omega_max: 6
+  shot_linear_max: 5.5
+  shot_chip_max: 3
+  dribbler_width: 0.08
+  acceleration {
+    a_speedup_f_max: 6
+    a_speedup_s_max: 5
+    a_speedup_phi_max: 60
+    a_brake_f_max: 5
+    a_brake_s_max: 5
+    a_brake_phi_max: 60
+  }
+  ir_param: 40
+  strategy {
+    a_speedup_f_max: 3
+    a_speedup_s_max: 3
+    a_speedup_phi_max: 60
+    a_brake_f_max: 3
+    a_brake_s_max: 3
+    a_brake_phi_max: 60
+  }
+  shoot_radius: 0.067
+  dribbler_height: 0.04
+}
+robot {
+  id: 0
+}
+robot {
+  id: 1
+}
+robot {
+  id: 2
+}
+robot {
+  id: 3
+}
+robot {
+  generation: 3
+  id: 4
+}
+robot {
+  id: 5
+}
+robot {
+  id: 6
+}
+robot {
+  id: 7
+}
+robot {
+  generation: 3
+  id: 8
+}
+robot {
+  id: 9
+}
+robot {
+  id: 10
+}
+robot {
+  id: 11
+}
+robot {
+  id: 12
+  acceleration {
+  }
+  strategy {
+  }
+}
+robot {
+  id: 13
+  acceleration {
+  }
+  strategy {
+  }
+}
+robot {
+  id: 14
+  acceleration {
+  }
+  strategy {
+  }
+}
+robot {
+  id: 15
+  acceleration {
+  }
+  strategy {
+  }
+}
+
