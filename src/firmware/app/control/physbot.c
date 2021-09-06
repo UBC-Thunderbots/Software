@@ -11,10 +11,14 @@ PhysBot app_physbot_create(float velocity_x, float velocity_y, float position_x,
 {
     float v[2]            = {velocity_x, velocity_y};
     float dr[2]           = {destination[0] - position_x, destination[1] - position_y};
-    const Component major = {
-        .disp = dot2D(major_vec, dr), .vel = dot2D(major_vec, v), .accel = 0, .time = 0};
-    const Component minor = {
-        .disp = dot2D(minor_vec, dr), .vel = dot2D(minor_vec, v), .accel = 0, .time = 0};
+    const Component major = {.disp  = shared_physics_dot2D(major_vec, dr),
+                             .vel   = shared_physics_dot2D(major_vec, v),
+                             .accel = 0,
+                             .time  = 0};
+    const Component minor = {.disp  = shared_physics_dot2D(minor_vec, dr),
+                             .vel   = shared_physics_dot2D(minor_vec, v),
+                             .accel = 0,
+                             .time  = 0};
 
     // current orientation is directly subtracted from destination because we do not
     // assume that the user wants the rotational displacement to be the min angle between
@@ -46,7 +50,7 @@ void app_physbot_computeAccelInLocalCoordinates(float *accel, PhysBot pb, float 
                                   {cosf(angle + P_PI / 2), sinf(angle + P_PI / 2)}};
     for (int i = 0; i < 2; i++)
     {
-        accel[i] = pb.min.accel * dot2D(local_norm_vec[i], minor_vec);
-        accel[i] += pb.maj.accel * dot2D(local_norm_vec[i], major_vec);
+        accel[i] = pb.min.accel * shared_physics_dot2D(local_norm_vec[i], minor_vec);
+        accel[i] += pb.maj.accel * shared_physics_dot2D(local_norm_vec[i], major_vec);
     }
 }

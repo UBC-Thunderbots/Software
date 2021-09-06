@@ -10,6 +10,7 @@ cc_library(
         "primitive_types.h",
     ],
     deps = [
+        "//shared:robot_constants",
         "//shared/proto:tbots_cc_proto",
         "//software/geom:angle",
         "//software/geom:angular_velocity",

@@ -2,7 +2,15 @@
 
 #include <gtest/gtest.h>
 
-TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_at_desired_angle)
+#include "software/test_util/equal_within_tolerance.h"
+
+class PassingEvaluationTest : public ::testing::Test
+{
+   protected:
+    RobotConstants_t robot_constants = create2015RobotConstants();
+};
+
+TEST_F(PassingEvaluationTest, getTimeToOrientationForRobot_robot_at_desired_angle)
 {
     Angle target_angle = Angle::half();
     Robot robot(0, {1, 1}, Vector(0, 0), Angle::half(), AngularVelocity::fromDegrees(0),
@@ -13,7 +21,8 @@ TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_at_desired_angle)
         getTimeToOrientationForRobot(robot.orientation(), target_angle, 4 * M_PI, 10.0));
 }
 
-TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_opposite_to_desired_angle)
+TEST_F(PassingEvaluationTest,
+       getTimeToOrientationForRobot_robot_opposite_to_desired_angle)
 {
     // Because we can't guarantee that the robot angular acceleration isn't going to
     // increase to the point where we can't reach the max angular speed within
@@ -44,13 +53,13 @@ TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_opposite_to_desir
         getTimeToOrientationForRobot(robot.orientation(), target_angle, 4 * M_PI, 10));
 }
 
-TEST(PassingEvaluationTest, getTimeToPositionForRobot_already_at_dest)
+TEST_F(PassingEvaluationTest, getTimeToPositionForRobot_already_at_dest)
 {
     Point dest(1, 1);
     EXPECT_EQ(Duration::fromSeconds(0), getTimeToPositionForRobot(dest, dest, 2.0, 3.0));
 }
 
-TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity)
+TEST_F(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity)
 {
     // Check that the robot reaches the dest in the at the expected time when
     // it has enough time that it accelerates up to it's maximum velocity
@@ -62,22 +71,24 @@ TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity)
 
     double distance_to_dest = (robot_location - dest).length();
 
-    double acceleration_time = ROBOT_MAX_SPEED_METERS_PER_SECOND /
-                               ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
+    double acceleration_time = robot_constants.robot_max_speed_m_per_s /
+                               robot_constants.robot_max_acceleration_m_per_s_2;
     // x = v*t + 1/2*a*t^2, v = initial velocity = 0
     double acceleration_distance = 0.5 *
-                                   ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED *
+                                   robot_constants.robot_max_acceleration_m_per_s_2 *
                                    std::pow(acceleration_time, 2);
     double time_at_max_vel = (distance_to_dest - 2 * acceleration_distance) /
-                             ROBOT_MAX_SPEED_METERS_PER_SECOND;
+                             robot_constants.robot_max_speed_m_per_s;
 
     double travel_time = 2 * acceleration_time + time_at_max_vel;
 
-    EXPECT_EQ(Duration::fromSeconds(travel_time),
-              getTimeToPositionForRobot(robot_location, dest, 2.0, 3.0));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(
+        Duration::fromSeconds(travel_time),
+        getTimeToPositionForRobot(robot_location, dest, 2.0, 3.0)));
 }
 
-TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity_with_tolerance)
+TEST_F(PassingEvaluationTest,
+       getTimeToPositionForRobot_reaches_max_velocity_with_tolerance)
 {
     // Check that the robot reaches the dest in the at the expected time when
     // it has enough time that it accelerates up to it's maximum velocity
@@ -94,14 +105,14 @@ TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity_with_
 
     double distance_to_dest = (robot_location - first_point_in_tolerance).length();
 
-    double acceleration_time = ROBOT_MAX_SPEED_METERS_PER_SECOND /
-                               ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
+    double acceleration_time = robot_constants.robot_max_speed_m_per_s /
+                               robot_constants.robot_max_acceleration_m_per_s_2;
     // x = v*t + 1/2*a*t^2, v = initial velocity = 0
     double acceleration_distance = 0.5 *
-                                   ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED *
+                                   robot_constants.robot_max_acceleration_m_per_s_2 *
                                    std::pow(acceleration_time, 2);
     double time_at_max_vel = (distance_to_dest - 2 * acceleration_distance) /
-                             ROBOT_MAX_SPEED_METERS_PER_SECOND;
+                             robot_constants.robot_max_speed_m_per_s;
 
     double travel_time = 2 * acceleration_time + time_at_max_vel;
 

@@ -117,6 +117,7 @@ cc_library(
         ":physics_robot_model",
         "//firmware/shared:physics",
         "//shared:constants",
+        "//shared:robot_constants",
         "//software/geom:angle",
         "//software/geom:angular_velocity",
         "//software/geom:point",
