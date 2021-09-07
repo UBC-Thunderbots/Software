@@ -60,7 +60,7 @@ void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
     }
     else
     {
-        oss << "\033[" << colour << "m" << log_entry.get().message() << "\033[m";
+        oss << "\033[" << colour << "m" << log_entry.get().message() << "\n\033[m";
     }
     std::cout << oss.str() << std::flush;
     resetColour();
