@@ -24,7 +24,7 @@ void robotLogReceiver(TbotsProto::RobotLog log)
     else if (TbotsProto::LogLevel_Name(log.log_level()) == "WARNING" ||
              TbotsProto::LogLevel_Name(log.log_level()) == "FATAL")
     {
-        //log FATAL as WARNING to prevent program from exiting
+        // log FATAL as WARNING to prevent program from exiting
         level = WARNING;
     }
 
