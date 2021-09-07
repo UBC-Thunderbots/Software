@@ -14,7 +14,10 @@ void PlayInfoWidget::updatePlayInfo(const PlayInfo& play_info)
     std::vector<std::string> tactics;
     for (const auto& [robot_id, tactic] : play_info.robot_tactic_assignment())
     {
-        tactics.emplace_back(std::to_string(robot_id).append("- ").append(tactic.tactic_name()).append("\n"));
+        tactics.emplace_back(std::to_string(robot_id)
+                                 .append("- ")
+                                 .append(tactic.tactic_name())
+                                 .append("\n"));
     }
     std::sort(tactics.begin(), tactics.end());
     for (const auto& next_tactic : tactics)

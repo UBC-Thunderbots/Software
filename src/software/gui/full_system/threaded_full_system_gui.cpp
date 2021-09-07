@@ -17,8 +17,8 @@ ThreadedFullSystemGUI::ThreadedFullSystemGUI(
           WORLD_DRAW_FUNCTIONS_BUFFER_SIZE, false)),
       ai_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<AIDrawFunction>>(
           AI_DRAW_FUNCTIONS_BUFFER_SIZE, false)),
-      play_info_msg_buffer(std::make_shared<ThreadSafeBuffer<PlayInfo>>(
-          PLAY_INFO_MSG_BUFFER_SIZE, false)),
+      play_info_msg_buffer(
+          std::make_shared<ThreadSafeBuffer<PlayInfo>>(PLAY_INFO_MSG_BUFFER_SIZE, false)),
       sensor_msg_buffer(
           std::make_shared<ThreadSafeBuffer<SensorProto>>(SENSOR_MSG_BUFFER_SIZE)),
       view_area_buffer(

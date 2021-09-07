@@ -156,7 +156,7 @@ PlayInfo STP::getPlayInfo()
 {
     std::string info_referee_command = toString(current_game_state.getRefereeCommand());
     std::string info_play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
-    PlayInfo info         = PlayInfo();
+    PlayInfo info              = PlayInfo();
     info.mutable_game_state()->set_referee_command_name(info_referee_command);
     info.mutable_play()->set_play_name(info_play_name);
 
