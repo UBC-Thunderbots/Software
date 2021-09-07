@@ -146,7 +146,8 @@ struct ShadowEnemyFSM
                 event.common.robot.id(), position_to_block, face_ball_orientation, 0,
                 DribblerMode::OFF, BallCollisionType::AVOID,
                 AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+                event.common.robot.robotConstants()));
         };
 
         /**
@@ -206,7 +207,8 @@ struct ShadowEnemyFSM
                 event.common.robot.id(), ball_position, face_ball_orientation, 0,
                 DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
                 AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+                event.common.robot.robotConstants()));
         };
 
 
