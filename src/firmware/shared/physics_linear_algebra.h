@@ -9,8 +9,9 @@
  * \param[in] rhs_len the size of the input vector
  * \param[in] matrix the matrix to multiply
  */
-void matrix_mult(float* lhs, int lhs_len, const float* rhs, int rhs_len,
-                 const float matrix[lhs_len][rhs_len]);
+void shared_physics_linear_algebra_matrixMultiply(float* lhs, int lhs_len,
+                                                  const float* rhs, int rhs_len,
+                                                  const float matrix[lhs_len][rhs_len]);
 
 /**
  * \brief Multiplies a matrix's transpose by a vector.
@@ -21,5 +22,6 @@ void matrix_mult(float* lhs, int lhs_len, const float* rhs, int rhs_len,
  * \param[in] rhs_len the size of the input vector
  * \param[in] matrix the matrix to multiply
  */
-void matrix_mult_t(float* lhs, int lhs_len, const float* rhs, int rhs_len,
-                   const float matrix[lhs_len][rhs_len]);
+void shared_physics_linear_algebra_matrixMultiplyTranspose(
+    float* lhs, int lhs_len, const float* rhs, int rhs_len,
+    const float matrix[lhs_len][rhs_len]);

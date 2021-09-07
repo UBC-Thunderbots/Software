@@ -24,12 +24,15 @@ void app_trajectory_planner_impl_getMaximumSpeedProfile(
             shared_polynomial2d_getCurvatureAtPositionOrder3(path, current_t);
 
         float max_speed = FLT_MAX;
+        // Avoid overflow
         if (max_allowable_acceleration <= 1)
         {
+            // no overflow possible when max_allowable_acceleration
             max_speed = sqrtf(max_allowable_acceleration * radius_of_curvature);
         }
         else if (radius_of_curvature < FLT_MAX / max_allowable_acceleration)
         {
+            // if max_allowable_acceleration is greater than 1 then check for overflow
             max_speed = sqrtf(max_allowable_acceleration * radius_of_curvature);
         }
 

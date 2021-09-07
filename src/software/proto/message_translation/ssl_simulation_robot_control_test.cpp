@@ -2,9 +2,18 @@
 
 #include <gtest/gtest.h>
 
-TEST(SSLSimulationProtoTest, test_create_robot_move_command_stationary)
+#include "shared/2015_robot_constants.h"
+
+class SSLSimulationProtoTest : public ::testing::Test
 {
-    auto move_command = createRobotMoveCommand(0, 0, 0, 0);
+   protected:
+    WheelConstants wheel_constants = create2015WheelConstants();
+};
+
+TEST_F(SSLSimulationProtoTest, test_create_robot_move_command_stationary)
+{
+    auto move_command =
+        createRobotMoveCommand(0, 0, 0, 0, 55, 45, wheel_constants.wheel_radius_meters);
     ASSERT_TRUE(move_command);
 
     // Expect that the local velocity has some positive value, and that there is minimum
@@ -14,9 +23,10 @@ TEST(SSLSimulationProtoTest, test_create_robot_move_command_stationary)
     EXPECT_NEAR(move_command->local_velocity().angular(), 0.0, 1e-5);
 }
 
-TEST(SSLSimulationProtoTest, test_create_robot_move_command_forward)
+TEST_F(SSLSimulationProtoTest, test_create_robot_move_command_forward)
 {
-    auto move_command = createRobotMoveCommand(60, -60, -60, 60);
+    auto move_command = createRobotMoveCommand(60, -60, -60, 60, 55, 45,
+                                               wheel_constants.wheel_radius_meters);
     ASSERT_TRUE(move_command);
 
     // Expect that the local velocity has some positive value, and that there is minimum
@@ -26,9 +36,10 @@ TEST(SSLSimulationProtoTest, test_create_robot_move_command_forward)
     EXPECT_NEAR(move_command->local_velocity().angular(), 0.0, 1e-5);
 }
 
-TEST(SSLSimulationProtoTest, test_create_robot_move_command_backward)
+TEST_F(SSLSimulationProtoTest, test_create_robot_move_command_backward)
 {
-    auto move_command = createRobotMoveCommand(-60, 60, 60, -60);
+    auto move_command = createRobotMoveCommand(-60, 60, 60, -60, 55, 45,
+                                               wheel_constants.wheel_radius_meters);
     ASSERT_TRUE(move_command);
 
     // Expect that the local velocity has some positive value, and that there is minimum
@@ -38,9 +49,10 @@ TEST(SSLSimulationProtoTest, test_create_robot_move_command_backward)
     EXPECT_NEAR(move_command->local_velocity().angular(), 0.0, 1e-5);
 }
 
-TEST(SSLSimulationProtoTest, test_create_robot_command)
+TEST_F(SSLSimulationProtoTest, test_create_robot_command)
 {
-    auto move_command  = createRobotMoveCommand(60, -60, -60, 60);
+    auto move_command  = createRobotMoveCommand(60, -60, -60, 60, 55, 45,
+                                               wheel_constants.wheel_radius_meters);
     auto robot_command = createRobotCommand(1, std::move(move_command), 2.0, 3.0, 4.0);
 
     ASSERT_TRUE(robot_command);
@@ -56,9 +68,10 @@ TEST(SSLSimulationProtoTest, test_create_robot_command)
     EXPECT_NEAR(robot_command->move_command().local_velocity().angular(), 0.0, 1e-5);
 }
 
-TEST(SSLSimulationProtoTest, test_create_robot_command_unset_optional_fields)
+TEST_F(SSLSimulationProtoTest, test_create_robot_command_unset_optional_fields)
 {
-    auto move_command  = createRobotMoveCommand(60, -60, -60, 60);
+    auto move_command  = createRobotMoveCommand(60, -60, -60, 60, 55, 45,
+                                               wheel_constants.wheel_radius_meters);
     auto robot_command = createRobotCommand(1, std::move(move_command), std::nullopt,
                                             std::nullopt, std::nullopt);
 
@@ -76,13 +89,15 @@ TEST(SSLSimulationProtoTest, test_create_robot_command_unset_optional_fields)
     ;
 }
 
-TEST(SSLSimulationProtoTest, test_create_robot_control)
+TEST_F(SSLSimulationProtoTest, test_create_robot_control)
 {
-    auto move_command_1 = createRobotMoveCommand(60, -60, -60, 60);
+    auto move_command_1 = createRobotMoveCommand(60, -60, -60, 60, 55, 45,
+                                                 wheel_constants.wheel_radius_meters);
     auto robot_command_1 =
         createRobotCommand(1, std::move(move_command_1), 2.0, 3.0, 4.0);
 
-    auto move_command_2 = createRobotMoveCommand(-60, 60, 60, -60);
+    auto move_command_2 = createRobotMoveCommand(-60, 60, 60, -60, 55, 45,
+                                                 wheel_constants.wheel_radius_meters);
     auto robot_command_2 =
         createRobotCommand(2, std::move(move_command_2), 4.0, 6.0, 8.0);
 

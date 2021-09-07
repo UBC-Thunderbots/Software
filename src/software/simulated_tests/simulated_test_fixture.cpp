@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <experimental/filesystem>
 
+#include "shared/2015_robot_constants.h"
 #include "software/logger/logger.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
 #include "software/test_util/test_util.h"
@@ -176,7 +177,8 @@ void SimulatedTestFixture::runTest(
     const Duration &timeout)
 {
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
-        field, thunderbots_config->getSimulatorConfig()));
+        field, create2015RobotConstants(), create2015WheelConstants(),
+        thunderbots_config->getSimulatorConfig()));
     simulator->setBallState(ball);
     simulator->addYellowRobots(friendly_robots);
     simulator->addBlueRobots(enemy_robots);

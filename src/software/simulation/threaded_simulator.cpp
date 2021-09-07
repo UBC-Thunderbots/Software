@@ -1,8 +1,10 @@
 #include "software/simulation/threaded_simulator.h"
 
 ThreadedSimulator::ThreadedSimulator(
-    const Field &field, std::shared_ptr<const SimulatorConfig> simulator_config)
-    : simulator(field, simulator_config),
+    const Field &field, const RobotConstants_t &robot_constants,
+    const WheelConstants &wheel_constants,
+    std::shared_ptr<const SimulatorConfig> simulator_config)
+    : simulator(field, robot_constants, wheel_constants, simulator_config),
       simulation_thread_started(false),
       stopping_simulation(false),
       slow_motion_multiplier(1.0)

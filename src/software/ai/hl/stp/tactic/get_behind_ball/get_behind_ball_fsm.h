@@ -35,7 +35,7 @@ struct GetBehindBallFSM
         // obstacles and we risk colliding with something), but large enough we can
         // reasonably get in the region and chip/kick the ball successfully. This
         // value is 'X' in the ASCII art below
-        double size_of_region_behind_ball = 4 * ROBOT_MAX_RADIUS_METERS;
+        double size_of_region_behind_ball = 3 * ROBOT_MAX_RADIUS_METERS;
 
         // ASCII art showing the region behind the ball
         // Diagram not to scale
@@ -70,7 +70,8 @@ struct GetBehindBallFSM
                 event.common.robot.id(), point_behind_ball,
                 event.control_params.chick_direction, 0.0, DribblerMode::OFF,
                 BallCollisionType::AVOID, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0));
+                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+                event.common.robot.robotConstants()));
         };
 
         /**
