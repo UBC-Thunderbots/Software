@@ -66,3 +66,15 @@ py_test(
     ] + PYTHON_BINDINGS,
     deps = NOTEBOOK_DEPS,
 )
+
+py_binary(
+    name = "robot_broadcast_receiver",
+    srcs = ["robot_broadcast_receiver.py"],
+    deps = ["//shared/proto:announcement_py_proto"],
+)
+
+py_binary(
+    name = "robot_broadcast_sender",
+    srcs = ["robot_broadcast_sender.py"],
+    deps = ["//shared/proto:announcement_py_proto"],
+)
