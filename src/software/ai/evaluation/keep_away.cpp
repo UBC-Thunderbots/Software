@@ -24,19 +24,19 @@ double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team)
 
 Point findKeepAwayTargetPoint(const World& world, const Pass& best_pass_so_far)
 {
-    static constexpr auto KEEPAWAY_SEARCH_CIRCLE_RADIUS = 0.75;
+    static constexpr auto KEEPAWAY_SEARCH_CIRCLE_RADIUS = 0.5;
 
     // the width of both the field boundary sigmoid and the circular search region sigmoid
     static constexpr auto SIGMOID_WIDTH = 0.1;
     // the inward offset of the field boundaries to use for the field lines sigmoid
     static constexpr auto FIELD_SIZE_REDUCTION_M = 0.25;
 
-    static constexpr auto GRADIENT_STEPS_PER_ITER = 2;
+    static constexpr auto GRADIENT_STEPS_PER_ITER = 5;
 
     // the parameters for GradientDescentOptimizer were originally tuned for a 4 zone
     // field division. Since we are optimizing over a much smaller "search space",
     // we need to scale the gradient appropriately. Value empirically determined.
-    static constexpr GradientDescentOptimizer<2>::ParamArray PARAM_WEIGHTS = {0.15, 0.15};
+    static constexpr GradientDescentOptimizer<2>::ParamArray PARAM_WEIGHTS = {0.1, 0.1};
 
 
     // the region to which the optimization is (effectively) constrained to

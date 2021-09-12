@@ -51,8 +51,6 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_keep_away)
         Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
     auto enemy_proximity_importance =
         passing_config->getEnemyProximityImportance()->value();
-    // auto enemy_reaction_time = Duration::fromSeconds(0);
-    // auto enemy_proximity_importance = 0.;
 
     // we have to create a Team for the enemy here to evaluate the initial enemy risk
     // score
