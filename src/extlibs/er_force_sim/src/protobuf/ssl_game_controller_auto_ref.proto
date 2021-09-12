@@ -1,0 +1,39 @@
+syntax = "proto2";
+
+import "extlibs/er_force_sim/src/protobuf/ssl_game_controller_common.proto";
+import "extlibs/er_force_sim/src/protobuf/ssl_game_event_2019.proto";
+
+package gameController;
+
+// AutoRefRegistration is the first message that a client must send to the
+// controller to identify itself
+message AutoRefRegistration
+{
+    // identifier is a unique name of the client
+    required string identifier = 1;
+    // signature can optionally be specified to enable secure communication
+    optional Signature signature = 2;
+}
+
+// AutoRefToController is the wrapper message for all subsequent messages from
+// the autoRef to the controller
+message AutoRefToController
+{
+    // reserve fields for removed fields
+    reserved 3, 4;
+    // signature can optionally be specified to enable secure communication
+    optional Signature signature = 1;
+    // game_event is an optional event that the autoRef detected during the game
+    optional GameEvent game_event = 2;
+}
+
+// ControllerToAutoRef is the wrapper message for all messages from controller
+// to autoRef
+message ControllerToAutoRef
+{
+    oneof msg
+    {
+        // a reply from the controller
+        ControllerReply controller_reply = 1;
+    }
+}

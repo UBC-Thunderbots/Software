@@ -108,12 +108,12 @@ cc_library(
     srcs = ["er_force_simulator_robot.cpp"],
     hdrs = ["er_force_simulator_robot.h"],
     deps = [
+        "//extlibs/er_force_sim/src/amun/simulator",
         "//shared:constants",
         "//software/proto:ssl_simulation_cc_proto",
         "//software/proto/message_translation:ssl_simulation_robot_control",
         "//software/simulation:simulator_robot",
         "//software/world:robot_state",
-        "@er_force_sim//src/amun/simulator",
     ],
 )
 
@@ -237,6 +237,7 @@ qt_cc_library(
         ":physics_simulator_ball",
         ":physics_simulator_robot",
         ":simulator_ball_singleton",
+        "//extlibs/er_force_sim/src/amun/simulator",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
         "//shared/parameter:cpp_configs",
@@ -249,7 +250,6 @@ qt_cc_library(
         "//software/world",
         "//software/world:field",
         "//software/world:team_colour",
-        "@er_force_sim//src/amun/simulator",
         "@qt//:qt_core",
         "@qt//:qt_gui",
         "@qt//:qt_widgets",
@@ -268,6 +268,7 @@ cc_library(
         ":physics_simulator_ball",
         ":physics_simulator_robot",
         ":simulator_ball_singleton",
+        "//extlibs/er_force_sim/src/amun/simulator",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
         "//shared/parameter:cpp_configs",
@@ -280,7 +281,6 @@ cc_library(
         "//software/world",
         "//software/world:field",
         "//software/world:team_colour",
-        "@er_force_sim//src/amun/simulator",
     ],
 )
 

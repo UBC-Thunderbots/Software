@@ -1,0 +1,182 @@
+syntax                  = "proto2";
+option cc_enable_arenas = true;
+
+import "extlibs/er_force_sim/src/protobuf/debug.proto";
+import "extlibs/er_force_sim/src/protobuf/gamestate.proto";
+// import "extlibs/er_force_sim/src/protobuf/deprecated/gamestate.proto";
+import "extlibs/er_force_sim/src/protobuf/robot.proto";
+import "extlibs/er_force_sim/src/protobuf/world.proto";
+import "extlibs/er_force_sim/src/protobuf/userinput.proto";
+import "extlibs/er_force_sim/src/protobuf/logfile.proto";
+
+package amun;
+
+// sent out by the strategy to tell that it offers this option
+message StrategyOption
+{
+    required string name        = 1;
+    optional bool default_value = 2;
+}
+
+message StatusStrategy
+{
+    enum STATE
+    {
+        CLOSED    = 1;
+        RUNNING   = 3;
+        FAILED    = 4;
+        COMPILING = 5;
+    };
+    required STATE state                = 1;
+    optional string filename            = 2;
+    optional string name                = 3;
+    optional string current_entry_point = 4;
+    repeated string entry_point         = 5;
+    // deprecated = 6
+    optional bool has_debugger      = 7;
+    repeated StrategyOption options = 8;
+}
+
+message StatusStrategyWrapper
+{
+    enum StrategyType
+    {
+        BLUE          = 1;
+        YELLOW        = 2;
+        AUTOREF       = 3;
+        REPLAY_BLUE   = 4;
+        REPLAY_YELLOW = 5;
+    }
+    required StrategyType type     = 1;
+    required StatusStrategy status = 2;
+}
+
+message Timing
+{
+    optional float blue_total      = 1;
+    optional float blue_path       = 2;
+    optional float yellow_total    = 3;
+    optional float yellow_path     = 4;
+    optional float autoref_total   = 10;
+    optional float tracking        = 5;
+    optional float controller      = 8;
+    optional float transceiver     = 6;
+    optional float transceiver_rtt = 9;
+    optional float simulator       = 7;
+}
+
+message StatusTransceiver
+{
+    required bool active               = 1;
+    optional string error              = 2;
+    optional int32 dropped_usb_packets = 3;
+    optional int32 dropped_commands    = 4;
+}
+
+message PortBindError
+{
+    required uint32 port = 1;
+}
+
+// tells the strategy and ui if an option is enabled or not
+message OptionStatus
+{
+    required string name = 2;
+    required bool value  = 3;
+}
+
+message StatusGameController
+{
+    enum GameControllerState
+    {
+        STOPPED        = 1;
+        STARTING       = 2;
+        RUNNING        = 3;
+        CRASHED        = 4;
+        NOT_RESPONDING = 5;
+    };
+    optional GameControllerState current_state = 1;
+}
+
+message StatusAmun
+{
+    optional PortBindError port_bind_error        = 1;
+    repeated OptionStatus options                 = 2;
+    optional StatusGameController game_controller = 3;
+}
+
+// The status message is dumped for log replay
+// -> take care not to break compatibility!
+// WARNING: every message containing timestamps must be rewritten in the
+// logcutter
+message Status
+{
+    required int64 time = 1;
+    // optional deprecated.amun.GameState game_state_deprecated = 2;
+    optional GameState game_state             = 15;
+    optional world.State world_state          = 3;
+    optional world.Geometry geometry          = 4;
+    optional robot.Team team_blue             = 5;
+    optional robot.Team team_yellow           = 6;
+    optional StatusStrategy strategy_blue     = 7;   // deprecated
+    optional StatusStrategy strategy_yellow   = 8;   // deprecated
+    optional StatusStrategy strategy_autoref  = 18;  // deprecated
+    repeated DebugValues debug                = 10;
+    optional Timing timing                    = 11;
+    repeated robot.RadioCommand radio_command = 12;
+    optional StatusTransceiver transceiver    = 13;
+    // deprecated = 14;
+    optional UserInput user_input_blue             = 16;
+    optional UserInput user_input_yellow           = 17;
+    optional StatusAmun amun_state                 = 19;
+    optional float timer_scaling                   = 20;
+    optional bool blue_running                     = 21;
+    optional bool yellow_running                   = 22;
+    optional bool autoref_running                  = 26;
+    optional world.State execution_state           = 23;
+    optional GameState execution_game_state        = 24;
+    optional UserInput execution_user_input        = 25;
+    optional logfile.Uid log_id                    = 27;
+    optional uint64 original_frame_number          = 28;
+    optional StatusStrategyWrapper status_strategy = 29;
+    optional UiResponse pure_ui_response =
+        30;  // NOTE: ANY STATUS containing this message will not be serialized in
+             // a log.
+}
+
+// This message can be used for pure user-ui-response.
+// It will be cut out when writing to log, therefore modifications
+// can be done without breaking log compatibility.
+// DO NOT use this message for information that could be useful in a logfile!
+// DO NOT add a UIResponse to a normal Status, send a NEW STATUS instead.
+message UiResponse
+{
+    optional bool enable_logging  = 1;
+    optional bool is_logging      = 2;
+    repeated Status logger_status = 3;  // used for the plotter right now
+    optional bool playback_burst_end =
+        4;  // used to notify logslider to update its position to Status::time
+    optional bool playback_paused     = 5;
+    optional LogPlaybackInfo log_info = 6;
+    optional int64 frame_number       = 7;
+    optional bool force_ra_horus      = 8;  // true if forced Ra, false if forced Horus
+    optional LogfileOpenInfo log_open = 9;
+    optional string export_visionlog_error = 10;
+    optional string requested_log_uid      = 11;
+    optional logfile.LogOffer log_offers   = 12;
+    optional string log_uid_parser_error   = 13;
+}
+
+message LogPlaybackInfo
+{
+    required int64 start_time   = 1;
+    required int64 duration     = 2;
+    required int64 packet_count = 3;
+}
+
+message LogfileOpenInfo
+{
+    required bool success = 1;
+    required string filename =
+        2;  // filename if success = true, error-message if success = false
+}

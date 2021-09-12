@@ -1,0 +1,28 @@
+syntax = "proto2";
+
+import "extlibs/er_force_sim/src/protobuf/ssl_vision_wrapper_tracked.proto";
+import "extlibs/er_force_sim/src/protobuf/ssl_gc_api.proto";
+import "extlibs/er_force_sim/src/protobuf/ssl_referee.proto";
+import "extlibs/er_force_sim/src/protobuf/ssl_geometry.proto";
+
+package gameController;
+
+// The input format to the GC
+message CiInput
+{
+    // New unix timestamp in [ns] for the GC
+    optional int64 timestamp = 1;
+    // New tracker packet with ball and robot data
+    optional TrackerWrapperPacket tracker_packet = 2;
+    // (UI) API input
+    repeated Input api_inputs = 3;
+    // Update geometry
+    optional SSL_GeometryData geometry = 4;
+}
+
+// The output format of the GC response
+message CiOutput
+{
+    // Latest referee message
+    optional SSL_Referee referee_msg = 1;
+}

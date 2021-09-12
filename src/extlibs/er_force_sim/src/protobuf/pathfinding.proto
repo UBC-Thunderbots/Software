@@ -1,0 +1,145 @@
+syntax = "proto2";
+
+package pathfinding;
+
+message Vector
+{
+    optional float x = 1;
+    optional float y = 2;
+};
+
+// static obstacles
+message CircleObstacle
+{
+    optional Vector center = 1;
+};
+
+message RectObstacle
+{
+    optional Vector bottom_left = 1;
+    optional Vector top_right   = 2;
+};
+
+message TriangleObstacle
+{
+    optional Vector p1 = 1;
+    optional Vector p2 = 2;
+    optional Vector p3 = 3;
+};
+
+message LineObstacle
+{
+    optional Vector start = 1;
+    optional Vector end   = 2;
+};
+
+// moving obstacles
+message MovingCircleObstacle
+{
+    optional Vector start_pos = 1;
+    optional Vector speed     = 2;
+    optional Vector acc       = 3;
+    optional float start_time = 4;
+    optional float end_time   = 5;
+};
+
+message MovingLineObstacle
+{
+    optional Vector start_pos1 = 1;
+    optional Vector speed1     = 2;
+    optional Vector acc1       = 3;
+    optional Vector start_pos2 = 4;
+    optional Vector speed2     = 5;
+    optional Vector acc2       = 6;
+    optional float start_time  = 7;
+    optional float end_time    = 8;
+};
+
+message TrajectoryPoint
+{
+    optional Vector pos   = 1;
+    optional Vector speed = 2;
+    optional float time   = 3;
+};
+
+message FriendlyRobotObstacle
+{
+    repeated TrajectoryPoint robot_trajectory = 1;
+};
+
+message Obstacle
+{
+    optional string name  = 1;
+    optional int32 prio   = 2;
+    optional float radius = 3;
+
+    oneof obstacle
+    {
+        CircleObstacle circle     = 4;
+        RectObstacle rectangle    = 5;
+        TriangleObstacle triangle = 6;
+        LineObstacle line         = 7;
+        // reserved: 8
+        MovingCircleObstacle moving_circle   = 9;
+        MovingLineObstacle moving_line       = 10;
+        FriendlyRobotObstacle friendly_robot = 11;
+    };
+};
+
+message WorldState
+{
+    repeated Obstacle obstacles           = 1;
+    optional uint32 out_of_field_priority = 2;
+    optional RectObstacle boundary        = 3;
+    optional float radius                 = 4;
+    optional uint32 robot_id              = 5;
+};
+
+message TrajectoryInput
+{
+    optional Vector v0          = 1;
+    optional Vector v1          = 2;
+    optional Vector distance    = 3;
+    optional Vector s0          = 4;
+    optional Vector s1          = 5;
+    optional float max_speed    = 6;
+    optional float acceleration = 7;
+};
+
+enum InputSourceType
+{
+    None                  = 0;
+    AllSamplers           = 1;
+    StandardSampler       = 2;
+    EndInObstacleSampler  = 3;
+    EscapeObstacleSampler = 4;
+};
+
+message PathFindingTask
+{
+    optional WorldState state      = 1;
+    optional TrajectoryInput input = 2;
+    optional InputSourceType type  = 3;
+}
+
+// these messages are for defining the pre-computed values to use during
+// run-time
+message StandardSamplerPoint
+{
+    optional float time        = 1;
+    optional float angle       = 2;
+    optional float mid_speed_x = 3;
+    optional float mid_speed_y = 4;
+};
+
+message StandardSamplerPrecomputationSegment
+{
+    repeated StandardSamplerPoint precomputed_points = 1;
+    optional float min_distance                      = 2;
+    optional float max_distance                      = 3;
+};
+
+message StandardSamplerPrecomputation
+{
+    repeated StandardSamplerPrecomputationSegment segments = 1;
+};

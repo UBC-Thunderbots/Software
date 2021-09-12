@@ -1,5 +1,7 @@
 #pragma once
 
+#include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
+#include "extlibs/er_force_sim/src/core/timer.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/proto/defending_side_msg.pb.h"
@@ -11,8 +13,6 @@
 #include "software/world/field.h"
 #include "software/world/team_types.h"
 #include "software/world/world.h"
-#include "src/amun/simulator/simulator.h"
-#include "src/core/timer.h"
 
 extern "C"
 {

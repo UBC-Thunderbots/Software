@@ -1,0 +1,85 @@
+syntax = "proto2";
+
+import "extlibs/er_force_sim/src/protobuf/ssl_game_controller_geometry.proto";
+import "extlibs/er_force_sim/src/protobuf/ssl_game_controller_common.proto";
+
+package gameController;
+
+// The GC state contains settings and state independent of the match state
+message GcState
+{
+    // The state of each team
+    map<string, GcStateTeam> team_state = 1;
+
+    // the states of the auto referees
+    map<string, GcStateAutoRef> auto_ref_state = 2;
+
+    // the states of the attached trackers
+    map<string, GcStateTracker> tracker_state = 3;
+
+    // the state of the currently selected tracker
+    optional GcStateTracker tracker_state_gc = 4;
+
+    // can the match be continued right now?
+    optional bool ready_to_continue = 5;
+}
+
+// The GC state for a singl eteam
+message GcStateTeam
+{
+    // true: The team is connected
+    optional bool connected = 1;
+
+    // true: The team connected via TLS with a verified certificate
+    optional bool connection_verified = 2;
+
+    // true: The remote control for the team is connected
+    optional bool remote_control_connected = 3;
+
+    // true: The remote control for the team connected via TLS with a verified
+    // certificate
+    optional bool remote_control_connection_verified = 4;
+}
+
+// The GC state of an auto referee
+message GcStateAutoRef
+{
+    // true: The autoRef connected via TLS with a verified certificate
+    optional bool connection_verified = 1;
+}
+
+// GC state of a tracker
+message GcStateTracker
+{
+    // Name of the source
+    optional string source_name = 1;
+
+    // UUID of the source
+    optional string uuid = 4;
+
+    // Current ball
+    optional Ball ball = 2;
+
+    // Current robots
+    repeated Robot robots = 3;
+}
+
+// The ball state
+message Ball
+{
+    // ball position [m]
+    optional Vector3 pos = 1;
+
+    // ball velocity [m/s]
+    optional Vector3 vel = 2;
+}
+
+// The robot state
+message Robot
+{
+    // robot id and team
+    optional BotId id = 1;
+
+    // robot position [m]
+    optional Vector2 pos = 2;
+}

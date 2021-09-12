@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+import "extlibs/er_force_sim/src/protobuf/grsim_commands.proto";
+import "extlibs/er_force_sim/src/protobuf/grsim_replacement.proto";
+
+message grSim_Packet
+{
+    optional grSim_Commands commands       = 1;
+    optional grSim_Replacement replacement = 2;
+}

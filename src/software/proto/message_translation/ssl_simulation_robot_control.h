@@ -1,8 +1,8 @@
 #pragma once
 
+#include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
 #include "software/proto/ssl_simulation_robot_control.pb.h"
 #include "software/proto/ssl_simulation_robot_feedback.pb.h"
-#include "src/amun/simulator/simulator.h"
 
 /**
  * Creates a RobotMoveCommand proto

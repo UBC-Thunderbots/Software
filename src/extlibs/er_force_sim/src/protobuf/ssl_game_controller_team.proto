@@ -1,0 +1,50 @@
+syntax = "proto2";
+
+import "extlibs/er_force_sim/src/protobuf/ssl_game_controller_common.proto";
+
+package gameController;
+
+// a registration that must be send by teams and autoRefs to the controller as
+// the very first message
+message TeamRegistration
+{
+    // the exact team name as published by the game-controller
+    required string team_name = 1;
+    // signature can optionally be specified to enable secure communication
+    optional Signature signature = 2;
+}
+
+// wrapper for all messages from a team's computer to the controller
+message TeamToController
+{
+    // signature can optionally be specified to enable secure communication
+    optional Signature signature = 1;
+
+    // reserve obsolete field ids
+    reserved 3;
+
+    oneof msg
+    {
+        // request a new desired keeper id
+        // this is only allowed during STOP and will be rejected otherwise
+        int32 desired_keeper = 2;
+        // request to substitute a robot at the next possibility
+        bool substitute_bot = 4;
+        // send a ping to the GC to test if the connection is still open.
+        // the value is ignored and a reply is sent back
+        bool ping = 5;
+    }
+}
+
+// wrapper for all messages from controller to a team's computer
+message ControllerToTeam
+{
+    // reserve obsolete field ids
+    reserved 2;
+
+    oneof msg
+    {
+        // a reply from the controller
+        ControllerReply controller_reply = 1;
+    }
+}

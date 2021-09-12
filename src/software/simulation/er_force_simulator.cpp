@@ -7,13 +7,13 @@
 #include <QtCore/QString>
 #include <iostream>
 
+#include "extlibs/er_force_sim/src/protobuf/robot.h"
 #include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "software/proto/message_translation/ssl_detection.h"
 #include "software/proto/message_translation/ssl_geometry.h"
 #include "software/proto/message_translation/ssl_wrapper.h"
 #include "software/simulation/er_force_simulator_robot_singleton.h"
 #include "software/simulation/simulator_ball_singleton.h"
-#include "src/protobuf/robot.h"
 
 extern "C"
 {

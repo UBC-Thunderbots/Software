@@ -1,0 +1,13 @@
+syntax                  = "proto2";
+option cc_enable_arenas = true;
+
+import "extlibs/er_force_sim/src/protobuf/robot.proto";
+import "extlibs/er_force_sim/src/protobuf/command.proto";
+package amun;
+
+// for strategy
+message UserInput
+{
+    repeated robot.RadioCommand radio_command   = 1;
+    repeated amun.RobotMoveCommand move_command = 2;
+}

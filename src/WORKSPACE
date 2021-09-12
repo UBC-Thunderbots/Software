@@ -73,12 +73,6 @@ load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
 
 boost_deps()
 
-git_repository(
-    name = "er_force_sim",
-    commit = "1717eb2ee7f25abb753d9cf62490bdb54e6fd992",
-    remote = "https://github.com/jonathanlew/er_force_sim",
-)
-
 new_git_repository(
     name = "eigen",
     build_file = "@//external:eigen.BUILD",
