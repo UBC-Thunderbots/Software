@@ -10,15 +10,6 @@ extern "C"
 #include "shared/proto/tbots_software_msgs.nanopb.h"
 }
 
-// TODO (#2066): The JERK_LIMIT is copied from firmware/main/control/control.h
-// which we currently can't include directly because it relies on firmware IO.
-// We should inject it as a robot or control param instead.
-#define JERK_LIMIT 40.0f  //(m/s^3)
-// TODO (#2066): The WHEEL_MOTOR_PHASE_RESISTANCE is copied from firmware/main/io/wheels.h
-// which we currently can't include directly because it is in firmware IO.
-// We should inject it as a robot or control param instead.
-#define WHEEL_MOTOR_PHASE_RESISTANCE 1.2f  // ohms—EC45 datasheet
-
 std::shared_ptr<ErForceSimulatorRobot>
     ErForceSimulatorRobotSingleton::er_force_simulator_robot = nullptr;
 
@@ -234,14 +225,8 @@ ErForceSimulatorRobotSingleton::createFirmwareRobot()
         &(ErForceSimulatorRobotSingleton::dribblerCoast),
         &(ErForceSimulatorRobotSingleton::getDribblerTemperatureDegC));
 
-    VelocityWheelConstants_t wheel_constants;
-    wheel_constants.wheel_rotations_per_motor_rotation  = GEAR_RATIO;
-    wheel_constants.wheel_radius                        = WHEEL_RADIUS;
-    wheel_constants.motor_max_voltage_before_wheel_slip = WHEEL_SLIP_VOLTAGE_LIMIT;
-    wheel_constants.motor_back_emf_per_rpm              = RPM_TO_VOLT;
-    wheel_constants.motor_phase_resistance              = WHEEL_MOTOR_PHASE_RESISTANCE;
-    wheel_constants.motor_current_per_unit_torque       = CURRENT_PER_TORQUE;
-    VelocityWheel_t* front_left_wheel                   = app_velocity_wheel_create(
+    WheelConstants_t wheel_constants  = create2021WheelConstants();
+    VelocityWheel_t* front_left_wheel = app_velocity_wheel_create(
         &(ErForceSimulatorRobotSingleton::setTargetRPMFrontLeft),
         &(ErForceSimulatorRobotSingleton::getMotorSpeedFrontLeft),
         &(ErForceSimulatorRobotSingleton::brakeMotorFrontLeft),
@@ -262,13 +247,8 @@ ErForceSimulatorRobotSingleton::createFirmwareRobot()
         &(ErForceSimulatorRobotSingleton::brakeMotorBackRight),
         &(ErForceSimulatorRobotSingleton::coastMotorBackRight), wheel_constants);
 
-    const RobotConstants_t robot_constants = {
-        .mass              = ROBOT_POINT_MASS,
-        .moment_of_inertia = INERTIA,
-        .robot_radius      = ROBOT_RADIUS,
-        .jerk_limit        = JERK_LIMIT,
-    };
-    ControllerState_t* controller_state = new ControllerState_t{
+    const RobotConstants_t robot_constants = create2021RobotConstants();
+    ControllerState_t* controller_state    = new ControllerState_t{
         .last_applied_acceleration_x       = 0,
         .last_applied_acceleration_y       = 0,
         .last_applied_acceleration_angular = 0,

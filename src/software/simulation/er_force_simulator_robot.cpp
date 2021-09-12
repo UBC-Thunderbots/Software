@@ -3,10 +3,14 @@
 #include "shared/constants.h"
 #include "software/proto/message_translation/ssl_simulation_robot_control.h"
 
-ErForceSimulatorRobot::ErForceSimulatorRobot(const RobotStateWithId& robot_state_with_id)
+ErForceSimulatorRobot::ErForceSimulatorRobot(const RobotStateWithId& robot_state_with_id,
+                                             RobotConstants_t robot_constants,
+                                             WheelConstants_t wheel_constants)
     : dribbler_ball_contact(true),
       id(robot_state_with_id.id),
-      robot_state(robot_state_with_id.robot_state)
+      robot_state(robot_state_with_id.robot_state),
+      robot_constants(robot_constants),
+      wheel_constants(wheel_constants)
 {
 }
 
@@ -22,9 +26,10 @@ void ErForceSimulatorRobot::setRobotState(const RobotState& robot_state)
 
 std::unique_ptr<sslsim::RobotCommand> ErForceSimulatorRobot::getRobotCommand()
 {
-    auto move_command =
-        createRobotMoveCommand(wheel_speed_front_right, wheel_speed_front_left,
-                               wheel_speed_back_left, wheel_speed_back_right);
+    auto move_command = createRobotMoveCommand(
+        wheel_speed_front_right, wheel_speed_front_left, wheel_speed_back_left,
+        wheel_speed_back_right, robot_constants.front_wheel_angle_deg,
+        robot_constants.back_wheel_angle_deg, wheel_constants.wheel_radius_meters);
 
     if (dribbler_ball_contact)
     {
@@ -248,15 +253,19 @@ std::array<float, 4> ErForceSimulatorRobot::getMotorSpeeds() const
     auto local_velocity = robot_state.velocity().rotate(-robot_state.orientation());
     float robot_local_speed[3]{
         static_cast<float>(local_velocity.x()), static_cast<float>(local_velocity.y()),
-        static_cast<float>(robot_state.angularVelocity().toRadians() * ROBOT_RADIUS)};
+        static_cast<float>(robot_state.angularVelocity().toRadians() *
+                           ROBOT_MAX_RADIUS_METERS)};
     float wheel_speeds[4]{0.0, 0.0, 0.0, 0.0};
-    speed3_to_speed4(robot_local_speed, wheel_speeds);
+    shared_physics_speed3ToSpeed4(robot_local_speed, wheel_speeds,
+                                  robot_constants.front_wheel_angle_deg,
+                                  robot_constants.back_wheel_angle_deg);
     std::array<float, 4> motor_speeds = {0.0, 0.0, 0.0, 0.0};
     for (unsigned int i = 0; i < 4; i++)
     {
         // Convert to m/s to RPM then divide by gear ratio to get motor speed
-        motor_speeds[i] =
-            (wheel_speeds[i] * 60.0f / (2.0f * (float)M_PI * WHEEL_RADIUS)) / GEAR_RATIO;
+        motor_speeds[i] = (wheel_speeds[i] * 60.0f /
+                           (2.0f * (float)M_PI * wheel_constants.wheel_radius_meters)) /
+                          wheel_constants.wheel_rotations_per_motor_rotation;
     }
     return motor_speeds;
 }

@@ -51,9 +51,11 @@ ErForceSimulator::~ErForceSimulator()
 }
 
 ErForceSimulator::ErForceSimulator(
-    const Field& field, std::shared_ptr<const SimulatorConfig> simulator_config,
+    const Field& field, const RobotConstants_t& robot_constants,
+    const WheelConstants& wheel_constants,
+    std::shared_ptr<const SimulatorConfig> simulator_config,
     const Duration& physics_time_step)
-    : physics_world(field, simulator_config),
+    : physics_world(field, robot_constants, wheel_constants, simulator_config),
       yellow_team_vision_msg(),
       blue_team_vision_msg(),
       frame_number(0),

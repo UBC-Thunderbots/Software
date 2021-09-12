@@ -42,7 +42,8 @@ class ErForceSimulator : public QObject
      * @param physics_time_step The time step used to simulated physics
      * and robot primitives.
      */
-    explicit ErForceSimulator(const Field& field,
+    explicit ErForceSimulator(const Field& field, const RobotConstants_t& robot_constants,
+                              const WheelConstants& wheel_constants,
                               std::shared_ptr<const SimulatorConfig> simulator_config,
                               const Duration& physics_time_step = Duration::fromSeconds(
                                   DEFAULT_PHYSICS_TIME_STEP_SECONDS));

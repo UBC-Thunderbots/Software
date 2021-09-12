@@ -28,8 +28,12 @@ class ErForceSimulatorRobot : public SimulatorRobot
      * Create a new ErForceSimulatorRobot given robot id and state
      *
      * @param robot_state the robot state with id
+     * @param robot_constants The robot constants
+     * @param wheel_constants The wheel constants
      */
-    explicit ErForceSimulatorRobot(const RobotStateWithId& robot_state_with_id);
+    explicit ErForceSimulatorRobot(const RobotStateWithId& robot_state_with_id,
+                                   RobotConstants_t robot_constants,
+                                   WheelConstants_t wheel_constants);
 
     /**
      * Returns the ID of this robot
@@ -268,4 +272,7 @@ class ErForceSimulatorRobot : public SimulatorRobot
     std::optional<float> kick_speed;       // [m/s]
     std::optional<float> kick_angle;       // [degree]
     std::optional<double> dribbler_speed;  // [rpm]
+
+    RobotConstants_t robot_constants;
+    WheelConstants_t wheel_constants;
 };
