@@ -56,7 +56,7 @@ int main(int argc, char **argv)
             NETWORK_LOGS_PORT, std::function(robotLogReceiver), true);
 
 
-        LOG(INFO) << "Network logger listenting on channel "
+        LOG(INFO) << "Network logger listening on channel "
                   << NETWORK_LOGGING_MULTICAST_CHANNELS[channel] << " and interface "
                   << interface << std::endl;
 
