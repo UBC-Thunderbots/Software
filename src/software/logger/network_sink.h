@@ -12,7 +12,7 @@
  * This class acts as a custom sink for g3log. In particular, it allows us to log to
  * multicast channels from robots
  */
-class NetworkSinc
+class NetworkSink
 {
    public:
     /**
