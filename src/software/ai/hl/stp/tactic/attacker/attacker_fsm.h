@@ -145,7 +145,6 @@ struct AttackerFSM
          *
          * @return if the ball should be kicked
          */
-        // TODO: revisit this, we shouldn't "panic chip" unless we're completely boxed in!
         const auto should_kick = [](auto event) {
             // check for enemy threat
             Circle about_to_steal_danger_zone(event.common.robot.position(),
