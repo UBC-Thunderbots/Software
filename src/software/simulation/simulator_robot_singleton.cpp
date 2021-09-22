@@ -1,6 +1,6 @@
 #include "software/simulation/simulator_robot_singleton.h"
 
-#include "shared/proto/robot_log_msg.pb.h"
+#include "proto/robot_log_msg.pb.h"
 
 extern "C"
 {

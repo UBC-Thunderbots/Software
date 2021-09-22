@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "shared/proto/robot_log_msg.nanopb.h"
+#include "proto/robot_log_msg.nanopb.h"
 
 typedef struct Logger
 {

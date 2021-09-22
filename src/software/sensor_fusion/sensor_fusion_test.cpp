@@ -2,10 +2,10 @@
 
 #include <gtest/gtest.h>
 
+#include "proto/message_translation/ssl_detection.h"
+#include "proto/message_translation/ssl_geometry.h"
+#include "proto/message_translation/ssl_wrapper.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/proto/message_translation/ssl_detection.h"
-#include "software/proto/message_translation/ssl_geometry.h"
-#include "software/proto/message_translation/ssl_wrapper.h"
 
 class SensorFusionTest : public ::testing::Test
 {

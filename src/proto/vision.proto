@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package TbotsProto;
+
+import "proto/geometry.proto";
+
+message RobotState
+{
+    Point global_position                   = 1;
+    Angle global_orientation                = 2;
+    Vector global_velocity                  = 3;
+    AngularVelocity global_angular_velocity = 4;
+}
+
+message BallState
+{
+    Point global_position  = 1;
+    Vector global_velocity = 2;
+}

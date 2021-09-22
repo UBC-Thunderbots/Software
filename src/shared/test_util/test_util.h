@@ -4,7 +4,7 @@
 
 #include <chrono>
 
-#include "shared/proto/robot_log_msg.nanopb.h"
+#include "proto/robot_log_msg.nanopb.h"
 #include "shared/robot_constants.h"
 
 namespace TestUtil

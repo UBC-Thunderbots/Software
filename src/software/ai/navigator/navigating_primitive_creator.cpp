@@ -1,8 +1,8 @@
 #include "software/ai/navigator/navigating_primitive_creator.h"
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
-#include "software/proto/message_translation/tbots_protobuf.h"
 
 NavigatingPrimitiveCreator::NavigatingPrimitiveCreator(
     std::shared_ptr<const NavigatorConfig> config)

@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "firmware/boards/robot_stm32h7/usart.h"
-#include "shared/proto/robot_log_msg.nanopb.h"
+#include "proto/robot_log_msg.nanopb.h"
 
 static char g_robot_log_buffer[TbotsProto_RobotLog_size];
 static UART_HandleTypeDef* g_uart_handle;

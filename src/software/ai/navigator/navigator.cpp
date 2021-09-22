@@ -1,10 +1,10 @@
 #include "software/ai/navigator/navigator.h"
 
+#include "proto/message_translation/tbots_protobuf.h"
+#include "proto/primitive/primitive_msg_factory.h"
 #include "software/ai/navigator/navigating_primitive_creator.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
-#include "software/proto/message_translation/tbots_protobuf.h"
-#include "software/proto/primitive/primitive_msg_factory.h"
 
 Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
                      RobotNavigationObstacleFactory robot_navigation_obstacle_factory,

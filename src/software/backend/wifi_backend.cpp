@@ -1,15 +1,15 @@
 #include "software/backend/wifi_backend.h"
 
+#include "proto/message_translation/defending_side.h"
+#include "proto/message_translation/tbots_protobuf.h"
+#include "proto/primitive/primitive_msg_factory.h"
+#include "proto/robot_log_msg.pb.h"
 #include "shared/constants.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "shared/proto/robot_log_msg.pb.h"
 #include "software/constants.h"
 #include "software/estop/boost_uart_communication.h"
 #include "software/estop/threaded_estop_reader.h"
 #include "software/logger/logger.h"
-#include "software/proto/message_translation/defending_side.h"
-#include "software/proto/message_translation/tbots_protobuf.h"
-#include "software/proto/primitive/primitive_msg_factory.h"
 #include "software/util/design_patterns/generic_factory.h"
 
 

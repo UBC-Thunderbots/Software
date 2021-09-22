@@ -5,12 +5,12 @@ cc_library(
     srcs = ["sensor_fusion.cpp"],
     hdrs = ["sensor_fusion.h"],
     deps = [
+        "//proto:sensor_msg_cc_proto",
+        "//proto/message_translation:ssl_detection",
+        "//proto/message_translation:ssl_geometry",
+        "//proto/message_translation:ssl_referee",
         "//shared/parameter:cpp_configs",
         "//software/logger",
-        "//software/proto:sensor_msg_cc_proto",
-        "//software/proto/message_translation:ssl_detection",
-        "//software/proto/message_translation:ssl_geometry",
-        "//software/proto/message_translation:ssl_referee",
         "//software/sensor_fusion/filter:sensor_fusion_filters",
         "//software/sensor_fusion/filter:vision_detection",
         "//software/world",
@@ -22,10 +22,10 @@ cc_test(
     srcs = ["sensor_fusion_test.cpp"],
     deps = [
         ":sensor_fusion",
+        "//proto/message_translation:ssl_detection",
+        "//proto/message_translation:ssl_geometry",
+        "//proto/message_translation:ssl_wrapper",
         "//shared/test_util:tbots_gtest_main",
-        "//software/proto/message_translation:ssl_detection",
-        "//software/proto/message_translation:ssl_geometry",
-        "//software/proto/message_translation:ssl_wrapper",
     ],
 )
 

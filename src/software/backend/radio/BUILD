@@ -26,7 +26,7 @@ cc_library(
     srcs = ["robot_status.cpp"],
     hdrs = ["robot_status.h"],
     deps = [
-        "//shared/proto:tbots_cc_proto",
+        "//proto:tbots_cc_proto",
         "//software/backend/radio/mrf:messages",
         "//software/logger",
     ],
