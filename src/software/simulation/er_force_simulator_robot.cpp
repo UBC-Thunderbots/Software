@@ -1,7 +1,7 @@
 #include "software/simulation/er_force_simulator_robot.h"
 
 #include "shared/constants.h"
-#include "software/proto/message_translation/ssl_simulation_robot_control.h"
+#include "proto/message_translation/ssl_simulation_robot_control.h"
 
 ErForceSimulatorRobot::ErForceSimulatorRobot(const RobotStateWithId& robot_state_with_id,
                                              RobotConstants_t robot_constants,
@@ -24,7 +24,7 @@ void ErForceSimulatorRobot::setRobotState(const RobotState& robot_state)
     this->robot_state = robot_state;
 }
 
-std::unique_ptr<sslsim::RobotCommand> ErForceSimulatorRobot::getRobotCommand()
+std::unique_ptr<SSLSimulationProto::RobotCommand> ErForceSimulatorRobot::getRobotCommand()
 {
     auto move_command = createRobotMoveCommand(
         wheel_speed_front_right, wheel_speed_front_left, wheel_speed_back_left,

@@ -1,5 +1,5 @@
 from .proto_log import ProtoLog
-from software.proto.sensor_msg_pb2 import SensorProto
+from proto.sensor_msg_pb2 import SensorProto
 from google.protobuf.message import Message
 from typing import List, Dict
 

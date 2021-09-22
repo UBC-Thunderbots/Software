@@ -4,8 +4,8 @@
 
 #include <chrono>
 
+#include "proto/robot_log_msg.nanopb.h"
 #include "shared/constants.h"
-#include "shared/proto/robot_log_msg.nanopb.h"
 #include "software/geom/algorithms/almost_equal.h"
 #include "software/geom/geom_constants.h"
 #include "software/geom/point.h"

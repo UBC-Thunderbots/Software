@@ -1,13 +1,13 @@
 #include "software/simulation/er_force_simulator_robot_singleton.h"
 
-#include "shared/proto/robot_log_msg.pb.h"
+#include "proto/robot_log_msg.pb.h"
 
 extern "C"
 {
 #include "firmware/app/logger/logger.h"
 #include "firmware/app/world/charger.h"
 #include "firmware/app/world/velocity_wheel.h"
-#include "shared/proto/tbots_software_msgs.nanopb.h"
+#include "proto/tbots_software_msgs.nanopb.h"
 }
 
 std::shared_ptr<ErForceSimulatorRobot>

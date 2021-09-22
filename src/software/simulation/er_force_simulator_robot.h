@@ -4,8 +4,8 @@
 #include <memory>
 
 #include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
-#include "software/proto/ssl_simulation_robot_control.pb.h"
-#include "software/proto/ssl_simulation_robot_feedback.pb.h"
+#include "proto/ssl_simulation_robot_control.pb.h"
+#include "proto/ssl_simulation_robot_feedback.pb.h"
 #include "software/simulation/firmware_object_deleter.h"
 #include "software/simulation/simulator_robot.h"
 #include "software/world/robot_state.h"
@@ -13,7 +13,7 @@
 extern "C"
 {
 #include "firmware/app/primitives/primitive_manager.h"
-#include "shared/proto/primitive.nanopb.h"
+#include "proto/primitive.nanopb.h"
 }
 
 /**
@@ -54,7 +54,7 @@ class ErForceSimulatorRobot : public SimulatorRobot
      *
      * @return the current robot command
      */
-    std::unique_ptr<sslsim::RobotCommand> getRobotCommand();
+    std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommand();
 
     /**
      * Sets the robot feedback

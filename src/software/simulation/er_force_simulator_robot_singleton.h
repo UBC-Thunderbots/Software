@@ -15,8 +15,8 @@ extern "C"
 #include "firmware/app/world/firmware_robot.h"
 #include "firmware/app/world/force_wheel.h"
 #include "firmware/shared/physics.h"
-#include "shared/proto/primitive.nanopb.h"
-#include "shared/proto/robot_log_msg.nanopb.h"
+#include "proto/primitive.nanopb.h"
+#include "proto/robot_log_msg.nanopb.h"
 #include "software/simulation/firmware_object_deleter.h"
 }
 

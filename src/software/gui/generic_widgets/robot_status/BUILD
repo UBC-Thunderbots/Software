@@ -17,7 +17,7 @@ qt_cc_library(
     srcs = ["robot_status_table.cpp"],
     hdrs = ["robot_status_table.h"],
     deps = [
-        "//shared/proto:tbots_cc_proto",
+        "//proto:tbots_cc_proto",
         "//software/time:duration",
         "@qt//:qt_core",
         "@qt//:qt_widgets",

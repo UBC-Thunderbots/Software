@@ -2,9 +2,9 @@
 
 #include <QtWidgets/QGraphicsScene>
 
+#include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "shared/robot_constants.h"
 #include "software/gui/drawing/draw_functions.h"
-#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 
 /**
  * This file contains all the functions that allow us to draw the contents

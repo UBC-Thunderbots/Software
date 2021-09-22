@@ -2,9 +2,9 @@
 
 #include <gtest/gtest.h>
 
+#include "proto/message_translation/primitive_google_to_nanopb_converter.h"
+#include "proto/primitive/primitive_msg_factory.h"
 #include "shared/2015_robot_constants.h"
-#include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
-#include "software/proto/primitive/primitive_msg_factory.h"
 #include "software/test_util/test_util.h"
 
 class ThreadedSimulatorTest : public ::testing::Test

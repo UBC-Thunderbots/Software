@@ -1,6 +1,6 @@
 #include "shared/test_util/test_util.h"
 
-#include "shared/proto/robot_log_msg.pb.h"
+#include "proto/robot_log_msg.pb.h"
 #include "software/logger/logger.h"
 
 namespace TestUtil

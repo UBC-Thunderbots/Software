@@ -8,10 +8,10 @@
 #include <iostream>
 
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
-#include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
-#include "software/proto/message_translation/ssl_detection.h"
-#include "software/proto/message_translation/ssl_geometry.h"
-#include "software/proto/message_translation/ssl_wrapper.h"
+#include "proto/message_translation/primitive_google_to_nanopb_converter.h"
+#include "proto/message_translation/ssl_detection.h"
+#include "proto/message_translation/ssl_geometry.h"
+#include "proto/message_translation/ssl_wrapper.h"
 #include "software/simulation/er_force_simulator_robot_singleton.h"
 #include "software/simulation/simulator_ball_singleton.h"
 
@@ -21,7 +21,7 @@ extern "C"
 #include "firmware/app/world/firmware_ball.h"
 #include "firmware/app/world/firmware_robot.h"
 #include "firmware/app/world/firmware_world.h"
-#include "shared/proto/robot_log_msg.nanopb.h"
+#include "proto/robot_log_msg.nanopb.h"
 }
 
 inline bool loadConfiguration(const QString& configFile,

@@ -1,7 +1,7 @@
 #include "software/test_util/test_util.h"
 
-#include "shared/proto/robot_log_msg.nanopb.h"
-#include "shared/proto/robot_log_msg.pb.h"
+#include "proto/robot_log_msg.nanopb.h"
+#include "proto/robot_log_msg.pb.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
 

@@ -68,9 +68,9 @@ cc_binary(
         "//firmware/app/world:firmware_world",
         "//firmware/shared:physics",
         "//firmware/shared:util",
+        "//proto:tbots_nanopb_proto",
         "//shared:constants",
         "//shared:robot_constants",
-        "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
     ],
 )
