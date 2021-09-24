@@ -47,3 +47,34 @@ TEST_F(HaltPlayTest, test_halt_play)
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
+
+TEST(HaltPlayInvariantAndIsApplicableTest, test_halt_play)
+{
+    // Lets setup some things we need to run this test
+    auto play_config = std::make_shared<PlayConfig>();
+    auto halt_play   = HaltPlay(play_config);
+    auto world       = createBlankTestingWorld();
+    auto game_state  = GameState();
+
+    // Lets iterate over all the possible referee command enum
+    // value and make sure that the HaltPlay is only applicable
+    // when the RefereeCommand is HALT.
+    //
+    // For any other command, we don't expect to run the halt_play.
+    for (auto referee_command : allValuesRefereeCommand())
+    {
+        game_state.updateRefereeCommand(referee_command);
+        world.updateGameState(game_state);
+
+        if (referee_command == RefereeCommand::HALT)
+        {
+            ASSERT_TRUE(halt_play.isApplicable());
+            ASSERT_TRUE(halt_play.invariantHolds());
+        }
+        else
+        {
+            ASSERT_FALSE(halt_play.isApplicable());
+            ASSERT_FALSE(halt_play.invariantHolds());
+        }
+    }
+}
