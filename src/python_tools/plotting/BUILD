@@ -8,7 +8,7 @@ py_library(
     deps = [
         requirement("bokeh"),
         requirement("numpy"),
-        "//software/proto:software_py_proto",
+        "//proto:software_py_proto",
     ],
 )
 

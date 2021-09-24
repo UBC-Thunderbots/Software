@@ -2,7 +2,7 @@ extern "C"
 {
 #include "firmware/app/logger/logger.h"
 
-#include "shared/proto/robot_log_msg.nanopb.h"
+#include "proto/robot_log_msg.nanopb.h"
 }
 
 #include <gtest/gtest.h>

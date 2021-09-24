@@ -1,9 +1,9 @@
 #pragma once
 
+#include "proto/logging/proto_logger.h"
 #include "shared/test_util/tbots_gtest_main.h"
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
-#include "software/proto/logging/proto_logger.h"
 #include "software/sensor_fusion/sensor_fusion.h"
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
 #include "software/simulated_tests/validation/terminating_function_validator.h"

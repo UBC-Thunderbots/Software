@@ -4,6 +4,8 @@ cc_binary(
     name = "full_system",
     srcs = ["full_system_main.cpp"],
     deps = [
+        "//proto/logging:proto_logger",
+        "//proto/message_translation:ssl_wrapper",
         "//shared/parameter:cpp_configs",
         "//software:constants",
         "//software/ai:threaded_ai",
@@ -14,8 +16,6 @@ cc_binary(
         "//software/gui/full_system:threaded_full_system_gui",
         "//software/logger",
         "//software/multithreading:observer_subject_adapter",
-        "//software/proto/logging:proto_logger",
-        "//software/proto/message_translation:ssl_wrapper",
         "//software/sensor_fusion:threaded_sensor_fusion",
         "//software/util/design_patterns:generic_factory",
         "@boost//:program_options",

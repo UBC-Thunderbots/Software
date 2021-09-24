@@ -3,10 +3,10 @@
 #include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
 
+#include "proto/primitive/primitive_msg_factory.h"
 #include "shared/2015_robot_constants.h"
 #include "shared/constants.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/proto/primitive/primitive_msg_factory.h"
 
 class ControllerPrimitiveGeneratorTest : public testing::Test
 {

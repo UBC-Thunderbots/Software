@@ -68,8 +68,8 @@ cc_library(
         ":usart",
         "//firmware/boards/robot_stm32h7/io:proto_multicast_communication",
         "//firmware/boards/robot_stm32h7/io:ublox_odinw262_communicator",
+        "//proto:tbots_nanopb_proto",
         "//shared:constants",
-        "//shared/proto:tbots_nanopb_proto",
         "@nanopb",
     ],
     # This is _very_ important. If we don't do this, bazel will not link in the

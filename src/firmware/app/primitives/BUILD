@@ -6,7 +6,7 @@ cc_library(
     hdrs = ["primitive.h"],
     deps = [
         "//firmware/app/world:firmware_world",
-        "//shared/proto:tbots_nanopb_proto",
+        "//proto:tbots_nanopb_proto",
     ],
 )
 
