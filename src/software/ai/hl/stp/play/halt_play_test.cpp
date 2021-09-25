@@ -7,6 +7,7 @@
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
+#include "software/world/game_state.h"
 #include "software/world/world.h"
 
 class HaltPlayTest : public SimulatedPlayTestFixture
@@ -48,33 +49,43 @@ TEST_F(HaltPlayTest, test_halt_play)
             Duration::fromSeconds(10));
 }
 
-TEST(HaltPlayInvariantAndIsApplicableTest, test_halt_play)
+// HaltPlayInvariantAndIsApplicableTest is the test suite, a collection of test cases.
+// test_invariant_and_is_applicable is the name of the first test case in the suite.
+//
+// If there were more test cases, we would duplicate the following TEST(...) {}
+// block and give the next test case a descriptive name.
+TEST(HaltPlayInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
 {
-    // Lets setup some things we need to run this test
-    auto play_config = std::make_shared<PlayConfig>();
-    auto halt_play   = HaltPlay(play_config);
-    auto world       = createBlankTestingWorld();
-    auto game_state  = GameState();
-
-    // Lets iterate over all the possible referee command enum
-    // value and make sure that the HaltPlay is only applicable
-    // when the RefereeCommand is HALT.
+    // Lets setup some things we need to run this test:
     //
-    // For any other command, we don't expect to run the halt_play.
-    for (auto referee_command : allValuesRefereeCommand())
-    {
-        game_state.updateRefereeCommand(referee_command);
-        world.updateGameState(game_state);
+    // Dynamic Parameter Config: This data structure is passed into the play and contains
+    // runtime configurable values.  We don't need to change anything here we just need to
+    // pass it in.
+    auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
 
-        if (referee_command == RefereeCommand::HALT)
-        {
-            ASSERT_TRUE(halt_play.isApplicable());
-            ASSERT_TRUE(halt_play.invariantHolds());
-        }
-        else
-        {
-            ASSERT_FALSE(halt_play.isApplicable());
-            ASSERT_FALSE(halt_play.invariantHolds());
-        }
-    }
+    // World: A blank testing world we will manipulate for the test
+    auto world = ::TestUtil::createBlankTestingWorld();
+
+    // HaltPlay: The play under test
+    auto halt_play = HaltPlay(play_config);
+
+    // GameState: The game state to test with. For this test we don't care about
+    // RestartReason and our_restart. Looking at software/world/game_state.cpp, we
+    // only need to init the play state to HALT
+    auto game_state =
+        GameState(GameState::PlayState::HALT, GameState::RestartReason::NONE, true);
+    world.updateGameState(game_state);
+
+    // Lets make sure the play will start running and stay running.
+    ASSERT_TRUE(halt_play.isApplicable(world));
+    ASSERT_TRUE(halt_play.invariantHolds(world));
+
+    // Now lets make sure that we don't run when are NOT halted
+    game_state =
+        GameState(GameState::PlayState::PLAYING, GameState::RestartReason::NONE, true);
+    world.updateGameState(game_state);
+
+    // Make sure we don't run the halt play
+    ASSERT_FALSE(halt_play.isApplicable(world));
+    ASSERT_FALSE(halt_play.invariantHolds(world));
 }
