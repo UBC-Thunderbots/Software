@@ -110,25 +110,6 @@ class GameState
     }
 
     /**
-     * Construct a new GameState with initial values for PlayState, RestartReason and
-     * our_restart.
-     *
-     * @play_state The PlayState to initialize to
-     * @restart_reason The reason for restarting play
-     * @our_restart True if we get the ball after the restart
-     *
-     **/
-    GameState(PlayState play_state, RestartReason restart_reason, bool our_restart)
-        : play_state_(play_state),
-          restart_reason_(restart_reason),
-          command_(RefereeCommand::HALT),
-          ball_state_(std::nullopt),
-          our_restart_(our_restart),
-          ball_placement_point_(std::nullopt)
-    {
-    }
-
-    /**
      * Updates the game state with a value from backend_input
      *
      * @param gameState the RefereeCommand from backend_input

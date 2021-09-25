@@ -140,4 +140,15 @@ namespace TestUtil
      */
     std::vector<RobotStateWithId> createMovingRobotStatesWithId(
         const std::vector<Point> &positions, const std::vector<Vector> &velocity);
+
+    /**
+     * Create a new GameState with the referee commands updated, previous_referee_command
+     * followed by the current_referee_command.
+     *
+     * @param current_referee_command The name of the current referee command to set
+     * @param previous_referee_command The name of the previous referee command to set
+     * @return the updated GameState
+     */
+    GameState createGameState(const RefereeCommand &current_referee_command,
+                              const RefereeCommand &previous_referee_command);
 };  // namespace TestUtil

@@ -72,18 +72,16 @@ TEST(HaltPlayInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
     // GameState: The game state to test with. For this test we don't care about
     // RestartReason and our_restart. Looking at software/world/game_state.cpp, we
     // only need to init the play state to HALT
-    auto game_state =
-        GameState(GameState::PlayState::HALT, GameState::RestartReason::NONE, true);
-    world.updateGameState(game_state);
+    world.updateGameState(
+        ::TestUtil::createGameState(RefereeCommand::HALT, RefereeCommand::HALT));
 
     // Lets make sure the play will start running and stay running.
     ASSERT_TRUE(halt_play.isApplicable(world));
     ASSERT_TRUE(halt_play.invariantHolds(world));
 
     // Now lets make sure that we don't run when are NOT halted
-    game_state =
-        GameState(GameState::PlayState::PLAYING, GameState::RestartReason::NONE, true);
-    world.updateGameState(game_state);
+    world.updateGameState(
+        ::TestUtil::createGameState(RefereeCommand::NORMAL_START, RefereeCommand::HALT));
 
     // Make sure we don't run the halt play
     ASSERT_FALSE(halt_play.isApplicable(world));
