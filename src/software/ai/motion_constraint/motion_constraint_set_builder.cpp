@@ -56,9 +56,12 @@ std::set<MotionConstraint> buildMotionConstraintSetFromGameState(
     }
     else if (game_state.isKickoff())
     {
-        motion_constraints.insert({MotionConstraint::HALF_METER_AROUND_BALL,
-                                   MotionConstraint::CENTER_CIRCLE,
-                                   MotionConstraint::ENEMY_HALF});
+        motion_constraints.insert(
+            {MotionConstraint::CENTER_CIRCLE, MotionConstraint::ENEMY_HALF});
+        if (game_state.isSetupState())
+        {
+            motion_constraints.insert(MotionConstraint::HALF_METER_AROUND_BALL);
+        }
     }
     else
     {
