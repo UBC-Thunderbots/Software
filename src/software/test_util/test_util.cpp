@@ -135,5 +135,4 @@ namespace TestUtil
         return game_state;
     }
 
-
 };  // namespace TestUtil
