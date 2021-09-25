@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 #include "firmware/app/world/firmware_world.h"
-#include "shared/proto/primitive.nanopb.h"
+#include "proto/primitive.nanopb.h"
 
 /**
  * \brief The definition of a movement primitive.

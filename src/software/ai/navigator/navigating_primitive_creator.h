@@ -1,7 +1,7 @@
 #pragma once
 
+#include "proto/primitive.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "shared/proto/primitive.pb.h"
 #include "software/ai/intent/all_intents.h"
 #include "software/ai/intent/navigating_intent.h"
 #include "software/ai/navigator/obstacle/obstacle.h"

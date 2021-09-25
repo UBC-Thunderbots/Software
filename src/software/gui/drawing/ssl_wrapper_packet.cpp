@@ -1,11 +1,11 @@
 #include "software/gui/drawing/ssl_wrapper_packet.h"
 
+#include "proto/message_translation/ssl_detection.h"
+#include "proto/message_translation/ssl_geometry.h"
 #include "software/gui/drawing/ball.h"
 #include "software/gui/drawing/colors.h"
 #include "software/gui/drawing/field.h"
 #include "software/gui/drawing/robot.h"
-#include "software/proto/message_translation/ssl_detection.h"
-#include "software/proto/message_translation/ssl_geometry.h"
 
 void drawSSLWrapperPacket(QGraphicsScene* scene,
                           const SSLProto::SSL_WrapperPacket& ssl_wrapper_packet,

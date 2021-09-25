@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/proto/robot_log_msg.nanopb.h"
+#include "proto/robot_log_msg.nanopb.h"
 
 /**
  * Redirects RobotLogs to a standard printf.

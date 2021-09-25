@@ -1,7 +1,7 @@
 #include "software/simulation/standalone_simulator.h"
 
+#include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "software/constants.h"
-#include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "software/world/field.h"
 extern "C"
 {

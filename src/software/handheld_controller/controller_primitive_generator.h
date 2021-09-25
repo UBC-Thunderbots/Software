@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/proto/tbots_software_msgs.pb.h"
+#include "proto/tbots_software_msgs.pb.h"
 #include "shared/robot_constants.h"
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"

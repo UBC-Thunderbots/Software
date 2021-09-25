@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
+#include "proto/primitive/primitive_msg_factory.h"
 #include "shared/2015_robot_constants.h"
-#include "software/proto/primitive/primitive_msg_factory.h"
 #include "software/util/typename/typename.h"
 
 class MoveIntentTest : public ::testing::Test

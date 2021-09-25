@@ -5,7 +5,7 @@ cc_library(
     hdrs = ["hl.h"],
     deps = [
         "//software/ai/intent",
-        "//software/proto:play_info_msg_cc_proto",
+        "//proto:play_info_msg_cc_proto",
         "//software/world",
     ],
 )

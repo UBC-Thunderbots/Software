@@ -4,7 +4,7 @@
 #include <QtWidgets/QTableWidget>
 #include <chrono>
 
-#include "shared/proto/robot_status_msg.pb.h"
+#include "proto/robot_status_msg.pb.h"
 #include "software/time/duration.h"
 
 /**

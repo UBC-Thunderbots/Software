@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#include "shared/proto/robot_log_msg.nanopb.h"
+#include "proto/robot_log_msg.nanopb.h"
 
 
 void io_uart_logger_handleRobotLog(TbotsProto_RobotLog log)

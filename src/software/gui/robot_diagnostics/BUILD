@@ -5,11 +5,11 @@ cc_library(
     srcs = ["threaded_robot_diagnostics_gui.cpp"],
     hdrs = ["threaded_robot_diagnostics_gui.h"],
     deps = [
+        "//proto:sensor_msg_cc_proto",
         "//software/gui/robot_diagnostics/widgets:robot_diagnostics_gui",
         "//software/multithreading:subject",
         "//software/multithreading:thread_safe_buffer",
         "//software/multithreading:threaded_observer",
-        "//software/proto:sensor_msg_cc_proto",
         "//software/world",
         "@qt//:qt_widgets",
     ],
