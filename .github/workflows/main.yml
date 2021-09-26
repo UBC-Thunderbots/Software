@@ -9,7 +9,7 @@ on:
 jobs:
   formatting-check:
     name: Formatting Check
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
@@ -24,7 +24,7 @@ jobs:
           
   software-tests:
     name: Software Tests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
@@ -44,7 +44,7 @@ jobs:
              
   firmware-tests:
     name: Firmware Tests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     env:
       DISPLAY: :0
     steps:
@@ -89,7 +89,7 @@ jobs:
              
   simulated-gameplay-tests:
     name: Simulated Gameplay Tests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
@@ -128,7 +128,7 @@ jobs:
             
   memory-leak-checks:
     name: Memory Leak Checks
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
