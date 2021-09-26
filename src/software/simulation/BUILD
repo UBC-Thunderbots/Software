@@ -277,6 +277,7 @@ cc_library(
         "//proto/message_translation:ssl_detection",
         "//proto/message_translation:ssl_geometry",
         "//proto/message_translation:ssl_wrapper",
+        "//shared/parameter:cpp_configs",
         "//software/simulation/physics:physics_world",
         "//software/world",
         "//software/world:field",
