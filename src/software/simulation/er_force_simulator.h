@@ -2,10 +2,10 @@
 
 #include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
 #include "extlibs/er_force_sim/src/core/timer.h"
-#include "shared/parameter/cpp_dynamic_parameters.h"
-#include "proto/tbots_software_msgs.pb.h"
 #include "proto/defending_side_msg.pb.h"
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
+#include "proto/tbots_software_msgs.pb.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/simulation/er_force_simulator_ball.h"
 #include "software/simulation/er_force_simulator_robot.h"
 #include "software/simulation/firmware_object_deleter.h"

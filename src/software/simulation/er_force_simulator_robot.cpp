@@ -1,7 +1,7 @@
 #include "software/simulation/er_force_simulator_robot.h"
 
-#include "shared/constants.h"
 #include "proto/message_translation/ssl_simulation_robot_control.h"
+#include "shared/constants.h"
 
 ErForceSimulatorRobot::ErForceSimulatorRobot(const RobotStateWithId& robot_state_with_id,
                                              RobotConstants_t robot_constants,

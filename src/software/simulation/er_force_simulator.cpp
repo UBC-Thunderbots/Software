@@ -207,8 +207,8 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 
     current_firmware_time = physics_world.getTimestamp();
 
-    SSLSimRobotControl yellow_robot_control{new sslsim::RobotControl};
-    SSLSimRobotControl blue_robot_control{new sslsim::RobotControl};
+    SSLSimulationProto::RobotControl yellow_robot_control;
+    SSLSimulationProto::RobotControl blue_robot_control;
 
     for (auto& iter : blue_simulator_robots)
     {
@@ -255,7 +255,7 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
         SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
         ErForceSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
             firmware_world);
-        *(blue_robot_control->mutable_robot_commands()->Add()) =
+        *(blue_robot_control.mutable_robot_commands()->Add()) =
             *(simulator_robot->getRobotCommand());
     }
 
@@ -306,15 +306,15 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
         ErForceSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
             firmware_world);
 
-        *(yellow_robot_control->mutable_robot_commands()->Add()) =
+        *(yellow_robot_control.mutable_robot_commands()->Add()) =
             *(simulator_robot->getRobotCommand());
     }
 
-    er_force_sim->handleRadioCommands(yellow_robot_control, false,
-                                      er_force_sim_timer.currentTime());
-    // er_force_sim->process();
-    er_force_sim->handleRadioCommands(blue_robot_control, true,
-                                      er_force_sim_timer.currentTime());
+    //    er_force_sim->handleRadioCommands(yellow_robot_control, false,
+    //                                      er_force_sim_timer.currentTime());
+    //    // er_force_sim->process();
+    //    er_force_sim->handleRadioCommands(blue_robot_control, true,
+    //                                      er_force_sim_timer.currentTime());
     std::this_thread::sleep_for(
         std::chrono::milliseconds(static_cast<int>(time_step.toMilliseconds())));
     er_force_sim->process();
