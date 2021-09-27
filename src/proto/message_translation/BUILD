@@ -143,7 +143,6 @@ cc_library(
     srcs = ["ssl_simulation_robot_control.cpp"],
     hdrs = ["ssl_simulation_robot_control.h"],
     deps = [
-        "//extlibs/er_force_sim/src/amun/simulator",
         "//firmware/shared:physics",
         "//proto:ssl_simulation_cc_proto",
         "//shared:constants",

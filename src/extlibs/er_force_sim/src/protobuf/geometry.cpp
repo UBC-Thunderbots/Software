@@ -45,7 +45,8 @@ void geometrySetDefault(world::Geometry *geometry, bool useQuadField)
     assert(geometry->IsInitialized());
 }
 
-void convertFromSSlGeometry(const SSL_GeometryFieldSize &g, world::Geometry &outGeometry)
+void convertFromSSlGeometry(const SSLProto::SSL_GeometryFieldSize &g,
+                            world::Geometry &outGeometry)
 {
     // assumes that the packet using the ssl vision naming convention for field
     // markings also the packet should be consistent, complete and use only one
@@ -62,7 +63,7 @@ void convertFromSSlGeometry(const SSL_GeometryFieldSize &g, world::Geometry &out
 
     float minThickness  = std::numeric_limits<float>::max();
     bool is2014Geometry = true;
-    for (const SSL_FieldLineSegment &line : g.field_lines())
+    for (const SSLProto::SSL_FieldLineSegment &line : g.field_lines())
     {
         minThickness     = std::min(minThickness, line.thickness());
         std::string name = line.name();
@@ -81,7 +82,7 @@ void convertFromSSlGeometry(const SSL_GeometryFieldSize &g, world::Geometry &out
         }
     }
 
-    for (const SSL_FieldCircularArc &arc : g.field_arcs())
+    for (const SSLProto::SSL_FieldCircularArc &arc : g.field_arcs())
     {
         minThickness     = std::min(minThickness, arc.thickness());
         std::string name = arc.name();
@@ -117,28 +118,28 @@ void convertFromSSlGeometry(const SSL_GeometryFieldSize &g, world::Geometry &out
 
 namespace proto_geom_internal
 {
-    static void fieldAddLine(SSL_GeometryFieldSize *field, std::string name, float x1,
-                             float y1, float x2, float y2,
+    static void fieldAddLine(SSLProto::SSL_GeometryFieldSize *field, std::string name,
+                             float x1, float y1, float x2, float y2,
                              const world::Geometry &geometry)
     {
-        SSL_FieldLineSegment *line = field->add_field_lines();
+        SSLProto::SSL_FieldLineSegment *line = field->add_field_lines();
         line->set_name(std::move(name));
-        Vector2f *p1 = line->mutable_p1();
+        SSLProto::Vector2f *p1 = line->mutable_p1();
         p1->set_x(x1);
         p1->set_y(y1);
-        Vector2f *p2 = line->mutable_p2();
+        SSLProto::Vector2f *p2 = line->mutable_p2();
         p2->set_x(x2);
         p2->set_y(y2);
         line->set_thickness(geometry.line_width() * 1000.0f);
     }
 
-    static void fieldAddCircularArc(SSL_GeometryFieldSize *field, std::string name,
-                                    float x, float y, float radius, float a1, float a2,
-                                    const world::Geometry &geometry)
+    static void fieldAddCircularArc(SSLProto::SSL_GeometryFieldSize *field,
+                                    std::string name, float x, float y, float radius,
+                                    float a1, float a2, const world::Geometry &geometry)
     {
-        SSL_FieldCircularArc *arc = field->add_field_arcs();
+        SSLProto::SSL_FieldCircularArc *arc = field->add_field_arcs();
         arc->set_name(name);
-        Vector2f *center = arc->mutable_center();
+        SSLProto::Vector2f *center = arc->mutable_center();
         center->set_x(x);
         center->set_y(y);
         arc->set_radius(radius);
@@ -150,7 +151,8 @@ namespace proto_geom_internal
 
 using namespace proto_geom_internal;
 
-void convertToSSlGeometry(const world::Geometry &geometry, SSL_GeometryFieldSize *field)
+void convertToSSlGeometry(const world::Geometry &geometry,
+                          SSLProto::SSL_GeometryFieldSize *field)
 {
     field->set_field_width(geometry.field_width() * 1000.0f);
     field->set_field_length(geometry.field_height() * 1000.0f);

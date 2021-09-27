@@ -101,8 +101,12 @@ ErForceSimulator::ErForceSimulator(
     QObject::connect(er_force_sim, &camun::simulator::Simulator::gotPacket, this,
                      &ErForceSimulator::setWrapperPacket);
     this->resetCurrentFirmwareTime();
+    er_force_sim->handleSimulatorTick(1);
 
     er_force_sim->process();
+
+    // er_force_sim->process();
+
     // er_force_sim_timer.setTime(1235, 1.0);
     //    er_force_sim->process();
 }

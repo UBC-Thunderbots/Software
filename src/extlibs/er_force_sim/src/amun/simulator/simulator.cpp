@@ -207,20 +207,7 @@ Simulator::~Simulator()
 
 void Simulator::process()
 {
-    Q_ASSERT(m_time != 0);
-    const qint64 start_time = Timer::systemTime();
-
-    const qint64 current_time = m_timer->currentTime();
-
-    // first: send vision packets in partial mode
-    if (m_isPartial)
-    {
-        while (m_visionPackets.size() > 0 &&
-               std::get<2>(m_visionPackets.head()) >= current_time)
-        {
-            sendVisionPacket();
-        }
-    }
+    sendVisionPacket();
 
     // collect responses from robots
     QList<robot::RadioResponse> responses;
@@ -288,43 +275,10 @@ void Simulator::process()
     sendSSLSimErrorInternal(ErrorSource::CONFIG);
 
     // simulate to current strategy time
-    double timeDelta = (current_time - m_time) * 1E-9;
-    m_data->dynamicsWorld->stepSimulation(timeDelta, 10, SUB_TIMESTEP);
-    m_time = current_time;
-
-    // only send a vision packet every third frame = 15 ms - epsilon (=half frame)
-    // gives a vision frequency of 66.67Hz
-    if (m_lastSentStatusTime + 12500000 <= m_time)
-    {
-        auto data = createVisionPacket();
-
-        if (m_isPartial)
-        {
-            std::get<2>(data) = m_time + m_visionDelay;
-            m_visionPackets.enqueue(data);
-        }
-        else
-        {
-            m_visionPackets.enqueue(data);
-            // timeout is in milliseconds
-            int timeout = m_visionDelay * 1E-6 / m_timeScaling;
-
-            // send after timeout, default timer mode, may jitter a bit
-            QTimer *timer = new QTimer();
-            timer->setTimerType(Qt::PreciseTimer);
-            timer->setSingleShot(true);
-            connect(timer, SIGNAL(timeout()), SLOT(sendVisionPacket()));
-            timer->start(timeout);
-            m_visionTimers.enqueue(timer);
-        }
-
-        m_lastSentStatusTime = m_time;
-    }
-
-    // send timing information
-    Status status(new amun::Status);
-    status->mutable_timing()->set_simulator((Timer::systemTime() - start_time) * 1E-9f);
-    emit sendStatus(status);
+    // double timeDelta = (current_time - m_time) * 1E-9;
+    // m_data->dynamicsWorld->stepSimulation(timeDelta, 10, SUB_TIMESTEP);
+    // m_time = current_time;
+    //     auto data = createVisionPacket();
 }
 
 void Simulator::sendSSLSimErrorInternal(ErrorSource source)
@@ -432,7 +386,190 @@ void Simulator::initializeDetection(SSL_DetectionFrame *detection, std::size_t c
     detection->set_t_sent((m_time + m_visionDelay) * 1E-9);
 }
 
-std::tuple<QList<QByteArray>, QByteArray, qint64> Simulator::createVisionPacket()
+// std::tuple<QList<QByteArray>, QByteArray, qint64> Simulator::createVisionPacket()
+//{
+//    const std::size_t numCameras = m_data->reportedCameraSetup.size();
+//    world::SimulatorState simState;
+//
+//    std::vector<SSL_DetectionFrame> detections(numCameras);
+//    for (std::size_t i = 0; i < numCameras; i++)
+//    {
+//        initializeDetection(&detections[i], i);
+//    }
+//
+//    auto *ball = simState.mutable_ball();
+//    m_data->ball->writeBallState(ball);
+//
+//    bool missingBall = m_data->missingBallDetections > 0 &&
+//                       m_data->rng.uniformFloat(0, 1) <= m_data->missingBallDetections;
+//    const btVector3 ballPosition = m_data->ball->position() / SIMULATOR_SCALE;
+//    if (m_time - m_lastBallSendTime >= m_minBallDetectionTime && !missingBall)
+//    {
+//        m_lastBallSendTime = m_time;
+//
+//        for (std::size_t cameraId = 0; cameraId < numCameras; ++cameraId)
+//        {
+//            // at least one id is always valid
+//            if (!checkCameraID(cameraId, ballPosition, m_data->cameraPositions,
+//                               m_data->cameraOverlap))
+//            {
+//                continue;
+//            }
+//
+//            // get ball position
+//            bool visible = m_data->ball->update(
+//                detections[cameraId].add_balls(), m_data->stddevBall,
+//                m_data->stddevBallArea, m_data->cameraPositions[cameraId],
+//                m_data->enableInvisibleBall, m_data->ballVisibilityThreshold);
+//            if (!visible)
+//            {
+//                detections[cameraId].clear_balls();
+//            }
+//        }
+//    }
+//
+//    // get robot positions
+//    for (bool teamIsBlue : {true, false})
+//    {
+//        auto &team = teamIsBlue ? m_data->robotsBlue : m_data->robotsYellow;
+//
+//        for (const auto &it : team)
+//        {
+//            SimRobot *robot = it.first;
+//            auto *robotProto =
+//                teamIsBlue ? simState.add_blue_robots() : simState.add_yellow_robots();
+//            robot->update(robotProto);
+//
+//            if (m_time - robot->getLastSendTime() >= m_minRobotDetectionTime)
+//            {
+//                const float timeDiff     = (m_time - robot->getLastSendTime()) * 1E-9;
+//                const btVector3 robotPos = robot->position() / SIMULATOR_SCALE;
+//
+//                for (std::size_t cameraId = 0; cameraId < numCameras; ++cameraId)
+//                {
+//                    if (!checkCameraID(cameraId, robotPos, m_data->cameraPositions,
+//                                       m_data->cameraOverlap))
+//                    {
+//                        continue;
+//                    }
+//
+//                    if (teamIsBlue)
+//                    {
+//                        robot->update(detections[cameraId].add_robots_blue(),
+//                                      m_data->stddevRobot, m_data->stddevRobotPhi,
+//                                      m_time);
+//                    }
+//                    else
+//                    {
+//                        robot->update(detections[cameraId].add_robots_yellow(),
+//                                      m_data->stddevRobot, m_data->stddevRobotPhi,
+//                                      m_time);
+//                    }
+//
+//                    // once in a while, add a ball mis-detection at a corner of the
+//                    // dribbler in real games, this happens because the ball detection
+//                    // light beam used by many teams is red
+//                    float detectionProb = timeDiff * m_data->ballDetectionsAtDribbler;
+//                    if (m_data->ballDetectionsAtDribbler > 0 &&
+//                        m_data->rng.uniformFloat(0, 1) < detectionProb)
+//                    {
+//                        // always on the right side of the dribbler for now
+//                        if (!m_data->ball->addDetection(
+//                                detections[cameraId].add_balls(),
+//                                robot->dribblerCorner(false) / SIMULATOR_SCALE,
+//                                m_data->stddevRobot, 0,
+//                                m_data->cameraPositions[cameraId], false, 0))
+//                        {
+//                            detections[cameraId].mutable_balls()->DeleteSubrange(
+//                                detections[cameraId].balls_size() - 1, 1);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    std::vector<SSL_WrapperPacket> packets;
+//    packets.reserve(numCameras);
+//
+//    // add a wrapper packet for all detections (also for empty ones).
+//    // The reason is that other teams might rely on the fact that these detections
+//    // are in regular intervals.
+//    for (auto &frame : detections)
+//    {
+//        // if multiple balls are reported, shuffle them randomly (the tracking might
+//        // have systematic errors depending on the ball order)
+//        if (frame.balls_size() > 1)
+//        {
+//            std::random_shuffle(frame.mutable_balls()->begin(),
+//                                frame.mutable_balls()->end());
+//        }
+//
+//        SSL_WrapperPacket packet;
+//        packet.mutable_detection()->CopyFrom(frame);
+//        packets.push_back(packet);
+//    }
+//
+//    // add field geometry
+//    if (packets.size() == 0)
+//    {
+//        packets.push_back(SSL_WrapperPacket());
+//    }
+//    SSL_GeometryData *geometry   = packets[0].mutable_geometry();
+//    SSL_GeometryFieldSize *field = geometry->mutable_field();
+//    convertToSSlGeometry(m_data->geometry, field);
+//
+//    const btVector3 positionErrorSimScale =
+//        btVector3(0.3f, 0.7f, 0.05f).normalized() * m_data->cameraPositionError;
+//    btVector3 positionErrorVisionScale{0, 0, positionErrorSimScale.z() * 1000};
+//    coordinates::toVision(positionErrorSimScale, positionErrorVisionScale);
+//    for (const auto &calibration : m_data->reportedCameraSetup)
+//    {
+//        auto calib = geometry->add_calib();
+//        calib->CopyFrom(calibration);
+//        calib->set_derived_camera_world_tx(calib->derived_camera_world_tx() +
+//                                           positionErrorVisionScale.x());
+//        calib->set_derived_camera_world_ty(calib->derived_camera_world_ty() +
+//                                           positionErrorVisionScale.y());
+//        calib->set_derived_camera_world_tz(calib->derived_camera_world_tz() +
+//                                           positionErrorVisionScale.z());
+//    }
+//
+//    // add ball model to geometry data
+//    geometry->mutable_models()->mutable_straight_two_phase()->set_acc_roll(-0.35);
+//    geometry->mutable_models()->mutable_straight_two_phase()->set_acc_slide(-4.5);
+//    geometry->mutable_models()->mutable_straight_two_phase()->set_k_switch(0.69);
+//    geometry->mutable_models()->mutable_chip_fixed_loss()->set_damping_z(0.566);
+//    geometry->mutable_models()->mutable_chip_fixed_loss()->set_damping_xy_first_hop(
+//        0.715);
+//    geometry->mutable_models()->mutable_chip_fixed_loss()->set_damping_xy_other_hops(1);
+//
+//    // serialize "vision packet"
+//    QList<QByteArray> data;
+//    for (std::size_t i = 0; i < packets.size(); ++i)
+//    {
+//        QByteArray d;
+//        d.resize(packets[i].ByteSize());
+//        if (packets[i].SerializeToArray(d.data(), d.size()))
+//        {
+//            data.push_back(d);
+//        }
+//        else
+//        {
+//            data.push_back(QByteArray());
+//        }
+//    }
+//
+//    QByteArray d;
+//    d.resize(simState.ByteSize());
+//    if (!simState.SerializeToArray(d.data(), d.size()))
+//    {
+//        d = {};
+//    }
+//    return {data, d, 0};
+//}
+
+std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
 {
     const std::size_t numCameras = m_data->reportedCameraSetup.size();
     world::SimulatorState simState;
@@ -535,7 +672,7 @@ std::tuple<QList<QByteArray>, QByteArray, qint64> Simulator::createVisionPacket(
         }
     }
 
-    std::vector<SSL_WrapperPacket> packets;
+    std::vector<SSLProto::SSL_WrapperPacket> packets;
     packets.reserve(numCameras);
 
     // add a wrapper packet for all detections (also for empty ones).
@@ -551,7 +688,7 @@ std::tuple<QList<QByteArray>, QByteArray, qint64> Simulator::createVisionPacket(
                                 frame.mutable_balls()->end());
         }
 
-        SSL_WrapperPacket packet;
+        SSLProto::SSL_WrapperPacket packet;
         packet.mutable_detection()->CopyFrom(frame);
         packets.push_back(packet);
     }
@@ -559,10 +696,10 @@ std::tuple<QList<QByteArray>, QByteArray, qint64> Simulator::createVisionPacket(
     // add field geometry
     if (packets.size() == 0)
     {
-        packets.push_back(SSL_WrapperPacket());
+        packets.push_back(SSLProto::SSL_WrapperPacket());
     }
-    SSL_GeometryData *geometry   = packets[0].mutable_geometry();
-    SSL_GeometryFieldSize *field = geometry->mutable_field();
+    SSLProto::SSL_GeometryData *geometry   = packets[0].mutable_geometry();
+    SSLProto::SSL_GeometryFieldSize *field = geometry->mutable_field();
     convertToSSlGeometry(m_data->geometry, field);
 
     const btVector3 positionErrorSimScale =
@@ -590,29 +727,7 @@ std::tuple<QList<QByteArray>, QByteArray, qint64> Simulator::createVisionPacket(
         0.715);
     geometry->mutable_models()->mutable_chip_fixed_loss()->set_damping_xy_other_hops(1);
 
-    // serialize "vision packet"
-    QList<QByteArray> data;
-    for (std::size_t i = 0; i < packets.size(); ++i)
-    {
-        QByteArray d;
-        d.resize(packets[i].ByteSize());
-        if (packets[i].SerializeToArray(d.data(), d.size()))
-        {
-            data.push_back(d);
-        }
-        else
-        {
-            data.push_back(QByteArray());
-        }
-    }
-
-    QByteArray d;
-    d.resize(simState.ByteSize());
-    if (!simState.SerializeToArray(d.data(), d.size()))
-    {
-        d = {};
-    }
-    return {data, d, 0};
+    return packets;
 }
 
 void Simulator::sendVisionPacket()

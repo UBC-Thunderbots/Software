@@ -31,6 +31,8 @@
 #include "extlibs/er_force_sim/src/protobuf/command.h"
 #include "extlibs/er_force_sim/src/protobuf/sslsim.h"
 #include "extlibs/er_force_sim/src/protobuf/status.h"
+#include "proto/messages_robocup_ssl_wrapper.pb.h"
+#include "proto/ssl_simulation_robot_control.pb.h"
 
 // higher values break the rolling friction of the ball
 const float SIMULATOR_SCALE  = 10.0f;
@@ -84,15 +86,22 @@ class camun::simulator::Simulator : public QObject
     void sendRealData(const QByteArray &data);  // sends amun::SimulatorState
     void sendSSLSimError(const QList<SSLSimError> &errors, ErrorSource source);
 
+   public:
+    void registerBlueRobotControlCommand(const SSLSimulationProto::RobotControl &control);
+    void registerYellowRobotControlCommand(
+        const SSLSimulationProto::RobotControl &control);
+    void stepSimulation(double time_ms);
+    // checks for possible collisions with the robots on the target position of the ball
+    // calls teleportRobotToFreePosition to move robots out of the way
+    void safelyTeleportBall(const float x, const float y);
+    std::vector<SSLProto::SSL_WrapperPacket> getWrapperPackets();
+
    public slots:
     void handleCommand(const Command &command);
     void handleRadioCommands(const SSLSimRobotControl &control, bool isBlue,
                              qint64 processingStart);
     void setScaling(double scaling);
     void setFlipped(bool flipped);
-    // checks for possible collisions with the robots on the target position of the ball
-    // calls teleportRobotToFreePosition to move robots out of the way
-    void safelyTeleportBall(const float x, const float y);
     void process();
 
    private slots:

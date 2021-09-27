@@ -40,6 +40,7 @@ qt_cc_library(
     linkstatic = True,
     deps = [
         ":protobuf_cc_lib",
+        "//proto:ssl_simulation_cc_proto",
         "@qt//:qt_core",
         "@qt//:qt_gui",
         "@qt//:qt_widgets",

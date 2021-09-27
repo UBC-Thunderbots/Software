@@ -22,6 +22,7 @@ qt_cc_library(
     deps = [
         "//extlibs/er_force_sim/src/core",
         "//extlibs/er_force_sim/src/protobuf",
+        "//proto:ssl_simulation_cc_proto",
         "@bullet",
         "@qt//:qt_core",
         "@qt//:qt_gui",
