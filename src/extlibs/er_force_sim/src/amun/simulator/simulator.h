@@ -71,7 +71,7 @@ class camun::simulator::Simulator : public QObject
     typedef QMap<unsigned int, QPair<SimRobot *, unsigned int>>
         RobotMap; /*First int: ID, Second int: Generation*/
 
-    explicit Simulator(const Timer *timer, const amun::SimulatorSetup &setup,
+    explicit Simulator(const amun::SimulatorSetup &setup,
                        bool useManualTrigger = false);
     ~Simulator() override;
     Simulator(const Simulator &) = delete;
@@ -95,17 +95,13 @@ class camun::simulator::Simulator : public QObject
     // calls teleportRobotToFreePosition to move robots out of the way
     void safelyTeleportBall(const float x, const float y);
     std::vector<SSLProto::SSL_WrapperPacket> getWrapperPackets();
+    void handleSimulatorSetupCommand(const Command &command);
 
    public slots:
-    void handleCommand(const Command &command);
     void handleRadioCommands(const SSLSimRobotControl &control, bool isBlue,
                              qint64 processingStart);
-    void setScaling(double scaling);
     void setFlipped(bool flipped);
     void process();
-
-   private slots:
-    void sendVisionPacket();
 
    private:
     void sendSSLSimErrorInternal(ErrorSource source);
@@ -126,11 +122,9 @@ class camun::simulator::Simulator : public QObject
     QQueue<std::tuple<QList<QByteArray>, QByteArray, qint64>> m_visionPackets;
     QQueue<QTimer *> m_visionTimers;
     bool m_isPartial;
-    const Timer *m_timer;
     QTimer *m_trigger;
     qint64 m_time;
     qint64 m_lastSentStatusTime;
-    double m_timeScaling;
     bool m_enabled;
     bool m_charge;
     // systemDelay + visionProcessingTime = visionDelay

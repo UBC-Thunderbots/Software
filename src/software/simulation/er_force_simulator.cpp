@@ -67,7 +67,7 @@ ErForceSimulator::ErForceSimulator(
 {
     loadConfiguration("simulator/2020", &er_force_sim_setup, false);
     er_force_sim =
-        new camun::simulator::Simulator(&er_force_sim_timer, er_force_sim_setup, true),
+        new camun::simulator::Simulator(er_force_sim_setup, true),
 
     // er_force_sim_timer.setTime(1234, 1.0);
         std::cout << "er_force_sim_timer.currentTime(): "
@@ -96,7 +96,7 @@ ErForceSimulator::ErForceSimulator(
             robot->set_id(i);
         }
     }
-    er_force_sim->handleCommand(c);
+    er_force_sim->handleSimulatorSetupCommand(c);
 
     QObject::connect(er_force_sim, &camun::simulator::Simulator::gotPacket, this,
                      &ErForceSimulator::setWrapperPacket);
