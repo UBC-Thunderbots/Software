@@ -45,42 +45,19 @@ jobs:
   firmware-tests:
     name: Firmware Tests
     runs-on: ubuntu-20.04
-    env:
-      DISPLAY: :0
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
     
       - name: Environment Setup
         run: |
-          sudo apt-get install xvfb
-          sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
           "${GITHUB_WORKSPACE}"/environment_setup/setup_firmware.sh
-
-      - name: STM32CubeMX Code Generation
-        run: |
-          "${GITHUB_WORKSPACE}"/.github/check_cubemx_ci.sh
 
       - name: Arduino Uno Firmware Build
         run: |
          cd src
          bazel build //firmware/boards/estop_arduino_uno:main 
-
-      - name: STM32H7 Robot Firmware Build
-        run: |
-         cd src
-         bazel build --cpu=stm32h7 //firmware/boards/robot_stm32h7:robot_stm32h7_main 
-     
-      - name: Legacy STM32F4 Robot Firmware Build
-        run: |
-         cd src
-         bazel build --cpu=stm32f4 //firmware/boards/legacy_robot_stm32f4:bin 
-         
-      - name: Legacy Radio Dongle Firmware Build
-        run: |
-         cd src
-         bazel build --cpu=stm32f4 //firmware/boards/legacy_dongle_stm32f4:bin         
 
       - name: Jetson Nano Build
         run: |
