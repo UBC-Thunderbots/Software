@@ -196,6 +196,18 @@ Simulator::~Simulator()
     delete m_data;
 }
 
+std::vector<robot::RadioResponse> Simulator::acceptBlueRobotControlCommand(
+    const SSLSimulationProto::RobotControl &control)
+{
+    return acceptRobotControlCommand(control, true);
+}
+
+std::vector<robot::RadioResponse> Simulator::acceptYellowRobotControlCommand(
+    const SSLSimulationProto::RobotControl &control)
+{
+    return acceptRobotControlCommand(control, false);
+}
+
 std::vector<robot::RadioResponse> Simulator::acceptRobotControlCommand(
     const SSLSimulationProto::RobotControl &control, bool isBlue)
 {
@@ -284,6 +296,12 @@ void Simulator::resetFlipped(Simulator::RobotMap &robots, float side)
         }
         y -= 0.3;
     }
+}
+
+void Simulator::stepSimulation(double time_s)
+{
+    m_data->dynamicsWorld->stepSimulation(time_s, 10, SUB_TIMESTEP);
+    handleSimulatorTick(time_s);
 }
 
 void Simulator::handleSimulatorTick(double timeStep)

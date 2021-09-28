@@ -90,7 +90,7 @@ class camun::simulator::Simulator : public QObject
         const SSLSimulationProto::RobotControl &control);
     std::vector<robot::RadioResponse> acceptYellowRobotControlCommand(
         const SSLSimulationProto::RobotControl &control);
-    void stepSimulation(double time_ms);
+    void stepSimulation(double time_s);
     // checks for possible collisions with the robots on the target position of the ball
     // calls teleportRobotToFreePosition to move robots out of the way
     void safelyTeleportBall(const float x, const float y);
