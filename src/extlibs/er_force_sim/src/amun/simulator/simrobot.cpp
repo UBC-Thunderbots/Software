@@ -591,7 +591,7 @@ bool SimRobot::canKickBall(SimBall *ball) const
     return false;
 }
 
-robot::RadioResponse SimRobot::setCommand(const sslsim::RobotCommand &command,
+robot::RadioResponse SimRobot::setCommand(const SSLSimulationProto::RobotCommand &command,
                                           SimBall *ball, bool charge, float rxLoss,
                                           float txLoss)
 {

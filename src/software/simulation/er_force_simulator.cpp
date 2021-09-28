@@ -66,8 +66,7 @@ ErForceSimulator::ErForceSimulator(
       wrapper_packet()
 {
     loadConfiguration("simulator/2020", &er_force_sim_setup, false);
-    er_force_sim =
-        new camun::simulator::Simulator(er_force_sim_setup, true),
+    er_force_sim = new camun::simulator::Simulator(er_force_sim_setup, true),
 
     // er_force_sim_timer.setTime(1234, 1.0);
         std::cout << "er_force_sim_timer.currentTime(): "
@@ -103,7 +102,6 @@ ErForceSimulator::ErForceSimulator(
     this->resetCurrentFirmwareTime();
     er_force_sim->handleSimulatorTick(1);
 
-    er_force_sim->process();
 
     // er_force_sim->process();
 
@@ -321,7 +319,7 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     //                                      er_force_sim_timer.currentTime());
     std::this_thread::sleep_for(
         std::chrono::milliseconds(static_cast<int>(time_step.toMilliseconds())));
-    er_force_sim->process();
+    // er_force_sim->process();
 
     frame_number++;
 }

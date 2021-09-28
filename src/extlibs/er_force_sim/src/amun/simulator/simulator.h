@@ -71,8 +71,7 @@ class camun::simulator::Simulator : public QObject
     typedef QMap<unsigned int, QPair<SimRobot *, unsigned int>>
         RobotMap; /*First int: ID, Second int: Generation*/
 
-    explicit Simulator(const amun::SimulatorSetup &setup,
-                       bool useManualTrigger = false);
+    explicit Simulator(const amun::SimulatorSetup &setup, bool useManualTrigger = false);
     ~Simulator() override;
     Simulator(const Simulator &) = delete;
     Simulator &operator=(const Simulator &) = delete;
@@ -87,8 +86,9 @@ class camun::simulator::Simulator : public QObject
     void sendSSLSimError(const QList<SSLSimError> &errors, ErrorSource source);
 
    public:
-    void registerBlueRobotControlCommand(const SSLSimulationProto::RobotControl &control);
-    void registerYellowRobotControlCommand(
+    std::vector<robot::RadioResponse> acceptBlueRobotControlCommand(
+        const SSLSimulationProto::RobotControl &control);
+    std::vector<robot::RadioResponse> acceptYellowRobotControlCommand(
         const SSLSimulationProto::RobotControl &control);
     void stepSimulation(double time_ms);
     // checks for possible collisions with the robots on the target position of the ball
@@ -101,9 +101,10 @@ class camun::simulator::Simulator : public QObject
     void handleRadioCommands(const SSLSimRobotControl &control, bool isBlue,
                              qint64 processingStart);
     void setFlipped(bool flipped);
-    void process();
 
    private:
+    std::vector<robot::RadioResponse> acceptRobotControlCommand(
+        const SSLSimulationProto::RobotControl &control, bool isBlue);
     void sendSSLSimErrorInternal(ErrorSource source);
     void resetFlipped(RobotMap &robots, float side);
     std::tuple<QList<QByteArray>, QByteArray, qint64> createVisionPacket();

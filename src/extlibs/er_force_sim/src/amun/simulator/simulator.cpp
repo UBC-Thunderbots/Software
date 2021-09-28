@@ -108,8 +108,7 @@ static void simulatorTickCallback(btDynamicsWorld *world, btScalar timeStep)
  * \brief %Simulator interface
  */
 
-Simulator::Simulator(const amun::SimulatorSetup &setup,
-                     bool useManualTrigger)
+Simulator::Simulator(const amun::SimulatorSetup &setup, bool useManualTrigger)
     : m_isPartial(useManualTrigger),
       m_time(0),
       m_lastSentStatusTime(0),
@@ -123,10 +122,6 @@ Simulator::Simulator(const amun::SimulatorSetup &setup,
     // timing may change if time is scaled
     m_trigger = new QTimer(this);
     m_trigger->setTimerType(Qt::PreciseTimer);
-    if (!m_isPartial)
-    {
-        connect(m_trigger, SIGNAL(timeout()), SLOT(process()));
-    }
 
     // setup bullet
     m_data                       = new SimulatorData;
@@ -201,78 +196,48 @@ Simulator::~Simulator()
     delete m_data;
 }
 
-void Simulator::process()
+std::vector<robot::RadioResponse> Simulator::acceptRobotControlCommand(
+    const SSLSimulationProto::RobotControl &control, bool isBlue)
 {
     // collect responses from robots
-    QList<robot::RadioResponse> responses;
+    std::vector<robot::RadioResponse> responses;
 
-    // apply only radio commands that were already received by the robots
-    while (m_radioCommands.size() > 0 && std::get<1>(m_radioCommands.head()) < m_time)
+    for (const SSLSimulationProto::RobotCommand &command : control.robot_commands())
     {
-        RadioCommand commands = m_radioCommands.dequeue();
-        for (const sslsim::RobotCommand &command :
-             std::get<0>(commands)->robot_commands())
+        // pass radio command to robot that matches the id
+        const auto id          = command.id();
+        SimulatorData *data    = m_data;
+        auto time              = m_time;
+        auto charge            = m_charge;
+        auto fabricateResponse = [data, &responses, time, charge, &id, &command](
+                                     const Simulator::RobotMap &map, const bool *isBlue) {
+            if (!map.contains(id))
+                return;
+            robot::RadioResponse response = map[id].first->setCommand(
+                command, data->ball, charge, data->robotCommandPacketLoss,
+                data->robotReplyPacketLoss);
+            response.set_time(time);
+
+            if (isBlue != nullptr)
+            {
+                response.set_is_blue(*isBlue);
+            }
+            // only collect valid responses
+            if (response.IsInitialized())
+            {
+                responses.emplace_back(response);
+            }
+        };
+        if (isBlue)
         {
-            if (m_data->robotCommandPacketLoss > 0 &&
-                m_data->rng.uniformFloat(0, 1) <= m_data->robotCommandPacketLoss)
-            {
-                continue;
-            }
-
-            // pass radio command to robot that matches the id
-            const auto id          = command.id();
-            SimulatorData *data    = m_data;
-            auto time              = m_time;
-            auto charge            = m_charge;
-            auto fabricateResponse = [data, &responses, time, charge, &id, &command](
-                                         const Simulator::RobotMap &map,
-                                         const bool *isBlue) {
-                if (!map.contains(id))
-                    return;
-                robot::RadioResponse response = map[id].first->setCommand(
-                    command, data->ball, charge, data->robotCommandPacketLoss,
-                    data->robotReplyPacketLoss);
-                response.set_time(time);
-
-                if (isBlue != nullptr)
-                {
-                    response.set_is_blue(*isBlue);
-                }
-                // only collect valid responses
-                if (response.IsInitialized())
-                {
-                    if (data->robotReplyPacketLoss == 0 ||
-                        data->rng.uniformFloat(0, 1) > data->robotReplyPacketLoss)
-                    {
-                        responses.append(response);
-                    }
-                }
-            };
-            bool blue = true;
-            if (std::get<2>(commands))
-            {
-                fabricateResponse(m_data->robotsBlue, &blue);
-            }
-            else
-            {
-                blue = false;
-                fabricateResponse(m_data->robotsYellow, &blue);
-            }
+            fabricateResponse(m_data->robotsBlue, &isBlue);
+        }
+        else
+        {
+            fabricateResponse(m_data->robotsYellow, &isBlue);
         }
     }
-
-    // radio responses are sent when a robot gets his command
-    // thus send the responses immediatelly
-    emit sendRadioResponses(responses);
-    sendSSLSimErrorInternal(ErrorSource::BLUE);
-    sendSSLSimErrorInternal(ErrorSource::YELLOW);
-    sendSSLSimErrorInternal(ErrorSource::CONFIG);
-
-    // simulate to current strategy time
-    // double timeDelta = (current_time - m_time) * 1E-9;
-    // m_data->dynamicsWorld->stepSimulation(timeDelta, 10, SUB_TIMESTEP);
-    // m_time = current_time;
-    //     auto data = createVisionPacket();
+    return responses;
 }
 
 void Simulator::sendSSLSimErrorInternal(ErrorSource source)
@@ -738,7 +703,7 @@ void Simulator::handleSimulatorSetupCommand(const Command &command)
         if (sim.has_enable())
         {
             m_enabled = sim.enable();
-            //m_time    = m_timer->currentTime();
+            // m_time    = m_timer->currentTime();
             // update timer when simulator status is changed
         }
 

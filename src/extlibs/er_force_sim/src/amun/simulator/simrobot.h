@@ -28,6 +28,7 @@
 #include "extlibs/er_force_sim/src/protobuf/command.pb.h"
 #include "extlibs/er_force_sim/src/protobuf/robot.pb.h"
 #include "extlibs/er_force_sim/src/protobuf/sslsim.h"
+#include "proto/ssl_simulation_robot_control.pb.h"
 
 class RNG;
 class SSL_DetectionRobot;
@@ -59,8 +60,9 @@ class camun::simulator::SimRobot : public QObject
     void begin(SimBall *ball, double time);
     bool canKickBall(SimBall *ball) const;
     void tryKick(SimBall *ball, float power, double time);
-    robot::RadioResponse setCommand(const sslsim::RobotCommand &command, SimBall *ball,
-                                    bool charge, float rxLoss, float txLoss);
+    robot::RadioResponse setCommand(const SSLSimulationProto::RobotCommand &command,
+                                    SimBall *ball, bool charge, float rxLoss,
+                                    float txLoss);
     void update(SSL_DetectionRobot *robot, float stddev_p, float stddev_phi, qint64 time);
     void update(world::SimRobot *robot) const;
     void restoreState(const world::SimRobot &robot);
@@ -107,7 +109,7 @@ class camun::simulator::SimRobot : public QObject
     };
 
     sslsim::TeleportRobot m_move;
-    sslsim::RobotCommand m_sslCommand;
+    SSLSimulationProto::RobotCommand m_sslCommand;
     bool m_charge;
     bool m_isCharged;
     bool m_inStandby;
