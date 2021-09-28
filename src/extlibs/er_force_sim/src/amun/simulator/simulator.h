@@ -114,7 +114,8 @@ class camun::simulator::Simulator : public QObject
     void moveBall(const sslsim::TeleportBall &ball);
     void moveRobot(const sslsim::TeleportRobot &robot);
     void teleportRobotToFreePosition(SimRobot *robot);
-    void initializeDetection(SSL_DetectionFrame *detection, std::size_t cameraId);
+    void initializeDetection(SSLProto::SSL_DetectionFrame *detection,
+                             std::size_t cameraId);
 
    private:
     typedef std::tuple<SSLSimRobotControl, qint64, bool> RadioCommand;

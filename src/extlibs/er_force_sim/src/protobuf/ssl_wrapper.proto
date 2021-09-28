@@ -1,9 +1,0 @@
-syntax = "proto2";
-import "extlibs/er_force_sim/src/protobuf/ssl_detection.proto";
-import "extlibs/er_force_sim/src/protobuf/ssl_geometry.proto";
-
-message SSL_WrapperPacket
-{
-    optional SSL_DetectionFrame detection = 1;
-    optional SSL_GeometryData geometry    = 2;
-}

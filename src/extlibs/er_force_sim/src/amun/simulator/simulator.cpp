@@ -30,7 +30,6 @@
 #include "extlibs/er_force_sim/src/core/rng.h"
 #include "extlibs/er_force_sim/src/core/timer.h"
 #include "extlibs/er_force_sim/src/protobuf/geometry.h"
-#include "extlibs/er_force_sim/src/protobuf/ssl_wrapper.pb.h"
 #include "simball.h"
 #include "simfield.h"
 #include "simrobot.h"
@@ -72,7 +71,7 @@ struct camun::simulator::SimulatorData
     btSequentialImpulseConstraintSolver *solver;
     btDiscreteDynamicsWorld *dynamicsWorld;
     world::Geometry geometry;
-    QVector<SSL_GeometryCameraCalibration> reportedCameraSetup;
+    QVector<SSLProto::SSL_GeometryCameraCalibration> reportedCameraSetup;
     QVector<btVector3> cameraPositions;
     SimField *field;
     SimBall *ball;
@@ -355,7 +354,8 @@ static bool checkCameraID(const int cameraId, const btVector3 &p,
     return ownDistance <= minDistance + 2 * overlap;
 }
 
-void Simulator::initializeDetection(SSL_DetectionFrame *detection, std::size_t cameraId)
+void Simulator::initializeDetection(SSLProto::SSL_DetectionFrame *detection,
+                                    std::size_t cameraId)
 {
     detection->set_frame_number(m_lastFrameNumber[cameraId]++);
     detection->set_camera_id(cameraId);
@@ -368,7 +368,7 @@ std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
     const std::size_t numCameras = m_data->reportedCameraSetup.size();
     world::SimulatorState simState;
 
-    std::vector<SSL_DetectionFrame> detections(numCameras);
+    std::vector<SSLProto::SSL_DetectionFrame> detections(numCameras);
     for (std::size_t i = 0; i < numCameras; i++)
     {
         initializeDetection(&detections[i], i);

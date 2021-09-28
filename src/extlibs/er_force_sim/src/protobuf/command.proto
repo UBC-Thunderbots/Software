@@ -4,7 +4,7 @@ option cc_enable_arenas = true;
 import "extlibs/er_force_sim/src/protobuf/world.proto";
 import "extlibs/er_force_sim/src/protobuf/robot.proto";
 import "extlibs/er_force_sim/src/protobuf/logfile.proto";
-import "extlibs/er_force_sim/src/protobuf/ssl_geometry.proto";
+import "proto/messages_robocup_ssl_geometry.proto";
 import "extlibs/er_force_sim/src/protobuf/ssl_simulation_control.proto";
 import "extlibs/er_force_sim/src/protobuf/ssl_simulation_custom_erforce_realism.proto";
 
@@ -19,8 +19,8 @@ message RobotMoveCommand
 
 message SimulatorSetup
 {
-    required world.Geometry geometry                    = 1;
-    repeated SSL_GeometryCameraCalibration camera_setup = 2;
+    required world.Geometry geometry                             = 1;
+    repeated SSLProto.SSL_GeometryCameraCalibration camera_setup = 2;
 }
 
 message SimulatorWorstCaseVision

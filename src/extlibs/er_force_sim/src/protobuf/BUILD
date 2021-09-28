@@ -11,6 +11,7 @@ proto_library(
     ]),
     visibility = ["//visibility:private"],
     deps = [
+        "//proto:ssl_proto",
         "@com_google_protobuf//:any_proto",
         "@com_google_protobuf//:duration_proto",
         "@com_google_protobuf//:timestamp_proto",

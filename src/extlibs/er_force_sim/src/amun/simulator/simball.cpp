@@ -26,7 +26,7 @@
 #include "extlibs/er_force_sim/src/core/coordinates.h"
 #include "extlibs/er_force_sim/src/core/rng.h"
 #include "extlibs/er_force_sim/src/core/vector.h"
-#include "extlibs/er_force_sim/src/protobuf/ssl_detection.pb.h"
+#include "proto/messages_robocup_ssl_detection.pb.h"
 #include "simulator.h"
 
 using namespace camun::simulator;
@@ -266,7 +266,7 @@ static float positionOfVisiblePixels(btVector3 &p, const btVector3 &simulatorBal
     return static_cast<float>(cameraHitCounter) / static_cast<float>(maxHits);
 }
 
-bool SimBall::update(SSL_DetectionBall *ball, float stddev, float stddevArea,
+bool SimBall::update(SSLProto::SSL_DetectionBall *ball, float stddev, float stddevArea,
                      const btVector3 &cameraPosition, bool enableInvisibleBall,
                      float visibilityThreshold)
 {
@@ -278,7 +278,7 @@ bool SimBall::update(SSL_DetectionBall *ball, float stddev, float stddevArea,
                         enableInvisibleBall, visibilityThreshold);
 }
 
-bool SimBall::addDetection(SSL_DetectionBall *ball, btVector3 pos, float stddev,
+bool SimBall::addDetection(SSLProto::SSL_DetectionBall *ball, btVector3 pos, float stddev,
                            float stddevArea, const btVector3 &cameraPosition,
                            bool enableInvisibleBall, float visibilityThreshold)
 {

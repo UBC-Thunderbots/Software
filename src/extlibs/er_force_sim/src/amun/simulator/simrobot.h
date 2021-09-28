@@ -31,7 +31,10 @@
 #include "proto/ssl_simulation_robot_control.pb.h"
 
 class RNG;
-class SSL_DetectionRobot;
+namespace SSLProto
+{
+    class SSL_DetectionRobot;
+}
 
 namespace camun
 {
@@ -63,7 +66,8 @@ class camun::simulator::SimRobot : public QObject
     robot::RadioResponse setCommand(const SSLSimulationProto::RobotCommand &command,
                                     SimBall *ball, bool charge, float rxLoss,
                                     float txLoss);
-    void update(SSL_DetectionRobot *robot, float stddev_p, float stddev_phi, qint64 time);
+    void update(SSLProto::SSL_DetectionRobot *robot, float stddev_p, float stddev_phi,
+                qint64 time);
     void update(world::SimRobot *robot) const;
     void restoreState(const world::SimRobot &robot);
     void move(const sslsim::TeleportRobot &robot);

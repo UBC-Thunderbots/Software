@@ -3,7 +3,7 @@ option cc_enable_arenas = true;
 
 import "extlibs/er_force_sim/src/protobuf/robot.proto";
 import "extlibs/er_force_sim/src/protobuf/ssl_mixed_team.proto";
-import "extlibs/er_force_sim/src/protobuf/ssl_wrapper.proto";
+import "proto/messages_robocup_ssl_wrapper.proto";
 
 package world;
 
@@ -131,9 +131,9 @@ message State
     // debug information from the simulator
     repeated SimulatorState reality = 13;
     // data for tracking replay and vision extraction
-    repeated SSL_WrapperPacket vision_frames = 10;
-    repeated int64 vision_frame_times        = 14;
-    optional int64 system_delay              = 15;
+    repeated SSLProto.SSL_WrapperPacket vision_frames = 10;
+    repeated int64 vision_frame_times                 = 14;
+    optional int64 system_delay                       = 15;
 }
 
 message SimulatorState

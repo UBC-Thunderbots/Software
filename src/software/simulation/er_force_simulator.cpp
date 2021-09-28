@@ -27,7 +27,10 @@ extern "C"
 inline bool loadConfiguration(const QString& configFile,
                               google::protobuf::Message* message, bool allowPartial)
 {
-    QString fullFilename = QString("software/simulation/config/") + configFile + ".txt";
+    QString fullFilename =
+        QString(
+            "/home/jonathan/robocup/thunderbots/Software/src/software/simulation/config/") +
+        configFile + ".txt";
     QFile file(fullFilename);
     if (!file.open(QFile::ReadOnly))
     {
@@ -60,10 +63,9 @@ ErForceSimulator::ErForceSimulator(
       blue_team_vision_msg(),
       frame_number(0),
       physics_time_step(physics_time_step),
-      er_force_sim_timer(),
-      //      er_force_sim_setup(),
-      //      er_force_sim(&er_force_sim_timer, er_force_sim_setup, true),
-      wrapper_packet()
+      er_force_sim_timer()
+//      er_force_sim_setup(),
+//      er_force_sim(&er_force_sim_timer, er_force_sim_setup, true),
 {
     loadConfiguration("simulator/2020", &er_force_sim_setup, false);
     er_force_sim = new camun::simulator::Simulator(er_force_sim_setup, true),
@@ -81,8 +83,7 @@ ErForceSimulator::ErForceSimulator(
     Team enemy_team    = Team();
     Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
 
-    World world    = World(field, ball, friendly_team, enemy_team);
-    wrapper_packet = *createSSLWrapperPacket(world, TeamColour::YELLOW);
+    World world = World(field, ball, friendly_team, enemy_team);
 
     auto* teamBlue   = c->mutable_set_team_blue();
     auto* teamYellow = c->mutable_set_team_yellow();
@@ -97,16 +98,8 @@ ErForceSimulator::ErForceSimulator(
     }
     er_force_sim->handleSimulatorSetupCommand(c);
 
-    QObject::connect(er_force_sim, &camun::simulator::Simulator::gotPacket, this,
-                     &ErForceSimulator::setWrapperPacket);
     this->resetCurrentFirmwareTime();
-    er_force_sim->handleSimulatorTick(1);
-
-
-    // er_force_sim->process();
-
-    // er_force_sim_timer.setTime(1235, 1.0);
-    //    er_force_sim->process();
+    er_force_sim->stepSimulation(1);
 }
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
@@ -326,7 +319,12 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 
 std::unique_ptr<SSLProto::SSL_WrapperPacket> ErForceSimulator::getSSLWrapperPacket() const
 {
-    return std::make_unique<SSLProto::SSL_WrapperPacket>(wrapper_packet);
+    if (er_force_sim->getWrapperPackets().empty())
+    {
+        LOG(FATAL) << "no wrapper packets" << std::endl;
+    }
+    return std::make_unique<SSLProto::SSL_WrapperPacket>(
+        er_force_sim->getWrapperPackets()[0]);
 }
 
 Field ErForceSimulator::getField() const
@@ -349,26 +347,6 @@ float ErForceSimulator::getCurrentFirmwareTimeSeconds()
     return static_cast<float>(current_firmware_time.toSeconds());
 }
 
-void ErForceSimulator::setWrapperPacket(const QByteArray& data, qint64 time,
-                                        QString sender)
-{
-    auto packet_data = SSLProto::SSL_WrapperPacket();
-    packet_data.ParseFromArray(data.data(), data.size());
-    std::cout << "ErForceSimulator packet_data.detection().t_capture()"
-              << packet_data.detection().t_capture() << std::endl;
-    std::cout << "ErForceSimulator packet_data.detection().robots_blue_size()"
-              << packet_data.detection().robots_blue_size() << std::endl;
-    std::cout << "ErForceSimulator packet_data.detection().robots_yellow_size()"
-              << packet_data.detection().robots_yellow_size() << std::endl;
-    std::cout << "ErForceSimulator packet_data.detection().t_capture() rem"
-              << static_cast<int>(packet_data.detection().t_capture()) % 100 << std::endl;
-    wrapper_packet = packet_data;
-    std::cout << "ErForceSimulator wrapper_packet.detection().t_capture()"
-              << wrapper_packet.detection().t_capture() << std::endl;
-    std::cout << "ErForceSimulator wrapper_packet.detection().t_capture() rem"
-              << static_cast<int>(wrapper_packet.detection().t_capture()) % 100
-              << std::endl;
-}
 
 // We must give this variable a value here, as non-const static variables must be
 // initialized out-of-line

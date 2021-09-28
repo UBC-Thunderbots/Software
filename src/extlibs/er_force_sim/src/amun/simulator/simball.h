@@ -34,7 +34,10 @@ static const float BALL_MASS         = 0.046f;
 static const float BALL_DECELERATION = 0.5f;
 
 class RNG;
-class SSL_DetectionBall;
+namespace SSLProto
+{
+    class SSL_DetectionBall;
+}
 
 namespace camun
 {
@@ -59,7 +62,7 @@ class camun::simulator::SimBall : public QObject
 
    public:
     void begin();
-    bool update(SSL_DetectionBall *ball, float stddev, float stddevArea,
+    bool update(SSLProto::SSL_DetectionBall *ball, float stddev, float stddevArea,
                 const btVector3 &cameraPosition, bool enableInvisibleBall,
                 float visibilityThreshold);
     void move(const sslsim::TeleportBall &ball);
@@ -76,7 +79,7 @@ class camun::simulator::SimBall : public QObject
     bool isInvalid() const;
 
     // can be used to add ball mis-detections
-    bool addDetection(SSL_DetectionBall *ball, btVector3 pos, float stddev,
+    bool addDetection(SSLProto::SSL_DetectionBall *ball, btVector3 pos, float stddev,
                       float stddevArea, const btVector3 &cameraPosition,
                       bool enableInvisibleBall, float visibilityThreshold);
 

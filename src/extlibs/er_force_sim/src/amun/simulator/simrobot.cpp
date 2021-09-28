@@ -24,8 +24,8 @@
 
 #include "extlibs/er_force_sim/src/core/coordinates.h"
 #include "extlibs/er_force_sim/src/core/rng.h"
-#include "extlibs/er_force_sim/src/protobuf/ssl_detection.pb.h"
 #include "mesh.h"
+#include "proto/messages_robocup_ssl_detection.pb.h"
 #include "simball.h"
 #include "simulator.h"
 
@@ -625,8 +625,8 @@ robot::RadioResponse SimRobot::setCommand(const SSLSimulationProto::RobotCommand
     return response;
 }
 
-void SimRobot::update(SSL_DetectionRobot *robot, float stddev_p, float stddev_phi,
-                      qint64 time)
+void SimRobot::update(SSLProto::SSL_DetectionRobot *robot, float stddev_p,
+                      float stddev_phi, qint64 time)
 {
     // setup vision packet
     robot->set_robot_id(m_specs.id());
