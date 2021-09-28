@@ -305,26 +305,16 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
             *(simulator_robot->getRobotCommand());
     }
 
-    //    er_force_sim->handleRadioCommands(yellow_robot_control, false,
-    //                                      er_force_sim_timer.currentTime());
-    //    // er_force_sim->process();
-    //    er_force_sim->handleRadioCommands(blue_robot_control, true,
-    //                                      er_force_sim_timer.currentTime());
-    std::this_thread::sleep_for(
-        std::chrono::milliseconds(static_cast<int>(time_step.toMilliseconds())));
-    // er_force_sim->process();
+    er_force_sim->acceptBlueRobotControlCommand(blue_robot_control);
+    er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);
+    er_force_sim->stepSimulation(1);
 
     frame_number++;
 }
 
-std::unique_ptr<SSLProto::SSL_WrapperPacket> ErForceSimulator::getSSLWrapperPacket() const
+std::vector<SSLProto::SSL_WrapperPacket> ErForceSimulator::getSSLWrapperPackets() const
 {
-    if (er_force_sim->getWrapperPackets().empty())
-    {
-        LOG(FATAL) << "no wrapper packets" << std::endl;
-    }
-    return std::make_unique<SSLProto::SSL_WrapperPacket>(
-        er_force_sim->getWrapperPackets()[0]);
+    return er_force_sim->getWrapperPackets();
 }
 
 Field ErForceSimulator::getField() const

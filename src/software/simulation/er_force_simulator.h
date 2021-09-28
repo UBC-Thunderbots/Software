@@ -91,13 +91,12 @@ class ErForceSimulator : public QObject
     void stepSimulation(const Duration& time_step);
 
     /**
-     * Returns an SSLProto::SSL_WrapperPacket representing the most recent state
-     * of the simulation
+     * Returns the most recent SSL Wrapper Packets
      *
-     * @return an SSLProto::SSL_WrapperPacket representing the most recent state
+     * @return vector of `SSLProto::SSL_WrapperPacket`s representing the most recent state
      * of the simulation
      */
-    std::unique_ptr<SSLProto::SSL_WrapperPacket> getSSLWrapperPacket() const;
+    std::vector<SSLProto::SSL_WrapperPacket> getSSLWrapperPackets() const;
 
     /**
      * Returns the field in the simulation

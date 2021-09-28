@@ -129,24 +129,25 @@ bool SimulatedTestFixture::validateAndCheckCompletion(
 
 void SimulatedTestFixture::updateSensorFusion(std::shared_ptr<ErForceSimulator> simulator)
 {
-    auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
-    assert(ssl_wrapper_packet);
+    auto ssl_wrapper_packets = simulator->getSSLWrapperPackets();
 
-    auto sensor_msg                        = SensorProto();
-    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
-
-    sensor_fusion.processSensorProto(sensor_msg);
-
-    if (should_log_replay)
+    for (const auto &packet : ssl_wrapper_packets)
     {
-        simulator_sensorproto_logger->onValueReceived(sensor_msg);
-        auto world_or_null = sensor_fusion.getWorld();
+        auto sensor_msg                        = SensorProto();
+        *(sensor_msg.mutable_ssl_vision_msg()) = packet;
 
-        if (world_or_null)
+        sensor_fusion.processSensorProto(sensor_msg);
+        if (should_log_replay)
         {
-            auto filtered_ssl_wrapper =
-                *createSSLWrapperPacket(*sensor_fusion.getWorld(), TeamColour::YELLOW);
-            sensorfusion_wrapper_logger->onValueReceived(filtered_ssl_wrapper);
+            simulator_sensorproto_logger->onValueReceived(sensor_msg);
+            auto world_or_null = sensor_fusion.getWorld();
+
+            if (world_or_null)
+            {
+                auto filtered_ssl_wrapper = *createSSLWrapperPacket(
+                    *sensor_fusion.getWorld(), TeamColour::YELLOW);
+                sensorfusion_wrapper_logger->onValueReceived(filtered_ssl_wrapper);
+            }
         }
     }
 }
