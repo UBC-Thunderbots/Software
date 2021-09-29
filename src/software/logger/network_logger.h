@@ -29,7 +29,7 @@ class NetworkLoggerSingleton
     {
         logWorker = g3::LogWorker::createLogWorker();
 
-        auto filtered_log_rotate_sink_handle = logWorker->addSink(
+        auto network_log_sink_handle = logWorker->addSink(
             std::make_unique<struct NetworkSink>(channel, interface, robot_id),
             &NetworkSink::sendToNetwork);
 
