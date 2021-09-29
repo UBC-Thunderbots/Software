@@ -38,7 +38,7 @@ void logFromNetworking(TbotsProto::RobotLog log)
 int main(int argc, char **argv)
 {
     // load command line arguments
-    auto args           = std::make_shared<NetworkLoggerMainCommandLineArgs>();
+    auto args           = std::make_shared<NetworkLogListenerMainCommandLineArgs>();
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
     auto logWorker               = g3::LogWorker::createLogWorker();
