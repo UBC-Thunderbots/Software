@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "shared/proto/robot_status_msg.pb.h"
+#include "proto/robot_status_msg.pb.h"
 
 // This struct contains various robot diagnostics (e.g. voltages, link quality, etc.)
 // and messages related to robot and dongle condition.

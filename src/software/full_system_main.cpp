@@ -1,8 +1,11 @@
 #include <boost/program_options.hpp>
+#include <chrono>
 #include <experimental/filesystem>
 #include <iostream>
 #include <numeric>
 
+#include "proto/logging/proto_logger.h"
+#include "proto/message_translation/ssl_wrapper.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/threaded_ai.h"
@@ -12,8 +15,6 @@
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/logger/logger.h"
 #include "software/multithreading/observer_subject_adapter.h"
-#include "software/proto/logging/proto_logger.h"
-#include "software/proto/message_translation/ssl_wrapper.h"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/design_patterns/generic_factory.h"
 
@@ -127,11 +128,23 @@ int main(int argc, char** argv)
 
         if (!args->getProtoLogOutputDir()->value().empty())
         {
+            auto now_time_point  = std::chrono::system_clock::now();
+            std::time_t now_time = std::chrono::system_clock::to_time_t(now_time_point);
+            // unfortunately there is no way to go from time_point to formatted string
+            // in modern C++ until C++20
+            char time_c_str[50];
+            std::strftime(time_c_str, sizeof(time_c_str), "%d%m%Y_%H%M%S",
+                          std::localtime(&now_time));
+            std::string time_string(time_c_str);
+
+
             namespace fs = std::experimental::filesystem;
             // we want to log protos, make the parent directory and pass the
             // subdirectories to the ProtoLoggers for each message type
             fs::path proto_log_output_dir(args->getProtoLogOutputDir()->value());
-            fs::create_directory(proto_log_output_dir);
+            // create a folder with a date+time name to store replays in
+            proto_log_output_dir /= time_string;
+            fs::create_directories(proto_log_output_dir);
 
             // log incoming SensorMsg
             auto sensor_msg_logger = std::make_shared<ProtoLogger<SensorProto>>(

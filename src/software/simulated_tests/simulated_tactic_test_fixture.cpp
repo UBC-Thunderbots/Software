@@ -1,10 +1,10 @@
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 
+#include "proto/message_translation/primitive_google_to_nanopb_converter.h"
+#include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/navigator/path_manager/velocity_obstacle_path_manager.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
 #include "software/gui/drawing/navigator.h"
-#include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
-#include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/test_util/test_util.h"
 
 SimulatedTacticTestFixture::SimulatedTacticTestFixture()

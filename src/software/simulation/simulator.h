@@ -1,8 +1,8 @@
 #pragma once
 
+#include "proto/defending_side_msg.pb.h"
+#include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/proto/defending_side_msg.pb.h"
-#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/firmware_object_deleter.h"
 #include "software/simulation/physics/physics_world.h"
 #include "software/simulation/physics_simulator_ball.h"
@@ -14,8 +14,8 @@
 extern "C"
 {
 #include "firmware/shared/physics.h"
-#include "shared/proto/primitive.nanopb.h"
-#include "shared/proto/tbots_software_msgs.nanopb.h"
+#include "proto/primitive.nanopb.h"
+#include "proto/tbots_software_msgs.nanopb.h"
 }
 
 /**
@@ -31,11 +31,14 @@ class Simulator
      * will have the given field, with no robots or ball.
      *
      * @param field The field to initialize the simulation with
+     * @param robot_constants The robot constants
+     * @param wheel_constants The wheel constants
      * @param simulator_config The config to fetch parameters from
      * @param physics_time_step The time step used to simulated physics
      * and robot primitives.
      */
-    explicit Simulator(const Field& field,
+    explicit Simulator(const Field& field, const RobotConstants_t& robot_constants,
+                       const WheelConstants& wheel_constants,
                        std::shared_ptr<const SimulatorConfig> simulator_config,
                        const Duration& physics_time_step =
                            Duration::fromSeconds(DEFAULT_PHYSICS_TIME_STEP_SECONDS));

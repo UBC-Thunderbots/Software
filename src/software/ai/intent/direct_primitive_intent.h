@@ -1,7 +1,7 @@
 #pragma once
 
+#include "proto/primitive/primitive_msg_factory.h"
 #include "software/ai/intent/intent.h"
-#include "software/proto/primitive/primitive_msg_factory.h"
 
 /**
  * A DirectPrimitiveIntent is an Intent that directly represents a Primitive, which means

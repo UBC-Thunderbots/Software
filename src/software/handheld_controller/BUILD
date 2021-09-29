@@ -42,10 +42,10 @@ cc_library(
     hdrs = ["controller_primitive_generator.h"],
     deps = [
         ":controller",
+        "//proto/message_translation:tbots_protobuf",
+        "//proto/primitive:primitive_msg_factory",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
-        "//software/proto/message_translation:tbots_protobuf",
-        "//software/proto/primitive:primitive_msg_factory",
     ],
 )
 

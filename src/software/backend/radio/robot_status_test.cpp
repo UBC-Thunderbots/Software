@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "shared/proto/robot_status_msg.pb.h"
+#include "proto/robot_status_msg.pb.h"
 #include "software/backend/radio/mrf/messages.h"
 
 TEST(RobotStatusTest, test_convert_robot_status_robot_status_msg_valid_robot_msg)

@@ -180,5 +180,8 @@ TEST_F(STPTest, DISABLED_test_get_play_info)
                                            expected_robot_tactic_assignment);
     EXPECT_EQ(play_info.getRefereeCommandName(), expected_referee_command);
     EXPECT_EQ(play_info.getPlayName(), expected_play_name);
-    EXPECT_EQ(play_info, expected_play_info);
+    // TODO (#2167): This test is non-deterministic so was disabled
+    //    EXPECT_EQ(play_info.getRobotTacticAssignment(),
+    //              expected_play_info.getRobotTacticAssignment());
+    //    EXPECT_EQ(play_info, expected_play_info);
 }

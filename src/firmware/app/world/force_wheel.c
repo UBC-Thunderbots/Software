@@ -8,13 +8,13 @@ struct ForceWheel
     float (*get_motor_speed_rpm)(void);
     void (*brake)(void);
     void (*coast)(void);
-    ForceWheelConstants_t wheel_constants;
+    WheelConstants_t wheel_constants;
 };
 
 ForceWheel_t* app_force_wheel_create(void (*apply_wheel_force)(float),
                                      float (*get_motor_speed_rpm)(void),
                                      void (*brake)(void), void (*coast)(void),
-                                     ForceWheelConstants_t wheel_constants)
+                                     WheelConstants_t wheel_constants)
 {
     ForceWheel_t* new_wheel = malloc(sizeof(ForceWheel_t));
 
@@ -58,7 +58,7 @@ void app_force_wheel_brake(const ForceWheel_t* wheel)
     wheel->brake();
 }
 
-ForceWheelConstants_t app_force_wheel_getWheelConstants(const ForceWheel_t* wheel)
+WheelConstants_t app_force_wheel_getWheelConstants(const ForceWheel_t* wheel)
 {
     return wheel->wheel_constants;
 }

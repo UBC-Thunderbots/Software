@@ -1,4 +1,4 @@
-from software.proto.repeated_any_msg_pb2 import RepeatedAnyMsg
+from proto.repeated_any_msg_pb2 import RepeatedAnyMsg
 from google.protobuf.internal.decoder import _DecodeVarint32
 from typing import TypeVar, Generic, Type, Any, Iterator, List, Dict
 import os

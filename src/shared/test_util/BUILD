@@ -11,8 +11,9 @@ cc_library(
     ],
     deps = [
         "//firmware/app/logger",
-        "//shared/proto:tbots_cc_proto",
-        "//shared/proto:tbots_nanopb_proto",
+        "//proto:tbots_cc_proto",
+        "//proto:tbots_nanopb_proto",
+        "//shared:robot_constants",
         "//shared/test_util:tbots_gtest_main",
         "//software/logger",
     ],

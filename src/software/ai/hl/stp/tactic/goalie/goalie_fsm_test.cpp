@@ -131,7 +131,7 @@ TEST(GoalieFSMTest, test_transitions)
     // goalie should transition to DribbleFSM
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<DribbleFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
 
     // goalie has ball, at the correct position and orientation to clear the ball
     world = ::TestUtil::setBallPosition(world, clear_ball_origin,
@@ -140,10 +140,10 @@ TEST(GoalieFSMTest, test_transitions)
                                   AngularVelocity::zero()),
                        Timestamp::fromSeconds(123));
 
-    // goalie should transition to ChipFSM
+    // goalie should stay in PivotKickFSM but be ready to chip
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<ChipFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
 
     goalie = ::TestUtil::createRobotAtPos(clear_ball_origin + Vector(-0.2, 0));
     world  = ::TestUtil::setBallPosition(world, clear_ball_origin,
@@ -152,12 +152,8 @@ TEST(GoalieFSMTest, test_transitions)
     world = ::TestUtil::setBallVelocity(world, Vector(1, 0), Timestamp::fromSeconds(123));
     EXPECT_TRUE(world.ball().hasBallBeenKicked(clear_ball_direction));
 
-    // process event once to fall through the ChipFSM
-    fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<ChipFSM>));
-
-    // tactic is done
+    // tactic is done since ball is out of defense area
+    world = ::TestUtil::setBallPosition(world, Point(-2, 0), Timestamp::fromSeconds(123));
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
@@ -173,27 +169,14 @@ TEST(GoalieFSMTest, test_transitions)
     world =
         ::TestUtil::setBallVelocity(world, Vector(0, -0.1), Timestamp::fromSeconds(124));
 
-    // goalie should transition to ChipFSM
+    // goalie should transition to PivotKickFSM
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<ChipFSM>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<PivotKickFSM>));
 
     // ball is now moving quickly towards the friendly goal
     world =
         ::TestUtil::setBallPosition(world, Point(-3.5, 1), Timestamp::fromSeconds(124));
     world =
         ::TestUtil::setBallVelocity(world, Vector(-2, -1), Timestamp::fromSeconds(124));
-
-    // goalie should transition to PanicState
-    fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PanicState>));
-
-    // ball is now out of danger
-    world = ::TestUtil::setBallPosition(world, Point(2, 0), Timestamp::fromSeconds(124));
-    world = ::TestUtil::setBallVelocity(world, Vector(0, 0), Timestamp::fromSeconds(124));
-    fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
-    // tactic is done
-    EXPECT_TRUE(fsm.is(boost::sml::X));
 }

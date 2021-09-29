@@ -1,8 +1,8 @@
 #include "software/ai/navigator/navigating_primitive_creator.h"
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
-#include "software/proto/message_translation/tbots_protobuf.h"
 
 NavigatingPrimitiveCreator::NavigatingPrimitiveCreator(
     std::shared_ptr<const NavigatorConfig> config)
@@ -15,25 +15,26 @@ TbotsProto::Primitive NavigatingPrimitiveCreator::createNavigatingPrimitive(
     const std::vector<ObstaclePtr> &enemy_robot_obstacles)
 {
     current_primitive = std::nullopt;
-    auto result       = calculateDestinationAndFinalSpeed(intent.getFinalSpeed(), path,
-                                                    enemy_robot_obstacles);
-    new_destination   = result.first;
-    new_final_speed   = result.second;
+    auto result       = calculateDestinationAndFinalSpeed(
+        intent.getFinalSpeed(), path, enemy_robot_obstacles, intent.getRobotConstants());
+    new_destination = result.first;
+    new_final_speed = result.second;
     intent.accept(*this);
     return *current_primitive;
 }
 
 void NavigatingPrimitiveCreator::visit(const MoveIntent &intent)
 {
-    current_primitive = *createMovePrimitive(
-        new_destination, new_final_speed, intent.getFinalAngle(),
-        intent.getDribblerMode(), intent.getAutoChipOrKick(),
-        intent.getMaxAllowedSpeedMode(), intent.getTargetSpinRevPerS());
+    current_primitive =
+        *createMovePrimitive(new_destination, new_final_speed, intent.getFinalAngle(),
+                             intent.getDribblerMode(), intent.getAutoChipOrKick(),
+                             intent.getMaxAllowedSpeedMode(),
+                             intent.getTargetSpinRevPerS(), intent.getRobotConstants());
 }
 
 std::pair<Point, double> NavigatingPrimitiveCreator::calculateDestinationAndFinalSpeed(
-    double final_speed, Path path,
-    const std::vector<ObstaclePtr> &enemy_robot_obstacles) const
+    double final_speed, Path path, const std::vector<ObstaclePtr> &enemy_robot_obstacles,
+    const RobotConstants_t &robot_constants) const
 {
     double desired_final_speed;
     Point final_dest;
@@ -48,7 +49,7 @@ std::pair<Point, double> NavigatingPrimitiveCreator::calculateDestinationAndFina
     else
     {
         // we are going to some intermediate point so we transition smoothly
-        double transition_final_speed = ROBOT_MAX_SPEED_METERS_PER_SECOND *
+        double transition_final_speed = robot_constants.robot_max_speed_m_per_s *
                                         config->getTransitionSpeedFactor()->value();
 
         desired_final_speed = calculateTransitionSpeedBetweenSegments(

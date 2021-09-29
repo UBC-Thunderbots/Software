@@ -3,9 +3,9 @@
 #include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/intent/chip_intent.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/proto/message_translation/tbots_protobuf.h"
 #include "software/test_util/test_util.h"
 
 TEST(ChipTacticTest, getChipOriginDirectionDistanceMeters)
