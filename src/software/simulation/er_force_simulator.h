@@ -184,4 +184,7 @@ class ErForceSimulator : public QObject
     Timer er_force_sim_timer;
     amun::SimulatorSetup er_force_sim_setup;
     camun::simulator::Simulator* er_force_sim;
+
+    RobotConstants_t robot_constants;
+    WheelConstants wheel_constants;
 };

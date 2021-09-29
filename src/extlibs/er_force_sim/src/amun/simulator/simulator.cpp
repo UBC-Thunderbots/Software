@@ -212,6 +212,7 @@ std::vector<robot::RadioResponse> Simulator::acceptRobotControlCommand(
 {
     // collect responses from robots
     std::vector<robot::RadioResponse> responses;
+    std::cout << "acceptRobotControlCommand: " << control.DebugString() << std::endl;
 
     for (const SSLSimulationProto::RobotCommand &command : control.robot_commands())
     {
@@ -301,6 +302,7 @@ void Simulator::stepSimulation(double time_s)
 {
     m_data->dynamicsWorld->stepSimulation(time_s, 10, SUB_TIMESTEP);
     handleSimulatorTick(time_s);
+    m_time += time_s * 1E9;
 }
 
 void Simulator::handleSimulatorTick(double timeStep)

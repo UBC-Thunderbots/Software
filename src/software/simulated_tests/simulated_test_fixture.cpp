@@ -53,7 +53,7 @@ void SimulatedTestFixture::SetUp()
     // team
     mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableFriendlyColorYellow()
-        ->setValue(false);
+        ->setValue(true);
     if (TbotsGtestMain::enable_visualizer)
     {
         enableVisualizer();

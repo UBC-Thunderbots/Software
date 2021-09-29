@@ -11,6 +11,7 @@
 #include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"
+#include "proto/message_translation/ssl_simulation_robot_control.h"
 #include "proto/message_translation/ssl_wrapper.h"
 #include "software/simulation/er_force_simulator_robot_singleton.h"
 #include "software/simulation/simulator_ball_singleton.h"
@@ -63,7 +64,9 @@ ErForceSimulator::ErForceSimulator(
       blue_team_vision_msg(),
       frame_number(0),
       physics_time_step(physics_time_step),
-      er_force_sim_timer()
+      er_force_sim_timer(),
+      robot_constants(robot_constants),
+      wheel_constants(wheel_constants)
 //      er_force_sim_setup(),
 //      er_force_sim(&er_force_sim_timer, er_force_sim_setup, true),
 {
@@ -205,6 +208,18 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     SSLSimulationProto::RobotControl yellow_robot_control;
     SSLSimulationProto::RobotControl blue_robot_control;
 
+    // hack to make things move
+    auto move_command = createRobotMoveCommand(
+        100, 200, -300, -400, robot_constants.front_wheel_angle_deg,
+        robot_constants.back_wheel_angle_deg, wheel_constants.wheel_radius_meters);
+
+    auto robot_command = createRobotCommand(1, std::move(move_command), 0, 0, 0);
+
+    std::vector<std::unique_ptr<SSLSimulationProto::RobotCommand>> robot_commands;
+    robot_commands.emplace_back(std::move(robot_command));
+
+    auto yellow_robot_control_ptr = createRobotControl(std::move(robot_commands));
+
     for (auto& iter : blue_simulator_robots)
     {
         auto simulator_robot = iter.first;
@@ -305,9 +320,10 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
             *(simulator_robot->getRobotCommand());
     }
 
-    er_force_sim->acceptBlueRobotControlCommand(blue_robot_control);
-    er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);
-    er_force_sim->stepSimulation(1);
+    // er_force_sim->acceptBlueRobotControlCommand(blue_robot_control);
+    // er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);
+    er_force_sim->acceptYellowRobotControlCommand(*yellow_robot_control_ptr);
+    er_force_sim->stepSimulation(0.01);
 
     frame_number++;
 }
