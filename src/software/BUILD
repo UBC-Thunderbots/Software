@@ -63,9 +63,9 @@ cc_binary(
     name = "network_log_listener_main",
     srcs = ["network_log_listener_main.cpp"],
     deps = [
+        "//proto:tbots_cc_proto",
         "//shared:constants",
         "//shared/parameter:cpp_configs",
-        "//shared/proto:tbots_cc_proto",
         "//software/logger:network_logger",
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",

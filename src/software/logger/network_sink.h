@@ -3,7 +3,7 @@
 #include <g3log/logmessage.hpp>
 #include <iostream>
 
-#include "shared/proto/robot_log_msg.pb.h"
+#include "proto/robot_log_msg.pb.h"
 #include "software/logger/custom_logging_levels.h"
 #include "software/networking/threaded_proto_udp_sender.h"
 

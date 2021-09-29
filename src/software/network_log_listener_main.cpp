@@ -3,8 +3,8 @@
 #include <numeric>
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "shared/proto/robot_log_msg.pb.h"
-#include "shared/proto/tbots_software_msgs.pb.h"
+#include "proto/robot_log_msg.pb.h"
+#include "proto/tbots_software_msgs.pb.h"
 #include "shared/constants.h"
 #include "software/networking/threaded_proto_udp_listener.h"
 
