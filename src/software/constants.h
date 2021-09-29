@@ -22,14 +22,3 @@ static const std::string SIMULATOR_MULTICAST_CHANNELS[MAX_SIMULATOR_MULTICAST_CH
         "ff02::c3d0:42d2:cc16",
 };
 
-static const std::string
-    NETWORK_LOGGING_MULTICAST_CHANNELS[MAX_SIMULATOR_MULTICAST_CHANNELS] = {
-        "ff02::c3d0:42d3:cc01", "ff02::c3d0:42d3:cc02", "ff02::c3d0:42d3:cc03",
-        "ff02::c3d0:42d3:cc04", "ff02::c3d0:42d3:cc05", "ff02::c3d0:42d3:cc06",
-        "ff02::c3d0:42d3:cc07", "ff02::c3d0:42d3:cc08", "ff02::c3d0:42d3:cc09",
-        "ff02::c3d0:42d3:cc10", "ff02::c3d0:42d3:cc11", "ff02::c3d0:42d3:cc12",
-        "ff02::c3d0:42d3:cc13", "ff02::c3d0:42d3:cc14", "ff02::c3d0:42d3:cc15",
-        "ff02::c3d0:42d3:cc16",
-};
-
-const short unsigned int NETWORK_LOGS_PORT = 42079;

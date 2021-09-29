@@ -60,12 +60,12 @@ cc_binary(
 )
 
 cc_binary(
-    name = "network_logger_main",
-    srcs = ["network_logger_main.cpp"],
+    name = "network_log_listener_main",
+    srcs = ["network_log_listener_main.cpp"],
     deps = [
+        "//shared:constants",
         "//shared/parameter:cpp_configs",
         "//shared/proto:tbots_cc_proto",
-        "//software:constants",
         "//software/logger:network_logger",
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",

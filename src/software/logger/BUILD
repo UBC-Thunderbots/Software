@@ -20,7 +20,7 @@ cc_library(
         "network_logger.h",
     ],
     deps = [
-        ":network_sinc",
+        ":network_sink",
         "@g3log",
         "@g3sinks",
     ],
@@ -75,7 +75,7 @@ cc_library(
 )
 
 cc_library(
-    name = "network_sinc",
+    name = "network_sink",
     srcs = [
         "network_sink.cpp",
     ],
@@ -83,9 +83,22 @@ cc_library(
         "network_sink.h",
     ],
     deps = [
+        "//shared:constants",
         "//shared/proto:tbots_cc_proto",
-        "//software:constants",
         "//software/networking:threaded_proto_udp_sender",
+        "//software/proto/message_translation:robot_log",
+        "@g3log",
+    ],
+)
+
+cc_test(
+    name = "network_sink_test",
+    srcs = ["network_sink_test.cpp"],
+    deps = [
+        "network_logger",
+        ":logger",
+        ":network_sink",
+        "//shared/test_util:tbots_gtest_main",
         "@g3log",
     ],
 )

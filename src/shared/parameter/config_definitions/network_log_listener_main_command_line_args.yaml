@@ -3,7 +3,7 @@
 
 - string:
     name: interface
-    value: "wlp2s0"
+    value: "wlp0s20f3"
     description: >-
         The interface to send and receive packets over (can be found through ifconfig)
 

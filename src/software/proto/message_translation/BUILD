@@ -198,3 +198,13 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
     ],
 )
+
+cc_library(
+    name = "robot_log",
+    srcs = ["robot_log.cpp"],
+    hdrs = ["robot_log.h"],
+    deps = [
+        "//shared/proto:tbots_cc_proto",
+        "@g3log",
+    ],
+)

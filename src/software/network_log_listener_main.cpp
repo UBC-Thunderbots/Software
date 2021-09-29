@@ -5,15 +5,15 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "shared/proto/robot_log_msg.pb.h"
 #include "shared/proto/tbots_software_msgs.pb.h"
-#include "software/constants.h"
+#include "shared/constants.h"
 #include "software/networking/threaded_proto_udp_listener.h"
 
 /*
- * This standalone program listens for RobotLog protos on the specified ip addres2079
- * and prints them
+ * This standalone program listens for RobotLog protos on the specified ip address
+ * and logs them
  */
 
-void robotLogReceiver(TbotsProto::RobotLog log)
+void logFromNetworking(TbotsProto::RobotLog log)
 {
     LEVELS level(INFO);
 
@@ -25,6 +25,7 @@ void robotLogReceiver(TbotsProto::RobotLog log)
              TbotsProto::LogLevel_Name(log.log_level()) == "FATAL")
     {
         // log FATAL as WARNING to prevent program from exiting
+        // note that the level of the RobotLog will itself be printed
         level = WARNING;
     }
 
@@ -52,12 +53,12 @@ int main(int argc, char **argv)
 
 
         auto log_input = std::make_unique<ThreadedProtoUdpListener<TbotsProto::RobotLog>>(
-            std::string(NETWORK_LOGGING_MULTICAST_CHANNELS[channel]) + "%" + interface,
-            NETWORK_LOGS_PORT, std::function(robotLogReceiver), true);
+            std::string(ROBOT_MULTICAST_CHANNELS[channel]) + "%" + interface,
+            ROBOT_LOGS_PORT, std::function(logFromNetworking), true);
 
 
-        LOG(INFO) << "Network logger listenting on channel "
-                  << NETWORK_LOGGING_MULTICAST_CHANNELS[channel] << " and interface "
+        LOG(INFO) << "Network logger listening on channel "
+                  << ROBOT_MULTICAST_CHANNELS[channel] << " and interface "
                   << interface << std::endl;
 
         // This blocks forever without using the CPU
