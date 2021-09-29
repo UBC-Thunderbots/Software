@@ -14,6 +14,7 @@
 #include "proto/message_translation/ssl_simulation_robot_control.h"
 #include "proto/message_translation/ssl_wrapper.h"
 #include "software/simulation/er_force_simulator_robot_singleton.h"
+#include "software/world/robot_state.h"
 #include "software/simulation/simulator_ball_singleton.h"
 
 extern "C"
@@ -100,6 +101,41 @@ ErForceSimulator::ErForceSimulator(
         }
     }
     er_force_sim->handleSimulatorSetupCommand(c);
+
+    for (unsigned int i = 0; i<11; i++)
+    {
+        auto blue_simulator_robot = std::make_shared<ErForceSimulatorRobot>(RobotStateWithId{.id=i, .robot_state= RobotState(Point(), Vector(),
+                        Angle::zero(),
+                        AngularVelocity::zero())},
+                                   robot_constants,
+                                   wheel_constants);
+        auto yellow_simulator_robot = std::make_shared<ErForceSimulatorRobot>(RobotStateWithId{.id=i, .robot_state= RobotState(Point(), Vector(),
+                        Angle::zero(),
+                        AngularVelocity::zero())},
+                                   robot_constants,
+                                   wheel_constants);
+
+        auto blue_firmware_robot = ErForceSimulatorRobotSingleton::createFirmwareRobot();
+        auto blue_firmware_ball  = SimulatorBallSingleton::createFirmwareBall();
+        auto yellow_firmware_robot = ErForceSimulatorRobotSingleton::createFirmwareRobot();
+        auto yellow_firmware_ball  = SimulatorBallSingleton::createFirmwareBall();
+
+        FirmwareWorld_t* blue_firmware_world_raw =
+            app_firmware_world_create(blue_firmware_robot.release(), blue_firmware_ball.release(),
+                                      &(ErForceSimulator::getCurrentFirmwareTimeSeconds));
+        auto blue_firmware_world =
+            std::shared_ptr<FirmwareWorld_t>(blue_firmware_world_raw, FirmwareWorldDeleter());
+
+        FirmwareWorld_t* yellow_firmware_world_raw =
+            app_firmware_world_create(yellow_firmware_robot.release(), blue_firmware_ball.release(),
+                                      &(ErForceSimulator::getCurrentFirmwareTimeSeconds));
+        auto yellow_firmware_world =
+            std::shared_ptr<FirmwareWorld_t>(yellow_firmware_world_raw, FirmwareWorldDeleter());
+
+        blue_simulator_robots.insert(std::make_pair(blue_simulator_robot, blue_firmware_world));
+        yellow_simulator_robots.insert(std::make_pair(yellow_simulator_robot, yellow_firmware_world));
+    }
+
 
     this->resetCurrentFirmwareTime();
     er_force_sim->stepSimulation(1);
@@ -195,6 +231,10 @@ void ErForceSimulator::setRobotPrimitive(
         ErForceSimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
             firmware_world, primitive_msg);
     }
+    else
+    {
+        LOG(WARNING)<<"Simulator robot with ID "<<id  <<" not found"<<std::endl;
+    }
 }
 
 void ErForceSimulator::stepSimulation(const Duration& time_step)
@@ -249,6 +289,7 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
                                               .at(simulator_robot->getRobotId())
                                               .global_orientation()
                                               .radians()),
+                       // TODO check that blue_team_vision_msg has a msg for robot at that id
                        AngularVelocity::fromRadians(blue_team_vision_msg.robot_states()
                                                         .at(simulator_robot->getRobotId())
                                                         .global_angular_velocity()
@@ -323,7 +364,7 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     // er_force_sim->acceptBlueRobotControlCommand(blue_robot_control);
     // er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);
     er_force_sim->acceptYellowRobotControlCommand(*yellow_robot_control_ptr);
-    er_force_sim->stepSimulation(0.01);
+    er_force_sim->stepSimulation(time_step.toSeconds());
 
     frame_number++;
 }
