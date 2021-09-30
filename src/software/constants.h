@@ -21,4 +21,3 @@ static const std::string SIMULATOR_MULTICAST_CHANNELS[MAX_SIMULATOR_MULTICAST_CH
         "ff02::c3d0:42d2:cc13", "ff02::c3d0:42d2:cc14", "ff02::c3d0:42d2:cc15",
         "ff02::c3d0:42d2:cc16",
 };
-
