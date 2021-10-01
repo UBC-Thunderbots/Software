@@ -78,9 +78,9 @@ class ErForceSimulator : public QObject
      * @param vision_msg The vision message
      */
     void setYellowRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg,
-                                    const TbotsProto::Vision& vision_msg);
+                                    std::unique_ptr<TbotsProto::Vision> vision_msg);
     void setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg,
-                                  const TbotsProto::Vision& vision_msg);
+                                  std::unique_ptr<TbotsProto::Vision> vision_msg);
 
     /**
      * Advances the simulation by the given time step. This will simulate
@@ -162,8 +162,8 @@ class ErForceSimulator : public QObject
         yellow_simulator_robots;
     std::map<std::shared_ptr<ErForceSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
         blue_simulator_robots;
-    TbotsProto::Vision yellow_team_vision_msg;
-    TbotsProto::Vision blue_team_vision_msg;
+    std::unique_ptr<TbotsProto::Vision> yellow_team_vision_msg;
+    std::unique_ptr<TbotsProto::Vision> blue_team_vision_msg;
 
     unsigned int frame_number;
 
