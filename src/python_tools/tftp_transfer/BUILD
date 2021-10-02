@@ -15,5 +15,6 @@ py_binary(
     srcs = ["client.py"],
     deps = [
         requirement("tftpy"),
+        "//python_tools:robot_broadcast_receiver",
     ],
 )

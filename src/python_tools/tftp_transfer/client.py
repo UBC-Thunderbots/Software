@@ -1,28 +1,8 @@
-import tftpy, hashlib, os, argparse, pathlib, logging
-
-# TODO (#2237): following dependency isn't necessary when checksum is obtained from announcements
-import tempfile
+import tftpy, hashlib, os, argparse, pathlib
+from python_tools.robot_broadcast_receiver import receive_announcements
 
 
-def verify_checksum(file_path: str, checksum: str) -> bool:
-    """
-    Compare the SHA-256 checksum of a given file and verify that it is the same as a given checksum.
-    
-    Any file-reading errors will return false.
-    
-    :param file_path: the path to a file
-    :param checksum: the target SHA-256 checksum to compare against
-    :return true if both checksums are correct, false otherwise
-    """
-    try:
-        file_hash = encode_sha256_checksum(file_path)
-    except Exception:
-        logging.getLogger("Tftp transfer").exception(
-            "Unexpected error when handling checksum verification."
-        )
-        return False
-
-    return file_hash == checksum
+MAX_UPLOAD_RETRIES = 3
 
 
 def encode_sha256_checksum(file_path: str) -> str:
@@ -49,50 +29,85 @@ def main():
         "--file",
         required=True,
         type=pathlib.Path,
-        help="path to the file to be transferred",
+        help="path to the file to be transferred. This should be an absolute path",
     )
-
-    # TODO (#2237): when announcements are working, we can just obtain the port and ip address from them and the
-    #               following two arguments aren't necessary
-    ap.add_argument("-p", "--port", type=int, help="the port to be used", required=True)
     ap.add_argument(
-        "-ip",
-        "--ip_address",
+        "--tftp_port",
+        type=int,
+        help="the port to be used for tftp transfers",
         required=True,
-        type=str,
-        help="ip address of outbound connection",
+    )
+    ap.add_argument(
+        "--announce_port",
+        type=int,
+        help="the port to be used for listening to announcements",
+        required=True,
+    )
+    ap.add_argument(
+        "-r",
+        "--retries",
+        type=int,
+        help="number of times to retry",
+        default=MAX_UPLOAD_RETRIES,
+        required=False,
     )
 
     args = vars(ap.parse_args())
+
     file_path = args["file"]
-    file_name = os.path.basename(args["file"])
+    file_name = os.path.basename(file_path)
     transfer_file_hash = encode_sha256_checksum(file_path)
-    port = args["port"]
-    ip_address = args["ip_address"]
-    client = tftpy.TftpClient(ip_address, port)
 
-    # send file to the robot
-    client.upload(file_name, file_path)
-    while True:
-        # verify the checksum
-        print("Verifying checksum...")
-        # TODO (#2237): currently, the checksum is verified by redownloading the file that we just
-        #       transferred from the robot to a temp directory & making sure the checksum
-        #       of the redownloaded file is the same. When we have announcements, the
-        #       checksum will be reported by the robot and we just compare the hash from the
-        #       announcement
-        with tempfile.TemporaryDirectory() as tmpdirname:
-            transferred_file_path = os.path.join(tmpdirname, file_name)
-            client.download(file_name, transferred_file_path)
+    tftp_port = args["tftp_port"]
+    announce_port = args["announce_port"]
 
-            if verify_checksum(transferred_file_path, transfer_file_hash):
+    max_retries = args["retries"]
+
+    retries_count = 0
+    # keep track of announcements from robots that have the correct sha256 checksum so that we dont re-upload files
+    # Note: we use a map of robot_id to announcement because announcements are not hashable
+    verified_announcements = {}
+
+    # additional + 1 is due to needing to verify announcements
+    while retries_count < max_retries + 1:
+        announcements = {
+            announcement.robot_id: announcement
+            for announcement in receive_announcements(announce_port)
+        }
+        # don't upload file to robot that has correct sha256 checksum
+        announcements_to_verify = {
+            robot_id: announcement
+            for robot_id, announcement in announcements.items()
+            if robot_id not in verified_announcements
+        }
+
+        if not announcements_to_verify:
+            break
+
+        for announcement in announcements_to_verify.values():
+            client = tftpy.TftpClient(announcement.ip_addr, tftp_port)
+            # send file to the robot
+            client.upload(file_name, file_path)
+
+            # verify the checksum
+            print(f"Verifying checksum for robot id: {announcement.robot_id}")
+            if announcement.sha256_checksum == transfer_file_hash:
                 print("Checksum verified")
-                break
+                verified_announcements[announcement.robot_id] = announcement
             else:
-                # if we can't validate the checksum, re-upload the file.
+                # if we can't validate the checksum, re-upload the file on the next try.
                 print("Checksum verification failed")
                 print("Retrying...")
-                client.upload(file_name, file_path)
+
+        retries_count += 1
+
+    if 0 < retries_count <= max_retries:
+        print("Files successfully uploaded for all robots")
+    elif retries_count > max_retries:
+        print("Files not successfully uploaded for all robots.")
+
+    if len(verified_announcements) > 0:
+        print(f"Successful for robot_id: {sorted(verified_announcements.keys())} ")
 
 
 if __name__ == "__main__":
