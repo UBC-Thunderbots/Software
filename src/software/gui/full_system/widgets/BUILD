@@ -28,7 +28,7 @@ qt_cc_library(
         "//software/ai/hl/stp/play",
         "//software/gui/full_system/ui:main_widget",
         "//software/gui/shared:parameters_spinbox",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory:generic_factory",
         "@qt//:qt_widgets",
     ],
 )

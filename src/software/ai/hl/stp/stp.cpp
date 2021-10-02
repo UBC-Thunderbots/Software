@@ -16,7 +16,7 @@
 #include "software/ai/intent/stop_intent.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.h"
 #include "software/util/typename/typename.h"
 
 STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,

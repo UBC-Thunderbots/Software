@@ -25,7 +25,7 @@ cc_library(
         ":enumerated_parameter",
         ":numeric_parameter",
         ":parameter",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory:generic_factory",
         "//software/world:game_state",
         "//software/world:team_colour",
     ],
