@@ -6,6 +6,7 @@
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
+#include "software/world/game_state.h"
 #include "software/world/world.h"
 
 class FreeKickPlayTest : public SimulatedPlayTestFixture
@@ -82,4 +83,67 @@ TEST_F(FreeKickPlayTest, test_free_kick_play_on_friendly_half)
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
+}
+
+TEST(FreeKickPlayInvariantAndisApplicableTest, test_invariant_and_is_applicable)
+{
+    auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
+
+    auto world = ::TestUtil::createBlankTestingWorld();
+
+    // FreeKickPlay: the play under test
+    auto free_kick_play = FreeKickPlay(play_config);
+
+    // Test 1: GameState is set to isOurFreeKick and
+    // min_dist_to_corner >= cornerKickPlay:BALL_IN_CORNER_RADIUS.
+    // Set team with possession to FRIENDLY
+    world.updateGameState(::TestUtil::createGameState(RefereeCommand::DIRECT_FREE_US,
+                                                      RefereeCommand::HALT));
+
+    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+
+    world.setTeamWithPossession(TeamSide::FRIENDLY);
+
+    ASSERT_TRUE(free_kick_play.isApplicable(world));
+    ASSERT_TRUE(free_kick_play.invariantHolds(world));
+
+
+    // Test 2: GameState is set to isOurFreeKick and
+    // min_dist_to_corner < cornerKickPlay:BALL_IN_CORNER_RADIUS.
+    // Team with possession is FRIENDLY
+    world = ::TestUtil::setBallPosition(world, world.field().enemyCornerPos(),
+                                        Timestamp::fromSeconds(0));
+
+    ASSERT_FALSE(free_kick_play.isApplicable(world));
+    ASSERT_TRUE(free_kick_play.invariantHolds(world));
+
+    // Test 3: GameState is set to isPlaying and
+    // min_dist_to_corner < cornerKickPlay:BALL_IN_CORNER_RADIUS.
+    // Team with possession is FRIENDLY
+    world.updateGameState(::TestUtil::createGameState(RefereeCommand::FORCE_START,
+                                                      RefereeCommand::DIRECT_FREE_US));
+
+    // Lets make sure the play stays running
+    ASSERT_FALSE(free_kick_play.isApplicable(world));
+    ASSERT_TRUE(free_kick_play.invariantHolds(world));
+
+    // Test 4: GameState is set to isTheirFreeKick and
+    // min_dist_to_corner >= cornerKickPlay:BALL_IN_CORNER_RADIUS.
+    // Team with possession is ENEMY
+    world.updateGameState(::TestUtil::createGameState(RefereeCommand::DIRECT_FREE_THEM,
+                                                      RefereeCommand::HALT));
+
+    world.setTeamWithPossession(TeamSide::ENEMY);
+
+    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
+
+    ASSERT_FALSE(free_kick_play.isApplicable(world));
+    ASSERT_FALSE(free_kick_play.invariantHolds(world));
+
+    // Test 5: GameState is set to HALT
+    world.updateGameState(
+        ::TestUtil::createGameState(RefereeCommand::HALT, RefereeCommand::HALT));
+
+    ASSERT_FALSE(free_kick_play.isApplicable(world));
+    ASSERT_FALSE(free_kick_play.invariantHolds(world));
 }
