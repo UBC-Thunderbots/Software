@@ -162,3 +162,4 @@ TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_goalie)
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
+
