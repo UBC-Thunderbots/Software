@@ -6,7 +6,7 @@
 #include <future>
 #include <thread>
 
-#include "shared/proto/tbots_software_msgs.pb.h"
+#include "proto/tbots_software_msgs.pb.h"
 #include "proto/sensor_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/geom/rectangle.h"

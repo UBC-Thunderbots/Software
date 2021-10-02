@@ -8,20 +8,12 @@ qt_cc_library(
     hdr = "full_system_gui.h",
     deps = [
         ":ai_control",
-<<<<<<< HEAD
-=======
+        "//proto:play_info_msg_cc_proto",
         "//proto:sensor_msg_cc_proto",
-        "//software/ai/hl/stp:play_info",
->>>>>>> 7eaae3cbf23fac80e3c20da5a7b4753c55c1823e
         "//software/gui:geometry_conversion",
         "//software/gui/full_system/ui:main_widget",
         "//software/gui/generic_widgets/robot_status",
         "//software/multithreading:thread_safe_buffer",
-<<<<<<< HEAD
-        "//software/proto:play_info_msg_cc_proto",
-        "//software/proto:sensor_msg_cc_proto",
-=======
->>>>>>> 7eaae3cbf23fac80e3c20da5a7b4753c55c1823e
         "//software/time:duration",
         "@qt//:qt_widgets",
     ],

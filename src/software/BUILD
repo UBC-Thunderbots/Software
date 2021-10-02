@@ -18,7 +18,7 @@ cc_binary(
         "//software/sensor_fusion:threaded_sensor_fusion",
         "//software/util/design_patterns:generic_factory",
         "@boost//:program_options",
-
+    ],
 )
 
 cc_binary(

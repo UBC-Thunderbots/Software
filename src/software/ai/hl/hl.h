@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "software/ai/intent/intent.h"
-#include "software/proto/play_info_msg.pb.h"
+#include "proto/play_info_msg.pb.h"
 #include "software/world/world.h"
 
 /**

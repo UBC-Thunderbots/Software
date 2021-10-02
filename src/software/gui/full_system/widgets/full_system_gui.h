@@ -10,11 +10,8 @@
 #include "software/gui/drawing/draw_functions.h"
 #include "software/gui/full_system/ui/ui_main_widget.h"
 #include "software/multithreading/thread_safe_buffer.h"
-<<<<<<< HEAD
-#include "software/proto/play_info_msg.pb.h"
-#include "software/proto/sensor_msg.pb.h"
-=======
->>>>>>> 7eaae3cbf23fac80e3c20da5a7b4753c55c1823e
+#include "proto/play_info_msg.pb.h"
+#include "proto/sensor_msg.pb.h"
 #include "software/time/duration.h"
 
 /**

@@ -16,7 +16,7 @@
 #include "software/ai/intent/stop_intent.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
-#include "software/proto/play_info_msg.pb.h"
+#include "proto/play_info_msg.pb.h"
 #include "software/util/design_patterns/generic_factory.h"
 #include "software/util/typename/typename.h"
 

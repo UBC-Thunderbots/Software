@@ -3,7 +3,7 @@
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QWidget>
 
-#include "software/proto/play_info_msg.pb.h"
+#include "proto/play_info_msg.pb.h"
 
 /**
  * This class abstracts how we display PlayInfo in the GUI
