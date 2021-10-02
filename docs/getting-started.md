@@ -50,9 +50,9 @@ These instructions assume you have a basic understanding of Linux and the comman
 
 ## Operating Systems
 
-We currently only support Linux, specifically Ubuntu 18.04 LTS. You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
+We currently only support Linux, specifically Ubuntu 18.04 LTS and 20.04 LTS (CI tests on 20.04). You are welcome to use a different version or distribution of Linux, but may need to make some tweaks in order for things to work.
 
-You can use Ubuntu 18.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
+You can use Ubuntu 20.04 LTS inside Windows through Windows Subsystem for Linux, by following [this guide](./getting-started-wsl.md). **Running and developing Thunderbots on Windows is experimental and not officially supported.**
 
 ## Getting the Code
 
@@ -94,6 +94,7 @@ We have several setup scripts to help you easily install the necessary dependenc
 * Run `./setup_firmware.sh`
   * You will be prompted for your admin password
   * This script will install everything necessary in order to build and run our robot firmware
+* If you are installing legacy robot firmware, e.g. STM32 devices, run `./setup_legacy_firmware.sh` instead.
 
 ### Setting Up USB Permissions
 
