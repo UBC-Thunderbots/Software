@@ -74,7 +74,7 @@ new_git_repository(
     name = "eigen",
     build_file = "@//external:eigen.BUILD",
     commit = "21ae2afd4edaa1b69782c67a54182d34efe43f9c",
-    remote = "https://gitlab.com/libeigen/eigen.git",
+    remote = "https://chromium.googlesource.com/external/gitlab.com/libeigen/eigen",
     shallow_since = "1544551075 +0100",
 )
 
