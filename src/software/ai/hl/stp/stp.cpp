@@ -123,6 +123,10 @@ std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
         auto play = play_constructor(play_config);
         if (play->isApplicable(world))
         {
+            if (!play->invariantHolds(world)){
+                LOG(WARNING) << "Play::isApplicable() is true and Play::invariantHolds() is false"
+                             << std::endl;
+            }
             applicable_plays.emplace_back(std::move(play));
         }
     }
