@@ -24,7 +24,7 @@ class NetworkSink
      * etc.)
      * @param robot_id id of the robot sending the logs
      */
-    NetworkSink(int channel, const std::string& interface, int robot_id);
+    NetworkSink(unsigned int channel, const std::string& interface, int robot_id);
     /**
      * This function is called on every call to LOG(). It sends a RobotLog proto on the
      * network

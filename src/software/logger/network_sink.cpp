@@ -5,7 +5,7 @@
 #include "proto/robot_log_msg.pb.h"
 #include "shared/constants.h"
 
-NetworkSink::NetworkSink(int channel, const std::string& interface, int robot_id)
+NetworkSink::NetworkSink(unsigned int channel, const std::string& interface, int robot_id)
     : robot_id(robot_id)
 {
     log_output.reset(new ThreadedProtoUdpSender<TbotsProto::RobotLog>(

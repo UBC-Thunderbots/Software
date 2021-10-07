@@ -11,6 +11,10 @@ MAKE_ENUM(FG_Colour, YELLOW, RED, GREEN, WHITE);
 class ColouredCoutSink
 {
    public:
+    /**
+     * creates a ColouredCoutSink which prints logs in different colours based on their level
+     * @param print_detailed If true, prints the log message as well as other details (level, file line, etc). If false, only prints the message
+     */
     ColouredCoutSink(bool print_detailed);
     /**
      * This is a helper function for mapping the FG_Colour enum to its relative
@@ -43,5 +47,8 @@ class ColouredCoutSink
      */
     void resetColour();
 
+    /*
+     * Determines whether log details (file, line, level, etc) are printed alongside the log message
+     */
     bool print_detailed;
 };
