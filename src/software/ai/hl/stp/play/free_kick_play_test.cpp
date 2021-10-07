@@ -97,11 +97,12 @@ TEST_F(FreeKickPlayTest, test_free_kick_play_on_friendly_half)
             Duration::fromSeconds(10));
 }
 
-TEST_F(FreeKickPlayIsApplicableInvariantHoldsTest, test_is_applicable_set_ball_center)
+TEST_F(FreeKickPlayIsApplicableInvariantHoldsTest,
+       test_set_ball_center_friendly_possession)
 {
-    // isApplicable Test 1: GameState is set to isOurFreeKick and
+    // Test 1: GameState sts to isOurFreeKick and isPlaying.
     // min_dist_to_corner >= cornerKickPlay:BALL_IN_CORNER_RADIUS.
-    // Set team with possession to FRIENDLY
+    // Set team with possession to FRIENDLY.
     world.updateGameState(::TestUtil::createGameState(RefereeCommand::DIRECT_FREE_US,
                                                       RefereeCommand::HALT));
 
@@ -109,18 +110,26 @@ TEST_F(FreeKickPlayIsApplicableInvariantHoldsTest, test_is_applicable_set_ball_c
 
     world.setTeamWithPossession(TeamSide::FRIENDLY);
 
-    ASSERT_TRUE(free_kick_play.isApplicable(world));
+    EXPECT_TRUE(free_kick_play.isApplicable(world));
+    EXPECT_TRUE(free_kick_play.invariantHolds(world));
 
     world.updateGameState(::TestUtil::createGameState(RefereeCommand::INDIRECT_FREE_US,
                                                       RefereeCommand::HALT));
 
-    ASSERT_TRUE(free_kick_play.isApplicable(world));
+    EXPECT_TRUE(free_kick_play.isApplicable(world));
+    EXPECT_TRUE(free_kick_play.invariantHolds(world));
+
+    world.updateGameState(::TestUtil::createGameState(RefereeCommand::FORCE_START,
+                                                      RefereeCommand::DIRECT_FREE_US));
+
+    EXPECT_FALSE(free_kick_play.isApplicable(world));
+    EXPECT_TRUE(free_kick_play.invariantHolds(world));
 }
 
 TEST_F(FreeKickPlayIsApplicableInvariantHoldsTest,
-       test_is_applicable_set_ball_enemy_corners)
+       test_set_ball_enemy_corners_friendly_possesion)
 {
-    // isApplicable Test 2: GameState is set to isOurFreeKick and
+    // Test 2: GameState is set to isOurFreeKick and
     // min_dist_to_corner < cornerKickPlay:BALL_IN_CORNER_RADIUS.
     // Team with possession is FRIENDLY
     world.updateGameState(::TestUtil::createGameState(RefereeCommand::DIRECT_FREE_US,
@@ -131,19 +140,21 @@ TEST_F(FreeKickPlayIsApplicableInvariantHoldsTest,
 
     world.setTeamWithPossession(TeamSide::FRIENDLY);
 
-    ASSERT_FALSE(free_kick_play.isApplicable(world));
+    EXPECT_FALSE(free_kick_play.isApplicable(world));
+    EXPECT_TRUE(free_kick_play.invariantHolds(world));
 
     world = ::TestUtil::setBallPosition(world, world.field().enemyCornerNeg(),
                                         Timestamp::fromSeconds(0));
 
-    ASSERT_FALSE(free_kick_play.isApplicable(world));
+    EXPECT_FALSE(free_kick_play.isApplicable(world));
+    EXPECT_TRUE(free_kick_play.invariantHolds(world));
 }
 
-TEST_F(FreeKickPlayIsApplicableInvariantHoldsTest, test_is_applicable_enemy_free_kick)
+TEST_F(FreeKickPlayIsApplicableInvariantHoldsTest, test_set_ball_center_enemy_posession)
 {
-    // isApplicable Test 3: GameState is set to isTheirFreeKick and
+    // Test 3: GameState sets to isTheirFreeKick and isPlaying.
     // min_dist_to_corner > cornerKickPlay:BALL_IN_CORNER_RADIUS.
-    // Team with possession is ENEMY
+    // Team with possession is ENEMY.
     world.updateGameState(::TestUtil::createGameState(RefereeCommand::DIRECT_FREE_THEM,
                                                       RefereeCommand::HALT));
 
@@ -151,42 +162,12 @@ TEST_F(FreeKickPlayIsApplicableInvariantHoldsTest, test_is_applicable_enemy_free
 
     world.setTeamWithPossession(TeamSide::ENEMY);
 
-    ASSERT_FALSE(free_kick_play.isApplicable(world));
-}
-
-TEST_F(FreeKickPlayIsApplicableInvariantHoldsTest,
-       test_invariant_holds_friendly_possession)
-{
-    // invariantHolds Test 1: GameState sets to isPlaying and isReady
-    // Team with possession is FRIENDLY
-    world.updateGameState(::TestUtil::createGameState(RefereeCommand::FORCE_START,
-                                                      RefereeCommand::DIRECT_FREE_US));
-
-    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-
-    world.setTeamWithPossession(TeamSide::FRIENDLY);
-
-    ASSERT_TRUE(free_kick_play.invariantHolds(world));
-
-    world.updateGameState(::TestUtil::createGameState(RefereeCommand::DIRECT_FREE_US,
-                                                      RefereeCommand::HALT));
-}
-
-TEST_F(FreeKickPlayIsApplicableInvariantHoldsTest, test_invariant_holds_enemy_possession)
-{
-    // invariantHolds Test 2: GameState sets to isPlaying and isReady
-    // Team with possession is ENEMY
-    world.updateGameState(::TestUtil::createGameState(RefereeCommand::DIRECT_FREE_THEM,
-                                                      RefereeCommand::HALT));
-
-    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-
-    world.setTeamWithPossession(TeamSide::ENEMY);
-
-    ASSERT_FALSE(free_kick_play.invariantHolds(world));
+    EXPECT_FALSE(free_kick_play.isApplicable(world));
+    EXPECT_FALSE(free_kick_play.invariantHolds(world));
 
     world.updateGameState(::TestUtil::createGameState(RefereeCommand::FORCE_START,
                                                       RefereeCommand::DIRECT_FREE_THEM));
 
-    ASSERT_FALSE(free_kick_play.invariantHolds(world));
+    EXPECT_FALSE(free_kick_play.isApplicable(world));
+    EXPECT_FALSE(free_kick_play.invariantHolds(world));
 }
