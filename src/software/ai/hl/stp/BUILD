@@ -20,22 +20,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "play_info",
-    srcs = ["play_info.cpp"],
-    hdrs = ["play_info.h"],
-    deps = [],
-)
-
-cc_test(
-    name = "play_info_test",
-    srcs = ["play_info_test.cpp"],
-    deps = [
-        ":play_info",
-        "//shared/test_util:tbots_gtest_main",
-    ],
-)
-
 cc_test(
     name = "stp_referee_command_play_selection_test",
     srcs = ["stp_referee_command_play_selection_test.cpp"],
