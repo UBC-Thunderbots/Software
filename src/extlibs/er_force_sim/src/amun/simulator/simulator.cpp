@@ -28,7 +28,6 @@
 #include "erroraggregator.h"
 #include "extlibs/er_force_sim/src/core/coordinates.h"
 #include "extlibs/er_force_sim/src/core/rng.h"
-#include "extlibs/er_force_sim/src/core/timer.h"
 #include "proto/er_force_sim/geometry.h"
 #include "simball.h"
 #include "simfield.h"

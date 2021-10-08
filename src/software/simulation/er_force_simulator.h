@@ -1,7 +1,6 @@
 #pragma once
 
 #include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
-#include "extlibs/er_force_sim/src/core/timer.h"
 #include "proto/defending_side_msg.pb.h"
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "proto/tbots_software_msgs.pb.h"

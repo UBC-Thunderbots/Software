@@ -101,7 +101,7 @@ TEST_F(SSLSimulationProtoTest, test_create_robot_control)
     auto robot_command_2 =
         createRobotCommand(2, std::move(move_command_2), 4.0, 6.0, 8.0);
 
-    std::vector<std::unique_ptr<sslsim::RobotCommand>> robot_commands = {};
+    std::vector<std::unique_ptr<SSLSimulationProto::RobotCommand>> robot_commands = {};
     robot_commands.push_back(std::move(robot_command_1));
     robot_commands.push_back(std::move(robot_command_2));
 

@@ -27,14 +27,3 @@ qt_cc_library(
         "@qt//:qt_widgets",
     ],
 )
-
-cc_library(
-    name = "timer",
-    srcs = ["timer.cpp"],
-    hdrs = ["timer.h"],
-    deps = [
-        "@qt//:qt_core",
-        "@qt//:qt_gui",
-        "@qt//:qt_widgets",
-    ],
-)
