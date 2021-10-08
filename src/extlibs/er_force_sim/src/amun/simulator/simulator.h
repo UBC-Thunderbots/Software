@@ -28,9 +28,8 @@
 #include <QtCore/QQueue>
 #include <tuple>
 
-#include "extlibs/er_force_sim/src/protobuf/command.h"
-#include "extlibs/er_force_sim/src/protobuf/sslsim.h"
-#include "extlibs/er_force_sim/src/protobuf/status.h"
+#include "proto/er_force_sim/command.h"
+#include "proto/er_force_sim/sslsim.h"
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "proto/ssl_simulation_robot_control.pb.h"
 
@@ -80,7 +79,6 @@ class camun::simulator::Simulator : public QObject
 
    signals:
     void gotPacket(const QByteArray &data, qint64 time, QString sender);
-    void sendStatus(const Status &status);
     void sendRadioResponses(const QList<robot::RadioResponse> &responses);
     void sendRealData(const QByteArray &data);  // sends amun::SimulatorState
     void sendSSLSimError(const QList<SSLSimError> &errors, ErrorSource source);

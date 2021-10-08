@@ -14,7 +14,7 @@ double TbotsGtestMain::test_speed       = 1.0;
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
-    // feenableexcept(FE_INVALID | FE_OVERFLOW);
+    feenableexcept(FE_INVALID | FE_OVERFLOW);
 
 
     // load command line arguments

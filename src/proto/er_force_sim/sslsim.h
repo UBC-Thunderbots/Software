@@ -23,8 +23,8 @@
 
 #include <QtCore/QSharedPointer>
 
-#include "extlibs/er_force_sim/src/protobuf/ssl_simulation_error.pb.h"
-#include "extlibs/er_force_sim/src/protobuf/ssl_simulation_robot_control.pb.h"
+#include "proto/er_force_sim/ssl_simulation_error.pb.h"
+#include "proto/er_force_sim/ssl_simulation_robot_control.pb.h"
 
 typedef QSharedPointer<sslsim::RobotControl> SSLSimRobotControl;
 typedef QSharedPointer<sslsim::SimulatorError> SSLSimError;

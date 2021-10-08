@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2015 Philipp Nordhus                                        *
+ *   Copyright 2015 Michael Eischer                                        *
  *   Robotics Erlangen e.V.                                                *
  *   http://www.robotics-erlangen.de/                                      *
  *   info@robotics-erlangen.de                                             *
@@ -18,26 +18,11 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef COMMAND_H
-#define COMMAND_H
+#ifndef SSL_REFEREE_H
+#define SSL_REFEREE_H
 
-#include <QtCore/QSharedPointer>
+#include "proto/ssl_gc_referee_message.pb.h"
 
-#include "extlibs/er_force_sim/src/protobuf/command.pb.h"
+void teamInfoSetDefault(SSLProto::Referee::TeamInfo *teamInfo);
 
-//! @file command.h
-//! @addtogroup protobuf
-//! @{
-
-//! Protobuf command wrapper with reference counting
-typedef QSharedPointer<amun::Command> Command;
-
-void simulatorSetupSetDefault(amun::SimulatorSetup &setup);
-
-// position is in meters in our coordinate system
-SSL_GeometryCameraCalibration createDefaultCamera(int cameraId, float x, float y,
-                                                  float z);
-
-//! @}
-
-#endif  // COMMAND_H
+#endif  // SSL_REFEREE_H

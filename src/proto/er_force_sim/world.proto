@@ -1,8 +1,7 @@
 syntax                  = "proto2";
 option cc_enable_arenas = true;
 
-import "extlibs/er_force_sim/src/protobuf/robot.proto";
-import "extlibs/er_force_sim/src/protobuf/ssl_mixed_team.proto";
+import "proto/er_force_sim/robot.proto";
 import "proto/messages_robocup_ssl_wrapper.proto";
 
 package world;
@@ -123,7 +122,6 @@ message State
     repeated robot.RadioResponse radio_response = 5;
     optional bool is_simulated                  = 6;
     optional bool has_vision_data               = 7;
-    optional ssl.TeamPlan mixed_team_info       = 8;
     optional TrackingAOI tracking_aoi           = 9;
     // robot states predicted without trajectories, only from vision data
     repeated Robot simple_tracking_yellow = 11;

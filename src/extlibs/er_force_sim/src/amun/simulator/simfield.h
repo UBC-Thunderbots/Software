@@ -25,7 +25,7 @@
 
 #include <QtCore/QList>
 
-#include "extlibs/er_force_sim/src/protobuf/world.pb.h"
+#include "proto/er_force_sim/world.pb.h"
 
 namespace camun
 {

@@ -34,15 +34,13 @@ class ErForceSimulator : public QObject
      * will have the given field, with no robots or ball.
      *
      * @param field The field to initialize the simulation with
+     * @param robot_constants The robot constants
+     * @param wheel_constants The wheel constants
      * @param simulator_config The config to fetch parameters from
-     * @param physics_time_step The time step used to simulated physics
-     * and robot primitives.
      */
     explicit ErForceSimulator(const Field& field, const RobotConstants_t& robot_constants,
                               const WheelConstants& wheel_constants,
-                              std::shared_ptr<const SimulatorConfig> simulator_config,
-                              const Duration& physics_time_step = Duration::fromSeconds(
-                                  DEFAULT_PHYSICS_TIME_STEP_SECONDS));
+                              std::shared_ptr<const SimulatorConfig> simulator_config);
     ErForceSimulator() = delete;
     ~ErForceSimulator();
 
@@ -167,21 +165,10 @@ class ErForceSimulator : public QObject
 
     unsigned int frame_number;
 
-    // The time step used to simulate physics and primitives
-    const Duration physics_time_step;
-
-    // The camera ID of all SSLDetectionFrames published by the simulator.
-    // This simulates having a single camera that can see the entire field
-    static constexpr unsigned int CAMERA_ID            = 0;
-    static constexpr float FIELD_LINE_THICKNESS_METRES = 0.01f;
-    // We reuse the firmware tick rate to mimic real firmware
-    static constexpr double DEFAULT_PHYSICS_TIME_STEP_SECONDS = 1.0 / CONTROL_LOOP_HZ;
-
     // The current time. This is static so that it may be used by the firmware,
     // and so must be set before each firmware tick
     static Timestamp current_firmware_time;
 
-    Timer er_force_sim_timer;
     amun::SimulatorSetup er_force_sim_setup;
     camun::simulator::Simulator* er_force_sim;
 

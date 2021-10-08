@@ -108,15 +108,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_WrapperPacket &packet)
 
     if (packet.has_detection())
     {
-        if (packet.detection().t_capture())
-        {
-            std::cout << "SensorFusion packet.detection().t_capture()"
-                      << packet.detection().t_capture() << std::endl;
-            std::cout << "SensorFusion packet.detection().robots_yellow_size()"
-                      << packet.detection().robots_yellow_size() << std::endl;
-            std::cout << "SensorFusion packet.detection().robots_blue_size()"
-                      << packet.detection().robots_blue_size() << std::endl;
-        }
         checkForVisionReset(packet.detection().t_capture());
         updateWorld(packet.detection());
     }

@@ -18,76 +18,26 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef STATUS_H
-#define STATUS_H
+#ifndef COMMAND_H
+#define COMMAND_H
 
 #include <QtCore/QSharedPointer>
 
-#include "extlibs/er_force_sim/src/protobuf/status.pb.h"
+#include "proto/er_force_sim/command.pb.h"
 
-//! @file status.h
+//! @file command.h
 //! @addtogroup protobuf
 //! @{
 
-class Status
-{
-   public:
-    Status() {}
+//! Protobuf command wrapper with reference counting
+typedef QSharedPointer<amun::Command> Command;
 
-    Status(amun::Status *status)
-    {
-        m_status = QSharedPointer<amun::Status>(status);
-    }
+void simulatorSetupSetDefault(amun::SimulatorSetup &setup);
 
-    void clear()
-    {
-        m_status.clear();
-        m_arena.clear();
-    }
-
-    bool isNull() const
-    {
-        return m_arena.isNull() && m_status.isNull();
-    }
-
-    amun::Status &operator*() const
-    {
-        if (m_arena.isNull())
-            return *m_status;
-        else
-            return *m_arenaStatus;
-    }
-
-    amun::Status *operator->() const
-    {
-        if (m_arena.isNull())
-            return &(*m_status);
-        else
-            return m_arenaStatus;
-    }
-
-    static Status createArena()
-    {
-        google::protobuf::ArenaOptions options;
-        options.initial_block_size     = 512;
-        options.max_block_size         = 32 * 1024;
-        google::protobuf::Arena *arena = new google::protobuf::Arena(options);
-        amun::Status *s = google::protobuf::Arena::CreateMessage<amun::Status>(arena);
-        return Status(s, arena);
-    }
-
-   private:
-    Status(amun::Status *status, google::protobuf::Arena *arena)
-    {
-        m_arenaStatus = status;
-        m_arena       = QSharedPointer<google::protobuf::Arena>(arena);
-    }
-
-    QSharedPointer<amun::Status> m_status;
-    amun::Status *m_arenaStatus = nullptr;
-    QSharedPointer<google::protobuf::Arena> m_arena;
-};
+// position is in meters in our coordinate system
+SSL_GeometryCameraCalibration createDefaultCamera(int cameraId, float x, float y,
+                                                  float z);
 
 //! @}
 
-#endif  // STATUS_H
+#endif  // COMMAND_H

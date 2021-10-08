@@ -7,7 +7,7 @@
 #include <QtCore/QString>
 #include <iostream>
 
-#include "extlibs/er_force_sim/src/protobuf/robot.h"
+#include "proto/er_force_sim/robot.h"
 #include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "proto/message_translation/ssl_detection.h"
 #include "proto/message_translation/ssl_geometry.h"
@@ -26,17 +26,17 @@ extern "C"
 #include "proto/robot_log_msg.nanopb.h"
 }
 
-inline bool loadConfiguration(const QString& configFile,
-                              google::protobuf::Message* message, bool allowPartial)
+inline bool loadConfiguration(const QString& config_file,
+                              google::protobuf::Message* message, bool allow_partial)
 {
-    QString fullFilename =
+    QString full_filename =
         QString(
             "/home/jonathan/robocup/thunderbots/Software/src/software/simulation/config/") +
-        configFile + ".txt";
-    QFile file(fullFilename);
+        config_file + ".txt";
+    QFile file(full_filename);
     if (!file.open(QFile::ReadOnly))
     {
-        std::cout << "Could not open configuration file " << fullFilename.toStdString()
+        std::cout << "Could not open configuration file " << full_filename.toStdString()
                   << std::endl;
         return false;
     }
@@ -45,7 +45,7 @@ inline bool loadConfiguration(const QString& configFile,
     std::string s = qPrintable(str);
 
     google::protobuf::TextFormat::Parser parser;
-    parser.AllowPartialMessage(allowPartial);
+    parser.AllowPartialMessage(allow_partial);
     parser.ParseFromString(s, message);
     return true;
 }
@@ -58,25 +58,17 @@ ErForceSimulator::~ErForceSimulator()
 ErForceSimulator::ErForceSimulator(
     const Field& field, const RobotConstants_t& robot_constants,
     const WheelConstants& wheel_constants,
-    std::shared_ptr<const SimulatorConfig> simulator_config,
-    const Duration& physics_time_step)
+    std::shared_ptr<const SimulatorConfig> simulator_config)
     : physics_world(field, robot_constants, wheel_constants, simulator_config),
       yellow_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
       blue_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
       frame_number(0),
-      physics_time_step(physics_time_step),
-      er_force_sim_timer(),
       robot_constants(robot_constants),
       wheel_constants(wheel_constants)
-//      er_force_sim_setup(),
-//      er_force_sim(&er_force_sim_timer, er_force_sim_setup, true),
 {
     loadConfiguration("simulator/2020", &er_force_sim_setup, false);
-    er_force_sim = new camun::simulator::Simulator(er_force_sim_setup, true),
+    er_force_sim = new camun::simulator::Simulator(er_force_sim_setup, true);
 
-    // er_force_sim_timer.setTime(1234, 1.0);
-        std::cout << "er_force_sim_timer.currentTime(): "
-                  << er_force_sim_timer.currentTime() << std::endl;
     Command c{new amun::Command};
     c->mutable_simulator()->set_enable(true);
     // start with default robots, take ER-Force specs.
@@ -146,11 +138,14 @@ ErForceSimulator::ErForceSimulator(
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
 {
-    er_force_sim->safelyTeleportBall(ball_state.position().x(),
-                                     ball_state.position().y());
+    er_force_sim->safelyTeleportBall(static_cast<float>(ball_state.position().x()),
+                                     static_cast<float>(ball_state.position().y()));
 }
 
-void ErForceSimulator::addYellowRobots(const std::vector<RobotStateWithId>& robots) {}
+void ErForceSimulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
+{
+    // TODO: add robots
+}
 
 void ErForceSimulator::addBlueRobots(const std::vector<RobotStateWithId>& robots)
 {
@@ -388,18 +383,6 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     SSLSimulationProto::RobotControl yellow_robot_control;
     SSLSimulationProto::RobotControl blue_robot_control;
 
-    // hack to make things move
-    auto move_command = createRobotMoveCommand(
-        100, 200, -300, -400, robot_constants.front_wheel_angle_deg,
-        robot_constants.back_wheel_angle_deg, wheel_constants.wheel_radius_meters);
-
-    auto robot_command = createRobotCommand(1, std::move(move_command), 0, 0, 0);
-
-    std::vector<std::unique_ptr<SSLSimulationProto::RobotCommand>> robot_commands;
-    robot_commands.emplace_back(std::move(robot_command));
-
-    auto yellow_robot_control_ptr = createRobotControl(std::move(robot_commands));
-
     for (auto& iter : blue_simulator_robots)
     {
         auto simulator_robot = iter.first;
@@ -528,7 +511,6 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 
     er_force_sim->acceptBlueRobotControlCommand(blue_robot_control);
     er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);
-    // er_force_sim->acceptYellowRobotControlCommand(*yellow_robot_control_ptr);
     er_force_sim->stepSimulation(time_step.toSeconds());
 
     frame_number++;

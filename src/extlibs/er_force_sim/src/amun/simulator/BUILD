@@ -9,8 +9,6 @@ cc_library(
     linkstatic = True,
     deps = [
         ":simulator_qt",
-        "//extlibs/er_force_sim/src/core",
-        "//extlibs/er_force_sim/src/protobuf",
     ],
 )
 
@@ -21,8 +19,8 @@ qt_cc_library(
     linkstatic = True,
     deps = [
         "//extlibs/er_force_sim/src/core",
-        "//extlibs/er_force_sim/src/protobuf",
         "//proto:ssl_simulation_cc_proto",
+        "//proto/er_force_sim:protobuf",
         "@bullet",
         "@qt//:qt_core",
         "@qt//:qt_gui",
