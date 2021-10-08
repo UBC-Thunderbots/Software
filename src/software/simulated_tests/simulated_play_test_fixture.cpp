@@ -70,9 +70,6 @@ void SimulatedPlayTestFixture::updatePrimitives(
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
     registerTickTime(duration_ms);
     auto vision_msg = createVision(world_with_updated_game_state);
-    std::cout << "Vision msg " << vision_msg->DebugString() << std::endl;
-    std::cout << "world friendly robots "
-              << world_with_updated_game_state.friendlyTeam().numRobots() << std::endl;
     simulator_to_update->setYellowRobotPrimitiveSet(
         createNanoPbPrimitiveSet(*primitive_set_msg), std::move(vision_msg));
 }

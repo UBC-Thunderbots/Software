@@ -29,6 +29,7 @@ extern "C"
 inline bool loadConfiguration(const QString& config_file,
                               google::protobuf::Message* message, bool allow_partial)
 {
+    // TODO: fix this with genrule
     QString full_filename =
         QString(
             "/home/jonathan/robocup/thunderbots/Software/src/software/simulation/config/") +
@@ -36,8 +37,8 @@ inline bool loadConfiguration(const QString& config_file,
     QFile file(full_filename);
     if (!file.open(QFile::ReadOnly))
     {
-        std::cout << "Could not open configuration file " << full_filename.toStdString()
-                  << std::endl;
+        LOG(FATAL) << "Could not open configuration file " << full_filename.toStdString()
+                   << std::endl;
         return false;
     }
     QString str = file.readAll();
@@ -155,8 +156,6 @@ void ErForceSimulator::addBlueRobots(const std::vector<RobotStateWithId>& robots
 void ErForceSimulator::setYellowRobotPrimitive(RobotId id,
                                                const TbotsProto_Primitive& primitive_msg)
 {
-    std::cout << "setYellowRobotPrimitive: yellow_team_vision_msg = "
-              << yellow_team_vision_msg->DebugString() << std::endl;
     simulator_ball = std::make_shared<ErForceSimulatorBall>(BallState(
         Point(yellow_team_vision_msg->ball_state().global_position().x_meters(),
               yellow_team_vision_msg->ball_state().global_position().y_meters()),
@@ -224,8 +223,6 @@ void ErForceSimulator::setYellowRobotPrimitive(RobotId id,
 void ErForceSimulator::setBlueRobotPrimitive(RobotId id,
                                              const TbotsProto_Primitive& primitive_msg)
 {
-    std::cout << "setBlueRobotPrimitive: blue_team_vision_msg = "
-              << blue_team_vision_msg->DebugString() << std::endl;
     simulator_ball = std::make_shared<ErForceSimulatorBall>(BallState(
         Point(blue_team_vision_msg->ball_state().global_position().x_meters(),
               blue_team_vision_msg->ball_state().global_position().y_meters()),
@@ -391,14 +388,12 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
         app_logger_init(simulator_robot->getRobotId(),
                         &ErForceSimulatorRobotSingleton::handleBlueRobotLogProto);
 
-        std::cout << "stepSimulation: blue_team_vision_msg = "
-                  << blue_team_vision_msg->DebugString() << std::endl;
         auto robot_state_it =
             blue_team_vision_msg->robot_states().find(simulator_robot->getRobotId());
         if (robot_state_it == blue_team_vision_msg->robot_states().end())
         {
-            std::cout << "Robot state for robot " << simulator_robot->getRobotId()
-                      << " not found";
+            LOG(WARNING) << "blue_team_vision_msg: Robot state for robot "
+                         << simulator_robot->getRobotId() << " not found" << std::endl;
         }
         else
         {
@@ -456,12 +451,10 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
         auto robot_state_it =
             yellow_team_vision_msg->robot_states().find(simulator_robot->getRobotId());
 
-        std::cout << "stepSimulation: yellow_team_vision_msg = "
-                  << yellow_team_vision_msg->DebugString() << std::endl;
         if (robot_state_it == yellow_team_vision_msg->robot_states().end())
         {
-            std::cout << "Robot state for robot " << simulator_robot->getRobotId()
-                      << " not found";
+            LOG(WARNING) << "yellow_team_vision_msg: Robot state for robot "
+                         << simulator_robot->getRobotId() << " not found" << std::endl;
         }
         else
         {

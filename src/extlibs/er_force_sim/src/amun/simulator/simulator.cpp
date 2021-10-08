@@ -211,7 +211,6 @@ std::vector<robot::RadioResponse> Simulator::acceptRobotControlCommand(
 {
     // collect responses from robots
     std::vector<robot::RadioResponse> responses;
-    std::cout << "acceptRobotControlCommand: " << control.DebugString() << std::endl;
 
     for (const SSLSimulationProto::RobotCommand &command : control.robot_commands())
     {
