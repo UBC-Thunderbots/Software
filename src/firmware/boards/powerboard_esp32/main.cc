@@ -1,7 +1,9 @@
 #ifdef PLATFORMIO_BUILD
 #include <constants_platformio.h>   // PlatformIO sees and includes the library based on the bazel rule name ONLY
+#include "echo.h"
 #else
 #include "shared/constants.h"
+#include "echo.h"
 #include <constants_platformio.h>
 #endif
 
@@ -18,5 +20,5 @@ void setup()
 
 void loop()
 {
-
+    Serial.print("hello!\n");
 }

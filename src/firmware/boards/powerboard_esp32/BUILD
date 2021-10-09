@@ -1,8 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-# example build file which shows how arduino targets can be built and flashed to the arduino directly
-# building the platformio_project will compile the Arduino code, running the platform_io project will flash the
-# connected Arduino
+# building the platformio_project will compile the Arduino code, running the platform_io project will flash the PICO
 
 # more information can be found here: https://github.com/mum4k/platformio_rules/blob/master/docs/platformio_doc.md
 
@@ -12,12 +10,20 @@ load(
     "platformio_project",
 )
 
+platformio_library(
+    name = "echo",
+    src = "echo.cc",
+    hdr = "echo.h",
+)
+
 platformio_project(
     name = "main",
     src = "main.cc",
-    board = "uno",
+    board = "pico32",
     framework = "arduino",
+    platform = "espressif32",
     deps = [
+        ":echo",
         "//shared:constants_platformio",
     ],
 )
