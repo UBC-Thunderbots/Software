@@ -2,13 +2,13 @@
 
 #include <gtest/gtest.h>
 
+#include "software/ai/motion_constraint/motion_constraint.h"
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
+#include "software/simulated_tests/non_terminating_validation_functions/robots_violating_motion_constraint.h"
 #include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_at_point_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_halt_validation.h"
-#include "software/simulated_tests/non_terminating_validation_functions/robots_violating_motion_constraint.h"
 #include "software/simulated_tests/validation/validation_function.h"
-#include "software/ai/motion_constraint/motion_constraint.h"
-#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -37,7 +37,9 @@ TEST_F(EnemyBallPlacementPlayTest, test_ball_placement_center)
     game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
     game_state.setBallPlacementPoint(ball_placement_point);
     setGameState(game_state);
-    std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory = std::make_shared<RobotNavigationObstacleFactory>(getAiConfig()->getRobotNavigationObstacleConfig());
+    std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory =
+        std::make_shared<RobotNavigationObstacleFactory>(
+            getAiConfig()->getRobotNavigationObstacleConfig());
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -49,22 +51,22 @@ TEST_F(EnemyBallPlacementPlayTest, test_ball_placement_center)
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [obstacle_factory](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [obstacle_factory](std::shared_ptr<World> world_ptr,
+                           ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
             {
                 // Empty string in yield means keep going!
-                yield(""); 
+                yield("");
             }
-            
-            robotsViolatingMotionConstraint(world_ptr,yield,obstacle_factory,MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
-        }
-    };
+
+            robotsViolatingMotionConstraint(
+                world_ptr, yield, obstacle_factory,
+                MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
+        }};
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
-
-    
 }
 
 TEST_F(EnemyBallPlacementPlayTest, test_ball_placement_diagonal)
@@ -85,8 +87,10 @@ TEST_F(EnemyBallPlacementPlayTest, test_ball_placement_diagonal)
     game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
     game_state.setBallPlacementPoint(ball_placement_point);
     setGameState(game_state);
-    std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory = std::make_shared<RobotNavigationObstacleFactory>(getAiConfig()->getRobotNavigationObstacleConfig());
-   
+    std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory =
+        std::make_shared<RobotNavigationObstacleFactory>(
+            getAiConfig()->getRobotNavigationObstacleConfig());
+
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
@@ -97,15 +101,18 @@ TEST_F(EnemyBallPlacementPlayTest, test_ball_placement_diagonal)
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [obstacle_factory](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [obstacle_factory](std::shared_ptr<World> world_ptr,
+                           ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
             {
                 yield("");
             }
-            
-            
-            
-            robotsViolatingMotionConstraint(world_ptr,yield,obstacle_factory,MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
+
+
+
+            robotsViolatingMotionConstraint(
+                world_ptr, yield, obstacle_factory,
+                MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
         }
 
     };
@@ -134,7 +141,9 @@ TEST_F(EnemyBallPlacementPlayTest, test_ball_placement_moving)
     game_state.setBallPlacementPoint(ball_placement_point);
     setGameState(game_state);
 
-    std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory = std::make_shared<RobotNavigationObstacleFactory>(getAiConfig()->getRobotNavigationObstacleConfig());
+    std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory =
+        std::make_shared<RobotNavigationObstacleFactory>(
+            getAiConfig()->getRobotNavigationObstacleConfig());
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, ball_placement_point](std::shared_ptr<World> world_ptr,
@@ -143,15 +152,16 @@ TEST_F(EnemyBallPlacementPlayTest, test_ball_placement_moving)
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [obstacle_factory](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [obstacle_factory](std::shared_ptr<World> world_ptr,
+                           ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
             {
                 yield("");
             }
-            robotsViolatingMotionConstraint(world_ptr,yield,obstacle_factory,MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
-            
-        }
-    };
+            robotsViolatingMotionConstraint(
+                world_ptr, yield, obstacle_factory,
+                MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
+        }};
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
@@ -175,7 +185,9 @@ TEST_F(EnemyBallPlacementPlayTest, test_no_placement)
     GameState game_state;
     game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
     setGameState(game_state);
-    std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory = std::make_shared<RobotNavigationObstacleFactory>(getAiConfig()->getRobotNavigationObstacleConfig());
+    std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory =
+        std::make_shared<RobotNavigationObstacleFactory>(
+            getAiConfig()->getRobotNavigationObstacleConfig());
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -188,15 +200,17 @@ TEST_F(EnemyBallPlacementPlayTest, test_no_placement)
 
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [obstacle_factory](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [obstacle_factory](std::shared_ptr<World> world_ptr,
+                           ValidationCoroutine::push_type& yield) {
             while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(2))
             {
                 yield("");
             }
-            robotsViolatingMotionConstraint(world_ptr,yield,obstacle_factory,MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
-        }
-    };
-    
+            robotsViolatingMotionConstraint(
+                world_ptr, yield, obstacle_factory,
+                MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
+        }};
+
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));

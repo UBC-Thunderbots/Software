@@ -54,8 +54,8 @@ class SimulatedPlayTestFixture : public SimulatedTestFixture
     /**
      * Gets the configs used in simulation
      * Useful for constructing duplicates of Obstacle Factory
-     * 
-     * @return the Ai Config 
+     *
+     * @return the Ai Config
      */
     std::shared_ptr<AiConfig> getAiConfig();
 

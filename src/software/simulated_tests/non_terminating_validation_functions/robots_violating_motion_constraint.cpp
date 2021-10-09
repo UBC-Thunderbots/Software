@@ -2,24 +2,22 @@
 
 #include "software/logger/logger.h"
 
-void robotsViolatingMotionConstraint(std::shared_ptr<World> world_ptr,
-                                        ValidationCoroutine::push_type& yield,
-                                        std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory,
-                                        MotionConstraint constraint){
-    
-    std::vector<ObstaclePtr> obstacles = obstacle_factory->createFromMotionConstraint(constraint,*world_ptr);
+void robotsViolatingMotionConstraint(
+    std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield,
+    std::shared_ptr<RobotNavigationObstacleFactory> obstacle_factory,
+    MotionConstraint constraint)
+{
+    std::vector<ObstaclePtr> obstacles =
+        obstacle_factory->createFromMotionConstraint(constraint, *world_ptr);
     for (auto robot : world_ptr->friendlyTeam().getAllRobots())
     {
         for (auto obstacle_ptr : obstacles)
         {
             if (obstacle_ptr.get()->contains(robot.position()))
             {
-                yield("Robot " + std::to_string(robot.id()) + " violated the motion constraint");
+                yield("Robot " + std::to_string(robot.id()) +
+                      " violated the motion constraint");
             }
         }
     }
 }
-
-
-
-
