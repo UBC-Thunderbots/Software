@@ -9,7 +9,6 @@ cc_binary(
         "//shared/parameter:cpp_configs",
         "//software:constants",
         "//software/ai:threaded_ai",
-        "//software/ai/hl/stp:play_info",
         "//software/backend",
         "//software/backend:all_backends",
         "//software/estop:arduino_util",
