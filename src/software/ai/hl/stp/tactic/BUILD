@@ -11,18 +11,6 @@ cc_test(
 )
 
 cc_library(
-    name = "kickoff_chip_tactic",
-    srcs = ["kickoff_chip_tactic.cpp"],
-    hdrs = ["kickoff_chip_tactic.h"],
-    deps = [
-        "//shared:constants",
-        "//software/ai/hl/stp/action:chip_action",
-        "//software/ai/hl/stp/tactic/chip:chip_tactic",
-        "//software/logger",
-    ],
-)
-
-cc_library(
     name = "penalty_setup_tactic",
     srcs = ["penalty_setup_tactic.cpp"],
     hdrs = ["penalty_setup_tactic.h"],
@@ -80,7 +68,6 @@ cc_library(
     name = "all_tactics",
     hdrs = ["all_tactics.h"],
     deps = [
-        ":kickoff_chip_tactic",
         ":penalty_setup_tactic",
         ":receiver_tactic",
         ":shadow_free_kicker_tactic",

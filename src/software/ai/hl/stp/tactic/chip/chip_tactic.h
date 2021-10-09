@@ -69,3 +69,5 @@ class ChipTactic : public Tactic
     // Tactic parameters
     ChipFSM::ControlParams control_params;
 };
+
+COPY_CLASS(KickoffChipTactic, ChipTactic)

@@ -10,6 +10,12 @@
 #include "software/ai/intent/intent.h"
 #include "software/world/world.h"
 
+#define COPY_CLASS(new_class, parent_class) \
+class new_class : public parent_class \
+{ \
+    using parent_class::parent_class; \
+};
+
 // TODO (#1888): remove this typedef
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with

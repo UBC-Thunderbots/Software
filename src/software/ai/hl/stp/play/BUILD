@@ -172,7 +172,7 @@ cc_library(
         "//shared:constants",
         "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/tactic:kickoff_chip_tactic",
+        "//software/ai/hl/stp/tactic:all_tactics",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
         "//software/util/design_patterns:generic_factory",
