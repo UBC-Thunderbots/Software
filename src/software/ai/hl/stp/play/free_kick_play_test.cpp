@@ -100,7 +100,7 @@ TEST_F(FreeKickPlayTest, test_free_kick_play_on_friendly_half)
 TEST_F(FreeKickPlayIsApplicableInvariantHoldsTest,
        test_set_ball_center_friendly_possession)
 {
-    // Test 1: GameState sts to isOurFreeKick and isPlaying.
+    // Test 1: GameState sets to isOurFreeKick and isPlaying.
     // min_dist_to_corner >= cornerKickPlay:BALL_IN_CORNER_RADIUS.
     // Set team with possession to FRIENDLY.
     world.updateGameState(::TestUtil::createGameState(RefereeCommand::DIRECT_FREE_US,
