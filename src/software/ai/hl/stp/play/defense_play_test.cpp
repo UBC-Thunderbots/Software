@@ -190,31 +190,44 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
             Duration::fromSeconds(10));
 }
 
-TEST_F(DefensePlayTest, test_invariant_and_is_applicable) 
+TEST_F(DefensePlayTest, test_invariant_and_is_applicable_enemy_possession) 
 {
-    std::cout<< "hello" <<std::endl;
-    //Setup
     auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
     auto world = ::TestUtil::createBlankTestingWorld();
     world.setTeamWithPossession(TeamSide::ENEMY);
 
-    //create a DefensePlay instance
     DefensePlay defense_play = DefensePlay(play_config);
 
-    //create correct sequence of referee commands to create the right gamestate for testing
-    //Referee game state setup: FORCE_START changes play_state_ to PLAYING
     world.updateGameState(
-        ::TestUtil::createGameState(RefereeCommand::HALT, RefereeCommand::FORCE_START)); 
+        ::TestUtil::createGameState(RefereeCommand::FORCE_START, RefereeCommand::HALT)); 
 
-    //DefensePlay should (not) be applicable and running
+    ASSERT_TRUE(defense_play.isApplicable(world));
+    ASSERT_TRUE(defense_play.invariantHolds(world)); 
+
+    world.updateGameState(
+        ::TestUtil::createGameState(RefereeCommand::HALT, RefereeCommand::FORCE_START));
+
     ASSERT_FALSE(defense_play.isApplicable(world));
-    ASSERT_FALSE(defense_play.invariantHolds(world)); 
+    ASSERT_FALSE(defense_play.invariantHolds(world));
+}
 
-    //Update Referee game state setup: NORMAL_START -> HALT
+//Put Team Possession with Friendly. Both invarariantHolds and isApplicable should break.
+TEST_F(DefensePlayTest, test_invariant_and_is_applicable_friendly_side) 
+{
+    auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
+    auto world = ::TestUtil::createBlankTestingWorld();
+    world.setTeamWithPossession(TeamSide::FRIENDLY);
+
+    DefensePlay defense_play = DefensePlay(play_config);
+
     world.updateGameState(
         ::TestUtil::createGameState(RefereeCommand::FORCE_START, RefereeCommand::HALT));
+    
+    ASSERT_FALSE(defense_play.isApplicable(world));
+    ASSERT_FALSE(defense_play.invariantHolds(world));
 
-    //DefensePlay should be applicable and not running
-    ASSERT_TRUE(defense_play.isApplicable(world));
-    ASSERT_TRUE(defense_play.invariantHolds(world));
+    world.updateGameState(::TestUtil::createGameState(RefereeCommand::HALT, RefereeCommand::FORCE_START));
+
+    ASSERT_FALSE(defense_play.isApplicable(world));
+    ASSERT_FALSE(defense_play.invariantHolds(world));
 }
