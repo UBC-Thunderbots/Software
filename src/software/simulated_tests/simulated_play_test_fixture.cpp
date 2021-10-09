@@ -72,6 +72,11 @@ void SimulatedPlayTestFixture::updatePrimitives(
         createNanoPbPrimitiveSet(*primitive_set_msg));
 }
 
+std::shared_ptr<AiConfig> SimulatedPlayTestFixture::getAiConfig()
+{
+    return ai_config;
+}
+
 std::optional<PlayInfo> SimulatedPlayTestFixture::getPlayInfo()
 {
     return ai.getPlayInfo();

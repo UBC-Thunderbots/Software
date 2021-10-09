@@ -12,6 +12,7 @@ cc_library(
         "robots_in_friendly_half_validation.cpp",
         "robots_not_in_center_circle_validation.cpp",
         "robots_slow_down_validation.cpp",
+        "robots_violating_motion_constraint.cpp",
     ],
     hdrs = [
         "ball_in_play_or_scored_validation.h",
@@ -22,11 +23,13 @@ cc_library(
         "robots_in_friendly_half_validation.h",
         "robots_not_in_center_circle_validation.h",
         "robots_slow_down_validation.h",
+        "robots_violating_motion_constraint.h",
     ],
     deps = [
         "//software/geom/algorithms",
         "//software/simulated_tests/validation:validation_function",
         "//software/world",
+        "//software/ai/navigator",
         "@boost//:coroutine2",
     ],
 )

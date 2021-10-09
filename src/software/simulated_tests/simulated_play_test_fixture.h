@@ -51,6 +51,14 @@ class SimulatedPlayTestFixture : public SimulatedTestFixture
      */
     void setGameState(const GameState& game_state_);
 
+    /**
+     * Gets the configs used in simulation
+     * Useful for constructing duplicates of Obstacle Factory
+     * 
+     * @return the Ai Config 
+     */
+    std::shared_ptr<AiConfig> getAiConfig();
+
     std::optional<PlayInfo> getPlayInfo() override;
     AIDrawFunction getDrawFunctions() override;
 
