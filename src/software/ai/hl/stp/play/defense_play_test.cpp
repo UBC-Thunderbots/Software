@@ -192,7 +192,6 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
 
 TEST_F(DefensePlayTest, test_invariant_and_is_applicable_enemy_possession)
 {
-    
     auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
     auto world       = ::TestUtil::createBlankTestingWorld();
     world.setTeamWithPossession(TeamSide::ENEMY);
@@ -206,7 +205,7 @@ TEST_F(DefensePlayTest, test_invariant_and_is_applicable_enemy_possession)
     ASSERT_TRUE(defense_play.isApplicable(world));
     ASSERT_TRUE(defense_play.invariantHolds(world));
 
-    //Gamestate isHalted
+    // Gamestate isHalted
     world.updateGameState(
         ::TestUtil::createGameState(RefereeCommand::HALT, RefereeCommand::FORCE_START));
 
@@ -214,7 +213,7 @@ TEST_F(DefensePlayTest, test_invariant_and_is_applicable_enemy_possession)
     ASSERT_FALSE(defense_play.invariantHolds(world));
 }
 
-TEST_F(DefensePlayTest, test_invariant_and_is_applicable_friendly_side)
+TEST_F(DefensePlayTest, test_invariant_and_is_applicable_friendly_possession)
 {
     auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
     auto world       = ::TestUtil::createBlankTestingWorld();
@@ -222,14 +221,14 @@ TEST_F(DefensePlayTest, test_invariant_and_is_applicable_friendly_side)
 
     DefensePlay defense_play = DefensePlay(play_config);
 
-    //Gamestate isPlaying
+    // Gamestate isPlaying
     world.updateGameState(
         ::TestUtil::createGameState(RefereeCommand::FORCE_START, RefereeCommand::HALT));
 
     ASSERT_FALSE(defense_play.isApplicable(world));
     ASSERT_FALSE(defense_play.invariantHolds(world));
 
-    //Gamestate isHalted
+    // Gamestate isHalted
     world.updateGameState(
         ::TestUtil::createGameState(RefereeCommand::HALT, RefereeCommand::FORCE_START));
 
