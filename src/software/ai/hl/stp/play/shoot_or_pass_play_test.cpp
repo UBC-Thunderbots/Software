@@ -52,3 +52,22 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(25));
 }
+
+TEST(ShootOrPassPlayInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
+{
+    auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
+    auto world = ::TestUtil::createBlankTestingWorld();
+    auto shoot_or_pass_play = ShootOrPassPlay(play_config);
+    world.updateGameState(
+            ::TestUtil::createGameState(RefereeCommand::FORCE_START, RefereeCommand::HALT)
+    );
+    world.setTeamWithPossession(TeamSide::FRIENDLY);
+
+    ASSERT_TRUE(shoot_or_pass_play.isApplicable(world));
+    ASSERT_TRUE(shoot_or_pass_play.invariantHolds(world));
+
+    world.setTeamWithPossession(TeamSide::ENEMY);
+
+    ASSERT_FALSE(shoot_or_pass_play.isApplicable(world));
+    ASSERT_FALSE(shoot_or_pass_play.invariantHolds(world));
+}
