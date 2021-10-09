@@ -189,3 +189,32 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
+
+TEST_F(DefensePlayTest, test_invariant_and_is_applicable) 
+{
+    std::cout<< "hello" <<std::endl;
+    //Setup
+    auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
+    auto world = ::TestUtil::createBlankTestingWorld();
+    world.setTeamWithPossession(TeamSide::ENEMY);
+
+    //create a DefensePlay instance
+    DefensePlay defense_play = DefensePlay(play_config);
+
+    //create correct sequence of referee commands to create the right gamestate for testing
+    //Referee game state setup: FORCE_START changes play_state_ to PLAYING
+    world.updateGameState(
+        ::TestUtil::createGameState(RefereeCommand::HALT, RefereeCommand::FORCE_START)); 
+
+    //DefensePlay should (not) be applicable and running
+    ASSERT_FALSE(defense_play.isApplicable(world));
+    ASSERT_FALSE(defense_play.invariantHolds(world)); 
+
+    //Update Referee game state setup: NORMAL_START -> HALT
+    world.updateGameState(
+        ::TestUtil::createGameState(RefereeCommand::FORCE_START, RefereeCommand::HALT));
+
+    //DefensePlay should be applicable and not running
+    ASSERT_TRUE(defense_play.isApplicable(world));
+    ASSERT_TRUE(defense_play.invariantHolds(world));
+}

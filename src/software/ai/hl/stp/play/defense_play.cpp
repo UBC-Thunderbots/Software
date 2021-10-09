@@ -17,6 +17,7 @@ DefensePlay::DefensePlay(std::shared_ptr<const PlayConfig> config) : Play(config
 
 bool DefensePlay::isApplicable(const World &world) const
 {
+    std::cout<< "World Game: " <<world.gameState().isPlaying() <<std::endl;
     return world.gameState().isPlaying() &&
            (world.getTeamWithPossession() == TeamSide::ENEMY);
 }
