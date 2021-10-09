@@ -11,12 +11,8 @@ sudo service udev restart
 # allow user access to serial ports
 sudo usermod -a -G dialout $USER
 
-# installs platformio to virtual environment
-python3 -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platformio/master/scripts/get-platformio.py)"
-
-#sym links executable to directory used by platformio 
-sudo ln -sf ~/.platformio/penv/bin/platformio /usr/local/bin/platformio
-sudo ln -sf ~/.platformio/penv/bin/pio /usr/local/bin/pio
+# installs platformio to global environment
+pip install -U "platformio==5.1.1"
 
 echo "================================================================"
 echo "Done platformio Setup, please reboot for changes to take place"
