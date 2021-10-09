@@ -12,7 +12,7 @@ sudo service udev restart
 sudo usermod -a -G dialout $USER
 
 # installs platformio to global environment
-pip install -U "platformio==5.1.1"
+pip install --install-option="--prefix=/usr/local/bin" "platformio==5.1.1"
 
 echo "================================================================"
 echo "Done platformio Setup, please reboot for changes to take place"
