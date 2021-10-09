@@ -4,12 +4,12 @@ import argparse
 from time import time
 
 RECEIVE_TIMEOUT_SECONDS = 0.2
-RECEIVE_DURATION_SECONDS = 4
 
 
-def receive_announcements(port: int) -> [Announcement]:
+def receive_announcements(port: int, duration: int) -> [Announcement]:
     """
     Returns a list of Announcements, without duplicates received within a time window of 4s on a specified port
+    :param duration: how long to listen for announcements
     :param port: the port to listen for announcements on
     :return: a list of Announcements, without duplicates
     """
@@ -19,7 +19,7 @@ def receive_announcements(port: int) -> [Announcement]:
     receiver.bind(("", port))
 
     announcements = []
-    timeout = time() + RECEIVE_DURATION_SECONDS
+    timeout = time() + duration
     while time() < timeout:
         try:
             data = receiver.recv(1024)
@@ -39,11 +39,18 @@ def main():
     # get command line args
     ap = argparse.ArgumentParser()
     ap.add_argument("-p", "--port", required=True, type=int, help="port to listen on")
+    ap.add_argument(
+        "-d" "--duration",
+        required=True,
+        type=int,
+        help="how long to listen for announcements. Recommended > 2",
+    )
     args = vars(ap.parse_args())
 
     port = args["port"]
+    duration = args["duration"]
 
-    announcements = receive_announcements(port)
+    announcements = receive_announcements(port, duration)
     for announcement in announcements:
         print(
             f"robot_id: {announcement.robot_id} \nip_addr: {announcement.ip_addr} \nmac_addr: {announcement.mac_addr} \n"

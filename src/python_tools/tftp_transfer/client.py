@@ -3,6 +3,7 @@ from python_tools.robot_broadcast_receiver import receive_announcements
 
 
 MAX_UPLOAD_RETRIES = 3
+ANNOUNCEMENT_TIMEOUT_SECOND = 4
 
 
 def encode_sha256_checksum(file_path: str) -> str:
@@ -44,6 +45,13 @@ def main():
         required=True,
     )
     ap.add_argument(
+        "-d",
+        "--duration",
+        type=int,
+        help="how long to listen for announcements. Recommended > 2",
+        required=True,
+    )
+    ap.add_argument(
         "-r",
         "--retries",
         type=int,
@@ -61,18 +69,20 @@ def main():
     tftp_port = args["tftp_port"]
     announce_port = args["announce_port"]
 
+    duration = args["duration"]
     max_retries = args["retries"]
 
     retries_count = 0
     # keep track of announcements from robots that have the correct sha256 checksum so that we dont re-upload files
     # Note: we use a map of robot_id to announcement because announcements are not hashable
     verified_announcements = {}
+    clients = {}
 
     # additional + 1 is due to needing to verify announcements
     while retries_count < max_retries + 1:
         announcements = {
             announcement.robot_id: announcement
-            for announcement in receive_announcements(announce_port)
+            for announcement in receive_announcements(announce_port, duration)
         }
         # don't upload file to robot that has correct sha256 checksum
         announcements_to_verify = {
@@ -81,13 +91,17 @@ def main():
             if robot_id not in verified_announcements
         }
 
+        # exit early when there are no more announcements to verify
         if not announcements_to_verify:
             break
 
         for announcement in announcements_to_verify.values():
-            client = tftpy.TftpClient(announcement.ip_addr, tftp_port)
+            if announcement.ip_addr not in clients:
+                clients[announcement.ip_addr] = tftpy.TftpClient(
+                    announcement.ip_addr, tftp_port
+                )
             # send file to the robot
-            client.upload(file_name, file_path)
+            clients[announcement.ip_addr].upload(file_name, file_path)
 
             # verify the checksum
             print(f"Verifying checksum for robot id: {announcement.robot_id}")
