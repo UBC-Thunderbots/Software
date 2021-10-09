@@ -6,8 +6,8 @@
 
 #include "proto/logging/proto_logger.h"
 #include "proto/message_translation/ssl_wrapper.h"
+#include "proto/play_info_msg.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/ai/hl/stp/play_info.h"
 #include "software/ai/threaded_ai.h"
 #include "software/backend/backend.h"
 #include "software/constants.h"

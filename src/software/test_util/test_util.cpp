@@ -4,6 +4,7 @@
 #include "proto/robot_log_msg.pb.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
+#include "software/world/game_state.h"
 
 namespace TestUtil
 {
@@ -123,6 +124,15 @@ namespace TestUtil
                                           AngularVelocity::zero())});
         }
         return states;
+    }
+
+    GameState createGameState(const RefereeCommand &current_referee_command,
+                              const RefereeCommand &previous_referee_command)
+    {
+        GameState game_state;
+        game_state.updateRefereeCommand(previous_referee_command);
+        game_state.updateRefereeCommand(current_referee_command);
+        return game_state;
     }
 
 };  // namespace TestUtil
