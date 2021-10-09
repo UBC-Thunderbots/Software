@@ -1,14 +1,14 @@
 #pragma once
 
+#include "proto/defending_side_msg.pb.h"
+#include "proto/robot_log_msg.pb.h"
+#include "proto/robot_status_msg.pb.h"
+#include "proto/tbots_software_msgs.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "shared/proto/robot_log_msg.pb.h"
-#include "shared/proto/robot_status_msg.pb.h"
-#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/backend/backend.h"
 #include "software/backend/ssl_proto_client.h"
 #include "software/networking/threaded_proto_udp_listener.h"
 #include "software/networking/threaded_proto_udp_sender.h"
-#include "software/proto/defending_side_msg.pb.h"
 
 class SimulatorBackend : public Backend
 {

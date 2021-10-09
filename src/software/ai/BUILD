@@ -10,7 +10,6 @@ cc_library(
     # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
     deps = [
         "//software/ai/hl/stp",
-        "//software/ai/hl/stp:play_info",
         "//software/ai/hl/stp/play:all_plays",
         "//software/ai/hl/stp/play:halt_play",
         "//software/ai/navigator",

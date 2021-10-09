@@ -1,9 +1,9 @@
 #pragma once
 
+#include "proto/logging/proto_logger.h"
 #include "shared/test_util/tbots_gtest_main.h"
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
-#include "software/proto/logging/proto_logger.h"
 #include "software/sensor_fusion/sensor_fusion.h"
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
 #include "software/simulated_tests/validation/terminating_function_validator.h"
@@ -124,9 +124,9 @@ class SimulatedTestFixture : public ::testing::Test
                                   std::shared_ptr<Simulator> simulator_to_update) = 0;
 
     /**
-     * Gets play info for displaying on the FullSystemGUI
+     * Gets play info message for displaying on the FullSystemGUI
      *
-     * @return play info to display, if any
+     * @return play info message to display, if any
      */
     virtual std::optional<PlayInfo> getPlayInfo() = 0;
 

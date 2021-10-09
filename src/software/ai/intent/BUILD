@@ -114,12 +114,12 @@ cc_library(
     hdrs = ["intent.h"],
     deps = [
         "intent_visitor",
-        "//shared/proto:tbots_cc_proto",
+        "//proto:tbots_cc_proto",
+        "//proto/primitive:primitive_msg_factory",
         "//software/ai/motion_constraint",
         "//software/geom:angle",
         "//software/geom:point",
         "//software/logger",
-        "//software/proto/primitive:primitive_msg_factory",
     ],
 )
 

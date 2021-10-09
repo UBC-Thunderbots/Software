@@ -3,14 +3,14 @@
 #include <atomic>
 #include <thread>
 
+#include "proto/defending_side_msg.pb.h"
+#include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/proto/defending_side_msg.pb.h"
-#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/simulator.h"
 
 extern "C"
 {
-#include "shared/proto/primitive.nanopb.h"
+#include "proto/primitive.nanopb.h"
 }
 
 /**

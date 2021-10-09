@@ -1,15 +1,15 @@
 import numpy as np
 from bokeh.plotting import figure, Figure
 from bokeh.models import ColumnDataSource, LabelSet
-from software.proto.messages_robocup_ssl_geometry_pb2 import (
+from proto.messages_robocup_ssl_geometry_pb2 import (
     SSL_FieldCircularArc,
     SSL_FieldLineSegment,
 )
-from software.proto.messages_robocup_ssl_detection_pb2 import (
+from proto.messages_robocup_ssl_detection_pb2 import (
     SSL_DetectionBall,
     SSL_DetectionRobot,
 )
-from software.proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
+from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
 from typing import Iterable
 
 ROBOT_MAX_RADIUS = 0.09

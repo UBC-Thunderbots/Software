@@ -7,7 +7,7 @@
 #include "firmware/boards/robot_stm32h7/usart.h"
 #pragma GCC diagnostic pop
 
-#include "shared/proto/robot_log_msg.nanopb.h"
+#include "proto/robot_log_msg.nanopb.h"
 /**
  * Initialize the UART logger
  *

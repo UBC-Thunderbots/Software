@@ -17,8 +17,8 @@ ThreadedFullSystemGUI::ThreadedFullSystemGUI(
           WORLD_DRAW_FUNCTIONS_BUFFER_SIZE, false)),
       ai_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<AIDrawFunction>>(
           AI_DRAW_FUNCTIONS_BUFFER_SIZE, false)),
-      play_info_buffer(
-          std::make_shared<ThreadSafeBuffer<PlayInfo>>(PLAY_INFO_BUFFER_SIZE, false)),
+      play_info_msg_buffer(
+          std::make_shared<ThreadSafeBuffer<PlayInfo>>(PLAY_INFO_MSG_BUFFER_SIZE, false)),
       sensor_msg_buffer(
           std::make_shared<ThreadSafeBuffer<SensorProto>>(SENSOR_MSG_BUFFER_SIZE)),
       view_area_buffer(
@@ -64,9 +64,10 @@ void ThreadedFullSystemGUI::createAndRunFullSystemGUI()
     QApplication::connect(application, &QApplication::aboutToQuit,
                           [&]() { application_shutting_down = true; });
     FullSystemGUI* full_system_gui = new FullSystemGUI(
-        world_draw_functions_buffer, ai_draw_functions_buffer, play_info_buffer,
+        world_draw_functions_buffer, ai_draw_functions_buffer, play_info_msg_buffer,
         sensor_msg_buffer, view_area_buffer, worlds_received_per_second_buffer,
         primitives_sent_per_second_buffer, mutable_thunderbots_config);
+    full_system_gui->setWindowState(Qt::WindowMaximized);
     full_system_gui->show();
 
     // Run the QApplication and all windows / widgets. This function will block
@@ -108,9 +109,9 @@ void ThreadedFullSystemGUI::onValueReceived(AIDrawFunction draw_function)
     ai_draw_functions_buffer->push(draw_function);
 }
 
-void ThreadedFullSystemGUI::onValueReceived(PlayInfo play_info)
+void ThreadedFullSystemGUI::onValueReceived(PlayInfo play_info_msg)
 {
-    play_info_buffer->push(play_info);
+    play_info_msg_buffer->push(play_info_msg);
 }
 
 void ThreadedFullSystemGUI::onValueReceived(SensorProto sensor_msg)

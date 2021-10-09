@@ -1,7 +1,7 @@
 #include "software/handheld_controller/controller_primitive_generator.h"
 
-#include "software/proto/message_translation/tbots_protobuf.h"
-#include "software/proto/primitive/primitive_msg_factory.h"
+#include "proto/message_translation/tbots_protobuf.h"
+#include "proto/primitive/primitive_msg_factory.h"
 
 ControllerPrimitiveGenerator::ControllerPrimitiveGenerator(
     std::shared_ptr<const HandheldControllerConfig> controller_input_config,

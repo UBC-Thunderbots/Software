@@ -3,9 +3,9 @@
 #include <cstdlib>
 #include <experimental/filesystem>
 
+#include "proto/message_translation/ssl_wrapper.h"
 #include "shared/2015_robot_constants.h"
 #include "software/logger/logger.h"
-#include "software/proto/message_translation/ssl_wrapper.h"
 #include "software/test_util/test_util.h"
 
 SimulatedTestFixture::SimulatedTestFixture()
@@ -294,9 +294,9 @@ bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_t
         if (full_system_gui)
         {
             full_system_gui->onValueReceived(*world);
-            if (auto play_info = getPlayInfo())
+            if (auto play_info_msg = getPlayInfo())
             {
-                full_system_gui->onValueReceived(*play_info);
+                full_system_gui->onValueReceived(*play_info_msg);
             }
             full_system_gui->onValueReceived(getDrawFunctions());
         }
