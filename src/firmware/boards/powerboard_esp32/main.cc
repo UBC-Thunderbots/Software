@@ -9,6 +9,8 @@
 
 #include <Arduino.h>
 
+#define LED_BUILTIN 13
+
 /**
 * Main code to run on the powerboard.
 */
