@@ -6,13 +6,23 @@ void PlayInfoWidget::updatePlayInfo(const PlayInfo& play_info)
 {
     QString referee_command_string =
         QString("Referee Command: %1\n")
-            .arg(QString::fromStdString(play_info.getRefereeCommandName()));
+            .arg(QString::fromStdString(play_info.game_state().referee_command_name()));
     QString play_name_string =
-        QString("Play Name: %1\n").arg(QString::fromStdString(play_info.getPlayName()));
+        QString("Play Name: %1\n")
+            .arg(QString::fromStdString(play_info.play().play_name()));
     QString tactics_string = QString("Tactics:\n");
-    for (const auto& tactic_string : play_info.getRobotTacticAssignment())
+    std::vector<std::string> tactics;
+    for (const auto& [robot_id, tactic] : play_info.robot_tactic_assignment())
     {
-        tactics_string.append(QString::fromStdString(tactic_string)).append("\n");
+        tactics.emplace_back(std::to_string(robot_id)
+                                 .append("- ")
+                                 .append(tactic.tactic_name())
+                                 .append("\n"));
+    }
+    std::sort(tactics.begin(), tactics.end());
+    for (const auto& next_tactic : tactics)
+    {
+        tactics_string.append(QString::fromStdString(next_tactic));
     }
 
     QString play_info_string =

@@ -7,7 +7,7 @@ qt_cc_library(
     srcs = ["play_info_widget.cpp"],
     hdrs = ["play_info_widget.h"],
     deps = [
-        "//software/ai/hl/stp:play_info",
+        "//proto:play_info_msg_cc_proto",
         "@qt//:qt_widgets",
     ],
 )

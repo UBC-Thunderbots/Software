@@ -9,7 +9,6 @@ cc_binary(
         "//shared/parameter:cpp_configs",
         "//software:constants",
         "//software/ai:threaded_ai",
-        "//software/ai/hl/stp:play_info",
         "//software/backend",
         "//software/backend:all_backends",
         "//software/estop:arduino_util",
@@ -17,7 +16,7 @@ cc_binary(
         "//software/logger",
         "//software/multithreading:observer_subject_adapter",
         "//software/sensor_fusion:threaded_sensor_fusion",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
         "@boost//:program_options",
     ],
 )
@@ -54,7 +53,7 @@ cc_binary(
         "//software/backend:all_backends",
         "//software/gui/robot_diagnostics:threaded_robot_diagnostics_gui",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
         "@boost//:program_options",
     ],
 )

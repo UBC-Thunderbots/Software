@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/test_plays/move_test_play.h"
 
 #include "software/ai/hl/stp/tactic/test_tactics/move_test_tactic.h"
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.h"
 
 MoveTestPlay::MoveTestPlay(std::shared_ptr<const PlayConfig> config) : Play(config, false)
 {
