@@ -6,7 +6,7 @@
 #include "software/backend/backend.h"
 #include "software/gui/robot_diagnostics/threaded_robot_diagnostics_gui.h"
 #include "software/logger/logger.h"
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.h"
 
 int main(int argc, char **argv)
 {
