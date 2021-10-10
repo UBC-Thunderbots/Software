@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "Arduino.h"
+#include <Arduino.h>
 
-
-class echo {};
+void echo();

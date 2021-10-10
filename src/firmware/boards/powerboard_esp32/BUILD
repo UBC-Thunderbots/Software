@@ -11,9 +11,9 @@ load(
 )
 
 platformio_library(
-    name = "echo",
-    src = "echo.cc",
-    hdr = "echo.h",
+    name = "echo_library",
+    src = "echo_library.cc",
+    hdr = "echo_library.h",
 )
 
 platformio_project(
@@ -23,7 +23,7 @@ platformio_project(
     framework = "arduino",
     platform = "espressif32",
     deps = [
-        ":echo",
+        ":echo_library",
         "//shared:constants_platformio",
     ],
 )
