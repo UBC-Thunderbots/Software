@@ -257,8 +257,7 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     // We only need to do this a single time since all robots
     // can see and interact with the same ball
 
-    // TODO: why is this borked?
-    // current_firmware_time = current_firmware_time + time_step;
+    current_firmware_time = current_firmware_time + time_step;
 
     SSLSimulationProto::RobotControl yellow_robot_control =
         updateSimulatorRobots(&ErForceSimulatorRobotSingleton::handleYellowRobotLogProto,

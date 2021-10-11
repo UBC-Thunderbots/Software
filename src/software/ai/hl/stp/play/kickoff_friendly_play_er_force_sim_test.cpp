@@ -56,5 +56,5 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(20));
+            Duration::fromSeconds(10));
 }
