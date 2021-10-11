@@ -41,6 +41,17 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
             robotInCenterCircle(9, world_ptr, yield);
             robotReceivedBall(9, world_ptr, yield);
             ballKicked(Angle::zero(), world_ptr, yield);
+
+            // Two Friendly robots defending the exterior of defense box and one goalie
+            Rectangle robots_defensive_rect(Point(-4, 2), Point(-5, -2));
+            robotInPolygon(0, robots_defensive_rect, world_ptr, yield);
+            robotInPolygon(5, robots_defensive_rect, world_ptr, yield);
+            robotInPolygon(6, robots_defensive_rect, world_ptr, yield);
+
+            // Two friendly robots near the half line setting up for offense
+            Rectangle robots_offensive_rect(Point(0, 3.5), Point(-1.5, -3.5));
+            robotInPolygon(8, robots_offensive_rect, world_ptr, yield);
+            robotInPolygon(10, robots_offensive_rect, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
