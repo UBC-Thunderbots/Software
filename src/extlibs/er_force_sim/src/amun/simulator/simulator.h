@@ -92,7 +92,20 @@ class camun::simulator::Simulator : public QObject
     // checks for possible collisions with the robots on the target position of the ball
     // calls teleportRobotToFreePosition to move robots out of the way
     void safelyTeleportBall(const float x, const float y);
+
+    /**
+     * Generates wrapper packets from the current state of the simulator
+     *
+     * @return list of wrapper packets
+     */
     std::vector<SSLProto::SSL_WrapperPacket> getWrapperPackets();
+
+    /**
+     * Gets the current simulator state of the simulator
+     *
+     * @return simulator state
+     */
+    world::SimulatorState getSimulatorState();
     void handleSimulatorSetupCommand(const Command &command);
 
    public slots:

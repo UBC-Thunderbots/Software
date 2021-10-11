@@ -366,16 +366,12 @@ void Simulator::initializeDetection(SSLProto::SSL_DetectionFrame *detection,
 std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
 {
     const std::size_t numCameras = m_data->reportedCameraSetup.size();
-    world::SimulatorState simState;
 
     std::vector<SSLProto::SSL_DetectionFrame> detections(numCameras);
     for (std::size_t i = 0; i < numCameras; i++)
     {
         initializeDetection(&detections[i], i);
     }
-
-    auto *ball = simState.mutable_ball();
-    m_data->ball->writeBallState(ball);
 
     bool missingBall = m_data->missingBallDetections > 0 &&
                        m_data->rng.uniformFloat(0, 1) <= m_data->missingBallDetections;
@@ -413,9 +409,6 @@ std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
         for (const auto &it : team)
         {
             SimRobot *robot = it.first;
-            auto *robotProto =
-                teamIsBlue ? simState.add_blue_robots() : simState.add_yellow_robots();
-            robot->update(robotProto);
 
             if (m_time - robot->getLastSendTime() >= m_minRobotDetectionTime)
             {
@@ -522,6 +515,31 @@ std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
     geometry->mutable_models()->mutable_chip_fixed_loss()->set_damping_xy_other_hops(1);
 
     return packets;
+}
+
+world::SimulatorState Simulator::getSimulatorState()
+{
+    const std::size_t numCameras = m_data->reportedCameraSetup.size();
+    world::SimulatorState simState;
+
+    auto *ball = simState.mutable_ball();
+    m_data->ball->writeBallState(ball);
+
+    // get robot positions
+    for (bool teamIsBlue : {true, false})
+    {
+        auto &team = teamIsBlue ? m_data->robotsBlue : m_data->robotsYellow;
+
+        for (const auto &it : team)
+        {
+            SimRobot *robot = it.first;
+            auto *robotProto =
+                teamIsBlue ? simState.add_blue_robots() : simState.add_yellow_robots();
+            robot->update(robotProto);
+        }
+    }
+
+    return simState;
 }
 
 void Simulator::resetVisionPackets()
