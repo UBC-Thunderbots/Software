@@ -67,6 +67,8 @@ ErForceSimulator::ErForceSimulator(
 
     World world = World(field, ball, friendly_team, enemy_team);
 
+    // TODO (#2283): remove this initialization when addYellowRobots and addBlueRobots are
+    // implemented
     auto* teamBlue   = c->mutable_set_team_blue();
     auto* teamYellow = c->mutable_set_team_yellow();
     for (auto* team : {teamBlue, teamYellow})
