@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/ai.h"
-#include "software/simulated_tests/simulated_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_test_fixture.h"
 
 /**
  * This is a test fixture designed to make it easy to write integration tests. It provides
@@ -11,10 +11,10 @@
  * changes over time during simulation. This allows us to easily write tests for
  * the AI's behaviour.
  */
-class SimulatedPlayTestFixture : public SimulatedTestFixture
+class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
 {
    public:
-    explicit SimulatedPlayTestFixture();
+    explicit SimulatedErForceSimPlayTestFixture();
 
    protected:
     void SetUp() override;
@@ -56,7 +56,7 @@ class SimulatedPlayTestFixture : public SimulatedTestFixture
 
    private:
     void updatePrimitives(const World& world,
-                          std::shared_ptr<Simulator> simulator_to_update) override;
+                          std::shared_ptr<ErForceSimulator> simulator_to_update) override;
     // The configs being used in simulation
     std::shared_ptr<AiConfig> ai_config;
     std::shared_ptr<AiControlConfig> ai_control_config;

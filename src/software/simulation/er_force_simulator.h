@@ -8,7 +8,6 @@
 #include "software/simulation/er_force_simulator_ball.h"
 #include "software/simulation/er_force_simulator_robot.h"
 #include "software/simulation/firmware_object_deleter.h"
-#include "software/simulation/physics/physics_world.h"
 #include "software/world/field.h"
 #include "software/world/team_types.h"
 #include "software/world/world.h"
@@ -169,7 +168,6 @@ class ErForceSimulator : public QObject
             simulator_robots,
         TbotsProto::Vision vision_msg);
 
-    PhysicsWorld physics_world;
     std::shared_ptr<ErForceSimulatorBall> simulator_ball;
     std::map<std::shared_ptr<ErForceSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
         yellow_simulator_robots;

@@ -7,7 +7,7 @@
 #include "software/sensor_fusion/sensor_fusion.h"
 #include "software/simulated_tests/validation/non_terminating_function_validator.h"
 #include "software/simulated_tests/validation/terminating_function_validator.h"
-#include "software/simulation/simulator.h"
+#include "software/simulation/er_force_simulator.h"
 
 /**
  * This is a test fixture designed to make it easy to write integration tests. It provides
@@ -15,10 +15,10 @@
  * changes over time during simulation. This allows us to easily write tests for
  * the AI's behaviour.
  */
-class SimulatedTestFixture : public ::testing::Test
+class SimulatedErForceSimTestFixture : public ::testing::Test
 {
    public:
-    explicit SimulatedTestFixture();
+    explicit SimulatedErForceSimTestFixture();
 
    protected:
     void SetUp() override;
@@ -105,14 +105,16 @@ class SimulatedTestFixture : public ::testing::Test
      * @return if validation functions are done
      */
     bool tickTest(Duration simulation_time_step, Duration ai_time_step,
-                  std::shared_ptr<World> world, std::shared_ptr<Simulator> simulator);
+                  std::shared_ptr<World> world,
+                  std::shared_ptr<ErForceSimulator> simulator);
 
     /**
-     * A helper function that updates SensorFusion with the latest data from the Simulator
+     * A helper function that updates SensorFusion with the latest data from the
+     * ErForceSimulator
      *
      * @param simulator The simulator to update sensor fusion with
      */
-    void updateSensorFusion(std::shared_ptr<Simulator> simulator);
+    void updateSensorFusion(std::shared_ptr<ErForceSimulator> simulator);
 
     /**
      * Updates primitives in the simulator based on the new world
@@ -120,8 +122,8 @@ class SimulatedTestFixture : public ::testing::Test
      * @param world to update primitives with
      * @param simulator_to_update The simulator to update
      */
-    virtual void updatePrimitives(const World &world,
-                                  std::shared_ptr<Simulator> simulator_to_update) = 0;
+    virtual void updatePrimitives(
+        const World &world, std::shared_ptr<ErForceSimulator> simulator_to_update) = 0;
 
     /**
      * Gets play info message for displaying on the FullSystemGUI
@@ -170,7 +172,7 @@ class SimulatedTestFixture : public ::testing::Test
     // the object in the SetUp function. Because the simulator has no
     // copy assignment operator, we have to make it a dynamically-allocated
     // object so we can assign new instances to this variable
-    std::shared_ptr<Simulator> simulator;
+    std::shared_ptr<ErForceSimulator> simulator;
     // The SensorFusion being tested and used in simulation
     SensorFusion sensor_fusion;
 

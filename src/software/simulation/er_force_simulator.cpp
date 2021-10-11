@@ -30,15 +30,15 @@ ErForceSimulator::ErForceSimulator(
     const Field& field, const RobotConstants_t& robot_constants,
     const WheelConstants& wheel_constants,
     std::shared_ptr<const SimulatorConfig> simulator_config)
-    : physics_world(field, robot_constants, wheel_constants, simulator_config),
-      yellow_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
+    : yellow_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
       blue_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
       frame_number(0),
       robot_constants(robot_constants),
       wheel_constants(wheel_constants)
 {
     QString config_file("simulator/2020");
-    QString full_filename = QString("extlibs/er_force_sim/config/") + config_file + ".txt";
+    QString full_filename =
+        QString("extlibs/er_force_sim/config/") + config_file + ".txt";
     QFile file(full_filename);
     if (!file.open(QFile::ReadOnly))
     {
@@ -257,7 +257,8 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     // We only need to do this a single time since all robots
     // can see and interact with the same ball
 
-    current_firmware_time = physics_world.getTimestamp();
+    // TODO: why is this borked?
+    // current_firmware_time = current_firmware_time + time_step;
 
     SSLSimulationProto::RobotControl yellow_robot_control =
         updateSimulatorRobots(&ErForceSimulatorRobotSingleton::handleYellowRobotLogProto,
@@ -267,8 +268,6 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
         updateSimulatorRobots(&ErForceSimulatorRobotSingleton::handleBlueRobotLogProto,
                               blue_simulator_robots, *blue_team_vision_msg);
 
-    std::cout << "yellow_robot_control: " << yellow_robot_control.DebugString()
-              << std::endl;
     er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);
     er_force_sim->acceptBlueRobotControlCommand(blue_robot_control);
     er_force_sim->stepSimulation(time_step.toSeconds());
@@ -283,12 +282,12 @@ std::vector<SSLProto::SSL_WrapperPacket> ErForceSimulator::getSSLWrapperPackets(
 
 Field ErForceSimulator::getField() const
 {
-    return physics_world.getField();
+    return Field::createSSLDivisionAField();
 }
 
 Timestamp ErForceSimulator::getTimestamp() const
 {
-    return physics_world.getTimestamp();
+    return current_firmware_time;
 }
 
 void ErForceSimulator::resetCurrentFirmwareTime()

@@ -227,7 +227,6 @@ std::vector<robot::RadioResponse> Simulator::acceptRobotControlCommand(
                 command, data->ball, charge, data->robotCommandPacketLoss,
                 data->robotReplyPacketLoss);
             response.set_time(time);
-            std::cout << "robot::RadioResponse: " << response.DebugString() << std::endl;
 
             if (isBlue != nullptr)
             {

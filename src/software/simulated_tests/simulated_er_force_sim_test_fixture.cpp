@@ -1,4 +1,4 @@
-#include "software/simulated_tests/simulated_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_test_fixture.h"
 
 #include <cstdlib>
 #include <experimental/filesystem>
@@ -8,7 +8,7 @@
 #include "software/logger/logger.h"
 #include "software/test_util/test_util.h"
 
-SimulatedTestFixture::SimulatedTestFixture()
+SimulatedErForceSimTestFixture::SimulatedErForceSimTestFixture()
     : mutable_thunderbots_config(std::make_shared<ThunderbotsConfig>()),
       thunderbots_config(
           std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config)),
@@ -18,7 +18,7 @@ SimulatedTestFixture::SimulatedTestFixture()
 {
 }
 
-void SimulatedTestFixture::SetUp()
+void SimulatedErForceSimTestFixture::SetUp()
 {
     LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
 
@@ -69,13 +69,13 @@ void SimulatedTestFixture::SetUp()
     tick_count        = 0;
 }
 
-void SimulatedTestFixture::enableVisualizer()
+void SimulatedErForceSimTestFixture::enableVisualizer()
 {
     full_system_gui = std::make_shared<ThreadedFullSystemGUI>(mutable_thunderbots_config);
     run_simulation_in_realtime = true;
 }
 
-void SimulatedTestFixture::setupReplayLogging()
+void SimulatedErForceSimTestFixture::setupReplayLogging()
 {
     // get the name of the current test to name the replay output directory
     auto test_name = ::testing::UnitTest::GetInstance()->current_test_info()->name();
@@ -97,7 +97,7 @@ void SimulatedTestFixture::setupReplayLogging()
 
     LOG(INFO) << "Logging " << test_name << " replay to " << out_dir;
 
-    fs::path sensorproto_out_dir = out_dir / "Simulator_SensorProto";
+    fs::path sensorproto_out_dir = out_dir / "ErForceSimulator_SensorProto";
     fs::path ssl_wrapper_out_dir = out_dir / "SensorFusion_SSL_WrapperPacket";
 
     simulator_sensorproto_logger =
@@ -107,7 +107,7 @@ void SimulatedTestFixture::setupReplayLogging()
     should_log_replay = true;
 }
 
-bool SimulatedTestFixture::validateAndCheckCompletion(
+bool SimulatedErForceSimTestFixture::validateAndCheckCompletion(
     std::vector<TerminatingFunctionValidator> &terminating_function_validators,
     std::vector<NonTerminatingFunctionValidator> &non_terminating_function_validators)
 {
@@ -127,31 +127,33 @@ bool SimulatedTestFixture::validateAndCheckCompletion(
     return terminating_function_validators.empty() ? false : validation_successful;
 }
 
-void SimulatedTestFixture::updateSensorFusion(std::shared_ptr<Simulator> simulator)
+void SimulatedErForceSimTestFixture::updateSensorFusion(
+    std::shared_ptr<ErForceSimulator> simulator)
 {
-    auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
-    assert(ssl_wrapper_packet);
+    auto ssl_wrapper_packets = simulator->getSSLWrapperPackets();
 
-    auto sensor_msg                        = SensorProto();
-    *(sensor_msg.mutable_ssl_vision_msg()) = *ssl_wrapper_packet;
-
-    sensor_fusion.processSensorProto(sensor_msg);
-
-    if (should_log_replay)
+    for (const auto &packet : ssl_wrapper_packets)
     {
-        simulator_sensorproto_logger->onValueReceived(sensor_msg);
-        auto world_or_null = sensor_fusion.getWorld();
+        auto sensor_msg                        = SensorProto();
+        *(sensor_msg.mutable_ssl_vision_msg()) = packet;
 
-        if (world_or_null)
+        sensor_fusion.processSensorProto(sensor_msg);
+        if (should_log_replay)
         {
-            auto filtered_ssl_wrapper =
-                *createSSLWrapperPacket(*sensor_fusion.getWorld(), TeamColour::YELLOW);
-            sensorfusion_wrapper_logger->onValueReceived(filtered_ssl_wrapper);
+            simulator_sensorproto_logger->onValueReceived(sensor_msg);
+            auto world_or_null = sensor_fusion.getWorld();
+
+            if (world_or_null)
+            {
+                auto filtered_ssl_wrapper = *createSSLWrapperPacket(
+                    *sensor_fusion.getWorld(), TeamColour::YELLOW);
+                sensorfusion_wrapper_logger->onValueReceived(filtered_ssl_wrapper);
+            }
         }
     }
 }
 
-void SimulatedTestFixture::sleep(
+void SimulatedErForceSimTestFixture::sleep(
     const std::chrono::steady_clock::time_point &wall_start_time,
     const Duration &desired_wall_tick_time)
 {
@@ -168,7 +170,7 @@ void SimulatedTestFixture::sleep(
     }
 }
 
-void SimulatedTestFixture::runTest(
+void SimulatedErForceSimTestFixture::runTest(
     const Field &field, const BallState &ball,
     const std::vector<RobotStateWithId> &friendly_robots,
     const std::vector<RobotStateWithId> &enemy_robots,
@@ -176,7 +178,7 @@ void SimulatedTestFixture::runTest(
     const std::vector<ValidationFunction> &non_terminating_validation_functions,
     const Duration &timeout)
 {
-    std::shared_ptr<Simulator> simulator(std::make_shared<Simulator>(
+    std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
         field, create2015RobotConstants(), create2015WheelConstants(),
         thunderbots_config->getSimulatorConfig()));
     simulator->setBallState(ball);
@@ -253,7 +255,7 @@ void SimulatedTestFixture::runTest(
     }
 }
 
-void SimulatedTestFixture::registerTickTime(double tick_time_ms)
+void SimulatedErForceSimTestFixture::registerTickTime(double tick_time_ms)
 {
     total_tick_duration += tick_time_ms;
     max_tick_duration = std::max(max_tick_duration, tick_time_ms);
@@ -261,9 +263,10 @@ void SimulatedTestFixture::registerTickTime(double tick_time_ms)
     tick_count++;
 }
 
-bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_time_step,
-                                    std::shared_ptr<World> world,
-                                    std::shared_ptr<Simulator> simulator)
+bool SimulatedErForceSimTestFixture::tickTest(Duration simulation_time_step,
+                                              Duration ai_time_step,
+                                              std::shared_ptr<World> world,
+                                              std::shared_ptr<ErForceSimulator> simulator)
 {
     auto wall_start_time           = std::chrono::steady_clock::now();
     bool validation_functions_done = false;
@@ -275,8 +278,7 @@ bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_t
 
     if (auto world_opt = sensor_fusion.getWorld())
     {
-        *world = world_opt.value();
-
+        *world                    = world_opt.value();
         validation_functions_done = validateAndCheckCompletion(
             terminating_function_validators, non_terminating_function_validators);
         if (validation_functions_done)
