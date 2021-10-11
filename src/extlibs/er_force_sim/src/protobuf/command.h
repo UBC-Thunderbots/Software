@@ -23,7 +23,7 @@
 
 #include <QtCore/QSharedPointer>
 
-#include "proto/er_force_sim/command.pb.h"
+#include "extlibs/er_force_sim/src/protobuf/command.pb.h"
 
 //! @file command.h
 //! @addtogroup protobuf

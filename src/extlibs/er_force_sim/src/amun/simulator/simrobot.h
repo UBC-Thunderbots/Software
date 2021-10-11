@@ -25,9 +25,9 @@
 
 #include <QtCore/QList>
 
-#include "proto/er_force_sim/command.pb.h"
-#include "proto/er_force_sim/robot.pb.h"
-#include "proto/er_force_sim/sslsim.h"
+#include "extlibs/er_force_sim/src/protobuf/command.pb.h"
+#include "extlibs/er_force_sim/src/protobuf/robot.pb.h"
+#include "extlibs/er_force_sim/src/protobuf/sslsim.h"
 #include "proto/ssl_simulation_robot_control.pb.h"
 
 class RNG;

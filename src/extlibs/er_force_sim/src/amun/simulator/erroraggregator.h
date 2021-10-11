@@ -23,7 +23,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QObject>
 
-#include "proto/er_force_sim/sslsim.h"
+#include "extlibs/er_force_sim/src/protobuf/sslsim.h"
 
 namespace camun
 {

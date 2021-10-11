@@ -25,8 +25,8 @@
 
 #include <QtCore/QObject>
 
-#include "proto/er_force_sim/command.pb.h"
-#include "proto/er_force_sim/sslsim.h"
+#include "extlibs/er_force_sim/src/protobuf/command.pb.h"
+#include "extlibs/er_force_sim/src/protobuf/sslsim.h"
 #include "simfield.h"
 
 static const float BALL_RADIUS       = 0.0215f;

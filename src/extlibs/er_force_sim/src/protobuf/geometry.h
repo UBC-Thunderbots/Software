@@ -21,7 +21,7 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include "proto/er_force_sim/world.pb.h"
+#include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
 
 void geometrySetDefault(world::Geometry *geometry, bool useQuadField = true);

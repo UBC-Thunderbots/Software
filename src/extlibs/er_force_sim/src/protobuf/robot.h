@@ -21,7 +21,7 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 
-#include "proto/er_force_sim/robot.pb.h"
+#include "extlibs/er_force_sim/src/protobuf/robot.pb.h"
 
 // used for replay of vision logs
 void robotSetDefault(robot::Specs *specs);

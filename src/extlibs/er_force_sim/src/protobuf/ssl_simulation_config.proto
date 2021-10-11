@@ -1,8 +1,8 @@
 syntax            = "proto2";
 option go_package = "github.com/RoboCup-SSL/ssl-simulation-protocol/pkg/sim";
 
-import "proto/er_force_sim/ssl_game_controller_common.proto";
-import "proto/er_force_sim/ssl_geometry.proto";
+import "extlibs/er_force_sim/src/protobuf/ssl_game_controller_common.proto";
+import "extlibs/er_force_sim/src/protobuf/ssl_geometry.proto";
 import "google/protobuf/any.proto";
 
 package sslsim;
