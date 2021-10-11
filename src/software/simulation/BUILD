@@ -261,6 +261,10 @@ cc_library(
     name = "er_force_simulator",
     srcs = ["er_force_simulator.cpp"],
     hdrs = ["er_force_simulator.h"],
+    data = [
+        "//software/simulation/config/simulator:2020.txt",
+        "//software/simulation/config/simulator:2020B.txt",
+    ],
     deps = [
         ":er_force_simulator_ball",
         ":er_force_simulator_qt",

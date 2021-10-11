@@ -26,36 +26,6 @@ extern "C"
 #include "firmware/app/world/firmware_world.h"
 }
 
-inline bool loadConfiguration(const QString& config_file,
-                              google::protobuf::Message* message, bool allow_partial)
-{
-    // TODO: fix this with genrule
-    QString full_filename =
-        QString(
-            "/home/jonathan/robocup/thunderbots/Software/src/software/simulation/config/") +
-        config_file + ".txt";
-    QFile file(full_filename);
-    if (!file.open(QFile::ReadOnly))
-    {
-        LOG(FATAL) << "Could not open configuration file " << full_filename.toStdString()
-                   << std::endl;
-        return false;
-    }
-    QString str = file.readAll();
-    file.close();
-    std::string s = qPrintable(str);
-
-    google::protobuf::TextFormat::Parser parser;
-    parser.AllowPartialMessage(allow_partial);
-    parser.ParseFromString(s, message);
-    return true;
-}
-
-ErForceSimulator::~ErForceSimulator()
-{
-    delete er_force_sim;
-}
-
 ErForceSimulator::ErForceSimulator(
     const Field& field, const RobotConstants_t& robot_constants,
     const WheelConstants& wheel_constants,
@@ -67,8 +37,23 @@ ErForceSimulator::ErForceSimulator(
       robot_constants(robot_constants),
       wheel_constants(wheel_constants)
 {
-    loadConfiguration("simulator/2020", &er_force_sim_setup, false);
-    er_force_sim = new camun::simulator::Simulator(er_force_sim_setup, true);
+    QString config_file("simulator/2020");
+    QString full_filename = QString("software/simulation/config/") + config_file + ".txt";
+    QFile file(full_filename);
+    if (!file.open(QFile::ReadOnly))
+    {
+        LOG(FATAL) << "Could not open configuration file " << full_filename.toStdString()
+                   << std::endl;
+    }
+    QString str = file.readAll();
+    file.close();
+    std::string s = qPrintable(str);
+
+    google::protobuf::TextFormat::Parser parser;
+    parser.ParseFromString(s, &er_force_sim_setup);
+
+    er_force_sim =
+        std::make_unique<camun::simulator::Simulator>(er_force_sim_setup, true);
 
     Command c{new amun::Command};
     c->mutable_simulator()->set_enable(true);

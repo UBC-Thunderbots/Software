@@ -41,8 +41,8 @@ class ErForceSimulator : public QObject
     explicit ErForceSimulator(const Field& field, const RobotConstants_t& robot_constants,
                               const WheelConstants& wheel_constants,
                               std::shared_ptr<const SimulatorConfig> simulator_config);
-    ErForceSimulator() = delete;
-    ~ErForceSimulator();
+    ErForceSimulator()  = delete;
+    ~ErForceSimulator() = default;
 
     /**
      * Sets the state of the ball in the simulation. No more than 1 ball may exist
@@ -185,7 +185,7 @@ class ErForceSimulator : public QObject
     static Timestamp current_firmware_time;
 
     amun::SimulatorSetup er_force_sim_setup;
-    camun::simulator::Simulator* er_force_sim;
+    std::unique_ptr<camun::simulator::Simulator> er_force_sim;
 
     RobotConstants_t robot_constants;
     WheelConstants wheel_constants;
