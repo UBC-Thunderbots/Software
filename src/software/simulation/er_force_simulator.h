@@ -17,6 +17,7 @@ extern "C"
 {
 #include "firmware/shared/physics.h"
 #include "proto/primitive.nanopb.h"
+#include "proto/robot_log_msg.nanopb.h"
 #include "proto/tbots_software_msgs.nanopb.h"
 }
 
@@ -152,6 +153,21 @@ class ErForceSimulator : public QObject
                  std::shared_ptr<FirmwareWorld_t>>& simulator_robots,
         std::shared_ptr<ErForceSimulatorBall> simulator_ball,
         const TbotsProto::Vision& vision_msg);
+
+    /**
+     * Update Simulator Robot and get the latest robot control
+     *
+     * @param handle_robot_log_proto Function pointer to handle robot log proto
+     * @param simulator_robots Map of simulator robots
+     * @param vision_msg The vision msg for this team of robots
+     *
+     * @return robot control
+     */
+    static SSLSimulationProto::RobotControl updateSimulatorRobots(
+        void (*handle_robot_log_proto)(TbotsProto_RobotLog),
+        std::map<std::shared_ptr<ErForceSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
+            simulator_robots,
+        TbotsProto::Vision vision_msg);
 
     PhysicsWorld physics_world;
     std::shared_ptr<ErForceSimulatorBall> simulator_ball;

@@ -24,7 +24,6 @@ extern "C"
 #include "firmware/app/world/firmware_ball.h"
 #include "firmware/app/world/firmware_robot.h"
 #include "firmware/app/world/firmware_world.h"
-#include "proto/robot_log_msg.nanopb.h"
 }
 
 inline bool loadConfiguration(const QString& config_file,
@@ -201,6 +200,8 @@ void ErForceSimulator::setRobotPrimitive(
 {
     simulator_ball =
         std::make_shared<ErForceSimulatorBall>(createBallState(vision_msg.ball_state()));
+    // Set to NEG_X because the vision msg in this simulator is normalized
+    // correctly
     SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
     auto simulator_robots_iter =
         std::find_if(simulator_robots.begin(), simulator_robots.end(),
@@ -214,12 +215,7 @@ void ErForceSimulator::setRobotPrimitive(
         auto firmware_world  = (*simulator_robots_iter).second;
 
         auto robot_state_it = vision_msg.robot_states().find(id);
-        if (robot_state_it == vision_msg.robot_states().end())
-        {
-            LOG(WARNING) << "setRobotPrimitive: Robot state for robot "
-                         << simulator_robot->getRobotId() << " not found";
-        }
-        else
+        if (robot_state_it != vision_msg.robot_states().end())
         {
             simulator_robot->setRobotState(
                 createRobotState(vision_msg.robot_states().at(id)));
@@ -234,6 +230,42 @@ void ErForceSimulator::setRobotPrimitive(
     }
 }
 
+SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
+    void (*handle_robot_log_proto)(TbotsProto_RobotLog),
+    std::map<std::shared_ptr<ErForceSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
+        simulator_robots,
+    TbotsProto::Vision vision_msg)
+{
+    SSLSimulationProto::RobotControl robot_control;
+
+    for (auto& iter : simulator_robots)
+    {
+        auto simulator_robot = iter.first;
+        auto firmware_world  = iter.second;
+
+        app_logger_init(simulator_robot->getRobotId(), handle_robot_log_proto);
+
+        auto robot_state_it =
+            vision_msg.robot_states().find(simulator_robot->getRobotId());
+        if (robot_state_it != vision_msg.robot_states().end())
+        {
+            simulator_robot->setRobotState(createRobotState(
+                vision_msg.robot_states().at(simulator_robot->getRobotId())));
+            ErForceSimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
+            auto simulator_ball = std::make_shared<ErForceSimulatorBall>(
+                createBallState(vision_msg.ball_state()));
+            // Set to NEG_X because the vision msg in this simulator is
+            // normalized correctly
+            SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
+            ErForceSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
+                firmware_world);
+            *(robot_control.mutable_robot_commands()->Add()) =
+                *(simulator_robot->getRobotCommand());
+        }
+    }
+    return robot_control;
+}
+
 void ErForceSimulator::stepSimulation(const Duration& time_step)
 {
     // Set the ball being referenced in each firmware_world.
@@ -242,73 +274,16 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 
     current_firmware_time = physics_world.getTimestamp();
 
-    SSLSimulationProto::RobotControl yellow_robot_control;
-    SSLSimulationProto::RobotControl blue_robot_control;
+    SSLSimulationProto::RobotControl yellow_robot_control =
+        updateSimulatorRobots(&ErForceSimulatorRobotSingleton::handleYellowRobotLogProto,
+                              yellow_simulator_robots, *yellow_team_vision_msg);
 
-    for (auto& iter : blue_simulator_robots)
-    {
-        auto simulator_robot = iter.first;
-        auto firmware_world  = iter.second;
+    SSLSimulationProto::RobotControl blue_robot_control =
+        updateSimulatorRobots(&ErForceSimulatorRobotSingleton::handleBlueRobotLogProto,
+                              blue_simulator_robots, *blue_team_vision_msg);
 
-        app_logger_init(simulator_robot->getRobotId(),
-                        &ErForceSimulatorRobotSingleton::handleBlueRobotLogProto);
-
-        auto robot_state_it =
-            blue_team_vision_msg->robot_states().find(simulator_robot->getRobotId());
-        if (robot_state_it == blue_team_vision_msg->robot_states().end())
-        {
-            LOG(WARNING) << "blue_team_vision_msg: Robot state for robot "
-                         << simulator_robot->getRobotId() << " not found" << std::endl;
-        }
-        else
-        {
-            simulator_robot->setRobotState(createRobotState(
-                blue_team_vision_msg->robot_states().at(simulator_robot->getRobotId())));
-            ErForceSimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-            simulator_ball = std::make_shared<ErForceSimulatorBall>(
-                createBallState(blue_team_vision_msg->ball_state()));
-            SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
-            ErForceSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
-                firmware_world);
-            *(blue_robot_control.mutable_robot_commands()->Add()) =
-                *(simulator_robot->getRobotCommand());
-        }
-    }
-
-    for (auto& iter : yellow_simulator_robots)
-    {
-        auto simulator_robot = iter.first;
-        auto firmware_world  = iter.second;
-
-        app_logger_init(simulator_robot->getRobotId(),
-                        &ErForceSimulatorRobotSingleton::handleYellowRobotLogProto);
-        auto robot_state_it =
-            yellow_team_vision_msg->robot_states().find(simulator_robot->getRobotId());
-
-        if (robot_state_it == yellow_team_vision_msg->robot_states().end())
-        {
-            LOG(WARNING) << "yellow_team_vision_msg: Robot state for robot "
-                         << simulator_robot->getRobotId() << " not found" << std::endl;
-        }
-        else
-        {
-            simulator_robot->setRobotState(
-                createRobotState(yellow_team_vision_msg->robot_states().at(
-                    simulator_robot->getRobotId())));
-            ErForceSimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-            simulator_ball = std::make_shared<ErForceSimulatorBall>(
-                createBallState(yellow_team_vision_msg->ball_state()));
-            SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
-            ErForceSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
-                firmware_world);
-
-            *(yellow_robot_control.mutable_robot_commands()->Add()) =
-                *(simulator_robot->getRobotCommand());
-        }
-    }
-
-    er_force_sim->acceptBlueRobotControlCommand(blue_robot_control);
     er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);
+    er_force_sim->acceptBlueRobotControlCommand(blue_robot_control);
     er_force_sim->stepSimulation(time_step.toSeconds());
 
     frame_number++;
