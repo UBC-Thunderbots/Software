@@ -61,7 +61,7 @@ proto_library(
         "ssl_gc_geometry.proto",
         "ssl_gc_referee_message.proto",
     ],
-    visibility = ["//visibility:private"],
+    visibility = ["//visibility:public"],
 )
 
 # These proto files are based on the following commit:
