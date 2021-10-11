@@ -1,0 +1,41 @@
+syntax                  = "proto2";
+option cc_enable_arenas = true;
+
+package logfile;
+
+message UidEntry
+{
+    required string hash  = 1;
+    optional uint32 flags = 2 [default = 0];
+}
+
+message Uid
+{
+    repeated UidEntry parts = 1;
+}
+
+// This message can be modified to describe arbitraty log locations,
+// for example logs that can be downloaded from our NAS or
+// that are offered peer-to-peer.
+message LogRequest
+{
+    required string path = 1;
+}
+
+message LogOfferEntry
+{
+    enum QUALITY
+    {
+        PERFECT    = 1;
+        UNKNOWN    = 2;
+        UNREADABLE = 3;
+    };
+    required string name     = 1;
+    required QUALITY quality = 2;
+    required LogRequest uri  = 3;
+}
+
+message LogOffer
+{
+    repeated LogOfferEntry entries = 1;
+}
