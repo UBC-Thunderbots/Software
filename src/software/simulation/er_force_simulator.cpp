@@ -38,7 +38,7 @@ ErForceSimulator::ErForceSimulator(
       wheel_constants(wheel_constants)
 {
     QString config_file("simulator/2020");
-    QString full_filename = QString("software/simulation/config/") + config_file + ".txt";
+    QString full_filename = QString("extlibs/er_force_sim/config/") + config_file + ".txt";
     QFile file(full_filename);
     if (!file.open(QFile::ReadOnly))
     {
