@@ -2,11 +2,13 @@
 
 #include "proto/message_translation/ssl_simulation_robot_control.h"
 #include "shared/constants.h"
+#include "shared/robot_constants.h"
+#include "software/logger/logger.h"
 
 ErForceSimulatorRobot::ErForceSimulatorRobot(const RobotStateWithId& robot_state_with_id,
                                              RobotConstants_t robot_constants,
                                              WheelConstants_t wheel_constants)
-    : dribbler_ball_contact(true),
+    : dribbler_ball_contact(false),
       id(robot_state_with_id.id),
       robot_state(robot_state_with_id.robot_state),
       robot_constants(robot_constants),
@@ -31,31 +33,39 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> ErForceSimulatorRobot::getRobo
         wheel_speed_back_right, robot_constants.front_wheel_angle_deg,
         robot_constants.back_wheel_angle_deg, wheel_constants.wheel_radius_meters);
 
-    if (dribbler_ball_contact)
+    if (isAutochipEnabled())
     {
-        if (isAutochipEnabled())
-        {
-            chip(autochip_distance_m.value());
-        }
-        else if (isAutokickEnabled())
-        {
-            kick(autokick_speed_m_per_s.value());
-        }
+        chip(autochip_distance_m.value());
+    }
+    else if (isAutokickEnabled())
+    {
+        kick(autokick_speed_m_per_s.value());
     }
 
     return createRobotCommand(id, std::move(move_command), kick_speed, kick_angle,
                               dribbler_speed);
 }
 
+std::optional<TbotsProto::RobotStatus> ErForceSimulatorRobot::getRobotStatus() const
+{
+    auto robot_status = std::make_optional<TbotsProto::RobotStatus>();
+    robot_status->set_robot_id(id);
+
+    auto break_beam_status = TbotsProto::BreakBeamStatus();
+    break_beam_status.set_ball_in_beam(dribbler_ball_contact);
+    *(robot_status->mutable_break_beam_status()) = break_beam_status;
+
+    return robot_status;
+}
+
 void ErForceSimulatorRobot::setRobotFeedback(
     const SSLSimulationProto::RobotFeedback& robot_feedback)
 {
-    // Keep the robot dribbler contact always true
+    dribbler_ball_contact = robot_feedback.dribbler_ball_contact();
 }
 
 void ErForceSimulatorRobot::reset()
 {
-    dribbler_speed = std::nullopt;
     // TODO: investigate if these values need to be
     // explicitly reset to 0 after each kick/chip
     kick_speed = std::nullopt;
@@ -122,7 +132,8 @@ void ErForceSimulatorRobot::chip(float distance_m)
 
 void ErForceSimulatorRobot::enableAutokick(float speed_m_per_s)
 {
-    autokick_speed_m_per_s = speed_m_per_s;
+    // TODO (#2167) er-force sim kicks faster
+    autokick_speed_m_per_s = speed_m_per_s / 1.12;
     disableAutochip();
 }
 

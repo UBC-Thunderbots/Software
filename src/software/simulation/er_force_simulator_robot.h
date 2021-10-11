@@ -3,7 +3,7 @@
 #include <cinttypes>
 #include <memory>
 
-#include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
+#include "proto/robot_status_msg.pb.h"
 #include "proto/ssl_simulation_robot_control.pb.h"
 #include "proto/ssl_simulation_robot_feedback.pb.h"
 #include "software/simulation/firmware_object_deleter.h"
@@ -55,6 +55,13 @@ class ErForceSimulatorRobot : public SimulatorRobot
      * @return the current robot command
      */
     std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommand();
+
+    /**
+     * Returns the current robot status
+     *
+     * @return the current robot status
+     */
+    std::optional<TbotsProto::RobotStatus> getRobotStatus() const;
 
     /**
      * Sets the robot feedback

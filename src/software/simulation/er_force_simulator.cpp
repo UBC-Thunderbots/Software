@@ -282,6 +282,8 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
         updateSimulatorRobots(&ErForceSimulatorRobotSingleton::handleBlueRobotLogProto,
                               blue_simulator_robots, *blue_team_vision_msg);
 
+    std::cout << "yellow_robot_control: " << yellow_robot_control.DebugString()
+              << std::endl;
     er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);
     er_force_sim->acceptBlueRobotControlCommand(blue_robot_control);
     er_force_sim->stepSimulation(time_step.toSeconds());
