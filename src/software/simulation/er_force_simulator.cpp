@@ -13,6 +13,7 @@
 #include "proto/message_translation/ssl_geometry.h"
 #include "proto/message_translation/ssl_simulation_robot_control.h"
 #include "proto/message_translation/ssl_wrapper.h"
+#include "proto/message_translation/tbots_protobuf.h"
 #include "software/simulation/er_force_simulator_robot_singleton.h"
 #include "software/simulation/simulator_ball_singleton.h"
 #include "software/world/robot_state.h"
@@ -156,133 +157,15 @@ void ErForceSimulator::addBlueRobots(const std::vector<RobotStateWithId>& robots
 void ErForceSimulator::setYellowRobotPrimitive(RobotId id,
                                                const TbotsProto_Primitive& primitive_msg)
 {
-    simulator_ball = std::make_shared<ErForceSimulatorBall>(BallState(
-        Point(yellow_team_vision_msg->ball_state().global_position().x_meters(),
-              yellow_team_vision_msg->ball_state().global_position().y_meters()),
-        Vector(
-            yellow_team_vision_msg->ball_state().global_velocity().x_component_meters(),
-            yellow_team_vision_msg->ball_state()
-                .global_velocity()
-                .x_component_meters())));
-    SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
-    auto yellow_simulator_robots_iter =
-        std::find_if(yellow_simulator_robots.begin(), yellow_simulator_robots.end(),
-                     [id](const auto& robot_world_pair) {
-                         return robot_world_pair.first->getRobotId() == id;
-                     });
-
-    if (yellow_simulator_robots_iter != yellow_simulator_robots.end())
-    {
-        auto simulator_robot = (*yellow_simulator_robots_iter).first;
-        auto firmware_world  = (*yellow_simulator_robots_iter).second;
-
-        auto robot_state_it = yellow_team_vision_msg->robot_states().find(id);
-        if (robot_state_it == yellow_team_vision_msg->robot_states().end())
-        {
-            LOG(WARNING) << "setRobotPrimitive: Robot state for robot "
-                         << simulator_robot->getRobotId() << " not found";
-        }
-        else
-        {
-            simulator_robot->setRobotState(RobotState(
-                Point(yellow_team_vision_msg->robot_states()
-                          .at(id)
-                          .global_position()
-                          .x_meters(),
-                      yellow_team_vision_msg->robot_states()
-                          .at(id)
-                          .global_position()
-                          .y_meters()),
-                Vector(yellow_team_vision_msg->robot_states()
-                           .at(id)
-                           .global_velocity()
-                           .x_component_meters(),
-                       yellow_team_vision_msg->robot_states()
-                           .at(id)
-                           .global_velocity()
-                           .x_component_meters()),
-                Angle::fromRadians(yellow_team_vision_msg->robot_states()
-                                       .at(id)
-                                       .global_orientation()
-                                       .radians()),
-                AngularVelocity::fromRadians(yellow_team_vision_msg->robot_states()
-                                                 .at(id)
-                                                 .global_angular_velocity()
-                                                 .radians_per_second())));
-            ErForceSimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-            ErForceSimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
-                firmware_world, primitive_msg);
-        }
-    }
-    else
-    {
-        LOG(WARNING) << "Simulator robot with ID " << id << " not found" << std::endl;
-    }
+    setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball,
+                      *yellow_team_vision_msg);
 }
 
 void ErForceSimulator::setBlueRobotPrimitive(RobotId id,
                                              const TbotsProto_Primitive& primitive_msg)
 {
-    simulator_ball = std::make_shared<ErForceSimulatorBall>(BallState(
-        Point(blue_team_vision_msg->ball_state().global_position().x_meters(),
-              blue_team_vision_msg->ball_state().global_position().y_meters()),
-        Vector(
-            blue_team_vision_msg->ball_state().global_velocity().x_component_meters(),
-            blue_team_vision_msg->ball_state().global_velocity().x_component_meters())));
-    SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
-    auto blue_simulator_robots_iter =
-        std::find_if(blue_simulator_robots.begin(), blue_simulator_robots.end(),
-                     [id](const auto& robot_world_pair) {
-                         return robot_world_pair.first->getRobotId() == id;
-                     });
-
-    if (blue_simulator_robots_iter != blue_simulator_robots.end())
-    {
-        auto simulator_robot = (*blue_simulator_robots_iter).first;
-        auto firmware_world  = (*blue_simulator_robots_iter).second;
-
-        auto robot_state_it = blue_team_vision_msg->robot_states().find(id);
-        if (robot_state_it == blue_team_vision_msg->robot_states().end())
-        {
-            LOG(WARNING) << "setRobotPrimitive: Robot state for robot "
-                         << simulator_robot->getRobotId() << " not found";
-        }
-        else
-        {
-            simulator_robot->setRobotState(RobotState(
-                Point(blue_team_vision_msg->robot_states()
-                          .at(id)
-                          .global_position()
-                          .x_meters(),
-                      blue_team_vision_msg->robot_states()
-                          .at(id)
-                          .global_position()
-                          .y_meters()),
-                Vector(blue_team_vision_msg->robot_states()
-                           .at(id)
-                           .global_velocity()
-                           .x_component_meters(),
-                       blue_team_vision_msg->robot_states()
-                           .at(id)
-                           .global_velocity()
-                           .x_component_meters()),
-                Angle::fromRadians(blue_team_vision_msg->robot_states()
-                                       .at(id)
-                                       .global_orientation()
-                                       .radians()),
-                AngularVelocity::fromRadians(blue_team_vision_msg->robot_states()
-                                                 .at(id)
-                                                 .global_angular_velocity()
-                                                 .radians_per_second())));
-            ErForceSimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-            ErForceSimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
-                firmware_world, primitive_msg);
-        }
-    }
-    else
-    {
-        LOG(WARNING) << "Simulator robot with ID " << id << " not found" << std::endl;
-    }
+    setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball,
+                      *blue_team_vision_msg);
 }
 
 void ErForceSimulator::setYellowRobotPrimitiveSet(
@@ -316,11 +199,8 @@ void ErForceSimulator::setRobotPrimitive(
     std::shared_ptr<ErForceSimulatorBall> simulator_ball,
     const TbotsProto::Vision& vision_msg)
 {
-    simulator_ball = std::make_shared<ErForceSimulatorBall>(BallState(
-        Point(vision_msg.ball_state().global_position().x_meters(),
-              vision_msg.ball_state().global_position().y_meters()),
-        Vector(vision_msg.ball_state().global_velocity().x_component_meters(),
-               vision_msg.ball_state().global_velocity().x_component_meters())));
+    simulator_ball =
+        std::make_shared<ErForceSimulatorBall>(createBallState(vision_msg.ball_state()));
     SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
     auto simulator_robots_iter =
         std::find_if(simulator_robots.begin(), simulator_robots.end(),
@@ -341,23 +221,8 @@ void ErForceSimulator::setRobotPrimitive(
         }
         else
         {
-            simulator_robot->setRobotState(RobotState(
-                Point(vision_msg.robot_states().at(id).global_position().x_meters(),
-                      vision_msg.robot_states().at(id).global_position().y_meters()),
-                Vector(vision_msg.robot_states()
-                           .at(id)
-                           .global_velocity()
-                           .x_component_meters(),
-                       vision_msg.robot_states()
-                           .at(id)
-                           .global_velocity()
-                           .x_component_meters()),
-                Angle::fromRadians(
-                    vision_msg.robot_states().at(id).global_orientation().radians()),
-                AngularVelocity::fromRadians(vision_msg.robot_states()
-                                                 .at(id)
-                                                 .global_angular_velocity()
-                                                 .radians_per_second())));
+            simulator_robot->setRobotState(
+                createRobotState(vision_msg.robot_states().at(id)));
             ErForceSimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
             ErForceSimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
                 firmware_world, primitive_msg);
@@ -397,42 +262,11 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
         }
         else
         {
-            simulator_robot->setRobotState(RobotState(
-                Point(blue_team_vision_msg->robot_states()
-                          .at(simulator_robot->getRobotId())
-                          .global_position()
-                          .x_meters(),
-                      blue_team_vision_msg->robot_states()
-                          .at(simulator_robot->getRobotId())
-                          .global_position()
-                          .y_meters()),
-                Vector(blue_team_vision_msg->robot_states()
-                           .at(simulator_robot->getRobotId())
-                           .global_velocity()
-                           .x_component_meters(),
-                       blue_team_vision_msg->robot_states()
-                           .at(simulator_robot->getRobotId())
-                           .global_velocity()
-                           .x_component_meters()),
-                Angle::fromRadians(blue_team_vision_msg->robot_states()
-                                       .at(simulator_robot->getRobotId())
-                                       .global_orientation()
-                                       .radians()),
-                // TODO check that blue_team_vision_msg has a msg for robot at that id
-                AngularVelocity::fromRadians(blue_team_vision_msg->robot_states()
-                                                 .at(simulator_robot->getRobotId())
-                                                 .global_angular_velocity()
-                                                 .radians_per_second())));
+            simulator_robot->setRobotState(createRobotState(
+                blue_team_vision_msg->robot_states().at(simulator_robot->getRobotId())));
             ErForceSimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-            simulator_ball = std::make_shared<ErForceSimulatorBall>(BallState(
-                Point(blue_team_vision_msg->ball_state().global_position().x_meters(),
-                      blue_team_vision_msg->ball_state().global_position().y_meters()),
-                Vector(blue_team_vision_msg->ball_state()
-                           .global_velocity()
-                           .x_component_meters(),
-                       blue_team_vision_msg->ball_state()
-                           .global_velocity()
-                           .x_component_meters())));
+            simulator_ball = std::make_shared<ErForceSimulatorBall>(
+                createBallState(blue_team_vision_msg->ball_state()));
             SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
             ErForceSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
                 firmware_world);
@@ -458,41 +292,12 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
         }
         else
         {
-            simulator_robot->setRobotState(RobotState(
-                Point(yellow_team_vision_msg->robot_states()
-                          .at(simulator_robot->getRobotId())
-                          .global_position()
-                          .x_meters(),
-                      yellow_team_vision_msg->robot_states()
-                          .at(simulator_robot->getRobotId())
-                          .global_position()
-                          .y_meters()),
-                Vector(yellow_team_vision_msg->robot_states()
-                           .at(simulator_robot->getRobotId())
-                           .global_velocity()
-                           .x_component_meters(),
-                       yellow_team_vision_msg->robot_states()
-                           .at(simulator_robot->getRobotId())
-                           .global_velocity()
-                           .x_component_meters()),
-                Angle::fromRadians(yellow_team_vision_msg->robot_states()
-                                       .at(simulator_robot->getRobotId())
-                                       .global_orientation()
-                                       .radians()),
-                AngularVelocity::fromRadians(yellow_team_vision_msg->robot_states()
-                                                 .at(simulator_robot->getRobotId())
-                                                 .global_angular_velocity()
-                                                 .radians_per_second())));
+            simulator_robot->setRobotState(
+                createRobotState(yellow_team_vision_msg->robot_states().at(
+                    simulator_robot->getRobotId())));
             ErForceSimulatorRobotSingleton::setSimulatorRobot(simulator_robot);
-            simulator_ball = std::make_shared<ErForceSimulatorBall>(BallState(
-                Point(yellow_team_vision_msg->ball_state().global_position().x_meters(),
-                      yellow_team_vision_msg->ball_state().global_position().y_meters()),
-                Vector(yellow_team_vision_msg->ball_state()
-                           .global_velocity()
-                           .x_component_meters(),
-                       yellow_team_vision_msg->ball_state()
-                           .global_velocity()
-                           .x_component_meters())));
+            simulator_ball = std::make_shared<ErForceSimulatorBall>(
+                createBallState(yellow_team_vision_msg->ball_state()));
             SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
             ErForceSimulatorRobotSingleton::runPrimitiveOnCurrentSimulatorRobot(
                 firmware_world);
