@@ -125,8 +125,10 @@ std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
         {
             if (!play->invariantHolds(world))
             {
-                LOG(WARNING) << "Unexpected behaviour from " << objectTypeName(*play) << ". Play::isApplicable() is true and Play::invariantHolds() is false"
-                             << std::endl;
+                LOG(WARNING)
+                    << "Unexpected behaviour from " << objectTypeName(*play)
+                    << ". Play::isApplicable() is true and Play::invariantHolds() is false"
+                    << std::endl;
             }
             applicable_plays.emplace_back(std::move(play));
         }
