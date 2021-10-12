@@ -143,6 +143,7 @@ INSTANTIATE_TEST_CASE_P(
                         RefereeCommand::HALT, Point(4.3, -3), Vector(0, 0), true, true),
         std::make_tuple(TeamSide::FRIENDLY, RefereeCommand::DIRECT_FREE_US,
                         RefereeCommand::HALT, Point(4.5, -2.8), Vector(0, 0), true, true),
+
         // Test that both invariantHolds() and isApplicable() for ball in the enemy right
         // corner with variable position
         std::make_tuple(TeamSide::FRIENDLY, RefereeCommand::DIRECT_FREE_US,
@@ -151,6 +152,7 @@ INSTANTIATE_TEST_CASE_P(
                         RefereeCommand::HALT, Point(4.3, 3), Vector(0, 0), true, true),
         std::make_tuple(TeamSide::FRIENDLY, RefereeCommand::DIRECT_FREE_US,
                         RefereeCommand::HALT, Point(4.5, 2.8), Vector(0, 0), true, true),
+
         // Test that invariantHolds() and !isApplicable() for ball not in a corner
         std::make_tuple(TeamSide::FRIENDLY, RefereeCommand::DIRECT_FREE_US,
                         RefereeCommand::HALT, Point(0, 0), Vector(0, 0), false, true),
@@ -158,12 +160,14 @@ INSTANTIATE_TEST_CASE_P(
                         RefereeCommand::HALT, Point(-4.5, 3), Vector(0, 0), false, true),
         std::make_tuple(TeamSide::FRIENDLY, RefereeCommand::DIRECT_FREE_US,
                         RefereeCommand::HALT, Point(-4.5, -3), Vector(0, 0), false, true),
+
         // Test that !invariantHolds() and isApplicable() for ball in corner but not our
         // possession
         std::make_tuple(TeamSide::ENEMY, RefereeCommand::DIRECT_FREE_US,
                         RefereeCommand::HALT, Point(4.5, -3), Vector(0, 0), true, false),
         std::make_tuple(TeamSide::ENEMY, RefereeCommand::DIRECT_FREE_US,
                         RefereeCommand::HALT, Point(4.5, 3), Vector(0, 0), true, false),
+
         // Test that !invariantHolds() and !isApplicable() for ball not corner and not our
         // possession
         std::make_tuple(TeamSide::ENEMY, RefereeCommand::DIRECT_FREE_US,
