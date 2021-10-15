@@ -163,3 +163,36 @@ TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_goalie)
             Duration::fromSeconds(10));
 }
 
+TEST(HaltPlayInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
+{
+    // Lets setup some things we need to run this test:
+    //
+    // Dynamic Parameter Config: This data structure is passed into the play and contains
+    // runtime configurable values.  We don't need to change anything here we just need to
+    // pass it in.
+    auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
+
+    // World: A blank testing world we will manipulate for the test
+    auto world = ::TestUtil::createBlankTestingWorld();
+
+    // Penalty_kick_enemy_play: The play under test
+    auto penalty_kick_enemy_play = PenaltyKickEnemyPlay(play_config);
+
+    // GameState: The game state to test with. For this test we don't care about
+    // RestartReason and our_restart. Looking at software/world/game_state.cpp, we
+    // only need to init the play state to prepare penalty them
+    world.updateGameState(::TestUtil::createGameState(
+            RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::PREPARE_PENALTY_THEM));
+
+    // Lets make sure the play will start running and stay running.
+    ASSERT_TRUE(penalty_kick_enemy_play.isApplicable(world));
+    ASSERT_TRUE(penalty_kick_enemy_play.invariantHolds(world));
+
+    world.updateGameState(::TestUtil::createGameState(
+            RefereeCommand::HALT, RefereeCommand::HALT));
+
+    ASSERT_FALSE(penalty_kick_enemy_play.isApplicable(world));
+    ASSERT_FALSE(penalty_kick_enemy_play.invariantHolds(world));
+
+}
+
