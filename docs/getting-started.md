@@ -31,6 +31,7 @@
     - [Debugging with CLion](#debugging-with-clion)
     - [Debugging from the Command line](#debugging-from-the-command-line)
   - [Profiling](#profiling)
+  - [Building for Jetson Nano](#building-for-jetson-nano)
   - [Flashing And Debugging A STM32F4 MCU](#flashing-and-debugging-a-stm32f4-mcu)
   - [Flashing the Radio Dongle](#flashing-the-radio-dongle)
   - [Flashing And Debugging A STM32H7 MCU](#flashing-and-debugging-a-stm32h7-mcu)
@@ -130,7 +131,7 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 VSCode is the more lightweight IDE, with support for code navigation, code completion, and integrated building and testing. However, debugging isn't integrated into this IDE.
 
 1. Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
-2. Run `./install_vscode.sh` (* **DO NOT** download VSCode yourself unless you know what you're doing. The `install_vscode.sh` script will grab the most stable version of VSCode)
+2. Run `./install_vscode.sh` (* **DO NOT** download VSCode yourself unless you know what you're doing. The `install_vscode.sh` script will grab the most stable version of VSCode *)
 3. Open `vscode`. You can type `vscode` in the terminal, or click the icon on your Desktop.
 &. Click `Open Folder` and navigate to where you cloned software. So if I cloned the repo to `/home/my_username/Downloads/Software`, I would select `/home/my_username/Downloads/Software`.
 4. VSCode will prompt you to install recommended extensions, click `Install`, this installs necessary plugins to work on the codebase. (Bazel, C++, Python, etc..)
@@ -222,6 +223,10 @@ bazel run -c dbg --run_under="valgrind --tool=callgrind --callgrind-out-file=/AB
 bazel run -c dbg --run_under="valgrind --tool=callgrind --callgrind-out-file=/tmp/profile.callgrind" //software/geom:angle_test
 ```
 This will output the file at the _absolute_ path given via the `--callgrind-out-file` argument. This file can then be viewed using `kcachegrind` (example: `kcachegrind /tmp/profile.callgrind`), giving lots of useful information about where time is being spent in the code.
+
+## Building for Jetson Nano 
+
+To build for the Jetson Nano, build the target with the `--cpu=jetson_nano` flag and the toolchain will automatically build using the ARM toolchain for Jetson Nano. For example, `bazel build --cpu=jetson_nano //software/geom/...`.
 
 ## Flashing And Debugging A STM32F4 MCU
 1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies), and have a STM32F4 based main board plugged into your computer. Do not plug both the dongle and the robot at the same time!

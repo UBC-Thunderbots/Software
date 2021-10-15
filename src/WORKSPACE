@@ -73,8 +73,8 @@ boost_deps()
 new_git_repository(
     name = "eigen",
     build_file = "@//external:eigen.BUILD",
-    commit = "2bf07fa5b5034ed5f5b1839fea40a2581946f6fa",
-    remote = "https://chromium.googlesource.com/external/gitlab.com/libeigen/eigen",
+    commit = "21ae2afd4edaa1b69782c67a54182d34efe43f9c",
+    remote = "https://chromium.googlesource.com/external/gitlab.com/libeigen/eigen.git",
     shallow_since = "1544551075 +0100",
 )
 

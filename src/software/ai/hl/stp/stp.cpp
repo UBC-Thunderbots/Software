@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/stp.h"
 
+#include <google/protobuf/map.h>
 #include <munkres/munkres.h>
 
 #include <algorithm>
@@ -8,15 +9,15 @@
 #include <exception>
 #include <random>
 
+#include "proto/play_info_msg.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/play_info.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/stop_intent.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.h"
 #include "software/util/typename/typename.h"
 
 STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
@@ -155,13 +156,15 @@ PlayInfo STP::getPlayInfo()
 {
     std::string info_referee_command = toString(current_game_state.getRefereeCommand());
     std::string info_play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
-    PlayInfo info              = PlayInfo(info_referee_command, info_play_name, {});
+    PlayInfo info              = PlayInfo();
+    info.mutable_game_state()->set_referee_command_name(info_referee_command);
+    info.mutable_play()->set_play_name(info_play_name);
 
     for (const auto& [tactic, robot] : robot_tactic_assignment)
     {
-        std::string s =
-            "Robot " + std::to_string(robot.id()) + "  -  " + objectTypeName(*tactic);
-        info.addRobotTacticAssignment(s);
+        PlayInfo_Tactic tactic_msg = PlayInfo_Tactic();
+        tactic_msg.set_tactic_name(objectTypeName(*tactic));
+        (*info.mutable_robot_tactic_assignment())[robot.id()] = tactic_msg;
     }
 
     return info;

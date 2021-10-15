@@ -71,20 +71,26 @@ function run_black_formatting () {
 }
 
 function run_code_spell(){
-    http_code=$(curl -sw '%{http_code}' https://raw.githubusercontent.com/codespell-project/codespell/v1.14.0/codespell_lib/data/dictionary.txt --output /tmp/dictionary.txt)
+    mkdir -p $CURR_DIR/dictionary
+    http_code=$(curl -sw '%{http_code}' https://raw.githubusercontent.com/codespell-project/codespell/v1.14.0/codespell_lib/data/dictionary.txt --output $CURR_DIR/dictionary/dictionary.txt)
 
     if [[ "$http_code" != 200 ]]; then
         printf "\n***Failed to download codespell dictionary!***\n\n"
-        exit 1
+	    if [ ! -f $CURR_DIR/dictionary/edited_dictionary.txt ]; then 
+	        printf "\n***Failed to load codespell dictonary from cache!***\n\n"
+	        exit 1
+	    fi
+	    printf "Loading Codespell dictionary from cache!\n\n"
+    else
+        sed "/atleast/d" $CURR_DIR/dictionary/dictionary.txt > $CURR_DIR/dictionary/edited_dictionary.txt #removing spell fixes that include the word 'atleast' from codespell dictionary 
+        rm $CURR_DIR/dictionary/dictionary.txt #remove the original dictionary.txt
     fi
 
-    sed "/atleast/d" /tmp/dictionary.txt > /tmp/edited_dictionary.txt #removing spell fixes that include the word 'atleast' from codespell dictionary 
-
     printf "Fixing spelling...\n\n"
-    cd $CURR_DIR/../src/software && codespell -w --skip="1,2,0" -D /tmp/edited_dictionary.txt # Skip binaries
-    cd $CURR_DIR/../src/firmware/app && codespell -w -D /tmp/edited_dictionary.txt
-    cd $CURR_DIR/../src/shared && codespell -w -D /tmp/edited_dictionary.txt
-    cd $CURR_DIR/../docs && codespell -w --skip="*.png" -D /tmp/edited_dictionary.txt # Skip images
+    cd $CURR_DIR/../src/software && codespell -w --skip="1,2,0" -D $CURR_DIR/dictionary/edited_dictionary.txt # Skip binaries
+    cd $CURR_DIR/../src/firmware/app && codespell -w -D $CURR_DIR/dictionary/edited_dictionary.txt
+    cd $CURR_DIR/../src/shared && codespell -w -D $CURR_DIR/dictionary/edited_dictionary.txt
+    cd $CURR_DIR/../docs && codespell -w --skip="*.png" -D $CURR_DIR/dictionary/edited_dictionary.txt # Skip images
 
     if [[ "$?" != 0 ]]; then
         printf "\n***Failed to fix spelling!***\n\n"
