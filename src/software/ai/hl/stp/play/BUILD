@@ -78,7 +78,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
         "//software/world:game_state",
     ],
     alwayslink = True,
