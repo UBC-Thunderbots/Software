@@ -10,6 +10,7 @@
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
+#include "software/world/game_state.h"
 
 class EnemyFreekickPlayTest : public SimulatedPlayTestFixture
 {
@@ -197,4 +198,28 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_chipper_robots_close_to_net)
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
+}
+
+TEST(EnemyFreeKickPlayInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
+{
+    auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
+
+    auto world = ::TestUtil::createBlankTestingWorld();
+
+    // EnemyFreeKickPlay: the play under test
+    auto enemy_free_kick_play = EnemyFreekickPlay(play_config);
+
+    //
+    world.updateGameState(
+        ::TestUtil::createGameState(RefereeCommand::DIRECT_FREE_THEM, RefereeCommand::DIRECT_FREE_THEM));
+
+    ASSERT_TRUE(enemy_free_kick_play.isApplicable(world));
+    ASSERT_TRUE(enemy_free_kick_play.invariantHolds(world));
+
+    world.updateGameState(
+        ::TestUtil::createGameState(RefereeCommand::NORMAL_START, RefereeCommand::DIRECT_FREE_THEM));
+
+    ASSERT_FALSE(enemy_free_kick_play.isApplicable(world));
+    ASSERT_FALSE(enemy_free_kick_play.invariantHolds(world));
+
 }
