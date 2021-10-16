@@ -124,4 +124,4 @@ class TGenericFactory : public GenericFactory<IndexType, TypeToCreate, ConfigTyp
             TYPENAME(T), generic_creator);
     }
 };
-#include "software/util/design_patterns/generic_factory.tpp"
+#include "software/util/generic_factory/generic_factory.tpp"

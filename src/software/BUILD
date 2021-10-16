@@ -16,7 +16,7 @@ cc_binary(
         "//software/logger",
         "//software/multithreading:observer_subject_adapter",
         "//software/sensor_fusion:threaded_sensor_fusion",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
         "@boost//:program_options",
     ],
 )
@@ -53,7 +53,21 @@ cc_binary(
         "//software/backend:all_backends",
         "//software/gui/robot_diagnostics:threaded_robot_diagnostics_gui",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
+        "@boost//:program_options",
+    ],
+)
+
+cc_binary(
+    name = "network_log_listener_main",
+    srcs = ["network_log_listener_main.cpp"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//shared:constants",
+        "//shared/parameter:cpp_configs",
+        "//software/logger:network_logger",
+        "//software/networking:threaded_proto_udp_listener",
+        "//software/networking:threaded_proto_udp_sender",
         "@boost//:program_options",
     ],
 )

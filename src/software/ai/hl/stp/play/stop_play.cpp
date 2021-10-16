@@ -4,7 +4,7 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.h"
 
 StopPlay::StopPlay(std::shared_ptr<const PlayConfig> config) : Play(config, false) {}
 
