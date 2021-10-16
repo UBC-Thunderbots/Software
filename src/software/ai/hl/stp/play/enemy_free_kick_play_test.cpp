@@ -9,8 +9,8 @@
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
-#include "software/world/world.h"
 #include "software/world/game_state.h"
+#include "software/world/world.h"
 
 class EnemyFreekickPlayTest : public SimulatedPlayTestFixture
 {
@@ -210,16 +210,15 @@ TEST(EnemyFreeKickPlayInvariantAndIsApplicableTest, test_invariant_and_is_applic
     auto enemy_free_kick_play = EnemyFreekickPlay(play_config);
 
     //
-    world.updateGameState(
-        ::TestUtil::createGameState(RefereeCommand::DIRECT_FREE_THEM, RefereeCommand::DIRECT_FREE_THEM));
+    world.updateGameState(::TestUtil::createGameState(RefereeCommand::DIRECT_FREE_THEM,
+                                                      RefereeCommand::DIRECT_FREE_THEM));
 
     ASSERT_TRUE(enemy_free_kick_play.isApplicable(world));
     ASSERT_TRUE(enemy_free_kick_play.invariantHolds(world));
 
-    world.updateGameState(
-        ::TestUtil::createGameState(RefereeCommand::NORMAL_START, RefereeCommand::DIRECT_FREE_THEM));
+    world.updateGameState(::TestUtil::createGameState(RefereeCommand::NORMAL_START,
+                                                      RefereeCommand::DIRECT_FREE_THEM));
 
     ASSERT_FALSE(enemy_free_kick_play.isApplicable(world));
     ASSERT_FALSE(enemy_free_kick_play.invariantHolds(world));
-
 }
