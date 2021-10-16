@@ -184,7 +184,7 @@ TEST(HaltPlayInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
     world.updateGameState(::TestUtil::createGameState(
             RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::PREPARE_PENALTY_THEM));
 
-    // Lets make sure the play will start running and stay running.
+    // Lets make sure it is their penalty.
     ASSERT_TRUE(penalty_kick_enemy_play.isApplicable(world));
     ASSERT_TRUE(penalty_kick_enemy_play.invariantHolds(world));
 
