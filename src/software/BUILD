@@ -84,3 +84,11 @@ sh_binary(
         "@bazel_tools//tools/bash/runfiles",
     ],
 )
+
+sh_binary(
+    name = "run_simulated_ai_vs_ai",
+    srcs = ["run_simulated_ai_vs_ai.sh"],
+    deps = [
+        "@bazel_tools//tools/bash/runfiles",
+    ],
+)
