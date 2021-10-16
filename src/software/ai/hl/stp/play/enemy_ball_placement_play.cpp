@@ -91,7 +91,7 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
             move_tactics[0]->updateControlParams(
                 placement_point + placement_to_net,
                 placement_to_net.orientation() + Angle::half(), 0);
-            shadow_enemy->updateControlParams(enemy_threats.at(1),
+            shadow_enemy->updateControlParams(enemy_threats.at(0),
                                               ROBOT_MAX_RADIUS_METERS * 3);
 
             tactics_to_run[0].emplace_back(move_tactics[0]);

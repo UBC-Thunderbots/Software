@@ -22,14 +22,16 @@ class EnemyBallPlacementPlay : public Play
     /**
      * Ball Placement tactic shadowing the defense enemy.
      *
+     *  
+     * @param world world
+     * @param yield yield
      * @param crease_defenders list of crease defenders
      * @param move_tactics list of move tactics
      * @param placement_point ball placement point
-     * @param world world
-     * @param yield yield
      */
     void ballPlacementWithShadow(
         TacticCoroutine::push_type &yield, const World &world,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders,
-        std::array<std::shared_ptr<MoveTactic>, 2> move_tactics, Point placement_point);
+        std::array<std::shared_ptr<MoveTactic>, 2> move_tactics,
+        Point placement_point);
 };
