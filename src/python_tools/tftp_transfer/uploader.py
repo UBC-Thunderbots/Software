@@ -72,7 +72,7 @@ def main():
     max_retries = args["retries"]
 
     retries_count = 0
-    # keep track of announcements from robots that have the correct sha256 checksum so that we dont re-upload files
+    # keep track of announcements from robots that have the correct sha256 checksum so that we don't re-upload files
     # Note: we use a map of robot_id to announcement because announcements are not hashable
     verified_announcements = {}
     clients = {}
