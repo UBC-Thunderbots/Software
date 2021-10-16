@@ -108,8 +108,10 @@ std::optional<Point> getBallPlacementPoint(const SSLProto::Referee &packet)
 {
     if (packet.has_designated_position())
     {
-        return Point(static_cast<double>(packet.designated_position().x() * METERS_PER_MILLIMETER),
-                     static_cast<double>(packet.designated_position().y() * METERS_PER_MILLIMETER));
+        return Point(
+            static_cast<double>(packet.designated_position().x() * METERS_PER_MILLIMETER),
+            static_cast<double>(packet.designated_position().y() *
+                                METERS_PER_MILLIMETER));
     }
     else
     {
