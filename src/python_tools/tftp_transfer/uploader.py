@@ -3,7 +3,6 @@ from python_tools.robot_broadcast_receiver import receive_announcements
 
 
 MAX_UPLOAD_RETRIES = 3
-ANNOUNCEMENT_TIMEOUT_SECOND = 4
 
 
 def encode_sha256_checksum(file_path: str) -> str:
@@ -114,8 +113,9 @@ def main():
                 print("Retrying...")
 
         retries_count += 1
-
-    if 0 < retries_count <= max_retries:
+    if retries_count <= 0:
+        print("Enter a valid number of retries")
+    elif 0 < retries_count <= max_retries:
         print("Files successfully uploaded for all robots")
     elif retries_count > max_retries:
         print("Files not successfully uploaded for all robots.")
