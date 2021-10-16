@@ -1,7 +1,6 @@
 #include "software/ai/hl/stp/play/enemy_ball_placement_play.h"
 
 #include <gtest/gtest.h>
-#include <utility>
 
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
@@ -14,7 +13,9 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class EnemyBallPlacementPlayTest : public SimulatedPlayTestFixture, public ::testing::WithParamInterface<std::tuple<std::vector<Point>, BallState>>
+class EnemyBallPlacementPlayTest
+    : public SimulatedPlayTestFixture,
+      public ::testing::WithParamInterface<std::tuple<std::vector<Point>, BallState>>
 {
    protected:
     Field field = Field::createSSLDivisionBField();
@@ -24,8 +25,8 @@ TEST_P(EnemyBallPlacementPlayTest, test_ball_placement)
 {
     Point ball_placement_point(1, 0);
     BallState ball_state = std::get<1>(GetParam());
-    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
-        std::get<0>(GetParam()));
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId(std::get<0>(GetParam()));
     setFriendlyGoalie(0);
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
@@ -121,12 +122,17 @@ INSTANTIATE_TEST_CASE_P(
     BallAndRobotStates, EnemyBallPlacementPlayTest,
     ::testing::Values(
         // Test ball placement with rectangular motion constraint
-        std::make_tuple(std::vector<Point>{Point(0, -1.5), Point(-1, 0), Point(0, 1.5), Point(-1.5, -1.5), Point(-1.5, 0),
-         Point(-1.5, 1.5)},BallState(Point(0,0),Vector(0,0))),
+        std::make_tuple(std::vector<Point>{Point(0, -1.5), Point(-1, 0), Point(0, 1.5),
+                                           Point(-1.5, -1.5), Point(-1.5, 0),
+                                           Point(-1.5, 1.5)},
+                        BallState(Point(0, 0), Vector(0, 0))),
         // Test ball placement with diagonal motion constraint
-        std::make_tuple(std::vector<Point>{Point(0, -1.5), Point(-1, 0), Point(0, 1.5), Point(-1.5, -1.5), Point(-1.5, 0),
-         Point(-1.5, 1.5)},BallState(Point(1.5,2),Vector(0,0))),
+        std::make_tuple(std::vector<Point>{Point(0, -1.5), Point(-1, 0), Point(0, 1.5),
+                                           Point(-1.5, -1.5), Point(-1.5, 0),
+                                           Point(-1.5, 1.5)},
+                        BallState(Point(1.5, 2), Vector(0, 0))),
         // Test ball placement with moving ball
-        std::make_tuple(std::vector<Point>{Point(0, -1.5), Point(-1, 0), Point(0, 1.5), Point(-1.5, -1.5), Point(-1.5, 0),
-          Point(-1.5, 1.5)},BallState(Point(0,0),Vector(0.90,0))))    
-);
+        std::make_tuple(std::vector<Point>{Point(0, -1.5), Point(-1, 0), Point(0, 1.5),
+                                           Point(-1.5, -1.5), Point(-1.5, 0),
+                                           Point(-1.5, 1.5)},
+                        BallState(Point(0, 0), Vector(0.90, 0)))));

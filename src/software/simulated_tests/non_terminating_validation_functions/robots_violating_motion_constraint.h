@@ -7,8 +7,8 @@
 
 /**
  * Checks if the friendly robots do not enter specified motion constraint during the test.
- * If they do, assertion fails. 
- * 
+ * If they do, assertion fails.
+ *
  * @param world_ptr the world pointer given by the simulator. Gets updated every tick
  * @param yield yields control to the next routine (coroutines) with error message
  * @param obstacle_factory the obstacle factory object to be passed in
