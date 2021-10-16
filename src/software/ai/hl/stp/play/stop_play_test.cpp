@@ -47,6 +47,27 @@ class StopPlayTest : public SimulatedPlayTestFixture
              field.enemyDefenseArea().negXPosYCorner()});
 };
 
+TEST_F(StopPlayInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
+{
+    auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
+
+    auto world = ::TestUtil::createBlankTestingWorld();
+
+    auto stop_play = StopPlay(play_config);
+
+    world.updateGameState(
+        ::TestUtil::createGameState(RefereeCommand::STOP, RefereeCommand::STOP));
+
+    ASSERT_TRUE(stop_play.isApplicable(world));
+    ASSERT_TRUE(stop_play.invariantHolds(world));
+
+    world.updateGameState(
+        ::TestUtil::createGameState(RefereeCommand::NORMAL_START, RefereeCommand::STOP));
+
+    ASSERT_FALSE(stop_play.isApplicable(world));
+    ASSERT_FALSE(stop_play.invariantHolds(world));
+}
+
 TEST_F(StopPlayTest, test_stop_play_ball_at_centre_robots_spread_out)
 {
     BallState ball_state(Point(0, 0), Vector(0, 0));
