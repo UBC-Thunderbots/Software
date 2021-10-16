@@ -10,7 +10,7 @@
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.h"
 #include "software/world/ball.h"
 
 FreeKickPlay::FreeKickPlay(std::shared_ptr<const PlayConfig> config)

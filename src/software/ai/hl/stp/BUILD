@@ -14,7 +14,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:all_tactics",
         "//software/ai/intent:stop_intent",
         "//software/ai/motion_constraint:motion_constraint_set_builder",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
         "//software/util/typename",
         "@munkres_cpp",
     ],
@@ -57,6 +57,6 @@ cc_test(
         "//software/ai/hl/stp/play/test_plays:halt_test_play",
         "//software/ai/hl/stp/play/test_plays:move_test_play",
         "//software/test_util",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
 )
