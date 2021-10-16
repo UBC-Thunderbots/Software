@@ -47,7 +47,7 @@ class StopPlayTest : public SimulatedPlayTestFixture
              field.enemyDefenseArea().negXPosYCorner()});
 };
 
-TEST_F(StopPlayInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
+TEST_F(StopPlayTest, test_invariant_and_is_applicable)
 {
     auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
 
