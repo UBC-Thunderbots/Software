@@ -175,4 +175,7 @@ class ErForceSimulator : public QObject
 
     RobotConstants_t robot_constants;
     WheelConstants wheel_constants;
+
+    const QString CONFIG_FILE      = "simulator/2020";
+    const QString CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";
 };
