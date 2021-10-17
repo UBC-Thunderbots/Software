@@ -80,8 +80,7 @@ class ErForceSimulator : public QObject
                                   std::unique_ptr<TbotsProto::Vision> vision_msg);
 
     /**
-     * Advances the simulation by the given time step. This will simulate
-     * one "camera frame" of data and increase the camera_frame value by 1.
+     * Advances the simulation by the given time step.
      *
      * @param time_step how much to advance the simulation by
      */
@@ -125,17 +124,6 @@ class ErForceSimulator : public QObject
      * @return The value of `current_firmware_time`, in seconds.
      */
     static float getCurrentFirmwareTimeSeconds();
-
-    /**
-     * Sets the primitive being simulated by the robot on the corresponding team
-     * in simulation
-     *
-     * @param id The id of the robot to set the primitive for
-     * @param primitive_msg The primitive to run on the robot
-     * @param vision_msg The vision message
-     */
-    void setYellowRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
-    void setBlueRobotPrimitive(RobotId id, const TbotsProto_Primitive& primitive_msg);
 
     /**
      * Sets the primitive being simulated by the robot in simulation

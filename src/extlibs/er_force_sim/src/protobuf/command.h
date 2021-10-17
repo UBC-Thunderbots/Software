@@ -29,9 +29,6 @@
 //! @addtogroup protobuf
 //! @{
 
-//! Protobuf command wrapper with reference counting
-typedef QSharedPointer<amun::Command> Command;
-
 void simulatorSetupSetDefault(amun::SimulatorSetup &setup);
 
 // position is in meters in our coordinate system

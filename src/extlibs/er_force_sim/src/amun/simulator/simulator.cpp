@@ -729,7 +729,7 @@ void Simulator::setFlipped(bool flipped)
     m_data->flip = flipped;
 }
 
-void Simulator::handleSimulatorSetupCommand(const Command &command)
+void Simulator::handleSimulatorSetupCommand(const std::shared_ptr<amun::Command> &command)
 {
     bool teamOrPerfectDribbleChanged = false;
 
@@ -739,8 +739,6 @@ void Simulator::handleSimulatorSetupCommand(const Command &command)
         if (sim.has_enable())
         {
             m_enabled = sim.enable();
-            // m_time    = m_timer->currentTime();
-            // update timer when simulator status is changed
         }
 
         if (sim.has_realism_config())

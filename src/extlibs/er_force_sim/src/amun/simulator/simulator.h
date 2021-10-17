@@ -106,7 +106,7 @@ class camun::simulator::Simulator : public QObject
      * @return simulator state
      */
     world::SimulatorState getSimulatorState();
-    void handleSimulatorSetupCommand(const Command &command);
+    void handleSimulatorSetupCommand(const std::shared_ptr<amun::Command> &command);
 
    public slots:
     void handleRadioCommands(const SSLSimRobotControl &control, bool isBlue,

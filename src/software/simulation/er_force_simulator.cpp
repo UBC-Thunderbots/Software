@@ -55,8 +55,8 @@ ErForceSimulator::ErForceSimulator(
     er_force_sim =
         std::make_unique<camun::simulator::Simulator>(er_force_sim_setup, true);
 
-    Command c{new amun::Command};
-    c->mutable_simulator()->set_enable(true);
+    auto simulator_setup_command = std::make_shared<amun::Command>();
+    simulator_setup_command->mutable_simulator()->set_enable(true);
     // start with default robots, take ER-Force specs.
     robot::Specs ERForce;
     robotSetDefault(&ERForce);
@@ -69,9 +69,9 @@ ErForceSimulator::ErForceSimulator(
 
     // TODO (#2283): remove this initialization when addYellowRobots and addBlueRobots are
     // implemented
-    auto* teamBlue   = c->mutable_set_team_blue();
-    auto* teamYellow = c->mutable_set_team_yellow();
-    for (auto* team : {teamBlue, teamYellow})
+    auto* team_blue   = simulator_setup_command->mutable_set_team_blue();
+    auto* team_yellow = simulator_setup_command->mutable_set_team_yellow();
+    for (auto* team : {team_blue, team_yellow})
     {
         for (int i = 0; i < 11; ++i)
         {
@@ -80,7 +80,8 @@ ErForceSimulator::ErForceSimulator(
             robot->set_id(i);
         }
     }
-    er_force_sim->handleSimulatorSetupCommand(c);
+    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
+    er_force_sim->seedPRGN(17);
 
     // TODO (#2283): remove this initialization when addYellowRobots and addBlueRobots are
     // implemented
@@ -123,7 +124,6 @@ ErForceSimulator::ErForceSimulator(
 
 
     this->resetCurrentFirmwareTime();
-    er_force_sim->stepSimulation(1);
 }
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
@@ -142,28 +142,16 @@ void ErForceSimulator::addBlueRobots(const std::vector<RobotStateWithId>& robots
     // TODO (#2283): add robots
 }
 
-void ErForceSimulator::setYellowRobotPrimitive(RobotId id,
-                                               const TbotsProto_Primitive& primitive_msg)
-{
-    setRobotPrimitive(id, primitive_msg, yellow_simulator_robots, simulator_ball,
-                      *yellow_team_vision_msg);
-}
-
-void ErForceSimulator::setBlueRobotPrimitive(RobotId id,
-                                             const TbotsProto_Primitive& primitive_msg)
-{
-    setRobotPrimitive(id, primitive_msg, blue_simulator_robots, simulator_ball,
-                      *blue_team_vision_msg);
-}
-
 void ErForceSimulator::setYellowRobotPrimitiveSet(
     const TbotsProto_PrimitiveSet& primitive_set_msg,
     std::unique_ptr<TbotsProto::Vision> vision_msg)
 {
     for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {
-        setYellowRobotPrimitive(primitive_set_msg.robot_primitives[i].key,
-                                primitive_set_msg.robot_primitives[i].value);
+        setRobotPrimitive(primitive_set_msg.robot_primitives[i].key,
+                          primitive_set_msg.robot_primitives[i].value,
+                          yellow_simulator_robots, simulator_ball,
+                          *yellow_team_vision_msg);
     }
     yellow_team_vision_msg = std::move(vision_msg);
 }
@@ -174,8 +162,9 @@ void ErForceSimulator::setBlueRobotPrimitiveSet(
 {
     for (pb_size_t i = 0; i < primitive_set_msg.robot_primitives_count; i++)
     {
-        setBlueRobotPrimitive(primitive_set_msg.robot_primitives[i].key,
-                              primitive_set_msg.robot_primitives[i].value);
+        setRobotPrimitive(primitive_set_msg.robot_primitives[i].key,
+                          primitive_set_msg.robot_primitives[i].value,
+                          blue_simulator_robots, simulator_ball, *blue_team_vision_msg);
     }
     blue_team_vision_msg = std::move(vision_msg);
 }
