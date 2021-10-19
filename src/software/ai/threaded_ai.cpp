@@ -28,8 +28,8 @@ void ThreadedAI::runAIAndSendPrimitives(const World &world)
     {
         auto new_primitives = ai.getPrimitives(world);
 
-        PlayInfo play_info = ai.getPlayInfo();
-        Subject<PlayInfo>::sendValueToObservers(play_info);
+        PlayInfo play_info_msg = ai.getPlayInfo();
+        Subject<PlayInfo>::sendValueToObservers(play_info_msg);
 
         Subject<TbotsProto::PrimitiveSet>::sendValueToObservers(*new_primitives);
     }

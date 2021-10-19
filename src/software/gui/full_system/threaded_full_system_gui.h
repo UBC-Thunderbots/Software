@@ -6,14 +6,14 @@
 #include <future>
 #include <thread>
 
-#include "shared/proto/tbots_software_msgs.pb.h"
-#include "software/ai/hl/stp/play_info.h"
+#include "proto/play_info_msg.pb.h"
+#include "proto/sensor_msg.pb.h"
+#include "proto/tbots_software_msgs.pb.h"
 #include "software/geom/rectangle.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/gui/full_system/widgets/full_system_gui.h"
 #include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/multithreading/thread_safe_buffer.h"
-#include "software/proto/sensor_msg.pb.h"
 #include "software/world/world.h"
 
 /**
@@ -35,7 +35,7 @@ class ThreadedFullSystemGUI
 
     void onValueReceived(World world) override;
     void onValueReceived(AIDrawFunction draw_function) override;
-    void onValueReceived(PlayInfo play_info) override;
+    void onValueReceived(PlayInfo play_info_msg) override;
     void onValueReceived(SensorProto sensor_msg) override;
     void onValueReceived(TbotsProto::PrimitiveSet primitive_msg) override;
 
@@ -65,7 +65,7 @@ class ThreadedFullSystemGUI
     // be passed safely
     std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer;
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer;
-    std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer;
+    std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_msg_buffer;
     std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer;
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer;
     std::shared_ptr<ThreadSafeBuffer<double>> worlds_received_per_second_buffer;
@@ -78,7 +78,7 @@ class ThreadedFullSystemGUI
     static constexpr std::size_t WORLD_DRAW_FUNCTIONS_BUFFER_SIZE = 2;
     static constexpr std::size_t AI_DRAW_FUNCTIONS_BUFFER_SIZE    = 2;
     // We only care about the most recent PlayInfo, so the buffer is of size 1
-    static constexpr std::size_t PLAY_INFO_BUFFER_SIZE = 1;
+    static constexpr std::size_t PLAY_INFO_MSG_BUFFER_SIZE = 1;
     // We don't want to miss any SensorProto updates so we make the buffer larger
     static constexpr std::size_t SENSOR_MSG_BUFFER_SIZE = 2;
     // We only care about the most recent view area that was requested, so the

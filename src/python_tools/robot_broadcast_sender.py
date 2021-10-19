@@ -1,4 +1,4 @@
-from shared.proto.announcement_pb2 import Announcement
+from proto.announcement_pb2 import Announcement
 import argparse
 import fcntl
 import socket

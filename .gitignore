@@ -145,3 +145,6 @@ src/config
 
 # ipynb Jupyter Notebooks
 *.ipynb
+
+# codespell dictionary
+formatting_scripts/dictionary/

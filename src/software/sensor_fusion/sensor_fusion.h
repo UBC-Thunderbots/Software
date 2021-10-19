@@ -2,11 +2,11 @@
 
 #include <google/protobuf/repeated_field.h>
 
+#include "proto/message_translation/ssl_detection.h"
+#include "proto/message_translation/ssl_geometry.h"
+#include "proto/message_translation/ssl_referee.h"
+#include "proto/sensor_msg.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/proto/message_translation/ssl_detection.h"
-#include "software/proto/message_translation/ssl_geometry.h"
-#include "software/proto/message_translation/ssl_referee.h"
-#include "software/proto/sensor_msg.pb.h"
 #include "software/sensor_fusion/filter/ball_filter.h"
 #include "software/sensor_fusion/filter/robot_team_filter.h"
 #include "software/sensor_fusion/filter/vision_detection.h"

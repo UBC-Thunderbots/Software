@@ -39,10 +39,10 @@
 #include "firmware/boards/robot_stm32h7/io/ublox_odinw262_communicator.h"
 #include "firmware/boards/robot_stm32h7/tim.h"
 #include "firmware/boards/robot_stm32h7/usart.h"
+#include "proto/robot_log_msg.nanopb.h"
+#include "proto/robot_status_msg.nanopb.h"
+#include "proto/tbots_software_msgs.nanopb.h"
 #include "shared/constants.h"
-#include "shared/proto/robot_log_msg.nanopb.h"
-#include "shared/proto/robot_status_msg.nanopb.h"
-#include "shared/proto/tbots_software_msgs.nanopb.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

@@ -5,10 +5,10 @@ cc_library(
     srcs = ["backend.cpp"],
     hdrs = ["backend.h"],
     deps = [
+        "//proto:sensor_msg_cc_proto",
+        "//proto/message_translation:tbots_protobuf",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
-        "//software/proto:sensor_msg_cc_proto",
-        "//software/proto/message_translation:tbots_protobuf",
         "//software/world",
     ],
 )
@@ -21,7 +21,7 @@ cc_library(
         ":backend",
         ":ssl_proto_client",
         "//software/backend/radio:radio_output",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"
     # design pattern to work are linked in
@@ -36,19 +36,19 @@ cc_library(
     deps = [
         ":backend",
         ":ssl_proto_client",
+        "//proto:defending_side_msg_cc_proto",
+        "//proto:tbots_cc_proto",
+        "//proto/message_translation:defending_side",
+        "//proto/message_translation:tbots_protobuf",
+        "//proto/primitive:primitive_msg_factory",
         "//shared:constants",
-        "//shared/proto:tbots_cc_proto",
         "//software:constants",
         "//software/estop:boost_uart_communication",
         "//software/estop:threaded_estop_reader",
         "//software/logger",
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",
-        "//software/proto:defending_side_msg_cc_proto",
-        "//software/proto/message_translation:defending_side",
-        "//software/proto/message_translation:tbots_protobuf",
-        "//software/proto/primitive:primitive_msg_factory",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"
     # design pattern to work are linked in
@@ -63,16 +63,16 @@ cc_library(
     deps = [
         ":backend",
         ":ssl_proto_client",
+        "//proto:defending_side_msg_cc_proto",
+        "//proto:tbots_cc_proto",
+        "//proto/message_translation:defending_side",
+        "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
-        "//shared/proto:tbots_cc_proto",
         "//software:constants",
         "//software/logger",
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",
-        "//software/proto:defending_side_msg_cc_proto",
-        "//software/proto/message_translation:defending_side",
-        "//software/proto/message_translation:tbots_protobuf",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"
     # design pattern to work are linked in
@@ -87,13 +87,13 @@ cc_library(
     deps = [
         ":backend",
         ":ssl_proto_client",
+        "//proto/logging:proto_log_reader",
+        "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
         "//software:constants",
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",
-        "//software/proto/logging:proto_log_reader",
-        "//software/proto/message_translation:tbots_protobuf",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"
     # design pattern to work are linked in
@@ -116,9 +116,9 @@ cc_library(
     srcs = ["ssl_proto_client.cpp"],
     hdrs = ["ssl_proto_client.h"],
     deps = [
+        "//proto:ssl_cc_proto",
         "//shared/parameter:cpp_configs",
         "//software:constants",
         "//software/networking:threaded_proto_udp_listener",
-        "//software/proto:ssl_cc_proto",
     ],
 )

@@ -10,7 +10,7 @@
 #include "firmware/app/world/velocity_wheel.h"
 #include "firmware/shared/physics.h"
 #include "firmware/shared/util.h"
-#include "shared/proto/primitive.nanopb.h"
+#include "proto/primitive.nanopb.h"
 
 /**
  * This struct represents a robot from the perspective of firmware

@@ -24,9 +24,9 @@ qt_cc_library(
     src = "standalone_simulator_gui.cpp",
     hdr = "standalone_simulator_gui.h",
     deps = [
+        "//proto:ssl_cc_proto",
         "//software/gui/drawing:ssl_wrapper_packet",
         "//software/gui/standalone_simulator/ui:main_widget",
-        "//software/proto:ssl_cc_proto",
         "//software/simulation:standalone_simulator",
         "@qt//:qt_widgets",
     ],

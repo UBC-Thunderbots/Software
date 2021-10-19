@@ -8,7 +8,7 @@
 #include "pb_common.h"
 #include "pb_decode.h"
 #include "pb_encode.h"
-#include "shared/proto/robot_log_msg.nanopb.h"
+#include "proto/robot_log_msg.nanopb.h"
 #include "task.h"
 
 // the id of the queue that contains tbots log protos

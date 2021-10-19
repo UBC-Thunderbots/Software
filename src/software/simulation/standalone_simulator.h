@@ -1,10 +1,10 @@
 #pragma once
 
+#include "proto/defending_side_msg.pb.h"
+#include "proto/tbots_software_msgs.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/networking/threaded_proto_udp_listener.h"
 #include "software/networking/threaded_proto_udp_sender.h"
-#include "software/proto/defending_side_msg.pb.h"
 #include "software/simulation/threaded_simulator.h"
 
 /**

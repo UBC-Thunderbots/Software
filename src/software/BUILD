@@ -4,20 +4,19 @@ cc_binary(
     name = "full_system",
     srcs = ["full_system_main.cpp"],
     deps = [
+        "//proto/logging:proto_logger",
+        "//proto/message_translation:ssl_wrapper",
         "//shared/parameter:cpp_configs",
         "//software:constants",
         "//software/ai:threaded_ai",
-        "//software/ai/hl/stp:play_info",
         "//software/backend",
         "//software/backend:all_backends",
         "//software/estop:arduino_util",
         "//software/gui/full_system:threaded_full_system_gui",
         "//software/logger",
         "//software/multithreading:observer_subject_adapter",
-        "//software/proto/logging:proto_logger",
-        "//software/proto/message_translation:ssl_wrapper",
         "//software/sensor_fusion:threaded_sensor_fusion",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
         "@boost//:program_options",
     ],
 )
@@ -54,7 +53,21 @@ cc_binary(
         "//software/backend:all_backends",
         "//software/gui/robot_diagnostics:threaded_robot_diagnostics_gui",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
+        "@boost//:program_options",
+    ],
+)
+
+cc_binary(
+    name = "network_log_listener_main",
+    srcs = ["network_log_listener_main.cpp"],
+    deps = [
+        "//proto:tbots_cc_proto",
+        "//shared:constants",
+        "//shared/parameter:cpp_configs",
+        "//software/logger:network_logger",
+        "//software/networking:threaded_proto_udp_listener",
+        "//software/networking:threaded_proto_udp_sender",
         "@boost//:program_options",
     ],
 )
