@@ -72,7 +72,7 @@ void SimulatedPlayTestFixture::updatePrimitives(
         createNanoPbPrimitiveSet(*primitive_set_msg));
 }
 
-std::shared_ptr<AiConfig> SimulatedPlayTestFixture::getAiConfig()
+std::shared_ptr<AiConfig> SimulatedPlayTestFixture::getAiConfig() const
 {
     return ai_config;
 }
