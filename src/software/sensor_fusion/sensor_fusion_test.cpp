@@ -624,7 +624,7 @@ TEST_F(SensorFusionTest, ball_placement_friendly_set_by_referee)
 {
     SensorProto sensor_msg;
 
-    // send Point(50, 75) to Referee message
+    // send (0.05, 0.075) to Referee message
     *(sensor_msg.mutable_ssl_referee_msg()) = *referee_ball_placement_yellow;
 
     auto ssl_wrapper_packet =
@@ -636,7 +636,7 @@ TEST_F(SensorFusionTest, ball_placement_friendly_set_by_referee)
     World result = *sensor_fusion.getWorld();
 
     Point returned_point = result.gameState().getBallPlacementPoint().value();
-    EXPECT_EQ(Point(50, 75), returned_point);
+    EXPECT_EQ(Point(0.05, 0.075), returned_point);
 }
 
 TEST_F(SensorFusionTest, ball_placement_enemy_set_by_referee)
