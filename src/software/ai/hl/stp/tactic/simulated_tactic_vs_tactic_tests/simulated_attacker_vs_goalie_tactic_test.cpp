@@ -40,7 +40,7 @@ std::vector<ValidationFunction> terminating_validation_functions = {};
 
 std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-runTest(field, ball_state, friendly_robots, enemy_robots, {}, terminating_validation_functions,
+runTest(field, ball_state, friendly_robots, enemy_robots, terminating_validation_functions,
 non_terminating_validation_functions, Duration::fromSeconds(10));
 }
 
@@ -50,5 +50,5 @@ INSTANTIATE_TEST_CASE_P(
         RobotStateWithId{0, RobotState(Point(1, 2), Vector(1, 1), Angle::fromDegrees(180),
                                        Angle::fromDegrees(10))},
         RobotStateWithId{1, RobotState(Point(0, 0), Vector(1, 1), Angle::fromDegrees(180),
-                                       Angle::fromDegrees(10))},
+                                       Angle::fromDegrees(10))}
                                        )));
