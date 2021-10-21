@@ -190,7 +190,7 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
             Duration::fromSeconds(10));
 }
 
-TEST_F(DefensePlayTest, test_invariant_and_is_applicable_enemy_possession)
+TEST(DefensePlayIsApplicableInvariantHoldsTest, test_invariant_and_is_applicable_enemy_possession)
 {
     auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
     auto world       = ::TestUtil::createBlankTestingWorld();
@@ -213,7 +213,7 @@ TEST_F(DefensePlayTest, test_invariant_and_is_applicable_enemy_possession)
     EXPECT_FALSE(defense_play.invariantHolds(world));
 }
 
-TEST_F(DefensePlayTest, test_invariant_and_is_applicable_friendly_possession)
+TEST(DefensePlayIsApplicableInvarantHoldsTest, test_invariant_and_is_applicable_friendly_possession)
 {
     auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
     auto world       = ::TestUtil::createBlankTestingWorld();
