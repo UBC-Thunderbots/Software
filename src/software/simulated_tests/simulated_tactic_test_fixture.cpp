@@ -84,6 +84,41 @@ void SimulatedTacticTestFixture::updatePrimitives(
         createNanoPbPrimitiveSet(*primitive_set_msg));
 }
 
+<<<<<<< Updated upstream
+=======
+void SimulatedTacticTestFixture::updateEnemyPrimitives(
+    const World& world, std::shared_ptr<Simulator> simulator_to_update)
+{
+    std::vector<std::unique_ptr<Intent>> intents;
+    auto start_tick_time = std::chrono::system_clock::now();
+
+    if (!enemy_robot_id)
+    {
+        LOG(FATAL) << "No enemy robot id set" << std::endl;
+    }
+    else if (auto new_robot = world.enemyTeam().getRobotById(*enemy_robot_id))
+    {
+        auto intent = enemy_tactic->get(*world.enemyTeam().getRobotById(*enemy_robot_id), world);
+        intent->setMotionConstraints(enemy_motion_constraints);
+        intents.push_back(std::move(intent));
+    }
+    else
+    {
+        LOG(FATAL) << "No enemy robot with robot id " << *enemy_robot_id << std::endl;
+    }
+
+    auto primitive_set_msg = enemy_navigator->getAssignedPrimitives(world, intents);
+    double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
+    registerTickTime(duration_ms);
+    auto defending_side = DefendingSideProto();
+    defending_side.set_defending_side(
+        DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X);
+    simulator_to_update->setBlueTeamDefendingSide(defending_side);
+    simulator_to_update->setBlueRobotPrimitiveSet(
+        createNanoPbPrimitiveSet(*primitive_set_msg));
+}
+
+>>>>>>> Stashed changes
 
 std::optional<PlayInfo> SimulatedTacticTestFixture::getPlayInfo()
 {
