@@ -35,8 +35,7 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play_bottom_left)
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::INDIRECT_FREE_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
-        {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             robotReceivedBall(5, world_ptr, yield);
             friendlyScored(world_ptr, yield);
         }};
@@ -64,8 +63,7 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play_top_right)
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::INDIRECT_FREE_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
-        {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             robotReceivedBall(5, world_ptr, yield);
             friendlyScored(world_ptr, yield);
         }};
