@@ -163,7 +163,6 @@ void SimulatedTacticTestFixture::updateEnemyPrimitives(
         createNanoPbPrimitiveSet(*primitive_set_msg));
 }
 
-
 std::optional<PlayInfo> SimulatedTacticTestFixture::getPlayInfo()
 {
     return std::nullopt;
