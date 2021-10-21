@@ -19,7 +19,7 @@ SimulatedTacticTestFixture::SimulatedTacticTestFixture()
           RobotNavigationObstacleFactory(
               thunderbots_config->getRobotNavigationObstacleConfig()),
           thunderbots_config->getNavigatorConfig())),
-      enemy_navigator(std::make_shared<Navigator(
+      enemy_navigator(std::make_shared<Navigator>(
           std::make_unique<VelocityObstaclePathManager>(
               std::make_unique<ThetaStarPathPlanner>(),
               RobotNavigationObstacleFactory(
@@ -49,7 +49,6 @@ void SimulatedTacticTestFixture::SetUp()
         RobotNavigationObstacleFactory(
             thunderbots_config->getRobotNavigationObstacleConfig()),
         thunderbots_config->getNavigatorConfig());
-    )
 }
 
 void SimulatedTacticTestFixture::setFriendlyTactic(std::shared_ptr<Tactic> tactic)
@@ -157,8 +156,8 @@ void SimulatedTacticTestFixture::updateEnemyPrimitives(
     auto primitive_set_msg = enemy_navigator->getAssignedPrimitives(world, intents);
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
     registerTickTime(duration_ms);
-    auto defending_side = DefendingSideProto().set_defending_side(
-        DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X));
+    auto defending_side = DefendingSideProto();
+    defending_side.set_defending_side(DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X);
     simulator_to_update->setBlueTeamDefendingSide(defending_side);
     simulator_to_update->setBlueRobotPrimitiveSet(
         createNanoPbPrimitiveSet(*primitive_set_msg));
