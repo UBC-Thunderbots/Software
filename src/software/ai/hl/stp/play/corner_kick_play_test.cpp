@@ -35,7 +35,8 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play_bottom_left)
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::INDIRECT_FREE_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             robotReceivedBall(5, world_ptr, yield);
             friendlyScored(world_ptr, yield);
         }};
@@ -63,7 +64,8 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play_top_right)
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::INDIRECT_FREE_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             robotReceivedBall(5, world_ptr, yield);
             friendlyScored(world_ptr, yield);
         }};
@@ -78,7 +80,7 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play_top_right)
 class CornerKickPlayInvariantAndIsApplicableTest
     : public SimulatedPlayTestFixture,
       public ::testing::WithParamInterface<
-          std::tuple<TeamSide, RefereeCommand, RefereeCommand, Point, Vector, bool, bool>>
+          std::tuple<TeamSide, RefereeCommand, RefereeCommand, Point, bool, bool>>
 {
    protected:
     Field field = Field::createSSLDivisionBField();
@@ -103,31 +105,17 @@ TEST_P(CornerKickPlayInvariantAndIsApplicableTest, test_invariant_and_is_applica
         ::TestUtil::createGameState(std::get<1>(GetParam()), std::get<2>(GetParam())));
 
     // initialize ball from parameters
-    BallState ball_state_in_corner(std::get<3>(GetParam()), std::get<4>(GetParam()));
+    BallState ball_state_in_corner(std::get<3>(GetParam()), Vector(0, 0));
     Timestamp time_stamp;
 
     Ball ball(ball_state_in_corner, time_stamp);
     world.updateBall(ball);
 
     // assert that isApplicable() is true or false depending on testcase
-    if (std::get<5>(GetParam()))
-    {
-        ASSERT_TRUE(corner_kick_play.isApplicable(world));
-    }
-    else
-    {
-        ASSERT_FALSE(corner_kick_play.isApplicable(world));
-    }
+    EXPECT_EQ(corner_kick_play.isApplicable(world), std::get<4>(GetParam()));
 
     // assert that invariantHolds() is true or false depending on testcase
-    if (std::get<6>(GetParam()))
-    {
-        ASSERT_TRUE(corner_kick_play.invariantHolds(world));
-    }
-    else
-    {
-        ASSERT_FALSE(corner_kick_play.invariantHolds(world));
-    }
+    EXPECT_EQ(corner_kick_play.invariantHolds(world), std::get<5>(GetParam()));
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -136,37 +124,37 @@ INSTANTIATE_TEST_CASE_P(
         // Test that both invariantHolds() and isApplicable() for ball in the enemy left
         // corner with variable position
         std::make_tuple(TeamSide::FRIENDLY, RefereeCommand::DIRECT_FREE_US,
-                        RefereeCommand::HALT, Point(4.5, -3), Vector(0, 0), true, true),
+                        RefereeCommand::HALT, Point(4.5, -3), true, true),
         std::make_tuple(TeamSide::FRIENDLY, RefereeCommand::DIRECT_FREE_US,
-                        RefereeCommand::HALT, Point(4.3, -3), Vector(0, 0), true, true),
+                        RefereeCommand::HALT, Point(4.3, -3), true, true),
         std::make_tuple(TeamSide::FRIENDLY, RefereeCommand::DIRECT_FREE_US,
-                        RefereeCommand::HALT, Point(4.5, -2.8), Vector(0, 0), true, true),
+                        RefereeCommand::HALT, Point(4.5, -2.8), true, true),
 
         // Test that both invariantHolds() and isApplicable() for ball in the enemy right
         // corner with variable position
         std::make_tuple(TeamSide::FRIENDLY, RefereeCommand::DIRECT_FREE_US,
-                        RefereeCommand::HALT, Point(4.5, 3), Vector(0, 0), true, true),
+                        RefereeCommand::HALT, Point(4.5, 3), true, true),
         std::make_tuple(TeamSide::FRIENDLY, RefereeCommand::DIRECT_FREE_US,
-                        RefereeCommand::HALT, Point(4.3, 3), Vector(0, 0), true, true),
+                        RefereeCommand::HALT, Point(4.3, 3), true, true),
         std::make_tuple(TeamSide::FRIENDLY, RefereeCommand::DIRECT_FREE_US,
-                        RefereeCommand::HALT, Point(4.5, 2.8), Vector(0, 0), true, true),
+                        RefereeCommand::HALT, Point(4.5, 2.8), true, true),
 
         // Test that invariantHolds() and !isApplicable() for ball not in a corner
         std::make_tuple(TeamSide::FRIENDLY, RefereeCommand::DIRECT_FREE_US,
-                        RefereeCommand::HALT, Point(0, 0), Vector(0, 0), false, true),
+                        RefereeCommand::HALT, Point(0, 0), false, true),
         std::make_tuple(TeamSide::FRIENDLY, RefereeCommand::DIRECT_FREE_US,
-                        RefereeCommand::HALT, Point(-4.5, 3), Vector(0, 0), false, true),
+                        RefereeCommand::HALT, Point(-4.5, 3), false, true),
         std::make_tuple(TeamSide::FRIENDLY, RefereeCommand::DIRECT_FREE_US,
-                        RefereeCommand::HALT, Point(-4.5, -3), Vector(0, 0), false, true),
+                        RefereeCommand::HALT, Point(-4.5, -3), false, true),
 
         // Test that !invariantHolds() and isApplicable() for ball in corner but not our
         // possession
         std::make_tuple(TeamSide::ENEMY, RefereeCommand::DIRECT_FREE_US,
-                        RefereeCommand::HALT, Point(4.5, -3), Vector(0, 0), true, false),
+                        RefereeCommand::HALT, Point(4.5, -3), true, false),
         std::make_tuple(TeamSide::ENEMY, RefereeCommand::DIRECT_FREE_US,
-                        RefereeCommand::HALT, Point(4.5, 3), Vector(0, 0), true, false),
+                        RefereeCommand::HALT, Point(4.5, 3), true, false),
 
         // Test that !invariantHolds() and !isApplicable() for ball not corner and not our
         // possession
         std::make_tuple(TeamSide::ENEMY, RefereeCommand::DIRECT_FREE_US,
-                        RefereeCommand::HALT, Point(0, 0), Vector(0, 0), false, false)));
+                        RefereeCommand::HALT, Point(0, 0), false, false)));
