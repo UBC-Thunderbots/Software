@@ -28,11 +28,14 @@ std::vector<RobotStateWithId> enemy_robots = {enemy_robot_state};
 
 BallState ball_state = BallState(Point(0.5, 0.5), Vector(0, 0));
 
-auto friendly_tactic = std::make_shared<AttackerTactic>();
+auto attacker_tactic_config = std::make_shared<const AttackerTacticConfig>();
+auto friendly_tactic = std::make_shared<AttackerTactic>(attacker_tactic_config);
 setFriendlyTactic(friendly_tactic);
 setFriendlyRobotId(1);
 
-auto enemy_tactic = std::make_shared<GoalieTactic>();
+std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
+        std::make_shared<const GoalieTacticConfig>();
+auto enemy_tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
 setEnemyTactic(enemy_tactic);
 setEnemyRobotId(0);
 
@@ -47,8 +50,8 @@ non_terminating_validation_functions, Duration::fromSeconds(10));
 INSTANTIATE_TEST_CASE_P(
         AttckerVsGoalie, SimulatedAttackerVsGoalieTacticTest,
         ::testing::Values(std::make_tuple(
-        RobotStateWithId{0, RobotState(Point(1, 2), Vector(1, 1), Angle::fromDegrees(180),
+        RobotStateWithId{1, RobotState(Point(1, 2), Vector(1, 1), Angle::fromDegrees(180),
                                        Angle::fromDegrees(10))},
-        RobotStateWithId{1, RobotState(Point(0, 0), Vector(1, 1), Angle::fromDegrees(180),
+        RobotStateWithId{0, RobotState(Point(0, 0), Vector(1, 1), Angle::fromDegrees(180),
                                        Angle::fromDegrees(10))}
                                        )));
