@@ -202,15 +202,15 @@ TEST_F(DefensePlayTest, test_invariant_and_is_applicable_enemy_possession)
     world.updateGameState(
         ::TestUtil::createGameState(RefereeCommand::FORCE_START, RefereeCommand::HALT));
 
-    ASSERT_TRUE(defense_play.isApplicable(world));
-    ASSERT_TRUE(defense_play.invariantHolds(world));
+    EXPECT_TRUE(defense_play.isApplicable(world));
+    EXPECT_TRUE(defense_play.invariantHolds(world));
 
     // Gamestate isHalted
     world.updateGameState(
         ::TestUtil::createGameState(RefereeCommand::HALT, RefereeCommand::FORCE_START));
 
-    ASSERT_FALSE(defense_play.isApplicable(world));
-    ASSERT_FALSE(defense_play.invariantHolds(world));
+    EXPECT_FALSE(defense_play.isApplicable(world));
+    EXPECT_FALSE(defense_play.invariantHolds(world));
 }
 
 TEST_F(DefensePlayTest, test_invariant_and_is_applicable_friendly_possession)
@@ -225,13 +225,13 @@ TEST_F(DefensePlayTest, test_invariant_and_is_applicable_friendly_possession)
     world.updateGameState(
         ::TestUtil::createGameState(RefereeCommand::FORCE_START, RefereeCommand::HALT));
 
-    ASSERT_FALSE(defense_play.isApplicable(world));
-    ASSERT_FALSE(defense_play.invariantHolds(world));
+    EXPECT_FALSE(defense_play.isApplicable(world));
+    EXPECT_FALSE(defense_play.invariantHolds(world));
 
     // Gamestate isHalted
     world.updateGameState(
         ::TestUtil::createGameState(RefereeCommand::HALT, RefereeCommand::FORCE_START));
 
-    ASSERT_FALSE(defense_play.isApplicable(world));
-    ASSERT_FALSE(defense_play.invariantHolds(world));
+    EXPECT_FALSE(defense_play.isApplicable(world));
+    EXPECT_FALSE(defense_play.invariantHolds(world));
 }
