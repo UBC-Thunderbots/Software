@@ -20,8 +20,8 @@ protected:
 
 TEST_P(SimulatedAttackerVsGoalieTacticTest, attacker_vs_goalie_test)
 {
-RobotStateWithId friendly_robot_state = get<0>(GetParam());
-RobotStateWithId enemy_robot_state = get<1>(GetParam());
+RobotStateWithId friendly_robot_state = std::get<0>(GetParam());
+RobotStateWithId enemy_robot_state = std::get<1>(GetParam());
 
 std::vector<RobotStateWithId> friendly_robots = {friendly_robot_state};
 std::vector<RobotStateWithId> enemy_robots = {enemy_robot_state};
