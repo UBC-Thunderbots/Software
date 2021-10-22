@@ -107,7 +107,7 @@ class SimulatedTestFixture : public ::testing::Test
      * @return if validation functions are done
      */
     bool tickTest(Duration simulation_time_step, Duration ai_time_step,
-                  std::shared_ptr<World> world);
+                  std::shared_ptr<World> friendly_world, std::shared_ptr<World> enemy_world);
 
     /**
      * A helper function that updates SensorFusion with the latest data from the Simulator
@@ -122,7 +122,7 @@ class SimulatedTestFixture : public ::testing::Test
      * @param world to update primitives with
      * @param simulator_to_update The simulator to update
      */
-    virtual void updatePrimitives(const World &world,
+    virtual void updatePrimitives(const World &friendly_world, const World &enemy_world,
                                   std::shared_ptr<Simulator> simulator_to_update) = 0;
 
     /**

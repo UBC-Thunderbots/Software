@@ -224,10 +224,11 @@ void SimulatedTestFixture::runTest(
     simulator->addBlueRobots(enemy_robots);
 
     updateSensorFusion(simulator);
-    std::shared_ptr<World> world;
-    if (auto world_opt = sensor_fusion.getWorld())
-    {
-        world = std::make_shared<World>(world_opt.value());
+    std::shared_ptr<World> friendly_world;
+    std::shared_ptr<World> enemy_world;
+    if (friendly_sensor_fusion.getWorld().has_value() && enemy_sensor_fusion.getWorld().has_value()) {
+        friendly_world = std::make_shared<World>(friendly_sensor_fusion.getWorld().value());
+        enemy_world = std::make_shared<World>(enemy_sensor_fusion.getWorld().value());
     }
     else
     {
@@ -237,13 +238,13 @@ void SimulatedTestFixture::runTest(
     for (const auto &validation_function : terminating_validation_functions)
     {
         terminating_function_validators.emplace_back(
-            TerminatingFunctionValidator(validation_function, world));
+            TerminatingFunctionValidator(validation_function, friendly_world));
     }
 
     for (const auto &validation_function : non_terminating_validation_functions)
     {
         non_terminating_function_validators.emplace_back(
-            NonTerminatingFunctionValidator(validation_function, world));
+            NonTerminatingFunctionValidator(validation_function, friendly_world));
     }
 
     const Timestamp timeout_time = simulator->getTimestamp() + timeout;
@@ -257,11 +258,11 @@ void SimulatedTestFixture::runTest(
 
     // Tick one frame to aid with visualization
     bool validation_functions_done =
-        tickTest(simulation_time_step, ai_time_step, world, simulator);
+        tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world);
 
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
-        if (!thunderbots_config->getAiControlConfig()->getRunAi()->value())
+        if (!friendly_thunderbots_config->getAiControlConfig()->getRunAi()->value())
         {
             auto ms_to_sleep = std::chrono::milliseconds(
                 static_cast<int>(ai_time_step.toMilliseconds()));
@@ -270,7 +271,7 @@ void SimulatedTestFixture::runTest(
         }
 
         validation_functions_done =
-            tickTest(simulation_time_step, ai_time_step, world, simulator);
+            tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world);
     }
     // Output the tick duration results
     double avg_tick_duration = total_tick_duration / tick_count;
@@ -302,9 +303,9 @@ void SimulatedTestFixture::registerTickTime(double tick_time_ms)
 }
 
 bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_time_step,
-                                    std::shared_ptr<World> world)
+                                    std::shared_ptr<World> friendly_world, std::shared_ptr<World> enemy_world)
 {
-    auto wall_start_time           = std::chrono::steady_clock::now();
+auto wall_start_time           = std::chrono::steady_clock::now();
     bool validation_functions_done = false;
     for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
     {
@@ -312,9 +313,11 @@ bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_t
         updateSensorFusion(simulator);
     }
 
-    if (auto world_opt = sensor_fusion.getWorld())
+    if (friendly_sensor_fusion.getWorld().has_value() && enemy_sensor_fusion.getWorld().has_value())
     {
-        *world = world_opt.value();
+        // DEBUG ?
+        *friendly_world = friendly_sensor_fusion.getWorld().value();
+        *enemy_world = enemy_sensor_fusion.getWorld().value();
 
         validation_functions_done = validateAndCheckCompletion(
             terminating_function_validators, non_terminating_function_validators);
@@ -323,7 +326,7 @@ bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_t
             return validation_functions_done;
         }
 
-        updatePrimitives(*world_opt, simulator); // pass friendly and enemy world
+        updatePrimitives(*friendly_world, *enemy_world, simulator); // pass friendly and enemy world
 
         if (run_simulation_in_realtime)
         {
@@ -332,7 +335,7 @@ bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_t
 
         if (full_system_gui)
         {
-            full_system_gui->onValueReceived(*world);
+            full_system_gui->onValueReceived(*friendly_world);
             if (auto play_info_msg = getPlayInfo())
             {
                 full_system_gui->onValueReceived(*play_info_msg);
