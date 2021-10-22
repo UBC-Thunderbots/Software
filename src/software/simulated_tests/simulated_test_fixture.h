@@ -90,8 +90,10 @@ class SimulatedTestFixture : public ::testing::Test
     void registerTickTime(double tick_time_ms);
 
     // The dynamic params being used in the tests
-    std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config;
-    std::shared_ptr<const ThunderbotsConfig> thunderbots_config;
+    std::shared_ptr<ThunderbotsConfig> friendly_mutable_thunderbots_config;
+    std::shared_ptr<ThunderbotsConfig> enemy_mutable_thunderbots_config;
+    std::shared_ptr<const ThunderbotsConfig> friendly_thunderbots_config;
+    std::shared_ptr<const ThunderbotsConfig> enemy_thunderbots_config;
 
    private:
     /**
@@ -105,7 +107,7 @@ class SimulatedTestFixture : public ::testing::Test
      * @return if validation functions are done
      */
     bool tickTest(Duration simulation_time_step, Duration ai_time_step,
-                  std::shared_ptr<World> world, std::shared_ptr<Simulator> simulator);
+                  std::shared_ptr<World> world);
 
     /**
      * A helper function that updates SensorFusion with the latest data from the Simulator
@@ -172,7 +174,8 @@ class SimulatedTestFixture : public ::testing::Test
     // object so we can assign new instances to this variable
     std::shared_ptr<Simulator> simulator;
     // The SensorFusion being tested and used in simulation
-    SensorFusion sensor_fusion;
+    SensorFusion friendly_sensor_fusion;
+    SensorFusion enemy_sensor_fusion;
 
     // whether we should log the filtered and unfiltered world states as replay logs
     // this will only be set to true if the environment variable
