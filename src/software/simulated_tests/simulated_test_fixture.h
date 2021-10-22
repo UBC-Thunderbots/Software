@@ -107,7 +107,7 @@ class SimulatedTestFixture : public ::testing::Test
      * @return if validation functions are done
      */
     bool tickTest(Duration simulation_time_step, Duration ai_time_step,
-                  std::shared_ptr<World> friendly_world, std::shared_ptr<World> enemy_world);
+                  std::shared_ptr<World> friendly_world, std::shared_ptr<World> enemy_world, std::shared_ptr<Simulator> simulator);
 
     /**
      * A helper function that updates SensorFusion with the latest data from the Simulator

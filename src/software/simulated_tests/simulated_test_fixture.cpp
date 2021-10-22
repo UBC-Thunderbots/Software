@@ -258,7 +258,7 @@ void SimulatedTestFixture::runTest(
 
     // Tick one frame to aid with visualization
     bool validation_functions_done =
-        tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world);
+        tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,simulator);
 
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
@@ -271,7 +271,7 @@ void SimulatedTestFixture::runTest(
         }
 
         validation_functions_done =
-            tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world);
+            tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,simulator);
     }
     // Output the tick duration results
     double avg_tick_duration = total_tick_duration / tick_count;
@@ -302,11 +302,13 @@ void SimulatedTestFixture::registerTickTime(double tick_time_ms)
     tick_count++;
 }
 
+// DO NOT REMOVE SIMULATOR - CAUSES SEGFAULT
 bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_time_step,
-                                    std::shared_ptr<World> friendly_world, std::shared_ptr<World> enemy_world)
+                                    std::shared_ptr<World> friendly_world, std::shared_ptr<World> enemy_world, std::shared_ptr<Simulator> simulator)
 {
 auto wall_start_time           = std::chrono::steady_clock::now();
     bool validation_functions_done = false;
+
     for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
     {
         simulator->stepSimulation(simulation_time_step);
