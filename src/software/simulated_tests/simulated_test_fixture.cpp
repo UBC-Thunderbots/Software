@@ -180,12 +180,12 @@ void SimulatedTestFixture::updateSensorFusion(std::shared_ptr<Simulator> simulat
     if (should_log_replay)
     {
         simulator_sensorproto_logger->onValueReceived(sensor_msg);
-        auto world_or_null = sensor_fusion.getWorld();
+        auto world_or_null = friendly_sensor_fusion.getWorld();
 
         if (world_or_null)
         {
             auto filtered_ssl_wrapper =
-                *createSSLWrapperPacket(*sensor_fusion.getWorld(), TeamColour::YELLOW);
+                *createSSLWrapperPacket(*friendly_sensor_fusion.getWorld(), TeamColour::YELLOW);
             sensorfusion_wrapper_logger->onValueReceived(filtered_ssl_wrapper);
         }
     }

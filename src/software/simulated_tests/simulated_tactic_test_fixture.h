@@ -69,7 +69,7 @@ class SimulatedTacticTestFixture : public SimulatedTestFixture
     void setEnemyMotionConstraints(const std::set<MotionConstraint>& motion_constriants);
 
    private:
-    void updatePrimitives(const World& world,
+    void updatePrimitives(const World& friendly_world, const World& enemy_world,
                           std::shared_ptr<Simulator> simulator_to_update) override;
     void updateFriendlyPrimitives(const World& world,
                           std::shared_ptr<Simulator> simulator_to_update);
