@@ -121,19 +121,16 @@ TEST(PenaltyKickInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
 
     // GameState: The game state to test with.
     world.updateGameState(::TestUtil::createGameState(
-            RefereeCommand::PREPARE_PENALTY_US, RefereeCommand::PREPARE_PENALTY_US));
+        RefereeCommand::PREPARE_PENALTY_US, RefereeCommand::PREPARE_PENALTY_US));
 
-    // Lets make sure the play will start running and stay running.
+    // Lets make sure the play will start running and stay running
     ASSERT_TRUE(penalty_kick_play.isApplicable(world));
     ASSERT_TRUE(penalty_kick_play.invariantHolds(world));
 
     world.updateGameState(::TestUtil::createGameState(
-            RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::PREPARE_PENALTY_US));
+        RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::PREPARE_PENALTY_US));
 
     // Making sure we don't run PenaltyKickPlay
     ASSERT_FALSE(penalty_kick_play.isApplicable(world));
     ASSERT_FALSE(penalty_kick_play.invariantHolds(world));
-
 }
-
-
