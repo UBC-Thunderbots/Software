@@ -2,7 +2,7 @@
 
 #include <cstdlib>
 
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.h"
 
 ReplayBackend::ReplayBackend(std::shared_ptr<const BackendConfig> config)
     : replay_reader(

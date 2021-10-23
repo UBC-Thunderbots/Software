@@ -17,7 +17,7 @@
 #include "software/ai/intent/stop_intent.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.h"
 #include "software/util/typename/typename.h"
 
 STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
@@ -123,6 +123,13 @@ std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
         auto play = play_constructor(play_config);
         if (play->isApplicable(world))
         {
+            if (!play->invariantHolds(world))
+            {
+                LOG(WARNING)
+                    << "Unexpected behaviour from " << objectTypeName(*play)
+                    << ". Play::isApplicable() is true and Play::invariantHolds() is false"
+                    << std::endl;
+            }
             applicable_plays.emplace_back(std::move(play));
         }
     }
