@@ -66,7 +66,7 @@ You can use Ubuntu 20.04 LTS inside Windows through Windows Subsystem for Linux,
 5. Clone your fork of the repository. As GitHub is forcing users to stop using usernames and passwords, we will use the SSH link. (you can put it wherever you want)
    1.  Eg. `git clone git@github.com:<your_username>/Software.git`
       1. You can find this link under the green `Clone or Download` button on the main page of the Software repository, under the SSH tab
-   2. To connect to GitHub using SSH, if not setup prior, you will need to add an SSH key to your GitHub account. Instructions can be found [here](https://help.github.com/articles/connecting-to-github-with-ssh/).
+   2. To connect to GitHub using SSH, if not setup prior, you will need to add an SSH key to your GitHub account. Instructions can be found [here](https://help.github.com/articles/connecting-to-github-with-ssh/).  For each computer you contribute to GitHub with, you will need an additional SSH Key pair linked to your account.
 6. Set up your git remotes ([what is a remote and how does it work?](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes))
    1. You should have a remote named `origin` that points to your fork of the repository. Git will have set this up automatically when you cloned your fork in the previous step.
    2. You will need to add a second remote, named `upstream`, that points to our main Software repository, which is where you created your fork from. (**Note:** This is _not_ your fork)
