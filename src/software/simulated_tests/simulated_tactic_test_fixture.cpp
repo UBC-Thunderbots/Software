@@ -156,9 +156,9 @@ void SimulatedTacticTestFixture::updateEnemyPrimitives(
     auto primitive_set_msg = enemy_navigator->getAssignedPrimitives(world, intents);
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
     registerTickTime(duration_ms);
-    // auto defending_side = DefendingSideProto();
-    // defending_side.set_defending_side(DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_NEG_X);
-    // simulator_to_update->setBlueTeamDefendingSide(defending_side);
+    auto defending_side = DefendingSideProto();
+    defending_side.set_defending_side(DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X);
+    simulator_to_update->setBlueTeamDefendingSide(defending_side);
     simulator_to_update->setBlueRobotPrimitiveSet(
         createNanoPbPrimitiveSet(*primitive_set_msg));
 }
