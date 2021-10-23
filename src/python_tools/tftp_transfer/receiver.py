@@ -10,7 +10,7 @@ def main():
         "--root_dir",
         required=True,
         type=str,
-        help="root directory for the TFTP server",
+        help="root directory for the TFTP server. This should be an absolute path",
     )
 
     args = vars(ap.parse_args())
