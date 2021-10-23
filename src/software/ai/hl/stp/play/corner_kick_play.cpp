@@ -10,7 +10,7 @@
 #include "software/ai/passing/pass_generator.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.h"
 #include "software/world/ball.h"
 
 CornerKickPlay::CornerKickPlay(std::shared_ptr<const PlayConfig> config)
@@ -69,7 +69,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
 
     do
     {
-        attacker->updateControlParams(pass);
+        attacker->updateControlParams(pass, true);
         receiver->updateControlParams(pass);
 
         if (!attacker->done())

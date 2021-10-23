@@ -152,8 +152,8 @@ cc_library(
         ":draw_functions",
         ":field",
         ":robot",
-        "//software/proto:ssl_cc_proto",
-        "//software/proto/message_translation:ssl_detection",
-        "//software/proto/message_translation:ssl_geometry",
+        "//proto:ssl_cc_proto",
+        "//proto/message_translation:ssl_detection",
+        "//proto/message_translation:ssl_geometry",
     ],
 )

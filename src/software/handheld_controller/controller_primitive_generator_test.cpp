@@ -3,9 +3,10 @@
 #include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
 
+#include "proto/primitive/primitive_msg_factory.h"
+#include "shared/2015_robot_constants.h"
 #include "shared/constants.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/proto/primitive/primitive_msg_factory.h"
 
 class ControllerPrimitiveGeneratorTest : public testing::Test
 {
@@ -16,6 +17,7 @@ class ControllerPrimitiveGeneratorTest : public testing::Test
     }
 
     std::shared_ptr<const HandheldControllerConfig> handheld_controller_config;
+    RobotConstants robot_constants = create2015RobotConstants();
 };
 
 TEST_F(ControllerPrimitiveGeneratorTest, test_create_direct_velocity)
@@ -54,7 +56,7 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input)
 
     auto actual_primitive =
         *ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
-            input, handheld_controller_config);
+            input, handheld_controller_config, robot_constants);
 
     double kick_speed =
         handheld_controller_config->getKickSpeedMetersPerSecond()->value();
@@ -64,7 +66,7 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input)
                                  AutoChipOrKickMode::AUTOKICK,
                                  kick_speed,
                              },
-                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
+                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_kick_primitive, actual_primitive));
 }
@@ -79,7 +81,7 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input1
 
     auto actual_primitive =
         *ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
-            input, handheld_controller_config);
+            input, handheld_controller_config, robot_constants);
 
     double chip_distance = handheld_controller_config->getChipDistanceMeters()->value();
     auto expected_chip_primitive =
@@ -88,7 +90,7 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input1
                                  AutoChipOrKickMode::AUTOCHIP,
                                  chip_distance,
                              },
-                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0);
+                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_chip_primitive, actual_primitive));
 }
@@ -107,7 +109,7 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input2
 
     auto actual_primitive =
         *ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
-            input, handheld_controller_config);
+            input, handheld_controller_config, robot_constants);
 
     unsigned int dribbler_rpm =
         input.isDribblerButtonPressed()

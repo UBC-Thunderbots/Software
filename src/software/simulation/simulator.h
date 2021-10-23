@@ -1,8 +1,8 @@
 #pragma once
 
+#include "proto/defending_side_msg.pb.h"
+#include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/proto/defending_side_msg.pb.h"
-#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/firmware_object_deleter.h"
 #include "software/simulation/physics/physics_world.h"
 #include "software/simulation/physics_simulator_ball.h"
@@ -13,8 +13,9 @@
 
 extern "C"
 {
-#include "shared/proto/primitive.nanopb.h"
-#include "shared/proto/tbots_software_msgs.nanopb.h"
+#include "firmware/shared/physics.h"
+#include "proto/primitive.nanopb.h"
+#include "proto/tbots_software_msgs.nanopb.h"
 }
 
 /**
@@ -30,11 +31,14 @@ class Simulator
      * will have the given field, with no robots or ball.
      *
      * @param field The field to initialize the simulation with
+     * @param robot_constants The robot constants
+     * @param wheel_constants The wheel constants
      * @param simulator_config The config to fetch parameters from
      * @param physics_time_step The time step used to simulated physics
      * and robot primitives.
      */
-    explicit Simulator(const Field& field,
+    explicit Simulator(const Field& field, const RobotConstants_t& robot_constants,
+                       const WheelConstants& wheel_constants,
                        std::shared_ptr<const SimulatorConfig> simulator_config,
                        const Duration& physics_time_step =
                            Duration::fromSeconds(DEFAULT_PHYSICS_TIME_STEP_SECONDS));
@@ -232,9 +236,8 @@ class Simulator
     // This simulates having a single camera that can see the entire field
     static constexpr unsigned int CAMERA_ID            = 0;
     static constexpr float FIELD_LINE_THICKNESS_METRES = 0.01f;
-    // 200Hz is approximately how fast our robot firmware runs, so we
-    // mimic that here for physics and primitive updates
-    static constexpr double DEFAULT_PHYSICS_TIME_STEP_SECONDS = 1.0 / 200.0;
+    // We reuse the firmware tick rate to mimic real firmware
+    static constexpr double DEFAULT_PHYSICS_TIME_STEP_SECONDS = 1.0 / CONTROL_LOOP_HZ;
 
     // The current time. This is static so that it may be used by the firmware,
     // and so must be set before each firmware tick

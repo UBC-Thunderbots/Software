@@ -7,6 +7,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":navigating_primitive_creator",
+        "//proto/message_translation:tbots_protobuf",
         "//shared/parameter:cpp_configs",
         "//software/ai/intent",
         "//software/ai/intent:all_intents",
@@ -16,7 +17,6 @@ cc_library(
         "//software/ai/navigator/path_manager",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/proto/message_translation:tbots_protobuf",
         "//software/world",
     ],
 )
@@ -41,6 +41,7 @@ cc_library(
     hdrs = ["navigating_primitive_creator.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "//proto/message_translation:tbots_protobuf",
         "//shared/parameter:cpp_configs",
         "//software/ai/intent:all_intents",
         "//software/ai/intent:navigating_intent",
@@ -49,7 +50,6 @@ cc_library(
         "//software/ai/navigator/path_planner",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/proto/message_translation:tbots_protobuf",
         "//software/world",
     ],
 )

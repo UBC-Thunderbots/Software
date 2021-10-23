@@ -15,14 +15,15 @@ NOTEBOOK_DEPS = [
     "//python_tools/plotting:plot_heatmap",
     "//python_tools/plotting:plot_ssl_wrapper",
     "//python_tools/plotting:plot_pass_generator",
-    "//shared/proto:tbots_py_proto",
-    "//software/proto:software_py_proto",
+    "//proto:tbots_py_proto",
+    "//proto:software_py_proto",
 ]
 
 PYTHON_BINDINGS = [
     "//software/python_bindings:pass_generator.so",
     "//software/python_bindings:passing.so",
     "//software/python_bindings:world.so",
+    "//software/python_bindings:keep_away.so",
 ]
 
 py_test(
@@ -34,7 +35,7 @@ py_library(
     name = "proto_log",
     srcs = ["proto_log.py"],
     deps = [
-        "//software/proto:software_py_proto",
+        "//proto:software_py_proto",
         requirement("protobuf"),
     ],
 )
@@ -44,7 +45,7 @@ py_library(
     srcs = ["sensor_proto_log.py"],
     deps = [
         ":proto_log",
-        "//software/proto:software_py_proto",
+        "//proto:software_py_proto",
     ],
 )
 
@@ -65,4 +66,16 @@ py_test(
         ":notebooks",
     ] + PYTHON_BINDINGS,
     deps = NOTEBOOK_DEPS,
+)
+
+py_binary(
+    name = "robot_broadcast_receiver",
+    srcs = ["robot_broadcast_receiver.py"],
+    deps = ["//proto:announcement_py_proto"],
+)
+
+py_binary(
+    name = "robot_broadcast_sender",
+    srcs = ["robot_broadcast_sender.py"],
+    deps = ["//proto:announcement_py_proto"],
 )

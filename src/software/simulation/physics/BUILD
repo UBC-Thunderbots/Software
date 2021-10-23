@@ -74,6 +74,7 @@ cc_library(
     hdrs = ["physics_field.h"],
     deps = [
         ":box2d_util",
+        ":physics_object_user_data",
         "//software/time:timestamp",
         "//software/world:field",
         "@box2d",
@@ -116,6 +117,7 @@ cc_library(
         ":physics_robot_model",
         "//firmware/shared:physics",
         "//shared:constants",
+        "//shared:robot_constants",
         "//software/geom:angle",
         "//software/geom:angular_velocity",
         "//software/geom:point",
@@ -180,6 +182,7 @@ cc_library(
     hdrs = ["simulation_contact_listener.h"],
     deps = [
         ":physics_ball",
+        ":physics_field",
         ":physics_object_user_data",
         ":physics_robot",
         "@box2d",

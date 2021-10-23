@@ -1,9 +1,9 @@
 #include "software/simulation/simulator.h"
 
-#include "software/proto/message_translation/primitive_google_to_nanopb_converter.h"
-#include "software/proto/message_translation/ssl_detection.h"
-#include "software/proto/message_translation/ssl_geometry.h"
-#include "software/proto/message_translation/ssl_wrapper.h"
+#include "proto/message_translation/primitive_google_to_nanopb_converter.h"
+#include "proto/message_translation/ssl_detection.h"
+#include "proto/message_translation/ssl_geometry.h"
+#include "proto/message_translation/ssl_wrapper.h"
 #include "software/simulation/force_wheel_simulator_robot_singleton.h"
 #include "software/simulation/simulator_ball_singleton.h"
 
@@ -13,13 +13,14 @@ extern "C"
 #include "firmware/app/world/firmware_ball.h"
 #include "firmware/app/world/firmware_robot.h"
 #include "firmware/app/world/firmware_world.h"
-#include "shared/proto/robot_log_msg.nanopb.h"
+#include "proto/robot_log_msg.nanopb.h"
 }
 
-Simulator::Simulator(const Field& field,
+Simulator::Simulator(const Field& field, const RobotConstants_t& robot_constants,
+                     const WheelConstants& wheel_constants,
                      std::shared_ptr<const SimulatorConfig> simulator_config,
                      const Duration& physics_time_step)
-    : physics_world(field, simulator_config),
+    : physics_world(field, robot_constants, wheel_constants, simulator_config),
       yellow_team_defending_side(FieldSide::NEG_X),
       blue_team_defending_side(FieldSide::NEG_X),
       frame_number(0),

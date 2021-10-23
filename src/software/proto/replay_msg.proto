@@ -1,8 +1,0 @@
-syntax = 'proto3';
-
-import "software/proto/sensor_msg.proto";
-
-message ReplayProto
-{
-    repeated SensorProto replay_msgs = 1;
-}

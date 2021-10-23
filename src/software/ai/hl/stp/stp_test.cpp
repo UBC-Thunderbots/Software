@@ -9,7 +9,7 @@
 #include "software/ai/hl/stp/play/test_plays/halt_test_play.h"
 #include "software/ai/hl/stp/play/test_plays/move_test_play.h"
 #include "software/test_util/test_util.h"
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.h"
 
 class STPTest : public ::testing::Test
 {
@@ -170,15 +170,28 @@ TEST_F(STPTest, test_get_play_info)
     stp.getIntents(world);
     EXPECT_EQ(*(stp.getCurrentPlayName()), TYPENAME(HaltTestPlay));
 
-    auto play_info = stp.getPlayInfo();
-    std::string expected_referee_command, expected_play_name;
-    expected_referee_command                                  = "HALT";
-    expected_play_name                                        = "HaltTestPlay";
-    std::vector<std::string> expected_robot_tactic_assignment = {
-        "Robot 0  -  StopTestTactic", "Robot 1  -  StopTestTactic"};
-    PlayInfo expected_play_info = PlayInfo(expected_referee_command, expected_play_name,
-                                           expected_robot_tactic_assignment);
-    EXPECT_EQ(play_info.getRefereeCommandName(), expected_referee_command);
-    EXPECT_EQ(play_info.getPlayName(), expected_play_name);
-    EXPECT_EQ(play_info, expected_play_info);
+    auto play_info_msg = stp.getPlayInfo();
+
+    std::string expected_referee_command, expected_play_name, expected_tactic_name;
+    expected_referee_command = "HALT";
+    expected_play_name       = "HaltTestPlay";
+    expected_tactic_name     = "StopTestTactic";
+
+    PlayInfo expected_play_info_msg = PlayInfo();
+    expected_play_info_msg.mutable_game_state()->set_referee_command_name(
+        expected_referee_command);
+    expected_play_info_msg.mutable_play()->set_play_name(expected_play_name);
+    PlayInfo_Tactic expected_tactic = PlayInfo_Tactic();
+    expected_tactic.set_tactic_name(expected_tactic_name);
+    (*expected_play_info_msg.mutable_robot_tactic_assignment())[0] = expected_tactic;
+    (*expected_play_info_msg.mutable_robot_tactic_assignment())[1] = expected_tactic;
+
+    EXPECT_EQ(play_info_msg.game_state().referee_command_name(),
+              expected_referee_command);
+    EXPECT_EQ(play_info_msg.play().play_name(), expected_play_name);
+    EXPECT_EQ(play_info_msg.robot_tactic_assignment_size(), 2);
+    EXPECT_EQ((*play_info_msg.mutable_robot_tactic_assignment())[0].tactic_name(),
+              expected_tactic.tactic_name());
+    EXPECT_EQ((*play_info_msg.mutable_robot_tactic_assignment())[1].tactic_name(),
+              expected_tactic.tactic_name());
 }

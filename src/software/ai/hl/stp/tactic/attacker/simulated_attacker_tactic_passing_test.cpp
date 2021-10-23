@@ -13,7 +13,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedAttackerTacticPassingTest
+class SimulatedAttackerTacticKeepAwayTest
     : public SimulatedTacticTestFixture,
       public ::testing::WithParamInterface<std::tuple<Pass, RobotStateWithId, BallState>>
 {
@@ -21,7 +21,7 @@ class SimulatedAttackerTacticPassingTest
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_P(SimulatedAttackerTacticPassingTest, attacker_test_passing)
+TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_passing)
 {
     Pass pass                    = std::get<0>(GetParam());
     RobotStateWithId robot_state = std::get<1>(GetParam());
@@ -29,12 +29,13 @@ TEST_P(SimulatedAttackerTacticPassingTest, attacker_test_passing)
 
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
     friendly_robots.emplace_back(robot_state);
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
     auto attacker_tactic_config = std::make_shared<AttackerTacticConfig>();
     // force passing for this test by setting min acceptable shot angle very high
     attacker_tactic_config->getMutableMinOpenAngleForShotDeg()->setValue(90);
     auto tactic = std::make_shared<AttackerTactic>(attacker_tactic_config);
-    tactic->updateControlParams(pass);
+    tactic->updateControlParams(pass, true);
     setTactic(tactic);
     setRobotId(1);
 
@@ -58,12 +59,13 @@ TEST_P(SimulatedAttackerTacticPassingTest, attacker_test_passing)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
-            non_terminating_validation_functions, Duration::fromSeconds(5));
+    runTest(field, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(5));
 }
 
 INSTANTIATE_TEST_CASE_P(
-    PassEnvironment, SimulatedAttackerTacticPassingTest,
+    PassEnvironment, SimulatedAttackerTacticKeepAwayTest,
     ::testing::Values(
         // Stationary Ball Tests
         // Attacker point != Balls location & Balls location != Robots Location

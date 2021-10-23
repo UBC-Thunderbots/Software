@@ -6,13 +6,13 @@
 #include <future>
 #include <thread>
 
-#include "shared/proto/tbots_software_msgs.pb.h"
+#include "proto/sensor_msg.pb.h"
+#include "proto/tbots_software_msgs.pb.h"
 #include "software/geom/rectangle.h"
 #include "software/gui/robot_diagnostics/widgets/robot_diagnostics_gui.h"
 #include "software/multithreading/first_in_first_out_threaded_observer.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/thread_safe_buffer.h"
-#include "software/proto/sensor_msg.pb.h"
 #include "software/world/world.h"
 
 /**

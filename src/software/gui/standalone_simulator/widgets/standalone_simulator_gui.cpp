@@ -1,8 +1,8 @@
 #include "software/gui/standalone_simulator/widgets/standalone_simulator_gui.h"
 
+#include "proto/message_translation/ssl_geometry.h"
 #include "software/gui/drawing/ssl_wrapper_packet.h"
 #include "software/gui/geometry_conversion.h"
-#include "software/proto/message_translation/ssl_geometry.h"
 #include "software/world/field.h"
 
 StandaloneSimulatorGUI::StandaloneSimulatorGUI(
@@ -81,7 +81,9 @@ void StandaloneSimulatorGUI::draw()
     main_widget->simulation_graphics_view->clearAndDraw(
         {main_widget->simulation_graphics_view->getDrawBallVelocityFunction()
              .getDrawFunction(),
-         getDrawSSLWrapperPacketFunction(ssl_wrapper_packet).getDrawFunction()});
+         getDrawSSLWrapperPacketFunction(ssl_wrapper_packet,
+                                         standalone_simulator->getRobotConstants())
+             .getDrawFunction()});
 }
 
 void StandaloneSimulatorGUI::updateDrawViewArea()

@@ -15,13 +15,13 @@
 
 # # Python Tools Usage Examples
 
-from software.proto.sensor_msg_pb2 import SensorProto
+from proto.sensor_msg_pb2 import SensorProto
 import numpy as np
 import matplotlib.pyplot as plt
 import os
 from python_tools.proto_log import ProtoLog
 from python_tools.sensor_proto_log import SensorProtoLog
-from shared.proto.tbots_software_msgs_pb2 import PrimitiveSet
+from proto.tbots_software_msgs_pb2 import PrimitiveSet
 
 # +
 # Create a ProtoLog from the chunked Protobuf message files in the directory,

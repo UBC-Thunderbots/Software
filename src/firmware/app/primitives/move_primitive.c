@@ -16,7 +16,9 @@
 // these are set to decouple the 3 axis from each other
 // the idea is to clamp the maximum velocity and acceleration
 // so that the axes would never have to compete for resources
-#define TIME_HORIZON 0.05f  // s
+#define TIME_HORIZON (0.05f)  // s
+// Number of times the control loop should tick per trajectory element
+#define NUM_TICKS_PER_TRAJECTORY_ELEMENT (4)
 
 typedef struct MoveState
 {
@@ -73,8 +75,10 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
     const float speed_at_dest_m_per_s   = prim_msg.final_speed_m_per_s;
     const float target_spin_rev_per_s   = prim_msg.target_spin_rev_per_s;
 
+    RobotConstants_t robot_constants = app_firmware_robot_getRobotConstants(robot);
+
     float max_speed_m_per_s = prim_msg.max_speed_m_per_s;
-    clamp(&max_speed_m_per_s, 0, (float)ROBOT_MAX_SPEED_METERS_PER_SECOND);
+    clamp(&max_speed_m_per_s, 0, robot_constants.robot_max_speed_m_per_s);
 
     const float current_x           = app_firmware_robot_getPositionX(robot);
     const float current_y           = app_firmware_robot_getPositionY(robot);
@@ -89,26 +93,37 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
         (int)(distance_to_destination / max_speed_m_per_s * target_spin_rev_per_s);
     // Change in orientation to reach destination orientation
     const float net_change_in_orientation =
-        min_angle_delta(current_orientation, destination_orientation);
+        shared_physics_minAngleDelta(current_orientation, destination_orientation);
+    const float orientation_delta =
+        net_change_in_orientation + (float)revolutions_to_spin * 2.0f * (float)M_PI;
+
+    const float estimated_time_delta = fmaxf(
+        fabsf(distance_to_destination) / (float)(robot_constants.robot_max_speed_m_per_s),
+        fabsf(net_change_in_orientation) /
+            (float)(robot_constants.robot_max_ang_speed_rad_per_s));
+
+    // clamp num elements between 3 (minimum number of trajectory elements) and
+    // TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
+    const unsigned int num_elements = (unsigned int)fmaxf(
+        fminf((estimated_time_delta * CONTROL_LOOP_HZ / NUM_TICKS_PER_TRAJECTORY_ELEMENT),
+              TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS),
+        3);
 
     // Plan a trajectory to move to the target position/orientation
     FirmwareRobotPathParameters_t path_parameters = {
         .path = {.x = {.coefficients = {0, 0, destination_x - current_x, current_x}},
                  .y = {.coefficients = {0, 0, destination_y - current_y, current_y}}},
-        .orientation_profile = {.coefficients = {0, 0,
-                                                 net_change_in_orientation +
-                                                     (float)revolutions_to_spin * 2.0f *
-                                                         (float)M_PI,
+        .orientation_profile = {.coefficients = {0, 0, orientation_delta,
                                                  current_orientation}},
         .t_start             = 0,
         .t_end               = 1.0f,
-        .num_elements        = 10,
+        .num_elements        = num_elements,
         .max_allowable_linear_acceleration =
-            (float)ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            robot_constants.robot_max_acceleration_m_per_s_2,
         .max_allowable_linear_speed = max_speed_m_per_s,
         .max_allowable_angular_acceleration =
-            (float)ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED,
-        .max_allowable_angular_speed = (float)ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            robot_constants.robot_max_ang_acceleration_rad_per_s_2,
+        .max_allowable_angular_speed = robot_constants.robot_max_ang_speed_rad_per_s,
         .initial_linear_speed        = current_speed,
         .final_linear_speed          = speed_at_dest_m_per_s};
     state->num_trajectory_elems = path_parameters.num_elements;

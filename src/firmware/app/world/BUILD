@@ -75,7 +75,8 @@ cc_library(
         "//firmware/app/control:trajectory_planner",
         "//firmware/shared:physics",
         "//firmware/shared:util",
-        "//shared/proto:tbots_nanopb_proto",
+        "//proto:tbots_nanopb_proto",
+        "//shared:constants",
     ],
 )
 
@@ -114,12 +115,14 @@ cc_library(
     name = "force_wheel",
     srcs = ["force_wheel.c"],
     hdrs = ["force_wheel.h"],
+    deps = ["//shared:robot_constants"],
 )
 
 cc_library(
     name = "velocity_wheel",
     srcs = ["velocity_wheel.c"],
     hdrs = ["velocity_wheel.h"],
+    deps = ["//shared:robot_constants"],
 )
 
 cc_test(
@@ -129,9 +132,4 @@ cc_test(
         ":force_wheel",
         "//shared/test_util:tbots_gtest_main",
     ],
-)
-
-cc_library(
-    name = "firmware_robot_constants",
-    hdrs = ["firmware_robot_constants.h"],
 )

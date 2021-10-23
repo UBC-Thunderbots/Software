@@ -45,6 +45,7 @@
     * [Filters](#filters)
   * [AI](#ai)
     * [Strategy](#strategy)
+      * [STP Diagram](#stp-diagram)
       * [Skills / Actions](#skills--actions)
       * [Tactics](#tactics)
       * [Plays](#plays)
@@ -438,6 +439,11 @@ We use a framework called `STP (Skills, Tactics, Plays)` to implement our stratg
 `STP` is a way of breaking down roles and responsibilities into a simple hierarchy, making it easier to build up more complex strategies from simpler pieces. This is the core of where our strategy is implemented.
 
 When the [AI](#ai) is given new information and asked to make a decision, our `STP` strategy is what is executed first. It takes in a [World](#world) and returns [Intents](#intents).
+
+###  STP Diagram
+The STP diagram shows how this works. Functions to assign tactics to robots and build motion constraints are passed into a `Play`'s `get` function, which the `Play` uses to generate tactics with assigned robots and with updated motion constraints.
+
+![STP Diagram](images/STP.svg)
 
 
 ### Skills / Actions

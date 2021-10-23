@@ -17,8 +17,7 @@ class SimulatedShadowEnemyTacticTest : public SimulatedTacticTestFixture
     void SetUp() override
     {
         SimulatedTacticTestFixture::SetUp();
-        setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION,
-                              MotionConstraint::ENEMY_DEFENSE_AREA});
+        setMotionConstraints({MotionConstraint::ENEMY_DEFENSE_AREA});
     }
 
    protected:
@@ -42,6 +41,9 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_pass)
     auto friendly_robots = {
         RobotStateWithId{.id = 0, .robot_state = shadower.currentState()}};
     auto enemy_robots = {
+        RobotStateWithId{.id          = 0,
+                         .robot_state = RobotState(Point(4, 0), Vector(), Angle::zero(),
+                                                   AngularVelocity::zero())},
         RobotStateWithId{.id = 1, .robot_state = shadowee.currentState()},
         RobotStateWithId{.id = 2, .robot_state = enemy.currentState()}};
 
@@ -86,6 +88,9 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_pass_if_enemy_does_not_have_ba
     auto friendly_robots = {
         RobotStateWithId{.id = 0, .robot_state = shadower.currentState()}};
     auto enemy_robots = {
+        RobotStateWithId{.id          = 0,
+                         .robot_state = RobotState(Point(4, 0), Vector(), Angle::zero(),
+                                                   AngularVelocity::zero())},
         RobotStateWithId{.id = 1, .robot_state = shadowee.currentState()},
         RobotStateWithId{.id = 2, .robot_state = enemy.currentState()}};
 
@@ -129,6 +134,9 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
     auto friendly_robots = {
         RobotStateWithId{.id = 0, .robot_state = shadower.currentState()}};
     auto enemy_robots = {
+        RobotStateWithId{.id          = 0,
+                         .robot_state = RobotState(Point(4, 0), Vector(), Angle::zero(),
+                                                   AngularVelocity::zero())},
         RobotStateWithId{.id = 1, .robot_state = shadowee.currentState()},
         RobotStateWithId{.id = 2, .robot_state = enemy.currentState()}};
 
@@ -181,6 +189,9 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_if_enemy_threat_is_null)
     auto friendly_robots = {
         RobotStateWithId{.id = 0, .robot_state = shadower.currentState()}};
     auto enemy_robots = {
+        RobotStateWithId{.id          = 0,
+                         .robot_state = RobotState(Point(4, 0), Vector(), Angle::zero(),
+                                                   AngularVelocity::zero())},
         RobotStateWithId{.id = 1, .robot_state = shadowee.currentState()},
         RobotStateWithId{.id = 2, .robot_state = enemy.currentState()}};
 

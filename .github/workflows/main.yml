@@ -9,7 +9,7 @@ on:
 jobs:
   formatting-check:
     name: Formatting Check
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
@@ -24,7 +24,7 @@ jobs:
           
   software-tests:
     name: Software Tests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
@@ -36,56 +36,37 @@ jobs:
       - name: Software Test
         run: |
           cd src
-          bazel test --show_timestamps\
-            -- //... -//software/simulated_tests/... \
-            -//software/ai/hl/stp/play/... \
-            -//software/ai/hl/stp/tactic/... \
+          bazel test --show_timestamps       \
+            -- //... -//software:full_system \
+            -//software/simulated_tests/...  \
+            -//software/ai/hl/...            \
             -//firmware/boards/estop_arduino_uno/... # Arduino requires setup_firmware 
              
   firmware-tests:
     name: Firmware Tests
-    runs-on: ubuntu-18.04
-    env:
-      DISPLAY: :0
+    runs-on: ubuntu-20.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
     
       - name: Environment Setup
         run: |
-          sudo apt-get install xvfb
-          sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
           "${GITHUB_WORKSPACE}"/environment_setup/setup_firmware.sh
-
-          # TODO (#2144): renable STM32CubeMX Code Generation check
-          #      - name: STM32CubeMX Code Generation
-          #        run: |
-          #          "${GITHUB_WORKSPACE}"/.github/check_cubemx_ci.sh
 
       - name: Arduino Uno Firmware Build
         run: |
          cd src
          bazel build //firmware/boards/estop_arduino_uno:main 
 
-      - name: STM32H7 Robot Firmware Build
+      - name: Jetson Nano Build
         run: |
          cd src
-         bazel build --cpu=stm32h7 //firmware/boards/robot_stm32h7:robot_stm32h7_main 
-     
-      - name: Legacy STM32F4 Robot Firmware Build
-        run: |
-         cd src
-         bazel build --cpu=stm32f4 //firmware/boards/legacy_robot_stm32f4:bin 
-         
-      - name: Legacy Radio Dongle Firmware Build
-        run: |
-         cd src
-         bazel build --cpu=stm32f4 //firmware/boards/legacy_dongle_stm32f4:bin         
+         bazel build --cpu=jetson_nano //software/simulation/... //firmware/app/...
              
   simulated-gameplay-tests:
     name: Simulated Gameplay Tests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
@@ -94,17 +75,16 @@ jobs:
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
 
-      - name: Simulated Test
+      - name: Simulated Test (Continue on error)
         # make sure that replays are uploaded even if tests fail
         continue-on-error: true
         run: |
           cd src
-          bazel test --show_timestamps   \
+          bazel test --show_timestamps       \
+            //software:full_system           \
             //software/simulated_tests/...   \
-            //software/ai/hl/stp/play/...    \
-            //software/ai/hl/stp/tactic/... 
+            //software/ai/hl/...
 
-      
       - name: Upload simulated test artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -112,10 +92,20 @@ jobs:
           # we only care about the replay logs from the STP tests
           path: |
             src/bazel-out/k8-fastbuild/testlogs/software/ai/hl/stp
+
+      - name: Simulated Test (Check for errors)
+        # Run Simulated Tests a second time to check for failures
+        run: |
+          cd src
+          bazel test --show_timestamps       \
+            //software:full_system           \
+            //software/simulated_tests/...   \
+            //software/ai/hl/...
+
             
   memory-leak-checks:
     name: Memory Leak Checks
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2

@@ -3,14 +3,14 @@
 #include <atomic>
 #include <thread>
 
+#include "proto/defending_side_msg.pb.h"
+#include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/proto/defending_side_msg.pb.h"
-#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/simulation/simulator.h"
 
 extern "C"
 {
-#include "shared/proto/primitive.nanopb.h"
+#include "proto/primitive.nanopb.h"
 }
 
 /**
@@ -24,9 +24,13 @@ class ThreadedSimulator
      * will have the given field, with no robots or ball.
      *
      * @param field The field to initialize the simulation with
+     * @param robot_constants The robot constants
+     * @param wheel_constants The wheel constants
      * @param simulator_config The config to fetch parameters from
      */
     explicit ThreadedSimulator(const Field& field,
+                               const RobotConstants_t& robot_constants,
+                               const WheelConstants& wheel_constants,
                                std::shared_ptr<const SimulatorConfig> simulator_config);
     ~ThreadedSimulator();
 

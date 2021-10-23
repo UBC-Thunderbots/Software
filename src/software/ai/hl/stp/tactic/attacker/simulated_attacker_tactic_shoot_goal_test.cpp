@@ -39,8 +39,7 @@ TEST_P(SimulatedAttackerTacticShootGoalTest, attacker_test_shoot_goal)
     tactic->updateControlParams(Point(0, field.fieldLines().yMin()));
     setTactic(tactic);
     setRobotId(0);
-    setMotionConstraints({MotionConstraint::ENEMY_ROBOTS_COLLISION,
-                          MotionConstraint::FRIENDLY_DEFENSE_AREA});
+    setMotionConstraints({MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [tactic, expected_kick_direction](std::shared_ptr<World> world_ptr,
@@ -70,7 +69,7 @@ INSTANTIATE_TEST_CASE_P(
         // enemy goal blocked by enemy robots with enemy threat left
         std::make_tuple(BallState(Point(2, 1), Vector()), Point(1, 1),
                         TestUtil::createStationaryRobotStatesWithId(
-                            {Point(1.6, 1), Point(3, 0.4), Point(3, 0.8), Point(3.1, 0.6),
+                            {Point(1.5, 1), Point(3, 0.4), Point(3, 0.8), Point(3.1, 0.6),
                              Point(3.1, 1), Point(4.2, 1.2)}),
                         Angle::fromDegrees(210)),
         // small opening in enemy formation
@@ -80,7 +79,7 @@ INSTANTIATE_TEST_CASE_P(
                              Point(3.1, 1), Point(4.2, 1.2)}),
                         Angle::fromDegrees(-30)),
         // extreme angle shot
-        std::make_tuple(BallState(Point(4, -2), Vector()), Point(1, 1),
+        std::make_tuple(BallState(Point(4, -1.9), Vector()), Point(1, 1),
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(1, 0), Point(3, 1.2), Point(3, 0.8), Point(3.1, 0.6),
                              Point(3.1, 1), Point(4.2, 0.5)}),

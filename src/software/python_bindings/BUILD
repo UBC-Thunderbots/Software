@@ -33,8 +33,8 @@ cc_library(
         ":python_binding_utilities",
         "//software/ai/passing:cost_functions",
         "//shared/parameter:cpp_configs",
-        "//software/proto:sensor_msg_cc_proto",
-        "//software/proto:ssl_cc_proto",
+        "//proto:sensor_msg_cc_proto",
+        "//proto:ssl_cc_proto",
         "//software/sensor_fusion",
         ":pass_utilities",
     ] + PYBIND_DEPS,
@@ -61,8 +61,8 @@ cc_library(
         "//software/geom:point",
         "//software/geom:vector",
         "//shared/parameter:cpp_configs",
-        "//software/proto:sensor_msg_cc_proto",
-        "//software/proto:ssl_cc_proto",
+        "//proto:sensor_msg_cc_proto",
+        "//proto:ssl_cc_proto",
         "//software/sensor_fusion",
         "//software/world",
         "//software/world:ball",
@@ -106,8 +106,8 @@ cc_library(
         "//software/geom:point",
         "//software/geom:vector",
         "//shared/parameter:cpp_configs",
-        "//software/proto:sensor_msg_cc_proto",
-        "//software/proto:ssl_cc_proto",
+        "//proto:sensor_msg_cc_proto",
+        "//proto:ssl_cc_proto",
         "//software/sensor_fusion",
         "//software/world",
         "//software/world:ball",
@@ -122,5 +122,28 @@ pybind_extension(
     name = "pass_generator",
     deps = [
         ":pass_generator_lib",
+    ],
+)
+
+cc_library(
+    name = "keep_away_lib",
+    srcs = ["keep_away.cpp"],
+    copts = ["-fexceptions"],
+    features = [
+        "-use_header_modules",
+        "-parse_headers",
+    ],
+    deps = [
+        ":python_binding_utilities",
+        ":pass_utilities",
+        "//software/ai/evaluation:keep_away",
+        "//software/math:math_functions",
+    ] + PYBIND_DEPS,
+)
+
+pybind_extension(
+    name = "keep_away",
+    deps = [
+        ":keep_away_lib",
     ],
 )

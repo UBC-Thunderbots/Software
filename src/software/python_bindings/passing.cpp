@@ -1,9 +1,9 @@
 #include <pybind11/pybind11.h>
 
+#include "proto/messages_robocup_ssl_wrapper.pb.h"
+#include "proto/sensor_msg.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/passing/cost_function.h"
-#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
-#include "software/proto/sensor_msg.pb.h"
 #include "software/python_bindings/pass_utilities.h"
 #include "software/python_bindings/python_binding_utilities.h"
 #include "software/sensor_fusion/sensor_fusion.h"
@@ -43,7 +43,12 @@ double ratePassEnemyRiskWrapper(const World& world, py::dict pass_dict,
 {
     auto pass = createPassFromDict(pass_dict);
     updatePassingConfigFromDict(passing_config_dict);
-    return ratePassEnemyRisk(world.enemyTeam(), pass, passing_config);
+    auto enemy_reaction_time =
+        Duration::fromSeconds(passing_config->getEnemyReactionTime()->value());
+    auto enemy_proximity_importance =
+        passing_config->getEnemyProximityImportance()->value();
+    return ratePassEnemyRisk(world.enemyTeam(), pass, enemy_reaction_time,
+                             enemy_proximity_importance);
 }
 
 double ratePassFriendlyCapabilityWrapper(const World& world, py::dict pass_dict,

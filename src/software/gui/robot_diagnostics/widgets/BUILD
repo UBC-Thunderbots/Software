@@ -13,12 +13,12 @@ qt_cc_library(
         ":leds",
         ":robot_selection",
         ":sensor_status",
+        "//proto:sensor_msg_cc_proto",
+        "//proto/message_translation:tbots_geometry",
+        "//proto/message_translation:tbots_protobuf",
         "//software/gui/generic_widgets/robot_status",
         "//software/gui/robot_diagnostics/ui:main_widget",
         "//software/multithreading:thread_safe_buffer",
-        "//software/proto:sensor_msg_cc_proto",
-        "//software/proto/message_translation:tbots_geometry",
-        "//software/proto/message_translation:tbots_protobuf",
         "@boost//:bind",
         "@qt//:qt_widgets",
     ],
@@ -42,6 +42,7 @@ qt_cc_library(
     hdr = "dribbler.h",
     deps = [
         "//shared:constants",
+        "//shared:robot_constants",
         "//software/gui/generic_widgets/slider",
         "//software/gui/robot_diagnostics/ui:main_widget",
         "@qt//:qt_widgets",
@@ -66,9 +67,10 @@ qt_cc_library(
     hdr = "sensor_status.h",
     deps = [
         ":decimal_progress_bar",
+        "//proto:sensor_msg_cc_proto",
         "//shared:constants",
+        "//shared:robot_constants",
         "//software/gui/robot_diagnostics/ui:main_widget",
-        "//software/proto:sensor_msg_cc_proto",
         "@qt//:qt_widgets",
     ],
 )
@@ -89,6 +91,7 @@ qt_cc_library(
     hdr = "robot_selection.h",
     deps = [
         "//shared:constants",
+        "//shared:robot_constants",
         "//software/gui/robot_diagnostics/ui:main_widget",
         "//software/logger",
         "@qt//:qt_widgets",

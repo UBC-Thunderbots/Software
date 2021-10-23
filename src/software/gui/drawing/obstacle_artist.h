@@ -37,6 +37,7 @@ class ObstacleArtist : public ObstacleVisitor
      */
     void visit(const GeomObstacle<Circle>& geom_obstacle) override;
     void visit(const GeomObstacle<Polygon>& geom_obstacle) override;
+    void visit(const GeomObstacle<Rectangle>& geom_obstacle) override;
 
    private:
     QGraphicsScene* scene_;

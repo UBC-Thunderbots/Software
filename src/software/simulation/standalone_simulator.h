@@ -1,10 +1,10 @@
 #pragma once
 
+#include "proto/defending_side_msg.pb.h"
+#include "proto/tbots_software_msgs.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "shared/proto/tbots_software_msgs.pb.h"
 #include "software/networking/threaded_proto_udp_listener.h"
 #include "software/networking/threaded_proto_udp_sender.h"
-#include "software/proto/defending_side_msg.pb.h"
 #include "software/simulation/threaded_simulator.h"
 
 /**
@@ -29,10 +29,13 @@ class StandaloneSimulator
      * @param standalone_simulator_config The config for the StandaloneSimulator
      * @param simulator_config The config for the Simulator
      * @param field The field to simulate
+     * @param robot_constants The robot constants
+     * @param wheel_constants The wheel constants
      */
     explicit StandaloneSimulator(
         std::shared_ptr<StandaloneSimulatorConfig> standalone_simulator_config,
-        std::shared_ptr<SimulatorConfig> simulator_config, const Field& field);
+        std::shared_ptr<SimulatorConfig> simulator_config, const Field& field,
+        const RobotConstants_t& robot_constants, const WheelConstants& wheel_constants);
     StandaloneSimulator() = delete;
 
     /**
@@ -125,6 +128,13 @@ class StandaloneSimulator
     // simulation looking appropriately / usefully slow
     static constexpr double DEFAULT_SLOW_MOTION_MULTIPLIER = 14.0;
 
+    /**
+     * Returns the robot constants for this robot state
+     *
+     * @return the robot constants for all robots in this simulator
+     */
+    const RobotConstants_t& getRobotConstants() const;
+
    private:
     /**
      * Sets the primitives being simulated by the robots on the respective team
@@ -171,4 +181,5 @@ class StandaloneSimulator
 
     SSLProto::SSL_WrapperPacket most_recent_ssl_wrapper_packet;
     mutable std::mutex most_recent_ssl_wrapper_packet_mutex;
+    RobotConstants_t robot_constants;
 };

@@ -1,6 +1,6 @@
 #include "software/backend/backend.h"
 
-#include "software/proto/message_translation/tbots_protobuf.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 void Backend::receiveRobotStatus(TbotsProto::RobotStatus msg)
 {

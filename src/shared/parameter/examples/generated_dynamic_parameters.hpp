@@ -10,7 +10,7 @@
 #include "software/parameter/config.h"
 #include "software/parameter/enumerated_parameter.h"
 #include "software/parameter/numeric_parameter.h"
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.h"
 
 class fooConfig;
 class exampleConfig;
@@ -118,8 +118,6 @@ class exampleConfig : public Config
             std::make_shared<Parameter<bool>>("example_bool_param", true);
         example_int_param =
             std::make_shared<NumericParameter<int>>("example_int_param", 3, 0, 5);
-        example_unsigned_int_param = std::make_shared<NumericParameter<uint>>(
-            "example_unsigned_int_param", 3, 0, 5);
         example_float_param = std::make_shared<NumericParameter<float>>(
             "example_float_param", 4.04, 1.1, 9.01);
         example_string_param = std::make_shared<Parameter<std::string>>(
@@ -130,15 +128,13 @@ class exampleConfig : public Config
             "example_factory_param", "HaltPlay",
             GenericFactory<std::string, Play>::getRegisteredNames());
         mutable_internal_param_list = {
-            example_bool_param,    example_int_param,    example_unsigned_int_param,
-            example_float_param,   example_string_param, example_enum_param,
-            example_factory_param, foo_config,
+            example_bool_param,   example_int_param,  example_float_param,
+            example_string_param, example_enum_param, example_factory_param,
+            foo_config,
         };
         immutable_internal_param_list = {
             std::const_pointer_cast<const Parameter<bool>>(example_bool_param),
             std::const_pointer_cast<const NumericParameter<int>>(example_int_param),
-            std::const_pointer_cast<const NumericParameter<uint>>(
-                example_unsigned_int_param),
             std::const_pointer_cast<const NumericParameter<float>>(example_float_param),
             std::const_pointer_cast<const Parameter<std::string>>(example_string_param),
             std::const_pointer_cast<const EnumeratedParameter<std::string>>(
@@ -167,17 +163,6 @@ class exampleConfig : public Config
     const std::shared_ptr<NumericParameter<int>> mutableExampleIntParam()
     {
         return example_int_param;
-    }
-
-    const std::shared_ptr<const NumericParameter<uint>> exampleUnsignedIntParam() const
-    {
-        return std::const_pointer_cast<const NumericParameter<uint>>(
-            example_unsigned_int_param);
-    }
-
-    const std::shared_ptr<NumericParameter<uint>> mutableExampleUnsignedIntParam()
-    {
-        return example_unsigned_int_param;
     }
 
     const std::shared_ptr<const NumericParameter<float>> exampleFloatParam() const
@@ -253,7 +238,6 @@ class exampleConfig : public Config
             bool help                         = false;
             bool example_bool_param           = true;
             int example_int_param             = 3;
-            uint example_unsigned_int_param   = 3;
             float example_float_param         = 4.04f;
             std::string example_string_param  = "Hello World";
             std::string example_enum_param    = "HALT";
@@ -273,10 +257,6 @@ class exampleConfig : public Config
         desc.add_options()("example_int_param",
                            boost::program_options::value<int>(&args.example_int_param),
                            "Can be any integer value in the range [min, max]");
-        desc.add_options()(
-            "example_unsigned_int_param",
-            boost::program_options::value<uint>(&args.example_unsigned_int_param),
-            "Can be any integer value in the range [min, max]. The minimum value must be >= 0");
         desc.add_options()(
             "example_float_param",
             boost::program_options::value<float>(&args.example_float_param),
@@ -307,7 +287,6 @@ class exampleConfig : public Config
 
         this->mutableExampleBoolParam()->setValue(args.example_bool_param);
         this->mutableExampleIntParam()->setValue(args.example_int_param);
-        this->mutableExampleUnsignedIntParam()->setValue(args.example_unsigned_int_param);
         this->mutableExampleFloatParam()->setValue(args.example_float_param);
         this->mutableExampleStringParam()->setValue(args.example_string_param);
         this->mutableExampleEnumParam()->setValue(args.example_enum_param);
@@ -345,7 +324,6 @@ class exampleConfig : public Config
     ParameterList immutable_internal_param_list;
     std::shared_ptr<Parameter<bool>> example_bool_param;
     std::shared_ptr<NumericParameter<int>> example_int_param;
-    std::shared_ptr<NumericParameter<uint>> example_unsigned_int_param;
     std::shared_ptr<NumericParameter<float>> example_float_param;
     std::shared_ptr<Parameter<std::string>> example_string_param;
     std::shared_ptr<EnumeratedParameter<std::string>> example_enum_param;

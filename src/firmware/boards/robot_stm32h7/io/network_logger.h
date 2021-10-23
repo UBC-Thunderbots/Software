@@ -1,7 +1,7 @@
 #pragma once
 #include "FreeRTOS.h"
 #include "cmsis_os.h"
-#include "shared/proto/robot_log_msg.nanopb.h"
+#include "proto/robot_log_msg.nanopb.h"
 
 /**
  * Logger Task

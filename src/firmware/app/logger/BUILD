@@ -4,7 +4,7 @@ cc_library(
     name = "logger",
     srcs = ["logger.c"],
     hdrs = ["logger.h"],
-    deps = ["//shared/proto:tbots_nanopb_proto"],
+    deps = ["//proto:tbots_nanopb_proto"],
 )
 
 cc_test(
@@ -12,7 +12,7 @@ cc_test(
     srcs = ["logger_test.cpp"],
     deps = [
         ":logger",
-        "//shared/proto:tbots_nanopb_proto",
+        "//proto:tbots_nanopb_proto",
         "//shared/test_util:tbots_gtest_main",
     ],
 )

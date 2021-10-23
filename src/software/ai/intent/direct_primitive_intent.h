@@ -1,5 +1,6 @@
 #pragma once
 
+#include "proto/primitive/primitive_msg_factory.h"
 #include "software/ai/intent/intent.h"
 
 /**

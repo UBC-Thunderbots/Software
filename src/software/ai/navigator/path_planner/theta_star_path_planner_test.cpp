@@ -61,6 +61,33 @@ void checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
     }
 }
 
+void checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
+                                       std::vector<Polygon> obstacles)
+{
+    // If the path size is 1, just need to check that the point is not within the obstacle
+    if (path_points.size() == 1)
+    {
+        for (auto const& obstacle : obstacles)
+        {
+            EXPECT_FALSE(contains(obstacle, path_points[0]))
+                << "Only point on path " << path_points[0] << " is in obstacle "
+                << obstacle;
+        }
+    }
+
+    // Check that no line segment on the path intersects the obstacle
+    for (std::size_t i = 0; i < path_points.size() - 1; i++)
+    {
+        Segment path_segment(path_points[i], path_points[i + 1]);
+        for (auto const& obstacle : obstacles)
+        {
+            EXPECT_FALSE(intersects(obstacle, path_segment))
+                << "Line segment {" << path_points[i] << "," << path_points[i + 1]
+                << "} intersects obstacle " << obstacle;
+        }
+    }
+}
+
 TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
 {
     // Test where we start in an obstacle. We should find the closest edge of
@@ -88,7 +115,7 @@ TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
     // Make sure the path does not exceed a bounding box
     // bounding box is expanded around the src because the path planner needs to find a
     // way out of the obstacle
-    Rectangle bounding_box({-1, 1.3}, {3.1, -0.1});
+    Rectangle bounding_box({-0.8, -1.3}, {3.1, 1.3});
     checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
     // Make sure the path does not go through any obstacles, except for the
@@ -153,7 +180,7 @@ TEST_F(TestThetaStarPathPlanner,
     EXPECT_EQ(dest, path->getEndPoint());
 
     // Make sure the path does not exceed a bounding box
-    Rectangle bounding_box({-3.1, 1.3}, {3.1, -1.3});
+    Rectangle bounding_box({-3.1, 1.4}, {3.1, -1.4});
     checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
     checkPathDoesNotIntersectObstacle(path_points, obstacles);
@@ -184,7 +211,7 @@ TEST_F(TestThetaStarPathPlanner,
     EXPECT_EQ(dest, path->getEndPoint());
 
     // Make sure the path does not exceed a bounding box
-    Rectangle bounding_box({-3.1, 0.05}, {3.1, -1.0});
+    Rectangle bounding_box({-3.1, 0.15}, {3.1, -1.0});
     checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
     checkPathDoesNotIntersectObstacle(path_points, obstacles);
@@ -197,14 +224,24 @@ TEST_F(TestThetaStarPathPlanner,
     Field field = Field::createSSLDivisionBField();
     Point start{0, 0}, dest{3, 0};
 
-    // Place a rectangle over our destination location
-    std::vector<ObstaclePtr> obstacles = {
-        robot_navigation_obstacle_factory.createFromShape(
-            Rectangle(Point(1, -1), Point(2, 1)))};
+    // Robot navigation obstacle factory expands the obstacle by the robot radius plus a
+    // constant offset. To make sure that the robot does not collide with the actual
+    // obstacle we will scale the obstacle by the robot radius and check collision with
+    // that.
+    Polygon obstacle_shape = Rectangle(Point(1, -1), Point(2, 1));
+
+    std::vector<ObstaclePtr> expanded_obstacles = {
+        robot_navigation_obstacle_factory.createFromShape(obstacle_shape)};
+
+    std::vector<Polygon> actual_obstacles = {
+        obstacle_shape.expand(Vector(-1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
+            .expand(Vector(1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
+            .expand(Vector(0, -1).normalize(ROBOT_MAX_RADIUS_METERS))
+            .expand(Vector(0, 1).normalize(ROBOT_MAX_RADIUS_METERS))};
 
     Rectangle navigable_area = field.fieldBoundary();
 
-    auto path = planner->findPath(start, dest, navigable_area, obstacles);
+    auto path = planner->findPath(start, dest, navigable_area, expanded_obstacles);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -215,10 +252,10 @@ TEST_F(TestThetaStarPathPlanner,
     EXPECT_EQ(dest, path->getEndPoint());
 
     // Make sure the path does not exceed a bounding box
-    Rectangle bounding_box({-0.1, 1.3}, {3.1, -1.3});
-    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    Rectangle bounding_box({-0.1, 1.35}, {3.1, -1.35});
 
-    checkPathDoesNotIntersectObstacle(path_points, obstacles);
+    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    checkPathDoesNotIntersectObstacle(path_points, actual_obstacles);
 }
 
 TEST_F(TestThetaStarPathPlanner,
@@ -228,14 +265,24 @@ TEST_F(TestThetaStarPathPlanner,
     Field field = Field::createSSLDivisionBField();
     Point start{0, 0}, dest{0, 3};
 
-    // Place a rectangle over our destination location
-    std::vector<ObstaclePtr> obstacles = {
-        robot_navigation_obstacle_factory.createFromShape(
-            Rectangle(Point(-1, 1), Point(1, 2)))};
+    // Robot navigation obstacle factory expands the obstacle by the robot radius plus a
+    // constant offset. To make sure that the robot does not collide with the actual
+    // obstacle we will scale the obstacle by the robot radius and check collision with
+    // that.
+    Polygon obstacle_shape = Rectangle(Point(-1, 1), Point(1, 2));
+
+    std::vector<ObstaclePtr> expanded_obstacles = {
+        robot_navigation_obstacle_factory.createFromShape(obstacle_shape)};
+
+    std::vector<Polygon> actual_obstacles = {
+        obstacle_shape.expand(Vector(-1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
+            .expand(Vector(1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
+            .expand(Vector(0, -1).normalize(ROBOT_MAX_RADIUS_METERS))
+            .expand(Vector(0, 1).normalize(ROBOT_MAX_RADIUS_METERS))};
 
     Rectangle navigable_area = field.fieldBoundary();
 
-    auto path = planner->findPath(start, dest, navigable_area, obstacles);
+    auto path = planner->findPath(start, dest, navigable_area, expanded_obstacles);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -246,10 +293,9 @@ TEST_F(TestThetaStarPathPlanner,
     EXPECT_EQ(dest, path->getEndPoint());
 
     // Make sure the path does not exceed a bounding box
-    Rectangle bounding_box({1.3, -0.1}, {-1.3, 3.1});
+    Rectangle bounding_box({1.32, -0.1}, {-1.3, 3.1});
     checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-
-    checkPathDoesNotIntersectObstacle(path_points, obstacles);
+    checkPathDoesNotIntersectObstacle(path_points, actual_obstacles);
 }
 
 TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
@@ -367,4 +413,72 @@ TEST_F(TestThetaStarPathPlanner,
     // Expect that the last two points are combined into one
     EXPECT_EQ(2, path->getKnots().size());
     EXPECT_EQ(start, path->getStartPoint());
+}
+
+TEST_F(TestThetaStarPathPlanner, test_theta_star_check_obstacle_edge)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point start{0, 3}, dest{3, 3};
+
+    std::vector<ObstaclePtr> obstacles = {
+        robot_navigation_obstacle_factory.createFromShape(
+            Rectangle(Point(1, 3), Point(2, 0)))};
+
+    Rectangle navigable_area = field.fieldBoundary();
+
+    auto path = planner->findPath(start, dest, navigable_area, obstacles);
+
+    ASSERT_TRUE(path != std::nullopt);
+
+    checkPathDoesNotIntersectObstacle(path->getKnots(), obstacles);
+}
+
+TEST_F(TestThetaStarPathPlanner,
+       test_theta_star_path_planner_straight_line_path_slightly_grazes_obstacle)
+{
+    Field field = Field::createSSLDivisionBField();
+    Point start{1.2299999999999995, 2.0999999999999996}, end{0, 3};
+
+    // Robot navigation obstacle factory expands the obstacle by the robot radius plus a
+    // constant offset. To make sure that the robot does not collide with the actual
+    // obstacle we will scale the obstacle by the robot radius and check collision with
+    // that.
+    Polygon obstacle_shape = Rectangle(Point(-1, 1), Point(1, 2));
+
+    std::vector<ObstaclePtr> expanded_obstacles = {
+        robot_navigation_obstacle_factory.createFromShape(obstacle_shape)};
+
+    std::vector<Polygon> actual_obstacles = {
+        obstacle_shape.expand(Vector(-1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
+            .expand(Vector(1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
+            .expand(Vector(0, -1).normalize(ROBOT_MAX_RADIUS_METERS))
+            .expand(Vector(0, 1).normalize(ROBOT_MAX_RADIUS_METERS))};
+
+    Rectangle navigable_area = field.fieldBoundary();
+
+    auto path = planner->findPath(start, end, navigable_area, expanded_obstacles);
+
+    ASSERT_TRUE(path != std::nullopt);
+    checkPathDoesNotIntersectObstacle(path->getKnots(), actual_obstacles);
+}
+
+TEST_F(TestThetaStarPathPlanner, test_theta_star_path_planner_start_in_enemy_half)
+{
+    // Start in enemy half (obstacle)
+    Point start{4, 3}, end{-0.1, -2.9};
+    Field field = Field::createSSLDivisionBField();
+
+    std::vector<ObstaclePtr> obstacles = {
+        robot_navigation_obstacle_factory.createFromShape(field.enemyHalf())};
+
+    Rectangle navigable_area = field.fieldBoundary();
+
+    auto path = planner->findPath(start, end, navigable_area, obstacles);
+
+    ASSERT_TRUE(path != std::nullopt);
+
+    // Make sure the path does not exceed a bounding box
+
+    Rectangle bounding_box({4.5, 3.3}, {-1.3, -3.2});
+    checkPathDoesNotExceedBoundingBox(path->getKnots(), bounding_box);
 }

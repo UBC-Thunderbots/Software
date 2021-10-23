@@ -1,3 +1,5 @@
+#pragma once
+
 #include <gtest/gtest.h>
 
 #include <chrono>
@@ -14,6 +16,21 @@
 
 namespace TestUtil
 {
+    /**
+     * Checks if two durations are within tolerance of each other
+     * Two durations are within tolerance of each other if the absolute duration
+     * difference is less than the tolerance duration
+     *
+     * @param duration1, duration2 Durations to compare
+     * @param tolerance tolerance to check equality with, default is 1 microsecond (1/1000
+     * millisecond)
+     *
+     * @return AssertionSuccess if the two durations are within tolerance of each other
+     */
+    ::testing::AssertionResult equalWithinTolerance(
+        const Duration &duration1, const Duration &duration2,
+        const Duration &tolerance = Duration::fromMilliseconds(0.001));
+
     /**
      * Checks if two polygons are within tolerance of each other
      * Two polygons are within tolerance of each other if the corresponding points are

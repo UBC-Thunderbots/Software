@@ -1,10 +1,10 @@
 #include "software/ai/navigator/navigator.h"
 
+#include "proto/message_translation/tbots_protobuf.h"
+#include "proto/primitive/primitive_msg_factory.h"
 #include "software/ai/navigator/navigating_primitive_creator.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
-#include "software/proto/message_translation/tbots_protobuf.h"
-#include "software/proto/primitive/primitive_msg_factory.h"
 
 Navigator::Navigator(std::unique_ptr<PathManager> path_manager,
                      RobotNavigationObstacleFactory robot_navigation_obstacle_factory,
@@ -107,21 +107,27 @@ std::unordered_set<PathObjective> Navigator::createPathObjectives(
         // start with direct primitive intent robots and then add motion constraints
         auto obstacles = direct_primitive_intent_obstacles;
 
-        auto motion_constraint_obstacles =
-            robot_navigation_obstacle_factory.createFromMotionConstraints(
-                intent->getMotionConstraints(), world);
-        obstacles.insert(obstacles.end(), motion_constraint_obstacles.begin(),
-                         motion_constraint_obstacles.end());
-
-        if (intent->getBallCollisionType() == BallCollisionType::AVOID)
-        {
-            obstacles.push_back(ball_obstacle);
-        }
-
         auto robot = world.friendlyTeam().getRobotById(robot_id);
 
         if (robot)
         {
+            auto motion_constraint_obstacles =
+                robot_navigation_obstacle_factory.createFromMotionConstraints(
+                    intent->getMotionConstraints(), world);
+            obstacles.insert(obstacles.end(), motion_constraint_obstacles.begin(),
+                             motion_constraint_obstacles.end());
+
+            std::vector<ObstaclePtr> enemy_robot_obstacles =
+                robot_navigation_obstacle_factory.createEnemyCollisionAvoidance(
+                    world.enemyTeam(), robot->velocity().length());
+            obstacles.insert(obstacles.end(), enemy_robot_obstacles.begin(),
+                             enemy_robot_obstacles.end());
+
+            if (intent->getBallCollisionType() == BallCollisionType::AVOID)
+            {
+                obstacles.push_back(ball_obstacle);
+            }
+
             Point start = robot->position();
             Point end   = intent->getDestination();
 

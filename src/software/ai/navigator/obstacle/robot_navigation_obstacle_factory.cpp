@@ -19,14 +19,6 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
 
     switch (motion_constraint)
     {
-        case MotionConstraint::ENEMY_ROBOTS_COLLISION:
-        {
-            std::vector<ObstaclePtr> enemy_robot_obstacles =
-                createFromTeam(world.enemyTeam());
-            obstacles.insert(obstacles.end(), enemy_robot_obstacles.begin(),
-                             enemy_robot_obstacles.end());
-        }
-        break;
         case MotionConstraint::CENTER_CIRCLE:
             obstacles.push_back(createFromShape(
                 Circle(world.field().centerPoint(), world.field().centerCircleRadius())));
@@ -150,6 +142,26 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromTeam(
     return obstacles;
 }
 
+std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createEnemyCollisionAvoidance(
+    const Team &enemy_team, double friendly_robot_speed) const
+{
+    if (friendly_robot_speed < config->getAllowedRobotCollisionSpeed()->value())
+    {
+        std::vector<ObstaclePtr> obstacles;
+        for (const auto &robot : enemy_team.getAllRobots())
+        {
+            obstacles.push_back(std::make_shared<GeomObstacle<Circle>>(
+                Circle(robot.position(),
+                       ROBOT_MAX_RADIUS_METERS + DIST_TO_FRONT_OF_ROBOT_METERS)));
+        }
+        return obstacles;
+    }
+    else
+    {
+        return createFromTeam(enemy_team);
+    }
+}
+
 ObstaclePtr RobotNavigationObstacleFactory::createFromBallPosition(
     const Point &ball_position) const
 {
@@ -196,6 +208,6 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromFieldRectangle(
     yMax =
         (yMax == field_lines.yMax()) ? field_boundary.yMax() : (yMax + expansion_amount);
 
-    return std::make_shared<GeomObstacle<Polygon>>(
+    return std::make_shared<GeomObstacle<Rectangle>>(
         Rectangle(Point(xMin, yMin), Point(xMax, yMax)));
 }

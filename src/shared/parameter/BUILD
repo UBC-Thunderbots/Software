@@ -1,4 +1,4 @@
-load(":parameter.bzl", "c_dynamic_parameters", "cpp_dynamic_parameters")
+load(":parameter.bzl", "cpp_dynamic_parameters")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -6,22 +6,17 @@ cpp_dynamic_parameters(
     name = "cpp_params",
     enum_deps = [
         "//software/world:game_state",
+        "//software/world:team_colour",
     ],
-    generated_parameter_file = "cpp_dynamic_parameters.h",
-)
-
-c_dynamic_parameters(
-    name = "c_params",
-    generated_parameter_file = "c_parameters.h",
-)
-
-cc_library(
-    name = "c_configs",
-    hdrs = [":c_params"],
+    generated_parameter_header = "cpp_dynamic_parameters.h",
+    generated_parameter_source = "cpp_dynamic_parameters.cpp",
 )
 
 cc_library(
     name = "cpp_configs",
+    srcs = [
+        ":cpp_params",
+    ],
     hdrs = [
         ":cpp_params",
     ],
@@ -30,26 +25,9 @@ cc_library(
         ":enumerated_parameter",
         ":numeric_parameter",
         ":parameter",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
         "//software/world:game_state",
-    ],
-)
-
-cc_test(
-    name = "c_config_test",
-    srcs = [
-        "config_test.cpp",
-    ],
-    data = [
-        "c_parameters.h",
-        "//shared/parameter/config_definitions:parameter_configs",
-    ],
-    deps = [
-        "//shared/parameter:c_configs",
-        "//shared/test_util:tbots_gtest_main",
-        "@boost//:filesystem",
-        "@libclang",
-        "@yaml-cpp",
+        "//software/world:team_colour",
     ],
 )
 

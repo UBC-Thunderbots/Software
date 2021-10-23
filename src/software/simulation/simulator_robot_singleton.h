@@ -15,8 +15,8 @@ extern "C"
 #include "firmware/app/world/firmware_robot.h"
 #include "firmware/app/world/force_wheel.h"
 #include "firmware/shared/physics.h"
-#include "shared/proto/primitive.nanopb.h"
-#include "shared/proto/robot_log_msg.nanopb.h"
+#include "proto/primitive.nanopb.h"
+#include "proto/robot_log_msg.nanopb.h"
 #include "software/simulation/firmware_object_deleter.h"
 }
 
@@ -235,10 +235,12 @@ class SimulatorRobotSingleton
      * calling the given function. If the simulator_robot is invalid, a warning is logged
      * and a default value is returned.
      *
+     * @tparam RET_VAL the return value of the function to execute
      * @param func The function to perform on the simulator robot
      */
-    template <class T>
-    static T checkValidAndExecute(std::function<T(std::shared_ptr<SimulatorRobot>)> func)
+    template <class RET_VAL>
+    static RET_VAL checkValidAndExecute(
+        std::function<RET_VAL(std::shared_ptr<SimulatorRobot>)> func)
     {
         if (simulator_robot)
         {
@@ -247,9 +249,8 @@ class SimulatorRobotSingleton
         LOG(WARNING)
             << "ForceWheelSimulatorRobotSingleton called without setting the ForceWheelSimulatorRobot first"
             << std::endl;
-        return static_cast<T>(0);
+        return static_cast<RET_VAL>(0);
     }
-
 
     /**
      * A helper function that will negate the given value if needed

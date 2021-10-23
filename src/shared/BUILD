@@ -21,8 +21,17 @@ platformio_library(
 
 cc_library(
     name = "robot_constants",
-    hdrs = ["robot_constants.h"],
+    srcs = [
+        "2015_robot_constants.c",
+        "2021_robot_constants.c",
+    ],
+    hdrs = [
+        "2015_robot_constants.h",
+        "2021_robot_constants.h",
+        "robot_constants.h",
+    ],
     deps = [
+        ":constants",
         "//firmware/shared/math:tbots_math",
     ],
 )

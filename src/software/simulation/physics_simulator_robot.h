@@ -3,6 +3,7 @@
 #include <cinttypes>
 #include <memory>
 
+#include "software/logger/logger.h"
 #include "software/simulation/force_wheel_simulator_robot.h"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/physics/physics_robot.h"
@@ -128,14 +129,24 @@ class PhysicsSimulatorRobot : public ForceWheelSimulatorRobot
      * before calling the given function. If the physics_robot is invalid, a warning is
      * logged and a default value is returned.
      *
+     * @tparam RET_VAL the return value of the function to execute
      * @param func The function to perform on the physics robot
      */
-    void checkValidAndExecuteVoid(
-        std::function<void(std::shared_ptr<PhysicsRobot>)> func);
-    float checkValidAndReturnFloat(
-        std::function<float(std::shared_ptr<PhysicsRobot>)> func);
-    unsigned int checkValidAndReturnUint(
-        std::function<unsigned int(std::shared_ptr<PhysicsRobot>)> func);
+    template <class RET_VAL>
+    RET_VAL checkValidAndExecute(
+        std::function<RET_VAL(std::shared_ptr<PhysicsRobot>)> func)
+    {
+        if (auto robot = physics_robot.lock())
+        {
+            return func(robot);
+        }
+        else
+        {
+            LOG(WARNING) << "PhysicsSimulatorRobot being used with invalid PhysicsRobot"
+                         << std::endl;
+            return static_cast<RET_VAL>(0);
+        }
+    }
 
     /**
      * Applies force to the physics ball to simulate it being dribbled by the

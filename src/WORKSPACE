@@ -74,7 +74,7 @@ new_git_repository(
     name = "eigen",
     build_file = "@//external:eigen.BUILD",
     commit = "21ae2afd4edaa1b69782c67a54182d34efe43f9c",
-    remote = "https://gitlab.com/libeigen/eigen.git",
+    remote = "https://chromium.googlesource.com/external/gitlab.com/libeigen/eigen.git",
     shallow_since = "1544551075 +0100",
 )
 
@@ -160,6 +160,16 @@ http_archive(
     strip_prefix = "gcc-arm-none-eabi-8-2019-q3-update",
     urls = [
         "https://developer.arm.com/-/media/Files/downloads/gnu-rm/8-2019q3/RC1.1/gcc-arm-none-eabi-8-2019-q3-update-linux.tar.bz2",
+    ],
+)
+
+http_archive(
+    name = "jetson_nano_gcc",
+    build_file = "@//external:jetson_nano_gcc.BUILD",
+    sha256 = "73eed74e593e2267504efbcf3678918bb22409ab7afa3dc7c135d2c6790c2345",
+    strip_prefix = "gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu",
+    urls = [
+        "http://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz",
     ],
 )
 

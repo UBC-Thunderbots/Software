@@ -23,7 +23,7 @@ TEST_P(ColouredCoutSinkTest, testLogInfo)
 {
     std::unique_ptr<g3::LogWorker> logWorker = g3::LogWorker::createLogWorker();
     auto colour_cout_sink_handle             = logWorker->addSink(
-        std::make_unique<ColouredCoutSink>(), &ColouredCoutSink::displayColouredLog);
+        std::make_unique<ColouredCoutSink>(true), &ColouredCoutSink::displayColouredLog);
     g3::initializeLogging(logWorker.get());
 
     LEVELS level = std::get<0>(GetParam());
@@ -39,6 +39,27 @@ TEST_P(ColouredCoutSinkTest, testLogInfo)
 
     // remove timestamp info from the log message
     output.erase(colour_prefix.length(), output.find("Lorem") - colour_prefix.length());
+
+    EXPECT_EQ(output, colour_prefix + test_str + reset_colour_suffix);
+}
+
+TEST_P(ColouredCoutSinkTest, testLogInfoNoDetails)
+{
+    std::unique_ptr<g3::LogWorker> logWorker = g3::LogWorker::createLogWorker();
+    auto colour_cout_sink_handle             = logWorker->addSink(
+        std::make_unique<ColouredCoutSink>(false), &ColouredCoutSink::displayColouredLog);
+    g3::initializeLogging(logWorker.get());
+
+    LEVELS level = std::get<0>(GetParam());
+    const std::string colour_prefix =
+        "\033[" + ColouredCoutSink::colourToString(std::get<1>(GetParam())) + "m";
+
+    testing::internal::CaptureStdout();
+
+    LOG(level) << test_str;
+    // wait for asynchronous logger
+    sleep(1);
+    std::string output = testing::internal::GetCapturedStdout();
 
     EXPECT_EQ(output, colour_prefix + test_str + reset_colour_suffix);
 }

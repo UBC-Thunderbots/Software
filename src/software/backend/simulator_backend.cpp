@@ -1,13 +1,13 @@
 #include "software/backend/simulator_backend.h"
 
+#include "proto/message_translation/defending_side.h"
+#include "proto/message_translation/tbots_protobuf.h"
+#include "proto/robot_log_msg.pb.h"
 #include "shared/constants.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "shared/proto/robot_log_msg.pb.h"
 #include "software/constants.h"
 #include "software/logger/logger.h"
-#include "software/proto/message_translation/defending_side.h"
-#include "software/proto/message_translation/tbots_protobuf.h"
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.h"
 
 SimulatorBackend::SimulatorBackend(std::shared_ptr<const BackendConfig> config)
     : network_config(config->getSimulatorBackendConfig()->getNetworkConfig()),
