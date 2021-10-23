@@ -96,9 +96,7 @@ std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_
                                        double radius)
 {
     if (shot_origin.x() < field.friendlyGoalCenter().x() ||
-        shot_origin.x() > field.enemyGoalCenter().x() ||
-        shot_origin.y() > field.enemyCornerPos().y() ||
-        shot_origin.y() < field.enemyCornerNeg().y())
+        shot_origin.x() > field.enemyGoalCenter().x())
     {
         return std::nullopt;
     }
