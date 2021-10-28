@@ -103,5 +103,5 @@ TEST(KickoffFriendlyPlayInvariantAndIsApplicableTest, test_invariant_and_is_appl
     ASSERT_FALSE(kickoff_friendly_play.isApplicable(world));
     ASSERT_FALSE(kickoff_friendly_play.invariantHolds(world));
 
-// hi
+    // hi
 }
