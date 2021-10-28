@@ -211,7 +211,8 @@ Debugging from the command line is certainly possible, but debugging in a full I
 Debugging in CLion is as simple as running the above instructions for building CLion, but clicking the little green bug in the top right corner instead of the little green arrow!
 
 ### Debugging from the Command line
-`bazel run -c dbg --run_under="gdb" //some/target:here` will run the target in `gdb`. Please see [here](https://www.cs.cmu.edu/~gilpin/tutorial/) for a tutorial on how to use `gdb` if you're not familiar with it. If gdb hangs when you try to debug, try to build the binaries with the dbg flag and then run gdb on the binary location that it prints out. It would look something like this: `bazel build -c dbg <target>`, and the output should have a path that will look like this: `bazel-bin/<target>`. Run that with gdb. 
+To debug from the command line, first you need to build your target with the debugging flag - `bazel build -c dbg //some/target:here`. When the target builds, you should see a path `bazel-bin/<target>`. Copy that path, and run `gdb <path>`. Please see [here](https://www.cs.cmu.edu/~gilpin/tutorial/) for a tutorial on how to use `gdb` if you're not familiar with it. Alternatively, you could do `bazel run -c dbg --run_under="gdb" //some/target:here`, which will run the target in `gdb`. While this is taken directly from the bazel docs, gdb may sometimes hang when using `--run_under`, so building the target first with debugging flags and running afterwards is preferred.
+
 
 ## Profiling 
 Unfortunately profiling for Bazel targets is not supported in CLion at this time. Hence the only way is via command line. Use the following command:
