@@ -114,7 +114,7 @@ void app_trajectory_planner_impl_generatePositionTrajectoryTimeProfile(
 
         // Catch-all case that there is no change in position for both the linear and
         // angular paths
-        trajectory_durations[i] = fabsf(delta_time);
+        trajectory_durations[i] = delta_time;
     }
 }
 

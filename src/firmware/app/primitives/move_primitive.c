@@ -102,12 +102,12 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
         fabsf(net_change_in_orientation) /
             (float)(robot_constants.robot_max_ang_speed_rad_per_s));
 
-    // Clamp num elements between 10 and TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
-    // TODO (#2296): determine the right values for the minimum number of elements
+    // clamp num elements between 3 (minimum number of trajectory elements) and
+    // TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
     const unsigned int num_elements = (unsigned int)fmaxf(
         fminf((estimated_time_delta * CONTROL_LOOP_HZ / NUM_TICKS_PER_TRAJECTORY_ELEMENT),
               TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS),
-        10);
+        3);
 
     // Plan a trajectory to move to the target position/orientation
     FirmwareRobotPathParameters_t path_parameters = {
@@ -116,9 +116,8 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
         .orientation_profile = {.coefficients = {0, 0, orientation_delta,
                                                  current_orientation}},
         .t_start             = 0,
-        // TODO (#2296): determine the right values for t_end
-        .t_end        = 1.0f,
-        .num_elements = num_elements,
+        .t_end               = 1.0f,
+        .num_elements        = num_elements,
         .max_allowable_linear_acceleration =
             robot_constants.robot_max_acceleration_m_per_s_2,
         .max_allowable_linear_speed = max_speed_m_per_s,
