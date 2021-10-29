@@ -165,32 +165,37 @@ void velocity_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
     const float curr_x           = app_firmware_robot_getPositionX(robot);
     const float curr_y           = app_firmware_robot_getPositionY(robot);
     const float curr_orientation = app_firmware_robot_getOrientation(robot);
-    const float dest_speed =
+    const float dest_linear_speed =
         pos_trajectory.linear_speed[num_elements - 1];  // final speed
 
     const float delta_x         = dest_x - curr_x;
     const float delta_y         = dest_y - curr_y;
     const float norm_dist_delta = shared_physics_norm2(delta_x, delta_y);
+    const float max_target_linear_speed =
+        fmaxf(max_speed_m_per_s, dest_linear_speed);  // initial speed
 
-    const float max_target_speed = fmaxf(max_speed_m_per_s, dest_speed);  // initial speed
-    const float start_acceleration_distance =
-        (max_target_speed * max_speed_m_per_s - dest_speed * dest_speed) /
-        (2 *
-         app_firmware_robot_getRobotConstants(robot).robot_max_acceleration_m_per_s_2);
-    float target_speed = max_target_speed;
-    if (norm_dist_delta < start_acceleration_distance)
+    const float start_linear_deceleration_distance =
+        (max_target_linear_speed * max_target_linear_speed -
+         dest_linear_speed * dest_linear_speed) /
+        (2 * app_firmware_robot_getRobotConstants(robot)
+                 .robot_max_acceleration_m_per_s_2 +
+         1e-6f);
+    float target_linear_speed = max_target_linear_speed;
+    if (norm_dist_delta < start_linear_deceleration_distance)
     {
         // interpolate target speed between initial speed and final speed while the robot
-        // is within start_acceleration_distance away from the destination, also add a
-        // minimum speed so the robot gets to the destination faster when dest speed is 0
-        target_speed = fmaxf((max_target_speed - dest_speed) *
-                                     (norm_dist_delta / start_acceleration_distance) +
-                                 dest_speed,
-                             0.1f);
+        // is within start_linear_deceleration_distance away from the destination, also
+        // add a minimum speed so the robot gets to the destination faster when dest speed
+        // is 0
+        target_linear_speed = fmaxf(
+            (max_target_linear_speed - dest_linear_speed) *
+                    (norm_dist_delta / (start_linear_deceleration_distance + 1e-6f)) +
+                dest_linear_speed,
+            0.1f);
     }
     float global_robot_velocity[2];
-    global_robot_velocity[0] = delta_x / norm_dist_delta * target_speed;
-    global_robot_velocity[1] = delta_y / norm_dist_delta * target_speed;
+    global_robot_velocity[0] = delta_x / (norm_dist_delta + 1e-6f) * target_linear_speed;
+    global_robot_velocity[1] = delta_y / (norm_dist_delta + 1e-6f) * target_linear_speed;
 
     float local_norm_vec[2][2] = {
         {cosf(curr_orientation), sinf(curr_orientation)},
@@ -199,19 +204,43 @@ void velocity_wheels_followPosTrajectory(const FirmwareRobot_t* robot,
     float local_robot_velocity[2];
     for (int i = 0; i < 2; i++)
     {
+        // interpolate target speed between initial speed and final speed while the robot
+        // is within start_linear_deceleration_distance away from the destination, also
+        // add a minimum speed so the robot gets to the final orientation faster when dest
+        // speed is 0
         local_robot_velocity[i] =
             shared_physics_dot2D(local_norm_vec[i], global_robot_velocity);
     }
 
-    VelocityTrajectory_t velocity_trajectory;
-    app_trajectory_planner_generateVelocityTrajectory(&pos_trajectory, num_elements,
-                                                      &velocity_trajectory);
+
+    const float dest_orientation = pos_trajectory.orientation[num_elements - 1];
+    const float dest_angular_speed =
+        pos_trajectory.angular_speed[num_elements - 1];  // final speed
+    const float delta_orientation = dest_orientation - curr_orientation;
+    const float max_angular_speed =
+        app_firmware_robot_getRobotConstants(robot).robot_max_ang_speed_rad_per_s;
+    const float max_target_angular_speed =
+        fmaxf(max_angular_speed, dest_angular_speed);  // initial speed
+    const float start_angular_deceleration_distance =
+        (max_target_angular_speed * max_target_angular_speed -
+         dest_angular_speed * dest_angular_speed) /
+        (2 * app_firmware_robot_getRobotConstants(robot)
+                 .robot_max_ang_acceleration_rad_per_s_2 +
+         1e-6f);
+    float target_angular_speed = max_target_angular_speed;
+    if (fabsf(delta_orientation) < start_angular_deceleration_distance)
+    {
+        target_angular_speed = fmaxf(
+            (max_target_angular_speed - dest_angular_speed) *
+                    (delta_orientation / (start_angular_deceleration_distance + 1e-6f)) +
+                dest_angular_speed,
+            0.01f * delta_orientation / (fabsf(delta_orientation) + 1e-6f));
+    }
 
     TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg;
-    control_msg.velocity.x_component_meters = local_robot_velocity[0];
-    control_msg.velocity.y_component_meters = local_robot_velocity[1];
-    control_msg.angular_velocity.radians_per_second =
-        velocity_trajectory.angular_velocity[trajectory_index];
+    control_msg.velocity.x_component_meters         = local_robot_velocity[0];
+    control_msg.velocity.y_component_meters         = local_robot_velocity[1];
+    control_msg.angular_velocity.radians_per_second = target_angular_speed;
 
     velocity_wheels_setLocalVelocity(robot, control_msg);
 }
