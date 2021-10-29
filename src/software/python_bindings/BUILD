@@ -124,3 +124,26 @@ pybind_extension(
         ":pass_generator_lib",
     ],
 )
+
+cc_library(
+    name = "keep_away_lib",
+    srcs = ["keep_away.cpp"],
+    copts = ["-fexceptions"],
+    features = [
+        "-use_header_modules",
+        "-parse_headers",
+    ],
+    deps = [
+        ":python_binding_utilities",
+        ":pass_utilities",
+        "//software/ai/evaluation:keep_away",
+        "//software/math:math_functions",
+    ] + PYBIND_DEPS,
+)
+
+pybind_extension(
+    name = "keep_away",
+    deps = [
+        ":keep_away_lib",
+    ],
+)

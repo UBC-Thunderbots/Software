@@ -50,7 +50,6 @@ void robotAtOrientation(RobotId robot_id, std::shared_ptr<World> world_ptr,
         {
             LOG(FATAL) << "There is no robot with ID: " + std::to_string(robot_id);
         }
-
         Robot robot = robot_optional.value();
         if (robot.orientation().minDiff(orientation) > close_to_orientation_threshold)
         {
