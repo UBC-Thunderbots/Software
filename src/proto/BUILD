@@ -25,10 +25,10 @@ cc_proto_library(
     deps = [":tbots_proto"],
 )
 
-nanopb_proto_library(
-    name = "tbots_nanopb_proto",
-    deps = [":tbots_proto"],
-)
+#nanopb_proto_library(
+    #name = "tbots_nanopb_proto",
+    #deps = [":tbots_proto"],
+#)
 
 py_proto_library(
     name = "tbots_py_proto",
