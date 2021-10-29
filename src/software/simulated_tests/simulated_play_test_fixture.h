@@ -63,7 +63,7 @@ class SimulatedPlayTestFixture : public SimulatedTestFixture
     AIDrawFunction getDrawFunctions() override;
 
    private:
-    void updatePrimitives(const World& world,
+    void updatePrimitives(const World& world, const World& enemy_world,
                           std::shared_ptr<Simulator> simulator_to_update) override;
     // The configs being used in simulation
     std::shared_ptr<AiConfig> ai_config;
