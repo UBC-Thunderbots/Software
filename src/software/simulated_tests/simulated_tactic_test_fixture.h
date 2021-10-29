@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/navigator/navigator.h"
 #include "software/simulated_tests/simulated_test_fixture.h"
@@ -23,6 +24,19 @@ class SimulatedTacticTestFixture : public SimulatedTestFixture
     void SetUp() override;
 
     /**
+     * Sets the friendly and enemy tactic to the given tactics, otherwise default to the
+     * halt tactic
+     *
+     * @param friendly_tactic The friendly tactic
+     * @param enemy_tactic The enemy tactic
+     *
+     * @throw invalid_argument if any tactic is invalid
+     */
+    void setTactic(
+        std::shared_ptr<Tactic> friendly_tactic = std::make_shared<StopTactic>(true),
+        std::shared_ptr<Tactic> enemy_tactic    = std::make_shared<StopTactic>(true));
+
+    /**
      * Sets the friendly tactic to test
      *
      * @param tactic The tactic under test
@@ -32,52 +46,43 @@ class SimulatedTacticTestFixture : public SimulatedTestFixture
     void setFriendlyTactic(std::shared_ptr<Tactic> tactic);
 
     /**
-     * Sets the tactic for the enemy (if applicable)
-     * 
+     * Sets the tactic for the enemy
+     *
      * @param tactic The tactic under test (for the enemy)
-     * 
+     *
      * @throw invalid_argument if does not contain a tactic
      */
     void setEnemyTactic(std::shared_ptr<Tactic> tactic);
 
     /**
-     * Sets the friendly robot id to run tactic on
+     * Sets the friendly and enemy robot IDs
      *
-     * @param robot_id The robot id to run tactic on
+     * @param friendly_robot_id The friendly robot ID
+     * @param enemy_robot_id The enemy robot ID, defaults to UINT_MAX as a flag to not set
+     * an enemy robot ID
      */
-    void setFriendlyRobotId(RobotId robot_id);
+    void setRobotId(RobotId friendly_robot_id, RobotId enemy_robot_id = UINT_MAX);
 
     /**
-     * Sets the enemy robot id to run the enemy tactic on
-     * 
-     * @param robot_id The enemy robot id to run the enemy tactic on
-     */
-    void setEnemyRobotId(RobotId robot_id);
-
-    /**
-     * Sets the friendly motion constraints to test
+     * Sets the motion constraints for the friendly and enemy (if applicable) teams
      *
-     * @param motion_constraints The motion constraints for the tactic
+     * @param friendly_motion_constraints The friendly motion constraint
+     * @param enemy_motion_constraints The enemy motion constraint
      */
-    void setFriendlyMotionConstraints(const std::set<MotionConstraint>& motion_constraints);
-
-    /**
-     * Sets the enemy motion constraints for test
-     * 
-     * @param motion_constraints The motion constraints for the enemy tactic
-     */
-    void setEnemyMotionConstraints(const std::set<MotionConstraint>& motion_constriants);
+    void setMotionConstraints(
+        const std::set<MotionConstraint>& friendly_motion_constraints,
+        const std::set<MotionConstraint>& enemy_motion_constraints = {});
 
    private:
     void updatePrimitives(const World& friendly_world, const World& enemy_world,
                           std::shared_ptr<Simulator> simulator_to_update) override;
     void updateFriendlyPrimitives(const World& world,
-                          std::shared_ptr<Simulator> simulator_to_update);
+                                  std::shared_ptr<Simulator> simulator_to_update);
     void updateEnemyPrimitives(const World& world,
-                          std::shared_ptr<Simulator> simulator_to_update);
+                               std::shared_ptr<Simulator> simulator_to_update);
 
     std::optional<PlayInfo> getPlayInfo() override;
-    AIDrawFunction getDrawFunctions() override;    
+    AIDrawFunction getDrawFunctions() override;
 
     std::shared_ptr<Tactic> friendly_tactic;
     std::shared_ptr<Tactic> enemy_tactic;

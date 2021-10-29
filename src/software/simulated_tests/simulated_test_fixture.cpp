@@ -11,10 +11,10 @@
 SimulatedTestFixture::SimulatedTestFixture()
     : friendly_mutable_thunderbots_config(std::make_shared<ThunderbotsConfig>()),
       enemy_mutable_thunderbots_config(std::make_shared<ThunderbotsConfig>()),
-      friendly_thunderbots_config(
-          std::const_pointer_cast<const ThunderbotsConfig>(friendly_mutable_thunderbots_config)),
-      enemy_thunderbots_config(
-              std::const_pointer_cast<const ThunderbotsConfig>(enemy_mutable_thunderbots_config)),
+      friendly_thunderbots_config(std::const_pointer_cast<const ThunderbotsConfig>(
+          friendly_mutable_thunderbots_config)),
+      enemy_thunderbots_config(std::const_pointer_cast<const ThunderbotsConfig>(
+          enemy_mutable_thunderbots_config)),
       friendly_sensor_fusion(friendly_thunderbots_config->getSensorFusionConfig()),
       enemy_sensor_fusion(enemy_thunderbots_config->getSensorFusionConfig()),
       should_log_replay(false),
@@ -26,42 +26,44 @@ void SimulatedTestFixture::SetUp()
 {
     LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
 
-    friendly_mutable_thunderbots_config->getMutableAiControlConfig()->getMutableRunAi()->setValue(
-            !TbotsGtestMain::stop_ai_on_start);
+    friendly_mutable_thunderbots_config->getMutableAiControlConfig()
+        ->getMutableRunAi()
+        ->setValue(!TbotsGtestMain::stop_ai_on_start);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always the yellow team
     friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()
-            ->getMutableOverrideGameControllerDefendingSide()
-            ->setValue(true);
+        ->getMutableOverrideGameControllerDefendingSide()
+        ->setValue(true);
     friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()
-            ->getMutableDefendingPositiveSide()
-            ->setValue(false);
+        ->getMutableDefendingPositiveSide()
+        ->setValue(false);
 
     // Experimentally determined restitution value
     friendly_mutable_thunderbots_config->getMutableSimulatorConfig()
-            ->getMutableBallRestitution()
-            ->setValue(0.8);
+        ->getMutableBallRestitution()
+        ->setValue(0.8);
     // Measured these values from fig. 9 on page 8 of
     // https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
     friendly_mutable_thunderbots_config->getMutableSimulatorConfig()
-            ->getMutableSlidingFrictionAcceleration()
-            ->setValue(6.9);
+        ->getMutableSlidingFrictionAcceleration()
+        ->setValue(6.9);
     friendly_mutable_thunderbots_config->getMutableSimulatorConfig()
-            ->getMutableRollingFrictionAcceleration()
-            ->setValue(0.5);
+        ->getMutableRollingFrictionAcceleration()
+        ->setValue(0.5);
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always defending the "negative" side of the field. This is so that the
     // coordinates given when setting up tests is from the perspective of the friendly
     // team
     enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
-            ->getMutableFriendlyColorYellow()
-            ->setValue(true);
-    enemy_mutable_thunderbots_config->getMutableAiControlConfig()->getMutableRunAi()->setValue(
-        !TbotsGtestMain::stop_ai_on_start);
+        ->getMutableFriendlyColorYellow()
+        ->setValue(true);
+    enemy_mutable_thunderbots_config->getMutableAiControlConfig()
+        ->getMutableRunAi()
+        ->setValue(!TbotsGtestMain::stop_ai_on_start);
 
-    //enemy
+    // enemy
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always the yellow team
@@ -70,7 +72,7 @@ void SimulatedTestFixture::SetUp()
         ->setValue(true);
     enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableDefendingPositiveSide()
-        ->setValue(true);
+        ->setValue(false);
 
     // Experimentally determined restitution value
     enemy_mutable_thunderbots_config->getMutableSimulatorConfig()
@@ -109,7 +111,8 @@ void SimulatedTestFixture::SetUp()
 
 void SimulatedTestFixture::enableVisualizer()
 {
-    full_system_gui = std::make_shared<ThreadedFullSystemGUI>(friendly_mutable_thunderbots_config);
+    full_system_gui =
+        std::make_shared<ThreadedFullSystemGUI>(friendly_mutable_thunderbots_config);
     // TODO: add support for enemy
     run_simulation_in_realtime = true;
 }
@@ -184,8 +187,8 @@ void SimulatedTestFixture::updateSensorFusion(std::shared_ptr<Simulator> simulat
 
         if (world_or_null)
         {
-            auto filtered_ssl_wrapper =
-                *createSSLWrapperPacket(*friendly_sensor_fusion.getWorld(), TeamColour::YELLOW);
+            auto filtered_ssl_wrapper = *createSSLWrapperPacket(
+                *friendly_sensor_fusion.getWorld(), TeamColour::YELLOW);
             sensorfusion_wrapper_logger->onValueReceived(filtered_ssl_wrapper);
         }
     }
@@ -226,8 +229,11 @@ void SimulatedTestFixture::runTest(
     updateSensorFusion(simulator);
     std::shared_ptr<World> friendly_world;
     std::shared_ptr<World> enemy_world;
-    if (friendly_sensor_fusion.getWorld().has_value() && enemy_sensor_fusion.getWorld().has_value()) {
-        friendly_world = std::make_shared<World>(friendly_sensor_fusion.getWorld().value());
+    if (friendly_sensor_fusion.getWorld().has_value() &&
+        enemy_sensor_fusion.getWorld().has_value())
+    {
+        friendly_world =
+            std::make_shared<World>(friendly_sensor_fusion.getWorld().value());
         enemy_world = std::make_shared<World>(enemy_sensor_fusion.getWorld().value());
     }
     else
@@ -257,8 +263,8 @@ void SimulatedTestFixture::runTest(
         simulation_time_step.toSeconds() * CAMERA_FRAMES_PER_AI_TICK * speed_factor);
 
     // Tick one frame to aid with visualization
-    bool validation_functions_done =
-        tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,simulator);
+    bool validation_functions_done = tickTest(simulation_time_step, ai_time_step,
+                                              friendly_world, enemy_world, simulator);
 
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
@@ -270,8 +276,8 @@ void SimulatedTestFixture::runTest(
             continue;
         }
 
-        validation_functions_done =
-            tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,simulator);
+        validation_functions_done = tickTest(simulation_time_step, ai_time_step,
+                                             friendly_world, enemy_world, simulator);
     }
     // Output the tick duration results
     double avg_tick_duration = total_tick_duration / tick_count;
@@ -304,9 +310,11 @@ void SimulatedTestFixture::registerTickTime(double tick_time_ms)
 
 // DO NOT REMOVE SIMULATOR - CAUSES SEGFAULT
 bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_time_step,
-                                    std::shared_ptr<World> friendly_world, std::shared_ptr<World> enemy_world, std::shared_ptr<Simulator> simulator)
+                                    std::shared_ptr<World> friendly_world,
+                                    std::shared_ptr<World> enemy_world,
+                                    std::shared_ptr<Simulator> simulator)
 {
-auto wall_start_time           = std::chrono::steady_clock::now();
+    auto wall_start_time           = std::chrono::steady_clock::now();
     bool validation_functions_done = false;
 
     for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
@@ -315,11 +323,12 @@ auto wall_start_time           = std::chrono::steady_clock::now();
         updateSensorFusion(simulator);
     }
 
-    if (friendly_sensor_fusion.getWorld().has_value() && enemy_sensor_fusion.getWorld().has_value())
+    if (friendly_sensor_fusion.getWorld().has_value() &&
+        enemy_sensor_fusion.getWorld().has_value())
     {
         // DEBUG ?
         *friendly_world = friendly_sensor_fusion.getWorld().value();
-        *enemy_world = enemy_sensor_fusion.getWorld().value();
+        *enemy_world    = enemy_sensor_fusion.getWorld().value();
 
         validation_functions_done = validateAndCheckCompletion(
             terminating_function_validators, non_terminating_function_validators);
@@ -328,7 +337,8 @@ auto wall_start_time           = std::chrono::steady_clock::now();
             return validation_functions_done;
         }
 
-        updatePrimitives(*friendly_world, *enemy_world, simulator); // pass friendly and enemy world
+        updatePrimitives(*friendly_world, *enemy_world,
+                         simulator);  // pass friendly and enemy world
 
         if (run_simulation_in_realtime)
         {
