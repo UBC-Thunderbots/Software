@@ -7,9 +7,11 @@
 SimulatedPlayTestFixture::SimulatedPlayTestFixture()
     : ai_config(friendly_mutable_thunderbots_config->getMutableAiConfig()),
       ai_control_config(friendly_mutable_thunderbots_config->getMutableAiControlConfig()),
-      sensor_fusion_config(friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()),
+      sensor_fusion_config(
+          friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()),
       game_state(),
-      ai(friendly_thunderbots_config->getAiConfig(), friendly_thunderbots_config->getAiControlConfig(),
+      ai(friendly_thunderbots_config->getAiConfig(),
+         friendly_thunderbots_config->getAiControlConfig(),
          friendly_thunderbots_config->getPlayConfig())
 {
 }
@@ -18,11 +20,13 @@ void SimulatedPlayTestFixture::SetUp()
 {
     SimulatedTestFixture::SetUp();
 
-    ai_config            = friendly_mutable_thunderbots_config->getMutableAiConfig();
-    ai_control_config    = friendly_mutable_thunderbots_config->getMutableAiControlConfig();
-    sensor_fusion_config = friendly_mutable_thunderbots_config->getMutableSensorFusionConfig();
+    ai_config         = friendly_mutable_thunderbots_config->getMutableAiConfig();
+    ai_control_config = friendly_mutable_thunderbots_config->getMutableAiControlConfig();
+    sensor_fusion_config =
+        friendly_mutable_thunderbots_config->getMutableSensorFusionConfig();
 
-    ai = AI(friendly_thunderbots_config->getAiConfig(), friendly_thunderbots_config->getAiControlConfig(),
+    ai = AI(friendly_thunderbots_config->getAiConfig(),
+            friendly_thunderbots_config->getAiControlConfig(),
             friendly_thunderbots_config->getPlayConfig());
 }
 
@@ -58,7 +62,8 @@ void SimulatedPlayTestFixture::setGameState(const GameState& game_state_)
 }
 
 void SimulatedPlayTestFixture::updatePrimitives(
-    const World& world, const World& unused_enemy_world, std::shared_ptr<Simulator> simulator_to_update)
+    const World& world, const World& unused_enemy_world,
+    std::shared_ptr<Simulator> simulator_to_update)
 {
     auto world_with_updated_game_state = world;
     world_with_updated_game_state.updateGameState(game_state);
