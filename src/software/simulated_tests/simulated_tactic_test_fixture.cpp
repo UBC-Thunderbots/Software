@@ -73,7 +73,7 @@ void SimulatedTacticTestFixture::setFriendlyTactic(std::shared_ptr<Tactic> tacti
     }
     else
     {
-        throw std::invalid_argument("Tactic is invalid");
+        throw std::invalid_argument("Friendly tactic is invalid");
     }
 }
 
@@ -85,7 +85,7 @@ void SimulatedTacticTestFixture::setEnemyTactic(std::shared_ptr<Tactic> tactic)
     }
     else
     {
-        throw std::invalid_argument("Tactic is invalid");
+        throw std::invalid_argument("Enemy tactic is invalid");
     }
 }
 
