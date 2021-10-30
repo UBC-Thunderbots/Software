@@ -286,7 +286,7 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
                     && (robot_tactic_assignment.at(tactic) == robot))
                 {
                     std::cout << "Changing robot tactic cost\n";
-                    robot_cost_for_tactic = robot_cost_for_tactic * 0.4;
+                    robot_cost_for_tactic = robot_cost_for_tactic * 1;
                 }
                 
                 std::set<RobotCapability> required_capabilities =
@@ -335,7 +335,8 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
                 auto val = matrix(row, col);
                 if (val == 0)
                 {
-                    if (robot_tactic_assignment.find(tactic_vector.at(col)) != robot_tactic_assignment.end())
+                    if (robot_tactic_assignment.find(tactic_vector.at(col)) != robot_tactic_assignment.end()
+                       && (robot_tactic_assignment.at(tactic_vector.at(col)) != robots.at(row)))
                     {
                         tactic_swap++;
                         std::cout << "Tactic swap count: " << tactic_swap << '\n';
