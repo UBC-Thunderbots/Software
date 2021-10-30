@@ -4,6 +4,7 @@
 
 #include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
+#include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
@@ -39,12 +40,8 @@ TEST_F(ShootOrPassPlayTest, DISABLED_test_shoot_or_pass_play)
         // time to settle into position and be observed with the Visualizer
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1971
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(24.5))
-            {
-                yield("Timestamp not at 24.5s");
-            }
-        }};
+        friendlyScored
+    };
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
@@ -78,16 +75,11 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play_with_keep_away)
         // time to settle into position and be observed with the Visualizer
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1971
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(24.5))
-            {
-                yield("Timestamp not at 24.5s");
-            }
-        }};
+        friendlyScored};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(25));
+            Duration::fromSeconds(20));
 }

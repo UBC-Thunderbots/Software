@@ -497,6 +497,7 @@ cc_test(
         "//software/ai/hl/stp/play:shoot_or_pass_play",
         "//software/simulated_tests:simulated_play_test_fixture",
         "//software/simulated_tests/validation:validation_function",
+        "//software/simulated_tests/terminating_validation_functions",
         "//software/test_util",
         "//software/time:duration",
         "//software/world",

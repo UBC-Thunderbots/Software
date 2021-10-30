@@ -224,11 +224,13 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
 
     if (goalie_robot && automatically_assign_goalie)
     {
-        robot_tactic_assignment.emplace(goalie_tactic, goalie_robot.value());
-
-        robots.erase(std::remove(robots.begin(), robots.end(), goalie_robot.value()),
-                     robots.end());
+        if (robot_tactic_assignment.find(goalie_tactic) == robot_tactic_assignment.end())
+        {
+            robot_tactic_assignment.emplace(goalie_tactic, goalie_robot.value());
+        }
     }
+    
+    auto remaining_robots = robots;
 
     // This functions optimizes the assignment of robots to tactics by minimizing
     // the total cost of assignment using the Hungarian algorithm
@@ -286,7 +288,7 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
                     && (robot_tactic_assignment.at(tactic) == robot))
                 {
                     std::cout << "Changing robot tactic cost\n";
-                    robot_cost_for_tactic = robot_cost_for_tactic * 1;
+                    robot_cost_for_tactic = (robot_cost_for_tactic - 0.1) < 0 ? 0 : (robot_cost_for_tactic - 0.1);
                 }
                 
                 std::set<RobotCapability> required_capabilities =
@@ -324,7 +326,6 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
         //        -1, 0,-1,         and            0,-1,
         //         0,-1,-1,                       -1, 0,
         //        -1,-1, 0,
-        auto remaining_robots = robots;
 
         static int tactic_swap = 0;
         
@@ -335,12 +336,14 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
                 auto val = matrix(row, col);
                 if (val == 0)
                 {
-                    if (robot_tactic_assignment.find(tactic_vector.at(col)) != robot_tactic_assignment.end()
-                       && (robot_tactic_assignment.at(tactic_vector.at(col)) != robots.at(row)))
+                    if (robot_tactic_assignment.find(tactic_vector.at(col)) != robot_tactic_assignment.end())
                     {
-                        tactic_swap++;
-                        std::cout << "Tactic swap count: " << tactic_swap << '\n';
-                        robot_tactic_assignment.at(tactic_vector.at(col)) = robots.at(row);
+                        if (robot_tactic_assignment.at(tactic_vector.at(col)) != robots.at(row))
+                        {
+                            tactic_swap++;
+                            std::cout << "Tactic swap count: " << tactic_swap << '\n';
+                            robot_tactic_assignment.at(tactic_vector.at(col)) = robots.at(row);
+                        }
                     }
                     else
                     {
