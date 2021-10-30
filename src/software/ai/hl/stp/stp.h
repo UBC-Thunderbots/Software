@@ -207,6 +207,8 @@ class STP : public HL
     // The Play that is currently running
     std::unique_ptr<Play> current_play;
     std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment;
+    std::map<std::shared_ptr<const Tactic>, Robot> tactic_assignment;
+
     // The random number generator
     std::mt19937 random_number_generator;
     std::shared_ptr<const AiControlConfig> control_config;
