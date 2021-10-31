@@ -76,8 +76,7 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
     ],
 )
-
-cc_test(
+acc_test(
     name = "observer_subject_adapter_test",
     srcs = ["observer_subject_adapter_test.cpp"],
     deps = [
