@@ -109,7 +109,7 @@ ErForceSimulator::ErForceSimulator(
             blue_firmware_world_raw, FirmwareWorldDeleter());
 
         FirmwareWorld_t* yellow_firmware_world_raw = app_firmware_world_create(
-            yellow_firmware_robot.release(), blue_firmware_ball.release(),
+            yellow_firmware_robot.release(), yellow_firmware_ball.release(),
             &(ErForceSimulator::getCurrentFirmwareTimeSeconds));
         auto yellow_firmware_world = std::shared_ptr<FirmwareWorld_t>(
             yellow_firmware_world_raw, FirmwareWorldDeleter());

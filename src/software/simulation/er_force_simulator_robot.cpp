@@ -173,22 +173,22 @@ unsigned int ErForceSimulatorRobot::getDribblerTemperatureDegC()
     return 25;
 }
 
-void ErForceSimulatorRobot::setTargetRPMFrontLeft(float rpm)
+void ErForceSimulatorRobot::setTargetRpmFrontLeft(float rpm)
 {
     wheel_speed_front_left = rpm;
 }
 
-void ErForceSimulatorRobot::setTargetRPMBackLeft(float rpm)
+void ErForceSimulatorRobot::setTargetRpmBackLeft(float rpm)
 {
     wheel_speed_back_left = rpm;
 }
 
-void ErForceSimulatorRobot::setTargetRPMBackRight(float rpm)
+void ErForceSimulatorRobot::setTargetRpmBackRight(float rpm)
 {
     wheel_speed_back_right = rpm;
 }
 
-void ErForceSimulatorRobot::setTargetRPMFrontRight(float rpm)
+void ErForceSimulatorRobot::setTargetRpmFrontRight(float rpm)
 {
     wheel_speed_front_right = rpm;
 }
@@ -270,7 +270,7 @@ std::array<float, 4> ErForceSimulatorRobot::getMotorSpeeds() const
     std::array<float, 4> motor_speeds = {0.0, 0.0, 0.0, 0.0};
     for (unsigned int i = 0; i < 4; i++)
     {
-        // Convert to m/s to RPM then divide by gear ratio to get motor speed
+        // Convert to m/s to Rpm then divide by gear ratio to get motor speed
         motor_speeds[i] = (wheel_speeds[i] * 60.0f /
                            (2.0f * (float)M_PI * wheel_constants.wheel_radius_meters)) /
                           wheel_constants.wheel_rotations_per_motor_rotation;

@@ -182,7 +182,7 @@ class ErForceSimulatorRobotSingleton
     static unsigned int getDribblerTemperatureDegC();
 
     /**
-     * Gets the motor speed for the wheel, in RPM
+     * Gets the motor speed for the wheel, in Rpm
      */
     static float getMotorSpeedFrontLeft();
     static float getMotorSpeedBackLeft();
@@ -234,14 +234,14 @@ class ErForceSimulatorRobotSingleton
 
    private:
     /**
-     * Sets the target RPM
+     * Sets the target Rpm
      *
      * @param rpm The rpm for the wheel to reach
      */
-    static void setTargetRPMFrontLeft(float rpm);
-    static void setTargetRPMBackLeft(float rpm);
-    static void setTargetRPMBackRight(float rpm);
-    static void setTargetRPMFrontRight(float rpm);
+    static void setTargetRpmFrontLeft(float rpm);
+    static void setTargetRpmBackLeft(float rpm);
+    static void setTargetRpmBackRight(float rpm);
+    static void setTargetRpmFrontRight(float rpm);
 
     /**
      * Helper function that checks if the pointer to the simulator_robot is valid before

@@ -227,22 +227,22 @@ ErForceSimulatorRobotSingleton::createFirmwareRobot()
 
     WheelConstants_t wheel_constants  = create2021WheelConstants();
     VelocityWheel_t* front_left_wheel = app_velocity_wheel_create(
-        &(ErForceSimulatorRobotSingleton::setTargetRPMFrontLeft),
+        &(ErForceSimulatorRobotSingleton::setTargetRpmFrontLeft),
         &(ErForceSimulatorRobotSingleton::getMotorSpeedFrontLeft),
         &(ErForceSimulatorRobotSingleton::brakeMotorFrontLeft),
         &(ErForceSimulatorRobotSingleton::coastMotorFrontLeft), wheel_constants);
     VelocityWheel_t* front_right_wheel = app_velocity_wheel_create(
-        &(ErForceSimulatorRobotSingleton::setTargetRPMFrontRight),
+        &(ErForceSimulatorRobotSingleton::setTargetRpmFrontRight),
         &(ErForceSimulatorRobotSingleton::getMotorSpeedFrontRight),
         &(ErForceSimulatorRobotSingleton::brakeMotorFrontRight),
         &(ErForceSimulatorRobotSingleton::coastMotorFrontRight), wheel_constants);
     VelocityWheel_t* back_left_wheel = app_velocity_wheel_create(
-        &(ErForceSimulatorRobotSingleton::setTargetRPMBackLeft),
+        &(ErForceSimulatorRobotSingleton::setTargetRpmBackLeft),
         &(ErForceSimulatorRobotSingleton::getMotorSpeedBackLeft),
         &(ErForceSimulatorRobotSingleton::brakeMotorBackLeft),
         &(ErForceSimulatorRobotSingleton::coastMotorBackLeft), wheel_constants);
     VelocityWheel_t* back_right_wheel = app_velocity_wheel_create(
-        &(ErForceSimulatorRobotSingleton::setTargetRPMBackRight),
+        &(ErForceSimulatorRobotSingleton::setTargetRpmBackRight),
         &(ErForceSimulatorRobotSingleton::getMotorSpeedBackRight),
         &(ErForceSimulatorRobotSingleton::brakeMotorBackRight),
         &(ErForceSimulatorRobotSingleton::coastMotorBackRight), wheel_constants);
@@ -268,22 +268,22 @@ ErForceSimulatorRobotSingleton::createFirmwareRobot()
                                                                   FirmwareRobotDeleter());
 }
 
-void ErForceSimulatorRobotSingleton::setTargetRPMFrontLeft(float rpm)
+void ErForceSimulatorRobotSingleton::setTargetRpmFrontLeft(float rpm)
 {
-    checkValidAndExecute<void>([rpm](auto robot) { robot->setTargetRPMFrontLeft(rpm); });
+    checkValidAndExecute<void>([rpm](auto robot) { robot->setTargetRpmFrontLeft(rpm); });
 }
 
-void ErForceSimulatorRobotSingleton::setTargetRPMBackLeft(float rpm)
+void ErForceSimulatorRobotSingleton::setTargetRpmBackLeft(float rpm)
 {
-    checkValidAndExecute<void>([rpm](auto robot) { robot->setTargetRPMBackLeft(rpm); });
+    checkValidAndExecute<void>([rpm](auto robot) { robot->setTargetRpmBackLeft(rpm); });
 }
 
-void ErForceSimulatorRobotSingleton::setTargetRPMBackRight(float rpm)
+void ErForceSimulatorRobotSingleton::setTargetRpmBackRight(float rpm)
 {
-    checkValidAndExecute<void>([rpm](auto robot) { robot->setTargetRPMBackRight(rpm); });
+    checkValidAndExecute<void>([rpm](auto robot) { robot->setTargetRpmBackRight(rpm); });
 }
 
-void ErForceSimulatorRobotSingleton::setTargetRPMFrontRight(float rpm)
+void ErForceSimulatorRobotSingleton::setTargetRpmFrontRight(float rpm)
 {
-    checkValidAndExecute<void>([rpm](auto robot) { robot->setTargetRPMFrontRight(rpm); });
+    checkValidAndExecute<void>([rpm](auto robot) { robot->setTargetRpmFrontRight(rpm); });
 }

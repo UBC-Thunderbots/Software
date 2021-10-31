@@ -204,17 +204,17 @@ class ErForceSimulatorRobot : public SimulatorRobot
     unsigned int getDribblerTemperatureDegC() override;
 
     /**
-     * Sets the target RPM of the wheel
+     * Sets the target Rpm of the wheel
      *
-     * @param rpm the target RPM of the wheel
+     * @param rpm the target Rpm of the wheel
      */
-    void setTargetRPMFrontLeft(float rpm);
-    void setTargetRPMBackLeft(float rpm);
-    void setTargetRPMBackRight(float rpm);
-    void setTargetRPMFrontRight(float rpm);
+    void setTargetRpmFrontLeft(float rpm);
+    void setTargetRpmBackLeft(float rpm);
+    void setTargetRpmBackRight(float rpm);
+    void setTargetRpmFrontRight(float rpm);
 
     /**
-     * Gets the motor speed for the wheel, in RPM
+     * Gets the motor speed for the wheel, in Rpm
      */
     float getMotorSpeedFrontLeft() override;
     float getMotorSpeedBackLeft() override;

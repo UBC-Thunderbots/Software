@@ -95,12 +95,10 @@ struct GetBehindBallFSM
             // inside it when taking the chip.
             Point behind_ball_vertex_A = event.control_params.ball_location;
             Point behind_ball_vertex_B =
-                behind_ball_vertex_A +
-                behind_ball.normalize(size_of_region_behind_ball + 2) +
-                behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
+                behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
+                behind_ball.perpendicular().normalize(size_of_region_behind_ball / 8);
             Point behind_ball_vertex_C =
-                behind_ball_vertex_A +
-                behind_ball.normalize(size_of_region_behind_ball + 2) -
+                behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -
                 behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
 
             Triangle behind_ball_region = Triangle(
@@ -109,7 +107,7 @@ struct GetBehindBallFSM
             return contains(behind_ball_region, event.common.robot.position()) &&
                    compareAngles(event.common.robot.orientation(),
                                  event.control_params.chick_direction,
-                                 Angle::fromDegrees(15));
+                                 Angle::fromDegrees(5));
         };
 
         return make_transition_table(
