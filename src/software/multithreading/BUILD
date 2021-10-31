@@ -77,7 +77,7 @@ cc_test(
     ],
 )
 
-acc_test(
+cc_test(
     name = "observer_subject_adapter_test",
     srcs = ["observer_subject_adapter_test.cpp"],
     deps = [
