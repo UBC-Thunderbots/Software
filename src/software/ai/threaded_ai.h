@@ -5,7 +5,7 @@
 #include "software/ai/ai.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/multithreading/first_in_first_out_threaded_observer.h"
-#include "software/multithreading/subject.h"
+#include "software/multithreading/subject.hpp"
 #include "software/world/world.h"
 
 /**

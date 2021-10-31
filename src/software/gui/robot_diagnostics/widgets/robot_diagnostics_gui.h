@@ -18,7 +18,7 @@
 #include "software/gui/robot_diagnostics/widgets/leds.h"
 #include "software/gui/robot_diagnostics/widgets/robot_selection.h"
 #include "software/gui/robot_diagnostics/widgets/sensor_status.h"
-#include "software/multithreading/thread_safe_buffer.h"
+#include "software/multithreading/thread_safe_buffer.hpp"
 #include "software/util/make_enum/make_enum.h"
 
 // Forward declare the name of the top-level GUI class defined in main_widget.ui
