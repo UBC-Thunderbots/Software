@@ -123,6 +123,3 @@ double Observer<T>::getDataReceivedPerSecond()
         return std::max(0.0, rate);
     }
 }
-
-
-

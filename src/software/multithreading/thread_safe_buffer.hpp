@@ -7,8 +7,8 @@
 #include <mutex>
 #include <optional>
 
-#include "software/time/duration.h"
 #include "software/logger/logger.h"
+#include "software/time/duration.h"
 #include "software/util/typename/typename.h"
 
 /**
@@ -183,4 +183,3 @@ ThreadSafeBuffer<T>::~ThreadSafeBuffer()
 
     received_new_value.notify_all();
 }
-

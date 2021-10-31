@@ -55,5 +55,3 @@ void Subject<T>::sendValueToObservers(T val)
         observer->receiveValue(val);
     }
 }
-
-

@@ -49,4 +49,3 @@ void ObserverSubjectAdapter<ObserverType, SubjectType>::receiveValue(ObserverTyp
 {
     Subject<SubjectType>::sendValueToObservers(conversion_function(val));
 }
-

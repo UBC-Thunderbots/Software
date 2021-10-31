@@ -142,6 +142,3 @@ std::optional<T> ThreadedObserver<T>::getNextValue(const Duration& max_wait_time
     // methods). If this functions is pure virtual then this case would cause a crash.
     return std::nullopt;
 }
-
-
-
