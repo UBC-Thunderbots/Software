@@ -1,8 +1,8 @@
 #pragma once
 #include <functional>
 
-#include "software/multithreading/observer.h"
-#include "software/multithreading/subject.h"
+#include "software/multithreading/observer.hpp"
+#include "software/multithreading/subject.hpp"
 
 /**
  * ObserverSubjectAdapter is a class made to "adapt" a type emitted by a Subject to
@@ -44,4 +44,8 @@ class ObserverSubjectAdapter : public Observer<ObserverType>, public Subject<Sub
     std::function<ConversionFunctionType> conversion_function;
 };
 
-#include "software/multithreading/observer_subject_adapter.tpp"
+template <typename ObserverType, typename SubjectType>
+void ObserverSubjectAdapter<ObserverType, SubjectType>::receiveValue(ObserverType val)
+{
+    Subject<SubjectType>::sendValueToObservers(conversion_function(val));
+}

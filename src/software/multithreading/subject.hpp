@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "software/multithreading/observer.h"
+#include "software/multithreading/observer.hpp"
 
 /**
  * This class represents something that can be watched by an Observer.
@@ -41,4 +41,17 @@ class Subject
     std::vector<std::shared_ptr<Observer<T>>> observers;
 };
 
-#include "software/multithreading/subject.tpp"
+template <typename T>
+void Subject<T>::registerObserver(std::shared_ptr<Observer<T>> observer)
+{
+    observers.emplace_back(observer);
+}
+
+template <typename T>
+void Subject<T>::sendValueToObservers(T val)
+{
+    for (std::shared_ptr<Observer<T>>& observer : observers)
+    {
+        observer->receiveValue(val);
+    }
+}

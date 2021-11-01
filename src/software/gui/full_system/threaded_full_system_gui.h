@@ -13,7 +13,7 @@
 #include "software/gui/drawing/draw_functions.h"
 #include "software/gui/full_system/widgets/full_system_gui.h"
 #include "software/multithreading/first_in_first_out_threaded_observer.h"
-#include "software/multithreading/thread_safe_buffer.h"
+#include "software/multithreading/thread_safe_buffer.hpp"
 #include "software/world/world.h"
 
 /**
