@@ -11,8 +11,8 @@ cc_library(
     name = "trajectory_planner",
     srcs = [
         "trajectory_planner.c",
-        "trajectory_planner_impl.c",
-        "trajectory_planner_impl.h",
+        "trajectory_planner_private.c",
+        "trajectory_planner_private.h",
     ],
     hdrs = ["trajectory_planner.h"],
     deps = [
@@ -58,10 +58,10 @@ cc_test(
 )
 
 cc_test(
-    name = "trajectory_planner_impl_test",
+    name = "trajectory_planner_private_test",
     srcs = [
-        "trajectory_planner_impl.h",
-        "trajectory_planner_impl_test.cpp",
+        "trajectory_planner_private.h",
+        "trajectory_planner_private_test.cpp",
     ],
     deps = [
         ":trajectory_planner",

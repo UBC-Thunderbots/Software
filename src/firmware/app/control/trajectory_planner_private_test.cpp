@@ -1,6 +1,6 @@
 extern "C"
 {
-#include "firmware/app/control/trajectory_planner_impl.h"
+#include "firmware/app/control/trajectory_planner_private.h"
 
 #include "firmware/app/control/trajectory_planner.h"
 }

@@ -1,4 +1,4 @@
-#include "firmware/app/control/trajectory_planner_impl.h"
+#include "firmware/app/control/trajectory_planner_private.h"
 
 #include <assert.h>
 #include <float.h>
