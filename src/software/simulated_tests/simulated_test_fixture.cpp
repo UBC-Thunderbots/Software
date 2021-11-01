@@ -226,9 +226,11 @@ void SimulatedTestFixture::runTest(
     simulator->addYellowRobots(friendly_robots);
     simulator->addBlueRobots(enemy_robots);
 
+    std::cerr << "LINE 229" << '\n';
     updateSensorFusion(simulator);
     std::shared_ptr<World> friendly_world;
     std::shared_ptr<World> enemy_world;
+    std::cerr << "LINE 233" << '\n';
     if (friendly_sensor_fusion.getWorld().has_value() &&
         enemy_sensor_fusion.getWorld().has_value())
     {
@@ -241,18 +243,21 @@ void SimulatedTestFixture::runTest(
         FAIL() << "Invalid initial world state";
     }
 
+    std::cerr << "LINE 246" << '\n';
     for (const auto &validation_function : terminating_validation_functions)
     {
         terminating_function_validators.emplace_back(
             TerminatingFunctionValidator(validation_function, friendly_world));
     }
 
+    std::cerr << "LINE 253" << '\n';
     for (const auto &validation_function : non_terminating_validation_functions)
     {
         non_terminating_function_validators.emplace_back(
             NonTerminatingFunctionValidator(validation_function, friendly_world));
     }
 
+    std::cerr << "LINE 260" << '\n';
     const Timestamp timeout_time = simulator->getTimestamp() + timeout;
     const Duration simulation_time_step =
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
@@ -266,19 +271,25 @@ void SimulatedTestFixture::runTest(
     bool validation_functions_done = tickTest(simulation_time_step, ai_time_step,
                                               friendly_world, enemy_world, simulator);
 
+    std::cerr << "LINE 274" << '\n';
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
+        std::cerr << "BEFORE IF" << std::endl;
         if (!friendly_thunderbots_config->getAiControlConfig()->getRunAi()->value())
         {
+            std::cerr << "AFTER IF" << std::endl;
             auto ms_to_sleep = std::chrono::milliseconds(
                 static_cast<int>(ai_time_step.toMilliseconds()));
             std::this_thread::sleep_for(ms_to_sleep);
             continue;
         }
 
+        std::cerr << "BEFORE TICK TEST" << std::endl;
         validation_functions_done = tickTest(simulation_time_step, ai_time_step,
                                              friendly_world, enemy_world, simulator);
+        std::cerr << "AFTER TICK TEST" << std::endl;
     }
+    std::cerr << "LINE 288" << '\n';
     // Output the tick duration results
     double avg_tick_duration = total_tick_duration / tick_count;
     LOG(INFO) << "max tick duration: " << max_tick_duration << "ms" << std::endl;
