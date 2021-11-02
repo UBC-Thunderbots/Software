@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
+#include "software/test_util/equal_within_tolerance.h"
 #include "software/test_util/test_util.h"
 
 class TbotsProtobufTest : public ::testing::Test
@@ -122,4 +123,42 @@ TEST(TbotsProtobufTest, vision_msg_test)
                       TbotsProtobufTest::assertRobotStateMessageFromRobot(
                           robot, robot_states_map[robot.id()]);
                   });
+}
+
+TEST(TbotsProtobufTest, robot_state_test)
+{
+    auto position         = Point(4.20, 4.20);
+    auto velocity         = Vector(4.20, 4.20);
+    auto orientation      = Angle::fromRadians(4.20);
+    auto angular_velocity = Angle::fromRadians(4.20);
+
+    Robot robot(0, position, velocity, orientation, angular_velocity,
+                Timestamp::fromSeconds(0));
+    auto robot_state_msg = createRobotState(robot);
+    auto robot_state     = createRobotState(*robot_state_msg);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_state.position(),
+                                               robot.currentState().position(), 1e-3));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_state.velocity(),
+                                               robot.currentState().velocity(), 1e-3));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_state.orientation(),
+                                               robot.currentState().orientation(),
+                                               Angle::fromDegrees(1e-3)));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_state.angularVelocity(),
+                                               robot.currentState().angularVelocity(),
+                                               AngularVelocity::fromDegrees(1e-3)));
+}
+
+TEST(TbotsProtobufTest, ball_state_test)
+{
+    auto position = Point(4.20, 4.20);
+    auto velocity = Vector(4.20, 4.20);
+
+    Ball ball(position, velocity, Timestamp::fromSeconds(0));
+    auto ball_state_msg = createBallState(ball);
+
+    auto ball_state = createBallState(*ball_state_msg);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(ball_state.position(),
+                                               ball.currentState().position(), 1e-3));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(ball_state.velocity(),
+                                               ball.currentState().velocity(), 1e-3));
 }
