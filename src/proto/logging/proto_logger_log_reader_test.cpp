@@ -4,7 +4,7 @@
 #include "proto/logging/proto_log_reader.h"
 #include "proto/logging/proto_logger.h"
 #include "proto/sensor_msg.pb.h"
-#include "software/multithreading/subject.h"
+#include "software/multithreading/subject.hpp"
 
 // the working directory of tests are the bazel WORKSPACE root (in this case, src)
 // this path is relative to the current working directory, i.e. the bazel root

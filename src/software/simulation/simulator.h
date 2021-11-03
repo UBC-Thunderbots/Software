@@ -55,12 +55,6 @@ class Simulator
     void setBallState(const BallState& ball_state);
 
     /**
-     * Removes the ball from the physics world. If a ball does not already exist,
-     * this has no effect.
-     */
-    void removeBall();
-
-    /**
      * Adds robots to the specified team with the given initial states.
      *
      * @pre The robot IDs must not be duplicated and must not match the ID

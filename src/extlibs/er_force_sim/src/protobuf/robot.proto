@@ -1,0 +1,162 @@
+syntax                  = "proto2";
+option cc_enable_arenas = true;
+
+package robot;
+
+message LimitParameters
+{
+    optional float a_speedup_f_max   = 1;
+    optional float a_speedup_s_max   = 2;
+    optional float a_speedup_phi_max = 3;
+    optional float a_brake_f_max     = 4;
+    optional float a_brake_s_max     = 5;
+    optional float a_brake_phi_max   = 6;
+};
+
+message Specs
+{
+    enum GenerationType
+    {
+        Regular = 1;
+        Ally    = 2;
+    }
+    required uint32 generation            = 1;
+    required uint32 year                  = 2;
+    required uint32 id                    = 3;
+    optional GenerationType type          = 19;
+    optional float radius                 = 4 [default = 0.09];
+    optional float height                 = 5 [default = 0.15];
+    optional float mass                   = 6;
+    optional float angle                  = 7;
+    optional float v_max                  = 8;
+    optional float omega_max              = 9;
+    optional float shot_linear_max        = 10 [default = 8.0];
+    optional float shot_chip_max          = 11;
+    optional float dribbler_width         = 12;
+    optional LimitParameters acceleration = 13;
+    optional LimitParameters strategy     = 16;
+    // deprecated = 14;
+    optional float ir_param        = 15;
+    optional float shoot_radius    = 17;
+    optional float dribbler_height = 18;
+    reserved 20;
+};
+
+message Generation
+{
+    required Specs default = 1;
+    repeated Specs robot   = 2;
+};
+
+message Team
+{
+    repeated Specs robot = 1;
+};
+
+message Polynomial
+{
+    required float a0 = 1;
+    required float a1 = 2;
+    required float a2 = 3;
+    required float a3 = 4;
+}
+
+message Spline
+{
+    required float t_start  = 1;
+    required float t_end    = 2;
+    required Polynomial x   = 3;
+    required Polynomial y   = 4;
+    required Polynomial phi = 5;
+};
+
+message ControllerInput
+{
+    repeated Spline spline = 1;
+};
+
+message SpeedVector
+{
+    optional float v_s   = 1;
+    optional float v_f   = 2;
+    optional float omega = 3;
+};
+
+message Command
+{
+    enum KickStyle
+    {
+        Linear = 1;
+        Chip   = 2;
+    }
+
+    optional ControllerInput controller = 1;
+    optional float v_f                  = 2;
+    optional float v_s                  = 3;
+    optional float omega                = 4;
+    optional KickStyle kick_style       = 5;
+    optional float kick_power           = 6;
+    optional float dribbler             = 7;
+    optional bool local                 = 8;
+    // deprecated = 9-10;
+    optional bool standby = 11;
+    // deprecated = 12
+    optional bool strategy_controlled = 13;
+    optional bool force_kick          = 14;
+    optional bool network_controlled  = 15;
+    optional bool eject_sdcard        = 16;
+    optional float cur_v_f            = 17;
+    optional float cur_v_s            = 18;
+    optional float cur_omega          = 19;
+    optional SpeedVector output0      = 20;
+    optional SpeedVector output1      = 21;
+    optional SpeedVector output2      = 22;
+}
+
+message RadioCommand
+{
+    required uint32 generation  = 1;
+    required uint32 id          = 2;
+    optional bool is_blue       = 4;
+    required Command command    = 3;
+    optional int64 command_time = 5;
+};
+
+message SpeedStatus
+{
+    required float v_f   = 1;
+    required float v_s   = 2;
+    required float omega = 3;
+}
+
+message ExtendedError
+{
+    required bool motor_1_error  = 1;
+    required bool motor_2_error  = 2;
+    required bool motor_3_error  = 3;
+    required bool motor_4_error  = 4;
+    required bool dribbler_error = 5;
+    required bool kicker_error   = 6;
+    // optional bool motor_overheated_error = 8;
+    optional bool kicker_break_beam_error = 11;
+    optional bool motor_encoder_error     = 9;
+    optional bool main_sensor_error       = 10;
+    optional int32 temperature            = 7;
+}
+
+message RadioResponse
+{
+    optional int64 time                   = 10;
+    required uint32 generation            = 1;
+    required uint32 id                    = 2;
+    optional float battery                = 3;
+    optional float packet_loss_rx         = 4;
+    optional float packet_loss_tx         = 5;
+    optional SpeedStatus estimated_speed  = 6;
+    optional bool ball_detected           = 7;
+    optional bool cap_charged             = 8;
+    optional bool error_present           = 9;
+    optional float radio_rtt              = 11;
+    optional ExtendedError extended_error = 12;
+    optional bool is_blue                 = 13;
+}

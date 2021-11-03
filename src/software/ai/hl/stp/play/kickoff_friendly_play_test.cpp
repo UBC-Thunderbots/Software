@@ -37,8 +37,14 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            // Robot 4 is the only robot allowed to be in the center circle and start
+            // the kickoff
+            robotInCenterCircle(4, world_ptr, yield);
+            robotReceivedBall(4, world_ptr, yield);
+            ballKicked(Angle::zero(), world_ptr, yield);
+
             // Two friendly robots near the half line setting up for offense
-            Rectangle robotsOffensiveRect(Point(-1.75, 2.5), Point(-1.5, -2.5));
+            Rectangle robotsOffensiveRect(Point(-0.5, 2.5), Point(-1.5, -2.5));
             robotInPolygon(1, robotsOffensiveRect, world_ptr, yield);
             robotInPolygon(5, robotsOffensiveRect, world_ptr, yield);
 
@@ -48,12 +54,6 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
             robotInPolygon(0, robotsDefensiveRect, world_ptr, yield);
             robotInPolygon(2, robotsDefensiveRect, world_ptr, yield);
             robotInPolygon(3, robotsDefensiveRect, world_ptr, yield);
-
-            // Robot 4 is the only robot allowed to be in the center circle and start
-            // the kickoff
-            robotInCenterCircle(4, world_ptr, yield);
-            robotReceivedBall(4, world_ptr, yield);
-            ballKicked(Angle::zero(), world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {

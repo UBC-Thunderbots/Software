@@ -3,7 +3,7 @@
 #include <Box2D/Box2D.h>
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/multithreading/thread_safe_buffer.h"
+#include "software/multithreading/thread_safe_buffer.hpp"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/physics/physics_field.h"
 #include "software/simulation/physics/physics_robot.h"
@@ -89,11 +89,6 @@ class PhysicsWorld
      * @param ball_state The new ball state
      */
     void setBallState(const BallState& ball_state);
-
-    /**
-     * Removes the ball from the physics world
-     */
-    void removeBall();
 
     /**
      * Adds robots to the yellow team with the given initial states.

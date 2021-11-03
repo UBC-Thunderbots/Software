@@ -4,8 +4,8 @@ package(default_visibility = ["//software/gui:__subpackages__"])
 
 qt_cc_library(
     name = "dynamic_parameter_widget",
-    src = "dynamic_parameter_widget.cpp",
-    hdr = "dynamic_parameter_widget.h",
+    srcs = ["dynamic_parameter_widget.cpp"],
+    hdrs = ["dynamic_parameter_widget.h"],
     deps = [
         "//shared/parameter",
         "//shared/parameter:cpp_configs",
