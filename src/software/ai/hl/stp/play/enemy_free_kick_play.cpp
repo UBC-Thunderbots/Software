@@ -6,7 +6,6 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
-#include "software/ai/hl/stp/tactic/shadow_free_kicker_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
@@ -33,12 +32,12 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         play_config->getRobotNavigationObstacleConfig());
 
     // These robots will both block the enemy robot taking a free kick
-        std::array<std::shared_ptr<ShadowEnemyTactic>,2> shadow_free_kicker = 
-            {std::make_shared<ShadowEnemyTactic>(),std::make_shared<ShadowEnemyTactic>()} ;
+    std::array<std::shared_ptr<ShadowEnemyTactic>, 2> shadow_free_kicker = {
+        std::make_shared<ShadowEnemyTactic>(), std::make_shared<ShadowEnemyTactic>()};
 
     // Init Shadow Enemy Tactics for extra robots
-    std::array<std::shared_ptr<ShadowEnemyTactic>,2> shadow_potential_receivers      = 
-            {std::make_shared<ShadowEnemyTactic>(),std::make_shared<ShadowEnemyTactic>()} ;
+    std::array<std::shared_ptr<ShadowEnemyTactic>, 2> shadow_potential_receivers = {
+        std::make_shared<ShadowEnemyTactic>(), std::make_shared<ShadowEnemyTactic>()};
 
     // Init Move Tactics for extra robots (These will be used if there are no robots to
     // shadow)
@@ -54,12 +53,12 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
-        if(enemy_threats.size()>=1)
+        if (enemy_threats.size() >= 1)
         {
-            std::get<0>(shadow_free_kicker)->updateControlParams(enemy_threats.at(0),
-                                                    ROBOT_MAX_RADIUS_METERS * 3);
-            std::get<1>(shadow_free_kicker)->updateControlParams(enemy_threats.at(0),
-                                                    ROBOT_MAX_RADIUS_METERS * 3);
+            std::get<0>(shadow_free_kicker)
+                ->updateControlParams(enemy_threats.at(0), ROBOT_MAX_RADIUS_METERS * 3);
+            std::get<1>(shadow_free_kicker)
+                ->updateControlParams(enemy_threats.at(0), ROBOT_MAX_RADIUS_METERS * 3);
         }
 
         // Add Freekick shadower tactics
@@ -121,10 +120,10 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         }
         if (enemy_threats.size() >= 3)
         {
-            std::get<0>(shadow_potential_receivers)->updateControlParams(enemy_threats.at(1),
-                                                    ROBOT_MAX_RADIUS_METERS * 3);
-            std::get<1>(shadow_potential_receivers)->updateControlParams(enemy_threats.at(2),
-                                                         ROBOT_MAX_RADIUS_METERS * 3);
+            std::get<0>(shadow_potential_receivers)
+                ->updateControlParams(enemy_threats.at(1), ROBOT_MAX_RADIUS_METERS * 3);
+            std::get<1>(shadow_potential_receivers)
+                ->updateControlParams(enemy_threats.at(2), ROBOT_MAX_RADIUS_METERS * 3);
 
             tactics_to_run[0].emplace_back(std::get<0>(shadow_potential_receivers));
             tactics_to_run[0].emplace_back(std::get<1>(shadow_potential_receivers));
