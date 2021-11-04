@@ -1,0 +1,36 @@
+geometry {
+	line_width: 0.01
+	field_width: 6.0
+	field_height: 9.0
+	boundary_width: 0.3
+	goal_width: 1.0
+	goal_depth: 0.18
+	goal_wall_width: 0.02
+	center_circle_radius: 0.5
+	defense_radius: 1.0
+	defense_stretch: 2.0
+	free_kick_from_defense_dist: 0.2
+	penalty_spot_from_field_line_dist: 1.8
+	penalty_line_from_spot_dist: 0.4
+	goal_height: 0.155
+	defense_width: 2.0
+	defense_height: 1.0
+	type: TYPE_2018
+}
+camera_setup {
+  camera_id: 0
+  focal_length: 390
+  principal_point_x: 300
+  principal_point_y: 300
+  distortion: 0.2
+  q0: 0.7
+  q1: 0.7
+  q2: 0.7
+  q3: 0.7
+  tx: 0
+  ty: 0
+  tz: 3500
+  derived_camera_world_tx: 0
+  derived_camera_world_ty: 0
+  derived_camera_world_tz: 6000
+}

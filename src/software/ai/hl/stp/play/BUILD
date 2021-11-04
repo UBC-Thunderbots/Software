@@ -16,7 +16,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     alwayslink = True,
 )
@@ -37,7 +37,7 @@ cc_library(
         "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/ai/passing:pass_generator",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
         "//software/world:ball",
     ],
     alwayslink = True,
@@ -60,9 +60,26 @@ cc_library(
         "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
         "//software/world:game_state",
         "//software/world:team",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "enemy_ball_placement_play",
+    srcs = ["enemy_ball_placement_play.cpp"],
+    hdrs = ["enemy_ball_placement_play.h"],
+    deps = [
+        ":play",
+        "//shared:constants",
+        "//shared/parameter:cpp_configs",
+        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
+        "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
+        "//software/util/generic_factory",
+        "//software/world:game_state",
     ],
     alwayslink = True,
 )
@@ -83,7 +100,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
         "//software/world:game_state",
     ],
     alwayslink = True,
@@ -99,7 +116,7 @@ cc_library(
         "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     alwayslink = True,
 )
@@ -114,7 +131,7 @@ cc_library(
         "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     alwayslink = True,
 )
@@ -129,6 +146,7 @@ cc_library(
         "//shared:constants",
         "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
+        "//software/ai/evaluation:find_open_areas",
         "//software/ai/evaluation:possession",
         "//software/ai/hl/stp/tactic:receiver_tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
@@ -138,7 +156,7 @@ cc_library(
         "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/ai/passing:pass_generator",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
         "//software/world:ball",
     ],
     alwayslink = True,
@@ -158,7 +176,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     alwayslink = True,
 )
@@ -175,7 +193,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:kickoff_chip_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     alwayslink = True,
 )
@@ -192,7 +210,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/move_goalie_to_goal_line:move_goalie_to_goal_line_tactic",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     alwayslink = True,
 )
@@ -210,7 +228,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/penalty_kick:penalty_kick_tactic",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     alwayslink = True,
 )
@@ -233,7 +251,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
         "//software/world:game_state",
     ],
     alwayslink = True,
@@ -259,7 +277,7 @@ cc_library(
         "//software/ai/passing:pass_generator",
         "//software/geom/algorithms",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     alwayslink = True,
 )
@@ -276,7 +294,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     alwayslink = True,
 )
@@ -299,6 +317,7 @@ cc_library(
         ":corner_kick_play",
         ":defense_play",
         ":dribbling_parcour_play",
+        ":enemy_ball_placement_play",
         ":enemy_free_kick_play",
         ":example_play",
         ":free_kick_play",
@@ -347,6 +366,22 @@ cc_test(
 )
 
 cc_test(
+    name = "kickoff_friendly_play_er_force_sim_test",
+    srcs = ["kickoff_friendly_play_er_force_sim_test.cpp"],
+    deps = [
+        "//shared/test_util:tbots_gtest_main",
+        "//software/ai/hl/stp/play:kickoff_friendly_play",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
+        "//software/simulated_tests/non_terminating_validation_functions",
+        "//software/simulated_tests/terminating_validation_functions",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/test_util",
+        "//software/time:duration",
+        "//software/world",
+    ],
+)
+
+cc_test(
     name = "kickoff_enemy_play_test",
     srcs = ["kickoff_enemy_play_test.cpp"],
     deps = [
@@ -384,6 +419,22 @@ cc_test(
     deps = [
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:defense_play",
+        "//software/simulated_tests:simulated_play_test_fixture",
+        "//software/simulated_tests/non_terminating_validation_functions",
+        "//software/simulated_tests/terminating_validation_functions",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/test_util",
+        "//software/time:duration",
+        "//software/world",
+    ],
+)
+
+cc_test(
+    name = "enemy_ball_placement_play_test",
+    srcs = ["enemy_ball_placement_play_test.cpp"],
+    deps = [
+        "//shared/test_util:tbots_gtest_main",
+        "//software/ai/hl/stp/play:enemy_ball_placement_play",
         "//software/simulated_tests:simulated_play_test_fixture",
         "//software/simulated_tests/non_terminating_validation_functions",
         "//software/simulated_tests/terminating_validation_functions",
@@ -539,7 +590,7 @@ cc_library(
         "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     alwayslink = True,
 )
@@ -571,7 +622,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     alwayslink = True,
 )
@@ -603,7 +654,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     alwayslink = True,
 )
@@ -635,7 +686,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     alwayslink = True,
 )

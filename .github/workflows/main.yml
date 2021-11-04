@@ -62,7 +62,7 @@ jobs:
       - name: Jetson Nano Build
         run: |
          cd src
-         bazel build --cpu=jetson_nano //software/simulation/... //firmware/app/...
+         bazel build --cpu=jetson_nano //firmware/app/...
              
   simulated-gameplay-tests:
     name: Simulated Gameplay Tests

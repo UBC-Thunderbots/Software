@@ -46,12 +46,6 @@ void Simulator::setBallState(const BallState& ball_state)
     }
 }
 
-void Simulator::removeBall()
-{
-    simulator_ball.reset();
-    physics_world.removeBall();
-}
-
 void Simulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
 {
     physics_world.addYellowRobots(robots);

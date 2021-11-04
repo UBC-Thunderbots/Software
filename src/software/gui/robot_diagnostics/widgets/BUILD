@@ -4,8 +4,8 @@ package(default_visibility = ["//software/gui/robot_diagnostics:__subpackages__"
 
 qt_cc_library(
     name = "robot_diagnostics_gui",
-    src = "robot_diagnostics_gui.cpp",
-    hdr = "robot_diagnostics_gui.h",
+    srcs = ["robot_diagnostics_gui.cpp"],
+    hdrs = ["robot_diagnostics_gui.h"],
     deps = [
         ":chicker",
         ":dribbler",
@@ -26,8 +26,8 @@ qt_cc_library(
 
 qt_cc_library(
     name = "chicker",
-    src = "chicker.cpp",
-    hdr = "chicker.h",
+    srcs = ["chicker.cpp"],
+    hdrs = ["chicker.h"],
     deps = [
         "//software/gui/generic_widgets/slider",
         "//software/gui/robot_diagnostics/ui:main_widget",
@@ -38,8 +38,8 @@ qt_cc_library(
 
 qt_cc_library(
     name = "dribbler",
-    src = "dribbler.cpp",
-    hdr = "dribbler.h",
+    srcs = ["dribbler.cpp"],
+    hdrs = ["dribbler.h"],
     deps = [
         "//shared:constants",
         "//shared:robot_constants",
@@ -51,8 +51,8 @@ qt_cc_library(
 
 qt_cc_library(
     name = "drive",
-    src = "drive.cpp",
-    hdr = "drive.h",
+    srcs = ["drive.cpp"],
+    hdrs = ["drive.h"],
     deps = [
         "//software/gui/generic_widgets/slider",
         "//software/gui/robot_diagnostics/ui:main_widget",
@@ -63,8 +63,8 @@ qt_cc_library(
 
 qt_cc_library(
     name = "sensor_status",
-    src = "sensor_status.cpp",
-    hdr = "sensor_status.h",
+    srcs = ["sensor_status.cpp"],
+    hdrs = ["sensor_status.h"],
     deps = [
         ":decimal_progress_bar",
         "//proto:sensor_msg_cc_proto",
@@ -77,8 +77,8 @@ qt_cc_library(
 
 qt_cc_library(
     name = "leds",
-    src = "leds.cpp",
-    hdr = "leds.h",
+    srcs = ["leds.cpp"],
+    hdrs = ["leds.h"],
     deps = [
         "//software/gui/robot_diagnostics/ui:main_widget",
         "@qt//:qt_widgets",
@@ -87,8 +87,8 @@ qt_cc_library(
 
 qt_cc_library(
     name = "robot_selection",
-    src = "robot_selection.cpp",
-    hdr = "robot_selection.h",
+    srcs = ["robot_selection.cpp"],
+    hdrs = ["robot_selection.h"],
     deps = [
         "//shared:constants",
         "//shared:robot_constants",
@@ -100,8 +100,8 @@ qt_cc_library(
 
 qt_cc_library(
     name = "decimal_progress_bar",
-    src = "decimal_progress_bar.cpp",
-    hdr = "decimal_progress_bar.h",
+    srcs = ["decimal_progress_bar.cpp"],
+    hdrs = ["decimal_progress_bar.h"],
     deps = [
         "@qt//:qt_widgets",
     ],
