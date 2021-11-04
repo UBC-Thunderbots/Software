@@ -4,8 +4,8 @@ package(default_visibility = ["//software/gui:__subpackages__"])
 
 qt_cc_library(
     name = "draw_function_visualizer",
-    src = "draw_function_visualizer.cpp",
-    hdr = "draw_function_visualizer.h",
+    srcs = ["draw_function_visualizer.cpp"],
+    hdrs = ["draw_function_visualizer.h"],
     deps = [
         ":zoomable_qgraphics_view",
         "//software/geom:rectangle",
@@ -20,8 +20,8 @@ qt_cc_library(
 
 qt_cc_library(
     name = "zoomable_qgraphics_view",
-    src = "zoomable_qgraphics_view.cpp",
-    hdr = "zoomable_qgraphics_view.h",
+    srcs = ["zoomable_qgraphics_view.cpp"],
+    hdrs = ["zoomable_qgraphics_view.h"],
     deps = [
         "@qt//:qt_gui",
         "@qt//:qt_widgets",

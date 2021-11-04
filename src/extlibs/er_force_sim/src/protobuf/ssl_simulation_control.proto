@@ -1,0 +1,94 @@
+syntax            = "proto2";
+option go_package = "github.com/RoboCup-SSL/ssl-simulation-protocol/pkg/sim";
+
+import "extlibs/er_force_sim/src/protobuf/ssl_game_controller_common.proto";
+import "extlibs/er_force_sim/src/protobuf/ssl_simulation_config.proto";
+import "extlibs/er_force_sim/src/protobuf/ssl_simulation_error.proto";
+
+package sslsim;
+
+// WARNING for all of these messages: They are used internally in full vision
+// coordinate systems (mm / mm per second) External users will send and recieve
+// messages in the stipulated units (meters / meters per seconds) Be careful
+// when converting between these two uses.
+
+// Teleport the ball to a new location and optionally set it to some velocity
+message TeleportBall
+{
+    // x-coordinate [m] (internally in mm, see comment on the top)
+    optional float x = 1;
+    // y-coordinate [m] (internally in mm, see comment on the top)
+    optional float y = 2;
+    // z-coordinate (height) [m] (internally in mm, see comment on the top)
+    optional float z = 3;
+    // Velocity in x-direction [m/s] (internally in mm, see comment on the top)
+    optional float vx = 4;
+    // Velocity in y-direction [m/s] (internally in mm, see comment on the top)
+    optional float vy = 5;
+    // Velocity in z-direction [m/s] (internally in mm, see comment on the top)
+    optional float vz = 6;
+    // Teleport the ball safely to the target, for example by
+    // moving robots out of the way in case of collision and set speed of robots
+    // close-by to zero
+    optional bool teleport_safely = 7 [default = false];
+    // Adapt the angular ball velocity such that the ball is rolling
+    optional bool roll = 8 [default = false];
+    // Instead of teleporting the ball, apply some force to make sure
+    // the ball reaches the required position soon (velocity is ignored if true)
+    optional bool by_force = 9 [default = false];
+}
+
+// Teleport a robot to some location and give it a velocity
+message TeleportRobot
+{
+    // Robot id to teleport
+    required gameController.BotId id = 1;
+    // x-coordinate [m] (internally in mm, see comment on the top)
+    optional float x = 2;
+    // y-coordinate [m] (internally in mm, see comment on the top)
+    optional float y = 3;
+    // Orientation [rad], measured from the x-axis counter-clockwise
+    optional float orientation = 4;
+    // Global velocity [m/s] towards x-axis (internally in mm, see comment on the
+    // top)
+    optional float v_x = 5 [default = 0];
+    // Global velocity [m/s] towards y-axis (internally in mm, see comment on the
+    // top)
+    optional float v_y = 6 [default = 0];
+    // Angular velocity [rad/s]
+    optional float v_angular = 7 [default = 0];
+    // Robot should be present on the field?
+    // true -> robot will be added, if it does not exist yet
+    // false -> robot will be removed, if it is present
+    optional bool present = 8;
+    // Instead of teleporting, apply some force to make sure
+    // the robot reaches the required position soon (velocity is ignored if true)
+    optional bool by_force = 9 [default = false];
+}
+
+// Control the simulation
+message SimulatorControl
+{
+    // Teleport the ball
+    optional TeleportBall teleport_ball = 1;
+    // Teleport robots
+    repeated TeleportRobot teleport_robot = 2;
+    // Change the simulation speed
+    optional float simulation_speed = 3;
+}
+
+// Command from the connected client to the simulator
+message SimulatorCommand
+{
+    // Control the simulation
+    optional SimulatorControl control = 1;
+    // Configure the simulation
+    optional sslsim.SimulatorConfig config = 2;
+}
+
+// Response of the simulator to the connected client
+message SimulatorResponse
+{
+    // List of errors, like using unsupported features
+    repeated SimulatorError errors = 1;
+}

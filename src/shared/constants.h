@@ -120,3 +120,8 @@ static const unsigned char ESTOP_STOP_MSG = 0;
 #define ARDUINO_ID_LENGTH 5
 static const char ARDUINO_VENDOR_ID[ARDUINO_ID_LENGTH]  = "2341";
 static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
+
+// ESP32
+
+// UART bard rate used to communication with the ESP32
+static const long ESP32_BAUD_RATE = 9600;
