@@ -43,7 +43,7 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_play)
             // Two robots defending close to the enemy robot performing the free kick
             Rectangle shadowing_free_kicker_rect(Point(0, 3), Point(1, 2));
             robotInPolygon(1, shadowing_free_kicker_rect, world_ptr, yield);
-            robotInPolygon(2, shadowing_free_kicker_rect, world_ptr, yield);
+            robotInPolygon(3, shadowing_free_kicker_rect, world_ptr, yield);
 
             // Two friendly robots in position to shadow enemy robots. Rectangles are
             // chosen to be generally in the way of the the front 2 enemy robots and the
@@ -60,7 +60,7 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_play)
             Rectangle crease_defender_rect(
                 goalie_position,
                 Point(goalie_position.x() + 0.2, goalie_position.y() - 0.2));
-            robotInPolygon(3, crease_defender_rect, world_ptr, yield);
+            robotInPolygon(2, crease_defender_rect, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {

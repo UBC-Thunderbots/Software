@@ -32,18 +32,13 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
     auto crease_defender_tactic = std::make_shared<CreaseDefenderTactic>(
         play_config->getRobotNavigationObstacleConfig());
 
-    // Init FreeKickShadower tactics (these robots will both block the enemy robot taking
-    // a free kick, at most we will have 2)
-    auto shadow_free_kicker_1 = std::make_shared<ShadowFreekickerTactic>(
-        ShadowFreekickerTactic::LEFT, world.enemyTeam(), world.ball(), world.field(),
-        true);
-    auto shadow_free_kicker_2 = std::make_shared<ShadowFreekickerTactic>(
-        ShadowFreekickerTactic::RIGHT, world.enemyTeam(), world.ball(), world.field(),
-        true);
+    // These robots will both block the enemy robot taking a free kick
+        std::array<std::shared_ptr<ShadowEnemyTactic>,2> shadow_free_kicker = 
+            {std::make_shared<ShadowEnemyTactic>(),std::make_shared<ShadowEnemyTactic>()} ;
 
     // Init Shadow Enemy Tactics for extra robots
-    auto shadow_tactic_main      = std::make_shared<ShadowEnemyTactic>();
-    auto shadow_tactic_secondary = std::make_shared<ShadowEnemyTactic>();
+    std::array<std::shared_ptr<ShadowEnemyTactic>,2> shadow_potential_receivers      = 
+            {std::make_shared<ShadowEnemyTactic>(),std::make_shared<ShadowEnemyTactic>()} ;
 
     // Init Move Tactics for extra robots (These will be used if there are no robots to
     // shadow)
@@ -59,9 +54,17 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
+        if(enemy_threats.size()>=1)
+        {
+            std::get<0>(shadow_free_kicker)->updateControlParams(enemy_threats.at(0),
+                                                    ROBOT_MAX_RADIUS_METERS * 3);
+            std::get<1>(shadow_free_kicker)->updateControlParams(enemy_threats.at(0),
+                                                    ROBOT_MAX_RADIUS_METERS * 3);
+        }
+
         // Add Freekick shadower tactics
-        tactics_to_run[0].emplace_back(shadow_free_kicker_1);
-        tactics_to_run[0].emplace_back(shadow_free_kicker_2);
+        tactics_to_run[0].emplace_back(std::get<0>(shadow_free_kicker));
+        tactics_to_run[0].emplace_back(std::get<1>(shadow_free_kicker));
         // Add Crease defender tactic on side of open enemy threats
         if (enemy_threats.size() >= 4)
         {
@@ -84,10 +87,9 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         tactics_to_run[0].emplace_back(crease_defender_tactic);
 
-
         // Assign ShadowEnemy tactics until we have every enemy covered. If there are not
         // enough threats to shadow, move our robots to block the friendly net
-        if (enemy_threats.size() == 0)
+        if (enemy_threats.size() <= 1)
         {
             move_tactic_main->updateControlParams(
                 world.field().friendlyGoalCenter() +
@@ -105,10 +107,8 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             tactics_to_run[0].emplace_back(move_tactic_main);
             tactics_to_run[0].emplace_back(move_tactic_secondary);
         }
-        if (enemy_threats.size() == 1)
+        if (enemy_threats.size() == 2)
         {
-            shadow_tactic_main->updateControlParams(enemy_threats.at(1),
-                                                    ROBOT_MAX_RADIUS_METERS * 3);
             move_tactic_main->updateControlParams(
                 world.field().friendlyGoalCenter() +
                     Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
@@ -116,18 +116,18 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                     .orientation(),
                 0);
 
-            tactics_to_run[0].emplace_back(shadow_tactic_main);
+            tactics_to_run[0].emplace_back(std::get<0>(shadow_potential_receivers));
             tactics_to_run[0].emplace_back(move_tactic_main);
         }
-        if (enemy_threats.size() >= 2)
+        if (enemy_threats.size() >= 3)
         {
-            shadow_tactic_main->updateControlParams(enemy_threats.at(1),
+            std::get<0>(shadow_potential_receivers)->updateControlParams(enemy_threats.at(1),
                                                     ROBOT_MAX_RADIUS_METERS * 3);
-            shadow_tactic_secondary->updateControlParams(enemy_threats.at(2),
+            std::get<1>(shadow_potential_receivers)->updateControlParams(enemy_threats.at(2),
                                                          ROBOT_MAX_RADIUS_METERS * 3);
 
-            tactics_to_run[0].emplace_back(shadow_tactic_main);
-            tactics_to_run[0].emplace_back(shadow_tactic_secondary);
+            tactics_to_run[0].emplace_back(std::get<0>(shadow_potential_receivers));
+            tactics_to_run[0].emplace_back(std::get<1>(shadow_potential_receivers));
         }
 
         // yield the Tactics this Play wants to run, in order of priority
