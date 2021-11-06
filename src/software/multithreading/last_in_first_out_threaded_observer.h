@@ -1,5 +1,5 @@
 #pragma once
-#include "software/multithreading/threaded_observer.h"
+#include "software/multithreading/threaded_observer.hpp"
 
 /**
  * The general usage of this class should be to extend it, then override

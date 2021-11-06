@@ -4,8 +4,8 @@ package(default_visibility = ["//software/gui:__subpackages__"])
 
 qt_cc_library(
     name = "slider",
-    src = "slider.cpp",
-    hdr = "slider.h",
+    srcs = ["slider.cpp"],
+    hdrs = ["slider.h"],
     deps = [
         "@qt//:qt_widgets",
     ],

@@ -73,8 +73,8 @@ Polygon Polygon::expand(const Vector& expansion_vector) const
     //            A'--------D'
     //
 
-    std::vector<Point> expanded_points;
     Point centroid_point = centroid();
+    std::vector<Point> expanded_points;
 
     // left and right is with respect to the vector pointing straight up
     enum SideOfDividingLine
@@ -116,6 +116,33 @@ Polygon Polygon::expand(const Vector& expansion_vector) const
             expanded_points.push_back(point);
         }
     }
+    return Polygon(expanded_points);
+}
+
+Polygon Polygon::expand(double expansion_amount) const
+{
+    if (expansion_amount < 0)
+    {
+        throw std::invalid_argument(
+            "Polygon::expand: expansion_amount must be non-negative");
+    }
+    Point centroid_point = centroid();
+    std::vector<Point> expanded_points;
+    expanded_points.reserve(points_.size());
+
+    Vector last_expansion =
+        (segments_[0].midPoint() - centroid_point).normalize(expansion_amount);
+    Point first_point = segments_[0].getStart() + last_expansion;
+    for (size_t i = 1; i < segments_.size(); i++)
+    {
+        Vector current_expansion =
+            (segments_[i].midPoint() - centroid_point).normalize(expansion_amount);
+        expanded_points.emplace_back(segments_[i].getStart() + current_expansion +
+                                     last_expansion);
+        last_expansion = current_expansion;
+    }
+    expanded_points.emplace_back(first_point + last_expansion);
+
     return Polygon(expanded_points);
 }
 
