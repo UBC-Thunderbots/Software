@@ -14,6 +14,7 @@ proto_library(
         "tbots_software_msgs.proto",
         "tbots_timestamp_msg.proto",
         "vision.proto",
+        "game_state.proto",
     ],
     deps = [
         "@nanopb//:nanopb_options_proto",
@@ -39,6 +40,7 @@ py_proto_library(
         "tbots_software_msgs.proto",
         "tbots_timestamp_msg.proto",
         "vision.proto",
+        "game_state.proto",
     ],
     deps = [
         "@nanopb//:nanopb_options_py_proto",
