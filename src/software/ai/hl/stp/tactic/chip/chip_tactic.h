@@ -70,4 +70,4 @@ class ChipTactic : public Tactic
     ChipFSM::ControlParams control_params;
 };
 
-COPY_CLASS(KickoffChipTactic, ChipTactic)
+COPY_TACTIC(KickoffChipTactic, ChipTactic)
