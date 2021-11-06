@@ -1,11 +1,11 @@
 #pragma once
 
-#include <mutex>
-#include <random>
-#include <thread>
 #include <algorithm>
 #include <chrono>
+#include <mutex>
 #include <numeric>
+#include <random>
+#include <thread>
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/passing/cost_function.h"
