@@ -114,6 +114,8 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 (world.ball().position() - world.field().friendlyGoalCenter())
                     .orientation(),
                 0);
+            std::get<0>(shadow_potential_receivers)
+                ->updateControlParams(enemy_threats.at(1), ROBOT_MAX_RADIUS_METERS * 3);
 
             tactics_to_run[0].emplace_back(std::get<0>(shadow_potential_receivers));
             tactics_to_run[0].emplace_back(move_tactic_main);
