@@ -187,14 +187,14 @@ TEST(HaltPlayInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
     ASSERT_FALSE(penalty_kick_enemy_play.isApplicable(world));
     ASSERT_FALSE(penalty_kick_enemy_play.invariantHolds(world));
 
-    world.updateGameState(::TestUtil::createGameState(
-            RefereeCommand::NORMAL_START, RefereeCommand::NORMAL_START));
+    world.updateGameState(::TestUtil::createGameState(RefereeCommand::NORMAL_START,
+                                                      RefereeCommand::NORMAL_START));
 
     ASSERT_FALSE(penalty_kick_enemy_play.isApplicable(world));
     ASSERT_FALSE(penalty_kick_enemy_play.invariantHolds(world));
 
     world.updateGameState(::TestUtil::createGameState(
-            RefereeCommand::PREPARE_PENALTY_US, RefereeCommand::PREPARE_PENALTY_US));
+        RefereeCommand::PREPARE_PENALTY_US, RefereeCommand::PREPARE_PENALTY_US));
 
     ASSERT_FALSE(penalty_kick_enemy_play.isApplicable(world));
     ASSERT_FALSE(penalty_kick_enemy_play.invariantHolds(world));
