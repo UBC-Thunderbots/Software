@@ -1,9 +1,9 @@
-#include "software/multithreading/observer_subject_adapter.h"
+#include "software/multithreading/observer_subject_adapter.hpp"
 
 #include <gtest/gtest.h>
 
-#include "software/multithreading/observer.h"
-#include "software/multithreading/subject.h"
+#include "software/multithreading/observer.hpp"
+#include "software/multithreading/subject.hpp"
 
 class TestObserver : public Observer<std::string>
 {

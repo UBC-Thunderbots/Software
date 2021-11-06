@@ -1,4 +1,4 @@
-#include "software/multithreading/observer.h"
+#include "software/multithreading/observer.hpp"
 
 #include <gtest/gtest.h>
 

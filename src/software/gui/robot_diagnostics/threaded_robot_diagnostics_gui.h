@@ -11,8 +11,8 @@
 #include "software/geom/rectangle.h"
 #include "software/gui/robot_diagnostics/widgets/robot_diagnostics_gui.h"
 #include "software/multithreading/first_in_first_out_threaded_observer.h"
-#include "software/multithreading/subject.h"
-#include "software/multithreading/thread_safe_buffer.h"
+#include "software/multithreading/subject.hpp"
+#include "software/multithreading/thread_safe_buffer.hpp"
 #include "software/world/world.h"
 
 /**
