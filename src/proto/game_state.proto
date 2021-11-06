@@ -9,45 +9,45 @@ message GameState
 {
     enum PlayState
     {
-        PlayState_HALT = 0;
-        PlayState_STOP = 1;
-        PlayState_SETUP = 2;
-        PlayState_READY = 3;
+        PlayState_HALT    = 0;
+        PlayState_STOP    = 1;
+        PlayState_SETUP   = 2;
+        PlayState_READY   = 3;
         PlayState_PLAYING = 4;
     }
     enum RestartReason
     {
-        NONE = 0;
-        KICKOFF = 1;
-        DIRECT = 2;
-        INDIRECT = 3;
-        PENALTY = 4;
+        NONE           = 0;
+        KICKOFF        = 1;
+        DIRECT         = 2;
+        INDIRECT       = 3;
+        PENALTY        = 4;
         BALL_PLACEMENT = 5;
     }
     enum RefereeCommand
     {
-        HALT = 0;
-        STOP = 1;
-        NORMAL_START = 2;
-        FORCE_START = 3;
-        PREPARE_KICKOFF_US = 4;
+        HALT                 = 0;
+        STOP                 = 1;
+        NORMAL_START         = 2;
+        FORCE_START          = 3;
+        PREPARE_KICKOFF_US   = 4;
         PREPARE_KICKOFF_THEM = 5;
-        PREPARE_PENALTY_US = 6;
+        PREPARE_PENALTY_US   = 6;
         PREPARE_PENALTY_THEM = 7;
-        DIRECT_FREE_US = 8;
-        DIRECT_FREE_THEM = 9;
-        INDIRECT_FREE_US = 10;
-        INDIRECT_FREE_THEM = 11;
-        TIMEOUT_US = 12;
-        TIMEOUT_THEM = 13;
-        GOAL_US = 14;
-        GOAL_THEM = 15;
-        BALL_PLACEMENT_US = 16;
-        BALL_PLACEMENT_THEM = 17;
+        DIRECT_FREE_US       = 8;
+        DIRECT_FREE_THEM     = 9;
+        INDIRECT_FREE_US     = 10;
+        INDIRECT_FREE_THEM   = 11;
+        TIMEOUT_US           = 12;
+        TIMEOUT_THEM         = 13;
+        GOAL_US              = 14;
+        GOAL_THEM            = 15;
+        BALL_PLACEMENT_US    = 16;
+        BALL_PLACEMENT_THEM  = 17;
     }
-    required PlayState play_state = 1;
+    required PlayState play_state         = 1;
     required RestartReason restart_reason = 2;
-    required RefereeCommand command = 3;
-    required BallState ball_state = 4;
-    required Point ball_placement_point = 5;
+    required RefereeCommand command       = 3;
+    required BallState ball_state         = 4;
+    required Point ball_placement_point   = 5;
 }
