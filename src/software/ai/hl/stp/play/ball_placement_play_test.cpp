@@ -46,3 +46,23 @@ TEST_F(BallPlacementPlayTest, test_ball_placement)
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
+TEST(FriendlyBallPlacementInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
+{
+    auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
+
+    auto world = ::TestUtil::createBlankTestingWorld();
+
+    auto ball_placement = BallPlacementPlay(play_config);
+
+    world.updateGameState(::TestUtil::createGameState(RefereeCommand::BALL_PLACEMENT_US,
+                                                      RefereeCommand::BALL_PLACEMENT_US));
+
+    ASSERT_TRUE(ball_placement.isApplicable(world));
+    ASSERT_TRUE(ball_placement.invariantHolds(world));
+
+    world.updateGameState(::TestUtil::createGameState(RefereeCommand::BALL_PLACEMENT_THEM,
+                                                      RefereeCommand::BALL_PLACEMENT_US));
+
+    ASSERT_FALSE(ball_placement.isApplicable(world));
+    ASSERT_FALSE(ball_placement.invariantHolds(world));
+}
