@@ -94,8 +94,7 @@ cc_test(
 cc_library(
     name = "pass_evaluation",
     hdrs = [
-        "pass_evaluation.h",
-        "pass_evaluation.tpp",
+        "pass_evaluation.hpp"
     ],
     deps = [
         ":field_pitch_division",
