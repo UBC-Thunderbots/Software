@@ -123,8 +123,7 @@ cc_test(
 cc_library(
     name = "pass_generator",
     hdrs = [
-        "pass_generator.h",
-        "pass_generator.tpp",
+        "pass_generator.hpp"
     ],
     deps = [
         ":cost_functions",
