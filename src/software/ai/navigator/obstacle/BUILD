@@ -3,8 +3,8 @@ package(default_visibility = ["//software/ai/navigator:__subpackages__"])
 cc_library(
     name = "obstacle",
     hdrs = [
-        "obstacle.h",
-        "obstacle.tpp",
+        "obstacle.hpp"
+
     ],
     # We expose obstacle so that it can visualized
     visibility = ["//visibility:public"],
