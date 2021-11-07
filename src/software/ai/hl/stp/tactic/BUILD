@@ -6,7 +6,7 @@ cc_test(
     deps = [
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
-    ],
+    ],/SOft
 )
 
 cc_library(

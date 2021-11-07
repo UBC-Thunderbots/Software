@@ -10,21 +10,21 @@
 #include "software/ai/intent/intent.h"
 #include "software/world/world.h"
 
-#define COPY_TACTIC(new_class, parent_class)                                              \
+#define COPY_TACTIC(new_class, parent_class)                                             \
     class new_class : public parent_class                                                \
     {                                                                                    \
-        using parent_class::parent_class; \
-\
+        using parent_class::parent_class;                                                \
+                                                                                         \
         void accept(TacticVisitor &visitor) const                                        \
         {                                                                                \
             visitor.visit(*this);                                                        \
-        } \
-};
+        }                                                                                \
+    };
 
 // TODO (#1888): remove this typedef
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with
-typedef boost::coroutines2::coroutine <std::shared_ptr<Action>> ActionCoroutine;
+typedef boost::coroutines2::coroutine<std::shared_ptr<Action>> ActionCoroutine;
 
 /**
  * In the STP framework, a Tactic represents a role or objective for a single robot.
@@ -38,8 +38,9 @@ typedef boost::coroutines2::coroutine <std::shared_ptr<Action>> ActionCoroutine;
  * Tactics are stateful, and use Intents to implement their behaviour. They also
  * make heavy use of our Evaluation functions in order to help them make decisions.
  */
-class Tactic {
-public:
+class Tactic
+{
+   public:
     /**
      * Creates a new Tactic. The Tactic will initially have no Robot assigned to it.
      *
@@ -151,12 +152,12 @@ public:
 
     virtual ~Tactic() = default;
 
-protected:
+   protected:
     // TODO (#1888): remove this field
     // The robot performing this Tactic
     std::optional<Robot> robot_;
 
-private:
+   private:
     // TODO (#1888): remove this function
     /**
      * A wrapper function for the calculateNextAction function.
