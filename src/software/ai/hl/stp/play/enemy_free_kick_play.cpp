@@ -53,6 +53,9 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
+        // shadow free kicker should shadow the robot with the ball and if no such enemy
+        // exists, then it will default to positioning between the ball and the friendly
+        // defense area
         if (enemy_threats.size() >= 1)
         {
             std::get<0>(shadow_free_kicker)
@@ -90,6 +93,8 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         // enough threats to shadow, move our robots to block the friendly net
         if (enemy_threats.size() <= 1)
         {
+            // Since the first enemy threat is covered by the shadow_free_kicker, just
+            // move to block the net
             move_tactic_main->updateControlParams(
                 world.field().friendlyGoalCenter() +
                     Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
@@ -108,6 +113,8 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         }
         if (enemy_threats.size() == 2)
         {
+            // Shadow the second most threatening enemy threat and move one robot to block
+            // the net
             move_tactic_main->updateControlParams(
                 world.field().friendlyGoalCenter() +
                     Vector(0, 2 * ROBOT_MAX_RADIUS_METERS),
@@ -122,6 +129,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
         }
         if (enemy_threats.size() >= 3)
         {
+            // Shadow the second and third most threatening enemy threats
             std::get<0>(shadow_potential_receivers)
                 ->updateControlParams(enemy_threats.at(1), ROBOT_MAX_RADIUS_METERS * 3);
             std::get<1>(shadow_potential_receivers)
