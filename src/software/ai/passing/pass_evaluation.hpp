@@ -10,11 +10,11 @@
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/passing/field_pitch_division.h"
+#include "software/ai/passing/pass.h"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/geom/point.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
-#include "software/ai/passing/pass.h"
 
 template <class ZoneEnum>
 using ZonePassMap = std::unordered_map<ZoneEnum, PassWithRating>;
