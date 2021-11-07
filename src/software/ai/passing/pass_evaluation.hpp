@@ -14,6 +14,7 @@
 #include "software/geom/point.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
+#include "software/ai/passing/pass.h"
 
 template <class ZoneEnum>
 using ZonePassMap = std::unordered_map<ZoneEnum, PassWithRating>;
@@ -95,7 +96,6 @@ class PassEvaluation
     // The timestamp when this evaluation was created
     Timestamp timestamp_;
 };
-#include "software/ai/passing/pass.h"
 template <class ZoneEnum>
 PassEvaluation<ZoneEnum>::PassEvaluation(
     std::shared_ptr<const FieldPitchDivision<ZoneEnum>> pitch_division,
