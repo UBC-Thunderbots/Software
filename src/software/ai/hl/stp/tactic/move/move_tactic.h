@@ -81,3 +81,5 @@ class MoveTactic : public Tactic
 
     MoveFSM::ControlParams control_params;
 };
+
+COPY_TACTIC(PenaltySetupTactic, MoveTactic)

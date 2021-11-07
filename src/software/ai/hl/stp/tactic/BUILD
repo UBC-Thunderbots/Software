@@ -4,7 +4,6 @@ cc_test(
     name = "penalty_setup_tactic_test",
     srcs = ["penalty_setup_tactic_test.cpp"],
     deps = [
-        ":penalty_setup_tactic",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
     ],
@@ -68,7 +67,6 @@ cc_library(
     name = "all_tactics",
     hdrs = ["all_tactics.h"],
     deps = [
-        ":penalty_setup_tactic",
         ":receiver_tactic",
         ":shadow_free_kicker_tactic",
         ":tactic",
