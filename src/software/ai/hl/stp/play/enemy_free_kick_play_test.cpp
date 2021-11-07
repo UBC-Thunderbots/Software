@@ -73,9 +73,10 @@ TEST_P(EnemyFreekickPlayTest, test_enemy_free_kick_play)
             }
             else
             {
+                // Running the test for 5s to check for segfaults
                 while (world_ptr->getMostRecentTimestamp() < Timestamp::fromSeconds(5))
                 {
-                    yield("Timestamp not at 5s");
+                    yield("Checking for Segfault: Timestamp not at 5s");
                 }
             }
         }};
