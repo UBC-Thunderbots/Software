@@ -119,7 +119,7 @@ TEST(PenaltyKickInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
     // PenaltyKickPlay: the play under test
     auto penalty_kick_play = PenaltyKickPlay(play_config);
 
-    // Test 1: PREPARE_PENALTY_US to PREPARE_PENALTY_THEM
+    // Test 1
     world.updateGameState(::TestUtil::createGameState(
         RefereeCommand::PREPARE_PENALTY_US, RefereeCommand::PREPARE_PENALTY_US));
 
@@ -127,7 +127,7 @@ TEST(PenaltyKickInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
     ASSERT_TRUE(penalty_kick_play.isApplicable(world));
     ASSERT_TRUE(penalty_kick_play.invariantHolds(world));
 
-    // testing with PREPARE_PENALTY_THEM
+    // Test 2: PREPARE_PENALTY_US to PREPARE_PENALTY_THEM
     world.updateGameState(::TestUtil::createGameState(
         RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::PREPARE_PENALTY_US));
 
@@ -135,15 +135,17 @@ TEST(PenaltyKickInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
     ASSERT_FALSE(penalty_kick_play.isApplicable(world));
     ASSERT_FALSE(penalty_kick_play.invariantHolds(world));
 
-    // test 2: NORMAL_START to PREPARE_PENALTY_US
-    world.updateGameState(::TestUtil::createGameState(RefereeCommand::NORMAL_START,
-                                                      RefereeCommand::NORMAL_START));
-
-    ASSERT_FALSE(penalty_kick_play.isApplicable(world));
-    ASSERT_FALSE(penalty_kick_play.invariantHolds(world));
-
+    // Test 3: NORMAL_START to PREPARE_PENALTY_US
     world.updateGameState(::TestUtil::createGameState(RefereeCommand::PREPARE_PENALTY_US,
                                                       RefereeCommand::NORMAL_START));
+
+    // making sure we run PenaltyKickPlay
+    ASSERT_TRUE(penalty_kick_play.isApplicable(world));
+    ASSERT_TRUE(penalty_kick_play.invariantHolds(world));
+
+    // Test 4: HALT to PREPARE_PENALTY_US
+    world.updateGameState(::TestUtil::createGameState(RefereeCommand::PREPARE_PENALTY_US,
+                                                      RefereeCommand::HALT));
 
     // making sure we run PenaltyKickPlay
     ASSERT_TRUE(penalty_kick_play.isApplicable(world));
