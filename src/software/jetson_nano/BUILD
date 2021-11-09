@@ -1,3 +1,5 @@
+package(default_visibility = ["//visibility:public"])
+
 cc_binary(
     name = "motor_interface",
     srcs = ["motor_interface.c"],

@@ -8832,7 +8832,7 @@
 
 	plugin-manager {
 
-		fragement@0 {
+		fragment@0 {
 			ids = ">=3448-0000-100", ">=3448-0002-100";
 
 			override@0 {
@@ -8978,7 +8978,7 @@
 			};
 		};
 
-		fragement@6 {
+		fragment@6 {
 			odm-data = "enable-tegra-wdt";
 
 			override@0 {
@@ -8990,7 +8990,7 @@
 			};
 		};
 
-		fragement@7 {
+		fragment@7 {
 			odm-data = "enable-pmic-wdt";
 
 			override@0 {
@@ -9002,7 +9002,7 @@
 			};
 		};
 
-		fragement@8 {
+		fragment@8 {
 			odm-data = "enable-pmic-wdt", "enable-tegra-wdt";
 
 			override@0 {
@@ -9014,7 +9014,7 @@
 			};
 		};
 
-		fragement@9 {
+		fragment@9 {
 			ids = "<3448-0000-300", "<3448-0002-300", ">=3448-0003-000";
 
 			override@0 {
@@ -9177,7 +9177,7 @@
 			};
 		};
 
-		fragement@10 {
+		fragment@10 {
 			ids = ">=3448-0000-300", ">=3448-0002-300";
 
 			override@4 {
@@ -9460,7 +9460,7 @@
 			};
 		};
 
-		fragement@13 {
+		fragment@13 {
 			ids = ">=3448-0000-300", ">=3448-0002-300", ">=3448-0003-400";
 
 			override@0 {

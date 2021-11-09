@@ -74,9 +74,9 @@ class ErForceSimulator : public QObject
      * @param primitive_set_msg The set of primitives to run on the robot
      * @param vision_msg The vision message
      */
-    void setYellowRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg,
+    void setYellowRobotPrimitiveSet(const TbotsProto::PrimitiveSet& primitive_set_msg,
                                     std::unique_ptr<TbotsProto::Vision> vision_msg);
-    void setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg,
+    void setBlueRobotPrimitiveSet(const TbotsProto::PrimitiveSet& primitive_set_msg,
                                   std::unique_ptr<TbotsProto::Vision> vision_msg);
 
     /**
@@ -135,10 +135,8 @@ class ErForceSimulator : public QObject
      * @param vision_msg The vision message
      */
     static void setRobotPrimitive(
-        RobotId id, const TbotsProto_Primitive& primitive_msg,
-        std::map<std::shared_ptr<ErForceSimulatorRobot>,
-                 std::shared_ptr<FirmwareWorld_t>>& simulator_robots,
-        std::shared_ptr<ErForceSimulatorBall> simulator_ball,
+        RobotId id, const TbotsProto::Primitive& primitive_msg,
+        std::vector<std::shared_ptr<ErForceSimulatorRobot>>& simulator_robots,
         const TbotsProto::Vision& vision_msg);
 
     /**
@@ -151,16 +149,11 @@ class ErForceSimulator : public QObject
      * @return robot control
      */
     static SSLSimulationProto::RobotControl updateSimulatorRobots(
-        void (*handle_robot_log_proto)(TbotsProto_RobotLog),
-        std::map<std::shared_ptr<ErForceSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
-            simulator_robots,
+        std::vector<std::shared_ptr<ErForceSimulatorRobot>> simulator_robots,
         TbotsProto::Vision vision_msg);
 
-    std::shared_ptr<ErForceSimulatorBall> simulator_ball;
-    std::map<std::shared_ptr<ErForceSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
-        yellow_simulator_robots;
-    std::map<std::shared_ptr<ErForceSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
-        blue_simulator_robots;
+    std::vector<std::shared_ptr<ErForceSimulatorRobot>> yellow_simulator_robots;
+    std::vector<std::shared_ptr<ErForceSimulatorRobot>> blue_simulator_robots;
     std::unique_ptr<TbotsProto::Vision> yellow_team_vision_msg;
     std::unique_ptr<TbotsProto::Vision> blue_team_vision_msg;
 

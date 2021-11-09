@@ -71,4 +71,3 @@ ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
         return direct_velocity_primitive;
     }
 }
-

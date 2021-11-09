@@ -36,6 +36,11 @@ TEST_F(SSLSimulationProtoTest, test_create_robot_move_command_forward)
     EXPECT_NEAR(move_command->local_velocity().angular(), 0.0, 1e-5);
 }
 
+TEST_F(SSLSimulationProtoTest, test_create_robot_move_command_forward_from_primitive)
+{
+    // TODO IMPL ME
+}
+
 TEST_F(SSLSimulationProtoTest, test_create_robot_move_command_backward)
 {
     auto move_command = createRobotMoveCommand(-60, 60, 60, -60, 55, 45,

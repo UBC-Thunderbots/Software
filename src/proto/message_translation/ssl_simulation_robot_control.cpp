@@ -50,6 +50,42 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
     return move_command;
 }
 
+std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
+    std::unique_ptr<TbotsProto::DirectControlPrimitive> direct_control,
+    float front_wheel_angle_deg, float back_wheel_angle_deg, float wheel_radius_meters)
+{
+    switch (direct_control->wheel_control_case())
+    {
+        case TbotsProto::DirectControlPrimitive::kDirectPerWheelControl:
+        {
+            return createRobotMoveCommand(
+                direct_control->direct_per_wheel_control().front_left_wheel_rpm(),
+                direct_control->direct_per_wheel_control().back_left_wheel_rpm(),
+                direct_control->direct_per_wheel_control().front_right_wheel_rpm(),
+                direct_control->direct_per_wheel_control().back_right_wheel_rpm(),
+                front_wheel_angle_deg, back_wheel_angle_deg, wheel_radius_meters);
+        }
+
+        case TbotsProto::DirectControlPrimitive::kDirectVelocityControl:
+        {
+            auto move_local_velocity = SSLSimulationProto::MoveLocalVelocity();
+            move_local_velocity.set_forward(direct_control->direct_velocity_control()
+                                                .velocity()
+                                                .x_component_meters());
+            move_local_velocity.set_left(direct_control->direct_velocity_control()
+                                             .velocity()
+                                             .y_component_meters());
+            move_local_velocity.set_angular(direct_control->direct_velocity_control()
+                                                .angular_velocity()
+                                                .radians_per_second());
+
+            auto move_command = std::make_unique<SSLSimulationProto::RobotMoveCommand>();
+            *(move_command->mutable_local_velocity()) = move_local_velocity;
+            return move_command;
+        }
+    }
+}
+
 std::unique_ptr<SSLSimulationProto::RobotCommand> createRobotCommand(
     unsigned robot_id, std::unique_ptr<SSLSimulationProto::RobotMoveCommand> move_command,
     std::optional<double> kick_speed, std::optional<double> kick_angle,

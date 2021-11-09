@@ -13,38 +13,44 @@ class PrimitiveExecutor
     /**
      * Start running a primitive
      *
-     * @param robot The robot to start/execute the primitive on
+     * @param robot_state The state of the robot to start/execute the primitive on
+     * @param robot_constants The robot constants
      * @param primitive The primitive to start
      */
-    void startPrimitive(const Robot& robot,
-                        std::unique_ptr<TbotsProto::Primitive> primitive);
+    void startPrimitive(const RobotState& robot_state,
+                        const RobotConstants_t& robot_constants,
+                        const TbotsProto::Primitive& primitive);
 
     /**
      * Steps the current primitive and returns a direct control primitive with the
      * target wheel velocities
      *
-     * @param robot The current robot to step the primitive on
+     * @param robot_state The current robot_state to step the primitive on
      * @returns DirectPerWheelControl The per-wheel direct control primitive msg
      */
-    std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(const Robot& robot);
+    std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
+        const RobotState& robot_state);
 
    private:
     /*
      * Compute the next target linear velocity the robot should be at
      * assuming max acceleration.
      *
-     * @param robot The robot we are planning the current primitive for
+     * @param robot_state The RobotState of the robot we are planning the current
+     * primitive for
      */
-    Vector getTargetLinearVelocity(const Robot& robot);
+    Vector getTargetLinearVelocity(const RobotState& robot_state);
 
     /*
      * Compute the next target angular velocity the robot should be at
      * assuming max acceleration.
      *
-     * @param robot The robot we are planning the current primitive for
+     * @param robot_state The RobotState of the robot we are planning the current
+     * primitive for
      */
-    AngularVelocity getTargetAngularVelocity(const Robot& robot);
+    AngularVelocity getTargetAngularVelocity(const RobotState& robot_state);
 
-    std::unique_ptr<TbotsProto::Primitive> current_primitive_;
+    TbotsProto::Primitive current_primitive_;
+    RobotConstants_t robot_constants_;
     unsigned num_elements_;
 };

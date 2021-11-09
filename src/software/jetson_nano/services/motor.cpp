@@ -13,7 +13,6 @@ std::unique_ptr<DriveUnitStatus> MotorService::poll(
     std::unique_ptr<TbotsProto::DirectControlPrimitive_DirectPerWheelControl>
         per_wheel_rpms)
 {
-
 }
 
 
