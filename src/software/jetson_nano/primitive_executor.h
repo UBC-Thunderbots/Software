@@ -2,6 +2,10 @@
 #include "software/geom/vector.h"
 #include "software/world/world.h"
 
+extern "C"
+{
+#include "firmware/app/control/trajectory_planner.h"
+}
 /**
  * Executes primitives with a velocity trajectory
  *
@@ -52,5 +56,6 @@ class PrimitiveExecutor
 
     TbotsProto::Primitive current_primitive_;
     RobotConstants_t robot_constants_;
+    PositionTrajectory_t position_trajectory_;
     unsigned num_elements_;
 };
