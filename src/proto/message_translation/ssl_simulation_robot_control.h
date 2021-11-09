@@ -37,7 +37,7 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
  * @return RobotMoveCommand proto
  */
 std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
-    std::unique_ptr<TbotsProto::DirectControlPrimitive> direct_control,
+    const TbotsProto::DirectControlPrimitive& direct_control,
     float front_wheel_angle_deg, float back_wheel_angle_deg, float wheel_radius_meters);
 
 /**

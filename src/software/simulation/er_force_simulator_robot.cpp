@@ -29,9 +29,19 @@ void ErForceSimulatorRobot::setRobotState(const RobotState& robot_state)
 std::unique_ptr<SSLSimulationProto::RobotCommand> ErForceSimulatorRobot::getRobotCommand()
 {
     auto move_command = createRobotMoveCommand(
-        std::move(direct_control), robot_constants.front_wheel_angle_deg,
+        *direct_control, robot_constants.front_wheel_angle_deg,
         robot_constants.back_wheel_angle_deg, wheel_constants.wheel_radius_meters);
 
+    if (direct_control->wheel_control_case() == TbotsProto::DirectControlPrimitive::WHEEL_CONTROL_NOT_SET)
+    {
+        LOG(WARNING) << "WHEEL CONTROL NOT SET";
+        move_command = std::make_unique<SSLSimulationProto::RobotMoveCommand>();
+    }
+    else
+    {
+        LOG(WARNING) << "WHEEL CONTROL SET";
+
+    }
     switch (direct_control->chick_command_case())
     {
         case TbotsProto::DirectControlPrimitive::kKickSpeedMPerS:
