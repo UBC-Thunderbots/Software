@@ -1,8 +1,11 @@
 #include "proto/primitive.pb.h"
+#include "software/geom/vector.h"
 #include "software/world/world.h"
 
 /**
- * The primitive executor steps the primitive and returns a DirectControlPrimitive
+ * Executes primitives with a velocity trajectory
+ *
+ * NOTE: This class is _NOT_ threadsafe
  */
 class PrimitiveExecutor
 {
@@ -10,17 +13,38 @@ class PrimitiveExecutor
     /**
      * Start running a primitive
      *
-     * @param robot_id The robot id to start/execute the primitive on
+     * @param robot The robot to start/execute the primitive on
      * @param primitive The primitive to start
      */
-    virtual void startPrimitive(RobotConstants_t robot_constants, RobotId robot_id,
-                                const World& world,
-                                std::unique_ptr<TbotsProto::Primitive> primitive) = 0;
+    void startPrimitive(const Robot& robot,
+                        std::unique_ptr<TbotsProto::Primitive> primitive);
 
     /**
      * Steps the current primitive and returns a direct control primitive with the
      * target wheel velocities
+     *
+     * @param robot The current robot to step the primitive on
+     * @returns DirectPerWheelControl The per-wheel direct control primitive msg
      */
-    virtual std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
-        const World& world) = 0;
+    std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(const Robot& robot);
+
+   private:
+    /*
+     * Compute the next target linear velocity the robot should be at
+     * assuming max acceleration.
+     *
+     * @param robot The robot we are planning the current primitive for
+     */
+    Vector getTargetLinearVelocity(const Robot& robot);
+
+    /*
+     * Compute the next target angular velocity the robot should be at
+     * assuming max acceleration.
+     *
+     * @param robot The robot we are planning the current primitive for
+     */
+    AngularVelocity getTargetAngularVelocity(const Robot& robot);
+
+    std::unique_ptr<TbotsProto::Primitive> current_primitive_;
+    unsigned num_elements_;
 };
