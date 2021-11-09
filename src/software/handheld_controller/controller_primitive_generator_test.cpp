@@ -20,32 +20,6 @@ class ControllerPrimitiveGeneratorTest : public testing::Test
     RobotConstants robot_constants = create2015RobotConstants();
 };
 
-TEST_F(ControllerPrimitiveGeneratorTest, test_create_direct_velocity)
-{
-    auto direct_velocity_primitive =
-        ControllerPrimitiveGenerator::createDirectControlPrimitive(
-            Vector(2, -4), AngularVelocity::fromRadians(0.5), 200);
-
-    ASSERT_TRUE(direct_velocity_primitive->has_direct_control());
-    EXPECT_EQ(direct_velocity_primitive->direct_control()
-                  .direct_velocity_control()
-                  .velocity()
-                  .x_component_meters(),
-              2);
-    EXPECT_EQ(direct_velocity_primitive->direct_control()
-                  .direct_velocity_control()
-                  .velocity()
-                  .y_component_meters(),
-              -4);
-    EXPECT_EQ(direct_velocity_primitive->direct_control()
-                  .direct_velocity_control()
-                  .angular_velocity()
-                  .radians_per_second(),
-              0.5);
-    EXPECT_EQ(direct_velocity_primitive->direct_control().dribbler_speed_rpm(), 200);
-}
-
-
 TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input)
 {
     // Tests if controller_primitive_generator returns a kick primitive if the
@@ -122,7 +96,7 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input2
     double angular_velocity = input.getAngularMotion() *
                               handheld_controller_config->getMaxAngularSpeed()->value();
     auto expected_direct_velocity_primitive =
-        *ControllerPrimitiveGenerator::createDirectControlPrimitive(
+        *createDirectControlPrimitive(
             Vector(x_velocity, y_velocity),
             AngularVelocity::fromRadians(angular_velocity), dribbler_rpm);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(

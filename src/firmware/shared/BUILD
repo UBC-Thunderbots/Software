@@ -6,6 +6,7 @@ cc_library(
     hdrs = ["physics.h"],
     deps = [
         ":physics_linear_alebra",
+        "//shared:constants",
         "//firmware/shared:util",
         "//firmware/shared/math:tbots_math",
     ],

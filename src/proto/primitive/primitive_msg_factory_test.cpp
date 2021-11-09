@@ -89,6 +89,33 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
     EXPECT_EQ(move_primitive->move().target_spin_rev_per_s(), 0.0f);
 }
 
+TEST_F(PrimitiveFactoryTest, test_create_direct_velocity)
+{
+    auto direct_velocity_primitive =
+        ControllerPrimitiveGenerator::createDirectControlPrimitive(
+            Vector(2, -4), AngularVelocity::fromRadians(0.5), 200);
+
+    ASSERT_TRUE(direct_velocity_primitive->has_direct_control());
+    EXPECT_EQ(direct_velocity_primitive->direct_control()
+                  .direct_velocity_control()
+                  .velocity()
+                  .x_component_meters(),
+              2);
+    EXPECT_EQ(direct_velocity_primitive->direct_control()
+                  .direct_velocity_control()
+                  .velocity()
+                  .y_component_meters(),
+              -4);
+    EXPECT_EQ(direct_velocity_primitive->direct_control()
+                  .direct_velocity_control()
+                  .angular_velocity()
+                  .radians_per_second(),
+              0.5);
+    EXPECT_EQ(direct_velocity_primitive->direct_control().dribbler_speed_rpm(), 200);
+}
+
+
+
 TEST_F(PrimitiveFactoryTest, test_create_stop_primitive_brake)
 {
     auto stop_primitive = createStopPrimitive(false);

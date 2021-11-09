@@ -13,13 +13,6 @@
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
 
-// these are set to decouple the 3 axis from each other
-// the idea is to clamp the maximum velocity and acceleration
-// so that the axes would never have to compete for resources
-#define TIME_HORIZON (0.05f)  // s
-// Number of times the control loop should tick per trajectory element
-#define NUM_TICKS_PER_TRAJECTORY_ELEMENT (4)
-
 typedef struct MoveState
 {
     // The trajectory we're tracking
