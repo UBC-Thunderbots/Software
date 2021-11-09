@@ -33,7 +33,6 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(const RobotState& robot_state)
     const Point final_position =
         Point(current_primitive_.move().destination().x_meters(),
               current_primitive_.move().destination().y_meters());
-
     std::clamp(max_speed_m_per_s, 0.0f, robot_constants_.robot_max_speed_m_per_s);
 
     const float max_target_linear_speed = fmaxf(max_speed_m_per_s, dest_linear_speed);
@@ -155,6 +154,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         }
         case TbotsProto::Primitive::PRIMITIVE_NOT_SET:
         {
+            // LOG(DEBUG) << "No primitive set!";
         }
     }
     return std::make_unique<TbotsProto::DirectControlPrimitive>();

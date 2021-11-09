@@ -180,7 +180,6 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
             // Set to NEG_X because the vision msg in this simulator is
             // normalized correctly
             simulator_robot->runCurrentPrimitive();
-            LOG(WARNING) << simulator_robot->getRobotId();
             auto command = *simulator_robot->getRobotCommand();
             *(robot_control.mutable_robot_commands()->Add()) = command;
         }
