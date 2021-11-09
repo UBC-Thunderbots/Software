@@ -32,16 +32,15 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> ErForceSimulatorRobot::getRobo
         *direct_control, robot_constants.front_wheel_angle_deg,
         robot_constants.back_wheel_angle_deg, wheel_constants.wheel_radius_meters);
 
-    if (direct_control->wheel_control_case() == TbotsProto::DirectControlPrimitive::WHEEL_CONTROL_NOT_SET)
+    // If there are robots on the field that don't have a primitive, the wheel control
+    // will be empty. In this case we return a blank RobotMoveCommand so that robots dont
+    // move.
+    if (direct_control->wheel_control_case() ==
+        TbotsProto::DirectControlPrimitive::WHEEL_CONTROL_NOT_SET)
     {
-        LOG(WARNING) << "WHEEL CONTROL NOT SET";
         move_command = std::make_unique<SSLSimulationProto::RobotMoveCommand>();
     }
-    else
-    {
-        LOG(WARNING) << "WHEEL CONTROL SET";
 
-    }
     switch (direct_control->chick_command_case())
     {
         case TbotsProto::DirectControlPrimitive::kKickSpeedMPerS:
@@ -67,10 +66,11 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> ErForceSimulatorRobot::getRobo
         case TbotsProto::DirectControlPrimitive::CHICK_COMMAND_NOT_SET:
         {
             // Command not set: lets not do anything here
-            chip(0.0f);
-            kick(0.0f);
+            //chip(0.0f);
+            //kick(0.0f);
         }
     }
+
     return createRobotCommand(id, std::move(move_command), kick_speed, kick_angle,
                               direct_control->dribbler_speed_rpm());
 }
