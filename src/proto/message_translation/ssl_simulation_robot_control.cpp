@@ -51,8 +51,8 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
 }
 
 std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
-    const TbotsProto::DirectControlPrimitive& direct_control,
-    float front_wheel_angle_deg, float back_wheel_angle_deg, float wheel_radius_meters)
+    const TbotsProto::DirectControlPrimitive& direct_control, float front_wheel_angle_deg,
+    float back_wheel_angle_deg, float wheel_radius_meters)
 {
     switch (direct_control.wheel_control_case())
     {
@@ -69,12 +69,10 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
         case TbotsProto::DirectControlPrimitive::kDirectVelocityControl:
         {
             auto move_local_velocity = SSLSimulationProto::MoveLocalVelocity();
-            move_local_velocity.set_forward(direct_control.direct_velocity_control()
-                                                .velocity()
-                                                .x_component_meters());
-            move_local_velocity.set_left(direct_control.direct_velocity_control()
-                                             .velocity()
-                                             .y_component_meters());
+            move_local_velocity.set_forward(
+                direct_control.direct_velocity_control().velocity().x_component_meters());
+            move_local_velocity.set_left(
+                direct_control.direct_velocity_control().velocity().y_component_meters());
             move_local_velocity.set_angular(direct_control.direct_velocity_control()
                                                 .angular_velocity()
                                                 .radians_per_second());

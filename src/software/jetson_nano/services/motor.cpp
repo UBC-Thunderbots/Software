@@ -3,6 +3,7 @@
 #include <linux/ioctl.h>
 #include <linux/spi/spidev.h>
 #include <linux/types.h>
+
 #include "proto/tbots_software_msgs.pb.h"
 
 MotorService::MotorService(const std::string& spi_device)

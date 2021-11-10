@@ -5,11 +5,11 @@ cc_library(
     srcs = ["primitive_executor.cpp"],
     hdrs = ["primitive_executor.h"],
     deps = [
-        "//proto/primitive:primitive_msg_factory",
-        "//software/world",
-        "//shared:constants",
         "//firmware/app/control:trajectory_planner",
         "//proto:tbots_cc_proto",
+        "//proto/primitive:primitive_msg_factory",
+        "//shared:constants",
+        "//software/world",
     ],
 )
 
@@ -17,9 +17,8 @@ cc_binary(
     name = "thunderloop",
     srcs = ["thunderloop.cpp"],
     deps = [
-        "//software/jetson_nano/services:motor",
+        ":primitive_executor",
         "//proto:tbots_cc_proto",
-        ":primitive_executor"
+        "//software/jetson_nano/services:motor",
     ],
 )
-

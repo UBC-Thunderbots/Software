@@ -27,8 +27,8 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(const RobotState& robot_state)
     }
 
     // Unpack current move primitive
-    const float dest_linear_speed   = current_primitive_.move().final_speed_m_per_s();
-    const float max_speed_m_per_s   = current_primitive_.move().max_speed_m_per_s();
+    const float dest_linear_speed = current_primitive_.move().final_speed_m_per_s();
+    const float max_speed_m_per_s = current_primitive_.move().max_speed_m_per_s();
     const Point final_position =
         Point(current_primitive_.move().destination().x_meters(),
               current_primitive_.move().destination().y_meters());

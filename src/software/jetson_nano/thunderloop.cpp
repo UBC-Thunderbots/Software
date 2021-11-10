@@ -18,7 +18,7 @@ class Thunderloop
      */
     Thunderloop(const RobotConstants_t& robot_constants)
     {
-        robot_id_ = 0;
+        robot_id_        = 0;
         robot_constants_ = robot_constants;
         motor_service_   = std::make_unique<MotorService>(std::string("/dev/spidev0.1"));
 

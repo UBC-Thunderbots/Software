@@ -9,10 +9,10 @@ cc_library(
     name = "motor",
     srcs = ["motor.cpp"],
     hdrs = ["motor.h"],
-    deps = 
-    [
-        "@trinamic",
-        ":service",
-        "//proto:tbots_cc_proto",
-    ],
+    deps =
+        [
+            ":service",
+            "//proto:tbots_cc_proto",
+            "@trinamic",
+        ],
 )

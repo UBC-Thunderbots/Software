@@ -113,9 +113,9 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//proto/message_translation:ssl_simulation_robot_control",
         "//shared:constants",
+        "//software/jetson_nano:primitive_executor",
         "//software/simulation:simulator_robot",
         "//software/world:robot_state",
-        "//software/jetson_nano:primitive_executor",
     ],
 )
 
