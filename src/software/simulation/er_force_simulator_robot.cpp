@@ -66,8 +66,8 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> ErForceSimulatorRobot::getRobo
         case TbotsProto::DirectControlPrimitive::CHICK_COMMAND_NOT_SET:
         {
             // Command not set: lets not do anything here
-            //chip(0.0f);
-            //kick(0.0f);
+            // chip(0.0f);
+            // kick(0.0f);
         }
     }
 
@@ -124,7 +124,7 @@ void ErForceSimulatorRobot::chip(float distance_m)
 
 void ErForceSimulatorRobot::startNewPrimitive(const TbotsProto::Primitive& primitive)
 {
-    primitive_executor.startPrimitive(robot_state, robot_constants, primitive);
+    primitive_executor.startPrimitive(robot_constants, primitive);
 }
 
 void ErForceSimulatorRobot::runCurrentPrimitive()

@@ -1,4 +1,10 @@
+#pragma once
+#include <string>
+#include <memory>
+
 #include "software/jetson_nano/services/service.h"
+#include "proto/tbots_software_msgs.pb.h"
+#include "proto/robot_status_msg.pb.h"
 
 class MotorService : public Service
 {
@@ -9,7 +15,7 @@ class MotorService : public Service
      *
      * @param spi_device The device the motor service will interact with
      */
-    explicit MotorService(std::string spi_device);
+    explicit MotorService(const std::string& spi_device);
     ~MotorService();
 
     /**
@@ -25,15 +31,14 @@ class MotorService : public Service
     /**
      * Polling the motor service will relay the provided per wheel control msg
      *
-     * TODO (#todo) Change the input here to include dribbler rpm
+     * TODO (#TODO) Change the input here to include dribbler rpm
      *
      * @param per_wheel_rpms The target rpms for the motor board
      * @returns DriveUnitStatus The status of all the drive units
      */
-    std::unique_ptr<DriveUnitStatus> poll(
-        std::unique_ptr<TbotsProto::DirectControlPrimitive_DirectPerWheelControl>
-            per_wheel_rpms);
+    std::unique_ptr<TbotsProto::DriveUnitStatus> poll(
+        const TbotsProto::DirectControlPrimitive_DirectPerWheelControl& per_wheel_rpms);
 
    private:
     int trinamic_spi_fd;  // The SPI file descriptor
-}
+};

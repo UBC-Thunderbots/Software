@@ -17,12 +17,10 @@ class PrimitiveExecutor
     /**
      * Start running a primitive
      *
-     * @param robot_state The state of the robot to start/execute the primitive on
      * @param robot_constants The robot constants
      * @param primitive The primitive to start
      */
-    void startPrimitive(const RobotState& robot_state,
-                        const RobotConstants_t& robot_constants,
+    void startPrimitive(const RobotConstants_t& robot_constants,
                         const TbotsProto::Primitive& primitive);
 
     /**

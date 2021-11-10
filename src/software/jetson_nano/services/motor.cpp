@@ -1,21 +1,28 @@
+#include "software/jetson_nano/services/motor.h"
+
 #include <linux/ioctl.h>
 #include <linux/spi/spidev.h>
 #include <linux/types.h>
+#include "proto/tbots_software_msgs.pb.h"
 
-#include "software/jetson_nano/services/service.h"
-
-MotorService::MotorService()
+MotorService::MotorService(const std::string& spi_device)
 {
-    // TODO RAII, open all the ports
+    // TODO RAII, open all the SPI ports
 }
 
-std::unique_ptr<DriveUnitStatus> MotorService::poll(
-    std::unique_ptr<TbotsProto::DirectControlPrimitive_DirectPerWheelControl>
-        per_wheel_rpms)
+MotorService::~MotorService()
 {
+    // TODO close all SPI ports
+}
+
+std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
+    const TbotsProto::DirectControlPrimitive_DirectPerWheelControl& per_wheel_rpms)
+{
+    // TODO communicate velocities to trinamic and read back feedback
+    return std::make_unique<TbotsProto::DriveUnitStatus>();
 }
 
 
-MotorService::start() {}
+void MotorService::start() {}
 
-MotorService::stop() {}
+void MotorService::stop() {}

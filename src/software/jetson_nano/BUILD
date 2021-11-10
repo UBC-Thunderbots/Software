@@ -1,15 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-cc_binary(
-    name = "motor_interface",
-    srcs = ["motor_interface.c"],
-    copts = ["-pthread"],
-    linkopts = ["-pthread", "-lrt"],
-    deps = [
-        "@trinamic"
-    ],
-)
-
 cc_library(
     name = "primitive_executor",
     srcs = ["primitive_executor.cpp"],
@@ -22,3 +12,14 @@ cc_library(
         "//proto:tbots_cc_proto",
     ],
 )
+
+cc_binary(
+    name = "thunderloop",
+    srcs = ["thunderloop.cpp"],
+    deps = [
+        "//software/jetson_nano/services:motor",
+        "//proto:tbots_cc_proto",
+        ":primitive_executor"
+    ],
+)
+

@@ -10,8 +10,7 @@ extern "C"
 }
 
 
-void PrimitiveExecutor::startPrimitive(const RobotState& robot_state,
-                                       const RobotConstants_t& robot_constants,
+void PrimitiveExecutor::startPrimitive(const RobotConstants_t& robot_constants,
                                        const TbotsProto::Primitive& primitive)
 {
     robot_constants_   = robot_constants;
