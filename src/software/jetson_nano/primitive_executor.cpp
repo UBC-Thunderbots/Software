@@ -2,8 +2,8 @@
 
 #include "proto/primitive.pb.h"
 #include "proto/primitive/primitive_msg_factory.h"
-#include "software/math/math_functions.h"
 #include "software/logger/logger.h"
+#include "software/math/math_functions.h"
 
 
 void PrimitiveExecutor::startPrimitive(const RobotConstants_t& robot_constants,
@@ -55,10 +55,17 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(const RobotState& robot_state)
                                    start_linear_deceleration_distance / 4,
                                    start_linear_deceleration_distance));
 
-    Vector target_velocity =
-        (final_position - robot_state.position()).normalize(target_linear_speed);
+    Vector target_global_velocity = final_position - robot_state.position();
 
-    return target_velocity;
+    double local_x_velocity =
+        robot_state.orientation().cos() * target_global_velocity.x() +
+        robot_state.orientation().sin() * target_global_velocity.y();
+
+    double local_y_velocity =
+        -robot_state.orientation().sin() * target_global_velocity.x() +
+        robot_state.orientation().cos() * target_global_velocity.y();
+
+    return Vector(local_x_velocity, local_y_velocity).normalize(target_linear_speed);
 }
 
 AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(const RobotState& robot_state)
@@ -70,7 +77,7 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(const RobotState& ro
         LOG(WARNING) << "Not a move primitive, cannot compute target velocity";
     }
 
-    const float dest_orientation   = current_primitive_.move().final_angle().radians();
+    const float dest_orientation = current_primitive_.move().final_angle().radians();
     const float delta_orientation =
         dest_orientation - static_cast<float>(robot_state.orientation().toRadians());
     const float max_target_angular_speed = robot_constants_.robot_max_ang_speed_rad_per_s;
@@ -83,11 +90,12 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(const RobotState& ro
 
     const float target_angular_speed =
         max_target_angular_speed *
-        static_cast<float>(sigmoid(delta_orientation,
-                                   start_angular_deceleration_distance / 7,
+        static_cast<float>(sigmoid(fabsf(delta_orientation),
+                                   start_angular_deceleration_distance / 2,
                                    start_angular_deceleration_distance));
 
-    return AngularVelocity::fromRadians(target_angular_speed);
+    return AngularVelocity::fromRadians(
+        copysign(target_angular_speed, delta_orientation));
 }
 
 
