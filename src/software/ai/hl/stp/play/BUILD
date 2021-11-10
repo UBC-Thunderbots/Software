@@ -260,7 +260,10 @@ cc_library(
 cc_library(
     name = "shoot_or_pass_play",
     srcs = ["shoot_or_pass_play.cpp"],
-    hdrs = ["shoot_or_pass_play.h"],
+    hdrs = [
+        "offensive_play_fsm.h",
+        "shoot_or_pass_play.h",
+    ],
     deps = [
         ":play",
         "//shared:constants",
@@ -278,6 +281,7 @@ cc_library(
         "//software/geom/algorithms",
         "//software/logger",
         "//software/util/generic_factory",
+        "@sml",
     ],
     alwayslink = True,
 )
