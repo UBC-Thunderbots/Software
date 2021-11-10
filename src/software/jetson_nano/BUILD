@@ -5,11 +5,11 @@ cc_library(
     srcs = ["primitive_executor.cpp"],
     hdrs = ["primitive_executor.h"],
     deps = [
-        "//firmware/app/control:trajectory_planner",
         "//proto:tbots_cc_proto",
         "//proto/primitive:primitive_msg_factory",
         "//shared:constants",
         "//software/world",
+        "//software/math:math_functions",
     ],
 )
 

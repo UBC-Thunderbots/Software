@@ -2,12 +2,8 @@
 
 #include "proto/primitive.pb.h"
 #include "proto/primitive/primitive_msg_factory.h"
+#include "software/math/math_functions.h"
 #include "software/logger/logger.h"
-
-extern "C"
-{
-#include "firmware/app/control/trajectory_planner.h"
-}
 
 
 void PrimitiveExecutor::startPrimitive(const RobotConstants_t& robot_constants,
@@ -23,7 +19,9 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(const RobotState& robot_state)
 
     if (current_primitive_.primitive_case() != TbotsProto::Primitive::kMove)
     {
-        LOG(WARNING) << "Not a move primitive, cannot compute target velocity";
+        LOG(WARNING) << "Not currently executing a move primitive,"
+                     << " cannot compute target velocity.";
+        return Vector();
     }
 
     // Unpack current move primitive
@@ -36,7 +34,7 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(const RobotState& robot_state)
 
     const float max_target_linear_speed = fmaxf(max_speed_m_per_s, dest_linear_speed);
 
-    // Compute length of distance to destination
+    // Compute distance to destination
     const float norm_dist_delta =
         static_cast<float>((robot_state.position() - final_position).length());
 
@@ -47,20 +45,15 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(const RobotState& robot_state)
          dest_linear_speed * dest_linear_speed) /
         (2 * robot_constants_.robot_max_acceleration_m_per_s_2 + LOCAL_EPSILON);
 
-    float target_linear_speed = max_target_linear_speed;
-    if (norm_dist_delta < start_linear_deceleration_distance)
-    {
-        // Interpolate target speed between initial speed and final speed while the robot
-        // is within start_linear_deceleration_distance away from the destination, also
-        // add a minimum speed so the robot gets to the destination faster when dest speed
-        // is 0
-        target_linear_speed =
-            fmaxf((max_target_linear_speed - dest_linear_speed) *
-                          (norm_dist_delta /
-                           (start_linear_deceleration_distance + LOCAL_EPSILON)) +
-                      dest_linear_speed,
-                  0.1f);
-    }
+    // Create a sigmoid that is 1 when we are further than the
+    // start_linear_deceleration_distance. It ~linearly goes from 1 to ~0 over
+    // the deceleration distance. We shift the sigmoid by a factor of 4 so that
+    // it doesn't fully zero out the speed before we are at the destination.
+    const float target_linear_speed =
+        max_target_linear_speed *
+        static_cast<float>(sigmoid(norm_dist_delta,
+                                   start_linear_deceleration_distance / 4,
+                                   start_linear_deceleration_distance));
 
     Vector target_velocity =
         (final_position - robot_state.position()).normalize(target_linear_speed);
@@ -78,32 +71,21 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(const RobotState& ro
     }
 
     const float dest_orientation   = current_primitive_.move().final_angle().radians();
-    const float dest_angular_speed = 0.0f;  // No support for spin prim
     const float delta_orientation =
         dest_orientation - static_cast<float>(robot_state.orientation().toRadians());
     const float max_target_angular_speed = robot_constants_.robot_max_ang_speed_rad_per_s;
 
     // Compute at what angular distance we should start decelerating angularly
-    // d = (Vf^2 - Vi^2) / (2a + LOCAL_EPSILON)
+    // d = (Vf^2 - 0) / (2a + LOCAL_EPSILON)
     const float start_angular_deceleration_distance =
-        (max_target_angular_speed * max_target_angular_speed -
-         dest_angular_speed * dest_angular_speed) /
+        (max_target_angular_speed * max_target_angular_speed) /
         (2 * robot_constants_.robot_max_ang_acceleration_rad_per_s_2 + LOCAL_EPSILON);
 
-    float target_angular_speed = max_target_angular_speed;
-
-    if (fabsf(delta_orientation) < start_angular_deceleration_distance)
-    {
-        // Interpolate target angular speed between initial and final angular speed while
-        // the robot is within start_angular_deceleration_distance away from the
-        // destination, also add a minimum speed so the robot gets to the destination
-        // faster when dest speed is 0
-        target_angular_speed = fmaxf(
-            (max_target_angular_speed - dest_angular_speed) *
-                    (delta_orientation / (start_angular_deceleration_distance + 1e-6f)) +
-                dest_angular_speed,
-            0.01f * delta_orientation / (fabsf(delta_orientation) + 1e-6f));
-    }
+    const float target_angular_speed =
+        max_target_angular_speed *
+        static_cast<float>(sigmoid(delta_orientation,
+                                   start_angular_deceleration_distance / 7,
+                                   start_angular_deceleration_distance));
 
     return AngularVelocity::fromRadians(target_angular_speed);
 }
@@ -153,6 +135,10 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         }
         case TbotsProto::Primitive::PRIMITIVE_NOT_SET:
         {
+            // TODO (#2283) Once we can add/remove robots, this log should
+            // be re-enabled. Right now it just gets spammed because we command
+            // 6 robots when there are 11 on the field.
+            //
             // LOG(DEBUG) << "No primitive set!";
         }
     }

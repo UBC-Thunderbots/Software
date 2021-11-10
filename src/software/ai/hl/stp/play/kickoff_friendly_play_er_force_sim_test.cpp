@@ -51,7 +51,7 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
             // Two friendly robots near the half line setting up for offense
             Rectangle robots_offensive_rect(Point(0, 3.5), Point(-1.5, -3.5));
             robotInPolygon(8, robots_offensive_rect, world_ptr, yield);
-            robotInPolygon(10, robots_offensive_rect, world_ptr, yield);
+            robotInPolygon(0, robots_offensive_rect, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
@@ -67,5 +67,5 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(100000));
 }
