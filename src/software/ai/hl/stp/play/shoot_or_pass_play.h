@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
+#include "software/ai/hl/stp/play/offensive_play_fsm.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
@@ -44,4 +45,6 @@ class ShootOrPassPlay : public Play
         TacticCoroutine::push_type &yield,
         std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
         std::shared_ptr<AttackerTactic> attacker_tactic, const World &world);
+
+    FSM<OffensivePlayFSM> fsm;
 };

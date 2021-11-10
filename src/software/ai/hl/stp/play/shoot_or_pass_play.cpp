@@ -4,7 +4,6 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/evaluation/possession.h"
-#include "software/ai/hl/stp/play/offensive_play_fsm.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
@@ -17,7 +16,18 @@
 using Zones = std::unordered_set<EighteenZoneId>;
 
 ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config, true)
+    : Play(config, true),
+      fsm(OffensivePlayFSM(
+          config, PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0},
+          Duration::fromSeconds(0), 0,
+          std::make_shared<AttackerTactic>(config->getAttackerTacticConfig()),
+          std::make_shared<ReceiverTactic>(
+              Field::createSSLDivisionBField(), Team(), Team(), Pass(Point(), Point(), 0),
+              Ball(Point(), Vector(), Timestamp::fromSeconds(0)), false),
+          std::vector<std::shared_ptr<MoveTactic>>(),
+          PassGenerator<EighteenZoneId>(std::make_shared<const EighteenZonePitchDivision>(
+                                            Field::createSSLDivisionBField()),
+                                        config->getPassingConfig())))
 {
 }
 
@@ -57,87 +67,26 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
             play_config->getRobotNavigationObstacleConfig()),
     };
 
-    auto attacker =
-        std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
-
-    auto pitch_division =
-        std::make_shared<const EighteenZonePitchDivision>(world.field());
-
-    PassGenerator<EighteenZoneId> pass_generator(pitch_division,
-                                                 play_config->getPassingConfig());
-
-    PassWithRating best_pass_and_score_so_far = attemptToShootWhileLookingForAPass(
-        yield, crease_defender_tactics, attacker, world);
-
-    // If the shoot tactic has not finished, then we need to pass, otherwise we are
-    // done this play
-    if (!attacker->done())
+    do
     {
-        // Commit to a pass
-        Pass pass = best_pass_and_score_so_far.pass;
+        std::get<0>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+        std::get<1>(crease_defender_tactics)
+            ->updateControlParams(world.ball().position(),
+                                  CreaseDefenderAlignment::RIGHT);
 
-        LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
-        LOG(DEBUG) << "Score of pass we committed to: "
-                   << best_pass_and_score_so_far.rating;
+        auto offensive_tactics = std::make_shared<TacticVector>();
 
-        // Perform the pass and wait until the receiver is finished
-        auto receiver = std::make_shared<ReceiverTactic>(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), pass, world.ball(),
-            false);
+        fsm.process_event(OffensivePlayFSM::Update(
+            OffensivePlayFSM::ControlParams(),
+            PlayUpdate(world, [offensive_tactics](TacticVector new_tactics) {
+                *offensive_tactics = new_tactics;
+            })));
 
-        auto pass_eval = pass_generator.generatePassEvaluation(world);
-
-        auto ranked_zones = pass_eval.rankZonesForReceiving(
-            world, best_pass_and_score_so_far.pass.receiverPoint());
-        Zones cherry_pick_region_1 = {ranked_zones[0]};
-        Zones cherry_pick_region_2 = {ranked_zones[1]};
-
-        auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
-        auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
-
-        auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
-        auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
-        cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
-                                                  pass1.receiverOrientation(), 0.0,
-                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-        cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
-                                                  pass2.receiverOrientation(), 0.0,
-                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-
-
-        do
-        {
-            // if we make it here then we have committed to the pass
-            attacker->updateControlParams(pass, true);
-            receiver->updateControlParams(pass);
-
-            std::get<0>(crease_defender_tactics)
-                ->updateControlParams(world.ball().position(),
-                                      CreaseDefenderAlignment::LEFT);
-            std::get<1>(crease_defender_tactics)
-                ->updateControlParams(world.ball().position(),
-                                      CreaseDefenderAlignment::RIGHT);
-            if (!attacker->done())
-            {
-                yield({{attacker, receiver},
-                       {cherry_pick_tactic_1, std::get<0>(crease_defender_tactics),
-                        std::get<1>(crease_defender_tactics)}});
-            }
-            else
-            {
-                yield({{receiver},
-                       {cherry_pick_tactic_1, cherry_pick_tactic_2},
-                       {std::get<0>(crease_defender_tactics),
-                        std::get<1>(crease_defender_tactics)}});
-            }
-        } while (!receiver->done());
-    }
-    else
-    {
-        LOG(DEBUG) << "Took shot";
-    }
-
-    LOG(DEBUG) << "Finished";
+        yield({*offensive_tactics,
+               {std::get<0>(crease_defender_tactics),
+                std::get<1>(crease_defender_tactics)}});
+    } while (!fsm.is(boost::sml::X));
 }
 
 PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(

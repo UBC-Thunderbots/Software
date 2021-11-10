@@ -64,7 +64,8 @@ struct OffensivePlayFSM
     {
         // number of additional offensive attacks on top of the minimum of 2 (passer and
         // receiver)
-        unsigned int num_additional_offensive_tactics;
+        // TODO: actually implement this
+        // unsigned int num_additional_offensive_tactics;
     };
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -143,9 +144,6 @@ struct OffensivePlayFSM
             // update the best pass in the attacker tactic
             attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
 
-            event.common.set_tactics(
-                {attacker_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2});
-
             // If we've assigned a robot as the passer in the PassGenerator, we
             // lower our threshold based on how long the PassGenerator as been
             // running since we set it
@@ -155,6 +153,8 @@ struct OffensivePlayFSM
                 1 - std::min(time_since_commit_stage_start.toSeconds() /
                                  pass_score_ramp_down_duration,
                              1.0 - abs_min_pass_score);
+            event.common.set_tactics(
+                {attacker_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2});
         };
 
         const auto take_pass = [this](auto event) {
