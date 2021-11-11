@@ -20,7 +20,7 @@
 using Zones = std::unordered_set<EighteenZoneId>;
 
 // This callback is used to return an intent from the fsm
-using SetTacticsCallback = std::function<void(TacticVector)>;
+using SetTacticsCallback = std::function<void(PriorityTacticVector)>;
 
 // The tactic update struct is used to update tactics and set the new intent
 struct PlayUpdate
@@ -59,6 +59,7 @@ struct OffensivePlayFSM
 {
     class AttemptToShootWhileLookingForAPassState;
     class TakePassState;
+    class StartState;
 
     struct ControlParams
     {
@@ -76,7 +77,8 @@ struct OffensivePlayFSM
         double min_pass_score_threshold, std::shared_ptr<AttackerTactic> attacker_tactic,
         std::shared_ptr<ReceiverTactic> receiver_tactic,
         std::vector<std::shared_ptr<MoveTactic>> aggressive_positioning_tactics,
-        PassGenerator<EighteenZoneId> pass_generator)
+        PassGenerator<EighteenZoneId> pass_generator,
+        Timestamp pass_optimization_start_time)
         : play_config(play_config),
           best_pass_and_score_so_far(best_pass_and_score_so_far),
           time_since_commit_stage_start(time_since_commit_stage_start),
@@ -84,7 +86,8 @@ struct OffensivePlayFSM
           attacker_tactic(attacker_tactic),
           receiver_tactic(receiver_tactic),
           aggressive_positioning_tactics(aggressive_positioning_tactics),
-          pass_generator(pass_generator)
+          pass_generator(pass_generator),
+          pass_optimization_start_time(pass_optimization_start_time)
     {
     }
 
@@ -94,6 +97,7 @@ struct OffensivePlayFSM
 
         const auto look_for_pass_s = state<AttemptToShootWhileLookingForAPassState>;
         const auto take_pass_s     = state<TakePassState>;
+        const auto start_state_s   = state<StartState>;
         const auto update_e        = event<Update>;
 
         const auto look_for_pass = [this](auto event) {
@@ -104,7 +108,7 @@ struct OffensivePlayFSM
             auto ranked_zones = pass_eval.rankZonesForReceiving(
                 event.common.world, event.common.world.ball().position());
 
-            this->best_pass_and_score_so_far = pass_eval.getBestPassOnField();
+            best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
             // These two tactics will set robots to roam around the field, trying tdouble
             // o put themselves into a good position to receive a pass
@@ -116,18 +120,12 @@ struct OffensivePlayFSM
 
             // Wait for a good pass by starting out only looking for "perfect" passes
             // (with a score of 1) and decreasing this threshold over time
-            min_pass_score_threshold = 1.0;
-            Timestamp pass_optimization_start_time =
-                event.common.world.getMostRecentTimestamp();
             // This boolean indicates if we're ready to perform a pass
             double abs_min_pass_score =
                 play_config->getShootOrPassPlayConfig()->getAbsMinPassScore()->value();
             double pass_score_ramp_down_duration = play_config->getShootOrPassPlayConfig()
                                                        ->getPassScoreRampDownDuration()
                                                        ->value();
-            LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
-            LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.rating;
-
             pass_eval = pass_generator.generatePassEvaluation(event.common.world);
             best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
@@ -152,16 +150,21 @@ struct OffensivePlayFSM
                 1 - std::min(time_since_commit_stage_start.toSeconds() /
                                  pass_score_ramp_down_duration,
                              1.0 - abs_min_pass_score);
-            TacticVector retval = {attacker_tactic};
-            retval.insert(retval.end(), offensive_positioning_tactics.begin(),
-                          offensive_positioning_tactics.end());
-            event.common.set_tactics(retval);
+            PriorityTacticVector ret_tactics = {{attacker_tactic}, {}};
+            ret_tactics[1].insert(ret_tactics[1].end(),
+                                  offensive_positioning_tactics.begin(),
+                                  offensive_positioning_tactics.end());
+            event.common.set_tactics(ret_tactics);
+        };
+
+        const auto start_looking_for_pass = [this, look_for_pass](auto event) {
+            Timestamp pass_optimization_start_time =
+                event.common.world.getMostRecentTimestamp();
+            look_for_pass(event);
         };
 
         const auto take_pass = [this](auto event) {
             // Commit to a pass
-            Pass pass = best_pass_and_score_so_far.pass;
-
             LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
             LOG(DEBUG) << "Score of pass we committed to: "
                        << best_pass_and_score_so_far.rating;
@@ -186,18 +189,18 @@ struct OffensivePlayFSM
                 MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
             // if we make it here then we have committed to the pass
-            attacker_tactic->updateControlParams(pass, true);
-            receiver_tactic->updateControlParams(pass);
+            attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, true);
+            receiver_tactic->updateControlParams(best_pass_and_score_so_far.pass);
 
             if (!attacker_tactic->done())
             {
                 event.common.set_tactics(
-                    {attacker_tactic, receiver_tactic, cherry_pick_tactic_1});
+                    {{attacker_tactic, receiver_tactic}, {cherry_pick_tactic_1}});
             }
             else
             {
                 event.common.set_tactics(
-                    {receiver_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2});
+                    {{receiver_tactic}, {cherry_pick_tactic_1, cherry_pick_tactic_2}});
             }
         };
 
@@ -206,20 +209,22 @@ struct OffensivePlayFSM
         };
         const auto should_abort   = [this](auto event) { return false; };
         const auto pass_completed = [this](auto event) {
-            return receiver_tactic->done();
+            return attacker_tactic->done() && receiver_tactic->done();
         };
         const auto took_shot = [this](auto event) { return false; };
 
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *look_for_pass_s + update_e[pass_found] / take_pass     = take_pass_s,
+            *start_state_s + update_e / start_looking_for_pass      = look_for_pass_s,
+            look_for_pass_s + update_e[pass_found] / take_pass      = take_pass_s,
             look_for_pass_s + update_e[!pass_found] / look_for_pass = look_for_pass_s,
             look_for_pass_s + update_e[took_shot]                   = X,
             take_pass_s + update_e[!pass_completed] / take_pass     = take_pass_s,
-            take_pass_s + update_e[should_abort] / look_for_pass    = look_for_pass_s,
-            take_pass_s + update_e[pass_completed] / take_pass      = X,
-            X + update_e / look_for_pass                            = look_for_pass_s);
+            take_pass_s + update_e[should_abort] / start_looking_for_pass =
+                look_for_pass_s,
+            take_pass_s + update_e[pass_completed] / take_pass = X,
+            X + update_e / start_looking_for_pass              = look_for_pass_s);
     }
 
    private:
@@ -231,4 +236,5 @@ struct OffensivePlayFSM
     std::shared_ptr<ReceiverTactic> receiver_tactic;
     std::vector<std::shared_ptr<MoveTactic>> aggressive_positioning_tactics;
     PassGenerator<EighteenZoneId> pass_generator;
+    Timestamp pass_optimization_start_time;
 };

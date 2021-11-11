@@ -27,7 +27,8 @@ ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config)
           std::vector<std::shared_ptr<MoveTactic>>(),
           PassGenerator<EighteenZoneId>(std::make_shared<const EighteenZonePitchDivision>(
                                             Field::createSSLDivisionBField()),
-                                        config->getPassingConfig())))
+                                        config->getPassingConfig()),
+          Timestamp::fromSeconds(0)))
 {
 }
 
@@ -74,17 +75,21 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
             ->updateControlParams(world.ball().position(),
                                   CreaseDefenderAlignment::RIGHT);
 
-        TacticVector offensive_tactics;
+        PriorityTacticVector tactics_to_return;
 
         fsm.process_event(OffensivePlayFSM::Update(
             OffensivePlayFSM::ControlParams{.num_additional_offensive_tactics = 2},
-            PlayUpdate(world, [&offensive_tactics](TacticVector new_tactics) {
-                offensive_tactics = new_tactics;
+            PlayUpdate(world, [&tactics_to_return](PriorityTacticVector new_tactics) {
+                tactics_to_return = new_tactics;
             })));
+        fsm.visit_current_states(
+            [](auto state) { std::cout << TYPENAME(state) << std::endl; });
 
-        yield({offensive_tactics,
-               {std::get<0>(crease_defender_tactics),
-                std::get<1>(crease_defender_tactics)}});
+        tactics_to_return.emplace_back(
+            TacticVector({std::get<0>(crease_defender_tactics),
+                          std::get<1>(crease_defender_tactics)}));
+
+        yield(tactics_to_return);
     } while (!fsm.is(boost::sml::X));
 }
 
