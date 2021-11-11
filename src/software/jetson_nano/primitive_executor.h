@@ -34,19 +34,23 @@ class PrimitiveExecutor
      * Compute the next target linear velocity the robot should be at
      * assuming max acceleration.
      *
+     * @param primitive The MovePrimitive to compute the linear velocity for
      * @param robot_state The RobotState of the robot we are planning the current
      * primitive for
      */
-    Vector getTargetLinearVelocity(const RobotState& robot_state);
+    Vector getTargetLinearVelocity(const TbotsProto::MovePrimitive& primitive,
+                                   const RobotState& robot_state);
 
     /*
      * Compute the next target angular velocity the robot should be at
      * assuming max acceleration.
      *
+     * @param primitive The MovePrimitive to compute the angular velocity for
      * @param robot_state The RobotState of the robot we are planning the current
      * primitive for
      */
-    AngularVelocity getTargetAngularVelocity(const RobotState& robot_state);
+    AngularVelocity getTargetAngularVelocity(const TbotsProto::MovePrimitive& primitive,
+                                             const RobotState& robot_state);
 
     TbotsProto::Primitive current_primitive_;
     RobotConstants_t robot_constants_;

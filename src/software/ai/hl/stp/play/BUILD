@@ -511,6 +511,7 @@ cc_test(
     deps = [
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:shoot_or_pass_play",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests:simulated_play_test_fixture",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",

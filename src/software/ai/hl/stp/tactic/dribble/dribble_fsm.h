@@ -54,6 +54,8 @@ struct DribbleFSM
     static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.9;
     // robot speed at which the robot is done dribbling
     static constexpr double ROBOT_DRIBBLING_DONE_SPEED = 0.2;  // m/s
+    // Tolerance for possession
+    static constexpr double POSSESSION_TOLERANCE_METERS = 0.01;  // m
 
     /**
      * Converts the ball position to the robot's position given the direction that the
@@ -200,8 +202,8 @@ struct DribbleFSM
          * @return if the ball has been have_possession
          */
         const auto have_possession = [](auto event) {
-            return event.common.robot.isNearDribbler(
-                event.common.world.ball().position());
+            return event.common.robot.isNearDribbler(event.common.world.ball().position(),
+                                                     POSSESSION_TOLERANCE_METERS);
         };
 
         /**

@@ -8,8 +8,8 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//proto/primitive:primitive_msg_factory",
         "//shared:constants",
-        "//software/world",
         "//software/math:math_functions",
+        "//software/world",
     ],
 )
 

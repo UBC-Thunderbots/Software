@@ -13,16 +13,10 @@ void PrimitiveExecutor::startPrimitive(const RobotConstants_t& robot_constants,
     current_primitive_ = primitive;
 }
 
-Vector PrimitiveExecutor::getTargetLinearVelocity(const RobotState& robot_state)
+Vector PrimitiveExecutor::getTargetLinearVelocity(
+    const TbotsProto::MovePrimitive& move_primitive, const RobotState& robot_state)
 {
     const float LOCAL_EPSILON = 1e-6f;  // Avoid dividing by zero
-
-    if (current_primitive_.primitive_case() != TbotsProto::Primitive::kMove)
-    {
-        LOG(WARNING) << "Not currently executing a move primitive,"
-                     << " cannot compute target velocity.";
-        return Vector();
-    }
 
     // Unpack current move primitive
     const float dest_linear_speed = current_primitive_.move().final_speed_m_per_s();
@@ -45,15 +39,15 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(const RobotState& robot_state)
          dest_linear_speed * dest_linear_speed) /
         (2 * robot_constants_.robot_max_acceleration_m_per_s_2 + LOCAL_EPSILON);
 
-    // Create a sigmoid that is 1 when we are further than the
-    // start_linear_deceleration_distance. It ~linearly goes from 1 to ~0 over
-    // the deceleration distance. We shift the sigmoid by a factor of 4 so that
-    // it doesn't fully zero out the speed before we are at the destination.
-    const float target_linear_speed =
-        max_target_linear_speed *
-        static_cast<float>(sigmoid(norm_dist_delta,
-                                   start_linear_deceleration_distance / 4,
-                                   start_linear_deceleration_distance));
+    // When we are close enough to start decelerating, we scale down the max
+    // speed the robot can travel at to be 60% of the max speed. Once
+    // we get "close enough", we scale the max_target_linear_speed proportional
+    // to the distance to the destination.
+    float target_linear_speed = max_target_linear_speed;
+    if (norm_dist_delta < start_linear_deceleration_distance)
+    {
+        target_linear_speed = max_target_linear_speed * fminf(norm_dist_delta, 0.6f);
+    }
 
     Vector target_global_velocity = final_position - robot_state.position();
 
@@ -68,14 +62,10 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(const RobotState& robot_state)
     return Vector(local_x_velocity, local_y_velocity).normalize(target_linear_speed);
 }
 
-AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(const RobotState& robot_state)
+AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
+    const TbotsProto::MovePrimitive& move_primitive, const RobotState& robot_state)
 {
     const float LOCAL_EPSILON = 1e-6f;  // Avoid dividing by zero
-
-    if (current_primitive_.primitive_case() != TbotsProto::Primitive::kMove)
-    {
-        LOG(WARNING) << "Not a move primitive, cannot compute target velocity";
-    }
 
     const float dest_orientation = current_primitive_.move().final_angle().radians();
     const float delta_orientation =
@@ -133,11 +123,45 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         case TbotsProto::Primitive::kMove:
         {
             // Compute the target velocities
-            Vector target_velocity = getTargetLinearVelocity(robot_state);
+            Vector target_velocity =
+                getTargetLinearVelocity(current_primitive_.move(), robot_state);
             AngularVelocity target_angular_velocity =
-                getTargetAngularVelocity(robot_state);
-            auto output = createDirectControlPrimitive(target_velocity,
-                                                       target_angular_velocity, 0.0);
+                getTargetAngularVelocity(current_primitive_.move(), robot_state);
+
+            auto output = createDirectControlPrimitive(
+                target_velocity, target_angular_velocity,
+                current_primitive_.move().dribbler_speed_rpm());
+
+            switch (
+                current_primitive_.move().auto_chip_or_kick().auto_chip_or_kick_case())
+            {
+                case TbotsProto::MovePrimitive::AutoChipOrKick::AutoChipOrKickCase::
+                    kAutokickSpeedMPerS:
+                {
+                    output->mutable_direct_control()->set_autokick_speed_m_per_s(
+                        current_primitive_.move()
+                            .auto_chip_or_kick()
+                            .autokick_speed_m_per_s());
+
+                    break;
+                }
+                case TbotsProto::MovePrimitive::AutoChipOrKick::AutoChipOrKickCase::
+                    kAutochipDistanceMeters:
+                {
+                    output->mutable_direct_control()->set_autochip_distance_meters(
+                        current_primitive_.move()
+                            .auto_chip_or_kick()
+                            .autochip_distance_meters());
+                    break;
+                }
+                case TbotsProto::MovePrimitive::AutoChipOrKick::AutoChipOrKickCase::
+                    AUTO_CHIP_OR_KICK_NOT_SET:
+                {
+                    output->mutable_direct_control()->clear_chick_command();
+                    break;
+                }
+            }
+
             return std::make_unique<TbotsProto::DirectControlPrimitive>(
                 output->direct_control());
         }
@@ -145,7 +169,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         {
             // TODO (#2283) Once we can add/remove robots, this log should
             // be re-enabled. Right now it just gets spammed because we command
-            // 6 robots when there are 11 on the field.
+            // 6 robots for Div B when there are 11 on the field.
             //
             // LOG(DEBUG) << "No primitive set!";
         }
