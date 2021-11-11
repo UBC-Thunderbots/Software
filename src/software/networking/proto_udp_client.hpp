@@ -3,7 +3,6 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <string>
-
 #include <type_traits>
 
 #include "software/logger/logger.h"
@@ -160,4 +159,3 @@ ProtoUdpClient<SendProtoT, ReceiveProtoT>::~ProtoUdpClient()
 {
     socket_.close();
 }
-

@@ -188,4 +188,3 @@ ProtoUdpListener<ReceiveProtoT>::~ProtoUdpListener()
 {
     socket_.close();
 }
-

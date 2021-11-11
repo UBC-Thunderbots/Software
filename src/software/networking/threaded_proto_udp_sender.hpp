@@ -76,4 +76,3 @@ void ThreadedProtoUdpSender<SendProtoT>::sendProto(const SendProtoT& message)
 
 
 #include "software/networking/threaded_proto_udp_sender.hpp"
-
