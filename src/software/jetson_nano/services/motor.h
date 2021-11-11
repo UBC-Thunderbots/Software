@@ -4,23 +4,8 @@
 
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
+#include "shared/robot_constants.h"
 #include "software/jetson_nano/services/service.h"
-
-// SPI Configs
-static uint32_t SPI_SPEED_HZ = 1000000;
-static uint8_t SPI_BITS      = 8;
-static uint32_t SPI_MODE     = 0x3u;
-
-// SPI Chip Selects
-static const uint32_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
-static const uint32_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 1;
-static const uint32_t BACK_LEFT_MOTOR_CHIP_SELECT   = 2;
-static const uint32_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 3;
-static const uint32_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
-
-// SPI Trinamic Motor Driver Paths (indexed with chip select above)
-static const char* SPI_PATHS[] = {"/dev/spidev1.0", "/dev/spidev1.1", "/dev/spidev1.2",
-                                  "/dev/spidev1.3", "/dev/spidev1.4"};
 
 class MotorService : public Service
 {
@@ -61,10 +46,14 @@ class MotorService : public Service
         float dribbler_speed_rpm);
 
    private:
+    // Constants
+    RobotConstants_t robot_constants_;
+    WheelConstants_t wheel_constants_;
+
     // SPI File Descriptors
     int front_left_motor_spi_fd;
     int front_right_motor_spi_fd;
     int back_left_motor_spi_fd;
     int back_right_motor_spi_fd;
-    int dribbler_spi_fd;
+    int dribbler_motor_spi_fd;
 };

@@ -38,27 +38,17 @@ class Thunderloop
      *                   └─────────────────┘  Voltages  └────────────┘
      *
      *
-     * @param robot_constants The constants for this robot
-     * @param front_left_motor_spi_path The spi path to the front left motor
-     * @param front_right_motor_spi_path The spi path to the front right motor
-     * @param back_left_motor_spi_path The spi path to the back left motor
-     * @param back_right_motor_spi_path The spi path to the back right motor
-     * @param dribbler_spi_path The spi path to the dribbler
-     *   Example path: /dev/spidev0.1 (use spi 0 with chipselect 1)
+     * @param robot_constants The robot constants
+     * @param wheel_consants The wheel constants
      */
     Thunderloop(const RobotConstants_t& robot_constants,
-                const std::string& front_left_motor_spi_path,
-                const std::string& front_right_motor_spi_path,
-                const std::string& back_left_motor_spi_path,
-                const std::string& back_right_motor_spi_path,
-                const std::string& dribbler_spi_path)
+                const WheelConstants_t& wheel_consants)
     {
         robot_id_        = 0;
         robot_constants_ = robot_constants;
+        wheel_consants_  = wheel_consants;
 
-        motor_service_ = std::make_unique<MotorService>(
-            front_left_motor_spi_path, front_right_motor_spi_path,
-            back_left_motor_spi_path, back_right_motor_spi_path, dribbler_spi_path);
+        motor_service_ = std::make_unique<MotorService>(robot_constants, wheel_consants);
 
         // TODO (#2331) remove this once we receive actual vision data
         current_robot_state_ =
@@ -68,7 +58,7 @@ class Thunderloop
     ~Thunderloop()
     {
         // De-initialize Services
-        motor_service_.stop();
+        motor_service_->stop();
     }
 
     /*
@@ -84,23 +74,24 @@ class Thunderloop
 
         for (;;)
         {
-            // TODO (#TODO) add loop timing instrospection and use Preempt-RT (maybe)
+            // TODO (#2335) add loop timing instrospection and use Preempt-RT (maybe)
             next_frame += std::chrono::milliseconds(
                 static_cast<int>(MILLISECONDS_PER_SECOND / run_at_hz));
 
             // TODO (#2331) poll network service and update current_robot_state_
-            // TODO (#TODO) poll redis service
+            // TODO (#2333) poll redis service
 
             // Execute latest primitive
             primitive_executor_.startPrimitive(robot_constants_, primitive_);
             direct_control_ = *primitive_executor_.stepPrimitive(*current_robot_state_);
 
             // Poll motor service with wheel velocities and dribbler rpm
+            // TODO (#2332) properly implement, this is just a placeholder
             drive_units_status_ =
-                *motor_service_->poll(direct_control_.direct_per_wheel_control(),
+                *motor_service_->poll(direct_control_.direct_velocity_control(),
                                       direct_control_.dribbler_speed_rpm());
 
-            // TODO (#TODO) power service poll
+            // TODO (#2334) power service poll
             std::this_thread::sleep_until(next_frame);
         }
     }
@@ -124,6 +115,7 @@ class Thunderloop
 
     // Current State
     RobotConstants_t robot_constants_;
+    WheelConstants_t wheel_consants_;
     std::unique_ptr<RobotState> current_robot_state_;
     unsigned robot_id_;
 };
@@ -133,7 +125,10 @@ int main(int argc, char** argv)
 {
     // TODO (#TODO) replace with network logger
     LoggerSingleton::initializeLogger("/tmp");
-    auto thunderloop = Thunderloop(create2021RobotConstants());
+
+    auto thunderloop =
+        Thunderloop(create2021RobotConstants(), create2021WheelConstants());
     thunderloop.run(CONTROL_LOOP_HZ);
+
     return 0;
 }

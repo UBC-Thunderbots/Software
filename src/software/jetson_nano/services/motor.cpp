@@ -15,90 +15,56 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/logger/logger.h"
 
-/**
- * Implements the SPI communication required by the tmc4671 driver
- * See line 15: https://github.com/trinamic/TMC-API/blob/master/tmc/ic/TMC4671/TMC4671.c
- *
- * @param motor The chip select of the motor to use
- * @param data The byte to write to the motor
- * @param lastTransfer Indicates that this is the "last msg" in the series of bytes for a
- * single message frame
- */
-uint8_t tmc4671_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
-{
-    int fd         = -1;
-    uint8_t tx[20] = {};
-    uint8_t rx[20] = {};
+// SPI Configs
+static uint32_t SPI_SPEED_HZ = 1000000;
+static uint8_t SPI_BITS      = 8;
+static uint32_t SPI_MODE     = 0x3u;
 
-    switch (motor)
-    {
-        case FRONT_LEFT_MOTOR_CHIP_SELECT:
-        {
-            fd = front_left
-        }
-    }
+// SPI Chip Selects
+static const uint32_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
+static const uint32_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 1;
+static const uint32_t BACK_LEFT_MOTOR_CHIP_SELECT   = 2;
+static const uint32_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 3;
+static const uint32_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
 
-    int ret;
-    struct spi_ioc_transfer tr = {
-        .tx_buf        = (unsigned long)tx,
-        .rx_buf        = (unsigned long)rx,
-        .len           = len,
-        .delay_usecs   = delay,
-        .speed_hz      = speed,
-        .bits_per_word = bits,
-    };
+// SPI Trinamic Motor Driver Paths (indexed with chip select above)
+static const char* SPI_PATHS[] = {"/dev/spidev1.0", "/dev/spidev1.1", "/dev/spidev1.2",
+                                  "/dev/spidev1.3", "/dev/spidev1.4"};
 
-    ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
-    if (ret < 1)
-    {
-        LOG(WARNING) << "can't send spi message";
-    }
-        tx[num_transfers_pending++] = data;
-        if (lastTransfer)
-        {
-            printf("================== TRANSFERING TO 4672 ===============\n");
-            transfer(fd, tx, rx, num_transfers_pending);
-            num_transfers_pending = 0;
-            return rx[0];
-        }
-    }
 
-    return rx[0];
-}
-
-static void transfer(int fd, uint8_t const *tx, uint8_t const *rx, size_t len)
-{
-}
-
-MotorService::MotorService()
+MotorService::MotorService(const RobotConstants_t& robot_constants,
+                           const WheelConstants_t& wheel_constants)
 
 {
+    robot_constants_ = robot_constants;
+    wheel_constants_ = wheel_constants;
+
     int ret = 0;
 
 #define OPEN_SPI_FILE_DESCRIPTOR(motor_name, chip_select)                                \
                                                                                          \
-    motor_name##_spi_fd = open(SPI_PATHS[chip_select], O_RDWR);                          \
-    if (motor_name##_spi_fd < 0)                                                         \
+    motor_name##_motor_spi_fd = open(SPI_PATHS[chip_select], O_RDWR);                    \
+    if (motor_name##_motor_spi_fd < 0)                                                   \
     {                                                                                    \
-        LOG(FATAL) << "can't open device: " << motor_name##_spi_path;                    \
+        LOG(FATAL) << "can't open device: " << #motor_name;                              \
     }                                                                                    \
                                                                                          \
-    ret = ioctl(motor_name##_spi_fd, SPI_IOC_WR_MODE32, &SPI_MODE);                      \
+    ret = ioctl(motor_name##_motor_spi_fd, SPI_IOC_WR_MODE32, &SPI_MODE);                \
     if (ret == -1)                                                                       \
     {                                                                                    \
-        LOG(FATAL) << "can't set spi mode for: " << motor_name##_spi_path;               \
+        LOG(FATAL) << "can't set spi mode for: " << #motor_name;                         \
     }                                                                                    \
                                                                                          \
-    ret = ioctl(motor_name##_spi_fd, SPI_IOC_WR_BITS_PER_WORD, &SPI_BITS);               \
+    ret = ioctl(motor_name##_motor_spi_fd, SPI_IOC_WR_BITS_PER_WORD, &SPI_BITS);         \
     if (ret == -1)                                                                       \
     {                                                                                    \
-        LOG(FATAL) << "can't set bits for: " << motor_name##_spi_path;                   \
+        LOG(FATAL) << "can't set bits for: " << #motor_name;                             \
     }                                                                                    \
                                                                                          \
-    ret = ioctl(motor_name##_spi_fd, SPI_IOC_WR_MAX_SPEED_HZ, &SPI_SPEED_HZ);            \
+    ret = ioctl(motor_name##_motor_spi_fd, SPI_IOC_WR_MAX_SPEED_HZ, &SPI_SPEED_HZ);      \
     if (ret == -1)                                                                       \
     {                                                                                    \
-        LOG(FATAL) << "can't set max speed hz for: " << motor_name##_spi_path;           \
+        LOG(FATAL) << "can't set max speed hz for: " << #motor_name;                     \
     }
 
     OPEN_SPI_FILE_DESCRIPTOR(front_left, FRONT_LEFT_MOTOR_CHIP_SELECT)
@@ -110,16 +76,24 @@ MotorService::MotorService()
 
 MotorService::~MotorService() {}
 
-std::unique_ptr<TbotsProto::DriveUnitStatus> poll(
-    const TbotsProto::DirectControlPrimitive_DirectVelocityControl& target_velocity,
+std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
+    const TbotsProto::DirectControlPrimitive_DirectVelocityControl& local_velocity,
     float dribbler_speed_rpm)
 {
-
-    // TODO communicate velocities to trinamic and read back feedback
+    // TODO (#2335) convert local velocity to per-wheel velocity
+    // using http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf and then
+    // communicate velocities to trinamic. Also read back feedback and
+    // return drive unit status.
     return std::make_unique<TbotsProto::DriveUnitStatus>();
 }
 
 
-void MotorService::start() {}
+void MotorService::start()
+{
+    // TODO (#2332)
+}
 
-void MotorService::stop() {}
+void MotorService::stop()
+{
+    // TODO (#2332)
+}

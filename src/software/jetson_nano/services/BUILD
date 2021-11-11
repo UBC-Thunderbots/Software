@@ -10,9 +10,10 @@ cc_library(
     srcs = ["motor.cpp"],
     hdrs = ["motor.h"],
     deps = [
-            ":service",
-            "//software/logger:logger",
-            "//proto:tbots_cc_proto",
-            "@trinamic",
-        ],
+        ":service",
+        "//proto:tbots_cc_proto",
+        "//shared:robot_constants",
+        "//software/logger",
+        "@trinamic",
+    ],
 )
