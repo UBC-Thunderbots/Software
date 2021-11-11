@@ -82,8 +82,6 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
             PlayUpdate(world, [&tactics_to_return](PriorityTacticVector new_tactics) {
                 tactics_to_return = new_tactics;
             })));
-        fsm.visit_current_states(
-            [](auto state) { std::cout << TYPENAME(state) << std::endl; });
 
         tactics_to_return.emplace_back(
             TacticVector({std::get<0>(crease_defender_tactics),
