@@ -91,9 +91,8 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
 
 TEST_F(PrimitiveFactoryTest, test_create_direct_velocity)
 {
-    auto direct_velocity_primitive =
-        ControllerPrimitiveGenerator::createDirectControlPrimitive(
-            Vector(2, -4), AngularVelocity::fromRadians(0.5), 200);
+    auto direct_velocity_primitive = createDirectControlPrimitive(
+        Vector(2, -4), AngularVelocity::fromRadians(0.5), 200);
 
     ASSERT_TRUE(direct_velocity_primitive->has_direct_control());
     EXPECT_EQ(direct_velocity_primitive->direct_control()
