@@ -124,7 +124,7 @@ class Thunderloop
 
 int main(int argc, char** argv)
 {
-    // TODO (#TODO) replace with network logger
+    // TODO (#2338) replace with network logger
     LoggerSingleton::initializeLogger("/tmp");
 
     auto thunderloop =
