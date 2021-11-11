@@ -1,5 +1,5 @@
 /**
- * A service defines an interface with hardware on the robot.
+ * A service defines an interface with hardware/software on the robot.
  */
 class Service
 {

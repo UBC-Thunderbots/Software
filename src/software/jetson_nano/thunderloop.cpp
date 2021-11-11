@@ -14,9 +14,10 @@ class Thunderloop
 {
    public:
     /**
-     * Thunderloop runs all of the robots operations. Receives Primtiives and
-     * Vision from AI, executes the primitives with the most recent vison data.
-     * It then polls the services to interact with the hardware peripherals.
+     * Thunderloop is a giant loop that runs at CONTROL_LOOP_HZ.
+     * It receives Primtiives and Vision from AI, executes the primitives with
+     * the most recent vison data, and polls the services to interact with the hardware
+     * peripherals.
      *
      * High Level Diagram: Service order in loop not shown
      *
@@ -74,7 +75,7 @@ class Thunderloop
 
         for (;;)
         {
-            // TODO (#2335) add loop timing instrospection and use Preempt-RT (maybe)
+            // TODO (#2335) add loop timing introspection and use Preempt-RT (maybe)
             next_frame += std::chrono::milliseconds(
                 static_cast<int>(MILLISECONDS_PER_SECOND / run_at_hz));
 

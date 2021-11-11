@@ -39,10 +39,10 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(
          dest_linear_speed * dest_linear_speed) /
         (2 * robot_constants_.robot_max_acceleration_m_per_s_2 + LOCAL_EPSILON);
 
-    // When we are close enough to start decelerating, we scale down the max
-    // speed the robot can travel at to be 60% of the max speed. Once
-    // we get "close enough", we scale the max_target_linear_speed proportional
-    // to the distance to the destination.
+    // When we are close enough to start decelerating, we reduce the max speed
+    // by 60%. Once we get closer than 0.6 meters, we start to linearly decrease
+    // speed proportional to the distance to the destination. 0.6 was determined
+    // experimentally.
     float target_linear_speed = max_target_linear_speed;
     if (norm_dist_delta < start_linear_deceleration_distance)
     {

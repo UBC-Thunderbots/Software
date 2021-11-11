@@ -2,16 +2,13 @@
 #include "software/geom/vector.h"
 #include "software/world/world.h"
 
-/**
- * Executes primitives with a velocity trajectory
- *
- * NOTE: This class is _NOT_ threadsafe
- */
 class PrimitiveExecutor
 {
    public:
     /**
      * Start running a primitive
+     *
+     * NOTE: This function is not thread-safe.
      *
      * @param robot_constants The robot constants
      * @param primitive The primitive to start
@@ -22,6 +19,8 @@ class PrimitiveExecutor
     /**
      * Steps the current primitive and returns a direct control primitive with the
      * target wheel velocities
+     *
+     * NOTE: This function is not thread-safe.
      *
      * @param robot_state The current robot_state to step the primitive on
      * @returns DirectPerWheelControl The per-wheel direct control primitive msg
