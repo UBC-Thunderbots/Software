@@ -64,8 +64,7 @@ struct OffensivePlayFSM
     {
         // number of additional offensive attacks on top of the minimum of 2 (passer and
         // receiver)
-        // TODO: actually implement this
-        // unsigned int num_additional_offensive_tactics;
+        unsigned int num_additional_offensive_tactics;
     };
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -104,15 +103,16 @@ struct OffensivePlayFSM
             auto pass_eval    = pass_generator.generatePassEvaluation(event.common.world);
             auto ranked_zones = pass_eval.rankZonesForReceiving(
                 event.common.world, event.common.world.ball().position());
-            Zones cherry_pick_region_1 = {ranked_zones[0]};
-            Zones cherry_pick_region_2 = {ranked_zones[1]};
 
             this->best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
             // These two tactics will set robots to roam around the field, trying tdouble
             // o put themselves into a good position to receive a pass
-            auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
-            auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
+            std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics(
+                event.control_params.num_additional_offensive_tactics);
+            std::generate(offensive_positioning_tactics.begin(),
+                          offensive_positioning_tactics.end(),
+                          []() { return std::make_shared<MoveTactic>(false); });
 
             // Wait for a good pass by starting out only looking for "perfect" passes
             // (with a score of 1) and decreasing this threshold over time
@@ -131,15 +131,14 @@ struct OffensivePlayFSM
             pass_eval = pass_generator.generatePassEvaluation(event.common.world);
             best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
-            auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
-            auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
+            for (unsigned int i = 0; i < offensive_positioning_tactics.size(); i++)
+            {
+                auto pass1 = pass_eval.getBestPassInZones({ranked_zones[i]}).pass;
 
-            cherry_pick_tactic_1->updateControlParams(
-                pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-            cherry_pick_tactic_2->updateControlParams(
-                pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                offensive_positioning_tactics[i]->updateControlParams(
+                    pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
+                    MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+            }
 
             // update the best pass in the attacker tactic
             attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
@@ -153,8 +152,10 @@ struct OffensivePlayFSM
                 1 - std::min(time_since_commit_stage_start.toSeconds() /
                                  pass_score_ramp_down_duration,
                              1.0 - abs_min_pass_score);
-            event.common.set_tactics(
-                {attacker_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2});
+            TacticVector retval = {attacker_tactic};
+            retval.insert(retval.end(), offensive_positioning_tactics.begin(),
+                          offensive_positioning_tactics.end());
+            event.common.set_tactics(retval);
         };
 
         const auto take_pass = [this](auto event) {

@@ -77,7 +77,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
         TacticVector offensive_tactics;
 
         fsm.process_event(OffensivePlayFSM::Update(
-            OffensivePlayFSM::ControlParams(),
+            OffensivePlayFSM::ControlParams{.num_additional_offensive_tactics = 2},
             PlayUpdate(world, [&offensive_tactics](TacticVector new_tactics) {
                 offensive_tactics = new_tactics;
             })));
