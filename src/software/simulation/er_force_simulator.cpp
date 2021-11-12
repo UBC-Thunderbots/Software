@@ -90,7 +90,6 @@ ErForceSimulator::ErForceSimulator(
         yellow_simulator_robots.emplace_back(yellow_simulator_robot);
     }
 
-
     this->resetCurrentTime();
 }
 
