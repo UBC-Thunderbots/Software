@@ -109,22 +109,11 @@ class ErForceSimulator : public QObject
     Timestamp getTimestamp() const;
 
     /**
-     * Resets the current firmware time to 0
+     * Resets the current time to 0
      */
-    static void resetCurrentFirmwareTime();
+    void resetCurrentTime();
 
    private:
-    /**
-     * Get the current time.
-     *
-     * This is passed into a `FirmwareWorld`, which requires that it is static (as it
-     * is C code). This will just return `current_firmware_time`, which should be updated
-     * to the actual current time before ticking any firmware.
-     *
-     * @return The value of `current_firmware_time`, in seconds.
-     */
-    static float getCurrentFirmwareTimeSeconds();
-
     /**
      * Sets the primitive being simulated by the robot in simulation
      *
@@ -158,9 +147,8 @@ class ErForceSimulator : public QObject
 
     unsigned int frame_number;
 
-    // The current time. This is static so that it may be used by the firmware,
-    // and so must be set before each firmware tick
-    static Timestamp current_firmware_time;
+    // The current time.
+    Timestamp current_time;
 
     amun::SimulatorSetup er_force_sim_setup;
     std::unique_ptr<camun::simulator::Simulator> er_force_sim;

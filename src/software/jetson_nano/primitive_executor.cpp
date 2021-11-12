@@ -132,35 +132,9 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
                 target_velocity, target_angular_velocity,
                 current_primitive_.move().dribbler_speed_rpm());
 
-            switch (
-                current_primitive_.move().auto_chip_or_kick().auto_chip_or_kick_case())
-            {
-                case TbotsProto::MovePrimitive::AutoChipOrKick::AutoChipOrKickCase::
-                    kAutokickSpeedMPerS:
-                {
-                    output->mutable_direct_control()->set_autokick_speed_m_per_s(
-                        current_primitive_.move()
-                            .auto_chip_or_kick()
-                            .autokick_speed_m_per_s());
-
-                    break;
-                }
-                case TbotsProto::MovePrimitive::AutoChipOrKick::AutoChipOrKickCase::
-                    kAutochipDistanceMeters:
-                {
-                    output->mutable_direct_control()->set_autochip_distance_meters(
-                        current_primitive_.move()
-                            .auto_chip_or_kick()
-                            .autochip_distance_meters());
-                    break;
-                }
-                case TbotsProto::MovePrimitive::AutoChipOrKick::AutoChipOrKickCase::
-                    AUTO_CHIP_OR_KICK_NOT_SET:
-                {
-                    output->mutable_direct_control()->clear_chick_command();
-                    break;
-                }
-            }
+            // Copy the AutoKickOrChip settings over
+            copyAutoChipOrKick(current_primitive_.move(),
+                               output->mutable_direct_control());
 
             return std::make_unique<TbotsProto::DirectControlPrimitive>(
                 output->direct_control());
@@ -175,4 +149,33 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         }
     }
     return std::make_unique<TbotsProto::DirectControlPrimitive>();
+}
+
+void PrimitiveExecutor::copyAutoChipOrKick(const TbotsProto::MovePrimitive& src,
+                                           TbotsProto::DirectControlPrimitive* dest)
+{
+    switch (src.auto_chip_or_kick().auto_chip_or_kick_case())
+    {
+        case TbotsProto::MovePrimitive::AutoChipOrKick::AutoChipOrKickCase::
+            kAutokickSpeedMPerS:
+        {
+            dest->set_autokick_speed_m_per_s(
+                src.auto_chip_or_kick().autokick_speed_m_per_s());
+
+            break;
+        }
+        case TbotsProto::MovePrimitive::AutoChipOrKick::AutoChipOrKickCase::
+            kAutochipDistanceMeters:
+        {
+            dest->set_autochip_distance_meters(
+                src.auto_chip_or_kick().autochip_distance_meters());
+            break;
+        }
+        case TbotsProto::MovePrimitive::AutoChipOrKick::AutoChipOrKickCase::
+            AUTO_CHIP_OR_KICK_NOT_SET:
+        {
+            dest->clear_chick_command();
+            break;
+        }
+    }
 }

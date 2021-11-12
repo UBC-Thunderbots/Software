@@ -54,6 +54,18 @@ class PrimitiveExecutor
     AngularVelocity getTargetAngularVelocity(const TbotsProto::MovePrimitive& primitive,
                                              const RobotState& robot_state);
 
+    /*
+     * The AutoKickOrChip settings from the move primitive need to get copied over
+     * to the direct control primitive.
+     *
+     * TODO (#2340) Remove
+     *
+     * @param src The move primitive to copy from
+     * @param dest The direct primitive to copy to
+     */
+    void copyAutoChipOrKick(const TbotsProto::MovePrimitive& src,
+                            TbotsProto::DirectControlPrimitive* dest);
+
     TbotsProto::Primitive current_primitive_;
     RobotConstants_t robot_constants_;
 };

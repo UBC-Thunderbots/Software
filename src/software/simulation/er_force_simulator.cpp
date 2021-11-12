@@ -89,6 +89,9 @@ ErForceSimulator::ErForceSimulator(
         blue_simulator_robots.emplace_back(blue_simulator_robot);
         yellow_simulator_robots.emplace_back(yellow_simulator_robot);
     }
+
+
+    this->resetCurrentTime();
 }
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
@@ -186,11 +189,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
 
 void ErForceSimulator::stepSimulation(const Duration& time_step)
 {
-    // Set the ball being referenced in each firmware_world.
-    // We only need to do this a single time since all robots
-    // can see and interact with the same ball
-
-    current_firmware_time = current_firmware_time + time_step;
+    current_time = current_time + time_step;
 
     SSLSimulationProto::RobotControl yellow_robot_control =
         updateSimulatorRobots(yellow_simulator_robots, *yellow_team_vision_msg);
@@ -217,20 +216,10 @@ Field ErForceSimulator::getField() const
 
 Timestamp ErForceSimulator::getTimestamp() const
 {
-    return current_firmware_time;
+    return current_time;
 }
 
-void ErForceSimulator::resetCurrentFirmwareTime()
+void ErForceSimulator::resetCurrentTime()
 {
-    current_firmware_time = Timestamp::fromSeconds(0);
+    current_time = Timestamp::fromSeconds(0);
 }
-
-float ErForceSimulator::getCurrentFirmwareTimeSeconds()
-{
-    return static_cast<float>(current_firmware_time.toSeconds());
-}
-
-
-// We must give this variable a value here, as non-const static variables must be
-// initialized out-of-line
-Timestamp ErForceSimulator::current_firmware_time = Timestamp::fromSeconds(0);
