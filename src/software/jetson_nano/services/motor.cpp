@@ -41,6 +41,12 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
 
     int ret = 0;
 
+    /**
+     * Opens SPI File Descriptor
+     *
+     * @param motor_name The name of the motor the spi path is connected to
+     * @param chip_select Which chip select to use
+     */
 #define OPEN_SPI_FILE_DESCRIPTOR(motor_name, chip_select)                                \
                                                                                          \
     motor_name##_motor_spi_fd = open(SPI_PATHS[chip_select], O_RDWR);                    \

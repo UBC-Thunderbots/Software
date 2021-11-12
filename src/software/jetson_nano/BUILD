@@ -13,12 +13,22 @@ cc_library(
     ],
 )
 
-cc_binary(
+cc_library(
     name = "thunderloop",
     srcs = ["thunderloop.cpp"],
+    hdrs = ["thunderloop.h"],
     deps = [
         ":primitive_executor",
         "//proto:tbots_cc_proto",
         "//software/jetson_nano/services:motor",
+    ],
+)
+
+cc_binary(
+    name = "thunderloop_main",
+    srcs = ["thunderloop_main.cpp"],
+    deps = [
+        ":thunderloop",
+        "//shared:constants",
     ],
 )

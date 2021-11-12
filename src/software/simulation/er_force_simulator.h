@@ -131,7 +131,6 @@ class ErForceSimulator : public QObject
      * @param id The id of the robot to set the primitive for
      * @param primitive_msg The primitive to run on the robot
      * @param simulator_robots The robots to set the primitives on
-     * @param simulator_ball The simulator ball to use in the primitives
      * @param vision_msg The vision message
      */
     static void setRobotPrimitive(
@@ -143,7 +142,7 @@ class ErForceSimulator : public QObject
      * Update Simulator Robot and get the latest robot control
      *
      * @param handle_robot_log_proto Function pointer to handle robot log proto
-     * @param simulator_robots Map of simulator robots
+     * @param simulator_robots Vector of simulator robots
      * @param vision_msg The vision msg for this team of robots
      *
      * @return robot control

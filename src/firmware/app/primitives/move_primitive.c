@@ -13,6 +13,13 @@
 #include "shared/constants.h"
 #include "shared/robot_constants.h"
 
+// these are set to decouple the 3 axis from each other
+// the idea is to clamp the maximum velocity and acceleration
+// so that the axes would never have to compete for resources
+#define TIME_HORIZON (0.05f)  // s
+// Number of times the control loop should tick per trajectory element
+#define NUM_TICKS_PER_TRAJECTORY_ELEMENT (4)
+
 typedef struct MoveState
 {
     // The trajectory we're tracking
@@ -97,11 +104,10 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
 
     // clamp num elements between 3 (minimum number of trajectory elements) and
     // TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS
-    const unsigned int num_elements =
-        (unsigned int)fmaxf(fminf((estimated_time_delta * (float)CONTROL_LOOP_HZ /
-                                   (float)NUM_TICKS_PER_TRAJECTORY_ELEMENT),
-                                  TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS),
-                            3);
+    const unsigned int num_elements = (unsigned int)fmaxf(
+        fminf((estimated_time_delta * CONTROL_LOOP_HZ / NUM_TICKS_PER_TRAJECTORY_ELEMENT),
+              TRAJECTORY_PLANNER_MAX_NUM_ELEMENTS),
+        3);
 
     // Plan a trajectory to move to the target position/orientation
     FirmwareRobotPathParameters_t path_parameters = {

@@ -89,9 +89,6 @@ ErForceSimulator::ErForceSimulator(
         blue_simulator_robots.emplace_back(blue_simulator_robot);
         yellow_simulator_robots.emplace_back(yellow_simulator_robot);
     }
-
-
-    this->resetCurrentFirmwareTime();
 }
 
 void ErForceSimulator::setBallState(const BallState& ball_state)

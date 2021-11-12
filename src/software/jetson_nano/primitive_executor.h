@@ -1,3 +1,4 @@
+#pragma once
 #include "proto/primitive.pb.h"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
@@ -36,6 +37,7 @@ class PrimitiveExecutor
      * @param primitive The MovePrimitive to compute the linear velocity for
      * @param robot_state The RobotState of the robot we are planning the current
      * primitive for
+     * @returns Vector The target linear velocity
      */
     Vector getTargetLinearVelocity(const TbotsProto::MovePrimitive& primitive,
                                    const RobotState& robot_state);
@@ -47,6 +49,7 @@ class PrimitiveExecutor
      * @param primitive The MovePrimitive to compute the angular velocity for
      * @param robot_state The RobotState of the robot we are planning the current
      * primitive for
+     * @returns AngularVelocity The target angular velocity
      */
     AngularVelocity getTargetAngularVelocity(const TbotsProto::MovePrimitive& primitive,
                                              const RobotState& robot_state);
