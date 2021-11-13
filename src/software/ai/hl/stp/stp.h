@@ -221,4 +221,6 @@ class STP : public HL
     std::shared_ptr<GoalieTactic> goalie_tactic;
     // Stop tactic common to all plays for robots that don't have tactics assigned
     TacticVector stop_tactics;
+    
+    static double constexpr NEW_TACTIC_ASSIGNMENT_THRESHOLD = 0.05;
 };

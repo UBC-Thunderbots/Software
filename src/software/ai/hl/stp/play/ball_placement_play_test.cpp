@@ -20,7 +20,7 @@ TEST_F(BallPlacementPlayTest, test_ball_placement)
     Point ball_placement_point(-3, -2);
     BallState ball_state(Point(0, 0.5), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
-        {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
+        {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-2, -0.5), Point(-3, -1.5),
          Point(4.6, -3.1)});
     setFriendlyGoalie(0);
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(

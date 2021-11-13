@@ -372,7 +372,7 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
         robots = remaining_robots;
     }
 
-    if (recalculate_tactic_assignment || (old_assignment > (new_assignment + 0.0)))
+    if (recalculate_tactic_assignment || (old_assignment > (new_assignment + NEW_TACTIC_ASSIGNMENT_THRESHOLD)))
     {
         robot_tactic_assignment = *new_tactic_assignment;
     }
