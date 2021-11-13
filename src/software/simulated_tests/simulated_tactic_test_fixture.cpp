@@ -95,10 +95,10 @@ void SimulatedTacticTestFixture::setRobotId(RobotId friendly_robot_id)
 }
 
 void SimulatedTacticTestFixture::setBothRobotId(RobotId friendly_robot_id,
-                                            RobotId enemy_robot_id)
+                                                RobotId enemy_robot_id)
 {
     this->friendly_robot_id = friendly_robot_id;
-    this->enemy_robot_id = enemy_robot_id;
+    this->enemy_robot_id    = enemy_robot_id;
 }
 
 void SimulatedTacticTestFixture::setMotionConstraints(

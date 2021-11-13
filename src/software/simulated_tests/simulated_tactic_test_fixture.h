@@ -53,23 +53,23 @@ class SimulatedTacticTestFixture : public SimulatedTestFixture
      * @throw invalid_argument if does not contain a tactic
      */
     void setEnemyTactic(std::shared_ptr<Tactic> tactic);
-    
+
     /**
      * Sets the friendly robot ID if the test only needs
      * friendly robots.
-     * 
+     *
      * @param friendly_robot_id The friendly robot ID
-     * 
+     *
      */
     void setRobotId(RobotId friendly_robot_id)
 
-    /**
-     * Sets the friendly and enemy robot IDs if the test requires both robots
-     *
-     * @param friendly_robot_id The friendly robot ID
-     * @param enemy_robot_id The enemy robot ID
-     */
-    void setBothRobotId(RobotId friendly_robot_id, RobotId enemy_robot_id);
+        /**
+         * Sets the friendly and enemy robot IDs if the test requires both robots
+         *
+         * @param friendly_robot_id The friendly robot ID
+         * @param enemy_robot_id The enemy robot ID
+         */
+        void setBothRobotId(RobotId friendly_robot_id, RobotId enemy_robot_id);
 
     /**
      * Sets the motion constraints for the friendly and enemy (if applicable) teams
