@@ -102,6 +102,4 @@ TEST(KickoffFriendlyPlayInvariantAndIsApplicableTest, test_invariant_and_is_appl
     // Make sure we don't run the kickoff friendly play
     ASSERT_FALSE(kickoff_friendly_play.isApplicable(world));
     ASSERT_FALSE(kickoff_friendly_play.invariantHolds(world));
-
-    // hi
 }
