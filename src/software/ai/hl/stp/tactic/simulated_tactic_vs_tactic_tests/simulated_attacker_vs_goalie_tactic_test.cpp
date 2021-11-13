@@ -36,7 +36,7 @@ TEST_P(SimulatedAttackerVsGoalieTacticTest, attacker_vs_goalie_test)
     auto enemy_tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
 
     setTactic(friendly_tactic, enemy_tactic);
-    setRobotId(friendly_robot_state.id, enemy_robot_state.id);
+    setBothRobotId(friendly_robot_state.id, enemy_robot_state.id);
 
     std::vector<ValidationFunction> terminating_validation_functions = {};
 

@@ -89,7 +89,7 @@ void SimulatedTacticTestFixture::setEnemyTactic(std::shared_ptr<Tactic> tactic)
     }
 }
 
-void SimulatedTacticTestFixture::setRobotId(RobotId friendly_robot_id)
+void SimulatedTacticTestFixture::setFriendlyRobotId(RobotId friendly_robot_id)
 {
     this->friendly_robot_id = friendly_robot_id;
 }
