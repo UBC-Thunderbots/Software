@@ -200,3 +200,14 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
     ],
 )
+
+cc_library(
+    name = "er_force_world",
+    srcs = ["er_force_world.cpp"],
+    hdrs = ["er_force_world.h"],
+    deps = [
+        "//extlibs/er_force_sim/src/protobuf:protobuf_cc_lib", 
+        "//software/world:robot", 
+        "//software/world:ball"
+    ],
+)

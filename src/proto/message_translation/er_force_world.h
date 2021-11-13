@@ -2,8 +2,8 @@
 
 #include "software/world/ball.h"
 #include "software/world/robot.h"
-#include "extlibs/er_force_sim/src/amun/simulator/simball.h"
-#include "extlibs/er_force_sim/src/amun/simulator/simrobot.h"
+#include "software/time/timestamp.h"
+#include "extlibs/er_force_sim/src/protobuf/world.pb.h"
 
 /**
  * convert a er force simulator ball to a ball object
@@ -13,7 +13,7 @@
  * @return the corresponding ball object to the er simulator ball 
  */
 
-Ball createBall(world::SimBall sim_ball);
+Ball createBall(world::SimBall sim_ball, Timestamp timestamp);
 
 /**
  * Convert a er force simulator robot to a robot object
@@ -22,4 +22,4 @@ Ball createBall(world::SimBall sim_ball);
  * 
  * @return the corresponding robot object to the er simulator robot 
  */
-Robot createRobot(world::SimRobot sim_robot);
+Robot createRobot(world::SimRobot sim_robot, Timestamp timestamp);
