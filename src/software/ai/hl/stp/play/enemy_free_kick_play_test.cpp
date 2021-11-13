@@ -209,17 +209,24 @@ TEST(EnemyFreeKickPlayInvariantAndIsApplicableTest, test_invariant_and_is_applic
     // EnemyFreeKickPlay: the play under test
     auto enemy_free_kick_play = EnemyFreekickPlay(play_config);
 
-    // Ensure play will start and stay running for our free kick play
+    // Test 1: Ensure play will start and stay running for our free kick play
     world.updateGameState(::TestUtil::createGameState(RefereeCommand::DIRECT_FREE_THEM,
                                                       RefereeCommand::DIRECT_FREE_THEM));
 
     ASSERT_TRUE(enemy_free_kick_play.isApplicable(world));
     ASSERT_TRUE(enemy_free_kick_play.invariantHolds(world));
 
-    // Ensure doesn't run when NOT our free kick play
+    // Test 2: Ensure doesn't run when NOT our free kick play
     world.updateGameState(::TestUtil::createGameState(RefereeCommand::DIRECT_FREE_US,
                                                       RefereeCommand::DIRECT_FREE_THEM));
 
     ASSERT_FALSE(enemy_free_kick_play.isApplicable(world));
     ASSERT_FALSE(enemy_free_kick_play.invariantHolds(world));
+
+    // Test 3: Ensure play goes from normal start command to enemy free kick play
+    world.updateGameState(::TestUtil::createGameState(RefereeCommand::DIRECT_FREE_THEM,
+                                                      RefereeCommand::NORMAL_START));
+
+    ASSERT_TRUE(enemy_free_kick_play.isApplicable(world));
+    ASSERT_TRUE(enemy_free_kick_play.invariantHolds(world));
 }
