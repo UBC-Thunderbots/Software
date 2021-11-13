@@ -83,42 +83,42 @@ ErForceSimulator::ErForceSimulator(
 
     // TODO (#2283): remove this initialization when addYellowRobots and addBlueRobots are
     // implemented
-    for (unsigned int i = 0; i < 11; i++)
-    {
-        auto blue_simulator_robot = std::make_shared<ErForceSimulatorRobot>(
-            RobotStateWithId{.id          = i,
-                             .robot_state = RobotState(Point(), Vector(), Angle::zero(),
-                                                       AngularVelocity::zero())},
-            robot_constants, wheel_constants);
-        auto yellow_simulator_robot = std::make_shared<ErForceSimulatorRobot>(
-            RobotStateWithId{.id          = i,
-                             .robot_state = RobotState(Point(), Vector(), Angle::zero(),
-                                                       AngularVelocity::zero())},
-            robot_constants, wheel_constants);
+    // for (unsigned int i = 0; i < 11; i++)
+    // {
+    //     auto blue_simulator_robot = std::make_shared<ErForceSimulatorRobot>(
+    //         RobotStateWithId{.id          = i,
+    //                          .robot_state = RobotState(Point(), Vector(), Angle::zero(),
+    //                                                    AngularVelocity::zero())},
+    //         robot_constants, wheel_constants);
+    //     auto yellow_simulator_robot = std::make_shared<ErForceSimulatorRobot>(
+    //         RobotStateWithId{.id          = i,
+    //                          .robot_state = RobotState(Point(), Vector(), Angle::zero(),
+    //                                                    AngularVelocity::zero())},
+    //         robot_constants, wheel_constants);
 
-        auto blue_firmware_robot = ErForceSimulatorRobotSingleton::createFirmwareRobot();
-        auto blue_firmware_ball  = SimulatorBallSingleton::createFirmwareBall();
-        auto yellow_firmware_robot =
-            ErForceSimulatorRobotSingleton::createFirmwareRobot();
-        auto yellow_firmware_ball = SimulatorBallSingleton::createFirmwareBall();
+    //     auto blue_firmware_robot = ErForceSimulatorRobotSingleton::createFirmwareRobot();
+    //     auto blue_firmware_ball  = SimulatorBallSingleton::createFirmwareBall();
+    //     auto yellow_firmware_robot =
+    //         ErForceSimulatorRobotSingleton::createFirmwareRobot();
+    //     auto yellow_firmware_ball = SimulatorBallSingleton::createFirmwareBall();
 
-        FirmwareWorld_t* blue_firmware_world_raw = app_firmware_world_create(
-            blue_firmware_robot.release(), blue_firmware_ball.release(),
-            &(ErForceSimulator::getCurrentFirmwareTimeSeconds));
-        auto blue_firmware_world = std::shared_ptr<FirmwareWorld_t>(
-            blue_firmware_world_raw, FirmwareWorldDeleter());
+    //     FirmwareWorld_t* blue_firmware_world_raw = app_firmware_world_create(
+    //         blue_firmware_robot.release(), blue_firmware_ball.release(),
+    //         &(ErForceSimulator::getCurrentFirmwareTimeSeconds));
+    //     auto blue_firmware_world = std::shared_ptr<FirmwareWorld_t>(
+    //         blue_firmware_world_raw, FirmwareWorldDeleter());
 
-        FirmwareWorld_t* yellow_firmware_world_raw = app_firmware_world_create(
-            yellow_firmware_robot.release(), yellow_firmware_ball.release(),
-            &(ErForceSimulator::getCurrentFirmwareTimeSeconds));
-        auto yellow_firmware_world = std::shared_ptr<FirmwareWorld_t>(
-            yellow_firmware_world_raw, FirmwareWorldDeleter());
+    //     FirmwareWorld_t* yellow_firmware_world_raw = app_firmware_world_create(
+    //         yellow_firmware_robot.release(), yellow_firmware_ball.release(),
+    //         &(ErForceSimulator::getCurrentFirmwareTimeSeconds));
+    //     auto yellow_firmware_world = std::shared_ptr<FirmwareWorld_t>(
+    //         yellow_firmware_world_raw, FirmwareWorldDeleter());
 
-        blue_simulator_robots.insert(
-            std::make_pair(blue_simulator_robot, blue_firmware_world));
-        yellow_simulator_robots.insert(
-            std::make_pair(yellow_simulator_robot, yellow_firmware_world));
-    }
+    //     blue_simulator_robots.insert(
+    //         std::make_pair(blue_simulator_robot, blue_firmware_world));
+    //     yellow_simulator_robots.insert(
+    //         std::make_pair(yellow_simulator_robot, yellow_firmware_world));
+    // }
 
 
     this->resetCurrentFirmwareTime();
@@ -133,11 +133,55 @@ void ErForceSimulator::setBallState(const BallState& ball_state)
 void ErForceSimulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
 {
     // TODO (#2283): add robots
+
+    for (unsigned int i = 0; i < 11; i++)
+    {
+        auto yellow_simulator_robot = std::make_shared<ErForceSimulatorRobot>(
+            RobotStateWithId{.id          = i,
+                             .robot_state = RobotState(Point(), Vector(), Angle::zero(),
+                                                       AngularVelocity::zero())},
+            robot_constants, wheel_constants);
+
+        auto yellow_firmware_robot =
+            ErForceSimulatorRobotSingleton::createFirmwareRobot();
+        auto yellow_firmware_ball = SimulatorBallSingleton::createFirmwareBall();
+
+        FirmwareWorld_t* yellow_firmware_world_raw = app_firmware_world_create(
+            yellow_firmware_robot.release(), yellow_firmware_ball.release(),
+            &(ErForceSimulator::getCurrentFirmwareTimeSeconds));
+        auto yellow_firmware_world = std::shared_ptr<FirmwareWorld_t>(
+            yellow_firmware_world_raw, FirmwareWorldDeleter());
+
+        yellow_simulator_robots.insert(
+            std::make_pair(yellow_simulator_robot, yellow_firmware_world));
+    }
 }
 
 void ErForceSimulator::addBlueRobots(const std::vector<RobotStateWithId>& robots)
 {
     // TODO (#2283): add robots
+
+    for (unsigned int i = 0; i < 11; i++)
+    {
+        auto blue_simulator_robot = std::make_shared<ErForceSimulatorRobot>(
+            RobotStateWithId{.id          = i,
+                             .robot_state = RobotState(Point(), Vector(), Angle::zero(),
+                                                       AngularVelocity::zero())},
+            robot_constants, wheel_constants);
+
+        auto blue_firmware_robot = ErForceSimulatorRobotSingleton::createFirmwareRobot();
+        auto blue_firmware_ball  = SimulatorBallSingleton::createFirmwareBall();
+        
+        FirmwareWorld_t* blue_firmware_world_raw = app_firmware_world_create(
+            blue_firmware_robot.release(), blue_firmware_ball.release(),
+            &(ErForceSimulator::getCurrentFirmwareTimeSeconds));
+        auto blue_firmware_world = std::shared_ptr<FirmwareWorld_t>(
+            blue_firmware_world_raw, FirmwareWorldDeleter());
+
+        blue_simulator_robots.insert(
+            std::make_pair(blue_simulator_robot, blue_firmware_world));
+    }
+
 }
 
 void ErForceSimulator::setYellowRobotPrimitiveSet(
