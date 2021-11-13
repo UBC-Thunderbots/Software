@@ -119,4 +119,17 @@ TEST(ShootOrPassPlayInvariantAndIsApplicableTest, test_invariant_and_is_applicab
     // Make sure play is not running when enemy has the ball
     ASSERT_FALSE(shoot_or_pass_play.isApplicable(world));
     ASSERT_FALSE(shoot_or_pass_play.invariantHolds(world));
+
+    // Set game state to a kickoff and start it. Game state is set to ready
+    world.updateGameState(::TestUtil::createGameState(
+        RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_US));
+    world.setTeamWithPossession(TeamSide::FRIENDLY);
+
+    // Move ball so that game state is set to playing
+    world.updateGameStateBall(Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0)));
+    world.updateGameStateBall(Ball(Point(0, 0.05), Vector(), Timestamp::fromSeconds(0)));
+
+    // Make sure play is running
+    ASSERT_TRUE(shoot_or_pass_play.isApplicable(world));
+    ASSERT_TRUE(shoot_or_pass_play.invariantHolds(world));
 }
