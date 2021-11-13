@@ -50,7 +50,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     // 		|                    |                    |
     // 		|                    |                    |
     // 		+--+ 2            4  |                 +--+
-    // 		|  |                 |                 |  |
+    // 		|  |             6    |                 |  |
     // 		|  |               +-+-+               |  |
     // 		|  | 3             |   |               |  |
     // 		|  |               +-+-+               |  |
@@ -86,6 +86,21 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     {
         // TODO: (Mathew): Minor instability with defenders and goalie when the ball and
         // attacker are in the middle of the net
+
+        //Find the closest robot to the ball using findNearestRobot?
+
+        //We should find the nearest robot, which is the robot with the highest threat, then remove ("ignore") it from the enemy team
+        
+        /*
+             robot_id = findNearestRobot;
+            world.enemyTeam().removeRobotWithId(robot_id);
+        */
+
+       int robot_id = getNearestRobot(world.enemyTeam(), new Point()).id(); //create a new reference point at (0,0) with new?
+       //return type of getNearestRobot is std::optional<Robot> (returns a robot)?
+       world.enemyTeam().removeRobotWithId(robot_id);      
+
+
         auto enemy_threats = getAllEnemyThreats(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball(), false);
 
@@ -109,7 +124,11 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 // anyway
                 shadow_enemy_tactics.at(i)->updateControlParams(enemy_threat,
                                                                 shadow_dist);
+               
                 result[0].emplace_back(shadow_enemy_tactics.at(i));
+                
+                std::cout<< enemy_threat.robot.id() << "string at position" << i <<std::endl;
+
             }
             else
             {
@@ -123,6 +142,9 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 defense_position_index++;
             }
         }
+
+        //move_tactics.at(defense_position_index).updateControlParams(//update to be directly infront of the enemy robot performing kickoff);
+        move_tactics.at(defense_position_index)->updateControlParams()
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(result);
