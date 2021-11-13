@@ -232,10 +232,7 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
         {
             if (robot_tactic_assignment.find(tactic) != robot_tactic_assignment.end())
             {
-                if (!recalculate_tactic_assignment)
-                {
-                    old_assignment += tactic->calculateRobotCost(robot_tactic_assignment.at(tactic), world);
-                }
+                old_assignment += tactic->calculateRobotCost(robot_tactic_assignment.at(tactic), world);
             }
             else
             {
