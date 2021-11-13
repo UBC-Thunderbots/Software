@@ -62,10 +62,10 @@ void SimulatedPlayTestFixture::setGameState(const GameState& game_state_)
 }
 
 void SimulatedPlayTestFixture::updatePrimitives(
-    const World& world, const World& unused_enemy_world,
+    const World& friendly_world, const World& unused_enemy_world,
     std::shared_ptr<Simulator> simulator_to_update)
 {
-    auto world_with_updated_game_state = world;
+    auto world_with_updated_game_state = friendly_world;
     world_with_updated_game_state.updateGameState(game_state);
 
     auto start_tick_time = std::chrono::system_clock::now();
