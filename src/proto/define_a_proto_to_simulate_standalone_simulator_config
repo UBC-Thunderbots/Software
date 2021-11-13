@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package TbotsProto;
+
+message yellow_team_channel
+{
+    // x coordinate
+    int min = 0;
+    int max = 15;
+    int value = 0;
+
+    // y coordinate
+    float y_meters = 2;
+}
+
+message Vector
+{
+    // x component
+    float x_component_meters = 1;
+
+    // y component
+    float y_component_meters = 2;
+}
+
+message Angle
+{
+    // the angle in radians
+    float radians = 1;
+}
+
+message AngularVelocity
+{
+    // the angular velocity in radians
+    float radians_per_second = 1;
+}

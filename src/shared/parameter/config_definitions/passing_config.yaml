@@ -1,4 +1,3 @@
-
  - double:
      name: static_field_position_quality_x_offset
      min: 0
