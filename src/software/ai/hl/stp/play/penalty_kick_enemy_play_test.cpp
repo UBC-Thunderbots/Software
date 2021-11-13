@@ -163,7 +163,7 @@ TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_goalie)
             Duration::fromSeconds(10));
 }
 
-TEST(HaltPlayInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
+TEST_F(PenaltyKickEnemyPlayTest, test_invariant_and_is_applicable)
 {
     auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
 
