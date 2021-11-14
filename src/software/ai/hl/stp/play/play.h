@@ -118,6 +118,8 @@ class Play
      * done when its coroutine is done (the getNextTactics() function has no
      * more work to do)
      *
+     * TODO: make pure virtual once all plays are not coroutines
+     *
      * @return true if the Play is done and false otherwise
      */
     virtual bool done() const;
@@ -154,6 +156,8 @@ class Play
      * the Tactic's state because the objects would have to be constructed and moved every
      * time the function is called.
      *
+     * TODO: delete once all plays are not coroutines
+     *
      * @param world The current state of the world
      * @return A list of shared_ptrs to the Tactics the Play wants to run at this time, in
      * order of priority
@@ -178,6 +182,8 @@ class Play
      * This function yields a list of shared_ptrs to the Tactics the Play wants to run at
      * this time, in order of priority. This yield happens in place of a return.
      *
+     * TODO: delete once all plays are not coroutines
+     *
      * @param yield The coroutine push_type for the Play
      */
     void getNextTacticsWrapper(TacticCoroutine::push_type& yield);
@@ -186,13 +192,15 @@ class Play
      * This function yields a list of shared_ptrs to the Tactics the Play wants to run at
      * this time, in order of priority. This yield happens in place of a return.
      *
+     * TODO: delete once all plays are not coroutines
+     *
      * @param yield The coroutine push_type for the Play
      * @param world The current state of the world
      */
     virtual void getNextTactics(TacticCoroutine::push_type& yield,
                                 const World& world) = 0;
 
-    // TODO: make this function pure virtual
+    // TODO: make pure virtual once all plays are not coroutines
     virtual void updateTactics(const PlayUpdate& play_update);
 
     // Whether this plays requires a goalie

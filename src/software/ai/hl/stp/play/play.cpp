@@ -105,6 +105,7 @@ void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
     }
 }
 
+// TODO: delete once all plays are not coroutines
 void Play::updateTactics(const PlayUpdate &play_update)
 {
     priority_tactics = getTactics(play_update.world);
