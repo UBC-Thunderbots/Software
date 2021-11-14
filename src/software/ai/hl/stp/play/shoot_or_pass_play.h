@@ -23,6 +23,6 @@ class ShootOrPassPlay : public Play
    private:
     void updateTactics(const PlayUpdate &play_update) override;
 
-    boost::sml::sm<ShootOrPassPlayFSM> main_fsm;
-    std::shared_ptr<boost::sml::sm<OffensivePlayFSM>> offensive_fsm;
+    FSM<ShootOrPassPlayFSM> main_fsm;
+    std::shared_ptr<FSM<OffensivePlayFSM>> offensive_fsm;
 };

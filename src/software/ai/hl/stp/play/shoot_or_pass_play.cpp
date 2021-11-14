@@ -18,8 +18,7 @@ using Zones = std::unordered_set<EighteenZoneId>;
 ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config)
     : Play(config, true),
       main_fsm{ShootOrPassPlayFSM{config}},
-      offensive_fsm(
-          std::make_shared<boost::sml::sm<OffensivePlayFSM>>(OffensivePlayFSM{config}))
+      offensive_fsm(std::make_shared<FSM<OffensivePlayFSM>>(OffensivePlayFSM{config}))
 {
 }
 

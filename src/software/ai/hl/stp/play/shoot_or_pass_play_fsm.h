@@ -15,7 +15,7 @@ struct ShootOrPassPlayFSM
 
     struct ControlParams
     {
-        std::shared_ptr<boost::sml::sm<OffensivePlayFSM>> offensive_fsm;
+        std::shared_ptr<FSM<OffensivePlayFSM>> offensive_fsm;
     };
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
