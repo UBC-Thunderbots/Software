@@ -11,8 +11,7 @@ TEST(PenaltyKickFSM, test_transitions)
                                         Timestamp::fromSeconds(0));
     Robot robot = ::TestUtil::createRobotAtPos(world.field().friendlyPenaltyMark());
 
-    FSM<PenaltyKickFSM> fsm(DribbleFSM(std::make_shared<Point>()),
-                            PenaltyKickFSM(std::nullopt, Point(), Angle()));
+    FSM<PenaltyKickFSM> fsm(DribbleFSM(), PenaltyKickFSM(std::nullopt, Point(), Angle()));
 
     PenaltyKickFSM::ControlParams control_params{};
 
