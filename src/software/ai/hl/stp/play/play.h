@@ -22,6 +22,41 @@ using MotionConstraintBuildFunction =
 // This coroutine returns a list of list of shared_ptrs to Tactic objects
 using TacticCoroutine = boost::coroutines2::coroutine<PriorityTacticVector>;
 
+
+// This callback is used to return an intent from the fsm
+using SetTacticsCallback = std::function<void(PriorityTacticVector)>;
+
+// The tactic update struct is used to update tactics and set the new intent
+struct PlayUpdate
+{
+    PlayUpdate(const World& world, const SetTacticsCallback& set_tactics_fun)
+        : world(world), set_tactics(set_tactics_fun)
+    {
+    }
+    // updated world
+    World world;
+    // callback to return the next tactics
+    SetTacticsCallback set_tactics;
+};
+
+/**
+ * The Update struct is the only event that a tactic fsm should respond to and it is
+ * composed of the following structs:
+ *
+ * ControlParams - uniquely defined by each tactic to control the FSM
+ * TacticUpdate - common struct that contains World and SetTacticsCallback
+ */
+#define DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS                         \
+    struct Update                                                                        \
+    {                                                                                    \
+        Update(const ControlParams& control_params, const PlayUpdate& common)            \
+            : control_params(control_params), common(common)                             \
+        {                                                                                \
+        }                                                                                \
+        ControlParams control_params;                                                    \
+        PlayUpdate common;                                                               \
+    };
+
 /**
  * In the STP framework, a Play is a collection of tactics that represent some
  * "team-wide" goal. It can be thought of like a traditional play in soccer.
@@ -157,6 +192,9 @@ class Play
     virtual void getNextTactics(TacticCoroutine::push_type& yield,
                                 const World& world) = 0;
 
+    // TODO: make this function pure virtual
+    virtual void updateTactics(const PlayUpdate& play_update);
+
     // Whether this plays requires a goalie
     const bool requires_goalie;
 
@@ -165,4 +203,6 @@ class Play
 
     // The Play's knowledge of the most up-to-date World
     std::optional<World> world;
+
+    PriorityTacticVector priority_tactics;
 };

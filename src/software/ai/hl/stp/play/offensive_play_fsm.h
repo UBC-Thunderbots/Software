@@ -19,42 +19,6 @@
 
 using Zones = std::unordered_set<EighteenZoneId>;
 
-// This callback is used to return an intent from the fsm
-using SetTacticsCallback = std::function<void(PriorityTacticVector)>;
-
-// The tactic update struct is used to update tactics and set the new intent
-struct PlayUpdate
-{
-    PlayUpdate(const World &world, const SetTacticsCallback &set_tactics_fun)
-        : world(world), set_tactics(set_tactics_fun)
-    {
-    }
-    // updated world
-    World world;
-    // callback to return the next tactics
-    SetTacticsCallback set_tactics;
-};
-
-/**
- * The Update struct is the only event that a tactic fsm should respond to and it is
- * composed of the following structs:
- *
- * ControlParams - uniquely defined by each tactic to control the FSM
- * TacticUpdate - common struct that contains World and SetTacticsCallback
- */
-#define DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS                         \
-    struct Update                                                                        \
-    {                                                                                    \
-        Update(const ControlParams &control_params, const PlayUpdate &common)            \
-            : control_params(control_params), common(common)                             \
-        {                                                                                \
-        }                                                                                \
-        ControlParams control_params;                                                    \
-        PlayUpdate common;                                                               \
-    };
-
-
-
 struct OffensivePlayFSM
 {
     class AttemptToShootWhileLookingForAPassState;

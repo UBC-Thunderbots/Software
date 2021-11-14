@@ -50,7 +50,10 @@ std::vector<std::unique_ptr<Intent>> Play::get(
     MotionConstraintBuildFunction motion_constraint_builder, const World &new_world)
 {
     std::vector<std::unique_ptr<Intent>> intents;
-    PriorityTacticVector priority_tactics = getTactics(new_world);
+    updateTactics(PlayUpdate(new_world, [this](PriorityTacticVector new_tactics) {
+        priority_tactics = std::move(new_tactics);
+    }));
+
     ConstPriorityTacticVector const_priority_tactics;
 
     // convert pointers to const pointers
@@ -100,4 +103,9 @@ void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
     {
         getNextTactics(yield, world.value());
     }
+}
+
+void Play::updateTactics(const PlayUpdate &play_update)
+{
+    priority_tactics = getTactics(play_update.world);
 }
