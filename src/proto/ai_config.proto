@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package DynamicParamProto;
+
+message AiControlConfig
+{
+    //  Selecting will allow HL and Navigator to run, unselecting will
+    //  stop new decisions from being made, but the robots will finish
+    //  the last commands they were given. DO NOT USE in place of the e-stop.
+    bool run_ai = 1;
+
+    // Overrides the current play with the play
+    // specified by currentPlay parameter
+    string override_ai_play = 2;
+    
+    // Specifies the ai play that should be in use
+    string current_ai_play = 3;
+}
