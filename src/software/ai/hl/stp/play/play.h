@@ -120,7 +120,7 @@ class Play
      *
      * @return true if the Play is done and false otherwise
      */
-    bool done() const;
+    virtual bool done() const;
 
     /**
      * Gets Intents from the Play given the assignment algorithm and world

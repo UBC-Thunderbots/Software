@@ -263,6 +263,7 @@ cc_library(
     hdrs = [
         "offensive_play_fsm.h",
         "shoot_or_pass_play.h",
+        "shoot_or_pass_play_fsm.h",
     ],
     deps = [
         ":play",

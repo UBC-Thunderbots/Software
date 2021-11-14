@@ -17,13 +17,9 @@ using Zones = std::unordered_set<EighteenZoneId>;
 
 ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config)
     : Play(config, true),
-      offensive_fsm(OffensivePlayFSM(config)),
-      crease_defender_tactics({
-          std::make_shared<CreaseDefenderTactic>(
-              play_config->getRobotNavigationObstacleConfig()),
-          std::make_shared<CreaseDefenderTactic>(
-              play_config->getRobotNavigationObstacleConfig()),
-      })
+      main_fsm{ShootOrPassPlayFSM{config}},
+      offensive_fsm(
+          std::make_shared<boost::sml::sm<OffensivePlayFSM>>(OffensivePlayFSM{config}))
 {
 }
 
@@ -42,33 +38,22 @@ bool ShootOrPassPlay::invariantHolds(const World &world) const
 void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                      const World &world)
 {
-    do
+    // This function doesn't get called so it does nothing
+    while (true)
     {
         yield({{}});
-    } while (true);
+    }
+}
+
+bool ShootOrPassPlay::done() const
+{
+    return main_fsm.is(boost::sml::X);
 }
 
 void ShootOrPassPlay::updateTactics(const PlayUpdate &play_update)
 {
-    std::get<0>(crease_defender_tactics)
-        ->updateControlParams(play_update.world.ball().position(),
-                              CreaseDefenderAlignment::LEFT);
-    std::get<1>(crease_defender_tactics)
-        ->updateControlParams(play_update.world.ball().position(),
-                              CreaseDefenderAlignment::RIGHT);
-
-    PriorityTacticVector tactics_to_return;
-
-    offensive_fsm.process_event(OffensivePlayFSM::Update(
-        OffensivePlayFSM::ControlParams{.num_additional_offensive_tactics = 2},
-        PlayUpdate(play_update.world,
-                   [&tactics_to_return](PriorityTacticVector new_tactics) {
-                       tactics_to_return = new_tactics;
-                   })));
-
-    tactics_to_return.emplace_back(TacticVector(
-        {std::get<0>(crease_defender_tactics), std::get<1>(crease_defender_tactics)}));
-    play_update.set_tactics(tactics_to_return);
+    main_fsm.process_event(ShootOrPassPlayFSM::Update(
+        ShootOrPassPlayFSM::ControlParams{.offensive_fsm = offensive_fsm}, play_update));
 }
 
 // Register this play in the genericFactory

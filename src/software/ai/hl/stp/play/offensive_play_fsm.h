@@ -130,16 +130,14 @@ struct OffensivePlayFSM
         };
 
         const auto start_looking_for_pass = [this, look_for_pass](auto event) {
-            Timestamp pass_optimization_start_time =
-                event.common.world.getMostRecentTimestamp();
-            // reset tactics
             attacker_tactic =
                 std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
             receiver_tactic = std::make_shared<ReceiverTactic>(
                 Field::createSSLDivisionBField(), Team(), Team(),
                 Pass(Point(), Point(), 0),
                 Ball(Point(), Vector(), Timestamp::fromSeconds(0)), false);
-
+            Timestamp pass_optimization_start_time =
+                event.common.world.getMostRecentTimestamp();
             look_for_pass(event);
         };
 
@@ -204,8 +202,7 @@ struct OffensivePlayFSM
             take_pass_s + update_e[!pass_completed] / take_pass     = take_pass_s,
             take_pass_s + update_e[should_abort] / start_looking_for_pass =
                 look_for_pass_s,
-            take_pass_s + update_e[pass_completed] / take_pass = X,
-            X + update_e / start_looking_for_pass              = look_for_pass_s);
+            take_pass_s + update_e[pass_completed] / take_pass = X);
     }
 
    private:

@@ -51,7 +51,7 @@ std::vector<std::unique_ptr<Intent>> Play::get(
 {
     std::vector<std::unique_ptr<Intent>> intents;
     updateTactics(PlayUpdate(new_world, [this](PriorityTacticVector new_tactics) {
-        priority_tactics = new_tactics;
+        priority_tactics = std::move(new_tactics);
     }));
 
     ConstPriorityTacticVector const_priority_tactics;
