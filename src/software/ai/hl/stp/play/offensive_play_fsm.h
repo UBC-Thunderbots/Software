@@ -4,8 +4,6 @@
 
 #include "shared/constants.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/play/offensive_play_fsm.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
@@ -13,9 +11,7 @@
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
 #include "software/ai/passing/pass_generator.h"
-#include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
-#include "software/util/generic_factory/generic_factory.h"
 
 using Zones = std::unordered_set<EighteenZoneId>;
 
@@ -136,6 +132,14 @@ struct OffensivePlayFSM
         const auto start_looking_for_pass = [this, look_for_pass](auto event) {
             Timestamp pass_optimization_start_time =
                 event.common.world.getMostRecentTimestamp();
+            // reset tactics
+            attacker_tactic =
+                std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
+            receiver_tactic = std::make_shared<ReceiverTactic>(
+                Field::createSSLDivisionBField(), Team(), Team(),
+                Pass(Point(), Point(), 0),
+                Ball(Point(), Vector(), Timestamp::fromSeconds(0)), false);
+
             look_for_pass(event);
         };
 
@@ -200,7 +204,8 @@ struct OffensivePlayFSM
             take_pass_s + update_e[!pass_completed] / take_pass     = take_pass_s,
             take_pass_s + update_e[should_abort] / start_looking_for_pass =
                 look_for_pass_s,
-            take_pass_s + update_e[pass_completed] / take_pass = X);
+            take_pass_s + update_e[pass_completed] / take_pass = X,
+            X + update_e / start_looking_for_pass              = look_for_pass_s);
     }
 
    private:

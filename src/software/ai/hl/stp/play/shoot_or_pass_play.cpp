@@ -16,7 +16,14 @@
 using Zones = std::unordered_set<EighteenZoneId>;
 
 ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config, true), fsm(OffensivePlayFSM(config))
+    : Play(config, true),
+      offensive_fsm(OffensivePlayFSM(config)),
+      crease_defender_tactics({
+          std::make_shared<CreaseDefenderTactic>(
+              play_config->getRobotNavigationObstacleConfig()),
+          std::make_shared<CreaseDefenderTactic>(
+              play_config->getRobotNavigationObstacleConfig()),
+      })
 {
 }
 
@@ -35,48 +42,33 @@ bool ShootOrPassPlay::invariantHolds(const World &world) const
 void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                      const World &world)
 {
-    /**
-     * There are two main stages to this Play:
-     * 1. Shoot while optimizing passes
-     *  - In this stage we try our best to shoot, while also optimizing passes
-     *  - Two robots move up to cherry-pick, two stay back as defenders, one is the
-     *    shooter/potential passer
-     * 2. If we could not shoot, perform the best pass we currently know about
-     *  - In this stage the shooter should be re-assigned to be a passer, one of
-     *    the cherry-pick tactics should be re-assigned to be a receiver, and the
-     *    two defenders continue to defend
-     */
-
-    // Setup crease defenders
-    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-        std::make_shared<CreaseDefenderTactic>(
-            play_config->getRobotNavigationObstacleConfig()),
-        std::make_shared<CreaseDefenderTactic>(
-            play_config->getRobotNavigationObstacleConfig()),
-    };
-
     do
     {
-        std::get<0>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
-        std::get<1>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
-                                  CreaseDefenderAlignment::RIGHT);
+        yield({{}});
+    } while (true);
+}
 
-        PriorityTacticVector tactics_to_return;
+void ShootOrPassPlay::updateTactics(const PlayUpdate &play_update)
+{
+    std::get<0>(crease_defender_tactics)
+        ->updateControlParams(play_update.world.ball().position(),
+                              CreaseDefenderAlignment::LEFT);
+    std::get<1>(crease_defender_tactics)
+        ->updateControlParams(play_update.world.ball().position(),
+                              CreaseDefenderAlignment::RIGHT);
 
-        fsm.process_event(OffensivePlayFSM::Update(
-            OffensivePlayFSM::ControlParams{.num_additional_offensive_tactics = 2},
-            PlayUpdate(world, [&tactics_to_return](PriorityTacticVector new_tactics) {
-                tactics_to_return = new_tactics;
-            })));
+    PriorityTacticVector tactics_to_return;
 
-        tactics_to_return.emplace_back(
-            TacticVector({std::get<0>(crease_defender_tactics),
-                          std::get<1>(crease_defender_tactics)}));
+    offensive_fsm.process_event(OffensivePlayFSM::Update(
+        OffensivePlayFSM::ControlParams{.num_additional_offensive_tactics = 2},
+        PlayUpdate(play_update.world,
+                   [&tactics_to_return](PriorityTacticVector new_tactics) {
+                       tactics_to_return = new_tactics;
+                   })));
 
-        yield(tactics_to_return);
-    } while (!fsm.is(boost::sml::X));
+    tactics_to_return.emplace_back(TacticVector(
+        {std::get<0>(crease_defender_tactics), std::get<1>(crease_defender_tactics)}));
+    play_update.set_tactics(tactics_to_return);
 }
 
 // Register this play in the genericFactory

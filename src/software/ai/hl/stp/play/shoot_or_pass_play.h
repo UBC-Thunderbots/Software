@@ -4,9 +4,6 @@
 #include "software/ai/hl/stp/play/offensive_play_fsm.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
-#include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/passing/eighteen_zone_pitch_division.h"
-#include "software/ai/passing/pass_generator.h"
 
 /**
  * Play that tries to find a shot on net, passes if it couldn't.
@@ -23,5 +20,8 @@ class ShootOrPassPlay : public Play
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 
    private:
-    FSM<OffensivePlayFSM> fsm;
+    void updateTactics(const PlayUpdate &play_update) override;
+
+    FSM<OffensivePlayFSM> offensive_fsm;
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics;
 };
