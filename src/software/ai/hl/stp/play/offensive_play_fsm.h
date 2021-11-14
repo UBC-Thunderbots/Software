@@ -71,23 +71,23 @@ struct OffensivePlayFSM
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
 
-    explicit OffensivePlayFSM(
-        std::shared_ptr<const PlayConfig> play_config,
-        PassWithRating best_pass_and_score_so_far, Duration time_since_commit_stage_start,
-        double min_pass_score_threshold, std::shared_ptr<AttackerTactic> attacker_tactic,
-        std::shared_ptr<ReceiverTactic> receiver_tactic,
-        std::vector<std::shared_ptr<MoveTactic>> aggressive_positioning_tactics,
-        PassGenerator<EighteenZoneId> pass_generator,
-        Timestamp pass_optimization_start_time)
+    explicit OffensivePlayFSM(std::shared_ptr<const PlayConfig> play_config)
         : play_config(play_config),
-          best_pass_and_score_so_far(best_pass_and_score_so_far),
-          time_since_commit_stage_start(time_since_commit_stage_start),
-          min_pass_score_threshold(min_pass_score_threshold),
-          attacker_tactic(attacker_tactic),
-          receiver_tactic(receiver_tactic),
-          aggressive_positioning_tactics(aggressive_positioning_tactics),
-          pass_generator(pass_generator),
-          pass_optimization_start_time(pass_optimization_start_time)
+          attacker_tactic(
+              std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig())),
+          receiver_tactic(std::make_shared<ReceiverTactic>(
+              Field::createSSLDivisionBField(), Team(), Team(), Pass(Point(), Point(), 0),
+              Ball(Point(), Vector(), Timestamp::fromSeconds(0)), false)),
+          aggressive_positioning_tactics(std::vector<std::shared_ptr<MoveTactic>>()),
+          pass_generator(PassGenerator<EighteenZoneId>(
+              std::make_shared<const EighteenZonePitchDivision>(
+                  Field::createSSLDivisionBField()),
+              play_config->getPassingConfig())),
+          pass_optimization_start_time(Timestamp::fromSeconds(0)),
+          best_pass_and_score_so_far(
+              PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0}),
+          time_since_commit_stage_start(Duration::fromSeconds(0)),
+          min_pass_score_threshold(0)
     {
     }
 
@@ -236,18 +236,17 @@ struct OffensivePlayFSM
             take_pass_s + update_e[!pass_completed] / take_pass     = take_pass_s,
             take_pass_s + update_e[should_abort] / start_looking_for_pass =
                 look_for_pass_s,
-            take_pass_s + update_e[pass_completed] / take_pass = X,
-            X + update_e / start_looking_for_pass              = look_for_pass_s);
+            take_pass_s + update_e[pass_completed] / take_pass = X);
     }
 
    private:
     std::shared_ptr<const PlayConfig> play_config;
-    PassWithRating best_pass_and_score_so_far;
-    Duration time_since_commit_stage_start;
-    double min_pass_score_threshold;
     std::shared_ptr<AttackerTactic> attacker_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
     std::vector<std::shared_ptr<MoveTactic>> aggressive_positioning_tactics;
     PassGenerator<EighteenZoneId> pass_generator;
     Timestamp pass_optimization_start_time;
+    PassWithRating best_pass_and_score_so_far;
+    Duration time_since_commit_stage_start;
+    double min_pass_score_threshold;
 };

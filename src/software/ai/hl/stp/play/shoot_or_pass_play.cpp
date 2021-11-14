@@ -16,19 +16,7 @@
 using Zones = std::unordered_set<EighteenZoneId>;
 
 ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config, true),
-      fsm(OffensivePlayFSM(
-          config, PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0},
-          Duration::fromSeconds(0), 0,
-          std::make_shared<AttackerTactic>(config->getAttackerTacticConfig()),
-          std::make_shared<ReceiverTactic>(
-              Field::createSSLDivisionBField(), Team(), Team(), Pass(Point(), Point(), 0),
-              Ball(Point(), Vector(), Timestamp::fromSeconds(0)), false),
-          std::vector<std::shared_ptr<MoveTactic>>(),
-          PassGenerator<EighteenZoneId>(std::make_shared<const EighteenZonePitchDivision>(
-                                            Field::createSSLDivisionBField()),
-                                        config->getPassingConfig()),
-          Timestamp::fromSeconds(0)))
+    : Play(config, true), fsm(OffensivePlayFSM(config))
 {
 }
 
