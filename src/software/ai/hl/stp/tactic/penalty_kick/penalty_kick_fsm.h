@@ -28,7 +28,7 @@ struct PenaltyKickFSM
     {
     };
 
-    DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
      * Helper function that determines whether the shooter robot has a viable shot on net.
