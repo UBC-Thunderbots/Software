@@ -24,5 +24,4 @@ class ShootOrPassPlay : public Play
     void updateTactics(const PlayUpdate &play_update) override;
 
     FSM<ShootOrPassPlayFSM> main_fsm;
-    std::shared_ptr<FSM<OffensivePlayFSM>> offensive_fsm;
 };

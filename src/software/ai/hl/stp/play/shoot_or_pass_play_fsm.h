@@ -15,7 +15,6 @@ struct ShootOrPassPlayFSM
 
     struct ControlParams
     {
-        std::shared_ptr<FSM<OffensivePlayFSM>> offensive_fsm;
     };
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
@@ -28,7 +27,9 @@ struct ShootOrPassPlayFSM
                   play_config->getRobotNavigationObstacleConfig()),
               std::make_shared<CreaseDefenderTactic>(
                   play_config->getRobotNavigationObstacleConfig()),
-          })
+          }),
+          offensive_fsm(
+              std::make_shared<FSM<OffensivePlayFSM>>(OffensivePlayFSM{play_config}))
     {
     }
 
@@ -49,7 +50,7 @@ struct ShootOrPassPlayFSM
 
             PriorityTacticVector tactics_to_return;
 
-            event.control_params.offensive_fsm->process_event(OffensivePlayFSM::Update(
+            offensive_fsm->process_event(OffensivePlayFSM::Update(
                 OffensivePlayFSM::ControlParams{.num_additional_offensive_tactics = 2},
                 PlayUpdate(event.common.world,
                            [&tactics_to_return](PriorityTacticVector new_tactics) {
@@ -64,7 +65,7 @@ struct ShootOrPassPlayFSM
         };
 
         const auto done_shoot_or_pass = [this](auto event) {
-            return event.control_params.offensive_fsm->is(boost::sml::X);
+            return offensive_fsm->is(boost::sml::X);
         };
 
         return make_transition_table(
@@ -77,4 +78,5 @@ struct ShootOrPassPlayFSM
    private:
     std::shared_ptr<const PlayConfig> play_config;
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics;
+    std::shared_ptr<FSM<OffensivePlayFSM>> offensive_fsm;
 };

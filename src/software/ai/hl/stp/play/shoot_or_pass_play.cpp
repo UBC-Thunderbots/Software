@@ -16,9 +16,7 @@
 using Zones = std::unordered_set<EighteenZoneId>;
 
 ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config, true),
-      main_fsm{ShootOrPassPlayFSM{config}},
-      offensive_fsm(std::make_shared<FSM<OffensivePlayFSM>>(OffensivePlayFSM{config}))
+    : Play(config, true), main_fsm{ShootOrPassPlayFSM{config}}
 {
 }
 
@@ -51,8 +49,7 @@ bool ShootOrPassPlay::done() const
 
 void ShootOrPassPlay::updateTactics(const PlayUpdate &play_update)
 {
-    main_fsm.process_event(ShootOrPassPlayFSM::Update(
-        ShootOrPassPlayFSM::ControlParams{.offensive_fsm = offensive_fsm}, play_update));
+    main_fsm.process_event(ShootOrPassPlayFSM::Update({}, play_update));
 }
 
 // Register this play in the genericFactory
