@@ -15,12 +15,9 @@ struct PenaltyKickFSM
      * Constructor for DribbleFSM
      *
      * @param complete_approach pointer to complete approach timestamp
-     * @param robot_shoot_position position to shoot
      * @param shot_angle angle to shoot at
      */
-    explicit PenaltyKickFSM(std::optional<Timestamp> complete_approach,
-                            Point robot_shoot_position, Angle shot_angle)
-        : complete_approach(complete_approach), shot_angle(shot_angle)
+    explicit PenaltyKickFSM() : complete_approach(std::nullopt), shot_angle(Angle::zero())
     {
     }
 

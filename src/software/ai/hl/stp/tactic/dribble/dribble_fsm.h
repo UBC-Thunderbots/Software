@@ -22,7 +22,7 @@ struct DribbleFSM
      * @param continuous_dribbling_start_point A pointer to a Point to track the
      * continuous dribbling start point
      */
-    explicit DribbleFSM(void) : continuous_dribbling_start_point(Point()) {}
+    explicit DribbleFSM() : continuous_dribbling_start_point(Point()) {}
 
     struct ControlParams
     {
