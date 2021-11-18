@@ -2,7 +2,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/ai/navigator/path_manager/path_objective.h"
 #include "software/ai/navigator/path_planner/path_planner.h"
 #include "software/geom/linear_spline2d.h"

@@ -1,4 +1,4 @@
-#include "software/ai/passing/pass_evaluation.h"
+#include "software/ai/passing/pass_evaluation.hpp"
 
 #include <gtest/gtest.h>
 
