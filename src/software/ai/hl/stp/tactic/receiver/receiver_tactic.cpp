@@ -8,21 +8,21 @@
 #include "software/geom/algorithms/closest_point.h"
 #include "software/logger/logger.h"
 
-ReceiverTactic::ReceiverTactic(const Pass pass)
+ReceiverTactic::ReceiverTactic()
     : Tactic(false, {RobotCapability::Move}),
-      pass(std::move(pass)),
       fsm(ReceiverFSM(std::make_shared<Timestamp>())),
-      control_params(
-          {ReceiverFSM::ControlParams{.pass = std::nullopt, .disable_one_touch = false}})
+      control_params({ReceiverFSM::ControlParams{.pass                   = std::nullopt,
+                                                 .disable_one_touch_shot = false}})
 {
 }
 
 void ReceiverTactic::updateWorldParams(const World& world) {}
-void ReceiverTactic::updateControlParams(const Pass& updated_pass, bool disable_one_touch)
+void ReceiverTactic::updateControlParams(const Pass& updated_pass,
+                                         bool disable_one_touch_shot)
 {
     // Update the control parameters stored by this Tactic
-    control_params.pass              = updated_pass;
-    control_params.disable_one_touch = disable_one_touch;
+    control_params.pass                   = updated_pass;
+    control_params.disable_one_touch_shot = disable_one_touch_shot;
 }
 
 void ReceiverTactic::updateIntent(const TacticUpdate& tactic_update)
@@ -37,20 +37,19 @@ bool ReceiverTactic::done() const
 
 double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world) const
 {
+    // If we have no receive point, make it expensive to assign this robot
+    if (!control_params.pass.has_value())
+    {
+        return 1;
+    }
+
     // Prefer robots closer to the pass receive position
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
-    double cost =
-        (robot.position() - pass.receiverPoint()).length() / world.field().totalXLength();
+    double cost = (robot.position() - control_params.pass->receiverPoint()).length() /
+                  world.field().totalXLength();
 
-    // TODO (#2167) robocup 2021 hack: prevents oscillating tactic assignments that give
-    // up the ball
-    //
-    // The attacker and receiver are the two tactics that need the ball/try to get the
-    // ball. We want these tactics to be the most expensive, so that the munkres algorithm
-    // minimizes the overal cost by assinging these tactics to the robots nearest to the
-    // ball.
-    return std::clamp<double>(cost, 0, 1) * 100;
+    return std::clamp<double>(cost, 0, 1);
 }
 
 void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)

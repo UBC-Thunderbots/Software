@@ -136,7 +136,7 @@ void FreeKickPlay::performPassStage(
     // Perform the pass and wait until the receiver is finished
     auto attacker =
         std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
-    auto receiver = std::make_shared<ReceiverTactic>(pass);
+    auto receiver = std::make_shared<ReceiverTactic>();
     do
     {
         attacker->updateControlParams(pass, true);

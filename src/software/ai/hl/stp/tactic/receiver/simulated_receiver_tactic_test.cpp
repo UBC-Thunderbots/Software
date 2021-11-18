@@ -34,7 +34,7 @@ TEST_P(SimulatedReceiverTacticTest, DISABLED_perfect_pass_receiver_test)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
     friendly_robots.emplace_back(robot_state);
 
-    auto tactic = std::make_shared<ReceiverTactic>(pass);
+    auto tactic = std::make_shared<ReceiverTactic>();
     tactic->updateControlParams(pass);
     setTactic(tactic);
     setRobotId(1);
@@ -120,7 +120,7 @@ TEST_P(SimulatedReceiverTacticTestOneTouch, test_one_touch)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
     friendly_robots.emplace_back(robot_state);
 
-    auto tactic = std::make_shared<ReceiverTactic>(pass);
+    auto tactic = std::make_shared<ReceiverTactic>();
     tactic->updateControlParams(pass);
     setTactic(tactic);
     setRobotId(1);

@@ -16,24 +16,18 @@
 class ReceiverTactic : public Tactic
 {
    public:
-    /**
-     * Creates a new ReceiverTactic
-     *
-     * @param pass The pass this tactic should try to receive
-     */
-    explicit ReceiverTactic(const Pass pass);
     void updateWorldParams(const World& world);
-
-    ReceiverTactic() = delete;
+    ReceiverTactic();
 
     /**
      * Updates the control parameters for this ReceiverTactic.
      *
      * @param updated_pass The pass this tactic should try to receive
-     * @param disable_one_touch If set to true, the receiver will not perform a one-touch
-     *        The robot will simply receive and dribble.
+     * @param disable_one_touch_shot If set to true, the receiver will not perform a
+     * one-touch The robot will simply receive and dribble.
      */
-    void updateControlParams(const Pass& updated_pass, bool disable_one_touch = false);
+    void updateControlParams(const Pass& updated_pass,
+                             bool disable_one_touch_shot = false);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -95,8 +89,6 @@ class ReceiverTactic : public Tactic
      * @return A feasible shot or std::nullopt if there is no feasible shot
      */
     std::optional<Shot> findFeasibleShot();
-
-    Pass pass;
 
     FSM<ReceiverFSM> fsm;
 

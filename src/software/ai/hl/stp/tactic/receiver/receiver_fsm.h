@@ -24,7 +24,7 @@ struct ReceiverFSM
         std::optional<Pass> pass = std::nullopt;
 
         // If set to true, we will only receive and dribble
-        bool disable_one_touch = false;
+        bool disable_one_touch_shot = false;
     };
 
     /**
@@ -48,10 +48,10 @@ struct ReceiverFSM
 
     // The maximum deflection angle that we will attempt a one-touch kick towards the
     // enemy goal with
-    static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(370);
+    static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(60);
 
     // The minimum angle between a ball's trajectory and the ball-receiver_point vector
-    // for which we can consider a pass to be stray
+    // for which we can consider a pass to be stray (i.e it won't make it to the receiver)
     static constexpr Angle MIN_STRAY_PASS_ANGLE = Angle::fromDegrees(60);
 
     // the minimum speed required for a pass to be considered stray
@@ -148,15 +148,15 @@ struct ReceiverFSM
             world.field(), world.friendlyTeam(), world.enemyTeam(),
             assigned_robot.position(), TeamType::ENEMY, {assigned_robot});
 
-        // Vector from the ball to the robot
-        Vector robot_to_ball = world.ball().position() - assigned_robot.position();
-
-        // The angle the robot will have to deflect the ball to shoot
-        Angle abs_angle_between_pass_and_shot_vectors;
-
         // The percentage of open net the robot would shoot on
         if (best_shot_opt)
         {
+            // Vector from the ball to the robot
+            Vector robot_to_ball = world.ball().position() - assigned_robot.position();
+
+            // The angle the robot will have to deflect the ball to shoot
+            Angle abs_angle_between_pass_and_shot_vectors;
+
             Vector robot_to_shot_target =
                 best_shot_opt->getPointToShootAt() - assigned_robot.position();
             abs_angle_between_pass_and_shot_vectors =
@@ -203,7 +203,7 @@ struct ReceiverFSM
          * @return true if one-touch possible
          */
         const auto onetouch_possible = [](auto event) {
-            return !event.control_params.disable_one_touch &&
+            return !event.control_params.disable_one_touch_shot &&
                    (findFeasibleShot(event.common.world, event.common.robot) !=
                     std::nullopt);
         };
@@ -223,19 +223,16 @@ struct ReceiverFSM
                 event.common.robot, event.common.world.ball(),
                 best_shot->getPointToShootAt());
 
-            if (best_shot)
+            if (best_shot && event.control_params.pass)
             {
-                if (event.control_params.pass)
-                {
-                    event.common.set_intent(std::make_unique<MoveIntent>(
-                        event.common.robot.id(), one_touch.getPointToShootAt(),
-                        one_touch.getOpenAngle(), 0, DribblerMode::OFF,
-                        BallCollisionType::ALLOW,
-                        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
-                                       BALL_MAX_SPEED_METERS_PER_SECOND},
-                        MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-                        event.common.robot.robotConstants()));
-                }
+                event.common.set_intent(std::make_unique<MoveIntent>(
+                    event.common.robot.id(), one_touch.getPointToShootAt(),
+                    one_touch.getOpenAngle(), 0, DribblerMode::OFF,
+                    BallCollisionType::ALLOW,
+                    AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                                   BALL_MAX_SPEED_METERS_PER_SECOND},
+                    MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+                    event.common.robot.robotConstants()));
             }
         };
 
@@ -319,6 +316,13 @@ struct ReceiverFSM
                 event.common.world.ball().position());
         };
 
+        /**
+         * If the pass is in progress and is deviating more than MIN_STRAY_PASS_ANGLE,
+         * return true so that the receiver can react and intercept the ball.
+         *
+         * @param event ReceiverFSM::Update event
+         * @return true if stray pass
+         */
         const auto stray_pass = [](auto event) {
             auto ball_position = event.common.world.ball().position();
 
@@ -342,10 +346,10 @@ struct ReceiverFSM
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
             *waiting_for_pass_s + update_e[!pass_started] / update_receive,
+            waiting_for_pass_s + update_e[pass_started && onetouch_possible] /
+                                     update_onetouch = onetouch_s,
             waiting_for_pass_s +
-                update_e[pass_started && onetouch_possible] / update_receive = onetouch_s,
-            waiting_for_pass_s + update_e[pass_started && !onetouch_possible] /
-                                     update_onetouch = receive_s,
+                update_e[pass_started && !onetouch_possible] / update_receive = receive_s,
             receive_s + update_e[!pass_finished] / adjust_receive,
             onetouch_s + update_e[!pass_finished && !stray_pass] / update_onetouch,
             onetouch_s + update_e[!pass_finished && stray_pass] / adjust_receive =
