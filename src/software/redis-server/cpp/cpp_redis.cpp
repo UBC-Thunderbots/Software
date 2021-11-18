@@ -1,10 +1,13 @@
-#include <sw/redis++/redis++.h>
 #include <iostream>
 #include <string>
 
+#include "cpp-redis/cpp_redis/core/client.hpp"
+
 using namespace sw::redis;
+cpp_redis::client client;
 
 int main(int argc, char *argv[]){
+    client.connect();
     try {
         // Create an Redis object, which is movable but NOT copyable.
         auto redis = Redis("tcp://127.0.0.1:6379");
@@ -25,5 +28,4 @@ int main(int argc, char *argv[]){
     } catch (const Error &e) {
         std::cout<<"Error"<<std::endl;
     }
-
 }
