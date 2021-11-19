@@ -89,7 +89,6 @@ class ErForceSimulatorRobot
     /**
      * Sets the current primitive this robot is running to a new one
      *
-     * @param firmware_world The world to run the primitive in
      * @param primitive_msg The primitive to start
      */
     void startNewPrimitive(const TbotsProto::Primitive& primitive);
