@@ -30,21 +30,19 @@ COUNTERCLOCKWISE = -1
 IDLE = 0
 
 # curr_state : next_state  indicates clockwise rotation
-clockwise_state_transitions =\
-{
+clockwise_state_transitions = {
     STATE_0: STATE_1,
     STATE_1: STATE_2,
     STATE_2: STATE_3,
-    STATE_3: STATE_0
+    STATE_3: STATE_0,
 }
 
 # curr_state : next_state  indicates counter clockwise rotation
-counterclockwise_state_transitions =\
-{
+counterclockwise_state_transitions = {
     STATE_0: STATE_3,
     STATE_1: STATE_0,
     STATE_2: STATE_1,
-    STATE_3: STATE_2
+    STATE_3: STATE_2,
 }
 
 """
@@ -55,15 +53,17 @@ counterclockwise_state_transitions =\
 @param on_counterclockwise_rotate, callback function to be called when rotatin counterclockwise, callback takes no params
 @param on_click, callback function to be called when push button is clicked, callback takes no params
 """
+
+
 class RotaryEncoder:
     def __init__(
-        self, 
-        A_PIN, 
-        B_PIN, 
+        self,
+        A_PIN,
+        B_PIN,
         BUTTON_PIN,
-        on_clockwise_rotate, 
-        on_counterclockwise_rotate, 
-        on_click
+        on_clockwise_rotate,
+        on_counterclockwise_rotate,
+        on_click,
     ):
         self.A_PIN = A_PIN
         self.B_PIN = B_PIN
@@ -102,12 +102,12 @@ class RotaryEncoder:
         if self.curr_state != next_state:
             self.count += 1
             self.curr_state = next_state
-            
+
         return prev_state
 
     def start(self):
         """ Start listening to GPIO pins to trigger callback functions """
-        
+
         def on_rotation(channel):
             """ Update rotation state and call user defined callback functions after complete rotation """
             prev_state = self.rot_state()
@@ -116,7 +116,7 @@ class RotaryEncoder:
                 if clockwise_state_transitions[prev_state] == self.curr_state:
                     self.on_clockwise_rotate()
                 elif counterclockwise_state_transitions[prev_state] == self.curr_state:
-                    self.on_counterclockwise_rotate() 
+                    self.on_counterclockwise_rotate()
 
                 self.count = 0
 
