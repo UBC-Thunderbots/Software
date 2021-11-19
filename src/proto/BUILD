@@ -14,7 +14,6 @@ proto_library(
         "robot_status_msg.proto",
         "tbots_software_msgs.proto",
         "tbots_timestamp_msg.proto",
-        "ai_control.proto",
         "vision.proto",
     ],
     deps = [
@@ -186,6 +185,7 @@ py_proto_library(
         "ssl_gc_game_event.proto",
         "ssl_gc_geometry.proto",
         "ssl_gc_referee_message.proto",
+        "ai_config.proto",
     ],
     deps = [
         ":tbots_py_proto",
