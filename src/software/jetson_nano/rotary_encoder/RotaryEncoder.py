@@ -57,8 +57,13 @@ counterclockwise_state_transitions =\
 """
 class RotaryEncoder:
     def __init__(
-        self, A_PIN, B_PIN, BUTTON_PIN,
-        on_clockwise_rotate, on_counterclockwise_rotate, on_click
+        self, 
+        A_PIN, 
+        B_PIN, 
+        BUTTON_PIN,
+        on_clockwise_rotate, 
+        on_counterclockwise_rotate, 
+        on_click
     ):
         self.A_PIN = A_PIN
         self.B_PIN = B_PIN
@@ -128,8 +133,8 @@ class RotaryEncoder:
 
         # add callback to be called when button is pressed
         GPIO.add_event_detect(
-            self.BUTTON_PIN, GPIO.FALLING,
-            callback=button_pressed, bouncetime=150)
+            self.BUTTON_PIN, GPIO.FALLING, callback=button_pressed, bouncetime=150
+        )
 
     def stop(self):
         """ clean up the GPIO pins that we were using for this class """
