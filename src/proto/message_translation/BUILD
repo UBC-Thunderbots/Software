@@ -211,3 +211,13 @@ cc_library(
         "//software/world:ball"
     ],
 )
+
+cc_test(
+    name = "er_force_world_test",
+    srcs = ["er_force_world_test.cpp"],
+    deps = [
+        ":er_force_world",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)

@@ -4,6 +4,8 @@
 #include "software/world/robot.h"
 #include "software/time/timestamp.h"
 #include "extlibs/er_force_sim/src/protobuf/world.pb.h"
+#include "software/world/ball_state.h"
+#include "software/world/robot_state.h"
 
 /**
  * convert a er force simulator ball to a ball object
