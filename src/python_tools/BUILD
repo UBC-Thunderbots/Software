@@ -79,3 +79,10 @@ py_binary(
     srcs = ["robot_broadcast_sender.py"],
     deps = ["//proto:announcement_py_proto"],
 )
+
+py_binary(
+    name = "bokeh_server",
+    srcs = ["bokeh_server.py"],
+    data = PYTHON_BINDINGS,
+    deps = NOTEBOOK_DEPS,
+)
