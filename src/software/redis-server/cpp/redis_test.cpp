@@ -1,10 +1,8 @@
-#include <gtest/gtest.h>
-
+#include "software/test_util/test_util.h"
 #include <iostream>
 #include <string>
 
 #include "cpp_redis/core/client.hpp"
-
 
 TEST(ServerTest, Get)
 {
@@ -19,17 +17,22 @@ TEST(ServerTest, Get)
             }
         });
 
-    client.set("hello", "42", [](cpp_redis::reply &reply) {
-        std::cout << "set hello 42: " << reply << std::endl;
+    client.set("A", "1", [](cpp_redis::reply &reply) {
+        std::cout << "Setting A to 1: " << reply << std::endl;
     });
 
-    client.decrby("hello", 12, [](cpp_redis::reply &reply) {
-        std::cout << "decrby hello 12: " << reply << std::endl;
+    client.get("A", [](cpp_redis::reply &reply) {
+        std::cout << "Getting A: " << reply << std::endl;
+        ASSERT_EQ(atoi(reply.as_string().c_str()),1);
     });
 
-    client.get("hello", [](cpp_redis::reply &reply) {
-        std::cout << "get hello: " << reply << std::endl;
+    client.set("A", "2", [](cpp_redis::reply &reply) {
+        std::cout << "Setting A to 2: " << reply << std::endl;
     });
 
-    client.sync_commit();
+    client.get("A", [](cpp_redis::reply &reply) {
+        std::cout << "Getting A: " << reply << std::endl;
+        ASSERT_EQ(atoi(reply.as_string().c_str()),2);
+    });
+  client.sync_commit();
 }

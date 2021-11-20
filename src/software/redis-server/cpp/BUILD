@@ -5,6 +5,7 @@ cc_test(
     srcs = ["redis_test.cpp"],
     deps = [
         "@cpp_redis",
-        "//shared/test_util:tbots_gtest_main"
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ],
 )
