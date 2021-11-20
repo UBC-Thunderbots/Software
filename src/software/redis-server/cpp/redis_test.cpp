@@ -1,8 +1,8 @@
-#include "software/test_util/test_util.h"
 #include <iostream>
 #include <string>
 
 #include "cpp_redis/core/client.hpp"
+#include "software/test_util/test_util.h"
 
 TEST(ServerTest, Get)
 {
@@ -23,7 +23,7 @@ TEST(ServerTest, Get)
 
     client.get("A", [](cpp_redis::reply &reply) {
         std::cout << "Getting A: " << reply << std::endl;
-        ASSERT_EQ(atoi(reply.as_string().c_str()),1);
+        ASSERT_EQ(atoi(reply.as_string().c_str()), 1);
     });
 
     client.set("A", "2", [](cpp_redis::reply &reply) {
@@ -32,7 +32,7 @@ TEST(ServerTest, Get)
 
     client.get("A", [](cpp_redis::reply &reply) {
         std::cout << "Getting A: " << reply << std::endl;
-        ASSERT_EQ(atoi(reply.as_string().c_str()),2);
+        ASSERT_EQ(atoi(reply.as_string().c_str()), 2);
     });
-  client.sync_commit();
+    client.sync_commit();
 }

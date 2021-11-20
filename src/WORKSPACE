@@ -31,7 +31,7 @@ http_archive(
     sha256 = "12a6fc86ba4ca3d4537a3eee82c094f385b8e03e283c664c976f16d421f17f7d",
     strip_prefix = "cpp_redis-fc2c43fa07e45e1ef0f77cbda6a240e7890ae5aa",
     urls = [
-        "https://github.com/cpp-redis/cpp_redis/archive/fc2c43fa07e45e1ef0f77cbda6a240e7890ae5aa.zip"
+        "https://github.com/cpp-redis/cpp_redis/archive/fc2c43fa07e45e1ef0f77cbda6a240e7890ae5aa.zip",
     ],
 )
 
@@ -394,4 +394,3 @@ load("@rules_third_party//libraries:bullet.bzl", "bullet")
 # Adds commit 272c7099d3ba8ac9e8c142e361e8d4cf5d91b8f2 of
 # https://github.com/bulletphysics/bullet3 to the WORKSPACE
 bullet()
-
