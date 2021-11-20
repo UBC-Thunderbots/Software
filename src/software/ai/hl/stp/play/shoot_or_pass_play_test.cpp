@@ -50,7 +50,7 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
             Duration::fromSeconds(25));
 }
 
-TEST_F(ShootOrPassPlayTest, DISABLED_test_shoot_or_pass_play_with_keep_away)
+TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play_with_keep_away)
 {
     BallState ball_state(Point(-1.8, 1.8), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({

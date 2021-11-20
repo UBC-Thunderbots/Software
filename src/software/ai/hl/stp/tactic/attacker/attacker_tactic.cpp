@@ -54,6 +54,7 @@ void AttackerTactic::updateIntent(const TacticUpdate& tactic_update)
         .chip_target            = chip_target,
         .attacker_tactic_config = attacker_tactic_config};
 
+    fsm.visit_current_states([](auto state) { std::cout << TYPENAME(state) << std::endl; });
     fsm.process_event(AttackerFSM::Update(control_params, tactic_update));
 }
 
