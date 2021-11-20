@@ -32,7 +32,7 @@ class StoppableSender:
             exit(1)
 
 def main():
-    address = './socket'
+    address = '/tmp/socket'
     sender = StoppableSender()
     sender.connect(address)
     sender.send_raw("nice")
