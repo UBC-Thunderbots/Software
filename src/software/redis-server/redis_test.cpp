@@ -4,7 +4,7 @@
 #include "cpp_redis/core/client.hpp"
 #include "software/test_util/test_util.h"
 
-TEST(ServerTest, DISABLED_Get)
+TEST(ServerTest, Get)
 {
     cpp_redis::client client;
     client.connect(

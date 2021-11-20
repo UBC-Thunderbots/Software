@@ -32,6 +32,14 @@ jobs:
       - name: Environment Setup
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+
+      - name: Install and start redis server
+        run: |
+        wget http://download.redis.io/redis-stable.tar.gz
+        tar xvzf redis-stable.tar.gz
+        cd redis-stable
+        make
+        redis-server
           
       - name: Software Test
         run: |
