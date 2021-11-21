@@ -39,8 +39,8 @@ jobs:
           tar xvzf redis-stable.tar.gz
           cd redis-stable
           make
-          redis-server
-          
+          make install
+          redis-server          
       - name: Software Test
         run: |
           cd src
