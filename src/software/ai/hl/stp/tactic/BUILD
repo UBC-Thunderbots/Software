@@ -10,20 +10,6 @@ cc_test(
 )
 
 cc_library(
-    name = "penalty_setup_tactic",
-    srcs = ["penalty_setup_tactic.cpp"],
-    hdrs = ["penalty_setup_tactic.h"],
-    deps = [
-        "//shared:constants",
-        "//software/ai/evaluation:calc_best_shot",
-        "//software/ai/hl/stp/action:kick_action",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
-    ],
-)
-
-cc_library(
     name = "receiver_tactic",
     srcs = ["receiver_tactic.cpp"],
     hdrs = ["receiver_tactic.h"],

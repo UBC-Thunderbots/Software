@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/tactic/penalty_setup_tactic.h"
+#include "software/ai/hl/stp/tactic/move/move_tactic.h"
 
 #include <gtest/gtest.h>
 
