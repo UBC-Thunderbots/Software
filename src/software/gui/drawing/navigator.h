@@ -3,7 +3,7 @@
 #include <QtWidgets/QGraphicsScene>
 
 #include "software/ai/navigator/navigator.h"
-#include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/gui/drawing/colors.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/gui/drawing/geom.h"

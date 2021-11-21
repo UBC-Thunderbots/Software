@@ -41,19 +41,19 @@ struct GetBehindBallFSM
         // Diagram not to scale
         //
         //                 X
-        //          v-------------v
+        //          v---------------------v
         //
-        //       >  B-------------C
-        //       |   \           /
-        //       |    \         /
-        //       |     \       /     <- Region considered "behind chick origin"
-        //     X |      \     /
-        //       |       \   /
-        //       |        \ /
-        //                 A    <  The chick origin is at A
-        //                 |
-        //                 V
-        //         direction of chip/kick
+        //       >  B---------------------C
+        //       |   \                   /
+        //       |    \                 /
+        //       |     \               /     <- Region considered "behind chick origin"
+        //     X |      \             /
+        //       |       \           /
+        //       |        \         /
+        //                A1---A---A2   <  The chick origin is at A
+        //                     |
+        //                     V
+        //             direction of chip/kick
 
         /**
          * Action that updates the MoveIntent
@@ -94,15 +94,22 @@ struct GetBehindBallFSM
             // We make the region close enough to the ball so that the robot will still be
             // inside it when taking the chip.
             Point behind_ball_vertex_A = event.control_params.ball_location;
+            Point behind_ball_vertex_A1 =
+                behind_ball_vertex_A +
+                behind_ball.perpendicular().normalize(size_of_region_behind_ball / 8);
+            Point behind_ball_vertex_A2 =
+                behind_ball_vertex_A -
+                behind_ball.perpendicular().normalize(size_of_region_behind_ball / 8);
             Point behind_ball_vertex_B =
                 behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) +
-                behind_ball.perpendicular().normalize(size_of_region_behind_ball / 8);
+                behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
             Point behind_ball_vertex_C =
                 behind_ball_vertex_A + behind_ball.normalize(size_of_region_behind_ball) -
                 behind_ball.perpendicular().normalize(size_of_region_behind_ball / 2);
 
-            Triangle behind_ball_region = Triangle(
-                behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C);
+            Polygon behind_ball_region =
+                Polygon({behind_ball_vertex_A2, behind_ball_vertex_A1,
+                         behind_ball_vertex_B, behind_ball_vertex_C});
 
             return contains(behind_ball_region, event.common.robot.position()) &&
                    compareAngles(event.common.robot.orientation(),

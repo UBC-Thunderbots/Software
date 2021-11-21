@@ -26,36 +26,10 @@ cc_library(
 )
 
 cc_library(
-    name = "shadow_free_kicker_tactic",
-    srcs = ["shadow_free_kicker_tactic.cpp"],
-    hdrs = ["shadow_free_kicker_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/evaluation:possession",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/geom/algorithms",
-        "//software/logger",
-    ],
-)
-
-cc_test(
-    name = "shadow_free_kicker_tactic_test",
-    srcs = ["shadow_free_kicker_tactic_test.cpp"],
-    deps = [
-        ":shadow_free_kicker_tactic",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
-    ],
-)
-
-cc_library(
     name = "all_tactics",
     hdrs = ["all_tactics.h"],
     deps = [
         ":receiver_tactic",
-        ":shadow_free_kicker_tactic",
         ":tactic",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",

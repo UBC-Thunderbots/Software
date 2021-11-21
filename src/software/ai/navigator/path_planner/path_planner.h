@@ -3,7 +3,7 @@
 #include <optional>
 #include <vector>
 
-#include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/geom/linear_spline2d.h"
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
