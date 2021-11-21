@@ -5,6 +5,7 @@ cc_test(
     srcs = ["penalty_setup_tactic_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",
+        "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/test_util",
     ],
 )
