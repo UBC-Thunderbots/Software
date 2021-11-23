@@ -130,7 +130,6 @@ class ErForceSimulator : public QObject
     /**
      * Update Simulator Robot and get the latest robot control
      *
-     * @param handle_robot_log_proto Function pointer to handle robot log proto
      * @param simulator_robots Vector of simulator robots
      * @param vision_msg The vision msg for this team of robots
      *
