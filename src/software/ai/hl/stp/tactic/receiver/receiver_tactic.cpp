@@ -10,7 +10,7 @@
 
 ReceiverTactic::ReceiverTactic()
     : Tactic(false, {RobotCapability::Move}),
-      fsm(ReceiverFSM(std::make_shared<Timestamp>())),
+      fsm(ReceiverFSM()),
       control_params({ReceiverFSM::ControlParams{.pass                   = std::nullopt,
                                                  .disable_one_touch_shot = false}})
 {

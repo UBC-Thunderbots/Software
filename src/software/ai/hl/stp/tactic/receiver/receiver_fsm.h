@@ -27,16 +27,7 @@ struct ReceiverFSM
         bool disable_one_touch_shot = false;
     };
 
-    /**
-     * Constructor for ReceiverFSM
-     *
-     * @param pass_start_time: updated by the play when the pass starts
-     *
-     */
-    explicit ReceiverFSM(const std::shared_ptr<Timestamp>& pass_start_timestamp)
-        : pass_start_timestamp(pass_start_timestamp)
-    {
-    }
+    explicit ReceiverFSM();
 
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
@@ -160,14 +151,11 @@ struct ReceiverFSM
             Vector robot_to_shot_target =
                 best_shot_opt->getPointToShootAt() - assigned_robot.position();
             abs_angle_between_pass_and_shot_vectors =
-                (robot_to_ball.orientation() - robot_to_shot_target.orientation())
-                    .clamp()
-                    .abs();
+                acuteAngle(robot_to_ball, robot_to_shot_target);
 
             Angle goal_angle =
                 acuteAngle(world.field().friendlyGoalpostPos(), assigned_robot.position(),
-                           world.field().friendlyGoalpostNeg())
-                    .abs();
+                           world.field().friendlyGoalpostNeg());
 
             double net_percent_open =
                 best_shot_opt->getOpenAngle().toDegrees() / goal_angle.toDegrees();
@@ -357,7 +345,4 @@ struct ReceiverFSM
             receive_s + update_e[pass_finished] / adjust_receive   = X,
             onetouch_s + update_e[pass_finished] / update_onetouch = X);
     }
-
-   private:
-    std::shared_ptr<Timestamp> pass_start_timestamp;
 };
