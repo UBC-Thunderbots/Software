@@ -186,6 +186,7 @@ py_proto_library(
         "ssl_gc_game_event.proto",
         "ssl_gc_geometry.proto",
         "ssl_gc_referee_message.proto",
+        "ai_config.proto",
     ],
     deps = [
         ":tbots_py_proto",
