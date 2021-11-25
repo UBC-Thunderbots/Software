@@ -126,8 +126,21 @@ ErForceSimulator::ErForceSimulator(
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
 {
-    er_force_sim->safelyTeleportBall(static_cast<float>(ball_state.position().x()),
-                                     static_cast<float>(ball_state.position().y()));
+    auto simulator_setup_command = std::make_shared<amun::Command>();
+    auto teleport_ball           = std::make_unique<sslsim::TeleportBall>();
+    auto simulator_control       = std::make_unique<sslsim::SimulatorControl>();
+    auto command_simulator       = std::make_unique<amun::CommandSimulator>();
+
+    teleport_ball->set_x(
+        static_cast<float>(ball_state.position().x() * MILLIMETERS_PER_METER));
+    teleport_ball->set_y(
+        static_cast<float>(ball_state.position().y() * MILLIMETERS_PER_METER));
+    *(simulator_control->mutable_teleport_ball())   = *teleport_ball;
+    *(command_simulator->mutable_ssl_control())     = *simulator_control;
+    *(simulator_setup_command->mutable_simulator()) = *command_simulator;
+
+
+    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
 }
 
 void ErForceSimulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
