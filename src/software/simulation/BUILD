@@ -290,6 +290,18 @@ cc_library(
 )
 
 cc_test(
+    name = "er_force_simulator_test",
+    srcs = ["er_force_simulator_test.cpp"],
+    deps = [
+        ":er_force_simulator",
+        "//proto/primitive:primitive_msg_factory",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+        "//software/world",
+    ],
+)
+
+cc_test(
     name = "simulator_test",
     srcs = ["simulator_test.cpp"],
     deps = [

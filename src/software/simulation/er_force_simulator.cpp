@@ -135,6 +135,10 @@ void ErForceSimulator::setBallState(const BallState& ball_state)
         static_cast<float>(ball_state.position().x() * MILLIMETERS_PER_METER));
     teleport_ball->set_y(
         static_cast<float>(ball_state.position().y() * MILLIMETERS_PER_METER));
+    teleport_ball->set_vx(
+        static_cast<float>(ball_state.velocity().x() * MILLIMETERS_PER_METER));
+    teleport_ball->set_vy(
+        static_cast<float>(ball_state.velocity().y() * MILLIMETERS_PER_METER));
     *(simulator_control->mutable_teleport_ball())   = *teleport_ball;
     *(command_simulator->mutable_ssl_control())     = *simulator_control;
     *(simulator_setup_command->mutable_simulator()) = *command_simulator;
