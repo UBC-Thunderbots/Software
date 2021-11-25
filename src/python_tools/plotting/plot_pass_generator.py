@@ -124,3 +124,5 @@ class PassGeneratorPlotter:
             tooltips=[pass_rating_tooltip], renderers=[receiver_point_glyph]
         )
         fig.add_tools(hover_tool)
+
+

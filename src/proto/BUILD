@@ -14,6 +14,7 @@ proto_library(
         "robot_status_msg.proto",
         "tbots_software_msgs.proto",
         "tbots_timestamp_msg.proto",
+        "ai_control_config.proto",
         "vision.proto",
     ],
     deps = [
