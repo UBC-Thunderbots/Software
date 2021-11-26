@@ -113,6 +113,9 @@ void SimulatedTestFixture::SetUp()
     enemy_tick_count           = 0;
 }
 
+
+// TODO: Add support to see tactic that enemies are running in visualizer
+// Do we really need this?
 void SimulatedTestFixture::enableVisualizer()
 {
     full_system_gui =
