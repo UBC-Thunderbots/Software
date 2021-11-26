@@ -1,7 +1,8 @@
+#include <chrono>
+#include <ctime>
 #include <iostream>
 #include <string>
-#include <chrono>
-#include <ctime>  
+
 #include "cpp_redis/core/client.hpp"
 #include "software/test_util/test_util.h"
 
@@ -51,31 +52,28 @@ TEST(RedisKeyValueStoreTests, cpp_redis_get_and_set_speed_test)
                           << std::endl;
             }
         });
-    auto start = std::chrono::system_clock::now();
+    auto start             = std::chrono::system_clock::now();
     std::time_t start_time = std::chrono::system_clock::to_time_t(start);
     std::cout << "Started computation at " << std::ctime(&start_time);
-    for(int i = 0; i<= 200; i++){
-            client.set("A", "1", [](cpp_redis::reply &reply) {
-            });
+    for (int i = 0; i <= 200; i++)
+    {
+        client.set("A", "1", [](cpp_redis::reply &reply) {});
 
-            client.get("A", [](cpp_redis::reply &reply) {
-                ASSERT_EQ(atoi(reply.as_string().c_str()), 1);
-            });
+        client.get("A", [](cpp_redis::reply &reply) {
+            ASSERT_EQ(atoi(reply.as_string().c_str()), 1);
+        });
 
-            client.set("A", "2", [](cpp_redis::reply &reply) {
-            });
+        client.set("A", "2", [](cpp_redis::reply &reply) {});
 
-            client.get("A", [](cpp_redis::reply &reply) {
-                ASSERT_EQ(atoi(reply.as_string().c_str()), 2);
-            });
-            client.sync_commit();
+        client.get("A", [](cpp_redis::reply &reply) {
+            ASSERT_EQ(atoi(reply.as_string().c_str()), 2);
+        });
+        client.sync_commit();
     }
-    auto end = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_seconds = end-start;
+    auto end                                      = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
     std::time_t end_time = std::chrono::system_clock::to_time_t(end);
 
     std::cout << "Finished computation at " << std::ctime(&end_time)
               << "Elapsed time: " << elapsed_seconds.count() << "s\n";
-
-
 }
