@@ -101,19 +101,22 @@ void SimulatedTestFixture::SetUp()
     setupReplayLogging();
 
     // Reset tick duration trackers
-    total_tick_duration = 0.0;
+    total_friendly_tick_duration = 0.0;
+	total_enemy_tick_duration = 0.0;
     // all tick times should be greater than 0
-    max_tick_duration = 0.0;
+    max_friendly_tick_duration = 0.0;
+	max_enemy_tick_duration = 0.0;
     // all tick times should be less than the max value of a double
-    min_tick_duration = std::numeric_limits<double>::max();
-    tick_count        = 0;
+    min_friendly_tick_duration = std::numeric_limits<double>::max();
+	min_enemy_tick_duration = std::numeric_limits<double>::max();
+  	friendly_tick_count        = 0;
+	enemy_tick_count 	   = 0;
 }
 
 void SimulatedTestFixture::enableVisualizer()
 {
     full_system_gui =
         std::make_shared<ThreadedFullSystemGUI>(friendly_mutable_thunderbots_config);
-    // TODO: add support for enemy
     run_simulation_in_realtime = true;
 }
 
@@ -280,10 +283,18 @@ void SimulatedTestFixture::runTest(
                                              friendly_world, enemy_world, simulator);
     }
     // Output the tick duration results
-    double avg_tick_duration = total_tick_duration / tick_count;
-    LOG(INFO) << "max tick duration: " << max_tick_duration << "ms" << std::endl;
-    LOG(INFO) << "min tick duration: " << min_tick_duration << "ms" << std::endl;
-    LOG(INFO) << "avg tick duration: " << avg_tick_duration << "ms" << std::endl;
+    double avg_friendly_tick_duration = total_friendly_tick_duration / friendly_tick_count;
+    LOG(INFO) << "max friendly tick duration: " << max_friendly_tick_duration << "ms" << std::endl;
+    LOG(INFO) << "min friendly tick duration: " << min_friendly_tick_duration << "ms" << std::endl;
+    LOG(INFO) << "avg friendly tick duration: " << avg_friendly_tick_duration << "ms" << std::endl;
+    
+    if (enemy_tick_count > 0) {
+    	double avg_enemy_tick_duration = total_enemy_tick_duration / enemy_tick_count;
+    	LOG(INFO) << "max enemy tick duration: " << max_enemy_tick_duration << "ms" << std::endl;
+    	LOG(INFO) << "min enemy tick duration: " << min_enemy_tick_duration << "ms" << std::endl;
+    	LOG(INFO) << "avg enemy tick duration: " << avg_enemy_tick_duration << "ms" << std::endl;
+    }
+
 
     if (!validation_functions_done && !terminating_validation_functions.empty())
     {
@@ -300,14 +311,21 @@ void SimulatedTestFixture::runTest(
     }
 }
 
-void SimulatedTestFixture::registerTickTime(double tick_time_ms)
+void SimulatedTestFixture::registerFriendlyTickTime(double tick_time_ms)
 {
-    total_tick_duration += tick_time_ms;
-    max_tick_duration = std::max(max_tick_duration, tick_time_ms);
-    min_tick_duration = std::min(min_tick_duration, tick_time_ms);
-    tick_count++;
+    total_friendly_tick_duration += tick_time_ms;
+    max_friendly_tick_duration = std::max(max_friendly_tick_duration, tick_time_ms);
+    min_friendly_tick_duration = std::min(min_friendly_tick_duration, tick_time_ms);
+    friendly_tick_count++;
 }
 
+void SimulatedTestFixture::registerEnemyTickTime(double tick_time_ms)
+{
+	total_enemy_tick_duration += tick_time_ms;
+	max_enemy_tick_duration = std::max(max_enemy_tick_duration, tick_time_ms);
+	min_enemy_tick_duration = std::min(min_enemy_tick_duration, tick_time_ms);
+	enemy_tick_count++;
+}
 
 bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_time_step,
                                     std::shared_ptr<World> friendly_world,

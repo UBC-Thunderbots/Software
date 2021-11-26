@@ -145,7 +145,7 @@ void SimulatedTacticTestFixture::updateFriendlyPrimitives(
 
     auto primitive_set_msg = friendly_navigator->getAssignedPrimitives(world, intents);
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
-    registerTickTime(duration_ms);
+    registerFriendlyTickTime(duration_ms);
     simulator_to_update->setYellowRobotPrimitiveSet(
         createNanoPbPrimitiveSet(*primitive_set_msg));
 }
@@ -174,7 +174,7 @@ void SimulatedTacticTestFixture::updateEnemyPrimitives(
 
     auto primitive_set_msg = enemy_navigator->getAssignedPrimitives(world, intents);
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
-    registerTickTime(duration_ms);
+    registerEnemyTickTime(duration_ms);
     auto defending_side = DefendingSideProto();
     defending_side.set_defending_side(
         DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X);

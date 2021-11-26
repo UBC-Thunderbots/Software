@@ -72,7 +72,7 @@ void SimulatedPlayTestFixture::updatePrimitives(
 
     auto primitive_set_msg = ai.getPrimitives(world_with_updated_game_state);
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
-    registerTickTime(duration_ms);
+    registerFriendlyTickTime(duration_ms);
     simulator_to_update->setYellowRobotPrimitiveSet(
         createNanoPbPrimitiveSet(*primitive_set_msg));
 }
