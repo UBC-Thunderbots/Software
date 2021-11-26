@@ -19,8 +19,8 @@ Robot createRobot(world::SimRobot sim_robot, Timestamp timestamp)
     world::Quaternion q = sim_robot.rotation();
     double siny_cosp    = 2 * (q.real() * q.k() + q.i() * q.j());
     double cosy_cosp    = 1 - 2 * (q.j() * q.j() + q.k() * q.k());
-    double angle        = Angle::atan(siny_cosp / cosy_cosp).toRadians();
-    const RobotState state(position, velocity, Angle::fromRadians(angle),
+    Angle angle         = Angle::atan(siny_cosp / cosy_cosp);
+    const RobotState state(position, velocity, angle,
                            Angle::atan(sim_robot.r_y() / sim_robot.r_x()));
     const Robot robot(id, state, timestamp);
     return robot;
