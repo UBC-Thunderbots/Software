@@ -1,0 +1,53 @@
+syntax = "proto2";
+
+package TbotsProto;
+
+import "proto/geometry.proto";
+import "proto/vision.proto";
+
+message GameState
+{
+    enum PlayState
+    {
+        PLAY_STATE_HALT    = 0;
+        PLAY_STATE_STOP    = 1;
+        PLAY_STATE_SETUP   = 2;
+        PLAY_STATE_READY   = 3;
+        PLAY_STATE_PLAYING = 4;
+    }
+    enum RestartReason
+    {
+        RESTART_REASON_NONE           = 0;
+        RESTART_REASON_KICKOFF        = 1;
+        RESTART_REASON_DIRECT         = 2;
+        RESTART_REASON_INDIRECT       = 3;
+        RESTART_REASON_PENALTY        = 4;
+        RESTART_REASON_BALL_PLACEMENT = 5;
+    }
+    enum RefereeCommand
+    {
+        REFEREE_COMMAND_HALT                 = 0;
+        REFEREE_COMMAND_STOP                 = 1;
+        REFEREE_COMMAND_NORMAL_START         = 2;
+        REFEREE_COMMAND_FORCE_START          = 3;
+        REFEREE_COMMAND_PREPARE_KICKOFF_US   = 4;
+        REFEREE_COMMAND_PREPARE_KICKOFF_THEM = 5;
+        REFEREE_COMMAND_PREPARE_PENALTY_US   = 6;
+        REFEREE_COMMAND_PREPARE_PENALTY_THEM = 7;
+        REFEREE_COMMAND_DIRECT_FREE_US       = 8;
+        REFEREE_COMMAND_DIRECT_FREE_THEM     = 9;
+        REFEREE_COMMAND_INDIRECT_FREE_US     = 10;
+        REFEREE_COMMAND_INDIRECT_FREE_THEM   = 11;
+        REFEREE_COMMAND_TIMEOUT_US           = 12;
+        REFEREE_COMMAND_TIMEOUT_THEM         = 13;
+        REFEREE_COMMAND_GOAL_US              = 14;
+        REFEREE_COMMAND_GOAL_THEM            = 15;
+        REFEREE_COMMAND_BALL_PLACEMENT_US    = 16;
+        REFEREE_COMMAND_BALL_PLACEMENT_THEM  = 17;
+    }
+    required PlayState play_state         = 1;
+    required RestartReason restart_reason = 2;
+    required RefereeCommand command       = 3;
+    optional BallState ball_state         = 4;
+    optional Point ball_placement_point   = 5;
+}
