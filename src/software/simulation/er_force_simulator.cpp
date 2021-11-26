@@ -50,10 +50,9 @@ ErForceSimulator::ErForceSimulator(
     google::protobuf::TextFormat::Parser parser;
     parser.ParseFromString(s, &er_force_sim_setup);
 
-    er_force_sim =
-        std::make_unique<camun::simulator::Simulator>(er_force_sim_setup, true);
+    er_force_sim = std::make_unique<camun::simulator::Simulator>(er_force_sim_setup);
 
-    auto simulator_setup_command = std::make_shared<amun::Command>();
+    auto simulator_setup_command = std::make_unique<amun::Command>();
     simulator_setup_command->mutable_simulator()->set_enable(true);
     // start with default robots, take ER-Force specs.
     robot::Specs ERForce;
@@ -126,7 +125,7 @@ ErForceSimulator::ErForceSimulator(
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
 {
-    auto simulator_setup_command = std::make_shared<amun::Command>();
+    auto simulator_setup_command = std::make_unique<amun::Command>();
     auto teleport_ball           = std::make_unique<sslsim::TeleportBall>();
     auto simulator_control       = std::make_unique<sslsim::SimulatorControl>();
     auto command_simulator       = std::make_unique<amun::CommandSimulator>();

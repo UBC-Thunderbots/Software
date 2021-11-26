@@ -13,10 +13,9 @@ class ErForceSimulatorTest : public ::testing::Test
     void SetUp() override
     {
         simulator_config = std::make_shared<const SimulatorConfig>();
-        simulator =
-            std::make_shared<ErForceSimulator>(
-        Field::createSSLDivisionBField(), robot_constants,wheel_constants,
-        simulator_config);
+        simulator = std::make_shared<ErForceSimulator>(Field::createSSLDivisionBField(),
+                                                       robot_constants, wheel_constants,
+                                                       simulator_config);
         simulator->resetCurrentFirmwareTime();
     }
 
@@ -32,7 +31,7 @@ TEST_F(ErForceSimulatorTest, set_ball_state_when_ball_does_not_already_exist)
     simulator->setBallState(ball_state);
     simulator->stepSimulation(Duration::fromMilliseconds(5));
 
-    auto ssl_wrapper_packets = simulator->getSSLWrapperPackets();
+    auto ssl_wrapper_packets                = simulator->getSSLWrapperPackets();
     bool at_least_one_wrapper_packet_passes = false;
     for (const auto& ssl_wrapper_packet : ssl_wrapper_packets)
     {
@@ -66,7 +65,7 @@ TEST_F(ErForceSimulatorTest, set_ball_state_when_ball_already_exists)
     simulator->setBallState(new_ball_state);
     simulator->stepSimulation(Duration::fromMilliseconds(5));
 
-    auto ssl_wrapper_packets = simulator->getSSLWrapperPackets();
+    auto ssl_wrapper_packets                = simulator->getSSLWrapperPackets();
     bool at_least_one_wrapper_packet_passes = false;
     for (const auto& ssl_wrapper_packet : ssl_wrapper_packets)
     {
