@@ -25,9 +25,9 @@ TEST(ErForceWorldTest, test_create_robot)
 {
     auto quater = std::make_unique<world::Quaternion>();
     quater->set_real(1.0);
-    quater->set_i(2.0);
-    quater->set_j(3.0);
-    quater->set_k(4.0);
+    quater->set_i(0.0);
+    quater->set_j(0.0);
+    quater->set_k(0.0);
 
     auto sim_robot = std::make_unique<world::SimRobot>();
     sim_robot->set_id(0);
