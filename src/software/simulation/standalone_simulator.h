@@ -3,8 +3,8 @@
 #include "proto/defending_side_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/networking/threaded_proto_udp_listener.h"
-#include "software/networking/threaded_proto_udp_sender.h"
+#include "software/networking/threaded_proto_udp_listener.hpp"
+#include "software/networking/threaded_proto_udp_sender.hpp"
 #include "software/simulation/threaded_simulator.h"
 
 /**

@@ -113,37 +113,6 @@ TEST_F(ThreadedSimulatorTest, start_and_stop_simulation_several_times)
     EXPECT_GT(ball_x_3, ball_x_2);
 }
 
-TEST_F(ThreadedSimulatorTest, add_and_remove_ball_during_simulation)
-{
-    threaded_simulator.startSimulation();
-
-    BallState ball_state(Point(0, 0), Vector(1, 0));
-    threaded_simulator.setBallState(ball_state);
-
-    // yield and sleep to give the simulation thread the best chance of running
-    std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-
-    EXPECT_TRUE(callback_called);
-
-    auto ball_position = getBallPosition();
-    ASSERT_TRUE(ball_position);
-    // Do a very coarse check for the ball's x coordinate because
-    // we don't really know how much the simulation thread got to run.
-    // This just roughly checks that physics is being updated as expected.
-    EXPECT_NEAR(ball_position->x(), 1000, 800);
-    EXPECT_NEAR(ball_position->y(), 0, 100);
-
-    threaded_simulator.removeBall();
-
-    // yield and sleep to give the simulation thread the best chance of running
-    std::this_thread::yield();
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-
-    threaded_simulator.stopSimulation();
-    ASSERT_FALSE(getBallPosition());
-}
-
 TEST_F(ThreadedSimulatorTest, add_robots_and_primitives_while_simulation_running)
 {
     threaded_simulator.startSimulation();

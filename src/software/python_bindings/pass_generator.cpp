@@ -1,4 +1,4 @@
-#include "software/ai/passing/pass_generator.h"
+#include "software/ai/passing/pass_generator.hpp"
 
 #include <pybind11/pybind11.h>
 

@@ -6,9 +6,9 @@
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/receiver_tactic.h"
+#include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
-#include "software/ai/passing/pass_generator.h"
+#include "software/ai/passing/pass_generator.hpp"
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
@@ -80,9 +80,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                    << best_pass_and_score_so_far.rating;
 
         // Perform the pass and wait until the receiver is finished
-        auto receiver = std::make_shared<ReceiverTactic>(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), pass, world.ball(),
-            false);
+        auto receiver = std::make_shared<ReceiverTactic>();
 
         auto pass_eval = pass_generator.generatePassEvaluation(world);
 
@@ -106,7 +104,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         do
         {
-            attacker->updateControlParams(pass);
+            // if we make it here then we have committed to the pass
+            attacker->updateControlParams(pass, true);
             receiver->updateControlParams(pass);
 
             std::get<0>(crease_defender_tactics)
@@ -195,6 +194,9 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
         cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
                                                   pass2.receiverOrientation(), 0.0,
                                                   MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+
+        // update the best pass in the attacker tactic
+        attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
 
         yield({{attacker_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
                 std::get<0>(crease_defender_tactics),

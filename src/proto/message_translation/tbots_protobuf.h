@@ -31,3 +31,21 @@ std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball);
  * @return The unique_ptr to a TbotsProto::Timestamp with the current UTC time
  */
 std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp();
+
+/**
+ * Create Robot State
+ *
+ * @param robot_state_proto the robot state proto
+ *
+ * @return the equivalent RobotState
+ */
+RobotState createRobotState(const TbotsProto::RobotState& robot_state_proto);
+
+/**
+ * Create Ball State
+ *
+ * @param ball_state_proto the ball state proto
+ *
+ * @return the equivalent BallState
+ */
+BallState createBallState(const TbotsProto::BallState& ball_state_proto);

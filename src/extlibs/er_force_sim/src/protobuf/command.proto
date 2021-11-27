@@ -1,0 +1,256 @@
+syntax                  = "proto2";
+option cc_enable_arenas = true;
+
+import "extlibs/er_force_sim/src/protobuf/world.proto";
+import "extlibs/er_force_sim/src/protobuf/robot.proto";
+import "extlibs/er_force_sim/src/protobuf/logfile.proto";
+import "proto/messages_robocup_ssl_geometry.proto";
+import "extlibs/er_force_sim/src/protobuf/ssl_simulation_control.proto";
+import "extlibs/er_force_sim/src/protobuf/ssl_simulation_custom_erforce_realism.proto";
+
+package amun;
+
+message RobotMoveCommand
+{
+    required uint32 id = 1;
+    optional float p_x = 2;
+    optional float p_y = 3;
+}
+
+message SimulatorSetup
+{
+    required world.Geometry geometry                             = 1;
+    repeated SSLProto.SSL_GeometryCameraCalibration camera_setup = 2;
+}
+
+message SimulatorWorstCaseVision
+{
+    // minimum time between two detections of one robot or ball (in seconds)
+    // when the feature is disabled, zero may be set here
+    optional float min_robot_detection_time = 1;
+    optional float min_ball_detection_time  = 2;
+}
+
+message CommandSimulator
+{
+    optional bool enable                                = 1;
+    optional SimulatorSetup simulator_setup             = 2;
+    optional SimulatorWorstCaseVision vision_worst_case = 3;
+    optional RealismConfigErForce realism_config        = 4;
+    optional world.SimulatorState set_simulator_state   = 5;
+    optional sslsim.SimulatorControl ssl_control        = 6;
+}
+
+message CommandReferee
+{
+    optional bool active                       = 1;
+    optional bytes command                     = 2;
+    optional bool use_internal_autoref         = 3;
+    optional bool use_automatic_robot_exchange = 4;
+}
+
+message CommandStrategyLoad
+{
+    required string filename    = 1;
+    optional string entry_point = 2;
+}
+
+message CommandStrategyClose {}
+
+message CommandStrategyTriggerDebugger {}
+
+message CommandStrategy
+{
+    optional CommandStrategyLoad load             = 1;
+    optional CommandStrategyClose close           = 2;
+    optional bool reload                          = 3;
+    optional bool auto_reload                     = 4;
+    optional bool enable_debug                    = 5;
+    optional CommandStrategyTriggerDebugger debug = 6;
+    optional bool performance_mode                = 7;
+    optional bool start_profiling                 = 8;
+    optional string finish_and_save_profile       = 9;
+    optional bool tournament_mode                 = 10;
+}
+
+message CommandControl
+{
+    repeated robot.RadioCommand commands = 1;
+}
+
+message TransceiverConfiguration
+{
+    required uint32 channel = 1;
+}
+
+message HostAddress
+{
+    required string host = 1;
+    required uint32 port = 2;
+}
+
+message SimulatorNetworking
+{
+    required bool control_simulator = 1;
+    required bool control_blue      = 2;
+    required bool control_yellow    = 3;
+    required uint32 port_blue       = 4;
+    required uint32 port_yellow     = 5;
+}
+
+message CommandTransceiver
+{
+    optional bool enable                                 = 1;
+    optional bool charge                                 = 2;
+    optional TransceiverConfiguration configuration      = 3;
+    optional HostAddress network_configuration           = 4;
+    optional bool use_network                            = 5;
+    optional SimulatorNetworking simulator_configuration = 6;
+}
+
+message VirtualFieldTransform
+{
+    required float a11     = 1;
+    required float a12     = 2;
+    required float a21     = 3;
+    required float a22     = 4;
+    required float offsetX = 5;
+    required float offsetY = 6;
+}
+
+// WARNING: if tracking parameters are added in the ui, it must be checked if
+// they are necessary for the trackig replay (and if they are they must be saved
+// in status packages)
+message CommandTracking
+{
+    optional bool aoi_enabled                      = 1;
+    optional world.TrackingAOI aoi                 = 2;
+    optional int64 system_delay                    = 3;
+    optional bool reset                            = 4;
+    optional bool enable_virtual_field             = 5;
+    optional VirtualFieldTransform field_transform = 6;
+    optional world.Geometry virtual_geometry       = 7;
+    optional bool tracking_replay_enabled          = 8;
+}
+
+// the UI may not store the option state, therefore only single values will be
+// changed (by hand)
+message CommandStrategyChangeOption
+{
+    required string name = 1;
+    required bool value  = 2;
+}
+
+message CommandAmun
+{
+    optional uint32 vision_port                        = 1;
+    optional uint32 referee_port                       = 2;
+    optional CommandStrategyChangeOption change_option = 3;
+}
+
+enum DebuggerInputTarget
+{
+    DITStrategyYellow = 0;
+    DITStrategyBlue   = 1;
+    DITAutoref        = 2;
+}
+
+message CommandDebuggerInputDisable {}
+
+message CommandDebuggerInputLine
+{
+    optional string line = 1;
+}
+
+message CommandDebuggerInput
+{
+    required DebuggerInputTarget strategy_type   = 1;
+    optional CommandDebuggerInputDisable disable = 2;
+    optional CommandDebuggerInputLine queue_line = 3;
+}
+
+enum PauseSimulatorReason
+{
+    Ui                  = 1;
+    WindowFocus         = 2;
+    DebugBlueStrategy   = 3;
+    DebugYellowStrategy = 4;
+    DebugAutoref        = 5;
+    Replay              = 6;
+    Horus               = 7;
+    Logging             = 8;
+}
+
+message PauseSimulatorCommand
+{
+    required PauseSimulatorReason reason = 1;
+    optional bool pause                  = 2;
+    optional bool toggle                 = 3;
+}
+
+message CommandReplay
+{
+    // replay in general, not any specific strategy. This may be enabled even when
+    // no strategy is replayed
+    optional bool enable                     = 1;
+    optional bool enable_blue_strategy       = 2;
+    optional CommandStrategy blue_strategy   = 3;
+    optional bool enable_yellow_strategy     = 4;
+    optional CommandStrategy yellow_strategy = 5;
+}
+
+message Flag {}  // empty message
+
+message CommandPlayback
+{
+    optional int32 seek_time           = 1;
+    optional int32 seek_packet         = 2;
+    optional int32 seek_time_backwards = 3;
+    optional int32 playback_speed      = 4;
+    optional Flag toggle_paused        = 5;
+    optional bool run_playback         = 6;  // used to switch between live and log
+                                             // (corresponding to ra and horus in the UI)
+    optional logfile.LogRequest log_path = 7;
+    optional Flag instant_replay         = 8;
+    optional string export_vision_log    = 9;  // the location to save the vision log to
+    optional Flag get_uid                = 10;
+    optional string find_logfile         = 11;
+    optional int32 playback_limit        = 12;
+}
+
+message CommandRecord
+{
+    optional bool use_logfile_location = 1;
+    optional Flag save_backlog         = 2;
+    optional bool run_logging          = 3;
+    optional bool for_replay           = 4;  // has to be set to either true or false iff
+                                   // save_backlog, request_backlog or run_logging are set
+    optional int32 request_backlog = 5;  // sent by the plotter when opened.
+    optional string overwrite_record_filename =
+        6;  // must be given in the first frame in which run_logging is true to be
+            // effective
+}
+
+message Command
+{
+    optional CommandSimulator simulator       = 1;
+    optional CommandReferee referee           = 2;
+    optional robot.Team set_team_blue         = 3;
+    optional robot.Team set_team_yellow       = 4;
+    optional CommandStrategy strategy_blue    = 5;
+    optional CommandStrategy strategy_yellow  = 6;
+    optional CommandStrategy strategy_autoref = 7;
+    optional CommandControl control           = 8;
+    optional CommandTransceiver transceiver   = 9;
+    //    optional float speed = 10;
+    optional CommandTracking tracking              = 11;
+    optional CommandAmun amun                      = 12;
+    optional HostAddress mixed_team_destination    = 13;
+    repeated RobotMoveCommand robot_move_blue      = 14;
+    repeated RobotMoveCommand robot_move_yellow    = 15;
+    optional CommandDebuggerInput debugger_input   = 16;
+    optional PauseSimulatorCommand pause_simulator = 17;
+    optional CommandReplay replay                  = 18;
+    optional CommandPlayback playback              = 19;
+    optional CommandRecord record                  = 20;
+}

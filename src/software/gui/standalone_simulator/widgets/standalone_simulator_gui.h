@@ -7,7 +7,7 @@
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/geom/rectangle.h"
 #include "software/gui/standalone_simulator/ui/ui_main_widget.h"
-#include "software/multithreading/thread_safe_buffer.h"
+#include "software/multithreading/thread_safe_buffer.hpp"
 #include "software/simulation/standalone_simulator.h"
 
 /**

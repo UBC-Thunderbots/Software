@@ -184,23 +184,6 @@ def _make_common_features(ctx):
         enabled = True,
     )
 
-    result["warnings_as_errors_feature"] = feature(
-        name = "warnings_as_errors",
-        flag_sets = [
-            flag_set(
-                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
-                flag_groups = [
-                    flag_group(
-                        # -Werror can be overridden by copts argument in cc_binary
-                        # Warnings are added in .bazelrc
-                        flags = ["-Werror"] +
-                                ctx.attr.host_compiler_warnings,
-                    ),
-                ],
-            ),
-        ],
-    )
-
     result["colour_feature"] = feature(
         name = "colour",
         # the compiler will highlight warnings and errors with colour
@@ -548,7 +531,6 @@ def _linux_gcc_impl(ctx):
             "c++17",
             "colour",
             "determinism",
-            "warnings_as_errors",
             "hardening",
             "build-id",
             "no-canonical-prefixes",
@@ -724,7 +706,6 @@ def _stm32_impl(ctx):
             "stdlib",
             "c++17",
             "colour",
-            "warnings_as_errors",
             "determinism",
             "no-canonical-prefixes",
         ] + ([ctx.attr.cpu] if ctx.attr.cpu in [
@@ -866,7 +847,6 @@ def _jetson_nano_impl(ctx):
             "stdlib",
             "c++17",
             "colour",
-            "warnings_as_errors",
             "no-canonical-system-headers",
             "determinism",
             "no-canonical-prefixes",
