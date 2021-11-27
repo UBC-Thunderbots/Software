@@ -40,14 +40,14 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
         // time to settle into position and be observed with the Visualizer
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1971
-        friendlyScored
+//        friendlyScored
     };
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(25));
+            Duration::fromSeconds(12));
 }
 
 TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play_with_keep_away)
@@ -75,11 +75,12 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play_with_keep_away)
         // time to settle into position and be observed with the Visualizer
         // TODO: Implement proper validation
         // https://github.com/UBC-Thunderbots/Software/issues/1971
-        friendlyScored};
+//        friendlyScored
+    };
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(20));
+            Duration::fromSeconds(10));
 }

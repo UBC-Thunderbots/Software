@@ -53,7 +53,7 @@ struct DribbleFSM
     // break the 1 meter rule
     static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.9;
     // robot speed at which the robot is done dribbling
-    static constexpr double ROBOT_DRIBBLING_DONE_SPEED = 0.4;  // m/s
+    static constexpr double ROBOT_DRIBBLING_DONE_SPEED = 0.2;  // m/s
 
     /**
      * Converts the ball position to the robot's position given the direction that the
@@ -214,29 +214,8 @@ struct DribbleFSM
          * direction and ahs possession of the ball
          */
         const auto dribbling_done = [have_possession](auto event) {
-//            std::cout << "compare points: " << comparePoints(event.common.world.ball().position(),
-//                                 getDribbleBallDestination(
-//                                     event.common.world.ball().position(),
-//                                     event.control_params.dribble_destination),
-//                                 BALL_CLOSE_TO_DEST_THRESHOLD) << '\n';
-//            std::cout << "final dribble orientation: " << getFinalDribbleOrientation(
-//                                     event.common.world.ball().position(),
-//                                     event.common.robot.position(),
-//                                     event.control_params.final_dribble_orientation).toDegrees() << '\n';
-//            std::cout << "control param final dribble orientation: " << event.control_params.final_dribble_orientation.value().toDegrees() << '\n';
-//            std::cout << "robot orientation: " << event.common.robot.orientation().toDegrees() << '\n';
-//            std::cout << "compare angle: " << compareAngles(event.common.robot.orientation(),
-//                                 getFinalDribbleOrientation(
-//                                     event.common.world.ball().position(),
-//                                     event.common.robot.position(),
-//                                     event.control_params.final_dribble_orientation),
-//                                 FINAL_DESTINATION_CLOSE_THRESHOLD) << " by "            << (getFinalDribbleOrientation(
-//                                     event.common.world.ball().position(),
-//                                     event.common.robot.position(),
-//                                     event.control_params.final_dribble_orientation)).toDegrees() << '\n';
-//            std::cout << "possession? " << have_possession(event) << '\n';
-//            std::cout << "robotStopped: " << robotStopped(event.common.robot, ROBOT_DRIBBLING_DONE_SPEED) << '\n';
-//            std::cout << "robotSpeed: " << event.common.robot.velocity().length();
+            std::cout << "robot stopped? " << robotStopped(event.common.robot, ROBOT_DRIBBLING_DONE_SPEED) << "\n";
+            std::cout << "robot speed? " << event.common.robot.velocity().length() << "\n";
             
             return comparePoints(event.common.world.ball().position(),
                                  getDribbleBallDestination(

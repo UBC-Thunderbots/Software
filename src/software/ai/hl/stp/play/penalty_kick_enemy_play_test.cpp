@@ -72,7 +72,7 @@ TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(15));
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -114,7 +114,7 @@ INSTANTIATE_TEST_CASE_P(
                              Point(1.2, -1.5), Point(0, 2), Point(1, 0)}),
                         1.6)));
 
-TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_goalie)
+TEST_F(PenaltyKickEnemyPlayTest, DISABLED_test_penalty_kick_enemy_play_goalie)
 {
     BallState ball_state(field.enemyPenaltyMark(), Vector(-3, 0.2));
 
