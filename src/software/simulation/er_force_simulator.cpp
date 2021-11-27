@@ -122,6 +122,8 @@ ErForceSimulator::ErForceSimulator(
 
 
     this->resetCurrentFirmwareTime();
+
+ 
 }
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
@@ -270,7 +272,9 @@ std::vector<SSLProto::SSL_WrapperPacket> ErForceSimulator::getSSLWrapperPackets(
     return er_force_sim->getWrapperPackets();
 }
 
-Field ErForceSimulator::getField() const
+MAKE_ENUM(FieldType, DIV_A, DIV_B);
+
+Field ErForceSimulator::getField(FieldType) const
 {
     return Field::createSSLDivisionAField();
 }
@@ -289,7 +293,6 @@ float ErForceSimulator::getCurrentFirmwareTimeSeconds()
 {
     return static_cast<float>(current_firmware_time.toSeconds());
 }
-
 
 // We must give this variable a value here, as non-const static variables must be
 // initialized out-of-line
