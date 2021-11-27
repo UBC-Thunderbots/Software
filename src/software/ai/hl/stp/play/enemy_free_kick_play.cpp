@@ -7,7 +7,7 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_free_kicker_tactic.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 #include "software/world/game_state.h"
 
 EnemyFreekickPlay::EnemyFreekickPlay(std::shared_ptr<const PlayConfig> config)

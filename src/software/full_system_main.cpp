@@ -16,7 +16,7 @@
 #include "software/logger/logger.h"
 #include "software/multithreading/observer_subject_adapter.h"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 // clang-format off
 std::string BANNER =

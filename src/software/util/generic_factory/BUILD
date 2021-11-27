@@ -3,8 +3,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "generic_factory",
     hdrs = [
-        "generic_factory.h",
-        "generic_factory.tpp",
+        "generic_factory.hpp",
     ],
     deps = [
         "//software/util/typename",

@@ -2,7 +2,7 @@
 
 #include "software/ai/hl/stp/tactic/test_tactics/stop_test_tactic.h"
 #include "software/geom/algorithms/contains.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 HaltTestPlay::HaltTestPlay(std::shared_ptr<const PlayConfig> config) : Play(config, false)
 {

@@ -1,11 +1,9 @@
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 #include <gtest/gtest.h>
 
 #include <exception>
 #include <iostream>
-
-#include "software/util/generic_factory/generic_factory.h"
 
 class TestConfig
 {

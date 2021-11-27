@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/example_play.h"
 
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 ExamplePlay::ExamplePlay(std::shared_ptr<const PlayConfig> config) : Play(config, false)
 {

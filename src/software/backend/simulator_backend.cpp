@@ -7,7 +7,7 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/constants.h"
 #include "software/logger/logger.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 SimulatorBackend::SimulatorBackend(std::shared_ptr<const BackendConfig> config)
     : network_config(config->getSimulatorBackendConfig()->getNetworkConfig()),

@@ -10,7 +10,7 @@
 #include "software/ai/passing/pass_generator.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 #include "software/world/ball.h"
 
 CornerKickPlay::CornerKickPlay(std::shared_ptr<const PlayConfig> config)

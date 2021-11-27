@@ -1,6 +1,6 @@
 #include <stdexcept>
 
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 template <class IndexType, class TypeToCreate, class ConfigType>
 GenericRegistry<IndexType, TypeToCreate, ConfigType>&

@@ -2,7 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 ScoringWithStaticDefendersPlay::ScoringWithStaticDefendersPlay(
     std::shared_ptr<const PlayConfig> config)

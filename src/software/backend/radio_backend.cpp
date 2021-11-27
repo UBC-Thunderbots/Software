@@ -3,7 +3,7 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/backend/radio/robot_status.h"
 #include "software/constants.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 RadioBackend::RadioBackend(std::shared_ptr<const BackendConfig> config)
     : ssl_communication_config(

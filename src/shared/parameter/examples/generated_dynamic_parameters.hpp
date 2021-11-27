@@ -10,7 +10,7 @@
 #include "software/parameter/config.h"
 #include "software/parameter/enumerated_parameter.h"
 #include "software/parameter/numeric_parameter.h"
-#include "software/util/generic_factory/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.hpp"
 
 class fooConfig;
 class exampleConfig;
