@@ -54,15 +54,8 @@ void SimulatedTacticTestFixture::SetUp()
 void SimulatedTacticTestFixture::setTactic(std::shared_ptr<Tactic> friendly_tactic,
                                            std::shared_ptr<Tactic> enemy_tactic)
 {
-    try
-    {
-        setFriendlyTactic(friendly_tactic);
-        setEnemyTactic(enemy_tactic);
-    }
-    catch (std::invalid_argument& e)
-    {
-        LOG(FATAL) << e.what() << std::endl;
-    }
+    setFriendlyTactic(friendly_tactic);
+    setEnemyTactic(enemy_tactic);
 }
 
 void SimulatedTacticTestFixture::setFriendlyTactic(std::shared_ptr<Tactic> tactic)
@@ -73,7 +66,7 @@ void SimulatedTacticTestFixture::setFriendlyTactic(std::shared_ptr<Tactic> tacti
     }
     else
     {
-        throw std::invalid_argument("Friendly tactic is invalid");
+        LOG(FATAL) << "Friendly tactic is invalid" << std::endl;
     }
 }
 
@@ -85,7 +78,7 @@ void SimulatedTacticTestFixture::setEnemyTactic(std::shared_ptr<Tactic> tactic)
     }
     else
     {
-        throw std::invalid_argument("Enemy tactic is invalid");
+        LOG(FATAL) << "Enemy tactic is invalid" << std::endl;
     }
 }
 
