@@ -131,9 +131,6 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                                                 shadow_dist);
 
                 result[0].emplace_back(shadow_enemy_tactics.at(i));
-
-                std::cout << enemy_threat.robot.id() << "string at position" << i
-                          << std::endl;
             }
             else
             {
