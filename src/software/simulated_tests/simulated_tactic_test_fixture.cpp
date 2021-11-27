@@ -61,7 +61,7 @@ void SimulatedTacticTestFixture::setTactic(std::shared_ptr<Tactic> friendly_tact
     }
     catch (std::invalid_argument& e)
     {
-        throw(e);
+        LOG(FATAL) << e.what() << std::endl;
     }
 }
 
