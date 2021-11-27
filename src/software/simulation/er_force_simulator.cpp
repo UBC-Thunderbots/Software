@@ -123,7 +123,7 @@ ErForceSimulator::ErForceSimulator(
 
     this->resetCurrentFirmwareTime();
 
- 
+    this->getSimulatorSetup();
 }
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
@@ -293,6 +293,12 @@ float ErForceSimulator::getCurrentFirmwareTimeSeconds()
 {
     return static_cast<float>(current_firmware_time.toSeconds());
 }
+
+String ErForceSimulator::getSimulatorSetup()
+{
+    return amun::SimulatorSetup();
+}
+
 
 // We must give this variable a value here, as non-const static variables must be
 // initialized out-of-line
