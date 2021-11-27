@@ -56,6 +56,12 @@ TEST_F(StopPlayTest, test_invariant_and_is_applicable)
     auto stop_play = StopPlay(play_config);
 
     world.updateGameState(
+        ::TestUtil::createGameState(RefereeCommand::HALT, RefereeCommand::HALT));
+
+    ASSERT_FALSE(stop_play.isApplicable(world));
+    ASSERT_FALSE(stop_play.invariantHolds(world));
+
+    world.updateGameState(
         ::TestUtil::createGameState(RefereeCommand::STOP, RefereeCommand::STOP));
 
     ASSERT_TRUE(stop_play.isApplicable(world));
