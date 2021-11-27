@@ -28,7 +28,7 @@ extern "C"
 
 ErForceSimulator::ErForceSimulator(
     const Field& field, const RobotConstants_t& robot_constants,
-    const WheelConstants& wheel_constants,
+    const WheelConstants& wheel_constants, private const FieldType
     std::shared_ptr<const SimulatorConfig> simulator_config)
     : yellow_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
       blue_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
@@ -123,7 +123,7 @@ ErForceSimulator::ErForceSimulator(
 
     this->resetCurrentFirmwareTime();
 
-    this->getSimulatorSetup();
+    FieldType = this->getSimulatorSetup();
 }
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
