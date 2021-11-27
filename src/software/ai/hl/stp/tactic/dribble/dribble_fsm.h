@@ -214,9 +214,12 @@ struct DribbleFSM
          * direction and ahs possession of the ball
          */
         const auto dribbling_done = [have_possession](auto event) {
-            std::cout << "robot stopped? " << robotStopped(event.common.robot, ROBOT_DRIBBLING_DONE_SPEED) << "\n";
-            std::cout << "robot speed? " << event.common.robot.velocity().length() << "\n";
-            
+            std::cout << "robot stopped? "
+                      << robotStopped(event.common.robot, ROBOT_DRIBBLING_DONE_SPEED)
+                      << "\n";
+            std::cout << "robot speed? " << event.common.robot.velocity().length()
+                      << "\n";
+
             return comparePoints(event.common.world.ball().position(),
                                  getDribbleBallDestination(
                                      event.common.world.ball().position(),

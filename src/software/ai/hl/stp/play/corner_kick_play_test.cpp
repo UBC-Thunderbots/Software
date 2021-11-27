@@ -84,7 +84,8 @@ class CornerKickPlayInvariantAndIsApplicableTest
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_P(CornerKickPlayInvariantAndIsApplicableTest, DISABLED_test_invariant_and_is_applicable)
+TEST_P(CornerKickPlayInvariantAndIsApplicableTest,
+       DISABLED_test_invariant_and_is_applicable)
 {
     // Set world variables
     auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();

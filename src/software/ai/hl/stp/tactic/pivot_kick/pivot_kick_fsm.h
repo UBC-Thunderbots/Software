@@ -72,8 +72,10 @@ struct PivotKickFSM
          * @return if the ball has been kicked
          */
         const auto ball_kicked = [](auto event) {
-            std::cout << "has ball been kicked: " << event.common.world.ball().hasBallBeenKicked(
-                event.control_params.kick_direction) << std::endl;
+            std::cout << "has ball been kicked: "
+                      << event.common.world.ball().hasBallBeenKicked(
+                             event.control_params.kick_direction)
+                      << std::endl;
             return event.common.world.ball().hasBallBeenKicked(
                 event.control_params.kick_direction);
         };
