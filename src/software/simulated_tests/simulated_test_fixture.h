@@ -211,6 +211,4 @@ class SimulatedTestFixture : public ::testing::Test
     // that we will simulate 2 time steps (2 camera frames) before we give
     // the latest data to the AI and run it.
     static constexpr unsigned int CAMERA_FRAMES_PER_AI_TICK = 2;
-
-    unsigned int update_primitive_count = 0;
 };

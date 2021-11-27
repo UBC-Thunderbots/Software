@@ -114,7 +114,7 @@ INSTANTIATE_TEST_CASE_P(
                              Point(1.2, -1.5), Point(0, 2), Point(1, 0)}),
                         1.6)));
 
-TEST_F(PenaltyKickEnemyPlayTest, DISABLED_test_penalty_kick_enemy_play_goalie)
+TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_goalie)
 {
     BallState ball_state(field.enemyPenaltyMark(), Vector(-3, 0.2));
 

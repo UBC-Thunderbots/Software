@@ -248,7 +248,9 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
     if (goalie_robot && automatically_assign_goalie)
     {
         ++new_tactics;
-        if (robot_tactic_assignment.find(goalie_tactic) == robot_tactic_assignment.end())
+        if (robot_tactic_assignment.find(goalie_tactic) ==
+                robot_tactic_assignment.end() ||
+            (robot_tactic_assignment.at(goalie_tactic) != goalie_robot))
         {
             recalculate_tactic_assignment = true;
         }

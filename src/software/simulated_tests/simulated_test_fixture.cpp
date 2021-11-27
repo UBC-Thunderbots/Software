@@ -14,8 +14,7 @@ SimulatedTestFixture::SimulatedTestFixture()
           std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config)),
       sensor_fusion(thunderbots_config->getSensorFusionConfig()),
       should_log_replay(false),
-      run_simulation_in_realtime(false),
-      update_primitive_count(0)
+      run_simulation_in_realtime(false)
 {
 }
 
@@ -285,14 +284,7 @@ bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_t
             return validation_functions_done;
         }
 
-        // Change this constant to increase number of primitives to skip
-        //        const unsigned int NUMBER_OF_PRIMITIVE_TICKS_TO_SKIP = 1;
-        //        update_primitive_count = (update_primitive_count + 1) %
-        //        NUMBER_OF_PRIMITIVE_TICKS_TO_SKIP; if(update_primitive_count == 0)
-        //        {
         updatePrimitives(*world_opt, simulator);
-        //        }
-
 
         if (run_simulation_in_realtime)
         {

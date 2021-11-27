@@ -118,14 +118,12 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                       CreaseDefenderAlignment::RIGHT);
             if (!attacker->done())
             {
-                LOG(DEBUG) << "sending an attacker and receiver\n";
                 yield({{attacker, receiver},
                        {cherry_pick_tactic_1, std::get<0>(crease_defender_tactics),
                         std::get<1>(crease_defender_tactics)}});
             }
             else
             {
-                LOG(DEBUG) << "sending only a receiver\n";
                 yield({{receiver},
                        {cherry_pick_tactic_1, cherry_pick_tactic_2},
                        {std::get<0>(crease_defender_tactics),
