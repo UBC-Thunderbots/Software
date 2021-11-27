@@ -32,6 +32,8 @@
 #include "extlibs/er_force_sim/src/protobuf/sslsim.h"
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "proto/ssl_simulation_robot_control.pb.h"
+// #include "software/world/robot_state.h"
+
 
 // higher values break the rolling friction of the ball
 const float SIMULATOR_SCALE  = 10.0f;
@@ -106,7 +108,8 @@ class camun::simulator::Simulator : public QObject
      * @return simulator state
      */
     world::SimulatorState getSimulatorState();
-    void handleSimulatorSetupCommand(const std::shared_ptr<amun::Command> &command);
+    void handleSimulatorSetupCommand(const std::shared_ptr<amun::Command> &command,
+                                     const std::vector<std::tuple<int, int>> &robots);
 
    public slots:
     void handleRadioCommands(const SSLSimRobotControl &control, bool isBlue,
@@ -121,7 +124,8 @@ class camun::simulator::Simulator : public QObject
     std::tuple<QList<QByteArray>, QByteArray, qint64> createVisionPacket();
     void resetVisionPackets();
     void setTeam(RobotMap &list, float side, const robot::Team &team,
-                 QMap<uint32_t, robot::Specs> &specs);
+                 QMap<uint32_t, robot::Specs> &specs,
+                 const std::vector<std::tuple<int, int>> &robots);
     void moveBall(const sslsim::TeleportBall &ball);
     void moveRobot(const sslsim::TeleportRobot &robot);
     void teleportRobotToFreePosition(SimRobot *robot);

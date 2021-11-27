@@ -91,15 +91,20 @@ void ErForceSimulator::addYellowRobots(const std::vector<RobotStateWithId>& robo
     robotSetDefault(&ERForce);
 
     auto* team_yellow = simulator_setup_command->mutable_set_team_yellow();
+    std::vector<std::tuple<int, int>>
+        yellow_robot_pos;  //=new std::vector<std::tuple<int, int>>;
+
 
     for (unsigned int i = 0; i < robots.size(); i++)
     {
         auto* robot = team_yellow->add_robot();
         robot->CopyFrom(ERForce);
         robot->set_id(i);
+        yellow_robot_pos.push_back(std::make_tuple(robots[i].robot_state.position().y(),
+                                                   robots[i].robot_state.position().x()));
     }
 
-    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
+    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command, yellow_robot_pos);
     er_force_sim->seedPRGN(17);
 
     for (unsigned int i = 0; i < robots.size(); i++)
@@ -120,6 +125,8 @@ void ErForceSimulator::addYellowRobots(const std::vector<RobotStateWithId>& robo
 
         yellow_simulator_robots.insert(
             std::make_pair(yellow_simulator_robot, yellow_firmware_world));
+
+        // simulator_setup_command->robot_move_blue() = createRobotMoveCommand());
     }
 }
 
@@ -132,16 +139,20 @@ void ErForceSimulator::addBlueRobots(const std::vector<RobotStateWithId>& robots
     robot::Specs ERForce;
     robotSetDefault(&ERForce);
 
-    auto* team_blue = simulator_setup_command->mutable_set_team_blue();
+    auto team_blue = simulator_setup_command->mutable_set_team_blue();
+    std::vector<std::tuple<int, int>> blue_robot_pos;
+    // = new std::vector<std::tuple<int, int>>;
 
     for (unsigned int i = 0; i < robots.size(); i++)
     {
         auto* robot = team_blue->add_robot();
         robot->CopyFrom(ERForce);
         robot->set_id(i);
+        blue_robot_pos.push_back(std::make_tuple(robots[i].robot_state.position().y(),
+                                                 robots[i].robot_state.position().x()));
     }
 
-    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
+    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command, blue_robot_pos);
     er_force_sim->seedPRGN(17);
 
     for (unsigned int i = 0; i < robots.size(); i++)

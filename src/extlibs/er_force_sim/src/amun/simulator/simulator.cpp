@@ -24,6 +24,7 @@
 #include <QtCore/QVector>
 #include <QtCore/QtDebug>
 #include <algorithm>
+#include <tuple>
 
 #include "erroraggregator.h"
 #include "extlibs/er_force_sim/src/core/coordinates.h"
@@ -32,6 +33,7 @@
 #include "simball.h"
 #include "simfield.h"
 #include "simrobot.h"
+// #include "software/world/robot_state.h"
 
 using namespace camun::simulator;
 
@@ -220,7 +222,8 @@ std::vector<robot::RadioResponse> Simulator::acceptRobotControlCommand(
         auto time              = m_time;
         auto charge            = m_charge;
         auto fabricateResponse = [data, &responses, time, charge, &id, &command](
-                                     const Simulator::RobotMap &map, const bool *isBlue) {
+                                     const Simulator::RobotMap &map, const bool *isBlue)
+        {
             if (!map.contains(id))
                 return;
             robot::RadioResponse response = map[id].first->setCommand(
@@ -556,7 +559,8 @@ void Simulator::handleRadioCommands(const SSLSimRobotControl &commands, bool isB
 }
 
 void Simulator::setTeam(Simulator::RobotMap &list, float side, const robot::Team &team,
-                        QMap<uint32_t, robot::Specs> &teamSpecs)
+                        QMap<uint32_t, robot::Specs> &teamSpecs,
+                        const std::vector<std::tuple<int, int>> &robots)
 {
     // remove old team
     deleteAll(list);
@@ -571,8 +575,8 @@ void Simulator::setTeam(Simulator::RobotMap &list, float side, const robot::Team
     resetVisionPackets();
 
     // align robots on a line
-    const float x = m_data->geometry.field_width() / 2 - 0.2;
-    float y       = m_data->geometry.field_height() / 2 - 0.2;
+    // const float x = m_data->geometry.field_width() / 2 - 0.2;
+    // float y       = m_data->geometry.field_height() / 2 - 0.2;
 
     for (int i = 0; i < team.robot_size(); i++)
     {
@@ -587,8 +591,9 @@ void Simulator::setTeam(Simulator::RobotMap &list, float side, const robot::Team
         }
         teamSpecs[id].CopyFrom(specs);
 
-        createRobot(list, x, side * y, id, m_aggregator, m_data, teamSpecs);
-        y -= 0.3;
+        createRobot(list, std::get<0>(robots[i]), std::get<1>(robots[i]), id,
+                    m_aggregator, m_data, teamSpecs);
+        // y -= 0.3;
     }
 }
 
@@ -729,7 +734,9 @@ void Simulator::setFlipped(bool flipped)
     m_data->flip = flipped;
 }
 
-void Simulator::handleSimulatorSetupCommand(const std::shared_ptr<amun::Command> &command)
+void Simulator::handleSimulatorSetupCommand(
+    const std::shared_ptr<amun::Command> &command,
+    const std::vector<std::tuple<int, int>> &robots)
 {
     bool teamOrPerfectDribbleChanged = false;
 
@@ -855,7 +862,8 @@ void Simulator::handleSimulatorSetupCommand(const std::shared_ptr<amun::Command>
             {
                 m_data->ball->restoreState(sim.set_simulator_state().ball());
             }
-            const auto restoreRobots = [](RobotMap &map, auto robots) {
+            const auto restoreRobots = [](RobotMap &map, auto robots)
+            {
                 for (const auto &robot : robots)
                 {
                     if (map.contains(robot.id()))
@@ -882,14 +890,15 @@ void Simulator::handleSimulatorSetupCommand(const std::shared_ptr<amun::Command>
     if (command->has_set_team_blue())
     {
         teamOrPerfectDribbleChanged = true;
-        setTeam(m_data->robotsBlue, 1.0f, command->set_team_blue(), m_data->specsBlue);
+        setTeam(m_data->robotsBlue, 1.0f, command->set_team_blue(), m_data->specsBlue,
+                robots);
     }
 
     if (command->has_set_team_yellow())
     {
         teamOrPerfectDribbleChanged = true;
         setTeam(m_data->robotsYellow, -1.0f, command->set_team_yellow(),
-                m_data->specsYellow);
+                m_data->specsYellow, robots);
     }
 
     if (teamOrPerfectDribbleChanged)
