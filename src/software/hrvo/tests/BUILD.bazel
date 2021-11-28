@@ -1,0 +1,11 @@
+cc_test (
+    name = "hrvo_test",
+    srcs = [
+        "hrvo_test.cpp",
+    ],
+    deps = [
+        "@gtest//:gtest",
+        "@gtest//:gtest_main",
+        "//src:HRVO"
+    ],
+)
