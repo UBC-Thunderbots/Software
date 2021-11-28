@@ -17,6 +17,7 @@ src/external/qt
 
 # HRVO Outputs
 *.gif
+*.png
 
 # CLion
 *.idea*
