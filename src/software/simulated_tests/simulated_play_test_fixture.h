@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <functional>
+
 #include "software/ai/ai.h"
 #include "software/simulated_tests/simulated_test_fixture.h"
 
@@ -34,6 +36,13 @@ class SimulatedPlayTestFixture : public SimulatedTestFixture
      * @param ai_play The name of the AI play
      */
     void setAIPlay(const std::string& ai_play);
+
+    /**
+     * Sets the AI play constructor to be used to run in the simulated test
+     *
+     * @param play_constructor The constructor for the play
+     */
+    void setAIPlayConstructor(std::function<std::unique_ptr<Play>()> play_constructor);
 
     /**
      * Sets the Referee command to override for the simulated test

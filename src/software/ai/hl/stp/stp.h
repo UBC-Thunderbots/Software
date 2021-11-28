@@ -124,6 +124,15 @@ class STP : public HL
     PlayInfo getPlayInfo() override;
 
     /**
+     * Overrides the play constructor so whenever STP creates a new play it calls
+     * constructor
+     *
+     * @param constructor the override constructor
+     */
+    void overridePlayConstructor(
+        std::function<std::unique_ptr<Play>()> constructor) override;
+
+    /**
      * Given a vector of vector of tactics and the current World, assigns robots
      * from the friendly team to each tactic
      *
@@ -201,6 +210,11 @@ class STP : public HL
      */
     bool overrideAIPlayIfApplicable();
 
+    /**
+     * Checks play override for overrides
+     */
+    void checkPlayOverrideConfig();
+
     // A function that constructs a Play that will be used if no other Plays are
     // applicable
     std::function<std::unique_ptr<Play>()> default_play_constructor;
@@ -212,12 +226,12 @@ class STP : public HL
     std::shared_ptr<const AiControlConfig> control_config;
     std::shared_ptr<const PlayConfig> play_config;
     std::string override_play_name;
-    std::string previous_override_play_name;
-    bool override_play;
-    bool previous_override_play;
     GameState current_game_state;
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;
     // Stop tactic common to all plays for robots that don't have tactics assigned
     TacticVector stop_tactics;
+    // override constructor that makes new plays
+    std::optional<std::function<std::unique_ptr<Play>()>> override_constructor;
+    std::optional<std::function<std::unique_ptr<Play>()>> previous_override_constructor;
 };

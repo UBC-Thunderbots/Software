@@ -45,6 +45,12 @@ void SimulatedErForceSimPlayTestFixture::setAIPlay(const std::string& ai_play)
     ai_control_config->getMutableCurrentAiPlay()->setValue(ai_play);
 }
 
+void SimulatedErForceSimPlayTestFixture::setAIPlayConstructor(
+    std::function<std::unique_ptr<Play>()> play_constructor)
+{
+    ai.overridePlayConstructor(play_constructor);
+}
+
 void SimulatedErForceSimPlayTestFixture::setRefereeCommand(
     const RefereeCommand& current_referee_command,
     const RefereeCommand& previous_referee_command)
