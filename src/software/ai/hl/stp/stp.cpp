@@ -34,7 +34,7 @@ STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
       goalie_tactic(std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig())),
       stop_tactics(),
       override_constructor(std::nullopt),
-      previous_override_constructor(std::nullopt)
+      previous_override_play_name("")
 {
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
     {
@@ -195,29 +195,30 @@ bool STP::overrideAIPlayIfApplicable()
 
     if (override_constructor)
     {
-        // the override constructor changed if the previous constructor was nullopt or the
-        // name of the returned plays are different
-        bool override_changed = !previous_override_constructor ||
-                                (TYPENAME(previous_override_constructor.value()()) !=
-                                 TYPENAME(override_constructor.value()()));
+        std::unique_ptr<Play> potential_new_play;
+        try
+        {
+            potential_new_play = override_constructor.value()();
+        }
+        catch (std::invalid_argument&)
+        {
+            auto default_play = default_play_constructor();
+            LOG(WARNING) << "Error: The Play \"" << override_play_name
+                         << "\" specified in the override is not valid." << std::endl;
+            LOG(WARNING) << "Falling back to the default Play - "
+                         << objectTypeName(*default_play) << std::endl;
+            potential_new_play = std::move(default_play);
+        }
+        // check if name of the play has changed
+        bool override_changed =
+            previous_override_play_name != objectTypeName(*potential_new_play);
         if (no_current_play || override_changed)
         {
-            try
-            {
-                current_play = override_constructor.value()();
-            }
-            catch (std::invalid_argument&)
-            {
-                auto default_play = default_play_constructor();
-                LOG(WARNING) << "Error: The Play \"" << override_play_name
-                             << "\" specified in the override is not valid." << std::endl;
-                LOG(WARNING) << "Falling back to the default Play - "
-                             << objectTypeName(*default_play) << std::endl;
-                current_play = std::move(default_play);
-            }
+            current_play                = std::move(potential_new_play);
+            previous_override_play_name = objectTypeName(*current_play);
         }
     }
-    return static_cast<bool>(override_constructor);
+    return override_constructor.has_value();
 }
 
 std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
@@ -355,6 +356,5 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
 
 void STP::overridePlayConstructor(std::function<std::unique_ptr<Play>()> constructor)
 {
-    previous_override_constructor = override_constructor;
-    override_constructor          = constructor;
+    override_constructor = constructor;
 }

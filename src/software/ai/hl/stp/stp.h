@@ -233,5 +233,5 @@ class STP : public HL
     TacticVector stop_tactics;
     // override constructor that makes new plays
     std::optional<std::function<std::unique_ptr<Play>()>> override_constructor;
-    std::optional<std::function<std::unique_ptr<Play>()>> previous_override_constructor;
+    std::string previous_override_play_name;
 };
