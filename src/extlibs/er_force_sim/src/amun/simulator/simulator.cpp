@@ -593,7 +593,6 @@ void Simulator::setTeam(Simulator::RobotMap &list, float side, const robot::Team
 
         createRobot(list, std::get<0>(robots[i]), std::get<1>(robots[i]), id,
                     m_aggregator, m_data, teamSpecs);
-        // y -= 0.3;
     }
 }
 
