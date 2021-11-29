@@ -37,28 +37,28 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
         {
-            // Robot 9 is the only robot allowed to be in the center circle and start
+            // Robot 2 is the only robot allowed to be in the center circle and start
             // the kickoff
-            robotInCenterCircle(4, world_ptr, yield);
-            robotReceivedBall(4, world_ptr, yield);
+            robotInCenterCircle(2, world_ptr, yield);
+            robotReceivedBall(2, world_ptr, yield);
             ballKicked(Angle::zero(), world_ptr, yield);
 
             // Two Friendly robots defending the exterior of defense box and one goalie
             Rectangle robots_defensive_rect(Point(-4, 2), Point(-5, -2));
             robotInPolygon(0, robots_defensive_rect, world_ptr, yield);
-            robotInPolygon(1, robots_defensive_rect, world_ptr, yield);
             robotInPolygon(3, robots_defensive_rect, world_ptr, yield);
+            robotInPolygon(4, robots_defensive_rect, world_ptr, yield);
 
             // Two friendly robots near the half line setting up for offense
             Rectangle robots_offensive_rect(Point(0, 3.5), Point(-1.5, -3.5));
-            robotInPolygon(2, robots_offensive_rect, world_ptr, yield);
+            robotInPolygon(1, robots_offensive_rect, world_ptr, yield);
             robotInPolygon(5, robots_offensive_rect, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
         {
-            for (RobotId robot_id : {0, 1, 2, 3, 5})
+            for (RobotId robot_id : {0, 1, 3, 4, 5})
             {
                 {
                     robotInFriendlyHalf(robot_id, world_ptr, yield);
