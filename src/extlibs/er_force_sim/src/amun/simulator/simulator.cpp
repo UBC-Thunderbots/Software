@@ -222,8 +222,7 @@ std::vector<robot::RadioResponse> Simulator::acceptRobotControlCommand(
         auto time              = m_time;
         auto charge            = m_charge;
         auto fabricateResponse = [data, &responses, time, charge, &id, &command](
-                                     const Simulator::RobotMap &map, const bool *isBlue)
-        {
+                                     const Simulator::RobotMap &map, const bool *isBlue) {
             if (!map.contains(id))
                 return;
             robot::RadioResponse response = map[id].first->setCommand(
@@ -861,8 +860,7 @@ void Simulator::handleSimulatorSetupCommand(
             {
                 m_data->ball->restoreState(sim.set_simulator_state().ball());
             }
-            const auto restoreRobots = [](RobotMap &map, auto robots)
-            {
+            const auto restoreRobots = [](RobotMap &map, auto robots) {
                 for (const auto &robot : robots)
                 {
                     if (map.contains(robot.id()))

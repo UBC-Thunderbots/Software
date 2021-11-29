@@ -216,8 +216,9 @@ void ErForceSimulator::setRobotPrimitive(
     SimulatorBallSingleton::setSimulatorBall(simulator_ball, FieldSide::NEG_X);
     auto simulator_robots_iter =
         std::find_if(simulator_robots.begin(), simulator_robots.end(),
-                     [id](const auto& robot_world_pair)
-                     { return robot_world_pair.first->getRobotId() == id; });
+                     [id](const auto& robot_world_pair) {
+                         return robot_world_pair.first->getRobotId() == id;
+                     });
 
     if (simulator_robots_iter != simulator_robots.end())
     {
