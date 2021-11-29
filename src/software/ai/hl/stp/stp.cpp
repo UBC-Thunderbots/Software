@@ -30,11 +30,14 @@ STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
       control_config(control_config),
       play_config(play_config),
       override_play_name(""),
+      previous_override_play_name(""),
+      override_play(false),
+      previous_override_play(false),
       current_game_state(),
       goalie_tactic(std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig())),
       stop_tactics(),
-      override_constructor(std::nullopt),
-      previous_override_play_name("")
+      play_constructor_override(std::nullopt),
+      play_constructor_override_changed(false)
 {
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
     {
@@ -179,13 +182,24 @@ PlayInfo STP::getPlayInfo()
 
 void STP::checkPlayOverrideConfig()
 {
-    override_play_name = control_config->getCurrentAiPlay()->value();
-    if (control_config->getOverrideAiPlay()->value())
+    previous_override_play           = override_play;
+    override_play                    = control_config->getOverrideAiPlay()->value();
+    bool override_play_value_changed = previous_override_play != override_play;
+
+    previous_override_play_name = override_play_name;
+    override_play_name          = control_config->getCurrentAiPlay()->value();
+    bool override_play_name_value_changed =
+        previous_override_play_name != override_play_name;
+
+    if (override_play)
     {
-        overridePlayConstructor([this]() {
-            return GenericFactory<std::string, Play, PlayConfig>::create(
-                override_play_name, play_config);
-        });
+        if (override_play_name_value_changed || override_play_value_changed)
+        {
+            overridePlayConstructor([this]() {
+                return GenericFactory<std::string, Play, PlayConfig>::create(
+                    override_play_name, play_config);
+            });
+        }
     }
 }
 
@@ -193,12 +207,13 @@ bool STP::overrideAIPlayIfApplicable()
 {
     bool no_current_play = !current_play || current_play->done();
 
-    if (override_constructor)
+    if (play_constructor_override &&
+        (no_current_play || play_constructor_override_changed))
     {
-        std::unique_ptr<Play> potential_new_play;
+        play_constructor_override_changed = false;
         try
         {
-            potential_new_play = override_constructor.value()();
+            current_play = play_constructor_override.value()();
         }
         catch (std::invalid_argument&)
         {
@@ -207,18 +222,10 @@ bool STP::overrideAIPlayIfApplicable()
                          << "\" specified in the override is not valid." << std::endl;
             LOG(WARNING) << "Falling back to the default Play - "
                          << objectTypeName(*default_play) << std::endl;
-            potential_new_play = std::move(default_play);
-        }
-        // check if name of the play has changed
-        bool override_changed =
-            previous_override_play_name != objectTypeName(*potential_new_play);
-        if (no_current_play || override_changed)
-        {
-            current_play                = std::move(potential_new_play);
-            previous_override_play_name = objectTypeName(*current_play);
+            current_play = std::move(default_play);
         }
     }
-    return override_constructor.has_value();
+    return play_constructor_override.has_value();
 }
 
 std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
@@ -356,5 +363,6 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
 
 void STP::overridePlayConstructor(std::function<std::unique_ptr<Play>()> constructor)
 {
-    override_constructor = constructor;
+    play_constructor_override         = constructor;
+    play_constructor_override_changed = true;
 }
