@@ -91,3 +91,45 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play_with_keep_away)
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(25));
 }
+
+TEST(ShootOrPassPlayInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
+{
+    // Lets setup some things we need to run this test:
+    //
+    // Dynamic Parameter Config: This data structure is passed into the play and contains
+    // runtime configurable values.  We don't need to change anything here we just need to
+    // pass it in.
+    auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
+
+    // World: A blank testing world we will manipulate for the test
+    auto world = ::TestUtil::createBlankTestingWorld();
+
+    // ShootOrPassPlay: The play under test
+    auto shoot_or_pass_play = ShootOrPassPlay(play_config);
+    world.updateGameState(
+        ::TestUtil::createGameState(RefereeCommand::FORCE_START, RefereeCommand::HALT));
+    world.setTeamWithPossession(TeamSide::FRIENDLY);
+
+    // Make sure play is running
+    ASSERT_TRUE(shoot_or_pass_play.isApplicable(world));
+    ASSERT_TRUE(shoot_or_pass_play.invariantHolds(world));
+
+    world.setTeamWithPossession(TeamSide::ENEMY);
+
+    // Make sure play is not running when enemy has the ball
+    ASSERT_FALSE(shoot_or_pass_play.isApplicable(world));
+    ASSERT_FALSE(shoot_or_pass_play.invariantHolds(world));
+
+    // Set game state to a kickoff and start it. Game state is set to ready
+    world.updateGameState(::TestUtil::createGameState(
+        RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_US));
+    world.setTeamWithPossession(TeamSide::FRIENDLY);
+
+    // Move ball so that game state is set to playing
+    world.updateGameStateBall(Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0)));
+    world.updateGameStateBall(Ball(Point(0, 0.05), Vector(), Timestamp::fromSeconds(0)));
+
+    // Make sure play is running
+    ASSERT_TRUE(shoot_or_pass_play.isApplicable(world));
+    ASSERT_TRUE(shoot_or_pass_play.invariantHolds(world));
+}
