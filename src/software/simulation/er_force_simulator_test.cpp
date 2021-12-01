@@ -16,7 +16,7 @@ class ErForceSimulatorTest : public ::testing::Test
         simulator = std::make_shared<ErForceSimulator>(Field::createSSLDivisionBField(),
                                                        robot_constants, wheel_constants,
                                                        simulator_config);
-        simulator->resetCurrentFirmwareTime();
+        simulator->resetCurrentTime();
     }
 
     std::shared_ptr<ErForceSimulator> simulator;
