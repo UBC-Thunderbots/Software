@@ -255,6 +255,13 @@ git_repository(
     shallow_since = "1602800469 +1100",
 )
 
+new_git_repository(
+    name = "trinamic",
+    build_file = "@//external:trinamic.BUILD",
+    commit = "0cd695fab6d43ceb121af4b8608e5d92b14e1ce9",
+    remote = "https://github.com/trinamic/TMC-API.git",
+)
+
 # Based on the hermetic Python 3 guide found here
 # https://thethoughtfulkoala.com/posts/2020/05/16/bazel-hermetic-python.html
 _py_configure = "./configure --prefix=$(pwd)/bazel_install"
