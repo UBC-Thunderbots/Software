@@ -43,9 +43,9 @@
 #include <set>
 #include <utility>
 #include <vector>
-#include <Goal.h>
 
 
+#include "Goal.h"
 #include "Simulator.h"
 #include "Vector2.h"
 

@@ -38,8 +38,6 @@
 #ifndef HRVO_VECTOR2_H_
 #define HRVO_VECTOR2_H_
 
-#include "Export.h"
-
 #include <cmath>
 #include <iosfwd>
 

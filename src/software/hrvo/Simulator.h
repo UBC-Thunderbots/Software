@@ -40,10 +40,9 @@
 
 #include <limits>
 #include <vector>
-#include <Goal.h>
 
 
-#include "Export.h"
+#include "Goal.h"
 #include "Vector2.h"
 
 /**
