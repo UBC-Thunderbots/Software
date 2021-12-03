@@ -82,8 +82,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
         std::make_shared<MoveTactic>(true)};
 
-    // created a new local variable Point at (zero,zero)
-    Point point = Point();
+    // created a new local variable Point at the center of the field (0,0)
+    Point point = world.field().centerPoint();
     // created an enemy_team for mutation
     Team enemy_team = world.enemyTeam();
 
@@ -93,12 +93,13 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         // attacker are in the middle of the net
 
         // We find the nearest enemy robot closest to (0,0) then ignore it from the enemy
-        // team
-        if (Team::getNearestRobot(world.enemyTeam().getAllRobots(), point).has_value())
+        // team. Since the center circle is a motion constraint during enemy kickoff, the
+        // shadowing robot will navigate to the closest point that it can to shadow, which
+        // might not be ideal. (i.e robot won't block a straight shot on net)
+        auto robot = Team::getNearestRobot(world.enemyTeam().getAllRobots(), point);
+        if (robot.has_value())
         {
-            int robot_id = Team::getNearestRobot(world.enemyTeam().getAllRobots(), point)
-                               .value()
-                               .id();
+            int robot_id = robot.value().id();
             enemy_team.removeRobotWithId(robot_id);
         }
         else

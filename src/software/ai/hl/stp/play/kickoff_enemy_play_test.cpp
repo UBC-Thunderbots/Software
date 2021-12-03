@@ -41,13 +41,9 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
             // friendly goal, based on where the enemy robots are initialized in the test.
             Rectangle robotOneShadowingRect(Point(0, 1.5), Point(-0.4, 1.3));
             Rectangle robotFiveShadowingRect(Point(0, -1.5), Point(-0.4, -1.3));
-            Rectangle robotThreeShadowingRect(Point(-0.49, 0.1), Point(-1.8, -0.1));
+            Rectangle robotThreeShadowingRect(Point(-1.54, 0.1), Point(-1.8, -0.1));
             robotInPolygon(1, robotOneShadowingRect, world_ptr, yield);
             robotInPolygon(5, robotFiveShadowingRect, world_ptr, yield);
-
-            // TODO: Fix bug with robot 3 not shadowing the enemy kicker in
-            // kickoff_enemy_play
-            // https://github.com/UBC-Thunderbots/Software/issues/1945
             robotInPolygon(3, robotThreeShadowingRect, world_ptr, yield);
 
             // Two Friendly robots defending the exterior of defense box
