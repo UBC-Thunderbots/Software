@@ -57,7 +57,7 @@ TEST_F(SimulatedDribbleTacticTest, test_intercept_ball_behind_enemy_robot)
 
     auto tactic = std::make_shared<DribbleTactic>();
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
@@ -81,7 +81,7 @@ TEST_F(SimulatedDribbleTacticTest, test_stopped_ball)
 
     auto tactic = std::make_shared<DribbleTactic>();
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
@@ -105,7 +105,7 @@ TEST_F(SimulatedDribbleTacticTest, test_ball_bounce_off_of_enemy_robot)
 
     auto tactic = std::make_shared<DribbleTactic>();
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
@@ -131,7 +131,7 @@ TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_dest)
     auto tactic = std::make_shared<DribbleTactic>();
     tactic->updateControlParams(dribble_destination, std::nullopt);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, tactic](std::shared_ptr<World> world_ptr,
@@ -162,7 +162,7 @@ TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_orientation)
     auto tactic = std::make_shared<DribbleTactic>();
     tactic->updateControlParams(std::nullopt, dribble_orientation);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_orientation, tactic](std::shared_ptr<World> world_ptr,
@@ -192,7 +192,7 @@ TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_dest_and_orientation
     auto tactic = std::make_shared<DribbleTactic>();
     tactic->updateControlParams(dribble_destination, dribble_orientation);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, dribble_orientation, tactic](
@@ -225,7 +225,7 @@ TEST_F(SimulatedDribbleTacticTest, test_dribble_dest_and_orientation_around_rect
     auto tactic = std::make_shared<DribbleTactic>();
     tactic->updateControlParams(dribble_destination, dribble_orientation);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, dribble_orientation, tactic](
@@ -259,7 +259,7 @@ TEST_F(SimulatedDribbleTacticTest,
     auto tactic = std::make_shared<DribbleTactic>();
     tactic->updateControlParams(dribble_destination, dribble_orientation, true);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, dribble_orientation, tactic](
@@ -296,7 +296,7 @@ TEST_F(SimulatedDribbleTacticTest, test_running_into_enemy_robot_knocking_ball_a
     // Don't avoid enemy robots to knock ball away
     setMotionConstraints({});
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, dribble_destination, dribble_orientation, tactic](
