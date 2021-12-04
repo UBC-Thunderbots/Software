@@ -81,69 +81,6 @@ TEST(PolygonCentroidTest, test_non_convex_five_points_up_left)
 }
 
 
-TEST(PolygonExpandTest, test_three_points_up)
-{
-    Polygon poly({{1, 2}, {2, 3}, {1, 3}});
-    Polygon expected({{1, 2}, {2, 6}, {1, 6}});
-    Vector expansion_vector({0, 3});
-    EXPECT_EQ(poly.expand(expansion_vector), expected);
-}
-
-TEST(PolygonExpandTest, test_three_points_left)
-{
-    Polygon poly({{1, 2}, {2, 3}, {1, 3}});
-    Polygon expected({{-1, 2}, {2, 3}, {-1, 3}});
-    Vector expansion_vector({-2, 0});
-    EXPECT_EQ(poly.expand(expansion_vector), expected);
-}
-
-TEST(PolygonExpandTest, test_five_points_right)
-{
-    Polygon poly({{1, 1}, {1, 3}, {2, 3}, {5, 3}, {5, 1}});
-    Polygon expected({{1, 1}, {1, 3}, {2, 3}, {8, 3}, {8, 1}});
-    Vector expansion_vector({3, 0});
-    EXPECT_EQ(poly.expand(expansion_vector), expected);
-}
-
-TEST(PolygonExpandTest, test_five_points_up_left)
-{
-    Polygon poly({{1, 1}, {1, 3}, {2, 3}, {5, 3}, {5, 1}});
-    Polygon expected({{-1, 4}, {-1, 6}, {0, 6}, {5, 3}, {5, 1}});
-    Vector expansion_vector({-2, 3});
-    EXPECT_EQ(poly.expand(expansion_vector), expected);
-}
-
-TEST(PolygonExpandTest, test_non_convex_five_points_up_left)
-{
-    Polygon poly({{1, 1}, {1, 3}, {2, 2}, {5, 3}, {5, 1}});
-    Polygon expected({{-1, 4}, {-1, 6}, {0, 5}, {5, 3}, {5, 1}});
-    Vector expansion_vector({-2, 3});
-    EXPECT_EQ(poly.expand(expansion_vector), expected);
-}
-
-TEST(PolygonExpandTest, test_four_points_0_vector)
-{
-    Polygon poly({{1, 1}, {1, 3}, {3, 3}, {5, 3}, {5, 1}});
-    Polygon expected(poly);
-    Vector expansion_vector({0, 0});
-    EXPECT_EQ(poly.expand(expansion_vector), expected);
-}
-
-TEST(PolygonExpandTest, test_four_points_doubled)
-{
-    Polygon poly({{-1, 1}, {1, 1}, {1, -1}, {-1, -1}});
-    Polygon expected({{2, 2}, {2, -2}, {-2, -2}, {-2, 2}});
-    EXPECT_EQ(poly.expand(1), expected);
-}
-
-TEST(PolygonExpandTest, test_four_points_no_scale)
-{
-    Polygon poly({{-1, 1}, {1, 1}, {1, -1}, {-1, -1}});
-    Polygon expected({{1, 1}, {1, -1}, {-1, -1}, {-1, 1}});
-    EXPECT_EQ(poly.expand(0), expected);
-}
-
-
 TEST(PolygonExpandTest, test_four_points_slanted)
 {
     // These points make a slanted 5 unit long square

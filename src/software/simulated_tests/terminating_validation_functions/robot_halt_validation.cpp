@@ -5,7 +5,7 @@
 
 void robotHalt(std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
 {
-    for (auto robot : world_ptr->friendlyTeam().getAllRobots())
+    for (const auto& robot : world_ptr->friendlyTeam().getAllRobots())
     {
         double robot_speed = robot.velocity().length();
 
