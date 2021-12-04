@@ -70,8 +70,8 @@ void SimulatedErForceSimPlayTestFixture::updatePrimitives(
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
     registerTickTime(duration_ms);
     auto vision_msg = createVision(world_with_updated_game_state);
-    simulator_to_update->setYellowRobotPrimitiveSet(
-        createNanoPbPrimitiveSet(*primitive_set_msg), std::move(vision_msg));
+    simulator_to_update->setYellowRobotPrimitiveSet(*primitive_set_msg,
+                                                    std::move(vision_msg));
 }
 
 std::optional<PlayInfo> SimulatedErForceSimPlayTestFixture::getPlayInfo()

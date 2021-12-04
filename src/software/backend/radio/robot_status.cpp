@@ -21,7 +21,7 @@ std::unique_ptr<TbotsProto::RobotStatus> convertRobotStatusToRobotStatusProto(
     const RadioRobotStatus& robot_status)
 {
     // Insufficient information to make the RobotStatus fields for
-    // ChipperKickerStatus, DriveUnits, and NetworkStatus
+    // ChipperKickerStatus, DriveUnitStatus, and NetworkStatus
     auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
 
     robot_msg->set_robot_id(robot_status.robot);
