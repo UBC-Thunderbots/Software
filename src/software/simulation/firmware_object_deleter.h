@@ -39,6 +39,7 @@ struct FirmwareRobotDeleter
         delete controller_state;
 
         app_firmware_robot_force_wheels_destroy(firmware_robot);
+        app_firmware_robot_velocity_wheels_destroy(firmware_robot);
         app_firmware_robot_destroy(firmware_robot);
     };
 };
