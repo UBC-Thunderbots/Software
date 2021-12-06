@@ -228,8 +228,9 @@ void Agent::computeNewVelocity()
             }
         }
 
-        discriminant = maxSpeed_ * maxSpeed_ - std::pow(det(velocityObstacles_[j].apex_,
-                                                       velocityObstacles_[j].side2_), 2.f);
+        discriminant =
+            maxSpeed_ * maxSpeed_ -
+            std::pow(det(velocityObstacles_[j].apex_, velocityObstacles_[j].side2_), 2.f);
 
         if (discriminant > 0.0f)
         {
@@ -421,8 +422,8 @@ void Agent::computePreferredVelocity()
     // TODO: support velocity (x,y) at goal instead of just speed.
     float speedAtGoal        = nextGoal->getDesiredSpeedAtCurrentGoal();
     Vector2 distVectorToGoal = goalPosition - position_;
-    auto distToGoal          = static_cast<float>(
-        std::sqrt(std::pow(distVectorToGoal.getX(), 2) + std::pow(distVectorToGoal.getY(), 2)));
+    auto distToGoal = static_cast<float>(std::sqrt(std::pow(distVectorToGoal.getX(), 2) +
+                                                   std::pow(distVectorToGoal.getY(), 2)));
     // d = (Vf^2 - Vi^2) / 2a
     double startLinearDecelerationDistance =
         std::abs((std::pow(speedAtGoal, 2) - std::pow(prefSpeed_, 2)) / (2 * maxAccel_));
@@ -431,8 +432,8 @@ void Agent::computePreferredVelocity()
     {
         // velocity given linear deceleration, distance away from goal, and desired final
         // speed
-        auto currPrefSpeed =
-            static_cast<float>(std::sqrt(std::pow(speedAtGoal, 2) + 2 * maxAccel_ * distToGoal));
+        auto currPrefSpeed = static_cast<float>(
+            std::sqrt(std::pow(speedAtGoal, 2) + 2 * maxAccel_ * distToGoal));
         prefVelocity_ = normalize(distVectorToGoal) * currPrefSpeed;
     }
     else
@@ -524,9 +525,9 @@ void Agent::update()
         //			const Vector2 goalPosition = simulator_->goals_[goalNo_]->position_;
         //			const Vector2 distVectorToGoal = goalPosition - position_;
         //			const float distToGoal = sqrt(sqr(distVectorToGoal.getX()) +
-        //sqr(distVectorToGoal.getY())); 			std::cout << "distToGoal=" << distToGoal << "
-        //dv=" << dv <<  " Actualdv=" << abs(dvVec) << " newVelocity_=" << velocity_ << "
-        //maxAccel/frame=" << maxAccel_  * simulator_->timeStep_ << std::endl;
+        // sqr(distVectorToGoal.getY())); 			std::cout << "distToGoal=" << distToGoal <<
+        // " dv=" << dv <<  " Actualdv=" << abs(dvVec) << " newVelocity_=" << velocity_ <<
+        // " maxAccel/frame=" << maxAccel_  * simulator_->timeStep_ << std::endl;
     }
 
     position_ += velocity_ * simulator_->timeStep_;

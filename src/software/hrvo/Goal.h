@@ -6,18 +6,28 @@
 class Simulator;
 
 /**
- * \class  Goal
- * \brief  A goal in the simulation.
+ * A goal in the simulation.
  */
 class Goal
 {
    private:
     /**
-     * \brief      Constructor.
-     * \param[in]  position  The position of this goal.
+     * @param position  The position of this goal.
      */
     explicit Goal(const Vector2 &position);
+
+    /**
+     * @param positions  The list of positions which the the robot should travel to in
+     * order.
+     */
     explicit Goal(std::vector<Vector2> positions);
+
+    /**
+     * @param positions  The list of positions which the the robot should travel to in
+     * order.
+     * @param speedAtPostition  The list of speed which the the robot should be at when it
+     * reached the position. Must be in the same order of the positions
+     */
     explicit Goal(std::vector<Vector2> positions, std::vector<float> speedAtPostition);
 
    public:

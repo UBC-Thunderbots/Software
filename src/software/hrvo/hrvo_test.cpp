@@ -29,8 +29,8 @@ class HRVOTest : public ::testing::Test
 
     void create_div_b_field()
     {
-        float field_width  = 9.f;
-        float field_height = 6.f;
+        float field_width   = 9.f;
+        float field_height  = 6.f;
         float robot_offsets = 2.1f * 0.25f;  // ROBOT_RADIUS * RADIUS_SCALE;
 
         for (float x = -(field_width / 2); x <= (field_width / 2); x += robot_offsets)

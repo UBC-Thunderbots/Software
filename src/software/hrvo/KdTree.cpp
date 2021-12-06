@@ -125,42 +125,46 @@ void KdTree::queryRecursive(Agent *agent, float &rangeSq, std::size_t node) cons
 
         if (agent->position_.getX() < nodes_[nodes_[node].left_].minX_)
         {
-            distSqLeft += std::pow(nodes_[nodes_[node].left_].minX_ - agent->position_.getX(), 2.f);
+            distSqLeft +=
+                std::pow(nodes_[nodes_[node].left_].minX_ - agent->position_.getX(), 2.f);
         }
         else if (agent->position_.getX() > nodes_[nodes_[node].left_].maxX_)
         {
-            distSqLeft += std::pow(agent->position_.getX() - nodes_[nodes_[node].left_].maxX_, 2.f);
+            distSqLeft +=
+                std::pow(agent->position_.getX() - nodes_[nodes_[node].left_].maxX_, 2.f);
         }
 
         if (agent->position_.getY() < nodes_[nodes_[node].left_].minY_)
         {
-            distSqLeft += std::pow(nodes_[nodes_[node].left_].minY_ - agent->position_.getY(), 2.f);
+            distSqLeft +=
+                std::pow(nodes_[nodes_[node].left_].minY_ - agent->position_.getY(), 2.f);
         }
         else if (agent->position_.getY() > nodes_[nodes_[node].left_].maxY_)
         {
-            distSqLeft += std::pow(agent->position_.getY() - nodes_[nodes_[node].left_].maxY_, 2.f);
+            distSqLeft +=
+                std::pow(agent->position_.getY() - nodes_[nodes_[node].left_].maxY_, 2.f);
         }
 
         if (agent->position_.getX() < nodes_[nodes_[node].right_].minX_)
         {
-            distSqRight +=
-                std::pow(nodes_[nodes_[node].right_].minX_ - agent->position_.getX(), 2.f);
+            distSqRight += std::pow(
+                nodes_[nodes_[node].right_].minX_ - agent->position_.getX(), 2.f);
         }
         else if (agent->position_.getX() > nodes_[nodes_[node].right_].maxX_)
         {
-            distSqRight +=
-                std::pow(agent->position_.getX() - nodes_[nodes_[node].right_].maxX_, 2.f);
+            distSqRight += std::pow(
+                agent->position_.getX() - nodes_[nodes_[node].right_].maxX_, 2.f);
         }
 
         if (agent->position_.getY() < nodes_[nodes_[node].right_].minY_)
         {
-            distSqRight +=
-                std::pow(nodes_[nodes_[node].right_].minY_ - agent->position_.getY(), 2.f);
+            distSqRight += std::pow(
+                nodes_[nodes_[node].right_].minY_ - agent->position_.getY(), 2.f);
         }
         else if (agent->position_.getY() > nodes_[nodes_[node].right_].maxY_)
         {
-            distSqRight +=
-                std::pow(agent->position_.getY() - nodes_[nodes_[node].right_].maxY_, 2.f);
+            distSqRight += std::pow(
+                agent->position_.getY() - nodes_[nodes_[node].right_].maxY_, 2.f);
         }
 
         if (distSqLeft < distSqRight)

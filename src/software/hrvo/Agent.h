@@ -11,98 +11,80 @@
 #include "Vector2.h"
 
 /**
- * \class  Agent
- * \brief  An agent in the simulation.
+ * An agent in the HRVO simulation.
  */
 class Agent
 {
    private:
     /**
-     * \class  Candidate
-     * \brief  A candidate point.
+     * A candidate point.
      */
     class Candidate
     {
        public:
-        /**
-         * \brief  Constructor.
-         */
         Candidate() : velocityObstacle1_(0), velocityObstacle2_(0) {}
 
-        /**
-         * \brief  The position of the candidate point.
-         */
+        // The position of the candidate point.
         Vector2 position_;
 
-        /**
-         * \brief  The number of the first velocity obstacle.
-         */
+        // The number of the first velocity obstacle.
         int velocityObstacle1_;
 
-        /**
-         * \brief  The number of the second velocity obstacle.
-         */
+        // The number of the second velocity obstacle.
         int velocityObstacle2_;
     };
 
     /**
-     * \class  VelocityObstacle
-     * \brief  A hybrid reciprocal velocity obstacle.
+     * A hybrid reciprocal velocity obstacle.
      */
     class VelocityObstacle
     {
        public:
-        /**
-         * \brief  Constructor.
-         */
         VelocityObstacle() {}
-        /**
-         * \brief  The position of the apex of the hybrid reciprocal velocity obstacle.
-         */
+
+        // The position of the apex of the hybrid reciprocal velocity obstacle.
         Vector2 apex_;
 
-        /**
-         * \brief  The direction of the first side of the hybrid reciprocal velocity
-         * obstacle.
-         */
+        // The direction of the first side of the hybrid reciprocal velocity obstacle.
         Vector2 side1_;
 
-        /**
-         * \brief  The direction of the second side of the hybrid reciprocal velocity
-         * obstacle.
-         */
+        // The direction of the second side of the hybrid reciprocal velocity obstacle.
         Vector2 side2_;
     };
 
+
     /**
-     * \brief      Constructor.
-     * \param[in]  simulator  The simulation.
+     * Constructor
+     *
+     * @param simulator  The simulation which the Agent is a part of
      */
     explicit Agent(Simulator *simulator);
 
     /**
-     * \brief      Constructor.
-     * \param[in]  simulator  The simulation.
-     * \param[in]  position   The starting position of this agent.
-     * \param[in]  goalNo     The goal number of this agent.
+     * Constructor
+     *
+     * @param simulator  The simulation.
+     * @param position   The starting position of this agent.
+     * @param goalNo     The goal number of this agent.
      */
     Agent(Simulator *simulator, const Vector2 &position, std::size_t goalNo);
 
     /**
-     * \brief      Constructor.
-     * \param[in]  simulator          The simulation.
-     * \param[in]  position           The starting position of this agent.
-     * \param[in]  goalNo             The goal number of this agent.
-     * \param[in]  neighborDist       The maximum neighbor distance of this agent.
-     * \param[in]  maxNeighbors       The maximum neighbor count of this agent.
-     * \param[in]  radius             The radius of this agent.
-     * \param[in]  goalRadius         The goal radius of this agent.
-     * \param[in]  prefSpeed          The preferred speed of this agent.
-     * \param[in]  maxSpeed           The maximum speed of this agent.
-     * \param[in]  uncertaintyOffset  The uncertainty offset of this agent.
-     * \param[in]  maxAccel           The maximum acceleration of this agent.
-     * \param[in]  velocity           The initial velocity of this agent.
-     * \param[in]  orientation        The initial orientation (in radians) of this agent.
+     * Constructor
+     *
+     * @param simulator          The simulation.
+     * @param position           The starting position of this agent.
+     * @param goalNo             The goal number of this agent.
+     * @param neighborDist       The maximum neighbor distance of this agent.
+     * @param maxNeighbors       The maximum neighbor count of this agent.
+     * @param radius             The radius of this agent.
+     * @param goalRadius         The goal radius of this agent.
+     * @param prefSpeed          The preferred speed of this agent.
+     * @param maxSpeed           The maximum speed of this agent.
+     * @param uncertaintyOffset  The uncertainty offset of this agent.
+     * @param maxAccel           The maximum acceleration of this agent.
+     * @param velocity           The initial velocity of this agent.
+     * @param orientation        The initial orientation (in radians) of this agent.
      */
     Agent(Simulator *simulator, const Vector2 &position, std::size_t goalNo,
           float neighborDist, std::size_t maxNeighbors, float radius,
@@ -110,29 +92,29 @@ class Agent
           float maxSpeed, float orientation, float uncertaintyOffset);
 
     /**
-     * \brief  Computes the neighbors of this agent.
+     * Computes the neighbors of this agent.
      */
     void computeNeighbors();
 
     /**
-     * \brief  Computes the new velocity of this agent.
+     * Computes the new velocity of this agent.
      */
     void computeNewVelocity();
 
     /**
-     * \brief  Computes the preferred velocity of this agent.
+     * Computes the preferred velocity of this agent.
      */
     void computePreferredVelocity();
 
     /**
-     * \brief          Inserts a neighbor into the set of neighbors of this agent.
-     * \param[in]      agentNo  The number of the agent to be inserted.
-     * \param[in,out]  rangeSq  The squared range around this agent.
+     *         Inserts a neighbor into the set of neighbors of this agent.
+     * @param      agentNo  The number of the agent to be inserted.
+     * @param  rangeSq  The squared range around this agent.
      */
     void insertNeighbor(std::size_t agentNo, float &rangeSq);
 
     /**
-     * \brief  Updates the orientation, position, and velocity of this agent.
+     * Updates the orientation, position, and velocity of this agent.
      */
     void update();
 
