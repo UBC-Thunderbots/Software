@@ -144,6 +144,6 @@ def animate_robots(robot_pos_df, gif_output_file=None):
 
 
 file_name = '1_robot_moving_in_square'
-file_location = f'visualizer/data/{file_name}.csv'
+file_location = f'/home/nima/thunderbots/Software/src/software/hrvo/hrvo_data/{file_name}.csv'
 df = pd.read_csv(file_location) #, skiprows=3)
-animate_robots(df, f'visualizer/gif/{file_name}.gif')
+animate_robots(df) #, f'/home/nima/thunderbots/Software/src/software/hrvo/hrvo_data/{file_name}.gif')

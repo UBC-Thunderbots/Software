@@ -1,12 +1,11 @@
 #include <gtest/gtest.h>
-#include <HRVO.h>
+//#include <HRVO.h>
 #include <fstream>
 #include <chrono>
 
-using namespace hrvo;
+#include "Simulator.h"
 
 const float HRVO_TWO_PI = 6.283185307179586f;
-const int NUM_ROBOTS = 4;
 const float ROBOT_RADIUS = 0.09f;
 const float RADIUS_SCALE = 1.0f;
 
@@ -31,7 +30,7 @@ class HRVOTest : public ::testing::Test
     {
         float field_width = 9.f;
         float field_height = 6.f;
-        float robot_offsets = 2.1 * 0.25f;//ROBOT_RADIUS * RADIUS_SCALE;
+        float robot_offsets = 2.1f * 0.25f;//ROBOT_RADIUS * RADIUS_SCALE;
 
         for (float x = -(field_width / 2); x <= (field_width / 2); x += robot_offsets)
         {
@@ -63,8 +62,10 @@ class HRVOTest : public ::testing::Test
 
     void run_simulator()
     {
+        // The output file name is the name of the test
         std::string out_file_name(::testing::UnitTest::GetInstance()->current_test_info()->name());
-        std::ofstream output_file("/home/nima/thunderbots/HRVO/visualizer/data/" + out_file_name + ".csv");
+        // TODO: Update so it is relative path
+        std::ofstream output_file("/home/nima/thunderbots/Software/src/software/hrvo/hrvo_data/" + out_file_name + ".csv");
         if(output_file.is_open())
         {
             std::cout << "File " << out_file_name << " Created and open" << std::endl;
@@ -76,7 +77,7 @@ class HRVOTest : public ::testing::Test
         // Column Names
         output_file << "frame,time,computation_time,robot_id,radius,x,y,velocity_x,velocity_y,speed,has_collided,pref_vel_x,pref_vel_y" << std::endl;
 
-        const unsigned int num_robots = simulator.getNumAgents();
+        const auto num_robots = static_cast<unsigned int>(simulator.getNumAgents());
 
         // Cache the robot radii
         std::vector<float> robot_radius(num_robots);
@@ -181,9 +182,11 @@ TEST_F(HRVOTest, 25_robots_around_circle) {
    float circle_radius = std::max(float(num_robots) / 10, 2.f);
    simulator.addAgent(Vector2(0.f, 0.f), simulator.addGoal(Vector2(0.f, 0.f)));
    for (std::size_t i = 0; i < num_robots; ++i) {
-		const Vector2 position = circle_radius * Vector2(std::cos(i * robot_starting_angle_dif), std::sin(i * robot_starting_angle_dif));
+       float x = std::cos(static_cast<float>(i) * robot_starting_angle_dif);
+       float y = std::sin(static_cast<float>(i) * robot_starting_angle_dif);
+		const Vector2 position = circle_radius * Vector2(x, y);
 		simulator.addAgent(position, simulator.addGoal(-position));
-	}
+    }
 }
 
 TEST_F(HRVOTest, 5_robots_in_vertical_line) {
