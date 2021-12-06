@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+
 #include "Vector2.h"
 
 class Simulator;
@@ -8,8 +9,9 @@ class Simulator;
  * \class  Goal
  * \brief  A goal in the simulation.
  */
-class Goal {
-private:
+class Goal
+{
+   private:
     /**
      * \brief      Constructor.
      * \param[in]  position  The position of this goal.
@@ -18,7 +20,7 @@ private:
     explicit Goal(std::vector<Vector2> positions);
     explicit Goal(std::vector<Vector2> positions, std::vector<float> speedAtPostition);
 
-public:
+   public:
     Vector2 position_;
     // Goal positions in order Could be Queue
     std::vector<Vector2> positions_;

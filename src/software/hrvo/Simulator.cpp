@@ -6,7 +6,12 @@
 #include "Goal.h"
 #include "KdTree.h"
 
-Simulator::Simulator() : defaults_(NULL), kdTree_(NULL), globalTime_(0.0f), timeStep_(0.0f), reachedGoals_(false)
+Simulator::Simulator()
+    : defaults_(NULL),
+      kdTree_(NULL),
+      globalTime_(0.0f),
+      timeStep_(0.0f),
+      reachedGoals_(false)
 {
     kdTree_ = new KdTree(this);
 }
@@ -19,12 +24,16 @@ Simulator::~Simulator()
     delete kdTree_;
     kdTree_ = NULL;
 
-    for (std::vector<Agent *>::iterator iter = agents_.begin(); iter != agents_.end(); ++iter) {
+    for (std::vector<Agent *>::iterator iter = agents_.begin(); iter != agents_.end();
+         ++iter)
+    {
         delete *iter;
         *iter = NULL;
     }
 
-    for (std::vector<Goal *>::iterator iter = goals_.begin(); iter != goals_.end(); ++iter) {
+    for (std::vector<Goal *>::iterator iter = goals_.begin(); iter != goals_.end();
+         ++iter)
+    {
         delete *iter;
         *iter = NULL;
     }
@@ -32,7 +41,8 @@ Simulator::~Simulator()
 
 std::size_t Simulator::addAgent(const Vector2 &position, std::size_t goalNo)
 {
-    if (defaults_ == NULL) {
+    if (defaults_ == NULL)
+    {
         throw std::runtime_error("Agent defaults not set when adding agent.");
     }
 
@@ -42,11 +52,15 @@ std::size_t Simulator::addAgent(const Vector2 &position, std::size_t goalNo)
     return agents_.size() - 1;
 }
 
-std::size_t Simulator::addAgent(const Vector2 &position, std::size_t goalNo, float neighborDist, std::size_t maxNeighbors, float radius, float goalRadius, float prefSpeed, float maxSpeed,
-                                float uncertaintyOffset, float maxAccel, const Vector2 &velocity, float orientation)
+std::size_t Simulator::addAgent(const Vector2 &position, std::size_t goalNo,
+                                float neighborDist, std::size_t maxNeighbors,
+                                float radius, float goalRadius, float prefSpeed,
+                                float maxSpeed, float uncertaintyOffset, float maxAccel,
+                                const Vector2 &velocity, float orientation)
 {
-    Agent *const agent = new Agent(this, position, goalNo, neighborDist, maxNeighbors, radius, velocity, maxAccel, goalRadius, prefSpeed, maxSpeed, orientation,
-                                   uncertaintyOffset);
+    Agent *const agent = new Agent(this, position, goalNo, neighborDist, maxNeighbors,
+                                   radius, velocity, maxAccel, goalRadius, prefSpeed,
+                                   maxSpeed, orientation, uncertaintyOffset);
     agents_.push_back(agent);
 
     return agents_.size() - 1;
@@ -68,7 +82,8 @@ std::size_t Simulator::addGoalPositions(const std::vector<Vector2> &positions)
     return goals_.size() - 1;
 }
 
-std::size_t Simulator::addGoalPositions(const std::vector<Vector2> &positions, const std::vector<float> &speedAtPosition)
+std::size_t Simulator::addGoalPositions(const std::vector<Vector2> &positions,
+                                        const std::vector<float> &speedAtPosition)
 {
     Goal *const goal = new Goal(positions, speedAtPosition);
     goals_.push_back(goal);
@@ -78,11 +93,14 @@ std::size_t Simulator::addGoalPositions(const std::vector<Vector2> &positions, c
 
 void Simulator::doStep()
 {
-    if (kdTree_ == NULL) {
-        throw std::runtime_error("Simulation not initialized when attempting to do step.");
+    if (kdTree_ == NULL)
+    {
+        throw std::runtime_error(
+            "Simulation not initialized when attempting to do step.");
     }
 
-    if (timeStep_ == 0.0f) {
+    if (timeStep_ == 0.0f)
+    {
         throw std::runtime_error("Time step not set when attempting to do step.");
     }
 
@@ -90,13 +108,17 @@ void Simulator::doStep()
 
     kdTree_->build();
 
-    for (std::vector<Agent *>::iterator iter = agents_.begin(); iter != agents_.end(); ++iter) {
+    for (std::vector<Agent *>::iterator iter = agents_.begin(); iter != agents_.end();
+         ++iter)
+    {
         (*iter)->computePreferredVelocity();
         (*iter)->computeNeighbors();
         (*iter)->computeNewVelocity();
     }
 
-    for (std::vector<Agent *>::iterator iter = agents_.begin(); iter != agents_.end(); ++iter) {
+    for (std::vector<Agent *>::iterator iter = agents_.begin(); iter != agents_.end();
+         ++iter)
+    {
         (*iter)->update();
     }
 
@@ -173,24 +195,27 @@ Vector2 Simulator::getGoalPosition(std::size_t goalNo) const
     return goals_[goalNo]->position_;
 }
 
-void Simulator::setAgentDefaults(float neighborDist, std::size_t maxNeighbors, float radius, float goalRadius, float prefSpeed, float maxSpeed,
-                                 float uncertaintyOffset, float maxAccel, const Vector2 &velocity, float orientation)
+void Simulator::setAgentDefaults(float neighborDist, std::size_t maxNeighbors,
+                                 float radius, float goalRadius, float prefSpeed,
+                                 float maxSpeed, float uncertaintyOffset, float maxAccel,
+                                 const Vector2 &velocity, float orientation)
 {
-    if (defaults_ == NULL) {
+    if (defaults_ == NULL)
+    {
         defaults_ = new Agent(this);
     }
 
-    defaults_->goalRadius_ = goalRadius;
-    defaults_->maxAccel_ = maxAccel;
-    defaults_->maxNeighbors_ = maxNeighbors;
-    defaults_->maxSpeed_ = maxSpeed;
-    defaults_->neighborDist_ = neighborDist;
-    defaults_->newVelocity_ = velocity;
+    defaults_->goalRadius_        = goalRadius;
+    defaults_->maxAccel_          = maxAccel;
+    defaults_->maxNeighbors_      = maxNeighbors;
+    defaults_->maxSpeed_          = maxSpeed;
+    defaults_->neighborDist_      = neighborDist;
+    defaults_->newVelocity_       = velocity;
     defaults_->uncertaintyOffset_ = uncertaintyOffset;
-    defaults_->orientation_ = orientation;
-    defaults_->prefSpeed_ = prefSpeed;
-    defaults_->radius_ = radius;
-    defaults_->velocity_ = velocity;
+    defaults_->orientation_       = orientation;
+    defaults_->prefSpeed_         = prefSpeed;
+    defaults_->radius_            = radius;
+    defaults_->velocity_          = velocity;
 }
 
 void Simulator::setAgentGoal(std::size_t agentNo, std::size_t goalNo)
@@ -258,6 +283,7 @@ void Simulator::setAgentVelocity(std::size_t agentNo, const Vector2 &velocity)
     agents_[agentNo]->velocity_ = velocity;
 }
 
-Vector2 Simulator::getAgentPrefVelocity(std::size_t agentNo) const {
+Vector2 Simulator::getAgentPrefVelocity(std::size_t agentNo) const
+{
     return agents_[agentNo]->prefVelocity_;
 }

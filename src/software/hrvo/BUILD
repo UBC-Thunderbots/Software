@@ -29,7 +29,6 @@ cc_library(
         "KdTree.h",
         "Simulator.h",
         "Vector2.h",
-        "Definitions.h",
         #        "HRVO.h",
     ],
     #    copts = [
@@ -56,7 +55,6 @@ cc_library(
 #    srcs = [
 #        "Agent.cpp",
 #        "Agent.h",
-#        "Definitions.h",
 #        "Goal.cpp",
 #        "Goal.h",
 #        "KdTree.cpp",

@@ -1,7 +1,7 @@
 #include "Goal.h"
 
-#include <utility>
 #include <stdexcept>
+#include <utility>
 
 Goal::Goal(const Vector2 &position) : position_(position)
 {
@@ -14,22 +14,24 @@ Goal::Goal(std::vector<Vector2> positions) : positions_(std::move(positions))
     speedAtPosition_ = std::vector<float>(positions_.size(), 0.f);
 }
 
-Goal::Goal(std::vector<Vector2> positions, std::vector<float> speedAtPostition) :
-        positions_(std::move(positions)),
-        speedAtPosition_(std::move(speedAtPostition))
+Goal::Goal(std::vector<Vector2> positions, std::vector<float> speedAtPostition)
+    : positions_(std::move(positions)), speedAtPosition_(std::move(speedAtPostition))
 {
     if (positions_.size() != speedAtPosition_.size())
     {
-        throw std::invalid_argument("positions and speedAtPostition arrays have to be the same size");
+        throw std::invalid_argument(
+            "positions and speedAtPostition arrays have to be the same size");
     }
 }
 
-Vector2 Goal::getNextGoalPostion() {
+Vector2 Goal::getNextGoalPostion()
+{
     currGoalIndex++;
     return getCurrentGoalPosition();
 }
 
-Vector2 Goal::getCurrentGoalPosition() {
+Vector2 Goal::getCurrentGoalPosition()
+{
     if (currGoalIndex >= positions_.size())
     {
         return Vector2();
@@ -40,15 +42,17 @@ Vector2 Goal::getCurrentGoalPosition() {
     }
 }
 
-bool Goal::isGoingToFinalGoal() {
-    if(currGoalIndex >= positions_.size() - 1)
+bool Goal::isGoingToFinalGoal()
+{
+    if (currGoalIndex >= positions_.size() - 1)
     {
         return true;
     }
     return false;
 }
 
-float Goal::getDesiredSpeedAtCurrentGoal() {
+float Goal::getDesiredSpeedAtCurrentGoal()
+{
     if (currGoalIndex >= speedAtPosition_.size())
     {
         return 0.f;

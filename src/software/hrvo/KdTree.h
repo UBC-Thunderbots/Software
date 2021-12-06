@@ -12,18 +12,30 @@ class Simulator;
  * \class  KdTree
  * \brief  k-D trees for agents in the simulation.
  */
-class KdTree {
-private:
+class KdTree
+{
+   private:
     /**
      * \class  Node
      * \brief  Defines a k-D tree node.
      */
-    class Node {
-    public:
+    class Node
+    {
+       public:
         /**
          * \brief  Constructor.
          */
-        Node() : begin_(0), end_(0), left_(0), right_(0), maxX_(0.0f), maxY_(0.0f), minX_(0.0f), minY_(0.0f) { }
+        Node()
+            : begin_(0),
+              end_(0),
+              left_(0),
+              right_(0),
+              maxX_(0.0f),
+              maxY_(0.0f),
+              minX_(0.0f),
+              minY_(0.0f)
+        {
+        }
 
         /**
          * \brief  The beginning node number.
@@ -102,9 +114,9 @@ private:
 
     /**
      * \brief          Recursive function to compute the neighbors of the specified agent.
-     * \param[in]      agent    A pointer to the agent for which neighbors are to be computed.
-     * \param[in,out]  rangeSq  The squared range around the agent.
-     * \param[in]      node     The current k-D tree node.
+     * \param[in]      agent    A pointer to the agent for which neighbors are to be
+     * computed. \param[in,out]  rangeSq  The squared range around the agent. \param[in]
+     * node     The current k-D tree node.
      */
     void queryRecursive(Agent *agent, float &rangeSq, std::size_t node) const;
 
@@ -115,4 +127,3 @@ private:
     friend class Agent;
     friend class Simulator;
 };
-
