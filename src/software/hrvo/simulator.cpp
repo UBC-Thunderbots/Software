@@ -1,10 +1,10 @@
-#include "Simulator.h"
+#include "simulator.h"
 
 #include <stdexcept>
 
-#include "Agent.h"
-#include "Goal.h"
-#include "KdTree.h"
+#include "agent.h"
+#include "goal.h"
+#include "kd_tree.h"
 
 Simulator::Simulator()
     : defaults_(NULL),

@@ -6,9 +6,9 @@
 #include <utility>
 #include <vector>
 
-#include "Goal.h"
-#include "Simulator.h"
-#include "Vector2.h"
+#include "goal.h"
+#include "simulator.h"
+#include "vector2.h"
 
 /**
  * An agent in the HRVO simulation.

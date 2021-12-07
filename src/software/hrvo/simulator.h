@@ -3,10 +3,10 @@
 #include <limits>
 #include <vector>
 
-#include "Agent.h"
-#include "Goal.h"
-#include "KdTree.h"
-#include "Vector2.h"
+#include "agent.h"
+#include "goal.h"
+#include "kd_tree.h"
+#include "vector2.h"
 
 class Simulator
 {

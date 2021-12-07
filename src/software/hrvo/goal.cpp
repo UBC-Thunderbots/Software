@@ -1,4 +1,4 @@
-#include "Goal.h"
+#include "goal.h"
 
 #include <stdexcept>
 #include <utility>

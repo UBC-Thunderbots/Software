@@ -1,10 +1,10 @@
-#include "KdTree.h"
+#include "kd_tree.h"
 
 #include <algorithm>
 #include <limits>
 
-#include "Agent.h"
-#include "Simulator.h"
+#include "agent.h"
+#include "simulator.h"
 
 KdTree::KdTree(Simulator *simulator) : simulator_(simulator) {}
 

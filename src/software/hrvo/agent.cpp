@@ -1,12 +1,12 @@
-#include "Agent.h"
+#include "agent.h"
 
 #include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <limits>
 
-#include "Goal.h"
-#include "KdTree.h"
+#include "goal.h"
+#include "kd_tree.h"
 
 Agent::Agent(Simulator *simulator)
     : simulator_(simulator),

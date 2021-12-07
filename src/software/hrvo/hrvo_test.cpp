@@ -3,7 +3,7 @@
 #include <chrono>
 #include <fstream>
 
-#include "Simulator.h"
+#include "simulator.h"
 
 const float HRVO_TWO_PI  = 6.283185307179586f;
 const float ROBOT_RADIUS = 0.09f;
