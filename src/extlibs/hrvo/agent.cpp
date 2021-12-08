@@ -439,31 +439,7 @@ void Agent::computePreferredVelocity()
     else
     {
         prefVelocity_ = normalize(goalPosition - position_) * prefSpeed_;
-        // prefVelocity_ = (goalPosition - position_) / simulator_->timeStep_;
     }
-
-
-    //    prefVelocity_ = (distToGoal / 8) * normalize(goalPosition - position_) *
-    //    prefSpeed_;
-    //        const Vector2 goalPosition = simulator_->goals_[goalNo_]->position_;
-    //        const float distSqToGoal = absSq(goalPosition - position_);
-    //
-    //        if (sqr(prefSpeed_ * simulator_->timeStep_) > distSqToGoal) {
-    //            prefVelocity_ = (goalPosition - position_) / simulator_->timeStep_;
-    //        }
-    //        else {
-    //            prefVelocity_ = prefSpeed_ * (goalPosition - position_) /
-    //            std::sqrt(distSqToGoal);
-    //        }
-
-    // if (sqr(prefSpeed_ * simulator_->timeStep_) > distSqToGoal) {
-    // 	prefVelocity_ = (goalPosition - position_) / simulator_->timeStep_;
-    // 	// TODO: Update to include accel
-    // https://github.com/UBC-Thunderbots/Software/blob/1d3e52972f0f28229f6a7c441635265aa89c2bb8/src/software/jetson_nano/primitive_executor.cpp#L36
-    // }
-    // else {
-    // 	prefVelocity_ = prefSpeed_ * (goalPosition - position_) / std::sqrt(distSqToGoal);
-    // }
 }
 
 void Agent::insertNeighbor(std::size_t agentNo, float &rangeSq)
@@ -525,9 +501,10 @@ void Agent::update()
         //			const Vector2 goalPosition = simulator_->goals_[goalNo_]->position_;
         //			const Vector2 distVectorToGoal = goalPosition - position_;
         //			const float distToGoal = sqrt(sqr(distVectorToGoal.getX()) +
-        // sqr(distVectorToGoal.getY())); 			std::cout << "distToGoal=" << distToGoal <<
-        // " dv=" << dv <<  " Actualdv=" << abs(dvVec) << " newVelocity_=" << velocity_ <<
-        // " maxAccel/frame=" << maxAccel_  * simulator_->timeStep_ << std::endl;
+        // sqr(distVectorToGoal.getY())); 			std::cout << "distToGoal=" <<
+        // distToGoal
+        // << " dv=" << dv <<  " Actualdv=" << abs(dvVec) << " newVelocity_=" << velocity_
+        // << " maxAccel/frame=" << maxAccel_  * simulator_->timeStep_ << std::endl;
     }
 
     position_ += velocity_ * simulator_->timeStep_;
