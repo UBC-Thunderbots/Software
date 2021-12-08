@@ -32,7 +32,7 @@ class Goal
 
    public:
     Vector2 position_;
-    // Goal positions in order Could be Queue
+    // Goal positions and speeds in the same order
     std::vector<Vector2> positions_;
     std::vector<float> speedAtPosition_;
     unsigned int currGoalIndex = 0;

@@ -107,8 +107,9 @@ class Agent
     void computePreferredVelocity();
 
     /**
-     *         Inserts a neighbor into the set of neighbors of this agent.
-     * @param      agentNo  The number of the agent to be inserted.
+     * Inserts a neighbor into the set of neighbors of this agent.
+     * 
+     * @param  agentNo  The number of the agent to be inserted.
      * @param  rangeSq  The squared range around this agent.
      */
     void insertNeighbor(std::size_t agentNo, float &rangeSq);

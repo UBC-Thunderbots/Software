@@ -38,7 +38,7 @@ class Vector2
     }
 
     /**
-     *    Sets the x-coordinate of this vector.
+     * Sets the x-coordinate of this vector.
      *
      * @param x  The replacement x-coordinate.
      */
@@ -48,7 +48,7 @@ class Vector2
     }
 
     /**
-     *    Sets the y-coordinate of this vector.
+     * Sets the y-coordinate of this vector.
      *
      * @param y  The replacement y-coordinate.
      */
@@ -68,10 +68,10 @@ class Vector2
     }
 
     /**
-     *    Computes the dot product of this vector with the specified vector.
+     * Computes the dot product of this vector with the specified vector.
      *
      * @param other  The vector with which the dot product should be computed.
-     * @return     The dot product of this vector with a specified vector.
+     * @return  The dot product of this vector with a specified vector.
      */
     float operator*(const Vector2 &other) const
     {
@@ -79,12 +79,12 @@ class Vector2
     }
 
     /**
-     *    Computes the scalar multiplication of this vector with the specified scalar
+     * Computes the scalar multiplication of this vector with the specified scalar
      * value.
      *
      * @param scalar  The scalar value with which the scalar multiplication should be
      * computed.
-     * @return     The scalar multiplication of this vector with a specified scalar value.
+     * @return  The scalar multiplication of this vector with a specified scalar value.
      */
     Vector2 operator*(float scalar) const
     {
@@ -92,10 +92,10 @@ class Vector2
     }
 
     /**
-     *    Computes the scalar division of this vector with the specified scalar value.
+     * Computes the scalar division of this vector with the specified scalar value.
      *
      * @param scalar  The scalar value with which the scalar division should be computed.
-     * @return     The scalar division of this vector with a specified scalar value.
+     * @return  The scalar division of this vector with a specified scalar value.
      */
     Vector2 operator/(float scalar) const
     {
@@ -105,10 +105,10 @@ class Vector2
     }
 
     /**
-     *    Computes the vector sum of this vector with the specified vector.
+     * Computes the vector sum of this vector with the specified vector.
      *
      * @param other  The vector with which the vector sum should be computed.
-     * @return     The vector sum of this vector with a specified vector.
+     * @return  The vector sum of this vector with a specified vector.
      */
     Vector2 operator+(const Vector2 &other) const
     {
@@ -116,10 +116,10 @@ class Vector2
     }
 
     /**
-     *    Computes the vector difference of this vector with the specified vector.
+     * Computes the vector difference of this vector with the specified vector.
      *
-     *    @param other  The vector with which the vector difference should be computed.
-     * @return     The vector difference of this vector with a specified vector.
+     * @param other  The vector with which the vector difference should be computed.
+     * @return  The vector difference of this vector with a specified vector.
      */
     Vector2 operator-(const Vector2 &other) const
     {
@@ -127,10 +127,10 @@ class Vector2
     }
 
     /**
-     *    Tests this vector for equality with the specified vector.
+     * Tests this vector for equality with the specified vector.
      *
      * @param other  The vector with which to test for equality.
-     * @return     True if the vectors are equal.
+     * @return  True if the vectors are equal.
      */
     bool operator==(const Vector2 &other) const
     {
@@ -138,10 +138,10 @@ class Vector2
     }
 
     /**
-     *    Tests this vector for inequality with the specified vector.
+     * Tests this vector for inequality with the specified vector.
      *
      * @param other  The vector with which to test for inequality
-     * @return     True if the vectors are not equal.
+     * @return  True if the vectors are not equal.
      */
     bool operator!=(const Vector2 &other) const
     {
@@ -149,12 +149,12 @@ class Vector2
     }
 
     /**
-     *    Sets the value of this vector to the scalar multiplication of itself with the
+     * Sets the value of this vector to the scalar multiplication of itself with the
      * specified scalar value.
      *
      * @param scalar  The scalar value with which the scalar multiplication should be
      * computed.
-     * @return     A reference to this vector.
+     * @return  A reference to this vector.
      */
     Vector2 &operator*=(float scalar)
     {
@@ -165,11 +165,11 @@ class Vector2
     }
 
     /**
-     *    Sets the value of this vector to the scalar division of itself with the
+     * Sets the value of this vector to the scalar division of itself with the
      * specified scalar value.
      *
      * @param scalar  The scalar value with which the scalar division should be computed.
-     * @return     A reference to this vector.
+     * @return  A reference to this vector.
      */
     Vector2 &operator/=(float scalar)
     {
@@ -182,11 +182,11 @@ class Vector2
     }
 
     /**
-     *    Sets the value of this vector to the vector sum of itself with the
+     * Sets the value of this vector to the vector sum of itself with the
      * specified vector.
      *
      * @param other  The vector with which the vector sum should be computed.
-     * @return     A reference to this vector.
+     * @return  A reference to this vector.
      */
     Vector2 &operator+=(const Vector2 &other)
     {
@@ -197,11 +197,11 @@ class Vector2
     }
 
     /**
-     *    Sets the value of this vector to the vector difference of itself with the
+     * Sets the value of this vector to the vector difference of itself with the
      * specified vector.
      *
      * @param other  The vector with which the vector difference should be computed.
-     * @return     A reference to this vector.
+     * @return  A reference to this vector.
      */
     Vector2 &operator-=(const Vector2 &other)
     {
@@ -220,7 +220,7 @@ class Vector2
  * Computes the length of a specified vector.
  *
  * @param vector  The vector whose length is to be computed.
- * @return     The length of the vector.
+ * @return  The length of the vector.
  */
 inline float abs(const Vector2 &vector)
 {
@@ -231,7 +231,7 @@ inline float abs(const Vector2 &vector)
  * Computes the squared length of a specified vector.
  *
  * @param vector  The vector whose squared length is to be calculated.
- * @return     The squared length of the vector.
+ * @return  The squared length of the vector.
  */
 inline float absSq(const Vector2 &vector)
 {
@@ -242,7 +242,7 @@ inline float absSq(const Vector2 &vector)
  * Computes the angle between a specified vector and the positive x-axis.
  *
  * @param vector  The vector whose angle with the positive x-axis is to be calculated.
- * @return     The angle in radians between the vector and the positive x-axis in the
+ * @return  The angle in radians between the vector and the positive x-axis in the
  * range [-PI, PI].
  */
 inline float atan(const Vector2 &vector)
@@ -256,7 +256,7 @@ inline float atan(const Vector2 &vector)
  *
  * @param vector1  The top row of the square matrix.
  * @param vector2  The bottom row of the square matrix.
- * @return     The determinant of the square matrix.
+ * @return  The determinant of the square matrix.
  */
 inline float det(const Vector2 &vector1, const Vector2 &vector2)
 {
@@ -267,7 +267,7 @@ inline float det(const Vector2 &vector1, const Vector2 &vector2)
  * Computes the normalization of a specified vector.
  *
  * @param vector  The vector whose normalization is to be calculated.
- * @return     The normalization of the vector.
+ * @return  The normalization of the vector.
  */
 inline Vector2 normalize(const Vector2 &vector)
 {
@@ -285,7 +285,7 @@ inline Vector2 normalize(const Vector2 &vector)
  *
  * @param vector1  The first end point of the line segment.
  * @param vector2  The second end point of the line segment.
- * @return     The normal vector of the line segment.
+ * @return  The normal vector of the line segment.
  */
 inline Vector2 normal(const Vector2 &vector1, const Vector2 &vector2)
 {
@@ -300,7 +300,7 @@ inline Vector2 normal(const Vector2 &vector1, const Vector2 &vector2)
  * @param scalar  The scalar value with which the scalar multiplication should be
  * computed.
  * @param vector  The vector with which the scalar multiplication should be computed.
- * @return     The scalar multiplication of the vector with the scalar value.
+ * @return  The scalar multiplication of the vector with the scalar value.
  */
 inline Vector2 operator*(float scalar, const Vector2 &vector)
 {
@@ -313,6 +313,6 @@ inline Vector2 operator*(float scalar, const Vector2 &vector)
  * @param stream  The output stream into which the two-dimensional vector should be
  * inserted.
  * @param vector  The two-dimensional vector which to insert into the output stream.
- * @return     A reference to the output stream.
+ * @return  A reference to the output stream.
  */
 std::ostream &operator<<(std::ostream &stream, const Vector2 &vector);
