@@ -417,8 +417,8 @@ void Agent::computePreferredVelocity()
     }
 
     // TODO: Update so we have the same logic for when the robot is accelerating
-    Goal *nextGoal       = simulator_->goals_[goalNo_];
-    Vector2 goalPosition = nextGoal->getCurrentGoalPosition();
+    Goal *nextGoal           = simulator_->goals_[goalNo_];
+    Vector2 goalPosition     = nextGoal->getCurrentGoalPosition();
     float speedAtGoal        = nextGoal->getDesiredSpeedAtCurrentGoal();
     Vector2 distVectorToGoal = goalPosition - position_;
     auto distToGoal = static_cast<float>(std::sqrt(std::pow(distVectorToGoal.getX(), 2) +
