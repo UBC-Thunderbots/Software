@@ -16,9 +16,6 @@ class SimulatorTest : public ::testing::Test
         simulator =
             std::make_shared<Simulator>(Field::createSSLDivisionBField(), robot_constants,
                                         wheel_constants, simulator_config);
-        simulator =
-            std::make_shared<Simulator>(Field::createSSLDivisionBField(), robot_constants,
-                                        wheel_constants, simulator_config);
         simulator->resetCurrentFirmwareTime();
     }
 

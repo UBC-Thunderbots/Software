@@ -34,15 +34,6 @@ class Polygon : public virtual Shape
     Point centroid() const;
 
     /**
-     * Returns the Polygon expanded in the direction of expansion_vector
-     * The Polygon is split in half perpendicular to expansion_vector and points on
-     * the half that expansion_vector is pointing are translated by expansion_vector
-     *
-     * @return a Polygon expanded in the direction of expansion_vector
-     */
-    Polygon expand(const Vector& expansion_vector) const;
-
-    /**
      * Returns the Polygon expanded in all directions by the expansion_amount
      *
      * @param expansion_amount a non-negative expansion amount

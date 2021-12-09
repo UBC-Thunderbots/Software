@@ -28,20 +28,6 @@ class ControllerPrimitiveGenerator
         const RobotConstants_t& robot_constants);
 
     void onValueReceived(ControllerInput world) override;
-
-    /**
-     * Creates a new DirectControl Primitive AI could output this primitive to control the
-     * linear velocity, angular velocity, and dribbler speed of a specific robot
-     *
-     * @param velocity x/y velocity vector
-     * @param angular_velocity The angular velocity
-     * @param dribbler_rpm The dribbler speed in rpm
-     *
-     * @return Pointer to the DirectControl Primitive
-     */
-    static std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
-        const Vector& velocity, AngularVelocity angular_velocity, double dribbler_rpm);
-
     /**
      * Given a ControllerInput, creates a Primitive to implement the desired behavior
      *

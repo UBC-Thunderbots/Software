@@ -107,16 +107,14 @@ class Rectangle : public ConvexPolygon
     Vector diagonal() const;
 
     /**
-     * Returns the Rectangle expanded in the direction of v
-     * To maintain the Rectangle invariant, this is done in two steps:
-     * 1. The Rectangle is split in half perpendicular to v*(1,0) and points on the half
-     * that v*(1,0) is pointing are translated by v*(1,0)
-     * 2. The Rectangle is split in half perpendicular to v*(0,1) and points on the half
-     * that v*(0,1) is pointing are translated by v*(0,1)
+     * Returns the Rectangle expanded in all directions by the expansion_amount
      *
-     * @return a Rectangle expanded in the direction of v
+     * @param expansion_amount a non-negative expansion amount
+     * @throw std::invalid_argument if expansion_amount is negative
+     *
+     * @return a Rectangle expanded in all directions by the expansion amount
      */
-    Rectangle expand(const Vector &v) const;
+    Rectangle expand(double expansion_amount) const;
 
     bool operator==(const Rectangle &p) const;
 };

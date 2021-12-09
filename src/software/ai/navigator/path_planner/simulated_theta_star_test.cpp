@@ -38,7 +38,7 @@ TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_robot_and_dest_in_same_o
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -80,7 +80,7 @@ TEST_F(SimulatedThetaStarTest,
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -119,7 +119,7 @@ TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_dest_in_obstacle)
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -159,7 +159,7 @@ TEST_F(SimulatedThetaStarTest,
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     setMotionConstraints({MotionConstraint::ENEMY_DEFENSE_AREA});
 
@@ -195,7 +195,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_in_obstacle)
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -227,8 +227,8 @@ TEST_F(SimulatedThetaStarTest, test_theta_no_obstacle_straight_path)
 
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
-    setTactic(tactic);
-    setRobotId(1);
+    setFriendlyTactic(tactic);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -281,7 +281,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_zig_zag_test)
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -323,7 +323,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_oscillation)
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -359,7 +359,7 @@ TEST_F(SimulatedThetaStarTest,
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::set<MotionConstraint> motion_constraints = {MotionConstraint::ENEMY_HALF};
     setMotionConstraints(motion_constraints);
@@ -398,7 +398,7 @@ TEST_F(SimulatedThetaStarTest,
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::set<MotionConstraint> motion_constraints = {
         MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA};
