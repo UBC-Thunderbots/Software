@@ -2,7 +2,7 @@
 
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/stop_intent.h"
-#define WRAP_ACTION(fn) [this](auto event) { fn(event); }
+#define SML_ACTION(fn) [this](auto event) { fn(event); }
 
 struct StopFSM
 {
@@ -27,11 +27,7 @@ struct StopFSM
      *
      * @param event StopFSM::Update
      */
-    void updateStop(const Update& event)
-    {
-        event.common.set_intent(
-            std::make_unique<StopIntent>(event.common.robot.id(), coast));
-    }
+    void updateStop(const Update& event);
 
     auto operator()()
     {
@@ -53,10 +49,10 @@ struct StopFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *stop_s + update_e[!stop_done] / WRAP_ACTION(updateStop) = stop_s,
-            stop_s + update_e[stop_done] / WRAP_ACTION(updateStop)   = X,
-            X + update_e[!stop_done] / WRAP_ACTION(updateStop)       = stop_s,
-            X + update_e[stop_done] / WRAP_ACTION(updateStop)        = X);
+            *stop_s + update_e[!stop_done] / SML_ACTION(updateStop) = stop_s,
+            stop_s + update_e[stop_done] / SML_ACTION(updateStop)   = X,
+            X + update_e[!stop_done] / SML_ACTION(updateStop)       = stop_s,
+            X + update_e[stop_done] / SML_ACTION(updateStop)        = X);
     }
 
    private:
