@@ -9,7 +9,7 @@
 #include "software/geom/angular_velocity.h"
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
-#include "software/multithreading/thread_safe_buffer.h"
+#include "software/multithreading/thread_safe_buffer.hpp"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/world/robot_state.h"
 

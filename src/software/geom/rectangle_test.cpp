@@ -123,34 +123,16 @@ TEST(RectangleEqualsTests, test_rectangles_not_equal_different_bottom_left_point
     EXPECT_FALSE(r == p);
 }
 
-TEST(RectangleExpandTest, test_right)
+TEST(RectangleExpandTest, test_four_points_doubled)
 {
-    Rectangle rectangle({1, 1}, {5, 3});
-    Rectangle expected({1, 1}, {8, 3});
-    Vector expansion_vector({3, 0});
-    EXPECT_EQ(rectangle.expand(expansion_vector), expected);
+    Rectangle rect({-1, 1}, {1, -1});
+    Rectangle expected({-2, 2}, {2, -2});
+    EXPECT_EQ(rect.expand(1), expected);
 }
 
-TEST(RectangleExpandTest, test_up_left)
+TEST(RectangleExpandTest, test_four_points_no_scale)
 {
-    Rectangle rectangle({1, 1}, {5, 3});
-    Rectangle expected({-1, 1}, {5, 6});
-    Vector expansion_vector({-2, 3});
-    EXPECT_EQ(rectangle.expand(expansion_vector), expected);
-}
-
-TEST(RectangleExpandTest, test_down_right)
-{
-    Rectangle rectangle({1, 1}, {5, 3});
-    Rectangle expected({1, 0}, {9, 3});
-    Vector expansion_vector({4, -1});
-    EXPECT_EQ(rectangle.expand(expansion_vector), expected);
-}
-
-TEST(RectangleExpandTest, test_0_vector)
-{
-    Rectangle rectangle({1, 1}, {5, 3});
-    Rectangle expected(rectangle);
-    Vector expansion_vector({0, 0});
-    EXPECT_EQ(rectangle.expand(expansion_vector), expected);
+    Rectangle poly({-1, 1}, {1, -1});
+    Rectangle expected({-1, 1}, {1, -1});
+    EXPECT_EQ(poly.expand(0), expected);
 }

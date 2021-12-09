@@ -177,11 +177,7 @@ struct CreaseDefenderFSM
         double robot_radius_expansion_amount =
             ROBOT_MAX_RADIUS_METERS * robot_obstacle_inflation_factor;
         Rectangle inflated_defense_area =
-            field.friendlyDefenseArea()
-                .expand(Vector(-1, 0).normalize(robot_radius_expansion_amount))
-                .expand(Vector(1, 0).normalize(robot_radius_expansion_amount))
-                .expand(Vector(0, -1).normalize(robot_radius_expansion_amount))
-                .expand(Vector(0, 1).normalize(robot_radius_expansion_amount));
+            field.friendlyDefenseArea().expand(robot_radius_expansion_amount);
 
         auto front_segment = Segment(inflated_defense_area.posXPosYCorner(),
                                      inflated_defense_area.posXNegYCorner());

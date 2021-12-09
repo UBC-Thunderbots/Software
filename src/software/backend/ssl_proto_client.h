@@ -4,7 +4,7 @@
 #include "proto/ssl_gc_referee_message.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/constants.h"
-#include "software/networking/threaded_proto_udp_listener.h"
+#include "software/networking/threaded_proto_udp_listener.hpp"
 
 /**
  * This class encapsulates ProtoUdpListener<SSLProto::SSL_WrapperPacket> and

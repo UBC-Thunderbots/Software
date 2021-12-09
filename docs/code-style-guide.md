@@ -332,6 +332,11 @@ Some general guidelines when writing tests are:
   // Pass by const reference
   Point predictBallPosition(const Ball& ball);
   ```
+
+* Use private instead of impl when naming files that are used for
+private functions for a class/file that should not be exposed to users. impl can be confused with pimpl, so using private in the naming is more clear.
+
+
 * All constructors should be marked with the `explicit` keyword. In the case of a one-argument constructor, this prevents it from being used as an implicit type conversion; in the case of other constructors, it acts as a safeguard in case arguments are later added or removed.
   ```cpp
   explicit AI(const World& world);

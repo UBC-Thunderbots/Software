@@ -44,7 +44,7 @@ TEST_F(SimulatedCreaseDefenderTacticTest, test_chip_ball)
         std::make_shared<CreaseDefenderTactic>(robot_navigation_obstacle_config);
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(tactic);
-    setRobotId(0);
+    setFriendlyRobotId(0);
     setMotionConstraints({MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -82,7 +82,7 @@ TEST_F(SimulatedCreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
         std::make_shared<CreaseDefenderTactic>(robot_navigation_obstacle_config);
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(tactic);
-    setRobotId(0);
+    setFriendlyRobotId(0);
     setMotionConstraints({MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -128,7 +128,7 @@ TEST_P(SimulatedCreaseDefenderTacticTest, crease_defender_test)
         std::make_shared<CreaseDefenderTactic>(robot_navigation_obstacle_config);
     tactic->updateControlParams(enemy_threat_point, alignment);
     setTactic(tactic);
-    setRobotId(0);
+    setFriendlyRobotId(0);
     setMotionConstraints({MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     Rectangle defense_area         = field.friendlyDefenseArea();

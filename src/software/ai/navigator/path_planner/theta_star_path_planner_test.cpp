@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/geom/point.h"
 #include "software/world/field.h"
@@ -234,10 +234,7 @@ TEST_F(TestThetaStarPathPlanner,
         robot_navigation_obstacle_factory.createFromShape(obstacle_shape)};
 
     std::vector<Polygon> actual_obstacles = {
-        obstacle_shape.expand(Vector(-1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
-            .expand(Vector(1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
-            .expand(Vector(0, -1).normalize(ROBOT_MAX_RADIUS_METERS))
-            .expand(Vector(0, 1).normalize(ROBOT_MAX_RADIUS_METERS))};
+        obstacle_shape.expand(ROBOT_MAX_RADIUS_METERS)};
 
     Rectangle navigable_area = field.fieldBoundary();
 
@@ -275,10 +272,7 @@ TEST_F(TestThetaStarPathPlanner,
         robot_navigation_obstacle_factory.createFromShape(obstacle_shape)};
 
     std::vector<Polygon> actual_obstacles = {
-        obstacle_shape.expand(Vector(-1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
-            .expand(Vector(1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
-            .expand(Vector(0, -1).normalize(ROBOT_MAX_RADIUS_METERS))
-            .expand(Vector(0, 1).normalize(ROBOT_MAX_RADIUS_METERS))};
+        obstacle_shape.expand(ROBOT_MAX_RADIUS_METERS)};
 
     Rectangle navigable_area = field.fieldBoundary();
 
@@ -449,10 +443,7 @@ TEST_F(TestThetaStarPathPlanner,
         robot_navigation_obstacle_factory.createFromShape(obstacle_shape)};
 
     std::vector<Polygon> actual_obstacles = {
-        obstacle_shape.expand(Vector(-1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
-            .expand(Vector(1, 0).normalize(ROBOT_MAX_RADIUS_METERS))
-            .expand(Vector(0, -1).normalize(ROBOT_MAX_RADIUS_METERS))
-            .expand(Vector(0, 1).normalize(ROBOT_MAX_RADIUS_METERS))};
+        obstacle_shape.expand(ROBOT_MAX_RADIUS_METERS)};
 
     Rectangle navigable_area = field.fieldBoundary();
 

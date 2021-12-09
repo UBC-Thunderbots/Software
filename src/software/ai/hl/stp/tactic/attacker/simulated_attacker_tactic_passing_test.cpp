@@ -37,7 +37,7 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_passing)
     auto tactic = std::make_shared<AttackerTactic>(attacker_tactic_config);
     tactic->updateControlParams(pass, true);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [pass, tactic](std::shared_ptr<World> world_ptr,

@@ -71,30 +71,10 @@ double Rectangle::yMin() const
     return negXNegYCorner().y();
 }
 
-Rectangle Rectangle::expand(const Vector &v) const
+Rectangle Rectangle::expand(double expansion_amount) const
 {
-    Point negCorner = negXNegYCorner();
-    Point posCorner = posXPosYCorner();
-    if (v.x() > 0)
-    {
-        posCorner = posCorner + Vector(v.x(), 0);
-    }
-
-    if (v.y() > 0)
-    {
-        posCorner = posCorner + Vector(0, v.y());
-    }
-
-    if (v.x() < 0)
-    {
-        negCorner = negCorner + Vector(v.x(), 0);
-    }
-
-    if (v.y() < 0)
-    {
-        negCorner = negCorner + Vector(0, v.y());
-    }
-    return Rectangle(negCorner, posCorner);
+    auto points = Polygon::expand(expansion_amount).getPoints();
+    return Rectangle(points[0], points[2]);
 }
 
 bool Rectangle::operator==(const Rectangle &p) const
