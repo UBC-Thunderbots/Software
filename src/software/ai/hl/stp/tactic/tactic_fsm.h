@@ -53,3 +53,10 @@ struct TacticUpdate
         ControlParams control_params;                                                    \
         TacticUpdate common;                                                             \
     };
+
+/**
+ * Converts a function to a lambda that can be used as an SML action
+ *
+ * @param fn The function to turn into a lambda
+ */
+#define SML_ACTION(fn) [this](auto event) { fn(event); }

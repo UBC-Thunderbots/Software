@@ -2,7 +2,6 @@
 
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/stop_intent.h"
-#define SML_ACTION(fn) [this](auto event) { fn(event); }
 
 struct StopFSM
 {

@@ -66,12 +66,7 @@ struct DribbleFSM
      * the ball
      */
     static Point robotPositionToFaceBall(const Point &ball_position,
-                                         const Angle &face_ball_angle)
-    {
-        return ball_position -
-               Vector::createFromAngle(face_ball_angle)
-                   .normalize(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
-    }
+                                         const Angle &face_ball_angle);
 
     /**
      * Calculates the interception point for intercepting balls
@@ -85,36 +80,7 @@ struct DribbleFSM
     // TODO (#1968): Merge this functionality with findBestInterceptForBall in the
     // evaluation folder
     static Point findInterceptionPoint(const Robot &robot, const Ball &ball,
-                                       const Field &field)
-    {
-        static constexpr double BALL_MOVING_SLOW_SPEED_THRESHOLD   = 0.3;
-        static constexpr double INTERCEPT_POSITION_SEARCH_INTERVAL = 0.1;
-        if (ball.velocity().length() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
-        {
-            auto face_ball_vector = (ball.position() - robot.position());
-            auto point_in_front_of_ball =
-                robotPositionToFaceBall(ball.position(), face_ball_vector.orientation());
-            return point_in_front_of_ball;
-        }
-        Point intercept_position = ball.position();
-        while (contains(field.fieldLines(), intercept_position))
-        {
-            Duration ball_time_to_position = Duration::fromSeconds(
-                distance(intercept_position, ball.position()) / ball.velocity().length());
-            Duration robot_time_to_pos = getTimeToPositionForRobot(
-                robot.position(), intercept_position,
-                robot.robotConstants().robot_max_speed_m_per_s,
-                robot.robotConstants().robot_max_acceleration_m_per_s_2);
-
-            if (robot_time_to_pos < ball_time_to_position)
-            {
-                break;
-            }
-            intercept_position +=
-                ball.velocity().normalize(INTERCEPT_POSITION_SEARCH_INTERVAL);
-        }
-        return intercept_position;
-    }
+                                       const Field &field);
 
     /**
      * Gets the destination to dribble the ball to from the update event
@@ -124,16 +90,7 @@ struct DribbleFSM
      * @return the destination to dribble the ball to
      */
     static Point getDribbleBallDestination(const Point &ball_position,
-                                           std::optional<Point> dribble_destination)
-    {
-        // Default is the current ball position
-        Point target_dest = ball_position;
-        if (dribble_destination)
-        {
-            target_dest = dribble_destination.value();
-        }
-        return target_dest;
-    }
+                                           std::optional<Point> dribble_destination);
 
     /**
      * Gets the final dribble orientation from the update event
@@ -144,16 +101,7 @@ struct DribbleFSM
      */
     static Angle getFinalDribbleOrientation(
         const Point &ball_position, const Point &robot_position,
-        std::optional<Angle> final_dribble_orientation)
-    {
-        // Default is face ball direction
-        Angle target_orientation = (ball_position - robot_position).orientation();
-        if (final_dribble_orientation)
-        {
-            target_orientation = final_dribble_orientation.value();
-        }
-        return target_orientation;
-    }
+        std::optional<Angle> final_dribble_orientation);
 
     /**
      * Calculates the next dribble destination and orientation
@@ -168,20 +116,34 @@ struct DribbleFSM
     static std::tuple<Point, Angle> calculateNextDribbleDestinationAndOrientation(
         const Ball &ball, const Robot &robot,
         std::optional<Point> dribble_destination_opt,
-        std::optional<Angle> final_dribble_orientation_opt)
-    {
-        Point dribble_destination =
-            getDribbleBallDestination(ball.position(), dribble_destination_opt);
+        std::optional<Angle> final_dribble_orientation_opt);
 
-        // Default destination and orientation assume ball is at the destination
-        // pivot to final face ball destination
-        Angle target_orientation = getFinalDribbleOrientation(
-            ball.position(), robot.position(), final_dribble_orientation_opt);
-        Point target_destination =
-            robotPositionToFaceBall(dribble_destination, target_orientation);
+    /**
+     * Action to get possession of the ball
+     *
+     * If the ball is moving quickly, then move in front of the ball
+     * If the ball is moving slowly, then chase the ball
+     *
+     * @param event DribbleFSM::Update
+     */
+    void getPossession(const Update &event);
 
-        return std::make_tuple(target_destination, target_orientation);
-    }
+    /**
+     * Action to dribble the ball
+     *
+     * This action will orient the robot towards the destination, dribble to the
+     * destination, and then pivot to face the expected orientation
+     *
+     * @param event DribbleFSM::Update
+     */
+    void dribble(const Update &event);
+
+    /**
+     * Start dribbling
+     *
+     * @param event DribbleFSM::Update
+     */
+    void startDribble(const Update &event);
 
     auto operator()()
     {
@@ -229,82 +191,18 @@ struct DribbleFSM
                    robotStopped(event.common.robot, ROBOT_DRIBBLING_DONE_SPEED);
         };
 
-        /**
-         * Action to get possession of the ball
-         *
-         * If the ball is moving quickly, then move in front of the ball
-         * If the ball is moving slowly, then chase the ball
-         *
-         * @param event DribbleFSM::Update
-         */
-        const auto get_possession = [this](auto event) {
-            auto ball_position = event.common.world.ball().position();
-            auto face_ball_orientation =
-                (ball_position - event.common.robot.position()).orientation();
-            Point intercept_position =
-                findInterceptionPoint(event.common.robot, event.common.world.ball(),
-                                      event.common.world.field());
-            event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), intercept_position, face_ball_orientation, 0,
-                DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
-                AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-                event.common.robot.robotConstants()));
-        };
-
-        /**
-         * Action to dribble the ball
-         *
-         * This action will orient the robot towards the destination, dribble to the
-         * destination, and then pivot to face the expected orientation
-         *
-         * @param event DribbleFSM::Update
-         */
-        const auto dribble = [this](auto event) {
-            Point ball_position = event.common.world.ball().position();
-            auto [target_destination, target_orientation] =
-                calculateNextDribbleDestinationAndOrientation(
-                    event.common.world.ball(), event.common.robot,
-                    event.control_params.dribble_destination,
-                    event.control_params.final_dribble_orientation);
-            AutoChipOrKick auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::OFF, 0};
-
-            if (!event.control_params.allow_excessive_dribbling &&
-                !comparePoints(ball_position, *continuous_dribbling_start_point,
-                               MAX_CONTINUOUS_DRIBBLING_DISTANCE))
-            {
-                // give the ball a little kick
-                auto_chip_or_kick =
-                    AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, DRIBBLE_KICK_SPEED};
-            }
-
-            event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), target_destination, target_orientation, 0,
-                DribblerMode::MAX_FORCE, BallCollisionType::ALLOW, auto_chip_or_kick,
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-                event.common.robot.robotConstants()));
-        };
-
-        /**
-         * Start dribbling
-         *
-         * @param event DribbleFSM::Update
-         */
-        const auto start_dribble = [this, dribble](auto event) {
-            // update continuous_dribbling_start_point once we start dribbling
-            *continuous_dribbling_start_point = event.common.world.ball().position();
-            dribble(event);
-        };
-
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *get_possession_s + update_e[have_possession] / start_dribble = dribble_s,
-            get_possession_s + update_e[!have_possession] / get_possession,
-            dribble_s + update_e[!have_possession] / get_possession = get_possession_s,
-            dribble_s + update_e[!dribbling_done] / dribble,
-            dribble_s + update_e[dribbling_done] / dribble  = X,
-            X + update_e[!have_possession] / get_possession = get_possession_s,
-            X + update_e[!dribbling_done] / dribble = dribble_s, X + update_e / dribble);
+            *get_possession_s + update_e[have_possession] / SML_ACTION(startDribble) =
+                dribble_s,
+            get_possession_s + update_e[!have_possession] / SML_ACTION(getPossession),
+            dribble_s + update_e[!have_possession] / SML_ACTION(getPossession) =
+                get_possession_s,
+            dribble_s + update_e[!dribbling_done] / SML_ACTION(dribble),
+            dribble_s + update_e[dribbling_done] / SML_ACTION(dribble) = X,
+            X + update_e[!have_possession] / SML_ACTION(getPossession) = get_possession_s,
+            X + update_e[!dribbling_done] / SML_ACTION(dribble)        = dribble_s,
+            X + update_e / SML_ACTION(dribble));
     }
 
    private:

@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "dribble_tactic",
-    srcs = ["dribble_tactic.cpp"],
+    srcs = [
+        "dribble_fsm.cpp",
+        "dribble_tactic.cpp",
+    ],
     hdrs = [
         "dribble_fsm.h",
         "dribble_tactic.h",
