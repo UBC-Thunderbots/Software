@@ -70,4 +70,5 @@ class ChipTactic : public Tactic
     ChipFSM::ControlParams control_params;
 };
 
+// Creates a new tactic called KickoffChipTactic that is a duplicate of ChipTactic
 COPY_TACTIC(KickoffChipTactic, ChipTactic)

@@ -189,7 +189,6 @@ cc_library(
         "//shared:constants",
         "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/tactic:all_tactics",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
         "//software/util/generic_factory",

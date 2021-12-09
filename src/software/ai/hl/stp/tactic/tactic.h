@@ -10,6 +10,12 @@
 #include "software/ai/intent/intent.h"
 #include "software/world/world.h"
 
+/**
+ * Copies a tactic, the new tactic will be the same besides having a different name
+ *
+ * @param new_class The new class that will be created
+ * @param parent_class The class that is being copied
+ */
 #define COPY_TACTIC(new_class, parent_class)                                             \
     class new_class : public parent_class                                                \
     {                                                                                    \
