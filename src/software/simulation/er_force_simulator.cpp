@@ -17,6 +17,7 @@
 #include "software/simulation/er_force_simulator_robot_singleton.h"
 #include "software/simulation/simulator_ball_singleton.h"
 #include "software/world/robot_state.h"
+#include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
 
 extern "C"
 {
@@ -26,9 +27,11 @@ extern "C"
 #include "firmware/app/world/firmware_world.h"
 }
 
+MAKE_ENUM(FieldType, DIV_A, DIV_B);
+
 ErForceSimulator::ErForceSimulator(
-    const Field& field, const RobotConstants_t& robot_constants,
-    const WheelConstants& wheel_constants, private const FieldType
+    const FieldType& field_type, const RobotConstants_t& robot_constants,
+    const WheelConstants& wheel_constants, 
     std::shared_ptr<const SimulatorConfig> simulator_config)
     : yellow_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
       blue_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
@@ -123,7 +126,7 @@ ErForceSimulator::ErForceSimulator(
 
     this->resetCurrentFirmwareTime();
 
-    FieldType = this->getSimulatorSetup();
+    field_type = this->getSimulatorSetup();
 }
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
@@ -272,9 +275,7 @@ std::vector<SSLProto::SSL_WrapperPacket> ErForceSimulator::getSSLWrapperPackets(
     return er_force_sim->getWrapperPackets();
 }
 
-MAKE_ENUM(FieldType, DIV_A, DIV_B);
-
-Field ErForceSimulator::getField(FieldType) const
+Field ErForceSimulator::getField() const
 {
     return Field::createSSLDivisionAField();
 }
@@ -294,7 +295,7 @@ float ErForceSimulator::getCurrentFirmwareTimeSeconds()
     return static_cast<float>(current_firmware_time.toSeconds());
 }
 
-String ErForceSimulator::getSimulatorSetup()
+std::unique_ptr<amun::SimulatorSetup> ErForceSimulator::getSimulatorSetup()
 {
     return amun::SimulatorSetup();
 }
