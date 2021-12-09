@@ -2,6 +2,7 @@
 
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/stop_intent.h"
+#define WRAP_ACTION(fn) [this](auto event) { fn(event); }
 
 struct StopFSM
 {
@@ -21,22 +22,23 @@ struct StopFSM
      */
     explicit StopFSM(bool coast) : coast(coast) {}
 
+    /**
+     * Action to set the StopIntent
+     *
+     * @param event StopFSM::Update
+     */
+    void updateStop(const Update& event)
+    {
+        event.common.set_intent(
+            std::make_unique<StopIntent>(event.common.robot.id(), coast));
+    }
+
     auto operator()()
     {
         using namespace boost::sml;
 
         const auto stop_s   = state<StopState>;
         const auto update_e = event<Update>;
-
-        /**
-         * Action to set the StopIntent
-         *
-         * @param event StopFSM::Update
-         */
-        const auto update_stop = [this](auto event) {
-            event.common.set_intent(
-                std::make_unique<StopIntent>(event.common.robot.id(), coast));
-        };
 
         /**
          * Guard if the stop is done
@@ -51,10 +53,10 @@ struct StopFSM
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *stop_s + update_e[!stop_done] / update_stop = stop_s,
-            stop_s + update_e[stop_done] / update_stop   = X,
-            X + update_e[!stop_done] / update_stop       = stop_s,
-            X + update_e[stop_done] / update_stop        = X);
+            *stop_s + update_e[!stop_done] / WRAP_ACTION(updateStop) = stop_s,
+            stop_s + update_e[stop_done] / WRAP_ACTION(updateStop)   = X,
+            X + update_e[!stop_done] / WRAP_ACTION(updateStop)       = stop_s,
+            X + update_e[stop_done] / WRAP_ACTION(updateStop)        = X);
     }
 
    private:
