@@ -416,7 +416,8 @@ void Agent::computePreferredVelocity()
         return;
     }
 
-    // TODO: Update so we have the same logic for when the robot is accelerating
+    // TODO (#2374): Update so we have the same logic for when the robot is accelerating
+    // https://github.com/UBC-Thunderbots/Software/issues/2374
     Goal *nextGoal           = simulator_->goals_[goalNo_];
     Vector2 goalPosition     = nextGoal->getCurrentGoalPosition();
     float speedAtGoal        = nextGoal->getDesiredSpeedAtCurrentGoal();

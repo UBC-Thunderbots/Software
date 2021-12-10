@@ -1,7 +1,4 @@
-package(default_visibility = [
-    "//software/ai:__subpackages__",
-    "//software/hrvo:__subpackages__",
-])
+package(default_visibility = ["//visibility:public"])
 
 cc_test(
     name = "hrvo_test",

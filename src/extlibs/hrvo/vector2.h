@@ -271,7 +271,7 @@ inline float det(const Vector2 &vector1, const Vector2 &vector2)
  */
 inline Vector2 normalize(const Vector2 &vector)
 {
-    // TODO: Added safety check for SIGFPE
+    // Added safety check to avoid division with 0
     float magnitude = abs(vector);
     if (magnitude != 0)
     {

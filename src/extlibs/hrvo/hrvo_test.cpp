@@ -1,13 +1,14 @@
 #include <gtest/gtest.h>
-//#include <HRVO.h>
+
 #include <chrono>
 #include <fstream>
 
 #include "simulator.h"
 
-const float HRVO_TWO_PI  = 6.283185307179586f;
-const float ROBOT_RADIUS = 0.09f;
-const float RADIUS_SCALE = 1.0f;
+const float HRVO_TWO_PI        = 6.283185307179586f;
+const float ROBOT_RADIUS       = 0.09f;
+const float RADIUS_SCALE       = 1.0f;
+const int SIMULATOR_FRAME_RATE = 30;
 
 class HRVOTest : public ::testing::Test
 {
@@ -16,8 +17,10 @@ class HRVOTest : public ::testing::Test
 
     HRVOTest() : simulator()
     {
-        simulator.setTimeStep(1.f / 200);
-        simulator.setAgentDefaults(3.f, 30, ROBOT_RADIUS * RADIUS_SCALE, 0.02f,
+        simulator.setTimeStep(1.f / SIMULATOR_FRAME_RATE);
+        simulator.setAgentDefaults(/*neighborDist*/ 3.f, /*maxNeighbors*/ 30,
+                                   /*radius*/ ROBOT_RADIUS * RADIUS_SCALE,
+                                   /*goalRadius*/ 0.02f,
                                    /*prefSpeed=*/3.5f, /*maxSpeed=*/4.825f,
                                    /*uncertaintyOffset=*/0.f, /*maxAccel=*/3.28f);
     }
@@ -40,8 +43,6 @@ class HRVOTest : public ::testing::Test
                 const Vector2 position(x, y);
                 simulator.addAgent(position, simulator.addGoal(position), 1.f, 1, 0.25f,
                                    0.25f, 0.1f, 0.1f, 0.f, 0.1f, Vector2(), 0.f);
-                //                simulator.addAgent(position,
-                //                simulator.addGoal(position));
             }
         }
 
@@ -54,8 +55,6 @@ class HRVOTest : public ::testing::Test
                 const Vector2 position(x, y);
                 simulator.addAgent(position, simulator.addGoal(position), 1.f, 1, 0.25f,
                                    0.25f, 0.1f, 0.1f, 0.f, 0.1f, Vector2(), 0.f);
-                //                simulator.addAgent(position,
-                //                simulator.addGoal(position));
             }
         }
     }
@@ -69,12 +68,10 @@ class HRVOTest : public ::testing::Test
     void run_simulator()
     {
         // The output file name is the name of the test
+        // The output is stored in the logging directory
         std::string out_file_name(
             ::testing::UnitTest::GetInstance()->current_test_info()->name());
-        // TODO: Update so it is relative path
-        std::ofstream output_file(
-            "/home/nima/thunderbots/Software/src/software/hrvo/hrvo_data/" +
-            out_file_name + ".csv");
+        std::ofstream output_file("/tmp/" + out_file_name + ".csv");
         if (output_file.is_open())
         {
             std::cout << "File " << out_file_name << " Created and open" << std::endl;
@@ -200,9 +197,6 @@ TEST_F(HRVOTest, div_b_edge_test)
 
 TEST_F(HRVOTest, 25_robots_around_circle)
 {
-    // TODO: Can use Agent.SetAgentRadius to set custom radius for robots.
-    //       Could have a randomly assigned radius with in a range
-
     /** Add robots around circle with one in the center **/
     const int num_robots           = 25;
     float robot_starting_angle_dif = HRVO_TWO_PI / num_robots;

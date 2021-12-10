@@ -5,7 +5,7 @@ import pandas as pd
 
 # Constants
 robot_radius = 0.09
-frame_rate = 200
+frame_rate = 30
 frame_length_ms = 1000.0 / frame_rate
 play_back_speed = 1.0
 div_a_field_width = 9.0
@@ -25,13 +25,12 @@ def animate_robots(robot_pos_df, gif_output_file=None):
     min_robot_x_pos = robot_pos_df["x"].min()
     max_robot_y_pos = robot_pos_df["y"].max()
     min_robot_y_pos = robot_pos_df["y"].min()
-    scale_constant = 1.0 / 8
-    x_offset = max(scale_constant * (max_robot_x_pos - min_robot_x_pos), 1.0)
-    y_offset = max(scale_constant * (max_robot_y_pos - min_robot_y_pos), 1.0)
+    plot_scale_constant = 0.125
+    x_offset = max(plot_scale_constant * (max_robot_x_pos - min_robot_x_pos), 1.0)
+    y_offset = max(plot_scale_constant * (max_robot_y_pos - min_robot_y_pos), 1.0)
 
     def setup_plot():
         """Initial drawing of the scatter plot."""
-        # TODO: Make robot and tracking line the same color
         for robot in robot_list:
             ax.add_patch(robot)
 
@@ -146,7 +145,6 @@ def animate_robots(robot_pos_df, gif_output_file=None):
     # Start/Stop on click
     fig.canvas.mpl_connect("button_press_event", toggle_pause)
 
-    # TODO: Allow highlighting after animation is over. Can achieve this by not passing frames to FunAnimation
     # Highlight tracked line on hover
     fig.canvas.mpl_connect("motion_notify_event", on_plot_hover)
 
@@ -171,11 +169,7 @@ def animate_robots(robot_pos_df, gif_output_file=None):
         print(f"Saved gif of robots to {gif_output_file}")
 
 
-file_name = "1_robot_moving_in_square"
-file_location = (
-    f"/home/nima/thunderbots/Software/src/software/hrvo/hrvo_data/{file_name}.csv"
-)
-df = pd.read_csv(file_location)  # , skiprows=3)
-animate_robots(
-    df
-)  # , f'/home/nima/thunderbots/Software/src/software/hrvo/hrvo_data/{file_name}.gif')
+file_name = "div_b_edge_test"
+file_location = f"/tmp/{file_name}.csv"
+df = pd.read_csv(file_location)
+animate_robots(df)  # , f'/tmp/{file_name}.gif') # Uncomment to store gif of test
