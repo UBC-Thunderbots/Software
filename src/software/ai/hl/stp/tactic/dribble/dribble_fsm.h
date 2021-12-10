@@ -145,64 +145,51 @@ struct DribbleFSM
      */
     void startDribble(const Update &event);
 
+    /**
+     * Guard that checks if the robot has possession of the ball
+     *
+     * @param event DribbleFSM::Update
+     *
+     * @return if the ball has been have_possession
+     */
+    bool havePossession(const Update &event);
+
+    /**
+     * Guard that checks if the ball is at the dribble_destination and robot is facing
+     * the right direction with possession of the ball
+     *
+     * @param event DribbleFSM::Update
+     *
+     * @return if the ball is at the dribble_destination, robot is facing the correct
+     * direction and ahs possession of the ball
+     */
+    bool dribblingDone(const Update &event);
+
     auto operator()()
     {
         using namespace boost::sml;
 
-        const auto get_possession_s = state<GetPossessionState>;
-        const auto dribble_s        = state<DribbleState>;
-
-        const auto update_e = event<Update>;
-
-        /**
-         * Guard that checks if the robot has possession of the ball
-         *
-         * @param event DribbleFSM::Update
-         *
-         * @return if the ball has been have_possession
-         */
-        const auto have_possession = [](auto event) {
-            return event.common.robot.isNearDribbler(
-                event.common.world.ball().position());
-        };
-
-        /**
-         * Guard that checks if the ball is at the dribble_destination and robot is facing
-         * the right direction with possession of the ball
-         *
-         * @param event DribbleFSM::Update
-         *
-         * @return if the ball is at the dribble_destination, robot is facing the correct
-         * direction and ahs possession of the ball
-         */
-        const auto dribbling_done = [have_possession](auto event) {
-            return comparePoints(event.common.world.ball().position(),
-                                 getDribbleBallDestination(
-                                     event.common.world.ball().position(),
-                                     event.control_params.dribble_destination),
-                                 BALL_CLOSE_TO_DEST_THRESHOLD) &&
-                   compareAngles(event.common.robot.orientation(),
-                                 getFinalDribbleOrientation(
-                                     event.common.world.ball().position(),
-                                     event.common.robot.position(),
-                                     event.control_params.final_dribble_orientation),
-                                 FINAL_DESTINATION_CLOSE_THRESHOLD) &&
-                   have_possession(event) &&
-                   robotStopped(event.common.robot, ROBOT_DRIBBLING_DONE_SPEED);
-        };
+        DEFINE_SML_STATE(GetPossessionState)
+        DEFINE_SML_STATE(DribbleState)
+        DEFINE_SML_EVENT(Update)
+        DEFINE_SML_GUARD(havePossession)
+        DEFINE_SML_GUARD(dribblingDone)
+        DEFINE_SML_ACTION(startDribble)
+        DEFINE_SML_ACTION(getPossession)
+        DEFINE_SML_ACTION(dribble)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *get_possession_s + update_e[have_possession] / SML_ACTION(startDribble) =
-                dribble_s,
-            get_possession_s + update_e[!have_possession] / SML_ACTION(getPossession),
-            dribble_s + update_e[!have_possession] / SML_ACTION(getPossession) =
-                get_possession_s,
-            dribble_s + update_e[!dribbling_done] / SML_ACTION(dribble),
-            dribble_s + update_e[dribbling_done] / SML_ACTION(dribble) = X,
-            X + update_e[!have_possession] / SML_ACTION(getPossession) = get_possession_s,
-            X + update_e[!dribbling_done] / SML_ACTION(dribble)        = dribble_s,
-            X + update_e / SML_ACTION(dribble));
+            *GetPossessionState_S + Update_E[havePossession_G] / startDribble_A =
+                DribbleState_S,
+            GetPossessionState_S + Update_E[!havePossession_G] / getPossession_A,
+            DribbleState_S + Update_E[!havePossession_G] / getPossession_A =
+                GetPossessionState_S,
+            DribbleState_S + Update_E[!dribblingDone_G] / dribble_A,
+            DribbleState_S + Update_E[dribblingDone_G] / dribble_A = X,
+            X + Update_E[!havePossession_G] / getPossession_A      = GetPossessionState_S,
+            X + Update_E[!dribblingDone_G] / dribble_A             = DribbleState_S,
+            X + Update_E / dribble_A);
     }
 
    private:

@@ -127,3 +127,25 @@ void DribbleFSM::startDribble(const Update &event)
     *continuous_dribbling_start_point = event.common.world.ball().position();
     dribble(event);
 }
+
+bool DribbleFSM::havePossession(const Update &event)
+{
+    return event.common.robot.isNearDribbler(event.common.world.ball().position());
+};
+
+bool DribbleFSM::dribblingDone(const Update &event)
+{
+    return comparePoints(
+               event.common.world.ball().position(),
+               getDribbleBallDestination(event.common.world.ball().position(),
+                                         event.control_params.dribble_destination),
+               BALL_CLOSE_TO_DEST_THRESHOLD) &&
+           compareAngles(
+               event.common.robot.orientation(),
+               getFinalDribbleOrientation(event.common.world.ball().position(),
+                                          event.common.robot.position(),
+                                          event.control_params.final_dribble_orientation),
+               FINAL_DESTINATION_CLOSE_THRESHOLD) &&
+           havePossession(event) &&
+           robotStopped(event.common.robot, ROBOT_DRIBBLING_DONE_SPEED);
+};
