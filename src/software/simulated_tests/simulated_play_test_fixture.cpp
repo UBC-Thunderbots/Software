@@ -48,6 +48,12 @@ void SimulatedPlayTestFixture::setAIPlay(const std::string& ai_play)
     ai_control_config->getMutableCurrentAiPlay()->setValue(ai_play);
 }
 
+void SimulatedPlayTestFixture::setAIPlayConstructor(
+    std::function<std::unique_ptr<Play>()> play_constructor)
+{
+    ai.overridePlayConstructor(play_constructor);
+}
+
 void SimulatedPlayTestFixture::setRefereeCommand(
     const RefereeCommand& current_referee_command,
     const RefereeCommand& previous_referee_command)
