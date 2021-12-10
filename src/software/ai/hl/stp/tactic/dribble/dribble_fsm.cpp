@@ -107,7 +107,7 @@ void DribbleFSM::dribble(const Update &event)
     AutoChipOrKick auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::OFF, 0};
 
     if (!event.control_params.allow_excessive_dribbling &&
-        !comparePoints(ball_position, *continuous_dribbling_start_point,
+        !comparePoints(ball_position, continuous_dribbling_start_point,
                        MAX_CONTINUOUS_DRIBBLING_DISTANCE))
     {
         // give the ball a little kick
@@ -124,7 +124,7 @@ void DribbleFSM::dribble(const Update &event)
 void DribbleFSM::startDribble(const Update &event)
 {
     // update continuous_dribbling_start_point once we start dribbling
-    *continuous_dribbling_start_point = event.common.world.ball().position();
+    continuous_dribbling_start_point = event.common.world.ball().position();
     dribble(event);
 }
 

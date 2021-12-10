@@ -22,10 +22,7 @@ struct DribbleFSM
      * @param continuous_dribbling_start_point A pointer to a Point to track the
      * continuous dribbling start point
      */
-    explicit DribbleFSM(const std::shared_ptr<Point> &continuous_dribbling_start_point)
-        : continuous_dribbling_start_point(continuous_dribbling_start_point)
-    {
-    }
+    explicit DribbleFSM(void) : continuous_dribbling_start_point(Point()) {}
 
     struct ControlParams
     {
@@ -193,5 +190,5 @@ struct DribbleFSM
     }
 
    private:
-    std::shared_ptr<Point> continuous_dribbling_start_point;
+    Point continuous_dribbling_start_point;
 };
