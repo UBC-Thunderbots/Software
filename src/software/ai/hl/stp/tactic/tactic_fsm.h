@@ -5,17 +5,8 @@
 #include <queue>
 
 #include "software/ai/intent/intent.h"
+#include "software/util/sml_fsm/sml_fsm.h"
 #include "software/world/world.h"
-
-/**
- * The Tactic FSM framework uses the [SML library](https://github.com/boost-ext/sml), and
- * aims to create a readable style of FSM to implement tactic gameplay. See the MoveTactic
- * for an example of how to implement a tactic using this framework
- */
-
-// An alias for an FSM
-template <class T>
-using FSM = boost::sml::sm<T, boost::sml::process_queue<std::queue>>;
 
 // This callback is used to return an intent from the fsm
 using SetIntentCallback = std::function<void(std::unique_ptr<Intent>)>;
@@ -52,28 +43,4 @@ struct TacticUpdate
         }                                                                                \
         ControlParams control_params;                                                    \
         TacticUpdate common;                                                             \
-    };
-
-/**
- * Converts a function to a lambda that can be used as an SML action
- *
- * @param fn The function to turn into a lambda
- * TacticUpdate - common struct that contains Robot, World, and SetIntentCallback
- */
-#define SML_ACTION(fn) [this](auto event) { fn(event); }
-
-
-#define DEFINE_SML_STATE(STATE) const auto STATE##_S = boost::sml::state<STATE>;
-#define DEFINE_SML_EVENT(EVENT) const auto EVENT##_E = boost::sml::event<EVENT>;
-
-
-#define DEFINE_SML_GUARD(FUNCTION)                                                       \
-    const auto FUNCTION##_G = [this](auto event) { return FUNCTION(event); };
-#define DEFINE_SML_ACTION(FUNCTION)                                                      \
-    const auto FUNCTION##_A = [this](auto event) { FUNCTION(event); };
-
-#define DEFINE_SML_SUB_FSM_UPDATE_ACTION(FUNCTION, SUB_FSM)                              \
-    const auto FUNCTION##_A = [this](auto event,                                         \
-                                     back::process<SUB_FSM::Update> processEvent) {      \
-        FUNCTION(event, processEvent);                                                   \
     };
