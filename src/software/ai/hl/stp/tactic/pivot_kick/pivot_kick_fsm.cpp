@@ -25,4 +25,4 @@ bool PivotKickFSM::ballKicked(const Update& event)
 {
     return event.common.world.ball().hasBallBeenKicked(
         event.control_params.kick_direction);
-};
+}

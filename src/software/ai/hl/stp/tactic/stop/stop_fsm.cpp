@@ -8,4 +8,4 @@ void StopFSM::updateStop(const Update& event)
 bool StopFSM::stopDone(const Update& event)
 {
     return robotStopped(event.common.robot);
-};
+}

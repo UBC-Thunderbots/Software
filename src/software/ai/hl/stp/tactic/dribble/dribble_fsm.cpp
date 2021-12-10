@@ -131,7 +131,7 @@ void DribbleFSM::startDribble(const Update &event)
 bool DribbleFSM::havePossession(const Update &event)
 {
     return event.common.robot.isNearDribbler(event.common.world.ball().position());
-};
+}
 
 bool DribbleFSM::dribblingDone(const Update &event)
 {
@@ -148,4 +148,4 @@ bool DribbleFSM::dribblingDone(const Update &event)
                FINAL_DESTINATION_CLOSE_THRESHOLD) &&
            havePossession(event) &&
            robotStopped(event.common.robot, ROBOT_DRIBBLING_DONE_SPEED);
-};
+}
