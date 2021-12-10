@@ -23,65 +23,49 @@ struct PivotKickFSM
     // this struct defines the only event that the PivotKickFSM responds to
     DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
+    /**
+     * Action that updates the DribbleFSM to get possession of the ball and pivot
+     *
+     * @param event PivotKickFSM::Update event
+     * @param processEvent processes the GetBehindBallFSM::Update
+     */
+    void getPossessionAndPivot(
+        const Update& event, boost::sml::back::process<DribbleFSM::Update> processEvent);
+
+    /**
+     * Action that kicks the ball
+     *
+     * @param event PivotKickFSM::Update event
+     */
+    void kickBall(const Update& event);
+
+    /**
+     * Guard that checks if the ball has been kicked
+     *
+     * @param event PivotKickFSM::Update event
+     *
+     * @return if the ball has been kicked
+     */
+    bool ballKicked(const Update& event);
+
     auto operator()()
     {
         using namespace boost::sml;
 
-        const auto get_possession_and_pivot_s = state<DribbleFSM>;
-        const auto start_s                    = state<StartState>;
-        const auto kick_ball_s                = state<KickState>;
+        DEFINE_SML_STATE(StartState)
+        DEFINE_SML_STATE(KickState)
+        DEFINE_SML_STATE(DribbleFSM)
+        DEFINE_SML_EVENT(Update)
 
-        // update_e is the _event_ that the PivotKickFSM responds to
-        const auto update_e = event<Update>;
-
-        /**
-         * Action that updates the DribbleFSM to get possession of the ball and pivot
-         *
-         * @param event PivotKickFSM::Update event
-         * @param processEvent processes the GetBehindBallFSM::Update
-         */
-        const auto get_possession_and_pivot =
-            [this](auto event, back::process<DribbleFSM::Update> processEvent) {
-                DribbleFSM::ControlParams control_params{
-                    .dribble_destination       = event.control_params.kick_origin,
-                    .final_dribble_orientation = event.control_params.kick_direction,
-                    .allow_excessive_dribbling = false};
-
-                processEvent(DribbleFSM::Update(control_params, event.common));
-            };
-
-        /**
-         * Action that kicks the ball
-         *
-         * @param event PivotKickFSM::Update event
-         */
-        const auto kick_ball = [this](auto event) {
-            event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), event.control_params.kick_origin,
-                event.control_params.kick_direction, 0, DribblerMode::OFF,
-                BallCollisionType::ALLOW, event.control_params.auto_chip_or_kick,
-                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
-                event.common.robot.robotConstants()));
-        };
-
-        /**
-         * Guard that checks if the ball has been kicked
-         *
-         * @param event PivotKickFSM::Update event
-         *
-         * @return if the ball has been kicked
-         */
-        const auto ball_kicked = [](auto event) {
-            return event.common.world.ball().hasBallBeenKicked(
-                event.control_params.kick_direction);
-        };
+        DEFINE_SML_GUARD(ballKicked)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(getPossessionAndPivot, DribbleFSM)
+        DEFINE_SML_ACTION(kickBall)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *start_s + update_e / get_possession_and_pivot = get_possession_and_pivot_s,
-            get_possession_and_pivot_s + update_e / get_possession_and_pivot,
-            get_possession_and_pivot_s = kick_ball_s,
-            kick_ball_s + update_e[!ball_kicked] / kick_ball,
-            kick_ball_s + update_e[ball_kicked] = X);
+            *StartState_S + Update_E / getPossessionAndPivot_A = DribbleFSM_S,
+            DribbleFSM_S + Update_E / getPossessionAndPivot_A, DribbleFSM_S = KickState_S,
+            KickState_S + Update_E[!ballKicked_G] / kickBall_A,
+            KickState_S + Update_E[ballKicked_G] = X);
     }
 };

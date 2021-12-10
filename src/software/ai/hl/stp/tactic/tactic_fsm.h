@@ -71,3 +71,9 @@ struct TacticUpdate
     const auto FUNCTION##_G = [this](auto event) { return FUNCTION(event); };
 #define DEFINE_SML_ACTION(FUNCTION)                                                      \
     const auto FUNCTION##_A = [this](auto event) { FUNCTION(event); };
+
+#define DEFINE_SML_SUB_FSM_UPDATE_ACTION(FUNCTION, SUB_FSM)                              \
+    const auto FUNCTION##_A = [this](auto event,                                         \
+                                     back::process<SUB_FSM::Update> processEvent) {      \
+        FUNCTION(event, processEvent);                                                   \
+    };
