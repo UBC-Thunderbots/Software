@@ -21,7 +21,7 @@ struct PivotKickFSM
     };
 
     // this struct defines the only event that the PivotKickFSM responds to
-    DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
      * Action that updates the DribbleFSM to get possession of the ball and pivot

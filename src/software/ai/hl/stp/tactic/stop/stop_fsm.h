@@ -14,7 +14,7 @@ struct StopFSM
     {
     };
 
-    DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
      * Constructor for StopFSM struct

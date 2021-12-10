@@ -27,7 +27,7 @@ struct ReceiverFSM
         bool disable_one_touch_shot = false;
     };
 
-    DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     // The minimum proportion of open net we're shooting on vs the entire size of the net
     // that we require before attempting a shot

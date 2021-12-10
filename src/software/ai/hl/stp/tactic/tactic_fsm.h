@@ -34,7 +34,7 @@ struct TacticUpdate
  * ControlParams - uniquely defined by each tactic to control the FSM
  * TacticUpdate - common struct that contains Robot, World, and SetIntentCallback
  */
-#define DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS                              \
+#define DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS                              \
     struct Update                                                                        \
     {                                                                                    \
         Update(const ControlParams &control_params, const TacticUpdate &common)          \

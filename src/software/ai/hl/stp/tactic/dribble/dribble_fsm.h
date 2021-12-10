@@ -37,7 +37,7 @@ struct DribbleFSM
         bool allow_excessive_dribbling;
     };
 
-    DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     // Threshold to determine if the ball is at the destination determined experimentally
     static constexpr double BALL_CLOSE_TO_DEST_THRESHOLD = 0.1;
