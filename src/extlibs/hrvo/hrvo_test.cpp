@@ -34,7 +34,7 @@ class HRVOTest : public ::testing::Test
     {
         float field_width   = 9.f;
         float field_height  = 6.f;
-        float robot_offsets = 2.1f * 0.25f;  // ROBOT_RADIUS * RADIUS_SCALE;
+        float robot_offsets = 2.1f * 0.25f;
 
         for (float x = -(field_width / 2); x <= (field_width / 2); x += robot_offsets)
         {
@@ -165,7 +165,7 @@ class HRVOTest : public ::testing::Test
             simulator.doStep();
             auto finishTickTime = std::chrono::high_resolution_clock::now();
             computationTime += finishTickTime - startTickTime;
-        } while (!simulator.haveReachedGoals() && prev_frame_time < 15.f);  //);
+        } while (!simulator.haveReachedGoals() && prev_frame_time < 15.f);
         auto finishTime = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> totalTime = finishTime - startTime;
         std::cout << "Total run time = " << totalTime.count() << std::endl;
@@ -185,13 +185,8 @@ TEST_F(HRVOTest, div_b_edge_test)
         const Vector2 position = -1 * (goal_offset / 2) + Vector2(0.f, 2.5f) +
                                  (static_cast<float>(i) * robot_offset);
         simulator.addAgent(position, simulator.addGoal(position + goal_offset));
-        // const Vector2 position2 = (goal_offset / 2) + Vector2(0.f, 2.2f) +
-        // (static_cast<float>(i) * robot_offset); simulator.addAgent(position2,
-        // simulator.addGoal(position2 - goal_offset));
     }
-    // add_static_obstacle(Vector2(0, 2.51f), 0.25f);
     add_static_obstacle(Vector2(0, 2.f), 0.75f);
-    // add_static_obstacle(Vector2(0, 1.49f), 0.25f);
     create_div_b_field();
 }
 
@@ -213,8 +208,8 @@ TEST_F(HRVOTest, 25_robots_around_circle)
 
 TEST_F(HRVOTest, 5_robots_in_vertical_line)
 {
-    const int num_robots = 5;
     /** Add robots in a vertical line where they all have to move down **/
+    const int num_robots = 5;
     const Vector2 goal_offset  = Vector2(0.f, -6.f);
     const Vector2 robot_offset = Vector2(0.f, -ROBOT_RADIUS * 2.5f);
     for (std::size_t i = 0; i < num_robots; ++i)
