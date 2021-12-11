@@ -6,10 +6,10 @@
 #include "extlibs/hrvo/simulator.h"
 #include "shared/test_util/tbots_gtest_main.h"
 
+const int SIMULATOR_FRAME_RATE = 30;
 const float HRVO_TWO_PI        = 6.283185307179586f;
 const float ROBOT_RADIUS       = 0.09f;
 const float RADIUS_SCALE       = 1.0f;
-const int SIMULATOR_FRAME_RATE = 30;
 
 class HRVOTest : public ::testing::Test
 {
@@ -72,9 +72,13 @@ class HRVOTest : public ::testing::Test
         // The output is stored in the logging directory
         std::string out_file_name(
             ::testing::UnitTest::GetInstance()->current_test_info()->name());
-        std::string output_file_loc(TbotsGtestMain::logging_dir + out_file_name + ".csv");
-        std::cout << "LoggingDir " << TbotsGtestMain::logging_dir << std::endl;
-
+        std::string file_directory(TbotsGtestMain::logging_dir);
+        if (file_directory.empty())
+        {
+            file_directory = "/tmp/";
+        }
+        
+        std::string output_file_loc(file_directory + out_file_name + ".csv");
         std::ofstream output_file(output_file_loc);
         if (output_file.is_open())
         {
