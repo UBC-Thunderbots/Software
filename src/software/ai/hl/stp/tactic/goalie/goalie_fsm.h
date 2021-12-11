@@ -132,6 +132,11 @@ struct GoalieFSM
      */
     void updatePositionToBlock(const Update &event);
 
+    /**
+     * Checks if ball is in the friendly defense area
+     *
+     * @param event GoalieFSM::Update event
+     */
     bool ballInDefenseArea(const Update &event);
 
     auto operator()()
