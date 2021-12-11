@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "receiver_tactic",
-    srcs = ["receiver_tactic.cpp"],
+    srcs = [
+        "receiver_fsm.cpp",
+        "receiver_tactic.cpp",
+    ],
     hdrs = [
         "receiver_fsm.h",
         "receiver_tactic.h",

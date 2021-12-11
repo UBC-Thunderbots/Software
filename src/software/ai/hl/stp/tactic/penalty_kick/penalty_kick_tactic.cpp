@@ -3,7 +3,8 @@
 PenaltyKickTactic::PenaltyKickTactic()
     : Tactic(false,
              {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
-      fsm(DribbleFSM(), PenaltyKickFSM(std::nullopt, Point(), Angle()))
+      fsm{DribbleFSM(), PenaltyKickFSM(std::nullopt, Point(), Angle()),
+          GetBehindBallFSM()}
 {
 }
 

@@ -35,51 +35,39 @@ struct MoveFSM
     // this struct defines the only event that the MoveFSM responds to
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
+    /**
+     * This is an Action that sets the intent to a move intent corresponding to the
+     * Update_E event
+     *
+     * @param event MoveFSM::Update event
+     */
+    void updateMove(const Update &event);
+
+    /**
+     * This guard is used to check if the robot is done moving
+     *
+     * @param event MoveFSM::Update event
+     *
+     * @return if robot has reached the destination
+     */
+    bool moveDone(const Update &event);
+
     auto operator()()
     {
         using namespace boost::sml;
 
-        // move_s is the _state_ used in the transition table
-        const auto move_s = state<MoveState>;
+        // MoveState_S is the _state_ used in the transition table
+        DEFINE_SML_STATE(MoveState)
+        // Update_E is the _event_ that the MoveFSM responds to
+        DEFINE_SML_EVENT(Update)
 
-        // update_e is the _event_ that the MoveFSM responds to
-        const auto update_e = event<Update>;
-
-        /**
-         * This is an Action that sets the intent to a move intent corresponding to the
-         * update_e event
-         *
-         * @param event MoveFSM::Update event
-         */
-        const auto update_move = [](auto event) {
-            event.common.set_intent(std::make_unique<MoveIntent>(
-                event.common.robot.id(), event.control_params.destination,
-                event.control_params.final_orientation, event.control_params.final_speed,
-                event.control_params.dribbler_mode,
-                event.control_params.ball_collision_type,
-                event.control_params.auto_chip_or_kick,
-                event.control_params.max_allowed_speed_mode,
-                event.control_params.target_spin_rev_per_s,
-                event.common.robot.robotConstants()));
-        };
-
-        /**
-         * This guard is used to check if the robot is done moving
-         *
-         * @param event MoveFSM::Update event
-         *
-         * @return if robot has reached the destination
-         */
-        const auto move_done = [](auto event) {
-            return robotReachedDestination(event.common.robot,
-                                           event.control_params.destination,
-                                           event.control_params.final_orientation);
-        };
+        DEFINE_SML_GUARD(moveDone)
+        DEFINE_SML_ACTION(updateMove)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *move_s + update_e[!move_done] / update_move = move_s,
-            move_s + update_e[move_done] / update_move   = X,
-            X + update_e[!move_done] / update_move       = move_s);
+            *MoveState_S + Update_E[!moveDone_G] / updateMove_A = MoveState_S,
+            MoveState_S + Update_E[moveDone_G] / updateMove_A   = X,
+            X + Update_E[!moveDone_G] / updateMove_A            = MoveState_S);
     }
 };
