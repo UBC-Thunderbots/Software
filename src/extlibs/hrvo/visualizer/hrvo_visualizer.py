@@ -1,15 +1,18 @@
 import argparse
+import math
 import os
 
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation, PillowWriter
-from matplotlib.patches import Circle
 import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
+from matplotlib.animation import FuncAnimation, PillowWriter
 
 # Constants
 FRAME_RATE = 30
 FRAME_LENGTH_MS = 1000.0 / FRAME_RATE
 PLAY_BACK_SPEED = 1.0
+
+PLOT_SCALE_CONSTANT = 0.125
 
 DEFAULT_ROBOT_COLOR = "royalblue"
 COLLIDED_ROBOT_COLOR = "red"
@@ -30,9 +33,8 @@ def animate_robots(file_loc, test_name, gif_output_file=None):
     min_robot_x_pos = robot_pos_df["x"].min()
     max_robot_y_pos = robot_pos_df["y"].max()
     min_robot_y_pos = robot_pos_df["y"].min()
-    plot_scale_constant = 0.125
-    x_offset = max(plot_scale_constant * (max_robot_x_pos - min_robot_x_pos), 1.0)
-    y_offset = max(plot_scale_constant * (max_robot_y_pos - min_robot_y_pos), 1.0)
+    x_offset = max(PLOT_SCALE_CONSTANT * (max_robot_x_pos - min_robot_x_pos), 1.0)
+    y_offset = max(PLOT_SCALE_CONSTANT * (max_robot_y_pos - min_robot_y_pos), 1.0)
 
     def setup_plot():
         """Initial drawing of the scatter plot."""
@@ -63,9 +65,9 @@ def animate_robots(file_loc, test_name, gif_output_file=None):
             # Update robot color if it collides with another robot
             other_robot_id = int(robot["has_collided"])
             if other_robot_id != -1:
-                print(f"went into for loop with other robot {other_robot_id}\n{robot}")
                 robot_list[robot_id].set_facecolor(COLLIDED_ROBOT_COLOR)
 
+                # Print the collision once
                 if other_robot_id > robot_id:
                     other_robot = curr_frame_df[
                         curr_frame_df["robot_id"] == other_robot_id
@@ -76,11 +78,9 @@ def animate_robots(file_loc, test_name, gif_output_file=None):
                     relative_vel_y = float(other_robot["velocity_y"]) - float(
                         robot["velocity_y"]
                     )
-                    relative_speed = pow(
-                        pow(relative_vel_x, 2) + pow(relative_vel_y, 2), 0.5
-                    )
+                    relative_speed = math.hypot(relative_vel_x, relative_vel_y)
                     print(
-                        f"robot {robot_id} and robot {other_robot_id} have collided with a relative velocity of {relative_speed}m/s"
+                        f"robot {robot_id} and robot {other_robot_id} have collided with a relative velocity of {round(relative_speed, 3)}m/s"
                     )
             else:
                 robot_list[robot_id].set_facecolor(DEFAULT_ROBOT_COLOR)
