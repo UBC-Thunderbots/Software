@@ -3,7 +3,8 @@
 #include <chrono>
 #include <fstream>
 
-#include "simulator.h"
+#include "extlibs/hrvo/simulator.h"
+#include "shared/test_util/tbots_gtest_main.h"
 
 const float HRVO_TWO_PI        = 6.283185307179586f;
 const float ROBOT_RADIUS       = 0.09f;
@@ -71,15 +72,19 @@ class HRVOTest : public ::testing::Test
         // The output is stored in the logging directory
         std::string out_file_name(
             ::testing::UnitTest::GetInstance()->current_test_info()->name());
-        std::ofstream output_file("/tmp/" + out_file_name + ".csv");
+        std::string output_file_loc(TbotsGtestMain::logging_dir + out_file_name + ".csv");
+        std::cout << "LoggingDir " << TbotsGtestMain::logging_dir << std::endl;
+
+        std::ofstream output_file(output_file_loc);
         if (output_file.is_open())
         {
-            std::cout << "File " << out_file_name << " Created and open" << std::endl;
+            std::cout << "File " << output_file_loc << " created and open" << std::endl;
         }
         else
         {
-            std::cout << "File not open" << std::endl;
+            std::cout << "File " << output_file_loc << " can not be created and opened." << std::endl;
         }
+
         // Column Names
         output_file
             << "frame,time,computation_time,robot_id,radius,x,y,velocity_x,velocity_y,speed,has_collided,pref_vel_x,pref_vel_y"
@@ -98,11 +103,11 @@ class HRVOTest : public ::testing::Test
         std::vector<float> prev_y_pos_arr(num_robots);
         float prev_frame_time = 0.f;
         unsigned int frame    = 0;
-        std::chrono::duration<double> computationTime(0);
-        auto startTime = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> computation_time(0);
+        auto start_time = std::chrono::high_resolution_clock::now();
         do
         {
-            auto startTickTime = std::chrono::high_resolution_clock::now();
+            auto start_tick_time = std::chrono::high_resolution_clock::now();
             float time         = simulator.getGlobalTime();
             for (unsigned int robot_id = 0; robot_id < num_robots; robot_id++)
             {
@@ -143,34 +148,41 @@ class HRVOTest : public ::testing::Test
 
                     velocity_x = (curr_x_pos - prev_x_pos) / delta_time;
                     velocity_y = (curr_y_pos - prev_y_pos) / delta_time;
-                    speed      = std::pow(
-                        std::pow(velocity_x, 2.f) + std::pow(velocity_y, 2.f), 0.5f);
+                    speed      = std::hypot(velocity_x, velocity_y);
 
                     // update previous robot x and y position
                     prev_x_pos_arr[robot_id] = curr_x_pos;
                     prev_y_pos_arr[robot_id] = curr_y_pos;
                 }
-                output_file << frame << "," << time << ","
-                            << std::to_string(computationTime.count()) << "," << robot_id
-                            << "," << robot_radius[robot_id] << ","
-                            << curr_robot_pos.getX() << "," << curr_robot_pos.getY()
-                            << "," << velocity_x << "," << velocity_y << "," << speed
-                            << "," << has_collided << ","
+                output_file << frame << "," 
+                            << time << ","
+                            << std::to_string(computation_time.count()) << "," 
+                            << robot_id << "," 
+                            << robot_radius[robot_id] << ","
+                            << curr_robot_pos.getX() << "," 
+                            << curr_robot_pos.getY() << "," 
+                            << velocity_x << "," 
+                            << velocity_y << "," 
+                            << speed << "," 
+                            << has_collided << ","
                             << simulator.getAgentPrefVelocity(robot_id).getX() << ","
                             << simulator.getAgentPrefVelocity(robot_id).getY()
                             << std::endl;
             }
+
             frame++;
             prev_frame_time = time;
             simulator.doStep();
-            auto finishTickTime = std::chrono::high_resolution_clock::now();
-            computationTime += finishTickTime - startTickTime;
+
+            auto finish_tick_time = std::chrono::high_resolution_clock::now();
+            computation_time += finish_tick_time - start_tick_time;
         } while (!simulator.haveReachedGoals() && prev_frame_time < 15.f);
-        auto finishTime = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> totalTime = finishTime - startTime;
-        std::cout << "Total run time = " << totalTime.count() << std::endl;
+
+        auto finish_time = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> total_time = finish_time - start_time;
+        std::cout << "Total run time = " << total_time.count() << std::endl;
         std::cout << "Total simulation time = " << prev_frame_time << std::endl;
-        std::cout << "Average time per tick = " << totalTime.count() / frame << std::endl;
+        std::cout << "Average time per tick = " << total_time.count() / frame << std::endl;
 
         output_file.close();
     }
