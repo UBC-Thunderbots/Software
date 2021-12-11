@@ -1,20 +1,25 @@
+import argparse
+import os
+
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
 from matplotlib.patches import Circle
 import pandas as pd
 
 # Constants
-robot_radius = 0.09
-frame_rate = 30
-frame_length_ms = 1000.0 / frame_rate
-play_back_speed = 1.0
-div_a_field_width = 9.0
-div_a_field_length = 12.0
-default_robot_color = "royalblue"
-collided_robot_color = "red"
+FRAME_RATE = 30
+FRAME_LENGTH_MS = 1000.0 / FRAME_RATE
+PLAY_BACK_SPEED = 1.0
+
+DEFAULT_ROBOT_COLOR = "royalblue"
+COLLIDED_ROBOT_COLOR = "red"
+
+FILE_DIRECTORY = "/tmp"
 
 
-def animate_robots(robot_pos_df, gif_output_file=None):
+def animate_robots(file_loc, test_name, gif_output_file=None):
+    robot_pos_df = pd.read_csv(file_loc)
+
     num_frames = robot_pos_df["frame"].max() + 1
     num_robots = robot_pos_df["robot_id"].max() + 1
     default_line_alpha = 0.3
@@ -59,7 +64,7 @@ def animate_robots(robot_pos_df, gif_output_file=None):
             other_robot_id = int(robot["has_collided"])
             if other_robot_id != -1:
                 print(f"went into for loop with other robot {other_robot_id}\n{robot}")
-                robot_list[robot_id].set_facecolor(collided_robot_color)
+                robot_list[robot_id].set_facecolor(COLLIDED_ROBOT_COLOR)
 
                 if other_robot_id > robot_id:
                     other_robot = curr_frame_df[
@@ -78,7 +83,7 @@ def animate_robots(robot_pos_df, gif_output_file=None):
                         f"robot {robot_id} and robot {other_robot_id} have collided with a relative velocity of {relative_speed}m/s"
                     )
             else:
-                robot_list[robot_id].set_facecolor(default_robot_color)
+                robot_list[robot_id].set_facecolor(DEFAULT_ROBOT_COLOR)
 
         # Update lines tracking the robot movement
         robots_grouped = robot_pos_df.groupby("robot_id")
@@ -115,7 +120,7 @@ def animate_robots(robot_pos_df, gif_output_file=None):
 
     # set up plot
     fig = plt.figure()
-    fig.suptitle(file_name)
+    fig.suptitle(test_name)
     ax = fig.add_subplot(
         111,
         autoscale_on=False,
@@ -149,11 +154,11 @@ def animate_robots(robot_pos_df, gif_output_file=None):
     fig.canvas.mpl_connect("motion_notify_event", on_plot_hover)
 
     # Animate
-    print(f"Animating robots from {file_location}")
+    print(f"Animating robots from {test_name}")
     robot_anim = FuncAnimation(
         fig,
         func=update,
-        interval=frame_length_ms / play_back_speed,
+        interval=FRAME_LENGTH_MS / PLAY_BACK_SPEED,
         init_func=setup_plot,
         frames=num_frames,
         blit=True,
@@ -165,11 +170,25 @@ def animate_robots(robot_pos_df, gif_output_file=None):
         # save gif
         print("==============================================")
         print(f"Saving gif of robots to {gif_output_file}...")
-        robot_anim.save(gif_output_file, writer=PillowWriter(fps=frame_rate))
+        robot_anim.save(gif_output_file, writer=PillowWriter(fps=FRAME_RATE))
         print(f"Saved gif of robots to {gif_output_file}")
 
 
-file_name = "div_b_edge_test"
-file_location = f"/tmp/{file_name}.csv"
-df = pd.read_csv(file_location)
-animate_robots(df)  # , f'/tmp/{file_name}.gif') # Uncomment to store gif of test
+def validate_file(f):
+    if not os.path.exists(f"{FILE_DIRECTORY}/{f}.csv"):
+        raise argparse.ArgumentTypeError(f"{FILE_DIRECTORY}/{f}.csv does not exist")
+    return f
+    
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-t', '--test_name', dest='file_name', required=True, type=validate_file, help=f'The name of the .csv file which you want to animate. File must be stored under {FILE_DIRECTORY}.')
+    parser.add_argument('-s', '--save_gif', dest='save_gif', action='store_true', help=f'If arg passed, animation will be saved as a GIF at {FILE_DIRECTORY}/test_name.gif.')
+    args = parser.parse_args()
+
+    csv_file_loc = f"{FILE_DIRECTORY}/{args.file_name}.csv"
+    gif_file_location = None
+    if args.save_gif:
+        gif_file_location = f"{FILE_DIRECTORY}/{args.file_name}.gif"
+
+    animate_robots(csv_file_loc, args.file_name, gif_file_location)
