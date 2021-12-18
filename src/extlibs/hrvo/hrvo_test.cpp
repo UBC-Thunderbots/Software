@@ -77,16 +77,14 @@ class HRVOTest : public ::testing::Test
         {
             file_directory = "/tmp/";
         }
-        
+
         std::string output_file_loc(file_directory + out_file_name + ".csv");
         std::ofstream output_file(output_file_loc);
-        if (output_file.is_open())
+        if (!output_file.is_open())
         {
-            std::cout << "File " << output_file_loc << " created and open" << std::endl;
-        }
-        else
-        {
-            std::cout << "File " << output_file_loc << " can not be created and opened." << std::endl;
+            std::cout << "File " << output_file_loc << " can not be created and opened."
+                      << std::endl;
+            return;
         }
 
         // Column Names
@@ -112,7 +110,7 @@ class HRVOTest : public ::testing::Test
         do
         {
             auto start_tick_time = std::chrono::high_resolution_clock::now();
-            float time         = simulator.getGlobalTime();
+            float time           = simulator.getGlobalTime();
             for (unsigned int robot_id = 0; robot_id < num_robots; robot_id++)
             {
                 Vector2 curr_robot_pos = simulator.getAgentPosition(robot_id);
@@ -158,17 +156,12 @@ class HRVOTest : public ::testing::Test
                     prev_x_pos_arr[robot_id] = curr_x_pos;
                     prev_y_pos_arr[robot_id] = curr_y_pos;
                 }
-                output_file << frame << "," 
-                            << time << ","
-                            << std::to_string(computation_time.count()) << "," 
-                            << robot_id << "," 
-                            << robot_radius[robot_id] << ","
-                            << curr_robot_pos.getX() << "," 
-                            << curr_robot_pos.getY() << "," 
-                            << velocity_x << "," 
-                            << velocity_y << "," 
-                            << speed << "," 
-                            << has_collided << ","
+                output_file << frame << "," << time << ","
+                            << std::to_string(computation_time.count()) << "," << robot_id
+                            << "," << robot_radius[robot_id] << ","
+                            << curr_robot_pos.getX() << "," << curr_robot_pos.getY()
+                            << "," << velocity_x << "," << velocity_y << "," << speed
+                            << "," << has_collided << ","
                             << simulator.getAgentPrefVelocity(robot_id).getX() << ","
                             << simulator.getAgentPrefVelocity(robot_id).getY()
                             << std::endl;
@@ -186,9 +179,11 @@ class HRVOTest : public ::testing::Test
         std::chrono::duration<double> total_time = finish_time - start_time;
         std::cout << "Total run time = " << total_time.count() << std::endl;
         std::cout << "Total simulation time = " << prev_frame_time << std::endl;
-        std::cout << "Average time per tick = " << total_time.count() / frame << std::endl;
+        std::cout << "Average time per tick = " << total_time.count() / frame
+                  << std::endl;
 
         output_file.close();
+        std::cout << "Test information outputted to " << output_file_loc << std::endl;
     }
 };
 
@@ -225,7 +220,7 @@ TEST_F(HRVOTest, 25_robots_around_circle)
 TEST_F(HRVOTest, 5_robots_in_vertical_line)
 {
     /** Add robots in a vertical line where they all have to move down **/
-    const int num_robots = 5;
+    const int num_robots       = 5;
     const Vector2 goal_offset  = Vector2(0.f, -6.f);
     const Vector2 robot_offset = Vector2(0.f, -ROBOT_RADIUS * 2.5f);
     for (std::size_t i = 0; i < num_robots; ++i)
