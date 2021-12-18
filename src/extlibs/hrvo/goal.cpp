@@ -30,7 +30,7 @@
  * <https://gamma.cs.unc.edu/HRVO/>
  */
 
-#include "goal.h"
+#include "extlibs/hrvo/goal.h"
 
 #include <stdexcept>
 #include <utility>

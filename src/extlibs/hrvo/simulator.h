@@ -35,10 +35,10 @@
 #include <limits>
 #include <vector>
 
-#include "agent.h"
-#include "goal.h"
-#include "kd_tree.h"
-#include "vector2.h"
+#include "extlibs/hrvo/agent.h"
+#include "extlibs/hrvo/goal.h"
+#include "extlibs/hrvo/kd_tree.h"
+#include "extlibs/hrvo/vector2.h"
 
 class Simulator
 {

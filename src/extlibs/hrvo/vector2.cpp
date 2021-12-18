@@ -30,7 +30,7 @@
  * <https://gamma.cs.unc.edu/HRVO/>
  */
 
-#include "vector2.h"
+#include "extlibs/hrvo/vector2.h"
 
 #include <ostream>
 

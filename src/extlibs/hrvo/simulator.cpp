@@ -30,13 +30,13 @@
  * <https://gamma.cs.unc.edu/HRVO/>
  */
 
-#include "simulator.h"
+#include "extlibs/hrvo/simulator.h"
 
 #include <stdexcept>
 
-#include "agent.h"
-#include "goal.h"
-#include "kd_tree.h"
+#include "extlibs/hrvo/agent.h"
+#include "extlibs/hrvo/goal.h"
+#include "extlibs/hrvo/kd_tree.h"
 
 Simulator::Simulator()
     : defaults_(NULL),

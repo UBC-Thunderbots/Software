@@ -30,13 +30,13 @@
  * <https://gamma.cs.unc.edu/HRVO/>
  */
 
-#include "kd_tree.h"
+#include "extlibs/hrvo/kd_tree.h"
 
 #include <algorithm>
 #include <limits>
 
-#include "agent.h"
-#include "simulator.h"
+#include "extlibs/hrvo/agent.h"
+#include "extlibs/hrvo/simulator.h"
 
 KdTree::KdTree(Simulator *simulator) : simulator_(simulator) {}
 
