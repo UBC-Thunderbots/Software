@@ -15,6 +15,10 @@ src/external/qt
 # Pycache
 *.pyc
 
+# HRVO Outputs
+*.gif
+*.png
+
 # CLion
 *.idea*
 cmake-build-debug
