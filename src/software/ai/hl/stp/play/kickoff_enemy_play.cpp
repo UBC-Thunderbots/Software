@@ -82,8 +82,6 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
         std::make_shared<MoveTactic>(true)};
 
-    // created a new local variable Point at the center of the field (0,0)
-    Point point = world.field().centerPoint();
     // created an enemy_team for mutation
     Team enemy_team = world.enemyTeam();
 
@@ -96,7 +94,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         // team. Since the center circle is a motion constraint during enemy kickoff, the
         // shadowing robot will navigate to the closest point that it can to shadow, which
         // might not be ideal. (i.e robot won't block a straight shot on net)
-        auto robot = Team::getNearestRobot(world.enemyTeam().getAllRobots(), point);
+        auto robot = Team::getNearestRobot(world.enemyTeam().getAllRobots(),
+                                           world.field().centerPoint());
         if (robot.has_value())
         {
             int robot_id = robot.value().id();
@@ -150,7 +149,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
         move_tactics.at(defense_position_index)
             ->updateControlParams(calculateBlockCone(world.field().friendlyGoalpostPos(),
                                                      world.field().friendlyGoalpostNeg(),
-                                                     point, 2 * ROBOT_MAX_RADIUS_METERS),
+                                                     world.field().centerPoint(),
+                                                     2 * ROBOT_MAX_RADIUS_METERS),
                                   Angle::zero(), 0, MaxAllowedSpeedMode::PHYSICAL_LIMIT);
         result[0].emplace_back(move_tactics.at(defense_position_index));
 
