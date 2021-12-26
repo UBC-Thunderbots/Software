@@ -3,6 +3,23 @@ import board
 from PIL import Image, ImageDraw, ImageOps
 import adafruit_rgb_display.st7735 as st7735
 
+"""
+Information for the display that we are using can be found here: https://www.adafruit.com/product/358#description
+
+Pin Connections:
+    Jetson Nano              LCD Display
+        Pin 6  (GND)            Pin 1  (GND)
+        Pin 1  (3.3V)           Pin 2  (VCC)
+        Pin 18                  Pin 3  (Reset)
+        Pin 22                  Pin 4  (D/C) 
+        N/C                     Pin 5  (CARD_CS)
+        Pin 24 (CS)             Pin 6  (TFT_CS)
+        Pin 19 (MOSI)           Pin 7  (MOSI)
+        Pin 23 (SCK)            Pin 8  (SCK)
+        N/C                     Pin 9  (MISO)
+        Pin 1  (3.3V)           Pin 10 (LITE)
+"""
+
 # Configuration for CS and DC pins (these are PiTFT defaults):
 CS_PIN = digitalio.DigitalInOut(board.CE0)  # Pin 24
 DC_PIN = digitalio.DigitalInOut(board.D25)  # Pin 22
