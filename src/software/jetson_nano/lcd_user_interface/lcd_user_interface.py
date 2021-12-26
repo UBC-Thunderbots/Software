@@ -4,9 +4,9 @@ from PIL import Image, ImageDraw, ImageOps
 import adafruit_rgb_display.st7735 as st7735
 
 # Configuration for CS and DC pins (these are PiTFT defaults):
-CS_PIN = digitalio.DigitalInOut(board.CE0)      # Pin 24
-DC_PIN = digitalio.DigitalInOut(board.D25)      # Pin 22
-RESET_PIN = digitalio.DigitalInOut(board.D24)   # Pin 18
+CS_PIN = digitalio.DigitalInOut(board.CE0)  # Pin 24
+DC_PIN = digitalio.DigitalInOut(board.D25)  # Pin 22
+RESET_PIN = digitalio.DigitalInOut(board.D24)  # Pin 18
 
 # Config for display baudrate (default max is 24mhz):
 BAUDRATE = 24000000
@@ -17,23 +17,32 @@ ROTATION = 90
 SPI = board.SPI()
 
 # We will use RGB colour model
-COLOUR_MODEL = 'RGB'
+COLOUR_MODEL = "RGB"
+
 
 class lcd_display:
     def __init__(self):
         """ Create a lcd_dislpay object """
         # Create the display for 1.8" ST7735R:
-        self.disp = st7735.ST7735R(SPI, rotation=ROTATION, cs=CS_PIN, dc=DC_PIN, rst=RESET_PIN, baudrate=BAUDRATE)
-        
-        # We swap height/width to rotate it to landscape
+        self.disp = st7735.ST7735R(
+            SPI,
+            rotation=ROTATION,
+            cs=CS_PIN,
+            dc=DC_PIN,
+            rst=RESET_PIN,
+            baudrate=BAUDRATE,
+        )
+
+        # Set display dimensions.
+        # We swap height/width to rotate display to landscape
         self.width = self.disp.height
         self.height = self.disp.width
 
-        # Initalize to an empty black screen
+        # Initialize to an empty black screen
         self.clear_screen()
 
     def clear_screen(self):
-        """ Clear this LCD dislpay, make it black """
+        """ Clear this LCD display, make it black """
         # Create blank image for drawing.
         image = Image.new(COLOUR_MODEL, (self.width, self.height))
 
@@ -49,7 +58,7 @@ class lcd_display:
         self.clear_screen()
 
         image = Image.open("./imgs/tbots.jpg")
-        image = ImageOps.invert(image)  # Image has inverted color
+        image = ImageOps.invert(image)  # Image has inverted colour
 
         # Scale the image to the smaller screen dimension
         image_ratio = image.width / image.height
@@ -57,7 +66,7 @@ class lcd_display:
         if screen_ratio < image_ratio:
             scaled_width = image.width * self.height // image.height
             scaled_height = self.height
-        else:   
+        else:
             scaled_width = self.width
             scaled_height = image.height * self.width // image.width
         image = image.resize((scaled_width, scaled_height), Image.BICUBIC)

@@ -96,6 +96,6 @@ py_binary(
         requirement("Adafruit-PlatformDetect"),
         requirement("Adafruit-PureIO"),
         requirement("Jetson.GPIO"),
-        requirement("Pillow")
+        requirement("Pillow"),
     ],
 )
