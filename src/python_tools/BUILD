@@ -79,23 +79,3 @@ py_binary(
     srcs = ["robot_broadcast_sender.py"],
     deps = ["//proto:announcement_py_proto"],
 )
-
-py_binary(
-    name = "rotary_encoder",
-    srcs = ["../src/software/jetson_nano/rotary_encoder/rotary_encoder.py"],
-    deps = [requirement("Jetson.GPIO")],
-)
-
-py_binary(
-    name = "lcd_user_interface",
-    srcs = ["../src/software/jetson_nano/lcd_user_inteface/lcd_user_inteface.py"],
-    deps = [
-        requirement("Adafruit-Blinka"),
-        requirement("adafruit-circuitpython-busdevice"),
-        requirement("adafruit-circuitpython-rgb-display"),
-        requirement("Adafruit-PlatformDetect"),
-        requirement("Adafruit-PureIO"),
-        requirement("Jetson.GPIO"),
-        requirement("Pillow"),
-    ],
-)

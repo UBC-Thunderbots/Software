@@ -25,8 +25,8 @@ CS_PIN = digitalio.DigitalInOut(board.CE0)  # Pin 24
 DC_PIN = digitalio.DigitalInOut(board.D25)  # Pin 22
 RESET_PIN = digitalio.DigitalInOut(board.D24)  # Pin 18
 
-# Config for display baudrate (default max is 24mhz):
-BAUDRATE = 24000000
+# Config for display baudrate to 4MHz:
+BAUDRATE = 4000000
 # Config the proper screen rotation
 ROTATION = 90
 
@@ -37,7 +37,7 @@ SPI = board.SPI()
 COLOUR_MODEL = "RGB"
 
 
-class lcd_display:
+class LcdDisplay:
     def __init__(self):
         """ Create a lcd_dislpay object """
         # Create the display for 1.8" ST7735R:
@@ -70,11 +70,11 @@ class lcd_display:
         draw.rectangle((0, 0, self.width, self.height), outline=0, fill=(0, 0, 0))
         self.disp.image(image)
 
-    def draw_logo(self):
+    def draw_image(self, path_to_image):
         """ Draw Thunderbots Logo on this LCD display """
         self.clear_screen()
 
-        image = Image.open("./imgs/tbots.jpg")
+        image = Image.open(path_to_image)
         image = ImageOps.invert(image)  # Image has inverted colour
 
         # Scale the image to the smaller screen dimension
@@ -95,3 +95,10 @@ class lcd_display:
 
         # Display image
         self.disp.image(image)
+
+
+if __name__ == "__main__":
+    path_to_logo = "./imgs/tbots.jpg"
+
+    display = LcdDisplay()
+    display.draw_image(path_to_logo)

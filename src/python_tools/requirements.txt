@@ -8,10 +8,3 @@ ipywidgets==7.6.2
 jupytext==1.11.2
 tftpy==0.8.1
 pandas==1.3.4
-Adafruit-Blinka==6.15.0
-adafruit-circuitpython-busdevice==5.1.1
-adafruit-circuitpython-rgb-display==3.10.9
-Adafruit-PlatformDetect==3.18.0
-Adafruit-PureIO==1.1.9
-Jetson.GPIO==2.0.17
-Pillow==8.4.0
