@@ -15,7 +15,7 @@ class ShootOrPassPlayTest : public SimulatedPlayTestFixture
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
+TEST_F(ShootOrPassPlayTest, DISABLED_test_shoot_or_pass_play)
 {
     BallState ball_state(Point(-4.4, 2.9), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({
@@ -60,10 +60,10 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play_with_keep_away)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({
         field.friendlyGoalCenter(),
         Point(-4.5, 3.0),
-        Point(-2, 1.7),
-        Point(-2, 0.5),
-        Point(-2, -1.7),
-        Point(-2, -1.5),
+        Point(-4.4, 3.0),
+        Point(-4.3, 3.0),
+        Point(-4.2, 3),
+        Point(-4.1, 3),
     });
     setFriendlyGoalie(0);
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(

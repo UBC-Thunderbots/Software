@@ -227,7 +227,7 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
 
     double old_assignment              = 0;
     unsigned int new_tactics           = 0;
-    bool recalculate_tactic_assignment = false;
+    bool recalculate_tactic_assignment = true;
     for (auto tactic_vector : tactics)
     {
         for (auto tactic : tactic_vector)

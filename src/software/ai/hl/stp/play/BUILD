@@ -44,6 +44,30 @@ cc_library(
 )
 
 cc_library(
+    name = "broken_play",
+    srcs = ["broken_play.cpp"],
+    hdrs = ["broken_play.h"],
+    deps = [
+        ":play",
+        "//shared:constants",
+        "//shared/parameter:cpp_configs",
+        "//software/ai/evaluation:enemy_threat",
+        "//software/ai/evaluation:possession",
+        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
+        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
+        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
+        "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
+        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/logger",
+        "//software/util/generic_factory",
+        "//software/world:game_state",
+        "//software/world:team",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
     name = "defense_play",
     srcs = ["defense_play.cpp"],
     hdrs = ["defense_play.h"],
@@ -418,6 +442,22 @@ cc_test(
     deps = [
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:defense_play",
+        "//software/simulated_tests:simulated_play_test_fixture",
+        "//software/simulated_tests/non_terminating_validation_functions",
+        "//software/simulated_tests/terminating_validation_functions",
+        "//software/simulated_tests/validation:validation_function",
+        "//software/test_util",
+        "//software/time:duration",
+        "//software/world",
+    ],
+)
+
+cc_test(
+    name = "broken_play_test",
+    srcs = ["broken_play_test.cpp"],
+    deps = [
+        "//shared/test_util:tbots_gtest_main",
+        "//software/ai/hl/stp/play:broken_play",
         "//software/simulated_tests:simulated_play_test_fixture",
         "//software/simulated_tests/non_terminating_validation_functions",
         "//software/simulated_tests/terminating_validation_functions",
