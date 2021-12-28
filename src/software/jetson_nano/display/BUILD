@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@python_tools_deps//:requirements.bzl", "requirement")
+load("@display_deps//:requirements.bzl", "requirement")
 
 py_binary(
     name = "rotary_encoder",
@@ -10,7 +10,7 @@ py_binary(
 
 py_binary(
     name = "lcd_user_interface",
-    srcs = ["lcd_user_inteface/lcd_user_inteface.py"],
+    srcs = ["lcd_user_interface/lcd_user_interface.py"],
     deps = [
         requirement("Adafruit-Blinka"),
         requirement("adafruit-circuitpython-busdevice"),
