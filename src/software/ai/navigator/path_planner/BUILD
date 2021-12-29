@@ -56,6 +56,17 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "global_path_planner",
+    srcs = ["global_path_planner.cpp"],
+    hdrs = ["global_path_planner.h"],
+    deps = [
+        ":path_planner",
+        "//extlibs/enlsvg:enlsvg",
+        "//software/world:world",
+    ],
+)
+
 cc_test(
     name = "theta_star_path_planner_test",
     srcs = ["theta_star_path_planner_test.cpp"],

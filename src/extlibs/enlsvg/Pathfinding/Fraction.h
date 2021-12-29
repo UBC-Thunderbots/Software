@@ -8,27 +8,27 @@ using namespace std;
 namespace Pathfinding {
 
 struct Fraction {
-    int n, d;
+    long n, d;
 
     inline Fraction() {}
         
-    inline Fraction(int n, int d) {
+    inline Fraction(long n, long d) {
         init(n, d);
     }
 
-    inline Fraction(int n): n(n), d(1) {}
+    inline Fraction(long n): n(n), d(1) {}
 
-    inline void init(int n) {
+    inline void init(long n) {
         this->n = n;
         this->d = 1;
     }
 
-    inline void init(int n, int d) {
+    inline void init(long n, long d) {
         /*if (d == 0) {
             cout << "\nERROR: Zero denominator: " << n << + "/" << d << "\n";
             return;
         }*/
-        const int g = gcd(n,d);
+        const long g = gcd(n,d);
         // Denominators are strictly positive.
         if (d/g > 0) {
             this->n = n/g;
@@ -40,7 +40,7 @@ struct Fraction {
     }
 
     inline float toFloat() const {
-        return float(n)/d;
+        return float(n)/float(d);
     }
 
     inline string toString() const {
@@ -51,21 +51,21 @@ struct Fraction {
         return a.str();
     }
 
-    inline static int gcd(int a, int b) {
+    inline static long gcd(long a, long b) {
         return a == 0 ? b : gcd(b%a, a);
     }
 
     /**
      * @return largest integer leq to this.
      */
-    inline int floor() const {
+    inline long floor() const {
         return n > 0 ? n/d : (n+1)/d - 1;
     }
     
     /**
      * @return smallest integer geq to this.
      */
-    inline int ceil() const {
+    inline long ceil() const {
         return n > 0 ? (n-1)/d + 1 : n/d;
     }
 
@@ -115,7 +115,7 @@ struct Fraction {
         return !(*this < o);
     }
 
-    inline Fraction multiplyDivide(int multiply, int divide) const {
+    inline Fraction multiplyDivide(long multiply, long divide) const {
         return Fraction((long)n*multiply, (long)d*divide);
     }
     
@@ -145,14 +145,14 @@ Fraction operator*(const Fraction& o, const Fraction& o2);
 Fraction operator/(const Fraction& o, const Fraction& o2);
 Fraction operator+(const Fraction& o, const Fraction& o2);
 Fraction operator-(const Fraction& o, const Fraction& o2);
-Fraction operator*(const Fraction& o, int o2);
-Fraction operator/(const Fraction& o, int o2);
-Fraction operator+(const Fraction& o, int o2);
-Fraction operator-(const Fraction& o, int o2);
-Fraction operator*(int o, const Fraction& o2);
-Fraction operator/(int o, const Fraction& o2);
-Fraction operator+(int o, const Fraction& o2);
-Fraction operator-(int o, const Fraction& o2);
+Fraction operator*(const Fraction& o, long o2);
+Fraction operator/(const Fraction& o, long o2);
+Fraction operator+(const Fraction& o, long o2);
+Fraction operator-(const Fraction& o, long o2);
+Fraction operator*(long o, const Fraction& o2);
+Fraction operator/(long o, const Fraction& o2);
+Fraction operator+(long o, const Fraction& o2);
+Fraction operator-(long o, const Fraction& o2);
 ostream& operator<< (ostream& stream, Fraction& obj);
 
 Fraction parseFraction(string s);
