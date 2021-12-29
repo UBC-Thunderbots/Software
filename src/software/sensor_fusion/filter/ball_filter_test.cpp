@@ -11,6 +11,12 @@
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
 #include "software/world/field.h"
+#include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/validation/validation_function.h"
+#include "software/test_util/test_util.h"
+#include "software/time/duration.h"
+#include "software/world/game_state.h"
+#include "software/world/world.h"
 
 class BallFilterTest : public ::testing::Test
 {
@@ -545,4 +551,29 @@ TEST_F(BallFilterTest, ball_moving_along_y_axis)
         time_step_variance, expected_position_tolerance,
         expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance,
         num_steps_to_ignore);
+}
+class BallOcclusionTest : public SimulatedPlayTestFixture
+{
+    protected: 
+        Field fleld = Field::createSSLDivisionBField(); 
+};
+
+TEST_F(BallOcclusionTest, ball_vertical_travel_occlusion)
+{
+    /* ball travels from right bottom corner to right top corner */
+    BallState ball_state(Point(-4.5, 3), Vector(1, 0));
+    auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
+        {
+            Point(-4, 2.8), Point(-2.5, 2.8), Point(-1, 2.8), Point(0.5, 2.8), 
+            Point(2, 2.8), Point(3.5, 2.8)
+        }
+    );
+    setFriendlyGoalie(0);
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId();
+    setEnemyGoalie(0);
+    setAIPlay(TYPENAME(HaltPlay));
+    setRefereeCommand(RefereeCommand::HALT, RefereeCommand::HALT);
+    std::vector<ValidationFunction> terminating_validating_function = {};
+    std::vector<ValidationFunction> non_terminating_validating_function = {};
+    runTest(field, ball_state, friendly_robots, enemy_robots, terminating_validating_function, non_terminating_validating_function, Duration::fromSeconds(0));
 }
