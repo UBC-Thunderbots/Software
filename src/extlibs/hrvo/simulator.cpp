@@ -135,15 +135,16 @@ void Simulator::doStep(float time_step)
     {
         throw std::runtime_error("Invalid time step used for the HRVO simulator.");
     }
-    timeStep_ = time_step;
+    timeStep_     = time_step;
     reachedGoals_ = true;
 
-    // Maybe should call update using the new timeStep so the robots are at the most up to date position,
-    // and then compute the next velocities
+    // Maybe should call update using the new timeStep so the robots are at the most up to
+    // date position, and then compute the next velocities
 
-    // Update robots position s given previous velocities and the time step since last frame
-    // NOTE: Vel at first iteration will always be zero. Do we want to skip update if globalTime == 0?
-    for (auto & agent : agents_)
+    // Update robots position s given previous velocities and the time step since last
+    // frame NOTE: Vel at first iteration will always be zero. Do we want to skip update
+    // if globalTime == 0?
+    for (auto &agent : agents_)
     {
         agent->update();
     }
@@ -154,13 +155,12 @@ void Simulator::doStep(float time_step)
     // Find next robots velocities
     // NOTE: We do not update the robot positions here as we do not know how long the
     //       next time step will be.
-    for (auto & agent : agents_)
+    for (auto &agent : agents_)
     {
         agent->computePreferredVelocity();
         agent->computeNeighbors();
         agent->computeNewVelocity();
     }
-
 }
 
 std::size_t Simulator::getAgentGoal(std::size_t agentNo) const

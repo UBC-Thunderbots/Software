@@ -6,11 +6,11 @@
 #include "extlibs/hrvo/simulator.h"
 #include "shared/test_util/tbots_gtest_main.h"
 
-const int SIMULATOR_FRAME_RATE = 30;
+const int SIMULATOR_FRAME_RATE  = 30;
 const float SIMULATOR_TIME_STEP = 1.f / SIMULATOR_FRAME_RATE;
-const float HRVO_TWO_PI        = 6.283185307179586f;
-const float ROBOT_RADIUS       = 0.09f;
-const float RADIUS_SCALE       = 1.0f;
+const float HRVO_TWO_PI         = 6.283185307179586f;
+const float ROBOT_RADIUS        = 0.09f;
+const float RADIUS_SCALE        = 1.0f;
 
 class HRVOTest : public ::testing::Test
 {

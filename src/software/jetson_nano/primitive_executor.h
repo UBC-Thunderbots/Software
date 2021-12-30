@@ -1,8 +1,8 @@
 #pragma once
+#include "extlibs/hrvo/simulator.h"
 #include "proto/primitive.pb.h"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
-#include "extlibs/hrvo/simulator.h"
 
 class PrimitiveExecutor
 {
