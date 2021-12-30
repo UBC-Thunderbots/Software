@@ -32,15 +32,6 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> ErForceSimulatorRobot::getRobo
         *direct_control, robot_constants.front_wheel_angle_deg,
         robot_constants.back_wheel_angle_deg, wheel_constants.wheel_radius_meters);
 
-    // If there are robots on the field that don't have a primitive, the wheel control
-    // will be empty. In this case we return a blank RobotMoveCommand so that robots don't
-    // move.
-    if (direct_control->wheel_control_case() ==
-        TbotsProto::DirectControlPrimitive::WHEEL_CONTROL_NOT_SET)
-    {
-        move_command = std::make_unique<SSLSimulationProto::RobotMoveCommand>();
-    }
-
     switch (direct_control->chick_command_case())
     {
         case TbotsProto::DirectControlPrimitive::kKickSpeedMPerS:

@@ -19,11 +19,18 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(
     const float LOCAL_EPSILON = 1e-6f;  // Avoid dividing by zero
 
     // Unpack current move primitive
+<<<<<<< HEAD
     const float dest_linear_speed = current_primitive_.move().final_speed_m_per_s();
     const float max_speed_m_per_s = current_primitive_.move().max_speed_m_per_s();
     const Point final_position =
         Point(current_primitive_.move().destination().x_meters(),
               current_primitive_.move().destination().y_meters());
+=======
+    const float dest_linear_speed = move_primitive.final_speed_m_per_s();
+    const float max_speed_m_per_s = move_primitive.max_speed_m_per_s();
+    const Point final_position    = Point(move_primitive.destination().x_meters(),
+                                       move_primitive.destination().y_meters());
+>>>>>>> e21f4b4f16e0a6bd5875443c3d3b4c1e3ed20b2d
     std::clamp(max_speed_m_per_s, 0.0f, robot_constants_.robot_max_speed_m_per_s);
 
     const float max_target_linear_speed = fmaxf(max_speed_m_per_s, dest_linear_speed);
@@ -67,7 +74,11 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
 {
     const float LOCAL_EPSILON = 1e-6f;  // Avoid dividing by zero
 
+<<<<<<< HEAD
     const float dest_orientation = current_primitive_.move().final_angle().radians();
+=======
+    const float dest_orientation = move_primitive.final_angle().radians();
+>>>>>>> e21f4b4f16e0a6bd5875443c3d3b4c1e3ed20b2d
     const float delta_orientation =
         dest_orientation - static_cast<float>(robot_state.orientation().toRadians());
     const float max_target_angular_speed = robot_constants_.robot_max_ang_speed_rad_per_s;

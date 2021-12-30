@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
-#include "software/ai/passing/pass_generator.h"
+#include "software/ai/passing/pass_generator.hpp"
 
 /**
  * Play that tries to find a shot on net, passes if it couldn't.

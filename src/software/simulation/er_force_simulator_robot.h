@@ -95,8 +95,6 @@ class ErForceSimulatorRobot
 
     /**
      * Runs the current primitive
-     *
-     * @param world The world to run the primitive in
      */
     void runCurrentPrimitive();
 
