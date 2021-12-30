@@ -320,6 +320,13 @@ class GameState
     bool isTheirBallPlacement() const;
 
     /**
+     * Returns the play state
+     *
+     * @return play state
+     */
+    PlayState getPlayState(void) const;
+
+    /**
      * Returns true if robots should be setting up for a restart e.g.
      * if a free kick is going to occur.
      *
@@ -397,6 +404,13 @@ class GameState
      * otherwise std::nullopt
      */
     std::optional<Point> getBallPlacementPoint(void) const;
+
+    /**
+     * Returns the ball state
+     *
+     * @return the ball state if one is specified, otherwise std::nullopt
+     */
+    std::optional<Ball> getBallState(void) const;
 
     /**
      * Sets the point on the field where the ball should be placed.

@@ -108,6 +108,11 @@ bool GameState::isTheirBallPlacement() const
     return isBallPlacement() && !our_restart_;
 }
 
+GameState::PlayState GameState::getPlayState(void) const
+{
+    return play_state_;
+}
+
 // Robots must be in position for a restart
 bool GameState::isSetupRestart() const
 {
@@ -155,6 +160,11 @@ void GameState::setBallPlacementPoint(Point placement_point)
 std::optional<Point> GameState::getBallPlacementPoint() const
 {
     return ball_placement_point_;
+}
+
+std::optional<Ball> GameState::getBallState(void) const
+{
+    return ball_state_;
 }
 
 // apologies for this monster switch statement

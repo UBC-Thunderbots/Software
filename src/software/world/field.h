@@ -117,6 +117,15 @@ class Field
     double goalXLength() const;
 
     /**
+     * Gets the the x-coordinate distance from the goal centre to the penalty mark, in
+     * metres.
+     *
+     * @return the x-coordinate distance from the goal centre to the penalty mark, in
+     * metres.
+     */
+    double goalCenterToPenaltyMark() const;
+
+    /**
      * Gets the radius of the centre circle in metres.
      *
      * @return the radius of the centre circle in metres.

@@ -27,6 +27,81 @@ std::unique_ptr<TbotsProto::Vision> createVision(const World& world)
     return vision_msg;
 }
 
+std::unique_ptr<TbotsProto::World> createWorld(const World& world)
+{
+    // create msg
+    auto world_msg                        = std::make_unique<TbotsProto::World>();
+    *(world_msg->mutable_time_set())      = *createCurrentTimestamp();
+    *(world_msg->mutable_field())         = *createField(world.field());
+    *(world_msg->mutable_friendly_team()) = *createTeam(world.friendlyTeam());
+    *(world_msg->mutable_enemy_team())    = *createTeam(world.enemyTeam());
+    *(world_msg->mutable_ball())          = *createBall(world.ball());
+    *(world_msg->mutable_game_state())    = *createGameState(world.gameState());
+
+    return world_msg;
+}
+
+std::unique_ptr<TbotsProto::Team> createTeam(const Team& team)
+{
+    // create msg
+    auto team_msg      = std::make_unique<TbotsProto::Team>();
+    const auto& robots = team.getAllRobots();
+
+    std::for_each(robots.begin(), robots.end(), [&](const Robot& robot) {
+        *(team_msg->add_robots()) = *createRobot(robot);
+    });
+
+    team_msg->set_goalie_id(team.getGoalieId());
+
+    return team_msg;
+}
+
+std::unique_ptr<TbotsProto::Robot> createRobot(const Robot& robot)
+{
+    // create msg
+    auto robot_msg = std::make_unique<TbotsProto::Robot>();
+    robot_msg->set_id(robot.id());
+    *(robot_msg->mutable_allocated_current_state()) = *createRobotState(robot);
+
+    return robot_msg;
+}
+
+std::unique_ptr<TbotsProto::Ball> createBall(const Ball& ball)
+{
+    // create msg
+    auto ball_msg                        = std::make_unique<TbotsProto::Ball>();
+    *(ball_msg->mutable_current_state()) = *createBallState(ball);
+    *(ball_msg->mutable_acceleration())  = *createVectorProto(ball.acceleration());
+
+    return ball_msg;
+}
+
+std::unique_ptr<TbotsProto::Field> createField(const Field& field)
+{
+    // create msg
+    auto field_msg = std::make_unique<TbotsProto::Field>();
+
+    field_msg->set_field_x_length(field.xLength());  // Doubles... probably fine.
+    field_msg->set_field_y_length(field.yLength());
+    field_msg->set_defense_x_length(field.defenseAreaXLength());
+    field_msg->set_defense_y_length(field.defenseAreaYLength());
+    field_msg->set_goal_x_length(field.goalXLength());
+    field_msg->set_goal_y_length(field.goalYLength());
+    field_msg->set_boundary_buffer_size(field.boundaryMargin());
+    field_msg->set_center_circle_radius(field.centerCircleRadius());
+    field_msg->set_goal_centre_to_penalty_mark(field.goalCenterToPenaltyMark);
+
+    *(field_msg->mutable_enemy_defense_area()) =
+        *createPolygonProto(field.enemyDefenseArea());
+    *(field_msg->mutable_friendly_defense_area()) =
+        *createPolygonProto(field.friendlyDefenseArea());
+    *(field_msg->mutable_field_lines())   = *createPolygonProto(field.fieldLines());
+    *(field_msg->mutable_enemy_goal())    = *createPolygonProto(field.enemyGoal());
+    *(field_msg->mutable_friendly_goal()) = *createPolygonProto(field.friendlyGoal());
+
+    return field_msg;
+}
+
 std::unique_ptr<TbotsProto::RobotState> createRobotState(const Robot& robot)
 {
     auto position         = createPointProto(robot.position());
@@ -42,6 +117,154 @@ std::unique_ptr<TbotsProto::RobotState> createRobotState(const Robot& robot)
     *(robot_state_msg->mutable_global_angular_velocity()) = *angular_velocity;
 
     return robot_state_msg;
+}
+
+std::unique_ptr<TbotsProto::GameState> createGameState(const GameState& game_state)
+{
+    auto game_state_msg = std::make_unique<TbotsProto::GameState>();
+
+    switch (game_state.getPlayState())
+    {
+        case GameState::HALT:
+            game_state_msg->set_play_state(
+                TbotsProto::GameState::PlayState::PLAY_STATE_HALT);
+            break;
+        case GameState::STOP:
+            game_state_msg->set_play_state(
+                TbotsProto::GameState::PlayState::PLAY_STATE_STOP);
+            break;
+        case GameState::SETUP:
+            game_state_msg->set_play_state(
+                TbotsProto::GameState::PlayState::PLAY_STATE_SETUP);
+            break;
+        case GameState::READY:
+            game_state_msg->set_play_state(
+                TbotsProto::GameState::PlayState::PLAY_STATE_READY);
+            break;
+        case GameState::PLAYING:
+            game_state_msg->set_play_state(
+                TbotsProto::GameState::PlayState::PLAY_STATE_PLAYING);
+            break;
+    }
+
+    switch (game_state.getRestartReason())
+    {
+        case GameState::NONE:
+            game_state_msg->set_restart_reason(
+                TbotsProto::GameState::RestartReason::RESTART_REASON_NONE);
+            break;
+        case GameState::KICKOFF:
+            game_state_msg->set_restart_reason(
+                TbotsProto::GameState::RestartReason::RESTART_REASON_KICKOFF);
+            break;
+        case GameState::DIRECT:
+            game_state_msg->set_restart_reason(
+                TbotsProto::GameState::RestartReason::RESTART_REASON_DIRECT);
+            break;
+        case GameState::INDIRECT:
+            game_state_msg->set_restart_reason(
+                TbotsProto::GameState::RestartReason::RESTART_REASON_INDIRECT);
+            break;
+        case GameState::PENALTY:
+            game_state_msg->set_restart_reason(
+                TbotsProto::GameState::RestartReason::RESTART_REASON_PENALTY);
+            break;
+        case GameState::BALL_PLACEMENT:
+            game_state_msg->set_restart_reason(
+                TbotsProto::GameState::RestartReason::RESTART_REASON_BALL_PLACEMENT);
+            break;
+    }
+
+    switch (game_state.getRefereeCommand())
+    {
+        case RefereeCommand::HALT:
+            game_state_msg->set_command(
+                TbotsProto::GameState::RefereeCommand::REFEREE_COMMAND_HALT);
+            break;
+        case RefereeCommand::STOP:
+            game_state_msg->set_command(
+                TbotsProto::GameState::RefereeCommand::REFEREE_COMMAND_STOP);
+            break;
+        case RefereeCommand::NORMAL_START:
+            game_state_msg->set_command(
+                TbotsProto::GameState::RefereeCommand::REFEREE_COMMAND_NORMAL_START);
+            break;
+        case RefereeCommand::FORCE_START:
+            game_state_msg->set_command(
+                TbotsProto::GameState::RefereeCommand::REFEREE_COMMAND_FORCE_START);
+            break;
+        case RefereeCommand::PREPARE_KICKOFF_US:
+            game_state_msg->set_command(TbotsProto::GameState::RefereeCommand::
+                                            REFEREE_COMMAND_PREPARE_KICKOFF_US);
+            break;
+        case RefereeCommand::PREPARE_KICKOFF_THEM:
+            game_state_msg->set_command(TbotsProto::GameState::RefereeCommand::
+                                            REFEREE_COMMAND_PREPARE_KICKOFF_THEM);
+            break;
+        case RefereeCommand::PREPARE_PENALTY_US:
+            game_state_msg->set_command(TbotsProto::GameState::RefereeCommand::
+                                            REFEREE_COMMAND_PREPARE_PENALTY_US);
+            break;
+        case RefereeCommand::PREPARE_PENALTY_THEM:
+            game_state_msg->set_command(TbotsProto::GameState::RefereeCommand::
+                                            REFEREE_COMMAND_PREPARE_PENALTY_THEM);
+            break;
+        case RefereeCommand::DIRECT_FREE_US:
+            game_state_msg->set_command(
+                TbotsProto::GameState::RefereeCommand::REFEREE_COMMAND_DIRECT_FREE_US);
+            break;
+        case RefereeCommand::DIRECT_FREE_THEM:
+            game_state_msg->set_command(
+                TbotsProto::GameState::RefereeCommand::REFEREE_COMMAND_DIRECT_FREE_THEM);
+            break;
+        case RefereeCommand::INDIRECT_FREE_US:
+            game_state_msg->set_command(
+                TbotsProto::GameState::RefereeCommand::REFEREE_COMMAND_INDIRECT_FREE_US);
+            break;
+        case RefereeCommand::INDIRECT_FREE_THEM:
+            game_state_msg->set_command(TbotsProto::GameState::RefereeCommand::
+                                            REFEREE_COMMAND_INDIRECT_FREE_THEM);
+            break;
+        case RefereeCommand::TIMEOUT_US:
+            game_state_msg->set_command(
+                TbotsProto::GameState::RefereeCommand::REFEREE_COMMAND_TIMEOUT_US);
+            break;
+        case RefereeCommand::TIMEOUT_THEM:
+            game_state_msg->set_command(
+                TbotsProto::GameState::RefereeCommand::REFEREE_COMMAND_TIMEOUT_THEM);
+            break;
+        case RefereeCommand::GOAL_US:
+            game_state_msg->set_command(
+                TbotsProto::GameState::RefereeCommand::REFEREE_COMMAND_GOAL_US);
+            break;
+        case RefereeCommand::GOAL_THEM:
+            game_state_msg->set_command(
+                TbotsProto::GameState::RefereeCommand::REFEREE_COMMAND_GOAL_THEM);
+            break;
+        case RefereeCommand::BALL_PLACEMENT_US:
+            game_state_msg->set_command(
+                TbotsProto::GameState::RefereeCommand::REFEREE_COMMAND_BALL_PLACEMENT_US);
+            break;
+        case RefereeCommand::BALL_PLACEMENT_THEM:
+            game_state_msg->set_command(TbotsProto::GameState::RefereeCommand::
+                                            REFEREE_COMMAND_BALL_PLACEMENT_THEM);
+            break;
+    }
+
+    auto ball_state = game_state.getBallState();
+    if (ball_state.has_value())
+    {
+        *(game_state_msg->mutable_ball_state()) = *createBallState(ball_state.value());
+    }
+
+    auto ball_placement_point = game_state.getBallPlacementPoint();
+    if (ball_placement_point.has_value())
+    {
+        *(game_state_msg->mutable_ball_placement_point()) =
+            *createPointProto(ball_placement_point.value());
+    }
+
+    return game_state_msg;
 }
 
 std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball)

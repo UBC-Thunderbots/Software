@@ -5,60 +5,61 @@ package TbotsProto;
 import "proto/game_state.proto";
 import "proto/vision.proto";
 import "proto/geometry.proto";
+import "proto/tbots_timestamp_msg.proto";
 
 message Field
 {
-    double field_x_length = 1;
-    double field_y_length = 2;
-    double defense_x_length = 3;
-    double defense_y_length = 4;
-    double goal_x_length = 5;
-    double goal_y_length = 6;
-    double boundary_buffer_size = 7;
-    double center_circle_radius = 8;
+    double field_x_length              = 1;
+    double field_y_length              = 2;
+    double defense_x_length            = 3;
+    double defense_y_length            = 4;
+    double goal_x_length               = 5;
+    double goal_y_length               = 6;
+    double boundary_buffer_size        = 7;
+    double center_circle_radius        = 8;
     double goal_centre_to_penalty_mark = 9;
-    Polygon enemy_defense_area = 10;
-    Polygon friendly_defense_area = 11;
-    Polygon field_lines = 12;
-    Polygon enemy_goal = 13;
-    Polygon friendly_goal = 14;
+    Polygon enemy_defense_area         = 10;
+    Polygon friendly_defense_area      = 11;
+    Polygon field_lines                = 12;
+    Polygon enemy_goal                 = 13;
+    Polygon friendly_goal              = 14;
 }
 
 message Ball
 {
-    BallState current_state_ = 1;
-    Vector acceleration_ = 2;
-    //    Timestamp timestamp_;
+    BallState current_state = 1;
+    Vector acceleration_    = 2;
+    //    Timestamp timestamp = 3;
 }
 
 message Robot
 {
-    uint32 id = 1;
+    uint32 id                = 1;
     RobotState current_state = 2;
-//    Timestamp timestamp_;
-//    // The hardware capabilities of the robot, generated from
-//    // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
-//    std::set<RobotCapability> unavailable_capabilities_;
-//    RobotConstants_t robot_constants_;
+    //    Timestamp timestamp = 3;
+    //    // The hardware capabilities of the robot, generated from
+    //    // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
+    //    std::set<RobotCapability> unavailable_capabilities_;
+    //    RobotConstants_t robot_constants_;
 }
 
 message Team
 {
     repeated Robot team_robots = 1;
-    RobotState robot_state = 2;
-    optional uint32 goalie_id = 3; // Does optional exist in proto3?
-//    // The duration for which a Robot must not have been updated for before
-//    // being removed from this team.
-//    Duration robot_expiry_buffer_duration;
-//    Timestamp last_update_timestamp;
+    uint32 goalie_id           = 2;  // optional in Team
+    //    // The duration for which a Robot must not have been updated for before
+    //    // being removed from this team.
+    //    Duration robot_expiry_buffer_duration;
+    //    Timestamp last_update_timestamp = 4;
 }
 
 message World
 {
-    Field field = 1;
-    Team friendly_team = 2;
-    Team enemy_team = 3;
-    Ball ball = 4;
-    GameState game_state = 5;
-    //RefereeState referee_state = 6;
+    Timestamp time_sent  = 1;
+    Field field          = 2;
+    Team friendly_team   = 3;
+    Team enemy_team      = 4;
+    Ball ball            = 5;
+    GameState game_state = 6;
+    // RefereeState referee_state = 7;
 }

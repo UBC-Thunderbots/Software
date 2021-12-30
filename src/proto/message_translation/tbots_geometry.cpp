@@ -31,3 +31,15 @@ std::unique_ptr<TbotsProto::Vector> createVectorProto(const Vector& vector)
     vector_msg->set_y_component_meters(static_cast<float>(vector.y()));
     return vector_msg;
 }
+
+std::unique_ptr<TbotsProto::Polygon> createPolygonProto(const Polygon& polygon)
+{
+    auto polygon_msg   = std::make_unique<TbotsProto::Polygon>();
+    const auto& points = polygon.getPoints();
+
+    std::for_each(points.begin(), points.end(), [&](const Point& point) {
+        *(polygon_msg->add_points()) = *createPointProto(point);
+    });
+
+    return polygon_msg;
+}

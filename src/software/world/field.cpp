@@ -85,6 +85,11 @@ double Field::goalXLength() const
     return goal_x_length_;
 }
 
+double Field::goalCenterToPenaltyMark() const
+{
+    return goal_centre_to_penalty_mark_;
+}
+
 double Field::defenseAreaYLength() const
 {
     return defense_y_length_;

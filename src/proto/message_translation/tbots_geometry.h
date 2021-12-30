@@ -17,3 +17,4 @@ std::unique_ptr<TbotsProto::Angle> createAngleProto(const Angle& angle);
 std::unique_ptr<TbotsProto::AngularVelocity> createAngularVelocityProto(
     const AngularVelocity& angular_velocity);
 std::unique_ptr<TbotsProto::Vector> createVectorProto(const Vector& vector);
+std::unique_ptr<TbotsProto::Polygon> createPolygonProto(const Polygon& polygon);
