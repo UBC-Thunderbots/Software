@@ -4,6 +4,7 @@
 #include "software/geom/angle.h"
 #include "software/geom/angular_velocity.h"
 #include "software/geom/point.h"
+#include "software/geom/polygon.h"
 
 /**
  * Internal geometry types to protobuf msg conversions

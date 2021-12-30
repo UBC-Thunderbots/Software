@@ -28,7 +28,7 @@ message Field
 message Ball
 {
     BallState current_state = 1;
-    Vector acceleration_    = 2;
+    Vector acceleration     = 2;
     //    Timestamp timestamp = 3;
 }
 

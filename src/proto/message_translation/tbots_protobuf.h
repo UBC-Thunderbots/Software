@@ -3,6 +3,7 @@
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/vision.pb.h"
+#include "proto/world.pb.h"
 #include "software/world/world.h"
 
 /**
