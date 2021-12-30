@@ -123,38 +123,44 @@ std::size_t Simulator::addGoalPositions(const std::vector<Vector2> &positions,
     return goals_.size() - 1;
 }
 
-void Simulator::doStep()
+void Simulator::doStep(float time_step)
 {
     if (kdTree_ == NULL)
     {
         throw std::runtime_error(
-            "Simulation not initialized when attempting to do step.");
+            "HRVO Simulation not initialized when attempting to do step.");
     }
 
-    if (timeStep_ == 0.0f)
+    if (timeStep_ <= 0.0f)
     {
-        throw std::runtime_error("Time step not set when attempting to do step.");
+        throw std::runtime_error("Invalid time step used for the HRVO simulator.");
     }
-
+    timeStep_ = time_step;
     reachedGoals_ = true;
+
+    // Maybe should call update using the new timeStep so the robots are at the most up to date position,
+    // and then compute the next velocities
+
+    // Update robots position s given previous velocities and the time step since last frame
+    // NOTE: Vel at first iteration will always be zero. Do we want to skip update if globalTime == 0?
+    for (auto & agent : agents_)
+    {
+        agent->update();
+    }
+    globalTime_ += timeStep_;
 
     kdTree_->build();
 
-    for (std::vector<Agent *>::iterator iter = agents_.begin(); iter != agents_.end();
-         ++iter)
+    // Find next robots velocities
+    // NOTE: We do not update the robot positions here as we do not know how long the
+    //       next time step will be.
+    for (auto & agent : agents_)
     {
-        (*iter)->computePreferredVelocity();
-        (*iter)->computeNeighbors();
-        (*iter)->computeNewVelocity();
+        agent->computePreferredVelocity();
+        agent->computeNeighbors();
+        agent->computeNewVelocity();
     }
 
-    for (std::vector<Agent *>::iterator iter = agents_.begin(); iter != agents_.end();
-         ++iter)
-    {
-        (*iter)->update();
-    }
-
-    globalTime_ += timeStep_;
 }
 
 std::size_t Simulator::getAgentGoal(std::size_t agentNo) const

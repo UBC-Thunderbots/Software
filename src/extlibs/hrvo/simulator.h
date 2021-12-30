@@ -96,7 +96,7 @@ class Simulator
      *  Performs a simulation step; updates the orientation, position, and velocity
      * of each agent, and the progress of each towards its goal.
      */
-    void doStep();
+    void doStep(float time_step);
 
     /**
      *      Returns the goal number of a specified agent.

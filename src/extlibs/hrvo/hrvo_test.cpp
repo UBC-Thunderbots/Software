@@ -170,7 +170,7 @@ class HRVOTest : public ::testing::Test
 
             frame++;
             prev_frame_time = time;
-            simulator.doStep();
+            simulator.doStep(SIMULATOR_TIME_STEP);
 
             auto finish_tick_time = std::chrono::high_resolution_clock::now();
             computation_time += finish_tick_time - start_tick_time;
