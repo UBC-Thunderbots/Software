@@ -2,6 +2,7 @@
 #include "proto/primitive.pb.h"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
+#include "extlibs/hrvo/simulator.h"
 
 class PrimitiveExecutor
 {
@@ -64,4 +65,5 @@ class PrimitiveExecutor
 
     TbotsProto::Primitive current_primitive_;
     RobotConstants_t robot_constants_;
+    Simulator hrvo_simulator_;
 };

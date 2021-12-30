@@ -556,9 +556,4 @@ void Agent::update()
         reachedGoal_              = false;
         simulator_->reachedGoals_ = false;
     }
-
-    if (!reachedGoal_)
-    {
-        orientation_ = atan(prefVelocity_);
-    }
 }
