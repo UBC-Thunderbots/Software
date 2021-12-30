@@ -31,3 +31,9 @@ message AngularVelocity
     // the angular velocity in radians
     float radians_per_second = 1;
 }
+
+message Polygon
+{
+    repeated Point points = 1;
+    // Add segments??
+}
