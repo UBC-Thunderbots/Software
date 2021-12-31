@@ -40,6 +40,7 @@ cc_test(
     srcs = ["ball_state_test.cpp"],
     deps = [
         ":ball_state",
+        "//proto/message_translation:tbots_protobuf",
         "//shared/test_util:tbots_gtest_main",
     ],
 )

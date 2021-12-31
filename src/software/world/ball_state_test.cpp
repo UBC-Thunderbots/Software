@@ -1,4 +1,5 @@
 #include "software/world/ball_state.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 #include <gtest/gtest.h>
 
@@ -54,6 +55,17 @@ TEST(BallStateTest, compare_states_with_different_distances_from_the_ground)
 {
     BallState ball_state_1(Point(1, -2.3), Vector(0, 0.4), 0.1);
     BallState ball_state_2(Point(1, -2.3), Vector(0, 0.4), 0.2);
+    EXPECT_FALSE(ball_state_1 == ball_state_2);
+    EXPECT_TRUE(ball_state_1 != ball_state_2);
+}
+
+TEST(BallStateTest, construct_with_protobuf)
+{
+    BallState ball_state_1(Point(1, -2.3), Vector(0, 0.4), 0.1);
+    Ball ball(ball_state_1, Timestamp());
+    std::unique_ptr<TbotsProto::BallState> ball_state_proto = createBallState(ball);
+    BallState ball_state_2(*ball_state_proto);
+
     EXPECT_FALSE(ball_state_1 == ball_state_2);
     EXPECT_TRUE(ball_state_1 != ball_state_2);
 }
