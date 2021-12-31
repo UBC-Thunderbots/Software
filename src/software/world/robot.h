@@ -2,6 +2,7 @@
 
 #include <optional>
 
+#include "proto/world.pb.h"
 #include "software/time/timestamp.h"
 #include "software/world/robot_capabilities.h"
 #include "software/world/robot_state.h"
@@ -46,6 +47,14 @@ class Robot
                    const Timestamp &timestamp,
                    const std::set<RobotCapability> &unavailable_capabilities =
                        std::set<RobotCapability>());
+
+    /**
+     * Creates a new robot based on the TbotsProto::Robot protobuf representation
+     *
+     * @param robot_proto The TbotsProto::Robot protobuf which this robot should be based
+     * on
+     */
+    explicit Robot(const TbotsProto::Robot &robot_proto);
 
     /**
      * Updates the robot with new data

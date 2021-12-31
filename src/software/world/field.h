@@ -1,5 +1,6 @@
 #pragma once
 
+#include "proto/world.pb.h"
 #include "software/geom/circle.h"
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
@@ -72,6 +73,18 @@ class Field
                    double boundary_buffer_size, double center_circle_radius);
 
     /**
+     * Constructs a new field based on the TbotsProto::Field protobuf representation
+     *
+     * @pre all dimensions (except for the boundary buffer) must be > 0.
+     * @pre the boundary buffer must be >= 0
+     *
+     * @throws invalid_argument if at least one dimension is <= 0
+     *
+     * @param field_proto
+     */
+    explicit Field(const TbotsProto::Field &field_proto);
+
+    /**
      * Gets the x-axis length of the field from goal-line to goal-line in metres.
      *
      * @return the x-axis length of the field in metres.
@@ -115,15 +128,6 @@ class Field
      * @return the "depth" of the goal along the x-axis, in metres.
      */
     double goalXLength() const;
-
-    /**
-     * Gets the the x-coordinate distance from the goal centre to the penalty mark, in
-     * metres.
-     *
-     * @return the x-coordinate distance from the goal centre to the penalty mark, in
-     * metres.
-     */
-    double goalCenterToPenaltyMark() const;
 
     /**
      * Gets the radius of the centre circle in metres.

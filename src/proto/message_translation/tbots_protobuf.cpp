@@ -85,7 +85,7 @@ std::unique_ptr<TbotsProto::Field> createField(const Field& field)
     // create msg
     auto field_msg = std::make_unique<TbotsProto::Field>();
 
-    field_msg->set_field_x_length(field.xLength());  // Doubles... probably fine.
+    field_msg->set_field_x_length(field.xLength());
     field_msg->set_field_y_length(field.yLength());
     field_msg->set_defense_x_length(field.defenseAreaXLength());
     field_msg->set_defense_y_length(field.defenseAreaYLength());
@@ -93,15 +93,6 @@ std::unique_ptr<TbotsProto::Field> createField(const Field& field)
     field_msg->set_goal_y_length(field.goalYLength());
     field_msg->set_boundary_buffer_size(field.boundaryMargin());
     field_msg->set_center_circle_radius(field.centerCircleRadius());
-    field_msg->set_goal_centre_to_penalty_mark(field.goalCenterToPenaltyMark());
-
-    *(field_msg->mutable_enemy_defense_area()) =
-        *createPolygonProto(field.enemyDefenseArea());
-    *(field_msg->mutable_friendly_defense_area()) =
-        *createPolygonProto(field.friendlyDefenseArea());
-    *(field_msg->mutable_field_lines())   = *createPolygonProto(field.fieldLines());
-    *(field_msg->mutable_enemy_goal())    = *createPolygonProto(field.enemyGoal());
-    *(field_msg->mutable_friendly_goal()) = *createPolygonProto(field.friendlyGoal());
 
     return field_msg;
 }

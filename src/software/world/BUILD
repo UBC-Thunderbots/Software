@@ -28,6 +28,7 @@ cc_library(
     srcs = ["ball_state.cpp"],
     hdrs = ["ball_state.h"],
     deps = [
+        "//proto:tbots_cc_proto",
         "//software/geom:point",
         "//software/geom:vector",
     ],
@@ -47,6 +48,7 @@ cc_library(
     srcs = ["field.cpp"],
     hdrs = ["field.h"],
     deps = [
+        "//proto:tbots_cc_proto",
         "//shared:constants",
         "//software/geom:circle",
         "//software/geom:rectangle",
@@ -99,6 +101,7 @@ cc_library(
     deps = [
         ":robot_capabilities",
         ":robot_state",
+        "//proto:tbots_cc_proto",
         "//software/logger",
         "//software/time:duration",
         "//software/time:timestamp",
@@ -120,6 +123,7 @@ cc_library(
     hdrs = ["robot_state.h"],
     deps = [
         "team_colour",
+        "//proto:tbots_cc_proto",
         "//shared:constants",
         "//shared:robot_constants",
         "//software/geom:angle",

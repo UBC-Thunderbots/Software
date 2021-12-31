@@ -25,6 +25,32 @@ Robot::Robot(RobotId id, const RobotState &initial_state, const Timestamp &times
 {
 }
 
+Robot::Robot(const TbotsProto::Robot &robot_proto)
+    : id_(robot_proto.id()),
+      current_state_(RobotState(robot_proto.current_state())),
+      timestamp_(Timestamp::fromTimestampProto(robot_proto.timestamp()))
+{
+    for (int i = 0; i < robot_proto.unavailable_capabilities_size(); i++)
+    {
+        auto unavailable_capability = robot_proto.unavailable_capabilities(i);
+        switch (unavailable_capability)
+        {
+            case TbotsProto::Robot_RobotCapability_Dribble:
+                unavailable_capabilities_.emplace(RobotCapability::Dribble);
+                break;
+            case TbotsProto::Robot_RobotCapability_Kick:
+                unavailable_capabilities_.emplace(RobotCapability::Kick);
+                break;
+            case TbotsProto::Robot_RobotCapability_Chip:
+                unavailable_capabilities_.emplace(RobotCapability::Chip);
+                break;
+            case TbotsProto::Robot_RobotCapability_Move:
+                unavailable_capabilities_.emplace(RobotCapability::Move);
+                break;
+        }
+    }
+}
+
 void Robot::updateState(const RobotState &state, const Timestamp &timestamp)
 {
     current_state_ = state;
