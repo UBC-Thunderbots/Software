@@ -78,6 +78,16 @@ std::unique_ptr<TbotsProto::GameState> createGameState(const GameState& game_sta
 std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball);
 
 /**
+ * Returns a TbotsProto::Timestamp proto given a timestamp.
+ *
+ * @param timestamp The Timestamp msg to extract the TbotsProto::Timestamp from
+ *
+ * @return The unique_ptr to a TbotsProto::Timestamp proto containing the timestamp with
+ * the same time zone as the timestamp argument.
+ */
+std::unique_ptr<TbotsProto::Timestamp> createTimestamp(const Timestamp& timestamp);
+
+/**
  * Returns a timestamp msg with the time that this function was called
  *
  * @return The unique_ptr to a TbotsProto::Timestamp with the current UTC time

@@ -3,6 +3,8 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
+#include "proto/message_translation/tbots_protobuf.h"
+#include "software/geom/algorithms/distance.h"
 
 
 class BallTest : public ::testing::Test
@@ -52,6 +54,21 @@ TEST_F(BallTest, construct_with_initial_state)
     EXPECT_EQ(Point(1, 2.3), ball.position());
     EXPECT_EQ(Vector(-0.04, 0.0), ball.velocity());
     EXPECT_EQ(current_time, ball.timestamp());
+}
+
+TEST_F(BallTest, construct_with_protobuf)
+{
+    Ball original_ball(Point(1.0, 1.0), Vector(2.0, 2.0), Timestamp::fromSeconds(3.0), Vector(4.0, 4.0));
+    std::unique_ptr<TbotsProto::Ball> ball_proto = createBall(original_ball);
+    Ball proto_converted_ball(*ball_proto);
+
+    // Using float equal since the protobuf objects (Point, Vector) store float instead of double
+    EXPECT_FLOAT_EQ(static_cast<float>(distance(original_ball.position(), proto_converted_ball.position())), 0.f);
+    EXPECT_FLOAT_EQ(static_cast<float>((original_ball.velocity() - proto_converted_ball.velocity()).length()), 0.f);
+    EXPECT_FLOAT_EQ(static_cast<float>((original_ball.acceleration() - proto_converted_ball.acceleration()).length()), 0.f);
+
+    // Timestamp proto is stored using a double
+    EXPECT_DOUBLE_EQ(original_ball.timestamp().toSeconds(), proto_converted_ball.timestamp().toSeconds());
 }
 
 TEST_F(BallTest, update_state_with_all_params)
