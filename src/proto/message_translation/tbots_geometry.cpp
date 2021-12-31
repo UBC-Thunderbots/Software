@@ -43,3 +43,35 @@ std::unique_ptr<TbotsProto::Polygon> createPolygonProto(const Polygon& polygon)
 
     return polygon_msg;
 }
+
+Point createPoint(const TbotsProto::Point& point)
+{
+    return Point(point.x_meters(), point.y_meters());
+}
+
+Angle createAngle(const TbotsProto::Angle& angle)
+{
+    return Angle::fromRadians(angle.radians());
+}
+
+AngularVelocity createAngularVelocity(const TbotsProto::AngularVelocity& angular_velocity)
+{
+    return AngularVelocity::fromRadians(angular_velocity.radians_per_second());
+}
+
+Vector createVector(const TbotsProto::Vector& vector)
+{
+    return Vector(vector.x_component_meters(), vector.y_component_meters());
+}
+
+Polygon createPolygon(const TbotsProto::Polygon& polygon)
+{
+    std::vector<Point> polygon_points;
+    const auto& polygons_msg_points = polygon.points();
+    for (const TbotsProto::Point& point : polygons_msg_points)
+    {
+        polygon_points.emplace_back(createPoint(point));
+    }
+
+    return Polygon(polygon_points);
+}
