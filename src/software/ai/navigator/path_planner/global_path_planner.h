@@ -21,14 +21,28 @@ class GlobalPathPlanner : public PathPlanner
         std::optional<Path> findPath(const Point &start, const Point &end,
                                      const Rectangle &navigable_area,
                                      const std::vector<ObstaclePtr> &obstacles) override;
-
-
+        
     private:
-        Pathfinding::ENLSVG::Algorithm algo;
-        Pathfinding::ENLSVG::Memory mem;
+        class Coordinate
+        {
+            public:
+                Coordinate(int row, int col)
+                    : x(row), y(col)
+                {
+                }
+                
+                int x;
+                int y;
+        };
+    
+        GlobalPathPlanner::Coordinate convertPointToCoord(const Point &p) const;
+        Point convertCoordToPoint(const Coordinate &c) const;
+    
         int num_grid_rows;
         int num_grid_cols;
-        Pathfinding::Grid grid;
+        std::unique_ptr<const Pathfinding::ENLSVG::Algorithm> algo;
+        std::unique_ptr<Pathfinding::ENLSVG::Memory> mem;
+        std::unique_ptr<const Pathfinding::Grid> grid;
         
         static constexpr int RESOLUTION_IN_CM = 9; 
 };
