@@ -57,7 +57,7 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
 
 Field::Field(const TbotsProto::Field &field_proto)
     : Field(field_proto.field_x_length(), field_proto.field_y_length(),
-            field_proto.defense_x_length(), field_proto.field_y_length(),
+            field_proto.defense_x_length(), field_proto.defense_y_length(),
             field_proto.goal_x_length(), field_proto.goal_y_length(),
             field_proto.boundary_buffer_size(), field_proto.center_circle_radius())
 {

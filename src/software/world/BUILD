@@ -64,6 +64,7 @@ cc_test(
     srcs = ["field_test.cpp"],
     deps = [
         ":field",
+        "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
         "//shared/test_util:tbots_gtest_main",
     ],
