@@ -2,11 +2,10 @@
 #include "path_planner.h"
 #include "software/world/world.h"
 
-class GlobalPathPlanner : public PathPlanner
+class EnlsvgPathPlanner : public PathPlanner
 {
     public:
-        GlobalPathPlanner(const Rectangle &navigable_area, const World &world);
-        
+        EnlsvgPathPlanner(const Rectangle &navigable_area, const std::vector<ObstaclePtr> &obstacles);   
         /**
          * Returns a path that is an optimized path between start and end.
          *
@@ -23,26 +22,20 @@ class GlobalPathPlanner : public PathPlanner
                                      const std::vector<ObstaclePtr> &obstacles) override;
         
     private:
-        class Coordinate
-        {
-            public:
-                Coordinate(int row, int col)
-                    : x(row), y(col)
-                {
-                }
-                
-                int x;
-                int y;
-        };
+        using GridVertex = Pathfinding::GridVertex;
+        using GridPath = Pathfinding::Path;
     
-        GlobalPathPlanner::Coordinate convertPointToCoord(const Point &p) const;
-        Point convertCoordToPoint(const Coordinate &c) const;
+        GridVertex convertPointToGridVertex(const Point &p) const;
+        Point convertGridVertexToPoint(const GridVertex &gv) const;
+        std::optional<Path> convertGridPathToPath(const GridPath &p) const;
+        void createObstaclesInGrid(const std::vector<ObstaclePtr> &obstacles) const;
+        bool isCoordNavigable(const GridVertex &gv) const;
     
         int num_grid_rows;
         int num_grid_cols;
         std::unique_ptr<const Pathfinding::ENLSVG::Algorithm> algo;
         std::unique_ptr<Pathfinding::ENLSVG::Memory> mem;
-        std::unique_ptr<const Pathfinding::Grid> grid;
+        std::unique_ptr<Pathfinding::Grid> grid;
         
-        static constexpr int RESOLUTION_IN_CM = 9; 
+        static constexpr double SIZE_OF_GRID_CELL_IN_METERS = 0.09; 
 };

@@ -57,9 +57,9 @@ cc_library(
 )
 
 cc_library(
-    name = "global_path_planner",
-    srcs = ["global_path_planner.cpp"],
-    hdrs = ["global_path_planner.h"],
+    name = "enlsvg_path_planner",
+    srcs = ["enlsvg_path_planner.cpp"],
+    hdrs = ["enlsvg_path_planner.h"],
     deps = [
         ":path_planner",
         "//extlibs/enlsvg:enlsvg",
