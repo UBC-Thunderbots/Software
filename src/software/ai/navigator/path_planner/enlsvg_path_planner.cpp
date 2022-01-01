@@ -2,14 +2,17 @@
 
 EnlsvgPathPlanner::EnlsvgPathPlanner(
     const Rectangle &navigable_area, const std::vector<ObstaclePtr> &obstacles)
+    :   num_grid_rows(static_cast<int>(round(navigable_area.xLength() / (double) SIZE_OF_GRID_CELL_IN_METERS))),
+        num_grid_cols(static_cast<int>(round(navigable_area.yLength() / (double) SIZE_OF_GRID_CELL_IN_METERS))),
+        min_navigable_y_enlsvg_point(convertPointToEnlsvgPoint(navigable_area.negXNegYCorner()).y),
+        min_navigable_x_enlsvg_point(convertPointToEnlsvgPoint(navigable_area.negXNegYCorner()).x),
+        max_navigable_y_enlsvg_point(convertPointToEnlsvgPoint(navigable_area.posXPosYCorner()).y),
+        max_navigable_x_enlsvg_point(convertPointToEnlsvgPoint(navigable_area.posXPosYCorner()).x),
+        grid(std::make_unique<EnlsvgGrid>(num_grid_rows, num_grid_cols))
 {
-    num_grid_rows = static_cast<int>(round(navigable_area.xLength() / (double) SIZE_OF_GRID_CELL_IN_METERS));
-    num_grid_cols = static_cast<int>(round(navigable_area.yLength() / (double) SIZE_OF_GRID_CELL_IN_METERS));
-    
-    grid = std::make_unique<Pathfinding::Grid>(num_grid_rows, num_grid_cols);
     createObstaclesInGrid(obstacles);
-    algo = std::make_unique<const Pathfinding::ENLSVG::Algorithm>(*grid);
-    mem = std::make_unique<Pathfinding::ENLSVG::Memory>(*algo);
+    algo = std::make_unique<const EnlsvgAlgorithm>(*grid);
+    mem = std::make_unique<EnlsvgMemory>(*algo);
 
 }
 
@@ -22,7 +25,7 @@ void EnlsvgPathPlanner::createObstaclesInGrid(const std::vector<ObstaclePtr> &ob
         
         for (Point &blocked_point : blocked_points)
         {
-            EnlsvgPathPlanner::GridVertex blocked_coord = convertPointToGridVertex(blocked_point);
+            EnlsvgPoint blocked_coord = convertPointToEnlsvgPoint(blocked_point);
             if (isCoordNavigable(blocked_coord))
             {
                 grid->setBlocked(blocked_coord.x, blocked_coord.y, true);
@@ -31,39 +34,49 @@ void EnlsvgPathPlanner::createObstaclesInGrid(const std::vector<ObstaclePtr> &ob
     }
 }
 
-bool EnlsvgPathPlanner::isCoordNavigable(const GridVertex& gv) const
+bool EnlsvgPathPlanner::isCoordNavigable(const EnlsvgPoint& ep) const
 {
-    //TODO
-    return false;
+    return (min_navigable_x_enlsvg_point >= ep.x && ep.x <= max_navigable_x_enlsvg_point)
+        && (min_navigable_y_enlsvg_point >= ep.y && ep.y <= max_navigable_y_enlsvg_point);
 }
 
 std::optional<Path> EnlsvgPathPlanner::findPath(
     const Point &start, const Point &end, const Rectangle &navigable_area,
     const std::vector<ObstaclePtr> &obstacles)
 {
+    bool navigable_area_contains_start =
+        (start.x() >= navigable_area.xMin()) && (start.x() <= navigable_area.xMax()) &&
+        (start.y() >= navigable_area.yMin()) && (start.y() <= navigable_area.yMax());
+    bool navigable_area_contains_end =
+        (end.x() >= navigable_area.xMin()) && (end.x() <= navigable_area.xMax()) &&
+        (end.y() >= navigable_area.yMin()) && (end.y() <= navigable_area.yMax());
+    if (!navigable_area_contains_start || !navigable_area_contains_end)
+    {
+        return std::nullopt;
+    }
     
-    EnlsvgPathPlanner::GridVertex s = convertPointToGridVertex(start);
-    EnlsvgPathPlanner::GridVertex e = convertPointToGridVertex(end);
-    EnlsvgPathPlanner::GridPath path = algo->computePath(*mem, s.x, s.y, e.x, e.y);
-    return convertGridPathToPath(path);
+    EnlsvgPoint s = convertPointToEnlsvgPoint(start);
+    EnlsvgPoint e = convertPointToEnlsvgPoint(end);
+    EnlsvgPath path = algo->computePath(*mem, s.x, s.y, e.x, e.y);
+    return convertEnlsvgPathToPath(path);
 }
 
-Pathfinding::GridVertex EnlsvgPathPlanner::convertPointToGridVertex(
+EnlsvgPathPlanner::EnlsvgPoint EnlsvgPathPlanner::convertPointToEnlsvgPoint(
     const Point &p) const
 {
-    return Pathfinding::GridVertex(
+    return EnlsvgPoint(
         static_cast<int>(round(p.x() / (double) SIZE_OF_GRID_CELL_IN_METERS)),
         static_cast<int>(round(p.y() / (double) SIZE_OF_GRID_CELL_IN_METERS)));
 }
 
-Point EnlsvgPathPlanner::convertGridVertexToPoint(
-    const Pathfinding::GridVertex &c) const
+Point EnlsvgPathPlanner::convertEnlsvgPointToPoint(
+    const EnlsvgPoint &c) const
 {
     return Point(static_cast<double>(c.x * SIZE_OF_GRID_CELL_IN_METERS), static_cast<double>(c.y / SIZE_OF_GRID_CELL_IN_METERS));
 }
 
-std::optional<Path> EnlsvgPathPlanner::convertGridPathToPath(
-    const EnlsvgPathPlanner::GridPath& p) const
+std::optional<Path> EnlsvgPathPlanner::convertEnlsvgPathToPath(
+    const EnlsvgPath& p) const
 {
     if (!p.size())
     {
@@ -73,7 +86,7 @@ std::optional<Path> EnlsvgPathPlanner::convertGridPathToPath(
     std::vector<Point> path;
     for (auto gv : p)
     {
-        path.emplace_back(convertGridVertexToPoint(gv));
+        path.emplace_back(convertEnlsvgPointToPoint(gv));
     }
     
     return std::optional(Path(path));

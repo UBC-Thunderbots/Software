@@ -22,20 +22,27 @@ class EnlsvgPathPlanner : public PathPlanner
                                      const std::vector<ObstaclePtr> &obstacles) override;
         
     private:
-        using GridVertex = Pathfinding::GridVertex;
-        using GridPath = Pathfinding::Path;
+        using EnlsvgPoint       = Pathfinding::GridVertex;
+        using EnlsvgPath        = Pathfinding::Path;
+        using EnlsvgGrid        = Pathfinding::Grid;
+        using EnlsvgAlgorithm   = Pathfinding::ENLSVG::Algorithm;
+        using EnlsvgMemory      = Pathfinding::ENLSVG::Memory;
     
-        GridVertex convertPointToGridVertex(const Point &p) const;
-        Point convertGridVertexToPoint(const GridVertex &gv) const;
-        std::optional<Path> convertGridPathToPath(const GridPath &p) const;
+        EnlsvgPoint convertPointToEnlsvgPoint(const Point &p) const;
+        Point convertEnlsvgPointToPoint(const EnlsvgPoint &gv) const;
+        std::optional<Path> convertEnlsvgPathToPath(const EnlsvgPath &p) const;
         void createObstaclesInGrid(const std::vector<ObstaclePtr> &obstacles) const;
-        bool isCoordNavigable(const GridVertex &gv) const;
+        bool isCoordNavigable(const EnlsvgPoint &gv) const;
     
         int num_grid_rows;
         int num_grid_cols;
-        std::unique_ptr<const Pathfinding::ENLSVG::Algorithm> algo;
-        std::unique_ptr<Pathfinding::ENLSVG::Memory> mem;
-        std::unique_ptr<Pathfinding::Grid> grid;
+        int min_navigable_y_enlsvg_point;
+        int min_navigable_x_enlsvg_point;
+        int max_navigable_y_enlsvg_point;
+        int max_navigable_x_enlsvg_point;
+        std::unique_ptr<EnlsvgGrid> grid;
+        std::unique_ptr<const EnlsvgAlgorithm> algo;
+        std::unique_ptr<EnlsvgMemory> mem;
         
         static constexpr double SIZE_OF_GRID_CELL_IN_METERS = 0.09; 
 };
