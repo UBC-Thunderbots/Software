@@ -6,11 +6,10 @@
 #include "extlibs/hrvo/simulator.h"
 #include "shared/test_util/tbots_gtest_main.h"
 
-const int SIMULATOR_FRAME_RATE  = 30;
-const float SIMULATOR_TIME_STEP = 1.f / SIMULATOR_FRAME_RATE;
-const float HRVO_TWO_PI         = 6.283185307179586f;
-const float ROBOT_RADIUS        = 0.09f;
-const float RADIUS_SCALE        = 1.0f;
+const int SIMULATOR_FRAME_RATE = 30;
+const float HRVO_TWO_PI        = 6.283185307179586f;
+const float ROBOT_RADIUS       = 0.09f;
+const float RADIUS_SCALE       = 1.0f;
 
 class HRVOTest : public ::testing::Test
 {
@@ -19,7 +18,7 @@ class HRVOTest : public ::testing::Test
 
     HRVOTest() : simulator()
     {
-        simulator.setTimeStep(SIMULATOR_TIME_STEP);
+        simulator.setTimeStep(1.f / SIMULATOR_FRAME_RATE);
         simulator.setAgentDefaults(/*neighborDist*/ 3.f, /*maxNeighbors*/ 30,
                                    /*radius*/ ROBOT_RADIUS * RADIUS_SCALE,
                                    /*goalRadius*/ 0.02f,
@@ -170,7 +169,7 @@ class HRVOTest : public ::testing::Test
 
             frame++;
             prev_frame_time = time;
-            simulator.doStep(SIMULATOR_TIME_STEP);
+            simulator.doStep();
 
             auto finish_tick_time = std::chrono::high_resolution_clock::now();
             computation_time += finish_tick_time - start_tick_time;
