@@ -1,6 +1,7 @@
 #include "software/world/world.h"
 
 #include <gtest/gtest.h>
+#include <include/gmock/gmock-matchers.h>
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/test_util/test_util.h"
@@ -67,7 +68,13 @@ TEST_F(WorldTest, construct_with_protobuf)
     auto world_proto = createWorld(world);
     World proto_converted_world(*world_proto);
 
-    EXPECT_EQ(world_proto, proto_converted_world);
+    // Can not compare the two World objects since TbotsProto::Team does not store the robot_expiry_buffer_duration
+    EXPECT_EQ(world.field(), proto_converted_world.field());
+    EXPECT_EQ(world.ball(), proto_converted_world.ball());
+    EXPECT_EQ(world.gameState(), proto_converted_world.gameState());
+    EXPECT_EQ(world.enemyTeam().getGoalieId(), proto_converted_world.enemyTeam().getGoalieId());
+    EXPECT_THAT(world.friendlyTeam().getAllRobots(), ::testing::ContainerEq(proto_converted_world.friendlyTeam().getAllRobots()));
+    EXPECT_THAT(world.enemyTeam().getAllRobots(), ::testing::ContainerEq(proto_converted_world.enemyTeam().getAllRobots()));
 }
 
 // Test that most recent timestamp from member objects works
