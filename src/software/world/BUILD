@@ -86,6 +86,7 @@ cc_test(
     srcs = ["game_state_test.cpp"],
     deps = [
         ":game_state",
+        "//proto/message_translation:tbots_protobuf",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
     ],

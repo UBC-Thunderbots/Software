@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "software/test_util/test_util.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 TEST(GameStateTest, test_get_name_of_referee_command)
 {
@@ -60,6 +61,16 @@ TEST(GameStateTest, default_constructor)
     EXPECT_TRUE(game_state.stayAwayFromBall());
     EXPECT_FALSE(game_state.stayOnSide());
     EXPECT_FALSE(game_state.stayBehindPenaltyLine());
+}
+
+TEST(GameStateTest, construct_with_protobuf)
+{
+    GameState original_game_state;
+    original_game_state.updateRefereeCommand(RefereeCommand::DIRECT_FREE_US);
+    auto proto_game_state = createGameState(original_game_state);
+    GameState proto_converted_game_state(*proto_game_state);
+
+    EXPECT_EQ(original_game_state, proto_converted_game_state);
 }
 
 TEST(GameStateTest, equality)

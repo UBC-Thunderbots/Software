@@ -103,11 +103,19 @@ class GameState
         : play_state_(HALT),
           restart_reason_(NONE),
           command_(RefereeCommand::HALT),
-          ball_state_(std::nullopt),
+          ball_(std::nullopt),
           our_restart_(false),
           ball_placement_point_(std::nullopt)
     {
     }
+
+    /**
+     * Creates a new game state based on the TbotsProto::GameState protobuf representation
+     *
+     * @param game_state_proto The TbotsProto::GameState protobuf which this game state
+     * should be based on
+     */
+    explicit GameState(const TbotsProto::GameState& game_state_proto);
 
     /**
      * Updates the game state with a value from backend_input
@@ -424,7 +432,7 @@ class GameState
     PlayState play_state_;
     RestartReason restart_reason_;
     RefereeCommand command_;
-    std::optional<Ball> ball_state_;
+    std::optional<Ball> ball_;
 
     // True if our team can kick the ball during a restart
     bool our_restart_;
