@@ -179,6 +179,7 @@ cc_test(
     srcs = ["team_test.cpp"],
     deps = [
         ":team",
+        "//proto/message_translation:tbots_protobuf",
         "//shared/test_util:tbots_gtest_main",
     ],
 )
