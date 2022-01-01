@@ -12,6 +12,11 @@ struct GridVertex {
 
     GridVertex() {}
     GridVertex(int x, int y): x(x), y(y) {}
+    
+    inline bool operator==(const GridVertex &other)
+    {
+        return (x == other.x) && (y == other.y);
+    }
 };
 
 typedef std::vector<GridVertex> Path;

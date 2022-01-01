@@ -92,3 +92,39 @@ std::optional<Path> EnlsvgPathPlanner::convertEnlsvgPathToPath(
     return std::optional(Path(path));
 }
 
+std::optional<EnlsvgPathPlanner::EnlsvgPoint> EnlsvgPathPlanner::findClosestUnblockedEnlsvgPoint(
+    const EnlsvgPoint &ep) const
+{
+    std::queue<EnlsvgPoint> q;
+    std::vector<EnlsvgPoint> visited;
+    q.push(ep);
+    while (!q.empty())
+    {
+        EnlsvgPoint test_coord = q.front();
+        visited.emplace_back(test_coord);
+        q.pop();
+        if (!isBlocked(test_coord))
+        {
+            return std::optional<EnlsvgPoint>(test_coord);
+        }
+        for (int i = -1; i < 2; ++i)
+        {
+            for (int j = -1; j < 2; ++j)
+            {
+                EnlsvgPoint next_coord = EnlsvgPoint(ep.x+i, ep.y+j);
+                if (isCoordNavigable(next_coord) 
+                    && (std::find(visited.begin(), visited.end(), next_coord) == visited.end()))
+                {
+                    q.push(next_coord);
+                }
+            }
+        }
+    }
+    return std::nullopt;
+}
+
+bool EnlsvgPathPlanner::isBlocked(const EnlsvgPoint &ep) const
+{
+    // TODO: Finish implementation
+    return false;
+}

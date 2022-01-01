@@ -2,6 +2,8 @@
 #include "path_planner.h"
 #include "software/world/world.h"
 
+#include <queue>
+
 class EnlsvgPathPlanner : public PathPlanner
 {
     public:
@@ -33,6 +35,8 @@ class EnlsvgPathPlanner : public PathPlanner
         std::optional<Path> convertEnlsvgPathToPath(const EnlsvgPath &p) const;
         void createObstaclesInGrid(const std::vector<ObstaclePtr> &obstacles) const;
         bool isCoordNavigable(const EnlsvgPoint &gv) const;
+        std::optional<EnlsvgPoint> findClosestUnblockedEnlsvgPoint(const EnlsvgPoint &ep) const;
+        bool isBlocked(const EnlsvgPoint &ep) const;
     
         int num_grid_rows;
         int num_grid_cols;
