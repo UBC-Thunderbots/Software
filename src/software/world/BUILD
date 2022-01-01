@@ -203,6 +203,7 @@ cc_test(
     srcs = ["world_test.cpp"],
     deps = [
         ":world",
+        "//proto/message_translation:tbots_protobuf",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
     ],

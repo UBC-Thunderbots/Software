@@ -4,6 +4,7 @@
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/test_util/test_util.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 class WorldTest : public ::testing::Test
 {
@@ -59,6 +60,14 @@ TEST_F(WorldTest, construction_with_parameters)
     EXPECT_EQ(ball, world.ball());
     EXPECT_EQ(friendly_team, world.friendlyTeam());
     EXPECT_EQ(enemy_team, world.enemyTeam());
+}
+
+TEST_F(WorldTest, construct_with_protobuf)
+{
+    auto world_proto = createWorld(world);
+    World proto_converted_world(*world_proto);
+
+    EXPECT_EQ(world_proto, proto_converted_world);
 }
 
 // Test that most recent timestamp from member objects works
