@@ -38,7 +38,7 @@ TEST(TbotsProtobufTest, vector_msg_test)
 
 TEST(TbotsProtobufTest, polygon_msg_test)
 {
-    auto polygon     = Polygon({Point(4.20, 4.20), Point(1.0, 1.1), Point(-1.0, -153.52)});
+    auto polygon = Polygon({Point(4.20, 4.20), Point(1.0, 1.1), Point(-1.0, -153.52)});
     auto polygon_msg = createPolygonProto(polygon);
 
     EXPECT_EQ(polygon.getPoints().size(), polygon_msg->points_size());
