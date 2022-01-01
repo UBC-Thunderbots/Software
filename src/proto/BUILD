@@ -7,6 +7,7 @@ package(default_visibility = ["//visibility:public"])
 proto_library(
     name = "tbots_proto",
     srcs = [
+        "ball.proto",
         "game_state.proto",
         "geometry.proto",
         "primitive.proto",
@@ -14,6 +15,7 @@ proto_library(
         "robot_status_msg.proto",
         "tbots_software_msgs.proto",
         "tbots_timestamp_msg.proto",
+        "team.proto",
         "vision.proto",
         "world.proto",
     ],
