@@ -1,6 +1,18 @@
 #include "software/world/robot_state.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 #include <gtest/gtest.h>
+
+TEST(RobotStateTest, create_with_protobuf)
+{
+    RobotState original_state(Point(1.1, -0.5), Vector(3, 0), Angle::quarter(),
+                     AngularVelocity::half());
+    Robot robot(1, original_state, Timestamp());
+    std::unique_ptr<TbotsProto::RobotState> state_proto = createRobotState(robot);
+    RobotState proto_converted_state(*state_proto);
+
+    EXPECT_EQ(proto_converted_state, original_state);
+}
 
 TEST(RobotStateTest, get_position)
 {

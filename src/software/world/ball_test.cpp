@@ -62,13 +62,7 @@ TEST_F(BallTest, construct_with_protobuf)
     std::unique_ptr<TbotsProto::Ball> ball_proto = createBall(original_ball);
     Ball proto_converted_ball(*ball_proto);
 
-    // Using float equal since the protobuf objects (Point, Vector) store float instead of double
-    EXPECT_FLOAT_EQ(static_cast<float>(distance(original_ball.position(), proto_converted_ball.position())), 0.f);
-    EXPECT_FLOAT_EQ(static_cast<float>((original_ball.velocity() - proto_converted_ball.velocity()).length()), 0.f);
-    EXPECT_FLOAT_EQ(static_cast<float>((original_ball.acceleration() - proto_converted_ball.acceleration()).length()), 0.f);
-
-    // Timestamp proto is stored using a double
-    EXPECT_DOUBLE_EQ(original_ball.timestamp().toSeconds(), proto_converted_ball.timestamp().toSeconds());
+    EXPECT_EQ(original_ball, proto_converted_ball);
 }
 
 TEST_F(BallTest, update_state_with_all_params)

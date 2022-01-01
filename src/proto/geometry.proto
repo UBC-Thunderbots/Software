@@ -5,35 +5,35 @@ package TbotsProto;
 message Point
 {
     // x coordinate
-    float x_meters = 1;
+    double x_meters = 1;
 
     // y coordinate
-    float y_meters = 2;
+    double y_meters = 2;
 }
 
 message Vector
 {
     // x component
-    float x_component_meters = 1;
+    double x_component_meters = 1;
 
     // y component
-    float y_component_meters = 2;
+    double y_component_meters = 2;
 }
 
 message Angle
 {
     // the angle in radians
-    float radians = 1;
+    double radians = 1;
 }
 
 message AngularVelocity
 {
     // the angular velocity in radians
-    float radians_per_second = 1;
+    double radians_per_second = 1;
 }
 
 message Polygon
 {
+    // list of polygon edges
     repeated Point points = 1;
-    // Add segments??
 }

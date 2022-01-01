@@ -3,15 +3,15 @@
 std::unique_ptr<TbotsProto::Point> createPointProto(const Point& point)
 {
     auto point_msg = std::make_unique<TbotsProto::Point>();
-    point_msg->set_x_meters(static_cast<float>(point.x()));
-    point_msg->set_y_meters(static_cast<float>(point.y()));
+    point_msg->set_x_meters(point.x());
+    point_msg->set_y_meters(point.y());
     return point_msg;
 }
 
 std::unique_ptr<TbotsProto::Angle> createAngleProto(const Angle& angle)
 {
     auto angle_msg = std::make_unique<TbotsProto::Angle>();
-    angle_msg->set_radians(static_cast<float>(angle.toRadians()));
+    angle_msg->set_radians(angle.toRadians());
     return angle_msg;
 }
 
@@ -20,15 +20,15 @@ std::unique_ptr<TbotsProto::AngularVelocity> createAngularVelocityProto(
 {
     auto anglular_velocity_msg = std::make_unique<TbotsProto::AngularVelocity>();
     anglular_velocity_msg->set_radians_per_second(
-        static_cast<float>(angular_velocity.toRadians()));
+        angular_velocity.toRadians());
     return anglular_velocity_msg;
 }
 
 std::unique_ptr<TbotsProto::Vector> createVectorProto(const Vector& vector)
 {
     auto vector_msg = std::make_unique<TbotsProto::Vector>();
-    vector_msg->set_x_component_meters(static_cast<float>(vector.x()));
-    vector_msg->set_y_component_meters(static_cast<float>(vector.y()));
+    vector_msg->set_x_component_meters(vector.x());
+    vector_msg->set_y_component_meters(vector.y());
     return vector_msg;
 }
 

@@ -116,6 +116,7 @@ cc_test(
     srcs = ["robot_test.cpp"],
     deps = [
         ":robot",
+        "//proto/message_translation:tbots_protobuf",
         "//shared/test_util:tbots_gtest_main",
     ],
 )
@@ -142,6 +143,7 @@ cc_test(
     srcs = ["robot_state_test.cpp"],
     deps = [
         ":robot_state",
+        "//proto/message_translation:tbots_protobuf",
         "//shared/test_util:tbots_gtest_main",
     ],
 )

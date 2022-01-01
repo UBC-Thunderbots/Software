@@ -66,6 +66,26 @@ std::unique_ptr<TbotsProto::Robot> createRobot(const Robot& robot)
     auto robot_msg = std::make_unique<TbotsProto::Robot>();
     robot_msg->set_id(robot.id());
     *(robot_msg->mutable_current_state()) = *createRobotState(robot);
+    *(robot_msg->mutable_timestamp())  = *createTimestamp(robot.timestamp());
+
+    for (RobotCapability capability : robot.getUnavailableCapabilities())
+    {
+        switch (capability) {
+
+            case RobotCapability::Dribble:
+                robot_msg->add_unavailable_capabilities(TbotsProto::Robot_RobotCapability_Dribble);
+                break;
+            case RobotCapability::Kick:
+                robot_msg->add_unavailable_capabilities(TbotsProto::Robot_RobotCapability_Kick);
+                break;
+            case RobotCapability::Chip:
+                robot_msg->add_unavailable_capabilities(TbotsProto::Robot_RobotCapability_Chip);
+                break;
+            case RobotCapability::Move:
+                robot_msg->add_unavailable_capabilities(TbotsProto::Robot_RobotCapability_Move);
+                break;
+        }
+    }
 
     return robot_msg;
 }
