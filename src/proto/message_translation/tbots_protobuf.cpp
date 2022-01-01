@@ -273,7 +273,7 @@ std::unique_ptr<TbotsProto::GameState> createGameState(const GameState& game_sta
             break;
     }
 
-    auto ball_state = game_state.getBallState();
+    auto ball_state = game_state.getBall();
     if (ball_state.has_value())
     {
         *(game_state_msg->mutable_ball()) = *createBall(ball_state.value());

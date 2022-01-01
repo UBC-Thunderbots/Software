@@ -414,11 +414,11 @@ class GameState
     std::optional<Point> getBallPlacementPoint(void) const;
 
     /**
-     * Returns the ball state
+     * Returns the ball
      *
      * @return the ball state if one is specified, otherwise std::nullopt
      */
-    std::optional<Ball> getBallState(void) const;
+    std::optional<Ball> getBall(void) const;
 
     /**
      * Sets the point on the field where the ball should be placed.

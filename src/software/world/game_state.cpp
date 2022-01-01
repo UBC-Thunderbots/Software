@@ -283,7 +283,7 @@ std::optional<Point> GameState::getBallPlacementPoint() const
     return ball_placement_point_;
 }
 
-std::optional<Ball> GameState::getBallState(void) const
+std::optional<Ball> GameState::getBall(void) const
 {
     return ball_;
 }

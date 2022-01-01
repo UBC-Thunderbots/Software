@@ -37,12 +37,14 @@ nanopb_proto_library(
 py_proto_library(
     name = "tbots_py_proto",
     srcs = [
+        "ball.proto",
         "game_state.proto",
         "geometry.proto",
         "primitive.proto",
         "robot_status_msg.proto",
         "tbots_software_msgs.proto",
         "tbots_timestamp_msg.proto",
+        "team.proto",
         "vision.proto",
         "world.proto",
     ],
