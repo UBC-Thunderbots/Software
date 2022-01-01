@@ -2,8 +2,7 @@
 
 #include "software/logger/logger.h"
 
-GameState::GameState(const TbotsProto::GameState& game_state_proto)
-    : our_restart_(false)
+GameState::GameState(const TbotsProto::GameState& game_state_proto) : our_restart_(false)
 {
     if (game_state_proto.has_ball())
     {
@@ -16,15 +15,16 @@ GameState::GameState(const TbotsProto::GameState& game_state_proto)
 
     if (game_state_proto.has_ball_placement_point())
     {
-        ball_placement_point_ = Point(game_state_proto.ball_placement_point().x_meters(), game_state_proto.ball_placement_point().y_meters());
+        ball_placement_point_ = Point(game_state_proto.ball_placement_point().x_meters(),
+                                      game_state_proto.ball_placement_point().y_meters());
     }
     else
     {
         ball_placement_point_ = std::nullopt;
     }
 
-    switch (game_state_proto.play_state()) {
-
+    switch (game_state_proto.play_state())
+    {
         case TbotsProto::GameState_PlayState_PLAY_STATE_HALT:
             play_state_ = GameState::PlayState::HALT;
             break;
@@ -42,7 +42,8 @@ GameState::GameState(const TbotsProto::GameState& game_state_proto)
             break;
     }
 
-    switch (game_state_proto.restart_reason()) {
+    switch (game_state_proto.restart_reason())
+    {
         case TbotsProto::GameState_RestartReason_RESTART_REASON_NONE:
             restart_reason_ = GameState::RestartReason::NONE;
             break;
@@ -63,8 +64,8 @@ GameState::GameState(const TbotsProto::GameState& game_state_proto)
             break;
     }
 
-    switch (game_state_proto.command()) {
-
+    switch (game_state_proto.command())
+    {
         case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_HALT:
             updateRefereeCommand(RefereeCommand::HALT);
             break;

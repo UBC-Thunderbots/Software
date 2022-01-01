@@ -189,7 +189,8 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
             vision_msg.robot_states().find(simulator_robot->getRobotId());
         if (robot_state_it != vision_msg.robot_states().end())
         {
-            simulator_robot->setRobotState(RobotState(vision_msg.robot_states().at(simulator_robot->getRobotId())));
+            simulator_robot->setRobotState(
+                RobotState(vision_msg.robot_states().at(simulator_robot->getRobotId())));
             // Set to NEG_X because the vision msg in this simulator is
             // normalized correctly
             simulator_robot->runCurrentPrimitive();

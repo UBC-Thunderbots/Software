@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "software/test_util/test_util.h"
 #include "proto/message_translation/tbots_protobuf.h"
+#include "software/test_util/test_util.h"
 
 TEST(GameStateTest, test_get_name_of_referee_command)
 {

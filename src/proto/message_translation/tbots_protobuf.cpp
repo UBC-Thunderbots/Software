@@ -66,23 +66,27 @@ std::unique_ptr<TbotsProto::Robot> createRobot(const Robot& robot)
     auto robot_msg = std::make_unique<TbotsProto::Robot>();
     robot_msg->set_id(robot.id());
     *(robot_msg->mutable_current_state()) = *createRobotState(robot);
-    *(robot_msg->mutable_timestamp())  = *createTimestamp(robot.timestamp());
+    *(robot_msg->mutable_timestamp())     = *createTimestamp(robot.timestamp());
 
     for (RobotCapability capability : robot.getUnavailableCapabilities())
     {
-        switch (capability) {
-
+        switch (capability)
+        {
             case RobotCapability::Dribble:
-                robot_msg->add_unavailable_capabilities(TbotsProto::Robot_RobotCapability_Dribble);
+                robot_msg->add_unavailable_capabilities(
+                    TbotsProto::Robot_RobotCapability_Dribble);
                 break;
             case RobotCapability::Kick:
-                robot_msg->add_unavailable_capabilities(TbotsProto::Robot_RobotCapability_Kick);
+                robot_msg->add_unavailable_capabilities(
+                    TbotsProto::Robot_RobotCapability_Kick);
                 break;
             case RobotCapability::Chip:
-                robot_msg->add_unavailable_capabilities(TbotsProto::Robot_RobotCapability_Chip);
+                robot_msg->add_unavailable_capabilities(
+                    TbotsProto::Robot_RobotCapability_Chip);
                 break;
             case RobotCapability::Move:
-                robot_msg->add_unavailable_capabilities(TbotsProto::Robot_RobotCapability_Move);
+                robot_msg->add_unavailable_capabilities(
+                    TbotsProto::Robot_RobotCapability_Move);
                 break;
         }
     }
@@ -96,7 +100,7 @@ std::unique_ptr<TbotsProto::Ball> createBall(const Ball& ball)
     auto ball_msg                        = std::make_unique<TbotsProto::Ball>();
     *(ball_msg->mutable_current_state()) = *createBallState(ball);
     *(ball_msg->mutable_acceleration())  = *createVectorProto(ball.acceleration());
-    *(ball_msg->mutable_timestamp())  = *createTimestamp(ball.timestamp());
+    *(ball_msg->mutable_timestamp())     = *createTimestamp(ball.timestamp());
 
     return ball_msg;
 }
@@ -297,7 +301,8 @@ std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball)
     return ball_state_msg;
 }
 
-std::unique_ptr<TbotsProto::Timestamp> createTimestamp(const Timestamp &timestamp) {
+std::unique_ptr<TbotsProto::Timestamp> createTimestamp(const Timestamp& timestamp)
+{
     auto timestamp_msg = std::make_unique<TbotsProto::Timestamp>();
     timestamp_msg->set_epoch_timestamp_seconds(timestamp.toSeconds());
     return timestamp_msg;

@@ -27,7 +27,7 @@ class TbotsProtobufTest : public ::testing::Test
         const TbotsProto::AngularVelocity& angular_velocity_msg)
     {
         EXPECT_EQ(angular_velocity_msg.radians_per_second(),
-                    angular_velocity.toRadians());
+                  angular_velocity.toRadians());
     }
 
     static void assertVectorMessageEqual(const Vector& vector,

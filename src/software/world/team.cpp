@@ -23,8 +23,7 @@ Team::Team(const std::vector<Robot>& team_robots,
 
 Team::Team(const TbotsProto::Team& team_proto,
            const Duration& robot_expiry_buffer_duration)
-    : robot_expiry_buffer_duration(robot_expiry_buffer_duration),
-      last_update_timestamp()
+    : robot_expiry_buffer_duration(robot_expiry_buffer_duration), last_update_timestamp()
 {
     if (team_proto.has_goalie_id())
     {

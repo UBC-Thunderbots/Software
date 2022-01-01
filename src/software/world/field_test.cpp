@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "shared/constants.h"
 #include "proto/message_translation/tbots_protobuf.h"
+#include "shared/constants.h"
 
 class FieldTest : public ::testing::Test
 {
@@ -209,7 +209,7 @@ TEST_F(FieldTest, construct_with_parameters)
 TEST_F(FieldTest, construct_with_protobuf)
 {
     Field original_field = Field::createSSLDivisionAField();
-    auto field_proto = createField(original_field);
+    auto field_proto     = createField(original_field);
     Field proto_converted_field(*field_proto);
 
     EXPECT_EQ(original_field, proto_converted_field);

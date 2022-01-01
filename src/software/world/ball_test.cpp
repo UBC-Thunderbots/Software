@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include "shared/constants.h"
 #include "proto/message_translation/tbots_protobuf.h"
+#include "shared/constants.h"
 #include "software/geom/algorithms/distance.h"
 
 
@@ -58,7 +58,8 @@ TEST_F(BallTest, construct_with_initial_state)
 
 TEST_F(BallTest, construct_with_protobuf)
 {
-    Ball original_ball(Point(1.0, 1.0), Vector(2.0, 2.0), Timestamp::fromSeconds(3.0), Vector(4.0, 4.0));
+    Ball original_ball(Point(1.0, 1.0), Vector(2.0, 2.0), Timestamp::fromSeconds(3.0),
+                       Vector(4.0, 4.0));
     std::unique_ptr<TbotsProto::Ball> ball_proto = createBall(original_ball);
     Ball proto_converted_ball(*ball_proto);
 

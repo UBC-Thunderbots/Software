@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 #include <include/gmock/gmock-matchers.h>
 
-#include "shared/constants.h"
 #include "proto/message_translation/tbots_protobuf.h"
+#include "shared/constants.h"
 #include "software/geom/algorithms/almost_equal.h"
 
 class RobotTest : public ::testing::Test
@@ -56,14 +56,19 @@ TEST_F(RobotTest, construct_with_initial_state)
 
 TEST_F(RobotTest, construct_with_protobuf)
 {
-    Robot original_robot = Robot(3,
-                        RobotState(Point(1, 1), Vector(-0.3, 0), Angle::fromRadians(2.2),
-                                   AngularVelocity::fromRadians(-0.6)),
-                        current_time, std::set<RobotCapability>{RobotCapability::Chip, RobotCapability::Move, RobotCapability::Kick, RobotCapability::Dribble});
+    Robot original_robot =
+        Robot(3,
+              RobotState(Point(1, 1), Vector(-0.3, 0), Angle::fromRadians(2.2),
+                         AngularVelocity::fromRadians(-0.6)),
+              current_time,
+              std::set<RobotCapability>{RobotCapability::Chip, RobotCapability::Move,
+                                        RobotCapability::Kick, RobotCapability::Dribble});
     auto robot_proto = createRobot(original_robot);
     Robot proto_converted_robot(*robot_proto);
 
-    EXPECT_THAT(original_robot.getUnavailableCapabilities(), ::testing::ContainerEq(proto_converted_robot.getUnavailableCapabilities()));
+    EXPECT_THAT(
+        original_robot.getUnavailableCapabilities(),
+        ::testing::ContainerEq(proto_converted_robot.getUnavailableCapabilities()));
     EXPECT_EQ(original_robot, proto_converted_robot);
 }
 

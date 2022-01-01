@@ -19,8 +19,7 @@ std::unique_ptr<TbotsProto::AngularVelocity> createAngularVelocityProto(
     const AngularVelocity& angular_velocity)
 {
     auto anglular_velocity_msg = std::make_unique<TbotsProto::AngularVelocity>();
-    anglular_velocity_msg->set_radians_per_second(
-        angular_velocity.toRadians());
+    anglular_velocity_msg->set_radians_per_second(angular_velocity.toRadians());
     return anglular_velocity_msg;
 }
 

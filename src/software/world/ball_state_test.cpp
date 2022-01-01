@@ -1,7 +1,8 @@
 #include "software/world/ball_state.h"
-#include "proto/message_translation/tbots_protobuf.h"
 
 #include <gtest/gtest.h>
+
+#include "proto/message_translation/tbots_protobuf.h"
 
 TEST(BallStateTest, get_position)
 {

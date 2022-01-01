@@ -1,11 +1,12 @@
 #include "software/world/team.h"
-#include "proto/message_translation/tbots_protobuf.h"
 
 #include <gtest/gtest.h>
+#include <include/gmock/gmock-matchers.h>
 
 #include <stdexcept>
 #include <unordered_set>
-#include <include/gmock/gmock-matchers.h>
+
+#include "proto/message_translation/tbots_protobuf.h"
 
 class TeamTest : public ::testing::Test
 {
@@ -84,12 +85,14 @@ TEST_F(TeamTest, construct_with_protobuf)
     std::vector<Robot> robot_list = {robot_0, robot_1, robot_2};
 
     Team original_team = Team(robot_list);
-    auto proto_team = createTeam(original_team);
+    auto proto_team    = createTeam(original_team);
     Team proto_converted_team(*proto_team);
 
-    // Proto representation of Team does not store the robot_expiry_buffer_duration, so we will not test it
+    // Proto representation of Team does not store the robot_expiry_buffer_duration, so we
+    // will not test it
     EXPECT_EQ(original_team.getGoalieId(), proto_converted_team.getGoalieId());
-    EXPECT_THAT(original_team.getAllRobots(), ::testing::ContainerEq(proto_converted_team.getAllRobots()));
+    EXPECT_THAT(original_team.getAllRobots(),
+                ::testing::ContainerEq(proto_converted_team.getAllRobots()));
 }
 
 TEST_F(TeamTest, update_with_3_robots)
