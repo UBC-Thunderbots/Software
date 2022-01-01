@@ -44,5 +44,6 @@ class EnlsvgPathPlanner : public PathPlanner
         std::unique_ptr<const EnlsvgAlgorithm> algo;
         std::unique_ptr<EnlsvgMemory> mem;
         
+        // analogous to resolution of grid
         static constexpr double SIZE_OF_GRID_CELL_IN_METERS = 0.09; 
 };
