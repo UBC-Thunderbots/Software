@@ -35,3 +35,20 @@ TEST(TbotsProtobufTest, vector_msg_test)
     EXPECT_EQ(vector_msg->x_component_meters(), vector.x());
     EXPECT_EQ(vector_msg->y_component_meters(), vector.y());
 }
+
+TEST(TbotsProtobufTest, polygon_msg_test)
+{
+    auto polygon     = Polygon({Point(4.20, 4.20), Point(1.0, 1.1), Point(-1.0, -153.52)});
+    auto polygon_msg = createPolygonProto(polygon);
+
+    EXPECT_EQ(polygon.getPoints().size(), polygon_msg->points_size());
+
+    EXPECT_EQ(polygon.getPoints()[0].x(), polygon_msg->points(0).x_meters());
+    EXPECT_EQ(polygon.getPoints()[0].y(), polygon_msg->points(0).y_meters());
+
+    EXPECT_EQ(polygon.getPoints()[1].x(), polygon_msg->points(1).x_meters());
+    EXPECT_EQ(polygon.getPoints()[1].y(), polygon_msg->points(1).y_meters());
+
+    EXPECT_EQ(polygon.getPoints()[2].x(), polygon_msg->points(2).x_meters());
+    EXPECT_EQ(polygon.getPoints()[2].y(), polygon_msg->points(2).y_meters());
+}
