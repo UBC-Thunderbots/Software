@@ -15,14 +15,14 @@ template <class T>
 using FSM = boost::sml::sm<T, boost::sml::process_queue<std::queue>>;
 
 /**
- * Defines an sml state wrapper around a class/struct
+ * Defines an SML state wrapper around a class/struct
  *
  * @param STATE The state class/struct
  */
 #define DEFINE_SML_STATE(STATE) const auto STATE##_S = boost::sml::state<STATE>;
 
 /**
- * Defines an sml event wrapper around a class/struct
+ * Defines an SML event wrapper around a class/struct
  *
  * @param EVENT The event class/struct
  */

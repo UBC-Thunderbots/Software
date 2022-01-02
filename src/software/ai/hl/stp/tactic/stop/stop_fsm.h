@@ -1,7 +1,5 @@
 #pragma once
 
-#include <functional>
-
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/stop_intent.h"
 
