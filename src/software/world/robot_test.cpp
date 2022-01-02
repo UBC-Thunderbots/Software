@@ -5,7 +5,6 @@
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "shared/constants.h"
-#include "software/geom/algorithms/almost_equal.h"
 
 class RobotTest : public ::testing::Test
 {

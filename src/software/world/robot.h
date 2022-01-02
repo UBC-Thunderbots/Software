@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include "proto/world.pb.h"
+#include "proto/team.pb.h"
 #include "software/time/timestamp.h"
 #include "software/world/robot_capabilities.h"
 #include "software/world/robot_state.h"

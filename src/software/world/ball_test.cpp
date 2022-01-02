@@ -4,7 +4,6 @@
 
 #include "proto/message_translation/tbots_protobuf.h"
 #include "shared/constants.h"
-#include "software/geom/algorithms/distance.h"
 
 
 class BallTest : public ::testing::Test
