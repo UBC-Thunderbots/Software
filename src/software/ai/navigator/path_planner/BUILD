@@ -80,6 +80,17 @@ cc_test(
 )
 
 cc_test(
+    name = "enlsvg_path_planner_test",
+    srcs = ["enlsvg_path_planner_test.cpp"],
+    deps = [
+        ":enlsvg_path_planner",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
+        "//software/test_util"
+    ]
+)
+
+cc_test(
     name = "simulated_theta_star_test",
     srcs = ["simulated_theta_star_test.cpp"],
     deps = [

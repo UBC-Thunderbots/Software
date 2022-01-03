@@ -125,6 +125,5 @@ std::optional<EnlsvgPathPlanner::EnlsvgPoint> EnlsvgPathPlanner::findClosestUnbl
 
 bool EnlsvgPathPlanner::isBlocked(const EnlsvgPoint &ep) const
 {
-    // TODO: Finish implementation
-    return false;
+    return grid->isBlocked(ep.x, ep.y);
 }
