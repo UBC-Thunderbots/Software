@@ -27,10 +27,7 @@ extern "C"
 #include "firmware/app/world/firmware_world.h"
 }
 
-MAKE_ENUM(FieldType, DIV_A, DIV_B);
-
-ErForceSimulator::ErForceSimulator(
-    const FieldType& field_type, const RobotConstants_t& robot_constants,
+ErForceSimulator::ErForceSimulator(const FieldType& field_type, const RobotConstants_t& robot_constants,
     const WheelConstants& wheel_constants, 
     std::shared_ptr<const SimulatorConfig> simulator_config)
     : yellow_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
