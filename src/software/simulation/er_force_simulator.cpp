@@ -7,6 +7,7 @@
 #include <QtCore/QString>
 #include <iostream>
 
+#include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
 #include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "proto/message_translation/ssl_detection.h"
@@ -17,7 +18,6 @@
 #include "software/simulation/er_force_simulator_robot_singleton.h"
 #include "software/simulation/simulator_ball_singleton.h"
 #include "software/world/robot_state.h"
-#include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
 
 extern "C"
 {
@@ -27,8 +27,9 @@ extern "C"
 #include "firmware/app/world/firmware_world.h"
 }
 
-ErForceSimulator::ErForceSimulator(const FieldType& field_type, const RobotConstants_t& robot_constants,
-    const WheelConstants& wheel_constants, 
+ErForceSimulator::ErForceSimulator(
+    const FieldType& field_type, const RobotConstants_t& robot_constants,
+    const WheelConstants& wheel_constants,
     std::shared_ptr<const SimulatorConfig> simulator_config)
     : yellow_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
       blue_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
