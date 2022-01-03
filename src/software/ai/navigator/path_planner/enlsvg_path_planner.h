@@ -22,6 +22,8 @@ class EnlsvgPathPlanner : public PathPlanner
         std::optional<Path> findPath(const Point &start, const Point &end,
                                      const Rectangle &navigable_area,
                                      const std::vector<ObstaclePtr> &obstacles) override;
+                                     
+        inline double getResolution() const { return SIZE_OF_GRID_CELL_IN_METERS; }
         
     private:
         using EnlsvgPoint       = Pathfinding::GridVertex;
@@ -40,10 +42,11 @@ class EnlsvgPathPlanner : public PathPlanner
     
         int num_grid_rows;
         int num_grid_cols;
-        int min_navigable_y_enlsvg_point;
-        int min_navigable_x_enlsvg_point;
+//        int min_navigable_y_enlsvg_point;
+//        int min_navigable_x_enlsvg_point;
         int max_navigable_y_enlsvg_point;
         int max_navigable_x_enlsvg_point;
+        Point origin;
         std::unique_ptr<EnlsvgGrid> grid;
         std::unique_ptr<const EnlsvgAlgorithm> algo;
         std::unique_ptr<EnlsvgMemory> mem;

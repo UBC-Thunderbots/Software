@@ -4,10 +4,11 @@ EnlsvgPathPlanner::EnlsvgPathPlanner(
     const Rectangle &navigable_area, const std::vector<ObstaclePtr> &obstacles)
     :   num_grid_rows(static_cast<int>(round(navigable_area.xLength() / (double) SIZE_OF_GRID_CELL_IN_METERS))),
         num_grid_cols(static_cast<int>(round(navigable_area.yLength() / (double) SIZE_OF_GRID_CELL_IN_METERS))),
-        min_navigable_y_enlsvg_point(convertPointToEnlsvgPoint(navigable_area.negXNegYCorner()).y),
-        min_navigable_x_enlsvg_point(convertPointToEnlsvgPoint(navigable_area.negXNegYCorner()).x),
+//        min_navigable_y_enlsvg_point(convertPointToEnlsvgPoint(navigable_area.negXNegYCorner()).y),
+//        min_navigable_x_enlsvg_point(convertPointToEnlsvgPoint(navigable_area.negXNegYCorner()).x),
         max_navigable_y_enlsvg_point(convertPointToEnlsvgPoint(navigable_area.posXPosYCorner()).y),
         max_navigable_x_enlsvg_point(convertPointToEnlsvgPoint(navigable_area.posXPosYCorner()).x),
+        origin(navigable_area.negXNegYCorner()) ,
         grid(std::make_unique<EnlsvgGrid>(num_grid_rows, num_grid_cols))
 {
     createObstaclesInGrid(obstacles);
@@ -36,8 +37,8 @@ void EnlsvgPathPlanner::createObstaclesInGrid(const std::vector<ObstaclePtr> &ob
 
 bool EnlsvgPathPlanner::isCoordNavigable(const EnlsvgPoint& ep) const
 {
-    return (min_navigable_x_enlsvg_point >= ep.x && ep.x <= max_navigable_x_enlsvg_point)
-        && (min_navigable_y_enlsvg_point >= ep.y && ep.y <= max_navigable_y_enlsvg_point);
+    return (0 >= ep.x && ep.x <= max_navigable_x_enlsvg_point)
+        && (0 >= ep.y && ep.y <= max_navigable_y_enlsvg_point);
 }
 
 std::optional<Path> EnlsvgPathPlanner::findPath(
@@ -65,14 +66,16 @@ EnlsvgPathPlanner::EnlsvgPoint EnlsvgPathPlanner::convertPointToEnlsvgPoint(
     const Point &p) const
 {
     return EnlsvgPoint(
-        static_cast<int>(round(p.x() / (double) SIZE_OF_GRID_CELL_IN_METERS)),
-        static_cast<int>(round(p.y() / (double) SIZE_OF_GRID_CELL_IN_METERS)));
+        static_cast<int>(round((p.x() - origin.x())/ (double) SIZE_OF_GRID_CELL_IN_METERS)),
+        static_cast<int>(round((p.y() - origin.y()) / (double) SIZE_OF_GRID_CELL_IN_METERS)));
 }
 
 Point EnlsvgPathPlanner::convertEnlsvgPointToPoint(
     const EnlsvgPoint &c) const
 {
-    return Point(static_cast<double>(c.x * SIZE_OF_GRID_CELL_IN_METERS), static_cast<double>(c.y / SIZE_OF_GRID_CELL_IN_METERS));
+    return Point(
+        static_cast<double>(c.x * SIZE_OF_GRID_CELL_IN_METERS + origin.x()), 
+        static_cast<double>(c.y * SIZE_OF_GRID_CELL_IN_METERS + origin.y()));
 }
 
 std::optional<Path> EnlsvgPathPlanner::convertEnlsvgPathToPath(
