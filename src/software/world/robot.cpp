@@ -30,9 +30,8 @@ Robot::Robot(const TbotsProto::Robot &robot_proto)
       current_state_(RobotState(robot_proto.current_state())),
       timestamp_(Timestamp::fromTimestampProto(robot_proto.timestamp()))
 {
-    for (int i = 0; i < robot_proto.unavailable_capabilities_size(); i++)
+    for (const auto &unavailable_capability : robot_proto.unavailable_capabilities())
     {
-        auto unavailable_capability = robot_proto.unavailable_capabilities(i);
         switch (unavailable_capability)
         {
             case TbotsProto::Robot_RobotCapability_Dribble:
