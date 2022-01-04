@@ -38,7 +38,7 @@ TEST_P(SimulatedAttackerTacticShootGoalTest, attacker_test_shoot_goal)
     // Make it very obvious when we decide to chip
     tactic->updateControlParams(Point(0, field.fieldLines().yMin()));
     setTactic(tactic);
-    setRobotId(0);
+    setFriendlyRobotId(0);
     setMotionConstraints({MotionConstraint::FRIENDLY_DEFENSE_AREA});
 
     std::vector<ValidationFunction> terminating_validation_functions = {

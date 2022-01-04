@@ -72,11 +72,21 @@ class camun::simulator::Simulator : public QObject
     typedef QMap<unsigned int, QPair<SimRobot *, unsigned int>>
         RobotMap; /*First int: ID, Second int: Generation*/
 
-    explicit Simulator(const amun::SimulatorSetup &setup, bool useManualTrigger = false);
+    /**
+     * Creates a simulator with the given set up
+     *
+     * @param setup the simulator set up
+     */
+    explicit Simulator(const amun::SimulatorSetup &setup);
     ~Simulator() override;
     Simulator(const Simulator &) = delete;
     Simulator &operator=(const Simulator &) = delete;
-    void handleSimulatorTick(double timeStep);
+
+    /**
+     * Seeds the pseudorandom generator
+     *
+     * @param seed
+     */
     void seedPRGN(uint32_t seed);
 
    signals:
@@ -86,14 +96,32 @@ class camun::simulator::Simulator : public QObject
     void sendSSLSimError(const QList<SSLSimError> &errors, ErrorSource source);
 
    public:
+    /**
+     * Accepts and executes a blue or yellow robot control command
+     *
+     * @param control the robot control command
+     *
+     * @return the radio response feedback from the simulator
+     */
     std::vector<robot::RadioResponse> acceptBlueRobotControlCommand(
         const SSLSimulationProto::RobotControl &control);
     std::vector<robot::RadioResponse> acceptYellowRobotControlCommand(
         const SSLSimulationProto::RobotControl &control);
+
+    /**
+     * Steps the simulation a given amount of time
+     *
+     * @param time_s time in seconds
+     */
     void stepSimulation(double time_s);
-    // checks for possible collisions with the robots on the target position of the ball
-    // calls teleportRobotToFreePosition to move robots out of the way
-    void safelyTeleportBall(const float x, const float y);
+
+    /**
+     * Handles a tick of the simulator
+     * Note: this function is required for bullet simulator callback
+     *
+     * @param time_s time in seconds
+     */
+    void handleSimulatorTick(double timeStep);
 
     /**
      * Generates wrapper packets from the current state of the simulator
@@ -108,8 +136,13 @@ class camun::simulator::Simulator : public QObject
      * @return simulator state
      */
     world::SimulatorState getSimulatorState();
-    void handleSimulatorSetupCommand(const std::shared_ptr<amun::Command> &command,
-                                     const std::vector<std::tuple<int, int>> &robots);
+
+    /**
+     * Handles a simulator set up command and configure the simulator accordingly
+     *
+     * @param command the simulator set up command
+     */
+    void handleSimulatorSetupCommand(const std::unique_ptr<amun::Command> &command);
 
    public slots:
     void handleRadioCommands(const SSLSimRobotControl &control, bool isBlue,
@@ -117,6 +150,14 @@ class camun::simulator::Simulator : public QObject
     void setFlipped(bool flipped);
 
    private:
+    /**
+     * Accepts and executes a blue or yellow robot control command
+     *
+     * @param control the robot control command
+     * @param isBlue whether it's blue robots or not
+     *
+     * @return the radio response feedback from the simulator
+     */
     std::vector<robot::RadioResponse> acceptRobotControlCommand(
         const SSLSimulationProto::RobotControl &control, bool isBlue);
     void sendSSLSimErrorInternal(ErrorSource source);
@@ -138,7 +179,6 @@ class camun::simulator::Simulator : public QObject
     QQueue<RadioCommand> m_radioCommands;
     QQueue<std::tuple<QList<QByteArray>, QByteArray, qint64>> m_visionPackets;
     QQueue<QTimer *> m_visionTimers;
-    bool m_isPartial;
     QTimer *m_trigger;
     qint64 m_time;
     qint64 m_lastSentStatusTime;

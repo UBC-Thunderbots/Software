@@ -8,6 +8,7 @@ cc_library(
         ":physics_linear_alebra",
         "//firmware/shared:util",
         "//firmware/shared/math:tbots_math",
+        "//shared:constants",
     ],
 )
 
