@@ -297,6 +297,7 @@ std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball)
 
     *(ball_state_msg->mutable_global_position()) = *position;
     *(ball_state_msg->mutable_global_velocity()) = *velocity;
+    ball_state_msg->set_distance_from_ground(ball.currentState().distanceFromGround());
 
     return ball_state_msg;
 }
