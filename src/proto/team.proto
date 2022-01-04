@@ -18,13 +18,10 @@ message Robot
     required RobotState current_state                 = 2;
     repeated RobotCapability unavailable_capabilities = 3;
     required Timestamp timestamp                      = 4;
-    //    RobotConstants_t robot_constants_;
 }
 
 message Team
 {
     repeated Robot team_robots = 1;
     optional uint32 goalie_id  = 2;
-    //    Duration robot_expiry_buffer_duration;
-    //    Timestamp last_update_timestamp = 4;
 }
