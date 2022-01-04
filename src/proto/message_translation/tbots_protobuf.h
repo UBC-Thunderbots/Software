@@ -67,11 +67,11 @@ std::unique_ptr<TbotsProto::Ball> createBall(const Ball& ball);
 std::unique_ptr<TbotsProto::Field> createField(const Field& field);
 
 /**
- * Returns (Robot, Game, Ball)State given a (Robot, Game, Ball)
+ * Returns (Robot, Game, Ball) State given a (Robot, Game, Ball)
  *
  * @param The (Robot, Game, Ball) to convert to State proto
  *
- * @return The unique_ptr to a (Robot, Game, Ball)State after conversion
+ * @return The unique_ptr to a (Robot, Game, Ball) State after conversion
  */
 std::unique_ptr<TbotsProto::RobotState> createRobotState(const Robot& robot);
 std::unique_ptr<TbotsProto::GameState> createGameState(const GameState& game_state);
