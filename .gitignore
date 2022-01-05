@@ -152,3 +152,6 @@ src/config
 
 # codespell dictionary
 formatting_scripts/dictionary/
+
+# clangd for nvim lsp
+src/.clangd
