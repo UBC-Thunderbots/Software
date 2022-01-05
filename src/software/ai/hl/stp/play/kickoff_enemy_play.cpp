@@ -150,7 +150,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
             ->updateControlParams(calculateBlockCone(world.field().friendlyGoalpostPos(),
                                                      world.field().friendlyGoalpostNeg(),
                                                      world.field().centerPoint(),
-                                                     2 * ROBOT_MAX_RADIUS_METERS),
+                                                     ROBOT_MAX_RADIUS_METERS),
                                   Angle::zero(), 0, MaxAllowedSpeedMode::PHYSICAL_LIMIT);
         result[0].emplace_back(move_tactics.at(defense_position_index));
 
