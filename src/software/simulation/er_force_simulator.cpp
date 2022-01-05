@@ -36,44 +36,59 @@ ErForceSimulator::ErForceSimulator(
     QString str = file.readAll();
     file.close();
     std::string s = qPrintable(str);
-
     google::protobuf::TextFormat::Parser parser;
     parser.ParseFromString(s, &er_force_sim_setup);
-
+    // er_force_sim =
+    //     std::make_unique<camun::simulator::Simulator>(er_force_sim_setup, true);
     er_force_sim = std::make_unique<camun::simulator::Simulator>(er_force_sim_setup);
-
-    auto simulator_setup_command = std::make_unique<amun::Command>();
+    auto simulator_setup_command = std::make_shared<amun::Command>();
     simulator_setup_command->mutable_simulator()->set_enable(true);
     // start with default robots, take ER-Force specs.
     robot::Specs ERForce;
     robotSetDefault(&ERForce);
-
     Team friendly_team = Team();
     Team enemy_team    = Team();
     Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
-
-    World world = World(field, ball, friendly_team, enemy_team);
-
-    // TODO (#2283): remove this initialization when addYellowRobots and addBlueRobots are
-    // implemented
+    World world        = World(field, ball, friendly_team, enemy_team);
 
     // TODO (#2283): remove this initialization when addYellowRobots and addBlueRobots are
     // implemented
 
-    this->resetCurrentFirmwareTime();
+    // TODO (#2283): remove this initialization when addYellowRobots and addBlueRobots are
+    // implemented
+
+    this->resetCurrentTime();
 }
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
 {
-    er_force_sim->safelyTeleportBall(static_cast<float>(ball_state.position().x()),
-                                     static_cast<float>(ball_state.position().y()));
+    auto simulator_setup_command = std::make_unique<amun::Command>();
+    auto teleport_ball           = std::make_unique<sslsim::TeleportBall>();
+    auto simulator_control       = std::make_unique<sslsim::SimulatorControl>();
+    auto command_simulator       = std::make_unique<amun::CommandSimulator>();
+
+    teleport_ball->set_x(
+        static_cast<float>(ball_state.position().x() * MILLIMETERS_PER_METER));
+    teleport_ball->set_y(
+        static_cast<float>(ball_state.position().y() * MILLIMETERS_PER_METER));
+    teleport_ball->set_vx(
+        static_cast<float>(ball_state.velocity().x() * MILLIMETERS_PER_METER));
+    teleport_ball->set_vy(
+        static_cast<float>(ball_state.velocity().y() * MILLIMETERS_PER_METER));
+    *(simulator_control->mutable_teleport_ball())   = *teleport_ball;
+    *(command_simulator->mutable_ssl_control())     = *simulator_control;
+    *(simulator_setup_command->mutable_simulator()) = *command_simulator;
+
+    std::vector<std::tuple<int, int>> empty_list;
+
+    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command, empty_list);
 }
 
 void ErForceSimulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
 {
     // TODO (#2283): add robots
 
-    auto simulator_setup_command = std::make_shared<amun::Command>();
+    auto simulator_setup_command = std::make_unique<amun::Command>();
     simulator_setup_command->mutable_simulator()->set_enable(true);
 
     robot::Specs ERForce;
@@ -102,45 +117,14 @@ void ErForceSimulator::addYellowRobots(const std::vector<RobotStateWithId>& robo
             RobotStateWithId{.id = i, .robot_state = robots[i].robot_state},
             robot_constants, wheel_constants);
 
-        blue_simulator_robots.emplace_back(blue_simulator_robot);
         yellow_simulator_robots.emplace_back(yellow_simulator_robot);
     }
-
-    this->resetCurrentTime();
-}
-
-void ErForceSimulator::setBallState(const BallState& ball_state)
-{
-    auto simulator_setup_command = std::make_unique<amun::Command>();
-    auto teleport_ball           = std::make_unique<sslsim::TeleportBall>();
-    auto simulator_control       = std::make_unique<sslsim::SimulatorControl>();
-    auto command_simulator       = std::make_unique<amun::CommandSimulator>();
-
-    teleport_ball->set_x(
-        static_cast<float>(ball_state.position().x() * MILLIMETERS_PER_METER));
-    teleport_ball->set_y(
-        static_cast<float>(ball_state.position().y() * MILLIMETERS_PER_METER));
-    teleport_ball->set_vx(
-        static_cast<float>(ball_state.velocity().x() * MILLIMETERS_PER_METER));
-    teleport_ball->set_vy(
-        static_cast<float>(ball_state.velocity().y() * MILLIMETERS_PER_METER));
-    *(simulator_control->mutable_teleport_ball())   = *teleport_ball;
-    *(command_simulator->mutable_ssl_control())     = *simulator_control;
-    *(simulator_setup_command->mutable_simulator()) = *command_simulator;
-
-
-    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
-}
-
-void ErForceSimulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
-{
-    // TODO (#2283): add robots
 }
 
 void ErForceSimulator::addBlueRobots(const std::vector<RobotStateWithId>& robots)
 {
     // TODO (#2283): add robots
-    auto simulator_setup_command = std::make_shared<amun::Command>();
+    auto simulator_setup_command = std::make_unique<amun::Command>();
     simulator_setup_command->mutable_simulator()->set_enable(true);
 
     robot::Specs ERForce;
@@ -168,17 +152,7 @@ void ErForceSimulator::addBlueRobots(const std::vector<RobotStateWithId>& robots
             RobotStateWithId{.id = i, .robot_state = robots[i].robot_state},
             robot_constants, wheel_constants);
 
-        auto blue_firmware_robot = ErForceSimulatorRobotSingleton::createFirmwareRobot();
-        auto blue_firmware_ball  = SimulatorBallSingleton::createFirmwareBall();
-
-        FirmwareWorld_t* blue_firmware_world_raw = app_firmware_world_create(
-            blue_firmware_robot.release(), blue_firmware_ball.release(),
-            &(ErForceSimulator::getCurrentFirmwareTimeSeconds));
-        auto blue_firmware_world = std::shared_ptr<FirmwareWorld_t>(
-            blue_firmware_world_raw, FirmwareWorldDeleter());
-
-        blue_simulator_robots.insert(
-            std::make_pair(blue_simulator_robot, blue_firmware_world));
+        blue_simulator_robots.emplace_back(blue_simulator_robot);
     }
 }
 

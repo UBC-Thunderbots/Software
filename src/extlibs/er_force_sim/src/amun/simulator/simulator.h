@@ -142,7 +142,8 @@ class camun::simulator::Simulator : public QObject
      *
      * @param command the simulator set up command
      */
-    void handleSimulatorSetupCommand(const std::unique_ptr<amun::Command> &command);
+    void handleSimulatorSetupCommand(const std::unique_ptr<amun::Command> &command,
+                                     const std::vector<std::tuple<int, int>> &robots);
 
    public slots:
     void handleRadioCommands(const SSLSimRobotControl &control, bool isBlue,

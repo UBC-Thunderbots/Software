@@ -718,7 +718,9 @@ void Simulator::setFlipped(bool flipped)
     m_data->flip = flipped;
 }
 
-void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command> &command)
+void Simulator::handleSimulatorSetupCommand(
+    const std::unique_ptr<amun::Command> &command,
+    const std::vector<std::tuple<int, int>> &robots)
 {
     bool teamOrPerfectDribbleChanged = false;
 
