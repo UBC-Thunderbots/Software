@@ -25,6 +25,11 @@ AI::AI(std::shared_ptr<const AiConfig> ai_config,
 {
 }
 
+void AI::overridePlayConstructor(std::function<std::unique_ptr<Play>()> constructor)
+{
+    high_level->overridePlayConstructor(constructor);
+}
+
 std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World &world) const
 {
     std::vector<std::unique_ptr<Intent>> assigned_intents = high_level->getIntents(world);

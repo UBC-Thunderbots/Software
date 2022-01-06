@@ -41,7 +41,7 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_keep_away)
     // force the keep away state
     tactic->updateControlParams(pass, false);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     // we use default parameters for testing ratePassEnemyRisk because that's (partially)
     // what the play uses to determine pass/no pass. Keep away state should try to

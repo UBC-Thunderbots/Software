@@ -61,7 +61,7 @@ TEST_P(SimulatedDribbleTacticPushEnemyTest, test_steal_ball_from_behind_enemy)
     auto tactic = std::make_shared<DribbleTactic>();
     tactic->updateControlParams(dribble_destination, dribble_orientation);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
