@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-StopPlay::StopPlay(std::shared_ptr<const PlayConfig> config) : Play(config, false) {}
+StopPlay::StopPlay(std::shared_ptr<const PlayConfig> config) : Play(config, 6, false) {}
 
 bool StopPlay::isApplicable(const World &world) const
 {

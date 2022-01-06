@@ -1,13 +1,16 @@
 #include "software/ai/hl/stp/play/play.h"
 
-Play::Play(std::shared_ptr<const PlayConfig> play_config, bool requires_goalie)
+Play::Play(std::shared_ptr<const PlayConfig> play_config, unsigned int min_tactics,
+           bool requires_goalie)
     : play_config(play_config),
       requires_goalie(requires_goalie),
       tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
-      world(std::nullopt)
+      world(std::nullopt),
+      min_tactics(min_tactics)
 {
 }
 
+// TODO (#2359): remove this function
 bool Play::done() const
 {
     // If the coroutine "iterator" is done, the getNextTactics function has completed
@@ -50,7 +53,10 @@ std::vector<std::unique_ptr<Intent>> Play::get(
     MotionConstraintBuildFunction motion_constraint_builder, const World &new_world)
 {
     std::vector<std::unique_ptr<Intent>> intents;
-    PriorityTacticVector priority_tactics = getTactics(new_world);
+    updateTactics(PlayUpdate(new_world, [this](PriorityTacticVector new_tactics) {
+        priority_tactics = std::move(new_tactics);
+    }));
+
     ConstPriorityTacticVector const_priority_tactics;
 
     // convert pointers to const pointers
@@ -100,4 +106,15 @@ void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
     {
         getNextTactics(yield, world.value());
     }
+}
+
+// TODO (#2359): delete once all plays are not coroutines
+void Play::updateTactics(const PlayUpdate &play_update)
+{
+    priority_tactics = getTactics(play_update.world);
+}
+
+unsigned int Play::minTactics()
+{
+    return min_tactics;
 }

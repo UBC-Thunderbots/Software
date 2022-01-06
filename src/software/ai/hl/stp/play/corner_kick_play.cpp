@@ -14,7 +14,7 @@
 #include "software/world/ball.h"
 
 CornerKickPlay::CornerKickPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config, true)
+    : Play(config, 5, true)
 {
 }
 

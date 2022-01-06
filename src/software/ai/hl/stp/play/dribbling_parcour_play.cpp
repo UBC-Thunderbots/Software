@@ -6,7 +6,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 DribblingParcourPlay::DribblingParcourPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config, false)
+    : Play(config, 1, false)
 {
 }
 

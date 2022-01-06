@@ -7,7 +7,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 KickoffFriendlyPlay::KickoffFriendlyPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config, true)
+    : Play(config, 5, true)
 {
 }
 

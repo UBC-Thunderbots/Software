@@ -13,7 +13,9 @@
 #include "software/world/game_state.h"
 #include "software/world/team.h"
 
-DefensePlay::DefensePlay(std::shared_ptr<const PlayConfig> config) : Play(config, true) {}
+DefensePlay::DefensePlay(std::shared_ptr<const PlayConfig> config) : Play(config, 5, true)
+{
+}
 
 bool DefensePlay::isApplicable(const World &world) const
 {

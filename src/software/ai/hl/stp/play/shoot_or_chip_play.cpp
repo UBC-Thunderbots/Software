@@ -14,7 +14,7 @@
 #include "software/world/game_state.h"
 
 ShootOrChipPlay::ShootOrChipPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config, true)
+    : Play(config, 5, true)
 {
 }
 

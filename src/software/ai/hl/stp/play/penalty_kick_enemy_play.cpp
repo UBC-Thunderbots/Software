@@ -7,7 +7,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config, false)
+    : Play(config, 6, false)
 {
 }
 

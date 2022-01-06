@@ -5,12 +5,8 @@
 #include <vector>
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
+#include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-
-using TacticVector              = std::vector<std::shared_ptr<Tactic>>;
-using PriorityTacticVector      = std::vector<TacticVector>;
-using ConstTacticVector         = std::vector<std::shared_ptr<const Tactic>>;
-using ConstPriorityTacticVector = std::vector<ConstTacticVector>;
 
 using RobotToTacticAssignmentFunction =
     std::function<std::map<std::shared_ptr<const Tactic>, Robot>(
@@ -52,9 +48,11 @@ class Play
      * Creates a new Play
      *
      * @param play_config The Play configuration
+     * @param min_tactics The minimum number of tactics this play supports
      * @param requires_goalie Whether this plays requires a goalie
      */
-    explicit Play(std::shared_ptr<const PlayConfig> play_config, bool requires_goalie);
+    explicit Play(std::shared_ptr<const PlayConfig> play_config, unsigned int min_tactics,
+                  bool requires_goalie);
 
     /**
      * Returns whether or not this Play can be started. For example, the Enemy Team
@@ -83,9 +81,18 @@ class Play
      * done when its coroutine is done (the getNextTactics() function has no
      * more work to do)
      *
+     * TODO (#2359): make pure virtual once all plays are not coroutines
+     *
      * @return true if the Play is done and false otherwise
      */
-    bool done() const;
+    virtual bool done() const;
+
+    /**
+     * Gets the minimum number of tactics that the play supports
+     *
+     * @return the minimum number of tactics that the play supports
+     */
+    unsigned int minTactics();
 
     /**
      * Gets Intents from the Play given the assignment algorithm and world
@@ -104,6 +111,7 @@ class Play
     virtual ~Play() = default;
 
    protected:
+    // TODO (#2359): remove this
     // The Play configuration
     std::shared_ptr<const PlayConfig> play_config;
 
@@ -118,6 +126,8 @@ class Play
      * access their updated state. Using unique_ptrs wouldn't allow the Play to maintain
      * the Tactic's state because the objects would have to be constructed and moved every
      * time the function is called.
+     *
+     * TODO (#2359): delete once all plays are not coroutines
      *
      * @param world The current state of the world
      * @return A list of shared_ptrs to the Tactics the Play wants to run at this time, in
@@ -143,6 +153,8 @@ class Play
      * This function yields a list of shared_ptrs to the Tactics the Play wants to run at
      * this time, in order of priority. This yield happens in place of a return.
      *
+     * TODO (#2359): delete once all plays are not coroutines
+     *
      * @param yield The coroutine push_type for the Play
      */
     void getNextTacticsWrapper(TacticCoroutine::push_type& yield);
@@ -151,18 +163,30 @@ class Play
      * This function yields a list of shared_ptrs to the Tactics the Play wants to run at
      * this time, in order of priority. This yield happens in place of a return.
      *
+     * TODO (#2359): delete once all plays are not coroutines
+     *
      * @param yield The coroutine push_type for the Play
      * @param world The current state of the world
      */
     virtual void getNextTactics(TacticCoroutine::push_type& yield,
                                 const World& world) = 0;
 
+    // TODO (#2359): make pure virtual once all plays are not coroutines
+    virtual void updateTactics(const PlayUpdate& play_update);
+
     // Whether this plays requires a goalie
     const bool requires_goalie;
 
+    // TODO (#2359): remove this
     // The coroutine that sequentially returns the Tactics the Play wants to run
     TacticCoroutine::pull_type tactic_sequence;
 
+    // TODO (#2359): remove this
     // The Play's knowledge of the most up-to-date World
     std::optional<World> world;
+
+    // TODO (#2359): remove this
+    PriorityTacticVector priority_tactics;
+
+    unsigned int min_tactics;
 };
