@@ -1,6 +1,6 @@
 jupyter==1.0.0
 notebook==6.4.1
-numpy==1.19.4
+numpy==1.21.0
 matplotlib==3.3.3
 protobuf==3.6.1
 bokeh==2.2.3
