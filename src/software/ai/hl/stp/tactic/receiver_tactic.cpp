@@ -184,7 +184,7 @@ std::optional<Shot> ReceiverTactic::findFeasibleShot()
     if (best_shot_opt)
     {
         Vector robot_to_shot_target =
-            best_shot_opt->getPointToShootAt() - robot_->position();
+            best_shot_opt.value().getPointToShootAt() - robot_->position();
         abs_angle_between_pass_and_shot_vectors =
             (robot_to_ball.orientation() - robot_to_shot_target.orientation())
                 .clamp()
@@ -194,7 +194,7 @@ std::optional<Shot> ReceiverTactic::findFeasibleShot()
                                       field.friendlyGoalpostNeg())
                                .abs();
         net_percent_open =
-            best_shot_opt->getOpenAngle().toDegrees() / goal_angle.toDegrees();
+            best_shot_opt.value().getOpenAngle().toDegrees() / goal_angle.toDegrees();
     }
 
     // If we have a shot with a sufficiently large enough opening, and the deflection
