@@ -77,9 +77,13 @@ TEST_F(ErForceSimulatorTest, set_ball_state_when_ball_already_exists)
                 {
                     double x_difference = fabs(ball.x() - (-3500.0f));
                     double y_difference = fabs(ball.y() - 20.0f);
-                    if (x_difference < 1.0f && y_difference < 1.0f)
+                    if (x_difference < 2.0f && y_difference < 2.0f)
                     {
                         at_least_one_wrapper_packet_passes = true;
+                    }
+                    else
+                    {
+                        std::cout<<x_difference<<","<<y_difference<<std::endl;
                     }
                 }
             }
