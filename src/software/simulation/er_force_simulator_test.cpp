@@ -83,7 +83,7 @@ TEST_F(ErForceSimulatorTest, set_ball_state_when_ball_already_exists)
                     }
                     else
                     {
-                        std::cout<<x_difference<<","<<y_difference<<std::endl;
+                        std::cout << x_difference << "," << y_difference << std::endl;
                     }
                 }
             }
