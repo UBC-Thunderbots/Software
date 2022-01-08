@@ -3,12 +3,15 @@
 #include "software/geom/circle.h"
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
+#include "software/util/make_enum/make_enum.h"
 
 typedef enum
 {
     POS_X,  // positive X side according to vision
     NEG_X   // negative X side
 } FieldSide;
+
+MAKE_ENUM(FieldType, DIV_A, DIV_B);
 
 /**
  * Exposes the dimensions of various parts of the field.
@@ -46,6 +49,13 @@ class Field
      * @return a field with the standard SSL Division A dimensions
      */
     static Field createSSLDivisionAField();
+
+    /**
+     * Creates a field with the standard SSL Division A or B dimensions
+     * 
+     * @return a field with the standard SSL Division A or B dimensions
+     */
+    static Field createField(FieldType field_type);
 
     Field() = delete;
 

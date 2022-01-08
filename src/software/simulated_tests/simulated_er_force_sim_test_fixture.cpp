@@ -179,7 +179,7 @@ void SimulatedErForceSimTestFixture::runTest(
     const Duration &timeout)
 {
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
-        field, create2015RobotConstants(), create2015WheelConstants(),
+        FieldType::DIV_B, create2015RobotConstants(), create2015WheelConstants(),
         thunderbots_config->getSimulatorConfig()));
     simulator->setBallState(ball);
     simulator->addYellowRobots(friendly_robots);

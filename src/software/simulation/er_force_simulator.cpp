@@ -25,9 +25,21 @@ ErForceSimulator::ErForceSimulator(
       blue_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
       frame_number(0),
       robot_constants(robot_constants),
-      wheel_constants(wheel_constants)
+      wheel_constants(wheel_constants),
+      field(Field::createField(field_type))
 {
-    QString full_filename = CONFIG_DIRECTORY + CONFIG_FILE + ".txt";
+
+    QString full_filename = CONFIG_DIRECTORY;
+
+    if(field_type == FieldType::DIV_A)
+    {
+       full_filename = full_filename + CONFIG_FILE + ".txt";
+    }
+    else
+    {
+       full_filename = full_filename + CONFIG_FILE + "B.txt";
+    }
+
     QFile file(full_filename);
     if (!file.open(QFile::ReadOnly))
     {
@@ -91,9 +103,6 @@ ErForceSimulator::ErForceSimulator(
     }
 
     this->resetCurrentTime();
-
-    field_type = this->getSimulatorSetup();
-
 }
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
@@ -230,7 +239,7 @@ std::vector<SSLProto::SSL_WrapperPacket> ErForceSimulator::getSSLWrapperPackets(
 
 Field ErForceSimulator::getField() const
 {
-    return Field::createSSLDivisionAField();
+    return field;
 }
 
 Timestamp ErForceSimulator::getTimestamp() const
@@ -242,9 +251,3 @@ void ErForceSimulator::resetCurrentTime()
 {
     current_time = Timestamp::fromSeconds(0);
 }
-
-std::unique_ptr<amun::SimulatorSetup> ErForceSimulator::getSimulatorSetup()
-{
-    return amun::SimulatorSetup();
-}
-

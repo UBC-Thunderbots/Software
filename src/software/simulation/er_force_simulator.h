@@ -20,8 +20,6 @@ extern "C"
 #include "proto/tbots_software_msgs.nanopb.h"
 }
 
-MAKE_ENUM(FieldType, DIV_A, DIV_B);
-
 /**
  * The ErForceSimulator abstracts away the physics simulation of all objects in the world,
  * as well as the firmware simulation for the robots. This provides a simple interface
@@ -39,8 +37,7 @@ class ErForceSimulator : public QObject
      * @param wheel_constants The wheel constants
      * @param simulator_config The config to fetch parameters from
      */
-    explicit ErForceSimulator(const FieldType& field_type,
-                              const RobotConstants_t& robot_constants,
+    explicit ErForceSimulator(const FieldType& field_type, const RobotConstants_t& robot_constants,
                               const WheelConstants& wheel_constants,
                               std::shared_ptr<const SimulatorConfig> simulator_config);
     ErForceSimulator()  = delete;
@@ -105,13 +102,6 @@ class ErForceSimulator : public QObject
     Field getField() const;
 
     /**
-     * Returns the field type in the simulation
-     *
-     * @return the field type in the simulation
-     */
-    Field Field(FieldType field_type);
-
-    /**
      * Returns the current time in the simulation
      *
      * @return the current time in the simulation
@@ -164,6 +154,7 @@ class ErForceSimulator : public QObject
 
     RobotConstants_t robot_constants;
     WheelConstants wheel_constants;
+    Field field;
 
     const QString CONFIG_FILE      = "simulator/2020";
     const QString CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";
