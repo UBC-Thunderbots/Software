@@ -13,9 +13,8 @@ class ErForceSimulatorTest : public ::testing::Test
     void SetUp() override
     {
         simulator_config = std::make_shared<const SimulatorConfig>();
-        simulator = std::make_shared<ErForceSimulator>(FieldType::DIV_B,
-                                                       robot_constants, wheel_constants,
-                                                       simulator_config);
+        simulator = std::make_shared<ErForceSimulator>(FieldType::DIV_B, robot_constants,
+                                                       wheel_constants, simulator_config);
         simulator->resetCurrentTime();
     }
 

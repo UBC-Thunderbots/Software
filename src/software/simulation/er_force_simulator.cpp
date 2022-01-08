@@ -28,16 +28,15 @@ ErForceSimulator::ErForceSimulator(
       wheel_constants(wheel_constants),
       field(Field::createField(field_type))
 {
-
     QString full_filename = CONFIG_DIRECTORY;
 
-    if(field_type == FieldType::DIV_A)
+    if (field_type == FieldType::DIV_A)
     {
-       full_filename = full_filename + CONFIG_FILE + ".txt";
+        full_filename = full_filename + CONFIG_FILE + ".txt";
     }
     else
     {
-       full_filename = full_filename + CONFIG_FILE + "B.txt";
+        full_filename = full_filename + CONFIG_FILE + "B.txt";
     }
 
     QFile file(full_filename);

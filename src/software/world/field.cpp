@@ -22,7 +22,7 @@ Field Field::createSSLDivisionAField()
 
 Field Field::createField(FieldType field_type)
 {
-    if(field_type == FieldType::DIV_A)
+    if (field_type == FieldType::DIV_A)
     {
         return createSSLDivisionAField();
     }

@@ -52,7 +52,7 @@ class Field
 
     /**
      * Creates a field with the standard SSL Division A or B dimensions
-     * 
+     *
      * @return a field with the standard SSL Division A or B dimensions
      */
     static Field createField(FieldType field_type);

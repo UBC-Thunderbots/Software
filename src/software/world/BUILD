@@ -49,10 +49,10 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/geom:circle",
-        "//software/util/make_enum",
         "//software/geom:rectangle",
         "//software/geom/algorithms",
         "//software/time:timestamp",
+        "//software/util/make_enum",
     ],
 )
 
