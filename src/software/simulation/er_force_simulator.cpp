@@ -51,12 +51,6 @@ ErForceSimulator::ErForceSimulator(
     Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
     World world        = World(field, ball, friendly_team, enemy_team);
 
-    // TODO (#2283): remove this initialization when addYellowRobots and addBlueRobots are
-    // implemented
-
-    // TODO (#2283): remove this initialization when addYellowRobots and addBlueRobots are
-    // implemented
-
     this->resetCurrentTime();
 }
 
@@ -79,15 +73,11 @@ void ErForceSimulator::setBallState(const BallState& ball_state)
     *(command_simulator->mutable_ssl_control())     = *simulator_control;
     *(simulator_setup_command->mutable_simulator()) = *command_simulator;
 
-    std::vector<std::tuple<int, int>> empty_list;
-
-    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command, empty_list);
+    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
 }
 
 void ErForceSimulator::addYellowRobots(const std::vector<RobotStateWithId>& robots)
 {
-    // TODO (#2283): add robots
-
     auto simulator_setup_command = std::make_unique<amun::Command>();
     simulator_setup_command->mutable_simulator()->set_enable(true);
 
@@ -95,21 +85,15 @@ void ErForceSimulator::addYellowRobots(const std::vector<RobotStateWithId>& robo
     robotSetDefault(&ERForce);
 
     auto* team_yellow = simulator_setup_command->mutable_set_team_yellow();
-    std::vector<std::tuple<int, int>>
-        yellow_robot_pos;  //=new std::vector<std::tuple<int, int>>;
-
 
     for (unsigned int i = 0; i < robots.size(); i++)
     {
         auto* robot = team_yellow->add_robot();
         robot->CopyFrom(ERForce);
         robot->set_id(i);
-        yellow_robot_pos.push_back(std::make_tuple(robots[i].robot_state.position().y(),
-                                                   robots[i].robot_state.position().x()));
     }
 
-    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command, yellow_robot_pos);
-    er_force_sim->seedPRGN(17);
+    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
 
     for (unsigned int i = 0; i < robots.size(); i++)
     {
@@ -130,21 +114,35 @@ void ErForceSimulator::addBlueRobots(const std::vector<RobotStateWithId>& robots
     robot::Specs ERForce;
     robotSetDefault(&ERForce);
 
-    auto team_blue = simulator_setup_command->mutable_set_team_blue();
-    std::vector<std::tuple<int, int>> blue_robot_pos;
-    // = new std::vector<std::tuple<int, int>>;
+    // auto team_blue = simulator_setup_command->mutable_set_team_blue();
+
+    // for (unsigned int i = 0; i < robots.size(); i++)
+    // {
+    //     auto* robot = team_blue->add_robot();
+    //     robot->CopyFrom(ERForce);
+    //     robot->set_id(i);
+    // }
+
+    auto simulator_control = std::make_unique<sslsim::SimulatorControl>();
+    auto command_simulator = std::make_unique<amun::CommandSimulator>();
 
     for (unsigned int i = 0; i < robots.size(); i++)
     {
-        auto* robot = team_blue->add_robot();
-        robot->CopyFrom(ERForce);
-        robot->set_id(i);
-        blue_robot_pos.push_back(std::make_tuple(robots[i].robot_state.position().y(),
-                                                 robots[i].robot_state.position().x()));
-    }
+        auto teleport_robot             = std::make_unique<sslsim::TeleportRobot>();
+        gameController::BotId* robot_id = new gameController::BotId();
+        robot_id->set_id(i);
+        robot_id->set_team(static_cast<gameController::Team>(2));
 
-    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command, blue_robot_pos);
-    er_force_sim->seedPRGN(17);
+        teleport_robot->set_x(static_cast<float>(robots[i].robot_state.position().x()));
+        teleport_robot->set_y(static_cast<float>(robots[i].robot_state.position().y()));
+        teleport_robot->set_allocated_id(robot_id);
+        teleport_robot->set_present(true);
+
+        *(simulator_control->add_teleport_robot())      = *teleport_robot;
+        *(command_simulator->mutable_ssl_control())     = *simulator_control;
+        *(simulator_setup_command->mutable_simulator()) = *command_simulator;
+        er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
+    }
 
     for (unsigned int i = 0; i < robots.size(); i++)
     {

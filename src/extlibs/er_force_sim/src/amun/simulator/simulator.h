@@ -142,8 +142,7 @@ class camun::simulator::Simulator : public QObject
      *
      * @param command the simulator set up command
      */
-    void handleSimulatorSetupCommand(const std::unique_ptr<amun::Command> &command,
-                                     const std::vector<std::tuple<int, int>> &robots);
+    void handleSimulatorSetupCommand(const std::unique_ptr<amun::Command> &command);
 
    public slots:
     void handleRadioCommands(const SSLSimRobotControl &control, bool isBlue,
@@ -166,8 +165,7 @@ class camun::simulator::Simulator : public QObject
     std::tuple<QList<QByteArray>, QByteArray, qint64> createVisionPacket();
     void resetVisionPackets();
     void setTeam(RobotMap &list, float side, const robot::Team &team,
-                 QMap<uint32_t, robot::Specs> &specs,
-                 const std::vector<std::tuple<int, int>> &robots);
+                 QMap<uint32_t, robot::Specs> &specs);
     void moveBall(const sslsim::TeleportBall &ball);
     void moveRobot(const sslsim::TeleportRobot &robot);
     void teleportRobotToFreePosition(SimRobot *robot);

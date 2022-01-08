@@ -259,6 +259,7 @@ static void createRobot(Simulator::RobotMap &list, float x, float y, uint32_t id
                         const ErrorAggregator *agg, SimulatorData *data,
                         const QMap<uint32_t, robot::Specs> &teamSpecs)
 {
+    std::cout << "hi" << std::endl;
     SimRobot *robot = new SimRobot(&data->rng, teamSpecs[id], data->dynamicsWorld,
                                    btVector3(x, y, 0), 0.f);
     robot->setDribbleMode(data->dribblePerfect);
@@ -554,8 +555,7 @@ void Simulator::handleRadioCommands(const SSLSimRobotControl &commands, bool isB
 }
 
 void Simulator::setTeam(Simulator::RobotMap &list, float side, const robot::Team &team,
-                        QMap<uint32_t, robot::Specs> &teamSpecs,
-                        const std::vector<std::tuple<int, int>> &robots)
+                        QMap<uint32_t, robot::Specs> &teamSpecs)
 {
     // remove old team
     deleteAll(list);
@@ -570,8 +570,8 @@ void Simulator::setTeam(Simulator::RobotMap &list, float side, const robot::Team
     resetVisionPackets();
 
     // align robots on a line
-    // const float x = m_data->geometry.field_width() / 2 - 0.2;
-    // float y       = m_data->geometry.field_height() / 2 - 0.2;
+    const float x = m_data->geometry.field_width() / 2 - 0.2;
+    float y       = m_data->geometry.field_height() / 2 - 0.2;
 
     for (int i = 0; i < team.robot_size(); i++)
     {
@@ -586,8 +586,8 @@ void Simulator::setTeam(Simulator::RobotMap &list, float side, const robot::Team
         }
         teamSpecs[id].CopyFrom(specs);
 
-        createRobot(list, std::get<0>(robots[i]), std::get<1>(robots[i]), id,
-                    m_aggregator, m_data, teamSpecs);
+        createRobot(list, x, side * y, id, m_aggregator, m_data, teamSpecs);
+        y -= 0.3;
     }
 }
 
@@ -632,30 +632,38 @@ void Simulator::moveRobot(const sslsim::TeleportRobot &robot)
 {
     if (!robot.id().has_team())
         return;
+
     if (!robot.id().has_id())
         return;
+
     bool is_blue = robot.id().team() == gameController::Team::BLUE;
 
     RobotMap &list = is_blue ? m_data->robotsBlue : m_data->robotsYellow;
     bool isPresent = list.contains(robot.id().id());
     QMap<uint32_t, robot::Specs> &teamSpecs =
         is_blue ? m_data->specsBlue : m_data->specsYellow;
+
     if (robot.has_present())
     {
+        // std::cout << isPresent << std::endl;
+        // std::cout << robot.present() << std::endl;
+
         if (robot.present() && !isPresent)
         {
             // add the requested robot
-            if (!teamSpecs.contains(robot.id().id()))
-            {
-                SSLSimError error{new sslsim::SimulatorError};
-                error->set_code("CREATE_UNSPEC_ROBOT");
-                std::string message =
-                    "trying to create robot " + std::to_string(robot.id().id());
-                message += ", but no spec for this robot was found";
-                error->set_message(std::move(message));
-                m_aggregator->aggregate(error, ErrorSource::CONFIG);
-            }
-            else if (!robot.has_x() || !robot.has_y())
+            // if (!teamSpecs.contains(robot.id().id()))
+            // {
+            //     std::cout << "Aw Man" << std::endl;
+            //     SSLSimError error{new sslsim::SimulatorError};
+            //     error->set_code("CREATE_UNSPEC_ROBOT");
+            //     std::string message =
+            //         "trying to create robot " + std::to_string(robot.id().id());
+            //     message += ", but no spec for this robot was found";
+            //     error->set_message(std::move(message));
+            //     m_aggregator->aggregate(error, ErrorSource::CONFIG);
+            // }
+            // else
+            if (!robot.has_x() || !robot.has_y())
             {
                 SSLSimError error{new sslsim::SimulatorError};
                 error->set_code("CREATE_NOPOS_ROBOT");
@@ -667,10 +675,18 @@ void Simulator::moveRobot(const sslsim::TeleportRobot &robot)
             }
             else
             {
-                Vector targetPos;
-                coordinates::fromVision(robot, targetPos);
-                // TODO: check if the given position is fine
-                createRobot(list, targetPos.x, targetPos.y, robot.id().id(), m_aggregator,
+                // Vector targetPos;
+                // coordinates::fromVision(robot, targetPos);
+                // // TODO: check if the given position is fine
+                // createRobot(list, targetPos.x, targetPos.y, robot.id().id(),
+                // m_aggregator,
+                //             m_data, teamSpecs);
+
+                std::cout << robot.x() << std::endl;
+                std::cout << robot.y() << std::endl;
+                std::cout << robot.id().id() << std::endl;
+
+                createRobot(list, robot.y(), robot.x(), robot.id().id(), m_aggregator,
                             m_data, teamSpecs);
             }
         }
@@ -718,9 +734,7 @@ void Simulator::setFlipped(bool flipped)
     m_data->flip = flipped;
 }
 
-void Simulator::handleSimulatorSetupCommand(
-    const std::unique_ptr<amun::Command> &command,
-    const std::vector<std::tuple<int, int>> &robots)
+void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command> &command)
 {
     bool teamOrPerfectDribbleChanged = false;
 
@@ -874,15 +888,14 @@ void Simulator::handleSimulatorSetupCommand(
     if (command->has_set_team_blue())
     {
         teamOrPerfectDribbleChanged = true;
-        setTeam(m_data->robotsBlue, 1.0f, command->set_team_blue(), m_data->specsBlue,
-                robots);
+        setTeam(m_data->robotsBlue, 1.0f, command->set_team_blue(), m_data->specsBlue);
     }
 
     if (command->has_set_team_yellow())
     {
         teamOrPerfectDribbleChanged = true;
         setTeam(m_data->robotsYellow, -1.0f, command->set_team_yellow(),
-                m_data->specsYellow, robots);
+                m_data->specsYellow);
     }
 
     if (teamOrPerfectDribbleChanged)
