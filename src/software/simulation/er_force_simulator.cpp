@@ -124,10 +124,13 @@ void ErForceSimulator::addBlueRobots(const std::vector<RobotStateWithId>& robots
         robot->set_id(i);
     }
 
+    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
+    simulator_setup_command->clear_set_team_blue();
+
     // Setup mutable_ssl_control simulator command
     auto simulator_control = std::make_unique<sslsim::SimulatorControl>();
     auto command_simulator = std::make_unique<amun::CommandSimulator>();
-    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
+
 
     // Add each robot to be added to the teleport robot repeated field
     for (unsigned int i = 0; i < robots.size(); i++)
