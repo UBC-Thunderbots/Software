@@ -97,6 +97,11 @@ class ErForceSimulator : public QObject
     std::vector<SSLProto::SSL_WrapperPacket> getSSLWrapperPackets() const;
 
     /**
+     * Returns the current Simulator State
+     */
+    world::SimulatorState getSimulatorState() const;
+
+    /**
      * Returns the field in the simulation
      *
      * @return the field in the simulation

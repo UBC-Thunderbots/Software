@@ -278,6 +278,11 @@ std::vector<SSLProto::SSL_WrapperPacket> ErForceSimulator::getSSLWrapperPackets(
     return er_force_sim->getWrapperPackets();
 }
 
+world::SimulatorState ErForceSimulator::getSimulatorState() const
+{
+    return er_force_sim->getSimulatorState();
+}
+
 Field ErForceSimulator::getField() const
 {
     return Field::createSSLDivisionAField();
