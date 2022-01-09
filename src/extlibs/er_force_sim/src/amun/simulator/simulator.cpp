@@ -710,7 +710,6 @@ void Simulator::moveRobot(const sslsim::TeleportRobot &robot)
         FLIP(r, v_y);
     }
 
-    std::cout << "Trying to move robot with id: " << robot.id().id() << std::endl;
     SimRobot *sim_robot = list[robot.id().id()].first;
     sim_robot->stopDribbling();
     sim_robot->move(r);

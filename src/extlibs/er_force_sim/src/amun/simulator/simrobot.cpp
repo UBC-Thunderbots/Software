@@ -320,7 +320,6 @@ void SimRobot::begin(SimBall *ball, double time)
 
     if (moveCommand)
     {
-        std::cout << "recieved move command" << std::endl;
         if (m_move.by_force())
         {
             // move robot by hand
