@@ -81,10 +81,6 @@ TEST_F(ErForceSimulatorTest, set_ball_state_when_ball_already_exists)
                     {
                         at_least_one_wrapper_packet_passes = true;
                     }
-                    else
-                    {
-                        std::cout << x_difference << "," << y_difference << std::endl;
-                    }
                 }
             }
         }

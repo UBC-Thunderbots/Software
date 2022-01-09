@@ -7,7 +7,6 @@
 #include <QtCore/QString>
 #include <iostream>
 
-#include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
 #include "extlibs/er_force_sim/src/protobuf/robot.h"
 #include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "proto/message_translation/ssl_detection.h"
