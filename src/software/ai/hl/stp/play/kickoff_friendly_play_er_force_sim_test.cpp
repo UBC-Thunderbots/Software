@@ -26,10 +26,6 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
         {Point(-3, 2.5), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
          Point(-3, -2.5)});
     setFriendlyGoalie(0);
-    // auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
-    //     {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
-    //      field.enemyDefenseArea().negXNegYCorner(),
-    //      field.enemyDefenseArea().negXPosYCorner()});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
          field.enemyDefenseArea().negXNegYCorner(),
@@ -55,18 +51,18 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
             Rectangle robots_defensive_rect(Point(-4, 2), Point(-5, -2));
             robotInPolygon(0, robots_defensive_rect, world_ptr, yield);
             robotInPolygon(3, robots_defensive_rect, world_ptr, yield);
-            robotInPolygon(2, robots_defensive_rect, world_ptr, yield);
+            robotInPolygon(1, robots_defensive_rect, world_ptr, yield);
 
             // Two friendly robots near the half line setting up for offense
             Rectangle robots_offensive_rect(Point(0, 3.5), Point(-1.5, -3.5));
-            robotInPolygon(1, robots_offensive_rect, world_ptr, yield);
+            robotInPolygon(2, robots_offensive_rect, world_ptr, yield);
             robotInPolygon(5, robots_offensive_rect, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
         {
-            for (RobotId robot_id : {0, 1, 3, 4, 5})
+            for (RobotId robot_id : {0, 1, 2, 3, 5})
             {
                 {
                     robotInFriendlyHalf(robot_id, world_ptr, yield);

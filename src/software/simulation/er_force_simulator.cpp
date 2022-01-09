@@ -114,35 +114,41 @@ void ErForceSimulator::addBlueRobots(const std::vector<RobotStateWithId>& robots
     robot::Specs ERForce;
     robotSetDefault(&ERForce);
 
-    // auto team_blue = simulator_setup_command->mutable_set_team_blue();
+    // Initialize Team Robots at the bottom of the field
+    auto team_blue = simulator_setup_command->mutable_set_team_blue();
 
-    // for (unsigned int i = 0; i < robots.size(); i++)
-    // {
-    //     auto* robot = team_blue->add_robot();
-    //     robot->CopyFrom(ERForce);
-    //     robot->set_id(i);
-    // }
+    for (unsigned int i = 0; i < robots.size(); i++)
+    {
+        auto* robot = team_blue->add_robot();
+        robot->CopyFrom(ERForce);
+        robot->set_id(i);
+    }
 
+    // Setup mutable_ssl_control simulator command
     auto simulator_control = std::make_unique<sslsim::SimulatorControl>();
     auto command_simulator = std::make_unique<amun::CommandSimulator>();
+    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
 
+    // Add each robot to be added to the teleport robot repeated field
     for (unsigned int i = 0; i < robots.size(); i++)
     {
         auto teleport_robot             = std::make_unique<sslsim::TeleportRobot>();
         gameController::BotId* robot_id = new gameController::BotId();
         robot_id->set_id(i);
-        robot_id->set_team(static_cast<gameController::Team>(2));
+        robot_id->set_team(gameController::Team::BLUE);
 
         teleport_robot->set_x(static_cast<float>(robots[i].robot_state.position().x()));
         teleport_robot->set_y(static_cast<float>(robots[i].robot_state.position().y()));
         teleport_robot->set_allocated_id(robot_id);
         teleport_robot->set_present(true);
 
-        *(simulator_control->add_teleport_robot())      = *teleport_robot;
-        *(command_simulator->mutable_ssl_control())     = *simulator_control;
-        *(simulator_setup_command->mutable_simulator()) = *command_simulator;
-        er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
+        *(simulator_control->add_teleport_robot()) = *teleport_robot;
     }
+
+    // Send message to simulator to teleport robots
+    *(command_simulator->mutable_ssl_control())     = *simulator_control;
+    *(simulator_setup_command->mutable_simulator()) = *command_simulator;
+    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
 
     for (unsigned int i = 0; i < robots.size(); i++)
     {

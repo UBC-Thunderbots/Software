@@ -259,7 +259,6 @@ static void createRobot(Simulator::RobotMap &list, float x, float y, uint32_t id
                         const ErrorAggregator *agg, SimulatorData *data,
                         const QMap<uint32_t, robot::Specs> &teamSpecs)
 {
-    std::cout << "hi" << std::endl;
     SimRobot *robot = new SimRobot(&data->rng, teamSpecs[id], data->dynamicsWorld,
                                    btVector3(x, y, 0), 0.f);
     robot->setDribbleMode(data->dribblePerfect);
@@ -645,25 +644,20 @@ void Simulator::moveRobot(const sslsim::TeleportRobot &robot)
 
     if (robot.has_present())
     {
-        // std::cout << isPresent << std::endl;
-        // std::cout << robot.present() << std::endl;
-
         if (robot.present() && !isPresent)
         {
             // add the requested robot
-            // if (!teamSpecs.contains(robot.id().id()))
-            // {
-            //     std::cout << "Aw Man" << std::endl;
-            //     SSLSimError error{new sslsim::SimulatorError};
-            //     error->set_code("CREATE_UNSPEC_ROBOT");
-            //     std::string message =
-            //         "trying to create robot " + std::to_string(robot.id().id());
-            //     message += ", but no spec for this robot was found";
-            //     error->set_message(std::move(message));
-            //     m_aggregator->aggregate(error, ErrorSource::CONFIG);
-            // }
-            // else
-            if (!robot.has_x() || !robot.has_y())
+            if (!teamSpecs.contains(robot.id().id()))
+            {
+                SSLSimError error{new sslsim::SimulatorError};
+                error->set_code("CREATE_UNSPEC_ROBOT");
+                std::string message =
+                    "trying to create robot " + std::to_string(robot.id().id());
+                message += ", but no spec for this robot was found";
+                error->set_message(std::move(message));
+                m_aggregator->aggregate(error, ErrorSource::CONFIG);
+            }
+            else if (!robot.has_x() || !robot.has_y())
             {
                 SSLSimError error{new sslsim::SimulatorError};
                 error->set_code("CREATE_NOPOS_ROBOT");
@@ -675,18 +669,10 @@ void Simulator::moveRobot(const sslsim::TeleportRobot &robot)
             }
             else
             {
-                // Vector targetPos;
-                // coordinates::fromVision(robot, targetPos);
-                // // TODO: check if the given position is fine
-                // createRobot(list, targetPos.x, targetPos.y, robot.id().id(),
-                // m_aggregator,
-                //             m_data, teamSpecs);
-
-                std::cout << robot.x() << std::endl;
-                std::cout << robot.y() << std::endl;
-                std::cout << robot.id().id() << std::endl;
-
-                createRobot(list, robot.y(), robot.x(), robot.id().id(), m_aggregator,
+                Vector targetPos;
+                coordinates::fromVision(robot, targetPos);
+                // TODO: check if the given position is fine
+                createRobot(list, targetPos.x, targetPos.y, robot.id().id(), m_aggregator,
                             m_data, teamSpecs);
             }
         }
@@ -724,6 +710,7 @@ void Simulator::moveRobot(const sslsim::TeleportRobot &robot)
         FLIP(r, v_y);
     }
 
+    std::cout << "Trying to move robot with id: " << robot.id().id() << std::endl;
     SimRobot *sim_robot = list[robot.id().id()].first;
     sim_robot->stopDribbling();
     sim_robot->move(r);
