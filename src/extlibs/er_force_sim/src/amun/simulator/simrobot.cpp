@@ -242,8 +242,7 @@ void SimRobot::begin(SimBall *ball, double time)
         stopDribbling();
     }
 
-    auto sendPartialCoordError = [this](const std::string &msg)
-    {
+    auto sendPartialCoordError = [this](const std::string &msg) {
         SSLSimError error{new sslsim::SimulatorError};
         error->set_code("PARTIAL_COORD");
         std::string message = "Partial coordinates are not implemented yet";
@@ -432,8 +431,7 @@ void SimRobot::begin(SimBall *ball, double time)
             power = qBound(0.05f, m_sslCommand.kick_speed(), maxShootSpeed);
         }
 
-        const auto getSpeedCompensation = [&]() -> float
-        {
+        const auto getSpeedCompensation = [&]() -> float {
             if (m_sslCommand.kick_angle() == 0)
             {
                 return 0.0f;

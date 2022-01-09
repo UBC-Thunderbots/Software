@@ -66,6 +66,8 @@ class ErForceSimulator : public QObject
      */
     void addYellowRobots(const std::vector<RobotStateWithId>& robots);
     void addBlueRobots(const std::vector<RobotStateWithId>& robots);
+    void addRobots(const std::vector<RobotStateWithId>& robots,
+                   gameController::Team team);
 
     /**
      * Sets the primitive being simulated by the robot on the corresponding team

@@ -31,16 +31,13 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlayConstructor(
-        [this]() {
-            return std::make_unique<KickoffFriendlyPlay>(
-                thunderbots_config->getPlayConfig());
-        });
+    setAIPlayConstructor([this]() {
+        return std::make_unique<KickoffFriendlyPlay>(thunderbots_config->getPlayConfig());
+    });
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
-        {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             // Robot 2 is the only robot allowed to be in the center circle and start
             // the kickoff
             robotInCenterCircle(3, world_ptr, yield);
@@ -60,8 +57,7 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
-        {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             for (RobotId robot_id : {0, 1, 2, 4, 5})
             {
                 {
