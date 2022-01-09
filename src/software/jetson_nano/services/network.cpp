@@ -1,33 +1,32 @@
 #include "software/networking/threaded_proto_udp_sender.hpp"
 #include "software/networking/threaded_proto_udp_listener.hpp"
-#include "proto/robot_status_msg.pb.h"
 #include "software/jetson_nano/services/network.h"
 
 
 
 NetworkService::NetworkService(const std::string& ip_address, 
-                            unsigned short port,
-                            bool multicast,
-                            const std::string& ip_addresslistener, 
-                            unsigned short portlistener)
+                            unsigned short vision_listener_port,
+                            unsigned short primitive_listener_port,
+                            unsigned short robot_status_sender_port,
+                            bool multicast)
 {
-    sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(ip_address, port, multicast);
-    listenerPrimitiveSet = std::make_unique<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>(ip_addresslistener, portlistener, boost::bind(&NetworkService::primitiveSetCallback, this, _1), multicast);
-    listenerVision = std::make_unique<ThreadedProtoUdpListener<TbotsProto::Vision>>(ip_addresslistener, portlistener, boost::bind(&NetworkService::visionCallback, this, _1), multicast);
+    sender = std::make_unique<ThreadedProtoUdpSender<TbotsProto::RobotStatus>>(ip_address, robot_status_sender_port, multicast);
+    listenerPrimitiveSet = std::make_unique<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>(ip_address, primitive_listener_port, boost::bind(&NetworkService::primitiveSetCallback, this, _1), multicast);
+    listenerVision = std::make_unique<ThreadedProtoUdpListener<TbotsProto::Vision>>(ip_address, vision_listener_port, boost::bind(&NetworkService::visionCallback, this, _1), multicast);
 
 }
 
 void NetworkService::start(){
 
 }
+NetworkService::~NetworkService(){}
 
-//std::tuple<TbotsProto::PrimitiveSet, TbotsProto::Vision> 
-void NetworkService::poll(const TbotsProto::RobotStatus & robot_status){
+std::tuple<TbotsProto::PrimitiveSet, TbotsProto::Vision> NetworkService::poll(const TbotsProto::RobotStatus & robot_status){
 
     sender->sendProto(robot_status);
-    //TbotsProto::PrimitiveSet emptyPrimitiveSet;
-    //TbotsProto::Vision emptyVision;
-    //return std::make_tuple<TbotsProto::PrimitiveSet, TbotsProto::Vision>(emptyPrimitiveSet, emptyVision);
+    TbotsProto::PrimitiveSet emptyPrimitiveSet;
+    TbotsProto::Vision emptyVision;
+    return std::make_tuple<TbotsProto::PrimitiveSet, TbotsProto::Vision>(std::move(emptyPrimitiveSet), std::move(emptyVision));
 
        
 }
