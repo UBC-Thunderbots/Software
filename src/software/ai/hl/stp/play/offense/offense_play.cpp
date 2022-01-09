@@ -10,7 +10,7 @@
 using Zones = std::unordered_set<EighteenZoneId>;
 
 OffensePlay::OffensePlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config, 5, true), fsm{OffensePlayFSM{config}}
+    : Play(config, true), fsm{OffensePlayFSM{config}}
 {
 }
 

@@ -10,7 +10,7 @@
 #include "software/world/game_state.h"
 
 EnemyFreekickPlay::EnemyFreekickPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config, 5, true)
+    : Play(config, true)
 {
 }
 

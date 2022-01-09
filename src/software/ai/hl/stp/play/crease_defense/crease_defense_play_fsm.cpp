@@ -2,10 +2,18 @@
 
 void CreaseDefensePlayFSM::defendDefenseArea(const Update& event)
 {
-    if (event.control_params.num_additional_crease_defenders_tactics + 1 !=
-        crease_defenders.size())
+    unsigned int num_defenders = event.common.num_tactics;
+    // TODO (#2385): Handle more than three defenders
+    if (num_defenders > 3)
     {
-        setUpDefenders(event.control_params.num_additional_crease_defenders_tactics + 1);
+        LOG(WARNING) << "CreaseDefensePlay can only handle up to 3 crease defenders"
+                     << std::endl;
+        num_defenders = 3;
+    }
+
+    if (num_defenders != crease_defenders.size())
+    {
+        setUpDefenders(num_defenders);
     }
     // TODO (#2385): Make the crease defense align robots on either side of the threat
     // when there are an even number of robots

@@ -20,13 +20,6 @@ class ShootOrPassPlay : public Play
 
     bool done() const override;
 
-    /**
-     * Update control params for this play
-     *
-     * @param num_additional_offensive_tactics The number of additional offensive tactics
-     */
-    void updateControlParams(unsigned int num_additional_offensive_tactics);
-
    private:
     void updateTactics(const PlayUpdate &play_update) override;
 

@@ -5,12 +5,8 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-using Zones = std::unordered_set<EighteenZoneId>;
-
 ShootOrPassPlay::ShootOrPassPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config, 2, true),
-      fsm{ShootOrPassPlayFSM{config}},
-      control_params{.num_additional_offensive_tactics = 3}
+    : Play(config, true), fsm{ShootOrPassPlayFSM{config}}, control_params{}
 {
 }
 
@@ -37,11 +33,6 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
 bool ShootOrPassPlay::done() const
 {
     return fsm.is(boost::sml::X);
-}
-
-void ShootOrPassPlay::updateControlParams(unsigned int num_additional_offensive_tactics)
-{
-    control_params.num_additional_offensive_tactics = num_additional_offensive_tactics;
 }
 
 void ShootOrPassPlay::updateTactics(const PlayUpdate &play_update)

@@ -14,8 +14,8 @@ void OffensePlayFSM::updateOffense(const Update& event)
     PriorityTacticVector tactics_to_return;
 
     shoot_or_pass_play_fsm->process_event(ShootOrPassPlayFSM::Update(
-        ShootOrPassPlayFSM::ControlParams{.num_additional_offensive_tactics = 2},
-        PlayUpdate(event.common.world,
+        ShootOrPassPlayFSM::ControlParams{},
+        PlayUpdate(event.common.world, 3,
                    [&tactics_to_return](PriorityTacticVector new_tactics) {
                        for (const auto& tactic_vector : new_tactics)
                        {
@@ -25,10 +25,9 @@ void OffensePlayFSM::updateOffense(const Update& event)
 
     crease_defense_play_fsm->process_event(CreaseDefensePlayFSM::Update(
         CreaseDefensePlayFSM::ControlParams{
-            .enemy_threat_origin = event.common.world.ball().position(),
-            .num_additional_crease_defenders_tactics = 0,
+            .enemy_threat_origin    = event.common.world.ball().position(),
             .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT},
-        PlayUpdate(event.common.world,
+        PlayUpdate(event.common.world, 2,
                    [&tactics_to_return](PriorityTacticVector new_tactics) {
                        for (const auto& tactic_vector : new_tactics)
                        {

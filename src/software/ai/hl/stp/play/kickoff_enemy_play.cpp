@@ -9,7 +9,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 KickoffEnemyPlay::KickoffEnemyPlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config, 5, true)
+    : Play(config, true)
 {
 }
 

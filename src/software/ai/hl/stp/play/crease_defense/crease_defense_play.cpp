@@ -6,10 +6,9 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 CreaseDefensePlay::CreaseDefensePlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config, 1, true),
+    : Play(config, true),
       fsm{CreaseDefensePlayFSM{config}},
-      control_params{.enemy_threat_origin                     = Point(),
-                     .num_additional_crease_defenders_tactics = 2,
+      control_params{.enemy_threat_origin    = Point(),
                      .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT}
 {
 }
@@ -44,15 +43,7 @@ void CreaseDefensePlay::updateControlParams(
     unsigned int num_additional_crease_defenders_tactics,
     MaxAllowedSpeedMode max_allowed_speed_mode)
 {
-    if (num_additional_crease_defenders_tactics > 2)
-    {
-        LOG(WARNING) << "CreaseDefensePlay can only handle 2 additional crease defenders"
-                     << std::endl;
-        num_additional_crease_defenders_tactics = 2;
-    }
-    control_params.enemy_threat_origin = enemy_threat_origin;
-    control_params.num_additional_crease_defenders_tactics =
-        num_additional_crease_defenders_tactics;
+    control_params.enemy_threat_origin    = enemy_threat_origin;
     control_params.max_allowed_speed_mode = max_allowed_speed_mode;
 }
 

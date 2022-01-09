@@ -1,5 +1,7 @@
 #include "software/ai/hl/stp/play/shoot_or_pass/shoot_or_pass_play_fsm.h"
 
+#include <algorithm>
+
 ShootOrPassPlayFSM::ShootOrPassPlayFSM(std::shared_ptr<const PlayConfig> play_config)
     : play_config(play_config),
       attacker_tactic(
@@ -65,9 +67,8 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
     pass_eval = pass_generator.generatePassEvaluation(event.common.world);
     best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
-    updateOffensivePositioningTactics(
-        ranked_zones, pass_eval,
-        event.control_params.num_additional_offensive_tactics + 1);
+    updateOffensivePositioningTactics(ranked_zones, pass_eval,
+                                      std::max(event.common.num_tactics - 1, 0));
 
     // update the best pass in the attacker tactic
     attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
@@ -112,9 +113,8 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
 
     if (!attacker_tactic->done())
     {
-        updateOffensivePositioningTactics(
-            ranked_zones, pass_eval,
-            event.control_params.num_additional_offensive_tactics);
+        updateOffensivePositioningTactics(ranked_zones, pass_eval,
+                                          std::max(event.common.num_tactics - 2, 0));
         PriorityTacticVector ret_tactics = {{attacker_tactic, receiver_tactic}, {}};
         ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
                               offensive_positioning_tactics.end());
@@ -123,9 +123,8 @@ void ShootOrPassPlayFSM::takePass(const Update& event)
     }
     else
     {
-        updateOffensivePositioningTactics(
-            ranked_zones, pass_eval,
-            event.control_params.num_additional_offensive_tactics + 1);
+        updateOffensivePositioningTactics(ranked_zones, pass_eval,
+                                          std::max(event.common.num_tactics - 1, 0));
         PriorityTacticVector ret_tactics = {{receiver_tactic}, {}};
         ret_tactics[1].insert(ret_tactics[1].end(), offensive_positioning_tactics.begin(),
                               offensive_positioning_tactics.end());

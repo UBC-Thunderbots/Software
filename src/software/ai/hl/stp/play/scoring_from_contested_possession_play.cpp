@@ -7,7 +7,7 @@
 
 ScoringFromContestedPossessionPlay::ScoringFromContestedPossessionPlay(
     std::shared_ptr<const PlayConfig> config)
-    : Play(config, 1, false)
+    : Play(config, false)
 {
 }
 

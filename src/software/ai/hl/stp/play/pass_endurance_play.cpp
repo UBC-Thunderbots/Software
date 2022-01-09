@@ -5,7 +5,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 PassEndurancePlay::PassEndurancePlay(std::shared_ptr<const PlayConfig> config)
-    : Play(config, NUM_ROBOTS, false)
+    : Play(config, false)
 {
 }
 

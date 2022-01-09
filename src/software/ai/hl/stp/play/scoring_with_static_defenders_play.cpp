@@ -6,7 +6,7 @@
 
 ScoringWithStaticDefendersPlay::ScoringWithStaticDefendersPlay(
     std::shared_ptr<const PlayConfig> config)
-    : Play(config, 2, false)
+    : Play(config, false)
 {
 }
 

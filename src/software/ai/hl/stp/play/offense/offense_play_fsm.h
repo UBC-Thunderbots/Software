@@ -15,6 +15,7 @@ struct OffensePlayFSM
 
     struct ControlParams
     {
+        unsigned int num_robots;
     };
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS

@@ -22,9 +22,6 @@ struct ShootOrPassPlayFSM
 
     struct ControlParams
     {
-        // number of additional offensive attacks on top of the minimum of 2 (passer and
-        // receiver)
-        unsigned int num_additional_offensive_tactics;
     };
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS

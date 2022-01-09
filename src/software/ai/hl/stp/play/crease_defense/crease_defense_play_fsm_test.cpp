@@ -16,39 +16,35 @@ TEST(CreaseDefensePlayFSMTest, test_transitions)
 
     fsm.process_event(CreaseDefensePlayFSM::Update(
         CreaseDefensePlayFSM::ControlParams{
-            .enemy_threat_origin                     = Point(),
-            .num_additional_crease_defenders_tactics = 2,
+            .enemy_threat_origin    = Point(),
             .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT},
-        PlayUpdate(world, [](PriorityTacticVector new_tactics) {})));
+        PlayUpdate(world, 3, [](PriorityTacticVector new_tactics) {})));
 
     EXPECT_TRUE(fsm.is(boost::sml::X));
 
     fsm.process_event(CreaseDefensePlayFSM::Update(
         CreaseDefensePlayFSM::ControlParams{
-            .enemy_threat_origin                     = Point(),
-            .num_additional_crease_defenders_tactics = 2,
+            .enemy_threat_origin    = Point(),
             .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT},
-        PlayUpdate(world, [](PriorityTacticVector new_tactics) {})));
+        PlayUpdate(world, 3, [](PriorityTacticVector new_tactics) {})));
 
     EXPECT_TRUE(fsm.is(boost::sml::X));
 
     // Change the number of defenders
     fsm.process_event(CreaseDefensePlayFSM::Update(
         CreaseDefensePlayFSM::ControlParams{
-            .enemy_threat_origin                     = Point(),
-            .num_additional_crease_defenders_tactics = 1,
+            .enemy_threat_origin    = Point(),
             .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT},
-        PlayUpdate(world, [](PriorityTacticVector new_tactics) {})));
+        PlayUpdate(world, 3, [](PriorityTacticVector new_tactics) {})));
 
     // FSM goes back to terminal state to re-set up the defenders
     EXPECT_TRUE(fsm.is(boost::sml::X));
 
     fsm.process_event(CreaseDefensePlayFSM::Update(
         CreaseDefensePlayFSM::ControlParams{
-            .enemy_threat_origin                     = Point(),
-            .num_additional_crease_defenders_tactics = 1,
+            .enemy_threat_origin    = Point(),
             .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT},
-        PlayUpdate(world, [](PriorityTacticVector new_tactics) {})));
+        PlayUpdate(world, 3, [](PriorityTacticVector new_tactics) {})));
 
     EXPECT_TRUE(fsm.is(boost::sml::X));
 }

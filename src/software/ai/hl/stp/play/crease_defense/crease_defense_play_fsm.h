@@ -14,8 +14,6 @@ struct CreaseDefensePlayFSM
     {
         // The origin point of the enemy threat
         Point enemy_threat_origin;
-        // number of additional crease defenders on top of the minimum of 1
-        unsigned int num_additional_crease_defenders_tactics;
         // The maximum allowed speed mode
         MaxAllowedSpeedMode max_allowed_speed_mode;
     };

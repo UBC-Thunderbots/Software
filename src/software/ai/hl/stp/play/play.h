@@ -48,11 +48,9 @@ class Play
      * Creates a new Play
      *
      * @param play_config The Play configuration
-     * @param min_tactics The minimum number of tactics this play supports
      * @param requires_goalie Whether this plays requires a goalie
      */
-    explicit Play(std::shared_ptr<const PlayConfig> play_config, unsigned int min_tactics,
-                  bool requires_goalie);
+    explicit Play(std::shared_ptr<const PlayConfig> play_config, bool requires_goalie);
 
     /**
      * Returns whether or not this Play can be started. For example, the Enemy Team
@@ -86,13 +84,6 @@ class Play
      * @return true if the Play is done and false otherwise
      */
     virtual bool done() const;
-
-    /**
-     * Gets the minimum number of tactics that the play supports
-     *
-     * @return the minimum number of tactics that the play supports
-     */
-    unsigned int minTactics();
 
     /**
      * Gets Intents from the Play given the assignment algorithm and world
@@ -187,6 +178,4 @@ class Play
 
     // TODO (#2359): remove this
     PriorityTacticVector priority_tactics;
-
-    unsigned int min_tactics;
 };
