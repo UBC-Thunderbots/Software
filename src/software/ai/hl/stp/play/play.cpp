@@ -51,9 +51,16 @@ std::vector<std::unique_ptr<Intent>> Play::get(
     MotionConstraintBuildFunction motion_constraint_builder, const World &new_world)
 {
     std::vector<std::unique_ptr<Intent>> intents;
-    updateTactics(PlayUpdate(new_world, 0, [this](PriorityTacticVector new_tactics) {
-        priority_tactics = std::move(new_tactics);
-    }));
+    unsigned int num_tactics =
+        static_cast<unsigned int>(new_world.friendlyTeam().numRobots());
+    if (requires_goalie && new_world.friendlyTeam().goalie())
+    {
+        num_tactics--;
+    }
+    updateTactics(
+        PlayUpdate(new_world, num_tactics, [this](PriorityTacticVector new_tactics) {
+            priority_tactics = std::move(new_tactics);
+        }));
 
     ConstPriorityTacticVector const_priority_tactics;
 

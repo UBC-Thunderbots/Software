@@ -15,7 +15,7 @@ using SetTacticsCallback = std::function<void(PriorityTacticVector)>;
 // The play update struct is used to update plays and set the new tactics
 struct PlayUpdate
 {
-    PlayUpdate(const World& world, int num_tactics,
+    PlayUpdate(const World& world, unsigned int num_tactics,
                const SetTacticsCallback& set_tactics_fun)
         : world(world), num_tactics(num_tactics), set_tactics(set_tactics_fun)
     {
@@ -23,7 +23,7 @@ struct PlayUpdate
     // updated world
     World world;
     // Number of tactics to set
-    int num_tactics;
+    unsigned int num_tactics;
     // callback to return the next tactics
     SetTacticsCallback set_tactics;
 };

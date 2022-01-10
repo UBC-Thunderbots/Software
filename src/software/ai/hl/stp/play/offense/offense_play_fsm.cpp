@@ -12,10 +12,14 @@ OffensePlayFSM::OffensePlayFSM(std::shared_ptr<const PlayConfig> play_config)
 void OffensePlayFSM::updateOffense(const Update& event)
 {
     PriorityTacticVector tactics_to_return;
+    unsigned int num_shoot_or_pass =
+        event.common.num_tactics > 3 ? event.common.num_tactics - 2 : 1;
+    unsigned int num_defenders =
+        event.common.num_tactics > 3 ? 2 : event.common.num_tactics - 1;
 
     shoot_or_pass_play_fsm->process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},
-        PlayUpdate(event.common.world, 3,
+        PlayUpdate(event.common.world, num_shoot_or_pass,
                    [&tactics_to_return](PriorityTacticVector new_tactics) {
                        for (const auto& tactic_vector : new_tactics)
                        {
@@ -27,7 +31,7 @@ void OffensePlayFSM::updateOffense(const Update& event)
         CreaseDefensePlayFSM::ControlParams{
             .enemy_threat_origin    = event.common.world.ball().position(),
             .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT},
-        PlayUpdate(event.common.world, 2,
+        PlayUpdate(event.common.world, num_defenders,
                    [&tactics_to_return](PriorityTacticVector new_tactics) {
                        for (const auto& tactic_vector : new_tactics)
                        {
