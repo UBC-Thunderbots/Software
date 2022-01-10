@@ -19,6 +19,12 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
+World::World(const TbotsProto::World &world_proto)
+    : World(Field(world_proto.field()), Ball(world_proto.ball()),
+            Team(world_proto.friendly_team()), Team(world_proto.enemy_team()))
+{
+}
+
 void World::updateBall(const Ball &new_ball)
 {
     ball_ = new_ball;
