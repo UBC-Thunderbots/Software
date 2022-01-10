@@ -35,6 +35,7 @@ ErForceSimulator::ErForceSimulator(
     }
     else
     {
+        // loading division B configuration
         full_filename = full_filename + CONFIG_FILE + "B.txt";
     }
 

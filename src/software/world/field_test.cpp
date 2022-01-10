@@ -35,7 +35,7 @@ class FieldTest : public ::testing::Test
 
 TEST(TestUtilsTest, create_division_b_field)
 {
-    Field field = Field::createSSLDivisionBField();
+    Field field = Field::createField(FieldType::DIV_B);
 
     // Check that the field has the correct dimensions for a
     // SSL Division B field according to the rules
@@ -96,7 +96,7 @@ TEST(TestUtilsTest, create_division_b_field)
 
 TEST(TestUtilsTest, create_division_a_field)
 {
-    Field field = Field::createSSLDivisionAField();
+    Field field = Field::createField(FieldType::DIV_A);
 
     // Check that the field has the correct dimensions for a
     // SSL Division A field according to the rules

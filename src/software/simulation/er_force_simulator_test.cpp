@@ -87,3 +87,37 @@ TEST_F(ErForceSimulatorTest, set_ball_state_when_ball_already_exists)
     }
     EXPECT_TRUE(at_least_one_wrapper_packet_passes);
 }
+
+TEST(ErForceSimulatorFieldTest, check_field_A_configuration)
+{
+    std::shared_ptr<const SimulatorConfig> simulator_config;
+    RobotConstants_t robot_constants = create2021RobotConstants();
+    WheelConstants wheel_constants   = create2021WheelConstants();
+    simulator_config = std::make_shared<const SimulatorConfig>();
+    std::shared_ptr<ErForceSimulator> simulator = std::make_shared<ErForceSimulator>(FieldType::DIV_A,
+                                                       robot_constants, wheel_constants,
+                                                       simulator_config);
+    simulator->resetCurrentTime();
+    simulator->getField();
+
+    EXPECT_EQ(simulator->getField(), Field::createSSLDivisionAField());
+}
+
+TEST(ErForceSimulatorFieldTest, check_field_B_configuration)
+{
+    std::shared_ptr<const SimulatorConfig> simulator_config;
+    RobotConstants_t robot_constants = create2021RobotConstants();
+    WheelConstants wheel_constants   = create2021WheelConstants();
+    simulator_config = std::make_shared<const SimulatorConfig>();
+    std::shared_ptr<ErForceSimulator> simulator = std::make_shared<ErForceSimulator>(FieldType::DIV_B,
+                                                       robot_constants, wheel_constants,
+                                                       simulator_config);
+    simulator->resetCurrentTime();
+    simulator->getField();
+
+    EXPECT_EQ(simulator->getField(), Field::createSSLDivisionBField());
+}
+
+
+
+
