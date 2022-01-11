@@ -2,7 +2,7 @@
 
 #include <chrono>
 
-#include "extlibs/base64/base64.h"
+#include "base64.h"
 #include "google/protobuf/text_format.h"
 #include "proto/robot_log_msg.pb.h"
 

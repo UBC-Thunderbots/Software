@@ -63,7 +63,6 @@ cc_library(
     deps = [
         ":backend",
         ":ssl_proto_client",
-        "//extlibs/base64",
         "//proto:defending_side_msg_cc_proto",
         "//proto:tbots_cc_proto",
         "//proto/message_translation:defending_side",

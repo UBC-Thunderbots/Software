@@ -102,11 +102,11 @@ cc_library(
         "protobuf_sink.h",
     ],
     deps = [
-        "//extlibs/base64",
         "//proto:any_cc_proto",
         "//proto:tbots_cc_proto",
         "//shared:constants",
         "//software/networking:threaded_unix_sender",
+        "@base64",
         "@g3log",
     ],
 )

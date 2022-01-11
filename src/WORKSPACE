@@ -66,6 +66,14 @@ http_archive(
 )
 
 http_archive(
+    name = "base64",
+    build_file = "@//extlibs:base64.BUILD",
+    sha256 = "5e5366919938b834ca95fec4c2a80ad0c002872175d43226c933d25e40572883",
+    strip_prefix = "cpp-base64-2.rc.08",
+    url = "https://github.com/ReneNyffenegger/cpp-base64/archive/refs/tags/V2.rc.08.zip",
+)
+
+http_archive(
     name = "rules_proto",
     sha256 = "602e7161d9195e50246177e7c55b2f39950a9cf7366f74ed5f22fd45750cd208",
     strip_prefix = "rules_proto-97d8af4dc474595af3900dd85cb3a29ad28cc313",
