@@ -546,6 +546,11 @@ world::SimulatorState Simulator::getSimulatorState()
             // Convert mm to m
             robotProto->set_p_x(newRobotPos.x() / 1000);
             robotProto->set_p_y(newRobotPos.y() / 1000);
+
+            // Convert velocity
+            coordinates::toVisionVelocity(*robotProto, *robotProto);
+            robotProto->set_v_x(robotProto->v_x() / 1000);
+            robotProto->set_v_y(robotProto->v_y() / 1000);
         }
     }
 
