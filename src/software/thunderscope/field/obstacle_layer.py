@@ -14,25 +14,28 @@ class ObstacleLayer(FieldLayer):
         self.obstacle_receiver = ThreadedUnixListener(
             "/tmp/tbots/TbotsProto.Obstacle", Obstacle, max_buffer_size=1,
         )
-        self.cached_obstacles = None
+        self.cached_obstacles = Obstacle()
 
     def paint(self, painter, option, widget):
+
         obstacles = self.obstacle_receiver.maybe_pop()
 
         if not obstacles:
             obstacles = self.cached_obstacles
 
         self.cached_obstacles = obstacles
-        painter.setPen(pg.mkPen("r"))
+
+        painter.setPen(pg.mkPen(colors.NAVIGATOR_OBSTACLE_COLOR))
 
         for polyobstacle in obstacles.polygon:
             polygon_points = [
                 QtCore.QPoint(
-                    int(constants.MM_TO_M * point.x_meters),
-                    int(constants.MM_TO_M * point.y_meters),
+                    constants.MM_TO_M * point.x_meters,
+                    constants.MM_TO_M * point.y_meters,
                 )
                 for point in polyobstacle.points
             ]
+
             poly = QtGui.QPolygon(polygon_points)
             painter.drawPolygon(poly)
 
@@ -41,6 +44,6 @@ class ObstacleLayer(FieldLayer):
                 self.createCircle(
                     constants.MM_TO_M * circleobstacle.origin.x_meters,
                     constants.MM_TO_M * circleobstacle.origin.y_meters,
-                    int(constants.MM_TO_M * circleobstacle.radius),
+                    constants.MM_TO_M * circleobstacle.radius,
                 )
             )

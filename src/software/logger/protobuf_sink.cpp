@@ -41,6 +41,9 @@ void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
 
         if (TbotsProto::LogLevel_Parse(log_entry.get().level(), &log_level_proto))
         {
+            std::time_t t = std::time(0);
+            log_msg_proto.mutable_created_timestamp()->set_epoch_timestamp_seconds(
+                static_cast<double>(t));
             log_msg_proto.set_log_msg(log_entry.get().message());
             log_msg_proto.set_log_level(log_level_proto);
             log_msg_proto.set_file_name(log_entry.get().file());

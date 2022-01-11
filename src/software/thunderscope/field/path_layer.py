@@ -12,7 +12,7 @@ class PathLayer(FieldLayer):
         self.path_receiver = ThreadedUnixListener(
             "/tmp/tbots/TbotsProto.PathVisualization", PathVisualization,
         )
-        self.cached_paths = None
+        self.cached_paths = PathVisualization()
 
     def paint(self, painter, option, widget):
 

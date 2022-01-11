@@ -17,7 +17,7 @@ class g3logWidget(pg_console.ConsoleWidget):
         self.ui.exceptionBtn.hide()
         self.ui.historyBtn.hide()
 
-        # TODO remove - dark theme hacks
+        # TODO (#TODO) remove - dark theme hacks
         self.ui.output.setStyleSheet(
             """QPlainTextEdit{
                 color: #ffffff;
@@ -34,7 +34,7 @@ class g3logWidget(pg_console.ConsoleWidget):
             return
 
         log_str = "{} {} [{}->{}] {}\n".format(
-            log.created_timestamp,
+            log.created_timestamp.epoch_timestamp_seconds,
             log.log_level,
             log.file_name,
             log.line_number,

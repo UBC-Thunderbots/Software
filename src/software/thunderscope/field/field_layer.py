@@ -26,7 +26,11 @@ class FieldLayer(pg.GraphicsObject):
         :return: Rectangle that covers the entire field
     
         """
-        # TODO this makes no sense
+        # TODO (#TODO) this rectangle makes no sense, it should be
+        # top left x, top left y, width, height. But for some reason
+        # that doesn't play nicely with the coordinate system.
+        #
+        # Instead it is bottom left x, bottom left y, width height.
         return QtCore.QRectF(-9000, -6000, 18000, 12000)
 
     def createCircle(self, x, y, radius):
