@@ -216,7 +216,8 @@ std::vector<robot::RadioResponse> Simulator::acceptRobotControlCommand(
         auto time              = m_time;
         auto charge            = m_charge;
         auto fabricateResponse = [data, &responses, time, charge, &id, &command](
-                                     const Simulator::RobotMap &map, const bool *isBlue) {
+                                     const Simulator::RobotMap &map, const bool *isBlue)
+        {
             if (!map.contains(id))
                 return;
             robot::RadioResponse response = map[id].first->setCommand(
@@ -530,9 +531,21 @@ world::SimulatorState Simulator::getSimulatorState()
         for (const auto &it : team)
         {
             SimRobot *robot = it.first;
+
+            // convert coordinates from ER Force
+            btVector3 robotPos = robot->position() / SIMULATOR_SCALE;
+            btVector3 newRobotPos;
+
+            coordinates::toVision(robotPos, newRobotPos);
+
             auto *robotProto =
                 teamIsBlue ? simState.add_blue_robots() : simState.add_yellow_robots();
+
             robot->update(robotProto);
+
+            // Convert mm to m
+            robotProto->set_p_x(newRobotPos.x() / 1000);
+            robotProto->set_p_y(newRobotPos.y() / 1000);
         }
     }
 
@@ -845,7 +858,8 @@ void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command>
             {
                 m_data->ball->restoreState(sim.set_simulator_state().ball());
             }
-            const auto restoreRobots = [](RobotMap &map, auto robots) {
+            const auto restoreRobots = [](RobotMap &map, auto robots)
+            {
                 for (const auto &robot : robots)
                 {
                     if (map.contains(robot.id()))

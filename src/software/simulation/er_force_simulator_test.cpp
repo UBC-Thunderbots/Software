@@ -159,10 +159,8 @@ TEST_F(ErForceSimulatorTest, add_yellow_robots)
 
         for (unsigned int i = 0; i < friendly_robots.size(); i++)
         {
-            // Simulator position seems flipped from visualizer, temporary for now
-            double x_difference = fabs(y - friendly_robots[i].robot_state.position().x());
-            double y_difference =
-                fabs(-x - friendly_robots[i].robot_state.position().y());
+            double x_difference = fabs(x - friendly_robots[i].robot_state.position().x());
+            double y_difference = fabs(y - friendly_robots[i].robot_state.position().y());
             if (x_difference < 0.2f && y_difference < 0.2f)
             {
                 friendly_robots.erase(friendly_robots.begin() + i);
