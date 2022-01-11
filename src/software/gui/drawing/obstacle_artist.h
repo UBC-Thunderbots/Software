@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QGraphicsScene>
 
+#include "proto/geometry.pb.h"
+#include "proto/visualization.pb.h"
 #include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/ai/navigator/obstacle/obstacle_visitor.h"
 #include "software/gui/drawing/colors.h"
@@ -39,7 +41,13 @@ class ObstacleArtist : public ObstacleVisitor
     void visit(const GeomObstacle<Polygon>& geom_obstacle) override;
     void visit(const GeomObstacle<Rectangle>& geom_obstacle) override;
 
+    /**
+     * Log the obstacle protobuf to the VISUALIZE log level and clear it
+     */
+    void visualize();
+
    private:
     QGraphicsScene* scene_;
     QPen pen_;
+    TbotsProto::Obstacle obstacle_proto_;
 };

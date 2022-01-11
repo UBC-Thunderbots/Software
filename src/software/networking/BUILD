@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@python_tools_deps//:requirements.bzl", "requirement")
+
 cc_library(
     name = "proto_udp_client",
     hdrs = [
@@ -30,14 +32,13 @@ cc_library(
     ],
     visibility = ["//visibility:private"],
     deps = [
-        "//software/logger",
         "@boost//:asio",
     ],
 )
 
 cc_library(
     name = "threaded_proto_udp_listener",
-    hdrs = [
+    srcs = [
         "threaded_proto_udp_listener.hpp",
     ],
     deps = [
@@ -54,5 +55,41 @@ cc_library(
     deps = [
         ":proto_udp_sender",
         "@boost//:asio",
+    ],
+)
+
+cc_library(
+    name = "unix_sender",
+    srcs = [
+        "unix_sender.cpp",
+    ],
+    hdrs = [
+        "unix_sender.h",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        "@boost//:asio",
+    ],
+)
+
+cc_library(
+    name = "threaded_unix_sender",
+    srcs = [
+        "threaded_unix_sender.cpp",
+    ],
+    hdrs = [
+        "threaded_unix_sender.h",
+    ],
+    deps = [
+        ":unix_sender",
+        "@boost//:asio",
+    ],
+)
+
+py_library(
+    name = "threaded_unix_listener_py",
+    srcs = ["threaded_unix_listener.py"],
+    deps = [
+        "//proto:software_py_proto",
     ],
 )

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "extlibs/base64/base64.h"
 #include "proto/defending_side_msg.pb.h"
 #include "proto/robot_log_msg.pb.h"
 #include "proto/robot_status_msg.pb.h"

@@ -121,7 +121,7 @@ class STP : public HL
      *
      * @return information about the currently running plays and tactics
      */
-    PlayInfo getPlayInfo() override;
+    TbotsProto::PlayInfo getPlayInfo() override;
 
     /**
      * Overrides the play constructor so whenever STP creates a new play it calls

@@ -48,6 +48,7 @@ host_software_packages=(
                       # properly manage this as a bazel dependency, so we have
                       # to manually install it ourselves
     python3       # Python 3
+    python3-venv # Virtual Environment
     python3-pip   # Required for bazel to install python dependencies for build targets
     python3-protobuf # This is required for the "NanoPb" library, which does not
                     # properly manage this as a bazel dependency, so we have
@@ -102,6 +103,13 @@ echo "================================================================"
 if ! /usr/bin/python3 -m pip install --upgrade pip ; then
     echo "##############################################################"
     echo "Error: Upgrading pip version failed"
+    echo "##############################################################"
+    exit 1
+fi
+
+if ! sudo /usr/bin/python3 -m venv /opt/tbotspython ; then
+    echo "##############################################################"
+    echo "Error: Setting up virtual environment failed"
     echo "##############################################################"
     exit 1
 fi

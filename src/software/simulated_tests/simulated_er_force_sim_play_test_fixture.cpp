@@ -80,7 +80,7 @@ void SimulatedErForceSimPlayTestFixture::updatePrimitives(
                                                     std::move(vision_msg));
 }
 
-std::optional<PlayInfo> SimulatedErForceSimPlayTestFixture::getPlayInfo()
+std::optional<TbotsProto::PlayInfo> SimulatedErForceSimPlayTestFixture::getPlayInfo()
 {
     return ai.getPlayInfo();
 }

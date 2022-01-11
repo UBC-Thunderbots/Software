@@ -37,3 +37,9 @@ message Polygon
     // list of polygon vertices
     repeated Point points = 1;
 }
+
+message Circle
+{
+    Point origin  = 1;
+    double radius = 2;
+}

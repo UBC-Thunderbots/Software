@@ -63,15 +63,18 @@ cc_library(
     deps = [
         ":backend",
         ":ssl_proto_client",
+        "//extlibs/base64",
         "//proto:defending_side_msg_cc_proto",
         "//proto:tbots_cc_proto",
         "//proto/message_translation:defending_side",
+        "//proto/message_translation:ssl_wrapper",
         "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
         "//software:constants",
         "//software/logger",
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",
+        "//software/networking:threaded_unix_sender",
         "//software/util/generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"
