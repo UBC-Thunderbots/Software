@@ -1,10 +1,11 @@
 import pyqtgraph as pg
+import time
 from software.thunderscope.field.field_layer import FieldLayer
 
 
 class Field(pg.PlotWidget):
 
-    """ TODO Docstring for Field. """
+    """Wrapper to handle Field Layers"""
 
     def __init__(self):
         pg.PlotWidget.__init__(self)
@@ -21,10 +22,18 @@ class Field(pg.PlotWidget):
         self.layers = []
 
     def add_layer(self, name: str, layer: FieldLayer):
+        """Add a layer to this field and to the legend.
+        
+        :param name: The name of the layer
+        :param layer: The FieldLayer graphics object
+
+        """
         self.layers.append(layer)
         self.addItem(layer)
         self.legend.addItem(layer, name)
 
     def refresh(self):
+        """Trigger an update on all the layers
+        """
         for layer in self.layers:
             layer.update()

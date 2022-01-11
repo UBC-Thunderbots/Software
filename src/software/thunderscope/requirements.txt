@@ -1,2 +1,1 @@
 pyqtgraph==0.12.3
-numpy==1.22.0

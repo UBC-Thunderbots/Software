@@ -12,13 +12,19 @@ class PathLayer(FieldLayer):
         self.path_receiver = ThreadedUnixListener(
             "/tmp/tbots/TbotsProto.PathVisualization", PathVisualization,
         )
+        self.cached_paths = None
 
     def paint(self, painter, option, widget):
-        pathz = self.path_receiver.maybe_pop()
-        if not pathz:
-            return
+
+        paths = self.path_receiver.maybe_pop()
+
+        if not paths:
+            paths = self.cached_paths
+
+        self.cached_paths = paths
         painter.setPen(pg.mkPen("w"))
-        for path in pathz.path:
+
+        for path in paths.path:
             polygon_points = [
                 QtCore.QPoint(
                     int(constants.MM_TO_M * point.x_meters),

@@ -12,18 +12,17 @@ class ObstacleLayer(FieldLayer):
     def __init__(self):
         FieldLayer.__init__(self)
         self.obstacle_receiver = ThreadedUnixListener(
-            "/tmp/tbots/TbotsProto.Obstacle",
-            Obstacle,
-            max_buffer_size=1,
-            convert_from_any=True,
+            "/tmp/tbots/TbotsProto.Obstacle", Obstacle, max_buffer_size=1,
         )
+        self.cached_obstacles = None
 
     def paint(self, painter, option, widget):
         obstacles = self.obstacle_receiver.maybe_pop()
 
         if not obstacles:
-            return
+            obstacles = self.cached_obstacles
 
+        self.cached_obstacles = obstacles
         painter.setPen(pg.mkPen("r"))
 
         for polyobstacle in obstacles.polygon:

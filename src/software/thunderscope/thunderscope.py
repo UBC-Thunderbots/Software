@@ -1,3 +1,4 @@
+import os
 import signal
 
 from software.thunderscope.field.field import Field
@@ -10,6 +11,12 @@ from pyqtgraph.dockarea import *
 
 
 if __name__ == "__main__":
+
+    # Setup unix socket directory
+    try:
+        os.mkdir("/tmp/tbots")
+    except:
+        pass
 
     # Setup MainApp and initialize DockArea
     app = pg.mkQApp("Thunderscope")
@@ -44,7 +51,7 @@ if __name__ == "__main__":
 
     timer = QtCore.QTimer()
     timer.timeout.connect(update)
-    timer.start(20)  # Refresh at 50hz
+    timer.start(5)  # Refresh at 200hz
 
     window.show()
 

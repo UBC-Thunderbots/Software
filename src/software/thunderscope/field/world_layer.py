@@ -15,7 +15,11 @@ import software.thunderscope.colors as colors
 class WorldLayer(FieldLayer):
     def __init__(self):
         FieldLayer.__init__(self)
-        self.world_receiver = ThreadedUnixListener("/tmp/tbots/TbotsProto.World", World)
+        self.world_receiver = ThreadedUnixListener(
+            "/tmp/tbots/TbotsProto.World", World, max_buffer_size=1
+        )
+        self.current_field = None
+        self.cached_world = None
 
     def draw_field(self, painter, field: Field):
 
@@ -87,8 +91,9 @@ class WorldLayer(FieldLayer):
         world = self.world_receiver.maybe_pop()
 
         if not world:
-            return
+            world = self.cached_world
 
+        self.cached_world = world
         field = world.field
         painter.setPen(pg.mkPen("w"))
 
@@ -96,3 +101,4 @@ class WorldLayer(FieldLayer):
         self.draw_team(painter, colors.BLUE_ROBOT_COLOR, world.friendly_team)
         self.draw_team(painter, colors.YELLOW_ROBOT_COLOR, world.enemy_team)
         self.draw_ball(painter, world.ball)
+        self.current_field = field

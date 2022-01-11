@@ -9,15 +9,13 @@ class UnixSender
 {
    public:
     /**
-     * Creates a UnixSender that sends the SendProto over the network to the
-     * given address and port.
+     * Creates a UnixSender that sends a string over the unix socket path.
      *
      * @param io_service The io_service to use to service outgoing SendProto data
      * @param unix_socket_path The path to the unix socket
      */
     UnixSender(boost::asio::io_service& io_service, const std::string& unix_socket_path);
-
-    virtual ~UnixSender();
+    ~UnixSender();
 
     /**
      * Sends the string over the unix socket

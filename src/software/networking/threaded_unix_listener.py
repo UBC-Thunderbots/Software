@@ -13,7 +13,7 @@ class ThreadedUnixListener:
         self, unix_path, proto_class, max_buffer_size=3, convert_from_any=True
     ):
 
-        """Receive protobuf over unix sockets and buffer them
+        """Receive protobuf over unix sockets and buffers them
 
         :param unix_path: The unix path to receive the new protobuf to plot
         :param proto_class: The type of protobuf we expect to receive
@@ -22,6 +22,7 @@ class ThreadedUnixListener:
 
         """
 
+        # cleanup the old path if it exists
         try:
             os.remove(unix_path)
         except:
@@ -44,6 +45,12 @@ class ThreadedUnixListener:
         return self.proto_buffer
 
     def maybe_pop(self):
+        """Pop from the buffer if a new packet exists. If not just return None
+
+        :return: proto if exists, else None
+        :rtype: proto or None
+
+        """
         try:
             return self.proto_buffer.get_nowait()
         except queue.Empty as empty:
@@ -59,9 +66,7 @@ class ThreadedUnixListener:
         try:
             self.proto_buffer.put_nowait(proto)
         except queue.Full as queue_full:
-            pass
-            # TODO make this a warning
-            # print("ProtoPlotter buffer overrun for {}".format(self.unix_path))
+            print("buffer overrun for {}".format(self.unix_path))
 
     def serve_till_stopped(self):
         while not self.stop:
@@ -84,6 +89,12 @@ class Session(socketserver.BaseRequestHandler):
         super().__init__(*args, **keys)
 
     def handle(self):
+        """Decode the base64 request and unpack from Any if we are receiving
+        an Any protobuf. If not, just unpack directly into the type provided.
+
+        Then, trigger the handle callback
+
+        """
         p = base64.b64decode(self.request[0])
         msg = self.proto_type()
 
