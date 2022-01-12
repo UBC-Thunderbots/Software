@@ -34,6 +34,7 @@ cc_library(
         "//software/geom:angle",
         "//software/geom:angular_velocity",
         "//software/geom:point",
+        "//software/geom:polygon",
         "//software/geom:vector",
     ],
 )

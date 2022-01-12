@@ -1,0 +1,30 @@
+syntax = "proto2";
+
+package TbotsProto;
+
+import "proto/game_state.proto";
+import "proto/team.proto";
+import "proto/ball.proto";
+import "proto/tbots_timestamp_msg.proto";
+
+message Field
+{
+    required double field_x_length       = 1;
+    required double field_y_length       = 2;
+    required double defense_x_length     = 3;
+    required double defense_y_length     = 4;
+    required double goal_x_length        = 5;
+    required double goal_y_length        = 6;
+    required double boundary_buffer_size = 7;
+    required double center_circle_radius = 8;
+}
+
+message World
+{
+    required Timestamp time_sent  = 1;
+    required Field field          = 2;
+    required Team friendly_team   = 3;
+    required Team enemy_team      = 4;
+    required Ball ball            = 5;
+    required GameState game_state = 6;
+}

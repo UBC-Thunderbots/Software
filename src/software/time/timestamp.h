@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "proto/tbots_timestamp_msg.pb.h"
 #include "software/time/duration.h"
 #include "software/time/time.h"
 
@@ -40,6 +41,18 @@ class Timestamp : public Time
      * @return A Timestamp created from the given value
      */
     static const Timestamp fromMilliseconds(double milliseconds);
+
+    /**
+     * Creates a new Timestamp value based on the TbotsProto::Timestamp protobuf
+     * representation
+     *
+     * @param timestamp_proto The TbotsProto::Timestamp protobuf which this timestamp
+     * should be based on
+     * @throws std::invalid_argument if the given value is < 0.0
+     * @return A Timestamp created from the given value
+     */
+    static const Timestamp fromTimestampProto(
+        const TbotsProto::Timestamp& timestamp_proto);
 
     /**
      * Compares Timestamps for equality. Timestamps are considered equal if their values
