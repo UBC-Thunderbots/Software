@@ -77,7 +77,7 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
         attacker_tactic->updateControlParams(best_pass_and_score_so_far.pass, false);
 
         // If we've assigned a robot as the passer in the PassGenerator, we
-        // lower our threshold based on how long the PassGenerator as been
+        // lower our threshold based on how long the PassGenerator has been
         // running since we set it
         time_since_commit_stage_start =
             event.common.world.getMostRecentTimestamp() - pass_optimization_start_time;

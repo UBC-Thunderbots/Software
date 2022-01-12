@@ -10,6 +10,8 @@
 
 struct CreaseDefensePlayFSM
 {
+    class DefenseState;
+
     struct ControlParams
     {
         // The origin point of the enemy threat
@@ -21,9 +23,9 @@ struct CreaseDefensePlayFSM
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
-     * Creates a crease defense play fsm
+     * Creates a crease defense play FSM
      *
-     * @param play_config the play config for this play fsm
+     * @param play_config the play config for this play FSM
      */
     explicit CreaseDefensePlayFSM(std::shared_ptr<const PlayConfig> play_config)
         : play_config(play_config), crease_defenders({})
@@ -31,7 +33,7 @@ struct CreaseDefensePlayFSM
     }
 
     /**
-     * Action to defend the defense defense area
+     * Action to defend the defense area
      *
      * @param event the FSM event
      */
@@ -48,13 +50,16 @@ struct CreaseDefensePlayFSM
     {
         using namespace boost::sml;
 
+        DEFINE_SML_STATE(DefenseState)
+
         DEFINE_SML_EVENT(Update)
 
         DEFINE_SML_ACTION(defendDefenseArea)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *X + Update_E / defendDefenseArea_A = X);
+            *DefenseState_S + Update_E / defendDefenseArea_A = DefenseState_S,
+            X + Update_E                                     = X);
     }
 
    private:

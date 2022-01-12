@@ -22,9 +22,9 @@ struct OffensePlayFSM
 
 
     /**
-     * Creates a offense play fsm
+     * Creates a offense play FSM
      *
-     * @param play_config the play config for this play fsm
+     * @param play_config the play config for this play FSM
      */
     explicit OffensePlayFSM(std::shared_ptr<const PlayConfig> play_config);
 
@@ -36,7 +36,7 @@ struct OffensePlayFSM
     void updateOffense(const Update& event);
 
     /**
-     * Guard for whehter offense is done
+     * Guard for whether offense is done
      *
      * @param event the OffensePlayFSM event
      *

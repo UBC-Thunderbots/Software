@@ -28,9 +28,9 @@ struct ShootOrPassPlayFSM
 
 
     /**
-     * Creates a shoot or pass play fsm
+     * Creates a shoot or pass play FSM
      *
-     * @param play_config the play config for this play fsm
+     * @param play_config the play config for this play FSM
      */
     explicit ShootOrPassPlayFSM(std::shared_ptr<const PlayConfig> play_config);
 

@@ -12,10 +12,13 @@ OffensePlayFSM::OffensePlayFSM(std::shared_ptr<const PlayConfig> play_config)
 void OffensePlayFSM::updateOffense(const Update& event)
 {
     PriorityTacticVector tactics_to_return;
-    unsigned int num_shoot_or_pass =
-        event.common.num_tactics > 3 ? event.common.num_tactics - 2 : 1;
-    unsigned int num_defenders =
-        event.common.num_tactics > 3 ? 2 : event.common.num_tactics - 1;
+    unsigned int num_shoot_or_pass = event.common.num_tactics - 2;
+    unsigned int num_defenders     = 2;
+    if (event.common.num_tactics <= 3)
+    {
+        num_shoot_or_pass = 1;
+        num_defenders     = event.common.num_tactics - 1;
+    }
 
     shoot_or_pass_play_fsm->process_event(ShootOrPassPlayFSM::Update(
         ShootOrPassPlayFSM::ControlParams{},

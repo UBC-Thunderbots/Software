@@ -12,7 +12,7 @@ TEST(CreaseDefensePlayFSMTest, test_transitions)
 
     FSM<CreaseDefensePlayFSM> fsm(CreaseDefensePlayFSM{
         std::make_shared<const ThunderbotsConfig>()->getPlayConfig()});
-    EXPECT_TRUE(fsm.is(boost::sml::X));
+    EXPECT_TRUE(fsm.is(boost::sml::state<CreaseDefensePlayFSM::DefenseState>));
 
     fsm.process_event(CreaseDefensePlayFSM::Update(
         CreaseDefensePlayFSM::ControlParams{
@@ -20,31 +20,6 @@ TEST(CreaseDefensePlayFSMTest, test_transitions)
             .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT},
         PlayUpdate(world, 3, [](PriorityTacticVector new_tactics) {})));
 
-    EXPECT_TRUE(fsm.is(boost::sml::X));
-
-    fsm.process_event(CreaseDefensePlayFSM::Update(
-        CreaseDefensePlayFSM::ControlParams{
-            .enemy_threat_origin    = Point(),
-            .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT},
-        PlayUpdate(world, 3, [](PriorityTacticVector new_tactics) {})));
-
-    EXPECT_TRUE(fsm.is(boost::sml::X));
-
-    // Change the number of defenders
-    fsm.process_event(CreaseDefensePlayFSM::Update(
-        CreaseDefensePlayFSM::ControlParams{
-            .enemy_threat_origin    = Point(),
-            .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT},
-        PlayUpdate(world, 3, [](PriorityTacticVector new_tactics) {})));
-
-    // FSM goes back to terminal state to re-set up the defenders
-    EXPECT_TRUE(fsm.is(boost::sml::X));
-
-    fsm.process_event(CreaseDefensePlayFSM::Update(
-        CreaseDefensePlayFSM::ControlParams{
-            .enemy_threat_origin    = Point(),
-            .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT},
-        PlayUpdate(world, 3, [](PriorityTacticVector new_tactics) {})));
-
-    EXPECT_TRUE(fsm.is(boost::sml::X));
+    // CreaseDefensePlayFSM always stays in the DefenseState
+    EXPECT_TRUE(fsm.is(boost::sml::state<CreaseDefensePlayFSM::DefenseState>));
 }

@@ -29,7 +29,7 @@ struct PlayUpdate
 };
 
 /**
- * The Update struct is the only event that a play fsm should respond to and it is
+ * The Update struct is the only event that a play FSM should respond to and it is
  * composed of the following structs:
  *
  * ControlParams - uniquely defined by each play to control the FSM
