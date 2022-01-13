@@ -14,6 +14,8 @@
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/logger/logger.h"
+#include "external/trinamic/tmc/ic/TMC4671/TMC4671.h"
+#include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
 
 // SPI Configs
 static uint32_t SPI_SPEED_HZ = 1000000;
@@ -30,7 +32,6 @@ static const uint32_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
 // SPI Trinamic Motor Driver Paths (indexed with chip select above)
 static const char* SPI_PATHS[] = {"/dev/spidev1.0", "/dev/spidev1.1", "/dev/spidev1.2",
                                   "/dev/spidev1.3", "/dev/spidev1.4"};
-
 
 MotorService::MotorService(const RobotConstants_t& robot_constants,
                            const WheelConstants_t& wheel_constants)
@@ -93,6 +94,27 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
     return std::make_unique<TbotsProto::DriveUnitStatus>();
 }
 
+void MotorService::transfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len)
+{
+    int ret;
+
+    struct spi_ioc_transfer tr[1];
+    memset(tr, 0, sizeof(tr));
+
+    tr[0].tx_buf        = (unsigned long)tx;
+    tr[0].rx_buf        = (unsigned long)rx;
+    tr[0].len           = len;
+    tr[0].delay_usecs   = 0;
+    tr[0].speed_hz      = SPI_SPEED_HZ;
+    tr[0].bits_per_word = 8;
+
+    ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
+
+    if (ret < 1)
+    {
+        perror("can't send spi message");
+    }
+}
 
 void MotorService::start()
 {

@@ -46,6 +46,9 @@ class MotorService : public Service
         float dribbler_speed_rpm);
 
    private:
+
+    void transfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len);
+
     // Constants
     RobotConstants_t robot_constants_;
     WheelConstants_t wheel_constants_;
