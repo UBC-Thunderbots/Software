@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "software/optimization/gradient_descent_optimizer.h"
+#include "software/optimization/gradient_descent_optimizer.hpp"
 
 TEST(GradientDescentOptimizerTest, minimize_single_valued_function)
 {

@@ -21,6 +21,24 @@ Team::Team(const std::vector<Robot>& team_robots,
     updateRobots(team_robots);
 }
 
+Team::Team(const TbotsProto::Team& team_proto,
+           const Duration& robot_expiry_buffer_duration)
+    : robot_expiry_buffer_duration(robot_expiry_buffer_duration), last_update_timestamp()
+{
+    if (team_proto.has_goalie_id())
+    {
+        goalie_id = team_proto.goalie_id();
+    }
+    else
+    {
+        goalie_id = std::nullopt;
+    }
+
+    for (int i = 0; i < team_proto.team_robots_size(); i++)
+    {
+        team_robots.emplace_back(Robot(team_proto.team_robots(i)));
+    }
+}
 
 void Team::updateRobots(const std::vector<Robot>& new_robots)
 {

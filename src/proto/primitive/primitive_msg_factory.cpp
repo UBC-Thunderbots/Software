@@ -70,6 +70,24 @@ std::unique_ptr<TbotsProto::Primitive> createEstopPrimitive()
     return estop_primitive_msg;
 }
 
+std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
+    const Vector &velocity, AngularVelocity angular_velocity, double dribbler_speed_rpm)
+{
+    auto direct_control_primitive_msg = std::make_unique<TbotsProto::Primitive>();
+
+    auto direct_velocity_control =
+        std::make_unique<TbotsProto::DirectControlPrimitive::DirectVelocityControl>();
+    *(direct_velocity_control->mutable_velocity()) = *createVectorProto(velocity);
+    *(direct_velocity_control->mutable_angular_velocity()) =
+        *createAngularVelocityProto(angular_velocity);
+    *(direct_control_primitive_msg->mutable_direct_control()
+          ->mutable_direct_velocity_control()) = *direct_velocity_control;
+
+    direct_control_primitive_msg->mutable_direct_control()->set_dribbler_speed_rpm(
+        static_cast<float>(dribbler_speed_rpm));
+    return direct_control_primitive_msg;
+}
+
 double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode,
                                           RobotConstants_t robot_constants)
 {

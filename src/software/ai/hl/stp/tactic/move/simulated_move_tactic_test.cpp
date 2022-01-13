@@ -33,7 +33,7 @@ TEST_F(SimulatedMoveTacticTest, test_move_across_field)
     auto tactic = std::make_shared<MoveTactic>(false);
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -75,7 +75,7 @@ TEST_F(SimulatedMoveTacticTest, test_autochip_move)
         destination, Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::ALLOW,
         {AutoChipOrKickMode::AUTOCHIP, 2.0}, MaxAllowedSpeedMode::TIPTOE);
     setTactic(tactic);
-    setRobotId(1);
+    setFriendlyRobotId(1);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -121,7 +121,7 @@ TEST_F(SimulatedMoveTacticTest, test_autokick_move)
                                 {AutoChipOrKickMode::AUTOKICK, 3.0},
                                 MaxAllowedSpeedMode::TIPTOE);
     setTactic(tactic);
-    setRobotId(0);
+    setFriendlyRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -163,7 +163,7 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_clockwise)
                                 BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
                                 MaxAllowedSpeedMode::PHYSICAL_LIMIT, 1.0);
     setTactic(tactic);
-    setRobotId(0);
+    setFriendlyRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,
@@ -209,7 +209,7 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_counter_clockwise)
                                 BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
                                 MaxAllowedSpeedMode::PHYSICAL_LIMIT, -4.0);
     setTactic(tactic);
-    setRobotId(0);
+    setFriendlyRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [destination, tactic](std::shared_ptr<World> world_ptr,

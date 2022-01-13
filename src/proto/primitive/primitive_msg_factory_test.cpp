@@ -36,7 +36,7 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive)
     EXPECT_EQ(move_primitive->move().destination().y_meters(), 1);
     EXPECT_EQ(move_primitive->move().final_speed_m_per_s(), 3.0);
     EXPECT_EQ(move_primitive->move().final_angle().radians(),
-              static_cast<float>(Angle::threeQuarter().toRadians()));
+              Angle::threeQuarter().toRadians());
     EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(),
               robot_constants.indefinite_dribbler_speed_rpm);
     EXPECT_FALSE(move_primitive->move().has_auto_chip_or_kick());
@@ -57,7 +57,7 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autochip)
     EXPECT_EQ(move_primitive->move().destination().y_meters(), 1);
     EXPECT_EQ(move_primitive->move().final_speed_m_per_s(), 3.0);
     EXPECT_EQ(move_primitive->move().final_angle().radians(),
-              static_cast<float>(Angle::threeQuarter().toRadians()));
+              Angle::threeQuarter().toRadians());
     EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(),
               robot_constants.indefinite_dribbler_speed_rpm);
     ASSERT_TRUE(move_primitive->move().has_auto_chip_or_kick());
@@ -79,7 +79,7 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
     EXPECT_EQ(move_primitive->move().destination().y_meters(), 1);
     EXPECT_EQ(move_primitive->move().final_speed_m_per_s(), 3.0);
     EXPECT_EQ(move_primitive->move().final_angle().radians(),
-              static_cast<float>(Angle::threeQuarter().toRadians()));
+              Angle::threeQuarter().toRadians());
     EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(),
               robot_constants.indefinite_dribbler_speed_rpm);
     ASSERT_TRUE(move_primitive->move().has_auto_chip_or_kick());
@@ -88,6 +88,32 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
               STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND);
     EXPECT_EQ(move_primitive->move().target_spin_rev_per_s(), 0.0f);
 }
+
+TEST_F(PrimitiveFactoryTest, test_create_direct_velocity)
+{
+    auto direct_velocity_primitive = createDirectControlPrimitive(
+        Vector(2, -4), AngularVelocity::fromRadians(0.5), 200);
+
+    ASSERT_TRUE(direct_velocity_primitive->has_direct_control());
+    EXPECT_EQ(direct_velocity_primitive->direct_control()
+                  .direct_velocity_control()
+                  .velocity()
+                  .x_component_meters(),
+              2);
+    EXPECT_EQ(direct_velocity_primitive->direct_control()
+                  .direct_velocity_control()
+                  .velocity()
+                  .y_component_meters(),
+              -4);
+    EXPECT_EQ(direct_velocity_primitive->direct_control()
+                  .direct_velocity_control()
+                  .angular_velocity()
+                  .radians_per_second(),
+              0.5);
+    EXPECT_EQ(direct_velocity_primitive->direct_control().dribbler_speed_rpm(), 200);
+}
+
+
 
 TEST_F(PrimitiveFactoryTest, test_create_stop_primitive_brake)
 {

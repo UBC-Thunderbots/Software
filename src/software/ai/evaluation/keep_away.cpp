@@ -4,7 +4,7 @@
 #include "software/geom/algorithms/closest_point.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/math/math_functions.h"
-#include "software/optimization/gradient_descent_optimizer.h"
+#include "software/optimization/gradient_descent_optimizer.hpp"
 
 double ratePasserPointForKeepAway(const Pass& pass, const Team& enemy_team)
 {

@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/world/robot.h"
 
 /**

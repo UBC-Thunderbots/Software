@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "move_goalie_to_goal_line_tactic",
-    srcs = ["move_goalie_to_goal_line_tactic.cpp"],
+    srcs = [
+        "move_goalie_to_goal_line_fsm.cpp",
+        "move_goalie_to_goal_line_tactic.cpp",
+    ],
     hdrs = [
         "move_goalie_to_goal_line_fsm.h",
         "move_goalie_to_goal_line_tactic.h",

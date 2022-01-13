@@ -4,7 +4,7 @@
 
 GetBehindBallTactic::GetBehindBallTactic(bool loop_forever)
     : Tactic(loop_forever, {RobotCapability::Move}),
-      fsm(),
+      fsm{GetBehindBallFSM()},
       control_params({.ball_location = Point(0, 0), .chick_direction = Angle::zero()})
 {
 }

@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "penalty_kick_tactic",
-    srcs = ["penalty_kick_tactic.cpp"],
+    srcs = [
+        "penalty_kick_fsm.cpp",
+        "penalty_kick_tactic.cpp",
+    ],
     hdrs = [
         "penalty_kick_fsm.h",
         "penalty_kick_tactic.h",

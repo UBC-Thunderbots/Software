@@ -5,8 +5,8 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/backend/backend.h"
 #include "software/backend/ssl_proto_client.h"
-#include "software/networking/threaded_proto_udp_listener.h"
-#include "software/networking/threaded_proto_udp_sender.h"
+#include "software/networking/threaded_proto_udp_listener.hpp"
+#include "software/networking/threaded_proto_udp_sender.hpp"
 
 class ReplayBackend : public Backend
 {

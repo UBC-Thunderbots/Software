@@ -5,7 +5,8 @@
 #include "software/ai/hl/stp/action/kick_action.h"
 
 KickTactic::KickTactic(bool loop_forever)
-    : Tactic(loop_forever, {RobotCapability::Kick, RobotCapability::Move})
+    : Tactic(loop_forever, {RobotCapability::Kick, RobotCapability::Move}),
+      fsm{GetBehindBallFSM()}
 {
 }
 

@@ -74,9 +74,9 @@ class ErForceSimulator : public QObject
      * @param primitive_set_msg The set of primitives to run on the robot
      * @param vision_msg The vision message
      */
-    void setYellowRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg,
+    void setYellowRobotPrimitiveSet(const TbotsProto::PrimitiveSet& primitive_set_msg,
                                     std::unique_ptr<TbotsProto::Vision> vision_msg);
-    void setBlueRobotPrimitiveSet(const TbotsProto_PrimitiveSet& primitive_set_msg,
+    void setBlueRobotPrimitiveSet(const TbotsProto::PrimitiveSet& primitive_set_msg,
                                   std::unique_ptr<TbotsProto::Vision> vision_msg);
 
     /**
@@ -109,66 +109,45 @@ class ErForceSimulator : public QObject
     Timestamp getTimestamp() const;
 
     /**
-     * Resets the current firmware time to 0
+     * Resets the current time to 0
      */
-    static void resetCurrentFirmwareTime();
+    void resetCurrentTime();
 
    private:
-    /**
-     * Get the current time.
-     *
-     * This is passed into a `FirmwareWorld`, which requires that it is static (as it
-     * is C code). This will just return `current_firmware_time`, which should be updated
-     * to the actual current time before ticking any firmware.
-     *
-     * @return The value of `current_firmware_time`, in seconds.
-     */
-    static float getCurrentFirmwareTimeSeconds();
-
     /**
      * Sets the primitive being simulated by the robot in simulation
      *
      * @param id The id of the robot to set the primitive for
      * @param primitive_msg The primitive to run on the robot
      * @param simulator_robots The robots to set the primitives on
-     * @param simulator_ball The simulator ball to use in the primitives
      * @param vision_msg The vision message
      */
     static void setRobotPrimitive(
-        RobotId id, const TbotsProto_Primitive& primitive_msg,
-        std::map<std::shared_ptr<ErForceSimulatorRobot>,
-                 std::shared_ptr<FirmwareWorld_t>>& simulator_robots,
-        std::shared_ptr<ErForceSimulatorBall> simulator_ball,
+        RobotId id, const TbotsProto::Primitive& primitive_msg,
+        std::vector<std::shared_ptr<ErForceSimulatorRobot>>& simulator_robots,
         const TbotsProto::Vision& vision_msg);
 
     /**
      * Update Simulator Robot and get the latest robot control
      *
-     * @param handle_robot_log_proto Function pointer to handle robot log proto
-     * @param simulator_robots Map of simulator robots
+     * @param simulator_robots Vector of simulator robots
      * @param vision_msg The vision msg for this team of robots
      *
      * @return robot control
      */
     static SSLSimulationProto::RobotControl updateSimulatorRobots(
-        void (*handle_robot_log_proto)(TbotsProto_RobotLog),
-        std::map<std::shared_ptr<ErForceSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
-            simulator_robots,
+        std::vector<std::shared_ptr<ErForceSimulatorRobot>> simulator_robots,
         TbotsProto::Vision vision_msg);
 
-    std::shared_ptr<ErForceSimulatorBall> simulator_ball;
-    std::map<std::shared_ptr<ErForceSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
-        yellow_simulator_robots;
-    std::map<std::shared_ptr<ErForceSimulatorRobot>, std::shared_ptr<FirmwareWorld_t>>
-        blue_simulator_robots;
+    std::vector<std::shared_ptr<ErForceSimulatorRobot>> yellow_simulator_robots;
+    std::vector<std::shared_ptr<ErForceSimulatorRobot>> blue_simulator_robots;
     std::unique_ptr<TbotsProto::Vision> yellow_team_vision_msg;
     std::unique_ptr<TbotsProto::Vision> blue_team_vision_msg;
 
     unsigned int frame_number;
 
-    // The current time. This is static so that it may be used by the firmware,
-    // and so must be set before each firmware tick
-    static Timestamp current_firmware_time;
+    // The current time.
+    Timestamp current_time;
 
     amun::SimulatorSetup er_force_sim_setup;
     std::unique_ptr<camun::simulator::Simulator> er_force_sim;

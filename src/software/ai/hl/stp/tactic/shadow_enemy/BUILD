@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "shadow_enemy_tactic",
-    srcs = ["shadow_enemy_tactic.cpp"],
+    srcs = [
+        "shadow_enemy_fsm.cpp",
+        "shadow_enemy_tactic.cpp",
+    ],
     hdrs = [
         "shadow_enemy_fsm.h",
         "shadow_enemy_tactic.h",

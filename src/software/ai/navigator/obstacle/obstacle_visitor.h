@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/ai/navigator/obstacle/obstacle.hpp"
 #include "software/geom/circle.h"
 #include "software/geom/polygon.h"
 #include "software/geom/rectangle.h"
