@@ -17,7 +17,7 @@ class g3logWidget(pg_console.ConsoleWidget):
         self.ui.exceptionBtn.hide()
         self.ui.historyBtn.hide()
 
-        # TODO (#TODO) remove - dark theme hacks
+        # flip the text and background color to make it dark theme
         self.ui.output.setStyleSheet(
             """QPlainTextEdit{
                 color: #ffffff;

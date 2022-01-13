@@ -15,7 +15,7 @@ class FieldLayer(pg.GraphicsObject):
             "symbol": "o",
             "size": 7,
             "pen": pg.mkPen("w"),
-            "brush": pg.mkBrush("r"),
+            "brush": pg.mkBrush("w"),
             "tip": "x: {x:.3g}\ny: {y:.3g}\ndata={data}".format,
         }
 
@@ -26,7 +26,7 @@ class FieldLayer(pg.GraphicsObject):
         :return: Rectangle that covers the entire field
     
         """
-        # TODO (#TODO) this rectangle makes no sense, it should be
+        # TODO (#2398) this rectangle makes no sense, it should be
         # top left x, top left y, width, height. But for some reason
         # that doesn't play nicely with the coordinate system.
         #
@@ -42,6 +42,7 @@ class FieldLayer(pg.GraphicsObject):
         :returns: bounding rectangle
 
         """
+        # TODO (#2398) fix this to be top left coordinates, width, height
         return QtCore.QRectF(
             int(x - radius), int(y - radius), int(radius * 2), int(radius * 2)
         )

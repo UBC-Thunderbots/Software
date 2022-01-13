@@ -79,8 +79,8 @@ class WorldLayer(FieldLayer):
             painter.setPen(pg.mkPen(color))
             painter.setBrush(pg.mkBrush(color))
 
-            # TODO (#TODO) Draw the Orientation of the robots
-            # TODO (#TODO) Draw the Velocities of the robots
+            # TODO (#2396) Draw the robot IDs of the robots
+            # TODO (#2397) Draw the Orientation of the robots
             painter.drawEllipse(
                 self.createCircle(
                     robot.current_state.global_position.x_meters * MM_TO_M,
@@ -100,7 +100,6 @@ class WorldLayer(FieldLayer):
         painter.setPen(pg.mkPen(colors.BALL_COLOR))
         painter.setBrush(pg.mkBrush(colors.BALL_COLOR))
 
-        # TODO (#TODO) Draw the Velocities of the and ball
         painter.drawEllipse(
             self.createCircle(
                 ball.current_state.global_position.x_meters * MM_TO_M,
@@ -115,12 +114,11 @@ class WorldLayer(FieldLayer):
 
         if not world:
             world = self.cached_world
-
         self.cached_world = world
         self.draw_field(painter, world.field)
         self.draw_ball(painter, world.ball)
 
-        # TODO (#TODO) Figure out which team color _we_ are and update the color
+        # TODO (#2399) Figure out which team color _we_ are and update the color
         # passed into the team.
         self.draw_team(painter, colors.YELLOW_ROBOT_COLOR, world.friendly_team)
         self.draw_team(painter, colors.BLUE_ROBOT_COLOR, world.enemy_team)
