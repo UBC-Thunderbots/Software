@@ -39,14 +39,15 @@ class EnlsvgPathPlanner : public PathPlanner
         bool isCoordNavigable(const EnlsvgPoint &gv) const;
         std::optional<EnlsvgPoint> findClosestUnblockedEnlsvgPoint(const EnlsvgPoint &ep) const;
         bool isBlocked(const EnlsvgPoint &ep) const;
+        void blockNearbyCoordDueToRobotRadius(const Point &point) const;
     
         int num_grid_rows;
         int num_grid_cols;
 //        int min_navigable_y_enlsvg_point;
 //        int min_navigable_x_enlsvg_point;
+        Point origin;
         int max_navigable_y_enlsvg_point;
         int max_navigable_x_enlsvg_point;
-        Point origin;
         std::unique_ptr<EnlsvgGrid> grid;
         std::unique_ptr<const EnlsvgAlgorithm> algo;
         std::unique_ptr<EnlsvgMemory> mem;

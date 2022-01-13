@@ -2,13 +2,11 @@
 
 EnlsvgPathPlanner::EnlsvgPathPlanner(
     const Rectangle &navigable_area, const std::vector<ObstaclePtr> &obstacles)
-    :   num_grid_rows(static_cast<int>(round(navigable_area.xLength() / (double) SIZE_OF_GRID_CELL_IN_METERS))),
-        num_grid_cols(static_cast<int>(round(navigable_area.yLength() / (double) SIZE_OF_GRID_CELL_IN_METERS))),
-//        min_navigable_y_enlsvg_point(convertPointToEnlsvgPoint(navigable_area.negXNegYCorner()).y),
-//        min_navigable_x_enlsvg_point(convertPointToEnlsvgPoint(navigable_area.negXNegYCorner()).x),
+    :   num_grid_rows(static_cast<int>(round(navigable_area.xLength() / SIZE_OF_GRID_CELL_IN_METERS))),
+        num_grid_cols(static_cast<int>(round(navigable_area.yLength() / SIZE_OF_GRID_CELL_IN_METERS))),
+        origin(navigable_area.negXNegYCorner()) ,
         max_navigable_y_enlsvg_point(convertPointToEnlsvgPoint(navigable_area.posXPosYCorner()).y),
         max_navigable_x_enlsvg_point(convertPointToEnlsvgPoint(navigable_area.posXPosYCorner()).x),
-        origin(navigable_area.negXNegYCorner()) ,
         grid(std::make_unique<EnlsvgGrid>(num_grid_rows, num_grid_cols))
 {
     createObstaclesInGrid(obstacles);
@@ -35,10 +33,24 @@ void EnlsvgPathPlanner::createObstaclesInGrid(const std::vector<ObstaclePtr> &ob
     }
 }
 
+void EnlsvgPathPlanner::blockNearbyCoordDueToRobotRadius(const Point &point) const
+{
+    for (int x_sign = -1; x_sign < 2; ++x_sign)
+    {
+        for (int y_sign = -1; y_sign < 2; ++y_sign)
+        {
+            EnlsvgPoint nearby_coord = 
+                convertPointToEnlsvgPoint(point + Vector(x_sign*ROBOT_MAX_RADIUS_METERS, 
+                                                        y_sign*ROBOT_MAX_RADIUS_METERS));
+            grid->setBlocked(nearby_coord.x, nearby_coord.y, true);
+        }
+    }
+}
+
 bool EnlsvgPathPlanner::isCoordNavigable(const EnlsvgPoint& ep) const
 {
-    return (0 >= ep.x && ep.x <= max_navigable_x_enlsvg_point)
-        && (0 >= ep.y && ep.y <= max_navigable_y_enlsvg_point);
+    return (ep.x >= 0&& ep.x <= max_navigable_x_enlsvg_point)
+        && (ep.y >= 0 && ep.y <= max_navigable_y_enlsvg_point);
 }
 
 std::optional<Path> EnlsvgPathPlanner::findPath(
@@ -56,10 +68,51 @@ std::optional<Path> EnlsvgPathPlanner::findPath(
         return std::nullopt;
     }
     
-    EnlsvgPoint s = convertPointToEnlsvgPoint(start);
-    EnlsvgPoint e = convertPointToEnlsvgPoint(end);
-    EnlsvgPath path = algo->computePath(*mem, s.x, s.y, e.x, e.y);
-    return convertEnlsvgPathToPath(path);
+    EnlsvgPoint s   = convertPointToEnlsvgPoint(start);
+    EnlsvgPoint e   = convertPointToEnlsvgPoint(end);
+    auto new_start  = findClosestUnblockedEnlsvgPoint(s);
+    auto new_end    = findClosestUnblockedEnlsvgPoint(e);
+    
+    if (new_start == std::nullopt || new_end == std::nullopt)
+    {
+        return std::nullopt;
+    }
+    
+    EnlsvgPath enlsvgPath = algo->computePath(*mem, new_start.value().x, new_start.value().y,
+                                              new_end.value().x, new_end.value().y);
+    std::optional<Path> path = convertEnlsvgPathToPath(enlsvgPath);
+    if (path == std::nullopt)
+    {
+        return std::nullopt;
+    }
+    
+    std::vector<Point> path_points = path.value().getKnots();
+    
+    // If start was initially blocked, add the start point
+    if (new_start.value() != s)
+    {
+        path_points.insert(path_points.begin(), start);
+    }
+    
+    // If the end point wasn't blocked, then replace the end with the actual end
+    if (new_end.value() == e)
+    {
+        path_points.pop_back();
+        path_points.emplace_back(end);
+    }
+     
+    // Make sure start and end points correspond to input start and end
+    path_points.erase(path_points.begin());
+    path_points.insert(path_points.begin(), start);
+    
+    // Due to processing, it is possible that the first two points may be very close together, this will fix that
+    if (path_points.size() > 2
+       && (path_points[0] - path_points[1]).length() < SIZE_OF_GRID_CELL_IN_METERS)
+    {
+        path_points.erase(path_points.begin() + 1);
+    }
+    
+    return Path(path_points);
 }
 
 EnlsvgPathPlanner::EnlsvgPoint EnlsvgPathPlanner::convertPointToEnlsvgPoint(
@@ -101,25 +154,27 @@ std::optional<EnlsvgPathPlanner::EnlsvgPoint> EnlsvgPathPlanner::findClosestUnbl
     std::queue<EnlsvgPoint> q;
     std::vector<EnlsvgPoint> visited;
     q.push(ep);
+    visited.emplace_back(ep);
     while (!q.empty())
     {
         EnlsvgPoint test_coord = q.front();
-        visited.emplace_back(test_coord);
         q.pop();
         if (!isBlocked(test_coord))
         {
             return std::optional<EnlsvgPoint>(test_coord);
         }
-        for (int i = -1; i < 2; ++i)
+        for (int i = 1; i > -2; i -= 2)
         {
-            for (int j = -1; j < 2; ++j)
+            EnlsvgPoint next_coord = EnlsvgPoint(test_coord.x+i, test_coord.y);
+            for (int j = 0; j < 2; ++j)
             {
-                EnlsvgPoint next_coord = EnlsvgPoint(ep.x+i, ep.y+j);
                 if (isCoordNavigable(next_coord) 
                     && (std::find(visited.begin(), visited.end(), next_coord) == visited.end()))
                 {
                     q.push(next_coord);
+                    visited.emplace_back(next_coord);
                 }
+                next_coord = EnlsvgPoint(test_coord.x, test_coord.y+i);
             }
         }
     }
