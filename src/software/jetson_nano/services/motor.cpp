@@ -21,7 +21,7 @@ extern "C"
 #include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
 
     // SPI Configs
-    static uint32_t SPI_SPEED_HZ = 20000;
+    static uint32_t SPI_SPEED_HZ = 200000;
     static uint8_t SPI_BITS      = 8;
     static uint32_t SPI_MODE     = 0x3u;
 
@@ -135,25 +135,96 @@ void MotorService::transfer(int fd, uint8_t const* tx, uint8_t const* rx, unsign
 
     if (ret < 1)
     {
-        perror("can't send spi message");
+        LOG(FATAL) << "BRUH x_x";
     }
-    LOG(INFO) << fd << " : " << tx[0] << rx[0] << std::endl;
+
+    printf("RX\n");
+    for (unsigned k = 0; k < len; k++)
+    {
+        printf("%x\n", rx[k]);
+    }
+
 }
 
 uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
                                            uint8_t last_transfer)
 {
-    static uint8_t tx[1] = {};
-    static uint8_t rx[1] = {};
-    transfer(file_descriptors[motor], tx, rx, 1);
-    return rx[0];
+    static uint8_t tx[5]    = {0};
+    static uint8_t rx[5]    = {0};
+    static uint8_t ret_byte = 0;
+
+    static bool transfer_started  = false;
+    static bool currently_writing = false;
+    static bool currently_reading = false;
+    static uint8_t position       = 0;
+
+    if (!transfer_started)
+    {
+        tx[0] = 0;
+        tx[1] = 0;
+        tx[2] = 0;
+        tx[3] = 0;
+        tx[4] = 0;
+
+        rx[0] = 0;
+        rx[1] = 0;
+        rx[2] = 0;
+        rx[3] = 0;
+        rx[4] = 0;
+
+        if (data & 0x80u)
+        {
+            LOG(INFO) << "Just started to write!";
+            position          = 0;
+            currently_reading = false;
+            currently_writing = true;
+        }
+        else
+        {
+            LOG(INFO) << "Just started to read!";
+            position          = 0;
+            currently_reading = true;
+            currently_writing = false;
+
+            tx[position] = data;
+            transfer(file_descriptors[motor], tx, rx, 5);
+            LOG(INFO) << std::to_string(rx[0]);
+            LOG(INFO) << std::to_string(rx[1]);
+            LOG(INFO) << std::to_string(rx[2]);
+            LOG(INFO) << std::to_string(rx[3]);
+            LOG(INFO) << std::to_string(rx[4]);
+        }
+
+        transfer_started = true;
+    }
+
+    if (currently_writing) {
+        tx[position++] = data;
+        LOG(INFO) << "Currently writing: " << tx[position];
+    }
+
+    if (currently_reading)
+    {
+        ret_byte = rx[position++];
+        LOG(INFO) << "Current read byte: " << std::to_string(ret_byte);
+    }
+
+    if (currently_writing && last_transfer)
+    {
+        transfer(file_descriptors[motor], tx, rx, 5);
+        transfer_started = false;
+        LOG(INFO) << "FINAL TRANSFER";
+    }
+
+    LOG(INFO) << std::to_string(ret_byte);
+    return ret_byte;
 }
 
 uint8_t MotorService::tmc6100ReadWriteByte(uint8_t motor, uint8_t data,
                                            uint8_t last_transfer)
 {
-    static uint8_t tx[1] = {};
-    static uint8_t rx[1] = {};
+    uint8_t tx[1] = {data};
+    uint8_t rx[1] = {};
     transfer(file_descriptors[motor], tx, rx, 1);
     return rx[0];
 }
@@ -162,15 +233,6 @@ void MotorService::start()
 {
     tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, 0x01, 0x00000000);
     uint32_t read = tmc4671_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, 0x00);
-    std::cerr << read << std::endl;
-    tmc4671_writeInt(FRONT_RIGHT_MOTOR_CHIP_SELECT, 0x01, 0x00000000);
-    read = tmc4671_readInt(FRONT_RIGHT_MOTOR_CHIP_SELECT, 0x00);
-    std::cerr << read << std::endl;
-    tmc4671_writeInt(BACK_LEFT_MOTOR_CHIP_SELECT, 0x01, 0x00000000);
-    read = tmc4671_readInt(BACK_LEFT_MOTOR_CHIP_SELECT, 0x00);
-    std::cerr << read << std::endl;
-    tmc4671_writeInt(BACK_RIGHT_MOTOR_CHIP_SELECT, 0x01, 0x00000000);
-    read = tmc4671_readInt(BACK_RIGHT_MOTOR_CHIP_SELECT, 0x00);
     std::cerr << read << std::endl;
     // TODO (#2332)
 }
