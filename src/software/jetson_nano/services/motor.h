@@ -45,6 +45,12 @@ class MotorService : public Service
         const TbotsProto::DirectControlPrimitive_DirectVelocityControl& local_velocity,
         float dribbler_speed_rpm);
 
+    /**
+     * TODO
+     */
+    uint8_t tmc4671ReadWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
+    uint8_t tmc6100ReadWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
+
    private:
 
     void transfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len);
@@ -54,9 +60,5 @@ class MotorService : public Service
     WheelConstants_t wheel_constants_;
 
     // SPI File Descriptors
-    int front_left_motor_spi_fd;
-    int front_right_motor_spi_fd;
-    int back_left_motor_spi_fd;
-    int back_right_motor_spi_fd;
-    int dribbler_motor_spi_fd;
+    std::unordered_map<int, int> file_descriptors;
 };
