@@ -38,8 +38,6 @@ ErForceSimulator::ErForceSimulator(
     std::string s = qPrintable(str);
     google::protobuf::TextFormat::Parser parser;
     parser.ParseFromString(s, &er_force_sim_setup);
-    // er_force_sim =
-    //     std::make_unique<camun::simulator::Simulator>(er_force_sim_setup, true);
     er_force_sim = std::make_unique<camun::simulator::Simulator>(er_force_sim_setup);
     auto simulator_setup_command = std::make_shared<amun::Command>();
     simulator_setup_command->mutable_simulator()->set_enable(true);
@@ -99,25 +97,26 @@ void ErForceSimulator::addRobots(const std::vector<RobotStateWithId>& robots,
     if (side == gameController::Team::BLUE)
     {
         auto team = simulator_setup_command->mutable_set_team_blue();
-        for (unsigned int i = 0; i < robots.size(); i++)
-        {
-            auto* robot = team->add_robot();
-            robot->CopyFrom(ERForce);
-            robot->set_id(i);
-        }
-        er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
-        simulator_setup_command->clear_set_team_blue();
     }
     else
     {
         auto team = simulator_setup_command->mutable_set_team_yellow();
-        for (unsigned int i = 0; i < robots.size(); i++)
-        {
-            auto* robot = team->add_robot();
-            robot->CopyFrom(ERForce);
-            robot->set_id(i);
-        }
-        er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
+    }
+
+    for (const auto& robot_state_with_id : robots)
+    {
+        auto* robot = team->add_robot();
+        robot->CopyFrom(ERForce);
+        robot->set_id(robot_state_with_id.id);
+    }
+    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
+
+    if (side == gameController::Team::BLUE)
+    {
+        simulator_setup_command->clear_set_team_blue();
+    }
+    else
+    {
         simulator_setup_command->clear_set_team_yellow();
     }
 
@@ -134,7 +133,9 @@ void ErForceSimulator::addRobots(const std::vector<RobotStateWithId>& robots,
         robot_id->set_id(i);
 
         if (side == gameController::Team::BLUE)
+        {
             robot_id->set_team(gameController::Team::BLUE);
+        }
         else
         {
             robot_id->set_team(gameController::Team::YELLOW);
@@ -171,7 +172,9 @@ void ErForceSimulator::addRobots(const std::vector<RobotStateWithId>& robots,
             robot_constants, wheel_constants);
 
         if (side == gameController::Team::BLUE)
+        {
             blue_simulator_robots.emplace_back(simulator_robot);
+        }
         else
         {
             yellow_simulator_robots.emplace_back(simulator_robot);

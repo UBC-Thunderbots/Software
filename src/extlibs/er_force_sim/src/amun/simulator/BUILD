@@ -21,7 +21,6 @@ qt_cc_library(
         "//extlibs/er_force_sim/src/core",
         "//extlibs/er_force_sim/src/protobuf",
         "//proto:ssl_simulation_cc_proto",
-        "//software/world",
         "@bullet",
         "@qt//:qt_core",
         "@qt//:qt_gui",
