@@ -69,14 +69,20 @@ class ThreadedUnixListener:
             print("buffer overrun for {}".format(self.unix_path))
 
     def serve_till_stopped(self):
+        """Keep handling requests until force_stop is called
+        """
         while not self.stop:
             self.server.handle_request()
 
     def force_stop(self):
+        """Stop handling requests
+        """
         self.stop = True
         self.server.server_close()
 
     def start(self):
+        """Start handling requests
+        """
         self.stop = False
         self.serve_till_stopped()
 
@@ -108,6 +114,16 @@ class Session(socketserver.BaseRequestHandler):
 
 
 def handler_factory(proto_type, handle_callback, convert_from_any):
+    """To pass in an arbitrary handle callback into the SocketServer,
+    we need to create a constructor that can create a Session object with
+    appropriate handle function.
+
+    :param proto_type: The type of protobuf to handle
+    :param handle_callback: The callback to run
+    :param convert_from_any: If true, the message needs to be decoded
+                             into Any before into the proto_type
+    """
+
     def create_handler(*args, **keys):
         return Session(proto_type, handle_callback, convert_from_any, *args, **keys)
 

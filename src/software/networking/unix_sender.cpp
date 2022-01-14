@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-static unsigned MAX_SEND_FAILURES_BEFORE_LOG = 1000;
-
 UnixSender::UnixSender(boost::asio::io_service& io_service,
                        const std::string& unix_socket_path)
     : socket_(io_service)

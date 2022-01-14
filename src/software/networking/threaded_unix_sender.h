@@ -10,9 +10,8 @@ class ThreadedUnixSender
 {
    public:
     /**
-     * Creates a UnixSender that sends a string over the unix socket path.
+     * Creates a ThreadedUnixSender that sends a string over the unix socket path.
      *
-     * @param io_service The io_service to use to service outgoing SendProto data
      * @param unix_socket_path The path to the unix socket
      */
     ThreadedUnixSender(const std::string& unix_socket_path);

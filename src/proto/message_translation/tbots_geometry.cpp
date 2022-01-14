@@ -1,5 +1,7 @@
 #include "proto/message_translation/tbots_geometry.h"
 
+#include <google/protobuf/util/message_differencer.h>
+
 std::unique_ptr<TbotsProto::Point> createPointProto(const Point& point)
 {
     auto point_msg = std::make_unique<TbotsProto::Point>();
@@ -43,6 +45,15 @@ std::unique_ptr<TbotsProto::Polygon> createPolygonProto(const Polygon& polygon)
     return polygon_msg;
 }
 
+std::unique_ptr<TbotsProto::Circle> createCircleProto(const Circle& circle)
+{
+    auto circle_proto                 = std::make_unique<TbotsProto::Circle>();
+    *(circle_proto->mutable_origin()) = *createPointProto(circle.origin());
+    circle_proto->set_radius(circle.radius());
+
+    return circle_proto;
+}
+
 Point createPoint(const TbotsProto::Point& point)
 {
     return Point(point.x_meters(), point.y_meters());
@@ -73,4 +84,9 @@ Polygon createPolygon(const TbotsProto::Polygon& polygon)
     }
 
     return Polygon(polygon_points);
+}
+
+Circle createCircle(const TbotsProto::Circle& circle)
+{
+    return Circle(createPoint(circle.origin()), circle.radius());
 }

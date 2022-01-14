@@ -7,8 +7,9 @@
 #include "software/logger/custom_logging_levels.h"
 #include "software/networking/threaded_unix_sender.h"
 
-static std::string TYPE_DELIMITER = "!!!";
-static std::string UNIX_BASE_PATH = "/tmp/tbots/";
+static const std::string TYPE_DELIMITER = "!!!";
+static const std::string UNIX_BASE_PATH = "/tmp/tbots/";
+
 using UnixSenderMap =
     std::unordered_map<std::string, std::unique_ptr<ThreadedUnixSender>>;
 
@@ -34,5 +35,6 @@ class ProtobufSink
  *
  * @param os The output stream
  * @param message The message to serialize
+ * @return The output stream containing the base64 encoded serialized Any protobuf
  */
 std::ostream& operator<<(std::ostream& os, const google::protobuf::Message& message);

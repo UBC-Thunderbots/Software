@@ -49,5 +49,5 @@ class ObstacleArtist : public ObstacleVisitor
    private:
     QGraphicsScene* scene_;
     QPen pen_;
-    TbotsProto::Obstacle obstacle_proto_;
+    TbotsProto::Obstacles obstacle_proto_;
 };

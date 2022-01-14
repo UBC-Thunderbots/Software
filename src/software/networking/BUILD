@@ -38,7 +38,7 @@ cc_library(
 
 cc_library(
     name = "threaded_proto_udp_listener",
-    srcs = [
+    hdrs = [
         "threaded_proto_udp_listener.hpp",
     ],
     deps = [

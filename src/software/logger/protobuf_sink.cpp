@@ -5,6 +5,7 @@
 #include "base64.h"
 #include "google/protobuf/text_format.h"
 #include "proto/robot_log_msg.pb.h"
+#include "shared/constants.h"
 
 ProtobufSink::ProtobufSink()
 {
@@ -41,9 +42,12 @@ void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
 
         if (TbotsProto::LogLevel_Parse(log_entry.get().level(), &log_level_proto))
         {
-            std::time_t t = std::time(0);
+            const auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now());
             log_msg_proto.mutable_created_timestamp()->set_epoch_timestamp_seconds(
-                static_cast<double>(t));
+                static_cast<double>(now_ms.time_since_epoch().count()) /
+                MILLISECONDS_PER_SECOND);
+
             log_msg_proto.set_log_msg(log_entry.get().message());
             log_msg_proto.set_log_level(log_level_proto);
             log_msg_proto.set_file_name(log_entry.get().file());

@@ -7,6 +7,7 @@ py_library(
     srcs = ["g3log_widget.py"],
     deps = [
         "//proto:software_py_proto",
+        "//software/thunderscope:constants",
         requirement("pyqtgraph"),
     ],
 )

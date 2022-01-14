@@ -33,5 +33,7 @@ class UnixSender
     std::string unix_socket_path_;
     std::string data_buffer_;
 
-    unsigned log_counter = 0;
+    // Failed to send log throttling
+    const unsigned MAX_SEND_FAILURES_BEFORE_LOG = 1000;
+    unsigned log_counter                        = 0;
 };

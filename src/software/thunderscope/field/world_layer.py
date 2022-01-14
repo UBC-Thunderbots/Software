@@ -7,7 +7,12 @@ from proto.team_pb2 import Robot, Team
 from proto.ball_pb2 import Ball
 from proto.vision_pb2 import RobotState, BallState
 from software.thunderscope.field.field_layer import FieldLayer
-from software.thunderscope.field.constants import ROBOT_MAX_RADIUS, BALL_RADIUS, MM_TO_M
+from software.thunderscope.constants import (
+    ROBOT_MAX_RADIUS,
+    BALL_RADIUS,
+    MM_PER_M,
+    UNIX_SOCKET_BASE_PATH,
+)
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 import software.thunderscope.colors as colors
 
@@ -16,7 +21,7 @@ class WorldLayer(FieldLayer):
     def __init__(self):
         FieldLayer.__init__(self)
         self.world_receiver = ThreadedUnixListener(
-            "/tmp/tbots/TbotsProto.World", World, max_buffer_size=1
+            UNIX_SOCKET_BASE_PATH + World.DESCRIPTOR.full_name, World, max_buffer_size=1
         )
         self.cached_world = World()
 
@@ -33,36 +38,36 @@ class WorldLayer(FieldLayer):
         # Draw Field Bounds
         painter.drawRect(
             QtCore.QRectF(
-                -(field.field_x_length / 2) * MM_TO_M,
-                (field.field_y_length / 2) * MM_TO_M,
-                (field.field_x_length) * MM_TO_M,
-                -(field.field_y_length) * MM_TO_M,
+                -(field.field_x_length / 2) * MM_PER_M,
+                (field.field_y_length / 2) * MM_PER_M,
+                (field.field_x_length) * MM_PER_M,
+                -(field.field_y_length) * MM_PER_M,
             )
         )
 
         # Draw Friendly Defense
         painter.drawRect(
             QtCore.QRectF(
-                -(field.field_x_length / 2) * MM_TO_M,
-                (field.defense_y_length / 2) * MM_TO_M,
-                (field.defense_x_length) * MM_TO_M,
-                -(field.defense_y_length) * MM_TO_M,
+                -(field.field_x_length / 2) * MM_PER_M,
+                (field.defense_y_length / 2) * MM_PER_M,
+                (field.defense_x_length) * MM_PER_M,
+                -(field.defense_y_length) * MM_PER_M,
             )
         )
 
         # Draw Enemy Defense Area
         painter.drawRect(
             QtCore.QRectF(
-                ((field.field_x_length / 2) - field.defense_x_length) * MM_TO_M,
-                (field.defense_y_length / 2) * MM_TO_M,
-                (field.defense_x_length) * MM_TO_M,
-                -(field.defense_y_length) * MM_TO_M,
+                ((field.field_x_length / 2) - field.defense_x_length) * MM_PER_M,
+                (field.defense_y_length / 2) * MM_PER_M,
+                (field.defense_x_length) * MM_PER_M,
+                -(field.defense_y_length) * MM_PER_M,
             )
         )
 
         # Draw Centre Cicle
         painter.drawEllipse(
-            self.createCircle(0, 0, field.center_circle_radius * MM_TO_M)
+            self.createCircle(0, 0, field.center_circle_radius * MM_PER_M)
         )
 
     def draw_team(self, painter, color, team: Team):
@@ -83,8 +88,8 @@ class WorldLayer(FieldLayer):
             # TODO (#2397) Draw the Orientation of the robots
             painter.drawEllipse(
                 self.createCircle(
-                    robot.current_state.global_position.x_meters * MM_TO_M,
-                    robot.current_state.global_position.y_meters * MM_TO_M,
+                    robot.current_state.global_position.x_meters * MM_PER_M,
+                    robot.current_state.global_position.y_meters * MM_PER_M,
                     ROBOT_MAX_RADIUS,
                 )
             )
@@ -102,13 +107,20 @@ class WorldLayer(FieldLayer):
 
         painter.drawEllipse(
             self.createCircle(
-                ball.current_state.global_position.x_meters * MM_TO_M,
-                ball.current_state.global_position.y_meters * MM_TO_M,
+                ball.current_state.global_position.x_meters * MM_PER_M,
+                ball.current_state.global_position.y_meters * MM_PER_M,
                 BALL_RADIUS,
             )
         )
 
     def paint(self, painter, option, widget):
+        """Paint this layer
+
+        :param painter: The painter object to draw with
+        :param option: Style information (unused)
+        :param widget: The widget that we are painting on
+
+        """
 
         world = self.world_receiver.maybe_pop()
 

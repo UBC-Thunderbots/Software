@@ -3,11 +3,6 @@ package(default_visibility = ["//visibility:public"])
 load("@thunderscope_deps//:requirements.bzl", "requirement")
 
 py_library(
-    name = "constants",
-    srcs = ["constants.py"],
-)
-
-py_library(
     name = "field",
     srcs = ["field.py"],
     deps = [
