@@ -1,38 +1,38 @@
-#include "service.h"
 #include "redis.h"
 
-#include "string"
-
+#include "service.h"
 #include "software/logger/logger.h"
 
-// Redis config
-static size_t PORT = 6379;
+RedisService::RedisService(std::string host, size_t port) : subscriber(), host(host), port(port) {}
 
-Redis::Redis() : subscriber() {
+void RedisService::start()
+{
+    subscriber.connect(
+        host, port,
+        [](const std::string &host, std::size_t port, cpp_redis::connect_state status)
+        {
+            if (status == cpp_redis::connect_state::dropped)
+            {
+                LOG(WARNING) << "Connection dropped";
+            }
+            else if (status == cpp_redis::connect_state::failed)
+            {
+                LOG(WARNING) << "Connection failed";
+            }
+            else if (status == cpp_redis::connect_state::ok)
+            {
+                LOG(INFO) << "Connection successful";
+            }
+        });
 }
 
-void Redis::start() {
-    subscriber.connect("127.0.0.1", PORT,
-                       [](const std::string &host, std::size_t port, cpp_redis::connect_state status) {
-                           // Should be logged instead
-                           if (status == cpp_redis::connect_state::dropped) {
-                               // Should be logged
-                               LOG(WARNING) << "connection dropped";
-                               std::cout << "client disconnected from " << host << ":" << port << std::endl;
-                           } else if (status == cpp_redis::connect_state::failed) {
-                               LOG(WARNING) << "connection failed";
-                           } else if (status == cpp_redis::connect_state::ok) {
-                               LOG(INFO) << "connection succesful";
-                           }
-                       });
-}
-
-void Redis::stop() {
+void RedisService::stop()
+{
     subscriber.disconnect(false);
 }
 
-void Redis::subscribe(const std::string &channel,
-                      void (*subscribe_callback)(std::string, std::string)) {
+void RedisService::subscribe(const std::string &channel,
+                      void (*subscribe_callback)(std::string, std::string))
+{
     subscriber.subscribe(channel, subscribe_callback);
 }
-

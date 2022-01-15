@@ -8,6 +8,7 @@
 #include "shared/constants.h"
 #include "software/jetson_nano/primitive_executor.h"
 #include "software/jetson_nano/services/motor.h"
+#include "software/jetson_nano/services/redis.h"
 #include "software/logger/logger.h"
 #include "software/world/robot_state.h"
 
@@ -58,6 +59,7 @@ class Thunderloop
    private:
     // Services
     std::unique_ptr<MotorService> motor_service_;
+    std::unique_ptr<RedisService> redis_service_;
 
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;
