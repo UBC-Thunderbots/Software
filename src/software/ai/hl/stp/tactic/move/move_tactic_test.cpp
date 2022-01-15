@@ -240,7 +240,7 @@ TEST_F(MoveTacticTest, test_spinning_move_counter_clockwise)
             Duration::fromSeconds(10));
 }
 
-TEST(MoveTacticTest, test_calculate_robot_cost)
+TEST(MoveTacticRobotCostTest, test_calculate_robot_cost)
 {
     World world = ::TestUtil::createBlankTestingWorld();
 
