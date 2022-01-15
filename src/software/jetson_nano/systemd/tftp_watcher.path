@@ -1,0 +1,8 @@
+[Unit]
+Description=Monitor for changes in the tftp script
+After=thunderbots.service
+
+[Path]
+#todo add binary path
+PathChanged=${%i_path}
+Unit=watcher@%i.service
