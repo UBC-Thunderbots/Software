@@ -1,5 +1,6 @@
 #pragma once
 
+#include "proto/vision.pb.h"
 #include "shared/2015_robot_constants.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
@@ -30,6 +31,15 @@ class RobotState
     explicit RobotState(const Point &position, const Vector &velocity,
                         const Angle &orientation,
                         const AngularVelocity &angular_velocity);
+
+    /**
+     * Creates a new robot state based on the TbotsProto::RobotState protobuf
+     * representation
+     *
+     * @param robot_state_proto The TbotsProto::RobotState protobuf which this robot state
+     * should be based on
+     */
+    explicit RobotState(const TbotsProto::RobotState &robot_state_proto);
 
     /**
      * Returns the position of the robot represented by this state

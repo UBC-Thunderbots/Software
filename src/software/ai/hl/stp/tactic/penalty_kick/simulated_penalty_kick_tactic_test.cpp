@@ -32,7 +32,7 @@ TEST_P(SimulatedPenaltyKickTacticTest, penalty_kick_test)
     setTactic(tactic);
 
     static RobotId shooter_id = 0;
-    setRobotId(shooter_id);
+    setFriendlyRobotId(shooter_id);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         friendlyScored,
@@ -57,7 +57,7 @@ TEST_F(SimulatedPenaltyKickTacticTest, penalty_no_goalie)
     setTactic(tactic);
 
     static RobotId shooter_id = 0;
-    setRobotId(shooter_id);
+    setFriendlyRobotId(shooter_id);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         friendlyScored,

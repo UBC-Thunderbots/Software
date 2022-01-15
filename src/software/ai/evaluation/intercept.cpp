@@ -3,7 +3,7 @@
 #include "shared/constants.h"
 #include "software/ai/evaluation/pass.h"
 #include "software/geom/algorithms/contains.h"
-#include "software/optimization/gradient_descent_optimizer.h"
+#include "software/optimization/gradient_descent_optimizer.hpp"
 
 std::optional<std::pair<Point, Duration>> findBestInterceptForBall(const Ball &ball,
                                                                    const Field &field,

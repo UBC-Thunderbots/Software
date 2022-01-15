@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "get_behind_ball_tactic",
-    srcs = ["get_behind_ball_tactic.cpp"],
+    srcs = [
+        "get_behind_ball_fsm.cpp",
+        "get_behind_ball_tactic.cpp",
+    ],
     hdrs = [
         "get_behind_ball_fsm.h",
         "get_behind_ball_tactic.h",

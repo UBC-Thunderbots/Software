@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "chip_tactic",
-    srcs = ["chip_tactic.cpp"],
+    srcs = [
+        "chip_fsm.cpp",
+        "chip_tactic.cpp",
+    ],
     hdrs = [
         "chip_fsm.h",
         "chip_tactic.h",

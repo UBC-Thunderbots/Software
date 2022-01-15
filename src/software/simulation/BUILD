@@ -113,27 +113,9 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//proto/message_translation:ssl_simulation_robot_control",
         "//shared:constants",
+        "//software/jetson_nano:primitive_executor",
         "//software/simulation:simulator_robot",
         "//software/world:robot_state",
-    ],
-)
-
-cc_library(
-    name = "er_force_simulator_robot_singleton",
-    srcs = ["er_force_simulator_robot_singleton.cpp"],
-    hdrs = ["er_force_simulator_robot_singleton.h"],
-    deps = [
-        ":er_force_simulator_robot",
-        ":firmware_object_deleter",
-        ":simulator_robot",
-        "//firmware/app/logger",
-        "//firmware/app/world:chicker",
-        "//firmware/app/world:dribbler",
-        "//firmware/app/world:firmware_robot",
-        "//firmware/shared:physics",
-        "//proto:tbots_cc_proto",
-        "//software/logger",
-        "//software/world:field",
     ],
 )
 
@@ -233,7 +215,7 @@ qt_cc_library(
     hdrs = ["er_force_simulator.h"],
     deps = [
         ":er_force_simulator_ball",
-        ":er_force_simulator_robot_singleton",
+        ":er_force_simulator_robot",
         ":firmware_object_deleter",
         ":physics_simulator_ball",
         ":physics_simulator_robot",
@@ -268,7 +250,6 @@ cc_library(
     deps = [
         ":er_force_simulator_ball",
         ":er_force_simulator_qt",
-        ":er_force_simulator_robot_singleton",
         ":firmware_object_deleter",
         ":physics_simulator_ball",
         ":physics_simulator_robot",
@@ -286,6 +267,18 @@ cc_library(
         "//software/world",
         "//software/world:field",
         "//software/world:team_colour",
+    ],
+)
+
+cc_test(
+    name = "er_force_simulator_test",
+    srcs = ["er_force_simulator_test.cpp"],
+    deps = [
+        ":er_force_simulator",
+        "//proto/primitive:primitive_msg_factory",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+        "//software/world",
     ],
 )
 
