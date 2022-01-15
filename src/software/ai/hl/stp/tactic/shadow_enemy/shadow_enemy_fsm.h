@@ -81,7 +81,7 @@ struct ShadowEnemyFSM
         if (best_enemy_shot_opt)
         {
             enemy_shot_vector =
-                best_enemy_shot_opt->getPointToShootAt() - shadowee.position();
+                best_enemy_shot_opt.value().getPointToShootAt() - shadowee.position();
         }
         return shadowee.position() + enemy_shot_vector.normalize(shadow_distance);
     }
