@@ -1,17 +1,17 @@
 #pragma once
 
 #include "cpp_redis/cpp_redis"
-#include "cpp_redis/core/client.hpp"
+#include "string"
 
 
-class Redis : public Service {
+class RedisService : public Service {
 public:
 
-    explicit Redis();
+    explicit RedisService(std::string host, size_t port);
 
-    void start() override;
+    virtual void start() override;
 
-    void stop() override;
+    virtual void stop() override;
 
     void subscribe(const std::string &channel,
                    void (*subscribe_callback)(std::string, std::string));
@@ -19,4 +19,6 @@ public:
 
 private:
     cpp_redis::subscriber subscriber;
+    std::string host;
+    size_t port;
 };
