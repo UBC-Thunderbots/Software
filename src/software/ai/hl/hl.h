@@ -38,7 +38,7 @@ class HL
      *
      * @return information about the currently running plays and tactics
      */
-    virtual PlayInfo getPlayInfo() = 0;
+    virtual TbotsProto::PlayInfo getPlayInfo() = 0;
 
     /**
      * Overrides the play constructor so whenever STP creates a new play it calls

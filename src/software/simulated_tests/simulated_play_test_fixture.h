@@ -68,7 +68,7 @@ class SimulatedPlayTestFixture : public SimulatedTestFixture
      */
     const std::shared_ptr<AiConfig> getAiConfig() const;
 
-    std::optional<PlayInfo> getPlayInfo() override;
+    std::optional<TbotsProto::PlayInfo> getPlayInfo() override;
     AIDrawFunction getDrawFunctions() override;
 
    private:

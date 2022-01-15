@@ -7,6 +7,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":navigating_primitive_creator",
+        "//proto:visualization_cc_proto",
         "//proto/message_translation:tbots_protobuf",
         "//shared/parameter:cpp_configs",
         "//software/ai/intent",

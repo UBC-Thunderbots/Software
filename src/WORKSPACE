@@ -66,6 +66,14 @@ http_archive(
 )
 
 http_archive(
+    name = "base64",
+    build_file = "@//extlibs:base64.BUILD",
+    sha256 = "5e5366919938b834ca95fec4c2a80ad0c002872175d43226c933d25e40572883",
+    strip_prefix = "cpp-base64-2.rc.08",
+    url = "https://github.com/ReneNyffenegger/cpp-base64/archive/refs/tags/V2.rc.08.zip",
+)
+
+http_archive(
     name = "rules_proto",
     sha256 = "602e7161d9195e50246177e7c55b2f39950a9cf7366f74ed5f22fd45750cd208",
     strip_prefix = "rules_proto-97d8af4dc474595af3900dd85cb3a29ad28cc313",
@@ -280,76 +288,50 @@ new_git_repository(
     shallow_since = "1631132123 +0200",
 )
 
-# Based on the hermetic Python 3 guide found here
-# https://thethoughtfulkoala.com/posts/2020/05/16/bazel-hermetic-python.html
-_py_configure = "./configure --prefix=$(pwd)/bazel_install"
-
-http_archive(
-    name = "python_interpreter",
-    build_file_content = """
-exports_files(["python_bin"])
-filegroup(
-    name = "files",
-    srcs = glob(["bazel_install/**"], exclude = ["**/* *"]),
-    visibility = ["//visibility:public"],
-)
-cc_library(
-    name = "python_headers",
-    hdrs = glob(["bazel_install/include/python3.7/*.h"]),
-    includes = ["bazel_install/include/python3.7"],
-    visibility = ["//visibility:public"]
-)
-""",
-    patch_cmds = [
-        "mkdir $(pwd)/bazel_install",
-        _py_configure,
-        "make -j$(nproc)",
-        "make install",
-        "ln -s bazel_install/bin/python3 python_bin",
-    ],
-    sha256 = "91923007b05005b5f9bd46f3b9172248aea5abc1543e8a636d59e629c3331b01",
-    strip_prefix = "Python-3.7.9",
-    urls = ["https://www.python.org/ftp/python/3.7.9/Python-3.7.9.tar.xz"],
-)
-
 register_toolchains("//:py_toolchain")
 
 load("@rules_python//python:pip.bzl", "pip_install")
 
 pip_install(
     name = "python_control_deps",
-    python_interpreter_target = "@python_interpreter//:python_bin",
+    python_interpreter = "/opt/tbotspython/bin/python",
     requirements = "//firmware/app/control/python_controller:requirements.txt",
 )
 
 pip_install(
     name = "dynamic_parameter_deps",
-    python_interpreter_target = "@python_interpreter//:python_bin",
+    python_interpreter = "/opt/tbotspython/bin/python",
     requirements = "//shared/parameter/generation_scripts:requirements.txt",
 )
 
 pip_install(
     name = "nanopb_deps",
-    python_interpreter_target = "@python_interpreter//:python_bin",
-    requirements = "//extlibs:nanopb_requirements.txt",
-)
-
-pip_install(
-    name = "nanopb_deps",
-    python_interpreter_target = "@python_interpreter//:python_bin",
+    python_interpreter = "/opt/tbotspython/bin/python",
     requirements = "//extlibs:nanopb_requirements.txt",
 )
 
 pip_install(
     name = "python_tools_deps",
-    python_interpreter_target = "@python_interpreter//:python_bin",
+    python_interpreter = "/opt/tbotspython/bin/python",
     requirements = "//python_tools:requirements.txt",
 )
 
 pip_install(
     name = "display_deps",
-    python_interpreter_target = "@python_interpreter//:python_bin",
+    python_interpreter = "/opt/tbotspython/bin/python",
     requirements = "//software/jetson_nano/display:requirements.txt",
+)
+
+pip_install(
+    name = "jetson_nano_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements = "//software/jetson_nano:requirements.txt",
+)
+
+pip_install(
+    name = "thunderscope_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements = "//software/thunderscope:requirements.txt",
 )
 
 # required to use `py_proto_library` from protobuf
@@ -365,37 +347,23 @@ bind(
     actual = "@six_archive//:six",
 )
 
-# pybind11 for Python bindings
-# quval's repo for pybind11 bazel rules has a fix for hermetic python interpreter. The pybind11 project's own
-# bazel repo uses the system shell to find the system python interpreter and associated headers, and will not
-# work with how we build our own interpreter. This has an additional patch for Python 3.7.9, as pyconfig.h
-# is placed in a different directory than the rest of the Python headers.
 http_archive(
     name = "pybind11_bazel",
-    patch_args = ["-p1"],
-    patches = [
-        "//extlibs:pybind11_bazel_pyconfig_fix.patch",
-    ],
-    sha256 = "b26d183b3b0ff09a8f6ed6332e92599500ca3363a451bfbda863f69782af5d91",
-    strip_prefix = "pybind11_bazel-938e4c46b8d66967cda41a1d2513f69d37faa2b3",
-    urls = ["https://github.com/quval/pybind11_bazel/archive/938e4c46b8d66967cda41a1d2513f69d37faa2b3.zip"],
+    strip_prefix = "pybind11_bazel-72cbbf1fbc830e487e3012862b7b720001b70672",
+    urls = ["https://github.com/pybind/pybind11_bazel/archive/72cbbf1fbc830e487e3012862b7b720001b70672.zip"],
 )
 
 # We still require the pybind library.
 http_archive(
     name = "pybind11",
     build_file = "@pybind11_bazel//:pybind11.BUILD",
-    sha256 = "8ff2fff22df038f5cd02cea8af56622bc67f5b64534f1b83b9f133b8366acff2",
-    strip_prefix = "pybind11-2.6.2",
-    urls = ["https://github.com/pybind/pybind11/archive/v2.6.2.tar.gz"],
+    strip_prefix = "pybind11-2.9.0",
+    urls = ["https://github.com/pybind/pybind11/archive/refs/tags/v2.9.0.zip"],
 )
 
 load("@pybind11_bazel//:python_configure.bzl", "python_configure")
 
-python_configure(
-    name = "local_config_python",
-    python_interpreter_target = "@python_interpreter//:python_bin",
-)
+python_configure(name = "local_config_python")
 
 maybe(
     git_repository,
