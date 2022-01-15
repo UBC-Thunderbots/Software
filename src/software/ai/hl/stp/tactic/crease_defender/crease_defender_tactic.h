@@ -38,7 +38,6 @@ class CreaseDefenderTactic : public Tactic
 
     CreaseDefenderTactic() = delete;
 
-    void updateWorldParams(const World &world) override;
     bool done() const override;
 
     /**
@@ -64,7 +63,6 @@ class CreaseDefenderTactic : public Tactic
     void accept(TacticVisitor &visitor) const override;
 
    private:
-    void calculateNextAction(ActionCoroutine::push_type &yield) override;
     void updateIntent(const TacticUpdate &tactic_update) override;
 
     // Tactic parameters

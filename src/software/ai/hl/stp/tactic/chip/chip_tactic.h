@@ -24,8 +24,6 @@ class ChipTactic : public Tactic
 
     ChipTactic() = delete;
 
-    void updateWorldParams(const World& world) override;
-
     /**
      * Updates the params for this tactic that cannot be derived from the world
      *
@@ -61,7 +59,6 @@ class ChipTactic : public Tactic
     bool done() const override;
 
    private:
-    void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
     FSM<ChipFSM> fsm;

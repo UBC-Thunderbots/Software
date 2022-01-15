@@ -13,7 +13,7 @@
  * The STP module is an implementation of the high-level logic Abstract class, that
  * uses the STP (Skills, Tactics, Plays) framework for its decision making.
  *
- * See play.h, tactic.h, and action.h for more specific documentation on
+ * See play.h and tactic.h for more specific documentation on
  * each component.
  *
  * Explaining WorldParams and ControlParams
