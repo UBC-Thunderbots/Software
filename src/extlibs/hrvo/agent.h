@@ -1,7 +1,7 @@
 #pragma once
 
-#include "simulator.h"
-#include "vector2.h"
+#include "extlibs/hrvo/vector2.h"
+#include "extlibs/hrvo/simulator.h"
 
 /**
  * An agent/robot in the HRVO simulation.
@@ -20,18 +20,7 @@ class Agent
      * @param goalNo             The goal number of this agent.
      * @param goalRadius         The goal radius of this agent.
      */
-    explicit Agent(Simulator *simulator) // TODO: Might be able to remove this constructor as the init values dont really make sense
-            : simulator_(simulator),
-              position_(Vector2(0.f, 0.f)),
-              radius_(0.f),
-              velocity_(Vector2(0.f, 0.f)),
-              maxSpeed_(0.f),
-              maxAccel_(0.f),
-              goalNo_(0),
-              goalRadius_(0.f),
-              reachedGoal_(false)
-    {
-    }
+    explicit Agent(Simulator *simulator); // TODO: Might be able to remove this constructor as the init values dont really make sense
 
     /**
      * Constructor
@@ -46,18 +35,7 @@ class Agent
      */
     Agent(Simulator *simulator, const Vector2 &position, float radius,
           const Vector2 &velocity, float maxSpeed, float maxAccel, std::size_t goalNo,
-          float goalRadius)
-        : simulator_(simulator),
-          position_(position),
-          radius_(radius),
-          velocity_(velocity),
-          maxSpeed_(maxSpeed),
-          maxAccel_(maxAccel),
-          goalNo_(goalNo),
-          goalRadius_(goalRadius),
-          reachedGoal_(false)
-    {
-    }
+          float goalRadius);
 
     virtual ~Agent() = 0;
 
@@ -69,83 +47,35 @@ class Agent
     /**
      * Updates the position and velocity of this agent.
      */
-    virtual void update()
-    {
-        const float dv = abs(newVelocity_ - velocity_);
-
-        if (dv < maxAccel_ * simulator_->timeStep_)
-        {
-            velocity_ = newVelocity_;
-        }
-        else
-        {
-            velocity_ = (1.0f - (maxAccel_ * simulator_->timeStep_ / dv)) * velocity_ +
-                        (maxAccel_ * simulator_->timeStep_ / dv) * newVelocity_;
-        }
-
-        position_ += velocity_ * simulator_->timeStep_;
-
-        if (absSq(simulator_->goals_[goalNo_]->getCurrentGoalPosition() - position_) <
-            goalRadius_ * goalRadius_)
-        {
-            // Is at current goal position
-            if (simulator_->goals_[goalNo_]->isGoingToFinalGoal())
-            {
-                reachedGoal_ = true;
-            }
-            else
-            {
-                simulator_->goals_[goalNo_]->getNextGoalPostion();
-                reachedGoal_              = false;
-                simulator_->reachedGoals_ = false;
-            }
-        }
-        else
-        {
-            reachedGoal_              = false;
-            simulator_->reachedGoals_ = false;
-        }
-    };
+    virtual void update();
 
     /**
      * Returns the current position of the agent
      *
      * @return The current position of the agent
      */
-    const Vector2 &getPosition() const
-    {
-        return position_;
-    }
+    const Vector2 &getPosition() const;
 
     /**
      * Returns the agents radius
      *
      * @return The agents radius
      */
-    float getRadius() const
-    {
-        return radius_;
-    }
+    float getRadius() const;
 
     /**
      * Return the current velocity of the agent
      *
      * @return The current velocity of the agent
      */
-    const Vector2 &getVelocity() const
-    {
-        return velocity_;
-    }
+    const Vector2 &getVelocity() const;
 
     /**
      * Return the max acceleration of the agent
      *
      * @return The max acceleration of the agent
      */
-    float getMaxAccel() const
-    {
-        return maxAccel_;
-    }
+    float getMaxAccel() const;
 
     // protected: TODO: make properties protected
     // Agent Properties
