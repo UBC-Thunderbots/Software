@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "proto/message_translation/primitive_google_to_nanopb_converter.h"
+#include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "shared/2021_robot_constants.h"
 #include "software/test_util/test_util.h"
@@ -172,4 +173,32 @@ TEST_F(ErForceSimulatorTest, add_yellow_robots)
     EXPECT_EQ(0, friendly_robots.size());
     EXPECT_EQ(3, yellow_robots.size());
     EXPECT_TRUE(yellow_visible);
+}
+
+TEST_F(ErForceSimulatorTest, velocity_and_orientation_test)
+{
+    RobotState robot_state1(Point(1, 0), Vector(2, 0), Angle::half(),
+                            AngularVelocity::zero());
+    RobotState robot_state2(Point(0, 1), Vector(0, 2), Angle::quarter(),
+                            AngularVelocity::half());
+
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 0, .robot_state = robot_state1},
+        RobotStateWithId{.id = 1, .robot_state = robot_state2},
+    };
+
+    simulator->addYellowRobots(states);
+
+    simulator->stepSimulation(Duration::fromMilliseconds(20));
+
+    auto simState      = simulator->getSimulatorState();
+    auto yellow_robots = simState.yellow_robots();
+
+    EXPECT_TRUE(yellow_robots[0].v_x() > 1.9 && yellow_robots[0].v_x() <= 2.0);
+    EXPECT_TRUE(yellow_robots[0].v_y() > -0.01 && yellow_robots[0].v_y() < 0.01);
+
+    EXPECT_TRUE(yellow_robots[1].v_x() > -0.01 && yellow_robots[1].v_x() < 0.01);
+    EXPECT_TRUE(yellow_robots[1].v_y() > 1.9 && yellow_robots[1].v_y() <= 2.0);
+
+    // TO ADD: Orientation Test Cases
 }

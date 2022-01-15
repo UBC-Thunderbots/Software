@@ -94,13 +94,14 @@ void ErForceSimulator::addRobots(const std::vector<RobotStateWithId>& robots,
     robotSetDefault(&ERForce);
 
     // Initialize Team Robots at the bottom of the field
+    ::robot::Team* team;
     if (side == gameController::Team::BLUE)
     {
-        auto team = simulator_setup_command->mutable_set_team_blue();
+        team = simulator_setup_command->mutable_set_team_blue();
     }
     else
     {
-        auto team = simulator_setup_command->mutable_set_team_yellow();
+        team = simulator_setup_command->mutable_set_team_yellow();
     }
 
     for (const auto& robot_state_with_id : robots)
