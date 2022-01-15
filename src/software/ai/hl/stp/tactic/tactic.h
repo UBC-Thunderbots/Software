@@ -41,11 +41,9 @@ class Tactic
     /**
      * Creates a new Tactic. The Tactic will initially have no Robot assigned to it.
      *
-     * @param loop_forever Whether or not this Tactic should never complete. If true, the
-     * tactic will be restarted every time it completes and will never report done
      * @param capability_reqs_ The capability requirements for running this tactic
      */
-    explicit Tactic(bool loop_forever, const std::set<RobotCapability> &capability_reqs_);
+    explicit Tactic(const std::set<RobotCapability> &capability_reqs_);
 
     Tactic() = delete;
 
@@ -115,9 +113,6 @@ class Tactic
      * updating the intent
      */
     virtual void updateIntent(const TacticUpdate &tactic_update) = 0;
-
-    // Whether or not this tactic should loop forever by restarting each time it is done
-    bool loop_forever;
 
     // robot capability requirements
     std::set<RobotCapability> capability_reqs;

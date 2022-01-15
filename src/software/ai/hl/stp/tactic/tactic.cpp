@@ -4,8 +4,8 @@
 #include "software/logger/logger.h"
 #include "software/util/typename/typename.h"
 
-Tactic::Tactic(bool loop_forever, const std::set<RobotCapability> &capability_reqs_)
-    : intent(), loop_forever(loop_forever), capability_reqs(capability_reqs_)
+Tactic::Tactic(const std::set<RobotCapability> &capability_reqs_)
+    : intent(), capability_reqs(capability_reqs_)
 {
 }
 

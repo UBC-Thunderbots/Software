@@ -2,8 +2,8 @@
 
 #include <algorithm>
 
-MoveTactic::MoveTactic(bool loop_forever)
-    : Tactic(loop_forever, {RobotCapability::Move}),
+MoveTactic::MoveTactic()
+    : Tactic({RobotCapability::Move}),
       fsm(),
       control_params{.destination            = Point(),
                      .final_orientation      = Angle::zero(),

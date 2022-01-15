@@ -3,8 +3,7 @@
 #include <algorithm>
 
 DribbleTactic::DribbleTactic()
-    : Tactic(false,
-             {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
+    : Tactic( {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
       fsm(DribbleFSM()),
       control_params{DribbleFSM::ControlParams{.dribble_destination       = std::nullopt,
                                                .final_dribble_orientation = std::nullopt,

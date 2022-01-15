@@ -11,7 +11,7 @@
 
 CreaseDefenderTactic::CreaseDefenderTactic(
     std::shared_ptr<const RobotNavigationObstacleConfig> robot_navigation_obstacle_config)
-    : Tactic(true, {RobotCapability::Move}),
+    : Tactic({RobotCapability::Move}),
       fsm(CreaseDefenderFSM(robot_navigation_obstacle_config)),
       control_params({Point(0, 0), CreaseDefenderAlignment::CENTRE,
                       MaxAllowedSpeedMode::PHYSICAL_LIMIT}),

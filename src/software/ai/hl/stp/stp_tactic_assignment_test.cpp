@@ -15,7 +15,7 @@
  * is cleaner to keep separate from the rest of the STP tests
  */
 
-// class STPTacticAssignmentTest : public ::testing::Test
+//class STPTacticAssignmentTest : public ::testing::Test
 //{
 //   public:
 //    STPTacticAssignmentTest()
@@ -68,7 +68,7 @@
 //    World world = ::TestUtil::createBlankTestingWorld();
 //};
 //
-// TEST_F(STPTacticAssignmentTest,
+//TEST_F(STPTacticAssignmentTest,
 //       test_correct_number_of_tactics_returned_when_equal_number_of_robots_and_tactics)
 //{
 //    Team friendly_team(Duration::fromSeconds(0));
@@ -79,8 +79,8 @@
 //    friendly_team.updateRobots({robot_0, robot_1});
 //    world.updateFriendlyTeamState(friendly_team);
 //
-//    auto move_tactic_1 = std::make_shared<MoveTestTactic>();
-//    auto move_tactic_2 = std::make_shared<MoveTestTactic>();
+//    auto move_tactic_1 = std::make_shared<MoveTactic>();
+//    auto move_tactic_2 = std::make_shared<MoveTactic>();
 //
 //    move_tactic_1->updateControlParams(Point(-1, 0));
 //    move_tactic_2->updateControlParams(Point(1, 0));
@@ -92,7 +92,7 @@
 //    EXPECT_TRUE(allTacticsAssigned(tactics, asst));
 //}
 //
-// TEST_F(STPTacticAssignmentTest,
+//TEST_F(STPTacticAssignmentTest,
 //       test_correct_number_of_tactics_returned_when_more_tactics_than_robots)
 //{
 //    Team friendly_team(Duration::fromSeconds(0));
@@ -101,8 +101,8 @@
 //    friendly_team.updateRobots({robot_0});
 //    world.updateFriendlyTeamState(friendly_team);
 //
-//    auto move_tactic_1 = std::make_shared<MoveTestTactic>();
-//    auto move_tactic_2 = std::make_shared<MoveTestTactic>();
+//    auto move_tactic_1 = std::make_shared<MoveTactic>();
+//    auto move_tactic_2 = std::make_shared<MoveTactic>();
 //
 //    move_tactic_1->updateControlParams(Point(-1, 0));
 //    move_tactic_2->updateControlParams(Point(1, 0));
@@ -115,7 +115,7 @@
 //    EXPECT_FALSE(asst.find(move_tactic_2) != asst.end());
 //}
 //
-// TEST_F(STPTacticAssignmentTest,
+//TEST_F(STPTacticAssignmentTest,
 //       test_correct_number_of_tactics_returned_when_more_robots_than_tactics)
 //{
 //    Team friendly_team(Duration::fromSeconds(0));
@@ -126,7 +126,7 @@
 //    friendly_team.updateRobots({robot_0, robot_1});
 //    world.updateFriendlyTeamState(friendly_team);
 //
-//    auto move_tactic_1 = std::make_shared<MoveTestTactic>();
+//    auto move_tactic_1 = std::make_shared<MoveTactic>();
 //
 //    move_tactic_1->updateControlParams(Point(-1, 0));
 //
@@ -137,13 +137,13 @@
 //    EXPECT_TRUE(asst.find(move_tactic_1) != asst.end());
 //}
 //
-// TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_robots)
+//TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_robots)
 //{
 //    Team friendly_team(Duration::fromSeconds(0));
 //    friendly_team.updateRobots({});
 //    world.updateFriendlyTeamState(friendly_team);
 //
-//    auto move_tactic_1 = std::make_shared<MoveTestTactic>();
+//    auto move_tactic_1 = std::make_shared<MoveTactic>();
 //
 //    move_tactic_1->updateControlParams(Point(-1, 0));
 //
@@ -154,7 +154,7 @@
 //    EXPECT_FALSE(asst.find(move_tactic_1) != asst.end());
 //}
 //
-// TEST_F(STPTacticAssignmentTest,
+//TEST_F(STPTacticAssignmentTest,
 //       test_correct_tactics_removed_when_more_tactics_than_robots)
 //{
 //    Team friendly_team(Duration::fromSeconds(0));
@@ -163,7 +163,7 @@
 //    friendly_team.updateRobots({robot_0});
 //    world.updateFriendlyTeamState(friendly_team);
 //
-//    auto move_tactic_1 = std::make_shared<MoveTestTactic>();
+//    auto move_tactic_1 = std::make_shared<MoveTactic>();
 //    auto stop_tactic_1 = std::make_shared<StopTestTactic>();
 //
 //    move_tactic_1->updateControlParams(Point(-1, 0));
@@ -178,8 +178,7 @@
 //    auto asst = stp.assignRobotsToTactics({tactics}, world, false);
 //
 //
-//    // move_tactic_1 should be the only Tactic assigned a robot, since stop_tactic_1 is
-//    a
+//    // move_tactic_1 should be the only Tactic assigned a robot, since stop_tactic_1 is a
 //    // lower priority than move_tactic_1 so it should be dropped since there's only 1
 //    // robot
 //    EXPECT_TRUE(asst.find(move_tactic_1) != asst.end());
@@ -187,7 +186,7 @@
 //}
 //
 //
-// TEST_F(STPTacticAssignmentTest, test_assigning_1_tactic_to_1_robot)
+//TEST_F(STPTacticAssignmentTest, test_assigning_1_tactic_to_1_robot)
 //{
 //    Team friendly_team(Duration::fromSeconds(0));
 //    Robot robot_0(0, Point(-1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
@@ -195,7 +194,7 @@
 //    friendly_team.updateRobots({robot_0});
 //    world.updateFriendlyTeamState(friendly_team);
 //
-//    auto move_tactic_1 = std::make_shared<MoveTestTactic>();
+//    auto move_tactic_1 = std::make_shared<MoveTactic>();
 //
 //    move_tactic_1->updateControlParams(Point(2, -3.2));
 //
@@ -211,7 +210,7 @@
 //// Each robot is already close to one of the tactic's destinations, so it is trivial to
 //// see the optimal assignment is for each robot to be assigned to the tactic whose
 //// destination it's closest to
-// TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap)
+//TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap)
 //{
 //    Team friendly_team(Duration::fromSeconds(0));
 //    Robot robot_0(0, Point(-1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
@@ -221,16 +220,15 @@
 //    friendly_team.updateRobots({robot_0, robot_1});
 //    world.updateFriendlyTeamState(friendly_team);
 //
-//    auto move_tactic_1 = std::make_shared<MoveTestTactic>();
-//    auto move_tactic_2 = std::make_shared<MoveTestTactic>();
+//    auto move_tactic_1 = std::make_shared<MoveTactic>();
+//    auto move_tactic_2 = std::make_shared<MoveTactic>();
 //
 //    move_tactic_1->updateControlParams(Point(-1, 0));
 //    move_tactic_2->updateControlParams(Point(1, 0));
 //
 //    ConstTacticVector tactics = {move_tactic_1, move_tactic_2};
 //
-//    // Each robot is close to separate tactic destinations. They should each be
-//    trivially
+//    // Each robot is close to separate tactic destinations. They should each be trivially
 //    // assigned to the tactic with the destination closest to their position
 //
 //    auto asst = stp.assignRobotsToTactics({tactics}, world, false);
@@ -252,7 +250,7 @@
 ////
 ////
 ////                     dest1             dest2
-// TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_with_overlap)
+//TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_with_overlap)
 //{
 //    Team friendly_team(Duration::fromSeconds(0));
 //    Robot robot_0(0, Point(-1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
@@ -262,8 +260,8 @@
 //    friendly_team.updateRobots({robot_0, robot_1});
 //    world.updateFriendlyTeamState(friendly_team);
 //
-//    auto move_tactic_1 = std::make_shared<MoveTestTactic>();
-//    auto move_tactic_2 = std::make_shared<MoveTestTactic>();
+//    auto move_tactic_1 = std::make_shared<MoveTactic>();
+//    auto move_tactic_2 = std::make_shared<MoveTactic>();
 //
 //    move_tactic_1->updateControlParams(Point(-1, 0));
 //    move_tactic_2->updateControlParams(Point(1, 0));
@@ -283,7 +281,7 @@
 //    EXPECT_EQ(asst.find(move_tactic_2)->second, robot_0);
 //}
 //
-// TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_2_tactics)
+//TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_2_tactics)
 //{
 //    Team friendly_team(Duration::fromSeconds(0));
 //    Robot robot_0(0, Point(-1.1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
@@ -295,8 +293,8 @@
 //    friendly_team.updateRobots({robot_0, robot_1, robot_2});
 //    world.updateFriendlyTeamState(friendly_team);
 //
-//    auto move_tactic_1 = std::make_shared<MoveTestTactic>();
-//    auto move_tactic_2 = std::make_shared<MoveTestTactic>();
+//    auto move_tactic_1 = std::make_shared<MoveTactic>();
+//    auto move_tactic_2 = std::make_shared<MoveTactic>();
 //
 //    move_tactic_1->updateControlParams(Point(-1, 0));
 //    move_tactic_2->updateControlParams(Point(1, 0));
@@ -314,7 +312,7 @@
 //    EXPECT_EQ(asst.find(move_tactic_2)->second, robot_1);
 //}
 //
-// TEST_F(STPTacticAssignmentTest,
+//TEST_F(STPTacticAssignmentTest,
 //       test_assigning_3_robots_to_3_tactics_all_with_the_same_cost)
 //{
 //    Team friendly_team(Duration::fromSeconds(0));
@@ -344,7 +342,7 @@
 //    EXPECT_EQ(asst.find(stop_tactic_3)->second, robot_2);
 //}
 //
-// TEST_F(STPTacticAssignmentTest,
+//TEST_F(STPTacticAssignmentTest,
 //       test_assigning_3_robots_to_3_tactics_with_2_of_the_same_cost)
 //{
 //    Team friendly_team(Duration::fromSeconds(0));
@@ -358,7 +356,7 @@
 //    world.updateFriendlyTeamState(friendly_team);
 //
 //    auto stop_tactic_1 = std::make_shared<StopTestTactic>();
-//    auto move_tactic_1 = std::make_shared<MoveTestTactic>();
+//    auto move_tactic_1 = std::make_shared<MoveTactic>();
 //    auto stop_tactic_2 = std::make_shared<StopTestTactic>();
 //
 //    // The destination of the move_tactic is relatively close to the robot positions, so
@@ -378,11 +376,10 @@
 //    EXPECT_EQ(asst.find(stop_tactic_2)->second, robot_1);
 //}
 //
-// TEST_F(STPTacticAssignmentTest,
+//TEST_F(STPTacticAssignmentTest,
 //       test_assigning_2_robots_to_1_tactic_unsatisfied_robotcapabilityflags)
 //{
-//    // test that the robot that matches capability requirements is selected over the
-//    robot
+//    // test that the robot that matches capability requirements is selected over the robot
 //    // that doesn't even though the former has lower cost
 //    Team friendly_team(Duration::fromSeconds(0));
 //    // this robot has no capabilities
@@ -393,7 +390,7 @@
 //    friendly_team.updateRobots({robot_0, robot_1});
 //    world.updateFriendlyTeamState(friendly_team);
 //
-//    auto move_tactic_1 = std::make_shared<MoveTestTactic>();
+//    auto move_tactic_1 = std::make_shared<MoveTactic>();
 //
 //    move_tactic_1->updateControlParams(Point(0, 0));
 //
@@ -405,7 +402,7 @@
 //    EXPECT_EQ(asst.find(move_tactic_1)->second, robot_1);
 //}
 //
-// TEST_F(STPTacticAssignmentTest,
+//TEST_F(STPTacticAssignmentTest,
 //       test_assigning_multiple_robots_to_goalie_tactic_goalie_set_on_team)
 //{
 //    // Test that only the robot set as the goalie on the team is assigned to the
@@ -416,8 +413,7 @@
 //    Robot robot_0(0, Point(-0.5, 0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
 //                  Timestamp::fromSeconds(0));
 //    // default is all capabilities, if not specified otherwise
-//    Robot robot_1(1, Point(-0.5, -0.2), Vector(), Angle::zero(),
-//    AngularVelocity::zero(),
+//    Robot robot_1(1, Point(-0.5, -0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
 //                  Timestamp::fromSeconds(0));
 //    friendly_team.updateRobots({robot_0, robot_1});
 //
@@ -447,7 +443,7 @@
 //    }
 //}
 //
-// TEST_F(STPTacticAssignmentTest,
+//TEST_F(STPTacticAssignmentTest,
 //       test_assigning_stop_tactics_to_unassigned_non_goalie_robots)
 //{
 //    // Test that StopTactic is assigned to remaining robots without tactics
@@ -462,7 +458,7 @@
 //    friendly_team.updateRobots({robot_0, robot_1, robot_2});
 //    world.updateFriendlyTeamState(friendly_team);
 //
-//    auto move_tactic_1 = std::make_shared<MoveTestTactic>();
+//    auto move_tactic_1 = std::make_shared<MoveTactic>();
 //
 //    move_tactic_1->updateControlParams(Point(-1, 0));
 //
@@ -479,7 +475,7 @@
 //    }
 //}
 //
-// TEST_F(STPTacticAssignmentTest, test_greediness_of_tiered_assignment)
+//TEST_F(STPTacticAssignmentTest, test_greediness_of_tiered_assignment)
 //{
 //    // Assigning {{tactic_1, tactic_2}} should result in the lowest cost
 //    // assignment for all 2 tactics among the 2 robots.
@@ -507,8 +503,8 @@
 //    friendly_team.updateRobots({robot_0, robot_1});
 //    world.updateFriendlyTeamState(friendly_team);
 //
-//    auto move_tactic_0 = std::make_shared<MoveTestTactic>();
-//    auto move_tactic_1 = std::make_shared<MoveTestTactic>();
+//    auto move_tactic_0 = std::make_shared<MoveTactic>();
+//    auto move_tactic_1 = std::make_shared<MoveTactic>();
 //
 //    move_tactic_0->updateControlParams(Point(0, 0));
 //    move_tactic_1->updateControlParams(Point(2, 0));
@@ -532,7 +528,7 @@
 //    EXPECT_EQ(asst.find(move_tactic_1)->second, robot_1);
 //}
 //
-// TEST_F(STPTacticAssignmentTest, test_assignment_with_tiered_assignment)
+//TEST_F(STPTacticAssignmentTest, test_assignment_with_tiered_assignment)
 //{
 //    // Regardless of how the play yields the tactics to be assigned,
 //    // the goalie should always be assigned to the goalie assigned to the team
@@ -540,16 +536,15 @@
 //    Robot robot_0(0, Point(-0.5, 0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
 //                  Timestamp::fromSeconds(0));
 //    // default is all capabilities, if not specified otherwise
-//    Robot robot_1(1, Point(-0.5, -0.2), Vector(), Angle::zero(),
-//    AngularVelocity::zero(),
+//    Robot robot_1(1, Point(-0.5, -0.2), Vector(), Angle::zero(), AngularVelocity::zero(),
 //                  Timestamp::fromSeconds(0));
 //    friendly_team.updateRobots({robot_0, robot_1});
 //
 //    friendly_team.assignGoalie(1);
 //    world.updateFriendlyTeamState(friendly_team);
 //
-//    auto move_tactic_0 = std::make_shared<MoveTestTactic>();
-//    auto move_tactic_1 = std::make_shared<MoveTestTactic>();
+//    auto move_tactic_0 = std::make_shared<MoveTactic>();
+//    auto move_tactic_1 = std::make_shared<MoveTactic>();
 //
 //    ConstPriorityTacticVector request = {{move_tactic_0, move_tactic_1}};
 //
@@ -628,14 +623,13 @@
 //    }
 //}
 //
-// TEST_F(STPTacticAssignmentTest, test_multi_tier_assignment_with_tiered_assignment)
+//TEST_F(STPTacticAssignmentTest, test_multi_tier_assignment_with_tiered_assignment)
 //{
 //    Team friendly_team;
 //    friendly_team =
 //        TestUtil::setRobotPositionsHelper(friendly_team,
 //                                          {Point(-4, -2), Point(-3, -3), Point(-3.5, 2),
-//                                           Point(2.2, 3), Point(0.6, 0.3), Point(4.5,
-//                                           3)},
+//                                           Point(2.2, 3), Point(0.6, 0.3), Point(4.5, 3)},
 //                                          Timestamp::fromSeconds(323));
 //    friendly_team.assignGoalie(0);
 //    world.updateFriendlyTeamState(friendly_team);
@@ -649,12 +643,11 @@
 //
 //    Pass passer_pass(Point(2, 3), Point(0.5, 0.3), 2);
 //    auto attacker =
-//        std::make_shared<AttackerTactic>(std::make_shared<const
-//        AttackerTacticConfig>());
+//        std::make_shared<AttackerTactic>(std::make_shared<const AttackerTacticConfig>());
 //    attacker->updateControlParams(passer_pass, true);
 //    auto receiver = std::make_shared<ReceiverTactic>();
 //
-//    auto move_tactic                  = std::make_shared<MoveTestTactic>();
+//    auto move_tactic                  = std::make_shared<MoveTactic>();
 //    ConstPriorityTacticVector request = {
 //        {attacker, receiver},
 //        {move_tactic, std::get<0>(crease_defender_tactics),

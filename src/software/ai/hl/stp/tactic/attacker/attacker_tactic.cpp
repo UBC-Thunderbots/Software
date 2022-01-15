@@ -7,8 +7,7 @@
 
 AttackerTactic::AttackerTactic(
     std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config)
-    : Tactic(false,
-             {RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
+    : Tactic( {RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
       fsm(DribbleFSM()),
       best_pass_so_far(std::nullopt),
       pass_committed(false),

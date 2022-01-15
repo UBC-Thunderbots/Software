@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/tactic/move_goalie_to_goal_line/move_goalie_to_goal_line_fsm.h"
 
 MoveGoalieToGoalLineTactic::MoveGoalieToGoalLineTactic()
-    : Tactic(false, {RobotCapability::Move}), fsm()
+    : Tactic({RobotCapability::Move}), fsm()
 {
 }
 

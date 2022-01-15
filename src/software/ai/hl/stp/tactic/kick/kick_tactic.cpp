@@ -2,8 +2,8 @@
 
 #include <algorithm>
 
-KickTactic::KickTactic(bool loop_forever)
-    : Tactic(loop_forever, {RobotCapability::Kick, RobotCapability::Move}),
+KickTactic::KickTactic()
+    : Tactic({RobotCapability::Kick, RobotCapability::Move}),
       fsm{GetBehindBallFSM()}
 {
 }

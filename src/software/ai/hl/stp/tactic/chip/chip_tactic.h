@@ -16,13 +16,8 @@ class ChipTactic : public Tactic
    public:
     /**
      * Creates a new ChipTactic
-     *
-     * @param loop_forever Whether or not this Tactic should never complete. If true, the
-     * tactic will be restarted every time it completes
      */
-    explicit ChipTactic(bool loop_forever);
-
-    ChipTactic() = delete;
+    explicit ChipTactic();
 
     /**
      * Updates the params for this tactic that cannot be derived from the world

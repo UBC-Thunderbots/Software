@@ -24,7 +24,7 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     // Create MoveTactics that will loop forever
     std::vector<std::shared_ptr<MoveTactic>> move_tactics(DIV_A_NUM_ROBOTS);
     std::generate(move_tactics.begin(), move_tactics.end(),
-                  []() { return std::make_shared<MoveTactic>(true); });
+                  []() { return std::make_shared<MoveTactic>(); });
 
     // Continue to loop to demonstrate the example play indefinitely
     do

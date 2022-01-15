@@ -27,7 +27,7 @@ void ScoringWithStaticDefendersPlay::getNextTactics(TacticCoroutine::push_type &
 {
     std::vector<std::shared_ptr<MoveTactic>> move_tactics(NUM_ROBOTS);
     std::generate(move_tactics.begin(), move_tactics.end(),
-                  []() { return std::make_shared<MoveTactic>(true); });
+                  []() { return std::make_shared<MoveTactic>(); });
 
     do
     {

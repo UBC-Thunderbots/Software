@@ -3,8 +3,8 @@
 #include <algorithm>
 
 
-ChipTactic::ChipTactic(bool loop_forever)
-    : Tactic(loop_forever, {RobotCapability::Chip, RobotCapability::Move}),
+ChipTactic::ChipTactic()
+    : Tactic({RobotCapability::Chip, RobotCapability::Move}),
       fsm{GetBehindBallFSM()}
 {
 }

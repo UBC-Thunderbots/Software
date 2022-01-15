@@ -13,13 +13,8 @@ class MoveTactic : public Tactic
    public:
     /**
      * Creates a new MoveTactic
-     *
-     * @param loop_forever Whether or not this Tactic should never complete. If true, the
-     * tactic will be restarted every time it completes
      */
-    explicit MoveTactic(bool loop_forever);
-
-    MoveTactic() = delete;
+    explicit MoveTactic();
 
     /**
      * Updates the params assuming that the max allowed speed mode is the physical limits

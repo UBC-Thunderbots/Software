@@ -10,7 +10,7 @@
 #include "software/logger/logger.h"
 
 PivotKickTactic::PivotKickTactic()
-    : Tactic(false, {RobotCapability::Move, RobotCapability::Kick, RobotCapability::Chip,
+    : Tactic({RobotCapability::Move, RobotCapability::Kick, RobotCapability::Chip,
                      RobotCapability::Dribble}),
       fsm(DribbleFSM()),
       control_params(PivotKickFSM::ControlParams())

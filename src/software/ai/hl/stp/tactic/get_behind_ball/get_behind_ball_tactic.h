@@ -16,9 +16,7 @@ class GetBehindBallTactic : public Tactic
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit GetBehindBallTactic(bool loop_forever);
-
-    GetBehindBallTactic() = delete;
+    explicit GetBehindBallTactic();
 
     /**
      * Updates the control parameters for this GetBehindBallTactic.

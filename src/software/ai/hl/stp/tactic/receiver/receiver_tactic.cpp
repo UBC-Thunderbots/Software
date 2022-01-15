@@ -7,7 +7,7 @@
 #include "software/logger/logger.h"
 
 ReceiverTactic::ReceiverTactic()
-    : Tactic(false, {RobotCapability::Move}),
+    : Tactic({RobotCapability::Move}),
       fsm(ReceiverFSM()),
       control_params({ReceiverFSM::ControlParams{.pass                   = std::nullopt,
                                                  .disable_one_touch_shot = false}})
