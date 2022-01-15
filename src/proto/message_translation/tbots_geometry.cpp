@@ -1,7 +1,5 @@
 #include "proto/message_translation/tbots_geometry.h"
 
-#include <google/protobuf/util/message_differencer.h>
-
 std::unique_ptr<TbotsProto::Point> createPointProto(const Point& point)
 {
     auto point_msg = std::make_unique<TbotsProto::Point>();
