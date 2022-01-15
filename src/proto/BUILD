@@ -7,6 +7,7 @@ package(default_visibility = ["//visibility:public"])
 proto_library(
     name = "tbots_proto",
     srcs = [
+        "ball.proto",
         "game_state.proto",
         "geometry.proto",
         "primitive.proto",
@@ -14,7 +15,9 @@ proto_library(
         "robot_status_msg.proto",
         "tbots_software_msgs.proto",
         "tbots_timestamp_msg.proto",
+        "team.proto",
         "vision.proto",
+        "world.proto",
     ],
     deps = [
         "@nanopb//:nanopb_options_proto",
@@ -34,13 +37,16 @@ nanopb_proto_library(
 py_proto_library(
     name = "tbots_py_proto",
     srcs = [
+        "ball.proto",
         "game_state.proto",
         "geometry.proto",
         "primitive.proto",
         "robot_status_msg.proto",
         "tbots_software_msgs.proto",
         "tbots_timestamp_msg.proto",
+        "team.proto",
         "vision.proto",
+        "world.proto",
     ],
     deps = [
         "@nanopb//:nanopb_options_py_proto",

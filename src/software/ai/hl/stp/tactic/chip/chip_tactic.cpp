@@ -5,7 +5,8 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 
 ChipTactic::ChipTactic(bool loop_forever)
-    : Tactic(loop_forever, {RobotCapability::Chip, RobotCapability::Move})
+    : Tactic(loop_forever, {RobotCapability::Chip, RobotCapability::Move}),
+      fsm{GetBehindBallFSM()}
 {
 }
 

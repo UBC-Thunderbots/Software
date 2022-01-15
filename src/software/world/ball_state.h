@@ -1,5 +1,6 @@
 #pragma once
 
+#include "proto/vision.pb.h"
 #include "software/geom/point.h"
 #include "software/geom/vector.h"
 
@@ -9,6 +10,8 @@
 class BallState
 {
    public:
+    BallState() = delete;
+
     /**
      * Creates a new ball state with the given position and velocity
      *
@@ -20,7 +23,14 @@ class BallState
      */
     explicit BallState(const Point& position, const Vector& velocity,
                        double distance_from_ground = 0.0);
-    BallState() = delete;
+
+    /**
+     * Creates a new ball state based on the TbotsProto::BallState protobuf representation
+     *
+     * @param ball_state_proto The TbotsProto::BallState protobuf which this ball state
+     * should be based on
+     */
+    explicit BallState(const TbotsProto::BallState& ball_state_proto);
 
     /**
      * Returns the position of the ball represented by this state

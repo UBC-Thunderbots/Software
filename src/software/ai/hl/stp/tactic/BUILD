@@ -46,9 +46,9 @@ cc_library(
         "//software/ai/hl/stp/action",
         "//software/ai/intent",
         "//software/ai/intent:stop_intent",
+        "//software/util/sml_fsm",
         "//software/util/typename",
         "//software/world",
-        "@sml",
     ],
 )
 

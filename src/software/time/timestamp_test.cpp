@@ -8,6 +8,21 @@ TEST(TimestampTest, default_constructor)
     EXPECT_DOUBLE_EQ(t.toSeconds(), 0);
 }
 
+TEST(TimestampTest, create_timestamp_from_positive_timestamp_protobuf)
+{
+    TbotsProto::Timestamp timestamp_msg;
+    timestamp_msg.set_epoch_timestamp_seconds(1.0);
+    Timestamp t = Timestamp::fromTimestampProto(timestamp_msg);
+    EXPECT_DOUBLE_EQ(t.toSeconds(), 1.0);
+}
+
+TEST(TimestampTest, create_timestamp_from_negative_timestamp_protobuf)
+{
+    TbotsProto::Timestamp timestamp_msg;
+    timestamp_msg.set_epoch_timestamp_seconds(-1.0);
+    EXPECT_THROW(Timestamp::fromTimestampProto(timestamp_msg), std::invalid_argument);
+}
+
 TEST(TimestampTest, create_timestamp_from_positive_seconds)
 {
     Timestamp timestamp = Timestamp::fromSeconds(1.0);

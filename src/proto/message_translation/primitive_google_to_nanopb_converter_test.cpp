@@ -33,8 +33,7 @@ TEST_F(PrimitiveGoogleToNanoPbConverterTest, convert_move_primitive)
     EXPECT_EQ(nanopb_primitive.primitive.move.destination.x_meters, 1.0f);
     EXPECT_EQ(nanopb_primitive.primitive.move.destination.y_meters, 2.0f);
     EXPECT_EQ(nanopb_primitive.primitive.move.final_speed_m_per_s, 100.0f);
-    EXPECT_EQ(nanopb_primitive.primitive.move.final_angle.radians,
-              static_cast<float>(M_PI));
+    EXPECT_EQ(nanopb_primitive.primitive.move.final_angle.radians, M_PI);
     EXPECT_EQ(nanopb_primitive.primitive.move.dribbler_speed_rpm, 16000);
     EXPECT_EQ(nanopb_primitive.primitive.move.auto_chip_or_kick.auto_chip_or_kick
                   .autochip_distance_meters,
@@ -75,8 +74,7 @@ TEST_F(PrimitiveGoogleToNanoPbConverterTest, convert_primitive_set)
             EXPECT_EQ(nanopb_primitive.primitive.move.destination.x_meters, 1.0f);
             EXPECT_EQ(nanopb_primitive.primitive.move.destination.y_meters, 2.0f);
             EXPECT_EQ(nanopb_primitive.primitive.move.final_speed_m_per_s, 100.0f);
-            EXPECT_EQ(nanopb_primitive.primitive.move.final_angle.radians,
-                      static_cast<float>(M_PI));
+            EXPECT_EQ(nanopb_primitive.primitive.move.final_angle.radians, M_PI);
             EXPECT_EQ(nanopb_primitive.primitive.move.dribbler_speed_rpm, 16000);
         }
         else
@@ -87,8 +85,7 @@ TEST_F(PrimitiveGoogleToNanoPbConverterTest, convert_primitive_set)
             EXPECT_EQ(nanopb_primitive.primitive.move.destination.x_meters, 2.0f);
             EXPECT_EQ(nanopb_primitive.primitive.move.destination.y_meters, 4.0f);
             EXPECT_EQ(nanopb_primitive.primitive.move.final_speed_m_per_s, 50.0f);
-            EXPECT_EQ(nanopb_primitive.primitive.move.final_angle.radians,
-                      static_cast<float>(M_PI));
+            EXPECT_EQ(nanopb_primitive.primitive.move.final_angle.radians, M_PI);
             EXPECT_EQ(nanopb_primitive.primitive.move.dribbler_speed_rpm, 16000);
         }
     }
