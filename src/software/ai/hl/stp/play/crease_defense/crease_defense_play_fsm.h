@@ -27,10 +27,7 @@ struct CreaseDefensePlayFSM
      *
      * @param play_config the play config for this play FSM
      */
-    explicit CreaseDefensePlayFSM(std::shared_ptr<const PlayConfig> play_config)
-        : play_config(play_config), crease_defenders({})
-    {
-    }
+    explicit CreaseDefensePlayFSM(std::shared_ptr<const PlayConfig> play_config);
 
     /**
      * Action to defend the defense area

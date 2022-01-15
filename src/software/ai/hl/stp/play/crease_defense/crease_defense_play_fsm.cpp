@@ -1,5 +1,10 @@
 #include "software/ai/hl/stp/play/crease_defense/crease_defense_play_fsm.h"
 
+CreaseDefensePlayFSM ::CreaseDefensePlayFSM(std::shared_ptr<const PlayConfig> play_config)
+    : play_config(play_config), crease_defenders({})
+{
+}
+
 void CreaseDefensePlayFSM::defendDefenseArea(const Update& event)
 {
     unsigned int num_defenders = event.common.num_tactics;
