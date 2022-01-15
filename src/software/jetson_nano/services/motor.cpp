@@ -137,40 +137,17 @@ void MotorService::transfer(int fd, uint8_t const* tx, uint8_t const* rx, unsign
     {
         LOG(FATAL) << "BRUH x_x";
     }
-
-    printf("RX\n");
-    for (unsigned k = 0; k < len; k++)
-    {
-        printf("%x\n", rx[k]);
-    }
-
 }
 
 uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
                                            uint8_t last_transfer)
 {
-    static uint8_t tx[5]    = {0};
-    static uint8_t rx[5]    = {0};
-    static uint8_t ret_byte = 0;
-
-    static bool transfer_started  = false;
-    static bool currently_writing = false;
-    static bool currently_reading = false;
-    static uint8_t position       = 0;
+    uint8_t ret_byte = 0;
 
     if (!transfer_started)
     {
-        tx[0] = 0;
-        tx[1] = 0;
-        tx[2] = 0;
-        tx[3] = 0;
-        tx[4] = 0;
-
-        rx[0] = 0;
-        rx[1] = 0;
-        rx[2] = 0;
-        rx[3] = 0;
-        rx[4] = 0;
+        memset(tx, 0, sizeof(tx));
+        memset(rx, 0, sizeof(rx));
 
         if (data & 0x80u)
         {
@@ -188,11 +165,6 @@ uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
 
             tx[position] = data;
             transfer(file_descriptors[motor], tx, rx, 5);
-            LOG(INFO) << std::to_string(rx[0]);
-            LOG(INFO) << std::to_string(rx[1]);
-            LOG(INFO) << std::to_string(rx[2]);
-            LOG(INFO) << std::to_string(rx[3]);
-            LOG(INFO) << std::to_string(rx[4]);
         }
 
         transfer_started = true;
@@ -200,13 +172,13 @@ uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
 
     if (currently_writing) {
         tx[position++] = data;
-        LOG(INFO) << "Currently writing: " << tx[position];
+        LOGF(INFO, "Current write byte: %x", tx[position]);
     }
 
     if (currently_reading)
     {
         ret_byte = rx[position++];
-        LOG(INFO) << "Current read byte: " << std::to_string(ret_byte);
+        LOGF(INFO, "Current read byte: %x", ret_byte);
     }
 
     if (currently_writing && last_transfer)
@@ -216,7 +188,6 @@ uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
         LOG(INFO) << "FINAL TRANSFER";
     }
 
-    LOG(INFO) << std::to_string(ret_byte);
     return ret_byte;
 }
 
@@ -233,7 +204,9 @@ void MotorService::start()
 {
     tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, 0x01, 0x00000000);
     uint32_t read = tmc4671_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, 0x00);
-    std::cerr << read << std::endl;
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, 0x01, 0x00000000);
+    read = tmc4671_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, 0x00);
+    LOG(INFO) << "READ: " << read << std::endl;
     // TODO (#2332)
 }
 

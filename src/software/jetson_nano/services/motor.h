@@ -53,7 +53,20 @@ class MotorService : public Service
 
    private:
 
+    /**
+     * TODO
+     */
     void transfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len);
+
+    // Transfer Buffers
+    uint8_t tx[5] = {0};
+    uint8_t rx[5] = {0};
+
+    // Transfer State
+    bool transfer_started  = false;
+    bool currently_writing = false;
+    bool currently_reading = false;
+    uint8_t position       = 0;
 
     // Constants
     RobotConstants_t robot_constants_;
@@ -61,4 +74,5 @@ class MotorService : public Service
 
     // SPI File Descriptors
     std::unordered_map<int, int> file_descriptors;
+
 };
