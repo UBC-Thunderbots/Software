@@ -1,44 +1,5 @@
-/*
- * agent.h
- * HRVO Library
- *
- * Copyright 2009 University of North Carolina at Chapel Hill
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * Please send all bug reports to <geom@cs.unc.edu>.
- *
- * The authors may be contacted via:
- *
- * Jamie Snape, Jur van den Berg, Stephen J. Guy, and Dinesh Manocha
- * Dept. of Computer Science
- * 201 S. Columbia St.
- * Frederick P. Brooks, Jr. Computer Science Bldg.
- * Chapel Hill, N.C. 27599-3175
- * United States of America
- *
- * <https://gamma.cs.unc.edu/HRVO/>
- */
-
 #pragma once
 
-#include <cstddef>
-#include <map>
-#include <set>
-#include <utility>
-#include <vector>
-
-#include "goal.h"
 #include "simulator.h"
 #include "vector2.h"
 
@@ -47,136 +8,164 @@
  */
 class Agent
 {
-   private:
-    /**
-     * A candidate point.
-     */
-    class Candidate
-    {
-       public:
-        Candidate() : velocityObstacle1_(0), velocityObstacle2_(0) {}
-
-        // The position of the candidate point.
-        Vector2 position_;
-
-        // The number of the first velocity obstacle.
-        int velocityObstacle1_;
-
-        // The number of the second velocity obstacle.
-        int velocityObstacle2_;
-    };
-
-    /**
-     * A hybrid reciprocal velocity obstacle.
-     */
-    class VelocityObstacle
-    {
-       public:
-        VelocityObstacle() {}
-
-        // The position of the apex of the hybrid reciprocal velocity obstacle.
-        Vector2 apex_;
-
-        // The direction of the first side of the hybrid reciprocal velocity obstacle.
-        Vector2 side1_;
-
-        // The direction of the second side of the hybrid reciprocal velocity obstacle.
-        Vector2 side2_;
-    };
-
-
+   public:
     /**
      * Constructor
      *
-     * @param simulator  The simulation which the Agent is a part of
-     */
-    explicit Agent(Simulator *simulator);
-
-    /**
-     * Constructor
-     *
-     * @param simulator  The simulation.
-     * @param position   The starting position of this agent.
-     * @param goalNo     The goal number of this agent.
-     */
-    Agent(Simulator *simulator, const Vector2 &position, std::size_t goalNo);
-
-    /**
-     * Constructor
-     *
-     * @param simulator          The simulation.
      * @param position           The starting position of this agent.
-     * @param goalNo             The goal number of this agent.
-     * @param neighborDist       The maximum neighbor distance of this agent.
-     * @param maxNeighbors       The maximum neighbor count of this agent.
      * @param radius             The radius of this agent.
-     * @param goalRadius         The goal radius of this agent.
-     * @param prefSpeed          The preferred speed of this agent.
-     * @param maxSpeed           The maximum speed of this agent.
-     * @param uncertaintyOffset  The uncertainty offset of this agent.
-     * @param maxAccel           The maximum acceleration of this agent.
      * @param velocity           The initial velocity of this agent.
-     * @param orientation        The initial orientation (in radians) of this agent.
+     * @param maxSpeed           The maximum speed of this agent.
+     * @param maxAccel           The maximum acceleration of this agent.
+     * @param goalNo             The goal number of this agent.
+     * @param goalRadius         The goal radius of this agent.
      */
-    Agent(Simulator *simulator, const Vector2 &position, std::size_t goalNo,
-          float neighborDist, std::size_t maxNeighbors, float radius,
-          const Vector2 &velocity, float maxAccel, float goalRadius, float prefSpeed,
-          float maxSpeed, float orientation, float uncertaintyOffset);
+    explicit Agent(Simulator *simulator) // TODO: Might be able to remove this constructor as the init values dont really make sense
+            : simulator_(simulator),
+              position_(Vector2(0.f, 0.f)),
+              radius_(0.f),
+              velocity_(Vector2(0.f, 0.f)),
+              maxSpeed_(0.f),
+              maxAccel_(0.f),
+              goalNo_(0),
+              goalRadius_(0.f),
+              reachedGoal_(false)
+    {
+    }
 
     /**
-     * Computes the neighbors of this agent.
+     * Constructor
+     *
+     * @param position           The starting position of this agent.
+     * @param radius             The radius of this agent.
+     * @param velocity           The initial velocity of this agent.
+     * @param maxSpeed           The maximum speed of this agent.
+     * @param maxAccel           The maximum acceleration of this agent.
+     * @param goalNo             The goal number of this agent.
+     * @param goalRadius         The goal radius of this agent.
      */
-    void computeNeighbors();
+    Agent(Simulator *simulator, const Vector2 &position, float radius,
+          const Vector2 &velocity, float maxSpeed, float maxAccel, std::size_t goalNo,
+          float goalRadius)
+        : simulator_(simulator),
+          position_(position),
+          radius_(radius),
+          velocity_(velocity),
+          maxSpeed_(maxSpeed),
+          maxAccel_(maxAccel),
+          goalNo_(goalNo),
+          goalRadius_(goalRadius),
+          reachedGoal_(false)
+    {
+    }
+
+    virtual ~Agent() = 0;
 
     /**
      * Computes the new velocity of this agent.
      */
-    void computeNewVelocity();
+    virtual void computeNewVelocity() = 0;
 
     /**
-     * Computes the preferred velocity of this agent.
+     * Updates the position and velocity of this agent.
      */
-    void computePreferredVelocity();
+    virtual void update()
+    {
+        const float dv = abs(newVelocity_ - velocity_);
+
+        if (dv < maxAccel_ * simulator_->timeStep_)
+        {
+            velocity_ = newVelocity_;
+        }
+        else
+        {
+            velocity_ = (1.0f - (maxAccel_ * simulator_->timeStep_ / dv)) * velocity_ +
+                        (maxAccel_ * simulator_->timeStep_ / dv) * newVelocity_;
+        }
+
+        position_ += velocity_ * simulator_->timeStep_;
+
+        if (absSq(simulator_->goals_[goalNo_]->getCurrentGoalPosition() - position_) <
+            goalRadius_ * goalRadius_)
+        {
+            // Is at current goal position
+            if (simulator_->goals_[goalNo_]->isGoingToFinalGoal())
+            {
+                reachedGoal_ = true;
+            }
+            else
+            {
+                simulator_->goals_[goalNo_]->getNextGoalPostion();
+                reachedGoal_              = false;
+                simulator_->reachedGoals_ = false;
+            }
+        }
+        else
+        {
+            reachedGoal_              = false;
+            simulator_->reachedGoals_ = false;
+        }
+    };
 
     /**
-     * Get the current Agent velocity
-     */
-    Vector2 getVelocity() const;
-
-    /**
-     * Inserts a neighbor into the set of neighbors of this agent.
+     * Returns the current position of the agent
      *
-     * @param  agentNo  The number of the agent to be inserted.
-     * @param  rangeSq  The squared range around this agent.
+     * @return The current position of the agent
      */
-    void insertNeighbor(std::size_t agentNo, float &rangeSq);
+    const Vector2 &getPosition() const
+    {
+        return position_;
+    }
 
     /**
-     * Updates the orientation, position, and velocity of this agent.
+     * Returns the agents radius
+     *
+     * @return The agents radius
      */
-    void update();
+    float getRadius() const
+    {
+        return radius_;
+    }
 
-   public:  // A
-    Simulator *const simulator_;
-    Vector2 newVelocity_;
+    /**
+     * Return the current velocity of the agent
+     *
+     * @return The current velocity of the agent
+     */
+    const Vector2 &getVelocity() const
+    {
+        return velocity_;
+    }
+
+    /**
+     * Return the max acceleration of the agent
+     *
+     * @return The max acceleration of the agent
+     */
+    float getMaxAccel() const
+    {
+        return maxAccel_;
+    }
+
+    // protected: TODO: make properties protected
+    // Agent Properties
     Vector2 position_;
-    Vector2 prefVelocity_;
-    Vector2 velocity_;
-    std::size_t goalNo_;
-    std::size_t maxNeighbors_;
-    float goalRadius_;
-    float maxAccel_;
-    float maxSpeed_;
-    float neighborDist_;
-    float orientation_;
-    float prefSpeed_;
     float radius_;
-    float uncertaintyOffset_;
-    bool reachedGoal_;
-    std::multimap<float, Candidate> candidates_;
-    std::set<std::pair<float, std::size_t>> neighbors_;
-    std::vector<VelocityObstacle> velocityObstacles_;
 
-    friend class KdTree;
+    Vector2 velocity_;
+    Vector2 newVelocity_;
+    float maxSpeed_;
+    float maxAccel_;
+
+    std::size_t goalNo_;
+    float goalRadius_;
+    bool reachedGoal_;
+
+    // Used to get the simulator time step
+    // TODO: Remove once new Path class is added and add timeStep as a argument to
+    // update(...)
+    Simulator *const simulator_;
+
+    friend class KdTree;  // TODO: Ideally we use getters instead of friending the class
     friend class Simulator;
 };

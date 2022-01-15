@@ -30,7 +30,7 @@
  * <https://gamma.cs.unc.edu/HRVO/>
  */
 
-#include "agent.h"
+#include "hrvo_agent.h"
 
 #include <algorithm>
 #include <cmath>
@@ -40,81 +40,56 @@
 #include "goal.h"
 #include "kd_tree.h"
 
-Agent::Agent(Simulator *simulator)
-    : simulator_(simulator),
-      goalNo_(0),
+HRVOAgent::HRVOAgent(Simulator *simulator)
+    : Agent(simulator),
       maxNeighbors_(0),
-      goalRadius_(0.0f),
-      maxAccel_(0.0f),
-      maxSpeed_(0.0f),
       neighborDist_(0.0f),
-      orientation_(0.0f),
       prefSpeed_(0.0f),
-      radius_(0.0f),
       uncertaintyOffset_(0.0f),
-      reachedGoal_(false)
 {
 }
 
-Agent::Agent(Simulator *simulator, const Vector2 &position, std::size_t goalNo)
-    : simulator_(simulator),
-      newVelocity_(simulator_->defaults_->velocity_),
-      position_(position),
-      velocity_(simulator_->defaults_->velocity_),
-      goalNo_(goalNo),
+HRVOAgent::HRVOAgent(Simulator *simulator, const Vector2 &position, std::size_t goalNo)
+        : Agent(simulator, position, simulator->defaults_->radius_, simulator->defaults_->velocity_, simulator->defaults_->maxSpeed_, simulator->defaults_->maxAccel_, goalNo, simulator->defaults_->goalRadius_),
       maxNeighbors_(simulator_->defaults_->maxNeighbors_),
-      goalRadius_(simulator_->defaults_->goalRadius_),
-      maxAccel_(simulator_->defaults_->maxAccel_),
-      maxSpeed_(simulator_->defaults_->maxSpeed_),
       neighborDist_(simulator_->defaults_->neighborDist_),
-      orientation_(simulator_->defaults_->orientation_),
       prefSpeed_(simulator_->defaults_->prefSpeed_),
-      radius_(simulator_->defaults_->radius_),
       uncertaintyOffset_(simulator_->defaults_->uncertaintyOffset_),
-      reachedGoal_(false)
 {
 }
 
-Agent::Agent(Simulator *simulator, const Vector2 &position, std::size_t goalNo,
-             float neighborDist, std::size_t maxNeighbors, float radius,
-             const Vector2 &velocity, float maxAccel, float goalRadius, float prefSpeed,
-             float maxSpeed, float orientation, float uncertaintyOffset)
-    : simulator_(simulator),
-      newVelocity_(velocity),
-      position_(position),
-      velocity_(velocity),
-      goalNo_(goalNo),
+HRVOAgent::HRVOAgent(Simulator *simulator, const Vector2 &position, std::size_t goalNo,
+                     float neighborDist, std::size_t maxNeighbors, float radius,
+                     const Vector2 &velocity, float maxAccel, float goalRadius,
+                     float prefSpeed, float maxSpeed, float orientation, // TODO: Remove orientation
+                     float uncertaintyOffset)
+    : Agent(simulator, position, radius, velocity, maxSpeed, maxAccel, goalNo, goalRadius),
       maxNeighbors_(maxNeighbors),
-      goalRadius_(goalRadius),
-      maxAccel_(maxAccel),
-      maxSpeed_(maxSpeed),
       neighborDist_(neighborDist),
-      orientation_(orientation),
       prefSpeed_(prefSpeed),
-      radius_(radius),
       uncertaintyOffset_(uncertaintyOffset),
-      reachedGoal_(false)
 {
 }
 
-void Agent::computeNeighbors()
+void HRVOAgent::computeNeighbors()
 {
     neighbors_.clear();
     simulator_->kdTree_->query(this, neighborDist_ * neighborDist_);
 }
 
-void Agent::computeNewVelocity()
+void HRVOAgent::computeNewVelocity()
 {
+    computePreferredVelocity();
+    computeNeighbors();
+
     velocityObstacles_.clear();
     velocityObstacles_.reserve(neighbors_.size());
 
     VelocityObstacle velocityObstacle;
 
-    for (std::set<std::pair<float, std::size_t>>::const_iterator iter =
-             neighbors_.begin();
-         iter != neighbors_.end(); ++iter)
+    for (const auto &neighbor : neighbors_)
     {
-        const Agent *const other = simulator_->agents_[iter->second];
+        const Agent *const other = simulator_->agents_[neighbor.second];
 
         if (absSq(other->position_ - position_) > std::pow(other->radius_ + radius_, 2))
         {
@@ -406,10 +381,9 @@ void Agent::computeNewVelocity()
 
     int optimal = -1;
 
-    for (std::multimap<float, Candidate>::const_iterator iter = candidates_.begin();
-         iter != candidates_.end(); ++iter)
+    for (std::pair<float, Candidate> &candidate_pair : candidates_)
     {
-        candidate  = iter->second;
+        candidate  = candidate_pair.second;
         bool valid = true;
 
         for (int j = 0; j < static_cast<int>(velocityObstacles_.size()); ++j)
@@ -440,7 +414,7 @@ void Agent::computeNewVelocity()
     }
 }
 
-void Agent::computePreferredVelocity()
+void HRVOAgent::computePreferredVelocity()
 {
     if (prefSpeed_ <= 0.1f || maxAccel_ <= 0.1f)
     {
@@ -474,12 +448,7 @@ void Agent::computePreferredVelocity()
     }
 }
 
-Vector2 Agent::getVelocity() const
-{
-    return velocity_;
-}
-
-void Agent::insertNeighbor(std::size_t agentNo, float &rangeSq)
+void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
 {
     const Agent *const other = simulator_->agents_[agentNo];
 
@@ -517,48 +486,5 @@ void Agent::insertNeighbor(std::size_t agentNo, float &rangeSq)
                 rangeSq = (--neighbors_.end())->first;
             }
         }
-    }
-}
-
-void Agent::update()
-{
-    const float dv = abs(newVelocity_ - velocity_);
-
-    if (dv < maxAccel_ * simulator_->timeStep_)
-    {
-        velocity_ = newVelocity_;
-    }
-    else
-    {
-        velocity_ = (1.0f - (maxAccel_ * simulator_->timeStep_ / dv)) * velocity_ +
-                    (maxAccel_ * simulator_->timeStep_ / dv) * newVelocity_;
-    }
-
-    position_ += velocity_ * simulator_->timeStep_;
-
-    if (absSq(simulator_->goals_[goalNo_]->getCurrentGoalPosition() - position_) <
-        goalRadius_ * goalRadius_)
-    {
-        // Is at current goal position
-        if (simulator_->goals_[goalNo_]->isGoingToFinalGoal())
-        {
-            reachedGoal_ = true;
-        }
-        else
-        {
-            simulator_->goals_[goalNo_]->getNextGoalPostion();
-            reachedGoal_              = false;
-            simulator_->reachedGoals_ = false;
-        }
-    }
-    else
-    {
-        reachedGoal_              = false;
-        simulator_->reachedGoals_ = false;
-    }
-
-    if (!reachedGoal_)
-    {
-        orientation_ = atan(prefVelocity_);
     }
 }

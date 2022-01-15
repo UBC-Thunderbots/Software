@@ -19,11 +19,12 @@ class HRVOTest : public ::testing::Test
     HRVOTest() : simulator()
     {
         simulator.setTimeStep(1.f / SIMULATOR_FRAME_RATE);
-        simulator.setAgentDefaults(/*neighborDist*/ 3.f, /*maxNeighbors*/ 30,
-                                   /*radius*/ ROBOT_RADIUS * RADIUS_SCALE,
-                                   /*goalRadius*/ 0.02f,
-                                   /*prefSpeed=*/3.5f, /*maxSpeed=*/4.825f,
-                                   /*uncertaintyOffset=*/0.f, /*maxAccel=*/3.28f);
+        // TODO: Replace the agent defaults with our own default object
+//        simulator.setAgentDefaults(/*neighborDist*/ 3.f, /*maxNeighbors*/ 30,
+//                                   /*radius*/ ROBOT_RADIUS * RADIUS_SCALE,
+//                                   /*goalRadius*/ 0.02f,
+//                                   /*prefSpeed=*/3.5f, /*maxSpeed=*/4.825f,
+//                                   /*uncertaintyOffset=*/0.f, /*maxAccel=*/3.28f);
     }
 
     void TearDown() override
