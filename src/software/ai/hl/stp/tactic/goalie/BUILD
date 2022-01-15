@@ -35,8 +35,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_goalie_tactic_test",
-    srcs = ["simulated_goalie_tactic_test.cpp"],
+    name = "goalie_tactic_test",
+    srcs = ["goalie_tactic_test.cpp"],
     deps = [
         ":goalie_tactic",
         "//shared/test_util:tbots_gtest_main",

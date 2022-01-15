@@ -5,9 +5,7 @@
 #include "software/util/typename/typename.h"
 
 Tactic::Tactic(bool loop_forever, const std::set<RobotCapability> &capability_reqs_)
-    : intent(),
-      loop_forever(loop_forever),
-      capability_reqs(capability_reqs_)
+    : intent(), loop_forever(loop_forever), capability_reqs(capability_reqs_)
 {
 }
 

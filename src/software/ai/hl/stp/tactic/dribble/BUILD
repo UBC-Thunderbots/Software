@@ -31,8 +31,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_dribble_tactic_test",
-    srcs = ["simulated_dribble_tactic_test.cpp"],
+    name = "dribble_tactic_test",
+    srcs = ["dribble_tactic_test.cpp"],
     deps = [
         ":dribble_tactic",
         "//shared/test_util:tbots_gtest_main",
@@ -47,8 +47,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_dribble_tactic_push_enemy_test",
-    srcs = ["simulated_dribble_tactic_push_enemy_test.cpp"],
+    name = "dribble_tactic_push_enemy_test",
+    srcs = ["dribble_tactic_push_enemy_test.cpp"],
     deps = [
         ":dribble_tactic",
         "//shared/test_util:tbots_gtest_main",

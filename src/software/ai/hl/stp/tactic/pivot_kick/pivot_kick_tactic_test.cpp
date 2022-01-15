@@ -1,8 +1,9 @@
+#include "software/ai/hl/stp/tactic/pivot_kick/pivot_kick_tactic.h"
+
 #include <gtest/gtest.h>
 
 #include <utility>
 
-#include "software/ai/hl/stp/tactic/kick/kick_tactic.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
@@ -12,7 +13,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedKickTacticTest
+class SimulatedPivotKickTacticTest
     : public SimulatedTacticTestFixture,
       public ::testing::WithParamInterface<std::tuple<Vector, Angle>>
 {
@@ -20,7 +21,7 @@ class SimulatedKickTacticTest
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_P(SimulatedKickTacticTest, kick_test)
+TEST_P(SimulatedPivotKickTacticTest, pivot_kick_test)
 {
     Vector ball_offset_from_robot = std::get<0>(GetParam());
     Angle angle_to_kick_at        = std::get<1>(GetParam());
@@ -32,9 +33,9 @@ TEST_P(SimulatedKickTacticTest, kick_test)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<KickTactic>(false);
+    auto tactic = std::make_shared<PivotKickTactic>();
     tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
-                                5);
+                                {AutoChipOrKickMode::AUTOKICK, 5});
     setTactic(tactic);
     setFriendlyRobotId(1);
 
@@ -56,7 +57,7 @@ TEST_P(SimulatedKickTacticTest, kick_test)
 }
 
 INSTANTIATE_TEST_CASE_P(
-    BallLocations, SimulatedKickTacticTest,
+    BallLocations, SimulatedPivotKickTacticTest,
     ::testing::Values(
         // place the ball directly to the left of the robot
         std::make_tuple(Vector(0, 0.5), Angle::zero()),

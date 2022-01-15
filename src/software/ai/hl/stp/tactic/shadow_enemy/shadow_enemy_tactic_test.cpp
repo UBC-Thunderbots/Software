@@ -1,8 +1,9 @@
+#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
+
 #include <gtest/gtest.h>
 
 #include <utility>
 
-#include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 #include "software/geom/triangle.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"

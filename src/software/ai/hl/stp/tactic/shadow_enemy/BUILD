@@ -32,8 +32,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_shadow_enemy_tactic_test",
-    srcs = ["simulated_shadow_enemy_tactic_test.cpp"],
+    name = "shadow_enemy_tactic_test",
+    srcs = ["shadow_enemy_tactic_test.cpp"],
     deps = [
         ":shadow_enemy_tactic",
         "//shared/test_util:tbots_gtest_main",

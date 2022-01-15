@@ -33,8 +33,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_pivot_kick_tactic_test",
-    srcs = ["simulated_pivot_kick_tactic_test.cpp"],
+    name = "pivot_kick_tactic_test",
+    srcs = ["pivot_kick_tactic_test.cpp"],
     deps = [
         ":pivot_kick_tactic",
         "//shared/test_util:tbots_gtest_main",

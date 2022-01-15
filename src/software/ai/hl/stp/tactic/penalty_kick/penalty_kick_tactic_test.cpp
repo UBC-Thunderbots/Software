@@ -1,8 +1,9 @@
+#include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
+
 #include <gtest/gtest.h>
 
 #include <utility>
 
-#include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 #include "software/simulated_tests/non_terminating_validation_functions/ball_in_play_or_scored_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/ball_never_moves_backward_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"

@@ -33,8 +33,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_move_goalie_to_goal_line_tactic_test",
-    srcs = ["simulated_move_goalie_to_goal_line_tactic_test.cpp"],
+    name = "move_goalie_to_goal_line_tactic_test",
+    srcs = ["move_goalie_to_goal_line_tactic_test.cpp"],
     deps = [
         ":move_goalie_to_goal_line_tactic",
         "//shared/test_util:tbots_gtest_main",

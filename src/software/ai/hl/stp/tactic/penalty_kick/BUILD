@@ -34,8 +34,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_penalty_kick_tactic_test",
-    srcs = ["simulated_penalty_kick_tactic_test.cpp"],
+    name = "penalty_kick_tactic_test",
+    srcs = ["penalty_kick_tactic_test.cpp"],
     deps = [
         ":penalty_kick_tactic",
         "//shared/test_util:tbots_gtest_main",

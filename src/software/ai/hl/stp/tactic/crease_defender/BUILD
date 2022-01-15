@@ -32,8 +32,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_crease_defender_tactic_test",
-    srcs = ["simulated_crease_defender_tactic_test.cpp"],
+    name = "crease_defender_tactic_test",
+    srcs = ["crease_defender_tactic_test.cpp"],
     deps = [
         ":crease_defender_tactic",
         "//shared/test_util:tbots_gtest_main",

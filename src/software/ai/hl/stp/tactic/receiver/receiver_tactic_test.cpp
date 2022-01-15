@@ -1,9 +1,10 @@
+#include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
+
 #include <gtest/gtest.h>
 
 #include <utility>
 
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"

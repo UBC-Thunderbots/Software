@@ -33,8 +33,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_receiver_tactic_test",
-    srcs = ["simulated_receiver_tactic_test.cpp"],
+    name = "receiver_tactic_test",
+    srcs = ["receiver_tactic_test.cpp"],
     deps = [
         ":receiver_tactic",
         "//shared/test_util:tbots_gtest_main",

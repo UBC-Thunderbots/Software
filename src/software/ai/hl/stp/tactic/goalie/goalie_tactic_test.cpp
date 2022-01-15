@@ -1,8 +1,9 @@
+#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
+
 #include <gtest/gtest.h>
 
 #include <utility>
 
-#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/simulated_tests/non_terminating_validation_functions/enemy_never_scores_validation.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"

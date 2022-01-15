@@ -1,8 +1,9 @@
+#include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
+
 #include <gtest/gtest.h>
 
 #include <utility>
 
-#include "software/ai/hl/stp/tactic/crease_defender/crease_defender_tactic.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robots_avoid_ball_validation.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
