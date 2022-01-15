@@ -21,6 +21,6 @@ class RedisService : public Service
 
    private:
     cpp_redis::subscriber subscriber;
-    std::string host;
-    size_t port;
+    std::string host_;
+    size_t port_;
 };

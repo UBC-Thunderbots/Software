@@ -3,14 +3,14 @@
 #include "software/logger/logger.h"
 
 RedisService::RedisService(std::string host, size_t port)
-    : subscriber(), host(host), port(port)
+    : subscriber(), host_(host), port_(port)
 {
 }
 
 void RedisService::start()
 {
     subscriber.connect(
-        host, port,
+        host_, port_,
         [](const std::string &host, std::size_t port, cpp_redis::connect_state status) {
             if (status == cpp_redis::connect_state::dropped)
             {
