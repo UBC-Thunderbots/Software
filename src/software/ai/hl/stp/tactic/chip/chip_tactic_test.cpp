@@ -32,7 +32,7 @@ TEST_P(ChipTacticTest, chip_test)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<ChipTactic>(false);
+    auto tactic = std::make_shared<ChipTactic>();
     tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
                                 5);
     setTactic(tactic);

@@ -99,7 +99,7 @@ void FreeKickPlay::chipAtGoalStage(
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     const World &world)
 {
-    auto chip_tactic = std::make_shared<ChipTactic>(false);
+    auto chip_tactic = std::make_shared<ChipTactic>();
 
     // Figure out where the fallback chip target is
     // This is exerimentally determined to be a reasonable value
@@ -175,11 +175,11 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
-    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
+    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>();
+    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>();
 
     // This tactic will move a robot into position to initially take the free-kick
-    auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
+    auto align_to_ball_tactic = std::make_shared<MoveTactic>();
 
     // Put the robot in roughly the right position to perform the kick
     LOG(DEBUG) << "Aligning to ball";

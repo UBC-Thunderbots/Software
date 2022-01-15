@@ -95,17 +95,17 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
     // This tactic will move a robot into position to initially take the free-kick
-    auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
+    auto align_to_ball_tactic = std::make_shared<MoveTactic>();
 
     auto zones_to_cherry_pick =
         pass_eval.rankZonesForReceiving(world, world.ball().position());
 
     // These tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
-    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
-    auto cherry_pick_tactic_3 = std::make_shared<MoveTactic>(false);
-    auto cherry_pick_tactic_4 = std::make_shared<MoveTactic>(false);
+    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>();
+    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>();
+    auto cherry_pick_tactic_3 = std::make_shared<MoveTactic>();
+    auto cherry_pick_tactic_4 = std::make_shared<MoveTactic>();
 
     auto update_cherry_pickers = [&](PassEvaluation<EighteenZoneId> pass_eval) {
         auto pass1 = pass_eval.getBestPassInZones({zones_to_cherry_pick[0]}).pass;

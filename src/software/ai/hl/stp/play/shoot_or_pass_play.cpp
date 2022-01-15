@@ -92,8 +92,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield,
         auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
         auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
 
-        auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
-        auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
+        auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>();
+        auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>();
         cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
                                                   pass1.receiverOrientation(), 0.0,
                                                   MaxAllowedSpeedMode::PHYSICAL_LIMIT);
@@ -158,8 +158,8 @@ PassWithRating ShootOrPassPlay::attemptToShootWhileLookingForAPass(
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
-    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
+    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>();
+    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>();
 
     // Wait for a good pass by starting out only looking for "perfect" passes (with a
     // score of 1) and decreasing this threshold over time

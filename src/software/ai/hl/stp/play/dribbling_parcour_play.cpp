@@ -27,7 +27,7 @@ void DribblingParcourPlay::getNextTactics(TacticCoroutine::push_type &yield,
 {
     std::shared_ptr<DribbleTactic> dribble_tactic = std::make_shared<DribbleTactic>();
     dribble_tactic->updateControlParams(std::nullopt, std::nullopt, true);
-    std::shared_ptr<MoveTactic> move_tactic = std::make_shared<MoveTactic>(true);
+    std::shared_ptr<MoveTactic> move_tactic = std::make_shared<MoveTactic>();
 
     do
     {

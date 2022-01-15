@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy/shadow_enemy_tactic.h"
 
 ShadowEnemyTactic::ShadowEnemyTactic()
-    : Tactic(false, {RobotCapability::Move, RobotCapability::Kick}),
+    : Tactic({RobotCapability::Move, RobotCapability::Kick}),
       fsm(),
       control_params{ShadowEnemyFSM::ControlParams{.enemy_threat    = std::nullopt,
                                                    .shadow_distance = 0}}

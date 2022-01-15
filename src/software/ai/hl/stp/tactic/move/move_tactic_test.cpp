@@ -31,7 +31,7 @@ TEST_F(MoveTacticTest, test_move_across_field)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto tactic = std::make_shared<MoveTactic>(false);
+    auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
     setFriendlyRobotId(1);
@@ -71,7 +71,7 @@ TEST_F(MoveTacticTest, test_autochip_move)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto tactic = std::make_shared<MoveTactic>(false);
+    auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(
         destination, Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::ALLOW,
         {AutoChipOrKickMode::AUTOCHIP, 2.0}, MaxAllowedSpeedMode::TIPTOE);
@@ -116,7 +116,7 @@ TEST_F(MoveTacticTest, test_autokick_move)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto tactic = std::make_shared<MoveTactic>(false);
+    auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::threeQuarter(), 0, DribblerMode::OFF,
                                 BallCollisionType::ALLOW,
                                 {AutoChipOrKickMode::AUTOKICK, 3.0},
@@ -159,7 +159,7 @@ TEST_F(MoveTacticTest, test_spinning_move_clockwise)
                                   AngularVelocity::quarter())}};
     auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<MoveTactic>(false);
+    auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0, DribblerMode::OFF,
                                 BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
                                 MaxAllowedSpeedMode::PHYSICAL_LIMIT, 1.0);
@@ -205,7 +205,7 @@ TEST_F(MoveTacticTest, test_spinning_move_counter_clockwise)
                                   AngularVelocity::zero())}};
     auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto tactic = std::make_shared<MoveTactic>(false);
+    auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::half(), 0, DribblerMode::OFF,
                                 BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
                                 MaxAllowedSpeedMode::PHYSICAL_LIMIT, -4.0);
@@ -247,7 +247,7 @@ TEST(MoveTacticTest, test_calculate_robot_cost)
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
 
-    MoveTactic tactic = MoveTactic(false);
+    MoveTactic tactic = MoveTactic();
     tactic.updateControlParams(Point(3, -4), Angle::zero(), 0.0);
 
     EXPECT_EQ(5 / world.field().totalXLength(), tactic.calculateRobotCost(robot, world));
