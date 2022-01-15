@@ -14,8 +14,8 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedDribbleTacticPushEnemyTest : public SimulatedTacticTestFixture,
-                                            public ::testing::WithParamInterface<Point>
+class DribbleTacticPushEnemyTest : public SimulatedTacticTestFixture,
+                                   public ::testing::WithParamInterface<Point>
 {
    protected:
     void checkPossession(std::shared_ptr<DribbleTactic> tactic,
@@ -49,7 +49,7 @@ class SimulatedDribbleTacticPushEnemyTest : public SimulatedTacticTestFixture,
              field.enemyDefenseArea().negXPosYCorner()});
 };
 
-TEST_P(SimulatedDribbleTacticPushEnemyTest, test_steal_ball_from_behind_enemy)
+TEST_P(DribbleTacticPushEnemyTest, test_steal_ball_from_behind_enemy)
 {
     Point initial_position = GetParam();
     BallState ball_state(Point(1 + DIST_TO_FRONT_OF_ROBOT_METERS, 2.5), Vector());
@@ -76,7 +76,7 @@ TEST_P(SimulatedDribbleTacticPushEnemyTest, test_steal_ball_from_behind_enemy)
             Duration::fromSeconds(10));
 }
 
-INSTANTIATE_TEST_CASE_P(CreaseDefenderEnvironment, SimulatedDribbleTacticPushEnemyTest,
+INSTANTIATE_TEST_CASE_P(CreaseDefenderEnvironment, DribbleTacticPushEnemyTest,
                         ::testing::Values(
                             // Steal ball from behind
                             Point(-2, 2.5),

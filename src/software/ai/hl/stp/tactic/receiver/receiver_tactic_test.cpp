@@ -16,7 +16,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedReceiverTacticTest
+class ReceiverTacticTest
     : public virtual SimulatedTacticTestFixture,
       public ::testing::WithParamInterface<std::tuple<Pass, RobotStateWithId>>
 {
@@ -24,7 +24,7 @@ class SimulatedReceiverTacticTest
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_P(SimulatedReceiverTacticTest, DISABLED_perfect_pass_receiver_test)
+TEST_P(ReceiverTacticTest, DISABLED_perfect_pass_receiver_test)
 {
     Pass pass                    = std::get<0>(GetParam());
     RobotStateWithId robot_state = std::get<1>(GetParam());
@@ -68,7 +68,7 @@ TEST_P(SimulatedReceiverTacticTest, DISABLED_perfect_pass_receiver_test)
 }
 
 INSTANTIATE_TEST_CASE_P(
-    PassEnvironmentReceiveAndDribble, SimulatedReceiverTacticTest,
+    PassEnvironmentReceiveAndDribble, ReceiverTacticTest,
     ::testing::Values(
         // Robot already at receive point
         std::make_tuple(Pass(Point(0.0, 0.5), Point(2, 2), 3),
@@ -106,11 +106,11 @@ INSTANTIATE_TEST_CASE_P(
                                                        Angle::fromDegrees(0),
                                                        Angle::fromDegrees(0))})));
 
-class SimulatedReceiverTacticTestOneTouch : public SimulatedReceiverTacticTest
+class ReceiverTacticTestOneTouch : public ReceiverTacticTest
 {
 };
 
-TEST_P(SimulatedReceiverTacticTestOneTouch, test_one_touch)
+TEST_P(ReceiverTacticTestOneTouch, test_one_touch)
 {
     Pass pass                    = std::get<0>(GetParam());
     RobotStateWithId robot_state = std::get<1>(GetParam());
@@ -140,7 +140,7 @@ TEST_P(SimulatedReceiverTacticTestOneTouch, test_one_touch)
 }
 
 INSTANTIATE_TEST_CASE_P(
-    PassEnvironmentOneTouchShot, SimulatedReceiverTacticTestOneTouch,
+    PassEnvironmentOneTouchShot, ReceiverTacticTestOneTouch,
     ::testing::Values(
 
         // one touch robot on receiver point

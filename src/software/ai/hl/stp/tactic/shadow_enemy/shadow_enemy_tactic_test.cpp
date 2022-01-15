@@ -13,7 +13,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedShadowEnemyTacticTest : public SimulatedTacticTestFixture
+class ShadowEnemyTacticTest : public SimulatedTacticTestFixture
 {
     void SetUp() override
     {
@@ -25,7 +25,7 @@ class SimulatedShadowEnemyTacticTest : public SimulatedTacticTestFixture
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_F(SimulatedShadowEnemyTacticTest, test_block_pass)
+TEST_F(ShadowEnemyTacticTest, test_block_pass)
 {
     Robot shadower(0, Point(-2, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                    Timestamp::fromSeconds(0));
@@ -72,7 +72,7 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_pass)
             Duration::fromSeconds(5));
 }
 
-TEST_F(SimulatedShadowEnemyTacticTest, test_block_pass_if_enemy_does_not_have_ball)
+TEST_F(ShadowEnemyTacticTest, test_block_pass_if_enemy_does_not_have_ball)
 {
     Robot shadower(0, Point(-2, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                    Timestamp::fromSeconds(0));
@@ -119,7 +119,7 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_pass_if_enemy_does_not_have_ba
             Duration::fromSeconds(5));
 }
 
-TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
+TEST_F(ShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
 {
     Robot shadower(0, Point(-2, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                    Timestamp::fromSeconds(0));
@@ -178,7 +178,7 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
             Duration::fromSeconds(5));
 }
 
-TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_if_enemy_threat_is_null)
+TEST_F(ShadowEnemyTacticTest, test_block_net_if_enemy_threat_is_null)
 {
     Robot shadower(0, Point(-2, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                    Timestamp::fromSeconds(0));

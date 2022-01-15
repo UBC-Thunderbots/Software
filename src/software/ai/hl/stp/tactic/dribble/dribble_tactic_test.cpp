@@ -15,7 +15,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedDribbleTacticTest : public SimulatedTacticTestFixture
+class DribbleTacticTest : public SimulatedTacticTestFixture
 {
    protected:
     void checkPossession(std::shared_ptr<DribbleTactic> tactic,
@@ -49,7 +49,7 @@ class SimulatedDribbleTacticTest : public SimulatedTacticTestFixture
              field.enemyDefenseArea().negXPosYCorner()});
 };
 
-TEST_F(SimulatedDribbleTacticTest, test_intercept_ball_behind_enemy_robot)
+TEST_F(DribbleTacticTest, test_intercept_ball_behind_enemy_robot)
 {
     Point initial_position = Point(-3, 1.5);
     BallState ball_state(Point(3, -2), Vector(-0.5, 1));
@@ -73,7 +73,7 @@ TEST_F(SimulatedDribbleTacticTest, test_intercept_ball_behind_enemy_robot)
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedDribbleTacticTest, test_stopped_ball)
+TEST_F(DribbleTacticTest, test_stopped_ball)
 {
     Point initial_position = Point(-3, 1.5);
     BallState ball_state(Point(-1, 1.5), Vector(0, 0));
@@ -97,7 +97,7 @@ TEST_F(SimulatedDribbleTacticTest, test_stopped_ball)
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedDribbleTacticTest, test_ball_bounce_off_of_enemy_robot)
+TEST_F(DribbleTacticTest, test_ball_bounce_off_of_enemy_robot)
 {
     Point initial_position = Point(-3, 1.5);
     BallState ball_state(Point(0, 0), Vector(2.5, 0));
@@ -121,7 +121,7 @@ TEST_F(SimulatedDribbleTacticTest, test_ball_bounce_off_of_enemy_robot)
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_dest)
+TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest)
 {
     Point initial_position    = Point(-3, 1.5);
     Point dribble_destination = Point(-3, 1);
@@ -152,7 +152,7 @@ TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_dest)
             Duration::fromSeconds(15));
 }
 
-TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_orientation)
+TEST_F(DribbleTacticTest, test_moving_ball_dribble_orientation)
 {
     Point initial_position    = Point(-3, 1.5);
     Angle dribble_orientation = Angle::quarter();
@@ -181,7 +181,7 @@ TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_orientation)
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_dest_and_orientation)
+TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest_and_orientation)
 {
     Point initial_position    = Point(-2, 1.5);
     Point dribble_destination = Point(-1, 2);
@@ -215,7 +215,7 @@ TEST_F(SimulatedDribbleTacticTest, test_moving_ball_dribble_dest_and_orientation
             Duration::fromSeconds(20));
 }
 
-TEST_F(SimulatedDribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
+TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
 {
     Point initial_position    = Point(3, -3);
     Point dribble_destination = Point(4, 2.5);
@@ -248,7 +248,7 @@ TEST_F(SimulatedDribbleTacticTest, test_dribble_dest_and_orientation_around_rect
             Duration::fromSeconds(20));
 }
 
-TEST_F(SimulatedDribbleTacticTest,
+TEST_F(DribbleTacticTest,
        test_dribble_dest_and_orientation_around_rectangle_with_excessive_dribbling)
 {
     Point initial_position    = Point(3, -3);
@@ -279,7 +279,7 @@ TEST_F(SimulatedDribbleTacticTest,
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedDribbleTacticTest, test_running_into_enemy_robot_knocking_ball_away)
+TEST_F(DribbleTacticTest, test_running_into_enemy_robot_knocking_ball_away)
 {
     Point initial_position    = Point(-2, 1.5);
     Point dribble_destination = Point(-1, 2);

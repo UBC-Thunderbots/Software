@@ -13,7 +13,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedPivotKickTacticTest
+class PivotKickTacticTest
     : public SimulatedTacticTestFixture,
       public ::testing::WithParamInterface<std::tuple<Vector, Angle>>
 {
@@ -21,7 +21,7 @@ class SimulatedPivotKickTacticTest
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_P(SimulatedPivotKickTacticTest, pivot_kick_test)
+TEST_P(PivotKickTacticTest, pivot_kick_test)
 {
     Vector ball_offset_from_robot = std::get<0>(GetParam());
     Angle angle_to_kick_at        = std::get<1>(GetParam());
@@ -57,7 +57,7 @@ TEST_P(SimulatedPivotKickTacticTest, pivot_kick_test)
 }
 
 INSTANTIATE_TEST_CASE_P(
-    BallLocations, SimulatedPivotKickTacticTest,
+    BallLocations, PivotKickTacticTest,
     ::testing::Values(
         // place the ball directly to the left of the robot
         std::make_tuple(Vector(0, 0.5), Angle::zero()),

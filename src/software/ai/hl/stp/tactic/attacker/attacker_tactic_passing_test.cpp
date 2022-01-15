@@ -13,7 +13,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedAttackerTacticKeepAwayTest
+class AttackerTacticKeepAwayTest
     : public SimulatedTacticTestFixture,
       public ::testing::WithParamInterface<std::tuple<Pass, RobotStateWithId, BallState>>
 {
@@ -21,7 +21,7 @@ class SimulatedAttackerTacticKeepAwayTest
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_passing)
+TEST_P(AttackerTacticKeepAwayTest, attacker_test_passing)
 {
     Pass pass                    = std::get<0>(GetParam());
     RobotStateWithId robot_state = std::get<1>(GetParam());
@@ -65,7 +65,7 @@ TEST_P(SimulatedAttackerTacticKeepAwayTest, attacker_test_passing)
 }
 
 INSTANTIATE_TEST_CASE_P(
-    PassEnvironment, SimulatedAttackerTacticKeepAwayTest,
+    PassEnvironment, AttackerTacticKeepAwayTest,
     ::testing::Values(
         // Stationary Ball Tests
         // Attacker point != Balls location & Balls location != Robots Location

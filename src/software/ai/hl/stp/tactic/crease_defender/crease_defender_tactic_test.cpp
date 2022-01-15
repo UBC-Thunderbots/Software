@@ -15,7 +15,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedCreaseDefenderTacticTest
+class CreaseDefenderTacticTest
     : public SimulatedTacticTestFixture,
       public ::testing::WithParamInterface<
           std::tuple<Point, CreaseDefenderAlignment, unsigned int>>
@@ -24,7 +24,7 @@ class SimulatedCreaseDefenderTacticTest
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_F(SimulatedCreaseDefenderTacticTest, test_chip_ball)
+TEST_F(CreaseDefenderTacticTest, test_chip_ball)
 {
     Point enemy_threat_point          = Point(-1.5, 0.5);
     CreaseDefenderAlignment alignment = CreaseDefenderAlignment::CENTRE;
@@ -65,7 +65,7 @@ TEST_F(SimulatedCreaseDefenderTacticTest, test_chip_ball)
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedCreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
+TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
 {
     Point enemy_threat_point          = Point(-1.5, 0.0);
     CreaseDefenderAlignment alignment = CreaseDefenderAlignment::CENTRE;
@@ -106,7 +106,7 @@ TEST_F(SimulatedCreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
             Duration::fromSeconds(10));
 }
 
-TEST_P(SimulatedCreaseDefenderTacticTest, crease_defender_test)
+TEST_P(CreaseDefenderTacticTest, crease_defender_test)
 {
     Point enemy_threat_point          = std::get<0>(GetParam());
     CreaseDefenderAlignment alignment = std::get<1>(GetParam());
@@ -195,7 +195,7 @@ TEST_P(SimulatedCreaseDefenderTacticTest, crease_defender_test)
 //  └───┴───┴────────────────┘
 
 INSTANTIATE_TEST_CASE_P(
-    CreaseDefenderEnvironment, SimulatedCreaseDefenderTacticTest,
+    CreaseDefenderEnvironment, CreaseDefenderTacticTest,
     ::testing::Values(
         // Enemy threat in front of crease, LEFT
         std::make_tuple(Point(1, 2.5), CreaseDefenderAlignment::LEFT, 2),

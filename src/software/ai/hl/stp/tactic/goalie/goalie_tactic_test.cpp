@@ -16,7 +16,7 @@
 #include "software/world/field.h"
 #include "software/world/world.h"
 
-class SimulatedGoalieTacticTest
+class GoalieTacticTest
     : public SimulatedTacticTestFixture,
       public ::testing::WithParamInterface<std::tuple<BallState, RobotStateWithId>>
 {
@@ -40,7 +40,7 @@ class SimulatedGoalieTacticTest
              field.enemyDefenseArea().negXPosYCorner()});
 };
 
-TEST_F(SimulatedGoalieTacticTest, test_panic_ball_very_fast_in_straight_line)
+TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_straight_line)
 {
     BallState ball_state(Point(0, 0), Vector(-3, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-4, -1)});
@@ -72,7 +72,7 @@ TEST_F(SimulatedGoalieTacticTest, test_panic_ball_very_fast_in_straight_line)
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedGoalieTacticTest, test_panic_ball_very_fast_in_diagonal_line)
+TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_diagonal_line)
 {
     BallState ball_state(Point(0, 0), Vector(-4.5, 0.25));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
@@ -105,7 +105,7 @@ TEST_F(SimulatedGoalieTacticTest, test_panic_ball_very_fast_in_diagonal_line)
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedGoalieTacticTest, test_ball_very_fast_misses_net)
+TEST_F(GoalieTacticTest, test_ball_very_fast_misses_net)
 {
     BallState ball_state(Point(0, 0), Vector(-4, 1));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-4.5, 0)});
@@ -131,7 +131,7 @@ TEST_F(SimulatedGoalieTacticTest, test_ball_very_fast_misses_net)
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedGoalieTacticTest, test_slow_ball_at_sharp_angle_to_friendly_goal)
+TEST_F(GoalieTacticTest, test_slow_ball_at_sharp_angle_to_friendly_goal)
 {
     BallState ball_state(Point(-4.5, -3), Vector(0, 0.1));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-4.5, 0)});
@@ -159,7 +159,7 @@ TEST_F(SimulatedGoalieTacticTest, test_slow_ball_at_sharp_angle_to_friendly_goal
             Duration::fromSeconds(10));
 }
 
-TEST_P(SimulatedGoalieTacticTest, goalie_test)
+TEST_P(GoalieTacticTest, goalie_test)
 {
     BallState ball_state         = std::get<0>(GetParam());
     RobotStateWithId robot_state = std::get<1>(GetParam());
@@ -198,7 +198,7 @@ TEST_P(SimulatedGoalieTacticTest, goalie_test)
 }
 
 INSTANTIATE_TEST_CASE_P(
-    GoalieEnvironment, SimulatedGoalieTacticTest,
+    GoalieEnvironment, GoalieTacticTest,
     ::testing::Values(
         // ball slow inside friendly defense area
         std::make_tuple(BallState(Point(-4, 0.8), Vector(-0.2, 0)),

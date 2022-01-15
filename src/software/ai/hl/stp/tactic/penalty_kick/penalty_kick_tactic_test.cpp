@@ -13,9 +13,8 @@
 #include "software/world/field.h"
 
 // goalie
-class SimulatedPenaltyKickTacticTest
-    : public SimulatedTacticTestFixture,
-      public ::testing::WithParamInterface<RobotStateWithId>
+class PenaltyKickTacticTest : public SimulatedTacticTestFixture,
+                              public ::testing::WithParamInterface<RobotStateWithId>
 {
    protected:
     Field field              = Field::createSSLDivisionBField();
@@ -25,7 +24,7 @@ class SimulatedPenaltyKickTacticTest
         0, RobotState(initial_position, Vector(0, 0), Angle::zero(), Angle::zero())};
 };
 
-TEST_P(SimulatedPenaltyKickTacticTest, penalty_kick_test)
+TEST_P(PenaltyKickTacticTest, penalty_kick_test)
 {
     RobotStateWithId enemy_robot = GetParam();
 
@@ -52,7 +51,7 @@ TEST_P(SimulatedPenaltyKickTacticTest, penalty_kick_test)
             non_terminating_validation_functions, Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedPenaltyKickTacticTest, penalty_no_goalie)
+TEST_F(PenaltyKickTacticTest, penalty_no_goalie)
 {
     auto tactic = std::make_shared<PenaltyKickTactic>();
     setTactic(tactic);
@@ -80,7 +79,7 @@ TEST_F(SimulatedPenaltyKickTacticTest, penalty_no_goalie)
 }
 
 INSTANTIATE_TEST_CASE_P(
-    RobotLocations, SimulatedPenaltyKickTacticTest,
+    RobotLocations, PenaltyKickTacticTest,
     ::testing::Values(
         // TODO: Improve dribbling control so the ball is not lost during this test
         // https://github.com/UBC-Thunderbots/Software/issues/2232

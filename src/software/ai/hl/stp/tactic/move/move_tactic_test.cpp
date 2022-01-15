@@ -13,13 +13,13 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedMoveTacticTest : public SimulatedTacticTestFixture
+class MoveTacticTest : public SimulatedTacticTestFixture
 {
    protected:
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_F(SimulatedMoveTacticTest, test_move_across_field)
+TEST_F(MoveTacticTest, test_move_across_field)
 {
     Point initial_position = Point(-3, 1.5);
     Point destination      = Point(2.5, -1.1);
@@ -59,7 +59,7 @@ TEST_F(SimulatedMoveTacticTest, test_move_across_field)
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedMoveTacticTest, test_autochip_move)
+TEST_F(MoveTacticTest, test_autochip_move)
 {
     Point initial_position = Point(-3, 1.5);
     Point destination      = Point(0, 1.5);
@@ -102,7 +102,7 @@ TEST_F(SimulatedMoveTacticTest, test_autochip_move)
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedMoveTacticTest, test_autokick_move)
+TEST_F(MoveTacticTest, test_autokick_move)
 {
     Point initial_position = Point(-1, -0.5);
     Point destination      = Point(-1, -1);
@@ -148,7 +148,7 @@ TEST_F(SimulatedMoveTacticTest, test_autokick_move)
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedMoveTacticTest, test_spinning_move_clockwise)
+TEST_F(MoveTacticTest, test_spinning_move_clockwise)
 {
     Point initial_position = Point(-4, 2);
     Point destination      = Point(4, 2);
@@ -194,7 +194,7 @@ TEST_F(SimulatedMoveTacticTest, test_spinning_move_clockwise)
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedMoveTacticTest, test_spinning_move_counter_clockwise)
+TEST_F(MoveTacticTest, test_spinning_move_counter_clockwise)
 {
     Point initial_position = Point(4, 2);
     Point destination      = Point(-4, 2);

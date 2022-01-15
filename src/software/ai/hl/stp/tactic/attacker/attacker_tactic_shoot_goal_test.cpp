@@ -13,7 +13,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedAttackerTacticShootGoalTest
+class AttackerTacticShootGoalTest
     : public SimulatedTacticTestFixture,
       // Params: initial ball state, initial robot position, enemy team, expected
       // chip/kick direction
@@ -24,7 +24,7 @@ class SimulatedAttackerTacticShootGoalTest
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_P(SimulatedAttackerTacticShootGoalTest, attacker_test_shoot_goal)
+TEST_P(AttackerTacticShootGoalTest, attacker_test_shoot_goal)
 {
     BallState ball_state         = std::get<0>(GetParam());
     Point initial_robot_point    = std::get<1>(GetParam());
@@ -58,7 +58,7 @@ TEST_P(SimulatedAttackerTacticShootGoalTest, attacker_test_shoot_goal)
 }
 
 INSTANTIATE_TEST_CASE_P(
-    ShootGoalEnvironment, SimulatedAttackerTacticShootGoalTest,
+    ShootGoalEnvironment, AttackerTacticShootGoalTest,
     ::testing::Values(
         // enemy goal blocked by enemy robots with enemy threat right
         std::make_tuple(BallState(Point(2, 1), Vector()), Point(1, 1),
