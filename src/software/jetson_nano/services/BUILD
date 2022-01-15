@@ -22,5 +22,9 @@ cc_library(
     name = "redis",
     srcs = ["redis.cpp"],
     hdrs = ["redis.h"],
-    deps = ["@cpp_redis"],
+    deps = [
+        ":service",
+        "//software/logger",
+        "@cpp_redis",
+    ],
 )
