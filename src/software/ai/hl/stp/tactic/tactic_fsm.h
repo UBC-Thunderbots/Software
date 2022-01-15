@@ -5,17 +5,8 @@
 #include <queue>
 
 #include "software/ai/intent/intent.h"
+#include "software/util/sml_fsm/sml_fsm.h"
 #include "software/world/world.h"
-
-/**
- * The Tactic FSM framework uses the [SML library](https://github.com/boost-ext/sml), and
- * aims to create a readable style of FSM to implement tactic gameplay. See the MoveTactic
- * for an example of how to implement a tactic using this framework
- */
-
-// An alias for an FSM
-template <class T>
-using FSM = boost::sml::sm<T, boost::sml::process_queue<std::queue>>;
 
 // This callback is used to return an intent from the fsm
 using SetIntentCallback = std::function<void(std::unique_ptr<Intent>)>;
@@ -43,7 +34,7 @@ struct TacticUpdate
  * ControlParams - uniquely defined by each tactic to control the FSM
  * TacticUpdate - common struct that contains Robot, World, and SetIntentCallback
  */
-#define DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS                              \
+#define DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS                       \
     struct Update                                                                        \
     {                                                                                    \
         Update(const ControlParams &control_params, const TacticUpdate &common)          \

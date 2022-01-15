@@ -12,7 +12,7 @@ struct StopFSM
     {
     };
 
-    DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
 
     /**
      * Constructor for StopFSM struct
@@ -21,40 +21,37 @@ struct StopFSM
      */
     explicit StopFSM(bool coast) : coast(coast) {}
 
+    /**
+     * Action to set the StopIntent
+     *
+     * @param event StopFSM::Update
+     */
+    void updateStop(const Update& event);
+
+    /**
+     * Guard if the stop is done
+     *
+     * @param event StopFSM::Update
+     *
+     * @return if the robot has stopped
+     */
+    bool stopDone(const Update& event);
+
     auto operator()()
     {
         using namespace boost::sml;
 
-        const auto stop_s   = state<StopState>;
-        const auto update_e = event<Update>;
-
-        /**
-         * Action to set the StopIntent
-         *
-         * @param event StopFSM::Update
-         */
-        const auto update_stop = [this](auto event) {
-            event.common.set_intent(
-                std::make_unique<StopIntent>(event.common.robot.id(), coast));
-        };
-
-        /**
-         * Guard if the stop is done
-         *
-         * @param event StopFSM::Update
-         *
-         * @return if the robot has stopped
-         */
-        const auto stop_done = [](auto event) {
-            return robotStopped(event.common.robot);
-        };
+        DEFINE_SML_STATE(StopState)
+        DEFINE_SML_EVENT(Update)
+        DEFINE_SML_GUARD(stopDone)
+        DEFINE_SML_ACTION(updateStop)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *stop_s + update_e[!stop_done] / update_stop = stop_s,
-            stop_s + update_e[stop_done] / update_stop   = X,
-            X + update_e[!stop_done] / update_stop       = stop_s,
-            X + update_e[stop_done] / update_stop        = X);
+            *StopState_S + Update_E[!stopDone_G] / updateStop_A = StopState_S,
+            StopState_S + Update_E[stopDone_G] / updateStop_A   = X,
+            X + Update_E[!stopDone_G] / updateStop_A            = StopState_S,
+            X + Update_E[stopDone_G] / updateStop_A             = X);
     }
 
    private:

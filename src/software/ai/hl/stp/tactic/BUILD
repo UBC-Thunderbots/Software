@@ -14,7 +14,6 @@ cc_library(
     name = "all_tactics",
     hdrs = ["all_tactics.h"],
     deps = [
-        ":receiver_tactic",
         ":tactic",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
@@ -46,9 +45,9 @@ cc_library(
         "//software/ai/hl/stp/action",
         "//software/ai/intent",
         "//software/ai/intent:stop_intent",
+        "//software/util/sml_fsm",
         "//software/util/typename",
         "//software/world",
-        "@sml",
     ],
 )
 

@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pivot_kick_tactic",
-    srcs = ["pivot_kick_tactic.cpp"],
+    srcs = [
+        "pivot_kick_fsm.cpp",
+        "pivot_kick_tactic.cpp",
+    ],
     hdrs = [
         "pivot_kick_fsm.h",
         "pivot_kick_tactic.h",

@@ -280,9 +280,9 @@ void force_wheels_setLocalVelocity(
     const FirmwareRobot_t* robot,
     TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg)
 {
-    float linear_velocity_x = control_msg.velocity.x_component_meters;
-    float linear_velocity_y = control_msg.velocity.y_component_meters;
-    float angular_velocity  = control_msg.angular_velocity.radians_per_second;
+    float linear_velocity_x = (float)control_msg.velocity.x_component_meters;
+    float linear_velocity_y = (float)control_msg.velocity.y_component_meters;
+    float angular_velocity  = (float)control_msg.angular_velocity.radians_per_second;
 
     app_firmware_robot_trackVelocityInRobotFrame(robot, linear_velocity_x,
                                                  linear_velocity_y, angular_velocity);
@@ -297,9 +297,9 @@ void velocity_wheels_setLocalVelocity(
     VelocityWheel_t* back_right_wheel  = robot->back_right_velocity_wheel;
     VelocityWheel_t* back_left_wheel   = robot->back_left_velocity_wheel;
 
-    float linear_velocity_x = control_msg.velocity.x_component_meters;
-    float linear_velocity_y = control_msg.velocity.y_component_meters;
-    float angular_velocity  = control_msg.angular_velocity.radians_per_second;
+    float linear_velocity_x = (float)control_msg.velocity.x_component_meters;
+    float linear_velocity_y = (float)control_msg.velocity.y_component_meters;
+    float angular_velocity  = (float)control_msg.angular_velocity.radians_per_second;
 
     float robot_velocity[3];
     robot_velocity[0] = linear_velocity_x;
