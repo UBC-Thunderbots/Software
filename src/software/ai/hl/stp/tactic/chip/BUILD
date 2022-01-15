@@ -12,8 +12,8 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
-        "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/tactic",
+        "//software/ai/intent:chip_intent",
         "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
         "//software/logger",
     ],

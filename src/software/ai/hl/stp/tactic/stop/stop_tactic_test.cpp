@@ -13,7 +13,6 @@ TEST(StopTacticTest, test_calculate_robot_cost)
                         Timestamp::fromSeconds(0));
 
     StopTactic tactic = StopTactic(false);
-    tactic.updateWorldParams(world);
 
     // We always expect the cost to be 0.5, because the StopTactic prefers all robots
     // equally

@@ -13,7 +13,6 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/evaluation:pass",
-        "//software/ai/hl/stp/action:stop_action",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/intent:move_intent",

@@ -127,22 +127,6 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
                                                   MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     };
 
-    // Wait for a robot to be assigned to align to take the corner
-    while (!align_to_ball_tactic->getAssignedRobot())
-    {
-        LOG(DEBUG) << "Nothing assigned to align to ball yet";
-        updateAlignToBallTactic(align_to_ball_tactic, world);
-        update_cherry_pickers(pass_generator.generatePassEvaluation(world));
-
-        yield({{align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
-                cherry_pick_tactic_3, cherry_pick_tactic_4}});
-    }
-
-
-    // Set the passer on the pass generator
-    LOG(DEBUG) << "Aligning with robot " << align_to_ball_tactic->getAssignedRobot()->id()
-               << "as the passer";
-
     // Put the robot in roughly the right position to perform the kick
     LOG(DEBUG) << "Aligning to ball";
     do
