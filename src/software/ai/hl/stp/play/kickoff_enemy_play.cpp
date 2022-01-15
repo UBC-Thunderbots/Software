@@ -147,11 +147,11 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         // update robot 3 to be directly between the ball and the friendly net
         move_tactics.at(defense_position_index)
-            ->updateControlParams(calculateBlockCone(world.field().friendlyGoalpostPos(),
-                                                     world.field().friendlyGoalpostNeg(),
-                                                     world.field().centerPoint(),
-                                                     ROBOT_MAX_RADIUS_METERS),
-                                  Angle::zero(), 0, MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+            ->updateControlParams(
+                calculateBlockCone(world.field().friendlyGoalpostPos(),
+                                   world.field().friendlyGoalpostNeg(),
+                                   world.field().centerPoint(), ROBOT_MAX_RADIUS_METERS),
+                Angle::zero(), 0, MaxAllowedSpeedMode::PHYSICAL_LIMIT);
         result[0].emplace_back(move_tactics.at(defense_position_index));
 
         // yield the Tactics this Play wants to run, in order of priority
