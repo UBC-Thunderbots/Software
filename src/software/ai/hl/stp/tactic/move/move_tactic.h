@@ -1,6 +1,5 @@
 #pragma once
 
-#include "software/ai/hl/stp/action/move_action.h"  // TODO (#1888): remove this dependency
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
@@ -21,8 +20,6 @@ class MoveTactic : public Tactic
     explicit MoveTactic(bool loop_forever);
 
     MoveTactic() = delete;
-
-    void updateWorldParams(const World& world) override;
 
     /**
      * Updates the params assuming that the max allowed speed mode is the physical limits
@@ -74,7 +71,6 @@ class MoveTactic : public Tactic
     bool done() const override;
 
    private:
-    void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
     FSM<MoveFSM> fsm;

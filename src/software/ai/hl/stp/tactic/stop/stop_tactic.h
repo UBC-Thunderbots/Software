@@ -1,6 +1,5 @@
 #pragma once
 
-#include "software/ai/hl/stp/action/move_action.h"  // TODO (#1888): remove this dependency
 #include "software/ai/hl/stp/tactic/stop/stop_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/stop_intent.h"
@@ -22,8 +21,6 @@ class StopTactic : public Tactic
 
     StopTactic() = delete;
 
-    void updateWorldParams(const World& world) override;
-
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots
      * equally
@@ -39,12 +36,7 @@ class StopTactic : public Tactic
     bool done() const override;
 
    private:
-    void calculateNextAction(ActionCoroutine::push_type& yield) override;
-
     void updateIntent(const TacticUpdate& tactic_update) override;
 
     FSM<StopFSM> fsm;
-
-    // Whether or not the robot should coast to a stop
-    bool coast;  // TODO (#1888): remove this field
 };
