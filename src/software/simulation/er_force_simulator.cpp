@@ -17,16 +17,28 @@
 #include "software/world/robot_state.h"
 
 ErForceSimulator::ErForceSimulator(
-    const Field& field, const RobotConstants_t& robot_constants,
+    const FieldType& field_type, const RobotConstants_t& robot_constants,
     const WheelConstants& wheel_constants,
     std::shared_ptr<const SimulatorConfig> simulator_config)
     : yellow_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
       blue_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
       frame_number(0),
       robot_constants(robot_constants),
-      wheel_constants(wheel_constants)
+      wheel_constants(wheel_constants),
+      field(Field::createField(field_type))
 {
-    QString full_filename = CONFIG_DIRECTORY + CONFIG_FILE + ".txt";
+    QString full_filename = CONFIG_DIRECTORY;
+
+    if (field_type == FieldType::DIV_A)
+    {
+        full_filename = full_filename + CONFIG_FILE + ".txt";
+    }
+    else
+    {
+        // loading division B configuration
+        full_filename = full_filename + CONFIG_FILE + "B.txt";
+    }
+
     QFile file(full_filename);
     if (!file.open(QFile::ReadOnly))
     {
@@ -225,7 +237,7 @@ std::vector<SSLProto::SSL_WrapperPacket> ErForceSimulator::getSSLWrapperPackets(
 
 Field ErForceSimulator::getField() const
 {
-    return Field::createSSLDivisionAField();
+    return field;
 }
 
 Timestamp ErForceSimulator::getTimestamp() const

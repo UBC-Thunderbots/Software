@@ -1,11 +1,9 @@
 load("@rules_python//python:defs.bzl", "py_runtime")
 load("@rules_python//python:defs.bzl", "py_runtime_pair")
 
-# targets for hermetic Python runtime
 py_runtime(
     name = "python3_runtime",
-    files = ["@python_interpreter//:files"],
-    interpreter = "@python_interpreter//:python_bin",
+    interpreter_path = "/opt/tbotspython/bin/python3",
     python_version = "PY3",
     visibility = ["//visibility:public"],
 )

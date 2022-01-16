@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@python_tools_deps//:requirements.bzl", "requirement")
+load("@jetson_nano_deps//:requirements.bzl", "requirement")
 
 py_binary(
     name = "receiver",
@@ -15,6 +15,6 @@ py_binary(
     srcs = ["uploader.py"],
     deps = [
         requirement("tftpy"),
-        "//python_tools:robot_broadcast_receiver",
+        "//software/jetson_nano/broadcasts:robot_broadcast_receiver",
     ],
 )

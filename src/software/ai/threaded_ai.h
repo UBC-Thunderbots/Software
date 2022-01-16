@@ -16,7 +16,7 @@
 class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
                    public Subject<TbotsProto::PrimitiveSet>,
                    public Subject<AIDrawFunction>,
-                   public Subject<PlayInfo>
+                   public Subject<TbotsProto::PlayInfo>
 {
    public:
     ThreadedAI() = delete;

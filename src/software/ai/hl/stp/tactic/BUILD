@@ -4,35 +4,9 @@ cc_test(
     name = "penalty_setup_tactic_test",
     srcs = ["penalty_setup_tactic_test.cpp"],
     deps = [
-        ":penalty_setup_tactic",
         "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
-    ],
-)
-
-cc_library(
-    name = "kickoff_chip_tactic",
-    srcs = ["kickoff_chip_tactic.cpp"],
-    hdrs = ["kickoff_chip_tactic.h"],
-    deps = [
-        "//shared:constants",
-        "//software/ai/hl/stp/action:chip_action",
-        "//software/ai/hl/stp/tactic/chip:chip_tactic",
-        "//software/logger",
-    ],
-)
-
-cc_library(
-    name = "penalty_setup_tactic",
-    srcs = ["penalty_setup_tactic.cpp"],
-    hdrs = ["penalty_setup_tactic.h"],
-    deps = [
-        "//shared:constants",
-        "//software/ai/evaluation:calc_best_shot",
-        "//software/ai/hl/stp/action:kick_action",
-        "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
+        "//software/test_util",
     ],
 )
 
@@ -40,8 +14,6 @@ cc_library(
     name = "all_tactics",
     hdrs = ["all_tactics.h"],
     deps = [
-        ":kickoff_chip_tactic",
-        ":penalty_setup_tactic",
         ":tactic",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
