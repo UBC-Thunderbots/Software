@@ -36,8 +36,8 @@
 
 #include "extlibs/hrvo/agent.h"
 #include "extlibs/hrvo/goal.h"
-#include "extlibs/hrvo/kd_tree.h"
 #include "extlibs/hrvo/hrvo_agent.h"
+#include "extlibs/hrvo/kd_tree.h"
 #include "extlibs/hrvo/linear_velocity_agent.h"
 
 Simulator::Simulator(float time_step)
@@ -55,13 +55,13 @@ void Simulator::updateWorld(const World &world)
     friendly_robot_id_map.clear();
 
     int max_neighbors = world.friendlyTeam().getAllRobots().size() - 1;
-    for (const Robot& friendly_robot : world.friendlyTeam().getAllRobots())
+    for (const Robot &friendly_robot : world.friendlyTeam().getAllRobots())
     {
         std::size_t agent_index = addHRVORobotAgent(friendly_robot, max_neighbors);
         friendly_robot_id_map.emplace(friendly_robot.id(), agent_index);
     }
 
-    for (const Robot& enemy_robot : world.enemyTeam().getAllRobots())
+    for (const Robot &enemy_robot : world.enemyTeam().getAllRobots())
     {
         addLinearVelocityRobotAgent(enemy_robot);
     }
@@ -72,54 +72,67 @@ void Simulator::updateWorld(const World &world)
 std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
 {
     // TODO (#2371): Replace Vector2 with Vector
-    Vector2 position(static_cast<float>(robot.position().x()), static_cast<float>(robot.position().y()));
-    Vector2 velocity(static_cast<float>(robot.velocity().x()), static_cast<float>(robot.velocity().y()));
-    float max_accel = robot.robotConstants().robot_max_acceleration_m_per_s_2;
-    float max_speed = robot.robotConstants().robot_max_speed_m_per_s;
-    float neighbor_dist = max_speed / 2; // Chosen arbitrarily
-// Max distance which the robot can travel in one time step + 5% tolerance
-    float goal_radius = max_speed * timeStep_ * 1.05f;
+    Vector2 position(static_cast<float>(robot.position().x()),
+                     static_cast<float>(robot.position().y()));
+    Vector2 velocity(static_cast<float>(robot.velocity().x()),
+                     static_cast<float>(robot.velocity().y()));
+    float max_accel     = robot.robotConstants().robot_max_acceleration_m_per_s_2;
+    float max_speed     = robot.robotConstants().robot_max_speed_m_per_s;
+    float neighbor_dist = max_speed / 2;  // Chosen arbitrarily
+    // Max distance which the robot can travel in one time step + 5% tolerance
+    float goal_radius        = max_speed * timeStep_ * 1.05f;
     float uncertainty_offset = 0.f;
 
-    auto& robot_primitives = *primitive_set_.mutable_robot_primitives();
+    auto &robot_primitives          = *primitive_set_.mutable_robot_primitives();
     TbotsProto::Primitive primitive = robot_primitives[robot.id()];
     TbotsProto::Point destination_point_proto;
     Vector2 destination_point = position;
     if (primitive.has_move())
     {
         destination_point_proto = primitive.mutable_move()->destination();
-        destination_point = Vector2(static_cast<float>(destination_point_proto.x_meters()), static_cast<float>(destination_point_proto.y_meters()));
+        destination_point =
+            Vector2(static_cast<float>(destination_point_proto.x_meters()),
+                    static_cast<float>(destination_point_proto.y_meters()));
     }
 
-    std::unique_ptr<HRVOAgent> agent = std::make_unique<HRVOAgent>(this, position, addGoal(destination_point), neighbor_dist, max_neighbors,
-                                                                   ROBOT_MAX_RADIUS_METERS, velocity, max_accel, goal_radius, max_speed,
-                                                                   max_speed, uncertainty_offset);
+    std::unique_ptr<HRVOAgent> agent = std::make_unique<HRVOAgent>(
+        this, position, addGoal(destination_point), neighbor_dist, max_neighbors,
+        ROBOT_MAX_RADIUS_METERS, velocity, max_accel, goal_radius, max_speed, max_speed,
+        uncertainty_offset);
     agents_.push_back(std::move(agent));
     return agents_.size() - 1;
 }
 
-void Simulator::addLinearVelocityRobotAgent(const Robot &enemy_robot)
+std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot)
 {
     // TODO (#2371): Replace Vector2 with Vector
-    Vector2 position(static_cast<float>(enemy_robot.position().x()), static_cast<float>(enemy_robot.position().y()));
-    Vector2 velocity(static_cast<float>(enemy_robot.velocity().x()), static_cast<float>(enemy_robot.velocity().y()));
-    // TODO: add a goal that makes sense
-    Vector2 goal_position(static_cast<float>(enemy_robot.position().x()), static_cast<float>(enemy_robot.position().y()));
-    float max_accel = enemy_robot.robotConstants().robot_max_acceleration_m_per_s_2;
-    float max_speed = enemy_robot.robotConstants().robot_max_speed_m_per_s;
+    Vector2 position(static_cast<float>(robot.position().x()),
+                     static_cast<float>(robot.position().y()));
+    Vector2 velocity(static_cast<float>(robot.velocity().x()),
+                     static_cast<float>(robot.velocity().y()));
+    // TODO: add a goal that makes sense. Goal Vector2 should probably a parameter. In
+    // update World we should compute a valid point given field/defense box with current
+    // velocity direction if collide with friendly/enemy_defense_area, use that point,
+    // else, use point which collides with field_lines
+    Vector2 goal_position(static_cast<float>(robot.position().x() + 5.0),
+                          static_cast<float>(robot.position().y() + 3.0));
+    float max_accel = robot.robotConstants().robot_max_acceleration_m_per_s_2;
+    float max_speed = robot.robotConstants().robot_max_speed_m_per_s;
     // Max distance which the robot can travel in one time step + 5% tolerance
     float goal_radius = max_speed * timeStep_ * 1.05f;
 
-    std::unique_ptr<LinearVelocityAgent> agent = std::make_unique<LinearVelocityAgent>(this, position, ROBOT_MAX_RADIUS_METERS, velocity, max_speed, max_accel,
-                                                                                       addGoal(goal_position), goal_radius);
+    std::unique_ptr<LinearVelocityAgent> agent = std::make_unique<LinearVelocityAgent>(
+        this, position, ROBOT_MAX_RADIUS_METERS, velocity, max_speed, max_accel,
+        addGoal(goal_position), goal_radius);
 
     agents_.push_back(std::move(agent));
+    return agents_.size() - 1;
 }
 
 void Simulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set)
 {
     primitive_set_ = primitive_set;
-    for (auto& [robot_id, primitive] : primitive_set.robot_primitives())
+    for (auto &[robot_id, primitive] : primitive_set.robot_primitives())
     {
         // TODO: Update implementation of Primitive to support multiple path points
         if (!primitive.has_move())
@@ -133,24 +146,27 @@ void Simulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set
             unsigned int agent_index = agent_index_iter->second;
             if (agent_index < agents_.size())
             {
-                std::unique_ptr<Goal>& goal = goals_[agents_[agent_index]->goalNo_];
+                std::unique_ptr<Goal> &goal = goals_[agents_[agent_index]->goalNo_];
                 goal->positions_.clear();
 
-                goal->positions_.push_back(Vector2(static_cast<float>(primitive.move().destination().x_meters()), static_cast<float>(primitive.move().destination().y_meters())));
+                goal->positions_.push_back(Vector2(
+                    static_cast<float>(primitive.move().destination().x_meters()),
+                    static_cast<float>(primitive.move().destination().y_meters())));
             }
         }
     }
 }
 
-std::size_t
-Simulator::addHRVOAgent(const Vector2 &position, std::size_t goalNo, float neighborDist, std::size_t maxNeighbors,
-                        float radius, float goalRadius, float prefSpeed, float maxSpeed, float uncertaintyOffset,
-                        float maxAccel, const Vector2 &velocity)
+std::size_t Simulator::addHRVOAgent(const Vector2 &position, std::size_t goalNo,
+                                    float neighborDist, std::size_t maxNeighbors,
+                                    float radius, float goalRadius, float prefSpeed,
+                                    float maxSpeed, float uncertaintyOffset,
+                                    float maxAccel, const Vector2 &velocity)
 {
     // TODO: makeUniquePtr<HRVOAgent>
-    std::unique_ptr<HRVOAgent> agent = std::make_unique<HRVOAgent>(this, position, goalNo, neighborDist, maxNeighbors,
-                                   radius, velocity, maxAccel, goalRadius, prefSpeed,
-                                   maxSpeed, uncertaintyOffset);
+    std::unique_ptr<HRVOAgent> agent = std::make_unique<HRVOAgent>(
+        this, position, goalNo, neighborDist, maxNeighbors, radius, velocity, maxAccel,
+        goalRadius, prefSpeed, maxSpeed, uncertaintyOffset);
     agents_.push_back(std::move(agent));
     return agents_.size() - 1;
 }

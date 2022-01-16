@@ -24,8 +24,8 @@ class Agent
      * @param goalRadius         The goal radius of this agent.
      */
     Agent(Simulator *simulator, const Vector2 &position, float radius,
-          const Vector2 &velocity, const Vector2 &prefVelocity, float maxSpeed, float maxAccel, std::size_t goalNo,
-          float goalRadius);
+          const Vector2 &velocity, const Vector2 &prefVelocity, float maxSpeed,
+          float maxAccel, std::size_t goalNo, float goalRadius);
 
     virtual ~Agent() = default;
 
@@ -73,7 +73,8 @@ class Agent
     float radius_;
 
     Vector2 velocity_;
-    Vector2 prefVelocity_; // TODO, can remove once we add VO support and not all Agents use HRVO
+    Vector2 prefVelocity_;  // TODO, can remove once we add VO support and not all Agents
+                            // use HRVO
     Vector2 newVelocity_;
     float maxSpeed_;
     float maxAccel_;

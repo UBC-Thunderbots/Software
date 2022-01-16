@@ -21,9 +21,9 @@ class LinearVelocityAgent : public Agent
      * @param goalNo             The goal number of this agent.
      * @param goalRadius         The goal radius of this agent.
      */
-    LinearVelocityAgent(Simulator *simulator, const Vector2 &position, float radius, const Vector2 &velocity,
-                        float maxSpeed, float maxAccel, std::size_t goalNo,
-                        float goalRadius);
+    LinearVelocityAgent(Simulator *simulator, const Vector2 &position, float radius,
+                        const Vector2 &velocity, float maxSpeed, float maxAccel,
+                        std::size_t goalNo, float goalRadius);
 
     virtual ~LinearVelocityAgent() override = default;
 

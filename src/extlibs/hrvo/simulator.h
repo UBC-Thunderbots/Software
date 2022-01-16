@@ -39,8 +39,8 @@
 #include "extlibs/hrvo/goal.h"
 #include "extlibs/hrvo/kd_tree.h"
 #include "extlibs/hrvo/vector2.h"
-#include "software/world/world.h"
 #include "proto/tbots_software_msgs.pb.h"
+#include "software/world/world.h"
 
 class Simulator
 {
@@ -48,18 +48,21 @@ class Simulator
     explicit Simulator(float time_step);
     ~Simulator() = default;
 
-    void updateWorld(const World& world);
+    void updateWorld(const World &world);
 
-    void updatePrimitiveSet(const TbotsProto::PrimitiveSet& primitive_set);
+    void updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set);
 
     /**
      *      Adds a new agent to the simulation based on Robot.
      *
      * @param Robot    The robot which this agent should be based on
-     * @param velocity The number of neighboring agents which the HRVO algorithm should consider when calculating new velocity
+     * @param velocity The number of neighboring agents which the HRVO algorithm should
+     * consider when calculating new velocity
      * @return    The number of the agent.
      */
     std::size_t addHRVORobotAgent(const Robot &robot, int max_neighbors = 10);
+
+    std::size_t addLinearVelocityRobotAgent(const Robot &robot);
 
     /**
      *      Adds a new agent to the simulation.
@@ -77,9 +80,11 @@ class Simulator
      * @param velocity           The initial velocity of this agent.
      * @return    The number of the agent.
      */
-    std::size_t addHRVOAgent(const Vector2 &position, std::size_t goalNo, float neighborDist, std::size_t maxNeighbors,
-                             float radius, float goalRadius, float prefSpeed, float maxSpeed, float uncertaintyOffset,
-                             float maxAccel, const Vector2 &velocity);
+    std::size_t addHRVOAgent(const Vector2 &position, std::size_t goalNo,
+                             float neighborDist, std::size_t maxNeighbors, float radius,
+                             float goalRadius, float prefSpeed, float maxSpeed,
+                             float uncertaintyOffset, float maxAccel,
+                             const Vector2 &velocity);
 
     /**
      *      Adds a new goal to the simulation.
@@ -306,7 +311,8 @@ class Simulator
     float timeStep_;
     bool reachedGoals_;
     std::vector<std::unique_ptr<Agent>> agents_;
-    std::vector<std::unique_ptr<Goal>> goals_; // won't be one to one since not all agents will have a goal
+    std::vector<std::unique_ptr<Goal>>
+        goals_;  // won't be one to one since not all agents will have a goal
 
     TbotsProto::PrimitiveSet primitive_set_;
     // robot id to agent index
@@ -315,6 +321,4 @@ class Simulator
     friend class Agent;
     friend class Goal;
     friend class KdTree;
-
-    void addLinearVelocityRobotAgent(const Robot &enemy_robot);
 };

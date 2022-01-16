@@ -4,8 +4,8 @@
 #include <fstream>
 
 #include "extlibs/hrvo/simulator.h"
-#include "shared/test_util/tbots_gtest_main.h"
 #include "proto/primitive/primitive_msg_factory.h"
+#include "shared/test_util/tbots_gtest_main.h"
 
 const int SIMULATOR_FRAME_RATE = 30;
 const float HRVO_TWO_PI        = 6.283185307179586f;
@@ -13,32 +13,46 @@ const float ROBOT_RADIUS       = 0.09f;
 
 class HRVOTest : public ::testing::Test
 {
-public:
+   public:
     Simulator simulator;
-    std::vector<Robot> robots;
-    Team team;
+    std::vector<Robot> friendly_robots;
+    Team friendly_team;
     World world;
     TbotsProto::PrimitiveSet primitive_set;
 
-    HRVOTest() : simulator(1.f / SIMULATOR_FRAME_RATE),
-                 robots({Robot(0, Point(1.0, -1.0), Vector(1.0, 0.0), Angle(), AngularVelocity(), Timestamp(), {}),
-                         Robot(1, Point(1.0, 1.0), Vector(1.0, 0.0), Angle(), AngularVelocity(), Timestamp(), {}),
-                         Robot(2, Point(-1.0, -1.0), Vector(1.0, 0.0), Angle(), AngularVelocity(), Timestamp(), {})}),
-                 team(robots),
-                 world(Field::createSSLDivisionBField(), Ball(Point(), Vector(), Timestamp()), team, Team())
+    HRVOTest()
+        : simulator(1.f / SIMULATOR_FRAME_RATE),
+          friendly_robots({Robot(0, Point(1.0, -1.0), Vector(-1.0, 0.0), Angle(),
+                                 AngularVelocity(), Timestamp(), {}),
+                           Robot(1, Point(1.0, 1.0), Vector(1.0, 0.0), Angle(),
+                                 AngularVelocity(), Timestamp(), {}),
+                           Robot(2, Point(-1.0, -1.0), Vector(1.0, -1.0), Angle(),
+                                 AngularVelocity(), Timestamp(), {})}),
+          friendly_team(friendly_robots),
+          world(Field::createSSLDivisionBField(), Ball(Point(), Vector(), Timestamp()),
+                Team(), friendly_team)
     {
-        TbotsProto::Primitive primitive1 = *createMovePrimitive(Point(), 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(), MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
+        TbotsProto::Primitive primitive1 = *createMovePrimitive(
+            Point(), 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(),
+            MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
+        TbotsProto::Primitive primitive2 = *createMovePrimitive(
+            Point(-3.0, -3.0), 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(),
+            MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
+        TbotsProto::Primitive primitive3 = *createMovePrimitive(
+            Point(2.0, 2.0), 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(),
+            MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
 
         (*primitive_set.mutable_robot_primitives())[0] = primitive1;
-        (*primitive_set.mutable_robot_primitives())[1] = primitive1;
-        (*primitive_set.mutable_robot_primitives())[2] = primitive1;
+        (*primitive_set.mutable_robot_primitives())[1] = primitive2;
+        (*primitive_set.mutable_robot_primitives())[2] = primitive3;
 
         // TODO: Replace the agent defaults with our own default object
-//        simulator.setAgentDefaults(/*neighborDist*/ 3.f, /*maxNeighbors*/ 30,
-//                                   /*radius*/ ROBOT_RADIUS * RADIUS_SCALE,
-//                                   /*goalRadius*/ 0.02f,
-//                                   /*prefSpeed=*/3.5f, /*maxSpeed=*/4.825f,
-//                                   /*uncertaintyOffset=*/0.f, /*maxAccel=*/3.28f);
+        //        simulator.setAgentDefaults(/*neighborDist*/ 3.f, /*maxNeighbors*/ 30,
+        //                                   /*radius*/ ROBOT_RADIUS * RADIUS_SCALE,
+        //                                   /*goalRadius*/ 0.02f,
+        //                                   /*prefSpeed=*/3.5f, /*maxSpeed=*/4.825f,
+        //                                   /*uncertaintyOffset=*/0.f,
+        //                                   /*maxAccel=*/3.28f);
     }
 
     void TearDown() override
@@ -57,8 +71,8 @@ public:
             for (float y : {-(field_height / 2), field_height / 2})
             {
                 const Vector2 position(x, y);
-                simulator.addHRVOAgent(position, simulator.addGoal(position), 1.f, 1, 0.25f,
-                                       0.25f, 0.1f, 0.1f, 0.f, 0.1f, Vector2());
+                simulator.addHRVOAgent(position, simulator.addGoal(position), 1.f, 1,
+                                       0.25f, 0.25f, 0.1f, 0.1f, 0.f, 0.1f, Vector2());
             }
         }
 
@@ -69,16 +83,16 @@ public:
             for (float x : {-(field_width / 2), field_width / 2})
             {
                 const Vector2 position(x, y);
-                simulator.addHRVOAgent(position, simulator.addGoal(position), 1.f, 1, 0.25f,
-                                       0.25f, 0.1f, 0.1f, 0.f, 0.1f, Vector2());
+                simulator.addHRVOAgent(position, simulator.addGoal(position), 1.f, 1,
+                                       0.25f, 0.25f, 0.1f, 0.1f, 0.f, 0.1f, Vector2());
             }
         }
     }
 
     void add_static_obstacle(const Vector2 position, const float radius)
     {
-        simulator.addHRVOAgent(position, simulator.addGoal(position), 1.f, 1, radius, radius,
-                               0.1f, 0.1f, 0.f, 0.1f, Vector2());
+        simulator.addHRVOAgent(position, simulator.addGoal(position), 1.f, 1, radius,
+                               radius, 0.1f, 0.1f, 0.f, 0.1f, Vector2());
     }
 
     void run_simulator()
@@ -206,10 +220,9 @@ TEST_F(HRVOTest, test)
 {
     simulator.updateWorld(world);
     simulator.updatePrimitiveSet(primitive_set);
-
 }
 
-//TEST_F(HRVOTest, div_b_edge_test)
+// TEST_F(HRVOTest, div_b_edge_test)
 //{
 //    const Vector2 goal_offset  = Vector2(8.f, 0);
 //    const Vector2 robot_offset = Vector2(0.f, -ROBOT_RADIUS * 2.5f);
@@ -217,31 +230,34 @@ TEST_F(HRVOTest, test)
 //    {
 //        const Vector2 position = -1 * (goal_offset / 2) + Vector2(0.f, 2.5f) +
 //                                 (static_cast<float>(i) * robot_offset);
-//        simulator.addHRVOAgent(position, simulator.addGoal(position + goal_offset), 0, 0, 0, 0, 0, 0, 0, 0,
+//        simulator.addHRVOAgent(position, simulator.addGoal(position + goal_offset), 0,
+//        0, 0, 0, 0, 0, 0, 0,
 //                               <#initializer#>);
 //    }
 //    add_static_obstacle(Vector2(0, 2.f), 0.75f);
 //    create_div_b_field();
 //}
 //
-//TEST_F(HRVOTest, 25_robots_around_circle)
+// TEST_F(HRVOTest, 25_robots_around_circle)
 //{
 //    /** Add robots around circle with one in the center **/
 //    const int num_robots           = 25;
 //    float robot_starting_angle_dif = HRVO_TWO_PI / num_robots;
 //    float circle_radius            = std::max(float(num_robots) / 10, 2.f);
-//    simulator.addHRVOAgent(Vector2(0.f, 0.f), simulator.addGoal(Vector2(0.f, 0.f)), 0, 0, 0, 0, 0, 0, 0, 0,
+//    simulator.addHRVOAgent(Vector2(0.f, 0.f), simulator.addGoal(Vector2(0.f, 0.f)), 0,
+//    0, 0, 0, 0, 0, 0, 0,
 //                           <#initializer#>);
 //    for (std::size_t i = 0; i < num_robots; ++i)
 //    {
 //        float x = std::cos(static_cast<float>(i) * robot_starting_angle_dif);
 //        float y = std::sin(static_cast<float>(i) * robot_starting_angle_dif);
 //        const Vector2 position = circle_radius * Vector2(x, y);
-//        simulator.addHRVOAgent(position, simulator.addGoal(-position), 0, 0, 0, 0, 0, 0, 0, 0, <#initializer#>);
+//        simulator.addHRVOAgent(position, simulator.addGoal(-position), 0, 0, 0, 0, 0, 0,
+//        0, 0, <#initializer#>);
 //    }
 //}
 //
-//TEST_F(HRVOTest, 5_robots_in_vertical_line)
+// TEST_F(HRVOTest, 5_robots_in_vertical_line)
 //{
 //    /** Add robots in a vertical line where they all have to move down **/
 //    const int num_robots       = 5;
@@ -250,33 +266,37 @@ TEST_F(HRVOTest, test)
 //    for (std::size_t i = 0; i < num_robots; ++i)
 //    {
 //        const Vector2 position = static_cast<float>(i) * robot_offset;
-//        simulator.addHRVOAgent(position, simulator.addGoal(position + goal_offset), 0, 0, 0, 0, 0, 0, 0, 0,
+//        simulator.addHRVOAgent(position, simulator.addGoal(position + goal_offset), 0,
+//        0, 0, 0, 0, 0, 0, 0,
 //                               <#initializer#>);
 //    }
 //}
 //
-//TEST_F(HRVOTest, 1_robot_in_line)
+// TEST_F(HRVOTest, 1_robot_in_line)
 //{
-//    simulator.addHRVOAgent(Vector2(-4.f, 0.f), simulator.addGoal(Vector2(4.f, 0.f)), 0, 0, 0, 0, 0, 0, 0, 0,
+//    simulator.addHRVOAgent(Vector2(-4.f, 0.f), simulator.addGoal(Vector2(4.f, 0.f)), 0,
+//    0, 0, 0, 0, 0, 0, 0,
 //                           <#initializer#>);
 //}
 //
-//TEST_F(HRVOTest, 1_robot_two_goals)
+// TEST_F(HRVOTest, 1_robot_two_goals)
 //{
 //    simulator.addHRVOAgent(Vector2(-4.f, 0.f), simulator.addGoalPositions(
-//            {Vector2(4.f, 0.f), Vector2(-4.f, 0.f)}), 0, 0, 0, 0, 0, 0, 0, 0, <#initializer#>);
+//            {Vector2(4.f, 0.f), Vector2(-4.f, 0.f)}), 0, 0, 0, 0, 0, 0, 0, 0,
+//            <#initializer#>);
 //}
 //
-//TEST_F(HRVOTest, 1_robot_moving_in_square)
+// TEST_F(HRVOTest, 1_robot_moving_in_square)
 //{
 //    simulator.addHRVOAgent(
 //            Vector2(-4.f, -4.f),
 //            simulator.addGoalPositions({Vector2(4.f, -4.f), Vector2(4.f, 4.f),
-//                                        Vector2(-4.f, 4.f), Vector2(-4.f, -4.f)}), 0, 0, 0, 0, 0, 0, 0, 0,
+//                                        Vector2(-4.f, 4.f), Vector2(-4.f, -4.f)}), 0, 0,
+//                                        0, 0, 0, 0, 0, 0,
 //            <#initializer#>);
 //}
 //
-//TEST_F(HRVOTest, 1_robot_moving_in_square_with_final_speed)
+// TEST_F(HRVOTest, 1_robot_moving_in_square_with_final_speed)
 //{
 //    simulator.addHRVOAgent(Vector2(-4.f, -4.f), simulator.addGoalPositions(
 //            {Vector2(4.f, -4.f), Vector2(4.f, 4.f),

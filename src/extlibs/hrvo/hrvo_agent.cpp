@@ -44,9 +44,9 @@
 HRVOAgent::HRVOAgent(Simulator *simulator, const Vector2 &position, std::size_t goalNo,
                      float neighborDist, std::size_t maxNeighbors, float radius,
                      const Vector2 &velocity, float maxAccel, float goalRadius,
-                     float prefSpeed, float maxSpeed,
-                     float uncertaintyOffset)
-    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, goalNo, goalRadius),
+                     float prefSpeed, float maxSpeed, float uncertaintyOffset)
+    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, goalNo,
+            goalRadius),
       maxNeighbors_(maxNeighbors),
       neighborDist_(neighborDist),
       prefSpeed_(prefSpeed),
@@ -72,7 +72,7 @@ void HRVOAgent::computeNewVelocity()
 
     for (const auto &neighbor : neighbors_)
     {
-        const std::unique_ptr<Agent>& other = simulator_->agents_[neighbor.second];
+        const std::unique_ptr<Agent> &other = simulator_->agents_[neighbor.second];
 
         if (absSq(other->position_ - position_) > std::pow(other->radius_ + radius_, 2))
         {
@@ -407,10 +407,10 @@ void HRVOAgent::computePreferredVelocity()
 
     // TODO (#2374): Update so we have the same logic for when the robot is accelerating
     // https://github.com/UBC-Thunderbots/Software/issues/2374
-    std::unique_ptr<Goal>& nextGoal = simulator_->goals_[goalNo_];
-    Vector2 goalPosition     = nextGoal->getCurrentGoalPosition();
-    float speedAtGoal        = nextGoal->getDesiredSpeedAtCurrentGoal();
-    Vector2 distVectorToGoal = goalPosition - position_;
+    std::unique_ptr<Goal> &nextGoal = simulator_->goals_[goalNo_];
+    Vector2 goalPosition            = nextGoal->getCurrentGoalPosition();
+    float speedAtGoal               = nextGoal->getDesiredSpeedAtCurrentGoal();
+    Vector2 distVectorToGoal        = goalPosition - position_;
     auto distToGoal = static_cast<float>(std::sqrt(std::pow(distVectorToGoal.getX(), 2) +
                                                    std::pow(distVectorToGoal.getY(), 2)));
     // d = (Vf^2 - Vi^2) / 2a
@@ -433,7 +433,7 @@ void HRVOAgent::computePreferredVelocity()
 
 void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
 {
-    const std::unique_ptr<Agent>& other = simulator_->agents_[agentNo];
+    const std::unique_ptr<Agent> &other = simulator_->agents_[agentNo];
 
     if (this != other.get())
     {

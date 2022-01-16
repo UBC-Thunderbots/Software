@@ -102,7 +102,7 @@ class HRVOAgent : public Agent
      */
     class Candidate
     {
-    public:
+       public:
         Candidate() : velocityObstacle1_(0), velocityObstacle2_(0) {}
 
         // The position of the candidate point.
@@ -120,7 +120,7 @@ class HRVOAgent : public Agent
      */
     class VelocityObstacle
     {
-    public:
+       public:
         VelocityObstacle() {}
 
         // The position of the apex of the hybrid reciprocal velocity obstacle.
