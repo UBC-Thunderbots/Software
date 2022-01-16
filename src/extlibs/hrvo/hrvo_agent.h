@@ -78,7 +78,7 @@ class HRVOAgent : public Agent
     void computeNewVelocity() override;
 
     /**
-     * Computes the neighbors of this agent.
+     * Computes the maxNeighbors nearest neighbors of this agent.
      */
     void computeNeighbors();
 
