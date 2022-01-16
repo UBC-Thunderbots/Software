@@ -21,7 +21,6 @@ bool ExamplePlay::invariantHolds(const World &world) const
 
 void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
-    // Create MoveTactics that will loop forever
     std::vector<std::shared_ptr<MoveTactic>> move_tactics(DIV_A_NUM_ROBOTS);
     std::generate(move_tactics.begin(), move_tactics.end(),
                   []() { return std::make_shared<MoveTactic>(); });

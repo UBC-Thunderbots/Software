@@ -14,8 +14,7 @@ class StopTactic : public Tactic
     /**
      * Creates a new StopTactic
      t
-     * @param loop_forever Whether or not this Tactic should never complete. If true, the
-     * tactic will be restarted every time it completes
+     * @param coast whether the robot should coast once it's stopped
      */
     explicit StopTactic(bool coast);
 

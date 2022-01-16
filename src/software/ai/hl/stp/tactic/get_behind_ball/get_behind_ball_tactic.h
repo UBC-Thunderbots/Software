@@ -12,9 +12,6 @@ class GetBehindBallTactic : public Tactic
    public:
     /**
      * Creates a new GetBehindBallTactic
-     *
-     * @param loop_forever Whether or not this Tactic should never complete. If true, the
-     * tactic will be restarted every time it completes
      */
     explicit GetBehindBallTactic();
 
@@ -32,6 +29,7 @@ class GetBehindBallTactic : public Tactic
      *
      * @param robot The robot to evaluate the cost for
      * @param world The state of the world with which to perform the evaluation
+     *
      * @return A cost in the range [0,1] indicating the cost of assigning the given robot
      * to this tactic. Lower cost values indicate a more preferred robot.
      */

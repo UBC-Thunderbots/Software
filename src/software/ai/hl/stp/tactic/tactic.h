@@ -48,10 +48,7 @@ class Tactic
     Tactic() = delete;
 
     /**
-     * Returns true if the Tactic is done and false otherwise. If the Tactic is supposed
-     * to loop forever, this function will always return false.
-     *
-     * Default implementation is when coroutine is done
+     * Returns true if the Tactic is done and false otherwise.
      *
      * @return true if the Tactic is done and false otherwise
      */
@@ -64,6 +61,8 @@ class Tactic
 
     /**
      * Mutable robot hardware capability requirements of the tactic.
+     *
+     * @return the Mutable robot hardware capability requirements of the tactic
      */
     std::set<RobotCapability> &mutableRobotCapabilityRequirements();
 
