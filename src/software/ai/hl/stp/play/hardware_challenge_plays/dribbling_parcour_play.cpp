@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/dribbling_parcour_play.h"
+#include "software/ai/hl/stp/play/hardware_challenge_plays/dribbling_parcour_play.h"
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"

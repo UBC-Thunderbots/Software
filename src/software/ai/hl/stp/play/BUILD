@@ -314,7 +314,6 @@ cc_library(
         ":ball_placement_play",
         ":corner_kick_play",
         ":defense_play",
-        ":dribbling_parcour_play",
         ":enemy_ball_placement_play",
         ":enemy_free_kick_play",
         ":example_play",
@@ -322,14 +321,15 @@ cc_library(
         ":halt_play",
         ":kickoff_enemy_play",
         ":kickoff_friendly_play",
-        ":pass_endurance_play",
         ":penalty_kick_enemy_play",
         ":penalty_kick_play",
-        ":scoring_from_contested_possession_play",
-        ":scoring_with_static_defenders_play",
         ":shoot_or_chip_play",
         ":shoot_or_pass_play",
         ":stop_play",
+        "//software/ai/hl/stp/play/hardware_challenge_plays:dribbling_parcour_play",
+        "//software/ai/hl/stp/play/hardware_challenge_plays:pass_endurance_play",
+        "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_from_contested_possession_play",
+        "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_with_static_defenders_play",
     ],
 )
 
@@ -571,133 +571,6 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:ball_placement_play",
         "//software/simulated_tests:simulated_play_test_fixture",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-cc_library(
-    name = "scoring_with_static_defenders_play",
-    srcs = ["scoring_with_static_defenders_play.cpp"],
-    hdrs = ["scoring_with_static_defenders_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-    ],
-    alwayslink = True,
-)
-
-cc_test(
-    name = "scoring_with_static_defenders_play_test",
-    srcs = ["scoring_with_static_defenders_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:scoring_with_static_defenders_play",
-        "//software/simulated_tests:simulated_play_test_fixture",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-cc_library(
-    name = "scoring_from_contested_possession_play",
-    srcs = ["scoring_from_contested_possession_play.cpp"],
-    hdrs = ["scoring_from_contested_possession_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-    ],
-    alwayslink = True,
-)
-
-cc_test(
-    name = "scoring_from_contested_possession_play_test",
-    srcs = ["scoring_from_contested_possession_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:scoring_from_contested_possession_play",
-        "//software/simulated_tests:simulated_play_test_fixture",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-cc_library(
-    name = "dribbling_parcour_play",
-    srcs = ["dribbling_parcour_play.cpp"],
-    hdrs = ["dribbling_parcour_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-    ],
-    alwayslink = True,
-)
-
-cc_test(
-    name = "dribbling_parcour_play_test",
-    srcs = ["dribbling_parcour_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:dribbling_parcour_play",
-        "//software/simulated_tests:simulated_play_test_fixture",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-cc_library(
-    name = "pass_endurance_play",
-    srcs = ["pass_endurance_play.cpp"],
-    hdrs = ["pass_endurance_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-    ],
-    alwayslink = True,
-)
-
-cc_test(
-    name = "pass_endurance_play_test",
-    srcs = ["pass_endurance_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:pass_endurance_play",
-        "//software/simulated_tests:simulated_play_test_fixture",
-        "//software/simulated_tests/non_terminating_validation_functions",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",

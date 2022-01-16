@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/scoring_from_contested_possession_play.h"
+#include "software/ai/hl/stp/play/hardware_challenge_plays/scoring_from_contested_possession_play.h"
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"

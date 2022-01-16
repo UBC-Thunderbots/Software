@@ -1,29 +1,28 @@
-#include "software/ai/hl/stp/play/scoring_with_static_defenders_play.h"
+#include "software/ai/hl/stp/play/hardware_challenge_plays/pass_endurance_play.h"
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-ScoringWithStaticDefendersPlay::ScoringWithStaticDefendersPlay(
-    std::shared_ptr<const PlayConfig> config)
+PassEndurancePlay::PassEndurancePlay(std::shared_ptr<const PlayConfig> config)
     : Play(config, false)
 {
 }
 
-bool ScoringWithStaticDefendersPlay::isApplicable(const World &world) const
+bool PassEndurancePlay::isApplicable(const World &world) const
 {
     // This play is never applicable so it will never be chosen during gameplay
     // This play can be run for hardware challenges by using the Play override
     return false;
 }
 
-bool ScoringWithStaticDefendersPlay::invariantHolds(const World &world) const
+bool PassEndurancePlay::invariantHolds(const World &world) const
 {
     return false;
 }
 
-void ScoringWithStaticDefendersPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                                    const World &world)
+void PassEndurancePlay::getNextTactics(TacticCoroutine::push_type &yield,
+                                       const World &world)
 {
     std::vector<std::shared_ptr<MoveTactic>> move_tactics(NUM_ROBOTS);
     std::generate(move_tactics.begin(), move_tactics.end(),
@@ -32,21 +31,10 @@ void ScoringWithStaticDefendersPlay::getNextTactics(TacticCoroutine::push_type &
     do
     {
         TacticVector result = {};
-        if (world.gameState().isStopped())
+        if (world.gameState().isPlaying())
         {
-            // line up along center line
-            int initial_offset = static_cast<int>(-move_tactics.size() / 2 + 1);
-            for (size_t k = 0; k < move_tactics.size(); k++)
-            {
-                auto next_position = Point(
-                    world.field().centerPoint().x(),
-                    (initial_offset + static_cast<int>(k)) * 4 * ROBOT_MAX_RADIUS_METERS);
-                move_tactics[k]->updateControlParams(next_position, Angle::zero(), 0);
-            }
-        }
-        else if (world.gameState().isOurFreeKick())
-        {
-            // TODO (#2106): replace this example play with an actual implementation
+            // TODO (#2109): replace this example play with an actual implementation of
+            // pass endurance
 
             // The angle between each robot spaced out in a circle around the ball
             Angle angle_between_robots =
@@ -62,11 +50,22 @@ void ScoringWithStaticDefendersPlay::getNextTactics(TacticCoroutine::push_type &
                     0);
             }
         }
+        else
+        {
+            // line up along center line
+            int initial_offset = static_cast<int>(-move_tactics.size() / 2 + 1);
+            for (size_t k = 0; k < move_tactics.size(); k++)
+            {
+                auto next_position = Point(
+                    world.field().centerPoint().x(),
+                    (initial_offset + static_cast<int>(k)) * 4 * ROBOT_MAX_RADIUS_METERS);
+                move_tactics[k]->updateControlParams(next_position, Angle::zero(), 0);
+            }
+        }
         result.insert(result.end(), move_tactics.begin(), move_tactics.end());
-        yield({result});
+        yield({{result}});
     } while (true);
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ScoringWithStaticDefendersPlay, PlayConfig>
-    factory;
+static TGenericFactory<std::string, Play, PassEndurancePlay, PlayConfig> factory;
