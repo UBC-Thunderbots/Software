@@ -64,14 +64,16 @@ void Simulator::updateWorld(const World &world)
 
     for (const Robot &enemy_robot : world.enemyTeam().getAllRobots())
     {
-        // TODO: add a goal that makes sense. Goal Vector2 should probably a parameter. In
-        // update World we should compute a valid point given field/defense box with current
-        // velocity direction if collide with friendly/enemy_defense_area, use that point,
-        // else, use point which collides with field_lines
         Segment segment(enemy_robot.position(), enemy_robot.position() + enemy_robot.velocity() * 100);
-        std::unordered_set<Point> interception_points = intersection(world.field().fieldLines(), segment);
-        Vector2 goal_position(static_cast<float>(interception_points.begin()->x()),
-                              static_cast<float>(interception_points.begin()->y()));
+
+        std::unordered_set<Point> intersection_point_set = intersection(world.field().friendlyDefenseArea(), segment);
+        if (intersection_point_set.empty())
+        {
+            // Guaranteed to have an intersection if robot is inside field
+            intersection_point_set = intersection(world.field().fieldLines(), segment);
+        }
+        Vector2 goal_position(static_cast<float>(intersection_point_set.begin()->x()),
+                              static_cast<float>(intersection_point_set.begin()->y()));
         addLinearVelocityRobotAgent(enemy_robot, goal_position);
     }
 
