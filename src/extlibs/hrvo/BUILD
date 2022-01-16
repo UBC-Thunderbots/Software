@@ -16,14 +16,18 @@ cc_library(
     srcs = [
         "agent.cpp",
         "goal.cpp",
+        "hrvo_agent.cpp",
         "kd_tree.cpp",
+        "linear_velocity_agent.cpp",
         "simulator.cpp",
         "vector2.cpp",
     ],
     hdrs = [
         "agent.h",
         "goal.h",
+        "hrvo_agent.h",
         "kd_tree.h",
+        "linear_velocity_agent.h",
         "simulator.h",
         "vector2.h",
     ],

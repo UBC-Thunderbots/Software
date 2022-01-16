@@ -48,44 +48,7 @@
  */
 class HRVOAgent : public Agent
 {
-   private:
-    /**
-     * A candidate point.
-     */
-    class Candidate
-    {
-       public:
-        Candidate() : velocityObstacle1_(0), velocityObstacle2_(0) {}
-
-        // The position of the candidate point.
-        Vector2 position_;
-
-        // The number of the first velocity obstacle.
-        int velocityObstacle1_;
-
-        // The number of the second velocity obstacle.
-        int velocityObstacle2_;
-    };
-
-    /**
-     * A hybrid reciprocal velocity obstacle.
-     */
-    class VelocityObstacle
-    {
-       public:
-        VelocityObstacle() {}
-
-        // The position of the apex of the hybrid reciprocal velocity obstacle.
-        Vector2 apex_;
-
-        // The direction of the first side of the hybrid reciprocal velocity obstacle.
-        Vector2 side1_;
-
-        // The direction of the second side of the hybrid reciprocal velocity obstacle.
-        Vector2 side2_;
-    };
-
-
+   public:
     /**
      * Constructor
      *
@@ -117,12 +80,13 @@ class HRVOAgent : public Agent
      * @param uncertaintyOffset  The uncertainty offset of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
      * @param velocity           The initial velocity of this agent.
-     * @param orientation        The initial orientation (in radians) of this agent.
      */
     HRVOAgent(Simulator *simulator, const Vector2 &position, std::size_t goalNo,
               float neighborDist, std::size_t maxNeighbors, float radius,
               const Vector2 &velocity, float maxAccel, float goalRadius, float prefSpeed,
-              float maxSpeed, float orientation, float uncertaintyOffset);
+              float maxSpeed, float uncertaintyOffset);
+
+    ~HRVOAgent() override = default;
 
     /**
      * Computes the new velocity of this agent.
@@ -147,6 +111,44 @@ class HRVOAgent : public Agent
      */
     void insertNeighbor(std::size_t agentNo, float &rangeSq);
 
+
+   private:
+    /**
+     * A candidate point.
+     */
+    class Candidate
+    {
+    public:
+        Candidate() : velocityObstacle1_(0), velocityObstacle2_(0) {}
+
+        // The position of the candidate point.
+        Vector2 position_;
+
+        // The number of the first velocity obstacle.
+        int velocityObstacle1_;
+
+        // The number of the second velocity obstacle.
+        int velocityObstacle2_;
+    };
+
+    /**
+     * A hybrid reciprocal velocity obstacle.
+     */
+    class VelocityObstacle
+    {
+    public:
+        VelocityObstacle() {}
+
+        // The position of the apex of the hybrid reciprocal velocity obstacle.
+        Vector2 apex_;
+
+        // The direction of the first side of the hybrid reciprocal velocity obstacle.
+        Vector2 side1_;
+
+        // The direction of the second side of the hybrid reciprocal velocity obstacle.
+        Vector2 side2_;
+    };
+
    public:  // A
     float prefSpeed_;
     Vector2 prefVelocity_;
@@ -154,7 +156,7 @@ class HRVOAgent : public Agent
     float neighborDist_;
     float uncertaintyOffset_;
     std::multimap<float, Candidate> candidates_;
-    // float -> Agent Index
+    // distance -> Agent Index
     std::set<std::pair<float, std::size_t>> neighbors_;
     std::vector<VelocityObstacle> velocityObstacles_;
 

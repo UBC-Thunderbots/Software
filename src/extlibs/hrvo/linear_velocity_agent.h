@@ -9,7 +9,7 @@
  */
 class LinearVelocityAgent : public Agent
 {
-   private:
+   public:
     /**
      * Constructor
      *
@@ -24,6 +24,8 @@ class LinearVelocityAgent : public Agent
     LinearVelocityAgent(Simulator *simulator, const Vector2 &position, float radius, const Vector2 &velocity,
                         float maxSpeed, float maxAccel, std::size_t goalNo,
                         float goalRadius);
+
+    ~LinearVelocityAgent() override = default;
 
     /**
      * Computes the new velocity of this agent.

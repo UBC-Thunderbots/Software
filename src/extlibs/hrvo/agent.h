@@ -12,19 +12,14 @@ class Agent
     /**
      * Constructor
      *
-     * @param position           The starting position of this agent.
-     * @param radius             The radius of this agent.
-     * @param velocity           The initial velocity of this agent.
-     * @param maxSpeed           The maximum speed of this agent.
-     * @param maxAccel           The maximum acceleration of this agent.
-     * @param goalNo             The goal number of this agent.
-     * @param goalRadius         The goal radius of this agent.
+     * @param simulator  The simulator which this agent is a part of
      */
     explicit Agent(Simulator *simulator); // TODO: Might be able to remove this constructor as the init values dont really make sense
 
     /**
      * Constructor
      *
+     * @param simulator          The simulator which this agent is a part of
      * @param position           The starting position of this agent.
      * @param radius             The radius of this agent.
      * @param velocity           The initial velocity of this agent.
@@ -83,6 +78,7 @@ class Agent
     float radius_;
 
     Vector2 velocity_;
+//    Vector2 prefVelocity_; // TODO: Add this
     Vector2 newVelocity_;
     float maxSpeed_;
     float maxAccel_;

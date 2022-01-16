@@ -61,7 +61,7 @@ HRVOAgent::HRVOAgent(Simulator *simulator, const Vector2 &position, std::size_t 
 HRVOAgent::HRVOAgent(Simulator *simulator, const Vector2 &position, std::size_t goalNo,
                      float neighborDist, std::size_t maxNeighbors, float radius,
                      const Vector2 &velocity, float maxAccel, float goalRadius,
-                     float prefSpeed, float maxSpeed, float orientation, // TODO: Remove orientation
+                     float prefSpeed, float maxSpeed,
                      float uncertaintyOffset)
     : Agent(simulator, position, radius, velocity, maxSpeed, maxAccel, goalNo, goalRadius),
       maxNeighbors_(maxNeighbors),
@@ -89,7 +89,7 @@ void HRVOAgent::computeNewVelocity()
 
     for (const auto &neighbor : neighbors_)
     {
-        const Agent *const other = simulator_->agents_[neighbor.second];
+        const std::unique_ptr<Agent>& other = simulator_->agents_[neighbor.second];
 
         if (absSq(other->position_ - position_) > std::pow(other->radius_ + radius_, 2))
         {
@@ -450,9 +450,9 @@ void HRVOAgent::computePreferredVelocity()
 
 void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
 {
-    const Agent *const other = simulator_->agents_[agentNo];
+    const std::unique_ptr<Agent>& other = simulator_->agents_[agentNo];
 
-    if (this != other)
+    if (this != other.get())
     {
         const float distSq = absSq(position_ - other->position_);
 
