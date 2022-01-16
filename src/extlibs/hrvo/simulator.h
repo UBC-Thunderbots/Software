@@ -45,12 +45,21 @@
 class Simulator
 {
    public:
-    Simulator();
+    explicit Simulator(float time_step);
     ~Simulator() = default;
 
     void updateWorld(const World& world);
 
     void updatePrimitiveSet(const TbotsProto::PrimitiveSet& primitive_set);
+
+    /**
+     *      Adds a new agent to the simulation based on Robot.
+     *
+     * @param Robot    The robot which this agent should be based on
+     * @param velocity The number of neighboring agents which the HRVO algorithm should consider when calculating new velocity
+     * @return    The number of the agent.
+     */
+    std::size_t addHRVORobotAgent(const Robot &robot, int max_neighbors = 10);
 
     /**
      *      Adds a new agent to the simulation.
@@ -66,15 +75,11 @@ class Simulator
      * @param uncertaintyOffset  The uncertainty offset of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
      * @param velocity           The initial velocity of this agent.
-     * @param orientation        The initial orientation (in radians) of this agent.
      * @return    The number of the agent.
      */
-    std::size_t addAgent(const Vector2 &position, std::size_t goalNo, float neighborDist,
-                         std::size_t maxNeighbors, float radius, float goalRadius,
-                         float prefSpeed, float maxSpeed, float uncertaintyOffset = 0.0f,
-                         float maxAccel          = std::numeric_limits<float>::infinity(),
-                         const Vector2 &velocity = Vector2(0.0f, 0.0f),
-                         float orientation       = 0.0f);
+    std::size_t addHRVOAgent(const Vector2 &position, std::size_t goalNo, float neighborDist, std::size_t maxNeighbors,
+                             float radius, float goalRadius, float prefSpeed, float maxSpeed, float uncertaintyOffset,
+                             float maxAccel, const Vector2 &velocity);
 
     /**
      *      Adds a new goal to the simulation.
@@ -305,9 +310,11 @@ class Simulator
 
     TbotsProto::PrimitiveSet primitive_set_;
     // robot id to agent index
-    std::map<unsigned int, unsigned int> robot_id_map;
+    std::map<unsigned int, unsigned int> friendly_robot_id_map;
 
     friend class Agent;
     friend class Goal;
     friend class KdTree;
+
+    void addLinearVelocityRobotAgent(const Robot &enemy_robot);
 };

@@ -25,7 +25,7 @@ class LinearVelocityAgent : public Agent
                         float maxSpeed, float maxAccel, std::size_t goalNo,
                         float goalRadius);
 
-    ~LinearVelocityAgent() override = default;
+    virtual ~LinearVelocityAgent() override = default;
 
     /**
      * Computes the new velocity of this agent.

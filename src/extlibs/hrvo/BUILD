@@ -33,6 +33,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//proto/primitive:primitive_msg_factory",
         "//software/world",
     ],
 )

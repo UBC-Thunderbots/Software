@@ -70,7 +70,7 @@ class HRVOAgent : public Agent
               const Vector2 &velocity, float maxAccel, float goalRadius, float prefSpeed,
               float maxSpeed, float uncertaintyOffset);
 
-    ~HRVOAgent() override = default;
+    virtual ~HRVOAgent() override = default;
 
     /**
      * Computes the new velocity of this agent.

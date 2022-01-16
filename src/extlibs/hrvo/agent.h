@@ -27,7 +27,7 @@ class Agent
           const Vector2 &velocity, const Vector2 &prefVelocity, float maxSpeed, float maxAccel, std::size_t goalNo,
           float goalRadius);
 
-    virtual ~Agent() = 0;
+    virtual ~Agent() = default;
 
     /**
      * Computes the new velocity of this agent.
