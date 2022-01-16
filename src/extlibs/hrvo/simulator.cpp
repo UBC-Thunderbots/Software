@@ -39,6 +39,7 @@
 #include "extlibs/hrvo/hrvo_agent.h"
 #include "extlibs/hrvo/kd_tree.h"
 #include "extlibs/hrvo/linear_velocity_agent.h"
+#include "software/geom/algorithms/intersection.h"
 
 Simulator::Simulator(float time_step)
     : globalTime_(0.0f),
@@ -63,7 +64,15 @@ void Simulator::updateWorld(const World &world)
 
     for (const Robot &enemy_robot : world.enemyTeam().getAllRobots())
     {
-        addLinearVelocityRobotAgent(enemy_robot);
+        // TODO: add a goal that makes sense. Goal Vector2 should probably a parameter. In
+        // update World we should compute a valid point given field/defense box with current
+        // velocity direction if collide with friendly/enemy_defense_area, use that point,
+        // else, use point which collides with field_lines
+        Segment segment(enemy_robot.position(), enemy_robot.position() + enemy_robot.velocity() * 100);
+        std::unordered_set<Point> interception_points = intersection(world.field().fieldLines(), segment);
+        Vector2 goal_position(static_cast<float>(interception_points.begin()->x()),
+                              static_cast<float>(interception_points.begin()->y()));
+        addLinearVelocityRobotAgent(enemy_robot, goal_position);
     }
 
     // TODO: If Ball is an obstacle, add ball as an Agent aswell
@@ -103,19 +112,13 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
     return agents_.size() - 1;
 }
 
-std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot)
+std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot, const Vector2 &destination)
 {
     // TODO (#2371): Replace Vector2 with Vector
     Vector2 position(static_cast<float>(robot.position().x()),
                      static_cast<float>(robot.position().y()));
     Vector2 velocity(static_cast<float>(robot.velocity().x()),
                      static_cast<float>(robot.velocity().y()));
-    // TODO: add a goal that makes sense. Goal Vector2 should probably a parameter. In
-    // update World we should compute a valid point given field/defense box with current
-    // velocity direction if collide with friendly/enemy_defense_area, use that point,
-    // else, use point which collides with field_lines
-    Vector2 goal_position(static_cast<float>(robot.position().x() + 5.0),
-                          static_cast<float>(robot.position().y() + 3.0));
     float max_accel = robot.robotConstants().robot_max_acceleration_m_per_s_2;
     float max_speed = robot.robotConstants().robot_max_speed_m_per_s;
     // Max distance which the robot can travel in one time step + 5% tolerance
@@ -123,7 +126,7 @@ std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot)
 
     std::unique_ptr<LinearVelocityAgent> agent = std::make_unique<LinearVelocityAgent>(
         this, position, ROBOT_MAX_RADIUS_METERS, velocity, max_speed, max_accel,
-        addGoal(goal_position), goal_radius);
+        addGoal(destination), goal_radius);
 
     agents_.push_back(std::move(agent));
     return agents_.size() - 1;
