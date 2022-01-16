@@ -33,6 +33,7 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//software/geom:angle",
         "//software/geom:angular_velocity",
+        "//software/geom:circle",
         "//software/geom:point",
         "//software/geom:polygon",
         "//software/geom:vector",
@@ -46,6 +47,7 @@ cc_test(
     deps = [
         "tbots_geometry",
         "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ],
 )
 
