@@ -39,21 +39,18 @@
 #include "extlibs/hrvo/goal.h"
 #include "extlibs/hrvo/kd_tree.h"
 #include "extlibs/hrvo/vector2.h"
+#include "software/world/world.h"
+#include "proto/tbots_software_msgs.pb.h"
 
 class Simulator
 {
    public:
     Simulator();
-    ~Simulator();
+    ~Simulator() = default;
 
-    /**
-     *      Adds a new agent with default properties to the simulation.
-     *
-     * @param position  The starting position of this agent.
-     * @param goalNo    The goal number of this agent.
-     * @return    The number of the agent.
-     */
-    std::size_t addAgent(const Vector2 &position, std::size_t goalNo);
+    void setWorld(const World& world);
+
+    void setPrimitiveSet(const TbotsProto::PrimitiveSet& primitive_set);
 
     /**
      *      Adds a new agent to the simulation.
@@ -276,27 +273,6 @@ class Simulator
     }
 
     /**
-     *      Sets the default properties for any new agent that is added.
-     *
-     * @param neighborDist       The default maximum neighbor distance of a new agent.
-     * @param maxNeighbors       The default maximum neighbor count of a new agent.
-     * @param radius             The default radius of a new agent.
-     * @param goalRadius         The default goal radius of a new agent.
-     * @param prefSpeed The default preferred speed of a new agent.
-     * @param maxSpeed The default maximum speed of a new agent.
-     * @param uncertaintyOffset  The default uncertainty offset of a new agent.
-     * @param maxAccel           The default maximum acceleration of a new agent.
-     * @param velocity           The default initial velocity of a new agent.
-     * @param orientation        The default initial orientation (in radians) of a new
-     * agent.
-     */
-    void setAgentDefaults(float neighborDist, std::size_t maxNeighbors, float radius,
-                          float goalRadius, float prefSpeed, float maxSpeed,
-                          float uncertaintyOffset = 0.0f,
-                          float maxAccel = std::numeric_limits<float>::infinity(),
-                          const Vector2 &velocity = Vector2(), float orientation = 0.0f);
-
-    /**
      *      Sets the goal number of a specified agent.
      *
      * @param agentNo  The number of the agent whose goal number is to be modified.
@@ -419,14 +395,17 @@ class Simulator
     Simulator &operator=(const Simulator &other);
 
 
-
     Agent *defaults_;
-    KdTree *kdTree_;
+    std::unique_ptr<KdTree> kdTree_;
     float globalTime_;
     float timeStep_;
     bool reachedGoals_;
-    std::vector<Agent *> agents_;
-    std::vector<Goal *> goals_;
+    std::vector<std::unique_ptr<Agent>> agents_;
+    std::vector<std::unique_ptr<Goal>> goals_; // won't be one to one since not all agents will have a goal
+
+    TbotsProto::PrimitiveSet primitive_set_;
+    // robot id to agent index
+    std::map<unsigned int, unsigned int> robot_id_map;
 
     friend class Agent;
     friend class Goal;

@@ -42,7 +42,7 @@ class Simulator;
  */
 class Goal
 {
-   private:
+   public:
     /**
      * @param position  The position of this goal.
      */
@@ -62,7 +62,7 @@ class Goal
      */
     explicit Goal(std::vector<Vector2> positions, std::vector<float> speedAtPostition);
 
-   public:
+public:
     Vector2 position_;
     // Goal positions and speeds in the same order
     std::vector<Vector2> positions_;

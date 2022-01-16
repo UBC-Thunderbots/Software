@@ -92,6 +92,7 @@ class KdTree
     // The maximum leaf size of a k-D tree.
     static const std::size_t HRVO_MAX_LEAF_SIZE = 10;
 
+public:
     /**
      * Constructor
      *
@@ -133,6 +134,7 @@ class KdTree
      */
     void queryRecursive(Agent *agent, float &rangeSq, std::size_t node) const;
 
+private:
     Simulator *const simulator_;
     std::vector<std::size_t> agents_;
     std::vector<Node> nodes_;
