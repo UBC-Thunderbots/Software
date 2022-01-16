@@ -1,29 +1,18 @@
 #include "agent.h"
 
+#include "extlibs/hrvo/simulator.h"
 
-Agent::Agent(Simulator *simulator, const Vector2 &position, float radius, const Vector2 &velocity, float maxSpeed,
+Agent::Agent(Simulator *simulator, const Vector2 &position, float radius, const Vector2 &velocity, const Vector2 &prefVelocity, float maxSpeed,
              float maxAccel, std::size_t goalNo, float goalRadius)
         : simulator_(simulator),
           position_(position),
           radius_(radius),
           velocity_(velocity),
+          prefVelocity_(prefVelocity),
           maxSpeed_(maxSpeed),
           maxAccel_(maxAccel),
           goalNo_(goalNo),
           goalRadius_(goalRadius),
-          reachedGoal_(false)
-{
-}
-
-Agent::Agent(Simulator *simulator)
-        : simulator_(simulator),
-          position_(Vector2(0.f, 0.f)),
-          radius_(0.f),
-          velocity_(Vector2(0.f, 0.f)),
-          maxSpeed_(0.f),
-          maxAccel_(0.f),
-          goalNo_(0),
-          goalRadius_(0.f),
           reachedGoal_(false)
 {
 }

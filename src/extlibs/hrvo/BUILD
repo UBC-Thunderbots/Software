@@ -32,4 +32,7 @@ cc_library(
         "vector2.h",
     ],
     visibility = ["//visibility:public"],
+    deps = [
+        "//software/world",
+    ],
 )

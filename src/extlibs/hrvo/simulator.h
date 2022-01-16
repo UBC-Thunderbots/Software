@@ -48,9 +48,9 @@ class Simulator
     Simulator();
     ~Simulator() = default;
 
-    void setWorld(const World& world);
+    void updateWorld(const World& world);
 
-    void setPrimitiveSet(const TbotsProto::PrimitiveSet& primitive_set);
+    void updatePrimitiveSet(const TbotsProto::PrimitiveSet& primitive_set);
 
     /**
      *      Adds a new agent to the simulation.
@@ -121,40 +121,6 @@ class Simulator
     float getAgentMaxAccel(std::size_t agentNo) const;
 
     /**
-     *      Returns the maximum neighbor count of a specified agent.
-     *
-     * @param agentNo  The number of the agent whose maximum neighbor count is to be
-     * retrieved.
-     * @return    The present maximum neighbor count of the agent.
-     */
-    std::size_t getAgentMaxNeighbors(std::size_t agentNo) const;
-
-    /**
-     *      Returns the maximum speed of a specified agent.
-     *
-     * @param agentNo  The number of the agent whose maximum speed is to be retrieved.
-     * @return    The present maximum speed of the agent.
-     */
-    float getAgentMaxSpeed(std::size_t agentNo) const;
-
-    /**
-     *      Returns the maximum neighbor distance of a specified agent.
-     *
-     * @param agentNo  The number of the agent whose maximum neighbor distance is to
-     * be retrieved.
-     * @return    The present maximum neighbor distance of the agent.
-     */
-    float getAgentNeighborDist(std::size_t agentNo) const;
-
-    /**
-     *      Returns the orientation of a specified agent.
-     *
-     * @param agentNo  The number of the agent whose orientation is to be retrieved.
-     * @return    The present orientation (in radians) of the agent.
-     */
-    float getAgentOrientation(std::size_t agentNo) const;
-
-    /**
      *      Returns the position of a specified agent.
      *
      * @param agentNo  The number of the agent whose position is to be retrieved.
@@ -163,17 +129,15 @@ class Simulator
     Vector2 getAgentPosition(std::size_t agentNo) const;
 
     /**
-     *      Returns the preferred speed of a specified agent.
+     *      Returns the preferred velocity of a specified agent.
      *
      * The preferred speed of an agent is the speed it would choose
      * to take if it were not influenced by other agents.
      *
-     * @param agentNo  The number of the agent whose preferred speed is to be
+     * @param agentNo  The number of the agent whose preferred velocity is to be
      * retrieved.
-     * @return    The present preferred speed of the agent.
+     * @return    The present preferred velocity of the agent.
      */
-    float getAgentPrefSpeed(std::size_t agentNo) const;
-
     Vector2 getAgentPrefVelocity(std::size_t agentNo) const;
 
     /**
@@ -192,19 +156,6 @@ class Simulator
      * @return    True if the agent has reached its goal; false otherwise.
      */
     bool getAgentReachedGoal(std::size_t agentNo) const;
-
-    /**
-     *      Returns the "uncertainty offset" of a specified agent.
-     *
-     * The uncertainty offset is the amount velocity obstacles are
-     *             widened to allow for uncertainty in the position and velocity
-     *             of a differential drive agent.
-     *
-     * @param agentNo  The number of the agent whose uncertainty offset is to be
-     * retrieved.
-     * @return    The present uncertainty offset of the agent.
-     */
-    float getAgentUncertaintyOffset(std::size_t agentNo) const;
 
     /**
      *      Returns the velocity of a specified agent.
@@ -299,38 +250,12 @@ class Simulator
     void setAgentMaxAccel(std::size_t agentNo, float maxAccel);
 
     /**
-     *      Sets the maximum neighbor count of a specified agent.
-     *
-     * @param agentNo       The number of the agent whose maximum neighbor count is to be
-     * modified.
-     * @param maxNeighbors  The replacement maximum neighbor count.
-     */
-    void setAgentMaxNeighbors(std::size_t agentNo, std::size_t maxNeighbors);
-
-    /**
      *      Sets the maximum speed of a specified agent.
      *
      * @param agentNo   The number of the agent whose maximum speed is to be modified.
      * @param maxSpeed  The replacement maximum speed.
      */
     void setAgentMaxSpeed(std::size_t agentNo, float maxSpeed);
-
-    /**
-     *      Sets the maximum neighbor distance of a specified agent.
-     *
-     * @param agentNo       The number of the agent whose maximum neighbor distance is to
-     * be modified.
-     * @param neighborDist  The replacement maximum neighbor distance.
-     */
-    void setAgentNeighborDist(std::size_t agentNo, float neighborDist);
-
-    /**
-     *      Sets the orientation of a specified agent.
-     *
-     * @param agentNo      The number of the agent whose orientation is to be modified.
-     * @param orientation  The replacement orientation (in radians).
-     */
-    void setAgentOrientation(std::size_t agentNo, float orientation);
 
     /**
      *      Sets the position of a specified agent.
@@ -340,36 +265,12 @@ class Simulator
     void setAgentPosition(std::size_t agentNo, const Vector2 &position);
 
     /**
-     *      Sets the preferred speed of a specified agent.
-     *
-     * The preferred speed of an agent is the speed it would choose
-     *             to take if it were not influenced by other agents.
-     *
-     * @param agentNo    The number of the agent whose preferred speed is to be modified.
-     * @param prefSpeed  The replacement preferred speed.
-     */
-    void setAgentPrefSpeed(std::size_t agentNo, float prefSpeed);
-
-    /**
      *      Sets the radius of a specified agent.
      *
      * @param agentNo  The number of the agent whose radius is to be modified.
      * @param radius   The replacement radius.
      */
     void setAgentRadius(std::size_t agentNo, float radius);
-
-    /**
-     *      Sets the "uncertainty offset" of a specified agent.
-     *
-     * The uncertainty offset is the amount velocity obstacles ar
-     *             widened to allow for uncertainty in the position and velocity
-     *             of a differential drive agent.
-     *
-     * @param agentNo            The number of the agent whose uncertainty offset is to be
-     * modified.
-     * @param uncertaintyOffset  The replacement uncertainty offset.
-     */
-    void setAgentUncertaintyOffset(std::size_t agentNo, float uncertaintyOffset);
 
     /**
      *      Sets the velocity of a specified agent.
@@ -395,7 +296,6 @@ class Simulator
     Simulator &operator=(const Simulator &other);
 
 
-    Agent *defaults_;
     std::unique_ptr<KdTree> kdTree_;
     float globalTime_;
     float timeStep_;

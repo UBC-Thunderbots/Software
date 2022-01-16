@@ -35,7 +35,7 @@
 #include <algorithm>
 #include <limits>
 
-#include "extlibs/hrvo/agent.h"
+#include "extlibs/hrvo/hrvo_agent.h"
 #include "extlibs/hrvo/simulator.h"
 
 KdTree::KdTree(Simulator *simulator) : simulator_(simulator) {}
@@ -141,7 +141,7 @@ void KdTree::buildRecursive(std::size_t begin, std::size_t end, std::size_t node
     }
 }
 
-void KdTree::queryRecursive(Agent *agent, float &rangeSq, std::size_t node) const
+void KdTree::queryRecursive(HRVOAgent *agent, float &rangeSq, std::size_t node) const
 {
     if (nodes_[node].end_ - nodes_[node].begin_ <= HRVO_MAX_LEAF_SIZE)
     {

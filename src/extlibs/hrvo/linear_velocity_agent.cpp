@@ -4,7 +4,7 @@ LinearVelocityAgent::LinearVelocityAgent(Simulator *simulator, const Vector2 &po
                                          const Vector2 &velocity, float maxSpeed,
                                          float maxAccel, std::size_t goalNo,
                                          float goalRadius)
-    : Agent(simulator, position, radius, velocity, maxSpeed, maxAccel, goalNo, goalRadius)
+    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, goalNo, goalRadius)
 {
 }
 

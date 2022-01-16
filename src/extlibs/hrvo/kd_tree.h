@@ -37,7 +37,7 @@
 
 #include "extlibs/hrvo/vector2.h"
 
-class Agent;
+class HRVOAgent;
 class Simulator;
 
 /**
@@ -120,7 +120,7 @@ public:
      * @param agent    A pointer to the agent for which neighbors are to be computed.
      * @param rangeSq  The squared range around the agent.
      */
-    void query(Agent *agent, float rangeSq) const
+    void query(HRVOAgent *agent, float rangeSq) const
     {
         queryRecursive(agent, rangeSq, 0);
     }
@@ -132,13 +132,13 @@ public:
      * @param rangeSq  The squared range around the agent.
      * @param node     The current k-D tree node.
      */
-    void queryRecursive(Agent *agent, float &rangeSq, std::size_t node) const;
+    void queryRecursive(HRVOAgent *agent, float &rangeSq, std::size_t node) const;
 
 private:
     Simulator *const simulator_;
     std::vector<std::size_t> agents_;
     std::vector<Node> nodes_;
 
-    friend class Agent;
+    friend class HRVOAgent;
     friend class Simulator;
 };

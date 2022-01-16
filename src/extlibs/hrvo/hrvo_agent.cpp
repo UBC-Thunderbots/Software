@@ -40,34 +40,17 @@
 #include "goal.h"
 #include "kd_tree.h"
 
-HRVOAgent::HRVOAgent(Simulator *simulator)
-    : Agent(simulator),
-      maxNeighbors_(0),
-      neighborDist_(0.0f),
-      prefSpeed_(0.0f),
-      uncertaintyOffset_(0.0f),
-{
-}
-
-HRVOAgent::HRVOAgent(Simulator *simulator, const Vector2 &position, std::size_t goalNo)
-        : Agent(simulator, position, simulator->defaults_->radius_, simulator->defaults_->velocity_, simulator->defaults_->maxSpeed_, simulator->defaults_->maxAccel_, goalNo, simulator->defaults_->goalRadius_),
-      maxNeighbors_(simulator_->defaults_->maxNeighbors_),
-      neighborDist_(simulator_->defaults_->neighborDist_),
-      prefSpeed_(simulator_->defaults_->prefSpeed_),
-      uncertaintyOffset_(simulator_->defaults_->uncertaintyOffset_),
-{
-}
 
 HRVOAgent::HRVOAgent(Simulator *simulator, const Vector2 &position, std::size_t goalNo,
                      float neighborDist, std::size_t maxNeighbors, float radius,
                      const Vector2 &velocity, float maxAccel, float goalRadius,
                      float prefSpeed, float maxSpeed,
                      float uncertaintyOffset)
-    : Agent(simulator, position, radius, velocity, maxSpeed, maxAccel, goalNo, goalRadius),
+    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, goalNo, goalRadius),
       maxNeighbors_(maxNeighbors),
       neighborDist_(neighborDist),
       prefSpeed_(prefSpeed),
-      uncertaintyOffset_(uncertaintyOffset),
+      uncertaintyOffset_(uncertaintyOffset)
 {
 }
 
@@ -381,7 +364,7 @@ void HRVOAgent::computeNewVelocity()
 
     int optimal = -1;
 
-    for (std::pair<float, Candidate> &candidate_pair : candidates_)
+    for (std::pair<float, Candidate> candidate_pair : candidates_)
     {
         candidate  = candidate_pair.second;
         bool valid = true;
@@ -416,7 +399,7 @@ void HRVOAgent::computeNewVelocity()
 
 void HRVOAgent::computePreferredVelocity()
 {
-    if (prefSpeed_ <= 0.1f || maxAccel_ <= 0.1f)
+    if (prefSpeed_ <= 0.01f || maxAccel_ <= 0.01f)
     {
         prefVelocity_ = Vector2(0.f, 0.f);
         return;
@@ -424,7 +407,7 @@ void HRVOAgent::computePreferredVelocity()
 
     // TODO (#2374): Update so we have the same logic for when the robot is accelerating
     // https://github.com/UBC-Thunderbots/Software/issues/2374
-    Goal *nextGoal           = simulator_->goals_[goalNo_];
+    std::unique_ptr<Goal>& nextGoal = simulator_->goals_[goalNo_];
     Vector2 goalPosition     = nextGoal->getCurrentGoalPosition();
     float speedAtGoal        = nextGoal->getDesiredSpeedAtCurrentGoal();
     Vector2 distVectorToGoal = goalPosition - position_;

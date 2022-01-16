@@ -48,7 +48,7 @@ Simulator::Simulator()
 {
 }
 
-void Simulator::setWorld(const World &world)
+void Simulator::updateWorld(const World &world)
 {
     // Reset all agents
     agents_.clear();
@@ -70,18 +70,16 @@ void Simulator::setWorld(const World &world)
         auto& robot_primitives = *primitive_set_.mutable_robot_primitives();
         TbotsProto::Primitive primitive = robot_primitives[friendly_robot.id()];
         TbotsProto::Point destination_point_proto;
+        Vector2 destination_point = position;
         if (primitive.has_move())
         {
             destination_point_proto = primitive.mutable_move()->destination();
+            destination_point = Vector2(static_cast<float>(destination_point_proto.x_meters()), static_cast<float>(destination_point_proto.y_meters()));
         }
-        Vector2 destination_point(static_cast<float>(destination_point_proto.x_meters()), static_cast<float>(destination_point_proto.y_meters()));
 
         std::unique_ptr<HRVOAgent> agent = std::make_unique<HRVOAgent>(this, position, addGoal(destination_point), neighbor_dist, max_neighbors,
                                                ROBOT_MAX_RADIUS_METERS, velocity, max_accel, goal_radius, max_speed,
                                                max_speed, uncertainty_offset);
-//    std::unique_ptr<HRVOAgent> agent = std::make_unique<HRVOAgent>(this, position, goalNo, neighborDist, maxNeighbors,
-//                                                 radius, velocity, maxAccel, goalRadius, prefSpeed,
-//                                                 maxSpeed, orientation, uncertaintyOffset);
         agents_.push_back(std::move(agent));
         robot_id_map.emplace(friendly_robot.id(), agents_.size() - 1);
     }
@@ -107,13 +105,17 @@ void Simulator::setWorld(const World &world)
     // TODO: If Ball is an obstacle, add ball as an Agent aswell
 }
 
-void Simulator::setPrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set)
+void Simulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set)
 {
-    // cache the primitiveSet
     primitive_set_ = primitive_set;
     for (auto& [robot_id, primitive] : primitive_set.robot_primitives())
     {
         // TODO: Update implementation of Primitive to support multiple path points
+        if (!primitive.has_move())
+        {
+            continue;
+        }
+
         auto agent_index_iter = robot_id_map.find(robot_id);
         if (agent_index_iter != robot_id_map.end())
         {
@@ -122,7 +124,8 @@ void Simulator::setPrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set)
             {
                 std::unique_ptr<Goal>& goal = goals_[agents_[agent_index]->goalNo_];
                 goal->positions_.clear();
-                goal->positions_.push_back(Vector2(static_cast<float>(primitive.destination().x_meters()), static_cast<float>(primitive.destination().y_meters())));
+
+                goal->positions_.push_back(Vector2(static_cast<float>(primitive.move().destination().x_meters()), static_cast<float>(primitive.move().destination().y_meters())));
             }
         }
     }
@@ -138,11 +141,7 @@ std::size_t Simulator::addAgent(const Vector2 &position, std::size_t goalNo,
     std::unique_ptr<HRVOAgent> agent = std::make_unique<HRVOAgent>(this, position, goalNo, neighborDist, maxNeighbors,
                                    radius, velocity, maxAccel, goalRadius, prefSpeed,
                                    maxSpeed, uncertaintyOffset);
-//    std::unique_ptr<HRVOAgent> agent = std::make_unique<HRVOAgent>(this, position, goalNo, neighborDist, maxNeighbors,
-//                                                 radius, velocity, maxAccel, goalRadius, prefSpeed,
-//                                                 maxSpeed, orientation, uncertaintyOffset);
-    agents_.push_back(agent);
-
+    agents_.push_back(std::move(agent));
     return agents_.size() - 1;
 }
 
@@ -216,34 +215,9 @@ float Simulator::getAgentMaxAccel(std::size_t agentNo) const
     return agents_[agentNo]->maxAccel_;
 }
 
-std::size_t Simulator::getAgentMaxNeighbors(std::size_t agentNo) const
-{
-    return agents_[agentNo]->maxNeighbors_;
-}
-
-float Simulator::getAgentMaxSpeed(std::size_t agentNo) const
-{
-    return agents_[agentNo]->maxSpeed_;
-}
-
-float Simulator::getAgentNeighborDist(std::size_t agentNo) const
-{
-    return agents_[agentNo]->neighborDist_;
-}
-
-float Simulator::getAgentOrientation(std::size_t agentNo) const
-{
-    return agents_[agentNo]->orientation_;
-}
-
 Vector2 Simulator::getAgentPosition(std::size_t agentNo) const
 {
     return agents_[agentNo]->position_;
-}
-
-float Simulator::getAgentPrefSpeed(std::size_t agentNo) const
-{
-    return agents_[agentNo]->prefSpeed_;
 }
 
 float Simulator::getAgentRadius(std::size_t agentNo) const
@@ -254,11 +228,6 @@ float Simulator::getAgentRadius(std::size_t agentNo) const
 bool Simulator::getAgentReachedGoal(std::size_t agentNo) const
 {
     return agents_[agentNo]->reachedGoal_;
-}
-
-float Simulator::getAgentUncertaintyOffset(std::size_t agentNo) const
-{
-    return agents_[agentNo]->uncertaintyOffset_;
 }
 
 Vector2 Simulator::getAgentVelocity(std::size_t agentNo) const
@@ -291,24 +260,9 @@ void Simulator::setAgentMaxAccel(std::size_t agentNo, float maxAccel)
     agents_[agentNo]->maxAccel_ = maxAccel;
 }
 
-void Simulator::setAgentMaxNeighbors(std::size_t agentNo, std::size_t maxNeighbors)
-{
-    agents_[agentNo]->maxNeighbors_ = maxNeighbors;
-}
-
 void Simulator::setAgentMaxSpeed(std::size_t agentNo, float maxSpeed)
 {
     agents_[agentNo]->maxSpeed_ = maxSpeed;
-}
-
-void Simulator::setAgentNeighborDist(std::size_t agentNo, float neighborDist)
-{
-    agents_[agentNo]->neighborDist_ = neighborDist;
-}
-
-void Simulator::setAgentOrientation(std::size_t agentNo, float orientation)
-{
-    agents_[agentNo]->orientation_ = orientation;
 }
 
 void Simulator::setAgentPosition(std::size_t agentNo, const Vector2 &position)
@@ -316,19 +270,9 @@ void Simulator::setAgentPosition(std::size_t agentNo, const Vector2 &position)
     agents_[agentNo]->position_ = position;
 }
 
-void Simulator::setAgentPrefSpeed(std::size_t agentNo, float prefSpeed)
-{
-    agents_[agentNo]->prefSpeed_ = prefSpeed;
-}
-
 void Simulator::setAgentRadius(std::size_t agentNo, float radius)
 {
     agents_[agentNo]->radius_ = radius;
-}
-
-void Simulator::setAgentUncertaintyOffset(std::size_t agentNo, float uncertaintyOffset)
-{
-    agents_[agentNo]->uncertaintyOffset_ = uncertaintyOffset;
 }
 
 void Simulator::setAgentVelocity(std::size_t agentNo, const Vector2 &velocity)

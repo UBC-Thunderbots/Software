@@ -52,22 +52,6 @@ class HRVOAgent : public Agent
     /**
      * Constructor
      *
-     * @param simulator  The simulation which the Agent is a part of
-     */
-    explicit HRVOAgent(Simulator *simulator);
-
-    /**
-     * Constructor
-     *
-     * @param simulator  The simulation.
-     * @param position   The starting position of this agent.
-     * @param goalNo     The goal number of this agent.
-     */
-    HRVOAgent(Simulator *simulator, const Vector2 &position, std::size_t goalNo);
-
-    /**
-     * Constructor
-     *
      * @param simulator          The simulation.
      * @param position           The starting position of this agent.
      * @param goalNo             The goal number of this agent.
@@ -151,7 +135,6 @@ class HRVOAgent : public Agent
 
    public:  // A
     float prefSpeed_;
-    Vector2 prefVelocity_;
     std::size_t maxNeighbors_;
     float neighborDist_;
     float uncertaintyOffset_;
