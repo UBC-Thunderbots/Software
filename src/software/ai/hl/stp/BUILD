@@ -50,6 +50,8 @@ cc_test(
     deps = [
         ":stp",
         "//shared/test_util:tbots_gtest_main",
+        "//software/ai/hl/stp/play/test_plays:halt_test_play",
+        "//software/ai/hl/stp/play/test_plays:move_test_play",
         "//software/test_util",
         "//software/util/generic_factory",
     ],

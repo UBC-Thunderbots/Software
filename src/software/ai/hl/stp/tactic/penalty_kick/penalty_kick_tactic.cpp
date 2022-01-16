@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
 
 PenaltyKickTactic::PenaltyKickTactic()
-    : Tactic( {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
+    : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
       fsm{DribbleFSM(), PenaltyKickFSM(), GetBehindBallFSM()}
 {
 }

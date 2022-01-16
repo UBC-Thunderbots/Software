@@ -4,8 +4,7 @@
 
 
 ChipTactic::ChipTactic()
-    : Tactic({RobotCapability::Chip, RobotCapability::Move}),
-      fsm{GetBehindBallFSM()}
+    : Tactic({RobotCapability::Chip, RobotCapability::Move}), fsm{GetBehindBallFSM()}
 {
 }
 

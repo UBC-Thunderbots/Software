@@ -3,8 +3,7 @@
 #include <algorithm>
 
 KickTactic::KickTactic()
-    : Tactic({RobotCapability::Kick, RobotCapability::Move}),
-      fsm{GetBehindBallFSM()}
+    : Tactic({RobotCapability::Kick, RobotCapability::Move}), fsm{GetBehindBallFSM()}
 {
 }
 

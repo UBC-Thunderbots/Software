@@ -2,7 +2,10 @@
 
 #include <algorithm>
 
-StopTactic::StopTactic(bool coast) : Tactic(std::set<RobotCapability>()), fsm(StopFSM(coast)) {}
+StopTactic::StopTactic(bool coast)
+    : Tactic(std::set<RobotCapability>()), fsm(StopFSM(coast))
+{
+}
 
 double StopTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {

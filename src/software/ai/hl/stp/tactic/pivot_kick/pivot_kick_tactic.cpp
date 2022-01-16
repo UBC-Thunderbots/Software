@@ -11,7 +11,7 @@
 
 PivotKickTactic::PivotKickTactic()
     : Tactic({RobotCapability::Move, RobotCapability::Kick, RobotCapability::Chip,
-                     RobotCapability::Dribble}),
+              RobotCapability::Dribble}),
       fsm(DribbleFSM()),
       control_params(PivotKickFSM::ControlParams())
 {
