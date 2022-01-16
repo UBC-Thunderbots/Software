@@ -38,10 +38,8 @@ bool CreaseDefensePlay::done() const
     return fsm.is(boost::sml::X);
 }
 
-void CreaseDefensePlay::updateControlParams(
-    const Point &enemy_threat_origin,
-    unsigned int num_additional_crease_defenders_tactics,
-    MaxAllowedSpeedMode max_allowed_speed_mode)
+void CreaseDefensePlay::updateControlParams(const Point &enemy_threat_origin,
+                                            MaxAllowedSpeedMode max_allowed_speed_mode)
 {
     control_params.enemy_threat_origin    = enemy_threat_origin;
     control_params.max_allowed_speed_mode = max_allowed_speed_mode;

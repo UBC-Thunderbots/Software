@@ -101,6 +101,15 @@ class Play
 
     virtual ~Play() = default;
 
+    // TODO (#2359): make pure virtual once all plays are not coroutines
+    /**
+     * Updates the priority tactic vector with new tactics
+     *
+     * @param play_update The PlayUpdate struct that contains all the information for
+     * updating the tactics
+     */
+    virtual void updateTactics(const PlayUpdate& play_update);
+
    protected:
     // TODO (#2359): remove this
     // The Play configuration
@@ -161,9 +170,6 @@ class Play
      */
     virtual void getNextTactics(TacticCoroutine::push_type& yield,
                                 const World& world) = 0;
-
-    // TODO (#2359): make pure virtual once all plays are not coroutines
-    virtual void updateTactics(const PlayUpdate& play_update);
 
     // Whether this plays requires a goalie
     const bool requires_goalie;
