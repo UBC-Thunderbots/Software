@@ -2,6 +2,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <getopt.h>
 #include <limits.h>
 #include <linux/ioctl.h>
@@ -37,6 +38,9 @@ extern "C"
                                       "/dev/spidev0.2", "/dev/spidev0.3",
                                       "/dev/spidev0.4"};
 
+    static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO = "77";
+    static const char* DRIVER_CONTROL_ENABLE_GPIO           = "78";
+
     static MotorService* g_motor_service = NULL;
 
     uint8_t tmc4671_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
@@ -52,7 +56,8 @@ extern "C"
 
 MotorService::MotorService(const RobotConstants_t& robot_constants,
                            const WheelConstants_t& wheel_constants)
-
+    : spi_cs_driver_to_controller_mux_gpio(SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO),
+      driver_control_enable_gpio(DRIVER_CONTROL_ENABLE_GPIO)
 {
     robot_constants_ = robot_constants;
     wheel_constants_ = wheel_constants;
@@ -95,11 +100,12 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     OPEN_SPI_FILE_DESCRIPTOR(front_right, FRONT_RIGHT_MOTOR_CHIP_SELECT)
     OPEN_SPI_FILE_DESCRIPTOR(back_left, BACK_LEFT_MOTOR_CHIP_SELECT)
     OPEN_SPI_FILE_DESCRIPTOR(back_right, BACK_RIGHT_MOTOR_CHIP_SELECT)
+    OPEN_SPI_FILE_DESCRIPTOR(dribbler, DRIBBLER_MOTOR_CHIP_SELECT)
+
+
 
     LOG(INFO) << "MOTOR READY" << std::endl;
 
-    // TODO enable dribbler
-    OPEN_SPI_FILE_DESCRIPTOR(dribbler, DRIBBLER_MOTOR_CHIP_SELECT)
 
     g_motor_service = this;
 }
@@ -117,7 +123,7 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
     return std::make_unique<TbotsProto::DriveUnitStatus>();
 }
 
-void MotorService::transfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len)
+void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len)
 {
     int ret;
 
@@ -142,6 +148,21 @@ void MotorService::transfer(int fd, uint8_t const* tx, uint8_t const* rx, unsign
 uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
                                            uint8_t last_transfer)
 {
+    LOG(INFO) << " TMC4671";
+    spi_cs_driver_to_controller_mux_gpio.setValue(GpioState::LOW);
+    return readWriteByte(motor, data, last_transfer);
+}
+
+uint8_t MotorService::tmc6100ReadWriteByte(uint8_t motor, uint8_t data,
+                                           uint8_t last_transfer)
+{
+    LOG(INFO) << " TMC6100";
+    spi_cs_driver_to_controller_mux_gpio.setValue(GpioState::HIGH);
+    return readWriteByte(motor, data, last_transfer);
+}
+
+uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer)
+{
     uint8_t ret_byte = 0;
 
     if (!transfer_started)
@@ -164,13 +185,14 @@ uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
             currently_writing = false;
 
             tx[position] = data;
-            transfer(file_descriptors[motor], tx, rx, 5);
+            spiTransfer(file_descriptors[motor], tx, rx, 5);
         }
 
         transfer_started = true;
     }
 
-    if (currently_writing) {
+    if (currently_writing)
+    {
         tx[position++] = data;
         LOGF(INFO, "Current write byte: %x", tx[position]);
     }
@@ -181,9 +203,15 @@ uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
         LOGF(INFO, "Current read byte: %x", ret_byte);
     }
 
+    if (currently_reading && last_transfer)
+    {
+        transfer_started = false;
+        LOG(INFO) << "FINAL TRANSFER";
+    }
+
     if (currently_writing && last_transfer)
     {
-        transfer(file_descriptors[motor], tx, rx, 5);
+        spiTransfer(file_descriptors[motor], tx, rx, 5);
         transfer_started = false;
         LOG(INFO) << "FINAL TRANSFER";
     }
@@ -191,23 +219,30 @@ uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
     return ret_byte;
 }
 
-uint8_t MotorService::tmc6100ReadWriteByte(uint8_t motor, uint8_t data,
-                                           uint8_t last_transfer)
-{
-    uint8_t tx[1] = {data};
-    uint8_t rx[1] = {};
-    transfer(file_descriptors[motor], tx, rx, 1);
-    return rx[0];
-}
-
 void MotorService::start()
 {
+    spi_cs_driver_to_controller_mux_gpio.setValue(GpioState::LOW);
+    spi_cs_driver_to_controller_mux_gpio.setValue(GpioState::HIGH);
+    spi_cs_driver_to_controller_mux_gpio.setValue(GpioState::LOW);
+    spi_cs_driver_to_controller_mux_gpio.setValue(GpioState::HIGH);
+    spi_cs_driver_to_controller_mux_gpio.setValue(GpioState::LOW);
+    spi_cs_driver_to_controller_mux_gpio.setValue(GpioState::HIGH);
+    spi_cs_driver_to_controller_mux_gpio.setValue(GpioState::LOW);
+    spi_cs_driver_to_controller_mux_gpio.setValue(GpioState::HIGH);
+    spi_cs_driver_to_controller_mux_gpio.setValue(GpioState::LOW);
+    spi_cs_driver_to_controller_mux_gpio.setValue(GpioState::HIGH);
+    spi_cs_driver_to_controller_mux_gpio.setValue(GpioState::LOW);
+    spi_cs_driver_to_controller_mux_gpio.setValue(GpioState::HIGH);
+    driver_control_enable_gpio.setValue(GpioState::HIGH);
     tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, 0x01, 0x00000000);
     uint32_t read = tmc4671_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, 0x00);
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, 0x01, 0x00000000);
-    read = tmc4671_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, 0x00);
-    LOG(INFO) << "READ: " << read << std::endl;
-    // TODO (#2332)
+    LOG(INFO) << read;
+
+    read = tmc6100_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GCONF);
+    LOG(INFO) << read;
+    tmc6100_writeInt(0, TMC6100_GCONF, 32);
+    read = tmc6100_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GCONF);
+    LOG(INFO) << read;
 }
 
 void MotorService::stop()

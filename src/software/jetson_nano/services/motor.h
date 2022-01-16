@@ -6,6 +6,8 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/robot_constants.h"
 #include "software/jetson_nano/services/service.h"
+#include "software/jetson_nano/gpio.h"
+
 
 class MotorService : public Service
 {
@@ -56,7 +58,11 @@ class MotorService : public Service
     /**
      * TODO
      */
-    void transfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len);
+    void spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len);
+    uint8_t readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
+
+    GPIO spi_cs_driver_to_controller_mux_gpio;
+    GPIO driver_control_enable_gpio;
 
     // Transfer Buffers
     uint8_t tx[5] = {0};

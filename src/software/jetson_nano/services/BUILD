@@ -14,6 +14,7 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//shared:robot_constants",
         "//software/logger",
+        "//software/jetson_nano:gpio",
         "@trinamic",
     ],
 )
