@@ -36,7 +36,7 @@ TEST_F(CreaseDefensePlayTest, test_defense_play)
     setAIPlayConstructor([this, ball_state]() -> std::unique_ptr<Play> {
         std::unique_ptr<CreaseDefensePlay> play = std::make_unique<CreaseDefensePlay>(
             friendly_thunderbots_config->getPlayConfig());
-        play->updateControlParams(Point(1, 3), 2);
+        play->updateControlParams(Point(1, 3));
         return play;
     });
 
