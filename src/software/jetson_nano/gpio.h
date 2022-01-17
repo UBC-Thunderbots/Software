@@ -26,20 +26,19 @@ class GPIO
          GpioState initial_state);
 
     /**
-     * Set the value
+     * Set the value to the provided state
      *
      * @param state The state
      */
     void setValue(GpioState state);
 
     /**
-     * Get the current value of the thing
+     * Get the current state of the gpio
      */
     GpioState getValue(void);
 
    private:
     std::string gpio_number_;
     GpioState current_state_;
-    FILE *gpio_file_descriptor_;
     char buf_[1];
 };

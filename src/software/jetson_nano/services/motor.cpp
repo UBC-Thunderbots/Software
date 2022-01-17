@@ -41,6 +41,11 @@ extern "C"
     static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO = "77";
     static const char* DRIVER_CONTROL_ENABLE_GPIO           = "78";
 
+    // We need a static pointer here, because trinamic externs the following two
+    // SPI binding functions that we need to interface with their API.
+    //
+    // The motor service exlusively calls the trinamic API which triggers these
+    // functions. The motor service will set this variable in the constructor.
     static MotorService* g_motor_service = NULL;
 
     uint8_t tmc4671_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
@@ -104,6 +109,7 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     OPEN_SPI_FILE_DESCRIPTOR(back_right, BACK_RIGHT_MOTOR_CHIP_SELECT)
     OPEN_SPI_FILE_DESCRIPTOR(dribbler, DRIBBLER_MOTOR_CHIP_SELECT)
 
+    // Make this instance available to the static functions above
     g_motor_service = this;
 }
 
@@ -144,13 +150,13 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 
 // Both the TMC4671 (the controller) and the TMC6100 (the driver) respect
 // the same SPI interface. So when we bind the API, we can use the same
-// readWriteByte function, provided that the chip select is turning on
+// readWriteByte function, provided that the chip select pin is turning on
 // the right chip.
 //
-// Each TMC4671 and TMC6100 pair have their chip selects as inputs from
-// a demux. The demux is controlled by the spi_cs_driver_to_controller_demux_gpio.
-// When low, the chip select is passed to the TMC4671, and to the TMC6100
-// when high.
+// Each TMC4671 and TMC6100 pair have their chip selects coming in from a
+// demux (see diagram below). The demux is controlled by the
+// spi_cs_driver_to_controller_demux_gpio. When low, the chip select is passed
+// to the TMC4671, and to the TMC6100 when high.
 //
 //
 //                                               FRONT LEFT MOTOR
@@ -199,20 +205,20 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
 
         if (data & TMC_WRITE_BIT)
         {
-            // If the transfer started and its a read operation,
+            // If the transfer started and its a write operation,
             // set the appropriate flags.
             currently_reading = false;
             currently_writing = true;
         }
         else
         {
-            currently_reading = true;
-            currently_writing = false;
-
             // The first byte should contain the address on a read operation.
             // Trigger a transfer (1 byte) and buffer the response (4 bytes)
             tx[position] = data;
             spiTransfer(file_descriptors[motor], tx, rx, 5);
+
+            currently_reading = true;
+            currently_writing = false;
         }
 
         transfer_started = true;
@@ -233,7 +239,8 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
 
     if (currently_writing && last_transfer)
     {
-        // last_transfer is true, lets trigger the spi transfer and  reset state
+        // we have all the bytes for this transfer, lets trigger the transfer and
+        // reset state
         spiTransfer(file_descriptors[motor], tx, rx, 5);
         transfer_started = false;
     }
@@ -250,7 +257,6 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
 void MotorService::start()
 {
     driver_control_enable_gpio.setValue(GpioState::HIGH);
-
     // TODO (#2332)
 }
 
