@@ -86,11 +86,6 @@ void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
     // never be seen/used by the rest of the system.
     yield({});
 
-    // Anytime after the first function call, the getNextTactics function will be
-    // used to perform the real logic. The calculateNextIntent function will yield its
-    // values to the top of the coroutine stack, where they will be retrieved by
-    // getNextAction, so we do not need to yield or return the result of this function
-    //
     // The getNextTactics function is given the World as a parameter rather than using
     // the member variable since it's more explicit and obvious where the World
     // comes from when implementing Plays. The World is passed as a reference, so when
