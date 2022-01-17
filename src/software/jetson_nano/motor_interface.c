@@ -29,37 +29,37 @@
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671.h"
 #include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
 
-#define SPI_TX_OCTAL            0x2000
-#define SPI_RX_OCTAL            0x4000
-#define PRE_ALLOCATION_SIZE (100*1024*1024) /* 100MB pagefault free buffer */
-#define MY_STACK_SIZE       (100*1024)      /* 100 kB is enough for now. */
+#define SPI_TX_OCTAL 0x2000
+#define SPI_RX_OCTAL 0x4000
+#define PRE_ALLOCATION_SIZE (100 * 1024 * 1024) /* 100MB pagefault free buffer */
+#define MY_STACK_SIZE (100 * 1024)              /* 100 kB is enough for now. */
 
 typedef struct
 {
-    uint16_t  startVoltage;
-    uint16_t  initWaitTime;
-    uint16_t  actualInitWaitTime;
-    uint8_t   initState;
-    uint8_t   initMode;
-    uint16_t  torqueMeasurementFactor;  // uint8_t.uint8_t
-    uint8_t	  motionMode;
-    uint8_t   motorMan;
-    int32_t   actualVelocityPT1;
-    int64_t	  akkuActualVelocity;
-    int16_t   actualTorquePT1;
-    int64_t   akkuActualTorque;
-    int32_t   positionScaler;
-    int32_t   linearScaler;
-    int16_t   hall_phi_e_old;
-    int16_t   hall_phi_e_new;
-    int16_t   hall_actual_coarse_offset;
-    uint16_t  last_Phi_E_Selection;
-    uint32_t  last_UQ_UD_EXT;
-    int16_t   last_PHI_E_EXT;
+    uint16_t startVoltage;
+    uint16_t initWaitTime;
+    uint16_t actualInitWaitTime;
+    uint8_t initState;
+    uint8_t initMode;
+    uint16_t torqueMeasurementFactor;  // uint8_t.uint8_t
+    uint8_t motionMode;
+    uint8_t motorMan;
+    int32_t actualVelocityPT1;
+    int64_t akkuActualVelocity;
+    int16_t actualTorquePT1;
+    int64_t akkuActualTorque;
+    int32_t positionScaler;
+    int32_t linearScaler;
+    int16_t hall_phi_e_old;
+    int16_t hall_phi_e_new;
+    int16_t hall_actual_coarse_offset;
+    uint16_t last_Phi_E_Selection;
+    uint32_t last_UQ_UD_EXT;
+    int16_t last_PHI_E_EXT;
 } TMinimalMotorConfig;
 
 static TMinimalMotorConfig motorConfig[TMC4671_MOTORS];
-static int fd = -1;
+static int fd  = -1;
 static int fd2 = -1;
 static void pabort(const char *s)
 {
@@ -70,13 +70,13 @@ static void pabort(const char *s)
     abort();
 }
 
-static const char *device = "/dev/spidev0.0";
+static const char *device  = "/dev/spidev0.0";
 static const char *device2 = "/dev/spidev1.0";
 static uint32_t mode;
 static uint8_t bits = 8;
 static char *input_file;
 static char *output_file;
-static uint32_t speed = 1000000; // 1Mhz
+static uint32_t speed = 1000000;  // 1Mhz
 static uint16_t delay;
 static int verbose;
 static int transfer_size;
@@ -88,11 +88,11 @@ static void transfer(int fd, uint8_t const *tx, uint8_t const *rx, size_t len)
 {
     int ret;
     struct spi_ioc_transfer tr = {
-        .tx_buf = (unsigned long)tx,
-        .rx_buf = (unsigned long)rx,
-        .len = len,
-        .delay_usecs = delay,
-        .speed_hz = speed,
+        .tx_buf        = (unsigned long)tx,
+        .rx_buf        = (unsigned long)rx,
+        .len           = len,
+        .delay_usecs   = delay,
+        .speed_hz      = speed,
         .bits_per_word = bits,
     };
 
@@ -108,7 +108,8 @@ static void transfer(int fd, uint8_t const *tx, uint8_t const *rx, size_t len)
         tr.rx_nbits = 4;
     else if (mode & SPI_RX_DUAL)
         tr.rx_nbits = 2;
-    if (!(mode & SPI_LOOP)) {
+    if (!(mode & SPI_LOOP))
+    {
         if (mode & (SPI_TX_OCTAL | SPI_TX_QUAD | SPI_TX_DUAL))
             tr.rx_buf = 0;
         else if (mode & (SPI_RX_OCTAL | SPI_RX_QUAD | SPI_RX_DUAL))
@@ -124,14 +125,14 @@ static void transfer(int fd, uint8_t const *tx, uint8_t const *rx, size_t len)
 uint8_t tmc4671_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
 {
     static int num_transfers_pending = 0;
-    static bool currently_reading = false;
-    static uint8_t tx[20] = {};
-    static uint8_t rx[20] = {};
+    static bool currently_reading    = false;
+    static uint8_t tx[20]            = {};
+    static uint8_t rx[20]            = {};
 
     // on the first transfer, lets figure out if its a read or write
-    if(num_transfers_pending == 0)
+    if (num_transfers_pending == 0)
     {
-	    if (data & 0x80)
+        if (data & 0x80)
         {
             currently_reading = false;
         }
@@ -154,7 +155,7 @@ uint8_t tmc4671_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
         }
         else if (num_transfers_pending == 4)
         {
-            currently_reading = false;
+            currently_reading     = false;
             num_transfers_pending = 0;
             return rx[num_transfers_pending];
         }
@@ -165,7 +166,7 @@ uint8_t tmc4671_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
         tx[num_transfers_pending++] = data;
         if (lastTransfer)
         {
-            printf("================== TRANSFERING TO 4672 ===============\n");
+            printf("================== TRANSFERRING TO 4672 ===============\n");
             transfer(fd, tx, rx, num_transfers_pending);
             num_transfers_pending = 0;
             return rx[0];
@@ -178,14 +179,14 @@ uint8_t tmc4671_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
 uint8_t tmc6100_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
 {
     static int num_transfers_pending = 0;
-    static bool currently_reading = false;
-    static uint8_t tx[20] = {};
-    static uint8_t rx[20] = {};
+    static bool currently_reading    = false;
+    static uint8_t tx[20]            = {};
+    static uint8_t rx[20]            = {};
 
     // on the first transfer, lets figure out if its a read or write
-    if(num_transfers_pending == 0)
+    if (num_transfers_pending == 0)
     {
-	    if (data & 0x80)
+        if (data & 0x80)
         {
             currently_reading = false;
         }
@@ -208,7 +209,7 @@ uint8_t tmc6100_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
         }
         else if (num_transfers_pending == 4)
         {
-            currently_reading = false;
+            currently_reading     = false;
             num_transfers_pending = 0;
             return rx[num_transfers_pending];
         }
@@ -219,7 +220,7 @@ uint8_t tmc6100_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
         tx[num_transfers_pending++] = data;
         if (lastTransfer)
         {
-            printf("================== TRANSFERING TO 6100 ===============\n");
+            printf("================== TRANSFERRING TO 6100 ===============\n");
             transfer(fd2, tx, rx, num_transfers_pending);
             num_transfers_pending = 0;
             return rx[0];
@@ -233,65 +234,53 @@ uint8_t tmc6100_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
 static void print_usage(const char *prog)
 {
     printf("Usage: %s [-DsbdlHOLC3vpNR24SI]\n", prog);
-    puts("  -D --device   device to use (default /dev/spidev1.1)\n"
-            "  -s --speed    max speed (Hz)\n"
-            "  -d --delay    delay (usec)\n"
-            "  -b --bpw      bits per word\n"
-            "  -i --input    input data from a file (e.g. \"test.bin\")\n"
-            "  -o --output   output data to a file (e.g. \"results.bin\")\n"
-            "  -l --loop     loopback\n"
-            "  -H --cpha     clock phase\n"
-            "  -O --cpol     clock polarity\n"
-            "  -L --lsb      least significant bit first\n"
-            "  -C --cs-high  chip select active high\n"
-            "  -3 --3wire    SI/SO signals shared\n"
-            "  -v --verbose  Verbose (show tx buffer)\n"
-            "  -p            Send data (e.g. \"1234\\xde\\xad\")\n"
-            "  -N --no-cs    no chip select\n"
-            "  -R --ready    slave pulls low to pause\n"
-            "  -2 --dual     dual transfer\n"
-            "  -4 --quad     quad transfer\n"
-            "  -8 --octal    octal transfer\n"
-            "  -S --size     transfer size\n"
-            "  -I --iter     iterations\n");
+    puts(
+        "  -D --device   device to use (default /dev/spidev1.1)\n"
+        "  -s --speed    max speed (Hz)\n"
+        "  -d --delay    delay (usec)\n"
+        "  -b --bpw      bits per word\n"
+        "  -i --input    input data from a file (e.g. \"test.bin\")\n"
+        "  -o --output   output data to a file (e.g. \"results.bin\")\n"
+        "  -l --loop     loopback\n"
+        "  -H --cpha     clock phase\n"
+        "  -O --cpol     clock polarity\n"
+        "  -L --lsb      least significant bit first\n"
+        "  -C --cs-high  chip select active high\n"
+        "  -3 --3wire    SI/SO signals shared\n"
+        "  -v --verbose  Verbose (show tx buffer)\n"
+        "  -p            Send data (e.g. \"1234\\xde\\xad\")\n"
+        "  -N --no-cs    no chip select\n"
+        "  -R --ready    slave pulls low to pause\n"
+        "  -2 --dual     dual transfer\n"
+        "  -4 --quad     quad transfer\n"
+        "  -8 --octal    octal transfer\n"
+        "  -S --size     transfer size\n"
+        "  -I --iter     iterations\n");
     exit(1);
 }
 
 static void parse_opts(int argc, char *argv[])
 {
-    while (1) {
+    while (1)
+    {
         static const struct option lopts[] = {
-            { "device",  1, 0, 'D' },
-            { "speed",   1, 0, 's' },
-            { "delay",   1, 0, 'd' },
-            { "bpw",     1, 0, 'b' },
-            { "input",   1, 0, 'i' },
-            { "output",  1, 0, 'o' },
-            { "loop",    0, 0, 'l' },
-            { "cpha",    0, 0, 'H' },
-            { "cpol",    0, 0, 'O' },
-            { "lsb",     0, 0, 'L' },
-            { "cs-high", 0, 0, 'C' },
-            { "3wire",   0, 0, '3' },
-            { "no-cs",   0, 0, 'N' },
-            { "ready",   0, 0, 'R' },
-            { "dual",    0, 0, '2' },
-            { "verbose", 0, 0, 'v' },
-            { "quad",    0, 0, '4' },
-            { "octal",   0, 0, '8' },
-            { "size",    1, 0, 'S' },
-            { "iter",    1, 0, 'I' },
-            { NULL, 0, 0, 0 },
+            {"device", 1, 0, 'D'},  {"speed", 1, 0, 's'},   {"delay", 1, 0, 'd'},
+            {"bpw", 1, 0, 'b'},     {"input", 1, 0, 'i'},   {"output", 1, 0, 'o'},
+            {"loop", 0, 0, 'l'},    {"cpha", 0, 0, 'H'},    {"cpol", 0, 0, 'O'},
+            {"lsb", 0, 0, 'L'},     {"cs-high", 0, 0, 'C'}, {"3wire", 0, 0, '3'},
+            {"no-cs", 0, 0, 'N'},   {"ready", 0, 0, 'R'},   {"dual", 0, 0, '2'},
+            {"verbose", 0, 0, 'v'}, {"quad", 0, 0, '4'},    {"octal", 0, 0, '8'},
+            {"size", 1, 0, 'S'},    {"iter", 1, 0, 'I'},    {NULL, 0, 0, 0},
         };
         int c;
 
-        c = getopt_long(argc, argv, "D:s:d:b:i:o:lHOLC3NR248p:vS:I:",
-                lopts, NULL);
+        c = getopt_long(argc, argv, "D:s:d:b:i:o:lHOLC3NR248p:vS:I:", lopts, NULL);
 
         if (c == -1)
             break;
 
-        switch (c) {
+        switch (c)
+        {
             case 'D':
                 device = optarg;
                 break;
@@ -359,7 +348,8 @@ static void parse_opts(int argc, char *argv[])
                 print_usage(argv[0]);
         }
     }
-    if (mode & SPI_LOOP) {
+    if (mode & SPI_LOOP)
+    {
         if (mode & SPI_TX_DUAL)
             mode |= SPI_RX_DUAL;
         if (mode & SPI_TX_QUAD)
@@ -374,21 +364,16 @@ static void periodicJob(uint32_t actualSystick)
     int32_t motor;
 
     // do encoder initialization if necessary
-    for(motor = 0; motor < TMC4671_MOTORS; motor++)
+    for (motor = 0; motor < TMC4671_MOTORS; motor++)
     {
         tmc4671_periodicJob(
-                motor, actualSystick,
-                motorConfig[motor].initMode,
-                &(motorConfig[motor].initState),
-                motorConfig[motor].initWaitTime,
-                &(motorConfig[motor].actualInitWaitTime),
-                motorConfig[motor].startVoltage,
-                &(motorConfig[motor].hall_phi_e_old),
-                &(motorConfig[motor].hall_phi_e_new),
-                &(motorConfig[motor].hall_actual_coarse_offset),
-                &(motorConfig[motor].last_Phi_E_Selection),
-                &(motorConfig[motor].last_UQ_UD_EXT),
-                &(motorConfig[motor].last_PHI_E_EXT));
+            motor, actualSystick, motorConfig[motor].initMode,
+            &(motorConfig[motor].initState), motorConfig[motor].initWaitTime,
+            &(motorConfig[motor].actualInitWaitTime), motorConfig[motor].startVoltage,
+            &(motorConfig[motor].hall_phi_e_old), &(motorConfig[motor].hall_phi_e_new),
+            &(motorConfig[motor].hall_actual_coarse_offset),
+            &(motorConfig[motor].last_Phi_E_Selection),
+            &(motorConfig[motor].last_UQ_UD_EXT), &(motorConfig[motor].last_PHI_E_EXT));
     }
 }
 
@@ -401,21 +386,21 @@ static void setprio(int prio, int sched)
         perror("sched_setscheduler");
 }
 
-void show_new_pagefault_count(const char* logtext, 
-        const char* allowed_maj,
-        const char* allowed_min)
+void show_new_pagefault_count(const char *logtext, const char *allowed_maj,
+                              const char *allowed_min)
 {
     static int last_majflt = 0, last_minflt = 0;
     struct rusage usage;
 
     getrusage(RUSAGE_SELF, &usage);
 
-    printf("%-30.30s: Pagefaults, Major:%ld (Allowed %s), " \
-            "Minor:%ld (Allowed %s)\n", logtext,
-            usage.ru_majflt - last_majflt, allowed_maj,
-            usage.ru_minflt - last_minflt, allowed_min);
+    printf(
+        "%-30.30s: Pagefaults, Major:%ld (Allowed %s), "
+        "Minor:%ld (Allowed %s)\n",
+        logtext, usage.ru_majflt - last_majflt, allowed_maj,
+        usage.ru_minflt - last_minflt, allowed_min);
 
-    last_majflt = usage.ru_majflt; 
+    last_majflt = usage.ru_majflt;
     last_minflt = usage.ru_minflt;
 }
 
@@ -425,8 +410,9 @@ static void prove_thread_stack_use_is_safe(int stacksize)
     int i;
 
     /* Prove that this thread is behaving well */
-    for (i = 0; i < stacksize; i += sysconf(_SC_PAGESIZE)) {
-        /* Each write to this buffer shall NOT generate a 
+    for (i = 0; i < stacksize; i += sysconf(_SC_PAGESIZE))
+    {
+        /* Each write to this buffer shall NOT generate a
            pagefault. */
         buffer[i] = i;
     }
@@ -439,19 +425,21 @@ static void prove_thread_stack_use_is_safe(int stacksize)
 static void *my_rt_thread(void *args)
 {
     struct timespec ts;
-    ts.tv_sec = 30;
+    ts.tv_sec  = 30;
     ts.tv_nsec = 0;
 
     setprio(sched_get_priority_max(SCHED_RR), SCHED_RR);
-    printf("I am an RT-thread with a stack that does not generate " \
-            "page-faults during use, stacksize=%i\n", MY_STACK_SIZE);
+    printf(
+        "I am an RT-thread with a stack that does not generate "
+        "page-faults during use, stacksize=%i\n",
+        MY_STACK_SIZE);
 
-    for(;;)
+    for (;;)
     {
         /* get monotonic clock time */
         struct timespec monotime;
         clock_gettime(CLOCK_MONOTONIC, &monotime);
-        printf("%ld\n", monotime.tv_nsec/1000);
+        printf("%ld\n", monotime.tv_nsec / 1000);
     }
 
     show_new_pagefault_count("Caused by creating thread", ">=0", ">=0");
@@ -466,7 +454,7 @@ static void *my_rt_thread(void *args)
 static void error(int at)
 {
     /* Just exit on error */
-    fprintf(stderr, "Some error occured at %d", at);
+    fprintf(stderr, "Some error occurred at %d", at);
     exit(1);
 }
 
@@ -487,7 +475,7 @@ static void start_rt_thread(void)
 
 static void configure_malloc_behavior(void)
 {
-    /* Now lock all current and future pages 
+    /* Now lock all current and future pages
        from preventing of being paged */
     if (mlockall(MCL_CURRENT | MCL_FUTURE))
         perror("mlockall failed:");
@@ -509,14 +497,15 @@ static void reserve_process_memory(int size)
     printf("malloc end: %p\n", buffer);
 
     /* Touch each page in this piece of memory to get it mapped into RAM */
-    for (i = 0; i < size; i += sysconf(_SC_PAGESIZE)) {
+    for (i = 0; i < size; i += sysconf(_SC_PAGESIZE))
+    {
         /* Each write to this buffer will generate a pagefault.
            Once the pagefault is handled a page will be locked in
            memory and never given back to the system. */
         buffer[i] = 0;
     }
 
-    /* buffer will now be released. As Glibc is configured such that it 
+    /* buffer will now be released. As Glibc is configured such that it
        never gives back memory to the kernel, the memory allocated above is
        locked for this process. All malloc() and new() calls come from
        the memory pool reserved and locked above. Issuing free() and
@@ -609,7 +598,7 @@ int main(int argc, char *argv[])
 
     printf("spi mode: 0x%x\n", mode);
     printf("bits per word: %u\n", bits);
-    printf("max speed: %u Hz (%u kHz)\n", speed, speed/1000);
+    printf("max speed: %u Hz (%u kHz)\n", speed, speed / 1000);
 
     printf"WRITING TO THIS SHIT\n");
     tmc6100_writeInt(0, TMC6100_GCONF, 32);
@@ -632,7 +621,7 @@ int main(int argc, char *argv[])
     tmc4671_writeInt(0, TMC4671_PWM_MAXCNT, 0x00000F9F);
     tmc4671_writeInt(0, TMC4671_PWM_BBM_H_BBM_L, 0x00001919);
     tmc4671_writeInt(0, TMC4671_PWM_SV_CHOP, 0x00000007);
-    
+
     // ADC configuration
     tmc4671_writeInt(0, TMC4671_ADC_I_SELECT, 0x09000100);
     tmc4671_writeInt(0, TMC4671_dsADC_MCFG_B_MCFG_A, 0x00100010);
@@ -641,22 +630,22 @@ int main(int argc, char *argv[])
     tmc4671_writeInt(0, TMC4671_dsADC_MDEC_B_MDEC_A, 0x014E014E);
     tmc4671_writeInt(0, TMC4671_ADC_I0_SCALE_OFFSET, 0x0100820A);
     tmc4671_writeInt(0, TMC4671_ADC_I1_SCALE_OFFSET, 0x0100819E);
-    
+
     // ABN encoder settings
     tmc4671_writeInt(0, TMC4671_ABN_DECODER_MODE, 0x00000000);
     tmc4671_writeInt(0, TMC4671_ABN_DECODER_PPR, 0x00001000);
     tmc4671_writeInt(0, TMC4671_ABN_DECODER_COUNT, 0x00000ED5);
     tmc4671_writeInt(0, TMC4671_ABN_DECODER_PHI_E_PHI_M_OFFSET, 0x00000000);
-    
+
     // Limits
     tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS, 0x000003E8);
-    
+
     // PI settings
     tmc4671_writeInt(0, TMC4671_PID_TORQUE_P_TORQUE_I, 0x01000100);
     tmc4671_writeInt(0, TMC4671_PID_FLUX_P_FLUX_I, 0x01000100);
-    
+
     // ===== ABN encoder test drive =====
-    // 
+    //
     // Init Encoder (mode 0)
     tmc4671_writeInt(0, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000008);
     tmc4671_writeInt(0, TMC4671_ABN_DECODER_PHI_E_PHI_M_OFFSET, 0x00000000);
@@ -665,24 +654,24 @@ int main(int argc, char *argv[])
     tmc4671_writeInt(0, TMC4671_UQ_UD_EXT, 0x000007D0);
     sleep(1);
     tmc4671_writeInt(0, TMC4671_ABN_DECODER_COUNT, 0x00000000);
-    
+
     // Feedback selection
     tmc4671_writeInt(0, TMC4671_PHI_E_SELECTION, 0x00000003);
     tmc4671_writeInt(0, TMC4671_VELOCITY_SELECTION, 0x00000009);
-    
+
     // Switch to torque mode
     tmc4671_writeInt(0, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000001);
-    
+
     // Rotate right
     tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_TARGET, 0x03E80000);
     sleep(1);
-    
+
     // Rotate left
     tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_TARGET, 0xFC180000);
     int output = tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_TARGET);
     printf("output of read %d\n", output);
     sleep(1);
-    
+
     // Stop
     tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_TARGET, 0x00000000);
 

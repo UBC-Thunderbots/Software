@@ -29,8 +29,8 @@ cc_library(
     srcs = ["gpio.cpp"],
     hdrs = ["gpio.h"],
     deps = [
-        "//software/util/make_enum:make_enum",
-        "//software/logger:logger",
+        "//software/logger",
+        "//software/util/make_enum",
     ],
 )
 

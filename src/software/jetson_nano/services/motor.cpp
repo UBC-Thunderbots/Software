@@ -2,7 +2,6 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <getopt.h>
 #include <limits.h>
 #include <linux/ioctl.h>
@@ -12,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/logger/logger.h"
@@ -56,8 +56,10 @@ extern "C"
 
 MotorService::MotorService(const RobotConstants_t& robot_constants,
                            const WheelConstants_t& wheel_constants)
-    : spi_cs_driver_to_controller_mux_gpio(SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO),
-      driver_control_enable_gpio(DRIVER_CONTROL_ENABLE_GPIO)
+    : spi_cs_driver_to_controller_demux_gpio(SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO,
+                                             GpioDirection::OUTPUT, GpioState::LOW),
+      driver_control_enable_gpio(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
+                                 GpioState::LOW)
 {
     robot_constants_ = robot_constants;
     wheel_constants_ = wheel_constants;
@@ -102,12 +104,6 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     OPEN_SPI_FILE_DESCRIPTOR(back_right, BACK_RIGHT_MOTOR_CHIP_SELECT)
     OPEN_SPI_FILE_DESCRIPTOR(dribbler, DRIBBLER_MOTOR_CHIP_SELECT)
 
-    spi_cs_driver_to_controller_mux_gpio.setupPin(1);
-    driver_control_enable_gpio.setupPin(1);
-
-    spi_cs_driver_to_controller_mux_gpio.setDirection(1);
-    driver_control_enable_gpio.setDirection(1);
-
     g_motor_service = this;
 }
 
@@ -142,23 +138,52 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 
     if (ret < 1)
     {
-        LOG(FATAL) << "BRUH x_x";
+        LOG(FATAL) << "SPI Transfer to motor failed, not safe to proceed";
     }
 }
 
+// Both the TMC4671 (the controller) and the TMC6100 (the driver) respect
+// the same SPI interface. So when we bind the API, we can use the same
+// readWriteByte function, provided that the chip select is turning on
+// the right chip.
+//
+// Each TMC4671 and TMC6100 pair have their chip selects as inputs from
+// a demux. The demux is controlled by the spi_cs_driver_to_controller_demux_gpio.
+// When low, the chip select is passed to the TMC4671, and to the TMC6100
+// when high.
+//
+//
+//                                               FRONT LEFT MOTOR
+//                                              CONTROLLER + DRIVER
+//                                             ┌─────────────────┐
+//                                             │                 │
+//                            ┌───────┐        │   ┌─────────┐   │
+//                            │       │ SEL(LOW)   │         │   │
+//                            │  1:2  ├────────┬───►TMC4671  │   │
+//                            │       │        │   └─────────┘   │
+//             FRONT_LEFT_CS  │ DEMUX │        │                 │
+//             ───────────────►       │        │   ┌─────────┐   │
+//                            │       │SEL(HIGH)   │         │   │
+//                            │       ├────────┬───►TMC6100  │   │
+//                            │       │        │   └─────────┘   │
+//                            │       │        │                 │
+//                            └───▲───┘        └─────────────────┘
+//                                │
+//                                │ SEL
+//                                │
+//                  spi_cs_driver_to_controller_demux
+//
 uint8_t MotorService::tmc4671ReadWriteByte(uint8_t motor, uint8_t data,
                                            uint8_t last_transfer)
 {
-    LOG(INFO) << " TMC4671";
-    spi_cs_driver_to_controller_mux_gpio.writeValue(0);
+    spi_cs_driver_to_controller_demux_gpio.setValue(GpioState::LOW);
     return readWriteByte(motor, data, last_transfer);
 }
 
 uint8_t MotorService::tmc6100ReadWriteByte(uint8_t motor, uint8_t data,
                                            uint8_t last_transfer)
 {
-    LOG(INFO) << " TMC6100: " << data;
-    spi_cs_driver_to_controller_mux_gpio.writeValue(1);
+    spi_cs_driver_to_controller_demux_gpio.setValue(GpioState::HIGH);
     return readWriteByte(motor, data, last_transfer);
 }
 
@@ -170,21 +195,22 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
     {
         memset(tx, 0, sizeof(tx));
         memset(rx, 0, sizeof(rx));
+        position = 0;
 
         if (data & TMC_WRITE_BIT)
         {
-            LOG(INFO) << "Just started to write!";
-            position          = 0;
+            // If the transfer started and its a read operation,
+            // set the appropriate flags.
             currently_reading = false;
             currently_writing = true;
         }
         else
         {
-            LOG(INFO) << "Just started to read!";
-            position          = 0;
             currently_reading = true;
             currently_writing = false;
 
+            // The first byte should contain the address on a read operation.
+            // Trigger a transfer (1 byte) and buffer the response (4 bytes)
             tx[position] = data;
             spiTransfer(file_descriptors[motor], tx, rx, 5);
         }
@@ -194,27 +220,28 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
 
     if (currently_writing)
     {
+        // Buffer the data to send out when last_transfer is true.
         tx[position++] = data;
-        LOGF(INFO, "Current write byte: %x", tx[position - 1]);
     }
 
     if (currently_reading)
     {
+        // If we are reading, we just need to return the buffered data
+        // byte by byte.
         ret_byte = rx[position++];
-        LOGF(INFO, "Current read byte: %x", ret_byte);
-    }
-
-    if (currently_reading && last_transfer)
-    {
-        transfer_started = false;
-        LOG(INFO) << "FINAL READ TRANSFER";
     }
 
     if (currently_writing && last_transfer)
     {
+        // last_transfer is true, lets trigger the spi transfer and  reset state
         spiTransfer(file_descriptors[motor], tx, rx, 5);
         transfer_started = false;
-        LOG(INFO) << "FINAL WRITE TRANSFER";
+    }
+
+    if (currently_reading && last_transfer)
+    {
+        // when reading, if last transfer is true, we just need to reset state
+        transfer_started = false;
     }
 
     return ret_byte;
@@ -222,21 +249,9 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
 
 void MotorService::start()
 {
-    driver_control_enable_gpio.writeValue(1);
-    spi_cs_driver_to_controller_mux_gpio.writeValue(0);
-    spi_cs_driver_to_controller_mux_gpio.writeValue(1);
+    driver_control_enable_gpio.setValue(GpioState::HIGH);
 
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, 0x01, 0x00000000);
-    uint32_t read = tmc4671_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, 0x00);
-    LOG(INFO) << read;
-
-    read = tmc6100_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GSTAT);
-    LOG(INFO) << read;
-    read = tmc6100_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GCONF);
-    LOG(INFO) << read;
-    tmc6100_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GCONF, 32);
-    read = tmc6100_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GCONF);
-    LOG(INFO) << read;
+    // TODO (#2332)
 }
 
 void MotorService::stop()

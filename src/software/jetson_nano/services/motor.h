@@ -5,8 +5,8 @@
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/robot_constants.h"
-#include "software/jetson_nano/services/service.h"
 #include "software/jetson_nano/gpio.h"
+#include "software/jetson_nano/services/service.h"
 
 
 class MotorService : public Service
@@ -48,20 +48,41 @@ class MotorService : public Service
         float dribbler_speed_rpm);
 
     /**
-     * TODO
+     * Trinamic API binding, sets spi_cs_driver_to_controller_demux appropriately
+     * and calls readWriteByte. See C++ implementation file for more info
+     *
+     * @param motor Which motor to talk to (in our case, the chip select)
+     * @param data The data to send
+     * @param last_transfer The last transfer of uint8_t data for this transaction.
      */
     uint8_t tmc4671ReadWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
     uint8_t tmc6100ReadWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
 
    private:
-
     /**
-     * TODO
+     * Trigger an SPI transfer over an open SPI connection
+     *
+     * @param fd The SPI File Descriptor to transfer data over
+     * @param tx The tx buffer, data to send out
+     * @param rx The rx buffer, will be updated with data from the full-duplex transfer
+     * @param len The length of the tx and rx buffer
+     *
      */
     void spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len);
+
+    /**
+     * Trinamic API Binding function
+     *
+     * @param motor Which motor to talk to (in our case, the chip select)
+     * @param data The data to send
+     * @param last_transfer The last transfer of uint8_t data for this transaction.
+     */
     uint8_t readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
 
-    GPIO spi_cs_driver_to_controller_mux_gpio;
+    // Select between driver and controller gpio
+    GPIO spi_cs_driver_to_controller_demux_gpio;
+
+    // Enable driver gpio
     GPIO driver_control_enable_gpio;
 
     // Transfer Buffers
@@ -80,5 +101,4 @@ class MotorService : public Service
 
     // SPI File Descriptors
     std::unordered_map<int, int> file_descriptors;
-
 };
