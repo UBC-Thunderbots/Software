@@ -1,8 +1,4 @@
-// Copyright (c) 2019, Alex Mous
-// Licensed under the Creative Commons Attribution-ShareAlike 4.0 International
-// (CC-BY-4.0)
-
-#include "gpio.h"
+#include "software/jetson_nano/gpio.h"
 
 #include <fcntl.h>
 #include <stdlib.h>
@@ -51,6 +47,11 @@ void GPIO::setValue(GpioState state)
 {
     std::ofstream gpio_fs("/sys/class/gpio/gpio" + gpio_number_ + "/value");
 
+    if (!gpio_fs.is_open())
+    {
+        LOG(FATAL) << "Could not set GPIO pin";
+    }
+
     switch (state)
     {
         case GpioState::HIGH:
@@ -69,9 +70,6 @@ void GPIO::setValue(GpioState state)
     {
         gpio_fs.close();
     }
-
-    // TODO confirm with elec
-    usleep(1000000);
 }
 
 GpioState GPIO::getValue()
@@ -85,7 +83,7 @@ GpioState GPIO::getValue()
     }
     else
     {
-        LOG(FATAL) << "TODO SOMETHING WENT HORRIBLY WRONG";
+        LOG(FATAL) << "Could not read GPIO pin";
     }
     if (level.compare("0") == 0)
     {
