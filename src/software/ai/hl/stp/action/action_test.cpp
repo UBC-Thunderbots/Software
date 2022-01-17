@@ -41,7 +41,7 @@ TEST(ActionTest, getRobot)
 
     std::optional<Robot> robot_opt = action.getRobot();
     EXPECT_TRUE(robot_opt.has_value());
-    EXPECT_EQ(robot, *robot_opt);
+    EXPECT_EQ(robot, robot_opt.value());
 }
 
 TEST(ActionTest, restart_after_done_makes_done_false)

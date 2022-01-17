@@ -43,6 +43,7 @@ AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
         {
             obstacle->accept(obstacle_artist);
         }
+        obstacle_artist.visualize();
     };
 
     return AIDrawFunction(draw_function);

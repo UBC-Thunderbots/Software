@@ -58,7 +58,7 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
      */
     void setGameState(const GameState& game_state_);
 
-    std::optional<PlayInfo> getPlayInfo() override;
+    std::optional<TbotsProto::PlayInfo> getPlayInfo() override;
     AIDrawFunction getDrawFunctions() override;
 
    private:

@@ -177,11 +177,11 @@ TEST_F(STPTest, test_get_play_info)
     expected_play_name       = "HaltTestPlay";
     expected_tactic_name     = "StopTestTactic";
 
-    PlayInfo expected_play_info_msg = PlayInfo();
+    TbotsProto::PlayInfo expected_play_info_msg = TbotsProto::PlayInfo();
     expected_play_info_msg.mutable_game_state()->set_referee_command_name(
         expected_referee_command);
     expected_play_info_msg.mutable_play()->set_play_name(expected_play_name);
-    PlayInfo_Tactic expected_tactic = PlayInfo_Tactic();
+    TbotsProto::PlayInfo_Tactic expected_tactic = TbotsProto::PlayInfo_Tactic();
     expected_tactic.set_tactic_name(expected_tactic_name);
     (*expected_play_info_msg.mutable_robot_tactic_assignment())[0] = expected_tactic;
     (*expected_play_info_msg.mutable_robot_tactic_assignment())[1] = expected_tactic;

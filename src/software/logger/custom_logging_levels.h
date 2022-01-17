@@ -10,3 +10,4 @@
 // over radio
 const LEVELS ROBOT_STATUS{INFO.value + 1, {"ROBOT_STATUS"}};
 const LEVELS CSV{INFO.value + 2, {"CSV"}};
+const LEVELS VISUALIZE{INFO.value + 3, {"VISUALIZE"}};
