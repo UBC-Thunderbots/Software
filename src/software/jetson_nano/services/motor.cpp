@@ -44,7 +44,7 @@ extern "C"
     // We need a static pointer here, because trinamic externs the following two
     // SPI binding functions that we need to interface with their API.
     //
-    // The motor service exlusively calls the trinamic API which triggers these
+    // The motor service exclusively calls the trinamic API which triggers these
     // functions. The motor service will set this variable in the constructor.
     static MotorService* g_motor_service = NULL;
 
