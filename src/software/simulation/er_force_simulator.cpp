@@ -125,7 +125,6 @@ void ErForceSimulator::addRobots(const std::vector<RobotStateWithId>& robots,
     auto simulator_control = std::make_unique<sslsim::SimulatorControl>();
     auto command_simulator = std::make_unique<amun::CommandSimulator>();
 
-
     // Add each robot to be added to the teleport robot repeated field
     for (unsigned int i = 0; i < robots.size(); i++)
     {
@@ -151,6 +150,7 @@ void ErForceSimulator::addRobots(const std::vector<RobotStateWithId>& robots,
 
         teleport_robot->set_orientation(
             static_cast<float>(robots[i].robot_state.orientation().toRadians()));
+
         teleport_robot->set_v_x(static_cast<float>(robots[i].robot_state.velocity().x() *
                                                    MILLIMETERS_PER_METER));
         teleport_robot->set_v_y(static_cast<float>(robots[i].robot_state.velocity().y() *

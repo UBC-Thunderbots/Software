@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "proto/message_translation/er_force_world.h"
 #include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
@@ -175,12 +176,12 @@ TEST_F(ErForceSimulatorTest, add_yellow_robots)
     EXPECT_TRUE(yellow_visible);
 }
 
-TEST_F(ErForceSimulatorTest, velocity_and_orientation_test)
+TEST_F(ErForceSimulatorTest, yellow_robot_velocity_test)
 {
-    RobotState robot_state1(Point(1, 0), Vector(2, 0), Angle::half(),
+    RobotState robot_state1(Point(1, 0), Vector(2, 0), Angle::zero(),
                             AngularVelocity::zero());
-    RobotState robot_state2(Point(0, 1), Vector(0, 2), Angle::quarter(),
-                            AngularVelocity::half());
+    RobotState robot_state2(Point(0, 1), Vector(0, 2), Angle::zero(),
+                            AngularVelocity::zero());
 
     std::vector<RobotStateWithId> states = {
         RobotStateWithId{.id = 0, .robot_state = robot_state1},
@@ -188,8 +189,7 @@ TEST_F(ErForceSimulatorTest, velocity_and_orientation_test)
     };
 
     simulator->addYellowRobots(states);
-
-    simulator->stepSimulation(Duration::fromMilliseconds(20));
+    simulator->stepSimulation(Duration::fromMilliseconds(5));
 
     auto simState      = simulator->getSimulatorState();
     auto yellow_robots = simState.yellow_robots();
@@ -199,6 +199,39 @@ TEST_F(ErForceSimulatorTest, velocity_and_orientation_test)
 
     EXPECT_TRUE(yellow_robots[1].v_x() > -0.01 && yellow_robots[1].v_x() < 0.01);
     EXPECT_TRUE(yellow_robots[1].v_y() > 1.9 && yellow_robots[1].v_y() <= 2.0);
+}
 
-    // TO ADD: Orientation Test Cases
+TEST_F(ErForceSimulatorTest, yellow_robot_orientation_test)
+{
+    RobotState robot_state1(Point(0, 0), Vector(0, 0), Angle::zero(),
+                            AngularVelocity::zero());
+    RobotState robot_state2(Point(0, 1), Vector(0, 0), Angle::quarter(),
+                            AngularVelocity::quarter());
+    RobotState robot_state3(Point(0, 2), Vector(0, 0), Angle::half(),
+                            AngularVelocity::half());
+
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 0, .robot_state = robot_state1},
+        RobotStateWithId{.id = 1, .robot_state = robot_state2},
+        RobotStateWithId{.id = 2, .robot_state = robot_state3},
+    };
+
+    simulator->addYellowRobots(states);
+    simulator->stepSimulation(Duration::fromSeconds(10));
+
+    auto simState      = simulator->getSimulatorState();
+    auto yellow_robots = simState.yellow_robots();
+
+    auto robot_zero    = createRobot(yellow_robots[0], Timestamp::fromSeconds(10));
+    auto robot_quarter = createRobot(yellow_robots[1], Timestamp::fromSeconds(10));
+    auto robot_half    = createRobot(yellow_robots[2], Timestamp::fromSeconds(10));
+
+    auto zero_diff = robot_zero.orientation().toRadians() - Angle::zero().toRadians();
+    auto quarter_diff =
+        robot_quarter.orientation().toRadians() - Angle::quarter().toRadians();
+    auto half_diff = robot_half.orientation().toRadians() - Angle::half().toRadians();
+
+    EXPECT_TRUE(zero_diff > -0.01 && zero_diff < 0.01);
+    EXPECT_TRUE(quarter_diff > -0.01 && quarter_diff < 0.01);
+    EXPECT_TRUE(half_diff > -0.01 && half_diff < 0.01);
 }

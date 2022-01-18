@@ -666,6 +666,7 @@ void SimRobot::update(world::SimRobot *robot) const
     rotation->set_i(q.getY());
     rotation->set_j(q.getZ());
     rotation->set_k(q.getW());
+    robot->set_angle(q.getAngle());
 
     const btVector3 velocity = m_body->getLinearVelocity() / SIMULATOR_SCALE;
     robot->set_v_x(velocity.x());
