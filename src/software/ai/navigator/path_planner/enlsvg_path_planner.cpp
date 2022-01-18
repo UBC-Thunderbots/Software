@@ -1,7 +1,7 @@
 #include "enlsvg_path_planner.h"
 
 EnlsvgPathPlanner::EnlsvgPathPlanner(
-    const Rectangle &navigable_area, const std::vector<ObstaclePtr> &obstacles)
+    const Rectangle &navigable_area, const std::vector<ObstaclePtr> &obstacles, double grid_boundary_offset)
     :   num_grid_rows(static_cast<int>(round(navigable_area.xLength() / SIZE_OF_GRID_CELL_IN_METERS))),
         num_grid_cols(static_cast<int>(round(navigable_area.yLength() / SIZE_OF_GRID_CELL_IN_METERS))),
         origin(navigable_area.negXNegYCorner()) ,
@@ -9,15 +9,32 @@ EnlsvgPathPlanner::EnlsvgPathPlanner(
         max_navigable_x_enlsvg_point(convertPointToEnlsvgPoint(navigable_area.posXPosYCorner()).x),
         grid(std::make_unique<EnlsvgGrid>(num_grid_rows, num_grid_cols))
 {
-    createObstaclesInGrid(obstacles);
+    createObstaclesInGrid(obstacles, grid_boundary_offset);
     algo = std::make_unique<const EnlsvgAlgorithm>(*grid);
     mem = std::make_unique<EnlsvgMemory>(*algo);
-
 }
 
 // TODO: check whether this const reference thing works because it shouldn't here
-void EnlsvgPathPlanner::createObstaclesInGrid(const std::vector<ObstaclePtr> &obstacles) const
+void EnlsvgPathPlanner::createObstaclesInGrid(const std::vector<ObstaclePtr> &obstacles, double boundary_margin) const
 {
+    double offset_in_enlsvg = boundary_margin / SIZE_OF_GRID_CELL_IN_METERS;
+    for (int x = 0; x < offset_in_enlsvg; ++x)
+    {
+        for (int y = 0; y < num_grid_cols; ++y)
+        {
+            grid->setBlocked(x, y, true);
+            grid->setBlocked(num_grid_rows-1-x, y, true);
+        }
+    }
+    for (int y = 0; y < offset_in_enlsvg; ++y)
+    {
+        for (int x = 0; x < num_grid_rows; ++x)
+        {
+            grid->setBlocked(x, y, true);
+            grid->setBlocked(x, num_grid_cols-1-y, true);
+        }
+    }
+    
     for (auto &obstacle : obstacles)
     {
         auto blocked_points = obstacle->rasterize(SIZE_OF_GRID_CELL_IN_METERS);
@@ -49,8 +66,8 @@ void EnlsvgPathPlanner::blockNearbyCoordDueToRobotRadius(const Point &point) con
 
 bool EnlsvgPathPlanner::isCoordNavigable(const EnlsvgPoint& ep) const
 {
-    return (ep.x >= 0&& ep.x <= max_navigable_x_enlsvg_point)
-        && (ep.y >= 0 && ep.y <= max_navigable_y_enlsvg_point);
+    return (ep.x >= 0 && ep.x < max_navigable_x_enlsvg_point)
+        && (ep.y >= 0 && ep.y < max_navigable_y_enlsvg_point);
 }
 
 std::optional<Path> EnlsvgPathPlanner::findPath(
@@ -166,7 +183,7 @@ std::optional<EnlsvgPathPlanner::EnlsvgPoint> EnlsvgPathPlanner::findClosestUnbl
         for (int i = 1; i > -2; i -= 2)
         {
             EnlsvgPoint next_coord = EnlsvgPoint(test_coord.x+i, test_coord.y);
-            for (int j = 0; j < 2; ++j)
+            for (int j = -1; j < 2; j += 2)
             {
                 if (isCoordNavigable(next_coord) 
                     && (std::find(visited.begin(), visited.end(), next_coord) == visited.end()))

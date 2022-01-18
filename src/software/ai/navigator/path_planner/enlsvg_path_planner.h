@@ -7,7 +7,8 @@
 class EnlsvgPathPlanner : public PathPlanner
 {
     public:
-        EnlsvgPathPlanner(const Rectangle &navigable_area, const std::vector<ObstaclePtr> &obstacles);   
+        EnlsvgPathPlanner(const Rectangle &navigable_area, const std::vector<ObstaclePtr> &obstacles,
+                        double boundary_margin_offset);   
         /**
          * Returns a path that is an optimized path between start and end.
          *
@@ -35,7 +36,7 @@ class EnlsvgPathPlanner : public PathPlanner
         EnlsvgPoint convertPointToEnlsvgPoint(const Point &p) const;
         Point convertEnlsvgPointToPoint(const EnlsvgPoint &gv) const;
         std::optional<Path> convertEnlsvgPathToPath(const EnlsvgPath &p) const;
-        void createObstaclesInGrid(const std::vector<ObstaclePtr> &obstacles) const;
+        void createObstaclesInGrid(const std::vector<ObstaclePtr> &obstacles, double grid_boundary_margin_offset) const;
         bool isCoordNavigable(const EnlsvgPoint &gv) const;
         std::optional<EnlsvgPoint> findClosestUnblockedEnlsvgPoint(const EnlsvgPoint &ep) const;
         bool isBlocked(const EnlsvgPoint &ep) const;
