@@ -20,43 +20,42 @@ extern "C"
 {
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671.h"
 #include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
+}
 
-    // SPI Configs
-    static uint32_t SPI_SPEED_HZ = 200000;
-    static uint8_t SPI_BITS      = 8;
-    static uint32_t SPI_MODE     = 0x3u;
+// SPI Configs
+static uint32_t SPI_SPEED_HZ = 200000;
+static uint8_t SPI_BITS      = 8;
+static uint32_t SPI_MODE     = 0x3u;
 
-    // SPI Chip Selects
-    static const uint32_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
-    static const uint32_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 1;
-    static const uint32_t BACK_LEFT_MOTOR_CHIP_SELECT   = 2;
-    static const uint32_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 3;
-    static const uint32_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
+// SPI Chip Selects
+static const uint32_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
+static const uint32_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 1;
+static const uint32_t BACK_LEFT_MOTOR_CHIP_SELECT   = 2;
+static const uint32_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 3;
+static const uint32_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
 
-    // SPI Trinamic Motor Driver Paths (indexed with chip select above)
-    static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1",
-                                      "/dev/spidev0.2", "/dev/spidev0.3",
-                                      "/dev/spidev0.4"};
+// SPI Trinamic Motor Driver Paths (indexed with chip select above)
+static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spidev0.2",
+                                  "/dev/spidev0.3", "/dev/spidev0.4"};
 
-    static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO = "77";
-    static const char* DRIVER_CONTROL_ENABLE_GPIO           = "78";
+static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO = "77";
+static const char* DRIVER_CONTROL_ENABLE_GPIO           = "78";
 
-    // We need a static pointer here, because trinamic externs the following two
-    // SPI binding functions that we need to interface with their API.
-    //
-    // The motor service exclusively calls the trinamic API which triggers these
-    // functions. The motor service will set this variable in the constructor.
-    static MotorService* g_motor_service = NULL;
+// We need a static pointer here, because trinamic externs the following two
+// SPI binding functions that we need to interface with their API.
+//
+// The motor service exclusively calls the trinamic API which triggers these
+// functions. The motor service will set this variable in the constructor.
+static MotorService* g_motor_service = NULL;
 
-    uint8_t tmc4671_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
-    {
-        return g_motor_service->tmc4671ReadWriteByte(motor, data, lastTransfer);
-    }
+uint8_t tmc4671_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
+{
+    return g_motor_service->tmc4671ReadWriteByte(motor, data, lastTransfer);
+}
 
-    uint8_t tmc6100_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
-    {
-        return g_motor_service->tmc6100ReadWriteByte(motor, data, lastTransfer);
-    }
+uint8_t tmc6100_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
+{
+    return g_motor_service->tmc6100ReadWriteByte(motor, data, lastTransfer);
 }
 
 MotorService::MotorService(const RobotConstants_t& robot_constants,
