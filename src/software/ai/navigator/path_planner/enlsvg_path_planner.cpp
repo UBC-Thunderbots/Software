@@ -1,9 +1,11 @@
 #include "enlsvg_path_planner.h"
 
 EnlsvgPathPlanner::EnlsvgPathPlanner(
-    const Rectangle &navigable_area, const std::vector<ObstaclePtr> &obstacles, double grid_boundary_offset)
-    :   num_grid_rows(static_cast<int>(round(navigable_area.xLength() / SIZE_OF_GRID_CELL_IN_METERS))),
-        num_grid_cols(static_cast<int>(round(navigable_area.yLength() / SIZE_OF_GRID_CELL_IN_METERS))),
+    const Rectangle &navigable_area, const std::vector<ObstaclePtr> &obstacles, double grid_boundary_offset, 
+    double resolution)
+    :   resolution(resolution),
+        num_grid_rows(static_cast<int>(round(navigable_area.xLength() / resolution))),
+        num_grid_cols(static_cast<int>(round(navigable_area.yLength() / resolution))),
         origin(navigable_area.negXNegYCorner()) ,
         max_navigable_y_enlsvg_point(convertPointToEnlsvgPoint(navigable_area.posXPosYCorner()).y),
         max_navigable_x_enlsvg_point(convertPointToEnlsvgPoint(navigable_area.posXPosYCorner()).x),
@@ -14,10 +16,9 @@ EnlsvgPathPlanner::EnlsvgPathPlanner(
     mem = std::make_unique<EnlsvgMemory>(*algo);
 }
 
-// TODO: check whether this const reference thing works because it shouldn't here
 void EnlsvgPathPlanner::createObstaclesInGrid(const std::vector<ObstaclePtr> &obstacles, double boundary_margin) const
 {
-    double offset_in_enlsvg = boundary_margin / SIZE_OF_GRID_CELL_IN_METERS;
+    double offset_in_enlsvg = boundary_margin / resolution;
     for (int x = 0; x < offset_in_enlsvg; ++x)
     {
         for (int y = 0; y < num_grid_cols; ++y)
@@ -37,7 +38,7 @@ void EnlsvgPathPlanner::createObstaclesInGrid(const std::vector<ObstaclePtr> &ob
     
     for (auto &obstacle : obstacles)
     {
-        auto blocked_points = obstacle->rasterize(SIZE_OF_GRID_CELL_IN_METERS);
+        auto blocked_points = obstacle->rasterize(resolution);
         
         for (Point &blocked_point : blocked_points)
         {
@@ -46,20 +47,6 @@ void EnlsvgPathPlanner::createObstaclesInGrid(const std::vector<ObstaclePtr> &ob
             {
                 grid->setBlocked(blocked_coord.x, blocked_coord.y, true);
             }
-        }
-    }
-}
-
-void EnlsvgPathPlanner::blockNearbyCoordDueToRobotRadius(const Point &point) const
-{
-    for (int x_sign = -1; x_sign < 2; ++x_sign)
-    {
-        for (int y_sign = -1; y_sign < 2; ++y_sign)
-        {
-            EnlsvgPoint nearby_coord = 
-                convertPointToEnlsvgPoint(point + Vector(x_sign*ROBOT_MAX_RADIUS_METERS, 
-                                                        y_sign*ROBOT_MAX_RADIUS_METERS));
-            grid->setBlocked(nearby_coord.x, nearby_coord.y, true);
         }
     }
 }
@@ -124,7 +111,7 @@ std::optional<Path> EnlsvgPathPlanner::findPath(
     
     // Due to processing, it is possible that the first two points may be very close together, this will fix that
     if (path_points.size() > 2
-       && (path_points[0] - path_points[1]).length() < SIZE_OF_GRID_CELL_IN_METERS)
+       && (path_points[0] - path_points[1]).length() < resolution)
     {
         path_points.erase(path_points.begin() + 1);
     }
@@ -136,16 +123,16 @@ EnlsvgPathPlanner::EnlsvgPoint EnlsvgPathPlanner::convertPointToEnlsvgPoint(
     const Point &p) const
 {
     return EnlsvgPoint(
-        static_cast<int>(round((p.x() - origin.x())/ (double) SIZE_OF_GRID_CELL_IN_METERS)),
-        static_cast<int>(round((p.y() - origin.y()) / (double) SIZE_OF_GRID_CELL_IN_METERS)));
+        static_cast<int>(round((p.x() - origin.x())/ (double) resolution)),
+        static_cast<int>(round((p.y() - origin.y()) / (double) resolution)));
 }
 
 Point EnlsvgPathPlanner::convertEnlsvgPointToPoint(
     const EnlsvgPoint &c) const
 {
     return Point(
-        static_cast<double>(c.x * SIZE_OF_GRID_CELL_IN_METERS + origin.x()), 
-        static_cast<double>(c.y * SIZE_OF_GRID_CELL_IN_METERS + origin.y()));
+        static_cast<double>(c.x * resolution + origin.x()), 
+        static_cast<double>(c.y * resolution + origin.y()));
 }
 
 std::optional<Path> EnlsvgPathPlanner::convertEnlsvgPathToPath(
@@ -168,6 +155,7 @@ std::optional<Path> EnlsvgPathPlanner::convertEnlsvgPathToPath(
 std::optional<EnlsvgPathPlanner::EnlsvgPoint> EnlsvgPathPlanner::findClosestUnblockedEnlsvgPoint(
     const EnlsvgPoint &ep) const
 {
+    // Uses DFS to find the closest unblocked cell by looking at nearby cells
     std::queue<EnlsvgPoint> q;
     std::vector<EnlsvgPoint> visited;
     q.push(ep);
