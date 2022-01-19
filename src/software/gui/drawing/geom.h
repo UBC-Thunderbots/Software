@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <QtCore/QLine>
 #include <QtCore/QPoint>
 #include <QtCore/QRect>

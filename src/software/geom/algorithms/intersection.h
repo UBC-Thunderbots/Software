@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_set>
+#include <optional>
 
 #include "software/geom/line.h"
 #include "software/geom/polygon.h"

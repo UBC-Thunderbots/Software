@@ -1,5 +1,6 @@
 #pragma once
 #include <experimental/filesystem>
+#include <optional>
 
 #include "proto/repeated_any_msg.pb.h"
 #include "software/util/typename/typename.h"

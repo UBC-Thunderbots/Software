@@ -1,6 +1,7 @@
 #pragma once
 #include <boost/filesystem.hpp>
 #include <string>
+#include <optional>
 
 class ArduinoUtil
 {
