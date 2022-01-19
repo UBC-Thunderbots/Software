@@ -66,24 +66,24 @@ std::vector<PlannerTestCase>
                    .obstacles =
                        {
                            robot_navigation_obstacle_factory.createFromRobotPosition(
-                               Point({3, 0})),
+                               Point(3, 0)),
                            robot_navigation_obstacle_factory.createFromRobotPosition(
-                               Point({std::cos(M_PI / 3) * 3, std::sin(M_PI / 3) * 3})),
+                               Point(std::cos(M_PI / 3) * 3, std::sin(M_PI / 3) * 3)),
                            robot_navigation_obstacle_factory.createFromRobotPosition(
-                               Point({std::cos(2 * M_PI / 3) * 3,
-                                      std::sin(2 * M_PI / 3) * 3})),
+                               Point(std::cos(2 * M_PI / 3) * 3,
+                                      std::sin(2 * M_PI / 3) * 3)),
                            robot_navigation_obstacle_factory
                                .createFromRobotPosition(
-                                   Point({std::cos(3 * M_PI / 3) * 3,
-                                          std::sin(3 * M_PI / 3) * 3})),
+                                   Point(std::cos(3 * M_PI / 3) * 3,
+                                          std::sin(3 * M_PI / 3) * 3)),
                            robot_navigation_obstacle_factory
                                .createFromRobotPosition(
-                                   Point({std::cos(4 * M_PI / 3) * 3,
-                                          std::sin(4 * M_PI / 3) * 3})),
+                                   Point(std::cos(4 * M_PI / 3) * 3,
+                                          std::sin(4 * M_PI / 3) * 3)),
                            robot_navigation_obstacle_factory
                                .createFromRobotPosition(
-                                   Point({std::cos(5 * M_PI / 3) * 3,
-                                          std::sin(5 * M_PI / 3) * 3})),
+                                   Point(std::cos(5 * M_PI / 3) * 3,
+                                          std::sin(5 * M_PI / 3) * 3)),
                        },
                    .should_return_path = true},
 
