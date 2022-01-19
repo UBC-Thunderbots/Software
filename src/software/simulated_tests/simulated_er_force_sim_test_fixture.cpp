@@ -255,7 +255,7 @@ void SimulatedErForceSimTestFixture::runTest(
                 failure_message += fun.currentErrorMessage() + std::string("\n");
             }
         }
-        ADD_FAILURE() << failure_message;
+        FAIL() << failure_message;
     }
 }
 
