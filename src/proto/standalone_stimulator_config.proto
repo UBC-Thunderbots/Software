@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package TbotsProto;
+
+message StandaloneSimulatorConfig
+{
+    int32 blue_team_channel    = 1;
+    int32 yellow_team_channel  = 2;
+    string network_interface   = 3;
+    string vision_ipv4_address = 4;
+    int32 vision_port          = 5;
+}

@@ -3,7 +3,6 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
-#include "software/ai/hl/stp/tactic/penalty_setup_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
 PenaltyKickPlay::PenaltyKickPlay(std::shared_ptr<const PlayConfig> config)

@@ -89,7 +89,7 @@ class SimulatedTacticTestFixture : public SimulatedTestFixture
     void updateEnemyPrimitives(const World& world,
                                std::shared_ptr<Simulator> simulator_to_update);
 
-    std::optional<PlayInfo> getPlayInfo() override;
+    std::optional<TbotsProto::PlayInfo> getPlayInfo() override;
     AIDrawFunction getDrawFunctions() override;
 
     std::shared_ptr<Tactic> friendly_tactic;

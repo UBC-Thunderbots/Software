@@ -66,7 +66,8 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
 {
     const float LOCAL_EPSILON = 1e-6f;  // Avoid dividing by zero
 
-    const float dest_orientation = move_primitive.final_angle().radians();
+    const float dest_orientation =
+        static_cast<float>(move_primitive.final_angle().radians());
     const float delta_orientation =
         dest_orientation - static_cast<float>(robot_state.orientation().toRadians());
     const float max_target_angular_speed = robot_constants_.robot_max_ang_speed_rad_per_s;
