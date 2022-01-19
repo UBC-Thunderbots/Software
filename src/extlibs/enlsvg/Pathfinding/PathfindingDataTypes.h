@@ -4,38 +4,40 @@
 #include <cstddef>
 #include <vector>
 
-namespace Pathfinding {
-
-struct GridVertex {
-    int x;
-    int y;
-
-    GridVertex() {}
-    GridVertex(int x, int y): x(x), y(y) {}
-    
-    inline bool operator==(const GridVertex &other)
+namespace Pathfinding
+{
+    struct GridVertex
     {
-        return (x == other.x) && (y == other.y);
-    }
-    
-    inline bool operator!=(const GridVertex &other)
+        int x;
+        int y;
+
+        GridVertex() {}
+        GridVertex(int x, int y) : x(x), y(y) {}
+
+        inline bool operator==(const GridVertex &other)
+        {
+            return (x == other.x) && (y == other.y);
+        }
+
+        inline bool operator!=(const GridVertex &other)
+        {
+            return (x != other.x) || (y != other.y);
+        }
+    };
+
+    typedef std::vector<GridVertex> Path;
+
+    struct ParentPtrs
     {
-        return (x != other.x) || (y != other.y);
-    }
-};
+        std::vector<GridVertex> current;
+        std::vector<GridVertex> parent;
+        GridVertex goal;
+        GridVertex goalParent;
+    };
 
-typedef std::vector<GridVertex> Path;
+    typedef int VertexID;
+    typedef size_t EdgeID;
 
-struct ParentPtrs {
-    std::vector<GridVertex> current;
-    std::vector<GridVertex> parent;
-    GridVertex goal;
-    GridVertex goalParent;
-};
-
-typedef int VertexID;
-typedef size_t EdgeID;
-
-}
+}  // namespace Pathfinding
 
 #endif

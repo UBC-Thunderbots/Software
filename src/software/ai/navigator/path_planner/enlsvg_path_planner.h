@@ -1,138 +1,152 @@
-#include "extlibs/enlsvg/Pathfinding/ENLSVG.h" 
+#include <queue>
+
+#include "extlibs/enlsvg/Pathfinding/ENLSVG.h"
 #include "path_planner.h"
 #include "software/world/world.h"
 
-#include <queue>
-
 /**
-* The Edge N-Level Sparse Visibility Graph algorithm is a fast pathfinding algorithm for precomputed grids. This class 
-* is a wrapper for an implementation found in software/src/extlibs/enlsvg/. This slide deck from Ohohcaketester
-* [https://github.com/Ohohcakester/Any-Angle-Pathfinding/files/1286724/ENLSVG_SoCS17.pdf] and this research paper
-* [https://aaai.org/ocs/index.php/SOCS/SOCS17/paper/view/15790] provides more information.
-*
-* Since this algorithm requires precomputation to achieve fast pathfinding, obstacles are passed into the constructor
-* and is unmodifiable once it is created.
-*/
+ * The Edge N-Level Sparse Visibility Graph algorithm is a fast pathfinding algorithm for
+ * precomputed grids. This class is a wrapper for an implementation found in
+ * software/src/extlibs/enlsvg/. This slide deck from Ohohcaketester
+ * [https://github.com/Ohohcakester/Any-Angle-Pathfinding/files/1286724/ENLSVG_SoCS17.pdf]
+ * and this research paper [https://aaai.org/ocs/index.php/SOCS/SOCS17/paper/view/15790]
+ * provides more information.
+ *
+ * Since this algorithm requires precomputation to achieve fast pathfinding, obstacles are
+ * passed into the constructor and is unmodifiable once it is created.
+ */
 class EnlsvgPathPlanner : public PathPlanner
 {
-    public:
-        /**
-        * Creates an EnlsvgPathPlanner object. It creates an internal grid representation using the passed
-        * navigable_area with the passed resolution. It also pads the outer boundaries of the grid as an obstacle using 
-        * the boundary_margin_offset parameter. It constructs the grid and sets the corresponding obstacles as 
-        * "blocked".
-        *
-        * @param navigable_area         The total area that the path planner must path plan inside
-        * @param obstacles              A list of obstacles to consider when path planning
-        * @param boundary_margin_offset Ppadding from the edges of the navigable_area to set as an obstacle
-        * @param resolution             The resolution of the internal representation of the grid. Uses the same units
-        *                               as boundary_margin_offset
-        */
-        EnlsvgPathPlanner(const Rectangle &navigable_area, const std::vector<ObstaclePtr> &obstacles,
-                        double boundary_margin_offset = 0.0, double resolution = 0.09);   
-        /**
-         * Returns a path that is an optimized path between start and end.
-         *
-         * @param start start point
-         * @param end end point
-         * @param navigable_area Rectangle representing the navigable area
-         * @param obstacles ignored
-         *
-         * @return a vector of points that is the optimal path avoiding obstacles
-         *         if no valid path then return empty vector
-         */
-        std::optional<Path> findPath(const Point &start, const Point &end,
-                                     const Rectangle &navigable_area,
-                                     const std::vector<ObstaclePtr> &obstacles) override;
-                                     
-        /** 
-        * Returns internal resolution of the grid.
-        *
-        * @return double    size of grid cell (in the same units as passed into the constructor)
-        */
-        inline double getResolution() const { return resolution; }
-        
-    private:
-        using EnlsvgPoint       = Pathfinding::GridVertex;
-        using EnlsvgPath        = Pathfinding::Path;
-        using EnlsvgGrid        = Pathfinding::Grid;
-        using EnlsvgAlgorithm   = Pathfinding::ENLSVG::Algorithm;
-        using EnlsvgMemory      = Pathfinding::ENLSVG::Memory;
-    
-        /**
-        * Conversions from a Point <-> internal coordinate representation.
-        * 
-        * @param p/gv               point to be converted
-        *
-        * @return EnlsvgPoint/Point converted point
-        */
-        EnlsvgPoint convertPointToEnlsvgPoint(const Point &p) const;
-        Point convertEnlsvgPointToPoint(const EnlsvgPoint &gv) const;
-        
-        /**
-        * Converts the internal representation of a path to a Path
-        *
-        * @param p          implenetation's representation of a path
-        *
-        * @return Point    converted Thunderbots Path
-        */
-        std::optional<Path> convertEnlsvgPathToPath(const EnlsvgPath &p) const;
-        
-        /**
-        * Creates the obstacles in the grid from the given obstacles as well as obstacle-izing regions from the edges of
-        * the grids based on the grid_boundary_margin_offset.
-        *
-        * @param obstacles                      a list of obstacles
-        * @param grid_boundary_margin_offset    an offset that represts the width of the region from the edges of the
-        *                                       grid to consider as an obstacle. Has the same units as the resolution
-        *                                       parameter in EnlsvgPathPlanner()
-        */
-        void createObstaclesInGrid(const std::vector<ObstaclePtr> &obstacles, double grid_boundary_margin_offset) const;
-        
-        /**
-        * Returns true if the internal representation of a coordinate is within the limits of the grid.
-        *
-        * @param gv     a internal coordinate representation to check
-        * 
-        * @return bool  true if the point is within the limits of the field, false otherwise
-        */
-        bool isCoordNavigable(const EnlsvgPoint &gv) const;
-        
-        /**
-        * Returns the closest unblocked internal coordinate for a point. It may return the given point itself.
-        *
-        * @param ep an internal point to investigate
-        *
-        * @return std::optional<EnlsvgPoint>    returns std::nullopt if the entire field is blocked, or an internal grid
-        *                                       coordinate representing a closest unblocked location
-        */
-        std::optional<EnlsvgPoint> findClosestUnblockedEnlsvgPoint(const EnlsvgPoint &ep) const;
-        
-        /*
-        * Returns true if a given internal coordinate is blocked, false otherwise.
-        *
-        * @param ep an internal point to check
-        *
-        * @return   true if the point is blocked in the internal grid and false otherwise. Also returns true if the 
-        *           given coordinate is out-of-bounds
-        */
-        bool isBlocked(const EnlsvgPoint &ep) const;
-            
-        // analagous to the size of a grid cell
-        double resolution;
-    
-        // can be arbitrarily thought of as the width of the grid on the x-axis
-        int num_grid_rows;
-        // can be arbitrarily thought of as the height of the grid on the y-axis
-        int num_grid_cols;
-        
-        Point origin;
-        
-        int max_navigable_y_enlsvg_point;
-        int max_navigable_x_enlsvg_point;
+   public:
+    /**
+     * Creates an EnlsvgPathPlanner object. It creates an internal grid representation
+     * using the passed navigable_area with the passed resolution. It also pads the outer
+     * boundaries of the grid as an obstacle using the boundary_margin_offset parameter.
+     * It constructs the grid and sets the corresponding obstacles as "blocked".
+     *
+     * @param navigable_area         The total area that the path planner must path plan
+     * inside
+     * @param obstacles              A list of obstacles to consider when path planning
+     * @param boundary_margin_offset Ppadding from the edges of the navigable_area to set
+     * as an obstacle
+     * @param resolution             The resolution of the internal representation of the
+     * grid. Uses the same units as boundary_margin_offset
+     */
+    EnlsvgPathPlanner(const Rectangle &navigable_area,
+                      const std::vector<ObstaclePtr> &obstacles,
+                      double boundary_margin_offset = 0.0, double resolution = 0.09);
+    /**
+     * Returns a path that is an optimized path between start and end.
+     *
+     * @param start start point
+     * @param end end point
+     * @param navigable_area Rectangle representing the navigable area
+     * @param obstacles ignored
+     *
+     * @return a vector of points that is the optimal path avoiding obstacles
+     *         if no valid path then return empty vector
+     */
+    std::optional<Path> findPath(const Point &start, const Point &end,
+                                 const Rectangle &navigable_area,
+                                 const std::vector<ObstaclePtr> &obstacles) override;
 
-        // Required internal data structures
-        std::unique_ptr<EnlsvgGrid> grid;
-        std::unique_ptr<const EnlsvgAlgorithm> algo;
-        std::unique_ptr<EnlsvgMemory> mem;
+    /**
+     * Returns internal resolution of the grid.
+     *
+     * @return double    size of grid cell (in the same units as passed into the
+     * constructor)
+     */
+    inline double getResolution() const
+    {
+        return resolution;
+    }
+
+   private:
+    using EnlsvgPoint     = Pathfinding::GridVertex;
+    using EnlsvgPath      = Pathfinding::Path;
+    using EnlsvgGrid      = Pathfinding::Grid;
+    using EnlsvgAlgorithm = Pathfinding::ENLSVG::Algorithm;
+    using EnlsvgMemory    = Pathfinding::ENLSVG::Memory;
+
+    /**
+     * Conversions from a Point <-> internal coordinate representation.
+     *
+     * @param p/gv               point to be converted
+     *
+     * @return EnlsvgPoint/Point converted point
+     */
+    EnlsvgPoint convertPointToEnlsvgPoint(const Point &p) const;
+    Point convertEnlsvgPointToPoint(const EnlsvgPoint &gv) const;
+
+    /**
+     * Converts the internal representation of a path to a Path
+     *
+     * @param p          implenetation's representation of a path
+     *
+     * @return Point    converted Thunderbots Path
+     */
+    std::optional<Path> convertEnlsvgPathToPath(const EnlsvgPath &p) const;
+
+    /**
+     * Creates the obstacles in the grid from the given obstacles as well as
+     * obstacle-izing regions from the edges of the grids based on the
+     * grid_boundary_margin_offset.
+     *
+     * @param obstacles                      a list of obstacles
+     * @param grid_boundary_margin_offset    an offset that represts the width of the
+     * region from the edges of the grid to consider as an obstacle. Has the same units as
+     * the resolution parameter in EnlsvgPathPlanner()
+     */
+    void createObstaclesInGrid(const std::vector<ObstaclePtr> &obstacles,
+                               double grid_boundary_margin_offset) const;
+
+    /**
+     * Returns true if the internal representation of a coordinate is within the limits of
+     * the grid.
+     *
+     * @param gv     a internal coordinate representation to check
+     *
+     * @return bool  true if the point is within the limits of the field, false otherwise
+     */
+    bool isCoordNavigable(const EnlsvgPoint &gv) const;
+
+    /**
+     * Returns the closest unblocked internal coordinate for a point. It may return the
+     * given point itself.
+     *
+     * @param ep an internal point to investigate
+     *
+     * @return std::optional<EnlsvgPoint>    returns std::nullopt if the entire field is
+     * blocked, or an internal grid coordinate representing a closest unblocked location
+     */
+    std::optional<EnlsvgPoint> findClosestUnblockedEnlsvgPoint(
+        const EnlsvgPoint &ep) const;
+
+    /*
+     * Returns true if a given internal coordinate is blocked, false otherwise.
+     *
+     * @param ep an internal point to check
+     *
+     * @return   true if the point is blocked in the internal grid and false otherwise.
+     * Also returns true if the given coordinate is out-of-bounds
+     */
+    bool isBlocked(const EnlsvgPoint &ep) const;
+
+    // analogous to the size of a grid cell
+    double resolution;
+
+    // can be arbitrarily thought of as the width of the grid on the x-axis
+    int num_grid_rows;
+    // can be arbitrarily thought of as the height of the grid on the y-axis
+    int num_grid_cols;
+
+    Point origin;
+
+    int max_navigable_y_enlsvg_point;
+    int max_navigable_x_enlsvg_point;
+
+    // Required internal data structures
+    std::unique_ptr<EnlsvgGrid> grid;
+    std::unique_ptr<const EnlsvgAlgorithm> algo;
+    std::unique_ptr<EnlsvgMemory> mem;
 };

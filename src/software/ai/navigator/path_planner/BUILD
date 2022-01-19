@@ -62,8 +62,8 @@ cc_library(
     hdrs = ["enlsvg_path_planner.h"],
     deps = [
         ":path_planner",
-        "//extlibs/enlsvg:enlsvg",
-        "//software/world:world",
+        "//extlibs/enlsvg",
+        "//software/world",
     ],
 )
 
@@ -86,8 +86,8 @@ cc_test(
         ":enlsvg_path_planner",
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
-        "//software/test_util"
-    ]
+        "//software/test_util",
+    ],
 )
 
 cc_test(
