@@ -74,6 +74,7 @@ void WifiBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 void WifiBackend::onValueReceived(World world)
 {
     vision_output->sendProto(*createVision(world));
+    LOG(VISUALIZE) << *createWorld(world);
 }
 
 void WifiBackend::receiveRobotLogs(TbotsProto::RobotLog log)

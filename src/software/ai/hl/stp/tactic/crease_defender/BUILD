@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "crease_defender_tactic",
-    srcs = ["crease_defender_tactic.cpp"],
+    srcs = [
+        "crease_defender_fsm.cpp",
+        "crease_defender_tactic.cpp",
+    ],
     hdrs = [
         "crease_defender_fsm.h",
         "crease_defender_tactic.h",

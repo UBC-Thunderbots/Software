@@ -36,6 +36,14 @@ class World final
                    const Team& enemy_team, unsigned int buffer_size = 20);
 
     /**
+     * Creates a new world based on the TbotsProto::World protobuf representation.
+     *
+     * @param world_proto The TbotsProto::World protobuf which this world should be based
+     * on
+     */
+    explicit World(const TbotsProto::World& world_proto);
+
+    /**
      * Updates the state of the ball in the world with the new ball data
      *
      * @param new_ball A Ball containing new ball information

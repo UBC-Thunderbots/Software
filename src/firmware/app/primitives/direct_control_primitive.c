@@ -38,11 +38,13 @@ void app_direct_control_primitive_start(TbotsProto_DirectControlPrimitive prim_m
         {
             TbotsProto_DirectControlPrimitive_DirectVelocityControl control_msg =
                 prim_msg.wheel_control.direct_velocity_control;
-            state->direct_velocity          = true;
-            state->direct_target_velocity_x = control_msg.velocity.x_component_meters;
-            state->direct_target_velocity_y = control_msg.velocity.y_component_meters;
+            state->direct_velocity = true;
+            state->direct_target_velocity_x =
+                (float)control_msg.velocity.x_component_meters;
+            state->direct_target_velocity_y =
+                (float)control_msg.velocity.y_component_meters;
             state->direct_target_velocity_angular =
-                control_msg.angular_velocity.radians_per_second;
+                (float)control_msg.angular_velocity.radians_per_second;
             break;
         }
         default:

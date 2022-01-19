@@ -6,7 +6,7 @@
 #include "cpp_redis/core/client.hpp"
 #include "software/test_util/test_util.h"
 
-TEST(RedisKeyValueStoreTests, cpp_redis_get_test)
+TEST(RedisKeyValueStoreTests, DISABLED_cpp_redis_get_test)
 {
     cpp_redis::client client;
     client.connect(
@@ -40,7 +40,7 @@ TEST(RedisKeyValueStoreTests, cpp_redis_get_test)
 }
 
 
-TEST(RedisKeyValueStoreTests, cpp_redis_get_and_set_speed_test)
+TEST(RedisKeyValueStoreTests, DISABLED_cpp_redis_get_and_set_speed_test)
 {
     cpp_redis::client client;
     client.connect(
