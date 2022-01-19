@@ -233,6 +233,10 @@ void SimulatedErForceSimTestFixture::runTest(
 
         validation_functions_done =
             tickTest(simulation_time_step, ai_time_step, world, simulator);
+        if (::testing::Test::HasFailure())
+        {
+            FAIL();
+        }
     }
     // Output the tick duration results
     double avg_tick_duration = total_tick_duration / tick_count;

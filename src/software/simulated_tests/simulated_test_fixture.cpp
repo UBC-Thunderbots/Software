@@ -282,6 +282,10 @@ void SimulatedTestFixture::runTest(
 
         validation_functions_done = tickTest(simulation_time_step, ai_time_step,
                                              friendly_world, enemy_world, simulator);
+        if (::testing::Test::HasFailure())
+        {
+            FAIL();
+        }
     }
     // Output the tick duration results
     double avg_friendly_tick_duration =
@@ -316,7 +320,7 @@ void SimulatedTestFixture::runTest(
                 failure_message += fun.currentErrorMessage() + std::string("\n");
             }
         }
-        ADD_FAILURE() << failure_message;
+        FAIL() << failure_message;
     }
 }
 
