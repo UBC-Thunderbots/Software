@@ -29,6 +29,10 @@ echo "================================================================"
 sudo apt-get update
 sudo apt-get install -y software-properties-common # required for add-apt-repository
 
+if [[ $(lsb_release -rs) == "18.04" ]]; then
+    sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+fi
+
 sudo apt-get update
 
 # (sorted alphabetically)
@@ -37,7 +41,7 @@ host_software_packages=(
     codespell # Fixes typos
     curl
     default-jdk # Needed for Bazel to run properly
-    gcc-7 # We use gcc 7.4.0
+    gcc-9 # We use gcc 7.4.0
     git # required for build
     kcachegrind # This lets us view the profiles output by callgrind
     libeigen3-dev # A math / numerical library used for things like linear regression

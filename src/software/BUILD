@@ -33,16 +33,16 @@ cc_binary(
     ],
 )
 
-#cc_binary(
-#    name = "handheld_control",
-#    srcs = ["handheld_control_main.cpp"],
-#    deps = [
-#        "//shared/parameter:cpp_configs",
-#        #"//software/backend:radio_backend",
-#        "//software/handheld_controller:controller_primitive_generator",
-#        "//software/handheld_controller:xbox_360_controller",
-#    ],
-#)
+cc_binary(
+    name = "handheld_control",
+    srcs = ["handheld_control_main.cpp"],
+    deps = [
+        "//shared/parameter:cpp_configs",
+        #"//software/backend:radio_backend",
+        "//software/handheld_controller:controller_primitive_generator",
+        "//software/handheld_controller:xbox_360_controller",
+    ],
+)
 
 cc_binary(
     name = "robot_diagnostics_main",

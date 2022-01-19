@@ -33,6 +33,8 @@ http_archive(
     urls = [
         "https://github.com/cpp-redis/cpp_redis/archive/fc2c43fa07e45e1ef0f77cbda6a240e7890ae5aa.zip",
     ],
+    patch_args = ["-p1"],
+    patches = ["@//extlibs:cpp_redis.patch"],
 )
 
 http_archive(

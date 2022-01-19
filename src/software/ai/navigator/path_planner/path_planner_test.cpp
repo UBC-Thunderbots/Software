@@ -36,7 +36,7 @@ RobotNavigationObstacleFactory robot_navigation_obstacle_factory(
     std::make_shared<const RobotNavigationObstacleConfig>());
 
 std::vector<PlannerTestCase>
-    test_cases = {{.name               = "Empty field straight line",
+    test_cases = std::vector<PlannerTestCase>({{.name               = "Empty field straight line",
                    .start              = Point(0, 0),
                    .end                = Point(1, 0),
                    .navigable_area     = Rectangle({-1, -1}, {2, 2}),
@@ -48,7 +48,7 @@ std::vector<PlannerTestCase>
                    .end                = Point(2.1, 0),
                    .navigable_area     = Rectangle({-2, -2}, {2.5, 2.5}),
                    .obstacles          = {robot_navigation_obstacle_factory
-                                     .createFromRobotPosition(Point({1, 0}))},
+                                     .createFromRobotPosition(Point(1, 0))},
                    .should_return_path = true},
 
                   {.name           = "Large rectangle in path",
@@ -110,7 +110,7 @@ std::vector<PlannerTestCase>
                    .navigable_area = Rectangle({-5, -5}, {5, 5}),
                    .obstacles      = {robot_navigation_obstacle_factory.createFromShape(
                        Rectangle({-1, -1}, {2, 1}))},
-                   .should_return_path = true}};
+                   .should_return_path = true}});
 
 
 template <typename PlannerT>
