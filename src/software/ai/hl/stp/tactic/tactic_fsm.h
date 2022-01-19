@@ -1,8 +1,6 @@
 #pragma once
 
 #include <functional>
-#include <include/boost/sml.hpp>
-#include <queue>
 
 #include "software/ai/intent/intent.h"
 #include "software/util/sml_fsm/sml_fsm.h"
