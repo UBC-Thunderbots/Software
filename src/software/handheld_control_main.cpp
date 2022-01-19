@@ -18,10 +18,11 @@ int main(int argc, char **argv)
         thunderbots_config->getHandheldControllerConfig());
     auto primitive_generator = std::make_shared<ControllerPrimitiveGenerator>(
         thunderbots_config->getHandheldControllerConfig(), create2015RobotConstants());
-//auto backend = std::make_shared<RadioBackend>(thunderbots_config->getBackendConfig());
+    // auto backend =
+    // std::make_shared<RadioBackend>(thunderbots_config->getBackendConfig());
 
     controller->Subject<ControllerInput>::registerObserver(primitive_generator);
-    //primitive_generator->Subject<TbotsProto::PrimitiveSet>::registerObserver(backend);
+    // primitive_generator->Subject<TbotsProto::PrimitiveSet>::registerObserver(backend);
 
     // This blocks forever without using the CPU
     std::promise<void>().get_future().wait();
