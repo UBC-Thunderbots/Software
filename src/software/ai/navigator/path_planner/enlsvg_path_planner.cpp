@@ -59,8 +59,9 @@ bool EnlsvgPathPlanner::isCoordNavigable(const EnlsvgPoint& ep) const
 
 std::optional<Path> EnlsvgPathPlanner::findPath(
     const Point &start, const Point &end, const Rectangle &navigable_area,
-    const std::vector<ObstaclePtr> &obstacles)
+    const std::vector<ObstaclePtr> &ignored)
 {
+    // Check if start and end coordinates are in navigable area and return null if it isn't
     bool navigable_area_contains_start =
         (start.x() >= navigable_area.xMin()) && (start.x() <= navigable_area.xMax()) &&
         (start.y() >= navigable_area.yMin()) && (start.y() <= navigable_area.yMax());
@@ -72,6 +73,7 @@ std::optional<Path> EnlsvgPathPlanner::findPath(
         return std::nullopt;
     }
     
+    // Find closest unblocked points in case the start and end positions are inside obstacles
     EnlsvgPoint s   = convertPointToEnlsvgPoint(start);
     EnlsvgPoint e   = convertPointToEnlsvgPoint(end);
     auto new_start  = findClosestUnblockedEnlsvgPoint(s);
@@ -98,14 +100,15 @@ std::optional<Path> EnlsvgPathPlanner::findPath(
         path_points.insert(path_points.begin(), start);
     }
     
-    // If the end point wasn't blocked, then replace the end with the actual end
+    // If the end point wasn't blocked, then replace the end with the actual end because some details get lose due to 
+    // the grid resolution
     if (new_end.value() == e)
     {
         path_points.pop_back();
         path_points.emplace_back(end);
     }
      
-    // Make sure start and end points correspond to input start and end
+    // Make sure start point corresponds exactly with the given start
     path_points.erase(path_points.begin());
     path_points.insert(path_points.begin(), start);
     

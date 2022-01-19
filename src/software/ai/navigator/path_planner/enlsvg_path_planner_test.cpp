@@ -54,6 +54,9 @@ void checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
     }
 }
 
+/**
+* This function also expands obstacle polygons by the size of the robot radius.
+*/
 void checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
                                        std::vector<Polygon> obstacles)
 {
@@ -140,10 +143,6 @@ TEST_F(TestEnlsvgPathPlanner,
     EXPECT_TRUE(path != std::nullopt);
 
     std::vector<Point> path_points = path->getKnots();
-//    for (Point p : path_points)
-//    {
-//        std::cout << "Point (" << p.x() << ", " << p.y() << ")\n";
-//    }
 
     // The path should start at exactly the start point and end at exactly the dest
     EXPECT_EQ(start, path->getStartPoint());
