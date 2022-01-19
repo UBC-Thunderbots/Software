@@ -32,7 +32,7 @@ void ShootOrPassPlayFSM::updateOffensivePositioningTactics(
             std::vector<std::shared_ptr<MoveTactic>>(num_tactics);
         std::generate(offensive_positioning_tactics.begin(),
                       offensive_positioning_tactics.end(),
-                      []() { return std::make_shared<MoveTactic>(false); });
+                      []() { return std::make_shared<MoveTactic>(); });
     }
 
     for (unsigned int i = 0; i < offensive_positioning_tactics.size(); i++)
