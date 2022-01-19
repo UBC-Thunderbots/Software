@@ -8,6 +8,7 @@ Play::Play(std::shared_ptr<const PlayConfig> play_config, bool requires_goalie)
 {
 }
 
+// TODO (#2359): remove this function
 bool Play::done() const
 {
     // If the coroutine "iterator" is done, the getNextTactics function has completed
@@ -50,7 +51,17 @@ std::vector<std::unique_ptr<Intent>> Play::get(
     MotionConstraintBuildFunction motion_constraint_builder, const World &new_world)
 {
     std::vector<std::unique_ptr<Intent>> intents;
-    PriorityTacticVector priority_tactics = getTactics(new_world);
+    unsigned int num_tactics =
+        static_cast<unsigned int>(new_world.friendlyTeam().numRobots());
+    if (requires_goalie && new_world.friendlyTeam().goalie())
+    {
+        num_tactics--;
+    }
+    updateTactics(
+        PlayUpdate(new_world, num_tactics, [this](PriorityTacticVector new_tactics) {
+            priority_tactics = std::move(new_tactics);
+        }));
+
     ConstPriorityTacticVector const_priority_tactics;
 
     // convert pointers to const pointers
@@ -100,4 +111,10 @@ void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
     {
         getNextTactics(yield, world.value());
     }
+}
+
+// TODO (#2359): delete once all plays are not coroutines
+void Play::updateTactics(const PlayUpdate &play_update)
+{
+    priority_tactics = getTactics(play_update.world);
 }

@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/play/shoot_or_pass_play.h"
+#include "software/ai/hl/stp/play/offense/offense_play.h"
 
 #include <gtest/gtest.h>
 
@@ -8,13 +8,13 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class ShootOrPassPlayTest : public SimulatedPlayTestFixture
+class OffensePlayTest : public SimulatedPlayTestFixture
 {
    protected:
     Field field = Field::createSSLDivisionBField();
 };
 
-TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
+TEST_F(OffensePlayTest, test_offense_play)
 {
     BallState ball_state(Point(-4.4, 2.9), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({
@@ -31,7 +31,7 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(ShootOrPassPlay));
+    setAIPlay(TYPENAME(OffensePlay));
     setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -53,7 +53,7 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
             Duration::fromSeconds(25));
 }
 
-TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play_with_keep_away)
+TEST_F(OffensePlayTest, test_offense_play_with_keep_away)
 {
     BallState ball_state(Point(-1.8, 1.8), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({
@@ -70,7 +70,7 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play_with_keep_away)
          field.enemyGoalCenter(), field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(ShootOrPassPlay));
+    setAIPlay(TYPENAME(OffensePlay));
     setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
@@ -92,7 +92,7 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play_with_keep_away)
             Duration::fromSeconds(25));
 }
 
-TEST(ShootOrPassPlayInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
+TEST(OffensePlayInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
 {
     // Lets setup some things we need to run this test:
     //
@@ -104,21 +104,21 @@ TEST(ShootOrPassPlayInvariantAndIsApplicableTest, test_invariant_and_is_applicab
     // World: A blank testing world we will manipulate for the test
     auto world = ::TestUtil::createBlankTestingWorld();
 
-    // ShootOrPassPlay: The play under test
-    auto shoot_or_pass_play = ShootOrPassPlay(play_config);
+    // OffensePlay: The play under test
+    auto offense_play = OffensePlay(play_config);
     world.updateGameState(
         ::TestUtil::createGameState(RefereeCommand::FORCE_START, RefereeCommand::HALT));
     world.setTeamWithPossession(TeamSide::FRIENDLY);
 
     // Make sure play is running
-    ASSERT_TRUE(shoot_or_pass_play.isApplicable(world));
-    ASSERT_TRUE(shoot_or_pass_play.invariantHolds(world));
+    ASSERT_TRUE(offense_play.isApplicable(world));
+    ASSERT_TRUE(offense_play.invariantHolds(world));
 
     world.setTeamWithPossession(TeamSide::ENEMY);
 
     // Make sure play is not running when enemy has the ball
-    ASSERT_FALSE(shoot_or_pass_play.isApplicable(world));
-    ASSERT_FALSE(shoot_or_pass_play.invariantHolds(world));
+    ASSERT_FALSE(offense_play.isApplicable(world));
+    ASSERT_FALSE(offense_play.invariantHolds(world));
 
     // Set game state to a kickoff and start it. Game state is set to ready
     world.updateGameState(::TestUtil::createGameState(
@@ -130,6 +130,6 @@ TEST(ShootOrPassPlayInvariantAndIsApplicableTest, test_invariant_and_is_applicab
     world.updateGameStateBall(Ball(Point(0, 0.05), Vector(), Timestamp::fromSeconds(0)));
 
     // Make sure play is running
-    ASSERT_TRUE(shoot_or_pass_play.isApplicable(world));
-    ASSERT_TRUE(shoot_or_pass_play.invariantHolds(world));
+    ASSERT_TRUE(offense_play.isApplicable(world));
+    ASSERT_TRUE(offense_play.invariantHolds(world));
 }
