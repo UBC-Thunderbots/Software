@@ -333,6 +333,16 @@ def _make_common_features(ctx):
         ],
     )
 
+    result["cpp17_feature"] = feature(
+        name = "c++17",
+        flag_sets = [
+            flag_set(
+                actions = ALL_CPP_ACTIONS,
+                flag_groups = [flag_group(flags = ["-std=c++17"])],
+            ),
+        ],
+    )
+
     result["cpp2a_feature"] = feature(
         name = "c++2a",
         flag_sets = [
@@ -704,7 +714,7 @@ def _stm32_impl(ctx):
         name = "common",
         implies = [
             "stdlib",
-            "c++2a",
+            "c++17",
             "colour",
             "determinism",
             "no-canonical-prefixes",
@@ -845,7 +855,7 @@ def _jetson_nano_impl(ctx):
         name = "common",
         implies = [
             "stdlib",
-            "c++2a",
+            "c++17",
             "colour",
             "no-canonical-system-headers",
             "determinism",
