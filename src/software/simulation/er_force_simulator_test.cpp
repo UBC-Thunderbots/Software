@@ -100,13 +100,17 @@ TEST_F(ErForceSimulatorTest, position_robots_for_default_kickoff)
         {Point(3, 2.5), Point(3, 1.5), Point(3, 0.5), Point(3, -0.5), Point(3, -1.5),
          Point(3, -2.5)});
 
+
     simulator->addYellowRobots(friendly_robots);
     simulator->addBlueRobots(enemy_robots);
+
+
     simulator->stepSimulation(Duration::fromMilliseconds(10));
 
     auto ssl_wrapper_packets = simulator->getSSLWrapperPackets();
     bool blue_visible        = false;
     bool yellow_visible      = false;
+
 
     for (const auto& ssl_wrapper_packet : ssl_wrapper_packets)
     {
@@ -124,6 +128,7 @@ TEST_F(ErForceSimulatorTest, position_robots_for_default_kickoff)
             }
         }
     }
+
     EXPECT_TRUE(blue_visible && yellow_visible);
 }
 
@@ -311,7 +316,6 @@ TEST_F(ErForceSimulatorTest, yellow_robot_add_robots_and_change_position)
     EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_3.position().y(),
                                                new_robot_state3.position().y(), 0.1));
 }
-
 
 TEST(ErForceSimulatorFieldTest, check_field_A_configuration)
 {
