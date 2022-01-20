@@ -32,7 +32,6 @@
 #include "extlibs/er_force_sim/src/protobuf/sslsim.h"
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "proto/ssl_simulation_robot_control.pb.h"
-// #include "software/world/robot_state.h"
 
 
 // higher values break the rolling friction of the ball
@@ -142,7 +141,7 @@ class camun::simulator::Simulator : public QObject
      *
      * @param command the simulator set up command
      */
-    void handleSimulatorSetupCommand(const std::unique_ptr<amun::Command> &command);
+    void handleSimulatorSetupCommand(const std::shared_ptr<amun::Command> &command);
 
    public slots:
     void handleRadioCommands(const SSLSimRobotControl &control, bool isBlue,

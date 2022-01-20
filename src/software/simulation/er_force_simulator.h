@@ -71,6 +71,15 @@ class ErForceSimulator : public QObject
     void addRobots(const std::vector<RobotStateWithId>& robots,
                    gameController::Team team);
 
+    void teleportRobot(std::shared_ptr<sslsim::SimulatorControl> simulator_control,
+                       gameController::Team side,
+                       const RobotStateWithId& robot_state_with_id);
+
+    void setRobots(std::shared_ptr<amun::Command> simulator_setup_command,
+                   const std::vector<RobotStateWithId>& robots,
+                   gameController::Team side);
+
+
     /**
      * Sets the primitive being simulated by the robot on the corresponding team
      * in simulation

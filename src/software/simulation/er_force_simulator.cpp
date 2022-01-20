@@ -66,7 +66,7 @@ ErForceSimulator::ErForceSimulator(
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
 {
-    auto simulator_setup_command = std::make_unique<amun::Command>();
+    auto simulator_setup_command = std::make_shared<amun::Command>();
     auto teleport_ball           = std::make_unique<sslsim::TeleportBall>();
     auto simulator_control       = std::make_unique<sslsim::SimulatorControl>();
     auto command_simulator       = std::make_unique<amun::CommandSimulator>();
@@ -96,10 +96,84 @@ void ErForceSimulator::addBlueRobots(const std::vector<RobotStateWithId>& robots
     addRobots(robots, gameController::Team::BLUE);
 }
 
+void ErForceSimulator::teleportRobot(
+    std::shared_ptr<sslsim::SimulatorControl> simulator_control,
+    gameController::Team side, const RobotStateWithId& robot_state_with_id)
+{
+    auto teleport_robot             = std::make_unique<sslsim::TeleportRobot>();
+    gameController::BotId* robot_id = new gameController::BotId();
+    robot_id->set_id(robot_state_with_id.id);
+
+    if (side == gameController::Team::BLUE)
+    {
+        robot_id->set_team(gameController::Team::BLUE);
+    }
+    else
+    {
+        robot_id->set_team(gameController::Team::YELLOW);
+    }
+
+    teleport_robot->set_x(static_cast<float>(
+        robot_state_with_id.robot_state.position().x() * MILLIMETERS_PER_METER));
+    teleport_robot->set_y(static_cast<float>(
+        robot_state_with_id.robot_state.position().y() * MILLIMETERS_PER_METER));
+    teleport_robot->set_allocated_id(robot_id);
+    teleport_robot->set_present(true);
+
+    teleport_robot->set_orientation(
+        static_cast<float>(robot_state_with_id.robot_state.orientation().toRadians()));
+
+    teleport_robot->set_v_x(static_cast<float>(
+        robot_state_with_id.robot_state.velocity().x() * MILLIMETERS_PER_METER));
+    teleport_robot->set_v_y(static_cast<float>(
+        robot_state_with_id.robot_state.velocity().y() * MILLIMETERS_PER_METER));
+    teleport_robot->set_v_angular(static_cast<float>(
+        robot_state_with_id.robot_state.angularVelocity().toRadians()));
+
+    *(simulator_control->add_teleport_robot()) = *teleport_robot;
+}
+
+void ErForceSimulator::setRobots(std::shared_ptr<amun::Command> simulator_setup_command,
+                                 const std::vector<RobotStateWithId>& robots,
+                                 gameController::Team side)
+{
+    // Setup mutable_ssl_control simulator command
+    auto simulator_control = std::make_shared<sslsim::SimulatorControl>();
+    auto command_simulator = std::make_unique<amun::CommandSimulator>();
+
+    // Add each robot to be added to the teleport robot repeated field
+    for (const auto& robot_state_with_id : robots)
+    {
+        teleportRobot(simulator_control, side, robot_state_with_id);
+    }
+
+    // Send message to simulator to teleport robots
+    *(command_simulator->mutable_ssl_control())     = *simulator_control;
+    *(simulator_setup_command->mutable_simulator()) = *command_simulator;
+    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
+
+    for (const auto& robot_state_with_id : robots)
+    {
+        auto simulator_robot = std::make_shared<ErForceSimulatorRobot>(
+            RobotStateWithId{.id          = robot_state_with_id.id,
+                             .robot_state = robot_state_with_id.robot_state},
+            robot_constants, wheel_constants);
+
+        if (side == gameController::Team::BLUE)
+        {
+            blue_simulator_robots.emplace_back(simulator_robot);
+        }
+        else
+        {
+            yellow_simulator_robots.emplace_back(simulator_robot);
+        }
+    }
+}
+
 void ErForceSimulator::addRobots(const std::vector<RobotStateWithId>& robots,
                                  gameController::Team side)
 {
-    auto simulator_setup_command = std::make_unique<amun::Command>();
+    auto simulator_setup_command = std::make_shared<amun::Command>();
     simulator_setup_command->mutable_simulator()->set_enable(true);
 
     robot::Specs ERForce;
@@ -133,66 +207,7 @@ void ErForceSimulator::addRobots(const std::vector<RobotStateWithId>& robots,
         simulator_setup_command->clear_set_team_yellow();
     }
 
-    // Setup mutable_ssl_control simulator command
-    auto simulator_control = std::make_unique<sslsim::SimulatorControl>();
-    auto command_simulator = std::make_unique<amun::CommandSimulator>();
-
-    // Add each robot to be added to the teleport robot repeated field
-    for (unsigned int i = 0; i < robots.size(); i++)
-    {
-        auto teleport_robot             = std::make_unique<sslsim::TeleportRobot>();
-        gameController::BotId* robot_id = new gameController::BotId();
-        robot_id->set_id(i);
-
-        if (side == gameController::Team::BLUE)
-        {
-            robot_id->set_team(gameController::Team::BLUE);
-        }
-        else
-        {
-            robot_id->set_team(gameController::Team::YELLOW);
-        }
-
-        teleport_robot->set_x(static_cast<float>(robots[i].robot_state.position().x() *
-                                                 MILLIMETERS_PER_METER));
-        teleport_robot->set_y(static_cast<float>(robots[i].robot_state.position().y() *
-                                                 MILLIMETERS_PER_METER));
-        teleport_robot->set_allocated_id(robot_id);
-        teleport_robot->set_present(true);
-
-        teleport_robot->set_orientation(
-            static_cast<float>(robots[i].robot_state.orientation().toRadians()));
-
-        teleport_robot->set_v_x(static_cast<float>(robots[i].robot_state.velocity().x() *
-                                                   MILLIMETERS_PER_METER));
-        teleport_robot->set_v_y(static_cast<float>(robots[i].robot_state.velocity().y() *
-                                                   MILLIMETERS_PER_METER));
-        teleport_robot->set_v_angular(
-            static_cast<float>(robots[i].robot_state.angularVelocity().toRadians()));
-
-        *(simulator_control->add_teleport_robot()) = *teleport_robot;
-    }
-
-    // Send message to simulator to teleport robots
-    *(command_simulator->mutable_ssl_control())     = *simulator_control;
-    *(simulator_setup_command->mutable_simulator()) = *command_simulator;
-    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
-
-    for (unsigned int i = 0; i < robots.size(); i++)
-    {
-        auto simulator_robot = std::make_shared<ErForceSimulatorRobot>(
-            RobotStateWithId{.id = i, .robot_state = robots[i].robot_state},
-            robot_constants, wheel_constants);
-
-        if (side == gameController::Team::BLUE)
-        {
-            blue_simulator_robots.emplace_back(simulator_robot);
-        }
-        else
-        {
-            yellow_simulator_robots.emplace_back(simulator_robot);
-        }
-    }
+    setRobots(simulator_setup_command, robots, side);
 }
 
 void ErForceSimulator::setYellowRobotPrimitiveSet(

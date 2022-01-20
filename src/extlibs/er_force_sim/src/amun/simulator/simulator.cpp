@@ -24,7 +24,6 @@
 #include <QtCore/QVector>
 #include <QtCore/QtDebug>
 #include <algorithm>
-#include <tuple>
 
 #include "erroraggregator.h"
 #include "extlibs/er_force_sim/src/core/coordinates.h"
@@ -33,7 +32,6 @@
 #include "simball.h"
 #include "simfield.h"
 #include "simrobot.h"
-// #include "software/world/robot_state.h"
 
 using namespace camun::simulator;
 
@@ -736,7 +734,7 @@ void Simulator::setFlipped(bool flipped)
     m_data->flip = flipped;
 }
 
-void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command> &command)
+void Simulator::handleSimulatorSetupCommand(const std::shared_ptr<amun::Command> &command)
 {
     bool teamOrPerfectDribbleChanged = false;
 

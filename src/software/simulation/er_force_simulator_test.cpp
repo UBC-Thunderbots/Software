@@ -193,11 +193,11 @@ TEST_F(ErForceSimulatorTest, yellow_robot_velocity_test)
     auto simState      = simulator->getSimulatorState();
     auto yellow_robots = simState.yellow_robots();
 
-    EXPECT_TRUE(yellow_robots[0].v_x() > 1.9 && yellow_robots[0].v_x() <= 2.0);
-    EXPECT_TRUE(yellow_robots[0].v_y() > -0.01 && yellow_robots[0].v_y() < 0.01);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(yellow_robots[0].v_x(), 2.0, 0.1));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(yellow_robots[0].v_y(), 0, 0.1));
 
-    EXPECT_TRUE(yellow_robots[1].v_x() > -0.01 && yellow_robots[1].v_x() < 0.01);
-    EXPECT_TRUE(yellow_robots[1].v_y() > 1.9 && yellow_robots[1].v_y() <= 2.0);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(yellow_robots[1].v_x(), 0, 0.1));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(yellow_robots[1].v_y(), 2, 0.1));
 }
 
 TEST_F(ErForceSimulatorTest, yellow_robot_orientation_test)
@@ -225,15 +225,93 @@ TEST_F(ErForceSimulatorTest, yellow_robot_orientation_test)
     auto robot_quarter = createRobot(yellow_robots[1], Timestamp::fromSeconds(10));
     auto robot_half    = createRobot(yellow_robots[2], Timestamp::fromSeconds(10));
 
-    auto zero_diff = robot_zero.orientation().toRadians() - Angle::zero().toRadians();
-    auto quarter_diff =
-        robot_quarter.orientation().toRadians() - Angle::quarter().toRadians();
-    auto half_diff = robot_half.orientation().toRadians() - Angle::half().toRadians();
-
-    EXPECT_TRUE(zero_diff > -0.01 && zero_diff < 0.01);
-    EXPECT_TRUE(quarter_diff > -0.01 && quarter_diff < 0.01);
-    EXPECT_TRUE(half_diff > -0.01 && half_diff < 0.01);
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_zero.orientation(), Angle::zero(),
+                                               Angle::fromDegrees(1)));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_quarter.orientation(),
+                                               Angle::quarter(), Angle::fromDegrees(1)));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_half.orientation(), Angle::half(),
+                                               Angle::fromDegrees(1)));
 }
+
+TEST_F(ErForceSimulatorTest, yellow_robot_add_robots_and_change_position)
+{
+    RobotState robot_state1(Point(1, -1), Vector(0, 0), Angle::zero(),
+                            AngularVelocity::zero());
+    RobotState robot_state2(Point(2, -2), Vector(0, 0), Angle::zero(),
+                            AngularVelocity::zero());
+    RobotState robot_state3(Point(3, -3), Vector(0, 0), Angle::zero(),
+                            AngularVelocity::zero());
+
+    std::vector<RobotStateWithId> states = {
+        RobotStateWithId{.id = 0, .robot_state = robot_state1},
+        RobotStateWithId{.id = 1, .robot_state = robot_state2},
+        RobotStateWithId{.id = 2, .robot_state = robot_state3},
+    };
+
+    simulator->addYellowRobots(states);
+    simulator->stepSimulation(Duration::fromMilliseconds(10));
+
+    auto simState      = simulator->getSimulatorState();
+    auto yellow_robots = simState.yellow_robots();
+
+    auto robot_1 = createRobot(yellow_robots[0], Timestamp::fromSeconds(10));
+    auto robot_2 = createRobot(yellow_robots[1], Timestamp::fromSeconds(10));
+    auto robot_3 = createRobot(yellow_robots[2], Timestamp::fromSeconds(10));
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_1.position().x(),
+                                               robot_state1.position().x(), 0.1));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_1.position().y(),
+                                               robot_state1.position().y(), 0.1));
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_2.position().x(),
+                                               robot_state2.position().x(), 0.1));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_2.position().y(),
+                                               robot_state2.position().y(), 0.1));
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_3.position().x(),
+                                               robot_state3.position().x(), 0.1));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_3.position().y(),
+                                               robot_state3.position().y(), 0.1));
+
+    RobotState new_robot_state1(Point(4, 0), Vector(0, 0), Angle::zero(),
+                                AngularVelocity::zero());
+    RobotState new_robot_state2(Point(0, 0), Vector(0, 0), Angle::zero(),
+                                AngularVelocity::zero());
+    RobotState new_robot_state3(Point(-2, -1), Vector(0, 0), Angle::zero(),
+                                AngularVelocity::zero());
+
+    std::vector<RobotStateWithId> new_states = {
+        RobotStateWithId{.id = 0, .robot_state = new_robot_state1},
+        RobotStateWithId{.id = 1, .robot_state = new_robot_state2},
+        RobotStateWithId{.id = 2, .robot_state = new_robot_state3},
+    };
+
+    simulator->addYellowRobots(new_states);
+    simulator->stepSimulation(Duration::fromMilliseconds(10));
+
+    simState      = simulator->getSimulatorState();
+    yellow_robots = simState.yellow_robots();
+
+    robot_1 = createRobot(yellow_robots[0], Timestamp::fromSeconds(20));
+    robot_2 = createRobot(yellow_robots[1], Timestamp::fromSeconds(20));
+    robot_3 = createRobot(yellow_robots[2], Timestamp::fromSeconds(20));
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_1.position().x(),
+                                               new_robot_state1.position().x(), 0.1));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_1.position().y(),
+                                               new_robot_state1.position().y(), 0.1));
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_2.position().x(),
+                                               new_robot_state2.position().x(), 0.1));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_2.position().y(),
+                                               new_robot_state2.position().y(), 0.1));
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_3.position().x(),
+                                               new_robot_state3.position().x(), 0.1));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_3.position().y(),
+                                               new_robot_state3.position().y(), 0.1));
+}
+
 
 TEST(ErForceSimulatorFieldTest, check_field_A_configuration)
 {
