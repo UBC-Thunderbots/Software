@@ -78,6 +78,14 @@ class HRVOAgent : public Agent
     void computeNewVelocity() override;
 
     /**
+     * Create the hybrid reciprocal velocity obstacle which other_agent should see for this Agent
+     *
+     * @param other_agent The Agent which this hybrid reciprocal velocity obstacle is being generated for
+     * @return The hybrid reciprocal velocity obstacle which other_agent should see for this Agent
+     */
+    Agent::VelocityObstacle createVelocityObstacle(const Agent& other_agent) override;
+
+    /**
      * Computes the maxNeighbors nearest neighbors of this agent.
      */
     void computeNeighbors();
@@ -95,8 +103,7 @@ class HRVOAgent : public Agent
      */
     void insertNeighbor(std::size_t agentNo, float &rangeSq);
 
-
-   private:
+private:
     /**
      * A candidate point.
      */
@@ -113,24 +120,6 @@ class HRVOAgent : public Agent
 
         // The number of the second velocity obstacle.
         int velocityObstacle2_;
-    };
-
-    /**
-     * A hybrid reciprocal velocity obstacle.
-     */
-    class VelocityObstacle
-    {
-       public:
-        VelocityObstacle() {}
-
-        // The position of the apex of the hybrid reciprocal velocity obstacle.
-        Vector2 apex_;
-
-        // The direction of the first side of the hybrid reciprocal velocity obstacle.
-        Vector2 side1_;
-
-        // The direction of the second side of the hybrid reciprocal velocity obstacle.
-        Vector2 side2_;
     };
 
    public:  // A

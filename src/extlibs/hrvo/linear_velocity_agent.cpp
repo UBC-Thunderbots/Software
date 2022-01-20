@@ -26,3 +26,35 @@ void LinearVelocityAgent::computeNewVelocity()
         newVelocity_ = velocity_;
     }
 }
+
+Agent::VelocityObstacle LinearVelocityAgent::createVelocityObstacle(const Agent &other_agent)
+{
+    VelocityObstacle velocityObstacle;
+    if (absSq(position_ - other_agent.position_) > std::pow(radius_ + other_agent.radius_, 2))
+    {
+        // This Agent is not colliding with other agent
+        velocityObstacle.apex_ = velocity_;
+
+        const float angle = atan(position_ - other_agent.position_);
+
+        // opening angle = arcsin((rad_A + rad_B) / distance)
+        const float openingAngle =
+                std::asin((other_agent.radius_ + radius_) / abs(position_ - other_agent.position_));
+
+        // Direction of the two edges of the velocity obstacle
+        velocityObstacle.side1_ =
+                Vector2(std::cos(angle - openingAngle), std::sin(angle - openingAngle));
+        velocityObstacle.side2_ =
+                Vector2(std::cos(angle + openingAngle), std::sin(angle + openingAngle));
+    }
+    else
+    {
+        // This Agent is colliding with other agent
+        // Creates Velocity Obstacle with the sides being 180 degrees
+        // apart from each other
+        velocityObstacle.apex_ = velocity_;
+        velocityObstacle.side1_ = normal(other_agent.position_, position_);
+        velocityObstacle.side2_ = -velocityObstacle.side1_;
+    }
+    return velocityObstacle;
+}

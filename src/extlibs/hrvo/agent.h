@@ -30,9 +30,35 @@ class Agent
     virtual ~Agent() = default;
 
     /**
+     * A hybrid reciprocal velocity obstacle.
+     */
+    class VelocityObstacle
+    {
+    public:
+        VelocityObstacle() = default;
+
+        // The position of the apex of the hybrid reciprocal velocity obstacle.
+        Vector2 apex_;
+
+        // The direction of the first side of the hybrid reciprocal velocity obstacle.
+        Vector2 side1_;
+
+        // The direction of the second side of the hybrid reciprocal velocity obstacle.
+        Vector2 side2_;
+    };
+
+    /**
      * Computes the new velocity of this agent.
      */
     virtual void computeNewVelocity() = 0;
+
+    /**
+     * Create the velocity obstacle which other_agent should see for this Agent
+     *
+     * @param other_agent The Agent which this velocity obstacle is being generated for
+     * @return The velocity obstacle which other_agent should see for this Agent
+     */
+    virtual VelocityObstacle createVelocityObstacle(const Agent& other_agent) = 0;
 
     /**
      * Updates the position and velocity of this agent.
