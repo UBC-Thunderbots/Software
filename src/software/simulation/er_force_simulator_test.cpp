@@ -1,6 +1,8 @@
 #include "software/simulation/er_force_simulator.h"
 
 #include <gtest/gtest.h>
+// TODO (#2419): remove this
+#include <fenv.h>
 
 #include "proto/message_translation/er_force_world.h"
 #include "proto/message_translation/primitive_google_to_nanopb_converter.h"
@@ -14,6 +16,8 @@ class ErForceSimulatorTest : public ::testing::Test
    protected:
     void SetUp() override
     {
+        // TODO (#2419): remove this to re-enable sigfpe checks
+        fedisableexcept(FE_INVALID | FE_OVERFLOW);
         simulator_config = std::make_shared<const SimulatorConfig>();
         simulator = std::make_shared<ErForceSimulator>(FieldType::DIV_B, robot_constants,
                                                        wheel_constants, simulator_config);
