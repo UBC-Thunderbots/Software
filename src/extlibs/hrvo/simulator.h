@@ -319,6 +319,15 @@ class Simulator
     // robot id to agent index
     std::map<unsigned int, unsigned int> friendly_robot_id_map;
 
+    // The scale which enemy robots should be larger than friendly robots
+    // This scale is used to avoid friendly robots passing enemy robots from a very close distance
+    // and risking collision
+    const float enemy_robot_radius_scale = 2.f;
+
+    // How much larger should the goal radius be. This is added as a safety tolerance so robots
+    // do not "teleport" over the goal between simulation frames.
+    const float goal_radius_scale = 1.05f;
+
     friend class Agent;
     friend class Goal;
     friend class KdTree;

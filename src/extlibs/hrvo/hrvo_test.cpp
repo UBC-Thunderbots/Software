@@ -42,8 +42,13 @@ class HRVOTest : public ::testing::Test
         Robot friendly_robot_2 = Robot(2, starting_point_2, Vector(1.0, 1.0), Angle(),
                                        AngularVelocity::zero(), current_time, {});
 
-        friendly_team.updateRobots({friendly_robot_0, friendly_robot_1, friendly_robot_2});
-        friendly_team.assignGoalie(1);
+        friendly_team.updateRobots({
+//            friendly_robot_0,
+            friendly_robot_1
+//            ,
+//            friendly_robot_2
+        });
+//        friendly_team.assignGoalie(1);
 
         TbotsProto::Primitive primitive_0 = *createMovePrimitive(
                 -starting_point_0, 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(),
@@ -62,13 +67,18 @@ class HRVOTest : public ::testing::Test
         // Enemy team setup
         Robot enemy_robot_0 = Robot(0, -starting_point_0, Vector(-1.0, 1.0), Angle(),
                                     AngularVelocity::zero(), current_time, {});
-        Robot enemy_robot_1 = Robot(1, -starting_point_1, Vector(-1.0, 0.0), Angle(),
+        Robot enemy_robot_1 = Robot(1, -starting_point_1, Vector(-1.1, 0.0), Angle(),
                                     AngularVelocity::threeQuarter(), current_time, {});
         Robot enemy_robot_2 = Robot(2, -starting_point_2, Vector(-1.0, -1.0), Angle(),
                                     AngularVelocity::zero(), current_time, {});
 
-        enemy_team.updateRobots({enemy_robot_0, enemy_robot_1, enemy_robot_2});
-        enemy_team.assignGoalie(1);
+        enemy_team.updateRobots({
+//            enemy_robot_0,
+            enemy_robot_1
+//            ,
+//            enemy_robot_2
+        });
+//        enemy_team.assignGoalie(0);
 
         // Reconstruct World with updated values
         world = World(field, ball, friendly_team, enemy_team);
@@ -149,8 +159,16 @@ class HRVOTest : public ::testing::Test
             robot_radius[robot_id] = simulator.getAgentRadius(robot_id);
         }
 
+        // Initialize the previous robots position array
         std::vector<float> prev_x_pos_arr(num_robots);
         std::vector<float> prev_y_pos_arr(num_robots);
+        for (int agent_id = 0; agent_id < num_robots; agent_id++)
+        {
+            Vector2 curr_robot_pos = simulator.getAgentPosition(agent_id);
+            prev_x_pos_arr[agent_id] = curr_robot_pos.getX();
+            prev_y_pos_arr[agent_id] = curr_robot_pos.getY();
+        }
+
         float prev_frame_time = 0.f;
         unsigned int frame    = 0;
         std::chrono::duration<double> computation_time(0);
