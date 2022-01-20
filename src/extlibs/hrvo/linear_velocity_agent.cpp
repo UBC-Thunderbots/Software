@@ -12,9 +12,17 @@ LinearVelocityAgent::LinearVelocityAgent(Simulator *simulator, const Vector2 &po
 void LinearVelocityAgent::computeNewVelocity()
 {
     // New Velocity towards goal...?
+    // TODO: Limit velocity to maxSpeed
     Vector2 velocity_to_dest =
         simulator_->goals_[goalNo_]->getCurrentGoalPosition() - position_;
     const float dv = abs(velocity_to_dest - velocity_);
-    newVelocity_   = (1.0f - (maxAccel_ * simulator_->timeStep_ / dv)) * velocity_ +
-                   (maxAccel_ * simulator_->timeStep_ / dv) * velocity_to_dest;
+    if (dv != 0.f)
+    {
+        newVelocity_ = (1.0f - (maxAccel_ * simulator_->timeStep_ / dv)) * velocity_ +
+                         (maxAccel_ * simulator_->timeStep_ / dv) * velocity_to_dest;
+    }
+    else
+    {
+        newVelocity_ = velocity_;
+    }
 }

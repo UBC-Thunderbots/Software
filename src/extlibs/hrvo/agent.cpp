@@ -20,6 +20,7 @@ Agent::Agent(Simulator *simulator, const Vector2 &position, float radius,
 
 void Agent::update()
 {
+    // TODO: Limit velocity to maxSpeed
     const float dv = abs(newVelocity_ - velocity_);
 
     if (dv < maxAccel_ * simulator_->timeStep_)

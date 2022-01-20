@@ -62,7 +62,8 @@ class Simulator
      */
     std::size_t addHRVORobotAgent(const Robot &robot, int max_neighbors = 10);
 
-    std::size_t addLinearVelocityRobotAgent(const Robot &robot, const Vector2 &destination);
+    std::size_t addLinearVelocityRobotAgent(const Robot &robot,
+                                            const Vector2 &destination);
 
     /**
      *      Adds a new agent to the simulation.

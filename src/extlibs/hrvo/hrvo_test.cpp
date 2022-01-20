@@ -8,51 +8,70 @@
 #include "shared/test_util/tbots_gtest_main.h"
 
 const int SIMULATOR_FRAME_RATE = 30;
-const float HRVO_TWO_PI        = 6.283185307179586f;
-const float ROBOT_RADIUS       = 0.09f;
 
 class HRVOTest : public ::testing::Test
 {
    public:
     Simulator simulator;
-    std::vector<Robot> friendly_robots;
+    Timestamp current_time;
+    Ball ball;
+    Field field;
     Team friendly_team;
+    Team enemy_team;
     World world;
     TbotsProto::PrimitiveSet primitive_set;
 
     HRVOTest()
         : simulator(1.f / SIMULATOR_FRAME_RATE),
-          friendly_robots({Robot(0, Point(1.0, -1.0), Vector(-1.0, 0.0), Angle(),
-                                 AngularVelocity(), Timestamp(), {}),
-                           Robot(1, Point(1.0, 1.0), Vector(1.0, 0.0), Angle(),
-                                 AngularVelocity(), Timestamp(), {}),
-                           Robot(2, Point(-1.0, -1.0), Vector(1.0, -1.0), Angle(),
-                                 AngularVelocity(), Timestamp(), {})}),
-          friendly_team(friendly_robots),
-          world(Field::createSSLDivisionBField(), Ball(Point(), Vector(), Timestamp()),
-                Team(), friendly_team)
+          current_time(Timestamp::fromSeconds(123)),
+          ball(Point(1, 2), Vector(-0.3, 0), current_time),
+          field(Field::createSSLDivisionBField()),
+          friendly_team(Duration::fromMilliseconds(1000)),
+          enemy_team(Duration::fromMilliseconds(1000)),
+          world(field, ball, friendly_team, enemy_team)
     {
-        TbotsProto::Primitive primitive1 = *createMovePrimitive(
-            Point(), 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(),
-            MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
-        TbotsProto::Primitive primitive2 = *createMovePrimitive(
-            Point(-3.0, -3.0), 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(),
-            MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
-        TbotsProto::Primitive primitive3 = *createMovePrimitive(
-            Point(2.0, 2.0), 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(),
-            MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
+        Point starting_point_0(-4.0, 4.0);
+        Point starting_point_1(-4.0, 0.0);
+        Point starting_point_2(-4.0, -4.0);
 
-        (*primitive_set.mutable_robot_primitives())[0] = primitive1;
-        (*primitive_set.mutable_robot_primitives())[1] = primitive2;
-        (*primitive_set.mutable_robot_primitives())[2] = primitive3;
+        // Friendly team setup
+        Robot friendly_robot_0 = Robot(0, starting_point_0, Vector(1.0, -1.0), Angle(),
+                                       AngularVelocity::zero(), current_time, {});
+        Robot friendly_robot_1 = Robot(1, starting_point_1, Vector(1.0, 0.0), Angle(),
+                                       AngularVelocity::threeQuarter(), current_time, {});
+        Robot friendly_robot_2 = Robot(2, starting_point_2, Vector(1.0, 1.0), Angle(),
+                                       AngularVelocity::zero(), current_time, {});
 
-        // TODO: Replace the agent defaults with our own default object
-        //        simulator.setAgentDefaults(/*neighborDist*/ 3.f, /*maxNeighbors*/ 30,
-        //                                   /*radius*/ ROBOT_RADIUS * RADIUS_SCALE,
-        //                                   /*goalRadius*/ 0.02f,
-        //                                   /*prefSpeed=*/3.5f, /*maxSpeed=*/4.825f,
-        //                                   /*uncertaintyOffset=*/0.f,
-        //                                   /*maxAccel=*/3.28f);
+        friendly_team.updateRobots({friendly_robot_0, friendly_robot_1, friendly_robot_2});
+        friendly_team.assignGoalie(1);
+
+        TbotsProto::Primitive primitive_0 = *createMovePrimitive(
+                -starting_point_0, 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(),
+                MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
+        TbotsProto::Primitive primitive_1 = *createMovePrimitive(
+                -starting_point_1, 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(),
+                MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
+        TbotsProto::Primitive primitive_2 = *createMovePrimitive(
+                -starting_point_2, 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(),
+                MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
+
+        (*primitive_set.mutable_robot_primitives())[0] = primitive_0;
+        (*primitive_set.mutable_robot_primitives())[1] = primitive_1;
+        (*primitive_set.mutable_robot_primitives())[2] = primitive_2;
+
+        // Enemy team setup
+        Robot enemy_robot_0 = Robot(0, -starting_point_0, Vector(-1.0, 1.0), Angle(),
+                                    AngularVelocity::zero(), current_time, {});
+        Robot enemy_robot_1 = Robot(1, -starting_point_1, Vector(-1.0, 0.0), Angle(),
+                                    AngularVelocity::threeQuarter(), current_time, {});
+        Robot enemy_robot_2 = Robot(2, -starting_point_2, Vector(-1.0, -1.0), Angle(),
+                                    AngularVelocity::zero(), current_time, {});
+
+        enemy_team.updateRobots({enemy_robot_0, enemy_robot_1, enemy_robot_2});
+        enemy_team.assignGoalie(1);
+
+        // Reconstruct World with updated values
+        world = World(field, ball, friendly_team, enemy_team);
     }
 
     void TearDown() override

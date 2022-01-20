@@ -92,29 +92,34 @@ void HRVOAgent::computeNewVelocity()
             velocityObstacle.side2_ =
                 Vector2(std::cos(angle + openingAngle), std::sin(angle + openingAngle));
 
-            // Diameter = 2 * sin(openingAngle) * cos(openingAngle) = sin(2 * openingAngle) = 2 * (rad_A + rad_B) ?
+            // Diameter = 2 * sin(openingAngle) * cos(openingAngle) = sin(2 *
+            // openingAngle) = 2 * (rad_A + rad_B) ?
             const float d = 2.0f * std::sin(openingAngle) * std::cos(openingAngle);
 
-            // This shifts one side of the velocity obstacle to share the responsibility of avoiding collision with
-            // neighbor. This assumes that neighbor will also be running HRVO
+            // This shifts one side of the velocity obstacle to share the responsibility
+            // of avoiding collision with neighbor. This assumes that neighbor will also
+            // be running HRVO
             if (det(other->position_ - position_, prefVelocity_ - other->prefVelocity_) >
                 0.0f)
             {
                 // Relative velocity is in the right half of velocity obstacle (VO)
-                // Shift the VO apex to the left so the right side is smaller, making the VO a Hybrid Reciprocal Velocity Obstacle (HRVO)
+                // Shift the VO apex to the left so the right side is smaller, making the
+                // VO a Hybrid Reciprocal Velocity Obstacle (HRVO)
                 const float s =
                     0.5f * det(velocity_ - other->velocity_, velocityObstacle.side2_) / d;
 
                 velocityObstacle.apex_ =
-                    other->velocity_ + s * velocityObstacle.side1_ -                    // Apex +
-                    (uncertaintyOffset_ * abs(other->position_ - position_) /    // Uncertainty
+                    other->velocity_ + s * velocityObstacle.side1_ -  // Apex +
+                    (uncertaintyOffset_ *
+                     abs(other->position_ - position_) /  // Uncertainty
                      (other->radius_ + radius_)) *
                         normalize(other->position_ - position_);
             }
             else
             {
                 // Relative velocity is in the left half of velocity obstacle (VO)
-                // Shift the VO apex to the right so the left side is smaller, making the VO a Hybrid Reciprocal Velocity Obstacle (HRVO)
+                // Shift the VO apex to the right so the left side is smaller, making the
+                // VO a Hybrid Reciprocal Velocity Obstacle (HRVO)
                 const float s =
                     0.5f * det(velocity_ - other->velocity_, velocityObstacle.side1_) / d;
 
@@ -130,7 +135,8 @@ void HRVOAgent::computeNewVelocity()
         else
         {
             // This Agent is colliding with neighbor
-            // Uses Reciprocal Velocity Obstacle (RVO) with the sides being 180 degrees apart from each other
+            // Uses Reciprocal Velocity Obstacle (RVO) with the sides being 180 degrees
+            // apart from each other
             velocityObstacle.apex_ =
                 0.5f * (other->velocity_ + velocity_) -
                 (uncertaintyOffset_ +
@@ -144,8 +150,8 @@ void HRVOAgent::computeNewVelocity()
     }
 
     // Calculate what velocities (candidates) are not inside any velocity obstacle
-    // This is likely implementing the ClearPath efficient geometric algorithm as stated in the HRVO paper to find the
-    // closest possible velocity to our preferred velocity.
+    // This is likely implementing the ClearPath efficient geometric algorithm as stated
+    // in the HRVO paper to find the closest possible velocity to our preferred velocity.
     candidates_.clear();
 
     Candidate candidate;
@@ -420,6 +426,7 @@ void HRVOAgent::computePreferredVelocity()
 {
     if (prefSpeed_ <= 0.01f || maxAccel_ <= 0.01f)
     {
+        // Used to avoid edge cases with division by zero
         prefVelocity_ = Vector2(0.f, 0.f);
         return;
     }

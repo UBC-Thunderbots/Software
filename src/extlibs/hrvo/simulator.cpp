@@ -64,13 +64,23 @@ void Simulator::updateWorld(const World &world)
 
     for (const Robot &enemy_robot : world.enemyTeam().getAllRobots())
     {
-        Segment segment(enemy_robot.position(), enemy_robot.position() + enemy_robot.velocity() * 100);
+        // Set goal of enemy robot to be the farthest point, when moving in the current direction
+        Segment segment(enemy_robot.position(),
+                        enemy_robot.position() + enemy_robot.velocity() * 100);
 
-        std::unordered_set<Point> intersection_point_set = intersection(world.field().friendlyDefenseArea(), segment);
+        // Enemy robot should not enter the friendly defense area
+        std::unordered_set<Point> intersection_point_set =
+            intersection(world.field().friendlyDefenseArea(), segment);
         if (intersection_point_set.empty())
         {
-            // Guaranteed to have an intersection if robot is inside field
+            // If the robot is not moving towards the friendly defense area, it should go to the edge
+            // of the field
             intersection_point_set = intersection(world.field().fieldLines(), segment);
+            if (intersection_point_set.empty())
+            {
+                // If the Enemy robot is outside of the field, it should continue moving in its current direction
+                intersection_point_set.insert(enemy_robot.position() + enemy_robot.velocity());
+            }
         }
         Vector2 goal_position(static_cast<float>(intersection_point_set.begin()->x()),
                               static_cast<float>(intersection_point_set.begin()->y()));
@@ -82,6 +92,15 @@ void Simulator::updateWorld(const World &world)
 
 std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
 {
+    // TODO: What to do if robot can't move?
+    // Add agent with 0 velocity and accel...
+    const std::set<RobotCapability> &unavailable_capabilities = robot.getUnavailableCapabilities();
+    bool can_move = unavailable_capabilities.find(RobotCapability::Move) == unavailable_capabilities.end();
+    if (!can_move)
+    {
+        return 0;
+    }
+
     // TODO (#2371): Replace Vector2 with Vector
     Vector2 position(static_cast<float>(robot.position().x()),
                      static_cast<float>(robot.position().y()));
@@ -114,7 +133,8 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
     return agents_.size() - 1;
 }
 
-std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot, const Vector2 &destination)
+std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot,
+                                                   const Vector2 &destination)
 {
     // TODO (#2371): Replace Vector2 with Vector
     Vector2 position(static_cast<float>(robot.position().x()),
