@@ -54,6 +54,7 @@ class MotorService : public Service
      * @param motor Which motor to talk to (in our case, the chip select)
      * @param data The data to send
      * @param last_transfer The last transfer of uint8_t data for this transaction.
+     * @return A byte read from the trinamic chip
      */
     uint8_t tmc4671ReadWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
     uint8_t tmc6100ReadWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
@@ -76,6 +77,7 @@ class MotorService : public Service
      * @param motor Which motor to talk to (in our case, the chip select)
      * @param data The data to send
      * @param last_transfer The last transfer of uint8_t data for this transaction.
+     * @return A byte read from the trinamic chip
      */
     uint8_t readWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
 

@@ -20,10 +20,10 @@ class GPIO
      * See https://www.kernel.org/doc/Documentation/gpio/sysfs.txt
      *
      * @param gpio The gpio to setup
-     * @param initial_direction The
+     * @param direction The direction to configure this gpio in
+     * @param initial_state The initial GpioState of the pin
      */
-    GPIO(std::string gpio_number, GpioDirection initial_direction,
-         GpioState initial_state);
+    GPIO(std::string gpio_number, GpioDirection direction, GpioState initial_state);
 
     /**
      * Set the value to the provided state
@@ -39,6 +39,4 @@ class GPIO
 
    private:
     std::string gpio_number_;
-    GpioState current_state_;
-    char buf_[1];
 };
