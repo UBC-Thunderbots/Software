@@ -105,8 +105,8 @@ TEST_F(ErForceSimulatorTest, position_robots_for_default_kickoff)
          Point(3, -2.5)});
 
 
-    simulator->addYellowRobots(friendly_robots);
-    simulator->addBlueRobots(enemy_robots);
+    simulator->setYellowRobots(friendly_robots);
+    simulator->setBlueRobots(enemy_robots);
 
 
     simulator->stepSimulation(Duration::fromMilliseconds(10));
@@ -140,7 +140,7 @@ TEST_F(ErForceSimulatorTest, add_yellow_robots)
 {
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {Point(0, 2), Point(1, 3), Point(2, 4)});
-    simulator->addYellowRobots(friendly_robots);
+    simulator->setYellowRobots(friendly_robots);
     simulator->stepSimulation(Duration::fromMilliseconds(10));
 
 
@@ -196,7 +196,7 @@ TEST_F(ErForceSimulatorTest, yellow_robot_velocity_test)
         RobotStateWithId{.id = 1, .robot_state = robot_state2},
     };
 
-    simulator->addYellowRobots(states);
+    simulator->setYellowRobots(states);
     simulator->stepSimulation(Duration::fromMilliseconds(5));
 
     auto simState      = simulator->getSimulatorState();
@@ -224,7 +224,7 @@ TEST_F(ErForceSimulatorTest, yellow_robot_orientation_test)
         RobotStateWithId{.id = 2, .robot_state = robot_state3},
     };
 
-    simulator->addYellowRobots(states);
+    simulator->setYellowRobots(states);
     simulator->stepSimulation(Duration::fromSeconds(10));
 
     auto simState      = simulator->getSimulatorState();
@@ -257,7 +257,7 @@ TEST_F(ErForceSimulatorTest, yellow_robot_add_robots_and_change_position)
         RobotStateWithId{.id = 2, .robot_state = robot_state3},
     };
 
-    simulator->addYellowRobots(states);
+    simulator->setYellowRobots(states);
     simulator->stepSimulation(Duration::fromMilliseconds(10));
 
     auto simState      = simulator->getSimulatorState();
@@ -267,24 +267,18 @@ TEST_F(ErForceSimulatorTest, yellow_robot_add_robots_and_change_position)
     auto robot_2 = createRobot(yellow_robots[1], Timestamp::fromSeconds(10));
     auto robot_3 = createRobot(yellow_robots[2], Timestamp::fromSeconds(10));
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_1.position().x(),
-                                               robot_state1.position().x(), 0.1));
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_1.position().y(),
-                                               robot_state1.position().y(), 0.1));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_1.currentState(), robot_state1, 0.1,
+                                               Angle::fromDegrees(1)));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_2.currentState(), robot_state2, 0.1,
+                                               Angle::fromDegrees(1)));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_3.currentState(), robot_state3, 0.1,
+                                               Angle::fromDegrees(1)));
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_2.position().x(),
-                                               robot_state2.position().x(), 0.1));
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_2.position().y(),
-                                               robot_state2.position().y(), 0.1));
-
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_3.position().x(),
-                                               robot_state3.position().x(), 0.1));
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_3.position().y(),
-                                               robot_state3.position().y(), 0.1));
+    EXPECT_EQ(states.size(), yellow_robots.size());
 
     RobotState new_robot_state1(Point(4, 0), Vector(0, 0), Angle::zero(),
                                 AngularVelocity::zero());
-    RobotState new_robot_state2(Point(0, 0), Vector(0, 0), Angle::zero(),
+    RobotState new_robot_state2(Point(2, -2), Vector(0, 0), Angle::zero(),
                                 AngularVelocity::zero());
     RobotState new_robot_state3(Point(-2, -1), Vector(0, 0), Angle::zero(),
                                 AngularVelocity::zero());
@@ -295,7 +289,7 @@ TEST_F(ErForceSimulatorTest, yellow_robot_add_robots_and_change_position)
         RobotStateWithId{.id = 2, .robot_state = new_robot_state3},
     };
 
-    simulator->addYellowRobots(new_states);
+    simulator->setYellowRobots(new_states);
     simulator->stepSimulation(Duration::fromMilliseconds(10));
 
     simState      = simulator->getSimulatorState();
@@ -305,21 +299,16 @@ TEST_F(ErForceSimulatorTest, yellow_robot_add_robots_and_change_position)
     robot_2 = createRobot(yellow_robots[1], Timestamp::fromSeconds(20));
     robot_3 = createRobot(yellow_robots[2], Timestamp::fromSeconds(20));
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_1.position().x(),
-                                               new_robot_state1.position().x(), 0.1));
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_1.position().y(),
-                                               new_robot_state1.position().y(), 0.1));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_1.currentState(), new_robot_state1,
+                                               0.1, Angle::fromDegrees(1)));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_2.currentState(), new_robot_state2,
+                                               0.1, Angle::fromDegrees(1)));
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_3.currentState(), new_robot_state3,
+                                               0.1, Angle::fromDegrees(1)));
 
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_2.position().x(),
-                                               new_robot_state2.position().x(), 0.1));
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_2.position().y(),
-                                               new_robot_state2.position().y(), 0.1));
-
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_3.position().x(),
-                                               new_robot_state3.position().x(), 0.1));
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_3.position().y(),
-                                               new_robot_state3.position().y(), 0.1));
+    EXPECT_EQ(new_states.size(), yellow_robots.size());
 }
+
 
 TEST(ErForceSimulatorFieldTest, check_field_A_configuration)
 {

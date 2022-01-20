@@ -88,12 +88,12 @@ void ErForceSimulator::setBallState(const BallState& ball_state)
 
 void ErForceSimulator::setYellowRobots(const std::vector<RobotStateWithId>& robots)
 {
-    addRobots(robots, gameController::Team::YELLOW);
+    setRobots(robots, gameController::Team::YELLOW);
 }
 
 void ErForceSimulator::setBlueRobots(const std::vector<RobotStateWithId>& robots)
 {
-    addRobots(robots, gameController::Team::BLUE);
+    setRobots(robots, gameController::Team::BLUE);
 }
 
 void ErForceSimulator::setRobots(const std::vector<RobotStateWithId>& robots,
@@ -176,6 +176,9 @@ void ErForceSimulator::setRobots(const std::vector<RobotStateWithId>& robots,
     *(command_simulator->mutable_ssl_control())     = *simulator_control;
     *(simulator_setup_command->mutable_simulator()) = *command_simulator;
     er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
+
+    blue_simulator_robots.clear();
+    yellow_simulator_robots.clear();
 
     for (const auto& robot_state_with_id : robots)
     {
