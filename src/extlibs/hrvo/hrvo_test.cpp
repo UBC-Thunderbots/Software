@@ -30,63 +30,49 @@ class HRVOTest : public ::testing::Test
           enemy_team(Duration::fromMilliseconds(1000)),
           world(field, ball, friendly_team, enemy_team)
     {
-        Point starting_point_0(-4.0, 4.0);
-        Point starting_point_1(-4.0, 0.0);
-        Point starting_point_2(-4.0, -4.0);
-
-        // Friendly team setup
-        Robot friendly_robot_0 = Robot(0, starting_point_0, Vector(1.0, -1.0), Angle(),
-                                       AngularVelocity::zero(), current_time, {});
-        Robot friendly_robot_1 = Robot(1, starting_point_1, Vector(1.0, 0.0), Angle(),
-                                       AngularVelocity::threeQuarter(), current_time, {});
-        Robot friendly_robot_2 = Robot(2, starting_point_2, Vector(1.0, 1.0), Angle(),
-                                       AngularVelocity::zero(), current_time, {});
-
-        friendly_team.updateRobots({
-//            friendly_robot_0,
-            friendly_robot_1
-//            ,
-//            friendly_robot_2
-        });
-//        friendly_team.assignGoalie(1);
-
-        TbotsProto::Primitive primitive_0 = *createMovePrimitive(
-                -starting_point_0, 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(),
-                MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
-        TbotsProto::Primitive primitive_1 = *createMovePrimitive(
-                -starting_point_1, 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(),
-                MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
-        TbotsProto::Primitive primitive_2 = *createMovePrimitive(
-                -starting_point_2, 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(),
-                MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
-
-        (*primitive_set.mutable_robot_primitives())[0] = primitive_0;
-        (*primitive_set.mutable_robot_primitives())[1] = primitive_1;
-        (*primitive_set.mutable_robot_primitives())[2] = primitive_2;
-
-        // Enemy team setup
-        Robot enemy_robot_0 = Robot(0, -starting_point_0, Vector(-1.0, 1.0), Angle(),
-                                    AngularVelocity::zero(), current_time, {});
-        Robot enemy_robot_1 = Robot(1, -starting_point_1, Vector(-1.1, 0.0), Angle(),
-                                    AngularVelocity::threeQuarter(), current_time, {});
-        Robot enemy_robot_2 = Robot(2, -starting_point_2, Vector(-1.0, -1.0), Angle(),
-                                    AngularVelocity::zero(), current_time, {});
-
-        enemy_team.updateRobots({
-//            enemy_robot_0,
-            enemy_robot_1
-//            ,
-//            enemy_robot_2
-        });
-//        enemy_team.assignGoalie(0);
-
-        // Reconstruct World with updated values
-        world = World(field, ball, friendly_team, enemy_team);
     }
 
     void TearDown() override
     {
         run_simulator();
+    }
+
+    /**
+     * Instantiate world and update simulator
+     * @param friendly_start_dest_pos_pairs List of friendly robot's start and destination point pairs
+     * @param enemy_position_velocity_pairs List of enemy robot's start point and start velocity pairs
+     */
+    void instantiate_robots_in_world(const std::vector<std::pair<Point, Point>>& friendly_start_dest_pos_pairs, const std::vector<std::pair<Point, Vector>>& enemy_position_velocity_pairs)
+    {
+        std::vector<Robot> friendly_robots;
+        for (int i = 0; i < friendly_start_dest_pos_pairs.size(); i++)
+        {
+            Point start = friendly_start_dest_pos_pairs[i].first;
+            Point dest = friendly_start_dest_pos_pairs[i].second;
+            friendly_robots.emplace_back(Robot(i, start, Vector(0.0, 0.0), Angle(),
+                                               AngularVelocity::zero(), current_time, {}));
+
+            TbotsProto::Primitive primitive = *createMovePrimitive(
+                    dest, 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(),
+                    MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
+            (*primitive_set.mutable_robot_primitives())[i] = primitive;
+        }
+        friendly_team.updateRobots(friendly_robots);
+
+        std::vector<Robot> enemy_robots;
+        for (int i = 0; i < enemy_position_velocity_pairs.size(); i++)
+        {
+            Point start = enemy_position_velocity_pairs[i].first;
+            Vector velocity = enemy_position_velocity_pairs[i].second;
+            enemy_robots.emplace_back(Robot(i, start, velocity, Angle(),
+                                               AngularVelocity::zero(), current_time, {}));
+        }
+        enemy_team.updateRobots(enemy_robots);
+
+        // Reconstruct World with updated values
+        world = World(field, ball, friendly_team, enemy_team);
+        simulator.updateWorld(world);
+        simulator.updatePrimitiveSet(primitive_set);
     }
 
     void create_div_b_field()
@@ -253,10 +239,17 @@ class HRVOTest : public ::testing::Test
     }
 };
 
-TEST_F(HRVOTest, test)
+TEST_F(HRVOTest, stationary_friendly_robot_dodging_moving_friendly_robot)
 {
-    simulator.updateWorld(world);
-    simulator.updatePrimitiveSet(primitive_set);
+    std::vector<std::pair<Point, Point>> friendly_start_dest_points = {std::pair(Point(0.0, 0.0), Point(0.0, 0.0)), std::pair(Point(-4.0, 0.0), Point(4.0, 0.0))};
+    instantiate_robots_in_world(friendly_start_dest_points, {});
+}
+
+TEST_F(HRVOTest, stationary_friendly_robot_dodging_moving_enemy_robot)
+{
+    std::vector<std::pair<Point, Point>> friendly_start_dest_points = {std::pair(Point(0.0, 0.0), Point(0.0, 0.0))};
+    std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {std::pair(Point(-4.0, 0.02), Vector(4.0, 0.0))};
+    instantiate_robots_in_world(friendly_start_dest_points, enemy_position_velocity_pairs);
 }
 
 // TEST_F(HRVOTest, div_b_edge_test)
