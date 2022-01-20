@@ -111,9 +111,9 @@ def animate_robots(file_loc, test_name, gif_output_file=None):
         """Pause/Play animation when clicked"""
         nonlocal is_paused
         if is_paused:
-            robot_anim.resume()
+            robot_anim.event_source.stop()
         else:
-            robot_anim.pause()
+            robot_anim.event_source.start()
         is_paused = not is_paused
 
     def on_plot_hover(event):
