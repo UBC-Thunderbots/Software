@@ -182,8 +182,8 @@ void SimulatedErForceSimTestFixture::runTest(
         FieldType::DIV_A, create2015RobotConstants(), create2015WheelConstants(),
         thunderbots_config->getSimulatorConfig()));
     simulator->setBallState(ball);
-    simulator->addYellowRobots(friendly_robots);
-    simulator->addBlueRobots(enemy_robots);
+    simulator->setYellowRobots(friendly_robots);
+    simulator->setBlueRobots(enemy_robots);
 
     updateSensorFusion(simulator);
     std::shared_ptr<World> world;
