@@ -95,17 +95,17 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
     // This tactic will move a robot into position to initially take the free-kick
-    auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
+    auto align_to_ball_tactic = std::make_shared<MoveTactic>();
 
     auto zones_to_cherry_pick =
         pass_eval.rankZonesForReceiving(world, world.ball().position());
 
     // These tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
-    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
-    auto cherry_pick_tactic_3 = std::make_shared<MoveTactic>(false);
-    auto cherry_pick_tactic_4 = std::make_shared<MoveTactic>(false);
+    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>();
+    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>();
+    auto cherry_pick_tactic_3 = std::make_shared<MoveTactic>();
+    auto cherry_pick_tactic_4 = std::make_shared<MoveTactic>();
 
     auto update_cherry_pickers = [&](PassEvaluation<EighteenZoneId> pass_eval) {
         auto pass1 = pass_eval.getBestPassInZones({zones_to_cherry_pick[0]}).pass;
@@ -126,22 +126,6 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
                                                   pass4.receiverOrientation(), 0.0,
                                                   MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     };
-
-    // Wait for a robot to be assigned to align to take the corner
-    while (!align_to_ball_tactic->getAssignedRobot())
-    {
-        LOG(DEBUG) << "Nothing assigned to align to ball yet";
-        updateAlignToBallTactic(align_to_ball_tactic, world);
-        update_cherry_pickers(pass_generator.generatePassEvaluation(world));
-
-        yield({{align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
-                cherry_pick_tactic_3, cherry_pick_tactic_4}});
-    }
-
-
-    // Set the passer on the pass generator
-    LOG(DEBUG) << "Aligning with robot " << align_to_ball_tactic->getAssignedRobot()->id()
-               << "as the passer";
 
     // Put the robot in roughly the right position to perform the kick
     LOG(DEBUG) << "Aligning to ball";

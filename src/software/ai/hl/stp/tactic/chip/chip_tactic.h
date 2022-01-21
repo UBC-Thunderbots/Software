@@ -16,15 +16,8 @@ class ChipTactic : public Tactic
    public:
     /**
      * Creates a new ChipTactic
-     *
-     * @param loop_forever Whether or not this Tactic should never complete. If true, the
-     * tactic will be restarted every time it completes
      */
-    explicit ChipTactic(bool loop_forever);
-
-    ChipTactic() = delete;
-
-    void updateWorldParams(const World& world) override;
+    explicit ChipTactic();
 
     /**
      * Updates the params for this tactic that cannot be derived from the world
@@ -61,7 +54,6 @@ class ChipTactic : public Tactic
     bool done() const override;
 
    private:
-    void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
     FSM<ChipFSM> fsm;

@@ -16,15 +16,8 @@ class KickTactic : public Tactic
    public:
     /**
      * Creates a new KickTactic
-     *
-     * @param loop_forever Whether or not this Tactic should never complete. If true, the
-     * tactic will be restarted every time it completes
      */
-    explicit KickTactic(bool loop_forever);
-
-    KickTactic() = delete;
-
-    void updateWorldParams(const World& world) override;
+    explicit KickTactic();
 
     /**
      * Updates the params for this tactic that cannot be derived from the world
@@ -64,7 +57,6 @@ class KickTactic : public Tactic
     bool done() const override;
 
    private:
-    void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
     FSM<KickFSM> fsm;

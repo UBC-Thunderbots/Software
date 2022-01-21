@@ -3,8 +3,6 @@
 #include "shared/constants.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/action/stop_action.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/point.h"
 #include "software/geom/ray.h"
@@ -13,15 +11,13 @@
 
 CreaseDefenderTactic::CreaseDefenderTactic(
     std::shared_ptr<const RobotNavigationObstacleConfig> robot_navigation_obstacle_config)
-    : Tactic(true, {RobotCapability::Move}),
+    : Tactic({RobotCapability::Move}),
       fsm(CreaseDefenderFSM(robot_navigation_obstacle_config)),
       control_params({Point(0, 0), CreaseDefenderAlignment::CENTRE,
                       MaxAllowedSpeedMode::PHYSICAL_LIMIT}),
       robot_navigation_obstacle_config(robot_navigation_obstacle_config)
 {
 }
-
-void CreaseDefenderTactic::updateWorldParams(const World &world) {}
 
 double CreaseDefenderTactic::calculateRobotCost(const Robot &robot,
                                                 const World &world) const
@@ -40,17 +36,6 @@ double CreaseDefenderTactic::calculateRobotCost(const Robot &robot,
                world.field().totalXLength();
     }
     return std::clamp<double>(cost, 0, 1);
-}
-
-void CreaseDefenderTactic::calculateNextAction(ActionCoroutine::push_type &yield)
-{
-    auto stop_action = std::make_shared<StopAction>(false);
-
-    do
-    {
-        stop_action->updateControlParams(*robot_, false);
-        yield(stop_action);
-    } while (!stop_action->done());
 }
 
 void CreaseDefenderTactic::accept(TacticVisitor &visitor) const

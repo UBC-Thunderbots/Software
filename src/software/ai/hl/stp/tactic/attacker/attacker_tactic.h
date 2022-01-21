@@ -24,8 +24,6 @@ class AttackerTactic : public Tactic
 
     AttackerTactic() = delete;
 
-    void updateWorldParams(const World& world) override;
-
     /**
      * Updates the control parameters for this AttackerTactic.
      *
@@ -57,7 +55,6 @@ class AttackerTactic : public Tactic
     bool done() const override;
 
    private:
-    void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
     FSM<AttackerFSM> fsm;

@@ -2,14 +2,12 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/action/stop_action.h"
 #include "software/logger/logger.h"
 #include "software/world/ball.h"
 
 AttackerTactic::AttackerTactic(
     std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config)
-    : Tactic(false,
-             {RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
+    : Tactic({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
       fsm(DribbleFSM()),
       best_pass_so_far(std::nullopt),
       pass_committed(false),
@@ -17,8 +15,6 @@ AttackerTactic::AttackerTactic(
       attacker_tactic_config(attacker_tactic_config)
 {
 }
-
-void AttackerTactic::updateWorldParams(const World& world) {}
 
 void AttackerTactic::updateControlParams(const Pass& best_pass_so_far,
                                          bool pass_committed)
@@ -77,12 +73,6 @@ double AttackerTactic::calculateRobotCost(const Robot& robot, const World& world
                world.field().totalXLength();
     }
     return std::clamp<double>(cost, 0, 1);
-}
-
-void AttackerTactic::calculateNextAction(ActionCoroutine::push_type& yield)
-{
-    auto stop_action = std::make_shared<StopAction>(false);
-    yield({stop_action});
 }
 
 void AttackerTactic::accept(TacticVisitor& visitor) const

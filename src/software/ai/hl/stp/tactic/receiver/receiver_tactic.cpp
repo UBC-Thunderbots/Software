@@ -2,21 +2,18 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/action/stop_action.h"
 #include "software/geom/algorithms/acute_angle.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/logger/logger.h"
 
 ReceiverTactic::ReceiverTactic()
-    : Tactic(false, {RobotCapability::Move}),
+    : Tactic({RobotCapability::Move}),
       fsm(ReceiverFSM()),
       control_params({ReceiverFSM::ControlParams{.pass                   = std::nullopt,
                                                  .disable_one_touch_shot = false}})
 {
 }
 
-void ReceiverTactic::updateWorldParams(const World& world) {}
 void ReceiverTactic::updateControlParams(const Pass& updated_pass,
                                          bool disable_one_touch_shot)
 {
@@ -50,15 +47,6 @@ double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world
                   world.field().totalXLength();
 
     return std::clamp<double>(cost, 0, 1);
-}
-
-void ReceiverTactic::calculateNextAction(ActionCoroutine::push_type& yield)
-{
-    auto stop_action = std::make_shared<StopAction>(true);
-    while (true)
-    {
-        yield({stop_action});
-    }
 }
 
 void ReceiverTactic::accept(TacticVisitor& visitor) const

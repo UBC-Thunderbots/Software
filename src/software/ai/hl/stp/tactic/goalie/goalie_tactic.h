@@ -29,16 +29,12 @@ class GoalieTactic : public Tactic
 
     GoalieTactic() = delete;
 
-    void updateWorldParams(const World &world) override;
-
     double calculateRobotCost(const Robot &robot, const World &world) const override;
 
     void accept(TacticVisitor &visitor) const override;
     bool done() const override;
-    bool isGoalieTactic() const override;
 
    private:
-    void calculateNextAction(ActionCoroutine::push_type &yield) override;
     void updateIntent(const TacticUpdate &tactic_update) override;
 
     FSM<GoalieFSM> fsm;
