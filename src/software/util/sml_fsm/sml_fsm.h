@@ -59,10 +59,24 @@ using FSM = boost::sml::sm<T, boost::sml::process_queue<std::queue>>;
         FUNCTION(event, processEvent);                                                   \
     };
 
+/**
+ * Strips extraneous information such as boost::sml template information to return
+ * human-friendly text about the state
+ *
+ * @param s the string with the extraneous information
+ *
+ * @return the string without the extraneous information
+ */
 std::string stripFSMState(std::string s);
 
-// getCurrentFullStateName and associated functions was adapted from
-// https://github.com/boost-ext/sml/issues/326#issuecomment-605529165
+/**
+ * Gets the current state name of the FSM
+ * Adapted from https://github.com/boost-ext/sml/issues/326#issuecomment-605529165
+ *
+ * @param state_machine The boost sml state machine
+ *
+ * @return the current state name
+ */
 template <typename SM>
 std::string getCurrentStateName(const SM& state_machine)
 {
@@ -96,6 +110,14 @@ struct state_machine_impl<boost::sml::back::sm<boost::sml::back::sm_policy<T, Ts
     using type = T;
 };
 
+/**
+ * Gets the current sub state name of the FSM
+ * Adapted from https://github.com/boost-ext/sml/issues/326#issuecomment-605529165
+ *
+ * @param state_machine The boost sml state machine
+ *
+ * @return the current sub state name
+ */
 template <typename SSM, typename SM>
 std::string getCurrentSubStateName(const SM& state_machine)
 {
@@ -117,6 +139,14 @@ std::string getCurrentSubStateName(const SM& state_machine)
     return name;
 }
 
+/**
+ * Gets the current full state name of the FSM, including sub states
+ * Adapted from https://github.com/boost-ext/sml/issues/326#issuecomment-605529165
+ *
+ * @param state_machine The boost sml state machine
+ *
+ * @return the current full state name
+ */
 template <typename SM>
 std::string getCurrentFullStateName(const SM& state_machine)
 {
