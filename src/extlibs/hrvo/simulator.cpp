@@ -135,6 +135,7 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
         }
     }
 
+    // TODO: Call addHRVOAgent here instead:
     std::unique_ptr<HRVOAgent> agent = std::make_unique<HRVOAgent>(
         this, position, addGoal(destination_point), neighbor_dist, max_neighbors,
         ROBOT_MAX_RADIUS_METERS, velocity, max_accel, goal_radius, max_speed, max_speed,
@@ -205,7 +206,6 @@ std::size_t Simulator::addHRVOAgent(const Vector2 &position, std::size_t goalNo,
                                     float maxSpeed, float uncertaintyOffset,
                                     float maxAccel, const Vector2 &velocity)
 {
-    // TODO: makeUniquePtr<HRVOAgent>
     std::unique_ptr<HRVOAgent> agent = std::make_unique<HRVOAgent>(
         this, position, goalNo, neighborDist, maxNeighbors, radius, velocity, maxAccel,
         goalRadius, prefSpeed, maxSpeed, uncertaintyOffset);

@@ -123,6 +123,7 @@ private:
     };
 
    public:  // A
+    Vector2 prefVelocity_;
     float prefSpeed_;
     std::size_t maxNeighbors_;
     float neighborDist_;

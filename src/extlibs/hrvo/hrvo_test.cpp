@@ -241,14 +241,14 @@ class HRVOTest : public ::testing::Test
 
 TEST_F(HRVOTest, stationary_friendly_robot_dodging_moving_friendly_robot)
 {
-    std::vector<std::pair<Point, Point>> friendly_start_dest_points = {std::pair(Point(0.0, 0.0), Point(0.0, 0.0)), std::pair(Point(-4.0, 0.0), Point(4.0, 0.0))};
+    std::vector<std::pair<Point, Point>> friendly_start_dest_points = {std::pair(Point(0.0, 0.0), Point(0.0, 0.0)), std::pair(Point(-2.0, 0.0), Point(4.0, 0.0))};
     instantiate_robots_in_world(friendly_start_dest_points, {});
 }
 
 TEST_F(HRVOTest, stationary_friendly_robot_dodging_moving_enemy_robot)
 {
-    std::vector<std::pair<Point, Point>> friendly_start_dest_points = {std::pair(Point(0.0, 0.0), Point(0.0, 0.0))};
-    std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {std::pair(Point(-4.0, 0.02), Vector(4.0, 0.0))};
+    std::vector<std::pair<Point, Point>> friendly_start_dest_points = {std::pair(Point(4.0, 0.0), Point(-4.0, 0.0))};
+    std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {std::pair(Point(-2.0, 0.02), Vector(1.0, 0.0))};
     instantiate_robots_in_world(friendly_start_dest_points, enemy_position_velocity_pairs);
 }
 

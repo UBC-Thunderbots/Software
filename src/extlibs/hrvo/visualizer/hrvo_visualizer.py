@@ -10,7 +10,7 @@ from matplotlib.animation import FuncAnimation, PillowWriter
 # Constants
 FRAME_RATE = 30
 FRAME_LENGTH_MS = 1000.0 / FRAME_RATE
-PLAY_BACK_SPEED = 1.0
+PLAY_BACK_SPEED = 0.3
 
 PLOT_SCALE_CONSTANT = 0.125
 

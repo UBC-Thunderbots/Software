@@ -99,8 +99,6 @@ class Agent
     float radius_;
 
     Vector2 velocity_;
-    Vector2 prefVelocity_;  // TODO, can remove once we add VO support and not all Agents
-                            // use HRVO
     Vector2 newVelocity_;
     float maxSpeed_;
     float maxAccel_;
@@ -109,9 +107,8 @@ class Agent
     float goalRadius_;
     bool reachedGoal_;
 
-    // Used to get the simulator time step
-    // TODO: Remove once new Path class is added and add timeStep as a argument to
-    // update(...)
+    // TODO (#2373): Remove once new Path class is added and add timeStep as a argument to
+    // update(time_step)
     Simulator *const simulator_;
 
     friend class KdTree;  // TODO: Ideally we use getters instead of friending the class

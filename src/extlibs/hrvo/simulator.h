@@ -306,7 +306,6 @@ class Simulator
     Simulator(const Simulator &other);
     Simulator &operator=(const Simulator &other);
 
-
     std::unique_ptr<KdTree> kdTree_;
     float globalTime_;
     float timeStep_;
@@ -315,9 +314,11 @@ class Simulator
     std::vector<std::unique_ptr<Goal>>
         goals_;  // won't be one to one since not all agents will have a goal
 
-    TbotsProto::PrimitiveSet primitive_set_;
-    // robot id to agent index
+    // friendly robot id to agent index
     std::map<unsigned int, unsigned int> friendly_robot_id_map;
+
+    // PrimitiveSet which includes the path which each friendly robot should take
+    TbotsProto::PrimitiveSet primitive_set_;
 
     // The scale which enemy robots should be larger than friendly robots
     // This scale is used to avoid friendly robots passing enemy robots from a very close distance

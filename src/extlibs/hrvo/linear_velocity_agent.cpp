@@ -18,8 +18,9 @@ void LinearVelocityAgent::computeNewVelocity()
     const float dv = abs(velocity_to_dest - velocity_);
     if (dv != 0.f)
     {
-        newVelocity_ = (1.0f - (maxAccel_ * simulator_->timeStep_ / dv)) * velocity_ +
-                         (maxAccel_ * simulator_->timeStep_ / dv) * velocity_to_dest;
+        newVelocity_ = normalize(velocity_) * maxSpeed_;
+//                (1.0f - (maxAccel_ * simulator_->timeStep_ / dv)) * velocity_ +
+//                         (maxAccel_ * simulator_->timeStep_ / dv) * velocity_to_dest;
     }
     else
     {
