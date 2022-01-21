@@ -37,11 +37,6 @@ double DribbleTactic::calculateRobotCost(const Robot &robot, const World &world)
     return std::clamp<double>(cost, 0, 1);
 }
 
-bool DribbleTactic::done() const
-{
-    return fsm.is(boost::sml::X);
-}
-
 void DribbleTactic::updateIntent(const TacticUpdate &tactic_update)
 {
     fsm.process_event(DribbleFSM::Update(control_params, tactic_update));

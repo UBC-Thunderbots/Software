@@ -42,3 +42,35 @@ struct TacticUpdate
         ControlParams control_params;                                                    \
         TacticUpdate common;                                                             \
     };
+
+#define DEFINE_TACTIC_DONE_AND_GET_FSM_STATE                                             \
+    bool done() const override                                                           \
+    {                                                                                    \
+        return fsm.is(boost::sml::X);                                                    \
+    }                                                                                    \
+                                                                                         \
+    std::string getFSMState() const override                                             \
+    {                                                                                    \
+        std::string state_str = getCurrentFullStateName(fsm);                            \
+        return state_str;                                                                \
+    }
+
+
+// fsm.visit_current_states([&state_str](auto state) {state_str+=
+// std::string(state.c_str());});
+
+// return stripFSMState(state_str);
+// GoalieTacticboost::ext::sml::v1_1_3::aux::string<GoalieFSM::PositionToBlockState>
+// MoveTacticboost::ext::sml::v1_1_3::aux::string<boost::ext::sml::v1_1_3::back::terminate_state>
+// AttackerTacticboost::ext::sml::v1_1_3::aux::string<boost::ext::sml::v1_1_3::back::sm<boost::ext::sml::v1_1_3::back::sm_policy<DribbleFSM>
+// >>
+// 2- AttackerTacticsm_policy<DribbleFSM
+//
+// fsm.visit_current_states([&state_str](auto state) {state_str+=
+// std::string(TYPENAME(state));});
+//
+// c_str:
+// 1- ShadowEnemyTacticShadowEnemyFSM::BlockPassState
+// 2-
+// AttackerTacticboost::ext::sml::v1_1_3::back::sm<boost::ext::sml::v1_1_3::back::sm_policy<DribbleFSM>
+// >

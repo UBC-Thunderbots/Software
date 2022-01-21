@@ -37,11 +37,6 @@ void KickTactic::accept(TacticVisitor &visitor) const
     visitor.visit(*this);
 }
 
-bool KickTactic::done() const
-{
-    return fsm.is(boost::sml::X);
-}
-
 void KickTactic::updateIntent(const TacticUpdate &tactic_update)
 {
     fsm.process_event(KickFSM::Update(control_params, tactic_update));

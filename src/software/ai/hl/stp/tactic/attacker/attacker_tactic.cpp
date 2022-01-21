@@ -53,11 +53,6 @@ void AttackerTactic::updateIntent(const TacticUpdate& tactic_update)
     fsm.process_event(AttackerFSM::Update(control_params, tactic_update));
 }
 
-bool AttackerTactic::done() const
-{
-    return fsm.is(boost::sml::X);
-}
-
 double AttackerTactic::calculateRobotCost(const Robot& robot, const World& world) const
 {
     // Default 0 cost assuming ball is in dribbler

@@ -308,6 +308,8 @@ cc_library(
         "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_from_contested_possession_play",
         "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_with_static_defenders_play",
         "//software/ai/hl/stp/play/offense:offense_play",
+        "//software/ai/hl/stp/play/shoot_or_pass:shoot_or_pass_play",
+        "//software/ai/hl/stp/play/crease_defense:crease_defense_play",
     ],
 )
 

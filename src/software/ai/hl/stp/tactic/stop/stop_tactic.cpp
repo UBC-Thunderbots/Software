@@ -13,11 +13,6 @@ double StopTactic::calculateRobotCost(const Robot &robot, const World &world) co
     return 0.5;
 }
 
-bool StopTactic::done() const
-{
-    return fsm.is(boost::sml::X);
-}
-
 void StopTactic::updateIntent(const TacticUpdate &tactic_update)
 {
     fsm.process_event(StopFSM::Update({}, tactic_update));
