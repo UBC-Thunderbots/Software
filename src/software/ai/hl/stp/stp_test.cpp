@@ -175,7 +175,7 @@ TEST_F(STPTest, test_get_play_info)
     std::string expected_referee_command, expected_play_name, expected_tactic_name;
     expected_referee_command = "HALT";
     expected_play_name       = "HaltTestPlay";
-    expected_tactic_name     = "StopTestTactic";
+    expected_tactic_name     = "StopTactic";
 
     TbotsProto::PlayInfo expected_play_info_msg = TbotsProto::PlayInfo();
     expected_play_info_msg.mutable_game_state()->set_referee_command_name(

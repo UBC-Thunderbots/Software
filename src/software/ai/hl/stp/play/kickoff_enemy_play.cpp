@@ -78,9 +78,9 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     };
     // these move tactics will be used to go to those positions
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
-        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true)};
+        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
+        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
+        std::make_shared<MoveTactic>()};
 
     // created an enemy_team for mutation
     Team enemy_team = world.enemyTeam();

@@ -15,8 +15,6 @@ class ShadowEnemyTactic : public Tactic
    public:
     explicit ShadowEnemyTactic();
 
-    void updateWorldParams(const World &world) override;
-
     /**
      * Updates the control parameters for this ShadowEnemyTactic
      *
@@ -45,7 +43,6 @@ class ShadowEnemyTactic : public Tactic
 
 
    private:
-    void calculateNextAction(ActionCoroutine::push_type &yield) override;
     void updateIntent(const TacticUpdate &tactic_update) override;
 
     FSM<ShadowEnemyFSM> fsm;

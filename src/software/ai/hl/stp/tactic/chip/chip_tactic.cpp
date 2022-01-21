@@ -2,15 +2,11 @@
 
 #include <algorithm>
 
-#include "software/ai/hl/stp/action/chip_action.h"
 
-ChipTactic::ChipTactic(bool loop_forever)
-    : Tactic(loop_forever, {RobotCapability::Chip, RobotCapability::Move}),
-      fsm{GetBehindBallFSM()}
+ChipTactic::ChipTactic()
+    : Tactic({RobotCapability::Chip, RobotCapability::Move}), fsm{GetBehindBallFSM()}
 {
 }
-
-void ChipTactic::updateWorldParams(const World &world) {}
 
 void ChipTactic::updateControlParams(const Point &chip_origin,
                                      const Angle &chip_direction,
@@ -34,18 +30,6 @@ double ChipTactic::calculateRobotCost(const Robot &robot, const World &world) co
                   world.field().totalXLength();
 
     return std::clamp<double>(cost, 0, 1);
-}
-
-void ChipTactic::calculateNextAction(ActionCoroutine::push_type &yield)
-{
-    auto chip_action = std::make_shared<ChipAction>();
-    do
-    {
-        chip_action->updateControlParams(*robot_, control_params.chip_origin,
-                                         control_params.chip_direction,
-                                         control_params.chip_distance_meters);
-        yield(chip_action);
-    } while (!chip_action->done());
 }
 
 void ChipTactic::accept(TacticVisitor &visitor) const

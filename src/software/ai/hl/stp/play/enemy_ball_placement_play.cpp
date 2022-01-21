@@ -118,8 +118,8 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     };
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_tactics = {
-        std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(),
+        std::make_shared<MoveTactic>(),
     };
 
     if (placement_point.has_value())
