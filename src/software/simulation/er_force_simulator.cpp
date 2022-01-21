@@ -177,6 +177,15 @@ void ErForceSimulator::setRobots(const std::vector<RobotStateWithId>& robots,
     *(simulator_setup_command->mutable_simulator()) = *command_simulator;
     er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
 
+    if (side == gameController::Team::BLUE)
+    {
+        blue_simulator_robots.clear();
+    }
+    else
+    {
+        yellow_simulator_robots.clear();
+    }
+
     for (const auto& robot_state_with_id : robots)
     {
         auto simulator_robot = std::make_shared<ErForceSimulatorRobot>(
@@ -186,25 +195,11 @@ void ErForceSimulator::setRobots(const std::vector<RobotStateWithId>& robots,
 
         if (side == gameController::Team::BLUE)
         {
-            if (robot_state_with_id.id < blue_simulator_robots.size())
-            {
-                blue_simulator_robots[robot_state_with_id.id] = simulator_robot;
-            }
-            else
-            {
-                blue_simulator_robots.emplace_back(simulator_robot);
-            }
+            blue_simulator_robots.emplace_back(simulator_robot);
         }
         else
         {
-            if (robot_state_with_id.id < yellow_simulator_robots.size())
-            {
-                yellow_simulator_robots[robot_state_with_id.id] = simulator_robot;
-            }
-            else
-            {
-                yellow_simulator_robots.emplace_back(simulator_robot);
-            }
+            yellow_simulator_robots.emplace_back(simulator_robot);
         }
     }
 }
