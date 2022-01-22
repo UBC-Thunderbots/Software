@@ -27,7 +27,7 @@ void Agent::update()
     }
 
     const float dv = abs(new_velocity_ - velocity_);
-    if (dv < max_accel_ * simulator_->timeStep_)
+    if (dv < max_accel_ * simulator_->timeStep_ || dv == 0.f)
     {
         velocity_ = new_velocity_;
     }
