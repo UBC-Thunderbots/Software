@@ -1,0 +1,27 @@
+syntax = "proto2";
+
+package TbotsProto;
+
+import "proto/tbots_timestamp_msg.proto";
+import "proto/vision.proto";
+
+message Robot
+{
+    enum RobotCapability
+    {
+        Dribble = 0;
+        Kick    = 1;
+        Chip    = 2;
+        Move    = 3;
+    }
+    required uint32 id                                = 1;
+    required RobotState current_state                 = 2;
+    repeated RobotCapability unavailable_capabilities = 3;
+    required Timestamp timestamp                      = 4;
+}
+
+message Team
+{
+    repeated Robot team_robots = 1;
+    optional uint32 goalie_id  = 2;
+}

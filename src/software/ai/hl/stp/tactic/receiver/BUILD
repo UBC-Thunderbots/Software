@@ -2,16 +2,16 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "receiver_tactic",
-    srcs = ["receiver_tactic.cpp"],
+    srcs = [
+        "receiver_fsm.cpp",
+        "receiver_tactic.cpp",
+    ],
     hdrs = [
         "receiver_fsm.h",
         "receiver_tactic.h",
     ],
     deps = [
         "//shared:constants",
-        "//software/ai/hl/stp/action:intercept_ball_action",
-        "//software/ai/hl/stp/action:kick_action",
-        "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
         "//software/ai/hl/stp/tactic/kick:kick_tactic",
@@ -33,8 +33,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_receiver_tactic_test",
-    srcs = ["simulated_receiver_tactic_test.cpp"],
+    name = "receiver_tactic_test",
+    srcs = ["receiver_tactic_test.cpp"],
     deps = [
         ":receiver_tactic",
         "//shared/test_util:tbots_gtest_main",

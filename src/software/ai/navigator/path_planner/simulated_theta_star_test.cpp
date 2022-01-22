@@ -35,7 +35,7 @@ TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_robot_and_dest_in_same_o
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(1, 0)});
 
-    auto tactic = std::make_shared<MoveTactic>(false);
+    auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
     setFriendlyRobotId(1);
@@ -77,7 +77,7 @@ TEST_F(SimulatedThetaStarTest,
     auto enemy_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(1, 0), Point(3, 0)});
 
-    auto tactic = std::make_shared<MoveTactic>(false);
+    auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
     setFriendlyRobotId(1);
@@ -116,7 +116,7 @@ TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_dest_in_obstacle)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(1, 0)});
 
-    auto tactic = std::make_shared<MoveTactic>(false);
+    auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
     setFriendlyRobotId(1);
@@ -156,7 +156,7 @@ TEST_F(SimulatedThetaStarTest,
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
 
-    auto tactic = std::make_shared<MoveTactic>(false);
+    auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
     setFriendlyRobotId(1);
@@ -192,7 +192,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_in_obstacle)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(1, 0)});
 
-    auto tactic = std::make_shared<MoveTactic>(false);
+    auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
     setFriendlyRobotId(1);
@@ -225,7 +225,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_no_obstacle_straight_path)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(1, 0)});
 
-    auto tactic = std::make_shared<MoveTactic>(false);
+    auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setFriendlyTactic(tactic);
     setFriendlyRobotId(1);
@@ -278,7 +278,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_zig_zag_test)
          Point(front_wall_x + gate_3, 0.0), Point(front_wall_x + gate_3, -0.5),
          Point(front_wall_x + gate_3, -1)});
 
-    auto tactic = std::make_shared<MoveTactic>(false);
+    auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
     setFriendlyRobotId(1);
@@ -320,7 +320,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_oscillation)
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(1, 0)});
 
-    auto tactic = std::make_shared<MoveTactic>(false);
+    auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
     setFriendlyRobotId(1);
@@ -356,7 +356,7 @@ TEST_F(SimulatedThetaStarTest,
         {Point(1, 0), Point(2, 3), Point(3, -1), Point(4, 2), Point(2, 3.2),
          Point(-1.7, 3.8)});
 
-    auto tactic = std::make_shared<MoveTactic>(false);
+    auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
     setFriendlyRobotId(1);
@@ -395,7 +395,7 @@ TEST_F(SimulatedThetaStarTest,
         {field.friendlyGoalCenter(), initial_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(0, 0)});
 
-    auto tactic = std::make_shared<MoveTactic>(false);
+    auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);
     setTactic(tactic);
     setFriendlyRobotId(1);

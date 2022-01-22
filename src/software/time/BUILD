@@ -26,6 +26,7 @@ cc_library(
     deps = [
         ":duration",
         ":time",
+        "//proto:tbots_cc_proto",
         "//shared:constants",
     ],
 )

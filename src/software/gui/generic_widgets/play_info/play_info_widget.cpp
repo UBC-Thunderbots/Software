@@ -2,7 +2,7 @@
 
 PlayInfoWidget::PlayInfoWidget(QWidget* parent) : QTextEdit(parent) {}
 
-void PlayInfoWidget::updatePlayInfo(const PlayInfo& play_info)
+void PlayInfoWidget::updatePlayInfo(const TbotsProto::PlayInfo& play_info)
 {
     QString referee_command_string =
         QString("Referee Command: %1\n")
