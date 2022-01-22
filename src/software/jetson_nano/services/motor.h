@@ -11,6 +11,21 @@
 
 class MotorService : public Service
 {
+    typedef struct
+    {
+        uint8_t encoder_init_mode;
+        uint8_t encoder_init_state;
+        uint16_t init_wait_time;
+        uint16_t actual_init_wait_time;
+        uint16_t start_voltage;
+        int16_t hall_PHI_E_old;
+        int16_t hall_PHI_E_new;
+        int16_t hall_actual_coarse_offset;
+        uint16_t last_PHI_E_selection;
+        uint32_t last_UQ_UD_EXT;
+        int16_t last_PHI_E_EXT;
+    } MotorState;
+
    public:
     /**
      * Service that interacts with the motor board.
@@ -58,6 +73,7 @@ class MotorService : public Service
      */
     uint8_t tmc4671ReadWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
     uint8_t tmc6100ReadWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
+    void periodicJob(uint32_t ms_tick);
 
    private:
     /**
@@ -103,4 +119,7 @@ class MotorService : public Service
 
     // SPI File Descriptors
     std::unordered_map<int, int> file_descriptors;
+
+    // Motor State
+    MotorState motor_state_[5];
 };

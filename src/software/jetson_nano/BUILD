@@ -41,4 +41,8 @@ cc_binary(
         ":thunderloop",
         "//shared:constants",
     ],
+    linkopts = [
+        "-lpthread",
+        "-lrt",
+    ]
 )

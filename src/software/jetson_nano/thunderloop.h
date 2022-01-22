@@ -55,9 +55,9 @@ class Thunderloop
      */
     void run(unsigned run_at_hz);
 
-   private:
     // Services
     std::unique_ptr<MotorService> motor_service_;
+   private:
 
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;

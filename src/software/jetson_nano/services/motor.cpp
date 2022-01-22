@@ -16,10 +16,30 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/logger/logger.h"
 
+#define POSITION_SCALE_MAX  (int32_t)65536
+#include <stdint.h>
+
 extern "C"
 {
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671.h"
 #include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
+
+    // We need a static pointer here, because trinamic externs the following two
+    // SPI binding functions that we need to interface with their API.
+    //
+    // The motor service exclusively calls the trinamic API which triggers these
+    // functions. The motor service will set this variable in the constructor.
+    static MotorService* g_motor_service = NULL;
+
+    uint8_t tmc4671_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
+    {
+        return g_motor_service->tmc4671ReadWriteByte(motor, data, lastTransfer);
+    }
+
+    uint8_t tmc6100_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
+    {
+        return g_motor_service->tmc6100ReadWriteByte(motor, data, lastTransfer);
+    }
 }
 
 // SPI Configs
@@ -33,6 +53,7 @@ static const uint32_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 1;
 static const uint32_t BACK_LEFT_MOTOR_CHIP_SELECT   = 2;
 static const uint32_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 3;
 static const uint32_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
+static const uint32_t TOTAL_NUMBER_OF_MOTORS        = 5;
 
 // SPI Trinamic Motor Driver Paths (indexed with chip select above)
 static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spidev0.2",
@@ -41,22 +62,6 @@ static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spid
 static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO = "77";
 static const char* DRIVER_CONTROL_ENABLE_GPIO           = "78";
 
-// We need a static pointer here, because trinamic externs the following two
-// SPI binding functions that we need to interface with their API.
-//
-// The motor service exclusively calls the trinamic API which triggers these
-// functions. The motor service will set this variable in the constructor.
-static MotorService* g_motor_service = NULL;
-
-uint8_t tmc4671_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
-{
-    return g_motor_service->tmc4671ReadWriteByte(motor, data, lastTransfer);
-}
-
-uint8_t tmc6100_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
-{
-    return g_motor_service->tmc6100ReadWriteByte(motor, data, lastTransfer);
-}
 
 MotorService::MotorService(const RobotConstants_t& robot_constants,
                            const WheelConstants_t& wheel_constants)
@@ -255,8 +260,73 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
 
 void MotorService::start()
 {
+
+    for (uint32_t motor = 0; motor < TOTAL_NUMBER_OF_MOTORS; motor++)
+    {
+        motor_state_[motor].init_wait_time            = 1000;
+        motor_state_[motor].start_voltage             = 4000;  // UQ_UD_EXT
+        motor_state_[motor].encoder_init_mode         = 0;
+        motor_state_[motor].encoder_init_state        = 0;
+        motor_state_[motor].hall_PHI_E_old            = 0;
+        motor_state_[motor].hall_PHI_E_new            = 0;
+        motor_state_[motor].hall_actual_coarse_offset = 0;
+        motor_state_[motor].last_PHI_E_selection      = 0;
+        motor_state_[motor].last_UQ_UD_EXT            = 0;
+        motor_state_[motor].last_PHI_E_EXT            = 0;
+    }
+
     driver_control_enable_gpio.setValue(GpioState::HIGH);
-    // TODO (#2332)
+
+    // Motor type &  PWM configuration
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PWM_POLARITIES, 0x00000000);
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PWM_MAXCNT, 0x00000F9F);
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PWM_BBM_H_BBM_L, 0x00001919);
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PWM_SV_CHOP, 0x00000007);
+    
+    // ADC configuration
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_ADC_I_SELECT, 0x09000100);
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_dsADC_MCFG_B_MCFG_A, 0x00100010);
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_dsADC_MCLK_A, 0x20000000);
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_dsADC_MCLK_B, 0x20000000);
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_dsADC_MDEC_B_MDEC_A, 0x014E014E);
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_ADC_I0_SCALE_OFFSET, 0x010081D5);
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_ADC_I1_SCALE_OFFSET, 0x0100818F);
+    
+    // ABN encoder settings
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_ABN_DECODER_MODE, 0x00001000);
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_ABN_DECODER_PPR, 0x00001000);
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_ABN_DECODER_COUNT, 0x0000099B);
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_ABN_DECODER_PHI_E_PHI_M_OFFSET, 0x00000000);
+    
+    // Limits
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_TORQUE_FLUX_LIMITS, 0x000003E8);
+    
+    // PI settings
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_TORQUE_P_TORQUE_I, 0x01000100);
+    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_FLUX_P_FLUX_I, 0x01000100);
+
+    LOGF(DEBUG, "Motor type configured to : %x", tmc4671_getMotorType(FRONT_LEFT_MOTOR_CHIP_SELECT));
+    LOGF(DEBUG, "Pole pairs configured to : %x", tmc4671_getPolePairs(FRONT_LEFT_MOTOR_CHIP_SELECT));
+}
+
+
+void MotorService::periodicJob(uint32_t ms_tick)
+{
+    for (uint32_t motor = 0; motor < TOTAL_NUMBER_OF_MOTORS; motor++)
+    {
+
+        int16_t* pointer = &(motor_state_[motor].last_PHI_E_EXT);
+        tmc4671_periodicJob(
+            motor, ms_tick, motor_state_[motor].encoder_init_mode,
+            &(motor_state_[motor].encoder_init_state), motor_state_[motor].init_wait_time,
+            &(motor_state_[motor].actual_init_wait_time),
+            motor_state_[motor].start_voltage, &(motor_state_[motor].hall_PHI_E_old),
+            &(motor_state_[motor].hall_PHI_E_new),
+            &(motor_state_[motor].hall_actual_coarse_offset),
+            &(motor_state_[motor].last_PHI_E_selection),
+            &(motor_state_[motor].last_UQ_UD_EXT), pointer);
+    }
 }
 
 void MotorService::stop()
