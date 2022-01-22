@@ -1,5 +1,4 @@
 #include "software/jetson_nano/thunderloop.h"
-
 #include <limits.h>
 #include <malloc.h>
 #include <pthread.h>
@@ -118,6 +117,7 @@ static void* my_rt_thread(void* args)
 
     uint32_t millisecond_counter = 0;
 
+    LOG(WARNING) << "REAL TIME THREAD STARTING";
     while (1)
     {
         /* wait untill next shot */

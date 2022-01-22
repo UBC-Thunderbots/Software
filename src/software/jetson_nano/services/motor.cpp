@@ -60,7 +60,7 @@ static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spid
                                   "/dev/spidev0.3", "/dev/spidev0.4"};
 
 static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO = "77";
-static const char* DRIVER_CONTROL_ENABLE_GPIO           = "78";
+static const char* DRIVER_CONTROL_ENABLE_GPIO           = "216";
 
 
 MotorService::MotorService(const RobotConstants_t& robot_constants,
@@ -260,23 +260,11 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
 
 void MotorService::start()
 {
-    for (uint32_t motor = 0; motor < TOTAL_NUMBER_OF_MOTORS; motor++)
-    {
-        motor_state_[motor].init_wait_time            = 1000;
-        motor_state_[motor].start_voltage             = 4000;  // UQ_UD_EXT
-        motor_state_[motor].encoder_init_mode         = 0;
-        motor_state_[motor].encoder_init_state        = 0;
-        motor_state_[motor].hall_PHI_E_old            = 0;
-        motor_state_[motor].hall_PHI_E_new            = 0;
-        motor_state_[motor].hall_actual_coarse_offset = 0;
-        motor_state_[motor].last_PHI_E_selection      = 0;
-        motor_state_[motor].last_UQ_UD_EXT            = 0;
-        motor_state_[motor].last_PHI_E_EXT            = 0;
-    }
 
     tmc6100_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GCONF, 32);
+    uint32_t result = tmc6100_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GCONF);
 
-    driver_control_enable_gpio.setValue(GpioState::HIGH);
+    LOGF(DEBUG, "TMC6100 Configuration %x", result);
 
     // Motor type &  PWM configuration
     tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
@@ -307,14 +295,40 @@ void MotorService::start()
     tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_TORQUE_P_TORQUE_I, 0x01000100);
     tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_FLUX_P_FLUX_I, 0x01000100);
 
+
+    // ===== ABN encoder test drive =====
     LOGF(DEBUG, "Motor type configured to : %x", tmc4671_getMotorType(FRONT_LEFT_MOTOR_CHIP_SELECT));
     LOGF(DEBUG, "Pole pairs configured to : %x", tmc4671_getPolePairs(FRONT_LEFT_MOTOR_CHIP_SELECT));
+
+    for (uint32_t motor = 0; motor < TOTAL_NUMBER_OF_MOTORS; motor++)
+    {
+        motor_state_[motor].init_wait_time            = 1000;
+        motor_state_[motor].start_voltage             = 16000;  // UQ_UD_EXT
+        motor_state_[motor].encoder_init_mode         = 0;
+        motor_state_[motor].encoder_init_state        = 0;
+        motor_state_[motor].hall_PHI_E_old            = 0;
+        motor_state_[motor].hall_PHI_E_new            = 0;
+        motor_state_[motor].hall_actual_coarse_offset = 0;
+        motor_state_[motor].last_PHI_E_selection      = 0;
+        motor_state_[motor].last_UQ_UD_EXT            = 0;
+        motor_state_[motor].last_PHI_E_EXT            = 0;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+        tmc4671_updatePhiSelectionAndInitialize(
+            motor, 0, 3, motor_state_[motor].encoder_init_mode,
+            &(motor_state_[motor].encoder_init_state));
+#pragma GCC diagnostic pop
+    }
+
+
+    sleep(5);
 }
 
 
 void MotorService::periodicJob(uint32_t ms_tick)
 {
-    for (uint32_t motor = 0; motor < TOTAL_NUMBER_OF_MOTORS; motor++)
+    for (uint32_t motor = 0; motor < 1; motor++)
     {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
