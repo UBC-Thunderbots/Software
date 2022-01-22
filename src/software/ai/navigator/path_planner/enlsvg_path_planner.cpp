@@ -63,7 +63,7 @@ bool EnlsvgPathPlanner::isCoordNavigable(const EnlsvgPoint &ep) const
 
 std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start, const Point &end,
                                                 const Rectangle &navigable_area,
-                                                const std::vector<ObstaclePtr> &ignored)
+                                                const std::vector<ObstaclePtr> &)
 {
     // Check if start and end coordinates are in navigable area and return null if it
     // isn't
@@ -105,8 +105,8 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start, const Point 
         path_points.insert(path_points.begin(), start);
     }
 
-    // If the end point wasn't blocked, then replace the end with the actual end because
-    // some details get lose due to the grid resolution
+    // If the end point wasn't blocked, then replace the end with the actual end because some details get lost due to 
+    // the grid resolution
     if (new_end.value() == enlsvg_end)
     {
         path_points.pop_back();

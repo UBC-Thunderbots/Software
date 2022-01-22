@@ -50,7 +50,7 @@ class EnlsvgPathPlanner : public PathPlanner
      */
     std::optional<Path> findPath(const Point &start, const Point &end,
                                  const Rectangle &navigable_area,
-                                 const std::vector<ObstaclePtr> &obstacles) override;
+                                 const std::vector<ObstaclePtr> &) override;
 
     /**
      * Returns internal resolution of the grid.
@@ -69,6 +69,10 @@ class EnlsvgPathPlanner : public PathPlanner
     using EnlsvgAlgorithm = Pathfinding::ENLSVG::Algorithm;
     using EnlsvgMemory    = Pathfinding::ENLSVG::Memory;
     
+    /**
+    * This struct is just the internal representation of a grid coordinate. This exists to define equality operators and
+    * to minimize changes to extlibs.
+    */
     struct EnlsvgPoint : Pathfinding::GridVertex
     {
     
@@ -87,6 +91,9 @@ class EnlsvgPathPlanner : public PathPlanner
         }
     };
     
+    /**
+    * This struct defines a hash function to use for EnlsvgPoints.
+    */
     struct HashEnlsvgPoint
     {
         size_t operator()(const EnlsvgPoint &p) const
@@ -124,7 +131,7 @@ class EnlsvgPathPlanner : public PathPlanner
      * grid_boundary_margin_offset.
      *
      * @param obstacles                      a list of obstacles
-     * @param grid_boundary_margin_offset    an offset that represts the width of the
+     * @param grid_boundary_margin_offset    an offset that represents the width of the
      * region from the edges of the grid to consider as an obstacle. Has the same units as
      * the resolution parameter in EnlsvgPathPlanner()
      */
@@ -167,9 +174,9 @@ class EnlsvgPathPlanner : public PathPlanner
     double resolution;
 
     // can be arbitrarily thought of as the width of the grid on the x-axis
-    int num_grid_rows;
+    unsigned int num_grid_rows;
     // can be arbitrarily thought of as the height of the grid on the y-axis
-    int num_grid_cols;
+    unsigned int num_grid_cols;
 
     // since the implementation depends on positive coordinates, this is the bottom-left most coordinate
     Point origin;
