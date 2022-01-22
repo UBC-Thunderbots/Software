@@ -19,6 +19,7 @@ cc_test(
     srcs = ["ball_test.cpp"],
     deps = [
         ":ball",
+        "//proto/message_translation:tbots_protobuf",
         "//shared/test_util:tbots_gtest_main",
     ],
 )
@@ -28,6 +29,7 @@ cc_library(
     srcs = ["ball_state.cpp"],
     hdrs = ["ball_state.h"],
     deps = [
+        "//proto:tbots_cc_proto",
         "//software/geom:point",
         "//software/geom:vector",
     ],
@@ -38,6 +40,7 @@ cc_test(
     srcs = ["ball_state_test.cpp"],
     deps = [
         ":ball_state",
+        "//proto/message_translation:tbots_protobuf",
         "//shared/test_util:tbots_gtest_main",
     ],
 )
@@ -47,11 +50,13 @@ cc_library(
     srcs = ["field.cpp"],
     hdrs = ["field.h"],
     deps = [
+        "//proto:tbots_cc_proto",
         "//shared:constants",
         "//software/geom:circle",
         "//software/geom:rectangle",
         "//software/geom/algorithms",
         "//software/time:timestamp",
+        "//software/util/make_enum",
     ],
 )
 
@@ -60,6 +65,7 @@ cc_test(
     srcs = ["field_test.cpp"],
     deps = [
         ":field",
+        "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
         "//shared/test_util:tbots_gtest_main",
     ],
@@ -81,6 +87,7 @@ cc_test(
     srcs = ["game_state_test.cpp"],
     deps = [
         ":game_state",
+        "//proto/message_translation:tbots_protobuf",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
     ],
@@ -99,6 +106,7 @@ cc_library(
     deps = [
         ":robot_capabilities",
         ":robot_state",
+        "//proto:tbots_cc_proto",
         "//software/logger",
         "//software/time:duration",
         "//software/time:timestamp",
@@ -110,6 +118,7 @@ cc_test(
     srcs = ["robot_test.cpp"],
     deps = [
         ":robot",
+        "//proto/message_translation:tbots_protobuf",
         "//shared/test_util:tbots_gtest_main",
     ],
 )
@@ -120,6 +129,7 @@ cc_library(
     hdrs = ["robot_state.h"],
     deps = [
         "team_colour",
+        "//proto:tbots_cc_proto",
         "//shared:constants",
         "//shared:robot_constants",
         "//software/geom:angle",
@@ -135,6 +145,7 @@ cc_test(
     srcs = ["robot_state_test.cpp"],
     deps = [
         ":robot_state",
+        "//proto/message_translation:tbots_protobuf",
         "//shared/test_util:tbots_gtest_main",
     ],
 )
@@ -169,6 +180,7 @@ cc_test(
     srcs = ["team_test.cpp"],
     deps = [
         ":team",
+        "//proto/message_translation:tbots_protobuf",
         "//shared/test_util:tbots_gtest_main",
     ],
 )
@@ -192,6 +204,7 @@ cc_test(
     srcs = ["world_test.cpp"],
     deps = [
         ":world",
+        "//proto/message_translation:tbots_protobuf",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
     ],

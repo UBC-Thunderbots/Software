@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "dribble_tactic",
-    srcs = ["dribble_tactic.cpp"],
+    srcs = [
+        "dribble_fsm.cpp",
+        "dribble_tactic.cpp",
+    ],
     hdrs = [
         "dribble_fsm.h",
         "dribble_tactic.h",
@@ -10,7 +13,6 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/evaluation:pass",
-        "//software/ai/hl/stp/action:stop_action",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/intent:move_intent",
@@ -29,8 +31,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_dribble_tactic_test",
-    srcs = ["simulated_dribble_tactic_test.cpp"],
+    name = "dribble_tactic_test",
+    srcs = ["dribble_tactic_test.cpp"],
     deps = [
         ":dribble_tactic",
         "//shared/test_util:tbots_gtest_main",
@@ -45,8 +47,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_dribble_tactic_push_enemy_test",
-    srcs = ["simulated_dribble_tactic_push_enemy_test.cpp"],
+    name = "dribble_tactic_push_enemy_test",
+    srcs = ["dribble_tactic_push_enemy_test.cpp"],
     deps = [
         ":dribble_tactic",
         "//shared/test_util:tbots_gtest_main",

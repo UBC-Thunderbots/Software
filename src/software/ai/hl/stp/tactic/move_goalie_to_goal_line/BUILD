@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "move_goalie_to_goal_line_tactic",
-    srcs = ["move_goalie_to_goal_line_tactic.cpp"],
+    srcs = [
+        "move_goalie_to_goal_line_fsm.cpp",
+        "move_goalie_to_goal_line_tactic.cpp",
+    ],
     hdrs = [
         "move_goalie_to_goal_line_fsm.h",
         "move_goalie_to_goal_line_tactic.h",
@@ -11,7 +14,6 @@ cc_library(
         "//shared:constants",
         "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:stop_action",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/geom:line",
@@ -31,8 +33,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_move_goalie_to_goal_line_tactic_test",
-    srcs = ["simulated_move_goalie_to_goal_line_tactic_test.cpp"],
+    name = "move_goalie_to_goal_line_tactic_test",
+    srcs = ["move_goalie_to_goal_line_tactic_test.cpp"],
     deps = [
         ":move_goalie_to_goal_line_tactic",
         "//shared/test_util:tbots_gtest_main",

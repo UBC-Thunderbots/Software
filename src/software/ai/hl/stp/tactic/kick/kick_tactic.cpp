@@ -2,14 +2,10 @@
 
 #include <algorithm>
 
-#include "software/ai/hl/stp/action/kick_action.h"
-
-KickTactic::KickTactic(bool loop_forever)
-    : Tactic(loop_forever, {RobotCapability::Kick, RobotCapability::Move})
+KickTactic::KickTactic()
+    : Tactic({RobotCapability::Kick, RobotCapability::Move}), fsm{GetBehindBallFSM()}
 {
 }
-
-void KickTactic::updateWorldParams(const World &world) {}
 
 void KickTactic::updateControlParams(const Point &kick_origin,
                                      const Angle &kick_direction,
@@ -34,18 +30,6 @@ double KickTactic::calculateRobotCost(const Robot &robot, const World &world) co
                   world.field().totalXLength();
 
     return std::clamp<double>(cost, 0, 1);
-}
-
-void KickTactic::calculateNextAction(ActionCoroutine::push_type &yield)
-{
-    auto kick_action = std::make_shared<KickAction>();
-    do
-    {
-        kick_action->updateControlParams(*robot_, control_params.kick_origin,
-                                         control_params.kick_direction,
-                                         control_params.kick_speed_meters_per_second);
-        yield(kick_action);
-    } while (!kick_action->done());
 }
 
 void KickTactic::accept(TacticVisitor &visitor) const

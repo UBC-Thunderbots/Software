@@ -54,7 +54,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
     };
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {
-        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)};
+        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>()};
 
     // Figure out where the fallback chip target is
     // Experimentally determined to be a reasonable value

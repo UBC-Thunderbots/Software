@@ -1,6 +1,7 @@
 #include "software/backend/simulator_backend.h"
 
 #include "proto/message_translation/defending_side.h"
+#include "proto/message_translation/ssl_wrapper.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_log_msg.pb.h"
 #include "shared/constants.h"
@@ -49,6 +50,7 @@ void SimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 void SimulatorBackend::onValueReceived(World world)
 {
     vision_output->sendProto(*createVision(world));
+    LOG(VISUALIZE) << *createWorld(world);
 }
 
 void SimulatorBackend::receiveRobotLogs(TbotsProto::RobotLog log)

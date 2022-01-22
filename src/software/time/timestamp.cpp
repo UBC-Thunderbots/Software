@@ -25,6 +25,12 @@ const Timestamp Timestamp::fromMilliseconds(double milliseconds)
     return Timestamp(milliseconds * SECONDS_PER_MILLISECOND);
 }
 
+const Timestamp Timestamp::fromTimestampProto(
+    const TbotsProto::Timestamp &timestamp_proto)
+{
+    return fromSeconds(timestamp_proto.epoch_timestamp_seconds());
+}
+
 Timestamp Timestamp::operator+(const Duration &duration) const
 {
     return Timestamp::fromSeconds(toSeconds() + duration.toSeconds());

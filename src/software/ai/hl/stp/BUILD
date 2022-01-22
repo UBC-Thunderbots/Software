@@ -40,10 +40,6 @@ cc_test(
         "//shared/parameter:cpp_configs",
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:halt_play",
-        "//software/ai/hl/stp/play/test_plays:halt_test_play",
-        "//software/ai/hl/stp/tactic/test_tactics:goalie_test_tactic",
-        "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
-        "//software/ai/hl/stp/tactic/test_tactics:stop_test_tactic",
         "//software/test_util",
     ],
 )

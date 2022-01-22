@@ -33,6 +33,7 @@
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "proto/ssl_simulation_robot_control.pb.h"
 
+
 // higher values break the rolling friction of the ball
 const float SIMULATOR_SCALE  = 10.0f;
 const float SUB_TIMESTEP     = 1 / 200.f;

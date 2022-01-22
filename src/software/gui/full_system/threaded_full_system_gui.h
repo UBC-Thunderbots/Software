@@ -23,7 +23,7 @@
 class ThreadedFullSystemGUI
     : public FirstInFirstOutThreadedObserver<World>,
       public FirstInFirstOutThreadedObserver<AIDrawFunction>,
-      public FirstInFirstOutThreadedObserver<PlayInfo>,
+      public FirstInFirstOutThreadedObserver<TbotsProto::PlayInfo>,
       public FirstInFirstOutThreadedObserver<SensorProto>,
       public FirstInFirstOutThreadedObserver<TbotsProto::PrimitiveSet>
 {
@@ -35,7 +35,7 @@ class ThreadedFullSystemGUI
 
     void onValueReceived(World world) override;
     void onValueReceived(AIDrawFunction draw_function) override;
-    void onValueReceived(PlayInfo play_info_msg) override;
+    void onValueReceived(TbotsProto::PlayInfo play_info_msg) override;
     void onValueReceived(SensorProto sensor_msg) override;
     void onValueReceived(TbotsProto::PrimitiveSet primitive_msg) override;
 
@@ -65,7 +65,7 @@ class ThreadedFullSystemGUI
     // be passed safely
     std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer;
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer;
-    std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_msg_buffer;
+    std::shared_ptr<ThreadSafeBuffer<TbotsProto::PlayInfo>> play_info_msg_buffer;
     std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer;
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer;
     std::shared_ptr<ThreadSafeBuffer<double>> worlds_received_per_second_buffer;

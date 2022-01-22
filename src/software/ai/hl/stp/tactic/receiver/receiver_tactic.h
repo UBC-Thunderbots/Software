@@ -16,7 +16,6 @@
 class ReceiverTactic : public Tactic
 {
    public:
-    void updateWorldParams(const World& world);
     ReceiverTactic();
 
     /**
@@ -77,7 +76,6 @@ class ReceiverTactic : public Tactic
     // enemy goal with
     static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(90);
 
-    void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
     /**

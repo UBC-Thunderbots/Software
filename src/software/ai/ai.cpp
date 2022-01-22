@@ -37,7 +37,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World &world) 
     return navigator->getAssignedPrimitives(world, assigned_intents);
 }
 
-PlayInfo AI::getPlayInfo() const
+TbotsProto::PlayInfo AI::getPlayInfo() const
 {
     return high_level->getPlayInfo();
 }

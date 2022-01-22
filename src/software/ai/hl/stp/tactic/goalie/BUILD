@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "goalie_tactic",
-    srcs = ["goalie_tactic.cpp"],
+    srcs = [
+        "goalie_fsm.cpp",
+        "goalie_tactic.cpp",
+    ],
     hdrs = [
         "goalie_fsm.h",
         "goalie_tactic.h",
@@ -11,8 +14,6 @@ cc_library(
         "//shared:constants",
         "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:chip_action",
-        "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
@@ -34,8 +35,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_goalie_tactic_test",
-    srcs = ["simulated_goalie_tactic_test.cpp"],
+    name = "goalie_tactic_test",
+    srcs = ["goalie_tactic_test.cpp"],
     deps = [
         ":goalie_tactic",
         "//shared/test_util:tbots_gtest_main",
