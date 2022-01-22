@@ -11,31 +11,32 @@ EnlsvgPathPlanner::EnlsvgPathPlanner(const Rectangle &navigable_area,
           convertPointToEnlsvgPoint(navigable_area.posXPosYCorner()).y),
       max_navigable_x_enlsvg_point(
           convertPointToEnlsvgPoint(navigable_area.posXPosYCorner()).x),
-      grid(std::make_unique<EnlsvgGrid>(num_grid_rows, num_grid_cols))
+      enlsvg_grid(std::make_unique<EnlsvgGrid>(num_grid_rows, num_grid_cols))
 {
     createObstaclesInGrid(obstacles, grid_boundary_offset);
-    algo = std::make_unique<const EnlsvgAlgorithm>(*grid);
-    mem  = std::make_unique<EnlsvgMemory>(*algo);
+    enlsvg_algo = std::make_unique<const EnlsvgAlgorithm>(*enlsvg_grid);
+    enlsvg_mem  = std::make_unique<EnlsvgMemory>(*enlsvg_algo);
 }
 
 void EnlsvgPathPlanner::createObstaclesInGrid(const std::vector<ObstaclePtr> &obstacles,
                                               double boundary_margin) const
 {
+    // block boundary areas
     double offset_in_enlsvg = boundary_margin / resolution;
     for (int x = 0; x < offset_in_enlsvg; ++x)
     {
         for (int y = 0; y < num_grid_cols; ++y)
         {
-            grid->setBlocked(x, y, true);
-            grid->setBlocked(num_grid_rows - 1 - x, y, true);
+            enlsvg_grid->setBlocked(x, y, true);
+            enlsvg_grid->setBlocked(num_grid_rows - 1 - x, y, true);
         }
     }
     for (int y = 0; y < offset_in_enlsvg; ++y)
     {
         for (int x = 0; x < num_grid_rows; ++x)
         {
-            grid->setBlocked(x, y, true);
-            grid->setBlocked(x, num_grid_cols - 1 - y, true);
+            enlsvg_grid->setBlocked(x, y, true);
+            enlsvg_grid->setBlocked(x, num_grid_cols - 1 - y, true);
         }
     }
 
@@ -48,7 +49,7 @@ void EnlsvgPathPlanner::createObstaclesInGrid(const std::vector<ObstaclePtr> &ob
             EnlsvgPoint blocked_coord = convertPointToEnlsvgPoint(blocked_point);
             if (isCoordNavigable(blocked_coord))
             {
-                grid->setBlocked(blocked_coord.x, blocked_coord.y, true);
+                enlsvg_grid->setBlocked(blocked_coord.x, blocked_coord.y, true);
             }
         }
     }
@@ -66,49 +67,47 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start, const Point 
 {
     // Check if start and end coordinates are in navigable area and return null if it
     // isn't
-    bool navigable_area_contains_start =
-        (start.x() >= navigable_area.xMin()) && (start.x() <= navigable_area.xMax()) &&
-        (start.y() >= navigable_area.yMin()) && (start.y() <= navigable_area.yMax());
-    bool navigable_area_contains_end =
-        (end.x() >= navigable_area.xMin()) && (end.x() <= navigable_area.xMax()) &&
-        (end.y() >= navigable_area.yMin()) && (end.y() <= navigable_area.yMax());
-    if (!navigable_area_contains_start || !navigable_area_contains_end)
+    if (!contains(navigable_area, start), !contains(navigable_area, end))
     {
+        LOG(WARNING) << "Start and/or end point is not within the navigable area; no path found" << std::endl;
         return std::nullopt;
     }
 
     // Find closest unblocked points in case the start and end positions are inside
     // obstacles
-    EnlsvgPoint s  = convertPointToEnlsvgPoint(start);
-    EnlsvgPoint e  = convertPointToEnlsvgPoint(end);
-    auto new_start = findClosestUnblockedEnlsvgPoint(s);
-    auto new_end   = findClosestUnblockedEnlsvgPoint(e);
+    EnlsvgPoint enlsvg_start    = convertPointToEnlsvgPoint(start);
+    EnlsvgPoint enlsvg_end      = convertPointToEnlsvgPoint(end);
+    auto new_start = findClosestUnblockedEnlsvgPoint(enlsvg_start);
+    auto new_end   = findClosestUnblockedEnlsvgPoint(enlsvg_end);
 
     if (new_start == std::nullopt || new_end == std::nullopt)
     {
+        LOG(WARNING) << "Unable to find a path; Unable to find a nearby start and/or end point that isn't blocked "
+            << " within the navigable area; no path found" << std::endl;
         return std::nullopt;
     }
 
     EnlsvgPath enlsvgPath =
-        algo->computePath(*mem, new_start.value().x, new_start.value().y,
-                          new_end.value().x, new_end.value().y);
+        enlsvg_algo->computePath(*enlsvg_mem, new_start.value().x, new_start.value().y,
+                                 new_end.value().x, new_end.value().y);
     std::optional<Path> path = convertEnlsvgPathToPath(enlsvgPath);
     if (path == std::nullopt)
     {
+        LOG(WARNING) << "The path planner was unable to find a path" << std::endl;
         return std::nullopt;
     }
 
     std::vector<Point> path_points = path.value().getKnots();
 
     // If start was initially blocked, add the start point
-    if (new_start.value() != s)
+    if (new_start.value() != enlsvg_start)
     {
         path_points.insert(path_points.begin(), start);
     }
 
     // If the end point wasn't blocked, then replace the end with the actual end because
     // some details get lose due to the grid resolution
-    if (new_end.value() == e)
+    if (new_end.value() == enlsvg_end)
     {
         path_points.pop_back();
         path_points.emplace_back(end);
@@ -161,11 +160,14 @@ std::optional<Path> EnlsvgPathPlanner::convertEnlsvgPathToPath(const EnlsvgPath 
 std::optional<EnlsvgPathPlanner::EnlsvgPoint>
 EnlsvgPathPlanner::findClosestUnblockedEnlsvgPoint(const EnlsvgPoint &ep) const
 {
-    // Uses DFS to find the closest unblocked cell by looking at nearby cells
+    // Try to short circuit
+    if (!isBlocked(ep)) { return ep; }
+    
+    // Uses BFS to find the closest unblocked cell by looking at nearby cells
     std::queue<EnlsvgPoint> q;
-    std::vector<EnlsvgPoint> visited;
+    std::unordered_set<EnlsvgPoint, HashEnlsvgPoint> visited;
     q.push(ep);
-    visited.emplace_back(ep);
+    visited.emplace(ep);
     while (!q.empty())
     {
         EnlsvgPoint test_coord = q.front();
@@ -174,19 +176,15 @@ EnlsvgPathPlanner::findClosestUnblockedEnlsvgPoint(const EnlsvgPoint &ep) const
         {
             return std::optional<EnlsvgPoint>(test_coord);
         }
-        for (int i = 1; i > -2; i -= 2)
+        // Place immediately horizontal and vertical coordinates on the list of nodes to check
+        EnlsvgPoint next_coords[4] = { { test_coord.x+1, test_coord.y }, { test_coord.x, test_coord.y-1 },
+                                      { test_coord.x, test_coord.y+1 }, { test_coord.x-1, test_coord.y } };
+        for (auto &next_coord : next_coords)
         {
-            EnlsvgPoint next_coord = EnlsvgPoint(test_coord.x + i, test_coord.y);
-            for (int j = -1; j < 2; j += 2)
+            if (isCoordNavigable(next_coord) && visited.count(next_coord) == 0)
             {
-                if (isCoordNavigable(next_coord) &&
-                    (std::find(visited.begin(), visited.end(), next_coord) ==
-                     visited.end()))
-                {
-                    q.push(next_coord);
-                    visited.emplace_back(next_coord);
-                }
-                next_coord = EnlsvgPoint(test_coord.x, test_coord.y + i);
+                q.push(next_coord);
+                visited.emplace(next_coord);
             }
         }
     }
@@ -195,5 +193,5 @@ EnlsvgPathPlanner::findClosestUnblockedEnlsvgPoint(const EnlsvgPoint &ep) const
 
 bool EnlsvgPathPlanner::isBlocked(const EnlsvgPoint &ep) const
 {
-    return grid->isBlocked(ep.x, ep.y);
+    return enlsvg_grid->isBlocked(ep.x, ep.y);
 }

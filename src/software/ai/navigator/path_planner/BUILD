@@ -64,6 +64,8 @@ cc_library(
         ":path_planner",
         "//extlibs/enlsvg",
         "//software/world",
+        "//software/logger",
+        "@boost//:functional",
     ],
 )
 

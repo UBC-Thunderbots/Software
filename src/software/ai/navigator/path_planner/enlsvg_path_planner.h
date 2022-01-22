@@ -3,6 +3,8 @@
 #include "extlibs/enlsvg/Pathfinding/ENLSVG.h"
 #include "path_planner.h"
 #include "software/world/world.h"
+#include "software/logger/logger.h"
+#include <boost/functional/hash/hash.hpp>
 
 /**
  * The Edge N-Level Sparse Visibility Graph algorithm is a fast pathfinding algorithm for
@@ -27,7 +29,7 @@ class EnlsvgPathPlanner : public PathPlanner
      * @param navigable_area         The total area that the path planner must path plan
      * inside
      * @param obstacles              A list of obstacles to consider when path planning
-     * @param boundary_margin_offset Ppadding from the edges of the navigable_area to set
+     * @param boundary_margin_offset Padding from the edges of the navigable_area to set
      * as an obstacle
      * @param resolution             The resolution of the internal representation of the
      * grid. Uses the same units as boundary_margin_offset
@@ -60,14 +62,43 @@ class EnlsvgPathPlanner : public PathPlanner
     {
         return resolution;
     }
-
+    
    private:
-    using EnlsvgPoint     = Pathfinding::GridVertex;
     using EnlsvgPath      = Pathfinding::Path;
     using EnlsvgGrid      = Pathfinding::Grid;
     using EnlsvgAlgorithm = Pathfinding::ENLSVG::Algorithm;
     using EnlsvgMemory    = Pathfinding::ENLSVG::Memory;
+    
+    struct EnlsvgPoint : Pathfinding::GridVertex
+    {
+    
+        EnlsvgPoint() : Pathfinding::GridVertex(){}
+        EnlsvgPoint(int x, int y) : Pathfinding::GridVertex(x, y){}
+        EnlsvgPoint(GridVertex p) : Pathfinding::GridVertex(p.x, p.y){}
 
+        inline bool operator==(const GridVertex &other) const
+        {
+            return (x == other.x) && (y == other.y);
+        }
+
+        inline bool operator!=(const GridVertex &other) const
+        {
+            return (x != other.x) || (y != other.y); 
+        }
+    };
+    
+    struct HashEnlsvgPoint
+    {
+        size_t operator()(const EnlsvgPoint &p) const
+        {
+            std::size_t seed = 0;
+            boost::hash_combine(seed, std::hash<int>{}(p.x));
+            boost::hash_combine(seed, std::hash<int>{}(p.y));
+            
+            return seed;
+        }
+    };
+        
     /**
      * Conversions from a Point <-> internal coordinate representation.
      *
@@ -140,13 +171,15 @@ class EnlsvgPathPlanner : public PathPlanner
     // can be arbitrarily thought of as the height of the grid on the y-axis
     int num_grid_cols;
 
+    // since the implementation depends on positive coordinates, this is the bottom-left most coordinate
     Point origin;
 
+    // max navigable coordinates
     int max_navigable_y_enlsvg_point;
     int max_navigable_x_enlsvg_point;
 
     // Required internal data structures
-    std::unique_ptr<EnlsvgGrid> grid;
-    std::unique_ptr<const EnlsvgAlgorithm> algo;
-    std::unique_ptr<EnlsvgMemory> mem;
+    std::unique_ptr<EnlsvgGrid> enlsvg_grid;
+    std::unique_ptr<const EnlsvgAlgorithm> enlsvg_algo;
+    std::unique_ptr<EnlsvgMemory> enlsvg_mem;
 };

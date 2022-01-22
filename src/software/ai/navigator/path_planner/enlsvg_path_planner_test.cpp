@@ -177,9 +177,9 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_src)
     auto path = planner.findPath(start, dest, navigable_area, obstacles);
 
     EXPECT_TRUE(path != std::nullopt);
-
+    
     std::vector<Point> path_points = path->getKnots();
-
+    
     // Make sure the start and end of the path are correct
     EXPECT_EQ(start, path->getStartPoint());
     EXPECT_EQ(dest, path->getEndPoint());
@@ -204,7 +204,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest)
     // Test where we try to end in an obstacle. Make sure we navigate to the closest point
     // on the edge of the dest
     Field field = Field::createSSLDivisionAField();
-    Point start{0, 0}, dest{2.7, 0};
+    Point start{0, 2}, dest{2.7, 0};
 
     Polygon obstacle = Rectangle(Point(-2.5, -1), Point(3.5, 1));
 
@@ -221,10 +221,6 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest)
     EXPECT_TRUE(path != std::nullopt);
 
     std::vector<Point> path_points = path->getKnots();
-    //    for (Point p : path_points)
-    //    {
-    //        std::cout << "Point (" << p.x() << ", " << p.y() << ")\n";
-    //    }
 
     // Make sure the start and end of the path are correct
     EXPECT_EQ(start, path->getStartPoint());
@@ -234,7 +230,92 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest)
     EXPECT_NEAR(0, path->getEndPoint().y(), 0.1);
 
     // Make the sure the path does not exceed a bounding box
-    Rectangle bounding_box({-0.3, -0.3}, {3.8, 1.3});
+    Rectangle bounding_box({-0.3, -1.1}, {3.8, 2.1});
+    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+
+    // Make sure path does not go through any obstacles, except for the first point, which
+    // is in the obstacle blocking the start position
+    checkPathDoesNotIntersectObstacle({path_points.begin() + 1, path_points.end()},
+                                      {obstacle});
+}
+
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest_blocked_src)
+{
+    // Test where we start and end in an obstacle
+    // We expect to exit out of the obstacle and path plan to a point next to the final point outside the obstacle
+    Field field = Field::createSSLDivisionAField();
+    Point start{0, 0.1}, dest{2.7, 0};
+
+    Polygon obstacle = Rectangle(Point(-2, -1.5), Point(3.5, 1));
+
+    // Place a rectangle over our destination location
+    std::vector<ObstaclePtr> obstacles = {
+        robot_navigation_obstacle_factory.createFromShape(obstacle)};
+
+    Rectangle navigable_area = field.fieldBoundary();
+
+    EnlsvgPathPlanner planner =
+        EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+
+    EXPECT_TRUE(path != std::nullopt);
+
+    std::vector<Point> path_points = path->getKnots();
+
+    // Make sure the start and end of the path are correct
+    EXPECT_EQ(start, path->getStartPoint());
+    
+    // The point following the start should be the closest point out of the obstacle, which is around (0, 1)
+    EXPECT_NEAR(0, path_points[1].x(), 0.3);
+    EXPECT_NEAR(1, path_points[1].y(), 0.3);
+
+    // The endpoint should be the closest point to the obstacle, which is around (3.5, 0)
+    EXPECT_NEAR(3.5, path->getEndPoint().x(), 0.3);
+    EXPECT_NEAR(0, path->getEndPoint().y(), 0.1);
+
+    // Make the sure the path does not exceed a bounding box
+    Rectangle bounding_box({-0.3, -1.1}, {3.8, 2.1});
+    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+
+    // Make sure path does not go through any obstacles, except for the first point, which
+    // is in the obstacle blocking the start position
+    checkPathDoesNotIntersectObstacle({path_points.begin() + 1, path_points.end()},
+                                      {obstacle});
+}
+
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_src_move_away_from_target_to_get_to_final_dest)
+{
+    // Test where we start inside an obstacle, but we need to briefly move away from the target point to get to the
+    // final destination
+    Field field = Field::createSSLDivisionAField();
+    Point start{1, 2}, dest{5, 4};
+
+    Polygon obstacle = Rectangle(Point(0, 1), Point(4, 4));
+
+    // Place a rectangle over our destination location
+    std::vector<ObstaclePtr> obstacles = {
+        robot_navigation_obstacle_factory.createFromShape(obstacle)};
+
+    Rectangle navigable_area = field.fieldBoundary();
+
+    EnlsvgPathPlanner planner =
+        EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
+    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+
+    EXPECT_TRUE(path != std::nullopt);
+
+    std::vector<Point> path_points = path->getKnots();
+
+    // Make sure the start and end of the path are correct
+    EXPECT_EQ(start, path->getStartPoint());
+    EXPECT_EQ(dest, path->getEndPoint());
+    
+    // The point following the start should be the closest point out of the obstacle, which is around (0 , 2)
+    EXPECT_NEAR(0, path_points[1].x(), 0.3);
+    EXPECT_NEAR(2, path_points[1].y(), 0.3);
+
+    // Make the sure the path does not exceed a bounding box
+    Rectangle bounding_box({-0.3, 0.9}, {5.1, 5.1});
     checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
     // Make sure path does not go through any obstacles, except for the first point, which
