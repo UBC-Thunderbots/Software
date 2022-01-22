@@ -462,7 +462,7 @@ void HRVOAgent::computePreferredVelocity()
         // Accelerate to max velocity
         // v_pref = v_now + a * t
         float currPrefSpeed =
-            std::max(max_speed_, abs(velocity_) + max_accel_ * simulator_->getTimeStep());
+            std::min(max_speed_, abs(velocity_) + max_accel_ * simulator_->getTimeStep());
         pref_velocity_ = normalize(goalPosition - position_) * currPrefSpeed;
     }
 }
