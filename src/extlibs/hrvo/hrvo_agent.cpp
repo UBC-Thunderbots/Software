@@ -452,15 +452,18 @@ void HRVOAgent::computePreferredVelocity()
     {
         // velocity given linear deceleration, distance away from goal, and desired final
         // speed
-        auto currPrefSpeed = static_cast<float>(
+        // v_pref = sqrt(v_goal^2 + 2 * a * d_remainingToDestination)
+        float currPrefSpeed = static_cast<float>(
             std::sqrt(std::pow(speedAtGoal, 2) + 2 * max_accel_ * distToGoal));
         pref_velocity_ = normalize(distVectorToGoal) * currPrefSpeed;
     }
     else
     {
-        // TODO (#2374): Update so we have the same logic for when the robot is accelerating
-        // https://github.com/UBC-Thunderbots/Software/issues/2374
-        pref_velocity_ = normalize(goalPosition - position_) * prefSpeed_;
+        // Accelerate to max velocity
+        // v_pref = v_now + a * t
+        float currPrefSpeed =
+            std::max(max_speed_, abs(velocity_) + max_accel_ * simulator_->getTimeStep());
+        pref_velocity_ = normalize(goalPosition - position_) * currPrefSpeed;
     }
 }
 
