@@ -11,7 +11,10 @@ const int SIMULATOR_FRAME_RATE = 30;
 
 class HRVOTest : public ::testing::Test
 {
-   public:
+    // Test Properties
+    float simulation_timeout = 15.0;
+
+    // HRVO Properties
     Simulator simulator;
     Timestamp current_time;
     Ball ball;
@@ -21,6 +24,7 @@ class HRVOTest : public ::testing::Test
     World world;
     TbotsProto::PrimitiveSet primitive_set;
 
+public:
     HRVOTest()
         : simulator(1.f / SIMULATOR_FRAME_RATE),
           current_time(Timestamp::fromSeconds(123)),
@@ -35,6 +39,15 @@ class HRVOTest : public ::testing::Test
     void TearDown() override
     {
         run_simulator();
+    }
+
+    /**
+     * Set simulation timeout.
+     * @param simulation_timeout The max amount of time which the test can run for
+     */
+    void setSimulationTimeout(float simulation_timeout)
+    {
+        HRVOTest::simulation_timeout = simulation_timeout;
     }
 
     /**
@@ -224,13 +237,14 @@ class HRVOTest : public ::testing::Test
 
             auto finish_tick_time = std::chrono::high_resolution_clock::now();
             computation_time += finish_tick_time - start_tick_time;
-        } while (prev_frame_time < 6.f);  // TODO: !simulator.haveReachedGoals() &&
+        } while (prev_frame_time < simulation_timeout);  // TODO:!simulator.haveReachedGoals() &&
+        // TODO: make the max simulation time sommething set in the test
 
         auto finish_time = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> total_time = finish_time - start_time;
         std::cout << "Total run time = " << total_time.count() << std::endl;
         std::cout << "Total simulation time = " << prev_frame_time << std::endl;
-        std::cout << "Average time per tick = " << total_time.count() / frame
+        std::cout << "Avg time per tick = " << total_time.count() / frame
                   << std::endl;
 
         output_file.close();
@@ -309,6 +323,77 @@ TEST_F(HRVOTest, destination_between_friendly_robot_and_stationary_friendly_robo
     instantiate_robots_in_world(friendly_start_dest_points, {});
 }
 
+ TEST_F(HRVOTest, twenty_five_robots_around_circle)
+{
+    // Add robots around circle with one in the center
+    const int num_robots           = 25;
+    std::vector<std::pair<Point, Point>> friendly_start_dest_points;
+    float robot_starting_angle_dif = 2.0 * M_PI / num_robots;
+    float circle_radius            = std::max(float(num_robots) / 10, 2.f);
+    for (std::size_t i = 0; i < num_robots; ++i)
+    {
+        float x = std::cos(static_cast<float>(i) * robot_starting_angle_dif);
+        float y = std::sin(static_cast<float>(i) * robot_starting_angle_dif);
+        const Point position = Point(x * circle_radius, y * circle_radius);
+        friendly_start_dest_points.emplace_back(std::make_pair(position, -position));
+    }
+    instantiate_robots_in_world(friendly_start_dest_points, {});
+}
+
+ TEST_F(HRVOTest, twenty_five_robots_moving_straight)
+{
+    // Add robots around circle with one in the center
+    const int num_robots           = 25;
+    std::vector<std::pair<Point, Point>> friendly_start_dest_points;
+    for (std::size_t i = 0; i < num_robots; ++i)
+    {
+        Point position(0.0, static_cast<double>(i) * 0.25);
+        Point dest(7.0, static_cast<double>(i) * 0.25);
+        friendly_start_dest_points.emplace_back(std::make_pair(position, dest));
+    }
+    instantiate_robots_in_world(friendly_start_dest_points, {});
+}
+
+ TEST_F(HRVOTest, div_a_friendly_and_enemy_robot_performance_test)
+{
+    // Add robots around circle with one in the center
+    const int num_robots_per_team = 11;
+    std::vector<std::pair<Point, Point>> friendly_start_dest_points;
+    std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs;
+    Vector robot_offset(0.0, -0.4);
+    Vector team_offset(8.0, 0.0);
+    for (std::size_t i = 0; i < num_robots_per_team; ++i)
+    {
+        Point friendly_pos = Point() + 2 * i * robot_offset;
+        friendly_start_dest_points.emplace_back(std::make_pair(friendly_pos, friendly_pos + team_offset));
+
+        Point enemy_pos = Point() + (2 * i + 1) * robot_offset + team_offset;
+        enemy_position_velocity_pairs.emplace_back(std::make_pair(enemy_pos, Vector(-1.0, 0.0)));
+    }
+    instantiate_robots_in_world(friendly_start_dest_points, enemy_position_velocity_pairs);
+}
+
+ TEST_F(HRVOTest, div_a_friendly_and_enemy_robot_performance_test_moving_across)
+{
+    // Add robots around circle with one in the center
+    const int num_robots_per_team = 11;
+    std::vector<std::pair<Point, Point>> friendly_start_dest_points;
+    std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs;
+    Vector enemy_robot_offset(0.0, -1.0);
+    Vector friendly_robot_offset(0.4, 0.0);
+    Vector dest_offset(0.0, -10.5);
+    for (std::size_t i = 0; i < num_robots_per_team; ++i)
+    {
+        Point friendly_pos = Point(0.0, 0.0) + i * friendly_robot_offset;
+        friendly_start_dest_points.emplace_back(std::make_pair(friendly_pos, friendly_pos + dest_offset));
+
+        Point enemy_pos = Point(-1.0, 0.0) + i * enemy_robot_offset;
+        enemy_position_velocity_pairs.emplace_back(std::make_pair(enemy_pos, Vector(1.5, 0.0)));
+    }
+    instantiate_robots_in_world(friendly_start_dest_points, enemy_position_velocity_pairs);
+    setSimulationTimeout(7.f);
+}
+
 // TEST_F(HRVOTest, div_b_edge_test)
 //{
 //    const Vector2 goal_offset  = Vector2(8.f, 0);
@@ -323,25 +408,6 @@ TEST_F(HRVOTest, destination_between_friendly_robot_and_stationary_friendly_robo
 //    }
 //    add_static_obstacle(Vector2(0, 2.f), 0.75f);
 //    create_div_b_field();
-//}
-//
-// TEST_F(HRVOTest, 25_robots_around_circle)
-//{
-//    /** Add robots around circle with one in the center **/
-//    const int num_robots           = 25;
-//    float robot_starting_angle_dif = HRVO_TWO_PI / num_robots;
-//    float circle_radius            = std::max(float(num_robots) / 10, 2.f);
-//    simulator.addHRVOAgent(Vector2(0.f, 0.f), simulator.addGoal(Vector2(0.f, 0.f)), 0,
-//    0, 0, 0, 0, 0, 0, 0,
-//                           <#initializer#>);
-//    for (std::size_t i = 0; i < num_robots; ++i)
-//    {
-//        float x = std::cos(static_cast<float>(i) * robot_starting_angle_dif);
-//        float y = std::sin(static_cast<float>(i) * robot_starting_angle_dif);
-//        const Vector2 position = circle_radius * Vector2(x, y);
-//        simulator.addHRVOAgent(position, simulator.addGoal(-position), 0, 0, 0, 0, 0, 0,
-//        0, 0, <#initializer#>);
-//    }
 //}
 //
 // TEST_F(HRVOTest, 5_robots_in_vertical_line)

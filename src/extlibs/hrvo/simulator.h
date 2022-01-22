@@ -278,8 +278,8 @@ class Simulator
 
     // The scale multiple of max robot speed which the preferred speed will be set at.
     // pref_speed = max_speed * pref_speed_scale
-    // NOTE: This scale multiple should be <= 1
-    const float pref_speed_scale = 0.5f;
+    // NOTE: This scale multiple must be <= 1
+    const float pref_speed_scale = 0.75f;
 
     friend class Agent;
     friend class Goal;

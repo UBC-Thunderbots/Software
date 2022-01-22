@@ -190,7 +190,7 @@ std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot,
                      static_cast<float>(robot.position().y()));
     Vector2 velocity(static_cast<float>(robot.velocity().x()),
                      static_cast<float>(robot.velocity().y()));
-    float max_accel = robot.robotConstants().robot_max_acceleration_m_per_s_2;
+    float max_accel = 0.f; //robot.robotConstants().robot_max_acceleration_m_per_s_2;
     float max_speed = robot.robotConstants().robot_max_speed_m_per_s;
 
     // Max distance which the robot can travel in one time step + scaling
