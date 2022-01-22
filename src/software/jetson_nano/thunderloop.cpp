@@ -116,12 +116,17 @@ static void* my_rt_thread(void* args)
     /* start after one second */
     t.tv_sec++;
 
+    uint32_t millisecond_counter = 0;
+
     while (1)
     {
         /* wait untill next shot */
         clock_nanosleep(0, TIMER_ABSTIME, &t, NULL);
+
+        millisecond_counter++;
+
         /* do the stuff */
-        g_tloop->motor_service_->periodicJob(static_cast<uint32_t>(t.tv_nsec / 1000000u));
+        g_tloop->motor_service_->periodicJob(millisecond_counter);
 
         /* calculate next shot */
         t.tv_nsec += interval_ns;

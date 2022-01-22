@@ -260,7 +260,6 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
 
 void MotorService::start()
 {
-
     for (uint32_t motor = 0; motor < TOTAL_NUMBER_OF_MOTORS; motor++)
     {
         motor_state_[motor].init_wait_time            = 1000;
@@ -274,6 +273,8 @@ void MotorService::start()
         motor_state_[motor].last_UQ_UD_EXT            = 0;
         motor_state_[motor].last_PHI_E_EXT            = 0;
     }
+
+    tmc6100_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GCONF, 32);
 
     driver_control_enable_gpio.setValue(GpioState::HIGH);
 
@@ -315,8 +316,8 @@ void MotorService::periodicJob(uint32_t ms_tick)
 {
     for (uint32_t motor = 0; motor < TOTAL_NUMBER_OF_MOTORS; motor++)
     {
-
-        int16_t* pointer = &(motor_state_[motor].last_PHI_E_EXT);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
         tmc4671_periodicJob(
             motor, ms_tick, motor_state_[motor].encoder_init_mode,
             &(motor_state_[motor].encoder_init_state), motor_state_[motor].init_wait_time,
@@ -325,8 +326,9 @@ void MotorService::periodicJob(uint32_t ms_tick)
             &(motor_state_[motor].hall_PHI_E_new),
             &(motor_state_[motor].hall_actual_coarse_offset),
             &(motor_state_[motor].last_PHI_E_selection),
-            &(motor_state_[motor].last_UQ_UD_EXT), pointer);
+            &(motor_state_[motor].last_UQ_UD_EXT), &(motor_state_[motor].last_PHI_E_EXT));
     }
+#pragma GCC diagnostic pop
 }
 
 void MotorService::stop()
