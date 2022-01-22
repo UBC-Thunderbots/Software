@@ -24,11 +24,7 @@ NetworkService::~NetworkService(){}
 std::tuple<TbotsProto::PrimitiveSet, TbotsProto::Vision> NetworkService::poll(const TbotsProto::RobotStatus & robot_status){
 
     sender->sendProto(robot_status);
-    //return saved primitive and vision input
-    TbotsProto::PrimitiveSet emptyPrimitiveSet;
-    TbotsProto::Vision emptyVision;
-
-    return std::make_tuple<TbotsProto::PrimitiveSet, TbotsProto::Vision>(std::move(emptyPrimitiveSet), std::move(emptyVision));
+    return std::make_tuple<TbotsProto::PrimitiveSet, TbotsProto::Vision>(std::move(PrimitiveSetInfo), std::move(VisionInfo));
 
        
 }
@@ -40,12 +36,12 @@ void NetworkService::stop(){
 }
 
 void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input){
-    //save input to a private variable in networking class
-    std::cout<<"Receive out\n";
+    PrimitiveSetInfo = input;
+    std::cout<<"Received PrimitiveSet\n";
 
 }
 void NetworkService::visionCallback(TbotsProto::Vision input){
-    //save input to a private variable in networking class
+    VisionInfo = input;
     std::cout<<"Received vision\n";
 }
 

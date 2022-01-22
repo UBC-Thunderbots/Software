@@ -29,5 +29,7 @@ class NetworkService: public Service
         std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::Vision>> listenerVision;
         void primitiveSetCallback(TbotsProto::PrimitiveSet input);
         void visionCallback(TbotsProto::Vision input);
+        TbotsProto::PrimitiveSet PrimitiveSetInfo;
+        TbotsProto::Vision VisionInfo;
 
 };
