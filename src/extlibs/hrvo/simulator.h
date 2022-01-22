@@ -51,7 +51,8 @@ class Simulator
     /**
      * Reset all agents to match the state of the given world.
      * Friendly robots will use the Hybrid Reciprocal algorithm to traverse.
-     * Enemy robots will go directly towards their goal without trying to avoid any obstacles
+     * Enemy robots will go directly towards their goal without trying to avoid any
+     * obstacles
      *
      * @param world The world which the simulation should be based upon
      */
@@ -100,11 +101,11 @@ class Simulator
      * @param curr_velocity      The initial velocity of this agent.
      * @return The index of the agent.
      */
-    std::size_t addHRVOAgent(const Vector2 &position, float agent_radius, const Vector2 &curr_velocity, float maxSpeed,
-                             float prefSpeed,
-                             float maxAccel, std::size_t goal_index, float goalRadius, float neighborDist,
-                             std::size_t maxNeighbors,
-                             float uncertaintyOffset);
+    std::size_t addHRVOAgent(const Vector2 &position, float agent_radius,
+                             const Vector2 &curr_velocity, float maxSpeed,
+                             float prefSpeed, float maxAccel, std::size_t goal_index,
+                             float goalRadius, float neighborDist,
+                             std::size_t maxNeighbors, float uncertaintyOffset);
 
     /**
      *
@@ -117,7 +118,9 @@ class Simulator
      * @param goal_radius   The goal agent_radius of this agent.
      * @return The index of the agent.
      */
-    size_t addLinearVelocityAgent(const Vector2 &position, float agent_radius, const Vector2 &curr_velocity, float max_speed, float max_accel, size_t goal_index, float goal_radius);
+    size_t addLinearVelocityAgent(const Vector2 &position, float agent_radius,
+                                  const Vector2 &curr_velocity, float max_speed,
+                                  float max_accel, size_t goal_index, float goal_radius);
 
     // TODO (#2373): Remove goals_ list when goal is a part of Agent
     /**
@@ -262,12 +265,12 @@ class Simulator
     TbotsProto::PrimitiveSet primitive_set_;
 
     // The scale which enemy robots should be larger than friendly robots
-    // This scale is used to avoid friendly robots passing enemy robots from a very close distance
-    // and risking collision
+    // This scale is used to avoid friendly robots passing enemy robots from a very close
+    // distance and risking collision
     const float enemy_robot_radius_scale = 2.f;
 
-    // How much larger should the goal radius be. This is added as a safety tolerance so robots
-    // do not "teleport" over the goal between simulation frames.
+    // How much larger should the goal radius be. This is added as a safety tolerance so
+    // robots do not "teleport" over the goal between simulation frames.
     const float goal_radius_scale = 1.05f;
 
     friend class Agent;

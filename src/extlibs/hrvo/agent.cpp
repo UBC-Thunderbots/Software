@@ -50,13 +50,13 @@ void Agent::update()
         else
         {
             simulator_->goals_[goal_index_]->getNextGoalPostion();
-            reached_goal_              = false;
+            reached_goal_             = false;
             simulator_->reachedGoals_ = false;
         }
     }
     else
     {
-        reached_goal_              = false;
+        reached_goal_             = false;
         simulator_->reachedGoals_ = false;
     }
 }

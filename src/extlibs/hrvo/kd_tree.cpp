@@ -102,9 +102,9 @@ void KdTree::buildRecursive(std::size_t begin, std::size_t end, std::size_t node
         while (true)
         {
             while (left <= right &&
-                   (vertical
-                        ? simulator_->agents_[agents_[left]]->getPosition().getX()
-                        : simulator_->agents_[agents_[left]]->getPosition().getY()) < split)
+                   (vertical ? simulator_->agents_[agents_[left]]->getPosition().getX()
+                             : simulator_->agents_[agents_[left]]->getPosition().getY()) <
+                       split)
             {
                 ++left;
             }
@@ -112,7 +112,8 @@ void KdTree::buildRecursive(std::size_t begin, std::size_t end, std::size_t node
             while (right >= left &&
                    (vertical
                         ? simulator_->agents_[agents_[right]]->getPosition().getX()
-                        : simulator_->agents_[agents_[right]]->getPosition().getY()) >= split)
+                        : simulator_->agents_[agents_[right]]->getPosition().getY()) >=
+                       split)
             {
                 --right;
             }

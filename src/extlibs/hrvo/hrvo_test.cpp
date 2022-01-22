@@ -39,22 +39,27 @@ class HRVOTest : public ::testing::Test
 
     /**
      * Instantiate world and update simulator
-     * @param friendly_start_dest_pos_pairs List of friendly robot's start and destination point pairs
-     * @param enemy_position_velocity_pairs List of enemy robot's start point and start velocity pairs
+     * @param friendly_start_dest_pos_pairs List of friendly robot's start and destination
+     * point pairs
+     * @param enemy_position_velocity_pairs List of enemy robot's start point and start
+     * velocity pairs
      */
-    void instantiate_robots_in_world(const std::vector<std::pair<Point, Point>>& friendly_start_dest_pos_pairs, const std::vector<std::pair<Point, Vector>>& enemy_position_velocity_pairs)
+    void instantiate_robots_in_world(
+        const std::vector<std::pair<Point, Point>>& friendly_start_dest_pos_pairs,
+        const std::vector<std::pair<Point, Vector>>& enemy_position_velocity_pairs)
     {
         std::vector<Robot> friendly_robots;
         for (int i = 0; i < friendly_start_dest_pos_pairs.size(); i++)
         {
             Point start = friendly_start_dest_pos_pairs[i].first;
-            Point dest = friendly_start_dest_pos_pairs[i].second;
+            Point dest  = friendly_start_dest_pos_pairs[i].second;
             friendly_robots.emplace_back(Robot(i, start, Vector(0.0, 0.0), Angle(),
-                                               AngularVelocity::zero(), current_time, {}));
+                                               AngularVelocity::zero(), current_time,
+                                               {}));
 
             TbotsProto::Primitive primitive = *createMovePrimitive(
-                    dest, 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(),
-                    MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
+                dest, 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(),
+                MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
             (*primitive_set.mutable_robot_primitives())[i] = primitive;
         }
         friendly_team.updateRobots(friendly_robots);
@@ -62,10 +67,10 @@ class HRVOTest : public ::testing::Test
         std::vector<Robot> enemy_robots;
         for (int i = 0; i < enemy_position_velocity_pairs.size(); i++)
         {
-            Point start = enemy_position_velocity_pairs[i].first;
+            Point start     = enemy_position_velocity_pairs[i].first;
             Vector velocity = enemy_position_velocity_pairs[i].second;
             enemy_robots.emplace_back(Robot(i, start, velocity, Angle(),
-                                               AngularVelocity::zero(), current_time, {}));
+                                            AngularVelocity::zero(), current_time, {}));
         }
         enemy_team.updateRobots(enemy_robots);
 
@@ -86,9 +91,8 @@ class HRVOTest : public ::testing::Test
             for (float y : {-(field_height / 2), field_height / 2})
             {
                 const Vector2 position(x, y);
-                simulator.addHRVOAgent(position,
-                                       0.25f, Vector2(), 0.1f, 0.1f, 0.1f, simulator.addGoal(position), 0.25f, 1.f, 1,
-                                       0.f);
+                simulator.addHRVOAgent(position, 0.25f, Vector2(), 0.1f, 0.1f, 0.1f,
+                                       simulator.addGoal(position), 0.25f, 1.f, 1, 0.f);
             }
         }
 
@@ -99,17 +103,16 @@ class HRVOTest : public ::testing::Test
             for (float x : {-(field_width / 2), field_width / 2})
             {
                 const Vector2 position(x, y);
-                simulator.addHRVOAgent(position,
-                                       0.25f, Vector2(), 0.1f, 0.1f, 0.1f, simulator.addGoal(position), 0.25f, 1.f, 1,
-                                       0.f);
+                simulator.addHRVOAgent(position, 0.25f, Vector2(), 0.1f, 0.1f, 0.1f,
+                                       simulator.addGoal(position), 0.25f, 1.f, 1, 0.f);
             }
         }
     }
 
     void add_static_obstacle(const Vector2 position, const float radius)
     {
-        simulator.addHRVOAgent(position, radius, Vector2(), 0.1f, 0.1f, 0.1f, simulator.addGoal(position),
-                               radius, 1.f, 1, 0.f);
+        simulator.addHRVOAgent(position, radius, Vector2(), 0.1f, 0.1f, 0.1f,
+                               simulator.addGoal(position), radius, 1.f, 1, 0.f);
     }
 
     void run_simulator()
@@ -152,7 +155,7 @@ class HRVOTest : public ::testing::Test
         std::vector<float> prev_y_pos_arr(num_robots);
         for (int agent_id = 0; agent_id < num_robots; agent_id++)
         {
-            Vector2 curr_robot_pos = simulator.getAgentPosition(agent_id);
+            Vector2 curr_robot_pos   = simulator.getAgentPosition(agent_id);
             prev_x_pos_arr[agent_id] = curr_robot_pos.getX();
             prev_y_pos_arr[agent_id] = curr_robot_pos.getY();
         }
@@ -227,7 +230,7 @@ class HRVOTest : public ::testing::Test
 
             auto finish_tick_time = std::chrono::high_resolution_clock::now();
             computation_time += finish_tick_time - start_tick_time;
-        } while (prev_frame_time < 2.f); //!simulator.haveReachedGoals() &&
+        } while (prev_frame_time < 2.f);  //! simulator.haveReachedGoals() &&
 
         auto finish_time = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> total_time = finish_time - start_time;
@@ -243,15 +246,20 @@ class HRVOTest : public ::testing::Test
 
 TEST_F(HRVOTest, stationary_friendly_robot_dodging_moving_friendly_robot)
 {
-    std::vector<std::pair<Point, Point>> friendly_start_dest_points = {std::pair(Point(0.0, 0.0), Point(0.0, 0.0)), std::pair(Point(-2.0, 0.0), Point(4.0, 0.0))};
+    std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
+        std::pair(Point(0.0, 0.0), Point(0.0, 0.0)),
+        std::pair(Point(-2.0, 0.0), Point(4.0, 0.0))};
     instantiate_robots_in_world(friendly_start_dest_points, {});
 }
 
 TEST_F(HRVOTest, stationary_friendly_robot_dodging_moving_enemy_robot)
 {
-    std::vector<std::pair<Point, Point>> friendly_start_dest_points = {std::pair(Point(4.0, 0.0), Point(-4.0, 0.0))};
-    std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {std::pair(Point(-2.0, 0.02), Vector(1.0, 0.0))};
-    instantiate_robots_in_world(friendly_start_dest_points, enemy_position_velocity_pairs);
+    std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
+        std::pair(Point(4.0, 0.0), Point(-4.0, 0.0))};
+    std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {
+        std::pair(Point(-2.0, 0.02), Vector(1.0, 0.0))};
+    instantiate_robots_in_world(friendly_start_dest_points,
+                                enemy_position_velocity_pairs);
 }
 
 // TEST_F(HRVOTest, div_b_edge_test)

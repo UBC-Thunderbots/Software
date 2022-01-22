@@ -34,7 +34,7 @@ class Agent
      */
     class VelocityObstacle
     {
-    public:
+       public:
         VelocityObstacle() = default;
 
         // The position of the apex of the hybrid reciprocal velocity obstacle.
@@ -58,7 +58,7 @@ class Agent
      * @param other_agent The Agent which this velocity obstacle is being generated for
      * @return The velocity obstacle which other_agent should see for this Agent
      */
-    virtual VelocityObstacle createVelocityObstacle(const Agent& other_agent) = 0;
+    virtual VelocityObstacle createVelocityObstacle(const Agent &other_agent) = 0;
 
     /**
      * Updates the position and velocity of this agent.
@@ -114,7 +114,7 @@ class Agent
      */
     bool hasReachedGoal() const;
 
- protected:
+   protected:
     // Agent Properties
     Vector2 position_;
     float radius_;
@@ -133,6 +133,7 @@ class Agent
     float goal_radius_;
     bool reached_goal_;
 
-    // TODO (#2373): Remove once new Path class is added and add timeStep as a argument to update(time_step)
+    // TODO (#2373): Remove once new Path class is added and add timeStep as a argument to
+    // update(time_step)
     Simulator *const simulator_;
 };
