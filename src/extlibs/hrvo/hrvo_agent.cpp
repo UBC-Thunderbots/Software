@@ -68,7 +68,8 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent& other_age
         // This Agent is not colliding with other agent
         const float angle = atan(position_ - other_agent.getPosition());
 
-        // opening angle = arcsin((rad_A + rad_B) / distance)
+        // The opening angle of the velocity obstacle
+        // opening angle = arcsin((rad_A + rad_B) / distance_BA)
         const float openingAngle =
                 std::asin((radius_ + other_agent.getRadius()) / abs(position_ - other_agent.getPosition()));
 
@@ -78,9 +79,7 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent& other_age
         velocityObstacle.side2_ =
                 Vector2(std::cos(angle + openingAngle), std::sin(angle + openingAngle));
 
-        // Diameter = 2 * sin(openingAngle) * cos(openingAngle) = sin(2 *
-        // openingAngle) = 2 * (rad_A + rad_B) TODO: ?
-        const float d = 2.0f * std::sin(openingAngle) * std::cos(openingAngle);
+        const float d = std::sin(2.f * openingAngle);
 
         // This shifts one side of the velocity obstacle to share the responsibility
         // of avoiding collision with other agent. This assumes that other agent will also

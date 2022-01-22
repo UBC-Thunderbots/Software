@@ -48,20 +48,39 @@ class Simulator
     explicit Simulator(float time_step);
     ~Simulator() = default;
 
+    /**
+     * Reset all agents to match the state of the given world.
+     * Friendly robots will use the Hybrid Reciprocal algorithm to traverse.
+     * Enemy robots will go directly towards their goal without trying to avoid any obstacles
+     *
+     * @param world The world which the simulation should be based upon
+     */
     void updateWorld(const World &world);
 
+    /**
+     * Reset all friendly agents goal points to match the path of the given primitive set
+     *
+     * @param primitive_set
+     */
     void updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set);
 
     /**
-     *      Adds a new agent to the simulation based on Robot.
+     *      Adds a new Hybrid Reciprocal Agent to the simulation based on Robot.
      *
      * @param Robot    The robot which this agent should be based on
      * @param velocity The number of neighboring agents which the HRVO algorithm should
      * consider when calculating new velocity
-     * @return    The number of the agent.
+     * @return    The index of the agent.
      */
     std::size_t addHRVORobotAgent(const Robot &robot, int max_neighbors = 10);
 
+    /**
+     *      Adds a new Linear Velocity Agent to the simulation based on Robot.
+     *
+     * @param robot       The robot which this agent should be based on
+     * @param destination Destination for this robot
+     * @return    The index of the agent.
+     */
     std::size_t addLinearVelocityRobotAgent(const Robot &robot,
                                             const Vector2 &destination);
 
@@ -69,24 +88,38 @@ class Simulator
      *      Adds a new agent to the simulation.
      *
      * @param position           The starting position of this agent.
-     * @param goal_index             The goal number of this agent.
+     * @param goal_index         The goal index of this agent.
      * @param neighborDist       The maximum neighbor distance of this agent.
      * @param maxNeighbors       The maximum neighbor count of this agent.
-     * @param radius             The radius of this agent.
-     * @param goalRadius         The goal radius of this agent.
+     * @param agent_radius       The agent_radius of this agent.
+     * @param goalRadius         The goal agent_radius of this agent.
      * @param prefSpeed          The preferred speed of this agent.
      * @param maxSpeed           The maximum speed of this agent.
      * @param uncertaintyOffset  The uncertainty offset of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
-     * @param velocity           The initial velocity of this agent.
-     * @return    The number of the agent.
+     * @param curr_velocity      The initial velocity of this agent.
+     * @return The index of the agent.
      */
-    std::size_t addHRVOAgent(const Vector2 &position, std::size_t goal_index,
-                             float neighborDist, std::size_t maxNeighbors, float radius,
-                             float goalRadius, float prefSpeed, float maxSpeed,
-                             float uncertaintyOffset, float maxAccel,
-                             const Vector2 &velocity);
+    std::size_t addHRVOAgent(const Vector2 &position, float agent_radius, const Vector2 &curr_velocity, float maxSpeed,
+                             float prefSpeed,
+                             float maxAccel, std::size_t goal_index, float goalRadius, float neighborDist,
+                             std::size_t maxNeighbors,
+                             float uncertaintyOffset);
 
+    /**
+     *
+     * @param position      The starting position of this agent.
+     * @param agent_radius  The agent_radius of this agent.
+     * @param curr_velocity The initial velocity of this agent.
+     * @param max_speed     The maximum speed of this agent.
+     * @param max_accel     The maximum acceleration of this agent.
+     * @param goal_index    The goal index of this agent.
+     * @param goal_radius   The goal agent_radius of this agent.
+     * @return The index of the agent.
+     */
+    size_t addLinearVelocityAgent(const Vector2 &position, float agent_radius, const Vector2 &curr_velocity, float max_speed, float max_accel, size_t goal_index, float goal_radius);
+
+    // TODO (#2373): Remove goals_ list when goal is a part of Agent
     /**
      *      Adds a new goal to the simulation.
      *
@@ -94,15 +127,14 @@ class Simulator
      * @return    The number of the goal.
      */
     std::size_t addGoal(const Vector2 &position);
-
     std::size_t addGoalPositions(const std::vector<Vector2> &positions);
-
     std::size_t addGoalPositions(const std::vector<Vector2> &positions,
                                  const std::vector<float> &speedAtPosition);
 
     /**
-     *  Performs a simulation step; updates the orientation, position, and velocity
-     * of each agent, and the progress of each towards its goal.
+     * Performs a simulation step; updates the position, and velocity
+     * of each agent, and the progress of each towards its goal by moving
+     * the simulation time_step seconds forward
      */
     void doStep();
 
@@ -220,8 +252,8 @@ class Simulator
     float timeStep_;
     bool reachedGoals_;
     std::vector<std::unique_ptr<Agent>> agents_;
-    std::vector<std::unique_ptr<Goal>>
-        goals_;  // won't be one to one since not all agents will have a goal
+    // TODO (#2373): Remove goals_ list when goal is a part of Agent
+    std::vector<std::unique_ptr<Goal>> goals_;
 
     // friendly robot id to agent index
     std::map<unsigned int, unsigned int> friendly_robot_id_map;

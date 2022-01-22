@@ -129,7 +129,7 @@ class Agent
     float max_speed_;
     float max_accel_;
 
-    std::size_t goal_index_; // TODO: Rename to goal_index_
+    std::size_t goal_index_;
     float goal_radius_;
     bool reached_goal_;
 
