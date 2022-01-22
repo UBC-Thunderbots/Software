@@ -465,8 +465,9 @@ void HRVOAgent::computePreferredVelocity()
         }
         else
         {
-            pref_velocity_ = (1.0f - (max_accel_ * simulator_->timeStep_ / dv)) * velocity_ +
-                             (max_accel_ * simulator_->timeStep_ / dv) * ideal_pref_velocity;
+            pref_velocity_ =
+                (1.0f - (max_accel_ * simulator_->timeStep_ / dv)) * velocity_ +
+                (max_accel_ * simulator_->timeStep_ / dv) * ideal_pref_velocity;
         }
     }
     else

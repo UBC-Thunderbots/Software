@@ -109,12 +109,6 @@ class HRVOTest : public ::testing::Test
         }
     }
 
-    void add_static_obstacle(const Vector2 position, const float radius)
-    {
-        simulator.addHRVOAgent(position, radius, Vector2(), 0.1f, 0.1f, 0.1f,
-                               simulator.addGoal(position), radius, 1.f, 1, 0.f);
-    }
-
     void run_simulator()
     {
         // The output file name is the name of the test
@@ -230,7 +224,7 @@ class HRVOTest : public ::testing::Test
 
             auto finish_tick_time = std::chrono::high_resolution_clock::now();
             computation_time += finish_tick_time - start_tick_time;
-        } while (prev_frame_time < 6.f); // TODO: !simulator.haveReachedGoals() &&
+        } while (prev_frame_time < 6.f);  // TODO: !simulator.haveReachedGoals() &&
 
         auto finish_time = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> total_time = finish_time - start_time;
@@ -279,30 +273,42 @@ TEST_F(HRVOTest, multiple_friendly_robots_lining_up)
         std::pair(Point(5.0, -0.9), Point(-3.0, 0.7)),
         std::pair(Point(5.0, -0.6), Point(-3.0, 0.9)),
         std::pair(Point(5.0, -0.3), Point(-3.0, 0.11))};
-    instantiate_robots_in_world(friendly_start_dest_points,
-                                {});
+    instantiate_robots_in_world(friendly_start_dest_points, {});
 }
 
 TEST_F(HRVOTest, single_friendly_robot_moving_in_line)
 {
     std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
-            std::pair(Point(-5.0, 0.0), Point(5.0, 0.0))};
+        std::pair(Point(-5.0, 0.0), Point(5.0, 0.0))};
     std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {
-            std::pair(Point(4.0, 0.0), Vector(0.0, 0.0))};
+        std::pair(Point(4.0, 0.0), Vector(0.0, 0.0))};
     instantiate_robots_in_world(friendly_start_dest_points,
                                 enemy_position_velocity_pairs);
 }
 
 TEST_F(HRVOTest, destination_between_friendly_robot_and_stationary_enemy_robot)
 {
-    // HRVO can not go towards a destination which has the enemy robot behind it, since a velocity obstacle
-    // will block the destination point
+    // HRVO can not go towards a destination which has the enemy robot behind it, since a
+    // velocity obstacle will block the destination point
+
+    // Can dynamically update the neighbor_dist property (= dist_to_goal + goal_radius),
+    // but might cause collision if velocity at goal is higher than 0 or if other robot is
+    // coming towards us
+
     std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
-            std::pair(Point(-5.0, 0.0), Point(4.0, 0.0))};
+        std::pair(Point(-5.0, 0.0), Point(4.0, 0.0))};
     std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {
-            std::pair(Point(5.0, 0.0), Vector(0.0, 0.0))};
+        std::pair(Point(5.0, 0.0), Vector(0.0, 0.0))};
     instantiate_robots_in_world(friendly_start_dest_points,
                                 enemy_position_velocity_pairs);
+}
+
+TEST_F(HRVOTest, destination_between_friendly_robot_and_stationary_friendly_robot)
+{
+    std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
+        std::pair(Point(-5.0, 0.0), Point(4.0, 0.0)),
+        std::pair(Point(5.0, 0.0), Point(5.0, 0.0))};
+    instantiate_robots_in_world(friendly_start_dest_points, {});
 }
 
 // TEST_F(HRVOTest, div_b_edge_test)

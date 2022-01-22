@@ -74,12 +74,12 @@ void Simulator::updateWorld(const World &world)
         // Enemy robot should not enter the friendly defense area
         std::unordered_set<Point> intersection_point_set =
             intersection(world.field().friendlyDefenseArea(), segment);
-        if (intersection_point_set.empty() && contains(world.field().fieldLines(), enemy_robot.position()))
+        if (intersection_point_set.empty() &&
+            contains(world.field().fieldLines(), enemy_robot.position()))
         {
             // If the robot is in the field, then move in the current direction
             // towards the field edge
-            intersection_point_set =
-                    intersection(world.field().fieldLines(), segment);
+            intersection_point_set = intersection(world.field().fieldLines(), segment);
         }
 
         if (intersection_point_set.empty())
