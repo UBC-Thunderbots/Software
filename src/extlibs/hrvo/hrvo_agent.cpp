@@ -455,7 +455,19 @@ void HRVOAgent::computePreferredVelocity()
         // v_pref = sqrt(v_goal^2 + 2 * a * d_remainingToDestination)
         float currPrefSpeed = static_cast<float>(
             std::sqrt(std::pow(speedAtGoal, 2) + 2 * max_accel_ * distToGoal));
-        pref_velocity_ = normalize(distVectorToGoal) * currPrefSpeed;
+        Vector2 ideal_pref_velocity = normalize(distVectorToGoal) * currPrefSpeed;
+
+        // Limit the preferred velocity to the kinematic limits
+        const float dv = abs(ideal_pref_velocity - velocity_);
+        if (dv < max_accel_ * simulator_->timeStep_)
+        {
+            pref_velocity_ = ideal_pref_velocity;
+        }
+        else
+        {
+            pref_velocity_ = (1.0f - (max_accel_ * simulator_->timeStep_ / dv)) * velocity_ +
+                             (max_accel_ * simulator_->timeStep_ / dv) * ideal_pref_velocity;
+        }
     }
     else
     {
@@ -463,7 +475,7 @@ void HRVOAgent::computePreferredVelocity()
         // v_pref = v_now + a * t
         float currPrefSpeed =
             std::min(max_speed_, abs(velocity_) + max_accel_ * simulator_->getTimeStep());
-        pref_velocity_ = normalize(goalPosition - position_) * currPrefSpeed;
+        pref_velocity_ = normalize(distVectorToGoal) * currPrefSpeed;
     }
 }
 

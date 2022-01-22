@@ -74,23 +74,22 @@ void Simulator::updateWorld(const World &world)
         // Enemy robot should not enter the friendly defense area
         std::unordered_set<Point> intersection_point_set =
             intersection(world.field().friendlyDefenseArea(), segment);
+        if (intersection_point_set.empty() && contains(world.field().fieldLines(), enemy_robot.position()))
+        {
+            // If the robot is in the field, then move in the current direction
+            // towards the field edge
+            intersection_point_set =
+                    intersection(world.field().fieldLines(), segment);
+        }
+
         if (intersection_point_set.empty())
         {
-            if (contains(world.field().fieldLines(), enemy_robot.position()))
-            {
-                // If the robot is in the field, then move in the current direction
-                // towards the field edge
-                intersection_point_set =
-                    intersection(world.field().fieldLines(), segment);
-            }
-            else
-            {
-                // If the robot is outside the field, continue moving in the current
-                // direction
-                intersection_point_set.insert(enemy_robot.position() +
-                                              enemy_robot.velocity() * 5);
-            }
+            // If the robot is outside the field, continue moving in the current
+            // direction
+            intersection_point_set.insert(enemy_robot.position() +
+                                          enemy_robot.velocity() * 5);
         }
+
         Vector2 goal_position(static_cast<float>(intersection_point_set.begin()->x()),
                               static_cast<float>(intersection_point_set.begin()->y()));
         addLinearVelocityRobotAgent(enemy_robot, goal_position);

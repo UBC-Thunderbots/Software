@@ -230,7 +230,7 @@ class HRVOTest : public ::testing::Test
 
             auto finish_tick_time = std::chrono::high_resolution_clock::now();
             computation_time += finish_tick_time - start_tick_time;
-        } while (!simulator.haveReachedGoals() && prev_frame_time < 15.f);
+        } while (prev_frame_time < 6.f); // TODO: !simulator.haveReachedGoals() &&
 
         auto finish_time = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> total_time = finish_time - start_time;
@@ -279,7 +279,28 @@ TEST_F(HRVOTest, multiple_friendly_robots_lining_up)
         std::pair(Point(5.0, -0.9), Point(-3.0, 0.7)),
         std::pair(Point(5.0, -0.6), Point(-3.0, 0.9)),
         std::pair(Point(5.0, -0.3), Point(-3.0, 0.11))};
-    std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {};
+    instantiate_robots_in_world(friendly_start_dest_points,
+                                {});
+}
+
+TEST_F(HRVOTest, single_friendly_robot_moving_in_line)
+{
+    std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
+            std::pair(Point(-5.0, 0.0), Point(5.0, 0.0))};
+    std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {
+            std::pair(Point(4.0, 0.0), Vector(0.0, 0.0))};
+    instantiate_robots_in_world(friendly_start_dest_points,
+                                enemy_position_velocity_pairs);
+}
+
+TEST_F(HRVOTest, destination_between_friendly_robot_and_stationary_enemy_robot)
+{
+    // HRVO can not go towards a destination which has the enemy robot behind it, since a velocity obstacle
+    // will block the destination point
+    std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
+            std::pair(Point(-5.0, 0.0), Point(4.0, 0.0))};
+    std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {
+            std::pair(Point(5.0, 0.0), Vector(0.0, 0.0))};
     instantiate_robots_in_world(friendly_start_dest_points,
                                 enemy_position_velocity_pairs);
 }
@@ -334,12 +355,6 @@ TEST_F(HRVOTest, multiple_friendly_robots_lining_up)
 //    }
 //}
 //
-// TEST_F(HRVOTest, 1_robot_in_line)
-//{
-//    simulator.addHRVOAgent(Vector2(-4.f, 0.f), simulator.addGoal(Vector2(4.f, 0.f)), 0,
-//    0, 0, 0, 0, 0, 0, 0,
-//                           <#initializer#>);
-//}
 //
 // TEST_F(HRVOTest, 1_robot_two_goals)
 //{
