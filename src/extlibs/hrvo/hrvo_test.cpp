@@ -230,7 +230,7 @@ class HRVOTest : public ::testing::Test
 
             auto finish_tick_time = std::chrono::high_resolution_clock::now();
             computation_time += finish_tick_time - start_tick_time;
-        } while (prev_frame_time < 2.f);  //! simulator.haveReachedGoals() &&
+        } while (! simulator.haveReachedGoals() && prev_frame_time < 15.f);
 
         auto finish_time = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> total_time = finish_time - start_time;
@@ -255,9 +255,19 @@ TEST_F(HRVOTest, stationary_friendly_robot_dodging_moving_friendly_robot)
 TEST_F(HRVOTest, stationary_friendly_robot_dodging_moving_enemy_robot)
 {
     std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
-        std::pair(Point(4.0, 0.0), Point(-4.0, 0.0))};
+            std::pair(Point(0.0, 0.0), Point(0.0, 0.0))};
     std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {
-        std::pair(Point(-2.0, 0.02), Vector(1.0, 0.0))};
+        std::pair(Point(-2.0, 0.0), Vector(1.0, 0.0))};
+    instantiate_robots_in_world(friendly_start_dest_points,
+                                enemy_position_velocity_pairs);
+}
+
+TEST_F(HRVOTest, friendly_and_enemy_robot_moving_towards_each_other)
+{
+    std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
+        std::pair(Point(5.0, 0.0), Point(-5.0, 0.0))};
+    std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {
+        std::pair(Point(-2.0, 0.0), Vector(1.0, 0.0))};
     instantiate_robots_in_world(friendly_start_dest_points,
                                 enemy_position_velocity_pairs);
 }
