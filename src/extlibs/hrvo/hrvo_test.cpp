@@ -147,7 +147,7 @@ class HRVOTest : public ::testing::Test
         std::vector<float> robot_radius(num_robots);
         for (unsigned int robot_id = 0; robot_id < num_robots; ++robot_id)
         {
-            robot_radius[robot_id] = simulator.getAgentRadius(robot_id);
+            robot_radius[robot_id] = ROBOT_MAX_RADIUS_METERS;
         }
 
         // Initialize the previous robots position array
@@ -171,7 +171,7 @@ class HRVOTest : public ::testing::Test
             for (unsigned int robot_id = 0; robot_id < num_robots; robot_id++)
             {
                 Vector2 curr_robot_pos = simulator.getAgentPosition(robot_id);
-                float curr_robot_rad   = simulator.getAgentRadius(robot_id);
+                float curr_robot_rad   = ROBOT_MAX_RADIUS_METERS;
 
                 // Check for collision with other robots
                 int has_collided = -1;
@@ -179,7 +179,7 @@ class HRVOTest : public ::testing::Test
                      other_robot_id++)
                 {
                     Vector2 other_robot_pos = simulator.getAgentPosition(other_robot_id);
-                    float other_robot_rad   = simulator.getAgentRadius(other_robot_id);
+                    float other_robot_rad   = ROBOT_MAX_RADIUS_METERS;
                     if (robot_id != other_robot_id)
                     {
                         if (absSq(curr_robot_pos - other_robot_pos) <
@@ -268,6 +268,18 @@ TEST_F(HRVOTest, friendly_and_enemy_robot_moving_towards_each_other)
         std::pair(Point(5.0, 0.0), Point(-5.0, 0.0))};
     std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {
         std::pair(Point(-2.0, 0.0), Vector(1.0, 0.0))};
+    instantiate_robots_in_world(friendly_start_dest_points,
+                                enemy_position_velocity_pairs);
+}
+
+TEST_F(HRVOTest, multiple_friendly_robots_lining_up)
+{
+    std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
+        std::pair(Point(5.0, 0.0), Point(-3.0, 0.5)),
+        std::pair(Point(5.0, -0.9), Point(-3.0, 0.7)),
+        std::pair(Point(5.0, -0.6), Point(-3.0, 0.9)),
+        std::pair(Point(5.0, -0.3), Point(-3.0, 0.11))};
+    std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {};
     instantiate_robots_in_world(friendly_start_dest_points,
                                 enemy_position_velocity_pairs);
 }

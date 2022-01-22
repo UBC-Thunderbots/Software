@@ -264,9 +264,12 @@ class Simulator
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set_;
 
-    // The scale which enemy robots should be larger than friendly robots
-    // This scale is used to avoid friendly robots passing enemy robots from a very close
-    // distance and risking collision
+    // The scale which friendly robots should be larger than friendly robots
+    // This scale is used to avoid close encounters, and reduce chance of collision
+    const float friendly_robot_radius_scale = 1.25f;
+
+    // The scale which enemy robots should be larger than their actual size
+    // This scale is used to avoid close encounters, and reduce chance of collision
     const float enemy_robot_radius_scale = 2.f;
 
     // How much larger should the goal radius be. This is added as a safety tolerance so

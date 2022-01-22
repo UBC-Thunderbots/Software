@@ -438,8 +438,6 @@ void HRVOAgent::computePreferredVelocity()
         return;
     }
 
-    // TODO (#2374): Update so we have the same logic for when the robot is accelerating
-    // https://github.com/UBC-Thunderbots/Software/issues/2374
     std::unique_ptr<Goal> &nextGoal = simulator_->goals_[goal_index_];
     Vector2 goalPosition            = nextGoal->getCurrentGoalPosition();
     float speedAtGoal               = nextGoal->getDesiredSpeedAtCurrentGoal();
@@ -460,6 +458,8 @@ void HRVOAgent::computePreferredVelocity()
     }
     else
     {
+        // TODO (#2374): Update so we have the same logic for when the robot is accelerating
+        // https://github.com/UBC-Thunderbots/Software/issues/2374
         pref_velocity_ = normalize(goalPosition - position_) * prefSpeed_;
     }
 }

@@ -99,11 +99,42 @@ void Simulator::updateWorld(const World &world)
     // TODO: If Ball is an obstacle, add ball as an Agent aswell
 }
 
+void Simulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set)
+{
+    primitive_set_ = primitive_set;
+
+    // Update all friendly agent's goal points based on the matching robot's primitive
+    for (auto &[robot_id, primitive] : primitive_set.robot_primitives())
+    {
+        auto agent_index_iter = friendly_robot_id_map.find(robot_id);
+        if (agent_index_iter != friendly_robot_id_map.end())
+        {
+            unsigned int agent_index = agent_index_iter->second;
+            if (agent_index < agents_.size())
+            {
+                std::unique_ptr<Goal> &goal =
+                        goals_[agents_[agent_index]->getGoalIndex()];
+                goal->positions_.clear();
+
+                if (primitive.has_move())
+                {
+                    // TODO (#2418): Update implementation of Primitive to support
+                    // multiple path points
+                    goal->positions_.push_back(Vector2(
+                            static_cast<float>(primitive.move().destination().x_meters()),
+                            static_cast<float>(primitive.move().destination().y_meters())));
+                }
+            }
+        }
+    }
+}
+
 std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
 {
     Vector2 position(static_cast<float>(robot.position().x()),
                      static_cast<float>(robot.position().y()));
     Vector2 velocity;
+    float agent_radius = ROBOT_MAX_RADIUS_METERS * friendly_robot_radius_scale;
     float max_accel  = 1e-4;
     float pref_speed = 1e-4;
     float max_speed  = 1e-4;
@@ -133,7 +164,7 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
     // destination
     Vector2 destination_point = position;
     auto &robot_primitives    = *primitive_set_.mutable_robot_primitives();
-    const auto primitive_iter = robot_primitives.find(robot.id());
+    const auto &primitive_iter = robot_primitives.find(robot.id());
     if (primitive_iter != robot_primitives.end())
     {
         TbotsProto::Primitive primitive = primitive_iter->second;
@@ -147,7 +178,7 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
         }
     }
 
-    return addHRVOAgent(position, ROBOT_MAX_RADIUS_METERS, velocity, max_speed,
+    return addHRVOAgent(position, agent_radius, velocity, max_speed,
                         pref_speed, max_accel, addGoal(destination_point), goal_radius,
                         neighbor_dist, max_neighbors, uncertainty_offset);
 }
@@ -173,6 +204,20 @@ std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot,
                                   addGoal(destination), goal_radius);
 }
 
+std::size_t Simulator::addHRVOAgent(const Vector2 &position, float agent_radius,
+                                    const Vector2 &curr_velocity, float maxSpeed,
+                                    float prefSpeed, float maxAccel,
+                                    std::size_t goal_index, float goalRadius,
+                                    float neighborDist, std::size_t maxNeighbors,
+                                    float uncertaintyOffset)
+{
+    std::unique_ptr<HRVOAgent> agent = std::make_unique<HRVOAgent>(
+            this, position, goal_index, neighborDist, maxNeighbors, agent_radius,
+            curr_velocity, maxAccel, goalRadius, prefSpeed, maxSpeed, uncertaintyOffset);
+    agents_.push_back(std::move(agent));
+    return agents_.size() - 1;
+}
+
 size_t Simulator::addLinearVelocityAgent(const Vector2 &position, float agent_radius,
                                          const Vector2 &curr_velocity, float max_speed,
                                          float max_accel, size_t goal_index,
@@ -182,50 +227,6 @@ size_t Simulator::addLinearVelocityAgent(const Vector2 &position, float agent_ra
         this, position, agent_radius, curr_velocity, max_speed, max_accel, goal_index,
         goal_radius);
 
-    agents_.push_back(std::move(agent));
-    return agents_.size() - 1;
-}
-
-void Simulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set)
-{
-    primitive_set_ = primitive_set;
-
-    // Update all friendly agent's goal points based on the matching robot's primitive
-    for (auto &[robot_id, primitive] : primitive_set.robot_primitives())
-    {
-        auto agent_index_iter = friendly_robot_id_map.find(robot_id);
-        if (agent_index_iter != friendly_robot_id_map.end())
-        {
-            unsigned int agent_index = agent_index_iter->second;
-            if (agent_index < agents_.size())
-            {
-                std::unique_ptr<Goal> &goal =
-                    goals_[agents_[agent_index]->getGoalIndex()];
-                goal->positions_.clear();
-
-                if (primitive.has_move())
-                {
-                    // TODO (#2418): Update implementation of Primitive to support
-                    // multiple path points
-                    goal->positions_.push_back(Vector2(
-                        static_cast<float>(primitive.move().destination().x_meters()),
-                        static_cast<float>(primitive.move().destination().y_meters())));
-                }
-            }
-        }
-    }
-}
-
-std::size_t Simulator::addHRVOAgent(const Vector2 &position, float agent_radius,
-                                    const Vector2 &curr_velocity, float maxSpeed,
-                                    float prefSpeed, float maxAccel,
-                                    std::size_t goal_index, float goalRadius,
-                                    float neighborDist, std::size_t maxNeighbors,
-                                    float uncertaintyOffset)
-{
-    std::unique_ptr<HRVOAgent> agent = std::make_unique<HRVOAgent>(
-        this, position, goal_index, neighborDist, maxNeighbors, agent_radius,
-        curr_velocity, maxAccel, goalRadius, prefSpeed, maxSpeed, uncertaintyOffset);
     agents_.push_back(std::move(agent));
     return agents_.size() - 1;
 }
