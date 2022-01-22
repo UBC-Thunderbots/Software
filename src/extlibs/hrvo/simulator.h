@@ -276,6 +276,11 @@ class Simulator
     // robots do not "teleport" over the goal between simulation frames.
     const float goal_radius_scale = 1.05f;
 
+    // The scale multiple of max robot speed which the preferred speed will be set at.
+    // pref_speed = max_speed * pref_speed_scale
+    // NOTE: This scale multiple should be <= 1
+    const float pref_speed_scale = 0.5f;
+
     friend class Agent;
     friend class Goal;
     friend class KdTree;

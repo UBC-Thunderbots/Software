@@ -148,7 +148,7 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
                            static_cast<float>(robot.velocity().y()));
         max_accel  = robot.robotConstants().robot_max_acceleration_m_per_s_2;
         max_speed  = robot.robotConstants().robot_max_speed_m_per_s;
-        pref_speed = max_speed;
+        pref_speed = max_speed * pref_speed_scale;
     }
     // A large distance chosen arbitrarily to allow Agent to decelerate before getting
     // into contact with a neighbor

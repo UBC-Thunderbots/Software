@@ -272,7 +272,7 @@ TEST_F(HRVOTest, multiple_friendly_robots_lining_up)
         std::pair(Point(5.0, 0.0), Point(-3.0, 0.5)),
         std::pair(Point(5.0, -0.9), Point(-3.0, 0.7)),
         std::pair(Point(5.0, -0.6), Point(-3.0, 0.9)),
-        std::pair(Point(5.0, -0.3), Point(-3.0, 0.11))};
+        std::pair(Point(5.0, -0.3), Point(-3.0, 1.1))};
     instantiate_robots_in_world(friendly_start_dest_points, {});
 }
 
@@ -280,10 +280,8 @@ TEST_F(HRVOTest, single_friendly_robot_moving_in_line)
 {
     std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
         std::pair(Point(-5.0, 0.0), Point(5.0, 0.0))};
-    std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {
-        std::pair(Point(4.0, 0.0), Vector(0.0, 0.0))};
     instantiate_robots_in_world(friendly_start_dest_points,
-                                enemy_position_velocity_pairs);
+                                {});
 }
 
 TEST_F(HRVOTest, destination_between_friendly_robot_and_stationary_enemy_robot)
