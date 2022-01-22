@@ -57,7 +57,11 @@ HRVOAgent::HRVOAgent(Simulator *simulator, const Vector2 &position, std::size_t 
 void HRVOAgent::computeNeighbors()
 {
     neighbors_.clear();
-    simulator_->kdTree_->query(this, neighborDist_ * neighborDist_);
+
+    std::unique_ptr<Goal> &current_goal = simulator_->goals_[goal_index_];
+    float new_neighbor_dist = std::min(neighborDist_, abs(position_ - current_goal->getCurrentGoalPosition()) + goal_radius_);
+
+    simulator_->kdTree_->query(this, new_neighbor_dist);
 }
 
 Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
@@ -472,10 +476,10 @@ void HRVOAgent::computePreferredVelocity()
     }
     else
     {
-        // Accelerate to max velocity
+        // Accelerate to preferred speed
         // v_pref = v_now + a * t
         float currPrefSpeed =
-            std::min(max_speed_, abs(velocity_) + max_accel_ * simulator_->getTimeStep());
+            std::min(prefSpeed_, abs(velocity_) + max_accel_ * simulator_->getTimeStep());
         pref_velocity_ = normalize(distVectorToGoal) * currPrefSpeed;
     }
 }
