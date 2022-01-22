@@ -32,7 +32,9 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(KickoffFriendlyPlay));
+    setAIPlayConstructor([this]() {
+        return std::make_unique<KickoffFriendlyPlay>(thunderbots_config->getPlayConfig());
+    });
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

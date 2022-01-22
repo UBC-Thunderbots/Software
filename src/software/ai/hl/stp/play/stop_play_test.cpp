@@ -4,13 +4,13 @@
 
 #include "software/simulated_tests/non_terminating_validation_functions/robots_avoid_ball_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robots_slow_down_validation.h"
-#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
+#include "software/simulated_tests/simulated_play_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class StopPlayTest : public SimulatedErForceSimPlayTestFixture
+class StopPlayTest : public SimulatedPlayTestFixture
 {
    protected:
     StopPlayTest() : stop_play_rules(initStopPlayRules()) {}
@@ -33,7 +33,7 @@ class StopPlayTest : public SimulatedErForceSimPlayTestFixture
 
     void SetUp() override
     {
-        SimulatedErForceSimPlayTestFixture::SetUp();
+        SimulatedPlayTestFixture::SetUp();
         setFriendlyGoalie(0);
         setEnemyGoalie(0);
         setAIPlay(TYPENAME(StopPlay));
