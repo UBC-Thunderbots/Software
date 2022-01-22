@@ -20,12 +20,12 @@ class Agent
      * @param prefVelocity       The preferred velocity of this agent.
      * @param maxSpeed           The maximum speed of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
-     * @param goalNo             The goal number of this agent.
+     * @param goalIndex             The goal number of this agent.
      * @param goalRadius         The goal radius of this agent.
      */
     Agent(Simulator *simulator, const Vector2 &position, float radius,
           const Vector2 &velocity, const Vector2 &prefVelocity, float maxSpeed,
-          float maxAccel, std::size_t goalNo, float goalRadius);
+          float maxAccel, std::size_t goalIndex, float goalRadius);
 
     virtual ~Agent() = default;
 
@@ -93,24 +93,46 @@ class Agent
      */
     float getMaxAccel() const;
 
-    // protected: TODO: make properties protected
+    /**
+     * Return the preferred velocity of the agent
+     *
+     * @return The preferred velocity of the agent
+     */
+    const Vector2 &getPrefVelocity() const;
+
+    /**
+     * Return the Goal index for this agent
+     *
+     * @return The Goal index for this agent
+     */
+    size_t getGoalIndex() const;
+
+    /**
+     * Return true if this agent has reached its final goal, false otherwise.
+     *
+     * @return True if this agent has reached its final goal, false otherwise.
+     */
+    bool hasReachedGoal() const;
+
+ protected:
     // Agent Properties
     Vector2 position_;
     float radius_;
 
+    // The actual current velocity of this Agent
     Vector2 velocity_;
-    Vector2 newVelocity_;
-    float maxSpeed_;
-    float maxAccel_;
+    // The requested new velocity of this Agent
+    Vector2 new_velocity_;
+    // The desired new velocity of this Agent
+    Vector2 pref_velocity_;
 
-    std::size_t goalNo_;
-    float goalRadius_;
-    bool reachedGoal_;
+    float max_speed_;
+    float max_accel_;
 
-    // TODO (#2373): Remove once new Path class is added and add timeStep as a argument to
-    // update(time_step)
+    std::size_t goal_index_; // TODO: Rename to goal_index_
+    float goal_radius_;
+    bool reached_goal_;
+
+    // TODO (#2373): Remove once new Path class is added and add timeStep as a argument to update(time_step)
     Simulator *const simulator_;
-
-    friend class KdTree;  // TODO: Ideally we use getters instead of friending the class
-    friend class Simulator;
 };

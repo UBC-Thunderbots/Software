@@ -54,7 +54,7 @@ class HRVOAgent : public Agent
      *
      * @param simulator          The simulation.
      * @param position           The starting position of this agent.
-     * @param goalNo             The goal number of this agent.
+     * @param goalIndex             The goal number of this agent.
      * @param neighborDist       The maximum neighbor distance of this agent.
      * @param maxNeighbors       The maximum neighbor count of this agent.
      * @param radius             The radius of this agent.
@@ -65,7 +65,7 @@ class HRVOAgent : public Agent
      * @param maxAccel           The maximum acceleration of this agent.
      * @param velocity           The initial velocity of this agent.
      */
-    HRVOAgent(Simulator *simulator, const Vector2 &position, std::size_t goalNo,
+    HRVOAgent(Simulator *simulator, const Vector2 &position, std::size_t goalIndex,
               float neighborDist, std::size_t maxNeighbors, float radius,
               const Vector2 &velocity, float maxAccel, float goalRadius, float prefSpeed,
               float maxSpeed, float uncertaintyOffset);
@@ -123,7 +123,6 @@ private:
     };
 
    public:  // A
-    Vector2 prefVelocity_;
     float prefSpeed_;
     std::size_t maxNeighbors_;
     float neighborDist_;

@@ -69,7 +69,7 @@ class Simulator
      *      Adds a new agent to the simulation.
      *
      * @param position           The starting position of this agent.
-     * @param goalNo             The goal number of this agent.
+     * @param goal_index             The goal number of this agent.
      * @param neighborDist       The maximum neighbor distance of this agent.
      * @param maxNeighbors       The maximum neighbor count of this agent.
      * @param radius             The radius of this agent.
@@ -81,7 +81,7 @@ class Simulator
      * @param velocity           The initial velocity of this agent.
      * @return    The number of the agent.
      */
-    std::size_t addHRVOAgent(const Vector2 &position, std::size_t goalNo,
+    std::size_t addHRVOAgent(const Vector2 &position, std::size_t goal_index,
                              float neighborDist, std::size_t maxNeighbors, float radius,
                              float goalRadius, float prefSpeed, float maxSpeed,
                              float uncertaintyOffset, float maxAccel,
@@ -105,22 +105,6 @@ class Simulator
      * of each agent, and the progress of each towards its goal.
      */
     void doStep();
-
-    /**
-     *      Returns the goal number of a specified agent.
-     *
-     * @param agentNo  The number of the agent whose goal number is to be retrieved.
-     * @return    The present goal number of the agent.
-     */
-    std::size_t getAgentGoal(std::size_t agentNo) const;
-
-    /**
-     *      Returns the goal radius of a specified agent.
-     *
-     * @param agentNo  The number of the agent whose goal radius is to be retrieved.
-     * @return    The present goal radius of the agent
-     */
-    float getAgentGoalRadius(std::size_t agentNo) const;
 
     /**
      *      Returns the maximum acceleration of a specified agent.
@@ -166,7 +150,7 @@ class Simulator
      * be retrieved.
      * @return    True if the agent has reached its goal; false otherwise.
      */
-    bool getAgentReachedGoal(std::size_t agentNo) const;
+    bool hasAgentReachedGoal(std::size_t agentNo) const;
 
     /**
      *      Returns the velocity of a specified agent.
@@ -185,14 +169,6 @@ class Simulator
     {
         return globalTime_;
     }
-
-    /**
-     *      Returns the position of a specified goal.
-     *
-     * @param goalNo  The number of the goal whose position is to be retrieved.
-     * @return    The position of the goal.
-     */
-    Vector2 getGoalPosition(std::size_t goalNo) const;
 
     /**
      *   Returns the count of agents in the simulation.
@@ -232,73 +208,6 @@ class Simulator
     bool haveReachedGoals() const
     {
         return reachedGoals_;
-    }
-
-    /**
-     *      Sets the goal number of a specified agent.
-     *
-     * @param agentNo  The number of the agent whose goal number is to be modified.
-     * @param goalNo   The replacement goal number.
-     */
-    void setAgentGoal(std::size_t agentNo, std::size_t goalNo);
-
-    void setAgentGoalPosition(size_t agentNo, Vector2 position);
-
-    /**
-     *      Sets the goal radius of a specified agent.
-     *
-     * @param agentNo     The number of the agent whose goal radius is to be modified.
-     * @param goalRadius  The replacement goal radius.
-     */
-    void setAgentGoalRadius(std::size_t agentNo, float goalRadius);
-
-    /**
-     *      Sets the maximum linear acceleraton of a specified agent.
-     *
-     * @param agentNo   The number of the agent whose maximum acceleration is to be
-     * modified. @param maxAccel  The replacement maximum acceleration.
-     */
-    void setAgentMaxAccel(std::size_t agentNo, float maxAccel);
-
-    /**
-     *      Sets the maximum speed of a specified agent.
-     *
-     * @param agentNo   The number of the agent whose maximum speed is to be modified.
-     * @param maxSpeed  The replacement maximum speed.
-     */
-    void setAgentMaxSpeed(std::size_t agentNo, float maxSpeed);
-
-    /**
-     *      Sets the position of a specified agent.
-     * @param agentNo   The number of the agent whose position is to be modified.
-     * @param position  The replacement position.
-     */
-    void setAgentPosition(std::size_t agentNo, const Vector2 &position);
-
-    /**
-     *      Sets the radius of a specified agent.
-     *
-     * @param agentNo  The number of the agent whose radius is to be modified.
-     * @param radius   The replacement radius.
-     */
-    void setAgentRadius(std::size_t agentNo, float radius);
-
-    /**
-     *      Sets the velocity of a specified agent.
-     *
-     * @param agentNo   The number of the agent whose velocity is to be modified.
-     * @param velocity  The replacement velocity.
-     */
-    void setAgentVelocity(std::size_t agentNo, const Vector2 &velocity);
-
-    /**
-     *      Sets the time step of the simulation.
-     *
-     * @param timeStep  The replacement time step of the simulation.
-     */
-    void setTimeStep(float timeStep)
-    {
-        timeStep_ = timeStep;
     }
 
     //	private:

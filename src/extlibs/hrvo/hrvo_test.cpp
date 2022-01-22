@@ -225,7 +225,7 @@ class HRVOTest : public ::testing::Test
 
             auto finish_tick_time = std::chrono::high_resolution_clock::now();
             computation_time += finish_tick_time - start_tick_time;
-        } while (!simulator.haveReachedGoals() && prev_frame_time < 15.f);
+        } while (prev_frame_time < 2.f); //!simulator.haveReachedGoals() &&
 
         auto finish_time = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> total_time = finish_time - start_time;
