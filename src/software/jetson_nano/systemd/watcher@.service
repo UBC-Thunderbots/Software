@@ -1,9 +1,9 @@
 [Unit]
-Description=generic watcher service: Temporary service to restart the given service
+Description=generic watcher service: Temporary service to restart the %i service
 
 [Service]
 Type=oneshot
-ExecStart=systemctl restart %i
+ExecStart=/bin/systemctl restart %i
 
 [Install]
 WantedBy=multi.user.target
