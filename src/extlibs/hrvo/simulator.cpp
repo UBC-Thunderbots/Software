@@ -84,8 +84,8 @@ void Simulator::updateWorld(const World &world)
 
         if (intersection_point_set.empty())
         {
-            // If the robot is outside the field, continue moving in the current
-            // direction
+            // If there is no intersection point (robot is outside the field), continue
+            // moving in the current direction
             intersection_point_set.insert(enemy_robot.position() +
                                           enemy_robot.velocity() * 5);
         }
@@ -95,12 +95,26 @@ void Simulator::updateWorld(const World &world)
         addLinearVelocityRobotAgent(enemy_robot, goal_position);
     }
 
-    // TODO: If Ball is an obstacle, add ball as an Agent aswell
+    if (add_ball_agent)
+    {
+        // Ball should be treated as an agent (obstacle)
+        const Ball &ball = world.ball();
+        Vector2 position(ball.position().x(), ball.position().y());
+        Vector2 velocity(ball.velocity().x(), ball.velocity().y());
+        Vector2 goal_pos = position + 100 * velocity;
+        float acceleration = ball.acceleration().length();
+        // Minimum of 0.5-meter distance away from the ball, if the ball is an obstacle
+        float ball_radius = 0.5f + ball_agent_radius_offset;
+
+        addLinearVelocityAgent(position, ball_radius, velocity, abs(velocity), acceleration, addGoal(goal_pos), 0.1f);
+    }
 }
 
 void Simulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set)
 {
     primitive_set_ = primitive_set;
+
+    add_ball_agent = primitive_set.stay_away_from_ball();
 
     // Update all friendly agent's goal points based on the matching robot's primitive
     for (auto &[robot_id, primitive] : primitive_set.robot_primitives())
@@ -119,9 +133,9 @@ void Simulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set
                 {
                     // TODO (#2418): Update implementation of Primitive to support
                     // multiple path points
-                    goal->positions_.push_back(Vector2(
+                    goal->positions_.emplace_back(
                         static_cast<float>(primitive.move().destination().x_meters()),
-                        static_cast<float>(primitive.move().destination().y_meters())));
+                        static_cast<float>(primitive.move().destination().y_meters()));
                 }
             }
         }

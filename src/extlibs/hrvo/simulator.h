@@ -245,24 +245,34 @@ class Simulator
         return reachedGoals_;
     }
 
-    //	private:
    public:
-    Simulator(const Simulator &other);
-    Simulator &operator=(const Simulator &other);
-
+    // KdTree used to calculate the K nearest agents
     std::unique_ptr<KdTree> kdTree_;
+
+    // The global time of this hrvo simulation
     float globalTime_;
+
+    // The amount of time which the simulator should advance by
     float timeStep_;
+
+    // True if all agents have reached their destination
     bool reachedGoals_;
+
+    // List of agents (robots) in this simulation
     std::vector<std::unique_ptr<Agent>> agents_;
     // TODO (#2373): Remove goals_ list when goal is a part of Agent
     std::vector<std::unique_ptr<Goal>> goals_;
 
+private:
     // friendly robot id to agent index
     std::map<unsigned int, unsigned int> friendly_robot_id_map;
 
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set_;
+
+    // True if the ball should be treated as an agent (obstacle) the next time we
+    // receive a world
+    bool add_ball_agent = false;
 
     // The scale which friendly robots should be larger than friendly robots
     // This scale is used to avoid close encounters, and reduce chance of collision
@@ -275,6 +285,11 @@ class Simulator
     // How much larger should the goal radius be. This is added as a safety tolerance so
     // robots do not "teleport" over the goal between simulation frames.
     const float goal_radius_scale = 1.05f;
+
+    // How much larger should the goal radius be (in meters). This is added as a safety
+    // tolerance so robots do not accidentally enter the minimum distance threshold.
+    // NOTE: This value must be >= 0
+    const float ball_agent_radius_offset = 0.1f;
 
     // The scale multiple of max robot speed which the preferred speed will be set at.
     // pref_speed = max_speed * pref_speed_scale

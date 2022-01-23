@@ -44,7 +44,8 @@
 #include "vector2.h"
 
 /**
- * An agent/robot in the simulation which uses the HRVO algorithm.
+ * An agent/robot in the simulation which uses the HRVO algorithm to motion plan towards the destination while
+ * avoiding obstacles.
  */
 class HRVOAgent : public Agent
 {
@@ -54,7 +55,7 @@ class HRVOAgent : public Agent
      *
      * @param simulator          The simulation.
      * @param position           The starting position of this agent.
-     * @param goalIndex             The goal number of this agent.
+     * @param goalIndex          The goal number of this agent.
      * @param neighborDist       The maximum neighbor distance of this agent.
      * @param maxNeighbors       The maximum neighbor count of this agent.
      * @param radius             The radius of this agent.

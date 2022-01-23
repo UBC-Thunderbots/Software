@@ -238,7 +238,6 @@ public:
             auto finish_tick_time = std::chrono::high_resolution_clock::now();
             computation_time += finish_tick_time - start_tick_time;
         } while (prev_frame_time < simulation_timeout);  // TODO:!simulator.haveReachedGoals() &&
-        // TODO: make the max simulation time sommething set in the test
 
         auto finish_time = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> total_time = finish_time - start_time;
@@ -268,6 +267,7 @@ TEST_F(HRVOTest, stationary_friendly_robot_dodging_moving_enemy_robot)
         std::pair(Point(-2.0, 0.0), Vector(1.0, 0.0))};
     instantiate_robots_in_world(friendly_start_dest_points,
                                 enemy_position_velocity_pairs);
+    setSimulationTimeout(3.f);
 }
 
 TEST_F(HRVOTest, friendly_and_enemy_robot_moving_towards_each_other)
@@ -278,6 +278,7 @@ TEST_F(HRVOTest, friendly_and_enemy_robot_moving_towards_each_other)
         std::pair(Point(-2.0, 0.0), Vector(1.0, 0.0))};
     instantiate_robots_in_world(friendly_start_dest_points,
                                 enemy_position_velocity_pairs);
+    setSimulationTimeout(5.f);
 }
 
 TEST_F(HRVOTest, multiple_friendly_robots_lining_up)
@@ -311,6 +312,16 @@ TEST_F(HRVOTest, destination_between_friendly_robot_and_stationary_enemy_robot)
         std::pair(Point(-5.0, 0.0), Point(4.0, 0.0))};
     std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {
         std::pair(Point(5.0, 0.0), Vector(0.0, 0.0))};
+    instantiate_robots_in_world(friendly_start_dest_points,
+                                enemy_position_velocity_pairs);
+}
+
+TEST_F(HRVOTest, destination_behind_stationary_enemy_robot)
+{
+    std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
+        std::pair(Point(-5.0, 0.0), Point(4.4, 0.0))};
+    std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {
+        std::pair(Point(4.0, 0.0), Vector(0.0, 0.0))};
     instantiate_robots_in_world(friendly_start_dest_points,
                                 enemy_position_velocity_pairs);
 }
@@ -409,22 +420,6 @@ TEST_F(HRVOTest, destination_between_friendly_robot_and_stationary_friendly_robo
 //    add_static_obstacle(Vector2(0, 2.f), 0.75f);
 //    create_div_b_field();
 //}
-//
-// TEST_F(HRVOTest, 5_robots_in_vertical_line)
-//{
-//    /** Add robots in a vertical line where they all have to move down **/
-//    const int num_robots       = 5;
-//    const Vector2 goal_offset  = Vector2(0.f, -6.f);
-//    const Vector2 robot_offset = Vector2(0.f, -ROBOT_RADIUS * 2.5f);
-//    for (std::size_t i = 0; i < num_robots; ++i)
-//    {
-//        const Vector2 position = static_cast<float>(i) * robot_offset;
-//        simulator.addHRVOAgent(position, simulator.addGoal(position + goal_offset), 0,
-//        0, 0, 0, 0, 0, 0, 0,
-//                               <#initializer#>);
-//    }
-//}
-//
 //
 // TEST_F(HRVOTest, 1_robot_two_goals)
 //{
