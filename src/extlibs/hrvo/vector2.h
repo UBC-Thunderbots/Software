@@ -304,7 +304,8 @@ inline float det(const Vector2 &vector1, const Vector2 &vector2)
  */
 inline float dotProduct(const Vector2 &vector_left, const Vector2 &vector_right)
 {
-    return vector_left.getX() * vector_right.getX() + vector_left.getY() * vector_right.getY();
+    return vector_left.getX() * vector_right.getX() +
+           vector_left.getY() * vector_right.getY();
 }
 
 /**

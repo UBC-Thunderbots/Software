@@ -263,7 +263,7 @@ class Simulator
     // TODO (#2373): Remove goals_ list when goal is a part of Agent
     std::vector<std::unique_ptr<Goal>> goals_;
 
-private:
+   private:
     // friendly robot id to agent index
     std::map<unsigned int, unsigned int> friendly_robot_id_map;
 

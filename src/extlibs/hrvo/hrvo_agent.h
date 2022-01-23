@@ -44,8 +44,8 @@
 #include "vector2.h"
 
 /**
- * An agent/robot in the simulation which uses the HRVO algorithm to motion plan towards the destination while
- * avoiding obstacles.
+ * An agent/robot in the simulation which uses the HRVO algorithm to motion plan towards
+ * the destination while avoiding obstacles.
  */
 class HRVOAgent : public Agent
 {

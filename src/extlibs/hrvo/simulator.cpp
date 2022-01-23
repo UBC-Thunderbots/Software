@@ -101,12 +101,13 @@ void Simulator::updateWorld(const World &world)
         const Ball &ball = world.ball();
         Vector2 position(ball.position().x(), ball.position().y());
         Vector2 velocity(ball.velocity().x(), ball.velocity().y());
-        Vector2 goal_pos = position + 100 * velocity;
+        Vector2 goal_pos   = position + 100 * velocity;
         float acceleration = ball.acceleration().length();
         // Minimum of 0.5-meter distance away from the ball, if the ball is an obstacle
         float ball_radius = 0.5f + ball_agent_radius_offset;
 
-        addLinearVelocityAgent(position, ball_radius, velocity, abs(velocity), acceleration, addGoal(goal_pos), 0.1f);
+        addLinearVelocityAgent(position, ball_radius, velocity, abs(velocity),
+                               acceleration, addGoal(goal_pos), 0.1f);
     }
 }
 

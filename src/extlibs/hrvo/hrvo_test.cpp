@@ -14,7 +14,7 @@ class HRVOTest : public ::testing::Test
     // Test Properties
     float simulation_timeout = 15.0;
 
-public:
+   public:
     // HRVO Properties
     Simulator simulator;
     Timestamp current_time;
@@ -217,8 +217,7 @@ public:
         std::chrono::duration<double> total_time = finish_time - start_time;
         std::cout << "Total run time = " << total_time.count() << std::endl;
         std::cout << "Total simulation time = " << prev_frame_time << std::endl;
-        std::cout << "Avg time per tick = " << total_time.count() / frame
-                  << std::endl;
+        std::cout << "Avg time per tick = " << total_time.count() / frame << std::endl;
 
         output_file.close();
         std::cout << "Test information outputted to " << output_file_loc << std::endl;
@@ -269,8 +268,7 @@ TEST_F(HRVOTest, single_friendly_robot_moving_in_line)
 {
     std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
         std::pair(Point(-5.0, 0.0), Point(5.0, 0.0))};
-    instantiate_robots_in_world(friendly_start_dest_points,
-                                {});
+    instantiate_robots_in_world(friendly_start_dest_points, {});
 }
 
 TEST_F(HRVOTest, destination_between_friendly_robot_and_stationary_enemy_robot)
@@ -308,27 +306,27 @@ TEST_F(HRVOTest, destination_between_friendly_robot_and_stationary_friendly_robo
     instantiate_robots_in_world(friendly_start_dest_points, {});
 }
 
- TEST_F(HRVOTest, twenty_five_robots_around_circle)
+TEST_F(HRVOTest, twenty_five_robots_around_circle)
 {
     // Add robots around circle with one in the center
-    const int num_robots           = 25;
+    const int num_robots = 25;
     std::vector<std::pair<Point, Point>> friendly_start_dest_points;
     float robot_starting_angle_dif = 2.0 * M_PI / num_robots;
     float circle_radius            = std::max(float(num_robots) / 10, 2.f);
     for (std::size_t i = 0; i < num_robots; ++i)
     {
-        float x = std::cos(static_cast<float>(i) * robot_starting_angle_dif);
-        float y = std::sin(static_cast<float>(i) * robot_starting_angle_dif);
+        float x              = std::cos(static_cast<float>(i) * robot_starting_angle_dif);
+        float y              = std::sin(static_cast<float>(i) * robot_starting_angle_dif);
         const Point position = Point(x * circle_radius, y * circle_radius);
         friendly_start_dest_points.emplace_back(std::make_pair(position, -position));
     }
     instantiate_robots_in_world(friendly_start_dest_points, {});
 }
 
- TEST_F(HRVOTest, twenty_five_robots_moving_straight)
+TEST_F(HRVOTest, twenty_five_robots_moving_straight)
 {
     // Add robots around circle with one in the center
-    const int num_robots           = 25;
+    const int num_robots = 25;
     std::vector<std::pair<Point, Point>> friendly_start_dest_points;
     for (std::size_t i = 0; i < num_robots; ++i)
     {
@@ -339,7 +337,7 @@ TEST_F(HRVOTest, destination_between_friendly_robot_and_stationary_friendly_robo
     instantiate_robots_in_world(friendly_start_dest_points, {});
 }
 
- TEST_F(HRVOTest, div_a_friendly_and_enemy_robot_performance_test)
+TEST_F(HRVOTest, div_a_friendly_and_enemy_robot_performance_test)
 {
     // Add robots around circle with one in the center
     const int num_robots_per_team = 11;
@@ -350,15 +348,18 @@ TEST_F(HRVOTest, destination_between_friendly_robot_and_stationary_friendly_robo
     for (std::size_t i = 0; i < num_robots_per_team; ++i)
     {
         Point friendly_pos = Point() + 2 * i * robot_offset;
-        friendly_start_dest_points.emplace_back(std::make_pair(friendly_pos, friendly_pos + team_offset));
+        friendly_start_dest_points.emplace_back(
+            std::make_pair(friendly_pos, friendly_pos + team_offset));
 
         Point enemy_pos = Point() + (2 * i + 1) * robot_offset + team_offset;
-        enemy_position_velocity_pairs.emplace_back(std::make_pair(enemy_pos, Vector(-1.0, 0.0)));
+        enemy_position_velocity_pairs.emplace_back(
+            std::make_pair(enemy_pos, Vector(-1.0, 0.0)));
     }
-    instantiate_robots_in_world(friendly_start_dest_points, enemy_position_velocity_pairs);
+    instantiate_robots_in_world(friendly_start_dest_points,
+                                enemy_position_velocity_pairs);
 }
 
- TEST_F(HRVOTest, div_a_friendly_and_enemy_robot_performance_test_moving_across)
+TEST_F(HRVOTest, div_a_friendly_and_enemy_robot_performance_test_moving_across)
 {
     // Add robots around circle with one in the center
     const int num_robots_per_team = 11;
@@ -370,19 +371,22 @@ TEST_F(HRVOTest, destination_between_friendly_robot_and_stationary_friendly_robo
     for (std::size_t i = 0; i < num_robots_per_team; ++i)
     {
         Point friendly_pos = Point(0.0, 0.0) + i * friendly_robot_offset;
-        friendly_start_dest_points.emplace_back(std::make_pair(friendly_pos, friendly_pos + dest_offset));
+        friendly_start_dest_points.emplace_back(
+            std::make_pair(friendly_pos, friendly_pos + dest_offset));
 
         Point enemy_pos = Point(-1.0, 0.0) + i * enemy_robot_offset;
-        enemy_position_velocity_pairs.emplace_back(std::make_pair(enemy_pos, Vector(1.5, 0.0)));
+        enemy_position_velocity_pairs.emplace_back(
+            std::make_pair(enemy_pos, Vector(1.5, 0.0)));
     }
-    instantiate_robots_in_world(friendly_start_dest_points, enemy_position_velocity_pairs);
+    instantiate_robots_in_world(friendly_start_dest_points,
+                                enemy_position_velocity_pairs);
     setSimulationTimeout(7.f);
 }
 
 TEST_F(HRVOTest, friendly_robot_going_around_ball_obstacle)
 {
     std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
-            std::pair(Point(-4.0, 0.0), Point(4.0, 0.0))};
+        std::pair(Point(-4.0, 0.0), Point(4.0, 0.0))};
     primitive_set.set_stay_away_from_ball(true);
     instantiate_robots_in_world(friendly_start_dest_points, {});
 }
