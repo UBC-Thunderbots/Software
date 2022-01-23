@@ -65,7 +65,8 @@ class ReceiverTactic : public Tactic
                                                      const Point& best_shot_target);
 
     void accept(TacticVisitor& visitor) const override;
-    bool done() const override;
+
+    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
     // The minimum proportion of open net we're shooting on vs the entire size of the net

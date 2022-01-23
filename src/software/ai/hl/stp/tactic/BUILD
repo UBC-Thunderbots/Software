@@ -68,3 +68,13 @@ cc_test(
         "//software/world",
     ],
 )
+
+cc_test(
+    name = "fsm_state_test",
+    srcs = ["fsm_state_test.cpp"],
+    deps = [
+        "//shared/test_util:tbots_gtest_main",
+        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
+        "//software/test_util",
+    ],
+)

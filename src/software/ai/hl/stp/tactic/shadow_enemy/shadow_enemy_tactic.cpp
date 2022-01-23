@@ -39,11 +39,6 @@ double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &wo
     return std::clamp<double>(cost, 0, 1);
 }
 
-bool ShadowEnemyTactic::done() const
-{
-    return fsm.is(boost::sml::X);
-}
-
 void ShadowEnemyTactic::updateIntent(const TacticUpdate &tactic_update)
 {
     fsm.process_event(ShadowEnemyFSM::Update(control_params, tactic_update));

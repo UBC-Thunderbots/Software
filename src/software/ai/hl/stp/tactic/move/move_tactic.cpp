@@ -59,11 +59,6 @@ double MoveTactic::calculateRobotCost(const Robot &robot, const World &world) co
     return std::clamp<double>(cost, 0, 1);
 }
 
-bool MoveTactic::done() const
-{
-    return fsm.is(boost::sml::X);
-}
-
 void MoveTactic::updateIntent(const TacticUpdate &tactic_update)
 {
     fsm.process_event(MoveFSM::Update(control_params, tactic_update));
