@@ -288,6 +288,16 @@ TEST_F(HRVOTest, destination_between_friendly_robot_and_stationary_enemy_robot)
                                 enemy_position_velocity_pairs);
 }
 
+TEST_F(HRVOTest, destination_between_friendly_robot_and_moving_enemy_robot)
+{
+    std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
+        std::pair(Point(-5.0, 0.0), Point(4.0, 0.0))};
+    std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {
+        std::pair(Point(5.0, 0.0), Vector(-0.1, 0.0))};
+    instantiate_robots_in_world(friendly_start_dest_points,
+                                enemy_position_velocity_pairs);
+}
+
 TEST_F(HRVOTest, destination_behind_stationary_enemy_robot)
 {
     std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
