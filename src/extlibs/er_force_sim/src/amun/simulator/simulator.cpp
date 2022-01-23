@@ -106,9 +106,8 @@ static void simulatorTickCallback(btDynamicsWorld *world, btScalar timeStep)
  * \brief %Simulator interface
  */
 
-Simulator::Simulator(const amun::SimulatorSetup &setup, bool useManualTrigger)
-    : m_isPartial(useManualTrigger),
-      m_time(0),
+Simulator::Simulator(const amun::SimulatorSetup &setup)
+    : m_time(0),
       m_lastSentStatusTime(0),
       m_enabled(false),
       m_charge(true),
@@ -116,11 +115,6 @@ Simulator::Simulator(const amun::SimulatorSetup &setup, bool useManualTrigger)
       m_visionProcessingTime(5 * 1000 * 1000),
       m_aggregator(new ErrorAggregator(this))
 {
-    // triggers by default every 5 milliseconds if simulator is enabled
-    // timing may change if time is scaled
-    m_trigger = new QTimer(this);
-    m_trigger->setTimerType(Qt::PreciseTimer);
-
     // setup bullet
     m_data                       = new SimulatorData;
     m_data->collision            = new btDefaultCollisionConfiguration();
@@ -303,7 +297,7 @@ void Simulator::stepSimulation(double time_s)
     m_time += time_s * 1E9;
 }
 
-void Simulator::handleSimulatorTick(double timeStep)
+void Simulator::handleSimulatorTick(double time_s)
 {
     // has to be done according to bullet wiki
     m_data->dynamicsWorld->clearForces();
@@ -322,16 +316,17 @@ void Simulator::handleSimulatorTick(double timeStep)
     m_data->ball->begin();
     for (const auto &pair : m_data->robotsBlue)
     {
-        pair.first->begin(m_data->ball, timeStep);
+        pair.first->begin(m_data->ball, time_s);
     }
     for (const auto &pair : m_data->robotsYellow)
     {
-        pair.first->begin(m_data->ball, timeStep);
+        pair.first->begin(m_data->ball, time_s);
     }
 
     // add gravity to all ACTIVE objects
     // thus has to be done after applying commands
     m_data->dynamicsWorld->applyGravity();
+    m_time += time_s * 1E9;
 }
 
 static bool checkCameraID(const int cameraId, const btVector3 &p,
@@ -623,17 +618,7 @@ void Simulator::moveBall(const sslsim::TeleportBall &ball)
 
     if (b.teleport_safely())
     {
-        if (!b.has_x() || !b.has_y())
-        {
-            SSLSimError error{new sslsim::SimulatorError};
-            error->set_code("TELEPORT_SAFELY_PARTIAL");
-            error->set_message(
-                "teleporting the ball safly with partial coordinates "
-                "is not possible");
-            m_aggregator->aggregate(error, ErrorSource::CONFIG);
-            return;
-        }
-        safelyTeleportBall(b.x(), b.y());
+        // Not handled
     }
 
     m_data->ball->move(b);
@@ -729,7 +714,7 @@ void Simulator::setFlipped(bool flipped)
     m_data->flip = flipped;
 }
 
-void Simulator::handleSimulatorSetupCommand(const std::shared_ptr<amun::Command> &command)
+void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command> &command)
 {
     bool teamOrPerfectDribbleChanged = false;
 
@@ -962,35 +947,4 @@ void Simulator::teleportRobotToFreePosition(SimRobot *robot)
     robotCommand.set_v_x(0);
     robotCommand.set_v_y(0);
     robot->move(robotCommand);
-}
-
-void Simulator::safelyTeleportBall(const float x, const float y)
-{
-    // remove the speed of all robots in this radius to avoid them running over
-    // the ball
-    const float STOP_ROBOTS_RADIUS = 1.5f;
-
-    btVector3 newBallPos(x, y, 0);
-    for (const auto &robotList : {m_data->robotsBlue, m_data->robotsYellow})
-    {
-        for (const auto &it : robotList)
-        {
-            SimRobot *robot    = it.first;
-            btVector3 robotPos = robot->position() / SIMULATOR_SCALE;
-            if (overlapCheck(newBallPos, BALL_RADIUS, robotPos, robot->specs().radius()))
-            {
-                teleportRobotToFreePosition(robot);
-            }
-            else if (overlapCheck(newBallPos, STOP_ROBOTS_RADIUS, robotPos,
-                                  robot->specs().radius()))
-            {
-                // set the speed to zero but keep the robot where it is
-                sslsim::TeleportRobot robotCommand;
-                robotCommand.mutable_id()->set_id(robot->specs().id());
-                robotCommand.set_v_x(0);
-                robotCommand.set_v_y(0);
-                robot->move(robotCommand);
-            }
-        }
-    }
 }

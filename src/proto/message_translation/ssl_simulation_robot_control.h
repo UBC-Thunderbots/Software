@@ -2,6 +2,7 @@
 
 #include "proto/ssl_simulation_robot_control.pb.h"
 #include "proto/ssl_simulation_robot_feedback.pb.h"
+#include "proto/tbots_software_msgs.pb.h"
 
 /**
  * Creates a RobotMoveCommand proto
@@ -22,6 +23,22 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
     double wheel_rpm_front_right, double wheel_rpm_front_left, double wheel_rpm_back_left,
     double wheel_rpm_back_right, float front_wheel_angle_deg, float back_wheel_angle_deg,
     float wheel_radius_meters);
+
+/**
+ * Creates a RobotMoveCommand proto
+ *
+ * @param direct_control The DirectControlPrimitive to create from
+ * @param front_wheel_angle_deg angle between each front wheel and the y axis of the robot
+ * in degrees
+ * @param back_wheel_angle_deg angle between each back wheel and the y axis of the robot
+ * in degrees
+ * @param wheel_radius_meters The radius of the wheel in meters
+ *
+ * @return RobotMoveCommand proto
+ */
+std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
+    const TbotsProto::DirectControlPrimitive& direct_control, float front_wheel_angle_deg,
+    float back_wheel_angle_deg, float wheel_radius_meters);
 
 /**
  * Creates a RobotCommand proto

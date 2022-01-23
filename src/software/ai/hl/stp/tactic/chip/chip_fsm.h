@@ -19,62 +19,52 @@ struct ChipFSM
         double chip_distance_meters;
     };
 
-    DEFINE_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+    DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
+
+    /**
+     * Action that updates the ChipIntent
+     *
+     * @param event ChipFSM::Update event
+     */
+    void updateChip(const Update &event);
+
+    /**
+     * Action that updates the GetBehindBallFSM
+     *
+     * @param event ChipFSM::Update event
+     * @param processEvent processes the GetBehindBallFSM::Update
+     */
+    void updateGetBehindBall(
+        const Update &event,
+        boost::sml::back::process<GetBehindBallFSM::Update> processEvent);
+
+    /**
+     * Guard that checks if the ball has been chicked
+     *
+     * @param event ChipFSM::Update event
+     *
+     * @return if the ball has been chicked
+     */
+    bool ballChicked(const Update &event);
+
 
     auto operator()()
     {
         using namespace boost::sml;
 
-        const auto get_behind_ball_s = state<GetBehindBallFSM>;
-        const auto chip_s            = state<ChipState>;
-        const auto update_e          = event<Update>;
+        DEFINE_SML_STATE(GetBehindBallFSM)
+        DEFINE_SML_STATE(ChipState)
+        DEFINE_SML_EVENT(Update)
 
-        /**
-         * Action that updates the ChipIntent
-         *
-         * @param event ChipFSM::Update event
-         */
-        const auto update_chip = [](auto event) {
-            event.common.set_intent(std::make_unique<ChipIntent>(
-                event.common.robot.id(), event.control_params.chip_origin,
-                event.control_params.chip_direction,
-                event.control_params.chip_distance_meters,
-                event.common.robot.robotConstants()));
-        };
-
-        /**
-         * Action that updates the GetBehindBallFSM
-         *
-         * @param event ChipFSM::Update event
-         * @param processEvent processes the GetBehindBallFSM::Update
-         */
-        const auto update_get_behind_ball =
-            [](auto event, back::process<GetBehindBallFSM::Update> processEvent) {
-                GetBehindBallFSM::ControlParams control_params{
-                    .ball_location   = event.control_params.chip_origin,
-                    .chick_direction = event.control_params.chip_direction};
-
-                // Update the get behind ball fsm
-                processEvent(GetBehindBallFSM::Update(control_params, event.common));
-            };
-
-        /**
-         * Guard that checks if the ball has been chicked
-         *
-         * @param event ChipFSM::Update event
-         *
-         * @return if the ball has been chicked
-         */
-        const auto ball_chicked = [](auto event) {
-            return event.common.world.ball().hasBallBeenKicked(
-                event.control_params.chip_direction);
-        };
+        DEFINE_SML_GUARD(ballChicked)
+        DEFINE_SML_ACTION(updateChip)
+        DEFINE_SML_SUB_FSM_UPDATE_ACTION(updateGetBehindBall, GetBehindBallFSM)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *get_behind_ball_s + update_e / update_get_behind_ball,
-            get_behind_ball_s                              = chip_s,
-            chip_s + update_e[!ball_chicked] / update_chip = chip_s,
-            chip_s + update_e[ball_chicked]                = X);
+            *GetBehindBallFSM_S + Update_E / updateGetBehindBall_A,
+            GetBehindBallFSM_S                                    = ChipState_S,
+            ChipState_S + Update_E[!ballChicked_G] / updateChip_A = ChipState_S,
+            ChipState_S + Update_E[ballChicked_G]                 = X);
     }
 };

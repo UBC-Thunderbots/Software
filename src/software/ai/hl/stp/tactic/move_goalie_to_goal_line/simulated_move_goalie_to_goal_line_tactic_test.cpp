@@ -28,7 +28,7 @@ TEST_P(SimulatedMoveGoalieToGoalLineTacticTest, move_to_goal_line_test)
 
     auto tactic = std::make_shared<MoveGoalieToGoalLineTactic>();
     setTactic(tactic);
-    setRobotId(0);
+    setFriendlyRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [tactic](std::shared_ptr<World> world_ptr,

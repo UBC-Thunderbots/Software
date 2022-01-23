@@ -35,6 +35,15 @@ class Team
         const Duration& robot_expiry_buffer_duration = Duration::fromMilliseconds(50));
 
     /**
+     * Creates a new team based on the TbotsProto::Team protobuf representation
+     *
+     * @param team_proto The TbotsProto::Team protobuf which this robot should be based on
+     */
+    explicit Team(
+        const TbotsProto::Team& team_proto,
+        const Duration& robot_expiry_buffer_duration = Duration::fromMilliseconds(50));
+
+    /**
      * Updates this team with new robots.
      *
      * @throws std::invalid_argument if multiple robots have the same id

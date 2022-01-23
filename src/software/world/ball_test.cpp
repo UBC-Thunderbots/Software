@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "shared/constants.h"
 
 
@@ -52,6 +53,15 @@ TEST_F(BallTest, construct_with_initial_state)
     EXPECT_EQ(Point(1, 2.3), ball.position());
     EXPECT_EQ(Vector(-0.04, 0.0), ball.velocity());
     EXPECT_EQ(current_time, ball.timestamp());
+}
+
+TEST_F(BallTest, construct_with_protobuf)
+{
+    Ball original_ball(Point(1.0, 1.0), Vector(2.0, 2.0), Timestamp::fromSeconds(3.0));
+    std::unique_ptr<TbotsProto::Ball> ball_proto = createBall(original_ball);
+    Ball proto_converted_ball(*ball_proto);
+
+    EXPECT_EQ(original_ball, proto_converted_ball);
 }
 
 TEST_F(BallTest, update_state_with_all_params)

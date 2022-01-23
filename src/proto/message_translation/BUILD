@@ -34,6 +34,7 @@ cc_library(
         "//software/geom:angle",
         "//software/geom:angular_velocity",
         "//software/geom:point",
+        "//software/geom:polygon",
         "//software/geom:vector",
     ],
 )
@@ -145,6 +146,7 @@ cc_library(
     deps = [
         "//firmware/shared:physics",
         "//proto:ssl_simulation_cc_proto",
+        "//proto:tbots_cc_proto",
         "//shared:constants",
         "//shared:robot_constants",
     ],
@@ -198,5 +200,26 @@ cc_test(
     deps = [
         ":defending_side",
         "//shared/test_util:tbots_gtest_main",
+    ],
+)
+
+cc_library(
+    name = "er_force_world",
+    srcs = ["er_force_world.cpp"],
+    hdrs = ["er_force_world.h"],
+    deps = [
+        "//extlibs/er_force_sim/src/protobuf:protobuf_cc_lib",
+        "//software/world:ball",
+        "//software/world:robot",
+    ],
+)
+
+cc_test(
+    name = "er_force_world_test",
+    srcs = ["er_force_world_test.cpp"],
+    deps = [
+        ":er_force_world",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
     ],
 )

@@ -9,6 +9,17 @@ RobotState::RobotState(const Point &position, const Vector &velocity,
 {
 }
 
+RobotState::RobotState(const TbotsProto::RobotState &robot_state_proto)
+    : position_(Point(robot_state_proto.global_position().x_meters(),
+                      robot_state_proto.global_position().y_meters())),
+      velocity_(Vector(robot_state_proto.global_velocity().x_component_meters(),
+                       robot_state_proto.global_velocity().y_component_meters())),
+      orientation_(Angle::fromRadians(robot_state_proto.global_orientation().radians())),
+      angular_velocity_(AngularVelocity::fromRadians(
+          robot_state_proto.global_angular_velocity().radians_per_second()))
+{
+}
+
 Point RobotState::position() const
 {
     return position_;

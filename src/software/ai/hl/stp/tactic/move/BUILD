@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "move_tactic",
-    srcs = ["move_tactic.cpp"],
+    srcs = [
+        "move_fsm.cpp",
+        "move_tactic.cpp",
+    ],
     hdrs = [
         "move_fsm.h",
         "move_tactic.h",

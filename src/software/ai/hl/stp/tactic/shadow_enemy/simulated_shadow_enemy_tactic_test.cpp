@@ -52,7 +52,7 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_pass)
     auto tactic = std::make_shared<ShadowEnemyTactic>();
     tactic->updateControlParams(enemy_threat, 2);
     setTactic(tactic);
-    setRobotId(0);
+    setFriendlyRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
@@ -99,7 +99,7 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_pass_if_enemy_does_not_have_ba
     auto tactic = std::make_shared<ShadowEnemyTactic>();
     tactic->updateControlParams(enemy_threat, 1.5);
     setTactic(tactic);
-    setRobotId(0);
+    setFriendlyRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic, shadowee](std::shared_ptr<World> world_ptr,
@@ -145,7 +145,7 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
     auto tactic = std::make_shared<ShadowEnemyTactic>();
     tactic->updateControlParams(enemy_threat, 2);
     setTactic(tactic);
-    setRobotId(0);
+    setFriendlyRobotId(0);
 
 
 
@@ -200,7 +200,7 @@ TEST_F(SimulatedShadowEnemyTacticTest, test_block_net_if_enemy_threat_is_null)
     auto tactic = std::make_shared<ShadowEnemyTactic>();
     tactic->updateControlParams(std::nullopt, 2);
     setTactic(tactic);
-    setRobotId(0);
+    setFriendlyRobotId(0);
 
 
 
