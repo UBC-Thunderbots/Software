@@ -14,6 +14,7 @@ class HRVOTest : public ::testing::Test
     // Test Properties
     float simulation_timeout = 15.0;
 
+public:
     // HRVO Properties
     Simulator simulator;
     Timestamp current_time;
@@ -24,11 +25,10 @@ class HRVOTest : public ::testing::Test
     World world;
     TbotsProto::PrimitiveSet primitive_set;
 
-public:
     HRVOTest()
         : simulator(1.f / SIMULATOR_FRAME_RATE),
           current_time(Timestamp::fromSeconds(123)),
-          ball(Point(1, 2), Vector(-0.3, 0), current_time),
+          ball(Point(), Vector(), current_time),
           field(Field::createSSLDivisionBField()),
           friendly_team(Duration::fromMilliseconds(1000)),
           enemy_team(Duration::fromMilliseconds(1000)),
@@ -36,6 +36,9 @@ public:
     {
     }
 
+    /**
+     * Run simulator at the end of the test
+     */
     void TearDown() override
     {
         run_simulator();
@@ -89,37 +92,8 @@ public:
 
         // Reconstruct World with updated values
         world = World(field, ball, friendly_team, enemy_team);
-        simulator.updateWorld(world);
         simulator.updatePrimitiveSet(primitive_set);
-    }
-
-    void create_div_b_field()
-    {
-        float field_width   = 9.f;
-        float field_height  = 6.f;
-        float robot_offsets = 2.1f * 0.25f;
-
-        for (float x = -(field_width / 2); x <= (field_width / 2); x += robot_offsets)
-        {
-            for (float y : {-(field_height / 2), field_height / 2})
-            {
-                const Vector2 position(x, y);
-                simulator.addHRVOAgent(position, 0.25f, Vector2(), 0.1f, 0.1f, 0.1f,
-                                       simulator.addGoal(position), 0.25f, 1.f, 1, 0.f);
-            }
-        }
-
-        // Vertical field lines
-        float max_y = (field_height / 2) - robot_offsets;
-        for (float y = -max_y; y <= max_y; y += robot_offsets)
-        {
-            for (float x : {-(field_width / 2), field_width / 2})
-            {
-                const Vector2 position(x, y);
-                simulator.addHRVOAgent(position, 0.25f, Vector2(), 0.1f, 0.1f, 0.1f,
-                                       simulator.addGoal(position), 0.25f, 1.f, 1, 0.f);
-            }
-        }
+        simulator.updateWorld(world);
     }
 
     void run_simulator()
@@ -237,7 +211,7 @@ public:
 
             auto finish_tick_time = std::chrono::high_resolution_clock::now();
             computation_time += finish_tick_time - start_tick_time;
-        } while (prev_frame_time < simulation_timeout);  // TODO:!simulator.haveReachedGoals() &&
+        } while (!simulator.haveReachedGoals() && prev_frame_time < simulation_timeout);
 
         auto finish_time = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> total_time = finish_time - start_time;
@@ -405,43 +379,10 @@ TEST_F(HRVOTest, destination_between_friendly_robot_and_stationary_friendly_robo
     setSimulationTimeout(7.f);
 }
 
-// TEST_F(HRVOTest, div_b_edge_test)
-//{
-//    const Vector2 goal_offset  = Vector2(8.f, 0);
-//    const Vector2 robot_offset = Vector2(0.f, -ROBOT_RADIUS * 2.5f);
-//    for (std::size_t i = 0; i < 1; ++i)
-//    {
-//        const Vector2 position = -1 * (goal_offset / 2) + Vector2(0.f, 2.5f) +
-//                                 (static_cast<float>(i) * robot_offset);
-//        simulator.addHRVOAgent(position, simulator.addGoal(position + goal_offset), 0,
-//        0, 0, 0, 0, 0, 0, 0,
-//                               <#initializer#>);
-//    }
-//    add_static_obstacle(Vector2(0, 2.f), 0.75f);
-//    create_div_b_field();
-//}
-//
-// TEST_F(HRVOTest, 1_robot_two_goals)
-//{
-//    simulator.addHRVOAgent(Vector2(-4.f, 0.f), simulator.addGoalPositions(
-//            {Vector2(4.f, 0.f), Vector2(-4.f, 0.f)}), 0, 0, 0, 0, 0, 0, 0, 0,
-//            <#initializer#>);
-//}
-//
-// TEST_F(HRVOTest, 1_robot_moving_in_square)
-//{
-//    simulator.addHRVOAgent(
-//            Vector2(-4.f, -4.f),
-//            simulator.addGoalPositions({Vector2(4.f, -4.f), Vector2(4.f, 4.f),
-//                                        Vector2(-4.f, 4.f), Vector2(-4.f, -4.f)}), 0, 0,
-//                                        0, 0, 0, 0, 0, 0,
-//            <#initializer#>);
-//}
-//
-// TEST_F(HRVOTest, 1_robot_moving_in_square_with_final_speed)
-//{
-//    simulator.addHRVOAgent(Vector2(-4.f, -4.f), simulator.addGoalPositions(
-//            {Vector2(4.f, -4.f), Vector2(4.f, 4.f),
-//             Vector2(-4.f, 4.f), Vector2(-4.f, -4.f)},
-//            {2.f, 2.f, 2.f, 0.f}), 0, 0, 0, 0, 0, 0, 0, 0, <#initializer#>);
-//}
+TEST_F(HRVOTest, friendly_robot_going_around_ball_obstacle)
+{
+    std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
+            std::pair(Point(-4.0, 0.0), Point(4.0, 0.0))};
+    primitive_set.set_stay_away_from_ball(true);
+    instantiate_robots_in_world(friendly_start_dest_points, {});
+}

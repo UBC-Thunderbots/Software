@@ -270,8 +270,9 @@ private:
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set_;
 
-    // True if the ball should be treated as an agent (obstacle) the next time we
-    // receive a world
+    // True if the ball should be treated as an agent (obstacle)
+    // NOTE: This will take effect the next time we receive a world, and we know
+    //       the current ball position and velocity
     bool add_ball_agent = false;
 
     // The scale which friendly robots should be larger than friendly robots
