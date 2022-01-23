@@ -177,9 +177,9 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_src)
     auto path = planner.findPath(start, dest, navigable_area, obstacles);
 
     EXPECT_TRUE(path != std::nullopt);
-    
+
     std::vector<Point> path_points = path->getKnots();
-    
+
     // Make sure the start and end of the path are correct
     EXPECT_EQ(start, path->getStartPoint());
     EXPECT_EQ(dest, path->getEndPoint());
@@ -242,7 +242,8 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest)
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest_blocked_src)
 {
     // Test where we start and end in an obstacle
-    // We expect to exit out of the obstacle and path plan to a point next to the final point outside the obstacle
+    // We expect to exit out of the obstacle and path plan to a point next to the final
+    // point outside the obstacle
     Field field = Field::createSSLDivisionAField();
     Point start{0, 0.1}, dest{2.7, 0};
 
@@ -264,8 +265,9 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest_blocked_src)
 
     // Make sure the start and end of the path are correct
     EXPECT_EQ(start, path->getStartPoint());
-    
-    // The point following the start should be the closest point out of the obstacle, which is around (0, 1)
+
+    // The point following the start should be the closest point out of the obstacle,
+    // which is around (0, 1)
     EXPECT_NEAR(0, path_points[1].x(), 0.3);
     EXPECT_NEAR(1, path_points[1].y(), 0.3);
 
@@ -283,10 +285,11 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest_blocked_src)
                                       {obstacle});
 }
 
-TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_src_move_away_from_target_to_get_to_final_dest)
+TEST_F(TestEnlsvgPathPlanner,
+       test_enlsvg_path_planner_blocked_src_move_away_from_target_to_get_to_final_dest)
 {
-    // Test where we start inside an obstacle, but we need to briefly move away from the target point to get to the
-    // final destination
+    // Test where we start inside an obstacle, but we need to briefly move away from the
+    // target point to get to the final destination
     Field field = Field::createSSLDivisionAField();
     Point start{1, 2}, dest{5, 4};
 
@@ -309,8 +312,9 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_src_move_away_fro
     // Make sure the start and end of the path are correct
     EXPECT_EQ(start, path->getStartPoint());
     EXPECT_EQ(dest, path->getEndPoint());
-    
-    // The point following the start should be the closest point out of the obstacle, which is around (0 , 2)
+
+    // The point following the start should be the closest point out of the obstacle,
+    // which is around (0 , 2)
     EXPECT_NEAR(0, path_points[1].x(), 0.3);
     EXPECT_NEAR(2, path_points[1].y(), 0.3);
 

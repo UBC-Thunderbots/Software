@@ -69,20 +69,23 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start, const Point 
     // isn't
     if (!contains(navigable_area, start), !contains(navigable_area, end))
     {
-        LOG(WARNING) << "Start and/or end point is not within the navigable area; no path found" << std::endl;
+        LOG(WARNING)
+            << "Start and/or end point is not within the navigable area; no path found"
+            << std::endl;
         return std::nullopt;
     }
 
     // Find closest unblocked points in case the start and end positions are inside
     // obstacles
-    EnlsvgPoint enlsvg_start    = convertPointToEnlsvgPoint(start);
-    EnlsvgPoint enlsvg_end      = convertPointToEnlsvgPoint(end);
-    auto new_start = findClosestUnblockedEnlsvgPoint(enlsvg_start);
-    auto new_end   = findClosestUnblockedEnlsvgPoint(enlsvg_end);
+    EnlsvgPoint enlsvg_start = convertPointToEnlsvgPoint(start);
+    EnlsvgPoint enlsvg_end   = convertPointToEnlsvgPoint(end);
+    auto new_start           = findClosestUnblockedEnlsvgPoint(enlsvg_start);
+    auto new_end             = findClosestUnblockedEnlsvgPoint(enlsvg_end);
 
     if (new_start == std::nullopt || new_end == std::nullopt)
     {
-        LOG(WARNING) << "Unable to find a path; Unable to find a nearby start and/or end point that isn't blocked "
+        LOG(WARNING)
+            << "Unable to find a path; Unable to find a nearby start and/or end point that isn't blocked "
             << " within the navigable area; no path found" << std::endl;
         return std::nullopt;
     }
@@ -105,8 +108,8 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start, const Point 
         path_points.insert(path_points.begin(), start);
     }
 
-    // If the end point wasn't blocked, then replace the end with the actual end because some details get lost due to 
-    // the grid resolution
+    // If the end point wasn't blocked, then replace the end with the actual end because
+    // some details get lost due to the grid resolution
     if (new_end.value() == enlsvg_end)
     {
         path_points.pop_back();
@@ -161,8 +164,11 @@ std::optional<EnlsvgPathPlanner::EnlsvgPoint>
 EnlsvgPathPlanner::findClosestUnblockedEnlsvgPoint(const EnlsvgPoint &ep) const
 {
     // Try to short circuit
-    if (!isBlocked(ep)) { return ep; }
-    
+    if (!isBlocked(ep))
+    {
+        return ep;
+    }
+
     // Uses BFS to find the closest unblocked cell by looking at nearby cells
     std::queue<EnlsvgPoint> q;
     std::unordered_set<EnlsvgPoint, HashEnlsvgPoint> visited;
@@ -176,9 +182,12 @@ EnlsvgPathPlanner::findClosestUnblockedEnlsvgPoint(const EnlsvgPoint &ep) const
         {
             return std::optional<EnlsvgPoint>(test_coord);
         }
-        // Place immediately horizontal and vertical coordinates on the list of nodes to check
-        EnlsvgPoint next_coords[4] = { { test_coord.x+1, test_coord.y }, { test_coord.x, test_coord.y-1 },
-                                      { test_coord.x, test_coord.y+1 }, { test_coord.x-1, test_coord.y } };
+        // Place immediately horizontal and vertical coordinates on the list of nodes to
+        // check
+        EnlsvgPoint next_coords[4] = {{test_coord.x + 1, test_coord.y},
+                                      {test_coord.x, test_coord.y - 1},
+                                      {test_coord.x, test_coord.y + 1},
+                                      {test_coord.x - 1, test_coord.y}};
         for (auto &next_coord : next_coords)
         {
             if (isCoordNavigable(next_coord) && visited.count(next_coord) == 0)

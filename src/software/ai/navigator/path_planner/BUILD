@@ -63,8 +63,8 @@ cc_library(
     deps = [
         ":path_planner",
         "//extlibs/enlsvg",
-        "//software/world",
         "//software/logger",
+        "//software/world",
         "@boost//:functional",
     ],
 )
