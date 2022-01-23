@@ -296,6 +296,18 @@ inline float det(const Vector2 &vector1, const Vector2 &vector2)
 }
 
 /**
+ * Computes the dot product of two vectors
+ *
+ * @param vector_left  The left hand side vector of dot product
+ * @param vector_right  The right hand side vector of dot product
+ * @return  The dot product of the two vectors.
+ */
+inline float dotProduct(const Vector2 &vector_left, const Vector2 &vector_right)
+{
+    return vector_left.getX() * vector_right.getX() + vector_left.getY() * vector_right.getY();
+}
+
+/**
  * Computes the normalization of a specified vector.
  *
  * @param vector  The vector whose normalization is to be calculated.

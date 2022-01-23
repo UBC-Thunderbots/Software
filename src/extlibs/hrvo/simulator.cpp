@@ -150,9 +150,9 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
         max_speed  = robot.robotConstants().robot_max_speed_m_per_s;
         pref_speed = max_speed * pref_speed_scale;
     }
-    // A large distance chosen arbitrarily to allow Agent to decelerate before getting
+    // A large radius chosen arbitrarily to allow Agent to decelerate before getting
     // into contact with a neighbor
-    float neighbor_dist = 10.f;
+    float neighbor_dist = 7.f;
 
     // Max distance which the robot can travel in one time step + scaling
     float goal_radius        = (max_speed * timeStep_) / 2 * goal_radius_scale;
@@ -190,7 +190,7 @@ std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot,
                      static_cast<float>(robot.position().y()));
     Vector2 velocity(static_cast<float>(robot.velocity().x()),
                      static_cast<float>(robot.velocity().y()));
-    float max_accel = 0.f; //robot.robotConstants().robot_max_acceleration_m_per_s_2;
+    float max_accel = 0.f;
     float max_speed = robot.robotConstants().robot_max_speed_m_per_s;
 
     // Max distance which the robot can travel in one time step + scaling

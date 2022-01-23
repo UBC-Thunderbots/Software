@@ -490,37 +490,52 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
 
     if (this != other_agent.get())
     {
-        const float distSq = absSq(position_ - other_agent->getPosition());
+        Vector2 other_agent_relative_pos = other_agent->getPosition() - position_;
+        const float distSq = absSq(other_agent_relative_pos);
+
+        Vector2 goal_pos = simulator_->goals_[goal_index_]->getCurrentGoalPosition();
+        Vector2 relative_goal_pos = goal_pos - position_;
+
+        // Whether the other robot is with in 45 degrees of the goal, relative to us
+        const float forty_five_deg_ratio = 1.f / std::sqrt(2.f);
+        bool is_other_agent_in_front = dotProduct(normalize(relative_goal_pos), normalize(other_agent_relative_pos)) > forty_five_deg_ratio;
+
+        bool is_other_agent_moving_towards_us = dotProduct(normalize(velocity_), normalize(other_agent->getVelocity())) < -forty_five_deg_ratio;
+
+        // Whether the other agent is within a 1.5-meter radius of our goal
+        bool is_other_agent_near_goal = absSq(other_agent->getPosition() - goal_pos) < 1.5f;
+
+        // Helper lambda function
+        auto add_other_agent = [&] () {
+            if (neighbors_.size() == maxNeighbors_)
+            {
+                neighbors_.erase(--neighbors_.end());
+            }
+
+            neighbors_.insert(std::make_pair(distSq, agentNo));
+
+            if (neighbors_.size() == maxNeighbors_)
+            {
+                rangeSq = (--neighbors_.end())->first;
+            }
+        };
 
         if (distSq < std::pow(radius_ + other_agent->getRadius(), 2) && distSq < rangeSq)
         {
+            // In collision with other agent, so the other neighbors are not important
             neighbors_.clear();
-
-            if (neighbors_.size() == maxNeighbors_)
-            {
-                neighbors_.erase(--neighbors_.end());
-            }
-
-            neighbors_.insert(std::make_pair(distSq, agentNo));
-
-            if (neighbors_.size() == maxNeighbors_)
-            {
-                rangeSq = (--neighbors_.end())->first;
-            }
+            add_other_agent();
         }
         else if (distSq < rangeSq)
         {
-            if (neighbors_.size() == maxNeighbors_)
-            {
-                neighbors_.erase(--neighbors_.end());
-            }
-
-            neighbors_.insert(std::make_pair(distSq, agentNo));
-
-            if (neighbors_.size() == maxNeighbors_)
-            {
-                rangeSq = (--neighbors_.end())->first;
-            }
+            add_other_agent();
+        }
+        else if (distSq > rangeSq && is_other_agent_in_front && is_other_agent_moving_towards_us && is_other_agent_near_goal)
+        {
+            // This is an edge case for when the other agent is outside our search range, but is
+            // moving towards us from behind our destination, so it is posing a possible threat
+            // of collision if we ignore it.
+            add_other_agent();
         }
     }
 }

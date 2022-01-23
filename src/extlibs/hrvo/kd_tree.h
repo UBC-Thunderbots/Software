@@ -117,7 +117,7 @@ class KdTree
     /**
      * Computes the neighbors of the specified agent.
      *
-     * @param agent    A pointer to the agent for which neighbors are to be computed.
+     * @param agent  A pointer to the agent for which neighbors are to be computed.
      * @param range  The range around the agent.
      */
     void query(HRVOAgent *agent, float range) const
