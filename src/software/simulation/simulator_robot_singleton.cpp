@@ -23,7 +23,7 @@ void SimulatorRobotSingleton::startNewPrimitiveOnCurrentSimulatorRobot(
     const TbotsProto_Primitive& primitive_msg)
 {
     checkValidAndExecute<void>([firmware_world, primitive_msg](auto robot) {
-        robot->startNewPrimitive(firmware_world, primitive_msg);
+        robot->startNewPrimitiveSet(firmware_world, primitive_msg);
     });
 }
 

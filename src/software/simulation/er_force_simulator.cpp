@@ -20,8 +20,8 @@ ErForceSimulator::ErForceSimulator(
     const FieldType& field_type, const RobotConstants_t& robot_constants,
     const WheelConstants& wheel_constants,
     std::shared_ptr<const SimulatorConfig> simulator_config)
-    : yellow_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
-      blue_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
+    : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
+      blue_team_world_msg(std::make_unique<TbotsProto::World>()),
       frame_number(0),
       robot_constants(robot_constants),
       wheel_constants(wheel_constants),
@@ -205,33 +205,33 @@ void ErForceSimulator::setRobots(const std::vector<RobotStateWithId>& robots,
 }
 
 void ErForceSimulator::setYellowRobotPrimitiveSet(
-    const TbotsProto::PrimitiveSet& primitive_set_msg,
-    std::unique_ptr<TbotsProto::Vision> vision_msg)
+        const TbotsProto::PrimitiveSet& primitive_set_msg,
+        std::unique_ptr<TbotsProto::World> world_msg)
 {
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
-        setRobotPrimitive(robot_id, primitive, yellow_simulator_robots,
-                          *yellow_team_vision_msg);
+        setRobotPrimitive(robot_id, primitive_set_msg, yellow_simulator_robots,
+                          *yellow_team_world_msg);
     }
-    yellow_team_vision_msg = std::move(vision_msg);
+    yellow_team_world_msg = std::move(world_msg);
 }
 
 void ErForceSimulator::setBlueRobotPrimitiveSet(
-    const TbotsProto::PrimitiveSet& primitive_set_msg,
-    std::unique_ptr<TbotsProto::Vision> vision_msg)
+        const TbotsProto::PrimitiveSet& primitive_set_msg,
+        std::unique_ptr<TbotsProto::World> world_msg)
 {
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
-        setRobotPrimitive(robot_id, primitive, blue_simulator_robots,
-                          *blue_team_vision_msg);
+        setRobotPrimitive(robot_id, primitive_set_msg, blue_simulator_robots,
+                          *blue_team_world_msg);
     }
-    blue_team_vision_msg = std::move(vision_msg);
+    blue_team_world_msg = std::move(world_msg);
 }
 
 void ErForceSimulator::setRobotPrimitive(
-    RobotId id, const TbotsProto::Primitive& primitive_msg,
-    std::vector<std::shared_ptr<ErForceSimulatorRobot>>& simulator_robots,
-    const TbotsProto::Vision& vision_msg)
+        RobotId id, const TbotsProto::PrimitiveSet &primitive_set_msg,
+        std::vector<std::shared_ptr<ErForceSimulatorRobot>>& simulator_robots,
+        const TbotsProto::World &world_msg)
 {
     // Set to NEG_X because the vision msg in this simulator is normalized
     // correctly
@@ -243,11 +243,15 @@ void ErForceSimulator::setRobotPrimitive(
     {
         auto simulator_robot = *simulator_robots_iter;
 
-        auto robot_state_it = vision_msg.robot_states().find(id);
-        if (robot_state_it != vision_msg.robot_states().end())
+        const auto &friendly_robots = world_msg.friendly_team().team_robots();
+        const auto robot_proto_it = std::find_if(friendly_robots.begin(), friendly_robots.end(), [&](const auto& robot) {
+            return robot.id() == simulator_robot->getRobotId();
+        });
+        if (robot_proto_it != friendly_robots.end())
         {
-            simulator_robot->setRobotState(RobotState(vision_msg.robot_states().at(id)));
-            simulator_robot->startNewPrimitive(primitive_msg);
+            simulator_robot->setRobotState(RobotState(robot_proto_it->current_state()));
+            simulator_robot->startNewPrimitiveSet(primitive_set_msg);
+            simulator_robot->updateWorldState(world_msg);
         }
     }
     else
@@ -257,19 +261,20 @@ void ErForceSimulator::setRobotPrimitive(
 }
 
 SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
-    std::vector<std::shared_ptr<ErForceSimulatorRobot>> simulator_robots,
-    TbotsProto::Vision vision_msg)
+        const std::vector<std::shared_ptr<ErForceSimulatorRobot>>& simulator_robots,
+        const TbotsProto::World& world_msg)
 {
     SSLSimulationProto::RobotControl robot_control;
 
     for (auto& simulator_robot : simulator_robots)
     {
-        auto robot_state_it =
-            vision_msg.robot_states().find(simulator_robot->getRobotId());
-        if (robot_state_it != vision_msg.robot_states().end())
+        const auto &friendly_robots = world_msg.friendly_team().team_robots();
+        const auto& robot_proto_it = std::find_if(friendly_robots.begin(), friendly_robots.end(), [&](const auto& robot) {
+            return robot.id() == simulator_robot->getRobotId();
+        });
+        if (robot_proto_it != friendly_robots.end())
         {
-            simulator_robot->setRobotState(
-                RobotState(vision_msg.robot_states().at(simulator_robot->getRobotId())));
+            simulator_robot->setRobotState(RobotState(robot_proto_it->current_state()));
             // Set to NEG_X because the vision msg in this simulator is
             // normalized correctly
             simulator_robot->runCurrentPrimitive();
@@ -285,10 +290,10 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     current_time = current_time + time_step;
 
     SSLSimulationProto::RobotControl yellow_robot_control =
-        updateSimulatorRobots(yellow_simulator_robots, *yellow_team_vision_msg);
+        updateSimulatorRobots(yellow_simulator_robots, *yellow_team_world_msg);
 
     SSLSimulationProto::RobotControl blue_robot_control =
-        updateSimulatorRobots(blue_simulator_robots, *blue_team_vision_msg);
+        updateSimulatorRobots(blue_simulator_robots, *blue_team_world_msg);
 
     er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);
     er_force_sim->acceptBlueRobotControlCommand(blue_robot_control);

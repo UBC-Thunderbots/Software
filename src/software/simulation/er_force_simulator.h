@@ -76,12 +76,12 @@ class ErForceSimulator : public QObject
      * in simulation
      *
      * @param primitive_set_msg The set of primitives to run on the robot
-     * @param vision_msg The vision message
+     * @param world_msg The vision message
      */
     void setYellowRobotPrimitiveSet(const TbotsProto::PrimitiveSet& primitive_set_msg,
-                                    std::unique_ptr<TbotsProto::Vision> vision_msg);
+                                    std::unique_ptr<TbotsProto::World> world_msg);
     void setBlueRobotPrimitiveSet(const TbotsProto::PrimitiveSet& primitive_set_msg,
-                                  std::unique_ptr<TbotsProto::Vision> vision_msg);
+                                  std::unique_ptr<TbotsProto::World> world_msg);
 
     /**
      * Advances the simulation by the given time step.
@@ -127,31 +127,31 @@ class ErForceSimulator : public QObject
      * Sets the primitive being simulated by the robot in simulation
      *
      * @param id The id of the robot to set the primitive for
-     * @param primitive_msg The primitive to run on the robot
+     * @param primitive_set_msg The primitive to run on the robot
      * @param simulator_robots The robots to set the primitives on
-     * @param vision_msg The vision message
+     * @param world_msg The vision message
      */
     static void setRobotPrimitive(
-        RobotId id, const TbotsProto::Primitive& primitive_msg,
-        std::vector<std::shared_ptr<ErForceSimulatorRobot>>& simulator_robots,
-        const TbotsProto::Vision& vision_msg);
+            RobotId id, const TbotsProto::PrimitiveSet &primitive_set_msg,
+            std::vector<std::shared_ptr<ErForceSimulatorRobot>>& simulator_robots,
+            const TbotsProto::World &world_msg);
 
     /**
      * Update Simulator Robot and get the latest robot control
      *
      * @param simulator_robots Vector of simulator robots
-     * @param vision_msg The vision msg for this team of robots
+     * @param world_msg The vision msg for this team of robots
      *
      * @return robot control
      */
     static SSLSimulationProto::RobotControl updateSimulatorRobots(
-        std::vector<std::shared_ptr<ErForceSimulatorRobot>> simulator_robots,
-        TbotsProto::Vision vision_msg);
+            const std::vector<std::shared_ptr<ErForceSimulatorRobot>>& simulator_robots,
+            const TbotsProto::World& world_msg);
 
     std::vector<std::shared_ptr<ErForceSimulatorRobot>> yellow_simulator_robots;
     std::vector<std::shared_ptr<ErForceSimulatorRobot>> blue_simulator_robots;
-    std::unique_ptr<TbotsProto::Vision> yellow_team_vision_msg;
-    std::unique_ptr<TbotsProto::Vision> blue_team_vision_msg;
+    std::unique_ptr<TbotsProto::World> yellow_team_world_msg;
+    std::unique_ptr<TbotsProto::World> blue_team_world_msg;
 
     unsigned int frame_number;
 

@@ -245,6 +245,19 @@ size_t Simulator::addLinearVelocityAgent(const Vector2 &position, float agent_ra
     return agents_.size() - 1;
 }
 
+Vector Simulator::getRobotVelocity(unsigned int robot_id) const
+{
+    auto agent_index_iter = friendly_robot_id_map.find(robot_id);
+    if (agent_index_iter != friendly_robot_id_map.end())
+    {
+        unsigned int agent_index = agent_index_iter->second;
+        Vector2 velocity_vector_2 = getAgentVelocity(agent_index);
+        return Vector(velocity_vector_2.getX(), velocity_vector_2.getY());
+    }
+    // TODO: Retruning 0 vector
+    return Vector();
+}
+
 std::size_t Simulator::addGoal(const Vector2 &position)
 {
     std::unique_ptr<Goal> goal = std::make_unique<Goal>(position);

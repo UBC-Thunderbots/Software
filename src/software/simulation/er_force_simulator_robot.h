@@ -91,7 +91,8 @@ class ErForceSimulatorRobot
      *
      * @param primitive_msg The primitive to start
      */
-    void startNewPrimitive(const TbotsProto::Primitive& primitive);
+    void startNewPrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set);
+    void updateWorldState(const TbotsProto::World &world_msg);
 
     /**
      * Runs the current primitive

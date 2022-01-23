@@ -53,8 +53,8 @@ void Thunderloop::run(unsigned run_at_hz)
         // TODO (#2333) poll redis service
 
         // Execute latest primitive
-        primitive_executor_.startPrimitive(robot_constants_, primitive_);
-        direct_control_ = *primitive_executor_.stepPrimitive(*current_robot_state_);
+        primitive_executor_.updatePrimitiveSet(robot_id_, primitive_set_);
+        direct_control_ = *primitive_executor_.stepPrimitive(0, *current_robot_state_);
 
         // Poll motor service with wheel velocities and dribbler rpm
         // TODO (#2332) properly implement, this is just a placeholder

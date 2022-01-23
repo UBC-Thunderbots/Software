@@ -195,6 +195,9 @@ class Simulator
      */
     Vector2 getAgentVelocity(std::size_t agentNo) const;
 
+//    TODO:
+    Vector getRobotVelocity(unsigned int robot_id) const;
+
     /**
      *   Returns the global time of the simulation.
      *

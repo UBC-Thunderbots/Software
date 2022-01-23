@@ -12,7 +12,8 @@ ErForceSimulatorRobot::ErForceSimulatorRobot(const RobotStateWithId& robot_state
       id(robot_state_with_id.id),
       robot_state(robot_state_with_id.robot_state),
       robot_constants(robot_constants),
-      wheel_constants(wheel_constants)
+      wheel_constants(wheel_constants),
+      primitive_executor()
 {
 }
 
@@ -112,12 +113,17 @@ void ErForceSimulatorRobot::chip(float distance_m)
     kick_angle = chip_angle.toDegrees();
 }
 
-void ErForceSimulatorRobot::startNewPrimitive(const TbotsProto::Primitive& primitive)
+void ErForceSimulatorRobot::startNewPrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set)
 {
-    primitive_executor.startPrimitive(robot_constants, primitive);
+    primitive_executor.updatePrimitiveSet(id, primitive_set);
+}
+
+void ErForceSimulatorRobot::updateWorldState(const TbotsProto::World &world_msg)
+{
+    primitive_executor.updateWorld(world_msg);
 }
 
 void ErForceSimulatorRobot::runCurrentPrimitive()
 {
-    direct_control = primitive_executor.stepPrimitive(robot_state);
+    direct_control = primitive_executor.stepPrimitive(id, robot_state);
 }

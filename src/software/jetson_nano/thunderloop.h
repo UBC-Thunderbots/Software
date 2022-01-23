@@ -63,7 +63,7 @@ class Thunderloop
     PrimitiveExecutor primitive_executor_;
 
     // Input Msg Buffers
-    TbotsProto::Primitive primitive_;
+    TbotsProto::PrimitiveSet primitive_set_;
     TbotsProto::DirectControlPrimitive direct_control_;
 
     // Output Msg Buffers
