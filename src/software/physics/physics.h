@@ -36,3 +36,29 @@ Point calculateFuturePosition(const Point &initial_position,
 Vector calculateFutureVelocity(const Vector &intial_velocity,
                                const Vector &constant_acceleration,
                                const Duration &duration_in_future);
+
+struct WheelSpeeds {
+    float front_right;
+    float front_left;
+    float back_right;
+    float back_left;
+};
+
+struct EuclideanSpeeds {
+    float x;
+    float y;
+    float rotation;
+};
+
+class EuclideanTo4Wheel
+{
+public:
+    EuclideanTo4Wheel() = delete;
+    EuclideanTo4Wheel(float front_wheel_angle_deg, float back_wheel_angle_deg);
+    WheelSpeeds convert_to_wheel_speeds(EuclideanSpeeds euclidean_speeds);
+    EuclideanSpeeds convert_to_euclidean_speeds(WheelSpeeds wheel_speeds);
+
+private:
+    float velocity_coupling_matrix_[3][4];
+    float delta_t_;
+};

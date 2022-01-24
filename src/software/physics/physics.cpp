@@ -25,3 +25,14 @@ Vector calculateFutureVelocity(const Vector &initial_velocity,
     double vy1 = initial_velocity.y() + seconds_in_future * constant_acceleration.y();
     return Vector(vx1, vy1);
 }
+
+EuclideanTo4Wheel::EuclideanTo4Wheel(float front_wheel_angle_deg, float back_wheel_angle_deg) {
+}
+
+WheelSpeeds EuclideanTo4Wheel::convert_to_wheel_speeds(EuclideanSpeeds euclidean_speeds) {
+    return WheelSpeeds();
+}
+
+EuclideanSpeeds EuclideanTo4Wheel::convert_to_euclidean_speeds(WheelSpeeds wheel_speeds) {
+    return EuclideanSpeeds();
+}
