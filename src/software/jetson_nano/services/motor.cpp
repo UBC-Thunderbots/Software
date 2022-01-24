@@ -16,7 +16,7 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/logger/logger.h"
 
-#define POSITION_SCALE_MAX  (int32_t)65536
+#define POSITION_SCALE_MAX (int32_t)65536
 #include <stdint.h>
 
 extern "C"
@@ -123,6 +123,100 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
     const TbotsProto::DirectControlPrimitive_DirectVelocityControl& local_velocity,
     float dribbler_speed_rpm)
 {
+    LOG(DEBUG) << "WAITING FOR ENCODER INIT";
+    sleep(10);
+    LOG(DEBUG) << "ENCODER INIT";
+    LOG(DEBUG) << "Haven't moved yet";
+
+    // Simone Parameters
+    tmc4671_writeInt(0, TMC4671_PID_FLUX_P_FLUX_I, 67109376);
+    tmc4671_writeInt(0, TMC4671_PID_TORQUE_P_TORQUE_I, 67109376);
+    tmc4671_writeInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I, 52428800);
+    tmc4671_writeInt(0, TMC4671_PID_POSITION_P_POSITION_I, 0);
+
+    tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS, 0);
+    tmc4671_writeInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS, 32767);
+    tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS, 5000);
+    tmc4671_writeInt(0, TMC4671_PID_ACCELERATION_LIMIT, 15000);
+    tmc4671_writeInt(0, TMC4671_PID_VELOCITY_LIMIT, 4000);
+    tmc4671_writeInt(0, TMC4671_PID_POSITION_LIMIT_LOW, -2147483647);
+    tmc4671_writeInt(0, TMC4671_PID_POSITION_LIMIT_HIGH, 2147483647);
+
+    sleep(2);
+    LOG(DEBUG) << "ENCODER INIT";
+    LOG(DEBUG) << "Haven't moved yet";
+    assert(tmc4671_readInt(0, TMC4671_PID_FLUX_P_FLUX_I) == 67109376);
+    assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_P_TORQUE_I) == 67109376);
+    assert(tmc4671_readInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I) == 52428800);
+    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_P_POSITION_I) == 0);
+    assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS) == 0);
+    assert(tmc4671_readInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS) == 32767);
+    assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS) == 5000);
+    assert(tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT) == 15000);
+    assert(tmc4671_readInt(0, TMC4671_PID_VELOCITY_LIMIT) == 4000);
+    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_LOW) == -2147483647);
+    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_HIGH) == 2147483647);
+
+    LOG(WARNING) << tmc4671_readInt(0, TMC6100_GSTAT);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_FLUX_P_FLUX_I);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_TORQUE_P_TORQUE_I);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_POSITION_P_POSITION_I);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_VELOCITY_LIMIT);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_LOW);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_HIGH);
+
+    LOG(WARNING) << tmc4671_readInt(0, TMC6100_GSTAT);
+    tmc4671_setTargetVelocity(0, 500);
+    LOG(DEBUG) << "Moved clockwise";
+
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_FLUX_P_FLUX_I);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_TORQUE_P_TORQUE_I);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_POSITION_P_POSITION_I);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_VELOCITY_LIMIT);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_LOW);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_HIGH);
+    LOG(WARNING) << tmc4671_readInt(0, TMC6100_GSTAT);
+    assert(tmc4671_readInt(0, TMC4671_PID_FLUX_P_FLUX_I) == 67109376);
+    assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_P_TORQUE_I) == 67109376);
+    assert(tmc4671_readInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I) == 52428800);
+    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_P_POSITION_I) == 0);
+    assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS) == 0);
+    assert(tmc4671_readInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS) == 32767);
+    assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS) == 5000);
+    assert(tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT) == 15000);
+    assert(tmc4671_readInt(0, TMC4671_PID_VELOCITY_LIMIT) == 4000);
+    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_LOW) == -2147483647);
+    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_HIGH) == 2147483647);
+    sleep(2);
+    LOG(DEBUG) << "Moving counter clockwise";
+    tmc4671_setTargetVelocity(0, -500);
+
+    assert(tmc4671_readInt(0, TMC4671_PID_FLUX_P_FLUX_I) == 67109376);
+    assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_P_TORQUE_I) == 67109376);
+    assert(tmc4671_readInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I) == 52428800);
+    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_P_POSITION_I) == 0);
+    assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS) == 0);
+    assert(tmc4671_readInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS) == 32767);
+    assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS) == 5000);
+    assert(tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT) == 15000);
+    assert(tmc4671_readInt(0, TMC4671_PID_VELOCITY_LIMIT) == 4000);
+    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_LOW) == -2147483647);
+    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_HIGH) == 2147483647);
+    sleep(2);
+    LOG(DEBUG) << "Stopping";
+    tmc4671_setTargetVelocity(0, 0);
+    sleep(2);
+
     // TODO (#2335) convert local velocity to per-wheel velocity
     // using http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf and then
     // communicate velocities to trinamic. Also read back feedback and
@@ -260,50 +354,72 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
 
 void MotorService::start()
 {
-
+    // TMC6100 INIT
     tmc6100_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GCONF, 32);
     uint32_t result = tmc6100_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GCONF);
+    assert(32 == result);
+    LOG(DEBUG) << "power stage online";
 
-    LOGF(DEBUG, "TMC6100 Configuration %x", result);
+    // Motor type & PWM configuration
+    tmc4671_writeInt(0, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
+    tmc4671_writeInt(0, TMC4671_PWM_POLARITIES, 0x00000000);
+    tmc4671_writeInt(0, TMC4671_PWM_MAXCNT, 0x00000F9F);
+    tmc4671_writeInt(0, TMC4671_PWM_BBM_H_BBM_L, 0x00001919);
+    tmc4671_writeInt(0, TMC4671_PWM_SV_CHOP, 0x00000107);
 
-    // Motor type &  PWM configuration
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PWM_POLARITIES, 0x00000000);
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PWM_MAXCNT, 0x00000F9F);
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PWM_BBM_H_BBM_L, 0x00001919);
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PWM_SV_CHOP, 0x00000007);
-    
     // ADC configuration
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_ADC_I_SELECT, 0x09000100);
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_dsADC_MCFG_B_MCFG_A, 0x00100010);
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_dsADC_MCLK_A, 0x20000000);
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_dsADC_MCLK_B, 0x20000000);
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_dsADC_MDEC_B_MDEC_A, 0x014E014E);
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_ADC_I0_SCALE_OFFSET, 0x010081D5);
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_ADC_I1_SCALE_OFFSET, 0x0100818F);
-    
+    tmc4671_writeInt(0, TMC4671_ADC_I_SELECT, 0x09000100);
+    tmc4671_writeInt(0, TMC4671_dsADC_MCFG_B_MCFG_A, 0x00100010);
+    tmc4671_writeInt(0, TMC4671_dsADC_MCLK_A, 0x20000000);
+    tmc4671_writeInt(0, TMC4671_dsADC_MCLK_B, 0x00000000);
+    tmc4671_writeInt(0, TMC4671_dsADC_MDEC_B_MDEC_A, 0x014E014E);
+    tmc4671_writeInt(0, TMC4671_ADC_I0_SCALE_OFFSET, 0x010081DD);
+    tmc4671_writeInt(0, TMC4671_ADC_I1_SCALE_OFFSET, 0x0100818E);
+
+    // Open loop settings
+    tmc4671_writeInt(0, TMC4671_OPENLOOP_MODE, 0x00000000);
+    tmc4671_writeInt(0, TMC4671_OPENLOOP_ACCELERATION, 0x0000003C);
+    tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0xFFFFFFFB);
+
+    // Feedback selection
+    tmc4671_writeInt(0, TMC4671_PHI_E_SELECTION, 0x00000002);
+    tmc4671_writeInt(0, TMC4671_UQ_UD_EXT, 0x00000779);
+
+    // ===== Open loop test drive =====
+    // Switch to open loop velocity mode
+    tmc4671_writeInt(0, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000008);
+
+    // Rotate right
+    tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000003C);
+    sleep(2);
+
+    // Rotate left
+    tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0xFFFFFFC4);
+    sleep(4);
+
+    // Stop
+    tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
+    sleep(2);
+    tmc4671_writeInt(0, TMC4671_UQ_UD_EXT, 0x00000000);
+
+
     // ABN encoder settings
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_ABN_DECODER_MODE, 0x00001000);
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_ABN_DECODER_PPR, 0x00001000);
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_ABN_DECODER_COUNT, 0x0000099B);
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_ABN_DECODER_PHI_E_PHI_M_OFFSET, 0x00000000);
-    
-    // Limits
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_TORQUE_FLUX_LIMITS, 0x000003E8);
-    
-    // PI settings
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_TORQUE_P_TORQUE_I, 0x01000100);
-    tmc4671_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC4671_PID_FLUX_P_FLUX_I, 0x01000100);
+    tmc4671_writeInt(0, TMC4671_ABN_DECODER_MODE, 0x00001000);
+    tmc4671_writeInt(0, TMC4671_ABN_DECODER_PPR, 0x00001000);
+    tmc4671_writeInt(0, TMC4671_ABN_DECODER_COUNT, 0x0000099B);
+    tmc4671_writeInt(0, TMC4671_ABN_DECODER_PHI_E_PHI_M_OFFSET, 0x00000000);
 
 
-    // ===== ABN encoder test drive =====
-    LOGF(DEBUG, "Motor type configured to : %x", tmc4671_getMotorType(FRONT_LEFT_MOTOR_CHIP_SELECT));
-    LOGF(DEBUG, "Pole pairs configured to : %x", tmc4671_getPolePairs(FRONT_LEFT_MOTOR_CHIP_SELECT));
+    // ABN encoder settings
+    LOGF(DEBUG, "Motor type configured to : %x",
+         tmc4671_getMotorType(FRONT_LEFT_MOTOR_CHIP_SELECT));
+    LOGF(DEBUG, "Pole pairs configured to : %x",
+         tmc4671_getPolePairs(FRONT_LEFT_MOTOR_CHIP_SELECT));
 
-    for (uint32_t motor = 0; motor < TOTAL_NUMBER_OF_MOTORS; motor++)
+    for (uint32_t motor = 0; motor < 1; motor++)
     {
-        motor_state_[motor].init_wait_time            = 1000;
-        motor_state_[motor].start_voltage             = 16000;  // UQ_UD_EXT
+        motor_state_[motor].init_wait_time            = 400;
+        motor_state_[motor].start_voltage             = 8000;  // UQ_UD_EXT
         motor_state_[motor].encoder_init_mode         = 0;
         motor_state_[motor].encoder_init_state        = 0;
         motor_state_[motor].hall_PHI_E_old            = 0;
@@ -315,20 +431,18 @@ void MotorService::start()
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
-        tmc4671_updatePhiSelectionAndInitialize(
-            motor, 0, 3, motor_state_[motor].encoder_init_mode,
-            &(motor_state_[motor].encoder_init_state));
+        tmc4671_writeInt(motor, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_ABN);
+        assert(tmc4671_readInt(motor, TMC4671_PHI_E_SELECTION) == TMC4671_PHI_E_ABN);
 #pragma GCC diagnostic pop
+        tmc4671_startEncoderInitialization(0, &(motor_state_[motor].encoder_init_mode),
+                                           &(motor_state_[motor].encoder_init_state));
     }
-
-
-    sleep(5);
 }
 
 
 void MotorService::periodicJob(uint32_t ms_tick)
 {
-    for (uint32_t motor = 0; motor < 1; motor++)
+    for (uint32_t motor = 0; motor < TOTAL_NUMBER_OF_MOTORS; motor++)
     {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"

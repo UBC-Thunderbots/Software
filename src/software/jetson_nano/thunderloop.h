@@ -57,8 +57,8 @@ class Thunderloop
 
     // Services
     std::unique_ptr<MotorService> motor_service_;
-   private:
 
+   private:
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;
 

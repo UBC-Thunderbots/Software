@@ -37,22 +37,25 @@ cc_library(
 cc_binary(
     name = "thunderloop_main",
     srcs = ["thunderloop_main.cpp"],
+    linkopts = [
+        "-lpthread",
+        "-lrt",
+    ],
     deps = [
         ":thunderloop",
         "//shared:constants",
     ],
-    linkopts = [
-        "-lpthread",
-        "-lrt",
-    ]
 )
 
 cc_binary(
     name = "motor_interface",
     srcs = ["motor_interface.c"],
     copts = ["-pthread"],
-    linkopts = ["-pthread", "-lrt"],
+    linkopts = [
+        "-pthread",
+        "-lrt",
+    ],
     deps = [
-        "@trinamic"
+        "@trinamic",
     ],
 )

@@ -1,4 +1,5 @@
 #include "software/jetson_nano/thunderloop.h"
+
 #include <limits.h>
 #include <malloc.h>
 #include <pthread.h>
@@ -25,7 +26,7 @@
 static Thunderloop* g_tloop;
 
 
-#define NSEC_PER_SEC    1000000000
+#define NSEC_PER_SEC 1000000000
 #define PRE_ALLOCATION_SIZE (100 * 1024 * 1024) /* 100MB pagefault free buffer */
 #define MY_STACK_SIZE (100 * 1024)              /* 100 kB is enough for now. */
 
@@ -41,19 +42,19 @@ static void setprio(int prio, int sched)
 void show_new_pagefault_count(const char* logtext, const char* allowed_maj,
                               const char* allowed_min)
 {
-    static long int last_majflt = 0, last_minflt = 0;
-    struct rusage usage;
+    // static long int last_majflt = 0, last_minflt = 0;
+    // struct rusage usage;
 
-    getrusage(RUSAGE_SELF, &usage);
+    // getrusage(RUSAGE_SELF, &usage);
 
-    LOGF(DEBUG,
-         "%-30.30s: Pagefaults, Major:%ld (Allowed %s), "
-         "Minor:%ld (Allowed %s)\n",
-         logtext, usage.ru_majflt - last_majflt, allowed_maj,
-         usage.ru_minflt - last_minflt, allowed_min);
+    ////LOGF(DEBUG,
+    ////"%-30.30s: Pagefaults, Major:%ld (Allowed %s), "
+    ////"Minor:%ld (Allowed %s)\n",
+    ////logtext, usage.ru_majflt - last_majflt, allowed_maj,
+    ////usage.ru_minflt - last_minflt, allowed_min);
 
-    last_majflt = usage.ru_majflt;
-    last_minflt = usage.ru_minflt;
+    ////last_majflt = usage.ru_majflt;
+    ////last_minflt = usage.ru_minflt;
 }
 
 static void prove_thread_stack_use_is_safe(int stacksize)
@@ -100,14 +101,14 @@ static inline void tsnorm(struct timespec* ts)
 static void* my_rt_thread(void* args)
 {
     struct timespec t;
-    int interval_ns = 1000000; // 1ms
+    int interval_ns = 1000000;  // 1ms
 
     setprio(sched_get_priority_max(SCHED_RR), SCHED_RR);
 
-    LOGF(DEBUG,
-         "I am an RT-thread with a stack that does not generate "
-         "page-faults during use, stacksize=%i\n",
-         MY_STACK_SIZE);
+    // LOGF(DEBUG,
+    //"I am an RT-thread with a stack that does not generate "
+    //"page-faults during use, stacksize=%i\n",
+    // MY_STACK_SIZE);
 
     /* get current time */
     clock_gettime(0, &t);
@@ -120,7 +121,7 @@ static void* my_rt_thread(void* args)
     LOG(WARNING) << "REAL TIME THREAD STARTING";
     while (1)
     {
-        /* wait untill next shot */
+        /* wait until next shot */
         clock_nanosleep(0, TIMER_ABSTIME, &t, NULL);
 
         millisecond_counter++;
@@ -144,7 +145,7 @@ static void* my_rt_thread(void* args)
 static void error(int at)
 {
     /* Just exit on error */
-    fprintf(stderr, "Some error occured at %d", at);
+    fprintf(stderr, "Some error occurred at %d", at);
     exit(1);
 }
 
@@ -252,13 +253,13 @@ void Thunderloop::run(unsigned run_at_hz)
     reserve_process_memory(PRE_ALLOCATION_SIZE);
     show_new_pagefault_count("2nd malloc() and use generated", "0", "0");
 
-    LOGF(DEBUG,
-         "\n\nLook at the output of ps -leyf, and see that the "
-         "RSS is now about %d [MB]\n",
-         PRE_ALLOCATION_SIZE / (1024 * 1024));
+    // LOGF(DEBUG,
+    //"\n\nLook at the output of ps -leyf, and see that the "
+    //"RSS is now about %d [MB]\n",
+    // PRE_ALLOCATION_SIZE / (1024 * 1024));
 
-    start_rt_thread();
     motor_service_->start();
+    start_rt_thread();
 
     for (;;)
     {
