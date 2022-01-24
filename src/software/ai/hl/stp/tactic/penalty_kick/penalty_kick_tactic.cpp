@@ -22,11 +22,6 @@ void PenaltyKickTactic::accept(TacticVisitor& visitor) const
     visitor.visit(*this);
 }
 
-bool PenaltyKickTactic::done() const
-{
-    return fsm.is(boost::sml::X);
-}
-
 void PenaltyKickTactic::updateIntent(const TacticUpdate& tactic_update)
 {
     fsm.process_event(PenaltyKickFSM::Update({}, tactic_update));

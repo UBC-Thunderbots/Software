@@ -51,7 +51,7 @@ class ChipTactic : public Tactic
 
     void accept(TacticVisitor& visitor) const override;
 
-    bool done() const override;
+    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
     void updateIntent(const TacticUpdate& tactic_update) override;
