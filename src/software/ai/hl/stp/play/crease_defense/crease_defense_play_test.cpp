@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/simulated_tests/non_terminating_validation_functions/ball_in_play_or_scored_validation.h"
-#include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_halt_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -11,7 +11,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class CreaseDefensePlayTest : public SimulatedPlayTestFixture
+class CreaseDefensePlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
     Field field = Field::createSSLDivisionBField();
@@ -34,8 +34,8 @@ TEST_F(CreaseDefensePlayTest, test_defense_play)
     });
     setEnemyGoalie(0);
     setAIPlayConstructor([this, ball_state]() -> std::unique_ptr<Play> {
-        std::unique_ptr<CreaseDefensePlay> play = std::make_unique<CreaseDefensePlay>(
-            friendly_thunderbots_config->getPlayConfig());
+        std::unique_ptr<CreaseDefensePlay> play =
+            std::make_unique<CreaseDefensePlay>(thunderbots_config->getPlayConfig());
         play->updateControlParams(Point(1, 3));
         return play;
     });

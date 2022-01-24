@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/simulated_tests/non_terminating_validation_functions/enemy_never_scores_validation.h"
-#include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -16,7 +16,7 @@
  * https://robocup-ssl.github.io/ssl-rules/sslrules.html#_penalty_kick
  * */
 class PenaltyKickEnemyPlayTest
-    : public SimulatedPlayTestFixture,
+    : public SimulatedErForceSimPlayTestFixture,
       public ::testing::WithParamInterface<std::tuple<
           RefereeCommand, RefereeCommand, std::vector<RobotStateWithId>, float>>
 {
