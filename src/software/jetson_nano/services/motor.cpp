@@ -143,7 +143,7 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 
     if (ret < 1)
     {
-        LOG(FATAL) << "SPI Transfer to motor failed, not safe to proceed";
+        LOG(FATAL) << "SPI Transfer to motor failed, not safe to proceed: errno " << ret;
     }
 }
 
