@@ -99,6 +99,10 @@ void SimulatedTestFixture::SetUp()
     {
         enableVisualizer();
     }
+    if (TbotsGtestMain::run_sim_in_realtime)
+    {
+        run_simulation_in_realtime = true;
+    }
     setupReplayLogging();
 
     // Reset tick duration trackers
@@ -117,8 +121,8 @@ void SimulatedTestFixture::SetUp()
 
 void SimulatedTestFixture::enableVisualizer()
 {
-    // full_system_gui =
-    // std::make_shared<ThreadedFullSystemGUI>(friendly_mutable_thunderbots_config);
+    full_system_gui =
+        std::make_shared<ThreadedFullSystemGUI>(friendly_mutable_thunderbots_config);
     run_simulation_in_realtime = true;
 }
 
