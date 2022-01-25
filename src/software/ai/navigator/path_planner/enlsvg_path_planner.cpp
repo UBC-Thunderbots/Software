@@ -23,17 +23,17 @@ void EnlsvgPathPlanner::createObstaclesInGrid(const std::vector<ObstaclePtr> &ob
 {
     // block boundary areas
     double offset_in_enlsvg = boundary_margin / resolution;
-    for (int x = 0; x < offset_in_enlsvg; ++x)
+    for (unsigned x = 0; x < offset_in_enlsvg; ++x)
     {
-        for (int y = 0; y < num_grid_cols; ++y)
+        for (unsigned y = 0; y < num_grid_cols; ++y)
         {
             enlsvg_grid->setBlocked(x, y, true);
             enlsvg_grid->setBlocked(num_grid_rows - 1 - x, y, true);
         }
     }
-    for (int y = 0; y < offset_in_enlsvg; ++y)
+    for (unsigned y = 0; y < offset_in_enlsvg; ++y)
     {
-        for (int x = 0; x < num_grid_rows; ++x)
+        for (unsigned x = 0; x < num_grid_rows; ++x)
         {
             enlsvg_grid->setBlocked(x, y, true);
             enlsvg_grid->setBlocked(x, num_grid_cols - 1 - y, true);
