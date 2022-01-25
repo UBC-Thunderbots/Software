@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Eigen/Dense>
+
 #include "software/geom/point.h"
 #include "software/time/duration.h"
 
@@ -59,6 +61,7 @@ public:
     EuclideanSpeeds convert_to_euclidean_speeds(WheelSpeeds wheel_speeds);
 
 private:
-    float velocity_coupling_matrix_[3][4];
+    Eigen::Matrix<float, 3, 4> wheel_to_euclidean_velocity_coupling_matrix_;
+    float acceleration_to_velocity(float acceleration, float current_velocity);
     float delta_t_;
 };

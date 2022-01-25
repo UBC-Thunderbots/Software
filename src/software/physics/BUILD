@@ -11,6 +11,7 @@ cc_library(
     deps = [
         "//software/geom:point",
         "//software/time:duration",
+        "@eigen",
     ],
 )
 

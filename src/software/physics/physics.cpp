@@ -1,5 +1,7 @@
 #include "software/physics/physics.h"
 
+#include <math.h>
+
 Point calculateFuturePosition(const Point &initial_position,
                               const Vector &initial_velocity,
                               const Vector &constant_acceleration,
@@ -26,13 +28,30 @@ Vector calculateFutureVelocity(const Vector &initial_velocity,
     return Vector(vx1, vy1);
 }
 
-EuclideanTo4Wheel::EuclideanTo4Wheel(float front_wheel_angle_deg, float back_wheel_angle_deg) {
+EuclideanTo4Wheel::EuclideanTo4Wheel(float front_wheel_angle_deg, float back_wheel_angle_deg)
+{
+    // TODO: replace with Thunderloop polling rate constant
+    delta_t_ = 1.0 / 200;
+
+    // TODO: check wheel angles and orientations
+    wheel_to_euclidean_velocity_coupling_matrix_ << -1/sin(front_wheel_angle_deg), -1/sin(back_wheel_angle_deg),
+                                                    1/sin(back_wheel_angle_deg), 1/sin(front_wheel_angle_deg),
+                                                    1/cos(front_wheel_angle_deg), -1/cos(back_wheel_angle_deg),
+                                                    -1/cos(back_wheel_angle_deg), 1/cos(front_wheel_angle_deg),
+                                                    1, 1, 1, 1;
 }
 
-WheelSpeeds EuclideanTo4Wheel::convert_to_wheel_speeds(EuclideanSpeeds euclidean_speeds) {
+WheelSpeeds EuclideanTo4Wheel::convert_to_wheel_speeds(EuclideanSpeeds euclidean_speeds)
+{
     return WheelSpeeds();
 }
 
-EuclideanSpeeds EuclideanTo4Wheel::convert_to_euclidean_speeds(WheelSpeeds wheel_speeds) {
+EuclideanSpeeds EuclideanTo4Wheel::convert_to_euclidean_speeds(WheelSpeeds wheel_speeds)
+{
     return EuclideanSpeeds();
+}
+
+float EuclideanTo4Wheel::acceleration_to_velocity(float acceleration, float current_velocity)
+{
+    return acceleration * delta_t_ + current_velocity;
 }
