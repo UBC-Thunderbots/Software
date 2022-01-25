@@ -1,10 +1,12 @@
 #include "software/ai/navigator/path_planner/enlsvg_path_planner.h"
-#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
-#include "software/test_util/test_util.h"
 
 #include <gtest/gtest.h>
+
 #include <chrono>
 #include <random>
+
+#include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
+#include "software/test_util/test_util.h"
 
 class TestEnlsvgPathPlanner : public testing::Test
 {
@@ -759,48 +761,52 @@ TEST_F(TestEnlsvgPathPlanner,
     checkPathDoesNotIntersectObstacle(path_points, obstacles);
 }
 
-TEST_F(TestEnlsvgPathPlanner,
-      test_enlsvg_path_planner_speed_test)
+TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_speed_test)
 {
-    // This test does not assert anything. It prints how long it takes to path plan 121 pseudo-randomly generated paths
-    // once the planner is initialized
-    const int num_paths_to_gen { 121 };
-    
+    // This test does not assert anything. It prints how long it takes to path plan 121
+    // pseudo-randomly generated paths once the planner is initialized
+    const int num_paths_to_gen{121};
+
     // Create blank div A field
     Field field        = Field::createSSLDivisionAField();
     Team friendly_team = Team(Duration::fromMilliseconds(1000));
     Team enemy_team    = Team(Duration::fromMilliseconds(1000));
     Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
-    World world = World(field, ball, friendly_team, enemy_team);
-    
+    World world        = World(field, ball, friendly_team, enemy_team);
+
     Rectangle navigable_area = world.field().fieldBoundary();
 
     std::mt19937 random_num_gen;
-    std::uniform_real_distribution x_distribution(-world.field().xLength() / 2, world.field().xLength() / 2);
-    std::uniform_real_distribution y_distribution(-world.field().yLength() / 2, world.field().yLength() / 2);
-    
-    // Create static obstacles with friendly and enemy defense areas blocked off along with the centre circle
+    std::uniform_real_distribution x_distribution(-world.field().xLength() / 2,
+                                                  world.field().xLength() / 2);
+    std::uniform_real_distribution y_distribution(-world.field().yLength() / 2,
+                                                  world.field().yLength() / 2);
+
+    // Create static obstacles with friendly and enemy defense areas blocked off along
+    // with the centre circle
     std::vector<ObstaclePtr> obstacles = {
         robot_navigation_obstacle_factory.createFromMotionConstraints(
-            { MotionConstraint::CENTER_CIRCLE, MotionConstraint::FRIENDLY_DEFENSE_AREA,
-             MotionConstraint::ENEMY_DEFENSE_AREA }, world),
+            {MotionConstraint::CENTER_CIRCLE, MotionConstraint::FRIENDLY_DEFENSE_AREA,
+             MotionConstraint::ENEMY_DEFENSE_AREA},
+            world),
     };
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, world.field().boundaryMargin());
-    
+
     auto start_time = std::chrono::system_clock::now();
-    
+
     for (int i = 0; i < num_paths_to_gen; ++i)
     {
-        Point start { x_distribution(random_num_gen), y_distribution(random_num_gen) };
-        Point end   { x_distribution(random_num_gen), y_distribution(random_num_gen) };
-        
+        Point start{x_distribution(random_num_gen), y_distribution(random_num_gen)};
+        Point end{x_distribution(random_num_gen), y_distribution(random_num_gen)};
+
         auto path = planner.findPath(start, end, navigable_area, obstacles);
     }
-    
+
     double duration_ms = ::TestUtil::millisecondsSince(start_time);
-    double avg_ms = duration_ms / static_cast<double>(num_paths_to_gen);
-    
-    std::cout << "Took " << duration_ms << "ms to run, average time of " << avg_ms << "ms" << std::endl;
+    double avg_ms      = duration_ms / static_cast<double>(num_paths_to_gen);
+
+    std::cout << "Took " << duration_ms << "ms to run, average time of " << avg_ms << "ms"
+              << std::endl;
 }
