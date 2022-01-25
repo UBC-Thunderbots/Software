@@ -98,8 +98,8 @@ void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 {
     attacker_tactic =
         std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
-    receiver_tactic                        = std::make_shared<ReceiverTactic>();
-    Timestamp pass_optimization_start_time = event.common.world.getMostRecentTimestamp();
+    receiver_tactic              = std::make_shared<ReceiverTactic>();
+    pass_optimization_start_time = event.common.world.getMostRecentTimestamp();
     lookForPass(event);
 }
 

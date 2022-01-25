@@ -321,3 +321,25 @@ std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp()
     timestamp_msg->set_epoch_timestamp_seconds(time_in_seconds);
     return timestamp_msg;
 }
+
+std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
+    const std::vector<PassWithRating>& passes_with_rating)
+{
+    auto pass_visualization_msg = std::make_unique<TbotsProto::PassVisualization>();
+
+    for (const auto& pass_with_rating : passes_with_rating)
+    {
+        auto pass_msg = std::make_unique<TbotsProto::Pass>();
+        *(pass_msg->mutable_passer()) =
+            *createPointProto(pass_with_rating.pass.passerPoint());
+        *(pass_msg->mutable_receiver()) =
+            *createPointProto(pass_with_rating.pass.receiverPoint());
+
+        auto pass_with_rating_msg = std::make_unique<TbotsProto::PassWithRating>();
+        pass_with_rating_msg->set_rating(pass_with_rating.rating);
+        *(pass_with_rating_msg->mutable_pass_()) = *pass_msg;
+
+        *(pass_visualization_msg->add_best_passes()) = *pass_with_rating_msg;
+    }
+    return pass_visualization_msg;
+}

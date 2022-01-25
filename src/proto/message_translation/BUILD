@@ -8,6 +8,8 @@ cc_library(
     deps = [
         ":tbots_geometry",
         "//proto:tbots_cc_proto",
+        "//proto:visualization_cc_proto",
+        "//software/ai/passing:pass_with_rating",
         "//software/geom:angle",
         "//software/geom:point",
         "//software/geom:vector",

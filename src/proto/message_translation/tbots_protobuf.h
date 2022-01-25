@@ -3,7 +3,9 @@
 #include "proto/message_translation/tbots_geometry.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/vision.pb.h"
+#include "proto/visualization.pb.h"
 #include "proto/world.pb.h"
+#include "software/ai/passing/pass_with_rating.h"
 #include "software/world/world.h"
 
 /**
@@ -93,3 +95,14 @@ std::unique_ptr<TbotsProto::Timestamp> createTimestamp(const Timestamp& timestam
  * @return The unique_ptr to a TbotsProto::Timestamp with the current UTC time
  */
 std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp();
+
+
+/**
+ * Returns a pass visualization given a vector of the best passes
+ *
+ * @param A vector of passes across their fields  with their ratings
+ *
+ * @return The unique_ptr to a PassVisualization proto
+ */
+std::unique_ptr<TbotsProto::PassVisualization> createPassVisualization(
+    const std::vector<PassWithRating>& passes_with_rating);

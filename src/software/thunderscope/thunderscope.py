@@ -3,7 +3,7 @@ import signal
 
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
-from field import obstacle_layer, path_layer, world_layer
+from field import obstacle_layer, path_layer, world_layer, pass_layer
 
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
@@ -31,6 +31,7 @@ if __name__ == "__main__":
     field.add_layer("Vision", world_layer.WorldLayer())
     field.add_layer("Obstacles", obstacle_layer.ObstacleLayer())
     field.add_layer("Path", path_layer.PathLayer())
+    field.add_layer("PassGenerator", pass_layer.PassLayer())
 
     field_dock = Dock("Field", size=(500, 2000))
     field_dock.addWidget(field)

@@ -4,6 +4,7 @@
 #include <experimental/filesystem>
 
 #include "proto/message_translation/ssl_wrapper.h"
+#include "proto/message_translation/tbots_protobuf.h"
 #include "shared/2015_robot_constants.h"
 #include "software/logger/logger.h"
 #include "software/test_util/test_util.h"
@@ -116,8 +117,8 @@ void SimulatedTestFixture::SetUp()
 
 void SimulatedTestFixture::enableVisualizer()
 {
-    full_system_gui =
-        std::make_shared<ThreadedFullSystemGUI>(friendly_mutable_thunderbots_config);
+    // full_system_gui =
+    // std::make_shared<ThreadedFullSystemGUI>(friendly_mutable_thunderbots_config);
     run_simulation_in_realtime = true;
 }
 
@@ -355,6 +356,8 @@ bool SimulatedTestFixture::tickTest(Duration simulation_time_step, Duration ai_t
     {
         *friendly_world = friendly_sensor_fusion.getWorld().value();
         *enemy_world    = enemy_sensor_fusion.getWorld().value();
+
+        LOG(VISUALIZE) << *createWorld(*friendly_world);
 
         validation_functions_done = validateAndCheckCompletion(
             terminating_function_validators, non_terminating_function_validators);
