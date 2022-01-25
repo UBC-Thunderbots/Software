@@ -81,12 +81,12 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     // move tactics to use to move to positions defined above
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
-        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true)};
+        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
+        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
+        std::make_shared<MoveTactic>()};
 
     // specific tactics
-    auto kickoff_chip_tactic = std::make_shared<KickoffChipTactic>(true);
+    auto kickoff_chip_tactic = std::make_shared<KickoffChipTactic>();
 
     // Part 1: setup state (move to key positions)
     while (world.gameState().isSetupState())

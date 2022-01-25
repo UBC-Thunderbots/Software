@@ -528,9 +528,26 @@ world::SimulatorState Simulator::getSimulatorState()
         for (const auto &it : team)
         {
             SimRobot *robot = it.first;
+
+            // convert coordinates from ER Force
+            btVector3 robotPos = robot->position() / SIMULATOR_SCALE;
+            btVector3 newRobotPos;
+
+            coordinates::toVision(robotPos, newRobotPos);
+
             auto *robotProto =
                 teamIsBlue ? simState.add_blue_robots() : simState.add_yellow_robots();
+
             robot->update(robotProto);
+
+            // Convert mm to m
+            robotProto->set_p_x(newRobotPos.x() / 1000);
+            robotProto->set_p_y(newRobotPos.y() / 1000);
+
+            // Convert velocity
+            coordinates::toVisionVelocity(*robotProto, *robotProto);
+            robotProto->set_v_x(robotProto->v_x() / 1000);
+            robotProto->set_v_y(robotProto->v_y() / 1000);
         }
     }
 
@@ -628,14 +645,17 @@ void Simulator::moveRobot(const sslsim::TeleportRobot &robot)
 {
     if (!robot.id().has_team())
         return;
+
     if (!robot.id().has_id())
         return;
+
     bool is_blue = robot.id().team() == gameController::Team::BLUE;
 
     RobotMap &list = is_blue ? m_data->robotsBlue : m_data->robotsYellow;
     bool isPresent = list.contains(robot.id().id());
     QMap<uint32_t, robot::Specs> &teamSpecs =
         is_blue ? m_data->specsBlue : m_data->specsYellow;
+
     if (robot.has_present())
     {
         if (robot.present() && !isPresent)

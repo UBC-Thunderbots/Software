@@ -12,7 +12,6 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
-        "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/tactic",
         "//software/ai/intent:move_intent",
         "//software/geom:triangle",

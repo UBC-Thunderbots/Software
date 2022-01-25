@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/test_util/test_util.h"
