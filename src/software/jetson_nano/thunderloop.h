@@ -49,11 +49,9 @@ class Thunderloop
     ~Thunderloop();
 
     /*
-     * Run the main robot loop!
-     *
-     * @param The rate to run the loop
+     * Run the main robot loop once!
      */
-    void run(unsigned run_at_hz);
+    void runOnce();
 
     // Services
     std::unique_ptr<MotorService> motor_service_;
