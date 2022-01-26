@@ -27,11 +27,6 @@ void ReceiverTactic::updateIntent(const TacticUpdate& tactic_update)
     fsm.process_event(ReceiverFSM::Update(control_params, tactic_update));
 }
 
-bool ReceiverTactic::done() const
-{
-    return fsm.is(boost::sml::X);
-}
-
 double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world) const
 {
     // If we have no receive point, make it expensive to assign this robot

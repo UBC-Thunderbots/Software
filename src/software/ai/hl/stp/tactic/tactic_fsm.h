@@ -42,3 +42,15 @@ struct TacticUpdate
         ControlParams control_params;                                                    \
         TacticUpdate common;                                                             \
     };
+
+#define DEFINE_TACTIC_DONE_AND_GET_FSM_STATE                                             \
+    bool done() const override                                                           \
+    {                                                                                    \
+        return fsm.is(boost::sml::X);                                                    \
+    }                                                                                    \
+                                                                                         \
+    std::string getFSMState() const override                                             \
+    {                                                                                    \
+        std::string state_str = getCurrentFullStateName(fsm);                            \
+        return state_str;                                                                \
+    }

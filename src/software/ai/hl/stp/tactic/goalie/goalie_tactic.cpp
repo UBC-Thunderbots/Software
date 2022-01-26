@@ -24,11 +24,6 @@ double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world) 
     }
 }
 
-bool GoalieTactic::done() const
-{
-    return fsm.is(boost::sml::X);
-}
-
 void GoalieTactic::updateIntent(const TacticUpdate &tactic_update)
 {
     fsm.process_event(GoalieFSM::Update({}, tactic_update));

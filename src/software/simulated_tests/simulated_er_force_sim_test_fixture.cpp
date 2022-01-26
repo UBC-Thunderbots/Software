@@ -1,5 +1,8 @@
 #include "software/simulated_tests/simulated_er_force_sim_test_fixture.h"
 
+// TODO (#2419): remove this
+#include <fenv.h>
+
 #include <cstdlib>
 #include <experimental/filesystem>
 
@@ -130,7 +133,11 @@ bool SimulatedErForceSimTestFixture::validateAndCheckCompletion(
 void SimulatedErForceSimTestFixture::updateSensorFusion(
     std::shared_ptr<ErForceSimulator> simulator)
 {
+    // TODO (#2419): remove this to re-enable sigfpe checks
+    fedisableexcept(FE_INVALID | FE_OVERFLOW);
     auto ssl_wrapper_packets = simulator->getSSLWrapperPackets();
+    // TODO (#2419): remove this to re-enable sigfpe checks
+    feenableexcept(FE_INVALID | FE_OVERFLOW);
 
     for (const auto &packet : ssl_wrapper_packets)
     {
@@ -179,11 +186,11 @@ void SimulatedErForceSimTestFixture::runTest(
     const Duration &timeout)
 {
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
-        FieldType::DIV_A, create2015RobotConstants(), create2015WheelConstants(),
+        FieldType::DIV_B, create2015RobotConstants(), create2015WheelConstants(),
         thunderbots_config->getSimulatorConfig()));
     simulator->setBallState(ball);
-    simulator->addYellowRobots(friendly_robots);
-    simulator->addBlueRobots(enemy_robots);
+    simulator->setYellowRobots(friendly_robots);
+    simulator->setBlueRobots(enemy_robots);
 
     updateSensorFusion(simulator);
     std::shared_ptr<World> world;
@@ -272,7 +279,11 @@ bool SimulatedErForceSimTestFixture::tickTest(Duration simulation_time_step,
     bool validation_functions_done = false;
     for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
     {
+        // TODO (#2419): remove this to re-enable sigfpe checks
+        fedisableexcept(FE_INVALID | FE_OVERFLOW);
         simulator->stepSimulation(simulation_time_step);
+        // TODO (#2419): remove this to re-enable sigfpe checks
+        feenableexcept(FE_INVALID | FE_OVERFLOW);
         updateSensorFusion(simulator);
     }
 
