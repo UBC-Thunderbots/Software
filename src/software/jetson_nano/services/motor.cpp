@@ -135,76 +135,76 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
 
     sleep(2);
 
-     LOG(DEBUG) << "ENCODER INIT";
-     LOG(DEBUG) << "Haven't moved yet";
+    LOG(DEBUG) << "ENCODER INIT";
+    LOG(DEBUG) << "Haven't moved yet";
 
-     // Simone Parameters
-     tmc4671_writeInt(0, TMC4671_PID_FLUX_P_FLUX_I, 67109376);
-     tmc4671_writeInt(0, TMC4671_PID_TORQUE_P_TORQUE_I, 67109376);
-     tmc4671_writeInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I, 52428800);
-     tmc4671_writeInt(0, TMC4671_PID_POSITION_P_POSITION_I, 0);
+    // Simone Parameters
+    tmc4671_writeInt(0, TMC4671_PID_FLUX_P_FLUX_I, 67109376);
+    tmc4671_writeInt(0, TMC4671_PID_TORQUE_P_TORQUE_I, 67109376);
+    tmc4671_writeInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I, 52428800);
+    tmc4671_writeInt(0, TMC4671_PID_POSITION_P_POSITION_I, 0);
 
-     tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS, 0);
-     tmc4671_writeInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS, 32767);
-     tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS, 5000);
-     tmc4671_writeInt(0, TMC4671_PID_ACCELERATION_LIMIT, 15000);
-     tmc4671_writeInt(0, TMC4671_PID_VELOCITY_LIMIT, 4000);
-     tmc4671_writeInt(0, TMC4671_PID_POSITION_LIMIT_LOW, -2147483647);
-     tmc4671_writeInt(0, TMC4671_PID_POSITION_LIMIT_HIGH, 2147483647);
+    tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS, 0);
+    tmc4671_writeInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS, 32767);
+    tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS, 5000);
+    tmc4671_writeInt(0, TMC4671_PID_ACCELERATION_LIMIT, 15000);
+    tmc4671_writeInt(0, TMC4671_PID_VELOCITY_LIMIT, 4000);
+    tmc4671_writeInt(0, TMC4671_PID_POSITION_LIMIT_LOW, -2147483647);
+    tmc4671_writeInt(0, TMC4671_PID_POSITION_LIMIT_HIGH, 2147483647);
 
-     sleep(2);
-     tmc4671_setTargetVelocity(0, 100);
-     LOG(DEBUG) << "Moved clockwise";
+    sleep(2);
+    tmc4671_setTargetVelocity(0, 100);
+    LOG(DEBUG) << "Moved clockwise";
 
-     LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_FLUX_P_FLUX_I);
-     LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_TORQUE_P_TORQUE_I);
-     LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I);
-     LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_POSITION_P_POSITION_I);
-     LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS);
-     LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS);
-     LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS);
-     LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT);
-     LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_VELOCITY_LIMIT);
-     LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_LOW);
-     LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_HIGH);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_FLUX_P_FLUX_I);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_TORQUE_P_TORQUE_I);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_POSITION_P_POSITION_I);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_VELOCITY_LIMIT);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_LOW);
+    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_HIGH);
 
-     int32_t drive_strength_0 =
-         (tmc6100_readInt(0, TMC6100_DRV_CONF) & (TMC6100_DRVSTRENGTH_MASK)) >>
-         TMC6100_DRVSTRENGTH_SHIFT;
-     assert(drive_strength_0 == 0);
+    int32_t drive_strength_0 =
+        (tmc6100_readInt(0, TMC6100_DRV_CONF) & (TMC6100_DRVSTRENGTH_MASK)) >>
+        TMC6100_DRVSTRENGTH_SHIFT;
+    assert(drive_strength_0 == 0);
 
-     assert(tmc4671_readInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I) == 52428800);
-     assert(tmc4671_readInt(0, TMC4671_PID_POSITION_P_POSITION_I) == 0);
-     assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS) == 0);
-     assert(tmc4671_readInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS) == 32767);
-     assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS) == 5000);
-     assert(tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT) == 15000);
-     assert(tmc4671_readInt(0, TMC4671_PID_VELOCITY_LIMIT) == 4000);
-     assert(tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_LOW) == -2147483647);
-     assert(tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_HIGH) == 2147483647);
-     sleep(2);
-     LOG(DEBUG) << "Moving counter clockwise";
-     tmc4671_setTargetVelocity(0, -500);
+    assert(tmc4671_readInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I) == 52428800);
+    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_P_POSITION_I) == 0);
+    assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS) == 0);
+    assert(tmc4671_readInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS) == 32767);
+    assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS) == 5000);
+    assert(tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT) == 15000);
+    assert(tmc4671_readInt(0, TMC4671_PID_VELOCITY_LIMIT) == 4000);
+    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_LOW) == -2147483647);
+    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_HIGH) == 2147483647);
+    sleep(2);
+    LOG(DEBUG) << "Moving counter clockwise";
+    tmc4671_setTargetVelocity(0, -500);
 
-     assert(tmc4671_readInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I) == 52428800);
-     assert(tmc4671_readInt(0, TMC4671_PID_POSITION_P_POSITION_I) == 0);
-     assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS) == 0);
-     assert(tmc4671_readInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS) == 32767);
-     assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS) == 5000);
-     assert(tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT) == 15000);
-     assert(tmc4671_readInt(0, TMC4671_PID_VELOCITY_LIMIT) == 4000);
-     assert(tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_LOW) == -2147483647);
-     assert(tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_HIGH) == 2147483647);
-     sleep(2);
-     LOG(DEBUG) << "Stopping";
-     tmc4671_setTargetVelocity(0, 0);
-     sleep(2);
+    assert(tmc4671_readInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I) == 52428800);
+    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_P_POSITION_I) == 0);
+    assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS) == 0);
+    assert(tmc4671_readInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS) == 32767);
+    assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS) == 5000);
+    assert(tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT) == 15000);
+    assert(tmc4671_readInt(0, TMC4671_PID_VELOCITY_LIMIT) == 4000);
+    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_LOW) == -2147483647);
+    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_HIGH) == 2147483647);
+    sleep(2);
+    LOG(DEBUG) << "Stopping";
+    tmc4671_setTargetVelocity(0, 0);
+    sleep(2);
 
-     // TODO (#2335) convert local velocity to per-wheel velocity
-     // using http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf and then
-     // communicate velocities to trinamic. Also read back feedback and
-     // return drive unit status.
-     return std::make_unique<TbotsProto::DriveUnitStatus>();
+    // TODO (#2335) convert local velocity to per-wheel velocity
+    // using http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf and then
+    // communicate velocities to trinamic. Also read back feedback and
+    // return drive unit status.
+    return std::make_unique<TbotsProto::DriveUnitStatus>();
 }
 
 void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, unsigned len)

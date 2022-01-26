@@ -72,7 +72,7 @@ static void configure_malloc_behavior(void)
 static void* motorServicePeriodicJob(void* args)
 {
     struct timespec t;
-    int interval_ns = 1000000;  // 1ms
+    int interval_ns              = 1000000;  // 1ms
     uint32_t millisecond_counter = 0;
 
     setprio(sched_get_priority_max(SCHED_RR), SCHED_RR);
@@ -124,7 +124,7 @@ static void reserve_process_memory(int size)
     // the memory pool reserved and locked above. Issuing free() and
     // delete() does NOT make this locking undone. So, with this locking
     // mechanism we can build C++ applications that will never run into
-    // a major/minor pagefault, even with swapping enabled. 
+    // a major/minor pagefault, even with swapping enabled.
     free(buffer);
 }
 

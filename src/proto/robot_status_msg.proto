@@ -17,14 +17,14 @@ message RobotStatus
     PowerStatus power_status                  = 9;
     TemperatureStatus temperature_status      = 10;
     Timestamp time_sent                       = 11;
-    ThunderloopStatus thunderloop_status = 12;
+    ThunderloopStatus thunderloop_status      = 12;
 }
 
 message ThunderloopStatus
 {
-    double network_service_poll_time_ns = 1;
+    double network_service_poll_time_ns     = 1;
     double primitive_executor_start_time_ns = 2;
-    double motor_service_poll_time_ns = 3;
+    double motor_service_poll_time_ns       = 3;
 }
 
 /* Data about the status of the break beam */
