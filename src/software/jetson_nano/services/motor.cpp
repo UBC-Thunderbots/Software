@@ -81,25 +81,29 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     file_descriptors[chip_select] = open(SPI_PATHS[chip_select], O_RDWR);                \
     if (file_descriptors[chip_select] < 0)                                               \
     {                                                                                    \
-        LOG(FATAL) << "can't open device: " << #motor_name;                              \
+        LOG(FATAL) << "can't open device: " << #motor_name                               \
+                   << "error: " << strerror(errno);                                      \
     }                                                                                    \
                                                                                          \
     ret = ioctl(file_descriptors[chip_select], SPI_IOC_WR_MODE32, &SPI_MODE);            \
     if (ret == -1)                                                                       \
     {                                                                                    \
-        LOG(FATAL) << "can't set spi mode for: " << #motor_name;                         \
+        LOG(FATAL) << "can't set spi mode for: " << #motor_name                          \
+                   << "error: " << strerror(errno);                                      \
     }                                                                                    \
                                                                                          \
     ret = ioctl(file_descriptors[chip_select], SPI_IOC_WR_BITS_PER_WORD, &SPI_BITS);     \
     if (ret == -1)                                                                       \
     {                                                                                    \
-        LOG(FATAL) << "can't set bits for: " << #motor_name;                             \
+        LOG(FATAL) << "can't set bits_per_word for: " << #motor_name                     \
+                   << "error: " << strerror(errno);                                      \
     }                                                                                    \
                                                                                          \
     ret = ioctl(file_descriptors[chip_select], SPI_IOC_WR_MAX_SPEED_HZ, &SPI_SPEED_HZ);  \
     if (ret == -1)                                                                       \
     {                                                                                    \
-        LOG(FATAL) << "can't set max speed hz for: " << #motor_name;                     \
+        LOG(FATAL) << "can't set spi max speed hz for: " << #motor_name                  \
+                   << "error: " << strerror(errno);                                      \
     }
 
     OPEN_SPI_FILE_DESCRIPTOR(front_left, FRONT_LEFT_MOTOR_CHIP_SELECT)
@@ -143,7 +147,8 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 
     if (ret < 1)
     {
-        LOG(FATAL) << "SPI Transfer to motor failed, not safe to proceed: errno " << ret;
+        LOG(FATAL) << "SPI Transfer to motor failed, not safe to proceed: errno "
+                   << strerror(errno);
     }
 }
 
