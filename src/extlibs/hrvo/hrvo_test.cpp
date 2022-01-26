@@ -125,7 +125,7 @@ class HRVOTest : public ::testing::Test
                     float other_robot_rad  = simulator.getAgentRadius(other_robot_id);
                     if (robot_id != other_robot_id)
                     {
-                        if (absSq(curr_robot_pos - other_robot_pos) <
+                        if (lengthSquared(curr_robot_pos - other_robot_pos) <
                             std::pow(curr_robot_rad + other_robot_rad, 2.f))
                         {
                             has_collided = other_robot_id;
@@ -145,8 +145,8 @@ class HRVOTest : public ::testing::Test
                     float prev_x_pos = prev_x_pos_arr[robot_id];
                     float prev_y_pos = prev_y_pos_arr[robot_id];
 
-                    float curr_x_pos = curr_robot_pos.getX();
-                    float curr_y_pos = curr_robot_pos.getY();
+                    float curr_x_pos = curr_robot_pos.x();
+                    float curr_y_pos = curr_robot_pos.y();
 
                     velocity_x = (curr_x_pos - prev_x_pos) / delta_time;
                     velocity_y = (curr_y_pos - prev_y_pos) / delta_time;
@@ -159,11 +159,11 @@ class HRVOTest : public ::testing::Test
                 output_file << frame << "," << time << ","
                             << std::to_string(computation_time.count()) << "," << robot_id
                             << "," << robot_radius[robot_id] << ","
-                            << curr_robot_pos.getX() << "," << curr_robot_pos.getY()
+                            << curr_robot_pos.x() << "," << curr_robot_pos.y()
                             << "," << velocity_x << "," << velocity_y << "," << speed
                             << "," << has_collided << ","
-                            << simulator.getAgentPrefVelocity(robot_id).getX() << ","
-                            << simulator.getAgentPrefVelocity(robot_id).getY()
+                            << simulator.getAgentPrefVelocity(robot_id).x() << ","
+                            << simulator.getAgentPrefVelocity(robot_id).y()
                             << std::endl;
             }
 
