@@ -65,9 +65,8 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start, const Point 
                                                 const Rectangle &navigable_area,
                                                 const std::vector<ObstaclePtr> &)
 {
-    // Check if start and end coordinates are in navigable area and return null if it
-    // isn't
-    if (!contains(navigable_area, start), !contains(navigable_area, end))
+    // Check if start and end coordinates are in navigable area and return null if it isn't
+    if (!contains(navigable_area, start) && !contains(navigable_area, end))
     {
         LOG(WARNING)
             << "Start and/or end point is not within the navigable area; no path found"
@@ -86,7 +85,7 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start, const Point 
     {
         LOG(WARNING)
             << "Unable to find a path; Unable to find a nearby start and/or end point that isn't blocked "
-            << " within the navigable area; no path found" << std::endl;
+            << "within the navigable area; no path found" << std::endl;
         return std::nullopt;
     }
 

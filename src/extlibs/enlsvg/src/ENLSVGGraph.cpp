@@ -110,9 +110,6 @@ namespace Pathfinding
             // We do this so that we can use the opposite(edgeId) function to get the
             // opposite edge.
 
-            // if (! ((edge_ij % 2 == 0) && (edge_ji % 2 == 1) && (edge_ji == edge_ij +
-            // 1)) ) std::cout << "error!" << std::endl;
-
             edgeLists[i].push_back(edge_ij);
             edgeLists[j].push_back(edge_ji);
         }

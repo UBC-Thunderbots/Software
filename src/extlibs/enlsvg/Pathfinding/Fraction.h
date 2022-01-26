@@ -28,10 +28,6 @@ namespace Pathfinding
 
         inline void init(long n, long d)
         {
-            /*if (d == 0) {
-                cout << "\nERROR: Zero denominator: " << n << + "/" << d << "\n";
-                return;
-            }*/
             const long g = gcd(n, d);
             // Denominators are strictly positive.
             if (d / g > 0)

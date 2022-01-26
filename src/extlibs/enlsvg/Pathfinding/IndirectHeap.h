@@ -186,20 +186,6 @@ namespace Pathfinding
             }
         }
 
-        /*
-        inline static int parent(int index)- {
-            return (index-1)/2;
-        }
-
-        inline static int leftChild(int index) {
-            return 2*index+1;
-        }
-
-        inline static int rightChild(int index) {
-            return 2*index+2;
-        }
-        */
-
        public:
         inline int size() const
         {

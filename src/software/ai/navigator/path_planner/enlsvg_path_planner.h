@@ -177,8 +177,7 @@ class EnlsvgPathPlanner : public PathPlanner
     // can be arbitrarily thought of as the height of the grid on the y-axis
     unsigned int num_grid_cols;
 
-    // since the implementation depends on positive coordinates, this is the bottom-left
-    // most coordinate
+    // since the implementation depends on positive coordinates, this is the bottom-left most coordinate
     Point origin;
 
     // max navigable coordinates

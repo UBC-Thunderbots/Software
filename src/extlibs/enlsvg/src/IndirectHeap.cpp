@@ -53,14 +53,6 @@ namespace Pathfinding
         initialise(capacity, POS_INF);
     }
 
-    /*void IndirectHeap::heapify() {
-        for (int i=heapSize/2-1; i>=0; i--) {
-            bubbleDown(i);
-        }
-    }*/
-
-
-
     // Runtime: O(lgn)
     void IndirectHeap::decreaseKey(int outIndex, double newKey)
     {
