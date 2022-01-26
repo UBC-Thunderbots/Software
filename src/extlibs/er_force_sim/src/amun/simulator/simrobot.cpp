@@ -257,6 +257,7 @@ void SimRobot::begin(SimBall *ball, double time)
     std::string message = " for robot (";
     message += std::to_string(m_specs.id());
     message += ')';
+
     if (m_move.has_x())
     {
         if (!m_move.has_y() || (!m_move.has_orientation() && !m_move.by_force()))
@@ -665,6 +666,7 @@ void SimRobot::update(world::SimRobot *robot) const
     rotation->set_i(q.getY());
     rotation->set_j(q.getZ());
     rotation->set_k(q.getW());
+    robot->set_angle(q.getAngle());
 
     const btVector3 velocity = m_body->getLinearVelocity() / SIMULATOR_SCALE;
     robot->set_v_x(velocity.x());

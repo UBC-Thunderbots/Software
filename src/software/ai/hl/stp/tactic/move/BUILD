@@ -12,7 +12,6 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
-        "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/tactic",
         "//software/ai/intent:move_intent",
         "//software/logger",
@@ -32,16 +31,6 @@ cc_test(
 cc_test(
     name = "move_tactic_test",
     srcs = ["move_tactic_test.cpp"],
-    deps = [
-        ":move_tactic",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
-    ],
-)
-
-cc_test(
-    name = "simulated_move_tactic_test",
-    srcs = ["simulated_move_tactic_test.cpp"],
     deps = [
         ":move_tactic",
         "//shared/test_util:tbots_gtest_main",
