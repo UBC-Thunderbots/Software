@@ -117,11 +117,12 @@ class KdTree
     /**
      * Computes the neighbors of the specified agent.
      *
-     * @param agent    A pointer to the agent for which neighbors are to be computed.
-     * @param rangeSq  The squared range around the agent.
+     * @param agent  A pointer to the agent for which neighbors are to be computed.
+     * @param range  The range around the agent.
      */
-    void query(HRVOAgent *agent, float rangeSq) const
+    void query(HRVOAgent *agent, float range) const
     {
+        float rangeSq = range * range;
         queryRecursive(agent, rangeSq, 0);
     }
 
