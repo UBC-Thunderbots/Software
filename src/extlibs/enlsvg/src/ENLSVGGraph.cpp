@@ -160,8 +160,6 @@ namespace Pathfinding
                         {
                             nextLevelEdges.push_back(neighbour);
                         }
-                        // debugging: if (nNeighbours[neighbour] < 0) std::cout << "ERROR"
-                        // << std::endl;
                     }
                 }
                 currentLevelEdges.clear();
