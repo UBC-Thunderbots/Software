@@ -49,7 +49,7 @@ class Thunderloop
     ~Thunderloop();
 
     /*
-     * Run the main robot loop once!
+     * Run the main robot loop!
      */
     void runOnce();
 

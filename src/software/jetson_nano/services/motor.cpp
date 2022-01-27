@@ -23,23 +23,6 @@ extern "C"
 {
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671.h"
 #include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
-
-    // We need a static pointer here, because trinamic externs the following two
-    // SPI binding functions that we need to interface with their API.
-    //
-    // The motor service exclusively calls the trinamic API which triggers these
-    // functions. The motor service will set this variable in the constructor.
-    static MotorService* g_motor_service = NULL;
-
-    uint8_t tmc4671_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
-    {
-        return g_motor_service->tmc4671ReadWriteByte(motor, data, lastTransfer);
-    }
-
-    uint8_t tmc6100_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
-    {
-        return g_motor_service->tmc6100ReadWriteByte(motor, data, lastTransfer);
-    }
 }
 
 // SPI Configs
@@ -62,6 +45,22 @@ static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spid
 static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO = "77";
 static const char* DRIVER_CONTROL_ENABLE_GPIO           = "216";
 
+// We need a static pointer here, because trinamic externs the following two
+// SPI binding functions that we need to interface with their API.
+//
+// The motor service exclusively calls the trinamic API which triggers these
+// functions. The motor service will set this variable in the constructor.
+static MotorService* g_motor_service = NULL;
+
+uint8_t tmc4671_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
+{
+    return g_motor_service->tmc4671ReadWriteByte(motor, data, lastTransfer);
+}
+
+uint8_t tmc6100_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
+{
+    return g_motor_service->tmc6100ReadWriteByte(motor, data, lastTransfer);
+}
 
 MotorService::MotorService(const RobotConstants_t& robot_constants,
                            const WheelConstants_t& wheel_constants)
@@ -86,25 +85,29 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     file_descriptors[chip_select] = open(SPI_PATHS[chip_select], O_RDWR);                \
     if (file_descriptors[chip_select] < 0)                                               \
     {                                                                                    \
-        LOG(FATAL) << "can't open device: " << #motor_name;                              \
+        LOG(FATAL) << "can't open device: " << #motor_name                               \
+                   << "error: " << strerror(errno);                                      \
     }                                                                                    \
                                                                                          \
     ret = ioctl(file_descriptors[chip_select], SPI_IOC_WR_MODE32, &SPI_MODE);            \
     if (ret == -1)                                                                       \
     {                                                                                    \
-        LOG(FATAL) << "can't set spi mode for: " << #motor_name;                         \
+        LOG(FATAL) << "can't set spi mode for: " << #motor_name                          \
+                   << "error: " << strerror(errno);                                      \
     }                                                                                    \
                                                                                          \
     ret = ioctl(file_descriptors[chip_select], SPI_IOC_WR_BITS_PER_WORD, &SPI_BITS);     \
     if (ret == -1)                                                                       \
     {                                                                                    \
-        LOG(FATAL) << "can't set bits for: " << #motor_name;                             \
+        LOG(FATAL) << "can't set bits_per_word for: " << #motor_name                     \
+                   << "error: " << strerror(errno);                                      \
     }                                                                                    \
                                                                                          \
     ret = ioctl(file_descriptors[chip_select], SPI_IOC_WR_MAX_SPEED_HZ, &SPI_SPEED_HZ);  \
     if (ret == -1)                                                                       \
     {                                                                                    \
-        LOG(FATAL) << "can't set max speed hz for: " << #motor_name;                     \
+        LOG(FATAL) << "can't set spi max speed hz for: " << #motor_name                  \
+                   << "error: " << strerror(errno);                                      \
     }
 
     OPEN_SPI_FILE_DESCRIPTOR(front_left, FRONT_LEFT_MOTOR_CHIP_SELECT)
@@ -123,83 +126,6 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
     const TbotsProto::DirectControlPrimitive_DirectVelocityControl& local_velocity,
     float dribbler_speed_rpm)
 {
-    sleep(7);
-
-    int32_t half_bridge_stuff = tmc4671_readInt(0, TMC4671_PWM_BBM_H_BBM_L);
-    int32_t bbm_l =
-        (half_bridge_stuff & TMC4671_PWM_BBM_L_MASK) >> TMC4671_PWM_BBM_L_SHIFT;
-    int32_t bbm_h =
-        (half_bridge_stuff & TMC4671_PWM_BBM_H_MASK) >> TMC4671_PWM_BBM_H_SHIFT;
-
-    LOGF(DEBUG, "LOW %d HIGH %d", bbm_l, bbm_h);
-
-    sleep(2);
-
-    LOG(DEBUG) << "ENCODER INIT";
-    LOG(DEBUG) << "Haven't moved yet";
-
-    // Simone Parameters
-    tmc4671_writeInt(0, TMC4671_PID_FLUX_P_FLUX_I, 67109376);
-    tmc4671_writeInt(0, TMC4671_PID_TORQUE_P_TORQUE_I, 67109376);
-    tmc4671_writeInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I, 52428800);
-    tmc4671_writeInt(0, TMC4671_PID_POSITION_P_POSITION_I, 0);
-
-    tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS, 0);
-    tmc4671_writeInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS, 32767);
-    tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS, 5000);
-    tmc4671_writeInt(0, TMC4671_PID_ACCELERATION_LIMIT, 15000);
-    tmc4671_writeInt(0, TMC4671_PID_VELOCITY_LIMIT, 4000);
-    tmc4671_writeInt(0, TMC4671_PID_POSITION_LIMIT_LOW, -2147483647);
-    tmc4671_writeInt(0, TMC4671_PID_POSITION_LIMIT_HIGH, 2147483647);
-
-    sleep(2);
-    tmc4671_setTargetVelocity(0, 100);
-    LOG(DEBUG) << "Moved clockwise";
-
-    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_FLUX_P_FLUX_I);
-    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_TORQUE_P_TORQUE_I);
-    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I);
-    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_POSITION_P_POSITION_I);
-    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS);
-    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS);
-    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS);
-    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT);
-    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_VELOCITY_LIMIT);
-    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_LOW);
-    LOG(DEBUG) << tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_HIGH);
-
-    int32_t drive_strength_0 =
-        (tmc6100_readInt(0, TMC6100_DRV_CONF) & (TMC6100_DRVSTRENGTH_MASK)) >>
-        TMC6100_DRVSTRENGTH_SHIFT;
-    assert(drive_strength_0 == 0);
-
-    assert(tmc4671_readInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I) == 52428800);
-    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_P_POSITION_I) == 0);
-    assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS) == 0);
-    assert(tmc4671_readInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS) == 32767);
-    assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS) == 5000);
-    assert(tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT) == 15000);
-    assert(tmc4671_readInt(0, TMC4671_PID_VELOCITY_LIMIT) == 4000);
-    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_LOW) == -2147483647);
-    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_HIGH) == 2147483647);
-    sleep(2);
-    LOG(DEBUG) << "Moving counter clockwise";
-    tmc4671_setTargetVelocity(0, -500);
-
-    assert(tmc4671_readInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I) == 52428800);
-    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_P_POSITION_I) == 0);
-    assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS) == 0);
-    assert(tmc4671_readInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS) == 32767);
-    assert(tmc4671_readInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS) == 5000);
-    assert(tmc4671_readInt(0, TMC4671_PID_ACCELERATION_LIMIT) == 15000);
-    assert(tmc4671_readInt(0, TMC4671_PID_VELOCITY_LIMIT) == 4000);
-    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_LOW) == -2147483647);
-    assert(tmc4671_readInt(0, TMC4671_PID_POSITION_LIMIT_HIGH) == 2147483647);
-    sleep(2);
-    LOG(DEBUG) << "Stopping";
-    tmc4671_setTargetVelocity(0, 0);
-    sleep(2);
-
     // TODO (#2335) convert local velocity to per-wheel velocity
     // using http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf and then
     // communicate velocities to trinamic. Also read back feedback and
@@ -225,7 +151,8 @@ void MotorService::spiTransfer(int fd, uint8_t const* tx, uint8_t const* rx, uns
 
     if (ret < 1)
     {
-        LOG(FATAL) << "SPI Transfer to motor failed, not safe to proceed";
+        LOG(FATAL) << "SPI Transfer to motor failed, not safe to proceed: errno "
+                   << strerror(errno);
     }
 }
 
@@ -337,98 +264,8 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
 
 void MotorService::start()
 {
-    tmc6100_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GCONF, 32);
-    uint32_t result = tmc6100_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GCONF);
-    assert(32 == result);
-
-    int32_t temp = tmc6100_readInt(0, TMC6100_DRV_CONF);
-    tmc6100_writeInt(0, TMC6100_DRV_CONF, temp & (~TMC6100_DRVSTRENGTH_MASK));
-    int32_t drive_strength_0 =
-        (tmc6100_readInt(0, TMC6100_DRV_CONF) & (TMC6100_DRVSTRENGTH_MASK)) >>
-        TMC6100_DRVSTRENGTH_SHIFT;
-    assert(drive_strength_0 == 0);
-
-    LOG(DEBUG) << "power stage online";
-
-    // Motor type & PWM configuration
-    tmc4671_writeInt(0, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
-    tmc4671_writeInt(0, TMC4671_PWM_POLARITIES, 0x00000000);
-    tmc4671_writeInt(0, TMC4671_PWM_MAXCNT, 0x00000F9F);
-    tmc4671_writeInt(0, TMC4671_PWM_BBM_H_BBM_L, 0x00002828);
-    tmc4671_writeInt(0, TMC4671_PWM_SV_CHOP, 0x00000107);
-
-    // ADC configuration
-    tmc4671_writeInt(0, TMC4671_ADC_I_SELECT, 0x09000100);
-    tmc4671_writeInt(0, TMC4671_dsADC_MCFG_B_MCFG_A, 0x00100010);
-    tmc4671_writeInt(0, TMC4671_dsADC_MCLK_A, 0x20000000);
-    tmc4671_writeInt(0, TMC4671_dsADC_MCLK_B, 0x00000000);
-    tmc4671_writeInt(0, TMC4671_dsADC_MDEC_B_MDEC_A, 0x014E014E);
-    tmc4671_writeInt(0, TMC4671_ADC_I0_SCALE_OFFSET, 0x010081DD);
-    tmc4671_writeInt(0, TMC4671_ADC_I1_SCALE_OFFSET, 0x0100818E);
-
-    // ABN encoder settings
-    tmc4671_writeInt(0, TMC4671_ABN_DECODER_MODE, 0x00001000);
-    tmc4671_writeInt(0, TMC4671_ABN_DECODER_PPR, 0x00001000);
-    tmc4671_writeInt(0, TMC4671_ABN_DECODER_COUNT, 0x00000417);
-    tmc4671_writeInt(0, TMC4671_ABN_DECODER_PHI_E_PHI_M_OFFSET, 0x00000000);
-
-    // Limits
-    tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS, 0x000003E8);
-
-    // PI settings
-    tmc4671_writeInt(0, TMC4671_PID_TORQUE_P_TORQUE_I, 0x01000100);
-    tmc4671_writeInt(0, TMC4671_PID_FLUX_P_FLUX_I, 0x01000100);
-
-    // Motor type & PWM configuration
-    tmc4671_writeInt(0, TMC4671_OPENLOOP_MODE, 0x00000000);
-    tmc4671_writeInt(0, TMC4671_OPENLOOP_ACCELERATION, 0x0000003C);
-    tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0xFFFFFFFB);
-    // Feedback selection
-    tmc4671_writeInt(0, TMC4671_PHI_E_SELECTION, 0x00000002);
-    tmc4671_writeInt(0, TMC4671_UQ_UD_EXT, 0x00000779);
-
-    // ===== Open loop test drive =====
-    // Switch to open loop velocity mode
-    tmc4671_writeInt(0, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000008);
-    // Rotate right
-    tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000003C);
-    sleep(2);
-    // Rotate left
-    tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0xFFFFFFC4);
-    sleep(4);
-    // Stop
-    tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
-    sleep(2);
-    tmc4671_writeInt(0, TMC4671_UQ_UD_EXT, 0x00000000);
-
-
-    // ABN encoder settings
-    LOGF(DEBUG, "Motor type configured to : %x",
-         tmc4671_getMotorType(FRONT_LEFT_MOTOR_CHIP_SELECT));
-    LOGF(DEBUG, "Pole pairs configured to : %x",
-         tmc4671_getPolePairs(FRONT_LEFT_MOTOR_CHIP_SELECT));
-
-    for (uint32_t motor = 0; motor < 1; motor++)
-    {
-        motor_state_[motor].init_wait_time            = 400;
-        motor_state_[motor].start_voltage             = 8000;  // UQ_UD_EXT
-        motor_state_[motor].encoder_init_mode         = 0;
-        motor_state_[motor].encoder_init_state        = 0;
-        motor_state_[motor].hall_PHI_E_old            = 0;
-        motor_state_[motor].hall_PHI_E_new            = 0;
-        motor_state_[motor].hall_actual_coarse_offset = 0;
-        motor_state_[motor].last_PHI_E_selection      = 0;
-        motor_state_[motor].last_UQ_UD_EXT            = 0;
-        motor_state_[motor].last_PHI_E_EXT            = 0;
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-        tmc4671_writeInt(motor, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_ABN);
-        assert(tmc4671_readInt(motor, TMC4671_PHI_E_SELECTION) == TMC4671_PHI_E_ABN);
-#pragma GCC diagnostic pop
-        tmc4671_startEncoderInitialization(0, &(motor_state_[motor].encoder_init_mode),
-                                           &(motor_state_[motor].encoder_init_state));
-    }
+    driver_control_enable_gpio.setValue(GpioState::HIGH);
+    // TODO (#2332)
 }
 
 
@@ -437,7 +274,7 @@ void MotorService::periodicJob(uint32_t ms_tick)
     for (uint32_t motor = 0; motor < TOTAL_NUMBER_OF_MOTORS; motor++)
     {
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wconversion"  // TODO figure out why we even need this
         tmc4671_periodicJob(
             motor, ms_tick, motor_state_[motor].encoder_init_mode,
             &(motor_state_[motor].encoder_init_state), motor_state_[motor].init_wait_time,

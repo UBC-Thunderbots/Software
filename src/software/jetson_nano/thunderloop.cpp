@@ -22,6 +22,18 @@
 #include "software/logger/logger.h"
 #include "software/world/robot_state.h"
 
+static void run_thunderloop()
+{
+    auto thunderloop =
+        Thunderloop(create2021RobotConstants(), create2021WheelConstants());
+
+    for (;;)
+    {
+        thunderloop.runOnce();
+    }
+}
+
+
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
                          const WheelConstants_t& wheel_consants)
 {
@@ -47,7 +59,7 @@ Thunderloop::~Thunderloop()
 /*
  * Run the main robot loop!
  */
-void Thunderloop::runOnce()
+void Thunderloop::run()
 {
     // TODO (#TODO) e-stop handling, if estop is
     motor_service_->start();
