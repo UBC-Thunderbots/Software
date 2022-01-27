@@ -10,8 +10,7 @@
 
 #include "software/logger/logger.h"
 
-GPIO::GPIO(std::string gpio_number, GpioDirection initial_direction,
-           GpioState initial_state)
+GPIO::GPIO(std::string gpio_number, GpioDirection direction, GpioState initial_state)
 {
     // Setup the provided GPIO pin
     gpio_number_ = gpio_number;
@@ -23,7 +22,7 @@ GPIO::GPIO(std::string gpio_number, GpioDirection initial_direction,
     auto set_direction_fs =
         std::ofstream("/sys/class/gpio/gpio" + gpio_number + "/direction");
 
-    switch (initial_direction)
+    switch (direction)
     {
         case GpioDirection::OUTPUT:
         {

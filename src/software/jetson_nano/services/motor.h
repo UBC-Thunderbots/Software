@@ -54,13 +54,11 @@ class MotorService : public Service
      * converts the linear velocity into individual wheel velocities based on
      * RobotConstants_t and WheelConstants_t.
      *
-     * @param local_velocity The target velocity for the robot.
-     * @param dribbler_speed_rpm The target dribbler rpm
+     * @param direct_control The direct_control msg to unpack and execute on the motors
      * @returns DriveUnitStatus The status of all the drive units
      */
     std::unique_ptr<TbotsProto::DriveUnitStatus> poll(
-        const TbotsProto::DirectControlPrimitive_DirectVelocityControl& local_velocity,
-        float dribbler_speed_rpm);
+        const TbotsProto::DirectControlPrimitive& direct_control);
 
     /**
      * Trinamic API binding, sets spi_cs_driver_to_controller_demux appropriately
@@ -73,7 +71,23 @@ class MotorService : public Service
      */
     uint8_t tmc4671ReadWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
     uint8_t tmc6100ReadWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
-    void periodicJob(uint32_t ms_tick);
+
+
+    /*
+     * For FOC to work, the controller needs to know the electical angle of the motor
+     * relative to the mechanical angle of the motor. In an incremental-encoder-only
+     * setup, we can energize the motor coils so that the rotor locks itself along
+     * one of its pole-pairs, allowing us to reset the encoder. Trinamics periodicJob
+     * API function can do this for us, we have to call start followed by the step
+     * function at 1ms intervals to perform this operation.
+     *
+     * WARNING: Do not try to spin the motor without initializing the encoder!
+     *          The motor can overheat.
+     *
+     * @param ms_tick The tick (ms) this function is being called at.
+     */
+    void startEncoderCalibration();
+    void stepEncoderCalibration(uint32_t ms_tick);
 
    private:
     /**

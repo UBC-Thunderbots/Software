@@ -48,15 +48,17 @@ class Thunderloop
 
     ~Thunderloop();
 
-    /*
-     * Run the main robot loop!
-     */
-    void runOnce();
+    void runLoop();
 
     // Services
     std::unique_ptr<MotorService> motor_service_;
 
    private:
+    /*
+     * Run the main robot loop once.
+     */
+    void runOnce();
+
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;
 

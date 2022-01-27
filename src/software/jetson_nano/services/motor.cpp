@@ -16,14 +16,10 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/logger/logger.h"
 
-#define POSITION_SCALE_MAX (int32_t)65536
-#include <stdint.h>
-
 extern "C"
 {
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671.h"
 #include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
-}
 
 // SPI Configs
 static uint32_t SPI_SPEED_HZ = 200000;
@@ -62,6 +58,7 @@ uint8_t tmc6100_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
     return g_motor_service->tmc6100ReadWriteByte(motor, data, lastTransfer);
 }
 
+}
 MotorService::MotorService(const RobotConstants_t& robot_constants,
                            const WheelConstants_t& wheel_constants)
     : spi_cs_driver_to_controller_demux_gpio(SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO,
@@ -123,8 +120,7 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
 MotorService::~MotorService() {}
 
 std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
-    const TbotsProto::DirectControlPrimitive_DirectVelocityControl& local_velocity,
-    float dribbler_speed_rpm)
+    const TbotsProto::DirectControlPrimitive& direct_control)
 {
     // TODO (#2335) convert local velocity to per-wheel velocity
     // using http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf and then
@@ -265,16 +261,42 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
 void MotorService::start()
 {
     driver_control_enable_gpio.setValue(GpioState::HIGH);
-    // TODO (#2332)
+
+    tmc4671_writeInt(0, TMC4671_CHIPINFO_ADDR, 0x000000000);
+    assert(0x34363731 == tmc4671_readInt(0, TMC4671_CHIPINFO_DATA));
+    LOGF(DEBUG, "TMC4671 chip info matches, confirmed online");
+    LOGF(DEBUG, "GPIO CONFIG: %x", tmc4671_readInt(0, TMC4671_GPIO_dsADCI_CONFIG));
 }
 
 
-void MotorService::periodicJob(uint32_t ms_tick)
+void MotorService::startEncoderCalibration()
 {
-    for (uint32_t motor = 0; motor < TOTAL_NUMBER_OF_MOTORS; motor++)
+    for (uint8_t motor = 0; motor < TOTAL_NUMBER_OF_MOTORS; motor++)
     {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"  // TODO figure out why we even need this
+        motor_state_[motor].init_wait_time            = 400;
+        motor_state_[motor].start_voltage             = 8000;  // UQ_UD_EXT
+        motor_state_[motor].encoder_init_mode         = 0;
+        motor_state_[motor].encoder_init_state        = 0;
+        motor_state_[motor].hall_PHI_E_old            = 0;
+        motor_state_[motor].hall_PHI_E_new            = 0;
+        motor_state_[motor].hall_actual_coarse_offset = 0;
+        motor_state_[motor].last_PHI_E_selection      = 0;
+        motor_state_[motor].last_UQ_UD_EXT            = 0;
+        motor_state_[motor].last_PHI_E_EXT            = 0;
+
+        const uint8_t mode = 0;  // incremental encoder estimation mode
+
+        tmc4671_writeInt(motor, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_ABN);
+        tmc4671_startEncoderInitialization(mode, &(motor_state_[motor].encoder_init_mode),
+                                           &(motor_state_[motor].encoder_init_state));
+    }
+}
+
+
+void MotorService::stepEncoderCalibration(uint32_t ms_tick)
+{
+    for (uint8_t motor = 0; motor < TOTAL_NUMBER_OF_MOTORS; motor++)
+    {
         tmc4671_periodicJob(
             motor, ms_tick, motor_state_[motor].encoder_init_mode,
             &(motor_state_[motor].encoder_init_state), motor_state_[motor].init_wait_time,
@@ -285,10 +307,9 @@ void MotorService::periodicJob(uint32_t ms_tick)
             &(motor_state_[motor].last_PHI_E_selection),
             &(motor_state_[motor].last_UQ_UD_EXT), &(motor_state_[motor].last_PHI_E_EXT));
     }
-#pragma GCC diagnostic pop
 }
 
 void MotorService::stop()
 {
-    // TODO (#2332)
+    driver_control_enable_gpio.setValue(GpioState::LOW);
 }

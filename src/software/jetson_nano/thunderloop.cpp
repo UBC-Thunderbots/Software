@@ -22,26 +22,12 @@
 #include "software/logger/logger.h"
 #include "software/world/robot_state.h"
 
-static void run_thunderloop()
-{
-    auto thunderloop =
-        Thunderloop(create2021RobotConstants(), create2021WheelConstants());
-
-    for (;;)
-    {
-        thunderloop.runOnce();
-    }
-}
-
-
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
                          const WheelConstants_t& wheel_consants)
 {
     robot_id_        = 0;
     robot_constants_ = robot_constants;
     wheel_consants_  = wheel_consants;
-
-    emergency_stop_ = true;
 
     motor_service_ = std::make_unique<MotorService>(robot_constants, wheel_consants);
 
@@ -59,20 +45,22 @@ Thunderloop::~Thunderloop()
 /*
  * Run the main robot loop!
  */
-void Thunderloop::run()
+void Thunderloop::runLoop()
 {
-    // TODO (#TODO) e-stop handling, if estop is
+    // TODO start power service
     motor_service_->start();
+    // motor_service_->startEncoderCalibration();
 
-    // TODO (#2331) poll network service and update current_robot_state_
-    // TODO (#2333) poll redis service
+    for (;;)
+    {
+        // TODO (#2331) poll network service and update current_robot_state_
+        // TODO (#2333) poll redis service
 
-    // Execute latest primitive
-    primitive_executor_.startPrimitive(robot_constants_, primitive_);
-    direct_control_ = *primitive_executor_.stepPrimitive(*current_robot_state_);
+        // Execute latest primitive
+        primitive_executor_.startPrimitive(robot_constants_, primitive_);
+        direct_control_ = *primitive_executor_.stepPrimitive(*current_robot_state_);
 
-    // Poll motor service with wheel velocities and dribbler rpm
-    // TODO (#2332) properly implement, this is just a placeholder
-    drive_units_status_ = *motor_service_->poll(direct_control_.direct_velocity_control(),
-                                                direct_control_.dribbler_speed_rpm());
+        // Run the motor service with the direct_control_ msg
+        drive_units_status_ = *motor_service_->poll(direct_control_);
+    }
 }

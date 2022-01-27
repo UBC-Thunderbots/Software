@@ -4,37 +4,57 @@
 #include "software/jetson_nano/thunderloop.h"
 #include "software/logger/logger.h"
 #include "software/world/robot_state.h"
+   #include <stdlib.h>
+   #include <stdio.h>
+   #include <sys/mman.h>	// Needed for mlockall()
+   #include <unistd.h>		// needed for sysconf(int name);
+   #include <malloc.h>
+   #include <sys/time.h>	// needed for getrusage
+   #include <sys/resource.h>	// needed for getrusage
+   #include <pthread.h>
+   #include <limits.h>
+
 
 // clang-format off
 std::string BANNER =
-"        ,/                                                                                                                     ,/   \n"
-"      ,'/         _    _ ____   _____   _______ _    _ _    _ _   _ _____  ______ _____  ____   ____ _______ _____           ,'/    \n"
-"    ,' /         | |  | |  _ \\ / ____| |__   __| |  | | |  | | \\ | |  __ \\|  ____|  __ \\|  _ \\ / __ \\__   __/ ____|        ,' /     \n"
-"  ,'  /_____,    | |  | | |_) | |         | |  | |__| | |  | |  \\| | |  | | |__  | |__) | |_) | |  | | | | | (___        ,'  /_____,\n"
-".'____    ,'     | |  | |  _ <+ |         | |  |  __  | |  | | . ` | |  | |  __| |  _  /|  _ <+ |  | | | |  \\___ \\     .'____    ,' \n"
-"     /  ,'       | |__| | |_) | |____     | |  | |  | | |__| | |\\  | |__| | |____| | \\ \\| |_) | |__| | | |  ____) |         /  ,'   \n"
-"    / ,'          \\____/|____/ \\_____|    |_|  |_|  |_|\\____/|_| \\_|_____/|______|_|  \\_\\____/ \\____/  |_| |_____/         / ,'     \n"
-"   /,'                                                                                                                    /,'       \n"
-"  /'                                                                                                                     /'          \n";
+"        ,/                                                                                       ,/    \n"
+"      ,'/         _____ _   _ _   _ _   _ ____  _____ ____  _     ___   ___  ____              ,'/     \n"
+"    ,' /         |_   _| | | | | | | \\ | |  _ \\| ____|  _ \\| |   / _ \\ / _ \\|  _ \\           ,' /      \n"
+"  ,'  /_____,      | | | |_| | | | |  \\| | | | |  _| | |_ )| |  | | | | | | | |_) |        ,'  /_____, \n"
+".'____    ,'       | | |  _  | |_| | |\\  | |_| | |___|  _ <| |__| |_| | |_| |  __/       .'____    ,'  \n"
+"     /  ,'         |_| |_| |_|\\___/|_| \\_|____/|_____|_| \\_\\_____\\___/ \\___/|_|               /  ,'    \n"
+"    / ,'                                                                                     / ,'      \n"
+"   /,'                                                                                      /,'        \n"
+"  /'                                                                                       /'          \n";
 // clang-format on
 
-static const g_nsec_per_sec        = 1000000000;
-static const g_pre_allocation_size = (100 * 1024 * 1024);  // 100MB pagefault free buffer
-static const g_periodic_job_stack_size = (100 * 1024);     // 100kb
+static const int g_nsec_per_sec        = 1000000000;
+static const int g_pre_allocation_size = 100 * 1024 * 1024;  // 100MB pagefault free buffer
+static const int g_periodic_job_stack_size = 100 * 1024;     // 100kb
 
-static void setprio(int prio, int sched)
-{
-    struct sched_param param;
-    // Set realtime priority for this thread
-    param.sched_priority = prio;
-    if (sched_setscheduler(0, sched, &param) < 0)
-    {
-        LOG(FATAL) << "sched_setscheduler: " << strerror(errno);
-    }
-}
-
+//  Real Time Linux
+//
 // https://rt.wiki.kernel.org/index.php/Squarewave-example
 // https://rt.wiki.kernel.org/index.php/Threaded_RT-application_with_memory_locking_and_stack_handling_example
+
+/** Set the priority
+ *
+ * @param prio The priority
+ * @param sched The sched
+ */
+//static void setprio(int prio, int sched)
+//{
+    //struct sched_param param;
+
+    //// Set realtime priority for this thread
+    //param.sched_priority = prio;
+
+    //if (sched_setscheduler(0, sched, &param) < 0)
+    //{
+        //LOG(FATAL) << "sched_setscheduler: " << strerror(errno);
+    //}
+//}
+
 // using clock_nanosleep of librt
 extern int clock_nanosleep(clockid_t __clock_id, int __flags,
                            __const struct timespec* __req, struct timespec* __rem);
@@ -54,67 +74,36 @@ static inline void tsnorm(struct timespec& ts)
     }
 }
 
-static void configure_malloc_behavior(void)
+static void configureMallocBehaviour(void)
 {
-    /* Now lock all current and future pages
-       from preventing of being paged */
+    // Now lock all current and future pages
+    // from preventing of being paged
     if (mlockall(MCL_CURRENT | MCL_FUTURE))
+    {
         perror("mlockall failed:");
+    }
 
-    /* Turn off malloc trimming.*/
+    // Turn off malloc trimming.
     mallopt(M_TRIM_THRESHOLD, -1);
 
-    /* Turn off mmap usage. */
+    // Turn off mmap usage.
     mallopt(M_MMAP_MAX, 0);
 }
 
 
-static void* motorServicePeriodicJob(void* args)
-{
-    struct timespec t;
-    int interval_ns              = 1000000;  // 1ms
-    uint32_t millisecond_counter = 0;
-
-    setprio(sched_get_priority_max(SCHED_RR), SCHED_RR);
-
-    /* get current time */
-    clock_gettime(0, &t);
-
-    /* start after one second */
-    t.tv_sec++;
-
-    LOG(INFO) << "Motor Service Periodic Job Starting";
-
-    for (;;)
-    {
-        // wait until next shot
-        clock_nanosleep(0, TIMER_ABSTIME, &t, NULL);
-
-        millisecond_counter++;
-
-        g_tloop->motor_service_->periodicJob(millisecond_counter);
-
-        // calculate next shot
-        t.tv_nsec += interval_ns;
-        tsnorm(t);
-    }
-
-    return NULL;
-}
-
-static void reserve_process_memory(int size)
+static void reserveProcessMemory(int size)
 {
     long int i;
     char* buffer;
 
     buffer = static_cast<char*>(malloc(size));
 
-    /* Touch each page in this piece of memory to get it mapped into RAM */
+    // Touch each page in this piece of memory to get it mapped into RAM
     for (i = 0; i < size; i += sysconf(_SC_PAGESIZE))
     {
-        /* Each write to this buffer will generate a pagefault.
-           Once the pagefault is handled a page will be locked in
-           memory and never given back to the system. */
+        // Each write to this buffer will generate a pagefault.
+        // Once the pagefault is handled a page will be locked in
+        // memory and never given back to the system.
         buffer[i] = 0;
     }
 
@@ -133,8 +122,8 @@ int main(int argc, char** argv)
     std::cout << BANNER << std::endl;
 
     // Page faults are bad, lets setup malloc and reserve some memory
-    configure_malloc_behavior();
-    reserve_process_memory(PRE_ALLOCATION_SIZE);
+    configureMallocBehaviour();
+    reserveProcessMemory(g_pre_allocation_size);
 
     // TODO (#2338) replace with network logger
     LoggerSingleton::initializeLogger("/tmp");
@@ -142,19 +131,20 @@ int main(int argc, char** argv)
     auto thunderloop =
         Thunderloop(create2021RobotConstants(), create2021WheelConstants());
 
-    pthread_t thread;
-    pthread_attr_t attr;
+    thunderloop.runLoop();
+    // pthread_t thread;
+    // pthread_attr_t attr;
 
-    /* init to default values */
-    if (pthread_attr_init(&attr))
-        error(1);
+    //[> init to default values <]
+    // if (pthread_attr_init(&attr))
+    // error(1);
 
-    /* Set the requested stacksize for this thread */
-    if (pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN + g_periodic_job_stack_size))
-        error(2);
+    //[> Set the requested stacksize for this thread <]
+    // if (pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN +
+    // g_periodic_job_stack_size)) error(2);
 
-    /* And finally start the actual thread */
-    pthread_create(&thread, &attr, my_rt_thread, NULL);
+    //[> And finally start the actual thread <]
+    // pthread_create(&thread, &attr, my_rt_thread, NULL);
 
     return 0;
 }
