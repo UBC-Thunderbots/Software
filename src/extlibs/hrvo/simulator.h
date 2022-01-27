@@ -89,7 +89,7 @@ class Simulator
      *      Adds a new agent to the simulation.
      *
      * @param position           The starting position of this agent.
-     * @param goal_index         The goal index of this agent.
+     * @param goal_index          The index of the Goal which this agent should go to.
      * @param neighborDist       The maximum neighbor distance of this agent.
      * @param maxNeighbors       The maximum neighbor count of this agent.
      * @param agent_radius       The agent_radius of this agent.
@@ -114,7 +114,7 @@ class Simulator
      * @param curr_velocity The initial velocity of this agent.
      * @param max_speed     The maximum speed of this agent.
      * @param max_accel     The maximum acceleration of this agent.
-     * @param goal_index    The goal index of this agent.
+     * @param goal_index     The index of the Goal which this agent should go to.
      * @param goal_radius   The goal agent_radius of this agent.
      * @return The index of the agent.
      */

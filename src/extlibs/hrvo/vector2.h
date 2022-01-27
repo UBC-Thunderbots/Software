@@ -1,3 +1,4 @@
+// TODO (#2371): Remove Vector2 files once it is replaced with Vector
 /*
  * vector2.h
  * HRVO Library

@@ -215,9 +215,9 @@ class HRVOTest : public ::testing::Test
 
         auto finish_time = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> total_time = finish_time - start_time;
-        std::cout << "Total run time = " << total_time.count() << std::endl;
-        std::cout << "Total simulation time = " << prev_frame_time << std::endl;
-        std::cout << "Avg time per tick = " << total_time.count() / frame << std::endl;
+        std::cout << "Total computation time = " << total_time.count() << "sec" << std::endl;
+        std::cout << "Total simulation time = " << prev_frame_time << "sec" << std::endl;
+        std::cout << "Avg computation time per tick = " << total_time.count() / frame << "sec/frame" << std::endl;
 
         output_file.close();
         std::cout << "Test information outputted to " << output_file_loc << std::endl;

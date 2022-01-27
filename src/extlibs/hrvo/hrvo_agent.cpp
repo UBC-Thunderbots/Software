@@ -60,7 +60,7 @@ void HRVOAgent::computeNeighbors()
 
     std::unique_ptr<Goal> &current_goal = simulator_->goals_[goal_index_];
     float new_neighbor_dist =
-        std::min(neighborDist_,
+        std::min(neighborDist_, // TODO: Update so its min of the constant in simulator.h
                  abs(position_ - current_goal->getCurrentGoalPosition()) + goal_radius_);
 
     simulator_->kdTree_->query(this, new_neighbor_dist);
