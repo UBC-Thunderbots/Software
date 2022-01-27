@@ -165,9 +165,6 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
         max_speed  = robot.robotConstants().robot_max_speed_m_per_s;
         pref_speed = max_speed * pref_speed_scale;
     }
-    // A large radius chosen arbitrarily to allow Agent to decelerate before getting
-    // into contact with a neighbor
-    float neighbor_dist = 7.f;
 
     // Max distance which the robot can travel in one time step + scaling
     float goal_radius        = (max_speed * timeStep_) / 2 * goal_radius_scale;
@@ -193,7 +190,7 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
     }
 
     return addHRVOAgent(position, agent_radius, velocity, max_speed, pref_speed,
-                        max_accel, addGoal(destination_point), goal_radius, neighbor_dist,
+                        max_accel, addGoal(destination_point), goal_radius, max_neighbor_search_dist,
                         max_neighbors, uncertainty_offset);
 }
 

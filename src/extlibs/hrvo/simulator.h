@@ -297,6 +297,11 @@ class Simulator
     // NOTE: This scale multiple must be <= 1
     const float pref_speed_scale = 0.75f;
 
+    // The maximum distance which HRVO Agents will look for neighbors, in meters.
+    // A large radius picked to allow for far visibility of neighbors so Agents have
+    // enough space to decelerate and avoid collisions.
+    const float max_neighbor_search_dist = 7.f;
+
     friend class Agent;
     friend class Goal;
     friend class KdTree;
