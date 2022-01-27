@@ -10,6 +10,13 @@
 namespace TestUtil
 {
     /**
+     * The struct represents the relevant aggregate functions used in testing
+     */
+    struct AggregateFunctions{
+        double avg, maximum, minimum;
+    };
+
+    /**
      * Takes a RobotLog proto and creates an INFO level g3log
      *
      * @param robot_log The RobotLog to log
