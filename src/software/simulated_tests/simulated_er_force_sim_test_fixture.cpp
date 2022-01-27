@@ -4,9 +4,10 @@
 #include <experimental/filesystem>
 
 #include "proto/message_translation/ssl_wrapper.h"
-#include "shared/2015_robot_constants.h"
+#include "shared/2021_robot_constants.h"
 #include "software/logger/logger.h"
 #include "software/test_util/test_util.h"
+#include "shared/test_util/test_util.h"
 
 SimulatedErForceSimTestFixture::SimulatedErForceSimTestFixture()
     : mutable_thunderbots_config(std::make_shared<ThunderbotsConfig>()),
@@ -268,6 +269,90 @@ bool SimulatedErForceSimTestFixture::tickTest(Duration simulation_time_step,
                                               std::shared_ptr<World> world,
                                               std::shared_ptr<ErForceSimulator> simulator)
 {
+    /* extract world ball and robot */
+    Ball world_ball = world.ball();
+    Team world_friendly_team = world.friendly_team();
+    Team world_enemy_team = world.enemy_team();
+    std::vector<Robot> world_friendly_robots = world_friendly_team.getAllRobots();
+    std::vector<Robot>  world_enemy_robots = world_enemy_team.getAllRobots();
+ 
+    /* extract simulator ball and robot */
+    world::SimulatorState simulator_state = simulator.getSimulatorState();
+    auto simulator_sim_ball = simulator_state.ball();
+    auto simulator_friendly_sim_robots = simulator_state.blue_robots();
+    auto simulator_enemy_sim_robots = simulator_state.yellow_robots();
+
+    /* convert simball and simrobot to normal ball and robot in world for comparison */
+    Ball simulator_ball = createBall(simulator_sim_ball, TimeStamp::fromSeconds(0));
+    std::vector<Robot> simulator_friendly_robots;
+    std::vector<Robot> simulator_enemy_robots;
+    for(int i = 0; i < simulator_friendly_sim_robots.size(); i++){
+        simulator_friendly_robots.push_back(createRobot(simulator_friendly_sim_robot[i], TimeStamp::fromSeconds(0)));
+    }
+    for(int i = 0; i < simulator_enemy_sim_robots.size(); i++){
+        simulator_enemy_robots.push_back(createRobot(simulator_enemy__sim_robot[i], TimeStamp::fromSeconds(0)));
+    }
+
+    /* compare ball position */
+    double ball_displacement;
+    Point world_ball_pos = world_ball.position();
+    Point simulator_ball_pos = simulator_ball.position();
+    ball_displacement = (world_ball_pos - simulator_ball_pos).distanceFromOrigin();
+
+    /* compare ball velocity */
+    double ball_velocity_diff;
+    Vector world_ball_vel = world_ball.velocity();
+    Vector simulator_ball_vel = simulator_ball.velocity();
+    ball_velocity_diff = (world_ball_vel - simulator_ball_vel).length();
+
+    /* vector for robot position and velocity difference */
+    std::vector<double> robot_displacement_by_id;
+    std::vector<double> robot_velocity_diff_by_id;
+
+    /* compare robot position */
+    for(int i = 0; i < MAX_ROBOT_IDS; i++){
+        
+        Robot world_robot;
+        Robot simulator_robot;
+        
+        /* find robot with id in friendly */
+        // TODO: ask if this finding is needed, whether the robot are returned the same way
+        int found = 0; // help exit when found = 2 (1 from world, 1 from simulator)
+        for(int j = 0; j < world_friendly_robots.size() && found < 2; j++){
+            if(world_friendly_robots[j].id() == i){
+                world_robot = world_friendly_robots[j];
+                found++;
+            }
+            if(simulator_friendly_robots[j].id() == i){
+                simulator_robot = world_friendly_robots[j];
+                found++;
+            }
+        }
+        for(int j = 0; j < world_enemy_robots.size() && found < 2; j++){
+            if(world_enemy_robots[j].id() == i){
+                world_robot = world_enemy_robots[j];
+                found++;
+            }
+            if(simulator_enemy_robots[j].id() == i){
+                simulator_robot = world_enemy_robots[j];
+                found++;
+            }
+        }
+        
+        /* find difference in robot[i] position */
+        Point world_robot_pos = world_robot.position();
+        Point simulator_robot_pos = simulator_robot.position();
+        double robot_displacement = (world_robot_pos - simulator_robot_pos).distanceFromOrigin();
+
+        /* find difference in robot[i] velocity */
+        Vector world_robot_vel = world_robot.velocity();
+        Vector simulator_robot_vel = simulator_robot.velocity();
+        double robot_velocity_diff = (world_robot_vel - simulator_robot_vel).length();
+
+        robot_displacement_by_id.push_back(robot_displacement);
+        robot_velocity_diff.push_back(robot_velocity_diff);
+    }
+    
     auto wall_start_time           = std::chrono::steady_clock::now();
     bool validation_functions_done = false;
     for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
