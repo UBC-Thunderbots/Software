@@ -19,7 +19,7 @@ namespace
     std::vector<std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>>
         test_vector = {
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new MoveTactic(false), std::set<MotionConstraint>({})),
+                new MoveTactic(), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new CreaseDefenderTactic(
                     std::make_shared<const RobotNavigationObstacleConfig>()),
@@ -31,9 +31,9 @@ namespace
                                             MotionConstraint::HALF_METER_AROUND_BALL,
                                             MotionConstraint::FRIENDLY_HALF})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new ChipTactic(true), std::set<MotionConstraint>({})),
+                new ChipTactic(), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new KickoffChipTactic(true),
+                new KickoffChipTactic(),
                 std::set<MotionConstraint>({MotionConstraint::CENTER_CIRCLE,
                                             MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
@@ -42,22 +42,15 @@ namespace
                                             MotionConstraint::ENEMY_DEFENSE_AREA,
                                             MotionConstraint::ENEMY_HALF})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new PenaltySetupTactic(true),
+                new PenaltySetupTactic(),
                 std::set<MotionConstraint>({MotionConstraint::ENEMY_HALF,
                                             MotionConstraint::ENEMY_DEFENSE_AREA,
                                             MotionConstraint::FRIENDLY_HALF,
                                             MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new ReceiverTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                                   pass, world.ball(), false),
-                std::set<MotionConstraint>({})),
+                new ReceiverTactic(), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new ShadowEnemyTactic(), std::set<MotionConstraint>({})),
-            std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new ShadowFreekickerTactic(ShadowFreekickerTactic::LEFT,
-                                           world.enemyTeam(), world.ball(), world.field(),
-                                           false),
-                std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new AttackerTactic(std::make_shared<const AttackerTacticConfig>()),
                 std::set<MotionConstraint>({})),
@@ -84,6 +77,11 @@ namespace
     auto them_penalty_motion_constraints = std::set<MotionConstraint>(
         {MotionConstraint::FRIENDLY_DEFENSE_AREA,
          MotionConstraint::HALF_METER_AROUND_BALL, MotionConstraint::FRIENDLY_HALF});
+
+    auto them_ball_placement =
+        std::set<MotionConstraint>({MotionConstraint::HALF_METER_AROUND_BALL,
+                                    MotionConstraint::FRIENDLY_DEFENSE_AREA,
+                                    MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE});
 }  // namespace
 
 class CheckMotionConstraints
@@ -138,10 +136,6 @@ TEST_P(CheckMotionConstraints, CycleStoppageOrThemGameStatesTest)
               buildMotionConstraintSet(game_state, *GetParam().first));
 
     game_state.updateRefereeCommand(RefereeCommand::GOAL_THEM);
-    EXPECT_EQ(correct_motion_constraints,
-              buildMotionConstraintSet(game_state, *GetParam().first));
-
-    game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
     EXPECT_EQ(correct_motion_constraints,
               buildMotionConstraintSet(game_state, *GetParam().first));
 }
@@ -218,6 +212,21 @@ TEST_P(CheckMotionConstraints, CycleThemPenaltyGameStatesTest)
               buildMotionConstraintSet(game_state, *GetParam().first));
 }
 
+TEST_P(CheckMotionConstraints, CycleThemBallPlacementTest)
+{
+    correct_motion_constraints = them_ball_placement;
+
+    for (MotionConstraint c : GetParam().second)
+    {
+        correct_motion_constraints.erase(c);
+    }
+
+    game_state.updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
+    EXPECT_EQ(correct_motion_constraints,
+              buildMotionConstraintSet(game_state, *GetParam().first));
+}
+
+
 INSTANTIATE_TEST_CASE_P(CycleStoppageOrThemGameStatesTest, CheckMotionConstraints,
                         ::testing::ValuesIn(test_vector.begin(), test_vector.end()));
 
@@ -231,4 +240,8 @@ INSTANTIATE_TEST_CASE_P(CycleOurPenaltyGameStatesTest, CheckMotionConstraints,
                         ::testing::ValuesIn(test_vector.begin(), test_vector.end()));
 
 INSTANTIATE_TEST_CASE_P(CycleThemPenaltyGameStatesTest, CheckMotionConstraints,
+                        ::testing::ValuesIn(test_vector.begin(), test_vector.end()));
+
+INSTANTIATE_TEST_CASE_P(CheckMotionConstraints_CycleThemBallPlacementTest_Test,
+                        CheckMotionConstraints,
                         ::testing::ValuesIn(test_vector.begin(), test_vector.end()));

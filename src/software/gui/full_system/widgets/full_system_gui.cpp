@@ -6,7 +6,7 @@
 FullSystemGUI::FullSystemGUI(
     std::shared_ptr<ThreadSafeBuffer<WorldDrawFunction>> world_draw_functions_buffer,
     std::shared_ptr<ThreadSafeBuffer<AIDrawFunction>> ai_draw_functions_buffer,
-    std::shared_ptr<ThreadSafeBuffer<PlayInfo>> play_info_buffer,
+    std::shared_ptr<ThreadSafeBuffer<TbotsProto::PlayInfo>> play_info_msg_buffer,
     std::shared_ptr<ThreadSafeBuffer<SensorProto>> sensor_msg_buffer,
     std::shared_ptr<ThreadSafeBuffer<Rectangle>> view_area_buffer,
     std::shared_ptr<ThreadSafeBuffer<double>> worlds_received_per_second_buffer,
@@ -18,7 +18,7 @@ FullSystemGUI::FullSystemGUI(
       data_per_second_timer(new QTimer(this)),
       world_draw_functions_buffer(world_draw_functions_buffer),
       ai_draw_functions_buffer(ai_draw_functions_buffer),
-      play_info_buffer(play_info_buffer),
+      play_info_msg_buffer(play_info_msg_buffer),
       sensor_msg_buffer(sensor_msg_buffer),
       view_area_buffer(view_area_buffer),
       worlds_received_per_second_buffer(worlds_received_per_second_buffer),
@@ -61,7 +61,7 @@ FullSystemGUI::FullSystemGUI(
 void FullSystemGUI::handleUpdate()
 {
     draw();
-    updatePlayInfo();
+    updatePlayInfoProto();
     updateSensorProto();
     updateDrawViewArea();
 }
@@ -84,9 +84,9 @@ void FullSystemGUI::draw()
          most_recent_ai_draw_function.getDrawFunction()});
 }
 
-void FullSystemGUI::updatePlayInfo()
+void FullSystemGUI::updatePlayInfoProto()
 {
-    if (auto play_info = play_info_buffer->popLeastRecentlyAddedValue())
+    if (auto play_info = play_info_msg_buffer->popLeastRecentlyAddedValue())
     {
         main_widget->play_info_widget->updatePlayInfo(play_info.value());
     }

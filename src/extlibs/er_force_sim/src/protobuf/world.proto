@@ -1,0 +1,179 @@
+syntax                  = "proto2";
+option cc_enable_arenas = true;
+
+import "extlibs/er_force_sim/src/protobuf/robot.proto";
+import "proto/messages_robocup_ssl_wrapper.proto";
+
+package world;
+
+message Geometry
+{
+    enum GeometryType
+    {
+        TYPE_2014 = 1;
+        TYPE_2018 = 2;
+    }
+    enum Division
+    {
+        A = 1;
+        B = 2;
+    }
+    required float line_width     = 1;
+    required float field_width    = 2;
+    required float field_height   = 3;
+    required float boundary_width = 4;
+    // deprecated = 5
+    required float goal_width                        = 6;
+    required float goal_depth                        = 7;
+    required float goal_wall_width                   = 8;
+    required float center_circle_radius              = 9;
+    required float defense_radius                    = 10;
+    required float defense_stretch                   = 11;
+    required float free_kick_from_defense_dist       = 12;
+    required float penalty_spot_from_field_line_dist = 13;
+    required float penalty_line_from_spot_dist       = 14;
+    required float goal_height                       = 15;
+    optional float defense_width                     = 16 [default = 2.0];
+    optional float defense_height                    = 17 [default = 1.0];
+    optional GeometryType type                       = 18 [default = TYPE_2014];
+    optional Division division                       = 19 [default = A];
+}
+
+message DivisionDimensions
+{
+    required float field_width_a  = 1;
+    required float field_height_a = 2;
+
+    required float field_width_b  = 3;
+    required float field_height_b = 4;
+}
+
+message BallPosition
+{
+    required int64 time                   = 1;
+    required float p_x                    = 2;
+    required float p_y                    = 3;
+    optional float derived_z              = 10;
+    optional float v_x                    = 5;
+    optional float v_y                    = 6;
+    optional float system_delay           = 7;
+    optional float time_diff_scaled       = 8;  // scaled by factor 100
+    optional uint32 camera_id             = 9;
+    optional float area                   = 11;
+    optional int64 vision_processing_time = 12;
+}
+
+message Ball
+{
+    required float p_x         = 1;
+    required float p_y         = 2;
+    optional float p_z         = 6;
+    required float v_x         = 3;
+    required float v_y         = 4;
+    optional float v_z         = 7;
+    optional float touchdown_x = 8;
+    optional float touchdown_y = 9;
+    optional bool is_bouncing  = 10;
+    repeated BallPosition raw  = 5;
+}
+
+message RobotPosition
+{
+    required int64 time                   = 1;
+    required float p_x                    = 2;
+    required float p_y                    = 3;
+    required float phi                    = 4;
+    optional float v_x                    = 5;
+    optional float v_y                    = 6;
+    optional float system_delay           = 7;
+    optional float time_diff_scaled       = 8;  // scaled by factor 100
+    optional float omega                  = 9;
+    optional uint32 camera_id             = 10;
+    optional int64 vision_processing_time = 11;
+}
+
+message Robot
+{
+    required uint32 id         = 1;
+    required float p_x         = 2;
+    required float p_y         = 3;
+    required float phi         = 4;
+    required float v_x         = 5;
+    required float v_y         = 6;
+    required float omega       = 7;
+    repeated RobotPosition raw = 8;
+}
+
+message TrackingAOI
+{
+    required float x1 = 1;
+    required float y1 = 2;
+    required float x2 = 3;
+    required float y2 = 4;
+}
+
+message State
+{
+    required int64 time   = 1;
+    optional Ball ball    = 2;
+    repeated Robot yellow = 3;
+    // robot states predicted with help of the desired trajectory (if available)
+    repeated Robot blue                         = 4;
+    repeated robot.RadioResponse radio_response = 5;
+    optional bool is_simulated                  = 6;
+    optional bool has_vision_data               = 7;
+    optional TrackingAOI tracking_aoi           = 9;
+    // robot states predicted without trajectories, only from vision data
+    repeated Robot simple_tracking_yellow = 11;
+    repeated Robot simple_tracking_blue   = 12;
+    // debug information from the simulator
+    repeated SimulatorState reality = 13;
+    // data for tracking replay and vision extraction
+    repeated SSLProto.SSL_WrapperPacket vision_frames = 10;
+    repeated int64 vision_frame_times                 = 14;
+    optional int64 system_delay                       = 15;
+}
+
+message SimulatorState
+{
+    repeated SimRobot blue_robots   = 1;
+    repeated SimRobot yellow_robots = 2;
+    optional SimBall ball           = 3;
+}
+
+message SimBall
+{
+    required float p_x       = 1;
+    required float p_y       = 2;
+    required float p_z       = 3;
+    required float v_x       = 4;
+    required float v_y       = 5;
+    required float v_z       = 6;
+    optional float angular_x = 7;
+    optional float angular_y = 8;
+    optional float angular_z = 9;
+}
+
+message Quaternion
+{
+    required float real = 1;
+    required float i    = 2;
+    required float j    = 3;
+    required float k    = 4;
+}
+
+message SimRobot
+{
+    required uint32 id           = 1;
+    required float p_x           = 2;
+    required float p_y           = 3;
+    required float p_z           = 4;
+    required Quaternion rotation = 5;
+    required float v_x           = 6;
+    required float v_y           = 7;
+    required float v_z           = 8;
+    required float r_x           = 9;
+    required float r_y           = 10;
+    required float r_z           = 11;
+    optional float angle         = 12;
+}

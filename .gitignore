@@ -9,11 +9,12 @@
 *.pb.cc
 *.pb.h
 
-# Symlinked qt directory
-src/external/qt
-
 # Pycache
 *.pyc
+
+# HRVO Outputs
+*.gif
+*.png
 
 # CLion
 *.idea*
@@ -145,3 +146,12 @@ src/config
 
 # ipynb Jupyter Notebooks
 *.ipynb
+
+# codespell dictionary
+formatting_scripts/dictionary/
+
+# clangd for nvim lsp
+src/.clangd
+
+# external is a special directory for bazel so it should be ignored
+src/external

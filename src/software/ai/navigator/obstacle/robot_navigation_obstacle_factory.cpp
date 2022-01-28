@@ -54,6 +54,18 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
                                                          world.field().fieldLines(),
                                                          world.field().fieldBoundary()));
             break;
+        case MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:
+            if (world.gameState().getBallPlacementPoint().has_value())
+            {
+                obstacles.push_back(createFromBallPlacement(
+                    world.gameState().getBallPlacementPoint().value(),
+                    world.ball().position()));
+            }
+            else
+            {
+                obstacles.push_back(
+                    createFromShape(Circle(world.ball().position(), 0.5)));
+            }
     }
 
     return obstacles;
@@ -150,9 +162,9 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createEnemyCollisionAvo
         std::vector<ObstaclePtr> obstacles;
         for (const auto &robot : enemy_team.getAllRobots())
         {
+            // allow collisions where friendly and enemy robots can be face to face
             obstacles.push_back(std::make_shared<GeomObstacle<Circle>>(
-                Circle(robot.position(),
-                       ROBOT_MAX_RADIUS_METERS + DIST_TO_FRONT_OF_ROBOT_METERS)));
+                Circle(robot.position(), 2 * DIST_TO_FRONT_OF_ROBOT_METERS)));
         }
         return obstacles;
     }
@@ -183,10 +195,7 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromShape(const Circle &circle
 ObstaclePtr RobotNavigationObstacleFactory::createFromShape(const Polygon &polygon) const
 {
     return std::make_shared<GeomObstacle<Polygon>>(
-        polygon.expand(Vector(-1, 0).normalize(robot_radius_expansion_amount))
-            .expand(Vector(1, 0).normalize(robot_radius_expansion_amount))
-            .expand(Vector(0, -1).normalize(robot_radius_expansion_amount))
-            .expand(Vector(0, 1).normalize(robot_radius_expansion_amount)));
+        polygon.expand(robot_radius_expansion_amount));
 }
 
 ObstaclePtr RobotNavigationObstacleFactory::createFromFieldRectangle(
@@ -210,4 +219,47 @@ ObstaclePtr RobotNavigationObstacleFactory::createFromFieldRectangle(
 
     return std::make_shared<GeomObstacle<Rectangle>>(
         Rectangle(Point(xMin, yMin), Point(xMax, yMax)));
+}
+
+ObstaclePtr RobotNavigationObstacleFactory::createFromBallPlacement(
+    const Point &placement_point, const Point &ball_point) const
+{
+    /*   The Polygon is constructed as follows:
+     *
+     *         ball_l           ball_r
+     *           +-------+-------+
+     *           |               |
+     *           |    ball_c     |
+     *           +-------+-------+
+     *           |               |
+     *           |               |
+     *           |               |
+     *           |     place_c   |
+     *           +-------+-------+
+     *           |               |
+     *           |               |
+     *           +-------+-------+
+     *        place_l          place_r
+     */
+    const double RADIUS = 0.5;
+
+    Vector place_to_ball = placement_point.toVector() - ball_point.toVector();
+    Vector ball_to_place = -place_to_ball;
+
+    Point place_l = placement_point + (place_to_ball.normalize(RADIUS) +
+                                       place_to_ball.perpendicular().normalize(RADIUS));
+    Point place_r = placement_point + (place_to_ball.normalize(RADIUS) -
+                                       place_to_ball.perpendicular().normalize(RADIUS));
+
+    Point ball_l = ball_point + (ball_to_place.normalize(RADIUS) +
+                                 ball_to_place.perpendicular().normalize(RADIUS));
+    Point ball_r = ball_point + (ball_to_place.normalize(RADIUS) -
+                                 ball_to_place.perpendicular().normalize(RADIUS));
+
+    return createFromShape(Polygon({
+        place_l,
+        place_r,
+        ball_l,
+        ball_r,
+    }));
 }

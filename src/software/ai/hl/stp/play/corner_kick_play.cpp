@@ -4,13 +4,13 @@
 #include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/receiver_tactic.h"
+#include "software/ai/hl/stp/tactic/receiver/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/passing/eighteen_zone_pitch_division.h"
-#include "software/ai/passing/pass_generator.h"
+#include "software/ai/passing/pass_generator.hpp"
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.h"
 #include "software/world/ball.h"
 
 CornerKickPlay::CornerKickPlay(std::shared_ptr<const PlayConfig> config)
@@ -63,13 +63,11 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
     // Perform the pass and wait until the receiver is finished
     auto attacker =
         std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
-    auto receiver =
-        std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(),
-                                         world.enemyTeam(), pass, world.ball(), false);
+    auto receiver = std::make_shared<ReceiverTactic>();
 
     do
     {
-        attacker->updateControlParams(pass);
+        attacker->updateControlParams(pass, true);
         receiver->updateControlParams(pass);
 
         if (!attacker->done())
@@ -97,17 +95,17 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
     // This tactic will move a robot into position to initially take the free-kick
-    auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
+    auto align_to_ball_tactic = std::make_shared<MoveTactic>();
 
     auto zones_to_cherry_pick =
         pass_eval.rankZonesForReceiving(world, world.ball().position());
 
     // These tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
-    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
-    auto cherry_pick_tactic_3 = std::make_shared<MoveTactic>(false);
-    auto cherry_pick_tactic_4 = std::make_shared<MoveTactic>(false);
+    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>();
+    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>();
+    auto cherry_pick_tactic_3 = std::make_shared<MoveTactic>();
+    auto cherry_pick_tactic_4 = std::make_shared<MoveTactic>();
 
     auto update_cherry_pickers = [&](PassEvaluation<EighteenZoneId> pass_eval) {
         auto pass1 = pass_eval.getBestPassInZones({zones_to_cherry_pick[0]}).pass;
@@ -128,22 +126,6 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
                                                   pass4.receiverOrientation(), 0.0,
                                                   MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     };
-
-    // Wait for a robot to be assigned to align to take the corner
-    while (!align_to_ball_tactic->getAssignedRobot())
-    {
-        LOG(DEBUG) << "Nothing assigned to align to ball yet";
-        updateAlignToBallTactic(align_to_ball_tactic, world);
-        update_cherry_pickers(pass_generator.generatePassEvaluation(world));
-
-        yield({{align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
-                cherry_pick_tactic_3, cherry_pick_tactic_4}});
-    }
-
-
-    // Set the passer on the pass generator
-    LOG(DEBUG) << "Aligning with robot " << align_to_ball_tactic->getAssignedRobot()->id()
-               << "as the passer";
 
     // Put the robot in roughly the right position to perform the kick
     LOG(DEBUG) << "Aligning to ball";

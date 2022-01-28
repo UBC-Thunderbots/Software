@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/example_play.h"
 
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.h"
 
 ExamplePlay::ExamplePlay(std::shared_ptr<const PlayConfig> config) : Play(config, false)
 {
@@ -21,10 +21,9 @@ bool ExamplePlay::invariantHolds(const World &world) const
 
 void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
-    // Create MoveTactics that will loop forever
     std::vector<std::shared_ptr<MoveTactic>> move_tactics(DIV_A_NUM_ROBOTS);
     std::generate(move_tactics.begin(), move_tactics.end(),
-                  []() { return std::make_shared<MoveTactic>(true); });
+                  []() { return std::make_shared<MoveTactic>(); });
 
     // Continue to loop to demonstrate the example play indefinitely
     do

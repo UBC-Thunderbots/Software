@@ -6,15 +6,16 @@
 #include "software/simulated_tests/non_terminating_validation_functions/ball_never_moves_backward_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robots_avoid_ball_validation.h"
-#include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
+#include "software/test_util/equal_within_tolerance.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class PenaltyKickPlayTest : public SimulatedPlayTestFixture
+class PenaltyKickPlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
     Field field = Field::createSSLDivisionBField();
@@ -45,8 +46,9 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             // making sure that the robot doesn't move the ball while the penalty is
             // setting up
-            ASSERT_EQ(world_ptr->field().friendlyPenaltyMark(),
-                      world_ptr->ball().position());
+            ASSERT_TRUE(
+                TestUtil::equalWithinTolerance(world_ptr->field().friendlyPenaltyMark(),
+                                               world_ptr->ball().position(), 1e-6));
         },
         [shooter_id](std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield) {
@@ -107,4 +109,47 @@ TEST_F(PenaltyKickPlayTest, DISABLED_test_penalty_kick_take)
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
+}
+
+TEST(PenaltyKickInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
+{
+    auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
+
+    // World: A blank testing world we will manipulate for the test
+    auto world = ::TestUtil::createBlankTestingWorld();
+
+    // PenaltyKickPlay: the play under test
+    auto penalty_kick_play = PenaltyKickPlay(play_config);
+
+    // Test 1
+    world.updateGameState(::TestUtil::createGameState(
+        RefereeCommand::PREPARE_PENALTY_US, RefereeCommand::PREPARE_PENALTY_US));
+
+    // Lets make sure the play will start running and stay running
+    ASSERT_TRUE(penalty_kick_play.isApplicable(world));
+    ASSERT_TRUE(penalty_kick_play.invariantHolds(world));
+
+    // Test 2: PREPARE_PENALTY_US to PREPARE_PENALTY_THEM
+    world.updateGameState(::TestUtil::createGameState(
+        RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::PREPARE_PENALTY_US));
+
+    // Making sure we don't run PenaltyKickPlay
+    ASSERT_FALSE(penalty_kick_play.isApplicable(world));
+    ASSERT_FALSE(penalty_kick_play.invariantHolds(world));
+
+    // Test 3: NORMAL_START to PREPARE_PENALTY_US
+    world.updateGameState(::TestUtil::createGameState(RefereeCommand::PREPARE_PENALTY_US,
+                                                      RefereeCommand::NORMAL_START));
+
+    // making sure we run PenaltyKickPlay
+    ASSERT_TRUE(penalty_kick_play.isApplicable(world));
+    ASSERT_TRUE(penalty_kick_play.invariantHolds(world));
+
+    // Test 4: HALT to PREPARE_PENALTY_US
+    world.updateGameState(::TestUtil::createGameState(RefereeCommand::PREPARE_PENALTY_US,
+                                                      RefereeCommand::HALT));
+
+    // making sure we run PenaltyKickPlay
+    ASSERT_TRUE(penalty_kick_play.isApplicable(world));
+    ASSERT_TRUE(penalty_kick_play.invariantHolds(world));
 }

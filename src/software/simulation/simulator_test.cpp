@@ -16,9 +16,6 @@ class SimulatorTest : public ::testing::Test
         simulator =
             std::make_shared<Simulator>(Field::createSSLDivisionBField(), robot_constants,
                                         wheel_constants, simulator_config);
-        simulator =
-            std::make_shared<Simulator>(Field::createSSLDivisionBField(), robot_constants,
-                                        wheel_constants, simulator_config);
         simulator->resetCurrentFirmwareTime();
     }
 
@@ -76,30 +73,6 @@ TEST_F(SimulatorTest, set_ball_state_when_ball_already_exists)
     auto ball = detection_frame.balls(0);
     EXPECT_FLOAT_EQ(-3500.0f, ball.x());
     EXPECT_FLOAT_EQ(20.0f, ball.y());
-}
-
-TEST_F(SimulatorTest, remove_ball_when_no_ball_exists)
-{
-    simulator->removeBall();
-
-    auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
-    ASSERT_TRUE(ssl_wrapper_packet);
-    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
-    auto detection_frame = ssl_wrapper_packet->detection();
-    EXPECT_EQ(0, detection_frame.balls_size());
-}
-
-TEST_F(SimulatorTest, remove_ball_when_the_ball_already_exists)
-{
-    BallState ball_state(Point(1, 2), Vector(0, -3));
-    simulator->setBallState(ball_state);
-    simulator->removeBall();
-
-    auto ssl_wrapper_packet = simulator->getSSLWrapperPacket();
-    ASSERT_TRUE(ssl_wrapper_packet);
-    ASSERT_TRUE(ssl_wrapper_packet->has_detection());
-    auto detection_frame = ssl_wrapper_packet->detection();
-    EXPECT_EQ(0, detection_frame.balls_size());
 }
 
 TEST_F(SimulatorTest, add_zero_yellow_robots)

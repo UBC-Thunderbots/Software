@@ -2,8 +2,10 @@
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
-#include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/ai/navigator/obstacle/obstacle.hpp"
+#include "software/geom/line.h"
 #include "software/geom/point.h"
+#include "software/geom/polygon.h"
 #include "software/logger/logger.h"
 #include "software/world/world.h"
 
@@ -113,6 +115,18 @@ class RobotNavigationObstacleFactory
      */
     ObstaclePtr createFromShape(const Circle &circle) const;
     ObstaclePtr createFromShape(const Polygon &polygon) const;
+
+    /**
+     * Returns an obstacle with the shape of the BallPlacementZone if the state is in
+     * enemy ball placement
+     *
+     * @param placement_point the point where the ball will be placed
+     * @param ball_point the point where the ball currently is
+     *
+     * @return ObstaclePtr
+     */
+    ObstaclePtr createFromBallPlacement(const Point &placement_point,
+                                        const Point &ball_point) const;
 
    private:
     std::shared_ptr<const RobotNavigationObstacleConfig> config;

@@ -24,14 +24,12 @@ class AttackerTactic : public Tactic
 
     AttackerTactic() = delete;
 
-    void updateWorldParams(const World& world) override;
-
     /**
      * Updates the control parameters for this AttackerTactic.
      *
      * @param updated_pass The pass to perform
      */
-    void updateControlParams(const Pass& updated_pass);
+    void updateControlParams(const Pass& best_pass_so_far, bool pass_committed);
 
     /**
      * Updates the control parameters for this AttackerTactic
@@ -54,16 +52,18 @@ class AttackerTactic : public Tactic
     double calculateRobotCost(const Robot& robot, const World& world) const override;
 
     void accept(TacticVisitor& visitor) const override;
-    bool done() const override;
+
+    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
-    void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
     FSM<AttackerFSM> fsm;
 
     // The pass to execute
-    std::optional<Pass> pass;
+    std::optional<Pass> best_pass_so_far;
+    // whether we have committed to the above pass
+    bool pass_committed;
     // The point the robot will chip towards if it is unable to shoot and is in danger
     // of losing the ball to an enemy
     std::optional<Point> chip_target;

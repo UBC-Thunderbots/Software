@@ -3,7 +3,7 @@
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QWidget>
 
-#include "software/ai/hl/stp/play_info.h"
+#include "proto/play_info_msg.pb.h"
 
 /**
  * This class abstracts how we display PlayInfo in the GUI
@@ -20,5 +20,5 @@ class PlayInfoWidget : public QTextEdit
      *
      * @param play_info The new PlayInfo to display
      */
-    void updatePlayInfo(const PlayInfo& play_info);
+    void updatePlayInfo(const TbotsProto::PlayInfo& play_info);
 };

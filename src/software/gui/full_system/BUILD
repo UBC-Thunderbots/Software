@@ -1,5 +1,3 @@
-load("@bazel_rules_qt//:qt.bzl", "qt_cc_library")
-
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -7,8 +5,9 @@ cc_library(
     srcs = ["threaded_full_system_gui.cpp"],
     hdrs = ["threaded_full_system_gui.h"],
     deps = [
+        "//proto:play_info_msg_cc_proto",
         "//proto:sensor_msg_cc_proto",
-        "//software/ai/hl/stp:play_info",
+        "//proto:visualization_cc_proto",
         "//software/gui/drawing:draw_functions",
         "//software/gui/drawing:world",
         "//software/gui/full_system/widgets:full_system_gui",

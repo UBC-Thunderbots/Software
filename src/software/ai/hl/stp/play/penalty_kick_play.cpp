@@ -3,8 +3,7 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/penalty_kick/penalty_kick_tactic.h"
-#include "software/ai/hl/stp/tactic/penalty_setup_tactic.h"
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.h"
 
 PenaltyKickPlay::PenaltyKickPlay(std::shared_ptr<const PlayConfig> config)
     : Play(config, true)
@@ -28,13 +27,13 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 {
     auto penalty_shot_tactic = std::make_shared<PenaltyKickTactic>();
 
-    auto shooter_setup_move = std::make_shared<PenaltySetupTactic>(true);
+    auto shooter_setup_move = std::make_shared<PenaltySetupTactic>();
 
     // Setup the goalie
-    auto move_tactic_2 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_3 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_4 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_5 = std::make_shared<MoveTactic>(true);
+    auto move_tactic_2 = std::make_shared<MoveTactic>();
+    auto move_tactic_3 = std::make_shared<MoveTactic>();
+    auto move_tactic_4 = std::make_shared<MoveTactic>();
+    auto move_tactic_5 = std::make_shared<MoveTactic>();
 
     do
     {

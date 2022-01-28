@@ -9,7 +9,7 @@
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/handheld_controller/controller_input.h"
-#include "software/multithreading/subject.h"
+#include "software/multithreading/subject.hpp"
 
 /**
  * Abstracts any handheld game controller, like an XBox or Playstation controller.

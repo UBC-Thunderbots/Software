@@ -21,7 +21,7 @@ cc_library(
         ":backend",
         ":ssl_proto_client",
         "//software/backend/radio:radio_output",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"
     # design pattern to work are linked in
@@ -48,7 +48,7 @@ cc_library(
         "//software/logger",
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"
     # design pattern to work are linked in
@@ -66,13 +66,15 @@ cc_library(
         "//proto:defending_side_msg_cc_proto",
         "//proto:tbots_cc_proto",
         "//proto/message_translation:defending_side",
+        "//proto/message_translation:ssl_wrapper",
         "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
         "//software:constants",
         "//software/logger",
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",
-        "//software/util/design_patterns:generic_factory",
+        "//software/networking:threaded_unix_sender",
+        "//software/util/generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"
     # design pattern to work are linked in
@@ -93,7 +95,7 @@ cc_library(
         "//software:constants",
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"
     # design pattern to work are linked in

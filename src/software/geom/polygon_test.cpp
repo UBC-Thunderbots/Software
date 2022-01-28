@@ -81,50 +81,27 @@ TEST(PolygonCentroidTest, test_non_convex_five_points_up_left)
 }
 
 
-TEST(PolygonExpandTest, test_three_points_up)
+TEST(PolygonExpandTest, test_four_points_slanted)
 {
-    Polygon poly({{1, 2}, {2, 3}, {1, 3}});
-    Polygon expected({{1, 2}, {2, 6}, {1, 6}});
-    Vector expansion_vector({0, 3});
-    EXPECT_EQ(poly.expand(expansion_vector), expected);
+    // These points make a slanted 5 unit long square
+    Polygon poly({{3, 4}, {7, 1}, {4, -3}, {0, 0}});
+    // These points make a slanted 10 unit long square
+    Polygon expected({{10.5, 1.5}, {4.5, -6.5}, {-3.5, -0.5}, {2.5, 7.5}});
+    // To double the initial square, we need to add 2.5 units in all 4 directions
+    EXPECT_EQ(poly.expand(2.5), expected);
 }
 
-TEST(PolygonExpandTest, test_three_points_left)
+TEST(PolygonExpandTest, test_invalid_modifier)
 {
-    Polygon poly({{1, 2}, {2, 3}, {1, 3}});
-    Polygon expected({{-1, 2}, {2, 3}, {-1, 3}});
-    Vector expansion_vector({-2, 0});
-    EXPECT_EQ(poly.expand(expansion_vector), expected);
-}
-
-TEST(PolygonExpandTest, test_five_points_right)
-{
-    Polygon poly({{1, 1}, {1, 3}, {2, 3}, {5, 3}, {5, 1}});
-    Polygon expected({{1, 1}, {1, 3}, {2, 3}, {8, 3}, {8, 1}});
-    Vector expansion_vector({3, 0});
-    EXPECT_EQ(poly.expand(expansion_vector), expected);
-}
-
-TEST(PolygonExpandTest, test_five_points_up_left)
-{
-    Polygon poly({{1, 1}, {1, 3}, {2, 3}, {5, 3}, {5, 1}});
-    Polygon expected({{-1, 4}, {-1, 6}, {0, 6}, {5, 3}, {5, 1}});
-    Vector expansion_vector({-2, 3});
-    EXPECT_EQ(poly.expand(expansion_vector), expected);
-}
-
-TEST(PolygonExpandTest, test_non_convex_five_points_up_left)
-{
-    Polygon poly({{1, 1}, {1, 3}, {2, 2}, {5, 3}, {5, 1}});
-    Polygon expected({{-1, 4}, {-1, 6}, {0, 5}, {5, 3}, {5, 1}});
-    Vector expansion_vector({-2, 3});
-    EXPECT_EQ(poly.expand(expansion_vector), expected);
-}
-
-TEST(PolygonExpandTest, test_four_points_0_vector)
-{
-    Polygon poly({{1, 1}, {1, 3}, {3, 3}, {5, 3}, {5, 1}});
-    Polygon expected(poly);
-    Vector expansion_vector({0, 0});
-    EXPECT_EQ(poly.expand(expansion_vector), expected);
+    Polygon poly({{-1, 1}, {1, 1}, {1, -1}, {-1, -1}});
+    Polygon expected({{-2, 2}, {2, 2}, {2, -2}, {-2, -2}});
+    try
+    {
+        EXPECT_EQ(poly.expand(-2), expected);
+        GTEST_FAIL();
+    }
+    catch (std::invalid_argument e)
+    {
+        GTEST_SUCCEED();
+    }
 }

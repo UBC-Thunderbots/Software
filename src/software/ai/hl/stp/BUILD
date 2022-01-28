@@ -14,25 +14,9 @@ cc_library(
         "//software/ai/hl/stp/tactic:all_tactics",
         "//software/ai/intent:stop_intent",
         "//software/ai/motion_constraint:motion_constraint_set_builder",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
         "//software/util/typename",
         "@munkres_cpp",
-    ],
-)
-
-cc_library(
-    name = "play_info",
-    srcs = ["play_info.cpp"],
-    hdrs = ["play_info.h"],
-    deps = [],
-)
-
-cc_test(
-    name = "play_info_test",
-    srcs = ["play_info_test.cpp"],
-    deps = [
-        ":play_info",
-        "//shared/test_util:tbots_gtest_main",
     ],
 )
 
@@ -56,10 +40,6 @@ cc_test(
         "//shared/parameter:cpp_configs",
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:halt_play",
-        "//software/ai/hl/stp/play/test_plays:halt_test_play",
-        "//software/ai/hl/stp/tactic/test_tactics:goalie_test_tactic",
-        "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
-        "//software/ai/hl/stp/tactic/test_tactics:stop_test_tactic",
         "//software/test_util",
     ],
 )
@@ -73,6 +53,6 @@ cc_test(
         "//software/ai/hl/stp/play/test_plays:halt_test_play",
         "//software/ai/hl/stp/play/test_plays:move_test_play",
         "//software/test_util",
-        "//software/util/design_patterns:generic_factory",
+        "//software/util/generic_factory",
     ],
 )

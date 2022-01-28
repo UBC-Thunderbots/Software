@@ -49,73 +49,30 @@ Point Polygon::centroid() const
     return Point((Vector(x_centre, y_centre) / (3 * signed_area)));
 }
 
-Polygon Polygon::expand(const Vector& expansion_vector) const
+Polygon Polygon::expand(double expansion_amount) const
 {
-    // ASCII art showing an expanded Polygon
-    //
-    // Original Polygon:
-    //
-    //            B---------C
-    //            |         |
-    //            |         |
-    //            A---------D
-    //
-    //                 |
-    //                 V
-    //          expansion vector
-    //
-    // Expanded Polygon (A and D are shifted down):
-    //
-    //            B---------C
-    //            |         |
-    //            |         |
-    //            |         |
-    //            A'--------D'
-    //
-
-    std::vector<Point> expanded_points;
-    Point centroid_point = centroid();
-
-    // left and right is with respect to the vector pointing straight up
-    enum SideOfDividingLine
+    if (expansion_amount < 0)
     {
-        LEFT,
-        RIGHT,
-        ON_THE_LINE
-    };
-
-    // For a dividing line through centroid_point and perpendicular to the
-    // expansion_vector, returns which side of the line the point p is on
-    auto side_of_dividing_line = [&](const Point& p) {
-        double d = (p - centroid_point).cross(expansion_vector.perpendicular());
-        if (d == 0)
-        {
-            return SideOfDividingLine::ON_THE_LINE;
-        }
-        else if (d < 0)
-        {
-            return SideOfDividingLine::LEFT;
-        }
-        else
-        {
-            return SideOfDividingLine::RIGHT;
-        }
-    };
-
-    SideOfDividingLine side_of_dividing_line_of_expansion_vector =
-        side_of_dividing_line(centroid_point + expansion_vector);
-
-    for (const auto& point : points_)
-    {
-        if (side_of_dividing_line(point) == side_of_dividing_line_of_expansion_vector)
-        {
-            expanded_points.push_back(point + expansion_vector);
-        }
-        else
-        {
-            expanded_points.push_back(point);
-        }
+        throw std::invalid_argument(
+            "Polygon::expand: expansion_amount must be non-negative");
     }
+    Point centroid_point = centroid();
+    std::vector<Point> expanded_points;
+    expanded_points.reserve(points_.size());
+
+    Vector last_expansion =
+        (segments_[0].midPoint() - centroid_point).normalize(expansion_amount);
+    Point first_point = segments_[0].getStart() + last_expansion;
+    for (size_t i = 1; i < segments_.size(); i++)
+    {
+        Vector current_expansion =
+            (segments_[i].midPoint() - centroid_point).normalize(expansion_amount);
+        expanded_points.emplace_back(segments_[i].getStart() + current_expansion +
+                                     last_expansion);
+        last_expansion = current_expansion;
+    }
+    expanded_points.emplace_back(first_point + last_expansion);
+
     return Polygon(expanded_points);
 }
 

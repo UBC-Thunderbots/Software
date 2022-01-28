@@ -4,7 +4,7 @@
 #include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.h"
 
 BallPlacementPlay::BallPlacementPlay(std::shared_ptr<const PlayConfig> config)
     : Play(config, true)
@@ -27,8 +27,8 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     auto place_ball_tactic = std::make_shared<DribbleTactic>();
 
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
-        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)};
+        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
+        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>()};
 
     // non goalie and non ball placing robots line up along a line just outside the
     // friendly defense area to wait for ball placement to finish

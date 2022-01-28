@@ -4,10 +4,10 @@ package(default_visibility = ["//software/gui:__subpackages__"])
 
 qt_cc_library(
     name = "play_info_widget",
-    src = "play_info_widget.cpp",
-    hdr = "play_info_widget.h",
+    srcs = ["play_info_widget.cpp"],
+    hdrs = ["play_info_widget.h"],
     deps = [
-        "//software/ai/hl/stp:play_info",
+        "//proto:play_info_msg_cc_proto",
         "@qt//:qt_widgets",
     ],
 )

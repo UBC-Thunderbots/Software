@@ -94,14 +94,6 @@ class ThreadedSimulator
     void setBallState(const BallState& ball_state);
 
     /**
-     * Removes the ball from the physics world. If a ball does not already exist,
-     * this has no effect.
-     *
-     * Note: This function is threadsafe.
-     */
-    void removeBall();
-
-    /**
      * Adds robots to the specified team with the given initial states.
      *
      * Note: These functions are threadsafe.

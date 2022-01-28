@@ -34,13 +34,14 @@ class Polygon : public virtual Shape
     Point centroid() const;
 
     /**
-     * Returns the Polygon expanded in the direction of expansion_vector
-     * The Polygon is split in half perpendicular to expansion_vector and points on
-     * the half that expansion_vector is pointing are translated by expansion_vector
+     * Returns the Polygon expanded in all directions by the expansion_amount
      *
-     * @return a Polygon expanded in the direction of expansion_vector
+     * @param expansion_amount a non-negative expansion amount
+     * @throw std::invalid_argument if expansion_amount is negative
+     *
+     * @return a Polygon expanded in all directions by the expansion amount
      */
-    Polygon expand(const Vector& expansion_vector) const;
+    Polygon expand(double expansion_amount) const;
 
     /**
      * Returns the line segments that form this polygon.

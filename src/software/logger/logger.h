@@ -11,6 +11,7 @@
 #include "software/logger/coloured_cout_sink.h"
 #include "software/logger/csv_sink.h"
 #include "software/logger/custom_logging_levels.h"
+#include "software/logger/protobuf_sink.h"
 
 // This undefines LOG macro defined by g3log
 #undef LOG
@@ -58,7 +59,6 @@ class LoggerSingleton
         static std::shared_ptr<LoggerSingleton> s(new LoggerSingleton(log_directory));
     }
 
-
    private:
     LoggerSingleton(const std::string& log_directory)
     {
@@ -80,8 +80,9 @@ class LoggerSingleton
         auto csv_sink_handle = logWorker->addSink(
             std::make_unique<CSVSink>(log_directory), &CSVSink::appendToFile);
         // Sink for outputting logs to the terminal
-        auto colour_cout_sink_handle = logWorker->addSink(
-            std::make_unique<ColouredCoutSink>(), &ColouredCoutSink::displayColouredLog);
+        auto colour_cout_sink_handle =
+            logWorker->addSink(std::make_unique<ColouredCoutSink>(true),
+                               &ColouredCoutSink::displayColouredLog);
         // Sink for storing a file of all logs
         auto log_rotate_sink_handle = logWorker->addSink(
             std::make_unique<LogRotate>(log_name, log_directory), &LogRotate::save);
@@ -91,6 +92,11 @@ class LoggerSingleton
                 std::make_unique<LogRotate>(log_name + filter_suffix, log_directory),
                 level_filter),
             &LogRotateWithFilter::save);
+
+        // Sink for visualization
+        auto visualization_handle = logWorker->addSink(std::make_unique<ProtobufSink>(),
+                                                       &ProtobufSink::sendProtobuf);
+
 
         g3::initializeLogging(logWorker.get());
     }

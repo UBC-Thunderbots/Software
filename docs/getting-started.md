@@ -23,6 +23,7 @@
       - [VSCode](#vscode)
   - [Building and Running the Code](#building-and-running-the-code)
     - [Building from the command-line](#building-from-the-command-line)
+         - [Editing with Vim or NeoVim](#editing-with-vim-or-neovim)
     - [Building with CLion](#building-with-clion)
     - [With VSCode](#with-vscode)
     - [Running our AI, Simulator, SimulatedTests or Robot Diagnostics](#running-our-ai-simulator-simulatedtests-or-robot-diagnostics)
@@ -31,6 +32,7 @@
     - [Debugging with CLion](#debugging-with-clion)
     - [Debugging from the Command line](#debugging-from-the-command-line)
   - [Profiling](#profiling)
+  - [Building for Jetson Nano](#building-for-jetson-nano)
   - [Flashing And Debugging A STM32F4 MCU](#flashing-and-debugging-a-stm32f4-mcu)
   - [Flashing the Radio Dongle](#flashing-the-radio-dongle)
   - [Flashing And Debugging A STM32H7 MCU](#flashing-and-debugging-a-stm32h7-mcu)
@@ -62,10 +64,11 @@ You can use Ubuntu 20.04 LTS inside Windows through Windows Subsystem for Linux,
 4. Click the `Fork` button in the top-right to fork the repository ([click here to learn about Forks](https://help.github.com/en/articles/fork-a-repo))
    1. Click on your user when prompted
    2. You should be automatically redirected to your new fork
-5. Clone your fork of the repository (you can put it wherever you want)
-   1.  Eg. `git clone https://github.com/<your-username>/Software.git`
-      1. You can find this link under the green `Clone or Download` button on the main page of the Software repository
-   2. We recommend cloning with SSH if you don't like typing your username and password all the time. Instructions can be found [here](https://help.github.com/articles/connecting-to-github-with-ssh/).
+5. Clone your fork of the repository. As GitHub is forcing users to stop using usernames and passwords, we will be using the SSH link.  Returning members who are migrating to using SSH after cloning from a previous method can use the following instructions to set up a new local repository using SSH.
+   1. To connect to GitHub using SSH, if not setup prior, you will need to add an SSH key to your GitHub account. Instructions can be found [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).  For each computer you contribute to GitHub with, you will need an additional SSH Key pair linked to your account.
+   2.  After you have successfully set up an SSH Key for your device and added it to GitHub, you can clone the repository using the following command (you can put it wherever you like):
+        1.  Eg. `git clone git@github.com:<your_username>/Software.git`
+        2.  You can find this link under the green `Clone or Download` button on the main page of the Software repository, under the SSH tab.  (This should now be available after adding your SSH key to GitHub successfully.)
 6. Set up your git remotes ([what is a remote and how does it work?](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes))
    1. You should have a remote named `origin` that points to your fork of the repository. Git will have set this up automatically when you cloned your fork in the previous step.
    2. You will need to add a second remote, named `upstream`, that points to our main Software repository, which is where you created your fork from. (**Note:** This is _not_ your fork)
@@ -130,7 +133,7 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 VSCode is the more lightweight IDE, with support for code navigation, code completion, and integrated building and testing. However, debugging isn't integrated into this IDE.
 
 1. Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
-2. Run `./install_vscode.sh` (* **DO NOT** download VSCode yourself unless you know what you're doing. The `install_vscode.sh` script will grab the most stable version of VSCode)
+2. Run `./install_vscode.sh` (* **DO NOT** download VSCode yourself unless you know what you're doing. The `install_vscode.sh` script will grab the most stable version of VSCode *)
 3. Open `vscode`. You can type `vscode` in the terminal, or click the icon on your Desktop.
 &. Click `Open Folder` and navigate to where you cloned software. So if I cloned the repo to `/home/my_username/Downloads/Software`, I would select `/home/my_username/Downloads/Software`.
 4. VSCode will prompt you to install recommended extensions, click `Install`, this installs necessary plugins to work on the codebase. (Bazel, C++, Python, etc..)
@@ -148,6 +151,13 @@ VSCode is the more lightweight IDE, with support for code navigation, code compl
 6. Build everything by running `bazel build //...`
 7. Run all the tests by running `bazel test //...`
 *See the bazel [command-line docs](https://docs.bazel.build/versions/master/command-line-reference.html) for more info.*
+
+#### Editing with Vim or NeoVim
+
+When editing with Vim or NeoVim, it's helpful to use plugins, such as [COC](https://github.com/neoclide/coc.nvim) or [LSP](https://github.com/neovim/nvim-lspconfig) to find references, go-to-definition, autocompletion, and more.
+These tools require a `compile_commands.json` file, which can be generated by following these instructions:
+1. Symlink `src/external` to `bazel-out/../../../external`: `ln -s bazel-out/../../../external .` from the src folder
+2. Generate the `compile_commands.json` file: `bazel run //:refresh_compile_commands`.
 
 ### Building with CLion
 
@@ -210,7 +220,7 @@ Debugging from the command line is certainly possible, but debugging in a full I
 Debugging in CLion is as simple as running the above instructions for building CLion, but clicking the little green bug in the top right corner instead of the little green arrow!
 
 ### Debugging from the Command line
-`bazel run -c dbg --run_under="gdb" //some/target:here` will run the target in `gdb`. Please see [here](https://www.cs.cmu.edu/~gilpin/tutorial/) for a tutorial on how to use `gdb` if you're not familiar with it.
+To debug from the command line, first you need to build your target with the debugging flag - `bazel build -c dbg //some/target:here`. When the target builds, you should see a path `bazel-bin/<target>`. Copy that path, and run `gdb <path>`. Please see [here](https://www.cs.cmu.edu/~gilpin/tutorial/) for a tutorial on how to use `gdb` if you're not familiar with it. Alternatively, you could do `bazel run -c dbg --run_under="gdb" //some/target:here`, which will run the target in `gdb`. While this is taken directly from the bazel docs, gdb may sometimes hang when using `--run_under`, so building the target first with debugging flags and running afterwards is preferred.
 
 
 ## Profiling 
@@ -222,6 +232,10 @@ bazel run -c dbg --run_under="valgrind --tool=callgrind --callgrind-out-file=/AB
 bazel run -c dbg --run_under="valgrind --tool=callgrind --callgrind-out-file=/tmp/profile.callgrind" //software/geom:angle_test
 ```
 This will output the file at the _absolute_ path given via the `--callgrind-out-file` argument. This file can then be viewed using `kcachegrind` (example: `kcachegrind /tmp/profile.callgrind`), giving lots of useful information about where time is being spent in the code.
+
+## Building for Jetson Nano 
+
+To build for the Jetson Nano, build the target with the `--cpu=jetson_nano` flag and the toolchain will automatically build using the ARM toolchain for Jetson Nano. For example, `bazel build --cpu=jetson_nano //software/geom/...`.
 
 ## Flashing And Debugging A STM32F4 MCU
 1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies), and have a STM32F4 based main board plugged into your computer. Do not plug both the dongle and the robot at the same time!

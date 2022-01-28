@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "crease_defender_tactic",
-    srcs = ["crease_defender_tactic.cpp"],
+    srcs = [
+        "crease_defender_fsm.cpp",
+        "crease_defender_tactic.cpp",
+    ],
     hdrs = [
         "crease_defender_fsm.h",
         "crease_defender_tactic.h",
@@ -11,8 +14,6 @@ cc_library(
         "//shared:constants",
         "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/action:stop_action",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/geom/algorithms",
@@ -31,8 +32,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_crease_defender_tactic_test",
-    srcs = ["simulated_crease_defender_tactic_test.cpp"],
+    name = "crease_defender_tactic_test",
+    srcs = ["crease_defender_tactic_test.cpp"],
     deps = [
         ":crease_defender_tactic",
         "//shared/test_util:tbots_gtest_main",

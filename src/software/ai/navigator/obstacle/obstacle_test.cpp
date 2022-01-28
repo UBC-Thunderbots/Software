@@ -1,4 +1,4 @@
-#include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/ai/navigator/obstacle/obstacle.hpp"
 
 #include <gtest/gtest.h>
 #include <math.h>

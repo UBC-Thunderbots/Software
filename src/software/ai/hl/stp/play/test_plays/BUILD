@@ -7,8 +7,8 @@ cc_library(
     deps = [
         "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/play",
-        "//software/ai/hl/stp/tactic/test_tactics:stop_test_tactic",
-        "//software/util/design_patterns:generic_factory",
+        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/util/generic_factory",
     ],
     alwayslink = True,
 )
@@ -20,8 +20,8 @@ cc_library(
     deps = [
         "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/play",
-        "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
-        "//software/util/design_patterns:generic_factory",
+        "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/util/generic_factory",
     ],
     alwayslink = True,
 )

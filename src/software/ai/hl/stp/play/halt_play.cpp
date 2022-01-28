@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/halt_play.h"
 
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
-#include "software/util/design_patterns/generic_factory.h"
+#include "software/util/generic_factory/generic_factory.h"
 
 HaltPlay::HaltPlay(std::shared_ptr<const PlayConfig> config) : Play(config, false) {}
 
@@ -17,7 +17,6 @@ bool HaltPlay::invariantHolds(const World &world) const
 
 void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
-    // Create Stop Tactics that will loop forever
     auto stop_tactic_1 = std::make_shared<StopTactic>(false);
     auto stop_tactic_2 = std::make_shared<StopTactic>(false);
     auto stop_tactic_3 = std::make_shared<StopTactic>(false);

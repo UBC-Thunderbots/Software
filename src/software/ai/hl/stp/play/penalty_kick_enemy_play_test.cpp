@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/simulated_tests/non_terminating_validation_functions/enemy_never_scores_validation.h"
-#include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -16,7 +16,7 @@
  * https://robocup-ssl.github.io/ssl-rules/sslrules.html#_penalty_kick
  * */
 class PenaltyKickEnemyPlayTest
-    : public SimulatedPlayTestFixture,
+    : public SimulatedErForceSimPlayTestFixture,
       public ::testing::WithParamInterface<std::tuple<
           RefereeCommand, RefereeCommand, std::vector<RobotStateWithId>, float>>
 {
@@ -163,3 +163,39 @@ TEST_F(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_goalie)
             Duration::fromSeconds(10));
 }
 
+TEST_F(PenaltyKickEnemyPlayTest, test_invariant_and_is_applicable)
+{
+    auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
+
+    // World: A blank testing world we will manipulate for the test
+    auto world = ::TestUtil::createBlankTestingWorld();
+
+    // Penalty_kick_enemy_play: The play under test
+    auto penalty_kick_enemy_play = PenaltyKickEnemyPlay(play_config);
+
+    // GameState: The game state to test with.
+    world.updateGameState(::TestUtil::createGameState(
+        RefereeCommand::PREPARE_PENALTY_THEM, RefereeCommand::PREPARE_PENALTY_THEM));
+
+    // Lets make sure it is their penalty.
+    ASSERT_TRUE(penalty_kick_enemy_play.isApplicable(world));
+    ASSERT_TRUE(penalty_kick_enemy_play.invariantHolds(world));
+
+    world.updateGameState(
+        ::TestUtil::createGameState(RefereeCommand::HALT, RefereeCommand::HALT));
+
+    ASSERT_FALSE(penalty_kick_enemy_play.isApplicable(world));
+    ASSERT_FALSE(penalty_kick_enemy_play.invariantHolds(world));
+
+    world.updateGameState(::TestUtil::createGameState(RefereeCommand::NORMAL_START,
+                                                      RefereeCommand::NORMAL_START));
+
+    ASSERT_FALSE(penalty_kick_enemy_play.isApplicable(world));
+    ASSERT_FALSE(penalty_kick_enemy_play.invariantHolds(world));
+
+    world.updateGameState(::TestUtil::createGameState(
+        RefereeCommand::PREPARE_PENALTY_US, RefereeCommand::PREPARE_PENALTY_US));
+
+    ASSERT_FALSE(penalty_kick_enemy_play.isApplicable(world));
+    ASSERT_FALSE(penalty_kick_enemy_play.invariantHolds(world));
+}
