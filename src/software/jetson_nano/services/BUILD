@@ -25,10 +25,10 @@ cc_library(
     deps = [
         ":service",
         "//proto:tbots_cc_proto",
+        "//shared:robot_constants",
         "//software/logger",
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",
-        "//shared:robot_constants",
         "@boost//:asio",
     ],
 )
@@ -40,7 +40,7 @@ cc_test(
     ],
     deps = [
         ":network",
-        "//software/backend:simulator_backend",
         "//shared/test_util:tbots_gtest_main",
+        "//software/backend:simulator_backend",
     ],
 )
