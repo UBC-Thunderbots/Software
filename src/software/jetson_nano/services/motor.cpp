@@ -320,24 +320,36 @@ void MotorService::start()
     tmc4671_writeInt(0, TMC4671_UQ_UD_EXT, 0x000007D0);
     sleep(1);
     tmc4671_writeInt(0, TMC4671_ABN_DECODER_COUNT, 0x00000000);
-    
-    // Feedback selection
-    tmc4671_writeInt(0, TMC4671_PHI_E_SELECTION, 0x00000003);
-    tmc4671_writeInt(0, TMC4671_VELOCITY_SELECTION, 0x00000009);
-    
-    // Switch to torque mode
-    tmc4671_writeInt(0, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000001);
-    
-    // Rotate right
-    tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_TARGET, 0x03E80000);
-    sleep(3);
-    
-    // Rotate left
-    tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_TARGET, 0xFC180000);
-    sleep(3);
-    
-    // Stop
-    tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_TARGET, 0x00000000);
+
+    // Simone Parameters
+    tmc4671_writeInt(0, TMC4671_PID_FLUX_P_FLUX_I, 67109376);
+    tmc4671_writeInt(0, TMC4671_PID_TORQUE_P_TORQUE_I, 67109376);
+    tmc4671_writeInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I, 52428800);
+    tmc4671_writeInt(0, TMC4671_PID_POSITION_P_POSITION_I, 0);
+
+    tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS, 0);
+    tmc4671_writeInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS, 32767);
+    tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS, 5000);
+    tmc4671_writeInt(0, TMC4671_PID_ACCELERATION_LIMIT, 15000);
+    tmc4671_writeInt(0, TMC4671_PID_VELOCITY_LIMIT, 4000);
+    tmc4671_writeInt(0, TMC4671_PID_POSITION_LIMIT_LOW, -2147483647);
+    tmc4671_writeInt(0, TMC4671_PID_POSITION_LIMIT_HIGH, 2147483647);
+
+    LOG(DEBUG) << "SET SIMONE PARAMS, 2 seconds";
+    sleep(2);
+
+    tmc4671_setTargetVelocity(0, 500);
+    sleep(2);
+    LOG(DEBUG) << "SOME DIR";
+
+    tmc4671_setTargetVelocity(0, 0);
+    sleep(2);
+    LOG(DEBUG) << "BACK DIR";
+
+    tmc4671_setTargetVelocity(0, -500);
+    sleep(2);
+    LOG(DEBUG) << "DONE";
+
 
     LOGF(WARNING, "Power stage status %x",
          tmc6100_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GSTAT));
