@@ -32,7 +32,6 @@ Thunderloop::~Thunderloop()
 {
     // De-initialize Services
     motor_service_->stop();
-    network_service_->stop();
 }
 
 /*

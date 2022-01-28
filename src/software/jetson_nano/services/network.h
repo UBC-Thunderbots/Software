@@ -46,8 +46,8 @@ class NetworkService : public Service
 
    private:
     // Variables
-    TbotsProto::PrimitiveSet primitive_set_info;
-    TbotsProto::Vision vision_info;
+    TbotsProto::PrimitiveSet primitive_set_msg;
+    TbotsProto::Vision vision_msg;
     std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotStatus>> sender;
     std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>
         listener_primitive_set;

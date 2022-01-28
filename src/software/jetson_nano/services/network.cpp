@@ -21,28 +21,31 @@ NetworkService::NetworkService(const std::string& ip_address,
         boost::bind(&NetworkService::visionCallback, this, _1), multicast);
 }
 
-void NetworkService::start() {}
+void NetworkService::start()
+{
+    // TODO (#2436) remove
+}
 NetworkService::~NetworkService() {}
 
 std::tuple<TbotsProto::PrimitiveSet, TbotsProto::Vision> NetworkService::poll(
     const TbotsProto::RobotStatus& robot_status)
 {
     sender->sendProto(robot_status);
-    return std::make_tuple<TbotsProto::PrimitiveSet, TbotsProto::Vision>(
-        std::move(primitive_set_info), std::move(vision_info));
+    return std::tuple<TbotsProto::PrimitiveSet, TbotsProto::Vision>{primitive_set_msg,
+                                                                    vision_msg};
 }
 
 
 void NetworkService::stop()
 {
-    // Todo:
+    // TODO (#2436) remove
 }
 
 void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
 {
-    primitive_set_info = input;
+    primitive_set_msg = input;
 }
 void NetworkService::visionCallback(TbotsProto::Vision input)
 {
-    vision_info = input;
+    vision_msg = input;
 }
