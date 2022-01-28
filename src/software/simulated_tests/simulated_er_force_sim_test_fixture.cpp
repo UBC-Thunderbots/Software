@@ -306,39 +306,17 @@ bool SimulatedErForceSimTestFixture::tickTest(Duration simulation_time_step,
     ball_velocity_diff = (world_ball_vel - simulator_ball_vel).length();
 
     /* vector for robot position and velocity difference */
-    std::vector<double> robot_displacement_by_id;
-    std::vector<double> robot_velocity_diff_by_id;
+    std::vector<double> robot_displacement_list;
+    std::vector<double> robot_velocity_list;
 
-    /* compare robot position */
-    for(int i = 0; i < MAX_ROBOT_IDS; i++){
-        
-        Robot world_robot;
+    /* compare world and simulator friendly robots */
+    int robot_index = 0;
+    for(Robot world_robot: world_friendly_robots){
+
         Robot simulator_robot;
-        
-        /* find robot with id in friendly */
-        // TODO: ask if this finding is needed, whether the robot are returned the same way
-        int found = 0; // help exit when found = 2 (1 from world, 1 from simulator)
-        for(int j = 0; j < world_friendly_robots.size() && found < 2; j++){
-            if(world_friendly_robots[j].id() == i){
-                world_robot = world_friendly_robots[j];
-                found++;
-            }
-            if(simulator_friendly_robots[j].id() == i){
-                simulator_robot = world_friendly_robots[j];
-                found++;
-            }
-        }
-        for(int j = 0; j < world_enemy_robots.size() && found < 2; j++){
-            if(world_enemy_robots[j].id() == i){
-                world_robot = world_enemy_robots[j];
-                found++;
-            }
-            if(simulator_enemy_robots[j].id() == i){
-                simulator_robot = world_enemy_robots[j];
-                found++;
-            }
-        }
-        
+        if(world_robot.id() == simulator_friendly_robots[robot_index].id())
+            simulator_robot = simulator_friendly_robots[robot_index]
+
         /* find difference in robot[i] position */
         Point world_robot_pos = world_robot.position();
         Point simulator_robot_pos = simulator_robot.position();
@@ -349,10 +327,33 @@ bool SimulatedErForceSimTestFixture::tickTest(Duration simulation_time_step,
         Vector simulator_robot_vel = simulator_robot.velocity();
         double robot_velocity_diff = (world_robot_vel - simulator_robot_vel).length();
 
-        robot_displacement_by_id.push_back(robot_displacement);
-        robot_velocity_diff.push_back(robot_velocity_diff);
+        robot_displacement_list.push_back(robot_displacement);
+        robot_velocity_list.push_back(robot_velocity_diff);
+
     }
     
+    /* compare world and simulator enemy robots */
+    robot_index = 0;
+    for(Robot world_robot: world_enemy_robots){
+
+        Robot simulator_robot;
+        if(world_robot.id() == simulator_enemy_robots[robot_index].id())
+            simulator_robot = simulator_enemy_robots[robot_index]
+
+        /* find difference in robot[i] position */
+        Point world_robot_pos = world_robot.position();
+        Point simulator_robot_pos = simulator_robot.position();
+        double robot_displacement = (world_robot_pos - simulator_robot_pos).distanceFromOrigin();
+
+        /* find difference in robot[i] velocity */
+        Vector world_robot_vel = world_robot.velocity();
+        Vector simulator_robot_vel = simulator_robot.velocity();
+        double robot_velocity_diff = (world_robot_vel - simulator_robot_vel).length();
+
+        robot_displacement_list.push_back(robot_displacement);
+        robot_velocity_list.push_back(robot_velocity_diff);
+
+    }
     auto wall_start_time           = std::chrono::steady_clock::now();
     bool validation_functions_done = false;
     for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
