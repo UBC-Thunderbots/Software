@@ -32,15 +32,3 @@ cc_library(
         "@boost//:asio",
     ],
 )
-
-cc_test(
-    name = "receive_test",
-    srcs = [
-        "network_service_test.cpp",
-    ],
-    deps = [
-        ":network",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/backend:simulator_backend",
-    ],
-)
