@@ -35,14 +35,29 @@ class SimulatedPlayTestFixture : public SimulatedTestFixture
      *
      * @param ai_play The name of the AI play
      */
-    void setAIPlay(const std::string& ai_play);
+    void setFriendlyAIPlay(const std::string& ai_play);
+    
+    /**
+     * Sets the enemy AI play to run in the simulated test
+     *
+     * @param enemy_ai_play The name of the enemy AI play
+     */
+    void setEnemyAIPlay(const std::string& enemy_ai_play);
 
     /**
      * Sets the AI play constructor to be used to run in the simulated test
      *
      * @param play_constructor The constructor for the play
      */
-    void setAIPlayConstructor(std::function<std::unique_ptr<Play>()> play_constructor);
+    void setFriendlyAIPlayConstructor(std::function<std::unique_ptr<Play>()> friendly_play_constructor);
+
+    /**
+     * Sets the enemy AI play constructor to be used to run in the simulated test
+     *
+     * @param enemy_play_constructor The constructor for the play
+     */
+    void setEnemyAIPlayConstructor(std::function<std::unique_ptr<Play>()> enemy_play_constructor);
+
 
     /**
      * Sets the Referee command to override for the simulated test
@@ -61,26 +76,49 @@ class SimulatedPlayTestFixture : public SimulatedTestFixture
     void setGameState(const GameState& game_state_);
 
     /**
-     * Gets the configs used in simulation
+     * Gets the friendly configs used in simulation
      * Useful for constructing duplicates of Obstacle Factory
      *
-     * @return the Ai Config
+     * @return the friendly AI Config
      */
-    const std::shared_ptr<AiConfig> getAiConfig() const;
+    const std::shared_ptr<AiConfig> getFriendlyAiConfig() const;
+    
+    /**
+     * Gets the enemy configs used in simulation
+     * Useful for constructing duplicates of Obstacle Factory
+     *
+     * @return the enemy AI Config
+     */
+    const std::shared_ptr<AiConfig> getEnemyAiConfig() const;
 
-    std::optional<TbotsProto::PlayInfo> getPlayInfo() override;
+
+    std::optional<TbotsProto::PlayInfo> getFriendlyPlayInfo() override;
+    std::optional<TbotsProto::PlayInfo> getEnemyPlayInfo() override;
+
     AIDrawFunction getDrawFunctions() override;
 
    private:
     void updatePrimitives(const World& friendly_world, const World& enemy_world,
                           std::shared_ptr<Simulator> simulator_to_update) override;
-    // The configs being used in simulation
-    std::shared_ptr<AiConfig> ai_config;
-    std::shared_ptr<AiControlConfig> ai_control_config;
-    std::shared_ptr<SensorFusionConfig> sensor_fusion_config;
+   
+    void updateFriendlyPrimitives(const World& friendly_world,
+                                  std::shared_ptr<Simulator> simulator_to_update);
 
+    void updateEnemyPrimitives(const World& enemy_world,
+                               std::shared_ptr<Simulator> simulator_to_update);
+
+    // The configs being used in simulation
+    std::shared_ptr<AiConfig> friendly_ai_config;
+    std::shared_ptr<AiControlConfig> friendly_ai_control_config;
+    std::shared_ptr<SensorFusionConfig> friendly_sensor_fusion_config;
+    std::shared_ptr<AiConfig> enemy_ai_config;
+    std::shared_ptr<AiControlConfig> enemy_ai_control_config;
+    std::shared_ptr<SensorFusionConfig> enemy_sensor_fusion_config;
+    
     GameState game_state;
 
     // The AI being tested and used in simulation
-    AI ai;
+    AI friendly_ai;
+    AI enemy_ai;
+
 };
