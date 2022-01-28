@@ -262,9 +262,86 @@ void MotorService::start()
 {
     driver_control_enable_gpio.setValue(GpioState::HIGH);
 
+    tmc6100_writeInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GCONF, 32);
+    uint32_t result = tmc6100_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GCONF);
+    assert(32 == result);
+
+    int32_t temp = tmc6100_readInt(0, TMC6100_DRV_CONF);
+    tmc6100_writeInt(0, TMC6100_DRV_CONF, temp & (~TMC6100_DRVSTRENGTH_MASK));
+    int32_t drive_strength_0 =
+        (tmc6100_readInt(0, TMC6100_DRV_CONF) & (TMC6100_DRVSTRENGTH_MASK)) >>
+        TMC6100_DRVSTRENGTH_SHIFT;
+    assert(drive_strength_0 == 0);
+
+    LOG(DEBUG) << "TMC4671 power stage online";
+    LOGF(WARNING, "Power stage status %x",
+         tmc6100_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GSTAT));
+
     tmc4671_writeInt(0, TMC4671_CHIPINFO_ADDR, 0x000000000);
     assert(0x34363731 == tmc4671_readInt(0, TMC4671_CHIPINFO_DATA));
     LOGF(DEBUG, "TMC4671 chip info matches, confirmed online");
+
+    // Motor type &  PWM configuration
+    tmc4671_writeInt(0, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
+    tmc4671_writeInt(0, TMC4671_PWM_POLARITIES, 0x00000000);
+    tmc4671_writeInt(0, TMC4671_PWM_MAXCNT, 0x00000F9F);
+    tmc4671_writeInt(0, TMC4671_PWM_BBM_H_BBM_L, 0x00002828);
+    tmc4671_writeInt(0, TMC4671_PWM_SV_CHOP, 0x00000107);
+
+    // ADC configuration
+    tmc4671_writeInt(0, TMC4671_ADC_I_SELECT, 0x09000100);
+    tmc4671_writeInt(0, TMC4671_dsADC_MCFG_B_MCFG_A, 0x00100010);
+    tmc4671_writeInt(0, TMC4671_dsADC_MCLK_A, 0x20000000);
+    tmc4671_writeInt(0, TMC4671_dsADC_MCLK_B, 0x20000000);
+    tmc4671_writeInt(0, TMC4671_dsADC_MDEC_B_MDEC_A, 0x014E014E);
+    tmc4671_writeInt(0, TMC4671_ADC_I0_SCALE_OFFSET, 0x010081DD);
+    tmc4671_writeInt(0, TMC4671_ADC_I1_SCALE_OFFSET, 0x0100818E);
+
+    // ABN encoder settings
+    tmc4671_writeInt(0, TMC4671_ABN_DECODER_MODE, 0x00000000);
+    tmc4671_writeInt(0, TMC4671_ABN_DECODER_PPR, 0x00001000);
+    tmc4671_writeInt(0, TMC4671_ABN_DECODER_COUNT, 0x0000034F);
+    tmc4671_writeInt(0, TMC4671_ABN_DECODER_PHI_E_PHI_M_OFFSET, 0x00000000);
+
+    // Limits
+    tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS, 0x000003E8);
+
+    // PI settings
+    tmc4671_writeInt(0, TMC4671_PID_TORQUE_P_TORQUE_I, 0x01000100);
+    tmc4671_writeInt(0, TMC4671_PID_FLUX_P_FLUX_I, 0x01000100);
+
+    // ===== ABN encoder test drive =====
+
+    // Init encoder (mode 0)
+    tmc4671_writeInt(0, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000008);
+    tmc4671_writeInt(0, TMC4671_ABN_DECODER_PHI_E_PHI_M_OFFSET, 0x00000000);
+    tmc4671_writeInt(0, TMC4671_PHI_E_SELECTION, 0x00000001);
+    tmc4671_writeInt(0, TMC4671_PHI_E_EXT, 0x00000000);
+    tmc4671_writeInt(0, TMC4671_UQ_UD_EXT, 0x000007D0);
+    sleep(1);
+    tmc4671_writeInt(0, TMC4671_ABN_DECODER_COUNT, 0x00000000);
+    
+    // Feedback selection
+    tmc4671_writeInt(0, TMC4671_PHI_E_SELECTION, 0x00000003);
+    tmc4671_writeInt(0, TMC4671_VELOCITY_SELECTION, 0x00000009);
+    
+    // Switch to torque mode
+    tmc4671_writeInt(0, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000001);
+    
+    // Rotate right
+    tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_TARGET, 0x03E80000);
+    sleep(3);
+    
+    // Rotate left
+    tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_TARGET, 0xFC180000);
+    sleep(3);
+    
+    // Stop
+    tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_TARGET, 0x00000000);
+
+    LOGF(WARNING, "Power stage status %x",
+         tmc6100_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GSTAT));
+
     LOGF(DEBUG, "GPIO CONFIG: %x", tmc4671_readInt(0, TMC4671_GPIO_dsADCI_CONFIG));
 }
 
