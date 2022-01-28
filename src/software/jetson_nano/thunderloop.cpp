@@ -1,5 +1,3 @@
-#include "software/jetson_nano/thunderloop.h"
-
 #include <chrono>
 #include <iostream>
 #include <thread>
