@@ -1,3 +1,5 @@
+#include "software/jetson_nano/thunderloop.h"
+
 #include <chrono>
 #include <iostream>
 #include <thread>
@@ -7,7 +9,6 @@
 #include "shared/constants.h"
 #include "software/jetson_nano/primitive_executor.h"
 #include "software/jetson_nano/services/motor.h"
-#include "software/jetson_nano/services/network.h"
 #include "software/logger/logger.h"
 #include "software/world/robot_state.h"
 
