@@ -4,7 +4,6 @@ load(
     "@platformio_rules//platformio:platformio.bzl",
     "platformio_library",
 )
-load("//shared:external_platformio_library.bzl", "external_platformio_library")
 
 platformio_library(
     name = "uart_framing_platformio",
