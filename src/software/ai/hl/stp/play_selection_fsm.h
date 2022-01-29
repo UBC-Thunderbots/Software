@@ -34,12 +34,33 @@ struct PlaySelectionFSM
      */
     explicit PlaySelectionFSM(std::shared_ptr<const AiConfig> ai_config);
 
+    /**
+     * Guards for whether the game state is stopped, halted, playing, or in set up
+     *
+     * @param event The PlaySelection::Update event
+     *
+     * @return whether the gamestate is stopped, halted, playing, or in set up
+     */
     bool gameStateStopped(const Update& event);
     bool gameStateHalted(const Update& event);
     bool gameStatePlaying(const Update& event);
     bool gameStateSetup(const Update& event);
+
+    /**
+     * Guards for whether the play is being overridden
+     *
+     * @param event The PlaySelection::Update event
+     *
+     * @return whether the play is being overridden
+     */
     bool playOverridden(const Update& event);
 
+    /**
+     * Action to set up the OverridePlay, SetPlay, StopPlay, HaltPlay, or OffensePlay
+     *
+     * @param event The PlaySelection::Update event
+     *
+     */
     void setupOverridePlay(const Update& event);
     void setupSetPlay(const Update& event);
     void setupStopPlay(const Update& event);

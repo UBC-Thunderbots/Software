@@ -105,11 +105,8 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 
 TbotsProto::PlayInfo STP::getPlayInfo()
 {
-    // std::string info_referee_command =
-    // toString(current_game_state.getRefereeCommand());
     std::string info_play_name = objectTypeName(*current_play);
     TbotsProto::PlayInfo info;
-    // info.mutable_game_state()->set_referee_command_name(info_referee_command);
     info.mutable_play()->set_play_name(info_play_name);
 
     for (const auto& [tactic, robot] : robot_tactic_assignment)
