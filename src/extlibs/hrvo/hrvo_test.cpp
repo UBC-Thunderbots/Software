@@ -12,7 +12,11 @@ const int SIMULATOR_FRAME_RATE = 30;
 class HRVOTest : public ::testing::Test
 {
     // Test Properties
-    float simulation_timeout = 15.0;
+    // Max simulation length in seconds
+    float simulation_timeout = 15.f;
+    // If true, Agents reaching their destination will not be considered as a way to
+    // end simulation
+    bool only_use_timeout = false;
 
    public:
     // HRVO Properties
@@ -45,12 +49,13 @@ class HRVOTest : public ::testing::Test
     }
 
     /**
-     * Set simulation timeout.
+     * Set simulation timeout, and only use the timeout as a way to end simulation.
      * @param simulation_timeout The max amount of time which the test can run for
      */
-    void setSimulationTimeout(float simulation_timeout)
+    void useSimulationTimeout(float simulation_timeout)
     {
         HRVOTest::simulation_timeout = simulation_timeout;
+        only_use_timeout = true;
     }
 
     /**
@@ -211,7 +216,7 @@ class HRVOTest : public ::testing::Test
 
             auto finish_tick_time = std::chrono::high_resolution_clock::now();
             computation_time += finish_tick_time - start_tick_time;
-        } while (!simulator.haveReachedGoals() && prev_frame_time < simulation_timeout);
+        } while ((only_use_timeout || !simulator.haveReachedGoals()) && prev_frame_time < simulation_timeout);
 
         auto finish_time = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> total_time = finish_time - start_time;
@@ -242,7 +247,7 @@ TEST_F(HRVOTest, stationary_friendly_robot_dodging_moving_enemy_robot)
         std::pair(Point(-2.0, 0.0), Vector(1.0, 0.0))};
     instantiate_robots_in_world(friendly_start_dest_points,
                                 enemy_position_velocity_pairs);
-    setSimulationTimeout(3.f);
+    useSimulationTimeout(3.f);
 }
 
 TEST_F(HRVOTest, friendly_and_enemy_robot_moving_towards_each_other)
@@ -253,7 +258,7 @@ TEST_F(HRVOTest, friendly_and_enemy_robot_moving_towards_each_other)
         std::pair(Point(-2.0, 0.0), Vector(1.0, 0.0))};
     instantiate_robots_in_world(friendly_start_dest_points,
                                 enemy_position_velocity_pairs);
-    setSimulationTimeout(5.f);
+    useSimulationTimeout(5.f);
 }
 
 TEST_F(HRVOTest, multiple_friendly_robots_lining_up)
@@ -392,7 +397,7 @@ TEST_F(HRVOTest, div_a_friendly_and_enemy_robot_performance_test_moving_across)
     }
     instantiate_robots_in_world(friendly_start_dest_points,
                                 enemy_position_velocity_pairs);
-    setSimulationTimeout(7.f);
+    useSimulationTimeout(7.f);
 }
 
 TEST_F(HRVOTest, friendly_robot_going_around_ball_obstacle)
