@@ -28,6 +28,18 @@ cc_library(
 )
 
 cc_test(
+    name = "stp_play_selection_fsm_test",
+    srcs = ["stp_play_selection_fsm_test.cpp"],
+    deps = [
+        ":stp",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/ai/hl/stp/play:all_plays",
+        "//software/test_util",
+        "//software/world",
+    ],
+)
+
+cc_test(
     name = "stp_referee_command_play_selection_test",
     srcs = ["stp_referee_command_play_selection_test.cpp"],
     deps = [

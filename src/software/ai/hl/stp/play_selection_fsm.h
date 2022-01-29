@@ -107,7 +107,9 @@ struct PlaySelectionFSM
             OverridePlay_S + Update_E[gameStateHalted_G] / setupHaltPlay_A = Halt_S,
             OverridePlay_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A =
                 Playing_S,
-            OverridePlay_S + Update_E[gameStateSetup_G] / setupSetPlay_A = SetPlay_S,
+            OverridePlay_S + Update_E[gameStateStopped_G] / setupStopPlay_A = Stop_S,
+            // If none of the above then either in setup or ready state so set play
+            OverridePlay_S + Update_E / setupSetPlay_A = SetPlay_S,
 
             // Check for transitions to other states, if not then default to running the
             // current play
