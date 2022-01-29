@@ -464,16 +464,16 @@ void HRVOAgent::computePreferredVelocity()
         Vector2 ideal_pref_velocity = normalize(distVectorToGoal) * currPrefSpeed;
 
         // Limit the preferred velocity to the kinematic limits
-        const float dv = abs(ideal_pref_velocity - velocity_);
-        if (dv <= max_accel_ * simulator_->timeStep_)
+        const Vector2 dv = ideal_pref_velocity - velocity_;
+        if (abs(dv) <= max_accel_ * simulator_->getTimeStep())
         {
             pref_velocity_ = ideal_pref_velocity;
         }
         else
         {
-            pref_velocity_ =
-                (1.0f - (max_accel_ * simulator_->timeStep_ / dv)) * velocity_ +
-                (max_accel_ * simulator_->timeStep_ / dv) * ideal_pref_velocity;
+            // Calculate the maximum velocity towards the preferred velocity, given the
+            // acceleration constraint
+            pref_velocity_ = velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / abs(dv));
         }
     }
     else
