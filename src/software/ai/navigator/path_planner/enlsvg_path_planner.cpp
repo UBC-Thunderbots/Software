@@ -67,7 +67,7 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start, const Point 
 {
     // Check if start and end coordinates are in navigable area and return null if it
     // isn't
-    if (!contains(navigable_area, start) && !contains(navigable_area, end))
+    if (!contains(navigable_area, start) || !contains(navigable_area, end))
     {
         LOG(WARNING)
             << "Start and/or end point is not within the navigable area; no path found"
