@@ -19,7 +19,7 @@ namespace
     std::vector<std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>>
         test_vector = {
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new MoveTactic(false), std::set<MotionConstraint>({})),
+                new MoveTactic(), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
                 new CreaseDefenderTactic(
                     std::make_shared<const RobotNavigationObstacleConfig>()),
@@ -31,9 +31,9 @@ namespace
                                             MotionConstraint::HALF_METER_AROUND_BALL,
                                             MotionConstraint::FRIENDLY_HALF})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new ChipTactic(true), std::set<MotionConstraint>({})),
+                new ChipTactic(), std::set<MotionConstraint>({})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new KickoffChipTactic(true),
+                new KickoffChipTactic(),
                 std::set<MotionConstraint>({MotionConstraint::CENTER_CIRCLE,
                                             MotionConstraint::HALF_METER_AROUND_BALL})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
@@ -42,7 +42,7 @@ namespace
                                             MotionConstraint::ENEMY_DEFENSE_AREA,
                                             MotionConstraint::ENEMY_HALF})),
             std::pair<std::shared_ptr<Tactic>, std::set<MotionConstraint>>(
-                new PenaltySetupTactic(true),
+                new PenaltySetupTactic(),
                 std::set<MotionConstraint>({MotionConstraint::ENEMY_HALF,
                                             MotionConstraint::ENEMY_DEFENSE_AREA,
                                             MotionConstraint::FRIENDLY_HALF,

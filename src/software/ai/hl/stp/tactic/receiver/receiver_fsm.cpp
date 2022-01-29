@@ -78,7 +78,7 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
         Angle abs_angle_between_pass_and_shot_vectors;
 
         Vector robot_to_shot_target =
-            best_shot_opt->getPointToShootAt() - assigned_robot.position();
+            best_shot_opt.value().getPointToShootAt() - assigned_robot.position();
         abs_angle_between_pass_and_shot_vectors =
             acuteAngle(robot_to_ball, robot_to_shot_target);
 
@@ -87,7 +87,7 @@ std::optional<Shot> ReceiverFSM::findFeasibleShot(const World& world,
                        world.field().friendlyGoalpostNeg());
 
         double net_percent_open =
-            best_shot_opt->getOpenAngle().toDegrees() / goal_angle.toDegrees();
+            best_shot_opt.value().getOpenAngle().toDegrees() / goal_angle.toDegrees();
 
         // If we have a shot with a sufficiently large enough opening, and the
         // deflection angle that is reasonable, we should one-touch kick the ball

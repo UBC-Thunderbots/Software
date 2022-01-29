@@ -4,8 +4,6 @@
 #include <boost/bind.hpp>
 #include <string>
 
-#include "software/logger/logger.h"
-
 template <class SendProto>
 class ProtoUdpSender
 {

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "software/ai/hl/stp/action/move_action.h"  // TODO (#1888): remove this dependency
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
@@ -14,15 +13,8 @@ class MoveTactic : public Tactic
    public:
     /**
      * Creates a new MoveTactic
-     *
-     * @param loop_forever Whether or not this Tactic should never complete. If true, the
-     * tactic will be restarted every time it completes
      */
-    explicit MoveTactic(bool loop_forever);
-
-    MoveTactic() = delete;
-
-    void updateWorldParams(const World& world) override;
+    explicit MoveTactic();
 
     /**
      * Updates the params assuming that the max allowed speed mode is the physical limits
@@ -71,10 +63,10 @@ class MoveTactic : public Tactic
     double calculateRobotCost(const Robot& robot, const World& world) const override;
 
     void accept(TacticVisitor& visitor) const override;
-    bool done() const override;
+
+    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
-    void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
     FSM<MoveFSM> fsm;

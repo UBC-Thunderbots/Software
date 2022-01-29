@@ -8,12 +8,17 @@ Ball createBall(world::SimBall sim_ball, Timestamp timestamp)
     const Ball ball(state, timestamp);
     return ball;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
 Robot createRobot(world::SimRobot sim_robot, Timestamp timestamp)
 {
     const RobotId id(sim_robot.id());
     const Point position(sim_robot.p_x(), sim_robot.p_y());
     const Vector velocity(sim_robot.v_x(), sim_robot.v_y());
 
+<<<<<<< HEAD
     /* adopted conversion from
      * https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles */
     world::Quaternion q = sim_robot.rotation();
@@ -21,6 +26,9 @@ Robot createRobot(world::SimRobot sim_robot, Timestamp timestamp)
     double cosy_cosp    = 1 - 2 * (q.j() * q.j() + q.k() * q.k());
     Angle angle         = Angle::atan(siny_cosp / cosy_cosp);
     const RobotState state(position, velocity, angle,
+=======
+    const RobotState state(position, velocity, Angle::fromRadians(sim_robot.angle()),
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
                            Angle::atan(sim_robot.r_y() / sim_robot.r_x()));
     const Robot robot(id, state, timestamp);
     return robot;

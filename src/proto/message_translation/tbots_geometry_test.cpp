@@ -1,6 +1,9 @@
 #include "proto/message_translation/tbots_geometry.h"
 
+#include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
+
+#include "software/test_util/test_util.h"
 
 TEST(TbotsProtobufTest, point_msg_test)
 {
@@ -51,4 +54,18 @@ TEST(TbotsProtobufTest, polygon_msg_test)
 
     EXPECT_EQ(polygon.getPoints()[2].x(), polygon_msg->points(2).x_meters());
     EXPECT_EQ(polygon.getPoints()[2].y(), polygon_msg->points(2).y_meters());
+<<<<<<< HEAD
+=======
+}
+
+TEST(TbotsProtobufTest, circle_msg_test)
+{
+    auto circle_1     = Circle(Point(-1, 1), 4);
+    auto circle_msg_1 = createCircleProto(circle_1);
+    auto circle_2     = createCircle(*circle_msg_1);
+    auto circle_msg_2 = createCircleProto(circle_2);
+
+    EXPECT_TRUE(
+        google::protobuf::util::MessageDifferencer::Equals(*circle_msg_1, *circle_msg_2));
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
 }

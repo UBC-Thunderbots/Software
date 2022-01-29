@@ -13,17 +13,10 @@
  * The STP module is an implementation of the high-level logic Abstract class, that
  * uses the STP (Skills, Tactics, Plays) framework for its decision making.
  *
- * See play.h, tactic.h, and action.h for more specific documentation on
+ * See play.h and tactic.h for more specific documentation on
  * each component.
  *
- * Explaining WorldParams and ControlParams
- * - WorldParams are any parameters that can be derived from the World
- *   class (eg. the ball, field) that are not related to gameplay logic.
- *   In the case of Tactics and Actions, because these parameters are not
- *   related to gameplay logic, we can automatically update them from STP.
- *   This means the Plays that call Tactics, and Tactics that call Actions,
- *   need to provide fewer parameters which overall makes the code a bit
- *   easier to read.
+ * Explaining ControlParams
  * - ControlParams are any parameters that are related to gameplay logic.
  *   Some examples are:
  *   - The EnemyThreat datastructure
@@ -32,11 +25,10 @@
  *   - How far to chip the ball
  *   These parameters can NOT be automatically updated because they are specific
  *   to the Play or Tactic that is providing them. Therefore, Plays update the
- *   ControlParams of Tactics, and Tactics update the ControlParams of Actions.
- *   These are the parameters that actually change their behaviour.
- * - NOTE: In the high-level overview below, the ControlParams and WorldParams
- *   are both updated before something is run (eg. the Control and WorldParams
- *   for the Tactics are both updated before the Tactics are run), so all
+ *   ControlParams of Tactics. These are the parameters that actually change their
+ *   behaviour.
+ * - NOTE: In the high-level overview below, the ControlParams
+ *   for the Tactics are updated before the Tactics are run, so all
  *   necessary information is provided before gameplay decisions are made.
  *
  * HIGH-LEVEL OVERVIEW
@@ -61,16 +53,9 @@
  *    criteria, and then we attempt to assign robots in such a way that minimizes the
  *    global cost.
  *
- * 4. Update the WorldParams for the tactics.
+ * 4. Run each tactic to get the Intent that each robot should run.
  *
- * 5. Run each tactic to get the Action that each robot should run.
- *    This will update the ControlParams for each Action.
- *
- * 6. Update the "WorldParams" for the Actions
- *
- * 7. Run each Action to get the Intent that each robot should run.
- *
- * 8. Return this list of Intents
+ * 5. Return this list of Intents
  */
 class STP : public HL
 {
@@ -121,7 +106,7 @@ class STP : public HL
      *
      * @return information about the currently running plays and tactics
      */
-    PlayInfo getPlayInfo() override;
+    TbotsProto::PlayInfo getPlayInfo() override;
 
     /**
      * Overrides the play constructor so whenever STP creates a new play it calls

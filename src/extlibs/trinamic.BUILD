@@ -25,6 +25,7 @@ cc_library(
 )
 
 cc_library(
+<<<<<<< HEAD
     name = "tmc6100-api",
     srcs = [
         "tmc/ic/TMC6100/TMC6100.c",
@@ -44,6 +45,8 @@ cc_library(
 )
 
 cc_library(
+=======
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
     name = "tmc-helpers-lib",
     srcs = [
         "tmc/helpers/CRC.c",
