@@ -3,19 +3,26 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "stp",
     srcs = [
+        "play_selection_fsm.cpp",
         "stp.cpp",
     ],
-    hdrs = ["stp.h"],
+    hdrs = [
+        "play_selection_fsm.h",
+        "stp.h",
+    ],
     deps = [
+        "//proto:play_info_msg_cc_proto",
         "//shared/parameter:cpp_configs",
-        "//software/ai/hl",
-        "//software/ai/hl/stp/play",
+        "//software/ai/hl/stp/play:all_plays",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic:all_tactics",
+        "//software/ai/intent",
         "//software/ai/intent:stop_intent",
         "//software/ai/motion_constraint:motion_constraint_set_builder",
         "//software/util/generic_factory",
+        "//software/util/sml_fsm",
         "//software/util/typename",
+        "//software/world",
         "@munkres_cpp",
     ],
 )

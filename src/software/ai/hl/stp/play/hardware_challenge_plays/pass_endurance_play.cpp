@@ -4,21 +4,9 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-PassEndurancePlay::PassEndurancePlay(std::shared_ptr<const PlayConfig> config)
+PassEndurancePlay::PassEndurancePlay(std::shared_ptr<const AiConfig> config)
     : Play(config, false)
 {
-}
-
-bool PassEndurancePlay::isApplicable(const World &world) const
-{
-    // This play is never applicable so it will never be chosen during gameplay
-    // This play can be run for hardware challenges by using the Play override
-    return false;
-}
-
-bool PassEndurancePlay::invariantHolds(const World &world) const
-{
-    return false;
 }
 
 void PassEndurancePlay::getNextTactics(TacticCoroutine::push_type &yield,
@@ -68,4 +56,4 @@ void PassEndurancePlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, PassEndurancePlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, PassEndurancePlay, AiConfig> factory;

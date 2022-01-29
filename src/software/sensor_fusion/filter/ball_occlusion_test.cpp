@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_halt_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
@@ -11,7 +11,7 @@
 #include "software/world/world.h"
 
 class BallOcclusionTest
-    : public SimulatedPlayTestFixture,
+    : public SimulatedErForceSimPlayTestFixture,
       public ::testing::WithParamInterface<std::tuple<
           BallState, std::vector<RobotStateWithId>, std::vector<RobotStateWithId>>>
 {

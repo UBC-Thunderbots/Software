@@ -40,7 +40,7 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
      *
      * @param play_constructor The constructor for the play
      */
-    void setAIPlayConstructor(std::function<std::unique_ptr<Play>()> play_constructor);
+    void setAIPlayConstructor(std::optional<PlayConstructor> constructor);
 
     /**
      * Sets the Referee command to override for the simulated test
@@ -74,7 +74,6 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
                           std::shared_ptr<ErForceSimulator> simulator_to_update) override;
     // The configs being used in simulation
     std::shared_ptr<AiConfig> ai_config;
-    std::shared_ptr<AiControlConfig> ai_control_config;
     std::shared_ptr<SensorFusionConfig> sensor_fusion_config;
 
     GameState game_state;

@@ -33,12 +33,14 @@ TEST_F(CreaseDefensePlayTest, test_defense_play)
         Point(-2, -1.25),
     });
     setEnemyGoalie(0);
-    setAIPlayConstructor([this, ball_state]() -> std::unique_ptr<Play> {
-        std::unique_ptr<CreaseDefensePlay> play =
-            std::make_unique<CreaseDefensePlay>(thunderbots_config->getPlayConfig());
-        play->updateControlParams(Point(1, 3));
-        return play;
-    });
+    setAIPlayConstructor(
+        [this,
+         ball_state](std::shared_ptr<const AiConfig> ai_config) -> std::unique_ptr<Play> {
+            std::unique_ptr<CreaseDefensePlay> play =
+                std::make_unique<CreaseDefensePlay>(ai_config);
+            play->updateControlParams(Point(1, 3));
+            return play;
+        });
 
     // We set the referee command to stop so that the robots do not kick/shoot during the
     // test

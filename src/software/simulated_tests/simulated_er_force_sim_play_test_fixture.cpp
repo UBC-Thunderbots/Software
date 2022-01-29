@@ -7,11 +7,9 @@
 
 SimulatedErForceSimPlayTestFixture::SimulatedErForceSimPlayTestFixture()
     : ai_config(mutable_thunderbots_config->getMutableAiConfig()),
-      ai_control_config(mutable_thunderbots_config->getMutableAiControlConfig()),
       sensor_fusion_config(mutable_thunderbots_config->getMutableSensorFusionConfig()),
       game_state(),
-      ai(thunderbots_config->getAiConfig(), thunderbots_config->getAiControlConfig(),
-         thunderbots_config->getPlayConfig())
+      ai(thunderbots_config->getAiConfig())
 {
 }
 
@@ -20,11 +18,9 @@ void SimulatedErForceSimPlayTestFixture::SetUp()
     SimulatedErForceSimTestFixture::SetUp();
 
     ai_config            = mutable_thunderbots_config->getMutableAiConfig();
-    ai_control_config    = mutable_thunderbots_config->getMutableAiControlConfig();
     sensor_fusion_config = mutable_thunderbots_config->getMutableSensorFusionConfig();
 
-    ai = AI(thunderbots_config->getAiConfig(), thunderbots_config->getAiControlConfig(),
-            thunderbots_config->getPlayConfig());
+    ai = AI(thunderbots_config->getAiConfig());
 }
 
 void SimulatedErForceSimPlayTestFixture::setFriendlyGoalie(RobotId goalie_id)
@@ -41,14 +37,14 @@ void SimulatedErForceSimPlayTestFixture::setEnemyGoalie(RobotId goalie_id)
 
 void SimulatedErForceSimPlayTestFixture::setAIPlay(const std::string& ai_play)
 {
-    ai_control_config->getMutableOverrideAiPlay()->setValue(true);
-    ai_control_config->getMutableCurrentAiPlay()->setValue(ai_play);
+    ai_config->getMutableAiControlConfig()->getMutableOverrideAiPlay()->setValue(true);
+    ai_config->getMutableAiControlConfig()->getMutableCurrentAiPlay()->setValue(ai_play);
 }
 
 void SimulatedErForceSimPlayTestFixture::setAIPlayConstructor(
-    std::function<std::unique_ptr<Play>()> play_constructor)
+    std::optional<PlayConstructor> constructor)
 {
-    ai.overridePlayConstructor(play_constructor);
+    ai.overridePlayConstructor(constructor);
 }
 
 void SimulatedErForceSimPlayTestFixture::setRefereeCommand(
