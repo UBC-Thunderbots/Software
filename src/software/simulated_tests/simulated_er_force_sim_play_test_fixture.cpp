@@ -80,6 +80,11 @@ void SimulatedErForceSimPlayTestFixture::updatePrimitives(
                                                     std::move(world_msg));
 }
 
+const std::shared_ptr<AiConfig> SimulatedErForceSimPlayTestFixture::getAiConfig() const
+{
+    return ai_config;
+}
+
 std::optional<TbotsProto::PlayInfo> SimulatedErForceSimPlayTestFixture::getPlayInfo()
 {
     return ai.getPlayInfo();

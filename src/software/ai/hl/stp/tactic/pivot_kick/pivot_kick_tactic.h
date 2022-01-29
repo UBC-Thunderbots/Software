@@ -16,7 +16,7 @@ class PivotKickTactic : public Tactic
      */
     explicit PivotKickTactic();
 
-    bool done() const override;
+    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
     /**
      * Update control params for this tactic

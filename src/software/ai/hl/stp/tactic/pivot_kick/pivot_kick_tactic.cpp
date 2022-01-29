@@ -42,11 +42,6 @@ void PivotKickTactic::updateControlParams(const Point &kick_origin,
     control_params.auto_chip_or_kick = auto_chip_or_kick;
 }
 
-bool PivotKickTactic::done() const
-{
-    return fsm.is(boost::sml::X);
-}
-
 void PivotKickTactic::updateIntent(const TacticUpdate &tactic_update)
 {
     fsm.process_event(PivotKickFSM::Update(control_params, tactic_update));

@@ -12,7 +12,11 @@ const int SIMULATOR_FRAME_RATE = 30;
 class HRVOTest : public ::testing::Test
 {
     // Test Properties
-    float simulation_timeout = 15.0;
+    // Max simulation length in seconds
+    float simulation_timeout = 15.f;
+    // If true, Agents reaching their destination will not be considered as a way to
+    // end simulation
+    bool only_use_timeout = false;
 
    public:
     // HRVO Properties
@@ -45,12 +49,13 @@ class HRVOTest : public ::testing::Test
     }
 
     /**
-     * Set simulation timeout.
+     * Set simulation timeout, and only use the timeout as a way to end simulation.
      * @param simulation_timeout The max amount of time which the test can run for
      */
-    void setSimulationTimeout(float simulation_timeout)
+    void useSimulationTimeout(float simulation_timeout)
     {
         HRVOTest::simulation_timeout = simulation_timeout;
+        only_use_timeout             = true;
     }
 
     /**
@@ -119,7 +124,7 @@ class HRVOTest : public ::testing::Test
 
         // Column Names
         output_file
-            << "frame,time,computation_time,robot_id,radius,x,y,velocity_x,velocity_y,speed,has_collided,pref_vel_x,pref_vel_y"
+            << "frame,time,computation_time,robot_id,radius,x,y,velocity_x,velocity_y,speed,goal_x,goal_y,goal_radius,has_collided,pref_vel_x,pref_vel_y"
             << std::endl;
 
         const auto num_robots = static_cast<unsigned int>(simulator.getNumAgents());
@@ -194,12 +199,18 @@ class HRVOTest : public ::testing::Test
                     prev_x_pos_arr[robot_id] = curr_x_pos;
                     prev_y_pos_arr[robot_id] = curr_y_pos;
                 }
+                Vector2 goal_position =
+                    simulator.goals_[simulator.agents_[robot_id]->getGoalIndex()]
+                        ->getCurrentGoalPosition();
+                float goal_radius = simulator.agents_[robot_id]->getGoalRadius();
+
                 output_file << frame << "," << time << ","
                             << std::to_string(computation_time.count()) << "," << robot_id
                             << "," << robot_radius[robot_id] << ","
                             << curr_robot_pos.getX() << "," << curr_robot_pos.getY()
                             << "," << velocity_x << "," << velocity_y << "," << speed
-                            << "," << has_collided << ","
+                            << "," << goal_position.getX() << "," << goal_position.getY()
+                            << "," << goal_radius << "," << has_collided << ","
                             << simulator.getAgentPrefVelocity(robot_id).getX() << ","
                             << simulator.getAgentPrefVelocity(robot_id).getY()
                             << std::endl;
@@ -211,13 +222,16 @@ class HRVOTest : public ::testing::Test
 
             auto finish_tick_time = std::chrono::high_resolution_clock::now();
             computation_time += finish_tick_time - start_tick_time;
-        } while (!simulator.haveReachedGoals() && prev_frame_time < simulation_timeout);
+        } while ((only_use_timeout || !simulator.haveReachedGoals()) &&
+                 prev_frame_time < simulation_timeout);
 
         auto finish_time = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> total_time = finish_time - start_time;
-        std::cout << "Total run time = " << total_time.count() << std::endl;
-        std::cout << "Total simulation time = " << prev_frame_time << std::endl;
-        std::cout << "Avg time per tick = " << total_time.count() / frame << std::endl;
+        std::cout << "Total computation time = " << total_time.count() << "sec"
+                  << std::endl;
+        std::cout << "Total simulation time = " << prev_frame_time << "sec" << std::endl;
+        std::cout << "Avg computation time per tick = " << total_time.count() / frame
+                  << "sec/frame" << std::endl;
 
         output_file.close();
         std::cout << "Test information outputted to " << output_file_loc << std::endl;
@@ -240,7 +254,7 @@ TEST_F(HRVOTest, stationary_friendly_robot_dodging_moving_enemy_robot)
         std::pair(Point(-2.0, 0.0), Vector(1.0, 0.0))};
     instantiate_robots_in_world(friendly_start_dest_points,
                                 enemy_position_velocity_pairs);
-    setSimulationTimeout(3.f);
+    useSimulationTimeout(3.f);
 }
 
 TEST_F(HRVOTest, friendly_and_enemy_robot_moving_towards_each_other)
@@ -251,7 +265,7 @@ TEST_F(HRVOTest, friendly_and_enemy_robot_moving_towards_each_other)
         std::pair(Point(-2.0, 0.0), Vector(1.0, 0.0))};
     instantiate_robots_in_world(friendly_start_dest_points,
                                 enemy_position_velocity_pairs);
-    setSimulationTimeout(5.f);
+    useSimulationTimeout(5.f);
 }
 
 TEST_F(HRVOTest, multiple_friendly_robots_lining_up)
@@ -269,17 +283,14 @@ TEST_F(HRVOTest, single_friendly_robot_moving_in_line)
     std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
         std::pair(Point(-5.0, 0.0), Point(5.0, 0.0))};
     instantiate_robots_in_world(friendly_start_dest_points, {});
+    useSimulationTimeout(5.f);
 }
 
 TEST_F(HRVOTest, destination_between_friendly_robot_and_stationary_enemy_robot)
 {
-    // HRVO can not go towards a destination which has the enemy robot behind it, since a
-    // velocity obstacle will block the destination point
-
-    // Can dynamically update the neighbor_dist property (= dist_to_goal + goal_radius),
-    // but might cause collision if velocity at goal is higher than 0 or if other robot is
-    // coming towards us
-
+    // HRVO normally can not go towards a destination which has the enemy robot behind it,
+    // since a velocity obstacle will block the destination point. However, the
+    // implementation has been updated so the neighbor dist is dynamically updated.
     std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
         std::pair(Point(-5.0, 0.0), Point(4.0, 0.0))};
     std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {
@@ -390,7 +401,7 @@ TEST_F(HRVOTest, div_a_friendly_and_enemy_robot_performance_test_moving_across)
     }
     instantiate_robots_in_world(friendly_start_dest_points,
                                 enemy_position_velocity_pairs);
-    setSimulationTimeout(7.f);
+    useSimulationTimeout(7.f);
 }
 
 TEST_F(HRVOTest, friendly_robot_going_around_ball_obstacle)

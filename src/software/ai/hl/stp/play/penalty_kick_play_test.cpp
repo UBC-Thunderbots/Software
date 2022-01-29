@@ -6,15 +6,16 @@
 #include "software/simulated_tests/non_terminating_validation_functions/ball_never_moves_backward_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robots_avoid_ball_validation.h"
-#include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
+#include "software/test_util/equal_within_tolerance.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class PenaltyKickPlayTest : public SimulatedPlayTestFixture
+class PenaltyKickPlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
     Field field = Field::createSSLDivisionBField();
@@ -45,8 +46,9 @@ TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             // making sure that the robot doesn't move the ball while the penalty is
             // setting up
-            ASSERT_EQ(world_ptr->field().friendlyPenaltyMark(),
-                      world_ptr->ball().position());
+            ASSERT_TRUE(
+                TestUtil::equalWithinTolerance(world_ptr->field().friendlyPenaltyMark(),
+                                               world_ptr->ball().position(), 1e-6));
         },
         [shooter_id](std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield) {

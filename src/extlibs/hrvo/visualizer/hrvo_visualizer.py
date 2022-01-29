@@ -33,6 +33,7 @@ def animate_robots(file_loc, test_name, gif_output_file=None):
     num_frames = robot_pos_df["frame"].max() + 1
     num_robots = robot_pos_df["robot_id"].max() + 1
     default_line_alpha = 0.3
+    default_goal_alpha = 0.3
     is_paused = False
 
     # Calculate plot size
@@ -51,12 +52,15 @@ def animate_robots(file_loc, test_name, gif_output_file=None):
         for line in line_list:
             line.set_data([], [])
 
-        return robot_list + line_list + [time_text] + [robot_id_text]
+        for goal in goal_list:
+            ax.add_patch(goal)
+
+        return robot_list + line_list + goal_list + [time_text] + [robot_id_text]
 
     def update(frame):
         """Update plot for new frame"""
         if frame >= num_frames:
-            return robot_list + line_list + [time_text] + [robot_id_text]
+            return robot_list + line_list + goal_list + [time_text] + [robot_id_text]
 
         # Current frame, dataframe filter
         curr_frame_df = robot_pos_df[robot_pos_df["frame"] == frame]
@@ -67,6 +71,10 @@ def animate_robots(file_loc, test_name, gif_output_file=None):
             robot_list[robot_id].center = (
                 float(robot["x"].head(1)),
                 float(robot["y"].head(1)),
+            )
+            goal_list[robot_id].center = (
+                float(robot["goal_x"].head(1)),
+                float(robot["goal_y"].head(1)),
             )
 
             # Update robot color if it collides with another robot
@@ -105,15 +113,15 @@ def animate_robots(file_loc, test_name, gif_output_file=None):
         curr_time = float(curr_frame_df["time"].head(1))
         time_text.set_text(f"Time: {curr_time:.2f}sec")
 
-        return robot_list + line_list + [time_text] + [robot_id_text]
+        return robot_list + line_list + goal_list + [time_text] + [robot_id_text]
 
     def toggle_pause(event):
         """Pause/Play animation when clicked"""
         nonlocal is_paused
         if is_paused:
-            robot_anim.event_source.stop()
-        else:
             robot_anim.event_source.start()
+        else:
+            robot_anim.event_source.stop()
         is_paused = not is_paused
 
     def on_plot_hover(event):
@@ -147,14 +155,26 @@ def animate_robots(file_loc, test_name, gif_output_file=None):
     initial_frame = robot_pos_df[robot_pos_df["frame"] == 0]
     robot_list = []
     line_list = []
+    goal_list = []
     for robot_id in range(num_robots):
-        radius = float(
+        robot_radius = float(
             initial_frame[initial_frame["robot_id"] == robot_id]["radius"].head(1)
         )
-        robot = Circle((0, 0), radius, facecolor="aqua", edgecolor="black")
+        goal_radius = float(
+            initial_frame[initial_frame["robot_id"] == robot_id]["goal_radius"].head(1)
+        )
+        robot = Circle((0, 0), robot_radius, facecolor="aqua", edgecolor="black")
         robot_list.append(robot)
         line_obj = ax.plot([], [], linestyle="--", alpha=default_line_alpha)[0]
         line_list.append(line_obj)
+        goal = Circle(
+            (0, 0),
+            goal_radius,
+            facecolor="aqua",
+            edgecolor="black",
+            alpha=default_goal_alpha,
+        )
+        goal_list.append(goal)
 
     # Start/Stop on click
     fig.canvas.mpl_connect("button_press_event", toggle_pause)

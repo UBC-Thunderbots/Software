@@ -26,15 +26,16 @@ void Agent::update()
         new_velocity_ = normalize(new_velocity_) * max_speed_;
     }
 
-    const float dv = abs(new_velocity_ - velocity_);
-    if (dv < max_accel_ * simulator_->timeStep_ || dv == 0.f)
+    const Vector2 dv = new_velocity_ - velocity_;
+    if (abs(dv) < max_accel_ * simulator_->getTimeStep() || abs(dv) == 0.f)
     {
         velocity_ = new_velocity_;
     }
     else
     {
-        velocity_ = (1.0f - (max_accel_ * simulator_->timeStep_ / dv)) * velocity_ +
-                    (max_accel_ * simulator_->timeStep_ / dv) * new_velocity_;
+        // Calculate the maximum velocity towards the preferred velocity, given the
+        // acceleration constraint
+        velocity_ = velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / abs(dv));
     }
 
     position_ += velocity_ * simulator_->timeStep_;
@@ -94,4 +95,9 @@ size_t Agent::getGoalIndex() const
 bool Agent::hasReachedGoal() const
 {
     return reached_goal_;
+}
+
+float Agent::getGoalRadius() const
+{
+    return goal_radius_;
 }
