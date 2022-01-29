@@ -1,18 +1,19 @@
+#include <limits.h>
+#include <malloc.h>
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/mman.h>      // Needed for mlockall()
+#include <sys/resource.h>  // needed for getrusage
+#include <sys/time.h>      // needed for getrusage
+#include <unistd.h>        // needed for sysconf(int name);
+
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/constants.h"
 #include "software/jetson_nano/thunderloop.h"
 #include "software/logger/logger.h"
 #include "software/world/robot_state.h"
-   #include <stdlib.h>
-   #include <stdio.h>
-   #include <sys/mman.h>	// Needed for mlockall()
-   #include <unistd.h>		// needed for sysconf(int name);
-   #include <malloc.h>
-   #include <sys/time.h>	// needed for getrusage
-   #include <sys/resource.h>	// needed for getrusage
-   #include <pthread.h>
-   #include <limits.h>
 
 
 // clang-format off
@@ -28,9 +29,10 @@ std::string BANNER =
 "  /'                                                                                       /'          \n";
 // clang-format on
 
-static const int g_nsec_per_sec        = 1000000000;
-static const int g_pre_allocation_size = 100 * 1024 * 1024;  // 100MB pagefault free buffer
-static const int g_periodic_job_stack_size = 100 * 1024;     // 100kb
+static const int g_nsec_per_sec = 1000000000;
+static const int g_pre_allocation_size =
+    100 * 1024 * 1024;                                    // 100MB pagefault free buffer
+static const int g_periodic_job_stack_size = 100 * 1024;  // 100kb
 
 //  Real Time Linux
 //
@@ -42,17 +44,17 @@ static const int g_periodic_job_stack_size = 100 * 1024;     // 100kb
  * @param prio The priority
  * @param sched The sched
  */
-//static void setprio(int prio, int sched)
+// static void setprio(int prio, int sched)
 //{
-    //struct sched_param param;
+// struct sched_param param;
 
-    //// Set realtime priority for this thread
-    //param.sched_priority = prio;
+//// Set realtime priority for this thread
+// param.sched_priority = prio;
 
-    //if (sched_setscheduler(0, sched, &param) < 0)
-    //{
-        //LOG(FATAL) << "sched_setscheduler: " << strerror(errno);
-    //}
+// if (sched_setscheduler(0, sched, &param) < 0)
+//{
+// LOG(FATAL) << "sched_setscheduler: " << strerror(errno);
+//}
 //}
 
 // using clock_nanosleep of librt
