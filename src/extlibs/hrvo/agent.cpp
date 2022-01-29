@@ -30,15 +30,15 @@
  * <https://gamma.cs.unc.edu/HRVO/>
  */
 
-#include "extlibs/hrvo/agent.h"
+#include "agent.h"
 
 #include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <limits>
 
-#include "goal.h"
-#include "kd_tree.h"
+#include "extlibs/hrvo/goal.h"
+#include "extlibs/hrvo/kd_tree.h"
 
 Agent::Agent(Simulator *simulator)
     : simulator_(simulator),
@@ -303,7 +303,7 @@ void Agent::computeNewVelocity()
             if (d != 0.0f)
             {
                 const float s =
-                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_.det(
+                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_).det(
                         velocityObstacles_[j].side1_) /
                     d;
                 const float t =
@@ -458,7 +458,7 @@ void Agent::computePreferredVelocity()
                                                    std::pow(distVectorToGoal.y(), 2)));
     // d = (Vf^2 - Vi^2) / 2a
     double startLinearDecelerationDistance =
-        std::((std::pow(speedAtGoal, 2) - std::pow(prefSpeed_, 2)) / (2 * maxAccel_)).length();
+        std::abs((std::pow(speedAtGoal, 2) - std::pow(prefSpeed_, 2)) / (2 * maxAccel_));
 
     if (distToGoal < startLinearDecelerationDistance)
     {

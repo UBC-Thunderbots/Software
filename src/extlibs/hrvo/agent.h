@@ -38,8 +38,8 @@
 #include <utility>
 #include <vector>
 
-#include "goal.h"
-#include "simulator.h"
+#include "extlibs/hrvo/goal.h"
+#include "extlibs/hrvo/simulator.h"
 #include "software/geom/vector.h"
 
 /**

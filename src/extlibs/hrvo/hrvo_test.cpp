@@ -125,7 +125,7 @@ class HRVOTest : public ::testing::Test
                     float other_robot_rad  = simulator.getAgentRadius(other_robot_id);
                     if (robot_id != other_robot_id)
                     {
-                        if (lengthSquared(curr_robot_pos - other_robot_pos) <
+                        if ((curr_robot_pos - other_robot_pos).lengthSquared() <
                             std::pow(curr_robot_rad + other_robot_rad, 2.f))
                         {
                             has_collided = other_robot_id;
