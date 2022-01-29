@@ -277,30 +277,30 @@ class Simulator
 
     // The scale which friendly robots should be larger than friendly robots
     // This scale is used to avoid close encounters, and reduce chance of collision
-    const float friendly_robot_radius_scale = 1.25f;
+    static constexpr float FRIENDLY_ROBOT_RADIUS_SCALE = 1.25f;
 
     // The scale which enemy robots should be larger than their actual size
     // This scale is used to avoid close encounters, and reduce chance of collision
-    const float enemy_robot_radius_scale = 2.f;
+    static constexpr float ENEMY_ROBOT_RADIUS_SCALE = 2.f;
 
     // How much larger should the goal radius be. This is added as a safety tolerance so
     // robots do not "teleport" over the goal between simulation frames.
-    const float goal_radius_scale = 1.05f;
+    static constexpr float GOAL_RADIUS_SCALE = 1.05f;
 
     // How much larger should the goal radius be (in meters). This is added as a safety
     // tolerance so robots do not accidentally enter the minimum distance threshold.
     // NOTE: This value must be >= 0
-    const float ball_agent_radius_offset = 0.1f;
+    static constexpr float BALL_AGENT_RADIUS_OFFSET = 0.1f;
 
     // The scale multiple of max robot speed which the preferred speed will be set at.
-    // pref_speed = max_speed * pref_speed_scale
+    // pref_speed = max_speed * PREF_SPEED_SCALE
     // NOTE: This scale multiple must be <= 1
-    const float pref_speed_scale = 0.75f;
+    static constexpr float PREF_SPEED_SCALE = 0.75f;
 
     // The maximum distance which HRVO Agents will look for neighbors, in meters.
     // A large radius picked to allow for far visibility of neighbors so Agents have
     // enough space to decelerate and avoid collisions.
-    const float max_neighbor_search_dist = 7.f;
+    static constexpr float MAX_NEIGHBOR_SEARCH_DIST = 7.f;
 
     friend class Agent;
     friend class Goal;

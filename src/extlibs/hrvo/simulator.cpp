@@ -104,7 +104,7 @@ void Simulator::updateWorld(const World &world)
         Vector2 goal_pos   = position + 100 * velocity;
         float acceleration = ball.acceleration().length();
         // Minimum of 0.5-meter distance away from the ball, if the ball is an obstacle
-        float ball_radius = 0.5f + ball_agent_radius_offset;
+        float ball_radius = 0.5f + BALL_AGENT_RADIUS_OFFSET;
 
         addLinearVelocityAgent(position, ball_radius, velocity, abs(velocity),
                                acceleration, addGoal(goal_pos), 0.1f);
@@ -148,7 +148,7 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
     Vector2 position(static_cast<float>(robot.position().x()),
                      static_cast<float>(robot.position().y()));
     Vector2 velocity;
-    float agent_radius = ROBOT_MAX_RADIUS_METERS * friendly_robot_radius_scale;
+    float agent_radius = ROBOT_MAX_RADIUS_METERS * FRIENDLY_ROBOT_RADIUS_SCALE;
     float max_accel    = 1e-4;
     float pref_speed   = 1e-4;
     float max_speed    = 1e-4;
@@ -163,11 +163,11 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
                            static_cast<float>(robot.velocity().y()));
         max_accel  = robot.robotConstants().robot_max_acceleration_m_per_s_2;
         max_speed  = robot.robotConstants().robot_max_speed_m_per_s;
-        pref_speed = max_speed * pref_speed_scale;
+        pref_speed = max_speed * PREF_SPEED_SCALE;
     }
 
     // Max distance which the robot can travel in one time step + scaling
-    float goal_radius        = (max_speed * timeStep_) / 2 * goal_radius_scale;
+    float goal_radius        = (max_speed * timeStep_) / 2 * GOAL_RADIUS_SCALE;
     float uncertainty_offset = 0.f;
 
     // Get this robot's destination point, if it has a primitive
@@ -191,7 +191,7 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
 
     return addHRVOAgent(position, agent_radius, velocity, max_speed, pref_speed,
                         max_accel, addGoal(destination_point), goal_radius,
-                        max_neighbor_search_dist, max_neighbors, uncertainty_offset);
+                        MAX_NEIGHBOR_SEARCH_DIST, max_neighbors, uncertainty_offset);
 }
 
 std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot,
@@ -206,10 +206,10 @@ std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot,
     float max_speed = robot.robotConstants().robot_max_speed_m_per_s;
 
     // Max distance which the robot can travel in one time step + scaling
-    float goal_radius = (max_speed * timeStep_) / 2 * goal_radius_scale;
+    float goal_radius = (max_speed * timeStep_) / 2 * GOAL_RADIUS_SCALE;
 
     // Enemy agents should appear larger to friendly agents to avoid collision
-    float agent_radius = ROBOT_MAX_RADIUS_METERS * enemy_robot_radius_scale;
+    float agent_radius = ROBOT_MAX_RADIUS_METERS * ENEMY_ROBOT_RADIUS_SCALE;
 
     return addLinearVelocityAgent(position, agent_radius, velocity, max_speed, max_accel,
                                   addGoal(destination), goal_radius);
