@@ -188,9 +188,14 @@ void SimulatedErForceSimTestFixture::runTest(
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
         FieldType::DIV_B, create2015RobotConstants(), create2015WheelConstants(),
         thunderbots_config->getSimulatorConfig()));
+
+    // TODO (#2419): remove this to re-enable sigfpe checks
+    fedisableexcept(FE_INVALID | FE_OVERFLOW);
     simulator->setBallState(ball);
     simulator->setYellowRobots(friendly_robots);
     simulator->setBlueRobots(enemy_robots);
+    // TODO (#2419): remove this to re-enable sigfpe checks
+    feenableexcept(FE_INVALID | FE_OVERFLOW);
 
     updateSensorFusion(simulator);
     std::shared_ptr<World> world;
