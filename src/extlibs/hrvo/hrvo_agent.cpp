@@ -465,7 +465,7 @@ void HRVOAgent::computePreferredVelocity()
 
         // Limit the preferred velocity to the kinematic limits
         const float dv = abs(ideal_pref_velocity - velocity_);
-        if (dv < max_accel_ * simulator_->timeStep_)
+        if (dv <= max_accel_ * simulator_->timeStep_)
         {
             pref_velocity_ = ideal_pref_velocity;
         }

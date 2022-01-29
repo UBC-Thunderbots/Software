@@ -20,14 +20,22 @@ void LinearVelocityAgent::computeNewVelocity()
     }
 
     const float dv = abs(pref_velocity_ - velocity_);
-    if (dv != 0.f)
+    if (dv <= max_accel_)
     {
-        new_velocity_ = (1.0f - (max_accel_ * simulator_->timeStep_ / dv)) * velocity_ +
-                        (max_accel_ * simulator_->timeStep_ / dv) * pref_velocity_;
+        new_velocity_ = pref_velocity_;
     }
     else
     {
-        new_velocity_ = velocity_;
+        // TODO: Might be able to simplify to:
+        //       = velocity_ + max_accel_ * (unit vector dv)
+        // Calculate the max velocity (given max accel) in the direction of dv
+        // Should only do this if dv > max_accel_ to we don't go faster than accel
+
+        // Calculate the maximum velocity towards the preferred velocity, given the
+        // max acceleration constraint
+        new_velocity_ = velocity_ + (max_accel_ * simulator_->timeStep_) * (dv / abs(dv)); // TODO: Compare the two outputs
+        new_velocity_ = (1.0f - (max_accel_ * simulator_->timeStep_ / dv)) * velocity_ +
+                        (max_accel_ * simulator_->timeStep_ / dv) * pref_velocity_;
     }
 }
 
