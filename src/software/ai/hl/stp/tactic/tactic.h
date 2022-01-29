@@ -55,7 +55,16 @@ class Tactic
     virtual bool done() const = 0;
 
     /**
+     * Gets the FSM state of the tactic
+     *
+     * @return the FSM state
+     */
+    virtual std::string getFSMState() const = 0;
+
+    /**
      * robot hardware capability requirements of the tactic.
+     *
+     * @return the robot capability requirements
      */
     const std::set<RobotCapability> &robotCapabilityRequirements() const;
 

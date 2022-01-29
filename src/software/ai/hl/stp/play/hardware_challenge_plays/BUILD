@@ -25,7 +25,7 @@ cc_test(
     deps = [
         ":scoring_with_static_defenders_play",
         "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_play_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests/non_terminating_validation_functions",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
@@ -57,7 +57,7 @@ cc_test(
     deps = [
         ":scoring_from_contested_possession_play",
         "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_play_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests/non_terminating_validation_functions",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
@@ -89,7 +89,7 @@ cc_test(
     deps = [
         ":dribbling_parcour_play",
         "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_play_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests/non_terminating_validation_functions",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
@@ -121,7 +121,7 @@ cc_test(
     deps = [
         ":pass_endurance_play",
         "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_play_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests/non_terminating_validation_functions",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",

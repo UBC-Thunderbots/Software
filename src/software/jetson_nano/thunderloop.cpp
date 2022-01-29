@@ -43,6 +43,8 @@ void Thunderloop::run(unsigned run_at_hz)
 
     auto next_frame = clock::now();
 
+    motor_service_->start();
+
     for (;;)
     {
         // TODO (#2335) add loop timing introspection and use Preempt-RT (maybe)

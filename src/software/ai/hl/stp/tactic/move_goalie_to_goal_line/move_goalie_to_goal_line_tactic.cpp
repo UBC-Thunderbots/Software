@@ -22,11 +22,6 @@ double MoveGoalieToGoalLineTactic::calculateRobotCost(const Robot &robot,
     }
 }
 
-bool MoveGoalieToGoalLineTactic::done() const
-{
-    return fsm.is(boost::sml::X);
-}
-
 void MoveGoalieToGoalLineTactic::updateIntent(const TacticUpdate &tactic_update)
 {
     fsm.process_event(MoveGoalieToGoalLineFSM::Update({}, tactic_update));

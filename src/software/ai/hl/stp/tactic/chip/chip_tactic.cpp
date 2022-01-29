@@ -37,11 +37,6 @@ void ChipTactic::accept(TacticVisitor &visitor) const
     visitor.visit(*this);
 }
 
-bool ChipTactic::done() const
-{
-    return fsm.is(boost::sml::X);
-}
-
 void ChipTactic::updateIntent(const TacticUpdate &tactic_update)
 {
     fsm.process_event(ChipFSM::Update(control_params, tactic_update));
