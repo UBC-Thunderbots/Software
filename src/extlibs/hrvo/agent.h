@@ -20,7 +20,7 @@ class Agent
      * @param prefVelocity       The preferred velocity of this agent.
      * @param maxSpeed           The maximum speed of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
-     * @param goalIndex             The goal number of this agent.
+     * @param goalIndex          The index of the Goal which this agent should go to.
      * @param goalRadius         The goal radius of this agent.
      */
     Agent(Simulator *simulator, const Vector2 &position, float radius,
@@ -92,6 +92,13 @@ class Agent
      * @return The max acceleration of the agent
      */
     float getMaxAccel() const;
+
+    /**
+     * Return the goal radius of the agent
+     *
+     * @return The goal radius of the agent
+     */
+    float getGoalRadius() const;
 
     /**
      * Return the preferred velocity of the agent
