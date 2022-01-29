@@ -156,9 +156,9 @@ class Vector final
 
     /**
      * Returns the determinant of a square matrix with rows from specified vectors
-     * 
+     *
      * @param other the bottom row Vector
-     * 
+     *
      * @return the determinant of a square matrix
      */
     double det(const Vector &other) const;

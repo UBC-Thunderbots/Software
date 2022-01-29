@@ -116,11 +116,13 @@ void Agent::computeNewVelocity()
     {
         const Agent *const other = simulator_->agents_[iter->second];
 
-        if ((other->position_ - position_).lengthSquared() > std::pow(other->radius_ + radius_, 2))
+        if ((other->position_ - position_).lengthSquared() >
+            std::pow(other->radius_ + radius_, 2))
         {
-            const float angle = atan2((other->position_ - position_).y(), (other->position_ - position_).x());
-            const float openingAngle =
-                std::asin((other->radius_ + radius_) / (other->position_ - position_).length());
+            const float angle        = atan2((other->position_ - position_).y(),
+                                      (other->position_ - position_).x());
+            const float openingAngle = std::asin((other->radius_ + radius_) /
+                                                 (other->position_ - position_).length());
 
             velocityObstacle.side1_ =
                 Vector(std::cos(angle - openingAngle), std::sin(angle - openingAngle));
@@ -133,7 +135,8 @@ void Agent::computeNewVelocity()
                 0.0f)
             {
                 const float s =
-                    0.5f * (velocity_ - other->velocity_).det(velocityObstacle.side2_) / d;
+                    0.5f * (velocity_ - other->velocity_).det(velocityObstacle.side2_) /
+                    d;
 
                 velocityObstacle.apex_ =
                     other->velocity_ + s * velocityObstacle.side1_ -
@@ -144,7 +147,8 @@ void Agent::computeNewVelocity()
             else
             {
                 const float s =
-                    0.5f * (velocity_ - other->velocity_).det(velocityObstacle.side1_) / d;
+                    0.5f * (velocity_ - other->velocity_).det(velocityObstacle.side1_) /
+                    d;
 
                 velocityObstacle.apex_ =
                     other->velocity_ + s * velocityObstacle.side2_ -
@@ -159,9 +163,10 @@ void Agent::computeNewVelocity()
         {
             velocityObstacle.apex_ =
                 0.5f * (other->velocity_ + velocity_) -
-                (uncertaintyOffset_ +
-                 0.5f * (other->radius_ + radius_ - (other->position_ - position_).length()) /
-                     simulator_->timeStep_) *
+                (uncertaintyOffset_ + 0.5f *
+                                          (other->radius_ + radius_ -
+                                           (other->position_ - position_).length()) /
+                                          simulator_->timeStep_) *
                     (other->position_ - position_).normalize();
             velocityObstacle.side1_ = (position_, other->position_).perpendicular();
             velocityObstacle.side2_ = -velocityObstacle.side1_;
@@ -193,13 +198,14 @@ void Agent::computeNewVelocity()
         candidate.velocityObstacle1_ = i;
         candidate.velocityObstacle2_ = i;
 
-        const float dotProduct1 =
-            (prefVelocity_ - velocityObstacles_[i].apex_).dot(velocityObstacles_[i].side1_);
-        const float dotProduct2 =
-            (prefVelocity_ - velocityObstacles_[i].apex_).dot(velocityObstacles_[i].side2_);
+        const float dotProduct1 = (prefVelocity_ - velocityObstacles_[i].apex_)
+                                      .dot(velocityObstacles_[i].side1_);
+        const float dotProduct2 = (prefVelocity_ - velocityObstacles_[i].apex_)
+                                      .dot(velocityObstacles_[i].side2_);
 
-        if (dotProduct1 > 0.0f && (velocityObstacles_[i].side1_).det(
-                                      prefVelocity_ - velocityObstacles_[i].apex_) > 0.0f)
+        if (dotProduct1 > 0.0f &&
+            (velocityObstacles_[i].side1_)
+                    .det(prefVelocity_ - velocityObstacles_[i].apex_) > 0.0f)
         {
             candidate.position_ =
                 velocityObstacles_[i].apex_ + dotProduct1 * velocityObstacles_[i].side1_;
@@ -211,8 +217,9 @@ void Agent::computeNewVelocity()
             }
         }
 
-        if (dotProduct2 > 0.0f && (velocityObstacles_[i].side2_).det(
-                                      prefVelocity_ - velocityObstacles_[i].apex_) < 0.0f)
+        if (dotProduct2 > 0.0f &&
+            (velocityObstacles_[i].side2_)
+                    .det(prefVelocity_ - velocityObstacles_[i].apex_) < 0.0f)
         {
             candidate.position_ =
                 velocityObstacles_[i].apex_ + dotProduct2 * velocityObstacles_[i].side2_;
@@ -232,7 +239,8 @@ void Agent::computeNewVelocity()
 
         float discriminant =
             maxSpeed_ * maxSpeed_ -
-            std::pow((velocityObstacles_[j].apex_).det(velocityObstacles_[j].side1_), 2.f);
+            std::pow((velocityObstacles_[j].apex_).det(velocityObstacles_[j].side1_),
+                     2.f);
 
         if (discriminant > 0.0f)
         {
@@ -262,7 +270,8 @@ void Agent::computeNewVelocity()
 
         discriminant =
             maxSpeed_ * maxSpeed_ -
-            std::pow((velocityObstacles_[j].apex_).det(velocityObstacles_[j].side2_), 2.f);
+            std::pow((velocityObstacles_[j].apex_).det(velocityObstacles_[j].side2_),
+                     2.f);
 
         if (discriminant > 0.0f)
         {
@@ -298,17 +307,17 @@ void Agent::computeNewVelocity()
             candidate.velocityObstacle1_ = i;
             candidate.velocityObstacle2_ = j;
 
-            float d = (velocityObstacles_[i].side1_).det( velocityObstacles_[j].side1_);
+            float d = (velocityObstacles_[i].side1_).det(velocityObstacles_[j].side1_);
 
             if (d != 0.0f)
             {
                 const float s =
-                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_).det(
-                        velocityObstacles_[j].side1_) /
+                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
+                        .det(velocityObstacles_[j].side1_) /
                     d;
                 const float t =
-                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_).det(
-                        velocityObstacles_[i].side1_) /
+                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
+                        .det(velocityObstacles_[i].side1_) /
                     d;
 
                 if (s >= 0.0f && t >= 0.0f)
@@ -319,7 +328,8 @@ void Agent::computeNewVelocity()
                     if ((candidate.position_).lengthSquared() < maxSpeed_ * maxSpeed_)
                     {
                         candidates_.insert(std::make_pair(
-                            (prefVelocity_ - candidate.position_).lengthSquared(), candidate));
+                            (prefVelocity_ - candidate.position_).lengthSquared(),
+                            candidate));
                     }
                 }
             }
@@ -329,12 +339,12 @@ void Agent::computeNewVelocity()
             if (d != 0.0f)
             {
                 const float s =
-                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_).det(
-                        velocityObstacles_[j].side1_) /
+                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
+                        .det(velocityObstacles_[j].side1_) /
                     d;
                 const float t =
-                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_).det(
-                        velocityObstacles_[i].side2_) /
+                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
+                        .det(velocityObstacles_[i].side2_) /
                     d;
 
                 if (s >= 0.0f && t >= 0.0f)
@@ -345,7 +355,8 @@ void Agent::computeNewVelocity()
                     if ((candidate.position_).lengthSquared() < maxSpeed_ * maxSpeed_)
                     {
                         candidates_.insert(std::make_pair(
-                            (prefVelocity_ - candidate.position_).lengthSquared(), candidate));
+                            (prefVelocity_ - candidate.position_).lengthSquared(),
+                            candidate));
                     }
                 }
             }
@@ -355,12 +366,12 @@ void Agent::computeNewVelocity()
             if (d != 0.0f)
             {
                 const float s =
-                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_).det(
-                        velocityObstacles_[j].side2_) /
+                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
+                        .det(velocityObstacles_[j].side2_) /
                     d;
                 const float t =
-                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_).det(
-                        velocityObstacles_[i].side1_) /
+                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
+                        .det(velocityObstacles_[i].side1_) /
                     d;
 
                 if (s >= 0.0f && t >= 0.0f)
@@ -371,7 +382,8 @@ void Agent::computeNewVelocity()
                     if ((candidate.position_).lengthSquared() < maxSpeed_ * maxSpeed_)
                     {
                         candidates_.insert(std::make_pair(
-                            (prefVelocity_ - candidate.position_).lengthSquared(), candidate));
+                            (prefVelocity_ - candidate.position_).lengthSquared(),
+                            candidate));
                     }
                 }
             }
@@ -381,12 +393,12 @@ void Agent::computeNewVelocity()
             if (d != 0.0f)
             {
                 const float s =
-                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_).det(
-                        velocityObstacles_[j].side2_) /
+                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
+                        .det(velocityObstacles_[j].side2_) /
                     d;
                 const float t =
-                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_).det(
-                        velocityObstacles_[i].side2_) /
+                    (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
+                        .det(velocityObstacles_[i].side2_) /
                     d;
 
                 if (s >= 0.0f && t >= 0.0f)
@@ -397,7 +409,8 @@ void Agent::computeNewVelocity()
                     if ((candidate.position_).lengthSquared() < maxSpeed_ * maxSpeed_)
                     {
                         candidates_.insert(std::make_pair(
-                            (prefVelocity_ - candidate.position_).lengthSquared(), candidate));
+                            (prefVelocity_ - candidate.position_).lengthSquared(),
+                            candidate));
                     }
                 }
             }
@@ -415,10 +428,10 @@ void Agent::computeNewVelocity()
         for (int j = 0; j < static_cast<int>(velocityObstacles_.size()); ++j)
         {
             if (j != candidate.velocityObstacle1_ && j != candidate.velocityObstacle2_ &&
-                (velocityObstacles_[j].side2_).det(
-                    candidate.position_ - velocityObstacles_[j].apex_) < 0.0f &&
-                (velocityObstacles_[j].side1_).det(
-                    candidate.position_ - velocityObstacles_[j].apex_) > 0.0f)
+                (velocityObstacles_[j].side2_)
+                        .det(candidate.position_ - velocityObstacles_[j].apex_) < 0.0f &&
+                (velocityObstacles_[j].side1_)
+                        .det(candidate.position_ - velocityObstacles_[j].apex_) > 0.0f)
             {
                 valid = false;
 
@@ -450,12 +463,12 @@ void Agent::computePreferredVelocity()
 
     // TODO (#2374): Update so we have the same logic for when the robot is accelerating
     // https://github.com/UBC-Thunderbots/Software/issues/2374
-    Goal *nextGoal           = simulator_->goals_[goalNo_];
+    Goal *nextGoal          = simulator_->goals_[goalNo_];
     Vector goalPosition     = nextGoal->getCurrentGoalPosition();
-    float speedAtGoal        = nextGoal->getDesiredSpeedAtCurrentGoal();
+    float speedAtGoal       = nextGoal->getDesiredSpeedAtCurrentGoal();
     Vector distVectorToGoal = goalPosition - position_;
-    auto distToGoal = static_cast<float>(std::sqrt(std::pow(distVectorToGoal.x(), 2) +
-                                                   std::pow(distVectorToGoal.y(), 2)));
+    auto distToGoal         = static_cast<float>(
+        std::sqrt(std::pow(distVectorToGoal.x(), 2) + std::pow(distVectorToGoal.y(), 2)));
     // d = (Vf^2 - Vi^2) / 2a
     double startLinearDecelerationDistance =
         std::abs((std::pow(speedAtGoal, 2) - std::pow(prefSpeed_, 2)) / (2 * maxAccel_));
@@ -536,8 +549,8 @@ void Agent::update()
 
     position_ += velocity_ * simulator_->timeStep_;
 
-    if ((simulator_->goals_[goalNo_]->getCurrentGoalPosition() - position_).lengthSquared() <
-        goalRadius_ * goalRadius_)
+    if ((simulator_->goals_[goalNo_]->getCurrentGoalPosition() - position_)
+            .lengthSquared() < goalRadius_ * goalRadius_)
     {
         // Is at current goal position
         if (simulator_->goals_[goalNo_]->isGoingToFinalGoal())

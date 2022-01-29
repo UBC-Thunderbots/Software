@@ -100,9 +100,8 @@ void KdTree::buildRecursive(std::size_t begin, std::size_t end, std::size_t node
         while (true)
         {
             while (left <= right &&
-                   (vertical
-                        ? simulator_->agents_[agents_[left]]->position_.x()
-                        : simulator_->agents_[agents_[left]]->position_.y()) < split)
+                   (vertical ? simulator_->agents_[agents_[left]]->position_.x()
+                             : simulator_->agents_[agents_[left]]->position_.y()) < split)
             {
                 ++left;
             }
@@ -179,24 +178,24 @@ void KdTree::queryRecursive(Agent *agent, float &rangeSq, std::size_t node) cons
 
         if (agent->position_.x() < nodes_[nodes_[node].right_].minX_)
         {
-            distSqRight += std::pow(
-                nodes_[nodes_[node].right_].minX_ - agent->position_.x(), 2.f);
+            distSqRight +=
+                std::pow(nodes_[nodes_[node].right_].minX_ - agent->position_.x(), 2.f);
         }
         else if (agent->position_.x() > nodes_[nodes_[node].right_].maxX_)
         {
-            distSqRight += std::pow(
-                agent->position_.x() - nodes_[nodes_[node].right_].maxX_, 2.f);
+            distSqRight +=
+                std::pow(agent->position_.x() - nodes_[nodes_[node].right_].maxX_, 2.f);
         }
 
         if (agent->position_.y() < nodes_[nodes_[node].right_].minY_)
         {
-            distSqRight += std::pow(
-                nodes_[nodes_[node].right_].minY_ - agent->position_.y(), 2.f);
+            distSqRight +=
+                std::pow(nodes_[nodes_[node].right_].minY_ - agent->position_.y(), 2.f);
         }
         else if (agent->position_.y() > nodes_[nodes_[node].right_].maxY_)
         {
-            distSqRight += std::pow(
-                agent->position_.y() - nodes_[nodes_[node].right_].maxY_, 2.f);
+            distSqRight +=
+                std::pow(agent->position_.y() - nodes_[nodes_[node].right_].maxY_, 2.f);
         }
 
         if (distSqLeft < distSqRight)

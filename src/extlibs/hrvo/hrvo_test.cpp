@@ -158,13 +158,11 @@ class HRVOTest : public ::testing::Test
                 }
                 output_file << frame << "," << time << ","
                             << std::to_string(computation_time.count()) << "," << robot_id
-                            << "," << robot_radius[robot_id] << ","
-                            << curr_robot_pos.x() << "," << curr_robot_pos.y()
-                            << "," << velocity_x << "," << velocity_y << "," << speed
-                            << "," << has_collided << ","
+                            << "," << robot_radius[robot_id] << "," << curr_robot_pos.x()
+                            << "," << curr_robot_pos.y() << "," << velocity_x << ","
+                            << velocity_y << "," << speed << "," << has_collided << ","
                             << simulator.getAgentPrefVelocity(robot_id).x() << ","
-                            << simulator.getAgentPrefVelocity(robot_id).y()
-                            << std::endl;
+                            << simulator.getAgentPrefVelocity(robot_id).y() << std::endl;
             }
 
             frame++;
