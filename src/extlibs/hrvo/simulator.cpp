@@ -190,8 +190,8 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
     }
 
     return addHRVOAgent(position, agent_radius, velocity, max_speed, pref_speed,
-                        max_accel, addGoal(destination_point), goal_radius, max_neighbor_search_dist,
-                        max_neighbors, uncertainty_offset);
+                        max_accel, addGoal(destination_point), goal_radius,
+                        max_neighbor_search_dist, max_neighbors, uncertainty_offset);
 }
 
 std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot,

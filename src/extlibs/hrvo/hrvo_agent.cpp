@@ -473,7 +473,8 @@ void HRVOAgent::computePreferredVelocity()
         {
             // Calculate the maximum velocity towards the preferred velocity, given the
             // acceleration constraint
-            pref_velocity_ = velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / abs(dv));
+            pref_velocity_ =
+                velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / abs(dv));
         }
     }
     else
