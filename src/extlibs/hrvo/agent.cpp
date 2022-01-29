@@ -35,8 +35,7 @@ void Agent::update()
     {
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
-        velocity_ =
-            velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / abs(dv));
+        velocity_ = velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / abs(dv));
     }
 
     position_ += velocity_ * simulator_->timeStep_;

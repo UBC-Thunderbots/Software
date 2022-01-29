@@ -55,7 +55,7 @@ class HRVOTest : public ::testing::Test
     void useSimulationTimeout(float simulation_timeout)
     {
         HRVOTest::simulation_timeout = simulation_timeout;
-        only_use_timeout = true;
+        only_use_timeout             = true;
     }
 
     /**
@@ -216,7 +216,8 @@ class HRVOTest : public ::testing::Test
 
             auto finish_tick_time = std::chrono::high_resolution_clock::now();
             computation_time += finish_tick_time - start_tick_time;
-        } while ((only_use_timeout || !simulator.haveReachedGoals()) && prev_frame_time < simulation_timeout);
+        } while ((only_use_timeout || !simulator.haveReachedGoals()) &&
+                 prev_frame_time < simulation_timeout);
 
         auto finish_time = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> total_time = finish_time - start_time;
