@@ -94,6 +94,13 @@ class Agent
     float getMaxAccel() const;
 
     /**
+     * Return the goal radius of the agent
+     *
+     * @return The goal radius of the agent
+     */
+    float getGoalRadius() const;
+
+    /**
      * Return the preferred velocity of the agent
      *
      * @return The preferred velocity of the agent

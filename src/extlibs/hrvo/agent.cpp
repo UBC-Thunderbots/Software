@@ -96,3 +96,8 @@ bool Agent::hasReachedGoal() const
 {
     return reached_goal_;
 }
+
+float Agent::getGoalRadius() const
+{
+    return goal_radius_;
+}

@@ -124,7 +124,7 @@ class HRVOTest : public ::testing::Test
 
         // Column Names
         output_file
-            << "frame,time,computation_time,robot_id,radius,x,y,velocity_x,velocity_y,speed,has_collided,pref_vel_x,pref_vel_y"
+            << "frame,time,computation_time,robot_id,radius,x,y,velocity_x,velocity_y,speed,goal_x,goal_y,goal_radius,has_collided,pref_vel_x,pref_vel_y"
             << std::endl;
 
         const auto num_robots = static_cast<unsigned int>(simulator.getNumAgents());
@@ -199,12 +199,18 @@ class HRVOTest : public ::testing::Test
                     prev_x_pos_arr[robot_id] = curr_x_pos;
                     prev_y_pos_arr[robot_id] = curr_y_pos;
                 }
+                Vector2 goal_position =
+                    simulator.goals_[simulator.agents_[robot_id]->getGoalIndex()]
+                        ->getCurrentGoalPosition();
+                float goal_radius = simulator.agents_[robot_id]->getGoalRadius();
+
                 output_file << frame << "," << time << ","
                             << std::to_string(computation_time.count()) << "," << robot_id
                             << "," << robot_radius[robot_id] << ","
                             << curr_robot_pos.getX() << "," << curr_robot_pos.getY()
                             << "," << velocity_x << "," << velocity_y << "," << speed
-                            << "," << has_collided << ","
+                            << "," << goal_position.getX() << "," << goal_position.getY()
+                            << "," << goal_radius << "," << has_collided << ","
                             << simulator.getAgentPrefVelocity(robot_id).getX() << ","
                             << simulator.getAgentPrefVelocity(robot_id).getY()
                             << std::endl;
@@ -277,17 +283,14 @@ TEST_F(HRVOTest, single_friendly_robot_moving_in_line)
     std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
         std::pair(Point(-5.0, 0.0), Point(5.0, 0.0))};
     instantiate_robots_in_world(friendly_start_dest_points, {});
+    useSimulationTimeout(5.f);
 }
 
 TEST_F(HRVOTest, destination_between_friendly_robot_and_stationary_enemy_robot)
 {
-    // HRVO can not go towards a destination which has the enemy robot behind it, since a
-    // velocity obstacle will block the destination point
-
-    // Can dynamically update the neighbor_dist property (= dist_to_goal + goal_radius),
-    // but might cause collision if velocity at goal is higher than 0 or if other robot is
-    // coming towards us
-
+    // HRVO normally can not go towards a destination which has the enemy robot behind it,
+    // since a velocity obstacle will block the destination point. However, the
+    // implementation has been updated so the neighbor dist is dynamically updated.
     std::vector<std::pair<Point, Point>> friendly_start_dest_points = {
         std::pair(Point(-5.0, 0.0), Point(4.0, 0.0))};
     std::vector<std::pair<Point, Vector>> enemy_position_velocity_pairs = {
