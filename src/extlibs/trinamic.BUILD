@@ -25,28 +25,6 @@ cc_library(
 )
 
 cc_library(
-<<<<<<< HEAD
-    name = "tmc6100-api",
-    srcs = [
-        "tmc/ic/TMC6100/TMC6100.c",
-    ],
-    hdrs = [
-        "tmc/ic/TMC6100/TMC6100.h",
-        "tmc/ic/TMC6100/TMC6100_Constants.h",
-        "tmc/ic/TMC6100/TMC6100_Fields.h",
-        "tmc/ic/TMC6100/TMC6100_Register.h",
-        "tmc/ic/TMC6100/TMC6100_Variants.h",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":tmc-helpers-lib",
-        ":tmc-ramp-lib",
-    ],
-)
-
-cc_library(
-=======
->>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
     name = "tmc-helpers-lib",
     srcs = [
         "tmc/helpers/CRC.c",
