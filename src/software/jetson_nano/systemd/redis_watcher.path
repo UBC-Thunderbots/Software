@@ -3,7 +3,7 @@ Description=Monitor for changes in the redis script
 After=thunderbots.service
 
 [Path]
-#todo add binary path
+#todo add binary path (#2443)
 PathChanged=${%i_path}
 Unit=watcher@%redis.service
 
