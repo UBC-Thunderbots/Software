@@ -21,23 +21,14 @@ TEST(ErForceWorldTest, test_create_ball)
     EXPECT_TRUE(
         TestUtil::equalWithinTolerance(test_ball.currentState(), expected_state, 1e-6));
 }
-<<<<<<< HEAD
-=======
 
->>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
 TEST(ErForceWorldTest, test_create_robot)
 {
     auto quater = std::make_unique<world::Quaternion>();
     quater->set_real(1.0);
-<<<<<<< HEAD
-    quater->set_i(2.0);
-    quater->set_j(3.0);
-    quater->set_k(4.0);
-=======
     quater->set_i(0);
     quater->set_j(0);
     quater->set_k(0);
->>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
 
     auto sim_robot = std::make_unique<world::SimRobot>();
     sim_robot->set_id(0);
@@ -55,11 +46,7 @@ TEST(ErForceWorldTest, test_create_robot)
     const Robot test_robot = createRobot(*sim_robot, Timestamp::fromSeconds(0));
     const Point expected_pos(sim_robot->p_x(), sim_robot->p_y());
     const Vector expected_vel(sim_robot->v_x(), sim_robot->v_y());
-<<<<<<< HEAD
-    RobotState expected_state(expected_pos, expected_vel, Angle::atan((double)20 / -49),
-=======
     RobotState expected_state(expected_pos, expected_vel, Angle::zero(),
->>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
                               Angle::fromDegrees(45));
     EXPECT_EQ(0, test_robot.id());
     EXPECT_TRUE(TestUtil::equalWithinTolerance(test_robot.currentState(), expected_state,

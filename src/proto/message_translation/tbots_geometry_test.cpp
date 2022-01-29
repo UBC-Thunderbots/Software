@@ -54,8 +54,6 @@ TEST(TbotsProtobufTest, polygon_msg_test)
 
     EXPECT_EQ(polygon.getPoints()[2].x(), polygon_msg->points(2).x_meters());
     EXPECT_EQ(polygon.getPoints()[2].y(), polygon_msg->points(2).y_meters());
-<<<<<<< HEAD
-=======
 }
 
 TEST(TbotsProtobufTest, circle_msg_test)
@@ -67,5 +65,4 @@ TEST(TbotsProtobufTest, circle_msg_test)
 
     EXPECT_TRUE(
         google::protobuf::util::MessageDifferencer::Equals(*circle_msg_1, *circle_msg_2));
->>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
 }

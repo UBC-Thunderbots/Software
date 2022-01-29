@@ -47,10 +47,7 @@ py_proto_library(
         "tbots_timestamp_msg.proto",
         "team.proto",
         "vision.proto",
-<<<<<<< HEAD
-=======
         "visualization.proto",
->>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
         "world.proto",
     ],
     deps = [

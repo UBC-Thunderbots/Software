@@ -36,13 +36,10 @@ message Polygon
 {
     // list of polygon vertices
     repeated Point points = 1;
-<<<<<<< HEAD
-=======
 }
 
 message Circle
 {
     Point origin  = 1;
     double radius = 2;
->>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
 }
