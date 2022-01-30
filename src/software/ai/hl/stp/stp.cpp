@@ -35,7 +35,7 @@ STP::STP(std::shared_ptr<const AiConfig> ai_config)
         [this, ai_config](std::string new_override_play_name) {
             if (ai_config->getAiControlConfig()->getOverrideAiPlay()->value())
             {
-                overridePlayName(new_override_play_name);
+                overridePlayConstructorFromName(new_override_play_name);
             }
         });
 
@@ -43,7 +43,7 @@ STP::STP(std::shared_ptr<const AiConfig> ai_config)
         [this, ai_config](bool new_override_ai_play) {
             if (new_override_ai_play)
             {
-                overridePlayName(
+                overridePlayConstructorFromName(
                     ai_config->getAiControlConfig()->getCurrentAiPlay()->value());
             }
         });
