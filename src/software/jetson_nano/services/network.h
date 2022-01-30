@@ -37,8 +37,9 @@ class NetworkService : public Service
     void stop() override;
 
     /**
-     * When the network service is polled, it senders the robot_status
-     * RobotConstants_t and WheelConstants_t.
+     * When the network service is polled, it sends the robot_status and returns
+     * a tuple of the most recent PrimitiveSet and Vision
+     * 
      * @returns a tuple of the stored primitive_set and vision
      */
     std::tuple<TbotsProto::PrimitiveSet, TbotsProto::Vision> poll(
