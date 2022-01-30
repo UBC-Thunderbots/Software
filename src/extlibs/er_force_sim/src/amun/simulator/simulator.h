@@ -33,6 +33,10 @@
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "proto/ssl_simulation_robot_control.pb.h"
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
 // higher values break the rolling friction of the ball
 const float SIMULATOR_SCALE  = 10.0f;
 const float SUB_TIMESTEP     = 1 / 200.f;
@@ -70,11 +74,29 @@ class camun::simulator::Simulator : public QObject
     typedef QMap<unsigned int, QPair<SimRobot *, unsigned int>>
         RobotMap; /*First int: ID, Second int: Generation*/
 
+<<<<<<< HEAD
     explicit Simulator(const amun::SimulatorSetup &setup, bool useManualTrigger = false);
     ~Simulator() override;
     Simulator(const Simulator &) = delete;
     Simulator &operator=(const Simulator &) = delete;
     void handleSimulatorTick(double timeStep);
+=======
+    /**
+     * Creates a simulator with the given set up
+     *
+     * @param setup the simulator set up
+     */
+    explicit Simulator(const amun::SimulatorSetup &setup);
+    ~Simulator() override;
+    Simulator(const Simulator &) = delete;
+    Simulator &operator=(const Simulator &) = delete;
+
+    /**
+     * Seeds the pseudorandom generator
+     *
+     * @param seed
+     */
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
     void seedPRGN(uint32_t seed);
 
    signals:
@@ -84,14 +106,42 @@ class camun::simulator::Simulator : public QObject
     void sendSSLSimError(const QList<SSLSimError> &errors, ErrorSource source);
 
    public:
+<<<<<<< HEAD
+=======
+    /**
+     * Accepts and executes a blue or yellow robot control command
+     *
+     * @param control the robot control command
+     *
+     * @return the radio response feedback from the simulator
+     */
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
     std::vector<robot::RadioResponse> acceptBlueRobotControlCommand(
         const SSLSimulationProto::RobotControl &control);
     std::vector<robot::RadioResponse> acceptYellowRobotControlCommand(
         const SSLSimulationProto::RobotControl &control);
+<<<<<<< HEAD
     void stepSimulation(double time_s);
     // checks for possible collisions with the robots on the target position of the ball
     // calls teleportRobotToFreePosition to move robots out of the way
     void safelyTeleportBall(const float x, const float y);
+=======
+
+    /**
+     * Steps the simulation a given amount of time
+     *
+     * @param time_s time in seconds
+     */
+    void stepSimulation(double time_s);
+
+    /**
+     * Handles a tick of the simulator
+     * Note: this function is required for bullet simulator callback
+     *
+     * @param time_s time in seconds
+     */
+    void handleSimulatorTick(double timeStep);
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
 
     /**
      * Generates wrapper packets from the current state of the simulator
@@ -106,7 +156,17 @@ class camun::simulator::Simulator : public QObject
      * @return simulator state
      */
     world::SimulatorState getSimulatorState();
+<<<<<<< HEAD
     void handleSimulatorSetupCommand(const std::shared_ptr<amun::Command> &command);
+=======
+
+    /**
+     * Handles a simulator set up command and configure the simulator accordingly
+     *
+     * @param command the simulator set up command
+     */
+    void handleSimulatorSetupCommand(const std::unique_ptr<amun::Command> &command);
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
 
    public slots:
     void handleRadioCommands(const SSLSimRobotControl &control, bool isBlue,
@@ -114,6 +174,17 @@ class camun::simulator::Simulator : public QObject
     void setFlipped(bool flipped);
 
    private:
+<<<<<<< HEAD
+=======
+    /**
+     * Accepts and executes a blue or yellow robot control command
+     *
+     * @param control the robot control command
+     * @param isBlue whether it's blue robots or not
+     *
+     * @return the radio response feedback from the simulator
+     */
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
     std::vector<robot::RadioResponse> acceptRobotControlCommand(
         const SSLSimulationProto::RobotControl &control, bool isBlue);
     void sendSSLSimErrorInternal(ErrorSource source);
@@ -134,7 +205,10 @@ class camun::simulator::Simulator : public QObject
     QQueue<RadioCommand> m_radioCommands;
     QQueue<std::tuple<QList<QByteArray>, QByteArray, qint64>> m_visionPackets;
     QQueue<QTimer *> m_visionTimers;
+<<<<<<< HEAD
     bool m_isPartial;
+=======
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
     QTimer *m_trigger;
     qint64 m_time;
     qint64 m_lastSentStatusTime;

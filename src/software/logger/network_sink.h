@@ -4,8 +4,7 @@
 #include <iostream>
 
 #include "proto/robot_log_msg.pb.h"
-#include "software/logger/custom_logging_levels.h"
-#include "software/networking/threaded_proto_udp_sender.h"
+#include "software/networking/threaded_proto_udp_sender.hpp"
 
 
 /**

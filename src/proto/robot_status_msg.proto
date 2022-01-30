@@ -10,7 +10,7 @@ message RobotStatus
     repeated ErrorCode error_code             = 2;
     BreakBeamStatus break_beam_status         = 3;
     ChipperKickerStatus chipper_kicker_status = 4;
-    DriveUnits drive_units                    = 5;
+    DriveUnitStatus drive_units               = 5;
     FirmwareStatus firmware_status            = 6;
     DribblerStatus dribbler_status            = 7;
     NetworkStatus network_status              = 8;
@@ -115,7 +115,7 @@ message DriveUnit
 }
 
 /* Data from all four drive units */
-message DriveUnits
+message DriveUnitStatus
 {
     DriveUnit front_left  = 1;
     DriveUnit front_right = 2;

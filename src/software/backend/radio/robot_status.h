@@ -90,7 +90,7 @@ struct RadioRobotStatus
 /**
  * Converts RadioRobotStatus to TbotsProto::RobotStatus
  * Does not convert ChipperKickerStatus,
- * DriveUnits, and NetworkStatus due to insufficient info
+ * DriveUnitStatus, and NetworkStatus due to insufficient info
  *
  * @param robot_status The RadioRobotStatus
  *

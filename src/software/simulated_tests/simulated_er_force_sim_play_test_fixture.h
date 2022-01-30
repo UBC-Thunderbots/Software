@@ -36,6 +36,13 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
     void setAIPlay(const std::string& ai_play);
 
     /**
+     * Sets the AI play constructor to be used to run in the simulated test
+     *
+     * @param play_constructor The constructor for the play
+     */
+    void setAIPlayConstructor(std::function<std::unique_ptr<Play>()> play_constructor);
+
+    /**
      * Sets the Referee command to override for the simulated test
      *
      * @param current_referee_command The name of the current referee command to set
@@ -51,7 +58,15 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
      */
     void setGameState(const GameState& game_state_);
 
-    std::optional<PlayInfo> getPlayInfo() override;
+    /**
+     * Gets the configs used in simulation
+     * Useful for constructing duplicates of Obstacle Factory
+     *
+     * @return the Ai Config
+     */
+    const std::shared_ptr<AiConfig> getAiConfig() const;
+
+    std::optional<TbotsProto::PlayInfo> getPlayInfo() override;
     AIDrawFunction getDrawFunctions() override;
 
    private:

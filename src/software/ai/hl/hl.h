@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "proto/play_info_msg.pb.h"
+#include "software/ai/hl/stp/play/play.h"
 #include "software/ai/intent/intent.h"
 #include "software/world/world.h"
 
@@ -37,7 +38,16 @@ class HL
      *
      * @return information about the currently running plays and tactics
      */
-    virtual PlayInfo getPlayInfo() = 0;
+    virtual TbotsProto::PlayInfo getPlayInfo() = 0;
+
+    /**
+     * Overrides the play constructor so whenever STP creates a new play it calls
+     * constructor
+     *
+     * @param constructor the override constructor
+     */
+    virtual void overridePlayConstructor(
+        std::function<std::unique_ptr<Play>()> constructor) = 0;
 
     virtual ~HL() = default;
 };

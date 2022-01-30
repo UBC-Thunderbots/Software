@@ -106,9 +106,14 @@ static void simulatorTickCallback(btDynamicsWorld *world, btScalar timeStep)
  * \brief %Simulator interface
  */
 
+<<<<<<< HEAD
 Simulator::Simulator(const amun::SimulatorSetup &setup, bool useManualTrigger)
     : m_isPartial(useManualTrigger),
       m_time(0),
+=======
+Simulator::Simulator(const amun::SimulatorSetup &setup)
+    : m_time(0),
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
       m_lastSentStatusTime(0),
       m_enabled(false),
       m_charge(true),
@@ -116,11 +121,14 @@ Simulator::Simulator(const amun::SimulatorSetup &setup, bool useManualTrigger)
       m_visionProcessingTime(5 * 1000 * 1000),
       m_aggregator(new ErrorAggregator(this))
 {
+<<<<<<< HEAD
     // triggers by default every 5 milliseconds if simulator is enabled
     // timing may change if time is scaled
     m_trigger = new QTimer(this);
     m_trigger->setTimerType(Qt::PreciseTimer);
 
+=======
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
     // setup bullet
     m_data                       = new SimulatorData;
     m_data->collision            = new btDefaultCollisionConfiguration();
@@ -303,7 +311,11 @@ void Simulator::stepSimulation(double time_s)
     m_time += time_s * 1E9;
 }
 
+<<<<<<< HEAD
 void Simulator::handleSimulatorTick(double timeStep)
+=======
+void Simulator::handleSimulatorTick(double time_s)
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
 {
     // has to be done according to bullet wiki
     m_data->dynamicsWorld->clearForces();
@@ -322,16 +334,28 @@ void Simulator::handleSimulatorTick(double timeStep)
     m_data->ball->begin();
     for (const auto &pair : m_data->robotsBlue)
     {
+<<<<<<< HEAD
         pair.first->begin(m_data->ball, timeStep);
     }
     for (const auto &pair : m_data->robotsYellow)
     {
         pair.first->begin(m_data->ball, timeStep);
+=======
+        pair.first->begin(m_data->ball, time_s);
+    }
+    for (const auto &pair : m_data->robotsYellow)
+    {
+        pair.first->begin(m_data->ball, time_s);
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
     }
 
     // add gravity to all ACTIVE objects
     // thus has to be done after applying commands
     m_data->dynamicsWorld->applyGravity();
+<<<<<<< HEAD
+=======
+    m_time += time_s * 1E9;
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
 }
 
 static bool checkCameraID(const int cameraId, const btVector3 &p,
@@ -533,9 +557,32 @@ world::SimulatorState Simulator::getSimulatorState()
         for (const auto &it : team)
         {
             SimRobot *robot = it.first;
+<<<<<<< HEAD
             auto *robotProto =
                 teamIsBlue ? simState.add_blue_robots() : simState.add_yellow_robots();
             robot->update(robotProto);
+=======
+
+            // convert coordinates from ER Force
+            btVector3 robotPos = robot->position() / SIMULATOR_SCALE;
+            btVector3 newRobotPos;
+
+            coordinates::toVision(robotPos, newRobotPos);
+
+            auto *robotProto =
+                teamIsBlue ? simState.add_blue_robots() : simState.add_yellow_robots();
+
+            robot->update(robotProto);
+
+            // Convert mm to m
+            robotProto->set_p_x(newRobotPos.x() / 1000);
+            robotProto->set_p_y(newRobotPos.y() / 1000);
+
+            // Convert velocity
+            coordinates::toVisionVelocity(*robotProto, *robotProto);
+            robotProto->set_v_x(robotProto->v_x() / 1000);
+            robotProto->set_v_y(robotProto->v_y() / 1000);
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
         }
     }
 
@@ -623,6 +670,7 @@ void Simulator::moveBall(const sslsim::TeleportBall &ball)
 
     if (b.teleport_safely())
     {
+<<<<<<< HEAD
         if (!b.has_x() || !b.has_y())
         {
             SSLSimError error{new sslsim::SimulatorError};
@@ -634,6 +682,9 @@ void Simulator::moveBall(const sslsim::TeleportBall &ball)
             return;
         }
         safelyTeleportBall(b.x(), b.y());
+=======
+        // Not handled
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
     }
 
     m_data->ball->move(b);
@@ -643,14 +694,25 @@ void Simulator::moveRobot(const sslsim::TeleportRobot &robot)
 {
     if (!robot.id().has_team())
         return;
+<<<<<<< HEAD
     if (!robot.id().has_id())
         return;
+=======
+
+    if (!robot.id().has_id())
+        return;
+
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
     bool is_blue = robot.id().team() == gameController::Team::BLUE;
 
     RobotMap &list = is_blue ? m_data->robotsBlue : m_data->robotsYellow;
     bool isPresent = list.contains(robot.id().id());
     QMap<uint32_t, robot::Specs> &teamSpecs =
         is_blue ? m_data->specsBlue : m_data->specsYellow;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
     if (robot.has_present())
     {
         if (robot.present() && !isPresent)
@@ -729,7 +791,11 @@ void Simulator::setFlipped(bool flipped)
     m_data->flip = flipped;
 }
 
+<<<<<<< HEAD
 void Simulator::handleSimulatorSetupCommand(const std::shared_ptr<amun::Command> &command)
+=======
+void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command> &command)
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
 {
     bool teamOrPerfectDribbleChanged = false;
 
@@ -963,6 +1029,7 @@ void Simulator::teleportRobotToFreePosition(SimRobot *robot)
     robotCommand.set_v_y(0);
     robot->move(robotCommand);
 }
+<<<<<<< HEAD
 
 void Simulator::safelyTeleportBall(const float x, const float y)
 {
@@ -994,3 +1061,5 @@ void Simulator::safelyTeleportBall(const float x, const float y)
         }
     }
 }
+=======
+>>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088

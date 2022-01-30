@@ -29,10 +29,10 @@ cc_library(
         ":play",
         "//shared:constants",
         "//software/ai/evaluation:possession",
-        "//software/ai/hl/stp/tactic:receiver_tactic",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
         "//software/ai/hl/stp/tactic/stop:stop_tactic",
         "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/ai/passing:pass_generator",
@@ -93,7 +93,6 @@ cc_library(
         "//shared:constants",
         "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/tactic:shadow_free_kicker_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
@@ -148,11 +147,11 @@ cc_library(
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/evaluation:find_open_areas",
         "//software/ai/evaluation:possession",
-        "//software/ai/hl/stp/tactic:receiver_tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
+        "//software/ai/hl/stp/tactic/receiver:receiver_tactic",
         "//software/ai/passing:eighteen_zone_pitch_division",
         "//software/ai/passing:pass_generator",
         "//software/logger",
@@ -190,7 +189,7 @@ cc_library(
         "//shared:constants",
         "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/tactic:kickoff_chip_tactic",
+        "//software/ai/hl/stp/tactic/chip:chip_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/logger",
         "//software/util/generic_factory",
@@ -223,7 +222,6 @@ cc_library(
         ":play",
         "//shared:constants",
         "//shared/parameter:cpp_configs",
-        "//software/ai/hl/stp/tactic:penalty_setup_tactic",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/hl/stp/tactic/penalty_kick:penalty_kick_tactic",
@@ -258,31 +256,6 @@ cc_library(
 )
 
 cc_library(
-    name = "shoot_or_pass_play",
-    srcs = ["shoot_or_pass_play.cpp"],
-    hdrs = ["shoot_or_pass_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/evaluation:calc_best_shot",
-        "//software/ai/evaluation:possession",
-        "//software/ai/hl/stp/tactic:receiver_tactic",
-        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
-        "//software/ai/hl/stp/tactic/crease_defender:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/shadow_enemy:shadow_enemy_tactic",
-        "//software/ai/passing:eighteen_zone_pitch_division",
-        "//software/ai/passing:pass_generator",
-        "//software/geom/algorithms",
-        "//software/logger",
-        "//software/util/generic_factory",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
     name = "stop_play",
     srcs = ["stop_play.cpp"],
     hdrs = ["stop_play.h"],
@@ -302,7 +275,10 @@ cc_library(
 cc_library(
     name = "play",
     srcs = ["play.cpp"],
-    hdrs = ["play.h"],
+    hdrs = [
+        "play.h",
+        "play_fsm.h",
+    ],
     deps = [
         "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic",
@@ -316,7 +292,6 @@ cc_library(
         ":ball_placement_play",
         ":corner_kick_play",
         ":defense_play",
-        ":dribbling_parcour_play",
         ":enemy_ball_placement_play",
         ":enemy_free_kick_play",
         ":example_play",
@@ -324,14 +299,17 @@ cc_library(
         ":halt_play",
         ":kickoff_enemy_play",
         ":kickoff_friendly_play",
-        ":pass_endurance_play",
         ":penalty_kick_enemy_play",
         ":penalty_kick_play",
-        ":scoring_from_contested_possession_play",
-        ":scoring_with_static_defenders_play",
         ":shoot_or_chip_play",
-        ":shoot_or_pass_play",
         ":stop_play",
+        "//software/ai/hl/stp/play/crease_defense:crease_defense_play",
+        "//software/ai/hl/stp/play/hardware_challenge_plays:dribbling_parcour_play",
+        "//software/ai/hl/stp/play/hardware_challenge_plays:pass_endurance_play",
+        "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_from_contested_possession_play",
+        "//software/ai/hl/stp/play/hardware_challenge_plays:scoring_with_static_defenders_play",
+        "//software/ai/hl/stp/play/offense:offense_play",
+        "//software/ai/hl/stp/play/shoot_or_pass:shoot_or_pass_play",
     ],
 )
 
@@ -341,7 +319,7 @@ cc_test(
     deps = [
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:example_play",
-        "//software/simulated_tests:simulated_play_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
@@ -352,22 +330,6 @@ cc_test(
 cc_test(
     name = "kickoff_friendly_play_test",
     srcs = ["kickoff_friendly_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:kickoff_friendly_play",
-        "//software/simulated_tests:simulated_play_test_fixture",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-cc_test(
-    name = "kickoff_friendly_play_er_force_sim_test",
-    srcs = ["kickoff_friendly_play_er_force_sim_test.cpp"],
     deps = [
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:kickoff_friendly_play",
@@ -388,7 +350,7 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:kickoff_enemy_play",
         "//software/geom/algorithms",
-        "//software/simulated_tests:simulated_play_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests/non_terminating_validation_functions",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
@@ -435,7 +397,7 @@ cc_test(
     deps = [
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:enemy_ball_placement_play",
-        "//software/simulated_tests:simulated_play_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests/non_terminating_validation_functions",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
@@ -497,21 +459,7 @@ cc_test(
     deps = [
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:free_kick_play",
-        "//software/simulated_tests:simulated_play_test_fixture",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-cc_test(
-    name = "shoot_or_pass_play_test",
-    srcs = ["shoot_or_pass_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:shoot_or_pass_play",
-        "//software/simulated_tests:simulated_play_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
@@ -525,7 +473,7 @@ cc_test(
     deps = [
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:shoot_or_chip_play",
-        "//software/simulated_tests:simulated_play_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",
         "//software/time:duration",
@@ -539,7 +487,7 @@ cc_test(
     deps = [
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:penalty_kick_play",
-        "//software/simulated_tests:simulated_play_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests/non_terminating_validation_functions",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
@@ -555,7 +503,7 @@ cc_test(
     deps = [
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:penalty_kick_enemy_play",
-        "//software/simulated_tests:simulated_play_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_play_test_fixture",
         "//software/simulated_tests/non_terminating_validation_functions",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
@@ -572,133 +520,6 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/hl/stp/play:ball_placement_play",
         "//software/simulated_tests:simulated_play_test_fixture",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-cc_library(
-    name = "scoring_with_static_defenders_play",
-    srcs = ["scoring_with_static_defenders_play.cpp"],
-    hdrs = ["scoring_with_static_defenders_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-    ],
-    alwayslink = True,
-)
-
-cc_test(
-    name = "scoring_with_static_defenders_play_test",
-    srcs = ["scoring_with_static_defenders_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:scoring_with_static_defenders_play",
-        "//software/simulated_tests:simulated_play_test_fixture",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-cc_library(
-    name = "scoring_from_contested_possession_play",
-    srcs = ["scoring_from_contested_possession_play.cpp"],
-    hdrs = ["scoring_from_contested_possession_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-    ],
-    alwayslink = True,
-)
-
-cc_test(
-    name = "scoring_from_contested_possession_play_test",
-    srcs = ["scoring_from_contested_possession_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:scoring_from_contested_possession_play",
-        "//software/simulated_tests:simulated_play_test_fixture",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-cc_library(
-    name = "dribbling_parcour_play",
-    srcs = ["dribbling_parcour_play.cpp"],
-    hdrs = ["dribbling_parcour_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-    ],
-    alwayslink = True,
-)
-
-cc_test(
-    name = "dribbling_parcour_play_test",
-    srcs = ["dribbling_parcour_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:dribbling_parcour_play",
-        "//software/simulated_tests:simulated_play_test_fixture",
-        "//software/simulated_tests/non_terminating_validation_functions",
-        "//software/simulated_tests/terminating_validation_functions",
-        "//software/simulated_tests/validation:validation_function",
-        "//software/test_util",
-        "//software/time:duration",
-        "//software/world",
-    ],
-)
-
-cc_library(
-    name = "pass_endurance_play",
-    srcs = ["pass_endurance_play.cpp"],
-    hdrs = ["pass_endurance_play.h"],
-    deps = [
-        ":play",
-        "//shared:constants",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/hl/stp/tactic/dribble:dribble_tactic",
-        "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
-        "//software/util/generic_factory",
-    ],
-    alwayslink = True,
-)
-
-cc_test(
-    name = "pass_endurance_play_test",
-    srcs = ["pass_endurance_play_test.cpp"],
-    deps = [
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/play:pass_endurance_play",
-        "//software/simulated_tests:simulated_play_test_fixture",
-        "//software/simulated_tests/non_terminating_validation_functions",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",

@@ -12,29 +12,29 @@ class TbotsProtobufTest : public ::testing::Test
     static void assertPointMessageEqual(const Point& point,
                                         const TbotsProto::Point& point_msg)
     {
-        EXPECT_NEAR(point_msg.x_meters(), point.x(), 1e-6);
-        EXPECT_NEAR(point_msg.y_meters(), point.y(), 1e-6);
+        EXPECT_EQ(point_msg.x_meters(), point.x());
+        EXPECT_EQ(point_msg.y_meters(), point.y());
     }
 
     static void assertAngleMessageEqual(const Angle& angle,
                                         const TbotsProto::Angle& angle_msg)
     {
-        EXPECT_NEAR(angle_msg.radians(), angle.toRadians(), 1e-6);
+        EXPECT_EQ(angle_msg.radians(), angle.toRadians());
     }
 
     static void assertAngularVelocityMessageEqual(
         const AngularVelocity& angular_velocity,
         const TbotsProto::AngularVelocity& angular_velocity_msg)
     {
-        EXPECT_NEAR(angular_velocity_msg.radians_per_second(),
-                    angular_velocity.toRadians(), 1e-6);
+        EXPECT_EQ(angular_velocity_msg.radians_per_second(),
+                  angular_velocity.toRadians());
     }
 
     static void assertVectorMessageEqual(const Vector& vector,
                                          const TbotsProto::Vector& vector_msg)
     {
-        EXPECT_NEAR(vector_msg.x_component_meters(), vector.x(), 1e-6);
-        EXPECT_NEAR(vector_msg.y_component_meters(), vector.y(), 1e-6);
+        EXPECT_EQ(vector_msg.x_component_meters(), vector.x());
+        EXPECT_EQ(vector_msg.y_component_meters(), vector.y());
     }
 
     static void assertBallStateMessageFromBall(

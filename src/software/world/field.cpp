@@ -20,6 +20,18 @@ Field Field::createSSLDivisionAField()
     return field;
 }
 
+Field Field::createField(FieldType field_type)
+{
+    if (field_type == FieldType::DIV_A)
+    {
+        return createSSLDivisionAField();
+    }
+    else
+    {
+        return createSSLDivisionBField();
+    }
+}
+
 Field::Field(double field_x_length, double field_y_length, double defense_x_length,
              double defense_y_length, double goal_x_length, double goal_y_length,
              double boundary_buffer_size, double center_circle_radius)
@@ -53,6 +65,14 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
         throw std::invalid_argument(
             "At least one field dimension is non-positive - Field is invalid");
     }
+}
+
+Field::Field(const TbotsProto::Field &field_proto)
+    : Field(field_proto.field_x_length(), field_proto.field_y_length(),
+            field_proto.defense_x_length(), field_proto.defense_y_length(),
+            field_proto.goal_x_length(), field_proto.goal_y_length(),
+            field_proto.boundary_buffer_size(), field_proto.center_circle_radius())
+{
 }
 
 double Field::xLength() const

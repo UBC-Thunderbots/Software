@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "software/ai/hl/hl.h"
 #include "software/ai/navigator/navigator.h"
 #include "software/time/timestamp.h"
@@ -24,6 +26,14 @@ class AI final
                 std::shared_ptr<const PlayConfig> play_config);
 
     /**
+     * Overrides the play constructor so whenever STP creates a new play it calls
+     * constructor
+     *
+     * @param constructor the override constructor
+     */
+    void overridePlayConstructor(std::function<std::unique_ptr<Play>()> constructor);
+
+    /**
      * Calculates the Primitives that should be run by our Robots given the current
      * state of the world.
      *
@@ -40,7 +50,7 @@ class AI final
      *
      * @return information about the currently running plays and tactics
      */
-    PlayInfo getPlayInfo() const;
+    TbotsProto::PlayInfo getPlayInfo() const;
 
     std::shared_ptr<Navigator> getNavigator() const;
 

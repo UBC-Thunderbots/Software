@@ -2,7 +2,7 @@
 
 PlayInfoWidget::PlayInfoWidget(QWidget* parent) : QTextEdit(parent) {}
 
-void PlayInfoWidget::updatePlayInfo(const PlayInfo& play_info)
+void PlayInfoWidget::updatePlayInfo(const TbotsProto::PlayInfo& play_info)
 {
     QString referee_command_string =
         QString("Referee Command: %1\n")
@@ -17,6 +17,8 @@ void PlayInfoWidget::updatePlayInfo(const PlayInfo& play_info)
         tactics.emplace_back(std::to_string(robot_id)
                                  .append("- ")
                                  .append(tactic.tactic_name())
+                                 .append(" - ")
+                                 .append(tactic.tactic_fsm_state())
                                  .append("\n"));
     }
     std::sort(tactics.begin(), tactics.end());

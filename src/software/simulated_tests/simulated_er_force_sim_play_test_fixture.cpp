@@ -45,6 +45,12 @@ void SimulatedErForceSimPlayTestFixture::setAIPlay(const std::string& ai_play)
     ai_control_config->getMutableCurrentAiPlay()->setValue(ai_play);
 }
 
+void SimulatedErForceSimPlayTestFixture::setAIPlayConstructor(
+    std::function<std::unique_ptr<Play>()> play_constructor)
+{
+    ai.overridePlayConstructor(play_constructor);
+}
+
 void SimulatedErForceSimPlayTestFixture::setRefereeCommand(
     const RefereeCommand& current_referee_command,
     const RefereeCommand& previous_referee_command)
@@ -70,11 +76,16 @@ void SimulatedErForceSimPlayTestFixture::updatePrimitives(
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
     registerTickTime(duration_ms);
     auto vision_msg = createVision(world_with_updated_game_state);
-    simulator_to_update->setYellowRobotPrimitiveSet(
-        createNanoPbPrimitiveSet(*primitive_set_msg), std::move(vision_msg));
+    simulator_to_update->setYellowRobotPrimitiveSet(*primitive_set_msg,
+                                                    std::move(vision_msg));
 }
 
-std::optional<PlayInfo> SimulatedErForceSimPlayTestFixture::getPlayInfo()
+const std::shared_ptr<AiConfig> SimulatedErForceSimPlayTestFixture::getAiConfig() const
+{
+    return ai_config;
+}
+
+std::optional<TbotsProto::PlayInfo> SimulatedErForceSimPlayTestFixture::getPlayInfo()
 {
     return ai.getPlayInfo();
 }

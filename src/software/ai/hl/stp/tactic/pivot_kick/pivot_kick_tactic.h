@@ -16,8 +16,7 @@ class PivotKickTactic : public Tactic
      */
     explicit PivotKickTactic();
 
-    void updateWorldParams(const World& world) override;
-    bool done() const override;
+    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
     /**
      * Update control params for this tactic
@@ -43,7 +42,6 @@ class PivotKickTactic : public Tactic
     void accept(TacticVisitor& visitor) const override;
 
    private:
-    void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
     // Tactic parameters
