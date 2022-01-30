@@ -101,7 +101,7 @@ class CppWriter(object):
 
         # for each node, create a subgraph of relevant dependencies
         # Note: This can be optimized by doing traversal from each source,
-        # and creating subgraphs for # all its descendants during the same traversal
+        # and creating subgraphs for all its descendants during the same traversal
         for node in dependency_graph.nodes:
             # find the subgraph of the dependency graph relevant to the current node
             dependency_graph.nodes[node][

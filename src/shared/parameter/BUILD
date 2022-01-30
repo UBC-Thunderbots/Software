@@ -54,9 +54,9 @@ cc_library(
 )
 
 cc_test(
-    name = "config_test",
+    name = "cpp_config_test",
     srcs = [
-        "config_test.cpp",
+        "cpp_config_test.cpp",
     ],
     data = [
         "//shared/parameter/config_definitions:parameter_configs",
