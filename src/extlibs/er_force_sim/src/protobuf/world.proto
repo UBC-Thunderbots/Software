@@ -175,8 +175,5 @@ message SimRobot
     required float r_x           = 9;
     required float r_y           = 10;
     required float r_z           = 11;
-<<<<<<< HEAD
-=======
-    optional float angle = 12;
->>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
+    optional float angle         = 12;
 }

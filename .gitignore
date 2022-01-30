@@ -149,12 +149,9 @@ src/config
 
 # codespell dictionary
 formatting_scripts/dictionary/
-<<<<<<< HEAD
-=======
 
 # clangd for nvim lsp
 src/.clangd
 
 # external is a special directory for bazel so it should be ignored
 src/external
->>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
