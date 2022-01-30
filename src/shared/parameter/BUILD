@@ -43,6 +43,7 @@ cc_library(
     ],
     deps = [
         ":config",
+        ":dynamic_param_cc_proto",
         ":enumerated_parameter",
         ":numeric_parameter",
         ":parameter",

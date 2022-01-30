@@ -1,6 +1,7 @@
 from cpp_source_config import CppSourceConfig
 from cpp_header_config import CppHeaderConfig
 from cpp_parameter import CppParameter
+import type_map
 from typing import List
 from dynamic_parameter_schema import PARAMETER_KEY, INCLUDE_KEY
 from case_conversion import to_pascal_case
@@ -49,15 +50,24 @@ class ProtoWriter(object):
 
         """
         output_proto_contents = ""
+        list_of_includes = []
 
         for config, config_definition in config_metadata.items():
             message_contents = ""
             entry_count = 1
             name = to_pascal_case(config.split(".")[0])
+            list_of_includes.append(config)
 
             # generate includes
             if "include" in config_definition:
                 for included_config in config_definition["include"]:
+
+                    # There is no way to forward declare messages in proto
+                    # so lets make use of google.protobuf.Any to store nested
+                    # configs
+                    #
+                    # Since we are autogenerating, we should know which index
+                    # corresponds to which type
                     message_contents += PROTO_CONFIG_ENTRY.format(
                         name=included_config.split(".")[0], count=entry_count
                     )
@@ -69,7 +79,7 @@ class ProtoWriter(object):
                     for param_type, param_definition in param_entry.items():
                         message_contents += "".join(
                             PROTO_PARAM_ENTRY.format(
-                                type=param_type,
+                                type=type_map.PROTO_TYPE_MAP[param_type],
                                 name=param_definition["name"],
                                 count=entry_count,
                             )
@@ -81,8 +91,22 @@ class ProtoWriter(object):
                 name=name, contents=message_contents,
             )
 
-        with open(f"{output_proto}", "w") as proto_file:
+        # make the top level config
+        top_level_config_contents = ""
+        entry_count = 1
 
+        for include in list(set(list_of_includes)):
+            top_level_config_contents += PROTO_CONFIG_ENTRY.format(
+                name=include.split(".")[0], count=entry_count
+            )
+            entry_count += 1
+
+        output_proto_contents += PROTO_MESSAGE_DEFINITION.format(
+            name=top_level_proto, contents=top_level_config_contents
+        )
+
+        # write the output
+        with open(f"{output_proto}", "w") as proto_file:
             proto_file.write(
                 CONFIG_PROTO.format(
                     autogen_warning=AUTOGEN_WARNING, contents=output_proto_contents,
