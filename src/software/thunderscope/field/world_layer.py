@@ -71,7 +71,6 @@ class WorldLayer(FieldLayer):
         )
 
 
-
     def draw_team(self, painter, color, team: Team):
 
 
