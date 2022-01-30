@@ -1,13 +1,6 @@
 #include <SoftwareSerial.h> // include library to enable software serial ports
-#include <EEPROM.h> // include library to read and write from flash memory
-
-#define EEPROM_SIZE 4
 
 SoftwareSerial SUART(2,3); //SRX = DPin-2; STX = DPin-3
-
-//Message Storage
-char INITIAL_MESSAGE;
-char MESSAGE;
 
 //Action Messages Library
 char HV_MEASUREMENT;
@@ -22,52 +15,48 @@ char CHICKER_CHIP_DISTANCE_SPEED;
 char PULSE_WIDTH;
 char FLYBACK;
 
+//Active Low & High
+int LOW = 0;
+int HIGH = 1;
+
 //PINS
-const int HV_MEASUREMENT_PIN;
-const int G_ENCODER_PIN;
-const int G_MOTOR_ANGLE_PIN;
-const int G_MOTOR_SPEED_PIN;
-const int BREAKBEAM_INTER_PIN;
-const int BREAKBEAM_DIFF_PIN;
-const int CHICKER_AUTOKICK_PIN;
-const int CHICKER_AUTOCHIP_PIN;
-const int KICK_DISTANCE_SPEED_PIN;
-const int KICK_DISTANCE_SPEED_VAL_PIN;
-const int CHIP_DISTANCE_SPEED_PIN;
-const int CHIP_DISTANCE_SPEED_VAL_PIN;
-const int PULSE_WIDTH_PIN;
-const int FLYBACK_FAULT_PIN;
+const int HV_MEASUREMENT_PIN = 5;
+const int G_ENCODER_A_PIN = 35;
+const int G_ENCODER_B_PIN = 34;
+const int G_MOTOR_ANGLE_PIN = 22;  //
+const int G_MOTOR_SPEED_PIN = 21;
+const int BREAKBEAM_INTER_PIN = 6;
+const int PULSE_WIDTH_KICKER_PIN = 10; //
+const int PUSLE_WIDTH_CHIPPER_PIN = 11;
+const int FLYBACK_FAULT_PIN = 17;
+const int PWM_SDA_PIN = 18;
+const int PWM_SCL_PIN = 20;
 
-//Flash Address
-int HV_MEASUREMENT_ADDRESS;
-int G_ENCODER_ADDRESS;
-int G_MOTOR_ANGLE_ADDRESS;
-int G_MOTOR_SPEED_ADDRESS;
-int BREAKBEAM_INTER_ADDRESS;
-int BREAKBEAM_DIFF_ADDRESS;
-int CHICKER_AUTOKICK_ADDRESS;
-int CHICKER_AUTOCHIP_ADDRESS;
-int KICK_DISTANCE_SPEED_ADDRESS;
-int CHIP_DISTANCE_SPEED_ADDRESS;
-int PULSE_WIDTH_ADDRESS;
-int FLYBACK_FAULT_ADDRESS;
 
-//Others
-int COUNTER;
-float checker;
+//Current Values
+int current_geneva_angle;
 
-int hv_data;
-int g_encoder_angle;
+
+//Values
+float hv_data;
+float g_encoder_angle;
 float g_motor_angle;
-float g_motor_speed;
-int breakbeam_diff;
-int breakbeam_inter;
-int autokick;
-int autochip;
+float g_encoder_a;
+float g_encoder_b;
+float breakbeam_inter;
+bool autokick_sw;
+bool autochip_sw;
 float kick_distance_speed;
 float chip_distance_speed;
-int flyback_fault;
+float flyback_fault;
+float PWM_SDA;
+float PWM_SCL;
 
+// Request 
+struct PowerLoopRequest request;
+
+// Status Response
+struct PowerLoopStatus status;
 
 
 void setup(){
@@ -78,198 +67,128 @@ void setup(){
 
     //Initializing GPIO pins
     pinMode(HV_MEASUREMENT_PIN, INPUT);
-    pinMode(G_ENCODER_PIN, INPUT);
+    pinMode(G_ENCODER_A_PIN, INPUT);
+    pinMode(G_ENCODER_B_PIN, INPUT);
     pinMode(G_MOTOR_ANGLE_PIN, INPUT);
     pinMode(G_MOTOR_SPEED_PIN, INPUT);
-    pinMode(BREAKBEAM_DIFF_PIN, INPUT);
     pinMode(BREAKBEAM_INTER_PIN, INPUT);
-    pinMode(CHICKER_AUTOCHIP_PIN, INPUT);
-    pinMode(CHICKER_AUTOKICK_PIN, INPUT);
-    pinMode(KICK_DISTANCE_SPEED_PIN, INPUT);
-    pinMode(CHIP_DISTANCE_SPEED_PIN, INPUT);
-    pinMode(PULSE_WIDTH_PIN, INPUT);
+    pinMode(PULSE_WIDTH_KICKER_PIN, OUTPUT);
+    pinMode(PUSLE_WIDTH_CHIPPER_PIN, OUTPUT);
     pinMode(FLYBACK_FAULT_PIN, INPUT);
-
-    
-    // initialize EEPROM with predefined size
-    for (int i = 0 ; i < EEPROM.length() ; i++) {
-      EEPROM.write(i, 0);
-    }
 
 }
 
+//Action Functions
+void moveGeneva(float g_motor_angle){
+    analogWrite(G_MOTOR_ANGLE_PIN, g_motor_angle); 
+}
 
+//Get Functions
+void getGenevaAngle(){
+    g_encoder_angle = analogRead(G_MOTOR_ANGLE_PIN);
+    return(g_encoder_angle);
+}
+
+void getGenevaEncoderA(){
+    g_encoder_a = analogRead(G_ENCODER_A_PIN);
+    return(g_encoder_a);
+}
+
+void getGenevaEncoderB(){
+    g_encoder_b = analogRead(G_ENCODER_B_PIN);
+    return(g_encoder_b);
+}
+
+void getHVMeasurement(){
+    hv_data = analogRead(HV_MEASUREMENT_PIN);
+    return(hv_data);
+}
+
+void getBreakBeam(){
+    breakbeam_inter = analogRead(BREAKBEAM_INTER_PIN);
+    return(breakbeam_inter);
+}
+
+void getPowerMonitorSDA(){
+    PWM_SDA = analogRead(PWM_SDA_PIN);
+    return(PWM_SDA);
+}
+
+void getPowerMonitorSCL(){
+    PWM_SCL = analogRead(PWM_SCL_PIN);
+    return(PWM_SCL);
+}
+
+void getFlybackFault(){
+    flyback_fault = analogRead(FLYBACK_FAULT_PIN);
+    return(flyback_fault);
+}
+
+
+
+//Main State Machine Loop
 void loop(){
-    INITIAL_MESSAGE = SUART.available(); //Checks if initial message is avaliable (If a message is recieved)
 
-    if (INITIAL_MESSAGE != 0) //If message avaliable, continue
-    {
+    // Request Handling
+    request = getIncomingJetsonNanoRequestMessageHereCOBS();
+
+        if(request.kick_angle != current_geneva_angle){
+            moveGeneva(request.kick_angle);
+        }
+
+
+        if(request.kick_speed != 0 && request.autokick == false){
+            kick(request.kick_speed);
+
+
+        if(request.kick_distance != 0 && request.autokick == false){
+            kick(request.kick_distance);
+        }
+
+
+        if(request.autokick == true){
+            if(analogRead(BREAKBEAM_INTER_PIN) == LOW){
+                kick(request.kick_speed);
+            }
+        }
+        else{
+            auto_kick(false);
+        }
+
         
-        MESSAGE = SUART.read(); //Store entire message
-
-        if (MESSAGE == HV_MEASUREMENT){
-
-            //Action
-            for(COUNTER = 0; COUNTER < 5; COUNTER++){  //Total 2.5s of reading in 0.5 intervals
-
-                hv_data = analogRead(HV_MEASUREMENT_PIN);
-
-                Serial.println(hv_data);
-
-                delay(500); //wait 0.5s
-             
-            }
-
-            EEPROM.write(HV_MEASUREMENT_ADDRESS, hv_data);
-
-        }
-
-        if(MESSAGE == GENEVA_ENCODER){
-
-            //Action
-            g_encoder_angle = analogRead(G_ENCODER_PIN);
-
-            Serial.println(g_encoder_angle);
-
-            EEPROM.write(G_ENCODER_ADDRESS, g_encoder_angle);
-        }
-
-        if(MESSAGE == GENEVA_MOTOR_ANGLE){
-
-            //Action
-            byte checker = SUART.available(); //check if a character has arrived via SUART Port
-            if (checker != 0) //a charctaer has arrived; it has been auto saved in FIFO; say 1 as 0x31
-            {
-                g_motor_angle = SUART.read(); //read arrived character from FIFO (say 1) and put into x as 0x31 
-
-                analogWrite(G_MOTOR_ANGLE_PIN, g_motor_angle); //Set motor angle
-            }
-            else{
-                Serial.println("Failed Retrieve Geneva Motor Angle");
-            }
-
-
-            EEPROM.write(G_MOTOR_ANGLE_ADDRESS, g_motor_angle);
-        }
-
-        if(MESSAGE == GENEVA_MOTOR_SPEED){
-
-            //Action
-            checker = SUART.available(); //check if a character has arrived via SUART Port
-            if (checker != 0) //a charctaer has arrived; it has been auto saved in FIFO; say 1 as 0x31
-            {
-                g_motor_speed = SUART.read(); //read arrived character from FIFO (say 1) and put into x as 0x31 
-
-                analogWrite(G_MOTOR_SPEED_PIN, g_motor_speed); //Set motor angle
-            }
-            else{
-                Serial.println("Failed Retrieve Geneva Motor Speed");
-            }
-
-            EEPROM.write(G_MOTOR_SPEED_ADDRESS ,g_motor_speed);
-        }
-
-        if(MESSAGE == BREAKBEAM){
-
-            //Action
-            breakbeam_inter = analogRead(BREAKBEAM_DIFF_PIN);
-            Serial.println(breakbeam_inter);
-
-            breakbeam_diff = analogRead(BREAKBEAM_INTER_PIN);
-            Serial.println(breakbeam_diff);
-
-            EEPROM.write(BREAKBEAM_INTER_ADDRESS, breakbeam_inter);
-            EEPROM.write(BREAKBEAM_DIFF_ADDRESS, breakbeam_diff);
-        }
-
-        if(MESSAGE == CHICKER_AUTO_KICK){
-
-            //Action
-            checker = SUART.available(); //check if a character has arrived via SUART Port
-            if (checker != 0) //a charctaer has arrived; it has been auto saved in FIFO; say 1 as 0x31
-            {
-                autokick = SUART.read(); //read arrived character from FIFO (say 1) and put into x as 0x31 
-
-                analogWrite(CHICKER_AUTOKICK_PIN, autokick); //Set motor angle
-            }
-            else{
-                Serial.println("Failed Retrieve Chicker Auto Kick Data");
-            }
-
-            EEPROM.write(CHICKER_AUTOKICK_ADDRESS, autokick);
-        }
-
-        if(MESSAGE == CHICKER_AUTO_CHIP){
-
-            //Action
-            checker = SUART.available(); //check if a character has arrived via SUART Port
-            if (checker != 0) //a charctaer has arrived; it has been auto saved in FIFO; say 1 as 0x31
-            {
-                autochip = SUART.read(); //read arrived character from FIFO (say 1) and put into x as 0x31 
-
-                analogWrite(CHICKER_AUTOCHIP_PIN, autochip); //Set motor angle
-            }
-            else{
-                Serial.println("Failed Retrieve Chicker Auto Kick Data");
-            }
-
-            EEPROM.write(CHICKER_AUTOCHIP_ADDRESS, autochip);
-        }
-        
-        if(MESSAGE == CHICKER_KICK_DISTANCE_SPEED){
-
-            //Action
-            checker = SUART.available(); //check if a character has arrived via SUART Port
-            if (checker != 0) //a charctaer has arrived; it has been auto saved in FIFO; say 1 as 0x31
-            {
-                kick_distance_speed = SUART.read(); //read arrived character from FIFO (say 1) and put into x as 0x31 
-
-                analogWrite(KICK_DISTANCE_SPEED_VAL_PIN, kick_distance_speed); //Set motor angle
-            }
-            else{
-                Serial.println("Failed Retrieve Chicker Auto Kick Data");
-            }
-
-            EEPROM.write(KICK_DISTANCE_SPEED_ADDRESS, kick_distance_speed);
-        }
-
-        if(MESSAGE == CHICKER_CHIP_DISTANCE_SPEED){
-
-            //Action
-            checker = SUART.available(); //check if a character has arrived via SUART Port
-            if (checker != 0) //a charctaer has arrived; it has been auto saved in FIFO; say 1 as 0x31
-            {
-                chip_distance_speed = SUART.read(); //read arrived character from FIFO (say 1) and put into x as 0x31 
-
-                analogWrite(CHIP_DISTANCE_SPEED_VAL_PIN, chip_distance_speed); //Set motor angle
-            }
-            else{
-                Serial.println("Failed Retrieve Chicker Auto Kick Data");
-            }
-
-            EEPROM.write(CHIP_DISTANCE_SPEED_ADDRESS, chip_distance_speed);
-        }
-
-        if(MESSAGE == PULSE_WIDTH){
-
-            //Action
-            //?????????????????????
-
-        }
-
-        if(MESSAGE == FLYBACK){
-
-            //Action
-            flyback_fault = analogRead(FLYBACK_FAULT_PIN);
-
-            Serial.println(flyback_fault);
-
-            EEPROM.write(FLYBACK_FAULT_ADDRESS, flyback_fault);
+        if(request.chip_speed != 0 && request.autochip == false){
+            kick(request.chip_speed);
         }
 
 
-    }
+        if(request.chip_distance != 0 && request.autochip == false){
+            kick(request.chip_distance); 
+        }
+
+        if(request.autochip == true){
+            if(analogRead(BREAKBEAM_INTER_PIN) == LOW){
+                kick(request.chip_speed);
+            }
+        }
+        else{
+            auto_chip(false);
+        }
 
 
+    //Updating Status
+    status.high_voltage_measurement_volts = getHVMeasurement(); 
+    status.breakbeam_tripped = getBreakBeam();
+    status.geneva_angle = getGenevaAngle();
+    status.battery_voltage = getBatteryVoltage();
+    status.current_draw = getCurrentDraw();
+    status.geneva_encoder_a = getGenevaEncoderA();
+    status.geneva_encoder_a = getGenevaEncoderB();
+    status.PWM_SDA = getPowerMonitorSDA();
+    status.PWM_SCL = getPowerMonitorSCL();
+    status.flyback_fault = getFlybackFault();
+
+
+    //Sending Status to JetsonNano
+    sendPowerLoopStatusToJetsonNanoOverCOBS(status); 
 
 }
