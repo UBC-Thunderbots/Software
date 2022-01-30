@@ -626,8 +626,8 @@ robot::RadioResponse SimRobot::setCommand(const SSLSimulationProto::RobotCommand
     return response;
 }
 
-void SimRobot::update(SSLProto::SSL_DetectionRobot *robot, float stddev_p, float stddev_phi,
-                      qint64 time, btVector3 positionOffset)
+void SimRobot::update(SSLProto::SSL_DetectionRobot *robot, float stddev_p,
+                      float stddev_phi, qint64 time, btVector3 positionOffset)
 {
     // setup vision packet
     robot->set_robot_id(m_specs.id());

@@ -29,7 +29,6 @@
 #include "extlibs/er_force_sim/src/core/coordinates.h"
 #include "extlibs/er_force_sim/src/core/rng.h"
 #include "extlibs/er_force_sim/src/protobuf/geometry.h"
-#include "extlibs/er_force_sim/src/protobuf/ssl_wrapper.pb.h"
 #include "simball.h"
 #include "simfield.h"
 #include "simrobot.h"
@@ -230,14 +229,14 @@ std::vector<robot::RadioResponse> Simulator::acceptRobotControlCommand(
                 response.set_is_blue(*isBlue);
             }
             // only collect valid responses
-                if (response.IsInitialized())
+            if (response.IsInitialized())
+            {
+                if (data->robotReplyPacketLoss == 0 ||
+                    data->rng.uniformFloat(0, 1) > data->robotReplyPacketLoss)
                 {
-                    if (data->robotReplyPacketLoss == 0 ||
-                        data->rng.uniformFloat(0, 1) > data->robotReplyPacketLoss)
-                    {
-                        responses.append(response);
-                    }
+                    responses.append(response);
                 }
+            }
         };
         if (isBlue)
         {
@@ -391,7 +390,7 @@ std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
         initializeDetection(&detections[i], i);
     }
 
-    auto* ball = simState.mutable_ball();
+    auto *ball = simState.mutable_ball();
     m_data->ball->writeBallState(ball);
 
     bool missingBall = m_data->missingBallDetections > 0 &&
@@ -433,7 +432,7 @@ std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
         for (const auto &it : team)
         {
             SimRobot *robot = it.first;
-            auto* robotProto =
+            auto *robotProto =
                 teamIsBlue ? simState.add_blue_robots() : simState.add_yellow_robots();
             robot->update(robotProto, m_data->ball);
 
@@ -652,9 +651,9 @@ void Simulator::moveBall(const sslsim::TeleportBall &ball)
     // remove the dribbling constraint
     if (!ball.has_by_force() || !ball.by_force())
     {
-        for (const auto& robotList : {m_data->robotsBlue, m_data->robotsYellow})
+        for (const auto &robotList : {m_data->robotsBlue, m_data->robotsYellow})
         {
-            for (const auto& it : robotList)
+            for (const auto &it : robotList)
             {
                 it.first->stopDribbling();
             }
@@ -761,7 +760,7 @@ void Simulator::moveRobot(const sslsim::TeleportRobot &robot)
         FLIP(r, v_y);
     }
 
-    SimRobot* sim_robot = list[robot.id().id()].first;
+    SimRobot *sim_robot = list[robot.id().id()].first;
     if (!r.has_by_force() || !r.by_force())
     {
         sim_robot->stopDribbling();
