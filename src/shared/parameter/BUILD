@@ -1,4 +1,4 @@
-load(":parameter.bzl", "cpp_dynamic_parameters")
+load(":parameter.bzl", "cpp_dynamic_parameters", "proto_dynamic_parameters")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -10,6 +10,27 @@ cpp_dynamic_parameters(
     ],
     generated_parameter_header = "cpp_dynamic_parameters.h",
     generated_parameter_source = "cpp_dynamic_parameters.cpp",
+)
+
+proto_dynamic_parameters(
+    name = "proto_params",
+    generated_proto_source = "dynamic_parameters.proto",
+)
+
+proto_library(
+    name = "dynamic_param_proto",
+    srcs = [
+        ":proto_params",
+    ],
+    deps = [
+        "@com_google_protobuf//:any_proto",
+        "@nanopb//:nanopb_options_proto",
+    ],
+)
+
+cc_proto_library(
+    name = "dynamic_param_cc_proto",
+    deps = [":dynamic_param_proto"],
 )
 
 cc_library(

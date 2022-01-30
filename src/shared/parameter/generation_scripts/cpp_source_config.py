@@ -11,6 +11,8 @@ import networkx as nx
 
 TAB_SIZE = 4
 HALF_TAB_SIZE = 2
+INDENT_ONCE = 1
+INDENT_TWICE = 2
 
 CONFIG_CONSTRUCTOR_HEADER_NO_INCLUDES = "{config_name}()"
 
@@ -104,10 +106,13 @@ const ParameterList& {config_name}::getParameterList() const
 
 class CppSourceConfig(object):
     def __init__(self, config_name: str, is_top_level_config: bool = False):
-        """Initializes a CppSourceConfig object, which can generate various strings specific to a config through properties. Some of the properties depend on having the dependency_graph set.
+        """Initializes a CppSourceConfig object, which can generate various
+        strings specific to a config through properties. Some of the properties
+        depend on having the dependency_graph set.
 
         :param config_name: the name of the config
         :param is_top_level_config: true if this is the top level config, false otherwise
+
         """
         self.config_name = config_name
         self.config_variable_name = to_snake_case(config_name) + "_config"
@@ -152,8 +157,9 @@ class CppSourceConfig(object):
     def dfs_helper(
         self, config: CppSourceConfig, arg_prefix: str, load_dependency: str
     ):
-        """A depth first search helper for adding the necessary prefix to accessing and setting
-        parameters of included configs in loadFromCommmandLineArguments function
+        """A depth first search helper for adding the necessary prefix to
+        accessing and setting parameters of included configs in
+        loadFromCommmandLineArguments function
 
         :param config: the current CppSourceConfig object
         :param arg_prefix: the prefix for accessing the arg struct
@@ -224,7 +230,7 @@ class CppSourceConfig(object):
         return CppSourceConfig.join_with_tabs(
             ",\n",
             [conf.included_config_constructor_arg_entry for conf in self.configs],
-            1,
+            INDENT_ONCE,
         )
 
     @property
@@ -235,7 +241,7 @@ class CppSourceConfig(object):
                 conf.included_config_constructor_initializer_list_entry
                 for conf in self.configs
             ],
-            2,
+            INDENT_TWICE,
             True,
         )
 
@@ -269,7 +275,7 @@ class CppSourceConfig(object):
             ]
             if self.is_top_level_config
             else [param.constructor_entry for param in self.parameters],
-            1,
+            INDENT_ONCE,
         )
 
     @property
@@ -282,7 +288,7 @@ class CppSourceConfig(object):
                 if not param.is_constant
             ]
             + [conf.config_variable_name for conf in self.configs],
-            2,
+            INDENT_TWICE,
         )
 
     @property
@@ -298,7 +304,7 @@ class CppSourceConfig(object):
             ",\n",
             [param.immutable_parameter_list_entry for param in self.parameters]
             + [conf.immutable_parameter_list_config_entry for conf in self.configs],
-            1,
+            INDENT_ONCE,
         )
 
     @property
@@ -311,7 +317,7 @@ class CppSourceConfig(object):
                 if not param.is_constant
             ]
             + self.included_config_command_line_arg_entries,
-            1,
+            INDENT_ONCE,
         )
 
     @property
@@ -338,7 +344,7 @@ class CppSourceConfig(object):
                 if not param.is_constant
             ]
             + [conf.included_config_command_line_arg_entry for conf in self.configs],
-            2,
+            INDENT_TWICE,
         )
 
     @property
@@ -356,7 +362,7 @@ class CppSourceConfig(object):
                 for conf in self.dependency_graph_topological_order_configs
             ]
             + [self.command_line_arg_struct],
-            1,
+            INDENT_ONCE,
         )
 
     @property
@@ -369,5 +375,5 @@ class CppSourceConfig(object):
                 if not param.is_constant
             ]
             + self.included_config_load_command_line_args_into_config_contents,
-            1,
+            INDENT_ONCE,
         )
