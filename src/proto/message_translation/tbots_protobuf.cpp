@@ -321,23 +321,3 @@ std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp()
     timestamp_msg->set_epoch_timestamp_seconds(time_in_seconds);
     return timestamp_msg;
 }
-
-RobotState createRobotState(const TbotsProto::RobotState& robot_state_proto)
-{
-    return RobotState(
-        Point(robot_state_proto.global_position().x_meters(),
-              robot_state_proto.global_position().y_meters()),
-        Vector(robot_state_proto.global_velocity().x_component_meters(),
-               robot_state_proto.global_velocity().x_component_meters()),
-        Angle::fromRadians(robot_state_proto.global_orientation().radians()),
-        AngularVelocity::fromRadians(
-            robot_state_proto.global_angular_velocity().radians_per_second()));
-}
-
-BallState createBallState(const TbotsProto::BallState& ball_state_proto)
-{
-    return BallState(Point(ball_state_proto.global_position().x_meters(),
-                           ball_state_proto.global_position().y_meters()),
-                     Vector(ball_state_proto.global_velocity().x_component_meters(),
-                            ball_state_proto.global_velocity().x_component_meters()));
-}
