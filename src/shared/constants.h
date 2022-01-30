@@ -121,13 +121,6 @@ static const unsigned char ESTOP_STOP_MSG = 0;
 static const char ARDUINO_VENDOR_ID[ARDUINO_ID_LENGTH]  = "2341";
 static const char ARDUINO_PRODUCT_ID[ARDUINO_ID_LENGTH] = "0043";
 
-<<<<<<< HEAD
-// ESP32
-
-// UART bard rate used to communication with the ESP32
-static const long ESP32_BAUD_RATE = 9600;
-=======
 // Number of times the control loop should tick per trajectory element
 static const unsigned NUM_TICKS_PER_TRAJECTORY_ELEMENT = 4u;
 static const unsigned CONTROL_LOOP_HZ                  = 200u;
->>>>>>> 0993cd662b74b714202ffaf0b5bedf2df4e1a088
