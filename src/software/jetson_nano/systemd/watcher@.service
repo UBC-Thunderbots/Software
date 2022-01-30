@@ -1,6 +1,7 @@
 
 # this is a generic watcher service, denoted by the presence of '@' in the filename.
-# When a generic service is intantiated, anything after the '@' can be referenced through the variable i
+# generic services are the same as normal services, except for
+# when a generic service is intantiated, anything after the '@' can be referenced through the variable i.
 # for example, creating a service called watcher@thunderloop will instantiate this file and replace
 # any reference to %i with thunderloop
 
