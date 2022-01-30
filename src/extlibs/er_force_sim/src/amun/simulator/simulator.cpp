@@ -111,7 +111,7 @@ Simulator::Simulator(const amun::SimulatorSetup &setup)
     : m_time(0),
       m_lastSentStatusTime(0),
       m_enabled(false),
-      m_charge(false),
+      m_charge(true),
       m_visionDelay(35 * 1000 * 1000),
       m_visionProcessingTime(5 * 1000 * 1000),
       m_aggregator(new ErrorAggregator(this))
