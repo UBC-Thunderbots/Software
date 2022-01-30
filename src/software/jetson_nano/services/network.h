@@ -11,7 +11,7 @@ class NetworkService : public Service
 {
    public:
     /**
-     * Service that runs the Network
+     * Service that communicates with our AI
      * Opens all the required ports and maintains them until destroyed.
      *
      * @param ip_address
