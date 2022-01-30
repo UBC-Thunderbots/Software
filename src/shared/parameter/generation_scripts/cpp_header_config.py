@@ -63,7 +63,7 @@ CONFIG_CLASS = """class {config_name} : public Config
 
     const ParameterList& getParameterList() const;
 
-    TbotsProto::{config_name} toProto();
+    TbotsProto::{config_name} toProto() const;
 
     void loadFromProto(const TbotsProto::{config_name}& config_proto);
 

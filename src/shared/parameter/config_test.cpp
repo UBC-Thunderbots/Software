@@ -1,16 +1,15 @@
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <boost/filesystem.hpp>
-#include <cstring>
-#include <regex>
+#include <set>
 
-#include "clang-c/Index.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
+#include "shared/parameter/parameter.h"
+#include "software/ai/hl/stp/play/halt_play.h"
+#include "software/util/variant_visitor/variant_visitor.h"
 #include "yaml-cpp/yaml.h"
 
-extern "C"
-{
-#include "shared/parameter/c_parameters.h"
-}
 /**
  * This function converts a config file names into config struct names.
  *
@@ -51,23 +50,103 @@ std::string toCamelCase(const std::string& snake_case_input)
     return ret_str;
 }
 
+/**
+ * Finds if the given string is a valid parameter type
+ *
+ * @param str the string
+ * @return true if string is a valid parameter type, false otherwise
+ */
+bool isValidParamType(const std::string& str)
+{
+    const static std::set<std::string> types = {"bool",   "int",  "double",
+                                                "string", "enum", "factory"};
+    return types.find(str) != types.end();
+}
+
+/**
+ * Gets the value of a field from a parameter node
+ *
+ * @param param_node the YAML node of parameter
+ * @param field the name of the field
+ */
+template <typename T>
+T getParamField(const YAML::Node& param_node, const std::string& field)
+{
+    return param_node.begin()->second[field].template as<T>();
+}
+
+/**
+ * Checks if a given parameter node is constant
+ *
+ * @param param_node the YAML node of parameter
+ * @return true if the node contains constant field and the field is true, false otherwise
+ */
+bool isParamConstant(const YAML::Node& param_node)
+{
+    return param_node.begin()->second["constant"] &&
+           getParamField<bool>(param_node, "constant");
+}
+
+/**
+ * Finds the parameter node (which could be an included config) within a config node
+ *
+ * @param config the config to look in
+ * @param param_name the name of the parameter to be looked for
+ * @return the parameter node if found, a null node otherwise
+ */
+YAML::Node findParamNode(const YAML::Node& config, const std::string& param_name)
+{
+    // If a config does not include other configs, it contains its parameters as a list.
+    // Otherwise, it is a map where the key is an index number for non-config parameters,
+    // and the config names for included configs.
+    if (config.IsSequence())
+    {
+        // If a sequence, there are no included configs
+        for (YAML::const_iterator config_it = config.begin(); config_it != config.end();
+             config_it++)
+        {
+            const YAML::Node param_node = *config_it;
+            if (getParamField<std::string>(param_node, "name") == param_name)
+            {
+                return param_node;
+            }
+        }
+    }
+    else if (config.IsMap())
+    {
+        for (YAML::const_iterator config_it = config.begin(); config_it != config.end();
+             config_it++)
+        {
+            const std::string param_index = config_it->first.as<std::string>();
+            const YAML::Node param_node   = config_it->second;
+
+            if (param_index == param_name)
+            {
+                // Must be the included config we are looking for
+                return param_node;
+            }
+            else if (param_node.IsSequence())
+            {
+                // Only a config can be a sequence type, and since it is not the included
+                // config we are looking for, continue
+                continue;
+            }
+
+            if (isValidParamType(param_node.begin()->first.as<std::string>()) &&
+                getParamField<std::string>(param_node, "name") == param_name)
+            {
+                return param_node;
+            }
+        }
+    }
+
+    // Could not find the node, so return a dummy node which will fail tests
+    return YAML::Node();
+}
 
 class YamlLoadFixture : public ::testing::Test
 {
    protected:
-    typedef struct ConfigMetadata
-    {
-        // the name of the config in snake_case
-        std::string config_name;
-
-        // the included configs in snake_case
-        std::vector<std::string> included_configs;
-
-        // the parameters defined by this config metadata
-        std::vector<YAML::Node> parameters;
-
-    } ConfigMetadata_t;
-
     /*
      * Sets up the test by loading the yaml files in the config folder.
      *
@@ -77,7 +156,7 @@ class YamlLoadFixture : public ::testing::Test
     void SetUp() override
     {
         // this is loaded from bazel data
-        boost::filesystem::path path("./shared/parameter/config_definitions");
+        boost::filesystem::path path("./shared/parameter/config_definitions/");
 
         for (auto& entry : boost::filesystem::directory_iterator(path))
         {
@@ -85,11 +164,10 @@ class YamlLoadFixture : public ::testing::Test
 
             ASSERT_NE(config.size(), 0);
 
-            ConfigMetadata_t metadata;
-
             // Store the config name, the name of the file
             boost::filesystem::path config_path(entry.path().string());
-            metadata.config_name = config_path.stem().string();
+            std::string config_name = toCamelCase(config_path.stem().string());
+            YAML::Node current_config_yaml;
 
             if (config.size() == 1)
             {
@@ -102,156 +180,320 @@ class YamlLoadFixture : public ::testing::Test
                     // document) or both includes and parameters (2 documents).  See a
                     // yaml config for an example
                     //
-                    // We try to load the first document as a parameter definitions, and
-                    // if the conversion doesn't match, we load it as an include list.
-                    metadata.parameters = config[0].as<std::vector<YAML::Node>>();
+                    // We try to load the first document as a include list, and
+                    // if the conversion doesn't match, we load it as parameters.
+                    config_name_to_includes_map[config_name] =
+                        config[0]["include"].as<std::vector<std::string>>();
                 }
                 catch (const YAML::BadConversion& e)
                 {
-                    metadata.included_configs =
-                        config[0]["include"].as<std::vector<std::string>>();
+                    current_config_yaml = config[0];
                 }
             }
-
-            if (config.size() == 2)
+            else if (config.size() == 2)
             {
                 // load both the documents because they exist
                 // we don't need to worry too much about format/checking validity
                 // as the schema check should have done that already.
-                metadata.included_configs =
+                config_name_to_includes_map[config_name] =
                     config[0]["include"].as<std::vector<std::string>>();
-                metadata.parameters = config[1].as<std::vector<YAML::Node>>();
+                current_config_yaml = config[1];
             }
 
-            config_file_to_metadata_map[entry.path().string()] = metadata;
+            config_yaml["ThunderbotsConfig"][config_name] = current_config_yaml;
+        }
+
+        for (auto const& p : config_name_to_includes_map)
+        {
+            for (auto const& included_config : p.second)
+            {
+                boost::filesystem::path included_config_path(included_config);
+                std::string included_config_name =
+                    toCamelCase(included_config_path.stem().string());
+                config_yaml["ThunderbotsConfig"][p.first][included_config_name] =
+                    config_yaml["ThunderbotsConfig"][included_config_name];
+            }
         }
     }
 
-    // store the config metadata which contains the included configs and the parameters
-    // in a mapping to the config file it was loaded from
-    std::map<std::string, ConfigMetadata_t> config_file_to_metadata_map;
+    YAML::Node config_yaml;
+    std::map<std::string, std::vector<std::string>> config_name_to_includes_map;
 };
 
-TEST_F(YamlLoadFixture, TestProperGeneration)
+class TestAutogenParameterList : public YamlLoadFixture
 {
-    // every file should generate a config, we iterate over all the config_metadata
-    // structs for each file, and use lib-clang to iterate over config.h to make sure the
-    // config was generated as expected
-    std::for_each(
-        config_file_to_metadata_map.begin(), config_file_to_metadata_map.end(),
-        [&](std::pair<std::string, ConfigMetadata_t> config_defn) {
-            std::string file_path     = config_defn.first;
-            ConfigMetadata_t metadata = config_defn.second;
-
-            // From the lib-clang docs: https://clang.llvm.org/doxygen/group__CINDEX.html
-            CXIndex index = clang_createIndex(0, 0);
-
-            // Parse the translation unit
-            CXTranslationUnit unit =
-                clang_parseTranslationUnit(index, "shared/parameter/c/config.h", nullptr,
-                                           0, nullptr, 0, CXTranslationUnit_None);
-
-            CXCursor cursor = clang_getTranslationUnitCursor(unit);
-
-            // We visit over all the "stuff" in the config.h file. The cursor allows us to
-            // traverse the file and get information about the structs and typedefs (among
-            // other things)
-            //
-            // For example: in example_test_config.yaml, we may have
-            //
-            // include:
-            //  - foo_config.yaml
-            //  - bar_config.yaml
-            //
-            // - bool:
-            //      name: example_bool_param
-            //      value: true
-            //      constant: true
-            //      description: >
-            //      Can be true or false
-            //
-            // This data will be available in the ConfigMetadata struct. We pass that
-            // struct into a recursive visitor that goes down the entire file and
-            // validates that.
-            //
-            // 1. There is a config struct that was generated with the proper name
-            // 2. That config struct has the params defined in the yaml file
-            // 3. The config struct includes the configs that are defined in the include
-            //
-            // NOTE: This test assumes the yaml files passed the schema checks
-            clang_visitChildren(
-                cursor,
-                [](CXCursor c, CXCursor parent, CXClientData client_data) {
-                    std::string config_name =
-                        toCamelCase(((ConfigMetadata_t*)client_data)->config_name);
-
-                    std::string generated_struct_name =
-                        std::string(clang_getCString(clang_getCursorSpelling(parent)));
-
-                    // the struct member can be an included config or another parameter
-                    // we make sure that it was generated correctly by finding it in the
-                    // metadata
-                    std::string generated_struct_member_name =
-                        std::string(clang_getCString(clang_getCursorSpelling(c)));
-
-                    if (config_name + "_s" == generated_struct_name)
-                    {
-                        // We found the generated config in the config.h file. We now
-                        // iterate over all the parameters and the included configs in the
-                        // yaml metadata to match the struct member, if there is no match,
-                        // then we generated garbage
-                        bool parameter_found      = false;
-                        bool include_config_found = false;
-
-                        // We do a linear search over all the parameter yaml definitions,
-                        // and check if the generated_struct_member is a valid parameter
-                        for (auto& param_defn :
-                             ((ConfigMetadata_t*)client_data)->parameters)
-                        {
-                            // This is the best way to access YAML nodes, the iterator
-                            // lets us look at the definition of the parameter, without
-                            // explicitly knowing the type of the parameter.
-                            //
-                            // bool:
-                            //   name: example_param
-                            //   ...
-                            for (YAML::iterator it = param_defn.begin();
-                                 it != param_defn.end(); ++it)
-                            {
-                                if (it->second["name"].as<std::string>() ==
-                                    generated_struct_member_name)
+   public:
+    /*
+     * Tests that the generated parameterlist tree is identical to the yaml tree
+     * Visits each config in the top level config and descends (sort of depth first)
+     */
+    void visit_parameters(ParameterVariant paramvar, const YAML::Node& current_config)
+    {
+        std::visit(overload{[&](std::shared_ptr<const Parameter<int>> param) {
+                                assert_parameter<int>(param, current_config);
+                            },
+                            [&](std::shared_ptr<const Parameter<bool>> param) {
+                                assert_parameter<bool>(param, current_config);
+                            },
+                            [&](std::shared_ptr<const Parameter<std::string>> param) {
+                                assert_parameter<std::string>(param, current_config);
+                            },
+                            [&](std::shared_ptr<const Parameter<double>> param) {
+                                assert_parameter<double>(param, current_config);
+                            },
+                            [&](std::shared_ptr<const NumericParameter<unsigned>> param) {
+                                assert_parameter<unsigned>(param, current_config);
+                            },
+                            [&](std::shared_ptr<const Config> param) {
+                                const YAML::Node param_node =
+                                    findParamNode(current_config, param->name());
+                                for (auto& v : param->getParameterList())
                                 {
-                                    parameter_found = true;
+                                    visit_parameters(v, param_node);
                                 }
-                            }
-                        }
+                            }},
+                   paramvar);
+    }
 
-                        // do a linear search over all the included configs, and check if
-                        // the struct member is a defined included config
-                        for (auto& included_config :
-                             ((ConfigMetadata_t*)client_data)->included_configs)
-                        {
-                            // we are converting example_config.yaml to example_config and
-                            // then to ExampleConfig, to compare against the generated
-                            // struct member
-                            std::string yaml_config_name = toCamelCase(
-                                included_config.substr(0, included_config.find(".")));
+    /*
+     * Function takes a param and the config node that contains it, and
+     * checks that the yaml was generated correctly into the expected
+     * parameter.
+     *
+     * Internally asserts and creates failures
+     */
+    template <typename T>
+    void assert_parameter(const std::shared_ptr<const Parameter<T>>& param,
+                          const YAML::Node& config_node)
+    {
+        try
+        {
+            const YAML::Node param_node = findParamNode(config_node, param->name());
+            // make sure the default value matches, accessing the yaml node with an
+            // invalid key will fail the test by default
+            ASSERT_EQ(getParamField<T>(param_node, "value"), param->value());
+        }
+        catch (...)
+        {
+            ADD_FAILURE() << param->name() << " didn't generate properly!";
+        }
+    }
+};
 
-                            if (yaml_config_name == generated_struct_member_name)
-                            {
-                                include_config_found = true;
-                            }
-                        }
+TEST_F(TestAutogenParameterList, DynamicParametersTest)
+{
+    // This creates a shared ptr pointing to a ThunderbotsConfig which can be mutated
+    const std::shared_ptr<ThunderbotsConfig> MutableDynamicParameters =
+        std::make_shared<ThunderbotsConfig>();
 
-                        EXPECT_TRUE(parameter_found | include_config_found)
-                            << config_name << " config was not generated correctly "
-                            << generated_struct_member_name << " not found in yaml";
-                    }
-                    return CXChildVisit_Recurse;
-                },
-                &metadata);
+    // This creates an immutable ThunderbotsConfig w/ proper const correctnesss
+    const std::shared_ptr<const ThunderbotsConfig> DynamicParameters =
+        std::const_pointer_cast<const ThunderbotsConfig>(MutableDynamicParameters);
 
-            clang_disposeTranslationUnit(unit);
-            clang_disposeIndex(index);
-        });
+    visit_parameters(DynamicParameters, config_yaml);
+}
+
+class TestParameterMutation : public YamlLoadFixture
+{
+   public:
+    /*
+     * Visits each parameter and mutates on the following policy
+     *
+     * std::string gets "test" appended at the end
+     * int gets set to max
+     * double gets set to max
+     * bool gets flipped
+     *
+     * Some parameters such as example_enum_param has a specific value set
+     */
+    void mutate_all_parameters(MutableParameterVariant paramvar)
+    {
+        static std::set<MutableParameterVariant> visited;
+        visited.insert(paramvar);
+        std::visit(overload{[&](std::shared_ptr<NumericParameter<int>> param) {
+                                param->setValue(param->getMax());
+                            },
+                            [&](std::shared_ptr<Parameter<bool>> param) {
+                                param->setValue(!param->value());
+                            },
+                            [&](std::shared_ptr<Parameter<std::string>> param) {
+                                param->setValue(param->value() + "test");
+                            },
+                            [&](std::shared_ptr<NumericParameter<double>> param) {
+                                param->setValue(param->getMax());
+                            },
+                            [&](std::shared_ptr<NumericParameter<unsigned>> param) {
+                                param->setValue(param->getMax());
+                            },
+                            [&](std::shared_ptr<EnumeratedParameter<std::string>> param) {
+                                if (param->name() == "example_factory_param")
+                                {
+                                    param->setValue("ExamplePlay");
+                                }
+                                else
+                                {
+                                    param->setValue("STOP");
+                                }
+                            },
+                            [&](std::shared_ptr<Config> param) {
+                                for (auto& v : param->getMutableParameterList())
+                                {
+                                    if (visited.find(v) == visited.end())
+                                    {
+                                        // Only mutate once per parameter
+                                        mutate_all_parameters(v);
+                                    }
+                                }
+                            }},
+                   paramvar);
+    }
+
+    /*
+     * Tests that the mutations in the mutable parameter list tree are propagated to
+     * the immutable tree, and that constant parameters have not changed
+     */
+    void assert_mutation(ParameterVariant paramvar, const YAML::Node& current_config)
+    {
+        std::visit(
+            overload{[&](std::shared_ptr<const NumericParameter<int>> param) {
+                         const YAML::Node param_node =
+                             findParamNode(current_config, param->name());
+                         if (!(isParamConstant(param_node)))
+                         {
+                             ASSERT_EQ(getParamField<int>(param_node, "max"),
+                                       param->value());
+                         }
+                         else
+                         {
+                             ASSERT_EQ(getParamField<int>(param_node, "value"),
+                                       param->value());
+                         }
+                     },
+                     [&](std::shared_ptr<const Parameter<bool>> param) {
+                         const YAML::Node param_node =
+                             findParamNode(current_config, param->name());
+                         if (!(isParamConstant(param_node)))
+                         {
+                             ASSERT_EQ(!getParamField<bool>(param_node, "value"),
+                                       param->value());
+                         }
+                         else
+                         {
+                             ASSERT_EQ(getParamField<bool>(param_node, "value"),
+                                       param->value());
+                         }
+                     },
+                     [&](std::shared_ptr<const Parameter<std::string>> param) {
+                         const YAML::Node param_node =
+                             findParamNode(current_config, param->name());
+                         if (!(isParamConstant(param_node)))
+                         {
+                             ASSERT_EQ(
+                                 getParamField<std::string>(param_node, "value") + "test",
+                                 param->value());
+                         }
+                         else
+                         {
+                             ASSERT_EQ(getParamField<std::string>(param_node, "value"),
+                                       param->value());
+                         }
+                     },
+                     [&](std::shared_ptr<const NumericParameter<double>> param) {
+                         const YAML::Node param_node =
+                             findParamNode(current_config, param->name());
+                         if (!(isParamConstant(param_node)))
+                         {
+                             ASSERT_NEAR(getParamField<double>(param_node, "max"),
+                                         param->value(), 1E-10);
+                         }
+                         else
+                         {
+                             ASSERT_EQ(getParamField<double>(param_node, "value"),
+                                       param->value());
+                         }
+                     },
+                     [&](std::shared_ptr<const NumericParameter<unsigned>> param) {
+                         const YAML::Node param_node =
+                             findParamNode(current_config, param->name());
+                         if (!(isParamConstant(param_node)))
+                         {
+                             ASSERT_EQ(getParamField<unsigned>(param_node, "max"),
+                                       param->value());
+                         }
+                         else
+                         {
+                             ASSERT_EQ(getParamField<unsigned>(param_node, "value"),
+                                       param->value());
+                         }
+                     },
+                     [&](std::shared_ptr<const EnumeratedParameter<std::string>> param) {
+                         const YAML::Node param_node =
+                             findParamNode(current_config, param->name());
+                         if (!(isParamConstant(param_node)))
+                         {
+                             if (param->name() == "example_enum_param")
+                             {
+                                 ASSERT_EQ("STOP", param->value());
+                             }
+                             else if (param->name() == "example_factory_param")
+                             {
+                                 ASSERT_EQ("ExamplePlay", param->value());
+                             }
+                         }
+                         else
+                         {
+                             ASSERT_EQ(getParamField<std::string>(param_node, "value"),
+                                       param->value());
+                         }
+                     },
+                     [&](std::shared_ptr<const Config> param) {
+                         const YAML::Node param_node =
+                             findParamNode(current_config, param->name());
+                         for (auto& v : param->getParameterList())
+                         {
+                             assert_mutation(v, param_node);
+                         }
+                     }},
+            paramvar);
+    }
+};
+
+TEST_F(TestParameterMutation, DynamicParametersTest)
+{
+    // This creates a shared ptr pointing to a ThunderbotsConfig which can be mutated
+    const std::shared_ptr<ThunderbotsConfig> mutable_dynamic_parameters =
+        std::make_shared<ThunderbotsConfig>();
+
+    // This creates an immutable ThunderbotsConfig w/ proper const correctnesss
+    const std::shared_ptr<const ThunderbotsConfig> dynamic_params =
+        std::const_pointer_cast<const ThunderbotsConfig>(mutable_dynamic_parameters);
+
+    mutate_all_parameters(mutable_dynamic_parameters);
+    assert_mutation(dynamic_params, config_yaml);
+}
+
+TEST_F(TestParameterMutation, ProtoGenerationTest)
+{
+    // This creates a shared ptr pointing to a ThunderbotsConfig which can be mutated
+    const std::shared_ptr<ThunderbotsConfig> mutable_dynamic_parameters =
+        std::make_shared<ThunderbotsConfig>();
+
+    // This creates an immutable ThunderbotsConfig w/ proper const correctnesss
+    const std::shared_ptr<const ThunderbotsConfig> dynamic_params =
+        std::const_pointer_cast<const ThunderbotsConfig>(mutable_dynamic_parameters);
+
+    // Mutate all the parameters
+    mutate_all_parameters(mutable_dynamic_parameters);
+
+    // Save as a proto
+    auto proto = mutable_dynamic_parameters->toProto();
+
+    // Create a new top level config
+    const std::shared_ptr<ThunderbotsConfig> mutable_dynamic_param_loaded_from_proto =
+        std::make_shared<ThunderbotsConfig>();
+
+    // Load top level config from the proto and make sure that the mutations across all
+    // configs are reflected
+    mutable_dynamic_param_loaded_from_proto->loadFromProto(proto);
+    assert_mutation(mutable_dynamic_param_loaded_from_proto, config_yaml);
 }

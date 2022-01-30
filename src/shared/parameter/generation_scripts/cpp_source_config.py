@@ -101,7 +101,7 @@ bool {config_name}::loadFromCommandLineArguments(int argc, char **argv) {{
     return args.help;
 }}
 
-TbotsProto::{config_name} {config_name}::toProto()
+TbotsProto::{config_name} {config_name}::toProto() const
 {{
     TbotsProto::{config_name} config_proto;
     {to_proto_contents}
