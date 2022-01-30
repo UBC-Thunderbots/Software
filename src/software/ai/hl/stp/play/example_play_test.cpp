@@ -12,7 +12,7 @@ class ExamplePlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
     FieldType field_type = FieldType::DIV_B;
-    Field field = Field::createField(field_type);
+    Field field          = Field::createField(field_type);
 };
 
 TEST_F(ExamplePlayTest, test_example_play)

@@ -22,7 +22,7 @@ class PenaltyKickEnemyPlayTest
 {
    protected:
     FieldType field_type = FieldType::DIV_B;
-    Field field = Field::createField(field_type);
+    Field field          = Field::createField(field_type);
 };
 
 TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
@@ -71,7 +71,7 @@ TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }

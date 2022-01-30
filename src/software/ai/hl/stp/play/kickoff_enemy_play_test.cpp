@@ -17,7 +17,7 @@ class KickoffEnemyPlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
     FieldType field_type = FieldType::DIV_B;
-    Field field = Field::createField(field_type);
+    Field field          = Field::createField(field_type);
 };
 
 TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)

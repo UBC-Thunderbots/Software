@@ -18,7 +18,7 @@ class KickoffFriendlyPlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
     FieldType field_type = FieldType::DIV_B;
-    Field field = Field::createField(field_type);
+    Field field          = Field::createField(field_type);
 };
 
 TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)

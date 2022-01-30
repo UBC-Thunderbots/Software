@@ -11,7 +11,8 @@
 class PassEndurancePlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+    FieldType field_type = FieldType::DIV_B;
+    Field field          = Field::createField(field_type);
 };
 
 TEST_F(PassEndurancePlayTest, test_pass_endurance_play_stopped)
@@ -37,7 +38,7 @@ TEST_F(PassEndurancePlayTest, test_pass_endurance_play_stopped)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
+    runTest(field_type, ball_state, friendly_robots, {}, terminating_validation_functions,
             non_terminating_validation_functions, Duration::fromSeconds(10));
 }
 
@@ -64,6 +65,6 @@ TEST_F(PassEndurancePlayTest, test_pass_endurance_play_force_start)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, {}, terminating_validation_functions,
+    runTest(field_type, ball_state, friendly_robots, {}, terminating_validation_functions,
             non_terminating_validation_functions, Duration::fromSeconds(10));
 }
