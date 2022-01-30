@@ -14,11 +14,11 @@ class NetworkService : public Service
      * Service that communicates with our AI
      * Opens all the required ports and maintains them until destroyed.
      *
-     * @param ip_address
-     * @param vision_listener_port
-     * @param primitive_listener_port
-     * @param robot_status_sender_port
-     * @param multicast
+     * @param ip_address The IP Address the service should connect to
+     * @param vision_listener_port The port to listen for vision protos
+     * @param primitive_listener_port The port to listen for primitive protos
+     * @param robot_status_sender_port The port to send robot status
+     * @param multicast  If true, then the provided IP address is a multicast address and we should join the group
      */
     NetworkService(const std::string& ip_address, unsigned short vision_listener_port,
                    unsigned short primitive_listener_port,
