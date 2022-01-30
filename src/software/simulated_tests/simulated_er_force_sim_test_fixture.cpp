@@ -186,25 +186,25 @@ void SimulatedErForceSimTestFixture::updateSensorFusion(
 
     for (const auto &packet : ssl_wrapper_packets)
     {
-    auto sensor_msg                        = SensorProto();
-    *(sensor_msg.mutable_ssl_vision_msg()) = packet;
+        auto sensor_msg                        = SensorProto();
+        *(sensor_msg.mutable_ssl_vision_msg()) = packet;
 
-    friendly_sensor_fusion.processSensorProto(sensor_msg);
-    enemy_sensor_fusion.processSensorProto(sensor_msg);
+        friendly_sensor_fusion.processSensorProto(sensor_msg);
+        enemy_sensor_fusion.processSensorProto(sensor_msg);
 
-    if (should_log_replay)
-    {
-        simulator_sensorproto_logger->onValueReceived(sensor_msg);
-        auto friendly_world_or_null = friendly_sensor_fusion.getWorld();
-
-        if (friendly_world_or_null)
+        if (should_log_replay)
         {
-            auto filtered_ssl_wrapper = *createSSLWrapperPacket(
-                *friendly_sensor_fusion.getWorld(), TeamColour::YELLOW);
-            sensorfusion_wrapper_logger->onValueReceived(filtered_ssl_wrapper);
+            simulator_sensorproto_logger->onValueReceived(sensor_msg);
+            auto friendly_world_or_null = friendly_sensor_fusion.getWorld();
+
+            if (friendly_world_or_null)
+            {
+                auto filtered_ssl_wrapper = *createSSLWrapperPacket(
+                    *friendly_sensor_fusion.getWorld(), TeamColour::YELLOW);
+                sensorfusion_wrapper_logger->onValueReceived(filtered_ssl_wrapper);
+            }
         }
     }
-}
 }
 
 void SimulatedErForceSimTestFixture::sleep(
@@ -225,7 +225,7 @@ void SimulatedErForceSimTestFixture::sleep(
 }
 
 void SimulatedErForceSimTestFixture::runTest(
-    const Field &field, const BallState &ball,
+    const FieldType &field_type, const BallState &ball,
     const std::vector<RobotStateWithId> &friendly_robots,
     const std::vector<RobotStateWithId> &enemy_robots,
     const std::vector<ValidationFunction> &terminating_validation_functions,
@@ -233,7 +233,7 @@ void SimulatedErForceSimTestFixture::runTest(
     const Duration &timeout)
 {
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
-        field, create2015RobotConstants(), create2015WheelConstants(),
+        field_type, create2015RobotConstants(), create2015WheelConstants(),
         friendly_thunderbots_config->getSimulatorConfig()));
     simulator->setBallState(ball);
     simulator->setYellowRobots(friendly_robots);
@@ -345,10 +345,11 @@ void SimulatedErForceSimTestFixture::registerEnemyTickTime(double tick_time_ms)
     enemy_tick_count++;
 }
 
-bool SimulatedErForceSimTestFixture::tickTest(Duration simulation_time_step, Duration ai_time_step,
-                                    std::shared_ptr<World> friendly_world,
-                                    std::shared_ptr<World> enemy_world,
-                                    std::shared_ptr<ErForceSimulator> simulator)
+bool SimulatedErForceSimTestFixture::tickTest(Duration simulation_time_step,
+                                              Duration ai_time_step,
+                                              std::shared_ptr<World> friendly_world,
+                                              std::shared_ptr<World> enemy_world,
+                                              std::shared_ptr<ErForceSimulator> simulator)
 {
     auto wall_start_time           = std::chrono::steady_clock::now();
     bool validation_functions_done = false;

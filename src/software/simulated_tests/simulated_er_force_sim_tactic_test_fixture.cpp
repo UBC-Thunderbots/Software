@@ -50,14 +50,15 @@ void SimulatedErForceSimTacticTestFixture::SetUp()
         enemy_thunderbots_config->getNavigatorConfig());
 }
 
-void SimulatedErForceSimTacticTestFixture::setTactic(std::shared_ptr<Tactic> friendly_tactic,
-                                           std::shared_ptr<Tactic> enemy_tactic)
+void SimulatedErForceSimTacticTestFixture::setTactic(
+    std::shared_ptr<Tactic> friendly_tactic, std::shared_ptr<Tactic> enemy_tactic)
 {
     setFriendlyTactic(friendly_tactic);
     setEnemyTactic(enemy_tactic);
 }
 
-void SimulatedErForceSimTacticTestFixture::setFriendlyTactic(std::shared_ptr<Tactic> tactic)
+void SimulatedErForceSimTacticTestFixture::setFriendlyTactic(
+    std::shared_ptr<Tactic> tactic)
 {
     if (tactic)
     {
@@ -87,7 +88,7 @@ void SimulatedErForceSimTacticTestFixture::setFriendlyRobotId(RobotId friendly_r
 }
 
 void SimulatedErForceSimTacticTestFixture::setBothRobotId(RobotId friendly_robot_id,
-                                                RobotId enemy_robot_id)
+                                                          RobotId enemy_robot_id)
 {
     this->friendly_robot_id = friendly_robot_id;
     this->enemy_robot_id    = enemy_robot_id;
@@ -139,8 +140,8 @@ void SimulatedErForceSimTacticTestFixture::updateFriendlyPrimitives(
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
     registerFriendlyTickTime(duration_ms);
     auto vision_msg = createVision(world);
-    simulator_to_update->setYellowRobotPrimitiveSet(
-        *primitive_set_msg, std::move(vision_msg));
+    simulator_to_update->setYellowRobotPrimitiveSet(*primitive_set_msg,
+                                                    std::move(vision_msg));
 }
 
 void SimulatedErForceSimTacticTestFixture::updateEnemyPrimitives(
@@ -172,8 +173,8 @@ void SimulatedErForceSimTacticTestFixture::updateEnemyPrimitives(
     defending_side.set_defending_side(
         DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X);
     auto vision_msg = createVision(world);
-    simulator_to_update->setBlueRobotPrimitiveSet(
-        *primitive_set_msg, std::move(vision_msg));
+    simulator_to_update->setBlueRobotPrimitiveSet(*primitive_set_msg,
+                                                  std::move(vision_msg));
 }
 
 std::optional<TbotsProto::PlayInfo> SimulatedErForceSimTacticTestFixture::getPlayInfo()

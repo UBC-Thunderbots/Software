@@ -62,7 +62,7 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
      * @throws runtime_error if any of the given robot ids are duplicated, or a
      * robot already exists on the specified team with one of the new IDs
      *
-     * @param field The field to run the test on
+     * @param field_typep The type of field to run the test on
      * @param ball_state The ball state to run the test with
      * @param friendly_robots The friendly robot states with ID to run the test with
      * @param enemy_robots The enemy robot states with ID to run the test with
@@ -75,7 +75,7 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
      * will fail.
      */
     void runTest(
-        const Field &field, const BallState &ball,
+        const FieldType &field_type, const BallState &ball,
         const std::vector<RobotStateWithId> &friendly_robots,
         const std::vector<RobotStateWithId> &enemy_robots,
         const std::vector<ValidationFunction> &terminating_validation_functions,
@@ -133,8 +133,9 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
      * @param enemy_world to update primitives with
      * @param simulator_to_update The simulator to update
      */
-    virtual void updatePrimitives(const World &friendly_world, const World &enemy_world,
-std::shared_ptr<ErForceSimulator> simulator_to_update) = 0;
+    virtual void updatePrimitives(
+        const World &friendly_world, const World &enemy_world,
+        std::shared_ptr<ErForceSimulator> simulator_to_update) = 0;
 
     /**
      * Gets play info message for displaying on the FullSystemGUI

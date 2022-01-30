@@ -68,7 +68,8 @@ void SimulatedErForceSimPlayTestFixture::setGameState(const GameState& game_stat
 }
 
 void SimulatedErForceSimPlayTestFixture::updatePrimitives(
-    const World& friendly_world, const World&, std::shared_ptr<ErForceSimulator> simulator_to_update)
+    const World& friendly_world, const World&,
+    std::shared_ptr<ErForceSimulator> simulator_to_update)
 {
     auto world_with_updated_game_state = friendly_world;
     world_with_updated_game_state.updateGameState(game_state);
@@ -79,8 +80,8 @@ void SimulatedErForceSimPlayTestFixture::updatePrimitives(
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
     registerFriendlyTickTime(duration_ms);
     auto vision_msg = createVision(friendly_world);
-    simulator_to_update->setYellowRobotPrimitiveSet(
-        *primitive_set_msg, std::move(vision_msg));
+    simulator_to_update->setYellowRobotPrimitiveSet(*primitive_set_msg,
+                                                    std::move(vision_msg));
 }
 
 const std::shared_ptr<AiConfig> SimulatedErForceSimPlayTestFixture::getAiConfig() const

@@ -17,7 +17,8 @@
 class KickoffFriendlyPlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+    FieldType field_type = FieldType::DIV_B;
+    Field field = Field::createField(field_type);
 };
 
 TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
@@ -33,7 +34,8 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
     setAIPlayConstructor([this]() {
-        return std::make_unique<KickoffFriendlyPlay>(friendly_thunderbots_config->getPlayConfig());
+        return std::make_unique<KickoffFriendlyPlay>(
+            friendly_thunderbots_config->getPlayConfig());
     });
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_US);
 
@@ -69,7 +71,7 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
             }
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
