@@ -133,6 +133,7 @@ bool SimulatedErForceSimTestFixture::validateAndCheckCompletion(
 void SimulatedErForceSimTestFixture::updateSensorFusion(
     std::shared_ptr<ErForceSimulator> simulator)
 {
+    std::cout << __func__ << " called" << std::endl;
     // TODO (#2419): remove this to re-enable sigfpe checks
     fedisableexcept(FE_INVALID | FE_OVERFLOW);
     auto ssl_wrapper_packets = simulator->getSSLWrapperPackets();
@@ -158,6 +159,7 @@ void SimulatedErForceSimTestFixture::updateSensorFusion(
             }
         }
     }
+    std::cout << __func__ << " finished" << std::endl;
 }
 
 void SimulatedErForceSimTestFixture::sleep(
@@ -203,12 +205,14 @@ void SimulatedErForceSimTestFixture::runTest(
         FAIL() << "Invalid initial world state";
     }
 
+    std::cout << __func__ << " 1" << std::endl;
     for (const auto &validation_function : terminating_validation_functions)
     {
         terminating_function_validators.emplace_back(
             TerminatingFunctionValidator(validation_function, world));
     }
 
+    std::cout << __func__ << " 2" << std::endl;
     for (const auto &validation_function : non_terminating_validation_functions)
     {
         non_terminating_function_validators.emplace_back(
@@ -220,16 +224,21 @@ void SimulatedErForceSimTestFixture::runTest(
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
 
 
+    std::cout << __func__ << " 3" << std::endl;
     double speed_factor         = 1 / (TbotsGtestMain::test_speed);
     const Duration ai_time_step = Duration::fromSeconds(
         simulation_time_step.toSeconds() * CAMERA_FRAMES_PER_AI_TICK * speed_factor);
 
     // Tick one frame to aid with visualization
+    std::cout << __func__ << " 4" << std::endl;
     bool validation_functions_done =
         tickTest(simulation_time_step, ai_time_step, world, simulator);
 
+    std::cout << __func__ << " 5" << std::endl;
+    int j = 6;
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
+        std::cout << j << " start" << std::endl;
         if (!thunderbots_config->getAiControlConfig()->getRunAi()->value())
         {
             auto ms_to_sleep = std::chrono::milliseconds(
@@ -238,9 +247,14 @@ void SimulatedErForceSimTestFixture::runTest(
             continue;
         }
 
+        std::cout << j << " mid" << std::endl;
         validation_functions_done =
             tickTest(simulation_time_step, ai_time_step, world, simulator);
+        std::cout << j << " end" << std::endl;
+        j++;
     }
+
+    std::cout << "Loop done" << std::endl;
     // Output the tick duration results
     double avg_tick_duration = total_tick_duration / tick_count;
     LOG(INFO) << "max tick duration: " << max_tick_duration << "ms" << std::endl;

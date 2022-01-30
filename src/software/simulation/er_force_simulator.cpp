@@ -88,12 +88,16 @@ void ErForceSimulator::setBallState(const BallState& ball_state)
 
 void ErForceSimulator::setYellowRobots(const std::vector<RobotStateWithId>& robots)
 {
+    std::cout << __func__ << " called" << std::endl;
     setRobots(robots, gameController::Team::YELLOW);
+    std::cout << __func__ << " finished" << std::endl;
 }
 
 void ErForceSimulator::setBlueRobots(const std::vector<RobotStateWithId>& robots)
 {
+    std::cout << __func__ << " called" << std::endl;
     setRobots(robots, gameController::Team::BLUE);
+    std::cout << __func__ << " finished" << std::endl;
 }
 
 void ErForceSimulator::setRobots(const std::vector<RobotStateWithId>& robots,
@@ -264,6 +268,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         const std::vector<std::shared_ptr<ErForceSimulatorRobot>>& simulator_robots,
         const TbotsProto::World& world_msg)
 {
+    std::cout << __func__ << " start" << std::endl;
     SSLSimulationProto::RobotControl robot_control;
 
     for (auto& simulator_robot : simulator_robots)
@@ -282,11 +287,13 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
             *(robot_control.mutable_robot_commands()->Add()) = command;
         }
     }
+    std::cout << __func__ << " end" << std::endl;
     return robot_control;
 }
 
 void ErForceSimulator::stepSimulation(const Duration& time_step)
 {
+    std::cout << __func__ << " start" << std::endl;
     current_time = current_time + time_step;
 
     SSLSimulationProto::RobotControl yellow_robot_control =
@@ -300,6 +307,7 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     er_force_sim->stepSimulation(time_step.toSeconds());
 
     frame_number++;
+    std::cout << __func__ << " end" << std::endl;
 }
 
 std::vector<SSLProto::SSL_WrapperPacket> ErForceSimulator::getSSLWrapperPackets() const

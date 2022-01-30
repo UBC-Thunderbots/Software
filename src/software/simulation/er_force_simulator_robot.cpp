@@ -24,6 +24,7 @@ unsigned int ErForceSimulatorRobot::getRobotId()
 
 void ErForceSimulatorRobot::setRobotState(const RobotState& robot_state)
 {
+    std::cout << __func__ << " start/end" << std::endl;
     this->robot_state = robot_state;
 }
 

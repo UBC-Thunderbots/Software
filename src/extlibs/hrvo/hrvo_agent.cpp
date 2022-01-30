@@ -159,6 +159,7 @@ void HRVOAgent::computeNewVelocity()
         VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
         velocityObstacles_.push_back(velocity_obstacle);
     }
+    std::cout << __func__ << " pref velocity computed=" << pref_velocity_ << std::endl;
 
     // Calculate what velocities (candidates) are not inside any velocity obstacle
     // This is likely implementing the ClearPath efficient geometric algorithm as stated
@@ -433,12 +434,14 @@ void HRVOAgent::computeNewVelocity()
             break;
         }
     }
+    std::cout << __func__ << " new velocity computed=" << new_velocity_ << std::endl;
 }
 
 void HRVOAgent::computePreferredVelocity()
 {
     if (prefSpeed_ <= 0.01f || max_accel_ <= 0.01f)
     {
+        std::cout << __func__ << " WOOOOOOOOOOAH=" << std::endl;
         // Used to avoid edge cases with division by zero
         pref_velocity_ = Vector2(0.f, 0.f);
         return;

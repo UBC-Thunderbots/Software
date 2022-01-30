@@ -49,6 +49,7 @@ void KdTree::build()
         agents_.push_back(i);
     }
 
+    // TODO: might be -1 (overflow)
     nodes_.resize(2 * simulator_->agents_.size() - 1);
 
     if (!agents_.empty())
