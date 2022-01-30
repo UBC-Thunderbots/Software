@@ -259,9 +259,9 @@ void STP::overridePlayConstructor(std::optional<PlayConstructor> constructor)
     override_constructor  = constructor;
 }
 
-void STP::overridePlayName(std::string name)
+void STP::overridePlayConstructorFromName(std::string name)
 {
-    overridePlayConstructor([name, this](std::shared_ptr<const AiConfig> ai_config) {
+    overridePlayConstructor([name](std::shared_ptr<const AiConfig> ai_config) {
         return GenericFactory<std::string, Play, AiConfig>::create(name, ai_config);
     });
 }

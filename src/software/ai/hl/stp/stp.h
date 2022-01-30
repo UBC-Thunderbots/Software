@@ -141,7 +141,12 @@ class STP
      */
     std::vector<std::unique_ptr<Intent>> getIntentsFromCurrentPlay(const World &world);
 
-    void overridePlayName(std::string name);
+    /**
+     * Overrides the play constructor from the name
+     *
+     * @param name the play name
+     */
+    void overridePlayConstructorFromName(std::string name);
 
     // The Play that is currently running
     std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment;
