@@ -1,3 +1,4 @@
+// TODO (#2371): Remove Vector2 files once it is replaced with Vector
 /*
  * vector2.h
  * HRVO Library
@@ -293,6 +294,19 @@ inline float atan(const Vector2 &vector)
 inline float det(const Vector2 &vector1, const Vector2 &vector2)
 {
     return vector1.getX() * vector2.getY() - vector1.getY() * vector2.getX();
+}
+
+/**
+ * Computes the dot product of two vectors
+ *
+ * @param vector_left  The left hand side vector of dot product
+ * @param vector_right  The right hand side vector of dot product
+ * @return  The dot product of the two vectors.
+ */
+inline float dotProduct(const Vector2 &vector_left, const Vector2 &vector_right)
+{
+    return vector_left.getX() * vector_right.getX() +
+           vector_left.getY() * vector_right.getY();
 }
 
 /**
