@@ -83,15 +83,24 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
         const Duration &timeout);
 
     /**
-     * Registers a new tick time for calculating tick time statistics
+     * Registers a new tick time for calculating friendly tick time statistics
      *
      * @param tick_time_ms The tick time in milliseconds
      */
-    void registerTickTime(double tick_time_ms);
+    void registerFriendlyTickTime(double tick_time_ms);
+
+    /**
+     * Registers a new tick time for calculating enemy tick time statistics
+     *
+     * @param tick_time_ms The tick time in milliseconds
+     */
+    void registerEnemyTickTime(double tick_time_ms);
 
     // The dynamic params being used in the tests
-    std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config;
-    std::shared_ptr<const ThunderbotsConfig> thunderbots_config;
+    std::shared_ptr<ThunderbotsConfig> friendly_mutable_thunderbots_config;
+    std::shared_ptr<ThunderbotsConfig> enemy_mutable_thunderbots_config;
+    std::shared_ptr<const ThunderbotsConfig> friendly_thunderbots_config;
+    std::shared_ptr<const ThunderbotsConfig> enemy_thunderbots_config;
 
    private:
     /**
@@ -105,7 +114,8 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
      * @return if validation functions are done
      */
     bool tickTest(Duration simulation_time_step, Duration ai_time_step,
-                  std::shared_ptr<World> world,
+                  std::shared_ptr<World> friendly_world,
+                  std::shared_ptr<World> enemy_world,
                   std::shared_ptr<ErForceSimulator> simulator);
 
     /**
@@ -119,10 +129,11 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
     /**
      * Updates primitives in the simulator based on the new world
      *
-     * @param world to update primitives with
+     * @param friendly_world to update primitives with
+     * @param enemy_world to update primitives with
      * @param simulator_to_update The simulator to update
      */
-    virtual void updatePrimitives(
+    virtual void updatePrimitives(const World &friendly_world, const World &enemy_world,
         const World &world, std::shared_ptr<ErForceSimulator> simulator_to_update) = 0;
 
     /**
@@ -174,7 +185,8 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
     // object so we can assign new instances to this variable
     std::shared_ptr<ErForceSimulator> simulator;
     // The SensorFusion being tested and used in simulation
-    SensorFusion sensor_fusion;
+    SensorFusion friendly_sensor_fusion;
+    SensorFusion enemy_sensor_fusion;
 
     // whether we should log the filtered and unfiltered world states as replay logs
     // this will only be set to true if the environment variable
@@ -195,13 +207,17 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
 
     // These variables track tick time statistics
     // Total duration of all ticks registered
-    double total_tick_duration;
+    double total_friendly_tick_duration;
+    double total_enemy_tick_duration;
     // The max tick duration registered
-    double max_tick_duration;
+    double max_friendly_tick_duration;
+    double max_enemy_tick_duration;
     // The min tick duration registered
-    double min_tick_duration;
+    double min_friendly_tick_duration;
+    double min_enemy_tick_duration;
     // Total number of ticks registered
-    unsigned int tick_count;
+    unsigned int friendly_tick_count;
+    unsigned int enemy_tick_count;
 
     // The rate at which camera data will be simulated and given to SensorFusion.
     // Each sequential "camera frame" will be 1 / SIMULATED_CAMERA_FPS time step
