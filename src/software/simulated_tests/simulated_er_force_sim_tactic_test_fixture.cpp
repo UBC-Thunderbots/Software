@@ -1,6 +1,5 @@
 #include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
 
-#include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/navigator/path_manager/velocity_obstacle_path_manager.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
@@ -139,8 +138,9 @@ void SimulatedErForceSimTacticTestFixture::updateFriendlyPrimitives(
     auto primitive_set_msg = friendly_navigator->getAssignedPrimitives(world, intents);
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
     registerFriendlyTickTime(duration_ms);
+    auto vision_msg = createVision(world);
     simulator_to_update->setYellowRobotPrimitiveSet(
-        createNanoPbPrimitiveSet(*primitive_set_msg));
+        *primitive_set_msg, std::move(vision_msg));
 }
 
 void SimulatedErForceSimTacticTestFixture::updateEnemyPrimitives(
@@ -171,9 +171,9 @@ void SimulatedErForceSimTacticTestFixture::updateEnemyPrimitives(
     auto defending_side = DefendingSideProto();
     defending_side.set_defending_side(
         DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X);
-    simulator_to_update->setBlueTeamDefendingSide(defending_side);
+    auto vision_msg = createVision(world);
     simulator_to_update->setBlueRobotPrimitiveSet(
-        createNanoPbPrimitiveSet(*primitive_set_msg));
+        *primitive_set_msg, std::move(vision_msg));
 }
 
 std::optional<TbotsProto::PlayInfo> SimulatedErForceSimTacticTestFixture::getPlayInfo()

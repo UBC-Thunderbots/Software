@@ -187,7 +187,7 @@ void SimulatedErForceSimTestFixture::updateSensorFusion(
     for (const auto &packet : ssl_wrapper_packets)
     {
     auto sensor_msg                        = SensorProto();
-    *(sensor_msg.mutable_ssl_vision_msg()) = *packet;
+    *(sensor_msg.mutable_ssl_vision_msg()) = packet;
 
     friendly_sensor_fusion.processSensorProto(sensor_msg);
     enemy_sensor_fusion.processSensorProto(sensor_msg);
@@ -236,8 +236,8 @@ void SimulatedErForceSimTestFixture::runTest(
         field, create2015RobotConstants(), create2015WheelConstants(),
         friendly_thunderbots_config->getSimulatorConfig()));
     simulator->setBallState(ball);
-    simulator->addYellowRobots(friendly_robots);
-    simulator->addBlueRobots(enemy_robots);
+    simulator->setYellowRobots(friendly_robots);
+    simulator->setBlueRobots(enemy_robots);
 
     updateSensorFusion(simulator);
     std::shared_ptr<World> friendly_world;
@@ -348,7 +348,7 @@ void SimulatedErForceSimTestFixture::registerEnemyTickTime(double tick_time_ms)
 bool SimulatedErForceSimTestFixture::tickTest(Duration simulation_time_step, Duration ai_time_step,
                                     std::shared_ptr<World> friendly_world,
                                     std::shared_ptr<World> enemy_world,
-                                    std::shared_ptr<Simulator> simulator)
+                                    std::shared_ptr<ErForceSimulator> simulator)
 {
     auto wall_start_time           = std::chrono::steady_clock::now();
     bool validation_functions_done = false;

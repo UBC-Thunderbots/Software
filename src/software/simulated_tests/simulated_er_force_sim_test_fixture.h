@@ -134,7 +134,7 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
      * @param simulator_to_update The simulator to update
      */
     virtual void updatePrimitives(const World &friendly_world, const World &enemy_world,
-        const World &world, std::shared_ptr<ErForceSimulator> simulator_to_update) = 0;
+std::shared_ptr<ErForceSimulator> simulator_to_update) = 0;
 
     /**
      * Gets play info message for displaying on the FullSystemGUI
