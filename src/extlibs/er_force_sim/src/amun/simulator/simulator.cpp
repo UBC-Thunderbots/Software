@@ -234,7 +234,7 @@ std::vector<robot::RadioResponse> Simulator::acceptRobotControlCommand(
                 if (data->robotReplyPacketLoss == 0 ||
                     data->rng.uniformFloat(0, 1) > data->robotReplyPacketLoss)
                 {
-                    responses.append(response);
+                    responses.emplace_back(response);
                 }
             }
         };
@@ -390,9 +390,6 @@ std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
         initializeDetection(&detections[i], i);
     }
 
-    auto *ball = simState.mutable_ball();
-    m_data->ball->writeBallState(ball);
-
     bool missingBall = m_data->missingBallDetections > 0 &&
                        m_data->rng.uniformFloat(0, 1) <= m_data->missingBallDetections;
     const btVector3 ballPosition = m_data->ball->position() / SIMULATOR_SCALE;
@@ -432,9 +429,6 @@ std::vector<SSLProto::SSL_WrapperPacket> Simulator::getWrapperPackets()
         for (const auto &it : team)
         {
             SimRobot *robot = it.first;
-            auto *robotProto =
-                teamIsBlue ? simState.add_blue_robots() : simState.add_yellow_robots();
-            robot->update(robotProto, m_data->ball);
 
             if (m_time - robot->getLastSendTime() >= m_minRobotDetectionTime)
             {
@@ -571,7 +565,7 @@ world::SimulatorState Simulator::getSimulatorState()
             auto *robotProto =
                 teamIsBlue ? simState.add_blue_robots() : simState.add_yellow_robots();
 
-            robot->update(robotProto);
+            robot->update(robotProto, m_data->ball);
 
             // Convert mm to m
             robotProto->set_p_x(newRobotPos.x() / 1000);

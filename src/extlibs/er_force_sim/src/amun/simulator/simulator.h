@@ -26,8 +26,8 @@
 #include <QtCore/QMap>
 #include <QtCore/QPair>
 #include <QtCore/QQueue>
-#include <tuple>
 #include <random>
+#include <tuple>
 
 #include "extlibs/er_force_sim/src/protobuf/command.h"
 #include "extlibs/er_force_sim/src/protobuf/sslsim.h"
