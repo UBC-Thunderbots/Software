@@ -16,8 +16,8 @@ from software.thunderscope.constants import (
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 import software.thunderscope.colors as colors
 
-class WorldLayer(FieldLayer):
 
+class WorldLayer(FieldLayer):
     def __init__(self):
         FieldLayer.__init__(self)
         self.world_receiver = ThreadedUnixListener(
@@ -65,14 +65,12 @@ class WorldLayer(FieldLayer):
             )
         )
 
-        # Draw Centre Cicle
+        # Draw Centre Circle
         painter.drawEllipse(
             self.createCircle(0, 0, field.center_circle_radius * MM_PER_M)
         )
 
-
     def draw_team(self, painter, color, team: Team):
-
 
         """Draw the team
 
@@ -84,7 +82,6 @@ class WorldLayer(FieldLayer):
 
         for robot in team.team_robots:
 
-
             painter.setPen(pg.mkPen(color))
             painter.setBrush(pg.mkBrush(color))
 
@@ -95,9 +92,11 @@ class WorldLayer(FieldLayer):
                     robot.current_state.global_position.x_meters * MM_PER_M,
                     robot.current_state.global_position.y_meters * MM_PER_M,
                     ROBOT_MAX_RADIUS,
-                ), (math.degrees(robot.current_state.global_orientation.radians) + 45) * -16 , 270 * -16
+                ),
+                (math.degrees(robot.current_state.global_orientation.radians) + 45)
+                * -16,
+                270 * -16,
             )
-
 
     def draw_ball(self, painter, ball: Ball):
         """Draw the ball
