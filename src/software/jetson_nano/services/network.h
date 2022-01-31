@@ -18,7 +18,8 @@ class NetworkService : public Service
      * @param vision_listener_port The port to listen for vision protos
      * @param primitive_listener_port The port to listen for primitive protos
      * @param robot_status_sender_port The port to send robot status
-     * @param multicast  If true, then the provided IP address is a multicast address and we should join the group
+     * @param multicast  If true, then the provided IP address is a multicast address and
+     * we should join the group
      */
     NetworkService(const std::string& ip_address, unsigned short vision_listener_port,
                    unsigned short primitive_listener_port,
@@ -39,7 +40,7 @@ class NetworkService : public Service
     /**
      * When the network service is polled, it sends the robot_status and returns
      * a tuple of the most recent PrimitiveSet and Vision
-     * 
+     *
      * @returns a tuple of the stored primitive_set and vision
      */
     std::tuple<TbotsProto::PrimitiveSet, TbotsProto::Vision> poll(
