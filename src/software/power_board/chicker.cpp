@@ -2,10 +2,14 @@
 
 hw_timer_t * timer = NULL; 
 
-#define GPIO_PIN 18
+const int GPIO_PIN = 18;
 
+/**
+ * Creates a pulse for a given duration.
+ *
+ * @param duration the duration of the pulse in microseconds.
+ */
 void oneShotPulse(int duration) {
-  // set timer to turn off pulse after duration in microseconds
   timerWrite(timer, 0);
   timerAlarmWrite(timer, duration, false); 
   timerAlarmEnable(timer);
@@ -13,6 +17,9 @@ void oneShotPulse(int duration) {
   digitalWrite(GPIO_PIN, HIGH);
 }
 
+/**
+ * Helper function that ends a pulse.
+ */
 void IRAM_ATTR stopPulse() {
   digitalWrite(GPIO_PIN, LOW);
 }
@@ -20,13 +27,10 @@ void IRAM_ATTR stopPulse() {
 void setup() {
   pinMode(GPIO_PIN, OUTPUT);
 
-  timer = timerBegin(0, 80, true); // configure for microseconds
+  timer = timerBegin(0, 80, true); 
   timerAttachInterrupt(timer, &stopPulse, true);
 }
 
 void loop() {
-  // delay(3000);
-  // oneShotPulse(1000000); 
-  // delay(5000);
-  // oneShotPulse(500000); 
+
 }
