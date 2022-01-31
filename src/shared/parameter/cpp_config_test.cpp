@@ -230,19 +230,19 @@ class TestAutogenParameterList : public YamlLoadFixture
     void visit_parameters(ParameterVariant paramvar, const YAML::Node& current_config)
     {
         std::visit(overload{[&](std::shared_ptr<const Parameter<int>> param) {
-                                assert_parameter<int>(param, current_config);
+                                assertParameter<int>(param, current_config);
                             },
                             [&](std::shared_ptr<const Parameter<bool>> param) {
-                                assert_parameter<bool>(param, current_config);
+                                assertParameter<bool>(param, current_config);
                             },
                             [&](std::shared_ptr<const Parameter<std::string>> param) {
-                                assert_parameter<std::string>(param, current_config);
+                                assertParameter<std::string>(param, current_config);
                             },
                             [&](std::shared_ptr<const Parameter<double>> param) {
-                                assert_parameter<double>(param, current_config);
+                                assertParameter<double>(param, current_config);
                             },
                             [&](std::shared_ptr<const NumericParameter<unsigned>> param) {
-                                assert_parameter<unsigned>(param, current_config);
+                                assertParameter<unsigned>(param, current_config);
                             },
                             [&](std::shared_ptr<const Config> param) {
                                 const YAML::Node param_node =
@@ -263,8 +263,8 @@ class TestAutogenParameterList : public YamlLoadFixture
      * Internally asserts and creates failures
      */
     template <typename T>
-    void assert_parameter(const std::shared_ptr<const Parameter<T>>& param,
-                          const YAML::Node& config_node)
+    void assertParameter(const std::shared_ptr<const Parameter<T>>& param,
+                         const YAML::Node& config_node)
     {
         try
         {
@@ -306,7 +306,7 @@ class TestParameterMutation : public YamlLoadFixture
      *
      * Some parameters such as example_enum_param has a specific value set
      */
-    void mutate_all_parameters(MutableParameterVariant paramvar)
+    void mutateAllParameters(MutableParameterVariant paramvar)
     {
         static std::set<MutableParameterVariant> visited;
         visited.insert(paramvar);
@@ -341,7 +341,7 @@ class TestParameterMutation : public YamlLoadFixture
                                     if (visited.find(v) == visited.end())
                                     {
                                         // Only mutate once per parameter
-                                        mutate_all_parameters(v);
+                                        mutateAllParameters(v);
                                     }
                                 }
                             }},
@@ -352,7 +352,7 @@ class TestParameterMutation : public YamlLoadFixture
      * Tests that the mutations in the mutable parameter list tree are propagated to
      * the immutable tree, and that constant parameters have not changed
      */
-    void assert_mutation(ParameterVariant paramvar, const YAML::Node& current_config)
+    void assertMutation(ParameterVariant paramvar, const YAML::Node& current_config)
     {
         std::visit(
             overload{[&](std::shared_ptr<const NumericParameter<int>> param) {
@@ -451,7 +451,7 @@ class TestParameterMutation : public YamlLoadFixture
                              findParamNode(current_config, param->name());
                          for (auto& v : param->getParameterList())
                          {
-                             assert_mutation(v, param_node);
+                             assertMutation(v, param_node);
                          }
                      }},
             paramvar);
@@ -468,8 +468,8 @@ TEST_F(TestParameterMutation, DynamicParametersTest)
     const std::shared_ptr<const ThunderbotsConfig> dynamic_params =
         std::const_pointer_cast<const ThunderbotsConfig>(mutable_dynamic_parameters);
 
-    mutate_all_parameters(mutable_dynamic_parameters);
-    assert_mutation(dynamic_params, config_yaml);
+    mutateAllParameters(mutable_dynamic_parameters);
+    assertMutation(dynamic_params, config_yaml);
 }
 
 TEST_F(TestParameterMutation, ProtoGenerationTest)
@@ -483,7 +483,7 @@ TEST_F(TestParameterMutation, ProtoGenerationTest)
         std::const_pointer_cast<const ThunderbotsConfig>(mutable_dynamic_parameters);
 
     // Mutate all the parameters
-    mutate_all_parameters(mutable_dynamic_parameters);
+    mutateAllParameters(mutable_dynamic_parameters);
 
     // Save as a proto
     auto proto = mutable_dynamic_parameters->toProto();
@@ -495,5 +495,5 @@ TEST_F(TestParameterMutation, ProtoGenerationTest)
     // Load top level config from the proto and make sure that the mutations across all
     // configs are reflected
     mutable_dynamic_param_loaded_from_proto->loadFromProto(proto);
-    assert_mutation(mutable_dynamic_param_loaded_from_proto, config_yaml);
+    assertMutation(mutable_dynamic_param_loaded_from_proto, config_yaml);
 }
