@@ -87,8 +87,9 @@ class EuclideanToFourWheel
      * @param target_euclidean_velocity The target Euclidean velocity.
      * @return The equivalent wheel speeds.
      */
-    WheelSpace_t get_target_wheel_speeds(EuclideanSpace_t target_euclidean_velocity,
-                                         const WheelSpace_t& current_wheel_speeds);
+    WheelSpace_t get_target_wheel_speeds(
+        const EuclideanSpace_t &target_euclidean_velocity,
+        const WheelSpace_t &current_wheel_speeds);
 
    private:
     /**
@@ -148,7 +149,7 @@ class EuclideanToFourWheel
      * @param wheel_speeds The measured wheel speeds.
      * @return The equivalent robot Euclidean velocity.
      */
-    EuclideanSpace_t get_euclidean_velocity_(const WheelSpace_t& wheel_speeds);
+    EuclideanSpace_t get_euclidean_velocity_(const WheelSpace_t &wheel_speeds);
 
     /**
      * Gets the target Euclidean acceleration.
@@ -157,8 +158,9 @@ class EuclideanToFourWheel
      * @param target_velocity The target velocity.
      * @return The Euclidean acceleration.
      */
-    EuclideanSpace_t get_euclidean_acceleration_(const EuclideanSpace_t& initial_velocity,
-                                                 const EuclideanSpace_t& target_velocity) const;
+    EuclideanSpace_t get_euclidean_acceleration_(
+        const EuclideanSpace_t &initial_velocity,
+        const EuclideanSpace_t &target_velocity) const;
 
     /**
      * Gets the translational wheel forces.
@@ -166,7 +168,8 @@ class EuclideanToFourWheel
      * @param target_acceleration The target Euclidean acceleration.
      * @return The target translational wheel forces.
      */
-    WheelSpace_t get_translational_wheel_forces_(EuclideanSpace_t target_acceleration) const;
+    WheelSpace_t get_translational_wheel_forces_(
+        EuclideanSpace_t target_acceleration) const;
 
     /**
      * Gets the rotational wheel forces.
@@ -182,5 +185,5 @@ class EuclideanToFourWheel
      * @param target_wheel_forces The target wheel forces.
      * @return The target wheel speed delta.
      */
-    WheelSpace_t get_wheel_speeds_delta_(const WheelSpace_t& target_wheel_forces);
+    WheelSpace_t get_wheel_speeds_delta_(const WheelSpace_t &target_wheel_forces);
 };

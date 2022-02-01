@@ -77,7 +77,8 @@ EuclideanToFourWheel::EuclideanToFourWheel(double front_wheel_angle_deg,
 }
 
 WheelSpace_t EuclideanToFourWheel::get_target_wheel_speeds(
-    EuclideanSpace_t target_euclidean_velocity, const WheelSpace_t& current_wheel_speeds)
+    const EuclideanSpace_t &target_euclidean_velocity,
+    const WheelSpace_t &current_wheel_speeds)
 {
     // calculate current Euclidean velocity
     auto current_euclidean_velocity = get_euclidean_velocity_(current_wheel_speeds);
@@ -102,13 +103,15 @@ WheelSpace_t EuclideanToFourWheel::get_target_wheel_speeds(
     return current_wheel_speeds + delta_wheel_speeds;
 }
 
-EuclideanSpace_t EuclideanToFourWheel::get_euclidean_velocity_(const WheelSpace_t& wheel_speeds)
+EuclideanSpace_t EuclideanToFourWheel::get_euclidean_velocity_(
+    const WheelSpace_t &wheel_speeds)
 {
     return wheel_speed_to_euclidean_velocity_D_inverse_ * wheel_speeds;
 }
 
 EuclideanSpace_t EuclideanToFourWheel::get_euclidean_acceleration_(
-    const EuclideanSpace_t& initial_velocity, const EuclideanSpace_t& target_velocity) const
+    const EuclideanSpace_t &initial_velocity,
+    const EuclideanSpace_t &target_velocity) const
 {
     return (target_velocity - initial_velocity) / delta_t_;
 }
@@ -152,7 +155,7 @@ WheelSpace_t EuclideanToFourWheel::get_rotational_wheel_forces_(
 }
 
 WheelSpace_t EuclideanToFourWheel::get_wheel_speeds_delta_(
-    const WheelSpace_t& target_wheel_forces)
+    const WheelSpace_t &target_wheel_forces)
 {
     return delta_t_ * wheel_force_to_delta_wheel_speed_D_C_alpha_ * target_wheel_forces;
 }
