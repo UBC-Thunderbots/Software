@@ -93,6 +93,8 @@ class MotorService : public Service
     void runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_samples);
 
    private:
+    void startDriver(uint8_t motor);
+    void startController(uint8_t motor);
     /**
      * Configuration TODO
      */
@@ -150,4 +152,6 @@ class MotorService : public Service
 
     // Motor State
     MotorState motor_state_[5];
+
+    std::unordered_map<int, bool> encoder_calibrated_;
 };

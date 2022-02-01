@@ -56,10 +56,6 @@ class Thunderloop
     std::unique_ptr<NetworkService> network_service_;
 
    private:
-    /*
-     * Run the main robot loop once.
-     */
-    void runOnce();
 
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;
