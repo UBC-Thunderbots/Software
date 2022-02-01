@@ -25,7 +25,6 @@ void NetworkService::start()
 {
     // TODO (#2436) remove
 }
-NetworkService::~NetworkService() {}
 
 std::tuple<TbotsProto::PrimitiveSet, TbotsProto::Vision> NetworkService::poll(
     const TbotsProto::RobotStatus& robot_status)

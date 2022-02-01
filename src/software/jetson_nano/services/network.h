@@ -25,8 +25,6 @@ class NetworkService : public Service
                    unsigned short primitive_listener_port,
                    unsigned short robot_status_sender_port, bool multicast);
 
-    virtual ~NetworkService();
-
     /**
      * Starts the network service
      */
