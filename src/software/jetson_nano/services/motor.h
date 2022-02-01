@@ -72,7 +72,6 @@ class MotorService : public Service
     uint8_t tmc4671ReadWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
     uint8_t tmc6100ReadWriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer);
 
-
     /*
      * For FOC to work, the controller needs to know the electical angle of the motor
      * relative to the mechanical angle of the motor. In an incremental-encoder-only
@@ -82,14 +81,30 @@ class MotorService : public Service
      * function at 1ms intervals to perform this operation.
      *
      * WARNING: Do not try to spin the motor without initializing the encoder!
-     *          The motor can overheat.
+     *          The motor can overheat if the TMC4671 doesn't auto shut-off
      *
-     * @param ms_tick The tick (ms) this function is being called at.
+     * @param motor The motor
      */
-    void startEncoderCalibration();
-    void stepEncoderCalibration(uint32_t ms_tick);
+    void calibrateEncoder(uint8_t motor);
+
+    /**
+     * TODO
+     */
+    void runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_samples);
 
    private:
+
+    /**
+     * Configuration TODO
+     */
+    void configurePWM(uint8_t motor);
+    void configurePI(uint8_t motor);
+    void configureADC(uint8_t motor);
+    void configureEncoder(uint8_t motor);
+
+    void writeToControllerOrDieTrying(uint8_t motor, uint8_t address, int32_t value);
+    void writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int32_t value);
+
     /**
      * Trigger an SPI transfer over an open SPI connection
      *
