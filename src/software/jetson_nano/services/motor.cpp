@@ -19,10 +19,11 @@
 extern "C"
 {
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671.h"
+#include "external/trinamic/tmc/ic/TMC4671/TMC4671_Variants.h"
 #include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
 
     // SPI Configs
-    static uint32_t SPI_SPEED_HZ = 200000;
+    static uint32_t SPI_SPEED_HZ = 400000;
     static uint8_t SPI_BITS      = 8;
     static uint32_t SPI_MODE     = 0x3u;
 
@@ -288,11 +289,24 @@ void MotorService::start()
     tmc4671_writeInt(0, TMC4671_PWM_BBM_H_BBM_L, 0x00002828);
     tmc4671_writeInt(0, TMC4671_PWM_SV_CHOP, 0x00000107);
 
+    // 00100100 00000000 00000001 00000000
+    // 00011000 00000000 00000001 00000000
+    // 00000001 00000000 00000001 00000000
+
     // ADC configuration
-    tmc4671_writeInt(0, TMC4671_ADC_I_SELECT, 0x09000100);
-    tmc4671_writeInt(0, TMC4671_dsADC_MCFG_B_MCFG_A, 0x00100010);
-    tmc4671_writeInt(0, TMC4671_dsADC_MCLK_A, 0x20000000);
-    tmc4671_writeInt(0, TMC4671_dsADC_MCLK_B, 0x20000000);
+    LOGF(DEBUG, "BEFORE %x", (tmc4671_readInt(0, TMC4671_ADC_I_SELECT)));
+    tmc4671_writeInt(0, TMC4671_ADC_I_SELECT, 0x00000100);
+    LOGF(DEBUG, "BEFORE %x", (tmc4671_readInt(0, TMC4671_ADC_I_SELECT)));
+    tmc4671_writeInt(0, TMC4671_ADC_I_SELECT, 0x01800100);
+    LOGF(DEBUG, "BEFORE %x", (tmc4671_readInt(0, TMC4671_ADC_I_SELECT)));
+    tmc4671_writeInt(0, TMC4671_ADC_I_SELECT, 0x01800100);
+    LOGF(DEBUG, "BEFORE %x", (tmc4671_readInt(0, TMC4671_ADC_I_SELECT)));
+    tmc4671_writeInt(0, TMC4671_ADC_I_SELECT, 0x01800100);
+    LOGF(DEBUG, "BEFORE %x", (tmc4671_readInt(0, TMC4671_ADC_I_SELECT)));
+    tmc4671_writeInt(0, TMC4671_ADC_I_SELECT, 0x01800100);
+    LOGF(DEBUG, "BEFORE %x", (tmc4671_readInt(0, TMC4671_ADC_I_SELECT)));
+    tmc4671_writeInt(0, TMC4671_ADC_I_SELECT, 0x01800100);
+    LOGF(DEBUG, "AFTER %x", (tmc4671_readInt(0, TMC4671_ADC_I_SELECT)));
     tmc4671_writeInt(0, TMC4671_dsADC_MDEC_B_MDEC_A, 0x014E014E);
     tmc4671_writeInt(0, TMC4671_ADC_I0_SCALE_OFFSET, 0x010081DD);
     tmc4671_writeInt(0, TMC4671_ADC_I1_SCALE_OFFSET, 0x0100818E);
@@ -310,46 +324,96 @@ void MotorService::start()
     tmc4671_writeInt(0, TMC4671_PID_TORQUE_P_TORQUE_I, 0x01000100);
     tmc4671_writeInt(0, TMC4671_PID_FLUX_P_FLUX_I, 0x01000100);
 
-    // ===== ABN encoder test drive =====
+    // Open loop settings
+    tmc4671_writeInt(0, TMC4671_OPENLOOP_MODE, 0x00000000);
+    tmc4671_writeInt(0, TMC4671_OPENLOOP_ACCELERATION, 0x0000003C);
+    tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0xFFFFFFFB);
 
-    // Init encoder (mode 0)
+    // Feedback selection
+    tmc4671_writeInt(0, TMC4671_PHI_E_SELECTION, 0x00000002);
+    tmc4671_writeInt(0, TMC4671_UQ_UD_EXT, 0x00000779);
+
+    // ===== Open loop test drive =====
+    // Switch to open loop velocity mode
     tmc4671_writeInt(0, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000008);
-    tmc4671_writeInt(0, TMC4671_ABN_DECODER_PHI_E_PHI_M_OFFSET, 0x00000000);
-    tmc4671_writeInt(0, TMC4671_PHI_E_SELECTION, 0x00000001);
-    tmc4671_writeInt(0, TMC4671_PHI_E_EXT, 0x00000000);
-    tmc4671_writeInt(0, TMC4671_UQ_UD_EXT, 0x000007D0);
-    sleep(1);
-    tmc4671_writeInt(0, TMC4671_ABN_DECODER_COUNT, 0x00000000);
+
+    // Rotate right
+    tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000004A);
+
+
+    for (int k = 0; k < 1000; k++)
+    {
+        int estimated_phi  = tmc4671_readInt(0, TMC4671_OPENLOOP_PHI);
+        int actual_encoder = tmc4671_readRegister16BitValue(
+            0, TMC4671_ABN_DECODER_PHI_E_PHI_M, BIT_16_TO_31);
+
+        LOG(CSV, "encoder_calibration.csv")
+            << actual_encoder << "," << estimated_phi << "\n";
+    }
+
+    // Stop
+    tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
+    sleep(2);
+
+    // Rotate right
+    tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000003A);
+
+    LOG(CSV, "phase_currents_and_voltages.csv")
+        << "adc_iv,adc_ux,adc_wy,pwm_iv,pwm_ux,pwm_wy\n";
+
+    for (int k = 0; k < 1000; k++)
+    {
+        int16_t adc_iv = tmc4671_readRegister16BitValue(0, TMC4671_ADC_IV, BIT_0_TO_15);
+        int16_t adc_ux =
+            tmc4671_readRegister16BitValue(0, TMC4671_ADC_IWY_IUX, BIT_0_TO_15);
+        int16_t adc_wy =
+            tmc4671_readRegister16BitValue(0, TMC4671_ADC_IWY_IUX, BIT_16_TO_31);
+
+        tmc4671_writeInt(0, TMC4671_INTERIM_ADDR, INTERIM_ADDR_PWM_UV);
+        int16_t pwm_iv = tmc4671_readRegister16BitValue(0, TMC4671_INTERIM_DATA, BIT_0_TO_15);
+
+        tmc4671_writeInt(0, TMC4671_INTERIM_ADDR, INTERIM_ADDR_PWM_WY_UX);
+        int16_t pwm_ux =
+            tmc4671_readRegister16BitValue(0, TMC4671_INTERIM_DATA, BIT_0_TO_15);
+        int16_t pwm_wy =
+            tmc4671_readRegister16BitValue(0, TMC4671_INTERIM_DATA, BIT_16_TO_31);
+
+        LOG(CSV, "phase_currents_and_voltages.csv")
+            << adc_iv << "," << adc_ux << "," << adc_wy << "," << pwm_iv << "," << pwm_ux
+            << "," << pwm_wy << "\n";
+    }
+
+    // Stop
+    tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
+    sleep(2);
+
+    tmc4671_writeInt(0, TMC4671_UQ_UD_EXT, 0x00000000);
 
     // Simone Parameters
-    tmc4671_writeInt(0, TMC4671_PID_FLUX_P_FLUX_I, 67109376);
-    tmc4671_writeInt(0, TMC4671_PID_TORQUE_P_TORQUE_I, 67109376);
-    tmc4671_writeInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I, 52428800);
-    tmc4671_writeInt(0, TMC4671_PID_POSITION_P_POSITION_I, 0);
+    // tmc4671_writeInt(0, TMC4671_PID_FLUX_P_FLUX_I, 67109376);
+    // tmc4671_writeInt(0, TMC4671_PID_TORQUE_P_TORQUE_I, 67109376);
+    // tmc4671_writeInt(0, TMC4671_PID_VELOCITY_P_VELOCITY_I, 52428800);
+    // tmc4671_writeInt(0, TMC4671_PID_POSITION_P_POSITION_I, 0);
 
-    tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS, 0);
-    tmc4671_writeInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS, 32767);
-    tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS, 5000);
-    tmc4671_writeInt(0, TMC4671_PID_ACCELERATION_LIMIT, 15000);
-    tmc4671_writeInt(0, TMC4671_PID_VELOCITY_LIMIT, 4000);
-    tmc4671_writeInt(0, TMC4671_PID_POSITION_LIMIT_LOW, -2147483647);
-    tmc4671_writeInt(0, TMC4671_PID_POSITION_LIMIT_HIGH, 2147483647);
+    // tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS, 0);
+    // tmc4671_writeInt(0, TMC4671_PIDOUT_UQ_UD_LIMITS, 32767);
+    // tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS, 5000);
+    // tmc4671_writeInt(0, TMC4671_PID_ACCELERATION_LIMIT, 15000);
+    // tmc4671_writeInt(0, TMC4671_PID_VELOCITY_LIMIT, 4000);
+    // tmc4671_writeInt(0, TMC4671_PID_POSITION_LIMIT_LOW, -2147483647);
+    // tmc4671_writeInt(0, TMC4671_PID_POSITION_LIMIT_HIGH, 2147483647);
+    // tmc4671_writeInt(0, TMC4671_UQ_UD_EXT, 0x00000000);
 
-    LOG(DEBUG) << "SET SIMONE PARAMS, 2 seconds";
-    sleep(2);
+    // LOG(DEBUG) << "SET SIMONE PARAMS, 2 seconds";
 
-    tmc4671_setTargetVelocity(0, 500);
-    sleep(2);
-    LOG(DEBUG) << "SOME DIR";
+    // tmc4671_writeInt(0, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_ABN);
+    // tmc4671_setTargetVelocity(0, 2);
+    // sleep(2);
+    // LOG(DEBUG) << "SOME DIR";
 
-    tmc4671_setTargetVelocity(0, 0);
-    sleep(2);
-    LOG(DEBUG) << "BACK DIR";
-
-    tmc4671_setTargetVelocity(0, -500);
-    sleep(2);
-    LOG(DEBUG) << "DONE";
-
+    // tmc4671_setTargetVelocity(0, 0);
+    // sleep(2);
+    // LOG(DEBUG) << "STOP";
 
     LOGF(WARNING, "Power stage status %x",
          tmc6100_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GSTAT));
