@@ -53,10 +53,9 @@ typedef Eigen::Vector3d EuclideanSpace_t;
  * Vector representation of the robot wheel space.
  *
  * 0: Front Right
- * 1: Back Right
+ * 1: Front Left
  * 2: Back Left
- * 3: Front Left
- * TODO: Verify wheel orientations
+ * 3: Back Right
  */
 typedef Eigen::Vector4d WheelSpace_t;
 
@@ -126,7 +125,7 @@ class EuclideanToFourWheel
     /**
      * Wheel force to wheel speed delta [m/s].
      */
-    Eigen::Matrix4f wheel_force_to_delta_wheel_speed_D_C_alpha_;
+    Eigen::Matrix4d wheel_force_to_delta_wheel_speed_D_C_alpha_;
 
     /**
      * Euclidean acceleration to wheel force coupling matrix.

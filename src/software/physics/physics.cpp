@@ -157,5 +157,5 @@ WheelSpace_t EuclideanToFourWheel::get_rotational_wheel_forces_(
 WheelSpace_t EuclideanToFourWheel::get_wheel_speeds_delta_(
     const WheelSpace_t &target_wheel_forces)
 {
-    return delta_t_ * wheel_force_to_delta_wheel_speed_D_C_alpha_ * target_wheel_forces;
+    return delta_t_ * (wheel_force_to_delta_wheel_speed_D_C_alpha_ * target_wheel_forces);
 }
