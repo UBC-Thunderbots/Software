@@ -93,3 +93,8 @@ std::unique_ptr<TbotsProto::Timestamp> createTimestamp(const Timestamp& timestam
  * @return The unique_ptr to a TbotsProto::Timestamp with the current UTC time
  */
 std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp();
+
+/**
+ * TODO
+ */
+RobotState createRobotStateFromProto(const TbotsProto::RobotState robot_state);

@@ -8,6 +8,7 @@
 #include "shared/constants.h"
 #include "software/jetson_nano/primitive_executor.h"
 #include "software/jetson_nano/services/motor.h"
+#include "software/jetson_nano/services/network.h"
 #include "software/logger/logger.h"
 #include "software/world/robot_state.h"
 
@@ -52,6 +53,7 @@ class Thunderloop
 
     // Services
     std::unique_ptr<MotorService> motor_service_;
+    std::unique_ptr<NetworkService> network_service_;
 
    private:
     /*
@@ -63,6 +65,9 @@ class Thunderloop
     PrimitiveExecutor primitive_executor_;
 
     // Input Msg Buffers
+    TbotsProto::PrimitiveSet primitive_set_;
+    TbotsProto::Vision vision_;
+    TbotsProto::RobotState robot_state_;
     TbotsProto::Primitive primitive_;
     TbotsProto::DirectControlPrimitive direct_control_;
 
@@ -75,6 +80,6 @@ class Thunderloop
     // Current State
     RobotConstants_t robot_constants_;
     WheelConstants_t wheel_consants_;
-    std::unique_ptr<RobotState> current_robot_state_;
     unsigned robot_id_;
+    unsigned channel_id_;
 };

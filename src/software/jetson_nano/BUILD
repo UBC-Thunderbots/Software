@@ -21,6 +21,7 @@ cc_library(
         ":primitive_executor",
         "//proto:tbots_cc_proto",
         "//software/jetson_nano/services:motor",
+        "//software/jetson_nano/services:network",
     ],
 )
 

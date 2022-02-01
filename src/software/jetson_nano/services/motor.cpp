@@ -305,71 +305,71 @@ void MotorService::start()
     tmc4671_writeInt(0, TMC4671_PID_TORQUE_FLUX_LIMITS, 0x000003E8);
 
     //// PI settings
-    //tmc4671_writeInt(0, TMC4671_PID_TORQUE_P_TORQUE_I, 0x01000100);
-    //tmc4671_writeInt(0, TMC4671_PID_FLUX_P_FLUX_I, 0x01000100);
+    // tmc4671_writeInt(0, TMC4671_PID_TORQUE_P_TORQUE_I, 0x01000100);
+    // tmc4671_writeInt(0, TMC4671_PID_FLUX_P_FLUX_I, 0x01000100);
 
     //// Open loop settings
-    //tmc4671_writeInt(0, TMC4671_OPENLOOP_MODE, 0x00000000);
-    //tmc4671_writeInt(0, TMC4671_OPENLOOP_ACCELERATION, 0x0000003C);
-    //tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0xFFFFFFFB);
+    // tmc4671_writeInt(0, TMC4671_OPENLOOP_MODE, 0x00000000);
+    // tmc4671_writeInt(0, TMC4671_OPENLOOP_ACCELERATION, 0x0000003C);
+    // tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0xFFFFFFFB);
 
     //// Feedback selection
-    //tmc4671_writeInt(0, TMC4671_PHI_E_SELECTION, 0x00000002);
-    //tmc4671_writeInt(0, TMC4671_UQ_UD_EXT, 0x00000779);
+    // tmc4671_writeInt(0, TMC4671_PHI_E_SELECTION, 0x00000002);
+    // tmc4671_writeInt(0, TMC4671_UQ_UD_EXT, 0x00000779);
 
     //// ===== Open loop test drive =====
     //// Switch to open loop velocity mode
-    //tmc4671_writeInt(0, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000008);
+    // tmc4671_writeInt(0, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000008);
 
     //// Rotate right
-    //tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000004A);
+    // tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000004A);
 
-    //for (int k = 0; k < 1000; k++)
+    // for (int k = 0; k < 1000; k++)
     //{
-        //int estimated_phi  = tmc4671_readInt(0, TMC4671_OPENLOOP_PHI);
-        //int actual_encoder = tmc4671_readRegister16BitValue(
-            //0, TMC4671_ABN_DECODER_PHI_E_PHI_M, BIT_16_TO_31);
+    // int estimated_phi  = tmc4671_readInt(0, TMC4671_OPENLOOP_PHI);
+    // int actual_encoder = tmc4671_readRegister16BitValue(
+    // 0, TMC4671_ABN_DECODER_PHI_E_PHI_M, BIT_16_TO_31);
 
-        //LOG(CSV, "encoder_calibration.csv")
-            //<< actual_encoder << "," << estimated_phi << "\n";
+    // LOG(CSV, "encoder_calibration.csv")
+    //<< actual_encoder << "," << estimated_phi << "\n";
     //}
 
     //// Stop
-    //tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
-    //sleep(2);
+    // tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
+    // sleep(2);
 
     //// Rotate right
-    //tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000003A);
+    // tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x0000003A);
 
-    //LOG(CSV, "phase_currents_and_voltages.csv")
-        //<< "adc_iv,adc_ux,adc_wy,pwm_iv,pwm_ux,pwm_wy\n";
+    // LOG(CSV, "phase_currents_and_voltages.csv")
+    //<< "adc_iv,adc_ux,adc_wy,pwm_iv,pwm_ux,pwm_wy\n";
 
-    //for (int k = 0; k < 1000; k++)
+    // for (int k = 0; k < 1000; k++)
     //{
-        //int16_t adc_iv = tmc4671_readRegister16BitValue(0, TMC4671_ADC_IV, BIT_0_TO_15);
-        //int16_t adc_ux =
-            //tmc4671_readRegister16BitValue(0, TMC4671_ADC_IWY_IUX, BIT_0_TO_15);
-        //int16_t adc_wy =
-            //tmc4671_readRegister16BitValue(0, TMC4671_ADC_IWY_IUX, BIT_16_TO_31);
+    // int16_t adc_iv = tmc4671_readRegister16BitValue(0, TMC4671_ADC_IV, BIT_0_TO_15);
+    // int16_t adc_ux =
+    // tmc4671_readRegister16BitValue(0, TMC4671_ADC_IWY_IUX, BIT_0_TO_15);
+    // int16_t adc_wy =
+    // tmc4671_readRegister16BitValue(0, TMC4671_ADC_IWY_IUX, BIT_16_TO_31);
 
-        //tmc4671_writeInt(0, TMC4671_INTERIM_ADDR, INTERIM_ADDR_PWM_UV);
-        //int16_t pwm_iv =
-            //tmc4671_readRegister16BitValue(0, TMC4671_INTERIM_DATA, BIT_0_TO_15);
+    // tmc4671_writeInt(0, TMC4671_INTERIM_ADDR, INTERIM_ADDR_PWM_UV);
+    // int16_t pwm_iv =
+    // tmc4671_readRegister16BitValue(0, TMC4671_INTERIM_DATA, BIT_0_TO_15);
 
-        //tmc4671_writeInt(0, TMC4671_INTERIM_ADDR, INTERIM_ADDR_PWM_WY_UX);
-        //int16_t pwm_ux =
-            //tmc4671_readRegister16BitValue(0, TMC4671_INTERIM_DATA, BIT_0_TO_15);
-        //int16_t pwm_wy =
-            //tmc4671_readRegister16BitValue(0, TMC4671_INTERIM_DATA, BIT_16_TO_31);
+    // tmc4671_writeInt(0, TMC4671_INTERIM_ADDR, INTERIM_ADDR_PWM_WY_UX);
+    // int16_t pwm_ux =
+    // tmc4671_readRegister16BitValue(0, TMC4671_INTERIM_DATA, BIT_0_TO_15);
+    // int16_t pwm_wy =
+    // tmc4671_readRegister16BitValue(0, TMC4671_INTERIM_DATA, BIT_16_TO_31);
 
-        //LOG(CSV, "phase_currents_and_voltages.csv")
-            //<< adc_iv << "," << adc_ux << "," << adc_wy << "," << pwm_iv << "," << pwm_ux
-            //<< "," << pwm_wy << "\n";
+    // LOG(CSV, "phase_currents_and_voltages.csv")
+    //<< adc_iv << "," << adc_ux << "," << adc_wy << "," << pwm_iv << "," << pwm_ux
+    //<< "," << pwm_wy << "\n";
     //}
 
     //// Stop
-    //tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
-    //sleep(2);
+    // tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
+    // sleep(2);
 
     // ENCODER CALIBRATION
     tmc4671_writeInt(0, TMC4671_MODE_RAMP_MODE_MOTION, 0x00000008);
@@ -397,79 +397,12 @@ void MotorService::start()
     tmc4671_writeInt(0, TMC4671_PID_POSITION_LIMIT_HIGH, 2147483647);
     tmc4671_writeInt(0, TMC4671_UQ_UD_EXT, 0x00000000);
 
-     LOG(DEBUG) << "SET SIMONE PARAMS, 2 seconds";
+    LOG(DEBUG) << "SET SIMONE PARAMS, 2 seconds";
 
-     tmc4671_writeInt(0, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_ABN);
-     tmc4671_setTargetVelocity(0, 500);
-     sleep(2);
-     LOG(DEBUG) << "SOME DIR";
-
-     tmc4671_setTargetVelocity(0, 0);
-     sleep(2);
-     LOG(DEBUG) << "STOP";
-
-     tmc4671_setTargetVelocity(0, -500);
-     sleep(2);
-     LOG(DEBUG) << "SOME DIR";
-
-     tmc4671_setTargetVelocity(0, 0);
-     sleep(2);
-     LOG(DEBUG) << "STOP";
-
-     tmc4671_setTargetVelocity(0, 1000);
-     sleep(2);
-     LOG(DEBUG) << "SOME DIR";
-
-     tmc4671_setTargetVelocity(0, 0);
-     sleep(2);
-     LOG(DEBUG) << "STOP";
-
-     tmc4671_setTargetVelocity(0, -1000);
-     sleep(2);
-     LOG(DEBUG) << "SOME DIR";
-
-     tmc4671_setTargetVelocity(0, 0);
-     sleep(2);
-     LOG(DEBUG) << "STOP";
-
-     tmc4671_setTargetVelocity(0, 2000);
-     sleep(2);
-     LOG(DEBUG) << "SOME DIR";
-
-     tmc4671_setTargetVelocity(0, 0);
-     sleep(2);
-     LOG(DEBUG) << "STOP";
-
-     tmc4671_setTargetVelocity(0, -2000);
-     sleep(2);
-     LOG(DEBUG) << "SOME DIR";
-
-     tmc4671_setTargetVelocity(0, 0);
-     sleep(2);
-     LOG(DEBUG) << "STOP";
-
-     tmc4671_setTargetVelocity(0, 3000);
-     sleep(2);
-     LOG(DEBUG) << "SOME DIR";
-
-     tmc4671_setTargetVelocity(0, 0);
-     sleep(2);
-     LOG(DEBUG) << "STOP";
-
-     tmc4671_setTargetVelocity(0, -3000);
-     sleep(2);
-     LOG(DEBUG) << "SOME DIR";
-
-     tmc4671_setTargetVelocity(0, 0);
-     sleep(2);
-     LOG(DEBUG) << "STOP";
-
-     LOGF(WARNING, "Power stage status %x",
-          tmc6100_readInt(FRONT_LEFT_MOTOR_CHIP_SELECT, TMC6100_GSTAT));
-
-     LOGF(DEBUG, "GPIO CONFIG: %x", tmc4671_readInt(0, TMC4671_GPIO_dsADCI_CONFIG));
+    tmc4671_writeInt(0, TMC4671_PHI_E_SELECTION, TMC4671_PHI_E_ABN);
+    tmc4671_setTargetVelocity(0, 500);
+    sleep(2);
 }
-
 
 void MotorService::stop()
 {

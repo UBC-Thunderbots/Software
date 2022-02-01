@@ -321,3 +321,11 @@ std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp()
     timestamp_msg->set_epoch_timestamp_seconds(time_in_seconds);
     return timestamp_msg;
 }
+
+RobotState createRobotStateFromProto(const TbotsProto::RobotState robot_state)
+{
+    return RobotState(createPoint(robot_state.global_position()),
+                      createVector(robot_state.global_velocity()),
+                      createAngle(robot_state.global_orientation()),
+                      createAngularVelocity(robot_state.global_angular_velocity()));
+}

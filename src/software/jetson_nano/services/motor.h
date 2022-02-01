@@ -93,7 +93,6 @@ class MotorService : public Service
     void runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_samples);
 
    private:
-
     /**
      * Configuration TODO
      */
