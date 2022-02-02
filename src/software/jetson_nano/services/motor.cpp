@@ -148,7 +148,7 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
         {
             // TODO (#2335) convert local velocity to per-wheel velocity
             // using http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf and then
-            // communicate velocities to trinamic. 
+            // communicate velocities to trinamic.
             break;
         }
         case TbotsProto::DirectControlPrimitive::WheelControlCase::WHEEL_CONTROL_NOT_SET:
