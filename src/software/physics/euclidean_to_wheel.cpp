@@ -15,11 +15,11 @@ EuclideanToWheel::EuclideanToWheel()
     delta_t_ = 1. / 200;
 
     // import robot constants
-    robot_mass_M_            = robot_constants.mass_kg;
-    robot_radius_R_          = robot_constants.robot_radius_m;
-    inertial_factor_alpha_   = robot_constants.inertial_factor;
-    front_wheel_angle_phi_   = robot_constants.front_wheel_angle_deg * M_PI / 180.;
-    rear_wheel_angle_theta_  = (robot_constants.back_wheel_angle_deg - 90.) * M_PI / 180.;
+    robot_mass_M_           = robot_constants.mass_kg;
+    robot_radius_R_         = robot_constants.robot_radius_m;
+    inertial_factor_alpha_  = robot_constants.inertial_factor;
+    front_wheel_angle_phi_  = robot_constants.front_wheel_angle_deg * M_PI / 180.;
+    rear_wheel_angle_theta_ = (robot_constants.back_wheel_angle_deg - 90.) * M_PI / 180.;
 
     // calculate DC_alpha matrix
     // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 17
@@ -74,8 +74,7 @@ WheelSpace_t EuclideanToWheel::getTargetWheelSpeeds(
     return current_wheel_speeds + delta_wheel_speeds;
 }
 
-EuclideanSpace_t EuclideanToWheel::getEuclideanVelocity(
-    const WheelSpace_t &wheel_speeds)
+EuclideanSpace_t EuclideanToWheel::getEuclideanVelocity(const WheelSpace_t &wheel_speeds)
 {
     return wheel_speed_to_euclidean_velocity_D_inverse_ * wheel_speeds;
 }
