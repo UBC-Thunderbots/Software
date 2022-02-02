@@ -10,24 +10,24 @@ function target_wheel_speeds = euclidean_to_wheel(current_wheel_speeds, target_e
 delta_t = 1/200; % s
 robot_mass_M = 2.5; % kg
 robot_radius_R = 0.09; % m
-mass_distribution_alpha = 0.5; % m
-front_wheel_angle_phi = deg2rad(45); % rad
-rear_wheel_angle_theta = deg2rad(55); % rad
+inertial_factor_alpha = 0.37; % m
+front_wheel_angle_phi = deg2rad(57.95); % rad
+rear_wheel_angle_theta = deg2rad(136.04 - 90); % rad
 
 % Wheel force to acceleration coupling matrix
-a = sin(front_wheel_angle_phi).^2 - cos(front_wheel_angle_phi).^2;
+a = sin(front_wheel_angle_phi)^2 - cos(front_wheel_angle_phi)^2;
 b = -sin(front_wheel_angle_phi) * sin(rear_wheel_angle_theta) - cos(front_wheel_angle_phi) * cos(rear_wheel_angle_theta);
-c = -sin(front_wheel_angle_phi) * sin(rear_wheel_angle_theta) + cos(rear_wheel_angle_theta) * cos(rear_wheel_angle_theta);
-d = sin(rear_wheel_angle_theta).^2 - cos(rear_wheel_angle_theta).^2;
+c = -sin(front_wheel_angle_phi) * sin(rear_wheel_angle_theta) + cos(front_wheel_angle_phi) * cos(rear_wheel_angle_theta);
+d = sin(rear_wheel_angle_theta)^2 - cos(rear_wheel_angle_theta)^2;
 
-DC_alpha = 1 / (robot_mass_M*mass_distribution_alpha) * ones(4) + 1 / robot_mass_M * [1 a b c; a 1 c b; b c 1 d; c b d 1];
+DC_alpha = 1 / (robot_mass_M*inertial_factor_alpha) * ones(4) + 1 / robot_mass_M * [1 a b c; a 1 c b; b c 1 d; c b d 1];
 
 % Euclidean velocity to wheel speed coupling matrix
 i = 1 / (2 * sin(front_wheel_angle_phi) + 2 * sin(rear_wheel_angle_theta));
-j = cos(front_wheel_angle_phi) / (2 * cos(front_wheel_angle_phi).^2 + 2 * cos(rear_wheel_angle_theta).^2);
-k = sin(rear_wheel_angle_theta) / (2*sin(front_wheel_angle_phi) + 2 * sin(rear_wheel_angle_theta));
+j = cos(front_wheel_angle_phi) / (2 * cos(front_wheel_angle_phi)^2 + 2 * cos(rear_wheel_angle_theta)^2);
+k = sin(rear_wheel_angle_theta) / (2 * sin(front_wheel_angle_phi) + 2 * sin(rear_wheel_angle_theta));
 
-D_inverse = [-i -i i i; j -j -(1-j) (1-j); k k (1-k) (1-k)];
+D_inverse = [-i -i i i; j -j -(1 - j) (1 - j); k k (1 - k) (1 - k)];
 
 % Step 1: Calculate Euclidean acceleration
 current_euclidean_velocity = D_inverse * current_wheel_speeds;
@@ -43,7 +43,7 @@ ay_select = [1 0; -1 0; 0 -1; 0 1];
 translational_wheel_force = robot_mass_M * (ax_select * ax + ay_select * ay);
 
 % Step 3: Calculate rotational wheel force
-rotational_wheel_force = target_euclidean_acceleration(3) / 4 * mass_distribution_alpha * robot_mass_M * robot_radius_R;
+rotational_wheel_force = target_euclidean_acceleration(3) / 4 * inertial_factor_alpha * robot_mass_M * robot_radius_R;
 
 % Step 4: Sum the wheel forces
 target_wheel_force = translational_wheel_force + rotational_wheel_force;

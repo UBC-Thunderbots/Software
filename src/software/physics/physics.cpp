@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include "shared/2021_robot_constants.h"
+#include "shared/constants.h"
 
 Point calculateFuturePosition(const Point &initial_position,
                               const Vector &initial_velocity,
@@ -38,21 +39,14 @@ EuclideanToFourWheel::EuclideanToFourWheel()
 
     // TODO: replace with Thunderloop polling rate constant
     // Set to period of control loop.
-    delta_t_ = 1.0 / 200;
+    delta_t_ = 1. / 200;
 
     // import robot constants
-
-    robot_mass_M_ = robot_constants.mass_kg;
-    // TODO: get robot radius from robot_constants
-    robot_radius_R_ = 0.2;
-    mass_distribution_alpha_ =
-        robot_constants.moment_of_inertia_kg_m_2 / (robot_mass_M_ * robot_radius_R_);
-    // TODO: get front wheel angle from robot_constants
-    //    front_wheel_angle_phi_ = robot_constants.front_wheel_angle_deg;
-    front_wheel_angle_phi_ = 45 * M_PI / 180.0;
-    // TODO: get rear wheel angle from robot_constants
-    //    rear_wheel_angle_theta_ = robot_constants.back_wheel_angle_deg;
-    rear_wheel_angle_theta_ = 55 * M_PI / 180.0;
+    robot_mass_M_            = robot_constants.mass_kg;
+    robot_radius_R_          = robot_constants.robot_radius_m;
+    inertial_factor_alpha_   = robot_constants.inertial_factor;
+    front_wheel_angle_phi_   = robot_constants.front_wheel_angle_deg * M_PI / 180.;
+    rear_wheel_angle_theta_  = (robot_constants.back_wheel_angle_deg - 90.) * M_PI / 180.;
 
     // calculate coupling matrices
     // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf
@@ -66,8 +60,8 @@ EuclideanToFourWheel::EuclideanToFourWheel()
     e << 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
     Eigen::Matrix4d f;
     f << 1, a, b, c, a, 1, c, b, b, c, 1, d, c, b, d, 1;
-    wheel_force_to_delta_wheel_speed_D_C_alpha_ =
-        1 / (robot_mass_M_ * mass_distribution_alpha_) * e + 1 / robot_mass_M_ * f;
+    wheel_force_to_wheel_speed_delta_D_C_alpha_ =
+        1 / (robot_mass_M_ * inertial_factor_alpha_) * e + 1 / robot_mass_M_ * f;
 
     auto i = 1 / (2 * sin(front_wheel_angle_phi_) + 2 * sin(rear_wheel_angle_theta_));
     auto j = cos(front_wheel_angle_phi_) / (2 * pow(cos(front_wheel_angle_phi_), 2) +
@@ -143,7 +137,7 @@ WheelSpace_t EuclideanToFourWheel::getRotationalWheelForces(
     EuclideanSpace_t target_acceleration) const
 {
     // calculate per wheel rotational force
-    auto rotational_force = target_acceleration(2) / 4 * mass_distribution_alpha_ *
+    auto rotational_force = target_acceleration(2) / 4 * inertial_factor_alpha_ *
                             robot_mass_M_ * robot_radius_R_;
 
     // apply force to each wheel
@@ -156,5 +150,5 @@ WheelSpace_t EuclideanToFourWheel::getRotationalWheelForces(
 WheelSpace_t EuclideanToFourWheel::getWheelSpeedsDelta(
     const WheelSpace_t &target_wheel_forces)
 {
-    return delta_t_ * (wheel_force_to_delta_wheel_speed_D_C_alpha_ * target_wheel_forces);
+    return delta_t_ * (wheel_force_to_wheel_speed_delta_D_C_alpha_ * target_wheel_forces);
 }

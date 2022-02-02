@@ -22,6 +22,9 @@ extern "C"
     {
         RobotConstants_t robot_constants = {
             .mass_kg = 2.5f,  // determined experimentally
+            // TODO: update units
+            .inertial_factor = INERTIAL_FACTOR,
+            .robot_radius_m  = ROBOT_MAX_RADIUS_METERS,
             .moment_of_inertia_kg_m_2 =
                 ROTATIONAL_MASS * ROBOT_MAX_RADIUS_METERS * ROBOT_MAX_RADIUS_METERS,
             // TODO (#2112): update this

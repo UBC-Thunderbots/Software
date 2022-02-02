@@ -244,7 +244,7 @@ namespace TestUtil
         else
         {
             return ::testing::AssertionFailure()
-                   << "Matrix 1 was " << matrix1 << ", matrix 2 was " << matrix2;
+                   << "Matrix 1 was \n" << matrix1 << "\n, matrix 2 was \n" << matrix2;
         }
     }
 };  // namespace TestUtil

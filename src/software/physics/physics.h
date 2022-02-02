@@ -101,7 +101,7 @@ class EuclideanToFourWheel
     /**
      * The mass distribution of the robot [m].
      */
-    double mass_distribution_alpha_{};
+    double inertial_factor_alpha_{};
 
     /**
      * The angle between the hemisphere line of the robot and the front wheel axles
@@ -117,7 +117,7 @@ class EuclideanToFourWheel
     /**
      * Wheel force to wheel speed delta [m/s].
      */
-    Eigen::Matrix4d wheel_force_to_delta_wheel_speed_D_C_alpha_;
+    Eigen::Matrix4d wheel_force_to_wheel_speed_delta_D_C_alpha_;
 
     /**
      * Wheel speed to Euclidean velocity coupling matrix.

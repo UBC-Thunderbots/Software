@@ -118,8 +118,8 @@ TEST_F(EuclideanToFourWheelTest, test_target_wheel_speeds_zero)
 {
     // test +/right
     current_wheel_speeds      = {0, 0, 0, 0};
-    target_euclidean_velocity = {1, 0, 0};
-    expected_wheel_speeds     = {-3.6957, -3.6957, 2.6112, 2.6112};
+    target_euclidean_velocity = {0, 0, 0};
+    expected_wheel_speeds     = {0, 0, 0, 0};
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_wheel_speeds,
@@ -133,7 +133,7 @@ TEST_F(EuclideanToFourWheelTest, test_target_wheel_speeds_x)
     // test +/right
     current_wheel_speeds      = {0, 0, 0, 0};
     target_euclidean_velocity = {1, 0, 0};
-    expected_wheel_speeds     = {-3.6957, -3.6957, 2.6112, 2.6112};
+    expected_wheel_speeds     = {-2.2584, -2.2584, 4.0112, 4.0112};
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_wheel_speeds,
@@ -144,7 +144,7 @@ TEST_F(EuclideanToFourWheelTest, test_target_wheel_speeds_x)
     // test -/left
     current_wheel_speeds      = {0, 0, 0, 0};
     target_euclidean_velocity = {-1, 0, 0};
-    expected_wheel_speeds     = {3.6957, 3.6957, -2.6112, -2.6112};
+    expected_wheel_speeds     = {2.2584, 2.2584, -4.0112, -4.0112};
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_wheel_speeds,
@@ -158,7 +158,7 @@ TEST_F(EuclideanToFourWheelTest, test_target_wheel_speeds_y)
     // test +/forwards
     current_wheel_speeds      = {0, 0, 0, 0};
     target_euclidean_velocity = {0, 1, 0};
-    expected_wheel_speeds     = {2.6949, -2.6949, -2.1860, 2.1860};
+    expected_wheel_speeds     = {2.1226, -2.1226, -2.7766, 2.7766};
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_wheel_speeds,
@@ -169,7 +169,7 @@ TEST_F(EuclideanToFourWheelTest, test_target_wheel_speeds_y)
     // test -/backwards
     current_wheel_speeds      = {0, 0, 0, 0};
     target_euclidean_velocity = {0, -1, 0};
-    expected_wheel_speeds     = {-2.6949, 2.6949, 2.1860, -2.1860};
+    expected_wheel_speeds     = {-2.1226, 2.1226, 2.7766, -2.7766};
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_wheel_speeds,
@@ -183,7 +183,7 @@ TEST_F(EuclideanToFourWheelTest, test_target_wheel_speeds_w)
     // test +/forwards
     current_wheel_speeds      = {0, 0, 0, 0};
     target_euclidean_velocity = {0, 0, 1};
-    expected_wheel_speeds     = {0.9706, 0.9706, 1.0134, 1.0134};
+    expected_wheel_speeds     = {0.0918, 0.0918, 0.0885, 0.0885};
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_wheel_speeds,
@@ -194,7 +194,7 @@ TEST_F(EuclideanToFourWheelTest, test_target_wheel_speeds_w)
     // test -/backwards
     current_wheel_speeds      = {0, 0, 0, 0};
     target_euclidean_velocity = {0, 0, -1};
-    expected_wheel_speeds     = {-0.9706, -0.9706, -1.0134, -1.0134};
+    expected_wheel_speeds     = {-0.0918, -0.0918, -0.0885, -0.0885};
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_wheel_speeds,
@@ -208,7 +208,7 @@ TEST_F(EuclideanToFourWheelTest, test_target_wheel_speeds_all)
     // test +/forwards
     current_wheel_speeds      = {0, 0, 0, 0};
     target_euclidean_velocity = {1, 1, 1};
-    expected_wheel_speeds     = {-0.0302, -5.4200, 1.4385, 5.8105};
+    expected_wheel_speeds     = {-0.0440, -4.2893, 1.3231, 6.8763};
 
     EXPECT_TRUE(TestUtil::equalWithinTolerance(
         expected_wheel_speeds,
