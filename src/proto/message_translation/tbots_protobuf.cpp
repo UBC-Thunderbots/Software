@@ -18,7 +18,7 @@ std::unique_ptr<TbotsProto::Vision> createVision(const World& world)
     // freed
     std::for_each(friendly_robots.begin(), friendly_robots.end(),
                   [&](const Robot& robot) {
-                      robot_states_map[robot.id()] = *createRobotState(robot);
+                      robot_states_map[robot.id()] = *createRobotStateProto(robot);
                   });
 
     // set ball state
@@ -65,7 +65,7 @@ std::unique_ptr<TbotsProto::Robot> createRobot(const Robot& robot)
     // create msg
     auto robot_msg = std::make_unique<TbotsProto::Robot>();
     robot_msg->set_id(robot.id());
-    *(robot_msg->mutable_current_state()) = *createRobotState(robot);
+    *(robot_msg->mutable_current_state()) = *createRobotStateProto(robot);
     *(robot_msg->mutable_timestamp())     = *createTimestamp(robot.timestamp());
 
     for (RobotCapability capability : robot.getUnavailableCapabilities())
@@ -121,7 +121,7 @@ std::unique_ptr<TbotsProto::Field> createField(const Field& field)
     return field_msg;
 }
 
-std::unique_ptr<TbotsProto::RobotState> createRobotState(const Robot& robot)
+std::unique_ptr<TbotsProto::RobotState> createRobotStateProto(const Robot& robot)
 {
     auto position         = createPointProto(robot.position());
     auto orientation      = createAngleProto(robot.orientation());
@@ -322,7 +322,7 @@ std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp()
     return timestamp_msg;
 }
 
-RobotState createRobotStateFromProto(const TbotsProto::RobotState robot_state)
+RobotState createRobotState(const TbotsProto::RobotState robot_state)
 {
     return RobotState(createPoint(robot_state.global_position()),
                       createVector(robot_state.global_velocity()),

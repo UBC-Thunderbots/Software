@@ -43,9 +43,11 @@ class Thunderloop
      *
      * @param robot_constants The robot constants
      * @param wheel_consants The wheel constants
+     * @param loop_hz The rate to run the loop
+     *
      */
     Thunderloop(const RobotConstants_t& robot_constants,
-                const WheelConstants_t& wheel_consants);
+                const WheelConstants_t& wheel_consants, const int loop_hz);
 
     ~Thunderloop();
 
@@ -71,10 +73,12 @@ class Thunderloop
     TbotsProto::NetworkStatus network_status_;
     TbotsProto::PowerStatus power_status_;
     TbotsProto::DriveUnitStatus drive_units_status_;
+    TbotsProto::ThunderloopStatus thunderloop_status_;
 
     // Current State
     RobotConstants_t robot_constants_;
     WheelConstants_t wheel_consants_;
     unsigned robot_id_;
     unsigned channel_id_;
+    int loop_hz_;
 };

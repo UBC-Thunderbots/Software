@@ -23,11 +23,57 @@
 #include "software/logger/logger.h"
 #include "software/world/robot_state.h"
 
+/**
+ * https://rt.wiki.kernel.org/index.php/Squarewave-example
+ * using clock_nanosleep of librt
+ */
+extern int clock_nanosleep(clockid_t __clock_id, int __flags,
+                           __const struct timespec* __req, struct timespec* __rem);
+
+/*
+ * The struct timespec consists of nanoseconds and seconds. If the nanoseconds
+ * are getting bigger than 1000000000 (= 1 second) the variable containing
+ * seconds has to be incremented and the nanoseconds decremented by 1000000000.
+ *
+ * @param ts timespec to modify
+ */
+static inline void tsnorm(struct timespec& ts)
+{
+    while (ts.tv_nsec >= static_cast<int>(NANOSECONDS_PER_SECOND))
+    {
+        ts.tv_nsec -= static_cast<int>(NANOSECONDS_PER_SECOND);
+        ts.tv_sec++;
+    }
+}
+
+/**
+ * https://gist.github.com/diabloneo/9619917
+ *
+ * @fn timespec_diff(struct timespec *, struct timespec *, struct timespec *)
+ * @brief Compute the diff of two timespecs, that is a - b = result.
+ * @param a the minuend
+ * @param b the subtrahend
+ * @param result a - b
+ */
+static inline void timespec_diff(struct timespec* a, struct timespec* b,
+                                 struct timespec* result)
+{
+    result->tv_sec  = a->tv_sec - b->tv_sec;
+    result->tv_nsec = a->tv_nsec - b->tv_nsec;
+    if (result->tv_nsec < 0)
+    {
+        --result->tv_sec;
+        result->tv_nsec += 1000000000L;
+    }
+}
+
+
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
-                         const WheelConstants_t& wheel_consants)
+                         const WheelConstants_t& wheel_consants, const int loop_hz)
 {
     robot_id_        = 0;
     channel_id_      = 0;
+    loop_hz_         = loop_hz;
     robot_constants_ = robot_constants;
     wheel_consants_  = wheel_consants;
 
@@ -48,20 +94,51 @@ Thunderloop::~Thunderloop()
  */
 void Thunderloop::runLoop()
 {
-    motor_service_->start();
+    // Timing
+    struct timespec next_shot;
+    struct timespec start_time;
+    struct timespec end_time;
+    struct timespec time;
 
+#define TIME_EXPRESSION(arg)                                                             \
+    clock_gettime(0, &start_time);                                                       \
+    arg;                                                                                 \
+    clock_gettime(0, &end_time);                                                         \
+    timespec_diff(&end_time, &start_time, &time);
+
+    // Input buffer
     TbotsProto::PrimitiveSet new_primitive_set;
     TbotsProto::Vision new_vision;
 
+    // Loop interval
+    int interval = 1 / loop_hz_ * static_cast<int>(NANOSECONDS_PER_SECOND);
+
+    // Start the services
+    motor_service_->start();
+
+    // Get current time
+    clock_gettime(0, &next_shot);
+
+    // Start after one second
+    next_shot.tv_sec++;
+
     for (;;)
     {
-        std::tie(new_primitive_set, new_vision) = network_service_->poll(robot_status_);
+        // Wait until next shot
+        clock_nanosleep(0, TIMER_ABSTIME, &next_shot, NULL);
+
+        // Poll network service and grab most recent messages
+        TIME_EXPRESSION(std::tie(new_primitive_set, new_vision) =
+                            network_service_->poll(robot_status_));
+
+        thunderloop_status_.set_network_service_poll_time_ns(time.tv_nsec);
 
         // If the primitive msg is new, update the internal buffer
+        // and start the new primitive.
         if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
             primitive_set_.time_sent().epoch_timestamp_seconds())
         {
-            // Cache
+            // Cache primitive set
             primitive_set_ = new_primitive_set;
 
             // If we have a primitive for "this" robot, lets update it
@@ -69,8 +146,11 @@ void Thunderloop::runLoop()
             {
                 primitive_ = new_primitive_set.mutable_robot_primitives()->at(robot_id_);
 
-                // ========= Execute new primitive ========
-                primitive_executor_.startPrimitive(robot_constants_, primitive_);
+                // ========= Start new primitive ========
+                TIME_EXPRESSION(
+                    primitive_executor_.startPrimitive(robot_constants_, primitive_));
+
+                thunderloop_status_.set_primitive_executor_start_time_ns(time.tv_nsec);
             }
         }
 
@@ -78,7 +158,7 @@ void Thunderloop::runLoop()
         if (new_vision.time_sent().epoch_timestamp_seconds() >
             vision_.time_sent().epoch_timestamp_seconds())
         {
-            // Cache
+            // Cache vision
             vision_ = new_vision;
 
             // If there is a detection for "this" robot, lets update it
@@ -89,10 +169,17 @@ void Thunderloop::runLoop()
         }
 
         // TODO (#2333) poll redis service
-        direct_control_ =
-            *primitive_executor_.stepPrimitive(createRobotStateFromProto(robot_state_));
+        TIME_EXPRESSION(direct_control_ = *primitive_executor_.stepPrimitive(
+                            createRobotState(robot_state_)));
+        thunderloop_status_.set_primitive_executor_step_time_ns(time.tv_nsec);
 
         // Run the motor service with the direct_control_ msg
-        drive_units_status_ = *motor_service_->poll(direct_control_);
+        TIME_EXPRESSION(drive_units_status_ = *motor_service_->poll(direct_control_));
+        thunderloop_status_.set_motor_service_poll_time_ns(time.tv_nsec);
+        *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
+
+        // Calculate next shot
+        next_shot.tv_nsec += interval;
+        tsnorm(next_shot);
     }
 }

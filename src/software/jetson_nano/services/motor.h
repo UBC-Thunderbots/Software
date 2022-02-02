@@ -35,9 +35,7 @@ class MotorService : public Service
     void stop() override;
 
     /**
-     * When the motor service is polled with a DirectVelocityControl msg, it
-     * converts the linear velocity into individual wheel velocities based on
-     * RobotConstants_t and WheelConstants_t.
+     * When the motor service is polled with a DirectControlPrimitive msg containing
      *
      * @param direct_control The direct_control msg to unpack and execute on the motors
      * @returns DriveUnitStatus The status of all the drive units
@@ -184,9 +182,6 @@ class MotorService : public Service
 
     // SPI File Descriptors
     std::unordered_map<int, int> file_descriptors;
-
-    // Motor State
-    MotorState motor_state_[5];
 
     std::unordered_map<int, bool> encoder_calibrated_;
 };

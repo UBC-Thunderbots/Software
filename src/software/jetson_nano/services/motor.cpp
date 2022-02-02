@@ -11,6 +11,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
+#include <sys/mman.h>      // Needed for mlockall()
+#include <sys/resource.h>  // needed for getrusage
+#include <sys/time.h>      // needed for getrusage
+#include <unistd.h>        // needed for sysconf(int name);
 #include <unistd.h>
 
 #include "proto/tbots_software_msgs.pb.h"
@@ -23,7 +27,7 @@ extern "C"
 #include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
 
     // SPI Configs
-    static uint32_t SPI_SPEED_HZ = 1000000;
+    static uint32_t SPI_SPEED_HZ = 1000000;  // 1 Mhz
     static uint8_t SPI_BITS      = 8;
     static uint32_t SPI_MODE     = 0x3u;
 
@@ -33,7 +37,7 @@ extern "C"
     static const uint32_t BACK_LEFT_MOTOR_CHIP_SELECT   = 2;
     static const uint32_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 1;
     static const uint32_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
-    static const uint32_t TOTAL_NUMBER_OF_MOTORS        = 2;
+    static const uint32_t TOTAL_NUMBER_OF_MOTORS        = 5;
 
     // SPI Trinamic Motor Driver Paths (indexed with chip select above)
     static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1",
@@ -60,6 +64,7 @@ extern "C"
         return g_motor_service->tmc6100ReadWriteByte(motor, data, lastTransfer);
     }
 }
+
 MotorService::MotorService(const RobotConstants_t& robot_constants,
                            const WheelConstants_t& wheel_constants)
     : spi_cs_driver_to_controller_demux_gpio(SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO,
@@ -125,6 +130,22 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
 {
     CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT])
         << "Running without encoder calibration can cause serious harm";
+
+    // switch (direct_control.wheel_control().wheel_control_case())
+    //{
+    // case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectPerWheelControl:
+    //{
+    // break;
+    //}
+    // case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectPerWheelControl:
+    //{
+    // break;
+    //}
+    // case TbotsProto::DirectControlPrimitive::WheelControlCase::WHEEL_CONTROL_NOT_SET;
+    //{
+    // break;
+    //}
+    //}
 
     // TODO (#2335) convert local velocity to per-wheel velocity
     // using http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf and then

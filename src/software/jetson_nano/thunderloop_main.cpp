@@ -35,45 +35,6 @@ static const int g_periodic_job_stack_size = 100 * 1024;    // 100kb
 
 //  Real Time Linux
 //
-// https://rt.wiki.kernel.org/index.php/Squarewave-example
-// https://rt.wiki.kernel.org/index.php/Threaded_RT-application_with_memory_locking_and_stack_handling_example
-
-/** Set the priority
- *
- * @param prio The priority
- * @param sched The sched
- */
-// static void setprio(int prio, int sched)
-//{
-// struct sched_param param;
-
-//// Set realtime priority for this thread
-// param.sched_priority = prio;
-
-// if (sched_setscheduler(0, sched, &param) < 0)
-//{
-// LOG(FATAL) << "sched_setscheduler: " << strerror(errno);
-//}
-//}
-
-// using clock_nanosleep of librt
-extern int clock_nanosleep(clockid_t __clock_id, int __flags,
-                           __const struct timespec* __req, struct timespec* __rem);
-
-/* The struct timespec consists of nanoseconds and seconds. If the nanoseconds
- * are getting bigger than 1000000000 (= 1 second) the variable containing
- * seconds has to be incremented and the nanoseconds decremented by 1000000000.
- *
- * @param ts timespec to modify
- */
-static inline void tsnorm(struct timespec& ts)
-{
-    while (ts.tv_nsec >= g_nsec_per_sec)
-    {
-        ts.tv_nsec -= g_nsec_per_sec;
-        ts.tv_sec++;
-    }
-}
 
 static void configureMallocBehaviour(void)
 {
@@ -92,31 +53,31 @@ static void configureMallocBehaviour(void)
 }
 
 
-// static void reserveProcessMemory(int size)
-//{
-// long int i;
-// char* buffer;
+static void reserveProcessMemory(int size)
+{
+    long int i;
+    char* buffer;
 
-// buffer = static_cast<char*>(malloc(size));
+    buffer = static_cast<char*>(malloc(size));
 
-//// Touch each page in this piece of memory to get it mapped into RAM
-// for (i = 0; i < size; i += sysconf(_SC_PAGESIZE))
-//{
-//// Each write to this buffer will generate a pagefault.
-//// Once the pagefault is handled a page will be locked in
-//// memory and never given back to the system.
-// buffer[i] = 0;
-//}
+    // Touch each page in this piece of memory to get it mapped into RAM
+    for (i = 0; i < size; i += sysconf(_SC_PAGESIZE))
+    {
+        // Each write to this buffer will generate a pagefault.
+        // Once the pagefault is handled a page will be locked in
+        // memory and never given back to the system.
+        buffer[i] = 0;
+    }
 
-//// Buffer will now be released. As Glibc is configured such that it
-//// never gives back memory to the kernel, the memory allocated above is
-//// locked for this process. All malloc() and new() calls come from
-//// the memory pool reserved and locked above. Issuing free() and
-//// delete() does NOT make this locking undone. So, with this locking
-//// mechanism we can build C++ applications that will never run into
-//// a major/minor pagefault, even with swapping enabled.
-// free(buffer);
-//}
+    // Buffer will now be released. As Glibc is configured such that it
+    // never gives back memory to the kernel, the memory allocated above is
+    // locked for this process. All malloc() and new() calls come from
+    // the memory pool reserved and locked above. Issuing free() and
+    // delete() does NOT make this locking undone. So, with this locking
+    // mechanism we can build C++ applications that will never run into
+    // a major/minor pagefault, even with swapping enabled.
+    free(buffer);
+}
 
 int main(int argc, char** argv)
 {
@@ -124,28 +85,15 @@ int main(int argc, char** argv)
 
     // Page faults are bad, lets setup malloc and reserve some memory
     configureMallocBehaviour();
-    // reserveProcessMemory(g_pre_allocation_size);
+    reserveProcessMemory(g_pre_allocation_size);
 
     // TODO (#2338) replace with network logger
     LoggerSingleton::initializeLogger("/tmp");
 
-    auto thunderloop =
-        Thunderloop(create2021RobotConstants(), create2021WheelConstants());
+    auto thunderloop = Thunderloop(create2021RobotConstants(), create2021WheelConstants(),
+                                   CONTROL_LOOP_HZ);
 
     thunderloop.runLoop();
-    // pthread_t thread;
-    // pthread_attr_t attr;
-
-    //[> init to default values <]
-    // if (pthread_attr_init(&attr))
-    // error(1);
-
-    //[> Set the requested stacksize for this thread <]
-    // if (pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN +
-    // g_periodic_job_stack_size)) error(2);
-
-    //[> And finally start the actual thread <]
-    // pthread_create(&thread, &attr, my_rt_thread, NULL);
 
     return 0;
 }

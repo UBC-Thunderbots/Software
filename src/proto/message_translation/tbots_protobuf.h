@@ -73,7 +73,7 @@ std::unique_ptr<TbotsProto::Field> createField(const Field& field);
  *
  * @return The unique_ptr to a (Robot, Game, Ball) State after conversion
  */
-std::unique_ptr<TbotsProto::RobotState> createRobotState(const Robot& robot);
+std::unique_ptr<TbotsProto::RobotState> createRobotStateProto(const Robot& robot);
 std::unique_ptr<TbotsProto::GameState> createGameState(const GameState& game_state);
 std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball);
 
@@ -95,6 +95,9 @@ std::unique_ptr<TbotsProto::Timestamp> createTimestamp(const Timestamp& timestam
 std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp();
 
 /**
- * TODO
+ * Return RobotState given the TbotsProto::RobotState protobuf
+ *
+ * @param robot_state The RobotState proto to create a RobotState from
+ * @return the RobotState
  */
-RobotState createRobotStateFromProto(const TbotsProto::RobotState robot_state);
+RobotState createRobotState(const TbotsProto::RobotState robot_state);
