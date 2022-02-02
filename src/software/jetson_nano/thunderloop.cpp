@@ -179,6 +179,8 @@ void Thunderloop::runLoop()
 
         *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
 
+        robot_status_.mutable_power_status()->set_capacitor_voltage(200);
+
         // Calculate next shot
         next_shot.tv_nsec += interval;
         tsnorm(next_shot);

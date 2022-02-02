@@ -27,7 +27,7 @@ extern "C"
 #include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
 }
 
-static float MAX_DRIVE_RPM = 10000.0;
+static float MAX_DRIVE_RPM = 100.0;
 
 // SPI Configs
 static uint32_t SPI_SPEED_HZ = 1000000;  // 1 Mhz
@@ -156,7 +156,8 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
         }
         case TbotsProto::DirectControlPrimitive::WheelControlCase::WHEEL_CONTROL_NOT_SET:
         {
-            LOG(WARNING) << "Motor service polled with an empty DirectControlPrimitive";
+            // LOG(WARNING) << "Motor service polled with an empty
+            // DirectControlPrimitive";
             break;
         }
     }
@@ -332,8 +333,8 @@ void MotorService::configurePI(uint8_t motor)
     writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_FLUX_TARGET_DDT_LIMITS, 0);
     writeToControllerOrDieTrying(motor, TMC4671_PIDOUT_UQ_UD_LIMITS, 32767);
     writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_FLUX_LIMITS, 5000);
-    writeToControllerOrDieTrying(motor, TMC4671_PID_ACCELERATION_LIMIT, 15000);
-    writeToControllerOrDieTrying(motor, TMC4671_PID_VELOCITY_LIMIT, 4000);
+    writeToControllerOrDieTrying(motor, TMC4671_PID_ACCELERATION_LIMIT, 1000);
+    writeToControllerOrDieTrying(motor, TMC4671_PID_VELOCITY_LIMIT, 10000);
 }
 
 void MotorService::configureADC(uint8_t motor)
@@ -378,6 +379,7 @@ void MotorService::calibrateEncoder(uint8_t motor)
 
 void MotorService::runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_samples)
 {
+    // Some limits
     tmc4671_writeInt(motor, TMC4671_PID_TORQUE_FLUX_LIMITS, 0x000003E8);
     tmc4671_writeInt(motor, TMC4671_PID_TORQUE_P_TORQUE_I, 0x01000100);
     tmc4671_writeInt(motor, TMC4671_PID_FLUX_P_FLUX_I, 0x01000100);
