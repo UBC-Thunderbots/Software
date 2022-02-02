@@ -130,7 +130,6 @@ void Thunderloop::runLoop()
         // Poll network service and grab most recent messages
         TIME_EXPRESSION(std::tie(new_primitive_set, new_vision) =
                             network_service_->poll(robot_status_));
-
         thunderloop_status_.set_network_service_poll_time_ns(time.tv_nsec);
 
         // If the primitive msg is new, update the internal buffer
@@ -138,15 +137,15 @@ void Thunderloop::runLoop()
         if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
             primitive_set_.time_sent().epoch_timestamp_seconds())
         {
-            // Cache primitive set
+            // Save new primitive set
             primitive_set_ = new_primitive_set;
 
-            // If we have a primitive for "this" robot, lets update it
+            // If we have a primitive for "this" robot, lets start it
             if (new_primitive_set.robot_primitives().count(robot_id_) != 0)
             {
                 primitive_ = new_primitive_set.mutable_robot_primitives()->at(robot_id_);
 
-                // ========= Start new primitive ========
+                // Start new primitive
                 TIME_EXPRESSION(
                     primitive_executor_.startPrimitive(robot_constants_, primitive_));
 
@@ -169,6 +168,7 @@ void Thunderloop::runLoop()
         }
 
         // TODO (#2333) poll redis service
+
         TIME_EXPRESSION(direct_control_ = *primitive_executor_.stepPrimitive(
                             createRobotState(robot_state_)));
         thunderloop_status_.set_primitive_executor_step_time_ns(time.tv_nsec);
@@ -176,6 +176,7 @@ void Thunderloop::runLoop()
         // Run the motor service with the direct_control_ msg
         TIME_EXPRESSION(drive_units_status_ = *motor_service_->poll(direct_control_));
         thunderloop_status_.set_motor_service_poll_time_ns(time.tv_nsec);
+
         *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
 
         // Calculate next shot
