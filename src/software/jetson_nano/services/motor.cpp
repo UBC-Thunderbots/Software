@@ -25,30 +25,32 @@ extern "C"
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671.h"
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671_Variants.h"
 #include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
+}
 
-    static unsigned MAX_DRIVE_RPM = 10000;
+static float MAX_DRIVE_RPM = 10000.0;
 
-    // SPI Configs
-    static uint32_t SPI_SPEED_HZ = 1000000;  // 1 Mhz
-    static uint8_t SPI_BITS      = 8;
-    static uint32_t SPI_MODE     = 0x3u;
+// SPI Configs
+static uint32_t SPI_SPEED_HZ = 1000000;  // 1 Mhz
+static uint8_t SPI_BITS      = 8;
+static uint32_t SPI_MODE     = 0x3u;
 
-    // SPI Chip Selects
-    static const uint32_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
-    static const uint32_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
-    static const uint32_t BACK_LEFT_MOTOR_CHIP_SELECT   = 2;
-    static const uint32_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 1;
-    static const uint32_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
-    static const uint32_t TOTAL_NUMBER_OF_MOTORS        = 5;
+// SPI Chip Selects
+static const uint32_t FRONT_LEFT_MOTOR_CHIP_SELECT  = 0;
+static const uint32_t FRONT_RIGHT_MOTOR_CHIP_SELECT = 3;
+static const uint32_t BACK_LEFT_MOTOR_CHIP_SELECT   = 2;
+static const uint32_t BACK_RIGHT_MOTOR_CHIP_SELECT  = 1;
+static const uint32_t DRIBBLER_MOTOR_CHIP_SELECT    = 4;
+static const uint32_t TOTAL_NUMBER_OF_MOTORS        = 5;
 
-    // SPI Trinamic Motor Driver Paths (indexed with chip select above)
-    static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1",
-                                      "/dev/spidev0.2", "/dev/spidev0.3",
-                                      "/dev/spidev0.4"};
+// SPI Trinamic Motor Driver Paths (indexed with chip select above)
+static const char* SPI_PATHS[] = {"/dev/spidev0.0", "/dev/spidev0.1", "/dev/spidev0.2",
+                                  "/dev/spidev0.3", "/dev/spidev0.4"};
 
-    static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO = "77";
-    static const char* DRIVER_CONTROL_ENABLE_GPIO           = "216";
+static const char* SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO = "77";
+static const char* DRIVER_CONTROL_ENABLE_GPIO           = "216";
 
+extern "C"
+{
     // We need a static pointer here, because trinamic externs the following two
     // SPI binding functions that we need to interface with their API.
     //
@@ -139,8 +141,9 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
         {
             tmc4671_setTargetVelocity(
                 FRONT_LEFT_MOTOR_CHIP_SELECT,
-                direct_control.direct_per_wheel_control().front_left_wheel_rpm() *
-                    MAX_DRIVE_RPM);
+                static_cast<int>(
+                    direct_control.direct_per_wheel_control().front_left_wheel_rpm() *
+                    MAX_DRIVE_RPM));
 
             break;
         }
@@ -153,6 +156,7 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
         }
         case TbotsProto::DirectControlPrimitive::WheelControlCase::WHEEL_CONTROL_NOT_SET:
         {
+            LOG(WARNING) << "Motor service polled with an empty DirectControlPrimitive";
             break;
         }
     }
