@@ -14,9 +14,6 @@ from cpp_writer import CppWriter
 # Path relative to the bazel WORKSPACE root
 # This path is included in the data for the py_binary bazel target
 PARAMETER_CONFIG_PATH = Path(os.path.dirname(__file__), "../config_definitions")
-PARAMETER_TEST_CONFIG_PATH = Path(
-    os.path.dirname(__file__), "../config_definitions/test"
-)
 
 
 def generate_cpp_dynamic_parameters(output_header, output_source, include_headers):
