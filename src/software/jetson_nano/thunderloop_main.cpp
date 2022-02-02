@@ -29,13 +29,12 @@ std::string BANNER =
 "  /'                                                                                       /'          \n";
 // clang-format on
 
-static const int g_nsec_per_sec        = 1000000000;
-static const int g_pre_allocation_size = 20 * 1024 * 1024;  // 100MB pagefault free buffer
-static const int g_periodic_job_stack_size = 100 * 1024;    // 100kb
 
-//  Real Time Linux
-//
-
+/*
+ * Configure malloc for real-time linux
+ *
+ * https://rt.wiki.kernel.org/index.php/Dynamic_memory_allocation_example
+ */
 static void configureMallocBehaviour(void)
 {
     // Now lock all current and future pages
@@ -53,6 +52,11 @@ static void configureMallocBehaviour(void)
 }
 
 
+/*
+ * Reserve memory for this process
+ *
+ * @param size How many bytes to reserve
+ */
 static void reserveProcessMemory(int size)
 {
     long int i;
@@ -85,7 +89,10 @@ int main(int argc, char** argv)
 
     // Page faults are bad, lets setup malloc and reserve some memory
     configureMallocBehaviour();
-    reserveProcessMemory(g_pre_allocation_size);
+
+    // 100MB pagefault free buffer
+    const int pre_allocation_size = 20 * 1024 * 1024;
+    reserveProcessMemory(pre_allocation_size);
 
     // TODO (#2338) replace with network logger
     LoggerSingleton::initializeLogger("/tmp");

@@ -334,8 +334,6 @@ void MotorService::configurePI(uint8_t motor)
     writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_FLUX_LIMITS, 5000);
     writeToControllerOrDieTrying(motor, TMC4671_PID_ACCELERATION_LIMIT, 15000);
     writeToControllerOrDieTrying(motor, TMC4671_PID_VELOCITY_LIMIT, 4000);
-    writeToControllerOrDieTrying(motor, TMC4671_PID_POSITION_LIMIT_LOW, -2147483647);
-    writeToControllerOrDieTrying(motor, TMC4671_PID_POSITION_LIMIT_HIGH, 2147483647);
 }
 
 void MotorService::configureADC(uint8_t motor)

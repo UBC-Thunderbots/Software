@@ -59,9 +59,7 @@ class MotorService : public Service
      * For FOC to work, the controller needs to know the electical angle of the rotor
      * relative to the mechanical angle of the rotor. In an incremental-encoder-only
      * setup, we can energize the motor coils so that the rotor locks itself along
-     * one of its pole-pairs, allowing us to reset the encoder. Trinamics periodicJob
-     * API function can do this for us, we have to call start followed by the step
-     * function at 1ms intervals to perform this operation.
+     * one of its pole-pairs, allowing us to reset the encoder.
      *
      * WARNING: Do not try to spin the motor without initializing the encoder!
      *          The motor can overheat if the TMC4671 doesn't auto shut-off.
@@ -125,8 +123,9 @@ class MotorService : public Service
     void configureEncoder(uint8_t motor);
 
     /**
-     * A lot of initialization parameters are necessary to function. If there is
-     * a single bit error, we can risk frying the motor driver or controller.
+     * A lot of initialization parameters are necessary to function. Even if
+     * there is a single bit error, we can risk frying the motor driver or
+     * controller.
      *
      * The following functions can be used to setup initialization params
      * that _must_ be set to continue. A failed call will crash the program
