@@ -56,7 +56,6 @@ class Thunderloop
     std::unique_ptr<NetworkService> network_service_;
 
    private:
-
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;
 

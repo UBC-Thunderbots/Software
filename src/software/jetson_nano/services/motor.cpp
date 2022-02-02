@@ -125,51 +125,6 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
 {
     CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT])
         << "Running without encoder calibration can cause serious harm";
-    CHECK(encoder_calibrated_[FRONT_RIGHT_MOTOR_CHIP_SELECT])
-        << "Running without encoder calibration can cause serious harm";
-
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 500);
-    tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 500);
-    sleep(1);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 1000);
-    tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 1000);
-    sleep(1);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 1500);
-    tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 1500);
-    sleep(1);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 2000);
-    tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 2000);
-    sleep(1);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 2500);
-    tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 2500);
-    sleep(1);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 3000);
-    tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 3000);
-    sleep(1);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 4000);
-    tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 4000);
-    sleep(1);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 5000);
-    tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 5000);
-    sleep(1);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 4000);
-    tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 4000);
-    sleep(1);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 3000);
-    tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 3000);
-    sleep(1);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 2000);
-    tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 2000);
-    sleep(1);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 1000);
-    tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 1000);
-    sleep(1);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 500);
-    tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 500);
-    sleep(1);
-    tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT, 0);
-    tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT, 0);
-    sleep(5);
 
     // TODO (#2335) convert local velocity to per-wheel velocity
     // using http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf and then
@@ -307,8 +262,7 @@ uint8_t MotorService::readWriteByte(uint8_t motor, uint8_t data, uint8_t last_tr
     return ret_byte;
 }
 
-void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address,
-                                               int32_t value)
+void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address, int32_t value)
 {
     tmc6100_writeInt(motor, address, value);
     int read_value = tmc6100_readInt(motor, address);
@@ -319,7 +273,7 @@ void MotorService::writeToDriverOrDieTrying(uint8_t motor, uint8_t address,
 }
 
 void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
-                                                   int32_t value)
+                                                int32_t value)
 {
     tmc4671_writeInt(motor, address, value);
     int read_value = tmc4671_readInt(motor, address);
@@ -372,6 +326,8 @@ void MotorService::configureEncoder(uint8_t motor)
 void MotorService::calibrateEncoder(uint8_t motor)
 {
     LOG(WARNING) << "Calibrating the encoder, ensure the robot is lifted off the ground";
+    sleep(1);
+
     writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_FLUX_LIMITS, 0x000003E8);
     writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_P_TORQUE_I, 0x01000100);
     writeToControllerOrDieTrying(motor, TMC4671_PID_FLUX_P_FLUX_I, 0x01000100);
@@ -450,7 +406,7 @@ void MotorService::runOpenLoopCalibrationRoutine(uint8_t motor, size_t num_sampl
     }
 
     // Stop open loop rotation
-    tmc4671_writeInt(0, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
+    tmc4671_writeInt(motor, TMC4671_OPENLOOP_VELOCITY_TARGET, 0x00000000);
 }
 
 void MotorService::startDriver(uint8_t motor)
@@ -468,7 +424,8 @@ void MotorService::startController(uint8_t motor)
     // Read the chip ID to validate the SPI connection
     tmc4671_writeInt(motor, TMC4671_CHIPINFO_ADDR, 0x000000000);
     CHECK(0x34363731 == tmc4671_readInt(motor, TMC4671_CHIPINFO_DATA))
-        << "TMC4671 is not responding";
+        << "The TMC4671 of motor " << static_cast<uint32_t>(motor)
+        << " is not responding";
 
     // Configure to brushless DC motor with 8 pole pairs
     writeToControllerOrDieTrying(motor, TMC4671_MOTOR_TYPE_N_POLE_PAIRS, 0x00030008);
@@ -479,6 +436,7 @@ void MotorService::startController(uint8_t motor)
     configureEncoder(motor);
 
     // Trigger encoder calibration
+    // TODO (#2451) Don't call this here, its not safe because it moves the motors
     calibrateEncoder(motor);
     configurePI(motor);
 }
@@ -490,11 +448,9 @@ void MotorService::start()
 
     // TMC6100 Setup
     startDriver(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    startDriver(FRONT_RIGHT_MOTOR_CHIP_SELECT);
 
     // TMC4671 Setup
     startController(FRONT_LEFT_MOTOR_CHIP_SELECT);
-    startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
 }
 
 void MotorService::stop()

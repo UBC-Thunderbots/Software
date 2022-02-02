@@ -29,10 +29,9 @@ std::string BANNER =
 "  /'                                                                                       /'          \n";
 // clang-format on
 
-static const int g_nsec_per_sec = 1000000000;
-static const int g_pre_allocation_size =
-    20 * 1024 * 1024;                                    // 100MB pagefault free buffer
-static const int g_periodic_job_stack_size = 100 * 1024;  // 100kb
+static const int g_nsec_per_sec        = 1000000000;
+static const int g_pre_allocation_size = 20 * 1024 * 1024;  // 100MB pagefault free buffer
+static const int g_periodic_job_stack_size = 100 * 1024;    // 100kb
 
 //  Real Time Linux
 //
@@ -93,30 +92,30 @@ static void configureMallocBehaviour(void)
 }
 
 
-//static void reserveProcessMemory(int size)
+// static void reserveProcessMemory(int size)
 //{
-    //long int i;
-    //char* buffer;
+// long int i;
+// char* buffer;
 
-    //buffer = static_cast<char*>(malloc(size));
+// buffer = static_cast<char*>(malloc(size));
 
-    //// Touch each page in this piece of memory to get it mapped into RAM
-    //for (i = 0; i < size; i += sysconf(_SC_PAGESIZE))
-    //{
-        //// Each write to this buffer will generate a pagefault.
-        //// Once the pagefault is handled a page will be locked in
-        //// memory and never given back to the system.
-        //buffer[i] = 0;
-    //}
+//// Touch each page in this piece of memory to get it mapped into RAM
+// for (i = 0; i < size; i += sysconf(_SC_PAGESIZE))
+//{
+//// Each write to this buffer will generate a pagefault.
+//// Once the pagefault is handled a page will be locked in
+//// memory and never given back to the system.
+// buffer[i] = 0;
+//}
 
-    //// Buffer will now be released. As Glibc is configured such that it
-    //// never gives back memory to the kernel, the memory allocated above is
-    //// locked for this process. All malloc() and new() calls come from
-    //// the memory pool reserved and locked above. Issuing free() and
-    //// delete() does NOT make this locking undone. So, with this locking
-    //// mechanism we can build C++ applications that will never run into
-    //// a major/minor pagefault, even with swapping enabled.
-    //free(buffer);
+//// Buffer will now be released. As Glibc is configured such that it
+//// never gives back memory to the kernel, the memory allocated above is
+//// locked for this process. All malloc() and new() calls come from
+//// the memory pool reserved and locked above. Issuing free() and
+//// delete() does NOT make this locking undone. So, with this locking
+//// mechanism we can build C++ applications that will never run into
+//// a major/minor pagefault, even with swapping enabled.
+// free(buffer);
 //}
 
 int main(int argc, char** argv)
@@ -125,7 +124,7 @@ int main(int argc, char** argv)
 
     // Page faults are bad, lets setup malloc and reserve some memory
     configureMallocBehaviour();
-    //reserveProcessMemory(g_pre_allocation_size);
+    // reserveProcessMemory(g_pre_allocation_size);
 
     // TODO (#2338) replace with network logger
     LoggerSingleton::initializeLogger("/tmp");
