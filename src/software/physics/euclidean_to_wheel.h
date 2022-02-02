@@ -108,6 +108,7 @@ class EuclideanToWheel
     /**
      * Gets the translational wheel forces.
      *
+     * @refitem http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 14
      * @param target_acceleration The target Euclidean acceleration.
      * @return The target translational wheel forces.
      */
@@ -116,6 +117,7 @@ class EuclideanToWheel
     /**
      * Gets the rotational wheel forces.
      *
+     * @refitem http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 14
      * @param target_acceleration The target Euclidean acceleration.
      * @return The target rotational wheel forces.
      */

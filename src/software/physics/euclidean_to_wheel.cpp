@@ -21,8 +21,8 @@ EuclideanToWheel::EuclideanToWheel()
     front_wheel_angle_phi_   = robot_constants.front_wheel_angle_deg * M_PI / 180.;
     rear_wheel_angle_theta_  = (robot_constants.back_wheel_angle_deg - 90.) * M_PI / 180.;
 
-    // calculate coupling matrices
-    // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf
+    // calculate DC_alpha matrix
+    // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 17
     auto a = pow(sin(front_wheel_angle_phi_), 2) - pow(cos(front_wheel_angle_phi_), 2);
     auto b = -sin(front_wheel_angle_phi_) * sin(rear_wheel_angle_theta_) -
              cos(front_wheel_angle_phi_) * cos(rear_wheel_angle_theta_);
@@ -36,6 +36,8 @@ EuclideanToWheel::EuclideanToWheel()
     wheel_force_to_wheel_speed_delta_D_C_alpha_ =
         1 / (robot_mass_M_ * inertial_factor_alpha_) * e + 1 / robot_mass_M_ * f;
 
+    // calculate D inverse matrix
+    // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 17
     auto i = 1 / (2 * sin(front_wheel_angle_phi_) + 2 * sin(rear_wheel_angle_theta_));
     auto j = cos(front_wheel_angle_phi_) / (2 * pow(cos(front_wheel_angle_phi_), 2) +
                                             2 * pow(cos(rear_wheel_angle_theta_), 2));
