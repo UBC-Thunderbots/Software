@@ -27,9 +27,8 @@ namespace TestUtil
         auto ppts1 = poly1.getPoints();
         auto ppts2 = poly2.getPoints();
         if (std::equal(ppts1.begin(), ppts1.end(), ppts2.begin(),
-                       [tolerance](const Point &p1, const Point &p2) {
-                           return equalWithinTolerance(p1, p2, tolerance);
-                       }))
+                       [tolerance](const Point &p1, const Point &p2)
+                       { return equalWithinTolerance(p1, p2, tolerance); }))
         {
             return ::testing::AssertionSuccess();
         }
@@ -229,5 +228,22 @@ namespace TestUtil
         }
 
         return assertion_result;
+    }
+
+    ::testing::AssertionResult TestUtil::equalWithinTolerance(
+        const Eigen::MatrixXd &matrix1, const Eigen::MatrixXd &matrix2, double tolerance)
+    {
+        auto distance = matrix1 - matrix2;
+        auto norm     = distance.norm();
+
+        if (equalWithinTolerance(norm, 0, tolerance))
+        {
+            return ::testing::AssertionSuccess();
+        }
+        else
+        {
+            return ::testing::AssertionFailure()
+                   << "Matrix 1 was " << matrix1 << ", matrix 2 was " << matrix2;
+        }
     }
 };  // namespace TestUtil

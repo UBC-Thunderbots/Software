@@ -3,12 +3,14 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
+#include <Eigen/Dense>
 
 #include "shared/constants.h"
 #include "software/geom/algorithms/almost_equal.h"
 #include "software/geom/geom_constants.h"
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
+#include "software/physics/physics.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
 #include "software/world/team.h"
@@ -157,5 +159,17 @@ namespace TestUtil
      */
     ::testing::AssertionResult equalWithinTolerance(const BallState &state1,
                                                     const BallState &state2,
+                                                    double tolerance);
+
+    /**
+     * Checks if two matrices are within tolerance of each other.
+     * Two matrices are within tolerance if their norms are within tolerance of each other.
+     *
+     * @param matrix1, matrix2 The matrices to compare.
+     * @param tolerance The tolerance to check velocities with.
+     * @return AssertionSuccess if the two states are within tolerance of each other.
+     */
+    ::testing::AssertionResult equalWithinTolerance(const Eigen::MatrixXd &matrix1,
+                                                    const Eigen::MatrixXd &matrix2,
                                                     double tolerance);
 };  // namespace TestUtil

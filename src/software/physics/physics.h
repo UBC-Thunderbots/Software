@@ -62,17 +62,10 @@ typedef Eigen::Vector4d WheelSpace_t;
 class EuclideanToFourWheel
 {
    public:
-    EuclideanToFourWheel() = delete;
-
     /**
      * Initializes the Euclidean velocity to wheel speed conversion matrices.
-     *
-     * @param front_wheel_angle_deg The angle between the hemisphere line and the front
-     * wheel axles.
-     * @param back_wheel_angle_deg The angle between the hemisphere line and the rear
-     * wheel axles.
      */
-    EuclideanToFourWheel(double front_wheel_angle_deg, double back_wheel_angle_deg);
+    EuclideanToFourWheel();
 
     /**
      * Gets wheel velocity targets from the desired Euclidean velocity.
@@ -86,56 +79,45 @@ class EuclideanToFourWheel
      * @param target_euclidean_velocity The target Euclidean velocity.
      * @return The equivalent wheel speeds.
      */
-    WheelSpace_t get_target_wheel_speeds(
-        const EuclideanSpace_t &target_euclidean_velocity,
-        const WheelSpace_t &current_wheel_speeds);
+    WheelSpace_t getTargetWheelSpeeds(const EuclideanSpace_t &target_euclidean_velocity,
+                                      const WheelSpace_t &current_wheel_speeds);
 
    private:
     /**
      * The control loop time period [s].
      */
-    double delta_t_;
+    double delta_t_{};
 
     /**
      * The mass of the robot [kg].
      */
-    double robot_mass_M_;
+    double robot_mass_M_{};
 
     /**
      * The robot radius [m].
      */
-    double robot_radius_R_;
+    double robot_radius_R_{};
 
     /**
      * The mass distribution of the robot [m].
      */
-    double mass_distribution_alpha_;
+    double mass_distribution_alpha_{};
 
     /**
      * The angle between the hemisphere line of the robot and the front wheel axles
      * [rads].
      */
-    double front_wheel_angle_phi_;
+    double front_wheel_angle_phi_{};
 
     /**
      * The angle between the hemisphere line of the robot and the rear wheel axles [rads].
      */
-    double rear_wheel_angle_theta_;
+    double rear_wheel_angle_theta_{};
 
     /**
      * Wheel force to wheel speed delta [m/s].
      */
     Eigen::Matrix4d wheel_force_to_delta_wheel_speed_D_C_alpha_;
-
-    /**
-     * Euclidean acceleration to wheel force coupling matrix.
-     */
-    Eigen::Matrix<double, 3, 4> wheel_forces_to_euclidean_acceleration_C_alpha_;
-
-    /**
-     * Euclidean velocity to wheel speed coupling matrix.
-     */
-    Eigen::Matrix<double, 4, 3> euclidean_velocity_to_wheel_speed_D_;
 
     /**
      * Wheel speed to Euclidean velocity coupling matrix.
@@ -148,7 +130,7 @@ class EuclideanToFourWheel
      * @param wheel_speeds The measured wheel speeds.
      * @return The equivalent robot Euclidean velocity.
      */
-    EuclideanSpace_t get_euclidean_velocity_(const WheelSpace_t &wheel_speeds);
+    EuclideanSpace_t getEuclideanVelocity(const WheelSpace_t &wheel_speeds);
 
     /**
      * Gets the target Euclidean acceleration.
@@ -157,7 +139,7 @@ class EuclideanToFourWheel
      * @param target_velocity The target velocity.
      * @return The Euclidean acceleration.
      */
-    EuclideanSpace_t get_euclidean_acceleration_(
+    EuclideanSpace_t getEuclideanAcceleration(
         const EuclideanSpace_t &initial_velocity,
         const EuclideanSpace_t &target_velocity) const;
 
@@ -167,8 +149,7 @@ class EuclideanToFourWheel
      * @param target_acceleration The target Euclidean acceleration.
      * @return The target translational wheel forces.
      */
-    WheelSpace_t get_translational_wheel_forces_(
-        EuclideanSpace_t target_acceleration) const;
+    WheelSpace_t getTranslationalWheelForces(EuclideanSpace_t target_acceleration) const;
 
     /**
      * Gets the rotational wheel forces.
@@ -176,7 +157,7 @@ class EuclideanToFourWheel
      * @param target_acceleration The target Euclidean acceleration.
      * @return The target rotational wheel forces.
      */
-    WheelSpace_t get_rotational_wheel_forces_(EuclideanSpace_t target_acceleration) const;
+    WheelSpace_t getRotationalWheelForces(EuclideanSpace_t target_acceleration) const;
 
     /**
      * Gets the wheel speed delta.
@@ -184,5 +165,5 @@ class EuclideanToFourWheel
      * @param target_wheel_forces The target wheel forces.
      * @return The target wheel speed delta.
      */
-    WheelSpace_t get_wheel_speeds_delta_(const WheelSpace_t &target_wheel_forces);
+    WheelSpace_t getWheelSpeedsDelta(const WheelSpace_t &target_wheel_forces);
 };
