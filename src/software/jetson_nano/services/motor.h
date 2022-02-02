@@ -35,7 +35,8 @@ class MotorService : public Service
     void stop() override;
 
     /**
-     * When the motor service is polled with a DirectControlPrimitive msg containing
+     * When the motor service is polled with a DirectControlPrimitive msg,
+     * call the appropriate trinamic api function to spin the appropriate motor.
      *
      * @param direct_control The direct_control msg to unpack and execute on the motors
      * @returns DriveUnitStatus The status of all the drive units
