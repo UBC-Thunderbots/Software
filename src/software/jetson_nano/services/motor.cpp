@@ -26,6 +26,8 @@ extern "C"
 #include "external/trinamic/tmc/ic/TMC4671/TMC4671_Variants.h"
 #include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
 
+    static unsigned MAX_DRIVE_RPM = 10000;
+
     // SPI Configs
     static uint32_t SPI_SPEED_HZ = 1000000;  // 1 Mhz
     static uint8_t SPI_BITS      = 8;
@@ -131,26 +133,30 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
     CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT])
         << "Running without encoder calibration can cause serious harm";
 
-    // switch (direct_control.wheel_control().wheel_control_case())
-    //{
-    // case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectPerWheelControl:
-    //{
-    // break;
-    //}
-    // case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectPerWheelControl:
-    //{
-    // break;
-    //}
-    // case TbotsProto::DirectControlPrimitive::WheelControlCase::WHEEL_CONTROL_NOT_SET;
-    //{
-    // break;
-    //}
-    //}
+    switch (direct_control.wheel_control_case())
+    {
+        case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectPerWheelControl:
+        {
+            tmc4671_setTargetVelocity(
+                FRONT_LEFT_MOTOR_CHIP_SELECT,
+                direct_control.direct_per_wheel_control().front_left_wheel_rpm() *
+                    MAX_DRIVE_RPM);
 
-    // TODO (#2335) convert local velocity to per-wheel velocity
-    // using http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf and then
-    // communicate velocities to trinamic. Also read back feedback and
-    // return drive unit status.
+            break;
+        }
+        case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectVelocityControl:
+        {
+            // TODO (#2335) convert local velocity to per-wheel velocity
+            // using http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf and then
+            // communicate velocities to trinamic. 
+            break;
+        }
+        case TbotsProto::DirectControlPrimitive::WheelControlCase::WHEEL_CONTROL_NOT_SET:
+        {
+            break;
+        }
+    }
+
     return std::make_unique<TbotsProto::DriveUnitStatus>();
 }
 

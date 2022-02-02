@@ -58,10 +58,10 @@ message DirectControlPrimitive
 
     message DirectPerWheelControl
     {
-        float front_left_wheel_rpm  = 1;
-        float back_left_wheel_rpm   = 2;
-        float front_right_wheel_rpm = 3;
-        float back_right_wheel_rpm  = 4;
+        int32 front_left_wheel_rpm  = 1;
+        int32 back_left_wheel_rpm   = 2;
+        int32 front_right_wheel_rpm = 3;
+        int32 back_right_wheel_rpm  = 4;
     }
 
     message DirectVelocityControl

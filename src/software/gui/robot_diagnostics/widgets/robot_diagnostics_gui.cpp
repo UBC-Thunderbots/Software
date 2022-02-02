@@ -131,31 +131,31 @@ void RobotDiagnosticsGUI::setWheelControlPrimitiveFromUI(
             primitive_msg.mutable_direct_control()
                 ->mutable_direct_per_wheel_control()
                 ->set_front_left_wheel_rpm(
-                    main_widget->lineEdit_direct_per_wheel_fl->text().toFloat());
+                    main_widget->lineEdit_direct_per_wheel_fl->text().toInt());
             primitive_msg.mutable_direct_control()
                 ->mutable_direct_per_wheel_control()
                 ->set_front_right_wheel_rpm(
-                    main_widget->lineEdit_direct_per_wheel_fr->text().toFloat());
+                    main_widget->lineEdit_direct_per_wheel_fr->text().toInt());
             primitive_msg.mutable_direct_control()
                 ->mutable_direct_per_wheel_control()
                 ->set_back_left_wheel_rpm(
-                    main_widget->lineEdit_direct_per_wheel_bl->text().toFloat());
+                    main_widget->lineEdit_direct_per_wheel_bl->text().toInt());
             primitive_msg.mutable_direct_control()
                 ->mutable_direct_per_wheel_control()
                 ->set_back_right_wheel_rpm(
-                    main_widget->lineEdit_direct_per_wheel_br->text().toFloat());
+                    main_widget->lineEdit_direct_per_wheel_br->text().toInt());
             break;
         case static_cast<int>(WheelControlTab::DIRECT_VELOCITY):
             primitive_msg.mutable_direct_control()
                 ->mutable_direct_velocity_control()
                 ->mutable_velocity()
                 ->set_x_component_meters(
-                    main_widget->lineEdit_direct_velocity_x->text().toFloat());
+                    main_widget->lineEdit_direct_velocity_x->text().toInt());
             primitive_msg.mutable_direct_control()
                 ->mutable_direct_velocity_control()
                 ->mutable_velocity()
                 ->set_y_component_meters(
-                    main_widget->lineEdit_direct_velocity_y->text().toFloat());
+                    main_widget->lineEdit_direct_velocity_y->text().toInt());
 
             auto angular_velocity_msg =
                 createAngularVelocityProto(AngularVelocity::fromDegrees(
