@@ -80,13 +80,14 @@ class WorldLayer(FieldLayer):
 
         """
 
+        convert_degree = -16
+
         for robot in team.team_robots:
 
             painter.setPen(pg.mkPen(color))
             painter.setBrush(pg.mkBrush(color))
 
             # TODO (#2396) Draw the robot IDs of the robots
-            # TODO (#2397) Draw the Orientation of the robots
             painter.drawChord(
                 self.createCircle(
                     robot.current_state.global_position.x_meters * MM_PER_M,
@@ -94,8 +95,8 @@ class WorldLayer(FieldLayer):
                     ROBOT_MAX_RADIUS,
                 ),
                 (math.degrees(robot.current_state.global_orientation.radians) + 45)
-                * -16,
-                270 * -16,
+                * convert_degree,
+                270 * convert_degree,
             )
 
     def draw_ball(self, painter, ball: Ball):
