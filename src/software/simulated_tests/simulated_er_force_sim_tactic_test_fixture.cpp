@@ -154,10 +154,10 @@ void SimulatedErForceSimTacticTestFixture::updateEnemyPrimitives(
     {
         LOG(FATAL) << "No enemy robot id set" << std::endl;
     }
-    else if (auto new_robot = world.friendlyTeam().getRobotById(*enemy_robot_id))
+    else if (auto new_robot = world.enemyTeam().getRobotById(*enemy_robot_id))
     {
         auto intent =
-            enemy_tactic->get(*world.friendlyTeam().getRobotById(*enemy_robot_id), world);
+            enemy_tactic->get(*world.enemyTeam().getRobotById(*enemy_robot_id), world);
         intent->setMotionConstraints(enemy_motion_constraints);
         intents.push_back(std::move(intent));
     }

@@ -62,8 +62,8 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
      * @throws runtime_error if any of the given robot ids are duplicated, or a
      * robot already exists on the specified team with one of the new IDs
      *
-     * @param field_typep The type of field to run the test on
-     * @param ball_state The ball state to run the test with
+     * @param field_type The type of field to run the test on
+     * @param ball The ball state to run the test with
      * @param friendly_robots The friendly robot states with ID to run the test with
      * @param enemy_robots The enemy robot states with ID to run the test with
      * @param terminating_validation_functions The terminating validation functions

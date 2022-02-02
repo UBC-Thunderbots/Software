@@ -55,18 +55,16 @@ void SimulatedErForceSimTestFixture::SetUp()
         ->getMutableRollingFrictionAcceleration()
         ->setValue(0.5);
 
-    // The simulated test abstracts and maintains the invariant that the friendly team
-    // is always defending the "negative" side of the field. This is so that the
-    // coordinates given when setting up tests is from the perspective of the friendly
+    // The simulated test abstracts and maintains the invariant that the enemy team
+    // is always defending the "positive" side of the field. This is so that the
+    // coordinates given when setting up tests is from the perspective of the enemy
     // team
     enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableFriendlyColorYellow()
-        ->setValue(true);
+        ->setValue(false);
     enemy_mutable_thunderbots_config->getMutableAiControlConfig()
         ->getMutableRunAi()
         ->setValue(!TbotsGtestMain::stop_ai_on_start);
-
-    // enemy
 
     // The simulated test abstracts and maintains the invariant that the friendly team
     // is always the yellow team
@@ -75,7 +73,7 @@ void SimulatedErForceSimTestFixture::SetUp()
         ->setValue(true);
     enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableDefendingPositiveSide()
-        ->setValue(false);
+        ->setValue(true);
 
     // Experimentally determined restitution value
     enemy_mutable_thunderbots_config->getMutableSimulatorConfig()

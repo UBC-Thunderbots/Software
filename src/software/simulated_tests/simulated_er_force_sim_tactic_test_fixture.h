@@ -9,8 +9,8 @@
 
 /**
  * This is a test fixture designed to make it easy to write integration tests for Tactics.
- * It provides an easy interface to set up a single robot running a single tactic , and
- * then validate how the world changes over time during simulation
+ * It provides an interface to set up a single friendly and enemy robot each running a
+ * single tactic, and then validate how the world changes over time during simulation
  *
  * Since users can't update the Tactic in sync with simulation ticks, the
  * SimulatedErForceSimTacticTestFixture will update the robot of the tactic
