@@ -8,8 +8,8 @@ function target_wheel_speeds = euclidean_to_wheel(current_wheel_speeds, target_e
 
 % Robot Parameters
 delta_t = 1/200; % s
-robot_mass_M = 1; % kg
-robot_radius_R = 1; % m
+robot_mass_M = 2.5; % kg
+robot_radius_R = 0.09; % m
 mass_distribution_alpha = 0.5; % m
 front_wheel_angle_phi = deg2rad(45); % rad
 rear_wheel_angle_theta = deg2rad(55); % rad

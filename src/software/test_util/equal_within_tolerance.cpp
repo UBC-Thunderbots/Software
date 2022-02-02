@@ -230,8 +230,9 @@ namespace TestUtil
         return assertion_result;
     }
 
-    ::testing::AssertionResult TestUtil::equalWithinTolerance(
-        const Eigen::MatrixXd &matrix1, const Eigen::MatrixXd &matrix2, double tolerance)
+    ::testing::AssertionResult equalWithinTolerance(const Eigen::MatrixXd &matrix1,
+                                                    const Eigen::MatrixXd &matrix2,
+                                                    double tolerance)
     {
         auto distance = matrix1 - matrix2;
         auto norm     = distance.norm();

@@ -41,16 +41,17 @@ EuclideanToFourWheel::EuclideanToFourWheel()
     delta_t_ = 1.0 / 200;
 
     // import robot constants
+
     robot_mass_M_ = robot_constants.mass_kg;
     // TODO: get robot radius from robot_constants
-    robot_radius_R_ = 1;
+    robot_radius_R_ = 0.2;
     mass_distribution_alpha_ =
         robot_constants.moment_of_inertia_kg_m_2 / (robot_mass_M_ * robot_radius_R_);
     // TODO: get front wheel angle from robot_constants
-//    front_wheel_angle_phi_ = robot_constants.front_wheel_angle_deg;
+    //    front_wheel_angle_phi_ = robot_constants.front_wheel_angle_deg;
     front_wheel_angle_phi_ = 45 * M_PI / 180.0;
     // TODO: get rear wheel angle from robot_constants
-//    rear_wheel_angle_theta_ = robot_constants.back_wheel_angle_deg;
+    //    rear_wheel_angle_theta_ = robot_constants.back_wheel_angle_deg;
     rear_wheel_angle_theta_ = 55 * M_PI / 180.0;
 
     // calculate coupling matrices
@@ -65,16 +66,14 @@ EuclideanToFourWheel::EuclideanToFourWheel()
     e << 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
     Eigen::Matrix4d f;
     f << 1, a, b, c, a, 1, c, b, b, c, 1, d, c, b, d, 1;
-
     wheel_force_to_delta_wheel_speed_D_C_alpha_ =
         1 / (robot_mass_M_ * mass_distribution_alpha_) * e + 1 / robot_mass_M_ * f;
 
     auto i = 1 / (2 * sin(front_wheel_angle_phi_) + 2 * sin(rear_wheel_angle_theta_));
     auto j = cos(front_wheel_angle_phi_) / (2 * pow(cos(front_wheel_angle_phi_), 2) +
-                                            2 * pow(cos(front_wheel_angle_phi_), 2));
+                                            2 * pow(cos(rear_wheel_angle_theta_), 2));
     auto k = sin(rear_wheel_angle_theta_) /
-             (2 * sin(front_wheel_angle_phi_), 2 * sin(rear_wheel_angle_theta_));
-
+             (2 * sin(front_wheel_angle_phi_) + 2 * sin(rear_wheel_angle_theta_));
     wheel_speed_to_euclidean_velocity_D_inverse_ << -i, -i, i, i, j, -j, -(1. - j),
         (1. - j), k, k, (1 - k), (1 - k);
 }
