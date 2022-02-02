@@ -128,7 +128,7 @@ class MotorService : public Service
      * A lot of initialization parameters are necessary to function. If there is
      * a single bit error, we can risk frying the motor driver or controller.
      *
-     * The following functions can be used around initialization params
+     * The following functions can be used to setup initialization params
      * that _must_ be set to continue. A failed call will crash the program
      *
      * @param motor Which motor to talk to (in our case, the chip select)
