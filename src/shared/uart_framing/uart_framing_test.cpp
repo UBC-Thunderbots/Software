@@ -79,8 +79,10 @@ TEST_P(CobsDecodingErrorTest, decode_error_tests)
 
 INSTANTIATE_TEST_CASE_P(decode_error_tests, CobsDecodingErrorTest,
                         ::testing::Values(std::vector<uint8_t>({0x01}),
+                                          std::vector<uint8_t>({0x01, START_END_FLAG_BYTE}),
                                           std::vector<uint8_t>({0x01,
-                                                                START_END_FLAG_BYTE}),
+                                                                START_END_FLAG_BYTE, 0x01}),
+                                          std::vector<uint8_t>({START_END_FLAG_BYTE, 0x02, START_END_FLAG_BYTE}),
                                           std::vector<uint8_t>(100, START_END_FLAG_BYTE),
                                           std::vector<uint8_t>(100, 0xFF)));
 
@@ -113,26 +115,26 @@ class UartFramingTest : public ::testing::Test
 
 TEST_F(UartFramingTest, length_and_crc_test)
 {
-    auto test_frame = addLengthAndCrc(test_message);
+    auto test_frame = createUartMessageFrame(test_message);
     // Check size of frame is the size of the original struct + length and crc fields
     EXPECT_EQ(sizeof(test_frame), sizeof(TestMessage) + 2 * sizeof(uint16_t));
     // Check fields of frame
     EXPECT_EQ(test_frame.length, sizeof(TestMessage));
     EXPECT_EQ(test_frame.crc, TEST_MESSAGE_CRC);
     EXPECT_EQ(test_frame.message, test_message);
-    EXPECT_TRUE(verifyLengthAndCrc(test_frame));
+    EXPECT_TRUE(test_frame.verifyLengthAndCrc());
 }
 
 TEST_F(UartFramingTest, verify_length_and_crc_detect_wrong_length_and_crc_test)
 {
     UartMessageFrame<TestMessage> test_frame = {sizeof(test_message), TEST_MESSAGE_CRC,
                                                 test_message};
-    EXPECT_TRUE(verifyLengthAndCrc(test_frame));
+    EXPECT_TRUE(test_frame.verifyLengthAndCrc());
     test_frame.length = 0;
-    EXPECT_FALSE(verifyLengthAndCrc(test_frame));
+    EXPECT_FALSE(test_frame.verifyLengthAndCrc());
     test_frame.length = sizeof(test_message);
     test_frame.crc    = 0;
-    EXPECT_FALSE(verifyLengthAndCrc(test_frame));
+    EXPECT_FALSE(test_frame.verifyLengthAndCrc());
 }
 
 TEST_F(UartFramingTest, verify_length_and_crc_detect_byte_error_test)
@@ -149,13 +151,14 @@ TEST_F(UartFramingTest, verify_length_and_crc_detect_byte_error_test)
               reinterpret_cast<uint8_t*>(&test_message_byte_error));
     UartMessageFrame<TestMessage> test_frame = {sizeof(test_message), TEST_MESSAGE_CRC,
                                                 test_message_byte_error};
-    EXPECT_FALSE(verifyLengthAndCrc(test_frame));
+    EXPECT_FALSE(test_frame.verifyLengthAndCrc());
 }
 
 TEST_F(UartFramingTest, marshalling_test)
 {
     // bytes is expected to be of form 0x00 0x02 0x10 0x05 ... 0x65 0x00
-    auto bytes = marshallUartPacket(test_message);
+    auto test_frame = createUartMessageFrame(test_message);
+    auto bytes = test_frame.marshallUartPacket();
     EXPECT_EQ(bytes.front(), START_END_FLAG_BYTE);
     EXPECT_EQ(bytes.back(), START_END_FLAG_BYTE);
     // Check overhead byte
@@ -166,12 +169,13 @@ TEST_F(UartFramingTest, marshalling_test)
     EXPECT_EQ(bytes.size(),
               sizeof(test_message) + 2 * sizeof(uint16_t) + 3 * sizeof(uint8_t));
 
-    auto test_frame = unmarshalUartPacket<TestMessage>(bytes);
+    auto test_frame_unmarshalled = unmarshalUartPacket<TestMessage>(bytes);
+    EXPECT_TRUE(test_frame_unmarshalled.has_value());
     // Check size of frame is the size of the original struct + length and crc fields
-    EXPECT_EQ(sizeof(test_frame.value()), sizeof(TestMessage) + 2 * sizeof(uint16_t));
+    EXPECT_EQ(sizeof(test_frame_unmarshalled.value()), sizeof(TestMessage) + 2 * sizeof(uint16_t));
     // Check fields of frame
-    EXPECT_EQ(test_frame->length, sizeof(TestMessage));
-    EXPECT_EQ(test_frame->crc, TEST_MESSAGE_CRC);
-    EXPECT_EQ(test_frame->message, test_message);
-    EXPECT_TRUE(verifyLengthAndCrc(test_frame.value()));
+    EXPECT_EQ(test_frame_unmarshalled->length, sizeof(TestMessage));
+    EXPECT_EQ(test_frame_unmarshalled->crc, TEST_MESSAGE_CRC);
+    EXPECT_EQ(test_frame_unmarshalled->message, test_message);
+    EXPECT_TRUE(test_frame_unmarshalled->verifyLengthAndCrc());
 }

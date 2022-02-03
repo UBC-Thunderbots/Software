@@ -5,6 +5,8 @@
 #include <vector>
 
 const uint8_t START_END_FLAG_BYTE = 0x00;
+template <typename T>
+struct UartMessageFrame;
 
 /**
  * Acts as a frame for uart messages
@@ -13,13 +15,6 @@ const uint8_t START_END_FLAG_BYTE = 0x00;
  *
  * @tparam T the type of message being framed
  */
-template <typename T>
-struct UartMessageFrame
-{
-    uint16_t length;
-    uint16_t crc;
-    T message;
-};
 
 namespace
 {
@@ -30,55 +25,22 @@ namespace
      * @param length the length of the data
      * @return CRC-16 for given data and length
      */
-    template <typename T>
-    uint16_t crc16(const T& data, uint16_t length)
+    uint16_t crc16(const std::vector<uint8_t>& data, uint16_t length)
     {
         uint8_t x;
         uint16_t crc = 0xFFFF;
-        auto ptr     = reinterpret_cast<const uint8_t*>(&data);
-        auto bytes   = std::vector<uint8_t>(ptr, ptr + sizeof(data));
         int i        = 0;
 
         while (length--)
         {
-            x = static_cast<uint8_t>(crc >> 8u) ^ bytes[i++];
+            x = static_cast<uint8_t>(crc >> 8u) ^ data[i++];
             x ^= static_cast<uint8_t>(x >> 4u);
             crc = static_cast<uint16_t>((crc << 8u) ^ (x << 12u) ^ (x << 5u) ^ x);
         }
 
         return crc;
     }
-    /**
-     * Calculates the length and crc for the given data and returns
-     * a UartMessageFrame with the given data and computed fields
-     *
-     * @tparam T the type of the data param
-     * @param data the data to put in a UartMessageFrame
-     * @return a UartMessageFrame with the given data and computed fields
-     */
-    template <typename T>
-    UartMessageFrame<T> addLengthAndCrc(const T& data)
-    {
-        uint16_t length = sizeof(data);
-        uint16_t crc    = crc16(data, length);
-        UartMessageFrame<T> frame{length, crc, data};
-        return frame;
-    }
 
-    /**
-     * Checks if the length and crc of the UartMessageFrame match
-     * the length and crc of the message
-     * @tparam T type that is being wrapped in data
-     * @param data the data to verify
-     * @return true if the length and crc match false otherwise
-     */
-    template <typename T>
-    bool verifyLengthAndCrc(UartMessageFrame<T> data)
-    {
-        uint16_t expected_length = sizeof(data.message);
-        uint16_t expected_crc    = crc16(data.message, data.length);
-        return data.crc == expected_crc && data.length == expected_length;
-    }
     /**
      * Implementation of modified Consistent Overhead Byte Stuffing(COBS) encoding
      * https://en.wikipedia.org/wiki/Consistent_Overhead_Byte_Stuffing
@@ -125,7 +87,8 @@ namespace
      * Implementation of modified Consistent Overhead Byte Stuffing(COBS) decoding
      * https://en.wikipedia.org/wiki/Consistent_Overhead_Byte_Stuffing
      *
-     * Uses a Delimiter byte at both the beginning(different) and end(normal)
+     * Uses a Delimiter byte at both the beginning and end instead of a single
+     * delimiter byte at the end as in the wikipedia example.
      *
      * @param to_decode the vector of bytes to decode
      * @return a vector of bytes decoded with COBS
@@ -144,6 +107,14 @@ namespace
         while (i < to_decode.size())
         {
             uint8_t overhead = to_decode[i++];
+            // Check that overhead does not point to past the end of the vector
+            if (overhead + i > to_decode.size()) {
+                return std::nullopt;
+            }
+            // Check that instances of the START_END_FLAG_BYTE are not in the middle of the vector
+            if (overhead == START_END_FLAG_BYTE && i != to_decode.size()) {
+                return std::nullopt;
+            }
             for (uint16_t j = 1; i < to_decode.size() && j < overhead; j++)
             {
                 decoded.emplace_back(to_decode[i++]);
@@ -154,31 +125,68 @@ namespace
                 decoded.emplace_back(START_END_FLAG_BYTE);
             }
         }
-        // Make sure decoded message is within the upper bound of bytes
-        if (decoded.size() + 3 + decoded.size() / 254 < to_decode.size())
-        {
-            return std::nullopt;
-        }
+
         return decoded;
     }
 }  // anonymous namespace
 
-/**
- * Prepares a struct for being sent over uart.
- * Performs both the framing and encoding.
- *
- * @tparam T type of struct beginning sent
- * @param data struct being marshalled
- * @return vector of bytes to be sent over uart
- */
 template <typename T>
-std::vector<uint8_t> marshallUartPacket(const T& data)
+struct UartMessageFrame
 {
-    auto framed_packet_struct = addLengthAndCrc(data);
-    auto framed_packet_ptr    = reinterpret_cast<const char*>(&framed_packet_struct);
-    std::vector<uint8_t> framed_packet(framed_packet_ptr,
-                                       framed_packet_ptr + sizeof(framed_packet_struct));
-    return cobsEncoding(framed_packet);
+    uint16_t length;
+    uint16_t crc;
+    T message;
+
+    /**
+     * Prepares a struct for being sent over uart.
+     * Performs both the framing and encoding.
+     *
+     * @tparam T type of struct beginning sent
+     * @param data struct being marshalled
+     * @return vector of bytes to be sent over uart
+     */
+    std::vector<uint8_t> marshallUartPacket()
+    {
+        auto message_ptr    = reinterpret_cast<const char*>(this);
+        std::vector<uint8_t> framed_packet(message_ptr,
+                                           message_ptr + sizeof(*this));
+        return cobsEncoding(framed_packet);
+    }
+
+    /**
+     * Checks if the length and crc of the UartMessageFrame match
+     * the length and crc of the message
+     * @tparam T type that is being wrapped in data
+     * @param data the data to verify
+     * @return true if the length and crc match false otherwise
+     */
+    bool verifyLengthAndCrc()
+    {
+        uint16_t expected_length = sizeof(message);
+        auto ptr     = reinterpret_cast<const uint8_t*>(&message);
+        auto bytes   = std::vector<uint8_t>(ptr, ptr + sizeof(message));
+        uint16_t expected_crc    = crc16(bytes, length);
+        return crc == expected_crc && length == expected_length;
+    }
+};
+
+/**
+     * Calculates the length and crc for the given data and returns
+     * a UartMessageFrame with the given data and computed fields
+     *
+     * @tparam T the type of the data param
+     * @param data the data to put in a UartMessageFrame
+     * @return a UartMessageFrame with the given data and computed fields
+     */
+template <typename T>
+UartMessageFrame<T> createUartMessageFrame(const T& data)
+{
+    uint16_t length = sizeof(data);
+    auto ptr     = reinterpret_cast<const uint8_t*>(&data);
+    auto bytes   = std::vector<uint8_t>(ptr, ptr + sizeof(data));
+    uint16_t crc    = crc16(bytes, length);
+    UartMessageFrame<T> frame{length, crc, data};
+    return frame;
 }
 
 /**
@@ -206,7 +214,7 @@ std::optional<UartMessageFrame<T>> unmarshalUartPacket(const std::vector<uint8_t
     }
     std::copy(decoded_data->begin(), decoded_data->end(),
               reinterpret_cast<uint8_t*>(&message_frame));
-    if (verifyLengthAndCrc(message_frame))
+    if (message_frame.verifyLengthAndCrc())
     {
         return message_frame;
     }
