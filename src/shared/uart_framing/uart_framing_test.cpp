@@ -77,14 +77,13 @@ TEST_P(CobsDecodingErrorTest, decode_error_tests)
     EXPECT_FALSE(decoded.has_value());
 }
 
-INSTANTIATE_TEST_CASE_P(decode_error_tests, CobsDecodingErrorTest,
-                        ::testing::Values(std::vector<uint8_t>({0x01}),
-                                          std::vector<uint8_t>({0x01, START_END_FLAG_BYTE}),
-                                          std::vector<uint8_t>({0x01,
-                                                                START_END_FLAG_BYTE, 0x01}),
-                                          std::vector<uint8_t>({START_END_FLAG_BYTE, 0x02, START_END_FLAG_BYTE}),
-                                          std::vector<uint8_t>(100, START_END_FLAG_BYTE),
-                                          std::vector<uint8_t>(100, 0xFF)));
+INSTANTIATE_TEST_CASE_P(
+    decode_error_tests, CobsDecodingErrorTest,
+    ::testing::Values(
+        std::vector<uint8_t>({0x01}), std::vector<uint8_t>({0x01, START_END_FLAG_BYTE}),
+        std::vector<uint8_t>({0x01, START_END_FLAG_BYTE, 0x01}),
+        std::vector<uint8_t>({START_END_FLAG_BYTE, 0x02, START_END_FLAG_BYTE}),
+        std::vector<uint8_t>(100, START_END_FLAG_BYTE), std::vector<uint8_t>(100, 0xFF)));
 
 class UartFramingTest : public ::testing::Test
 {
@@ -158,7 +157,7 @@ TEST_F(UartFramingTest, marshalling_test)
 {
     // bytes is expected to be of form 0x00 0x02 0x10 0x05 ... 0x65 0x00
     auto test_frame = createUartMessageFrame(test_message);
-    auto bytes = test_frame.marshallUartPacket();
+    auto bytes      = test_frame.marshallUartPacket();
     EXPECT_EQ(bytes.front(), START_END_FLAG_BYTE);
     EXPECT_EQ(bytes.back(), START_END_FLAG_BYTE);
     // Check overhead byte
@@ -172,7 +171,8 @@ TEST_F(UartFramingTest, marshalling_test)
     auto test_frame_unmarshalled = unmarshalUartPacket<TestMessage>(bytes);
     EXPECT_TRUE(test_frame_unmarshalled.has_value());
     // Check size of frame is the size of the original struct + length and crc fields
-    EXPECT_EQ(sizeof(test_frame_unmarshalled.value()), sizeof(TestMessage) + 2 * sizeof(uint16_t));
+    EXPECT_EQ(sizeof(test_frame_unmarshalled.value()),
+              sizeof(TestMessage) + 2 * sizeof(uint16_t));
     // Check fields of frame
     EXPECT_EQ(test_frame_unmarshalled->length, sizeof(TestMessage));
     EXPECT_EQ(test_frame_unmarshalled->crc, TEST_MESSAGE_CRC);
