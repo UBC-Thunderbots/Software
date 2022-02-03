@@ -16,6 +16,7 @@
 #include "software/logger/logger.h"
 #include "software/multithreading/observer_subject_adapter.hpp"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
+#include "software/networking/proto_unix_listener.hpp"
 #include "software/util/generic_factory/generic_factory.h"
 
 // clang-format off
@@ -49,6 +50,8 @@ int main(int argc, char** argv)
         auto mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
         auto thunderbots_config =
             std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
+
+
 
         // Override default network interface
         if (!args->getInterface()->value().empty())

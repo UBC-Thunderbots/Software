@@ -93,3 +93,11 @@ py_library(
         "//proto:software_py_proto",
     ],
 )
+
+py_library(
+    name = "threaded_unix_sender_py",
+    srcs = ["threaded_unix_sender.py"],
+    deps = [
+        "//proto:software_py_proto",
+    ],
+)

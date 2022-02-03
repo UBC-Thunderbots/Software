@@ -7,7 +7,9 @@ py_binary(
     srcs = ["thunderscope.py"],
     deps = [
         "//proto:software_py_proto",
+        "//shared/parameter:dynamic_param_py_proto",
         "//software/networking:threaded_unix_listener_py",
+        "//software/networking:threaded_unix_sender_py",
         "//software/thunderscope:colors",
         "//software/thunderscope:constants",
         "//software/thunderscope/field",
