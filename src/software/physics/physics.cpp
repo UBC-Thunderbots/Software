@@ -1,12 +1,5 @@
 #include "software/physics/physics.h"
 
-#define _USE_MATH_DEFINES
-
-#include <cmath>
-
-#include "shared/2021_robot_constants.h"
-#include "shared/constants.h"
-
 Point calculateFuturePosition(const Point &initial_position,
                               const Vector &initial_velocity,
                               const Vector &constant_acceleration,

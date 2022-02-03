@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Eigen/Dense>
-
 #include "software/geom/point.h"
 #include "software/time/duration.h"
 
