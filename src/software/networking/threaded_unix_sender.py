@@ -19,21 +19,13 @@ class ThreadedUnixSender:
         :param convert_from_any: Convert from any
 
         """
-        # cleanup the old path if it exists
-        try:
-            os.remove(unix_path)
-        except:
-            pass
-
         self.unix_path = unix_path
         self.proto_buffer = queue.Queue(max_buffer_size)
 
         self.socket = socket.socket(socket.AF_UNIX, type=socket.SOCK_DGRAM)
-        self.socket.connect(self.unix_path)
 
         self.thread = Thread(target=self.__send_protobuf)
         self.thread.start()
-
 
     @property
     def buffer(self):
@@ -42,14 +34,14 @@ class ThreadedUnixSender:
     def __send_protobuf(self):
         """Send the buffered protobuf
         """
+        print("WHAT")
         proto = None
 
-        try:
-            proto = self.proto_buffer.get_nowait(proto)
-        except queue.Empty as queue_empty:
-            return
+        while True:
+            proto = self.proto_buffer.get()
 
-        self.socket.sendall(proto.SerializeToString())
+            print("SENDING")
+            self.socket.sendto(bytes("HELLO", 'utf-8'), self.unix_path)
 
     def send(self, proto):
         """Buffer a protobuf to be sent by the send thread

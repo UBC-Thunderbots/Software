@@ -32,20 +32,6 @@ class ProtoUnixListener
                       std::function<void(ReceiveProtoT&)> receive_callback,
                       bool multicast);
 
-    /**
-     * Creates an ProtoUnixListener that will listen for ReceiveProtoT packets from
-     * the network on any local address with given port. For every ReceiveProtoT packet
-     * received, the receive_callback will be called to perform any operations desired by
-     * the caller
-     *
-     * @param io_service The io_service to use to service incoming ReceiveProtoT data
-     * @param port The port on which to listen for ReceiveProtoT packets
-     * @param receive_callback The function to run for every ReceiveProtoT packet received
-     * from the network
-     */
-    ProtoUnixListener(boost::asio::io_service& io_service, unsigned short port,
-                      std::function<void(ReceiveProtoT&)> receive_callback);
-
     virtual ~ProtoUnixListener();
 
    private:
@@ -67,7 +53,6 @@ class ProtoUnixListener
     boost::asio::local::datagram_protocol::socket socket_;
     // The endpoint for the sender
     boost::asio::local::datagram_protocol::endpoint listen_endpoint_;
-    boost::asio::local::datagram_protocol::endpoint endpoint_;
 
     static constexpr unsigned int MAX_BUFFER_LENGTH = 9000;
     std::array<char, MAX_BUFFER_LENGTH> raw_received_data_;
@@ -83,19 +68,11 @@ ProtoUnixListener<ReceiveProtoT>::ProtoUnixListener(
     bool multicast)
     : socket_(io_service), receive_callback(receive_callback)
 {
-    remove(ip_address.c_str());
+    ::unlink(ip_address.c_str());
     listen_endpoint_ = boost::asio::local::datagram_protocol::endpoint(ip_address);
     socket_.open();
     socket_.bind(listen_endpoint_);
     startListen();
-}
-
-template <class ReceiveProtoT>
-ProtoUnixListener<ReceiveProtoT>::ProtoUnixListener(
-    boost::asio::io_service& io_service, const unsigned short port,
-    std::function<void(ReceiveProtoT&)> receive_callback)
-    : socket_(io_service), receive_callback(receive_callback)
-{
 }
 
 template <class ReceiveProtoT>
@@ -115,6 +92,7 @@ template <class ReceiveProtoT>
 void ProtoUnixListener<ReceiveProtoT>::handleDataReception(
     const boost::system::error_code& error, size_t num_bytes_received)
 {
+    LOG(DEBUG) << "DATA RECEIVER";
     if (!error)
     {
         auto packet_data = ReceiveProtoT();

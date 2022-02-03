@@ -6,6 +6,7 @@
 
 #include "proto/logging/proto_logger.h"
 #include "proto/message_translation/ssl_wrapper.h"
+#include "shared/parameter/dynamic_parameters.pb.h"
 #include "proto/play_info_msg.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/threaded_ai.h"
@@ -15,8 +16,8 @@
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/logger/logger.h"
 #include "software/multithreading/observer_subject_adapter.hpp"
+#include "software/networking/threaded_unix_listener.hpp"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
-#include "software/networking/proto_unix_listener.hpp"
 #include "software/util/generic_factory/generic_factory.h"
 
 // clang-format off
@@ -51,6 +52,12 @@ int main(int argc, char** argv)
         auto thunderbots_config =
             std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
 
+        ThreadedProtoUnixListener<TbotsProto::ThunderbotsConfig>(
+            "/tmp/tbots/bobthebuilder", 0,
+            [](TbotsProto::ThunderbotsConfig input) {
+                LOG(DEBUG) << "RECEVIED PROTOBUF";
+            },
+            false);
 
 
         // Override default network interface

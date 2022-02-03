@@ -53,7 +53,7 @@ if __name__ == "__main__":
     def update():
         field.refresh()
         logs.refresh()
-        test.write(ThunderbotsConfig())
+        test.send(ThunderbotsConfig())
 
     timer = QtCore.QTimer()
     timer.timeout.connect(update)
