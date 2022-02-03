@@ -20,8 +20,8 @@ namespace TestUtil
         const RobotConstants_t robot_constants = {
             .mass_kg                                = 1.1f,
             .moment_of_inertia_kg_m_2               = 1.2f,
-            .inertial_factor                        = 0.37,
-            .robot_radius_m                         = 0.09,
+            .inertial_factor                        = 0.37f,
+            .robot_radius_m                         = 0.09f,
             .jerk_limit_kg_m_per_s_3                = 1.4f,
             .front_wheel_angle_deg                  = 1.5f,
             .back_wheel_angle_deg                   = 1.6f,
