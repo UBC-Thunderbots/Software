@@ -27,8 +27,9 @@ namespace TestUtil
         auto ppts1 = poly1.getPoints();
         auto ppts2 = poly2.getPoints();
         if (std::equal(ppts1.begin(), ppts1.end(), ppts2.begin(),
-                       [tolerance](const Point &p1, const Point &p2)
-                       { return equalWithinTolerance(p1, p2, tolerance); }))
+                       [tolerance](const Point &p1, const Point &p2) {
+                           return equalWithinTolerance(p1, p2, tolerance);
+                       }))
         {
             return ::testing::AssertionSuccess();
         }
@@ -243,8 +244,9 @@ namespace TestUtil
         }
         else
         {
-            return ::testing::AssertionFailure()
-                   << "Matrix 1 was \n" << matrix1 << "\n, matrix 2 was \n" << matrix2;
+            return ::testing::AssertionFailure() << "Matrix 1 was \n"
+                                                 << matrix1 << "\n, matrix 2 was \n"
+                                                 << matrix2;
         }
     }
 };  // namespace TestUtil

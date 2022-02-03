@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include <chrono>
 #include <Eigen/Dense>
+#include <chrono>
 
 #include "shared/constants.h"
 #include "software/geom/algorithms/almost_equal.h"
@@ -163,7 +163,8 @@ namespace TestUtil
 
     /**
      * Checks if two matrices are within tolerance of each other.
-     * Two matrices are within tolerance if their norms are within tolerance of each other.
+     * Two matrices are within tolerance if their norms are within tolerance of each
+     * other.
      *
      * @param matrix1, matrix2 The matrices to compare.
      * @param tolerance The tolerance to check velocities with.
