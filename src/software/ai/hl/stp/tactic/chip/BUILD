@@ -12,9 +12,9 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
-        "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
+        "//software/ai/intent:chip_intent",
         "//software/logger",
     ],
 )
@@ -32,16 +32,6 @@ cc_test(
 cc_test(
     name = "chip_tactic_test",
     srcs = ["chip_tactic_test.cpp"],
-    deps = [
-        ":chip_tactic",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
-    ],
-)
-
-cc_test(
-    name = "simulated_chip_tactic_test",
-    srcs = ["simulated_chip_tactic_test.cpp"],
     deps = [
         ":chip_tactic",
         "//shared/test_util:tbots_gtest_main",

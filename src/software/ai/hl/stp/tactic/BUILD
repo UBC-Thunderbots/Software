@@ -4,35 +4,9 @@ cc_test(
     name = "penalty_setup_tactic_test",
     srcs = ["penalty_setup_tactic_test.cpp"],
     deps = [
-        ":penalty_setup_tactic",
         "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
-    ],
-)
-
-cc_library(
-    name = "kickoff_chip_tactic",
-    srcs = ["kickoff_chip_tactic.cpp"],
-    hdrs = ["kickoff_chip_tactic.h"],
-    deps = [
-        "//shared:constants",
-        "//software/ai/hl/stp/action:chip_action",
-        "//software/ai/hl/stp/tactic/chip:chip_tactic",
-        "//software/logger",
-    ],
-)
-
-cc_library(
-    name = "penalty_setup_tactic",
-    srcs = ["penalty_setup_tactic.cpp"],
-    hdrs = ["penalty_setup_tactic.h"],
-    deps = [
-        "//shared:constants",
-        "//software/ai/evaluation:calc_best_shot",
-        "//software/ai/hl/stp/action:kick_action",
-        "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/logger",
+        "//software/test_util",
     ],
 )
 
@@ -40,8 +14,6 @@ cc_library(
     name = "all_tactics",
     hdrs = ["all_tactics.h"],
     deps = [
-        ":kickoff_chip_tactic",
-        ":penalty_setup_tactic",
         ":tactic",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
         "//software/ai/hl/stp/tactic/chip:chip_tactic",
@@ -70,23 +42,11 @@ cc_library(
     ],
     deps = [
         ":transition_conditions",
-        "//software/ai/hl/stp/action",
         "//software/ai/intent",
         "//software/ai/intent:stop_intent",
         "//software/util/sml_fsm",
         "//software/util/typename",
         "//software/world",
-    ],
-)
-
-cc_test(
-    name = "tactic_test",
-    srcs = ["tactic_test.cpp"],
-    deps = [
-        ":tactic",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
-        "//software/test_util",
     ],
 )
 
@@ -106,5 +66,15 @@ cc_test(
         ":tactic",
         "//shared/test_util:tbots_gtest_main",
         "//software/world",
+    ],
+)
+
+cc_test(
+    name = "fsm_state_test",
+    srcs = ["fsm_state_test.cpp"],
+    deps = [
+        "//shared/test_util:tbots_gtest_main",
+        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
+        "//software/test_util",
     ],
 )

@@ -24,6 +24,16 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "gpio",
+    srcs = ["gpio.cpp"],
+    hdrs = ["gpio.h"],
+    deps = [
+        "//software/logger",
+        "//software/util/make_enum",
+    ],
+)
+
 cc_binary(
     name = "thunderloop_main",
     srcs = ["thunderloop_main.cpp"],

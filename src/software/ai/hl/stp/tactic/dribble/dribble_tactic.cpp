@@ -2,19 +2,14 @@
 
 #include <algorithm>
 
-#include "software/ai/hl/stp/action/stop_action.h"  // TODO (#1888): remove this dependency
-
 DribbleTactic::DribbleTactic()
-    : Tactic(false,
-             {RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
+    : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
       fsm(DribbleFSM()),
       control_params{DribbleFSM::ControlParams{.dribble_destination       = std::nullopt,
                                                .final_dribble_orientation = std::nullopt,
                                                .allow_excessive_dribbling = false}}
 {
 }
-
-void DribbleTactic::updateWorldParams(const World &world) {}
 
 void DribbleTactic::updateControlParams(std::optional<Point> dribble_destination,
                                         std::optional<Angle> final_dribble_orientation,
@@ -40,22 +35,6 @@ double DribbleTactic::calculateRobotCost(const Robot &robot, const World &world)
                world.field().totalXLength();
     }
     return std::clamp<double>(cost, 0, 1);
-}
-
-void DribbleTactic::calculateNextAction(ActionCoroutine::push_type &yield)
-{
-    auto stop_action = std::make_shared<StopAction>(false);
-
-    do
-    {
-        stop_action->updateControlParams(*robot_, false);
-        yield(stop_action);
-    } while (!stop_action->done());
-}
-
-bool DribbleTactic::done() const
-{
-    return fsm.is(boost::sml::X);
 }
 
 void DribbleTactic::updateIntent(const TacticUpdate &tactic_update)
