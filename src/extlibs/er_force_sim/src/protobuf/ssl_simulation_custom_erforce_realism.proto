@@ -50,4 +50,7 @@ message RealismConfigErForce
     optional int64 vision_processing_time = 14;
     // If false, 'glue' the ball during dribbling
     optional bool simulate_dribbling = 15;
+    // Simulates an offset of all reported object positions (robots, ball) at this
+    // magnitude [m]
+    optional float object_position_offset = 16;
 }
