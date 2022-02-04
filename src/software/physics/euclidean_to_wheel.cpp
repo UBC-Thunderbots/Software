@@ -13,35 +13,40 @@ EuclideanToWheel::EuclideanToWheel(const float &control_loop_frequency_Hz)
 
     // import robot constants
     robot_mass_M_kg_           = robot_constants.mass_kg;
-    robot_radius_R_m_         = robot_constants.robot_radius_m;
-    inertial_factor_alpha_m_  = robot_constants.inertial_factor;
-    front_wheel_angle_phi_rad_  = robot_constants.front_wheel_angle_deg * M_PI / 180.;
-    rear_wheel_angle_theta_rad_ = (robot_constants.back_wheel_angle_deg - 90.) * M_PI / 180.;
+    robot_radius_R_m_          = robot_constants.robot_radius_m;
+    inertial_factor_alpha_m_   = robot_constants.inertial_factor;
+    front_wheel_angle_phi_rad_ = robot_constants.front_wheel_angle_deg * M_PI / 180.;
+    rear_wheel_angle_theta_rad_ =
+        (robot_constants.back_wheel_angle_deg - 90.) * M_PI / 180.;
 
     // calculate DC_alpha matrix
     // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 17
-    auto a = pow(sin(front_wheel_angle_phi_rad_), 2) - pow(cos(front_wheel_angle_phi_rad_), 2);
+    auto a =
+        pow(sin(front_wheel_angle_phi_rad_), 2) - pow(cos(front_wheel_angle_phi_rad_), 2);
     auto b = -sin(front_wheel_angle_phi_rad_) * sin(rear_wheel_angle_theta_rad_) -
              cos(front_wheel_angle_phi_rad_) * cos(rear_wheel_angle_theta_rad_);
     auto c = -sin(front_wheel_angle_phi_rad_) * sin(rear_wheel_angle_theta_rad_) +
              cos(front_wheel_angle_phi_rad_) * cos(rear_wheel_angle_theta_rad_);
-    auto d = pow(sin(rear_wheel_angle_theta_rad_), 2) - pow(cos(rear_wheel_angle_theta_rad_), 2);
+    auto d = pow(sin(rear_wheel_angle_theta_rad_), 2) -
+             pow(cos(rear_wheel_angle_theta_rad_), 2);
     Eigen::Matrix4d e;
     e << 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
     Eigen::Matrix4d f;
     f << 1, a, b, c, a, 1, c, b, b, c, 1, d, c, b, d, 1;
     wheel_force_to_wheel_speed_delta_D_C_alpha_ =
-            1 / (robot_mass_M_kg_ * inertial_factor_alpha_m_) * e + 1 / robot_mass_M_kg_ * f;
+        1 / (robot_mass_M_kg_ * inertial_factor_alpha_m_) * e + 1 / robot_mass_M_kg_ * f;
 
     // calculate D inverse matrix
     // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 17
-    auto i = 1 / (2 * sin(front_wheel_angle_phi_rad_) + 2 * sin(rear_wheel_angle_theta_rad_));
-    auto j = cos(front_wheel_angle_phi_rad_) / (2 * pow(cos(front_wheel_angle_phi_rad_), 2) +
-                                                2 * pow(cos(rear_wheel_angle_theta_rad_), 2));
+    auto i =
+        1 / (2 * sin(front_wheel_angle_phi_rad_) + 2 * sin(rear_wheel_angle_theta_rad_));
+    auto j =
+        cos(front_wheel_angle_phi_rad_) / (2 * pow(cos(front_wheel_angle_phi_rad_), 2) +
+                                           2 * pow(cos(rear_wheel_angle_theta_rad_), 2));
     auto k = sin(rear_wheel_angle_theta_rad_) /
              (2 * sin(front_wheel_angle_phi_rad_) + 2 * sin(rear_wheel_angle_theta_rad_));
     wheel_speed_to_euclidean_velocity_D_inverse_ << -i, -i, i, i, j, -j, -(1. - j),
-            (1. - j), k, k, (1 - k), (1 - k);
+        (1. - j), k, k, (1 - k), (1 - k);
 }
 
 /**
@@ -128,5 +133,6 @@ WheelSpace_t EuclideanToWheel::getRotationalWheelForces(
 WheelSpace_t EuclideanToWheel::getWheelSpeedsDelta(
     const WheelSpace_t &target_wheel_forces)
 {
-    return delta_t_s_ * (wheel_force_to_wheel_speed_delta_D_C_alpha_ * target_wheel_forces);
+    return delta_t_s_ *
+           (wheel_force_to_wheel_speed_delta_D_C_alpha_ * target_wheel_forces);
 }

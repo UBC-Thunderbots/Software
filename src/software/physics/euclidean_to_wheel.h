@@ -24,7 +24,6 @@ typedef Eigen::Vector4d WheelSpace_t;
 class EuclideanToWheel
 {
    public:
-
     EuclideanToWheel() = default;
 
     /**
