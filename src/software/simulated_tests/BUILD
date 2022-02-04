@@ -45,6 +45,7 @@ cc_library(
         "//shared/test_util:tbots_gtest_main",
         # TODO (#1889) Remove this dep after optional params are implemented
         "//software/ai/hl/stp/play:halt_play",
+        "//proto/message_translation:er_force_world"
     ],
 )
 

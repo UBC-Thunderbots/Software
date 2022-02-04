@@ -13,7 +13,7 @@ namespace TestUtil
      * The struct represents the relevant aggregate functions used in testing
      */
     struct AggregateFunctions{
-        double avg, maximum, minimum;
+        double average, maximum, minimum;
     };
 
     /**
