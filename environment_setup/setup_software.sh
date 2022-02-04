@@ -102,13 +102,6 @@ echo "================================================================"
 echo "Upgrading Pip Version"
 echo "================================================================"
 
-if ! /usr/bin/python3.8 -m pip install --upgrade pip ; then
-    echo "##############################################################"
-    echo "Error: Upgrading pip version failed"
-    echo "##############################################################"
-    exit 1
-fi
-
 if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
     echo "##############################################################"
     echo "Error: Setting up virtual environment failed"
