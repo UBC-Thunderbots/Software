@@ -11,11 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
-#include <sys/mman.h>      // Needed for mlockall()
-#include <sys/resource.h>  // needed for getrusage
-#include <sys/time.h>      // needed for getrusage
-#include <unistd.h>        // needed for sysconf(int name);
-#include <unistd.h>
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/logger/logger.h"

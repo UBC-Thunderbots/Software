@@ -22,6 +22,7 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//software/jetson_nano/services:motor",
         "//software/jetson_nano/services:network",
+        "//software/util/scoped_timespec_timer",
     ],
 )
 

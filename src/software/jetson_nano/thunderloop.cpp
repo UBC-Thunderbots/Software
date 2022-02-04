@@ -1,19 +1,5 @@
 #include "software/jetson_nano/thunderloop.h"
 
-#include <limits.h>
-#include <malloc.h>
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/mman.h>      // Needed for mlockall()
-#include <sys/resource.h>  // needed for getrusage
-#include <sys/time.h>      // needed for getrusage
-#include <unistd.h>        // needed for sysconf(int name);
-
-#include <chrono>
-#include <iostream>
-#include <thread>
-
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/2021_robot_constants.h"
@@ -21,6 +7,7 @@
 #include "software/jetson_nano/primitive_executor.h"
 #include "software/jetson_nano/services/motor.h"
 #include "software/logger/logger.h"
+#include "software/util/scoped_timespec_timer/scoped_timespec_timer.h"
 #include "software/world/robot_state.h"
 
 /**
@@ -58,20 +45,7 @@ void Thunderloop::runLoop()
 {
     // Timing
     struct timespec next_shot;
-    struct timespec start_time;
-    struct timespec end_time;
     struct timespec time;
-
-    /**
-     * Times an arbitrary expression and stores the result in time.
-     *
-     * @param arg The expression to time
-     */
-#define TIME_EXPRESSION(arg)                                                             \
-    clock_gettime(0, &start_time);                                                       \
-    arg;                                                                                 \
-    clock_gettime(0, &end_time);                                                         \
-    timespecDiff(&end_time, &start_time, &time);
 
     // Input buffer
     TbotsProto::PrimitiveSet new_primitive_set;
@@ -85,7 +59,9 @@ void Thunderloop::runLoop()
     motor_service_->start();
 
     // Get current time
-    clock_gettime(0, &next_shot);
+    // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since CLOCK_REALTIME can jump
+    // backwards
+    clock_gettime(CLOCK_MONOTONIC, &next_shot);
 
     // Start after one second
     next_shot.tv_sec++;
@@ -93,12 +69,14 @@ void Thunderloop::runLoop()
     for (;;)
     {
         // Wait until next shot
-        clock_nanosleep(0, TIMER_ABSTIME, &next_shot, NULL);
+        // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since CLOCK_REALTIME can jump
+        // backwards
+        clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_shot, NULL);
 
         // Poll network service and grab most recent messages
-        TIME_EXPRESSION(std::tie(new_primitive_set, new_vision) =
-                            network_service_->poll(robot_status_));
-        thunderloop_status_.set_network_service_poll_time_ns(time.tv_nsec);
+        auto [new_primitive_set, new_vision] = network_service_->poll(robot_status_);
+        thunderloop_status_.set_network_service_poll_time_ns(
+            static_cast<unsigned long>(time.tv_nsec));
 
         // If the primitive msg is new, update the internal buffer
         // and start the new primitive.
@@ -114,10 +92,13 @@ void Thunderloop::runLoop()
                 primitive_ = new_primitive_set.mutable_robot_primitives()->at(robot_id_);
 
                 // Start new primitive
-                TIME_EXPRESSION(
-                    primitive_executor_.startPrimitive(robot_constants_, primitive_));
+                {
+                    ScopedTimespecTimer timer(&time);
+                    primitive_executor_.startPrimitive(robot_constants_, primitive_);
+                }
 
-                thunderloop_status_.set_primitive_executor_start_time_ns(time.tv_nsec);
+                thunderloop_status_.set_primitive_executor_start_time_ns(
+                    static_cast<unsigned long>(time.tv_nsec));
             }
         }
 
@@ -137,13 +118,21 @@ void Thunderloop::runLoop()
 
         // TODO (#2333) poll redis service
 
-        TIME_EXPRESSION(direct_control_ = *primitive_executor_.stepPrimitive(
-                            createRobotState(robot_state_)));
-        thunderloop_status_.set_primitive_executor_step_time_ns(time.tv_nsec);
+        {
+            ScopedTimespecTimer timer(&time);
+            direct_control_ =
+                *primitive_executor_.stepPrimitive(createRobotState(robot_state_));
+        }
+        thunderloop_status_.set_primitive_executor_step_time_ns(
+            static_cast<unsigned long>(time.tv_nsec));
 
         // Run the motor service with the direct_control_ msg
-        TIME_EXPRESSION(drive_units_status_ = *motor_service_->poll(direct_control_));
-        thunderloop_status_.set_motor_service_poll_time_ns(time.tv_nsec);
+        {
+            ScopedTimespecTimer timer(&time);
+            drive_units_status_ = *motor_service_->poll(direct_control_);
+        }
+        thunderloop_status_.set_motor_service_poll_time_ns(
+            static_cast<unsigned long>(time.tv_nsec));
 
         *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
 
@@ -161,17 +150,5 @@ void Thunderloop::timespecNorm(struct timespec& ts)
     {
         ts.tv_nsec -= static_cast<int>(NANOSECONDS_PER_SECOND);
         ts.tv_sec++;
-    }
-}
-
-void Thunderloop::timespecDiff(struct timespec* a, struct timespec* b,
-                               struct timespec* result)
-{
-    result->tv_sec  = a->tv_sec - b->tv_sec;
-    result->tv_nsec = a->tv_nsec - b->tv_nsec;
-    if (result->tv_nsec < 0)
-    {
-        --result->tv_sec;
-        result->tv_nsec += 1000000000L;
     }
 }

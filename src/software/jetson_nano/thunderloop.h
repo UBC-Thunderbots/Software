@@ -58,19 +58,6 @@ class Thunderloop
     std::unique_ptr<NetworkService> network_service_;
 
    private:
-    /**
-     * Subtract two timespecs and store in result struct
-     *
-     * https://gist.github.com/diabloneo/9619917
-     *
-     * @fn timespec_diff(struct timespec *, struct timespec *, struct timespec *)
-     * @brief Compute the diff of two timespecs, that is a - b = result.
-     * @param a the minuend
-     * @param b the subtrahend
-     * @param result a - b
-     */
-    void timespecDiff(struct timespec* a, struct timespec* b, struct timespec* result);
-
     /*
      * The struct timespec consists of nanoseconds and seconds. If the nanoseconds
      * are getting bigger than 1000000000 (= 1 second) the variable containing
