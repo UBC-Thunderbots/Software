@@ -42,23 +42,11 @@ cc_library(
     ],
     deps = [
         ":transition_conditions",
-        "//software/ai/hl/stp/action",
         "//software/ai/intent",
         "//software/ai/intent:stop_intent",
         "//software/util/sml_fsm",
         "//software/util/typename",
         "//software/world",
-    ],
-)
-
-cc_test(
-    name = "tactic_test",
-    srcs = ["tactic_test.cpp"],
-    deps = [
-        ":tactic",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
-        "//software/test_util",
     ],
 )
 
@@ -78,5 +66,15 @@ cc_test(
         ":tactic",
         "//shared/test_util:tbots_gtest_main",
         "//software/world",
+    ],
+)
+
+cc_test(
+    name = "fsm_state_test",
+    srcs = ["fsm_state_test.cpp"],
+    deps = [
+        "//shared/test_util:tbots_gtest_main",
+        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
+        "//software/test_util",
     ],
 )

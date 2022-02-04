@@ -20,6 +20,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
     wheel_consants_  = wheel_consants;
 
     motor_service_ = std::make_unique<MotorService>(robot_constants, wheel_consants);
+    // add network service here
 
     // TODO (#2331) remove this once we receive actual vision data
     current_robot_state_ =
@@ -42,6 +43,8 @@ void Thunderloop::run(unsigned run_at_hz)
     using clock = std::chrono::steady_clock;
 
     auto next_frame = clock::now();
+
+    motor_service_->start();
 
     for (;;)
     {

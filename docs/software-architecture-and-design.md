@@ -46,7 +46,6 @@
   * [AI](#ai)
     * [Strategy](#strategy)
       * [STP Diagram](#stp-diagram)
-      * [Skills / Actions](#skills--actions)
       * [Tactics](#tactics)
       * [Plays](#plays)
     * [Navigation](#navigation)
@@ -156,7 +155,6 @@ Read [https://www.geeksforgeeks.org/inheritance-in-c/] for more information.
 Examples of this can be found in many places, including:
 * [Plays](#plays)
 * [Tactics](#tactics)
-* [Actions](#skills--actions)
 * [Intents](#intents)
 * Different implementations of the [Backend](#backend)
 
@@ -262,7 +260,7 @@ We use the [boost Coroutine2 library](https://www.boost.org/doc/libs/1_71_0/libs
 
 
 ## How Do We Use Coroutines?
-We use Coroutines to write our [strategy logic](#strategy). The "pause and resume" functionality of Coroutines makes it much easier to write [Plays](#plays), [Tactics](#tactics), and [Actions](#skills--actions).
+We use Coroutines to write our [strategy logic](#strategy). The "pause and resume" functionality of Coroutines makes it much easier to write [Plays](#plays).
 
 Specifically, we use Coroutines as a way to break down our strategy into "stages". Once a "stage" completes we generally don't want to re-evaluate it, and would rather commit to a decision and move on. Coroutines makes it much easier to write "stages" of strategy without requiring complex state machine logic to check what stage we are in, and it's easier for developers to see what the intended order of operations is (eg. "Line up to take the shot" -> "shoot").
 
@@ -445,20 +443,6 @@ The STP diagram shows how this works. Functions to assign tactics to robots and 
 
 ![STP Diagram](images/STP.svg)
 
-
-### Skills / Actions
-The `S` in `STP` stands for `Skills`. In our system, we call these `Actions`. Actions represent simple tasks an individual robot can do. Examples include:
-1. Moving to a position (without colliding with anything)
-2. Shooting the ball at a target
-3. Intercepting a moving ball
-
-Actions use [Intents](#intents) to implement their behaviour. Actions are responsible for obeying any preconditions `Intents` have.
-
-**It seems like Actions and Intents are basically the same thing. Why aren't they combined into a single class?**
-
-[Actions](#skills--actions) and [Intents](#intents) are not combined because [Actions](#skills--actions) are part of [STP](#strategy) and our strategy logic, while [Intents](#intents) are more part of the [Navigator](#navigation). Combining them would break the abstraction and couple our strategy implementation to the [Navigator](#navigation), removing our flexibility to implement different strategy systems in the future.
-
-
 ### Tactics
 The `T` in `STP` stands for `Tactics`. A `Tactic` represents a "single-robots' role" on a team. Examples include:
 1. Being a goalie
@@ -466,7 +450,14 @@ The `T` in `STP` stands for `Tactics`. A `Tactic` represents a "single-robots' r
 3. Being a defender that shadows enemy robots
 4. Being a defender that tries to steal the ball from enemies
 
-Tactics use [Actions](#skills--actions) to implement their behaviour. Using the [Action](#skills--actions) abstraction makes it much easier for Tactics to express what they want to do, and make it easier to design and implement behaviour. Tactics can focus more on what things to do, and when to do them, in order to implement more intelligent and adaptable behaviour.
+They can also represent lower level behaviours, such as
+1. Moving to a position (without colliding with anything)
+2. Shooting the ball at a target
+3. Intercepting a moving ball
+
+The high level behaviours can use the lower level behaviours in a hierarchical way.
+
+Tactics use [Intents](#intents) to implement their behaviour, so that it can decouple strategy from the [Navigator](#navigation).
 
 ### Plays
 The `P` in `STP` stands for `Plays`. A `Play` represents a "team-wide goal" for the robots. They can be thought of much like Plays in real-life soccer. Examples include:

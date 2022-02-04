@@ -5,5 +5,5 @@
 
 TEST(PenaltySetupTacticTest, constructor_test)
 {
-    PenaltySetupTactic tactic = PenaltySetupTactic(true);
+    PenaltySetupTactic tactic = PenaltySetupTactic();
 }

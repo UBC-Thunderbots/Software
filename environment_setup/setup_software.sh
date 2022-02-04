@@ -121,6 +121,13 @@ if ! sudo /opt/tbotspython/bin/pip3 install pyqt5  ; then
     exit 1
 fi
 
+if ! sudo /opt/tbotspython/bin/pip3 install --upgrade protobuf  ; then
+    echo "##############################################################"
+    echo "Error: Installing protobuf failed"
+    echo "##############################################################"
+    exit 1
+fi
+
 echo "================================================================"
 echo "Done Upgrading Pip Version"
 echo "================================================================"
