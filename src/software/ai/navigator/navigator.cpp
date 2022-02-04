@@ -101,23 +101,6 @@ std::unordered_set<PathObjective> Navigator::createPathObjectives(
     auto ball_obstacle =
         robot_navigation_obstacle_factory.createFromBallPosition(world.ball().position());
 
-    for (const auto &robot_id : direct_primitive_intent_robots)
-    {
-        auto robot = world.friendlyTeam().getRobotById(robot_id);
-        if (robot)
-        {
-            auto robot_obstacle =
-                robot_navigation_obstacle_factory.createFromRobot(*robot);
-            direct_primitive_intent_obstacles.push_back(robot_obstacle);
-        }
-        else
-        {
-            std::stringstream ss;
-            ss << "Failed to find robot associated with robot id = " << robot_id;
-            LOG(WARNING) << ss.str();
-        }
-    }
-
     for (const auto &intent : navigating_intents)
     {
         RobotId robot_id = intent->getRobotId();
@@ -133,12 +116,6 @@ std::unordered_set<PathObjective> Navigator::createPathObjectives(
                     intent->getMotionConstraints(), world);
             obstacles.insert(obstacles.end(), motion_constraint_obstacles.begin(),
                              motion_constraint_obstacles.end());
-
-            std::vector<ObstaclePtr> enemy_robot_obstacles =
-                robot_navigation_obstacle_factory.createEnemyCollisionAvoidance(
-                    world.enemyTeam(), robot->velocity().length());
-            obstacles.insert(obstacles.end(), enemy_robot_obstacles.begin(),
-                             enemy_robot_obstacles.end());
 
             if (intent->getBallCollisionType() == BallCollisionType::AVOID)
             {
