@@ -24,10 +24,15 @@ typedef Eigen::Vector4d WheelSpace_t;
 class EuclideanToWheel
 {
    public:
+
+    EuclideanToWheel() = default;
+
     /**
      * Initializes the Euclidean velocity to wheel speed conversion matrices.
+     *
+     * @param control_loop_frequency_Hz The frequency of the control loop.
      */
-    EuclideanToWheel();
+    explicit EuclideanToWheel(const float &control_loop_frequency_Hz);
 
     /**
      * Gets wheel velocity targets from the desired Euclidean velocity.
