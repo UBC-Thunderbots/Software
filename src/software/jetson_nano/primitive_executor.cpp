@@ -31,8 +31,6 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(const unsigned int robot_id,
 {
     Vector target_global_velocity = hrvo_simulator.getRobotVelocity(robot_id);
 
-    std::cout << target_global_velocity << std::endl;
-
     double local_x_velocity =
         robot_state.orientation().cos() * target_global_velocity.x() +
         robot_state.orientation().sin() * target_global_velocity.y();
@@ -133,7 +131,6 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             // LOG(DEBUG) << "No primitive set!";
         }
     }
-    std::cout << __func__ << " end" << std::endl;
     return std::make_unique<TbotsProto::DirectControlPrimitive>();
 }
 
