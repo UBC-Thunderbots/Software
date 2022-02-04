@@ -64,18 +64,14 @@ void Thunderloop::runLoop()
     // backwards
     clock_gettime(CLOCK_MONOTONIC, &next_shot);
 
-    // Start after one second
-    next_shot.tv_sec++;
-
     for (;;)
     {
         {
-            ScopedTimespecTimer iteration_timer(&iteration_time);
-
             // Wait until next shot
             // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since CLOCK_REALTIME can
             // jump backwards
             clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_shot, NULL);
+            ScopedTimespecTimer iteration_timer(&iteration_time);
 
             // Poll network service and grab most recent messages
             {
@@ -148,18 +144,21 @@ void Thunderloop::runLoop()
             *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
 
             robot_status_.mutable_power_status()->set_capacitor_voltage(200);
-
-            // Calculate next shot
-            next_shot.tv_nsec += interval;
-            timespecNorm(next_shot);
         }
 
+        auto loop_duration =
+            iteration_time.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
+            iteration_time.tv_nsec;
+        thunderloop_status_.set_iteration_time_ns(loop_duration);
+
         // Make sure the iteration can fit inside the period of the loop
-        CHECK((static_cast<double>(iteration_time.tv_sec) * MILLISECONDS_PER_SECOND) +
-                  (static_cast<double>(iteration_time.tv_nsec) *
-                   MILLISECONDS_PER_NANOSECOND) <=
-              (1.0 / loop_hz_) * MILLISECONDS_PER_SECOND)
+        CHECK(loop_duration * static_cast<int>(SECONDS_PER_NANOSECOND) <=
+              (1.0 / loop_hz_))
             << "Loop takes longer than 1/loop_hz_ seconds";
+
+        // Calculate next shot taking into account how long this iteration took
+        next_shot.tv_nsec += interval - loop_duration;
+        timespecNorm(next_shot);
     }
 }
 
