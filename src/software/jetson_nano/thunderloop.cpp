@@ -45,7 +45,8 @@ void Thunderloop::runLoop()
 {
     // Timing
     struct timespec next_shot;
-    struct timespec time;
+    struct timespec poll_time;
+    struct timespec iteration_time;
 
     // Input buffer
     TbotsProto::PrimitiveSet new_primitive_set;
@@ -68,79 +69,97 @@ void Thunderloop::runLoop()
 
     for (;;)
     {
-        // Wait until next shot
-        // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since CLOCK_REALTIME can jump
-        // backwards
-        clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_shot, NULL);
-
-        // Poll network service and grab most recent messages
-        auto [new_primitive_set, new_vision] = network_service_->poll(robot_status_);
-        thunderloop_status_.set_network_service_poll_time_ns(
-            static_cast<unsigned long>(time.tv_nsec));
-
-        // If the primitive msg is new, update the internal buffer
-        // and start the new primitive.
-        if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
-            primitive_set_.time_sent().epoch_timestamp_seconds())
         {
-            // Save new primitive set
-            primitive_set_ = new_primitive_set;
+            ScopedTimespecTimer iteration_timer(&iteration_time);
 
-            // If we have a primitive for "this" robot, lets start it
-            if (new_primitive_set.robot_primitives().count(robot_id_) != 0)
+            // Wait until next shot
+            // Note: CLOCK_MONOTONIC is used over CLOCK_REALTIME since CLOCK_REALTIME can
+            // jump backwards
+            clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next_shot, NULL);
+
+            // Poll network service and grab most recent messages
             {
-                primitive_ = new_primitive_set.mutable_robot_primitives()->at(robot_id_);
+                ScopedTimespecTimer timer(&poll_time);
+                auto result       = network_service_->poll(robot_status_);
+                new_primitive_set = std::get<0>(result);
+                new_vision        = std::get<1>(result);
+            }
 
-                // Start new primitive
+            thunderloop_status_.set_network_service_poll_time_ns(
+                static_cast<unsigned long>(poll_time.tv_nsec));
+
+            // If the primitive msg is new, update the internal buffer
+            // and start the new primitive.
+            if (new_primitive_set.time_sent().epoch_timestamp_seconds() >
+                primitive_set_.time_sent().epoch_timestamp_seconds())
+            {
+                // Save new primitive set
+                primitive_set_ = new_primitive_set;
+
+                // If we have a primitive for "this" robot, lets start it
+                if (new_primitive_set.robot_primitives().count(robot_id_) != 0)
                 {
-                    ScopedTimespecTimer timer(&time);
-                    primitive_executor_.startPrimitive(robot_constants_, primitive_);
+                    primitive_ =
+                        new_primitive_set.mutable_robot_primitives()->at(robot_id_);
+
+                    // Start new primitive
+                    {
+                        ScopedTimespecTimer timer(&poll_time);
+                        primitive_executor_.startPrimitive(robot_constants_, primitive_);
+                    }
+
+                    thunderloop_status_.set_primitive_executor_start_time_ns(
+                        static_cast<unsigned long>(poll_time.tv_nsec));
                 }
-
-                thunderloop_status_.set_primitive_executor_start_time_ns(
-                    static_cast<unsigned long>(time.tv_nsec));
             }
-        }
 
-        // If the vision msg is new, update the internal buffer
-        if (new_vision.time_sent().epoch_timestamp_seconds() >
-            vision_.time_sent().epoch_timestamp_seconds())
-        {
-            // Cache vision
-            vision_ = new_vision;
-
-            // If there is a detection for "this" robot, lets update it
-            if (new_vision.robot_states().count(robot_id_) != 0)
+            // If the vision msg is new, update the internal buffer
+            if (new_vision.time_sent().epoch_timestamp_seconds() >
+                vision_.time_sent().epoch_timestamp_seconds())
             {
-                robot_state_ = new_vision.mutable_robot_states()->at(robot_id_);
+                // Cache vision
+                vision_ = new_vision;
+
+                // If there is a detection for "this" robot, lets update it
+                if (new_vision.robot_states().count(robot_id_) != 0)
+                {
+                    robot_state_ = new_vision.mutable_robot_states()->at(robot_id_);
+                }
             }
+
+            // TODO (#2333) poll redis service
+
+            {
+                ScopedTimespecTimer timer(&poll_time);
+                direct_control_ =
+                    *primitive_executor_.stepPrimitive(createRobotState(robot_state_));
+            }
+            thunderloop_status_.set_primitive_executor_step_time_ns(
+                static_cast<unsigned long>(poll_time.tv_nsec));
+
+            // Run the motor service with the direct_control_ msg
+            {
+                ScopedTimespecTimer timer(&poll_time);
+                drive_units_status_ = *motor_service_->poll(direct_control_);
+            }
+            thunderloop_status_.set_motor_service_poll_time_ns(
+                static_cast<unsigned long>(poll_time.tv_nsec));
+
+            *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
+
+            robot_status_.mutable_power_status()->set_capacitor_voltage(200);
+
+            // Calculate next shot
+            next_shot.tv_nsec += interval;
+            timespecNorm(next_shot);
         }
 
-        // TODO (#2333) poll redis service
-
-        {
-            ScopedTimespecTimer timer(&time);
-            direct_control_ =
-                *primitive_executor_.stepPrimitive(createRobotState(robot_state_));
-        }
-        thunderloop_status_.set_primitive_executor_step_time_ns(
-            static_cast<unsigned long>(time.tv_nsec));
-
-        // Run the motor service with the direct_control_ msg
-        {
-            ScopedTimespecTimer timer(&time);
-            drive_units_status_ = *motor_service_->poll(direct_control_);
-        }
-        thunderloop_status_.set_motor_service_poll_time_ns(
-            static_cast<unsigned long>(time.tv_nsec));
-
-        *(robot_status_.mutable_thunderloop_status()) = thunderloop_status_;
-
-        robot_status_.mutable_power_status()->set_capacitor_voltage(200);
-
-        // Calculate next shot
-        next_shot.tv_nsec += interval;
-        timespecNorm(next_shot);
+        // Make sure the iteration can fit inside the period of the loop
+        CHECK((static_cast<double>(iteration_time.tv_sec) * MILLISECONDS_PER_SECOND) +
+                  (static_cast<double>(iteration_time.tv_nsec) *
+                   MILLISECONDS_PER_NANOSECOND) <=
+              (1.0 / loop_hz_) * MILLISECONDS_PER_SECOND)
+            << "Loop takes longer than 1/loop_hz_ seconds";
     }
 }
 
