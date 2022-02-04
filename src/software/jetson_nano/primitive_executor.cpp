@@ -7,11 +7,10 @@
 #include "proto/tbots_software_msgs.pb.h"
 
 
-PrimitiveExecutor::PrimitiveExecutor()
-// TODO: Set dynamically
+PrimitiveExecutor::PrimitiveExecutor(double time_step)
 : current_primitive_(),
   robot_constants_(),
-  hrvo_simulator(1/30.f)
+  hrvo_simulator(static_cast<float>(time_step))
 {}
 void PrimitiveExecutor::updatePrimitiveSet(const unsigned int robot_id, const TbotsProto::PrimitiveSet &primitive_set_msg)
 {
@@ -74,7 +73,6 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
 std::unique_ptr<TbotsProto::DirectControlPrimitive>
 PrimitiveExecutor::stepPrimitive(const unsigned int robot_id, const RobotState &robot_state)
 {
-    std::cout << __func__ << " start" << std::endl;
     // TODO: Step here?
     hrvo_simulator.doStep();
     switch (current_primitive_.primitive_case())

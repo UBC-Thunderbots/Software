@@ -8,9 +8,9 @@
 class PrimitiveExecutor
 {
    public:
-    PrimitiveExecutor();
+    explicit PrimitiveExecutor(double time_step);
 
-/**
+    /**
      * Start running a primitive
      *
      * @param primitive_set_msg The primitive to start

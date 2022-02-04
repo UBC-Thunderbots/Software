@@ -104,22 +104,6 @@ cc_library(
 )
 
 cc_library(
-    name = "er_force_simulator_robot",
-    srcs = ["er_force_simulator_robot.cpp"],
-    hdrs = ["er_force_simulator_robot.h"],
-    deps = [
-        "//extlibs/er_force_sim/src/amun/simulator",
-        "//proto:ssl_simulation_cc_proto",
-        "//proto:tbots_cc_proto",
-        "//proto/message_translation:ssl_simulation_robot_control",
-        "//shared:constants",
-        "//software/jetson_nano:primitive_executor",
-        "//software/simulation:simulator_robot",
-        "//software/world:robot_state",
-    ],
-)
-
-cc_library(
     name = "force_wheel_simulator_robot_singleton",
     srcs = ["force_wheel_simulator_robot_singleton.cpp"],
     hdrs = ["force_wheel_simulator_robot_singleton.h"],
