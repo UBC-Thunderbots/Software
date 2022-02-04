@@ -208,7 +208,7 @@ std::vector<std::weak_ptr<PhysicsRobot>> PhysicsWorld::getYellowPhysicsRobots() 
     std::vector<std::weak_ptr<PhysicsRobot>> robots;
     for (const auto& yellow_physics_robot : yellow_physics_robots)
     {
-        CHECK(yellow_physics_robot)
+        CHECK(static_cast<bool>(yellow_physics_robot))
             << "Encountered a nullptr to a yellow physics robot in the physics world";
 
         robots.emplace_back(yellow_physics_robot);
@@ -221,7 +221,7 @@ std::vector<std::weak_ptr<PhysicsRobot>> PhysicsWorld::getBluePhysicsRobots() co
     std::vector<std::weak_ptr<PhysicsRobot>> robots;
     for (const auto& blue_physics_robot : blue_physics_robots)
     {
-        CHECK(blue_physics_robot)
+        CHECK(static_cast<bool>(blue_physics_robot))
             << "Encountered a nullptr to a blue physics robot in the physics world";
 
         robots.emplace_back(blue_physics_robot);
