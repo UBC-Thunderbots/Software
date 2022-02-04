@@ -11,11 +11,8 @@ void robotAtPosition(RobotId robot_id, std::shared_ptr<World> world_ptr,
             std::shared_ptr<World> world_ptr) -> std::optional<Point> {
         std::optional<Robot> robot_optional =
             world_ptr->friendlyTeam().getRobotById(robot_id);
-        if (!robot_optional.has_value())
-        {
-            LOG(FATAL) << "There is no robot with ID: " + std::to_string(robot_id);
-        }
-
+        CHECK(robot_optional.has_value())
+            << "There is no robot with ID: " + std::to_string(robot_id);
         Robot robot = robot_optional.value();
         if ((robot.position() - destination).length() > close_to_destination_threshold)
         {
@@ -46,10 +43,8 @@ void robotAtOrientation(RobotId robot_id, std::shared_ptr<World> world_ptr,
             std::shared_ptr<World> world_ptr) -> std::optional<Angle> {
         std::optional<Robot> robot_optional =
             world_ptr->friendlyTeam().getRobotById(robot_id);
-        if (!robot_optional.has_value())
-        {
-            LOG(FATAL) << "There is no robot with ID: " + std::to_string(robot_id);
-        }
+        CHECK(robot_optional.has_value())
+            << "There is no robot with ID: " + std::to_string(robot_id);
         Robot robot = robot_optional.value();
         if (robot.orientation().minDiff(orientation) > close_to_orientation_threshold)
         {
@@ -82,10 +77,8 @@ void robotAtAngularVelocity(RobotId robot_id, std::shared_ptr<World> world_ptr,
             std::shared_ptr<World> world_ptr) -> std::optional<AngularVelocity> {
         std::optional<Robot> robot_optional =
             world_ptr->friendlyTeam().getRobotById(robot_id);
-        if (!robot_optional.has_value())
-        {
-            LOG(FATAL) << "There is no robot with ID: " + std::to_string(robot_id);
-        }
+        CHECK(robot_optional.has_value())
+            << "There is no robot with ID: " + std::to_string(robot_id);
 
         Robot robot = robot_optional.value();
         if (robot.angularVelocity().minDiff(angular_velocity) >

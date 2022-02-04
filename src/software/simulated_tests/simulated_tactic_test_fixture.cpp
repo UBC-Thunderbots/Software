@@ -60,26 +60,16 @@ void SimulatedTacticTestFixture::setTactic(std::shared_ptr<Tactic> friendly_tact
 
 void SimulatedTacticTestFixture::setFriendlyTactic(std::shared_ptr<Tactic> tactic)
 {
-    if (tactic)
-    {
-        this->friendly_tactic = tactic;
-    }
-    else
-    {
-        LOG(FATAL) << "Friendly tactic is invalid" << std::endl;
-    }
+    CHECK(static_cast<bool>(tactic.has_value()))
+        << "Friendly tactic is invalid" << std::endl;
+    this->friendly_tactic = tactic;
 }
 
 void SimulatedTacticTestFixture::setEnemyTactic(std::shared_ptr<Tactic> tactic)
 {
-    if (tactic)
-    {
-        this->enemy_tactic = tactic;
-    }
-    else
-    {
-        LOG(FATAL) << "Enemy tactic is invalid" << std::endl;
-    }
+    CHECK(static_cast<bool>(tactic.has_value()))
+        << "Enemy tactic is invalid" << std::endl;
+    this->enemy_tactic = tactic;
 }
 
 void SimulatedTacticTestFixture::setFriendlyRobotId(RobotId friendly_robot_id)
@@ -119,22 +109,15 @@ void SimulatedTacticTestFixture::updateFriendlyPrimitives(
     std::vector<std::unique_ptr<Intent>> intents;
     auto start_tick_time = std::chrono::system_clock::now();
 
-    if (!friendly_robot_id)
-    {
-        LOG(FATAL) << "No friendly robot id set" << std::endl;
-    }
-    else if (auto new_robot = world.friendlyTeam().getRobotById(*friendly_robot_id))
-    {
-        auto intent = friendly_tactic->get(
-            *world.friendlyTeam().getRobotById(*friendly_robot_id), world);
-        intent->setMotionConstraints(friendly_motion_constraints);
-        intents.push_back(std::move(intent));
-    }
-    else
-    {
-        LOG(FATAL) << "No friendly robot with robot id " << *friendly_robot_id
-                   << std::endl;
-    }
+    CHECK(friendly_robot_id.has_value()) << "No friendly robot id set" << std::endl;
+    auto new_robot = world.friendlyTeam().getRobotById(*friendly_robot_id);
+
+    CHECK(new_robot.has_value())
+        << "No friendly robot with robot id " << *friendly_robot_id << std::endl;
+    auto intent = friendly_tactic->get(
+        *world.friendlyTeam().getRobotById(*friendly_robot_id), world);
+    intent->setMotionConstraints(friendly_motion_constraints);
+    intents.push_back(std::move(intent));
 
     auto primitive_set_msg = friendly_navigator->getAssignedPrimitives(world, intents);
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
@@ -149,21 +132,14 @@ void SimulatedTacticTestFixture::updateEnemyPrimitives(
     std::vector<std::unique_ptr<Intent>> intents;
     auto start_tick_time = std::chrono::system_clock::now();
 
-    if (!enemy_robot_id)
-    {
-        LOG(FATAL) << "No enemy robot id set" << std::endl;
-    }
-    else if (auto new_robot = world.friendlyTeam().getRobotById(*enemy_robot_id))
-    {
-        auto intent =
-            enemy_tactic->get(*world.friendlyTeam().getRobotById(*enemy_robot_id), world);
-        intent->setMotionConstraints(enemy_motion_constraints);
-        intents.push_back(std::move(intent));
-    }
-    else
-    {
-        LOG(FATAL) << "No enemy robot with robot id " << *enemy_robot_id << std::endl;
-    }
+    CHECK(enemy_robot_id) << "No enemy robot id set" << std::endl;
+    auto new_robot = world.friendlyTeam().getRobotById(*enemy_robot_id);
+
+    CHECK(new_robot) << "No enemy robot with robot id " << *enemy_robot_id << std::endl;
+    auto intent =
+        enemy_tactic->get(*world.friendlyTeam().getRobotById(*enemy_robot_id), world);
+    intent->setMotionConstraints(enemy_motion_constraints);
+    intents.push_back(std::move(intent));
 
     auto primitive_set_msg = enemy_navigator->getAssignedPrimitives(world, intents);
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
