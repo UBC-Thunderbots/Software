@@ -48,12 +48,10 @@ Simulator::Simulator(float time_step)
       reachedGoals_(false),
       kdTree_(std::make_unique<KdTree>(this))
 {
-    std::cout << __func__ << " called" << std::endl;
 }
 
 void Simulator::updateWorld(const World &world)
 {
-    std::cout << __func__ << " called ";
     // Reset all agents
     agents_.clear();
     friendly_robot_id_map.clear();
@@ -111,12 +109,10 @@ void Simulator::updateWorld(const World &world)
         addLinearVelocityAgent(position, ball_radius, velocity, abs(velocity),
                                acceleration, addGoal(goal_pos), 0.1f);
     }
-    std::cout << agents_.size() << std::endl;
 }
 
 void Simulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set)
 {
-    std::cout << __func__ << " called" << std::endl;
     primitive_set_ = primitive_set;
 
     add_ball_agent = primitive_set.stay_away_from_ball();
@@ -163,18 +159,14 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
                     unavailable_capabilities.end();
     if (can_move)
     {
-        std::cout << __func__ << " Can move=" << std::endl;
         velocity = Vector2(static_cast<float>(robot.velocity().x()),
                            static_cast<float>(robot.velocity().y()));
+        // TODO: Update robot constants to be passed down
         max_accel =
             create2015RobotConstants()
                 .robot_max_acceleration_m_per_s_2;  // robot.robotConstants().robot_max_acceleration_m_per_s_2;
-        std::cout << __func__ << "max accel "
-                  << robot.robotConstants().robot_max_acceleration_m_per_s_2 << std::endl;
         max_speed = create2015RobotConstants().robot_max_speed_m_per_s *
                     5;  // robot.robotConstants().robot_max_speed_m_per_s;
-        std::cout << __func__ << "max velocity "
-                  << robot.robotConstants().robot_max_speed_m_per_s << std::endl;
         pref_speed = max_speed * PREF_SPEED_SCALE;
     }
 
@@ -264,9 +256,6 @@ Vector Simulator::getRobotVelocity(unsigned int robot_id) const
         Vector2 goal_pos =
             goals_[agents_[agent_index]->getGoalIndex()]->getCurrentGoalPosition();
         Vector2 curr_pos = agents_[agent_index]->getPosition();
-        std::cout << __func__ << " map elem found with vel=" << velocity_vector_2 << "for"
-                  << agent_index << " with pos=" << curr_pos << " with goal" << goal_pos
-                  << std::endl;
         return Vector(velocity_vector_2.getX(), velocity_vector_2.getY());
     }
     // TODO: Retruning 0 vector
@@ -300,7 +289,7 @@ std::size_t Simulator::addGoalPositions(const std::vector<Vector2> &positions,
 
 void Simulator::doStep()
 {
-    std::cout << __func__ << " start" << std::endl;
+
     if (agents_.size() == 0)
     {
         // TODO: Log error
@@ -320,24 +309,19 @@ void Simulator::doStep()
 
     reachedGoals_ = true;
 
-    std::cout << __func__ << " KdTree before" << std::endl;
     kdTree_->build();
 
     for (auto &agent : agents_)
     {
         agent->computeNewVelocity();
-        std::cout << __func__ << " velocity computed=" << agent->getVelocity()
-                  << std::endl;
     }
 
     for (auto &agent : agents_)
     {
         agent->update();
     }
-    std::cout << __func__ << " agents updated" << std::endl;
 
     globalTime_ += timeStep_;
-    std::cout << __func__ << " end" << std::endl;
 }
 
 float Simulator::getAgentMaxAccel(std::size_t agentNo) const
