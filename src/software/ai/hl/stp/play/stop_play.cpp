@@ -50,8 +50,8 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
     MaxAllowedSpeedMode stop_mode = MaxAllowedSpeedMode::STOP_COMMAND;
 
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
-        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true)};
+        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>(),
+        std::make_shared<MoveTactic>()};
 
     auto goalie_tactic =
         std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig(), stop_mode);

@@ -56,6 +56,7 @@ cc_library(
         "//software/geom:rectangle",
         "//software/geom/algorithms",
         "//software/time:timestamp",
+        "//software/util/make_enum",
     ],
 )
 

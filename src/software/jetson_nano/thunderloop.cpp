@@ -21,6 +21,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
 
     motor_service_ = std::make_unique<MotorService>(robot_constants, wheel_consants);
     redis_service_ = std::make_unique<RedisService>("127.0.0.1", 6379);
+    // add network service here
 
     // TODO (#2331) remove this once we receive actual vision data
     current_robot_state_ =
@@ -31,7 +32,6 @@ Thunderloop::~Thunderloop()
 {
     // De-initialize Services
     motor_service_->stop();
-    redis_service_->stop();
 }
 
 /*
@@ -52,6 +52,7 @@ void Thunderloop::run(unsigned run_at_hz)
             static_cast<int>(MILLISECONDS_PER_SECOND / run_at_hz));
 
         // TODO (#2331) poll network service and update current_robot_state_
+        // TODO (#2333) poll redis service
 
         // Execute latest primitive
         primitive_executor_.startPrimitive(robot_constants_, primitive_);

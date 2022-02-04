@@ -257,6 +257,7 @@ void SimRobot::begin(SimBall *ball, double time)
     std::string message = " for robot (";
     message += std::to_string(m_specs.id());
     message += ')';
+
     if (m_move.has_x())
     {
         if (!m_move.has_y() || (!m_move.has_orientation() && !m_move.by_force()))
@@ -626,7 +627,7 @@ robot::RadioResponse SimRobot::setCommand(const SSLSimulationProto::RobotCommand
 }
 
 void SimRobot::update(SSLProto::SSL_DetectionRobot *robot, float stddev_p,
-                      float stddev_phi, qint64 time)
+                      float stddev_phi, qint64 time, btVector3 positionOffset)
 {
     // setup vision packet
     robot->set_robot_id(m_specs.id());
@@ -637,7 +638,7 @@ void SimRobot::update(SSLProto::SSL_DetectionRobot *robot, float stddev_p,
     // add noise
     btTransform transform;
     m_motionState->getWorldTransform(transform);
-    const btVector3 p    = transform.getOrigin() / SIMULATOR_SCALE;
+    const btVector3 p    = transform.getOrigin() / SIMULATOR_SCALE + positionOffset;
     const Vector p_noise = m_rng->normalVector(stddev_p);
     robot->set_x((p.y() + p_noise.x) * 1000.0f);
     robot->set_y(-(p.x() + p_noise.y) * 1000.0f);
@@ -649,7 +650,7 @@ void SimRobot::update(SSLProto::SSL_DetectionRobot *robot, float stddev_p,
     m_lastSendTime = time;
 }
 
-void SimRobot::update(world::SimRobot *robot) const
+void SimRobot::update(world::SimRobot *robot, SimBall *ball) const
 {
     btTransform transform;
     m_motionState->getWorldTransform(transform);
@@ -665,6 +666,7 @@ void SimRobot::update(world::SimRobot *robot) const
     rotation->set_i(q.getY());
     rotation->set_j(q.getZ());
     rotation->set_k(q.getW());
+    robot->set_angle(q.getAngle());
 
     const btVector3 velocity = m_body->getLinearVelocity() / SIMULATOR_SCALE;
     robot->set_v_x(velocity.x());
@@ -675,6 +677,24 @@ void SimRobot::update(world::SimRobot *robot) const
     robot->set_r_x(angular.x());
     robot->set_r_y(angular.y());
     robot->set_r_z(angular.z());
+
+    bool ballTouchesRobot = false;
+    int numManifolds      = m_world->getDispatcher()->getNumManifolds();
+    for (int i = 0; i < numManifolds; ++i)
+    {
+        btPersistentManifold *contactManifold =
+            m_world->getDispatcher()->getManifoldByIndexInternal(i);
+        btCollisionObject *objectA = (btCollisionObject *)(contactManifold->getBody0());
+        btCollisionObject *objectB = (btCollisionObject *)(contactManifold->getBody1());
+        if ((objectA == m_dribblerBody && objectB == ball->body()) ||
+            (objectA == ball->body() && objectB == m_dribblerBody) ||
+            (objectA == m_body && objectB == ball->body()) ||
+            (objectA == ball->body() && objectB == m_body))
+        {
+            ballTouchesRobot = true;
+        }
+    }
+    robot->set_touches_ball(ballTouchesRobot);
 }
 
 void SimRobot::restoreState(const world::SimRobot &robot)

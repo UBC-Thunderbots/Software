@@ -88,7 +88,7 @@ const std::shared_ptr<AiConfig> SimulatedPlayTestFixture::getAiConfig() const
     return ai_config;
 }
 
-std::optional<PlayInfo> SimulatedPlayTestFixture::getPlayInfo()
+std::optional<TbotsProto::PlayInfo> SimulatedPlayTestFixture::getPlayInfo()
 {
     return ai.getPlayInfo();
 }

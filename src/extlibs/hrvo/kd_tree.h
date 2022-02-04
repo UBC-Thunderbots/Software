@@ -37,7 +37,7 @@
 
 #include "extlibs/hrvo/vector2.h"
 
-class Agent;
+class HRVOAgent;
 class Simulator;
 
 /**
@@ -92,6 +92,7 @@ class KdTree
     // The maximum leaf size of a k-D tree.
     static const std::size_t HRVO_MAX_LEAF_SIZE = 10;
 
+   public:
     /**
      * Constructor
      *
@@ -116,11 +117,12 @@ class KdTree
     /**
      * Computes the neighbors of the specified agent.
      *
-     * @param agent    A pointer to the agent for which neighbors are to be computed.
-     * @param rangeSq  The squared range around the agent.
+     * @param agent  A pointer to the agent for which neighbors are to be computed.
+     * @param range  The range around the agent.
      */
-    void query(Agent *agent, float rangeSq) const
+    void query(HRVOAgent *agent, float range) const
     {
+        float rangeSq = range * range;
         queryRecursive(agent, rangeSq, 0);
     }
 
@@ -131,12 +133,13 @@ class KdTree
      * @param rangeSq  The squared range around the agent.
      * @param node     The current k-D tree node.
      */
-    void queryRecursive(Agent *agent, float &rangeSq, std::size_t node) const;
+    void queryRecursive(HRVOAgent *agent, float &rangeSq, std::size_t node) const;
 
+   private:
     Simulator *const simulator_;
     std::vector<std::size_t> agents_;
     std::vector<Node> nodes_;
 
-    friend class Agent;
+    friend class HRVOAgent;
     friend class Simulator;
 };

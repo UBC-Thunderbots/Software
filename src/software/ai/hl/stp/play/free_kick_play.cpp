@@ -99,7 +99,7 @@ void FreeKickPlay::chipAtGoalStage(
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
     const World &world)
 {
-    auto chip_tactic = std::make_shared<ChipTactic>(false);
+    auto chip_tactic = std::make_shared<ChipTactic>();
 
     // Figure out where the fallback chip target is
     // This is exerimentally determined to be a reasonable value
@@ -175,44 +175,11 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
-    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
+    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>();
+    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>();
 
     // This tactic will move a robot into position to initially take the free-kick
-    auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
-
-    // Wait for a robot to be assigned to aligned to the ball to pass
-    while (!align_to_ball_tactic->getAssignedRobot())
-    {
-        LOG(DEBUG) << "Nothing assigned to align to ball yet";
-        updateAlignToBallTactic(align_to_ball_tactic, world);
-
-        auto pass_eval = pass_generator.generatePassEvaluation(world);
-        auto pass1     = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
-        auto pass2     = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
-
-        cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
-                                                  pass1.receiverOrientation(), 0.0,
-                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-        cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
-                                                  pass2.receiverOrientation(), 0.0,
-                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-
-        std::get<0>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
-        std::get<1>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(),
-                                  CreaseDefenderAlignment::RIGHT);
-
-        yield({{align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
-                std::get<0>(crease_defender_tactics),
-                std::get<1>(crease_defender_tactics)}});
-    }
-
-
-    // Set the passer on the pass generator
-    LOG(DEBUG) << "Aligning with robot " << align_to_ball_tactic->getAssignedRobot()->id()
-               << "as the passer";
+    auto align_to_ball_tactic = std::make_shared<MoveTactic>();
 
     // Put the robot in roughly the right position to perform the kick
     LOG(DEBUG) << "Aligning to ball";
