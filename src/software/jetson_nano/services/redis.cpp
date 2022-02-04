@@ -1,12 +1,8 @@
 #include "redis.h"
 
-#include "software/logger/logger.h"
 
 RedisService::RedisService(std::string host, size_t port)
-        : subscriber(), host_(host), port_(port) {
-}
-
-void RedisService::start() {
+        : subscriber(), client(), host_(host), port_(port) {
     subscriber.connect(
             host_, port_,
             [](const std::string &host, std::size_t port, cpp_redis::connect_state status) {
@@ -18,7 +14,6 @@ void RedisService::start() {
                     LOG(INFO) << "Subscriber connection successful";
                 }
             });
-
     client.connect(
             host_, port_,
             [](const std::string &host, std::size_t port, cpp_redis::connect_state status) {
@@ -32,25 +27,31 @@ void RedisService::start() {
             });
 }
 
-void RedisService::stop() {
-    subscriber.disconnect(false);
-}
-
 void RedisService::subscribe(const std::string &channel,
                              void (*subscribe_callback)(std::string, std::string)) {
     subscriber.subscribe(channel, subscribe_callback);
 }
-
+// blocking
 cpp_redis::reply RedisService::get(const std::string &key) {
     auto future = client.get(key);
     client.commit();
     return future.get();
 }
 
-cpp_redis::reply RedisService::set(const std::string &key, const std::string &value) {
+// non blocking
+std::optional<cpp_redis::reply> RedisService::poll(const std::string &key) {
+    auto future = client.get(key);
+    std::chrono::system_clock::time_point zero_seconds = std::chrono::system_clock::now() + std::chrono::seconds(0);
+    std::future_status status = future.wait_until(zero_seconds);
+    if (status == std::future_status::ready) {
+        return future.get();
+    }
+    return {};
+}
+
+void RedisService::set(const std::string &key, const std::string &value) {
     auto future = client.set(key, value);
     client.commit();
-    return future.get();
 }
 
 
