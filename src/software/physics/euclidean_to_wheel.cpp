@@ -12,41 +12,48 @@ EuclideanToWheel::EuclideanToWheel()
 
     // TODO: replace with Thunderloop polling rate constant
     // Set to period of control loop.
-    delta_t_ = 1. / 200;
+    delta_t_s_ = 1. / 200;
 
     // import robot constants
-    robot_mass_M_           = robot_constants.mass_kg;
-    robot_radius_R_         = robot_constants.robot_radius_m;
-    inertial_factor_alpha_  = robot_constants.inertial_factor;
-    front_wheel_angle_phi_  = robot_constants.front_wheel_angle_deg * M_PI / 180.;
-    rear_wheel_angle_theta_ = (robot_constants.back_wheel_angle_deg - 90.) * M_PI / 180.;
+    robot_mass_M_kg_           = robot_constants.mass_kg;
+    robot_radius_R_m_         = robot_constants.robot_radius_m;
+    inertial_factor_alpha_m_  = robot_constants.inertial_factor;
+    front_wheel_angle_phi_rad_  = robot_constants.front_wheel_angle_deg * M_PI / 180.;
+    rear_wheel_angle_theta_rad_ = (robot_constants.back_wheel_angle_deg - 90.) * M_PI / 180.;
 
     // calculate DC_alpha matrix
     // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 17
-    auto a = pow(sin(front_wheel_angle_phi_), 2) - pow(cos(front_wheel_angle_phi_), 2);
-    auto b = -sin(front_wheel_angle_phi_) * sin(rear_wheel_angle_theta_) -
-             cos(front_wheel_angle_phi_) * cos(rear_wheel_angle_theta_);
-    auto c = -sin(front_wheel_angle_phi_) * sin(rear_wheel_angle_theta_) +
-             cos(front_wheel_angle_phi_) * cos(rear_wheel_angle_theta_);
-    auto d = pow(sin(rear_wheel_angle_theta_), 2) - pow(cos(rear_wheel_angle_theta_), 2);
+    auto a = pow(sin(front_wheel_angle_phi_rad_), 2) - pow(cos(front_wheel_angle_phi_rad_), 2);
+    auto b = -sin(front_wheel_angle_phi_rad_) * sin(rear_wheel_angle_theta_rad_) -
+             cos(front_wheel_angle_phi_rad_) * cos(rear_wheel_angle_theta_rad_);
+    auto c = -sin(front_wheel_angle_phi_rad_) * sin(rear_wheel_angle_theta_rad_) +
+             cos(front_wheel_angle_phi_rad_) * cos(rear_wheel_angle_theta_rad_);
+    auto d = pow(sin(rear_wheel_angle_theta_rad_), 2) - pow(cos(rear_wheel_angle_theta_rad_), 2);
     Eigen::Matrix4d e;
     e << 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
     Eigen::Matrix4d f;
     f << 1, a, b, c, a, 1, c, b, b, c, 1, d, c, b, d, 1;
     wheel_force_to_wheel_speed_delta_D_C_alpha_ =
-        1 / (robot_mass_M_ * inertial_factor_alpha_) * e + 1 / robot_mass_M_ * f;
+            1 / (robot_mass_M_kg_ * inertial_factor_alpha_m_) * e + 1 / robot_mass_M_kg_ * f;
 
     // calculate D inverse matrix
     // ref: http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf pg 17
-    auto i = 1 / (2 * sin(front_wheel_angle_phi_) + 2 * sin(rear_wheel_angle_theta_));
-    auto j = cos(front_wheel_angle_phi_) / (2 * pow(cos(front_wheel_angle_phi_), 2) +
-                                            2 * pow(cos(rear_wheel_angle_theta_), 2));
-    auto k = sin(rear_wheel_angle_theta_) /
-             (2 * sin(front_wheel_angle_phi_) + 2 * sin(rear_wheel_angle_theta_));
+    auto i = 1 / (2 * sin(front_wheel_angle_phi_rad_) + 2 * sin(rear_wheel_angle_theta_rad_));
+    auto j = cos(front_wheel_angle_phi_rad_) / (2 * pow(cos(front_wheel_angle_phi_rad_), 2) +
+                                            2 * pow(cos(rear_wheel_angle_theta_rad_), 2));
+    auto k = sin(rear_wheel_angle_theta_rad_) /
+             (2 * sin(front_wheel_angle_phi_rad_) + 2 * sin(rear_wheel_angle_theta_rad_));
     wheel_speed_to_euclidean_velocity_D_inverse_ << -i, -i, i, i, j, -j, -(1. - j),
         (1. - j), k, k, (1 - k), (1 - k);
 }
 
+/**
+ * Step 1: Convert Euclidean velocity to acceleration.
+ * Step 2: Calculate the target translational wheel forces.
+ * Step 3: Calculate the target rotational wheel forces.
+ * Step 4: Sum the wheel forces.
+ * Step 5: Convert wheel forces to speeds.
+ */
 WheelSpace_t EuclideanToWheel::getTargetWheelSpeeds(
     const EuclideanSpace_t &target_euclidean_velocity,
     const WheelSpace_t &current_wheel_speeds)
@@ -83,36 +90,36 @@ EuclideanSpace_t EuclideanToWheel::getEuclideanAcceleration(
     const EuclideanSpace_t &initial_velocity,
     const EuclideanSpace_t &target_velocity) const
 {
-    return (target_velocity - initial_velocity) / delta_t_;
+    return (target_velocity - initial_velocity) / delta_t_s_;
 }
 
 WheelSpace_t EuclideanToWheel::getTranslationalWheelForces(
     EuclideanSpace_t target_acceleration) const
 {
     // x acceleration
-    Eigen::Vector2d ax(target_acceleration(0) / sin(front_wheel_angle_phi_),
-                       target_acceleration(0) / sin(rear_wheel_angle_theta_));
+    Eigen::Vector2d ax(target_acceleration(0) / sin(front_wheel_angle_phi_rad_),
+                       target_acceleration(0) / sin(rear_wheel_angle_theta_rad_));
 
     Eigen::Matrix<double, 4, 2> ax_select;
     ax_select << -1, 0, -1, 0, 0, 1, 0, 1;
 
     // y acceleration
-    Eigen::Vector2d ay(target_acceleration(1) / cos(front_wheel_angle_phi_),
-                       target_acceleration(1) / cos(rear_wheel_angle_theta_));
+    Eigen::Vector2d ay(target_acceleration(1) / cos(front_wheel_angle_phi_rad_),
+                       target_acceleration(1) / cos(rear_wheel_angle_theta_rad_));
 
     Eigen::Matrix<double, 4, 2> ay_select;
     ay_select << 1, 0, -1, 0, 0, -1, 0, 1;
 
     // sum x and y wheel forces
-    return robot_mass_M_ * (ax_select * ax + ay_select * ay);
+    return robot_mass_M_kg_ * (ax_select * ax + ay_select * ay);
 }
 
 WheelSpace_t EuclideanToWheel::getRotationalWheelForces(
     EuclideanSpace_t target_acceleration) const
 {
     // calculate per wheel rotational force
-    auto rotational_force = target_acceleration(2) / 4 * inertial_factor_alpha_ *
-                            robot_mass_M_ * robot_radius_R_;
+    auto rotational_force = target_acceleration(2) / 4 * inertial_factor_alpha_m_ *
+                            robot_mass_M_kg_ * robot_radius_R_m_;
 
     // apply force to each wheel
     WheelSpace_t target_force(rotational_force, rotational_force, rotational_force,
@@ -124,5 +131,5 @@ WheelSpace_t EuclideanToWheel::getRotationalWheelForces(
 WheelSpace_t EuclideanToWheel::getWheelSpeedsDelta(
     const WheelSpace_t &target_wheel_forces)
 {
-    return delta_t_ * (wheel_force_to_wheel_speed_delta_D_C_alpha_ * target_wheel_forces);
+    return delta_t_s_ * (wheel_force_to_wheel_speed_delta_D_C_alpha_ * target_wheel_forces);
 }

@@ -32,12 +32,6 @@ class EuclideanToWheel
     /**
      * Gets wheel velocity targets from the desired Euclidean velocity.
      *
-     * Step 1: Convert Euclidean velocity to acceleration.
-     * Step 2: Calculate the target translational wheel forces.
-     * Step 3: Calculate the target rotational wheel forces.
-     * Step 4: Sum the wheel forces.
-     * Step 5: Convert wheel forces to speeds.
-     *
      * @param target_euclidean_velocity The target Euclidean velocity.
      * @return The equivalent wheel speeds.
      */
@@ -48,33 +42,33 @@ class EuclideanToWheel
     /**
      * The control loop time period [s].
      */
-    double delta_t_{};
+    double delta_t_s_{};
 
     /**
      * The mass of the robot [kg].
      */
-    double robot_mass_M_{};
+    double robot_mass_M_kg_{};
 
     /**
      * The robot radius [m].
      */
-    double robot_radius_R_{};
+    double robot_radius_R_m_{};
 
     /**
      * The mass distribution of the robot [m].
      */
-    double inertial_factor_alpha_{};
+    double inertial_factor_alpha_m_{};
 
     /**
      * The angle between the hemisphere line of the robot and the front wheel axles
      * [rads].
      */
-    double front_wheel_angle_phi_{};
+    double front_wheel_angle_phi_rad_{};
 
     /**
      * The angle between the hemisphere line of the robot and the rear wheel axles [rads].
      */
-    double rear_wheel_angle_theta_{};
+    double rear_wheel_angle_theta_rad_{};
 
     /**
      * Wheel force to wheel speed delta [m/s].
