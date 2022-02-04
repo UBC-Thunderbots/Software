@@ -2,30 +2,32 @@
 
 #include "proto/primitive.pb.h"
 #include "proto/primitive/primitive_msg_factory.h"
+#include "proto/tbots_software_msgs.pb.h"
 #include "software/logger/logger.h"
 #include "software/math/math_functions.h"
-#include "proto/tbots_software_msgs.pb.h"
-
 
 PrimitiveExecutor::PrimitiveExecutor(double time_step)
-: current_primitive_(),
-  robot_constants_(),
-  hrvo_simulator(static_cast<float>(time_step))
-{}
-void PrimitiveExecutor::updatePrimitiveSet(const unsigned int robot_id, const TbotsProto::PrimitiveSet &primitive_set_msg)
+    : current_primitive_(),
+      robot_constants_(),
+      hrvo_simulator(static_cast<float>(time_step))
+{
+}
+
+void PrimitiveExecutor::updatePrimitiveSet(
+    const unsigned int robot_id, const TbotsProto::PrimitiveSet& primitive_set_msg)
 {
     hrvo_simulator.updatePrimitiveSet(primitive_set_msg);
-    // TODO Might be able to improve. dont think can use []
+    // TODO Might be able to improve. don't think can use []
     current_primitive_ = primitive_set_msg.robot_primitives().at(robot_id);
 }
 
-void PrimitiveExecutor::updateWorld(const TbotsProto::World &world_msg)
+void PrimitiveExecutor::updateWorld(const TbotsProto::World& world_msg)
 {
     hrvo_simulator.updateWorld(World(world_msg));
 }
 
-Vector PrimitiveExecutor::getTargetLinearVelocity(
-        const unsigned int robot_id, const RobotState& robot_state)
+Vector PrimitiveExecutor::getTargetLinearVelocity(const unsigned int robot_id,
+                                                  const RobotState& robot_state)
 {
     Vector target_global_velocity = hrvo_simulator.getRobotVelocity(robot_id);
 
@@ -39,7 +41,8 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(
         -robot_state.orientation().sin() * target_global_velocity.x() +
         robot_state.orientation().cos() * target_global_velocity.y();
 
-    return Vector(local_x_velocity, local_y_velocity).normalize(target_global_velocity.length());
+    return Vector(local_x_velocity, local_y_velocity)
+        .normalize(target_global_velocity.length());
 }
 
 AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
@@ -70,8 +73,8 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
 }
 
 
-std::unique_ptr<TbotsProto::DirectControlPrimitive>
-PrimitiveExecutor::stepPrimitive(const unsigned int robot_id, const RobotState &robot_state)
+std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
+    const unsigned int robot_id, const RobotState& robot_state)
 {
     // TODO: Step here?
     hrvo_simulator.doStep();
@@ -106,8 +109,7 @@ PrimitiveExecutor::stepPrimitive(const unsigned int robot_id, const RobotState &
         case TbotsProto::Primitive::kMove:
         {
             // Compute the target velocities
-            Vector target_velocity =
-                getTargetLinearVelocity(robot_id, robot_state);
+            Vector target_velocity = getTargetLinearVelocity(robot_id, robot_state);
             AngularVelocity target_angular_velocity =
                 getTargetAngularVelocity(current_primitive_.move(), robot_state);
 

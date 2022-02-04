@@ -89,11 +89,14 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
     }
 }
 
-std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectControl(std::unique_ptr<TbotsProto::DirectControlPrimitive> direct_control, unsigned int robot_id, RobotConstants_t& robot_constants, WheelConstants_t wheel_constants)
+std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectControl(
+    unsigned int robot_id,
+    std::unique_ptr<TbotsProto::DirectControlPrimitive> direct_control,
+    RobotConstants_t& robot_constants, WheelConstants_t wheel_constants)
 {
     auto move_command = createRobotMoveCommand(
-            *direct_control, robot_constants.front_wheel_angle_deg,
-            robot_constants.back_wheel_angle_deg, wheel_constants.wheel_radius_meters);
+        *direct_control, robot_constants.front_wheel_angle_deg,
+        robot_constants.back_wheel_angle_deg, wheel_constants.wheel_radius_meters);
     // Values for robot command
     std::optional<float> kick_speed;       // [m/s]
     std::optional<float> kick_angle;       // [degree]
@@ -115,7 +118,8 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
             // https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
             float range = direct_control->chip_distance_meters();
             float numerator =
-                    range * static_cast<float>(ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED);
+                range *
+                static_cast<float>(ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED);
             float denominator = static_cast<float>(2.0f * (chip_angle * 2.0f).sin());
             float chip_speed  = static_cast<float>(std::sqrt(numerator / denominator));
 
@@ -137,7 +141,8 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
             // https://courses.lumenlearning.com/boundless-physics/chapter/projectile-motion/
             float range = direct_control->autochip_distance_meters();
             float numerator =
-                    range * static_cast<float>(ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED);
+                range *
+                static_cast<float>(ACCELERATION_DUE_TO_GRAVITY_METERS_PER_SECOND_SQUARED);
             float denominator = static_cast<float>(2.0f * (chip_angle * 2.0f).sin());
             float chip_speed  = static_cast<float>(std::sqrt(numerator / denominator));
 
@@ -157,7 +162,8 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
 }
 
 std::unique_ptr<SSLSimulationProto::RobotCommand> createRobotCommand(
-    unsigned int robot_id, std::unique_ptr<SSLSimulationProto::RobotMoveCommand> move_command,
+    unsigned int robot_id,
+    std::unique_ptr<SSLSimulationProto::RobotMoveCommand> move_command,
     std::optional<double> kick_speed, std::optional<double> kick_angle,
     std::optional<double> dribbler_speed)
 {

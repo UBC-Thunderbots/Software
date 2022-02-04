@@ -41,7 +41,19 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
     const TbotsProto::DirectControlPrimitive& direct_control, float front_wheel_angle_deg,
     float back_wheel_angle_deg, float wheel_radius_meters);
 
-std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectControl(std::unique_ptr<TbotsProto::DirectControlPrimitive> direct_control, unsigned int robot_id, RobotConstants_t& robot_constants, WheelConstants_t wheel_constants);
+/**
+ * Creates a RobotCommand proto from Direct Control Primitive
+ *
+ * @param robot_id The id this RobotCommand is for
+ * @param direct_control The Direct Control Primitive to create this RobotCommand from
+ * @param robot_constants The Robot Constant to create this RobotCommand from
+ * @param wheel_constants The Wheel Constant to create this RobotCommand from
+ * @return
+ */
+std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectControl(
+    unsigned int robot_id,
+    std::unique_ptr<TbotsProto::DirectControlPrimitive> direct_control,
+    RobotConstants_t& robot_constants, WheelConstants_t wheel_constants);
 
 /**
  * Creates a RobotCommand proto
@@ -55,7 +67,8 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> getRobotCommandFromDirectContr
  * @return RobotCommand proto
  */
 std::unique_ptr<SSLSimulationProto::RobotCommand> createRobotCommand(
-    unsigned int robot_id, std::unique_ptr<SSLSimulationProto::RobotMoveCommand> move_command,
+    unsigned int robot_id,
+    std::unique_ptr<SSLSimulationProto::RobotMoveCommand> move_command,
     std::optional<double> kick_speed, std::optional<double> kick_angle,
     std::optional<double> dribbler_speed);
 

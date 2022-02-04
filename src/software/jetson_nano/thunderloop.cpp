@@ -13,7 +13,8 @@
 #include "software/world/robot_state.h"
 
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
-                         const WheelConstants_t& wheel_consants) : primitive_executor_(0)
+                         const WheelConstants_t& wheel_consants)
+    : primitive_executor_(0)
 {
     robot_id_        = 0;
     robot_constants_ = robot_constants;
