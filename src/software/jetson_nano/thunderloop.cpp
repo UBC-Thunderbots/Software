@@ -30,28 +30,6 @@
 extern int clock_nanosleep(clockid_t __clock_id, int __flags,
                            __const struct timespec* __req, struct timespec* __rem);
 
-static inline void timespecNorm(struct timespec& ts)
-{
-    while (ts.tv_nsec >= static_cast<int>(NANOSECONDS_PER_SECOND))
-    {
-        ts.tv_nsec -= static_cast<int>(NANOSECONDS_PER_SECOND);
-        ts.tv_sec++;
-    }
-}
-
-static inline void timespecDiff(struct timespec* a, struct timespec* b,
-                                struct timespec* result)
-{
-    result->tv_sec  = a->tv_sec - b->tv_sec;
-    result->tv_nsec = a->tv_nsec - b->tv_nsec;
-    if (result->tv_nsec < 0)
-    {
-        --result->tv_sec;
-        result->tv_nsec += 1000000000L;
-    }
-}
-
-
 Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
                          const WheelConstants_t& wheel_consants, const int loop_hz)
 {
@@ -93,14 +71,15 @@ void Thunderloop::runLoop()
     clock_gettime(0, &start_time);                                                       \
     arg;                                                                                 \
     clock_gettime(0, &end_time);                                                         \
-    timespec_diff(&end_time, &start_time, &time);
+    timespecDiff(&end_time, &start_time, &time);
 
     // Input buffer
     TbotsProto::PrimitiveSet new_primitive_set;
     TbotsProto::Vision new_vision;
 
     // Loop interval
-    int interval = (1.0f / loop_hz_) * static_cast<int>(NANOSECONDS_PER_SECOND);
+    int interval =
+        static_cast<int>(1.0f / static_cast<float>(loop_hz_) * NANOSECONDS_PER_SECOND);
 
     // Start the services
     motor_service_->start();
@@ -173,5 +152,26 @@ void Thunderloop::runLoop()
         // Calculate next shot
         next_shot.tv_nsec += interval;
         timespecNorm(next_shot);
+    }
+}
+
+void Thunderloop::timespecNorm(struct timespec& ts)
+{
+    while (ts.tv_nsec >= static_cast<int>(NANOSECONDS_PER_SECOND))
+    {
+        ts.tv_nsec -= static_cast<int>(NANOSECONDS_PER_SECOND);
+        ts.tv_sec++;
+    }
+}
+
+void Thunderloop::timespecDiff(struct timespec* a, struct timespec* b,
+                               struct timespec* result)
+{
+    result->tv_sec  = a->tv_sec - b->tv_sec;
+    result->tv_nsec = a->tv_nsec - b->tv_nsec;
+    if (result->tv_nsec < 0)
+    {
+        --result->tv_sec;
+        result->tv_nsec += 1000000000L;
     }
 }

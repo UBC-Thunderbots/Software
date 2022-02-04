@@ -58,6 +58,28 @@ class Thunderloop
     std::unique_ptr<NetworkService> network_service_;
 
    private:
+    /**
+     * Subtract two timespecs and store in result struct
+     *
+     * https://gist.github.com/diabloneo/9619917
+     *
+     * @fn timespec_diff(struct timespec *, struct timespec *, struct timespec *)
+     * @brief Compute the diff of two timespecs, that is a - b = result.
+     * @param a the minuend
+     * @param b the subtrahend
+     * @param result a - b
+     */
+    void timespecDiff(struct timespec* a, struct timespec* b, struct timespec* result);
+
+    /*
+     * The struct timespec consists of nanoseconds and seconds. If the nanoseconds
+     * are getting bigger than 1000000000 (= 1 second) the variable containing
+     * seconds has to be incremented and the nanoseconds decremented by 1000000000.
+     *
+     * @param ts timespec to modify
+     */
+    void timespecNorm(struct timespec& ts);
+
     // Primitive Executor
     PrimitiveExecutor primitive_executor_;
 
@@ -82,26 +104,3 @@ class Thunderloop
     unsigned channel_id_;
     int loop_hz_;
 };
-
-/**
- * Subtract two timespecs and store in result struct
- *
- * https://gist.github.com/diabloneo/9619917
- *
- * @fn timespec_diff(struct timespec *, struct timespec *, struct timespec *)
- * @brief Compute the diff of two timespecs, that is a - b = result.
- * @param a the minuend
- * @param b the subtrahend
- * @param result a - b
- */
-static inline void timespecDiff(struct timespec* a, struct timespec* b,
-                                struct timespec* result);
-
-/*
- * The struct timespec consists of nanoseconds and seconds. If the nanoseconds
- * are getting bigger than 1000000000 (= 1 second) the variable containing
- * seconds has to be incremented and the nanoseconds decremented by 1000000000.
- *
- * @param ts timespec to modify
- */
-static inline void timespecNorm(struct timespec& ts);
