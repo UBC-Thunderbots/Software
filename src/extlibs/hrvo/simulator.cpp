@@ -164,12 +164,17 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
     if (can_move)
     {
         std::cout << __func__ << " Can move=" << std::endl;
-        velocity   = Vector2(static_cast<float>(robot.velocity().x()),
+        velocity = Vector2(static_cast<float>(robot.velocity().x()),
                            static_cast<float>(robot.velocity().y()));
-        max_accel  = create2015RobotConstants().robot_max_acceleration_m_per_s_2;//robot.robotConstants().robot_max_acceleration_m_per_s_2;
-        std::cout << __func__ << "max accel " << robot.robotConstants().robot_max_acceleration_m_per_s_2 << std::endl;
-        max_speed  = create2015RobotConstants().robot_max_speed_m_per_s * 5;//robot.robotConstants().robot_max_speed_m_per_s;
-        std::cout << __func__ << "max velocity " << robot.robotConstants().robot_max_speed_m_per_s << std::endl;
+        max_accel =
+            create2015RobotConstants()
+                .robot_max_acceleration_m_per_s_2;  // robot.robotConstants().robot_max_acceleration_m_per_s_2;
+        std::cout << __func__ << "max accel "
+                  << robot.robotConstants().robot_max_acceleration_m_per_s_2 << std::endl;
+        max_speed = create2015RobotConstants().robot_max_speed_m_per_s *
+                    5;  // robot.robotConstants().robot_max_speed_m_per_s;
+        std::cout << __func__ << "max velocity "
+                  << robot.robotConstants().robot_max_speed_m_per_s << std::endl;
         pref_speed = max_speed * PREF_SPEED_SCALE;
     }
 
@@ -254,11 +259,14 @@ Vector Simulator::getRobotVelocity(unsigned int robot_id) const
     auto agent_index_iter = friendly_robot_id_map.find(robot_id);
     if (agent_index_iter != friendly_robot_id_map.end())
     {
-        unsigned int agent_index = agent_index_iter->second;
+        unsigned int agent_index  = agent_index_iter->second;
         Vector2 velocity_vector_2 = getAgentVelocity(agent_index);
-        Vector2 goal_pos = goals_[agents_[agent_index]->getGoalIndex()]->getCurrentGoalPosition();
+        Vector2 goal_pos =
+            goals_[agents_[agent_index]->getGoalIndex()]->getCurrentGoalPosition();
         Vector2 curr_pos = agents_[agent_index]->getPosition();
-        std::cout << __func__ << " map elem found with vel=" << velocity_vector_2 << "for" << agent_index << " with pos=" << curr_pos << " with goal" << goal_pos << std::endl;
+        std::cout << __func__ << " map elem found with vel=" << velocity_vector_2 << "for"
+                  << agent_index << " with pos=" << curr_pos << " with goal" << goal_pos
+                  << std::endl;
         return Vector(velocity_vector_2.getX(), velocity_vector_2.getY());
     }
     // TODO: Retruning 0 vector
@@ -318,7 +326,8 @@ void Simulator::doStep()
     for (auto &agent : agents_)
     {
         agent->computeNewVelocity();
-        std::cout << __func__ << " velocity computed=" << agent->getVelocity() << std::endl;
+        std::cout << __func__ << " velocity computed=" << agent->getVelocity()
+                  << std::endl;
     }
 
     for (auto &agent : agents_)

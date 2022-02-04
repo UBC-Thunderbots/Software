@@ -195,7 +195,7 @@ class Simulator
      */
     Vector2 getAgentVelocity(std::size_t agentNo) const;
 
-//    TODO:
+    //    TODO:
     Vector getRobotVelocity(unsigned int robot_id) const;
 
     /**
