@@ -87,6 +87,7 @@ if [[ $(lsb_release -rs) == "18.04" ]]; then
     host_software_packages+=(python-minimal)
     host_software_packages+=(libclang-dev)
     host_software_packages+=(python3.8)
+    host_software_packages+=(python3.8-venv)
 fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
