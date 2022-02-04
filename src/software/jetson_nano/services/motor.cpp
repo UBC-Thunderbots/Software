@@ -27,8 +27,6 @@ extern "C"
 #include "external/trinamic/tmc/ic/TMC6100/TMC6100.h"
 }
 
-static float MAX_DRIVE_RPM = 100.0;
-
 // SPI Configs
 static uint32_t SPI_SPEED_HZ = 1000000;  // 1 Mhz
 static uint8_t SPI_BITS      = 8;
@@ -58,14 +56,14 @@ extern "C"
     // functions. The motor service will set this variable in the constructor.
     static MotorService* g_motor_service = NULL;
 
-    uint8_t tmc4671_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
+    uint8_t tmc4671_readwriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer)
     {
-        return g_motor_service->tmc4671ReadWriteByte(motor, data, lastTransfer);
+        return g_motor_service->tmc4671ReadWriteByte(motor, data, last_transfer);
     }
 
-    uint8_t tmc6100_readwriteByte(uint8_t motor, uint8_t data, uint8_t lastTransfer)
+    uint8_t tmc6100_readwriteByte(uint8_t motor, uint8_t data, uint8_t last_transfer)
     {
-        return g_motor_service->tmc6100ReadWriteByte(motor, data, lastTransfer);
+        return g_motor_service->tmc6100ReadWriteByte(motor, data, last_transfer);
     }
 }
 
@@ -132,6 +130,7 @@ MotorService::~MotorService() {}
 std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
     const TbotsProto::DirectControlPrimitive& direct_control)
 {
+    // TODO (#2335) We can only spin 1 motor right now
     CHECK(encoder_calibrated_[FRONT_LEFT_MOTOR_CHIP_SELECT])
         << "Running without encoder calibration can cause serious harm";
 
@@ -139,11 +138,16 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
     {
         case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectPerWheelControl:
         {
+            // TODO (#2456) until we figure out the right factor considering
+            // the gear ratio
+            static float RANDOM_SCALING_FACTOR = 100.0;
+
+            // TODO (#2335) We can only spin 1 motor right now, figure out the
             tmc4671_setTargetVelocity(
                 FRONT_LEFT_MOTOR_CHIP_SELECT,
                 static_cast<int>(
                     direct_control.direct_per_wheel_control().front_left_wheel_rpm() *
-                    MAX_DRIVE_RPM));
+                    RANDOM_SCALING_FACTOR));
 
             break;
         }
@@ -156,8 +160,7 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
         }
         case TbotsProto::DirectControlPrimitive::WheelControlCase::WHEEL_CONTROL_NOT_SET:
         {
-            // LOG(WARNING) << "Motor service polled with an empty
-            // DirectControlPrimitive";
+            LOG(WARNING) << "Motor service polled with an empty DirectControlPrimitive ";
             break;
         }
     }
@@ -317,6 +320,7 @@ void MotorService::writeToControllerOrDieTrying(uint8_t motor, uint8_t address,
 
 void MotorService::configurePWM(uint8_t motor)
 {
+    // Please read the header file and the datasheet for more info
     writeToControllerOrDieTrying(motor, TMC4671_PWM_POLARITIES, 0x00000000);
     writeToControllerOrDieTrying(motor, TMC4671_PWM_MAXCNT, 0x00000F9F);
     writeToControllerOrDieTrying(motor, TMC4671_PWM_BBM_H_BBM_L, 0x00002828);
@@ -325,6 +329,7 @@ void MotorService::configurePWM(uint8_t motor)
 
 void MotorService::configurePI(uint8_t motor)
 {
+    // Please read the header file and the datasheet for more info
     writeToControllerOrDieTrying(motor, TMC4671_PID_FLUX_P_FLUX_I, 67109376);
     writeToControllerOrDieTrying(motor, TMC4671_PID_TORQUE_P_TORQUE_I, 67109376);
     writeToControllerOrDieTrying(motor, TMC4671_PID_VELOCITY_P_VELOCITY_I, 52428800);

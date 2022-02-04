@@ -30,14 +30,7 @@
 extern int clock_nanosleep(clockid_t __clock_id, int __flags,
                            __const struct timespec* __req, struct timespec* __rem);
 
-/*
- * The struct timespec consists of nanoseconds and seconds. If the nanoseconds
- * are getting bigger than 1000000000 (= 1 second) the variable containing
- * seconds has to be incremented and the nanoseconds decremented by 1000000000.
- *
- * @param ts timespec to modify
- */
-static inline void tsnorm(struct timespec& ts)
+static inline void timespecNorm(struct timespec& ts)
 {
     while (ts.tv_nsec >= static_cast<int>(NANOSECONDS_PER_SECOND))
     {
@@ -46,17 +39,8 @@ static inline void tsnorm(struct timespec& ts)
     }
 }
 
-/**
- * https://gist.github.com/diabloneo/9619917
- *
- * @fn timespec_diff(struct timespec *, struct timespec *, struct timespec *)
- * @brief Compute the diff of two timespecs, that is a - b = result.
- * @param a the minuend
- * @param b the subtrahend
- * @param result a - b
- */
-static inline void timespec_diff(struct timespec* a, struct timespec* b,
-                                 struct timespec* result)
+static inline void timespecDiff(struct timespec* a, struct timespec* b,
+                                struct timespec* result)
 {
     result->tv_sec  = a->tv_sec - b->tv_sec;
     result->tv_nsec = a->tv_nsec - b->tv_nsec;
@@ -100,6 +84,11 @@ void Thunderloop::runLoop()
     struct timespec end_time;
     struct timespec time;
 
+    /**
+     * Times an arbitrary expression and stores the result in time.
+     *
+     * @param arg The expression to time
+     */
 #define TIME_EXPRESSION(arg)                                                             \
     clock_gettime(0, &start_time);                                                       \
     arg;                                                                                 \
@@ -111,7 +100,7 @@ void Thunderloop::runLoop()
     TbotsProto::Vision new_vision;
 
     // Loop interval
-    int interval = 1 / loop_hz_ * static_cast<int>(NANOSECONDS_PER_SECOND);
+    int interval = (1.0f / loop_hz_) * static_cast<int>(NANOSECONDS_PER_SECOND);
 
     // Start the services
     motor_service_->start();
@@ -183,6 +172,6 @@ void Thunderloop::runLoop()
 
         // Calculate next shot
         next_shot.tv_nsec += interval;
-        tsnorm(next_shot);
+        timespecNorm(next_shot);
     }
 }
