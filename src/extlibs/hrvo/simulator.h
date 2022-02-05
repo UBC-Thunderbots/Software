@@ -45,7 +45,13 @@
 class Simulator
 {
    public:
-    explicit Simulator(float time_step);
+    /**
+     * Constructor
+     * @param time_step The simulation time step (in seconds)
+     * @param robot_constants The robot constants which should be used for all agents
+     */
+    explicit Simulator(float time_step, const RobotConstants_t &robot_constants);
+
     ~Simulator() = default;
 
     /**
@@ -267,7 +273,10 @@ class Simulator
     std::vector<std::unique_ptr<Goal>> goals_;
 
    private:
-    // friendly robot id to agent index
+    // The robot constants to use for all agents
+    RobotConstants_t robot_constants_;
+
+    // Friendly robot id to agent index
     std::map<unsigned int, unsigned int> friendly_robot_id_map;
 
     // PrimitiveSet which includes the path which each friendly robot should take

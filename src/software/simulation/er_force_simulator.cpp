@@ -188,8 +188,8 @@ void ErForceSimulator::setRobots(const std::vector<RobotStateWithId>& robots,
 
     for (const auto& robot_state_with_id : robots)
     {
-        auto robot_primitive_executor =
-            std::make_shared<PrimitiveExecutor>(primitive_executor_time_step);
+        auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
+            primitive_executor_time_step, robot_constants);
 
         if (side == gameController::Team::BLUE)
         {

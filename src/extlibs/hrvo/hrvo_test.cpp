@@ -30,7 +30,7 @@ class HRVOTest : public ::testing::Test
     TbotsProto::PrimitiveSet primitive_set;
 
     HRVOTest()
-        : simulator(1.f / SIMULATOR_FRAME_RATE),
+        : simulator(1.f / SIMULATOR_FRAME_RATE, create2021RobotConstants()),
           current_time(Timestamp::fromSeconds(123)),
           ball(Point(), Vector(), current_time),
           field(Field::createSSLDivisionBField()),

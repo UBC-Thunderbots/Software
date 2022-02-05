@@ -8,7 +8,14 @@
 class PrimitiveExecutor
 {
    public:
-    explicit PrimitiveExecutor(double time_step);
+    /**
+     * Constructor
+     * @param time_step Time step which this primitive executor operates in
+     * @param robot_constants The robot constants for the robot which uses this primitive
+     * executor
+     */
+    explicit PrimitiveExecutor(const double time_step,
+                               const RobotConstants_t& robot_constants);
 
     /**
      * Start running a primitive

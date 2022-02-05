@@ -6,10 +6,11 @@
 #include "software/logger/logger.h"
 #include "software/math/math_functions.h"
 
-PrimitiveExecutor::PrimitiveExecutor(double time_step)
+PrimitiveExecutor::PrimitiveExecutor(const double time_step,
+                                     const RobotConstants_t& robot_constants)
     : current_primitive_(),
-      robot_constants_(),
-      hrvo_simulator(static_cast<float>(time_step))
+      robot_constants_(robot_constants),
+      hrvo_simulator(static_cast<float>(time_step), robot_constants)
 {
 }
 

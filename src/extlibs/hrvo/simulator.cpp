@@ -42,9 +42,10 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/intersection.h"
 
-Simulator::Simulator(float time_step)
+Simulator::Simulator(float time_step, const RobotConstants_t &robot_constants)
     : globalTime_(0.0f),
       timeStep_(time_step),
+      robot_constants_(robot_constants),
       reachedGoals_(false),
       kdTree_(std::make_unique<KdTree>(this))
 {
@@ -162,11 +163,8 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
         velocity = Vector2(static_cast<float>(robot.velocity().x()),
                            static_cast<float>(robot.velocity().y()));
         // TODO: Update robot constants to be passed down
-        max_accel =
-            create2015RobotConstants()
-                .robot_max_acceleration_m_per_s_2;  // robot.robotConstants().robot_max_acceleration_m_per_s_2;
-        max_speed = create2015RobotConstants().robot_max_speed_m_per_s *
-                    5;  // robot.robotConstants().robot_max_speed_m_per_s;
+        max_accel  = robot_constants_.robot_max_acceleration_m_per_s_2;
+        max_speed  = robot_constants_.robot_max_speed_m_per_s;
         pref_speed = max_speed * PREF_SPEED_SCALE;
     }
 
@@ -207,7 +205,7 @@ std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot,
     Vector2 velocity(static_cast<float>(robot.velocity().x()),
                      static_cast<float>(robot.velocity().y()));
     float max_accel = 0.f;
-    float max_speed = robot.robotConstants().robot_max_speed_m_per_s;
+    float max_speed = robot_constants_.robot_max_speed_m_per_s;
 
     // Max distance which the robot can travel in one time step + scaling
     float goal_radius = (max_speed * timeStep_) / 2 * GOAL_RADIUS_SCALE;
@@ -289,7 +287,6 @@ std::size_t Simulator::addGoalPositions(const std::vector<Vector2> &positions,
 
 void Simulator::doStep()
 {
-
     if (agents_.size() == 0)
     {
         // TODO: Log error
