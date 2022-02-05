@@ -42,10 +42,9 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/intersection.h"
 
-Simulator::Simulator(float time_step, const RobotConstants_t &robot_constants)
+Simulator::Simulator(float time_step)
     : globalTime_(0.0f),
       timeStep_(time_step),
-      robot_constants_(robot_constants),
       reachedGoals_(false),
       kdTree_(std::make_unique<KdTree>(this))
 {
@@ -160,11 +159,10 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
                     unavailable_capabilities.end();
     if (can_move)
     {
-        velocity = Vector2(static_cast<float>(robot.velocity().x()),
+        velocity   = Vector2(static_cast<float>(robot.velocity().x()),
                            static_cast<float>(robot.velocity().y()));
-        // TODO: Update robot constants to be passed down
-        max_accel  = robot_constants_.robot_max_acceleration_m_per_s_2;
-        max_speed  = robot_constants_.robot_max_speed_m_per_s;
+        max_accel  = robot.robotConstants().robot_max_acceleration_m_per_s_2;
+        max_speed  = robot.robotConstants().robot_max_speed_m_per_s;
         pref_speed = max_speed * PREF_SPEED_SCALE;
     }
 
@@ -205,7 +203,7 @@ std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot,
     Vector2 velocity(static_cast<float>(robot.velocity().x()),
                      static_cast<float>(robot.velocity().y()));
     float max_accel = 0.f;
-    float max_speed = robot_constants_.robot_max_speed_m_per_s;
+    float max_speed = robot.robotConstants().robot_max_speed_m_per_s;
 
     // Max distance which the robot can travel in one time step + scaling
     float goal_radius = (max_speed * timeStep_) / 2 * GOAL_RADIUS_SCALE;
@@ -244,22 +242,6 @@ size_t Simulator::addLinearVelocityAgent(const Vector2 &position, float agent_ra
     return agents_.size() - 1;
 }
 
-Vector Simulator::getRobotVelocity(unsigned int robot_id) const
-{
-    auto agent_index_iter = friendly_robot_id_map.find(robot_id);
-    if (agent_index_iter != friendly_robot_id_map.end())
-    {
-        unsigned int agent_index  = agent_index_iter->second;
-        Vector2 velocity_vector_2 = getAgentVelocity(agent_index);
-        Vector2 goal_pos =
-            goals_[agents_[agent_index]->getGoalIndex()]->getCurrentGoalPosition();
-        Vector2 curr_pos = agents_[agent_index]->getPosition();
-        return Vector(velocity_vector_2.getX(), velocity_vector_2.getY());
-    }
-    // TODO: Retruning 0 vector
-    return Vector();
-}
-
 std::size_t Simulator::addGoal(const Vector2 &position)
 {
     std::unique_ptr<Goal> goal = std::make_unique<Goal>(position);
@@ -287,12 +269,6 @@ std::size_t Simulator::addGoalPositions(const std::vector<Vector2> &positions,
 
 void Simulator::doStep()
 {
-    if (agents_.size() == 0)
-    {
-        // TODO: Log error
-        return;
-    }
-
     if (kdTree_ == nullptr)
     {
         throw std::runtime_error(

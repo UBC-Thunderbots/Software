@@ -56,6 +56,19 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "enlsvg_path_planner",
+    srcs = ["enlsvg_path_planner.cpp"],
+    hdrs = ["enlsvg_path_planner.h"],
+    deps = [
+        ":path_planner",
+        "//extlibs/enlsvg",
+        "//software/logger",
+        "//software/world",
+        "@boost//:functional",
+    ],
+)
+
 cc_test(
     name = "theta_star_path_planner_test",
     srcs = ["theta_star_path_planner_test.cpp"],
@@ -65,6 +78,17 @@ cc_test(
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/test_util",
         "//software/world:field",
+    ],
+)
+
+cc_test(
+    name = "enlsvg_path_planner_test",
+    srcs = ["enlsvg_path_planner_test.cpp"],
+    deps = [
+        ":enlsvg_path_planner",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
+        "//software/test_util",
     ],
 )
 
