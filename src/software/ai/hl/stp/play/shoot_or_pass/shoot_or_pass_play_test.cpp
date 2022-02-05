@@ -32,7 +32,8 @@ TEST_F(ShootOrPassPlayTest, test_shoot_or_pass_play)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(ShootOrPassPlay));
+    setFriendlyAIPlay(TYPENAME(ShootOrPassPlay));
+    setEnemyAIPlay(TYPENAME(HaltPlay));
     setRefereeCommand(RefereeCommand::FORCE_START, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {friendlyScored};

@@ -36,7 +36,10 @@ class StopPlayTest : public SimulatedPlayTestFixture
         SimulatedPlayTestFixture::SetUp();
         setFriendlyGoalie(0);
         setEnemyGoalie(0);
-        setAIPlay(TYPENAME(StopPlay));
+        setFriendlyAIPlay(TYPENAME(StopPlay));
+        setEnemyAIPlay(TYPENAME(HaltPlay));
+
+
         setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
     }
     Field field = Field::createSSLDivisionBField();
