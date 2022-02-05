@@ -86,6 +86,8 @@ if [[ $(lsb_release -rs) == "18.04" ]]; then
     # the bazel install hasn't installed it properly
     host_software_packages+=(python-minimal)
     host_software_packages+=(libclang-dev)
+    host_software_packages+=(python3.8)
+    host_software_packages+=(python3.8-venv)
 fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
@@ -100,19 +102,20 @@ echo "================================================================"
 echo "Upgrading Pip Version"
 echo "================================================================"
 
-if ! /usr/bin/python3 -m pip install --upgrade pip ; then
-    echo "##############################################################"
-    echo "Error: Upgrading pip version failed"
-    echo "##############################################################"
-    exit 1
-fi
-
-if ! sudo /usr/bin/python3 -m venv /opt/tbotspython ; then
+if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
     echo "##############################################################"
     echo "Error: Setting up virtual environment failed"
     echo "##############################################################"
     exit 1
 fi
+
+if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
+    echo "##############################################################"
+    echo "Error: Upgrading pip version in venv failed"
+    echo "##############################################################"
+    exit 1
+fi
+
 
 if ! sudo /opt/tbotspython/bin/pip3 install pyqt5  ; then
     echo "##############################################################"
