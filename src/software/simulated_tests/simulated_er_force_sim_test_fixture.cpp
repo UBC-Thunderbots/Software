@@ -29,72 +29,26 @@ void SimulatedErForceSimTestFixture::SetUp()
 {
     LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
 
-    friendly_mutable_thunderbots_config->getMutableAiControlConfig()
-        ->getMutableRunAi()
-        ->setValue(!TbotsGtestMain::stop_ai_on_start);
-
-    // The simulated test abstracts and maintains the invariant that the friendly team
-    // is always the yellow team
+    setCommonConfigs(friendly_mutable_thunderbots_config);
+    setCommonConfigs(enemy_mutable_thunderbots_config);
+    // The friendly team defends the negative side of the field
+    // and controls the yellow robots
     friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableOverrideGameControllerDefendingSide()
+        ->getMutableFriendlyColorYellow()
         ->setValue(true);
     friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableDefendingPositiveSide()
         ->setValue(false);
 
-    // Experimentally determined restitution value
-    friendly_mutable_thunderbots_config->getMutableSimulatorConfig()
-        ->getMutableBallRestitution()
-        ->setValue(0.8);
-    // Measured these values from fig. 9 on page 8 of
-    // https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
-    friendly_mutable_thunderbots_config->getMutableSimulatorConfig()
-        ->getMutableSlidingFrictionAcceleration()
-        ->setValue(6.9);
-    friendly_mutable_thunderbots_config->getMutableSimulatorConfig()
-        ->getMutableRollingFrictionAcceleration()
-        ->setValue(0.5);
-
-    // The simulated test abstracts and maintains the invariant that the enemy team
-    // is always defending the "positive" side of the field. This is so that the
-    // coordinates given when setting up tests is from the perspective of the enemy
-    // team
+    // The enemy team defends the positive side of the field
+    // and controls the blue robots
     enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableFriendlyColorYellow()
         ->setValue(false);
-    enemy_mutable_thunderbots_config->getMutableAiControlConfig()
-        ->getMutableRunAi()
-        ->setValue(!TbotsGtestMain::stop_ai_on_start);
-
-    // The simulated test abstracts and maintains the invariant that the friendly team
-    // is always the yellow team
-    enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableOverrideGameControllerDefendingSide()
-        ->setValue(true);
     enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableDefendingPositiveSide()
         ->setValue(true);
 
-    // Experimentally determined restitution value
-    enemy_mutable_thunderbots_config->getMutableSimulatorConfig()
-        ->getMutableBallRestitution()
-        ->setValue(0.8);
-    // Measured these values from fig. 9 on page 8 of
-    // https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
-    enemy_mutable_thunderbots_config->getMutableSimulatorConfig()
-        ->getMutableSlidingFrictionAcceleration()
-        ->setValue(6.9);
-    enemy_mutable_thunderbots_config->getMutableSimulatorConfig()
-        ->getMutableRollingFrictionAcceleration()
-        ->setValue(0.5);
-
-    // The simulated test abstracts and maintains the invariant that the friendly team
-    // is always defending the "negative" side of the field. This is so that the
-    // coordinates given when setting up tests is from the perspective of the friendly
-    // team
-    enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableFriendlyColorYellow()
-        ->setValue(false);
     if (TbotsGtestMain::enable_visualizer)
     {
         enableVisualizer();
@@ -112,6 +66,30 @@ void SimulatedErForceSimTestFixture::SetUp()
     min_enemy_tick_duration    = std::numeric_limits<double>::max();
     friendly_tick_count        = 0;
     enemy_tick_count           = 0;
+}
+
+void SimulatedErForceSimTestFixture::setCommonConfigs(
+    std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config)
+{
+    mutable_thunderbots_config->getMutableAiControlConfig()->getMutableRunAi()->setValue(
+        !TbotsGtestMain::stop_ai_on_start);
+
+    mutable_thunderbots_config->getMutableSensorFusionConfig()
+        ->getMutableOverrideGameControllerDefendingSide()
+        ->setValue(true);
+
+    // Experimentally determined restitution value
+    mutable_thunderbots_config->getMutableSimulatorConfig()
+        ->getMutableBallRestitution()
+        ->setValue(0.8);
+    // Measured these values from fig. 9 on page 8 of
+    // https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
+    mutable_thunderbots_config->getMutableSimulatorConfig()
+        ->getMutableSlidingFrictionAcceleration()
+        ->setValue(6.9);
+    mutable_thunderbots_config->getMutableSimulatorConfig()
+        ->getMutableRollingFrictionAcceleration()
+        ->setValue(0.5);
 }
 
 void SimulatedErForceSimTestFixture::enableVisualizer()

@@ -84,18 +84,34 @@ class SimulatedErForceSimTacticTestFixture : public SimulatedErForceSimTestFixtu
    private:
     void updatePrimitives(const World& friendly_world, const World& enemy_world,
                           std::shared_ptr<ErForceSimulator> simulator_to_update) override;
-    void updateFriendlyPrimitives(const World& world,
-                                  std::shared_ptr<ErForceSimulator> simulator_to_update);
-    void updateEnemyPrimitives(const World& world,
-                               std::shared_ptr<ErForceSimulator> simulator_to_update);
+
+    /**
+     * Updates primitives on the given simulator given these inputs
+     *
+     * @param world the world
+     * @param simulator_to_update The simulator to update
+     * @param navigator the navigator to use
+     * @param robot_id the robot id of the robot to control
+     * @param tactic The tactic to run on the robot
+     * @param motion_constraints The motion constraints
+     * @param config the ThunderbotsConfig
+     *
+     * @return the tick duration in ms
+     */
+    static double updatePrimitives(const World& world,
+                                   std::shared_ptr<ErForceSimulator> simulator_to_update,
+                                   std::shared_ptr<Navigator> navigator, RobotId robot_id,
+                                   std::shared_ptr<Tactic> tactic,
+                                   const std::set<MotionConstraint>& motion_constraints,
+                                   std::shared_ptr<const ThunderbotsConfig> config);
 
     std::optional<TbotsProto::PlayInfo> getPlayInfo() override;
     AIDrawFunction getDrawFunctions() override;
 
     std::shared_ptr<Tactic> friendly_tactic;
     std::shared_ptr<Tactic> enemy_tactic;
-    std::optional<RobotId> friendly_robot_id;
-    std::optional<RobotId> enemy_robot_id;
+    std::optional<RobotId> friendly_robot_id_opt;
+    std::optional<RobotId> enemy_robot_id_opt;
 
     // Motion constraints to set for intent
     std::set<MotionConstraint> friendly_motion_constraints;

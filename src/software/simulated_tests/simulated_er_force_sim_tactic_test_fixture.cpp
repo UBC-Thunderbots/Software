@@ -60,38 +60,26 @@ void SimulatedErForceSimTacticTestFixture::setTactic(
 void SimulatedErForceSimTacticTestFixture::setFriendlyTactic(
     std::shared_ptr<Tactic> tactic)
 {
-    if (tactic)
-    {
-        this->friendly_tactic = tactic;
-    }
-    else
-    {
-        LOG(FATAL) << "Friendly tactic is invalid" << std::endl;
-    }
+    CHECK(static_cast<bool>(tactic)) << "Friendly tactic is invalid" << std::endl;
+    this->friendly_tactic = tactic;
 }
 
 void SimulatedErForceSimTacticTestFixture::setEnemyTactic(std::shared_ptr<Tactic> tactic)
 {
-    if (tactic)
-    {
-        this->enemy_tactic = tactic;
-    }
-    else
-    {
-        LOG(FATAL) << "Enemy tactic is invalid" << std::endl;
-    }
+    CHECK(static_cast<bool>(tactic)) << "Enemy tactic is invalid" << std::endl;
+    this->enemy_tactic = tactic;
 }
 
 void SimulatedErForceSimTacticTestFixture::setFriendlyRobotId(RobotId friendly_robot_id)
 {
-    this->friendly_robot_id = friendly_robot_id;
+    this->friendly_robot_id_opt = friendly_robot_id;
 }
 
 void SimulatedErForceSimTacticTestFixture::setBothRobotId(RobotId friendly_robot_id,
                                                           RobotId enemy_robot_id)
 {
-    this->friendly_robot_id = friendly_robot_id;
-    this->enemy_robot_id    = enemy_robot_id;
+    this->friendly_robot_id_opt = friendly_robot_id;
+    this->enemy_robot_id_opt    = enemy_robot_id;
 }
 
 void SimulatedErForceSimTacticTestFixture::setMotionConstraints(
@@ -106,75 +94,51 @@ void SimulatedErForceSimTacticTestFixture::updatePrimitives(
     const World& friendly_world, const World& enemy_world,
     std::shared_ptr<ErForceSimulator> simulator_to_update)
 {
-    updateFriendlyPrimitives(friendly_world, simulator_to_update);
-    if (this->enemy_robot_id)
+    CHECK(friendly_robot_id_opt.has_value()) << "No friendly robot id set" << std::endl;
+    registerFriendlyTickTime(
+        updatePrimitives(friendly_world, simulator_to_update, friendly_navigator,
+                         friendly_robot_id_opt.value(), friendly_tactic,
+                         friendly_motion_constraints, friendly_thunderbots_config));
+    if (this->enemy_robot_id_opt.has_value())
     {
-        updateEnemyPrimitives(enemy_world, simulator_to_update);
+        registerEnemyTickTime(updatePrimitives(
+            enemy_world, simulator_to_update, enemy_navigator, enemy_robot_id_opt.value(),
+            enemy_tactic, enemy_motion_constraints, enemy_thunderbots_config));
     }
 }
 
-void SimulatedErForceSimTacticTestFixture::updateFriendlyPrimitives(
-    const World& world, std::shared_ptr<ErForceSimulator> simulator_to_update)
+double SimulatedErForceSimTacticTestFixture::updatePrimitives(
+    const World& world, std::shared_ptr<ErForceSimulator> simulator_to_update,
+    std::shared_ptr<Navigator> navigator, RobotId robot_id,
+    std::shared_ptr<Tactic> tactic, const std::set<MotionConstraint>& motion_constraints,
+    std::shared_ptr<const ThunderbotsConfig> config)
 {
     std::vector<std::unique_ptr<Intent>> intents;
     auto start_tick_time = std::chrono::system_clock::now();
 
-    if (!friendly_robot_id)
+    auto new_robot_opt = world.friendlyTeam().getRobotById(robot_id);
+
+    CHECK(new_robot_opt.has_value())
+        << "No robot with robot id " << robot_id << std::endl;
+    auto intent = tactic->get(new_robot_opt.value(), world);
+    intent->setMotionConstraints(motion_constraints);
+    intents.push_back(std::move(intent));
+
+    auto primitive_set_msg = navigator->getAssignedPrimitives(world, intents);
+    double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
+    auto vision_msg        = createVision(world);
+
+    if (config->getSensorFusionConfig()->getFriendlyColorYellow()->value())
     {
-        LOG(FATAL) << "No friendly robot id set" << std::endl;
-    }
-    else if (auto new_robot = world.friendlyTeam().getRobotById(*friendly_robot_id))
-    {
-        auto intent = friendly_tactic->get(
-            *world.friendlyTeam().getRobotById(*friendly_robot_id), world);
-        intent->setMotionConstraints(friendly_motion_constraints);
-        intents.push_back(std::move(intent));
+        simulator_to_update->setYellowRobotPrimitiveSet(*primitive_set_msg,
+                                                        std::move(vision_msg));
     }
     else
     {
-        LOG(FATAL) << "No friendly robot with robot id " << *friendly_robot_id
-                   << std::endl;
+        simulator_to_update->setBlueRobotPrimitiveSet(*primitive_set_msg,
+                                                      std::move(vision_msg));
     }
-
-    auto primitive_set_msg = friendly_navigator->getAssignedPrimitives(world, intents);
-    double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
-    registerFriendlyTickTime(duration_ms);
-    auto vision_msg = createVision(world);
-    simulator_to_update->setYellowRobotPrimitiveSet(*primitive_set_msg,
-                                                    std::move(vision_msg));
-}
-
-void SimulatedErForceSimTacticTestFixture::updateEnemyPrimitives(
-    const World& world, std::shared_ptr<ErForceSimulator> simulator_to_update)
-{
-    std::vector<std::unique_ptr<Intent>> intents;
-    auto start_tick_time = std::chrono::system_clock::now();
-
-    if (!enemy_robot_id)
-    {
-        LOG(FATAL) << "No enemy robot id set" << std::endl;
-    }
-    else if (auto new_robot = world.friendlyTeam().getRobotById(*enemy_robot_id))
-    {
-        auto intent =
-            enemy_tactic->get(*world.friendlyTeam().getRobotById(*enemy_robot_id), world);
-        intent->setMotionConstraints(enemy_motion_constraints);
-        intents.push_back(std::move(intent));
-    }
-    else
-    {
-        LOG(FATAL) << "No enemy robot with robot id " << *enemy_robot_id << std::endl;
-    }
-
-    auto primitive_set_msg = enemy_navigator->getAssignedPrimitives(world, intents);
-    double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
-    registerEnemyTickTime(duration_ms);
-    auto defending_side = DefendingSideProto();
-    defending_side.set_defending_side(
-        DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X);
-    auto vision_msg = createVision(world);
-    simulator_to_update->setBlueRobotPrimitiveSet(*primitive_set_msg,
-                                                  std::move(vision_msg));
+    return duration_ms;
 }
 
 std::optional<TbotsProto::PlayInfo> SimulatedErForceSimTacticTestFixture::getPlayInfo()

@@ -119,6 +119,14 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
                   std::shared_ptr<ErForceSimulator> simulator);
 
     /**
+     * Sets configs that are common to the friendly and enemy teams
+     *
+     * @param mutable_thunderbots_config A mutable thunderbots config
+     */
+    static void setCommonConfigs(
+        std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config);
+
+    /**
      * A helper function that updates SensorFusion with the latest data from the
      * ErForceSimulator
      *
