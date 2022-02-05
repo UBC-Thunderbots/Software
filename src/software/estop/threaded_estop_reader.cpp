@@ -75,10 +75,8 @@ void ThreadedEstopReader::tick(const boost::system::error_code& error)
             estop_state = new_state;
         }
 
-        if (num_consecutive_status_error > MAXIMUM_CONSECUTIVE_STATUS_ERROR)
-        {
-            LOG(FATAL) << "ESTOP Consecutive Unexpected messages";
-        }
+        CHECK(num_consecutive_status_error <= MAXIMUM_CONSECUTIVE_STATUS_ERROR)
+            << "ESTOP Consecutive Unexpected messages";
 
         boost::posix_time::milliseconds next_interval(INTERVAL_BETWEEN_READS_MS);
 
