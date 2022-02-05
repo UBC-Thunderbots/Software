@@ -45,6 +45,7 @@
 Simulator::Simulator(float time_step, const RobotConstants_t &robot_constants)
     : globalTime_(0.0f),
       timeStep_(time_step),
+      robot_constants_(robot_constants),
       reachedGoals_(false),
       kdTree_(std::make_unique<KdTree>(this))
 {
