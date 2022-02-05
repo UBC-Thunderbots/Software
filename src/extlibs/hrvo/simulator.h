@@ -269,7 +269,7 @@ class Simulator
     float globalTime_;
 
     // The amount of time which the simulator should advance by
-    float timeStep_;
+    const float timeStep_;
 
     // True if all agents have reached their destination
     bool reachedGoals_;
