@@ -30,7 +30,8 @@ TEST_F(HaltPlayTest, test_halt_play)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlay(TYPENAME(HaltPlay));
+    setFriendlyAIPlay(TYPENAME(HaltPlay));
+    setEnemyAIPlay(TYPENAME(HaltPlay));
     setRefereeCommand(RefereeCommand::HALT, RefereeCommand::HALT);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
