@@ -92,8 +92,9 @@ class SimulatedPlayTestFixture : public SimulatedTestFixture
     const std::shared_ptr<AiConfig> getEnemyAiConfig() const;
 
 
-    std::optional<TbotsProto::PlayInfo> getFriendlyPlayInfo() override;
-    std::optional<TbotsProto::PlayInfo> getEnemyPlayInfo() override;
+    std::optional<TbotsProto::PlayInfo> getFriendlyPlayInfo(); 
+    std::optional<TbotsProto::PlayInfo> getEnemyPlayInfo();
+    std::optional<TbotsProto::PlayInfo> getPlayInfo() override; 
 
     AIDrawFunction getDrawFunctions() override;
 

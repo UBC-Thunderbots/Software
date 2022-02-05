@@ -9,15 +9,14 @@ SimulatedPlayTestFixture::SimulatedPlayTestFixture()
       friendly_ai_control_config(friendly_mutable_thunderbots_config->getMutableAiControlConfig()),
       friendly_sensor_fusion_config(
           friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()),
-      game_state(),
-      friendly_ai(friendly_thunderbots_config->getAiConfig(),
-         friendly_thunderbots_config->getAiControlConfig(),
-         friendly_thunderbots_config->getPlayConfig())
       enemy_ai_config(enemy_mutable_thunderbots_config->getMutableAiConfig()),
       enemy_ai_control_config(enemy_mutable_thunderbots_config->getMutableAiControlConfig()),
       enemy_sensor_fusion_config(
           enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()),
       game_state(),
+      friendly_ai(friendly_thunderbots_config->getAiConfig(),
+         friendly_thunderbots_config->getAiControlConfig(),
+         friendly_thunderbots_config->getPlayConfig()),
       enemy_ai(enemy_thunderbots_config->getAiConfig(),
          enemy_thunderbots_config->getAiControlConfig(),
          enemy_thunderbots_config->getPlayConfig())
@@ -50,13 +49,13 @@ void SimulatedPlayTestFixture::SetUp()
 
 void SimulatedPlayTestFixture::setFriendlyGoalie(RobotId goalie_id)
 {
-    sensor_fusion_config->getMutableFriendlyGoalieId()->setValue(
+    friendly_sensor_fusion_config->getMutableFriendlyGoalieId()->setValue(
         static_cast<int>(goalie_id));
 }
 
 void SimulatedPlayTestFixture::setEnemyGoalie(RobotId goalie_id)
 {
-    sensor_fusion_config->getMutableEnemyGoalieId()->setValue(
+    enemy_sensor_fusion_config->getMutableEnemyGoalieId()->setValue(
         static_cast<int>(goalie_id));
 }
 
@@ -78,7 +77,7 @@ void SimulatedPlayTestFixture::setFriendlyAIPlayConstructor(
     friendly_ai.overridePlayConstructor(friendly_play_constructor);
 }
 
-void SimulatredPlayTestFixture::setEnemyAIPlayConstructor(
+void SimulatedPlayTestFixture::setEnemyAIPlayConstructor(
     std::function<std::unique_ptr<Play>()> enemy_play_constructor)
 {
     enemy_ai.overridePlayConstructor(enemy_play_constructor);
@@ -158,7 +157,12 @@ std::optional<TbotsProto::PlayInfo> SimulatedPlayTestFixture::getEnemyPlayInfo()
     return enemy_ai.getPlayInfo();
 }
 
+std::optional<TbotsProto::PlayInfo> SimulatedPlayTestFixture::getPlayInfo() 
+{
+    return friendly_ai.getPlayInfo();
+}
+
 AIDrawFunction SimulatedPlayTestFixture::getDrawFunctions()
 {
-    return drawNavigator(ai.getNavigator());
+    return drawNavigator(friendly_ai.getNavigator());
 }
