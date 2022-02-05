@@ -45,7 +45,13 @@
 class Simulator
 {
    public:
-    explicit Simulator(float time_step);
+    /**
+     * Constructor
+     * @param time_step
+     * @param robot_constants
+     */
+    explicit Simulator(float time_step, const RobotConstants_t &robot_constants);
+
     ~Simulator() = default;
 
     /**
@@ -140,6 +146,13 @@ class Simulator
      * the simulation time_step seconds forward
      */
     void doStep();
+
+    /**
+     * Get the current friendly robot velocity
+     * @param robot_id The robot id of the friendly robot to retrieve velocity from
+     * @return Current global velocity of robot
+     */
+    Vector getRobotVelocity(unsigned int robot_id) const;
 
     /**
      *      Returns the maximum acceleration of a specified agent.
@@ -246,6 +259,9 @@ class Simulator
     }
 
    public:
+    // The robot constants which all agents will use
+    RobotConstants_t robot_constants_;
+
     // KdTree used to calculate the K nearest agents
     std::unique_ptr<KdTree> kdTree_;
 
