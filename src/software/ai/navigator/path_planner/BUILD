@@ -69,6 +69,18 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "global_path_planner",
+    srcs = ["global_path_planner.cpp"],
+    hdrs = ["global_path_planner.h"],
+    deps = [
+        ":enlsvg_path_planner",
+        "//software/geom:point",
+        "//software/geom:linear_spline2d",
+        "//software/ai/motion_constraint:motion_constraint",
+    ],
+)
+
 cc_test(
     name = "theta_star_path_planner_test",
     srcs = ["theta_star_path_planner_test.cpp"],

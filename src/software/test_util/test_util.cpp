@@ -8,9 +8,8 @@
 
 namespace TestUtil
 {
-    World createBlankTestingWorld()
+    World createBlankTestingWorld(Field field)
     {
-        Field field        = Field::createSSLDivisionBField();
         Team friendly_team = Team(Duration::fromMilliseconds(1000));
         Team enemy_team    = Team(Duration::fromMilliseconds(1000));
         Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
@@ -18,6 +17,21 @@ namespace TestUtil
         World world = World(field, ball, friendly_team, enemy_team);
 
         return world;
+    }
+    
+    World createBlankTestingWorld()
+    {
+        return createBlankTestingWorldDivB();
+    }
+    
+    World createBlankTestingWorldDivA()
+    {
+        return createBlankTestingWorld(Field::createSSLDivisionAField());
+    }
+    
+    World createBlankTestingWorldDivB()
+    {
+        return createBlankTestingWorld(Field::createSSLDivisionBField());
     }
 
     Team setRobotPositionsHelper(Team team, const std::vector<Point> &robot_positions,
