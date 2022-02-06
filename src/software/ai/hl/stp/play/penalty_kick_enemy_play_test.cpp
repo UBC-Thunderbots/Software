@@ -62,10 +62,7 @@ TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)
             robotAtOrientation(0, world_ptr, Angle::zero(), Angle::fromDegrees(5), yield);
             robotAtPosition(0, world_ptr, world_ptr->field().friendlyGoalCenter(), 0.05,
                             yield);
-            for (unsigned int id = 1; id <= 5; id++)
-            {
-                robotInPolygon(id, behind_ball_region, world_ptr, yield);
-            }
+            robotInPolygon(behind_ball_region, 5, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
