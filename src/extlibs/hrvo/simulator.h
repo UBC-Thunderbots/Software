@@ -275,6 +275,7 @@ class Simulator
     bool reachedGoals_;
 
     // List of agents (robots) in this simulation
+    // TODO: Doesn't have to be unique_ptr
     std::vector<std::unique_ptr<Agent>> agents_;
     // TODO (#2373): Remove goals_ list when goal is a part of Agent
     std::vector<std::unique_ptr<Goal>> goals_;
