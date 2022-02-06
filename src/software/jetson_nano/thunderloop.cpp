@@ -59,7 +59,8 @@ void Thunderloop::run()
 
         // Execute latest primitive
         primitive_executor_.updatePrimitiveSet(robot_id_, primitive_set_);
-        direct_control_ = *primitive_executor_.stepPrimitive(robot_id_, *current_robot_state_);
+        direct_control_ =
+            *primitive_executor_.stepPrimitive(robot_id_, *current_robot_state_);
 
         // Poll motor service with wheel velocities and dribbler rpm
         // TODO (#2332) properly implement, this is just a placeholder
