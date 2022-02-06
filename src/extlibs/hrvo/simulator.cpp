@@ -167,30 +167,32 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
         pref_speed = max_speed * PREF_SPEED_SCALE;
     }
 
-    // Max distance which the robot can travel in one time step + scaling
-    float goal_radius        = (max_speed * timeStep_) / 2 * GOAL_RADIUS_SCALE;
-    float uncertainty_offset = 0.f;
-
     // Get this robot's destination point, if it has a primitive
     // If this robot does not have a primitive, then set its current position as its
     // destination
     Vector2 destination_point  = position;
     float speed_at_goal = 0.f;
-    auto &robot_primitives     = *primitive_set_.mutable_robot_primitives();
-    const auto &primitive_iter = robot_primitives.find(robot.id());
+    const auto &robot_primitives     = primitive_set_.robot_primitives();
+    auto primitive_iter = robot_primitives.find(robot.id());
     if (primitive_iter != robot_primitives.end())
     {
         TbotsProto::Primitive primitive = primitive_iter->second;
         TbotsProto::Point destination_point_proto;
         if (primitive.has_move())
         {
-            destination_point_proto = primitive.mutable_move()->destination();
+            const auto& move_primitive = primitive.move();
+            destination_point_proto = move_primitive.destination();
             destination_point =
                 Vector2(static_cast<float>(destination_point_proto.x_meters()),
                         static_cast<float>(destination_point_proto.y_meters()));
-            speed_at_goal = primitive.mutable_move()->final_speed_m_per_s();
+            speed_at_goal = move_primitive.final_speed_m_per_s();
+            max_speed = move_primitive.max_speed_m_per_s();
         }
     }
+
+    // Max distance which the robot can travel in one time step + scaling
+    float goal_radius        = (max_speed * timeStep_) / 2 * GOAL_RADIUS_SCALE;
+    float uncertainty_offset = 0.f;
 
     return addHRVOAgent(position, agent_radius, velocity, max_speed, pref_speed,
                         max_accel, addGoalPositions({destination_point}, {speed_at_goal}), goal_radius, // TODO: Add speed at goal here
