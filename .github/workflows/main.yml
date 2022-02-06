@@ -52,6 +52,11 @@ jobs:
       - name: Stop redis server
         run: |
           redis-cli shutdown
+
+      - name: Jetson Nano Build
+        run: |
+         cd src
+         bazel build --cpu=jetson_nano //software/jetson_nano/...
              
   firmware-tests:
     name: Firmware Tests
@@ -69,11 +74,6 @@ jobs:
         run: |
          cd src
          bazel build //firmware/boards/estop_arduino_uno:main 
-
-      - name: Jetson Nano Build
-        run: |
-         cd src
-         bazel build --cpu=jetson_nano //firmware/app/...
              
   simulated-gameplay-tests:
     name: Simulated Gameplay Tests
