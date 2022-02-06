@@ -167,26 +167,27 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
         pref_speed = max_speed * PREF_SPEED_SCALE;
     }
 
+    // TODO (#2418): Replace destination point with a list of path points
     // Get this robot's destination point, if it has a primitive
     // If this robot does not have a primitive, then set its current position as its
     // destination
-    Vector2 destination_point  = position;
-    float speed_at_goal = 0.f;
-    const auto &robot_primitives     = primitive_set_.robot_primitives();
-    auto primitive_iter = robot_primitives.find(robot.id());
+    Vector2 destination_point    = position;
+    float speed_at_goal          = 0.f;
+    const auto &robot_primitives = primitive_set_.robot_primitives();
+    auto primitive_iter          = robot_primitives.find(robot.id());
     if (primitive_iter != robot_primitives.end())
     {
         TbotsProto::Primitive primitive = primitive_iter->second;
         TbotsProto::Point destination_point_proto;
         if (primitive.has_move())
         {
-            const auto& move_primitive = primitive.move();
-            destination_point_proto = move_primitive.destination();
+            const auto &move_primitive = primitive.move();
+            destination_point_proto    = move_primitive.destination();
             destination_point =
                 Vector2(static_cast<float>(destination_point_proto.x_meters()),
                         static_cast<float>(destination_point_proto.y_meters()));
             speed_at_goal = move_primitive.final_speed_m_per_s();
-            max_speed = move_primitive.max_speed_m_per_s();
+            max_speed     = move_primitive.max_speed_m_per_s();
         }
     }
 
@@ -195,7 +196,8 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
     float uncertainty_offset = 0.f;
 
     return addHRVOAgent(position, agent_radius, velocity, max_speed, pref_speed,
-                        max_accel, addGoalPositions({destination_point}, {speed_at_goal}), goal_radius, // TODO: Add speed at goal here
+                        max_accel, addGoalPositions({destination_point}, {speed_at_goal}),
+                        goal_radius,
                         MAX_NEIGHBOR_SEARCH_DIST, max_neighbors, uncertainty_offset);
 }
 
@@ -207,7 +209,7 @@ std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot,
                      static_cast<float>(robot.position().y()));
     Vector2 velocity(static_cast<float>(robot.velocity().x()),
                      static_cast<float>(robot.velocity().y()));
-    float max_accel = 0.f; // TODO: Maybe use robot constant
+    float max_accel = 0.f;  // TODO: Maybe use robot constant
     float max_speed = robot_constants_.robot_max_speed_m_per_s;
 
     // Max distance which the robot can travel in one time step + scaling
@@ -317,7 +319,7 @@ Vector Simulator::getRobotVelocity(unsigned int robot_id) const
         return Vector(velocity_vector_2.getX(), velocity_vector_2.getY());
     }
     // TODO: Retruning 0 vector could return optional
-//    LOG(WARNING) << "Robot_id not found for getRobotVelocity";
+    //    LOG(WARNING) << "Robot_id not found for getRobotVelocity";
     std::cout << "Robot_id not found for getRobotVelocity" << std::endl;
 
     return Vector();
