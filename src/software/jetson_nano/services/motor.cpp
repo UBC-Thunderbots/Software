@@ -137,7 +137,8 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
             // the gear ratio
             static float RANDOM_SCALING_FACTOR = 100.0;
 
-            // TODO (#2335) We can only spin 1 motor right now, figure out the
+            // TODO (#2456) We can only spin 1 motor right now, figure out how
+            // to spin the rest and update the following code
             tmc4671_setTargetVelocity(
                 FRONT_LEFT_MOTOR_CHIP_SELECT,
                 static_cast<int>(
