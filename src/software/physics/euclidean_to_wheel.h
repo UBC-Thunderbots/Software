@@ -24,7 +24,7 @@ typedef Eigen::Vector4d WheelSpace_t;
 class EuclideanToWheel
 {
    public:
-    EuclideanToWheel() = default;
+    EuclideanToWheel() = delete;
 
     /**
      * Initializes the Euclidean velocity to wheel speed conversion matrices.
