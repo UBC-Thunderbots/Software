@@ -12,15 +12,7 @@ class EuclideanToWheelTest : public ::testing::Test
     EuclideanSpace_t target_euclidean_velocity{};
     WheelSpace_t expected_wheel_speeds{};
 
-    static void SetUp() override
-    {
-        auto euclideanToFourWheel = new EuclideanToWheel(200);
-    }
-
-    static void TearDown() override
-    {
-        delete euclideanToFourWheel;
-    }
+    EuclideanToWheel euclidean_to_four_wheel = EuclideanToWheel(200.0f);
 };
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_zero)
