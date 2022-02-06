@@ -175,6 +175,7 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
     // If this robot does not have a primitive, then set its current position as its
     // destination
     Vector2 destination_point  = position;
+    float speed_at_goal = 0.f;
     auto &robot_primitives     = *primitive_set_.mutable_robot_primitives();
     const auto &primitive_iter = robot_primitives.find(robot.id());
     if (primitive_iter != robot_primitives.end())
@@ -187,11 +188,12 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
             destination_point =
                 Vector2(static_cast<float>(destination_point_proto.x_meters()),
                         static_cast<float>(destination_point_proto.y_meters()));
+            speed_at_goal = primitive.mutable_move()->final_speed_m_per_s();
         }
     }
 
     return addHRVOAgent(position, agent_radius, velocity, max_speed, pref_speed,
-                        max_accel, addGoal(destination_point), goal_radius,
+                        max_accel, addGoalPositions({destination_point}, {speed_at_goal}), goal_radius, // TODO: Add speed at goal here
                         MAX_NEIGHBOR_SEARCH_DIST, max_neighbors, uncertainty_offset);
 }
 
