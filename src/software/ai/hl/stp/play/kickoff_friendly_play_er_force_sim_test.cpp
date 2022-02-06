@@ -1,7 +1,6 @@
-#include "software/ai/hl/stp/play/kickoff_friendly_play.h"
-
 #include <gtest/gtest.h>
 
+#include "software/ai/hl/stp/play/kickoff_friendly_play.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robots_in_friendly_half_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robots_not_in_center_circle_validation.h"
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
@@ -39,25 +38,24 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            // Robot 4 is the only robot allowed to be in the center circle and start
+            // Robot 9 is the only robot allowed to be in the center circle and start
             // the kickoff
             robotInCenterCircle(world_ptr, yield);
             robotReceivedBall(world_ptr, yield);
             ballKicked(Angle::zero(), world_ptr, yield);
 
-            // Two friendly robots near the half line setting up for offense
-            Rectangle robotsOffensiveRect(Point(-0.5, 2.5), Point(-1.5, -2.5));
-            robotInPolygon(robotsOffensiveRect, 2, world_ptr, yield);
-
-
             // Two Friendly robots defending the exterior of defense box and one goalie
-            Rectangle robotsDefensiveRect(Point(-3.2, 1.1), Point(-3.51, -1.1));
-            robotInPolygon(robotsDefensiveRect, 3, world_ptr, yield);
+            Rectangle robots_defensive_rect(Point(-4, 2), Point(-5, -2));
+            robotInPolygon(robots_defensive_rect, 3, world_ptr, yield);
+
+            // Two friendly robots near the half line setting up for offense
+            Rectangle robots_offensive_rect(Point(0, 3.5), Point(-1.5, -3.5));
+            robotInPolygon(robots_offensive_rect, 2, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            for (RobotId robot_id : {0, 1, 2, 3, 5})
+            for (RobotId robot_id : {0, 1, 2, 3, 4, 5, 6, 7, 8, 10})
             {
                 {
                     robotInFriendlyHalf(robot_id, world_ptr, yield);
@@ -69,36 +67,4 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
-}
-
-TEST(KickoffFriendlyPlayInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
-{
-    // Dynamic Parameter Config: This data structure is passed into the play and contains
-    // runtime configurable values.  We don't need to change anything here we just need to
-    // pass it in.
-    auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
-
-    // World: A blank testing world we will manipulate for the test
-    auto world = ::TestUtil::createBlankTestingWorld();
-
-    // KickoffFriendlyPlay: The play under test
-    auto kickoff_friendly_play = KickoffFriendlyPlay(play_config);
-
-    // GameState: The game state to test with.
-
-    world.updateGameState(::TestUtil::createGameState(
-        RefereeCommand::PREPARE_KICKOFF_US, RefereeCommand::PREPARE_KICKOFF_US));
-
-    // Lets make sure the play will start running and stay running.
-
-    ASSERT_TRUE(kickoff_friendly_play.isApplicable(world));
-    ASSERT_TRUE(kickoff_friendly_play.invariantHolds(world));
-
-    // Now lets make sure that we don't run when are NOT halted
-    world.updateGameState(::TestUtil::createGameState(
-        RefereeCommand::FORCE_START, RefereeCommand::PREPARE_KICKOFF_US));
-
-    // Make sure we don't run the kickoff friendly play
-    ASSERT_FALSE(kickoff_friendly_play.isApplicable(world));
-    ASSERT_FALSE(kickoff_friendly_play.invariantHolds(world));
 }
