@@ -151,7 +151,14 @@ void SimulatedTacticTestFixture::updateEnemyPrimitives(
 
 std::optional<TbotsProto::PlayInfo> SimulatedTacticTestFixture::getPlayInfo()
 {
-    return std::nullopt;
+    TbotsProto::PlayInfo info;
+    info.mutable_play()->set_play_name("SimulatedTacticTest");
+    TbotsProto::PlayInfo_Tactic tactic_msg;
+    tactic_msg.set_tactic_name(objectTypeName(*friendly_tactic));
+    tactic_msg.set_tactic_fsm_state(friendly_tactic->getFSMState());
+    CHECK(friendly_robot_id_opt.has_value()) << "No friendly robot id set" << std::endl;
+    (*info.mutable_robot_tactic_assignment())[friendly_robot_id_opt.value()] = tactic_msg;
+    return info;
 }
 
 AIDrawFunction SimulatedTacticTestFixture::getDrawFunctions()
