@@ -35,9 +35,8 @@ TEST_F(DefensePlayTest, test_defense_play)
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(DefensePlay));
     // We set the referee command to stop so that the robots do not kick/shoot during
-    the
-        // test
-        setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
+    // the test
+    setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -47,10 +46,9 @@ TEST_F(DefensePlayTest, test_defense_play)
             Rectangle attacker_rect(Point(0, 2.85), Point(0.9, 2));
             robotInPolygon(attacker_rect, 1, world_ptr, yield);
 
-            // Two friendly robots in position to shadow enemy robots. One is on the
-            enemy
-                // with the ball and the other is on the next highest threat
-                Rectangle shadowing_rect_1(Point(0.5, 2.5), Point(1, 2));
+            // Two friendly robots in position to shadow enemy robots. One is on the enemy
+            // with the ball and the other is on the next highest threat
+            Rectangle shadowing_rect_1(Point(0.5, 2.5), Point(1, 2));
             Rectangle shadowing_rect_2(Point(-2, -0.75), Point(-1.5, -1.25));
             robotInPolygon(shadowing_rect_1, 1, world_ptr, yield);
             robotInPolygon(shadowing_rect_2, 1, world_ptr, yield);
@@ -93,9 +91,8 @@ TEST_F(DefensePlayTest, test_defense_play_one_immediate_threat)
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(DefensePlay));
     // We set the referee command to stop so that the robots do not kick/shoot during
-    the
-        // test
-        setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
+    // the test
+    setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -148,8 +145,8 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
     });
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(DefensePlay));
-    // We set the referee command to stop so that the robots do not kick/shoot during the
-    // test
+    // We set the referee command to stop so that the robots do not kick/shoot during
+    // the test
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
