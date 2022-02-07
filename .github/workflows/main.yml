@@ -73,7 +73,7 @@ jobs:
       - name: Arduino Uno Firmware Build
         run: |
          cd src
-         bazel build //firmware/boards/estop_arduino_uno:main 
+         bazel build //software/emergency_stop:main 
              
   simulated-gameplay-tests:
     name: Simulated Gameplay Tests
@@ -138,7 +138,7 @@ jobs:
           bazel test -c dbg  \
             --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
             -- //firmware/...   \
-            -//firmware/boards/estop_arduino_uno/... # Arduino requires setup_firmware              
+            -//software/emergency_stop/...
             
       - name: Shared Memory Leak Check
         run: |

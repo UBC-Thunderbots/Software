@@ -14,7 +14,6 @@
   - [Getting the Code](#getting-the-code)
   - [Running the setup scripts](#running-the-setup-scripts)
     - [Installing Software Dependencies](#installing-software-dependencies)
-    - [Installing Firmware Dependencies](#installing-firmware-dependencies)
     - [Setting Up USB Permissions](#setting-up-usb-permissions)
     - [Installing an IDE](#installing-an-ide)
       - [CLion](#clion)
@@ -90,14 +89,6 @@ We have several setup scripts to help you easily install the necessary dependenc
 * Run `./setup_software.sh`
   * You will be prompted for your admin password
   * This script will install everything necessary in order to build and run our main `AI` software 
-
-### Installing Firmware Dependencies
-
-* Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
-* Run `./setup_firmware.sh`
-  * You will be prompted for your admin password
-  * This script will install everything necessary in order to build and run our robot firmware
-* If you are installing legacy robot firmware, e.g. STM32 devices, run `./setup_legacy_firmware.sh` instead.
 
 ### Setting Up USB Permissions
 
