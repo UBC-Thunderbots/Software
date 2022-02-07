@@ -13,7 +13,7 @@
 
 class CreaseDefensePlayTest : public SimulatedErForceSimPlayTestFixture
 {
-   protected:   dw
+   protected:
     Field field = Field::createSSLDivisionBField();
 };
 
