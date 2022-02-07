@@ -166,7 +166,7 @@ sudo service udev restart
 sudo usermod -a -G dialout $USER
 
 # installs platformio to global environment
-sudo /opt/tbotspython/pip install --prefix /usr/local platformio==5.1.1
+sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==5.2.4
 echo "================================================================"
 echo "Done platformio Setup"
 echo "================================================================"
