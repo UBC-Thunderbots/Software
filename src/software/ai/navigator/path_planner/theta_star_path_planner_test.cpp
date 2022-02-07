@@ -258,7 +258,7 @@ TEST_F(TestThetaStarPathPlanner,
 TEST_F(TestThetaStarPathPlanner,
        test_theta_star_path_planner_single_obstacle_along_y_axis)
 {
-    // Test where we need to navigate around a single obstacle along the x-axis
+    // Test where we need to navigate around a single obstacle along the y-axis
     Field field = Field::createSSLDivisionBField();
     Point start{0, 0}, dest{0, 3};
 

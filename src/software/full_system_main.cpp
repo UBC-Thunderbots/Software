@@ -85,10 +85,8 @@ int main(int argc, char** argv)
                 ->setValue(ArduinoUtil::getArduinoPort().value_or(""));
         }
 
-        if (args->getBackend()->value().empty())
-        {
-            LOG(FATAL) << "The option '--backend' is required but missing";
-        }
+        CHECK(!args->getBackend()->value().empty())
+            << "The option '--backend' is required but missing";
 
         // update command line arguments in BackendConfig
         auto mutable_backend_config =
