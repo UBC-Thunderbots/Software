@@ -48,7 +48,7 @@ jobs:
             -- //... -//software:full_system \
             -//software/simulated_tests/...  \
             -//software/ai/hl/...            \
-            -//firmware/boards/estop_arduino_uno/... # Arduino requires setup_firmware 
+            -//software/emergency_stop/... # Arduino requires setup_firmware 
       - name: Stop redis server
         run: |
           redis-cli shutdown
