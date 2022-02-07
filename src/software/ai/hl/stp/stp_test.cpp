@@ -42,7 +42,6 @@ TEST_F(STPTest, test_get_play_info)
                                                   Timestamp::fromSeconds(0));
     world.updateRefereeCommand(RefereeCommand::HALT);
     stp.getIntents(world);
-    stp.getIntents(world);
 
     auto play_info_msg = stp.getPlayInfo();
 

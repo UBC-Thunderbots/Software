@@ -23,6 +23,7 @@ PriorityTacticVector Play::getTactics(const World &world)
     }
     else
     {
+        // Make a new tactic_sequence
         tactic_sequence = TacticCoroutine::pull_type(
             boost::bind(&Play::getNextTacticsWrapper, this, _1));
         // Run the coroutine. This will call the bound getNextTactics function
@@ -41,6 +42,7 @@ PriorityTacticVector Play::getTactics(const World &world)
     }
     else
     {
+        // Make a new tactic_sequence
         tactic_sequence = TacticCoroutine::pull_type(
             boost::bind(&Play::getNextTacticsWrapper, this, _1));
         // Run the coroutine. This will call the bound getNextTactics function
