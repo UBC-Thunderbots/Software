@@ -21,8 +21,7 @@ TEST_F(DefensePlayTest, test_defense_play)
 {
     BallState ball_state(Point(0.9, 2.85), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
-        {Point(-4.5, 0), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3,
-        -1.5),
+        {Point(-4.5, 0), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
          Point(-3, -3.0)});
     setFriendlyGoalie(0);
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({
@@ -37,8 +36,8 @@ TEST_F(DefensePlayTest, test_defense_play)
     setAIPlay(TYPENAME(DefensePlay));
     // We set the referee command to stop so that the robots do not kick/shoot during
     the
-    // test
-    setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
+        // test
+        setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -50,8 +49,8 @@ TEST_F(DefensePlayTest, test_defense_play)
 
             // Two friendly robots in position to shadow enemy robots. One is on the
             enemy
-            // with the ball and the other is on the next highest threat
-            Rectangle shadowing_rect_1(Point(0.5, 2.5), Point(1, 2));
+                // with the ball and the other is on the next highest threat
+                Rectangle shadowing_rect_1(Point(0.5, 2.5), Point(1, 2));
             Rectangle shadowing_rect_2(Point(-2, -0.75), Point(-1.5, -1.25));
             robotInPolygon(shadowing_rect_1, 1, world_ptr, yield);
             robotInPolygon(shadowing_rect_2, 1, world_ptr, yield);
@@ -69,8 +68,7 @@ TEST_F(DefensePlayTest, test_defense_play)
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
-        {}};
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {}};
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
@@ -81,8 +79,7 @@ TEST_F(DefensePlayTest, test_defense_play_one_immediate_threat)
 {
     BallState ball_state(Point(-1.2, 0), Vector(0, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
-        {Point(-4.5, 0), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3,
-        -1.5),
+        {Point(-4.5, 0), Point(-3, 1.5), Point(-3, 0.5), Point(-3, -0.5), Point(-3, -1.5),
          Point(-3, -3.0)});
     setFriendlyGoalie(0);
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({
@@ -97,8 +94,8 @@ TEST_F(DefensePlayTest, test_defense_play_one_immediate_threat)
     setAIPlay(TYPENAME(DefensePlay));
     // We set the referee command to stop so that the robots do not kick/shoot during
     the
-    // test
-    setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
+        // test
+        setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
@@ -203,16 +200,14 @@ TEST(DefensePlayIsApplicableInvariantHoldsTest,
 
     // Gamestate isPlaying
     world.updateGameState(
-        ::TestUtil::createGameState(RefereeCommand::FORCE_START,
-        RefereeCommand::HALT));
+        ::TestUtil::createGameState(RefereeCommand::FORCE_START, RefereeCommand::HALT));
 
     EXPECT_TRUE(defense_play.isApplicable(world));
     EXPECT_TRUE(defense_play.invariantHolds(world));
 
     // Gamestate isHalted
     world.updateGameState(
-        ::TestUtil::createGameState(RefereeCommand::HALT,
-        RefereeCommand::FORCE_START));
+        ::TestUtil::createGameState(RefereeCommand::HALT, RefereeCommand::FORCE_START));
 
     EXPECT_FALSE(defense_play.isApplicable(world));
     EXPECT_FALSE(defense_play.invariantHolds(world));
@@ -229,16 +224,14 @@ TEST(DefensePlayIsApplicableInvarantHoldsTest,
 
     // Gamestate isPlaying
     world.updateGameState(
-        ::TestUtil::createGameState(RefereeCommand::FORCE_START,
-        RefereeCommand::HALT));
+        ::TestUtil::createGameState(RefereeCommand::FORCE_START, RefereeCommand::HALT));
 
     EXPECT_FALSE(defense_play.isApplicable(world));
     EXPECT_FALSE(defense_play.invariantHolds(world));
 
     // Gamestate isHalted
     world.updateGameState(
-        ::TestUtil::createGameState(RefereeCommand::HALT,
-        RefereeCommand::FORCE_START));
+        ::TestUtil::createGameState(RefereeCommand::HALT, RefereeCommand::FORCE_START));
 
     EXPECT_FALSE(defense_play.isApplicable(world));
     EXPECT_FALSE(defense_play.invariantHolds(world));
