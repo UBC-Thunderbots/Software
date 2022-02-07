@@ -13,7 +13,7 @@
 
 class CreaseDefensePlayTest : public SimulatedErForceSimPlayTestFixture
 {
-   protected:
+   protected:   dw
     Field field = Field::createSSLDivisionBField();
 };
 
@@ -54,9 +54,7 @@ TEST_F(CreaseDefensePlayTest, test_defense_play)
             Rectangle crease_defender_rect(
                 Point(goalie_position.x(), goalie_position.y()),
                 Point(goalie_position.x() + 1.5, goalie_position.y() + 1.0));
-            robotInPolygon(1, crease_defender_rect, world_ptr, yield);
-            robotInPolygon(2, crease_defender_rect, world_ptr, yield);
-            robotInPolygon(3, crease_defender_rect, world_ptr, yield);
+            robotInPolygon(crease_defender_rect, 3, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
