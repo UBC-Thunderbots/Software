@@ -48,7 +48,6 @@ jobs:
             -- //... -//software:full_system \
             -//software/simulated_tests/...  \
             -//software/ai/hl/...            \
-            -//firmware/boards/estop_arduino_uno/... # Arduino requires setup_firmware 
       - name: Stop redis server
         run: |
           redis-cli shutdown
@@ -57,23 +56,6 @@ jobs:
         run: |
          cd src
          bazel build --cpu=jetson_nano //software/jetson_nano/...
-             
-  firmware-tests:
-    name: Firmware Tests
-    runs-on: ubuntu-20.04
-    steps:
-      # checks-out the repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v2
-    
-      - name: Environment Setup
-        run: |
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
-          "${GITHUB_WORKSPACE}"/environment_setup/setup_firmware.sh
-
-      - name: Arduino Uno Firmware Build
-        run: |
-         cd src
-         bazel build //firmware/boards/estop_arduino_uno:main 
              
   simulated-gameplay-tests:
     name: Simulated Gameplay Tests
@@ -138,7 +120,7 @@ jobs:
           bazel test -c dbg  \
             --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
             -- //firmware/...   \
-            -//firmware/boards/estop_arduino_uno/... # Arduino requires setup_firmware              
+            -//software/emergency_stop/...
             
       - name: Shared Memory Leak Check
         run: |

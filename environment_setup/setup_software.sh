@@ -154,8 +154,25 @@ if ! sudo apt-get install bazel-3.7.2 -y ; then
 fi
 sudo ln -s /usr/bin/bazel-3.7.2 /usr/bin/bazel
 
+# setup platformio to compile arduino code
+# link to instructions: https://docs.platformio.org/en/latest/core/installation.html
+# **need to reboot for changes to come into effect**
+
+# downloading platformio udev rules
+curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules
+sudo service udev restart
+
+# allow user access to serial ports
+sudo usermod -a -G dialout $USER
+
+# installs platformio to global environment
+sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==5.2.4
+echo "================================================================"
+echo "Done platformio Setup"
+echo "================================================================"
+
 # Done
 echo "================================================================"
-echo "Done Software Setup"
+echo "Done Software Setup, please reboot for changes to take place"
 echo "================================================================"
 
