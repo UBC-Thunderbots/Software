@@ -12,8 +12,6 @@ void robotInPolygon(Polygon polygon, int count, std::shared_ptr<World> world_ptr
         for (Robot robot : robots)
         {
             Point position = robot.position();
-            std::cout << "Robot " << robot.id() << " in location " << position
-                      << std::endl;
             if (contains(polygon, position))
             {
                 total++;
