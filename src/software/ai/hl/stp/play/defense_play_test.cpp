@@ -168,8 +168,6 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
                 Point(goalie_position.x() + 1.75, goalie_position.y() + 0.4));
             robotInPolygon(left_crease_defender_and_shadow_rec, 3, world_ptr, yield);
 
-            // robotInPolygon(right_crease_defender_and_shadow_rect, 1, world_ptr, yield);
-
             // Two friendly robots in position to shadow enemy robots. One is on the enemy
             // with the ball and the other is on the next highest threat
             Rectangle shadowing_rect(Point(-2.75, -0.5), Point(-2.25, -1));
