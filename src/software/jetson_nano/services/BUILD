@@ -15,6 +15,7 @@ cc_library(
         "//shared:robot_constants",
         "//software/jetson_nano:gpio",
         "//software/logger",
+        "//software/physics:euclidean_to_wheel",
         "@trinamic",
     ],
 )

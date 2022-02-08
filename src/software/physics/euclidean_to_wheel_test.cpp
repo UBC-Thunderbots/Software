@@ -12,7 +12,8 @@ class EuclideanToWheelTest : public ::testing::Test
     EuclideanSpace_t target_euclidean_velocity{};
     WheelSpace_t expected_wheel_speeds{};
 
-    EuclideanToWheel euclidean_to_four_wheel = EuclideanToWheel(200.0f);
+    EuclideanToWheel euclidean_to_four_wheel =
+        EuclideanToWheel(200.0f, create2021RobotConstants());
 };
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_zero)

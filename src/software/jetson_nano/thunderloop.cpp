@@ -26,7 +26,8 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
     robot_constants_ = robot_constants;
     wheel_consants_  = wheel_consants;
 
-    motor_service_   = std::make_unique<MotorService>(robot_constants, wheel_consants);
+    motor_service_ =
+        std::make_unique<MotorService>(robot_constants, wheel_consants, loop_hz);
     network_service_ = std::make_unique<NetworkService>(
         std::string(ROBOT_MULTICAST_CHANNELS[channel_id_]) + "%" + "eth0", VISION_PORT,
         PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);

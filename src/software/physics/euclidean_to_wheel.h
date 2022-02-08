@@ -2,6 +2,8 @@
 
 #include <Eigen/Dense>
 
+#include "shared/robot_constants.h"
+
 /**
  * Vector representation of 2D Euclidean space.
  *
@@ -30,8 +32,10 @@ class EuclideanToWheel
      * Initializes the Euclidean velocity to wheel speed conversion matrices.
      *
      * @param control_loop_frequency_Hz The frequency of the control loop.
+     * @param robot_constants The constants of the robot we are computing for.
      */
-    explicit EuclideanToWheel(const float &control_loop_frequency_Hz);
+    explicit EuclideanToWheel(const int &control_loop_frequency_Hz,
+                              const RobotConstants_t &robot_constants);
 
     /**
      * Gets wheel velocity targets from the desired Euclidean velocity.

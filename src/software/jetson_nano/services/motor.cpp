@@ -13,6 +13,7 @@
 #include <sys/ioctl.h>
 
 #include "proto/tbots_software_msgs.pb.h"
+#include "shared/constants.h"
 #include "software/logger/logger.h"
 
 extern "C"
@@ -63,14 +64,27 @@ extern "C"
 }
 
 MotorService::MotorService(const RobotConstants_t& robot_constants,
-                           const WheelConstants_t& wheel_constants)
+                           const WheelConstants_t& wheel_constants,
+                           int control_loop_frequency_hz)
     : spi_cs_driver_to_controller_demux_gpio(SPI_CS_DRIVER_TO_CONTROLLER_MUX_GPIO,
                                              GpioDirection::OUTPUT, GpioState::LOW),
       driver_control_enable_gpio(DRIVER_CONTROL_ENABLE_GPIO, GpioDirection::OUTPUT,
-                                 GpioState::LOW)
+                                 GpioState::LOW),
+      euclidean_to_four_wheel(control_loop_frequency_hz, robot_constants)
 {
     robot_constants_ = robot_constants;
     wheel_constants_ = wheel_constants;
+
+    // Conversions (RPM <-> Velocity)
+    //
+    // motor_rpm * minutes_per_second = motor_rps
+    // motor_rps * wheel_rotations_per_motor_rotation = wheel_rps
+    // wheel_rps * 2 * wheel_radius_meters = velocity
+    rpm_to_velocity_ = static_cast<float>(MINUTES_PER_SECOND) *
+                       wheel_constants_.wheel_rotations_per_motor_rotation * 2 *
+                       wheel_constants_.wheel_radius_meters * static_cast<float>(M_PI);
+
+    velocity_to_rpm_ = 1.0f / rpm_to_velocity_;
 
     int ret = 0;
 
@@ -121,25 +135,54 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
     {
         case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectPerWheelControl:
         {
-            // TODO (#2456) until we figure out the right factor considering
-            // the gear ratio
-            static float RANDOM_SCALING_FACTOR = 100.0;
-
-            // TODO (#2456) We can only spin 1 motor right now, figure out how
-            // to spin the rest and update the following code
             tmc4671_setTargetVelocity(
                 FRONT_LEFT_MOTOR_CHIP_SELECT,
                 static_cast<int>(
                     direct_control.direct_per_wheel_control().front_left_wheel_rpm() *
-                    RANDOM_SCALING_FACTOR));
+                    wheel_constants_.wheel_rotations_per_motor_rotation));
 
             break;
         }
         case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectVelocityControl:
         {
-            // TODO (#2335) convert local velocity to per-wheel velocity
-            // using http://robocup.mi.fu-berlin.de/buch/omnidrive.pdf and then
-            // communicate velocities to trinamic.
+            EuclideanSpace_t target_euclidean_velocity = {
+                direct_control.direct_velocity_control().velocity().x_component_meters(),
+                direct_control.direct_velocity_control().velocity().y_component_meters(),
+                direct_control.direct_velocity_control()
+                    .angular_velocity()
+                    .radians_per_second(),
+            };
+
+            WheelSpace_t current_wheel_speeds = {
+                static_cast<float>(
+                    tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)) *
+                    rpm_to_velocity_,
+                static_cast<float>(
+                    tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT)) *
+                    rpm_to_velocity_,
+                static_cast<float>(
+                    tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)) *
+                    rpm_to_velocity_,
+                static_cast<float>(
+                    tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT)) *
+                    rpm_to_velocity_};
+
+            WheelSpace_t target_speeds = euclidean_to_four_wheel.getTargetWheelSpeeds(
+                target_euclidean_velocity, current_wheel_speeds);
+
+            tmc4671_setTargetVelocity(
+                FRONT_RIGHT_MOTOR_CHIP_SELECT,
+                static_cast<int>(target_speeds[0] * velocity_to_rpm_));
+            tmc4671_setTargetVelocity(
+                FRONT_LEFT_MOTOR_CHIP_SELECT,
+                static_cast<int>(target_speeds[1] * velocity_to_rpm_));
+            tmc4671_setTargetVelocity(
+                BACK_LEFT_MOTOR_CHIP_SELECT,
+                static_cast<int>(target_speeds[2] * velocity_to_rpm_));
+            tmc4671_setTargetVelocity(
+                BACK_RIGHT_MOTOR_CHIP_SELECT,
+                static_cast<int>(target_speeds[3] * velocity_to_rpm_));
+
             break;
         }
         case TbotsProto::DirectControlPrimitive::WheelControlCase::WHEEL_CONTROL_NOT_SET:
@@ -465,9 +508,15 @@ void MotorService::start()
 
     // TMC6100 Setup
     startDriver(FRONT_LEFT_MOTOR_CHIP_SELECT);
+    startDriver(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    startDriver(BACK_LEFT_MOTOR_CHIP_SELECT);
+    startDriver(BACK_RIGHT_MOTOR_CHIP_SELECT);
 
     // TMC4671 Setup
     startController(FRONT_LEFT_MOTOR_CHIP_SELECT);
+    startController(FRONT_RIGHT_MOTOR_CHIP_SELECT);
+    startController(BACK_LEFT_MOTOR_CHIP_SELECT);
+    startController(BACK_RIGHT_MOTOR_CHIP_SELECT);
 }
 
 void MotorService::stop()
