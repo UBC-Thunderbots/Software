@@ -1,17 +1,18 @@
 #include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 
-#include "proto/message_translation/primitive_google_to_nanopb_converter.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/gui/drawing/navigator.h"
 #include "software/test_util/test_util.h"
 
 SimulatedErForceSimPlayTestFixture::SimulatedErForceSimPlayTestFixture()
-    : ai_config(mutable_thunderbots_config->getMutableAiConfig()),
-      ai_control_config(mutable_thunderbots_config->getMutableAiControlConfig()),
-      sensor_fusion_config(mutable_thunderbots_config->getMutableSensorFusionConfig()),
+    : ai_config(friendly_mutable_thunderbots_config->getMutableAiConfig()),
+      ai_control_config(friendly_mutable_thunderbots_config->getMutableAiControlConfig()),
+      sensor_fusion_config(
+          friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()),
       game_state(),
-      ai(thunderbots_config->getAiConfig(), thunderbots_config->getAiControlConfig(),
-         thunderbots_config->getPlayConfig())
+      ai(friendly_thunderbots_config->getAiConfig(),
+         friendly_thunderbots_config->getAiControlConfig(),
+         friendly_thunderbots_config->getPlayConfig())
 {
 }
 
@@ -19,12 +20,14 @@ void SimulatedErForceSimPlayTestFixture::SetUp()
 {
     SimulatedErForceSimTestFixture::SetUp();
 
-    ai_config            = mutable_thunderbots_config->getMutableAiConfig();
-    ai_control_config    = mutable_thunderbots_config->getMutableAiControlConfig();
-    sensor_fusion_config = mutable_thunderbots_config->getMutableSensorFusionConfig();
+    ai_config         = friendly_mutable_thunderbots_config->getMutableAiConfig();
+    ai_control_config = friendly_mutable_thunderbots_config->getMutableAiControlConfig();
+    sensor_fusion_config =
+        friendly_mutable_thunderbots_config->getMutableSensorFusionConfig();
 
-    ai = AI(thunderbots_config->getAiConfig(), thunderbots_config->getAiControlConfig(),
-            thunderbots_config->getPlayConfig());
+    ai = AI(friendly_thunderbots_config->getAiConfig(),
+            friendly_thunderbots_config->getAiControlConfig(),
+            friendly_thunderbots_config->getPlayConfig());
 }
 
 void SimulatedErForceSimPlayTestFixture::setFriendlyGoalie(RobotId goalie_id)
@@ -65,17 +68,18 @@ void SimulatedErForceSimPlayTestFixture::setGameState(const GameState& game_stat
 }
 
 void SimulatedErForceSimPlayTestFixture::updatePrimitives(
-    const World& world, std::shared_ptr<ErForceSimulator> simulator_to_update)
+    const World& friendly_world, const World&,
+    std::shared_ptr<ErForceSimulator> simulator_to_update)
 {
-    auto world_with_updated_game_state = world;
+    auto world_with_updated_game_state = friendly_world;
     world_with_updated_game_state.updateGameState(game_state);
 
     auto start_tick_time = std::chrono::system_clock::now();
 
     auto primitive_set_msg = ai.getPrimitives(world_with_updated_game_state);
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
-    registerTickTime(duration_ms);
-    auto vision_msg = createVision(world_with_updated_game_state);
+    registerFriendlyTickTime(duration_ms);
+    auto vision_msg = createVision(friendly_world);
     simulator_to_update->setYellowRobotPrimitiveSet(*primitive_set_msg,
                                                     std::move(vision_msg));
 }
