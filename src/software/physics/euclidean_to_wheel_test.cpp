@@ -13,7 +13,7 @@ class EuclideanToWheelTest : public ::testing::Test
     WheelSpace_t expected_wheel_speeds{};
 
     EuclideanToWheel euclidean_to_four_wheel =
-        EuclideanToWheel(200.0f, create2021RobotConstants());
+        EuclideanToWheel(200, create2021RobotConstants());
 };
 
 TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_zero)
@@ -117,4 +117,21 @@ TEST_F(EuclideanToWheelTest, test_target_wheel_speeds_all)
         euclidean_to_four_wheel.getTargetWheelSpeeds(target_euclidean_velocity,
                                                      current_wheel_speeds),
         0.001));
+}
+
+TEST_F(EuclideanToWheelTest, test_sanity_check_conversion_is_linear)
+{
+    current_wheel_speeds      = {1, 2, 3, 5};
+    target_euclidean_velocity = {3, 1, 5};
+
+    auto result = euclidean_to_four_wheel.getTargetWheelSpeeds(target_euclidean_velocity,
+                                                               current_wheel_speeds);
+
+    current_wheel_speeds      = {100, 200, 300, 500};
+    target_euclidean_velocity = {300, 100, 500};
+
+    auto scaled_result = euclidean_to_four_wheel.getTargetWheelSpeeds(
+        target_euclidean_velocity, current_wheel_speeds);
+
+    EXPECT_TRUE(TestUtil::equalWithinTolerance(result * 100, scaled_result, 0.001));
 }

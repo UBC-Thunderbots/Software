@@ -181,8 +181,6 @@ class MotorService : public Service
     // Constants
     RobotConstants_t robot_constants_;
     WheelConstants_t wheel_constants_;
-    float rpm_to_velocity_ = 0.0f;
-    float velocity_to_rpm_ = 0.0f;
 
     // SPI File Descriptors
     std::unordered_map<int, int> file_descriptors;

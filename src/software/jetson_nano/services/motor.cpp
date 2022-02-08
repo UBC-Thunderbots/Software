@@ -75,17 +75,6 @@ MotorService::MotorService(const RobotConstants_t& robot_constants,
     robot_constants_ = robot_constants;
     wheel_constants_ = wheel_constants;
 
-    // Conversions (RPM <-> Velocity)
-    //
-    // motor_rpm * minutes_per_second = motor_rps
-    // motor_rps * wheel_rotations_per_motor_rotation = wheel_rps
-    // wheel_rps * 2 * wheel_radius_meters = velocity
-    rpm_to_velocity_ = static_cast<float>(MINUTES_PER_SECOND) *
-                       wheel_constants_.wheel_rotations_per_motor_rotation * 2 *
-                       wheel_constants_.wheel_radius_meters * static_cast<float>(M_PI);
-
-    velocity_to_rpm_ = 1.0f / rpm_to_velocity_;
-
     int ret = 0;
 
     /**
@@ -140,7 +129,21 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
                 static_cast<int>(
                     direct_control.direct_per_wheel_control().front_left_wheel_rpm() *
                     wheel_constants_.wheel_rotations_per_motor_rotation));
-
+            tmc4671_setTargetVelocity(
+                FRONT_RIGHT_MOTOR_CHIP_SELECT,
+                static_cast<int>(
+                    direct_control.direct_per_wheel_control().front_right_wheel_rpm() *
+                    wheel_constants_.wheel_rotations_per_motor_rotation));
+            tmc4671_setTargetVelocity(
+                BACK_LEFT_MOTOR_CHIP_SELECT,
+                static_cast<int>(
+                    direct_control.direct_per_wheel_control().back_left_wheel_rpm() *
+                    wheel_constants_.wheel_rotations_per_motor_rotation));
+            tmc4671_setTargetVelocity(
+                BACK_RIGHT_MOTOR_CHIP_SELECT,
+                static_cast<int>(
+                    direct_control.direct_per_wheel_control().back_right_wheel_rpm() *
+                    wheel_constants_.wheel_rotations_per_motor_rotation));
             break;
         }
         case TbotsProto::DirectControlPrimitive::WheelControlCase::kDirectVelocityControl:
@@ -154,34 +157,28 @@ std::unique_ptr<TbotsProto::DriveUnitStatus> MotorService::poll(
             };
 
             WheelSpace_t current_wheel_speeds = {
-                static_cast<float>(
-                    tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)) *
-                    rpm_to_velocity_,
-                static_cast<float>(
-                    tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT)) *
-                    rpm_to_velocity_,
-                static_cast<float>(
-                    tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)) *
-                    rpm_to_velocity_,
-                static_cast<float>(
-                    tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT)) *
-                    rpm_to_velocity_};
+                static_cast<double>(
+                    tmc4671_getActualVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT)),
+                static_cast<double>(
+                    tmc4671_getActualVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT)),
+                static_cast<double>(
+                    tmc4671_getActualVelocity(BACK_LEFT_MOTOR_CHIP_SELECT)),
+                static_cast<double>(
+                    tmc4671_getActualVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT))};
 
+            // This is a linear transformation, we don't need to convert to/from
+            // RPM to MPS
             WheelSpace_t target_speeds = euclidean_to_four_wheel.getTargetWheelSpeeds(
                 target_euclidean_velocity, current_wheel_speeds);
 
-            tmc4671_setTargetVelocity(
-                FRONT_RIGHT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_speeds[0] * velocity_to_rpm_));
-            tmc4671_setTargetVelocity(
-                FRONT_LEFT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_speeds[1] * velocity_to_rpm_));
-            tmc4671_setTargetVelocity(
-                BACK_LEFT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_speeds[2] * velocity_to_rpm_));
-            tmc4671_setTargetVelocity(
-                BACK_RIGHT_MOTOR_CHIP_SELECT,
-                static_cast<int>(target_speeds[3] * velocity_to_rpm_));
+            tmc4671_setTargetVelocity(FRONT_RIGHT_MOTOR_CHIP_SELECT,
+                                      static_cast<int>(target_speeds[0]));
+            tmc4671_setTargetVelocity(FRONT_LEFT_MOTOR_CHIP_SELECT,
+                                      static_cast<int>(target_speeds[1]));
+            tmc4671_setTargetVelocity(BACK_LEFT_MOTOR_CHIP_SELECT,
+                                      static_cast<int>(target_speeds[2]));
+            tmc4671_setTargetVelocity(BACK_RIGHT_MOTOR_CHIP_SELECT,
+                                      static_cast<int>(target_speeds[3]));
 
             break;
         }
