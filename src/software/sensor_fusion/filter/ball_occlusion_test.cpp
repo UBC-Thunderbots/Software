@@ -16,7 +16,7 @@ class BallOcclusionTest
           BallState, std::vector<RobotStateWithId>, std::vector<RobotStateWithId>>>
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+    FieldType field_type = FieldType::DIV_B;
 };
 
 TEST_P(BallOcclusionTest, test_ball_occlusion)
@@ -36,7 +36,7 @@ TEST_P(BallOcclusionTest, test_ball_occlusion)
             }
         }};
     std::vector<ValidationFunction> non_terminating_validating_function = {};
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validating_function, non_terminating_validating_function,
             Duration::fromSeconds(10));
 }

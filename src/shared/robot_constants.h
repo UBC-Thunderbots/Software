@@ -38,6 +38,12 @@ typedef struct RobotConstants
     // The moment of inertia of the entire robot [kg m^2]
     float moment_of_inertia_kg_m_2;
 
+    // The inertial factor
+    float inertial_factor;
+
+    // The radius of the robot [m]
+    float robot_radius_m;
+
     // The maximum jerk this robot may safely undergo [m/s^3]
     float jerk_limit_kg_m_per_s_3;
 
