@@ -137,13 +137,19 @@ void Thunderloop::runLoop()
                 ScopedTimespecTimer timer(&poll_time);
 
                 struct timespec result;
-                ScopedTimespecTimer::timespecDiff(&next_shot,
+                ScopedTimespecTimer::timespecDiff(&poll_time,
                                                   &last_primitive_received_time, &result);
+
+                auto nanoseconds_elapsed_since_last_primitive =
+                    result.tv_sec * static_cast<int>(NANOSECONDS_PER_SECOND) +
+                    result.tv_nsec;
 
                 // If we haven't received a a primitive in a while, override the
                 // current_primitive_ with an estop primitive.
-                if (result.tv_nsec > static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
+                if (nanoseconds_elapsed_since_last_primitive >
+                    static_cast<long>(PRIMITIVE_MANAGER_TIMEOUT_NS))
                 {
+                    primitive_.Clear();
                     *(primitive_.mutable_estop()) = emergency_stop_override;
                 }
 
