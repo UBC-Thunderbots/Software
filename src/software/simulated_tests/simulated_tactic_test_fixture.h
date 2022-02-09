@@ -94,8 +94,8 @@ class SimulatedTacticTestFixture : public SimulatedTestFixture
 
     std::shared_ptr<Tactic> friendly_tactic;
     std::shared_ptr<Tactic> enemy_tactic;
-    std::optional<RobotId> friendly_robot_id;
-    std::optional<RobotId> enemy_robot_id;
+    std::optional<RobotId> friendly_robot_id_opt;
+    std::optional<RobotId> enemy_robot_id_opt;
 
     // Motion constraints to set for intent
     std::set<MotionConstraint> friendly_motion_constraints;

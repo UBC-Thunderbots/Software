@@ -6,17 +6,18 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robots_in_friendly_half_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robots_not_in_center_circle_validation.h"
-#include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class KickoffEnemyPlayTest : public SimulatedPlayTestFixture
+class KickoffEnemyPlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+    FieldType field_type = FieldType::DIV_B;
+    Field field          = Field::createField(field_type);
 };
 
 TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
@@ -55,7 +56,7 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         robotsInFriendlyHalf, robotsNotInCenterCircle};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }

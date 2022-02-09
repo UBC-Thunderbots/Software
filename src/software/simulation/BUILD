@@ -275,6 +275,7 @@ cc_test(
     srcs = ["er_force_simulator_test.cpp"],
     deps = [
         ":er_force_simulator",
+        "//proto/message_translation:er_force_world",
         "//proto/primitive:primitive_msg_factory",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",

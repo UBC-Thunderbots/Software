@@ -58,11 +58,19 @@ class SimulatedErForceSimPlayTestFixture : public SimulatedErForceSimTestFixture
      */
     void setGameState(const GameState& game_state_);
 
+    /**
+     * Gets the configs used in simulation
+     * Useful for constructing duplicates of Obstacle Factory
+     *
+     * @return the Ai Config
+     */
+    const std::shared_ptr<AiConfig> getAiConfig() const;
+
     std::optional<TbotsProto::PlayInfo> getPlayInfo() override;
     AIDrawFunction getDrawFunctions() override;
 
    private:
-    void updatePrimitives(const World& world,
+    void updatePrimitives(const World& friendly_world, const World& enemy_world,
                           std::shared_ptr<ErForceSimulator> simulator_to_update) override;
     // The configs being used in simulation
     std::shared_ptr<AiConfig> ai_config;

@@ -27,13 +27,13 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 {
     auto penalty_shot_tactic = std::make_shared<PenaltyKickTactic>();
 
-    auto shooter_setup_move = std::make_shared<PenaltySetupTactic>(true);
+    auto shooter_setup_move = std::make_shared<PenaltySetupTactic>();
 
     // Setup the goalie
-    auto move_tactic_2 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_3 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_4 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_5 = std::make_shared<MoveTactic>(true);
+    auto move_tactic_2 = std::make_shared<MoveTactic>();
+    auto move_tactic_3 = std::make_shared<MoveTactic>();
+    auto move_tactic_4 = std::make_shared<MoveTactic>();
+    auto move_tactic_5 = std::make_shared<MoveTactic>();
 
     do
     {

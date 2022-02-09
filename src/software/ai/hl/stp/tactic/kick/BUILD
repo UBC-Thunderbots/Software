@@ -12,9 +12,9 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
-        "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
+        "//software/ai/intent:kick_intent",
         "//software/logger",
     ],
 )
@@ -30,12 +30,12 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_kick_tactic_test",
-    srcs = ["simulated_kick_tactic_test.cpp"],
+    name = "kick_tactic_test",
+    srcs = ["kick_tactic_test.cpp"],
     deps = [
         ":kick_tactic",
         "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_tactic_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_tactic_test_fixture",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",

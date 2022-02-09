@@ -13,22 +13,6 @@ cc_library(
     ],
 )
 
-# cc_library(
-#     name = "radio_backend",
-#     srcs = ["radio_backend.cpp"],
-#     hdrs = ["radio_backend.h"],
-#     deps = [
-#         ":backend",
-#         ":ssl_proto_client",
-#         "//software/backend/radio:radio_output",
-#         "//software/util/generic_factory",
-#     ],
-#     # We force linking so that the static variables required for the "factory"
-#     # design pattern to work are linked in
-#     # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
-#     alwayslink = True,
-# )
-
 cc_library(
     name = "wifi_backend",
     srcs = ["wifi_backend.cpp"],
@@ -106,7 +90,6 @@ cc_library(
 cc_library(
     name = "all_backends",
     deps = [
-        #":radio_backend",
         ":replay_backend",
         ":simulator_backend",
         ":wifi_backend",

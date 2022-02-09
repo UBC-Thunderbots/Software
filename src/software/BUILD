@@ -38,7 +38,7 @@ cc_binary(
     srcs = ["handheld_control_main.cpp"],
     deps = [
         "//shared/parameter:cpp_configs",
-        #"//software/backend:radio_backend",
+        "//software/backend:wifi_backend",
         "//software/handheld_controller:controller_primitive_generator",
         "//software/handheld_controller:xbox_360_controller",
     ],

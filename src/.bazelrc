@@ -10,8 +10,7 @@ test --test_output=all
 build --crosstool_top=//cc_toolchain:toolchain
 
 # Add warnings to Thunderbots code only
-# TODO (#1475): Remove -Wno-vla-parameter and //firmware/.*
-build --per_file_copt=//software/.*,//shared/.*,-//software/proto/*,//firmware/.*@-Wall,-Wextra,-Wconversion,-Wno-unused-parameter,-Werror,-Wno-vla-parameter
+build --per_file_copt=//software/.*,//shared/.*@-Wall,-Wextra,-Wconversion,-Wno-unused-parameter,-Werror,-Wno-vla-parameter
 
 # Warn variable length arrays only when compiling cpp
 build --per_file_copt=.*\.cpp@-Wvla
