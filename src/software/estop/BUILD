@@ -67,4 +67,3 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
     ],
 )
-
