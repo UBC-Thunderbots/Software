@@ -143,8 +143,7 @@ void StandaloneSimulatorDrawFunctionVisualizer::contextMenuEvent(QContextMenuEve
     menu.addAction("Reset View",
                    [this]() { DrawFunctionVisualizer::setViewArea(last_view_area); });
     menu.addAction("Place Ball Here", [&]() {
-        standalone_simulator->setBallState(BallState(
-            point_in_scene, Vector(0, 0),0));
+        standalone_simulator->setBallState(BallState(point_in_scene, Vector(0, 0), 0));
     });
     menu.addAction("Add Yellow Robot Here",
                    [&]() { standalone_simulator->addYellowRobot(point_in_scene); });

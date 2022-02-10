@@ -104,7 +104,7 @@ new_git_repository(
     build_file = "@//extlibs:eigen.BUILD",
     commit = "937c3d73cbf55b6edc658decf7931b90ede1daef",
     remote = "https://chromium.googlesource.com/external/gitlab.com/libeigen/eigen.git",
-shallow_since = "1642460459 -0600",
+    shallow_since = "1642460459 -0600",
 )
 
 # nanopb: lightweight protobuf library used on the STM32. The build file in the
@@ -120,12 +120,6 @@ http_archive(
     urls = [
         "https://jpa.kapsi.fi/nanopb/download/nanopb-0.3.9.4-linux-x86.tar.gz",
     ],
-)
-
-new_local_repository(
-    name = "libusb",
-    build_file = "@//extlibs:libusb.BUILD",
-    path = "/",
 )
 
 new_git_repository(
@@ -180,16 +174,6 @@ new_local_repository(
     name = "libclang",
     build_file = "@//extlibs:libclang.BUILD",
     path = "/usr/lib/llvm-6.0/",
-)
-
-http_archive(
-    name = "arm_developer_gcc",
-    build_file = "@//extlibs:arm_gcc.BUILD",
-    sha256 = "b50b02b0a16e5aad8620e9d7c31110ef285c1dde28980b1a9448b764d77d8f92",
-    strip_prefix = "gcc-arm-none-eabi-8-2019-q3-update",
-    urls = [
-        "https://developer.arm.com/-/media/Files/downloads/gnu-rm/8-2019q3/RC1.1/gcc-arm-none-eabi-8-2019-q3-update-linux.tar.bz2",
-    ],
 )
 
 http_archive(
