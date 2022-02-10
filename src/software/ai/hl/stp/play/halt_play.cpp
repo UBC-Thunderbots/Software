@@ -3,17 +3,7 @@
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-HaltPlay::HaltPlay(std::shared_ptr<const PlayConfig> config) : Play(config, false) {}
-
-bool HaltPlay::isApplicable(const World &world) const
-{
-    return world.gameState().isHalted();
-}
-
-bool HaltPlay::invariantHolds(const World &world) const
-{
-    return world.gameState().isHalted();
-}
+HaltPlay::HaltPlay(std::shared_ptr<const AiConfig> config) : Play(config, false) {}
 
 void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
@@ -33,4 +23,4 @@ void HaltPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &wo
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, HaltPlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, HaltPlay, AiConfig> factory;
