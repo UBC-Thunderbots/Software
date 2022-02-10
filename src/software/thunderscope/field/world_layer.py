@@ -83,30 +83,31 @@ class WorldLayer(FieldLayer):
 
             painter.setPen(pg.mkPen(colors.ROBOT_ID_COLOR))
 
-            robot_id_font = painter.font()
-            robot_id_font.setPointSize(200)
-            painter.setFont(robot_id_font)
-
+            painter.setPen(pg.mkPen(colors.ROBOT_ID_COLOR))
             robot_id_bounding_rect = QtCore.QRectF(robot.current_state.global_position.x_meters * MM_PER_M - (1 * ROBOT_MAX_RADIUS),
                                                    robot.current_state.global_position.y_meters * MM_PER_M + (2 * ROBOT_MAX_RADIUS),
                                                    ROBOT_MAX_RADIUS * MM_PER_M,
                                                    ROBOT_MAX_RADIUS * MM_PER_M)
 
-            scaling_factor = 1.0 / (robot_id_bounding_rect.width() / (ROBOT_MAX_RADIUS * 2))
+            robot_id_font = painter.font()
+            robot_id_font.setPointSize((robot_id_bounding_rect.width()) / (ROBOT_MAX_RADIUS * 4))
+            painter.setFont(robot_id_font)
 
+            painter.drawText(robot_id_bounding_rect, str(robot.id))
+
+            # scaling_factor = 1.0 / (robot_id_bounding_rect.width() / (ROBOT_MAX_RADIUS * 2))
             # unsuccessful scaling attempts:
             # QtGui.QTransform(scaling_factor, 0, 0, -scaling_factor, 0, 0)
             # QtGui.QTransform.scale(scaling_factor, scaling_factor)
 
             #painter.scale(1.0, -1.0)
-            painter.drawText(robot_id_bounding_rect, str(robot.id))
 
             """
             Working code:
             painter.setPen(pg.mkPen(colors.ROBOT_ID_COLOR))
 
             robot_id_font = painter.font()
-            robot_id_font.setPointSize(200)
+            robot_id_font.setPointSize(robot_id_bounding_rect.width() / (ROBOT_MAX_RADIUS * 4))
             painter.setFont(robot_id_font)
 
             robot_id_bounding_rect = QtCore.QRectF(robot.current_state.global_position.x_meters * MM_PER_M - (1 * ROBOT_MAX_RADIUS),
