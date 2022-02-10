@@ -11,7 +11,7 @@ class PathLayer(FieldLayer):
         FieldLayer.__init__(self)
         self.path_receiver = ThreadedUnixListener(
             constants.UNIX_SOCKET_BASE_PATH + PathVisualization.DESCRIPTOR.full_name,
-            PathVisualization,
+            PathVisualization
         )
         self.cached_paths = PathVisualization()
 

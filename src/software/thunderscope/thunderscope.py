@@ -3,6 +3,7 @@ import signal
 
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
+from software.thunderscope.arbitrary_plot.arb_plot import NamedValuePlotter
 from field import obstacle_layer, path_layer, world_layer
 
 import pyqtgraph as pg
@@ -41,17 +42,24 @@ if __name__ == "__main__":
     log_dock = Dock("logs", size=(500, 100))
     log_dock.addWidget(logs)
 
+    #Setup Arbitrary Plot Widget
+    arb_plot = NamedValuePlotter()
+    arb_plot_dock = Dock("Performance", size = (500,100))
+    arb_plot_dock.addWidget(arb_plot.plot)
+
     # Configure Docks
     dock_area.addDock(field_dock, "left")
     dock_area.addDock(log_dock, "bottom", field_dock)
+    dock_area.addDock(arb_plot_dock, "right", log_dock)
 
     def update():
         field.refresh()
         logs.refresh()
+        arb_plot.refresh()
 
     timer = QtCore.QTimer()
     timer.timeout.connect(update)
-    timer.start(5)  # Refresh at 200hz
+    timer.start(3)  # Refresh at 200hz
 
     window.show()
 

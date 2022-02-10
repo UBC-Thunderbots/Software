@@ -102,6 +102,14 @@ void ThreadedFullSystemGUI::onValueReceived(World world)
         remaining_attempts_to_set_view_area--;
         view_area_buffer->push(world.field().fieldBoundary());
     }
+
+    TbotsProto::NamedValue named_val;
+    named_val.set_name("World Hz");
+    named_val.set_value(static_cast<float>(
+        FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
+
+    LOG(VISUALIZE) << named_val;
+
     worlds_received_per_second_buffer->push(
         FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond());
 }

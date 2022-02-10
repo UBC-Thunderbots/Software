@@ -11,7 +11,7 @@ class g3logWidget(pg_console.ConsoleWidget):
         pg_console.ConsoleWidget.__init__(self)
 
         self.log_receiver = ThreadedUnixListener(
-            constants.UNIX_SOCKET_BASE_PATH + "log", RobotLog, convert_from_any=False
+            constants.UNIX_SOCKET_BASE_PATH + "log", RobotLog, convert_from_any=False, max_buffer_size=10
         )
 
         # disable input and buttons
@@ -32,17 +32,18 @@ class g3logWidget(pg_console.ConsoleWidget):
     def refresh(self):
         """Update the log widget with another log message
         """
-        log = self.log_receiver.maybe_pop()
+        for _ in range(10):
+            log = self.log_receiver.maybe_pop()
 
-        if not log:
-            return
+            if not log:
+                return
 
-        log_str = "{} {} [{}->{}] {}\n".format(
-            log.created_timestamp.epoch_timestamp_seconds,
-            log.log_level,
-            log.file_name,
-            log.line_number,
-            log.log_msg,
-        )
+            log_str = "{} {} [{}->{}] {}\n".format(
+                log.created_timestamp.epoch_timestamp_seconds,
+                log.log_level,
+                log.file_name,
+                log.line_number,
+                log.log_msg,
+            )
 
-        self.write(log_str)
+            self.write(log_str)
