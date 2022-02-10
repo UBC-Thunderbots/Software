@@ -338,7 +338,7 @@ def _make_common_features(ctx):
         flag_sets = [
             flag_set(
                 actions = ALL_CPP_ACTIONS,
-                flag_groups = [flag_group(flags = ["-std=c++2a"])],
+                flag_groups = [flag_group(flags = ["-std=c++2a", "-fconcepts"])],
             ),
         ],
     )
