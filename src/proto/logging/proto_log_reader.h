@@ -1,5 +1,5 @@
 #pragma once
-#include <experimental/filesystem>
+#include <filesystem>
 #include <optional>
 
 #include "proto/repeated_any_msg.pb.h"
@@ -48,13 +48,13 @@ class ProtoLogReader
      * @return a RepeatedAnyMsg object that has been read from the given path.
      */
     static RepeatedAnyMsg readDelimitedRepeatedAnyMsgFile(
-        const std::experimental::filesystem::path& file_path);
+        const std::filesystem::path& file_path);
 
     size_t max_chunk_idx;
     size_t cur_chunk_idx;
     int cur_msg_idx;
     RepeatedAnyMsg cur_chunk;
-    std::experimental::filesystem::path replay_dir;
+    std::filesystem::path replay_dir;
 };
 
 template <typename MsgT>
