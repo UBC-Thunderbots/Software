@@ -6,7 +6,7 @@
 void robotInPolygon(Polygon polygon, int count, std::shared_ptr<World> world_ptr,
                     ValidationCoroutine::push_type& yield)
 {
-    auto robot_in_polygon = [polygon](std::shared_ptr<World> world_ptr) {
+    auto num_robots_in_polygon = [polygon](std::shared_ptr<World> world_ptr) {
         std::vector<Robot> robots = world_ptr->friendlyTeam().getAllRobots();
         int total                 = 0;
         for (Robot robot : robots)
@@ -20,7 +20,7 @@ void robotInPolygon(Polygon polygon, int count, std::shared_ptr<World> world_ptr
         return total;
     };
 
-    while (robot_in_polygon(world_ptr) < count)
+    while (num_robots_in_polygon(world_ptr) < count)
     {
         std::stringstream ss_poly;
         ss_poly << polygon;
