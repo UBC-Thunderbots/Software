@@ -152,6 +152,7 @@ if ! sudo apt-get install bazel-5.0.0 -y ; then
     echo "##############################################################"
     exit 1
 fi
+sudo rm -f /usr/bin/bazel # remove symlink
 sudo ln -s /usr/bin/bazel-5.0.0 /usr/bin/bazel
 
 # setup platformio to compile arduino code
