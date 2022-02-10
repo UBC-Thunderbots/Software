@@ -16,6 +16,17 @@ load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_depende
 # https://bazelbuild.github.io/rules_foreign_cc/0.5.1/flatten.html#rules_foreign_cc_dependencies
 rules_foreign_cc_dependencies()
 
+rules_python_version = "740825b7f74930c62f44af95c9a4c1bd428d2c53"  # Latest @ 2021-06-23
+
+http_archive(
+    name = "rules_python",
+    sha256 = "09a3c4791c61b62c2cbc5b2cbea4ccc32487b38c7a2cc8f87a794d7a659cc742",
+    strip_prefix = "rules_python-{}".format(rules_python_version),
+    url = "https://github.com/bazelbuild/rules_python/archive/{}.zip".format(rules_python_version),
+)
+
+load("@rules_python//python:pip.bzl", "pip_install")
+
 all_contents = """filegroup(name = "all", srcs = glob(["**/**"]), visibility = ["//visibility:public"])"""
 
 http_archive(
@@ -75,9 +86,10 @@ http_archive(
 
 http_archive(
     name = "rules_proto",
-    sha256 = "602e7161d9195e50246177e7c55b2f39950a9cf7366f74ed5f22fd45750cd208",
-    strip_prefix = "rules_proto-97d8af4dc474595af3900dd85cb3a29ad28cc313",
-    url = "https://github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
+    strip_prefix = "rules_proto-e507ccded37c389186afaeb2b836ec576dc875dc",
+    urls = [
+        "https://github.com/bazelbuild/rules_proto/archive/e507ccded37c389186afaeb2b836ec576dc875dc.zip",
+    ],
 )
 
 load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
@@ -273,13 +285,6 @@ new_git_repository(
     shallow_since = "1596403987 -0600",
 )
 
-git_repository(
-    name = "rules_python",
-    commit = "6f37aa9966f53e063c41b7509a386d53a9f156c3",
-    remote = "https://github.com/bazelbuild/rules_python.git",
-    shallow_since = "1602800469 +1100",
-)
-
 new_git_repository(
     name = "trinamic",
     build_file = "@//extlibs:trinamic.BUILD",
@@ -289,8 +294,6 @@ new_git_repository(
 )
 
 register_toolchains("//:py_toolchain")
-
-load("@rules_python//python:pip.bzl", "pip_install")
 
 pip_install(
     name = "python_control_deps",
