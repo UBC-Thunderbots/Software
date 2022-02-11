@@ -6,7 +6,7 @@
 
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
-#include "software/simulated_tests/simulated_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_at_point_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_received_ball_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
@@ -15,7 +15,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class DribbleTacticTest : public SimulatedTacticTestFixture
+class DribbleTacticTest : public SimulatedErForceSimTacticTestFixture
 {
    protected:
     void checkPossession(std::shared_ptr<DribbleTactic> tactic,
@@ -38,10 +38,11 @@ class DribbleTacticTest : public SimulatedTacticTestFixture
 
     void SetUp() override
     {
-        SimulatedTacticTestFixture::SetUp();
+        SimulatedErForceSimTacticTestFixture::SetUp();
         setMotionConstraints({MotionConstraint::ENEMY_DEFENSE_AREA});
     }
-    Field field = Field::createSSLDivisionBField();
+    FieldType field_type = FieldType::DIV_B;
+    Field field          = Field::createField(field_type);
     std::vector<RobotStateWithId> enemy_robots =
         TestUtil::createStationaryRobotStatesWithId(
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
@@ -68,7 +69,7 @@ TEST_F(DribbleTacticTest, test_intercept_ball_behind_enemy_robot)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -92,7 +93,7 @@ TEST_F(DribbleTacticTest, test_stopped_ball)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -116,7 +117,7 @@ TEST_F(DribbleTacticTest, test_ball_bounce_off_of_enemy_robot)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -147,7 +148,7 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest)
             robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(15));
 }
@@ -176,7 +177,7 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_orientation)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -210,7 +211,7 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest_and_orientation)
             robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(20));
 }
@@ -243,7 +244,7 @@ TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
             robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(20));
 }
@@ -274,7 +275,7 @@ TEST_F(DribbleTacticTest,
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -314,7 +315,7 @@ TEST_F(DribbleTacticTest, test_running_into_enemy_robot_knocking_ball_away)
             robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(20));
 }

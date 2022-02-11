@@ -130,8 +130,15 @@ void DribbleFSM::startDribble(const Update &event)
 
 bool DribbleFSM::havePossession(const Update &event)
 {
-    return event.common.robot.isNearDribbler(event.common.world.ball().position());
+    return event.common.robot.isNearDribbler(event.common.world.ball().position(), 0.005);
 }
+
+bool DribbleFSM::lostPossession(const Update &event)
+{
+    return !event.common.robot.isNearDribbler(
+        // avoid cases where ball is exactly on the edge fo the robot
+        event.common.world.ball().position(), LOSE_BALL_POSSESSION_THRESHOLD);
+};
 
 bool DribbleFSM::dribblingDone(const Update &event)
 {
