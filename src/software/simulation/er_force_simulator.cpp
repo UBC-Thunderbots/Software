@@ -61,11 +61,11 @@ ErForceSimulator::ErForceSimulator(
     Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
     World world        = World(field, ball, friendly_team, enemy_team);
 
-    auto realism_config       = std::make_unique<RealismConfigErForce>();
+    auto realism_config = std::make_unique<RealismConfigErForce>();
     // Sets the dribbler to be ideal
     realism_config->set_simulate_dribbling(false);
-    auto command_simulator       = std::make_unique<amun::CommandSimulator>();
-    *(command_simulator->mutable_realism_config())     = *realism_config;
+    auto command_simulator = std::make_unique<amun::CommandSimulator>();
+    *(command_simulator->mutable_realism_config())  = *realism_config;
     *(simulator_setup_command->mutable_simulator()) = *command_simulator;
 
     er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);

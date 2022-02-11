@@ -228,17 +228,12 @@ void SimulatedErForceSimTestFixture::runTest(
     updateSensorFusion(simulator);
     std::shared_ptr<World> friendly_world;
     std::shared_ptr<World> enemy_world;
-    if (friendly_sensor_fusion.getWorld().has_value() &&
-        enemy_sensor_fusion.getWorld().has_value())
-    {
-        friendly_world =
-            std::make_shared<World>(friendly_sensor_fusion.getWorld().value());
-        enemy_world = std::make_shared<World>(enemy_sensor_fusion.getWorld().value());
-    }
-    else
-    {
-        FAIL() << "Invalid initial world state";
-    }
+    CHECK(friendly_sensor_fusion.getWorld().has_value())
+        << "Invalid friendly world state" << std::endl;
+    CHECK(enemy_sensor_fusion.getWorld().has_value())
+        << "Invalid enemy world state" << std::endl;
+    friendly_world = std::make_shared<World>(friendly_sensor_fusion.getWorld().value());
+    enemy_world    = std::make_shared<World>(enemy_sensor_fusion.getWorld().value());
 
     for (const auto &validation_function : terminating_validation_functions)
     {
@@ -286,6 +281,11 @@ void SimulatedErForceSimTestFixture::runTest(
                   << std::endl;
         LOG(INFO) << "avg friendly tick duration: " << avg_friendly_tick_duration << "ms"
                   << std::endl;
+    }
+    else
+    {
+        LOG(WARNING) << "Primitives were never updated for the friendly robots"
+                     << std::endl;
     }
 
     if (enemy_tick_count > 0)
