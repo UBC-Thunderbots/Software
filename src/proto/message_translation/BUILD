@@ -151,6 +151,7 @@ cc_library(
         "//proto:tbots_cc_proto",
         "//shared:constants",
         "//shared:robot_constants",
+        "//software/geom:angle",
     ],
 )
 

@@ -43,8 +43,8 @@ class Thunderloop
      * @param robot_constants The robot constants
      * @param wheel_consants The wheel constants
      */
-    Thunderloop(const RobotConstants_t& robot_constants,
-                const WheelConstants_t& wheel_consants);
+    Thunderloop(unsigned run_frequency, const RobotConstants_t &robot_constants,
+                const WheelConstants_t &wheel_consants);
 
     ~Thunderloop();
 
@@ -53,9 +53,12 @@ class Thunderloop
      *
      * @param The rate to run the loop
      */
-    void run(unsigned run_at_hz);
+    void run();
 
    private:
+    // Frequency which this will run at
+    unsigned run_frequency_;
+
     // Services
     std::unique_ptr<MotorService> motor_service_;
 

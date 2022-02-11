@@ -179,79 +179,83 @@ void ErForceSimulator::setRobots(const std::vector<RobotStateWithId>& robots,
 
     if (side == gameController::Team::BLUE)
     {
-        blue_simulator_robots.clear();
+        yellow_primitive_executor_map.clear();
     }
     else
     {
-        yellow_simulator_robots.clear();
+        yellow_primitive_executor_map.clear();
     }
 
     for (const auto& robot_state_with_id : robots)
     {
-        auto simulator_robot = std::make_shared<ErForceSimulatorRobot>(
-            RobotStateWithId{.id          = robot_state_with_id.id,
-                             .robot_state = robot_state_with_id.robot_state},
-            robot_constants, wheel_constants);
+        auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
+            primitive_executor_time_step, robot_constants);
 
         if (side == gameController::Team::BLUE)
         {
-            blue_simulator_robots.emplace_back(simulator_robot);
+            yellow_primitive_executor_map.insert(
+                {robot_state_with_id.id, robot_primitive_executor});
         }
         else
         {
-            yellow_simulator_robots.emplace_back(simulator_robot);
+            blue_primitive_executor_map.insert(
+                {robot_state_with_id.id, robot_primitive_executor});
         }
     }
 }
 
 void ErForceSimulator::setYellowRobotPrimitiveSet(
-        const TbotsProto::PrimitiveSet& primitive_set_msg,
-        std::unique_ptr<TbotsProto::World> world_msg)
+    const TbotsProto::PrimitiveSet& primitive_set_msg,
+    std::unique_ptr<TbotsProto::World> world_msg)
 {
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
-        setRobotPrimitive(robot_id, primitive_set_msg, yellow_simulator_robots,
+        setRobotPrimitive(robot_id, primitive_set_msg, yellow_primitive_executor_map,
                           *yellow_team_world_msg);
     }
     yellow_team_world_msg = std::move(world_msg);
 }
 
 void ErForceSimulator::setBlueRobotPrimitiveSet(
-        const TbotsProto::PrimitiveSet& primitive_set_msg,
-        std::unique_ptr<TbotsProto::World> world_msg)
+    const TbotsProto::PrimitiveSet& primitive_set_msg,
+    std::unique_ptr<TbotsProto::World> world_msg)
 {
     for (auto& [robot_id, primitive] : primitive_set_msg.robot_primitives())
     {
-        setRobotPrimitive(robot_id, primitive_set_msg, blue_simulator_robots,
+        setRobotPrimitive(robot_id, primitive_set_msg, blue_primitive_executor_map,
                           *blue_team_world_msg);
     }
     blue_team_world_msg = std::move(world_msg);
 }
 
 void ErForceSimulator::setRobotPrimitive(
-        RobotId id, const TbotsProto::PrimitiveSet &primitive_set_msg,
-        std::vector<std::shared_ptr<ErForceSimulatorRobot>>& simulator_robots,
-        const TbotsProto::World &world_msg)
+    RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
+    std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
+        robot_primitive_executor_map,
+    const TbotsProto::World& world_msg)
 {
     // Set to NEG_X because the vision msg in this simulator is normalized
     // correctly
-    auto simulator_robots_iter =
-        std::find_if(simulator_robots.begin(), simulator_robots.end(),
-                     [id](const auto& robot) { return robot->getRobotId() == id; });
+    auto robot_primitive_executor_iter = robot_primitive_executor_map.find(id);
 
-    if (simulator_robots_iter != simulator_robots.end())
+    if (robot_primitive_executor_iter != robot_primitive_executor_map.end())
     {
-        auto simulator_robot = *simulator_robots_iter;
+        auto robot_primitive_executor = robot_primitive_executor_iter->second;
+        unsigned int robot_id         = robot_primitive_executor_iter->first;
 
-        const auto &friendly_robots = world_msg.friendly_team().team_robots();
-        const auto robot_proto_it = std::find_if(friendly_robots.begin(), friendly_robots.end(), [&](const auto& robot) {
-            return robot.id() == simulator_robot->getRobotId();
-        });
+        const auto& friendly_robots = world_msg.friendly_team().team_robots();
+        const auto robot_proto_it =
+            std::find_if(friendly_robots.begin(), friendly_robots.end(),
+                         [&](const auto& robot) { return robot.id() == robot_id; });
         if (robot_proto_it != friendly_robots.end())
         {
-            simulator_robot->setRobotState(RobotState(robot_proto_it->current_state()));
-            simulator_robot->startNewPrimitiveSet(primitive_set_msg);
-            simulator_robot->updateWorldState(world_msg);
+            robot_primitive_executor->updatePrimitiveSet(robot_id, primitive_set_msg);
+            robot_primitive_executor->updateWorld(world_msg);
+        }
+        else
+        {
+            LOG(WARNING) << "Primitive not included in PrimitiveSet for robot with ID "
+                         << id << std::endl;
         }
     }
     else
@@ -261,24 +265,29 @@ void ErForceSimulator::setRobotPrimitive(
 }
 
 SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
-        const std::vector<std::shared_ptr<ErForceSimulatorRobot>>& simulator_robots,
-        const TbotsProto::World& world_msg)
+    std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
+        robot_primitive_executor_map,
+    const TbotsProto::World& world_msg)
 {
     SSLSimulationProto::RobotControl robot_control;
 
-    for (auto& simulator_robot : simulator_robots)
+    for (auto& primitive_executor_with_id : robot_primitive_executor_map)
     {
-        const auto &friendly_robots = world_msg.friendly_team().team_robots();
-        const auto& robot_proto_it = std::find_if(friendly_robots.begin(), friendly_robots.end(), [&](const auto& robot) {
-            return robot.id() == simulator_robot->getRobotId();
-        });
+        unsigned int robot_id       = primitive_executor_with_id.first;
+        const auto& friendly_robots = world_msg.friendly_team().team_robots();
+        const auto& robot_proto_it =
+            std::find_if(friendly_robots.begin(), friendly_robots.end(),
+                         [&](const auto& robot) { return robot.id() == robot_id; });
         if (robot_proto_it != friendly_robots.end())
         {
-            simulator_robot->setRobotState(RobotState(robot_proto_it->current_state()));
+            auto& primitive_executor = primitive_executor_with_id.second;
             // Set to NEG_X because the vision msg in this simulator is
             // normalized correctly
-            simulator_robot->runCurrentPrimitive();
-            auto command = *simulator_robot->getRobotCommand();
+            auto direct_control = primitive_executor->stepPrimitive(
+                robot_id, RobotState(robot_proto_it->current_state()));
+
+            auto command = *getRobotCommandFromDirectControl(
+                robot_id, std::move(direct_control), robot_constants, wheel_constants);
             *(robot_control.mutable_robot_commands()->Add()) = command;
         }
     }
@@ -290,10 +299,10 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     current_time = current_time + time_step;
 
     SSLSimulationProto::RobotControl yellow_robot_control =
-        updateSimulatorRobots(yellow_simulator_robots, *yellow_team_world_msg);
+        updateSimulatorRobots(yellow_primitive_executor_map, *yellow_team_world_msg);
 
     SSLSimulationProto::RobotControl blue_robot_control =
-        updateSimulatorRobots(blue_simulator_robots, *blue_team_world_msg);
+        updateSimulatorRobots(blue_primitive_executor_map, *blue_team_world_msg);
 
     er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);
     er_force_sim->acceptBlueRobotControlCommand(blue_robot_control);

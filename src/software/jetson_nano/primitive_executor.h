@@ -1,21 +1,29 @@
 #pragma once
+#include "extlibs/hrvo/simulator.h"
 #include "proto/primitive.pb.h"
+#include "proto/tbots_software_msgs.pb.h"
 #include "software/geom/vector.h"
 #include "software/world/world.h"
-#include "proto/tbots_software_msgs.pb.h"
-#include "extlibs/hrvo/simulator.h"
 
 class PrimitiveExecutor
 {
    public:
-    PrimitiveExecutor();
+    /**
+     * Constructor
+     * @param time_step Time step which this primitive executor operates in
+     * @param robot_constants The robot constants for the robot which uses this primitive
+     * executor
+     */
+    explicit PrimitiveExecutor(const double time_step,
+                               const RobotConstants_t& robot_constants);
 
-/**
+    /**
      * Start running a primitive
      *
      * @param primitive_set_msg The primitive to start
      */
-    void updatePrimitiveSet(const unsigned int robot_id, const TbotsProto::PrimitiveSet &primitive_set_msg);
+    void updatePrimitiveSet(const unsigned int robot_id,
+                            const TbotsProto::PrimitiveSet& primitive_set_msg);
 
     void updateWorld(const TbotsProto::World& world_msg);
 
@@ -26,8 +34,8 @@ class PrimitiveExecutor
      * @param robot_state The current robot_state to step the primitive on
      * @returns DirectPerWheelControl The per-wheel direct control primitive msg
      */
-    std::unique_ptr<TbotsProto::DirectControlPrimitive>
-    stepPrimitive(const unsigned int robot_id, const RobotState &robot_state);
+    std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
+        const unsigned int robot_id, const RobotState& robot_state);
 
    private:
     /*

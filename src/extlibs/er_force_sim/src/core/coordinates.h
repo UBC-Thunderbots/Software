@@ -18,8 +18,8 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>. *
  ***************************************************************************/
 
-#ifndef CORE_COORDINATES.h
-#define CORE_COORDINATES .h
+#ifndef CORE_COORDINATES
+#define CORE_COORDINATES
 
 #include <type_traits>
 

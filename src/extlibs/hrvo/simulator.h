@@ -45,7 +45,13 @@
 class Simulator
 {
    public:
-    explicit Simulator(float time_step);
+    /**
+     * Constructor
+     * @param time_step
+     * @param robot_constants
+     */
+    explicit Simulator(float time_step, const RobotConstants_t &robot_constants);
+
     ~Simulator() = default;
 
     /**
@@ -142,6 +148,13 @@ class Simulator
     void doStep();
 
     /**
+     * Get the current friendly robot velocity
+     * @param robot_id The robot id of the friendly robot to retrieve velocity from
+     * @return Current global velocity of robot
+     */
+    Vector getRobotVelocity(unsigned int robot_id) const;
+
+    /**
      *      Returns the maximum acceleration of a specified agent.
      *
      * @param agentNo  The number of the agent whose maximum acceleration is to be
@@ -195,9 +208,6 @@ class Simulator
      */
     Vector2 getAgentVelocity(std::size_t agentNo) const;
 
-//    TODO:
-    Vector getRobotVelocity(unsigned int robot_id) const;
-
     /**
      *   Returns the global time of the simulation.
      *
@@ -249,6 +259,9 @@ class Simulator
     }
 
    public:
+    // The robot constants which all agents will use
+    RobotConstants_t robot_constants_;
+
     // KdTree used to calculate the K nearest agents
     std::unique_ptr<KdTree> kdTree_;
 
@@ -256,12 +269,13 @@ class Simulator
     float globalTime_;
 
     // The amount of time which the simulator should advance by
-    float timeStep_;
+    const float timeStep_;
 
     // True if all agents have reached their destination
     bool reachedGoals_;
 
     // List of agents (robots) in this simulation
+    // TODO: Doesn't have to be unique_ptr
     std::vector<std::unique_ptr<Agent>> agents_;
     // TODO (#2373): Remove goals_ list when goal is a part of Agent
     std::vector<std::unique_ptr<Goal>> goals_;

@@ -5,8 +5,7 @@
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
-#include "software/simulation/er_force_simulator_ball.h"
-#include "software/simulation/er_force_simulator_robot.h"
+#include "software/jetson_nano/primitive_executor.h"
 #include "software/simulation/firmware_object_deleter.h"
 #include "software/world/field.h"
 #include "software/world/team_types.h"
@@ -128,31 +127,38 @@ class ErForceSimulator : public QObject
      *
      * @param id The id of the robot to set the primitive for
      * @param primitive_set_msg The primitive to run on the robot
-     * @param simulator_robots The robots to set the primitives on
+     * @param robot_primitive_executor_map The robot primitive executors to send the
+     * primitive set to
      * @param world_msg The vision message
      */
     static void setRobotPrimitive(
-            RobotId id, const TbotsProto::PrimitiveSet &primitive_set_msg,
-            std::vector<std::shared_ptr<ErForceSimulatorRobot>>& simulator_robots,
-            const TbotsProto::World &world_msg);
+        RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
+        std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
+            robot_primitive_executor_map,
+        const TbotsProto::World& world_msg);
 
     /**
      * Update Simulator Robot and get the latest robot control
      *
-     * @param simulator_robots Vector of simulator robots
+     * @param robot_primitive_executor_map Map of robot IDs to the robot's primitive
+     * executor
      * @param world_msg The vision msg for this team of robots
      *
      * @return robot control
      */
-    static SSLSimulationProto::RobotControl updateSimulatorRobots(
-            const std::vector<std::shared_ptr<ErForceSimulatorRobot>>& simulator_robots,
-            const TbotsProto::World& world_msg);
+    SSLSimulationProto::RobotControl updateSimulatorRobots(
+        std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>&
+            robot_primitive_executor_map,
+        const TbotsProto::World& world_msg);
 
-    std::vector<std::shared_ptr<ErForceSimulatorRobot>> yellow_simulator_robots;
-    std::vector<std::shared_ptr<ErForceSimulatorRobot>> blue_simulator_robots;
+    std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>
+        yellow_primitive_executor_map;
+    std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>
+        blue_primitive_executor_map;
     std::unique_ptr<TbotsProto::World> yellow_team_world_msg;
     std::unique_ptr<TbotsProto::World> blue_team_world_msg;
 
+    static constexpr double primitive_executor_time_step = 1.0 / 60.0;
     unsigned int frame_number;
 
     // The current time.

@@ -12,14 +12,17 @@
 #include "software/logger/logger.h"
 #include "software/world/robot_state.h"
 
-Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
-                         const WheelConstants_t& wheel_consants)
+Thunderloop::Thunderloop(unsigned run_frequency, const RobotConstants_t &robot_constants,
+                         const WheelConstants_t &wheel_consants)
+    : primitive_executor_(1.0 / run_frequency, robot_constants),
+      run_frequency_(run_frequency)
 {
     robot_id_        = 0;
     robot_constants_ = robot_constants;
     wheel_consants_  = wheel_consants;
 
     motor_service_ = std::make_unique<MotorService>(robot_constants, wheel_consants);
+    // add network service here
 
     // TODO (#2331) remove this once we receive actual vision data
     current_robot_state_ =
@@ -37,7 +40,7 @@ Thunderloop::~Thunderloop()
  *
  * @param The rate to run the loop
  */
-void Thunderloop::run(unsigned run_at_hz)
+void Thunderloop::run()
 {
     using clock = std::chrono::steady_clock;
 
@@ -49,14 +52,15 @@ void Thunderloop::run(unsigned run_at_hz)
     {
         // TODO (#2335) add loop timing introspection and use Preempt-RT (maybe)
         next_frame += std::chrono::milliseconds(
-            static_cast<int>(MILLISECONDS_PER_SECOND / run_at_hz));
+            static_cast<int>(MILLISECONDS_PER_SECOND / run_frequency_));
 
         // TODO (#2331) poll network service and update current_robot_state_
         // TODO (#2333) poll redis service
 
         // Execute latest primitive
         primitive_executor_.updatePrimitiveSet(robot_id_, primitive_set_);
-        direct_control_ = *primitive_executor_.stepPrimitive(0, *current_robot_state_);
+        direct_control_ =
+            *primitive_executor_.stepPrimitive(robot_id_, *current_robot_state_);
 
         // Poll motor service with wheel velocities and dribbler rpm
         // TODO (#2332) properly implement, this is just a placeholder

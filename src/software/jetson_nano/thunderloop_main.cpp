@@ -25,9 +25,9 @@ int main(int argc, char** argv)
     // TODO (#2338) replace with network logger
     LoggerSingleton::initializeLogger("/tmp");
 
-    auto thunderloop =
-        Thunderloop(create2021RobotConstants(), create2021WheelConstants());
-    thunderloop.run(CONTROL_LOOP_HZ);
+    auto thunderloop = Thunderloop(CONTROL_LOOP_HZ, create2021RobotConstants(),
+                                   create2021WheelConstants());
+    thunderloop.run();
 
     return 0;
 }
