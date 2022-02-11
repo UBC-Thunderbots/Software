@@ -2,7 +2,7 @@ jupyter==1.0.0
 notebook==6.4.1
 numpy==1.21.0
 matplotlib==3.3.3
-protobuf==3.6.1
+protobuf==3.15.0
 bokeh==2.2.3
 ipywidgets==7.6.2
 jupytext==1.11.2
