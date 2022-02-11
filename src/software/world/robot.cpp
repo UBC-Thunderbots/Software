@@ -96,10 +96,6 @@ bool Robot::isNearDribbler(const Point &test_point, double TOLERANCE) const
     const double POSSESSION_THRESHOLD_METERS = ROBOT_MAX_RADIUS_METERS + TOLERANCE;
 
     Vector vector_to_test_point = test_point - position();
-    std::cout << "vector_to_test_point.length()" << vector_to_test_point.length()
-              << std::endl;
-    std::cout << "POSSESSION_THRESHOLD_METERS" << POSSESSION_THRESHOLD_METERS
-              << std::endl;
     if (vector_to_test_point.length() > POSSESSION_THRESHOLD_METERS)
     {
         return false;

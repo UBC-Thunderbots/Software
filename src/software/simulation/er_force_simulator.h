@@ -122,9 +122,6 @@ class ErForceSimulator : public QObject
      */
     void resetCurrentTime();
 
-    //TODO: implement this
-    static std::unique_ptr<robot::Specs> createErForceSimRobot(const RobotConstants_t& robot_constants, const RobotId & robot_id);
-
    private:
     /**
      * Sets the primitive being simulated by the robot in simulation
