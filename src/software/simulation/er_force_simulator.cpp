@@ -51,7 +51,7 @@ ErForceSimulator::ErForceSimulator(
     google::protobuf::TextFormat::Parser parser;
     parser.ParseFromString(s, &er_force_sim_setup);
     er_force_sim = std::make_unique<camun::simulator::Simulator>(er_force_sim_setup);
-    auto simulator_setup_command = std::make_shared<amun::Command>();
+    auto simulator_setup_command = std::make_unique<amun::Command>();
     simulator_setup_command->mutable_simulator()->set_enable(true);
     // start with default robots, take ER-Force specs.
     robot::Specs ERForce;
@@ -60,6 +60,15 @@ ErForceSimulator::ErForceSimulator(
     Team enemy_team    = Team();
     Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
     World world        = World(field, ball, friendly_team, enemy_team);
+
+    // configure realism
+    auto realism_config       = std::make_unique<RealismConfigErForce>();
+    realism_config->set_simulate_dribbling(false);
+    auto command_simulator       = std::make_unique<amun::CommandSimulator>();
+    *(command_simulator->mutable_realism_config())     = *realism_config;
+    *(simulator_setup_command->mutable_simulator()) = *command_simulator;
+
+    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
 
     this->resetCurrentTime();
 }
@@ -100,7 +109,6 @@ void ErForceSimulator::setRobots(const std::vector<RobotStateWithId>& robots,
                                  gameController::Team side)
 {
     auto simulator_setup_command = std::make_unique<amun::Command>();
-    simulator_setup_command->mutable_simulator()->set_enable(true);
 
     robot::Specs ERForce;
     robotSetDefault(&ERForce);

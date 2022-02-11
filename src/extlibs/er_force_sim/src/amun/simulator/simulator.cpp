@@ -265,6 +265,8 @@ static void createRobot(Simulator::RobotMap &list, float x, float y, uint32_t id
     SimRobot *robot = new SimRobot(&data->rng, teamSpecs[id], data->dynamicsWorld,
                                    btVector3(x, y, 0), 0.f);
     robot->setDribbleMode(data->dribblePerfect);
+    assert(data->dribblePerfect);
+    std::cout<<"data->dribblePerfect "<<data->dribblePerfect<<std::endl;
     robot->connect(robot, &SimRobot::sendSSLSimError, agg, &ErrorAggregator::aggregate);
     list[id] = {robot, teamSpecs[id].generation()};
 }
@@ -861,6 +863,7 @@ void Simulator::handleSimulatorSetupCommand(const std::unique_ptr<amun::Command>
             if (realism.has_simulate_dribbling())
             {
                 m_data->dribblePerfect      = !realism.simulate_dribbling();
+                std::cout<<"teamOrPerfectDribbleChanged"<<std::endl;
                 teamOrPerfectDribbleChanged = true;
             }
         }
