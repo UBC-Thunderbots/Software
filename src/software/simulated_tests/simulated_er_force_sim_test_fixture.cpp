@@ -274,14 +274,17 @@ void SimulatedErForceSimTestFixture::runTest(
                                              friendly_world, enemy_world, simulator);
     }
     // Output the tick duration results
-    double avg_friendly_tick_duration =
-        total_friendly_tick_duration / friendly_tick_count;
-    LOG(INFO) << "max friendly tick duration: " << max_friendly_tick_duration << "ms"
-              << std::endl;
-    LOG(INFO) << "min friendly tick duration: " << min_friendly_tick_duration << "ms"
-              << std::endl;
-    LOG(INFO) << "avg friendly tick duration: " << avg_friendly_tick_duration << "ms"
-              << std::endl;
+    if (friendly_tick_count > 0)
+    {
+        double avg_friendly_tick_duration =
+            total_friendly_tick_duration / friendly_tick_count;
+        LOG(INFO) << "max friendly tick duration: " << max_friendly_tick_duration << "ms"
+                  << std::endl;
+        LOG(INFO) << "min friendly tick duration: " << min_friendly_tick_duration << "ms"
+                  << std::endl;
+        LOG(INFO) << "avg friendly tick duration: " << avg_friendly_tick_duration << "ms"
+                  << std::endl;
+    }
 
     if (enemy_tick_count > 0)
     {
