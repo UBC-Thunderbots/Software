@@ -98,9 +98,7 @@ int main(int argc, char** argv)
                 args->getBackend()->value(), thunderbots_config->getBackendConfig());
         auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(
             thunderbots_config->getSensorFusionConfig());
-        auto ai = std::make_shared<ThreadedAI>(thunderbots_config->getAiConfig(),
-                                               thunderbots_config->getAiControlConfig(),
-                                               thunderbots_config->getPlayConfig());
+        auto ai = std::make_shared<ThreadedAI>(thunderbots_config->getAiConfig());
         std::shared_ptr<ThreadedFullSystemGUI> visualizer;
 
         // Connect observers

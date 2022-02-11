@@ -10,8 +10,8 @@ TEST(CreaseDefensePlayFSMTest, test_transitions)
 {
     World world = ::TestUtil::createBlankTestingWorld();
 
-    FSM<CreaseDefensePlayFSM> fsm(CreaseDefensePlayFSM{
-        std::make_shared<const ThunderbotsConfig>()->getPlayConfig()});
+    FSM<CreaseDefensePlayFSM> fsm(
+        CreaseDefensePlayFSM{std::make_shared<const ThunderbotsConfig>()->getAiConfig()});
     EXPECT_TRUE(fsm.is(boost::sml::state<CreaseDefensePlayFSM::DefenseState>));
 
     fsm.process_event(CreaseDefensePlayFSM::Update(
