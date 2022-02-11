@@ -57,8 +57,8 @@ TEST_F(ShadowEnemyTacticTest, test_block_pass)
     setFriendlyRobotId(0);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [this, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
+        [tactic](std::shared_ptr<World> world_ptr,
+                 ValidationCoroutine::push_type& yield) {
             // As the shadowee is located at (0,-2) and the enemy robot that
             // has the ball is located at (0,2), we would like to block the pass
             // with a shadow distance of 2
@@ -207,8 +207,8 @@ TEST_F(ShadowEnemyTacticTest, test_block_net_if_enemy_threat_is_null)
 
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [this, tactic](std::shared_ptr<World> world_ptr,
-                       ValidationCoroutine::push_type& yield) {
+        [tactic](std::shared_ptr<World> world_ptr,
+                 ValidationCoroutine::push_type& yield) {
             // We compose a triangle consisting of the friendly goal posts
             // and the ball position. If our robot is in this triangle, then
             // it is blocking a possible shot on net

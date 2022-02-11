@@ -208,6 +208,9 @@ void SimulatedErForceSimTestFixture::runTest(
     const std::vector<ValidationFunction> &non_terminating_validation_functions,
     const Duration &timeout)
 {
+    const Duration simulation_time_step =
+        Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
+
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
         field_type, create2015RobotConstants(), create2015WheelConstants(),
         friendly_thunderbots_config->getSimulatorConfig()));
@@ -215,6 +218,8 @@ void SimulatedErForceSimTestFixture::runTest(
     // TODO (#2419): remove this to re-enable sigfpe checks
     fedisableexcept(FE_INVALID | FE_OVERFLOW);
     simulator->setBallState(ball);
+    // step the simulator to make sure the ball is in position
+    simulator->stepSimulation(simulation_time_step);
     simulator->setYellowRobots(friendly_robots);
     simulator->setBlueRobots(enemy_robots);
     // TODO (#2419): remove this to re-enable sigfpe checks
@@ -248,9 +253,6 @@ void SimulatedErForceSimTestFixture::runTest(
     }
 
     const Timestamp timeout_time = simulator->getTimestamp() + timeout;
-    const Duration simulation_time_step =
-        Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
-
 
     double speed_factor         = 1 / (TbotsGtestMain::test_speed);
     const Duration ai_time_step = Duration::fromSeconds(
