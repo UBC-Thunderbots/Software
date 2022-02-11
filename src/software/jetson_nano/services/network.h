@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mutex>
+
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/robot_constants.h"
@@ -48,10 +50,16 @@ class NetworkService : public Service
     // Variables
     TbotsProto::PrimitiveSet primitive_set_msg;
     TbotsProto::Vision vision_msg;
+
+    std::mutex primitive_set_mutex;
+    std::mutex vision_mutex;
+
     std::unique_ptr<ThreadedProtoUdpSender<TbotsProto::RobotStatus>> sender;
     std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::PrimitiveSet>>
         listener_primitive_set;
     std::unique_ptr<ThreadedProtoUdpListener<TbotsProto::Vision>> listener_vision;
+
+
     // Functions to callback primitiveSet and vision and stores them in a variable
     void primitiveSetCallback(TbotsProto::PrimitiveSet input);
     void visionCallback(TbotsProto::Vision input);

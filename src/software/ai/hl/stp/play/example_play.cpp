@@ -3,21 +3,7 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-ExamplePlay::ExamplePlay(std::shared_ptr<const PlayConfig> config) : Play(config, false)
-{
-}
-
-bool ExamplePlay::isApplicable(const World &world) const
-{
-    // This play is never applicable so it will never be chosen during gameplay
-    // This play can be run for testing by using the Play override
-    return false;
-}
-
-bool ExamplePlay::invariantHolds(const World &world) const
-{
-    return true;
-}
+ExamplePlay::ExamplePlay(std::shared_ptr<const AiConfig> config) : Play(config, false) {}
 
 void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
@@ -52,4 +38,4 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ExamplePlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, ExamplePlay, AiConfig> factory;

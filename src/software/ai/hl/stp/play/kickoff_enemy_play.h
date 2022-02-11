@@ -12,11 +12,7 @@
 class KickoffEnemyPlay : public Play
 {
    public:
-    KickoffEnemyPlay(std::shared_ptr<const PlayConfig> config);
-
-    bool isApplicable(const World &world) const override;
-
-    bool invariantHolds(const World &world) const override;
+    KickoffEnemyPlay(std::shared_ptr<const AiConfig> config);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 };

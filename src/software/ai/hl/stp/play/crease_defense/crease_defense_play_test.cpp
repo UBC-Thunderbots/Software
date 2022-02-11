@@ -14,7 +14,8 @@
 class CreaseDefensePlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+    FieldType field_type = FieldType::DIV_B;
+    Field field          = Field::createField(field_type);
 };
 
 TEST_F(CreaseDefensePlayTest, test_defense_play)
@@ -33,12 +34,13 @@ TEST_F(CreaseDefensePlayTest, test_defense_play)
         Point(-2, -1.25),
     });
     setEnemyGoalie(0);
-    setAIPlayConstructor([this, ball_state]() -> std::unique_ptr<Play> {
-        std::unique_ptr<CreaseDefensePlay> play =
-            std::make_unique<CreaseDefensePlay>(thunderbots_config->getPlayConfig());
-        play->updateControlParams(Point(1, 3));
-        return play;
-    });
+    setAIPlayConstructor(
+        [ball_state](std::shared_ptr<const AiConfig> ai_config) -> std::unique_ptr<Play> {
+            std::unique_ptr<CreaseDefensePlay> play =
+                std::make_unique<CreaseDefensePlay>(ai_config);
+            play->updateControlParams(Point(1, 3));
+            return play;
+        });
 
     // We set the referee command to stop so that the robots do not kick/shoot during the
     // test
@@ -62,7 +64,7 @@ TEST_F(CreaseDefensePlayTest, test_defense_play)
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {}};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }

@@ -20,21 +20,16 @@ class STPTacticAssignmentTest : public ::testing::Test
    public:
     STPTacticAssignmentTest()
         : thunderbots_config(std::make_shared<const ThunderbotsConfig>()),
-          stp([]() { return nullptr; }, thunderbots_config->getAiControlConfig(),
-              thunderbots_config->getPlayConfig(), 0)
+          stp(thunderbots_config->getAiConfig())
     {
     }
 
    protected:
     void SetUp() override
     {
-        thunderbots_config            = std::make_shared<const ThunderbotsConfig>();
-        auto default_play_constructor = [this]() -> std::unique_ptr<Play> {
-            return std::make_unique<HaltPlay>(thunderbots_config->getPlayConfig());
-        };
+        thunderbots_config = std::make_shared<const ThunderbotsConfig>();
         // Give an explicit seed to STP so that our tests are deterministic
-        stp   = STP(default_play_constructor, thunderbots_config->getAiControlConfig(),
-                  thunderbots_config->getPlayConfig(), 0);
+        stp   = STP(thunderbots_config->getAiConfig());
         world = ::TestUtil::createBlankTestingWorld();
     }
 
@@ -655,9 +650,9 @@ TEST_F(STPTacticAssignmentTest, test_multi_tier_assignment_with_tiered_assignmen
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
-            thunderbots_config->getPlayConfig()->getRobotNavigationObstacleConfig()),
+            thunderbots_config->getAiConfig()->getRobotNavigationObstacleConfig()),
         std::make_shared<CreaseDefenderTactic>(
-            thunderbots_config->getPlayConfig()->getRobotNavigationObstacleConfig()),
+            thunderbots_config->getAiConfig()->getRobotNavigationObstacleConfig()),
     };
 
     Pass passer_pass(Point(2, 3), Point(0.5, 0.3), 2);
