@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "software/geom/triangle.h"
-#include "software/simulated_tests/simulated_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
@@ -13,16 +13,17 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class ShadowEnemyTacticTest : public SimulatedTacticTestFixture
+class ShadowEnemyTacticTest : public SimulatedErForceSimTacticTestFixture
 {
     void SetUp() override
     {
-        SimulatedTacticTestFixture::SetUp();
+        SimulatedErForceSimTacticTestFixture::SetUp();
         setMotionConstraints({MotionConstraint::ENEMY_DEFENSE_AREA});
     }
 
    protected:
-    Field field = Field::createSSLDivisionBField();
+    FieldType field_type = FieldType::DIV_B;
+    Field field          = Field::createField(field_type);
 };
 
 TEST_F(ShadowEnemyTacticTest, test_block_pass)
@@ -67,7 +68,7 @@ TEST_F(ShadowEnemyTacticTest, test_block_pass)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(5));
 }
@@ -114,7 +115,7 @@ TEST_F(ShadowEnemyTacticTest, test_block_pass_if_enemy_does_not_have_ball)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(5));
 }
@@ -173,7 +174,7 @@ TEST_F(ShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(5));
 }
@@ -219,7 +220,7 @@ TEST_F(ShadowEnemyTacticTest, test_block_net_if_enemy_threat_is_null)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(5));
 }
