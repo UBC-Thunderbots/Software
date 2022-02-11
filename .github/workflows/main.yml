@@ -21,9 +21,28 @@ jobs:
       - name: Check Formatting
         run: |
           ./formatting_scripts/check_formatting_ci.sh
-          
+
   software-tests:
     name: Software Tests
+    runs-on: ubuntu-20.04
+    steps:
+      # checks-out the repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
+
+      - name: Environment Setup
+        run: |
+          "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
+
+      - name: Software Test
+        run: |
+          cd src
+          bazel test --show_timestamps       \
+            -- //... -//software:full_system \
+            -//software/simulated_tests/...  \
+            -//software/ai/hl/...            \
+
+  jetson-nano-tests:
+    name: Jetson Nano Software Tests
     runs-on: ubuntu-20.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
@@ -41,13 +60,7 @@ jobs:
           make >/dev/null 
           make install >/dev/null 
           redis-server --daemonize yes          
-      - name: Software Test
-        run: |
-          cd src
-          bazel test --show_timestamps       \
-            -- //... -//software:full_system \
-            -//software/simulated_tests/...  \
-            -//software/ai/hl/...            \
+
       - name: Stop redis server
         run: |
           redis-cli shutdown
@@ -56,7 +69,7 @@ jobs:
         run: |
          cd src
          bazel build --cpu=jetson_nano //software/jetson_nano/...
-             
+
   simulated-gameplay-tests:
     name: Simulated Gameplay Tests
     runs-on: ubuntu-20.04
@@ -95,10 +108,9 @@ jobs:
             //software/simulated_tests/...   \
             //software/ai/hl/...
 
-            
-  memory-leak-checks:
-    name: Memory Leak Checks
-    runs-on: ubuntu-20.04
+  ubuntu-18-software-tests:
+    name: Ubuntu 18 Software Tests
+    runs-on: ubuntu-18.04
     steps:
       # checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
@@ -107,25 +119,8 @@ jobs:
         run: |
           "${GITHUB_WORKSPACE}"/environment_setup/setup_software.sh
 
-      - name: Simulation Memory Leak Check
+      - name: Software Geom Test
         run: |
           cd src
-          bazel test -c dbg  \
-            --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
-            //software/simulation/...
-            
-      - name: Firmware Memory Leak Check
-        run: |
-          cd src
-          bazel test -c dbg  \
-            --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
-            -- //firmware/...   \
-            -//software/emergency_stop/...
-            
-      - name: Shared Memory Leak Check
-        run: |
-          cd src
-          bazel test -c dbg  \
-            --run_under="valgrind --leak-check=yes --undef-value-errors=no --error-exitcode=1"   \
-            //shared/parameter/...
-
+          bazel test --show_timestamps       \
+            //software/geom/...
