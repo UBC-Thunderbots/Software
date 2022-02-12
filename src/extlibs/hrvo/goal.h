@@ -36,7 +36,7 @@
 #include "extlibs/hrvo/vector2.h"
 #include "software/geom/vector.h"
 
-class Simulator;
+class HRVOSimulator;
 
 /**
  * A goal in the simulation.

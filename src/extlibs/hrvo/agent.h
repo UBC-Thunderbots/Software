@@ -2,7 +2,7 @@
 
 #include "extlibs/hrvo/vector2.h"
 
-class Simulator;
+class HRVOSimulator;
 
 /**
  * An agent/robot in the HRVO simulation.
@@ -23,7 +23,7 @@ class Agent
      * @param goalIndex          The index of the Goal which this agent should go to.
      * @param goalRadius         The goal radius of this agent.
      */
-    Agent(Simulator *simulator, const Vector2 &position, float radius,
+    Agent(HRVOSimulator *simulator, const Vector2 &position, float radius,
           const Vector2 &velocity, const Vector2 &prefVelocity, float maxSpeed,
           float maxAccel, std::size_t goalIndex, float goalRadius);
 
@@ -123,6 +123,8 @@ class Agent
 
     void setPosition(const Vector2 &position);
 
+    void setVelocity(const Vector2 &velocity);
+
 protected:
     // Agent Properties
     Vector2 position_;
@@ -144,5 +146,5 @@ protected:
 
     // TODO (#2373): Remove once new Path class is added and add timeStep as a argument to
     // update(time_step)
-    Simulator *const simulator_;
+    HRVOSimulator *const simulator_;
 };

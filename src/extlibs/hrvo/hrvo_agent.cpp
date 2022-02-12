@@ -41,7 +41,7 @@
 #include "kd_tree.h"
 
 
-HRVOAgent::HRVOAgent(Simulator *simulator, const Vector2 &position, std::size_t goalIndex,
+HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector2 &position, std::size_t goalIndex,
                      float neighborDist, std::size_t maxNeighbors, float radius,
                      const Vector2 &velocity, float maxAccel, float goalRadius,
                      float prefSpeed, float maxSpeed, float uncertaintyOffset)

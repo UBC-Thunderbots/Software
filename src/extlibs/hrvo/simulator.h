@@ -42,7 +42,7 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/world/world.h"
 
-class Simulator
+class HRVOSimulator
 {
    public:
     /**
@@ -50,9 +50,9 @@ class Simulator
      * @param time_step
      * @param robot_constants
      */
-    explicit Simulator(float time_step, const RobotConstants_t &robot_constants);
+    explicit HRVOSimulator(float time_step, const RobotConstants_t &robot_constants);
 
-    ~Simulator() = default;
+    ~HRVOSimulator() = default;
 
     /**
      * Reset all agents to match the state of the given world.

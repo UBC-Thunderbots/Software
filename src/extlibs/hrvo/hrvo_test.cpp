@@ -20,7 +20,7 @@ class HRVOTest : public ::testing::Test
 
    public:
     // HRVO Properties
-    Simulator simulator;
+    HRVOSimulator simulator;
     Timestamp current_time;
     Ball ball;
     Field field;

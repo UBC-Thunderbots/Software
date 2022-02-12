@@ -66,7 +66,7 @@ class HRVOAgent : public Agent
      * @param maxAccel           The maximum acceleration of this agent.
      * @param velocity           The initial velocity of this agent.
      */
-    HRVOAgent(Simulator *simulator, const Vector2 &position, std::size_t goalIndex,
+    HRVOAgent(HRVOSimulator *simulator, const Vector2 &position, std::size_t goalIndex,
               float neighborDist, std::size_t maxNeighbors, float radius,
               const Vector2 &velocity, float maxAccel, float goalRadius, float prefSpeed,
               float maxSpeed, float uncertaintyOffset);

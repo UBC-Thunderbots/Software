@@ -38,7 +38,7 @@
 #include "extlibs/hrvo/vector2.h"
 
 class HRVOAgent;
-class Simulator;
+class HRVOSimulator;
 
 /**
  * k-D trees for agents in the simulation.
@@ -98,7 +98,7 @@ class KdTree
      *
      * @param  simulator  The simulation.
      */
-    explicit KdTree(Simulator *simulator);
+    explicit KdTree(HRVOSimulator *simulator);
 
     /**
      * Builds an agent k-D tree.
@@ -136,7 +136,7 @@ class KdTree
     void queryRecursive(HRVOAgent *agent, float &rangeSq, std::size_t node) const;
 
    private:
-    Simulator *const simulator_;
+    HRVOSimulator *const simulator_;
     std::vector<std::size_t> agents_;
     std::vector<Node> nodes_;
 

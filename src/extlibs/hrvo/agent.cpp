@@ -2,7 +2,7 @@
 
 #include "extlibs/hrvo/simulator.h"
 
-Agent::Agent(Simulator *simulator, const Vector2 &position, float radius,
+Agent::Agent(HRVOSimulator *simulator, const Vector2 &position, float radius,
              const Vector2 &velocity, const Vector2 &prefVelocity, float maxSpeed,
              float maxAccel, std::size_t goalIndex, float goalRadius)
     : simulator_(simulator),
@@ -16,10 +16,6 @@ Agent::Agent(Simulator *simulator, const Vector2 &position, float radius,
       goal_radius_(goalRadius),
       reached_goal_(false)
 {
-}
-
-void Agent::setPosition(const Vector2 &position) {
-    position_ = position;
 }
 
 void Agent::update()
@@ -64,6 +60,16 @@ void Agent::update()
         reached_goal_             = false;
         simulator_->reachedGoals_ = false;
     }
+}
+
+void Agent::setPosition(const Vector2 &position)
+{
+    position_ = position;
+}
+
+void Agent::setVelocity(const Vector2 &velocity)
+{
+    velocity_ = velocity;
 }
 
 float Agent::getMaxAccel() const

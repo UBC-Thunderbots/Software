@@ -76,5 +76,5 @@ class PrimitiveExecutor
 
     TbotsProto::Primitive current_primitive_;
     RobotConstants_t robot_constants_;
-    Simulator hrvo_simulator;
+    HRVOSimulator hrvo_simulator;
 };

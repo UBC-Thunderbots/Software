@@ -22,7 +22,7 @@ class LinearVelocityAgent : public Agent
      * @param goal_index  The goal number of this agent.
      * @param goalRadius  The goal radius of this agent.
      */
-    LinearVelocityAgent(Simulator *simulator, const Vector2 &position, float radius,
+    LinearVelocityAgent(HRVOSimulator *simulator, const Vector2 &position, float radius,
                         const Vector2 &velocity, float maxSpeed, float maxAccel,
                         std::size_t goal_index, float goalRadius);
 
