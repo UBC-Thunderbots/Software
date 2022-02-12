@@ -36,7 +36,7 @@ auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
         });
 
 setFriendlyGoalie(0);
-setEnemyGoalie(0);
+setEnemyGoalie(1);
 setFriendlyAIPlay(TYPENAME(PenaltyKickPlay));
 setEnemyAIPlay(TYPENAME(PenaltyKickEnemyPlay));
 setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_PENALTY_THEM

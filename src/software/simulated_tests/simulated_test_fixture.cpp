@@ -72,7 +72,7 @@ void SimulatedTestFixture::SetUp()
         ->setValue(true);
     enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableDefendingPositiveSide()
-        ->setValue(false);
+        ->setValue(true);
 
     // Experimentally determined restitution value
     enemy_mutable_thunderbots_config->getMutableSimulatorConfig()

@@ -46,7 +46,7 @@ void SimulatedPlayTestFixture::setFriendlyGoalie(RobotId goalie_id)
 
 void SimulatedPlayTestFixture::setEnemyGoalie(RobotId goalie_id)
 {
-    friendly_sensor_fusion_config->getMutableEnemyGoalieId()->setValue(
+    enemy_sensor_fusion_config->getMutableFriendlyGoalieId()->setValue(
         static_cast<int>(goalie_id));
 }
 
