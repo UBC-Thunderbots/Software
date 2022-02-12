@@ -122,8 +122,12 @@ void SimulatedPlayTestFixture::updateEnemyPrimitives(
     auto primitive_set_msg = enemy_ai.getPrimitives(world_with_updated_game_state);
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
     registerEnemyTickTime(duration_ms);
+    auto defending_side = DefendingSideProto();
+    defending_side.set_defending_side(
+            DefendingSideProto::FieldSide::DefendingSideProto_FieldSide_POS_X);
+    simulator_to_update->setBlueTeamDefendingSide(defending_side);
     simulator_to_update->setBlueRobotPrimitiveSet(
-        createNanoPbPrimitiveSet(*primitive_set_msg));
+            createNanoPbPrimitiveSet(*primitive_set_msg));
 }
 
 const std::shared_ptr<AiConfig> SimulatedPlayTestFixture::getFriendlyAiConfig() const

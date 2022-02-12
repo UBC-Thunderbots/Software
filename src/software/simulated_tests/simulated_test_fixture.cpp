@@ -58,7 +58,9 @@ void SimulatedTestFixture::SetUp()
     // team
     enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableFriendlyColorYellow()
-        ->setValue(true);
+        ->setValue(false);                          //I'm not 100% sure about this
+                                                              //Changing to false doesn't visibly do anything to test
+                                                              //     - Phil
     enemy_mutable_thunderbots_config->getMutableAiControlConfig()
         ->getMutableRunAi()
         ->setValue(!TbotsGtestMain::stop_ai_on_start);
