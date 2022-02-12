@@ -69,6 +69,11 @@ static const char
         "ff02::c3d0:42d2:bb16",
 };
 
+// Redis default server connections properties
+#define REDIS_HOST_LENGTH 10
+static const char REDIS_DEFAULT_HOST[REDIS_HOST_LENGTH] = "127.0.0.1";
+static const short unsigned int REDIS_DEFAULT_PORT = 6379;
+
 // the port robots are listening to for vision and primitives
 static const short unsigned int VISION_PORT    = 42069;
 static const short unsigned int PRIMITIVE_PORT = 42070;
