@@ -20,10 +20,8 @@ void robotNotInCenterCircle(RobotId robot_id, std::shared_ptr<World> world_ptr,
 {
     std::optional<Robot> robot_optional =
         world_ptr->friendlyTeam().getRobotById(robot_id);
-    if (!robot_optional.has_value())
-    {
-        LOG(FATAL) << "There is no robot with ID: " + std::to_string(robot_id);
-    }
+    CHECK(robot_optional.has_value())
+        << "There is no robot with ID: " + std::to_string(robot_id);
     Point position = robot_optional.value().position();
     if (contains(world_ptr->field().centerCircle(), position))
     {

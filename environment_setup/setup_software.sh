@@ -102,20 +102,29 @@ echo "================================================================"
 echo "Upgrading Pip Version"
 echo "================================================================"
 
+<<<<<<< HEAD
 if ! /usr/bin/python3.8 -m pip install --upgrade pip ; then
-    echo "##############################################################"
-    echo "Error: Upgrading pip version failed"
-    echo "##############################################################"
-    exit 1
-fi
-
+=======
 if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
+>>>>>>> e002cc9b2f2fa5b6504e00edbc839af0183686a9
     echo "##############################################################"
     echo "Error: Setting up virtual environment failed"
     echo "##############################################################"
     exit 1
 fi
 
+<<<<<<< HEAD
+if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
+=======
+if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
+>>>>>>> e002cc9b2f2fa5b6504e00edbc839af0183686a9
+    echo "##############################################################"
+    echo "Error: Upgrading pip version in venv failed"
+    echo "##############################################################"
+    exit 1
+fi
+
+<<<<<<< HEAD
 if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
     echo "##############################################################"
     echo "Error: Upgrading pip version in venv failed"
@@ -123,6 +132,8 @@ if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
     exit 1
 fi
 
+=======
+>>>>>>> e002cc9b2f2fa5b6504e00edbc839af0183686a9
 
 if ! sudo /opt/tbotspython/bin/pip3 install pyqt5  ; then
     echo "##############################################################"
@@ -152,17 +163,35 @@ sudo apt-get install curl gnupg
 curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
 echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
 sudo apt-get update
-if ! sudo apt-get install bazel-3.7.2 -y ; then
+if ! sudo apt-get install bazel-5.0.0 -y ; then
     echo "##############################################################"
     echo "Error: Installing Bazel failed"
     echo "If you have a newer version installed, please manually downgrade"
     echo "##############################################################"
     exit 1
 fi
-sudo ln -s /usr/bin/bazel-3.7.2 /usr/bin/bazel
+sudo rm -f /usr/bin/bazel # remove symlink
+sudo ln -s /usr/bin/bazel-5.0.0 /usr/bin/bazel
+
+# setup platformio to compile arduino code
+# link to instructions: https://docs.platformio.org/en/latest/core/installation.html
+# **need to reboot for changes to come into effect**
+
+# downloading platformio udev rules
+curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules
+sudo service udev restart
+
+# allow user access to serial ports
+sudo usermod -a -G dialout $USER
+
+# installs platformio to global environment
+sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==5.2.4
+echo "================================================================"
+echo "Done platformio Setup"
+echo "================================================================"
 
 # Done
 echo "================================================================"
-echo "Done Software Setup"
+echo "Done Software Setup, please reboot for changes to take place"
 echo "================================================================"
 

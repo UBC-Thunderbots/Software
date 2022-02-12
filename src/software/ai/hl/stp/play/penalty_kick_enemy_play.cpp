@@ -6,20 +6,9 @@
 #include "software/ai/hl/stp/tactic/move_goalie_to_goal_line/move_goalie_to_goal_line_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(std::shared_ptr<const PlayConfig> config)
+PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(std::shared_ptr<const AiConfig> config)
     : Play(config, false)
 {
-}
-
-bool PenaltyKickEnemyPlay::isApplicable(const World &world) const
-{
-    return world.gameState().isTheirPenalty();
-}
-
-bool PenaltyKickEnemyPlay::invariantHolds(const World &world) const
-{
-    return world.gameState().isTheirPenalty() && !world.gameState().isStopped() &&
-           !world.gameState().isHalted();
 }
 
 void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
@@ -71,4 +60,4 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, PenaltyKickEnemyPlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, PenaltyKickEnemyPlay, AiConfig> factory;

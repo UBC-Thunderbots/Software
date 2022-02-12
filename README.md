@@ -9,8 +9,6 @@ Our main software repository, for both software and firmware. To get started, pl
 
 For an explanation of our software layout and architecture, check out [software architecture and design](docs/software-architecture-and-design.md).
 
-For an explanation of our firmware layout and architecture, check out [firmware architecture and design](docs/firmware-architecture-and-design.md).
-
 Got a question? Look at the [FAQ](docs/faq.md) to see if it's already been answered!
 
 Want to learn more about the SSL League? (Teams, rules, etc.) Check out the [Official SSL RoboCup Website](https://ssl.robocup.org/).

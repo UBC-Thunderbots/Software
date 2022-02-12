@@ -9,21 +9,9 @@
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-KickoffEnemyPlay::KickoffEnemyPlay(std::shared_ptr<const PlayConfig> config)
+KickoffEnemyPlay::KickoffEnemyPlay(std::shared_ptr<const AiConfig> config)
     : Play(config, true)
 {
-}
-
-bool KickoffEnemyPlay::isApplicable(const World &world) const
-{
-    return (world.gameState().isReadyState() || world.gameState().isSetupState()) &&
-           world.gameState().isTheirKickoff();
-}
-
-bool KickoffEnemyPlay::invariantHolds(const World &world) const
-{
-    return !world.gameState().isPlaying() &&
-           (!world.gameState().isStopped() || !world.gameState().isHalted());
 }
 
 void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
@@ -160,4 +148,4 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, KickoffEnemyPlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, KickoffEnemyPlay, AiConfig> factory;

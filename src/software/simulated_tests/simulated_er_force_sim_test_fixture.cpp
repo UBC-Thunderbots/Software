@@ -14,10 +14,14 @@
 #include "proto/message_translation/er_force_world.h"
 
 SimulatedErForceSimTestFixture::SimulatedErForceSimTestFixture()
-    : mutable_thunderbots_config(std::make_shared<ThunderbotsConfig>()),
-      thunderbots_config(
-          std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config)),
-      sensor_fusion(thunderbots_config->getSensorFusionConfig()),
+    : friendly_mutable_thunderbots_config(std::make_shared<ThunderbotsConfig>()),
+      enemy_mutable_thunderbots_config(std::make_shared<ThunderbotsConfig>()),
+      friendly_thunderbots_config(std::const_pointer_cast<const ThunderbotsConfig>(
+          friendly_mutable_thunderbots_config)),
+      enemy_thunderbots_config(std::const_pointer_cast<const ThunderbotsConfig>(
+          enemy_mutable_thunderbots_config)),
+      friendly_sensor_fusion(friendly_thunderbots_config->getSensorFusionConfig()),
+      enemy_sensor_fusion(enemy_thunderbots_config->getSensorFusionConfig()),
       should_log_replay(false),
       run_simulation_in_realtime(false)
 {
@@ -27,17 +31,54 @@ void SimulatedErForceSimTestFixture::SetUp()
 {
     LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
 
+    setCommonConfigs(friendly_mutable_thunderbots_config);
+    setCommonConfigs(enemy_mutable_thunderbots_config);
+    // The friendly team defends the negative side of the field
+    // and controls the yellow robots
+    friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()
+        ->getMutableFriendlyColorYellow()
+        ->setValue(true);
+    friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()
+        ->getMutableDefendingPositiveSide()
+        ->setValue(false);
+
+    // The enemy team defends the positive side of the field
+    // and controls the blue robots
+    enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
+        ->getMutableFriendlyColorYellow()
+        ->setValue(false);
+    enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
+        ->getMutableDefendingPositiveSide()
+        ->setValue(true);
+
+    if (TbotsGtestMain::enable_visualizer)
+    {
+        enableVisualizer();
+    }
+    setupReplayLogging();
+
+    // Reset tick duration trackers
+    total_friendly_tick_duration = 0.0;
+    total_enemy_tick_duration    = 0.0;
+    // all tick times should be greater than 0
+    max_friendly_tick_duration = 0.0;
+    max_enemy_tick_duration    = 0.0;
+    // all tick times should be less than the max value of a double
+    min_friendly_tick_duration = std::numeric_limits<double>::max();
+    min_enemy_tick_duration    = std::numeric_limits<double>::max();
+    friendly_tick_count        = 0;
+    enemy_tick_count           = 0;
+}
+
+void SimulatedErForceSimTestFixture::setCommonConfigs(
+    std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config)
+{
     mutable_thunderbots_config->getMutableAiControlConfig()->getMutableRunAi()->setValue(
         !TbotsGtestMain::stop_ai_on_start);
 
-    // The simulated test abstracts and maintains the invariant that the friendly team
-    // is always the yellow team
     mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableOverrideGameControllerDefendingSide()
         ->setValue(true);
-    mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableDefendingPositiveSide()
-        ->setValue(false);
 
     // Experimentally determined restitution value
     mutable_thunderbots_config->getMutableSimulatorConfig()
@@ -51,32 +92,12 @@ void SimulatedErForceSimTestFixture::SetUp()
     mutable_thunderbots_config->getMutableSimulatorConfig()
         ->getMutableRollingFrictionAcceleration()
         ->setValue(0.5);
-
-    // The simulated test abstracts and maintains the invariant that the friendly team
-    // is always defending the "negative" side of the field. This is so that the
-    // coordinates given when setting up tests is from the perspective of the friendly
-    // team
-    mutable_thunderbots_config->getMutableSensorFusionConfig()
-        ->getMutableFriendlyColorYellow()
-        ->setValue(true);
-    if (TbotsGtestMain::enable_visualizer)
-    {
-        enableVisualizer();
-    }
-    setupReplayLogging();
-
-    // Reset tick duration trackers
-    total_tick_duration = 0.0;
-    // all tick times should be greater than 0
-    max_tick_duration = 0.0;
-    // all tick times should be less than the max value of a double
-    min_tick_duration = std::numeric_limits<double>::max();
-    tick_count        = 0;
 }
 
 void SimulatedErForceSimTestFixture::enableVisualizer()
 {
-    full_system_gui = std::make_shared<ThreadedFullSystemGUI>(mutable_thunderbots_config);
+    full_system_gui =
+        std::make_shared<ThreadedFullSystemGUI>(friendly_mutable_thunderbots_config);
     run_simulation_in_realtime = true;
 }
 
@@ -146,16 +167,18 @@ void SimulatedErForceSimTestFixture::updateSensorFusion(
         auto sensor_msg                        = SensorProto();
         *(sensor_msg.mutable_ssl_vision_msg()) = packet;
 
-        sensor_fusion.processSensorProto(sensor_msg);
+        friendly_sensor_fusion.processSensorProto(sensor_msg);
+        enemy_sensor_fusion.processSensorProto(sensor_msg);
+
         if (should_log_replay)
         {
             simulator_sensorproto_logger->onValueReceived(sensor_msg);
-            auto world_or_null = sensor_fusion.getWorld();
+            auto friendly_world_or_null = friendly_sensor_fusion.getWorld();
 
-            if (world_or_null)
+            if (friendly_world_or_null)
             {
                 auto filtered_ssl_wrapper = *createSSLWrapperPacket(
-                    *sensor_fusion.getWorld(), TeamColour::YELLOW);
+                    *friendly_sensor_fusion.getWorld(), TeamColour::YELLOW);
                 sensorfusion_wrapper_logger->onValueReceived(filtered_ssl_wrapper);
             }
         }
@@ -180,7 +203,7 @@ void SimulatedErForceSimTestFixture::sleep(
 }
 
 void SimulatedErForceSimTestFixture::runTest(
-    const Field &field, const BallState &ball,
+    const FieldType &field_type, const BallState &ball,
     const std::vector<RobotStateWithId> &friendly_robots,
     const std::vector<RobotStateWithId> &enemy_robots,
     const std::vector<ValidationFunction> &terminating_validation_functions,
@@ -188,17 +211,26 @@ void SimulatedErForceSimTestFixture::runTest(
     const Duration &timeout)
 {
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
-        FieldType::DIV_B, create2015RobotConstants(), create2015WheelConstants(),
-        thunderbots_config->getSimulatorConfig()));
+        field_type, create2015RobotConstants(), create2015WheelConstants(),
+        friendly_thunderbots_config->getSimulatorConfig()));
+
+    // TODO (#2419): remove this to re-enable sigfpe checks
+    fedisableexcept(FE_INVALID | FE_OVERFLOW);
     simulator->setBallState(ball);
     simulator->setYellowRobots(friendly_robots);
     simulator->setBlueRobots(enemy_robots);
+    // TODO (#2419): remove this to re-enable sigfpe checks
+    feenableexcept(FE_INVALID | FE_OVERFLOW);
 
     updateSensorFusion(simulator);
-    std::shared_ptr<World> world;
-    if (auto world_opt = sensor_fusion.getWorld())
+    std::shared_ptr<World> friendly_world;
+    std::shared_ptr<World> enemy_world;
+    if (friendly_sensor_fusion.getWorld().has_value() &&
+        enemy_sensor_fusion.getWorld().has_value())
     {
-        world = std::make_shared<World>(world_opt.value());
+        friendly_world =
+            std::make_shared<World>(friendly_sensor_fusion.getWorld().value());
+        enemy_world = std::make_shared<World>(enemy_sensor_fusion.getWorld().value());
     }
     else
     {
@@ -208,13 +240,13 @@ void SimulatedErForceSimTestFixture::runTest(
     for (const auto &validation_function : terminating_validation_functions)
     {
         terminating_function_validators.emplace_back(
-            TerminatingFunctionValidator(validation_function, world));
+            TerminatingFunctionValidator(validation_function, friendly_world));
     }
 
     for (const auto &validation_function : non_terminating_validation_functions)
     {
         non_terminating_function_validators.emplace_back(
-            NonTerminatingFunctionValidator(validation_function, world));
+            NonTerminatingFunctionValidator(validation_function, friendly_world));
     }
 
     const Timestamp timeout_time = simulator->getTimestamp() + timeout;
@@ -243,6 +275,7 @@ void SimulatedErForceSimTestFixture::runTest(
     std::vector<AggregateFunctions> robots_velocity_stats;
 
     // Tick one frame to aid with visualization
+<<<<<<< HEAD
     bool validation_functions_done =
         tickTest(simulation_time_step, ai_time_step, world, simulator, ball_displacement, ball_velocity_diff, robots_displacement, robots_velocity_diff);
 
@@ -262,6 +295,14 @@ void SimulatedErForceSimTestFixture::runTest(
         robots_displacement.clear();
         robots_velocity_diff.clear();
         if (!thunderbots_config->getAiControlConfig()->getRunAi()->value())
+=======
+    bool validation_functions_done = tickTest(simulation_time_step, ai_time_step,
+                                              friendly_world, enemy_world, simulator);
+
+    while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
+    {
+        if (!friendly_thunderbots_config->getAiControlConfig()->getRunAi()->value())
+>>>>>>> e002cc9b2f2fa5b6504e00edbc839af0183686a9
         {
             auto ms_to_sleep = std::chrono::milliseconds(
                 static_cast<int>(ai_time_step.toMilliseconds()));
@@ -269,6 +310,7 @@ void SimulatedErForceSimTestFixture::runTest(
             continue;
         }
 
+<<<<<<< HEAD
         validation_functions_done =
             tickTest(simulation_time_step, ai_time_step, world, simulator, ball_displacement, ball_velocity_diff, robots_displacement, robots_velocity_diff);
         
@@ -297,9 +339,14 @@ void SimulatedErForceSimTestFixture::runTest(
     for(int i = 0; i < num_robots; i++){
         robots_displacement_stats[i].average = sum_robots_displacement[i] / tick_count;
         robots_velocity_stats[i].average = sum_robots_velocity[i] / tick_count;
+=======
+        validation_functions_done = tickTest(simulation_time_step, ai_time_step,
+                                             friendly_world, enemy_world, simulator);
+>>>>>>> e002cc9b2f2fa5b6504e00edbc839af0183686a9
     }
 
     // Output the tick duration results
+<<<<<<< HEAD
     double avg_tick_duration = total_tick_duration / tick_count;
     LOG(INFO) << "max tick duration: " << max_tick_duration << "ms" << std::endl;
     LOG(INFO) << "min tick duration: " << min_tick_duration << "ms" << std::endl;
@@ -322,6 +369,28 @@ void SimulatedErForceSimTestFixture::runTest(
         LOG(INFO) << "min robot velocity difference: " << ball_velocity_stats.minimum << std::endl;
         LOG(INFO) << "avg robot velocity difference: " << ball_velocity_stats.average << std::endl;
     }
+=======
+    double avg_friendly_tick_duration =
+        total_friendly_tick_duration / friendly_tick_count;
+    LOG(INFO) << "max friendly tick duration: " << max_friendly_tick_duration << "ms"
+              << std::endl;
+    LOG(INFO) << "min friendly tick duration: " << min_friendly_tick_duration << "ms"
+              << std::endl;
+    LOG(INFO) << "avg friendly tick duration: " << avg_friendly_tick_duration << "ms"
+              << std::endl;
+
+    if (enemy_tick_count > 0)
+    {
+        double avg_enemy_tick_duration = total_enemy_tick_duration / enemy_tick_count;
+        LOG(INFO) << "max enemy tick duration: " << max_enemy_tick_duration << "ms"
+                  << std::endl;
+        LOG(INFO) << "min enemy tick duration: " << min_enemy_tick_duration << "ms"
+                  << std::endl;
+        LOG(INFO) << "avg enemy tick duration: " << avg_enemy_tick_duration << "ms"
+                  << std::endl;
+    }
+
+>>>>>>> e002cc9b2f2fa5b6504e00edbc839af0183686a9
 
     if (!validation_functions_done && !terminating_validation_functions.empty())
     {
@@ -338,22 +407,36 @@ void SimulatedErForceSimTestFixture::runTest(
     }
 }
 
-void SimulatedErForceSimTestFixture::registerTickTime(double tick_time_ms)
+void SimulatedErForceSimTestFixture::registerFriendlyTickTime(double tick_time_ms)
 {
-    total_tick_duration += tick_time_ms;
-    max_tick_duration = std::max(max_tick_duration, tick_time_ms);
-    min_tick_duration = std::min(min_tick_duration, tick_time_ms);
-    tick_count++;
+    total_friendly_tick_duration += tick_time_ms;
+    max_friendly_tick_duration = std::max(max_friendly_tick_duration, tick_time_ms);
+    min_friendly_tick_duration = std::min(min_friendly_tick_duration, tick_time_ms);
+    friendly_tick_count++;
+}
+
+void SimulatedErForceSimTestFixture::registerEnemyTickTime(double tick_time_ms)
+{
+    total_enemy_tick_duration += tick_time_ms;
+    max_enemy_tick_duration = std::max(max_enemy_tick_duration, tick_time_ms);
+    min_enemy_tick_duration = std::min(min_enemy_tick_duration, tick_time_ms);
+    enemy_tick_count++;
 }
 
 bool SimulatedErForceSimTestFixture::tickTest(Duration simulation_time_step,
                                               Duration ai_time_step,
+<<<<<<< HEAD
                                               std::shared_ptr<World> world,
                                               std::shared_ptr<ErForceSimulator> simulator
                                               double &ball_displacement,
                                               double &ball_velocity_diff,
                                               std::vector<double> &robots_displacement,
                                               std::vector<double> &robots_velocity_diff)
+=======
+                                              std::shared_ptr<World> friendly_world,
+                                              std::shared_ptr<World> enemy_world,
+                                              std::shared_ptr<ErForceSimulator> simulator)
+>>>>>>> e002cc9b2f2fa5b6504e00edbc839af0183686a9
 {
     /* extract world ball and robot */
     Ball world_ball = world.ball();
@@ -436,6 +519,7 @@ bool SimulatedErForceSimTestFixture::tickTest(Duration simulation_time_step,
 
     auto wall_start_time           = std::chrono::steady_clock::now();
     bool validation_functions_done = false;
+
     for (size_t i = 0; i < CAMERA_FRAMES_PER_AI_TICK; i++)
     {
         // TODO (#2419): remove this to re-enable sigfpe checks
@@ -446,9 +530,12 @@ bool SimulatedErForceSimTestFixture::tickTest(Duration simulation_time_step,
         updateSensorFusion(simulator);
     }
 
-    if (auto world_opt = sensor_fusion.getWorld())
+    if (friendly_sensor_fusion.getWorld().has_value() &&
+        enemy_sensor_fusion.getWorld().has_value())
     {
-        *world                    = world_opt.value();
+        *friendly_world = friendly_sensor_fusion.getWorld().value();
+        *enemy_world    = enemy_sensor_fusion.getWorld().value();
+
         validation_functions_done = validateAndCheckCompletion(
             terminating_function_validators, non_terminating_function_validators);
         if (validation_functions_done)
@@ -456,7 +543,8 @@ bool SimulatedErForceSimTestFixture::tickTest(Duration simulation_time_step,
             return validation_functions_done;
         }
 
-        updatePrimitives(*world_opt, simulator);
+        updatePrimitives(*friendly_world, *enemy_world,
+                         simulator);  // pass friendly and enemy world
 
         if (run_simulation_in_realtime)
         {
@@ -465,7 +553,7 @@ bool SimulatedErForceSimTestFixture::tickTest(Duration simulation_time_step,
 
         if (full_system_gui)
         {
-            full_system_gui->onValueReceived(*world);
+            full_system_gui->onValueReceived(*friendly_world);
             if (auto play_info_msg = getPlayInfo())
             {
                 full_system_gui->onValueReceived(*play_info_msg);

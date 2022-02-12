@@ -28,6 +28,7 @@ cc_library(
         "//software/simulation/physics:physics_world",
         "//software/world",
         "//software/world:robot_state",
+        "@eigen",
     ],
 )
 
