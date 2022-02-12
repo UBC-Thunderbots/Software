@@ -43,6 +43,7 @@ cc_library(
         "//software/time:duration",
         "//proto/logging:proto_logger",
         "//shared/test_util:tbots_gtest_main",
+        "//shared/test_util:test_util"
         # TODO (#1889) Remove this dep after optional params are implemented
         "//software/ai/hl/stp/play:halt_play",
         "//proto/message_translation:er_force_world"
