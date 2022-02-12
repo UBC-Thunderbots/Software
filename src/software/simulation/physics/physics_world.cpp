@@ -50,11 +50,9 @@ const std::vector<RobotStateWithId> PhysicsWorld::getRobotStates(
     std::vector<RobotStateWithId> robot_states;
     for (const auto& robot : physics_robots)
     {
-        if (!robot)
-        {
-            LOG(FATAL) << "Encountered a nullptr to a " << toString(colour)
-                       << " physics robot in the physics world";
-        }
+        CHECK(static_cast<bool>(robot))
+            << "Encountered a nullptr to a " << toString(colour)
+            << " physics robot in the physics world";
 
         auto state_with_id = RobotStateWithId{.id          = robot->getRobotId(),
                                               .robot_state = robot->getRobotState()};
@@ -135,13 +133,8 @@ RobotId PhysicsWorld::getAvailableRobotId(TeamColour colour) const
         }
     }
 
-    if (isRobotIdAvailable(std::numeric_limits<RobotId>::max(), colour))
-    {
-        return std::numeric_limits<RobotId>::max();
-    }
-
-    LOG(FATAL) << "Out of available " << toString(colour)
-               << " robot IDs in the physics world";
+    CHECK(isRobotIdAvailable(std::numeric_limits<RobotId>::max(), colour))
+        << "Out of available " << toString(colour) << " robot IDs in the physics world";
 
     return std::numeric_limits<RobotId>::max();
 }
@@ -172,11 +165,9 @@ bool PhysicsWorld::isRobotIdAvailable(RobotId id, TeamColour colour) const
     bool id_available = true;
     for (const auto& robot : physics_robots)
     {
-        if (!robot)
-        {
-            LOG(FATAL) << "Encountered a nullptr to a " << toString(colour)
-                       << " physics robot in the physics world";
-        }
+        CHECK(static_cast<bool>(robot))
+            << "Encountered a nullptr to a " << toString(colour)
+            << " physics robot in the physics world";
 
         if (id == robot->getRobotId())
         {
@@ -217,11 +208,8 @@ std::vector<std::weak_ptr<PhysicsRobot>> PhysicsWorld::getYellowPhysicsRobots() 
     std::vector<std::weak_ptr<PhysicsRobot>> robots;
     for (const auto& yellow_physics_robot : yellow_physics_robots)
     {
-        if (!yellow_physics_robot)
-        {
-            LOG(FATAL)
-                << "Encountered a nullptr to a yellow physics robot in the physics world";
-        }
+        CHECK(static_cast<bool>(yellow_physics_robot))
+            << "Encountered a nullptr to a yellow physics robot in the physics world";
 
         robots.emplace_back(yellow_physics_robot);
     }
@@ -233,11 +221,8 @@ std::vector<std::weak_ptr<PhysicsRobot>> PhysicsWorld::getBluePhysicsRobots() co
     std::vector<std::weak_ptr<PhysicsRobot>> robots;
     for (const auto& blue_physics_robot : blue_physics_robots)
     {
-        if (!blue_physics_robot)
-        {
-            LOG(FATAL)
-                << "Encountered a nullptr to a blue physics robot in the physics world";
-        }
+        CHECK(static_cast<bool>(blue_physics_robot))
+            << "Encountered a nullptr to a blue physics robot in the physics world";
 
         robots.emplace_back(blue_physics_robot);
     }

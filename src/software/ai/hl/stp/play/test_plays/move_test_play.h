@@ -11,21 +11,14 @@
  *
  * This play is applicable when the ball's x and y coordinates are >= 0
  * This play's invariant holds while the ball's x coordinate is >= 0
- *
- * We use the Ball's position to control the 'isApplicable' and 'invariantHolds' values
- * because it is easy to change during tests
  */
 class MoveTestPlay : public Play
 {
    public:
-    MoveTestPlay(std::shared_ptr<const PlayConfig> config);
-
-    bool isApplicable(const World &world) const override;
-
-    bool invariantHolds(const World &world) const override;
+    MoveTestPlay(std::shared_ptr<const AiConfig> config);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 
    private:
-    std::shared_ptr<const PlayConfig> play_config;
+    std::shared_ptr<const AiConfig> ai_config;
 };

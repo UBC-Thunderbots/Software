@@ -1,5 +1,5 @@
 load("@rules_proto//proto:defs.bzl", "ProtoInfo")
-load("@rules_cc//cc:toolchain_utils.bzl", "find_cpp_toolchain")
+load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
 def _nanopb_proto_library_impl(ctx):
     # This is the folder we will place all our generation artifacts in

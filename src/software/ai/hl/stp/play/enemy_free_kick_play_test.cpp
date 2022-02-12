@@ -224,34 +224,3 @@ TEST_F(EnemyFreekickPlayTest, test_enemy_free_kick_chipper_robots_close_to_net)
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
-
-TEST(EnemyFreeKickPlayInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
-{
-    auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
-
-    auto world = ::TestUtil::createBlankTestingWorld();
-
-    // EnemyFreeKickPlay: the play under test
-    auto enemy_free_kick_play = EnemyFreekickPlay(play_config);
-
-    // Test 1: Ensure play will start and stay running for our free kick play
-    world.updateGameState(::TestUtil::createGameState(RefereeCommand::DIRECT_FREE_THEM,
-                                                      RefereeCommand::DIRECT_FREE_THEM));
-
-    ASSERT_TRUE(enemy_free_kick_play.isApplicable(world));
-    ASSERT_TRUE(enemy_free_kick_play.invariantHolds(world));
-
-    // Test 2: Ensure doesn't run when NOT our free kick play
-    world.updateGameState(::TestUtil::createGameState(RefereeCommand::DIRECT_FREE_US,
-                                                      RefereeCommand::DIRECT_FREE_THEM));
-
-    ASSERT_FALSE(enemy_free_kick_play.isApplicable(world));
-    ASSERT_FALSE(enemy_free_kick_play.invariantHolds(world));
-
-    // Test 3: Ensure play goes from normal start command to enemy free kick play
-    world.updateGameState(::TestUtil::createGameState(RefereeCommand::DIRECT_FREE_THEM,
-                                                      RefereeCommand::NORMAL_START));
-
-    ASSERT_TRUE(enemy_free_kick_play.isApplicable(world));
-    ASSERT_TRUE(enemy_free_kick_play.invariantHolds(world));
-}

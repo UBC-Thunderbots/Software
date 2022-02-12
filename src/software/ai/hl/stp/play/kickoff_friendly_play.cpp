@@ -6,22 +6,9 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-KickoffFriendlyPlay::KickoffFriendlyPlay(std::shared_ptr<const PlayConfig> config)
+KickoffFriendlyPlay::KickoffFriendlyPlay(std::shared_ptr<const AiConfig> config)
     : Play(config, true)
 {
-}
-
-bool KickoffFriendlyPlay::isApplicable(const World &world) const
-{
-    return ((world.gameState().isReadyState() || world.gameState().isSetupState()) &&
-            world.gameState().isOurKickoff()) &&
-           !world.gameState().isHalted() && !world.gameState().isStopped();
-}
-
-bool KickoffFriendlyPlay::invariantHolds(const World &world) const
-{
-    return (!world.gameState().isPlaying() || world.gameState().isHalted() ||
-            world.gameState().isStopped());
 }
 
 void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
@@ -143,4 +130,4 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, KickoffFriendlyPlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, KickoffFriendlyPlay, AiConfig> factory;

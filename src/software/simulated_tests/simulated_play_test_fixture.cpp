@@ -4,6 +4,8 @@
 #include "software/gui/drawing/navigator.h"
 #include "software/test_util/test_util.h"
 
+// TODO: THIS IS BORKED AFTER NEW CHANGES
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
 SimulatedPlayTestFixture::SimulatedPlayTestFixture()
     : friendly_ai_config(friendly_mutable_thunderbots_config->getMutableAiConfig()),
       friendly_ai_control_config(friendly_mutable_thunderbots_config->getMutableAiControlConfig()),
@@ -46,7 +48,7 @@ void SimulatedPlayTestFixture::SetUp()
                   enemy_thunderbots_config->getAiControlConfig(),
                   enemy_thunderbots_config->getPlayConfig());
 }
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
 void SimulatedPlayTestFixture::setFriendlyGoalie(RobotId goalie_id)
 {
     friendly_sensor_fusion_config->getMutableFriendlyGoalieId()->setValue(
@@ -71,6 +73,8 @@ void SimulatedPlayTestFixture::setEnemyAIPlay(const std::string& enemy_ai_play)
     enemy_ai_control_config->getMutableCurrentAiPlay()->setValue(enemy_ai_play);
 }
 
+/////////////////////////////////////////////////////////////
+// TODO: THIS IS REALLY BORKED
 void SimulatedPlayTestFixture::setFriendlyAIPlayConstructor(
     std::function<std::unique_ptr<Play>()> friendly_play_constructor)
 {
@@ -81,7 +85,17 @@ void SimulatedPlayTestFixture::setEnemyAIPlayConstructor(
     std::function<std::unique_ptr<Play>()> enemy_play_constructor)
 {
     enemy_ai.overridePlayConstructor(enemy_play_constructor);
+    ai_config->getMutableAiControlConfig()->getMutableOverrideAiPlay()->setValue(true);
+    ai_config->getMutableAiControlConfig()->getMutableCurrentAiPlay()->setValue(ai_play);
 }
+
+void SimulatedPlayTestFixture::setAIPlayConstructor(
+    std::optional<PlayConstructor> constructor)
+{
+    ai.overridePlayConstructor(constructor);
+}
+//////////////////////////////////////////////////////////
+
 
 void SimulatedPlayTestFixture::setRefereeCommand(
     const RefereeCommand& current_referee_command,

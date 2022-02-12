@@ -49,15 +49,16 @@ class SimulatedPlayTestFixture : public SimulatedTestFixture
      *
      * @param play_constructor The constructor for the play
      */
-    void setFriendlyAIPlayConstructor(std::function<std::unique_ptr<Play>()> friendly_play_constructor);
+    void setFriendlyAIPlayConstructor(std::optional<PlayConstructor> friendly_play_constructor);
 
     /**
      * Sets the enemy AI play constructor to be used to run in the simulated test
      *
      * @param enemy_play_constructor The constructor for the play
      */
-    void setEnemyAIPlayConstructor(std::function<std::unique_ptr<Play>()> enemy_play_constructor);
+    void setEnemyAIPlayConstructor(std::optional<PlayConstructor> enemy_play_constructor);
 
+    void setAIPlayConstructor(std::optional<PlayConstructor> constructor);
 
     /**
      * Sets the Referee command to override for the simulated test

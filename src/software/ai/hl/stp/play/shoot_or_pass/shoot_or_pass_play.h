@@ -10,12 +10,9 @@
 class ShootOrPassPlay : public Play
 {
    public:
-    ShootOrPassPlay(std::shared_ptr<const PlayConfig> config);
+    ShootOrPassPlay(std::shared_ptr<const AiConfig> config);
 
-    bool isApplicable(const World &world) const override;
-    bool invariantHolds(const World &world) const override;
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
-    bool done() const override;
     void updateTactics(const PlayUpdate &play_update) override;
 
    private:
