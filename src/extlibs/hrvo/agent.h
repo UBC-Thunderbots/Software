@@ -121,7 +121,9 @@ class Agent
      */
     bool hasReachedGoal() const;
 
-   protected:
+    void setPosition(const Vector2 &position);
+
+protected:
     // Agent Properties
     Vector2 position_;
     float radius_;

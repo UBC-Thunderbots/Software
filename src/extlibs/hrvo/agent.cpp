@@ -18,6 +18,10 @@ Agent::Agent(Simulator *simulator, const Vector2 &position, float radius,
 {
 }
 
+void Agent::setPosition(const Vector2 &position) {
+    position_ = position;
+}
+
 void Agent::update()
 {
     if (abs(new_velocity_) >= max_speed_)

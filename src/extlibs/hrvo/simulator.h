@@ -282,7 +282,13 @@ class Simulator
 
    private:
     // friendly robot id to agent index
+    // TODO: Update Agent ID to be a property (Agent ID == Robot ID), then use a map of Agents
+    //       - Problem: It is likely that there is a duplicate of every robot ID (friendly and enemy robot)
+    //       - Possible Solution: Two arrays (friendly and enemy) of Agent shared_ptr. And one Agents array with all Agents. Doesn't seem ideal though
     std::map<unsigned int, unsigned int> friendly_robot_id_map;
+    std::map<unsigned int, unsigned int> enemy_robot_id_map;
+    std::size_t ball_agent_id = -1; // Can size_t be negative?
+    int update_world = 0;
 
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set_;

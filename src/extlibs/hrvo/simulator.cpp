@@ -51,8 +51,117 @@ Simulator::Simulator(float time_step, const RobotConstants_t &robot_constants)
 {
 }
 
+//void Simulator::updateWorld(const World &world)
+//{
+//    // TODO:
+//    // 1. Add new Robots and remove old robots
+//    // 2. Update friendly and enemy robot positions
+//    const auto& friendly_team = world.friendlyTeam().getAllRobots();
+//    const auto& enemy_team = world.enemyTeam().getAllRobots();
+//    // Update this snippet of code based on above TODO
+//    if (friendly_robot_id_map.empty() && enemy_robot_id_map.empty())
+//    {
+//        int max_neighbors =
+//            std::max(1, static_cast<int>(world.friendlyTeam().getAllRobots().size()) - 1);
+//        for (const Robot &friendly_robot : friendly_team)
+//        {
+//            std::size_t agent_index = addHRVORobotAgent(friendly_robot, max_neighbors);
+//            friendly_robot_id_map.emplace(friendly_robot.id(), agent_index);
+//        }
+//
+//        for (const Robot &enemy_robot : enemy_team)
+//        {
+//            // Set goal of enemy robot to be the farthest point, when moving in the current
+//            // direction
+//            Segment segment(enemy_robot.position(),
+//                            enemy_robot.position() + enemy_robot.velocity() * 100);
+//
+//            // Enemy robot should not enter the friendly defense area
+//            std::unordered_set<Point> intersection_point_set =
+//                    intersection(world.field().friendlyDefenseArea(), segment);
+//            if (intersection_point_set.empty() &&
+//                contains(world.field().fieldLines(), enemy_robot.position()))
+//            {
+//                // If the robot is in the field, then move in the current direction
+//                // towards the field edge
+//                intersection_point_set = intersection(world.field().fieldLines(), segment);
+//            }
+//
+//            if (intersection_point_set.empty())
+//            {
+//                // If there is no intersection point (robot is outside the field), continue
+//                // moving in the current direction
+//                intersection_point_set.insert(enemy_robot.position() +
+//                                              enemy_robot.velocity() * 5);
+//            }
+//
+//            Vector2 goal_position(static_cast<float>(intersection_point_set.begin()->x()),
+//                                  static_cast<float>(intersection_point_set.begin()->y()));
+//            std::size_t agent_index = addLinearVelocityRobotAgent(enemy_robot, goal_position);
+//            enemy_robot_id_map.emplace(enemy_robot.id(), agent_index);
+//        }
+//    }
+//    else
+//    {
+//        // Update Agents
+//        for (const Robot &friendly_robot : friendly_team)
+//        {
+//            auto agent_index_iter = friendly_robot_id_map.find(friendly_robot.id());
+//            if (agent_index_iter != friendly_robot_id_map.end())
+//            {
+//                unsigned int agent_index = agent_index_iter->second;
+//                Point position = friendly_robot.position();
+//                agents_[agent_index]->setPosition(Vector2(position.x(), position.y()));
+//            }
+//            else
+//            {
+//                // Robot is new
+//            }
+//        }
+//
+//        for (const Robot &enemy_robot : enemy_team)
+//        {
+//            auto agent_index_iter = enemy_robot_id_map.find(enemy_robot.id());
+//            if (agent_index_iter != enemy_robot_id_map.end())
+//            {
+//                unsigned int agent_index = agent_index_iter->second;
+//                Point position = enemy_robot.position();
+//                agents_[agent_index]->setPosition(Vector2(position.x(), position.y()));
+//            }
+//            else
+//            {
+//                // Robot is new
+//            }
+//        }
+//    }
+//
+//    if (ball_agent_id == -1)
+//    {
+//        // Ball should be treated as an agent (obstacle)
+//        const Ball &ball = world.ball();
+//        Vector2 position(ball.position().x(), ball.position().y());
+//        Vector2 velocity(ball.velocity().x(), ball.velocity().y());
+//        Vector2 goal_pos   = position + 100 * velocity;
+//        float acceleration = ball.acceleration().length();
+//        // Minimum of 0.5-meter distance away from the ball, if the ball is an obstacle
+//        float ball_radius = 0.5f + BALL_AGENT_RADIUS_OFFSET;
+//
+//        std::size_t agent_index = addLinearVelocityAgent(position, ball_radius, velocity, abs(velocity),
+//                               acceleration, addGoal(goal_pos), 0.1f);
+//        ball_agent_id = agent_index;
+//    }
+//    else
+//    {
+//        Point position = world.ball().position();
+//        agents_[ball_agent_id]->setPosition(Vector2(position.x(), position.y()));
+//    }
+//}
+
 void Simulator::updateWorld(const World &world)
 {
+    if (update_world++ % 10 != 0) {
+        return;
+    }
     // Reset all agents
     agents_.clear();
     friendly_robot_id_map.clear();
