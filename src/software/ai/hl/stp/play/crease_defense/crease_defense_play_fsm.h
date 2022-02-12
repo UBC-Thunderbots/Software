@@ -1,7 +1,5 @@
 #pragma once
 
-#include <include/boost/sml.hpp>
-
 #include "shared/constants.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
@@ -25,9 +23,9 @@ struct CreaseDefensePlayFSM
     /**
      * Creates a crease defense play FSM
      *
-     * @param play_config the play config for this play FSM
+     * @param ai_config the play config for this play FSM
      */
-    explicit CreaseDefensePlayFSM(std::shared_ptr<const PlayConfig> play_config);
+    explicit CreaseDefensePlayFSM(std::shared_ptr<const AiConfig> ai_config);
 
     /**
      * Action to defend the defense area
@@ -60,6 +58,6 @@ struct CreaseDefensePlayFSM
     }
 
    private:
-    std::shared_ptr<const PlayConfig> play_config;
+    std::shared_ptr<const AiConfig> ai_config;
     std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defenders;
 };
