@@ -102,29 +102,13 @@ echo "================================================================"
 echo "Upgrading Pip Version"
 echo "================================================================"
 
-<<<<<<< HEAD
-if ! /usr/bin/python3.8 -m pip install --upgrade pip ; then
-=======
 if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
->>>>>>> e002cc9b2f2fa5b6504e00edbc839af0183686a9
     echo "##############################################################"
     echo "Error: Setting up virtual environment failed"
     echo "##############################################################"
     exit 1
 fi
 
-<<<<<<< HEAD
-if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
-=======
-if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
->>>>>>> e002cc9b2f2fa5b6504e00edbc839af0183686a9
-    echo "##############################################################"
-    echo "Error: Upgrading pip version in venv failed"
-    echo "##############################################################"
-    exit 1
-fi
-
-<<<<<<< HEAD
 if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
     echo "##############################################################"
     echo "Error: Upgrading pip version in venv failed"
@@ -132,8 +116,6 @@ if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
     exit 1
 fi
 
-=======
->>>>>>> e002cc9b2f2fa5b6504e00edbc839af0183686a9
 
 if ! sudo /opt/tbotspython/bin/pip3 install pyqt5  ; then
     echo "##############################################################"
