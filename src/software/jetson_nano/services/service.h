@@ -1,3 +1,4 @@
+#pragma once
 /**
  * A service defines an interface with hardware/software on the robot.
  */
