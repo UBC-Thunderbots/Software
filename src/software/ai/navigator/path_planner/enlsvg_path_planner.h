@@ -51,6 +51,8 @@ class EnlsvgPathPlanner : public PathPlanner
     std::optional<Path> findPath(const Point &start, const Point &end,
                                  const Rectangle &navigable_area,
                                  const std::vector<ObstaclePtr> &) override;
+                                 
+    std::optional<Path> findPath(const Point &start, const Point &end);
 
     /**
      * Returns internal resolution of the grid.

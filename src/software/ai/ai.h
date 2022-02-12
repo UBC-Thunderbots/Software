@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "software/ai/hl/hl.h"
+//#include "software/ai/hl/hl.h"
 #include "software/ai/navigator/navigator.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"

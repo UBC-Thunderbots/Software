@@ -75,6 +75,11 @@ std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start, const Point 
         return std::nullopt;
     }
 
+    return findPath(start, end);
+}
+
+std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start, const Point &end)
+{
     // Find closest unblocked points in case the start and end positions are inside
     // obstacles
     EnlsvgPoint enlsvg_start = convertPointToEnlsvgPoint(start);
