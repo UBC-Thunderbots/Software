@@ -8,20 +8,15 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 SimulatedPlayTestFixture::SimulatedPlayTestFixture()
     : friendly_ai_config(friendly_mutable_thunderbots_config->getMutableAiConfig()),
-      friendly_ai_control_config(friendly_mutable_thunderbots_config->getMutableAiControlConfig()),
-      friendly_sensor_fusion_config(
-          friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()),
-      enemy_ai_config(enemy_mutable_thunderbots_config->getMutableAiConfig()),
-      enemy_ai_control_config(enemy_mutable_thunderbots_config->getMutableAiControlConfig()),
-      enemy_sensor_fusion_config(
-          enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()),
-      game_state(),
-      friendly_ai(friendly_thunderbots_config->getAiConfig(),
-         friendly_thunderbots_config->getAiControlConfig(),
-         friendly_thunderbots_config->getPlayConfig()),
-      enemy_ai(enemy_thunderbots_config->getAiConfig(),
-         enemy_thunderbots_config->getAiControlConfig(),
-         enemy_thunderbots_config->getPlayConfig())
+    friendly_sensor_fusion_config(
+            friendly_mutable_thunderbots_config->getMutableSensorFusionConfig()),
+    enemy_ai_config(enemy_mutable_thunderbots_config->getMutableAiConfig()),
+    enemy_sensor_fusion_config(
+            enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()),
+    game_state(),
+    friendly_ai(friendly_thunderbots_config->getAiConfig()),
+    enemy_ai(enemy_mutable_thunderbots_config->getAiConfig())
+
 {
 }
 
@@ -31,24 +26,18 @@ void SimulatedPlayTestFixture::SetUp()
     
     // Friendly Config
     friendly_ai_config         = friendly_mutable_thunderbots_config->getMutableAiConfig();
-    friendly_ai_control_config = friendly_mutable_thunderbots_config->getMutableAiControlConfig();
     friendly_sensor_fusion_config =
         friendly_mutable_thunderbots_config->getMutableSensorFusionConfig();
 
-    friendly_ai = AI(friendly_thunderbots_config->getAiConfig(),
-                    friendly_thunderbots_config->getAiControlConfig(),
-                    friendly_thunderbots_config->getPlayConfig());
+    friendly_ai = AI(friendly_thunderbots_config->getAiConfig());
 
     // Enemy Config
-    enemy_ai_config             = enemy_mutable_thunderbots_config->getMutableAiConfig();
-    enemy_ai_control_config     = enemy_mutable_thunderbots_config->getMutableAiControlConfig();
+    enemy_ai_config             = enemy_mutable_thunderbots_config->getMutableAiConfig();;
     enemy_sensor_fusion_config =
         enemy_mutable_thunderbots_config->getMutableSensorFusionConfig();
-    enemy_ai = AI(enemy_thunderbots_config->getAiConfig(),
-                  enemy_thunderbots_config->getAiControlConfig(),
-                  enemy_thunderbots_config->getPlayConfig());
+    enemy_ai = AI(enemy_thunderbots_config->getAiConfig());
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void SimulatedPlayTestFixture::setFriendlyGoalie(RobotId goalie_id)
 {
     friendly_sensor_fusion_config->getMutableFriendlyGoalieId()->setValue(
@@ -57,45 +46,31 @@ void SimulatedPlayTestFixture::setFriendlyGoalie(RobotId goalie_id)
 
 void SimulatedPlayTestFixture::setEnemyGoalie(RobotId goalie_id)
 {
-    enemy_sensor_fusion_config->getMutableEnemyGoalieId()->setValue(
+    friendly_sensor_fusion_config->getMutableEnemyGoalieId()->setValue(
         static_cast<int>(goalie_id));
 }
 
 void SimulatedPlayTestFixture::setFriendlyAIPlay(const std::string& friendly_ai_play)
 {
-    friendly_ai_control_config->getMutableOverrideAiPlay()->setValue(true);
-    friendly_ai_control_config->getMutableCurrentAiPlay()->setValue(friendly_ai_play);
+    friendly_ai_config->getMutableAiControlConfig()->getMutableOverrideAiPlay()->setValue(true);
+    friendly_ai_config->getMutableAiControlConfig()->getMutableCurrentAiPlay()->setValue(friendly_ai_play);
 }
 
 void SimulatedPlayTestFixture::setEnemyAIPlay(const std::string& enemy_ai_play)
 {
-    enemy_ai_control_config->getMutableOverrideAiPlay()->setValue(true);
-    enemy_ai_control_config->getMutableCurrentAiPlay()->setValue(enemy_ai_play);
+    enemy_ai_config->getMutableAiControlConfig()->getMutableOverrideAiPlay()->setValue(true);
+    enemy_ai_config->getMutableAiControlConfig()->getMutableCurrentAiPlay()->setValue(enemy_ai_play);
 }
 
-/////////////////////////////////////////////////////////////
-// TODO: THIS IS REALLY BORKED
-void SimulatedPlayTestFixture::setFriendlyAIPlayConstructor(
-    std::function<std::unique_ptr<Play>()> friendly_play_constructor)
+void SimulatedPlayTestFixture::setFriendlyAIPlayConstructor(std::optional<PlayConstructor> friendly_play_constructor)
 {
     friendly_ai.overridePlayConstructor(friendly_play_constructor);
 }
 
-void SimulatedPlayTestFixture::setEnemyAIPlayConstructor(
-    std::function<std::unique_ptr<Play>()> enemy_play_constructor)
+void SimulatedPlayTestFixture::setEnemyAIPlayConstructor(std::optional<PlayConstructor> enemy_play_constructor)
 {
     enemy_ai.overridePlayConstructor(enemy_play_constructor);
-    ai_config->getMutableAiControlConfig()->getMutableOverrideAiPlay()->setValue(true);
-    ai_config->getMutableAiControlConfig()->getMutableCurrentAiPlay()->setValue(ai_play);
 }
-
-void SimulatedPlayTestFixture::setAIPlayConstructor(
-    std::optional<PlayConstructor> constructor)
-{
-    ai.overridePlayConstructor(constructor);
-}
-//////////////////////////////////////////////////////////
-
 
 void SimulatedPlayTestFixture::setRefereeCommand(
     const RefereeCommand& current_referee_command,

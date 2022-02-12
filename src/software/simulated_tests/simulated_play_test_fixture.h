@@ -111,10 +111,8 @@ class SimulatedPlayTestFixture : public SimulatedTestFixture
 
     // The configs being used in simulation
     std::shared_ptr<AiConfig> friendly_ai_config;
-    std::shared_ptr<AiControlConfig> friendly_ai_control_config;
     std::shared_ptr<SensorFusionConfig> friendly_sensor_fusion_config;
     std::shared_ptr<AiConfig> enemy_ai_config;
-    std::shared_ptr<AiControlConfig> enemy_ai_control_config;
     std::shared_ptr<SensorFusionConfig> enemy_sensor_fusion_config;
     
     GameState game_state;
