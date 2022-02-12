@@ -41,6 +41,10 @@ if __name__ == "__main__":
     log_dock = Dock("logs", size=(500, 100))
     log_dock.addWidget(logs)
 
+    # Setup 'Chicker' widget
+    chicker_dock = Dock("chicker", size=(100,100))
+    # chicker_dock.addWidget(create a new widget)
+
     # Configure Docks
     dock_area.addDock(field_dock, "left")
     dock_area.addDock(log_dock, "bottom", field_dock)
