@@ -7,26 +7,12 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-using Zones = std::unordered_set<EighteenZoneId>;
-
-OffensePlay::OffensePlay(std::shared_ptr<const PlayConfig> config)
+OffensePlay::OffensePlay(std::shared_ptr<const AiConfig> config)
     : Play(config, true),
-      shoot_or_pass_play(std::make_shared<ShootOrPassPlay>(play_config)),
-      crease_defense_play(std::make_shared<CreaseDefensePlay>(play_config))
+      shoot_or_pass_play(std::make_shared<ShootOrPassPlay>(ai_config)),
+      crease_defense_play(std::make_shared<CreaseDefensePlay>(ai_config))
 
 {
-}
-
-bool OffensePlay::isApplicable(const World &world) const
-{
-    return world.gameState().isPlaying() &&
-           (world.getTeamWithPossession() == TeamSide::FRIENDLY);
-}
-
-bool OffensePlay::invariantHolds(const World &world) const
-{
-    return world.gameState().isPlaying() &&
-           (world.getTeamWithPossession() == TeamSide::FRIENDLY);
 }
 
 void OffensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
@@ -36,11 +22,6 @@ void OffensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     {
         yield({{}});
     }
-}
-
-bool OffensePlay::done() const
-{
-    return shoot_or_pass_play->done();
 }
 
 void OffensePlay::updateTactics(const PlayUpdate &play_update)
@@ -79,4 +60,4 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, OffensePlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, OffensePlay, AiConfig> factory;

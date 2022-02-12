@@ -1,6 +1,32 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "euclidean_to_wheel",
+    srcs = [
+        "euclidean_to_wheel.cpp",
+    ],
+    hdrs = [
+        "euclidean_to_wheel.h",
+    ],
+    deps = [
+        "//shared:robot_constants",
+        "@eigen",
+    ],
+)
+
+cc_test(
+    name = "euclidean_to_wheel_test",
+    srcs = [
+        "euclidean_to_wheel_test.cpp",
+    ],
+    deps = [
+        ":euclidean_to_wheel",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+    ],
+)
+
+cc_library(
     name = "physics",
     srcs = [
         "physics.cpp",
@@ -11,6 +37,7 @@ cc_library(
     deps = [
         "//software/geom:point",
         "//software/time:duration",
+        "@eigen",
     ],
 )
 

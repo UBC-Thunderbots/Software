@@ -22,9 +22,10 @@ This file outlines a list of common things that should be addressed when opening
     Link any issues that this PR resolved. Ex. `resolves #1, #2, and #5` (note that they MUST be specified like this so Github can automatically close them then this PR merges)
 -->
 
-### Length Justification
+### Length Justification and Key Files to Review
 
-<!-- If this pull request is longer then **500** lines (additions + deletions), please justify here why we *cannot* break this up into multiple pull requests. -->
+<!-- If this pull request is longer then **500** lines (additions + deletions), please justify here why we *cannot* break this up into multiple pull requests
+and list the key files that contain the main idea of your PR -->
 
 ### Review Checklist
 
@@ -38,7 +39,6 @@ This file outlines a list of common things that should be addressed when opening
 - [ ] **Remove all commented out code**
 - [ ] **Remove extra print statements**: for example, those just used for testing
 - [ ] **Resolve all TODO's**: All `TODO` (or similar) statements should either be completed or associated with a github issue
-- [ ] **Justify drops in code coverage**: If this PR results in a non-trivial drop in code coverage (a bot should post a coverage diagram as a comment), please justify why we can't test the code that's not covered.
 
 <!--
     Feel free to make additions of things that we should be checking to this file if you think there's something missing!!!!

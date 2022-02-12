@@ -10,11 +10,7 @@
 class ScoringWithStaticDefendersPlay : public Play
 {
    public:
-    ScoringWithStaticDefendersPlay(std::shared_ptr<const PlayConfig> config);
-
-    bool isApplicable(const World &world) const override;
-
-    bool invariantHolds(const World &world) const override;
+    ScoringWithStaticDefendersPlay(std::shared_ptr<const AiConfig> config);
 
     void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
 

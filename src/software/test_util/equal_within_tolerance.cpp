@@ -230,4 +230,23 @@ namespace TestUtil
 
         return assertion_result;
     }
+
+    ::testing::AssertionResult equalWithinTolerance(const Eigen::MatrixXd &matrix1,
+                                                    const Eigen::MatrixXd &matrix2,
+                                                    double tolerance)
+    {
+        auto distance = matrix1 - matrix2;
+        auto norm     = distance.norm();
+
+        if (equalWithinTolerance(norm, 0, tolerance))
+        {
+            return ::testing::AssertionSuccess();
+        }
+        else
+        {
+            return ::testing::AssertionFailure() << "Matrix 1 was \n"
+                                                 << matrix1 << "\n, matrix 2 was \n"
+                                                 << matrix2;
+        }
+    }
 };  // namespace TestUtil

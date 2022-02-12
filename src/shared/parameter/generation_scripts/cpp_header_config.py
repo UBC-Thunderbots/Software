@@ -5,12 +5,14 @@ from collections.abc import Iterable
 from case_conversion import to_snake_case
 import networkx as nx
 
+TAB_SIZE = 4
+HALF_TAB_SIZE = 2
+INDENT_ONCE = 1
+INDENT_TWICE = 2
+
 #######################################################################
 #                             CPP Config                              #
 #######################################################################
-
-TAB_SIZE = 4
-HALF_TAB_SIZE = 2
 
 FORWARD_DECLARATION = "class {config_name};"
 
@@ -61,6 +63,10 @@ CONFIG_CLASS = """class {config_name} : public Config
 
     const ParameterList& getParameterList() const;
 
+    TbotsProto::{config_name} toProto() const;
+
+    void loadFromProto(const TbotsProto::{config_name}& config_proto);
+
    private:
     MutableParameterList mutable_internal_param_list;
     ParameterList immutable_internal_param_list;
@@ -71,7 +77,8 @@ CONFIG_CLASS = """class {config_name} : public Config
 
 class CppHeaderConfig(object):
     def __init__(self, config_name: str, is_top_level_config: bool = False):
-        """Initializes a CppHeaderConfig object, which can generate various strings specific to a config through properties. Some of the properties depend on having the dependency_graph set.
+        """Initializes a CppHeaderConfig object, which can generate various strings specific to a
+        config through properties. Some of the properties depend on having the dependency_graph set.
 
         :param config_name: the name of the config
         :param is_top_level_config: true if this is the top level config, false otherwise
@@ -177,7 +184,7 @@ class CppHeaderConfig(object):
         return CppHeaderConfig.join_with_tabs(
             ",\n",
             [conf.included_config_constructor_arg_entry for conf in self.configs],
-            2,
+            INDENT_TWICE,
         )
 
     @property
@@ -212,7 +219,7 @@ class CppHeaderConfig(object):
             "\n\n",
             [param.parameter_public_entry for param in self.parameters]
             + [conf.config_public_entry for conf in self.configs],
-            1,
+            INDENT_ONCE,
         )
 
     @property
@@ -221,5 +228,5 @@ class CppHeaderConfig(object):
             "\n",
             [param.parameter_private_entry for param in self.parameters]
             + [conf.config_private_entry for conf in self.configs],
-            1,
+            INDENT_ONCE,
         )

@@ -87,6 +87,21 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "simulated_er_force_sim_tactic_test_fixture",
+    testonly = True,
+    srcs = ["simulated_er_force_sim_tactic_test_fixture.cpp"],
+    hdrs = ["simulated_er_force_sim_tactic_test_fixture.h"],
+    deps = [
+        ":simulated_er_force_sim_test_fixture",
+        "//software/ai/hl/stp/tactic",
+        "//software/ai/navigator",
+        "//software/ai/navigator/path_manager:velocity_obstacle_path_manager",
+        "//software/ai/navigator/path_planner:theta_star_path_planner",
+        "@gtest",
+    ],
+)
+
 cc_test(
     name = "simulated_play_test_fixture_test",
     srcs = ["simulated_play_test_fixture_test.cpp"],
