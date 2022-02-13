@@ -80,7 +80,7 @@ TEST(RedisKeyValueStoreTests, DISABLED_cpp_redis_get_and_set_speed_test)
 }
 
 
-TEST(RedisImplTests, redis_client_get_and_set_impl_test)
+TEST(RedisImplTests, DISABLED_redis_client_get_and_set_impl_test)
 {
     auto redis = RedisClient("127.0.0.1", 6379);
 
