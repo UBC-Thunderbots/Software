@@ -30,20 +30,28 @@ RedisClient::RedisClient(std::string host, size_t port)
     client.config_get("notify-keyspace-events", [this](cpp_redis::reply &reply) {
         if (reply.as_array()[1].as_string().empty()) {
             LOG(INFO) << "Redis keyspace event notifications are disabled. Enabling.";
-            std::cout << "Redis keyspace event notifications are disabled. Enabling." << std::endl;
             client.config_set("notify-keyspace-events", "KEA");
             client.commit();
         }
     }).commit();
 
-    // ensure that redis server is accepting all connection's
-//    client.config_get("bind", [this](cpp_redis::reply &reply) {
-//        if (reply.as_array()[1].as_string().empty()) {
-//            LOG(INFO) << "Redis keyspace event notifications are disabled. Enabling.";
-//            client.config_set("bind", "0.0.0.0");
-//            client.commit();
-//        }
-//    }).commit();
+    // ensure that redis server is accepting connections from any host (potentially unsafe)
+    client.config_get("bind", [this](cpp_redis::reply &reply) {
+        if (reply.as_array()[1].as_string().empty()) {
+            LOG(INFO) << "Redis keyspace event notifications are disabled. Enabling.";
+            client.config_set("bind", "0.0.0.0");
+            client.commit();
+        }
+    }).commit();
+    // ensure that redis server has AOF (append-only file) persistence
+    client.config_get("appendonly", [this](cpp_redis::reply &reply) {
+        if (reply.as_array()[1].as_string() == "no") {
+            LOG(INFO) << "Redis AOF persistence disabled. Enabling.";
+            std::cout << "Redis AOF persistence disabled. Enabling." << std::endl;
+            client.config_set("appendonly", "yes");
+            client.commit();
+        }
+    }).commit();
 
     // subscribe to key 'set' event within the keyspace
     // adds key and its value to the key value set
