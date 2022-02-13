@@ -14,8 +14,6 @@
   - [Getting the Code](#getting-the-code)
   - [Running the setup scripts](#running-the-setup-scripts)
     - [Installing Software Dependencies](#installing-software-dependencies)
-    - [Installing Firmware Dependencies](#installing-firmware-dependencies)
-    - [Setting Up USB Permissions](#setting-up-usb-permissions)
     - [Installing an IDE](#installing-an-ide)
       - [CLion](#clion)
         - [Getting your Student License](#getting-your-student-license)
@@ -33,10 +31,6 @@
     - [Debugging from the Command line](#debugging-from-the-command-line)
   - [Profiling](#profiling)
   - [Building for Jetson Nano](#building-for-jetson-nano)
-  - [Flashing And Debugging A STM32F4 MCU](#flashing-and-debugging-a-stm32f4-mcu)
-  - [Flashing the Radio Dongle](#flashing-the-radio-dongle)
-  - [Flashing And Debugging A STM32H7 MCU](#flashing-and-debugging-a-stm32h7-mcu)
-  - [Working with CubeMX to regenerate code](#working-with-cubemx-to-regenerate-code)
   - [Setting up Virtual Robocup 2021](#setting-up-virtual-robocup-2021)
     - [Setting up the SSL Simulation Environment](#setting-up-the-ssl-simulation-environment)
     - [Pushing a Dockerfile to dockerhub](#pushing-a-dockerfile-to-dockerhub)
@@ -90,21 +84,6 @@ We have several setup scripts to help you easily install the necessary dependenc
 * Run `./setup_software.sh`
   * You will be prompted for your admin password
   * This script will install everything necessary in order to build and run our main `AI` software 
-
-### Installing Firmware Dependencies
-
-* Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
-* Run `./setup_firmware.sh`
-  * You will be prompted for your admin password
-  * This script will install everything necessary in order to build and run our robot firmware
-* If you are installing legacy robot firmware, e.g. STM32 devices, run `./setup_legacy_firmware.sh` instead.
-
-### Setting Up USB Permissions
-
-* inside a terminal, navigate to the `environment_setup` folder. Eg. `cd path/to/the/repository/Software/environment_setup` 
-  * Run `./setup_udev_rules.sh`
-    * You will be prompted for your admin password
-    * This script will set up the USB permissions required in order to use our radio/wifi dongle
 
 ### Installing an IDE
 
@@ -236,37 +215,6 @@ This will output the file at the _absolute_ path given via the `--callgrind-out-
 ## Building for Jetson Nano 
 
 To build for the Jetson Nano, build the target with the `--cpu=jetson_nano` flag and the toolchain will automatically build using the ARM toolchain for Jetson Nano. For example, `bazel build --cpu=jetson_nano //software/geom/...`.
-
-## Flashing And Debugging A STM32F4 MCU
-1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies), and have a STM32F4 based main board plugged into your computer. Do not plug both the dongle and the robot at the same time!
-2. Make sure the robot is elevated, with the wheels not touching any surface to avoid experimental firmware causing accidental damage.
-3. From the `src` folder, to flash the radio dongle, run `bazel run --cpu=stm32f4 //firmware/tools:legacy_flash_firmware robot`
-4. For the robot, make sure the robot is in bootloader mode (BL switch on the piano keys is down), and push the power switch away from the dribbler (i.e towards the back of the robot) and hold it there before running the command.
-5. There should be a progress bar indicating the flashing progress, hold the switch back until the process finishes.
-6. When the process is finished, release the power switch, push the BL switch back up, and the robot now has been flashed!
-7. To see print outs from the robot, run `sudo cat /dev/ttyACM0`. If `ttyACM0` isn't the right device, run `ls /dev/tty*` with the robot disconnected, and again with the robot connected, and replace `ttyACM0` with the new device that has been added. The radio dongle does not have this feature.
-
-## Flashing the Radio Dongle
-1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies) and have a dongle plugged into your computer. Do not plug both the dongle and the robot at the same time!
-2. From the `src` folder, to flash the radio dongle, run `bazel run --cpu=stm32f4 //firmware/tools:legacy_flash_firmware radio_dongle`.
-3. If the dongle has a blue pcb, then follow step (a). If the dongle has a green pcb then follow step (b). There should be a progress bar indicating the flashing progress.
-
-    (a) Hold down the red button while unplugging and plugging in the dongle. There should be a single orange light on. Then run the script described in step 2.
-
-    (b) Hold down the yellow button while running the script described in step 2.
-
-## Flashing And Debugging A STM32H7 MCU
-1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies), and have a [NUCLEO-H743ZI](https://www.st.com/en/evaluation-tools/nucleo-h743zi.html) plugged into your computer.
-2. From the `src` folder, run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware/tools:stm32h7_firmware`. We specify `--cpu=stm32h7` because we want to compile code for the stm32h7 MCU (rather then a `x86_64` processor like you have in your computer), and `--compilation_mode=dbg` in order to build in the debug symbols required so you can step through the code and see what's going on. You'll be given a list of elf files to choose from.
-3. If you want just flash the firmware, go to step 5. Assuming you choose 0 from the list in step (2), run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware/tools:stm32h7_firmware 0 debug`. This will load the `.elf` file associated with (0) to the nucleo and put you into a gdb prompt.
-4. At this point you should be in a gdb window. Take a look at [this tutorial](https://www.cprogramming.com/gdb.html) for some basics.
-5. To flash the firmware without debugging, run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware/tools:stm32h7_firmware 0 program`
-
-## Working with CubeMX to regenerate code
-1. Make sure you've followed [Installing Firmware Dependencies](#installing-firmware-dependencies)
-2. To regenerate code from the `.ioc` file, run `bazel run //firmware/tools:cubemx_regen path/to/directory/with/.ioc`. The directory that is passed in as an argument must only contain 1 ioc file, which will be used to generate code into the same directory.
-
-To make sure we are all using the same cube version, run `STM32CubeMX` when editing the `.ioc` file.
 
 ## Setting up Virtual Robocup 2021
 

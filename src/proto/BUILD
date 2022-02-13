@@ -13,7 +13,6 @@ proto_library(
         "primitive.proto",
         "robot_log_msg.proto",
         "robot_status_msg.proto",
-        "standalone_stimulator_config.proto",
         "tbots_software_msgs.proto",
         "tbots_timestamp_msg.proto",
         "team.proto",

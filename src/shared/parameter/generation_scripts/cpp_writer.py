@@ -10,15 +10,6 @@ import networkx as nx
 #                             CPP Writer                              #
 #######################################################################
 
-# The escape characters at the front change the color to red when
-# printed in a terminal, and the escape characters at the end clears and resets
-# back to the original color. More info can be found here:
-# https://stackoverflow.com/questions/287871/print-in-terminal-with-colors
-AUTOGEN_FAILURE_MSG = """\033[91m====================================================\033[0m
-\033[91m                CFG AUTOGEN FAILURE
-\u001b[34;1m Reason: {}
-\033[91m====================================================\033[0m"""
-
 AUTOGEN_WARNING = """
 /**
  *  !! WARNING !!
@@ -37,6 +28,7 @@ CONFIG_H = (
     '#include "shared/parameter/enumerated_parameter.h"\n'
     '#include "shared/parameter/numeric_parameter.h"\n'
     '#include "software/util/generic_factory/generic_factory.h"\n'
+    '#include "shared/parameter/dynamic_parameters.pb.h"\n'
     "\n"
     "{include_headers}\n"
     "\n"
@@ -64,8 +56,9 @@ class CppWriter(object):
     def create_header_config_list_from_metadata(
         top_level_config_name: str, config_metadata: dict
     ) -> List[CppHeaderConfig]:
-        """Takes the config metadata loaded by config_yaml_loader, and converts it to a list of CppHeaderConfig objects;
-        this includes setting the dependency graphs needed for the configs.
+        """Takes the config metadata loaded by config_yaml_loader, and converts
+        it to a list of CppHeaderConfig objects; this includes setting the
+        dependency graphs needed for the configs.
 
         :param top_level_config_name: the name of the top level config
         :param config_metadata: the dictionary containing the config metadata
@@ -107,8 +100,8 @@ class CppWriter(object):
                     dependency_graph.add_edge(config_name, included_config_name)
 
         # for each node, create a subgraph of relevant dependencies
-        # Note: This can be optimized by doing traversal from each source, and creating subgraphs for
-        # all its descendants during the same traversal
+        # Note: This can be optimized by doing traversal from each source,
+        # and creating subgraphs for all its descendants during the same traversal
         for node in dependency_graph.nodes:
             # find the subgraph of the dependency graph relevant to the current node
             dependency_graph.nodes[node][
@@ -130,8 +123,9 @@ class CppWriter(object):
     def create_source_config_list_from_metadata(
         top_level_config_name: str, config_metadata: dict
     ) -> List[CppSourceConfig]:
-        """Takes the config metadata loaded by config_yaml_loader, and converts it to a list of CppSourceConfig objects;
-        this includes setting the dependency graphs needed for the configs.
+        """Takes the config metadata loaded by config_yaml_loader, and
+        converts it to a list of CppSourceConfig objects; this includes
+        setting the dependency graphs needed for the configs.
 
         :param top_leve_config_name: the name of the top level config
         :param config_metadata: the dictionary containing the config metadata
