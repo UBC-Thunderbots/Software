@@ -1,15 +1,16 @@
 #pragma once
 
-#include "cpp_redis/cpp_redis"
-#include "string"
 #include "chrono"
-#include "unordered_map"
-#include "software/logger/logger.h"
+#include "cpp_redis/cpp_redis"
 #include "shared/constants.h"
+#include "software/logger/logger.h"
+#include "string"
+#include "unordered_map"
 
 
-class RedisClient {
-public:
+class RedisClient
+{
+   public:
     /**
      * Service that communicates with various external services
      * @param value The IP of the Redis server, default localhost
@@ -32,12 +33,12 @@ public:
      */
     cpp_redis::reply get(const std::string &key);
 
-//    /**
-//     * polls redis service for value corresponding to key; non-blocking
-//     * @param key
-//     * @return
-//     */
-//    std::optional<cpp_redis::reply> poll(const std::string &key);
+    //    /**
+    //     * polls redis service for value corresponding to key; non-blocking
+    //     * @param key
+    //     * @return
+    //     */
+    //    std::optional<cpp_redis::reply> poll(const std::string &key);
 
     /**
      * sets a key value pair in the redis database
@@ -53,7 +54,7 @@ public:
 
 
 
-private:
+   private:
     cpp_redis::subscriber subscriber;
     cpp_redis::client client;
     // Connection Parameters
