@@ -87,6 +87,7 @@ http_archive(
 http_archive(
     name = "rules_proto",
     strip_prefix = "rules_proto-e507ccded37c389186afaeb2b836ec576dc875dc",
+    sha256 = "ba66b430aaed1b6d2530154fd5ff968fb810ee0936edfe5f48e1f1c36ff2ea65",
     urls = [
         "https://github.com/bazelbuild/rules_proto/archive/e507ccded37c389186afaeb2b836ec576dc875dc.zip",
     ],
