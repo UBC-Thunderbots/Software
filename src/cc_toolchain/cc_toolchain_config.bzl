@@ -619,6 +619,7 @@ def _jetson_nano_impl(ctx):
                     "-lm",
                     "-lc",
                     "-lgcc",
+                    "-static",
                     "-Wl,--end-group",
                 ])],
             ),
@@ -680,18 +681,6 @@ def _jetson_nano_impl(ctx):
 
     supports_pic_feature = feature(name = "supports_pic", enabled = True)
 
-    static_libgcc = feature(
-        name = "static-libgcc",
-        flag_sets = [
-            flag_set(
-                actions = ALL_LINK_ACTIONS,
-                flag_groups = [
-                    flag_group(flags = ["-static-libgcc"]),
-                ],
-            ),
-        ],
-    )
-
     lld_feature = feature(
         name = "lld",
         flag_sets = [
@@ -706,7 +695,6 @@ def _jetson_nano_impl(ctx):
 
     features = common.values() + [
         lld_feature,
-        static_libgcc,
         stdlib_feature,
         pic_feature,
         supports_pic_feature,
