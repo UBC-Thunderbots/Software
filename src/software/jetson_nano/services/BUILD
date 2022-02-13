@@ -33,27 +33,3 @@ cc_library(
         "@boost//:asio",
     ],
 )
-
-cc_library(
-    name = "redis",
-    srcs = ["redis.cpp"],
-    hdrs = ["redis.h"],
-    deps = [
-        ":service",
-        "//software/logger",
-        "@cpp_redis",
-    ],
-)
-
-cc_test(
-    name = "redis_test_cpp",
-    srcs = [
-        "redis_test.cpp",
-    ],
-    deps = [
-        ":redis",
-        "//shared/test_util:tbots_gtest_main",
-        "//software/test_util",
-        "@cpp_redis",
-    ],
-)

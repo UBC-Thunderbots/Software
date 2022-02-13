@@ -7,7 +7,7 @@
 #include "cpp_redis/core/subscriber.hpp"
 #include "software/test_util/test_util.h"
 
-#include "software/jetson_nano/services/redis.h"
+#include "software/jetson_nano/redis/redis_client.h"
 
 TEST(RedisKeyValueStoreTests, DISABLED_cpp_redis_get_test) {
     cpp_redis::client client;
@@ -77,7 +77,7 @@ TEST(RedisKeyValueStoreTests, DISABLED_cpp_redis_get_and_set_speed_test) {
 
 TEST(RedisImplTest, DISABLED_cpp_redis_get_and_set_impl_test) {
 
-    auto redis = RedisService("127.0.0.1", 6379);
+    auto redis = RedisClient("127.0.0.1", 6379);
 
     cpp_redis::client client;
     client.connect(

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "cpp_redis/cpp_redis"
-#include "software/jetson_nano/services/service.h"
 #include "string"
 #include "chrono"
 #include "unordered_map"
@@ -9,21 +8,14 @@
 #include "shared/constants.h"
 
 
-class RedisService : public Service {
+class RedisClient {
 public:
-
-    virtual void start() override;
-
-    virtual void stop() override;
-
-    void poll();
-
     /**
      * Service that communicates with various external services
      * @param value The IP of the Redis server, default localhost
      * @param key the key of the Redis server, default 6379
      */
-    explicit RedisService(std::string value, size_t key);
+    explicit RedisClient(std::string value, size_t key);
 
     /**
      * Subscribes to a message channel
@@ -55,7 +47,7 @@ public:
     void set(const std::string &key, const std::string &value);
 
 
-    virtual ~RedisService();
+    virtual ~RedisClient();
 
     std::unordered_map<std::string, std::string> key_value_set_;
 

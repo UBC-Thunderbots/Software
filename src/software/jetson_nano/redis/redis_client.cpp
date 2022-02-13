@@ -1,7 +1,7 @@
-#include "redis.h"
+#include "software/jetson_nano/redis/redis_client.h"
 
 
-RedisService::RedisService(std::string host, size_t port)
+RedisClient::RedisClient(std::string host, size_t port)
         : subscriber(), client(), host_(host), port_(port) {
     subscriber.connect(
             host_, port_,
@@ -48,7 +48,6 @@ RedisService::RedisService(std::string host, size_t port)
     // subscribe to key 'set' event within the keyspace
     // adds key and its value to the key value set
     subscriber.subscribe("__keyevent@0__:set", [this](const std::string &channel, const std::string &key) {
-//        std::cout << "BRUH" << std::endl;
         client.get(key, [this, key](cpp_redis::reply &value) {
             key_value_set_[key] = value.as_string();
             std::cout << key << " : " << value.as_string().c_str() << std::endl;
@@ -58,28 +57,23 @@ RedisService::RedisService(std::string host, size_t port)
     subscriber.commit();
 }
 
-void RedisService::subscribe(const std::string &channel,
-                             void (*subscribe_callback)(std::string, std::string)) {
+void RedisClient::subscribe(const std::string &channel,
+                            void (*subscribe_callback)(std::string, std::string)) {
     subscriber.subscribe(channel, subscribe_callback);
 }
 
-cpp_redis::reply RedisService::get(const std::string &key) {
+cpp_redis::reply RedisClient::get(const std::string &key) {
     auto future = client.get(key);
     client.commit();
     return future.get();
 }
 
-void RedisService::set(const std::string &key, const std::string &value) {
+void RedisClient::set(const std::string &key, const std::string &value) {
     client.set(key, value);
     client.sync_commit();
 }
 
-
-void RedisService::start() {};
-
-void RedisService::stop() {};
-
-RedisService::~RedisService() {}
+RedisClient::~RedisClient() {}
 
 
 
