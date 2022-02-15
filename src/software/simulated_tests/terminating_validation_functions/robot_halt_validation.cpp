@@ -9,9 +9,10 @@ void robotHalt(std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type&
     {
         double robot_speed = robot.velocity().length();
 
-        if (robot_speed > 0)
+        if (robot_speed > 1e-3)
         {
-            yield("Robot " + std::to_string(robot.id()) + " has not stopped");
+            yield("Robot " + std::to_string(robot.id()) +
+                  " has not stopped and is moving at " + std::to_string(robot_speed));
         }
     }
 }
