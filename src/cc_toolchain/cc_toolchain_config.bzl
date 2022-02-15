@@ -363,6 +363,31 @@ def _make_common_features(ctx):
         ],
     )
 
+    result["pic"] = feature(
+        name = "pic",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
+                flag_groups = [
+                    flag_group(flags = ["-fPIC"]),
+                ],
+            ),
+        ],
+    )
+
+    result["lld"] = feature(
+        name = "lld",
+        flag_sets = [
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [flag_group(flags = [
+                    "-fuse-ld=gold",
+                ])],
+            ),
+        ],
+    )
+
     return result
 
 def _linux_gcc_impl(ctx):
@@ -396,31 +421,6 @@ def _linux_gcc_impl(ctx):
         ],
     )
 
-    static_libgcc = feature(
-        name = "static-libgcc",
-        flag_sets = [
-            flag_set(
-                actions = ALL_LINK_ACTIONS,
-                flag_groups = [
-                    flag_group(flags = ["-static-libgcc"]),
-                ],
-            ),
-        ],
-    )
-
-    pic_feature = feature(
-        name = "pic",
-        enabled = True,
-        flag_sets = [
-            flag_set(
-                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
-                flag_groups = [
-                    flag_group(flags = ["-fPIC"]),
-                ],
-            ),
-        ],
-    )
-
     supports_pic_feature = feature(name = "supports_pic", enabled = True)
 
     stdlib_feature = feature(
@@ -434,18 +434,6 @@ def _linux_gcc_impl(ctx):
                     "-ldl",
                     "-lrt",
                     "-lstdc++fs",
-                ])],
-            ),
-        ],
-    )
-
-    lld_feature = feature(
-        name = "lld",
-        flag_sets = [
-            flag_set(
-                actions = ALL_LINK_ACTIONS,
-                flag_groups = [flag_group(flags = [
-                    "-fuse-ld=gold",
                 ])],
             ),
         ],
@@ -527,28 +515,25 @@ def _linux_gcc_impl(ctx):
     common_feature = feature(
         name = "common",
         implies = [
-            "builtin_include_directories",
+            "build-id",
             "c++2a",
             "colour",
             "determinism",
-            "hardening",
-            "build-id",
-            "no-canonical-prefixes",
-            "stdlib",
-            "lld",
             "frame-pointer",
+            "hardening",
+            "lld",
+            "no-canonical-prefixes",
+            "pic",
             "static_link_cpp_runtimes",
+            "stdlib",
         ],
     )
 
     features = common.values() + [
-        static_libgcc,
-        pic_feature,
         supports_pic_feature,
         builtin_include_directories_feature,
         common_feature,
         stdlib_feature,
-        lld_feature,
         coverage_feature,
         opt_feature,
         runtime_library_search_directories,
@@ -657,46 +642,23 @@ def _jetson_nano_impl(ctx):
     common_feature = feature(
         name = "common",
         implies = [
-            "stdlib",
+            "build-id",
             "c++2a",
             "colour",
-            "no-canonical-system-headers",
             "determinism",
+            "frame-pointer",
+            "lld",
             "no-canonical-prefixes",
-        ],
-    )
-
-    pic_feature = feature(
-        name = "pic",
-        enabled = True,
-        flag_sets = [
-            flag_set(
-                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
-                flag_groups = [
-                    flag_group(flags = ["-fPIC"]),
-                ],
-            ),
+            "no-canonical-system-headers",
+            "pic",
+            "stdlib",
         ],
     )
 
     supports_pic_feature = feature(name = "supports_pic", enabled = True)
 
-    lld_feature = feature(
-        name = "lld",
-        flag_sets = [
-            flag_set(
-                actions = ALL_LINK_ACTIONS,
-                flag_groups = [flag_group(flags = [
-                    "-fuse-ld=gold",
-                ])],
-            ),
-        ],
-    )
-
     features = common.values() + [
-        lld_feature,
         stdlib_feature,
-        pic_feature,
         supports_pic_feature,
         common_feature,
         opt_feature,
@@ -705,16 +667,8 @@ def _jetson_nano_impl(ctx):
     cxx_builtin_include_directories = ctx.attr.builtin_include_directories
 
     tool_paths = [
-        tool_path(name = "gcc", path = ctx.attr.host_compiler_path),
-        tool_path(name = "ar", path = ctx.attr.host_compiler_prefix + "/jetson_nano_ar"),
-        tool_path(name = "compat-ld", path = ctx.attr.host_compiler_prefix + "/jetson_nano_ld"),
-        tool_path(name = "cpp", path = ctx.attr.host_compiler_prefix + "/jetson_nano_cpp"),
-        tool_path(name = "gcov", path = ctx.attr.host_compiler_prefix + "/jetson_nano_gcov"),
-        tool_path(name = "ld", path = ctx.attr.host_compiler_prefix + "/jetson_nano_ld"),
-        tool_path(name = "nm", path = ctx.attr.host_compiler_prefix + "/jetson_nano_nm"),
-        tool_path(name = "objcopy", path = ctx.attr.host_compiler_prefix + "/jetson_nano_objcopy"),
-        tool_path(name = "objdump", path = ctx.attr.host_compiler_prefix + "/jetson_nano_objdump"),
-        tool_path(name = "strip", path = ctx.attr.host_compiler_prefix + "/jetson_nano_strip"),
+        tool_path(name = name, path = path)
+        for name, path in ctx.attr.tool_paths.items()
     ]
 
     out = ctx.actions.declare_file(ctx.label.name)
@@ -753,12 +707,11 @@ cc_toolchain_config_jetson_nano = rule(
         ]),
         "builtin_include_directories": attr.string_list(),
         "extra_no_canonical_prefixes_flags": attr.string_list(),
-        "host_compiler_path": attr.string(),
-        "host_compiler_prefix": attr.string(),
         "host_compiler_warnings": attr.string_list(),
         "host_unfiltered_compile_flags": attr.string_list(),
         "target_cpu": attr.string(),
         "target_system_name": attr.string(),
+        "tool_paths": attr.string_dict(),
         "toolchain_identifier": attr.string(),
         "extra_features": attr.string_list(),
     },
