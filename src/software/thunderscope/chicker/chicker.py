@@ -15,13 +15,18 @@ class ChickerWidget(QWidget):
         grid.addWidget(self.createButton("Discharge"), 1, 0)
         grid.addWidget(self.createButton("Chip"), 1, 1)
         grid.addWidget(self.createButton("Auto Chip"), 1, 2)
-        grid.addWidget(self.createSlider(), 2, 0)
-        grid.addWidget(self.createSlider(), 3, 0)
+        grid.addWidget(self.createSlider("Geneva Slider", 0, 5, 1), 2, 0, 1, 3)
+        grid.addWidget(self.createSlider("Power Slider", 0, 100, 10), 3, 0, 1, 3)
         self.setLayout(grid)
 
     def createButton(self, text):
-        groupBox = QGroupBox("Button")
+        groupBox = QGroupBox()
         button = QPushButton(text)
+        groupBox.setStyleSheet("color: white")
+        button.setStyleSheet("color: black")
+
+        # to disable the button: button.setEnabled(False)
+        # we need to also change the color manually when disabling the button (use background-color: grey)
 
         vbox = QVBoxLayout()
         vbox.addWidget(button)
@@ -30,21 +35,19 @@ class ChickerWidget(QWidget):
 
         return groupBox
 
-    def createSlider(self):
-        groupBox = QGroupBox("Slider Example")
-
-        radio1 = QRadioButton("&Radio horizontal slider")
+    def createSlider(self, text, minVal, maxVal, tickSpacing):
+        groupBox = QGroupBox(text)
 
         slider = QSlider(Qt.Horizontal)
-        slider.setFocusPolicy(Qt.StrongFocus)
+        slider.setMinimum(minVal)
+        slider.setMaximum(maxVal)
+        # slider.setFocusPolicy(Qt.StrongFocus)
         slider.setTickPosition(QSlider.TicksBothSides)
-        slider.setTickInterval(10)
-        slider.setSingleStep(1)
-
-        radio1.setChecked(True)
+        slider.setTickInterval(tickSpacing)
+        # slider.setSingleStep(5)
+        groupBox.setStyleSheet("color: white")
 
         vbox = QVBoxLayout()
-        vbox.addWidget(radio1)
         vbox.addWidget(slider)
         vbox.addStretch(1)
         groupBox.setLayout(vbox)
