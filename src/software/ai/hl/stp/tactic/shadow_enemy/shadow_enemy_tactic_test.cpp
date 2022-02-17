@@ -160,7 +160,7 @@ TEST_F(ShadowEnemyTacticTest, test_block_net_then_steal_and_chip)
             Triangle shotTriangle{world_ptr->field().friendlyGoalpostPos(),
                                   world_ptr->field().friendlyGoalpostNeg(),
                                   world_ptr->ball().position()};
-            robotInPolygon(0, shotTriangle, world_ptr, yield);
+            robotInPolygon(shotTriangle, 1, world_ptr, yield);
         },
         [this, tactic](std::shared_ptr<World> world_ptr,
                        ValidationCoroutine::push_type& yield) {
@@ -215,7 +215,7 @@ TEST_F(ShadowEnemyTacticTest, test_block_net_if_enemy_threat_is_null)
             Triangle shotTriangle{world_ptr->field().friendlyGoalpostPos(),
                                   world_ptr->field().friendlyGoalpostNeg(),
                                   world_ptr->ball().position()};
-            robotInPolygon(0, shotTriangle, world_ptr, yield);
+            robotInPolygon(shotTriangle, 1, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
