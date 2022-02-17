@@ -10,6 +10,7 @@ py_binary(
         "//software/networking:threaded_unix_listener_py",
         "//software/thunderscope:colors",
         "//software/thunderscope:constants",
+        "//software/thunderscope/chicker",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
         "//software/thunderscope/log:g3log_widget",

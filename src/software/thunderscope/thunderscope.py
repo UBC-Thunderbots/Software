@@ -3,6 +3,7 @@ import signal
 
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
+from software.thunderscope.chicker.chicker import ChickerWidget
 from field import obstacle_layer, path_layer, world_layer
 
 import pyqtgraph as pg
@@ -42,12 +43,14 @@ if __name__ == "__main__":
     log_dock.addWidget(logs)
 
     # Setup 'Chicker' widget
+    chicker_widget = ChickerWidget()
     chicker_dock = Dock("chicker", size=(100,100))
-    # chicker_dock.addWidget(create a new widget)
+    chicker_dock.addWidget(chicker_widget)
 
     # Configure Docks
     dock_area.addDock(field_dock, "left")
     dock_area.addDock(log_dock, "bottom", field_dock)
+    dock_area.addDock(chicker_dock, "right", field_dock)
 
     def update():
         field.refresh()
