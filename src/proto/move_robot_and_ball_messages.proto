@@ -4,7 +4,7 @@ package TbotsProto;
 
 import "proto/geometry.proto";
 
-message MoveRobotMessage
+message MoveRobot
 {
     Point global_position                   = 1;
     Angle global_orientation                = 2;
@@ -12,7 +12,7 @@ message MoveRobotMessage
     AngularVelocity global_angular_velocity = 4;
 }
 
-message MoveBallMessage
+message MoveBall
 {
     Point global_position       = 1;
     Vector global_velocity      = 2;
