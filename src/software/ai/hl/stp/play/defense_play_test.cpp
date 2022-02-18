@@ -170,6 +170,10 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
             Rectangle right_crease_defender_and_shadow_rect(
                 Point(goalie_position.x(), goalie_position.y()),
                 Point(goalie_position.x() + 1.0, goalie_position.y() - 0.3));
+
+            std::cout << goalie_position.x() << std::endl;
+            std::cout << goalie_position.y() << std::endl;
+            
             robotInPolygon(2, left_crease_defender_rect, world_ptr, yield);
             robotInPolygon(3, right_crease_defender_and_shadow_rect, world_ptr, yield);
 
@@ -178,6 +182,8 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
             Rectangle robot_five_shadowing_rect(Point(-2.75, -0.5), Point(-2.25, -1));
             robotInPolygon(4, right_crease_defender_and_shadow_rect, world_ptr, yield);
             robotInPolygon(5, robot_five_shadowing_rect, world_ptr, yield);
+
+            
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {

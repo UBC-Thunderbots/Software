@@ -4,13 +4,13 @@
 
 #include "software/simulated_tests/non_terminating_validation_functions/robots_avoid_ball_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robots_slow_down_validation.h"
-#include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class StopPlayTest : public SimulatedPlayTestFixture
+class StopPlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
     StopPlayTest() : stop_play_rules(initStopPlayRules()) {}
@@ -21,9 +21,11 @@ class StopPlayTest : public SimulatedPlayTestFixture
     std::vector<ValidationFunction> initStopPlayRules()
     {
         return {
-            [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+            {
                 // Wait 2 seconds for robots that start too close to the ball to move away
-                if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(2))
+                // EDIT: Updated to 4 seconds for Er Force Simulator
+                if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(4))
                 {
                     robotsSlowDown(1.5, world_ptr, yield);
                     robotsAvoidBall(0.5, {}, world_ptr, yield);
@@ -33,7 +35,7 @@ class StopPlayTest : public SimulatedPlayTestFixture
 
     void SetUp() override
     {
-        SimulatedPlayTestFixture::SetUp();
+        SimulatedErForceSimPlayTestFixture::SetUp();
         setFriendlyGoalie(0);
         setEnemyGoalie(0);
         setAIPlay(TYPENAME(StopPlay));

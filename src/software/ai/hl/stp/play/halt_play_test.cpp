@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_halt_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
@@ -10,7 +10,7 @@
 #include "software/world/game_state.h"
 #include "software/world/world.h"
 
-class HaltPlayTest : public SimulatedPlayTestFixture
+class HaltPlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
     Field field = Field::createSSLDivisionBField();
@@ -35,7 +35,8 @@ TEST_F(HaltPlayTest, test_halt_play)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
 
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             for (unsigned i = 0; i < 1000; i++)
             {
                 robotHalt(world_ptr, yield);
