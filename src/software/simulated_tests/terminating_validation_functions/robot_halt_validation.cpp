@@ -9,10 +9,10 @@ void robotHalt(std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type&
     {
         double robot_speed = robot.velocity().length();
 
-        // Added tolerance for ER Force Simulator Halt Command
-        if (robot_speed > 0.01)
+        if (robot_speed > 1e-3)
         {
-            yield("Robot " + std::to_string(robot.id()) + " has not stopped");
+            yield("Robot " + std::to_string(robot.id()) +
+                  " has not stopped and is moving at " + std::to_string(robot_speed));
         }
     }
 }

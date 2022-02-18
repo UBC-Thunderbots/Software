@@ -17,7 +17,8 @@
 class KickoffFriendlyPlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+    FieldType field_type = FieldType::DIV_B;
+    Field field          = Field::createField(field_type);
 };
 
 TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
@@ -32,8 +33,8 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlayConstructor([this]() {
-        return std::make_unique<KickoffFriendlyPlay>(thunderbots_config->getPlayConfig());
+    setAIPlayConstructor([](std::shared_ptr<const AiConfig> ai_config) {
+        return std::make_unique<KickoffFriendlyPlay>(ai_config);
     });
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_US);
 
@@ -41,21 +42,18 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             // Robot 4 is the only robot allowed to be in the center circle and start
             // the kickoff
-            robotInCenterCircle(4, world_ptr, yield);
-            robotReceivedBall(4, world_ptr, yield);
+            robotInCenterCircle(world_ptr, yield);
+            robotReceivedBall(world_ptr, yield);
             ballKicked(Angle::zero(), world_ptr, yield);
 
             // Two friendly robots near the half line setting up for offense
             Rectangle robotsOffensiveRect(Point(-0.5, 2.5), Point(-1.5, -2.5));
-            robotInPolygon(1, robotsOffensiveRect, world_ptr, yield);
-            robotInPolygon(5, robotsOffensiveRect, world_ptr, yield);
+            robotInPolygon(robotsOffensiveRect, 2, world_ptr, yield);
 
 
             // Two Friendly robots defending the exterior of defense box and one goalie
             Rectangle robotsDefensiveRect(Point(-3.2, 1.1), Point(-3.51, -1.1));
-            robotInPolygon(0, robotsDefensiveRect, world_ptr, yield);
-            robotInPolygon(2, robotsDefensiveRect, world_ptr, yield);
-            robotInPolygon(3, robotsDefensiveRect, world_ptr, yield);
+            robotInPolygon(robotsDefensiveRect, 3, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
@@ -69,39 +67,7 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
             }
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
-}
-
-TEST(KickoffFriendlyPlayInvariantAndIsApplicableTest, test_invariant_and_is_applicable)
-{
-    // Dynamic Parameter Config: This data structure is passed into the play and contains
-    // runtime configurable values.  We don't need to change anything here we just need to
-    // pass it in.
-    auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
-
-    // World: A blank testing world we will manipulate for the test
-    auto world = ::TestUtil::createBlankTestingWorld();
-
-    // KickoffFriendlyPlay: The play under test
-    auto kickoff_friendly_play = KickoffFriendlyPlay(play_config);
-
-    // GameState: The game state to test with.
-
-    world.updateGameState(::TestUtil::createGameState(
-        RefereeCommand::PREPARE_KICKOFF_US, RefereeCommand::PREPARE_KICKOFF_US));
-
-    // Lets make sure the play will start running and stay running.
-
-    ASSERT_TRUE(kickoff_friendly_play.isApplicable(world));
-    ASSERT_TRUE(kickoff_friendly_play.invariantHolds(world));
-
-    // Now lets make sure that we don't run when are NOT halted
-    world.updateGameState(::TestUtil::createGameState(
-        RefereeCommand::FORCE_START, RefereeCommand::PREPARE_KICKOFF_US));
-
-    // Make sure we don't run the kickoff friendly play
-    ASSERT_FALSE(kickoff_friendly_play.isApplicable(world));
-    ASSERT_FALSE(kickoff_friendly_play.invariantHolds(world));
 }

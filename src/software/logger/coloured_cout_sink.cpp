@@ -55,9 +55,9 @@ void ColouredCoutSink::displayColouredLog(g3::LogMessageMover log_entry)
     auto level  = log_entry.get()._level;
     auto colour = colourToString(getColour(level));
 
-    if (level.value == VISUALIZE.value)
+    if (level.value == VISUALIZE.value || level.value == CSV.value)
     {
-        // Don't log anything that calls LOG(VISUALIZE)
+        // Don't log anything that calls LOG(VISUALIZE) and LOG(CSV)
         return;
     }
 

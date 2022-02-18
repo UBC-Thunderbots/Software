@@ -5,21 +5,9 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-DribblingParcourPlay::DribblingParcourPlay(std::shared_ptr<const PlayConfig> config)
+DribblingParcourPlay::DribblingParcourPlay(std::shared_ptr<const AiConfig> config)
     : Play(config, false)
 {
-}
-
-bool DribblingParcourPlay::isApplicable(const World &world) const
-{
-    // This play is never applicable so it will never be chosen during gameplay
-    // This play can be run for hardware challenges by using the Play override
-    return false;
-}
-
-bool DribblingParcourPlay::invariantHolds(const World &world) const
-{
-    return false;
 }
 
 void DribblingParcourPlay::getNextTactics(TacticCoroutine::push_type &yield,
@@ -47,4 +35,4 @@ void DribblingParcourPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, DribblingParcourPlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, DribblingParcourPlay, AiConfig> factory;

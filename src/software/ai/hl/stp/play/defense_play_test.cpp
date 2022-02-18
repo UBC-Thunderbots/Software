@@ -34,24 +34,25 @@ TEST_F(DefensePlayTest, test_defense_play)
     });
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(DefensePlay));
-    // We set the referee command to stop so that the robots do not kick/shoot during the
-    // test
+    // We set the referee command to stop so that the robots do not kick/shoot during
+    // the test
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // Wait for all robots to come to a halt
             robotHalt(world_ptr, yield);
             // Attacker in front of enemy with the ball
             Rectangle attacker_rect(Point(0, 2.85), Point(0.9, 2));
-            robotInPolygon(1, attacker_rect, world_ptr, yield);
+            robotInPolygon(attacker_rect, 1, world_ptr, yield);
 
             // Two friendly robots in position to shadow enemy robots. One is on the enemy
             // with the ball and the other is on the next highest threat
-            Rectangle robot_four_shadowing_rect(Point(0.5, 2.5), Point(1, 2));
-            Rectangle robot_five_shadowing_rect(Point(-2, -0.75), Point(-1.5, -1.25));
-            robotInPolygon(4, robot_four_shadowing_rect, world_ptr, yield);
-            robotInPolygon(5, robot_five_shadowing_rect, world_ptr, yield);
+            Rectangle shadowing_rect_1(Point(0.5, 2.5), Point(1, 2));
+            Rectangle shadowing_rect_2(Point(-2, -0.75), Point(-1.5, -1.25));
+            robotInPolygon(shadowing_rect_1, 1, world_ptr, yield);
+            robotInPolygon(shadowing_rect_2, 1, world_ptr, yield);
 
             // Two friendly crease defenders should be close to the goalie
             Point goalie_position = world_ptr->friendlyTeam().goalie()->position();
@@ -61,8 +62,8 @@ TEST_F(DefensePlayTest, test_defense_play)
             Rectangle right_crease_defender_rect(
                 Point(goalie_position.x(), goalie_position.y()),
                 Point(goalie_position.x() + 0.3, goalie_position.y() - 0.3));
-            robotInPolygon(2, left_crease_defender_rect, world_ptr, yield);
-            robotInPolygon(3, right_crease_defender_rect, world_ptr, yield);
+            robotInPolygon(left_crease_defender_rect, 1, world_ptr, yield);
+            robotInPolygon(right_crease_defender_rect, 1, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
@@ -90,22 +91,22 @@ TEST_F(DefensePlayTest, test_defense_play_one_immediate_threat)
     });
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(DefensePlay));
-    // We set the referee command to stop so that the robots do not kick/shoot during the
-    // test
+    // We set the referee command to stop so that the robots do not kick/shoot during
+    // the test
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // Wait for all robots to come to a halt
             robotHalt(world_ptr, yield);
             // Attacker in front of enemy with the ball
             Rectangle attacker_rect(Point(-2.5, 0.5), Point(-1, -0.5));
-            robotInPolygon(1, attacker_rect, world_ptr, yield);
+            robotInPolygon(attacker_rect, 1, world_ptr, yield);
 
             // Two friendly robots swarming around the immediate threat
             Rectangle swarming_rect(Point(-2, 1), Point(0, -1));
-            robotInPolygon(4, swarming_rect, world_ptr, yield);
-            robotInPolygon(5, swarming_rect, world_ptr, yield);
+            robotInPolygon(swarming_rect, 2, world_ptr, yield);
 
             // Two friendly crease defenders should be close to the goalie
             Point goalie_position = world_ptr->friendlyTeam().goalie()->position();
@@ -115,14 +116,13 @@ TEST_F(DefensePlayTest, test_defense_play_one_immediate_threat)
             Rectangle right_crease_defender_rect(
                 Point(goalie_position.x(), goalie_position.y()),
                 Point(goalie_position.x() + 0.3, goalie_position.y() - 0.3));
-            robotInPolygon(2, left_crease_defender_rect, world_ptr, yield);
-            robotInPolygon(3, right_crease_defender_rect, world_ptr, yield);
+            robotInPolygon(left_crease_defender_rect, 1, world_ptr, yield);
+            robotInPolygon(right_crease_defender_rect, 1, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            ballInPlay(world_ptr, yield);
-        }};
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        { ballInPlay(world_ptr, yield); }};
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
@@ -146,17 +146,18 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
     });
     setEnemyGoalie(0);
     setAIPlay(TYPENAME(DefensePlay));
-    // We set the referee command to stop so that the robots do not kick/shoot during the
-    // test
+    // We set the referee command to stop so that the robots do not kick/shoot during
+    // the test
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             // Wait for all robots to come to a halt
             robotHalt(world_ptr, yield);
             // Attacker in front of enemy with the ball
             Rectangle attacker_rect(Point(-3.5, 1.2), Point(-2.3, 0.2));
-            robotInPolygon(1, attacker_rect, world_ptr, yield);
+            robotInPolygon(attacker_rect, 1, world_ptr, yield);
 
             // The rectangle for the right crease defender and one of the shadowing robots
             // is shared to make the test less brittle since the AI may assign different
@@ -164,82 +165,22 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
 
             // Two friendly crease defenders should be close to the goalie
             Point goalie_position = world_ptr->friendlyTeam().goalie()->position();
-            Rectangle left_crease_defender_rect(
-                Point(goalie_position.x(), goalie_position.y() + 0.45),
-                Point(goalie_position.x() + 0.55, goalie_position.y()));
-            Rectangle right_crease_defender_and_shadow_rect(
-                Point(goalie_position.x(), goalie_position.y()),
-                Point(goalie_position.x() + 1.0, goalie_position.y() - 0.3));
-
-            std::cout << goalie_position.x() << std::endl;
-            std::cout << goalie_position.y() << std::endl;
-            
-            robotInPolygon(2, left_crease_defender_rect, world_ptr, yield);
-            robotInPolygon(3, right_crease_defender_and_shadow_rect, world_ptr, yield);
+            Rectangle left_crease_defender_and_shadow_rec(
+                Point(goalie_position.x() + 1, goalie_position.y() + 0.8),
+                Point(goalie_position.x() + 1.75, goalie_position.y() + 0.4));
+            robotInPolygon(left_crease_defender_and_shadow_rec, 3, world_ptr, yield);
 
             // Two friendly robots in position to shadow enemy robots. One is on the enemy
             // with the ball and the other is on the next highest threat
-            Rectangle robot_five_shadowing_rect(Point(-2.75, -0.5), Point(-2.25, -1));
-            robotInPolygon(4, right_crease_defender_and_shadow_rect, world_ptr, yield);
-            robotInPolygon(5, robot_five_shadowing_rect, world_ptr, yield);
-
-            
+            Rectangle shadowing_rect(Point(-2.75, -0.5), Point(-2.25, -1));
+            robotInPolygon(shadowing_rect, 1, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            ballInPlay(world_ptr, yield);
-        }};
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        { ballInPlay(world_ptr, yield); }};
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
-}
-
-TEST(DefensePlayIsApplicableInvariantHoldsTest,
-     test_invariant_and_is_applicable_enemy_possession)
-{
-    auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
-    auto world       = ::TestUtil::createBlankTestingWorld();
-    world.setTeamWithPossession(TeamSide::ENEMY);
-
-    DefensePlay defense_play = DefensePlay(play_config);
-
-    // Gamestate isPlaying
-    world.updateGameState(
-        ::TestUtil::createGameState(RefereeCommand::FORCE_START, RefereeCommand::HALT));
-
-    EXPECT_TRUE(defense_play.isApplicable(world));
-    EXPECT_TRUE(defense_play.invariantHolds(world));
-
-    // Gamestate isHalted
-    world.updateGameState(
-        ::TestUtil::createGameState(RefereeCommand::HALT, RefereeCommand::FORCE_START));
-
-    EXPECT_FALSE(defense_play.isApplicable(world));
-    EXPECT_FALSE(defense_play.invariantHolds(world));
-}
-
-TEST(DefensePlayIsApplicableInvarantHoldsTest,
-     test_invariant_and_is_applicable_friendly_possession)
-{
-    auto play_config = std::make_shared<ThunderbotsConfig>()->getPlayConfig();
-    auto world       = ::TestUtil::createBlankTestingWorld();
-    world.setTeamWithPossession(TeamSide::FRIENDLY);
-
-    DefensePlay defense_play = DefensePlay(play_config);
-
-    // Gamestate isPlaying
-    world.updateGameState(
-        ::TestUtil::createGameState(RefereeCommand::FORCE_START, RefereeCommand::HALT));
-
-    EXPECT_FALSE(defense_play.isApplicable(world));
-    EXPECT_FALSE(defense_play.invariantHolds(world));
-
-    // Gamestate isHalted
-    world.updateGameState(
-        ::TestUtil::createGameState(RefereeCommand::HALT, RefereeCommand::FORCE_START));
-
-    EXPECT_FALSE(defense_play.isApplicable(world));
-    EXPECT_FALSE(defense_play.invariantHolds(world));
 }
