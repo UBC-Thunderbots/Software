@@ -29,14 +29,12 @@ message MovePrimitive
     }
 
     Path path                        = 1;
-    float final_path_peed            = 2;
-    Point destination                = 4;
-    float final_speed_m_per_s        = 5;
-    Angle final_angle                = 6;
-    float dribbler_speed_rpm         = 7;
-    float max_speed_m_per_s          = 8;
-    AutoChipOrKick auto_chip_or_kick = 9;
-    float target_spin_rev_per_s      = 10;
+    float final_speed_m_per_s        = 2;
+    Angle final_angle                = 3;
+    float dribbler_speed_rpm         = 4;
+    float max_speed_m_per_s          = 5;
+    AutoChipOrKick auto_chip_or_kick = 6;
+    float target_spin_rev_per_s      = 7;
 }
 
 message StopPrimitive

@@ -11,6 +11,11 @@ message Point
     double y_meters = 2;
 }
 
+message Path
+{
+    repeated Point point = 1;
+}
+
 message Vector
 {
     // x component

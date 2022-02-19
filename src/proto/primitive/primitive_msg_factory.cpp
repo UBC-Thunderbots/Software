@@ -14,7 +14,17 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     auto dest_msg        = createPointProto(Point(dest.x(), dest.y()));
     auto final_angle_msg = createAngleProto(final_angle);
     *(move_primitive_msg->mutable_move()->mutable_final_angle()) = *final_angle_msg;
-    *(move_primitive_msg->mutable_move()->mutable_destination()) = *dest_msg;
+
+    TbotsProto::Path path_proto;
+
+//    for (auto knot : knots)
+//    {
+//        *(path_proto.add_point()) = *createPointProto(knot);
+//    }
+    *(path_proto.add_point(Point(dest.x, dest.y)));
+    auto path_msg = path_proto;
+
+    *(move_primitive_msg->mutable_move()->mutable_path()) = *path_msg;
     move_primitive_msg->mutable_move()->set_final_speed_m_per_s(
         static_cast<float>(final_speed_m_per_s));
     move_primitive_msg->mutable_move()->set_max_speed_m_per_s(
