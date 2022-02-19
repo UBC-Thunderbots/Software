@@ -1,9 +1,0 @@
-- bool:
-    name: test_value_one
-    value: true
-    description: a test value
-
-- string:
-    name: test_value_two
-    value: test
-    description: a test value

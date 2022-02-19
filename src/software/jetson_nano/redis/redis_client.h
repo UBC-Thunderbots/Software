@@ -12,16 +12,19 @@ class RedisClient
 {
    public:
     /**
-     * Service that communicates with various external services
+     * Client that communicates with the a redis server
      * @param value The IP of the Redis server, default localhost
      * @param key the key of the Redis server, default 6379
      */
     explicit RedisClient(std::string value, size_t key);
 
+    virtual ~RedisClient();
+
+
     /**
      * Subscribes to a message channel
      * @param channel The channel being subscribed to
-     * @param subscribe_callback Callback for when messages come through channel
+     * @param subscribe_callback callback for when messages are published to channel
      */
     void subscribe(const std::string &channel,
                    void (*subscribe_callback)(std::string, std::string));
@@ -29,16 +32,9 @@ class RedisClient
     /**
      * gets the value corresponding to the key; blocking
      * @param key
-     * @return
+     * @return a redis reply object
      */
     cpp_redis::reply get(const std::string &key);
-
-    //    /**
-    //     * polls redis service for value corresponding to key; non-blocking
-    //     * @param key
-    //     * @return
-    //     */
-    //    std::optional<cpp_redis::reply> poll(const std::string &key);
 
     /**
      * sets a key value pair in the redis database
@@ -47,16 +43,11 @@ class RedisClient
      */
     void set(const std::string &key, const std::string &value);
 
-
-    virtual ~RedisClient();
-
     std::unordered_map<std::string, std::string> key_value_set_;
 
-
-
    private:
-    cpp_redis::subscriber subscriber;
-    cpp_redis::client client;
+    cpp_redis::subscriber subscriber_;
+    cpp_redis::client client_;
     // Connection Parameters
     std::string host_;
     size_t port_;
