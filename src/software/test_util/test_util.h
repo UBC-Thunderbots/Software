@@ -35,10 +35,37 @@ namespace TestUtil
      */
     World createBlankTestingWorld();
 
+    /**
+     * Creates a blank testing World given a Field.
+     *
+     * @param field field to use when creating a field
+     *
+     * @return   a World object initialized with the given field, empty teams with 1000
+     * millisecond expiry buffers, and the Ball at the centre of the field with no
+     * velocity.
+     */
     World createBlankTestingWorld(Field field);
 
+    /**
+     * Creates a World object with a normal SSL Division A field, default (empty)
+     * teams with 1000 milliseconds expiry buffers, and the Ball at the center of the
+     * field with no velocity.
+     *
+     * @return a World object initialized with a Division B SSL field, empty teams
+     * with 1000 millisecond expiry buffers, and the Ball at the center of the field
+     * with no velocity.
+     */
     World createBlankTestingWorldDivA();
 
+    /**
+     * Creates a World object with a normal SSL Division B field, default (empty)
+     * teams with 1000 milliseconds expiry buffers, and the Ball at the center of the
+     * field with no velocity.
+     *
+     * @return a World object initialized with a Division B SSL field, empty teams
+     * with 1000 millisecond expiry buffers, and the Ball at the center of the field
+     * with no velocity.
+     */
     World createBlankTestingWorldDivB();
 
     /**
