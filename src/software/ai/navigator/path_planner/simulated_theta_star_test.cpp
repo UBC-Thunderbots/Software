@@ -10,11 +10,14 @@
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
+#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
 
-class SimulatedThetaStarTest : public SimulatedTacticTestFixture
+class SimulatedThetaStarTest : public SimulatedErForceSimTacticTestFixture //SimulatedTacticTestFixture
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+//    Field field = Field::createSSLDivisionBField();
+    FieldType field_type = FieldType::DIV_B;
+    Field field          = Field::createField(field_type);
 };
 
 TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_robot_and_dest_in_same_obstacle)
@@ -54,7 +57,7 @@ TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_robot_and_dest_in_same_o
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(15));
 }
@@ -96,7 +99,7 @@ TEST_F(SimulatedThetaStarTest,
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(15));
 }
@@ -135,7 +138,7 @@ TEST_F(SimulatedThetaStarTest, DISABLED_test_theta_star_dest_in_obstacle)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(15));
 }
@@ -177,7 +180,7 @@ TEST_F(SimulatedThetaStarTest,
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(15));
 }
@@ -211,7 +214,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_robot_in_obstacle)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(15));
 }
@@ -244,7 +247,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_no_obstacle_straight_path)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(15));
 }
@@ -297,7 +300,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_zig_zag_test)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(15));
 }
@@ -339,7 +342,7 @@ TEST_F(SimulatedThetaStarTest, test_theta_star_oscillation)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(15));
 }
@@ -378,7 +381,7 @@ TEST_F(SimulatedThetaStarTest,
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(15));
 }
@@ -418,7 +421,7 @@ TEST_F(SimulatedThetaStarTest,
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(15));
 }
