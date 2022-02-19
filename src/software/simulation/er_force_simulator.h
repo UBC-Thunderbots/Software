@@ -90,6 +90,9 @@ class ErForceSimulator : public QObject
      */
     void stepSimulation(const Duration& time_step);
 
+    std::vector<TbotsProto::RobotStatus> getBlueRobotStatuses() const;
+    std::vector<TbotsProto::RobotStatus> getYellowRobotStatuses() const;
+
     /**
      * Returns the most recent SSL Wrapper Packets
      *
@@ -164,6 +167,9 @@ class ErForceSimulator : public QObject
     RobotConstants_t robot_constants;
     WheelConstants wheel_constants;
     Field field;
+
+    std::optional<RobotId> blue_robot_with_ball;
+    std::optional<RobotId> yellow_robot_with_ball;
 
     const QString CONFIG_FILE      = "simulator/2020";
     const QString CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";
