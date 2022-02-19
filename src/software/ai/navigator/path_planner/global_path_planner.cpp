@@ -14,15 +14,14 @@ GlobalPathPlanner::GlobalPathPlanner(
     // is on and off. By cycling through every combination of bits, we'll consequently
     // also have every combination of MotionConstraints
     // (https://www.geeksforgeeks.org/generate-n-bit-gray-codes/)
-    for (int counter = 0; counter < std::pow(2, all_constraints.size()); ++counter)
+    for (unsigned counter = 0; counter < std::pow(2, all_constraints.size()); ++counter)
     {
         std::set<MotionConstraint> motion_constraint_obstacles;
 
         // Use the value of the counter and bit arithmetic to get the motion constraint
         // obstacles out
-        int constraint_bits = counter;
-        for (unsigned j = 0;
-             j<all_constraints.size(); ++j, constraint_bits = constraint_bits> > 1)
+        unsigned constraint_bits = counter;
+        for (unsigned j = 0; j < all_constraints.size(); ++j, constraint_bits >>= 1)
         {
             if (constraint_bits & 1)
             {
