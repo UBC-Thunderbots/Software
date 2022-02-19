@@ -67,4 +67,8 @@ void RedisClient::set(const std::string &key, const std::string &value)
     client_.sync_commit();
 }
 
+std::unordered_map<std::string, std::string> RedisClient::getAllKeyValuePairs() {
+    return key_value_set_;
+}
+
 RedisClient::~RedisClient() {}

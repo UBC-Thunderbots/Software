@@ -43,12 +43,14 @@ class RedisClient
      */
     void set(const std::string &key, const std::string &value);
 
-    std::unordered_map<std::string, std::string> key_value_set_;
+    std::unordered_map<std::string, std::string> getAllKeyValuePairs();
 
    private:
     cpp_redis::subscriber subscriber_;
     cpp_redis::client client_;
+    std::unordered_map<std::string, std::string> key_value_set_;
     // Connection Parameters
     std::string host_;
     size_t port_;
+
 };
