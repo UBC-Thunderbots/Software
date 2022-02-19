@@ -36,7 +36,7 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play_bottom_left)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            robotReceivedBall(5, world_ptr, yield);
+            robotReceivedBall(world_ptr, yield);
             friendlyScored(world_ptr, yield);
         }};
 
@@ -64,7 +64,7 @@ TEST_F(CornerKickPlayTest, test_corner_kick_play_top_right)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            robotReceivedBall(5, world_ptr, yield);
+            robotReceivedBall(world_ptr, yield);
             friendlyScored(world_ptr, yield);
         }};
 

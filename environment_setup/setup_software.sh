@@ -29,6 +29,8 @@ echo "================================================================"
 sudo apt-get update
 sudo apt-get install -y software-properties-common # required for add-apt-repository
 
+sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+
 sudo apt-get update
 
 # (sorted alphabetically)
@@ -37,8 +39,10 @@ host_software_packages=(
     codespell # Fixes typos
     curl
     default-jdk # Needed for Bazel to run properly
-    gcc-7 # We use gcc 7.4.0
+    gcc-9 # We use gcc 9.3.0
+    libstdc++6-9-dbg
     git # required for build
+    g++-9
     kcachegrind # This lets us view the profiles output by callgrind
     libeigen3-dev # A math / numerical library used for things like linear regression
     libprotobuf-dev
@@ -145,14 +149,15 @@ sudo apt-get install curl gnupg
 curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
 echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
 sudo apt-get update
-if ! sudo apt-get install bazel-3.7.2 -y ; then
+if ! sudo apt-get install bazel-5.0.0 -y ; then
     echo "##############################################################"
     echo "Error: Installing Bazel failed"
     echo "If you have a newer version installed, please manually downgrade"
     echo "##############################################################"
     exit 1
 fi
-sudo ln -s /usr/bin/bazel-3.7.2 /usr/bin/bazel
+sudo rm -f /usr/bin/bazel # remove symlink
+sudo ln -s /usr/bin/bazel-5.0.0 /usr/bin/bazel
 
 # setup platformio to compile arduino code
 # link to instructions: https://docs.platformio.org/en/latest/core/installation.html
