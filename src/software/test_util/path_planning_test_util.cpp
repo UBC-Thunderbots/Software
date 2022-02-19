@@ -1,7 +1,7 @@
 #include "path_planning_test_util.h"
 
 void TestUtil::checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
-                                       std::vector<Polygon> obstacles)
+                                                 std::vector<Polygon> obstacles)
 {
     for_each(obstacles.begin(), obstacles.end(),
              [](Polygon& shape) { shape = shape.expand(ROBOT_MAX_RADIUS_METERS); });
@@ -31,7 +31,7 @@ void TestUtil::checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
 }
 
 void TestUtil::checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
-                                       std::vector<ObstaclePtr> obstacles)
+                                                 std::vector<ObstaclePtr> obstacles)
 {
     // If the path size is 1, just need to check that the point is not within the obstacle
     if (path_points.size() == 1)
@@ -59,7 +59,7 @@ void TestUtil::checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
 
 
 void TestUtil::checkPathDoesNotExceedBoundingBox(std::vector<Point> path_points,
-                                       Rectangle bounding_box)
+                                                 Rectangle bounding_box)
 {
     for (auto const& path_point : path_points)
     {

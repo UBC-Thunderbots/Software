@@ -36,11 +36,11 @@ namespace TestUtil
     World createBlankTestingWorld();
 
     World createBlankTestingWorld(Field field);
-    
+
     World createBlankTestingWorldDivA();
-    
+
     World createBlankTestingWorldDivB();
-    
+
     /**
      * Returns a new World object with friendly robots in the positions specified
      * by the vector of Points. Robots will be created with consecutive increasing

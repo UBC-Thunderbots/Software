@@ -6,8 +6,8 @@
 #include <random>
 
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
-#include "software/test_util/test_util.h"
 #include "software/test_util/path_planning_test_util.h"
+#include "software/test_util/test_util.h"
 
 class TestEnlsvgPathPlanner : public testing::Test
 {
@@ -128,8 +128,8 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_src)
 
     // Make sure path does not go through any obstacles, except for the first point, which
     // is in the obstacle blocking the start position
-    TestUtil::checkPathDoesNotIntersectObstacle({path_points.begin() + 1, path_points.end()},
-                                      obstacles);
+    TestUtil::checkPathDoesNotIntersectObstacle(
+        {path_points.begin() + 1, path_points.end()}, obstacles);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest)
@@ -168,8 +168,8 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest)
 
     // Make sure path does not go through any obstacles, except for the first point, which
     // is in the obstacle blocking the start position
-    TestUtil::checkPathDoesNotIntersectObstacle({path_points.begin() + 1, path_points.end()},
-                                      {obstacle});
+    TestUtil::checkPathDoesNotIntersectObstacle(
+        {path_points.begin() + 1, path_points.end()}, {obstacle});
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest_blocked_src)
@@ -214,8 +214,8 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest_blocked_src)
 
     // Make sure path does not go through any obstacles, except for the first point, which
     // is in the obstacle blocking the start position
-    TestUtil::checkPathDoesNotIntersectObstacle({path_points.begin() + 1, path_points.end()},
-                                      {obstacle});
+    TestUtil::checkPathDoesNotIntersectObstacle(
+        {path_points.begin() + 1, path_points.end()}, {obstacle});
 }
 
 TEST_F(TestEnlsvgPathPlanner,
@@ -257,8 +257,8 @@ TEST_F(TestEnlsvgPathPlanner,
 
     // Make sure path does not go through any obstacles, except for the first point, which
     // is in the obstacle blocking the start position
-    TestUtil::checkPathDoesNotIntersectObstacle({path_points.begin() + 1, path_points.end()},
-                                      {obstacle});
+    TestUtil::checkPathDoesNotIntersectObstacle(
+        {path_points.begin() + 1, path_points.end()}, {obstacle});
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_same_cell_dest)
@@ -319,8 +319,8 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_outside_o
 
     // Make sure path does not go through any obstacles, except for the first point, which
     // is in the obstacle blocking the start position
-    TestUtil::checkPathDoesNotIntersectObstacle({path_points.begin() + 1, path_points.end()},
-                                      {obstacle});
+    TestUtil::checkPathDoesNotIntersectObstacle(
+        {path_points.begin() + 1, path_points.end()}, {obstacle});
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_along_x_axis)

@@ -62,12 +62,12 @@ cc_library(
     hdrs = ["enlsvg_path_planner.h"],
     deps = [
         ":path_planner",
-        "//shared/parameter:cpp_configs",
-        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//extlibs/enlsvg",
+        "//shared/parameter:cpp_configs",
+        "//software/ai/motion_constraint:motion_constraint_set_builder",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/logger",
         "//software/world",
-        "//software/ai/motion_constraint:motion_constraint_set_builder",
     ],
 )
 
@@ -77,10 +77,10 @@ cc_library(
     hdrs = ["global_path_planner.h"],
     deps = [
         ":enlsvg_path_planner",
-        "//software/geom:point",
+        "//software/ai/hl/stp/tactic",
+        "//software/ai/motion_constraint",
         "//software/geom:linear_spline2d",
-        "//software/ai/motion_constraint:motion_constraint",
-        "//software/ai/hl/stp/tactic:tactic",
+        "//software/geom:point",
     ],
 )
 

@@ -18,17 +18,17 @@ namespace TestUtil
 
         return world;
     }
-    
+
     World createBlankTestingWorld()
     {
         return createBlankTestingWorldDivB();
     }
-    
+
     World createBlankTestingWorldDivA()
     {
         return createBlankTestingWorld(Field::createSSLDivisionAField());
     }
-    
+
     World createBlankTestingWorldDivB()
     {
         return createBlankTestingWorld(Field::createSSLDivisionBField());

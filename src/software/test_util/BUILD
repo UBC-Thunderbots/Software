@@ -5,13 +5,13 @@ cc_library(
     testonly = True,
     srcs = [
         "equal_within_tolerance.cpp",
-        "test_util.cpp",
         "path_planning_test_util.cpp",
+        "test_util.cpp",
     ],
     hdrs = [
         "equal_within_tolerance.h",
-        "test_util.h",
         "path_planning_test_util.h",
+        "test_util.h",
     ],
     deps = [
         "//firmware/app/logger",
@@ -19,6 +19,7 @@ cc_library(
         "//proto:tbots_nanopb_proto",
         "//shared:constants",
         "//shared/test_util:tbots_gtest_main",
+        "//software/ai/navigator/obstacle",
         "//software/geom:angle",
         "//software/geom:angular_velocity",
         "//software/geom:geom_constants",
@@ -30,7 +31,6 @@ cc_library(
         "//software/simulation/physics:physics_world",
         "//software/world",
         "//software/world:robot_state",
-        "//software/ai/navigator/obstacle:obstacle",
         "@eigen",
     ],
 )
