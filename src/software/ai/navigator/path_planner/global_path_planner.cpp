@@ -41,7 +41,7 @@ std::shared_ptr<EnlsvgPathPlanner> GlobalPathPlanner::getPathGenerator(
     {
         return planners.at(motion_constraints);
     }
-    catch (std::out_of_range e)
+    catch (std::out_of_range &e)
     {
         LOG(WARNING) << "GlobalPathPlanner is unable to obtain a path planner for the following motion constraints: ";
         for (auto constraint : motion_constraints)
