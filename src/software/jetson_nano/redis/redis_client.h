@@ -52,5 +52,4 @@ class RedisClient
     // Connection Parameters
     std::string host_;
     size_t port_;
-
 };
