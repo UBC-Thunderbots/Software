@@ -34,6 +34,7 @@
 
 #include <limits>
 #include <vector>
+#include <fstream>
 
 #include "extlibs/hrvo/agent.h"
 #include "extlibs/hrvo/goal.h"
@@ -52,7 +53,7 @@ class HRVOSimulator
      */
     explicit HRVOSimulator(float time_step, const RobotConstants_t &robot_constants);
 
-    ~HRVOSimulator() = default;
+    ~HRVOSimulator();
 
     /**
      * Reset all agents to match the state of the given world.
@@ -258,7 +259,12 @@ class HRVOSimulator
         return reachedGoals_;
     }
 
-   public:
+    void recordSimulator();
+    std::ofstream output_file;
+    std::string output_file_loc;
+    unsigned int frame = 0;
+
+public:
     // The robot constants which all agents will use
     RobotConstants_t robot_constants_;
 
