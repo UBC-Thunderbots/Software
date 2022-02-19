@@ -48,7 +48,7 @@ std::shared_ptr<EnlsvgPathPlanner> GlobalPathPlanner::getPathGenerator(
         {
             LOG(WARNING) << toString(constraint) << " ";
         }
-        LOG(WARNING) << "Returning obstacle-free planner." << std::endl;
+        LOG(WARNING) << "\nReturning obstacle-free planner." << std::endl;
     }
     return planners.at({});
 }

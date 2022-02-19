@@ -51,7 +51,17 @@ class EnlsvgPathPlanner : public PathPlanner
     std::optional<Path> findPath(const Point &start, const Point &end,
                                  const Rectangle &navigable_area,
                                  const std::vector<ObstaclePtr> &) override;
-                                 
+                            
+    /**
+    * Returns a path that is an optimized path between start and end. Has no checking on whether the start and end 
+    * are valid and within field boundaries.
+    *
+    * @param start  start point
+    * @param end    end point
+    *
+    * @return   a vector of points that is the optimal path avoiding obstacles
+    *           if no valid path, then return an empty vector
+    */
     std::optional<Path> findPath(const Point &start, const Point &end);
 
     /**

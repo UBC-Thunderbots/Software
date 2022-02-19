@@ -39,6 +39,8 @@ class GlobalPathPlanner
         * then it returns a path planner without any static obstacles.
         *
         * @param constraints    the motion constraints used to get the relevant path planner
+        *
+        * @return path planner for static obstacles created by constraints
         */
         std::shared_ptr<EnlsvgPathPlanner> getPathGenerator(const std::set<MotionConstraint> constraints);
         
