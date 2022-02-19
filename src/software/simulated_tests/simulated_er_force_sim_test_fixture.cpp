@@ -202,7 +202,7 @@ void SimulatedErForceSimTestFixture::updateSensorFusion(
 
         if (should_log_replay)
         {
-            simulator_sensorproto_logger->onValueReceived(sensor_msg);
+            simulator_sensorproto_logger->onValueReceived(yellow_sensor_msg);
             auto friendly_world_or_null = friendly_sensor_fusion.getWorld();
 
             if (friendly_world_or_null)
