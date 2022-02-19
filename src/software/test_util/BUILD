@@ -31,6 +31,7 @@ cc_library(
         "//software/world",
         "//software/world:robot_state",
         "//software/ai/navigator/obstacle:obstacle",
+        "@eigen",
     ],
 )
 

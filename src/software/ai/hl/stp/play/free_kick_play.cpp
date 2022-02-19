@@ -13,26 +13,9 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/ball.h"
 
-FreeKickPlay::FreeKickPlay(std::shared_ptr<const PlayConfig> config)
+FreeKickPlay::FreeKickPlay(std::shared_ptr<const AiConfig> config)
     : Play(config, true), MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
 {
-}
-
-bool FreeKickPlay::isApplicable(const World &world) const
-{
-    double min_dist_to_corner =
-        std::min((world.field().enemyCornerPos() - world.ball().position()).length(),
-                 (world.field().enemyCornerNeg() - world.ball().position()).length());
-
-    // Make sure we don't interfere with the cornerkick play
-    return world.gameState().isOurFreeKick() &&
-           min_dist_to_corner >= CornerKickPlay::BALL_IN_CORNER_RADIUS;
-}
-
-bool FreeKickPlay::invariantHolds(const World &world) const
-{
-    return (world.gameState().isPlaying() || world.gameState().isReadyState()) &&
-           (world.getTeamWithPossession() == TeamSide::FRIENDLY);
 }
 
 void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
@@ -49,13 +32,13 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
     // Setup crease defenders to help the goalie
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
-            play_config->getRobotNavigationObstacleConfig()),
+            ai_config->getRobotNavigationObstacleConfig()),
         std::make_shared<CreaseDefenderTactic>(
-            play_config->getRobotNavigationObstacleConfig()),
+            ai_config->getRobotNavigationObstacleConfig()),
     };
 
     auto attacker =
-        std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
+        std::make_shared<AttackerTactic>(ai_config->getAttackerTacticConfig());
 
     PassWithRating best_pass_and_score_so_far =
         shootOrFindPassStage(yield, attacker, crease_defender_tactics, world);
@@ -135,7 +118,7 @@ void FreeKickPlay::performPassStage(
 
     // Perform the pass and wait until the receiver is finished
     auto attacker =
-        std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
+        std::make_shared<AttackerTactic>(ai_config->getAttackerTacticConfig());
     auto receiver = std::make_shared<ReceiverTactic>();
     do
     {
@@ -161,7 +144,7 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         std::make_shared<const EighteenZonePitchDivision>(world.field());
 
     PassGenerator<EighteenZoneId> pass_generator(pitch_division,
-                                                 play_config->getPassingConfig());
+                                                 ai_config->getPassingConfig());
 
     using Zones = std::unordered_set<EighteenZoneId>;
 
@@ -258,4 +241,4 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, FreeKickPlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, FreeKickPlay, AiConfig> factory;

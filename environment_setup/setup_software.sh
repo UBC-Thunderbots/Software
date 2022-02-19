@@ -29,6 +29,8 @@ echo "================================================================"
 sudo apt-get update
 sudo apt-get install -y software-properties-common # required for add-apt-repository
 
+sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+
 sudo apt-get update
 
 # (sorted alphabetically)
@@ -37,8 +39,10 @@ host_software_packages=(
     codespell # Fixes typos
     curl
     default-jdk # Needed for Bazel to run properly
-    gcc-7 # We use gcc 7.4.0
+    gcc-9 # We use gcc 9.3.0
+    libstdc++6-9-dbg
     git # required for build
+    g++-9
     kcachegrind # This lets us view the profiles output by callgrind
     libeigen3-dev # A math / numerical library used for things like linear regression
     libprotobuf-dev
@@ -86,6 +90,8 @@ if [[ $(lsb_release -rs) == "18.04" ]]; then
     # the bazel install hasn't installed it properly
     host_software_packages+=(python-minimal)
     host_software_packages+=(libclang-dev)
+    host_software_packages+=(python3.8)
+    host_software_packages+=(python3.8-venv)
 fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
@@ -100,19 +106,20 @@ echo "================================================================"
 echo "Upgrading Pip Version"
 echo "================================================================"
 
-if ! /usr/bin/python3 -m pip install --upgrade pip ; then
-    echo "##############################################################"
-    echo "Error: Upgrading pip version failed"
-    echo "##############################################################"
-    exit 1
-fi
-
-if ! sudo /usr/bin/python3 -m venv /opt/tbotspython ; then
+if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
     echo "##############################################################"
     echo "Error: Setting up virtual environment failed"
     echo "##############################################################"
     exit 1
 fi
+
+if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
+    echo "##############################################################"
+    echo "Error: Upgrading pip version in venv failed"
+    echo "##############################################################"
+    exit 1
+fi
+
 
 if ! sudo /opt/tbotspython/bin/pip3 install pyqt5  ; then
     echo "##############################################################"
@@ -142,17 +149,35 @@ sudo apt-get install curl gnupg
 curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
 echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
 sudo apt-get update
-if ! sudo apt-get install bazel-3.7.2 -y ; then
+if ! sudo apt-get install bazel-5.0.0 -y ; then
     echo "##############################################################"
     echo "Error: Installing Bazel failed"
     echo "If you have a newer version installed, please manually downgrade"
     echo "##############################################################"
     exit 1
 fi
-sudo ln -s /usr/bin/bazel-3.7.2 /usr/bin/bazel
+sudo rm -f /usr/bin/bazel # remove symlink
+sudo ln -s /usr/bin/bazel-5.0.0 /usr/bin/bazel
+
+# setup platformio to compile arduino code
+# link to instructions: https://docs.platformio.org/en/latest/core/installation.html
+# **need to reboot for changes to come into effect**
+
+# downloading platformio udev rules
+curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules
+sudo service udev restart
+
+# allow user access to serial ports
+sudo usermod -a -G dialout $USER
+
+# installs platformio to global environment
+sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==5.2.4
+echo "================================================================"
+echo "Done platformio Setup"
+echo "================================================================"
 
 # Done
 echo "================================================================"
-echo "Done Software Setup"
+echo "Done Software Setup, please reboot for changes to take place"
 echo "================================================================"
 

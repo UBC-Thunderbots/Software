@@ -6,21 +6,9 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 ScoringFromContestedPossessionPlay::ScoringFromContestedPossessionPlay(
-    std::shared_ptr<const PlayConfig> config)
+    std::shared_ptr<const AiConfig> config)
     : Play(config, false)
 {
-}
-
-bool ScoringFromContestedPossessionPlay::isApplicable(const World &world) const
-{
-    // This play is never applicable so it will never be chosen during gameplay
-    // This play can be run for hardware challenges by using the Play override
-    return false;
-}
-
-bool ScoringFromContestedPossessionPlay::invariantHolds(const World &world) const
-{
-    return false;
 }
 
 void ScoringFromContestedPossessionPlay::getNextTactics(TacticCoroutine::push_type &yield,
@@ -49,5 +37,5 @@ void ScoringFromContestedPossessionPlay::getNextTactics(TacticCoroutine::push_ty
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, ScoringFromContestedPossessionPlay, PlayConfig>
+static TGenericFactory<std::string, Play, ScoringFromContestedPossessionPlay, AiConfig>
     factory;

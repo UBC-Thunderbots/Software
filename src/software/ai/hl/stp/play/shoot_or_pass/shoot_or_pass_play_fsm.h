@@ -1,7 +1,5 @@
 #pragma once
 
-#include <include/boost/sml.hpp>
-
 #include "shared/constants.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
@@ -30,9 +28,9 @@ struct ShootOrPassPlayFSM
     /**
      * Creates a shoot or pass play FSM
      *
-     * @param play_config the play config for this play FSM
+     * @param ai_config the play config for this play FSM
      */
-    explicit ShootOrPassPlayFSM(std::shared_ptr<const PlayConfig> play_config);
+    explicit ShootOrPassPlayFSM(std::shared_ptr<const AiConfig> ai_config);
 
     /**
      * Updates the offensive positioning tactics
@@ -131,11 +129,12 @@ struct ShootOrPassPlayFSM
             TakePassState_S + Update_E[!passCompleted_G] / takePass_A = TakePassState_S,
             TakePassState_S + Update_E[shouldAbortPass_G] / startLookingForPass_A =
                 AttemptShotState_S,
-            TakePassState_S + Update_E[passCompleted_G] / takePass_A = X);
+            TakePassState_S + Update_E[passCompleted_G] / takePass_A = X,
+            X + Update_E / startLookingForPass_A = AttemptShotState_S);
     }
 
    private:
-    std::shared_ptr<const PlayConfig> play_config;
+    std::shared_ptr<const AiConfig> ai_config;
     std::shared_ptr<AttackerTactic> attacker_tactic;
     std::shared_ptr<ReceiverTactic> receiver_tactic;
     std::vector<std::shared_ptr<MoveTactic>> offensive_positioning_tactics;

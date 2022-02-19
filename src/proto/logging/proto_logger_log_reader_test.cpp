@@ -10,7 +10,7 @@
 // this path is relative to the current working directory, i.e. the bazel root
 constexpr const char* REPLAY_TEST_PATH_SUFFIX = "proto/logging/test_logs";
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 // hahaha test subject because it's a subject but also a test subject
 class TestSubject : public Subject<SensorProto>

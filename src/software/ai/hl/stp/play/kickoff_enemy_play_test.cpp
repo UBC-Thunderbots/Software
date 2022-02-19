@@ -16,7 +16,8 @@
 class KickoffEnemyPlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+    FieldType field_type = FieldType::DIV_B;
+    Field field          = Field::createField(field_type);
 };
 
 TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
@@ -39,23 +40,22 @@ TEST_F(KickoffEnemyPlayTest, test_kickoff_enemy_play)
             // Two friendly robots in position to shadow enemy robots. Rectangles are
             // chosen to be generally in the way of the the front 3 enemy robots and the
             // friendly goal, based on where the enemy robots are initialized in the test.
-            Rectangle robotOneShadowingRect(Point(0, 1.5), Point(-0.4, 1.3));
-            Rectangle robotFiveShadowingRect(Point(0, -1.5), Point(-0.4, -1.3));
-            Rectangle robotThreeShadowingRect(Point(-0.60, 0.1), Point(-0.86, -0.1));
-            robotInPolygon(1, robotOneShadowingRect, world_ptr, yield);
-            robotInPolygon(5, robotFiveShadowingRect, world_ptr, yield);
-            robotInPolygon(3, robotThreeShadowingRect, world_ptr, yield);
+            Rectangle shadowing_rect_1(Point(0, 1.5), Point(-0.4, 1.3));
+            Rectangle shadowing_rect_2(Point(0, -1.5), Point(-0.4, -1.3));
+            Rectangle shadowing_rect_3(Point(-0.60, 0.1), Point(-0.86, -0.1));
+            robotInPolygon(shadowing_rect_1, 1, world_ptr, yield);
+            robotInPolygon(shadowing_rect_2, 1, world_ptr, yield);
+            robotInPolygon(shadowing_rect_3, 1, world_ptr, yield);
 
             // Two Friendly robots defending the exterior of defense box
             Rectangle robotsDefendingRect(Point(-3.2, 1.1), Point(-3.5, -1.1));
-            robotInPolygon(2, robotsDefendingRect, world_ptr, yield);
-            robotInPolygon(4, robotsDefendingRect, world_ptr, yield);
+            robotInPolygon(robotsDefendingRect, 2, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         robotsInFriendlyHalf, robotsNotInCenterCircle};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }

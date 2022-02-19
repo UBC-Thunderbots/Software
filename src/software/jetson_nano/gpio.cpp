@@ -46,10 +46,7 @@ void GPIO::setValue(GpioState state)
 {
     std::ofstream gpio_fs("/sys/class/gpio/gpio" + gpio_number_ + "/value");
 
-    if (!gpio_fs.is_open())
-    {
-        LOG(FATAL) << "Could not set GPIO pin";
-    }
+    CHECK(gpio_fs.is_open()) << "Could not set GPIO pin";
 
     switch (state)
     {
@@ -76,14 +73,9 @@ GpioState GPIO::getValue()
     std::ifstream gpio_fs("/sys/class/gpio/gpio" + gpio_number_ + "/value");
     std::string level;
 
-    if (gpio_fs.is_open())
-    {
-        std::getline(gpio_fs, level);
-    }
-    else
-    {
-        LOG(FATAL) << "Could not read GPIO pin";
-    }
+    CHECK(gpio_fs.is_open()) << "Could not read GPIO pin";
+    std::getline(gpio_fs, level);
+
     if (level.compare("0") == 0)
     {
         return GpioState::LOW;

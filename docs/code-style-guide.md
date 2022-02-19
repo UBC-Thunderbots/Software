@@ -1,7 +1,6 @@
 # Code Style Guide
 
 ## Table of Contents
-* [C-specific Guidelines](#c-specific-guidelines)
 * [Names and Variables](#names-and-variables)
 * [Comments](#comments)
 * [Headers](#headers)
@@ -20,87 +19,6 @@ Our C++ coding style is based off of [Google's C++ Style Guide](https://google.g
 
 If you want to know more about our coding style you can take a look at our [clang-format configuration file](https://github.com/UBC-Thunderbots/Software/blob/master/.clang-format).
 
-
-### C-Specific Guidelines
-The vast majority of the things noted in this document will apply to `C` code as well, but there are some special cases / exceptions for `C` code. Please also see the [Firmware architecture and design document](firmware-architecture-and-design.md) for much of the context needed for these.
-* If something is in a header, then it is *always* considered public.
-* Public names should always follow the format `PREFIX_FILENAME_NAME`, where:
-    * `PREFIX` is one of `app`, `io`, `shared`, depending on the high level folder this is under
-    * `FILENAME` is the name of the file (Example: `firmware_robot` for `firmware_robot.h`)
-    * `NAME` is the name of whatever the function/variable is, following standard naming rules indicated below for functions/variables.
-  
-  ```C 
-  // Incorrect (missing prefix)
-  float firmware_robot_getRobotPositionX(Robot* robot);
-
-  // Incorrect (missing filename)
-  float app_getRobotPositionX(Robot* robot);
-
-  // Incorrect (incorrect function name style)
-  float app_firmware_robot_get_robot_position_x(Robot* robot);
-
-  // Correct
-  float app_firmware_robot_getRobotPositionX(Robot* robot);
-
-  // Correct
-  float shared_util_boundValue(float upper, float lower, float value);
-
-  ```
-
-* Structs are `CamelCaseUpperFirst`, and struct typedefs are `CamelCaseUpperFirst_t`
-
-  ``` C
-  // Incorrect
-  struct myDog;
-
-  // Incorrect
-  typedef struct MyDog MyDog_typedef; 
-
-  // Correct
-  typedef struct MyDog MyDog_t;
-  ```
-
-* Functions that take no arguments must be declared as `foo(void)` **not** `foo()`, as the second option allows `foo` to take anything as it's arguments ([reference](https://softwareengineering.stackexchange.com/questions/286490/what-is-the-difference-between-function-and-functionvoid/286494))
-
-* Functions that return values via argument(s) must have all pointer parameters labelled as `[in]`, `[in/out]`, or `[out]` in the javadoc, **in that order**. The exceptions to this are [pseudo-class](/docs/firmware-architecture-and-design.md#pseudo-class) functions, which should take the "class" (which is an `[in/out]` as the first argument) and function pointers.
-
-  ``` C
-  // Incorrect
-  /**
-   * Create a trajectory with given max speed
-   * 
-   * @param max_acceleration The maximum acceleration permitted. This will be
-   *                         updated to the maximum acceleration actually seen
-   *                         on the generated trajectory.
-   * @param created_trajectory A pointer that will be set to the created 
-   *                           created trajectory.
-   * @param max_speed The maximum speed on the trajectory permitted on the 
-   *                  trajectory.
-   *
-   * @return true if the trajectory was generated successfully, false otherwise
-   */
-  bool generateTrajectory(float* max_acceleration, 
-                          Trajectory* created_trajectory, 
-                          float max_speed);
-
-  // Correct
-  /**
-   * Create a trajectory with given max speed
-   * 
-   * @param max_speed The maximum speed on the trajectory permitted on the 
-   *                       trajectory.
-   * @param max_acceleration [in/out] The maximum acceleration permitted. This 
-   *                                  will be updated to the maximum acceleration 
-   *                                  actually seen on the generated trajectory.
-   * @param created_trajectory [out] A pointer that will be set to the created 
-   *                                 created trajectory.
-   *
-   * @return true if the trajectory was generated successfully, false otherwise
-   */
-  bool generateTrajectory(float max_speed, 
-                          float* max_acceleration, 
-                          Trajectory* created_trajectory);
-  ```
 
 ### Names and Variables
 

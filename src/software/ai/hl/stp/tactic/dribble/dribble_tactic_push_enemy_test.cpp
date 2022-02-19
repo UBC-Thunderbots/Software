@@ -26,14 +26,14 @@ class DribbleTacticPushEnemyTest : public SimulatedTacticTestFixture,
         {
             yield("Tactic not done");
         }
-        robotReceivedBall(1, world_ptr, yield);
+        robotReceivedBall(world_ptr, yield);
         auto received_ball_time = world_ptr->getMostRecentTimestamp();
         while (world_ptr->getMostRecentTimestamp() <
                received_ball_time + Duration::fromSeconds(1))
         {
             yield("Waiting 1 second to see if possession is maintained");
         }
-        robotReceivedBall(1, world_ptr, yield);
+        robotReceivedBall(world_ptr, yield);
     }
 
     void SetUp() override
