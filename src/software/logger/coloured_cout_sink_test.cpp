@@ -71,5 +71,4 @@ INSTANTIATE_TEST_CASE_P(
         std::make_tuple<LEVELS, FG_Colour>(LEVELS(INFO), FG_Colour::WHITE),
         std::make_tuple<LEVELS, FG_Colour>(LEVELS(DEBUG), FG_Colour::GREEN),
         std::make_tuple<LEVELS, FG_Colour>(LEVELS(ROBOT_STATUS), FG_Colour::WHITE),
-        std::make_tuple<LEVELS, FG_Colour>(LEVELS(WARNING), FG_Colour::YELLOW),
-        std::make_tuple<LEVELS, FG_Colour>(LEVELS(CSV), FG_Colour::WHITE)));
+        std::make_tuple<LEVELS, FG_Colour>(LEVELS(WARNING), FG_Colour::YELLOW)));

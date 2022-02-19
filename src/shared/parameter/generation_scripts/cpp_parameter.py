@@ -42,6 +42,10 @@ COMMAND_LINE_ARG_ENTRY = "{param_type} {param_name} = {quote}{value}{quote};"
 
 LOAD_COMMAND_LINE_ARG_INTO_CONFIG = "this->{dependencies}getMutable{param_accessor_name}()->setValue(args.{arg_prefix}{param_name});"
 
+TO_PROTO_ENTRY = "config_proto.set_{param_name}({param_variable_name}->value());"
+
+LOAD_FROM_PROTO_ENTRY = "{param_variable_name}->setValue(config_proto.{param_name}());"
+
 
 class CppParameter(object):
     def __init__(self, param_type: str, param_metadata: dict):
@@ -242,4 +246,16 @@ class CppParameter(object):
             param_accessor_name=to_pascal_case(self.param_name),
             dependencies="",
             arg_prefix="",
+        )
+
+    @property
+    def to_proto_entry(self):
+        return TO_PROTO_ENTRY.format(
+            param_name=self.param_name, param_variable_name=self.param_variable_name,
+        )
+
+    @property
+    def load_from_proto_entry(self):
+        return LOAD_FROM_PROTO_ENTRY.format(
+            param_name=self.param_name, param_variable_name=self.param_variable_name,
         )
