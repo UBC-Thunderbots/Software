@@ -6,10 +6,12 @@ cc_library(
     srcs = [
         "equal_within_tolerance.cpp",
         "test_util.cpp",
+        "path_planning_test_util.cpp",
     ],
     hdrs = [
         "equal_within_tolerance.h",
         "test_util.h",
+        "path_planning_test_util.h",
     ],
     deps = [
         "//firmware/app/logger",
@@ -28,6 +30,7 @@ cc_library(
         "//software/simulation/physics:physics_world",
         "//software/world",
         "//software/world:robot_state",
+        "//software/ai/navigator/obstacle:obstacle",
     ],
 )
 
