@@ -11,6 +11,7 @@ ProtobufSink::ProtobufSink()
 {
     // Setup the logs
     unix_senders["log"] = std::make_unique<ThreadedUnixSender>(UNIX_BASE_PATH + "log");
+    unix_senders["protobuf"] = std::make_unique<ThreadedUnixSender>(UNIX_BASE_PATH + "protobuf");
 }
 
 void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
@@ -19,21 +20,8 @@ void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
 
     if (level.value == VISUALIZE.value)
     {
-        std::string msg = log_entry.get().message();
-        size_t pos      = msg.find(TYPE_DELIMITER);
-
-        std::string proto_type_name  = msg.substr(0, pos);
-        std::string serialized_proto = msg.substr(pos + TYPE_DELIMITER.length());
-
-        // If we don't already have a unix sender for this type, lets create it
-        if (unix_senders.count(proto_type_name) == 0)
-        {
-            unix_senders[proto_type_name] =
-                std::make_unique<ThreadedUnixSender>(UNIX_BASE_PATH + proto_type_name);
-        }
-
         // Send the protobuf
-        unix_senders[proto_type_name]->sendString(serialized_proto);
+        unix_senders["protobuf"]->sendString(log_entry.get().message());
     }
     else
     {
