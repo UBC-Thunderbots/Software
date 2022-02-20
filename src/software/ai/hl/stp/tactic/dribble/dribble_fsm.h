@@ -13,8 +13,9 @@
 struct DribbleFSM
 {
    public:
-    class GetPossessionState;
-    class DribbleState;
+    class GetPossession;
+    class Dribble;
+    class LoseBall;
 
     /**
      * Constructor for DribbleFSM
@@ -63,7 +64,8 @@ struct DribbleFSM
      * the ball
      */
     static Point robotPositionToFaceBall(const Point &ball_position,
-                                         const Angle &face_ball_angle);
+                                         const Angle &face_ball_angle,
+                                         double additional_offset = 0.0);
 
     /**
      * Calculates the interception point for intercepting balls
@@ -142,6 +144,8 @@ struct DribbleFSM
      */
     void startDribble(const Update &event);
 
+    void loseBall(const Update &event);
+
     /**
      * Guard that checks if the robot has possession of the ball
      *
@@ -171,31 +175,37 @@ struct DribbleFSM
      */
     bool dribblingDone(const Update &event);
 
+    bool shouldLoseBall(const Update &event);
+
     auto operator()()
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(GetPossessionState)
-        DEFINE_SML_STATE(DribbleState)
+        DEFINE_SML_STATE(GetPossession)
+        DEFINE_SML_STATE(Dribble)
+        DEFINE_SML_STATE(LoseBall)
         DEFINE_SML_EVENT(Update)
         DEFINE_SML_GUARD(havePossession)
         DEFINE_SML_GUARD(lostPossession)
         DEFINE_SML_GUARD(dribblingDone)
+        DEFINE_SML_GUARD(shouldLoseBall)
         DEFINE_SML_ACTION(startDribble)
+        DEFINE_SML_ACTION(loseBall)
         DEFINE_SML_ACTION(getPossession)
         DEFINE_SML_ACTION(dribble)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *GetPossessionState_S + Update_E[havePossession_G] / startDribble_A =
-                DribbleState_S,
-            GetPossessionState_S + Update_E[!havePossession_G] / getPossession_A,
-            DribbleState_S + Update_E[lostPossession_G] / getPossession_A =
-                GetPossessionState_S,
-            DribbleState_S + Update_E[!dribblingDone_G] / dribble_A,
-            DribbleState_S + Update_E[dribblingDone_G] / dribble_A = X,
-            X + Update_E[lostPossession_G] / getPossession_A       = GetPossessionState_S,
-            X + Update_E[!dribblingDone_G] / dribble_A             = DribbleState_S,
+            *GetPossession_S + Update_E[havePossession_G] / startDribble_A = Dribble_S,
+            GetPossession_S + Update_E[!havePossession_G] / getPossession_A,
+            Dribble_S + Update_E[lostPossession_G] / getPossession_A = GetPossession_S,
+            Dribble_S + Update_E[shouldLoseBall_G] / loseBall_A      = LoseBall_S,
+            Dribble_S + Update_E[!dribblingDone_G] / dribble_A,
+            Dribble_S + Update_E[dribblingDone_G] / dribble_A = X,
+            LoseBall_S + Update_E[!lostPossession_G] / loseBall_A,
+            LoseBall_S + Update_E[lostPossession_G] / getPossession_A = GetPossession_S,
+            X + Update_E[lostPossession_G] / getPossession_A          = GetPossession_S,
+            X + Update_E[!dribblingDone_G] / dribble_A                = Dribble_S,
             X + Update_E / dribble_A);
     }
 
