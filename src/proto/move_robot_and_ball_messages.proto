@@ -9,11 +9,11 @@ message RobotId
     uint32 robot_id = 1;
 }
 
-enum TeamColour                                                                                                                                                                                           
-{                                                                                                                                                                                                                                                                                                                                                                       
-    BLUE = 0;                                                                                                                                                                                     
-    YELLOW = 1;                                                                                                                                                                                       
-}   
+enum TeamColour
+{
+    BLUE   = 0;
+    YELLOW = 1;
+}
 
 message MoveRobot
 {
