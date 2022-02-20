@@ -39,17 +39,12 @@ struct DribbleFSM
 
     // Threshold to determine if the ball is at the destination determined experimentally
     static constexpr double BALL_CLOSE_TO_DEST_THRESHOLD = 0.1;
-    // Threshold to determine if the robot has the expected orientation when dribbling the
-    // ball
-    static constexpr Angle FACE_DESTINATION_CLOSE_THRESHOLD = Angle::fromDegrees(5);
     // Threshold to determine if the robot has the expected orientation when completing
     // the dribble
     static constexpr Angle FINAL_DESTINATION_CLOSE_THRESHOLD = Angle::fromDegrees(1);
-    // Kick speed when breaking up continuous dribbling
-    static constexpr double DRIBBLE_KICK_SPEED = 0.05;
     // Maximum distance to continuously dribble the ball, slightly conservative to not
     // break the 1 meter rule
-    static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.9;
+    static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.8;
     // robot speed at which the robot is done dribbling
     static constexpr double ROBOT_DRIBBLING_DONE_SPEED = 0.2;  // m/s
 
@@ -145,6 +140,11 @@ struct DribbleFSM
      */
     void startDribble(const Update &event);
 
+    /**
+     * Action to lose possession of the ball
+     *
+     * @param event DribbleFSM::Update
+     */
     void loseBall(const Update &event);
 
     /**
@@ -176,6 +176,14 @@ struct DribbleFSM
      */
     bool dribblingDone(const Update &event);
 
+    /**
+     * Guard that checks if the the robot should lose possession to avoid excessive
+     * dribbling
+     *
+     * @param event DribbleFSM::Update
+     *
+     * @return if the ball possession should be lost
+     */
     bool shouldLoseBall(const Update &event);
 
     auto operator()()

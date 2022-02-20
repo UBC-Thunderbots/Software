@@ -90,6 +90,11 @@ class ErForceSimulator : public QObject
      */
     void stepSimulation(const Duration& time_step);
 
+    /**
+     * Gets the blue and yellow robot statuses
+     *
+     * @return a vector of robot statuses from either blue or yellow robots
+     */
     std::vector<TbotsProto::RobotStatus> getBlueRobotStatuses() const;
     std::vector<TbotsProto::RobotStatus> getYellowRobotStatuses() const;
 
