@@ -106,6 +106,12 @@ git_repository(
     shallow_since = "1570056263 -0700",
 )
 
+git_repository(
+    name = "pybind11_protobuf",
+    commit = "f20537c3285636716ed86a7ef96baa19a788c944",
+    remote = "https://github.com/pybind/pybind11_protobuf",
+)
+
 load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
 
 boost_deps()

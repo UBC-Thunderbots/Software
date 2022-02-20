@@ -1,4 +1,5 @@
 load(":parameter.bzl", "cpp_dynamic_parameters", "proto_dynamic_parameters")
+load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -110,3 +111,32 @@ cc_test(
         "//software/util/make_enum",
     ],
 )
+
+PYBIND_DEPS = [
+    "@local_config_python//:python_headers",
+    "@pybind11",
+]
+
+cc_library(
+    name = "dynamic_parameters_lib",
+    srcs = ["python_bindings.cpp"],
+    copts = ["-fexceptions"],
+    features = [
+        "-use_header_modules",
+        "-parse_headers",
+    ],
+    deps = [
+        "//software/sensor_fusion",
+        "//shared/parameter:cpp_configs",
+        "//proto:sensor_msg_cc_proto",
+        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
+    ] + PYBIND_DEPS,
+)
+
+pybind_extension(
+    name = "dynamic_parameters",
+    deps = [
+        ":dynamic_parameters_lib",
+    ],
+)
+
