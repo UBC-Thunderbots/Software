@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/tactic/dribble/dribble_tactic.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
-#include "software/simulated_tests/simulated_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_at_point_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_received_ball_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
@@ -14,7 +14,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class DribbleTacticPushEnemyTest : public SimulatedTacticTestFixture,
+class DribbleTacticPushEnemyTest : public SimulatedErForceSimTacticTestFixture,
                                    public ::testing::WithParamInterface<Point>
 {
    protected:
@@ -26,22 +26,23 @@ class DribbleTacticPushEnemyTest : public SimulatedTacticTestFixture,
         {
             yield("Tactic not done");
         }
-        robotReceivedBall(1, world_ptr, yield);
+        robotReceivedBall(world_ptr, yield);
         auto received_ball_time = world_ptr->getMostRecentTimestamp();
         while (world_ptr->getMostRecentTimestamp() <
                received_ball_time + Duration::fromSeconds(1))
         {
             yield("Waiting 1 second to see if possession is maintained");
         }
-        robotReceivedBall(1, world_ptr, yield);
+        robotReceivedBall(world_ptr, yield);
     }
 
     void SetUp() override
     {
-        SimulatedTacticTestFixture::SetUp();
+        SimulatedErForceSimTacticTestFixture::SetUp();
         setMotionConstraints({MotionConstraint::ENEMY_DEFENSE_AREA});
     }
-    Field field = Field::createSSLDivisionBField();
+    FieldType field_type = FieldType::DIV_B;
+    Field field          = Field::createField(field_type);
     std::vector<RobotStateWithId> enemy_robots =
         TestUtil::createStationaryRobotStatesWithId(
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
@@ -71,7 +72,7 @@ TEST_P(DribbleTacticPushEnemyTest, test_steal_ball_from_behind_enemy)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
