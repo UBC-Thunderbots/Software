@@ -1,5 +1,6 @@
 load(":parameter.bzl", "cpp_dynamic_parameters", "proto_dynamic_parameters")
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+load("@com_google_protobuf//:protobuf.bzl", "py_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -32,6 +33,16 @@ proto_library(
 cc_proto_library(
     name = "dynamic_param_cc_proto",
     deps = [":dynamic_param_proto"],
+)
+
+py_proto_library(
+    name = "dynamic_param_py_proto",
+    srcs = [
+        "dynamic_parameters.proto",
+    ],
+    deps = [
+        "@com_google_protobuf//:protobuf_python",
+    ],
 )
 
 cc_library(

@@ -31,7 +31,21 @@ CONFIG_PROTO = (
 
 PROTO_MESSAGE_DEFINITION = "message {name} {{\n" "{contents}" "}}\n\n"
 
-PROTO_PARAM_ENTRY = "{type} {name} = {count};\n"
+PROTO_PARAM_ENTRY = (
+    "{type} {name} = {count_0};\n"
+    "message {name}_range {{\n"
+    "{type} min_value = {count_1};\n"
+    "{type} max_value = {count_2};\n"
+    "}}\n"
+    "message {name}_options {{\n"
+    "repeated {type} allowed_values = {count_3};\n"
+    "}}\n"
+    "oneof {name}_allowed_values {{\n"
+    "{name}_range {name}_allowed_range = {count_4};\n"
+    "{name}_options {name}_allowed_options = {count_5};\n"
+    "}}\n"
+)
+
 
 PROTO_CONFIG_ENTRY = "google.protobuf.Any {name} = {count};\n"
 
@@ -54,7 +68,7 @@ class ProtoWriter(object):
 
         for config, config_definition in config_metadata.items():
             message_contents = ""
-            entry_count = 1
+            field_number_count = 1
             name = to_pascal_case(config.split(".")[0])
             list_of_includes.append(config)
 
@@ -69,22 +83,28 @@ class ProtoWriter(object):
                     # Since we are autogenerating, we should know which index
                     # corresponds to which type
                     message_contents += PROTO_CONFIG_ENTRY.format(
-                        name=included_config.split(".")[0], count=entry_count
+                        name=included_config.split(".")[0], count=field_number_count
                     )
-                    entry_count += 1
+                    field_number_count += 1
 
             # generate parameters
             if "parameters" in config_definition:
                 for param_entry in config_definition["parameters"]:
                     for param_type, param_definition in param_entry.items():
+
+                        protobuf_field_numbers = {
+                            "count_{}".format(x): x + field_number_count
+                            for x in range(6)
+                        }
+
                         message_contents += "".join(
                             PROTO_PARAM_ENTRY.format(
                                 type=type_map.PROTO_TYPE_MAP[param_type],
                                 name=param_definition["name"],
-                                count=entry_count,
+                                **protobuf_field_numbers,
                             )
                         )
-                        entry_count += 1
+                        field_number_count += 6
 
             # append to output
             output_proto_contents += PROTO_MESSAGE_DEFINITION.format(
@@ -93,13 +113,13 @@ class ProtoWriter(object):
 
         # make the top level config
         top_level_config_contents = ""
-        entry_count = 1
+        field_number_count = 1
 
         for include in list(set(list_of_includes)):
             top_level_config_contents += PROTO_CONFIG_ENTRY.format(
-                name=include.split(".")[0], count=entry_count
+                name=include.split(".")[0], count=field_number_count
             )
-            entry_count += 1
+            field_number_count += 1
 
         output_proto_contents += PROTO_MESSAGE_DEFINITION.format(
             name=top_level_proto, contents=top_level_config_contents

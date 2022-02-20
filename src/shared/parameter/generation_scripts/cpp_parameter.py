@@ -44,6 +44,13 @@ LOAD_COMMAND_LINE_ARG_INTO_CONFIG = "this->{dependencies}getMutable{param_access
 
 TO_PROTO_ENTRY = "config_proto.set_{param_name}({param_variable_name}->value());"
 
+TO_PROTO_RANGE = (
+    "config_proto.mutable_{param_name}_allowed_values().mutable_{param_name}_allowed_range().set_min_value({min_value});\n"
+    "config_proto.mutable_{param_name}_allowed_values().mutable_{param_name}_allowed_range().set_max_value({max_value});"
+)
+
+TO_PROTO_OPTIONS = "*(config_proto.mutable_{param_name}_allowed_values().mutable_{param_name}_allowed_options().add_allowed_values()) = {option}"
+
 LOAD_FROM_PROTO_ENTRY = "{param_variable_name}->setValue(config_proto.{param_name}());"
 
 
@@ -250,6 +257,13 @@ class CppParameter(object):
 
     @property
     def to_proto_entry(self):
+        print(
+            TO_PROTO_RANGE.format(
+                param_name=self.param_name, min_value=100, max_value=200
+            )
+        )
+        print(TO_PROTO_OPTIONS.format(param_name=self.param_name, option="123123"))
+
         return TO_PROTO_ENTRY.format(
             param_name=self.param_name, param_variable_name=self.param_variable_name,
         )

@@ -84,20 +84,19 @@ http_archive(
     url = "https://github.com/ReneNyffenegger/cpp-base64/archive/refs/tags/V2.rc.08.zip",
 )
 
-http_archive(
-    name = "rules_proto",
-    sha256 = "ba66b430aaed1b6d2530154fd5ff968fb810ee0936edfe5f48e1f1c36ff2ea65",
-    strip_prefix = "rules_proto-e507ccded37c389186afaeb2b836ec576dc875dc",
-    urls = [
-        "https://github.com/bazelbuild/rules_proto/archive/e507ccded37c389186afaeb2b836ec576dc875dc.zip",
-    ],
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+git_repository(
+    name = "com_google_protobuf",
+    patch_args = ["-p1"],
+    patches = ["@//extlibs:protobuf.patch"],
+    remote = "https://github.com/protocolbuffers/protobuf",
+    tag = "v3.19.4",
 )
 
-load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
-rules_proto_dependencies()
-
-rules_proto_toolchains()
+protobuf_deps()
 
 git_repository(
     name = "com_github_nelhage_rules_boost",
