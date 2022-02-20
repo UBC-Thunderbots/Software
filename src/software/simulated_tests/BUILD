@@ -113,3 +113,16 @@ cc_test(
         "//software/world",
     ],
 )
+
+cc_library(
+    name = "tactic_stepper",
+    srcs = ["tactic_stepper.cpp"],
+    hdrs = ["tactic_stepper.h"],
+    deps = [
+        "//software/ai/hl/stp/tactic",
+        "//software/ai/navigator",
+        "//software/ai/navigator/path_manager:velocity_obstacle_path_manager",
+        "//software/ai/navigator/path_planner:theta_star_path_planner",
+        "@gtest",
+    ],
+)
