@@ -4,10 +4,15 @@ package TbotsProto;
 
 import "proto/geometry.proto";
 
+message RobotId
+{
+    uint32 robot_id = 1;
+}
+
 enum TeamColour                                                                                                                                                                                           
-{                                                                                                                                                                                                                                                                                                                                                                          
-    YELLOW = 1;                                                                                                                                                                                     
-    BLUE = 2;                                                                                                                                                                                       
+{                                                                                                                                                                                                                                                                                                                                                                       
+    BLUE = 0;                                                                                                                                                                                     
+    YELLOW = 1;                                                                                                                                                                                       
 }   
 
 message MoveRobot
@@ -17,7 +22,6 @@ message MoveRobot
     Vector global_velocity                  = 3;
     AngularVelocity global_angular_velocity = 4;
     TeamColour team_colour                  = 5;
-    Robot robot_id                          = 6;
 }
 
 message MoveBall
