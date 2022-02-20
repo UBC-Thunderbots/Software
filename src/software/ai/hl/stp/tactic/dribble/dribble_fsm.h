@@ -59,6 +59,7 @@ struct DribbleFSM
      *
      * @param ball_position The ball position
      * @param face_ball_angle The angle to face the ball
+     * @param additional_offset Additional offset from facing the ball
      *
      * @return the point that the robot should be positioned to face the ball and dribble
      * the ball
@@ -213,5 +214,5 @@ struct DribbleFSM
     Point continuous_dribbling_start_point;
 
     // if ball and front of robot are separated by this amount, then we've lost possession
-    static constexpr double LOSE_BALL_POSSESSION_THRESHOLD = 0.02;
+    static constexpr double LOSE_BALL_POSSESSION_THRESHOLD = 0.04;
 };

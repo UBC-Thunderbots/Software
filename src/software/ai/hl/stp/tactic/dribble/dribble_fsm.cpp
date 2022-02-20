@@ -135,7 +135,7 @@ void DribbleFSM::loseBall(const Update &event)
     auto face_ball_orientation =
         (ball_position - event.common.robot.position()).orientation();
     Point away_from_ball_position = robotPositionToFaceBall(
-        ball_position, face_ball_orientation, LOSE_BALL_POSSESSION_THRESHOLD * 1.5);
+        ball_position, face_ball_orientation, LOSE_BALL_POSSESSION_THRESHOLD * 2);
 
     event.common.set_intent(std::make_unique<MoveIntent>(
         event.common.robot.id(), away_from_ball_position, face_ball_orientation, 0,
