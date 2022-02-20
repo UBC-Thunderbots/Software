@@ -9,6 +9,7 @@ import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.dockarea import *
 
+from shared.parameter.dynamic_parameters_pb2 import ThunderbotsConfig
 
 if __name__ == "__main__":
 
