@@ -1,6 +1,6 @@
 import shared.parameter.python_bindings as py
 from proto.sensor_msg_pb2 import SensorProto
-from proto.world_pb2 import SimulatorInitialization, SimulatorTick
+from proto.world_pb2 import WorldState, SimulatorTick
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.networking.threaded_unix_sender import ThreadedUnixSender
 
