@@ -2,16 +2,16 @@
 
 #include <algorithm>
 
-ShootOrPassPlayFSM::ShootOrPassPlayFSM(std::shared_ptr<const PlayConfig> play_config)
-    : play_config(play_config),
+ShootOrPassPlayFSM::ShootOrPassPlayFSM(std::shared_ptr<const AiConfig> ai_config)
+    : ai_config(ai_config),
       attacker_tactic(
-          std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig())),
+          std::make_shared<AttackerTactic>(ai_config->getAttackerTacticConfig())),
       receiver_tactic(std::make_shared<ReceiverTactic>()),
       offensive_positioning_tactics(std::vector<std::shared_ptr<MoveTactic>>()),
       pass_generator(
           PassGenerator<EighteenZoneId>(std::make_shared<const EighteenZonePitchDivision>(
                                             Field::createSSLDivisionBField()),
-                                        play_config->getPassingConfig())),
+                                        ai_config->getPassingConfig())),
       pass_optimization_start_time(Timestamp::fromSeconds(0)),
       best_pass_and_score_so_far(
           PassWithRating{.pass = Pass(Point(), Point(), 0), .rating = 0}),
@@ -66,8 +66,8 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
         // (with a score of 1) and decreasing this threshold over time
         // This boolean indicates if we're ready to perform a pass
         double abs_min_pass_score =
-            play_config->getShootOrPassPlayConfig()->getAbsMinPassScore()->value();
-        double pass_score_ramp_down_duration = play_config->getShootOrPassPlayConfig()
+            ai_config->getShootOrPassPlayConfig()->getAbsMinPassScore()->value();
+        double pass_score_ramp_down_duration = ai_config->getShootOrPassPlayConfig()
                                                    ->getPassScoreRampDownDuration()
                                                    ->value();
         pass_eval = pass_generator.generatePassEvaluation(event.common.world);
@@ -97,9 +97,9 @@ void ShootOrPassPlayFSM::lookForPass(const Update& event)
 void ShootOrPassPlayFSM::startLookingForPass(const Update& event)
 {
     attacker_tactic =
-        std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
-    receiver_tactic                        = std::make_shared<ReceiverTactic>();
-    Timestamp pass_optimization_start_time = event.common.world.getMostRecentTimestamp();
+        std::make_shared<AttackerTactic>(ai_config->getAttackerTacticConfig());
+    receiver_tactic              = std::make_shared<ReceiverTactic>();
+    pass_optimization_start_time = event.common.world.getMostRecentTimestamp();
     lookForPass(event);
 }
 

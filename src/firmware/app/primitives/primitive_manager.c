@@ -1,18 +1,7 @@
 #include "firmware/app/primitives/primitive_manager.h"
 
-// There are different semaphore implementations depending on if we're on a x86 or arm
-// system, and we use typdefs here to switch between them
-#ifdef __arm__
-#include <FreeRTOS.h>
-#include <semphr.h>
-#define static_assert _Static_assert
-#elif __unix__
-#include <pthread.h>
-#else
-#error "Could not determine what CPU this is being compiled for."
-#endif
-
 #include <assert.h>
+#include <pthread.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -23,12 +12,8 @@
 
 struct PrimitiveManager
 {
-// The mutex that prevents multiple entries into the same primitive at the same time.
-#ifdef __arm__
-    SemaphoreHandle_t primitive_mutex;
-#elif __unix__
+    // The mutex that prevents multiple entries into the same primitive at the same time.
     pthread_mutex_t primitive_mutex;
-#endif
 
     // The primitive that is currently running. If NULL then there is no primitive running
     const primitive_t *current_primitive;
@@ -43,13 +28,7 @@ struct PrimitiveManager
  */
 void app_primitive_manager_lockPrimitiveMutex(PrimitiveManager_t *manager)
 {
-#ifdef __arm__
-    xSemaphoreTake(manager->primitive_mutex, portMAX_DELAY);
-#elif __unix__
     pthread_mutex_lock(&(manager->primitive_mutex));
-#else
-#error "Could not determine what CPU this is being compiled for."
-#endif
 }
 
 /**
@@ -58,13 +37,7 @@ void app_primitive_manager_lockPrimitiveMutex(PrimitiveManager_t *manager)
  */
 void app_primitive_manager_unlockPrimitiveMutex(PrimitiveManager_t *manager)
 {
-#ifdef __arm__
-    xSemaphoreGive(manager->primitive_mutex);
-#elif __unix__
     pthread_mutex_unlock(&(manager->primitive_mutex));
-#else
-#error "Could not determine what CPU this is being compiled for."
-#endif
 }
 
 PrimitiveManager_t *app_primitive_manager_create(void)
@@ -72,14 +45,7 @@ PrimitiveManager_t *app_primitive_manager_create(void)
     PrimitiveManager_t *manager =
         (PrimitiveManager_t *)malloc(sizeof(PrimitiveManager_t));
 
-#ifdef __arm__
-    static StaticSemaphore_t primitive_mutex_storage;
-    manager->primitive_mutex = xSemaphoreCreateMutexStatic(&primitive_mutex_storage);
-#elif __unix__
     pthread_mutex_init(&(manager->primitive_mutex), NULL);
-#else
-#error "Could not determine what CPU this is being compiled for."
-#endif
 
     manager->current_primitive       = NULL;
     manager->current_primitive_state = NULL;

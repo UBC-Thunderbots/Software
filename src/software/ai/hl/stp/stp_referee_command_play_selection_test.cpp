@@ -26,13 +26,7 @@ class STPRefereeCommandPlaySelectionTestWithPositions
 {
    public:
     STPRefereeCommandPlaySelectionTestWithPositions()
-        : stp(
-              []() {
-                  return std::make_unique<HaltPlay>(
-                      std::make_shared<const ThunderbotsConfig>()->getPlayConfig());
-              },
-              std::make_shared<const AiControlConfig>(),
-              std::make_shared<const ThunderbotsConfig>()->getPlayConfig(), 0)
+        : stp(std::make_shared<const ThunderbotsConfig>()->getAiConfig())
     {
     }
 
@@ -40,31 +34,6 @@ class STPRefereeCommandPlaySelectionTestWithPositions
     STP stp;
     World world = ::TestUtil::createBlankTestingWorld();
 };
-
-TEST_P(STPRefereeCommandPlaySelectionTestWithPositions,
-       test_play_selection_for_states_and_positions)
-{
-    // set up the friendly team
-    ::TestUtil::setFriendlyRobotPositions(world, GetParam().friendly_positions,
-                                          Timestamp());
-    ::TestUtil::setEnemyRobotPositions(world, GetParam().enemy_positions, Timestamp());
-    world.updateBall(Ball(BallState(GetParam().ball_position, Vector()), Timestamp()));
-
-    // to set restart reason, etc. properly
-    world.updateRefereeCommand(GetParam().first_game_state);
-    world.updateGameStateBall(world.ball());
-    world.updateRefereeCommand(GetParam().second_game_state);
-    world.updateGameStateBall(world.ball());
-    std::unique_ptr<Play> play;
-    try
-    {
-        play = stp.calculateNewPlay(world);
-    }
-    catch (const std::runtime_error& e)
-    {
-        FAIL() << "No play for test case: " + GetParam().name;
-    }
-}
 
 std::vector<PlaySelectionTestParams> test_params = {
     {.name               = "Our Kickoff",
@@ -190,21 +159,15 @@ class STPRefereeCommandPlaySelectionTest
 {
    public:
     STPRefereeCommandPlaySelectionTest()
-        : stp([]() { return nullptr; }, std::make_shared<const AiControlConfig>(),
-              std::make_shared<const ThunderbotsConfig>()->getPlayConfig(), 0)
+        : stp(std::make_shared<const ThunderbotsConfig>()->getAiConfig())
     {
     }
 
    protected:
     void SetUp() override
     {
-        auto default_play_constructor = []() -> std::unique_ptr<Play> {
-            return std::make_unique<HaltPlay>(
-                std::make_shared<const ThunderbotsConfig>()->getPlayConfig());
-        };
         // Give an explicit seed to STP so that our tests are deterministic
-        stp = STP(default_play_constructor, std::make_shared<const AiControlConfig>(),
-                  std::make_shared<const ThunderbotsConfig>()->getPlayConfig(), 0);
+        stp = STP(std::make_shared<const ThunderbotsConfig>()->getAiConfig());
 
         Robot robot_0(0, Point(-1.1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                       Timestamp::fromSeconds(0));
@@ -227,23 +190,7 @@ class STPRefereeCommandPlaySelectionTest
     World world = ::TestUtil::createBlankTestingWorld();
 };
 
-TEST_P(STPRefereeCommandPlaySelectionTest, test_play_selection_for_all_referee_commands)
-{
-    world.updateRefereeCommand(GetParam());
-    world.updateGameStateBall(Ball(Point(), Vector(), Timestamp::fromSeconds(0)));
-
-    try
-    {
-        auto play_ptr = stp.calculateNewPlay(world);
-    }
-    catch (...)
-    {
-        FAIL() << "No play for game state " << GetParam();
-    }
-}
-
 // TODO (Issue #1999): Include `BALL_PLACEMENT_THEM` when ball placement states have plays
-
 // NORMAL_START is omitted since there is no preceding PREPARE state
 // GOAL_US and GOAL_THEM are omitted since selecting a play is not applicable
 INSTANTIATE_TEST_CASE_P(
