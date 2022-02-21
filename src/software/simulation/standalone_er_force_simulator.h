@@ -22,8 +22,7 @@ class StandaloneErForceSimulator
     // Listeners
     std::shared_ptr<ThreadedProtoUnixListener<TbotsProto::SimulatorTick>>
         simulation_tick_input_;
-    std::shared_ptr<ThreadedProtoUnixListener<TbotsProto::SimulatorInitialization>>
-        simulation_init_input_;
+    std::shared_ptr<ThreadedProtoUnixListener<TbotsProto::WorldState>> world_state_input_;
     std::shared_ptr<ThreadedProtoUnixListener<TbotsProto::PrimitiveSet>>
         blue_primitive_set_input_;
     std::shared_ptr<ThreadedProtoUnixListener<TbotsProto::PrimitiveSet>>

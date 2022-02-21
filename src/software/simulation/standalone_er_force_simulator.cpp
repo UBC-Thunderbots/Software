@@ -4,13 +4,10 @@
 
 StandaloneErForceSimulator::StandaloneErForceSimulator()
 {
-    simulation_init_input_.reset(
-        new ThreadedProtoUnixListener<TbotsProto::SimulatorInitialization>(
-            "/tmp/tbots/simulation_initialization",
-            [this](TbotsProto::SimulatorInitialization input) {
-                LOG(DEBUG)
-                    << "Simulation Init Message Received but not currently handled";
-            }));
+    world_state_input_.reset(new ThreadedProtoUnixListener<TbotsProto::WorldState>(
+        "/tmp/tbots/simulation_initialization", [this](TbotsProto::WorldState input) {
+            LOG(DEBUG) << "Simulation Init Message Received but not currently handled";
+        }));
 
     simulation_tick_input_.reset(new ThreadedProtoUnixListener<TbotsProto::SimulatorTick>(
         "/tmp/tbots/simulation_tick", [this](TbotsProto::SimulatorTick input) {
@@ -50,12 +47,9 @@ StandaloneErForceSimulator::StandaloneErForceSimulator()
     wrapper_packet_output_.reset(new ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(
         "/tmp/tbots/ssl_wrapper_packet"));
 
-    TbotsProto::SimulatorInitialization sim_init;
-    sim_init.set_field_type(TbotsProto::FieldType::DIV_B);
-
-    er_force_sim_.reset(new ErForceSimulator(sim_init, create2021RobotConstants(),
-                                             create2021WheelConstants(),
-                                             std::make_shared<const SimulatorConfig>()));
+    er_force_sim_.reset(new ErForceSimulator(
+        TbotsProto::FieldType::DIV_B, create2021RobotConstants(),
+        create2021WheelConstants(), std::make_shared<const SimulatorConfig>()));
 }
 
 StandaloneErForceSimulator::~StandaloneErForceSimulator() {}
