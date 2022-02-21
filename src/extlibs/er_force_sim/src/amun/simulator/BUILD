@@ -7,6 +7,7 @@ qt_cc_library(
     srcs = glob(["*.cpp"]),
     hdrs = glob(["*.h"]),
     #linkstatic = True,
+    alwayslink=True,
     deps = [
         "//extlibs/er_force_sim/src/core:core_qt",
         "//extlibs/er_force_sim/src/protobuf:protobuf_qt",

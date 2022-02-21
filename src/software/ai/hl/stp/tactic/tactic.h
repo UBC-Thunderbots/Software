@@ -43,7 +43,7 @@ class Tactic
      *
      * @param capability_reqs_ The capability requirements for running this tactic
      */
-    explicit Tactic(const std::set<RobotCapability> &capability_reqs_);
+    explicit Tactic(const std::set<RobotCapability>& capability_reqs_);
 
     Tactic() = delete;
 

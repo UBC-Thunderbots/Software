@@ -407,12 +407,10 @@ load("@pybind11_bazel//:python_configure.bzl", "python_configure")
 
 python_configure(name = "local_config_python")
 
-maybe(
-    git_repository,
+git_repository(
     name = "rules_third_party",
     commit = "8d0ba00f9874588c1ea38d1be2859060ac8c8516",
     remote = "https://github.com/DraconicEnt/rules_third_party.git",
-    shallow_since = "1620228587 -0400",
 )
 
 load("@rules_third_party//libraries:bullet.bzl", "bullet")
