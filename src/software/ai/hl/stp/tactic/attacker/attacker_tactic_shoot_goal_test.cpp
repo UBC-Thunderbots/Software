@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/geom/algorithms/contains.h"
-#include "software/simulated_tests/simulated_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -14,14 +14,15 @@
 #include "software/world/world.h"
 
 class AttackerTacticShootGoalTest
-    : public SimulatedTacticTestFixture,
+    : public SimulatedErForceSimTacticTestFixture,
       // Params: initial ball state, initial robot position, enemy team, expected
       // chip/kick direction
       public ::testing::WithParamInterface<
           std::tuple<BallState, Point, std::vector<RobotStateWithId>, Angle>>
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+    FieldType field_type = FieldType::DIV_B;
+    Field field          = Field::createField(field_type);
 };
 
 TEST_P(AttackerTacticShootGoalTest, attacker_test_shoot_goal)
@@ -52,7 +53,7 @@ TEST_P(AttackerTacticShootGoalTest, attacker_test_shoot_goal)
         }};
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
