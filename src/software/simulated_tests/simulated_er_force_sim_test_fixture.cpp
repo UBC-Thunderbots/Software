@@ -29,6 +29,13 @@ void SimulatedErForceSimTestFixture::SetUp()
 {
     LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
 
+    friendly_mutable_thunderbots_config=std::make_shared<ThunderbotsConfig>();
+    enemy_mutable_thunderbots_config=std::make_shared<ThunderbotsConfig>();
+    friendly_thunderbots_config=std::const_pointer_cast<const ThunderbotsConfig>(
+            friendly_mutable_thunderbots_config);
+    enemy_thunderbots_config=std::const_pointer_cast<const ThunderbotsConfig>(
+            enemy_mutable_thunderbots_config);
+
     setCommonConfigs(friendly_mutable_thunderbots_config);
     setCommonConfigs(enemy_mutable_thunderbots_config);
     // The friendly team defends the negative side of the field
