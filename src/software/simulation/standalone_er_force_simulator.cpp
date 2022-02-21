@@ -4,16 +4,33 @@
 
 StandaloneErForceSimulator::StandaloneErForceSimulator()
 {
+    tick_debug_ = 0;
+
     world_state_input_.reset(new ThreadedProtoUnixListener<TbotsProto::WorldState>(
-        "/tmp/tbots/simulation_initialization", [this](TbotsProto::WorldState input) {
-            LOG(DEBUG) << "Simulation Init Message Received but not currently handled";
+        std::scoped_lock lock(simulator_mutex);
+        "/tmp/tbots/world_state", [this](TbotsProto::WorldState input) {
+            this->er_force_sim_->setWorldState(input);
+            LOG(DEBUG) << "Reconfigured to " << input.DebugString();
         }));
+
+    wrapper_packet_output_.reset(new ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(
+        "/tmp/tbots/ssl_wrapper_packet"));
 
     simulation_tick_input_.reset(new ThreadedProtoUnixListener<TbotsProto::SimulatorTick>(
         "/tmp/tbots/simulation_tick", [this](TbotsProto::SimulatorTick input) {
-            LOG(DEBUG) << "SIM TICK!: " << input.milliseconds();
-            this->er_force_sim_->stepSimulation(Duration::fromMilliseconds(5));
-            LOG(DEBUG) << "DONE TICK!";
+            std::scoped_lock lock(simulator_mutex);
+
+            this->er_force_sim_->stepSimulation(
+                Duration::fromMilliseconds(input.milliseconds()));
+            this->tick_debug_++;
+
+            for (auto packet : this->er_force_sim_->getSSLWrapperPackets())
+            {
+                LOG(DEBUG) << packet.DebugString();
+                // wrapper_packet_output_->sendProto(packet);
+            }
+
+            LOG(DEBUG) << "<tick number> " << this->tick_debug_;
         }));
 
     yellow_primitive_set_input_.reset(
@@ -43,9 +60,6 @@ StandaloneErForceSimulator::StandaloneErForceSimulator()
             std::scoped_lock lock(simulator_mutex);
             yellow_vision_ = input;
         }));
-
-    wrapper_packet_output_.reset(new ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(
-        "/tmp/tbots/ssl_wrapper_packet"));
 
     er_force_sim_.reset(new ErForceSimulator(
         TbotsProto::FieldType::DIV_B, create2021RobotConstants(),

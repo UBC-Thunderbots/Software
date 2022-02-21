@@ -42,4 +42,6 @@ class StandaloneErForceSimulator
 
     std::mutex simulator_mutex;
     std::thread simulation_thread;
+
+    unsigned tick_debug_;
 };
