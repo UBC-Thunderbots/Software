@@ -127,8 +127,5 @@ Vector RNG::normalVector(double sigma, double mean)
     // Box-Muller transform (polar)
     const double tmp = sigma * std::sqrt(-2.0 * std::log(s) / s);
 
-    Vector result;
-    result.x = tmp * u + mean;
-    result.y = tmp * v + mean;
-    return result;
+    return Vector(tmp * u + mean, tmp * v + mean);
 }
