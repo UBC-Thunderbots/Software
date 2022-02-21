@@ -36,10 +36,9 @@ SPI = board.SPI()
 # We will use RGB colour model
 COLOUR_MODEL = "RGB"
 
-
 class LcdDisplay:
     def __init__(self):
-        """ Create a lcd_dislpay object """
+        """ Create a lcd_display object """
         # Create the display for 1.8" ST7735R:
         self.disp = st7735.ST7735R(
             SPI,
@@ -54,24 +53,23 @@ class LcdDisplay:
         # We swap height/width to rotate display to landscape
         self.width = self.disp.height
         self.height = self.disp.width
+        
+        # Create blank image for drawing
+        self.image = Image.new(COLOUR_MODEL, (self.width, self.height))
+        # Get drawing object to draw on image
+        self.draw  = ImageDraw.Draw(self.image)
 
         # Initialize to an empty black screen
         self.clear_screen()
 
     def clear_screen(self):
         """ Clear this LCD display, make it black """
-        # Create blank image for drawing.
-        image = Image.new(COLOUR_MODEL, (self.width, self.height))
-
-        # Get drawing object to draw on image.
-        draw = ImageDraw.Draw(image)
-
         # Draw a black filled box to clear the image.
-        draw.rectangle((0, 0, self.width, self.height), outline=0, fill=(0, 0, 0))
-        self.disp.image(image)
+        self.draw.rectangle((0, 0, self.width, self.height), outline=0, fill=(0, 0, 0))
+        self.disp.image(self.image)
 
     def draw_image(self, path_to_image):
-        """ Draw Thunderbots Logo on this LCD display """
+        """ Draw image on this LCD display """
         self.clear_screen()
 
         image = Image.open(path_to_image)
@@ -96,6 +94,13 @@ class LcdDisplay:
         # Display image
         self.disp.image(image)
 
+    def prepare(self):
+        """ Create a blank rectangle for drawing """
+        self.draw.rectangle((0, 20, self.width, self.height), outline=0, fill=0)
+    
+    def show(self):
+        """ Display the image """
+        self.disp.image(self.image)
 
 if __name__ == "__main__":
     path_to_logo = "./imgs/tbots.jpg"
