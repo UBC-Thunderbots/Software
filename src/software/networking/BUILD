@@ -73,9 +73,9 @@ cc_library(
 )
 
 cc_library(
-    name = "unix_listener",
+    name = "proto_unix_listener",
     hdrs = [
-        "unix_listener.hpp",
+        "proto_unix_listener.hpp",
     ],
     visibility = ["//visibility:private"],
     deps = [
@@ -98,12 +98,12 @@ cc_library(
 )
 
 cc_library(
-    name = "threaded_unix_listener",
+    name = "threaded_proto_unix_listener",
     hdrs = [
-        "threaded_unix_listener.hpp",
+        "threaded_proto_unix_listener.hpp",
     ],
     deps = [
-        ":unix_listener",
+        ":proto_unix_listener",
         "@boost//:asio",
     ],
 )
