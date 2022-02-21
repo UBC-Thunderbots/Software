@@ -4,6 +4,7 @@ import base64
 import os
 from google.protobuf import text_format
 from google.protobuf.any_pb2 import Any
+from proto.robot_log_msg_pb2 import RobotLog
 from threading import Thread
 import queue
 
@@ -101,13 +102,17 @@ class Session(socketserver.BaseRequestHandler):
         Then, trigger the handle callback
 
         """
-        p = base64.b64decode(self.request[0])
-        msg = self.proto_type()
-
         if self.convert_from_any:
+            p = base64.b64decode(self.request[0])
+            msg = self.proto_type()
             any_msg = Any.FromString(p)
             any_msg.Unpack(msg)
         else:
+            p = None
+            if self.proto_type == RobotLog:
+                p = base64.b64decode(self.request[0])
+            else:
+                p = self.request[0]
             msg = self.proto_type.FromString(p)
 
         self.handle_callback(msg)

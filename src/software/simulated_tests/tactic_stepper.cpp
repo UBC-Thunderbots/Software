@@ -20,12 +20,21 @@ TacticStepper::TacticStepper(std::shared_ptr<Tactic> tactic_to_run,
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> TacticStepper::getPrimitives(const World& world,
-                                                                       const Robot& robot)
+                                                                       unsigned robot_id)
 {
     std::vector<std::unique_ptr<Intent>> intents;
-    auto intent = tactic->get(robot, world);
-    intent->setMotionConstraints(motion_constraints);
-    intents.push_back(std::move(intent));
+    auto robot = world.friendlyTeam().getRobotById(robot_id);
+    if (robot.has_value())
+    {
+        auto intent = tactic->get(robot.value(), world);
+        intent->setMotionConstraints(motion_constraints);
+        intents.push_back(std::move(intent));
+        LOG(WARNING) << "step: " << robot_id;
+    }
+    else
+    {
+        LOG(WARNING) << "BRUH X_X WHY IS THERE NO ROBOT WITH ID " << robot_id;
+    }
 
     auto primitive_set_msg = navigator->getAssignedPrimitives(world, intents);
     return primitive_set_msg;

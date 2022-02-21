@@ -14,6 +14,8 @@ py_binary(
         "//software/thunderscope:constants",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
+        "//software/thunderscope/field:obstacle_layer",
+        "//software/thunderscope/field:path_layer",
         "//software/thunderscope/log:g3log_widget",
         requirement("pyqtgraph"),
         requirement("numpy"),

@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "pybind11_protobuf/native_proto_caster.h"
 #include "shared/constants.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
@@ -76,19 +77,11 @@ PYBIND11_MODULE(python_bindings, m)
 
     py::class_<TacticStepper>(m, "TacticStepper")
         .def(py::init<std::shared_ptr<Tactic>, const std::set<MotionConstraint>&,
-                      std::shared_ptr<const ThunderbotsConfig>>());
+                      std::shared_ptr<const ThunderbotsConfig>>())
+        .def("getPrimitives", &TacticStepper::getPrimitives);
 
-    // py::class_<ErForceSimulator>(m, "ErForceSimulator")
-    //.def(py::init<const TbotsProto::SimulatorInitialization&, RobotConstants_t&,
-    // WheelConstants&, std::shared_ptr<const SimulatorConfig>>());
-
-    py::class_<Robot>(m, "Robot")
-        .def(py::init<unsigned, Point&, Vector&, Angle&, Angle&, Timestamp&>())
-        .def("timestamp", &Robot::timestamp)
-        .def("position", &Robot::position)
-        .def("velocity", &Robot::velocity)
-        .def("orientation", &Robot::orientation)
-        .def("angularVelocity", &Robot::angularVelocity);
+    m.def("createVision", &createVision);
+    m.def("createWorld", &createWorld);
 
     py::class_<Team>(m, "Team")
         .def(py::init<const std::vector<Robot>&>())

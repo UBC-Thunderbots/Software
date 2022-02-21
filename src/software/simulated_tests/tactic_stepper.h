@@ -11,7 +11,7 @@ class TacticStepper
                            std::shared_ptr<const ThunderbotsConfig> thunderbots_config);
 
     std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitives(const World& world,
-                                                            const Robot& robot);
+                                                            unsigned robot_id);
 
    private:
     std::shared_ptr<Tactic> tactic;

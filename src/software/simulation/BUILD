@@ -315,6 +315,7 @@ cc_library(
         "//proto:defending_side_msg_cc_proto",
         "//proto:tbots_cc_proto",
         "//proto/message_translation:primitive_google_to_nanopb_converter",
+        "//proto/message_translation:tbots_protobuf",
         "//shared/parameter:cpp_configs",
         "//software:constants",
         "//software/logger",

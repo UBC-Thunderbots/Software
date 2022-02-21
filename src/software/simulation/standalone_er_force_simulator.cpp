@@ -1,5 +1,6 @@
 #include "software/simulation/standalone_er_force_simulator.h"
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "software/time/duration.h"
 
 StandaloneErForceSimulator::StandaloneErForceSimulator()
@@ -22,15 +23,11 @@ StandaloneErForceSimulator::StandaloneErForceSimulator()
 
             this->er_force_sim_->stepSimulation(
                 Duration::fromMilliseconds(input.milliseconds()));
-            this->tick_debug_++;
 
             for (auto packet : this->er_force_sim_->getSSLWrapperPackets())
             {
-                LOG(DEBUG) << packet.DebugString();
-                // wrapper_packet_output_->sendProto(packet);
+                wrapper_packet_output_->sendProto(packet);
             }
-
-            LOG(DEBUG) << "<tick number> " << this->tick_debug_;
         }));
 
     yellow_primitive_set_input_.reset(
