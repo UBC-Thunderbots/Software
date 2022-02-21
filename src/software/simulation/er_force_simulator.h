@@ -33,17 +33,19 @@ class ErForceSimulator
      * Creates a new Simulator. The starting state of the simulation
      * will have the given field, with no robots or ball.
      *
-     * @param sim_init The initialization protobuf
+     * @param field_type The field type
      * @param robot_constants The robot constants
      * @param wheel_constants The wheel constants
      * @param simulator_config The config to fetch parameters from
      */
-    explicit ErForceSimulator(const TbotsProto::SimulatorInitialization& sim_init,
+    explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
                               const RobotConstants_t& robot_constants,
                               const WheelConstants& wheel_constants,
                               std::shared_ptr<const SimulatorConfig> simulator_config);
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
+
+    void setWorldState(const TbotsProto::WorldState& world_state);
 
     /**
      * Sets the state of the ball in the simulation. No more than 1 ball may exist
@@ -70,6 +72,8 @@ class ErForceSimulator
     void setBlueRobots(const std::vector<RobotStateWithId>& robots);
     void setRobots(const std::vector<RobotStateWithId>& robots,
                    gameController::Team team);
+    void setRobots(const google::protobuf::Map<uint32_t, TbotsProto::RobotState>& robots,
+                   gameController::Team side);
 
     /**
      * Sets the primitive being simulated by the robot on the corresponding team

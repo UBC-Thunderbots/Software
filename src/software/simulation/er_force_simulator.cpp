@@ -17,19 +17,19 @@
 #include "software/world/robot_state.h"
 
 ErForceSimulator::ErForceSimulator(
-    const TbotsProto::SimulatorInitialization& sim_init,
-    const RobotConstants_t& robot_constants, const WheelConstants& wheel_constants,
+    const TbotsProto::FieldType& field_type, const RobotConstants_t& robot_constants,
+    const WheelConstants& wheel_constants,
     std::shared_ptr<const SimulatorConfig> simulator_config)
     : yellow_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
       blue_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
       frame_number(0),
       robot_constants(robot_constants),
       wheel_constants(wheel_constants),
-      field(Field::createField(sim_init.field_type()))
+      field(Field::createField(field_type))
 {
     QString full_filename = CONFIG_DIRECTORY;
 
-    if (sim_init.field_type() == TbotsProto::FieldType::DIV_A)
+    if (field_type == TbotsProto::FieldType::DIV_A)
     {
         full_filename = full_filename + CONFIG_FILE + ".txt";
     }
@@ -73,19 +73,14 @@ ErForceSimulator::ErForceSimulator(
 
     er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
 
-    setBallState(createBallState(sim_init.ball_state()));
-
-    std::for_each(
-        sim_init.friendly_team().team_robots().begin(),
-        sim_init.friendly_team().team_robots().end(),
-        [&](const TbotsProto::Robot& robot) { LOG(DEBUG) << robot.DebugString(); });
-
-    std::for_each(
-        sim_init.enemy_team().team_robots().begin(),
-        sim_init.enemy_team().team_robots().end(),
-        [&](const TbotsProto::Robot& robot) { LOG(DEBUG) << robot.DebugString(); });
-
     this->resetCurrentTime();
+}
+
+void ErForceSimulator::setWorldState(const TbotsProto::WorldState& world_state)
+{
+    setBallState(createBallState(world_state.ball_state()));
+    setRobots(world_state.blue_robots(), gameController::Team::BLUE);
+    setRobots(world_state.yellow_robots(), gameController::Team::YELLOW);
 }
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
@@ -214,6 +209,113 @@ void ErForceSimulator::setRobots(const std::vector<RobotStateWithId>& robots,
         auto simulator_robot = std::make_shared<ErForceSimulatorRobot>(
             RobotStateWithId{.id          = robot_state_with_id.id,
                              .robot_state = robot_state_with_id.robot_state},
+            robot_constants, wheel_constants);
+
+        if (side == gameController::Team::BLUE)
+        {
+            blue_simulator_robots.emplace_back(simulator_robot);
+        }
+        else
+        {
+            yellow_simulator_robots.emplace_back(simulator_robot);
+        }
+    }
+}
+
+void ErForceSimulator::setRobots(
+    const google::protobuf::Map<uint32_t, TbotsProto::RobotState>& robots,
+    gameController::Team side)
+{
+    auto simulator_setup_command = std::make_unique<amun::Command>();
+
+    robot::Specs ERForce;
+    robotSetDefault(&ERForce);
+
+    // Initialize Team Robots at the bottom of the field
+    ::robot::Team* team;
+    if (side == gameController::Team::BLUE)
+    {
+        team = simulator_setup_command->mutable_set_team_blue();
+    }
+    else
+    {
+        team = simulator_setup_command->mutable_set_team_yellow();
+    }
+
+    for (auto& [id, robot_state] : robots)
+    {
+        auto* robot = team->add_robot();
+        robot->CopyFrom(ERForce);
+        robot->set_id(id);
+    }
+    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
+
+    if (side == gameController::Team::BLUE)
+    {
+        simulator_setup_command->clear_set_team_blue();
+    }
+    else
+    {
+        simulator_setup_command->clear_set_team_yellow();
+    }
+
+    auto simulator_control = std::make_shared<sslsim::SimulatorControl>();
+    auto command_simulator = std::make_unique<amun::CommandSimulator>();
+
+    // Add each robot to be added to the teleport robot repeated field
+    for (auto& [id, robot_state] : robots)
+    {
+        auto teleport_robot             = std::make_unique<sslsim::TeleportRobot>();
+        gameController::BotId* robot_id = new gameController::BotId();
+        robot_id->set_id(id);
+
+        if (side == gameController::Team::BLUE)
+        {
+            robot_id->set_team(gameController::Team::BLUE);
+        }
+        else
+        {
+            robot_id->set_team(gameController::Team::YELLOW);
+        }
+
+        teleport_robot->set_x(static_cast<float>(
+            robot_state.global_position().x_meters() * MILLIMETERS_PER_METER));
+        teleport_robot->set_y(static_cast<float>(
+            robot_state.global_position().y_meters() * MILLIMETERS_PER_METER));
+        teleport_robot->set_allocated_id(robot_id);
+        teleport_robot->set_present(true);
+
+        teleport_robot->set_orientation(
+            static_cast<float>(robot_state.global_orientation().radians()));
+
+        teleport_robot->set_v_x(static_cast<float>(
+            robot_state.global_velocity().x_component_meters() * MILLIMETERS_PER_METER));
+        teleport_robot->set_v_y(static_cast<float>(
+            robot_state.global_velocity().x_component_meters() * MILLIMETERS_PER_METER));
+        teleport_robot->set_v_angular(static_cast<float>(
+            robot_state.global_angular_velocity().radians_per_second()));
+
+        *(simulator_control->add_teleport_robot()) = *teleport_robot;
+    }
+
+    // Send message to simulator to teleport robots
+    *(command_simulator->mutable_ssl_control())     = *simulator_control;
+    *(simulator_setup_command->mutable_simulator()) = *command_simulator;
+    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
+
+    if (side == gameController::Team::BLUE)
+    {
+        blue_simulator_robots.clear();
+    }
+    else
+    {
+        yellow_simulator_robots.clear();
+    }
+
+    for (auto& [id, robot_state] : robots)
+    {
+        auto simulator_robot = std::make_shared<ErForceSimulatorRobot>(
+            RobotStateWithId{.id = id, .robot_state = createRobotState(robot_state)},
             robot_constants, wheel_constants);
 
         if (side == gameController::Team::BLUE)

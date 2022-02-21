@@ -36,10 +36,9 @@ enum FieldType
     DIV_B = 1;
 }
 
-message SimulatorInitialization
+message WorldState
 {
-    required FieldType field_type = 1;
-    required Team friendly_team   = 2;
-    required Team enemy_team      = 3;
-    required BallState ball_state = 4;
+    map<uint32, RobotState> blue_robots   = 1;
+    map<uint32, RobotState> yellow_robots = 2;
+    optional BallState ball_state         = 3;
 }

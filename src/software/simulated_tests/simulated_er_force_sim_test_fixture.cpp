@@ -29,12 +29,12 @@ void SimulatedErForceSimTestFixture::SetUp()
 {
     LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
 
-    friendly_mutable_thunderbots_config=std::make_shared<ThunderbotsConfig>();
-    enemy_mutable_thunderbots_config=std::make_shared<ThunderbotsConfig>();
-    friendly_thunderbots_config=std::const_pointer_cast<const ThunderbotsConfig>(
-            friendly_mutable_thunderbots_config);
-    enemy_thunderbots_config=std::const_pointer_cast<const ThunderbotsConfig>(
-            enemy_mutable_thunderbots_config);
+    friendly_mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
+    enemy_mutable_thunderbots_config    = std::make_shared<ThunderbotsConfig>();
+    friendly_thunderbots_config = std::const_pointer_cast<const ThunderbotsConfig>(
+        friendly_mutable_thunderbots_config);
+    enemy_thunderbots_config = std::const_pointer_cast<const ThunderbotsConfig>(
+        enemy_mutable_thunderbots_config);
 
     setCommonConfigs(friendly_mutable_thunderbots_config);
     setCommonConfigs(enemy_mutable_thunderbots_config);
@@ -219,11 +219,8 @@ void SimulatedErForceSimTestFixture::runTest(
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
 
     // TODO nuke me
-    TbotsProto::SimulatorInitialization init_proto;
-    init_proto.set_field_type(field_type);
-
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
-        init_proto, create2015RobotConstants(), create2015WheelConstants(),
+        field_type, create2015RobotConstants(), create2015WheelConstants(),
         friendly_thunderbots_config->getSimulatorConfig()));
 
     // TODO (#2419): remove this to re-enable sigfpe checks
