@@ -133,18 +133,18 @@ http_archive(
 # Six is a dependency of com_google_absl_py
 http_archive(
     name = "six_archive",
+    build_file = "@com_google_absl_py//third_party:six.BUILD",
+    sha256 = "105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a",
+    strip_prefix = "six-1.10.0",
     urls = [
         "http://mirror.bazel.build/pypi.python.org/packages/source/s/six/six-1.10.0.tar.gz",
         "https://pypi.python.org/packages/source/s/six/six-1.10.0.tar.gz",
     ],
-    sha256 = "105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a",
-    strip_prefix = "six-1.10.0",
-    build_file = "@com_google_absl_py//third_party:six.BUILD",
 )
 
 new_local_repository(
-  name = "python",
-  path = "/usr/include/python3.8"
+    name = "python",
+    path = "/usr/include/python3.8",
 )
 
 bind(
@@ -186,7 +186,6 @@ new_git_repository(
     remote = "https://github.com/saebyn/munkres-cpp.git",
     shallow_since = "1479502661 -0800",
 )
-
 
 git_repository(
     name = "yaml-cpp",

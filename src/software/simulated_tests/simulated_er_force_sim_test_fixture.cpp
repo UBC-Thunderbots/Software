@@ -211,7 +211,7 @@ void SimulatedErForceSimTestFixture::runTest(
     const Duration simulation_time_step =
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
 
-    // TODO nuke me 
+    // TODO nuke me
     TbotsProto::SimulatorInitialization init_proto;
     init_proto.set_field_type(field_type);
 

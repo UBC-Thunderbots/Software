@@ -16,7 +16,7 @@ class MoveGoalieToGoalLineTacticTest
 {
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
-    Field field          = Field::createField(field_type);
+    Field field                      = Field::createField(field_type);
 };
 
 TEST_P(MoveGoalieToGoalLineTacticTest, move_to_goal_line_test)

@@ -19,8 +19,9 @@ class ErForceSimulatorTest : public ::testing::Test
         // TODO (#2419): remove this to re-enable sigfpe checks
         fedisableexcept(FE_INVALID | FE_OVERFLOW);
         simulator_config = std::make_shared<const SimulatorConfig>();
-        simulator = std::make_shared<ErForceSimulator>(TbotsProto::FieldType::DIV_B, robot_constants,
-                                                       wheel_constants, simulator_config);
+        simulator = std::make_shared<ErForceSimulator>(TbotsProto::FieldType::DIV_B,
+                                                       robot_constants, wheel_constants,
+                                                       simulator_config);
         simulator->resetCurrentTime();
     }
 

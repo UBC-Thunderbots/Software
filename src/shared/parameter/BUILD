@@ -140,6 +140,7 @@ cc_library(
         "//software/sensor_fusion",
         "//shared/parameter:cpp_configs",
         "//proto:sensor_msg_cc_proto",
+        "//software/simulation:er_force_simulator",
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
     ] + PYBIND_DEPS,
 )
@@ -154,10 +155,10 @@ pybind_extension(
 py_test(
     name = "simulated_test_fixture",
     srcs = ["simulated_test_fixture.py"],
-    deps = [
-        "//proto:software_py_proto",
-    ],
     data = [
         ":python_bindings.so",
+    ],
+    deps = [
+        "//proto:software_py_proto",
     ],
 )

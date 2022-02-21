@@ -17,8 +17,8 @@
 #include "software/world/robot_state.h"
 
 ErForceSimulator::ErForceSimulator(
-    const TbotsProto::SimulatorInitialization& sim_init, const RobotConstants_t& robot_constants,
-    const WheelConstants& wheel_constants,
+    const TbotsProto::SimulatorInitialization& sim_init,
+    const RobotConstants_t& robot_constants, const WheelConstants& wheel_constants,
     std::shared_ptr<const SimulatorConfig> simulator_config)
     : yellow_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
       blue_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
@@ -75,6 +75,15 @@ ErForceSimulator::ErForceSimulator(
 
     setBallState(createBallState(sim_init.ball_state()));
 
+    std::for_each(
+        sim_init.friendly_team().team_robots().begin(),
+        sim_init.friendly_team().team_robots().end(),
+        [&](const TbotsProto::Robot& robot) { LOG(DEBUG) << robot.DebugString(); });
+
+    std::for_each(
+        sim_init.enemy_team().team_robots().begin(),
+        sim_init.enemy_team().team_robots().end(),
+        [&](const TbotsProto::Robot& robot) { LOG(DEBUG) << robot.DebugString(); });
 
     this->resetCurrentTime();
 }

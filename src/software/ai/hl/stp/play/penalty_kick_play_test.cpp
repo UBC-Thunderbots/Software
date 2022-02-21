@@ -19,7 +19,7 @@ class PenaltyKickPlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
     TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
-    Field field          = Field::createField(field_type);
+    Field field                      = Field::createField(field_type);
 };
 
 TEST_F(PenaltyKickPlayTest, test_penalty_kick_setup)
