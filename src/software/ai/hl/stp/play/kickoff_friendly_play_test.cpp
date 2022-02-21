@@ -33,9 +33,7 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlayConstructor([](std::shared_ptr<const AiConfig> ai_config) {
-        return std::make_unique<KickoffFriendlyPlay>(ai_config);
-    });
+    setAIPlay(std::move(std::make_unique<KickoffFriendlyPlay>(getAiConfig())));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {

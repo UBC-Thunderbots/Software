@@ -1,6 +1,5 @@
 #include "software/simulated_tests/tactic_stepper.h"
 
-#include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/navigator/path_manager/velocity_obstacle_path_manager.h"
 #include "software/ai/navigator/path_planner/theta_star_path_planner.h"
 

@@ -123,6 +123,14 @@ cc_library(
         "//software/ai/navigator",
         "//software/ai/navigator/path_manager:velocity_obstacle_path_manager",
         "//software/ai/navigator/path_planner:theta_star_path_planner",
-        "@gtest",
+    ],
+)
+
+cc_library(
+    name = "play_stepper",
+    srcs = ["play_stepper.cpp"],
+    hdrs = ["play_stepper.h"],
+    deps = [
+        "//software/ai",
     ],
 )

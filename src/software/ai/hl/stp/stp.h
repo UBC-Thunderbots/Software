@@ -84,12 +84,11 @@ class STP
     TbotsProto::PlayInfo getPlayInfo();
 
     /**
-     * Overrides the play constructor so whenever STP creates a new play it calls
-     * constructor
+     * Overrides the play
      *
-     * @param constructor the override constructor
+     * @param play the play to override with
      */
-    void overridePlayConstructor(std::optional<PlayConstructor> constructor);
+    void overridePlay(std::unique_ptr<Play> play);
 
     /**
      * Given a vector of vector of tactics and the current World, assigns robots
@@ -142,11 +141,11 @@ class STP
     std::vector<std::unique_ptr<Intent>> getIntentsFromCurrentPlay(const World &world);
 
     /**
-     * Overrides the play constructor from the name
+     * Overrides the play from the name
      *
      * @param name the play name
      */
-    void overridePlayConstructorFromName(std::string name);
+    void overridePlayFromName(std::string name);
 
     // The Play that is currently running
     std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment;
@@ -158,5 +157,5 @@ class STP
     std::unique_ptr<Play> current_play;
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
     bool override_play_changed;
-    std::optional<PlayConstructor> override_constructor;
+    std::unique_ptr<Play> override_play;
 };
