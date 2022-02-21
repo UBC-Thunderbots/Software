@@ -78,7 +78,10 @@ ErForceSimulator::ErForceSimulator(
 
 void ErForceSimulator::setWorldState(const TbotsProto::WorldState& world_state)
 {
-    setBallState(createBallState(world_state.ball_state()));
+    if (world_state.has_ball_state())
+    {
+        setBallState(createBallState(world_state.ball_state()));
+    }
     setRobots(world_state.blue_robots(), gameController::Team::BLUE);
     setRobots(world_state.yellow_robots(), gameController::Team::YELLOW);
 }
@@ -118,108 +121,13 @@ void ErForceSimulator::setBlueRobots(const std::vector<RobotStateWithId>& robots
 void ErForceSimulator::setRobots(const std::vector<RobotStateWithId>& robots,
                                  gameController::Team side)
 {
-    auto simulator_setup_command = std::make_unique<amun::Command>();
-
-    robot::Specs ERForce;
-    robotSetDefault(&ERForce);
-
-    // Initialize Team Robots at the bottom of the field
-    ::robot::Team* team;
-    if (side == gameController::Team::BLUE)
-    {
-        team = simulator_setup_command->mutable_set_team_blue();
-    }
-    else
-    {
-        team = simulator_setup_command->mutable_set_team_yellow();
-    }
-
+    google::protobuf::Map<uint32_t, TbotsProto::RobotState> proto_robots;
     for (const auto& robot_state_with_id : robots)
     {
-        auto* robot = team->add_robot();
-        robot->CopyFrom(ERForce);
-        robot->set_id(robot_state_with_id.id);
+        proto_robots[robot_state_with_id.id] =
+            *createRobotStateProto(robot_state_with_id.robot_state);
     }
-    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
-
-    if (side == gameController::Team::BLUE)
-    {
-        simulator_setup_command->clear_set_team_blue();
-    }
-    else
-    {
-        simulator_setup_command->clear_set_team_yellow();
-    }
-
-    auto simulator_control = std::make_shared<sslsim::SimulatorControl>();
-    auto command_simulator = std::make_unique<amun::CommandSimulator>();
-
-    // Add each robot to be added to the teleport robot repeated field
-    for (const auto& robot_state_with_id : robots)
-    {
-        auto teleport_robot             = std::make_unique<sslsim::TeleportRobot>();
-        gameController::BotId* robot_id = new gameController::BotId();
-        robot_id->set_id(robot_state_with_id.id);
-
-        if (side == gameController::Team::BLUE)
-        {
-            robot_id->set_team(gameController::Team::BLUE);
-        }
-        else
-        {
-            robot_id->set_team(gameController::Team::YELLOW);
-        }
-
-        teleport_robot->set_x(static_cast<float>(
-            robot_state_with_id.robot_state.position().x() * MILLIMETERS_PER_METER));
-        teleport_robot->set_y(static_cast<float>(
-            robot_state_with_id.robot_state.position().y() * MILLIMETERS_PER_METER));
-        teleport_robot->set_allocated_id(robot_id);
-        teleport_robot->set_present(true);
-
-        teleport_robot->set_orientation(static_cast<float>(
-            robot_state_with_id.robot_state.orientation().toRadians()));
-
-        teleport_robot->set_v_x(static_cast<float>(
-            robot_state_with_id.robot_state.velocity().x() * MILLIMETERS_PER_METER));
-        teleport_robot->set_v_y(static_cast<float>(
-            robot_state_with_id.robot_state.velocity().y() * MILLIMETERS_PER_METER));
-        teleport_robot->set_v_angular(static_cast<float>(
-            robot_state_with_id.robot_state.angularVelocity().toRadians()));
-
-        *(simulator_control->add_teleport_robot()) = *teleport_robot;
-    }
-
-    // Send message to simulator to teleport robots
-    *(command_simulator->mutable_ssl_control())     = *simulator_control;
-    *(simulator_setup_command->mutable_simulator()) = *command_simulator;
-    er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
-
-    if (side == gameController::Team::BLUE)
-    {
-        blue_simulator_robots.clear();
-    }
-    else
-    {
-        yellow_simulator_robots.clear();
-    }
-
-    for (const auto& robot_state_with_id : robots)
-    {
-        auto simulator_robot = std::make_shared<ErForceSimulatorRobot>(
-            RobotStateWithId{.id          = robot_state_with_id.id,
-                             .robot_state = robot_state_with_id.robot_state},
-            robot_constants, wheel_constants);
-
-        if (side == gameController::Team::BLUE)
-        {
-            blue_simulator_robots.emplace_back(simulator_robot);
-        }
-        else
-        {
-            yellow_simulator_robots.emplace_back(simulator_robot);
-        }
-    }
+    setRobots(proto_robots, side);
 }
 
 void ErForceSimulator::setRobots(
@@ -267,7 +175,7 @@ void ErForceSimulator::setRobots(
     {
         auto teleport_robot             = std::make_unique<sslsim::TeleportRobot>();
         gameController::BotId* robot_id = new gameController::BotId();
-        robot_id->set_id(id);
+        robot_id->set_id(static_cast<int>(id));
 
         if (side == gameController::Team::BLUE)
         {
