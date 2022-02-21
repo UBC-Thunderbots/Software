@@ -28,3 +28,10 @@ message World
     required Ball ball            = 5;
     required GameState game_state = 6;
 }
+
+message SimulatorInitialization
+{
+    required Team friendly_team   = 1;
+    required Team enemy_team      = 2;
+    required Ball ball            = 3;
+}
