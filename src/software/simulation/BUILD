@@ -217,8 +217,8 @@ cc_library(
     ],
     deps = [
         ":er_force_simulator_ball",
-        ":firmware_object_deleter",
         ":er_force_simulator_robot",
+        ":firmware_object_deleter",
         ":physics_simulator_ball",
         ":physics_simulator_robot",
         ":simulator_ball_singleton",

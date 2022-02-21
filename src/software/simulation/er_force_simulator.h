@@ -26,7 +26,7 @@ extern "C"
  * as well as the firmware simulation for the robots. This provides a simple interface
  * to setup, run, and query the current state of the simulation.
  */
-class ErForceSimulator 
+class ErForceSimulator
 {
    public:
     /**
