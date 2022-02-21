@@ -84,7 +84,7 @@ class STP
     TbotsProto::PlayInfo getPlayInfo();
 
     /**
-     * Overrides the play 
+     * Overrides the play
      *
      * @param play the play to override with
      */

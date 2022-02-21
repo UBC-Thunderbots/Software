@@ -39,19 +39,6 @@ bool PlaySelectionFSM::gameStateSetup(const Update& event)
     return event.game_state.isSetupState();
 }
 
-bool PlaySelectionFSM::playOverridden(const Update& event)
-{
-    return static_cast<bool>(event.override_play);
-}
-
-void PlaySelectionFSM::setupOverridePlay(Update event)
-{
-    if (static_cast<bool>(event.override_play))
-    {
-        event.set_current_play(std::move(event.override_play));
-    }
-}
-
 void PlaySelectionFSM::setupSetPlay(const Update& event)
 {
     current_play.reset();

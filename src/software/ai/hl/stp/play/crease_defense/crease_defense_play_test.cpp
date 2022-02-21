@@ -34,13 +34,12 @@ TEST_F(CreaseDefensePlayTest, test_defense_play)
         Point(-2, -1.25),
     });
     setEnemyGoalie(0);
-    setAIPlayConstructor(
-        [ball_state](std::shared_ptr<const AiConfig> ai_config) -> std::unique_ptr<Play> {
-            std::unique_ptr<CreaseDefensePlay> play =
-                std::make_unique<CreaseDefensePlay>(ai_config);
-            play->updateControlParams(Point(1, 3));
-            return play;
-        });
+
+    std::unique_ptr<CreaseDefensePlay> play =
+        std::make_unique<CreaseDefensePlay>(getAiConfig());
+    play->updateControlParams(Point(1, 3));
+
+    setAIPlay(play);
 
     // We set the referee command to stop so that the robots do not kick/shoot during the
     // test
