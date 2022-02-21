@@ -131,10 +131,10 @@ PYBIND_DEPS = [
 cc_library(
     name = "pyton_bindings_lib",
     srcs = ["python_bindings.cpp"],
-    copts = ["-fexceptions"],
+    #copts = ["-fexceptions"],
     features = [
-        "-use_header_modules",
-        "-parse_headers",
+#        "-use_header_modules",
+#        "-parse_headers",
     ],
     deps = [
         "//software/sensor_fusion",
