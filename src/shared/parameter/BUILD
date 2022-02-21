@@ -129,7 +129,7 @@ PYBIND_DEPS = [
 ]
 
 cc_library(
-    name = "dynamic_parameters_lib",
+    name = "pyton_bindings_lib",
     srcs = ["python_bindings.cpp"],
     copts = ["-fexceptions"],
     features = [
@@ -145,9 +145,19 @@ cc_library(
 )
 
 pybind_extension(
-    name = "dynamic_parameters",
+    name = "python_bindings",
     deps = [
-        ":dynamic_parameters_lib",
+        ":pyton_bindings_lib",
     ],
 )
 
+py_test(
+    name = "simulated_test_fixture",
+    srcs = ["simulated_test_fixture.py"],
+    deps = [
+        "//proto:software_py_proto",
+    ],
+    data = [
+        ":python_bindings.so",
+    ],
+)

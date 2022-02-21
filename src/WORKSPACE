@@ -111,6 +111,47 @@ git_repository(
     remote = "https://github.com/pybind/pybind11_protobuf",
 )
 
+http_archive(
+    name = "com_google_absl",
+    sha256 = "dcf71b9cba8dc0ca9940c4b316a0c796be8fab42b070bb6b7cab62b48f0e66c4",  # SHARED_ABSL_SHA
+    strip_prefix = "abseil-cpp-20211102.0",
+    urls = [
+        "https://github.com/abseil/abseil-cpp/archive/refs/tags/20211102.0.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "com_google_absl_py",
+    repo_mapping = {"@six_archive": "@six"},
+    sha256 = "0be59b82d65dfa1f995365dcfea2cc57989297b065fda696ef13f30fcc6c8e5b",
+    strip_prefix = "abseil-py-pypi-v0.15.0",
+    urls = [
+        "https://github.com/abseil/abseil-py/archive/refs/tags/pypi-v0.15.0.tar.gz",
+    ],
+)
+
+# Six is a dependency of com_google_absl_py
+http_archive(
+    name = "six_archive",
+    urls = [
+        "http://mirror.bazel.build/pypi.python.org/packages/source/s/six/six-1.10.0.tar.gz",
+        "https://pypi.python.org/packages/source/s/six/six-1.10.0.tar.gz",
+    ],
+    sha256 = "105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a",
+    strip_prefix = "six-1.10.0",
+    build_file = "@com_google_absl_py//third_party:six.BUILD",
+)
+
+new_local_repository(
+  name = "python",
+  path = "/usr/include/python3.8"
+)
+
+bind(
+    name = "python_headers",
+    actual = "//:python_headers",
+)
+
 load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
 
 boost_deps()
@@ -146,7 +187,7 @@ new_git_repository(
     shallow_since = "1479502661 -0800",
 )
 
-# yaml cpp parser for dynamic parameters test
+
 git_repository(
     name = "yaml-cpp",
     commit = "f531f8a8c3f8ca0923f9219c72fcca511555f824",
