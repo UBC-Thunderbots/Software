@@ -9,7 +9,6 @@
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/sensor_fusion/sensor_fusion.h"
 #include "software/simulated_tests/tactic_stepper.h"
-#include "software/simulation/er_force_simulator.h"
 
 namespace py = pybind11;
 
@@ -60,7 +59,8 @@ PYBIND11_MODULE(python_bindings, m)
 
     py::class_<Tactic, std::shared_ptr<Tactic>>(m, "Tactic");
 
-    py::class_<AttackerTactic, std::shared_ptr<AttackerTactic>>(m, "AttackerTactic")
+    py::class_<AttackerTactic, std::shared_ptr<AttackerTactic>, Tactic>(m,
+                                                                        "AttackerTactic")
         .def(py::init<std::shared_ptr<const AttackerTacticConfig>>());
 
     py::class_<SensorFusion>(m, "SensorFusion")
@@ -72,9 +72,9 @@ PYBIND11_MODULE(python_bindings, m)
         .def(py::init<std::shared_ptr<Tactic>, const std::set<MotionConstraint>&,
                       std::shared_ptr<const ThunderbotsConfig>>());
 
-    py::class_<ErForceSimulator>(m, "ErForceSimulator")
-        .def(py::init<const TbotsProto::SimulatorInitialization&, RobotConstants_t&,
-                      WheelConstants&, std::shared_ptr<const SimulatorConfig>>());
+    // py::class_<ErForceSimulator>(m, "ErForceSimulator")
+    //.def(py::init<const TbotsProto::SimulatorInitialization&, RobotConstants_t&,
+    // WheelConstants&, std::shared_ptr<const SimulatorConfig>>());
 
     py::class_<Robot>(m, "Robot")
         .def(py::init<unsigned, Point&, Vector&, Angle&, Angle&, Timestamp&>())

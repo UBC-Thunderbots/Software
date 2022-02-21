@@ -6,8 +6,6 @@ qt_cc_library(
     name = "simulator_qt",
     srcs = glob(["*.cpp"]),
     hdrs = glob(["*.h"]),
-    #linkstatic = True,
-    alwayslink=True,
     deps = [
         "//extlibs/er_force_sim/src/core:core_qt",
         "//extlibs/er_force_sim/src/protobuf:protobuf_qt",
@@ -17,4 +15,6 @@ qt_cc_library(
         "@qt//:qt_gui",
         "@qt//:qt_widgets",
     ],
+    #linkstatic = True,
+    alwayslink = True,
 )

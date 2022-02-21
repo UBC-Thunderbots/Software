@@ -133,8 +133,8 @@ cc_library(
     srcs = ["python_bindings.cpp"],
     copts = ["-fexceptions"],
     features = [
-                "-use_header_modules",
-                "-parse_headers",
+        "-use_header_modules",
+        "-parse_headers",
     ],
     deps = [
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
@@ -142,7 +142,6 @@ cc_library(
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
         "//software/simulated_tests:tactic_stepper",
         "//software/sensor_fusion",
-        "//software/simulation:er_force_simulator",
         "//shared/parameter:cpp_configs",
         "//proto:sensor_msg_cc_proto",
     ] + PYBIND_DEPS,
