@@ -43,3 +43,8 @@ message SimulatorInitialization
     required Team enemy_team      = 3;
     required BallState ball_state = 4;
 }
+
+message SimulatorTick
+{
+    required double milliseconds = 1;
+}

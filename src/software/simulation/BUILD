@@ -306,6 +306,33 @@ cc_library(
 )
 
 cc_library(
+    name = "standalone_er_force_simulator",
+    srcs = ["standalone_er_force_simulator.cpp"],
+    hdrs = ["standalone_er_force_simulator.h"],
+    deps = [
+        ":er_force_simulator",
+        ":threaded_simulator",
+        "//proto:defending_side_msg_cc_proto",
+        "//proto:tbots_cc_proto",
+        "//proto/message_translation:primitive_google_to_nanopb_converter",
+        "//shared/parameter:cpp_configs",
+        "//software:constants",
+        "//software/logger",
+        "//software/networking:threaded_proto_unix_listener",
+        "//software/networking:threaded_proto_unix_sender",
+        "//software/world:field",
+    ],
+)
+
+cc_binary(
+    name = "standalone_er_force_simulator_main",
+    srcs = ["standalone_er_force_simulator_main.cpp"],
+    deps = [
+        ":standalone_er_force_simulator",
+    ],
+)
+
+cc_library(
     name = "firmware_object_deleter",
     hdrs = ["firmware_object_deleter.h"],
     deps = [

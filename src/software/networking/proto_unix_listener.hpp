@@ -87,8 +87,8 @@ void ProtoUnixListener<ReceiveProtoT>::handleDataReception(
     {
         auto packet_data = ReceiveProtoT();
         std::string str(std::begin(raw_received_data_), std::end(raw_received_data_));
-        if (packet_data.ParseFromArray(raw_received_data_.data(),
-                                       static_cast<int>(num_bytes_received)))
+        if (!packet_data.ParseFromArray(raw_received_data_.data(),
+                                        static_cast<int>(num_bytes_received)))
         {
             receive_callback(packet_data);
         }

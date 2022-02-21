@@ -13,9 +13,9 @@ class ProtoUnixSender
     /**
      * TODO
      */
-    ProtoUnixSender(boost::asio::io_service& io_service, const std::string& unix_path)
+    ProtoUnixSender(boost::asio::io_service& io_service, const std::string& unix_path);
 
-        virtual ~ProtoUnixSender();
+    virtual ~ProtoUnixSender();
 
     /**
      * Sends a protobuf message to the initialized ip address and port
@@ -26,13 +26,6 @@ class ProtoUnixSender
     void sendProto(const SendProto& message);
 
    private:
-    // A UDP socket to send data over
-    boost::asio::ip::udp::socket socket_;
-
-    // The endpoint for the receiver
-    boost::asio::ip::udp::endpoint receiver_endpoint;
-
-    // Buffer to hold serialized protobuf data
     std::string data_buffer;
     UnixSender unix_sender_;
 };

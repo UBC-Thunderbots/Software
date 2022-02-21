@@ -34,14 +34,13 @@ class ThreadedUnixSender:
     def __send_protobuf(self):
         """Send the buffered protobuf
         """
-        print("WHAT")
         proto = None
 
         while True:
             proto = self.proto_buffer.get()
-
-            print("SENDING")
-            self.socket.sendto(bytes("HELLO", "utf-8"), self.unix_path)
+            if proto is not None:
+                send = proto.SerializeToString()
+                self.socket.sendto(send, self.unix_path)
 
     def send(self, proto):
         """Buffer a protobuf to be sent by the send thread
@@ -49,7 +48,6 @@ class ThreadedUnixSender:
         :param proto: The protobuf to send
 
         """
-
         try:
             self.proto_buffer.put_nowait(proto)
         except queue.Full as queue_full:
