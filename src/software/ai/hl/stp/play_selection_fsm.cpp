@@ -41,14 +41,14 @@ bool PlaySelectionFSM::gameStateSetup(const Update& event)
 
 bool PlaySelectionFSM::playOverridden(const Update& event)
 {
-    return event.override_constructor.has_value();
+    return static_cast<bool>(event.override_play);
 }
 
-void PlaySelectionFSM::setupOverridePlay(const Update& event)
+void PlaySelectionFSM::setupOverridePlay(Update event)
 {
-    if (event.override_constructor.has_value())
+    if (static_cast<bool>(event.override_play))
     {
-        event.set_current_play(event.override_constructor.value()(ai_config));
+        event.set_current_play(std::move(event.override_play));
     }
 }
 

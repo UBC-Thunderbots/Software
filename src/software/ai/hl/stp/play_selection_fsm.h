@@ -14,15 +14,15 @@ struct PlaySelectionFSM
 
     struct Update
     {
-        Update(const std::optional<PlayConstructor>& override_constructor,
+        Update(std::unique_ptr<Play> override_play,
                const std::function<void(std::unique_ptr<Play>)>& set_current_play,
                const GameState& game_state)
-            : override_constructor(override_constructor),
+            : override_play(std::move(override_play)),
               set_current_play(set_current_play),
               game_state(game_state)
         {
         }
-        std::optional<PlayConstructor> override_constructor;
+        std::unique_ptr<Play> override_play;
         std::function<void(std::unique_ptr<Play>)> set_current_play;
         GameState game_state;
     };
@@ -61,7 +61,7 @@ struct PlaySelectionFSM
      * @param event The PlaySelection::Update event
      *
      */
-    void setupOverridePlay(const Update& event);
+    void setupOverridePlay(Update event);
     void setupSetPlay(const Update& event);
     void setupStopPlay(const Update& event);
     void setupHaltPlay(const Update& event);

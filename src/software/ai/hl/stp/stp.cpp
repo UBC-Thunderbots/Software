@@ -29,13 +29,13 @@ STP::STP(std::shared_ptr<const AiConfig> ai_config)
       current_play(std::make_unique<HaltPlay>(ai_config)),
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config})),
       override_play_changed(false),
-      override_constructor(std::nullopt)
+      override_play(nullptr)
 {
     ai_config->getAiControlConfig()->getCurrentAiPlay()->registerCallbackFunction(
-        [this, ai_config](std::string new_override_play_name) {
+        [this,ai_config](std::string new_override_play_name) {
             if (ai_config->getAiControlConfig()->getOverrideAiPlay()->value())
             {
-                overridePlayConstructorFromName(new_override_play_name);
+                overridePlayFromName(new_override_play_name);
             }
         });
 
@@ -43,7 +43,7 @@ STP::STP(std::shared_ptr<const AiConfig> ai_config)
         [this, ai_config](bool new_override_ai_play) {
             if (new_override_ai_play)
             {
-                overridePlayConstructorFromName(
+                overridePlayFromName(
                     ai_config->getAiControlConfig()->getCurrentAiPlay()->value());
             }
         });
@@ -67,7 +67,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
     }
 
     fsm->process_event(PlaySelectionFSM::Update(
-        override_constructor,
+        override_play,
         [this](std::unique_ptr<Play> play) { current_play = std::move(play); },
         world.gameState()));
 
@@ -253,15 +253,13 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
     return robot_tactic_assignment;
 }
 
-void STP::overridePlayConstructor(std::optional<PlayConstructor> constructor)
+void STP::overridePlay(std::unique_ptr<Play> play)
 {
     override_play_changed = true;
-    override_constructor  = constructor;
+    override_play  = std::move(play);
 }
 
-void STP::overridePlayConstructorFromName(std::string name)
+void STP::overridePlayFromName(std::string name)
 {
-    overridePlayConstructor([name](std::shared_ptr<const AiConfig> ai_config) {
-        return GenericFactory<std::string, Play, AiConfig>::create(name, ai_config);
-    });
+    overridePlay(GenericFactory<std::string, Play, AiConfig>::create(name, ai_config));
 }
