@@ -125,12 +125,3 @@ cc_library(
         "//software/ai/navigator/path_planner:theta_star_path_planner",
     ],
 )
-
-cc_library(
-    name = "play_stepper",
-    srcs = ["play_stepper.cpp"],
-    hdrs = ["play_stepper.h"],
-    deps = [
-        "//software/ai",
-    ],
-)
