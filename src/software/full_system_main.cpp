@@ -16,7 +16,7 @@
 #include "software/gui/full_system/threaded_full_system_gui.h"
 #include "software/logger/logger.h"
 #include "software/multithreading/observer_subject_adapter.hpp"
-#include "software/networking/threaded_unix_listener.hpp"
+#include "software/networking/threaded_proto_unix_listener.hpp"
 #include "software/sensor_fusion/threaded_sensor_fusion.h"
 #include "software/util/generic_factory/generic_factory.h"
 
@@ -53,11 +53,9 @@ int main(int argc, char** argv)
             std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
 
         ThreadedProtoUnixListener<TbotsProto::ThunderbotsConfig>(
-            "/tmp/tbots/bobthebuilder", 0,
-            [](TbotsProto::ThunderbotsConfig input) {
+            "/tmp/tbots/bobthebuilder", [](TbotsProto::ThunderbotsConfig input) {
                 LOG(DEBUG) << "RECEIVED PROTOBUF";
-            },
-            false);
+            });
 
 
         // Override default network interface

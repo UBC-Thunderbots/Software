@@ -94,7 +94,7 @@ void ProtoUnixListener<ReceiveProtoT>::handleDataReception(
         }
         else
         {
-            LOG(WARNING) << "Malformed protobuf received over " << unix_path;
+            LOG(WARNING) << "Malformed protobuf received over " << unix_path_;
         }
 
         // Once we've handled the data, start listening again
