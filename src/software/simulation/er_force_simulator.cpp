@@ -179,7 +179,7 @@ void ErForceSimulator::setRobots(const std::vector<RobotStateWithId>& robots,
 
     if (side == gameController::Team::BLUE)
     {
-        yellow_primitive_executor_map.clear();
+        blue_primitive_executor_map.clear();
     }
     else
     {
@@ -193,12 +193,12 @@ void ErForceSimulator::setRobots(const std::vector<RobotStateWithId>& robots,
 
         if (side == gameController::Team::BLUE)
         {
-            yellow_primitive_executor_map.insert(
+            blue_primitive_executor_map.insert(
                 {robot_state_with_id.id, robot_primitive_executor});
         }
         else
         {
-            blue_primitive_executor_map.insert(
+            yellow_primitive_executor_map.insert(
                 {robot_state_with_id.id, robot_primitive_executor});
         }
     }
