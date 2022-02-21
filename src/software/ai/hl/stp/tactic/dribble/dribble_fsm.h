@@ -13,8 +13,9 @@
 struct DribbleFSM
 {
    public:
-    class GetPossessionState;
-    class DribbleState;
+    class GetPossession;
+    class Dribble;
+    class LoseBall;
 
     /**
      * Constructor for DribbleFSM
@@ -38,17 +39,12 @@ struct DribbleFSM
 
     // Threshold to determine if the ball is at the destination determined experimentally
     static constexpr double BALL_CLOSE_TO_DEST_THRESHOLD = 0.1;
-    // Threshold to determine if the robot has the expected orientation when dribbling the
-    // ball
-    static constexpr Angle FACE_DESTINATION_CLOSE_THRESHOLD = Angle::fromDegrees(5);
     // Threshold to determine if the robot has the expected orientation when completing
     // the dribble
     static constexpr Angle FINAL_DESTINATION_CLOSE_THRESHOLD = Angle::fromDegrees(1);
-    // Kick speed when breaking up continuous dribbling
-    static constexpr double DRIBBLE_KICK_SPEED = 0.05;
     // Maximum distance to continuously dribble the ball, slightly conservative to not
     // break the 1 meter rule
-    static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.9;
+    static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.8;
     // robot speed at which the robot is done dribbling
     static constexpr double ROBOT_DRIBBLING_DONE_SPEED = 0.2;  // m/s
 
@@ -58,12 +54,14 @@ struct DribbleFSM
      *
      * @param ball_position The ball position
      * @param face_ball_angle The angle to face the ball
+     * @param additional_offset Additional offset from facing the ball
      *
      * @return the point that the robot should be positioned to face the ball and dribble
      * the ball
      */
     static Point robotPositionToFaceBall(const Point &ball_position,
-                                         const Angle &face_ball_angle);
+                                         const Angle &face_ball_angle,
+                                         double additional_offset = 0.0);
 
     /**
      * Calculates the interception point for intercepting balls
@@ -143,6 +141,13 @@ struct DribbleFSM
     void startDribble(const Update &event);
 
     /**
+     * Action to lose possession of the ball
+     *
+     * @param event DribbleFSM::Update
+     */
+    void loseBall(const Update &event);
+
+    /**
      * Guard that checks if the robot has possession of the ball
      *
      * @param event DribbleFSM::Update
@@ -150,6 +155,15 @@ struct DribbleFSM
      * @return if the ball has been have_possession
      */
     bool havePossession(const Update &event);
+
+    /**
+     * Guard that checks if the robot has lost possession of the ball
+     *
+     * @param event DribbleFSM::Update
+     *
+     * @return if the ball possession has been lost
+     */
+    bool lostPossession(const Update &event);
 
     /**
      * Guard that checks if the ball is at the dribble_destination and robot is facing
@@ -162,33 +176,51 @@ struct DribbleFSM
      */
     bool dribblingDone(const Update &event);
 
+    /**
+     * Guard that checks if the the robot should lose possession to avoid excessive
+     * dribbling
+     *
+     * @param event DribbleFSM::Update
+     *
+     * @return if the ball possession should be lost
+     */
+    bool shouldLoseBall(const Update &event);
+
     auto operator()()
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(GetPossessionState)
-        DEFINE_SML_STATE(DribbleState)
+        DEFINE_SML_STATE(GetPossession)
+        DEFINE_SML_STATE(Dribble)
+        DEFINE_SML_STATE(LoseBall)
         DEFINE_SML_EVENT(Update)
         DEFINE_SML_GUARD(havePossession)
+        DEFINE_SML_GUARD(lostPossession)
         DEFINE_SML_GUARD(dribblingDone)
+        DEFINE_SML_GUARD(shouldLoseBall)
         DEFINE_SML_ACTION(startDribble)
+        DEFINE_SML_ACTION(loseBall)
         DEFINE_SML_ACTION(getPossession)
         DEFINE_SML_ACTION(dribble)
 
         return make_transition_table(
             // src_state + event [guard] / action = dest_state
-            *GetPossessionState_S + Update_E[havePossession_G] / startDribble_A =
-                DribbleState_S,
-            GetPossessionState_S + Update_E[!havePossession_G] / getPossession_A,
-            DribbleState_S + Update_E[!havePossession_G] / getPossession_A =
-                GetPossessionState_S,
-            DribbleState_S + Update_E[!dribblingDone_G] / dribble_A,
-            DribbleState_S + Update_E[dribblingDone_G] / dribble_A = X,
-            X + Update_E[!havePossession_G] / getPossession_A      = GetPossessionState_S,
-            X + Update_E[!dribblingDone_G] / dribble_A             = DribbleState_S,
+            *GetPossession_S + Update_E[havePossession_G] / startDribble_A = Dribble_S,
+            GetPossession_S + Update_E[!havePossession_G] / getPossession_A,
+            Dribble_S + Update_E[lostPossession_G] / getPossession_A = GetPossession_S,
+            Dribble_S + Update_E[shouldLoseBall_G] / loseBall_A      = LoseBall_S,
+            Dribble_S + Update_E[!dribblingDone_G] / dribble_A,
+            Dribble_S + Update_E[dribblingDone_G] / dribble_A = X,
+            LoseBall_S + Update_E[!lostPossession_G] / loseBall_A,
+            LoseBall_S + Update_E[lostPossession_G] / getPossession_A = GetPossession_S,
+            X + Update_E[lostPossession_G] / getPossession_A          = GetPossession_S,
+            X + Update_E[!dribblingDone_G] / dribble_A                = Dribble_S,
             X + Update_E / dribble_A);
     }
 
    private:
     Point continuous_dribbling_start_point;
+
+    // if ball and front of robot are separated by this amount, then we've lost possession
+    static constexpr double LOSE_BALL_POSSESSION_THRESHOLD = 0.04;
 };

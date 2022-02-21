@@ -95,6 +95,14 @@ class ErForceSimulator
     void stepSimulation(const Duration& time_step);
 
     /**
+     * Gets the blue and yellow robot statuses
+     *
+     * @return a vector of robot statuses from either blue or yellow robots
+     */
+    std::vector<TbotsProto::RobotStatus> getBlueRobotStatuses() const;
+    std::vector<TbotsProto::RobotStatus> getYellowRobotStatuses() const;
+
+    /**
      * Returns the most recent SSL Wrapper Packets
      *
      * @return vector of `SSLProto::SSL_WrapperPacket`s representing the most recent state
@@ -168,6 +176,9 @@ class ErForceSimulator
     RobotConstants_t robot_constants;
     WheelConstants wheel_constants;
     Field field;
+
+    std::optional<RobotId> blue_robot_with_ball;
+    std::optional<RobotId> yellow_robot_with_ball;
 
     const QString CONFIG_FILE      = "simulator/2020";
     const QString CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";
