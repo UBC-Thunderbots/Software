@@ -20,10 +20,10 @@ TEST_F(SimulatedHRVOTest, test_move_in_straight_line)
 {
     Point destination      = Point(4, 0);
     Point initial_position = Point(0, 0);
-    BallState ball_state(Point(1, 0), Vector(0, 0));
+    BallState ball_state(Point(1, 2), Vector(0, 0));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
-    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(1, 0)});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(1, 0), Point(1, 0.3), Point(1, -0.3)});
 
     auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);

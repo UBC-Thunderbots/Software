@@ -42,18 +42,19 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/intersection.h"
 
-HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants)
+HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
+                             const std::string& record_playback_name)
     : globalTime_(0.0f),
       timeStep_(time_step),
       robot_constants_(robot_constants),
       reachedGoals_(false),
-      kdTree_(std::make_unique<KdTree>(this))
+      kdTree_(std::make_unique<KdTree>(this)),
+      record_playback_name(record_playback_name)
 {
-    bool record_simulator = true;
-    if (record_simulator)
+    if (!record_playback_name.empty())
     {
         std::string file_directory = "/tmp/";
-        output_file_loc = file_directory +  + "simulation_playback.csv";
+        output_file_loc = file_directory + record_playback_name + ".csv";
         output_file = std::ofstream(output_file_loc);
         if (!output_file.is_open())
         {
@@ -144,7 +145,7 @@ void HRVOSimulator::updateWorld(const World &world)
                 Point position = friendly_robot.position();
                 agents_[agent_index]->setPosition(Vector2(position.x(), position.y()));
 
-                if (update_world % 10 == 0)
+                if (update_world % 30 == 0)
                 {
                     Vector velocity = friendly_robot.velocity();
                     agents_[agent_index]->setVelocity(Vector2(velocity.x(), velocity.y()));
@@ -186,8 +187,10 @@ void HRVOSimulator::updateWorld(const World &world)
         Vector2 velocity(ball.velocity().x(), ball.velocity().y());
         Vector2 goal_pos   = position + 100 * velocity;
         float acceleration = ball.acceleration().length();
+        // TODO: Dynamically add and remove the ball as an Agent
+        //       + Add a ball radius to primitive.proto
         // Minimum of 0.5-meter distance away from the ball, if the ball is an obstacle
-        float ball_radius = 0.5f + BALL_AGENT_RADIUS_OFFSET;
+        float ball_radius = BALL_MAX_RADIUS_METERS + BALL_AGENT_RADIUS_OFFSET;
 
         std::size_t agent_index = addLinearVelocityAgent(position, ball_radius, velocity, abs(velocity),
                                acceleration, addGoal(goal_pos), 0.1f);
@@ -274,7 +277,7 @@ void HRVOSimulator::recordSimulator()
     std::vector<float> robot_radius(num_robots);
     for (unsigned int robot_id = 0; robot_id < num_robots; ++robot_id)
     {
-        robot_radius[robot_id] = ROBOT_MAX_RADIUS_METERS;
+        robot_radius[robot_id] = getAgentRadius(robot_id); // ROBOT_MAX_RADIUS_METERS;
     }
 
     // Initialize the previous robots position array
@@ -289,67 +292,51 @@ void HRVOSimulator::recordSimulator()
 
     float prev_frame_time = 0.f;
     std::chrono::duration<double> computation_time(0);
-    auto start_time = std::chrono::high_resolution_clock::now();        auto start_tick_time = std::chrono::high_resolution_clock::now();
+    auto start_time = std::chrono::high_resolution_clock::now();
+    auto start_tick_time = std::chrono::high_resolution_clock::now();
     float time           = getGlobalTime();
-    for (unsigned int robot_id = 0; robot_id < num_robots; robot_id++)
+    for (unsigned int agent_id = 0; agent_id < num_robots; agent_id++)
     {
-        Vector2 curr_robot_pos = getAgentPosition(robot_id);
-        float curr_robot_rad   = ROBOT_MAX_RADIUS_METERS;
+        Vector2 curr_robot_pos = getAgentPosition(agent_id);
+        float curr_robot_rad   = robot_radius[agent_id]; //ROBOT_MAX_RADIUS_METERS;
 
         // Check for collision with other robots
         int has_collided = -1;
-        for (unsigned int other_robot_id = 0; other_robot_id < num_robots;
-             other_robot_id++)
+        for (unsigned int other_agent_id = 0; other_agent_id < num_robots;
+             other_agent_id++)
         {
-            Vector2 other_robot_pos = getAgentPosition(other_robot_id);
-            float other_robot_rad   = ROBOT_MAX_RADIUS_METERS;
-            if (robot_id != other_robot_id)
+            Vector2 other_robot_pos = getAgentPosition(other_agent_id);
+            float other_robot_rad   = robot_radius[other_agent_id];
+            if (agent_id != other_agent_id)
             {
                 if (absSq(curr_robot_pos - other_robot_pos) <
                     std::pow(curr_robot_rad + other_robot_rad, 2.f))
                 {
-                    has_collided = other_robot_id;
+                    has_collided = other_agent_id;
                     break;
                 }
             }
         }
 
         // Velocity and Speed measured in m/s
-        float velocity_x = 0.f;
-        float velocity_y = 0.f;
-        float speed      = 0.f;
-        float delta_time = time - prev_frame_time;
-        // Get current robots velocity
-        if (frame != 0)
-        {
-            float prev_x_pos = prev_x_pos_arr[robot_id];
-            float prev_y_pos = prev_y_pos_arr[robot_id];
-
-            float curr_x_pos = curr_robot_pos.getX();
-            float curr_y_pos = curr_robot_pos.getY();
-
-            velocity_x = (curr_x_pos - prev_x_pos) / delta_time;
-            velocity_y = (curr_y_pos - prev_y_pos) / delta_time;
-            speed      = std::hypot(velocity_x, velocity_y);
-
-            // update previous robot x and y position
-            prev_x_pos_arr[robot_id] = curr_x_pos;
-            prev_y_pos_arr[robot_id] = curr_y_pos;
-        }
+        Vector2 robot_velocity = getAgentVelocity(agent_id);
+        float velocity_x = robot_velocity.getX();
+        float velocity_y = robot_velocity.getY();
+        float speed      = abs(robot_velocity);
         Vector2 goal_position =
-                goals_[agents_[robot_id]->getGoalIndex()]
+                goals_[agents_[agent_id]->getGoalIndex()]
                         ->getCurrentGoalPosition();
-        float goal_radius = agents_[robot_id]->getGoalRadius();
+        float goal_radius = agents_[agent_id]->getGoalRadius();
 
         output_file << frame << "," << time << ","
-                    << std::to_string(computation_time.count()) << "," << robot_id
-                    << "," << robot_radius[robot_id] << ","
+                    << std::to_string(computation_time.count()) << "," << agent_id
+                    << "," << robot_radius[agent_id] << ","
                     << curr_robot_pos.getX() << "," << curr_robot_pos.getY()
-                    << "," << velocity_x << "," << velocity_y << "," << speed
+                    << "," << robot_velocity.getX() << "," << robot_velocity.getY() << "," << abs(robot_velocity)
                     << "," << goal_position.getX() << "," << goal_position.getY()
                     << "," << goal_radius << "," << has_collided << ","
-                    << getAgentPrefVelocity(robot_id).getX() << ","
-                    << getAgentPrefVelocity(robot_id).getY()
+                    << getAgentPrefVelocity(agent_id).getX() << ","
+                    << getAgentPrefVelocity(agent_id).getY()
                     << std::endl;
     }
 
@@ -552,8 +539,10 @@ void HRVOSimulator::doStep()
 
     globalTime_ += timeStep_;
 
-    // add if
-    recordSimulator();
+    if (!record_playback_name.empty())
+    {
+        recordSimulator();
+    }
 }
 
 Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
