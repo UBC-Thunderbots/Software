@@ -7,8 +7,8 @@ StandaloneErForceSimulator::StandaloneErForceSimulator()
     tick_debug_ = 0;
 
     world_state_input_.reset(new ThreadedProtoUnixListener<TbotsProto::WorldState>(
-        std::scoped_lock lock(simulator_mutex);
         "/tmp/tbots/world_state", [this](TbotsProto::WorldState input) {
+            std::scoped_lock lock(simulator_mutex);
             this->er_force_sim_->setWorldState(input);
             LOG(DEBUG) << "Reconfigured to " << input.DebugString();
         }));
