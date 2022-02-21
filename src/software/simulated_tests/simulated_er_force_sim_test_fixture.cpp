@@ -201,7 +201,7 @@ void SimulatedErForceSimTestFixture::sleep(
 }
 
 void SimulatedErForceSimTestFixture::runTest(
-    const FieldType &field_type, const BallState &ball,
+    const TbotsProto::FieldType &field_type, const BallState &ball,
     const std::vector<RobotStateWithId> &friendly_robots,
     const std::vector<RobotStateWithId> &enemy_robots,
     const std::vector<ValidationFunction> &terminating_validation_functions,
@@ -211,8 +211,12 @@ void SimulatedErForceSimTestFixture::runTest(
     const Duration simulation_time_step =
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
 
+    // TODO nuke me 
+    TbotsProto::SimulatorInitialization init_proto;
+    init_proto.set_field_type(field_type);
+
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
-        field_type, create2015RobotConstants(), create2015WheelConstants(),
+        init_proto, create2015RobotConstants(), create2015WheelConstants(),
         friendly_thunderbots_config->getSimulatorConfig()));
 
     // TODO (#2419): remove this to re-enable sigfpe checks

@@ -33,12 +33,12 @@ class ErForceSimulator : public QObject
      * Creates a new Simulator. The starting state of the simulation
      * will have the given field, with no robots or ball.
      *
-     * @param field_type The field type
+     * @param sim_init The initialization protobuf
      * @param robot_constants The robot constants
      * @param wheel_constants The wheel constants
      * @param simulator_config The config to fetch parameters from
      */
-    explicit ErForceSimulator(const FieldType& field_type,
+    explicit ErForceSimulator(const TbotsProto::SimulatorInitialization& sim_init,
                               const RobotConstants_t& robot_constants,
                               const WheelConstants& wheel_constants,
                               std::shared_ptr<const SimulatorConfig> simulator_config);

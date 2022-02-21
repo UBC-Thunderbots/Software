@@ -101,3 +101,11 @@ std::unique_ptr<TbotsProto::Timestamp> createCurrentTimestamp();
  * @return the RobotState
  */
 RobotState createRobotState(const TbotsProto::RobotState robot_state);
+
+/**
+ * Return BallState given the TbotsProto::BallState protobuf
+ *
+ * @param robot_state The BallState proto to create a RobotState from
+ * @return the BallState
+ */
+BallState createBallState(const TbotsProto::BallState ball_state);

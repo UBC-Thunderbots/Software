@@ -329,3 +329,10 @@ RobotState createRobotState(const TbotsProto::RobotState robot_state)
                       createAngle(robot_state.global_orientation()),
                       createAngularVelocity(robot_state.global_angular_velocity()));
 }
+
+BallState createBallState(const TbotsProto::BallState ball_state)
+{
+    return BallState(createPoint(ball_state.global_position()),
+                     createVector(ball_state.global_velocity()),
+                     ball_state.distance_from_ground());
+}

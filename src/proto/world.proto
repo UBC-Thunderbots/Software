@@ -4,6 +4,7 @@ package TbotsProto;
 
 import "proto/game_state.proto";
 import "proto/team.proto";
+import "proto/vision.proto";
 import "proto/ball.proto";
 import "proto/tbots_timestamp_msg.proto";
 
@@ -29,9 +30,16 @@ message World
     required GameState game_state = 6;
 }
 
+enum FieldType
+{
+   DIV_A = 0;
+   DIV_B = 1;
+}
+
 message SimulatorInitialization
 {
-    required Team friendly_team   = 1;
-    required Team enemy_team      = 2;
-    required Ball ball            = 3;
+    required FieldType field_type = 1;
+    required Team friendly_team   = 2;
+    required Team enemy_team      = 3;
+    required BallState ball_state = 4;
 }

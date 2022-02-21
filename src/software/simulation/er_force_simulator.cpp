@@ -17,7 +17,7 @@
 #include "software/world/robot_state.h"
 
 ErForceSimulator::ErForceSimulator(
-    const FieldType& field_type, const RobotConstants_t& robot_constants,
+    const TbotsProto::SimulatorInitialization& sim_init, const RobotConstants_t& robot_constants,
     const WheelConstants& wheel_constants,
     std::shared_ptr<const SimulatorConfig> simulator_config)
     : yellow_team_vision_msg(std::make_unique<TbotsProto::Vision>()),
@@ -25,11 +25,11 @@ ErForceSimulator::ErForceSimulator(
       frame_number(0),
       robot_constants(robot_constants),
       wheel_constants(wheel_constants),
-      field(Field::createField(field_type))
+      field(Field::createField(sim_init.field_type()))
 {
     QString full_filename = CONFIG_DIRECTORY;
 
-    if (field_type == FieldType::DIV_A)
+    if (sim_init.field_type() == TbotsProto::FieldType::DIV_A)
     {
         full_filename = full_filename + CONFIG_FILE + ".txt";
     }
@@ -45,14 +45,17 @@ ErForceSimulator::ErForceSimulator(
         LOG(FATAL) << "Could not open configuration file " << full_filename.toStdString()
                    << std::endl;
     }
+
     QString str = file.readAll();
     file.close();
+
     std::string s = qPrintable(str);
     google::protobuf::TextFormat::Parser parser;
     parser.ParseFromString(s, &er_force_sim_setup);
     er_force_sim = std::make_unique<camun::simulator::Simulator>(er_force_sim_setup);
     auto simulator_setup_command = std::make_unique<amun::Command>();
     simulator_setup_command->mutable_simulator()->set_enable(true);
+
     // start with default robots, take ER-Force specs.
     robot::Specs ERForce;
     robotSetDefault(&ERForce);
@@ -69,6 +72,9 @@ ErForceSimulator::ErForceSimulator(
     *(simulator_setup_command->mutable_simulator()) = *command_simulator;
 
     er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
+
+    setBallState(createBallState(sim_init.ball_state()));
+
 
     this->resetCurrentTime();
 }

@@ -18,7 +18,7 @@ class EnemyBallPlacementPlayTest
       public ::testing::WithParamInterface<std::tuple<std::vector<Point>, BallState>>
 {
    protected:
-    FieldType field_type = FieldType::DIV_B;
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field          = Field::createField(field_type);
 };
 
