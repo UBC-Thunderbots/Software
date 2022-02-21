@@ -19,9 +19,12 @@ PYBIND11_MODULE(python_bindings, m)
     py::class_<SensorFusionConfig, std::shared_ptr<SensorFusionConfig>>(
         m, "SensorFusionConfig")
         .def(py::init())
-        .def("getMutableFriendlyColorYellow", &SensorFusionConfig::getMutableFriendlyColorYellow)
-        .def("getMutableOverrideGameControllerDefendingSide", &SensorFusionConfig::getMutableOverrideGameControllerDefendingSide)
-        .def("getMutableDefendingPositiveSide", &SensorFusionConfig::getMutableDefendingPositiveSide);
+        .def("getMutableFriendlyColorYellow",
+             &SensorFusionConfig::getMutableFriendlyColorYellow)
+        .def("getMutableOverrideGameControllerDefendingSide",
+             &SensorFusionConfig::getMutableOverrideGameControllerDefendingSide)
+        .def("getMutableDefendingPositiveSide",
+             &SensorFusionConfig::getMutableDefendingPositiveSide);
 
     py::class_<SimulatorConfig, std::shared_ptr<SimulatorConfig>>(m, "SimulatorConfig")
         .def(py::init());
