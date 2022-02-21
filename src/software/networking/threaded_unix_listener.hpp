@@ -1,16 +1,16 @@
 #pragma once
 
-#include "software/networking/proto_udp_listener.hpp"
+#include "software/networking/unix_listener.hpp"
 
 /**
  * A threaded listener that receives serialized ReceiveProtoT Proto's over the network
  */
 template <class ReceiveProtoT>
-class ThreadedProtoUdpListener
+class ThreadedProtoUnixListener
 {
    public:
     /**
-     * Creates a ThreadedProtoUdpListener that will listen for ReceiveProtoT packets
+     * Creates a ThreadedProtoUnixListener that will listen for ReceiveProtoT packets
      * from the network of given address and port. For every
      * ReceiveProtoT packet received, the receive_callback will be called to perform any
      * operations desired by the caller.
@@ -23,57 +23,35 @@ class ThreadedProtoUdpListener
      * from the network
      * @param multicast If true, joins the multicast group of given ip_address
      */
-    ThreadedProtoUdpListener(const std::string& ip_address, unsigned short port,
-                             std::function<void(ReceiveProtoT)> receive_callback,
-                             bool multicast);
+    ThreadedProtoUnixListener(const std::string& ip_address, unsigned short port,
+                              std::function<void(ReceiveProtoT)> receive_callback,
+                              bool multicast);
 
-    /**
-     * Creates a ThreadedProtoUdpListener that will listen for ReceiveProtoT packets
-     * from the network on any local address with given port. For every ReceiveProtoT
-     * packet received, the receive_callback will be called to perform any operations
-     * desired by the caller.
-     *
-     * @param port The port on which to listen for ReceiveProtoT packets
-     * @param receive_callback The function to run for every ReceiveProtoT packet received
-     * from the network
-     */
-    ThreadedProtoUdpListener(unsigned short port,
-                             std::function<void(ReceiveProtoT)> receive_callback);
-
-    ~ThreadedProtoUdpListener();
+    ~ThreadedProtoUnixListener();
 
    private:
     // The io_service that will be used to service all network requests
     boost::asio::io_service io_service;
+
     // The thread running the io_service in the background. This thread will run for the
     // entire lifetime of the class
     std::thread io_service_thread;
-    std::function<void(ReceiveProtoT)> receive_callback_;
-    ProtoUdpListener<ReceiveProtoT> udp_listener;
+    ProtoUnixListener<ReceiveProtoT> unix_listener;
 };
 
 template <class ReceiveProtoT>
-ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
+ThreadedProtoUnixListener<ReceiveProtoT>::ThreadedProtoUnixListener(
     const std::string& ip_address, const unsigned short port,
     std::function<void(ReceiveProtoT)> receive_callback, bool multicast)
     : io_service(),
-      udp_listener(io_service, ip_address, port, receive_callback, multicast)
+      unix_listener(io_service, ip_address, port, receive_callback, multicast)
 {
     // start the thread to run the io_service in the background
     io_service_thread = std::thread([this]() { io_service.run(); });
 }
 
 template <class ReceiveProtoT>
-ThreadedProtoUdpListener<ReceiveProtoT>::ThreadedProtoUdpListener(
-    const unsigned short port, std::function<void(ReceiveProtoT)> receive_callback)
-    : io_service(), udp_listener(io_service, port, receive_callback)
-{
-    // start the thread to run the io_service in the background
-    io_service_thread = std::thread([this]() { io_service.run(); });
-}
-
-template <class ReceiveProtoT>
-ThreadedProtoUdpListener<ReceiveProtoT>::~ThreadedProtoUdpListener()
+ThreadedProtoUnixListener<ReceiveProtoT>::~ThreadedProtoUnixListener()
 {
     // Stop the io_service. This is safe to call from another thread.
     // https://stackoverflow.com/questions/4808848/boost-asio-stopping-io-service
@@ -87,5 +65,3 @@ ThreadedProtoUdpListener<ReceiveProtoT>::~ThreadedProtoUdpListener()
     // `std::terminate` when we deallocate the thread object and kill our whole program
     io_service_thread.join();
 }
-
-#include "software/networking/threaded_proto_udp_listener.hpp"

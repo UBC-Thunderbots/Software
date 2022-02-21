@@ -5,6 +5,9 @@ from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from field import obstacle_layer, path_layer, world_layer
 
+from shared.parameter.dynamic_parameters_pb2 import ThunderbotsConfig
+from software.networking import threaded_unix_sender
+
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.dockarea import *
@@ -46,13 +49,16 @@ if __name__ == "__main__":
     dock_area.addDock(field_dock, "left")
     dock_area.addDock(log_dock, "bottom", field_dock)
 
+    test = threaded_unix_sender.ThreadedUnixSender("/tmp/testing")
+
     def update():
         field.refresh()
         logs.refresh()
+        test.send(ThunderbotsConfig())
 
     timer = QtCore.QTimer()
     timer.timeout.connect(update)
-    timer.start(5)  # Refresh at 200hz
+    timer.start(50)  # Refresh at 200hz
 
     window.show()
 
