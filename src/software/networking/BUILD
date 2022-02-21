@@ -73,6 +73,18 @@ cc_library(
 )
 
 cc_library(
+    name = "proto_unix_sender",
+    hdrs = [
+        "proto_unix_sender.hpp",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        ":unix_sender",
+        "@boost//:asio",
+    ],
+)
+
+cc_library(
     name = "proto_unix_listener",
     hdrs = [
         "proto_unix_listener.hpp",
@@ -93,6 +105,17 @@ cc_library(
     ],
     deps = [
         ":unix_sender",
+        "@boost//:asio",
+    ],
+)
+
+cc_library(
+    name = "threaded_proto_unix_sender",
+    hdrs = [
+        "threaded_proto_unix_sender.hpp",
+    ],
+    deps = [
+        ":proto_unix_sender",
         "@boost//:asio",
     ],
 )

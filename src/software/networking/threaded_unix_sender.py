@@ -41,7 +41,7 @@ class ThreadedUnixSender:
             proto = self.proto_buffer.get()
 
             print("SENDING")
-            self.socket.sendto(bytes("HELLO", 'utf-8'), self.unix_path)
+            self.socket.sendto(bytes("HELLO", "utf-8"), self.unix_path)
 
     def send(self, proto):
         """Buffer a protobuf to be sent by the send thread

@@ -6,9 +6,9 @@
 
 #include "proto/logging/proto_logger.h"
 #include "proto/message_translation/ssl_wrapper.h"
-#include "shared/parameter/dynamic_parameters.pb.h"
 #include "proto/play_info_msg.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
+#include "shared/parameter/dynamic_parameters.pb.h"
 #include "software/ai/threaded_ai.h"
 #include "software/backend/backend.h"
 #include "software/constants.h"
@@ -55,7 +55,7 @@ int main(int argc, char** argv)
         ThreadedProtoUnixListener<TbotsProto::ThunderbotsConfig>(
             "/tmp/tbots/bobthebuilder", 0,
             [](TbotsProto::ThunderbotsConfig input) {
-                LOG(DEBUG) << "RECEVIED PROTOBUF";
+                LOG(DEBUG) << "RECEIVED PROTOBUF";
             },
             false);
 

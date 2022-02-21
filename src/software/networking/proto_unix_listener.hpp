@@ -5,13 +5,15 @@
 #include <string>
 
 #include "software/logger/logger.h"
-#include "software/networking/proto_udp_listener.hpp"
 #include "software/util/typename/typename.h"
 
 template <class ReceiveProtoT>
 class ProtoUnixListener
 {
    public:
+    /*
+     * TODO
+     */
     ProtoUnixListener(boost::asio::io_service& io_service, const std::string& unix_path,
                       std::function<void(ReceiveProtoT&)> receive_callback);
 
