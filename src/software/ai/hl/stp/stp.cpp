@@ -24,7 +24,6 @@
 STP::STP(std::shared_ptr<const AiConfig> ai_config)
     : robot_tactic_assignment(),
       ai_config(ai_config),
-      goalie_tactic(std::make_shared<GoalieTactic>(ai_config->getGoalieTacticConfig())),
       stop_tactics(),
       current_play(std::make_unique<HaltPlay>(ai_config)),
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config})),
@@ -87,7 +86,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     auto intents = getIntentsFromCurrentPlay(world);
 
     auto all_tactics = stop_tactics;
-    all_tactics.push_back(goalie_tactic);
+    all_tactics.push_back(current_play->goalie_tactic);
     for (auto tactic : all_tactics)
     {
         auto iter = robot_tactic_assignment.find(tactic);
@@ -131,7 +130,8 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
 
     if (goalie_robot && automatically_assign_goalie)
     {
-        robot_tactic_assignment.emplace(goalie_tactic, goalie_robot.value());
+        robot_tactic_assignment.emplace(current_play->goalie_tactic,
+                                        goalie_robot.value());
 
         robots.erase(std::remove(robots.begin(), robots.end(), goalie_robot.value()),
                      robots.end());

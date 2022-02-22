@@ -13,7 +13,6 @@ PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(std::shared_ptr<const AiConfig> confi
 void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                                           const World &world)
 {
-    auto move_to_goal_line_tactic = std::make_shared<MoveGoalieToGoalLineTactic>();
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
         std::make_shared<const GoalieTacticConfig>();
     auto goalie_tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
@@ -23,9 +22,8 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
     auto move_tactic_5 = std::make_shared<MoveTactic>();
     auto move_tactic_6 = std::make_shared<MoveTactic>();
 
-    PriorityTacticVector tactics_to_run = {{move_to_goal_line_tactic, move_tactic_2,
-                                            move_tactic_3, move_tactic_4, move_tactic_5,
-                                            move_tactic_6}};
+    PriorityTacticVector tactics_to_run = {
+        {move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5, move_tactic_6}};
 
     do
     {
@@ -49,11 +47,15 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
             Point(world.field().enemyPenaltyMark().x() + 1.5,
                   -8 * ROBOT_MAX_RADIUS_METERS),
             world.field().enemyGoalCenter().toVector().orientation(), 0);
-        move_to_goal_line_tactic->updateControlParams(world.field().friendlyGoalCenter(),
-                                                      Angle::zero(), 0);
 
-        world.gameState().isPlaying() ? tactics_to_run[0][0] = goalie_tactic
-                                      : tactics_to_run[0][0] = move_to_goal_line_tactic;
+        if (!world.gameState().isPlaying())
+        {
+            goalie_tactic->updateControlParams(true);
+        }
+        else
+        {
+            goalie_tactic->updateControlParams(false);
+        }
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(tactics_to_run);

@@ -10,7 +10,8 @@ GoalieTactic::GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tact
       fsm(DribbleFSM(), GoalieFSM(goalie_tactic_config, max_allowed_speed_mode)),
       fsm_map(),
       goalie_tactic_config(goalie_tactic_config),
-      max_allowed_speed_mode(max_allowed_speed_mode)
+      max_allowed_speed_mode(max_allowed_speed_mode),
+      control_params{.should_move_to_goal_line = false}
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
@@ -18,6 +19,12 @@ GoalieTactic::GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tact
             DribbleFSM(), GoalieFSM(goalie_tactic_config, max_allowed_speed_mode));
     }
 }
+
+void GoalieTactic::updateControlParams(bool should_move_to_goal_line)
+{
+    control_params.should_move_to_goal_line = should_move_to_goal_line;
+}
+
 
 double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {

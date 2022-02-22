@@ -89,26 +89,26 @@ TEST(GoalieFSMTest, test_transitions)
                        GoalieFSM(std::make_shared<const GoalieTacticConfig>(),
                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT));
 
-    // goalie starts in PositionToBlockState
-    EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlockState>));
+    // goalie starts in PositionToBlock
+    EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlock>));
 
     // ball is now moving slowly towards the friendly goal
     world =
         ::TestUtil::setBallVelocity(world, Vector(-0.1, 0), Timestamp::fromSeconds(123));
 
-    // goalie should remain in PositionToBlockState
+    // goalie should remain in PositionToBlock
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlockState>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlock>));
 
     // ball is now moving quickly towards the friendly goal
     world =
         ::TestUtil::setBallVelocity(world, Vector(-1, 0), Timestamp::fromSeconds(123));
 
-    // goalie should transition to PanicState
+    // goalie should transition to Panic
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PanicState>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::Panic>));
 
     // ball is now out of danger
     world = ::TestUtil::setBallVelocity(world, Vector(1, 0), Timestamp::fromSeconds(123));
@@ -118,10 +118,10 @@ TEST(GoalieFSMTest, test_transitions)
         {}, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 
-    // process event again to reset goalie to PositionToBlockState
+    // process event again to reset goalie to PositionToBlock
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlockState>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlock>));
 
     // ball is now stationary in the "no-chip" rectangle
     world = ::TestUtil::setBallPosition(world, world.field().friendlyGoalCenter(),
@@ -158,10 +158,10 @@ TEST(GoalieFSMTest, test_transitions)
         {}, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
     EXPECT_TRUE(fsm.is(boost::sml::X));
 
-    // process event once to reset goalie to PositionToBlockState
+    // process event once to reset goalie to PositionToBlock
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlockState>));
+    EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlock>));
 
     // ball is now moving slowly inside the friendly defense area
     world =

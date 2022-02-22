@@ -29,6 +29,8 @@ class GoalieTactic : public Tactic
 
     GoalieTactic() = delete;
 
+    void updateControlParams(bool should_move_to_goal_line);
+
     double calculateRobotCost(const Robot &robot, const World &world) const override;
 
     void accept(TacticVisitor &visitor) const override;
@@ -44,4 +46,6 @@ class GoalieTactic : public Tactic
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
     MaxAllowedSpeedMode max_allowed_speed_mode;
+
+    GoalieFSM::ControlParams control_params;
 };

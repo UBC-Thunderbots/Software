@@ -6,6 +6,7 @@
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play_fsm.h"
+#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 
 using RobotToTacticAssignmentFunction =
@@ -38,6 +39,7 @@ using TacticCoroutine = boost::coroutines2::coroutine<PriorityTacticVector>;
 class Play
 {
    public:
+    friend class STP;
     /**
      * Creates a new Play
      *
@@ -75,6 +77,9 @@ class Play
     // TODO (#2359): remove this
     // The Play configuration
     std::shared_ptr<const AiConfig> ai_config;
+
+    // Goalie tactic common to all plays
+    std::shared_ptr<GoalieTactic> goalie_tactic;
 
    private:
     /**

@@ -281,6 +281,7 @@ cc_library(
     deps = [
         "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic",
+        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/util/sml_fsm",
         "@boost//:coroutine2",
     ],

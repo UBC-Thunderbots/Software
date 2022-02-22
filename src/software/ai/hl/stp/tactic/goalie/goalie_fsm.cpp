@@ -184,7 +184,7 @@ bool GoalieFSM::panicDone(const Update &event)
            intersections.empty();
 }
 
-void GoalieFSM::updatePanic(const Update &event)
+void GoalieFSM::panic(const Update &event)
 {
     std::vector<Point> intersections =
         getIntersectionsBetweenBallVelocityAndFullGoalSegment(event.common.world.ball(),
@@ -230,7 +230,7 @@ void GoalieFSM::updatePivotKick(
     processEvent(PivotKickFSM::Update(control_params, event.common));
 }
 
-void GoalieFSM::updatePositionToBlock(const Update &event)
+void GoalieFSM::positionToBlock(const Update &event)
 {
     Point goalie_pos = getGoaliePositionToBlock(
         event.common.world.ball(), event.common.world.field(), goalie_tactic_config);
@@ -258,4 +258,24 @@ bool GoalieFSM::ballInDefenseArea(const Update &event)
 {
     return contains(event.common.world.field().friendlyDefenseArea(),
                     event.common.world.ball().position());
+}
+
+bool GoalieFSM::shouldMoveToGoalLine(const Update &event)
+{
+    return event.control_params.should_move_to_goal_line;
+}
+
+void GoalieFSM::moveToGoalLine(const Update &event)
+{
+    event.common.set_intent(std::make_unique<MoveIntent>(
+        event.common.robot.id(), event.common.world.field().friendlyGoalCenter(),
+        Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}, max_allowed_speed_mode, 0.0,
+        event.common.robot.robotConstants()));
+
+    event.common.set_primitive(createMovePrimitive(
+        event.common.world.field().friendlyGoalCenter(), Angle::zero(), 0,
+        DribblerMode::OFF, BallCollisionType::AVOID,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}, max_allowed_speed_mode, 0.0,
+        event.common.robot.robotConstants()));
 }
