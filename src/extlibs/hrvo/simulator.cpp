@@ -596,7 +596,6 @@ std::vector<Polygon> HRVOSimulator::getRobotVelocityObstacles(unsigned int robot
             }
             velocity_obstacles.emplace_back(Polygon(points));
         }
-        Vector2 velocity_vector_2 = getAgentVelocity(agent_index);
     }
     return velocity_obstacles;
 }
