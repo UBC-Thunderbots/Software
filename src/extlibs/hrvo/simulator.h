@@ -32,9 +32,9 @@
 
 #pragma once
 
+#include <fstream>
 #include <limits>
 #include <vector>
-#include <fstream>
 
 #include "extlibs/hrvo/agent.h"
 #include "extlibs/hrvo/goal.h"
@@ -50,10 +50,13 @@ class HRVOSimulator
      * Constructor
      * @param time_step
      * @param robot_constants
-     * @param record_playback_name If passed the simulator will recorded and saved under this name
+     * @param record_playback_name If passed the simulator will recorded and saved under
+     * this name
      */
-    explicit HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
-                           const std::string& record_playback_name = "simoutput"); // TODO: Update, should probably use dynamic params
+    explicit HRVOSimulator(
+        float time_step, const RobotConstants_t &robot_constants,
+        const std::string &record_playback_name =
+            "simoutput");  // TODO: Update, should probably use dynamic params
 
     ~HRVOSimulator();
 
@@ -269,7 +272,7 @@ class HRVOSimulator
     std::string record_playback_name;
     unsigned int frame = 0;
 
-public:
+   public:
     // The robot constants which all agents will use
     RobotConstants_t robot_constants_;
 
@@ -293,13 +296,16 @@ public:
 
    private:
     // friendly robot id to agent index
-    // TODO: Update Agent ID to be a property (Agent ID == Robot ID), then use a map of Agents
-    //       - Problem: It is likely that there is a duplicate of every robot ID (friendly and enemy robot)
-    //       - Possible Solution: Two arrays (friendly and enemy) of Agent shared_ptr. And one Agents array with all Agents. Doesn't seem ideal though
+    // TODO: Update Agent ID to be a property (Agent ID == Robot ID), then use a map of
+    // Agents
+    //       - Problem: It is likely that there is a duplicate of every robot ID (friendly
+    //       and enemy robot)
+    //       - Possible Solution: Two arrays (friendly and enemy) of Agent shared_ptr. And
+    //       one Agents array with all Agents. Doesn't seem ideal though
     std::map<unsigned int, unsigned int> friendly_robot_id_map;
     std::map<unsigned int, unsigned int> enemy_robot_id_map;
-    std::size_t ball_agent_id = -1; // Can size_t be negative?
-    int update_world = 0;
+    std::size_t ball_agent_id = -1;  // Can size_t be negative?
+    int update_world          = 0;
 
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set_;

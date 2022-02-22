@@ -4,18 +4,19 @@
 
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/geom/algorithms/contains.h"
+#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_stationary_in_polygon_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
-#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
 
-class SimulatedThetaStarTest : public SimulatedErForceSimTacticTestFixture //SimulatedTacticTestFixture
+class SimulatedThetaStarTest
+    : public SimulatedErForceSimTacticTestFixture  // SimulatedTacticTestFixture
 {
    protected:
-//    Field field = Field::createSSLDivisionBField();
+    //    Field field = Field::createSSLDivisionBField();
     FieldType field_type = FieldType::DIV_B;
     Field field          = Field::createField(field_type);
 };

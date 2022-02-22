@@ -125,7 +125,7 @@ class Agent
 
     void setVelocity(const Vector2 &velocity);
 
-protected:
+   protected:
     // Agent Properties
     Vector2 position_;
     float radius_;

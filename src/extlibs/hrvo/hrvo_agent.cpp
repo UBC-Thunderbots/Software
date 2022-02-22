@@ -41,10 +41,11 @@
 #include "kd_tree.h"
 
 
-HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector2 &position, std::size_t goalIndex,
-                     float neighborDist, std::size_t maxNeighbors, float radius,
-                     const Vector2 &velocity, float maxAccel, float goalRadius,
-                     float prefSpeed, float maxSpeed, float uncertaintyOffset)
+HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector2 &position,
+                     std::size_t goalIndex, float neighborDist, std::size_t maxNeighbors,
+                     float radius, const Vector2 &velocity, float maxAccel,
+                     float goalRadius, float prefSpeed, float maxSpeed,
+                     float uncertaintyOffset)
     : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel,
             goalIndex, goalRadius),
       maxNeighbors_(maxNeighbors),
@@ -59,11 +60,11 @@ void HRVOAgent::computeNeighbors()
     neighbors_.clear();
 
     std::unique_ptr<Goal> &current_goal = simulator_->goals_[goal_index_];
-    float new_neighbor_dist =
+    float new_neighbor_dist = 100;
         std::min(neighborDist_,
                  abs(position_ - current_goal->getCurrentGoalPosition()) + goal_radius_);
 
-    simulator_->kdTree_->query(this, new_neighbor_dist);
+        simulator_->kdTree_->query(this, new_neighbor_dist);
 }
 
 Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
@@ -158,6 +159,8 @@ void HRVOAgent::computeNewVelocity()
         const std::unique_ptr<Agent> &other_agent = simulator_->agents_[neighbor.second];
         VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
         velocityObstacles_.push_back(velocity_obstacle);
+        std::cerr << "VELOCITY OBSTACLES: " << velocityObstacles_.size() << "\n";
+        std::cerr << "NEIGHBOURS: " << neighbors_.size() << "\n";
     }
 
     // Calculate what velocities (candidates) are not inside any velocity obstacle

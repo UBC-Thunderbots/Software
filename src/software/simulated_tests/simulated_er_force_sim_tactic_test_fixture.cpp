@@ -126,7 +126,7 @@ double SimulatedErForceSimTacticTestFixture::updatePrimitives(
 
     auto primitive_set_msg = navigator->getAssignedPrimitives(world, intents);
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
-    auto world_msg        = createWorld(world);
+    auto world_msg         = createWorld(world);
 
     if (config->getSensorFusionConfig()->getFriendlyColorYellow()->value())
     {
