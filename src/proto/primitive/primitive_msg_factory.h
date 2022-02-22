@@ -25,10 +25,17 @@
  * @return Pointer to Move Primitive Message
  */
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
-    const Point &dest, double final_speed_m_per_s, const Angle &final_angle,
+    const Point& dest, double final_speed_m_per_s, const Angle& final_angle,
     DribblerMode dribbler_mode, AutoChipOrKick auto_chip_or_kick,
     MaxAllowedSpeedMode max_allowed_speed_mode, double target_spin_rev_per_s,
     RobotConstants_t robot_constants);
+
+std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
+    const Point& destination, const Angle& final_angle, double final_speed,
+    const DribblerMode& dribbler_mode, const BallCollisionType& ball_collision_type,
+    const AutoChipOrKick& auto_chip_or_kick,
+    const MaxAllowedSpeedMode& max_allowed_speed_mode, double target_spin_rev_per_s,
+    const RobotConstants_t& robot_constants, double cost);
 
 /**
  * Create a Stop Move Primitive Message
@@ -50,7 +57,7 @@ std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast);
  * @return Pointer to the DirectControl Primitive
  */
 std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
-    const Vector &velocity, AngularVelocity angular_velocity, double dribbler_rpm);
+    const Vector& velocity, AngularVelocity angular_velocity, double dribbler_rpm);
 
 
 

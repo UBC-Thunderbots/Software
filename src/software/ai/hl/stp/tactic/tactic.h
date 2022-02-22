@@ -127,6 +127,7 @@ class Tactic
 
    private:
     std::unique_ptr<Intent> intent;
+    std::unique_ptr<TbotsProto::Primitive> primitive;
 
     /**
      * Updates the intent ptr with the new intent
@@ -135,6 +136,9 @@ class Tactic
      * updating the intent
      */
     virtual void updateIntent(const TacticUpdate &tactic_update) = 0;
+
+    // TODO: make pure virtual
+    virtual void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm);
 
     // robot capability requirements
     std::set<RobotCapability> capability_reqs;

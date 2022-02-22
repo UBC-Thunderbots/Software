@@ -9,8 +9,6 @@
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 
-MAKE_ENUM(BallCollisionType, AVOID, ALLOW);
-
 /**
  * An intent is a simple "thing" a robot or player may want to do. It specifies WHAT a
  * robot should do, not necessarily exactly how it will do it. Examples are shooting at

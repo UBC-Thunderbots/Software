@@ -5,6 +5,7 @@
 MoveTactic::MoveTactic()
     : Tactic({RobotCapability::Move}),
       fsm(),
+      fsm_map(),
       control_params{.destination            = Point(),
                      .final_orientation      = Angle::zero(),
                      .final_speed            = 0.0,
@@ -14,6 +15,10 @@ MoveTactic::MoveTactic()
                      .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
                      .target_spin_rev_per_s  = 0.0}
 {
+    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
+    {
+        fsm_map[id] = std::make_unique<FSM<MoveFSM>>();
+    }
 }
 
 void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
@@ -61,6 +66,15 @@ double MoveTactic::calculateRobotCost(const Robot &robot, const World &world) co
 
 void MoveTactic::updateIntent(const TacticUpdate &tactic_update)
 {
+    fsm.process_event(MoveFSM::Update(control_params, tactic_update));
+}
+
+void MoveTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
+{
+    if (reset_fsm)
+    {
+        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<MoveFSM>>();
+    }
     fsm.process_event(MoveFSM::Update(control_params, tactic_update));
 }
 

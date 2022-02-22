@@ -2,6 +2,7 @@
 
 #include <functional>
 
+#include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/ai/intent/intent.h"
 #include "software/ai/navigator/path_planner/path_planner.h"

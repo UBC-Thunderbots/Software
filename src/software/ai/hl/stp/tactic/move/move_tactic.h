@@ -68,8 +68,10 @@ class MoveTactic : public Tactic
 
    private:
     void updateIntent(const TacticUpdate& tactic_update) override;
+    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
     FSM<MoveFSM> fsm;
+    std::map<RobotId, std::unique_ptr<FSM<MoveFSM>>> fsm_map;
 
     MoveFSM::ControlParams control_params;
 };

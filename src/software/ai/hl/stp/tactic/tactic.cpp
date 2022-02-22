@@ -34,3 +34,30 @@ std::unique_ptr<Intent> Tactic::get(const Robot &robot, const World &world)
         return std::make_unique<StopIntent>(robot.id(), false);
     }
 }
+
+std::unique_ptr<TbotsProto::PrimitiveSet> Tactic::get(
+    std::optional<RobotId> last_execution_robot, const World &world,
+    std::shared_ptr<const PathPlanner> path_planner)
+{
+    auto primitive_set = std::make_unique<TbotsProto::PrimitiveSet>();
+    for (const auto &robot : world.friendlyTeam().getAllRobots())
+    {
+        primitive.reset();
+        updatePrimitive(TacticUpdate(
+                            robot, world,
+                            [this](std::unique_ptr<TbotsProto::Primitive> new_primitive) {
+                                primitive = std::move(new_primitive);
+                            },
+                            path_planner),
+                        last_execution_robot == robot.id());
+
+        if (primitive)
+        {
+            primitive_set->mutable_robot_primitives()->insert(
+                google::protobuf::MapPair(robot.id(), *primitive));
+        }
+    }
+    return primitive_set;
+}
+
+void Tactic::updatePrimitive(const TacticUpdate &, bool) {}
