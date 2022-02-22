@@ -1,4 +1,4 @@
-#include "path_planning_test_util.h"
+#include "software/test_util/path_planning_test_util.h"
 
 void TestUtil::checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
                                                  std::vector<Polygon> obstacles)

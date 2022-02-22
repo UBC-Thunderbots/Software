@@ -17,7 +17,7 @@
  * Since this algorithm requires precomputation to achieve fast pathfinding, obstacles are
  * passed into the constructor and is unmodifiable once it is created.
  */
-class EnlsvgPathPlanner : public PathPlanner
+class EnlsvgPathPlanner
 {
    public:
     /**
@@ -50,7 +50,7 @@ class EnlsvgPathPlanner : public PathPlanner
      */
     std::optional<Path> findPath(const Point &start, const Point &end,
                                  const Rectangle &navigable_area,
-                                 const std::vector<ObstaclePtr> &) override;
+                                 const std::vector<ObstaclePtr> &);
 
     /**
      * Returns a path that is an optimized path between start and end. Has no checking on
@@ -62,7 +62,7 @@ class EnlsvgPathPlanner : public PathPlanner
      * @return   a vector of points that is the optimal path avoiding obstacles
      *           if no valid path, then return an empty vector
      */
-    std::optional<Path> findPath(const Point &start, const Point &end);
+    std::optional<Path> findPath(const Point &start, const Point &end) const;
 
     /**
      * Returns internal resolution of the grid.

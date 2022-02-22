@@ -15,6 +15,7 @@
 #include "software/world/field.h"
 #include "software/world/team.h"
 #include "software/world/world.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 #define UNUSED(x) (void)(x)
 
@@ -38,13 +39,13 @@ namespace TestUtil
     /**
      * Creates a blank testing World given a Field.
      *
-     * @param field field to use when creating a field
+     * @param field_proto field to use when creating a field
      *
      * @return   a World object initialized with the given field, empty teams with 1000
      * millisecond expiry buffers, and the Ball at the centre of the field with no
      * velocity.
      */
-    World createBlankTestingWorld(Field field);
+    World createBlankTestingWorld(TbotsProto::Field field_proto);
 
     /**
      * Creates a World object with a normal SSL Division A field, default (empty)

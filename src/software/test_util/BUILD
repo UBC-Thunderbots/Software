@@ -32,6 +32,7 @@ cc_library(
         "//software/world",
         "//software/world:robot_state",
         "@eigen",
+        "//proto/message_translation:tbots_protobuf",
     ],
 )
 

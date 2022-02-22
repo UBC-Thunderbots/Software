@@ -14,13 +14,13 @@
 using Path = LinearSpline2d;
 
 /**
- * GlobalPathPlanner is a module that constructs every possible path planner for every
+ * GlobalPathPlannerFactory is a module that constructs every possible path planner for every
  * possible combination of static obstacles. It pre-computes static obstacle planners in
  * order to achieve path planning efficiencies during the game.
  *
- * The GlobalPathPlanner uses MotionConstraints to create these static obstacles.
+ * The GlobalPathPlannerFactory uses MotionConstraints to create these static obstacles.
  */
-class GlobalPathPlanner
+class GlobalPathPlannerFactory
 {
    public:
     /**
@@ -33,7 +33,7 @@ class GlobalPathPlanner
      * obstacles
      * @param navigable_area             the path planner's navigable area
      */
-    GlobalPathPlanner(const std::shared_ptr<const RobotNavigationObstacleConfig>
+    GlobalPathPlannerFactory(const std::shared_ptr<const RobotNavigationObstacleConfig>
                           navigation_obstacle_config,
                       const World &world, const Rectangle &navigable_area);
 
@@ -46,9 +46,9 @@ class GlobalPathPlanner
      *
      * @return path planner for static obstacles created by constraints
      */
-    std::shared_ptr<EnlsvgPathPlanner> getPathGenerator(
-        const std::set<MotionConstraint> constraints);
+    std::shared_ptr<const EnlsvgPathPlanner> getPathPlanner(
+        const std::set<MotionConstraint> &constraints) const;
 
    private:
-    std::map<std::set<MotionConstraint>, std::shared_ptr<EnlsvgPathPlanner>> planners;
+    std::map<std::set<MotionConstraint>, std::shared_ptr<const EnlsvgPathPlanner>> planners;
 };

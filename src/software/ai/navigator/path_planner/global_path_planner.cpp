@@ -1,6 +1,6 @@
-#include "global_path_planner.h"
+#include "software/ai/navigator/path_planner/global_path_planner.h"
 
-GlobalPathPlanner::GlobalPathPlanner(
+GlobalPathPlannerFactory::GlobalPathPlannerFactory(
     const std::shared_ptr<const RobotNavigationObstacleConfig> navigation_obstacle_config,
     const World &world, const Rectangle &navigable_area)
 {
@@ -38,8 +38,8 @@ GlobalPathPlanner::GlobalPathPlanner(
     }
 }
 
-std::shared_ptr<EnlsvgPathPlanner> GlobalPathPlanner::getPathGenerator(
-    const std::set<MotionConstraint> motion_constraints)
+std::shared_ptr<const EnlsvgPathPlanner> GlobalPathPlannerFactory::getPathPlanner(
+    const std::set<MotionConstraint> &motion_constraints) const
 {
     try
     {
@@ -48,7 +48,7 @@ std::shared_ptr<EnlsvgPathPlanner> GlobalPathPlanner::getPathGenerator(
     catch (std::out_of_range &e)
     {
         LOG(WARNING)
-            << "GlobalPathPlanner is unable to obtain a path planner for the following motion constraints: ";
+            << "GlobalPathPlannerFactory is unable to obtain a path planner for the following motion constraints: ";
         for (auto constraint : motion_constraints)
         {
             LOG(WARNING) << toString(constraint) << " ";
