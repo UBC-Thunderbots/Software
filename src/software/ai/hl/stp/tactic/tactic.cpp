@@ -49,7 +49,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Tactic::get(
                                 primitive = std::move(new_primitive);
                             },
                             path_planner),
-                        last_execution_robot == robot.id());
+                       !last_execution_robot.has_value()|| last_execution_robot != robot.id());
 
         if (primitive)
         {

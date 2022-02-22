@@ -78,6 +78,10 @@ class ReceiverTactic : public Tactic
     static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(90);
 
     void updateIntent(const TacticUpdate& tactic_update) override;
+    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
+
+    FSM<ReceiverFSM> fsm;
+    std::map<RobotId, std::unique_ptr<FSM<ReceiverFSM>>> fsm_map;
 
     /**
      * Finds a feasible shot for the robot, if any.
@@ -88,8 +92,6 @@ class ReceiverTactic : public Tactic
      * @return A feasible shot or std::nullopt if there is no feasible shot
      */
     std::optional<Shot> findFeasibleShot();
-
-    FSM<ReceiverFSM> fsm;
 
     ReceiverFSM::ControlParams control_params;
 };

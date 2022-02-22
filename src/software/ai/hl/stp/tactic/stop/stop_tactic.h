@@ -37,6 +37,9 @@ class StopTactic : public Tactic
 
    private:
     void updateIntent(const TacticUpdate& tactic_update) override;
+    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
     FSM<StopFSM> fsm;
+    std::map<RobotId, std::unique_ptr<FSM<StopFSM>>> fsm_map;
+    bool coast;
 };

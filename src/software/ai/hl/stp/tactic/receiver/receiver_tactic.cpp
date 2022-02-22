@@ -8,10 +8,14 @@
 
 ReceiverTactic::ReceiverTactic()
     : Tactic({RobotCapability::Move}),
-      fsm(ReceiverFSM()),
+      fsm(ReceiverFSM()),fsm_map(),
       control_params({ReceiverFSM::ControlParams{.pass                   = std::nullopt,
                                                  .disable_one_touch_shot = false}})
 {
+    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
+    {
+        fsm_map[id] = std::make_unique<FSM<ReceiverFSM>>(ReceiverFSM());
+    }
 }
 
 void ReceiverTactic::updateControlParams(const Pass& updated_pass,
@@ -47,4 +51,13 @@ double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world
 void ReceiverTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
+}
+
+void ReceiverTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
+{
+    if (reset_fsm)
+    {
+        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<ReceiverFSM>>(ReceiverFSM());
+    }
+    fsm.process_event(ReceiverFSM::Update(control_params, tactic_update));
 }

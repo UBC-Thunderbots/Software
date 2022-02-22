@@ -43,8 +43,10 @@ class PivotKickTactic : public Tactic
 
    private:
     void updateIntent(const TacticUpdate& tactic_update) override;
+    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    // Tactic parameters
     FSM<PivotKickFSM> fsm;
+    std::map<RobotId, std::unique_ptr<FSM<PivotKickFSM>>> fsm_map;
+
     PivotKickFSM::ControlParams control_params;
 };

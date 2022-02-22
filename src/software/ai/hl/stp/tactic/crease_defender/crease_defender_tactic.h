@@ -63,10 +63,12 @@ class CreaseDefenderTactic : public Tactic
     void accept(TacticVisitor &visitor) const override;
 
    private:
-    void updateIntent(const TacticUpdate &tactic_update) override;
+    void updateIntent(const TacticUpdate& tactic_update) override;
+    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
-    // Tactic parameters
     FSM<CreaseDefenderFSM> fsm;
+    std::map<RobotId, std::unique_ptr<FSM<CreaseDefenderFSM>>> fsm_map;
+
     CreaseDefenderFSM::ControlParams control_params;
     std::shared_ptr<const RobotNavigationObstacleConfig> robot_navigation_obstacle_config;
 };

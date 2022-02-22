@@ -13,8 +13,13 @@ PivotKickTactic::PivotKickTactic()
     : Tactic({RobotCapability::Move, RobotCapability::Kick, RobotCapability::Chip,
               RobotCapability::Dribble}),
       fsm(DribbleFSM()),
+      fsm_map(),
       control_params(PivotKickFSM::ControlParams())
 {
+    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
+    {
+        fsm_map[id] = std::make_unique<FSM<PivotKickFSM>>(DribbleFSM());
+    }
 }
 
 double PivotKickTactic::calculateRobotCost(const Robot &robot, const World &world) const
@@ -46,3 +51,13 @@ void PivotKickTactic::updateIntent(const TacticUpdate &tactic_update)
 {
     fsm.process_event(PivotKickFSM::Update(control_params, tactic_update));
 }
+
+void PivotKickTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
+{
+    if (reset_fsm)
+    {
+        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<PivotKickFSM>>(DribbleFSM());
+    }
+    fsm.process_event(PivotKickFSM::Update(control_params, tactic_update));
+}
+

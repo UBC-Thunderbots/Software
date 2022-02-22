@@ -48,7 +48,9 @@ class DribbleTactic : public Tactic
 
    private:
     void updateIntent(const TacticUpdate& tactic_update) override;
+    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
     FSM<DribbleFSM> fsm;
+    std::map<RobotId, std::unique_ptr<FSM<DribbleFSM>>> fsm_map;
     DribbleFSM::ControlParams control_params;
 };

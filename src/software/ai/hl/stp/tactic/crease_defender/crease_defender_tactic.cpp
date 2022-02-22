@@ -13,10 +13,15 @@ CreaseDefenderTactic::CreaseDefenderTactic(
     std::shared_ptr<const RobotNavigationObstacleConfig> robot_navigation_obstacle_config)
     : Tactic({RobotCapability::Move}),
       fsm(CreaseDefenderFSM(robot_navigation_obstacle_config)),
+      fsm_map(),
       control_params({Point(0, 0), CreaseDefenderAlignment::CENTRE,
                       MaxAllowedSpeedMode::PHYSICAL_LIMIT}),
       robot_navigation_obstacle_config(robot_navigation_obstacle_config)
 {
+    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
+    {
+        fsm_map[id] = std::make_unique<FSM<CreaseDefenderFSM>>(CreaseDefenderFSM(robot_navigation_obstacle_config));
+    }
 }
 
 double CreaseDefenderTactic::calculateRobotCost(const Robot &robot,
@@ -56,3 +61,13 @@ void CreaseDefenderTactic::updateIntent(const TacticUpdate &tactic_update)
 {
     fsm.process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
 }
+
+void CreaseDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
+{
+    if (reset_fsm)
+    {
+        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<CreaseDefenderFSM>>(CreaseDefenderFSM(robot_navigation_obstacle_config));
+    }
+    fsm.process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
+}
+

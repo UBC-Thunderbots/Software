@@ -4,8 +4,12 @@
 
 
 ChipTactic::ChipTactic()
-    : Tactic({RobotCapability::Chip, RobotCapability::Move}), fsm{GetBehindBallFSM()}
+    : Tactic({RobotCapability::Chip, RobotCapability::Move}), fsm{GetBehindBallFSM()}, fsm_map()
 {
+    for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
+    {
+        fsm_map[id] = std::make_unique<FSM<ChipFSM>>(GetBehindBallFSM());
+    }
 }
 
 void ChipTactic::updateControlParams(const Point &chip_origin,
@@ -39,5 +43,14 @@ void ChipTactic::accept(TacticVisitor &visitor) const
 
 void ChipTactic::updateIntent(const TacticUpdate &tactic_update)
 {
+    fsm.process_event(ChipFSM::Update(control_params, tactic_update));
+}
+
+void ChipTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
+{
+    if (reset_fsm)
+    {
+        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<ChipFSM>>(GetBehindBallFSM());
+    }
     fsm.process_event(ChipFSM::Update(control_params, tactic_update));
 }
