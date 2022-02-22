@@ -6,6 +6,7 @@
 #include "shared/constants.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
+#include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/sensor_fusion/sensor_fusion.h"
@@ -27,6 +28,11 @@ PYBIND11_MODULE(python_bindings, m)
         .def("getMutableDefendingPositiveSide",
              &SensorFusionConfig::getMutableDefendingPositiveSide);
 
+    py::class_<Parameter<bool>, std::shared_ptr<Parameter<bool>>>(m, "Parameter")
+        .def(py::init<std::string, bool>())
+        .def("value", &Parameter<bool>::value)
+        .def("setValue", &Parameter<bool>::setValue);
+
     py::class_<SimulatorConfig, std::shared_ptr<SimulatorConfig>>(m, "SimulatorConfig")
         .def(py::init());
 
@@ -36,6 +42,10 @@ PYBIND11_MODULE(python_bindings, m)
 
     py::class_<AttackerTacticConfig, std::shared_ptr<AttackerTacticConfig>>(
         m, "AttackerTacticConfig")
+        .def(py::init());
+
+    py::class_<GoalieTacticConfig, std::shared_ptr<GoalieTacticConfig>>(
+        m, "GoalieTacticConfig")
         .def(py::init());
 
     py::class_<RobotConstants_t>(m, "RobotConstants")
@@ -69,6 +79,9 @@ PYBIND11_MODULE(python_bindings, m)
     py::class_<AttackerTactic, std::shared_ptr<AttackerTactic>, Tactic>(m,
                                                                         "AttackerTactic")
         .def(py::init<std::shared_ptr<const AttackerTacticConfig>>());
+
+    py::class_<GoalieTactic, std::shared_ptr<GoalieTactic>, Tactic>(m, "GoalieTactic")
+        .def(py::init<std::shared_ptr<const GoalieTacticConfig>>());
 
     py::class_<SensorFusion>(m, "SensorFusion")
         .def(py::init<std::shared_ptr<const SensorFusionConfig>&>())

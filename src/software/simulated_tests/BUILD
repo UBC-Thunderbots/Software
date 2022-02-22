@@ -147,6 +147,7 @@ cc_library(
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
         "//software/ai:ai",
         "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
+        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/simulated_tests:tactic_stepper",
         "//software/sensor_fusion",
         "//shared/parameter:cpp_configs",

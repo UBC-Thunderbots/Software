@@ -37,39 +37,64 @@ def tactic_stepper():
 
 
 def main():
-    sim_interface = StandaloneErForceSimulator()
 
+    # setup simulator
+    sim_interface = StandaloneErForceSimulator()
     sim_interface.setup_blue_robots([(1, 1)])
     sim_interface.setup_yellow_robots([(2, 2)])
-    sim_interface.setup_ball()
+    sim_interface.setup_ball(ball_position=(1, -2))
 
+    # create tactics
     attacker_tactic = py.AttackerTactic(py.AttackerTacticConfig())
+    goalie_tactic = py.GoalieTactic(py.GoalieTacticConfig())
 
-    tactic_stepper = py.TacticStepper(
-        attacker_tactic,
-        set([py.MotionConstraint.FRIENDLY_DEFENSE_AREA]),
-        py.ThunderbotsConfig(),
+    # create tactic steppers
+    attacker_tactic_stepper = py.TacticStepper(
+        attacker_tactic, set(), py.ThunderbotsConfig(),
     )
 
-    sensor_fusion_config = py.SensorFusionConfig()
-    sensor_fusion = py.SensorFusion(sensor_fusion_config)
+    goalie_tactic_stepper = py.TacticStepper(
+        goalie_tactic, set(), py.ThunderbotsConfig(),
+    )
+
+    # create sensor fusions
+    yellow_sensor_fusion_config = py.SensorFusionConfig()
+    yellow_sensor_fusion = py.SensorFusion(yellow_sensor_fusion_config)
+
+    blue_sensor_fusion_config = py.SensorFusionConfig()
+    blue_sensor_fusion_config.getMutableFriendlyColorYellow().setValue(False)
+    blue_sensor_fusion_config.getMutableDefendingPositiveSide().setValue(True)
+    blue_sensor_fusion = py.SensorFusion(blue_sensor_fusion_config)
 
     def run_lol():
-        sim_interface.tick(15)
+        sim_interface.tick(5)
         ssl_wrapper = sim_interface.get_ssl_wrapper_packet()
         if ssl_wrapper is None:
             return
+
         yellow_sensor_proto = sim_interface.get_yellow_sensor_proto(ssl_wrapper)
-        sensor_fusion.processSensorProto(yellow_sensor_proto)
-        world = sensor_fusion.getWorld()
-        thunderscope.world_layer.cached_world = py.createWorld(world)
-        primitives = tactic_stepper.getPrimitives(world, 0)
+        yellow_sensor_fusion.processSensorProto(yellow_sensor_proto)
+        yellow_world = yellow_sensor_fusion.getWorld()
+
+        blue_sensor_proto = sim_interface.get_blue_sensor_proto(ssl_wrapper)
+        blue_sensor_fusion.processSensorProto(blue_sensor_proto)
+        blue_world = blue_sensor_fusion.getWorld()
+
+        thunderscope.world_layer.cached_world = py.createWorld(yellow_world)
+
+        yellow_primitives = attacker_tactic_stepper.getPrimitives(yellow_world, 0)
+        blue_primitives = goalie_tactic_stepper.getPrimitives(blue_world, 0)
+
         sim_interface.send_yellow_primitive_set_and_vision(
-            py.createVision(world), primitives
+            py.createVision(yellow_world), yellow_primitives
+        )
+
+        sim_interface.send_blue_primitive_set_and_vision(
+            py.createVision(blue_world), blue_primitives
         )
 
     thunderscope = Thunderscope()
-    thunderscope.schedule_something(16, run_lol)
+    thunderscope.schedule_something(5, run_lol)
     thunderscope.show()
 
 
