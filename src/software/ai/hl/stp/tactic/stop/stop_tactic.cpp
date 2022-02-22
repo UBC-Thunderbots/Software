@@ -31,7 +31,8 @@ void StopTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_f
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<StopFSM>>(StopFSM(coast));
+        fsm_map[tactic_update.robot.id()] =
+            std::make_unique<FSM<StopFSM>>(StopFSM(coast));
     }
     fsm.process_event(StopFSM::Update({}, tactic_update));
 }

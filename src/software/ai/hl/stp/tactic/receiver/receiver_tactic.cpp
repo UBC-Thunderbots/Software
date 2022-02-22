@@ -8,7 +8,8 @@
 
 ReceiverTactic::ReceiverTactic()
     : Tactic({RobotCapability::Move}),
-      fsm(ReceiverFSM()),fsm_map(),
+      fsm(ReceiverFSM()),
+      fsm_map(),
       control_params({ReceiverFSM::ControlParams{.pass                   = std::nullopt,
                                                  .disable_one_touch_shot = false}})
 {
@@ -53,11 +54,12 @@ void ReceiverTactic::accept(TacticVisitor& visitor) const
     visitor.visit(*this);
 }
 
-void ReceiverTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
+void ReceiverTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<ReceiverFSM>>(ReceiverFSM());
+        fsm_map[tactic_update.robot.id()] =
+            std::make_unique<FSM<ReceiverFSM>>(ReceiverFSM());
     }
     fsm.process_event(ReceiverFSM::Update(control_params, tactic_update));
 }

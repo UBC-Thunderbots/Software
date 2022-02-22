@@ -80,11 +80,12 @@ void AttackerTactic::accept(TacticVisitor& visitor) const
     visitor.visit(*this);
 }
 
-void AttackerTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
+void AttackerTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<AttackerFSM>>(DribbleFSM());
+        fsm_map[tactic_update.robot.id()] =
+            std::make_unique<FSM<AttackerFSM>>(DribbleFSM());
     }
 
     std::optional<Shot> shot = calcBestShotOnGoal(

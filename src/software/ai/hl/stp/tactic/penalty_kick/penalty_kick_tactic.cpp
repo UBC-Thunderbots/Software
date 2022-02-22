@@ -2,11 +2,13 @@
 
 PenaltyKickTactic::PenaltyKickTactic()
     : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
-      fsm{DribbleFSM(), PenaltyKickFSM(), GetBehindBallFSM()}, fsm_map()
+      fsm{DribbleFSM(), PenaltyKickFSM(), GetBehindBallFSM()},
+      fsm_map()
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
-        fsm_map[id] = std::make_unique<FSM<PenaltyKickFSM>>(DribbleFSM(), PenaltyKickFSM(), GetBehindBallFSM());
+        fsm_map[id] = std::make_unique<FSM<PenaltyKickFSM>>(
+            DribbleFSM(), PenaltyKickFSM(), GetBehindBallFSM());
     }
 }
 
@@ -31,13 +33,12 @@ void PenaltyKickTactic::updateIntent(const TacticUpdate& tactic_update)
     fsm.process_event(PenaltyKickFSM::Update({}, tactic_update));
 }
 
-void PenaltyKickTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
+void PenaltyKickTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
     if (reset_fsm)
     {
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<PenaltyKickFSM>>(
-      DribbleFSM(), PenaltyKickFSM(), GetBehindBallFSM()
-                );
+            DribbleFSM(), PenaltyKickFSM(), GetBehindBallFSM());
     }
     fsm.process_event(PenaltyKickFSM::Update({}, tactic_update));
 }

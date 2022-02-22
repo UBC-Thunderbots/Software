@@ -207,7 +207,6 @@ cc_library(
         "//shared/parameter:cpp_configs",
         "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/hl/stp/tactic/move_goalie_to_goal_line:move_goalie_to_goal_line_tactic",
         "//software/logger",
         "//software/util/generic_factory",
     ],

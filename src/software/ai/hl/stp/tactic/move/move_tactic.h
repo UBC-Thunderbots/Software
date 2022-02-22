@@ -78,3 +78,4 @@ class MoveTactic : public Tactic
 
 // Creates a new tactic called PenaltySetupTactic that is a duplicate of MoveTactic
 COPY_TACTIC(PenaltySetupTactic, MoveTactic)
+COPY_TACTIC(MoveGoalieToGoalLineTactic, MoveTactic)

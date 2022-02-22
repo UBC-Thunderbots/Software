@@ -20,7 +20,8 @@ CreaseDefenderTactic::CreaseDefenderTactic(
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
-        fsm_map[id] = std::make_unique<FSM<CreaseDefenderFSM>>(CreaseDefenderFSM(robot_navigation_obstacle_config));
+        fsm_map[id] = std::make_unique<FSM<CreaseDefenderFSM>>(
+            CreaseDefenderFSM(robot_navigation_obstacle_config));
     }
 }
 
@@ -62,12 +63,13 @@ void CreaseDefenderTactic::updateIntent(const TacticUpdate &tactic_update)
     fsm.process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
 }
 
-void CreaseDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
+void CreaseDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
+                                           bool reset_fsm)
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<CreaseDefenderFSM>>(CreaseDefenderFSM(robot_navigation_obstacle_config));
+        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<CreaseDefenderFSM>>(
+            CreaseDefenderFSM(robot_navigation_obstacle_config));
     }
     fsm.process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
 }
-

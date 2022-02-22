@@ -3,7 +3,6 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
-#include "software/ai/hl/stp/tactic/move_goalie_to_goal_line/move_goalie_to_goal_line_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
 PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(std::shared_ptr<const AiConfig> config)
@@ -50,6 +49,8 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
             Point(world.field().enemyPenaltyMark().x() + 1.5,
                   -8 * ROBOT_MAX_RADIUS_METERS),
             world.field().enemyGoalCenter().toVector().orientation(), 0);
+        move_to_goal_line_tactic->updateControlParams(world.field().friendlyGoalCenter(),
+                                                      Angle::zero(), 0);
 
         world.gameState().isPlaying() ? tactics_to_run[0][0] = goalie_tactic
                                       : tactics_to_run[0][0] = move_to_goal_line_tactic;

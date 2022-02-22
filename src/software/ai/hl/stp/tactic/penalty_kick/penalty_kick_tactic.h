@@ -38,8 +38,8 @@ class PenaltyKickTactic : public Tactic
     void accept(TacticVisitor &visitor) const override;
 
    private:
-    void updateIntent(const TacticUpdate& tactic_update) override;
-    void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
+    void updateIntent(const TacticUpdate &tactic_update) override;
+    void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
 
     FSM<PenaltyKickFSM> fsm;
     std::map<RobotId, std::unique_ptr<FSM<PenaltyKickFSM>>> fsm_map;

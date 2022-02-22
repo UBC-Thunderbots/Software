@@ -42,11 +42,13 @@ void GetBehindBallTactic::accept(TacticVisitor &visitor) const
     visitor.visit(*this);
 }
 
-void GetBehindBallTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
+void GetBehindBallTactic::updatePrimitive(const TacticUpdate &tactic_update,
+                                          bool reset_fsm)
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<GetBehindBallFSM>>(GetBehindBallFSM());
+        fsm_map[tactic_update.robot.id()] =
+            std::make_unique<FSM<GetBehindBallFSM>>(GetBehindBallFSM());
     }
     fsm.process_event(GetBehindBallFSM::Update(control_params, tactic_update));
 }

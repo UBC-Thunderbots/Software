@@ -43,13 +43,14 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Tactic::get(
     for (const auto &robot : world.friendlyTeam().getAllRobots())
     {
         primitive.reset();
-        updatePrimitive(TacticUpdate(
-                            robot, world,
-                            [this](std::unique_ptr<TbotsProto::Primitive> new_primitive) {
-                                primitive = std::move(new_primitive);
-                            },
-                            path_planner),
-                       !last_execution_robot.has_value()|| last_execution_robot != robot.id());
+        updatePrimitive(
+            TacticUpdate(
+                robot, world,
+                [this](std::unique_ptr<TbotsProto::Primitive> new_primitive) {
+                    primitive = std::move(new_primitive);
+                },
+                path_planner),
+            !last_execution_robot.has_value() || last_execution_robot != robot.id());
 
         if (primitive)
         {

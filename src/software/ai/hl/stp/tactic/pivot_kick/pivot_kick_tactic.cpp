@@ -56,8 +56,8 @@ void PivotKickTactic::updatePrimitive(const TacticUpdate &tactic_update, bool re
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<PivotKickFSM>>(DribbleFSM());
+        fsm_map[tactic_update.robot.id()] =
+            std::make_unique<FSM<PivotKickFSM>>(DribbleFSM());
     }
     fsm.process_event(PivotKickFSM::Update(control_params, tactic_update));
 }
-

@@ -10,11 +10,12 @@ GoalieTactic::GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tact
       fsm(DribbleFSM(), GoalieFSM(goalie_tactic_config, max_allowed_speed_mode)),
       fsm_map(),
       goalie_tactic_config(goalie_tactic_config),
-    max_allowed_speed_mode(max_allowed_speed_mode)
+      max_allowed_speed_mode(max_allowed_speed_mode)
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {
-        fsm_map[id] = std::make_unique<FSM<GoalieFSM>>(DribbleFSM(), GoalieFSM(goalie_tactic_config, max_allowed_speed_mode));
+        fsm_map[id] = std::make_unique<FSM<GoalieFSM>>(
+            DribbleFSM(), GoalieFSM(goalie_tactic_config, max_allowed_speed_mode));
     }
 }
 
@@ -44,7 +45,8 @@ void GoalieTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset
 {
     if (reset_fsm)
     {
-        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<GoalieFSM>>(DribbleFSM(), GoalieFSM(goalie_tactic_config, max_allowed_speed_mode));
+        fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<GoalieFSM>>(
+            DribbleFSM(), GoalieFSM(goalie_tactic_config, max_allowed_speed_mode));
     }
     fsm.process_event(GoalieFSM::Update({}, tactic_update));
 }
