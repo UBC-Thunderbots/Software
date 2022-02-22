@@ -1,4 +1,5 @@
 #include "software/simulated_tests/simulated_er_force_sim_test_fixture.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 // TODO (#2419): remove this
 #include <fenv.h>
@@ -350,6 +351,7 @@ bool SimulatedErForceSimTestFixture::tickTest(Duration simulation_time_step,
     {
         *friendly_world = friendly_sensor_fusion.getWorld().value();
         *enemy_world    = enemy_sensor_fusion.getWorld().value();
+        LOG(VISUALIZE) << *createWorld(friendly_sensor_fusion.getWorld().value());
 
         validation_functions_done = validateAndCheckCompletion(
             terminating_function_validators, non_terminating_function_validators);
