@@ -123,6 +123,14 @@ void ReceiverFSM::updateOnetouch(const Update& event)
                            BALL_MAX_SPEED_METERS_PER_SECOND},
             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
             event.common.robot.robotConstants()));
+
+        event.common.set_primitive(
+            createMovePrimitive(one_touch.getPointToShootAt(), one_touch.getOpenAngle(),
+                                0, DribblerMode::OFF, BallCollisionType::ALLOW,
+                                AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
+                                               BALL_MAX_SPEED_METERS_PER_SECOND},
+                                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+                                event.common.robot.robotConstants()));
     }
 }
 
@@ -132,6 +140,12 @@ void ReceiverFSM::updateReceive(const Update& event)
     {
         event.common.set_intent(std::make_unique<MoveIntent>(
             event.common.robot.id(), event.control_params.pass->receiverPoint(),
+            event.control_params.pass->receiverOrientation(), 0, DribblerMode::MAX_FORCE,
+            BallCollisionType::ALLOW, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+            MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+            event.common.robot.robotConstants()));
+        event.common.set_primitive(createMovePrimitive(
+            event.control_params.pass->receiverPoint(),
             event.control_params.pass->receiverOrientation(), 0, DribblerMode::MAX_FORCE,
             BallCollisionType::ALLOW, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
@@ -161,6 +175,11 @@ void ReceiverFSM::adjustReceive(const Update& event)
             event.common.robot.id(), ball_receive_pos, ball_receive_orientation, 0,
             DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+            MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+            event.common.robot.robotConstants()));
+        event.common.set_primitive(createMovePrimitive(
+            ball_receive_pos, ball_receive_orientation, 0, DribblerMode::MAX_FORCE,
+            BallCollisionType::ALLOW, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
             event.common.robot.robotConstants()));
     }

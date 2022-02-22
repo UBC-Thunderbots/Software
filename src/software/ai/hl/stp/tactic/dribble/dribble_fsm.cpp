@@ -94,6 +94,11 @@ void DribbleFSM::getPossession(const Update &event)
         DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         0.0, event.common.robot.robotConstants()));
+
+    event.common.set_primitive(createMovePrimitive(
+        intercept_position, face_ball_orientation, 0, DribblerMode::MAX_FORCE,
+        BallCollisionType::ALLOW, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+        MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, event.common.robot.robotConstants()));
 }
 
 void DribbleFSM::dribble(const Update &event)
@@ -119,6 +124,11 @@ void DribbleFSM::dribble(const Update &event)
         event.common.robot.id(), target_destination, target_orientation, 0,
         DribblerMode::MAX_FORCE, BallCollisionType::ALLOW, auto_chip_or_kick,
         MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, event.common.robot.robotConstants()));
+
+    event.common.set_primitive(createMovePrimitive(
+        target_destination, target_orientation, 0, DribblerMode::MAX_FORCE,
+        BallCollisionType::ALLOW, auto_chip_or_kick, MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        0.0, event.common.robot.robotConstants(), 0.0));
 }
 
 void DribbleFSM::startDribble(const Update &event)

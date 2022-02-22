@@ -19,6 +19,12 @@ void PivotKickFSM::kickBall(const Update& event)
         event.control_params.kick_direction, 0, DribblerMode::OFF,
         BallCollisionType::ALLOW, event.control_params.auto_chip_or_kick,
         MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, event.common.robot.robotConstants()));
+
+    event.common.set_primitive(createMovePrimitive(
+        event.control_params.kick_origin, event.control_params.kick_direction, 0,
+        DribblerMode::OFF, BallCollisionType::ALLOW,
+        event.control_params.auto_chip_or_kick, MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+        event.common.robot.robotConstants()));
 }
 
 bool PivotKickFSM::ballKicked(const Update& event)

@@ -15,8 +15,7 @@ void MoveFSM::updateMove(const Update &event)
         event.control_params.final_speed, event.control_params.dribbler_mode,
         event.control_params.ball_collision_type, event.control_params.auto_chip_or_kick,
         event.control_params.max_allowed_speed_mode,
-        event.control_params.target_spin_rev_per_s, event.common.robot.robotConstants(),
-        1.0));
+        event.control_params.target_spin_rev_per_s, event.common.robot.robotConstants()));
 }
 
 bool MoveFSM::moveDone(const Update &event)

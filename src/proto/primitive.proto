@@ -20,6 +20,12 @@ message EstopPrimitive {}
 
 message MovePrimitive
 {
+    enum BallCollisionType
+    {
+        ALLOW = 0;
+        AVOID = 1;
+    }
+
     message AutoChipOrKick
     {
         oneof auto_chip_or_kick
@@ -29,13 +35,14 @@ message MovePrimitive
         };
     }
 
-    Point destination                = 1;
-    float final_speed_m_per_s        = 2;
-    Angle final_angle                = 3;
-    float dribbler_speed_rpm         = 4;
-    float max_speed_m_per_s          = 5;
-    AutoChipOrKick auto_chip_or_kick = 6;
-    float target_spin_rev_per_s      = 7;
+    Point destination                     = 1;
+    float final_speed_m_per_s             = 2;
+    Angle final_angle                     = 3;
+    float dribbler_speed_rpm              = 4;
+    float max_speed_m_per_s               = 5;
+    AutoChipOrKick auto_chip_or_kick      = 6;
+    float target_spin_rev_per_s           = 7;
+    BallCollisionType ball_collision_type = 8;
 }
 
 message StopPrimitive

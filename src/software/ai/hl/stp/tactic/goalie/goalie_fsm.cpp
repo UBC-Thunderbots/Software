@@ -201,6 +201,11 @@ void GoalieFSM::updatePanic(const Update &event)
         BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
+
+    event.common.set_primitive(createMovePrimitive(
+        goalie_pos, goalie_orientation, 0.0, DribblerMode::OFF, BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
+        max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
 }
 
 void GoalieFSM::updatePivotKick(
@@ -239,6 +244,12 @@ void GoalieFSM::updatePositionToBlock(const Update &event)
     event.common.set_intent(std::make_unique<MoveIntent>(
         event.common.robot.id(), goalie_pos, goalie_orientation, goalie_final_speed,
         DribblerMode::OFF, BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
+        max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
+
+    event.common.set_primitive(createMovePrimitive(
+        goalie_pos, goalie_orientation, goalie_final_speed, DribblerMode::OFF,
+        BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
 }

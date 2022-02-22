@@ -70,6 +70,11 @@ void ShadowEnemyFSM::blockPass(const Update &event)
         DribblerMode::OFF, BallCollisionType::AVOID,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         0.0, event.common.robot.robotConstants()));
+
+    event.common.set_primitive(createMovePrimitive(
+        position_to_block, face_ball_orientation, 0, DribblerMode::OFF,
+        BallCollisionType::AVOID, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+        MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, event.common.robot.robotConstants()));
 }
 
 void ShadowEnemyFSM::blockShot(const Update &event,
@@ -115,6 +120,12 @@ void ShadowEnemyFSM::stealAndChip(const Update &event)
     event.common.set_intent(std::make_unique<MoveIntent>(
         event.common.robot.id(), ball_position, face_ball_orientation, 0,
         DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
+        MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, event.common.robot.robotConstants()));
+
+    event.common.set_primitive(createMovePrimitive(
+        ball_position, face_ball_orientation, 0, DribblerMode::MAX_FORCE,
+        BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, event.common.robot.robotConstants()));
 }

@@ -17,6 +17,10 @@ void ChipFSM::updateChip(const Update &event)
         event.common.robot.id(), event.control_params.chip_origin,
         event.control_params.chip_direction, event.control_params.chip_distance_meters,
         event.common.robot.robotConstants()));
+
+    event.common.set_primitive(createChipPrimitive(
+        event.control_params.chip_origin, event.control_params.chip_direction,
+        event.control_params.chip_distance_meters, event.common.robot.robotConstants()));
 }
 
 bool ChipFSM::ballChicked(const Update &event)

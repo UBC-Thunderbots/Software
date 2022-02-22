@@ -35,7 +35,19 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const DribblerMode& dribbler_mode, const BallCollisionType& ball_collision_type,
     const AutoChipOrKick& auto_chip_or_kick,
     const MaxAllowedSpeedMode& max_allowed_speed_mode, double target_spin_rev_per_s,
-    const RobotConstants_t& robot_constants, double cost);
+    // TODO: delete default argument
+    const RobotConstants_t& robot_constants, double cost = 1.0);
+
+std::unique_ptr<TbotsProto::Primitive> createChipPrimitive(
+    const Point& chip_origin, const Angle& chip_direction, double chip_distance_meters,
+    // TODO: delete default argument
+    RobotConstants_t robot_constants, double cost = 1.0);
+
+std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
+    const Point& kick_origin, const Angle& kick_direction,
+    double kick_speed_meters_per_second,
+    // TODO: delete default argument
+    RobotConstants_t robot_constants, double cost = 1.0);
 
 /**
  * Create a Stop Move Primitive Message
