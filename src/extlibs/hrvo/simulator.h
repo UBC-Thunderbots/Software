@@ -157,6 +157,8 @@ class HRVOSimulator
      */
     Vector getRobotVelocity(unsigned int robot_id) const;
 
+    std::vector<Polygon> getRobotVelocityObstacles(unsigned int robot_id) const;
+
     /**
      *      Returns the maximum acceleration of a specified agent.
      *
