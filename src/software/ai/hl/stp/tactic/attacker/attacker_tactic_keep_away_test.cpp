@@ -7,20 +7,19 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/ai/passing/cost_function.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
-#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_tactic_test_fixture.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
 class AttackerTacticKeepAwayTest
-    : public SimulatedErForceSimTacticTestFixture,
+    : public SimulatedTacticTestFixture,
       public ::testing::WithParamInterface<std::tuple<
           Pass, RobotStateWithId, BallState, std::vector<RobotStateWithId>, bool>>
 {
    protected:
-    FieldType field_type = FieldType::DIV_B;
-    Field field          = Field::createField(field_type);
+    Field field = Field::createSSLDivisionBField();
 };
 
 TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
@@ -185,7 +184,7 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
             }
         }};
 
-    runTest(field_type, ball_state, friendly_robots, enemy_robots, {},
+    runTest(field, ball_state, friendly_robots, enemy_robots, {},
             non_terminating_validation_functions, Duration::fromSeconds(3.0));
 }
 
