@@ -158,8 +158,6 @@ void HRVOAgent::computeNewVelocity()
         const std::unique_ptr<Agent> &other_agent = simulator_->agents_[neighbor.second];
         VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
         velocityObstacles_.push_back(velocity_obstacle);
-        std::cerr << "VELOCITY OBSTACLES: " << velocityObstacles_.size() << "\n";
-        std::cerr << "NEIGHBOURS: " << neighbors_.size() << "\n";
     }
 
     // Calculate what velocities (candidates) are not inside any velocity obstacle

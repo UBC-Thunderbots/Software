@@ -53,10 +53,7 @@ class HRVOSimulator
      * @param record_playback_name If passed the simulator will recorded and saved under
      * this name
      */
-    explicit HRVOSimulator(
-        float time_step, const RobotConstants_t &robot_constants,
-        const std::string &record_playback_name =
-            "simoutput");  // TODO: Update, should probably use dynamic params
+    explicit HRVOSimulator(float time_step, const RobotConstants_t &robot_constants);
 
     ~HRVOSimulator();
 
@@ -266,7 +263,6 @@ class HRVOSimulator
         return reachedGoals_;
     }
 
-    void recordSimulator();
     std::ofstream output_file;
     std::string output_file_loc;
     std::string record_playback_name;

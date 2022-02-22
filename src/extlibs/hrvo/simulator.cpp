@@ -42,8 +42,7 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/intersection.h"
 
-HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants,
-                             const std::string &record_playback_name)
+HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants)
     : globalTime_(0.0f),
       timeStep_(time_step),
       robot_constants_(robot_constants),
