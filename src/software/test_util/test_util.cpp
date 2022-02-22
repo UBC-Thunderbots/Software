@@ -10,10 +10,10 @@ namespace TestUtil
 {
     World createBlankTestingWorld(std::unique_ptr<TbotsProto::Field> field_proto)
     {
-        Field field         = Field(*field_proto);
-        Team friendly_team  = Team(Duration::fromMilliseconds(1000));
-        Team enemy_team     = Team(Duration::fromMilliseconds(1000));
-        Ball ball           = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
+        Field field        = Field(*field_proto);
+        Team friendly_team = Team(Duration::fromMilliseconds(1000));
+        Team enemy_team    = Team(Duration::fromMilliseconds(1000));
+        Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
 
         World world = World(field, ball, friendly_team, enemy_team);
 

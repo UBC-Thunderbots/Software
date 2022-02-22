@@ -17,6 +17,7 @@ cc_library(
         "//firmware/app/logger",
         "//proto:tbots_cc_proto",
         "//proto:tbots_nanopb_proto",
+        "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/navigator/obstacle",
@@ -32,7 +33,6 @@ cc_library(
         "//software/world",
         "//software/world:robot_state",
         "@eigen",
-        "//proto/message_translation:tbots_protobuf",
     ],
 )
 

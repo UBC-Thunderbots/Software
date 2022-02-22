@@ -4,6 +4,7 @@
 
 #include <chrono>
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_log_msg.nanopb.h"
 #include "shared/constants.h"
 #include "software/geom/algorithms/almost_equal.h"
@@ -15,7 +16,6 @@
 #include "software/world/field.h"
 #include "software/world/team.h"
 #include "software/world/world.h"
-#include "proto/message_translation/tbots_protobuf.h"
 
 #define UNUSED(x) (void)(x)
 

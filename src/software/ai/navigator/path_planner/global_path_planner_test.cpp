@@ -26,7 +26,7 @@ TEST_F(TestGlobalPathPlanner, test_no_motion_constraints)
     Point start{1, 2}, dest{3, -2};
 
     std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner({});
-    auto path                                  = planner->findPath(start, dest);
+    auto path                                        = planner->findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -48,7 +48,7 @@ TEST_F(TestGlobalPathPlanner,
         obstacle_factory.createFromMotionConstraints(constraints, world);
 
     std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner(constraints);
-    auto path                                  = planner->findPath(start, dest);
+    auto path                                        = planner->findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -82,7 +82,7 @@ TEST_F(
         obstacle_factory.createFromMotionConstraints(constraints, world);
 
     std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner(constraints);
-    auto path                                  = planner->findPath(start, dest);
+    auto path                                        = planner->findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -128,7 +128,7 @@ TEST_F(TestGlobalPathPlanner,
         obstacle_factory.createFromMotionConstraints(constraints, world);
 
     std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner(constraints);
-    auto path                                  = planner->findPath(start, dest);
+    auto path                                        = planner->findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -154,7 +154,7 @@ TEST_F(TestGlobalPathPlanner, test_enemy_half_blocked_starting_and_ending_in_blo
         obstacle_factory.createFromMotionConstraints(constraints, world);
 
     std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner(constraints);
-    auto path                                  = planner->findPath(start, dest);
+    auto path                                        = planner->findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -182,7 +182,7 @@ TEST_F(TestGlobalPathPlanner, test_friendly_half_blocked_starting_in_blocked_are
         obstacle_factory.createFromMotionConstraints(constraints, world);
 
     std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner(constraints);
-    auto path                                  = planner->findPath(start, dest);
+    auto path                                        = planner->findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
