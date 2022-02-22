@@ -9,26 +9,36 @@
 #include "software/world/world.h"
 
 // This callback is used to return an intent from the fsm
-using SetIntentCallback = std::function<void(std::unique_ptr<Intent>)>;
+using SetIntentCallback    = std::function<void(std::unique_ptr<Intent>)>;
+using SetPrimitiveCallback = std::function<void(std::unique_ptr<TbotsProto::Primitive>)>;
 
 // The tactic update struct is used to update tactics and set the new intent
 struct TacticUpdate
 {
+    // TODO: remove this function
     TacticUpdate(const Robot &robot, const World &world,
-                 const SetIntentCallback &set_intent_fun,
-                 std::shared_ptr<const PathPlanner> path_planner = nullptr)
+                 const SetIntentCallback &set_intent_fun)
+        : robot(robot), world(world), set_intent(set_intent_fun)
+    {
+    }
+
+    TacticUpdate(const Robot &robot, const World &world,
+                 const SetPrimitiveCallback &set_primitive_fun,
+                 std::shared_ptr<const PathPlanner> path_planner)
         : robot(robot),
           world(world),
-          set_intent(set_intent_fun),
+          set_primitive(set_primitive_fun),
           path_planner(path_planner)
     {
     }
+
     // updated robot that tactic is assigned to
     Robot robot;
     // updated world
     World world;
     // callback to return the next intent
     SetIntentCallback set_intent;
+    SetPrimitiveCallback set_primitive;
 
     std::shared_ptr<const PathPlanner> path_planner;
 };
