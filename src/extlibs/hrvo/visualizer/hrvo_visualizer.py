@@ -59,12 +59,26 @@ def animate_robots(file_loc, test_name, gif_output_file=None):
         for velocity_vec in velocity_list:
             velocity_vec.set_data([], [])
 
-        return robot_list + line_list + goal_list + velocity_list + [time_text] + [robot_id_text]
+        return (
+            robot_list
+            + line_list
+            + goal_list
+            + velocity_list
+            + [time_text]
+            + [robot_id_text]
+        )
 
     def update(frame):
         """Update plot for new frame"""
         if frame >= num_frames:
-            return robot_list + line_list + goal_list + velocity_list + [time_text] + [robot_id_text]
+            return (
+                robot_list
+                + line_list
+                + goal_list
+                + velocity_list
+                + [time_text]
+                + [robot_id_text]
+            )
 
         # Current frame, dataframe filter
         curr_frame_df = robot_pos_df[robot_pos_df["frame"] == frame]
@@ -78,7 +92,9 @@ def animate_robots(file_loc, test_name, gif_output_file=None):
 
             vel_x = float(robot["velocity_x"].head(1))
             vel_y = float(robot["velocity_y"].head(1))
-            velocity_list[robot_id].set_data([robot_x, robot_x + vel_x], [robot_y, robot_y + vel_y])
+            velocity_list[robot_id].set_data(
+                [robot_x, robot_x + vel_x], [robot_y, robot_y + vel_y]
+            )
 
             goal_list[robot_id].center = (
                 float(robot["goal_x"].head(1)),
@@ -121,7 +137,14 @@ def animate_robots(file_loc, test_name, gif_output_file=None):
         curr_time = float(curr_frame_df["time"].head(1))
         time_text.set_text(f"Time: {curr_time:.2f}sec")
 
-        return robot_list + line_list + goal_list + velocity_list + [time_text] + [robot_id_text]
+        return (
+            robot_list
+            + line_list
+            + goal_list
+            + velocity_list
+            + [time_text]
+            + [robot_id_text]
+        )
 
     def toggle_pause(event):
         """Pause/Play animation when clicked"""
@@ -174,7 +197,14 @@ def animate_robots(file_loc, test_name, gif_output_file=None):
         )
         robot = Circle((0, 0), robot_radius, facecolor="aqua", edgecolor="black")
         robot_list.append(robot)
-        velocity_obj = ax.plot([], [], linestyle="solid", zorder=100, color="black", alpha=velocity_vect_alpha)[0]
+        velocity_obj = ax.plot(
+            [],
+            [],
+            linestyle="solid",
+            zorder=100,
+            color="black",
+            alpha=velocity_vect_alpha,
+        )[0]
         velocity_list.append(velocity_obj)
         line_obj = ax.plot([], [], linestyle="--", alpha=default_line_alpha)[0]
         line_list.append(line_obj)

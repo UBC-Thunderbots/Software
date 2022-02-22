@@ -1,8 +1,10 @@
 #include "software/jetson_nano/primitive_executor.h"
 
+#include "proto/message_translation/tbots_geometry.h"
 #include "proto/primitive.pb.h"
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
+#include "proto/visualization.pb.h"
 #include "software/logger/logger.h"
 #include "software/math/math_functions.h"
 
@@ -77,6 +79,17 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
 {
     // TODO: Step here?
     hrvo_simulator.doStep();
+
+    if (robot_id == 1)
+    {
+        TbotsProto::Obstacles obstacle_proto_;
+        for (auto obstacle : hrvo_simulator.getRobotVelocityObstacles(1))
+        {
+            *(obstacle_proto_.add_polygon()) = *createPolygonProto(obstacle);
+        }
+        LOG(VISUALIZE) << obstacle_proto_;
+    }
+
     switch (current_primitive_.primitive_case())
     {
         case TbotsProto::Primitive::kEstop:

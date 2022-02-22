@@ -74,7 +74,8 @@ void SimulatedErForceSimPlayTestFixture::updatePrimitives(
     auto primitive_set_msg = ai.getPrimitives(world_with_updated_game_state);
     double duration_ms     = ::TestUtil::millisecondsSince(start_tick_time);
     registerFriendlyTickTime(duration_ms);
-    auto world_msg = createWorld(world_with_updated_game_state); // TODO: is this correct?
+    auto world_msg =
+        createWorld(world_with_updated_game_state);  // TODO: is this correct?
     simulator_to_update->setYellowRobotPrimitiveSet(*primitive_set_msg,
                                                     std::move(world_msg));
 }
