@@ -29,24 +29,19 @@ def main():
     )
 
     world_state_sender = ThreadedUnixSender("/tmp/tbots/world_state")
-
     blue_vision = ThreadedUnixSender("/tmp/tbots/blue_vision")
     yellow_vision = ThreadedUnixSender("/tmp/tbots/yellow_vision")
-
     blue_primitive_set = ThreadedUnixSender("/tmp/tbots/blue_primitive_set")
     yellow_primitive_set = ThreadedUnixSender("/tmp/tbots/yellow_primitive_set")
-
     world_state_init = ThreadedUnixSender("/tmp/tbots/world_state_init")
     sim_tick_sender = ThreadedUnixSender("/tmp/tbots/simulation_tick")
 
     ssl_wrapper_listener = ThreadedUnixListener(
         "/tmp/tbots/ssl_wrapper_packet", SSL_WrapperPacket, convert_from_any=False
     )
-
     blue_robot_status_listener = ThreadedUnixListener(
         "/tmp/tbots/blue_robot_status", RobotStatus, convert_from_any=False
     )
-
     yellow_robot_status_listener = ThreadedUnixListener(
         "/tmp/tbots/yellow_robot_status", RobotStatus, convert_from_any=False
     )

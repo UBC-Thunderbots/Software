@@ -7,6 +7,7 @@ from google.protobuf.any_pb2 import Any
 from proto.robot_log_msg_pb2 import RobotLog
 from threading import Thread
 import queue
+import logging
 
 
 class ThreadedUnixListener:
@@ -67,7 +68,7 @@ class ThreadedUnixListener:
         try:
             self.proto_buffer.put_nowait(proto)
         except queue.Full as queue_full:
-            print("receive buffer overrun for {}".format(self.unix_path))
+            logging.warning("receive buffer overrun for {}".format(self.unix_path))
 
     def serve_till_stopped(self):
         """Keep handling requests until force_stop is called

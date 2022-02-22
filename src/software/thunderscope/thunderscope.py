@@ -17,9 +17,10 @@ from shared.parameter.dynamic_parameters_pb2 import ThunderbotsConfig
 
 class Thunderscope(object):
 
-    """ TODO Thunderscope """
+    """ Thunderscope """
 
-    def __init__(self, refresh_interval_ms=50):
+    def __init__(self, refresh_interval_ms=5):
+
         # Setup MainApp and initialize DockArea
         self.app = pg.mkQApp("Thunderscope")
         self.app.setStyleSheet(

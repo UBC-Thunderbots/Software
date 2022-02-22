@@ -6,6 +6,7 @@ import os
 from google.protobuf import text_format
 from google.protobuf.any_pb2 import Any
 from threading import Thread
+import logging
 import queue
 
 
@@ -51,4 +52,4 @@ class ThreadedUnixSender:
         try:
             self.proto_buffer.put_nowait(proto)
         except queue.Full as queue_full:
-            print("send buffer overrun for {}".format(self.unix_path))
+            logging.warning("send buffer overrun for {}".format(self.unix_path))
