@@ -56,6 +56,10 @@ void SimulatedErForceSimTestFixture::SetUp()
         ->getMutableDefendingPositiveSide()
         ->setValue(true);
 
+    friendly_sensor_fusion =
+        SensorFusion(friendly_thunderbots_config->getSensorFusionConfig());
+    enemy_sensor_fusion = SensorFusion(enemy_thunderbots_config->getSensorFusionConfig());
+
     if (TbotsGtestMain::enable_visualizer)
     {
         enableVisualizer();
