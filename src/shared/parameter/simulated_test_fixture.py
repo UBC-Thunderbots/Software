@@ -5,6 +5,7 @@ from proto.vision_pb2 import RobotState, BallState
 import threading
 from pyqtgraph.Qt import QtCore, QtGui
 from proto.geometry_pb2 import Point, Angle, Vector, AngularVelocity
+from proto.robot_status_msg_pb2 import RobotStatus
 from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
 from software.thunderscope.thunderscope import Thunderscope
 from software.networking.threaded_unix_listener import ThreadedUnixListener
@@ -38,8 +39,16 @@ def main():
     world_state_init = ThreadedUnixSender("/tmp/tbots/world_state_init")
     sim_tick_sender = ThreadedUnixSender("/tmp/tbots/simulation_tick")
 
-    listener = ThreadedUnixListener(
+    ssl_wrapper_listener = ThreadedUnixListener(
         "/tmp/tbots/ssl_wrapper_packet", SSL_WrapperPacket, convert_from_any=False
+    )
+
+    blue_robot_status_listener = ThreadedUnixListener(
+        "/tmp/tbots/blue_robot_status", RobotStatus, convert_from_any=False
+    )
+
+    yellow_robot_status_listener = ThreadedUnixListener(
+        "/tmp/tbots/yellow_robot_status", RobotStatus, convert_from_any=False
     )
 
     tick = SimulatorTick()
@@ -76,13 +85,23 @@ def main():
     world_state_sender.send(world_state)
 
     def run_lol():
-        start_time = time.time()
         sim_tick_sender.send(tick)
         time.sleep(0.016)
-        wrapper = listener.maybe_pop()
+
         sense = SensorProto()
-        sense.ssl_vision_msg.CopyFrom(wrapper)
+        ssl_wrapper = ssl_wrapper_listener.maybe_pop()
+        sense.ssl_vision_msg.CopyFrom(ssl_wrapper)
+
+        yellow_robot_status = yellow_robot_status_listener.maybe_pop()
+
+        packets = []
+        while yellow_robot_status is not None:
+            packets.append(yellow_robot_status)
+            yellow_robot_status = yellow_robot_status_listener.maybe_pop()
+
+        sense.robot_status_msgs.extend(packets)
         sensor_fusion.processSensorProto(sense)
+
         world = sensor_fusion.getWorld()
         thunderscope.world_layer.cached_world = py.createWorld(world)
         vision = py.createVision(world)

@@ -33,6 +33,10 @@ class StandaloneErForceSimulator
     // Senders
     std::shared_ptr<ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>>
         wrapper_packet_output_;
+    std::shared_ptr<ThreadedProtoUnixSender<TbotsProto::RobotStatus>>
+        blue_robot_status_output_;
+    std::shared_ptr<ThreadedProtoUnixSender<TbotsProto::RobotStatus>>
+        yellow_robot_status_output_;
 
     std::shared_ptr<ErForceSimulator> er_force_sim_;
 

@@ -17,6 +17,16 @@ StandaloneErForceSimulator::StandaloneErForceSimulator()
     wrapper_packet_output_.reset(new ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(
         "/tmp/tbots/ssl_wrapper_packet"));
 
+    wrapper_packet_output_.reset(new ThreadedProtoUnixSender<SSLProto::SSL_WrapperPacket>(
+        "/tmp/tbots/ssl_wrapper_packet"));
+
+    blue_robot_status_output_.reset(new ThreadedProtoUnixSender<TbotsProto::RobotStatus>(
+        "/tmp/tbots/blue_robot_status"));
+
+    yellow_robot_status_output_.reset(
+        new ThreadedProtoUnixSender<TbotsProto::RobotStatus>(
+            "/tmp/tbots/yellow_robot_status"));
+
     simulation_tick_input_.reset(new ThreadedProtoUnixListener<TbotsProto::SimulatorTick>(
         "/tmp/tbots/simulation_tick", [this](TbotsProto::SimulatorTick input) {
             std::scoped_lock lock(simulator_mutex);
@@ -27,6 +37,17 @@ StandaloneErForceSimulator::StandaloneErForceSimulator()
             for (auto packet : this->er_force_sim_->getSSLWrapperPackets())
             {
                 wrapper_packet_output_->sendProto(packet);
+            }
+
+            for (const auto packet : this->er_force_sim_->getBlueRobotStatuses())
+            {
+                blue_robot_status_output_->sendProto(packet);
+            }
+
+            for (const auto packet : this->er_force_sim_->getYellowRobotStatuses())
+            {
+                yellow_robot_status_output_->sendProto(packet);
+                LOG(DEBUG) << packet.DebugString();
             }
         }));
 
