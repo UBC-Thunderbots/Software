@@ -29,11 +29,10 @@ std::unique_ptr<TbotsProto::PrimitiveSet> TacticStepper::getPrimitives(const Wor
         auto intent = tactic->get(robot.value(), world);
         intent->setMotionConstraints(motion_constraints);
         intents.push_back(std::move(intent));
-        LOG(WARNING) << "step: " << robot_id;
     }
     else
     {
-        LOG(WARNING) << "BRUH X_X WHY IS THERE NO ROBOT WITH ID " << robot_id;
+        LOG(WARNING) << "No robot found with id: " << robot_id;
     }
 
     auto primitive_set_msg = navigator->getAssignedPrimitives(world, intents);

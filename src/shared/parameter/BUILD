@@ -1,6 +1,7 @@
 load(":parameter.bzl", "cpp_dynamic_parameters", "proto_dynamic_parameters")
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
 load("@com_google_protobuf//:protobuf.bzl", "py_proto_library")
+load("@thunderscope_deps//:requirements.bzl", "requirement")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -120,57 +121,5 @@ cc_test(
         ":parameter",
         "//shared/test_util:tbots_gtest_main",
         "//software/util/make_enum",
-    ],
-)
-
-PYBIND_DEPS = [
-    "@local_config_python//:python_headers",
-    "@pybind11",
-]
-
-cc_library(
-    name = "pyton_bindings_lib",
-    srcs = ["python_bindings.cpp"],
-    copts = ["-fexceptions"],
-    features = [
-        "-use_header_modules",
-        "-parse_headers",
-    ],
-    deps = [
-        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
-        "//software/ai:ai",
-        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
-        "//software/simulated_tests:tactic_stepper",
-        "//software/sensor_fusion",
-        "//shared/parameter:cpp_configs",
-        "//proto:sensor_msg_cc_proto",
-    ] + PYBIND_DEPS,
-)
-
-pybind_extension(
-    name = "python_bindings",
-    deps = [
-        ":pyton_bindings_lib",
-    ],
-)
-
-py_test(
-    name = "simulated_test_fixture",
-    srcs = ["simulated_test_fixture.py"],
-    data = [
-        ":python_bindings.so",
-    ],
-    deps = [
-        "//proto:software_py_proto",
-        "//software/networking:threaded_unix_listener_py",
-        "//software/networking:threaded_unix_sender_py",
-        "//software/thunderscope",
-        "//software/thunderscope:colors",
-        "//software/thunderscope:constants",
-        "//software/thunderscope/field",
-        "//software/thunderscope/field:field_layer",
-        "//software/thunderscope/field:obstacle_layer",
-        "//software/thunderscope/field:world_layer",
-        "//software/thunderscope/log:g3log_widget",
     ],
 )

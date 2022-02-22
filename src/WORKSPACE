@@ -374,6 +374,12 @@ pip_install(
     requirements = "//software/thunderscope:requirements.txt",
 )
 
+pip_install(
+    name = "simulated_tests_deps",
+    python_interpreter = "/opt/tbotspython/bin/python",
+    requirements = "//software/simulated_tests:requirements.txt",
+)
+
 # required to use `py_proto_library` from protobuf
 http_archive(
     name = "six_archive",

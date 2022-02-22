@@ -26,6 +26,7 @@ StandaloneErForceSimulator::StandaloneErForceSimulator()
         BASE_PATH + WORLD_STATE_PATH, [this](TbotsProto::WorldState input) {
             std::scoped_lock lock(simulator_mutex);
             this->er_force_sim_->setWorldState(input);
+            LOG(DEBUG) << input.DebugString();
         }));
 
     simulation_tick_input_.reset(new ThreadedProtoUnixListener<TbotsProto::SimulatorTick>(
