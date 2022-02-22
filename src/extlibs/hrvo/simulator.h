@@ -342,6 +342,9 @@ class HRVOSimulator
     // enough space to decelerate and avoid collisions.
     static constexpr float MAX_NEIGHBOR_SEARCH_DIST = 7.f;
 
+    // The maximum number of neighbors/agents to consider when drawing velocity obstacles.
+    static constexpr unsigned int MAX_NEIGHBORS = 15;
+
     friend class Agent;
     friend class Goal;
     friend class KdTree;

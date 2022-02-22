@@ -85,5 +85,5 @@ TEST_F(SimulatedHRVOTest, test_zig_zag_movement)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(15));
+            Duration::fromSeconds(23));
 }

@@ -60,11 +60,10 @@ void HRVOAgent::computeNeighbors()
     neighbors_.clear();
 
     std::unique_ptr<Goal> &current_goal = simulator_->goals_[goal_index_];
-    float new_neighbor_dist = 100;
-        std::min(neighborDist_,
+    float new_neighbor_dist = std::min(neighborDist_,
                  abs(position_ - current_goal->getCurrentGoalPosition()) + goal_radius_);
 
-        simulator_->kdTree_->query(this, new_neighbor_dist);
+    simulator_->kdTree_->query(this, new_neighbor_dist);
 }
 
 Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)

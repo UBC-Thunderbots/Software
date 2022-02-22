@@ -77,15 +77,23 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
 std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimitive(
     const unsigned int robot_id, const RobotState& robot_state)
 {
-    // TODO: Step here?
     hrvo_simulator.doStep();
 
+    // Visualize velocity obstacles
+    // TODO: Make robot_id (1) a dynamic parameter for visualization
     if (robot_id == 1)
     {
         TbotsProto::Obstacles obstacle_proto_;
-        for (auto obstacle : hrvo_simulator.getRobotVelocityObstacles(1))
+        for (auto& obstacle : hrvo_simulator.getRobotVelocityObstacles(1))
         {
             *(obstacle_proto_.add_polygon()) = *createPolygonProto(obstacle);
+        }
+
+        // Plot what HRVO Simulator sees
+        for (auto& agent : hrvo_simulator.agents_)
+        {
+            Point position(agent->getPosition().getX(), agent->getPosition().getY());
+            *(obstacle_proto_.add_circle()) = *createCircleProto(Circle(position, agent->getRadius()));
         }
         LOG(VISUALIZE) << obstacle_proto_;
     }
