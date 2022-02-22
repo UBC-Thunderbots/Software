@@ -103,6 +103,20 @@ class Tactic
     std::unique_ptr<Intent> get(const Robot &robot, const World &world);
 
     /**
+     * Updates and returns a set of primitives for all friendly robots from this tactic
+     *
+     * @param last_execution_robot The robot id of the robot that last executed the
+     * primitive for this tactic
+     * @param world The updated world
+     * @param path_planner The path planner to plan a path with
+     *
+     * @return the next intent
+     */
+    std::unique_ptr<TbotsProto::PrimitiveSet> get(
+        std::optional<RobotId> last_execution_robot, const World &world,
+        std::shared_ptr<const PathPlanner> path_planner);
+
+    /**
      * Accepts a Tactic Visitor and calls the visit function on itself
      *
      * @param visitor A Tactic Visitor

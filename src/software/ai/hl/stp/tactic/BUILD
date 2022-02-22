@@ -44,6 +44,7 @@ cc_library(
         ":transition_conditions",
         "//software/ai/intent",
         "//software/ai/intent:stop_intent",
+        "//software/ai/navigator/path_planner",
         "//software/util/sml_fsm",
         "//software/util/typename",
         "//software/world",

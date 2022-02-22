@@ -2,7 +2,9 @@
 
 #include <functional>
 
+#include "proto/tbots_software_msgs.pb.h"
 #include "software/ai/intent/intent.h"
+#include "software/ai/navigator/path_planner/path_planner.h"
 #include "software/util/sml_fsm/sml_fsm.h"
 #include "software/world/world.h"
 
@@ -13,8 +15,12 @@ using SetIntentCallback = std::function<void(std::unique_ptr<Intent>)>;
 struct TacticUpdate
 {
     TacticUpdate(const Robot &robot, const World &world,
-                 const SetIntentCallback &set_intent_fun)
-        : robot(robot), world(world), set_intent(set_intent_fun)
+                 const SetIntentCallback &set_intent_fun,
+                 std::shared_ptr<const PathPlanner> path_planner = nullptr)
+        : robot(robot),
+          world(world),
+          set_intent(set_intent_fun),
+          path_planner(path_planner)
     {
     }
     // updated robot that tactic is assigned to
@@ -23,6 +29,8 @@ struct TacticUpdate
     World world;
     // callback to return the next intent
     SetIntentCallback set_intent;
+
+    std::shared_ptr<const PathPlanner> path_planner;
 };
 
 /**

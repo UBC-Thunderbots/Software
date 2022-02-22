@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "generator/nanopb/options.proto";
+
 package TbotsProto;
 
 message Point
@@ -35,7 +37,7 @@ message AngularVelocity
 message Polygon
 {
     // list of polygon vertices
-    repeated Point points = 1;
+    repeated Point points = 1 [(nanopb.fieldopt).max_count = 20];
 }
 
 message Circle
