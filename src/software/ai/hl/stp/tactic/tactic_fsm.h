@@ -19,7 +19,10 @@ struct TacticUpdate
     // TODO: remove this function
     TacticUpdate(const Robot &robot, const World &world,
                  const SetIntentCallback &set_intent_fun)
-        : robot(robot), world(world), set_intent(set_intent_fun)
+        : robot(robot),
+          world(world),
+          set_intent(set_intent_fun),
+          set_primitive([](std::unique_ptr<TbotsProto::Primitive>) {})
     {
     }
 
@@ -28,6 +31,7 @@ struct TacticUpdate
                  std::shared_ptr<const PathPlanner> path_planner)
         : robot(robot),
           world(world),
+          set_intent([](std::unique_ptr<Intent>) {}),
           set_primitive(set_primitive_fun),
           path_planner(path_planner)
     {
