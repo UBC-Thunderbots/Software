@@ -6,7 +6,7 @@
 #include "software/util/generic_factory/generic_factory.h"
 
 PenaltyKickEnemyPlay::PenaltyKickEnemyPlay(std::shared_ptr<const AiConfig> config)
-    : Play(config, false)
+    : Play(config, true)
 {
 }
 
@@ -15,7 +15,6 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 {
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
         std::make_shared<const GoalieTacticConfig>();
-    auto goalie_tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
     auto move_tactic_2 = std::make_shared<MoveTactic>();
     auto move_tactic_3 = std::make_shared<MoveTactic>();
     auto move_tactic_4 = std::make_shared<MoveTactic>();

@@ -40,7 +40,7 @@ double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world) 
 
 void GoalieTactic::updateIntent(const TacticUpdate &tactic_update)
 {
-    fsm.process_event(GoalieFSM::Update({}, tactic_update));
+    fsm.process_event(GoalieFSM::Update(control_params, tactic_update));
 }
 
 void GoalieTactic::accept(TacticVisitor &visitor) const
@@ -55,5 +55,5 @@ void GoalieTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset
         fsm_map[tactic_update.robot.id()] = std::make_unique<FSM<GoalieFSM>>(
             DribbleFSM(), GoalieFSM(goalie_tactic_config, max_allowed_speed_mode));
     }
-    fsm.process_event(GoalieFSM::Update({}, tactic_update));
+    fsm.process_event(GoalieFSM::Update(control_params, tactic_update));
 }
