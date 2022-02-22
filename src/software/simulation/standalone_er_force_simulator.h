@@ -1,20 +1,57 @@
 #pragma once
 
 #include <atomic>
-#include <thread>
 
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/vision.pb.h"
 #include "proto/world.pb.h"
-#include "shared/2021_robot_constants.h"
 #include "software/networking/threaded_proto_unix_listener.hpp"
 #include "software/networking/threaded_proto_unix_sender.hpp"
 #include "software/simulation/er_force_simulator.h"
 
+const std::string BASE_PATH                = "/tmp/tbots";
+const std::string WORLD_STATE_PATH         = "/world_state";
+const std::string SSL_WRAPPER_PACKET_PATH  = "/ssl_wrapper_packet";
+const std::string BLUE_ROBOT_STATUS_PATH   = "/blue_robot_status";
+const std::string YELLOW_ROBOT_STATUS_PATH = "/yellow_robot_status";
+const std::string SIMULATION_TICK_PATH     = "/simulation_tick";
+const std::string YELLOW_VISION_PATH       = "/yellow_vision";
+const std::string BLUE_VISION_PATH         = "/blue_vision";
+const std::string BLUE_PRIMITIVE_SET       = "/blue_primitive_set";
+const std::string YELLOW_PRIMITIVE_SET     = "/yellow_primitive_set";
 
 class StandaloneErForceSimulator
 {
    public:
+    /**
+     * Creates a standalone er force simulator and sets up the appropriate
+     * communication channels (unix senders/listeners). All inputs (left) and
+     * outputs (right) shown below are over unix sockets.
+     *
+     *
+     *                        ┌────────────────────────────┐
+     *                        │                            │
+     *                        │                            │
+     *   SimulatorTick        │                            │
+     *   ─────────────────────►                            │
+     *                        │    Standalone ER Force     │
+     *                        │         Simulator          │
+     *   WorldState           │                            │
+     *   ─────────────────────►                            │ SSL_WrapperPacket
+     *                        │                            ├────────────────────►
+     *                        │                            │
+     *   Blue Primitive Set   │                            │
+     *   ─────────────────────►  ┌──────────────────────┐  │ Blue Robot Status
+     *   Yellow Primitive Set │  │                      │  ├────────────────────►
+     *                        │  │                      │  │ Yellow Robot Status
+     *                        │  │  ER Force Simulator  │  │
+     *   Blue Vision          │  │                      │  │
+     *   ─────────────────────►  │                      │  │
+     *   Yellow Vision        │  └──────────────────────┘  │
+     *                        │                            │
+     *                        └────────────────────────────┘
+     *
+     */
     StandaloneErForceSimulator();
     virtual ~StandaloneErForceSimulator();
 
@@ -38,14 +75,12 @@ class StandaloneErForceSimulator
     std::shared_ptr<ThreadedProtoUnixSender<TbotsProto::RobotStatus>>
         yellow_robot_status_output_;
 
+    // Simulator
     std::shared_ptr<ErForceSimulator> er_force_sim_;
 
-    // Buffers
+    // Vision Buffer
     TbotsProto::Vision blue_vision_;
     TbotsProto::Vision yellow_vision_;
 
     std::mutex simulator_mutex;
-    std::thread simulation_thread;
-
-    unsigned tick_debug_;
 };
