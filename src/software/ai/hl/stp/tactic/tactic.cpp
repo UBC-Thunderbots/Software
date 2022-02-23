@@ -5,7 +5,7 @@
 #include "software/util/typename/typename.h"
 
 Tactic::Tactic(const std::set<RobotCapability> &capability_reqs_)
-    : intent(), capability_reqs(capability_reqs_)
+    : intent(), capability_reqs(capability_reqs_), last_execution_robot(std::nullopt)
 {
 }
 
@@ -35,9 +35,13 @@ std::unique_ptr<Intent> Tactic::get(const Robot &robot, const World &world)
     }
 }
 
+void Tactic::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
+{
+    this->last_execution_robot = last_execution_robot;
+}
+
 std::unique_ptr<TbotsProto::PrimitiveSet> Tactic::get(
-    std::optional<RobotId> last_execution_robot, const World &world,
-    std::shared_ptr<const PathPlanner> path_planner)
+    const World &world, std::shared_ptr<const PathPlanner> path_planner)
 {
     auto primitive_set = std::make_unique<TbotsProto::PrimitiveSet>();
     for (const auto &robot : world.friendlyTeam().getAllRobots())
