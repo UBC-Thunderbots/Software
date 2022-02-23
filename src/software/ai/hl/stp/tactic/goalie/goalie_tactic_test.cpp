@@ -7,7 +7,6 @@
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/simulated_tests/non_terminating_validation_functions/enemy_never_scores_validation.h"
 #include "software/simulated_tests/simulated_tactic_test_fixture.h"
-#include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_received_ball_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -30,6 +29,11 @@ class GoalieTacticTest
         {
             yield("Waiting " + std::to_string(seconds_to_wait) +
                   " seconds to check that the enemy team did not score");
+        }
+        while (contains(world_ptr->field().friendlyDefenseArea(),
+                        world_ptr->ball().position()))
+        {
+            yield("Ball is in the friendly defense area");
         }
     }
     Field field = Field::createSSLDivisionBField();
@@ -55,10 +59,6 @@ TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_straight_line)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
                        ValidationCoroutine::push_type& yield) {
-            while (!tactic->done())
-            {
-                yield("Tactic not done");
-            }
             checkGoalieSuccess(1, world_ptr, yield);
         }};
 
@@ -88,10 +88,6 @@ TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_diagonal_line)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
                        ValidationCoroutine::push_type& yield) {
-            while (!tactic->done())
-            {
-                yield("Tactic not done");
-            }
             checkGoalieSuccess(2, world_ptr, yield);
         }};
 
@@ -176,14 +172,6 @@ TEST_P(GoalieTacticTest, goalie_test)
         [this, tactic](std::shared_ptr<World> world_ptr,
                        ValidationCoroutine::push_type& yield) {
             robotReceivedBall(world_ptr, yield);
-            while (!tactic->done())
-            {
-                yield("Tactic not done");
-            }
-            Angle clear_angle =
-                (world_ptr->ball().position() - world_ptr->field().friendlyGoalCenter())
-                    .orientation();
-            ballKicked(clear_angle, world_ptr, yield);
             checkGoalieSuccess(1, world_ptr, yield);
         }};
 

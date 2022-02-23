@@ -113,11 +113,6 @@ TEST(GoalieFSMTest, test_transitions)
     // ball is now out of danger
     world = ::TestUtil::setBallVelocity(world, Vector(1, 0), Timestamp::fromSeconds(123));
 
-    // tactic is done
-    fsm.process_event(GoalieFSM::Update(
-        {}, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::X));
-
     // process event again to reset goalie to PositionToBlock
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
@@ -152,11 +147,10 @@ TEST(GoalieFSMTest, test_transitions)
     world = ::TestUtil::setBallVelocity(world, Vector(1, 0), Timestamp::fromSeconds(123));
     EXPECT_TRUE(world.ball().hasBallBeenKicked(clear_ball_direction));
 
-    // tactic is done since ball is out of defense area
+    // ball is out of defense area
     world = ::TestUtil::setBallPosition(world, Point(-2, 0), Timestamp::fromSeconds(123));
     fsm.process_event(GoalieFSM::Update(
         {}, TacticUpdate(goalie, world, [](std::unique_ptr<Intent>) {})));
-    EXPECT_TRUE(fsm.is(boost::sml::X));
 
     // process event once to reset goalie to PositionToBlock
     fsm.process_event(GoalieFSM::Update(
