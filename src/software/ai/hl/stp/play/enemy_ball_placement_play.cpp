@@ -8,19 +8,9 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-EnemyBallPlacementPlay::EnemyBallPlacementPlay(std::shared_ptr<const PlayConfig> config)
+EnemyBallPlacementPlay::EnemyBallPlacementPlay(std::shared_ptr<const AiConfig> config)
     : Play(config, true)
 {
-}
-
-bool EnemyBallPlacementPlay::isApplicable(const World &world) const
-{
-    return world.gameState().isTheirBallPlacement();
-}
-
-bool EnemyBallPlacementPlay::invariantHolds(const World &world) const
-{
-    return world.gameState().isTheirBallPlacement();
 }
 
 void EnemyBallPlacementPlay::ballPlacementWithShadow(
@@ -110,16 +100,16 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders = {
         std::make_shared<CreaseDefenderTactic>(
-            play_config->getRobotNavigationObstacleConfig()),
+            ai_config->getRobotNavigationObstacleConfig()),
         std::make_shared<CreaseDefenderTactic>(
-            play_config->getRobotNavigationObstacleConfig()),
+            ai_config->getRobotNavigationObstacleConfig()),
         std::make_shared<CreaseDefenderTactic>(
-            play_config->getRobotNavigationObstacleConfig()),
+            ai_config->getRobotNavigationObstacleConfig()),
     };
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_tactics = {
-        std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(),
+        std::make_shared<MoveTactic>(),
     };
 
     if (placement_point.has_value())
@@ -135,4 +125,4 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     }
 }
 
-static TGenericFactory<std::string, Play, EnemyBallPlacementPlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, EnemyBallPlacementPlay, AiConfig> factory;

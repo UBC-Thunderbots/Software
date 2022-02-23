@@ -11,6 +11,7 @@
 
 #include "proto/play_info_msg.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
+#include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
@@ -20,84 +21,69 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/util/typename/typename.h"
 
-STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
-         std::shared_ptr<const AiControlConfig> control_config,
-         std::shared_ptr<const PlayConfig> play_config, long random_seed)
-    : default_play_constructor(default_play_constructor),
-      current_play(nullptr),
-      robot_tactic_assignment(),
-      random_number_generator(random_seed),
-      control_config(control_config),
-      play_config(play_config),
-      override_play_name(""),
-      previous_override_play_name(""),
-      override_play(false),
-      previous_override_play(false),
-      current_game_state(),
-      goalie_tactic(std::make_shared<GoalieTactic>(play_config->getGoalieTacticConfig())),
+STP::STP(std::shared_ptr<const AiConfig> ai_config)
+    : robot_tactic_assignment(),
+      ai_config(ai_config),
+      goalie_tactic(std::make_shared<GoalieTactic>(ai_config->getGoalieTacticConfig())),
       stop_tactics(),
-      play_constructor_override(std::nullopt),
-      play_constructor_override_changed(false)
+      current_play(std::make_unique<HaltPlay>(ai_config)),
+      fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config})),
+      override_play_changed(false),
+      override_constructor(std::nullopt)
 {
+    ai_config->getAiControlConfig()->getCurrentAiPlay()->registerCallbackFunction(
+        [this, ai_config](std::string new_override_play_name) {
+            if (ai_config->getAiControlConfig()->getOverrideAiPlay()->value())
+            {
+                overridePlayConstructorFromName(new_override_play_name);
+            }
+        });
+
+    ai_config->getAiControlConfig()->getOverrideAiPlay()->registerCallbackFunction(
+        [this, ai_config](bool new_override_ai_play) {
+            if (new_override_ai_play)
+            {
+                overridePlayConstructorFromName(
+                    ai_config->getAiControlConfig()->getCurrentAiPlay()->value());
+            }
+        });
+
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
     {
         stop_tactics.push_back(std::make_shared<StopTactic>(false));
     }
 }
 
-void STP::updateSTPState(const World& world)
-{
-    updateGameState(world);
-    updateAIPlay(world);
-}
-
-void STP::updateGameState(const World& world)
-{
-    current_game_state = world.gameState();
-}
-
-void STP::updateAIPlay(const World& world)
-{
-    checkPlayOverrideConfig();
-    bool play_overridden = overrideAIPlayIfApplicable();
-    if (!play_overridden)
-    {
-        bool no_current_play = !current_play || current_play->done();
-        if (no_current_play || !current_play->invariantHolds(world))
-        {
-            try
-            {
-                current_play = calculateNewPlay(world);
-            }
-            catch (const std::runtime_error& e)
-            {
-                auto default_play = default_play_constructor();
-                LOG(WARNING) << "Unable to assign a new Play. No Plays are valid"
-                             << std::endl;
-                LOG(WARNING) << "Falling back to the default Play - "
-                             << objectTypeName(*default_play) << std::endl;
-                current_play = std::move(default_play);
-            }
-        }
-    }
-}
-
 std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World& world)
 {
+    if (override_play_changed)
+    {
+        // Reset override play
+        fsm->process_event(PlaySelectionFSM::Update(
+            std::nullopt,
+            [this](std::unique_ptr<Play> play) { current_play = std::move(play); },
+            world.gameState()));
+        override_play_changed = false;
+    }
+
+    fsm->process_event(PlaySelectionFSM::Update(
+        override_constructor,
+        [this](std::unique_ptr<Play> play) { current_play = std::move(play); },
+        world.gameState()));
+
     return current_play->get(
         [this](const ConstPriorityTacticVector& tactics, const World& world,
                bool automatically_assign_goalie) {
             return assignRobotsToTactics(tactics, world, automatically_assign_goalie);
         },
-        [this](const Tactic& tactic) {
-            return buildMotionConstraintSet(current_game_state, tactic);
+        [world](const Tactic& tactic) {
+            return buildMotionConstraintSet(world.gameState(), tactic);
         },
         world);
 }
 
 std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 {
-    updateSTPState(world);
     auto intents = getIntentsFromCurrentPlay(world);
 
     auto all_tactics = stop_tactics;
@@ -109,7 +95,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
         {
             auto intent = tactic->get(iter->second, world);
             intent->setMotionConstraints(
-                buildMotionConstraintSet(current_game_state, *tactic));
+                buildMotionConstraintSet(world.gameState(), *tactic));
             intents.push_back(std::move(intent));
         }
     }
@@ -117,115 +103,21 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     return intents;
 }
 
-std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
-{
-    std::vector<std::unique_ptr<Play>> applicable_plays;
-    for (const auto& play_constructor :
-         GenericFactory<std::string, Play, PlayConfig>::getRegisteredConstructors())
-    {
-        auto play = play_constructor(play_config);
-        if (play->isApplicable(world))
-        {
-            if (!play->invariantHolds(world))
-            {
-                LOG(WARNING)
-                    << "Unexpected behaviour from " << objectTypeName(*play)
-                    << ". Play::isApplicable() is true and Play::invariantHolds() is false"
-                    << std::endl;
-            }
-            applicable_plays.emplace_back(std::move(play));
-        }
-    }
-
-    if (applicable_plays.empty())
-    {
-        throw std::runtime_error(
-            "No new Play could be calculated because no Plays are applicable");
-    }
-
-    // Create a uniform distribution over the indices of the applicable_plays
-    // https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
-    auto uniform_distribution = std::uniform_int_distribution<std::mt19937::result_type>(
-        0, applicable_plays.size() - 1);
-    auto play_index = uniform_distribution(random_number_generator);
-
-    return std::move(applicable_plays[play_index]);
-}
-
-std::optional<std::string> STP::getCurrentPlayName() const
-{
-    if (current_play)
-    {
-        return std::make_optional(objectTypeName(*current_play));
-    }
-
-    return std::nullopt;
-}
-
 TbotsProto::PlayInfo STP::getPlayInfo()
 {
-    std::string info_referee_command = toString(current_game_state.getRefereeCommand());
-    std::string info_play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
+    std::string info_play_name = objectTypeName(*current_play);
     TbotsProto::PlayInfo info;
-    info.mutable_game_state()->set_referee_command_name(info_referee_command);
     info.mutable_play()->set_play_name(info_play_name);
 
     for (const auto& [tactic, robot] : robot_tactic_assignment)
     {
         TbotsProto::PlayInfo_Tactic tactic_msg;
         tactic_msg.set_tactic_name(objectTypeName(*tactic));
+        tactic_msg.set_tactic_fsm_state(tactic->getFSMState());
         (*info.mutable_robot_tactic_assignment())[robot.id()] = tactic_msg;
     }
 
     return info;
-}
-
-void STP::checkPlayOverrideConfig()
-{
-    previous_override_play           = override_play;
-    override_play                    = control_config->getOverrideAiPlay()->value();
-    bool override_play_value_changed = previous_override_play != override_play;
-
-    previous_override_play_name = override_play_name;
-    override_play_name          = control_config->getCurrentAiPlay()->value();
-    bool override_play_name_value_changed =
-        previous_override_play_name != override_play_name;
-
-    if (override_play)
-    {
-        if (override_play_name_value_changed || override_play_value_changed)
-        {
-            overridePlayConstructor([this]() {
-                return GenericFactory<std::string, Play, PlayConfig>::create(
-                    override_play_name, play_config);
-            });
-        }
-    }
-}
-
-bool STP::overrideAIPlayIfApplicable()
-{
-    bool no_current_play = !current_play || current_play->done();
-
-    if (play_constructor_override &&
-        (no_current_play || play_constructor_override_changed))
-    {
-        play_constructor_override_changed = false;
-        try
-        {
-            current_play = play_constructor_override.value()();
-        }
-        catch (std::invalid_argument&)
-        {
-            auto default_play = default_play_constructor();
-            LOG(WARNING) << "Error: The Play \"" << override_play_name
-                         << "\" specified in the override is not valid." << std::endl;
-            LOG(WARNING) << "Falling back to the default Play - "
-                         << objectTypeName(*default_play) << std::endl;
-            current_play = std::move(default_play);
-        }
-    }
-    return play_constructor_override.has_value();
 }
 
 std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
@@ -361,8 +253,15 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
     return robot_tactic_assignment;
 }
 
-void STP::overridePlayConstructor(std::function<std::unique_ptr<Play>()> constructor)
+void STP::overridePlayConstructor(std::optional<PlayConstructor> constructor)
 {
-    play_constructor_override         = constructor;
-    play_constructor_override_changed = true;
+    override_play_changed = true;
+    override_constructor  = constructor;
+}
+
+void STP::overridePlayConstructorFromName(std::string name)
+{
+    overridePlayConstructor([name](std::shared_ptr<const AiConfig> ai_config) {
+        return GenericFactory<std::string, Play, AiConfig>::create(name, ai_config);
+    });
 }

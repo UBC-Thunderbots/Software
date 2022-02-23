@@ -6,15 +6,16 @@ about: Defines an item of work for the project
 ### Description of the task
 
 <!--
+    What is the high level goal of the task?
     What does this work depend on?
     What interface will this work use or create?
-    What are the main components of the task?
+    What are the main components / suggested implementation details of the task?
     Where does this work fit in the larger project?
+    Is there an associated RFC?
 
-    It is important to define this task sufficiently so that an untrained
-    team member can take it on and know where to start. Feel free to
-    link to resources or other team member which could guide the assignee to
-    complete the task
+    It is important to define this task sufficiently so that a less experienced
+    team member can take it on and know where to start. Please link to resources
+    or tag other team member(s) which could guide the assignee to complete the task
 -->
 
 ### Acceptance criteria
@@ -27,9 +28,7 @@ about: Defines an item of work for the project
     functionalities, testing requirements, documentation, etc.
 -->
 
-- [ ] Item A
-- [ ] Item B
-- [ ] Item C
+- [ ] 
 
 ### Blocked By
 

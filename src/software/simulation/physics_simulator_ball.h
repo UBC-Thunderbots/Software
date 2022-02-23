@@ -3,6 +3,7 @@
 #include <functional>
 #include <memory>
 
+#include "software/logger/logger.h"
 #include "software/simulation/physics/physics_ball.h"
 #include "software/simulation/simulator_ball.h"
 

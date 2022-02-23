@@ -34,6 +34,7 @@
 #include <vector>
 
 #include "extlibs/hrvo/vector2.h"
+#include "software/geom/vector.h"
 
 class Simulator;
 
@@ -42,7 +43,7 @@ class Simulator;
  */
 class Goal
 {
-   private:
+   public:
     /**
      * @param position  The position of this goal.
      */

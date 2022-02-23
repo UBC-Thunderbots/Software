@@ -9,19 +9,9 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-EnemyFreekickPlay::EnemyFreekickPlay(std::shared_ptr<const PlayConfig> config)
+EnemyFreekickPlay::EnemyFreekickPlay(std::shared_ptr<const AiConfig> config)
     : Play(config, true)
 {
-}
-
-bool EnemyFreekickPlay::isApplicable(const World &world) const
-{
-    return world.gameState().isTheirFreeKick();
-}
-
-bool EnemyFreekickPlay::invariantHolds(const World &world) const
-{
-    return world.gameState().isTheirFreeKick();
 }
 
 void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
@@ -29,7 +19,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 {
     // Init a Crease Defender Tactic
     auto crease_defender_tactic = std::make_shared<CreaseDefenderTactic>(
-        play_config->getRobotNavigationObstacleConfig());
+        ai_config->getRobotNavigationObstacleConfig());
 
     // These robots will both block the enemy robot taking a free kick
     std::array<std::shared_ptr<ShadowEnemyTactic>, 2> shadow_free_kicker = {
@@ -41,8 +31,8 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     // Init Move Tactics for extra robots (These will be used if there are no robots to
     // shadow)
-    auto move_tactic_main      = std::make_shared<MoveTactic>(true);
-    auto move_tactic_secondary = std::make_shared<MoveTactic>(true);
+    auto move_tactic_main      = std::make_shared<MoveTactic>();
+    auto move_tactic_secondary = std::make_shared<MoveTactic>();
 
     do
     {
@@ -145,4 +135,4 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, EnemyFreekickPlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, EnemyFreekickPlay, AiConfig> factory;

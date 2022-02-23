@@ -5,12 +5,8 @@
 #include <vector>
 
 #include "shared/parameter/cpp_dynamic_parameters.h"
+#include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-
-using TacticVector              = std::vector<std::shared_ptr<Tactic>>;
-using PriorityTacticVector      = std::vector<TacticVector>;
-using ConstTacticVector         = std::vector<std::shared_ptr<const Tactic>>;
-using ConstPriorityTacticVector = std::vector<ConstTacticVector>;
 
 using RobotToTacticAssignmentFunction =
     std::function<std::map<std::shared_ptr<const Tactic>, Robot>(
@@ -38,12 +34,6 @@ using TacticCoroutine = boost::coroutines2::coroutine<PriorityTacticVector>;
  *
  * These stages are useful in order for us to create more complex behaviour and write
  * it in a more understandable way.
- *
- * Plays define what conditions must be met for them to start (with the isApplicable
- * function), and what conditions must be continuously met for the Play to continue
- * running (with the invariantHolds function). These are very important to get right,
- * so that we can always run at least 1 Play in every scenario, and that Plays don't
- * unexpectedly stop during gameplay. See the documentation in stp.h for more info.
  */
 class Play
 {
@@ -51,41 +41,10 @@ class Play
     /**
      * Creates a new Play
      *
-     * @param play_config The Play configuration
+     * @param ai_config The Play configuration
      * @param requires_goalie Whether this plays requires a goalie
      */
-    explicit Play(std::shared_ptr<const PlayConfig> play_config, bool requires_goalie);
-
-    /**
-     * Returns whether or not this Play can be started. For example, the Enemy Team
-     * must have the ball for a defensive play to be applicable.
-     *
-     * @param world The current state of the world
-     * @return true if this Play can be started, and false otherwise
-     */
-    virtual bool isApplicable(const World& world) const = 0;
-
-    /**
-     * Returns whether or not the invariant for this Play holds (is true). The invariant
-     * is a set of conditions that must remain true for the Play to continue running
-     * (not necessarily the same as the Applicable conditions). For example, the Invariant
-     * for an Offensive Play might be that our team must have possession of the ball. If
-     * our team no longer has possession of the ball (ie. the invariant no longer holds),
-     * then we should probably run a different Play.
-     *
-     * @param world The current state of the world
-     * @return true if this Play's invariant holds (is true), and false otherwise
-     */
-    virtual bool invariantHolds(const World& world) const = 0;
-
-    /**
-     * Returns true if the Play is done and false otherwise. The Play is considered
-     * done when its coroutine is done (the getNextTactics() function has no
-     * more work to do)
-     *
-     * @return true if the Play is done and false otherwise
-     */
-    bool done() const;
+    explicit Play(std::shared_ptr<const AiConfig> ai_config, bool requires_goalie);
 
     /**
      * Gets Intents from the Play given the assignment algorithm and world
@@ -103,9 +62,19 @@ class Play
 
     virtual ~Play() = default;
 
+    // TODO (#2359): make pure virtual once all plays are not coroutines
+    /**
+     * Updates the priority tactic vector with new tactics
+     *
+     * @param play_update The PlayUpdate struct that contains all the information for
+     * updating the tactics
+     */
+    virtual void updateTactics(const PlayUpdate& play_update);
+
    protected:
+    // TODO (#2359): remove this
     // The Play configuration
-    std::shared_ptr<const PlayConfig> play_config;
+    std::shared_ptr<const AiConfig> ai_config;
 
    private:
     /**
@@ -118,6 +87,8 @@ class Play
      * access their updated state. Using unique_ptrs wouldn't allow the Play to maintain
      * the Tactic's state because the objects would have to be constructed and moved every
      * time the function is called.
+     *
+     * TODO (#2359): delete once all plays are not coroutines
      *
      * @param world The current state of the world
      * @return A list of shared_ptrs to the Tactics the Play wants to run at this time, in
@@ -143,6 +114,8 @@ class Play
      * This function yields a list of shared_ptrs to the Tactics the Play wants to run at
      * this time, in order of priority. This yield happens in place of a return.
      *
+     * TODO (#2359): delete once all plays are not coroutines
+     *
      * @param yield The coroutine push_type for the Play
      */
     void getNextTacticsWrapper(TacticCoroutine::push_type& yield);
@@ -150,6 +123,8 @@ class Play
     /**
      * This function yields a list of shared_ptrs to the Tactics the Play wants to run at
      * this time, in order of priority. This yield happens in place of a return.
+     *
+     * TODO (#2359): delete once all plays are not coroutines
      *
      * @param yield The coroutine push_type for the Play
      * @param world The current state of the world
@@ -160,9 +135,18 @@ class Play
     // Whether this plays requires a goalie
     const bool requires_goalie;
 
+    // TODO (#2359): remove this
     // The coroutine that sequentially returns the Tactics the Play wants to run
     TacticCoroutine::pull_type tactic_sequence;
 
+    // TODO (#2359): remove this
     // The Play's knowledge of the most up-to-date World
     std::optional<World> world;
+
+    // TODO (#2359): remove this
+    PriorityTacticVector priority_tactics;
 };
+
+// Function that creates a play
+using PlayConstructor =
+    std::function<std::unique_ptr<Play>(std::shared_ptr<const AiConfig>)>;

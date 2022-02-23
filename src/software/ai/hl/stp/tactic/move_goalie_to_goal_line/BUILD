@@ -14,7 +14,6 @@ cc_library(
         "//shared:constants",
         "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:stop_action",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/geom:line",
@@ -34,12 +33,12 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_move_goalie_to_goal_line_tactic_test",
-    srcs = ["simulated_move_goalie_to_goal_line_tactic_test.cpp"],
+    name = "move_goalie_to_goal_line_tactic_test",
+    srcs = ["move_goalie_to_goal_line_tactic_test.cpp"],
     deps = [
         ":move_goalie_to_goal_line_tactic",
         "//shared/test_util:tbots_gtest_main",
-        "//software/simulated_tests:simulated_tactic_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_tactic_test_fixture",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",

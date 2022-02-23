@@ -14,8 +14,6 @@ cc_library(
         "//shared:constants",
         "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:enemy_threat",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/action:stop_action",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
         "//software/ai/intent:move_intent",
@@ -34,13 +32,13 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_shadow_enemy_tactic_test",
-    srcs = ["simulated_shadow_enemy_tactic_test.cpp"],
+    name = "shadow_enemy_tactic_test",
+    srcs = ["shadow_enemy_tactic_test.cpp"],
     deps = [
         ":shadow_enemy_tactic",
         "//shared/test_util:tbots_gtest_main",
         "//software/geom:triangle",
-        "//software/simulated_tests:simulated_tactic_test_fixture",
+        "//software/simulated_tests:simulated_er_force_sim_tactic_test_fixture",
         "//software/simulated_tests/terminating_validation_functions",
         "//software/simulated_tests/validation:validation_function",
         "//software/test_util",

@@ -13,30 +13,18 @@
 #include "software/world/game_state.h"
 #include "software/world/team.h"
 
-DefensePlay::DefensePlay(std::shared_ptr<const PlayConfig> config) : Play(config, true) {}
-
-bool DefensePlay::isApplicable(const World &world) const
-{
-    return world.gameState().isPlaying() &&
-           (world.getTeamWithPossession() == TeamSide::ENEMY);
-}
-
-bool DefensePlay::invariantHolds(const World &world) const
-{
-    return world.gameState().isPlaying() &&
-           (world.getTeamWithPossession() == TeamSide::ENEMY);
-}
+DefensePlay::DefensePlay(std::shared_ptr<const AiConfig> config) : Play(config, true) {}
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     auto shoot_goal_tactic =
-        std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
+        std::make_shared<AttackerTactic>(ai_config->getAttackerTacticConfig());
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
-            play_config->getRobotNavigationObstacleConfig()),
+            ai_config->getRobotNavigationObstacleConfig()),
         std::make_shared<CreaseDefenderTactic>(
-            play_config->getRobotNavigationObstacleConfig()),
+            ai_config->getRobotNavigationObstacleConfig()),
     };
 
     std::array<std::shared_ptr<ShadowEnemyTactic>, 2> shadow_enemy_tactics = {
@@ -45,7 +33,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
     };
 
     auto move_tactics = std::vector<std::shared_ptr<MoveTactic>>{
-        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)};
+        std::make_shared<MoveTactic>(), std::make_shared<MoveTactic>()};
 
     std::vector<std::shared_ptr<StopTactic>> stop_tactics = {
         std::make_shared<StopTactic>(false), std::make_shared<StopTactic>(false)};
@@ -75,7 +63,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
             enemy_threats.begin(), enemy_threats.end(), [this, world](auto enemy_threat) {
                 return distance(world.field().friendlyGoal(),
                                 enemy_threat.robot.position()) <
-                       play_config->getDefensePlayConfig()
+                       ai_config->getDefensePlayConfig()
                            ->getImmediateThreatDistance()
                            ->value();
             }));
@@ -143,4 +131,4 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World 
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, DefensePlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, DefensePlay, AiConfig> factory;
