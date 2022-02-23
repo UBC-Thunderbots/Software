@@ -13,6 +13,12 @@ from pyqtgraph.dockarea import *
 
 if __name__ == "__main__":
 
+    class ProtoReceiver():
+        def __init__(self):
+            self.proto_receiver = ThreadedUnixListener(
+                constants.UNIX_SOCKET_BASE_PATH + "protobuf", convert_from_any=False, max_buffer_size=10
+            )
+
     # Setup unix socket directory
     try:
         os.mkdir("/tmp/tbots")

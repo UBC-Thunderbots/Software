@@ -10,13 +10,12 @@ import queue
 
 class ThreadedUnixListener:
     def __init__(
-        self, unix_path, proto_class, max_buffer_size=3, convert_from_any=True
+        self, unix_path, max_buffer_size=3, convert_from_any=True
     ):
 
         """Receive protobuf over unix sockets and buffers them
 
         :param unix_path: The unix path to receive the new protobuf to plot
-        :param proto_class: The type of protobuf we expect to receive
         :param max_buffer_size: The size of the buffer
         :param convert_from_any: Convert from any
 
@@ -30,7 +29,7 @@ class ThreadedUnixListener:
 
         self.server = socketserver.UnixDatagramServer(
             unix_path,
-            handler_factory(proto_class, self.__buffer_protobuf, convert_from_any),
+            handler_factory(self.__buffer_protobuf, convert_from_any)
         )
         self.stop = False
 
@@ -88,9 +87,8 @@ class ThreadedUnixListener:
 
 
 class Session(socketserver.BaseRequestHandler):
-    def __init__(self, proto_type, handle_callback, convert_from_any, *args, **keys):
+    def __init__(self, handle_callback, convert_from_any, *args, **keys):
         self.handle_callback = handle_callback
-        self.proto_type = proto_type
         self.convert_from_any = convert_from_any
         super().__init__(*args, **keys)
 
@@ -102,29 +100,21 @@ class Session(socketserver.BaseRequestHandler):
 
         """
         p = base64.b64decode(self.request[0])
-        msg = self.proto_type()
 
-        if self.convert_from_any:
-            any_msg = Any.FromString(p)
-            any_msg.Unpack(msg)
-        else:
-            msg = self.proto_type.FromString(p)
-
-        self.handle_callback(msg)
+        self.handle_callback(p)
 
 
-def handler_factory(proto_type, handle_callback, convert_from_any):
+def handler_factory(handle_callback, convert_from_any):
     """To pass in an arbitrary handle callback into the SocketServer,
     we need to create a constructor that can create a Session object with
     appropriate handle function.
 
-    :param proto_type: The type of protobuf to handle
     :param handle_callback: The callback to run
     :param convert_from_any: If true, the message needs to be decoded
                              into Any before into the proto_type
     """
 
     def create_handler(*args, **keys):
-        return Session(proto_type, handle_callback, convert_from_any, *args, **keys)
+        return Session(handle_callback, convert_from_any, *args, **keys)
 
     return create_handler
