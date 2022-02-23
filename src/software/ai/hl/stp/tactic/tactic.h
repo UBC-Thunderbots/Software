@@ -146,8 +146,13 @@ class Tactic
      */
     virtual void updateIntent(const TacticUpdate &tactic_update) = 0;
 
-    // TODO: make pure virtual
-    virtual void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm);
+    /**
+     * Updates the primitive ptr with the new primitive
+     *
+     * @param tactic_update The tactic_update struct that contains all the information for
+     * updating the primitive
+     */
+    virtual void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) = 0;
 
     // robot capability requirements
     std::set<RobotCapability> capability_reqs;

@@ -64,5 +64,3 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Tactic::get(
     }
     return primitive_set;
 }
-
-void Tactic::updatePrimitive(const TacticUpdate &, bool) {}
