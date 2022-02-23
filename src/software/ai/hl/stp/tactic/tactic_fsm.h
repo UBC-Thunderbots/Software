@@ -74,6 +74,9 @@ struct TacticUpdate
                                                                                          \
     std::string getFSMState() const override                                             \
     {                                                                                    \
-        std::string state_str = getCurrentFullStateName(fsm);                            \
+        std::string state_str = "";                                                      \
+        if (last_execution_robot.has_value())                                            \
+            state_str =                                                                  \
+                getCurrentFullStateName(*fsm_map.at(last_execution_robot.value()));      \
         return state_str;                                                                \
     }

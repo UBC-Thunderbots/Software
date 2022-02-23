@@ -131,6 +131,9 @@ class Tactic
 
     virtual ~Tactic() = default;
 
+   protected:
+    std::optional<RobotId> last_execution_robot;
+
    private:
     std::unique_ptr<Intent> intent;
     std::unique_ptr<TbotsProto::Primitive> primitive;
@@ -148,5 +151,4 @@ class Tactic
 
     // robot capability requirements
     std::set<RobotCapability> capability_reqs;
-    std::optional<RobotId> last_execution_robot;
 };

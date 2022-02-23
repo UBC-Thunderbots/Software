@@ -5,7 +5,7 @@
 #include "software/util/typename/typename.h"
 
 Tactic::Tactic(const std::set<RobotCapability> &capability_reqs_)
-    : intent(), capability_reqs(capability_reqs_), last_execution_robot(std::nullopt)
+    : last_execution_robot(std::nullopt), intent(), capability_reqs(capability_reqs_)
 {
 }
 
