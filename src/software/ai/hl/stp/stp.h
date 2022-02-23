@@ -148,7 +148,6 @@ class STP
      */
     void overridePlayConstructorFromName(std::string name);
 
-    // The Play that is currently running
     std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment;
     std::shared_ptr<const AiConfig> ai_config;
     // Stop tactic common to all plays for robots that don't have tactics assigned

@@ -53,6 +53,7 @@ STP::STP(std::shared_ptr<const AiConfig> ai_config)
     }
 }
 
+// TODO delete this
 std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World& world)
 {
     if (override_play_changed)
@@ -81,6 +82,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World&
         world);
 }
 
+// TODO delete this
 std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 {
     auto intents = getIntentsFromCurrentPlay(world);
@@ -102,6 +104,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     return intents;
 }
 
+// TODO: move this to AI
 TbotsProto::PlayInfo STP::getPlayInfo()
 {
     std::string info_play_name = objectTypeName(*current_play);
@@ -253,12 +256,14 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
     return robot_tactic_assignment;
 }
 
+// TODO: move this to AI
 void STP::overridePlayConstructor(std::optional<PlayConstructor> constructor)
 {
     override_play_changed = true;
     override_constructor  = constructor;
 }
 
+// TODO: move this to AI
 void STP::overridePlayConstructorFromName(std::string name)
 {
     overridePlayConstructor([name](std::shared_ptr<const AiConfig> ai_config) {

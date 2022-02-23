@@ -73,6 +73,45 @@ class Play
      */
     virtual void updateTactics(const PlayUpdate& play_update);
 
+    /**
+     * Given a vector of vector of tactics and the current World, assigns robots
+     * from the friendly team to each tactic
+     *
+     * Some tactics may not be assigned a robot, depending on if there is a robot
+     * capable of performing that tactic
+     *
+     * This will clear all assigned robots from all tactics
+     *
+     * The outer vector ranks the inner vector of tactics by priority. Tactics in
+     * lower indexes of the outer vector will be assigned first. For example:
+     *
+     * {
+     *      {crease_defender_1, crease_defender_2},
+     *      {move_tactic},
+     * }
+     *
+     * The cost of assigning both the crease_defender tactics will be minimized across
+     * all robots first, followed by the move_tactic.
+     *
+     * The order of the given tactics in the inner vector also determines their priority,
+     * with the tactics at the beginning of the vector being a higher priority than those
+     * at the end. The priority determines which tactics will NOT be assigned if there are
+     * not enough robots on the field to assign them all. For example, if a Play returned
+     * 4 Tactics in total but there were only 3 robots on the field at the time, only the
+     * first 3 Tactics in the vectors would be assigned to robots and run. (In the example
+     * above, only the goalie and crease_defenders would be assigned)
+     *
+     * @param tactics The vector of vector of tactics that should be assigned a robot.
+     * Note that this function modifies tactics to make the correct assignments, because
+     * we need to modify the individual tactics _and_ possibly add/remove tactics
+     * @param world The state of the world, which contains the friendly Robots that will
+     * be assigned to each tactic
+     *
+     * @return map from assigned tactics to robot
+     */
+    std::unique_ptr<TbotsProto::PrimitiveSet> selectPrimitives(
+        ConstPriorityTacticVector tactics, const World& world);
+
    protected:
     // TODO (#2359): remove this
     // The Play configuration
@@ -137,6 +176,9 @@ class Play
     virtual void getNextTactics(TacticCoroutine::push_type& yield,
                                 const World& world) = 0;
 
+    // Stop tactic common to all plays for robots that don't have tactics assigned
+    TacticVector stop_tactics;
+
     // Whether this plays requires a goalie
     const bool requires_goalie;
 
@@ -150,6 +192,8 @@ class Play
 
     // TODO (#2359): remove this
     PriorityTacticVector priority_tactics;
+
+    std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment;
 };
 
 // Function that creates a play

@@ -1,12 +1,22 @@
 #include "software/ai/hl/stp/play/play.h"
 
+#include <munkres/munkres.h>
+
+#include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
+#include "software/ai/motion_constraint/motion_constraint_set_builder.h"
+
 Play::Play(std::shared_ptr<const AiConfig> ai_config, bool requires_goalie)
     : ai_config(ai_config),
       goalie_tactic(std::make_shared<GoalieTactic>(ai_config->getGoalieTacticConfig())),
+      stop_tactics(),
       requires_goalie(requires_goalie),
       tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
       world(std::nullopt)
 {
+    for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
+    {
+        stop_tactics.push_back(std::make_shared<StopTactic>(false));
+    }
 }
 
 PriorityTacticVector Play::getTactics(const World &world)
@@ -133,4 +143,138 @@ void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
 void Play::updateTactics(const PlayUpdate &play_update)
 {
     play_update.set_tactics(getTactics(play_update.world));
+}
+
+std::unique_ptr<TbotsProto::PrimitiveSet> Play::selectPrimitives(
+    ConstPriorityTacticVector tactics, const World &world)
+{
+    auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
+    robot_tactic_assignment.clear();
+
+    std::optional<Robot> goalie_robot = world.friendlyTeam().goalie();
+    std::vector<Robot> robots         = world.friendlyTeam().getAllRobots();
+
+    if (goalie_robot && requires_goalie)
+    {
+        robot_tactic_assignment.emplace(goalie_tactic, goalie_robot.value());
+
+        robots.erase(std::remove(robots.begin(), robots.end(), goalie_robot.value()),
+                     robots.end());
+    }
+
+    // This functions optimizes the assignment of robots to tactics by minimizing
+    // the total cost of assignment using the Hungarian algorithm
+    // (also known as the Munkres algorithm)
+    // https://en.wikipedia.org/wiki/Hungarian_algorithm
+    //
+    // https://github.com/saebyn/munkres-cpp is the implementation of the Hungarian
+    // algorithm that we use here
+    for (auto tactic_vector : tactics)
+    {
+        size_t num_tactics = tactic_vector.size();
+
+        if (robots.size() < tactic_vector.size())
+        {
+            // We do not have enough robots to assign all the tactics to. We "drop"
+            // (aka don't assign) the tactics at the end of the vector since they are
+            // considered lower priority
+            tactic_vector.resize(robots.size());
+            num_tactics = tactic_vector.size();
+        }
+        else
+        {
+            // Assign rest of robots with StopTactic
+            for (unsigned int i = 0; i < (robots.size() - tactic_vector.size()); i++)
+            {
+                tactic_vector.push_back(stop_tactics[i]);
+            }
+        }
+
+        size_t num_rows = robots.size();
+        size_t num_cols = tactic_vector.size();
+
+        // The Matrix constructor will assert if the rows and columns of the matrix are
+        // not >= 1, so we perform that check first and skip over this tactic_vector if
+        // it is empty. This represents the cases where there are either no tactics or no
+        // robots
+        if (num_rows == 0 || num_cols == 0)
+        {
+            continue;
+        }
+
+        // The rows of the matrix are the "workers" (the robots) and the columns are the
+        // "jobs" (the Tactics).
+        Matrix<double> matrix(num_rows, num_cols);
+
+        // Initialize the matrix with the cost of assigning each Robot to each Tactic
+        for (size_t row = 0; row < num_rows; row++)
+        {
+            for (size_t col = 0; col < num_cols; col++)
+            {
+                Robot robot                           = robots.at(row);
+                std::shared_ptr<const Tactic> &tactic = tactic_vector.at(col);
+                double robot_cost_for_tactic = tactic->calculateRobotCost(robot, world);
+
+                std::set<RobotCapability> required_capabilities =
+                    tactic->robotCapabilityRequirements();
+                std::set<RobotCapability> robot_capabilities =
+                    robot.getAvailableCapabilities();
+                std::set<RobotCapability> missing_capabilities;
+                std::set_difference(
+                    required_capabilities.begin(), required_capabilities.end(),
+                    robot_capabilities.begin(), robot_capabilities.end(),
+                    std::inserter(missing_capabilities, missing_capabilities.begin()));
+
+                if (missing_capabilities.size() > 0)
+                {
+                    matrix(row, col) = robot_cost_for_tactic + 10.0f;
+                }
+                else
+                {
+                    // capability requirements are satisfied, use real cost
+                    matrix(row, col) = robot_cost_for_tactic;
+                }
+            }
+        }
+
+        // Apply the Munkres/Hungarian algorithm to the matrix.
+        Munkres<double> m;
+        m.solve(matrix);
+
+        // The Munkres matrix gets solved such that there will be exactly one 0 in every
+        // row and exactly one 0 in every column. All other values will be -1. The 0's
+        // indicate the "workers" and "jobs" (robots and tactics for us) that are most
+        // optimally paired together
+        //
+        // Example matrices:
+        //        -1, 0,-1,         and            0,-1,
+        //         0,-1,-1,                       -1, 0,
+        //        -1,-1, 0,
+        auto remaining_robots = robots;
+
+        for (size_t row = 0; row < num_rows; row++)
+        {
+            for (size_t col = 0; col < num_tactics; col++)
+            {
+                auto val = matrix(row, col);
+                if (val == 0)
+                {
+                    robot_tactic_assignment.emplace(tactic_vector.at(col),
+                                                    robots.at(row));
+                    remaining_robots.erase(
+                        std::remove_if(remaining_robots.begin(), remaining_robots.end(),
+                                       [robots, row](const Robot &robot) {
+                                           return robot.id() == robots.at(row).id();
+                                       }),
+                        remaining_robots.end());
+                    break;
+                }
+            }
+        }
+
+        robots = remaining_robots;
+    }
+
+    (void)robot_tactic_assignment;
+    return primitives_to_run;
 }
