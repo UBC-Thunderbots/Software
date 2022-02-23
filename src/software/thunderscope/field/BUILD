@@ -45,3 +45,21 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
+
+py_binary(
+    name = "world_layer_interactions",
+    srcs = ["world_layer_interactions.py"],
+    deps = [
+        ":field_layer",
+        requirement("pyqtgraph"),
+    ],
+)
+
+
+py_binary(
+    name = "key_press_window",
+    srcs = ["key_press_window.py"],
+    deps = [
+        requirement("pyqtgraph"),
+    ]
+)

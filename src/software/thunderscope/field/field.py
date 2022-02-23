@@ -2,7 +2,6 @@ import pyqtgraph as pg
 import time
 from software.thunderscope.field.field_layer import FieldLayer
 
-
 class Field(pg.PlotWidget):
 
     """Wrapper to handle Field Layers"""
@@ -20,6 +19,14 @@ class Field(pg.PlotWidget):
 
         # Fields
         self.layers = []
+
+    def keyPressEvent(self, event):
+        for layer in self.layers:
+            layer.keyPressEvent(event)
+    
+    def keyReleaseEvent(self, event):
+        for layer in self.layers:
+            layer.keyReleaseEvent(event)
 
     def add_layer(self, name: str, layer: FieldLayer):
         """Add a layer to this field and to the legend.
