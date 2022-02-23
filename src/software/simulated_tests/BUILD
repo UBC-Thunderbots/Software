@@ -166,12 +166,12 @@ py_test(
     name = "simulated_test_fixture",  # TODO nuke the py
     srcs = [
         "simulated_test_fixture.py",
-        "standalone_simulator_interface.py",
     ],
     data = [
         ":python_bindings.so",
     ],
     deps = [
+        ":standalone_simulator_wrapper",
         "//proto:software_py_proto",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
@@ -184,5 +184,20 @@ py_test(
         "//software/thunderscope/field:world_layer",
         "//software/thunderscope/log:g3log_widget",
         requirement("pytest"),
+    ],
+)
+
+py_test(
+    name = "standalone_simulator_wrapper",
+    srcs = [
+        "standalone_simulator_wrapper.py",
+    ],
+    data = [
+        "//software/simulation:standalone_er_force_simulator_main"
+    ],
+    deps = [
+        "//proto:software_py_proto",
+        "//software/networking:threaded_unix_listener_py",
+        "//software/networking:threaded_unix_sender_py",
     ],
 )

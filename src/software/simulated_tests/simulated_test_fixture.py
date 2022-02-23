@@ -8,8 +8,8 @@ from proto.geometry_pb2 import Point, Angle, Vector, AngularVelocity
 from proto.robot_status_msg_pb2 import RobotStatus
 from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
 from software.thunderscope.thunderscope import Thunderscope
-from software.simulated_tests.standalone_simulator_interface import (
-    StandaloneErForceSimulator,
+from software.simulated_tests.standalone_simulator_wrapper import (
+    StandaloneSimulatorWrapper,
 )
 import time
 import pytest
@@ -38,11 +38,13 @@ def tactic_stepper():
 
 def main():
 
+    thunderscope = Thunderscope()
+
     # setup simulator
-    sim_interface = StandaloneErForceSimulator()
-    sim_interface.setup_blue_robots([(1, 1)])
-    sim_interface.setup_yellow_robots([(2, 2)])
-    sim_interface.setup_ball(ball_position=(1, -2))
+    sim_wrapper = StandaloneSimulatorWrapper()
+    sim_wrapper.setup_blue_robots([(1, 1)])
+    sim_wrapper.setup_yellow_robots([(2, 2)])
+    sim_wrapper.setup_ball(ball_position=(1, -2))
 
     # create tactics
     attacker_tactic = py.AttackerTactic(py.AttackerTacticConfig())
@@ -67,16 +69,16 @@ def main():
     blue_sensor_fusion = py.SensorFusion(blue_sensor_fusion_config)
 
     def run_lol():
-        sim_interface.tick(5)
-        ssl_wrapper = sim_interface.get_ssl_wrapper_packet()
+        sim_wrapper.tick(5)
+        ssl_wrapper = sim_wrapper.get_ssl_wrapper_packet()
         if ssl_wrapper is None:
             return
 
-        yellow_sensor_proto = sim_interface.get_yellow_sensor_proto(ssl_wrapper)
+        yellow_sensor_proto = sim_wrapper.get_yellow_sensor_proto(ssl_wrapper)
         yellow_sensor_fusion.processSensorProto(yellow_sensor_proto)
         yellow_world = yellow_sensor_fusion.getWorld()
 
-        blue_sensor_proto = sim_interface.get_blue_sensor_proto(ssl_wrapper)
+        blue_sensor_proto = sim_wrapper.get_blue_sensor_proto(ssl_wrapper)
         blue_sensor_fusion.processSensorProto(blue_sensor_proto)
         blue_world = blue_sensor_fusion.getWorld()
 
@@ -85,15 +87,14 @@ def main():
         yellow_primitives = attacker_tactic_stepper.getPrimitives(yellow_world, 0)
         blue_primitives = goalie_tactic_stepper.getPrimitives(blue_world, 0)
 
-        sim_interface.send_yellow_primitive_set_and_vision(
+        sim_wrapper.send_yellow_primitive_set_and_vision(
             py.createVision(yellow_world), yellow_primitives
         )
 
-        sim_interface.send_blue_primitive_set_and_vision(
+        sim_wrapper.send_blue_primitive_set_and_vision(
             py.createVision(blue_world), blue_primitives
         )
 
-    thunderscope = Thunderscope()
     thunderscope.schedule_something(5, run_lol)
     thunderscope.show()
 

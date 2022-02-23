@@ -6,9 +6,11 @@ from proto.vision_pb2 import RobotState, BallState
 from proto.robot_status_msg_pb2 import RobotStatus
 from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
 from proto.geometry_pb2 import Point, Angle, Vector, AngularVelocity
+from subprocess import Popen, PIPE
+import subprocess
 
 
-class StandaloneErForceSimulator(object):
+class StandaloneSimulatorWrapper(object):
     def __init__(self):
         """Runs our standalone er-force simulator binary and sets up the unix
         sockets to communicate with it
@@ -37,7 +39,10 @@ class StandaloneErForceSimulator(object):
 
         self.world_state = WorldState()
 
-        # TODO subprocess the binary here
+        self.standalone_simulator = Popen(
+                        ['software/simulation/standalone_er_force_simulator_main'],
+                        stdout=PIPE, stderr=PIPE
+                    )
 
     def __setup_robots(self, robot_locations, team_colour):
         """Initializes the world from a list of robot locations
