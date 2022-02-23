@@ -432,31 +432,50 @@ Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
 
 std::vector<Polygon> HRVOSimulator::getRobotVelocityObstacles(unsigned int robot_id) const
 {
+    // TODO: Refactor to a function e.g. std::optional<Unique_ptr<HRVOAgent>> getFriendlyRobotAgent(robot_id);
     std::vector<Polygon> velocity_obstacles;
     auto agent_index_iter = friendly_robot_id_map.find(robot_id);
     if (agent_index_iter != friendly_robot_id_map.end())
     {
         unsigned int agent_index = agent_index_iter->second;
-        HRVOAgent *agent_1       = dynamic_cast<HRVOAgent *>(agents_[agent_index].get());
-        if (agent_1 != nullptr)
+        HRVOAgent *hrvo_agent       = dynamic_cast<HRVOAgent *>(agents_[agent_index].get());
+        if (hrvo_agent != nullptr)
         {
-            std::vector<Point> points;
-            for (Agent::VelocityObstacle vo : agent_1->velocityObstacles_)
+            auto agent_position = getAgentPosition(agent_index);
+            for (Agent::VelocityObstacle vo : hrvo_agent->velocityObstacles_)
             {
-                auto agent_position = getAgentPosition(agent_index);
-                points.emplace_back(Point(agent_position.getX() + vo.apex_.getX(),
-                                          agent_position.getY() + vo.apex_.getY()));
-                points.emplace_back(
-                    Point(agent_position.getX() + vo.apex_.getX() + vo.side1_.getX(),
-                          agent_position.getY() + vo.apex_.getY() + vo.side1_.getY()));
-                points.emplace_back(
-                    Point(agent_position.getX() + vo.apex_.getX() + vo.side2_.getX(),
-                          agent_position.getY() + vo.apex_.getY() + vo.side2_.getY()));
+                std::vector<Point> points;
+                Vector2 shifted_apex = agent_position + vo.apex_;
+                Vector2 shifted_side1 = agent_position + vo.side1_;
+                Vector2 shifted_side2 = agent_position + vo.side2_;
+                points.emplace_back(Point(shifted_apex.getX(),shifted_apex.getY()));
+                points.emplace_back(Point(shifted_side1.getX(), shifted_side1.getY()));
+                points.emplace_back(Point(shifted_side2.getX(), shifted_side2.getY()));
                 velocity_obstacles.emplace_back(Polygon(points));
             }
         }
     }
     return velocity_obstacles;
+}
+
+std::vector<Circle> HRVOSimulator::getRobotCandidateCircles(unsigned int robot_id, const float circle_rad) const
+{
+    std::vector<Circle> candidate_circles;
+    auto agent_index_iter = friendly_robot_id_map.find(robot_id);
+    if (agent_index_iter != friendly_robot_id_map.end())
+    {
+        unsigned int agent_index = agent_index_iter->second;
+        HRVOAgent *hrvo_agent       = dynamic_cast<HRVOAgent *>(agents_[agent_index].get());
+        if (hrvo_agent != nullptr)
+        {
+            for (auto& candidate : hrvo_agent->candidates_)
+            {
+                Vector2 candidate_pos = hrvo_agent->getPosition() + candidate.second.position_;
+                candidate_circles.emplace_back(Circle(Point(candidate_pos.getX(), candidate_pos.getY()), circle_rad));
+            }
+        }
+    }
+    return candidate_circles;
 }
 
 float HRVOSimulator::getAgentMaxAccel(std::size_t agentNo) const

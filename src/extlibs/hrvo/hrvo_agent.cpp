@@ -161,8 +161,11 @@ void HRVOAgent::computeNewVelocity()
     }
 
     // Calculate what velocities (candidates) are not inside any velocity obstacle
-    // This is likely implementing the ClearPath efficient geometric algorithm as stated
-    // in the HRVO paper to find the closest possible velocity to our preferred velocity.
+    // This is likely implementing the ClearPath efficient geometric algorithm, as stated
+    // in the HRVO paper, to find the closest possible velocity to our preferred velocity.
+    // TODO: Debug through the rest
+    //       HRVO can potentially be extended to FVO (https://gamma.cs.unc.edu/CA/ClearPath.pdfhttps://gamma.cs.unc.edu/CA/ClearPath.pdf)
+    //       to make VO's smaller (cuts the tip of the triangle)
     candidates_.clear();
 
     Candidate candidate;

@@ -95,6 +95,12 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
             Point position(agent->getPosition().getX(), agent->getPosition().getY());
             *(obstacle_proto_.add_circle()) = *createCircleProto(Circle(position, agent->getRadius()));
         }
+
+        // Plot candidate circles
+        for (auto& candidate_circle : hrvo_simulator.getRobotCandidateCircles(1))
+        {
+            *(obstacle_proto_.add_circle()) = *createCircleProto(candidate_circle);
+        }
         LOG(VISUALIZE) << obstacle_proto_;
     }
 

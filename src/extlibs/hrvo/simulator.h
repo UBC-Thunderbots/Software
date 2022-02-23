@@ -157,7 +157,10 @@ class HRVOSimulator
      */
     Vector getRobotVelocity(unsigned int robot_id) const;
 
+    // TODO:
     std::vector<Polygon> getRobotVelocityObstacles(unsigned int robot_id) const;
+
+    std::vector<Circle> getRobotCandidateCircles(unsigned int robot_id, const float circle_rad = 0.03f) const;
 
     /**
      *      Returns the maximum acceleration of a specified agent.
@@ -317,7 +320,7 @@ class HRVOSimulator
 
     // The scale which enemy robots should be larger than their actual size
     // This scale is used to avoid close encounters, and reduce chance of collision
-    static constexpr float ENEMY_ROBOT_RADIUS_SCALE = 2.f;
+    static constexpr float ENEMY_ROBOT_RADIUS_SCALE = 1.5f;
 
     // How much larger should the goal radius be. This is added as a safety tolerance so
     // robots do not "teleport" over the goal between simulation frames.
@@ -331,12 +334,12 @@ class HRVOSimulator
     // The scale multiple of max robot speed which the preferred speed will be set at.
     // pref_speed = max_speed * PREF_SPEED_SCALE
     // NOTE: This scale multiple must be <= 1
-    static constexpr float PREF_SPEED_SCALE = 0.75f;
+    static constexpr float PREF_SPEED_SCALE = 1.f;
 
     // The maximum distance which HRVO Agents will look for neighbors, in meters.
     // A large radius picked to allow for far visibility of neighbors so Agents have
     // enough space to decelerate and avoid collisions.
-    static constexpr float MAX_NEIGHBOR_SEARCH_DIST = 7.f;
+    static constexpr float MAX_NEIGHBOR_SEARCH_DIST = 2.f;
 
     // The maximum number of neighbors/agents to consider when drawing velocity obstacles.
     static constexpr unsigned int MAX_NEIGHBORS = 15;
