@@ -39,6 +39,7 @@
 
 #include "goal.h"
 #include "kd_tree.h"
+#include "software/geom/algorithms/rasterize.h"
 
 
 HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector2 &position,
@@ -142,6 +143,13 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
     return velocityObstacle;
 }
 
+double HRVOAgent::calculateVelocityCost(Vector velocity, double time_to_collision_weight)
+{
+    double time_to_collision = 0.1f; // TODO: Implement time to collision based on paper.
+    Vector pref_vel(pref_velocity_.getX(), pref_velocity_.getY());
+    return (velocity - pref_vel).length() + time_to_collision_weight / time_to_collision;
+}
+
 void HRVOAgent::computeNewVelocity()
 {
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
@@ -160,6 +168,27 @@ void HRVOAgent::computeNewVelocity()
         velocityObstacles_.push_back(velocity_obstacle);
     }
 
+    Circle kinematic_limit(Point(velocity_.getX(), velocity_.getY()), max_accel_ * simulator_->getTimeStep());
+    std::vector<Point> vel_samples = rasterize(kinematic_limit, 0.01);
+    new_velocity_ = Vector2();
+    double min_cost = std::numeric_limits<double>::max();
+    for (Point& vel_sample : vel_samples)
+    {
+        if (vel_sample.distanceFromOrigin() < max_speed_)
+        {
+            // TODO: Tune time_to_collision_weight...
+            double vel_sample_cost = calculateVelocityCost(vel_sample.toVector(), 0.1f);
+            std::cout << vel_sample_cost << "<" << min_cost << std::endl;
+            if (vel_sample_cost < min_cost)
+            {
+                min_cost = vel_sample_cost;
+                Vector2 vel_sample_vect2(vel_sample.x(), vel_sample.y());
+                new_velocity_ = vel_sample_vect2;
+            }
+        }
+    }
+
+    /*
     // Calculate what velocities (candidates) are not inside any velocity obstacle
     // This is likely implementing the ClearPath efficient geometric algorithm, as stated
     // in the HRVO paper, to find the closest possible velocity to our preferred velocity.
@@ -436,6 +465,7 @@ void HRVOAgent::computeNewVelocity()
             break;
         }
     }
+     */
 }
 
 void HRVOAgent::computePreferredVelocity()
