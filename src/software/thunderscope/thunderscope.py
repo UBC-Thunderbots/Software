@@ -16,11 +16,17 @@ if __name__ == "__main__":
     class ProtoReceiver():
         def __init__(self):
             self.proto_receiver = ThreadedUnixListener(
-                constants.UNIX_SOCKET_BASE_PATH + "protobuf", convert_from_any=False, max_buffer_size=10
+                constants.UNIX_SOCKET_BASE_PATH + "protobuf", convert_from_any=True, max_buffer_size=3
             )
+            self.thread = Thread(target=self.start)
+            self.thread.start()
 
+        def start():
+            while True: 
+                proto = self.proto_receiver.buffer.get()
+                print(proto)
         
-
+    proto_receiver = ProtoReceiver()
     # Setup unix socket directory
     try:
         os.mkdir("/tmp/tbots")
