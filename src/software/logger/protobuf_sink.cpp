@@ -10,8 +10,8 @@
 ProtobufSink::ProtobufSink()
 {
     // Setup the logs
-    unix_senders["log"] = std::make_unique<ThreadedUnixSender>(UNIX_BASE_PATH + "log");
-    unix_senders["protobuf"] = std::make_unique<ThreadedUnixSender>(UNIX_BASE_PATH + "protobuf");
+    unix_senders["protobuf"] =
+        std::make_unique<ThreadedUnixSender>(UNIX_BASE_PATH + "protobuf");
 }
 
 void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
@@ -42,9 +42,16 @@ void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
             log_msg_proto.set_line_number(
                 static_cast<uint32_t>(std::stoul(log_entry.get().line())));
 
-            std::string log_msg;
-            log_msg_proto.SerializeToString(&log_msg);
-            unix_senders["log"]->sendString(base64_encode(log_msg));
+            // Pack into Any
+            google::protobuf::Any any;
+            any.PackFrom(log_msg_proto);
+
+            // Serialize into any
+            std::string serialized_any;
+            any.SerializeToString(&serialized_any);
+            unix_senders["protobuf"]->sendString(log_msg_proto.GetTypeName() +
+                                                 TYPE_DELIMITER +
+                                                 base64_encode(serialized_any));
         }
     }
 }
