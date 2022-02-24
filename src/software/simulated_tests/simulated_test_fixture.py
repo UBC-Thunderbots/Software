@@ -153,7 +153,46 @@ class EventuallyValidation(object):
     """Docstring for EventuallyValidation. """
 
     def __init__(self):
-        EventuallyValidation.__init__(self)
+        pass
+
+    @property
+    def error_msg(self):
+        return ""
+
+    def validate(self, world):
+        self.done = True
+
+    def visualize(self, arg1):
+        """TODO: Docstring for visualize.
+
+        :param function: TODO
+        :returns: TODO
+
+        """
+        pass
+
+    def done(self):
+        pass
+
+            # ball_at_point_validation.cpp
+            # ball_kicked_validation.h
+            # friendly_scored_validation.cpp
+            # robot_halt_validation.cpp
+            # robot_in_circle.cpp
+            # robot_in_polygon_validation.cpp
+            # robot_received_ball_validation.cpp
+            #   - all dribblers highlighted red
+            #   - if a robot receives a ball, they all go green
+            # robot_state_validation.cpp
+            # robot_stationary_in_polygon_validation.cpp
+
+class RobotEntersRectangle(EventuallyValidation):
+
+    def __init__(self, rectangle):
+        self.rectangle = rectangle
+
+        
+
 
 def run_tactic_test(simulator, full_system,
              always_validation : List[AlwaysValidation],
@@ -164,6 +203,9 @@ def run_tactic_test(simulator, full_system,
 
     while True:
         for validation in always_validation:
+            validation.validate(new_world)
+
+        for validation in eventually_validation:
             validation.validate(new_world)
 
 def test_attacker_tactic_keepaway(simulator):
