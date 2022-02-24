@@ -6,8 +6,8 @@ import "proto/geometry.proto";
 import "proto/vision.proto";
 
 message Validation {
-  repeated AlwaysValidation;
-  repeated EventuallyValidation;
+  repeated AlwaysValidation always_validation = 1;
+  repeated EventuallyValidationStream eventually_stream = 2;
 }
 
 message AlwaysValidation {
@@ -16,7 +16,12 @@ message AlwaysValidation {
   }
 }
 
+message EventuallyValidationStream {
+  repeated EventuallyValidation validation= 1;
+}
+
 message EventuallyValidation {
+  bool passed = 1
   oneof validation {
     RobotInPolygonValidation robot_in_polygon = 1;
     RobotInCircleValidation robot_in_polygon = 1;
@@ -26,19 +31,21 @@ message EventuallyValidation {
   }
 }
 
+ret: Validation
+
+pass in: [[RobotHasBallValidation, BallKickedValidation, RobotHasBallValidation, BallKickedValidation,] ,
+[RobotInPolygonValidation, RobotInCircleValidation, RobotInPolygonValidation] ,]
+
 message RobotInPolygonValidation {
   Polygon expected_polygon = 1;
-  bool passed = 2;
 }
 
 message RobotInCircleValidation {
   Circle expected_circle = 1;
-  bool passed = 2;
 }
 
 message RobotFacingAngleValidation {
   Angle expected_angle = 1;
-  bool passed = 2;
 }
 
 message BallKickedValidation {
