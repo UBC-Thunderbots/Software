@@ -36,9 +36,9 @@ class StandaloneSimulatorWrapper(object):
         self.yellow_robot_status_listener = ThreadedUnixListener(
             "/tmp/tbots/yellow_robot_status", RobotStatus, convert_from_any=False
         )
-
         self.world_state = WorldState()
 
+        # TODO change to er_force_sim_main
         self.standalone_simulator = Popen(
                         ['software/simulation/standalone_er_force_simulator_main'],
                         stdout=PIPE, stderr=PIPE
