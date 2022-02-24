@@ -5,30 +5,35 @@ package TbotsProto;
 import "proto/geometry.proto";
 import "proto/vision.proto";
 
-message Validation {
-  repeated AlwaysValidation always_validation = 1;
-  repeated EventuallyValidationStream eventually_stream = 2;
+message Validation
+{
+    repeated AlwaysValidation always_validation           = 1;
+    repeated EventuallyValidationStream eventually_stream = 2;
 }
 
-message AlwaysValidation {
-  oneof validation {
-    ...
-  }
+message AlwaysValidation
+{
+    oneof validation
+    {
+        ...
+    }
 }
 
-message EventuallyValidationStream {
-  repeated EventuallyValidation validation= 1;
+message EventuallyValidationStream
+{
+    repeated EventuallyValidation validation = 1;
 }
 
-message EventuallyValidation {
-  bool passed = 1
-  oneof validation {
-    RobotInPolygonValidation robot_in_polygon = 1;
-    RobotInCircleValidation robot_in_polygon = 1;
-    RobotFacingAngleValidation robot_in_polygon = 1;
-    BallKickedValidation robot_in_polygon = 1;
-    BallInCircleValidation robot_in_polygon = 1;
-  }
+message EventuallyValidation
+{
+    bool passed = 1 oneof validation
+    {
+        RobotInPolygonValidation robot_in_polygon   = 1;
+        RobotInCircleValidation robot_in_polygon    = 1;
+        RobotFacingAngleValidation robot_in_polygon = 1;
+        BallKickedValidation robot_in_polygon       = 1;
+        BallInCircleValidation robot_in_polygon     = 1;
+    }
 }
 
 ret: Validation
@@ -36,22 +41,27 @@ ret: Validation
 pass in: [[RobotHasBallValidation, BallKickedValidation, RobotHasBallValidation, BallKickedValidation,] ,
 [RobotInPolygonValidation, RobotInCircleValidation, RobotInPolygonValidation] ,]
 
-message RobotInPolygonValidation {
-  Polygon expected_polygon = 1;
+message RobotInPolygonValidation
+{
+    Polygon expected_polygon = 1;
 }
 
-message RobotInCircleValidation {
-  Circle expected_circle = 1;
+message RobotInCircleValidation
+{
+    Circle expected_circle = 1;
 }
 
-message RobotFacingAngleValidation {
-  Angle expected_angle = 1;
+message RobotFacingAngleValidation
+{
+    Angle expected_angle = 1;
 }
 
-message BallKickedValidation {
- ...
+message BallKickedValidation
+{
+    ...
 }
 
-message BallInCircleValidation {
- ... 
+message BallInCircleValidation
+{
+    ...
 }

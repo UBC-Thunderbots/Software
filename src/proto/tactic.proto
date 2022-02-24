@@ -5,6 +5,7 @@ package TbotsProto;
 import "proto/geometry.proto";
 import "proto/primitive.proto";
 import "proto/world.proto";
+// import "shared/parameter/dynamic_parameters.proto";
 
 message Tactic
 {
@@ -33,13 +34,11 @@ message AttackerTactic
     optional Pass best_pass_so_far = 1;
     // whether we have committed to the pass and will be taking it
     required bool pass_committed = 2;
-    // The shot to take
-    optional Shot shot = 3;
     // The point the robot will chip towards if it is unable to shoot and is in danger
     // of losing the ball to an enemy
-    optional Point chip_target = 4;
-
-    // TODO: add std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config;
+    optional Point chip_target = 3;
+    // Attacker config
+    // required AttackerTacticConfig attacker_tactic_config= 4;
 }
 
 message ChipTactic

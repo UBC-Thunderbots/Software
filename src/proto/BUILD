@@ -23,6 +23,8 @@ proto_library(
     ],
     deps = [
         "@nanopb//:nanopb_options_proto",
+        "//shared/parameter:dynamic_param_proto",
+        #"//shared/parameter:proto_params",
     ],
 )
 

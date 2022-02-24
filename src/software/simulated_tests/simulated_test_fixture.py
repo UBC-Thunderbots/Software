@@ -49,8 +49,8 @@ def main():
     # Multiple streams of validation
     # AlwaysValidation
     # EventuallyValidation
-    # 
-    
+    #
+
     def run_lol():
         sim_wrapper.tick(5)
         ssl_wrapper = sim_wrapper.get_ssl_wrapper_packet()
@@ -83,31 +83,32 @@ def main():
 
 
 # if __name__ == "__main__":
-    # main()
+# main()
 
 VALIDATION_1 = 0
 VALIDATION_2 = 0
 
-class Validation1(object):
 
+class Validation1(object):
     def __init__(self):
         self.done = False
         self.validation = 0
-        
+
     def validate(self, world):
         if world == 5:
             self.done = True
         return self.done
 
-class Validation2(object):
 
+class Validation2(object):
     def __init__(self):
         self.done = False
-        
+
     def validate(self, world):
         if world == 15:
             self.done = True
         return self.done
+
 
 def validation_sequence():
 
@@ -131,6 +132,7 @@ def simulator():
     print("deleting simulator")
     del er_force_sim
 
+
 def full_system():
     print("simulator test fixture")
     print("creating full_system")
@@ -147,7 +149,7 @@ class AlwaysValidation(object):
     def validate(self, world):
         assert True
 
-        
+
 class EventuallyValidation(object):
 
     """Docstring for EventuallyValidation. """
@@ -174,29 +176,30 @@ class EventuallyValidation(object):
     def done(self):
         pass
 
-            # ball_at_point_validation.cpp
-            # ball_kicked_validation.h
-            # friendly_scored_validation.cpp
-            # robot_halt_validation.cpp
-            # robot_in_circle.cpp
-            # robot_in_polygon_validation.cpp
-            # robot_received_ball_validation.cpp
-            #   - all dribblers highlighted red
-            #   - if a robot receives a ball, they all go green
-            # robot_state_validation.cpp
-            # robot_stationary_in_polygon_validation.cpp
+        # ball_at_point_validation.cpp
+        # ball_kicked_validation.h
+        # friendly_scored_validation.cpp
+        # robot_halt_validation.cpp
+        # robot_in_circle.cpp
+        # robot_in_polygon_validation.cpp
+        # robot_received_ball_validation.cpp
+        #   - all dribblers highlighted red
+        #   - if a robot receives a ball, they all go green
+        # robot_state_validation.cpp
+        # robot_stationary_in_polygon_validation.cpp
+
 
 class RobotEntersRectangle(EventuallyValidation):
-
     def __init__(self, rectangle):
         self.rectangle = rectangle
 
-        
 
-
-def run_tactic_test(simulator, full_system,
-             always_validation : List[AlwaysValidation],
-             eventually_validation : List[EventuallyValidation]):
+def run_tactic_test(
+    simulator,
+    full_system,
+    always_validation: List[AlwaysValidation],
+    eventually_validation: List[EventuallyValidation],
+):
 
     # step sim + sensor_fusion here
     new_world = World()
@@ -207,6 +210,7 @@ def run_tactic_test(simulator, full_system,
 
         for validation in eventually_validation:
             validation.validate(new_world)
+
 
 def test_attacker_tactic_keepaway(simulator):
     """TODO: Docstring for test_attacker_tactic_keepaway.
