@@ -61,7 +61,8 @@ void HRVOAgent::computeNeighbors()
     neighbors_.clear();
 
     std::unique_ptr<Goal> &current_goal = simulator_->goals_[goal_index_];
-    float new_neighbor_dist = std::min(neighborDist_,
+    float new_neighbor_dist =
+        std::min(neighborDist_,
                  abs(position_ - current_goal->getCurrentGoalPosition()) + goal_radius_);
 
     simulator_->kdTree_->query(this, new_neighbor_dist);
@@ -143,26 +144,30 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
     return velocityObstacle;
 }
 
-double HRVOAgent::calculateVelocityCost(Vector2 &velocity, double time_to_collision_weight)
+double HRVOAgent::calculateVelocityCost(Vector2 &velocity,
+                                        double time_to_collision_weight)
 {
-    // Can you do something like difference in position of A and B, and velocities of A and B
-    // and using that to calculate the time to collision? Doesn't take into account the radius
+    // Can you do something like difference in position of A and B, and velocities of A
+    // and B and using that to calculate the time to collision? Doesn't take into account
+    // the radius
     double min_time_to_collision = std::numeric_limits<double>::max();
-    for (auto& [distance, neighbor_id] : neighbors_)
+    for (auto &[distance, neighbor_id] : neighbors_)
     {
         // TODO: Calculate VO here?
         std::shared_ptr<Agent> other_agent = simulator_->agents_[neighbor_id];
         VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
         if (velocity_obstacle.containsVector(velocity))
         {
-            double time_to_collision = 0.1; // TODO: Implement time to collision based on paper.
+            double time_to_collision =
+                0.1;  // TODO: Implement time to collision based on paper.
             if (time_to_collision < min_time_to_collision)
             {
                 min_time_to_collision = time_to_collision;
             }
         }
     }
-    return abs(velocity - pref_velocity_) + time_to_collision_weight / min_time_to_collision;
+    return abs(velocity - pref_velocity_) +
+           time_to_collision_weight / min_time_to_collision;
 }
 
 void HRVOAgent::computeNewVelocity()
@@ -170,8 +175,11 @@ void HRVOAgent::computeNewVelocity()
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
 
-//    neighborDist_ = std::min(std::min(0.4f, static_cast<float>(std::pow(abs(velocity_), 2))), HRVOSimulator::MAX_NEIGHBOR_SEARCH_DIST);
-//    neighborDist_ = std::min(static_cast<float>(std::pow(abs(velocity_), 2)) / (2 * max_accel_), 0.4f);
+    //    neighborDist_ = std::min(std::min(0.4f,
+    //    static_cast<float>(std::pow(abs(velocity_), 2))),
+    //    HRVOSimulator::MAX_NEIGHBOR_SEARCH_DIST); neighborDist_ =
+    //    std::min(static_cast<float>(std::pow(abs(velocity_), 2)) / (2 * max_accel_),
+    //    0.4f);
 
     computePreferredVelocity();
     computeNeighbors();
@@ -187,32 +195,32 @@ void HRVOAgent::computeNewVelocity()
         velocityObstacles_.push_back(velocity_obstacle);
     }
 
-//    Circle kinematic_limit(Point(velocity_.getX(), velocity_.getY()), max_accel_ * simulator_->getTimeStep());
-//    std::vector<Point> vel_samples = rasterize(kinematic_limit, 0.01);
-//    new_velocity_ = Vector2();
-//    double min_cost = std::numeric_limits<double>::max();
-//    for (Point& vel_sample : vel_samples)
-//    {
-//        if (vel_sample.distanceFromOrigin() < max_speed_)
-//        {
-//            // TODO: Tune time_to_collision_weight...
-//            double vel_sample_cost = calculateVelocityCost(vel_sample.toVector(), 0.1f);
-//            std::cout << vel_sample_cost << "<" << min_cost << std::endl;
-//            if (vel_sample_cost < min_cost)
-//            {
-//                min_cost = vel_sample_cost;
-//                Vector2 vel_sample_vect2(vel_sample.x(), vel_sample.y());
-//                new_velocity_ = vel_sample_vect2;
-//            }
-//        }
-//    }
+    //    Circle kinematic_limit(Point(velocity_.getX(), velocity_.getY()), max_accel_ *
+    //    simulator_->getTimeStep()); std::vector<Point> vel_samples =
+    //    rasterize(kinematic_limit, 0.01); new_velocity_ = Vector2(); double min_cost =
+    //    std::numeric_limits<double>::max(); for (Point& vel_sample : vel_samples)
+    //    {
+    //        if (vel_sample.distanceFromOrigin() < max_speed_)
+    //        {
+    //            // TODO: Tune time_to_collision_weight...
+    //            double vel_sample_cost = calculateVelocityCost(vel_sample.toVector(),
+    //            0.1f); std::cout << vel_sample_cost << "<" << min_cost << std::endl; if
+    //            (vel_sample_cost < min_cost)
+    //            {
+    //                min_cost = vel_sample_cost;
+    //                Vector2 vel_sample_vect2(vel_sample.x(), vel_sample.y());
+    //                new_velocity_ = vel_sample_vect2;
+    //            }
+    //        }
+    //    }
 
-//    /*
+    //    /*
     // Calculate what velocities (candidates) are not inside any velocity obstacle
     // This is likely implementing the ClearPath efficient geometric algorithm, as stated
     // in the HRVO paper, to find the closest possible velocity to our preferred velocity.
     // TODO: Debug through the rest
-    //       HRVO can potentially be extended to FVO (https://gamma.cs.unc.edu/CA/ClearPath.pdfhttps://gamma.cs.unc.edu/CA/ClearPath.pdf)
+    //       HRVO can potentially be extended to FVO
+    //       (https://gamma.cs.unc.edu/CA/ClearPath.pdfhttps://gamma.cs.unc.edu/CA/ClearPath.pdf)
     //       to make VO's smaller (cuts the tip of the triangle)
     candidates_.clear();
 
@@ -484,7 +492,7 @@ void HRVOAgent::computeNewVelocity()
             break;
         }
     }
-//     */
+    //     */
 }
 
 void HRVOAgent::computePreferredVelocity()

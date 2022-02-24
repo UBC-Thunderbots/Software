@@ -47,7 +47,8 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minimia)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0), Point(1, 0.3), Point(1, 0.6), Point(0.7, 0.6), Point(1, -0.3), Point(1, -0.6), Point(0.7, -0.6)});
+        {Point(1, 0), Point(1, 0.3), Point(1, 0.6), Point(0.7, 0.6), Point(1, -0.3),
+         Point(1, -0.6), Point(0.7, -0.6)});
 
     auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);
@@ -70,7 +71,8 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minimia_with_open_end)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
-        {Point(2, 0), Point(1, 0.3), Point(1, 0.6), Point(0.7, 0.6), Point(1, -0.3), Point(1, -0.6), Point(0.7, -0.6)});
+        {Point(2, 0), Point(1, 0.3), Point(1, 0.6), Point(0.7, 0.6), Point(1, -0.3),
+         Point(1, -0.6), Point(0.7, -0.6)});
 
     auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);
@@ -92,8 +94,7 @@ TEST_F(SimulatedHRVOTest, test_single_enemy_directly_infront)
     BallState ball_state(Point(1, 2), Vector(0, 0));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
-    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
-        {Point(1, 0)});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(1, 0)});
 
     auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(destination, Angle::zero(), 0);

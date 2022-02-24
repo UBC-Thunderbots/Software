@@ -158,9 +158,11 @@ class HRVOSimulator
     // TODO:
     std::vector<Polygon> getRobotVelocityObstacles(unsigned int robot_id) const;
 
-    std::vector<Circle> getRobotCandidateCircles(unsigned int robot_id, const float circle_rad = 0.03f) const;
+    std::vector<Circle> getRobotCandidateCircles(unsigned int robot_id,
+                                                 const float circle_rad = 0.03f) const;
 
-    std::optional<std::shared_ptr<HRVOAgent>> getFriendlyAgentFromRobotId(unsigned int robot_id) const;
+    std::optional<std::shared_ptr<HRVOAgent>> getFriendlyAgentFromRobotId(
+        unsigned int robot_id) const;
 
     /**
      *      Returns the maximum acceleration of a specified agent.
@@ -311,7 +313,7 @@ class HRVOSimulator
     //       the current ball position and velocity
     bool add_ball_agent = false;
 
-public:
+   public:
     // The scale which friendly robots should be larger than friendly robots
     // This scale is used to avoid close encounters, and reduce chance of collision
     static constexpr float FRIENDLY_ROBOT_RADIUS_SCALE = 1.25f;
