@@ -15,9 +15,7 @@ import os
 
 
 class ThreadedUnixListener:
-    def __init__(
-        self, unix_path, proto_type, max_buffer_size=3, convert_from_any=True
-    ):
+    def __init__(self, unix_path, max_buffer_size=3, convert_from_any=True):
 
         """Receive protobuf over unix sockets and buffers them
 
@@ -34,8 +32,7 @@ class ThreadedUnixListener:
             pass
 
         self.server = socketserver.UnixDatagramServer(
-            unix_path,
-            handler_factory(self.__buffer_protobuf, convert_from_any)
+            unix_path, handler_factory(self.__buffer_protobuf, convert_from_any)
         )
         self.stop = False
 
@@ -105,15 +102,17 @@ class Session(socketserver.BaseRequestHandler):
         Then, trigger the handle callback
 
         """
-        p = base64.b64decode(self.request[0])
-        self.proto_type = self.find_proto(p.split("!!!")[0].split(".")[1])
-        msg = self.proto_type()
+        p = self.request[0]
+        type_name = str(p.split(b"!!!")[0], "utf-8")
+        proto_type = self.find_proto(type_name.split(".")[1])
+        msg = proto_type()
+        p = base64.b64decode(p.split(b"!!!")[1])
 
         if self.convert_from_any:
             any_msg = Any.FromString(p)
             any_msg.Unpack(msg)
         else:
-            msg = self.proto_type.FromString(p)
+            msg = proto_type.FromString(p)
 
         self.handle_callback(msg)
 
@@ -121,14 +120,12 @@ class Session(socketserver.BaseRequestHandler):
         """
         Search through all protobufs and return class of proto_type
         """
-                                                                                                                                                                                                                                        
         proto_path = os.path.dirname(proto.__file__)
 
         for file in glob.glob(proto_path + "**/*.py"):
-                                                                                                                                                                                                                                        
             name = os.path.splitext(os.path.basename(file))[0]
 
-            # Ignore __ files                                                                                                                                                                                                           
+            # Ignore __ files
             if name.startswith("__"):
                 continue
             module = importlib.import_module("proto." + name)
