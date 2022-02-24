@@ -15,11 +15,6 @@ cc_library(
     srcs = ["primitive_manager.c"],
     hdrs = ["primitive_manager.h"],
     copts = select({
-        # TODO: this should not be dependent on freertos at all
-        "//cc_toolchain:cpu_stm32f4": [
-            "-isystem firmware/boards/shared/legacy_freertos/include",
-            "-isystem firmware/boards/shared/legacy_stm32lib/include",
-        ],
         "//conditions:default": [],
     }),
     deps = [
@@ -29,8 +24,6 @@ cc_library(
         ":stop",
         "//firmware/app/world:firmware_world",
     ] + select({
-        # TODO: this should not be dependent on freertos at all
-        "//cc_toolchain:cpu_stm32f4": ["//firmware/boards/legacy_robot_stm32f4:legacy_shared_libs"],
         "//conditions:default": [],
     }),
 )
