@@ -15,16 +15,23 @@ if __name__ == "__main__":
 
     class ProtoReceiver():
         def __init__(self):
+            self.proto_map = dict()
             self.proto_receiver = ThreadedUnixListener(
                 constants.UNIX_SOCKET_BASE_PATH + "protobuf", convert_from_any=True, max_buffer_size=3
             )
             self.thread = Thread(target=self.start)
             self.thread.start()
 
-        def start():
+        def start(self):
             while True: 
                 proto = self.proto_receiver.buffer.get()
                 print(proto)
+
+        def registerObserver(self, proto_type, buffer):
+            if proto_type in self.proto_map:
+                self.proto_map[proto_type].append(buffer)
+            else:
+                self.proto_map[proto_type] = [buffer]
         
     proto_receiver = ProtoReceiver()
     # Setup unix socket directory
