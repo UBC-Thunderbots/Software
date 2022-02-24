@@ -19,11 +19,10 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(
     const float LOCAL_EPSILON = 1e-6f;  // Avoid dividing by zero
 
     // Unpack current move primitive
-    auto destination = move_primitive.path().point().at(0);
+    auto destination              = move_primitive.path().point().at(0);
     const float dest_linear_speed = move_primitive.final_speed_m_per_s();
     const float max_speed_m_per_s = move_primitive.max_speed_m_per_s();
-    const Point final_position    = Point(destination.x_meters(),
-                                       destination.y_meters());
+    const Point final_position    = Point(destination.x_meters(), destination.y_meters());
     std::clamp(max_speed_m_per_s, 0.0f, robot_constants_.robot_max_speed_m_per_s);
 
     const float max_target_linear_speed = fmaxf(max_speed_m_per_s, dest_linear_speed);
