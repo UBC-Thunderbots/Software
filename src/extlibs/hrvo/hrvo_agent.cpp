@@ -608,3 +608,32 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
         }
     }
 }
+
+std::vector<Polygon> HRVOAgent::getVelocityObstacles() const
+{
+    std::vector<Polygon> velocity_obstacles;
+    for (const Agent::VelocityObstacle &vo : velocityObstacles_)
+    {
+        std::vector<Point> points;
+        Vector2 shifted_apex  = position_ + vo.apex_;
+        Vector2 shifted_side1 = position_ + vo.side1_;
+        Vector2 shifted_side2 = position_ + vo.side2_;
+        points.emplace_back(Point(shifted_apex.getX(), shifted_apex.getY()));
+        points.emplace_back(Point(shifted_side1.getX(), shifted_side1.getY()));
+        points.emplace_back(Point(shifted_side2.getX(), shifted_side2.getY()));
+        velocity_obstacles.emplace_back(Polygon(points));
+    }
+    return velocity_obstacles;
+}
+
+std::vector<Circle> HRVOAgent::getCandidateCircles(const float circle_rad) const
+{
+    std::vector<Circle> candidate_circles;
+    for (auto &candidate : candidates_)
+    {
+        Vector2 candidate_pos = position_ + candidate.second.position_;
+        candidate_circles.emplace_back(
+                Circle(Point(candidate_pos.getX(), candidate_pos.getY()), circle_rad));
+    }
+    return candidate_circles;
+}

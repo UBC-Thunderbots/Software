@@ -49,6 +49,7 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//proto:visualization_cc_proto",
         "//proto/primitive:primitive_msg_factory",
         "//software/world",
     ],

@@ -42,6 +42,8 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/logger/logger.h"
+#include "proto/visualization.pb.h"
+#include "proto/message_translation/tbots_geometry.h"
 
 HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants)
     : global_time(0.0f),
@@ -376,44 +378,35 @@ Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
     return Vector();
 }
 
-std::vector<Polygon> HRVOSimulator::getRobotVelocityObstacles(unsigned int robot_id) const
+void HRVOSimulator::visualize()
 {
-    std::vector<Polygon> velocity_obstacles;
-    auto hrvo_agent = getFriendlyAgentFromRobotId(robot_id);
-    if (hrvo_agent.has_value())
-    {
-        auto agent_position = hrvo_agent.value()->getPosition();
-        for (const Agent::VelocityObstacle &vo : hrvo_agent.value()->velocityObstacles_)
-        {
-            std::vector<Point> points;
-            Vector2 shifted_apex  = agent_position + vo.apex_;
-            Vector2 shifted_side1 = agent_position + vo.side1_;
-            Vector2 shifted_side2 = agent_position + vo.side2_;
-            points.emplace_back(Point(shifted_apex.getX(), shifted_apex.getY()));
-            points.emplace_back(Point(shifted_side1.getX(), shifted_side1.getY()));
-            points.emplace_back(Point(shifted_side2.getX(), shifted_side2.getY()));
-            velocity_obstacles.emplace_back(Polygon(points));
-        }
-    }
-    return velocity_obstacles;
-}
+    TbotsProto::Obstacles obstacle_proto_;
 
-std::vector<Circle> HRVOSimulator::getRobotCandidateCircles(unsigned int robot_id,
-                                                            const float circle_rad) const
-{
-    std::vector<Circle> candidate_circles;
-    auto hrvo_agent = getFriendlyAgentFromRobotId(robot_id);
-    if (hrvo_agent.has_value())
+    for (auto id_pair : friendly_robot_id_map)
     {
-        for (auto &candidate : hrvo_agent.value()->candidates_)
+        unsigned int robot_id = id_pair.first;
+        if (robot_id == 1) // TODO: Remove this if
         {
-            Vector2 candidate_pos =
-                hrvo_agent.value()->getPosition() + candidate.second.position_;
-            candidate_circles.emplace_back(
-                Circle(Point(candidate_pos.getX(), candidate_pos.getY()), circle_rad));
+            auto friendly_agent = getFriendlyAgentFromRobotId(robot_id).value();
+            for (auto& obstacle : friendly_agent->getVelocityObstacles())
+            {
+                *(obstacle_proto_.add_polygon()) = *createPolygonProto(obstacle);
+            }
+
+            Point position(friendly_agent->getPosition().getX(), friendly_agent->getPosition().getY());
+            *(obstacle_proto_.add_circle()) =
+                    *createCircleProto(Circle(position, friendly_agent->getRadius()));
+
+            for (auto& candidate_circle : friendly_agent->getCandidateCircles())
+            {
+                *(obstacle_proto_.add_circle()) = *createCircleProto(candidate_circle);
+            }
         }
     }
-    return candidate_circles;
+    // TODO: Create a new HRVO visualization proto.
+    //       Ideally we send the velocity obstacles for all friendly agents, and we filter
+    //       the data in Thunderscope.
+    LOG(VISUALIZE) << obstacle_proto_;
 }
 
 std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(

@@ -76,6 +76,7 @@ class HRVOAgent : public Agent
      */
     void computeNewVelocity() override;
 
+    // TODO: Remove
     double calculateVelocityCost(Vector2 &velocity, double time_to_collision_weight);
 
     /**
@@ -106,6 +107,15 @@ class HRVOAgent : public Agent
      * @param  rangeSq  The squared range around this agent.
      */
     void insertNeighbor(std::size_t agentNo, float &rangeSq);
+
+    /**
+     * Get a list of circles which represent the new velocity candidates
+     * @param circle_rad The radius of the circles which represent candidates
+     * @return list of circles which represent the new velocity candidates
+     */
+    std::vector<Circle> getCandidateCircles(const float circle_rad = 0.03f) const;
+
+    std::vector<Polygon> getVelocityObstacles() const;
 
    private:
     /**

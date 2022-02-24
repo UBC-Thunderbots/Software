@@ -30,5 +30,6 @@ void ObstacleArtist::visit(const GeomObstacle<Rectangle>& geom_obstacle)
 void ObstacleArtist::visualize()
 {
     // Log and Clear protobuf
+//    LOG(VISUALIZE) << obstacle_proto_;
     obstacle_proto_ = TbotsProto::Obstacles();
 }

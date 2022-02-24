@@ -155,14 +155,18 @@ class HRVOSimulator
      */
     Vector getRobotVelocity(unsigned int robot_id) const;
 
-    // TODO:
-    std::vector<Polygon> getRobotVelocityObstacles(unsigned int robot_id) const;
-
-    std::vector<Circle> getRobotCandidateCircles(unsigned int robot_id,
-                                                 const float circle_rad = 0.03f) const;
-
+    /**
+     * Get friendly HRVO agent from robot id. Returns std::nullopt if agent does not exist
+     * @param robot_id Robot id as represented in the real world
+     * @return Optional shared pointer to an HRVO agent
+     */
     std::optional<std::shared_ptr<HRVOAgent>> getFriendlyAgentFromRobotId(
         unsigned int robot_id) const;
+
+    /**
+     * Visualize this simulator to Thunderscope
+     */
+    void visualize();
 
     /**
      *      Returns the maximum acceleration of a specified agent.

@@ -7,7 +7,6 @@ cc_library(
     deps = [
         "//extlibs/hrvo",
         "//proto:tbots_cc_proto",
-        "//proto:visualization_cc_proto",
         "//proto/primitive:primitive_msg_factory",
         "//shared:constants",
         "//software/math:math_functions",
