@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package TbotsProto;
+
+import "proto/geometry.proto";
+import "proto/vision.proto";
+
+message Validation {
+  repeated AlwaysValidation;
+  repeated EventuallyValidation;
+}
+
+message AlwaysValidation {
+  oneof validation {
+    ...
+  }
+}
+
+message EventuallyValidation {
+  oneof validation {
+    RobotInPolygonValidation robot_in_polygon = 1;
+    RobotInCircleValidation robot_in_polygon = 1;
+    RobotFacingAngleValidation robot_in_polygon = 1;
+    BallKickedValidation robot_in_polygon = 1;
+    BallInCircleValidation robot_in_polygon = 1;
+  }
+}
+
+message RobotInPolygonValidation {
+  Polygon expected_polygon = 1;
+  bool passed = 2;
+}
+
+message RobotInCircleValidation {
+  Circle expected_circle = 1;
+  bool passed = 2;
+}
+
+message RobotFacingAngleValidation {
+  Angle expected_angle = 1;
+  bool passed = 2;
+}
+
+message BallKickedValidation {
+ ...
+}
+
+message BallInCircleValidation {
+ ... 
+}
