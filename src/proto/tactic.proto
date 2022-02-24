@@ -38,6 +38,8 @@ message AttackerTactic
     // The point the robot will chip towards if it is unable to shoot and is in danger
     // of losing the ball to an enemy
     optional Point chip_target = 4;
+
+    // TODO: add std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config;
 }
 
 message ChipTactic
@@ -65,6 +67,8 @@ message CreaseDefenderTactic
     required CreaseDefenderAlignment crease_defender_alignment = 2;
     // The maximum allowed speed mode
     required MovePrimitive.MaxAllowedSpeedMode max_allowed_speed_mode = 3;
+    // TODO: std::shared_ptr<const RobotNavigationObstacleConfig>
+    // robot_navigation_obstacle_config
 }
 
 message DribbleTactic
@@ -86,7 +90,12 @@ message GetBehindBallTactic
     required Angle chick_direction = 2;
 }
 
-message GoalieTactic {}
+message GoalieTactic
+{
+    // The maximum allowed speed mode
+    required MovePrimitive.MaxAllowedSpeedMode max_allowed_speed_mode = 1;
+    // TODO: add std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config
+}
 
 message KickTactic
 {
@@ -151,4 +160,7 @@ message ShadowEnemyTactic
     required double shadow_distance = 2;
 }
 
-message StopTactic {}
+message StopTactic
+{
+    required bool coast = 1;
+}

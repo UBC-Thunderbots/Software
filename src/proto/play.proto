@@ -1,6 +1,63 @@
-syntax = "proto3";
+syntax = "proto2";
 
 package TbotsProto;
 
 import "proto/geometry.proto";
 
+message Play
+{
+    oneof play
+    {
+        ShootOrChipPlay shoot_or_chip               = 1;
+        KickoffFriendlyPlay kickoff_friendly        = 2;
+        OffensePlay offense                         = 3;
+        CornerKickPlay corner_kick                  = 4;
+        ShootOrPassPlay shoot_or_pass               = 5;
+        BallPlacementPlay ball_placement            = 6;
+        HaltPlay halt                               = 7;
+        EnemyFreeKickPlay enemy_free_kick           = 8;
+        ExamplePlay example                         = 9;
+        DefensePlay defense                         = 10;
+        EnemyBallPlacementPlay enemy_ball_placement = 11;
+        PenaltyKickEnemyPlay penalty_kick_enemy     = 12;
+        PenaltyKickPlay penalty_kick                = 13;
+        FreeKickPlay free_kick                      = 14;
+        CreaseDefensePlay crease_defense            = 15;
+        StopPlay stop                               = 16;
+        KickoffEnemyPlay kickoff_enemy              = 17;
+    }
+}
+
+message ShootOrChipPlay {}
+
+message KickoffFriendlyPlay {}
+
+message OffensePlay {}
+
+message CornerKickPlay {}
+
+message ShootOrPassPlay {}
+
+message BallPlacementPlay {}
+
+message HaltPlay {}
+
+message EnemyFreeKickPlay {}
+
+message ExamplePlay {}
+
+message DefensePlay {}
+
+message EnemyBallPlacementPlay {}
+
+message PenaltyKickEnemyPlay {}
+
+message PenaltyKickPlay {}
+
+message FreeKickPlay {}
+
+message CreaseDefensePlay {}
+
+message StopPlay {}
+
+message KickoffEnemyPlay {}
