@@ -273,13 +273,14 @@ void SimulatedErForceSimTestFixture::runTest(
     // declare struct for ball_displacement, velocity_diff; array of struct for robots
     // fields
     struct AggregateFunctions ball_displacement_stats = AggregateFunctions();
-    struct AggregateFunctions ball_velocity_stats = AggregateFunctions();
+    struct AggregateFunctions ball_velocity_stats     = AggregateFunctions();
     std::vector<AggregateFunctions> robots_displacement_stats;
     std::vector<AggregateFunctions> robots_velocity_stats;
 
     // Tick one frame to aid with visualization
-    bool validation_functions_done =
-        tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world, simulator, ball_displacement, ball_velocity_diff, robots_displacement, robots_velocity_diff);
+    bool validation_functions_done = tickTest(
+        simulation_time_step, ai_time_step, friendly_world, enemy_world, simulator,
+        ball_displacement, ball_velocity_diff, robots_displacement, robots_velocity_diff);
 
     // Initialize Values
     ball_displacement_stats.maximum = ball_displacement;
@@ -291,7 +292,7 @@ void SimulatedErForceSimTestFixture::runTest(
     sum_robots_displacement         = robots_displacement;
     sum_robots_velocity             = robots_velocity_diff;
 
-    size_t num_robots = robots_displacement.size();
+    size_t num_robots         = robots_displacement.size();
     validation_functions_done = false;
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
@@ -300,7 +301,8 @@ void SimulatedErForceSimTestFixture::runTest(
         if (!friendly_thunderbots_config->getAiControlConfig()->getRunAi()->value())
             validation_functions_done =
                 tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,
-                         simulator, ball_displacement, ball_velocity_diff, robots_displacement, robots_velocity_diff);
+                         simulator, ball_displacement, ball_velocity_diff,
+                         robots_displacement, robots_velocity_diff);
 
         while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
         {
@@ -312,8 +314,10 @@ void SimulatedErForceSimTestFixture::runTest(
                 continue;
             }
 
-            validation_functions_done = tickTest(
-                simulation_time_step, ai_time_step, friendly_world, enemy_world, simulator, ball_displacement, ball_velocity_diff, robots_displacement, robots_velocity_diff);
+            validation_functions_done =
+                tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,
+                         simulator, ball_displacement, ball_velocity_diff,
+                         robots_displacement, robots_velocity_diff);
 
             sum_ball_displacement += ball_displacement;
             sum_ball_velocity += ball_velocity_diff;
@@ -345,16 +349,21 @@ void SimulatedErForceSimTestFixture::runTest(
         }
 
         // compute the averages
-        ball_displacement_stats.average = sum_ball_displacement / (friendly_tick_count+enemy_tick_count);
-        ball_velocity_stats.average     = sum_ball_velocity / (friendly_tick_count + enemy_tick_count);
-        
+        ball_displacement_stats.average =
+            sum_ball_displacement / (friendly_tick_count + enemy_tick_count);
+        ball_velocity_stats.average =
+            sum_ball_velocity / (friendly_tick_count + enemy_tick_count);
+
         for (size_t i = 0; i < num_robots; i++)
         {
             robots_displacement_stats[i].average =
                 sum_robots_displacement[i] / (friendly_tick_count + enemy_tick_count);
-            robots_velocity_stats[i].average = sum_robots_velocity[i] / (friendly_tick_count + enemy_tick_count);
-            validation_functions_done = tickTest(simulation_time_step, ai_time_step,
-                                                 friendly_world, enemy_world, simulator, ball_displacement, ball_velocity_diff, robots_displacement, robots_velocity_diff);
+            robots_velocity_stats[i].average =
+                sum_robots_velocity[i] / (friendly_tick_count + enemy_tick_count);
+            validation_functions_done =
+                tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,
+                         simulator, ball_displacement, ball_velocity_diff,
+                         robots_displacement, robots_velocity_diff);
         }
 
         // Output the statistics for ball and robots
@@ -424,32 +433,28 @@ void SimulatedErForceSimTestFixture::runTest(
     }
 }
 
-    void SimulatedErForceSimTestFixture::registerFriendlyTickTime(double tick_time_ms)
-    {
-        total_friendly_tick_duration += tick_time_ms;
-        max_friendly_tick_duration = std::max(max_friendly_tick_duration, tick_time_ms);
-        min_friendly_tick_duration = std::min(min_friendly_tick_duration, tick_time_ms);
-        friendly_tick_count++;
-    }
+void SimulatedErForceSimTestFixture::registerFriendlyTickTime(double tick_time_ms)
+{
+    total_friendly_tick_duration += tick_time_ms;
+    max_friendly_tick_duration = std::max(max_friendly_tick_duration, tick_time_ms);
+    min_friendly_tick_duration = std::min(min_friendly_tick_duration, tick_time_ms);
+    friendly_tick_count++;
+}
 
-    void SimulatedErForceSimTestFixture::registerEnemyTickTime(double tick_time_ms)
-    {
-        total_enemy_tick_duration += tick_time_ms;
-        max_enemy_tick_duration = std::max(max_enemy_tick_duration, tick_time_ms);
-        min_enemy_tick_duration = std::min(min_enemy_tick_duration, tick_time_ms);
-        enemy_tick_count++;
-    }
+void SimulatedErForceSimTestFixture::registerEnemyTickTime(double tick_time_ms)
+{
+    total_enemy_tick_duration += tick_time_ms;
+    max_enemy_tick_duration = std::max(max_enemy_tick_duration, tick_time_ms);
+    min_enemy_tick_duration = std::min(min_enemy_tick_duration, tick_time_ms);
+    enemy_tick_count++;
+}
 
-bool SimulatedErForceSimTestFixture::tickTest(Duration simulation_time_step,
-                                              Duration ai_time_step,
-                                              std::shared_ptr<World> friendly_world,
-                                              std::shared_ptr<World> enemy_world,
-                                              std::shared_ptr<ErForceSimulator> simulator,
-                                                double &ball_displacement,
-                                                double &ball_velocity_diff, 
-                                                std::vector<double> &robots_displacement,
-                                                std::vector<double> &robots_velocity_diff
-                                            )
+bool SimulatedErForceSimTestFixture::tickTest(
+    Duration simulation_time_step, Duration ai_time_step,
+    std::shared_ptr<World> friendly_world, std::shared_ptr<World> enemy_world,
+    std::shared_ptr<ErForceSimulator> simulator, double &ball_displacement,
+    double &ball_velocity_diff, std::vector<double> &robots_displacement,
+    std::vector<double> &robots_velocity_diff)
 {
     /* extract world ball and robot */
     Ball world_ball                          = friendly_world->ball();
@@ -494,14 +499,14 @@ bool SimulatedErForceSimTestFixture::tickTest(Duration simulation_time_step,
     for (Robot world_robot : world_friendly_robots)
     {
         int robot_index = 0;
-        while(world_robot.id() != simulator_friendly_robots[robot_index++].id());
-        Robot simulator_robot = simulator_friendly_robots[robot_index-1];
+        while (world_robot.id() != simulator_friendly_robots[robot_index++].id())
+            ;
+        Robot simulator_robot = simulator_friendly_robots[robot_index - 1];
 
-                /* find difference in robot[i] position */
-        Point world_robot_pos = world_robot.position();
+        /* find difference in robot[i] position */
+        Point world_robot_pos     = world_robot.position();
         Point simulator_robot_pos = simulator_robot.position();
-        double robot_displacement =
-            (world_robot_pos - simulator_robot_pos).length();
+        double robot_displacement = (world_robot_pos - simulator_robot_pos).length();
 
         /* find difference in robot[i] velocity */
         Vector world_robot_vel     = world_robot.velocity();
@@ -516,14 +521,14 @@ bool SimulatedErForceSimTestFixture::tickTest(Duration simulation_time_step,
     for (Robot world_robot : world_enemy_robots)
     {
         int robot_index = 0;
-        while (world_robot.id() != simulator_enemy_robots[robot_index++].id());
-        Robot simulator_robot = simulator_enemy_robots[robot_index-1];
+        while (world_robot.id() != simulator_enemy_robots[robot_index++].id())
+            ;
+        Robot simulator_robot = simulator_enemy_robots[robot_index - 1];
 
-                /* find difference in robot[i] position */
-        Point world_robot_pos = world_robot.position();
+        /* find difference in robot[i] position */
+        Point world_robot_pos     = world_robot.position();
         Point simulator_robot_pos = simulator_robot.position();
-        double robot_displacement =
-            (world_robot_pos - simulator_robot_pos).length();
+        double robot_displacement = (world_robot_pos - simulator_robot_pos).length();
 
         /* find difference in robot[i] velocity */
         Vector world_robot_vel     = world_robot.velocity();
