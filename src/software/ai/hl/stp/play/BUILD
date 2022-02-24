@@ -528,3 +528,18 @@ cc_test(
         "//software/world",
     ],
 )
+
+cc_library(
+    name = "assigned_tactics_play",
+    srcs = ["assigned_tactics_play.cpp"],
+    hdrs = ["assigned_tactics_play.h"],
+    deps = [
+        ":play",
+        "//shared:constants",
+        "//shared/parameter:cpp_configs",
+        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/logger",
+        "//software/util/generic_factory",
+    ],
+    alwayslink = True,
+)
