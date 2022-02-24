@@ -55,8 +55,6 @@ class HRVOSimulator
      */
     explicit HRVOSimulator(float time_step, const RobotConstants_t &robot_constants);
 
-    ~HRVOSimulator();
-
     /**
      * Reset all agents to match the state of the given world.
      * Friendly robots will use the Hybrid Reciprocal algorithm to traverse.
@@ -162,6 +160,8 @@ class HRVOSimulator
 
     std::vector<Circle> getRobotCandidateCircles(unsigned int robot_id, const float circle_rad = 0.03f) const;
 
+    std::optional<std::shared_ptr<HRVOAgent>> getFriendlyAgentFromRobotId(unsigned int robot_id) const;
+
     /**
      *      Returns the maximum acceleration of a specified agent.
      *
@@ -266,9 +266,6 @@ class HRVOSimulator
         return reachedGoals_;
     }
 
-    std::ofstream output_file;
-    std::string output_file_loc;
-    std::string record_playback_name;
     unsigned int frame = 0;
 
    public:
@@ -289,7 +286,7 @@ class HRVOSimulator
 
     // List of agents (robots) in this simulation
     // TODO: Doesn't have to be unique_ptr
-    std::vector<std::unique_ptr<Agent>> agents_;
+    std::vector<std::shared_ptr<Agent>> agents_;
     // TODO (#2373): Remove goals_ list when goal is a part of Agent
     std::vector<std::unique_ptr<Goal>> goals_;
 
@@ -304,7 +301,7 @@ class HRVOSimulator
     std::map<unsigned int, unsigned int> friendly_robot_id_map;
     std::map<unsigned int, unsigned int> enemy_robot_id_map;
     std::size_t ball_agent_id = -1;  // Can size_t be negative?
-    int update_world          = 0;
+    float last_time_world_updated;
 
     // PrimitiveSet which includes the path which each friendly robot should take
     TbotsProto::PrimitiveSet primitive_set_;
@@ -314,6 +311,7 @@ class HRVOSimulator
     //       the current ball position and velocity
     bool add_ball_agent = false;
 
+public:
     // The scale which friendly robots should be larger than friendly robots
     // This scale is used to avoid close encounters, and reduce chance of collision
     static constexpr float FRIENDLY_ROBOT_RADIUS_SCALE = 1.25f;
@@ -343,6 +341,18 @@ class HRVOSimulator
 
     // The maximum number of neighbors/agents to consider when drawing velocity obstacles.
     static constexpr unsigned int MAX_NEIGHBORS = 15;
+
+    // The max allowed difference in speed of the two robots colliding is 1.5 m/s.
+    // Based on the rules, if the robot is travelling <= 0.6 m/s it will not receive a
+    // penalty after a collision. To be safe, the max collision speed is set to 0.5 m/s
+    static constexpr float MAX_COLLISION_SPEED = 0.5f;
+
+    // The max allowed difference in speed of the two robots colliding is 1.5 m/s.
+    // Based on the rules, if the robot is travelling <= 0.6 m/s it will not receive a
+    // penalty after a collision. To be safe, the max collision speed is set to 0.5 m/s
+    // TODO: Should this value be based on actual time instead of simulation time?
+    //       In case of the simulation hanging
+    static constexpr float TIME_TO_UPDATE_WORLD = 1.f / 2;
 
     friend class Agent;
     friend class Goal;

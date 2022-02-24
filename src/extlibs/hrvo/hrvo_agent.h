@@ -76,7 +76,7 @@ class HRVOAgent : public Agent
      */
     void computeNewVelocity() override;
 
-    double calculateVelocityCost(Vector velocity, double time_to_collision_weight);
+    double calculateVelocityCost(Vector2 &velocity, double time_to_collision_weight);
 
     /**
      * Create the hybrid reciprocal velocity obstacle which other_agent should see for
