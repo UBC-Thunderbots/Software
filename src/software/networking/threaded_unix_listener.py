@@ -2,15 +2,21 @@ import socketserver
 import time
 import base64
 import os
+from webbrowser import get
 from google.protobuf import text_format
 from google.protobuf.any_pb2 import Any
 from threading import Thread
+import proto
 import queue
+import glob
+import importlib
+import inspect
+import os
 
 
 class ThreadedUnixListener:
     def __init__(
-        self, unix_path, max_buffer_size=3, convert_from_any=True
+        self, unix_path, proto_type, max_buffer_size=3, convert_from_any=True
     ):
 
         """Receive protobuf over unix sockets and buffers them
@@ -100,8 +106,38 @@ class Session(socketserver.BaseRequestHandler):
 
         """
         p = base64.b64decode(self.request[0])
+        self.proto_type = self.find_proto(p.split("!!!")[0].split(".")[1])
+        msg = self.proto_type()
 
-        self.handle_callback(p)
+        if self.convert_from_any:
+            any_msg = Any.FromString(p)
+            any_msg.Unpack(msg)
+        else:
+            msg = self.proto_type.FromString(p)
+
+        self.handle_callback(msg)
+
+    def find_proto(self, proto_type):
+        """
+        Search through all protobufs and return class of proto_type
+        """
+                                                                                                                                                                                                                                        
+        proto_path = os.path.dirname(proto.__file__)
+
+        for file in glob.glob(proto_path + "**/*.py"):
+                                                                                                                                                                                                                                        
+            name = os.path.splitext(os.path.basename(file))[0]
+
+            # Ignore __ files                                                                                                                                                                                                           
+            if name.startswith("__"):
+                continue
+            module = importlib.import_module("proto." + name)
+
+            for member in dir(module):
+                handler_class = getattr(module, member)
+                if handler_class and inspect.isclass(handler_class):
+                    if str(member) == proto_type:
+                        return handler_class
 
 
 def handler_factory(handle_callback, convert_from_any):
