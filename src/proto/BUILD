@@ -22,9 +22,8 @@ proto_library(
         "world.proto",
     ],
     deps = [
-        "@nanopb//:nanopb_options_proto",
         "//shared/parameter:dynamic_param_proto",
-        #"//shared/parameter:proto_params",
+        "@nanopb//:nanopb_options_proto",
     ],
 )
 
@@ -56,6 +55,7 @@ py_proto_library(
         "world.proto",
     ],
     deps = [
+        "//shared/parameter:dynamic_param_py_proto",
         "@nanopb//:nanopb_options_py_proto",
     ],
 )

@@ -1,8 +1,8 @@
 diff --git a/protobuf.bzl b/protobuf.bzl
-index 971612812..9aad16892 100644
+index 971612812..fc5be2529 100644
 --- a/protobuf.bzl
 +++ b/protobuf.bzl
-@@ -80,7 +80,14 @@ def _proto_gen_impl(ctx):
+@@ -80,9 +80,18 @@ def _proto_gen_impl(ctx):
      source_dir = _SourceDir(ctx)
      gen_dir = _GenDir(ctx).rstrip("/")
      if source_dir:
@@ -14,7 +14,12 @@ index 971612812..9aad16892 100644
 +            import_flags += ["-I" + source_dir]
 +        if has_generated:
 +            import_flags += ["-I" + gen_dir]
++        import_flags += ["-I" + "bazel-out/k8-fastbuild/bin"]
 +        import_flags = depset(direct=import_flags)
      else:
-         import_flags = depset(direct=["-I."])
+-        import_flags = depset(direct=["-I."])
++        import_flags = ["-I" + "bazel-out/k8-fastbuild/bin", "-I."]
++        import_flags = depset(direct=import_flags)
  
+     for dep in ctx.attr.deps:
+         if type(dep.proto.import_flags) == "list":

@@ -5,7 +5,7 @@ package TbotsProto;
 import "proto/geometry.proto";
 import "proto/primitive.proto";
 import "proto/world.proto";
-// import "shared/parameter/dynamic_parameters.proto";
+import "shared/parameter/dynamic_parameters.proto";
 
 message Tactic
 {
@@ -38,7 +38,7 @@ message AttackerTactic
     // of losing the ball to an enemy
     optional Point chip_target = 3;
     // Attacker config
-    // required AttackerTacticConfig attacker_tactic_config= 4;
+    required AttackerTacticConfig attacker_tactic_config = 4;
 }
 
 message ChipTactic
