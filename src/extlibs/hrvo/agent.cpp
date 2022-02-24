@@ -38,27 +38,27 @@ void Agent::update()
         velocity_ = velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / abs(dv));
     }
 
-    position_ += velocity_ * simulator_->timeStep_;
+    position_ += velocity_ * simulator_->time_step;
 
-    if (absSq(simulator_->goals_[goal_index_]->getCurrentGoalPosition() - position_) <
+    if (absSq(simulator_->goals[goal_index_]->getCurrentGoalPosition() - position_) <
         goal_radius_ * goal_radius_)
     {
         // Is at current goal position
-        if (simulator_->goals_[goal_index_]->isGoingToFinalGoal())
+        if (simulator_->goals[goal_index_]->isGoingToFinalGoal())
         {
             reached_goal_ = true;
         }
         else
         {
-            simulator_->goals_[goal_index_]->getNextGoalPostion();
+            simulator_->goals[goal_index_]->getNextGoalPostion();
             reached_goal_             = false;
-            simulator_->reachedGoals_ = false;
+            simulator_->reached_goals = false;
         }
     }
     else
     {
         reached_goal_             = false;
-        simulator_->reachedGoals_ = false;
+        simulator_->reached_goals = false;
     }
 }
 

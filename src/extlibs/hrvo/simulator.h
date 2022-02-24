@@ -68,9 +68,9 @@ class HRVOSimulator
     /**
      * Reset all friendly agents goal points to match the path of the given primitive set
      *
-     * @param primitive_set
+     * @param new_primitive_set
      */
-    void updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set);
+    void updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set);
 
     /**
      *      Adds a new Hybrid Reciprocal Agent to the simulation based on Robot.
@@ -129,7 +129,7 @@ class HRVOSimulator
                                   const Vector2 &curr_velocity, float max_speed,
                                   float max_accel, size_t goal_index, float goal_radius);
 
-    // TODO (#2373): Remove goals_ list when goal is a part of Agent
+    // TODO (#2373): Remove goals list when goal is a part of Agent
     /**
      *      Adds a new goal to the simulation.
      *
@@ -225,7 +225,7 @@ class HRVOSimulator
      */
     float getGlobalTime() const
     {
-        return globalTime_;
+        return global_time;
     }
 
     /**
@@ -235,7 +235,7 @@ class HRVOSimulator
      */
     std::size_t getNumAgents() const
     {
-        return agents_.size();
+        return agents.size();
     }
 
     /**
@@ -245,7 +245,7 @@ class HRVOSimulator
      */
     std::size_t getNumGoals() const
     {
-        return goals_.size();
+        return goals.size();
     }
 
     /**
@@ -255,7 +255,7 @@ class HRVOSimulator
      */
     float getTimeStep() const
     {
-        return timeStep_;
+        return time_step;
     }
 
     /**
@@ -265,55 +265,49 @@ class HRVOSimulator
      */
     bool haveReachedGoals() const
     {
-        return reachedGoals_;
+        return reached_goals;
     }
 
+private:
     unsigned int frame = 0;
 
-   public:
-    // The robot constants which all agents will use
-    RobotConstants_t robot_constants_;
-
-    // KdTree used to calculate the K nearest agents
-    std::unique_ptr<KdTree> kdTree_;
-
-    // The global time of this hrvo simulation
-    float globalTime_;
-
-    // The amount of time which the simulator should advance by
-    const float timeStep_;
-
-    // True if all agents have reached their destination
-    bool reachedGoals_;
-
-    // List of agents (robots) in this simulation
-    // TODO: Doesn't have to be unique_ptr
-    std::vector<std::shared_ptr<Agent>> agents_;
-    // TODO (#2373): Remove goals_ list when goal is a part of Agent
-    std::vector<std::unique_ptr<Goal>> goals_;
-
-   private:
-    // friendly robot id to agent index
-    // TODO: Update Agent ID to be a property (Agent ID == Robot ID), then use a map of
-    // Agents
-    //       - Problem: It is likely that there is a duplicate of every robot ID (friendly
-    //       and enemy robot)
-    //       - Possible Solution: Two arrays (friendly and enemy) of Agent shared_ptr. And
-    //       one Agents array with all Agents. Doesn't seem ideal though
-    std::map<unsigned int, unsigned int> friendly_robot_id_map;
-    std::map<unsigned int, unsigned int> enemy_robot_id_map;
-    std::size_t ball_agent_id = -1;  // Can size_t be negative?
-    float last_time_world_updated;
-
     // PrimitiveSet which includes the path which each friendly robot should take
-    TbotsProto::PrimitiveSet primitive_set_;
+    TbotsProto::PrimitiveSet primitive_set;
 
     // True if the ball should be treated as an agent (obstacle)
     // NOTE: This will take effect the next time we receive a world, and we know
     //       the current ball position and velocity
     bool add_ball_agent = false;
+    std::size_t ball_agent_id = -1;
+
+    // The robot constants which all agents will use
+    RobotConstants_t robot_constants;
+
+    // The global time of this hrvo simulation
+    float global_time;
+
+    // The amount of time which the simulator should advance by
+    const float time_step;
+
+    // The last time which the velocity of the robot was updated
+    float last_time_velocity_updated;
+
+    // True if all agents have reached their destination
+    bool reached_goals;
 
    public:
+    // KdTree used to calculate the K nearest agents
+    std::unique_ptr<KdTree> kd_tree;
+
+    // List of agents (robots) in this simulation
+    std::vector<std::shared_ptr<Agent>> agents;
+    // TODO (#2373): Remove goals list when goal is a part of Agent
+    std::vector<std::unique_ptr<Goal>> goals;
+
+    // robot id to agent index
+    std::map<unsigned int, unsigned int> friendly_robot_id_map;
+    std::map<unsigned int, unsigned int> enemy_robot_id_map;
+
     // The scale which friendly robots should be larger than friendly robots
     // This scale is used to avoid close encounters, and reduce chance of collision
     static constexpr float FRIENDLY_ROBOT_RADIUS_SCALE = 1.25f;

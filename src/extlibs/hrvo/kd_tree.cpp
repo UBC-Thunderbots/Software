@@ -42,14 +42,14 @@ KdTree::KdTree(HRVOSimulator *simulator) : simulator_(simulator) {}
 
 void KdTree::build()
 {
-    agents_.reserve(simulator_->agents_.size());
+    agents_.reserve(simulator_->agents.size());
 
-    for (std::size_t i = agents_.size(); i < simulator_->agents_.size(); ++i)
+    for (std::size_t i = agents_.size(); i < simulator_->agents.size(); ++i)
     {
         agents_.push_back(i);
     }
 
-    nodes_.resize(2 * simulator_->agents_.size() - 1);
+    nodes_.resize(2 * simulator_->agents.size() - 1);
 
     if (!agents_.empty())
     {
@@ -62,13 +62,13 @@ void KdTree::buildRecursive(std::size_t begin, std::size_t end, std::size_t node
     nodes_[node].begin_ = begin;
     nodes_[node].end_   = end;
     nodes_[node].minX_  = nodes_[node].maxX_ =
-        simulator_->agents_[agents_[begin]]->getPosition().getX();
+        simulator_->agents[agents_[begin]]->getPosition().getX();
     nodes_[node].minY_ = nodes_[node].maxY_ =
-        simulator_->agents_[agents_[begin]]->getPosition().getY();
+        simulator_->agents[agents_[begin]]->getPosition().getY();
 
     for (std::size_t i = begin + 1; i < end; ++i)
     {
-        float agent_x = simulator_->agents_[agents_[i]]->getPosition().getX();
+        float agent_x = simulator_->agents[agents_[i]]->getPosition().getX();
         if (agent_x > nodes_[node].maxX_)
         {
             nodes_[node].maxX_ = agent_x;
@@ -78,7 +78,7 @@ void KdTree::buildRecursive(std::size_t begin, std::size_t end, std::size_t node
             nodes_[node].minX_ = agent_x;
         }
 
-        float agent_y = simulator_->agents_[agents_[i]]->getPosition().getY();
+        float agent_y = simulator_->agents[agents_[i]]->getPosition().getY();
         if (agent_y > nodes_[node].maxY_)
         {
             nodes_[node].maxY_ = agent_y;
@@ -102,18 +102,18 @@ void KdTree::buildRecursive(std::size_t begin, std::size_t end, std::size_t node
         while (true)
         {
             while (left <= right &&
-                   (vertical ? simulator_->agents_[agents_[left]]->getPosition().getX()
-                             : simulator_->agents_[agents_[left]]->getPosition().getY()) <
-                       split)
+                    (vertical ? simulator_->agents[agents_[left]]->getPosition().getX()
+                             : simulator_->agents[agents_[left]]->getPosition().getY()) <
+                    split)
             {
                 ++left;
             }
 
             while (right >= left &&
-                   (vertical
-                        ? simulator_->agents_[agents_[right]]->getPosition().getX()
-                        : simulator_->agents_[agents_[right]]->getPosition().getY()) >=
-                       split)
+                    (vertical
+                        ? simulator_->agents[agents_[right]]->getPosition().getX()
+                        : simulator_->agents[agents_[right]]->getPosition().getY()) >=
+                    split)
             {
                 --right;
             }

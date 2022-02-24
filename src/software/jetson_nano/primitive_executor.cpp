@@ -78,32 +78,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
     const unsigned int robot_id, const RobotState& robot_state)
 {
     hrvo_simulator.doStep();
-
-    // Visualize velocity obstacles
-    // TODO: Make robot_id (1) a dynamic parameter for visualization
-    if (robot_id == 1)
-    {
-        TbotsProto::Obstacles obstacle_proto_;
-        for (auto& obstacle : hrvo_simulator.getRobotVelocityObstacles(1))
-        {
-            *(obstacle_proto_.add_polygon()) = *createPolygonProto(obstacle);
-        }
-
-        // Plot what HRVO Simulator sees
-        for (auto& agent : hrvo_simulator.agents_)
-        {
-            Point position(agent->getPosition().getX(), agent->getPosition().getY());
-            *(obstacle_proto_.add_circle()) =
-                *createCircleProto(Circle(position, agent->getRadius()));
-        }
-
-        // Plot candidate circles
-        for (auto& candidate_circle : hrvo_simulator.getRobotCandidateCircles(1))
-        {
-            *(obstacle_proto_.add_circle()) = *createCircleProto(candidate_circle);
-        }
-        LOG(VISUALIZE) << obstacle_proto_;
-    }
+    visualizeHRVOSimulator();
 
     switch (current_primitive_.primitive_case())
     {
@@ -161,6 +136,36 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
         }
     }
     return std::make_unique<TbotsProto::DirectControlPrimitive>();
+}
+
+void PrimitiveExecutor::visualizeHRVOSimulator()
+{
+    TbotsProto::Obstacles obstacle_proto_;
+
+    for (auto id_pair : hrvo_simulator.friendly_robot_id_map)
+    {
+        unsigned int agent_id = id_pair.second;
+        for (auto& obstacle : hrvo_simulator.getRobotVelocityObstacles(agent_id))
+        {
+            *(obstacle_proto_.add_polygon()) = *createPolygonProto(obstacle);
+        }
+
+        for (auto& agent : hrvo_simulator.agents)
+        {
+            Point position(agent->getPosition().getX(), agent->getPosition().getY());
+            *(obstacle_proto_.add_circle()) =
+                    *createCircleProto(Circle(position, agent->getRadius()));
+        }
+
+        for (auto& candidate_circle : hrvo_simulator.getRobotCandidateCircles(agent_id))
+        {
+            *(obstacle_proto_.add_circle()) = *createCircleProto(candidate_circle);
+        }
+    }
+    // TODO: Create a new HRVO visualization proto.
+    //       Ideally we send the velocity obstacles for all friendly agents, and we filter
+    //       the data in Thunderscope.
+    // LOG(VISUALIZE) << obstacle_proto_;
 }
 
 void PrimitiveExecutor::copyAutoChipOrKick(const TbotsProto::MovePrimitive& src,

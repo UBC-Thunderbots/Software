@@ -15,7 +15,7 @@ void LinearVelocityAgent::computeNewVelocity()
     // TODO: Check this logic, agents going past their goal point?
     // Preferring a velocity which points directly towards goal
     pref_velocity_ =
-        simulator_->goals_[goal_index_]->getCurrentGoalPosition() - position_;
+            simulator_->goals[goal_index_]->getCurrentGoalPosition() - position_;
 
     if (abs(pref_velocity_) > max_speed_)
     {

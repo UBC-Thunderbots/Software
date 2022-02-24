@@ -60,12 +60,12 @@ void HRVOAgent::computeNeighbors()
 {
     neighbors_.clear();
 
-    std::unique_ptr<Goal> &current_goal = simulator_->goals_[goal_index_];
+    std::unique_ptr<Goal> &current_goal = simulator_->goals[goal_index_];
     float new_neighbor_dist =
         std::min(neighborDist_,
                  abs(position_ - current_goal->getCurrentGoalPosition()) + goal_radius_);
 
-    simulator_->kdTree_->query(this, new_neighbor_dist);
+    simulator_->kd_tree->query(this, new_neighbor_dist);
 }
 
 Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
@@ -132,11 +132,11 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
         // apart from each other
         velocityObstacle.apex_ =
             0.5f * (other_agent.getVelocity() + velocity_) -
-            (uncertaintyOffset_ + 0.5f *
+                    (uncertaintyOffset_ + 0.5f *
                                       (other_agent.getRadius() + radius_ -
                                        abs(position_ - other_agent.getPosition())) /
-                                      simulator_->timeStep_) *
-                normalize(position_ - other_agent.getPosition());
+                                      simulator_->getTimeStep()) *
+                    normalize(position_ - other_agent.getPosition());
         velocityObstacle.side1_ = normal(other_agent.getPosition(), position_);
         velocityObstacle.side2_ = -velocityObstacle.side1_;
     }
@@ -154,7 +154,7 @@ double HRVOAgent::calculateVelocityCost(Vector2 &velocity,
     for (auto &[distance, neighbor_id] : neighbors_)
     {
         // TODO: Calculate VO here?
-        std::shared_ptr<Agent> other_agent = simulator_->agents_[neighbor_id];
+        std::shared_ptr<Agent> other_agent = simulator_->agents[neighbor_id];
         VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
         if (velocity_obstacle.containsVector(velocity))
         {
@@ -190,7 +190,7 @@ void HRVOAgent::computeNewVelocity()
     // Create Velocity Obstacles for neighbors
     for (const auto &neighbor : neighbors_)
     {
-        std::shared_ptr<Agent> other_agent = simulator_->agents_[neighbor.second];
+        std::shared_ptr<Agent> other_agent = simulator_->agents[neighbor.second];
         VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
         velocityObstacles_.push_back(velocity_obstacle);
     }
@@ -504,7 +504,7 @@ void HRVOAgent::computePreferredVelocity()
         return;
     }
 
-    std::unique_ptr<Goal> &nextGoal = simulator_->goals_[goal_index_];
+    std::unique_ptr<Goal> &nextGoal = simulator_->goals[goal_index_];
     Vector2 goalPosition            = nextGoal->getCurrentGoalPosition();
     float speedAtGoal               = nextGoal->getDesiredSpeedAtCurrentGoal();
     Vector2 distVectorToGoal        = goalPosition - position_;
@@ -549,14 +549,14 @@ void HRVOAgent::computePreferredVelocity()
 
 void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
 {
-    std::shared_ptr<Agent> other_agent = simulator_->agents_[agentNo];
+    std::shared_ptr<Agent> other_agent = simulator_->agents[agentNo];
 
     if (this != other_agent.get())
     {
         Vector2 other_agent_relative_pos = other_agent->getPosition() - position_;
         const float distSq               = absSq(other_agent_relative_pos);
 
-        Vector2 goal_pos = simulator_->goals_[goal_index_]->getCurrentGoalPosition();
+        Vector2 goal_pos = simulator_->goals[goal_index_]->getCurrentGoalPosition();
         Vector2 relative_goal_pos = goal_pos - position_;
 
         // Whether the other robot is with in 45 degrees of the goal, relative to us
