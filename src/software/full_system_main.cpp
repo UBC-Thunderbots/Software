@@ -1,6 +1,6 @@
 #include <boost/program_options.hpp>
 #include <chrono>
-#include <experimental/filesystem>
+#include <filesystem>
 #include <iostream>
 #include <numeric>
 
@@ -133,7 +133,7 @@ int main(int argc, char** argv)
             std::string time_string(time_c_str);
 
 
-            namespace fs = std::experimental::filesystem;
+            namespace fs = std::filesystem;
             // we want to log protos, make the parent directory and pass the
             // subdirectories to the ProtoLoggers for each message type
             fs::path proto_log_output_dir(args->getProtoLogOutputDir()->value());

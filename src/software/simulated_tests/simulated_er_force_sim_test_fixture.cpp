@@ -4,7 +4,7 @@
 #include <fenv.h>
 
 #include <cstdlib>
-#include <experimental/filesystem>
+#include <filesystem>
 
 #include "proto/message_translation/er_force_world.h"
 #include "proto/message_translation/ssl_wrapper.h"
@@ -108,7 +108,7 @@ void SimulatedErForceSimTestFixture::setupReplayLogging()
     // get the name of the current test to name the replay output directory
     auto test_name = ::testing::UnitTest::GetInstance()->current_test_info()->name();
 
-    namespace fs = std::experimental::filesystem;
+    namespace fs                                           = std::filesystem;
     static constexpr auto SIMULATED_TEST_OUTPUT_DIR_SUFFIX = "simulated_test_outputs";
 
     const char *test_outputs_dir_or_null = std::getenv("TEST_UNDECLARED_OUTPUTS_DIR");
@@ -212,6 +212,9 @@ void SimulatedErForceSimTestFixture::runTest(
     const std::vector<ValidationFunction> &non_terminating_validation_functions,
     const Duration &timeout)
 {
+    const Duration simulation_time_step =
+        Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
+
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
         field_type, create2015RobotConstants(), create2015WheelConstants(),
         friendly_thunderbots_config->getSimulatorConfig()));
@@ -219,6 +222,8 @@ void SimulatedErForceSimTestFixture::runTest(
     // TODO (#2419): remove this to re-enable sigfpe checks
     fedisableexcept(FE_INVALID | FE_OVERFLOW);
     simulator->setBallState(ball);
+    // step the simulator to make sure the ball is in position
+    simulator->stepSimulation(simulation_time_step);
     simulator->setYellowRobots(friendly_robots);
     simulator->setBlueRobots(enemy_robots);
     // TODO (#2419): remove this to re-enable sigfpe checks
@@ -227,17 +232,12 @@ void SimulatedErForceSimTestFixture::runTest(
     updateSensorFusion(simulator);
     std::shared_ptr<World> friendly_world;
     std::shared_ptr<World> enemy_world;
-    if (friendly_sensor_fusion.getWorld().has_value() &&
-        enemy_sensor_fusion.getWorld().has_value())
-    {
-        friendly_world =
-            std::make_shared<World>(friendly_sensor_fusion.getWorld().value());
-        enemy_world = std::make_shared<World>(enemy_sensor_fusion.getWorld().value());
-    }
-    else
-    {
-        FAIL() << "Invalid initial world state";
-    }
+    CHECK(friendly_sensor_fusion.getWorld().has_value())
+        << "Invalid friendly world state" << std::endl;
+    CHECK(enemy_sensor_fusion.getWorld().has_value())
+        << "Invalid enemy world state" << std::endl;
+    friendly_world = std::make_shared<World>(friendly_sensor_fusion.getWorld().value());
+    enemy_world    = std::make_shared<World>(enemy_sensor_fusion.getWorld().value());
 
     for (const auto &validation_function : terminating_validation_functions)
     {
@@ -252,9 +252,6 @@ void SimulatedErForceSimTestFixture::runTest(
     }
 
     const Timestamp timeout_time = simulator->getTimestamp() + timeout;
-    const Duration simulation_time_step =
-        Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
-
 
     double speed_factor         = 1 / (TbotsGtestMain::test_speed);
     const Duration ai_time_step = Duration::fromSeconds(
@@ -368,6 +365,31 @@ void SimulatedErForceSimTestFixture::runTest(
 
         // Output the statistics for ball and robots
         LOG(INFO) << "max ball displacement: " << ball_displacement_stats.maximum
+        validation_functions_done = tickTest(simulation_time_step, ai_time_step,
+                                             friendly_world, enemy_world, simulator);
+    }
+    // Output the tick duration results
+    if (friendly_tick_count > 0)
+    {
+        double avg_friendly_tick_duration =
+            total_friendly_tick_duration / friendly_tick_count;
+        LOG(INFO) << "max friendly tick duration: " << max_friendly_tick_duration << "ms"
+                  << std::endl;
+        LOG(INFO) << "min friendly tick duration: " << min_friendly_tick_duration << "ms"
+                  << std::endl;
+        LOG(INFO) << "avg friendly tick duration: " << avg_friendly_tick_duration << "ms"
+                  << std::endl;
+    }
+    else
+    {
+        LOG(WARNING) << "Primitives were never updated for the friendly robots"
+                     << std::endl;
+    }
+
+    if (enemy_tick_count > 0)
+    {
+        double avg_enemy_tick_duration = total_enemy_tick_duration / enemy_tick_count;
+        LOG(INFO) << "max enemy tick duration: " << max_enemy_tick_duration << "ms"
                   << std::endl;
         LOG(INFO) << "min ball displacement: " << ball_displacement_stats.minimum
                   << std::endl;

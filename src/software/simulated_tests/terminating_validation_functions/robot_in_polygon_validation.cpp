@@ -3,30 +3,29 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/logger/logger.h"
 
-void robotInPolygon(RobotId robot_id, Polygon polygon, std::shared_ptr<World> world_ptr,
+void robotInPolygon(Polygon polygon, int count, std::shared_ptr<World> world_ptr,
                     ValidationCoroutine::push_type& yield)
 {
-    auto robot_in_polygon = [robot_id, polygon](std::shared_ptr<World> world_ptr) {
-        std::optional<Robot> robot_optional =
-            world_ptr->friendlyTeam().getRobotById(robot_id);
-        CHECK(robot_optional.has_value())
-            << "There is no robot with ID: " + std::to_string(robot_id);
-
-        Point position = robot_optional.value().position();
-        return contains(polygon, position);
+    auto num_robots_in_polygon = [polygon](std::shared_ptr<World> world_ptr) {
+        std::vector<Robot> robots = world_ptr->friendlyTeam().getAllRobots();
+        int total                 = 0;
+        for (Robot robot : robots)
+        {
+            Point position = robot.position();
+            if (contains(polygon, position))
+            {
+                total++;
+            }
+        }
+        return total;
     };
 
-    while (!robot_in_polygon(world_ptr))
+    while (num_robots_in_polygon(world_ptr) < count)
     {
-        std::optional<Robot> robot_optional =
-            world_ptr->friendlyTeam().getRobotById(robot_id);
-
         std::stringstream ss_poly;
         ss_poly << polygon;
-        std::stringstream ss_position;
-        ss_position << robot_optional.value().position();
 
-        yield("Robot with ID " + std::to_string(robot_id) + " has not entered the " +
-              ss_poly.str() + ". Actual position is " + ss_position.str() + ".");
+        yield("There were not " + std::to_string(count) + " robots simultaneously in " +
+              ss_poly.str());
     }
 }

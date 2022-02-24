@@ -100,7 +100,7 @@ TEST(PolygonExpandTest, test_invalid_modifier)
         EXPECT_EQ(poly.expand(-2), expected);
         GTEST_FAIL();
     }
-    catch (std::invalid_argument e)
+    catch (const std::invalid_argument& e)
     {
         GTEST_SUCCEED();
     }
