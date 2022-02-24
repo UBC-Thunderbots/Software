@@ -40,9 +40,10 @@ class StandaloneSimulatorWrapper(object):
 
         # TODO change to er_force_sim_main
         self.standalone_simulator = Popen(
-                        ['software/simulation/standalone_er_force_simulator_main'],
-                        stdout=PIPE, stderr=PIPE
-                    )
+            ["software/simulation/standalone_er_force_simulator_main"],
+            stdout=PIPE,
+            stderr=PIPE,
+        )
 
     def __setup_robots(self, robot_locations, team_colour):
         """Initializes the world from a list of robot locations

@@ -193,7 +193,7 @@ py_test(
         "standalone_simulator_wrapper.py",
     ],
     data = [
-        "//software/simulation:standalone_er_force_simulator_main"
+        "//software/simulation:standalone_er_force_simulator_main",
     ],
     deps = [
         "//proto:software_py_proto",

@@ -19,6 +19,25 @@ message EstopPrimitive {}
 
 message MovePrimitive
 {
+    enum BallCollisionType
+    {
+        ALLOW = 0;
+        AVOID = 1;
+    }
+
+    enum DribblerMode
+    {
+        OFF        = 0;
+        INDEFINITE = 1;
+        MAX_FORCE  = 2;
+    }
+
+    enum MaxAllowedSpeedMode
+    {
+        PHYSICAL_LIMIT = 0;
+        STOP_COMMAND   = 1;
+    }
+
     message AutoChipOrKick
     {
         oneof auto_chip_or_kick
