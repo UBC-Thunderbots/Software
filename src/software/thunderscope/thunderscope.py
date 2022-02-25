@@ -55,6 +55,7 @@ if __name__ == "__main__":
     def update():
         field.refresh()
         logs.refresh()
+        chicker_widget.refresh()
 
     timer = QtCore.QTimer()
     timer.timeout.connect(update)

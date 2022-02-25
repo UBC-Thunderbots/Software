@@ -18,15 +18,17 @@ class ChickerWidget(QWidget):
         grid.addWidget(self.createSlider("Geneva Slider", 0, 5, 1), 2, 0, 1, 3)
         grid.addWidget(self.createSlider("Power Slider", 0, 100, 10), 3, 0, 1, 3)
         self.setLayout(grid)
+        self.grid = grid
 
     def createButton(self, text):
         groupBox = QGroupBox()
         button = QPushButton(text)
         groupBox.setStyleSheet("color: white")
         button.setStyleSheet("color: black")
-
-        # to disable the button: button.setEnabled(False)
-        # we need to also change the color manually when disabling the button (use background-color: grey)
+        button.setCheckable(True)
+        # button.toggle()
+        if text != "Charge":
+            button.setStyleSheet("background-color: grey")
 
         vbox = QVBoxLayout()
         vbox.addWidget(button)
@@ -41,10 +43,8 @@ class ChickerWidget(QWidget):
         slider = QSlider(Qt.Horizontal)
         slider.setMinimum(minVal)
         slider.setMaximum(maxVal)
-        # slider.setFocusPolicy(Qt.StrongFocus)
         slider.setTickPosition(QSlider.TicksBothSides)
         slider.setTickInterval(tickSpacing)
-        # slider.setSingleStep(5)
         groupBox.setStyleSheet("color: white")
 
         vbox = QVBoxLayout()
@@ -53,3 +53,37 @@ class ChickerWidget(QWidget):
         groupBox.setLayout(vbox)
 
         return groupBox
+
+    def refresh(self):
+        # iterate over all items in grid
+
+        for button in self.grid.parentWidget().findChildren(QPushButton):
+            if button.text() == "Charge" and button.isChecked():
+                button.toggle()
+                print("charge clicked")
+                for otherButton in self.grid.parentWidget().findChildren(QPushButton):
+                    otherButton.setStyleSheet("color: black")
+                    if otherButton.text() != "Charge":
+                        otherButton.setStyleSheet("background-color: White")
+                    else:
+                        otherButton.setStyleSheet("background-color: Grey")
+
+            elif button.text() != "Charge" and button.isChecked():
+                button.toggle()
+                print("other button clicked")
+                for otherButton in self.grid.parentWidget().findChildren(QPushButton):
+                    otherButton.setStyleSheet("color: black")
+                    if otherButton.text() == "Charge":
+                        otherButton.setStyleSheet("background-color: White")
+                    else:
+                        otherButton.setStyleSheet("background-color: Grey")
+            """
+
+        for button in self.grid.parentWidget().findChildren(QPushButton):
+            if button.text() == "Charge" and button.isChecked():
+                print("can click")
+
+            elif button.text() == "Charge" and not button.isChecked():
+                print("disabled")
+        
+        """
