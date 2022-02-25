@@ -128,6 +128,12 @@ class Agent
     void setPosition(const Vector2 &position);
 
     /**
+     * Update radius of Agent
+     * @param radius New radius
+     */
+    void setRadius(float radius);
+
+    /**
      * Update the velocity of Agent
      * @param velocity New velocity
      */

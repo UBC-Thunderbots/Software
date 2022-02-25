@@ -345,7 +345,7 @@ class HRVOSimulator
     // The scale multiple of max robot speed which the preferred speed will be set at.
     // pref_speed = max_speed * PREF_SPEED_SCALE
     // NOTE: This scale multiple must be <= 1
-    static constexpr float PREF_SPEED_SCALE = 1.f;
+    static constexpr float PREF_SPEED_SCALE = 0.85f;
 
     // The maximum distance which HRVO Agents will look for neighbors, in meters.
     // A large radius picked to allow for far visibility of neighbors so Agents have

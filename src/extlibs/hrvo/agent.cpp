@@ -116,3 +116,8 @@ void Agent::setMaxSpeed(float max_speed)
 {
     max_speed_ = max_speed;
 }
+
+void Agent::setRadius(float radius)
+{
+    radius_ = radius;
+}

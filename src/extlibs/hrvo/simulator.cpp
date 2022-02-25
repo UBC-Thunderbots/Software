@@ -172,12 +172,18 @@ void HRVOSimulator::updateWorld(const World &world)
             agents[ball_agent_id]->setPosition(Vector2(position.x(), position.y()));
         }
     }
+    else if (ball_agent_id != -1)
+    {
+        agents[ball_agent_id]->setRadius(0.f);
+    }
 }
 
 void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set)
 {
     primitive_set = new_primitive_set;
 
+    // TODO (#2498): Dynamically add and remove the ball as an Agent, and if needed
+    //               update its radius based on the PrimitiveSet
     add_ball_agent = primitive_set.stay_away_from_ball();
 
     // Update all friendly agent's goal points based on the matching robot's primitive
