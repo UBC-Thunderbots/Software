@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
+#include <memory>
 #include "extlibs/hrvo/vector2.h"
+#include "extlibs/hrvo/path_point.h"
 
 class PathPoint;
 
@@ -13,18 +15,16 @@ class Path {
         //explicit Path(const PathPoint &path_point); 
         //explicit Path(const PathPoint &pathPoint, float goal_radius);
         
-        Vector2 getNextGoalPostion();
+        Vector2 getNextGoalPosition();
         Vector2 getCurrentGoalPosition();
         float getDesiredSpeedAtCurrentGoal();
         bool isGoingToFinalGoal();
         float goal_radius;
+        unsigned int getGoalIndex() const;
+        std::vector<PathPoint> getPathVec() const;
 
     private:
         std::vector<PathPoint> path;
-
-        //TODO: snake_case
-        
         unsigned int curr_goal_index = 0;
-
 
 };

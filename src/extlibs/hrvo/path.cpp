@@ -10,8 +10,9 @@ Path::Path() {
     
     goal_radius = 0.0f;
     Vector2 vector = Vector2();
-    PathPoint pathpoint = PathPoint(vector);
-    path.push_back(pathpoint);
+    PathPoint path_point(vector);
+    path.push_back(path_point);
+
 }
 
 Path::Path(const std::vector<PathPoint> &path_points, float goal_radius_) {
@@ -19,19 +20,7 @@ Path::Path(const std::vector<PathPoint> &path_points, float goal_radius_) {
     goal_radius = goal_radius_;
 }
 
-/*
-Path::Path(const PathPoint &path_point) {
-    goalRadius_ = 0.0f;
-    path.push_back(path_point);
-}
-
-Path::Path(const PathPoint &path_point, float goalRadius) {
-    goalRadius_ = goalRadius;
-    path.push_back(path_point);
-}
-*/
-
-Vector2 Path::getNextGoalPostion() {
+Vector2 Path::getNextGoalPosition() {
     curr_goal_index++;
     return getCurrentGoalPosition();
 }
@@ -67,4 +56,13 @@ bool Path::isGoingToFinalGoal() {
         return true;
     }
     return false;
+}
+
+// TODO: remove
+unsigned int Path::getGoalIndex() const {
+    return curr_goal_index;
+}
+
+std::vector<PathPoint> Path::getPathVec() const {
+    return path;
 }

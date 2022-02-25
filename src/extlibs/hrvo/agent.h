@@ -1,6 +1,7 @@
 #pragma once
 
 #include "extlibs/hrvo/vector2.h"
+#include "extlibs/hrvo/path.h"
 
 class Simulator;
 
@@ -20,12 +21,12 @@ class Agent
      * @param prefVelocity       The preferred velocity of this agent.
      * @param maxSpeed           The maximum speed of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
-     * @param goalIndex          The index of the Goal which this agent should go to.
+     * @peram path               The path for this agent
      * @param goalRadius         The goal radius of this agent.
      */
     Agent(Simulator *simulator, const Vector2 &position, float radius,
           const Vector2 &velocity, const Vector2 &prefVelocity, float maxSpeed,
-          float maxAccel, std::size_t goalIndex, float goalRadius);
+          float maxAccel, Path &path);
 
     virtual ~Agent() = default;
 
@@ -121,7 +122,9 @@ class Agent
      */
     bool hasReachedGoal() const;
 
-   protected:
+    Path getPath();
+
+protected:
     // Agent Properties
     Vector2 position_;
     float radius_;
@@ -133,11 +136,15 @@ class Agent
     // The desired new velocity of this Agent
     Vector2 pref_velocity_;
 
+    Path path;
+
     float max_speed_;
     float max_accel_;
 
-    std::size_t goal_index_;
-    float goal_radius_;
+    //TODO: We can remove this
+    //std::size_t goal_index_;
+    //float goal_radius_;
+
     bool reached_goal_;
 
     // TODO (#2373): Remove once new Path class is added and add timeStep as a argument to

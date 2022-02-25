@@ -41,12 +41,12 @@
 #include "kd_tree.h"
 
 
-HRVOAgent::HRVOAgent(Simulator *simulator, const Vector2 &position, std::size_t goalIndex,
+HRVOAgent::HRVOAgent(Simulator *simulator, const Vector2 &position,
                      float neighborDist, std::size_t maxNeighbors, float radius,
-                     const Vector2 &velocity, float maxAccel, float goalRadius,
+                     const Vector2 &velocity, float maxAccel, Path &path,
                      float prefSpeed, float maxSpeed, float uncertaintyOffset)
     : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel,
-            goalIndex, goalRadius),
+            path),
       maxNeighbors_(maxNeighbors),
       neighborDist_(neighborDist),
       prefSpeed_(prefSpeed),
@@ -58,10 +58,11 @@ void HRVOAgent::computeNeighbors()
 {
     neighbors_.clear();
 
-    std::unique_ptr<Goal> &current_goal = simulator_->goals_[goal_index_];
+    //std::unique_ptr<Goal> &current_goal = simulator_->goals_[goal_index_];
+
     float new_neighbor_dist =
         std::min(neighborDist_,
-                 abs(position_ - current_goal->getCurrentGoalPosition()) + goal_radius_);
+                 abs(position_ - path.getCurrentGoalPosition()) + path.goal_radius);
 
     simulator_->kdTree_->query(this, new_neighbor_dist);
 }
@@ -444,9 +445,9 @@ void HRVOAgent::computePreferredVelocity()
         return;
     }
 
-    std::unique_ptr<Goal> &nextGoal = simulator_->goals_[goal_index_];
-    Vector2 goalPosition            = nextGoal->getCurrentGoalPosition();
-    float speedAtGoal               = nextGoal->getDesiredSpeedAtCurrentGoal();
+    //std::unique_ptr<Goal> &nextGoal = simulator_->goals_[goal_index_];
+    Vector2 goalPosition            = path.getCurrentGoalPosition();
+    float speedAtGoal               = path.getDesiredSpeedAtCurrentGoal();
     Vector2 distVectorToGoal        = goalPosition - position_;
     auto distToGoal = static_cast<float>(std::sqrt(std::pow(distVectorToGoal.getX(), 2) +
                                                    std::pow(distVectorToGoal.getY(), 2)));
@@ -496,7 +497,7 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
         Vector2 other_agent_relative_pos = other_agent->getPosition() - position_;
         const float distSq               = absSq(other_agent_relative_pos);
 
-        Vector2 goal_pos = simulator_->goals_[goal_index_]->getCurrentGoalPosition();
+        Vector2 goal_pos = path.getCurrentGoalPosition();
         Vector2 relative_goal_pos = goal_pos - position_;
 
         // Whether the other robot is with in 45 degrees of the goal, relative to us

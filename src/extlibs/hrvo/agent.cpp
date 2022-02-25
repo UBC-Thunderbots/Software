@@ -1,10 +1,12 @@
 #include "agent.h"
 
 #include "extlibs/hrvo/simulator.h"
+#include "extlibs/hrvo/path.h"
+
 //std::size_t goalIndex,
 Agent::Agent(Simulator *simulator, const Vector2 &position, float radius,
              const Vector2 &velocity, const Vector2 &prefVelocity, float maxSpeed,
-             float maxAccel, Path path, float goalRadius)
+             float maxAccel, Path &path)
     : simulator_(simulator),
       position_(position),
       radius_(radius),
@@ -13,8 +15,8 @@ Agent::Agent(Simulator *simulator, const Vector2 &position, float radius,
       max_speed_(maxSpeed),
       max_accel_(maxAccel),
       //goal_index_(goalIndex),
-      Path(path),
-      goal_radius_(goalRadius),
+      path(path),
+      //goal_radius_(goalRadius),
       reached_goal_(false)
 {
 }
@@ -41,17 +43,17 @@ void Agent::update()
 
     position_ += velocity_ * simulator_->timeStep_;
 
-    if (absSq(simulator_->goals_[goal_index_]->getCurrentGoalPosition() - position_) <
-        goal_radius_ * goal_radius_)
+    if (absSq(path.getCurrentGoalPosition() - position_) <
+        path.goal_radius * path.goal_radius)
     {
         // Is at current goal position
-        if (simulator_->goals_[goal_index_]->isGoingToFinalGoal())
+        if (path.isGoingToFinalGoal())
         {
             reached_goal_ = true;
         }
         else
         {
-            simulator_->goals_[goal_index_]->getNextGoalPostion();
+            path.getNextGoalPosition();
             reached_goal_             = false;
             simulator_->reachedGoals_ = false;
         }
@@ -88,9 +90,10 @@ const Vector2 &Agent::getPrefVelocity() const
     return pref_velocity_;
 }
 
+//TODO: change
 size_t Agent::getGoalIndex() const
 {
-    return goal_index_;
+    return path.getGoalIndex(); //warning curr_goal_index return type is unsigned int
 }
 
 bool Agent::hasReachedGoal() const
@@ -98,7 +101,13 @@ bool Agent::hasReachedGoal() const
     return reached_goal_;
 }
 
+//TODO: change
 float Agent::getGoalRadius() const
 {
-    return goal_radius_;
+    return path.goal_radius;
+}
+
+Path Agent::getPath()
+{
+    return path;
 }

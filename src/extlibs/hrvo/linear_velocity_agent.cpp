@@ -3,17 +3,16 @@
 LinearVelocityAgent::LinearVelocityAgent(Simulator *simulator, const Vector2 &position,
                                          float radius, const Vector2 &velocity,
                                          float maxSpeed, float maxAccel,
-                                         std::size_t goal_index, float goalRadius)
+                                         Path &path)
     : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel,
-            goal_index, goalRadius)
+            path)
 {
 }
 
 void LinearVelocityAgent::computeNewVelocity()
 {
     // Preferring a velocity which points directly towards goal
-    pref_velocity_ =
-        simulator_->goals_[goal_index_]->getCurrentGoalPosition() - position_;
+    pref_velocity_ = path.getCurrentGoalPosition() - position_;
 
     if (abs(pref_velocity_) > max_speed_)
     {

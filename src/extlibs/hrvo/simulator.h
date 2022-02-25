@@ -103,8 +103,7 @@ class Simulator
      */
     std::size_t addHRVOAgent(const Vector2 &position, float agent_radius,
                              const Vector2 &curr_velocity, float maxSpeed,
-                             float prefSpeed, float maxAccel, std::size_t goal_index,
-                             float goalRadius, float neighborDist,
+                             float prefSpeed, float maxAccel, Path &path, float neighborDist,
                              std::size_t maxNeighbors, float uncertaintyOffset);
 
     /**
@@ -120,7 +119,7 @@ class Simulator
      */
     size_t addLinearVelocityAgent(const Vector2 &position, float agent_radius,
                                   const Vector2 &curr_velocity, float max_speed,
-                                  float max_accel, size_t goal_index, float goal_radius);
+                                  float max_accel, Path &path);
 
     // TODO (#2373): Remove goals_ list when goal is a part of Agent
     /**
@@ -133,6 +132,8 @@ class Simulator
     std::size_t addGoalPositions(const std::vector<Vector2> &positions);
     std::size_t addGoalPositions(const std::vector<Vector2> &positions,
                                  const std::vector<float> &speedAtPosition);
+
+    Path addPath(const Vector2 &position, float goal_radius);
 
     /**
      * Performs a simulation step; updates the position, and velocity
@@ -215,15 +216,16 @@ class Simulator
         return agents_.size();
     }
 
+    //TODO: never used
     /**
      *   Returns the count of goals in the simulation.
      *
      * @return The count of goals in the simulation.
      */
-    std::size_t getNumGoals() const
-    {
-        return goals_.size();
-    }
+//    std::size_t getNumGoals() const
+//    {
+//        return goals_.size();
+//    }
 
     /**
      *   Returns the time step of the simulation.
@@ -261,7 +263,7 @@ class Simulator
     // List of agents (robots) in this simulation
     std::vector<std::unique_ptr<Agent>> agents_;
     // TODO (#2373): Remove goals_ list when goal is a part of Agent
-    std::vector<std::unique_ptr<Goal>> goals_;
+    // std::vector<std::unique_ptr<Goal>> goals_;
 
    private:
     // friendly robot id to agent index
