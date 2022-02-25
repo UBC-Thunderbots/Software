@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     # Setup 'Chicker' widget
     chicker_widget = ChickerWidget()
-    chicker_dock = Dock("chicker", size=(100,100))
+    chicker_dock = Dock("Chicker", size=(100,100))
     chicker_dock.addWidget(chicker_widget)
 
     # Configure Docks
