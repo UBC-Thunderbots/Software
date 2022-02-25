@@ -23,7 +23,12 @@ const std::map<RobotId, std::optional<Path>> VelocityObstaclePathManager::getMan
     for (auto const &current_objective : objectives)
     {
         // find path with relevant obstacles
-        std::vector<ObstaclePtr> path_obstacles = current_objective.obstacles;
+        std::vector<ObstaclePtr> path_obstacles =
+            getObstaclesAroundStartOfOtherObjectives(objectives, current_objective);
+        path_obstacles.insert(path_obstacles.end(), current_velocity_obstacles.begin(),
+                              current_velocity_obstacles.end());
+        path_obstacles.insert(path_obstacles.end(), current_objective.obstacles.begin(),
+                              current_objective.obstacles.end());
         path_planning_obstacles.insert(path_planning_obstacles.end(),
                                        path_obstacles.begin(), path_obstacles.end());
         auto path = path_planner->findPath(current_objective.start, current_objective.end,
