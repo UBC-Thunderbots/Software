@@ -155,6 +155,15 @@ class Vector final
     double cross(const Vector &other) const;
 
     /**
+     * Calculates the determinant of a 2x2 matrix
+     *
+     * @param other Vector forming the bottom row of the matrix
+     *
+     * @return the determinant with rows from the specified vectors
+     */
+    double det(const Vector &other) const;
+
+    /**
      * Returns the direction of this Vector
      *
      * @return the direction of this Vector, in the range [-π, π], with 0 being

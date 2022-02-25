@@ -90,8 +90,8 @@ void Simulator::updateWorld(const World &world)
                                           enemy_robot.velocity() * 5);
         }
 
-        Vector2 goal_position(static_cast<float>(intersection_point_set.begin()->x()),
-                              static_cast<float>(intersection_point_set.begin()->y()));
+        Vector goal_position(static_cast<float>(intersection_point_set.begin()->x()),
+                             static_cast<float>(intersection_point_set.begin()->y()));
         addLinearVelocityRobotAgent(enemy_robot, goal_position);
     }
 
@@ -99,14 +99,14 @@ void Simulator::updateWorld(const World &world)
     {
         // Ball should be treated as an agent (obstacle)
         const Ball &ball = world.ball();
-        Vector2 position(ball.position().x(), ball.position().y());
-        Vector2 velocity(ball.velocity().x(), ball.velocity().y());
-        Vector2 goal_pos   = position + 100 * velocity;
+        Vector position(ball.position().x(), ball.position().y());
+        Vector velocity(ball.velocity().x(), ball.velocity().y());
+        Vector goal_pos    = position + 100 * velocity;
         float acceleration = ball.acceleration().length();
         // Minimum of 0.5-meter distance away from the ball, if the ball is an obstacle
         float ball_radius = 0.5f + BALL_AGENT_RADIUS_OFFSET;
 
-        addLinearVelocityAgent(position, ball_radius, velocity, abs(velocity),
+        addLinearVelocityAgent(position, ball_radius, velocity, (velocity).length(),
                                acceleration, addGoal(goal_pos), 0.1f);
     }
 }
@@ -145,9 +145,9 @@ void Simulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set
 
 std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
 {
-    Vector2 position(static_cast<float>(robot.position().x()),
-                     static_cast<float>(robot.position().y()));
-    Vector2 velocity;
+    Vector position(static_cast<float>(robot.position().x()),
+                    static_cast<float>(robot.position().y()));
+    Vector velocity;
     float agent_radius = ROBOT_MAX_RADIUS_METERS * FRIENDLY_ROBOT_RADIUS_SCALE;
     float max_accel    = 1e-4;
     float pref_speed   = 1e-4;
@@ -159,8 +159,8 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
                     unavailable_capabilities.end();
     if (can_move)
     {
-        velocity   = Vector2(static_cast<float>(robot.velocity().x()),
-                           static_cast<float>(robot.velocity().y()));
+        velocity   = Vector(static_cast<float>(robot.velocity().x()),
+                          static_cast<float>(robot.velocity().y()));
         max_accel  = robot.robotConstants().robot_max_acceleration_m_per_s_2;
         max_speed  = robot.robotConstants().robot_max_speed_m_per_s;
         pref_speed = max_speed * PREF_SPEED_SCALE;
@@ -173,7 +173,7 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
     // Get this robot's destination point, if it has a primitive
     // If this robot does not have a primitive, then set its current position as its
     // destination
-    Vector2 destination_point  = position;
+    Vector destination_point   = position;
     auto &robot_primitives     = *primitive_set_.mutable_robot_primitives();
     const auto &primitive_iter = robot_primitives.find(robot.id());
     if (primitive_iter != robot_primitives.end())
@@ -184,8 +184,8 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
         {
             destination_point_proto = primitive.mutable_move()->destination();
             destination_point =
-                Vector2(static_cast<float>(destination_point_proto.x_meters()),
-                        static_cast<float>(destination_point_proto.y_meters()));
+                Vector(static_cast<float>(destination_point_proto.x_meters()),
+                       static_cast<float>(destination_point_proto.y_meters()));
         }
     }
 
@@ -195,13 +195,13 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
 }
 
 std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot,
-                                                   const Vector2 &destination)
+                                                   const Vector &destination)
 {
-    // TODO (#2371): Replace Vector2 with Vector
-    Vector2 position(static_cast<float>(robot.position().x()),
-                     static_cast<float>(robot.position().y()));
-    Vector2 velocity(static_cast<float>(robot.velocity().x()),
-                     static_cast<float>(robot.velocity().y()));
+    // TODO (#2371): Replace Vector with Vector
+    Vector position(static_cast<float>(robot.position().x()),
+                    static_cast<float>(robot.position().y()));
+    Vector velocity(static_cast<float>(robot.velocity().x()),
+                    static_cast<float>(robot.velocity().y()));
     float max_accel = 0.f;
     float max_speed = robot.robotConstants().robot_max_speed_m_per_s;
 
@@ -215,8 +215,8 @@ std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot,
                                   addGoal(destination), goal_radius);
 }
 
-std::size_t Simulator::addHRVOAgent(const Vector2 &position, float agent_radius,
-                                    const Vector2 &curr_velocity, float maxSpeed,
+std::size_t Simulator::addHRVOAgent(const Vector &position, float agent_radius,
+                                    const Vector &curr_velocity, float maxSpeed,
                                     float prefSpeed, float maxAccel,
                                     std::size_t goal_index, float goalRadius,
                                     float neighborDist, std::size_t maxNeighbors,
@@ -229,8 +229,8 @@ std::size_t Simulator::addHRVOAgent(const Vector2 &position, float agent_radius,
     return agents_.size() - 1;
 }
 
-size_t Simulator::addLinearVelocityAgent(const Vector2 &position, float agent_radius,
-                                         const Vector2 &curr_velocity, float max_speed,
+size_t Simulator::addLinearVelocityAgent(const Vector &position, float agent_radius,
+                                         const Vector &curr_velocity, float max_speed,
                                          float max_accel, size_t goal_index,
                                          float goal_radius)
 {
@@ -242,7 +242,7 @@ size_t Simulator::addLinearVelocityAgent(const Vector2 &position, float agent_ra
     return agents_.size() - 1;
 }
 
-std::size_t Simulator::addGoal(const Vector2 &position)
+std::size_t Simulator::addGoal(const Vector &position)
 {
     std::unique_ptr<Goal> goal = std::make_unique<Goal>(position);
     goals_.push_back(std::move(goal));
@@ -250,7 +250,7 @@ std::size_t Simulator::addGoal(const Vector2 &position)
     return goals_.size() - 1;
 }
 
-std::size_t Simulator::addGoalPositions(const std::vector<Vector2> &positions)
+std::size_t Simulator::addGoalPositions(const std::vector<Vector> &positions)
 {
     std::unique_ptr<Goal> goal = std::make_unique<Goal>(positions);
     goals_.push_back(std::move(goal));
@@ -258,7 +258,7 @@ std::size_t Simulator::addGoalPositions(const std::vector<Vector2> &positions)
     return goals_.size() - 1;
 }
 
-std::size_t Simulator::addGoalPositions(const std::vector<Vector2> &positions,
+std::size_t Simulator::addGoalPositions(const std::vector<Vector> &positions,
                                         const std::vector<float> &speedAtPosition)
 {
     std::unique_ptr<Goal> goal = std::make_unique<Goal>(positions, speedAtPosition);
@@ -302,7 +302,7 @@ float Simulator::getAgentMaxAccel(std::size_t agentNo) const
     return agents_[agentNo]->getMaxAccel();
 }
 
-Vector2 Simulator::getAgentPosition(std::size_t agentNo) const
+Vector Simulator::getAgentPosition(std::size_t agentNo) const
 {
     return agents_[agentNo]->getPosition();
 }
@@ -317,12 +317,12 @@ bool Simulator::hasAgentReachedGoal(std::size_t agentNo) const
     return agents_[agentNo]->hasReachedGoal();
 }
 
-Vector2 Simulator::getAgentVelocity(std::size_t agentNo) const
+Vector Simulator::getAgentVelocity(std::size_t agentNo) const
 {
     return agents_[agentNo]->getVelocity();
 }
 
-Vector2 Simulator::getAgentPrefVelocity(std::size_t agentNo) const
+Vector Simulator::getAgentPrefVelocity(std::size_t agentNo) const
 {
     return agents_[agentNo]->getPrefVelocity();
 }
