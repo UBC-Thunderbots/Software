@@ -161,7 +161,7 @@ TEST_P(CreaseDefenderTacticTest, crease_defender_test)
             unsigned num_ticks = 1000;
             for (unsigned i = 0; i < num_ticks; i++)
             {
-                robotInPolygon(0, defender_regions[target_defend_region], world_ptr,
+                robotInPolygon(defender_regions[target_defend_region], 1, world_ptr,
                                yield);
             }
         }};
