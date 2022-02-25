@@ -78,7 +78,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
     const unsigned int robot_id, const RobotState& robot_state)
 {
     hrvo_simulator.doStep();
-    if (robot_id == 0)
+    if (robot_id == 1)
     {
         // All robots should have identical HRVO simulations. To avoid spam, only
         // the HRVO simulation for robot 0 will be sent to Thunderscope.

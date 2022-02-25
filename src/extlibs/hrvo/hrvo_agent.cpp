@@ -65,7 +65,7 @@ void HRVOAgent::computeNeighbors()
         std::min(neighborDist_,
                  abs(position_ - current_goal->getCurrentGoalPosition()) + goal_radius_);
 
-    simulator_->kd_tree->query(this, new_neighbor_dist);
+    simulator_->getKdTree()->query(this, new_neighbor_dist);
 }
 
 Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
@@ -154,7 +154,7 @@ double HRVOAgent::calculateVelocityCost(Vector2 &velocity,
     for (auto &[distance, neighbor_id] : neighbors_)
     {
         // TODO: Calculate VO here?
-        std::shared_ptr<Agent> other_agent = simulator_->agents[neighbor_id];
+        std::shared_ptr<Agent> other_agent = simulator_->getAgents()[neighbor_id];
         VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
         if (velocity_obstacle.containsVector(velocity))
         {
@@ -190,7 +190,7 @@ void HRVOAgent::computeNewVelocity()
     // Create Velocity Obstacles for neighbors
     for (const auto &neighbor : neighbors_)
     {
-        std::shared_ptr<Agent> other_agent = simulator_->agents[neighbor.second];
+        std::shared_ptr<Agent> other_agent = simulator_->getAgents()[neighbor.second];
         VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
         velocityObstacles_.push_back(velocity_obstacle);
     }
@@ -492,7 +492,6 @@ void HRVOAgent::computeNewVelocity()
             break;
         }
     }
-    //     */
 }
 
 void HRVOAgent::computePreferredVelocity()
@@ -549,7 +548,7 @@ void HRVOAgent::computePreferredVelocity()
 
 void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
 {
-    std::shared_ptr<Agent> other_agent = simulator_->agents[agentNo];
+    std::shared_ptr<Agent> other_agent = simulator_->getAgents()[agentNo];
 
     if (this != other_agent.get())
     {

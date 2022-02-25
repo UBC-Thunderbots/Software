@@ -93,23 +93,18 @@ void Thunderloop::runLoop()
                 // Save new primitive set
                 primitive_set_ = new_primitive_set;
 
-                // If we have a primitive for "this" robot, lets start it
-                if (new_primitive_set.robot_primitives().count(robot_id_) != 0)
+                // Update primitive executor's primitive set
                 {
-                    primitive_ =
-                        new_primitive_set.mutable_robot_primitives()->at(robot_id_);
-
-                    // Start new primitive
-                    {
-                        ScopedTimespecTimer timer(&poll_time);
-                        primitive_executor_.startPrimitive(robot_constants_, primitive_);
-                    }
-
-                    thunderloop_status_.set_primitive_executor_start_time_ns(
-                        static_cast<unsigned long>(poll_time.tv_nsec));
+                    ScopedTimespecTimer timer(&poll_time);
+                    primitive_executor_.updatePrimitiveSet(robot_id_, primitive_set_);
                 }
+
+                thunderloop_status_.set_primitive_executor_start_time_ns(
+                        static_cast<unsigned long>(poll_time.tv_nsec));
             }
 
+            // TODO (#2495): Replace Vision proto with World proto in Network Service and
+            //               call PrimitiveExecutor::updateWorld
             // If the vision msg is new, update the internal buffer
             if (new_vision.time_sent().epoch_timestamp_seconds() >
                 vision_.time_sent().epoch_timestamp_seconds())
@@ -129,7 +124,7 @@ void Thunderloop::runLoop()
             {
                 ScopedTimespecTimer timer(&poll_time);
                 direct_control_ =
-                    *primitive_executor_.stepPrimitive(createRobotState(robot_state_));
+                    *primitive_executor_.stepPrimitive(robot_id_, createRobotState(robot_state_));
             }
             thunderloop_status_.set_primitive_executor_step_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));

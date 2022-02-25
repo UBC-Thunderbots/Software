@@ -378,7 +378,7 @@ Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
     return Vector();
 }
 
-void HRVOSimulator::visualize()
+void HRVOSimulator::visualize() const
 {
     TbotsProto::Obstacles obstacle_proto_;
 
@@ -453,4 +453,14 @@ Vector2 HRVOSimulator::getAgentVelocity(std::size_t agentNo) const
 Vector2 HRVOSimulator::getAgentPrefVelocity(std::size_t agentNo) const
 {
     return agents[agentNo]->getPrefVelocity();
+}
+
+const std::unique_ptr<KdTree> &HRVOSimulator::getKdTree() const
+{
+    return kd_tree;
+}
+
+const std::vector<std::shared_ptr<Agent>> &HRVOSimulator::getAgents() const
+{
+    return agents;
 }

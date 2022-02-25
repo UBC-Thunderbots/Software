@@ -166,7 +166,15 @@ class HRVOSimulator
     /**
      * Visualize this simulator to Thunderscope
      */
-    void visualize();
+    void visualize() const;
+
+    /**
+     * Get
+     * @return
+     */
+    const std::unique_ptr<KdTree> &getKdTree() const;
+
+    const std::vector<std::shared_ptr<Agent>> &getAgents() const;
 
     /**
      *      Returns the maximum acceleration of a specified agent.
@@ -299,18 +307,19 @@ private:
     // True if all agents have reached their destination
     bool reached_goals;
 
-   public:
     // KdTree used to calculate the K nearest agents
     std::unique_ptr<KdTree> kd_tree;
 
     // List of agents (robots) in this simulation
     std::vector<std::shared_ptr<Agent>> agents;
-    // TODO (#2373): Remove goals list when goal is a part of Agent
-    std::vector<std::unique_ptr<Goal>> goals;
 
     // robot id to agent index
     std::map<unsigned int, unsigned int> friendly_robot_id_map;
     std::map<unsigned int, unsigned int> enemy_robot_id_map;
+
+public:
+    // TODO (#2373): Remove goals list when goal is a part of Agent
+    std::vector<std::unique_ptr<Goal>> goals;
 
     // The scale which friendly robots should be larger than friendly robots
     // This scale is used to avoid close encounters, and reduce chance of collision
