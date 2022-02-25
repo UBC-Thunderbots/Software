@@ -364,9 +364,9 @@ void SimulatedErForceSimTestFixture::runTest(
         }
 
         // Output the statistics for ball and robots
-        LOG(INFO) << "max ball displacement: " << ball_displacement_stats.maximum
+        LOG(INFO) << "max ball displacement: " << ball_displacement_stats.maximum;
         validation_functions_done = tickTest(simulation_time_step, ai_time_step,
-                                             friendly_world, enemy_world, simulator);
+                                             friendly_world, enemy_world, simulator, ball_displacement, ball_velocity_diff, robots_displacement, robots_velocity_diff);
     }
     // Output the tick duration results
     if (friendly_tick_count > 0)
@@ -388,7 +388,6 @@ void SimulatedErForceSimTestFixture::runTest(
 
     if (enemy_tick_count > 0)
     {
-        double avg_enemy_tick_duration = total_enemy_tick_duration / enemy_tick_count;
         LOG(INFO) << "max enemy tick duration: " << max_enemy_tick_duration << "ms"
                   << std::endl;
         LOG(INFO) << "min ball displacement: " << ball_displacement_stats.minimum
