@@ -100,7 +100,7 @@ void Thunderloop::runLoop()
                 }
 
                 thunderloop_status_.set_primitive_executor_start_time_ns(
-                        static_cast<unsigned long>(poll_time.tv_nsec));
+                    static_cast<unsigned long>(poll_time.tv_nsec));
             }
 
             // TODO (#2495): Replace Vision proto with World proto in Network Service and
@@ -123,8 +123,8 @@ void Thunderloop::runLoop()
 
             {
                 ScopedTimespecTimer timer(&poll_time);
-                direct_control_ =
-                    *primitive_executor_.stepPrimitive(robot_id_, createRobotState(robot_state_));
+                direct_control_ = *primitive_executor_.stepPrimitive(
+                    robot_id_, createRobotState(robot_state_));
             }
             thunderloop_status_.set_primitive_executor_step_time_ns(
                 static_cast<unsigned long>(poll_time.tv_nsec));

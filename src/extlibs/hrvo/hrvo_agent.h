@@ -110,7 +110,8 @@ class HRVOAgent : public Agent
      * @param circle_rad The radius of the circles which represent candidates
      * @return list of circles which represent the new velocity candidates
      */
-    std::vector<Circle> getCandidateVelocitiesAsCircles(const float circle_rad = 0.03f) const;
+    std::vector<Circle> getCandidateVelocitiesAsCircles(
+        const float circle_rad = 0.03f) const;
 
     std::vector<Polygon> getVelocityObstaclesAsPolygons() const;
 

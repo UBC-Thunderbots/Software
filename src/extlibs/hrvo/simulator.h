@@ -165,7 +165,8 @@ class HRVOSimulator
 
     /**
      * Visualize this simulator to Thunderscope
-     * @param robot_id The friendly robot_id which we want its velocity obstacles to be visualized
+     * @param robot_id The friendly robot_id which we want its velocity obstacles to be
+     * visualized
      */
     void visualize(unsigned int robot_id) const;
 
@@ -285,7 +286,7 @@ class HRVOSimulator
         return reached_goals;
     }
 
-private:
+   private:
     unsigned int frame = 0;
 
     // PrimitiveSet which includes the path which each friendly robot should take
@@ -294,7 +295,7 @@ private:
     // True if the ball should be treated as an agent (obstacle)
     // NOTE: This will take effect the next time we receive a world, and we know
     //       the current ball position and velocity
-    bool add_ball_agent = false;
+    bool add_ball_agent       = false;
     std::size_t ball_agent_id = -1;
 
     // The robot constants which all agents will use
@@ -322,7 +323,7 @@ private:
     std::map<unsigned int, unsigned int> friendly_robot_id_map;
     std::map<unsigned int, unsigned int> enemy_robot_id_map;
 
-public:
+   public:
     // TODO (#2373): Remove goals list when goal is a part of Agent
     std::vector<std::unique_ptr<Goal>> goals;
 

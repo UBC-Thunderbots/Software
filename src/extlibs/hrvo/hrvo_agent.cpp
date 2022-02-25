@@ -132,11 +132,11 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
         // apart from each other
         velocityObstacle.apex_ =
             0.5f * (other_agent.getVelocity() + velocity_) -
-                    (uncertaintyOffset_ + 0.5f *
+            (uncertaintyOffset_ + 0.5f *
                                       (other_agent.getRadius() + radius_ -
                                        abs(position_ - other_agent.getPosition())) /
                                       simulator_->getTimeStep()) *
-                    normalize(position_ - other_agent.getPosition());
+                normalize(position_ - other_agent.getPosition());
         velocityObstacle.side1_ = normal(other_agent.getPosition(), position_);
         velocityObstacle.side2_ = -velocityObstacle.side1_;
     }
@@ -536,8 +536,8 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
         {
             add_other_agent();
         }
-        else if (is_other_agent_in_front &&
-                 is_other_agent_moving_towards_us && is_other_agent_near_goal)
+        else if (is_other_agent_in_front && is_other_agent_moving_towards_us &&
+                 is_other_agent_near_goal)
         {
             // This is an edge case for when the other agent is outside our search range,
             // but is moving towards us from behind our destination, so it is posing a
@@ -564,14 +564,15 @@ std::vector<Polygon> HRVOAgent::getVelocityObstaclesAsPolygons() const
     return velocity_obstacles;
 }
 
-std::vector<Circle> HRVOAgent::getCandidateVelocitiesAsCircles(const float circle_rad) const
+std::vector<Circle> HRVOAgent::getCandidateVelocitiesAsCircles(
+    const float circle_rad) const
 {
     std::vector<Circle> candidate_circles;
     for (auto &candidate : candidates_)
     {
         Vector2 candidate_pos = position_ + candidate.second.position_;
         candidate_circles.emplace_back(
-                Circle(Point(candidate_pos.getX(), candidate_pos.getY()), circle_rad));
+            Circle(Point(candidate_pos.getX(), candidate_pos.getY()), circle_rad));
     }
     return candidate_circles;
 }

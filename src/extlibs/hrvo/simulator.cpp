@@ -39,11 +39,11 @@
 #include "extlibs/hrvo/hrvo_agent.h"
 #include "extlibs/hrvo/kd_tree.h"
 #include "extlibs/hrvo/linear_velocity_agent.h"
+#include "proto/message_translation/tbots_geometry.h"
+#include "proto/visualization.pb.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/logger/logger.h"
-#include "proto/visualization.pb.h"
-#include "proto/message_translation/tbots_geometry.h"
 
 HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants)
     : global_time(0.0f),
@@ -382,7 +382,8 @@ Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
 
 void HRVOSimulator::visualize(unsigned int robot_id) const
 {
-    // TODO (#2499): Create a new HRVO visualization proto and uncomment/update LOG(VISUALIZE)
+    // TODO (#2499): Create a new HRVO visualization proto and uncomment/update
+    // LOG(VISUALIZE)
     TbotsProto::Obstacles obstacle_proto;
 
     // Add velocity obstacles and candidate new velocities to be visualized
@@ -390,25 +391,25 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
     if (friendly_agent_opt.has_value())
     {
         auto friendly_agent = friendly_agent_opt.value();
-        for (auto &obstacle: friendly_agent->getVelocityObstaclesAsPolygons())
+        for (auto &obstacle : friendly_agent->getVelocityObstaclesAsPolygons())
         {
             *(obstacle_proto.add_polygon()) = *createPolygonProto(obstacle);
         }
 
-        for (auto &candidate_circle: friendly_agent->getCandidateVelocitiesAsCircles())
+        for (auto &candidate_circle : friendly_agent->getCandidateVelocitiesAsCircles())
         {
             *(obstacle_proto.add_circle()) = *createCircleProto(candidate_circle);
         }
     }
 
     // Add circles representing agents
-    for (auto& agent : agents)
+    for (auto &agent : agents)
     {
         Point position(agent->getPosition().getX(), agent->getPosition().getY());
         *(obstacle_proto.add_circle()) =
-                *createCircleProto(Circle(position, agent->getRadius()));
+            *createCircleProto(Circle(position, agent->getRadius()));
     }
-//    LOG(VISUALIZE) << obstacle_proto;
+    //    LOG(VISUALIZE) << obstacle_proto;
 }
 
 std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(

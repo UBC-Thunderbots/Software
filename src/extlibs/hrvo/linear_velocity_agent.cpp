@@ -14,8 +14,7 @@ void LinearVelocityAgent::computeNewVelocity()
 {
     // TODO (#2496): Fix bug where LinearVelocityAgents go past their destination
     // Preferring a velocity which points directly towards goal
-    pref_velocity_ =
-            simulator_->goals[goal_index_]->getCurrentGoalPosition() - position_;
+    pref_velocity_ = simulator_->goals[goal_index_]->getCurrentGoalPosition() - position_;
 
     if (abs(pref_velocity_) > max_speed_)
     {
