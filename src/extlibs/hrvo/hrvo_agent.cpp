@@ -173,13 +173,13 @@ void HRVOAgent::computeNewVelocity()
     candidate.velocityObstacle1_ = std::numeric_limits<int>::max();
     candidate.velocityObstacle2_ = std::numeric_limits<int>::max();
 
-    if ((pref_velocity_).lengthSquared() < max_speed_ * max_speed_)
+    if (pref_velocity_.lengthSquared() < max_speed_ * max_speed_)
     {
         candidate.position_ = pref_velocity_;
     }
     else
     {
-        candidate.position_ = max_speed_ * (pref_velocity_).normalize();
+        candidate.position_ = max_speed_ * pref_velocity_.normalize();
     }
 
     candidates_.insert(std::make_pair(
@@ -202,7 +202,7 @@ void HRVOAgent::computeNewVelocity()
             candidate.position_ =
                 velocityObstacles_[i].apex_ + dotProduct1 * velocityObstacles_[i].side1_;
 
-            if ((candidate.position_).lengthSquared() < max_speed_ * max_speed_)
+            if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
             {
                 candidates_.insert(std::make_pair(
                     (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
@@ -216,7 +216,7 @@ void HRVOAgent::computeNewVelocity()
             candidate.position_ =
                 velocityObstacles_[i].apex_ + dotProduct2 * velocityObstacles_[i].side2_;
 
-            if ((candidate.position_).lengthSquared() < max_speed_ * max_speed_)
+            if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
             {
                 candidates_.insert(std::make_pair(
                     (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
@@ -317,7 +317,7 @@ void HRVOAgent::computeNewVelocity()
                     candidate.position_ =
                         velocityObstacles_[i].apex_ + s * velocityObstacles_[i].side1_;
 
-                    if ((candidate.position_).lengthSquared() < max_speed_ * max_speed_)
+                    if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
                     {
                         candidates_.insert(std::make_pair(
                             (pref_velocity_ - candidate.position_).lengthSquared(),
@@ -344,7 +344,7 @@ void HRVOAgent::computeNewVelocity()
                     candidate.position_ =
                         velocityObstacles_[i].apex_ + s * velocityObstacles_[i].side2_;
 
-                    if ((candidate.position_).lengthSquared() < max_speed_ * max_speed_)
+                    if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
                     {
                         candidates_.insert(std::make_pair(
                             (pref_velocity_ - candidate.position_).lengthSquared(),
@@ -371,7 +371,7 @@ void HRVOAgent::computeNewVelocity()
                     candidate.position_ =
                         velocityObstacles_[i].apex_ + s * velocityObstacles_[i].side1_;
 
-                    if ((candidate.position_).lengthSquared() < max_speed_ * max_speed_)
+                    if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
                     {
                         candidates_.insert(std::make_pair(
                             (pref_velocity_ - candidate.position_).lengthSquared(),
@@ -398,7 +398,7 @@ void HRVOAgent::computeNewVelocity()
                     candidate.position_ =
                         velocityObstacles_[i].apex_ + s * velocityObstacles_[i].side2_;
 
-                    if ((candidate.position_).lengthSquared() < max_speed_ * max_speed_)
+                    if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
                     {
                         candidates_.insert(std::make_pair(
                             (pref_velocity_ - candidate.position_).lengthSquared(),
@@ -470,11 +470,11 @@ void HRVOAgent::computePreferredVelocity()
         // v_pref = sqrt(v_goal^2 + 2 * a * d_remainingToDestination)
         float currPrefSpeed = static_cast<float>(
             std::sqrt(std::pow(speedAtGoal, 2) + 2 * max_accel_ * distToGoal));
-        Vector ideal_pref_velocity = (distVectorToGoal).normalize() * currPrefSpeed;
+        Vector ideal_pref_velocity = distVectorToGoal.normalize() * currPrefSpeed;
 
         // Limit the preferred velocity to the kinematic limits
         const Vector dv = ideal_pref_velocity - velocity_;
-        if ((dv).length() <= max_accel_ * simulator_->getTimeStep())
+        if (dv.length() <= max_accel_ * simulator_->getTimeStep())
         {
             pref_velocity_ = ideal_pref_velocity;
         }
@@ -482,8 +482,8 @@ void HRVOAgent::computePreferredVelocity()
         {
             // Calculate the maximum velocity towards the preferred velocity, given the
             // acceleration constraint
-            pref_velocity_ = velocity_ + (max_accel_ * simulator_->getTimeStep()) *
-                                             (dv / (dv).length());
+            pref_velocity_ =
+                velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / dv.length());
         }
     }
     else
@@ -492,8 +492,8 @@ void HRVOAgent::computePreferredVelocity()
         // v_pref = v_now + a * t
         float currPrefSpeed =
             std::min(static_cast<double>(prefSpeed_),
-                     (velocity_).length() + max_accel_ * simulator_->getTimeStep());
-        pref_velocity_ = (distVectorToGoal).normalize() * currPrefSpeed;
+                     velocity_.length() + max_accel_ * simulator_->getTimeStep());
+        pref_velocity_ = distVectorToGoal.normalize() * currPrefSpeed;
     }
 }
 
@@ -504,7 +504,7 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
     if (this != other_agent.get())
     {
         Vector other_agent_relative_pos = other_agent->getPosition() - position_;
-        const float distSq              = (other_agent_relative_pos).lengthSquared();
+        const float distSq              = other_agent_relative_pos.lengthSquared();
 
         Vector goal_pos = simulator_->goals_[goal_index_]->getCurrentGoalPosition();
         Vector relative_goal_pos = goal_pos - position_;
@@ -512,11 +512,11 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
         // Whether the other robot is with in 45 degrees of the goal, relative to us
         const float forty_five_deg_ratio = 1.f / std::sqrt(2.f);
         bool is_other_agent_in_front =
-            (relative_goal_pos).normalize().dot((other_agent_relative_pos).normalize()) >
+            relative_goal_pos.normalize().dot(other_agent_relative_pos.normalize()) >
             forty_five_deg_ratio;
 
         bool is_other_agent_moving_towards_us =
-            (velocity_).normalize().dot((other_agent->getVelocity()).normalize()) <
+            velocity_.normalize().dot((other_agent->getVelocity()).normalize()) <
             -forty_five_deg_ratio;
 
         // Whether the other agent is within a 1.5-meter radius of our goal

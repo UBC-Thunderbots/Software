@@ -20,14 +20,14 @@ Agent::Agent(Simulator *simulator, const Vector &position, float radius,
 
 void Agent::update()
 {
-    if ((new_velocity_).length() >= max_speed_)
+    if (new_velocity_.length() >= max_speed_)
     {
         // New velocity can not be greater than max speed
-        new_velocity_ = (new_velocity_).normalize() * max_speed_;
+        new_velocity_ = new_velocity_.normalize() * max_speed_;
     }
 
     const Vector dv = new_velocity_ - velocity_;
-    if ((dv).length() < max_accel_ * simulator_->getTimeStep() || (dv).length() == 0.f)
+    if (dv.length() < max_accel_ * simulator_->getTimeStep() || dv.length() == 0.f)
     {
         velocity_ = new_velocity_;
     }
@@ -36,7 +36,7 @@ void Agent::update()
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
         velocity_ =
-            velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / (dv).length());
+            velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / dv.length());
     }
 
     position_ += velocity_ * simulator_->timeStep_;

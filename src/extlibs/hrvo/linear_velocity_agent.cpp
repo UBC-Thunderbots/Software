@@ -15,13 +15,13 @@ void LinearVelocityAgent::computeNewVelocity()
     pref_velocity_ =
         simulator_->goals_[goal_index_]->getCurrentGoalPosition() - position_;
 
-    if ((pref_velocity_).length() > max_speed_)
+    if (pref_velocity_.length() > max_speed_)
     {
         pref_velocity_ = (pref_velocity_).normalize() * max_speed_;
     }
 
     const Vector dv = pref_velocity_ - velocity_;
-    if ((dv).length() <= max_accel_ * simulator_->getTimeStep())
+    if (dv.length() <= max_accel_ * simulator_->getTimeStep())
     {
         new_velocity_ = pref_velocity_;
     }
@@ -30,7 +30,7 @@ void LinearVelocityAgent::computeNewVelocity()
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
         new_velocity_ =
-            velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / (dv).length());
+            velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / dv.length());
     }
 }
 

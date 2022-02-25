@@ -106,7 +106,7 @@ void Simulator::updateWorld(const World &world)
         // Minimum of 0.5-meter distance away from the ball, if the ball is an obstacle
         float ball_radius = 0.5f + BALL_AGENT_RADIUS_OFFSET;
 
-        addLinearVelocityAgent(position, ball_radius, velocity, (velocity).length(),
+        addLinearVelocityAgent(position, ball_radius, velocity, velocity.length(),
                                acceleration, addGoal(goal_pos), 0.1f);
     }
 }
