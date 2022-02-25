@@ -75,7 +75,7 @@ class ErForceSimulator : public QObject
      * in simulation
      *
      * @param primitive_set_msg The set of primitives to run on the robot
-     * @param world_msg The vision message
+     * @param world_msg The world message
      */
     void setYellowRobotPrimitiveSet(const TbotsProto::PrimitiveSet& primitive_set_msg,
                                     std::unique_ptr<TbotsProto::World> world_msg);
@@ -129,7 +129,7 @@ class ErForceSimulator : public QObject
      * @param primitive_set_msg The primitive to run on the robot
      * @param robot_primitive_executor_map The robot primitive executors to send the
      * primitive set to
-     * @param world_msg The vision message
+     * @param world_msg The world message
      */
     static void setRobotPrimitive(
         RobotId id, const TbotsProto::PrimitiveSet& primitive_set_msg,
@@ -142,7 +142,7 @@ class ErForceSimulator : public QObject
      *
      * @param robot_primitive_executor_map Map of robot IDs to the robot's primitive
      * executor
-     * @param world_msg The vision msg for this team of robots
+     * @param world_msg The world msg for this team of robots
      *
      * @return robot control
      */
@@ -151,6 +151,7 @@ class ErForceSimulator : public QObject
             robot_primitive_executor_map,
         const TbotsProto::World& world_msg);
 
+    // Map of Robot id to Primitive Executor
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>
         yellow_primitive_executor_map;
     std::unordered_map<unsigned int, std::shared_ptr<PrimitiveExecutor>>

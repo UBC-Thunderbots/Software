@@ -78,6 +78,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
     const unsigned int robot_id, const RobotState& robot_state)
 {
     hrvo_simulator.doStep();
+    // TODO (#2499): Remove if and visualize the HRVO Simulator of all robots
     if (robot_id == 1)
     {
         // All robots should have identical HRVO simulations. To avoid spam, only

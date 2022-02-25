@@ -242,7 +242,7 @@ void ErForceSimulator::setRobotPrimitive(
         robot_primitive_executor_map,
     const TbotsProto::World& world_msg)
 {
-    // Set to NEG_X because the vision msg in this simulator is normalized
+    // Set to NEG_X because the world msg in this simulator is normalized
     // correctly
     auto robot_primitive_executor_iter = robot_primitive_executor_map.find(id);
 
@@ -289,7 +289,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
         if (robot_proto_it != friendly_robots.end())
         {
             auto& primitive_executor = primitive_executor_with_id.second;
-            // Set to NEG_X because the vision msg in this simulator is
+            // Set to NEG_X because the world msg in this simulator is
             // normalized correctly
             auto direct_control = primitive_executor->stepPrimitive(
                 robot_id, RobotState(robot_proto_it->current_state()));
