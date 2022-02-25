@@ -92,7 +92,7 @@ void SensorFusion::processSensorProto(const SensorProto &sensor_msg)
                 fromStringToRefereeCommand(current_state_string);
             game_state.updateRefereeCommand(current_state);
         }
-        catch (std::invalid_argument e)
+        catch (const std::invalid_argument &e)
         {
             LOG(WARNING) << e.what();
         }
