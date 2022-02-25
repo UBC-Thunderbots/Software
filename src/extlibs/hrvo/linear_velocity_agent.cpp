@@ -12,7 +12,7 @@ LinearVelocityAgent::LinearVelocityAgent(HRVOSimulator *simulator,
 
 void LinearVelocityAgent::computeNewVelocity()
 {
-    // TODO: Check this logic, agents going past their goal point?
+    // TODO (#2496): Fix bug where LinearVelocityAgents go past their destination
     // Preferring a velocity which points directly towards goal
     pref_velocity_ =
             simulator_->goals[goal_index_]->getCurrentGoalPosition() - position_;

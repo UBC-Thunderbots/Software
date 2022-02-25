@@ -144,43 +144,10 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
     return velocityObstacle;
 }
 
-double HRVOAgent::calculateVelocityCost(Vector2 &velocity,
-                                        double time_to_collision_weight)
-{
-    // Can you do something like difference in position of A and B, and velocities of A
-    // and B and using that to calculate the time to collision? Doesn't take into account
-    // the radius
-    double min_time_to_collision = std::numeric_limits<double>::max();
-    for (auto &[distance, neighbor_id] : neighbors_)
-    {
-        // TODO: Calculate VO here?
-        std::shared_ptr<Agent> other_agent = simulator_->getAgents()[neighbor_id];
-        VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
-        if (velocity_obstacle.containsVector(velocity))
-        {
-            double time_to_collision =
-                0.1;  // TODO: Implement time to collision based on paper.
-            if (time_to_collision < min_time_to_collision)
-            {
-                min_time_to_collision = time_to_collision;
-            }
-        }
-    }
-    return abs(velocity - pref_velocity_) +
-           time_to_collision_weight / min_time_to_collision;
-}
-
 void HRVOAgent::computeNewVelocity()
 {
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
-
-    //    neighborDist_ = std::min(std::min(0.4f,
-    //    static_cast<float>(std::pow(abs(velocity_), 2))),
-    //    HRVOSimulator::MAX_NEIGHBOR_SEARCH_DIST); neighborDist_ =
-    //    std::min(static_cast<float>(std::pow(abs(velocity_), 2)) / (2 * max_accel_),
-    //    0.4f);
-
     computePreferredVelocity();
     computeNeighbors();
 
@@ -195,35 +162,7 @@ void HRVOAgent::computeNewVelocity()
         velocityObstacles_.push_back(velocity_obstacle);
     }
 
-    //    Circle kinematic_limit(Point(velocity_.getX(), velocity_.getY()), max_accel_ *
-    //    simulator_->getTimeStep()); std::vector<Point> vel_samples =
-    //    rasterize(kinematic_limit, 0.01); new_velocity_ = Vector2(); double min_cost =
-    //    std::numeric_limits<double>::max(); for (Point& vel_sample : vel_samples)
-    //    {
-    //        if (vel_sample.distanceFromOrigin() < max_speed_)
-    //        {
-    //            // TODO: Tune time_to_collision_weight...
-    //            double vel_sample_cost = calculateVelocityCost(vel_sample.toVector(),
-    //            0.1f); std::cout << vel_sample_cost << "<" << min_cost << std::endl; if
-    //            (vel_sample_cost < min_cost)
-    //            {
-    //                min_cost = vel_sample_cost;
-    //                Vector2 vel_sample_vect2(vel_sample.x(), vel_sample.y());
-    //                new_velocity_ = vel_sample_vect2;
-    //            }
-    //        }
-    //    }
-
-    //    /*
-    // Calculate what velocities (candidates) are not inside any velocity obstacle
-    // This is likely implementing the ClearPath efficient geometric algorithm, as stated
-    // in the HRVO paper, to find the closest possible velocity to our preferred velocity.
-    // TODO: Debug through the rest
-    //       HRVO can potentially be extended to FVO
-    //       (https://gamma.cs.unc.edu/CA/ClearPath.pdfhttps://gamma.cs.unc.edu/CA/ClearPath.pdf)
-    //       to make VO's smaller (cuts the tip of the triangle)
     candidates_.clear();
-
     Candidate candidate;
 
     candidate.velocityObstacle1_ = std::numeric_limits<int>::max();
@@ -572,7 +511,7 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
         bool is_other_agent_near_goal =
             absSq(other_agent->getPosition() - goal_pos) < 1.5f;
 
-        // Helper lambda function
+        // Helper lambda function for adding other_agent to list of neighbors
         auto add_other_agent = [&]() {
             if (neighbors_.size() == maxNeighbors_)
             {
@@ -587,7 +526,7 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
             }
         };
 
-        if (distSq < std::pow(radius_ + other_agent->getRadius(), 2) && distSq < rangeSq)
+        if (distSq < std::pow(radius_ + other_agent->getRadius(), 2))
         {
             // In collision with other agent, so the other neighbors are not important
             neighbors_.clear();
@@ -597,7 +536,7 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
         {
             add_other_agent();
         }
-        else if (distSq > rangeSq && is_other_agent_in_front &&
+        else if (is_other_agent_in_front &&
                  is_other_agent_moving_towards_us && is_other_agent_near_goal)
         {
             // This is an edge case for when the other agent is outside our search range,
@@ -608,7 +547,7 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
     }
 }
 
-std::vector<Polygon> HRVOAgent::getVelocityObstacles() const
+std::vector<Polygon> HRVOAgent::getVelocityObstaclesAsPolygons() const
 {
     std::vector<Polygon> velocity_obstacles;
     for (const Agent::VelocityObstacle &vo : velocityObstacles_)
@@ -625,7 +564,7 @@ std::vector<Polygon> HRVOAgent::getVelocityObstacles() const
     return velocity_obstacles;
 }
 
-std::vector<Circle> HRVOAgent::getCandidateCircles(const float circle_rad) const
+std::vector<Circle> HRVOAgent::getCandidateVelocitiesAsCircles(const float circle_rad) const
 {
     std::vector<Circle> candidate_circles;
     for (auto &candidate : candidates_)

@@ -76,9 +76,6 @@ class HRVOAgent : public Agent
      */
     void computeNewVelocity() override;
 
-    // TODO: Remove
-    double calculateVelocityCost(Vector2 &velocity, double time_to_collision_weight);
-
     /**
      * Create the hybrid reciprocal velocity obstacle which other_agent should see for
      * this Agent
@@ -113,9 +110,9 @@ class HRVOAgent : public Agent
      * @param circle_rad The radius of the circles which represent candidates
      * @return list of circles which represent the new velocity candidates
      */
-    std::vector<Circle> getCandidateCircles(const float circle_rad = 0.03f) const;
+    std::vector<Circle> getCandidateVelocitiesAsCircles(const float circle_rad = 0.03f) const;
 
-    std::vector<Polygon> getVelocityObstacles() const;
+    std::vector<Polygon> getVelocityObstaclesAsPolygons() const;
 
    private:
     /**

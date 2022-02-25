@@ -115,7 +115,7 @@ class HRVOSimulator
                              std::size_t maxNeighbors, float uncertaintyOffset);
 
     /**
-     *
+     * Add a new LinearlyVelocityAgent
      * @param position      The starting position of this agent.
      * @param agent_radius  The agent_radius of this agent.
      * @param curr_velocity The initial velocity of this agent.
@@ -165,15 +165,20 @@ class HRVOSimulator
 
     /**
      * Visualize this simulator to Thunderscope
+     * @param robot_id The friendly robot_id which we want its velocity obstacles to be visualized
      */
-    void visualize() const;
+    void visualize(unsigned int robot_id) const;
 
     /**
-     * Get
-     * @return
+     * Get the KDTree of Agents
+     * @return KDTree of Agents
      */
     const std::unique_ptr<KdTree> &getKdTree() const;
 
+    /**
+     * Get the list of Agents in this simulator
+     * @return List of Agents
+     */
     const std::vector<std::shared_ptr<Agent>> &getAgents() const;
 
     /**
@@ -359,8 +364,6 @@ public:
     // The max allowed difference in speed of the two robots colliding is 1.5 m/s.
     // Based on the rules, if the robot is travelling <= 0.6 m/s it will not receive a
     // penalty after a collision. To be safe, the max collision speed is set to 0.5 m/s
-    // TODO: Should this value be based on actual time instead of simulation time?
-    //       In case of the simulation hanging
     static constexpr float TIME_TO_UPDATE_WORLD = 1.f / 2;
 
     friend class Agent;

@@ -45,25 +45,6 @@ class Agent
 
         // The direction of the second side of the hybrid reciprocal velocity obstacle.
         Vector2 side2_;
-
-        /*
-         * Check if velocity obstacle contains vector
-         * @param vector vector to check if is inside velocity obstacle
-         * @return true if velocity obstacle contains vector, false otherwise
-         */
-        bool containsVector(Vector2 &vector)
-        {
-            // Assuming that side1_ is the left side of the velocity obstacle
-            // TODO: Double check that this is true using det...
-            if (det(side1_, side2_) < 0.f)
-            {
-                return det(side1_, vector) < 0.f && det(side2_, vector) > 0.f;
-            }
-            else
-            {
-                return det(side1_, vector) > 0.f && det(side2_, vector) < 0.f;
-            }
-        }
     };
 
     /**

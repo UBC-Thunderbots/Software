@@ -58,7 +58,9 @@ void HRVOSimulator::updateWorld(const World &world)
 {
     const auto &friendly_team = world.friendlyTeam().getAllRobots();
     const auto &enemy_team    = world.enemyTeam().getAllRobots();
-    // TODO: Update implementation here to add and remove agents to match the world
+    // TODO (#2498): Update implementation to correctly support adding and removing agents
+    //               to represent the newly added and removed friendly/enemy robots in the
+    //               World.
     if (friendly_robot_id_map.empty() && enemy_robot_id_map.empty())
     {
         for (const Robot &friendly_robot : friendly_team)
@@ -143,8 +145,8 @@ void HRVOSimulator::updateWorld(const World &world)
         }
     }
 
-    // TODO: Dynamically add and remove the ball as an Agent
-    //       + Add a ball radius to primitive.proto
+    // TODO (#2498): Dynamically add and remove the ball as an Agent, and if needed
+    //               update its radius based on the PrimitiveSet
     if (add_ball_agent)
     {
         if (ball_agent_id == -1)
@@ -264,7 +266,7 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
                      static_cast<float>(robot.position().y()));
     Vector2 velocity(static_cast<float>(robot.velocity().x()),
                      static_cast<float>(robot.velocity().y()));
-    float max_accel = 0.f;  // TODO: Maybe use robot constant
+    float max_accel = 0.f;
     float max_speed = robot_constants.robot_max_speed_m_per_s;
 
     // Max distance which the robot can travel in one time step + scaling
@@ -378,35 +380,35 @@ Vector HRVOSimulator::getRobotVelocity(unsigned int robot_id) const
     return Vector();
 }
 
-void HRVOSimulator::visualize() const
+void HRVOSimulator::visualize(unsigned int robot_id) const
 {
-    TbotsProto::Obstacles obstacle_proto_;
+    // TODO (#2499): Create a new HRVO visualization proto and uncomment/update LOG(VISUALIZE)
+    TbotsProto::Obstacles obstacle_proto;
 
-    for (auto id_pair : friendly_robot_id_map)
+    // Add velocity obstacles and candidate new velocities to be visualized
+    auto friendly_agent_opt = getFriendlyAgentFromRobotId(robot_id);
+    if (friendly_agent_opt.has_value())
     {
-        unsigned int robot_id = id_pair.first;
-        if (robot_id == 1) // TODO: Remove this if
+        auto friendly_agent = friendly_agent_opt.value();
+        for (auto &obstacle: friendly_agent->getVelocityObstaclesAsPolygons())
         {
-            auto friendly_agent = getFriendlyAgentFromRobotId(robot_id).value();
-            for (auto& obstacle : friendly_agent->getVelocityObstacles())
-            {
-                *(obstacle_proto_.add_polygon()) = *createPolygonProto(obstacle);
-            }
+            *(obstacle_proto.add_polygon()) = *createPolygonProto(obstacle);
+        }
 
-            Point position(friendly_agent->getPosition().getX(), friendly_agent->getPosition().getY());
-            *(obstacle_proto_.add_circle()) =
-                    *createCircleProto(Circle(position, friendly_agent->getRadius()));
-
-            for (auto& candidate_circle : friendly_agent->getCandidateCircles())
-            {
-                *(obstacle_proto_.add_circle()) = *createCircleProto(candidate_circle);
-            }
+        for (auto &candidate_circle: friendly_agent->getCandidateVelocitiesAsCircles())
+        {
+            *(obstacle_proto.add_circle()) = *createCircleProto(candidate_circle);
         }
     }
-    // TODO: Create a new HRVO visualization proto.
-    //       Ideally we send the velocity obstacles for all friendly agents, and we filter
-    //       the data in Thunderscope.
-    LOG(VISUALIZE) << obstacle_proto_;
+
+    // Add circles representing agents
+    for (auto& agent : agents)
+    {
+        Point position(agent->getPosition().getX(), agent->getPosition().getY());
+        *(obstacle_proto.add_circle()) =
+                *createCircleProto(Circle(position, agent->getRadius()));
+    }
+//    LOG(VISUALIZE) << obstacle_proto;
 }
 
 std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(

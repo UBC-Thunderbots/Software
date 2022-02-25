@@ -82,7 +82,7 @@ std::unique_ptr<TbotsProto::DirectControlPrimitive> PrimitiveExecutor::stepPrimi
     {
         // All robots should have identical HRVO simulations. To avoid spam, only
         // the HRVO simulation for robot 0 will be sent to Thunderscope.
-        hrvo_simulator.visualize();
+        hrvo_simulator.visualize(robot_id);
     }
 
     switch (current_primitive_.primitive_case())
