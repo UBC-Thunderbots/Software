@@ -365,8 +365,10 @@ void SimulatedErForceSimTestFixture::runTest(
 
         // Output the statistics for ball and robots
         LOG(INFO) << "max ball displacement: " << ball_displacement_stats.maximum;
-        validation_functions_done = tickTest(simulation_time_step, ai_time_step,
-                                             friendly_world, enemy_world, simulator, ball_displacement, ball_velocity_diff, robots_displacement, robots_velocity_diff);
+        validation_functions_done =
+            tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,
+                     simulator, ball_displacement, ball_velocity_diff,
+                     robots_displacement, robots_velocity_diff);
     }
     // Output the tick duration results
     if (friendly_tick_count > 0)
