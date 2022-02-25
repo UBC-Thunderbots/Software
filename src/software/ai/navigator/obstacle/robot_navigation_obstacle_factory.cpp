@@ -16,7 +16,7 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
     const MotionConstraint &motion_constraint, const World &world) const
 {
     std::vector<ObstaclePtr> obstacles;
-
+    
     switch (motion_constraint)
     {
         case MotionConstraint::CENTER_CIRCLE:
@@ -66,6 +66,28 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
                 obstacles.push_back(
                     createFromShape(Circle(world.ball().position(), 0.5)));
             }
+            break;
+        case MotionConstraint::FIELD_BOUNDARY_ZONE:
+            Rectangle field_walls       = world.field().fieldBoundary();
+            Rectangle playable_field    = world.field().fieldLines();
+            // put each boundary zone as an obstacle
+            Rectangle upper_boundary = 
+                Rectangle(field_walls.posXNegYCorner(),
+                          { playable_field.posXPosYCorner().x(), field_walls.posXPosYCorner().y() });
+            Rectangle left_boundary =
+                Rectangle(field_walls.posXNegYCorner(),
+                          { field_walls.negXPosYCorner().x(), playable_field.negXNegYCorner().y() });
+            Rectangle right_boundary =
+                Rectangle({ field_walls.posXPosYCorner().x(), playable_field.posXPosYCorner().y() },
+                         field_walls.negXPosYCorner());
+            Rectangle lower_boundary =
+                Rectangle({ playable_field.negXNegYCorner().x(), field_walls.negXNegYCorner().y() },
+                         field_walls.negXPosYCorner());
+            obstacles.push_back(createFromShape(upper_boundary));
+            obstacles.push_back(createFromShape(left_boundary));
+            obstacles.push_back(createFromShape(right_boundary));
+            obstacles.push_back(createFromShape(lower_boundary));
+            break;
     }
 
     return obstacles;

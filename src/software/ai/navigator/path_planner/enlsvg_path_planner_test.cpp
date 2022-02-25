@@ -31,7 +31,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_empty_grid)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -53,7 +53,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_no_navigable_area)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path == std::nullopt);
 }
@@ -75,7 +75,7 @@ TEST_F(TestEnlsvgPathPlanner,
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
 
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -107,7 +107,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_src)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -149,7 +149,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -190,7 +190,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest_blocked_src)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -236,7 +236,7 @@ TEST_F(TestEnlsvgPathPlanner,
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -275,7 +275,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_same_cell_dest)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -301,7 +301,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_outside_o
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -339,7 +339,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_along_x_a
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -371,7 +371,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_along_y_a
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -401,7 +401,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_not_centered_at_origin)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -430,7 +430,7 @@ TEST_F(TestEnlsvgPathPlanner,
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -455,7 +455,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_circular_obstacle)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -484,7 +484,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enslvg_path_planner_check_obstacle_edge)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -513,7 +513,7 @@ TEST_F(TestEnlsvgPathPlanner,
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     ASSERT_TRUE(path != std::nullopt);
 
@@ -542,7 +542,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enslvg_path_planner_start_in_enemy_half)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     ASSERT_TRUE(path != std::nullopt);
 
@@ -576,7 +576,7 @@ TEST_F(TestEnlsvgPathPlanner, test_start_in_boundary_margin)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     ASSERT_TRUE(path != std::nullopt);
 
@@ -611,7 +611,7 @@ TEST_F(TestEnlsvgPathPlanner, test_one_path_planner_object_called_twice_for_same
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     ASSERT_TRUE(path != std::nullopt);
 
@@ -628,7 +628,7 @@ TEST_F(TestEnlsvgPathPlanner, test_one_path_planner_object_called_twice_for_same
 
     // Test same path using the same path planner object to make sure it still works when
     // being reused
-    auto same_path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto same_path = planner.findPath(start, dest);
     std::vector<Point> same_path_points = path->getKnots();
 
     for (unsigned i = 0; i < path_points.size(); ++i)
@@ -652,7 +652,7 @@ TEST_F(TestEnlsvgPathPlanner,
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    std::optional<Path> path = planner.findPath(start, dest, navigable_area, obstacles);
+    std::optional<Path> path = planner.findPath(start, dest);
 
     ASSERT_TRUE(path != std::nullopt);
 
@@ -671,7 +671,7 @@ TEST_F(TestEnlsvgPathPlanner,
     start = Point(5, 0);
     dest  = Point(-2, 0.5);
 
-    auto path_two = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path_two = planner.findPath(start, dest);
     path_points   = path_two->getKnots();
 
     ASSERT_TRUE(path_two != std::nullopt);
@@ -730,7 +730,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_speed_test)
         Point start{x_distribution(random_num_gen), y_distribution(random_num_gen)};
         Point end{x_distribution(random_num_gen), y_distribution(random_num_gen)};
 
-        auto path = planner.findPath(start, end, navigable_area, obstacles);
+        auto path = planner.findPath(start, end);
     }
 
     double duration_ms = ::TestUtil::millisecondsSince(start_time);

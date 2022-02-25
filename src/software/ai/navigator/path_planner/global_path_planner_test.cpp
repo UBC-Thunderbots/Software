@@ -43,7 +43,8 @@ TEST_F(TestGlobalPathPlanner,
     Point dest  = world.field().friendlyGoalCenter();
 
     std::set<MotionConstraint> constraints = {MotionConstraint::FRIENDLY_DEFENSE_AREA,
-                                              MotionConstraint::ENEMY_DEFENSE_AREA};
+                                              MotionConstraint::ENEMY_DEFENSE_AREA, 
+                                             MotionConstraint::FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
         obstacle_factory.createFromMotionConstraints(constraints, world);
 
@@ -77,7 +78,8 @@ TEST_F(
 
     std::set<MotionConstraint> constraints = {MotionConstraint::FRIENDLY_DEFENSE_AREA,
                                               MotionConstraint::ENEMY_DEFENSE_AREA,
-                                              MotionConstraint::CENTER_CIRCLE};
+                                              MotionConstraint::CENTER_CIRCLE,
+                                             MotionConstraint::FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
         obstacle_factory.createFromMotionConstraints(constraints, world);
 
@@ -123,7 +125,8 @@ TEST_F(TestGlobalPathPlanner,
 
     std::set<MotionConstraint> constraints = {MotionConstraint::ENEMY_HALF,
                                               MotionConstraint::CENTER_CIRCLE,
-                                              MotionConstraint::FRIENDLY_DEFENSE_AREA};
+                                              MotionConstraint::FRIENDLY_DEFENSE_AREA,
+                                             MotionConstraint::FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
         obstacle_factory.createFromMotionConstraints(constraints, world);
 
@@ -149,7 +152,8 @@ TEST_F(TestGlobalPathPlanner, test_enemy_half_blocked_starting_and_ending_in_blo
     Point start{2, 1}, dest{0, 0};
 
     std::set<MotionConstraint> constraints = {MotionConstraint::ENEMY_HALF,
-                                              MotionConstraint::FRIENDLY_DEFENSE_AREA};
+                                              MotionConstraint::FRIENDLY_DEFENSE_AREA,
+                                             MotionConstraint::FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
         obstacle_factory.createFromMotionConstraints(constraints, world);
 
@@ -177,7 +181,8 @@ TEST_F(TestGlobalPathPlanner, test_friendly_half_blocked_starting_in_blocked_are
     Point start{-3, -3}, dest{4, 1};
 
     std::set<MotionConstraint> constraints = {MotionConstraint::FRIENDLY_HALF,
-                                              MotionConstraint::ENEMY_DEFENSE_AREA};
+                                              MotionConstraint::ENEMY_DEFENSE_AREA,
+                                             MotionConstraint::FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
         obstacle_factory.createFromMotionConstraints(constraints, world);
 

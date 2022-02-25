@@ -33,8 +33,7 @@ GlobalPathPlannerFactory::GlobalPathPlannerFactory(
             motion_constraint_obstacles, world);
         planners.emplace(std::make_pair(
             motion_constraint_obstacles,
-            std::make_shared<EnlsvgPathPlanner>(navigable_area, obstacles,
-                                                world.field().boundaryMargin())));
+            std::make_shared<EnlsvgPathPlanner>(navigable_area, obstacles, ROBOT_MAX_RADIUS_METERS)));
     }
 }
 
