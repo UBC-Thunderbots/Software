@@ -121,9 +121,23 @@ class Agent
      */
     bool hasReachedGoal() const;
 
+    /**
+     * Update position of Agent
+     * @param position New position
+     */
     void setPosition(const Vector2 &position);
 
+    /**
+     * Update the velocity of Agent
+     * @param velocity New velocity
+     */
     void setVelocity(const Vector2 &velocity);
+
+    /**
+     * Update the max speed of Agent
+     * @param max_speed New max speed
+     */
+    void setMaxSpeed(float max_speed);
 
    protected:
     // Agent Properties

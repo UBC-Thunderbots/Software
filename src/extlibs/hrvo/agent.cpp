@@ -111,3 +111,8 @@ float Agent::getGoalRadius() const
 {
     return goal_radius_;
 }
+
+void Agent::setMaxSpeed(float max_speed)
+{
+    max_speed_ = max_speed;
+}

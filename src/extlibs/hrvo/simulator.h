@@ -76,11 +76,9 @@ class HRVOSimulator
      *      Adds a new Hybrid Reciprocal Agent to the simulation based on Robot.
      *
      * @param Robot    The robot which this agent should be based on
-     * @param velocity The number of neighboring agents which the HRVO algorithm should
-     * consider when calculating new velocity
      * @return    The index of the agent.
      */
-    std::size_t addHRVORobotAgent(const Robot &robot, int max_neighbors = 10);
+    std::size_t addHRVORobotAgent(const Robot &robot);
 
     /**
      *      Adds a new Linear Velocity Agent to the simulation based on Robot.

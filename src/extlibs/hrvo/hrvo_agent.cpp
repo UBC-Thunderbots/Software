@@ -576,3 +576,8 @@ std::vector<Circle> HRVOAgent::getCandidateVelocitiesAsCircles(
     }
     return candidate_circles;
 }
+
+void HRVOAgent::setPrefSpeed(float pref_speed)
+{
+    prefSpeed_ = pref_speed;
+}

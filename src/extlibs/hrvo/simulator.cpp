@@ -65,7 +65,7 @@ void HRVOSimulator::updateWorld(const World &world)
     {
         for (const Robot &friendly_robot : friendly_team)
         {
-            std::size_t agent_index = addHRVORobotAgent(friendly_robot, MAX_NEIGHBORS);
+            std::size_t agent_index = addHRVORobotAgent(friendly_robot);
             friendly_robot_id_map.emplace(friendly_robot.id(), agent_index);
         }
 
@@ -188,20 +188,27 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
         {
             std::unique_ptr<Goal> &goal = goals[hrvo_agent.value()->getGoalIndex()];
             goal->positions_.clear();
+            goal->speedAtPosition_.clear();
 
             if (primitive.has_move())
             {
                 // TODO (#2418): Update implementation of Primitive to support
                 // multiple path points
-                goal->positions_.emplace_back(
+                goal->positions_.emplace_back(Vector2(
                     static_cast<float>(primitive.move().destination().x_meters()),
-                    static_cast<float>(primitive.move().destination().y_meters()));
+                    static_cast<float>(primitive.move().destination().y_meters())));
+                goal->speedAtPosition_.emplace_back(
+                    primitive.move().final_speed_m_per_s());
+
+                float new_max_speed = primitive.move().max_speed_m_per_s();
+                hrvo_agent.value()->setMaxSpeed(new_max_speed);
+                hrvo_agent.value()->setPrefSpeed(new_max_speed * PREF_SPEED_SCALE);
             }
         }
     }
 }
 
-std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
+std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
 {
     Vector2 position(static_cast<float>(robot.position().x()),
                      static_cast<float>(robot.position().y()));
@@ -254,7 +261,7 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot, int max_neighbo
 
     return addHRVOAgent(position, agent_radius, velocity, max_speed, pref_speed,
                         max_accel, addGoalPositions({destination_point}, {speed_at_goal}),
-                        goal_radius, MAX_NEIGHBOR_SEARCH_DIST, max_neighbors,
+                        goal_radius, MAX_NEIGHBOR_SEARCH_DIST, MAX_NEIGHBORS,
                         uncertainty_offset);
 }
 

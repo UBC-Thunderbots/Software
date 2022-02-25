@@ -115,6 +115,12 @@ class HRVOAgent : public Agent
 
     std::vector<Polygon> getVelocityObstaclesAsPolygons() const;
 
+    /**
+     * Update preferred speed of Agent
+     * @param pref_speed New preferred speed
+     */
+    void setPrefSpeed(float pref_speed);
+
    private:
     /**
      * A candidate point.
@@ -136,6 +142,7 @@ class HRVOAgent : public Agent
 
    public:
     float prefSpeed_;
+
     std::size_t maxNeighbors_;
     float neighborDist_;
     float uncertaintyOffset_;
