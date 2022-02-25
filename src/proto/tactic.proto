@@ -65,9 +65,8 @@ message CreaseDefenderTactic
     // The crease defender alignment with respect to the enemy threat
     required CreaseDefenderAlignment crease_defender_alignment = 2;
     // The maximum allowed speed mode
-    required MovePrimitive.MaxAllowedSpeedMode max_allowed_speed_mode = 3;
-    // TODO: std::shared_ptr<const RobotNavigationObstacleConfig>
-    // robot_navigation_obstacle_config
+    required MovePrimitive.MaxAllowedSpeedMode max_allowed_speed_mode       = 3;
+    required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 4;
 }
 
 message DribbleTactic
@@ -93,7 +92,7 @@ message GoalieTactic
 {
     // The maximum allowed speed mode
     required MovePrimitive.MaxAllowedSpeedMode max_allowed_speed_mode = 1;
-    // TODO: add std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config
+    required GoalieTacticConfig goalie_tactic_config                  = 2;
 }
 
 message KickTactic

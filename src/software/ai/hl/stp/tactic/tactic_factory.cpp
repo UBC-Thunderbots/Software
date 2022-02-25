@@ -6,9 +6,9 @@
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::AttackerTactic& tactic_proto)
 {
-    // TODO: Use the config from the proto
-    auto tactic =
-        std::make_shared<AttackerTactic>(std::make_shared<const AttackerTacticConfig>());
+    auto config = std::make_shared<AttackerTacticConfig>();
+    config->loadFromProto(tactic_proto.attacker_tactic_config());
+    auto tactic = std::make_shared<AttackerTactic>(config);
 
     if (tactic_proto.has_best_pass_so_far())
     {
