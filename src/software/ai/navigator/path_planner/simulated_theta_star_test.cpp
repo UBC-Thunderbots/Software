@@ -11,8 +11,7 @@
 #include "software/time/duration.h"
 #include "software/world/world.h"
 
-class SimulatedThetaStarTest
-    : public SimulatedTacticTestFixture
+class SimulatedThetaStarTest : public SimulatedTacticTestFixture
 {
    protected:
     Field field = Field::createSSLDivisionBField();
