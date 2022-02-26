@@ -1,7 +1,4 @@
 #pragma once
-
-#include <optional>
-
 #include "software/multithreading/threaded_observer.hpp"
 
 /**
@@ -16,7 +13,7 @@ template <typename T>
 class FirstInFirstOutThreadedObserver : public ThreadedObserver<T>
 {
    public:
-    FirstInFirstOutThreadedObserver() : ThreadedObserver<T>(){};
+    FirstInFirstOutThreadedObserver<T>() : ThreadedObserver<T>(){};
 
     /**
      * Creates a new FirstInFirstOutThreadedObserver

@@ -19,14 +19,14 @@ ProtoLogger<MsgT>::ProtoLogger(
 {
     std::lock_guard<std::mutex> lock(chunk_mutex);
     // check if directory exists, if not make a directory
-    if (std::filesystem::exists(output_dir_path))
+    if (std::experimental::filesystem::exists(output_dir_path))
     {
-        if (!std::filesystem::is_directory(output_dir_path))
+        if (!std::experimental::filesystem::is_directory(output_dir_path))
         {
             throw std::invalid_argument(output_directory +
                                         " exists and is not a directory!");
         }
-        if (!std::filesystem::is_empty(output_dir_path))
+        if (!std::experimental::filesystem::is_empty(output_dir_path))
         {
             // this is better behavior than either adding more chunks to the same
             // directory (and having one directory end up with multiple replays) or
@@ -37,7 +37,7 @@ ProtoLogger<MsgT>::ProtoLogger(
     }
     else
     {
-        std::filesystem::create_directory(output_dir_path);
+        std::experimental::filesystem::create_directory(output_dir_path);
         LOG(INFO) << "Created directory " << output_dir_path;
     }
 
@@ -101,7 +101,7 @@ void ProtoLogger<MsgT>::saveCurrentChunkHelper()
                   });
     }
 
-    std::filesystem::path chunk_path =
+    std::experimental::filesystem::path chunk_path =
         output_dir_path / std::to_string(current_chunk_idx);
     std::ofstream chunk_ofstream(chunk_path);
     auto result = google::protobuf::util::SerializeDelimitedToOstream(current_chunk,

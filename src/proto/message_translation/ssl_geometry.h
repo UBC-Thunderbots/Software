@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <optional>
 
 #include "proto/messages_robocup_ssl_geometry.pb.h"
 #include "software/geom/circle.h"

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <optional>
-
 #include "proto/ssl_simulation_robot_control.pb.h"
 #include "proto/ssl_simulation_robot_feedback.pb.h"
 #include "proto/tbots_software_msgs.pb.h"

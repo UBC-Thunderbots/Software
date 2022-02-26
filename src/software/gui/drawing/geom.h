@@ -5,7 +5,6 @@
 #include <QtCore/QRect>
 #include <QtGui/QPolygonF>
 #include <QtWidgets/QGraphicsScene>
-#include <optional>
 
 #include "software/geom/circle.h"
 #include "software/geom/polygon.h"

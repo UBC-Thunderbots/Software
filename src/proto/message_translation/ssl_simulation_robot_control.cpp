@@ -70,17 +70,12 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
         {
             auto move_local_velocity = SSLSimulationProto::MoveLocalVelocity();
             move_local_velocity.set_forward(
-                static_cast<float>(direct_control.direct_velocity_control()
-                                       .velocity()
-                                       .x_component_meters()));
+                direct_control.direct_velocity_control().velocity().x_component_meters());
             move_local_velocity.set_left(
-                static_cast<float>(direct_control.direct_velocity_control()
-                                       .velocity()
-                                       .y_component_meters()));
-            move_local_velocity.set_angular(
-                static_cast<float>(direct_control.direct_velocity_control()
-                                       .angular_velocity()
-                                       .radians_per_second()));
+                direct_control.direct_velocity_control().velocity().y_component_meters());
+            move_local_velocity.set_angular(direct_control.direct_velocity_control()
+                                                .angular_velocity()
+                                                .radians_per_second());
 
             auto move_command = std::make_unique<SSLSimulationProto::RobotMoveCommand>();
             *(move_command->mutable_local_velocity()) = move_local_velocity;
@@ -91,7 +86,6 @@ std::unique_ptr<SSLSimulationProto::RobotMoveCommand> createRobotMoveCommand(
             return std::make_unique<SSLSimulationProto::RobotMoveCommand>();
         }
     }
-    return std::make_unique<SSLSimulationProto::RobotMoveCommand>();
 }
 
 std::unique_ptr<SSLSimulationProto::RobotCommand> createRobotCommand(

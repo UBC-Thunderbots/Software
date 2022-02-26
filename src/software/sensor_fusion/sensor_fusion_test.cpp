@@ -252,7 +252,7 @@ class SensorFusionTest : public ::testing::Test
         robot_msg->set_robot_id(2);
         robot_msg->add_error_code(TbotsProto::ErrorCode::WHEEL_0_MOTOR_HOT);
 
-        return robot_msg;
+        return std::move(robot_msg);
     }
 
     std::unique_ptr<TbotsProto::RobotStatus> initLowCapErrorCode()
@@ -262,7 +262,7 @@ class SensorFusionTest : public ::testing::Test
         robot_msg->set_robot_id(2);
         robot_msg->add_error_code(TbotsProto::ErrorCode::LOW_CAP);
 
-        return robot_msg;
+        return std::move(robot_msg);
     }
 
     std::unique_ptr<TbotsProto::RobotStatus> initDribbleMotorHotErrorCode()
@@ -272,7 +272,7 @@ class SensorFusionTest : public ::testing::Test
         robot_msg->set_robot_id(2);
         robot_msg->add_error_code(TbotsProto::ErrorCode::DRIBBLER_MOTOR_HOT);
 
-        return robot_msg;
+        return std::move(robot_msg);
     }
 
     std::unique_ptr<TbotsProto::RobotStatus> initMultipleErrorCode()
@@ -283,7 +283,7 @@ class SensorFusionTest : public ::testing::Test
         robot_msg->add_error_code(TbotsProto::ErrorCode::LOW_CAP);
         robot_msg->add_error_code(TbotsProto::ErrorCode::DRIBBLER_MOTOR_HOT);
 
-        return robot_msg;
+        return std::move(robot_msg);
     }
 
     std::unique_ptr<TbotsProto::RobotStatus> initNoErrorCode()
@@ -291,7 +291,7 @@ class SensorFusionTest : public ::testing::Test
         auto robot_msg = std::make_unique<TbotsProto::RobotStatus>();
         robot_msg->set_robot_id(2);
 
-        return robot_msg;
+        return std::move(robot_msg);
     }
 
     std::unique_ptr<SSLProto::Referee> initRefereeIndirectYellow()

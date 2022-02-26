@@ -1,5 +1,5 @@
 #pragma once
-#include <filesystem>
+#include <experimental/filesystem>
 
 #include "proto/repeated_any_msg.pb.h"
 #include "software/multithreading/first_in_first_out_threaded_observer.h"
@@ -64,7 +64,7 @@ class ProtoLogger : public FirstInFirstOutThreadedObserver<MsgT>
 
     RepeatedAnyMsg current_chunk;
     size_t current_chunk_idx;
-    std::filesystem::path output_dir_path;
+    std::experimental::filesystem::path output_dir_path;
     const int msgs_per_chunk;
     std::optional<std::function<bool(MsgT, MsgT)>> sort_comparator;
     // this allows us to save ProtoLog's from the main thread

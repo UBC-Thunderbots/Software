@@ -29,8 +29,6 @@ echo "================================================================"
 sudo apt-get update
 sudo apt-get install -y software-properties-common # required for add-apt-repository
 
-sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-
 sudo apt-get update
 
 # (sorted alphabetically)
@@ -39,10 +37,8 @@ host_software_packages=(
     codespell # Fixes typos
     curl
     default-jdk # Needed for Bazel to run properly
-    gcc-9 # We use gcc 9.3.0
-    libstdc++6-9-dbg
+    gcc-7 # We use gcc 7.4.0
     git # required for build
-    g++-9
     kcachegrind # This lets us view the profiles output by callgrind
     libeigen3-dev # A math / numerical library used for things like linear regression
     libprotobuf-dev

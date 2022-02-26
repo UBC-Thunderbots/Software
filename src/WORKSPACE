@@ -37,8 +37,6 @@ http_archive(
 
 http_archive(
     name = "cpp_redis",
-    patch_args = ["-p1"],
-    patches = ["@//extlibs:cpp_redis.patch"],
     sha256 = "12a6fc86ba4ca3d4537a3eee82c094f385b8e03e283c664c976f16d421f17f7d",
     strip_prefix = "cpp_redis-fc2c43fa07e45e1ef0f77cbda6a240e7890ae5aa",
     urls = [
@@ -86,7 +84,6 @@ http_archive(
 
 http_archive(
     name = "rules_proto",
-    sha256 = "ba66b430aaed1b6d2530154fd5ff968fb810ee0936edfe5f48e1f1c36ff2ea65",
     strip_prefix = "rules_proto-e507ccded37c389186afaeb2b836ec576dc875dc",
     urls = [
         "https://github.com/bazelbuild/rules_proto/archive/e507ccded37c389186afaeb2b836ec576dc875dc.zip",
@@ -113,9 +110,9 @@ boost_deps()
 new_git_repository(
     name = "eigen",
     build_file = "@//extlibs:eigen.BUILD",
-    commit = "937c3d73cbf55b6edc658decf7931b90ede1daef",
+    commit = "21ae2afd4edaa1b69782c67a54182d34efe43f9c",
     remote = "https://chromium.googlesource.com/external/gitlab.com/libeigen/eigen.git",
-    shallow_since = "1642460459 -0600",
+    shallow_since = "1544551075 +0100",
 )
 
 # nanopb: lightweight protobuf library used on the STM32. The build file in the
@@ -131,6 +128,12 @@ http_archive(
     urls = [
         "https://jpa.kapsi.fi/nanopb/download/nanopb-0.3.9.4-linux-x86.tar.gz",
     ],
+)
+
+new_local_repository(
+    name = "libusb",
+    build_file = "@//extlibs:libusb.BUILD",
+    path = "/",
 )
 
 new_git_repository(
@@ -188,12 +191,22 @@ new_local_repository(
 )
 
 http_archive(
+    name = "arm_developer_gcc",
+    build_file = "@//extlibs:arm_gcc.BUILD",
+    sha256 = "b50b02b0a16e5aad8620e9d7c31110ef285c1dde28980b1a9448b764d77d8f92",
+    strip_prefix = "gcc-arm-none-eabi-8-2019-q3-update",
+    urls = [
+        "https://developer.arm.com/-/media/Files/downloads/gnu-rm/8-2019q3/RC1.1/gcc-arm-none-eabi-8-2019-q3-update-linux.tar.bz2",
+    ],
+)
+
+http_archive(
     name = "jetson_nano_gcc",
     build_file = "@//extlibs:jetson_nano_gcc.BUILD",
-    sha256 = "8dfe681531f0bd04fb9c53cf3c0a3368c616aa85d48938eebe2b516376e06a66",
-    strip_prefix = "gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu",
+    sha256 = "73eed74e593e2267504efbcf3678918bb22409ab7afa3dc7c135d2c6790c2345",
+    strip_prefix = "gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu",
     urls = [
-        "https://developer.arm.com/-/media/Files/downloads/gnu-a/9.2-2019.12/binrel/gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu.tar.xz",
+        "http://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-linux-gnu/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu.tar.xz",
     ],
 )
 
@@ -270,13 +283,6 @@ new_git_repository(
     shallow_since = "1596403987 -0600",
 )
 
-git_repository(
-    name = "rules_python",
-    commit = "6f37aa9966f53e063c41b7509a386d53a9f156c3",
-    remote = "https://github.com/bazelbuild/rules_python.git",
-    shallow_since = "1617165164 +1100",
-)
-
 new_git_repository(
     name = "trinamic",
     build_file = "@//extlibs:trinamic.BUILD",
@@ -344,7 +350,6 @@ bind(
 
 http_archive(
     name = "pybind11_bazel",
-    sha256 = "fec6281e4109115c5157ca720b8fe20c8f655f773172290b03f57353c11869c2",
     strip_prefix = "pybind11_bazel-72cbbf1fbc830e487e3012862b7b720001b70672",
     urls = ["https://github.com/pybind/pybind11_bazel/archive/72cbbf1fbc830e487e3012862b7b720001b70672.zip"],
 )
@@ -353,7 +358,6 @@ http_archive(
 http_archive(
     name = "pybind11",
     build_file = "@pybind11_bazel//:pybind11.BUILD",
-    sha256 = "1c6e0141f7092867c5bf388bc3acdb2689ed49f59c3977651394c6c87ae88232",
     strip_prefix = "pybind11-2.9.0",
     urls = ["https://github.com/pybind/pybind11/archive/refs/tags/v2.9.0.zip"],
 )
@@ -367,7 +371,6 @@ maybe(
     name = "rules_third_party",
     commit = "8d0ba00f9874588c1ea38d1be2859060ac8c8516",
     remote = "https://github.com/DraconicEnt/rules_third_party.git",
-    shallow_since = "1620228587 -0400",
 )
 
 load("@rules_third_party//libraries:bullet.bzl", "bullet")

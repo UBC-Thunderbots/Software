@@ -1,7 +1,7 @@
 #include "software/simulated_tests/simulated_test_fixture.h"
 
 #include <cstdlib>
-#include <filesystem>
+#include <experimental/filesystem>
 
 #include "proto/message_translation/ssl_wrapper.h"
 #include "shared/2015_robot_constants.h"
@@ -126,7 +126,7 @@ void SimulatedTestFixture::setupReplayLogging()
     // get the name of the current test to name the replay output directory
     auto test_name = ::testing::UnitTest::GetInstance()->current_test_info()->name();
 
-    namespace fs                                           = std::filesystem;
+    namespace fs = std::experimental::filesystem;
     static constexpr auto SIMULATED_TEST_OUTPUT_DIR_SUFFIX = "simulated_test_outputs";
 
     const char *test_outputs_dir_or_null = std::getenv("TEST_UNDECLARED_OUTPUTS_DIR");
