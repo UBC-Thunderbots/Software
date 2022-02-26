@@ -92,6 +92,7 @@ if [[ $(lsb_release -rs) == "18.04" ]]; then
     host_software_packages+=(libclang-dev)
     host_software_packages+=(python3.8)
     host_software_packages+=(python3.8-venv)
+    host_software_packages+=(python3-setuptools)
 fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
@@ -103,8 +104,11 @@ fi
 
 # Upgrade python3 pip, which some pip packages require
 echo "================================================================"
-echo "Upgrading Pip Version"
+echo "Setting Up Virtual Python Environment"
 echo "================================================================"
+
+# delete tbotspython first
+sudo rm -r /opt/tbotspython
 
 if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
     echo "##############################################################"
@@ -136,7 +140,7 @@ if ! sudo /opt/tbotspython/bin/pip3 install --upgrade protobuf  ; then
 fi
 
 echo "================================================================"
-echo "Done Upgrading Pip Version"
+echo "Done Setting Up Virtual Python Environment"
 echo "================================================================"
 
 # Install Bazel
@@ -157,23 +161,43 @@ if ! sudo apt-get install bazel-5.0.0 -y ; then
     exit 1
 fi
 sudo rm -f /usr/bin/bazel # remove symlink
-sudo ln -s /usr/bin/bazel-5.0.0 /usr/bin/bazel
+
+echo "================================================================"
+echo "Done Installing Bazel"
+echo "================================================================"
+
+echo "================================================================"
+echo "Setting Up PlatformIO"
+echo "================================================================"
 
 # setup platformio to compile arduino code
 # link to instructions: https://docs.platformio.org/en/latest/core/installation.html
 # **need to reboot for changes to come into effect**
 
 # downloading platformio udev rules
-curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules
+if ! curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules; then
+    echo "##############################################################"
+    echo "Error: Downloading PlatformIO udev rules failed"
+    echo "##############################################################"
+    exit 1
+fi
+
 sudo service udev restart
 
 # allow user access to serial ports
 sudo usermod -a -G dialout $USER
 
-# installs platformio to global environment
-sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==5.2.4
+# installs PlatformIO to global environment
+if ! sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==5.2.4; then
+    echo "##############################################################"
+    echo "Error: Installing PlatformIO failed"
+    echo "##############################################################"
+    exit 1
+fi
+
+
 echo "================================================================"
-echo "Done platformio Setup"
+echo "Done PlatformIO Setup"
 echo "================================================================"
 
 # Done
