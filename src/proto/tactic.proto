@@ -51,21 +51,21 @@ message ChipTactic
     required double chip_distance_meters = 3;
 }
 
+enum CreaseDefenderAlignment
+{
+    LEFT   = 0;
+    RIGHT  = 1;
+    CENTRE = 2;
+}
+
 message CreaseDefenderTactic
 {
-    enum CreaseDefenderAlignment
-    {
-        LEFT   = 0;
-        RIGHT  = 1;
-        CENTRE = 2;
-    }
-
     // The origin point of the enemy threat
     required Point enemy_threat_origin = 1;
     // The crease defender alignment with respect to the enemy threat
     required CreaseDefenderAlignment crease_defender_alignment = 2;
     // The maximum allowed speed mode
-    required MovePrimitive.MaxAllowedSpeedMode max_allowed_speed_mode       = 3;
+    required MaxAllowedSpeedMode max_allowed_speed_mode                     = 3;
     required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 4;
 }
 
@@ -91,8 +91,8 @@ message GetBehindBallTactic
 message GoalieTactic
 {
     // The maximum allowed speed mode
-    required MovePrimitive.MaxAllowedSpeedMode max_allowed_speed_mode = 1;
-    required GoalieTacticConfig goalie_tactic_config                  = 2;
+    required MaxAllowedSpeedMode max_allowed_speed_mode = 1;
+    required GoalieTacticConfig goalie_tactic_config    = 2;
 }
 
 message KickTactic
@@ -116,13 +116,13 @@ message MoveTactic
     // The speed the robot should have when it arrives at its destination
     required double final_speed = 3;
     // How to run the dribbler
-    required MovePrimitive.DribblerMode dribbler_mode = 4;
+    required DribblerMode dribbler_mode = 4;
     // How to navigate around the ball
-    required MovePrimitive.BallCollisionType ball_collision_type = 5;
+    required BallCollisionType ball_collision_type = 5;
     // The command to autochip or autokick
-    required MovePrimitive.AutoChipOrKick auto_chip_or_kick = 6;
+    required AutoChipOrKick auto_chip_or_kick = 6;
     // The maximum allowed speed mode
-    required MovePrimitive.MaxAllowedSpeedMode max_allowed_speed_mode = 7;
+    required MaxAllowedSpeedMode max_allowed_speed_mode = 7;
     // The target spin while moving in revolutions per second
     required double target_spin_rev_per_s = 8;
 }
@@ -136,7 +136,7 @@ message PivotKickTactic
     // The direction the Robot will kick in
     required Angle kick_direction = 2;
     // How the robot will chip or kick the ball
-    required MovePrimitive.AutoChipOrKick auto_chip_or_kick = 3;
+    required AutoChipOrKick auto_chip_or_kick = 3;
 }
 
 message ReceiverTactic

@@ -94,9 +94,10 @@ void DribbleFSM::getPossession(const Update &event)
         Vector::createFromAngle(face_ball_orientation).normalize(0.05);
     event.common.set_intent(std::make_unique<MoveIntent>(
         event.common.robot.id(), intercept_position, face_ball_orientation, 0,
-        DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        0.0, event.common.robot.robotConstants()));
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+        event.common.robot.robotConstants()));
 }
 
 void DribbleFSM::dribble(const Update &event)
@@ -124,9 +125,10 @@ void DribbleFSM::dribble(const Update &event)
 
     event.common.set_intent(std::make_unique<MoveIntent>(
         event.common.robot.id(), target_destination, target_orientation, 0,
-        DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        0.0, event.common.robot.robotConstants()));
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+        event.common.robot.robotConstants()));
 }
 
 void DribbleFSM::loseBall(const Update &event)
@@ -139,9 +141,10 @@ void DribbleFSM::loseBall(const Update &event)
 
     event.common.set_intent(std::make_unique<MoveIntent>(
         event.common.robot.id(), away_from_ball_position, face_ball_orientation, 0,
-        DribblerMode::OFF, BallCollisionType::AVOID,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        0.0, event.common.robot.robotConstants()));
+        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+        event.common.robot.robotConstants()));
 }
 
 void DribbleFSM::startDribble(const Update &event)
