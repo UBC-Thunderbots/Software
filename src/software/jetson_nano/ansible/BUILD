@@ -7,7 +7,18 @@ py_binary(
     name = "dynamic_inventory",
     srcs = ["dynamic_inventory.py"],
     data = ["setup.yml"],
-    deps = [requirement("ansible")],
+    deps = [
+        requirement("ansible"),
+    ],
+)
+
+py_binary(
+    name = "run_ansible",
+    srcs = ["run_ansible.py"],
+    data = ["setup.yml"],
+    deps = [
+        requirement("ansible"),
+    ],
 )
 
 genrule(
@@ -25,6 +36,7 @@ py_binary(
 sh_binary(
     name = "ansible_sh",
     srcs = ["ansible_sh.sh"],
+    args = ["$(location :requirements(\"ansible\")"],
     data = [
         requirement("ansible"),
     ],
