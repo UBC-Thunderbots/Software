@@ -193,21 +193,19 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
             goal->positions_.clear();
             goal->speedAtPosition_.clear();
 
-                if (primitive.has_move())
-                {
-                    // TODO (#2418): Update implementation of Primitive to support
-                    // multiple path points
-                    auto destination = primitive.move().path().point().at(0);
-                    goal->positions_.emplace_back(
-                        static_cast<float>(destination.x_meters()),
-                        static_cast<float>(destination.y_meters()));
-                    goal->speedAtPosition_.emplace_back(
-                            primitive.move().final_speed_m_per_s());
+            if (primitive.has_move())
+            {
+                // TODO (#2418): Update implementation of Primitive to support
+                // multiple path points
+                auto destination = primitive.move().path().point().at(0);
+                goal->positions_.emplace_back(static_cast<float>(destination.x_meters()),
+                                              static_cast<float>(destination.y_meters()));
+                goal->speedAtPosition_.emplace_back(
+                    primitive.move().final_speed_m_per_s());
 
-                    float new_max_speed = primitive.move().max_speed_m_per_s();
-                    hrvo_agent.value()->setMaxSpeed(new_max_speed);
-                    hrvo_agent.value()->setPrefSpeed(new_max_speed * PREF_SPEED_SCALE);
-                }
+                float new_max_speed = primitive.move().max_speed_m_per_s();
+                hrvo_agent.value()->setMaxSpeed(new_max_speed);
+                hrvo_agent.value()->setPrefSpeed(new_max_speed * PREF_SPEED_SCALE);
             }
         }
     }
@@ -252,7 +250,7 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
         if (primitive.has_move())
         {
             const auto &move_primitive = primitive.move();
-            destination_point_proto = move_primitive.path().point().at(0);
+            destination_point_proto    = move_primitive.path().point().at(0);
             destination_point =
                 Vector2(static_cast<float>(destination_point_proto.x_meters()),
                         static_cast<float>(destination_point_proto.y_meters()));
