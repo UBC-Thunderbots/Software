@@ -50,9 +50,9 @@ std::shared_ptr<const EnlsvgPathPlanner> GlobalPathPlannerFactory::getPathPlanne
             << "GlobalPathPlannerFactory is unable to obtain a path planner for the following motion constraints: ";
         for (auto constraint : motion_constraints)
         {
-            LOG(WARNING) << toString(constraint) << " ";
+            LOG(WARNING) << toString(constraint);
         }
-        LOG(WARNING) << "\nReturning obstacle-free planner." << std::endl;
+        LOG(WARNING) << "Returning obstacle-free planner.";
     }
     return planners.at({});
 }
