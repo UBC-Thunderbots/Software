@@ -14,9 +14,15 @@ py_binary(
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
         "//software/thunderscope/log:g3log_widget",
+        "//software/thunderscope:ProtoReceiver",
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],
+)
+
+py_library(
+    name = "ProtoReceiver",
+    srcs = ["ProtoReceiver.py"],
 )
 
 py_library(
