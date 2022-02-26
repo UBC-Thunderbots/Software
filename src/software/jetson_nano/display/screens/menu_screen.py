@@ -1,8 +1,9 @@
 from screen import Screen
 
+
 class MenuScreen(Screen):
     def __init__(self, lcd_display, status_codes):
-        # Defining this screens actions 
+        # Defining this screens actions
         def home():
             """ Action to go to Home Screen """
             return {self.status_codes["change screen"]: "Home"}
@@ -14,13 +15,13 @@ class MenuScreen(Screen):
         def config_chip_and_kick():
             """ Go to Chip and Kick Screen """
             return {self.status_codes["change screen"]: "Chip and Kick"}
-       
+
         # Listing actions for Menu Screen
         self.actions = ["Wheels", "Chip and Kick", "Home"]
         self.action_map = {
             self.actions[0]: config_wheels,
             self.actions[1]: config_chip_and_kick,
-            self.actions[2]: home
+            self.actions[2]: home,
         }
 
         def draw_screen():
@@ -33,18 +34,35 @@ class MenuScreen(Screen):
 
             x = 0
             y = 20
-            
-            self.lcd_display.draw.text((x, y), "{} Configure Wheels".format(val0), font=self.font, fill="#ffffff")
+
+            self.lcd_display.draw.text(
+                (x, y),
+                "{} Configure Wheels".format(val0),
+                font=self.font,
+                fill="#ffffff",
+            )
             y += self.font_size
-            self.lcd_display.draw.text((x, y), "{} Configure Chip & Kick".format(val1), font=self.font, fill="#ffffff")
+            self.lcd_display.draw.text(
+                (x, y),
+                "{} Configure Chip & Kick".format(val1),
+                font=self.font,
+                fill="#ffffff",
+            )
 
             y = self.lcd_display.height - self.font_size - 6
-            self.lcd_display.draw.text((x, y), "{} Go to Home screen".format(val2), font=self.font, fill="#ffffff")
+            self.lcd_display.draw.text(
+                (x, y),
+                "{} Go to Home screen".format(val2),
+                font=self.font,
+                fill="#ffffff",
+            )
 
         # Pass Menu Screen parameters to super class
-        super().__init__(lcd_display, status_codes, self.actions, self.action_map, draw_screen)
-    
+        super().__init__(
+            lcd_display, status_codes, self.actions, self.action_map, draw_screen
+        )
+
+
 if __name__ == "__main__":
     menu_screen = MenuScreen(None)
     menu_screen.on_click()
-

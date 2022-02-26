@@ -41,6 +41,7 @@ counterclockwise_state_transitions = {
 CLOCKWISE = 1
 COUNTERCLOCKWISE = 0
 
+
 class RotaryEncoder:
     def __init__(
         self,
@@ -71,7 +72,7 @@ class RotaryEncoder:
 
     def setup(self):
         """ Initialize GPIO pins and rotary encoder state """
-        
+
         # Set the GPIO mode if it has not been set
         if not GPIO.getmode():
             GPIO.setmode(GPIO.BOARD)
@@ -95,7 +96,7 @@ class RotaryEncoder:
         pin_2_state = GPIO.input(self.PIN_2)
         next_state = (pin_1_state, pin_2_state)
         prev_state = self.curr_state
-        
+
         if self.curr_state != next_state:
             self.count += 1
             self.curr_state = next_state
@@ -111,7 +112,7 @@ class RotaryEncoder:
         def on_rotation(channel):
             """ Update rotation state and call user defined callback functions after complete rotation """
             self.rot_state()
-            
+
             if self.count // self.transitions_per_rotation != 0:
                 if self.dir == CLOCKWISE:
                     self.on_clockwise_rotate()
@@ -144,7 +145,7 @@ class RotaryEncoder:
         GPIO.cleanup()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     def on_click():
         print("click")
@@ -156,21 +157,20 @@ if __name__ == '__main__':
         print("counterclockwise")
 
     BUTTON_PIN = 40  # BOARD 35, TEGRA_SOC: 'DAP4_FS'
-    PIN_1 = 33      # BOARD 40, TEGRA_SOC: 'DAP4_DOUT' 
-    PIN_2 = 35      # BOARD 33, TEGRA_SOC: 'GPIO_PE6'
+    PIN_1 = 33  # BOARD 40, TEGRA_SOC: 'DAP4_DOUT'
+    PIN_2 = 35  # BOARD 33, TEGRA_SOC: 'GPIO_PE6'
 
-    rot = \
-        RotaryEncoder(
-            PIN_1, 
-            PIN_2, 
-            BUTTON_PIN, 
-            on_clockwise_rotate, 
-            on_counterclockwise_rotate, 
-            on_click
-        )
+    rot = RotaryEncoder(
+        PIN_1,
+        PIN_2,
+        BUTTON_PIN,
+        on_clockwise_rotate,
+        on_counterclockwise_rotate,
+        on_click,
+    )
 
     rot.start()
-    print('Press Enter to quit program...')
+    print("Press Enter to quit program...")
     input()
     rot.stop()
-    print('Quitting program...')
+    print("Quitting program...")

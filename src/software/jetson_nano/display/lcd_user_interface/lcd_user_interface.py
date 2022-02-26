@@ -36,6 +36,7 @@ SPI = board.SPI()
 # We will use RGB colour model
 COLOUR_MODEL = "RGB"
 
+
 class LcdDisplay:
     def __init__(self):
         """ Create a lcd_display object """
@@ -53,11 +54,11 @@ class LcdDisplay:
         # We swap height/width to rotate display to landscape
         self.width = self.disp.height
         self.height = self.disp.width
-        
+
         # Create blank image for drawing
         self.image = Image.new(COLOUR_MODEL, (self.width, self.height))
         # Get drawing object to draw on image
-        self.draw  = ImageDraw.Draw(self.image)
+        self.draw = ImageDraw.Draw(self.image)
 
         # Initialize to an empty black screen
         self.clear_screen()
@@ -97,10 +98,11 @@ class LcdDisplay:
     def prepare(self):
         """ Create a blank rectangle for drawing """
         self.draw.rectangle((0, 20, self.width, self.height), outline=0, fill=0)
-    
+
     def show(self):
         """ Display the image """
         self.disp.image(self.image)
+
 
 if __name__ == "__main__":
     path_to_logo = "./imgs/tbots.jpg"
