@@ -37,7 +37,7 @@ class EnlsvgPathPlanner
     EnlsvgPathPlanner(const Rectangle &navigable_area,
                       const std::vector<ObstaclePtr> &obstacles,
                       double boundary_margin_offset = 0.0, double resolution = 0.09);
-                      
+
     /**
      * Returns a path that is an optimized path between start and end. Has no checking on
      * whether the start and end are valid and within field boundaries.

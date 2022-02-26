@@ -628,7 +628,7 @@ TEST_F(TestEnlsvgPathPlanner, test_one_path_planner_object_called_twice_for_same
 
     // Test same path using the same path planner object to make sure it still works when
     // being reused
-    auto same_path = planner.findPath(start, dest);
+    auto same_path                      = planner.findPath(start, dest);
     std::vector<Point> same_path_points = path->getKnots();
 
     for (unsigned i = 0; i < path_points.size(); ++i)
