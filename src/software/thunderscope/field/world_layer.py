@@ -67,7 +67,7 @@ class WorldLayer(FieldLayer):
 
     def hoverMoveEvent(self, event):
         self.mouse_hover_pos = [event.pos().x(), event.pos().y()]
-        # print(event.pos())
+        self.identify_robots(event.pos().x(), event.pos().y())
 
     def mouseClickEvent(self, event):
         print(event.pos())
@@ -78,6 +78,21 @@ class WorldLayer(FieldLayer):
         # see if there is a robot here and if there is, then "select" it
         # wait on a keypress event for what action to take
     
+    def identify_robots(self, mouse_x, mouse_y):
+        self.identify_robot(mouse_x, mouse_y, self.cached_world.friendly_team.team_robots, "Friendly: ")
+        self.identify_robot(mouse_x, mouse_y, self.cached_world.enemy_team.team_robots, "Enemy: ")
+
+    def identify_robot(self, mouse_x, mouse_y, team, side):
+        for robot_ in team:
+            pos_x = robot_.current_state.global_position.x_meters
+            pos_y = robot_.current_state.global_position.y_meters
+            if math.sqrt((pos_x - mouse_x/1000)**2 + (pos_y - mouse_y/1000)**2) <= ROBOT_MAX_RADIUS/1000:
+                print(side)
+                print(robot_.id)        
+                # print(robot_.current_state.global_position)
+                # print(mouse_x/1000)
+                # print(mouse_y/1000)
+
     def draw_mouse_click_loc(self, painter):
         """Draw a circle indicating where the mouse was clicked on the field
 
