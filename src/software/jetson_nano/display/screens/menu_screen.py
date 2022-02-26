@@ -1,19 +1,19 @@
 from screen import Screen
 
 class MenuScreen(Screen):
-    def __init__(self, lcd_display, key_list):
+    def __init__(self, lcd_display, status_codes):
         # Defining this screens actions 
         def home():
             """ Action to go to Home Screen """
-            return {self.key_list["change screen"]: "Home"}
+            return {self.status_codes["change screen"]: "Home"}
 
         def config_wheels():
             """ Go to Wheel Screen """
-            return {self.key_list["change screen"]: "Wheels"}
+            return {self.status_codes["change screen"]: "Wheels"}
 
         def config_chip_and_kick():
             """ Go to Chip and Kick Screen """
-            return {self.key_list["change screen"]: "Chip and Kick"}
+            return {self.status_codes["change screen"]: "Chip and Kick"}
        
         # Listing actions for Menu Screen
         self.actions = ["Wheels", "Chip and Kick", "Home"]
@@ -42,8 +42,9 @@ class MenuScreen(Screen):
             self.lcd_display.draw.text((x, y), "{} Go to Home screen".format(val2), font=self.font, fill="#ffffff")
 
         # Pass Menu Screen parameters to super class
-        super().__init__(lcd_display, key_list, self.actions, self.action_map, draw_screen)
+        super().__init__(lcd_display, status_codes, self.actions, self.action_map, draw_screen)
     
 if __name__ == "__main__":
     menu_screen = MenuScreen(None)
     menu_screen.on_click()
+

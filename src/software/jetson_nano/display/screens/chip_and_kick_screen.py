@@ -4,7 +4,7 @@ CHIP = 0
 KICK = 1
 
 class ChipAndKickScreen(Screen):
-    def __init__(self, lcd_display, key_list):
+    def __init__(self, lcd_display, status_codes):
         self.enable = False
         self.speeds = [0.0, 0.0] # [chip_speed, kick_speed] (using a list to mimic pass by reference)
 
@@ -13,7 +13,7 @@ class ChipAndKickScreen(Screen):
             """ Go to the menu screen """
             self.curr_action = 0
 
-            return {self.key_list["change screen"]: "Menu"}
+            return {self.status_codes["change screen"]: "Menu"}
         
         def set_chip_and_kick_speed():
             """ Enable and disable settings """
@@ -23,25 +23,25 @@ class ChipAndKickScreen(Screen):
                 self.enable = True
             
             self.update_screen()
-            return {self.key_list["none"]: None}
+            return {self.status_codes["none"]: None}
         
         def set_chip():
             """ Set chip speed """
             return {
-                self.key_list["edit"]: {
+                self.status_codes["edit"]: {
                     "param": self.speeds, 
                     "setting": CHIP, 
-                    "delta": 0.1
+                    "delta": 0.5
                 }
             }
         
         def set_kick():
             """ Set kick speed """
             return {
-                self.key_list["edit"]: {
+                self.status_codes["edit"]: {
                     "param": self.speeds, 
                     "setting": KICK, 
-                    "delta": 0.1
+                    "delta": 0.5
                 }
             }
         
@@ -90,4 +90,5 @@ class ChipAndKickScreen(Screen):
             self.lcd_display.draw.text((x, y), "{} Go to Menu screen".format(val3), font=self.font, fill="#ffffff")
 
         # Pass Wheel Screen parameters to super class
-        super().__init__(lcd_display, key_list, self.actions, self.action_map, draw_screen)
+        super().__init__(lcd_display, status_codes, self.actions, self.action_map, draw_screen)
+

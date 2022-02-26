@@ -6,7 +6,7 @@ BACK_LEFT   = 2
 BACK_RIGHT  = 3
 
 class WheelsScreen(Screen):
-    def __init__(self, lcd_display, key_list):
+    def __init__(self, lcd_display, status_codes):
         self.enable = False
         self.wheel_speeds = [0.0, 0.0, 0.0, 0.0] # [front left, front right, back left, back right] (using a list to mimic pass by reference)
 
@@ -15,7 +15,7 @@ class WheelsScreen(Screen):
         def menu():
             """ Go to the menu screen """
             self.curr_action = 0
-            return {self.key_list["change screen"]: "Menu"}
+            return {self.status_codes["change screen"]: "Menu"}
         
         def set_wheel_speed():
             """ Enable and disable settings """
@@ -24,45 +24,45 @@ class WheelsScreen(Screen):
             else:
                 self.enable = True
             self.update_screen()
-            return {self.key_list["none"]: None}
+            return {self.status_codes["none"]: None}
         
         def front_left():
             """ Set speed for front left wheel """
             return {
-                self.key_list["edit"]: {
+                self.status_codes["edit"]: {
                     "param": self.wheel_speeds, 
                     "setting": FRONT_LEFT, 
-                    "delta": 0.1
+                    "delta": 0.5
                 }
             }
         
         def front_right():
             """ Set speed for front right wheel """
             return {
-                self.key_list["edit"]: {
+                self.status_codes["edit"]: {
                     "param": self.wheel_speeds, 
                     "setting": FRONT_RIGHT, 
-                    "delta": 0.1
+                    "delta": 0.5
                 }
             }
         
         def back_left():
             """ Set speed for back left wheel """
             return {
-                self.key_list["edit"]: {
+                self.status_codes["edit"]: {
                     "param": self.wheel_speeds, 
                     "setting": BACK_LEFT, 
-                    "delta": 0.1
+                    "delta": 0.5
                 }
             }
         
         def back_right():
             """ Set speed for back right wheel """
             return {
-                self.key_list["edit"]: {
+                self.status_codes["edit"]: {
                     "param": self.wheel_speeds, 
                     "setting": BACK_RIGHT, 
-                    "delta": 0.1
+                    "delta": 0.5
                 }
             }
 
@@ -129,5 +129,6 @@ class WheelsScreen(Screen):
             self.lcd_display.draw.text((x, y), "{} Go to Menu screen".format(val5), font=self.font, fill="#ffffff")
 
         # Pass Wheel Screen parameters to super class
-        super().__init__(lcd_display, key_list, self.actions, self.action_map, draw_screen)
+        super().__init__(lcd_display, status_codes, self.actions, self.action_map, draw_screen)
+
 

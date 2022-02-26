@@ -1,18 +1,18 @@
 from screen import Screen
 
 class HomeScreen(Screen):
-    def __init__(self, lcd_display, key_list):
+    def __init__(self, lcd_display, status_codes):
         def menu():
             """ Action to go to Menu Screen """
-            return {self.key_list["change screen"]: "Menu"}
+            return {self.status_codes["change screen"]: "Menu"}
 
         def robot_id():
             """ Set Robot ID """
-            return {self.key_list["none"]: None}
+            return {self.status_codes["none"]: None}
 
         def channel_id():
             """ Set Channel ID """
-            return {self.key_list["none"]: None}
+            return {self.status_codes["none"]: None}
 
         # Listing actions for Home Screen
         self.actions = ["Robot ID", "Channel ID", "Menu"]
@@ -46,7 +46,7 @@ class HomeScreen(Screen):
             self.lcd_display.draw.text((0, self.lcd_display.height-6-self.font_size), "{} Go to Menu screen".format(val2), font=self.font, fill="#FFFFFF")
             
         # Pass Home Screen parameters to super class
-        super().__init__(lcd_display, key_list, self.actions, self.action_map, draw_screen)
+        super().__init__(lcd_display, status_codes, self.actions, self.action_map, draw_screen)
 
 # For testing
 if __name__ == "__main__":
@@ -55,3 +55,4 @@ if __name__ == "__main__":
     from lcd_user_interface import LcdDisplay
     home_screen = HomeScreen(LcdDisplay())
     home_screen.on_clockwise_rotate()
+

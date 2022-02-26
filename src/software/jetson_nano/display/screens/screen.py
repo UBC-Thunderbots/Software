@@ -2,11 +2,11 @@ from PIL import ImageFont
 import subprocess
 
 class Screen():
-    def __init__(self, lcd_display, key_list, actions, action_map, draw_screen): 
+    def __init__(self, lcd_display, status_codes, actions, action_map, draw_screen): 
         self.lcd_display = lcd_display
         self.font_size = 12
         self.font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', self.font_size)
-        self.key_list = key_list
+        self.status_codes = status_codes
         self.draw_screen = draw_screen
 
         # Screen actions
@@ -49,8 +49,8 @@ class Screen():
         action = self.action_map[self.actions[self.curr_action]]()
         
         # For editing settings
-        if self.key_list["edit"] in action: 
-            payload = action[self.key_list["edit"]]
+        if self.status_codes["edit"] in action: 
+            payload = action[self.status_codes["edit"]]
             
             self.param = payload["param"]
             self.setting = payload["setting"]
@@ -84,3 +84,4 @@ class Screen():
     def dec_val(self):
         """ Decrement self.param by self.delta """
         self.param[self.setting] -= self.delta
+
