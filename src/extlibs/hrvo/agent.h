@@ -1,7 +1,7 @@
 #pragma once
 
-#include "extlibs/hrvo/vector2.h"
 #include "extlibs/hrvo/path.h"
+#include "extlibs/hrvo/vector2.h"
 
 class Simulator;
 
@@ -124,7 +124,7 @@ class Agent
 
     Path getPath();
 
-protected:
+   protected:
     // Agent Properties
     Vector2 position_;
     float radius_;
@@ -142,7 +142,5 @@ protected:
     float max_accel_;
     bool reached_goal_;
 
-    // TODO (#2373): Remove once new Path class is added and add timeStep as a argument to
-    // update(time_step)
     Simulator *const simulator_;
 };

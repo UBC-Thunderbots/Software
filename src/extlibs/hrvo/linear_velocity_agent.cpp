@@ -2,10 +2,8 @@
 
 LinearVelocityAgent::LinearVelocityAgent(Simulator *simulator, const Vector2 &position,
                                          float radius, const Vector2 &velocity,
-                                         float maxSpeed, float maxAccel,
-                                         Path &path)
-    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel,
-            path)
+                                         float maxSpeed, float maxAccel, Path &path)
+    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, path)
 {
 }
 

@@ -127,17 +127,18 @@ void Simulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set
             unsigned int agent_index = agent_index_iter->second;
             if (agent_index < agents_.size())
             {
-
                 Path path = agents_[agent_index]->getPath();
                 path.getPathVector().clear();
 
-                // if there is new instructions, get destination, create path point, add to path
+                // if there is new instructions, get destination, create path point, add
+                // to path
                 if (primitive.has_move())
                 {
                     // TODO (#2418): Update implementation of Primitive to support
                     // multiple path points
-                    path.getPathVector().emplace_back(PathPoint(Vector2(static_cast<float>(primitive.move().destination().x_meters()), static_cast<float>(primitive.move().destination().y_meters()))));
-
+                    path.getPathVector().emplace_back(PathPoint(Vector2(
+                        static_cast<float>(primitive.move().destination().x_meters()),
+                        static_cast<float>(primitive.move().destination().y_meters()))));
                 }
             }
         }
@@ -192,8 +193,8 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
     Path path = addPath(destination_point, goal_radius);
 
     return addHRVOAgent(position, agent_radius, velocity, max_speed, pref_speed,
-                        max_accel, path,
-                        MAX_NEIGHBOR_SEARCH_DIST, max_neighbors, uncertainty_offset);
+                        max_accel, path, MAX_NEIGHBOR_SEARCH_DIST, max_neighbors,
+                        uncertainty_offset);
 }
 
 std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot,
@@ -220,14 +221,13 @@ std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot,
 
 std::size_t Simulator::addHRVOAgent(const Vector2 &position, float agent_radius,
                                     const Vector2 &curr_velocity, float maxSpeed,
-                                    float prefSpeed, float maxAccel,
-                                    Path &path,
+                                    float prefSpeed, float maxAccel, Path &path,
                                     float neighborDist, std::size_t maxNeighbors,
                                     float uncertaintyOffset)
 {
     std::unique_ptr<HRVOAgent> agent = std::make_unique<HRVOAgent>(
-        this, position, neighborDist, maxNeighbors, agent_radius,
-        curr_velocity, maxAccel, path, prefSpeed, maxSpeed, uncertaintyOffset);
+        this, position, neighborDist, maxNeighbors, agent_radius, curr_velocity, maxAccel,
+        path, prefSpeed, maxSpeed, uncertaintyOffset);
     agents_.push_back(std::move(agent));
     return agents_.size() - 1;
 }

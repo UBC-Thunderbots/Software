@@ -103,8 +103,9 @@ class Simulator
      */
     std::size_t addHRVOAgent(const Vector2 &position, float agent_radius,
                              const Vector2 &curr_velocity, float maxSpeed,
-                             float prefSpeed, float maxAccel, Path &path, float neighborDist,
-                             std::size_t maxNeighbors, float uncertaintyOffset);
+                             float prefSpeed, float maxAccel, Path &path,
+                             float neighborDist, std::size_t maxNeighbors,
+                             float uncertaintyOffset);
 
     /**
      *
@@ -216,16 +217,16 @@ class Simulator
         return agents_.size();
     }
 
-    //TODO: never used
+    // TODO: never used
     /**
      *   Returns the count of goals in the simulation.
      *
      * @return The count of goals in the simulation.
      */
-//    std::size_t getNumGoals() const
-//    {
-//        return goals_.size();
-//    }
+    //    std::size_t getNumGoals() const
+    //    {
+    //        return goals_.size();
+    //    }
 
     /**
      *   Returns the time step of the simulation.

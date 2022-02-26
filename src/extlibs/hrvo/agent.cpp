@@ -1,7 +1,7 @@
 #include "agent.h"
 
-#include "extlibs/hrvo/simulator.h"
 #include "extlibs/hrvo/path.h"
+#include "extlibs/hrvo/simulator.h"
 
 Agent::Agent(Simulator *simulator, const Vector2 &position, float radius,
              const Vector2 &velocity, const Vector2 &prefVelocity, float maxSpeed,
