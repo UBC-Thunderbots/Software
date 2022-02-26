@@ -18,6 +18,7 @@ from proto.visualization_pb2 import NamedValue
 from proto.robot_log_msg_pb2 import RobotLog
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from field import obstacle_layer, path_layer, world_layer
+import ProtoReceiver
 import software.thunderscope.constants as constants
 
 import pyqtgraph as pg

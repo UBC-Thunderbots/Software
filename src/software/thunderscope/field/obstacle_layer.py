@@ -10,11 +10,11 @@ from software.networking.threaded_unix_listener import ThreadedUnixListener
 
 
 class ObstacleLayer(FieldLayer):
-    def __init__(self):
+    def __init__(self, buffer_size=10):
         FieldLayer.__init__(self)
         self.cached_obstacles = Obstacles()
 
-        self.obstacle_buffer = queue.Queue(10)  # TODO pass in buffer size everywhere
+        self.obstacle_buffer = queue.Queue(buffer_size)
 
     def paint(self, painter, option, widget):
         """Paint this layer

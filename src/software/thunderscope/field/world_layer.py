@@ -19,11 +19,11 @@ import software.thunderscope.colors as colors
 
 
 class WorldLayer(FieldLayer):
-    def __init__(self):
+    def __init__(self, buffer_size=10):
         FieldLayer.__init__(self)
         self.cached_world = World()
 
-        self.world_buffer = queue.Queue(10)  # TODO pass in buffer size everywhere
+        self.world_buffer = queue.Queue(buffer_size)
 
     def draw_field(self, painter, field: Field):
 
