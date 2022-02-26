@@ -34,12 +34,13 @@ TEST_F(CreaseDefensePlayTest, test_defense_play)
         Point(-2, -1.25),
     });
     setEnemyGoalie(0);
-    setAIPlayConstructor([this, ball_state]() -> std::unique_ptr<Play> {
-        std::unique_ptr<CreaseDefensePlay> play = std::make_unique<CreaseDefensePlay>(
-            friendly_thunderbots_config->getPlayConfig());
-        play->updateControlParams(Point(1, 3));
-        return play;
-    });
+    setAIPlayConstructor(
+        [ball_state](std::shared_ptr<const AiConfig> ai_config) -> std::unique_ptr<Play> {
+            std::unique_ptr<CreaseDefensePlay> play =
+                std::make_unique<CreaseDefensePlay>(ai_config);
+            play->updateControlParams(Point(1, 3));
+            return play;
+        });
 
     // We set the referee command to stop so that the robots do not kick/shoot during the
     // test
@@ -55,9 +56,7 @@ TEST_F(CreaseDefensePlayTest, test_defense_play)
             Rectangle crease_defender_rect(
                 Point(goalie_position.x(), goalie_position.y()),
                 Point(goalie_position.x() + 1.5, goalie_position.y() + 1.0));
-            robotInPolygon(1, crease_defender_rect, world_ptr, yield);
-            robotInPolygon(2, crease_defender_rect, world_ptr, yield);
-            robotInPolygon(3, crease_defender_rect, world_ptr, yield);
+            robotInPolygon(crease_defender_rect, 3, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {

@@ -367,7 +367,7 @@ float PhysicsRobot::getMotorBrakeForce(float motor_speed) const
 
 void PhysicsRobot::setPositionAndOrientation(const Point& position, const Angle& angle)
 {
-    auto func = [=]() {
+    auto func = [=, this]() {
         b2World* world = robot_body->GetWorld();
         if (bodyExistsInWorld(robot_body, world))
         {

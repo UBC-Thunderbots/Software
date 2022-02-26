@@ -4,20 +4,8 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-HaltTestPlay::HaltTestPlay(std::shared_ptr<const PlayConfig> config) : Play(config, false)
+HaltTestPlay::HaltTestPlay(std::shared_ptr<const AiConfig> config) : Play(config, false)
 {
-}
-
-bool HaltTestPlay::isApplicable(const World &world) const
-{
-    return world.ball().position().y() >= 0;
-}
-
-bool HaltTestPlay::invariantHolds(const World &world) const
-{
-    return contains(
-        Rectangle(world.field().enemyCornerNeg(), world.field().friendlyCornerPos()),
-        world.ball().position());
 }
 
 void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
@@ -33,4 +21,4 @@ void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield, const World
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, HaltTestPlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, HaltTestPlay, AiConfig> factory;
