@@ -115,9 +115,10 @@ void HRVOSimulator::updateWorld(const World &world)
                 Point position = friendly_robot.position();
                 hrvo_agent.value()->setPosition(Vector2(position.x(), position.y()));
 
-                // Update velocity every TIME_TO_UPDATE_WORLD seconds to allow for sensor
-                // fusion to get an updated velocity.
-                if (global_time - last_time_velocity_updated >= TIME_TO_UPDATE_WORLD)
+                // Only update velocity if time has passed since the last time velocity was updated
+                // This is to allow SensorFusion to update the actual robot velocity in World after
+                // a doStep call
+                if (global_time - last_time_velocity_updated >= time_step)
                 {
                     Vector velocity = friendly_robot.velocity();
                     hrvo_agent.value()->setVelocity(Vector2(velocity.x(), velocity.y()));
@@ -137,10 +138,6 @@ void HRVOSimulator::updateWorld(const World &world)
 
                 Vector velocity = enemy_robot.velocity();
                 agents[agent_index]->setVelocity(Vector2(velocity.x(), velocity.y()));
-            }
-            else
-            {
-                // Robot is new
             }
         }
     }
