@@ -122,6 +122,10 @@ class Agent
      */
     bool hasReachedGoal() const;
 
+    /**
+     * Gets the the path for this agent
+     * @return Path for this agent
+     */
     Path getPath();
 
    protected:

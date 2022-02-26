@@ -39,7 +39,6 @@
 #include <vector>
 
 #include "agent.h"
-#include "goal.h"
 #include "simulator.h"
 #include "vector2.h"
 

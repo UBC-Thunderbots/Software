@@ -35,7 +35,6 @@
 #include <stdexcept>
 
 #include "extlibs/hrvo/agent.h"
-#include "extlibs/hrvo/goal.h"
 #include "extlibs/hrvo/hrvo_agent.h"
 #include "extlibs/hrvo/kd_tree.h"
 #include "extlibs/hrvo/linear_velocity_agent.h"

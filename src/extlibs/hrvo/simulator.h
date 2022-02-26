@@ -36,7 +36,6 @@
 #include <vector>
 
 #include "extlibs/hrvo/agent.h"
-#include "extlibs/hrvo/goal.h"
 #include "extlibs/hrvo/kd_tree.h"
 #include "extlibs/hrvo/vector2.h"
 #include "proto/tbots_software_msgs.pb.h"
@@ -122,18 +121,14 @@ class Simulator
                                   const Vector2 &curr_velocity, float max_speed,
                                   float max_accel, Path &path);
 
-    // TODO (#2373): Remove goals_ list when goal is a part of Agent
-    /**
-     *      Adds a new goal to the simulation.
-     *
-     * @param position  The position of this goal.
-     * @return    The number of the goal.
-     */
-    std::size_t addGoal(const Vector2 &position);
-    std::size_t addGoalPositions(const std::vector<Vector2> &positions);
-    std::size_t addGoalPositions(const std::vector<Vector2> &positions,
-                                 const std::vector<float> &speedAtPosition);
 
+    /**
+     *      Returns a new path with a single path point
+     *
+     * @param position  The position of this
+     * @param goal_radius   The goal radius of the path
+     * @return a Path object
+     */
     Path addPath(const Vector2 &position, float goal_radius);
 
     /**
@@ -217,17 +212,6 @@ class Simulator
         return agents_.size();
     }
 
-    // TODO: never used
-    /**
-     *   Returns the count of goals in the simulation.
-     *
-     * @return The count of goals in the simulation.
-     */
-    //    std::size_t getNumGoals() const
-    //    {
-    //        return goals_.size();
-    //    }
-
     /**
      *   Returns the time step of the simulation.
      *
@@ -263,8 +247,6 @@ class Simulator
 
     // List of agents (robots) in this simulation
     std::vector<std::unique_ptr<Agent>> agents_;
-    // TODO (#2373): Remove goals_ list when goal is a part of Agent
-    // std::vector<std::unique_ptr<Goal>> goals_;
 
    private:
     // friendly robot id to agent index

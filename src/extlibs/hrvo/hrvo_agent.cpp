@@ -36,8 +36,6 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
-
-#include "goal.h"
 #include "kd_tree.h"
 
 
