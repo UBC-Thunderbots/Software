@@ -89,6 +89,5 @@ cc_library(
         ":all_tactics",
         "//proto:tbots_cc_proto",
         "//proto/message_translation:tbots_protobuf",
-        "//software/util/make_enum",
     ],
 )
