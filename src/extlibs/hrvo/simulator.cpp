@@ -127,21 +127,16 @@ void Simulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set
             unsigned int agent_index = agent_index_iter->second;
             if (agent_index < agents_.size())
             {
-                // TODO: Edit unique pointer for goal
+
                 Path path = agents_[agent_index]->getPath();
-                path.getPathVec().clear();
+                path.getPathVector().clear();
 
                 // if there is new instructions, get destination, create path point, add to path
                 if (primitive.has_move())
                 {
                     // TODO (#2418): Update implementation of Primitive to support
                     // multiple path points
-                    path.getPathVec().emplace_back(PathPoint(Vector2( static_cast<float>(primitive.move().destination().x_meters()), static_cast<float>(primitive.move().destination().y_meters()))));
-                    /*
-                    path.getPathVec().emplace_back(
-                        static_cast<float>(primitive.move().destination().x_meters()),
-                        static_cast<float>(primitive.move().destination().y_meters()));
-                    */
+                    path.getPathVector().emplace_back(PathPoint(Vector2(static_cast<float>(primitive.move().destination().x_meters()), static_cast<float>(primitive.move().destination().y_meters()))));
 
                 }
             }
@@ -196,7 +191,6 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
     }
     Path path = addPath(destination_point, goal_radius);
 
-    //TODO: replace addGoal and goal_radius with a constructed Path Object with destination point and goal_radius
     return addHRVOAgent(position, agent_radius, velocity, max_speed, pref_speed,
                         max_accel, path,
                         MAX_NEIGHBOR_SEARCH_DIST, max_neighbors, uncertainty_offset);
@@ -224,7 +218,6 @@ std::size_t Simulator::addLinearVelocityRobotAgent(const Robot &robot,
                                   path);
 }
 
-//This function should add an Agent to the list of agents
 std::size_t Simulator::addHRVOAgent(const Vector2 &position, float agent_radius,
                                     const Vector2 &curr_velocity, float maxSpeed,
                                     float prefSpeed, float maxAccel,
@@ -239,8 +232,6 @@ std::size_t Simulator::addHRVOAgent(const Vector2 &position, float agent_radius,
     return agents_.size() - 1;
 }
 
-//size_t goal_index,
-//float goal_radius
 size_t Simulator::addLinearVelocityAgent(const Vector2 &position, float agent_radius,
                                          const Vector2 &curr_velocity, float max_speed,
                                          float max_accel, Path &path)
@@ -252,16 +243,6 @@ size_t Simulator::addLinearVelocityAgent(const Vector2 &position, float agent_ra
     return agents_.size() - 1;
 }
 
-/*
-std::size_t Simulator::addGoal(const Vector2 &position)
-{
-    std::unique_ptr<PathPoint> path_point = std::make_unique<PathPoint>(position);
-    goals_.push_back(std::move(goal));
-
-    return goals_.size() - 1;
-}
-*/
-
 Path Simulator::addPath(const Vector2 &position, float goal_radius)
 {
     std::vector<PathPoint> path_points;
@@ -269,25 +250,6 @@ Path Simulator::addPath(const Vector2 &position, float goal_radius)
     Path path(path_points, goal_radius);
     return path;
 }
-
-/* Never  used
-std::size_t Simulator::addGoalPositions(const std::vector<Vector2> &positions)
-{
-    std::unique_ptr<Goal> goal = std::make_unique<Goal>(positions);
-    goals_.push_back(std::move(goal));
-
-    return goals_.size() - 1;
-}
-
-std::size_t Simulator::addGoalPositions(const std::vector<Vector2> &positions,
-                                        const std::vector<float> &speedAtPosition)
-{
-    std::unique_ptr<Goal> goal = std::make_unique<Goal>(positions, speedAtPosition);
-    goals_.push_back(std::move(goal));
-
-    return goals_.size() - 1;
-}
- */
 
 void Simulator::doStep()
 {

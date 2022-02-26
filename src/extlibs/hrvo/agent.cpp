@@ -3,7 +3,6 @@
 #include "extlibs/hrvo/simulator.h"
 #include "extlibs/hrvo/path.h"
 
-//std::size_t goalIndex,
 Agent::Agent(Simulator *simulator, const Vector2 &position, float radius,
              const Vector2 &velocity, const Vector2 &prefVelocity, float maxSpeed,
              float maxAccel, Path &path)
@@ -14,9 +13,7 @@ Agent::Agent(Simulator *simulator, const Vector2 &position, float radius,
       pref_velocity_(prefVelocity),
       max_speed_(maxSpeed),
       max_accel_(maxAccel),
-      //goal_index_(goalIndex),
       path(path),
-      //goal_radius_(goalRadius),
       reached_goal_(false)
 {
 }
@@ -43,17 +40,17 @@ void Agent::update()
 
     position_ += velocity_ * simulator_->timeStep_;
 
-    if (absSq(path.getCurrentGoalPosition() - position_) <
+    if (absSq(path.getCurrentPathPointPosition() - position_) <
         path.goal_radius * path.goal_radius)
     {
         // Is at current goal position
-        if (path.isGoingToFinalGoal())
+        if (path.isGoingToFinalPathPoint())
         {
             reached_goal_ = true;
         }
         else
         {
-            path.getNextGoalPosition();
+            path.getNextPathPointPosition();
             reached_goal_             = false;
             simulator_->reachedGoals_ = false;
         }
@@ -90,18 +87,11 @@ const Vector2 &Agent::getPrefVelocity() const
     return pref_velocity_;
 }
 
-//TODO: change
-size_t Agent::getGoalIndex() const
-{
-    return path.getGoalIndex(); //warning curr_goal_index return type is unsigned int
-}
-
 bool Agent::hasReachedGoal() const
 {
     return reached_goal_;
 }
 
-//TODO: change
 float Agent::getGoalRadius() const
 {
     return path.goal_radius;

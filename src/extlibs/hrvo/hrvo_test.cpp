@@ -200,7 +200,7 @@ class HRVOTest : public ::testing::Test
                     prev_y_pos_arr[robot_id] = curr_y_pos;
                 }
 
-                Vector2 goal_position = simulator.agents_[robot_id]->getPath().getCurrentGoalPosition();
+                Vector2 goal_position = simulator.agents_[robot_id]->getPath().getCurrentPathPointPosition();
 
                 float goal_radius = simulator.agents_[robot_id]->getGoalRadius();
 

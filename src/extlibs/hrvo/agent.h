@@ -135,16 +135,11 @@ protected:
     Vector2 new_velocity_;
     // The desired new velocity of this Agent
     Vector2 pref_velocity_;
-
+    // The path of this Agent
     Path path;
 
     float max_speed_;
     float max_accel_;
-
-    //TODO: We can remove this
-    //std::size_t goal_index_;
-    //float goal_radius_;
-
     bool reached_goal_;
 
     // TODO (#2373): Remove once new Path class is added and add timeStep as a argument to
