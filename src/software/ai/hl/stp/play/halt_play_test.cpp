@@ -35,8 +35,7 @@ TEST_F(HaltPlayTest, test_halt_play)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
 
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
-        {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             for (unsigned i = 0; i < 1000; i++)
             {
                 robotHalt(world_ptr, yield);

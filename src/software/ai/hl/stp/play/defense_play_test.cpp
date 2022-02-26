@@ -39,8 +39,7 @@ TEST_F(DefensePlayTest, test_defense_play)
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
-        {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             // Wait for all robots to come to a halt
             robotHalt(world_ptr, yield);
             // Attacker in front of enemy with the ball
@@ -96,8 +95,7 @@ TEST_F(DefensePlayTest, test_defense_play_one_immediate_threat)
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
-        {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             // Wait for all robots to come to a halt
             robotHalt(world_ptr, yield);
             // Attacker in front of enemy with the ball
@@ -121,8 +119,9 @@ TEST_F(DefensePlayTest, test_defense_play_one_immediate_threat)
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
-        { ballInPlay(world_ptr, yield); }};
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            ballInPlay(world_ptr, yield);
+        }};
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
@@ -151,8 +150,7 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
     setRefereeCommand(RefereeCommand::STOP, RefereeCommand::STOP);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
-        {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             // Wait for all robots to come to a halt
             robotHalt(world_ptr, yield);
             // Attacker in front of enemy with the ball
@@ -177,8 +175,9 @@ TEST_F(DefensePlayTest, test_defense_play_close_to_net)
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
-        { ballInPlay(world_ptr, yield); }};
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+            ballInPlay(world_ptr, yield);
+        }};
 
     runTest(field, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
