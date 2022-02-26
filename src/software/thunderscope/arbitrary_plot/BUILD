@@ -3,8 +3,8 @@ package(default_visibility = ["//visibility:public"])
 load("@thunderscope_deps//:requirements.bzl", "requirement")
 
 py_library(
-    name = "arb_plot",
-    srcs = ["arb_plot.py"],
+    name = "named_value_plotter",
+    srcs = ["named_value_plotter.py"],
     deps = [
         requirement("pyqtgraph"),
     ],

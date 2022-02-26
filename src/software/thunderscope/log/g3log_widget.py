@@ -8,7 +8,7 @@ import queue
 
 
 class g3logWidget(pg_console.ConsoleWidget):
-    def __init__(self):
+    def __init__(self, buffer_size=10):
         pg_console.ConsoleWidget.__init__(self)
 
         # disable input and buttons
@@ -26,7 +26,7 @@ class g3logWidget(pg_console.ConsoleWidget):
             }"""
         )
 
-        self.log_buffer = queue.Queue(10)  # TODO pass in buffer size everywhere
+        self.log_buffer = queue.Queue(buffer_size) 
 
     @property
     def buffer(self):
