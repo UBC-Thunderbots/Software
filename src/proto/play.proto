@@ -2,8 +2,6 @@ syntax = "proto2";
 
 package TbotsProto;
 
-import "proto/geometry.proto";
-
 message Play
 {
     oneof play

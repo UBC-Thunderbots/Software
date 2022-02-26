@@ -92,7 +92,7 @@ message EnemyThreat
     // 0 - The robot already has the ball
     // 1 - The robot needs 1 pass to get the ball
     // 2 - ...etc
-    required uint32 num_passes_to_get_possession = 6;
+    required int32 num_passes_to_get_possession = 6;
 
     // The robot that would pass to this robot if necessary
     optional Robot passer = 7;
