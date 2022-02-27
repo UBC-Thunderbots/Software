@@ -17,19 +17,19 @@ class g3logCheckboxes(QWidget):
         cbutton.setChecked(True)
         cbutton.log_level = "INFO"
         cbutton.toggled.connect(self.onClicked)
-        layout.addWidget(cbutton, 0, 0)
+        layout.addWidget(cbutton, 1, 0)
 
         cbutton = QCheckBox("WARNING")
         cbutton.setChecked(True)
         cbutton.log_level = "WARNING"
         cbutton.toggled.connect(self.onClicked)
-        layout.addWidget(cbutton, 0, 0)
+        layout.addWidget(cbutton, 2, 0)
 
         cbutton = QCheckBox("FATAL")
         cbutton.setChecked(True)
         cbutton.log_level = "FATAL"
         cbutton.toggled.connect(self.onClicked)
-        layout.addWidget(cbutton, 0, 0)
+        layout.addWidget(cbutton, 3, 0)
 
         self.setStyleSheet(
             "color : white;"
