@@ -9,7 +9,6 @@
 #include "software/networking/threaded_proto_unix_sender.hpp"
 #include "software/simulation/er_force_simulator.h"
 
-const std::string BASE_PATH                = "/tmp/tbots";
 const std::string WORLD_STATE_PATH         = "/world_state";
 const std::string SSL_WRAPPER_PACKET_PATH  = "/ssl_wrapper_packet";
 const std::string BLUE_ROBOT_STATUS_PATH   = "/blue_robot_status";
@@ -19,40 +18,36 @@ const std::string YELLOW_VISION_PATH       = "/yellow_vision";
 const std::string BLUE_VISION_PATH         = "/blue_vision";
 const std::string BLUE_PRIMITIVE_SET       = "/blue_primitive_set";
 const std::string YELLOW_PRIMITIVE_SET     = "/yellow_primitive_set";
-
 class StandaloneErForceSimulator
 {
    public:
     /**
-     * Creates a standalone er force simulator and sets up the appropriate
+     * Creates a ER force simulator and sets up the appropriate
      * communication channels (unix senders/listeners). All inputs (left) and
      * outputs (right) shown below are over unix sockets.
      *
      *
      *                        ┌────────────────────────────┐
-     *                        │                            │
-     *                        │                            │
      *   SimulatorTick        │                            │
      *   ─────────────────────►                            │
-     *                        │    Standalone ER Force     │
-     *                        │         Simulator          │
+     *                        │     ER Force Simulator     │
+     *                        │            Main            │
      *   WorldState           │                            │
      *   ─────────────────────►                            │ SSL_WrapperPacket
-     *                        │                            ├────────────────────►
-     *                        │                            │
+     *                        │                            ├───────────────────►
      *   Blue Primitive Set   │                            │
      *   ─────────────────────►  ┌──────────────────────┐  │ Blue Robot Status
-     *   Yellow Primitive Set │  │                      │  ├────────────────────►
+     *   Yellow Primitive Set │  │                      │  ├───────────────────►
      *                        │  │                      │  │ Yellow Robot Status
      *                        │  │  ER Force Simulator  │  │
      *   Blue Vision          │  │                      │  │
      *   ─────────────────────►  │                      │  │
      *   Yellow Vision        │  └──────────────────────┘  │
-     *                        │                            │
      *                        └────────────────────────────┘
      *
+     * @param base_unix_path The base path of the unix sockets
      */
-    StandaloneErForceSimulator();
+    StandaloneErForceSimulator(std::string base_unix_path);
     virtual ~StandaloneErForceSimulator();
 
    private:

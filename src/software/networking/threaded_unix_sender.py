@@ -41,7 +41,10 @@ class ThreadedUnixSender:
             proto = self.proto_buffer.get()
             if proto is not None:
                 send = proto.SerializeToString()
-                self.socket.sendto(send, self.unix_path)
+                try:
+                    self.socket.sendto(send, self.unix_path)
+                except Exception as e:
+                    logging.exception("something died {}".format(self.unix_path))
 
     def send(self, proto):
         """Buffer a protobuf to be sent by the send thread

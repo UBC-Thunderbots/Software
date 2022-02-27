@@ -171,6 +171,7 @@ py_test(
         ":python_bindings.so",
     ],
     deps = [
+        ":full_system_wrapper",
         ":standalone_simulator_wrapper",
         "//proto:software_py_proto",
         "//software/networking:threaded_unix_listener_py",
@@ -187,13 +188,28 @@ py_test(
     ],
 )
 
-py_test(
+py_library(
     name = "standalone_simulator_wrapper",
     srcs = [
         "standalone_simulator_wrapper.py",
     ],
     data = [
         "//software/simulation:standalone_er_force_simulator_main",
+    ],
+    deps = [
+        "//proto:software_py_proto",
+        "//software/networking:threaded_unix_listener_py",
+        "//software/networking:threaded_unix_sender_py",
+    ],
+)
+
+py_library(
+    name = "full_system_wrapper",
+    srcs = [
+        "full_system_wrapper.py",
+    ],
+    data = [
+        "//software:full_system",
     ],
     deps = [
         "//proto:software_py_proto",

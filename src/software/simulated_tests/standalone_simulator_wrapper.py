@@ -9,40 +9,55 @@ from proto.geometry_pb2 import Point, Angle, Vector, AngularVelocity
 from subprocess import Popen, PIPE
 import subprocess
 
+WORLD_STATE_PATH = "/world_state"
+SSL_WRAPPER_PACKET_PATH = "/ssl_wrapper_packet"
+BLUE_ROBOT_STATUS_PATH = "/blue_robot_status"
+YELLOW_ROBOT_STATUS_PATH = "/yellow_robot_status"
+SIMULATION_TICK_PATH = "/simulation_tick"
+YELLOW_VISION_PATH = "/yellow_vision"
+BLUE_VISION_PATH = "/blue_vision"
+BLUE_PRIMITIVE_SET = "/blue_primitive_set"
+YELLOW_PRIMITIVE_SET = "/yellow_primitive_set"
+
 
 class StandaloneSimulatorWrapper(object):
-    def __init__(self):
+    def __init__(self, base_unix_path="/tmp/tbots"):
+
         """Runs our standalone er-force simulator binary and sets up the unix
         sockets to communicate with it
 
         """
-        self.sim_tick_sender = ThreadedUnixSender("/tmp/tbots/simulation_tick")
-        self.world_state_sender = ThreadedUnixSender("/tmp/tbots/world_state")
-        self.blue_vision_sender = ThreadedUnixSender("/tmp/tbots/blue_vision")
-        self.yellow_vision_sender = ThreadedUnixSender("/tmp/tbots/yellow_vision")
+        self.sim_tick_sender = ThreadedUnixSender(base_unix_path + SIMULATION_TICK_PATH)
+        self.world_state_sender = ThreadedUnixSender(base_unix_path + WORLD_STATE_PATH)
+        self.blue_vision_sender = ThreadedUnixSender(base_unix_path + BLUE_VISION_PATH)
+        self.yellow_vision_sender = ThreadedUnixSender(
+            base_unix_path + YELLOW_VISION_PATH
+        )
         self.blue_primitive_set_sender = ThreadedUnixSender(
-            "/tmp/tbots/blue_primitive_set"
+            base_unix_path + BLUE_PRIMITIVE_SET
         )
         self.yellow_primitive_set_sender = ThreadedUnixSender(
-            "/tmp/tbots/yellow_primitive_set"
+            base_unix_path + YELLOW_PRIMITIVE_SET
         )
 
         self.ssl_wrapper_listener = ThreadedUnixListener(
-            "/tmp/tbots/ssl_wrapper_packet", SSL_WrapperPacket, convert_from_any=False
+            base_unix_path + SSL_WRAPPER_PACKET_PATH,
+            SSL_WrapperPacket,
+            convert_from_any=False,
         )
         self.blue_robot_status_listener = ThreadedUnixListener(
-            "/tmp/tbots/blue_robot_status", RobotStatus, convert_from_any=False
+            base_unix_path + BLUE_ROBOT_STATUS_PATH, RobotStatus, convert_from_any=False
         )
         self.yellow_robot_status_listener = ThreadedUnixListener(
-            "/tmp/tbots/yellow_robot_status", RobotStatus, convert_from_any=False
+            base_unix_path + YELLOW_ROBOT_STATUS_PATH,
+            RobotStatus,
+            convert_from_any=False,
         )
         self.world_state = WorldState()
 
         # TODO change to er_force_sim_main
         self.standalone_simulator = Popen(
             ["software/simulation/standalone_er_force_simulator_main"],
-            stdout=PIPE,
-            stderr=PIPE,
         )
 
     def __setup_robots(self, robot_locations, team_colour):

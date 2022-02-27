@@ -55,9 +55,8 @@ cc_library(
         "//shared:constants",
         "//software:constants",
         "//software/logger",
-        "//software/networking:threaded_proto_udp_listener",
-        "//software/networking:threaded_proto_udp_sender",
-        "//software/networking:threaded_unix_sender",
+        "//software/networking:threaded_proto_unix_listener",
+        "//software/networking:threaded_proto_unix_sender",
         "//software/util/generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"

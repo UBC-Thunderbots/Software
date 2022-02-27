@@ -10,80 +10,53 @@ from proto.robot_status_msg_pb2 import RobotStatus
 from typing import List
 from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
 from software.thunderscope.thunderscope import Thunderscope
+import threading
 from software.simulated_tests.standalone_simulator_wrapper import (
     StandaloneSimulatorWrapper,
 )
+from software.simulated_tests.full_system_wrapper import FullSystemWrapper
 import time
 import pytest
 
 
 def main():
 
+    # visualizer
     thunderscope = Thunderscope()
 
-    # setup simulator
-    sim_wrapper = StandaloneSimulatorWrapper()
-    # create tactics
-    attacker_tactic = py.AttackerTactic(py.AttackerTacticConfig())
-    goalie_tactic = py.GoalieTactic(py.GoalieTacticConfig())
+    def step_simulation():
 
-    # create tactic steppers
-    attacker_tactic_stepper = py.TacticStepper(
-        attacker_tactic, set(), py.ThunderbotsConfig(),
-    )
+        # setup simulator
+        simulator = StandaloneSimulatorWrapper()
+        time.sleep(0.1)  # wait for the sim to start
 
-    goalie_tactic_stepper = py.TacticStepper(
-        goalie_tactic, set(), py.ThunderbotsConfig(),
-    )
+        simulator.setup_blue_robots([(0, 0), (1, 1)])
+        simulator.setup_yellow_robots([(-1, -1), (-2, -2)])
 
-    # create sensor fusions
-    yellow_sensor_fusion_config = py.SensorFusionConfig()
-    yellow_sensor_fusion = py.SensorFusion(yellow_sensor_fusion_config)
+        # setup full_system
+        yellow_full_system = FullSystemWrapper()
+        time.sleep(0.1)
 
-    blue_sensor_fusion_config = py.SensorFusionConfig()
-    blue_sensor_fusion_config.getMutableFriendlyColorYellow().setValue(False)
-    blue_sensor_fusion_config.getMutableDefendingPositiveSide().setValue(True)
-    blue_sensor_fusion = py.SensorFusion(blue_sensor_fusion_config)
+        while True:
+            ssl_wrapper = simulator.get_ssl_wrapper_packet()
+            simulator.tick(10)
 
-    # Visualize currently active validation
-    # Multiple streams of validation
-    # AlwaysValidation
-    # EventuallyValidation
-    #
+            if ssl_wrapper is None:
+                continue
 
-    def run_lol():
-        sim_wrapper.tick(5)
-        ssl_wrapper = sim_wrapper.get_ssl_wrapper_packet()
-        if ssl_wrapper is None:
-            return
+            yellow_sensor_proto = simulator.get_yellow_sensor_proto(ssl_wrapper)
+            yellow_full_system.send_sensor_proto(yellow_sensor_proto)
 
-        yellow_sensor_proto = sim_wrapper.get_yellow_sensor_proto(ssl_wrapper)
-        yellow_sensor_fusion.processSensorProto(yellow_sensor_proto)
-        yellow_world = yellow_sensor_fusion.getWorld()
+            simulator.send_yellow_primitive_set_and_vision(
+                yellow_full_system.get_vision(), yellow_full_system.get_primitive_set()
+            )
+            time.sleep(0.01)
 
-        blue_sensor_proto = sim_wrapper.get_blue_sensor_proto(ssl_wrapper)
-        blue_sensor_fusion.processSensorProto(blue_sensor_proto)
-        blue_world = blue_sensor_fusion.getWorld()
+    run_sim_thread = threading.Thread(target=step_simulation)
+    run_sim_thread.start()
 
-        thunderscope.world_layer.cached_world = py.createWorld(yellow_world)
-
-        yellow_primitives = attacker_tactic_stepper.getPrimitives(yellow_world, 0)
-        blue_primitives = goalie_tactic_stepper.getPrimitives(blue_world, 0)
-
-        sim_wrapper.send_yellow_primitive_set_and_vision(
-            py.createVision(yellow_world), yellow_primitives
-        )
-
-        sim_wrapper.send_blue_primitive_set_and_vision(
-            py.createVision(blue_world), blue_primitives
-        )
-
-    thunderscope.schedule_something(5, run_lol)
     thunderscope.show()
 
-
-# if __name__ == "__main__":
-# main()
 
 VALIDATION_1 = 0
 VALIDATION_2 = 0
@@ -110,132 +83,38 @@ class Validation2(object):
         return self.done
 
 
-def validation_sequence():
-
-    val1 = Validation1()
-    val2 = Validation2()
-
-    while not val1.done:
-        yield val1
-    while not val2.done:
-        yield val2
-
-    return
-
-
-@pytest.fixture()
-def simulator():
-    print("simulator test fixture")
-    print("creating simulator")
-    er_force_sim = None
-    yield er_force_sim
-    print("deleting simulator")
-    del er_force_sim
-
-
-def full_system():
-    print("simulator test fixture")
-    print("creating full_system")
-    full_system = None
-    yield full_system
-    print("deleting full_system")
-    del full_system
-
-
-class AlwaysValidation(object):
-
-    """Docstring for AlwaysValidation. """
-
-    def validate(self, world):
-        assert True
-
-
-class EventuallyValidation(object):
-
-    """Docstring for EventuallyValidation. """
-
-    def __init__(self):
-        pass
-
-    @property
-    def error_msg(self):
-        return ""
-
-    def validate(self, world):
-        self.done = True
-
-    def visualize(self, arg1):
-        """TODO: Docstring for visualize.
-
-        :param function: TODO
-        :returns: TODO
-
-        """
-        pass
-
-    def done(self):
-        pass
-
-        # ball_at_point_validation.cpp
-        # ball_kicked_validation.h
-        # friendly_scored_validation.cpp
-        # robot_halt_validation.cpp
-        # robot_in_circle.cpp
-        # robot_in_polygon_validation.cpp
-        # robot_received_ball_validation.cpp
-        #   - all dribblers highlighted red
-        #   - if a robot receives a ball, they all go green
-        # robot_state_validation.cpp
-        # robot_stationary_in_polygon_validation.cpp
-
-
-class RobotEntersRectangle(EventuallyValidation):
-    def __init__(self, rectangle):
-        self.rectangle = rectangle
+# ball_at_point_validation.cpp
+# ball_kicked_validation.h
+# friendly_scored_validation.cpp
+# robot_halt_validation.cpp
+# robot_in_circle.cpp
+# robot_in_polygon_validation.cpp
+# robot_received_ball_validation.cpp
+#   - all dribblers highlighted red
+#   - if a robot receives a ball, they all go green
+# robot_state_validation.cpp
+# robot_stationary_in_polygon_validation.cpp
 
 
 def run_tactic_test(
     simulator,
     full_system,
-    always_validation: List[AlwaysValidation],
-    eventually_validation: List[EventuallyValidation],
+    # always_validation: List[AlwaysValidation],
+    # eventually_validation: List[EventuallyValidation],
 ):
-
-    # step sim + sensor_fusion here
-    new_world = World()
-
-    while True:
-        for validation in always_validation:
-            validation.validate(new_world)
-
-        for validation in eventually_validation:
-            validation.validate(new_world)
+    main()
 
 
-def test_attacker_tactic_keepaway(simulator):
+def test_attacker_tactic_keepaway():
     """TODO: Docstring for test_attacker_tactic_keepaway.
 
     :param function: TODO
     :returns: TODO
 
     """
-    # simulator = StandaloneSimulatorWrapper()
-    # simulator.setup_blue_robots([(1, 1)])
-    # simulator.setup_yellow_robots([(2, 2)])
-    # simulator.setup_ball(ball_position=(1, -2))
-
-    run_tactic_test(None, None, [AlwaysValidation()], [])
-
-
-def test_attacker_tactic_shoots_on_net():
-    """TODO: Docstring for test_attacker_tactic_shoots_on_net.
-
-    :param function: TODO
-    :returns: TODO
-
-    """
-    pass
+    main()
 
 
 if __name__ == "__main__":
-    sys.exit(pytest.main([__file__, "-svv"]))
+    main()
+    # sys.exit(pytest.main([__file__, "-svv"]))
