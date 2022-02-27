@@ -11,3 +11,11 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
+
+py_library(
+    name = "g3log_checkboxes",
+    srcs = ["g3log_checkboxes.py"],
+    deps = [
+        requirement("pyqtgraph"),
+    ],
+)

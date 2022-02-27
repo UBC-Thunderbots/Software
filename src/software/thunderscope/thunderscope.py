@@ -3,6 +3,7 @@ import signal
 
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
+from software.thunderscope.log.g3log_checkboxes import g3logCheckboxes
 from field import obstacle_layer, path_layer, world_layer
 
 import pyqtgraph as pg
@@ -41,9 +42,16 @@ if __name__ == "__main__":
     log_dock = Dock("logs", size=(500, 100))
     log_dock.addWidget(logs)
 
+    # Setup Checkbox Widget
+    check_boxes = g3logCheckboxes()
+
+    check_boxes_dock = Dock("Checkboxes", size=(500, 100))
+    check_boxes_dock.addWidget(check_boxes)
+
     # Configure Docks
     dock_area.addDock(field_dock, "left")
     dock_area.addDock(log_dock, "bottom", field_dock)
+    dock_area.addDock(check_boxes_dock, "bottom", log_dock)
 
     def update():
         field.refresh()
