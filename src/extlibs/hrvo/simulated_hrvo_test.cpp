@@ -101,7 +101,7 @@ TEST_F(SimulatedHRVOTest, test_zig_zag_movement)
             Duration::fromSeconds(15));
 }
 
-TEST_F(SimulatedHRVOTest, test_start_in_local_minimia)
+TEST_F(SimulatedHRVOTest, test_start_in_local_minima)
 {
     Point destination      = Point(4, 0);
     Point initial_position = Point(0.7, 0);
@@ -125,7 +125,7 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minimia)
             Duration::fromSeconds(6));
 }
 
-TEST_F(SimulatedHRVOTest, test_start_in_local_minimia_with_open_end)
+TEST_F(SimulatedHRVOTest, test_start_in_local_minima_with_open_end)
 {
     Point destination      = Point(4, 0);
     Point initial_position = Point(0.7, 0);

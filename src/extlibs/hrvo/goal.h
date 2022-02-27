@@ -58,8 +58,9 @@ class Goal
     /**
      * @param positions  The list of positions which the the robot should travel to in
      * order.
-     * @param speed_at_positions  The list of speed which the the robot should be at when
-     * it reached the position. Must be in the same order of the positions
+     * @param speed_at_positions  The list of speeds which the the robot should be at when
+     * it reaches the matching position. Must be in the same order and of the same length
+     * of the positions
      */
     explicit Goal(std::vector<Vector2> positions, std::vector<float> speed_at_positions);
 

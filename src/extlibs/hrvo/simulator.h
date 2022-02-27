@@ -48,10 +48,9 @@ class HRVOSimulator
    public:
     /**
      * Constructor
-     * @param time_step
-     * @param robot_constants
-     * @param record_playback_name If passed the simulator will recorded and saved under
-     * this name
+     * @param time_step The time step between each step of the simulator
+     * @param robot_constants The robot constants to be used for all Agents representing a
+     * robot
      */
     explicit HRVOSimulator(float time_step, const RobotConstants_t &robot_constants);
 
