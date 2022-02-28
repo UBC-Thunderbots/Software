@@ -1,4 +1,4 @@
-syntax = "proto2";
+syntax = "proto3";
 
 package TbotsProto;
 
@@ -45,9 +45,9 @@ message GameState
         REFEREE_COMMAND_BALL_PLACEMENT_US    = 16;
         REFEREE_COMMAND_BALL_PLACEMENT_THEM  = 17;
     }
-    required PlayState play_state         = 1;
-    required RestartReason restart_reason = 2;
-    required RefereeCommand command       = 3;
+     PlayState play_state         = 1;
+     RestartReason restart_reason = 2;
+     RefereeCommand command       = 3;
     optional Ball ball                    = 4;
     optional Point ball_placement_point   = 5;
 }

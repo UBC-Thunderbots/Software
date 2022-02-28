@@ -1,4 +1,4 @@
-syntax = "proto2";
+syntax = "proto3";
 
 package SSLSimulationProto;
 
@@ -24,24 +24,24 @@ message TeleportBall
     // Teleport the ball safely to the target, for example by
     // moving robots out of the way in case of collision and set speed of robots close-by
     // to zero
-    optional bool teleport_safely = 7 [default = false];
+    optional bool teleport_safely = 7;
     // Adapt the angular ball velocity such that the ball is rolling
-    optional bool roll = 8 [default = false];
+    optional bool roll = 8;
     // Instead of teleporting the ball, apply some force to make sure
-    // the ball reaches the required position soon (velocity is ignored if true)
+    // the ball reaches the  position soon (velocity is ignored if true)
     // WARNING: A command with by_force stays active (the move will take some time)
     // until canceled by another TeleportBall command with by_force = false.
     // To avoid teleporting the ball at the end and resetting its current spin,
     // do not set any of the optional fields in this message to end the force without
     // triggering an additional teleportation
-    optional bool by_force = 9 [default = false];
+    optional bool by_force = 9;
 }
 
 // Teleport a robot to some location and give it a velocity
 message TeleportRobot
 {
     // Robot id to teleport
-    required SSLProto.RobotId id = 1;
+     SSLProto.RobotId id = 1;
     // x-coordinate [m]
     optional float x = 2;
     // y-coordinate [m]
@@ -49,22 +49,22 @@ message TeleportRobot
     // Orientation [rad], measured from the x-axis counter-clockwise
     optional float orientation = 4;
     // Global velocity [m/s] towards x-axis
-    optional float v_x = 5 [default = 0];
+    optional float v_x = 5;
     // Global velocity [m/s] towards y-axis
-    optional float v_y = 6 [default = 0];
+    optional float v_y = 6;
     // Angular velocity [rad/s]
-    optional float v_angular = 7 [default = 0];
+    optional float v_angular = 7;
     // Robot should be present on the field?
     // true -> robot will be added, if it does not exist yet
     // false -> robot will be removed, if it is present
     optional bool present = 8;
     // Instead of teleporting, apply some force to make sure
-    // the robot reaches the required position soon (velocity is ignored if true)
+    // the robot reaches the  position soon (velocity is ignored if true)
     // WARNING: A command with by_force stays active (the move will take some time)
     // until canceled by another TeleportRobot command for the same bot with by_force =
     // false. To avoid teleporting at the end, do not set any of the optional fields in
     // this message to end the force without triggering an additional teleportation
-    optional bool by_force = 9 [default = false];
+    optional bool by_force = 9;
 }
 
 // Control the simulation

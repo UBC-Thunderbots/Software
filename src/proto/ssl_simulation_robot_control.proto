@@ -1,4 +1,4 @@
-syntax = "proto2";
+syntax = "proto3";
 
 package SSLSimulationProto;
 
@@ -6,13 +6,13 @@ package SSLSimulationProto;
 message RobotCommand
 {
     // Id of the robot
-    required uint32 id = 1;
+     uint32 id = 1;
     // Movement command
     optional RobotMoveCommand move_command = 2;
     // Absolute (3 dimensional) kick speed [m/s]
     optional float kick_speed = 3;
     // Kick angle [degree] (defaults to 0 degrees for a straight kick)
-    optional float kick_angle = 4 [default = 0];
+    optional float kick_angle = 4;
     // Dribbler speed in rounds per minute [rpm]
     optional float dribbler_speed = 5;
 }
@@ -35,35 +35,35 @@ message RobotMoveCommand
 message MoveWheelVelocity
 {
     // Velocity [m/s] of front right wheel
-    required float front_right = 1;
+     float front_right = 1;
     // Velocity [m/s] of back right wheel
-    required float back_right = 2;
+     float back_right = 2;
     // Velocity [m/s] of back left wheel
-    required float back_left = 3;
+     float back_left = 3;
     // Velocity [m/s] of front left wheel
-    required float front_left = 4;
+     float front_left = 4;
 }
 
 // Move robot with local velocity
 message MoveLocalVelocity
 {
     // Velocity forward [m/s] (towards the dribbler)
-    required float forward = 1;
+     float forward = 1;
     // Velocity to the left [m/s]
-    required float left = 2;
+     float left = 2;
     // Angular velocity counter-clockwise [rad/s]
-    required float angular = 3;
+     float angular = 3;
 }
 
 // Move robot with global velocity
 message MoveGlobalVelocity
 {
     // Velocity on x-axis of the field [m/s]
-    required float x = 1;
+     float x = 1;
     // Velocity on y-axis of the field [m/s]
-    required float y = 2;
+     float y = 2;
     // Angular velocity counter-clockwise [rad/s]
-    required float angular = 3;
+     float angular = 3;
 }
 
 // Command from the connected client to the simulator

@@ -4,7 +4,7 @@ load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 def _nanopb_proto_library_impl(ctx):
     # This is the folder we will place all our generation artifacts in
     #
-    # Because we need to generate the `.c` and `.h` files for all the proto files required
+    # Because we need to generate the `.c` and `.h` files for all the proto files 
     # for this library, including all the transitive dependencies, we would like to
     # generate these in the same folder as each proto file. However bazel will not
     # permit us to modify/produce files outside the folder that this rule is called from.

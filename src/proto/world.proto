@@ -1,4 +1,4 @@
-syntax = "proto2";
+syntax = "proto3";
 
 package TbotsProto;
 
@@ -11,24 +11,24 @@ import "proto/tbots_timestamp_msg.proto";
 
 message Field
 {
-    required double field_x_length       = 1;
-    required double field_y_length       = 2;
-    required double defense_x_length     = 3;
-    required double defense_y_length     = 4;
-    required double goal_x_length        = 5;
-    required double goal_y_length        = 6;
-    required double boundary_buffer_size = 7;
-    required double center_circle_radius = 8;
+     double field_x_length       = 1;
+     double field_y_length       = 2;
+     double defense_x_length     = 3;
+     double defense_y_length     = 4;
+     double goal_x_length        = 5;
+     double goal_y_length        = 6;
+     double boundary_buffer_size = 7;
+     double center_circle_radius = 8;
 }
 
 message World
 {
-    required Timestamp time_sent  = 1;
-    required Field field          = 2;
-    required Team friendly_team   = 3;
-    required Team enemy_team      = 4;
-    required Ball ball            = 5;
-    required GameState game_state = 6;
+     Timestamp time_sent  = 1;
+     Field field          = 2;
+     Team friendly_team   = 3;
+     Team enemy_team      = 4;
+     Ball ball            = 5;
+     GameState game_state = 6;
 }
 
 enum FieldType
@@ -46,40 +46,40 @@ message WorldState
 
 message SimulatorTick
 {
-    required double milliseconds = 1;
+     double milliseconds = 1;
 }
 
 message Pass
 {
     // The location of the passer
-    required Point passer_point = 1;
+     Point passer_point = 1;
 
     // The location of the receiver
-    required Point receiver_point = 2;
+     Point receiver_point = 2;
 
     // The speed of the pass in meters/second
-    required double pass_speed_m_per_s = 3;
+     double pass_speed_m_per_s = 3;
 }
 
 message Shot
 {
-    required Point point = 1;
-    required Angle angle = 2;
+     Point point = 1;
+     Angle angle = 2;
 }
 
 message EnemyThreat
 {
     // The enemy robot
-    required Robot robot = 1;
+     Robot robot = 1;
 
     // Whether or not this robot has possession of the ball
-    required bool has_ball = 2;
+     bool has_ball = 2;
 
     // How much of the goal the enemy robot can see
     // This does not account for obstacles
     // For example, robots in the corner would have a very small angle
     // while robots directly in front of the net would have a large angle
-    required Angle goal_angle = 3;
+     Angle goal_angle = 3;
 
     // The largest angle the robot has to shoot on the friendly net, taking obstacles
     // into account
@@ -92,7 +92,7 @@ message EnemyThreat
     // 0 - The robot already has the ball
     // 1 - The robot needs 1 pass to get the ball
     // 2 - ...etc
-    required int32 num_passes_to_get_possession = 6;
+     int32 num_passes_to_get_possession = 6;
 
     // The robot that would pass to this robot if necessary
     optional Robot passer = 7;

@@ -1,4 +1,4 @@
-syntax = "proto2";
+syntax = "proto3";
 
 package SSLSimulationProto;
 
@@ -9,7 +9,7 @@ import "google/protobuf/any.proto";
 message RobotFeedback
 {
     // Id of the robot
-    required uint32 id = 1;
+     uint32 id = 1;
     // Has the dribbler contact to the ball right now
     optional bool dribbler_ball_contact = 2;
     // Custom robot feedback for specific simulators (the protobuf files are managed by

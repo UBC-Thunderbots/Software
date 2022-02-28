@@ -1,4 +1,4 @@
-syntax = "proto2";
+syntax = "proto3";
 
 package TbotsProto;
 
@@ -7,6 +7,6 @@ import "proto/tbots_timestamp_msg.proto";
 
 message Ball
 {
-    required BallState current_state = 1;
-    required Timestamp timestamp     = 2;
+     BallState current_state = 1;
+     Timestamp timestamp     = 2;
 }

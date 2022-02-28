@@ -1,35 +1,35 @@
-syntax = "proto2";
+syntax = "proto3";
 
 package TbotsProto;
 
 message Point
 {
     // x coordinate
-    required double x_meters = 1;
+     double x_meters = 1;
 
     // y coordinate
-    required double y_meters = 2;
+     double y_meters = 2;
 }
 
 message Vector
 {
     // x component
-    required double x_component_meters = 1;
+     double x_component_meters = 1;
 
     // y component
-    required double y_component_meters = 2;
+     double y_component_meters = 2;
 }
 
 message Angle
 {
     // the angle in radians
-    required double radians = 1;
+     double radians = 1;
 }
 
 message AngularVelocity
 {
     // the angular velocity in radians
-    required double radians_per_second = 1;
+     double radians_per_second = 1;
 }
 
 message Polygon
@@ -40,6 +40,6 @@ message Polygon
 
 message Circle
 {
-    required Point origin  = 1;
-    required double radius = 2;
+     Point origin  = 1;
+     double radius = 2;
 }
