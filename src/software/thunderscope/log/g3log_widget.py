@@ -1,7 +1,8 @@
 import pyqtgraph as pg
 import pyqtgraph.console as pg_console
-import software.thunderscope.constants as constants
 from proto.robot_log_msg_pb2 import RobotLog
+
+import software.thunderscope.constants as constants
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 
 

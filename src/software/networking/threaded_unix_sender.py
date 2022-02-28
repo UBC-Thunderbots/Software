@@ -1,13 +1,10 @@
-import socketserver
-import socket
-import time
-import base64
-import os
-from google.protobuf import text_format
-from google.protobuf.any_pb2 import Any
-from threading import Thread
 import logging
 import queue
+import socket
+from threading import Thread
+
+from google.protobuf import text_format
+from google.protobuf.any_pb2 import Any
 
 
 class ThreadedUnixSender:
@@ -51,7 +48,7 @@ class ThreadedUnixSender:
                 send = proto.SerializeToString()
                 try:
                     self.socket.sendto(send, self.unix_path)
-                except Exception as e:
+                except Exception:
                     logging.exception("something died {}".format(self.unix_path))
 
     def send(self, proto):

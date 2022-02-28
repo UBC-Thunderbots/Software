@@ -1,29 +1,24 @@
-import software.simulated_tests.python_bindings as py
-
-# from hanging_threads import start_monitoring
-# start_monitoring(seconds_frozen=10, test_interval=100)
-from proto.sensor_msg_pb2 import SensorProto
-from proto.world_pb2 import WorldState, SimulatorTick, World
-import os
-from proto.vision_pb2 import RobotState, BallState
-import threading
-import logging
-from pyqtgraph.Qt import QtCore, QtGui
 import sys
-from proto.geometry_pb2 import Point, Angle, Vector, AngularVelocity
+import threading
+import time
+
+import pytest
+from proto.geometry_pb2 import Angle, AngularVelocity, Point, Vector
+from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
 from proto.primitive_pb2 import MaxAllowedSpeedMode
 from proto.robot_status_msg_pb2 import RobotStatus
-from typing import List
+from proto.sensor_msg_pb2 import SensorProto
 from proto.tactic_pb2 import AssignedTacticPlayControlParams, GoalieTactic, Tactic
-from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
-from software.thunderscope.thunderscope import Thunderscope
-import threading
+from proto.vision_pb2 import BallState, RobotState
+from proto.world_pb2 import SimulatorTick, World, WorldState
+from pyqtgraph.Qt import QtCore, QtGui
+
+import software.simulated_tests.python_bindings as py
+from software.simulated_tests.full_system_wrapper import FullSystemWrapper
 from software.simulated_tests.standalone_simulator_wrapper import (
     StandaloneSimulatorWrapper,
 )
-from software.simulated_tests.full_system_wrapper import FullSystemWrapper
-import time
-import pytest
+from software.thunderscope.thunderscope import Thunderscope
 
 
 class TacticTestRunner(object):
@@ -72,7 +67,7 @@ class TacticTestRunner(object):
             time_elapsed_s = 0
 
             while time_elapsed_s < test_timeout_s:
-                tick_start_time = time.time()
+                time.time()
 
                 ssl_wrapper = self.simulator.get_ssl_wrapper_packet()
                 self.simulator.tick(tick_duration_s * 1000)
@@ -106,17 +101,46 @@ class TacticTestRunner(object):
             self.thunderscope.show()
 
 
-@pytest.mark.parametrize("test_input", [(2, 0), (1, 0), (-2, 0), (3, 3), (-1, -1)])
-def test_goalie_blocks_shot(test_input):
-    tactic_runner = TacticTestRunner()
-    tactic_runner.simulator.setup_yellow_robots([test_input])
+@pytest.fixture
+def tactic_runner():
+    runner = TacticTestRunner()
+    yield runner
+
+
+@pytest.mark.parametrize(
+    "goalie_starting_position,ball_starting_position",
+    [
+        ((-4.2, 0), (-2, 1)),
+        ((-4.2, 0.4), (-2, -1)),
+        ((-4.2, -0.4), (-2, 0.1)),
+        ((-4.2, 0.2), (-2, -0.1)),
+        ((-4.2, -0.2), (-2, 1)),
+        ((-4.2, 0.2), (-2, -0.1)),
+        ((-4.2, -0.5), (-2, 2)),
+        ((-4.2, -0.5), (-2, -2)),
+    ],
+)
+def test_goalie_blocks_shot(
+    goalie_starting_position, ball_starting_position, tactic_runner
+):
+
+    tactic_runner.simulator.setup_yellow_robots([goalie_starting_position])
+    tactic_runner.simulator.setup_ball(
+        ball_position=ball_starting_position,
+        # TODO need a vector library here
+        ball_velocity=(
+            2.5 * (-4.5 - ball_starting_position[0]),
+            -2.5 * ball_starting_position[1],
+        ),
+    )
+
     params = AssignedTacticPlayControlParams()
     params.assigned_tactics[0].goalie.CopyFrom(
         GoalieTactic(max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT)
     )
+
     tactic_runner.yellow_full_system.send_tactic_override(params)
     tactic_runner.run_test()
-    assert True
 
 
 # ball_at_point_validation.cpp

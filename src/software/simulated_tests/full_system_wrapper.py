@@ -1,14 +1,15 @@
+from subprocess import Popen
+
+from proto.geometry_pb2 import Angle, AngularVelocity, Point, Vector
+from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
+from proto.robot_status_msg_pb2 import RobotStatus
+from proto.sensor_msg_pb2 import SensorProto
+from proto.tbots_software_msgs_pb2 import PrimitiveSet, Vision
+from proto.vision_pb2 import BallState, RobotState
+from proto.world_pb2 import SimulatorTick, WorldState
+
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.networking.threaded_unix_sender import ThreadedUnixSender
-from proto.sensor_msg_pb2 import SensorProto
-from proto.world_pb2 import WorldState, SimulatorTick
-from proto.vision_pb2 import RobotState, BallState
-from proto.robot_status_msg_pb2 import RobotStatus
-from proto.tbots_software_msgs_pb2 import Vision, PrimitiveSet
-from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
-from proto.geometry_pb2 import Point, Angle, Vector, AngularVelocity
-from subprocess import Popen, PIPE
-import subprocess
 
 VISION_INPUT_PATH = "/vision"
 PRIMITIVE_INPUT_PATH = "/primitive"

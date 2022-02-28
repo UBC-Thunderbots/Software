@@ -1,5 +1,5 @@
-
 import pyqtgraph as pg
+
 from software.thunderscope.field.field_layer import FieldLayer
 
 

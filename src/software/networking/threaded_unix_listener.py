@@ -1,13 +1,13 @@
-import socketserver
-import time
 import base64
+import logging
 import os
+import queue
+import socketserver
+from threading import Thread
+
 from google.protobuf import text_format
 from google.protobuf.any_pb2 import Any
 from proto.robot_log_msg_pb2 import RobotLog
-from threading import Thread
-import queue
-import logging
 
 
 class ThreadedUnixListener:

@@ -1,16 +1,20 @@
 import math
 
 import pyqtgraph as pg
-import software.thunderscope.colors as colors
 from proto.ball_pb2 import Ball
 from proto.team_pb2 import Robot, Team
 from proto.vision_pb2 import BallState, RobotState
 from proto.world_pb2 import Field, World
 from pyqtgraph.Qt import QtCore, QtGui
+
+import software.thunderscope.colors as colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
-from software.thunderscope.constants import (BALL_RADIUS, MM_PER_M,
-                                             ROBOT_MAX_RADIUS,
-                                             UNIX_SOCKET_BASE_PATH)
+from software.thunderscope.constants import (
+    BALL_RADIUS,
+    MM_PER_M,
+    ROBOT_MAX_RADIUS,
+    UNIX_SOCKET_BASE_PATH,
+)
 from software.thunderscope.field.field_layer import FieldLayer
 
 

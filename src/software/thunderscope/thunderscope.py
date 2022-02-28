@@ -5,6 +5,7 @@ import pyqtgraph as pg
 from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
 from shared.parameter.dynamic_parameters_pb2 import ThunderbotsConfig
+
 from software.networking import threaded_unix_sender
 from software.thunderscope.field import obstacle_layer, path_layer, world_layer
 from software.thunderscope.field.field import Field
@@ -46,11 +47,6 @@ class Thunderscope(object):
         self.timer.timeout.connect(self.refresh)
         self.timer.start(refresh_interval_ms)  # Refresh at 200hz
 
-    def schedule_something(self, interval, callback):
-        self.new_timer = QtCore.QTimer()
-        self.new_timer.timeout.connect(callback)
-        self.new_timer.start(interval)
-
     def setup_field_widget(self):
         """TODO: Docstring for setup_field.
 
@@ -59,9 +55,7 @@ class Thunderscope(object):
 
         """
         self.field = Field()
-        # TODO janky
-        self.world_layer = world_layer.WorldLayer()
-        self.field.add_layer("Vision", self.world_layer)
+        self.field.add_layer("Vision", world_layer.WorldLayer())
         self.field.add_layer("Obstacles", obstacle_layer.ObstacleLayer())
         self.field.add_layer("Path", path_layer.PathLayer())
 
