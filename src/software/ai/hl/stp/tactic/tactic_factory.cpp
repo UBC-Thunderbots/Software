@@ -76,7 +76,6 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto)
 std::shared_ptr<Tactic> createTactic(const TbotsProto::AttackerTactic &tactic_proto)
 {
     auto config = std::make_shared<AttackerTacticConfig>();
-    config->loadFromProto(tactic_proto.attacker_tactic_config());
     auto tactic = std::make_shared<AttackerTactic>(config);
 
     if (tactic_proto.has_best_pass_so_far())
@@ -105,7 +104,6 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::CreaseDefenderTactic &tac
 {
     auto config = std::make_shared<RobotNavigationObstacleConfig>();
 
-    config->loadFromProto(tactic_proto.robot_navigation_obstacle_config());
     auto tactic = std::make_shared<CreaseDefenderTactic>(config);
 
     tactic->updateControlParams(createPoint(tactic_proto.enemy_threat_origin()),
@@ -144,8 +142,7 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::GetBehindBallTactic &tact
 
 std::shared_ptr<Tactic> createTactic(const TbotsProto::GoalieTactic &tactic_proto)
 {
-    auto config = std::shared_ptr<GoalieTacticConfig>();
-    config->loadFromProto(tactic_proto.goalie_tactic_config());
+    auto config = std::make_shared<GoalieTacticConfig>();
 
     auto tactic =
         std::make_shared<GoalieTactic>(config, tactic_proto.max_allowed_speed_mode());

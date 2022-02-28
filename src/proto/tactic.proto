@@ -5,7 +5,6 @@ package TbotsProto;
 import "proto/geometry.proto";
 import "proto/primitive.proto";
 import "proto/world.proto";
-import "shared/parameter/dynamic_parameters.proto";
 
 // TODO move to play.proto
 message AssignedTacticPlayControlParams
@@ -43,8 +42,6 @@ message AttackerTactic
     // The point the robot will chip towards if it is unable to shoot and is in danger
     // of losing the ball to an enemy
     optional Point chip_target = 3;
-    // Attacker config
-    required AttackerTacticConfig attacker_tactic_config = 4;
 }
 
 message ChipTactic
@@ -71,8 +68,7 @@ message CreaseDefenderTactic
     // The crease defender alignment with respect to the enemy threat
     required CreaseDefenderAlignment crease_defender_alignment = 2;
     // The maximum allowed speed mode
-    required MaxAllowedSpeedMode max_allowed_speed_mode                     = 3;
-    required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 4;
+    required MaxAllowedSpeedMode max_allowed_speed_mode = 3;
 }
 
 message DribbleTactic
@@ -98,7 +94,6 @@ message GoalieTactic
 {
     // The maximum allowed speed mode
     required MaxAllowedSpeedMode max_allowed_speed_mode = 1;
-    required GoalieTacticConfig goalie_tactic_config    = 2;
 }
 
 message KickTactic

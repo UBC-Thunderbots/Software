@@ -6,8 +6,10 @@ import threading
 from pyqtgraph.Qt import QtCore, QtGui
 import sys
 from proto.geometry_pb2 import Point, Angle, Vector, AngularVelocity
+from proto.primitive_pb2 import MaxAllowedSpeedMode
 from proto.robot_status_msg_pb2 import RobotStatus
 from typing import List
+from proto.tactic_pb2 import AssignedTacticPlayControlParams, GoalieTactic, Tactic
 from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
 from software.thunderscope.thunderscope import Thunderscope
 import threading
@@ -36,6 +38,12 @@ def main():
         # setup full_system
         yellow_full_system = FullSystemWrapper()
         time.sleep(0.1)
+
+        params = AssignedTacticPlayControlParams()
+        tactic = GoalieTactic(max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT)
+        params.assigned_tactics[0].goalie.CopyFrom(tactic)
+        time.sleep(1)
+        yellow_full_system.send_tactic_override(params)
 
         while True:
             ssl_wrapper = simulator.get_ssl_wrapper_packet()

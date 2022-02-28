@@ -18,6 +18,8 @@ SSL_WRAPPER_OUTPUT_PATH = "/ssl_wrapper"
 SSL_REFEREE_OUTPUT_PATH = "/ssl_referee"
 SENSOR_PROTO_OUTPUT_PATH = "/sensor_proto"
 
+TACTIC_OVERRIDE_PATH = "/tactic_override"
+
 
 class FullSystemWrapper(object):
     def __init__(self, base_unix_path="/tmp/tbots"):
@@ -36,6 +38,7 @@ class FullSystemWrapper(object):
         self.ssl_referee_sender = ThreadedUnixSender(
             base_unix_path + SSL_REFEREE_OUTPUT_PATH
         )
+        self.tactic_override = ThreadedUnixSender(base_unix_path + TACTIC_OVERRIDE_PATH)
 
         self.sensor_proto_sender = ThreadedUnixSender(
             base_unix_path + SENSOR_PROTO_OUTPUT_PATH
@@ -67,3 +70,6 @@ class FullSystemWrapper(object):
 
     def get_primitive_set(self):
         return self.primitive_listener.maybe_pop()
+
+    def send_tactic_override(self, assigned_tactic_play_control_params):
+        return self.tactic_override.send(assigned_tactic_play_control_params)

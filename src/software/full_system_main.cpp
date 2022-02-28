@@ -36,7 +36,7 @@ int main(int argc, char** argv)
         auto thunderbots_config =
             std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
 
-        ThreadedProtoUnixListener<TbotsProto::ThunderbotsConfig>(
+        auto test1 = ThreadedProtoUnixListener<TbotsProto::ThunderbotsConfig>(
             "/tmp/tbots/dynamic_parameters", [](TbotsProto::ThunderbotsConfig input) {
                 LOG(DEBUG) << "RECEIVED PROTOBUF";
             });
@@ -47,11 +47,13 @@ int main(int argc, char** argv)
             thunderbots_config->getSensorFusionConfig());
         auto ai = std::make_shared<ThreadedAI>(thunderbots_config->getAiConfig());
 
-        ThreadedProtoUnixListener<TbotsProto::AssignedTacticPlayControlParams>(
-            "/tmp/tbots/tactic_override",
-            [&ai](TbotsProto::AssignedTacticPlayControlParams input) {
-                ai->overrideTactics(input);
-            });
+        auto test2 =
+            ThreadedProtoUnixListener<TbotsProto::AssignedTacticPlayControlParams>(
+                "/tmp/tbots/tactic_override",
+                [&ai](TbotsProto::AssignedTacticPlayControlParams input) {
+                    LOG(DEBUG) << input.DebugString();
+                    ai->overrideTactics(input);
+                });
 
         // Connect observers
         ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(backend);
