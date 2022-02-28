@@ -1,11 +1,11 @@
 import pyqtgraph as pg
-from pyqtgraph.Qt import QtCore, QtGui
-from software.thunderscope.field.field_layer import FieldLayer
-import software.thunderscope.constants as constants
 import software.thunderscope.colors as colors
-from proto.geometry_pb2 import Polygon, Circle
+import software.thunderscope.constants as constants
+from proto.geometry_pb2 import Circle, Polygon
 from proto.visualization_pb2 import Obstacles
+from pyqtgraph.Qt import QtCore, QtGui
 from software.networking.threaded_unix_listener import ThreadedUnixListener
+from software.thunderscope.field.field_layer import FieldLayer
 
 
 class ObstacleLayer(FieldLayer):

@@ -62,12 +62,11 @@ class TacticTestRunner(object):
         """
 
         def __stopper():
-            # self.yellow_full_system.stop()
             self.simulator.standalone_simulator_process.kill()
             self.yellow_full_system.full_system_process.kill()
-            self.thunderscope.close()
             self.simulator.standalone_simulator_process.wait()
             self.yellow_full_system.full_system_process.wait()
+            self.thunderscope.close()
 
         def __runner():
             time_elapsed_s = 0
@@ -81,6 +80,7 @@ class TacticTestRunner(object):
 
                 # if we wanted to open thunderscope, lets sleep
                 # until this ssl wrapper packet is delivered
+                # TODO fix this duration
                 if open_thunderscope:
                     time.sleep(tick_duration_s)
 
@@ -102,8 +102,6 @@ class TacticTestRunner(object):
         run_sim_thread = threading.Thread(target=__runner)
         run_sim_thread.start()
 
-        # This will block forever, we rely on the timer above to fire and close
-        # thunderscope.
         if open_thunderscope:
             self.thunderscope.show()
 

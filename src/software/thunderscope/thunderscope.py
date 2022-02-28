@@ -1,18 +1,14 @@
 import os
 import signal
 
-from software.thunderscope.field.field import Field
-from software.thunderscope.log.g3log_widget import g3logWidget
-from software.thunderscope.field import obstacle_layer, path_layer, world_layer
-
+import pyqtgraph as pg
+from pyqtgraph.dockarea import *
+from pyqtgraph.Qt import QtCore, QtGui
 from shared.parameter.dynamic_parameters_pb2 import ThunderbotsConfig
 from software.networking import threaded_unix_sender
-
-import pyqtgraph as pg
-from pyqtgraph.Qt import QtCore, QtGui
-from pyqtgraph.dockarea import *
-
-from shared.parameter.dynamic_parameters_pb2 import ThunderbotsConfig
+from software.thunderscope.field import obstacle_layer, path_layer, world_layer
+from software.thunderscope.field.field import Field
+from software.thunderscope.log.g3log_widget import g3logWidget
 
 
 class Thunderscope(object):

@@ -1,9 +1,8 @@
 import pyqtgraph as pg
 import pyqtgraph.console as pg_console
-from software.networking.threaded_unix_listener import ThreadedUnixListener
 import software.thunderscope.constants as constants
-
 from proto.robot_log_msg_pb2 import RobotLog
+from software.networking.threaded_unix_listener import ThreadedUnixListener
 
 
 class g3logWidget(pg_console.ConsoleWidget):
