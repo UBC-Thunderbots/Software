@@ -1,10 +1,10 @@
 #include "software/ai/navigator/path_planner/global_path_planner.h"
 
+#include <chrono>
+
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/test_util/path_planning_test_util.h"
 #include "software/test_util/test_util.h"
-
-#include <chrono>
 
 class TestGlobalPathPlanner : public testing::Test
 {
@@ -44,9 +44,9 @@ TEST_F(TestGlobalPathPlanner,
     Point start = world.field().enemyGoalCenter();
     Point dest  = world.field().friendlyGoalCenter();
 
-    std::set<MotionConstraint> constraints = {MotionConstraint::FRIENDLY_DEFENSE_AREA,
-                                              MotionConstraint::ENEMY_DEFENSE_AREA,
-                                              MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE};
+    std::set<MotionConstraint> constraints = {
+        MotionConstraint::FRIENDLY_DEFENSE_AREA, MotionConstraint::ENEMY_DEFENSE_AREA,
+        MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
         obstacle_factory.createFromMotionConstraints(constraints, world);
 
@@ -126,7 +126,8 @@ TEST_F(TestGlobalPathPlanner,
 
     std::set<MotionConstraint> constraints = {
         MotionConstraint::ENEMY_HALF, MotionConstraint::CENTER_CIRCLE,
-        MotionConstraint::FRIENDLY_DEFENSE_AREA, MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE};
+        MotionConstraint::FRIENDLY_DEFENSE_AREA,
+        MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
         obstacle_factory.createFromMotionConstraints(constraints, world);
 
@@ -151,9 +152,9 @@ TEST_F(TestGlobalPathPlanner, test_enemy_half_blocked_starting_and_ending_in_blo
 {
     Point start{2, 1}, dest{0, 0};
 
-    std::set<MotionConstraint> constraints = {MotionConstraint::ENEMY_HALF,
-                                              MotionConstraint::FRIENDLY_DEFENSE_AREA,
-                                              MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE};
+    std::set<MotionConstraint> constraints = {
+        MotionConstraint::ENEMY_HALF, MotionConstraint::FRIENDLY_DEFENSE_AREA,
+        MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
         obstacle_factory.createFromMotionConstraints(constraints, world);
 
@@ -180,9 +181,9 @@ TEST_F(TestGlobalPathPlanner, test_friendly_half_blocked_starting_in_blocked_are
 {
     Point start{-3, -3}, dest{4, 1};
 
-    std::set<MotionConstraint> constraints = {MotionConstraint::FRIENDLY_HALF,
-                                              MotionConstraint::ENEMY_DEFENSE_AREA,
-                                              MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE};
+    std::set<MotionConstraint> constraints = {
+        MotionConstraint::FRIENDLY_HALF, MotionConstraint::ENEMY_DEFENSE_AREA,
+        MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
         obstacle_factory.createFromMotionConstraints(constraints, world);
 
@@ -207,22 +208,22 @@ TEST_F(TestGlobalPathPlanner, test_leave_the_field)
 {
     Point start{1, 2};
     Point dest = world.field().friendlyCornerPos() + Vector(0, 0.1);
-    
-    std::set<MotionConstraint> constraints = { 
-        MotionConstraint::ENEMY_DEFENSE_AREA, MotionConstraint::FRIENDLY_DEFENSE_AREA 
-    };
-    std::vector<ObstaclePtr> obstacles = obstacle_factory.createFromMotionConstraints(constraints, world);
-    
-    std::shared_ptr<const EnlsvgPathPlanner> planner    = gpp.getPathPlanner(constraints);
-    auto path                                           = planner->findPath(start, dest);
-    
+
+    std::set<MotionConstraint> constraints = {MotionConstraint::ENEMY_DEFENSE_AREA,
+                                              MotionConstraint::FRIENDLY_DEFENSE_AREA};
+    std::vector<ObstaclePtr> obstacles =
+        obstacle_factory.createFromMotionConstraints(constraints, world);
+
+    std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner(constraints);
+    auto path                                        = planner->findPath(start, dest);
+
     EXPECT_TRUE(path != std::nullopt);
-    
+
     std::vector<Point> path_points = path->getKnots();
-    
+
     EXPECT_EQ(start, path->getStartPoint());
     EXPECT_EQ(dest, path->getEndPoint());
-    
+
     Rectangle bounding_box(start, dest);
     TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
     TestUtil::checkPathDoesNotIntersectObstacle(path_points, obstacles);
