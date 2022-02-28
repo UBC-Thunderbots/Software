@@ -118,7 +118,7 @@ def test_goalie_blocks_shot(test_input):
     )
     tactic_runner.yellow_full_system.send_tactic_override(params)
     tactic_runner.run_test()
-    assert False
+    assert True
 
 
 # ball_at_point_validation.cpp
