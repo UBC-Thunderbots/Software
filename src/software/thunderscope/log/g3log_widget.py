@@ -11,7 +11,10 @@ class g3logWidget(pg_console.ConsoleWidget):
         pg_console.ConsoleWidget.__init__(self)
 
         self.log_receiver = ThreadedUnixListener(
-            constants.UNIX_SOCKET_BASE_PATH + "log", RobotLog, convert_from_any=False, max_buffer_size=1000,
+            constants.UNIX_SOCKET_BASE_PATH + "log",
+            RobotLog,
+            convert_from_any=False,
+            max_buffer_size=1000,
         )
 
         # disable input and buttons

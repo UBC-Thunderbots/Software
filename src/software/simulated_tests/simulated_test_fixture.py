@@ -114,7 +114,8 @@ def test_goalie_blocks_shot(test_input):
     tactic_runner.simulator.setup_yellow_robots([test_input])
     params = AssignedTacticPlayControlParams()
     params.assigned_tactics[0].goalie.CopyFrom(
-        GoalieTactic(max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT))
+        GoalieTactic(max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT)
+    )
     tactic_runner.yellow_full_system.send_tactic_override(params)
     tactic_runner.run_test()
     assert False
