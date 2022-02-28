@@ -13,14 +13,13 @@ from proto.team_pb2 import Robot, Team
 from proto.ball_pb2 import Ball
 from threading import Thread
 from software.thunderscope.log.g3log_widget import g3logWidget
-from software.thunderscope.arbitrary_plot.arb_plot import NamedValuePlotter
+from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
 from proto.visualization_pb2 import NamedValue
 from proto.robot_log_msg_pb2 import RobotLog
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from field import obstacle_layer, path_layer, world_layer
-import ProtoReceiver
+from ProtoReceiver import ProtoReceiver
 import software.thunderscope.constants as constants
-
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.dockarea import *
@@ -44,15 +43,14 @@ if __name__ == "__main__":
     window.setWindowTitle("Thunderscope")
 
     # Setup Field + Layers
-    field = Field()
-
+    field = Field() 
     world = world_layer.WorldLayer()
     obstacles = obstacle_layer.ObstacleLayer()
     paths = path_layer.PathLayer()
 
-    proto_receiver.registerObserver(World, world.world_buffer)
-    proto_receiver.registerObserver(Obstacles, obstacles.obstacle_buffer)
-    proto_receiver.registerObserver(PathVisualization, paths.path_visualization_buffer)
+    proto_receiver.register_observer(World, world.world_buffer)
+    proto_receiver.register_observer(Obstacles, obstacles.obstacle_buffer)
+    proto_receiver.register_observer(PathVisualization, paths.path_visualization_buffer)
 
     field.add_layer("Vision", world)
     field.add_layer("Obstacles", obstacles)
@@ -63,30 +61,30 @@ if __name__ == "__main__":
 
     # Setup Console Widget
     logs = g3logWidget()
-    proto_receiver.registerObserver(RobotLog, logs.buffer)
+    proto_receiver.register_observer(RobotLog, logs.log_buffer)
 
     log_dock = Dock("logs", size=(500, 100))
     log_dock.addWidget(logs)
 
     # Setup Arbitrary Plot Widget
-    arb_plot = NamedValuePlotter()
-    arb_plot_dock = Dock("Performance", size=(500, 100))
-    arb_plot_dock.addWidget(arb_plot.plot)
-    proto_receiver.registerObserver(NamedValue, arb_plot.named_value_buffer)
+    named_value_plotter = NamedValuePlotter()
+    named_value_plotter_dock = Dock("Performance", size=(500, 100))
+    named_value_plotter_dock.addWidget(named_value_plotter.plot)
+    proto_receiver.register_observer(NamedValue, named_value_plotter.named_value_buffer)
 
     # Configure Docks
     dock_area.addDock(field_dock, "left")
     dock_area.addDock(log_dock, "bottom", field_dock)
-    dock_area.addDock(arb_plot_dock, "right", log_dock)
+    dock_area.addDock(named_value_plotter_dock, "right", log_dock)
 
     def update():
         field.refresh()
         logs.refresh()
-        arb_plot.refresh()
+        named_value_plotter.refresh()
 
     timer = QtCore.QTimer()
     timer.timeout.connect(update)
-    timer.start(3)  # Refresh at 200hz
+    timer.start(5)  # Refresh at 200hz
 
     window.show()
 

@@ -28,14 +28,9 @@ class g3logWidget(pg_console.ConsoleWidget):
 
         self.log_buffer = queue.Queue(buffer_size) 
 
-    @property
-    def buffer(self):
-        return self.log_buffer
-
     def refresh(self):
         """Update the log widget with another log message
         """
-        for _ in range(10):
 
             try:
                 log = self.log_buffer.get_nowait()

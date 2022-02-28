@@ -7,7 +7,10 @@ import queue
 import random
 from pyqtgraph.Qt import QtGui
 from collections import deque
-
+DEQUE_SIZE = 500
+MIN_Y_RANGE = 0
+MAX_Y_RANGE = 100
+TIME_WINDOW_TO_DISPLAY_S = 10
 
 class NamedValuePlotter(object):
     def __init__(self, buffer_size=10):
@@ -25,13 +28,7 @@ class NamedValuePlotter(object):
     def plot(self):
         return self.win
 
-    """Refreshes NamedValuePlotter
-
-    param: self.named_value_buffer: buffer with protobufs to plot
-    param: self.plots: map of protobufs to plot where protobuf name is the key and (x,y) data as the value
-    param: data_x: map of x-axis data where protobuf name is the key and deque of data is the value
-    param: data_y: map of y-axis data where protobuf name is the key and deque of data is the value
-
+    """Refreshes NamedValuePlotter and updates data in "plots" with data from "named_value_buffer"
     """
     def refresh(self):
         try:
@@ -49,8 +46,8 @@ class NamedValuePlotter(object):
                     brush=None,
                 )
                 self.plots[named_value.name].setDownsampling(method="peak")
-                self.data_x[named_value.name] = deque([], 500)
-                self.data_y[named_value.name] = deque([], 500)
+                self.data_x[named_value.name] = deque([], DEQUE_SIZE)
+                self.data_y[named_value.name] = deque([], DEQUE_SIZE)
                 self.legend.addItem(self.plots[named_value.name], named_value.name)
 
             #Add incoming data to existing deques of data
@@ -60,8 +57,8 @@ class NamedValuePlotter(object):
                 self.data_x[named_value.name], self.data_y[named_value.name]
             )
             self.win.setRange(
-                yRange=[0, 100],
-                xRange=[time.time() - self.time - 10, time.time() - self.time],
+                yRange=[MIN_Y_RANGE, MAX_Y_RANGE],
+                xRange=[time.time() - self.time - TIME_WINDOW_TO_DISPLAY_S, time.time() - self.time],
                 disableAutoRange=True,
             )
         except queue.Empty as empty:

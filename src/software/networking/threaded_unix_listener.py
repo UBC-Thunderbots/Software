@@ -104,7 +104,7 @@ class Session(socketserver.BaseRequestHandler):
         """
         p = self.request[0]
         type_name = str(p.split(b"!!!")[0], "utf-8")
-        proto_type = self.find_proto(type_name.split(".")[1])
+        proto_type = self.find_proto_class(type_name.split(".")[1])
         msg = proto_type()
         p = base64.b64decode(p.split(b"!!!")[1])
 
@@ -116,10 +116,11 @@ class Session(socketserver.BaseRequestHandler):
 
         self.handle_callback(msg)
 
-    def find_proto(self, proto_type):
-        """
-        Search through all protobufs and return class of proto_type
-        """
+    """Search through all protobufs and return class of proto_type
+
+    param: proto_class_name: String of the proto class name to search for
+    """
+    def find_proto_class(self, proto_class_name):
         proto_path = os.path.dirname(proto.__file__)
 
         for file in glob.glob(proto_path + "**/*.py"):
@@ -133,7 +134,7 @@ class Session(socketserver.BaseRequestHandler):
             for member in dir(module):
                 handler_class = getattr(module, member)
                 if handler_class and inspect.isclass(handler_class):
-                    if str(member) == proto_type:
+                    if str(member) == proto_class_name:
                         return handler_class
 
 
