@@ -63,7 +63,7 @@ message DribblerStatus
 /* Error codes are to be displayed in the visualizer */
 enum ErrorCode
 {
-    // Default message  for proto enums
+    // Default message required for proto enums
     NO_ERROR = 0;
 
     // Level triggered events

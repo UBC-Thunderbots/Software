@@ -1,4 +1,4 @@
-syntax = "proto3";
+syntax = "proto2";
 
 package SSLProto;
 
@@ -6,10 +6,10 @@ import "proto/ssl_gc_common.proto";
 import "proto/ssl_gc_geometry.proto";
 
 // GameEvent contains exactly one game event
-// Each game event has optional and  fields. The  fields are mandatory to
+// Each game event has optional and required fields. The required fields are mandatory to
 // process the event. Some optional fields are only used for visualization, others are
-//  to determine the ball placement position. If fields are missing that are
-//  for the ball placement position, no ball placement command will be issued.
+// required to determine the ball placement position. If fields are missing that are
+// required for the ball placement position, no ball placement command will be issued.
 // Fields are marked optional to make testing and extending of the protocol easier.
 // An autoRef should ideally set all fields, except if there are good reasons to not do
 // so.
@@ -112,7 +112,7 @@ message GameEvent
     message BallLeftField
     {
         // the team that last touched the ball
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that last touched the ball
         optional uint32 by_bot = 2;
         // the location where the ball left the field
@@ -122,7 +122,7 @@ message GameEvent
     message AimlessKick
     {
         // the team that last touched the ball
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that last touched the ball
         optional uint32 by_bot = 2;
         // the location where the ball left the field
@@ -134,7 +134,7 @@ message GameEvent
     message Goal
     {
         // the team that scored the goal
-         Team by_team = 1;
+        required Team by_team = 1;
         // the team that shot the goal (different from by_team for own goals)
         optional Team kicking_team = 6;
         // the bot that shot the goal
@@ -158,7 +158,7 @@ message GameEvent
     message IndirectGoal
     {
         // the team that tried to shoot the goal
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that kicked the ball - at least the team must be set
         optional uint32 by_bot = 2;
         // the location where the ball entered the goal
@@ -170,7 +170,7 @@ message GameEvent
     message ChippedGoal
     {
         // the team that tried to shoot the goal
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that kicked the ball
         optional uint32 by_bot = 2;
         // the location where the ball entered the goal
@@ -185,7 +185,7 @@ message GameEvent
     message BotTooFastInStop
     {
         // the team that found guilty
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that was too fast
         optional uint32 by_bot = 2;
         // the location of the bot
@@ -197,7 +197,7 @@ message GameEvent
     message DefenderTooCloseToKickPoint
     {
         // the team that was found guilty
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that violates the distance to the kick point
         optional uint32 by_bot = 2;
         // the location of the bot
@@ -228,7 +228,7 @@ message GameEvent
     message BotCrashUnique
     {
         // the team that caused the crash
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that caused the crash
         optional uint32 violator = 2;
         // the bot of the opposite team that was involved in the crash
@@ -248,7 +248,7 @@ message GameEvent
     message BotPushedBot
     {
         // the team that pushed the other team
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that pushed the other bot
         optional uint32 violator = 2;
         // the bot of the opposite team that was pushed
@@ -262,7 +262,7 @@ message GameEvent
     message BotTippedOver
     {
         // the team that found guilty
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that tipped over
         optional uint32 by_bot = 2;
         // the location of the bot
@@ -275,7 +275,7 @@ message GameEvent
     message DefenderInDefenseArea
     {
         // the team that found guilty
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that is inside the penalty area
         optional uint32 by_bot = 2;
         // the location of the bot
@@ -288,7 +288,7 @@ message GameEvent
     message DefenderInDefenseAreaPartially
     {
         // the team that found guilty
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that is partially inside the penalty area
         optional uint32 by_bot = 2;
         // the location of the bot
@@ -302,7 +302,7 @@ message GameEvent
     message AttackerTouchedBallInDefenseArea
     {
         // the team that found guilty
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that is inside the penalty area
         optional uint32 by_bot = 2;
         // the location of the bot
@@ -314,7 +314,7 @@ message GameEvent
     message BotKickedBallTooFast
     {
         // the team that found guilty
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that kicked too fast
         optional uint32 by_bot = 2;
         // the location of the ball at the time of the highest speed
@@ -328,7 +328,7 @@ message GameEvent
     message BotDribbledBallTooFar
     {
         // the team that found guilty
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that dribbled too far
         optional uint32 by_bot = 2;
         // the location where the dribbling started
@@ -340,7 +340,7 @@ message GameEvent
     message AttackerTouchedOpponentInDefenseArea
     {
         // the team that found guilty
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that touched the opponent robot
         optional uint32 by_bot = 2;
         // the bot of the opposite team that was touched
@@ -352,7 +352,7 @@ message GameEvent
     message AttackerDoubleTouchedBall
     {
         // the team that found guilty
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that touched the ball twice
         optional uint32 by_bot = 2;
         // the location of the ball when it was first touched
@@ -363,7 +363,7 @@ message GameEvent
     message AttackerTooCloseToDefenseArea
     {
         // the team that found guilty
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that is too close to the defense area
         optional uint32 by_bot = 2;
         // the location of the bot
@@ -377,7 +377,7 @@ message GameEvent
     message BotHeldBallDeliberately
     {
         // the team that found guilty
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that holds the ball
         optional uint32 by_bot = 2;
         // the location of the ball
@@ -389,7 +389,7 @@ message GameEvent
     message BotInterferedPlacement
     {
         // the team that found guilty
-         Team by_team = 1;
+        required Team by_team = 1;
         // the bot that interfered the placement
         optional uint32 by_bot = 2;
         // the location of the bot
@@ -399,25 +399,25 @@ message GameEvent
     message MultipleCards
     {
         // the team that received multiple yellow cards
-         Team by_team = 1;
+        required Team by_team = 1;
     }
     // a team collected multiple fouls, which results in a yellow card
     message MultipleFouls
     {
         // the team that collected multiple fouls
-         Team by_team = 1;
+        required Team by_team = 1;
     }
     // a team failed to place the ball multiple times in a row
     message MultiplePlacementFailures
     {
         // the team that failed multiple times
-         Team by_team = 1;
+        required Team by_team = 1;
     }
     // timeout waiting for the attacking team to perform the free kick
     message KickTimeout
     {
         // the team that that should have kicked
-         Team by_team = 1;
+        required Team by_team = 1;
         // the location of the ball
         optional Vector2 location = 2;
         // the time [s] that was waited
@@ -435,7 +435,7 @@ message GameEvent
     message PlacementFailed
     {
         // the team that failed
-         Team by_team = 1;
+        required Team by_team = 1;
         // the remaining distance [m] from ball to placement position
         optional float remaining_distance = 2;
     }
@@ -443,23 +443,23 @@ message GameEvent
     message UnsportingBehaviorMinor
     {
         // the team that found guilty
-         Team by_team = 1;
+        required Team by_team = 1;
         // an explanation of the situation and decision
-         string reason = 2;
+        required string reason = 2;
     }
     // a team was found guilty for major unsporting behavior
     message UnsportingBehaviorMajor
     {
         // the team that found guilty
-         Team by_team = 1;
+        required Team by_team = 1;
         // an explanation of the situation and decision
-         string reason = 2;
+        required string reason = 2;
     }
     // a keeper held the ball in its defense area for too long
     message KeeperHeldBall
     {
         // the team that found guilty
-         Team by_team = 1;
+        required Team by_team = 1;
         // the location of the ball
         optional Vector2 location = 2;
         // the duration [s] that the keeper hold the ball
@@ -469,7 +469,7 @@ message GameEvent
     message PlacementSucceeded
     {
         // the team that did the placement
-         Team by_team = 1;
+        required Team by_team = 1;
         // the time [s] taken for placing the ball
         optional float time_taken = 2;
         // the distance [m] between placement location and actual ball position
@@ -488,25 +488,25 @@ message GameEvent
     message BotSubstitution
     {
         // the team that substitutes robots
-         Team by_team = 1;
+        required Team by_team = 1;
     }
     // A challenge flag, requested by a team previously, is flagged
     message ChallengeFlag
     {
         // the team that substitutes robots
-         Team by_team = 1;
+        required Team by_team = 1;
     }
     // An emergency stop, requested by team previously, occurred
     message EmergencyStop
     {
         // the team that substitutes robots
-         Team by_team = 1;
+        required Team by_team = 1;
     }
     // a team has too many robots on the field
     message TooManyRobots
     {
         // the team that has too many robots
-         Team by_team = 1;
+        required Team by_team = 1;
         // number of robots allowed at the moment
         optional int32 num_robots_allowed = 2;
         // number of robots currently on the field
@@ -518,7 +518,7 @@ message GameEvent
     message BoundaryCrossing
     {
         // the team that has too many robots
-         Team by_team = 1;
+        required Team by_team = 1;
         // the location of the ball
         optional Vector2 location = 2;
     }
@@ -526,7 +526,7 @@ message GameEvent
     message PenaltyKickFailed
     {
         // the team that last touched the ball
-         Team by_team = 1;
+        required Team by_team = 1;
         // the location of the ball at the moment of this event
         optional Vector2 location = 2;
     }

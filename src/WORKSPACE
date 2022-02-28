@@ -380,7 +380,7 @@ pip_install(
     requirements = "//software/simulated_tests:requirements.txt",
 )
 
-#  to use `py_proto_library` from protobuf
+# required to use `py_proto_library` from protobuf
 http_archive(
     name = "six_archive",
     build_file = "//extlibs:six.BUILD",

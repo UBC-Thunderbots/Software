@@ -1,4 +1,4 @@
-syntax = "proto3";
+syntax = "proto2";
 
 package TbotsProto;
 
@@ -39,22 +39,22 @@ message AttackerTactic
     // The best pass so far
     optional Pass best_pass_so_far = 1;
     // whether we have committed to the pass and will be taking it
-    bool pass_committed = 2;
+    required bool pass_committed = 2;
     // The point the robot will chip towards if it is unable to shoot and is in danger
     // of losing the ball to an enemy
     optional Point chip_target = 3;
     // Attacker config
-    AttackerTacticConfig attacker_tactic_config = 4;
+    required AttackerTacticConfig attacker_tactic_config = 4;
 }
 
 message ChipTactic
 {
     // The location where the chip will be taken from
-    Point chip_origin = 1;
+    required Point chip_origin = 1;
     // The direction the Robot will chip in
-    Angle chip_direction = 2;
+    required Angle chip_direction = 2;
     // The distance the robot will chip to
-    double chip_distance_meters = 3;
+    required double chip_distance_meters = 3;
 }
 
 enum CreaseDefenderAlignment
@@ -67,12 +67,12 @@ enum CreaseDefenderAlignment
 message CreaseDefenderTactic
 {
     // The origin point of the enemy threat
-    Point enemy_threat_origin = 1;
+    required Point enemy_threat_origin = 1;
     // The crease defender alignment with respect to the enemy threat
-    CreaseDefenderAlignment crease_defender_alignment = 2;
+    required CreaseDefenderAlignment crease_defender_alignment = 2;
     // The maximum allowed speed mode
-    MaxAllowedSpeedMode max_allowed_speed_mode                     = 3;
-    RobotNavigationObstacleConfig robot_navigation_obstacle_config = 4;
+    required MaxAllowedSpeedMode max_allowed_speed_mode                     = 3;
+    required RobotNavigationObstacleConfig robot_navigation_obstacle_config = 4;
 }
 
 message DribbleTactic
@@ -82,33 +82,33 @@ message DribbleTactic
     // The final orientation to face the ball when finishing dribbling
     optional Angle final_dribble_orientation = 2;
     // whether to allow excessive dribbling, i.e. more than 1 metre at a time
-    bool allow_excessive_dribbling = 3;
+    required bool allow_excessive_dribbling = 3;
 }
 
 message GetBehindBallTactic
 {
     // The location where the chick will be taken, i.e. where we expect the ball to be
     // when we chip or kick it
-    Point ball_location = 1;
+    required Point ball_location = 1;
     // The direction the Robot will chick in
-    Angle chick_direction = 2;
+    required Angle chick_direction = 2;
 }
 
 message GoalieTactic
 {
     // The maximum allowed speed mode
-    MaxAllowedSpeedMode max_allowed_speed_mode = 1;
-    GoalieTacticConfig goalie_tactic_config    = 2;
+    required MaxAllowedSpeedMode max_allowed_speed_mode = 1;
+    required GoalieTacticConfig goalie_tactic_config    = 2;
 }
 
 message KickTactic
 {
     // The location where the kick will be taken from
-    Point kick_origin = 1;
+    required Point kick_origin = 1;
     // The direction the Robot will kick in
-    Angle kick_direction = 2;
+    required Angle kick_direction = 2;
     // How fast the Robot will kick the ball in meters per second
-    double kick_speed_meters_per_second = 3;
+    required double kick_speed_meters_per_second = 3;
 }
 
 message MoveGoalieToGoalLineTactic {}
@@ -116,21 +116,21 @@ message MoveGoalieToGoalLineTactic {}
 message MoveTactic
 {
     // The point the robot is trying to move to
-    Point destination = 1;
+    required Point destination = 1;
     // The orientation the robot should have when it arrives at its destination
-    Angle final_orientation = 2;
+    required Angle final_orientation = 2;
     // The speed the robot should have when it arrives at its destination
-    double final_speed = 3;
+    required double final_speed = 3;
     // How to run the dribbler
-    DribblerMode dribbler_mode = 4;
+    required DribblerMode dribbler_mode = 4;
     // How to navigate around the ball
-    BallCollisionType ball_collision_type = 5;
+    required BallCollisionType ball_collision_type = 5;
     // The command to autochip or autokick
-    AutoChipOrKick auto_chip_or_kick = 6;
+    required AutoChipOrKick auto_chip_or_kick = 6;
     // The maximum allowed speed mode
-    MaxAllowedSpeedMode max_allowed_speed_mode = 7;
+    required MaxAllowedSpeedMode max_allowed_speed_mode = 7;
     // The target spin while moving in revolutions per second
-    double target_spin_rev_per_s = 8;
+    required double target_spin_rev_per_s = 8;
 }
 
 message PenaltyKickTactic {}
@@ -138,11 +138,11 @@ message PenaltyKickTactic {}
 message PivotKickTactic
 {
     // The location where the kick will be taken from
-    Point kick_origin = 1;
+    required Point kick_origin = 1;
     // The direction the Robot will kick in
-     Angle kick_direction = 2;
+    required Angle kick_direction = 2;
     // How the robot will chip or kick the ball
-     AutoChipOrKick auto_chip_or_kick = 3;
+    required AutoChipOrKick auto_chip_or_kick = 3;
 }
 
 message ReceiverTactic
@@ -150,7 +150,7 @@ message ReceiverTactic
     // The pass to receive
     optional Pass pass = 1;
     // If set to true, we will only receive and dribble
-     bool disable_one_touch_shot = 2;
+    required bool disable_one_touch_shot = 2;
 }
 
 message ShadowEnemyTactic
@@ -161,10 +161,10 @@ message ShadowEnemyTactic
     // How far from the enemy the robot will position itself to shadow. If the enemy
     // threat has the ball, it will position itself to block the shot on goal.
     // Otherwise it will try to block the pass to the enemy threat.
-     double shadow_distance = 2;
+    required double shadow_distance = 2;
 }
 
 message StopTactic
 {
-     bool coast = 1;
+    required bool coast = 1;
 }

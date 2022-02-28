@@ -40,9 +40,6 @@ GameState::GameState(const TbotsProto::GameState& game_state_proto) : our_restar
         case TbotsProto::GameState_PlayState_PLAY_STATE_PLAYING:
             play_state_ = GameState::PlayState::PLAYING;
             break;
-        case TbotsProto::GameState_PlayState_GameState_PlayState_INT_MIN_SENTINEL_DO_NOT_USE_:
-        case TbotsProto::GameState_PlayState_GameState_PlayState_INT_MAX_SENTINEL_DO_NOT_USE_:
-            break;
     }
 
     switch (game_state_proto.restart_reason())
@@ -64,9 +61,6 @@ GameState::GameState(const TbotsProto::GameState& game_state_proto) : our_restar
             break;
         case TbotsProto::GameState_RestartReason_RESTART_REASON_BALL_PLACEMENT:
             restart_reason_ = GameState::RestartReason::BALL_PLACEMENT;
-            break;
-        case TbotsProto::GameState_RestartReason_GameState_RestartReason_INT_MIN_SENTINEL_DO_NOT_USE_:
-        case TbotsProto::GameState_RestartReason_GameState_RestartReason_INT_MAX_SENTINEL_DO_NOT_USE_:
             break;
     }
 
@@ -125,9 +119,6 @@ GameState::GameState(const TbotsProto::GameState& game_state_proto) : our_restar
             break;
         case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_BALL_PLACEMENT_THEM:
             updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
-            break;
-        case TbotsProto::GameState_RefereeCommand_GameState_RefereeCommand_INT_MIN_SENTINEL_DO_NOT_USE_:
-        case TbotsProto::GameState_RefereeCommand_GameState_RefereeCommand_INT_MAX_SENTINEL_DO_NOT_USE_:
             break;
     }
 }

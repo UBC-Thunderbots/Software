@@ -1,10 +1,9 @@
-syntax = "proto3";
+syntax = "proto2";
 
 package TbotsProto;
 
 enum Play
 {
-    BRUh        = 0;
     ShootOrChipPlay        = 1;
     KickoffFriendlyPlay    = 2;
     OffensePlay            = 3;

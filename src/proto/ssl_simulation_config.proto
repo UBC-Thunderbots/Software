@@ -1,4 +1,4 @@
-syntax = "proto3";
+syntax = "proto2";
 
 package SSLSimulationProto;
 
@@ -29,24 +29,24 @@ message RobotLimits
 message RobotWheelAngles
 {
     // Angle front right [rad]
-     float front_right = 1;
+    required float front_right = 1;
     // Angle back right [rad]
-     float back_right = 2;
+    required float back_right = 2;
     // Angle back left [rad]
-     float back_left = 3;
+    required float back_left = 3;
     // Angle front left [rad]
-     float front_left = 4;
+    required float front_left = 4;
 }
 
 // Specs of a robot
 message RobotSpecs
 {
     // Id of the robot
-     SSLProto.RobotId id = 1;
+    required SSLProto.RobotId id = 1;
     // Robot radius [m]
-    optional float radius = 2;
+    optional float radius = 2 [default = 0.09];
     // Robot height [m]
-    optional float height = 3;
+    optional float height = 3 [default = 0.15];
     // Robot mass [kg]
     optional float mass = 4;
     // Max linear kick speed [m/s] (unset = unlimited)

@@ -1,4 +1,4 @@
-syntax = "proto3";
+syntax = "proto2";
 
 package TbotsProto;
 
@@ -14,10 +14,10 @@ message Robot
         Chip    = 2;
         Move    = 3;
     }
-     uint32 id                                = 1;
-     RobotState current_state                 = 2;
+    required uint32 id                                = 1;
+    required RobotState current_state                 = 2;
     repeated RobotCapability unavailable_capabilities = 3;
-     Timestamp timestamp                      = 4;
+    required Timestamp timestamp                      = 4;
 }
 
 message Team

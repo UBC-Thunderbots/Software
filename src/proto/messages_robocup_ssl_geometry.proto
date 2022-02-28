@@ -1,14 +1,14 @@
 // This file should be kept up to date with Robocup SSL's version
 // https://github.com/RoboCup-SSL/ssl-vision/blob/master/src/shared/proto/messages_robocup_ssl_geometry.proto
-syntax = "proto3";
+syntax = "proto2";
 
 package SSLProto;
 
 // A 2D float vector.
 message Vector2f
 {
-     float x = 1;
-     float y = 2;
+    required float x = 1;
+    required float y = 2;
 }
 
 // Represents a field marking as a line segment represented by a start point p1,
@@ -18,13 +18,13 @@ message Vector2f
 message SSL_FieldLineSegment
 {
     // Name of this field marking.
-     string name = 1;
+    required string name = 1;
     // Start point of the line segment.
-     Vector2f p1 = 2;
+    required Vector2f p1 = 2;
     // End point of the line segment.
-     Vector2f p2 = 3;
+    required Vector2f p2 = 3;
     // Thickness of the line segment.
-     float thickness = 4;
+    required float thickness = 4;
     // The type of this shape
     optional SSL_FieldShapeType type = 5;
 }
@@ -34,28 +34,28 @@ message SSL_FieldLineSegment
 message SSL_FieldCircularArc
 {
     // Name of this field marking.
-     string name = 1;
+    required string name = 1;
     // Center point of the circular arc.
-     Vector2f center = 2;
+    required Vector2f center = 2;
     // Radius of the arc.
-     float radius = 3;
+    required float radius = 3;
     // Start angle in counter-clockwise order.
-     float a1 = 4;
+    required float a1 = 4;
     // End angle in counter-clockwise order.
-     float a2 = 5;
+    required float a2 = 5;
     // Thickness of the arc.
-     float thickness = 6;
+    required float thickness = 6;
     // The type of this shape
     optional SSL_FieldShapeType type = 7;
 }
 
 message SSL_GeometryFieldSize
 {
-     int32 field_length               = 1;
-     int32 field_width                = 2;
-     int32 goal_width                 = 3;
-     int32 goal_depth                 = 4;
-     int32 boundary_width             = 5;
+    required int32 field_length               = 1;
+    required int32 field_width                = 2;
+    required int32 goal_width                 = 3;
+    required int32 goal_depth                 = 4;
+    required int32 boundary_width             = 5;
     repeated SSL_FieldLineSegment field_lines = 6;
     repeated SSL_FieldCircularArc field_arcs  = 7;
     optional int32 penalty_area_depth         = 8;
@@ -64,18 +64,18 @@ message SSL_GeometryFieldSize
 
 message SSL_GeometryCameraCalibration
 {
-     uint32 camera_id              = 1;
-     float focal_length            = 2;
-     float principal_point_x       = 3;
-     float principal_point_y       = 4;
-     float distortion              = 5;
-     float q0                      = 6;
-     float q1                      = 7;
-     float q2                      = 8;
-     float q3                      = 9;
-     float tx                      = 10;
-     float ty                      = 11;
-     float tz                      = 12;
+    required uint32 camera_id              = 1;
+    required float focal_length            = 2;
+    required float principal_point_x       = 3;
+    required float principal_point_y       = 4;
+    required float distortion              = 5;
+    required float q0                      = 6;
+    required float q1                      = 7;
+    required float q2                      = 8;
+    required float q3                      = 9;
+    required float tx                      = 10;
+    required float ty                      = 11;
+    required float tz                      = 12;
     optional float derived_camera_world_tx = 13;
     optional float derived_camera_world_ty = 14;
     optional float derived_camera_world_tz = 15;
@@ -92,11 +92,11 @@ message SSL_GeometryCameraCalibration
 message SSL_BallModelStraightTwoPhase
 {
     // Ball sliding acceleration [m/s^2] (should be negative)
-     double acc_slide = 1;
+    required double acc_slide = 1;
     // Ball rolling acceleration [m/s^2] (should be negative)
-     double acc_roll = 2;
+    required double acc_roll = 2;
     // Fraction of the initial velocity where the ball starts to roll
-     double k_switch = 3;
+    required double k_switch = 3;
 }
 
 // Fixed-Loss model for chipped balls.
@@ -104,11 +104,11 @@ message SSL_BallModelStraightTwoPhase
 message SSL_BallModelChipFixedLoss
 {
     // Chip kick velocity damping factor in XY direction for the first hop
-     double damping_xy_first_hop = 1;
+    required double damping_xy_first_hop = 1;
     // Chip kick velocity damping factor in XY direction for all following hops
-     double damping_xy_other_hops = 2;
+    required double damping_xy_other_hops = 2;
     // Chip kick velocity damping factor in Z direction for all hops
-     double damping_z = 3;
+    required double damping_z = 3;
 }
 
 message SSL_GeometryModels
@@ -119,7 +119,7 @@ message SSL_GeometryModels
 
 message SSL_GeometryData
 {
-     SSL_GeometryFieldSize field         = 1;
+    required SSL_GeometryFieldSize field         = 1;
     repeated SSL_GeometryCameraCalibration calib = 2;
     optional SSL_GeometryModels models           = 3;
 }
