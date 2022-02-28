@@ -56,7 +56,7 @@ class StandaloneSimulatorWrapper(object):
         self.world_state = WorldState()
 
         # TODO change to er_force_sim_main
-        self.standalone_simulator = Popen(
+        self.standalone_simulator_process = Popen(
             ["software/simulation/standalone_er_force_simulator_main"],
         )
 

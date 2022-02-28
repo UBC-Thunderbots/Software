@@ -51,7 +51,7 @@ class FullSystemWrapper(object):
             base_unix_path + PRIMITIVE_INPUT_PATH, PrimitiveSet, convert_from_any=False,
         )
 
-        self.full_system = Popen(["software/full_system"])
+        self.full_system_process = Popen(["software/full_system"])
 
     def send_robot_status(self, robot_status):
         self.robot_status_sender.send(robot_status)

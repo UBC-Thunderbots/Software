@@ -96,6 +96,9 @@ class Thunderscope(object):
         self.window.show()
         pg.exec()
 
+    def close(self):
+        self.window.close()
+
 
 if __name__ == "__main__":
     thunderscope = Thunderscope()

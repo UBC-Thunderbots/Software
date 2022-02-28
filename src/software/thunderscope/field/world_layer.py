@@ -94,7 +94,7 @@ class WorldLayer(FieldLayer):
                     robot.current_state.global_position.y_meters * MM_PER_M,
                     ROBOT_MAX_RADIUS,
                 ),
-                (math.degrees(robot.current_state.global_orientation.radians) + 45)
+                int((math.degrees(robot.current_state.global_orientation.radians) + 45))
                 * convert_degree,
                 270 * convert_degree,
             )
