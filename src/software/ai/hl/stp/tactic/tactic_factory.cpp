@@ -4,6 +4,75 @@
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/logger/logger.h"
 
+std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto)
+{
+    switch (tactic_proto.tactic_case())
+    {
+        case TbotsProto::Tactic::kAttacker:
+        {
+            return createTactic(tactic_proto.attacker());
+        }
+        case TbotsProto::Tactic::kChip:
+        {
+            return createTactic(tactic_proto.get_behind_ball());
+        }
+        case TbotsProto::Tactic::kCreaseDefender:
+        {
+            return createTactic(tactic_proto.crease_defender());
+        }
+        case TbotsProto::Tactic::kDribble:
+        {
+            return createTactic(tactic_proto.dribble());
+        }
+        case TbotsProto::Tactic::kGetBehindBall:
+        {
+            return createTactic(tactic_proto.get_behind_ball());
+        }
+        case TbotsProto::Tactic::kGoalie:
+        {
+            return createTactic(tactic_proto.goalie());
+        }
+        case TbotsProto::Tactic::kKick:
+        {
+            return createTactic(tactic_proto.kick());
+        }
+        case TbotsProto::Tactic::kMoveGoalieToGoalLine:
+        {
+            return createTactic(tactic_proto.move_goalie_to_goal_line());
+        }
+        case TbotsProto::Tactic::kMove:
+        {
+            return createTactic(tactic_proto.move());
+        }
+        case TbotsProto::Tactic::kPenaltyKick:
+        {
+            return createTactic(tactic_proto.penalty_kick());
+        }
+        case TbotsProto::Tactic::kPivotKick:
+        {
+            return createTactic(tactic_proto.pivot_kick());
+        }
+        case TbotsProto::Tactic::kReceiver:
+        {
+            return createTactic(tactic_proto.receiver());
+        }
+        case TbotsProto::Tactic::kShadowEnemy:
+        {
+            return createTactic(tactic_proto.shadow_enemy());
+        }
+        case TbotsProto::Tactic::kStop:
+        {
+            return createTactic(tactic_proto.stop());
+        }
+        case TbotsProto::Tactic::TACTIC_NOT_SET:
+        {
+            LOG(FATAL) << "Tactic not set";
+        }
+    }
+    LOG(FATAL) << "Tactic not set";
+    return std::shared_ptr<Tactic>();
+}
+
 std::shared_ptr<Tactic> createTactic(const TbotsProto::AttackerTactic &tactic_proto)
 {
     auto config = std::make_shared<AttackerTacticConfig>();

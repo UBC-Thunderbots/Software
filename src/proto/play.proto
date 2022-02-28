@@ -21,4 +21,5 @@ enum Play
     CreaseDefensePlay      = 15;
     StopPlay               = 16;
     KickoffEnemyPlay       = 17;
+    AssignedTacticsPlay    = 18;
 }

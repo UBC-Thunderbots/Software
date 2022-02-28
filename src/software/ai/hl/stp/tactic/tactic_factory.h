@@ -3,6 +3,7 @@
 #include "proto/tactic.pb.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"
 
+std::shared_ptr<Tactic> createTactic(const TbotsProto::Tactic &tactic_proto);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::AttackerTactic &tactic_proto);
 std::shared_ptr<Tactic> createTactic(const TbotsProto::ChipTactic &tactic_proto);
 std::shared_ptr<Tactic> createTactic(

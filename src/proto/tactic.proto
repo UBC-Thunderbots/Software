@@ -7,6 +7,12 @@ import "proto/primitive.proto";
 import "proto/world.proto";
 import "shared/parameter/dynamic_parameters.proto";
 
+// TODO move to play.proto
+message AssignedTacticPlayControlParams
+{
+    map<uint32, Tactic> assigned_tactics = 1;
+}
+
 message Tactic
 {
     oneof tactic
