@@ -191,5 +191,5 @@ EnlsvgPathPlanner::findClosestUnblockedEnlsvgPoint(const EnlsvgPoint &ep) const
 
 bool EnlsvgPathPlanner::isBlocked(const EnlsvgPoint &ep) const
 {
-    return enlsvg_grid->isBlocked(ep.x, ep.y);
+    return !isCoordNavigable(ep) || enlsvg_grid->isBlocked(ep.x, ep.y);
 }

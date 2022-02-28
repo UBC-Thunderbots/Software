@@ -13,6 +13,8 @@
 
 using Path = LinearSpline2d;
 
+// TODO #2504: The GLobalPathPlanner doesn't handle MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE and 
+// MotionConstraint::HALF_METER_AROUND_BALL correctly in most situations
 /**
  * GlobalPathPlannerFactory is a module that constructs every possible path planner for
  * every possible combination of static obstacles. It pre-computes static obstacle

@@ -26,4 +26,4 @@ MAKE_ENUM(MotionConstraint,
           // Path between ball and placement point in ball placement
           AVOID_BALL_PLACEMENT_INTERFERENCE,
           // Region around the playable zone
-          FIELD_BOUNDARY_ZONE);
+          AVOID_FIELD_BOUNDARY_ZONE);
