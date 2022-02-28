@@ -195,3 +195,14 @@ class StandaloneSimulatorWrapper(object):
         """
         self.yellow_vision_sender.send(vision)
         self.yellow_primitive_set_sender.send(primitive_set)
+
+    def stop():
+        self.sim_tick_sender.force_stop()
+        self.world_state_sender.force_stop()
+        self.blue_vision_sender.force_stop()
+        self.yellow_vision_sender.force_stop()
+        self.blue_primitive_set_sender.force_stop()
+        self.yellow_primitive_set_sender.force_stop()
+        self.ssl_wrapper_listener.force_stop()
+        self.blue_robot_status_listener.force_stop()
+        self.yellow_robot_status_listener.force_stop()

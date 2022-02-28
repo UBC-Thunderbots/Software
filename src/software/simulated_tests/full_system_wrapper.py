@@ -73,3 +73,12 @@ class FullSystemWrapper(object):
 
     def send_tactic_override(self, assigned_tactic_play_control_params):
         return self.tactic_override.send(assigned_tactic_play_control_params)
+
+    def stop():
+        self.robot_status_sender.force_stop()
+        self.ssl_wrapper_sender.force_stop()
+        self.ssl_referee_sender.force_stop()
+        self.tactic_override.force_stop()
+        self.sensor_proto_sender.force_stop()
+        self.vision_listener.force_stop()
+        self.primitive_listener.force_stop()

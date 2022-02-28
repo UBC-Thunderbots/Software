@@ -1,4 +1,7 @@
 import software.simulated_tests.python_bindings as py
+
+# from hanging_threads import start_monitoring
+# start_monitoring(seconds_frozen=10, test_interval=100)
 from proto.sensor_msg_pb2 import SensorProto
 from proto.world_pb2 import WorldState, SimulatorTick, World
 import os
@@ -58,6 +61,14 @@ class TacticTestRunner(object):
                                   in realtime
         """
 
+        def __stopper():
+            # self.yellow_full_system.stop()
+            self.simulator.standalone_simulator_process.kill()
+            self.yellow_full_system.full_system_process.kill()
+            self.thunderscope.close()
+            self.simulator.standalone_simulator_process.wait()
+            self.yellow_full_system.full_system_process.wait()
+
         def __runner():
             time_elapsed_s = 0
 
@@ -86,20 +97,10 @@ class TacticTestRunner(object):
                     self.yellow_full_system.get_primitive_set(),
                 )
 
-        def __stopper():
-            self.simulator.standalone_simulator_process.kill()
-            self.yellow_full_system.full_system_process.kill()
-            self.thunderscope.close()
-            self.simulator.standalone_simulator_process.wait()
-            self.yellow_full_system.full_system_process.wait()
+            __stopper()
 
         run_sim_thread = threading.Thread(target=__runner)
         run_sim_thread.start()
-
-        # TODO 0.5 is kind of random, this delay comes from the time.sleep(durations)
-        # not accounting for the variation in the runtime
-        stop_sim_thread = threading.Timer(test_timeout_s + 0.5, __stopper)
-        stop_sim_thread.start()
 
         # This will block forever, we rely on the timer above to fire and close
         # thunderscope.
@@ -113,10 +114,10 @@ def test_goalie_blocks_shot(test_input):
     tactic_runner.simulator.setup_yellow_robots([test_input])
     params = AssignedTacticPlayControlParams()
     params.assigned_tactics[0].goalie.CopyFrom(
-        GoalieTactic(max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT)
-    )
+        GoalieTactic(max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT))
     tactic_runner.yellow_full_system.send_tactic_override(params)
     tactic_runner.run_test()
+    assert False
 
 
 # ball_at_point_validation.cpp

@@ -212,6 +212,7 @@ py_library(
         "//software:full_system",
     ],
     deps = [
+        requirement("hanging_threads"),
         "//proto:software_py_proto",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",

@@ -25,8 +25,16 @@ class ThreadedUnixSender:
 
         self.socket = socket.socket(socket.AF_UNIX, type=socket.SOCK_DGRAM)
 
-        self.thread = Thread(target=self.__send_protobuf)
+        self.stop = False
+
+        self.thread = Thread(target=self.__send_protobuf, daemon=True)
         self.thread.start()
+
+    def force_stop(self):
+        """Stop handling requests
+        """
+        self.stop = True
+        self.server.server_close()
 
     @property
     def buffer(self):
@@ -37,7 +45,7 @@ class ThreadedUnixSender:
         """
         proto = None
 
-        while True:
+        while not self.stop:
             proto = self.proto_buffer.get()
             if proto is not None:
                 send = proto.SerializeToString()
