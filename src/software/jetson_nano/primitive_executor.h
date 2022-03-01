@@ -18,13 +18,19 @@ class PrimitiveExecutor
                                const RobotConstants_t& robot_constants);
 
     /**
-     * Start running a primitive
-     *
+     * Update primitive executor with a new Primitive Set
+     * @param robot_id The id of the robot which is running this Primitive Executor
      * @param primitive_set_msg The primitive to start
      */
     void updatePrimitiveSet(const unsigned int robot_id,
                             const TbotsProto::PrimitiveSet& primitive_set_msg);
 
+    /**
+     * Update primitive executor with a new World
+     * @param world_msg Protobuf representation of the current World (World from the
+     * perspective of the team which the robot with this Primitive Executor is a member
+     * of)
+     */
     void updateWorld(const TbotsProto::World& world_msg);
 
     /**
