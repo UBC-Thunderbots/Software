@@ -11,10 +11,12 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
-    auto dest_msg        = createPointProto(Point(dest.x(), dest.y()));
+    TbotsProto::Path path_proto;
+    *(path_proto.add_point()) = *createPointProto(Point(dest.x(), dest.y()));
+    *(move_primitive_msg->mutable_move()->mutable_path()) = path_proto;
+
     auto final_angle_msg = createAngleProto(final_angle);
     *(move_primitive_msg->mutable_move()->mutable_final_angle()) = *final_angle_msg;
-    *(move_primitive_msg->mutable_move()->mutable_destination()) = *dest_msg;
     move_primitive_msg->mutable_move()->set_final_speed_m_per_s(
         static_cast<float>(final_speed_m_per_s));
     move_primitive_msg->mutable_move()->set_max_speed_m_per_s(
@@ -23,7 +25,6 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
 
     move_primitive_msg->mutable_move()->set_dribbler_speed_rpm(static_cast<float>(
         convertDribblerModeToDribblerSpeed(dribbler_mode, robot_constants)));
-
     if (auto_chip_or_kick.auto_chip_kick_mode == AutoChipOrKickMode::AUTOCHIP)
     {
         move_primitive_msg->mutable_move()
@@ -52,10 +53,12 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
 
+    TbotsProto::Path path_proto;
     auto dest_msg        = createPointProto(Point(destination.x(), destination.y()));
     auto final_angle_msg = createAngleProto(final_angle);
     *(move_primitive_msg->mutable_move()->mutable_final_angle()) = *final_angle_msg;
-    *(move_primitive_msg->mutable_move()->mutable_destination()) = *dest_msg;
+    *(path_proto.add_point())                                    = *dest_msg;
+    *(move_primitive_msg->mutable_move()->mutable_path())        = path_proto;
     move_primitive_msg->mutable_move()->set_final_speed_m_per_s(
         static_cast<float>(final_speed));
     move_primitive_msg->mutable_move()->set_max_speed_m_per_s(

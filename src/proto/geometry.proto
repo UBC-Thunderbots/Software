@@ -13,6 +13,11 @@ message Point
     double y_meters = 2;
 }
 
+message Path
+{
+    repeated Point point = 1 [(nanopb.fieldopt).max_count = 20];
+}
+
 message Vector
 {
     // x component
