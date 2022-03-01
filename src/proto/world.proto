@@ -97,3 +97,10 @@ message EnemyThreat
     // The robot that would pass to this robot if necessary
     optional Robot passer = 7;
 }
+
+message ValidationVisualization
+{
+    repeated Polygon polgons = 1;
+    repeated Circle circles  = 2;
+    required bool passed     = 3;
+}

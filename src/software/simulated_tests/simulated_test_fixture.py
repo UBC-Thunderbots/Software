@@ -10,7 +10,7 @@ from proto.robot_status_msg_pb2 import RobotStatus
 from proto.sensor_msg_pb2 import SensorProto
 from proto.tactic_pb2 import AssignedTacticPlayControlParams, GoalieTactic, Tactic
 from proto.vision_pb2 import BallState, RobotState
-from proto.world_pb2 import SimulatorTick, World, WorldState
+from proto.world_pb2 import SimulatorTick, World, WorldState, ValidationVisualization
 from pyqtgraph.Qt import QtCore, QtGui
 
 import software.simulated_tests.python_bindings as py
@@ -123,7 +123,6 @@ def tactic_runner():
 def test_goalie_blocks_shot(
     goalie_starting_position, ball_starting_position, tactic_runner
 ):
-
     tactic_runner.simulator.setup_yellow_robots([goalie_starting_position])
     tactic_runner.simulator.setup_ball(
         ball_position=ball_starting_position,

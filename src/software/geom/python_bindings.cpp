@@ -1,8 +1,13 @@
 #include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include <sstream>
 
+#include "proto/geometry.pb.h"
+#include "proto/message_translation/tbots_geometry.h"
+#include "pybind11_protobuf/native_proto_caster.h"
+#include "software/geom/algorithms/contains.h"
 #include "software/geom/circle.h"
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
@@ -13,6 +18,8 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(geometry, m)
 {
+    pybind11_protobuf::ImportNativeProtoCasters();
+
     py::class_<Point>(m, "Point", py::module_local())
         .def(py::init<double, double>())
         .def("x", &Point::x)
@@ -56,4 +63,50 @@ PYBIND11_MODULE(geometry, m)
             stream << v;
             return stream.str();
         });
+
+    py::class_<Polygon>(m, "Polygon")
+        .def(py::init<std::vector<Point>>())
+        .def("centroid", &Polygon::centroid)
+        .def("getPoints", &Polygon::getPoints)
+        .def("getSegments", &Polygon::getSegments)
+        // Overloaded
+        .def("__repr__", [](const Polygon& v) {
+            std::stringstream stream;
+            stream << v;
+            return stream.str();
+        });
+
+    py::class_<Segment>(m, "Segment")
+        .def(py::init<Point, Point>())
+        .def("setStart", &Segment::setStart)
+        .def("setEnd", &Segment::setEnd)
+        .def("getStart", &Segment::getStart)
+        .def("getEnd", &Segment::getEnd)
+        .def("length", &Segment::length)
+        .def("lengthSquared", &Segment::lengthSquared)
+        .def("reverse", &Segment::reverse);
+
+    py::class_<Circle>(m, "Circle")
+        .def(py::init<Point, double>())
+        .def("origin", &Circle::origin)
+        .def("radius", &Circle::radius)
+        .def("are", &Circle::area);
+
+    m.def("createPoint", &createPoint);
+    m.def("createPolygon", &createPolygon);
+    m.def("createCircle", &createCircle);
+    m.def("createVector", &createVector);
+
+    m.def("createPointProto", &createPointProto);
+    m.def("createPolygonProto", &createPolygonProto);
+    m.def("createCircleProto", &createCircleProto);
+    m.def("createVectorProto", &createVectorProto);
+
+    m.def("contains", py::overload_cast<const Circle&, const Segment&>(&contains));
+    m.def("contains", py::overload_cast<const Circle&, const Point&>(&contains));
+    m.def("contains", py::overload_cast<const Polygon&, const Point&>(&contains));
+    m.def("contains", py::overload_cast<const Ray&, const Point&>(&contains));
+    m.def("contains",
+          py::overload_cast<const Segment&, const Point&, double, int>(&contains));
+    m.def("contains", py::overload_cast<const Rectangle&, const Point&>(&contains));
 }

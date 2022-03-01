@@ -425,7 +425,9 @@ pybind_library(
         ":angle",
         ":point",
         ":vector",
+        "//proto/message_translation:tbots_geometry",
         "//software/geom/algorithms",
+        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
     ],
 )
 
