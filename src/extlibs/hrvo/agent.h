@@ -154,7 +154,9 @@ class Agent
     Vector2 velocity_;
     // The requested new velocity of this Agent
     Vector2 new_velocity_;
-    // The desired new velocity of this Agent
+    // The desired new speed of this Agent
+    // NOTE: HRVO algorithm will try to pick this speed, however, it may pick a different
+    // speed to avoid collisions.
     Vector2 pref_velocity_;
 
     float max_speed_;

@@ -205,7 +205,7 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
 
                 float new_max_speed = primitive.move().max_speed_m_per_s();
                 hrvo_agent.value()->setMaxSpeed(new_max_speed);
-                hrvo_agent.value()->setPrefSpeed(new_max_speed * PREF_SPEED_SCALE);
+                hrvo_agent.value()->setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
             }
         }
     }

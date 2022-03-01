@@ -113,13 +113,19 @@ class HRVOAgent : public Agent
     std::vector<Circle> getCandidateVelocitiesAsCircles(
         const float circle_rad = 0.03f) const;
 
+    /**
+     * Get a list of triangles (polygons) which represent the velocity obstacles
+     * which this HRVO Agent currently sees.
+     * @return A list of polygons which represent velocity obstacles
+     */
     std::vector<Polygon> getVelocityObstaclesAsPolygons() const;
 
     /**
-     * Update preferred speed of Agent
-     * @param pref_speed New preferred speed
+     * Update preferred speed of Agent. The preferred speed represents the speed which we
+     * would like this Agent to travel at.
+     * @param new_pref_speed New preferred speed
      */
-    void setPrefSpeed(float pref_speed);
+    void setPreferredSpeed(float new_pref_speed);
 
    private:
     /**

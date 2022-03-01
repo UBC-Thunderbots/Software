@@ -20,8 +20,11 @@ void PrimitiveExecutor::updatePrimitiveSet(
     const unsigned int robot_id, const TbotsProto::PrimitiveSet& primitive_set_msg)
 {
     hrvo_simulator.updatePrimitiveSet(primitive_set_msg);
-    // TODO Might be able to improve. don't think can use []
-    current_primitive_ = primitive_set_msg.robot_primitives().at(robot_id);
+    auto primitive_set_msg_iter = primitive_set_msg.robot_primitives().find(robot_id);
+    if (primitive_set_msg_iter != primitive_set_msg.robot_primitives().end())
+    {
+        current_primitive_ = primitive_set_msg_iter->second;
+    }
 }
 
 void PrimitiveExecutor::updateWorld(const TbotsProto::World& world_msg)
