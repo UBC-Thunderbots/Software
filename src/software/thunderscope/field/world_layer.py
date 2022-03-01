@@ -34,7 +34,7 @@ class WorldLayer(FieldLayer):
         :param field: The field proto to draw
 
         """
-        painter.setPen(pg.mkPen("w"))
+        painter.setPen(pg.mkPen("w", width=2))
 
         # Draw Field Bounds
         painter.drawRect(

@@ -25,7 +25,7 @@ class TacticTestRunner(object):
 
     """Run a tactic"""
 
-    def __init__(self, launch_delay_s=1):
+    def __init__(self, launch_delay_s=0.1):
         """Initialize the TacticTestRunner
 
         :param launch_delay_s: How long to wait after launching 

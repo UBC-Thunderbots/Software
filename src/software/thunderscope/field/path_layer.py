@@ -31,7 +31,7 @@ class PathLayer(FieldLayer):
             paths = self.cached_paths
 
         self.cached_paths = paths
-        painter.setPen(pg.mkPen("w"))
+        painter.setPen(pg.mkPen("g", width=1))
 
         for path in paths.path:
             polygon_points = [
