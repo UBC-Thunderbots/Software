@@ -210,6 +210,7 @@ py_library(
     ],
     data = [
         "//software:full_system",
+        "//software/geom:geometry.so",
     ],
     deps = [
         requirement("hanging_threads"),
