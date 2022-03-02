@@ -33,6 +33,8 @@ class Screen:
             fill="#ffffff",
         )
 
+        # TODO: try using getouput or get statusoutput instead of checkoutput
+
         # Get IP address
         cmd = "hostname -I | cut -d' ' -f1"
         IP = "  IP: " + subprocess.check_output(cmd, shell=True).decode("utf-8")

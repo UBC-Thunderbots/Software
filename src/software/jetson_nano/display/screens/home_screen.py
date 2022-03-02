@@ -32,7 +32,7 @@ class HomeScreen(Screen):
             cursor2 = ">" if self.curr_action == 2 else " "
 
             """
-            TODO: use this to put the cursor positions
+            TODO: try to use these to put the cursor positions
             cursor_pos_x = 0
             cursor_pos_y = 20 + self.font_size * self.curr_action
             """
