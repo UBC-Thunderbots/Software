@@ -44,8 +44,8 @@ class Validation(object):
 
     """A validation function that should eventually be true"""
 
-    def validate(self, vision) -> ValidationStatus:
-        raise NotImplementedError("validate is not implemented")
+    def get_validation_status(self, vision) -> ValidationStatus:
+        raise NotImplementedError("get_validation_status is not implemented")
 
     def get_validation_geometry(self, vision) -> ValidationGeometry:
         raise NotImplementedError("get_validation_geometry is not implemented")
@@ -74,7 +74,7 @@ class RobotEntersRegion(EventuallyValidation):
     def __init__(self, regions=[]):
         self.regions = regions
 
-    def validate(self, vision) -> ValidationStatus:
+    def get_validation_status(self, vision) -> ValidationStatus:
         """Checks if _any_ robot enters the provided regions
 
         :param vision: The vision msg to validate
@@ -126,7 +126,7 @@ def run_validation_sequence_sets(
 
         # We only want to check the first
         for validation in validation_sequence:
-            status = validation.validate(vision)
+            status = validation.get_validation_status(vision)
 
             validation_proto.status.append(status)
             validation_proto.geometry.append(validation.get_validation_geometry(vision))
