@@ -7,12 +7,8 @@ from pyqtgraph.Qt import QtCore, QtGui
 from shared.parameter.dynamic_parameters_pb2 import ThunderbotsConfig
 
 from software.networking import threaded_unix_sender
-from software.thunderscope.field import (
-    obstacle_layer,
-    path_layer,
-    world_layer,
-    validation_layer,
-)
+from software.thunderscope.field import (obstacle_layer, path_layer,
+                                         validation_layer, world_layer)
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 

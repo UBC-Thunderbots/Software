@@ -9,12 +9,9 @@ from pyqtgraph.Qt import QtCore, QtGui
 
 import software.thunderscope.colors as colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
-from software.thunderscope.constants import (
-    BALL_RADIUS,
-    MM_PER_M,
-    ROBOT_MAX_RADIUS,
-    UNIX_SOCKET_BASE_PATH,
-)
+from software.thunderscope.constants import (BALL_RADIUS, MM_PER_M,
+                                             ROBOT_MAX_RADIUS,
+                                             UNIX_SOCKET_BASE_PATH)
 from software.thunderscope.field.field_layer import FieldLayer
 
 

@@ -1,106 +1,37 @@
-import sys
+import logging
 import threading
 import time
 
 import pytest
-import logging
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - [%(levelname)s] - [%(threadName)s] - %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s",
 )
 logger = logging.getLogger(__name__)
+
+import software.geom.geometry as tbots_geom
 from proto.geometry_pb2 import Angle, AngularVelocity, Point, Vector
-from software.networking.threaded_unix_sender import ThreadedUnixSender
 from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
 from proto.primitive_pb2 import MaxAllowedSpeedMode
 from proto.robot_status_msg_pb2 import RobotStatus
 from proto.sensor_msg_pb2 import SensorProto
+from proto.tactic_pb2 import (AssignedTacticPlayControlParams, GoalieTactic,
+                              Tactic)
 from proto.tbots_software_msgs_pb2 import Vision
-from proto.tactic_pb2 import AssignedTacticPlayControlParams, GoalieTactic, Tactic
 from proto.vision_pb2 import BallState, RobotState
-from proto.world_pb2 import (
-    SimulatorTick,
-    World,
-    WorldState,
-    ValidationProto,
-    ValidationStatus,
-    ValidationGeometry,
-)
+from proto.world_pb2 import (SimulatorTick, ValidationGeometry,
+                             ValidationProto, ValidationStatus, World,
+                             WorldState)
 from pyqtgraph.Qt import QtCore, QtGui
 
-import software.simulated_tests.python_bindings as py
-import software.geom.geometry as tbots_geom
-from typing import Set, List
-
+from software.networking.threaded_unix_sender import ThreadedUnixSender
+from software.simulated_tests.eventually_validation.robot_enters_region import \
+    RobotEntersRegion
 from software.simulated_tests.full_system_wrapper import FullSystemWrapper
-from software.simulated_tests.standalone_simulator_wrapper import (
-    StandaloneSimulatorWrapper,
-)
+from software.simulated_tests.standalone_simulator_wrapper import \
+    StandaloneSimulatorWrapper
 from software.thunderscope.thunderscope import Thunderscope
-
-# TODO move to validation files
-class Validation(object):
-
-    """A validation function that should eventually be true"""
-
-    def get_validation_status(self, vision) -> ValidationStatus:
-        raise NotImplementedError("get_validation_status is not implemented")
-
-    def get_validation_geometry(self, vision) -> ValidationGeometry:
-        raise NotImplementedError("get_validation_geometry is not implemented")
-
-    def get_failure_message(self):
-        raise NotImplementedError("get_failure_message is not implemented")
-
-
-class EventuallyValidation(Validation):
-    pass
-
-
-class AlwaysValidation(Validation):
-    pass
-
-
-# TODO finalize naming
-ValidationSequence = List[Validation]
-ValidationSequenceSet = Set[ValidationSequence]
-
-
-class RobotEntersRegion(EventuallyValidation):
-
-    """Checks if a Robot enters any of the provided regions."""
-
-    def __init__(self, regions=[]):
-        self.regions = regions
-
-    def get_validation_status(self, vision) -> ValidationStatus:
-        """Checks if _any_ robot enters the provided regions
-
-        :param vision: The vision msg to validate
-        :returns: PENDING until a robot enters any of the regions
-                  PASS when a robot enters
-        """
-        for region in self.regions:
-            for robot_id, robot_states in vision.robot_states.items():
-                if tbots_geom.contains(
-                    region, tbots_geom.createPoint(robot_states.global_position)
-                ):
-                    return ValidationStatus.PASS
-
-        return ValidationStatus.PENDING
-
-    def get_validation_geometry(self, vision) -> ValidationGeometry:
-        """Returns the underlying geometry this validation is checking
-
-        :param vision: The vision msg to validate
-        :returns: ValidationGeometry containing geometry to visualize
-
-        """
-        return create_validation_geometry(self.regions)
-
-    def get_failure_message(self):
-        return "Robot didn't enter any of these regions: {}".format(self.regions)
 
 
 def run_validation_sequence_sets(
@@ -116,10 +47,13 @@ def run_validation_sequence_sets(
     :param always_validation_sequence_set:
             A collection of sequences of AlwaysValidation to validate.
 
+    :returns: ValidationProto, error_msg
+
     """
 
     # Proto that stores validation geometry and validation status
     validation_proto = ValidationProto()
+    error_msg = None
 
     # Validate
     for validation_sequence in eventually_validation_sequence_set:
@@ -131,10 +65,10 @@ def run_validation_sequence_sets(
             validation_proto.status.append(status)
             validation_proto.geometry.append(validation.get_validation_geometry(vision))
 
-            # If the validation function failed, raise an
-            # AssertionError so that
+            # If the validation function failed, return out the error msg
             if status == ValidationStatus.FAIL:
-                raise AssertionError(validation.get_failure_message())
+                error_msg = validation.get_failure_message()
+                break
 
             # If the current validation is pending, we don't care about
             # the next one. Keep evaluating until this one passes.
@@ -146,7 +80,7 @@ def run_validation_sequence_sets(
             if status == ValidationStatus.PASS:
                 continue
 
-    return validation_proto
+    return validation_proto, error_msg
 
 
 class TacticTestRunner(object):
@@ -156,16 +90,15 @@ class TacticTestRunner(object):
     def __init__(self, launch_delay_s=0.1, base_unix_path="/tmp/tbots"):
         """Initialize the TacticTestRunner
 
-        :param launch_delay_s: How long to wait after launching 
+        :param launch_delay_s: How long to wait after launching the processes
 
         """
         self.thunderscope = Thunderscope()
         self.simulator = StandaloneSimulatorWrapper()
         self.yellow_full_system = FullSystemWrapper()
+        time.sleep(launch_delay_s)
 
         self.validation_sender = ThreadedUnixSender(base_unix_path + "/validation")
-
-        time.sleep(launch_delay_s)
 
     def run_test(
         self,
@@ -223,17 +156,23 @@ class TacticTestRunner(object):
                 else:
                     cached_vision = vision
 
-                # NOTE: The following line will raise AssertionError(
-                # on validation failure that will propagate to the main
-                # thread through the excepthook
-                validation = run_validation_sequence_sets(
+                # Validate
+                validation, error_msg = run_validation_sequence_sets(
                     vision,
                     eventually_validation_sequence_set,
                     always_validation_sequence_set,
                 )
 
+                # NOTE: The following line will raise AssertionError(
+                # on validation failure that will propagate to the main
+                # thread through the excepthook
+                if error_msg:
+                    raise AssertionError(error_msg)
+
                 # Send out the validation proto to thunderscope
                 self.validation_sender.send(validation)
+
+                # Step the primtives
                 self.simulator.send_yellow_primitive_set_and_vision(
                     vision, self.yellow_full_system.get_primitive_set(),
                 )
@@ -264,94 +203,7 @@ class TacticTestRunner(object):
             self.thunderscope.show()
 
 
-def create_validation_geometry(geometry=[]) -> ValidationGeometry:
-    """Given a list of (vectors, polygons, circles), creates
-    a ValidationGeometry proto
-
-    :param geometry: A list of geom
-    :returns: ValidationGeometry
-
-    """
-
-    validation_geometry = ValidationGeometry()
-
-    CREATE_PROTO_DISPATCH = {
-        tbots_geom.Vector.__name__: tbots_geom.createVectorProto,
-        tbots_geom.Polygon.__name__: tbots_geom.createPolygonProto,
-        tbots_geom.Rectangle.__name__: tbots_geom.createPolygonProto,
-        tbots_geom.Circle.__name__: tbots_geom.createCircleProto,
-    }
-
-    ADD_TO_VALIDATION_GEOMETRY_DISPATCH = {
-        tbots_geom.Vector.__name__: validation_geometry.vectors.append,
-        tbots_geom.Polygon.__name__: validation_geometry.polygons.append,
-        tbots_geom.Rectangle.__name__: validation_geometry.polygons.append,
-        tbots_geom.Circle.__name__: validation_geometry.circles.append,
-    }
-
-    for geom in geometry:
-        ADD_TO_VALIDATION_GEOMETRY_DISPATCH[type(geom).__name__](
-            CREATE_PROTO_DISPATCH[type(geom).__name__](geom)
-        )
-
-    return validation_geometry
-
-
 @pytest.fixture
 def tactic_runner():
     runner = TacticTestRunner()
     yield runner
-
-
-@pytest.mark.parametrize(
-    "goalie_starting_position,ball_starting_position",
-    [
-        ((4.2, 0), (-2, 1)),
-        ((4.2, 0.4), (-2, -1)),
-        ((4.2, -0.4), (-2, 0.1)),
-        ((-4.2, 0.4), (-2, -1)),
-        ((-4.2, -0.4), (-2, 0.1)),
-        ((-4.2, 0.2), (-2, -0.1)),
-        ((-4.2, -0.2), (-2, 1)),
-        ((-4.2, 0.2), (-2, -0.1)),
-        ((-4.2, -0.5), (-2, 2)),
-        ((-4.2, -0.5), (-2, -2)),
-    ],
-)
-def test_goalie_blocks_shot(
-    goalie_starting_position, ball_starting_position, tactic_runner
-):
-    # Setup Robot
-    tactic_runner.simulator.setup_yellow_robots([goalie_starting_position])
-
-    # Setup Tactic
-    params = AssignedTacticPlayControlParams()
-    params.assigned_tactics[0].goalie.CopyFrom(
-        GoalieTactic(max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT)
-    )
-    tactic_runner.yellow_full_system.send_tactic_override(params)
-
-    # Setup ball with initial velocity using our software/geom
-    tactic_runner.simulator.setup_ball(
-        ball_position=tbots_geom.Point(*ball_starting_position),
-        ball_velocity=(
-            tbots_geom.Field().friendlyGoalCenter()
-            - tbots_geom.Vector(ball_starting_position[0], ball_starting_position[1])
-        )
-        .toVector()
-        .normalize(5),  # TODO we should try a range of speeds
-    )
-
-    # Validation
-    eventually_sequences = [
-        [
-            # Goalie should be in the defense area
-            RobotEntersRegion(regions=[tbots_geom.Field().friendlyDefenseArea()])
-        ]
-    ]
-
-    tactic_runner.run_test(eventually_validation_sequence_set=eventually_sequences)
-
-
-if __name__ == "__main__":
-    sys.exit(pytest.main([__file__, "-svv"]))

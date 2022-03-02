@@ -130,45 +130,10 @@ cc_library(
     ],
 )
 
-PYBIND_DEPS = [
-    "@local_config_python//:python_headers",
-    "@pybind11",
-]
-
-cc_library(
-    name = "pyton_bindings_lib",
-    srcs = ["python_bindings.cpp"],
-    copts = ["-fexceptions"],
-    features = [
-        "-use_header_modules",
-        "-parse_headers",
-    ],
-    deps = [
-        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
-        "//software/ai:ai",
-        "//software/ai/hl/stp/tactic/attacker:attacker_tactic",
-        "//software/ai/hl/stp/tactic/goalie:goalie_tactic",
-        "//software/simulated_tests:tactic_stepper",
-        "//software/sensor_fusion",
-        "//shared/parameter:cpp_configs",
-        "//proto:sensor_msg_cc_proto",
-    ] + PYBIND_DEPS,
-)
-
-pybind_extension(
-    name = "python_bindings",
-    deps = [
-        ":pyton_bindings_lib",
-    ],
-)
-
-py_test(
-    name = "simulated_test_fixture",  # TODO nuke the py
+py_library(
+    name = "simulated_test_fixture",
     srcs = [
         "simulated_test_fixture.py",
-    ],
-    data = [
-        ":python_bindings.so",
     ],
     deps = [
         ":full_system_wrapper",
@@ -177,15 +142,8 @@ py_test(
         "//proto:tbots_py_proto",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
+        "//software/simulated_tests/eventually_validation",
         "//software/thunderscope",
-        "//software/thunderscope:colors",
-        "//software/thunderscope:constants",
-        "//software/thunderscope/field",
-        "//software/thunderscope/field:field_layer",
-        "//software/thunderscope/field:obstacle_layer",
-        "//software/thunderscope/field:world_layer",
-        "//software/thunderscope/log:g3log_widget",
-        requirement("pytest"),
     ],
 )
 
@@ -221,5 +179,31 @@ py_library(
         "//proto:tbots_py_proto",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
+    ],
+)
+
+py_library(
+    name = "validation",
+    srcs = [
+        "validation.py",
+    ],
+    data = [
+        "//software:full_system",
+        "//software/geom:geometry.so",
+    ],
+    deps = [
+        "//proto:software_py_proto",
+        "//proto:tbots_py_proto",
+    ],
+)
+
+py_test(
+    name = "goalie_tactic_test",
+    srcs = [
+        "goalie_tactic_test.py",
+    ],
+    deps = [
+        ":simulated_test_fixture",
+        requirement("pytest"),
     ],
 )
