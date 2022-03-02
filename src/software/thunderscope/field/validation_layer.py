@@ -12,7 +12,7 @@ from proto.world_pb2 import (
     SimulatorTick,
     World,
     WorldState,
-    Validation,
+    ValidationProto,
     ValidationStatus,
     ValidationGeometry,
 )
@@ -23,10 +23,12 @@ class ValidationLayer(FieldLayer):
         FieldLayer.__init__(self)
         self.validation_receiver = ThreadedUnixListener(
             constants.UNIX_SOCKET_BASE_PATH + "validation",
-            Validation,
+            ValidationProto,
             max_buffer_size=1,
+            convert_from_any=False,
         )
-        self.cached_validations = Validation()
+
+        self.cached_validation = ValidationProto()
 
     def paint(self, painter, option, widget):
         """Paint this layer
@@ -37,32 +39,39 @@ class ValidationLayer(FieldLayer):
 
         """
 
-        validations = self.obstacle_receiver.maybe_pop()
+        validation = self.validation_receiver.maybe_pop()
 
-        if not validations:
-            validations = self.cached_obstacles
+        if not validation:
+            validation = self.cached_validation
 
-        self.cached_validations = obstacles
+        self.cached_validation = validation
 
-        painter.setPen(pg.mkPen(colors.NAVIGATOR_OBSTACLE_COLOR))
+        for geometry, status in zip(validation.geometry, validation.status):
 
-        for polyvalidation in obstacles.polygon:
-            polygon_points = [
-                QtCore.QPoint(
-                    constants.MM_PER_M * point.x_meters,
-                    constants.MM_PER_M * point.y_meters,
+            if status == ValidationStatus.PASS:
+                painter.setPen(pg.mkPen(colors.VALIDATION_PASSED_COLOR, width=3))
+            if status == ValidationStatus.FAIL:
+                painter.setPen(pg.mkPen(colors.VALIDATION_FAILED_COLOR, width=3))
+            if status == ValidationStatus.PENDING:
+                painter.setPen(pg.mkPen(colors.VALIDATION_PENDING_COLOR, width=3))
+
+            for circle in geometry.circles:
+                painter.drawEllipse(
+                    self.createCircle(
+                        constants.MM_PER_M * circle.origin.x_meters,
+                        constants.MM_PER_M * circle.origin.y_meters,
+                        constants.MM_PER_M * circle.radius,
+                    )
                 )
-                for point in polyvalidation.points
-            ]
 
-            poly = QtGui.QPolygon(polygon_points)
-            painter.drawPolygon(poly)
+            for polygon in geometry.polygons:
+                polygon_points = [
+                    QtCore.QPoint(
+                        constants.MM_PER_M * point.x_meters,
+                        constants.MM_PER_M * point.y_meters,
+                    )
+                    for point in polygon.points
+                ]
 
-        for circlevalidation in obstacles.circle:
-            painter.drawEllipse(
-                self.createCircle(
-                    constants.MM_PER_M * circlevalidation.origin.x_meters,
-                    constants.MM_PER_M * circlevalidation.origin.y_meters,
-                    constants.MM_PER_M * circlevalidation.radius,
-                )
-            )
+                poly = QtGui.QPolygon(polygon_points)
+                painter.drawPolygon(poly)

@@ -7,7 +7,12 @@ from pyqtgraph.Qt import QtCore, QtGui
 from shared.parameter.dynamic_parameters_pb2 import ThunderbotsConfig
 
 from software.networking import threaded_unix_sender
-from software.thunderscope.field import obstacle_layer, path_layer, world_layer
+from software.thunderscope.field import (
+    obstacle_layer,
+    path_layer,
+    world_layer,
+    validation_layer,
+)
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 
@@ -58,6 +63,7 @@ class Thunderscope(object):
         self.field.add_layer("Vision", world_layer.WorldLayer())
         self.field.add_layer("Obstacles", obstacle_layer.ObstacleLayer())
         self.field.add_layer("Path", path_layer.PathLayer())
+        self.field.add_layer("Validation", validation_layer.ValidationLayer())
 
         field_dock = Dock("Field", size=(500, 2000))
         field_dock.addWidget(self.field)

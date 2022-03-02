@@ -112,7 +112,7 @@ message ValidationGeometry
     repeated Vector vectors   = 3;
 }
 
-message Validation
+message ValidationProto
 {
     repeated ValidationGeometry geometry = 1;
     repeated ValidationStatus status     = 2;

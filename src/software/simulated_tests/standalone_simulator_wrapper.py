@@ -104,9 +104,7 @@ class StandaloneSimulatorWrapper(object):
         """
         self.__setup_robots(robot_locations, "yellow")
 
-    def setup_ball(
-        self, ball_position=(0, 0), ball_velocity=(0, 0), distance_from_ground=0
-    ):
+    def setup_ball(self, ball_position, ball_velocity, distance_from_ground=0):
         """Setup the ball with the x, y coordinates in meters
 
         :param ball_position: A tuple with the x,y coordinates
@@ -117,11 +115,11 @@ class StandaloneSimulatorWrapper(object):
         self.world_state.ball_state.CopyFrom(
             BallState(
                 global_position=Point(
-                    x_meters=ball_position[0], y_meters=ball_position[1]
+                    x_meters=ball_position.x(), y_meters=ball_position.y(),
                 ),
                 global_velocity=Vector(
-                    x_component_meters=ball_velocity[0],
-                    y_component_meters=ball_velocity[1],
+                    x_component_meters=ball_velocity.x(),
+                    y_component_meters=ball_velocity.y(),
                 ),
                 distance_from_ground=distance_from_ground,
             )

@@ -11,6 +11,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 from proto.geometry_pb2 import Angle, AngularVelocity, Point, Vector
+from software.networking.threaded_unix_sender import ThreadedUnixSender
 from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
 from proto.primitive_pb2 import MaxAllowedSpeedMode
 from proto.robot_status_msg_pb2 import RobotStatus
@@ -22,7 +23,7 @@ from proto.world_pb2 import (
     SimulatorTick,
     World,
     WorldState,
-    Validation,
+    ValidationProto,
     ValidationStatus,
     ValidationGeometry,
 )
@@ -30,6 +31,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 
 import software.simulated_tests.python_bindings as py
 import software.geom.geometry as tbots_geom
+from typing import Set, List
 
 from software.simulated_tests.full_system_wrapper import FullSystemWrapper
 from software.simulated_tests.standalone_simulator_wrapper import (
@@ -37,12 +39,121 @@ from software.simulated_tests.standalone_simulator_wrapper import (
 )
 from software.thunderscope.thunderscope import Thunderscope
 
+# TODO move to validation files
+class Validation(object):
+
+    """A validation function that should eventually be true"""
+
+    def validate(self, vision) -> ValidationStatus:
+        raise NotImplementedError("validate is not implemented")
+
+    def get_validation_geometry(self, vision) -> ValidationGeometry:
+        raise NotImplementedError("get_validation_geometry is not implemented")
+
+    def get_failure_message(self):
+        raise NotImplementedError("get_failure_message is not implemented")
+
+
+class EventuallyValidation(Validation):
+    pass
+
+
+class AlwaysValidation(Validation):
+    pass
+
+
+# TODO finalize naming
+ValidationSequence = List[Validation]
+ValidationSequenceSet = Set[ValidationSequence]
+
+
+class RobotEntersRegion(EventuallyValidation):
+
+    """Checks if a Robot enters any of the provided regions."""
+
+    def __init__(self, regions=[]):
+        self.regions = regions
+
+    def validate(self, vision) -> ValidationStatus:
+        """Checks if _any_ robot enters the provided regions
+
+        :param vision: The vision msg to validate
+        :returns: PENDING until a robot enters any of the regions
+                  PASS when a robot enters
+        """
+        for region in self.regions:
+            for robot_id, robot_states in vision.robot_states.items():
+                if tbots_geom.contains(
+                    region, tbots_geom.createPoint(robot_states.global_position)
+                ):
+                    return ValidationStatus.PASS
+
+        return ValidationStatus.PENDING
+
+    def get_validation_geometry(self, vision) -> ValidationGeometry:
+        """Returns the underlying geometry this validation is checking
+
+        :param vision: The vision msg to validate
+        :returns: ValidationGeometry containing geometry to visualize
+
+        """
+        return create_validation_geometry(self.regions)
+
+    def get_failure_message(self):
+        return "Robot didn't enter any of these regions: {}".format(self.regions)
+
+
+def run_validation_sequence_sets(
+    vision, eventually_validation_sequence_set, always_validation_sequence_set
+):
+    """Given both eventually and always validation sequence sets, (and vision)
+    run validation and aggregate the results in a validation proto.
+
+    :raises AssertionError: If the test fails
+    :param vision: Vision to validate with
+    :param eventually_validation_sequence_set:
+            A collection of sequences of EventuallyValidation to validate.
+    :param always_validation_sequence_set:
+            A collection of sequences of AlwaysValidation to validate.
+
+    """
+
+    # Proto that stores validation geometry and validation status
+    validation_proto = ValidationProto()
+
+    # Validate
+    for validation_sequence in eventually_validation_sequence_set:
+
+        # We only want to check the first
+        for validation in validation_sequence:
+            status = validation.validate(vision)
+
+            validation_proto.status.append(status)
+            validation_proto.geometry.append(validation.get_validation_geometry(vision))
+
+            # If the validation function failed, raise an
+            # AssertionError so that
+            if status == ValidationStatus.FAIL:
+                raise AssertionError(validation.get_failure_message())
+
+            # If the current validation is pending, we don't care about
+            # the next one. Keep evaluating until this one passes.
+            if status == ValidationStatus.PENDING:
+                break
+
+            # If the validation has passed, continue
+            # this line is not needed, but just added to be explicit
+            if status == ValidationStatus.PASS:
+                continue
+
+    return validation_proto
+
 
 class TacticTestRunner(object):
 
     """Run a tactic"""
 
-    def __init__(self, launch_delay_s=0.1):
+    def __init__(self, launch_delay_s=0.1, base_unix_path="/tmp/tbots"):
         """Initialize the TacticTestRunner
 
         :param launch_delay_s: How long to wait after launching 
@@ -51,21 +162,25 @@ class TacticTestRunner(object):
         self.thunderscope = Thunderscope()
         self.simulator = StandaloneSimulatorWrapper()
         self.yellow_full_system = FullSystemWrapper()
+
+        self.validation_sender = ThreadedUnixSender(base_unix_path + "/validation")
+
         time.sleep(launch_delay_s)
 
     def run_test(
         self,
-        always_validation=[],
-        eventually_validation=[],
+        always_validation_sequence_set=[[]],
+        eventually_validation_sequence_set=[[]],
         test_timeout_s=3,
         tick_duration_s=0.01,
         open_thunderscope=True,
     ):
         """Run a test
 
-        :param always_validation: Validation functions that should hold on every tick
-        :param eventually_validation: Validation that should eventually be true,
-                                      before the test ends
+        :param always_validation_sequence_set: Validation functions that should
+                                hold on every tick
+        :param eventually_validation_sequence_set: Validation that should
+                                eventually be true, before the test ends
         :param test_timeout_s: The timeout for the test, if any eventually_validations
                                 remain after the timeout, the test fails.
         :param tick_duration_s: The simulation step duration
@@ -82,7 +197,7 @@ class TacticTestRunner(object):
 
         def __runner():
             time_elapsed_s = 0
-            cached_vision = None
+            cached_vision = Vision()
 
             while time_elapsed_s < test_timeout_s:
 
@@ -108,8 +223,17 @@ class TacticTestRunner(object):
                 else:
                     cached_vision = vision
 
-                EventuallyValidation.validate_sequences(eventually_validation_sequences)
+                # NOTE: The following line will raise AssertionError(
+                # on validation failure that will propagate to the main
+                # thread through the excepthook
+                validation = run_validation_sequence_sets(
+                    vision,
+                    eventually_validation_sequence_set,
+                    always_validation_sequence_set,
+                )
 
+                # Send out the validation proto to thunderscope
+                self.validation_sender.send(validation)
                 self.simulator.send_yellow_primitive_set_and_vision(
                     vision, self.yellow_full_system.get_primitive_set(),
                 )
@@ -173,95 +297,6 @@ def create_validation_geometry(geometry=[]) -> ValidationGeometry:
     return validation_geometry
 
 
-class EventuallyValidation(object):
-
-    """The validation function should eventually be true"""
-
-    def validate(self, vision) -> ValidationStatus:
-        raise NotImplementedError("get_validation_status is not implemented")
-
-    def get_validation_geometry(self, vision) -> ValidationGeometry:
-        raise NotImplementedError("get_validation_geometry is not implemented")
-
-    def get_failure_message(self):
-        raise NotImplementedError("get_failure_message is not implemented")
-
-    @staticmethod
-    def validate_sequence(self, validation_sequence: EventuallyValidation):
-        """Validates a sequence of EventuallyValidation objects and returns
-        a Validation protobuf containing the status and geometry.
-
-        :param validation_sequences: The sequence to validate
-
-        """
-
-        # Proto that stores validation geometry and validation status
-        validation_proto = Validation()
-
-        # Validate
-        for validation_sequence in validation_sequences:
-
-            # We only want to check the first
-            for validation in validation_sequence:
-                status = validation.get_validation_status(vision)
-
-                validation_proto.status.append(status)
-                validation_proto.geometry.append(validation.get_validation_geometry())
-
-                # If the validation function failed, raise an
-                # AssertionError so that
-                if status == Validation.FAIL:
-                    raise AssertionError(validation.get_failure_message())
-
-                # If the current validation is pending, we don't care about
-                # the next one. Keep evaluating until this one passes.
-                if status == Validation.PENDING:
-                    break
-
-                # If the validation has passed, continue
-                # this line is not needed, but just added to be explicit
-                if status == Validation.PASS:
-                    continue
-
-        return validation_proto
-
-
-class RobotEntersRegion(EventuallyValidation):
-
-    """Checks if a Robot enters any of the provided regions."""
-
-    def __init__(self, regions=[]):
-        self.regions = regions
-
-    def get_validation_status(self, vision) -> ValidationStatus:
-        """Checks if _any_ robot enters the provided regions
-
-        :param vision: The vision msg to validate
-        :returns: UNDETERMINED until a robot enters any of the regions
-                  PASS when a robot enters
-        """
-        for region in self.regions:
-            for robot_id, robot_states in vision.robot_states.items():
-                if tbots_geom.contains(
-                    region, tbots_geom.createPoint(robot_states.global_position)
-                ):
-                    return ValidationStatus.PASS
-
-        return ValidationStatus.UNDETERMINED
-
-    def get_validation_geometry(self, vision) -> ValidationGeometry:
-        """Returns the underlying geometry this validation is checking
-
-        :param vision: The vision msg to validate
-        :returns: ValidationGeometry containing geometry to visualize
-
-        """
-        return create_validation_geometry(self.regions)
-
-    def get_failure_message(self):
-        return "Robot didn't enter any of these regions: {}".format(self.regions)
-
-
 @pytest.fixture
 def tactic_runner():
     runner = TacticTestRunner()
@@ -271,7 +306,9 @@ def tactic_runner():
 @pytest.mark.parametrize(
     "goalie_starting_position,ball_starting_position",
     [
-        ((-4.2, 0), (-2, 1)),
+        ((4.2, 0), (-2, 1)),
+        ((4.2, 0.4), (-2, -1)),
+        ((4.2, -0.4), (-2, 0.1)),
         ((-4.2, 0.4), (-2, -1)),
         ((-4.2, -0.4), (-2, 0.1)),
         ((-4.2, 0.2), (-2, -0.1)),
@@ -284,40 +321,37 @@ def tactic_runner():
 def test_goalie_blocks_shot(
     goalie_starting_position, ball_starting_position, tactic_runner
 ):
+    # Setup Robot
     tactic_runner.simulator.setup_yellow_robots([goalie_starting_position])
-    tactic_runner.simulator.setup_ball(
-        ball_position=ball_starting_position,
-        # TODO need a vector library here
-        ball_velocity=(
-            2.5 * (-4.5 - ball_starting_position[0]),
-            -2.5 * ball_starting_position[1],
-        ),
-    )
 
+    # Setup Tactic
     params = AssignedTacticPlayControlParams()
     params.assigned_tactics[0].goalie.CopyFrom(
         GoalieTactic(max_allowed_speed_mode=MaxAllowedSpeedMode.PHYSICAL_LIMIT)
     )
-
     tactic_runner.yellow_full_system.send_tactic_override(params)
-    tactic_runner.run_test(
-        eventually_validation=[
-            RobotEntersRegion(regions=[tbots_geom.Field().friendlyDefenseArea()])
-        ]
+
+    # Setup ball with initial velocity using our software/geom
+    tactic_runner.simulator.setup_ball(
+        ball_position=tbots_geom.Point(*ball_starting_position),
+        ball_velocity=(
+            tbots_geom.Field().friendlyGoalCenter()
+            - tbots_geom.Vector(ball_starting_position[0], ball_starting_position[1])
+        )
+        .toVector()
+        .normalize(5),  # TODO we should try a range of speeds
     )
 
+    # Validation
+    eventually_sequences = [
+        [
+            # Goalie should be in the defense area
+            RobotEntersRegion(regions=[tbots_geom.Field().friendlyDefenseArea()])
+        ]
+    ]
 
-# ball_at_point_validation.cpp
-# ball_kicked_validation.h
-# friendly_scored_validation.cpp
-# robot_halt_validation.cpp
-# robot_in_circle.cpp
-# robot_in_polygon_validation.cpp
-# robot_received_ball_validation.cpp
-#   - all dribblers highlighted red
-#   - if a robot receives a ball, they all go green
-# robot_state_validation.cpp
-# robot_stationary_in_polygon_validation.cpp
+    tactic_runner.run_test(eventually_validation_sequence_set=eventually_sequences)
+
 
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__, "-svv"]))

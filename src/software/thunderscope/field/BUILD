@@ -45,3 +45,12 @@ py_library(
         requirement("pyqtgraph"),
     ],
 )
+
+py_library(
+    name = "validation_layer",
+    srcs = ["validation_layer.py"],
+    deps = [
+        ":field_layer",
+        requirement("pyqtgraph"),
+    ],
+)
