@@ -86,21 +86,34 @@ class WheelsScreen(Screen):
             """ Wheels Screen Layout """
             self.lcd_display.prepare()
 
+            """
+            TODO: remove these after testing the new cursors
             val0 = ">" if self.curr_action == 0 else " "
             val1 = ">" if self.curr_action == 1 else " "
             val2 = ">" if self.curr_action == 2 else " "
             val3 = ">" if self.curr_action == 3 else " "
             val4 = ">" if self.curr_action == 4 else " "
             val5 = ">" if self.curr_action == 5 else " "
+            """
 
-            x = 0
+            # TODO: use this to put the cursor positions
+            cursor_pos_x = 0
+            cursor_pos_y = 20 + self.font_size * self.curr_action
+            
+            self.lcd_display.draw.text(
+                (cursor_pos_x, cursor_pos_y), ">", font=self.font, fill="#ffffff"
+            )
+
+            # x and y coordinates for drawing on screen
+            x = 3
             y = 20
 
-            set_wheel_speed_str = "{} Set Wheel Speed: ".format(val0)
+            set_wheel_speed_str = "Set Wheel Speed: "
+            #set_wheel_speed_str = "{} Set Wheel Speed: ".format(val0)
             self.lcd_display.draw.text(
                 (x, y), set_wheel_speed_str, font=self.font, fill="#ffffff"
             )
-            x = self.font.getsize(set_wheel_speed_str)[0]
+            x += self.font.getsize(set_wheel_speed_str)[0]
             self.lcd_display.draw.text(
                 (x, y),
                 "{}".format(self.enable),
@@ -108,13 +121,14 @@ class WheelsScreen(Screen):
                 fill="#00ff00" if self.enable else "#0000ff",
             )
 
-            x = 0
+            x = 3
             y += self.font_size
-            front_left_str = "{} Front Left: ".format(val1)
+            front_left_str = "Front Left: "
+            #front_left_str = "{} Front Left: ".format(val1)
             self.lcd_display.draw.text(
                 (x, y), front_left_str, font=self.font, fill="#ffffff"
             )
-            x = self.font.getsize(front_left_str)[0]
+            x += self.font.getsize(front_left_str)[0]
             self.lcd_display.draw.text(
                 (x, y),
                 str(round(self.wheel_speeds[FRONT_LEFT], 1)),
@@ -122,9 +136,10 @@ class WheelsScreen(Screen):
                 fill="#00ffff",
             )
 
-            x = 0
+            x = 3
             y += self.font_size
-            front_right_str = "{} Front Right: ".format(val2)
+            front_right_str = "Front Right: "
+            #front_right_str = "{} Front Right: ".format(val2)
             self.lcd_display.draw.text(
                 (x, y), front_right_str, font=self.font, fill="#ffffff"
             )
@@ -136,13 +151,14 @@ class WheelsScreen(Screen):
                 fill="#00ffff",
             )
 
-            x = 0
+            x = 3
             y += self.font_size
-            back_left_str = "{} Back Left: ".format(val3)
+            back_left_str = "Back Left: "
+            #back_left_str = "{} Back Left: ".format(val3)
             self.lcd_display.draw.text(
                 (x, y), back_left_str, font=self.font, fill="#ffffff"
             )
-            x = self.font.getsize(back_left_str)[0]
+            x += self.font.getsize(back_left_str)[0]
             self.lcd_display.draw.text(
                 (x, y),
                 str(round(self.wheel_speeds[BACK_LEFT], 1)),
@@ -150,13 +166,14 @@ class WheelsScreen(Screen):
                 fill="#00ffff",
             )
 
-            x = 0
+            x = 3
             y += self.font_size
-            back_right_str = "{} Back Right: ".format(val4)
+            back_right_str = "Back Right: "
+            #back_right_str = "{} Back Right: ".format(val4)
             self.lcd_display.draw.text(
                 (x, y), back_right_str, font=self.font, fill="#ffffff"
             )
-            x = self.font.getsize(back_right_str)[0]
+            x += self.font.getsize(back_right_str)[0]
             self.lcd_display.draw.text(
                 (x, y),
                 str(round(self.wheel_speeds[BACK_RIGHT], 1)),
@@ -164,11 +181,12 @@ class WheelsScreen(Screen):
                 fill="#00ffff",
             )
 
-            x = 0
-            y = self.lcd_display.height - self.font_size - 6
+            x = 3
+            y = self.lcd_display.height - self.font_size - 6 # TODO define this padding number
             self.lcd_display.draw.text(
                 (x, y),
-                "{} Go to Menu screen".format(val5),
+                "Go to Menu screen",
+                #"{} Go to Menu screen".format(val5),
                 font=self.font,
                 fill="#ffffff",
             )

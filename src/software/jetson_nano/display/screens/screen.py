@@ -33,11 +33,13 @@ class Screen:
             fill="#ffffff",
         )
 
+        # Get IP address
         cmd = "hostname -I | cut -d' ' -f1"
         IP = "  IP: " + subprocess.check_output(cmd, shell=True).decode("utf-8")
 
         self.lcd_display.draw.text((0, 2), IP, font=self.font, fill="#000000")
 
+        # Get signal strength
         cmd = "iwconfig | grep 'Signal level='"
         signal = " " + subprocess.check_output(
             cmd, stderr=subprocess.STDOUT, shell=True

@@ -62,19 +62,32 @@ class ChipAndKickScreen(Screen):
             """ Wheels Screen Layout """
             self.lcd_display.prepare()
 
+            """
+            TODO: remove these after testing new cursors
             val0 = ">" if self.curr_action == 0 else " "
             val1 = ">" if self.curr_action == 1 else " "
             val2 = ">" if self.curr_action == 2 else " "
             val3 = ">" if self.curr_action == 3 else " "
+            """
+            
+            # TODO: Test using this for showing cursor
+            cursor_pos_x = 0
+            cursor_pos_y = 20 + self.font_size * self.curr_action
 
-            x = 0
+            self.lcd_display.draw.text(
+                (cursor_pos_x, cursor_pos_y), ">", font=self.font, fill="#ffffff"
+            )
+
+            # x and y coordinates for drawing on screen
+            x = 3
             y = 20
 
-            set_chip_and_kick_str = "{} Set Chip & Kick: ".format(val0)
+            #set_chip_and_kick_str = "{} Set Chip & Kick: ".format(val0)
+            set_chip_and_kick_str = "Set Chip & Kick: "
             self.lcd_display.draw.text(
                 (x, y), set_chip_and_kick_str, font=self.font, fill="#ffffff"
             )
-            x = self.font.getsize(set_chip_and_kick_str)[0]
+            x += self.font.getsize(set_chip_and_kick_str)[0]
             self.lcd_display.draw.text(
                 (x, y),
                 "{}".format(self.enable),
@@ -82,29 +95,32 @@ class ChipAndKickScreen(Screen):
                 fill="#00ff00" if self.enable else "#0000ff",
             )
 
-            x = 0
+            x = 3
             y += self.font_size
-            chip_str = "{} Chip Speed: ".format(val1)
+            #chip_str = "{} Chip Speed: ".format(val1)
+            chip_str = "Chip Speed: "
             self.lcd_display.draw.text((x, y), chip_str, font=self.font, fill="#ffffff")
             x = (self.font.getsize(chip_str))[0]
             self.lcd_display.draw.text(
                 (x, y), str(round(self.speeds[CHIP], 1)), font=self.font, fill="#00ffff"
             )
 
-            x = 0
+            x = 3
             y += self.font_size
-            kick_str = "{} Kick Speed: ".format(val2)
+            #kick_str = "{} Kick Speed: ".format(val2)
+            kick_str = "Kick Speed: "
             self.lcd_display.draw.text((x, y), kick_str, font=self.font, fill="#ffffff")
-            x = (self.font.getsize(kick_str))[0]
+            x += (self.font.getsize(kick_str))[0]
             self.lcd_display.draw.text(
                 (x, y), str(round(self.speeds[KICK], 1)), font=self.font, fill="#00ffff"
             )
 
-            x = 0
-            y = self.lcd_display.height - self.font_size - 6  # 6 is padding
+            x = 3
+            y = self.lcd_display.height - self.font_size - 6  # TODO: define 6 somewhere, it is padding
             self.lcd_display.draw.text(
                 (x, y),
-                "{} Go to Menu screen".format(val3),
+                " Go to Menu screen",
+                #"{} Go to Menu screen".format(val3),
                 font=self.font,
                 fill="#ffffff",
             )

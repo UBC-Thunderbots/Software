@@ -27,17 +27,24 @@ class HomeScreen(Screen):
             """ Home Screen Layout """
             self.lcd_display.prepare()
 
-            val0 = ">" if self.curr_action == 0 else " "
-            val1 = ">" if self.curr_action == 1 else " "
-            val2 = ">" if self.curr_action == 2 else " "
+            cursor0 = ">" if self.curr_action == 0 else " "
+            cursor1 = ">" if self.curr_action == 1 else " "
+            cursor2 = ">" if self.curr_action == 2 else " "
 
-            robot_id_str = "{} Robot ID".format(val0)
+            """
+            TODO: use this to put the cursor positions
+            cursor_pos_x = 0
+            cursor_pos_y = 20 + self.font_size * self.curr_action
+            """
+            
+            # TODO: lots of magic numbers here need to be defined
+            robot_id_str = "{} Robot ID".format(cursor0)
             self.lcd_display.draw.text(
                 (0, 20), robot_id_str, font=self.font, fill="#FFFFFF"
             )
             self.lcd_display.draw.text(
                 (self.font.getsize(robot_id_str)[0] + 3, 20),
-                "{} Channel ID".format(val1),
+                "{} Channel ID".format(cursor1),
                 font=self.font,
                 fill="#FFFFFF",
             )
@@ -59,7 +66,7 @@ class HomeScreen(Screen):
 
             self.lcd_display.draw.text(
                 (0, self.lcd_display.height - 6 - self.font_size),
-                "{} Go to Menu screen".format(val2),
+                "{} Go to Menu screen".format(cursor2),
                 font=self.font,
                 fill="#FFFFFF",
             )
