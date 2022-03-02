@@ -174,6 +174,7 @@ py_test(
         ":full_system_wrapper",
         ":standalone_simulator_wrapper",
         "//proto:software_py_proto",
+        "//proto:tbots_py_proto",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
         "//software/thunderscope",
@@ -198,6 +199,8 @@ py_library(
     ],
     deps = [
         "//proto:software_py_proto",
+        "//proto:tbots_py_proto",
+        requirement("coloredlogs"),
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
     ],
@@ -215,6 +218,7 @@ py_library(
     deps = [
         requirement("hanging_threads"),
         "//proto:software_py_proto",
+        "//proto:tbots_py_proto",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
     ],

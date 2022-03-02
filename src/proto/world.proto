@@ -98,9 +98,22 @@ message EnemyThreat
     optional Robot passer = 7;
 }
 
-message ValidationVisualization
+enum ValidationStatus
 {
-    repeated Polygon polgons = 1;
-    repeated Circle circles  = 2;
-    required bool passed     = 3;
+    PASS    = 0;
+    FAIL    = 1;
+    PENDING = 2;
+}
+
+message ValidationGeometry
+{
+    repeated Polygon polygons = 1;
+    repeated Circle circles   = 2;
+    repeated Vector vectors   = 3;
+}
+
+message Validation
+{
+    repeated ValidationGeometry geometry = 1;
+    repeated ValidationStatus status     = 2;
 }

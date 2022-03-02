@@ -427,6 +427,7 @@ pybind_library(
         ":vector",
         "//proto/message_translation:tbots_geometry",
         "//software/geom/algorithms",
+        "//software/world:field",
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
     ],
 )

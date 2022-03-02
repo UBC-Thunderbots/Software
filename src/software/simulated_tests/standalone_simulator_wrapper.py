@@ -146,7 +146,9 @@ class StandaloneSimulatorWrapper(object):
 
         """
         sensor_proto = SensorProto()
-        sensor_proto.ssl_vision_msg.CopyFrom(ssl_wrapper)
+
+        if ssl_wrapper:
+            sensor_proto.ssl_vision_msg.CopyFrom(ssl_wrapper)
 
         robot_status = robot_status_listener.maybe_pop()
 
