@@ -16,12 +16,19 @@ import software.geom.geometry as tbots_geom
 from proto.geometry_pb2 import Angle, AngularVelocity, Point, Vector
 from proto.tbots_software_msgs_pb2 import Vision
 from proto.vision_pb2 import BallState, RobotState
-from proto.world_pb2 import (SimulatorTick, ValidationGeometry,
-                             ValidationProto, ValidationStatus, World,
-                             WorldState)
+from proto.world_pb2 import (
+    SimulatorTick,
+    ValidationGeometry,
+    ValidationProto,
+    ValidationStatus,
+    World,
+    WorldState,
+)
 
-from software.simulated_tests.validation import (EventuallyValidation,
-                                                 create_validation_geometry)
+from software.simulated_tests.validation import (
+    EventuallyValidation,
+    create_validation_geometry,
+)
 
 
 class RobotEntersRegion(EventuallyValidation):

@@ -1,4 +1,5 @@
 syntax = "proto2";
+import "generator/nanopb/options.proto";
 
 package TbotsProto;
 
@@ -9,6 +10,11 @@ message Point
 
     // y coordinate
     required double y_meters = 2;
+}
+
+message Path
+{
+    repeated Point point = 1 [(nanopb.fieldopt).max_count = 20];
 }
 
 message Vector

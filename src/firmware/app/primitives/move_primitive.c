@@ -68,9 +68,11 @@ void app_move_primitive_start(TbotsProto_MovePrimitive prim_msg, void* void_stat
     /* Handle robot movement */
     MoveState_t* state = (MoveState_t*)void_state_ptr;
 
+    TbotsProto_Point destination = prim_msg.path.point[0];
+
     // parameters from the primitive message
-    const float destination_x           = (float)prim_msg.destination.x_meters;
-    const float destination_y           = (float)prim_msg.destination.y_meters;
+    const float destination_x           = (float)destination.x_meters;
+    const float destination_y           = (float)destination.y_meters;
     const float destination_orientation = (float)prim_msg.final_angle.radians;
     const float speed_at_dest_m_per_s   = prim_msg.final_speed_m_per_s;
     const float target_spin_rev_per_s   = prim_msg.target_spin_rev_per_s;

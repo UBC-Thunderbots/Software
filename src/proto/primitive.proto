@@ -48,7 +48,16 @@ message EstopPrimitive {}
 
 message MovePrimitive
 {
-    Point destination                = 1;
+    message AutoChipOrKick
+    {
+        oneof auto_chip_or_kick
+        {
+            float autokick_speed_m_per_s   = 1;
+            float autochip_distance_meters = 2;
+        };
+    }
+
+    Path path                        = 1;
     float final_speed_m_per_s        = 2;
     Angle final_angle                = 3;
     float dribbler_speed_rpm         = 4;

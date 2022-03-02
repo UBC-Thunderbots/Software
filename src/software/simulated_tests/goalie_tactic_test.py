@@ -15,22 +15,28 @@ from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
 from proto.primitive_pb2 import MaxAllowedSpeedMode
 from proto.robot_status_msg_pb2 import RobotStatus
 from proto.sensor_msg_pb2 import SensorProto
-from proto.tactic_pb2 import (AssignedTacticPlayControlParams, GoalieTactic,
-                              Tactic)
+from proto.tactic_pb2 import AssignedTacticPlayControlParams, GoalieTactic, Tactic
 from proto.tbots_software_msgs_pb2 import Vision
 from proto.vision_pb2 import BallState, RobotState
-from proto.world_pb2 import (SimulatorTick, ValidationGeometry,
-                             ValidationProto, ValidationStatus, World,
-                             WorldState)
+from proto.world_pb2 import (
+    SimulatorTick,
+    ValidationGeometry,
+    ValidationProto,
+    ValidationStatus,
+    World,
+    WorldState,
+)
 from pyqtgraph.Qt import QtCore, QtGui
 
 from software.networking.threaded_unix_sender import ThreadedUnixSender
-from software.simulated_tests.eventually_validation.robot_enters_region import \
-    RobotEntersRegion
+from software.simulated_tests.eventually_validation.robot_enters_region import (
+    RobotEntersRegion,
+)
 from software.simulated_tests.full_system_wrapper import FullSystemWrapper
 from software.simulated_tests.simulated_test_fixture import tactic_runner
-from software.simulated_tests.standalone_simulator_wrapper import \
-    StandaloneSimulatorWrapper
+from software.simulated_tests.standalone_simulator_wrapper import (
+    StandaloneSimulatorWrapper,
+)
 from software.thunderscope.thunderscope import Thunderscope
 
 
