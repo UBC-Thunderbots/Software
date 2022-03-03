@@ -24,7 +24,7 @@ extern "C"
 }
 
 // SPI Configs
-static uint32_t SPI_SPEED_HZ = 1000000;  // 1 Mhz
+static uint32_t SPI_SPEED_HZ = 200000;  // 1 Mhz
 static uint8_t SPI_BITS      = 8;
 static uint32_t SPI_MODE     = 0x3u;
 
