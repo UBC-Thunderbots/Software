@@ -27,32 +27,34 @@ from proto.world_pb2 import (
 
 from software.simulated_tests.validation import (
     EventuallyValidation,
+    Validation,
     create_validation_geometry,
 )
 
 
-class RobotEntersRegion(EventuallyValidation):
+class RobotEntersRegion(Validation):
 
     """Checks if a Robot enters any of the provided regions."""
 
-    def __init__(self, regions=[]):
+    def __init__(self, flipped = False, regions=[]):
         self.regions = regions
+        self.flipped = flipped
 
-    def get_validation_status(self, vision) -> ValidationStatus:
+    def _get_private_validation_status(self, vision) -> ValidationStatus:
         """Checks if _any_ robot enters the provided regions
 
         :param vision: The vision msg to validate
-        :returns: PENDING until a robot enters any of the regions
-                  PASS when a robot enters
+        :returns: FAILING until a robot enters any of the regions
+                  PASSING when a robot enters
         """
         for region in self.regions:
             for robot_id, robot_states in vision.robot_states.items():
                 if tbots_geom.contains(
                     region, tbots_geom.createPoint(robot_states.global_position)
                 ):
-                    return ValidationStatus.PASS
+                    return ValidationStatus.PASSING
 
-        return ValidationStatus.PENDING
+        return ValidationStatus.FAILING
 
     def get_validation_geometry(self, vision) -> ValidationGeometry:
         """Returns the underlying geometry this validation is checking

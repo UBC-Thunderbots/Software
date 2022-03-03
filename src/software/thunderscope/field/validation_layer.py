@@ -47,12 +47,10 @@ class ValidationLayer(FieldLayer):
 
         for geometry, status in zip(validation.geometry, validation.status):
 
-            if status == ValidationStatus.PASS:
+            if status == ValidationStatus.PASSING:
                 painter.setPen(pg.mkPen(colors.VALIDATION_PASSED_COLOR, width=3))
-            if status == ValidationStatus.FAIL:
+            if status == ValidationStatus.FAILING:
                 painter.setPen(pg.mkPen(colors.VALIDATION_FAILED_COLOR, width=3))
-            if status == ValidationStatus.PENDING:
-                painter.setPen(pg.mkPen(colors.VALIDATION_PENDING_COLOR, width=3))
 
             for circle in geometry.circles:
                 painter.drawEllipse(

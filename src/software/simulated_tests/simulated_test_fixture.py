@@ -71,19 +71,14 @@ def run_validation_sequence_sets(
             validation_proto.status.append(status)
             validation_proto.geometry.append(validation.get_validation_geometry(vision))
 
-            # If the validation function failed, return out the error msg
-            if status == ValidationStatus.FAIL:
-                error_msg = validation.get_failure_message()
-                break
-
             # If the current validation is pending, we don't care about
             # the next one. Keep evaluating until this one passes.
-            if status == ValidationStatus.PENDING:
+            if status == ValidationStatus.FAILING:
                 break
 
             # If the validation has passed, continue
             # this line is not needed, but just added to be explicit
-            if status == ValidationStatus.PASS:
+            if status == ValidationStatus.PASSING:
                 continue
 
     return validation_proto, error_msg

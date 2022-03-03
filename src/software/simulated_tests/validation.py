@@ -38,16 +38,28 @@ from software.thunderscope.thunderscope import Thunderscope
 
 class Validation(object):
 
-    """A validation function that should eventually be true"""
+    """A validation function"""
+
+    def __init__(self, flipped = False):
+        self.flipped = flipped
 
     def get_validation_status(self, vision) -> ValidationStatus:
-        raise NotImplementedError("get_validation_status is not implemented")
+        return self.__flip(self._get_private_validation_status(vision)) if self.flipped else self._get_private_validation_status(vision)
 
     def get_validation_geometry(self, vision) -> ValidationGeometry:
         raise NotImplementedError("get_validation_geometry is not implemented")
 
     def get_failure_message(self):
         raise NotImplementedError("get_failure_message is not implemented")
+
+    def _get_private_validation_status(self, vision) -> ValidationStatus:
+        raise NotImplementedError("get_validation_status is not implemented")
+
+    def _flip(self, validation_status) -> ValidationStatus:
+        if validation_status == ValidationStatus.PASSING:
+            return ValidationStatus.FAILING
+        if validation_status == ValidationStatus.FAILING:
+            return ValidationStatus.PASSING
 
 
 class EventuallyValidation(Validation):
