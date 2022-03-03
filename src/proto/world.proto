@@ -100,8 +100,8 @@ message EnemyThreat
 
 enum ValidationStatus
 {
-    PASSING    = 0;
-    FAILING    = 1;
+    PASSING = 0;
+    FAILING = 1;
 }
 
 message ValidationGeometry

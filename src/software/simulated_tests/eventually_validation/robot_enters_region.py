@@ -36,7 +36,7 @@ class RobotEntersRegion(Validation):
 
     """Checks if a Robot enters any of the provided regions."""
 
-    def __init__(self, flipped = False, regions=[]):
+    def __init__(self, flipped=False, regions=[]):
         self.regions = regions
         self.flipped = flipped
 

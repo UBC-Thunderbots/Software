@@ -40,11 +40,15 @@ class Validation(object):
 
     """A validation function"""
 
-    def __init__(self, flipped = False):
+    def __init__(self, flipped=False):
         self.flipped = flipped
 
     def get_validation_status(self, vision) -> ValidationStatus:
-        return self._flip(self._get_private_validation_status(vision)) if self.flipped else self._get_private_validation_status(vision)
+        return (
+            self._flip(self._get_private_validation_status(vision))
+            if self.flipped
+            else self._get_private_validation_status(vision)
+        )
 
     def get_validation_geometry(self, vision) -> ValidationGeometry:
         raise NotImplementedError("get_validation_geometry is not implemented")
