@@ -108,7 +108,7 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
                     PASSER_ENEMY_PROXIMITY_IMPORTANCE);
 
                 // make sure we improved over the initial proximity risk score
-                if (current_enemy_proximity_risk >= initial_enemy_proximity_risk)
+                if (current_enemy_proximity_risk > initial_enemy_proximity_risk)
                 {
                     std::stringstream ss;
                     ss << "At " << last_timestamp
@@ -160,7 +160,7 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_keep_away)
                                       enemy_proximity_importance);
 
                 // make sure we improved over the initial enemy risk score
-                if (current_enemy_risk_score <= initial_enemy_risk_score)
+                if (current_enemy_risk_score < (initial_enemy_risk_score - 0.01))
                 {
                     std::stringstream ss;
                     ss << "At " << last_timestamp
