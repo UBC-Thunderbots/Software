@@ -71,18 +71,18 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
             Rectangle field_walls    = world.field().fieldBoundary();
             Rectangle playable_field = world.field().fieldLines();
             // put each boundary zone as an obstacle
-            Rectangle upper_boundary = Rectangle(
-                field_walls.posXNegYCorner(),
-                {playable_field.posXPosYCorner().x(), field_walls.posXPosYCorner().y()});
-            Rectangle left_boundary = Rectangle(
-                field_walls.posXNegYCorner(),
-                {field_walls.negXPosYCorner().x(), playable_field.negXNegYCorner().y()});
-            Rectangle right_boundary = Rectangle(
-                {field_walls.posXPosYCorner().x(), playable_field.posXPosYCorner().y()},
-                field_walls.negXPosYCorner());
-            Rectangle lower_boundary = Rectangle(
-                {playable_field.negXNegYCorner().x(), field_walls.negXNegYCorner().y()},
-                field_walls.negXPosYCorner());
+            Rectangle upper_boundary =
+                Rectangle(field_walls.posXNegYCorner(),
+                          {playable_field.xMax(), field_walls.yMax()});
+            Rectangle left_boundary =
+                Rectangle(field_walls.posXNegYCorner(),
+                          {field_walls.xMin(), playable_field.yMin()});
+            Rectangle right_boundary =
+                Rectangle({field_walls.xMax(), playable_field.yMax()},
+                          field_walls.negXPosYCorner());
+            Rectangle lower_boundary =
+                Rectangle({playable_field.xMin(), field_walls.yMin()},
+                          field_walls.negXPosYCorner());
             obstacles.push_back(createFromShape(upper_boundary));
             obstacles.push_back(createFromShape(left_boundary));
             obstacles.push_back(createFromShape(right_boundary));

@@ -11,8 +11,7 @@ class TestGlobalPathPlanner : public testing::Test
    public:
     TestGlobalPathPlanner()
         : world(TestUtil::createBlankTestingWorldDivA()),
-          gpp(std::make_shared<RobotNavigationObstacleConfig>(), world,
-              world.field().fieldBoundary()),
+          gpp(std::make_shared<RobotNavigationObstacleConfig>(), world),
           obstacle_factory(std::make_shared<const RobotNavigationObstacleConfig>())
     {
     }

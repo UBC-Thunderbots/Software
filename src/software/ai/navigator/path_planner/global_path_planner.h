@@ -30,15 +30,14 @@ class GlobalPathPlannerFactory
      * Creates path planners for every possible combination of obstacles using the given
      * parameters.
      *
-     * @param navigation_obstacle_config the config is used to convert motion constraints
+     * @param navigation_obstacle_config the config used to get motion constraints
      * into obstacles
-     * @param world                      the world is used to create the path planner gand
-     * obstacles
-     * @param navigable_area             the path planner's navigable area
+     * @param world                      the world used to create the path planner grid
+     * and obstacles
      */
     GlobalPathPlannerFactory(const std::shared_ptr<const RobotNavigationObstacleConfig>
                                  navigation_obstacle_config,
-                             const World &world, const Rectangle &navigable_area);
+                             const World &world);
 
     /**
      * Given a set of motion constraints, returns the relevant EnlsvgPathPlanner. If the
