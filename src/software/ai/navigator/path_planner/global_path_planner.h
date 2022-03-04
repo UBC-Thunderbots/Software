@@ -27,8 +27,8 @@ class GlobalPathPlannerFactory
 {
    public:
     /**
-     * Creates path planners for every possible combination of obstacles using the given
-     * parameters.
+     * Creates path planners for every possible combination of obstacles using the World´s
+     * field and obstacle config's motion constraints.
      *
      * @param navigation_obstacle_config the config used to get motion constraints
      * into obstacles
