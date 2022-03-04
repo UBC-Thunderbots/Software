@@ -1,4 +1,4 @@
-import sys
+import sys, redis
 import digitalio
 import board
 from PIL import Image, ImageDraw, ImageOps
@@ -20,7 +20,24 @@ PIN_1 = "GPIO_PE6"  # BOARD 40, TEGRA_SOC: 'DAP4_DOUT'
 PIN_2 = "DAP4_FS"  # BOARD 33, TEGRA_SOC: 'GPIO_PE6'
 
 # These keys indicate how to handle return values
-status_codes = {"none": 0, "change screen": 1, "edit": 2}
+status_codes = {"none": 0, "change screen": 1, "edit": 2, "update redis": 3}
+
+# These are the keys for the redis dicationary
+redis_keys = [
+    "robot id",
+    "channel id",
+    "battery voltage",
+    "cap voltage",
+    "packet loss",
+    "chip and kick enable",
+    "chip speed",
+    "kick speed",
+    "wheels enable",
+    "fr wheel",
+    "fl wheel",
+    "fr wheel",
+    "bl wheel",
+]
 
 """
 TODO: 
@@ -33,6 +50,9 @@ TODO:
 
 class RobotUi:
     def __init__(self):
+        self.r = redis.Redis(host="localhost", port=6379, db=0)
+        self.redis_dict = {}  # TODO initialize this
+
         self.lcd_display = LcdDisplay()
         self.lcd_display.draw_image("./lcd_user_interface/imgs/tbots.jpg")
         self.curr_screen = "Home"
@@ -48,10 +68,15 @@ class RobotUi:
         def on_click():
             """ Execute on click callback of curr screen """
             action = self.screens[self.curr_screen].on_click()
+
             if status_codes["change screen"] in action:
                 self.curr_screen = action[status_codes["change screen"]]
                 self.screens[self.curr_screen].draw_screen()
                 self.lcd_display.show()
+            elif status_codes["update redis"] in action:
+                payload = action[self.status_codes["update redis"]]
+                self.r.set(payload["redis key"], payload["value"])
+                self.redis_dict[payload["redis key"]] = payload["value"]
 
         def on_clockwise_rotate():
             """ Execute the clockwise rotate callback of curr screen """
@@ -78,7 +103,18 @@ class RobotUi:
 
 # For testing
 if __name__ == "__main__":
+    sys.path.append("./redis-test/")
+    import subprocess
+
+    # start redis server
+    cmd = "cd redis-test && sudo docker-compose up -d"
+    st, out = subprocess.getstatusoutput(cmd)
+
     robot_ui = RobotUi()
     print("Press any key to exit...")
     input()
     robot_ui.stop()
+
+    # stop redis server
+    cmd = "cd redis-test && sudo docker-compose down"
+    st, out = subprocess.getstatusoutput(cmd)

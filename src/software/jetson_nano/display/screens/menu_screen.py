@@ -38,7 +38,7 @@ class MenuScreen(Screen):
             # TODO: use this to put the cursor positions
             cursor_pos_x = 0
             cursor_pos_y = 20 + self.font_size * self.curr_action
-            
+
             self.lcd_display.draw.text(
                 (cursor_pos_x, cursor_pos_y), ">", font=self.font, fill="#ffffff"
             )
@@ -50,7 +50,7 @@ class MenuScreen(Screen):
             self.lcd_display.draw.text(
                 (x, y),
                 "Configure Wheels",
-                #"{} Configure Wheels".format(val0),
+                # "{} Configure Wheels".format(val0),
                 font=self.font,
                 fill="#ffffff",
             )
@@ -58,16 +58,18 @@ class MenuScreen(Screen):
             self.lcd_display.draw.text(
                 (x, y),
                 "Configure Chip & Kick".format(),
-                #"{} Configure Chip & Kick".format(val1),
+                # "{} Configure Chip & Kick".format(val1),
                 font=self.font,
                 fill="#ffffff",
             )
 
-            y = self.lcd_display.height - self.font_size - 6 # TODO: define this value, its for padding
+            y = (
+                self.lcd_display.height - self.font_size - 6
+            )  # TODO: define this value, its for padding
             self.lcd_display.draw.text(
                 (x, y),
                 "Go to Home screen",
-                #"{} Go to Home screen".format(val2),
+                # "{} Go to Home screen".format(val2),
                 font=self.font,
                 fill="#ffffff",
             )

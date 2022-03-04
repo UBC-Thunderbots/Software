@@ -70,6 +70,16 @@ class Screen:
             self.param = payload["param"]
             self.setting = payload["setting"]
             self.delta = payload["delta"]
+            self.redis_key = payload["redis key"]
+            if self.edit_mode:
+                action = {
+                    self.status_codes["update redis"]: {
+                        "redis key": self.redis_key,
+                        "value": self.param[self.setting],
+                    }
+                }
+            else:
+                action = {self.status_codes["none"]: None}
             self.edit_mode = not self.edit_mode
 
         return action

@@ -27,7 +27,12 @@ class ChipAndKickScreen(Screen):
                 self.enable = True
 
             self.update_screen()
-            return {self.status_codes["none"]: None}
+            return {
+                self.status_codes["update redis"]: {
+                    "redis key": "chip and kick enable",
+                    "value": 1 if self.enable else 0,
+                }
+            }
 
         def set_chip():
             """ Set chip speed """
@@ -36,6 +41,7 @@ class ChipAndKickScreen(Screen):
                     "param": self.speeds,
                     "setting": CHIP,
                     "delta": 0.5,
+                    "redis key": "chip speed",
                 }
             }
 
@@ -46,6 +52,7 @@ class ChipAndKickScreen(Screen):
                     "param": self.speeds,
                     "setting": KICK,
                     "delta": 0.5,
+                    "redis key": "kick speed",
                 }
             }
 
@@ -69,7 +76,7 @@ class ChipAndKickScreen(Screen):
             val2 = ">" if self.curr_action == 2 else " "
             val3 = ">" if self.curr_action == 3 else " "
             """
-            
+
             # TODO: Test using this for showing cursor
             cursor_pos_x = 0
             cursor_pos_y = 20 + self.font_size * self.curr_action
@@ -82,7 +89,7 @@ class ChipAndKickScreen(Screen):
             x = 3
             y = 20
 
-            #set_chip_and_kick_str = "{} Set Chip & Kick: ".format(val0)
+            # set_chip_and_kick_str = "{} Set Chip & Kick: ".format(val0)
             set_chip_and_kick_str = "Set Chip & Kick: "
             self.lcd_display.draw.text(
                 (x, y), set_chip_and_kick_str, font=self.font, fill="#ffffff"
@@ -97,7 +104,7 @@ class ChipAndKickScreen(Screen):
 
             x = 3
             y += self.font_size
-            #chip_str = "{} Chip Speed: ".format(val1)
+            # chip_str = "{} Chip Speed: ".format(val1)
             chip_str = "Chip Speed: "
             self.lcd_display.draw.text((x, y), chip_str, font=self.font, fill="#ffffff")
             x = (self.font.getsize(chip_str))[0]
@@ -107,7 +114,7 @@ class ChipAndKickScreen(Screen):
 
             x = 3
             y += self.font_size
-            #kick_str = "{} Kick Speed: ".format(val2)
+            # kick_str = "{} Kick Speed: ".format(val2)
             kick_str = "Kick Speed: "
             self.lcd_display.draw.text((x, y), kick_str, font=self.font, fill="#ffffff")
             x += (self.font.getsize(kick_str))[0]
@@ -116,11 +123,13 @@ class ChipAndKickScreen(Screen):
             )
 
             x = 3
-            y = self.lcd_display.height - self.font_size - 6  # TODO: define 6 somewhere, it is padding
+            y = (
+                self.lcd_display.height - self.font_size - 6
+            )  # TODO: define 6 somewhere, it is padding
             self.lcd_display.draw.text(
                 (x, y),
                 " Go to Menu screen",
-                #"{} Go to Menu screen".format(val3),
+                # "{} Go to Menu screen".format(val3),
                 font=self.font,
                 fill="#ffffff",
             )

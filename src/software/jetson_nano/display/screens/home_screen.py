@@ -36,7 +36,7 @@ class HomeScreen(Screen):
             cursor_pos_x = 0
             cursor_pos_y = 20 + self.font_size * self.curr_action
             """
-            
+
             # TODO: lots of magic numbers here need to be defined
             robot_id_str = "{} Robot ID".format(cursor0)
             self.lcd_display.draw.text(

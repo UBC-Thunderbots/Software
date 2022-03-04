@@ -29,7 +29,12 @@ class WheelsScreen(Screen):
             else:
                 self.enable = True
             self.update_screen()
-            return {self.status_codes["none"]: None}
+            return {
+                self.status_codes["update redis"]: {
+                    "redis key": "wheels enable",
+                    "value": 1 if self.enable else 0,
+                }
+            }
 
         def front_left():
             """ Set speed for front left wheel """
@@ -38,6 +43,7 @@ class WheelsScreen(Screen):
                     "param": self.wheel_speeds,
                     "setting": FRONT_LEFT,
                     "delta": 0.5,
+                    "redis key": "fl wheel",
                 }
             }
 
@@ -48,6 +54,7 @@ class WheelsScreen(Screen):
                     "param": self.wheel_speeds,
                     "setting": FRONT_RIGHT,
                     "delta": 0.5,
+                    "redis key": "fr wheel",
                 }
             }
 
@@ -58,6 +65,7 @@ class WheelsScreen(Screen):
                     "param": self.wheel_speeds,
                     "setting": BACK_LEFT,
                     "delta": 0.5,
+                    "redis key": "bl wheel",
                 }
             }
 
@@ -68,6 +76,7 @@ class WheelsScreen(Screen):
                     "param": self.wheel_speeds,
                     "setting": BACK_RIGHT,
                     "delta": 0.5,
+                    "redis key": "br wheel",
                 }
             }
 
@@ -99,7 +108,7 @@ class WheelsScreen(Screen):
             # TODO: use this to put the cursor positions
             cursor_pos_x = 0
             cursor_pos_y = 20 + self.font_size * self.curr_action
-            
+
             self.lcd_display.draw.text(
                 (cursor_pos_x, cursor_pos_y), ">", font=self.font, fill="#ffffff"
             )
@@ -109,7 +118,7 @@ class WheelsScreen(Screen):
             y = 20
 
             set_wheel_speed_str = "Set Wheel Speed: "
-            #set_wheel_speed_str = "{} Set Wheel Speed: ".format(val0)
+            # set_wheel_speed_str = "{} Set Wheel Speed: ".format(val0)
             self.lcd_display.draw.text(
                 (x, y), set_wheel_speed_str, font=self.font, fill="#ffffff"
             )
@@ -124,7 +133,7 @@ class WheelsScreen(Screen):
             x = 3
             y += self.font_size
             front_left_str = "Front Left: "
-            #front_left_str = "{} Front Left: ".format(val1)
+            # front_left_str = "{} Front Left: ".format(val1)
             self.lcd_display.draw.text(
                 (x, y), front_left_str, font=self.font, fill="#ffffff"
             )
@@ -139,7 +148,7 @@ class WheelsScreen(Screen):
             x = 3
             y += self.font_size
             front_right_str = "Front Right: "
-            #front_right_str = "{} Front Right: ".format(val2)
+            # front_right_str = "{} Front Right: ".format(val2)
             self.lcd_display.draw.text(
                 (x, y), front_right_str, font=self.font, fill="#ffffff"
             )
@@ -154,7 +163,7 @@ class WheelsScreen(Screen):
             x = 3
             y += self.font_size
             back_left_str = "Back Left: "
-            #back_left_str = "{} Back Left: ".format(val3)
+            # back_left_str = "{} Back Left: ".format(val3)
             self.lcd_display.draw.text(
                 (x, y), back_left_str, font=self.font, fill="#ffffff"
             )
@@ -169,7 +178,7 @@ class WheelsScreen(Screen):
             x = 3
             y += self.font_size
             back_right_str = "Back Right: "
-            #back_right_str = "{} Back Right: ".format(val4)
+            # back_right_str = "{} Back Right: ".format(val4)
             self.lcd_display.draw.text(
                 (x, y), back_right_str, font=self.font, fill="#ffffff"
             )
@@ -182,11 +191,13 @@ class WheelsScreen(Screen):
             )
 
             x = 3
-            y = self.lcd_display.height - self.font_size - 6 # TODO define this padding number
+            y = (
+                self.lcd_display.height - self.font_size - 6
+            )  # TODO define this padding number
             self.lcd_display.draw.text(
                 (x, y),
                 "Go to Menu screen",
-                #"{} Go to Menu screen".format(val5),
+                # "{} Go to Menu screen".format(val5),
                 font=self.font,
                 fill="#ffffff",
             )
