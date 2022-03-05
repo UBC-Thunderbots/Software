@@ -2,6 +2,7 @@ import pyqtgraph as pg
 import time
 from software.thunderscope.field.field_layer import FieldLayer
 
+
 class Field(pg.PlotWidget):
 
     """Wrapper to handle Field Layers"""
@@ -23,7 +24,7 @@ class Field(pg.PlotWidget):
     def keyPressEvent(self, event):
         for layer in self.layers:
             layer.keyPressEvent(event)
-    
+
     def keyReleaseEvent(self, event):
         for layer in self.layers:
             layer.keyReleaseEvent(event)

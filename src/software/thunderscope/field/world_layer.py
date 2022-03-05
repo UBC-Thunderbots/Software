@@ -12,13 +12,15 @@ from software.thunderscope.constants import (
     BALL_RADIUS,
     MM_PER_M,
     UNIX_SOCKET_BASE_PATH,
-    KEY_CTRL, KEY_M, KEY_R,
+    KEY_CTRL,
+    KEY_M,
+    KEY_R,
 )
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 import software.thunderscope.colors as colors
 
-class WorldLayer(FieldLayer):
 
+class WorldLayer(FieldLayer):
     def __init__(self):
         FieldLayer.__init__(self)
         self.world_receiver = ThreadedUnixListener(
@@ -31,9 +33,9 @@ class WorldLayer(FieldLayer):
         self.pressed_M = False
         self.pressed_R = False
         self.mouse_clicked = False
-        self.mouse_click_pos = [0,0]
-        self.mouse_hover_pos = [0,0] # might not need later, see hoverMoveEvent
-    
+        self.mouse_click_pos = [0, 0]
+        self.mouse_hover_pos = [0, 0]  # might not need later, see hoverMoveEvent
+
     # Note: the function name formatting is different but this can't be changed since it's overriding the built-in Qt function
     def keyPressEvent(self, event):
         """Detect when a key has been pressed
@@ -49,12 +51,12 @@ class WorldLayer(FieldLayer):
         elif event.key() == KEY_CTRL:
             # TODO (#2410) enter function to move the ball
             print("pressed CTRL")
-        
+
         elif event.key() == KEY_M:
             # TODO (#2410) enter function to move the robot
             print("pressed M")
             self.pressed_M = True
-    
+
     # Note: the function name formatting is different but this can't be changed since it's overriding the built-in Qt function
     def keyReleaseEvent(self, event):
         """Detect when a key has been released
@@ -97,15 +99,15 @@ class WorldLayer(FieldLayer):
         # TODO (#2410) implement robot and ball interactivity through simulator, based on mouse and keyboard events
 
         # print the position of the mouse click
-        print("x: " + str(event.pos().x()/1000))
-        print("y: " + str(event.pos().y()/1000))
+        print("x: " + str(event.pos().x() / 1000))
+        print("y: " + str(event.pos().y() / 1000))
 
         self.mouse_clicked = True
         self.mouse_click_pos = [event.pos().x(), event.pos().y()]
 
         # determine whether a robot was clicked
         self.identify_robots(event.pos().x(), event.pos().y())
-    
+
     def identify_robots(self, mouse_x, mouse_y):
         """Identify which robot was clicked on the field
 
@@ -113,8 +115,12 @@ class WorldLayer(FieldLayer):
         :param mouse_y: The y position of the mouse click
         
         """
-        self.identify_robot(mouse_x, mouse_y, self.cached_world.friendly_team.team_robots, "Friendly: ")
-        self.identify_robot(mouse_x, mouse_y, self.cached_world.enemy_team.team_robots, "Enemy: ")
+        self.identify_robot(
+            mouse_x, mouse_y, self.cached_world.friendly_team.team_robots, "Friendly: "
+        )
+        self.identify_robot(
+            mouse_x, mouse_y, self.cached_world.enemy_team.team_robots, "Enemy: "
+        )
 
     def identify_robot(self, mouse_x, mouse_y, team, side):
         """Identify which robot was clicked on the team
@@ -128,9 +134,12 @@ class WorldLayer(FieldLayer):
         for robot_ in team:
             pos_x = robot_.current_state.global_position.x_meters
             pos_y = robot_.current_state.global_position.y_meters
-            if math.sqrt((pos_x - mouse_x/1000)**2 + (pos_y - mouse_y/1000)**2) <= ROBOT_MAX_RADIUS/1000:
+            if (
+                math.sqrt((pos_x - mouse_x / 1000) ** 2 + (pos_y - mouse_y / 1000) ** 2)
+                <= ROBOT_MAX_RADIUS / 1000
+            ):
                 print(side)
-                print(robot_.id)        
+                print(robot_.id)
 
     # Temporary draw function for testing purposes
     def draw_mouse_click_loc(self, painter):
@@ -143,7 +152,7 @@ class WorldLayer(FieldLayer):
         painter.setBrush(pg.mkBrush(colors.BLUE_ROBOT_COLOR))
         painter.drawEllipse(
             self.createCircle(
-                self.mouse_click_pos[0], self.mouse_click_pos[1], BALL_RADIUS*3,
+                self.mouse_click_pos[0], self.mouse_click_pos[1], BALL_RADIUS * 3,
             )
         )
         self.mouse_clicked = False
@@ -253,7 +262,7 @@ class WorldLayer(FieldLayer):
         self.cached_world = world
         self.draw_field(painter, world.field)
         self.draw_ball(painter, world.ball)
-        
+
         # temporary function call for testing purposes
         self.draw_mouse_click_loc(painter)
 

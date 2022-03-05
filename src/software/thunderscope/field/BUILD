@@ -55,11 +55,10 @@ py_binary(
     ],
 )
 
-
 py_binary(
     name = "key_press_window",
     srcs = ["key_press_window.py"],
     deps = [
         requirement("pyqtgraph"),
-    ]
+    ],
 )
