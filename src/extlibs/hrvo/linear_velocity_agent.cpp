@@ -30,7 +30,7 @@ void LinearVelocityAgent::computeNewVelocity()
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
         new_velocity_ =
-            velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / dv.length());
+            velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv.normalize());
     }
 }
 
@@ -64,7 +64,7 @@ Agent::VelocityObstacle LinearVelocityAgent::createVelocityObstacle(
         // Creates Velocity Obstacle with the sides being 180 degrees
         // apart from each other
         velocityObstacle.apex_  = velocity_;
-        velocityObstacle.side1_ = (position_ - other_agent.getPosition()).perpendicular();
+        velocityObstacle.side1_ = (other_agent.getPosition(), position_).perpendicular();
         velocityObstacle.side2_ = -velocityObstacle.side1_;
     }
     return velocityObstacle;

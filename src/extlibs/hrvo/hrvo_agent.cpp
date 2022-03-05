@@ -95,14 +95,14 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
         // of avoiding collision with other agent. This assumes that other agent will also
         // be running HRVO
         if ((position_ - other_agent.getPosition())
-                .det(other_agent.getPrefVelocity() - pref_velocity_) > 0.0f)
+                .determinant(other_agent.getPrefVelocity() - pref_velocity_) > 0.0f)
         {
             // Relative velocity is in the right half of velocity obstacle (VO)
             // Shift the VO apex to the left so the right side is smaller, making the
             // VO a Hybrid Reciprocal Velocity Obstacle (HRVO)
             const float s =
                 0.5f *
-                (other_agent.getVelocity() - velocity_).det(velocityObstacle.side2_) / d;
+                (other_agent.getVelocity() - velocity_).determinant(velocityObstacle.side2_) / d;
 
             velocityObstacle.apex_ =
                 velocity_ + s * velocityObstacle.side1_ -
@@ -117,7 +117,7 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
             // VO a Hybrid Reciprocal Velocity Obstacle (HRVO)
             const float s =
                 0.5f *
-                (other_agent.getVelocity() - velocity_).det(velocityObstacle.side1_) / d;
+                (other_agent.getVelocity() - velocity_).determinant(velocityObstacle.side1_) / d;
 
             velocityObstacle.apex_ =
                 velocity_ + s * velocityObstacle.side2_ -
@@ -197,7 +197,7 @@ void HRVOAgent::computeNewVelocity()
 
         if (dotProduct1 > 0.0f &&
             (velocityObstacles_[i].side1_)
-                    .det(pref_velocity_ - velocityObstacles_[i].apex_) > 0.0f)
+                    .determinant(pref_velocity_ - velocityObstacles_[i].apex_) > 0.0f)
         {
             candidate.position_ =
                 velocityObstacles_[i].apex_ + dotProduct1 * velocityObstacles_[i].side1_;
@@ -211,7 +211,7 @@ void HRVOAgent::computeNewVelocity()
 
         if (dotProduct2 > 0.0f &&
             (velocityObstacles_[i].side2_)
-                    .det(pref_velocity_ - velocityObstacles_[i].apex_) < 0.0f)
+                    .determinant(pref_velocity_ - velocityObstacles_[i].apex_) < 0.0f)
         {
             candidate.position_ =
                 velocityObstacles_[i].apex_ + dotProduct2 * velocityObstacles_[i].side2_;
@@ -231,7 +231,7 @@ void HRVOAgent::computeNewVelocity()
 
         float discriminant =
             max_speed_ * max_speed_ -
-            std::pow((velocityObstacles_[j].apex_).det(velocityObstacles_[j].side1_),
+            std::pow((velocityObstacles_[j].apex_).determinant(velocityObstacles_[j].side1_),
                      2.f);
 
         if (discriminant > 0.0f)
@@ -262,7 +262,7 @@ void HRVOAgent::computeNewVelocity()
 
         discriminant =
             max_speed_ * max_speed_ -
-            std::pow((velocityObstacles_[j].apex_).det(velocityObstacles_[j].side2_),
+            std::pow((velocityObstacles_[j].apex_).determinant(velocityObstacles_[j].side2_),
                      2.f);
 
         if (discriminant > 0.0f)
@@ -299,17 +299,17 @@ void HRVOAgent::computeNewVelocity()
             candidate.velocityObstacle1_ = i;
             candidate.velocityObstacle2_ = j;
 
-            float d = (velocityObstacles_[i].side1_).det(velocityObstacles_[j].side1_);
+            float d = (velocityObstacles_[i].side1_).determinant(velocityObstacles_[j].side1_);
 
             if (d != 0.0f)
             {
                 const float s =
                     (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
-                        .det(velocityObstacles_[j].side1_) /
+                        .determinant(velocityObstacles_[j].side1_) /
                     d;
                 const float t =
                     (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
-                        .det(velocityObstacles_[i].side1_) /
+                        .determinant(velocityObstacles_[i].side1_) /
                     d;
 
                 if (s >= 0.0f && t >= 0.0f)
@@ -326,17 +326,17 @@ void HRVOAgent::computeNewVelocity()
                 }
             }
 
-            d = (velocityObstacles_[i].side2_).det(velocityObstacles_[j].side1_);
+            d = (velocityObstacles_[i].side2_).determinant(velocityObstacles_[j].side1_);
 
             if (d != 0.0f)
             {
                 const float s =
                     (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
-                        .det(velocityObstacles_[j].side1_) /
+                        .determinant(velocityObstacles_[j].side1_) /
                     d;
                 const float t =
                     (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
-                        .det(velocityObstacles_[i].side2_) /
+                        .determinant(velocityObstacles_[i].side2_) /
                     d;
 
                 if (s >= 0.0f && t >= 0.0f)
@@ -353,17 +353,17 @@ void HRVOAgent::computeNewVelocity()
                 }
             }
 
-            d = (velocityObstacles_[i].side1_).det(velocityObstacles_[j].side2_);
+            d = (velocityObstacles_[i].side1_).determinant(velocityObstacles_[j].side2_);
 
             if (d != 0.0f)
             {
                 const float s =
                     (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
-                        .det(velocityObstacles_[j].side2_) /
+                        .determinant(velocityObstacles_[j].side2_) /
                     d;
                 const float t =
                     (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
-                        .det(velocityObstacles_[i].side1_) /
+                        .determinant(velocityObstacles_[i].side1_) /
                     d;
 
                 if (s >= 0.0f && t >= 0.0f)
@@ -380,17 +380,17 @@ void HRVOAgent::computeNewVelocity()
                 }
             }
 
-            d = (velocityObstacles_[i].side2_).det(velocityObstacles_[j].side2_);
+            d = (velocityObstacles_[i].side2_).determinant(velocityObstacles_[j].side2_);
 
             if (d != 0.0f)
             {
                 const float s =
                     (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
-                        .det(velocityObstacles_[j].side2_) /
+                        .determinant(velocityObstacles_[j].side2_) /
                     d;
                 const float t =
                     (velocityObstacles_[j].apex_ - velocityObstacles_[i].apex_)
-                        .det(velocityObstacles_[i].side2_) /
+                        .determinant(velocityObstacles_[i].side2_) /
                     d;
 
                 if (s >= 0.0f && t >= 0.0f)
@@ -420,9 +420,9 @@ void HRVOAgent::computeNewVelocity()
         {
             if (j != candidate.velocityObstacle1_ && j != candidate.velocityObstacle2_ &&
                 (velocityObstacles_[j].side2_)
-                        .det(candidate.position_ - velocityObstacles_[j].apex_) < 0.0f &&
+                        .determinant(candidate.position_ - velocityObstacles_[j].apex_) < 0.0f &&
                 (velocityObstacles_[j].side1_)
-                        .det(candidate.position_ - velocityObstacles_[j].apex_) > 0.0f)
+                        .determinant(candidate.position_ - velocityObstacles_[j].apex_) > 0.0f)
             {
                 valid = false;
 
@@ -457,8 +457,7 @@ void HRVOAgent::computePreferredVelocity()
     Vector goalPosition             = nextGoal->getCurrentGoalPosition();
     float speedAtGoal               = nextGoal->getDesiredSpeedAtCurrentGoal();
     Vector distVectorToGoal         = goalPosition - position_;
-    auto distToGoal                 = static_cast<float>(
-        std::sqrt(std::pow(distVectorToGoal.x(), 2) + std::pow(distVectorToGoal.y(), 2)));
+    auto distToGoal                 = static_cast<float>(distVectorToGoal.length());
     // d = (Vf^2 - Vi^2) / 2a
     double startLinearDecelerationDistance =
         std::abs((std::pow(speedAtGoal, 2) - std::pow(prefSpeed_, 2)) / (2 * max_accel_));
@@ -483,7 +482,7 @@ void HRVOAgent::computePreferredVelocity()
             // Calculate the maximum velocity towards the preferred velocity, given the
             // acceleration constraint
             pref_velocity_ =
-                velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / dv.length());
+                velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv.normalize());
         }
     }
     else

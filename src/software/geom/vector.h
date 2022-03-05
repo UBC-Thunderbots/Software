@@ -161,7 +161,7 @@ class Vector final
      *
      * @return the determinant with rows from the specified vectors
      */
-    double det(const Vector &other) const;
+    double determinant(const Vector &other) const;
 
     /**
      * Returns the direction of this Vector
