@@ -37,36 +37,36 @@ class PrimitiveExecutor
      * Steps the current primitive and returns a direct control primitive with the
      * target wheel velocities
      *
-     * @param robot_state The current robot_state to step the primitive on
+     * @param robot_id The id of the robot which is running this Primitive Executor
+     * @param orientation The current robot_state to step the primitive on
      * @returns DirectPerWheelControl The per-wheel direct control primitive msg
      */
     std::unique_ptr<TbotsProto::DirectControlPrimitive> stepPrimitive(
-        const unsigned int robot_id, const RobotState& robot_state);
+        const unsigned int robot_id, const Angle& orientation);
 
    private:
     /*
      * Compute the next target linear velocity the robot should be at
      * assuming max acceleration.
      *
-     * @param primitive The MovePrimitive to compute the linear velocity for
-     * @param robot_state The RobotState of the robot we are planning the current
+     * @param robot_id The id of the robot which is running this Primitive Executor
+     * @param orientation The orientation of the robot we are planning the current
      * primitive for
      * @returns Vector The target linear velocity
      */
-    Vector getTargetLinearVelocity(const unsigned int robot_id,
-                                   const RobotState& robot_state);
+    Vector getTargetLinearVelocity(const unsigned int robot_id, const Angle& orientation);
 
     /*
      * Compute the next target angular velocity the robot should be at
      * assuming max acceleration.
      *
-     * @param primitive The MovePrimitive to compute the angular velocity for
-     * @param robot_state The RobotState of the robot we are planning the current
+     * @param move_primitive The MovePrimitive to compute the angular velocity for
+     * @param orientation The orientation of the robot we are planning the current
      * primitive for
      * @returns AngularVelocity The target angular velocity
      */
-    AngularVelocity getTargetAngularVelocity(const TbotsProto::MovePrimitive& primitive,
-                                             const RobotState& robot_state);
+    AngularVelocity getTargetAngularVelocity(
+        const TbotsProto::MovePrimitive& move_primitive, const Angle& orientation);
 
     /*
      * The AutoKickOrChip settings from the move primitive need to get copied over
@@ -82,5 +82,5 @@ class PrimitiveExecutor
 
     TbotsProto::Primitive current_primitive_;
     RobotConstants_t robot_constants_;
-    HRVOSimulator hrvo_simulator;
+    HRVOSimulator hrvo_simulator_;
 };
