@@ -111,7 +111,7 @@ TEST(RedisImplTests, DISABLED_redis_client_get_and_set_impl_test)
     std::time_t end_time = std::chrono::system_clock::to_time_t(end);
 
     ASSERT_LE(elapsed_seconds.count() * 1000, 25);
-    ASSERT_EQ(redis.key_value_set_.size(), 20);
+    ASSERT_EQ(redis.getAllKeyValuePairs().size(), 20);
 
     std::cout << "Finished computation at " << std::ctime(&end_time)
               << "Elapsed time: " << elapsed_seconds.count() << "s\n";
