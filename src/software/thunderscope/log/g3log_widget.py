@@ -31,18 +31,17 @@ class g3logWidget(pg_console.ConsoleWidget):
     def refresh(self):
         """Update the log widget with another log message
         """
+        try:
+            log = self.log_buffer.get_nowait()
+        except queue.Empty as empty:
+            return
 
-            try:
-                log = self.log_buffer.get_nowait()
-            except queue.Empty as empty:
-                return
+        log_str = "{} {} [{}->{}] {}\n".format(
+            log.created_timestamp.epoch_timestamp_seconds,
+            log.log_level,
+            log.file_name,
+            log.line_number,
+            log.log_msg,
+        )
 
-            log_str = "{} {} [{}->{}] {}\n".format(
-                log.created_timestamp.epoch_timestamp_seconds,
-                log.log_level,
-                log.file_name,
-                log.line_number,
-                log.log_msg,
-            )
-
-            self.write(log_str)
+        self.write(log_str)

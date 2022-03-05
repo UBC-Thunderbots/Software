@@ -7,6 +7,8 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/gui/drawing/world.h"
 #include "software/logger/logger.h"
+#include "proto/message_translation/tbots_protobuf.h"
+// #include "proto/message_translation/tbots_protobuf.cpp"
 
 ThreadedFullSystemGUI::ThreadedFullSystemGUI(
     std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config)
@@ -103,12 +105,14 @@ void ThreadedFullSystemGUI::onValueReceived(World world)
         view_area_buffer->push(world.field().fieldBoundary());
     }
 
-    TbotsProto::NamedValue named_val;
-    named_val.set_name("World Hz");
-    named_val.set_value(static_cast<float>(
+    // TbotsProto::NamedValue named_val;
+    // named_val.set_name("World Hz");
+    // named_val.set_value(static_cast<float>(
+    //     FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
+
+    LOG(VISUALIZE) << *createNamedValue("World Hz", static_cast<float>(
         FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
 
-    LOG(VISUALIZE) << named_val;
 
     worlds_received_per_second_buffer->push(
         FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond());
@@ -131,6 +135,9 @@ void ThreadedFullSystemGUI::onValueReceived(SensorProto sensor_msg)
 
 void ThreadedFullSystemGUI::onValueReceived(TbotsProto::PrimitiveSet primitive_msg)
 {
+    LOG(VISUALIZE) << *createNamedValue("Primitive Hz", static_cast<float>(
+        FirstInFirstOutThreadedObserver<TbotsProto::PrimitiveSet>::getDataReceivedPerSecond()));
+
     primitives_sent_per_second_buffer->push(
         FirstInFirstOutThreadedObserver<
             TbotsProto::PrimitiveSet>::getDataReceivedPerSecond());

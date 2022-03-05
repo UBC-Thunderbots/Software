@@ -26,13 +26,15 @@ from pyqtgraph.dockarea import *
 
 
 if __name__ == "__main__":
-
-    proto_receiver = ProtoReceiver()
+    
     # Setup unix socket directory
     try:
         os.mkdir("/tmp/tbots")
-    except:
+    except Exception as e:
+        print(e)
         pass
+
+    proto_receiver = ProtoReceiver()
 
     # Setup MainApp and initialize DockArea
     app = pg.mkQApp("Thunderscope")

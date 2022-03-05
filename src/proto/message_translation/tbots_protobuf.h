@@ -4,6 +4,7 @@
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/vision.pb.h"
 #include "proto/world.pb.h"
+#include "proto/visualization.pb.h"
 #include "software/world/world.h"
 
 /**
@@ -86,6 +87,17 @@ std::unique_ptr<TbotsProto::BallState> createBallState(const Ball& ball);
  * the same time zone as the timestamp argument.
  */
 std::unique_ptr<TbotsProto::Timestamp> createTimestamp(const Timestamp& timestamp);
+
+/**
+ * Returns a TbotsProto::NamedValue proto given a name and value.
+ *
+ * @param name The name of the value to plot
+ * @param value The NamedValue msg to extract the TbotsProto::NamedValue from
+ *
+ * @return The unique_ptr to a TbotsProto::Timestamp proto containing the timestamp with
+ * the same time zone as the timestamp argument.
+ */
+std::unique_ptr<TbotsProto::NamedValue> createNamedValue(const std::string name, float value);
 
 /**
  * Returns a timestamp msg with the time that this function was called
