@@ -1,19 +1,44 @@
 from screen import Screen
 
+ROBOT_ID = 0
+CHANNEL_ID = 1
+
 
 class HomeScreen(Screen):
-    def __init__(self, lcd_display, status_codes):
+    def __init__(self, lcd_display, redis_dict, status_codes):
+        self.robot_ids = [
+            redis_dict["robot id"],
+            redis_dict["channel id"],
+        ]
+        self.battery_voltage = (redis_dict["battery voltage"],)
+        self.cap_voltage = (redis_dict["cap voltage"],)
+        self.packet_loss = redis_dict["packet loss"]
+
         def menu():
             """ Action to go to Menu Screen """
             return {self.status_codes["change screen"]: "Menu"}
 
         def robot_id():
             """ Set Robot ID """
-            return {self.status_codes["none"]: None}
+            return {
+                self.status_codes["edit"]: {
+                    "param": self.robot_ids,
+                    "setting": ROBOT_ID,
+                    "delta": 1,
+                    "redis key": "robot id",
+                }
+            }
 
         def channel_id():
             """ Set Channel ID """
-            return {self.status_codes["none"]: None}
+            return {
+                self.status_codes["edit"]: {
+                    "param": self.robot_ids,
+                    "setting": CHANNEL_ID,
+                    "delta": 1,
+                    "redis key": "channel id",
+                }
+            }
 
         # Listing actions for Home Screen
         self.actions = ["Robot ID", "Channel ID", "Menu"]

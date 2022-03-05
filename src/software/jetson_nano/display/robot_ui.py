@@ -33,10 +33,10 @@ redis_keys = [
     "chip speed",
     "kick speed",
     "wheels enable",
-    "fr wheel",
-    "fl wheel",
-    "fr wheel",
-    "bl wheel",
+    "fl wheel speed",
+    "fr wheel speed",
+    "bl wheel speed",
+    "br wheel speed",
 ]
 
 """
@@ -45,24 +45,32 @@ TODO:
     - Add packet loss to dashboard
     - Add robot & channel ID to dashboard
     - Add battery & capacitor voltage to dashboard
+    - Poll redis server to continuously update values
 """
 
 
 class RobotUi:
     def __init__(self):
-        self.r = redis.Redis(host="localhost", port=6379, db=0)
-        self.redis_dict = {}  # TODO initialize this
 
+        # Initialize redis server and our redis dictionary
+        self.r = redis.Redis(host="localhost", port=6379, db=0)
+        self.redis_dict = {}
+        for key in redis_keys:
+            self.redis_dict[key] = self.r.get(key).decode("UTF-8")
+
+        # Draw Tbots logo on first boot
         self.lcd_display = LcdDisplay()
         self.lcd_display.draw_image("./lcd_user_interface/imgs/tbots.jpg")
         self.curr_screen = "Home"
 
         # All of our screens
         self.screens = {
-            "Home": HomeScreen(self.lcd_display, status_codes),
+            "Home": HomeScreen(self.lcd_display, self.redis_dict, status_codes),
             "Menu": MenuScreen(self.lcd_display, status_codes),
-            "Wheels": WheelsScreen(self.lcd_display, status_codes),
-            "Chip and Kick": ChipAndKickScreen(self.lcd_display, status_codes),
+            "Wheels": WheelsScreen(self.lcd_display, self.redis_dict, status_codes),
+            "Chip and Kick": ChipAndKickScreen(
+                self.lcd_display, self.redis_dict, status_codes
+            ),
         }
 
         def on_click():

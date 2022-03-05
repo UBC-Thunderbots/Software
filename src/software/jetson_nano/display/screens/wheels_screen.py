@@ -7,14 +7,14 @@ BACK_RIGHT = 3
 
 
 class WheelsScreen(Screen):
-    def __init__(self, lcd_display, status_codes):
-        self.enable = False
+    def __init__(self, lcd_display, redis_dict, status_codes):
+        self.enable = False if redis_dict["wheels enable"] == 0 else True
         self.wheel_speeds = [
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-        ]  # [front left, front right, back left, back right] (using a list to mimic pass by reference)
+            redis_dict["fl wheel speed"],
+            redis_dict["fr wheel speed"],
+            redis_dict["bl wheel speed"],
+            redis_dict["br wheel speed"],
+        ]
 
         # Defining this screens actions
         def menu():
@@ -43,7 +43,7 @@ class WheelsScreen(Screen):
                     "param": self.wheel_speeds,
                     "setting": FRONT_LEFT,
                     "delta": 0.5,
-                    "redis key": "fl wheel",
+                    "redis key": "fl wheel speed",
                 }
             }
 
@@ -54,7 +54,7 @@ class WheelsScreen(Screen):
                     "param": self.wheel_speeds,
                     "setting": FRONT_RIGHT,
                     "delta": 0.5,
-                    "redis key": "fr wheel",
+                    "redis key": "fr wheel speed",
                 }
             }
 
@@ -65,7 +65,7 @@ class WheelsScreen(Screen):
                     "param": self.wheel_speeds,
                     "setting": BACK_LEFT,
                     "delta": 0.5,
-                    "redis key": "bl wheel",
+                    "redis key": "bl wheel speed",
                 }
             }
 
@@ -76,7 +76,7 @@ class WheelsScreen(Screen):
                     "param": self.wheel_speeds,
                     "setting": BACK_RIGHT,
                     "delta": 0.5,
-                    "redis key": "br wheel",
+                    "redis key": "br wheel speed",
                 }
             }
 

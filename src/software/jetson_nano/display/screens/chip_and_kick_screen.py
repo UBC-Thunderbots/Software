@@ -5,12 +5,12 @@ KICK = 1
 
 
 class ChipAndKickScreen(Screen):
-    def __init__(self, lcd_display, status_codes):
-        self.enable = False
+    def __init__(self, lcd_display, redis_dict, status_codes):
+        self.enable = False if redis_dict["chip and kick enable"] == 0 else True
         self.speeds = [
-            0.0,
-            0.0,
-        ]  # [chip_speed, kick_speed] (using a list to mimic pass by reference)
+            redis_dict["chip speed"],
+            redis_dict["kick speed"],
+        ]
 
         # Defining this screens actions
         def menu():
