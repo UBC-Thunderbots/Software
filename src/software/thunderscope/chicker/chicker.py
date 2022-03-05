@@ -174,9 +174,8 @@ class ChickerWidget(QWidget):
                             print("Geneva:", self.geneva_value, "Power:", self.power_value)
                             self.radioCheckable[1] = False
                         for button in self.grid.parentWidget().findChildren(QPushButton):
-                            if button.text() == "Kick" or button.text() == "Chip":
-                                button.setStyleSheet("background-color: Grey")
-                                button.setCheckable(False)
+                            button.setStyleSheet("background-color: Grey")
+                            button.setCheckable(False)
                     # auto chip clicked - print; kick/chip grey, disabled
                     elif radio.text() == "Auto Chip":
                         self.radioCheckable[0] = True
@@ -188,10 +187,8 @@ class ChickerWidget(QWidget):
                             self.radioCheckable[2] = False
                         # find kick/chip pushButtons
                         for button in self.grid.parentWidget().findChildren(QPushButton):
-                            if button.text() == "Kick" or button.text() == "Chip":
-                                button.setStyleSheet("background-color: Grey")
-                                button.setCheckable(False)
-
+                            button.setStyleSheet("background-color: Grey")
+                            button.setCheckable(False)
         """
         for item in self.grid.parentWidget().findChildren(QGroupBox):
 
