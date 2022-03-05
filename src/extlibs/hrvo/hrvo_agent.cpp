@@ -83,7 +83,7 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
             std::asin((radius_ + other_agent.getRadius()) /
                       (position_ - other_agent.getPosition()).length());
 
-        // Direction of the two edges of the velocity obstacle
+        // Direction of the two edges of the velocity obstacles
         velocityObstacle.side1_ =
             Vector(std::cos(angle - openingAngle), std::sin(angle - openingAngle));
         velocityObstacle.side2_ =
@@ -100,9 +100,10 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
             // Relative velocity is in the right half of velocity obstacle (VO)
             // Shift the VO apex to the left so the right side is smaller, making the
             // VO a Hybrid Reciprocal Velocity Obstacle (HRVO)
-            const float s =
-                0.5f *
-                (other_agent.getVelocity() - velocity_).determinant(velocityObstacle.side2_) / d;
+            const float s = 0.5f *
+                            (other_agent.getVelocity() - velocity_)
+                                .determinant(velocityObstacle.side2_) /
+                            d;
 
             velocityObstacle.apex_ =
                 velocity_ + s * velocityObstacle.side1_ -
@@ -115,9 +116,10 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
             // Relative velocity is in the left half of velocity obstacle (VO)
             // Shift the VO apex to the right so the left side is smaller, making the
             // VO a Hybrid Reciprocal Velocity Obstacle (HRVO)
-            const float s =
-                0.5f *
-                (other_agent.getVelocity() - velocity_).determinant(velocityObstacle.side1_) / d;
+            const float s = 0.5f *
+                            (other_agent.getVelocity() - velocity_)
+                                .determinant(velocityObstacle.side1_) /
+                            d;
 
             velocityObstacle.apex_ =
                 velocity_ + s * velocityObstacle.side2_ -
@@ -138,7 +140,8 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
                                        (position_ - other_agent.getPosition()).length()) /
                                       simulator_->timeStep_) *
                 (position_ - other_agent.getPosition()).normalize();
-        velocityObstacle.side1_ = (other_agent.getPosition() - position_).perpendicular().normalize();
+        velocityObstacle.side1_ =
+            (other_agent.getPosition() - position_).perpendicular().normalize();
         velocityObstacle.side2_ = -velocityObstacle.side1_;
     }
 
@@ -231,8 +234,9 @@ void HRVOAgent::computeNewVelocity()
 
         float discriminant =
             max_speed_ * max_speed_ -
-            std::pow((velocityObstacles_[j].apex_).determinant(velocityObstacles_[j].side1_),
-                     2.f);
+            std::pow(
+                (velocityObstacles_[j].apex_).determinant(velocityObstacles_[j].side1_),
+                2.f);
 
         if (discriminant > 0.0f)
         {
@@ -262,8 +266,9 @@ void HRVOAgent::computeNewVelocity()
 
         discriminant =
             max_speed_ * max_speed_ -
-            std::pow((velocityObstacles_[j].apex_).determinant(velocityObstacles_[j].side2_),
-                     2.f);
+            std::pow(
+                (velocityObstacles_[j].apex_).determinant(velocityObstacles_[j].side2_),
+                2.f);
 
         if (discriminant > 0.0f)
         {
@@ -299,7 +304,8 @@ void HRVOAgent::computeNewVelocity()
             candidate.velocityObstacle1_ = i;
             candidate.velocityObstacle2_ = j;
 
-            float d = (velocityObstacles_[i].side1_).determinant(velocityObstacles_[j].side1_);
+            float d =
+                (velocityObstacles_[i].side1_).determinant(velocityObstacles_[j].side1_);
 
             if (d != 0.0f)
             {
@@ -420,9 +426,11 @@ void HRVOAgent::computeNewVelocity()
         {
             if (j != candidate.velocityObstacle1_ && j != candidate.velocityObstacle2_ &&
                 (velocityObstacles_[j].side2_)
-                        .determinant(candidate.position_ - velocityObstacles_[j].apex_) < 0.0f &&
+                        .determinant(candidate.position_ - velocityObstacles_[j].apex_) <
+                    0.0f &&
                 (velocityObstacles_[j].side1_)
-                        .determinant(candidate.position_ - velocityObstacles_[j].apex_) > 0.0f)
+                        .determinant(candidate.position_ - velocityObstacles_[j].apex_) >
+                    0.0f)
             {
                 valid = false;
 
