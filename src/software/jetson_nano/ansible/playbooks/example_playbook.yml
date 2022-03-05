@@ -1,0 +1,13 @@
+---
+- name: Example Ansible playbook that can be run on multiple Jetson Nanos
+  hosts: THUNDERBOTS_HOSTS
+
+  tasks:
+
+  - name: echo hello
+    register: res
+    shell: echo "hello world"
+
+  - debug: msg="{{ res.stdout }}"
+  - debug: msg="{{ res.stderr }}"
+

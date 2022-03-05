@@ -6,7 +6,7 @@ load("@ansible_deps//:requirements.bzl", "requirement")
 py_binary(
     name = "dynamic_inventory",
     srcs = ["dynamic_inventory.py"],
-    data = ["setup.yml"],
+    data = ["playbooks/example_playbook.yml"],
     deps = [
         requirement("ansible"),
     ],
@@ -15,17 +15,22 @@ py_binary(
 py_binary(
     name = "run_ansible",
     srcs = ["run_ansible.py"],
-    data = ["setup.yml"],
+    data = ["playbooks/example_playbook.yml"],
     deps = [
         requirement("ansible"),
     ],
 )
 
-genrule(
-    name = "setup",
-    outs = ["ansible_script.sh"],
-    cmd_bash = "echo ansible >> ansible.sh && chmod +x ansible.sh",
-)
+#genrule(
+#    name = "setup",
+#    outs = ["example_playbook.yml"],
+#)
+#
+#genrule(
+#    name = "setup",
+#    outs = ["ansible_script.sh"],
+#    cmd_bash = "echo ansible >> ansible.sh && chmod +x ansible.sh",
+#)
 
 py_binary(
     name = "ansible_py",
