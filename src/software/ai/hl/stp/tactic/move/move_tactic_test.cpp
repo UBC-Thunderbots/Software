@@ -73,8 +73,9 @@ TEST_F(MoveTacticTest, test_autochip_move)
 
     auto tactic = std::make_shared<MoveTactic>();
     tactic->updateControlParams(
-        destination, Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::ALLOW,
-        {AutoChipOrKickMode::AUTOCHIP, 2.0}, MaxAllowedSpeedMode::TIPTOE);
+        destination, Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::AUTOCHIP, 2.0},
+        TbotsProto::MaxAllowedSpeedMode::TIPTOE);
     setTactic(tactic);
     setFriendlyRobotId(1);
 
@@ -117,10 +118,10 @@ TEST_F(MoveTacticTest, test_autokick_move)
          field.enemyDefenseArea().negXPosYCorner()});
 
     auto tactic = std::make_shared<MoveTactic>();
-    tactic->updateControlParams(destination, Angle::threeQuarter(), 0, DribblerMode::OFF,
-                                BallCollisionType::ALLOW,
-                                {AutoChipOrKickMode::AUTOKICK, 3.0},
-                                MaxAllowedSpeedMode::TIPTOE);
+    tactic->updateControlParams(
+        destination, Angle::threeQuarter(), 0, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::AUTOKICK, 3.0},
+        TbotsProto::MaxAllowedSpeedMode::TIPTOE);
     setTactic(tactic);
     setFriendlyRobotId(0);
 
@@ -160,9 +161,10 @@ TEST_F(MoveTacticTest, test_spinning_move_clockwise)
     auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
     auto tactic = std::make_shared<MoveTactic>();
-    tactic->updateControlParams(destination, Angle::zero(), 0, DribblerMode::OFF,
-                                BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
-                                MaxAllowedSpeedMode::PHYSICAL_LIMIT, 1.0);
+    tactic->updateControlParams(
+        destination, Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 1.0);
     setTactic(tactic);
     setFriendlyRobotId(0);
 
@@ -206,9 +208,10 @@ TEST_F(MoveTacticTest, test_spinning_move_counter_clockwise)
     auto enemy_robots    = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
     auto tactic = std::make_shared<MoveTactic>();
-    tactic->updateControlParams(destination, Angle::half(), 0, DribblerMode::OFF,
-                                BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
-                                MaxAllowedSpeedMode::PHYSICAL_LIMIT, -4.0);
+    tactic->updateControlParams(
+        destination, Angle::half(), 0, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::OFF, 0.0},
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, -4.0);
     setTactic(tactic);
     setFriendlyRobotId(0);
 

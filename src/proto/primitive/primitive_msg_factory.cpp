@@ -5,8 +5,8 @@
 
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const Point &dest, double final_speed_m_per_s, const Angle &final_angle,
-    DribblerMode dribbler_mode, AutoChipOrKick auto_chip_or_kick,
-    MaxAllowedSpeedMode max_allowed_speed_mode, double target_spin_rev_per_s,
+    TbotsProto::DribblerMode dribbler_mode, AutoChipOrKick auto_chip_or_kick,
+    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode, double target_spin_rev_per_s,
     RobotConstants_t robot_constants)
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
@@ -89,16 +89,16 @@ std::unique_ptr<TbotsProto::Primitive> createDirectControlPrimitive(
     return direct_control_primitive_msg;
 }
 
-double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode,
+double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
                                           RobotConstants_t robot_constants)
 {
     switch (dribbler_mode)
     {
-        case DribblerMode::INDEFINITE:
+        case TbotsProto::DribblerMode::INDEFINITE:
             return robot_constants.indefinite_dribbler_speed_rpm;
-        case DribblerMode::MAX_FORCE:
+        case TbotsProto::DribblerMode::MAX_FORCE:
             return robot_constants.max_force_dribbler_speed_rpm;
-        case DribblerMode::OFF:
+        case TbotsProto::DribblerMode::OFF:
             return 0.0;
         default:
             LOG(WARNING) << "DribblerMode is invalid" << std::endl;
@@ -107,15 +107,16 @@ double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode,
 }
 
 double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
-    MaxAllowedSpeedMode max_allowed_speed_mode, RobotConstants_t robot_constants)
+    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
+    RobotConstants_t robot_constants)
 {
     switch (max_allowed_speed_mode)
     {
-        case MaxAllowedSpeedMode::PHYSICAL_LIMIT:
+        case TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT:
             return robot_constants.robot_max_speed_m_per_s;
-        case MaxAllowedSpeedMode::STOP_COMMAND:
+        case TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND:
             return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND;
-        case MaxAllowedSpeedMode::TIPTOE:
+        case TbotsProto::MaxAllowedSpeedMode::TIPTOE:
             return 0.5;
         default:
             LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;

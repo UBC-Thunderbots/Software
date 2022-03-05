@@ -13,6 +13,7 @@ struct AttackerFSM
 {
     struct ControlParams
     {
+        // TODO: clean up default values and move config to consturctor
         // The best pass so far
         std::optional<Pass> best_pass_so_far = std::nullopt;
         // whether we have committed to the pass and will be taking it
