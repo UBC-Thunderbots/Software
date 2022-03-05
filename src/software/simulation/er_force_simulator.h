@@ -26,7 +26,7 @@ extern "C"
  * as well as the firmware simulation for the robots. This provides a simple interface
  * to setup, run, and query the current state of the simulation.
  */
-class ErForceSimulator
+class ErForceSimulator : public QObject
 {
    public:
     /**
@@ -44,8 +44,6 @@ class ErForceSimulator
                               std::shared_ptr<const SimulatorConfig> simulator_config);
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
-
-    void setWorldState(const TbotsProto::WorldState& world_state);
 
     /**
      * Sets the state of the ball in the simulation. No more than 1 ball may exist
@@ -72,8 +70,6 @@ class ErForceSimulator
     void setBlueRobots(const std::vector<RobotStateWithId>& robots);
     void setRobots(const std::vector<RobotStateWithId>& robots,
                    gameController::Team team);
-    void setRobots(const google::protobuf::Map<uint32_t, TbotsProto::RobotState>& robots,
-                   gameController::Team side);
 
     /**
      * Sets the primitive being simulated by the robot on the corresponding team
