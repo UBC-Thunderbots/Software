@@ -25,16 +25,12 @@ RedisClient::RedisClient(std::string host, size_t port)
 
     // ensure that keyspace events are configured properly
     client_.config_set("notify-keyspace-events", "KEA");
-    client_.commit();
 
-    // ensure that redis server is accepting connections from any host (potentially
-    // unsafe)
+    // ensure that redis server is accepting connections from any host (potentially unsafe)
     client_.config_set("bind", "0.0.0.0");
-    client_.commit();
 
     // ensure that redis server has AOF (append-only file) persistence
     client_.config_set("appendonly", "yes");
-    client_.commit();
 
     // subscribe to key 'set' event within the keyspace
     // adds key and its value to the key value set
@@ -46,12 +42,6 @@ RedisClient::RedisClient(std::string host, size_t port)
                               client_.commit();
                           });
     subscriber_.commit();
-}
-
-void RedisClient::subscribe(const std::string &channel,
-                            void (*subscribe_callback)(std::string, std::string))
-{
-    subscriber_.subscribe(channel, subscribe_callback);
 }
 
 cpp_redis::reply RedisClient::get(const std::string &key)

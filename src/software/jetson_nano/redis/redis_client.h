@@ -22,14 +22,6 @@ class RedisClient
 
 
     /**
-     * Subscribes to a message channel
-     * @param channel The channel being subscribed to
-     * @param subscribe_callback callback for when messages are published to channel
-     */
-    void subscribe(const std::string &channel,
-                   void (*subscribe_callback)(std::string, std::string));
-
-    /**
      * gets the value corresponding to the key; blocking
      * @param key
      * @return a redis reply object
@@ -43,6 +35,9 @@ class RedisClient
      */
     void set(const std::string &key, const std::string &value);
 
+    /**
+     * @return a map of all the key value pairs in redis server
+     */
     std::unordered_map<std::string, std::string> getAllKeyValuePairs();
 
    private:
