@@ -138,7 +138,7 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
                                        (position_ - other_agent.getPosition()).length()) /
                                       simulator_->timeStep_) *
                 (position_ - other_agent.getPosition()).normalize();
-        velocityObstacle.side1_ = (position_ - other_agent.getPosition()).perpendicular();
+        velocityObstacle.side1_ = (other_agent.getPosition() - position_).perpendicular().normalize();
         velocityObstacle.side2_ = -velocityObstacle.side1_;
     }
 
