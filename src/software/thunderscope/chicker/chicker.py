@@ -22,9 +22,11 @@ class ChickerWidget(QWidget):
         self.setLayout(grid)
         self.grid = grid
 
-        self.charged = False
         # state of radio buttons in order NoAuto, AutoKick, AutoChip
         self.radioCheckable = [True, True, True]
+        self.charged = False
+        self.geneva_value = 1
+        self.power_value = 1
 
     def createButton(self, text):
         groupBox = QGroupBox()
@@ -87,6 +89,14 @@ class ChickerWidget(QWidget):
         # grid --> groupBox --> button/slider
         for item in self.grid.parentWidget().findChildren(QGroupBox):
 
+            # update slider values
+            for slider in item.findChildren(QSlider):
+                # if slider.valueChanged():
+                if item.title() == "Geneva Slider":
+                    self.geneva_value = slider.value()
+                elif item.title() == "Power Slider":
+                    self.power_value = slider.value()
+
             # check all push buttons
             for button in item.findChildren(QPushButton):
                 if not self.charged:
@@ -102,7 +112,9 @@ class ChickerWidget(QWidget):
                     if button.text() == "Charge" and button.isChecked():
                         button.toggle()
                         self.charged = True
-                        print("Charge clicked") # ----- replace this line ----- (next PR)
+                        # print ----- replace this ----- (next PR)
+                        print("Charge clicked")
+                        print("Geneva:", self.geneva_value, "Power:", self.power_value)
 
                 elif self.charged:
                     # discharge button white; text: "Discharge"; setCheckable(True)
@@ -119,15 +131,21 @@ class ChickerWidget(QWidget):
                         if button.text() == "Discharge":
                             button.toggle()
                             self.charged = False
-                            print("Discharge clicked") # ----- replace this line ----- (next PR)
+                            # ----- replace this line ----- (next PR)
+                            print("Discharge clicked")
+                            print("Geneva:", self.geneva_value, "Power:", self.power_value)
                         # kick/chip button clicked; change text to 'Charge';
                         else:
                             button.toggle()
                             self.charged = False
                             if button.text() == "Kick":
-                                print("Kick clicked") # ----- replace this line ----- (next PR)
+                                # ----- replace this line ----- (next PR)
+                                print("Kick clicked")
+                                print("Geneva:", self.geneva_value, "Power:", self.power_value)
                             elif button.text() == "Chip":
-                                print("Chip clicked") # ----- replace this line ----- (next PR)
+                                # ----- replace this line ----- (next PR)
+                                print("Chip clicked")
+                                print("Geneva:", self.geneva_value, "Power:", self.power_value)
 
             # check all radio buttons, regardles of charge
             for radio in item.findChildren(QRadioButton):
@@ -137,7 +155,9 @@ class ChickerWidget(QWidget):
                         self.radioCheckable[1] = True
                         self.radioCheckable[2] = True
                         if self.radioCheckable[0]:
-                            print("No Auto clicked") # ----- replace this line ----- (next PR)
+                            # ----- replace this line ----- (next PR)
+                            print("No Auto clicked")
+                            print("Geneva:", self.geneva_value, "Power:", self.power_value)
                             self.radioCheckable[0] = False
                         # find kick/chip pushButtons, set them clickable
                         for button in self.grid.parentWidget().findChildren(QPushButton):
@@ -149,7 +169,9 @@ class ChickerWidget(QWidget):
                         self.radioCheckable[0] = True
                         self.radioCheckable[2] = True
                         if self.radioCheckable[1]:
-                            print("Auto Kick clicked") # ----- replace this line ----- (next PR)
+                            # ----- replace this line ----- (next PR)
+                            print("Auto Kick clicked")
+                            print("Geneva:", self.geneva_value, "Power:", self.power_value)
                             self.radioCheckable[1] = False
                         for button in self.grid.parentWidget().findChildren(QPushButton):
                             if button.text() == "Kick" or button.text() == "Chip":
@@ -160,7 +182,9 @@ class ChickerWidget(QWidget):
                         self.radioCheckable[0] = True
                         self.radioCheckable[1] = True
                         if self.radioCheckable[2]:
-                            print("Auto Chip clicked") # ----- replace this line ----- (next PR)
+                            # ----- replace this line ----- (next PR)
+                            print("Auto Chip clicked")
+                            print("Geneva:", self.geneva_value, "Power:", self.power_value)
                             self.radioCheckable[2] = False
                         # find kick/chip pushButtons
                         for button in self.grid.parentWidget().findChildren(QPushButton):
@@ -169,7 +193,6 @@ class ChickerWidget(QWidget):
                                 button.setCheckable(False)
 
         """
-        
         for item in self.grid.parentWidget().findChildren(QGroupBox):
 
             # check all push buttons
@@ -237,5 +260,4 @@ class ChickerWidget(QWidget):
                                 if button.text() == "Kick" or button.text() == "Chip":
                                     button.setStyleSheet("background-color: Grey")
                                     button.setCheckable(False)
-        
         """
