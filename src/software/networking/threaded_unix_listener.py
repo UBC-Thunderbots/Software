@@ -120,6 +120,7 @@ class Session(socketserver.BaseRequestHandler):
 
     param: proto_class_name: String of the proto class name to search for
     """
+
     def find_proto_class(self, proto_class_name):
         proto_path = os.path.dirname(proto.__file__)
 

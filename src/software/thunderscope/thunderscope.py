@@ -26,7 +26,7 @@ from pyqtgraph.dockarea import *
 
 
 if __name__ == "__main__":
-    
+
     # Setup unix socket directory
     try:
         os.mkdir("/tmp/tbots")
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     window.setWindowTitle("Thunderscope")
 
     # Setup Field + Layers
-    field = Field() 
+    field = Field()
     world = world_layer.WorldLayer()
     obstacles = obstacle_layer.ObstacleLayer()
     paths = path_layer.PathLayer()

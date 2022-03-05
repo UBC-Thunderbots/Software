@@ -7,10 +7,12 @@ import queue
 import random
 from pyqtgraph.Qt import QtGui
 from collections import deque
+
 DEQUE_SIZE = 500
 MIN_Y_RANGE = 0
 MAX_Y_RANGE = 100
 TIME_WINDOW_TO_DISPLAY_S = 10
+
 
 class NamedValuePlotter(object):
     def __init__(self, buffer_size=10):
@@ -30,11 +32,12 @@ class NamedValuePlotter(object):
 
     """Refreshes NamedValuePlotter and updates data in "plots" with data from "named_value_buffer"
     """
+
     def refresh(self):
         try:
             named_value = self.named_value_buffer.get_nowait()
 
-            #if named_value is new, create a plot and for the new value and add it to necessary maps
+            # if named_value is new, create a plot and for the new value and add it to necessary maps
             if named_value.name not in self.plots:
                 self.plots[named_value.name] = self.win.plot(
                     pen=QtGui.QColor(
@@ -50,7 +53,7 @@ class NamedValuePlotter(object):
                 self.data_y[named_value.name] = deque([], DEQUE_SIZE)
                 self.legend.addItem(self.plots[named_value.name], named_value.name)
 
-            #Add incoming data to existing deques of data
+            # Add incoming data to existing deques of data
             self.data_x[named_value.name].append(time.time() - self.time)
             self.data_y[named_value.name].append(named_value.value)
             self.plots[named_value.name].setData(
@@ -58,7 +61,10 @@ class NamedValuePlotter(object):
             )
             self.win.setRange(
                 yRange=[MIN_Y_RANGE, MAX_Y_RANGE],
-                xRange=[time.time() - self.time - TIME_WINDOW_TO_DISPLAY_S, time.time() - self.time],
+                xRange=[
+                    time.time() - self.time - TIME_WINDOW_TO_DISPLAY_S,
+                    time.time() - self.time,
+                ],
                 disableAutoRange=True,
             )
         except queue.Empty as empty:

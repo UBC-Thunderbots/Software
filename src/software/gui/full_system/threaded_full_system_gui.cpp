@@ -3,11 +3,11 @@
 #include <QtCore/QTimer>
 #include <QtWidgets/QApplication>
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "proto/visualization.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/gui/drawing/world.h"
 #include "software/logger/logger.h"
-#include "proto/message_translation/tbots_protobuf.h"
 // #include "proto/message_translation/tbots_protobuf.cpp"
 
 ThreadedFullSystemGUI::ThreadedFullSystemGUI(
@@ -110,8 +110,10 @@ void ThreadedFullSystemGUI::onValueReceived(World world)
     // named_val.set_value(static_cast<float>(
     //     FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
 
-    LOG(VISUALIZE) << *createNamedValue("World Hz", static_cast<float>(
-        FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
+    LOG(VISUALIZE) << *createNamedValue(
+        "World Hz",
+        static_cast<float>(
+            FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
 
 
     worlds_received_per_second_buffer->push(
@@ -135,8 +137,10 @@ void ThreadedFullSystemGUI::onValueReceived(SensorProto sensor_msg)
 
 void ThreadedFullSystemGUI::onValueReceived(TbotsProto::PrimitiveSet primitive_msg)
 {
-    LOG(VISUALIZE) << *createNamedValue("Primitive Hz", static_cast<float>(
-        FirstInFirstOutThreadedObserver<TbotsProto::PrimitiveSet>::getDataReceivedPerSecond()));
+    LOG(VISUALIZE) << *createNamedValue(
+        "Primitive Hz",
+        static_cast<float>(FirstInFirstOutThreadedObserver<
+                           TbotsProto::PrimitiveSet>::getDataReceivedPerSecond()));
 
     primitives_sent_per_second_buffer->push(
         FirstInFirstOutThreadedObserver<
