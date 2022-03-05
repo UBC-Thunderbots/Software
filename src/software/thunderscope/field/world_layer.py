@@ -12,9 +12,7 @@ from software.thunderscope.constants import (
     BALL_RADIUS,
     MM_PER_M,
     UNIX_SOCKET_BASE_PATH,
-    KEY_R,
-    KEY_CTRL,
-    KEY_M,
+    KEY_CTRL, KEY_M, KEY_R,
 )
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 import software.thunderscope.colors as colors
@@ -29,77 +27,118 @@ class WorldLayer(FieldLayer):
         self.cached_world = World()
         self.setAcceptHoverEvents(True)
         self.setAcceptTouchEvents(True)
-        self.pressed_R = False
         self.pressed_CTRL = False
         self.pressed_M = False
+        self.pressed_R = False
         self.mouse_clicked = False
         self.mouse_click_pos = [0,0]
-        self.mouse_hover_pos = [0,0]
-        self.override_ball_loc = False
+        self.mouse_hover_pos = [0,0] # might not need later, see hoverMoveEvent
     
+    # Note: the function name formatting is different but this can't be changed since it's overriding the built-in Qt function
     def keyPressEvent(self, event):
+        """Detect when a key has been pressed
+
+        :param event: The event
+
+        """
         if event.key() == KEY_R:
+            # TODO (#2410) enter function to rotate the robot
             print("pressed R")
             self.pressed_R = True
-            # enter function to rotate robot
+
         elif event.key() == KEY_CTRL:
-            self.pressed_CTRL = True
+            # TODO (#2410) enter function to move the ball
             print("pressed CTRL")
-            # enter function to move ball
+        
         elif event.key() == KEY_M:
+            # TODO (#2410) enter function to move the robot
             print("pressed M")
             self.pressed_M = True
-            # enter function to move robot
     
+    # Note: the function name formatting is different but this can't be changed since it's overriding the built-in Qt function
     def keyReleaseEvent(self, event):
+        """Detect when a key has been released
+
+        :param event: The event
+
+        """
         if event.key() == KEY_R:
+            # TODO (#2410) exit function to rotate the robot
             print("released R")
             self.pressed_R = False
-            # enter function to rotate robot
+
         elif event.key() == KEY_CTRL:
+            # TODO (#2410) exit function to move the ball
             self.pressed_CTRL = False
             print("released CTRL")
-            # enter function to move ball
+
         elif event.key() == KEY_M:
+            # TODO (#2410) exit function to move the robot
             print("released M")
             self.pressed_M = False
-            # enter function to move robot
 
+    # Note: the function name formatting is different but this can't be changed since it's overriding the built-in Qt function
     def hoverMoveEvent(self, event):
-        self.mouse_hover_pos = [event.pos().x(), event.pos().y()]
-        self.identify_robots(event.pos().x(), event.pos().y())
+        """Detect where the mouse is hovering on the field
+        NOTE: Currently not used but may be useful in next part of (#2410)
 
+        :param event: The event
+
+        """
+        self.mouse_hover_pos = [event.pos().x(), event.pos().y()]
+
+    # Note: the function name formatting is different but this can't be changed since it's overriding the built-in Qt function
     def mouseClickEvent(self, event):
-        print(event.pos())
-        self.mouse_click_pos = [event.pos().x(), event.pos().y()]
+        """Detect whether the mouse was clicked anywhere on the field
+
+        :param event: The event
+
+        """
+        # TODO (#2410) implement robot and ball interactivity through simulator, based on mouse and keyboard events
+
+        # print the position of the mouse click
+        print("x: " + str(event.pos().x()/1000))
+        print("y: " + str(event.pos().y()/1000))
+
         self.mouse_clicked = True
-        if self.pressed_CTRL:
-            self.override_ball_loc = True
-        # see if there is a robot here and if there is, then "select" it
-        # wait on a keypress event for what action to take
+        self.mouse_click_pos = [event.pos().x(), event.pos().y()]
+
+        # determine whether a robot was clicked
+        self.identify_robots(event.pos().x(), event.pos().y())
     
     def identify_robots(self, mouse_x, mouse_y):
+        """Identify which robot was clicked on the field
+
+        :param mouse_x: The x position of the mouse click
+        :param mouse_y: The y position of the mouse click
+        
+        """
         self.identify_robot(mouse_x, mouse_y, self.cached_world.friendly_team.team_robots, "Friendly: ")
         self.identify_robot(mouse_x, mouse_y, self.cached_world.enemy_team.team_robots, "Enemy: ")
 
     def identify_robot(self, mouse_x, mouse_y, team, side):
+        """Identify which robot was clicked on the team
+
+        :param mouse_x: The x position of the mouse click
+        :param mouse_y: The y position of the mouse click
+        :param team: The team of robots to iterate over
+        :param side: The label of the team, "Friendly" or "Enemy"
+
+        """
         for robot_ in team:
             pos_x = robot_.current_state.global_position.x_meters
             pos_y = robot_.current_state.global_position.y_meters
             if math.sqrt((pos_x - mouse_x/1000)**2 + (pos_y - mouse_y/1000)**2) <= ROBOT_MAX_RADIUS/1000:
                 print(side)
                 print(robot_.id)        
-                # print(robot_.current_state.global_position)
-                # print(mouse_x/1000)
-                # print(mouse_y/1000)
 
+    # Temporary draw function for testing purposes
     def draw_mouse_click_loc(self, painter):
         """Draw a circle indicating where the mouse was clicked on the field
 
         :param painter: The painter
 
         """
-
         painter.setPen(pg.mkPen(colors.BLUE_ROBOT_COLOR))
         painter.setBrush(pg.mkBrush(colors.BLUE_ROBOT_COLOR))
         painter.drawEllipse(
@@ -107,17 +146,6 @@ class WorldLayer(FieldLayer):
                 self.mouse_click_pos[0], self.mouse_click_pos[1], BALL_RADIUS*3,
             )
         )
-        self.mouse_clicked = False
-    
-    def draw_key_press_ctrl_mouse(self, painter):
-        if self.pressed_CTRL and self.mouse_clicked:
-            painter.setPen(pg.mkPen(colors.YELLOW_ROBOT_COLOR))
-            painter.setBrush(pg.mkBrush(colors.YELLOW_ROBOT_COLOR))
-            painter.drawEllipse(
-                self.createCircle(
-                    self.mouse_click_pos[0], self.mouse_click_pos[1], BALL_RADIUS*2,
-                )
-            )       
         self.mouse_clicked = False
 
     def draw_field(self, painter, field: Field):
@@ -174,7 +202,6 @@ class WorldLayer(FieldLayer):
         :param team: The team proto to draw
 
         """
-
         convert_degree = -16
 
         for robot in team.team_robots:
@@ -201,26 +228,15 @@ class WorldLayer(FieldLayer):
         :param ball: The ball proto to draw
 
         """
-        if self.override_ball_loc and self.pressed_CTRL:
-            painter.setPen(pg.mkPen(colors.BALL_COLOR))
-            painter.setBrush(pg.mkBrush(colors.BALL_COLOR))
-            painter.drawEllipse(
-                self.createCircle(
-                    self.mouse_click_pos[0],
-                    self.mouse_click_pos[1],
-                    BALL_RADIUS,
-                )
+        painter.setPen(pg.mkPen(colors.BALL_COLOR))
+        painter.setBrush(pg.mkBrush(colors.BALL_COLOR))
+        painter.drawEllipse(
+            self.createCircle(
+                ball.current_state.global_position.x_meters * MM_PER_M,
+                ball.current_state.global_position.y_meters * MM_PER_M,
+                BALL_RADIUS,
             )
-        else:
-            painter.setPen(pg.mkPen(colors.BALL_COLOR))
-            painter.setBrush(pg.mkBrush(colors.BALL_COLOR))
-            painter.drawEllipse(
-                self.createCircle(
-                    ball.current_state.global_position.x_meters * MM_PER_M,
-                    ball.current_state.global_position.y_meters * MM_PER_M,
-                    BALL_RADIUS,
-                )
-            )
+        )
 
     def paint(self, painter, option, widget):
         """Paint this layer
@@ -230,7 +246,6 @@ class WorldLayer(FieldLayer):
         :param widget: The widget that we are painting on
 
         """
-
         world = self.world_receiver.maybe_pop()
 
         if not world:
@@ -239,10 +254,8 @@ class WorldLayer(FieldLayer):
         self.draw_field(painter, world.field)
         self.draw_ball(painter, world.ball)
         
-        # temporary draw function - draws the last location where a mouseClickEvent occurrred
-        # self.draw_mouse_click_loc(painter)
-
-        self.draw_key_press_ctrl_mouse(painter)
+        # temporary function call for testing purposes
+        self.draw_mouse_click_loc(painter)
 
         # TODO (#2399) Figure out which team color _we_ are and update the color
         # passed into the team.
