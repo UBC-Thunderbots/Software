@@ -104,7 +104,7 @@ TEST_F(
 
     // we are differentiating between defense area obstacles and the center circle
     // obstacles because the lost resolution means that we interfere with the center
-    // circle while path planning (but not to a problematic degree). THis won't be a
+    // circle while path planning (but not to a problematic degree). This won't be a
     // problem since obstacles are inflated by the RobotNavigationObstacleFactory
     std::vector<ObstaclePtr> defense_area_obstacles =
         obstacle_factory.createFromMotionConstraints(

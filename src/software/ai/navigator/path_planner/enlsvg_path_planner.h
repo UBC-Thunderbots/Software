@@ -24,7 +24,7 @@ class EnlsvgPathPlanner
      * Creates an EnlsvgPathPlanner object. It creates an internal grid representation
      * using the passed navigable_area with the passed resolution. It also pads the outer
      * boundaries of the grid as an obstacle using the boundary_margin_offset parameter.
-     * It constructs the grid and sets the correspoonding obstacles as "blocked".
+     * It constructs the grid and sets the corresponding obstacles as "blocked".
      *
      * @param navigable_area         The total area that the path planner must path plan
      * inside
