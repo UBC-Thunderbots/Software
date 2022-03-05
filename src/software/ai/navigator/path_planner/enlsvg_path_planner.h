@@ -2,9 +2,12 @@
 #include <queue>
 
 #include "extlibs/enlsvg/Pathfinding/ENLSVG.h"
-#include "path_planner.h"
+#include "software/ai/navigator/obstacle/obstacle.hpp"
+#include "software/geom/linear_spline2d.h"
 #include "software/logger/logger.h"
 #include "software/world/world.h"
+
+using Path = LinearSpline2d;
 
 /**
  * The Edge N-Level Sparse Visibility Graph algorithm is a fast pathfinding algorithm for

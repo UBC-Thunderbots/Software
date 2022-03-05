@@ -61,13 +61,13 @@ cc_library(
     srcs = ["enlsvg_path_planner.cpp"],
     hdrs = ["enlsvg_path_planner.h"],
     deps = [
-        ":path_planner",
         "//extlibs/enlsvg",
         "//shared/parameter:cpp_configs",
         "//software/ai/motion_constraint:motion_constraint_set_builder",
+        "//software/ai/navigator/obstacle",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
+        "//software/geom:linear_spline2d",
         "//software/logger",
-        "//software/world",
     ],
 )
 
