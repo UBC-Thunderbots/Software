@@ -26,7 +26,8 @@ RedisClient::RedisClient(std::string host, size_t port)
     // ensure that keyspace events are configured properly
     client_.config_set("notify-keyspace-events", "KEA");
 
-    // ensure that redis server is accepting connections from any host (potentially unsafe)
+    // ensure that redis server is accepting connections from any host (potentially
+    // unsafe)
     client_.config_set("bind", "0.0.0.0");
 
     // ensure that redis server has AOF (append-only file) persistence
