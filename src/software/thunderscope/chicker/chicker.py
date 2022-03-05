@@ -21,7 +21,10 @@ class ChickerWidget(QWidget):
         grid.addWidget(self.createSlider("Power Slider", 1, 100, 10), 3, 0, 1, 3)
         self.setLayout(grid)
         self.grid = grid
+
         self.charged = False
+        # state of radio buttons in order NoAuto, AutoKick, AutoChip
+        self.radioCheckable = [True, True, True]
 
     def createButton(self, text):
         groupBox = QGroupBox()
@@ -79,13 +82,94 @@ class ChickerWidget(QWidget):
             elif not self.charged:
                 if button.text() == "Discharge":
                     button.setText("Charge")
-                # set radio button to 'No Auto'
-                for radio in self.grid.parentWidget().findChildren(QRadioButton):
-                    if radio.text() == "No Auto":
-                        radio.setChecked(True)
 
         # iterate over all boxes - possibly the only way to access the widgets
         # grid --> groupBox --> button/slider
+        for item in self.grid.parentWidget().findChildren(QGroupBox):
+
+            # check all push buttons
+            for button in item.findChildren(QPushButton):
+                if not self.charged:
+                    # charge button white; text: "Charge"; setCheckable(True)
+                    if button.text() == "Charge":
+                        button.setStyleSheet("background-color: White")
+                        button.setCheckable(True)
+                    # kick/chip button grey; setCheckable(False)
+                    else:
+                        button.setStyleSheet("background-color: Grey")
+                        button.setCheckable(False)
+                    # behaviour upon clicking charge; change text to 'Discharge'; print; charged = True; toggle
+                    if button.text() == "Charge" and button.isChecked():
+                        button.toggle()
+                        self.charged = True
+                        print("Charge clicked") # ----- replace this line ----- (next PR)
+
+                elif self.charged:
+                    # discharge button white; text: "Discharge"; setCheckable(True)
+                    if button.text() == "Discharge":
+                        button.setStyleSheet("background-color: White")
+                        button.setCheckable(True)
+                    # kick/chip button white; setCheckable(True)
+                    else:
+                        button.setStyleSheet("background-color: White")
+                        button.setCheckable(True)
+
+                    if button.isChecked():
+                        # discharge clicked; change text to 'Charge'; print; set 'No Auto' on; charged = False
+                        if button.text() == "Discharge":
+                            button.toggle()
+                            self.charged = False
+                            print("Discharge clicked") # ----- replace this line ----- (next PR)
+                        # kick/chip button clicked; change text to 'Charge';
+                        else:
+                            button.toggle()
+                            self.charged = False
+                            if button.text() == "Kick":
+                                print("Kick clicked") # ----- replace this line ----- (next PR)
+                            elif button.text() == "Chip":
+                                print("Chip clicked") # ----- replace this line ----- (next PR)
+
+            # check all radio buttons, regardles of charge
+            for radio in item.findChildren(QRadioButton):
+                if radio.isChecked():
+                    # no auto clicked - change to no auto; Kick/chip white and enabled
+                    if radio.text() == "No Auto":
+                        self.radioCheckable[1] = True
+                        self.radioCheckable[2] = True
+                        if self.radioCheckable[0]:
+                            print("No Auto clicked") # ----- replace this line ----- (next PR)
+                            self.radioCheckable[0] = False
+                        # find kick/chip pushButtons, set them clickable
+                        for button in self.grid.parentWidget().findChildren(QPushButton):
+                            if self.charged and (button.text() == "Kick" or button.text() == "Chip"):
+                                button.setStyleSheet("background-color: White")
+                                button.setCheckable(True)
+                    # auto kick clicked - print; kick/chip grey, disabled
+                    elif radio.text() == "Auto Kick":
+                        self.radioCheckable[0] = True
+                        self.radioCheckable[2] = True
+                        if self.radioCheckable[1]:
+                            print("Auto Kick clicked") # ----- replace this line ----- (next PR)
+                            self.radioCheckable[1] = False
+                        for button in self.grid.parentWidget().findChildren(QPushButton):
+                            if button.text() == "Kick" or button.text() == "Chip":
+                                button.setStyleSheet("background-color: Grey")
+                                button.setCheckable(False)
+                    # auto chip clicked - print; kick/chip grey, disabled
+                    elif radio.text() == "Auto Chip":
+                        self.radioCheckable[0] = True
+                        self.radioCheckable[1] = True
+                        if self.radioCheckable[2]:
+                            print("Auto Chip clicked") # ----- replace this line ----- (next PR)
+                            self.radioCheckable[2] = False
+                        # find kick/chip pushButtons
+                        for button in self.grid.parentWidget().findChildren(QPushButton):
+                            if button.text() == "Kick" or button.text() == "Chip":
+                                button.setStyleSheet("background-color: Grey")
+                                button.setCheckable(False)
+
+        """
+        
         for item in self.grid.parentWidget().findChildren(QGroupBox):
 
             # check all push buttons
@@ -153,3 +237,5 @@ class ChickerWidget(QWidget):
                                 if button.text() == "Kick" or button.text() == "Chip":
                                     button.setStyleSheet("background-color: Grey")
                                     button.setCheckable(False)
+        
+        """
