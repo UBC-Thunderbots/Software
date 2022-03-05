@@ -28,7 +28,7 @@ message MovePrimitive
         };
     }
 
-    Point destination                = 1;
+    Path path                        = 1;
     float final_speed_m_per_s        = 2;
     Angle final_angle                = 3;
     float dribbler_speed_rpm         = 4;
