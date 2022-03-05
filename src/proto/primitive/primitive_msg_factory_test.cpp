@@ -32,8 +32,9 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive)
                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 5.0, robot_constants);
 
     ASSERT_TRUE(move_primitive->has_move());
-    EXPECT_EQ(move_primitive->move().destination().x_meters(), -5);
-    EXPECT_EQ(move_primitive->move().destination().y_meters(), 1);
+    auto destination = move_primitive->move().path().point().at(0);
+    EXPECT_EQ(destination.x_meters(), -5);
+    EXPECT_EQ(destination.y_meters(), 1);
     EXPECT_EQ(move_primitive->move().final_speed_m_per_s(), 3.0);
     EXPECT_EQ(move_primitive->move().final_angle().radians(),
               Angle::threeQuarter().toRadians());
@@ -52,9 +53,11 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autochip)
                             DribblerMode::INDEFINITE, {AutoChipOrKickMode::AUTOCHIP, 2.5},
                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
 
+
     ASSERT_TRUE(move_primitive->has_move());
-    EXPECT_EQ(move_primitive->move().destination().x_meters(), -5);
-    EXPECT_EQ(move_primitive->move().destination().y_meters(), 1);
+    auto destination = move_primitive->move().path().point().at(0);
+    EXPECT_EQ(destination.x_meters(), -5);
+    EXPECT_EQ(destination.y_meters(), 1);
     EXPECT_EQ(move_primitive->move().final_speed_m_per_s(), 3.0);
     EXPECT_EQ(move_primitive->move().final_angle().radians(),
               Angle::threeQuarter().toRadians());
@@ -75,8 +78,9 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
                             MaxAllowedSpeedMode::STOP_COMMAND, 0.0, robot_constants);
 
     ASSERT_TRUE(move_primitive->has_move());
-    EXPECT_EQ(move_primitive->move().destination().x_meters(), -5);
-    EXPECT_EQ(move_primitive->move().destination().y_meters(), 1);
+    auto destination = move_primitive->move().path().point().at(0);
+    EXPECT_EQ(destination.x_meters(), -5);
+    EXPECT_EQ(destination.y_meters(), 1);
     EXPECT_EQ(move_primitive->move().final_speed_m_per_s(), 3.0);
     EXPECT_EQ(move_primitive->move().final_angle().radians(),
               Angle::threeQuarter().toRadians());

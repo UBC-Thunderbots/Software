@@ -64,7 +64,7 @@ Agent::VelocityObstacle LinearVelocityAgent::createVelocityObstacle(
         // Creates Velocity Obstacle with the sides being 180 degrees
         // apart from each other
         velocityObstacle.apex_  = velocity_;
-        velocityObstacle.side1_ = (other_agent.getPosition(), position_).perpendicular();
+        velocityObstacle.side1_ = (position_ - other_agent.getPosition()).perpendicular();
         velocityObstacle.side2_ = -velocityObstacle.side1_;
     }
     return velocityObstacle;
