@@ -36,7 +36,7 @@ void ThreadedAI::overrideTactics(
     for (auto& assigned_tactic : assigned_tactic_play_control_params.assigned_tactics())
     {
         tactic_assignment_map[assigned_tactic.first] =
-            createTactic(assigned_tactic.second);
+            createTactic(assigned_tactic.second, ai_config);
     }
 
     play->updateControlParams(tactic_assignment_map);
