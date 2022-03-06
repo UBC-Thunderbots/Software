@@ -45,13 +45,13 @@ if __name__ == "__main__":
     # Setup Checkbox Widget
     check_boxes = logs.checkboxWidget
 
-    check_boxes_dock = Dock("Checkboxes", size=(500, 100))
+    check_boxes_dock = Dock("Logs filter", size=(100, 100))
     check_boxes_dock.addWidget(check_boxes)
 
     # Configure Docks
     dock_area.addDock(field_dock, "left")
     dock_area.addDock(log_dock, "bottom", field_dock)
-    dock_area.addDock(check_boxes_dock, "bottom", log_dock)
+    dock_area.addDock(check_boxes_dock, "right", log_dock)
 
     def update():
         field.refresh()
