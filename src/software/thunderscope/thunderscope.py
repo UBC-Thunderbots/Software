@@ -43,7 +43,7 @@ if __name__ == "__main__":
     log_dock.addWidget(logs)
 
     # Setup Checkbox Widget
-    check_boxes = g3logCheckboxes()
+    check_boxes = logs.checkboxWidget
 
     check_boxes_dock = Dock("Checkboxes", size=(500, 100))
     check_boxes_dock.addWidget(check_boxes)

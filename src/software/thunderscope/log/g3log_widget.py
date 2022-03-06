@@ -2,6 +2,7 @@ import pyqtgraph as pg
 import pyqtgraph.console as pg_console
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 import software.thunderscope.constants as constants
+from software.thunderscope.log.g3log_checkboxes import g3logCheckboxes
 
 from proto.robot_log_msg_pb2 import RobotLog
 
@@ -29,6 +30,8 @@ class g3logWidget(pg_console.ConsoleWidget):
             }"""
         )
 
+        self.checkboxWidget = g3logCheckboxes()
+
     def refresh(self):
         """Update the log widget with another log message
         """
@@ -37,12 +40,14 @@ class g3logWidget(pg_console.ConsoleWidget):
         if not log:
             return
 
-        log_str = "{} {} [{}->{}] {}\n".format(
-            log.created_timestamp.epoch_timestamp_seconds,
-            log.log_level,
-            log.file_name,
-            log.line_number,
-            log.log_msg,
-        )
-
-        self.write(log_str)
+        if (log.log_level == 0 and self.checkboxWidget.isChecked1()) or (log.log_level == 1 and self.checkboxWidget.isChecked2()) or (log.log_level == 2 and self.checkboxWidget.isChecked3()) or (log.log_level == 3 and self.checkboxWidget.isChecked4()):
+            log_str = "{} {} [{}->{}] {}\n".format(
+                log.created_timestamp.epoch_timestamp_seconds,
+                log.log_level,
+                log.file_name,
+                log.line_number,
+                log.log_msg,
+            )
+            self.write(log_str)
+        else:
+            return
