@@ -1,12 +1,14 @@
 import pyqtgraph as pg
 from PyQt5.QtWidgets import *
 
+
 class g3logCheckboxes(QWidget):
     def __init__(self):
         QWidget.__init__(self)
         layout = QGridLayout()
         self.setLayout(layout)
 
+        # Creates 4 checkboxes based on the 4 log types
         self.cbutton1 = QCheckBox("DEBUG")
         self.cbutton1.setChecked(True)
         self.cbutton1.log_level = "DEBUG"
@@ -40,7 +42,12 @@ class g3logCheckboxes(QWidget):
 
     def onClicked(self):
         cbutton = self.sender()
-        print("Display " + (cbutton.log_level) + " logs is set to " + str(cbutton.isChecked()))
+        print(
+            "Display "
+            + (cbutton.log_level)
+            + " logs is set to "
+            + str(cbutton.isChecked())
+        )
 
     def isChecked1(self):
         return self.cbutton1.isChecked()
@@ -50,6 +57,6 @@ class g3logCheckboxes(QWidget):
 
     def isChecked3(self):
         return self.cbutton3.isChecked()
-    
+
     def isChecked4(self):
         return self.cbutton4.isChecked()

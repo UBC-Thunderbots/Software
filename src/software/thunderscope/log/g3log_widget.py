@@ -30,6 +30,7 @@ class g3logWidget(pg_console.ConsoleWidget):
             }"""
         )
 
+        # Creates checkbox widget
         self.checkboxWidget = g3logCheckboxes()
 
     def refresh(self):
@@ -40,7 +41,13 @@ class g3logWidget(pg_console.ConsoleWidget):
         if not log:
             return
 
-        if (log.log_level == 0 and self.checkboxWidget.isChecked1()) or (log.log_level == 1 and self.checkboxWidget.isChecked2()) or (log.log_level == 2 and self.checkboxWidget.isChecked3()) or (log.log_level == 3 and self.checkboxWidget.isChecked4()):
+        # Checks whether this type of log is enabled from checkboxes
+        if (
+            (log.log_level == 0 and self.checkboxWidget.isChecked1())
+            or (log.log_level == 1 and self.checkboxWidget.isChecked2())
+            or (log.log_level == 2 and self.checkboxWidget.isChecked3())
+            or (log.log_level == 3 and self.checkboxWidget.isChecked4())
+        ):
             log_str = "{} {} [{}->{}] {}\n".format(
                 log.created_timestamp.epoch_timestamp_seconds,
                 log.log_level,
