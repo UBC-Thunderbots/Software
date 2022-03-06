@@ -16,6 +16,29 @@ class SimulatedHRVOTest : public SimulatedErForceSimTacticTestFixture
     Field field          = Field::createField(field_type);
 };
 
+TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_no_obstacle)
+{
+    Point destination      = Point(3, 0);
+    Point initial_position = Point(-2.5, 0);
+    BallState ball_state(Point(1, 2), Vector(0, 0));
+    auto friendly_robots =
+            TestUtil::createStationaryRobotStatesWithId({Point(-3, 0), initial_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId(
+        {Point(-2, -2)});
+
+    auto tactic = std::make_shared<MoveTactic>();
+    tactic->updateControlParams(destination, Angle::zero(), 0);
+    setTactic(tactic);
+    setFriendlyRobotId(1);
+
+    std::vector<ValidationFunction> terminating_validation_functions     = {};
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
+    terminating_validation_functions, non_terminating_validation_functions,
+    Duration::fromSeconds(6));
+}
+
 TEST_F(SimulatedHRVOTest, test_three_robot_wall)
 {
     Point destination      = Point(4, 0);
