@@ -104,17 +104,17 @@ class Session(socketserver.BaseRequestHandler):
 
         """
         if self.convert_from_any:
-            p = base64.b64decode(self.request[0])
+            packet = base64.b64decode(self.request[0])
             msg = self.proto_type()
-            any_msg = Any.FromString(p)
+            any_msg = Any.FromString(packet)
             any_msg.Unpack(msg)
         else:
-            p = None
+            packet = None
             if self.proto_type == RobotLog:
-                p = base64.b64decode(self.request[0])
+                packet = base64.b64decode(self.request[0])
             else:
-                p = self.request[0]
-            msg = self.proto_type.FromString(p)
+                packet = self.request[0]
+            msg = self.proto_type.FromString(packet)
 
         self.handle_callback(msg)
 

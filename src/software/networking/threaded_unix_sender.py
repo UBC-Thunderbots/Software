@@ -49,7 +49,7 @@ class ThreadedUnixSender:
                 try:
                     self.socket.sendto(send, self.unix_path)
                 except Exception:
-                    logging.exception("something died {}".format(self.unix_path))
+                    logging.exception("Failed to send on {}".format(self.unix_path))
 
     def send(self, proto):
         """Buffer a protobuf to be sent by the send thread
