@@ -1,11 +1,13 @@
-import socketserver
-import time
 import base64
+import logging
 import os
+import queue
+import socketserver
+from threading import Thread
+
 from google.protobuf import text_format
 from google.protobuf.any_pb2 import Any
-from threading import Thread
-import queue
+from proto.robot_log_msg_pb2 import RobotLog
 
 
 class ThreadedUnixListener:
@@ -37,7 +39,7 @@ class ThreadedUnixListener:
         self.unix_path = unix_path
         self.proto_buffer = queue.Queue(max_buffer_size)
 
-        self.thread = Thread(target=self.start)
+        self.thread = Thread(target=self.start, daemon=True)
         self.thread.start()
 
     @property
@@ -66,7 +68,7 @@ class ThreadedUnixListener:
         try:
             self.proto_buffer.put_nowait(proto)
         except queue.Full as queue_full:
-            print("buffer overrun for {}".format(self.unix_path))
+            logging.warning("receive buffer overrun for {}".format(self.unix_path))
 
     def serve_till_stopped(self):
         """Keep handling requests until force_stop is called
@@ -101,13 +103,17 @@ class Session(socketserver.BaseRequestHandler):
         Then, trigger the handle callback
 
         """
-        p = base64.b64decode(self.request[0])
-        msg = self.proto_type()
-
         if self.convert_from_any:
+            p = base64.b64decode(self.request[0])
+            msg = self.proto_type()
             any_msg = Any.FromString(p)
             any_msg.Unpack(msg)
         else:
+            p = None
+            if self.proto_type == RobotLog:
+                p = base64.b64decode(self.request[0])
+            else:
+                p = self.request[0]
             msg = self.proto_type.FromString(p)
 
         self.handle_callback(msg)
