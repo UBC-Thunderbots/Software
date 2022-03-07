@@ -9,6 +9,8 @@ BASE_Y = 20
 """
 This screen is used to edit the chip and kick speed settings
 """
+
+
 class ChipAndKickScreen(Screen):
     def __init__(self, lcd_display, redis_dict, status_codes):
         self.enable = False if redis_dict["chip and kick enable"] == 0 else True
@@ -23,7 +25,7 @@ class ChipAndKickScreen(Screen):
             self.curr_action = 0
 
             return {self.status_codes["change screen"]: "Menu"}
-        
+
         def set_chip_and_kick_speed():
             """ Enable and disable settings """
             if self.enable:
@@ -38,7 +40,7 @@ class ChipAndKickScreen(Screen):
                     "value": 1 if self.enable else 0,
                 }
             }
-        
+
         def set_chip():
             """ Set chip speed """
             return {
@@ -49,7 +51,7 @@ class ChipAndKickScreen(Screen):
                     "redis key": "chip speed",
                 }
             }
-        
+
         def set_kick():
             """ Set kick speed """
             return {
@@ -60,14 +62,14 @@ class ChipAndKickScreen(Screen):
                     "redis key": "kick speed",
                 }
             }
-        
+
         # Listing actions for Config Wheels Screen
         self.actions = ["Set Chip and Kick Speed", "Chip", "Kick", "Menu"]
         self.action_map = {
-            self.actions[0]: set_chip_and_kick_speed, 
+            self.actions[0]: set_chip_and_kick_speed,
             self.actions[1]: set_chip,
             self.actions[2]: set_kick,
-            self.actions[3]: menu
+            self.actions[3]: menu,
         }
 
         def draw_screen():
@@ -77,11 +79,11 @@ class ChipAndKickScreen(Screen):
             cursor = ">"
             cursor_size = self.font.getsize(cursor)[0]
             cursor_pos_x = 0
-            if self.curr_action != len(self.actions)-1:
+            if self.curr_action != len(self.actions) - 1:
                 cursor_pos_y = 20 + self.font_size * self.curr_action
             else:
                 cursor_pos_y = self.lcd_display.height - self.font_size - PADDING
-            
+
             self.lcd_display.draw.text(
                 (cursor_pos_x, cursor_pos_y), cursor, font=self.font, fill="#ffffff"
             )
@@ -102,7 +104,7 @@ class ChipAndKickScreen(Screen):
                 fill="#00ff00" if self.enable else "#0000ff",
             )
 
-            x = cursor_size 
+            x = cursor_size
             y += self.font_size
             chip_str = "Chip Speed: "
             self.lcd_display.draw.text((x, y), chip_str, font=self.font, fill="#ffffff")
@@ -121,18 +123,15 @@ class ChipAndKickScreen(Screen):
             )
 
             x = cursor_size
-            y = (
-                self.lcd_display.height - self.font_size - PADDING
-            )  
+            y = self.lcd_display.height - self.font_size - PADDING
             self.lcd_display.draw.text(
-                (x, y),
-                "Go to Menu screen",
-                font=self.font,
-                fill="#ffffff",
+                (x, y), "Go to Menu screen", font=self.font, fill="#ffffff",
             )
 
         # Pass Wheel Screen parameters to super class
-        super().__init__(lcd_display, status_codes, self.actions, self.action_map, draw_screen)
+        super().__init__(
+            lcd_display, status_codes, self.actions, self.action_map, draw_screen
+        )
 
     def update_values(self, redis_dict):
         if not self.edit_mode:

@@ -43,6 +43,8 @@ redis_keys = [
 This is the top level class for the robot user interface. It ties together the 
 rotary encoder, lcd display, redis server, and all the screens.
 """
+
+
 class RobotUi:
     def __init__(self):
 
@@ -51,7 +53,7 @@ class RobotUi:
         self.redis_dict = {}
         for key in redis_keys:
             self.redis_dict[key] = float(self.r.get(key).decode("UTF-8"))
-        self.shutdown = False # This flag will be used to stop polling redis 
+        self.shutdown = False  # This flag will be used to stop polling redis
 
         # Draw Tbots logo on first boot
         self.lcd_display = LcdDisplay()
@@ -80,7 +82,7 @@ class RobotUi:
                 payload = action[status_codes["update redis"]]
                 self.r.set(payload["redis key"], payload["value"])
                 self.redis_dict[payload["redis key"]] = payload["value"]
-                #print("Key: {}, Value: {}".format(payload["redis key"], self.r.get(payload["redis key"]).decode("UTF-8")))
+                # print("Key: {}, Value: {}".format(payload["redis key"], self.r.get(payload["redis key"]).decode("UTF-8")))
 
         def on_clockwise_rotate():
             """ Execute the clockwise rotate callback of curr screen """
@@ -106,7 +108,7 @@ class RobotUi:
         while not self.shutdown:
             for key in redis_keys:
                 self.redis_dict[key] = float(self.r.get(key).decode("UTF-8"))
-            
+
             for _, screen in self.screens.items():
                 if _ != "Menu":
                     screen.update_values(self.redis_dict)
@@ -123,7 +125,7 @@ if __name__ == "__main__":
     sys.path.append("./redis-test/")
     import subprocess
     from threading import Thread
-    
+
     def init_redis():
         r = redis.Redis(host="localhost", port=6379, db=0)
         redis_dict = {}
@@ -139,7 +141,7 @@ if __name__ == "__main__":
     init_redis()
 
     robot_ui = RobotUi()
-    thread = Thread(target=start_polling, args=(robot_ui, ))
+    thread = Thread(target=start_polling, args=(robot_ui,))
     thread.start()
 
     print("Press any key to exit...")

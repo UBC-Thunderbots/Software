@@ -11,6 +11,8 @@ BASE_Y = 20
 """
 This screen is used to edit wheel speed settings
 """
+
+
 class WheelsScreen(Screen):
     def __init__(self, lcd_display, redis_dict, status_codes):
         self.enable = False if redis_dict["wheels enable"] == 0 else True
@@ -104,7 +106,7 @@ class WheelsScreen(Screen):
             cursor = ">"
             cursor_size = self.font.getsize(cursor)[0]
             cursor_pos_x = 0
-            if self.curr_action != len(self.actions)-1:
+            if self.curr_action != len(self.actions) - 1:
                 cursor_pos_y = BASE_Y + self.font_size * self.curr_action
             else:
                 cursor_pos_y = self.lcd_display.height - self.font_size - PADDING
@@ -186,14 +188,9 @@ class WheelsScreen(Screen):
             )
 
             x = cursor_size
-            y = (
-                self.lcd_display.height - self.font_size - PADDING
-            ) 
+            y = self.lcd_display.height - self.font_size - PADDING
             self.lcd_display.draw.text(
-                (x, y),
-                "Go to Menu screen",
-                font=self.font,
-                fill="#ffffff",
+                (x, y), "Go to Menu screen", font=self.font, fill="#ffffff",
             )
 
         # Pass Wheel Screen parameters to super class

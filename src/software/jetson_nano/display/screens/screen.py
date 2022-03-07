@@ -5,6 +5,8 @@ import subprocess
 All new screens will inherit from this class. This class will handles editing variables and maintaining
 the current action the cursor is hovering.
 """
+
+
 class Screen:
     def __init__(self, lcd_display, status_codes, actions, action_map, draw_screen):
         self.lcd_display = lcd_display
@@ -59,7 +61,10 @@ class Screen:
             signal = "N/A"
 
         self.lcd_display.draw.text(
-            (self.lcd_display.width - self.font.getsize(signal)[0], 2), signal, font=self.font, fill="#000000"
+            (self.lcd_display.width - self.font.getsize(signal)[0], 2),
+            signal,
+            font=self.font,
+            fill="#000000",
         )
 
         self.lcd_display.show()
