@@ -1,4 +1,4 @@
-import sys, redis
+import sys, time, redis
 import digitalio
 import board
 from PIL import Image, ImageDraw, ImageOps
@@ -40,15 +40,9 @@ redis_keys = [
 ]
 
 """
-TODO: 
-    - Integrate with redis server
-    - Add packet loss to dashboard
-    - Add robot & channel ID to dashboard
-    - Add battery & capacitor voltage to dashboard
-    - Poll redis server to continuously update values
+This is the top level class for the robot user interface. It ties together the 
+rotary encoder, lcd display, redis server, and all the screens.
 """
-
-
 class RobotUi:
     def __init__(self):
 
@@ -56,7 +50,8 @@ class RobotUi:
         self.r = redis.Redis(host="localhost", port=6379, db=0)
         self.redis_dict = {}
         for key in redis_keys:
-            self.redis_dict[key] = self.r.get(key).decode("UTF-8")
+            self.redis_dict[key] = float(self.r.get(key).decode("UTF-8"))
+        self.shutdown = False # This flag will be used to stop polling redis 
 
         # Draw Tbots logo on first boot
         self.lcd_display = LcdDisplay()
@@ -82,9 +77,10 @@ class RobotUi:
                 self.screens[self.curr_screen].draw_screen()
                 self.lcd_display.show()
             elif status_codes["update redis"] in action:
-                payload = action[self.status_codes["update redis"]]
+                payload = action[status_codes["update redis"]]
                 self.r.set(payload["redis key"], payload["value"])
                 self.redis_dict[payload["redis key"]] = payload["value"]
+                #print("Key: {}, Value: {}".format(payload["redis key"], self.r.get(payload["redis key"]).decode("UTF-8")))
 
         def on_clockwise_rotate():
             """ Execute the clockwise rotate callback of curr screen """
@@ -105,7 +101,20 @@ class RobotUi:
 
         self.rotary_encoder.start()
 
+    def poll_redis(self):
+        """ Update redis dict every 10 seconds """
+        while not self.shutdown:
+            for key in redis_keys:
+                self.redis_dict[key] = float(self.r.get(key).decode("UTF-8"))
+            
+            for _, screen in self.screens.items():
+                if _ != "Menu":
+                    screen.update_values(self.redis_dict)
+            time.sleep(10)
+
     def stop(self):
+        """ Cleanup the GPIO pins """
+        self.shutdown = True
         self.rotary_encoder.stop()
 
 
@@ -113,15 +122,30 @@ class RobotUi:
 if __name__ == "__main__":
     sys.path.append("./redis-test/")
     import subprocess
+    from threading import Thread
+    
+    def init_redis():
+        r = redis.Redis(host="localhost", port=6379, db=0)
+        redis_dict = {}
+        for key in redis_keys:
+            r.set(key, 0)
+
+    def start_polling(robot_ui):
+        robot_ui.poll_redis()
 
     # start redis server
     cmd = "cd redis-test && sudo docker-compose up -d"
     st, out = subprocess.getstatusoutput(cmd)
+    init_redis()
 
     robot_ui = RobotUi()
+    thread = Thread(target=start_polling, args=(robot_ui, ))
+    thread.start()
+
     print("Press any key to exit...")
     input()
     robot_ui.stop()
+    thread.join()
 
     # stop redis server
     cmd = "cd redis-test && sudo docker-compose down"

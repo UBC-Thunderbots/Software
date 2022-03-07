@@ -1,13 +1,20 @@
 from PIL import ImageFont
 import subprocess
 
-
+"""
+All new screens will inherit from this class. This class will handles editing variables and maintaining
+the current action the cursor is hovering.
+"""
 class Screen:
     def __init__(self, lcd_display, status_codes, actions, action_map, draw_screen):
         self.lcd_display = lcd_display
         self.font_size = 12
         self.font = ImageFont.truetype(
             "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", self.font_size
+        )
+        self.big_font_size = 22
+        self.big_font = ImageFont.truetype(
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", self.big_font_size
         )
         self.status_codes = status_codes
         self.draw_screen = draw_screen
@@ -33,22 +40,26 @@ class Screen:
             fill="#ffffff",
         )
 
-        # TODO: try using getouput or get statusoutput instead of checkoutput
-
         # Get IP address
-        cmd = "hostname -I | cut -d' ' -f1"
-        IP = "  IP: " + subprocess.check_output(cmd, shell=True).decode("utf-8")
+        try:
+            cmd = "hostname -I | cut -d' ' -f1"
+            IP = "  IP: " + subprocess.check_output(cmd, shell=True).decode("utf-8")
+        except:
+            IP = "  IP: N/A"
 
         self.lcd_display.draw.text((0, 2), IP, font=self.font, fill="#000000")
 
         # Get signal strength
-        cmd = "iwconfig | grep 'Signal level='"
-        signal = " " + subprocess.check_output(
-            cmd, stderr=subprocess.STDOUT, shell=True
-        ).decode("utf-8").split("Signal level=")[1].replace("\n", "")
+        try:
+            cmd = "iwconfig | grep 'Signal level='"
+            signal = " " + subprocess.check_output(
+                cmd, stderr=subprocess.STDOUT, shell=True
+            ).decode("utf-8").split("Signal level=")[1].replace("\n", "")
+        except:
+            signal = "N/A"
 
         self.lcd_display.draw.text(
-            (self.lcd_display.width / 2 + 24, 2), signal, font=self.font, fill="#000000"
+            (self.lcd_display.width - self.font.getsize(signal)[0], 2), signal, font=self.font, fill="#000000"
         )
 
         self.lcd_display.show()
@@ -81,7 +92,6 @@ class Screen:
             else:
                 action = {self.status_codes["none"]: None}
             self.edit_mode = not self.edit_mode
-
         return action
 
     def on_clockwise_rotate(self):
