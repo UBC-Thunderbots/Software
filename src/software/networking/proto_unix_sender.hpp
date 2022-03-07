@@ -11,7 +11,10 @@ class ProtoUnixSender
 {
    public:
     /**
-     * TODO
+     * Creates a ProtoUnixSender
+     *
+     * @param io_service The io service
+     * @param unix_path The unix socket pack to send on
      */
     ProtoUnixSender(boost::asio::io_service& io_service, const std::string& unix_path);
 

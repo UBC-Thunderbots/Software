@@ -10,7 +10,11 @@ class ThreadedProtoUnixListener
 {
    public:
     /*
-     * TODO
+     * Listens for packets over the provided unix socket and triggers the
+     * receive_callback on a new message.
+     *
+     * @param unix_path The unix path to connect to
+     * @param receive_callback The callback to trigger on a new packet
      */
     ThreadedProtoUnixListener(const std::string& unix_path,
                               std::function<void(ReceiveProtoT)> receive_callback);
