@@ -4,57 +4,30 @@
 #include "proto/message_translation/ssl_wrapper.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_log_msg.pb.h"
-#include "proto/sensor_msg.pb.h"
 #include "shared/constants.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/constants.h"
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-const std::string VISION_OUTPUT_PATH      = "/vision";
-const std::string PRIMITIVE_OUTPUT_PATH   = "/primitive";
-const std::string ROBOT_STATUS_INPUT_PATH = "/robot_status";
-const std::string DEFENDING_SIDE_OUTPUT   = "/defending_side";
-const std::string SSL_WRAPPER_INPUT_PATH  = "/ssl_wrapper";
-const std::string SSL_REFEREE_INPUT_PATH  = "/ssl_referee";
-const std::string SENSOR_PROTO_INPUT_PATH = "/sensor_proto";
-
 SimulatorBackend::SimulatorBackend(std::shared_ptr<const BackendConfig> config)
-    : sensor_fusion_config(config->getSimulatorBackendConfig()->getSensorFusionConfig())
+    : network_config(config->getSimulatorBackendConfig()->getNetworkConfig()),
+      sensor_fusion_config(config->getSimulatorBackendConfig()->getSensorFusionConfig()),
+      ssl_proto_client(boost::bind(&Backend::receiveSSLWrapperPacket, this, _1),
+                       boost::bind(&Backend::receiveSSLReferee, this, _1),
+                       network_config->getSslCommunicationConfig())
 {
-    // Protobuf Inputs
-    robot_status_input.reset(new ThreadedProtoUnixListener<TbotsProto::RobotStatus>(
-        config->getSimulatorBackendConfig()->getBaseUnixPath()->value() +
-            ROBOT_STATUS_INPUT_PATH,
-        boost::bind(&Backend::receiveRobotStatus, this, _1)));
+    std::string network_interface = this->network_config->getNetworkInterface()->value();
+    int channel                   = this->network_config->getChannel()->value();
 
-    ssl_wrapper_input.reset(new ThreadedProtoUnixListener<SSLProto::SSL_WrapperPacket>(
-        config->getSimulatorBackendConfig()->getBaseUnixPath()->value() +
-            SSL_WRAPPER_INPUT_PATH,
-        boost::bind(&Backend::receiveSSLWrapperPacket, this, _1)));
+    network_config->getChannel()->registerCallbackFunction([this](int new_channel) {
+        std::string new_network_interface =
+            this->network_config->getNetworkInterface()->value();
+        joinMulticastChannel(new_channel, new_network_interface);
+    });
 
-    ssl_referee_input.reset(new ThreadedProtoUnixListener<SSLProto::Referee>(
-        config->getSimulatorBackendConfig()->getBaseUnixPath()->value() +
-            SSL_REFEREE_INPUT_PATH,
-        boost::bind(&Backend::receiveSSLReferee, this, _1)));
-
-    sensor_proto_input.reset(new ThreadedProtoUnixListener<SensorProto>(
-        config->getSimulatorBackendConfig()->getBaseUnixPath()->value() +
-            SENSOR_PROTO_INPUT_PATH,
-        boost::bind(&Backend::receiveSensorProto, this, _1)));
-
-    // Protobuf Outputs
-    vision_output.reset(new ThreadedProtoUnixSender<TbotsProto::Vision>(
-        config->getSimulatorBackendConfig()->getBaseUnixPath()->value() +
-        VISION_OUTPUT_PATH));
-
-    primitive_output.reset(new ThreadedProtoUnixSender<TbotsProto::PrimitiveSet>(
-        config->getSimulatorBackendConfig()->getBaseUnixPath()->value() +
-        PRIMITIVE_OUTPUT_PATH));
-
-    defending_side_output.reset(new ThreadedProtoUnixSender<DefendingSideProto>(
-        config->getSimulatorBackendConfig()->getBaseUnixPath()->value() +
-        DEFENDING_SIDE_OUTPUT));
+    // connect to current channel
+    joinMulticastChannel(channel, network_interface);
 }
 
 void SimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
@@ -78,6 +51,38 @@ void SimulatorBackend::onValueReceived(World world)
 {
     vision_output->sendProto(*createVision(world));
     LOG(VISUALIZE) << *createWorld(world);
+}
+
+void SimulatorBackend::receiveRobotLogs(TbotsProto::RobotLog log)
+{
+    LOG(INFO) << "[ROBOT " << log.robot_id() << " " << LogLevel_Name(log.log_level())
+              << "]"
+              << "[" << log.file_name() << ":" << log.line_number()
+              << "]: " << log.log_msg() << std::endl;
+}
+
+void SimulatorBackend::joinMulticastChannel(int channel, const std::string& interface)
+{
+    vision_output.reset(new ThreadedProtoUdpSender<TbotsProto::Vision>(
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface, VISION_PORT,
+        true));
+
+    primitive_output.reset(new ThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface,
+        PRIMITIVE_PORT, true));
+
+    robot_status_input.reset(new ThreadedProtoUdpListener<TbotsProto::RobotStatus>(
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface,
+        ROBOT_STATUS_PORT, boost::bind(&Backend::receiveRobotStatus, this, _1), true));
+
+    robot_log_input.reset(new ThreadedProtoUdpListener<TbotsProto::RobotLog>(
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface,
+        ROBOT_LOGS_PORT, boost::bind(&SimulatorBackend::receiveRobotLogs, this, _1),
+        true));
+
+    defending_side_output.reset(new ThreadedProtoUdpSender<DefendingSideProto>(
+        std::string(SIMULATOR_MULTICAST_CHANNELS[channel]) + "%" + interface,
+        DEFENDING_SIDE_PORT, true));
 }
 
 // Register this backend in the genericFactory

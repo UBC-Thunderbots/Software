@@ -118,18 +118,6 @@ cc_test(
     ],
 )
 
-cc_library(
-    name = "tactic_stepper",
-    srcs = ["tactic_stepper.cpp"],
-    hdrs = ["tactic_stepper.h"],
-    deps = [
-        "//software/ai/hl/stp/tactic",
-        "//software/ai/navigator",
-        "//software/ai/navigator/path_manager:velocity_obstacle_path_manager",
-        "//software/ai/navigator/path_planner:theta_star_path_planner",
-    ],
-)
-
 py_library(
     name = "simulated_test_fixture",
     srcs = [
@@ -153,7 +141,7 @@ py_library(
         "standalone_simulator_wrapper.py",
     ],
     data = [
-        "//software/simulation:standalone_er_force_simulator_main",
+        "//software:er_force_simulator_main",
     ],
     deps = [
         "//proto:software_py_proto",
@@ -170,7 +158,7 @@ py_library(
         "full_system_wrapper.py",
     ],
     data = [
-        "//software:full_system",
+        "//software:unix_full_system",
         "//software/geom:geometry.so",
     ],
     deps = [

@@ -55,6 +55,31 @@ cc_library(
         "//shared:constants",
         "//software:constants",
         "//software/logger",
+        "//software/networking:threaded_proto_udp_listener",
+        "//software/networking:threaded_proto_udp_sender",
+        "//software/util/generic_factory",
+    ],
+    # We force linking so that the static variables required for the "factory"
+    # design pattern to work are linked in
+    # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
+    alwayslink = True,
+)
+
+cc_library(
+    name = "unix_simulator_backend",
+    srcs = ["unix_simulator_backend.cpp"],
+    hdrs = ["unix_simulator_backend.h"],
+    deps = [
+        ":backend",
+        ":ssl_proto_client",
+        "//proto:defending_side_msg_cc_proto",
+        "//proto:tbots_cc_proto",
+        "//proto/message_translation:defending_side",
+        "//proto/message_translation:ssl_wrapper",
+        "//proto/message_translation:tbots_protobuf",
+        "//shared:constants",
+        "//software:constants",
+        "//software/logger",
         "//software/networking:threaded_proto_unix_listener",
         "//software/networking:threaded_proto_unix_sender",
         "//software/util/generic_factory",

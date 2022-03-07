@@ -1,6 +1,29 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
+    name = "unix_full_system",
+    srcs = ["unix_full_system_main.cpp"],
+    deps = [
+        "//proto/logging:proto_logger",
+        "//proto/message_translation:ssl_wrapper",
+        "//shared/parameter:cpp_configs",
+        "//shared/parameter:dynamic_param_cc_proto",
+        "//software:constants",
+        "//software/ai:threaded_ai",
+        "//software/backend",
+        "//software/backend:all_backends",
+        "//software/estop:arduino_util",
+        "//software/gui/full_system:threaded_full_system_gui",
+        "//software/logger",
+        "//software/multithreading:observer_subject_adapter",
+        "//software/networking:threaded_proto_unix_listener",
+        "//software/sensor_fusion:threaded_sensor_fusion",
+        "//software/util/generic_factory",
+        "@boost//:program_options",
+    ],
+)
+
+cc_binary(
     name = "full_system",
     srcs = ["full_system_main.cpp"],
     deps = [
@@ -32,6 +55,17 @@ cc_binary(
         "//software/logger",
         "//software/simulation:standalone_simulator",
         "@boost//:program_options",
+    ],
+)
+
+cc_binary(
+    name = "er_force_simulator_main",
+    srcs = ["er_force_simulator_main.cpp"],
+    deps = [
+        "//software:constants",
+        "//software/networking:threaded_proto_unix_listener",
+        "//software/networking:threaded_proto_unix_sender",
+        "//software/simulation:er_force_simulator",
     ],
 )
 
