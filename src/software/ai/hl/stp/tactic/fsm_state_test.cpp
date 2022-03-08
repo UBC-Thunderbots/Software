@@ -11,7 +11,7 @@ TEST(FsmStateTest, test_get_fsm_state)
     Robot robot = ::TestUtil::createRobotAtPos(Point(-2, -3));
     Pass pass   = Pass(Point(0, 0), Point(2, 0), 5);
 
-    EXPECT_EQ("DribbleFSM.GetPossessionState", tactic.getFSMState());
+    EXPECT_EQ("DribbleFSM.GetPossession", tactic.getFSMState());
     tactic.updateControlParams(pass, true);
     tactic.get(robot, world);
 
@@ -22,7 +22,7 @@ TEST(FsmStateTest, test_get_fsm_state)
 
     // process event once to fall through the Dribble FSM
     tactic.get(robot, world);
-    EXPECT_EQ("PivotKickFSM.DribbleFSM.DribbleState", tactic.getFSMState());
+    EXPECT_EQ("PivotKickFSM.DribbleFSM.Dribble", tactic.getFSMState());
 
     // robot should now kick the ball
     tactic.get(robot, world);
