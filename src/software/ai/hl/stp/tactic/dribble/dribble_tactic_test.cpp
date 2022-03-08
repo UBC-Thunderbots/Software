@@ -145,7 +145,7 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            // TODO: tune dribbling and re-enable
+            // TODO (#2514): tune dribbling and re-enable
             // robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
 
@@ -183,8 +183,7 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_orientation)
             Duration::fromSeconds(10));
 }
 
-// TODO: fix this
-TEST_F(DribbleTacticTest, DISABLED_test_moving_ball_dribble_dest_and_orientation)
+TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest_and_orientation)
 {
     Point initial_position    = Point(-2, 1.5);
     Point dribble_destination = Point(-1, 2);
@@ -210,13 +209,13 @@ TEST_F(DribbleTacticTest, DISABLED_test_moving_ball_dribble_dest_and_orientation
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            // TODO: tune dribbling and re-enable
+            // TODO (#2514): tune dribbling and re-enable
             // robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(20));
+            Duration::fromSeconds(22));
 }
 
 TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
@@ -244,7 +243,7 @@ TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            // TODO: tune dribbling and re-enable
+            // TODO (#2514): tune dribbling and re-enable
             // robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
 
@@ -316,7 +315,7 @@ TEST_F(DribbleTacticTest, test_running_into_enemy_robot_knocking_ball_away)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {
         [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-            // TODO: tune dribbling and re-enable
+            // TODO (#2514): tune dribbling and re-enable
             // robotNotExcessivelyDribbling(1, world_ptr, yield);
         }};
 

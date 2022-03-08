@@ -4,7 +4,7 @@
 
 #include "software/test_util/test_util.h"
 
-// TODO: fix and re-enable
+// TODO (#2473): fix and re-enable
 TEST(PenaltyKickFSM, DISABLED_test_transitions)
 {
     World world = ::TestUtil::createBlankTestingWorld();

@@ -25,7 +25,7 @@ class PenaltyKickTacticTest : public SimulatedErForceSimTacticTestFixture,
         0, RobotState(initial_position, Vector(0, 0), Angle::zero(), Angle::zero())};
 };
 
-// TODO: fix and re-enable
+// TODO (#2232): Improve dribbling control so the ball is not lost during this test
 TEST_P(PenaltyKickTacticTest, DISABLED_penalty_kick_test)
 {
     RobotStateWithId enemy_robot = GetParam();
@@ -84,12 +84,9 @@ TEST_F(PenaltyKickTacticTest, DISABLED_penalty_no_goalie)
 INSTANTIATE_TEST_CASE_P(
     RobotLocations, PenaltyKickTacticTest,
     ::testing::Values(
-        // TODO: Improve dribbling control so the ball is not lost during this test
-        // https://github.com/UBC-Thunderbots/Software/issues/2232
         // enemy robot stationary at centre of goal
-        // RobotStateWithId{0,
-        // RobotState(Field::createSSLDivisionBField().enemyGoalCenter(),
-        //                                Vector(0, 0), Angle::half(), Angle::zero())},
+        RobotStateWithId{0, RobotState(Field::createSSLDivisionBField().enemyGoalCenter(),
+                                       Vector(0, 0), Angle::half(), Angle::zero())},
 
         // enemy robot stationary left of net
         RobotStateWithId{0,

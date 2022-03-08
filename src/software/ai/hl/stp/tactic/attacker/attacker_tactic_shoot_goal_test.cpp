@@ -81,7 +81,7 @@ INSTANTIATE_TEST_CASE_P(
                         TestUtil::createStationaryRobotStatesWithId(
                             {Point(1, 0), Point(3, 1.2), Point(3, 0.8), Point(3.1, 0.6),
                              Point(3.1, 1), Point(4.2, 0.5)}))
-        // TODO:fix and re-enable
+        // TODO(#2468): Fix and re-enable
         // enemy trying to steal
         // std::make_tuple(BallState(Point(2.5, -1), Vector()), Point(1, 1),
         //                 TestUtil::createStationaryRobotStatesWithId(
