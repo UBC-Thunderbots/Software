@@ -190,7 +190,6 @@ void SensorFusion::updateWorld(
         if (robot_status_msg.has_break_beam_status() &&
             robot_status_msg.break_beam_status().ball_in_beam())
         {
-            std::cout << "breakbeam" << std::endl;
             friendly_robot_id_with_ball_in_dribbler = robot_id;
         }
         if ((!robot_status_msg.has_break_beam_status() ||
