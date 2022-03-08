@@ -1,5 +1,6 @@
 import pyqtgraph as pg
 import math
+import queue
 
 from pyqtgraph.Qt import QtCore, QtGui
 from proto.world_pb2 import World, Field
@@ -18,12 +19,11 @@ import software.thunderscope.colors as colors
 
 
 class WorldLayer(FieldLayer):
-    def __init__(self):
+    def __init__(self, buffer_size=10):
         FieldLayer.__init__(self)
-        self.world_receiver = ThreadedUnixListener(
-            UNIX_SOCKET_BASE_PATH + World.DESCRIPTOR.full_name, World, max_buffer_size=1
-        )
         self.cached_world = World()
+
+        self.world_buffer = queue.Queue(buffer_size)
 
     def draw_field(self, painter, field: Field):
 
@@ -126,10 +126,11 @@ class WorldLayer(FieldLayer):
 
         """
 
-        world = self.world_receiver.maybe_pop()
-
-        if not world:
+        try:
+            world = self.world_buffer.get_nowait()
+        except queue.Empty as empty:
             world = self.cached_world
+
         self.cached_world = world
         self.draw_field(painter, world.field)
         self.draw_ball(painter, world.ball)
