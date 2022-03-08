@@ -30,6 +30,7 @@ void SimulatedErForceSimTestFixture::SetUp()
 {
     LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
 
+    // new configs so that callbacks to the previous test's AI are cleared
     friendly_mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
     enemy_mutable_thunderbots_config    = std::make_shared<ThunderbotsConfig>();
     friendly_thunderbots_config = std::const_pointer_cast<const ThunderbotsConfig>(
@@ -57,6 +58,7 @@ void SimulatedErForceSimTestFixture::SetUp()
         ->getMutableDefendingPositiveSide()
         ->setValue(true);
 
+    // reinitializing to prevent the previous test's configs from being reused
     friendly_sensor_fusion =
         SensorFusion(friendly_thunderbots_config->getSensorFusionConfig());
     enemy_sensor_fusion = SensorFusion(enemy_thunderbots_config->getSensorFusionConfig());
