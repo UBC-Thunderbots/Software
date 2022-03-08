@@ -123,10 +123,16 @@ std::unique_ptr<TbotsProto::Field> createField(const Field& field)
 
 std::unique_ptr<TbotsProto::RobotState> createRobotStateProto(const Robot& robot)
 {
-    auto position         = createPointProto(robot.position());
-    auto orientation      = createAngleProto(robot.orientation());
-    auto velocity         = createVectorProto(robot.velocity());
-    auto angular_velocity = createAngularVelocityProto(robot.angularVelocity());
+    return createRobotStateProto(robot.currentState());
+}
+
+std::unique_ptr<TbotsProto::RobotState> createRobotStateProto(
+    const RobotState& robot_state)
+{
+    auto position         = createPointProto(robot_state.position());
+    auto orientation      = createAngleProto(robot_state.orientation());
+    auto velocity         = createVectorProto(robot_state.velocity());
+    auto angular_velocity = createAngularVelocityProto(robot_state.angularVelocity());
 
     auto robot_state_msg = std::make_unique<TbotsProto::RobotState>();
 
@@ -328,4 +334,11 @@ RobotState createRobotState(const TbotsProto::RobotState robot_state)
                       createVector(robot_state.global_velocity()),
                       createAngle(robot_state.global_orientation()),
                       createAngularVelocity(robot_state.global_angular_velocity()));
+}
+
+BallState createBallState(const TbotsProto::BallState ball_state)
+{
+    return BallState(createPoint(ball_state.global_position()),
+                     createVector(ball_state.global_velocity()),
+                     ball_state.distance_from_ground());
 }
