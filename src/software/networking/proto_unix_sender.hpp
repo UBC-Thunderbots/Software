@@ -50,5 +50,4 @@ void ProtoUnixSender<SendProto>::sendProto(const SendProto& message)
 template <class SendProto>
 ProtoUnixSender<SendProto>::~ProtoUnixSender()
 {
-    // TODO remove me
 }

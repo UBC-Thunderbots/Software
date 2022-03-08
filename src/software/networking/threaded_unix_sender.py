@@ -8,13 +8,14 @@ from google.protobuf.any_pb2 import Any
 
 
 class ThreadedUnixSender:
-    def __init__(self, unix_path, max_buffer_size=3, convert_to_any=True):
+    def __init__(self, unix_path, max_buffer_size=3):
 
         """Send protobufs over unix sockets
 
         :param unix_path: The unix path to send the protobuf to
-        :param max_buffer_size: The size of the send buffer
-        :param convert_from_any: Convert from any
+        :param max_buffer_size: The size of the send buffer. If
+                the buffer gets spammed faster than the thread can
+                send them out, a buffer overrun msg will be logged.
 
         """
         self.unix_path = unix_path

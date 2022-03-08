@@ -3,7 +3,7 @@
 #include "software/networking/proto_unix_listener.hpp"
 
 /**
- * A threaded listener that receives serialized ReceiveProtoT Proto's over the network
+ * A threaded listener that receives serialized ReceiveProtoT protos over the network
  */
 template <class ReceiveProtoT>
 class ThreadedProtoUnixListener
