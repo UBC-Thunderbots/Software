@@ -6,7 +6,7 @@
 
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/simulated_tests/non_terminating_validation_functions/enemy_never_scores_validation.h"
-#include "software/simulated_tests/simulated_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_in_polygon_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_received_ball_validation.h"
@@ -17,7 +17,7 @@
 #include "software/world/world.h"
 
 class GoalieTacticTest
-    : public SimulatedTacticTestFixture,
+    : public SimulatedErForceSimTacticTestFixture,
       public ::testing::WithParamInterface<std::tuple<BallState, RobotStateWithId>>
 {
    protected:
@@ -32,7 +32,8 @@ class GoalieTacticTest
                   " seconds to check that the enemy team did not score");
         }
     }
-    Field field = Field::createSSLDivisionBField();
+    FieldType field_type = FieldType::DIV_B;
+    Field field          = Field::createField(field_type);
     std::vector<RobotStateWithId> enemy_robots =
         TestUtil::createStationaryRobotStatesWithId(
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
@@ -67,7 +68,7 @@ TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_straight_line)
             enemyNeverScores(world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -100,7 +101,7 @@ TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_diagonal_line)
             enemyNeverScores(world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -126,7 +127,7 @@ TEST_F(GoalieTacticTest, test_ball_very_fast_misses_net)
             enemyNeverScores(world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -154,7 +155,7 @@ TEST_F(GoalieTacticTest, test_slow_ball_at_sharp_angle_to_friendly_goal)
             enemyNeverScores(world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -192,7 +193,7 @@ TEST_P(GoalieTacticTest, goalie_test)
             enemyNeverScores(world_ptr, yield);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }

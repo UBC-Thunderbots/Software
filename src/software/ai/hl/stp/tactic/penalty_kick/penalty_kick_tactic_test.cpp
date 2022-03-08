@@ -7,17 +7,18 @@
 #include "software/simulated_tests/non_terminating_validation_functions/ball_in_play_or_scored_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/ball_never_moves_backward_validation.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robot_not_excessively_dribbling_validation.h"
-#include "software/simulated_tests/simulated_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/friendly_scored_validation.h"
 #include "software/test_util/test_util.h"
 #include "software/world/field.h"
 
 // goalie
-class PenaltyKickTacticTest : public SimulatedTacticTestFixture,
+class PenaltyKickTacticTest : public SimulatedErForceSimTacticTestFixture,
                               public ::testing::WithParamInterface<RobotStateWithId>
 {
    protected:
-    Field field              = Field::createSSLDivisionBField();
+    FieldType field_type     = FieldType::DIV_B;
+    Field field              = Field::createField(field_type);
     BallState ball           = BallState(field.friendlyPenaltyMark(), Vector(0, 0));
     Point initial_position   = field.friendlyPenaltyMark() + Vector(-0.1, 0);
     RobotStateWithId shooter = {
@@ -47,7 +48,7 @@ TEST_P(PenaltyKickTacticTest, penalty_kick_test)
             robotNotExcessivelyDribbling(shooter_id, world_ptr, yield);
         }};
 
-    runTest(field, ball, {shooter}, {enemy_robot}, terminating_validation_functions,
+    runTest(field_type, ball, {shooter}, {enemy_robot}, terminating_validation_functions,
             non_terminating_validation_functions, Duration::fromSeconds(10));
 }
 
@@ -74,7 +75,7 @@ TEST_F(PenaltyKickTacticTest, penalty_no_goalie)
 
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(0, -2.5)});
 
-    runTest(field, ball, {shooter}, enemy_robots, terminating_validation_functions,
+    runTest(field_type, ball, {shooter}, enemy_robots, terminating_validation_functions,
             non_terminating_validation_functions, Duration::fromSeconds(10));
 }
 
