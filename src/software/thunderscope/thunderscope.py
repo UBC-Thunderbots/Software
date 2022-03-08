@@ -51,7 +51,7 @@ if __name__ == "__main__":
     # Configure Docks
     dock_area.addDock(field_dock, "left")
     dock_area.addDock(log_dock, "bottom", field_dock)
-    dock_area.addDock(check_boxes_dock, "right", log_dock)
+    dock_area.addDock(check_boxes_dock, "bottom", log_dock)
 
     def update():
         field.refresh()

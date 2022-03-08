@@ -4,7 +4,7 @@ from software.networking.threaded_unix_listener import ThreadedUnixListener
 import software.thunderscope.constants as constants
 from software.thunderscope.log.g3log_checkboxes import g3logCheckboxes
 
-from proto.robot_log_msg_pb2 import RobotLog
+from proto.robot_log_msg_pb2 import RobotLog, LogLevel
 
 
 class g3logWidget(pg_console.ConsoleWidget):
@@ -43,10 +43,22 @@ class g3logWidget(pg_console.ConsoleWidget):
 
         # Checks whether this type of log is enabled from checkboxes
         if (
-            (log.log_level == 0 and self.checkboxWidget.isChecked1())
-            or (log.log_level == 1 and self.checkboxWidget.isChecked2())
-            or (log.log_level == 2 and self.checkboxWidget.isChecked3())
-            or (log.log_level == 3 and self.checkboxWidget.isChecked4())
+            (
+                log.log_level == LogLevel.DEBUG
+                and self.checkboxWidget.debug_checkbox.isChecked()
+            )
+            or (
+                log.log_level == LogLevel.INFO
+                and self.checkboxWidget.info_checkbox.isChecked()
+            )
+            or (
+                log.log_level == LogLevel.WARNING
+                and self.checkboxWidget.warning_checkbox.isChecked()
+            )
+            or (
+                log.log_level == LogLevel.FATAL
+                and self.checkboxWidget.fatal_checkbox.isChecked()
+            )
         ):
             log_str = "{} {} [{}->{}] {}\n".format(
                 log.created_timestamp.epoch_timestamp_seconds,
