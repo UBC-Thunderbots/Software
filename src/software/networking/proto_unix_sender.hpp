@@ -24,6 +24,8 @@ class ProtoUnixSender
      * Sends a protobuf message to the initialized ip address and port
      * This function returns after the message has been sent.
      *
+     * If any errors occur, a warning message will be logged.
+     *
      * @param message The protobuf message to send
      */
     void sendProto(const SendProto& message);
