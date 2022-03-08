@@ -1,19 +1,19 @@
 #include <map>
 #include <set>
 
-#include "enlsvg_path_planner.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
+#include "software/ai/navigator/path_planner/enlsvg_path_planner.h"
 #include "software/geom/linear_spline2d.h"
 #include "software/geom/point.h"
 #include "software/logger/logger.h"
 
 using Path = LinearSpline2d;
 
-// TODO #2504: The GLobalPathPlanner doesn't handle
+// TODO #2504: The GlobalPathPlanner doesn't handle
 // MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE and
 // MotionConstraint::HALF_METER_AROUND_BALL correctly in most situations
 /**
