@@ -49,12 +49,6 @@ message Pass
     required double pass_speed_m_per_s = 3;
 }
 
-message Shot
-{
-    required Point point = 1;
-    required Angle angle = 2;
-}
-
 message EnemyThreat
 {
     // The enemy robot
