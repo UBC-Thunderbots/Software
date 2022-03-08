@@ -52,7 +52,7 @@ SimBall::SimBall(RNG *rng, btDiscreteDynamicsWorld *world) : m_rng(rng), m_world
     m_body = new btRigidBody(rbInfo);
     // see simulator.cpp
     m_body->setRestitution(1.f);
-    m_body->setFriction(1.f);
+    m_body->setFriction(0.7f);
 
     // \mu_r = -a / g = 0.0357 (while rolling)
     // rollingFriction in bullet is too unstable to be useful
