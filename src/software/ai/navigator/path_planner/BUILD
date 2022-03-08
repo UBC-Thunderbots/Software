@@ -72,9 +72,9 @@ cc_library(
 )
 
 cc_library(
-    name = "global_path_planner",
-    srcs = ["global_path_planner.cpp"],
-    hdrs = ["global_path_planner.h"],
+    name = "global_path_planner_factory",
+    srcs = ["global_path_planner_factory.cpp"],
+    hdrs = ["global_path_planner_factory.h"],
     deps = [
         ":enlsvg_path_planner",
         "//software/ai/hl/stp/tactic",
@@ -108,10 +108,10 @@ cc_test(
 )
 
 cc_test(
-    name = "global_path_planner_test",
-    srcs = ["global_path_planner_test.cpp"],
+    name = "global_path_planner_factory_test",
+    srcs = ["global_path_planner_factory_test.cpp"],
     deps = [
-        ":global_path_planner",
+        ":global_path_planner_factory",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
         "//software/world",

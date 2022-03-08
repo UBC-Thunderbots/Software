@@ -1,4 +1,4 @@
-#include "software/ai/navigator/path_planner/global_path_planner.h"
+#include "software/ai/navigator/path_planner/global_path_planner_factory.h"
 
 #include <chrono>
 
