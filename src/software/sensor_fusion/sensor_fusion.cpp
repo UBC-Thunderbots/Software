@@ -16,6 +16,7 @@ SensorFusion::SensorFusion(std::shared_ptr<const SensorFusionConfig> sensor_fusi
       team_with_possession(TeamSide::ENEMY),
       friendly_goalie_id(0),
       enemy_goalie_id(0),
+      ball_in_dribbler_timeout(0),
       reset_time_vision_packets_detected(0),
       last_t_capture(0)
 {
@@ -191,6 +192,7 @@ void SensorFusion::updateWorld(
             robot_status_msg.break_beam_status().ball_in_beam())
         {
             friendly_robot_id_with_ball_in_dribbler = robot_id;
+            ball_in_dribbler_timeout = NUM_DROPPED_DETECTIONS_BEFORE_BALL_NOT_IN_DRIBBLER;
         }
         if ((!robot_status_msg.has_break_beam_status() ||
              !robot_status_msg.break_beam_status().ball_in_beam()) &&
@@ -198,6 +200,7 @@ void SensorFusion::updateWorld(
             friendly_robot_id_with_ball_in_dribbler.value() == robot_id)
         {
             friendly_robot_id_with_ball_in_dribbler = std::nullopt;
+            ball_in_dribbler_timeout = 0;
         }
     }
 }
@@ -259,32 +262,17 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
         enemy_team    = createEnemyTeam(yellow_team);
     }
 
-    // update breakbeam status
-    auto friendly_team_robots = friendly_team.getAllRobots();
-    for (auto &friendly_robot : friendly_team_robots)
+    ball_in_dribbler_timeout--;
+    if (ball_in_dribbler_timeout <= 0)
     {
-        auto robot_state = friendly_robot.currentState();
-        friendly_robot.updateState(robot_state, friendly_robot.timestamp());
+        friendly_robot_id_with_ball_in_dribbler = std::nullopt;
+        ball_in_dribbler_timeout                = 0;
     }
-    friendly_team.updateRobots(friendly_team_robots);
-
-    // TODO don't make this hacky with statics
-    static std::optional<Robot> robot_with_ball_in_dribbler;
-    static const int NUM_DROPPED_DETECTIONS_BEFORE_BALL_NOT_IN_DRIBBLER = 3;
 
     if (friendly_robot_id_with_ball_in_dribbler.has_value())
     {
-        robot_with_ball_in_dribbler =
+        std::optional<Robot> robot_with_ball_in_dribbler =
             friendly_team.getRobotById(friendly_robot_id_with_ball_in_dribbler.value());
-        friendly_robot_id_with_ball_in_dribbler = std::nullopt;
-        ball_in_dribbler_timeout = NUM_DROPPED_DETECTIONS_BEFORE_BALL_NOT_IN_DRIBBLER;
-    }
-
-    if (ball_in_dribbler_timeout > 0)
-    {
-        // robot_with_ball_in_dribbler so lets decrement the counter so that we timeout
-        // properly
-        ball_in_dribbler_timeout--;
 
         if (robot_with_ball_in_dribbler.has_value())
         {
@@ -307,9 +295,6 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
     }
     else
     {
-        // If we got here, we timedout on ball in dribbler msgs
-        robot_with_ball_in_dribbler = std::nullopt;
-
         std::optional<Ball> new_ball = createBall(ball_detections);
         if (new_ball)
         {

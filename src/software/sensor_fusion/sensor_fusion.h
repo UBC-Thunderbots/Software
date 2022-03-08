@@ -143,7 +143,7 @@ class SensorFusion
 
     unsigned int friendly_goalie_id;
     unsigned int enemy_goalie_id;
-    int ball_in_dribbler_timeout = 0;
+    int ball_in_dribbler_timeout;
 
     // The number of "reset packets" we have received. These indicate that the
     // vision time should be reset. Please see `checkForVisionReset` to see how
@@ -152,4 +152,6 @@ class SensorFusion
 
     // The timestamp, in seconds, of the most recently received vision packet
     double last_t_capture;
+
+    const int NUM_DROPPED_DETECTIONS_BEFORE_BALL_NOT_IN_DRIBBLER = 2;
 };
