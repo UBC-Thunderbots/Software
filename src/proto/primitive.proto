@@ -19,9 +19,12 @@ enum DribblerMode
 
 enum MaxAllowedSpeedMode
 {
+    // The physical limit of the robots
     PHYSICAL_LIMIT = 0;
-    STOP_COMMAND   = 1;
-    TIPTOE         = 2;
+    // Move at speed limit for the stop command
+    STOP_COMMAND = 1;
+    // Move at speed at which collisions are allowed
+    COLLISIONS_ALLOWED = 2;
 }
 
 message AutoChipOrKick

@@ -116,8 +116,8 @@ double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
             return robot_constants.robot_max_speed_m_per_s;
         case TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND:
             return STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND;
-        case TbotsProto::MaxAllowedSpeedMode::TIPTOE:
-            return 0.5;
+        case TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED:
+            return COLLISION_ALLOWED_ROBOT_MAX_SPEED_METERS_PER_SECOND;
         default:
             LOG(WARNING) << "MaxAllowedSpeedMode is invalid" << std::endl;
             return 0.0;
