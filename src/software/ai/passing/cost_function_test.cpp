@@ -17,7 +17,7 @@ class PassingEvaluationTest : public testing::Test
     {
         entire_field =
             std::make_shared<Rectangle>(Field::createSSLDivisionBField().fieldLines());
-        passing_config         = std::make_shared<PassingConfig>();
+        passing_config = std::make_shared<PassingConfig>();
         passing_config->getMutableMinPassSpeedMPerS()->setValue(3.5);
         passing_config->getMutableMaxPassSpeedMPerS()->setValue(5.5);
         avg_desired_pass_speed = 3.9;
