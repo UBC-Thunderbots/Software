@@ -27,7 +27,7 @@ class ProtoReceiver:
                     try:
                         buffer.put_nowait(proto)
                     except queue.Full:
-                        pass    
+                        pass
 
     def register_observer(self, proto_type, buffer):
         """Register a widget to consume from a given protobuf class
