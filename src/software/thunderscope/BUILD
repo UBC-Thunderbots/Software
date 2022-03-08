@@ -22,7 +22,7 @@ py_binary(
 
 py_library(
     name = "ProtoReceiver",
-    srcs = ["ProtoReceiver.py"],
+    srcs = ["proto_receiver.py"],
 )
 
 py_library(

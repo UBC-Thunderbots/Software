@@ -94,8 +94,8 @@ std::unique_ptr<TbotsProto::Timestamp> createTimestamp(const Timestamp& timestam
  * @param name The name of the value to plot
  * @param value The NamedValue msg to extract the TbotsProto::NamedValue from
  *
- * @return The unique_ptr to a TbotsProto::Timestamp proto containing the timestamp with
- * the same time zone as the timestamp argument.
+ * @return The unique_ptr to a TbotsProto::NamedValue proto containing data with
+ *         specified name and value
  */
 std::unique_ptr<TbotsProto::NamedValue> createNamedValue(const std::string name,
                                                          float value);

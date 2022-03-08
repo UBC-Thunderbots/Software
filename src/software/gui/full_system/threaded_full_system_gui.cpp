@@ -8,7 +8,6 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/gui/drawing/world.h"
 #include "software/logger/logger.h"
-// #include "proto/message_translation/tbots_protobuf.cpp"
 
 ThreadedFullSystemGUI::ThreadedFullSystemGUI(
     std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config)
@@ -104,11 +103,6 @@ void ThreadedFullSystemGUI::onValueReceived(World world)
         remaining_attempts_to_set_view_area--;
         view_area_buffer->push(world.field().fieldBoundary());
     }
-
-    // TbotsProto::NamedValue named_val;
-    // named_val.set_name("World Hz");
-    // named_val.set_value(static_cast<float>(
-    //     FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
 
     LOG(VISUALIZE) << *createNamedValue(
         "World Hz",
