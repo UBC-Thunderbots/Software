@@ -5,11 +5,6 @@ import "proto/geometry.proto";
 
 package TbotsProto;
 
-message Path
-{
-    repeated Point point = 1;
-}
-
 message PathVisualization
 {
     repeated Path path = 1;

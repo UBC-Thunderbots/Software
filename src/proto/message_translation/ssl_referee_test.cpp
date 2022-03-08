@@ -145,16 +145,6 @@ INSTANTIATE_TEST_CASE_P(
         std::make_tuple(RefereeCommand::TIMEOUT_THEM,
                         SSLProto::Referee_Command_TIMEOUT_YELLOW, TeamColour::BLUE),
 
-        // goal
-        std::make_tuple(RefereeCommand::GOAL_US, SSLProto::Referee_Command_GOAL_YELLOW,
-                        TeamColour::YELLOW),
-        std::make_tuple(RefereeCommand::GOAL_US, SSLProto::Referee_Command_GOAL_BLUE,
-                        TeamColour::BLUE),
-        std::make_tuple(RefereeCommand::GOAL_THEM, SSLProto::Referee_Command_GOAL_BLUE,
-                        TeamColour::YELLOW),
-        std::make_tuple(RefereeCommand::GOAL_THEM, SSLProto::Referee_Command_GOAL_YELLOW,
-                        TeamColour::BLUE),
-
         // ball placement
         std::make_tuple(RefereeCommand::BALL_PLACEMENT_US,
                         SSLProto::Referee_Command_BALL_PLACEMENT_YELLOW,
