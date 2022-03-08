@@ -51,6 +51,7 @@ SimBall::SimBall(RNG *rng, btDiscreteDynamicsWorld *world) : m_rng(rng), m_world
     // parameters seem to be ignored...
     m_body = new btRigidBody(rbInfo);
     // see simulator.cpp
+    // TODO (#2512): Check these values with real life
     m_body->setRestitution(1.f);
     m_body->setFriction(0.7f);
 
