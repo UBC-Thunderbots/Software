@@ -57,6 +57,8 @@ std::unique_ptr<SSLSimulationProto::RobotCommand> ErForceSimulatorRobot::getRobo
         case TbotsProto::DirectControlPrimitive::CHICK_COMMAND_NOT_SET:
         {
             direct_control->clear_chick_command();
+            kick(0);
+            chip(0);
             break;
         }
     }

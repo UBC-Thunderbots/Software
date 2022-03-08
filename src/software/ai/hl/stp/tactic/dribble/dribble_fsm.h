@@ -44,7 +44,7 @@ struct DribbleFSM
     static constexpr Angle FINAL_DESTINATION_CLOSE_THRESHOLD = Angle::fromDegrees(1);
     // Maximum distance to continuously dribble the ball, slightly conservative to not
     // break the 1 meter rule
-    static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.75;
+    static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.78;
     // robot speed at which the robot is done dribbling
     static constexpr double ROBOT_DRIBBLING_DONE_SPEED = 0.2;  // m/s
 

@@ -140,8 +140,8 @@ void DribbleFSM::loseBall(const Update &event)
     event.common.set_intent(std::make_unique<MoveIntent>(
         event.common.robot.id(), away_from_ball_position, face_ball_orientation, 0,
         DribblerMode::OFF, BallCollisionType::AVOID,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        0.0, event.common.robot.robotConstants()));
+        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, 0.5},
+        MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, event.common.robot.robotConstants()));
 }
 
 void DribbleFSM::startDribble(const Update &event)

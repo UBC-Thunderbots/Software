@@ -200,7 +200,7 @@ void SensorFusion::updateWorld(
             friendly_robot_id_with_ball_in_dribbler.value() == robot_id)
         {
             friendly_robot_id_with_ball_in_dribbler = std::nullopt;
-            ball_in_dribbler_timeout = 0;
+            ball_in_dribbler_timeout                = 0;
         }
     }
 }
