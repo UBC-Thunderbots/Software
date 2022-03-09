@@ -17,7 +17,7 @@ class ThreadedProtoUnixListener
      * @param receive_callback The callback to trigger on a new packet
      */
     ThreadedProtoUnixListener(const std::string& unix_path,
-                              std::function<void(ReceiveProtoT)> receive_callback);
+                              std::function<void(ReceiveProtoT&)> receive_callback);
 
     ~ThreadedProtoUnixListener();
 
