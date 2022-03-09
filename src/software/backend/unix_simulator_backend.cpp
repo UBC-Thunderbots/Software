@@ -11,7 +11,7 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-SimulatorBackend::SimulatorBackend(std::shared_ptr<const BackendConfig> config)
+UnixSimulatorBackend::UnixSimulatorBackend(std::shared_ptr<const BackendConfig> config)
     : sensor_fusion_config(config->getSimulatorBackendConfig()->getSensorFusionConfig())
 {
     // Protobuf Inputs
@@ -49,7 +49,7 @@ SimulatorBackend::SimulatorBackend(std::shared_ptr<const BackendConfig> config)
         DEFENDING_SIDE_OUTPUT));
 }
 
-void SimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
+void UnixSimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 {
     primitive_output->sendProto(primitives);
 
@@ -66,11 +66,11 @@ void SimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
     }
 }
 
-void SimulatorBackend::onValueReceived(World world)
+void UnixSimulatorBackend::onValueReceived(World world)
 {
     vision_output->sendProto(*createVision(world));
     LOG(VISUALIZE) << *createWorld(world);
 }
 
 // Register this backend in the genericFactory
-static TGenericFactory<std::string, Backend, SimulatorBackend, BackendConfig> factory;
+static TGenericFactory<std::string, Backend, UnixSimulatorBackend, BackendConfig> factory;

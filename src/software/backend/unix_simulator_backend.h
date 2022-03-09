@@ -11,10 +11,10 @@
 #include "software/networking/threaded_proto_unix_listener.hpp"
 #include "software/networking/threaded_proto_unix_sender.hpp"
 
-class SimulatorBackend : public Backend
+class UnixSimulatorBackend : public Backend
 {
    public:
-    SimulatorBackend(std::shared_ptr<const BackendConfig> config);
+    UnixSimulatorBackend(std::shared_ptr<const BackendConfig> config);
 
    private:
     void onValueReceived(TbotsProto::PrimitiveSet primitives) override;

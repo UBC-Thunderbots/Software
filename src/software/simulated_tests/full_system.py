@@ -22,7 +22,7 @@ SENSOR_PROTO_OUTPUT_PATH = "/sensor_proto"
 TACTIC_OVERRIDE_PATH = "/tactic_override"
 
 
-class FullSystemWrapper(object):
+class FullSystem(object):
     def __init__(self, base_unix_path="/tmp/tbots"):
 
         """Runs our standalone er-force simulator binary and sets up the unix

@@ -124,8 +124,8 @@ py_library(
         "simulated_test_fixture.py",
     ],
     deps = [
-        ":full_system_wrapper",
-        ":standalone_simulator_wrapper",
+        ":er_force_simulator",
+        ":full_system",
         "//proto:software_py_proto",
         "//proto:tbots_py_proto",
         "//software/networking:threaded_unix_listener_py",
@@ -136,9 +136,9 @@ py_library(
 )
 
 py_library(
-    name = "standalone_simulator_wrapper",
+    name = "er_force_simulator",
     srcs = [
-        "standalone_simulator_wrapper.py",
+        "er_force_simulator.py",
     ],
     data = [
         "//software:er_force_simulator_main",
@@ -153,16 +153,15 @@ py_library(
 )
 
 py_library(
-    name = "full_system_wrapper",
+    name = "full_system",
     srcs = [
-        "full_system_wrapper.py",
+        "full_system.py",
     ],
     data = [
         "//software:unix_full_system",
         "//software/geom:geometry.so",
     ],
     deps = [
-        requirement("hanging_threads"),
         "//proto:software_py_proto",
         "//proto:tbots_py_proto",
         "//software/networking:threaded_unix_listener_py",
@@ -176,7 +175,6 @@ py_library(
         "validation.py",
     ],
     data = [
-        "//software:full_system",
         "//software/geom:geometry.so",
     ],
     deps = [

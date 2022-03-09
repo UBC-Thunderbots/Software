@@ -41,6 +41,7 @@ cc_library(
 )
 
 cc_library(
+    # TODO (#2510) Remove
     name = "simulator_backend",
     srcs = ["simulator_backend.cpp"],
     hdrs = ["simulator_backend.h"],
@@ -66,6 +67,7 @@ cc_library(
 )
 
 cc_library(
+    # TODO (#2510) Rename to SimulatorBackend
     name = "unix_simulator_backend",
     srcs = ["unix_simulator_backend.cpp"],
     hdrs = ["unix_simulator_backend.h"],

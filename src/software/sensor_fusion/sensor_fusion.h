@@ -139,11 +139,8 @@ class SensorFusion
 
     TeamSide team_with_possession;
 
-    std::optional<RobotId> friendly_robot_id_with_ball_in_dribbler;
-
     unsigned int friendly_goalie_id;
     unsigned int enemy_goalie_id;
-    int ball_in_dribbler_timeout = 0;
 
     // The number of "reset packets" we have received. These indicate that the
     // vision time should be reset. Please see `checkForVisionReset` to see how
