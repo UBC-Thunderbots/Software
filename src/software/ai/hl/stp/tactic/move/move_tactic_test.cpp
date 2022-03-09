@@ -75,7 +75,7 @@ TEST_F(MoveTacticTest, test_autochip_move)
     tactic->updateControlParams(
         destination, Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::AUTOCHIP, 2.0},
-        TbotsProto::MaxAllowedSpeedMode::TIPTOE);
+        TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED);
     setTactic(tactic);
     setFriendlyRobotId(1);
 
@@ -121,7 +121,7 @@ TEST_F(MoveTacticTest, test_autokick_move)
     tactic->updateControlParams(
         destination, Angle::threeQuarter(), 0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW, {AutoChipOrKickMode::AUTOKICK, 3.0},
-        TbotsProto::MaxAllowedSpeedMode::TIPTOE);
+        TbotsProto::MaxAllowedSpeedMode::COLLISIONS_ALLOWED);
     setTactic(tactic);
     setFriendlyRobotId(0);
 

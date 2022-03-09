@@ -79,7 +79,7 @@ class HRVOTest : public ::testing::Test
                                                {}));
 
             TbotsProto::Primitive primitive = *createMovePrimitive(
-                dest, 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(),
+                dest, 0.0, Angle(), TbotsProto::DribblerMode::MAX_FORCE, AutoChipOrKick(),
                 TbotsProto::MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
             (*primitive_set.mutable_robot_primitives())[i] = primitive;
         }

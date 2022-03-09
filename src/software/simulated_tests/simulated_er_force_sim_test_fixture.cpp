@@ -30,6 +30,7 @@ void SimulatedErForceSimTestFixture::SetUp()
 {
     LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
 
+    // new configs so that callbacks to the previous test's AI are cleared
     friendly_mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
     enemy_mutable_thunderbots_config    = std::make_shared<ThunderbotsConfig>();
     friendly_thunderbots_config = std::const_pointer_cast<const ThunderbotsConfig>(
@@ -56,6 +57,11 @@ void SimulatedErForceSimTestFixture::SetUp()
     enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableDefendingPositiveSide()
         ->setValue(true);
+
+    // reinitializing to prevent the previous test's configs from being reused
+    friendly_sensor_fusion =
+        SensorFusion(friendly_thunderbots_config->getSensorFusionConfig());
+    enemy_sensor_fusion = SensorFusion(enemy_thunderbots_config->getSensorFusionConfig());
 
     if (TbotsGtestMain::enable_visualizer)
     {
@@ -168,49 +174,17 @@ void SimulatedErForceSimTestFixture::updateSensorFusion(
     // TODO (#2419): remove this to re-enable sigfpe checks
     feenableexcept(FE_INVALID | FE_OVERFLOW);
 
-    auto blue_robot_statuses   = simulator->getBlueRobotStatuses();
-    auto yellow_robot_statuses = simulator->getYellowRobotStatuses();
-
     for (const auto &packet : ssl_wrapper_packets)
     {
-        auto blue_sensor_msg                          = SensorProto();
-        auto yellow_sensor_msg                        = SensorProto();
-        *(blue_sensor_msg.mutable_ssl_vision_msg())   = packet;
-        *(yellow_sensor_msg.mutable_ssl_vision_msg()) = packet;
-        for (const auto &msg : blue_robot_statuses)
-        {
-            *(blue_sensor_msg.add_robot_status_msgs()) = msg;
-        }
-        for (const auto &msg : yellow_robot_statuses)
-        {
-            *(yellow_sensor_msg.add_robot_status_msgs()) = msg;
-        }
+        auto sensor_msg                        = SensorProto();
+        *(sensor_msg.mutable_ssl_vision_msg()) = packet;
 
-        if (friendly_thunderbots_config->getSensorFusionConfig()
-                ->getFriendlyColorYellow()
-                ->value())
-        {
-            friendly_sensor_fusion.processSensorProto(yellow_sensor_msg);
-        }
-        else
-        {
-            friendly_sensor_fusion.processSensorProto(blue_sensor_msg);
-        }
-
-        if (enemy_thunderbots_config->getSensorFusionConfig()
-                ->getFriendlyColorYellow()
-                ->value())
-        {
-            enemy_sensor_fusion.processSensorProto(yellow_sensor_msg);
-        }
-        else
-        {
-            enemy_sensor_fusion.processSensorProto(blue_sensor_msg);
-        }
+        friendly_sensor_fusion.processSensorProto(sensor_msg);
+        enemy_sensor_fusion.processSensorProto(sensor_msg);
 
         if (should_log_replay)
         {
-            simulator_sensorproto_logger->onValueReceived(yellow_sensor_msg);
+            simulator_sensorproto_logger->onValueReceived(sensor_msg);
             auto friendly_world_or_null = friendly_sensor_fusion.getWorld();
 
             if (friendly_world_or_null)
@@ -251,7 +225,6 @@ void SimulatedErForceSimTestFixture::runTest(
     const Duration simulation_time_step =
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
 
-    // TODO nuke me
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
         field_type, create2015RobotConstants(), create2015WheelConstants(),
         friendly_thunderbots_config->getSimulatorConfig()));

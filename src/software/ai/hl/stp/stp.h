@@ -87,6 +87,8 @@ class STP
      * Overrides the play
      *
      * @param play the play to override with
+     *
+     * NOTE: pass in nullptr to stop overriding the play
      */
     void overridePlay(std::unique_ptr<Play> play);
 

@@ -5,19 +5,19 @@ from pyqtgraph.Qt import QtCore, QtGui
 
 import software.thunderscope.colors as colors
 import software.thunderscope.constants as constants
+import queue
+from proto.geometry_pb2 import Polygon, Circle
+from proto.visualization_pb2 import Obstacles
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
 
 
 class ObstacleLayer(FieldLayer):
-    def __init__(self):
+    def __init__(self, buffer_size=10):
         FieldLayer.__init__(self)
-        self.obstacle_receiver = ThreadedUnixListener(
-            constants.UNIX_SOCKET_BASE_PATH + Obstacles.DESCRIPTOR.full_name,
-            Obstacles,
-            max_buffer_size=1,
-        )
         self.cached_obstacles = Obstacles()
+
+        self.obstacle_buffer = queue.Queue(buffer_size)
 
     def paint(self, painter, option, widget):
         """Paint this layer
@@ -28,9 +28,9 @@ class ObstacleLayer(FieldLayer):
 
         """
 
-        obstacles = self.obstacle_receiver.maybe_pop()
-
-        if not obstacles:
+        try:
+            obstacles = self.obstacle_buffer.get_nowait()
+        except queue.Empty as empty:
             obstacles = self.cached_obstacles
 
         self.cached_obstacles = obstacles

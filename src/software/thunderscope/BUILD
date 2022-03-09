@@ -10,8 +10,10 @@ py_binary(
         "//shared/parameter:dynamic_param_py_proto",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
+        "//software/thunderscope:proto_receiver",
         "//software/thunderscope:colors",
         "//software/thunderscope:constants",
+        "//software/thunderscope/arbitrary_plot:named_value_plotter",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
         "//software/thunderscope/field:obstacle_layer",
@@ -22,6 +24,11 @@ py_binary(
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],
+)
+
+py_library(
+    name = "proto_receiver",
+    srcs = ["proto_receiver.py"],
 )
 
 py_library(

@@ -30,6 +30,7 @@ class Thunderscope(object):
         )
         signal.signal(signal.SIGINT, signal.SIG_DFL)
         self.dock_area = DockArea()
+        self.proto_receiver = ProtoReceiver()
 
         self.window = QtGui.QMainWindow()
         self.window.setCentralWidget(self.dock_area)
@@ -60,10 +61,19 @@ class Thunderscope(object):
 
         """
         self.field = Field()
-        self.field.add_layer("Vision", world_layer.WorldLayer())
-        self.field.add_layer("Obstacles", obstacle_layer.ObstacleLayer())
-        self.field.add_layer("Path", path_layer.PathLayer())
-        self.field.add_layer("Validation", validation_layer.ValidationLayer())
+
+        world = world_layer.WorldLayer()
+        obstacles = obstacle_layer.ObstacleLayer()
+        paths = path_layer.PathLayer()
+        validation = validation_layer.ValidationLayer()
+
+        self.field.add_layer("Vision", world)
+        self.field.add_layer("Obstacles", obstacles)
+        self.field.add_layer("Paths", paths)
+
+        self.proto_receiver.register_observer(World, world.world_buffer)
+        self.proto_receiver.register_observer(Obstacles, obstacles.obstacle_buffer)
+        self.proto_receiver.register_observer(PathVisualization, paths.path_visualization_buffer)
 
         field_dock = Dock("Field", size=(500, 2000))
         field_dock.addWidget(self.field)

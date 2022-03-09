@@ -39,6 +39,7 @@ enum FieldType
 
 message WorldState
 {
+    // Robot ID to RobotState map for both teams
     map<uint32, RobotState> blue_robots   = 1;
     map<uint32, RobotState> yellow_robots = 2;
     optional BallState ball_state         = 3;
@@ -46,6 +47,7 @@ message WorldState
 
 message SimulatorTick
 {
+    // The duration to step the simulation
     required double milliseconds = 1;
 }
 
@@ -61,12 +63,15 @@ message Pass
     required double pass_speed_m_per_s = 3;
 }
 
+<<<<<<< HEAD
 message Shot
 {
     required Point point = 1;
     required Angle angle = 2;
 }
 
+=======
+>>>>>>> b6da26fc08396f9b9e81d0c5cf114e5b8ba8d3aa
 message EnemyThreat
 {
     // The enemy robot

@@ -1,21 +1,15 @@
 import pyqtgraph as pg
 import pyqtgraph.console as pg_console
-from proto.robot_log_msg_pb2 import RobotLog
-
-import software.thunderscope.constants as constants
 from software.networking.threaded_unix_listener import ThreadedUnixListener
+import software.thunderscope.constants as constants
+
+from proto.robot_log_msg_pb2 import RobotLog
+import queue
 
 
 class g3logWidget(pg_console.ConsoleWidget):
-    def __init__(self):
+    def __init__(self, buffer_size=10):
         pg_console.ConsoleWidget.__init__(self)
-
-        self.log_receiver = ThreadedUnixListener(
-            constants.UNIX_SOCKET_BASE_PATH + "log",
-            RobotLog,
-            convert_from_any=False,
-            max_buffer_size=1000,
-        )
 
         # disable input and buttons
         self.input.hide()
@@ -32,12 +26,14 @@ class g3logWidget(pg_console.ConsoleWidget):
             }"""
         )
 
+        self.log_buffer = queue.Queue(buffer_size)
+
     def refresh(self):
         """Update the log widget with another log message
         """
-        log = self.log_receiver.maybe_pop()
-
-        if not log:
+        try:
+            log = self.log_buffer.get_nowait()
+        except queue.Empty as empty:
             return
 
         log_str = "{} {} [{}->{}] {}\n".format(

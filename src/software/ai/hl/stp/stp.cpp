@@ -251,8 +251,6 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
 
 void STP::overridePlay(std::unique_ptr<Play> play)
 {
-    // TODO is there no way to go back to not overriding? we could null this out but don't
-    // see that done anywhere
     override_play = std::move(play);
 }
 
