@@ -15,8 +15,8 @@ class MoveGoalieToGoalLineTacticTest
       public ::testing::WithParamInterface<RobotStateWithId>
 {
    protected:
-    FieldType field_type = FieldType::DIV_B;
-    Field field          = Field::createField(field_type);
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
 };
 
 TEST_P(MoveGoalieToGoalLineTacticTest, move_to_goal_line_test)

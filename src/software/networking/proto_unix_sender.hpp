@@ -18,7 +18,7 @@ class ProtoUnixSender
      */
     ProtoUnixSender(boost::asio::io_service& io_service, const std::string& unix_path);
 
-    virtual ~ProtoUnixSender();
+    virtual ~ProtoUnixSender() = default;
 
     /**
      * Sends a protobuf message to the initialized ip address and port
@@ -47,9 +47,4 @@ void ProtoUnixSender<SendProto>::sendProto(const SendProto& message)
 {
     message.SerializeToString(&data_buffer);
     unix_sender_.sendString(data_buffer);
-}
-
-template <class SendProto>
-ProtoUnixSender<SendProto>::~ProtoUnixSender()
-{
 }
