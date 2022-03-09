@@ -1,12 +1,14 @@
-import pyqtgraph as pg
-import time
-from software.networking.threaded_unix_listener import ThreadedUnixListener
-import software.thunderscope.constants as constants
-from proto.visualization_pb2 import NamedValue
 import queue
 import random
-from pyqtgraph.Qt import QtGui
+import time
 from collections import deque
+
+import pyqtgraph as pg
+from proto.visualization_pb2 import NamedValue
+from pyqtgraph.Qt import QtGui
+
+import software.thunderscope.constants as constants
+from software.networking.threaded_unix_listener import ThreadedUnixListener
 
 DEQUE_SIZE = 500
 MIN_Y_RANGE = 0

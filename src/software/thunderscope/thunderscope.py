@@ -65,7 +65,7 @@ class Thunderscope(object):
         world = world_layer.WorldLayer()
         obstacles = obstacle_layer.ObstacleLayer()
         paths = path_layer.PathLayer()
-        validation = validation_layer.ValidationLayer()
+        validation_layer.ValidationLayer()
 
         self.field.add_layer("Vision", world)
         self.field.add_layer("Obstacles", obstacles)
@@ -73,7 +73,9 @@ class Thunderscope(object):
 
         self.proto_receiver.register_observer(World, world.world_buffer)
         self.proto_receiver.register_observer(Obstacles, obstacles.obstacle_buffer)
-        self.proto_receiver.register_observer(PathVisualization, paths.path_visualization_buffer)
+        self.proto_receiver.register_observer(
+            PathVisualization, paths.path_visualization_buffer
+        )
 
         field_dock = Dock("Field", size=(500, 2000))
         field_dock.addWidget(self.field)

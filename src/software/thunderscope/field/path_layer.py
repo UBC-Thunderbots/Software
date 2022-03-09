@@ -1,3 +1,5 @@
+import queue
+
 import pyqtgraph as pg
 from proto.visualization_pb2 import PathVisualization
 from pyqtgraph.Qt import QtCore, QtGui
@@ -5,11 +7,6 @@ from pyqtgraph.Qt import QtCore, QtGui
 import software.thunderscope.constants as constants
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
-import queue
-from software.thunderscope.field.field_layer import FieldLayer
-import software.thunderscope.constants as constants
-from pyqtgraph.Qt import QtCore, QtGui
-from proto.visualization_pb2 import PathVisualization
 
 
 class PathLayer(FieldLayer):

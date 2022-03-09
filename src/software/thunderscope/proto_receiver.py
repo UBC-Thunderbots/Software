@@ -1,8 +1,8 @@
-import software.thunderscope.constants as constants
 import queue
 from threading import Thread
-from software.networking.threaded_unix_listener import ThreadedUnixListener
+
 import software.thunderscope.constants as constants
+from software.networking.threaded_unix_listener import ThreadedUnixListener
 
 
 class ProtoReceiver:
