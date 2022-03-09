@@ -11,7 +11,9 @@ class ThreadedProtoUnixSender
 {
    public:
     /**
-     * TODO
+     * Create a ThreadedProtoUnixSender
+     *
+     * @param unix_path The unix socket path to send on
      */
     ThreadedProtoUnixSender(const std::string& unix_path);
 

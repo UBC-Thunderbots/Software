@@ -12,7 +12,12 @@ class ProtoUnixListener
 {
    public:
     /*
-     * TODO
+     * Listens for packets over the provided unix socket and triggers the
+     * receive_callback on a new message.
+     *
+     * @param io_service The io service
+     * @param unix_path The unix path to connect to
+     * @param receive_callback The callback to trigger on a new packet
      */
     ProtoUnixListener(boost::asio::io_service& io_service, const std::string& unix_path,
                       std::function<void(ReceiveProtoT&)> receive_callback);
@@ -86,7 +91,6 @@ void ProtoUnixListener<ReceiveProtoT>::handleDataReception(
     if (!error)
     {
         auto packet_data = ReceiveProtoT();
-        std::string str(std::begin(raw_received_data_), std::end(raw_received_data_));
         packet_data.ParseFromArray(raw_received_data_.data(),
                                    static_cast<int>(num_bytes_received));
         receive_callback(packet_data);

@@ -11,15 +11,20 @@ class ProtoUnixSender
 {
    public:
     /**
-     * TODO
+     * Creates a ProtoUnixSender
+     *
+     * @param io_service The io service
+     * @param unix_path The unix socket pack to send on
      */
     ProtoUnixSender(boost::asio::io_service& io_service, const std::string& unix_path);
 
-    virtual ~ProtoUnixSender();
+    virtual ~ProtoUnixSender() = default;
 
     /**
      * Sends a protobuf message to the initialized ip address and port
      * This function returns after the message has been sent.
+     *
+     * If any errors occur, a warning message will be logged.
      *
      * @param message The protobuf message to send
      */
@@ -42,10 +47,4 @@ void ProtoUnixSender<SendProto>::sendProto(const SendProto& message)
 {
     message.SerializeToString(&data_buffer);
     unix_sender_.sendString(data_buffer);
-}
-
-template <class SendProto>
-ProtoUnixSender<SendProto>::~ProtoUnixSender()
-{
-    // TODO remove me
 }

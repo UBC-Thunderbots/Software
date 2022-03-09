@@ -1,15 +1,15 @@
+import socketserver
+import time
 import base64
+import os
+from google.protobuf.any_pb2 import Any
+from threading import Thread
+import proto
+import queue
 import glob
 import importlib
 import inspect
 import os
-import queue
-import socketserver
-from threading import Thread
-
-import proto
-from google.protobuf import text_format
-from google.protobuf.any_pb2 import Any
 
 
 class ThreadedUnixListener:
@@ -114,12 +114,12 @@ class Session(socketserver.BaseRequestHandler):
 
         self.handle_callback(msg)
 
-    """Search through all protobufs and return class of proto_type
-
-    param: proto_class_name: String of the proto class name to search for
-    """
-
     def find_proto_class(self, proto_class_name):
+        """Search through all protobufs and return class of proto_type
+
+        :param proto_class_name: String of the proto class name to search for
+
+        """
         proto_path = os.path.dirname(proto.__file__)
 
         for file in glob.glob(proto_path + "**/*.py"):
