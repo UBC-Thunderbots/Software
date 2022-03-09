@@ -2,12 +2,6 @@ include:
     - arduino_config.yaml
 ---
 - string:
-    name: runtime_path
-    value: ""
-    description: >-
-      All unix sockets and logging will be routed to this directory. Allows
-      users to pass in a clean/empty path on every run.
-- string:
     name: backend
     value: ""
     description: >-

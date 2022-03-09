@@ -1,9 +1,3 @@
 include:
   - network_config.yaml
   - sensor_fusion_config.yaml
----
-- string:
-    name: base_unix_path
-    value: "/tmp/tbots"
-    description: >-
-        Base unix path where the sockets should be created/connected to
