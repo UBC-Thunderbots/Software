@@ -4,7 +4,12 @@ import signal
 import pyqtgraph as pg
 from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
-from shared.parameter.dynamic_parameters_pb2 import ThunderbotsConfig
+from software.thunderscope.proto_receiver import ProtoReceiver
+
+from proto.world_pb2 import World
+from proto.visualization_pb2 import PathVisualization
+from proto.geometry_pb2 import Circle, Polygon
+from proto.visualization_pb2 import Obstacles
 
 from software.networking import threaded_unix_sender
 from software.thunderscope.field import (
@@ -15,6 +20,8 @@ from software.thunderscope.field import (
 )
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
+from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
+from proto.visualization_pb2 import NamedValue
 
 
 class Thunderscope(object):
@@ -30,7 +37,6 @@ class Thunderscope(object):
         )
         signal.signal(signal.SIGINT, signal.SIG_DFL)
         self.dock_area = DockArea()
-        self.proto_receiver = ProtoReceiver()
 
         self.window = QtGui.QMainWindow()
         self.window.setCentralWidget(self.dock_area)
@@ -42,12 +48,16 @@ class Thunderscope(object):
         except:
             pass
 
+        self.proto_receiver = ProtoReceiver()
+
         field_dock = self.setup_field_widget()
         log_dock = self.setup_log_widget()
+        performance_dock = self.setup_performance_plot()
 
         # Configure Docks
         self.dock_area.addDock(field_dock, "left")
         self.dock_area.addDock(log_dock, "bottom", field_dock)
+        self.dock_area.addDock(performance_dock, "right", log_dock)
 
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.refresh)
@@ -96,9 +106,24 @@ class Thunderscope(object):
 
         return log_dock
 
+    def setup_performance_plot(self):
+        self.named_value_plotter = NamedValuePlotter()
+        self.named_value_plotter_dock = Dock("Performance", size=(500, 100))
+        self.named_value_plotter_dock.addWidget(self.named_value_plotter.plot)
+
+        self.proto_receiver.register_observer(
+            NamedValue, self.named_value_plotter.named_value_buffer
+        )
+
+        named_value_plotter_dock = Dock("Performance", size=(500, 100))
+        named_value_plotter_dock.addWidget(self.named_value_plotter.plot)
+
+        return named_value_plotter_dock
+
     def refresh(self):
         self.field.refresh()
         self.logs.refresh()
+        self.named_value_plotter.refresh()
 
     def show(self):
         self.window.show()

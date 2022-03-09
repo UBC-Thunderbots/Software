@@ -93,22 +93,3 @@ message EnemyThreat
     // The robot that would pass to this robot if necessary
     optional Robot passer = 7;
 }
-
-enum ValidationStatus
-{
-    PASSING = 0;
-    FAILING = 1;
-}
-
-message ValidationGeometry
-{
-    repeated Polygon polygons = 1;
-    repeated Circle circles   = 2;
-    repeated Vector vectors   = 3;
-}
-
-message ValidationProto
-{
-    repeated ValidationGeometry geometry = 1;
-    repeated ValidationStatus status     = 2;
-}

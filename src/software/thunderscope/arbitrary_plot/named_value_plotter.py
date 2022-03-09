@@ -43,9 +43,9 @@ class NamedValuePlotter(object):
             if named_value.name not in self.plots:
                 self.plots[named_value.name] = self.win.plot(
                     pen=QtGui.QColor(
-                        random.randint(0, 255),
-                        random.randint(0, 255),
-                        random.randint(0, 255),
+                        random.randint(100, 255),
+                        random.randint(100, 255),
+                        random.randint(100, 255),
                     ),
                     name=named_value.name,
                     brush=None,

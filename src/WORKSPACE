@@ -88,6 +88,8 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
     name = "com_google_protobuf",
+    # We need this patch to properly add generated dependencies to the protoc
+    # compiler. It also fixes an issue with the python imports.
     patch_args = ["-p1"],
     patches = ["@//extlibs:protobuf.patch"],
     remote = "https://github.com/protocolbuffers/protobuf",
@@ -147,6 +149,7 @@ new_local_repository(
     path = "/usr/include/python3.8",
 )
 
+# These headers are used by pybind11
 bind(
     name = "python_headers",
     actual = "//:python_headers",
@@ -187,6 +190,7 @@ new_git_repository(
     shallow_since = "1479502661 -0800",
 )
 
+# yaml cpp parser for dynamic parameters test
 git_repository(
     name = "yaml-cpp",
     commit = "f531f8a8c3f8ca0923f9219c72fcca511555f824",
@@ -413,10 +417,12 @@ load("@pybind11_bazel//:python_configure.bzl", "python_configure")
 
 python_configure(name = "local_config_python")
 
-git_repository(
+maybe(
+    git_repository,
     name = "rules_third_party",
     commit = "8d0ba00f9874588c1ea38d1be2859060ac8c8516",
     remote = "https://github.com/DraconicEnt/rules_third_party.git",
+    shallow_since = "1620228587 -0400",
 )
 
 load("@rules_third_party//libraries:bullet.bzl", "bullet")

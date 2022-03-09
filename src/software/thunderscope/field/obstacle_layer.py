@@ -34,7 +34,7 @@ class ObstacleLayer(FieldLayer):
 
         self.cached_obstacles = obstacles
 
-        painter.setPen(pg.mkPen(colors.NAVIGATOR_OBSTACLE_COLOR))
+        painter.setPen(pg.mkPen(colors.NAVIGATOR_OBSTACLE_COLOR, width=2))
 
         for polyobstacle in obstacles.polygon:
             polygon_points = [

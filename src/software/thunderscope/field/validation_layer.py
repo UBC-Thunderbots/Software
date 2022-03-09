@@ -1,14 +1,15 @@
 import pyqtgraph as pg
+import queue
 from proto.geometry_pb2 import Circle, Polygon
 from proto.visualization_pb2 import Obstacles
 from proto.world_pb2 import (
     SimulatorTick,
-    ValidationGeometry,
-    ValidationProto,
-    ValidationStatus,
     World,
     WorldState,
 )
+
+from proto.validation_pb2 import ValidationGeometry, ValidationProto, ValidationStatus
+
 from pyqtgraph.Qt import QtCore, QtGui
 
 import software.thunderscope.colors as colors
@@ -18,16 +19,10 @@ from software.thunderscope.field.field_layer import FieldLayer
 
 
 class ValidationLayer(FieldLayer):
-    def __init__(self):
+    def __init__(self, buffer_size=10):
         FieldLayer.__init__(self)
-        self.validation_receiver = ThreadedUnixListener(
-            constants.UNIX_SOCKET_BASE_PATH + "validation",
-            ValidationProto,
-            max_buffer_size=1,
-            convert_from_any=False,
-        )
-
         self.cached_validation = ValidationProto()
+        self.validation_buffer = queue.Queue(buffer_size)
 
     def paint(self, painter, option, widget):
         """Paint this layer
@@ -38,12 +33,11 @@ class ValidationLayer(FieldLayer):
 
         """
 
-        validation = self.validation_receiver.maybe_pop()
-
-        if not validation:
+        try:
+            validation = self.validation_buffer.get_nowait()
+            self.cached_validation = validation
+        except queue.Empty as empty:
             validation = self.cached_validation
-
-        self.cached_validation = validation
 
         for geometry, status in zip(validation.geometry, validation.status):
 

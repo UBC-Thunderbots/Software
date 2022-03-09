@@ -49,6 +49,7 @@ py_proto_library(
         "tbots_software_msgs.proto",
         "tbots_timestamp_msg.proto",
         "team.proto",
+        "validation.proto",
         "vision.proto",
         "visualization.proto",
         "world.proto",
