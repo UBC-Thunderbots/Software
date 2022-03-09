@@ -1,6 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
+    # TODO (#2510) Rename to full_system
     name = "unix_full_system",
     srcs = ["unix_full_system_main.cpp"],
     deps = [
@@ -24,6 +25,7 @@ cc_binary(
 )
 
 cc_binary(
+    # TODO (#2510) Remove
     name = "full_system",
     srcs = ["full_system_main.cpp"],
     deps = [
