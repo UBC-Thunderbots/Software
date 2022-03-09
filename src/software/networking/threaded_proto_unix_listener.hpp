@@ -27,13 +27,13 @@ class ThreadedProtoUnixListener
     // The thread running the io_service in the background. This thread will run for the
     // entire lifetime of the class
     std::thread io_service_thread;
-    std::function<void(ReceiveProtoT)> receive_callback_;
+    std::function<void(ReceiveProtoT&)> receive_callback_;
     ProtoUnixListener<ReceiveProtoT> unix_listener;
 };
 
 template <class ReceiveProtoT>
 ThreadedProtoUnixListener<ReceiveProtoT>::ThreadedProtoUnixListener(
-    const std::string& unix_path, std::function<void(ReceiveProtoT)> receive_callback)
+    const std::string& unix_path, std::function<void(ReceiveProtoT&)> receive_callback)
     : io_service(), unix_listener(io_service, unix_path, receive_callback)
 {
     // start the thread to run the io_service in the background
