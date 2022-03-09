@@ -18,17 +18,9 @@ from proto.robot_status_msg_pb2 import RobotStatus
 from proto.sensor_msg_pb2 import SensorProto
 from proto.tactic_pb2 import AssignedTacticPlayControlParams, GoalieTactic, Tactic
 from proto.tbots_software_msgs_pb2 import Vision
+from proto.validation_pb2 import ValidationGeometry, ValidationProto, ValidationStatus
 from proto.vision_pb2 import BallState, RobotState
-from proto.world_pb2 import (
-    SimulatorTick,
-    World,
-    WorldState,
-)
-from proto.validation_pb2 import (
-    ValidationGeometry,
-    ValidationProto,
-    ValidationStatus,
-)
+from proto.world_pb2 import SimulatorTick, World, WorldState
 from pyqtgraph.Qt import QtCore, QtGui
 
 from software.networking.threaded_unix_sender import ThreadedUnixSender

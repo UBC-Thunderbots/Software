@@ -22,6 +22,8 @@ PYBIND11_MODULE(geometry, m)
 {
     pybind11_protobuf::ImportNativeProtoCasters();
 
+    // Operator overloading section of
+    // https://pybind11.readthedocs.io/en/stable/advanced/classes.html
     py::class_<Point>(m, "Point", py::module_local())
         .def(py::init<double, double>())
         .def("x", &Point::x)
@@ -117,6 +119,7 @@ PYBIND11_MODULE(geometry, m)
           py::overload_cast<const Segment&, const Point&, double, int>(&contains));
     m.def("contains", py::overload_cast<const Rectangle&, const Point&>(&contains));
 
+    // https://pybind11.readthedocs.io/en/stable/classes.html
     py::class_<Field>(m, "Field")
         .def(py::init(&Field::createSSLDivisionBField))  // Default to Div B Field
         .def("createSSLDivisionAField", &Field::createSSLDivisionAField)

@@ -1,0 +1,3 @@
+protobuf==3.19.4
+pyqtgraph==0.12.3
+pyqt5 # version is embedded in the package

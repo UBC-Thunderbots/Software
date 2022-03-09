@@ -58,6 +58,13 @@ function run_bazel_formatting () {
     fi
 }
 
+# Format the imports and remove unused imports/variables
+# NOTE: Its important that this runs _before_ black formatting
+function run_python_import_formatting(){
+    /opt/tbotspython/bin/autoflake -r --in-place --remove-unused-variables $CURR_DIR/../src/software
+}
+
+
 # Function to run black python formatting
 function run_black_formatting () {
     printf "Running black to format Python files...\n\n"
@@ -122,6 +129,7 @@ function run_eof_new_line(){
 run_code_spell
 run_clang_format
 run_bazel_formatting
+run_python_import_formatting
 run_black_formatting
 run_eof_new_line
 run_git_diff_check

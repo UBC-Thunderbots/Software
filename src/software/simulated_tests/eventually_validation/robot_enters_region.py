@@ -15,18 +15,9 @@ logger = logging.getLogger(__name__)
 import software.geom.geometry as tbots_geom
 from proto.geometry_pb2 import Angle, AngularVelocity, Point, Vector
 from proto.tbots_software_msgs_pb2 import Vision
+from proto.validation_pb2 import ValidationGeometry, ValidationProto, ValidationStatus
 from proto.vision_pb2 import BallState, RobotState
-from proto.world_pb2 import (
-    SimulatorTick,
-    World,
-    WorldState,
-)
-
-from proto.validation_pb2 import (
-    ValidationGeometry,
-    ValidationProto,
-    ValidationStatus,
-)
+from proto.world_pb2 import SimulatorTick, World, WorldState
 
 from software.simulated_tests.validation import (
     EventuallyValidation,

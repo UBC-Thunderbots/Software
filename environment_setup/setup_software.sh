@@ -28,9 +28,7 @@ echo "================================================================"
 
 sudo apt-get update
 sudo apt-get install -y software-properties-common # required for add-apt-repository
-
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-
 sudo apt-get update
 
 # (sorted alphabetically)
@@ -124,17 +122,9 @@ if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
     exit 1
 fi
 
-
-if ! sudo /opt/tbotspython/bin/pip3 install pyqt5  ; then
+if ! sudo /opt/tbotspython/bin/pip3.8 install -r requirements.txt ; then
     echo "##############################################################"
-    echo "Error: Installing pyqt5 failed"
-    echo "##############################################################"
-    exit 1
-fi
-
-if ! sudo /opt/tbotspython/bin/pip3 install --upgrade protobuf  ; then
-    echo "##############################################################"
-    echo "Error: Installing protobuf failed"
+    echo "Install python requirements failed"
     echo "##############################################################"
     exit 1
 fi

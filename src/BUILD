@@ -33,6 +33,7 @@ refresh_compile_commands(
     ],
 )
 
+# Python headers used by pybind11 automatic protobuf conversion
 cc_library(
     name = "python_headers",
     visibility = ["//visibility:public"],

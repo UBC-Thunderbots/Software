@@ -6,7 +6,6 @@ import "proto/geometry.proto";
 import "proto/primitive.proto";
 import "proto/world.proto";
 
-
 message AssignedTacticPlayControlParams
 {
     map<uint32, Tactic> assigned_tactics = 1;

@@ -2,16 +2,14 @@ import os
 import signal
 
 import pyqtgraph as pg
+from proto.geometry_pb2 import Circle, Polygon
+from proto.visualization_pb2 import NamedValue, Obstacles, PathVisualization
+from proto.world_pb2 import World
 from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
-from software.thunderscope.proto_receiver import ProtoReceiver
-
-from proto.world_pb2 import World
-from proto.visualization_pb2 import PathVisualization
-from proto.geometry_pb2 import Circle, Polygon
-from proto.visualization_pb2 import Obstacles
 
 from software.networking import threaded_unix_sender
+from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
 from software.thunderscope.field import (
     obstacle_layer,
     path_layer,
@@ -20,8 +18,7 @@ from software.thunderscope.field import (
 )
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
-from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
-from proto.visualization_pb2 import NamedValue
+from software.thunderscope.proto_receiver import ProtoReceiver
 
 
 class Thunderscope(object):
