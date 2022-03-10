@@ -90,7 +90,7 @@ def ansible_runner(playbook: str, options: dict = {}):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--playbook", "-p", required=True, help="The YAML playbook to run")
+    ap.add_argument("--playbook", "-pb", required=True, help="The YAML playbook to run")
     ap.add_argument(
         "--ssh_pass", "-pwd", required=False, help="Password to ssh into hosts"
     )
@@ -124,6 +124,15 @@ def main():
         nargs="*",
         required=False,
         help="space separated list of variables to set in the form key=value",
+        default=[],
+    )
+
+    ap.add_argument(
+        "--port",
+        "-p",
+        nargs="*",
+        required=False,
+        help="port to listen to Announcement scripts on",
         default=[],
     )
 
