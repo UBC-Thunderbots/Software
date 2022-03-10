@@ -8,6 +8,8 @@
 
 #include "proto/message_translation/er_force_world.h"
 #include "proto/message_translation/ssl_wrapper.h"
+#include "proto/message_translation/tbots_protobuf.h"
+#include "shared/2015_robot_constants.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/test_util/test_util.h"
 #include "software/logger/logger.h"
