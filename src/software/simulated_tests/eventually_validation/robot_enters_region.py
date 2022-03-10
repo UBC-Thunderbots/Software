@@ -1,5 +1,3 @@
-import logging
-
 import pytest
 
 import software.geom.geometry as tbots_geom

@@ -6,6 +6,9 @@ import os
 import queue
 import socketserver
 from threading import Thread
+from software.logger.logger import createLogger
+
+logger = createLogger(__name__)
 
 import proto
 from google.protobuf.any_pb2 import Any
@@ -65,7 +68,7 @@ class ThreadedUnixListener:
         try:
             self.proto_buffer.put_nowait(proto)
         except queue.Full as queue_full:
-            print("buffer overrun for {}".format(self.unix_path))
+            logger.warning("buffer overrun for {}".format(self.unix_path))
 
     def serve_till_stopped(self):
         """Keep handling requests until force_stop is called

@@ -1,9 +1,8 @@
-import logging
 import threading
+import argparse
 import time
 
 import pytest
-
 import software.geom.geometry as tbots_geom
 from proto.geometry_pb2 import Angle, AngularVelocity, Point, Vector
 from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
@@ -29,6 +28,8 @@ from software.thunderscope.thunderscope import Thunderscope
 from software.logger.logger import createLogger
 
 logger = createLogger(__name__)
+
+PROCESS_BUFFER_DELAY = 0.01
 
 
 def run_validation_sequence_sets(
@@ -79,18 +80,26 @@ class TacticTestRunner(object):
 
     """Run a tactic"""
 
-    def __init__(self, launch_delay_s=0.1, base_unix_path="/tmp/tbots"):
+    def __init__(
+        self, launch_delay_s=0.1, enable_thunderscope=True, runtime_dir="/tmp/tbots"
+    ):
         """Initialize the TacticTestRunner
 
         :param launch_delay_s: How long to wait after launching the processes
+        :param enable_thunderscope: If true, thunderscope opens and the test runs
+                                  in realtime
+        :param runtime_dir: Directory to open sockets, store logs and any output files
 
         """
-        self.thunderscope = Thunderscope()
+        self.enable_thunderscope = enable_thunderscope
+
+        if self.enable_thunderscope:
+            self.thunderscope = Thunderscope()
+            self.validation_sender = ThreadedUnixSender(runtime_dir + "/validation")
+
         self.simulator = ErForceSimulator()
         self.yellow_full_system = FullSystem()
         time.sleep(launch_delay_s)
-
-        self.validation_sender = ThreadedUnixSender(base_unix_path + "/validation")
 
     def run_test(
         self,
@@ -98,7 +107,6 @@ class TacticTestRunner(object):
         eventually_validation_sequence_set=[[]],
         test_timeout_s=3,
         tick_duration_s=0.0166,  # Default to 60hz
-        open_thunderscope=True,
     ):
         """Run a test
 
@@ -109,18 +117,18 @@ class TacticTestRunner(object):
         :param test_timeout_s: The timeout for the test, if any eventually_validations
                                 remain after the timeout, the test fails.
         :param tick_duration_s: The simulation step duration
-        :param open_thunderscope: If true, thunderscope opens and the test runs
-                                  in realtime
+
         """
 
         def __stopper():
             # Wait just a bit to let the last couple buffers empty
-            time.sleep(0.01)
+            time.sleep(PROCESS_BUFFER_DELAY)
             self.simulator.simulator_process.kill()
             self.yellow_full_system.full_system_process.kill()
             self.simulator.simulator_process.wait()
             self.yellow_full_system.full_system_process.wait()
-            self.thunderscope.close()
+            if self.enable_thunderscope:
+                self.thunderscope.close()
 
         def __runner():
             time_elapsed_s = 0
@@ -132,8 +140,13 @@ class TacticTestRunner(object):
                 self.simulator.tick(tick_duration_s * SECONDS_TO_MS)
                 time_elapsed_s += tick_duration_s
 
-                if open_thunderscope:
+                if self.enable_thunderscope:
                     time.sleep(tick_duration_s)
+                else:
+                    # TODO (#2518) we should remove this sleep and use
+                    # blocking calls to make this loop run as fast as it
+                    # possibly can.
+                    time.sleep(PROCESS_BUFFER_DELAY)
 
                 # Send the sensor_proto and get vision
                 self.yellow_full_system.send_sensor_proto(
@@ -163,8 +176,9 @@ class TacticTestRunner(object):
                 if error_msg:
                     raise AssertionError(error_msg)
 
-                # Send out the validation proto to thunderscope
-                self.validation_sender.send(validation)
+                if self.enable_thunderscope:
+                    # Send out the validation proto to thunderscope
+                    self.validation_sender.send(validation)
 
                 # Step the primtives
                 self.simulator.send_yellow_primitive_set_and_vision(
@@ -190,14 +204,35 @@ class TacticTestRunner(object):
 
         threading.excepthook = excepthook
 
-        run_sim_thread = threading.Thread(target=__runner, daemon=True)
-        run_sim_thread.start()
-
-        if open_thunderscope:
+        # If thunderscope is enabled, run the test in a thread and show
+        # thunderscope on this thread. The excepthook is setup to catch
+        # any test failures and propagate them to the main thread
+        if self.enable_thunderscope:
+            run_sim_thread = threading.Thread(target=__runner, daemon=True)
+            run_sim_thread.start()
             self.thunderscope.show()
+
+        # If thunderscope is disabled, just run the test
+        else:
+            __runner()
+
+
+def load_command_line_arguments():
+    """Load from command line arguments using argpase
+
+    NOTE: Pytest has its own built in argument parser (conftest.py, pytest_addoption)
+    but it doesn't seem to play nicely with bazel. We juse use argparse instead.
+
+    """
+    parser = argparse.ArgumentParser(description="Process some integers.")
+    parser.add_argument(
+        "--enable_thunderscope", action="store_true", help="enable the visualizer"
+    )
+    return parser.parse_args()
 
 
 @pytest.fixture
 def tactic_runner():
-    runner = TacticTestRunner()
+    args = load_command_line_arguments()
+    runner = TacticTestRunner(enable_thunderscope=args.enable_thunderscope)
     yield runner

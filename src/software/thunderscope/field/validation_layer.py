@@ -1,5 +1,3 @@
-import queue
-
 import pyqtgraph as pg
 from proto.geometry_pb2 import Circle, Polygon
 from proto.validation_pb2 import ValidationGeometry, ValidationProto, ValidationStatus
