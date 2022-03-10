@@ -12,8 +12,6 @@
 #include "shared/2015_robot_constants.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/test_util/test_util.h"
-#include "proto/message_translation/tbots_protobuf.h"
-#include "shared/2015_robot_constants.h"
 #include "software/logger/logger.h"
 #include "software/test_util/test_util.h"
 
@@ -362,18 +360,20 @@ void SimulatedErForceSimTestFixture::runTest(
             }
         }
 
+        auto total_tick_count = friendly_tick_count + enemy_tick_count;
         // compute the averages
         ball_displacement_stats.average =
-            sum_ball_displacement / (friendly_tick_count + enemy_tick_count);
+            (total_tick_count == 0) ? 0 : sum_ball_displacement / total_tick_count;
         ball_velocity_stats.average =
-            sum_ball_velocity / (friendly_tick_count + enemy_tick_count);
+            (total_tick_count == 0) ? 0 : sum_ball_velocity / total_tick_count;
 
         for (size_t i = 0; i < num_robots; i++)
         {
             robots_displacement_stats[i].average =
-                sum_robots_displacement[i] / (friendly_tick_count + enemy_tick_count);
+                (total_tick_count == 0) ? 0
+                                        : sum_robots_displacement[i] / total_tick_count;
             robots_velocity_stats[i].average =
-                sum_robots_velocity[i] / (friendly_tick_count + enemy_tick_count);
+                (total_tick_count == 0) ? 0 : sum_robots_velocity[i] / total_tick_count;
             validation_functions_done =
                 tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,
                          simulator, ball_displacement, ball_velocity_diff,
