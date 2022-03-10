@@ -125,11 +125,6 @@ void ThreadedFullSystemGUI::onValueReceived(SensorProto sensor_msg)
 
 void ThreadedFullSystemGUI::onValueReceived(TbotsProto::PrimitiveSet primitive_msg)
 {
-    LOG(VISUALIZE) << *createNamedValue(
-        "Primitive Hz",
-        static_cast<float>(FirstInFirstOutThreadedObserver<
-                           TbotsProto::PrimitiveSet>::getDataReceivedPerSecond()));
-
     primitives_sent_per_second_buffer->push(
         FirstInFirstOutThreadedObserver<
             TbotsProto::PrimitiveSet>::getDataReceivedPerSecond());

@@ -22,34 +22,37 @@ YELLOW_PRIMITIVE_SET = "/yellow_primitive_set"
 
 
 class ErForceSimulator(object):
-    def __init__(self, base_unix_path="/tmp/tbots"):
+    def __init__(self, runtime_dir="/tmp/tbots"):
 
         """Runs our standalone er-force simulator binary and sets up the unix
         sockets to communicate with it
 
+        :param runtime_dir: The unix path to run everything
+
         """
-        self.sim_tick_sender = ThreadedUnixSender(base_unix_path + SIMULATION_TICK_PATH)
-        self.world_state_sender = ThreadedUnixSender(base_unix_path + WORLD_STATE_PATH)
-        self.blue_vision_sender = ThreadedUnixSender(base_unix_path + BLUE_VISION_PATH)
-        self.yellow_vision_sender = ThreadedUnixSender(
-            base_unix_path + YELLOW_VISION_PATH
-        )
+        # inputs to er_force_simulator_main
+        self.sim_tick_sender = ThreadedUnixSender(runtime_dir + SIMULATION_TICK_PATH)
+        self.world_state_sender = ThreadedUnixSender(runtime_dir + WORLD_STATE_PATH)
+        self.blue_vision_sender = ThreadedUnixSender(runtime_dir + BLUE_VISION_PATH)
+        self.yellow_vision_sender = ThreadedUnixSender(runtime_dir + YELLOW_VISION_PATH)
         self.blue_primitive_set_sender = ThreadedUnixSender(
-            base_unix_path + BLUE_PRIMITIVE_SET
+            runtime_dir + BLUE_PRIMITIVE_SET
         )
         self.yellow_primitive_set_sender = ThreadedUnixSender(
-            base_unix_path + YELLOW_PRIMITIVE_SET
+            runtime_dir + YELLOW_PRIMITIVE_SET
         )
 
+        # outputs from er_force_sim_main
         self.ssl_wrapper_listener = ThreadedUnixListener(
-            base_unix_path + SSL_WRAPPER_PACKET_PATH, SSL_WrapperPacket,
+            runtime_dir + SSL_WRAPPER_PACKET_PATH, SSL_WrapperPacket
         )
         self.blue_robot_status_listener = ThreadedUnixListener(
-            base_unix_path + BLUE_ROBOT_STATUS_PATH, RobotStatus
+            runtime_dir + BLUE_ROBOT_STATUS_PATH, RobotStatus
         )
         self.yellow_robot_status_listener = ThreadedUnixListener(
-            base_unix_path + YELLOW_ROBOT_STATUS_PATH, RobotStatus,
+            runtime_dir + YELLOW_ROBOT_STATUS_PATH, RobotStatus,
         )
+
         self.world_state = WorldState()
 
         # TODO change to er_force_sim_main
@@ -153,9 +156,19 @@ class ErForceSimulator(object):
         return sensor_proto
 
     def get_blue_sensor_proto(self, ssl_wrapper):
+        """Returns the blue sensor proto
+
+        :param ssl_wrapper: The wrapper to pack in the sensor proto
+
+        """
         return self.__get_sensor_proto(ssl_wrapper, self.blue_robot_status_listener)
 
     def get_yellow_sensor_proto(self, ssl_wrapper):
+        """Returns the yellow sensor proto
+
+        :param ssl_wrapper: The wrapper to pack in the sensor proto
+
+        """
         return self.__get_sensor_proto(ssl_wrapper, self.yellow_robot_status_listener)
 
     def get_ssl_wrapper_packet(self):
@@ -192,6 +205,8 @@ class ErForceSimulator(object):
         self.yellow_primitive_set_sender.send(primitive_set)
 
     def stop():
+        """Stop all listeners and senders.
+        """
         self.sim_tick_sender.force_stop()
         self.world_state_sender.force_stop()
         self.blue_vision_sender.force_stop()

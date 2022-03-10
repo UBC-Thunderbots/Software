@@ -23,34 +23,39 @@ TACTIC_OVERRIDE_PATH = "/tactic_override"
 
 
 class FullSystem(object):
-    def __init__(self, base_unix_path="/tmp/tbots"):
+    def __init__(self, runtime_dir="/tmp/tbots"):
 
         """Runs our standalone er-force simulator binary and sets up the unix
         sockets to communicate with it
 
+        :param runtime_dir: The runtime directory
+
         """
-        # TODO I don't think we need these
+
+        # inputs to full_system
         self.robot_status_sender = ThreadedUnixSender(
-            base_unix_path + ROBOT_STATUS_OUTPUT_PATH
+            runtime_dir + ROBOT_STATUS_OUTPUT_PATH
         )
         self.ssl_wrapper_sender = ThreadedUnixSender(
-            base_unix_path + SSL_WRAPPER_OUTPUT_PATH
+            runtime_dir + SSL_WRAPPER_OUTPUT_PATH
         )
         self.ssl_referee_sender = ThreadedUnixSender(
-            base_unix_path + SSL_REFEREE_OUTPUT_PATH
+            runtime_dir + SSL_REFEREE_OUTPUT_PATH
         )
-        self.tactic_override = ThreadedUnixSender(base_unix_path + TACTIC_OVERRIDE_PATH)
-
         self.sensor_proto_sender = ThreadedUnixSender(
-            base_unix_path + SENSOR_PROTO_OUTPUT_PATH
+            runtime_dir + SENSOR_PROTO_OUTPUT_PATH
         )
 
+        # outputs from full_system
         self.vision_listener = ThreadedUnixListener(
-            base_unix_path + VISION_INPUT_PATH, Vision
+            runtime_dir + VISION_INPUT_PATH, Vision
         )
         self.primitive_listener = ThreadedUnixListener(
-            base_unix_path + PRIMITIVE_INPUT_PATH, PrimitiveSet
+            runtime_dir + PRIMITIVE_INPUT_PATH, PrimitiveSet
         )
+
+        # override the tactic
+        self.tactic_override = ThreadedUnixSender(runtime_dir + TACTIC_OVERRIDE_PATH)
 
         # TODO (#2510) rename to full_system
         self.full_system_process = Popen(["software/unix_full_system"])
