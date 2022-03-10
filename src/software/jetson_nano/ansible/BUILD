@@ -6,7 +6,7 @@ load("@ansible_deps//:requirements.bzl", "requirement")
 py_binary(
     name = "run_ansible",
     srcs = ["run_ansible.py"],
-    data = [":testPB"],
+    data = [":playbooks"],
     deps = [
         requirement("ansible"),
         "//software/jetson_nano/broadcasts:robot_broadcast_receiver",
@@ -14,7 +14,7 @@ py_binary(
 )
 
 filegroup(
-    name = "testPB",
+    name = "playbooks",
     data = glob([
         "playbooks/**/*.yml",
     ]),
