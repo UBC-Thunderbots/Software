@@ -122,3 +122,10 @@ sh_binary(
         "@bazel_tools//tools/bash/runfiles",
     ],
 )
+
+py_library(
+    name = "py_constants",
+    srcs = [
+        "constants.py",
+    ],
+)

@@ -36,7 +36,7 @@ class ThreadedUnixListener:
         self.unix_path = unix_path
         self.proto_buffer = queue.Queue(max_buffer_size)
 
-        self.thread = Thread(target=self.start)
+        self.thread = Thread(target=self.start, daemon=True)
         self.thread.start()
 
     @property

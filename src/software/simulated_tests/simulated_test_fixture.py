@@ -15,6 +15,7 @@ from proto.tbots_software_msgs_pb2 import Vision
 from proto.validation_pb2 import ValidationGeometry, ValidationProto, ValidationStatus
 from proto.vision_pb2 import BallState, RobotState
 from proto.world_pb2 import SimulatorTick, World, WorldState
+from software.constants import SECONDS_TO_MS
 from pyqtgraph.Qt import QtCore, QtGui
 
 from software.networking.threaded_unix_sender import ThreadedUnixSender
@@ -87,7 +88,7 @@ class TacticTestRunner(object):
         self.thunderscope = Thunderscope()
         self.simulator = ErForceSimulator()
         self.yellow_full_system = FullSystem()
-        time.sleep(0.1)
+        time.sleep(launch_delay_s)
 
         self.validation_sender = ThreadedUnixSender(base_unix_path + "/validation")
 
@@ -113,6 +114,8 @@ class TacticTestRunner(object):
         """
 
         def __stopper():
+            # Wait just a bit to let the last couple buffers empty
+            time.sleep(0.01)
             self.simulator.simulator_process.kill()
             self.yellow_full_system.full_system_process.kill()
             self.simulator.simulator_process.wait()
@@ -126,7 +129,7 @@ class TacticTestRunner(object):
             while time_elapsed_s < test_timeout_s:
 
                 ssl_wrapper = self.simulator.get_ssl_wrapper_packet()
-                self.simulator.tick(tick_duration_s * 1000)
+                self.simulator.tick(tick_duration_s * SECONDS_TO_MS)
                 time_elapsed_s += tick_duration_s
 
                 if open_thunderscope:
@@ -187,7 +190,7 @@ class TacticTestRunner(object):
 
         threading.excepthook = excepthook
 
-        run_sim_thread = threading.Thread(target=__runner)
+        run_sim_thread = threading.Thread(target=__runner, daemon=True)
         run_sim_thread.start()
 
         if open_thunderscope:
