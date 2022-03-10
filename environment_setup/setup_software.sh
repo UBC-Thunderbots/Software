@@ -65,6 +65,7 @@ host_software_packages=(
     libffi-dev # needed to use _ctypes in Python3
     libssl-dev # needed to build Python 3 with ssl support
     openssl # possibly also necessary for ssl in Python 3
+    sshpass #used to remotely ssh into robots via Ansible
 )
 
 if [[ $(lsb_release -rs) == "20.04" ]]; then
@@ -175,6 +176,7 @@ sudo /usr/bin/python3.8 -m pip install --prefix /usr/local platformio==5.2.4
 echo "================================================================"
 echo "Done platformio Setup"
 echo "================================================================"
+
 
 # Done
 echo "================================================================"

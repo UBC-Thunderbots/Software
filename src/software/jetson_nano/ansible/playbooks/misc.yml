@@ -1,0 +1,28 @@
+---
+
+#This file has a bunch of common tasks that can be reused in other playbooks or individually
+
+  #shutsdown a host
+- name: Shutdown
+  become_method: sudo
+  become: true
+  shell: sudo shutdown
+  tags:
+    - shutdown
+  register: res
+
+  #reboots the host and waits until a connection is re-established
+- name: Reboot
+  become: true
+  become_method: sudo
+  register: res
+  tags:
+    - reboot
+  reboot:
+    msg: "Reboot initiated by Ansible"
+    connect_timeout: 20
+    reboot_timeout: 1200
+    pre_reboot_delay: 0
+    post_reboot_delay: 60
+    test_command: whoami
+

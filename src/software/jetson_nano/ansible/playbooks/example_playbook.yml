@@ -1,13 +1,39 @@
 ---
-- name: Example Ansible playbook that can be run on multiple Jetson Nanos
-  hosts: THUNDERBOTS_HOSTS
+# Example Ansible playbook that can be run on multiple Jetson Nanos
 
+  #plays start by defining basic setup info
+- name: Example Ansible playbook          # name of this playbook
+  hosts: THUNDERBOTS_HOSTS                # ensures that we only run on hosts defined under this group
+
+  vars:
+    - example_var: example                # variables can be set statically or at runtime
+
+
+  #once setup is done, tasks can be defined. They will be executed in order
   tasks:
 
-  - name: echo hello
-    register: res
-    shell: echo "hello world"
+  - name: echo hello world
+    register: res                         # save the result of this task in the variable "res"
+    tags: echo_hello_world
+    shell: echo hello world
 
-  - debug: msg="{{ res.stdout }}"
-  - debug: msg="{{ res.stderr }}"
+  - debug:
+      msg:
+        - "[Robot ID = {{ inventory_hostname }}]"
+        - "stdout = {{ res.stdout_lines }} "
+        - "stderr = {{ res.stderr }}"
+
+  - name: echo example variable
+    register: res
+    tags: echo_example_var
+    shell: echo {{ example_var }}
+
+  - debug:
+      msg:
+        - "[Robot ID = {{ inventory_hostname }}]"
+        - "stdout = {{ res.stdout_lines }} "
+        - "stderr = {{ res.stderr }}"
+
+
+
 
