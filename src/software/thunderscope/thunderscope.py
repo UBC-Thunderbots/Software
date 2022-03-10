@@ -4,18 +4,16 @@ import signal
 import pyqtgraph as pg
 from proto.geometry_pb2 import Circle, Polygon
 from proto.visualization_pb2 import NamedValue, Obstacles, PathVisualization
+from proto.robot_log_msg_pb2 import RobotLog
 from proto.world_pb2 import World
 from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
 
 from software.networking import threaded_unix_sender
-from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
-from software.thunderscope.field import (
-    obstacle_layer,
-    path_layer,
-    validation_layer,
-    world_layer,
-)
+from software.thunderscope.arbitrary_plot.named_value_plotter import \
+    NamedValuePlotter
+from software.thunderscope.field import (obstacle_layer, path_layer,
+                                         validation_layer, world_layer)
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_receiver import ProtoReceiver
@@ -72,11 +70,12 @@ class Thunderscope(object):
         world = world_layer.WorldLayer()
         obstacles = obstacle_layer.ObstacleLayer()
         paths = path_layer.PathLayer()
-        validation_layer.ValidationLayer()
+        validation = validation_layer.ValidationLayer()
 
         self.field.add_layer("Vision", world)
         self.field.add_layer("Obstacles", obstacles)
         self.field.add_layer("Paths", paths)
+        self.field.add_layer("Validation", validation)
 
         self.proto_receiver.register_observer(World, world.world_buffer)
         self.proto_receiver.register_observer(Obstacles, obstacles.obstacle_buffer)
@@ -97,6 +96,7 @@ class Thunderscope(object):
 
         """
         self.logs = g3logWidget()
+        self.proto_receiver.register_observer(RobotLog, self.logs.log_buffer)
 
         log_dock = Dock("logs", size=(500, 100))
         log_dock.addWidget(self.logs)

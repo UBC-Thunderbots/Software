@@ -2,47 +2,18 @@ import logging
 
 import pytest
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - [%(levelname)s] - [%(threadName)s] - %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s",
-)
-logger = logging.getLogger(__name__)
 from typing import List, Set
 
 import software.geom.geometry as tbots_geom
-from proto.geometry_pb2 import Angle, AngularVelocity, Point, Vector
-from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
-from proto.primitive_pb2 import MaxAllowedSpeedMode
-from proto.robot_status_msg_pb2 import RobotStatus
-from proto.sensor_msg_pb2 import SensorProto
-from proto.tactic_pb2 import AssignedTacticPlayControlParams, GoalieTactic, Tactic
-from proto.tbots_software_msgs_pb2 import Vision
-from proto.validation_pb2 import ValidationGeometry, ValidationProto, ValidationStatus
-from proto.vision_pb2 import BallState, RobotState
-from proto.world_pb2 import SimulatorTick, World, WorldState
-from pyqtgraph.Qt import QtCore, QtGui
-
-from software.networking.threaded_unix_sender import ThreadedUnixSender
-from software.simulated_tests.full_system_wrapper import FullSystemWrapper
-from software.simulated_tests.standalone_simulator_wrapper import (
-    StandaloneSimulatorWrapper,
-)
-from software.thunderscope.thunderscope import Thunderscope
-
+from proto.validation_pb2 import (ValidationGeometry, ValidationProto,
+                                  ValidationStatus)
 
 class Validation(object):
 
     """A validation function"""
 
-    def __init__(self, flipped=False):
-        self.flipped = flipped
-
     def get_validation_status(self, vision) -> ValidationStatus:
-        return (
-            self._flip(self._get_private_validation_status(vision))
-            if self.flipped
-            else self._get_private_validation_status(vision)
-        )
+        raise NotImplementedError("get_validation_status is not implemented")
 
     def get_validation_geometry(self, vision) -> ValidationGeometry:
         raise NotImplementedError("get_validation_geometry is not implemented")
@@ -50,28 +21,31 @@ class Validation(object):
     def get_failure_message(self):
         raise NotImplementedError("get_failure_message is not implemented")
 
-    def _get_private_validation_status(self, vision) -> ValidationStatus:
-        raise NotImplementedError("get_validation_status is not implemented")
 
-    def _flip(self, validation_status) -> ValidationStatus:
-        if validation_status == ValidationStatus.PASSING:
-            return ValidationStatus.FAILING
-        if validation_status == ValidationStatus.FAILING:
-            return ValidationStatus.PASSING
-
-
-class EventuallyValidation(Validation):
-    pass
-
-
-class AlwaysValidation(Validation):
-    pass
-
-
-# TODO finalize naming
 ValidationSequence = List[Validation]
 ValidationSequenceSet = Set[ValidationSequence]
 
+
+def flip_validation(get_validation_status_func):
+    """Decorator to flip the validation function logic if
+    should_flip is True.
+
+    :param flip: If true, the result is flipped
+
+    """
+    def inner(self, vision):
+        status = get_validation_status_func(self, vision)
+
+        flipped = {
+            ValidationStatus.FAILING : ValidationStatus.PASSING,
+            ValidationStatus.PASSING : ValidationStatus.FAILING,
+        }
+
+        if self.flipped:
+            return flipped[status]
+
+        return status
+    return inner
 
 def create_validation_geometry(geometry=[]) -> ValidationGeometry:
     """Given a list of (vectors, polygons, circles), creates a ValidationGeometry

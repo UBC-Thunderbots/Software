@@ -46,13 +46,14 @@ class FullSystem(object):
         )
 
         self.vision_listener = ThreadedUnixListener(
-            base_unix_path + VISION_INPUT_PATH, Vision, convert_from_any=False,
+            base_unix_path + VISION_INPUT_PATH, Vision
         )
         self.primitive_listener = ThreadedUnixListener(
-            base_unix_path + PRIMITIVE_INPUT_PATH, PrimitiveSet, convert_from_any=False,
+            base_unix_path + PRIMITIVE_INPUT_PATH, PrimitiveSet
         )
 
-        self.full_system_process = Popen(["software/full_system"])
+        # TODO (#2510) rename to full_system
+        self.full_system_process = Popen(["software/unix_full_system"])
 
     def send_robot_status(self, robot_status):
         self.robot_status_sender.send(robot_status)

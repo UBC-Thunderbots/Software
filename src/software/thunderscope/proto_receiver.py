@@ -10,7 +10,6 @@ class ProtoReceiver:
         self.proto_map = dict()
         self.proto_receiver = ThreadedUnixListener(
             constants.UNIX_SOCKET_BASE_PATH + "protobuf",
-            convert_from_any=True,
             max_buffer_size=3,
         )
         self.thread = Thread(target=self.start)

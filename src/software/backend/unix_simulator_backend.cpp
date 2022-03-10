@@ -16,36 +16,36 @@ UnixSimulatorBackend::UnixSimulatorBackend(std::shared_ptr<const BackendConfig> 
 {
     // Protobuf Inputs
     robot_status_input.reset(new ThreadedProtoUnixListener<TbotsProto::RobotStatus>(
-        config->getSimulatorBackendConfig()->getBaseUnixPath()->value() +
+        config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
             ROBOT_STATUS_INPUT_PATH,
         boost::bind(&Backend::receiveRobotStatus, this, _1)));
 
     ssl_wrapper_input.reset(new ThreadedProtoUnixListener<SSLProto::SSL_WrapperPacket>(
-        config->getSimulatorBackendConfig()->getBaseUnixPath()->value() +
+        config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
             SSL_WRAPPER_INPUT_PATH,
         boost::bind(&Backend::receiveSSLWrapperPacket, this, _1)));
 
     ssl_referee_input.reset(new ThreadedProtoUnixListener<SSLProto::Referee>(
-        config->getSimulatorBackendConfig()->getBaseUnixPath()->value() +
+        config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
             SSL_REFEREE_INPUT_PATH,
         boost::bind(&Backend::receiveSSLReferee, this, _1)));
 
     sensor_proto_input.reset(new ThreadedProtoUnixListener<SensorProto>(
-        config->getSimulatorBackendConfig()->getBaseUnixPath()->value() +
+        config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
             SENSOR_PROTO_INPUT_PATH,
         boost::bind(&Backend::receiveSensorProto, this, _1)));
 
     // Protobuf Outputs
     vision_output.reset(new ThreadedProtoUnixSender<TbotsProto::Vision>(
-        config->getSimulatorBackendConfig()->getBaseUnixPath()->value() +
+        config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
         VISION_OUTPUT_PATH));
 
     primitive_output.reset(new ThreadedProtoUnixSender<TbotsProto::PrimitiveSet>(
-        config->getSimulatorBackendConfig()->getBaseUnixPath()->value() +
+        config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
         PRIMITIVE_OUTPUT_PATH));
 
     defending_side_output.reset(new ThreadedProtoUnixSender<DefendingSideProto>(
-        config->getSimulatorBackendConfig()->getBaseUnixPath()->value() +
+        config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
         DEFENDING_SIDE_OUTPUT));
 }
 
@@ -64,12 +64,24 @@ void UnixSimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
     {
         defending_side_output->sendProto(*createDefendingSide(FieldSide::NEG_X));
     }
+    // TODO (#2510) Find a new home once SimulatorBackend and ThreadedFullSystemGUI are
+    // gone
+    LOG(VISUALIZE) << *createNamedValue(
+        "Primitive Hz",
+        static_cast<float>(
+            FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
 }
 
 void UnixSimulatorBackend::onValueReceived(World world)
 {
     vision_output->sendProto(*createVision(world));
     LOG(VISUALIZE) << *createWorld(world);
+    // TODO (#2510) Find a new home once SimulatorBackend and ThreadedFullSystemGUI are
+    // gone
+    LOG(VISUALIZE) << *createNamedValue(
+        "World Hz",
+        static_cast<float>(
+            FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
 }
 
 // Register this backend in the genericFactory

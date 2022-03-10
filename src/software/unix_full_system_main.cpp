@@ -11,7 +11,7 @@
 #include "shared/parameter/dynamic_parameters.pb.h"
 #include "software/ai/threaded_ai.h"
 #include "software/backend/backend.h"
-#include "software/backend/simulator_backend.h"
+#include "software/backend/unix_simulator_backend.h"
 #include "software/constants.h"
 #include "software/estop/arduino_util.h"
 #include "software/gui/full_system/threaded_full_system_gui.h"
@@ -24,10 +24,12 @@
 int main(int argc, char** argv)
 {
     // load command line arguments
-    auto args           = std::make_shared<FullSystemMainCommandLineArgs>();
+    // TODO (#2510) Remove the Arudino Config
+    auto arduino_config = std::make_shared<ArduinoConfig>();
+    auto args           = std::make_shared<FullSystemMainCommandLineArgs>(arduino_config);
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
-    std::string runtime_path = args->getRuntimePath()->value();
+    std::string runtime_path = args->getRuntimeDir()->value();
     LoggerSingleton::initializeLogger(runtime_path);
 
     if (!help_requested)
@@ -37,8 +39,8 @@ int main(int argc, char** argv)
         auto thunderbots_config =
             std::const_pointer_cast<const ThunderbotsConfig>(mutable_thunderbots_config);
 
-        auto backend =
-            std::make_shared<SimulatorBackend>(thunderbots_config->getBackendConfig());
+        auto backend = std::make_shared<UnixSimulatorBackend>(
+            thunderbots_config->getBackendConfig());
         auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(
             thunderbots_config->getSensorFusionConfig());
         auto ai = std::make_shared<ThreadedAI>(thunderbots_config->getAiConfig());

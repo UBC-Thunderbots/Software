@@ -4,34 +4,30 @@ import time
 
 import pytest
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - [%(levelname)s] - [%(threadName)s] - %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s",
-)
-logger = logging.getLogger(__name__)
-
 import software.geom.geometry as tbots_geom
 from proto.geometry_pb2 import Angle, AngularVelocity, Point, Vector
 from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
 from proto.primitive_pb2 import MaxAllowedSpeedMode
 from proto.robot_status_msg_pb2 import RobotStatus
 from proto.sensor_msg_pb2 import SensorProto
-from proto.tactic_pb2 import AssignedTacticPlayControlParams, GoalieTactic, Tactic
+from proto.tactic_pb2 import (AssignedTacticPlayControlParams, GoalieTactic,
+                              Tactic)
 from proto.tbots_software_msgs_pb2 import Vision
-from proto.validation_pb2 import ValidationGeometry, ValidationProto, ValidationStatus
+from proto.validation_pb2 import (ValidationGeometry, ValidationProto,
+                                  ValidationStatus)
 from proto.vision_pb2 import BallState, RobotState
 from proto.world_pb2 import SimulatorTick, World, WorldState
 from pyqtgraph.Qt import QtCore, QtGui
 
 from software.networking.threaded_unix_sender import ThreadedUnixSender
-from software.simulated_tests.eventually_validation.robot_enters_region import (
-    RobotEntersRegion,
-)
-from software.simulated_tests.full_system_wrapper import FullSystemWrapper
-from software.simulated_tests.standalone_simulator_wrapper import (
-    StandaloneSimulatorWrapper,
-)
+from software.simulated_tests.eventually_validation.robot_enters_region import \
+    RobotEntersRegion
+from software.simulated_tests.full_system import FullSystem
+from software.simulated_tests.er_force_simulator import ErForceSimulator
 from software.thunderscope.thunderscope import Thunderscope
+
+from software.logger.logger import createLogger
+logger = createLogger(__name__)
 
 
 def run_validation_sequence_sets(
@@ -43,9 +39,9 @@ def run_validation_sequence_sets(
     :raises AssertionError: If the test fails
     :param vision: Vision to validate with
     :param eventually_validation_sequence_set:
-            A collection of sequences of EventuallyValidation to validate.
+            A collection of sequences of eventually validations to validate.
     :param always_validation_sequence_set:
-            A collection of sequences of AlwaysValidation to validate.
+            A collection of sequences of always validations to validate.
 
     :returns: ValidationProto, error_msg
 
@@ -89,9 +85,9 @@ class TacticTestRunner(object):
 
         """
         self.thunderscope = Thunderscope()
-        self.simulator = StandaloneSimulatorWrapper()
-        self.yellow_full_system = FullSystemWrapper()
-        time.sleep(launch_delay_s)
+        self.simulator = ErForceSimulator()
+        self.yellow_full_system = FullSystem()
+        time.sleep(0.1)
 
         self.validation_sender = ThreadedUnixSender(base_unix_path + "/validation")
 
@@ -100,7 +96,7 @@ class TacticTestRunner(object):
         always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=[[]],
         test_timeout_s=3,
-        tick_duration_s=0.01,
+        tick_duration_s=0.0166, # Default to 60hz
         open_thunderscope=True,
     ):
         """Run a test
@@ -117,9 +113,9 @@ class TacticTestRunner(object):
         """
 
         def __stopper():
-            self.simulator.standalone_simulator_process.kill()
+            self.simulator.simulator_process.kill()
             self.yellow_full_system.full_system_process.kill()
-            self.simulator.standalone_simulator_process.wait()
+            self.simulator.simulator_process.wait()
             self.yellow_full_system.full_system_process.wait()
             self.thunderscope.close()
 

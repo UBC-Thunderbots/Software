@@ -104,12 +104,6 @@ void ThreadedFullSystemGUI::onValueReceived(World world)
         view_area_buffer->push(world.field().fieldBoundary());
     }
 
-    LOG(VISUALIZE) << *createNamedValue(
-        "World Hz",
-        static_cast<float>(
-            FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
-
-
     worlds_received_per_second_buffer->push(
         FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond());
 }

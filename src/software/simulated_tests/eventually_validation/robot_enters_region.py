@@ -2,28 +2,16 @@ import logging
 
 import pytest
 
-logging.basicConfig(
-    level=logging.INFO,
-    format=(
-        "%(asctime)s - [%(levelname)s] - [%(threadName)s] -"
-        "%(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s"
-    ),
-)
-logger = logging.getLogger(__name__)
-
-
 import software.geom.geometry as tbots_geom
 from proto.geometry_pb2 import Angle, AngularVelocity, Point, Vector
 from proto.tbots_software_msgs_pb2 import Vision
-from proto.validation_pb2 import ValidationGeometry, ValidationProto, ValidationStatus
+from proto.validation_pb2 import (ValidationGeometry, ValidationProto,
+                                  ValidationStatus)
 from proto.vision_pb2 import BallState, RobotState
 from proto.world_pb2 import SimulatorTick, World, WorldState
 
-from software.simulated_tests.validation import (
-    EventuallyValidation,
-    Validation,
-    create_validation_geometry,
-)
+from software.simulated_tests.validation import (Validation,
+                                                 create_validation_geometry, flip_validation)
 
 
 class RobotEntersRegion(Validation):
@@ -34,7 +22,8 @@ class RobotEntersRegion(Validation):
         self.regions = regions
         self.flipped = flipped
 
-    def _get_private_validation_status(self, vision) -> ValidationStatus:
+    @flip_validation
+    def get_validation_status(self, vision) -> ValidationStatus:
         """Checks if _any_ robot enters the provided regions
 
         :param vision: The vision msg to validate

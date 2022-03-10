@@ -124,7 +124,7 @@ fi
 
 if ! sudo /opt/tbotspython/bin/pip3.8 install -r requirements.txt ; then
     echo "##############################################################"
-    echo "Install python requirements failed"
+    echo "Error: Installing python requirements failed"
     echo "##############################################################"
     exit 1
 fi

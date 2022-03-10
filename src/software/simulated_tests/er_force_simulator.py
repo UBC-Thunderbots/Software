@@ -21,7 +21,7 @@ BLUE_PRIMITIVE_SET = "/blue_primitive_set"
 YELLOW_PRIMITIVE_SET = "/yellow_primitive_set"
 
 
-class StandaloneSimulatorWrapper(object):
+class ErForceSimulator(object):
     def __init__(self, base_unix_path="/tmp/tbots"):
 
         """Runs our standalone er-force simulator binary and sets up the unix
@@ -44,21 +44,19 @@ class StandaloneSimulatorWrapper(object):
         self.ssl_wrapper_listener = ThreadedUnixListener(
             base_unix_path + SSL_WRAPPER_PACKET_PATH,
             SSL_WrapperPacket,
-            convert_from_any=False,
         )
         self.blue_robot_status_listener = ThreadedUnixListener(
-            base_unix_path + BLUE_ROBOT_STATUS_PATH, RobotStatus, convert_from_any=False
+            base_unix_path + BLUE_ROBOT_STATUS_PATH, RobotStatus
         )
         self.yellow_robot_status_listener = ThreadedUnixListener(
             base_unix_path + YELLOW_ROBOT_STATUS_PATH,
             RobotStatus,
-            convert_from_any=False,
         )
         self.world_state = WorldState()
 
         # TODO change to er_force_sim_main
-        self.standalone_simulator_process = Popen(
-            ["software/simulation/standalone_er_force_simulator_main"],
+        self.simulator_process = Popen(
+            ["software/er_force_simulator_main"],
         )
 
     def __setup_robots(self, robot_locations, team_colour):

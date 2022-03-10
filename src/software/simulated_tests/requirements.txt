@@ -1,3 +1,1 @@
 pytest==6.2.5
-hanging-threads==2.0.5
-coloredlogs==15.0.1

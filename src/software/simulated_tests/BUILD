@@ -1,7 +1,3 @@
-load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
-load("@com_google_protobuf//:protobuf.bzl", "py_proto_library")
-load("@simulated_tests_deps//:requirements.bzl", "requirement")
-
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -128,6 +124,7 @@ py_library(
         ":full_system",
         "//proto:software_py_proto",
         "//proto:tbots_py_proto",
+        "//software/logger:py_logger",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
         "//software/simulated_tests/eventually_validation",
@@ -146,7 +143,7 @@ py_library(
     deps = [
         "//proto:software_py_proto",
         "//proto:tbots_py_proto",
-        requirement("coloredlogs"),
+        "//software/logger:py_logger",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
     ],
@@ -164,6 +161,7 @@ py_library(
     deps = [
         "//proto:software_py_proto",
         "//proto:tbots_py_proto",
+        "//software/logger:py_logger",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
     ],
@@ -180,16 +178,7 @@ py_library(
     deps = [
         "//proto:software_py_proto",
         "//proto:tbots_py_proto",
+        "//software/logger:py_logger",
     ],
 )
 
-py_test(
-    name = "goalie_tactic_test",
-    srcs = [
-        "goalie_tactic_test.py",
-    ],
-    deps = [
-        ":simulated_test_fixture",
-        requirement("pytest"),
-    ],
-)
