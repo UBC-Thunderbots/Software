@@ -21,13 +21,13 @@ struct MoveFSM
         // The speed the robot should have when it arrives at its destination
         double final_speed;
         // How to run the dribbler
-        DribblerMode dribbler_mode;
+        TbotsProto::DribblerMode dribbler_mode;
         // How to navigate around the ball
-        BallCollisionType ball_collision_type;
+        TbotsProto::BallCollisionType ball_collision_type;
         // The command to autochip or autokick
         AutoChipOrKick auto_chip_or_kick;
         // The maximum allowed speed mode
-        MaxAllowedSpeedMode max_allowed_speed_mode;
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
         // The target spin while moving in revolutions per second
         double target_spin_rev_per_s;
     };

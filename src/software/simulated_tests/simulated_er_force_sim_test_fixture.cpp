@@ -12,6 +12,8 @@
 #include "shared/2015_robot_constants.h"
 #include "shared/2021_robot_constants.h"
 #include "shared/test_util/test_util.h"
+#include "proto/message_translation/tbots_protobuf.h"
+#include "shared/2015_robot_constants.h"
 #include "software/logger/logger.h"
 #include "software/test_util/test_util.h"
 
@@ -35,6 +37,14 @@ void SimulatedErForceSimTestFixture::SetUp()
 {
     LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
 
+    // new configs so that callbacks to the previous test's AI are cleared
+    friendly_mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
+    enemy_mutable_thunderbots_config    = std::make_shared<ThunderbotsConfig>();
+    friendly_thunderbots_config = std::const_pointer_cast<const ThunderbotsConfig>(
+        friendly_mutable_thunderbots_config);
+    enemy_thunderbots_config = std::const_pointer_cast<const ThunderbotsConfig>(
+        enemy_mutable_thunderbots_config);
+
     setCommonConfigs(friendly_mutable_thunderbots_config);
     setCommonConfigs(enemy_mutable_thunderbots_config);
     // The friendly team defends the negative side of the field
@@ -54,6 +64,11 @@ void SimulatedErForceSimTestFixture::SetUp()
     enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableDefendingPositiveSide()
         ->setValue(true);
+
+    // reinitializing to prevent the previous test's configs from being reused
+    friendly_sensor_fusion =
+        SensorFusion(friendly_thunderbots_config->getSensorFusionConfig());
+    enemy_sensor_fusion = SensorFusion(enemy_thunderbots_config->getSensorFusionConfig());
 
     if (TbotsGtestMain::enable_visualizer)
     {
@@ -207,7 +222,7 @@ void SimulatedErForceSimTestFixture::sleep(
 }
 
 void SimulatedErForceSimTestFixture::runTest(
-    const FieldType &field_type, const BallState &ball,
+    const TbotsProto::FieldType &field_type, const BallState &ball,
     const std::vector<RobotStateWithId> &friendly_robots,
     const std::vector<RobotStateWithId> &enemy_robots,
     const std::vector<ValidationFunction> &terminating_validation_functions,
