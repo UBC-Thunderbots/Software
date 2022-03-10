@@ -181,4 +181,3 @@ py_library(
         "//software/logger:py_logger",
     ],
 )
-

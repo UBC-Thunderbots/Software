@@ -1,4 +1,5 @@
 package(default_visibility = ["//visibility:public"])
+
 load("@simulated_tests_deps//:requirements.bzl", "requirement")
 
 cc_library(

@@ -5,8 +5,8 @@ import pytest
 from typing import List, Set
 
 import software.geom.geometry as tbots_geom
-from proto.validation_pb2 import (ValidationGeometry, ValidationProto,
-                                  ValidationStatus)
+from proto.validation_pb2 import ValidationGeometry, ValidationProto, ValidationStatus
+
 
 class Validation(object):
 
@@ -33,19 +33,22 @@ def flip_validation(get_validation_status_func):
     :param flip: If true, the result is flipped
 
     """
+
     def inner(self, vision):
         status = get_validation_status_func(self, vision)
 
         flipped = {
-            ValidationStatus.FAILING : ValidationStatus.PASSING,
-            ValidationStatus.PASSING : ValidationStatus.FAILING,
+            ValidationStatus.FAILING: ValidationStatus.PASSING,
+            ValidationStatus.PASSING: ValidationStatus.FAILING,
         }
 
         if self.flipped:
             return flipped[status]
 
         return status
+
     return inner
+
 
 def create_validation_geometry(geometry=[]) -> ValidationGeometry:
     """Given a list of (vectors, polygons, circles), creates a ValidationGeometry

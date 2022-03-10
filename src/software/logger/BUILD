@@ -114,6 +114,6 @@ cc_library(
 py_library(
     name = "py_logger",
     srcs = [
-        "logger.py"
+        "logger.py",
     ],
 )

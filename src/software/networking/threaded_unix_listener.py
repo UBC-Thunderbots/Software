@@ -107,7 +107,6 @@ class Session(socketserver.BaseRequestHandler):
         else:
             self.handle_log_visualize()
 
-
     def handle_proto(self):
         """If a specific protobuf class is passed in, this handler is called
 

@@ -6,6 +6,7 @@ from threading import Thread
 from google.protobuf import text_format
 from google.protobuf.any_pb2 import Any
 
+
 class ThreadedUnixSender:
     def __init__(self, unix_path, max_buffer_size=3):
 

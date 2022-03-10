@@ -10,23 +10,23 @@ from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
 from proto.primitive_pb2 import MaxAllowedSpeedMode
 from proto.robot_status_msg_pb2 import RobotStatus
 from proto.sensor_msg_pb2 import SensorProto
-from proto.tactic_pb2 import (AssignedTacticPlayControlParams, GoalieTactic,
-                              Tactic)
+from proto.tactic_pb2 import AssignedTacticPlayControlParams, GoalieTactic, Tactic
 from proto.tbots_software_msgs_pb2 import Vision
-from proto.validation_pb2 import (ValidationGeometry, ValidationProto,
-                                  ValidationStatus)
+from proto.validation_pb2 import ValidationGeometry, ValidationProto, ValidationStatus
 from proto.vision_pb2 import BallState, RobotState
 from proto.world_pb2 import SimulatorTick, World, WorldState
 from pyqtgraph.Qt import QtCore, QtGui
 
 from software.networking.threaded_unix_sender import ThreadedUnixSender
-from software.simulated_tests.eventually_validation.robot_enters_region import \
-    RobotEntersRegion
+from software.simulated_tests.eventually_validation.robot_enters_region import (
+    RobotEntersRegion,
+)
 from software.simulated_tests.full_system import FullSystem
 from software.simulated_tests.er_force_simulator import ErForceSimulator
 from software.thunderscope.thunderscope import Thunderscope
 
 from software.logger.logger import createLogger
+
 logger = createLogger(__name__)
 
 
@@ -96,7 +96,7 @@ class TacticTestRunner(object):
         always_validation_sequence_set=[[]],
         eventually_validation_sequence_set=[[]],
         test_timeout_s=3,
-        tick_duration_s=0.0166, # Default to 60hz
+        tick_duration_s=0.0166,  # Default to 60hz
         open_thunderscope=True,
     ):
         """Run a test

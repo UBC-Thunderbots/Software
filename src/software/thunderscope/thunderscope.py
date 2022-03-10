@@ -10,10 +10,13 @@ from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
 
 from software.networking import threaded_unix_sender
-from software.thunderscope.arbitrary_plot.named_value_plotter import \
-    NamedValuePlotter
-from software.thunderscope.field import (obstacle_layer, path_layer,
-                                         validation_layer, world_layer)
+from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
+from software.thunderscope.field import (
+    obstacle_layer,
+    path_layer,
+    validation_layer,
+    world_layer,
+)
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_receiver import ProtoReceiver
