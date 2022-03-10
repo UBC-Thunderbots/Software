@@ -12,7 +12,8 @@ import os
 import argparse
 
 HOST_GROUP = "THUNDERBOTS_HOSTS"
-NANO_USER = "robot"
+NANO_USER = "propbot"
+ANNOUNCEMENT_LISTEN_DURATION_S = 2
 
 # loads variables, inventory, and play into Ansible API, then runs it
 def ansible_runner(playbook: str, options: dict = {}):
@@ -30,7 +31,11 @@ def ansible_runner(playbook: str, options: dict = {}):
     host_aliases = hosts
 
     if not hosts:
-        announcements = receive_announcements()
+        if not options['port']:
+            print("Announcement Port not defined, exiting")
+            exit()
+
+        announcements = receive_announcements(port=options['port'], duration=ANNOUNCEMENT_LISTEN_DURATION_S)
         hosts = [a.ip_addr for a in announcements]
         host_aliases = [a.robot_id for a in announcements]
 
@@ -57,7 +62,6 @@ def ansible_runner(playbook: str, options: dict = {}):
         start_at_task=None,
         extra_vars=vars,
         skip_tags=skip_tags,
-        become_ask_pass=True,
     )
 
     inventory = InventoryManager(loader=loader, sources=())
@@ -78,7 +82,7 @@ def ansible_runner(playbook: str, options: dict = {}):
         inventory=inventory,
         variable_manager=variable_manager,
         loader=loader,
-        passwords={"conn_pass": ssh_pass},
+        passwords={"conn_pass": ssh_pass, 'become_pass': ssh_pass},
     )
 
     pbex.run()
@@ -96,7 +100,7 @@ def main():
         nargs="*",
         required=False,
         help="space separated list of hosts to run on, defaults to using robot announcements",
-        default=[],
+        default=['192.168.1.78'],
     )
     ap.add_argument(
         "--tags",
