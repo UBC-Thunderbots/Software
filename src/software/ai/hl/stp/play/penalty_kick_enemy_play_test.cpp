@@ -21,8 +21,8 @@ class PenaltyKickEnemyPlayTest
           RefereeCommand, RefereeCommand, std::vector<RobotStateWithId>, float>>
 {
    protected:
-    FieldType field_type = FieldType::DIV_B;
-    Field field          = Field::createField(field_type);
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
 };
 
 TEST_P(PenaltyKickEnemyPlayTest, test_penalty_kick_enemy_play_setup)

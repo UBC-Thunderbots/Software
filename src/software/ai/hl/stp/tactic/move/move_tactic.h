@@ -31,11 +31,13 @@ class MoveTactic : public Tactic
      */
     void updateControlParams(
         Point destination, Angle final_orientation, double final_speed,
-        DribblerMode dribbler_mode                 = DribblerMode::OFF,
-        BallCollisionType ball_collision_type      = BallCollisionType::AVOID,
-        AutoChipOrKick auto_chip_or_kick           = {AutoChipOrKickMode::OFF, 0},
-        MaxAllowedSpeedMode max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        double target_spin_rev_per_s               = 0.0);
+        TbotsProto::DribblerMode dribbler_mode = TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType ball_collision_type =
+            TbotsProto::BallCollisionType::AVOID,
+        AutoChipOrKick auto_chip_or_kick = {AutoChipOrKickMode::OFF, 0},
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        double target_spin_rev_per_s = 0.0);
 
     /**
      * Updates the params assuming that the dribbler and chicker and while avoiding the
@@ -49,7 +51,7 @@ class MoveTactic : public Tactic
      */
     void updateControlParams(Point destination, Angle final_orientation,
                              double final_speed,
-                             MaxAllowedSpeedMode max_allowed_speed_mode);
+                             TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
