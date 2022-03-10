@@ -16,8 +16,8 @@
 class CornerKickPlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
-    FieldType field_type = FieldType::DIV_B;
-    Field field          = Field::createField(field_type);
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
 };
 
 TEST_F(CornerKickPlayTest, test_corner_kick_play_bottom_left)

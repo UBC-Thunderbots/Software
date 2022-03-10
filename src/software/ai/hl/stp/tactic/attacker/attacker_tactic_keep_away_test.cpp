@@ -19,8 +19,8 @@ class AttackerTacticKeepAwayTest
           Pass, RobotStateWithId, BallState, std::vector<RobotStateWithId>, bool>>
 {
    protected:
-    FieldType field_type = FieldType::DIV_B;
-    Field field          = Field::createField(field_type);
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
 };
 
 // TODO(#2468): Fix and re-enable

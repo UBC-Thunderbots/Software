@@ -17,8 +17,8 @@ class PenaltyKickTacticTest : public SimulatedErForceSimTacticTestFixture,
                               public ::testing::WithParamInterface<RobotStateWithId>
 {
    protected:
-    FieldType field_type     = FieldType::DIV_B;
-    Field field              = Field::createField(field_type);
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
     BallState ball           = BallState(field.friendlyPenaltyMark(), Vector(0, 0));
     Point initial_position   = field.friendlyPenaltyMark() + Vector(-0.1, 0);
     RobotStateWithId shooter = {

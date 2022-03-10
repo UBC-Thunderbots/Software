@@ -32,8 +32,8 @@ class GoalieTacticTest
                   " seconds to check that the enemy team did not score");
         }
     }
-    FieldType field_type = FieldType::DIV_B;
-    Field field          = Field::createField(field_type);
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
     std::vector<RobotStateWithId> enemy_robots =
         TestUtil::createStationaryRobotStatesWithId(
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
