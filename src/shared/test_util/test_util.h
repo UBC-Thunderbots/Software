@@ -15,6 +15,12 @@ namespace TestUtil
     struct AggregateFunctions
     {
         double average, maximum, minimum;
+        AggregateFunctions()
+        {
+            average = 0;
+            maximum = 0;
+            minimum = 200000;
+        }
     };
 
     /**

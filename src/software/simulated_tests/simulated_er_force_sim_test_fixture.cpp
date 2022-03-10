@@ -489,8 +489,8 @@ bool SimulatedErForceSimTestFixture::tickTest(
     /* extract simulator ball and robot */
     world::SimulatorState simulator_state = simulator->getSimulatorState();
     auto simulator_sim_ball               = simulator_state.ball();
-    auto simulator_friendly_sim_robots    = simulator_state.blue_robots();
-    auto simulator_enemy_sim_robots       = simulator_state.yellow_robots();
+    auto simulator_friendly_sim_robots    = simulator_state.yellow_robots();
+    auto simulator_enemy_sim_robots       = simulator_state.blue_robots();
 
     /* convert simball and simrobot to normal ball and robot in world for comparison */
     Ball simulator_ball = createBall(simulator_sim_ball, Timestamp::fromSeconds(0));

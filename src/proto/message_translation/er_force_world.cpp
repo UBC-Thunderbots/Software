@@ -9,6 +9,7 @@ Ball createBall(world::SimBall sim_ball, Timestamp timestamp)
     return ball;
 }
 
+// correct issue #2328: avoid division by 0
 Robot createRobot(world::SimRobot sim_robot, Timestamp timestamp)
 {
     const RobotId id(sim_robot.id());
@@ -16,7 +17,7 @@ Robot createRobot(world::SimRobot sim_robot, Timestamp timestamp)
     const Vector velocity(sim_robot.v_x(), sim_robot.v_y());
 
     const RobotState state(position, velocity, Angle::fromRadians(sim_robot.angle()),
-                           Angle::atan(sim_robot.r_y() / sim_robot.r_x()));
+                           Angle::zero());
     const Robot robot(id, state, timestamp);
     return robot;
 }
