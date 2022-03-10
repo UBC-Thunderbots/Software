@@ -67,9 +67,10 @@ void ShadowEnemyFSM::blockPass(const Update &event)
 
     event.common.set_intent(std::make_unique<MoveIntent>(
         event.common.robot.id(), position_to_block, face_ball_orientation, 0,
-        DribblerMode::OFF, BallCollisionType::AVOID,
-        AutoChipOrKick{AutoChipOrKickMode::OFF, 0}, MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        0.0, event.common.robot.robotConstants()));
+        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+        event.common.robot.robotConstants()));
 }
 
 void ShadowEnemyFSM::blockShot(const Update &event,
@@ -98,10 +99,10 @@ void ShadowEnemyFSM::blockShot(const Update &event,
         .destination            = position_to_block,
         .final_orientation      = face_ball_orientation,
         .final_speed            = 0.0,
-        .dribbler_mode          = DribblerMode::OFF,
-        .ball_collision_type    = BallCollisionType::AVOID,
+        .dribbler_mode          = TbotsProto::DribblerMode::OFF,
+        .ball_collision_type    = TbotsProto::BallCollisionType::AVOID,
         .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-        .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         .target_spin_rev_per_s  = 0.0};
 
     processEvent(MoveFSM::Update(control_params, event.common));
@@ -114,7 +115,8 @@ void ShadowEnemyFSM::stealAndChip(const Update &event)
         (ball_position - event.common.robot.position()).orientation();
     event.common.set_intent(std::make_unique<MoveIntent>(
         event.common.robot.id(), ball_position, face_ball_orientation, 0,
-        DribblerMode::MAX_FORCE, BallCollisionType::ALLOW,
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
-        MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, event.common.robot.robotConstants()));
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+        event.common.robot.robotConstants()));
 }

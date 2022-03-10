@@ -17,8 +17,8 @@ class KickTacticTest : public SimulatedErForceSimTacticTestFixture,
                        public ::testing::WithParamInterface<std::tuple<Vector, Angle>>
 {
    protected:
-    FieldType field_type = FieldType::DIV_B;
-    Field field          = Field::createField(field_type);
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
 };
 
 TEST_P(KickTacticTest, kick_test)
