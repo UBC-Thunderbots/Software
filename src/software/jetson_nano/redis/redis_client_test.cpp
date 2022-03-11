@@ -13,7 +13,7 @@ TEST(RedisKeyValueStoreTests, DISABLED_cpp_redis_get_test)
 {
     cpp_redis::client client;
     client.connect(
-        "127.0.0.1", 6379,
+        REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT,
         [](const std::string &host, std::size_t port, cpp_redis::connect_state status) {
             if (status == cpp_redis::connect_state::dropped)
             {
@@ -46,7 +46,7 @@ TEST(RedisKeyValueStoreTests, DISABLED_cpp_redis_get_and_set_speed_test)
 {
     cpp_redis::client client;
     client.connect(
-        "127.0.0.1", 6379,
+        REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT,
         [](const std::string &host, std::size_t port, cpp_redis::connect_state status) {
             if (status == cpp_redis::connect_state::dropped)
             {
@@ -86,7 +86,7 @@ TEST(RedisImplTests, DISABLED_redis_client_get_and_set_impl_test)
 
     cpp_redis::client client;
     client.connect(
-        "127.0.0.1", 6379,
+        REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT,
         [](const std::string &host, std::size_t port, cpp_redis::connect_state status) {
             if (status == cpp_redis::connect_state::dropped)
             {
