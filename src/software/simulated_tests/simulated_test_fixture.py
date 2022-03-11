@@ -131,8 +131,8 @@ class TacticTestRunner(object):
                 # NOTE: The following line will raise AssertionError(
                 # on validation failure that will propagate to the main
                 # thread through the excepthook
-                # if error_msg:
-                    # raise AssertionError(error_msg)
+                if error_msg:
+                    raise AssertionError(error_msg)
 
                 if self.enable_thunderscope:
                     # Send out the validation proto to thunderscope

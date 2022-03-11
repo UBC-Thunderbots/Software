@@ -21,6 +21,7 @@ class RobotEntersRegion(Validation):
     def __init__(self, flipped=False, regions=[]):
         self.regions = regions
         self.flipped = flipped
+        self.failed_once = False
 
     @flip_validation
     def get_validation_status(self, vision) -> ValidationStatus:
@@ -30,14 +31,18 @@ class RobotEntersRegion(Validation):
         :returns: FAILING until a robot enters any of the regions
                   PASSING when a robot enters
         """
-        for region in self.regions:
-            for robot_id, robot_states in vision.robot_states.items():
-                if tbots_geom.contains(
-                    region, tbots_geom.createPoint(robot_states.global_position)
-                ):
-                    return ValidationStatus.PASSING
+        if not self.failed_once:
+            for region in self.regions:
+                for robot_id, robot_states in vision.robot_states.items():
+                    if tbots_geom.contains(
+                        region, tbots_geom.createPoint(robot_states.global_position)
+                    ):
+                        return ValidationStatus.PASSING
 
-        return ValidationStatus.FAILING
+            return ValidationStatus.FAILING
+
+        else:
+            return ValidationStatus.FAILING
 
     def get_validation_geometry(self, vision) -> ValidationGeometry:
         """Returns the underlying geometry this validation is checking
