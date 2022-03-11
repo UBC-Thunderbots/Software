@@ -13,7 +13,8 @@
 class HaltPlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
 };
 
 TEST_F(HaltPlayTest, test_halt_play)
@@ -35,7 +36,8 @@ TEST_F(HaltPlayTest, test_halt_play)
 
     std::vector<ValidationFunction> terminating_validation_functions = {
 
-        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
+        [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield)
+        {
             for (unsigned i = 0; i < 1000; i++)
             {
                 robotHalt(world_ptr, yield);
@@ -44,7 +46,7 @@ TEST_F(HaltPlayTest, test_halt_play)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
