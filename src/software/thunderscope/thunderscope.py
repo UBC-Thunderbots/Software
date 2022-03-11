@@ -3,6 +3,7 @@ import signal
 
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
+from software.thunderscope.play.playinfo_widget import playInfoWidget
 from field import obstacle_layer, path_layer, world_layer
 
 import pyqtgraph as pg
@@ -37,17 +38,23 @@ if __name__ == "__main__":
 
     # Setup Console Widget
     logs = g3logWidget()
+    playInfo = playInfoWidget()
 
     log_dock = Dock("logs", size=(500, 100))
     log_dock.addWidget(logs)
 
+    playInfo_dock = Dock("playInfo", size = (500,100))
+    playInfo_dock.addWidget(playInfo)
+
     # Configure Docks
     dock_area.addDock(field_dock, "left")
     dock_area.addDock(log_dock, "bottom", field_dock)
+    dock_area.addDock(playInfo_dock, "bottom", log_dock)
 
     def update():
         field.refresh()
         logs.refresh()
+        playInfo.refresh()
 
     timer = QtCore.QTimer()
     timer.timeout.connect(update)

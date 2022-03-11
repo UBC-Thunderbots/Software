@@ -13,6 +13,7 @@ py_binary(
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
         "//software/thunderscope/log:g3log_widget",
+        "//software/thunderscope/play:playinfo_widget",
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],
