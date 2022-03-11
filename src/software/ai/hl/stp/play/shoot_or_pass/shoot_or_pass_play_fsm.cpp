@@ -156,6 +156,13 @@ bool ShootOrPassPlayFSM::passFound(const Update& event)
 
 bool ShootOrPassPlayFSM::shouldAbortPass(const Update& event)
 {
+    // lost possession
+    if (event.common.world.getTeamWithPossession() == TeamSide::ENEMY)
+    {
+        return true;
+    }
+
+    // enemy robot blocking pass
     // TODO (#2384): implement this
     return false;
 }
