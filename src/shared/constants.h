@@ -24,6 +24,8 @@ static const double BALL_MASS_KG = 0.004593;
 // The max allowed speed of the robot when the stop command is issued, in meters per
 // second
 static const double STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND = 1.5;
+// The max allowed speed of the robot before collisions would incur a foul
+static const double COLLISION_ALLOWED_ROBOT_MAX_SPEED_METERS_PER_SECOND = 0.5;
 // The maximum number of robots we can communicate with over radio.
 static const unsigned MAX_ROBOTS_OVER_RADIO = 8;
 
@@ -49,8 +51,10 @@ static const double MICROSECONDS_PER_MILLISECOND = 1000.0;
 static const double MICROSECONDS_PER_SECOND      = 1000000.0;
 static const double MILLISECONDS_PER_SECOND      = 1000.0;
 static const double SECONDS_PER_MICROSECOND      = 1.0 / 1000000.0;
+static const double SECONDS_PER_NANOSECOND       = 1.0 / 1000000000.0;
 static const double SECONDS_PER_MILLISECOND      = 1.0 / 1000.0;
 static const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
+static const double MILLISECONDS_PER_NANOSECOND  = 1.0 / 1000000.0;
 
 // Networking
 // the IPv6 multicast address, only ff02 is important, the rest is random

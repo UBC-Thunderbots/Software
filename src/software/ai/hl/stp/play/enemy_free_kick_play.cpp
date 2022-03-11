@@ -9,19 +9,9 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-EnemyFreekickPlay::EnemyFreekickPlay(std::shared_ptr<const PlayConfig> config)
+EnemyFreekickPlay::EnemyFreekickPlay(std::shared_ptr<const AiConfig> config)
     : Play(config, true)
 {
-}
-
-bool EnemyFreekickPlay::isApplicable(const World &world) const
-{
-    return world.gameState().isTheirFreeKick();
-}
-
-bool EnemyFreekickPlay::invariantHolds(const World &world) const
-{
-    return world.gameState().isTheirFreeKick();
 }
 
 void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
@@ -29,7 +19,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 {
     // Init a Crease Defender Tactic
     auto crease_defender_tactic = std::make_shared<CreaseDefenderTactic>(
-        play_config->getRobotNavigationObstacleConfig());
+        ai_config->getRobotNavigationObstacleConfig());
 
     // These robots will both block the enemy robot taking a free kick
     std::array<std::shared_ptr<ShadowEnemyTactic>, 2> shadow_free_kicker = {
@@ -73,18 +63,18 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             if (enemy_threats.at(3).robot.position().y() > 0)
             {
                 crease_defender_tactic->updateControlParams(
-                    world.ball().position(), CreaseDefenderAlignment::LEFT);
+                    world.ball().position(), TbotsProto::CreaseDefenderAlignment::LEFT);
             }
             else
             {
                 crease_defender_tactic->updateControlParams(
-                    world.ball().position(), CreaseDefenderAlignment::RIGHT);
+                    world.ball().position(), TbotsProto::CreaseDefenderAlignment::RIGHT);
             }
         }
         else
         {
-            crease_defender_tactic->updateControlParams(world.ball().position(),
-                                                        CreaseDefenderAlignment::CENTRE);
+            crease_defender_tactic->updateControlParams(
+                world.ball().position(), TbotsProto::CreaseDefenderAlignment::CENTRE);
         }
 
         tactics_to_run[0].emplace_back(crease_defender_tactic);
@@ -145,4 +135,4 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, EnemyFreekickPlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, EnemyFreekickPlay, AiConfig> factory;

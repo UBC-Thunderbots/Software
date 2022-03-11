@@ -9,21 +9,9 @@
 #include "software/geom/algorithms/calculate_block_cone.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-KickoffEnemyPlay::KickoffEnemyPlay(std::shared_ptr<const PlayConfig> config)
+KickoffEnemyPlay::KickoffEnemyPlay(std::shared_ptr<const AiConfig> config)
     : Play(config, true)
 {
-}
-
-bool KickoffEnemyPlay::isApplicable(const World &world) const
-{
-    return (world.gameState().isReadyState() || world.gameState().isSetupState()) &&
-           world.gameState().isTheirKickoff();
-}
-
-bool KickoffEnemyPlay::invariantHolds(const World &world) const
-{
-    return !world.gameState().isPlaying() &&
-           (!world.gameState().isStopped() || !world.gameState().isHalted());
 }
 
 void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
@@ -151,7 +139,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 calculateBlockCone(world.field().friendlyGoalpostPos(),
                                    world.field().friendlyGoalpostNeg(),
                                    world.field().centerPoint(), ROBOT_MAX_RADIUS_METERS),
-                Angle::zero(), 0, MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                Angle::zero(), 0, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
         result[0].emplace_back(move_tactics.at(defense_position_index));
 
         // yield the Tactics this Play wants to run, in order of priority
@@ -160,4 +148,4 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, KickoffEnemyPlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, KickoffEnemyPlay, AiConfig> factory;

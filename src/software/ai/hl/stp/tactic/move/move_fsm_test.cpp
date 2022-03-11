@@ -12,10 +12,10 @@ TEST(MoveFSMTest, test_transitions)
         .destination            = Point(2, 3),
         .final_orientation      = Angle::half(),
         .final_speed            = 0.0,
-        .dribbler_mode          = DribblerMode::OFF,
-        .ball_collision_type    = BallCollisionType::AVOID,
+        .dribbler_mode          = TbotsProto::DribblerMode::OFF,
+        .ball_collision_type    = TbotsProto::BallCollisionType::AVOID,
         .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-        .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         .target_spin_rev_per_s  = 0.0};
 
     FSM<MoveFSM> fsm;
@@ -45,10 +45,10 @@ TEST(MoveFSMTest, test_transitions)
         .destination            = Point(1, -3),
         .final_orientation      = Angle::half(),
         .final_speed            = 0.0,
-        .dribbler_mode          = DribblerMode::OFF,
-        .ball_collision_type    = BallCollisionType::AVOID,
+        .dribbler_mode          = TbotsProto::DribblerMode::OFF,
+        .ball_collision_type    = TbotsProto::BallCollisionType::AVOID,
         .auto_chip_or_kick      = AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
-        .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
         .target_spin_rev_per_s  = 0.0};
     fsm.process_event(MoveFSM::Update(
         control_params, TacticUpdate(robot, world, [](std::unique_ptr<Intent>) {})));

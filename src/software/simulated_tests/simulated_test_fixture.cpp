@@ -1,7 +1,7 @@
 #include "software/simulated_tests/simulated_test_fixture.h"
 
 #include <cstdlib>
-#include <experimental/filesystem>
+#include <filesystem>
 
 #include "proto/message_translation/ssl_wrapper.h"
 #include "shared/2015_robot_constants.h"
@@ -25,6 +25,13 @@ SimulatedTestFixture::SimulatedTestFixture()
 void SimulatedTestFixture::SetUp()
 {
     LoggerSingleton::initializeLogger(TbotsGtestMain::logging_dir);
+
+    friendly_mutable_thunderbots_config = std::make_shared<ThunderbotsConfig>();
+    enemy_mutable_thunderbots_config    = std::make_shared<ThunderbotsConfig>();
+    friendly_thunderbots_config = std::const_pointer_cast<const ThunderbotsConfig>(
+        friendly_mutable_thunderbots_config);
+    enemy_thunderbots_config = std::const_pointer_cast<const ThunderbotsConfig>(
+        enemy_mutable_thunderbots_config);
 
     friendly_mutable_thunderbots_config->getMutableAiControlConfig()
         ->getMutableRunAi()
@@ -94,6 +101,11 @@ void SimulatedTestFixture::SetUp()
     enemy_mutable_thunderbots_config->getMutableSensorFusionConfig()
         ->getMutableFriendlyColorYellow()
         ->setValue(false);
+
+    friendly_sensor_fusion =
+        SensorFusion(friendly_thunderbots_config->getSensorFusionConfig());
+    enemy_sensor_fusion = SensorFusion(enemy_thunderbots_config->getSensorFusionConfig());
+
     if (TbotsGtestMain::enable_visualizer)
     {
         enableVisualizer();
@@ -126,7 +138,7 @@ void SimulatedTestFixture::setupReplayLogging()
     // get the name of the current test to name the replay output directory
     auto test_name = ::testing::UnitTest::GetInstance()->current_test_info()->name();
 
-    namespace fs = std::experimental::filesystem;
+    namespace fs                                           = std::filesystem;
     static constexpr auto SIMULATED_TEST_OUTPUT_DIR_SUFFIX = "simulated_test_outputs";
 
     const char *test_outputs_dir_or_null = std::getenv("TEST_UNDECLARED_OUTPUTS_DIR");

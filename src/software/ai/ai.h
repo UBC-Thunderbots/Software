@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "software/ai/hl/hl.h"
+#include "software/ai/hl/stp/stp.h"
 #include "software/ai/navigator/navigator.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
@@ -18,20 +18,15 @@ class AI final
     /**
      * Create an AI with given configurations
      * @param ai_config The AI configuration
-     * @param control_config The AI Control configuration
-     * @param play_config The Play configuration
      */
-    explicit AI(std::shared_ptr<const AiConfig> ai_config,
-                std::shared_ptr<const AiControlConfig> control_config,
-                std::shared_ptr<const PlayConfig> play_config);
+    explicit AI(std::shared_ptr<const AiConfig> ai_config);
 
     /**
-     * Overrides the play constructor so whenever STP creates a new play it calls
-     * constructor
+     * Overrides the play
      *
-     * @param constructor the override constructor
+     * @param play play to override with
      */
-    void overridePlayConstructor(std::function<std::unique_ptr<Play>()> constructor);
+    void overridePlay(std::unique_ptr<Play> play);
 
     /**
      * Calculates the Primitives that should be run by our Robots given the current
@@ -56,5 +51,5 @@ class AI final
 
    private:
     std::shared_ptr<Navigator> navigator;
-    std::unique_ptr<HL> high_level;
+    std::unique_ptr<STP> stp;
 };

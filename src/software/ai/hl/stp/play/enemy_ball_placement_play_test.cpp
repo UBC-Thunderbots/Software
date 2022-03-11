@@ -18,7 +18,8 @@ class EnemyBallPlacementPlayTest
       public ::testing::WithParamInterface<std::tuple<std::vector<Point>, BallState>>
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
 };
 
 TEST_P(EnemyBallPlacementPlayTest, test_ball_placement)
@@ -65,7 +66,7 @@ TEST_P(EnemyBallPlacementPlayTest, test_ball_placement)
                 MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -113,7 +114,7 @@ TEST_F(EnemyBallPlacementPlayTest, test_no_placement)
                 MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }

@@ -5,22 +5,13 @@
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-CreaseDefensePlay::CreaseDefensePlay(std::shared_ptr<const PlayConfig> config)
+CreaseDefensePlay::CreaseDefensePlay(std::shared_ptr<const AiConfig> config)
     : Play(config, true),
       fsm{CreaseDefensePlayFSM{config}},
-      control_params{.enemy_threat_origin    = Point(),
-                     .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT}
+      control_params{
+          .enemy_threat_origin    = Point(),
+          .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}
 {
-}
-
-bool CreaseDefensePlay::isApplicable(const World &world) const
-{
-    return false;
-}
-
-bool CreaseDefensePlay::invariantHolds(const World &world) const
-{
-    return false;
 }
 
 void CreaseDefensePlay::getNextTactics(TacticCoroutine::push_type &yield,
@@ -33,13 +24,9 @@ void CreaseDefensePlay::getNextTactics(TacticCoroutine::push_type &yield,
     }
 }
 
-bool CreaseDefensePlay::done() const
-{
-    return fsm.is(boost::sml::X);
-}
-
-void CreaseDefensePlay::updateControlParams(const Point &enemy_threat_origin,
-                                            MaxAllowedSpeedMode max_allowed_speed_mode)
+void CreaseDefensePlay::updateControlParams(
+    const Point &enemy_threat_origin,
+    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
 {
     control_params.enemy_threat_origin    = enemy_threat_origin;
     control_params.max_allowed_speed_mode = max_allowed_speed_mode;
@@ -51,4 +38,4 @@ void CreaseDefensePlay::updateTactics(const PlayUpdate &play_update)
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, CreaseDefensePlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, CreaseDefensePlay, AiConfig> factory;

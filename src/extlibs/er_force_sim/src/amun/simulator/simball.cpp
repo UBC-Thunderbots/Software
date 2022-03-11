@@ -268,19 +268,20 @@ static float positionOfVisiblePixels(btVector3 &p, const btVector3 &simulatorBal
 
 bool SimBall::update(SSLProto::SSL_DetectionBall *ball, float stddev, float stddevArea,
                      const btVector3 &cameraPosition, bool enableInvisibleBall,
-                     float visibilityThreshold)
+                     float visibilityThreshold, btVector3 positionOffset)
 {
     btTransform transform;
     m_motionState->getWorldTransform(transform);
     btVector3 pos = transform.getOrigin() / SIMULATOR_SCALE;
 
     return addDetection(ball, pos, stddev, stddevArea, cameraPosition,
-                        enableInvisibleBall, visibilityThreshold);
+                        enableInvisibleBall, visibilityThreshold, positionOffset);
 }
 
 bool SimBall::addDetection(SSLProto::SSL_DetectionBall *ball, btVector3 pos, float stddev,
                            float stddevArea, const btVector3 &cameraPosition,
-                           bool enableInvisibleBall, float visibilityThreshold)
+                           bool enableInvisibleBall, float visibilityThreshold,
+                           btVector3 positionOffset)
 {
     // setup ssl-vision ball detection
     ball->set_confidence(1.0);

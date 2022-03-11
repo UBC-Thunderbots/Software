@@ -38,11 +38,11 @@ class SimulatedPlayTestFixture : public SimulatedTestFixture
     void setAIPlay(const std::string& ai_play);
 
     /**
-     * Sets the AI play constructor to be used to run in the simulated test
+     * Sets the AI play to be used to run in the simulated test
      *
-     * @param play_constructor The constructor for the play
+     * @param play The play
      */
-    void setAIPlayConstructor(std::function<std::unique_ptr<Play>()> play_constructor);
+    void setAIPlay(std::unique_ptr<Play> play);
 
     /**
      * Sets the Referee command to override for the simulated test
@@ -76,7 +76,6 @@ class SimulatedPlayTestFixture : public SimulatedTestFixture
                           std::shared_ptr<Simulator> simulator_to_update) override;
     // The configs being used in simulation
     std::shared_ptr<AiConfig> ai_config;
-    std::shared_ptr<AiControlConfig> ai_control_config;
     std::shared_ptr<SensorFusionConfig> sensor_fusion_config;
 
     GameState game_state;

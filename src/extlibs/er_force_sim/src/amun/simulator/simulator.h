@@ -26,6 +26,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QPair>
 #include <QtCore/QQueue>
+#include <random>
 #include <tuple>
 
 #include "extlibs/er_force_sim/src/protobuf/command.h"
@@ -191,6 +192,8 @@ class camun::simulator::Simulator : public QObject
     qint64 m_lastBallSendTime      = 0;
     std::map<qint64, unsigned> m_lastFrameNumber;
     ErrorAggregator *m_aggregator;
+
+    std::mt19937 rand_shuffle_src = std::mt19937(std::random_device()());
 };
 
 #endif  // SIMULATOR_H

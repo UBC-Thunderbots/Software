@@ -1,5 +1,6 @@
 import pyqtgraph as pg
 import math
+import queue
 
 from pyqtgraph.Qt import QtCore, QtGui
 from proto.world_pb2 import World, Field
@@ -18,21 +19,20 @@ import software.thunderscope.colors as colors
 
 
 class WorldLayer(FieldLayer):
-    def __init__(self):
+    def __init__(self, buffer_size=10):
         FieldLayer.__init__(self)
-        self.world_receiver = ThreadedUnixListener(
-            UNIX_SOCKET_BASE_PATH + World.DESCRIPTOR.full_name, World, max_buffer_size=1
-        )
         self.cached_world = World()
 
+        self.world_buffer = queue.Queue(buffer_size)
+
     def draw_field(self, painter, field: Field):
+
         """Draw the field
 
         :param painter: The painter
         :param field: The field proto to draw
 
         """
-
         painter.setPen(pg.mkPen("w"))
 
         # Draw Field Bounds
@@ -65,12 +65,13 @@ class WorldLayer(FieldLayer):
             )
         )
 
-        # Draw Centre Cicle
+        # Draw Centre Circle
         painter.drawEllipse(
             self.createCircle(0, 0, field.center_circle_radius * MM_PER_M)
         )
 
     def draw_team(self, painter, color, team: Team):
+
         """Draw the team
 
         :param painter: The painter
@@ -79,19 +80,23 @@ class WorldLayer(FieldLayer):
 
         """
 
+        convert_degree = -16
+
         for robot in team.team_robots:
 
             painter.setPen(pg.mkPen(color))
             painter.setBrush(pg.mkBrush(color))
 
             # TODO (#2396) Draw the robot IDs of the robots
-            # TODO (#2397) Draw the Orientation of the robots
-            painter.drawEllipse(
+            painter.drawChord(
                 self.createCircle(
                     robot.current_state.global_position.x_meters * MM_PER_M,
                     robot.current_state.global_position.y_meters * MM_PER_M,
                     ROBOT_MAX_RADIUS,
-                )
+                ),
+                (math.degrees(robot.current_state.global_orientation.radians) + 45)
+                * convert_degree,
+                270 * convert_degree,
             )
 
     def draw_ball(self, painter, ball: Ball):
@@ -104,7 +109,6 @@ class WorldLayer(FieldLayer):
 
         painter.setPen(pg.mkPen(colors.BALL_COLOR))
         painter.setBrush(pg.mkBrush(colors.BALL_COLOR))
-
         painter.drawEllipse(
             self.createCircle(
                 ball.current_state.global_position.x_meters * MM_PER_M,
@@ -122,10 +126,11 @@ class WorldLayer(FieldLayer):
 
         """
 
-        world = self.world_receiver.maybe_pop()
-
-        if not world:
+        try:
+            world = self.world_buffer.get_nowait()
+        except queue.Empty as empty:
             world = self.cached_world
+
         self.cached_world = world
         self.draw_field(painter, world.field)
         self.draw_ball(painter, world.ball)

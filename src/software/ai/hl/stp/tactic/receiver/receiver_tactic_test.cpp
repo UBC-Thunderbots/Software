@@ -53,7 +53,7 @@ TEST_P(ReceiverTacticTest, DISABLED_perfect_pass_receiver_test)
             // NOTE: we don't check robotAtPosition for receive and dribble
             // because the robot is free to adjust itself to best receive
             // the pass (and dribble). We only care if the robot received the ball.
-            robotReceivedBall(1, world_ptr, yield);
+            robotReceivedBall(world_ptr, yield);
 
             while (!tactic->done())
             {

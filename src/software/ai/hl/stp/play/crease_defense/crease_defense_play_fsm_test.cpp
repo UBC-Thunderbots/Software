@@ -10,14 +10,14 @@ TEST(CreaseDefensePlayFSMTest, test_transitions)
 {
     World world = ::TestUtil::createBlankTestingWorld();
 
-    FSM<CreaseDefensePlayFSM> fsm(CreaseDefensePlayFSM{
-        std::make_shared<const ThunderbotsConfig>()->getPlayConfig()});
+    FSM<CreaseDefensePlayFSM> fsm(
+        CreaseDefensePlayFSM{std::make_shared<const ThunderbotsConfig>()->getAiConfig()});
     EXPECT_TRUE(fsm.is(boost::sml::state<CreaseDefensePlayFSM::DefenseState>));
 
     fsm.process_event(CreaseDefensePlayFSM::Update(
         CreaseDefensePlayFSM::ControlParams{
             .enemy_threat_origin    = Point(),
-            .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT},
+            .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT},
         PlayUpdate(world, 3, [](PriorityTacticVector new_tactics) {})));
 
     // CreaseDefensePlayFSM always stays in the DefenseState
