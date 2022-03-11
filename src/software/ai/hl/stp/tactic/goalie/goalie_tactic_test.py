@@ -15,7 +15,7 @@ from software.simulated_tests.simulated_test_fixture import tactic_runner
     "goalie_starting_position,ball_starting_position",
     [
         ((3.2, 0), (-2, 1)),
-        # ((4.2, 0.4), (-2, -1)),
+        ((4.2, 0.4), (-2, -1)),
         # ((4.2, -0.4), (-2, 0.1)),
         # ((-4.2, 0.4), (-2, -1)),
         # ((-4.2, -0.4), (-2, 0.1)),

@@ -79,3 +79,45 @@ def create_validation_geometry(geometry=[]) -> ValidationGeometry:
         )
 
     return validation_geometry
+
+def run_validation_sequence_sets(
+    vision, eventually_validation_sequence_set, always_validation_sequence_set
+):
+    """Given both eventually and always validation sequence sets, (and vision)
+    run validation and aggregate the results in a validation proto.
+
+    :raises AssertionError: If the test fails
+    :param vision: Vision to validate with
+    :param eventually_validation_sequence_set:
+            A collection of sequences of eventually validations to validate.
+    :param always_validation_sequence_set:
+            A collection of sequences of always validations to validate.
+
+    :returns: ValidationProto, error_msg
+
+    """
+
+    # Proto that stores validation geometry and validation status
+    validation_proto = ValidationProto()
+
+    # Validate
+    for validation_sequence in eventually_validation_sequence_set:
+
+        # We only want to check the first
+        for validation in validation_sequence:
+            status = validation.get_validation_status(vision)
+
+            validation_proto.status.append(status)
+            validation_proto.geometry.append(validation.get_validation_geometry(vision))
+
+            # If the current validation is pending, we don't care about
+            # the next one. Keep evaluating until this one passes.
+            if status == ValidationStatus.FAILING:
+                break
+
+            # If the validation has passed, continue
+            # this line is not needed, but just added to be explicit
+            if status == ValidationStatus.PASSING:
+                continue
+
+    return validation_proto
