@@ -20,9 +20,9 @@ AI::AI(std::shared_ptr<const AiConfig> ai_config)
 {
 }
 
-void AI::overridePlayConstructor(std::optional<PlayConstructor> constructor)
+void AI::overridePlay(std::unique_ptr<Play> play)
 {
-    stp->overridePlayConstructor(constructor);
+    stp->overridePlay(std::move(play));
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World &world) const

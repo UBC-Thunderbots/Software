@@ -3,7 +3,6 @@ syntax = "proto2";
 package TbotsProto;
 
 import "proto/vision.proto";
-import "proto/geometry.proto";
 import "proto/tbots_timestamp_msg.proto";
 
 message Ball

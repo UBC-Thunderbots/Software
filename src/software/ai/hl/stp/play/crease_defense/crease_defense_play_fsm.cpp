@@ -22,9 +22,10 @@ void CreaseDefensePlayFSM::defendDefenseArea(const Update& event)
     }
     // TODO (#2385): Make the crease defense align robots on either side of the threat
     // when there are an even number of robots
-    static const std::vector<CreaseDefenderAlignment> ALIGNMENTS = {
-        CreaseDefenderAlignment::CENTRE, CreaseDefenderAlignment::LEFT,
-        CreaseDefenderAlignment::RIGHT};
+    static const std::vector<TbotsProto::CreaseDefenderAlignment> ALIGNMENTS = {
+        TbotsProto::CreaseDefenderAlignment::CENTRE,
+        TbotsProto::CreaseDefenderAlignment::LEFT,
+        TbotsProto::CreaseDefenderAlignment::RIGHT};
     for (unsigned int i = 0; i < crease_defenders.size(); i++)
     {
         crease_defenders.at(i)->updateControlParams(

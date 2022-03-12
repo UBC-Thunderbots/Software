@@ -5,18 +5,22 @@ cc_library(
     testonly = True,
     srcs = [
         "equal_within_tolerance.cpp",
+        "path_planning_test_util.cpp",
         "test_util.cpp",
     ],
     hdrs = [
         "equal_within_tolerance.h",
+        "path_planning_test_util.h",
         "test_util.h",
     ],
     deps = [
         "//firmware/app/logger",
         "//proto:tbots_cc_proto",
         "//proto:tbots_nanopb_proto",
+        "//proto/message_translation:tbots_protobuf",
         "//shared:constants",
         "//shared/test_util:tbots_gtest_main",
+        "//software/ai/navigator/obstacle",
         "//software/geom:angle",
         "//software/geom:angular_velocity",
         "//software/geom:geom_constants",

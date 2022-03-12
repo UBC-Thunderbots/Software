@@ -10,10 +10,6 @@
 static const std::string TYPE_DELIMITER = "!!!";
 static const std::string UNIX_BASE_PATH = "/tmp/tbots/";
 
-using UnixSenderMap =
-    std::unordered_map<std::string, std::unique_ptr<ThreadedUnixSender>>;
-
-
 class ProtobufSink
 {
    public:
@@ -27,7 +23,7 @@ class ProtobufSink
     void sendProtobuf(g3::LogMessageMover log_entry);
 
    private:
-    UnixSenderMap unix_senders;
+    std::unique_ptr<ThreadedUnixSender> protobuf_sender;
 };
 
 /*

@@ -34,13 +34,13 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input)
 
     double kick_speed =
         handheld_controller_config->getKickSpeedMetersPerSecond()->value();
-    auto expected_kick_primitive =
-        *createMovePrimitive(Point(), 0, Angle::zero(), DribblerMode::OFF,
-                             AutoChipOrKick{
-                                 AutoChipOrKickMode::AUTOKICK,
-                                 kick_speed,
-                             },
-                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
+    auto expected_kick_primitive = *createMovePrimitive(
+        Point(), 0, Angle::zero(), TbotsProto::DribblerMode::OFF,
+        AutoChipOrKick{
+            AutoChipOrKickMode::AUTOKICK,
+            kick_speed,
+        },
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_kick_primitive, actual_primitive));
 }
@@ -58,13 +58,13 @@ TEST_F(ControllerPrimitiveGeneratorTest, test_create_primitive_controller_input1
             input, handheld_controller_config, robot_constants);
 
     double chip_distance = handheld_controller_config->getChipDistanceMeters()->value();
-    auto expected_chip_primitive =
-        *createMovePrimitive(Point(), 0, Angle::zero(), DribblerMode::OFF,
-                             AutoChipOrKick{
-                                 AutoChipOrKickMode::AUTOCHIP,
-                                 chip_distance,
-                             },
-                             MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
+    auto expected_chip_primitive = *createMovePrimitive(
+        Point(), 0, Angle::zero(), TbotsProto::DribblerMode::OFF,
+        AutoChipOrKick{
+            AutoChipOrKickMode::AUTOCHIP,
+            chip_distance,
+        },
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
     EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equals(
         expected_chip_primitive, actual_primitive));
 }

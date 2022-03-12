@@ -3,6 +3,7 @@
 #include <QtCore/QTimer>
 #include <QtWidgets/QApplication>
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "proto/visualization.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/gui/drawing/world.h"
@@ -102,6 +103,13 @@ void ThreadedFullSystemGUI::onValueReceived(World world)
         remaining_attempts_to_set_view_area--;
         view_area_buffer->push(world.field().fieldBoundary());
     }
+
+    LOG(VISUALIZE) << *createNamedValue(
+        "World Hz",
+        static_cast<float>(
+            FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
+
+
     worlds_received_per_second_buffer->push(
         FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond());
 }
@@ -123,6 +131,11 @@ void ThreadedFullSystemGUI::onValueReceived(SensorProto sensor_msg)
 
 void ThreadedFullSystemGUI::onValueReceived(TbotsProto::PrimitiveSet primitive_msg)
 {
+    LOG(VISUALIZE) << *createNamedValue(
+        "Primitive Hz",
+        static_cast<float>(FirstInFirstOutThreadedObserver<
+                           TbotsProto::PrimitiveSet>::getDataReceivedPerSecond()));
+
     primitives_sent_per_second_buffer->push(
         FirstInFirstOutThreadedObserver<
             TbotsProto::PrimitiveSet>::getDataReceivedPerSecond());

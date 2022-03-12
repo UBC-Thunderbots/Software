@@ -61,11 +61,26 @@ cc_library(
     srcs = ["enlsvg_path_planner.cpp"],
     hdrs = ["enlsvg_path_planner.h"],
     deps = [
-        ":path_planner",
         "//extlibs/enlsvg",
+        "//shared/parameter:cpp_configs",
+        "//software/ai/motion_constraint:motion_constraint_set_builder",
+        "//software/ai/navigator/obstacle",
+        "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
+        "//software/geom:linear_spline2d",
         "//software/logger",
-        "//software/world",
-        "@boost//:functional",
+    ],
+)
+
+cc_library(
+    name = "global_path_planner_factory",
+    srcs = ["global_path_planner_factory.cpp"],
+    hdrs = ["global_path_planner_factory.h"],
+    deps = [
+        ":enlsvg_path_planner",
+        "//software/ai/hl/stp/tactic",
+        "//software/ai/motion_constraint",
+        "//software/geom:linear_spline2d",
+        "//software/geom:point",
     ],
 )
 
@@ -89,6 +104,17 @@ cc_test(
         "//shared/test_util:tbots_gtest_main",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/test_util",
+    ],
+)
+
+cc_test(
+    name = "global_path_planner_factory_test",
+    srcs = ["global_path_planner_factory_test.cpp"],
+    deps = [
+        ":global_path_planner_factory",
+        "//shared/test_util:tbots_gtest_main",
+        "//software/test_util",
+        "//software/world",
     ],
 )
 

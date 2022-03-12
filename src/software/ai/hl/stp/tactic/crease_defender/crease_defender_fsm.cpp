@@ -2,7 +2,7 @@
 
 std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     const Field& field, const Point& enemy_threat_origin,
-    const CreaseDefenderAlignment& crease_defender_alignment,
+    const TbotsProto::CreaseDefenderAlignment& crease_defender_alignment,
     double robot_obstacle_inflation_factor)
 {
     // We increment the angle to positive goalpost by 1/6, 3/6, or 5/6 of the shot
@@ -13,11 +13,11 @@ std::optional<Point> CreaseDefenderFSM::findBlockThreatPoint(
     Angle angle_to_positive_goalpost =
         (field.friendlyGoalpostPos() - enemy_threat_origin).orientation();
     Angle angle_to_block = angle_to_positive_goalpost + shot_angle_sixth * 3.0;
-    if (crease_defender_alignment == CreaseDefenderAlignment::LEFT)
+    if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::LEFT)
     {
         angle_to_block = angle_to_positive_goalpost + shot_angle_sixth * 1.0;
     }
-    else if (crease_defender_alignment == CreaseDefenderAlignment::RIGHT)
+    else if (crease_defender_alignment == TbotsProto::CreaseDefenderAlignment::RIGHT)
     {
         angle_to_block = angle_to_positive_goalpost + shot_angle_sixth * 5.0;
     }
@@ -59,18 +59,19 @@ void CreaseDefenderFSM::blockThreat(
                         event.common.world.field().friendlyDefenseArea().yMax();
     }
 
-    BallCollisionType ball_collision_type = BallCollisionType::ALLOW;
+    TbotsProto::BallCollisionType ball_collision_type =
+        TbotsProto::BallCollisionType::ALLOW;
     if ((event.common.world.ball().position() - destination).length() <
         (event.common.robot.position() - destination).length())
     {
-        ball_collision_type = BallCollisionType::AVOID;
+        ball_collision_type = TbotsProto::BallCollisionType::AVOID;
     }
 
     MoveFSM::ControlParams control_params{
         .destination         = destination,
         .final_orientation   = face_threat_orientation,
         .final_speed         = 0.0,
-        .dribbler_mode       = DribblerMode::OFF,
+        .dribbler_mode       = TbotsProto::DribblerMode::OFF,
         .ball_collision_type = ball_collision_type,
         .auto_chip_or_kick = AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, chip_distance},
         .max_allowed_speed_mode = event.control_params.max_allowed_speed_mode,

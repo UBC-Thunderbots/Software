@@ -528,3 +528,41 @@ cc_test(
         "//software/world",
     ],
 )
+
+cc_library(
+    name = "assigned_tactics_play",
+    srcs = ["assigned_tactics_play.cpp"],
+    hdrs = ["assigned_tactics_play.h"],
+    deps = [
+        ":play",
+        "//shared:constants",
+        "//shared/parameter:cpp_configs",
+        "//software/ai/hl/stp/tactic/stop:stop_tactic",
+        "//software/logger",
+        "//software/util/generic_factory",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
+    name = "play_factory",
+    srcs = ["play_factory.cpp"],
+    hdrs = [
+        "play_factory.h",
+    ],
+    deps = [
+        ":all_plays",
+        "//proto:tbots_cc_proto",
+        "//proto/message_translation:tbots_protobuf",
+        "//software/util/generic_factory",
+    ],
+)
+
+cc_test(
+    name = "play_factory_test",
+    srcs = ["play_factory_test.cpp"],
+    deps = [
+        "//shared/test_util:tbots_gtest_main",
+        "//software/ai/hl/stp/play:play_factory",
+    ],
+)
