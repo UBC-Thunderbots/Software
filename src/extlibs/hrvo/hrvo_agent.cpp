@@ -448,7 +448,7 @@ void HRVOAgent::computePreferredVelocity()
     Vector2 distVectorToGoal        = goalPosition - position_;
     auto distToGoal                 = abs(distVectorToGoal);
     // Reduced max acceleration to avoid overshooting
-    const float offsetted_max_accel = max_accel_ - 0.8f;
+    const float offsetted_max_accel = max_accel_ - 1.f;
     // d = (Vf^2 - Vi^2) / 2a
     double startLinearDecelerationDistance =
         std::abs((std::pow(speedAtGoal, 2) - std::pow(prefSpeed_, 2)) /
