@@ -69,36 +69,28 @@ if __name__ == "__main__":
     log_dock = Dock("logs", size=(500, 100))
     log_dock.addWidget(logs)
 
-<<<<<<< HEAD
     # Setup 'Chicker' widget
     chicker_widget = ChickerWidget()
     chicker_dock = Dock("Chicker", size=(100, 100))
     chicker_dock.addWidget(chicker_widget)
-=======
+
     # Setup Arbitrary Plot Widget
     named_value_plotter = NamedValuePlotter()
     named_value_plotter_dock = Dock("Performance", size=(500, 100))
     named_value_plotter_dock.addWidget(named_value_plotter.plot)
     proto_receiver.register_observer(NamedValue, named_value_plotter.named_value_buffer)
->>>>>>> master
 
     # Configure Docks
     dock_area.addDock(field_dock, "left")
     dock_area.addDock(log_dock, "bottom", field_dock)
-<<<<<<< HEAD
     dock_area.addDock(chicker_dock, "right", field_dock)
-=======
     dock_area.addDock(named_value_plotter_dock, "right", log_dock)
->>>>>>> master
 
     def update():
         field.refresh()
         logs.refresh()
-<<<<<<< HEAD
         chicker_widget.refresh()
-=======
         named_value_plotter.refresh()
->>>>>>> master
 
     timer = QtCore.QTimer()
     timer.timeout.connect(update)
