@@ -145,7 +145,7 @@ TEST_F(GoalieTacticTest, test_slow_ball_at_sharp_angle_to_friendly_goal)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             checkGoalieSuccess(5, world_ptr, yield);
-            robotInPolygon(0, Rectangle(world_ptr->field().friendlyNegativeYQuadrant()),
+            robotInPolygon(Rectangle(world_ptr->field().friendlyNegativeYQuadrant()), 1,
                            world_ptr, yield);
         }};
 
@@ -175,7 +175,7 @@ TEST_P(GoalieTacticTest, goalie_test)
     std::vector<ValidationFunction> terminating_validation_functions = {
         [this, tactic](std::shared_ptr<World> world_ptr,
                        ValidationCoroutine::push_type& yield) {
-            robotReceivedBall(0, world_ptr, yield);
+            robotReceivedBall(world_ptr, yield);
             while (!tactic->done())
             {
                 yield("Tactic not done");

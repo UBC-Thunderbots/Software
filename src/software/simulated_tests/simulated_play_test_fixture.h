@@ -38,11 +38,11 @@ class SimulatedPlayTestFixture : public SimulatedTestFixture
     void setAIPlay(const std::string& ai_play);
 
     /**
-     * Sets the AI play constructor to be used to run in the simulated test
+     * Sets the AI play to be used to run in the simulated test
      *
-     * @param play_constructor The constructor for the play
+     * @param play The play
      */
-    void setAIPlayConstructor(std::optional<PlayConstructor> constructor);
+    void setAIPlay(std::unique_ptr<Play> play);
 
     /**
      * Sets the Referee command to override for the simulated test

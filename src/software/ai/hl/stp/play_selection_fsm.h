@@ -14,15 +14,11 @@ struct PlaySelectionFSM
 
     struct Update
     {
-        Update(const std::optional<PlayConstructor>& override_constructor,
-               const std::function<void(std::unique_ptr<Play>)>& set_current_play,
+        Update(const std::function<void(std::unique_ptr<Play>)>& set_current_play,
                const GameState& game_state)
-            : override_constructor(override_constructor),
-              set_current_play(set_current_play),
-              game_state(game_state)
+            : set_current_play(set_current_play), game_state(game_state)
         {
         }
-        std::optional<PlayConstructor> override_constructor;
         std::function<void(std::unique_ptr<Play>)> set_current_play;
         GameState game_state;
     };
@@ -61,7 +57,7 @@ struct PlaySelectionFSM
      * @param event The PlaySelection::Update event
      *
      */
-    void setupOverridePlay(const Update& event);
+    void setupOverridePlay(Update event);
     void setupSetPlay(const Update& event);
     void setupStopPlay(const Update& event);
     void setupHaltPlay(const Update& event);
@@ -71,13 +67,11 @@ struct PlaySelectionFSM
     {
         using namespace boost::sml;
 
-        DEFINE_SML_STATE(OverridePlay)
         DEFINE_SML_STATE(SetPlay)
         DEFINE_SML_STATE(Halt)
         DEFINE_SML_STATE(Playing)
         DEFINE_SML_STATE(Stop)
 
-        DEFINE_SML_GUARD(playOverridden)
         DEFINE_SML_GUARD(gameStateStopped)
         DEFINE_SML_GUARD(gameStateHalted)
         DEFINE_SML_GUARD(gameStatePlaying)
@@ -85,7 +79,6 @@ struct PlaySelectionFSM
 
         DEFINE_SML_EVENT(Update)
 
-        DEFINE_SML_ACTION(setupOverridePlay)
         DEFINE_SML_ACTION(setupSetPlay)
         DEFINE_SML_ACTION(setupStopPlay)
         DEFINE_SML_ACTION(setupHaltPlay)
@@ -99,38 +92,24 @@ struct PlaySelectionFSM
             *Halt_S + Update_E[gameStateStopped_G] / setupStopPlay_A   = Stop_S,
             Halt_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A = Playing_S,
             Halt_S + Update_E[gameStateSetup_G] / setupSetPlay_A       = SetPlay_S,
-            Halt_S + Update_E[playOverridden_G] / setupOverridePlay_A  = OverridePlay_S,
-
-            // If play overridden then continue running the overridden play, otherwise
-            // check game state
-            OverridePlay_S + Update_E[playOverridden_G] = OverridePlay_S,
-            OverridePlay_S + Update_E[gameStateHalted_G] / setupHaltPlay_A = Halt_S,
-            OverridePlay_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A =
-                Playing_S,
-            OverridePlay_S + Update_E[gameStateStopped_G] / setupStopPlay_A = Stop_S,
-            // If none of the above then either in setup or ready state so set play
-            OverridePlay_S + Update_E / setupSetPlay_A = SetPlay_S,
 
             // Check for transitions to other states, if not then default to running the
             // current play
             Stop_S + Update_E[gameStateHalted_G] / setupHaltPlay_A     = Halt_S,
             Stop_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A = Playing_S,
             Stop_S + Update_E[gameStateSetup_G] / setupSetPlay_A       = SetPlay_S,
-            Stop_S + Update_E[playOverridden_G] / setupOverridePlay_A  = OverridePlay_S,
 
             // Check for transitions to other states, if not then default to running the
             // current play
-            Playing_S + Update_E[gameStateHalted_G] / setupHaltPlay_A    = Halt_S,
-            Playing_S + Update_E[gameStateStopped_G] / setupStopPlay_A   = Stop_S,
-            Playing_S + Update_E[gameStateSetup_G] / setupSetPlay_A      = SetPlay_S,
-            Playing_S + Update_E[playOverridden_G] / setupOverridePlay_A = OverridePlay_S,
+            Playing_S + Update_E[gameStateHalted_G] / setupHaltPlay_A  = Halt_S,
+            Playing_S + Update_E[gameStateStopped_G] / setupStopPlay_A = Stop_S,
+            Playing_S + Update_E[gameStateSetup_G] / setupSetPlay_A    = SetPlay_S,
 
             // Check for transitions to other states, if not then default to running the
             // current play
             SetPlay_S + Update_E[gameStateHalted_G] / setupHaltPlay_A     = Halt_S,
             SetPlay_S + Update_E[gameStateStopped_G] / setupStopPlay_A    = Stop_S,
             SetPlay_S + Update_E[gameStatePlaying_G] / setupOffensePlay_A = Playing_S,
-            SetPlay_S + Update_E[playOverridden_G] / setupOverridePlay_A = OverridePlay_S,
 
             X + Update_E = X);
     }

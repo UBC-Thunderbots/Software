@@ -17,8 +17,8 @@
 class KickoffFriendlyPlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
-    FieldType field_type = FieldType::DIV_B;
-    Field field          = Field::createField(field_type);
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
 };
 
 TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
@@ -33,30 +33,25 @@ TEST_F(KickoffFriendlyPlayTest, test_kickoff_friendly_play)
          field.enemyDefenseArea().negXNegYCorner(),
          field.enemyDefenseArea().negXPosYCorner()});
     setEnemyGoalie(0);
-    setAIPlayConstructor([](std::shared_ptr<const AiConfig> ai_config) {
-        return std::make_unique<KickoffFriendlyPlay>(ai_config);
-    });
+    setAIPlay(std::move(std::make_unique<KickoffFriendlyPlay>(getAiConfig())));
     setRefereeCommand(RefereeCommand::NORMAL_START, RefereeCommand::PREPARE_KICKOFF_US);
 
     std::vector<ValidationFunction> terminating_validation_functions = {
         [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
             // Robot 4 is the only robot allowed to be in the center circle and start
             // the kickoff
-            robotInCenterCircle(4, world_ptr, yield);
-            robotReceivedBall(4, world_ptr, yield);
+            robotInCenterCircle(world_ptr, yield);
+            robotReceivedBall(world_ptr, yield);
             ballKicked(Angle::zero(), world_ptr, yield);
 
             // Two friendly robots near the half line setting up for offense
             Rectangle robotsOffensiveRect(Point(-0.5, 2.5), Point(-1.5, -2.5));
-            robotInPolygon(1, robotsOffensiveRect, world_ptr, yield);
-            robotInPolygon(5, robotsOffensiveRect, world_ptr, yield);
+            robotInPolygon(robotsOffensiveRect, 2, world_ptr, yield);
 
 
             // Two Friendly robots defending the exterior of defense box and one goalie
             Rectangle robotsDefensiveRect(Point(-3.2, 1.1), Point(-3.51, -1.1));
-            robotInPolygon(0, robotsDefensiveRect, world_ptr, yield);
-            robotInPolygon(2, robotsDefensiveRect, world_ptr, yield);
-            robotInPolygon(3, robotsDefensiveRect, world_ptr, yield);
+            robotInPolygon(robotsDefensiveRect, 3, world_ptr, yield);
         }};
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {

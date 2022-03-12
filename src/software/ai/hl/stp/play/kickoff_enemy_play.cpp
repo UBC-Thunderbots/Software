@@ -139,7 +139,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield,
                 calculateBlockCone(world.field().friendlyGoalpostPos(),
                                    world.field().friendlyGoalpostNeg(),
                                    world.field().centerPoint(), ROBOT_MAX_RADIUS_METERS),
-                Angle::zero(), 0, MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                Angle::zero(), 0, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
         result[0].emplace_back(move_tactics.at(defense_position_index));
 
         // yield the Tactics this Play wants to run, in order of priority

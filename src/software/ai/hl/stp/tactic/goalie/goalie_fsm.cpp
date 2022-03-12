@@ -197,8 +197,8 @@ void GoalieFSM::updatePanic(const Update &event)
         (event.common.world.ball().position() - goalie_pos).orientation();
 
     event.common.set_intent(std::make_unique<MoveIntent>(
-        event.common.robot.id(), goalie_pos, goalie_orientation, 0.0, DribblerMode::OFF,
-        BallCollisionType::ALLOW,
+        event.common.robot.id(), goalie_pos, goalie_orientation, 0.0,
+        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
 }
@@ -238,7 +238,7 @@ void GoalieFSM::updatePositionToBlock(const Update &event)
 
     event.common.set_intent(std::make_unique<MoveIntent>(
         event.common.robot.id(), goalie_pos, goalie_orientation, goalie_final_speed,
-        DribblerMode::OFF, BallCollisionType::ALLOW,
+        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
 }

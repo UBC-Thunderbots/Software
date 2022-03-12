@@ -58,11 +58,12 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
         // Update crease defenders
         std::get<0>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+            ->updateControlParams(world.ball().position(),
+                                  TbotsProto::CreaseDefenderAlignment::LEFT);
         result[0].emplace_back(std::get<0>(crease_defender_tactics));
         std::get<1>(crease_defender_tactics)
             ->updateControlParams(world.ball().position(),
-                                  CreaseDefenderAlignment::RIGHT);
+                                  TbotsProto::CreaseDefenderAlignment::RIGHT);
         result[0].emplace_back(std::get<1>(crease_defender_tactics));
 
         // Update tactics moving to open areas

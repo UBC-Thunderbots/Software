@@ -12,8 +12,8 @@
 class FreeKickPlayTest : public SimulatedErForceSimPlayTestFixture
 {
    protected:
-    FieldType field_type = FieldType::DIV_B;
-    Field field          = Field::createField(field_type);
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
 };
 
 TEST_F(FreeKickPlayTest, test_free_kick_play_on_enemy_half)
