@@ -2,10 +2,10 @@
 
 MoveIntent::MoveIntent(unsigned int robot_id, const Point& destination,
                        const Angle& final_angle, double final_speed,
-                       const DribblerMode& dribbler_mode,
-                       const BallCollisionType& ball_collision_type,
+                       const TbotsProto::DribblerMode& dribbler_mode,
+                       const TbotsProto::BallCollisionType& ball_collision_type,
                        const AutoChipOrKick& auto_chip_or_kick,
-                       const MaxAllowedSpeedMode& max_allowed_speed_mode,
+                       const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
                        double target_spin_rev_per_s,
                        const RobotConstants_t& robot_constants)
     : NavigatingIntent(robot_id, destination, final_speed, ball_collision_type,
@@ -32,7 +32,7 @@ const Angle& MoveIntent::getFinalAngle() const
     return final_angle;
 }
 
-const DribblerMode& MoveIntent::getDribblerMode() const
+const TbotsProto::DribblerMode& MoveIntent::getDribblerMode() const
 {
     return dribbler_mode;
 }

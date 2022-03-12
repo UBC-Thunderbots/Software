@@ -10,7 +10,7 @@
 ProtobufSink::ProtobufSink()
 {
     // Setup the logs
-    unix_senders["log"] = std::make_unique<ThreadedUnixSender>(UNIX_BASE_PATH + "log");
+    protobuf_sender = std::make_unique<ThreadedUnixSender>(UNIX_BASE_PATH + "protobuf");
 }
 
 void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
@@ -19,21 +19,8 @@ void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
 
     if (level.value == VISUALIZE.value)
     {
-        std::string msg = log_entry.get().message();
-        size_t pos      = msg.find(TYPE_DELIMITER);
-
-        std::string proto_type_name  = msg.substr(0, pos);
-        std::string serialized_proto = msg.substr(pos + TYPE_DELIMITER.length());
-
-        // If we don't already have a unix sender for this type, lets create it
-        if (unix_senders.count(proto_type_name) == 0)
-        {
-            unix_senders[proto_type_name] =
-                std::make_unique<ThreadedUnixSender>(UNIX_BASE_PATH + proto_type_name);
-        }
-
         // Send the protobuf
-        unix_senders[proto_type_name]->sendString(serialized_proto);
+        protobuf_sender->sendString(log_entry.get().message());
     }
     else
     {
@@ -54,9 +41,15 @@ void ProtobufSink::sendProtobuf(g3::LogMessageMover log_entry)
             log_msg_proto.set_line_number(
                 static_cast<uint32_t>(std::stoul(log_entry.get().line())));
 
-            std::string log_msg;
-            log_msg_proto.SerializeToString(&log_msg);
-            unix_senders["log"]->sendString(base64_encode(log_msg));
+            // Pack into Any
+            google::protobuf::Any any;
+            any.PackFrom(log_msg_proto);
+
+            // Serialize into any
+            std::string serialized_any;
+            any.SerializeToString(&serialized_any);
+            protobuf_sender->sendString(log_msg_proto.GetTypeName() + TYPE_DELIMITER +
+                                        base64_encode(serialized_any));
         }
     }
 }

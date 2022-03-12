@@ -23,17 +23,6 @@ cc_proto_library(
     deps = [":protobuf_proto_lib"],
 )
 
-cc_library(
-    name = "protobuf",
-    srcs = glob(["*.cpp"]),
-    hdrs = glob(["*.h"]),
-    linkstatic = True,
-    deps = [
-        ":protobuf_cc_lib",
-        ":protobuf_qt",
-    ],
-)
-
 qt_cc_library(
     name = "protobuf_qt",
     srcs = glob(["*.cpp"]),

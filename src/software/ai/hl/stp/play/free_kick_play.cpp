@@ -94,10 +94,11 @@ void FreeKickPlay::chipAtGoalStage(
     {
         chip_tactic->updateControlParams(world.ball().position(), chip_target);
         std::get<0>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+            ->updateControlParams(world.ball().position(),
+                                  TbotsProto::CreaseDefenderAlignment::LEFT);
         std::get<1>(crease_defender_tactics)
             ->updateControlParams(world.ball().position(),
-                                  CreaseDefenderAlignment::RIGHT);
+                                  TbotsProto::CreaseDefenderAlignment::RIGHT);
 
         yield({{chip_tactic, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
@@ -126,10 +127,11 @@ void FreeKickPlay::performPassStage(
         receiver->updateControlParams(pass);
 
         std::get<0>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+            ->updateControlParams(world.ball().position(),
+                                  TbotsProto::CreaseDefenderAlignment::LEFT);
         std::get<1>(crease_defender_tactics)
             ->updateControlParams(world.ball().position(),
-                                  CreaseDefenderAlignment::RIGHT);
+                                  TbotsProto::CreaseDefenderAlignment::RIGHT);
         yield({{attacker, receiver, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
     } while (!receiver->done());
@@ -175,18 +177,19 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
         auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
 
-        cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
-                                                  pass1.receiverOrientation(), 0.0,
-                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-        cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
-                                                  pass2.receiverOrientation(), 0.0,
-                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_1->updateControlParams(
+            pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_2->updateControlParams(
+            pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
         std::get<0>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+            ->updateControlParams(world.ball().position(),
+                                  TbotsProto::CreaseDefenderAlignment::LEFT);
         std::get<1>(crease_defender_tactics)
             ->updateControlParams(world.ball().position(),
-                                  CreaseDefenderAlignment::RIGHT);
+                                  TbotsProto::CreaseDefenderAlignment::RIGHT);
         yield({{align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
                 std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});
@@ -210,18 +213,19 @@ PassWithRating FreeKickPlay::shootOrFindPassStage(
         auto pass1 = pass_eval.getBestPassInZones(cherry_pick_region_1).pass;
         auto pass2 = pass_eval.getBestPassInZones(cherry_pick_region_2).pass;
 
-        cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
-                                                  pass1.receiverOrientation(), 0.0,
-                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-        cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
-                                                  pass2.receiverOrientation(), 0.0,
-                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_1->updateControlParams(
+            pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_2->updateControlParams(
+            pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
         std::get<0>(crease_defender_tactics)
-            ->updateControlParams(world.ball().position(), CreaseDefenderAlignment::LEFT);
+            ->updateControlParams(world.ball().position(),
+                                  TbotsProto::CreaseDefenderAlignment::LEFT);
         std::get<1>(crease_defender_tactics)
             ->updateControlParams(world.ball().position(),
-                                  CreaseDefenderAlignment::RIGHT);
+                                  TbotsProto::CreaseDefenderAlignment::RIGHT);
         yield({{align_to_ball_tactic, shoot_tactic, cherry_pick_tactic_1,
                 cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
                 std::get<1>(crease_defender_tactics)}});

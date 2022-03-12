@@ -15,7 +15,7 @@ struct CreaseDefensePlayFSM
         // The origin point of the enemy threat
         Point enemy_threat_origin;
         // The maximum allowed speed mode
-        MaxAllowedSpeedMode max_allowed_speed_mode;
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
     };
 
     DEFINE_PLAY_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
