@@ -9,6 +9,7 @@ py_binary(
         "//proto:software_py_proto",
         "//software/networking:threaded_unix_listener_py",
         "//software/thunderscope:colors",
+        "//software/thunderscope:common_widgets",
         "//software/thunderscope:constants",
         "//software/thunderscope/chicker",
         "//software/thunderscope/field",
@@ -27,4 +28,9 @@ py_library(
 py_library(
     name = "colors",
     srcs = ["colors.py"],
+)
+
+py_library(
+    name = "common_widgets",
+    srcs = ["common_widgets.py"],
 )
