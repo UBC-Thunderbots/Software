@@ -43,7 +43,7 @@ void ThreadedEstopReader::tick(const boost::system::error_code& error)
             uart_reader->flushSerialPort(uart_reader->flush_receive);
             estop_msg = uart_reader->serialRead(ESTOP_MESSAGE_SIZE_BYTES);
         }
-        catch (std::exception e)
+        catch (const std::exception& e)
         {
             LOG(FATAL)
                 << "crashing system and timing out robots as we have lost connection to ESTOP source : "
@@ -75,10 +75,8 @@ void ThreadedEstopReader::tick(const boost::system::error_code& error)
             estop_state = new_state;
         }
 
-        if (num_consecutive_status_error > MAXIMUM_CONSECUTIVE_STATUS_ERROR)
-        {
-            LOG(FATAL) << "ESTOP Consecutive Unexpected messages";
-        }
+        CHECK(num_consecutive_status_error <= MAXIMUM_CONSECUTIVE_STATUS_ERROR)
+            << "ESTOP Consecutive Unexpected messages";
 
         boost::posix_time::milliseconds next_interval(INTERVAL_BETWEEN_READS_MS);
 

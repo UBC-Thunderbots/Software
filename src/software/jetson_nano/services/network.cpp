@@ -29,6 +29,7 @@ void NetworkService::start()
 std::tuple<TbotsProto::PrimitiveSet, TbotsProto::Vision> NetworkService::poll(
     const TbotsProto::RobotStatus& robot_status)
 {
+    std::scoped_lock lock{primitive_set_mutex, vision_mutex};
     sender->sendProto(robot_status);
     return std::tuple<TbotsProto::PrimitiveSet, TbotsProto::Vision>{primitive_set_msg,
                                                                     vision_msg};
@@ -42,9 +43,11 @@ void NetworkService::stop()
 
 void NetworkService::primitiveSetCallback(TbotsProto::PrimitiveSet input)
 {
+    std::scoped_lock<std::mutex> lock(primitive_set_mutex);
     primitive_set_msg = input;
 }
 void NetworkService::visionCallback(TbotsProto::Vision input)
 {
+    std::scoped_lock<std::mutex> lock(vision_mutex);
     vision_msg = input;
 }

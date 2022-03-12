@@ -112,6 +112,13 @@ message TrackingAOI
     required float y2 = 4;
 }
 
+enum WorldSource
+{
+    INTERNAL_SIMULATION = 1;
+    EXTERNAL_SIMULATION = 2;
+    REAL_LIFE           = 3;
+}
+
 message State
 {
     required int64 time   = 1;
@@ -132,6 +139,7 @@ message State
     repeated SSLProto.SSL_WrapperPacket vision_frames = 10;
     repeated int64 vision_frame_times                 = 14;
     optional int64 system_delay                       = 15;
+    optional WorldSource world_source                 = 16;
 }
 
 message SimulatorState
@@ -175,5 +183,7 @@ message SimRobot
     required float r_x           = 9;
     required float r_y           = 10;
     required float r_z           = 11;
-    optional float angle         = 12;
+    // touching counts anywhere on the robot; both the dribbler and the robot body
+    optional bool touches_ball = 12;
+    optional float angle       = 13;
 }

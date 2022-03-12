@@ -84,8 +84,9 @@ TEST(TbotsProtobufTest, robot_state_msg_test)
 
     Robot robot(0, position, velocity, orientation, angular_velocity,
                 Timestamp::fromSeconds(0));
-    auto robot_state_msg = createRobotState(robot);
+    auto robot_state_msg = createRobotStateProto(robot);
 
+    EXPECT_EQ(robot.currentState(), createRobotState(*robot_state_msg));
     TbotsProtobufTest::assertRobotStateMessageFromRobot(robot, *robot_state_msg);
 }
 

@@ -6,19 +6,9 @@
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/util/generic_factory/generic_factory.h"
 
-BallPlacementPlay::BallPlacementPlay(std::shared_ptr<const PlayConfig> config)
+BallPlacementPlay::BallPlacementPlay(std::shared_ptr<const AiConfig> config)
     : Play(config, true)
 {
-}
-
-bool BallPlacementPlay::isApplicable(const World &world) const
-{
-    return world.gameState().isOurBallPlacement();
-}
-
-bool BallPlacementPlay::invariantHolds(const World &world) const
-{
-    return world.gameState().isOurBallPlacement();
 }
 
 void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
@@ -57,4 +47,4 @@ void BallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, BallPlacementPlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, BallPlacementPlay, AiConfig> factory;

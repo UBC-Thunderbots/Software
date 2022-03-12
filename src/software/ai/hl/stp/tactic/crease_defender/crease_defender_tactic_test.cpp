@@ -18,7 +18,7 @@
 class CreaseDefenderTacticTest
     : public SimulatedTacticTestFixture,
       public ::testing::WithParamInterface<
-          std::tuple<Point, CreaseDefenderAlignment, unsigned int>>
+          std::tuple<Point, TbotsProto::CreaseDefenderAlignment, unsigned int>>
 {
    protected:
     Field field = Field::createSSLDivisionBField();
@@ -26,8 +26,9 @@ class CreaseDefenderTacticTest
 
 TEST_F(CreaseDefenderTacticTest, test_chip_ball)
 {
-    Point enemy_threat_point          = Point(-1.5, 0.5);
-    CreaseDefenderAlignment alignment = CreaseDefenderAlignment::CENTRE;
+    Point enemy_threat_point = Point(-1.5, 0.5);
+    TbotsProto::CreaseDefenderAlignment alignment =
+        TbotsProto::CreaseDefenderAlignment::CENTRE;
 
     Point initial_position = Point(-3, 1.5);
     BallState ball_state(enemy_threat_point, Vector(-2, 0));
@@ -67,8 +68,9 @@ TEST_F(CreaseDefenderTacticTest, test_chip_ball)
 
 TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
 {
-    Point enemy_threat_point          = Point(-1.5, 0.0);
-    CreaseDefenderAlignment alignment = CreaseDefenderAlignment::CENTRE;
+    Point enemy_threat_point = Point(-1.5, 0.0);
+    TbotsProto::CreaseDefenderAlignment alignment =
+        TbotsProto::CreaseDefenderAlignment::CENTRE;
 
     Point initial_position = Point(0, 0);
     BallState ball_state(enemy_threat_point, Vector());
@@ -108,9 +110,9 @@ TEST_F(CreaseDefenderTacticTest, test_not_bumping_ball_towards_net)
 
 TEST_P(CreaseDefenderTacticTest, crease_defender_test)
 {
-    Point enemy_threat_point          = std::get<0>(GetParam());
-    CreaseDefenderAlignment alignment = std::get<1>(GetParam());
-    unsigned int target_defend_region = std::get<2>(GetParam());
+    Point enemy_threat_point                      = std::get<0>(GetParam());
+    TbotsProto::CreaseDefenderAlignment alignment = std::get<1>(GetParam());
+    unsigned int target_defend_region             = std::get<2>(GetParam());
     ASSERT_LE(target_defend_region, 5);
 
     Point initial_position = Point(-3, 1.5);
@@ -161,7 +163,7 @@ TEST_P(CreaseDefenderTacticTest, crease_defender_test)
             unsigned num_ticks = 1000;
             for (unsigned i = 0; i < num_ticks; i++)
             {
-                robotInPolygon(0, defender_regions[target_defend_region], world_ptr,
+                robotInPolygon(defender_regions[target_defend_region], 1, world_ptr,
                                yield);
             }
         }};
@@ -198,16 +200,16 @@ INSTANTIATE_TEST_CASE_P(
     CreaseDefenderEnvironment, CreaseDefenderTacticTest,
     ::testing::Values(
         // Enemy threat in front of crease, LEFT
-        std::make_tuple(Point(1, 2.5), CreaseDefenderAlignment::LEFT, 2),
+        std::make_tuple(Point(1, 2.5), TbotsProto::CreaseDefenderAlignment::LEFT, 2),
         // Enemy threat in front of crease, CENTRE
-        std::make_tuple(Point(1, -2.5), CreaseDefenderAlignment::CENTRE, 3),
+        std::make_tuple(Point(1, -2.5), TbotsProto::CreaseDefenderAlignment::CENTRE, 3),
         // Enemy threat in front of crease, RIGHT
-        std::make_tuple(Point(1.5, 2), CreaseDefenderAlignment::RIGHT, 2),
+        std::make_tuple(Point(1.5, 2), TbotsProto::CreaseDefenderAlignment::RIGHT, 2),
         // Enemy threat left side of crease, RIGHT
-        std::make_tuple(Point(-3.5, 2.5), CreaseDefenderAlignment::RIGHT, 1),
+        std::make_tuple(Point(-3.5, 2.5), TbotsProto::CreaseDefenderAlignment::RIGHT, 1),
         // Enemy threat left side of crease, CENTRE
-        std::make_tuple(Point(-4, 2.5), CreaseDefenderAlignment::CENTRE, 0),
+        std::make_tuple(Point(-4, 2.5), TbotsProto::CreaseDefenderAlignment::CENTRE, 0),
         // Enemy threat right side of crease, RIGHT
-        std::make_tuple(Point(-4, -2), CreaseDefenderAlignment::RIGHT, 5),
+        std::make_tuple(Point(-4, -2), TbotsProto::CreaseDefenderAlignment::RIGHT, 5),
         // Enemy threat right side of crease, LEFT
-        std::make_tuple(Point(-4.25, -2), CreaseDefenderAlignment::LEFT, 5)));
+        std::make_tuple(Point(-4.25, -2), TbotsProto::CreaseDefenderAlignment::LEFT, 5)));

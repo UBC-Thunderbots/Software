@@ -61,20 +61,9 @@ bool EnlsvgPathPlanner::isCoordNavigable(const EnlsvgPoint &ep) const
            (ep.y >= 0 && ep.y < max_navigable_y_enlsvg_point);
 }
 
-std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start, const Point &end,
-                                                const Rectangle &navigable_area,
-                                                const std::vector<ObstaclePtr> &)
+std::optional<Path> EnlsvgPathPlanner::findPath(const Point &start,
+                                                const Point &end) const
 {
-    // Check if start and end coordinates are in navigable area and return null if it
-    // isn't
-    if (!contains(navigable_area, start) || !contains(navigable_area, end))
-    {
-        LOG(WARNING)
-            << "Start and/or end point is not within the navigable area; no path found"
-            << std::endl;
-        return std::nullopt;
-    }
-
     // Find closest unblocked points in case the start and end positions are inside
     // obstacles
     EnlsvgPoint enlsvg_start = convertPointToEnlsvgPoint(start);
@@ -202,5 +191,5 @@ EnlsvgPathPlanner::findClosestUnblockedEnlsvgPoint(const EnlsvgPoint &ep) const
 
 bool EnlsvgPathPlanner::isBlocked(const EnlsvgPoint &ep) const
 {
-    return enlsvg_grid->isBlocked(ep.x, ep.y);
+    return !isCoordNavigable(ep) || enlsvg_grid->isBlocked(ep.x, ep.y);
 }

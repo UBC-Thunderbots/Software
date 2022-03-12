@@ -34,12 +34,6 @@ using TacticCoroutine = boost::coroutines2::coroutine<PriorityTacticVector>;
  *
  * These stages are useful in order for us to create more complex behaviour and write
  * it in a more understandable way.
- *
- * Plays define what conditions must be met for them to start (with the isApplicable
- * function), and what conditions must be continuously met for the Play to continue
- * running (with the invariantHolds function). These are very important to get right,
- * so that we can always run at least 1 Play in every scenario, and that Plays don't
- * unexpectedly stop during gameplay. See the documentation in stp.h for more info.
  */
 class Play
 {
@@ -47,43 +41,10 @@ class Play
     /**
      * Creates a new Play
      *
-     * @param play_config The Play configuration
+     * @param ai_config The Play configuration
      * @param requires_goalie Whether this plays requires a goalie
      */
-    explicit Play(std::shared_ptr<const PlayConfig> play_config, bool requires_goalie);
-
-    /**
-     * Returns whether or not this Play can be started. For example, the Enemy Team
-     * must have the ball for a defensive play to be applicable.
-     *
-     * @param world The current state of the world
-     * @return true if this Play can be started, and false otherwise
-     */
-    virtual bool isApplicable(const World& world) const = 0;
-
-    /**
-     * Returns whether or not the invariant for this Play holds (is true). The invariant
-     * is a set of conditions that must remain true for the Play to continue running
-     * (not necessarily the same as the Applicable conditions). For example, the Invariant
-     * for an Offensive Play might be that our team must have possession of the ball. If
-     * our team no longer has possession of the ball (ie. the invariant no longer holds),
-     * then we should probably run a different Play.
-     *
-     * @param world The current state of the world
-     * @return true if this Play's invariant holds (is true), and false otherwise
-     */
-    virtual bool invariantHolds(const World& world) const = 0;
-
-    /**
-     * Returns true if the Play is done and false otherwise. The Play is considered
-     * done when its coroutine is done (the getNextTactics() function has no
-     * more work to do)
-     *
-     * TODO (#2359): make pure virtual once all plays are not coroutines
-     *
-     * @return true if the Play is done and false otherwise
-     */
-    virtual bool done() const;
+    explicit Play(std::shared_ptr<const AiConfig> ai_config, bool requires_goalie);
 
     /**
      * Gets Intents from the Play given the assignment algorithm and world
@@ -95,7 +56,7 @@ class Play
      *
      * @return the vector of intents to execute
      */
-    std::vector<std::unique_ptr<Intent>> get(
+    virtual std::vector<std::unique_ptr<Intent>> get(
         RobotToTacticAssignmentFunction robot_to_tactic_assignment_algorithm,
         MotionConstraintBuildFunction motion_constraint_builder, const World& new_world);
 
@@ -113,7 +74,7 @@ class Play
    protected:
     // TODO (#2359): remove this
     // The Play configuration
-    std::shared_ptr<const PlayConfig> play_config;
+    std::shared_ptr<const AiConfig> ai_config;
 
    private:
     /**
@@ -185,3 +146,7 @@ class Play
     // TODO (#2359): remove this
     PriorityTacticVector priority_tactics;
 };
+
+// Function that creates a play
+using PlayConstructor =
+    std::function<std::unique_ptr<Play>(std::shared_ptr<const AiConfig>)>;

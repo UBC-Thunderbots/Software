@@ -20,21 +20,16 @@ class STPTacticAssignmentTest : public ::testing::Test
    public:
     STPTacticAssignmentTest()
         : thunderbots_config(std::make_shared<const ThunderbotsConfig>()),
-          stp([]() { return nullptr; }, thunderbots_config->getAiControlConfig(),
-              thunderbots_config->getPlayConfig(), 0)
+          stp(thunderbots_config->getAiConfig())
     {
     }
 
    protected:
     void SetUp() override
     {
-        thunderbots_config            = std::make_shared<const ThunderbotsConfig>();
-        auto default_play_constructor = [this]() -> std::unique_ptr<Play> {
-            return std::make_unique<HaltPlay>(thunderbots_config->getPlayConfig());
-        };
+        thunderbots_config = std::make_shared<const ThunderbotsConfig>();
         // Give an explicit seed to STP so that our tests are deterministic
-        stp   = STP(default_play_constructor, thunderbots_config->getAiControlConfig(),
-                  thunderbots_config->getPlayConfig(), 0);
+        stp   = STP(thunderbots_config->getAiConfig());
         world = ::TestUtil::createBlankTestingWorld();
     }
 
@@ -83,9 +78,9 @@ TEST_F(STPTacticAssignmentTest,
     auto move_tactic_2 = std::make_shared<MoveTactic>();
 
     move_tactic_1->updateControlParams(Point(-1, 0), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     move_tactic_2->updateControlParams(Point(1, 0), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     ConstTacticVector tactics = {move_tactic_1, move_tactic_2};
 
@@ -107,9 +102,9 @@ TEST_F(STPTacticAssignmentTest,
     auto move_tactic_2 = std::make_shared<MoveTactic>();
 
     move_tactic_1->updateControlParams(Point(-1, 0), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     move_tactic_2->updateControlParams(Point(1, 0), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     ConstTacticVector tactics = {move_tactic_1, move_tactic_2};
 
@@ -133,7 +128,7 @@ TEST_F(STPTacticAssignmentTest,
     auto move_tactic_1 = std::make_shared<MoveTactic>();
 
     move_tactic_1->updateControlParams(Point(-1, 0), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     ConstTacticVector tactics = {move_tactic_1};
 
@@ -151,7 +146,7 @@ TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_robots
     auto move_tactic_1 = std::make_shared<MoveTactic>();
 
     move_tactic_1->updateControlParams(Point(-1, 0), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     ConstTacticVector tactics = {move_tactic_1};
 
@@ -173,7 +168,7 @@ TEST_F(STPTacticAssignmentTest,
     auto stop_tactic_1 = std::make_shared<StopTactic>(false);
 
     move_tactic_1->updateControlParams(Point(-1, 0), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     ConstTacticVector tactics = {move_tactic_1, stop_tactic_1};
 
@@ -204,7 +199,7 @@ TEST_F(STPTacticAssignmentTest, test_assigning_1_tactic_to_1_robot)
     auto move_tactic_1 = std::make_shared<MoveTactic>();
 
     move_tactic_1->updateControlParams(Point(2, -3.2), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     ConstTacticVector tactics = {move_tactic_1};
 
@@ -232,9 +227,9 @@ TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap)
     auto move_tactic_2 = std::make_shared<MoveTactic>();
 
     move_tactic_1->updateControlParams(Point(-1, 0), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     move_tactic_2->updateControlParams(Point(1, 0), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     ConstTacticVector tactics = {move_tactic_1, move_tactic_2};
 
@@ -274,9 +269,9 @@ TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_with_overla
     auto move_tactic_2 = std::make_shared<MoveTactic>();
 
     move_tactic_1->updateControlParams(Point(-1, 0), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     move_tactic_2->updateControlParams(Point(1, 0), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     ConstTacticVector tactics = {move_tactic_1, move_tactic_2};
 
@@ -309,9 +304,9 @@ TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_2_tactics)
     auto move_tactic_2 = std::make_shared<MoveTactic>();
 
     move_tactic_1->updateControlParams(Point(-1, 0), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     move_tactic_2->updateControlParams(Point(1, 0), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     ConstTacticVector tactics = {move_tactic_1, move_tactic_2};
 
@@ -377,7 +372,7 @@ TEST_F(STPTacticAssignmentTest,
     // the cost of assigning any robot to the move_tactic should be less than the
     // stop_tactics
     move_tactic_1->updateControlParams(Point(0, 0), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     ConstTacticVector tactics = {stop_tactic_1, move_tactic_1, stop_tactic_2};
 
@@ -408,7 +403,7 @@ TEST_F(STPTacticAssignmentTest,
     auto move_tactic_1 = std::make_shared<MoveTactic>();
 
     move_tactic_1->updateControlParams(Point(0, 0), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     ConstTacticVector tactics = {move_tactic_1};
 
@@ -477,7 +472,7 @@ TEST_F(STPTacticAssignmentTest,
     auto move_tactic_1 = std::make_shared<MoveTactic>();
 
     move_tactic_1->updateControlParams(Point(-1, 0), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     ConstTacticVector tactics                   = {move_tactic_1};
     std::vector<Robot> expected_robots_assigned = {robot_0, robot_1, robot_2};
@@ -524,9 +519,9 @@ TEST_F(STPTacticAssignmentTest, test_greediness_of_tiered_assignment)
     auto move_tactic_1 = std::make_shared<MoveTactic>();
 
     move_tactic_0->updateControlParams(Point(0, 0), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     move_tactic_1->updateControlParams(Point(2, 0), Angle::zero(), 0,
-                                       MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+                                       TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     ConstPriorityTacticVector normal_tactics = {{move_tactic_0, move_tactic_1}};
 
@@ -655,9 +650,9 @@ TEST_F(STPTacticAssignmentTest, test_multi_tier_assignment_with_tiered_assignmen
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(
-            thunderbots_config->getPlayConfig()->getRobotNavigationObstacleConfig()),
+            thunderbots_config->getAiConfig()->getRobotNavigationObstacleConfig()),
         std::make_shared<CreaseDefenderTactic>(
-            thunderbots_config->getPlayConfig()->getRobotNavigationObstacleConfig()),
+            thunderbots_config->getAiConfig()->getRobotNavigationObstacleConfig()),
     };
 
     Pass passer_pass(Point(2, 3), Point(0.5, 0.3), 2);
