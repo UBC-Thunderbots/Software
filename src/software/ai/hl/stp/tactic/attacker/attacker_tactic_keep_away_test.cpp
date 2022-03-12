@@ -35,11 +35,11 @@ TEST_P(AttackerTacticKeepAwayTest, DISABLED_attacker_test_keep_away)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5)});
     friendly_robots.emplace_back(robot_state);
 
-    auto attacker_tactic_config = std::make_shared<AttackerTacticConfig>();
+    auto ai_config = std::make_shared<AiConfig>();
     // force passing for this test by setting min acceptable shot angle very high
-    attacker_tactic_config->getMutableMinOpenAngleForShotDeg()->setValue(90);
-    attacker_tactic_config->getMutableEnemyAboutToStealBallRadius()->setValue(0.01);
-    auto tactic = std::make_shared<AttackerTactic>(attacker_tactic_config);
+    ai_config->getAttackerTacticConfig()->getMutableMinOpenAngleForShotDeg()->setValue(90);
+    ai_config->getAttackerTacticConfig()->getMutableEnemyAboutToStealBallRadius()->setValue(0.01);
+    auto tactic = std::make_shared<AttackerTactic>(ai_config);
     // force the keep away state
     tactic->updateControlParams(pass, false);
     setTactic(tactic);

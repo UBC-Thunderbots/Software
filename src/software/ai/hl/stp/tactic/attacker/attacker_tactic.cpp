@@ -5,14 +5,13 @@
 #include "software/logger/logger.h"
 #include "software/world/ball.h"
 
-AttackerTactic::AttackerTactic(
-    std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config)
+AttackerTactic::AttackerTactic( std::shared_ptr<const AiConfig> ai_config)
     : Tactic({RobotCapability::Kick, RobotCapability::Chip, RobotCapability::Move}),
-      fsm(DribbleFSM()),
+      fsm(DribbleFSM(ai_config->getDribbleTacticConfig()), AttackerFSM(ai_config->getAttackerTacticConfig())),
       best_pass_so_far(std::nullopt),
       pass_committed(false),
       chip_target(std::nullopt),
-      attacker_tactic_config(attacker_tactic_config)
+      attacker_tactic_config(ai_config->getAttackerTacticConfig())
 {
 }
 
@@ -47,8 +46,7 @@ void AttackerTactic::updateIntent(const TacticUpdate& tactic_update)
         .best_pass_so_far       = best_pass_so_far,
         .pass_committed         = pass_committed,
         .shot                   = shot,
-        .chip_target            = chip_target,
-        .attacker_tactic_config = attacker_tactic_config};
+        .chip_target            = chip_target};
 
     fsm.process_event(AttackerFSM::Update(control_params, tactic_update));
 }

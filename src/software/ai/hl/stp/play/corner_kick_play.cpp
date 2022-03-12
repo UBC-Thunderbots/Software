@@ -46,7 +46,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
 
     // Perform the pass and wait until the receiver is finished
     auto attacker =
-        std::make_shared<AttackerTactic>(ai_config->getAttackerTacticConfig());
+        std::make_shared<AttackerTactic>(ai_config);
     auto receiver = std::make_shared<ReceiverTactic>();
 
     do

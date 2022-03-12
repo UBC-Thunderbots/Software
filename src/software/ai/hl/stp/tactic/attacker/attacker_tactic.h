@@ -17,10 +17,10 @@ class AttackerTactic : public Tactic
     /**
      * Creates a new AttackerTactic
      *
-     * @param attacker_tactic_config The config to fetch parameters from
+     * @param ai_config The AI configuration
      */
     explicit AttackerTactic(
-        std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config);
+std::shared_ptr<const AiConfig> ai_config);
 
     AttackerTactic() = delete;
 

@@ -49,7 +49,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield,
         world.field().enemyGoalCenter() - Vector(fallback_chip_target_x_offset, 0);
 
     auto attacker =
-        std::make_shared<AttackerTactic>(ai_config->getAttackerTacticConfig());
+        std::make_shared<AttackerTactic>(ai_config);
     attacker->updateControlParams(fallback_chip_target);
 
     do

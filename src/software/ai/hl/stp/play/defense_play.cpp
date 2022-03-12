@@ -18,7 +18,7 @@ DefensePlay::DefensePlay(std::shared_ptr<const AiConfig> config) : Play(config, 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
 {
     auto shoot_goal_tactic =
-        std::make_shared<AttackerTactic>(ai_config->getAttackerTacticConfig());
+        std::make_shared<AttackerTactic>(ai_config);
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(

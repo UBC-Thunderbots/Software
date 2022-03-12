@@ -28,12 +28,9 @@ TEST_P(SimulatedAttackerVsGoalieTacticTest, attacker_vs_goalie_test)
 
     BallState ball_state = BallState(Point(0.5, 0.5), Vector(0, 0));
 
-    auto attacker_tactic_config = std::make_shared<const AttackerTacticConfig>();
-    auto friendly_tactic = std::make_shared<AttackerTactic>(attacker_tactic_config);
+    auto friendly_tactic = std::make_shared<AttackerTactic>(friendly_mutable_thunderbots_config->getAiConfig());
 
-    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
-        std::make_shared<const GoalieTacticConfig>();
-    auto enemy_tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
+    auto enemy_tactic = std::make_shared<GoalieTactic>(enemy_mutable_thunderbots_config->getAiConfig());
 
     setTactic(friendly_tactic, enemy_tactic);
     setBothRobotId(friendly_robot_state.id, enemy_robot_state.id);

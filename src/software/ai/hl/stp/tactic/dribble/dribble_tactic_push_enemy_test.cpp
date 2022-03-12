@@ -48,6 +48,7 @@ class DribbleTacticPushEnemyTest : public SimulatedErForceSimTacticTestFixture,
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
+    std::shared_ptr<const AiConfig> ai_config =     std::make_shared<AiConfig>();
 };
 
 TEST_P(DribbleTacticPushEnemyTest, test_steal_ball_from_behind_enemy)
@@ -59,7 +60,7 @@ TEST_P(DribbleTacticPushEnemyTest, test_steal_ball_from_behind_enemy)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, -2.5), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>();
+    auto tactic = std::make_shared<DribbleTactic>(ai_config);
     tactic->updateControlParams(dribble_destination, dribble_orientation);
     setTactic(tactic);
     setFriendlyRobotId(1);

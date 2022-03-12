@@ -85,7 +85,7 @@ TEST(GoalieFSMTest, test_transitions)
         Point(GoalieFSM::getNoChipRectangle(world.field()).xMax(), 0);
     Angle clear_ball_direction = Angle::zero();
 
-    FSM<GoalieFSM> fsm(DribbleFSM(),
+    FSM<GoalieFSM> fsm(DribbleFSM(std::make_shared<DribbleTacticConfig>()),
                        GoalieFSM(std::make_shared<const GoalieTacticConfig>(),
                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT));
 

@@ -2,6 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/evaluation/pass.h"
+#include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
@@ -20,10 +21,9 @@ struct DribbleFSM
     /**
      * Constructor for DribbleFSM
      *
-     * @param continuous_dribbling_start_point A pointer to a Point to track the
-     * continuous dribbling start point
+     * @param dribble_tactic_config The config to fetch parameters from
      */
-    explicit DribbleFSM(void) : continuous_dribbling_start_point(Point()) {}
+    explicit DribbleFSM(std::shared_ptr<const DribbleTacticConfig> dribble_tactic_config) : dribble_tactic_config(dribble_tactic_config),continuous_dribbling_start_point(Point()) {}
 
     struct ControlParams
     {
@@ -36,17 +36,6 @@ struct DribbleFSM
     };
 
     DEFINE_TACTIC_UPDATE_STRUCT_WITH_CONTROL_AND_COMMON_PARAMS
-
-    // Threshold to determine if the ball is at the destination determined experimentally
-    static constexpr double BALL_CLOSE_TO_DEST_THRESHOLD = 0.1;
-    // Threshold to determine if the robot has the expected orientation when completing
-    // the dribble
-    static constexpr Angle FINAL_DESTINATION_CLOSE_THRESHOLD = Angle::fromDegrees(1);
-    // Maximum distance to continuously dribble the ball, slightly conservative to not
-    // break the 1 meter rule
-    static constexpr double MAX_CONTINUOUS_DRIBBLING_DISTANCE = 0.78;
-    // robot speed at which the robot is done dribbling
-    static constexpr double ROBOT_DRIBBLING_DONE_SPEED = 0.2;  // m/s
 
     /**
      * Converts the ball position to the robot's position given the direction that the
@@ -219,8 +208,7 @@ struct DribbleFSM
     }
 
    private:
+    // the dribble tactic config
+    std::shared_ptr<const DribbleTacticConfig> dribble_tactic_config;
     Point continuous_dribbling_start_point;
-
-    // if ball and front of robot are separated by this amount, then we've lost possession
-    static constexpr double LOSE_BALL_POSSESSION_THRESHOLD = 0.04;
 };

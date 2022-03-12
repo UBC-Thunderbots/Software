@@ -39,6 +39,7 @@ class GoalieTacticTest
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
+    std::shared_ptr<const AiConfig> ai_config = std::make_shared<const AiConfig>();
 };
 
 TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_straight_line)
@@ -46,10 +47,7 @@ TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_straight_line)
     BallState ball_state(Point(0, 0), Vector(-3, 0));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-4, -1)});
 
-    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
-        std::make_shared<const GoalieTacticConfig>();
-
-    auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
+    auto tactic = std::make_shared<GoalieTactic>(ai_config);
     setTactic(tactic);
     setFriendlyRobotId(0);
 
@@ -79,10 +77,8 @@ TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_diagonal_line)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {field.friendlyGoalCenter() + Vector(0, -0.5)});
 
-    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
-        std::make_shared<const GoalieTacticConfig>();
     auto tactic =
-        std::make_shared<GoalieTactic>(std::make_shared<const GoalieTacticConfig>());
+        std::make_shared<GoalieTactic>(ai_config);
     setTactic(tactic);
     setFriendlyRobotId(0);
 
@@ -111,9 +107,7 @@ TEST_F(GoalieTacticTest, test_ball_very_fast_misses_net)
     BallState ball_state(Point(0, 0), Vector(-4, 1));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-4.5, 0)});
 
-    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
-        std::make_shared<const GoalieTacticConfig>();
-    auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
+    auto tactic = std::make_shared<GoalieTactic>(ai_config);
     setTactic(tactic);
     setFriendlyRobotId(0);
 
@@ -137,9 +131,7 @@ TEST_F(GoalieTacticTest, test_slow_ball_at_sharp_angle_to_friendly_goal)
     BallState ball_state(Point(-4.5, -3), Vector(0, 0.1));
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId({Point(-4.5, 0)});
 
-    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
-        std::make_shared<const GoalieTacticConfig>();
-    auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
+    auto tactic = std::make_shared<GoalieTactic>(ai_config);
     setTactic(tactic);
     setFriendlyRobotId(0);
 
@@ -167,9 +159,7 @@ TEST_P(GoalieTacticTest, goalie_test)
 
     auto friendly_robots = {robot_state};
 
-    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config =
-        std::make_shared<const GoalieTacticConfig>();
-    auto tactic = std::make_shared<GoalieTactic>(goalie_tactic_config);
+    auto tactic = std::make_shared<GoalieTactic>(ai_config);
     setTactic(tactic);
     setFriendlyRobotId(0);
 

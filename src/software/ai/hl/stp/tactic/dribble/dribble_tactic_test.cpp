@@ -48,6 +48,7 @@ class DribbleTacticTest : public SimulatedErForceSimTacticTestFixture
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
+    std::shared_ptr<AiConfig> ai_config = std::make_shared<ThunderbotsConfig>()->getAiConfig();
 };
 
 TEST_F(DribbleTacticTest, test_intercept_ball_behind_enemy_robot)
@@ -57,7 +58,7 @@ TEST_F(DribbleTacticTest, test_intercept_ball_behind_enemy_robot)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>();
+    auto tactic = std::make_shared<DribbleTactic>(ai_config);
     setTactic(tactic);
     setFriendlyRobotId(1);
 
@@ -105,7 +106,7 @@ TEST_F(DribbleTacticTest, test_ball_bounce_off_of_enemy_robot)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(3, 3), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>();
+    auto tactic = std::make_shared<DribbleTactic>(ai_config);
     setTactic(tactic);
     setFriendlyRobotId(1);
 
@@ -130,7 +131,7 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>();
+    auto tactic = std::make_shared<DribbleTactic>(ai_config);
     tactic->updateControlParams(dribble_destination, std::nullopt);
     setTactic(tactic);
     setFriendlyRobotId(1);
@@ -162,7 +163,7 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_orientation)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>();
+    auto tactic = std::make_shared<DribbleTactic>(ai_config);
     tactic->updateControlParams(std::nullopt, dribble_orientation);
     setTactic(tactic);
     setFriendlyRobotId(1);
@@ -192,7 +193,7 @@ TEST_F(DribbleTacticTest, test_moving_ball_dribble_dest_and_orientation)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>();
+    auto tactic = std::make_shared<DribbleTactic>(ai_config);
     tactic->updateControlParams(dribble_destination, dribble_orientation);
     setTactic(tactic);
     setFriendlyRobotId(1);
@@ -226,7 +227,7 @@ TEST_F(DribbleTacticTest, test_dribble_dest_and_orientation_around_rectangle)
     BallState ball_state(Point(4, -2.5), Vector(0, 0));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
-    auto tactic = std::make_shared<DribbleTactic>();
+    auto tactic = std::make_shared<DribbleTactic>(ai_config);
     tactic->updateControlParams(dribble_destination, dribble_orientation);
     setTactic(tactic);
     setFriendlyRobotId(1);
@@ -261,7 +262,7 @@ TEST_F(DribbleTacticTest,
     BallState ball_state(Point(4, -2.5), Vector(0, 0));
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), initial_position});
-    auto tactic = std::make_shared<DribbleTactic>();
+    auto tactic = std::make_shared<DribbleTactic>(ai_config);
     tactic->updateControlParams(dribble_destination, dribble_orientation, true);
     setTactic(tactic);
     setFriendlyRobotId(1);
@@ -296,7 +297,7 @@ TEST_F(DribbleTacticTest, test_running_into_enemy_robot_knocking_ball_away)
         .robot_state = RobotState(Point(1, 1.1), Vector(), Angle::fromDegrees(-30),
                                   AngularVelocity::zero())});
 
-    auto tactic = std::make_shared<DribbleTactic>();
+    auto tactic = std::make_shared<DribbleTactic>(ai_config);
     tactic->updateControlParams(dribble_destination, dribble_orientation);
     // Don't avoid enemy robots to knock ball away
     setMotionConstraints({});
