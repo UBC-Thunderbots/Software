@@ -150,23 +150,20 @@ void PrimitiveExecutor::copyAutoChipOrKick(const TbotsProto::MovePrimitive& src,
 {
     switch (src.auto_chip_or_kick().auto_chip_or_kick_case())
     {
-        case TbotsProto::MovePrimitive::AutoChipOrKick::AutoChipOrKickCase::
-            kAutokickSpeedMPerS:
+        case TbotsProto::AutoChipOrKick::AutoChipOrKickCase::kAutokickSpeedMPerS:
         {
             dest->set_autokick_speed_m_per_s(
                 src.auto_chip_or_kick().autokick_speed_m_per_s());
 
             break;
         }
-        case TbotsProto::MovePrimitive::AutoChipOrKick::AutoChipOrKickCase::
-            kAutochipDistanceMeters:
+        case TbotsProto::AutoChipOrKick::AutoChipOrKickCase::kAutochipDistanceMeters:
         {
             dest->set_autochip_distance_meters(
                 src.auto_chip_or_kick().autochip_distance_meters());
             break;
         }
-        case TbotsProto::MovePrimitive::AutoChipOrKick::AutoChipOrKickCase::
-            AUTO_CHIP_OR_KICK_NOT_SET:
+        case TbotsProto::AutoChipOrKick::AutoChipOrKickCase::AUTO_CHIP_OR_KICK_NOT_SET:
         {
             dest->clear_chick_command();
             break;

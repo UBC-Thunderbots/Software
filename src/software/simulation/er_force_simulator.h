@@ -37,7 +37,7 @@ class ErForceSimulator : public QObject
      * @param wheel_constants The wheel constants
      * @param simulator_config The config to fetch parameters from
      */
-    explicit ErForceSimulator(const FieldType& field_type,
+    explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
                               const RobotConstants_t& robot_constants,
                               const WheelConstants& wheel_constants,
                               std::shared_ptr<const SimulatorConfig> simulator_config);

@@ -1,7 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@bazel_rules_qt//:qt.bzl", "qt_cc_library")
-
 cc_library(
     name = "simulator_robot",
     srcs = ["simulator_robot.cpp"],
@@ -232,12 +230,12 @@ cc_library(
         "//extlibs/er_force_sim/config/simulator:2020B.txt",
     ],
     deps = [
-        ":er_force_simulator_qt",
+        ":er_force_simulator_ball",
         ":firmware_object_deleter",
         ":physics_simulator_ball",
         ":physics_simulator_robot",
         ":simulator_ball_singleton",
-        "//extlibs/er_force_sim/src/amun/simulator",
+        "//extlibs/er_force_sim/src/amun/simulator:simulator_qt",
         "//firmware/app/primitives:primitive_manager",
         "//firmware/app/world:firmware_world",
         "//proto:defending_side_msg_cc_proto",

@@ -17,7 +17,7 @@
 #include "software/world/robot_state.h"
 
 ErForceSimulator::ErForceSimulator(
-    const FieldType& field_type, const RobotConstants_t& robot_constants,
+    const TbotsProto::FieldType& field_type, const RobotConstants_t& robot_constants,
     const WheelConstants& wheel_constants,
     std::shared_ptr<const SimulatorConfig> simulator_config)
     : yellow_team_world_msg(std::make_unique<TbotsProto::World>()),
@@ -29,7 +29,7 @@ ErForceSimulator::ErForceSimulator(
 {
     QString full_filename = CONFIG_DIRECTORY;
 
-    if (field_type == FieldType::DIV_A)
+    if (field_type == TbotsProto::FieldType::DIV_A)
     {
         full_filename = full_filename + CONFIG_FILE + ".txt";
     }
