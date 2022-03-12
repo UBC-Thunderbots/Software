@@ -4,11 +4,11 @@
 
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
+#include "software/simulated_tests/terminating_validation_functions/robot_stationary_in_polygon_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
 #include "software/time/duration.h"
 #include "software/world/world.h"
-#include "software/simulated_tests/terminating_validation_functions/robot_stationary_in_polygon_validation.h"
 
 class SimulatedHRVOTest : public SimulatedErForceSimTacticTestFixture
 {
@@ -32,17 +32,17 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_fr
     setTactic(tactic);
     setFriendlyRobotId(1);
 
-    std::vector<ValidationFunction> terminating_validation_functions     = {
-            [destination, tactic](std::shared_ptr<World> world_ptr,
-                                  ValidationCoroutine::push_type& yield) {
-                // Small rectangle around the destination point that the robot should be
-                // stationary within for 15 ticks
-                float threshold = 0.05f;
-                Rectangle expected_final_position(
-                        Point(destination.x() - threshold, destination.y() - threshold),
-                        Point(destination.x() + threshold, destination.y() + threshold));
-                robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
-            }};
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [destination, tactic](std::shared_ptr<World> world_ptr,
+                              ValidationCoroutine::push_type& yield) {
+            // Small rectangle around the destination point that the robot should be
+            // stationary within for 15 ticks
+            float threshold = 0.05f;
+            Rectangle expected_final_position(
+                Point(destination.x() - threshold, destination.y() - threshold),
+                Point(destination.x() + threshold, destination.y() + threshold));
+            robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
+        }};
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
@@ -65,17 +65,17 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_fr
     setTactic(tactic);
     setFriendlyRobotId(1);
 
-    std::vector<ValidationFunction> terminating_validation_functions     = {
-            [destination, tactic](std::shared_ptr<World> world_ptr,
-                                  ValidationCoroutine::push_type& yield) {
-                // Small rectangle around the destination point that the robot should be
-                // stationary within for 15 ticks
-                float threshold = 0.05f;
-                Rectangle expected_final_position(
-                        Point(destination.x() - threshold, destination.y() - threshold),
-                        Point(destination.x() + threshold, destination.y() + threshold));
-                robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
-            }};
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [destination, tactic](std::shared_ptr<World> world_ptr,
+                              ValidationCoroutine::push_type& yield) {
+            // Small rectangle around the destination point that the robot should be
+            // stationary within for 15 ticks
+            float threshold = 0.05f;
+            Rectangle expected_final_position(
+                Point(destination.x() - threshold, destination.y() - threshold),
+                Point(destination.x() + threshold, destination.y() + threshold));
+            robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
+        }};
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
@@ -97,17 +97,17 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_no_obstacle)
     setTactic(tactic);
     setFriendlyRobotId(1);
 
-    std::vector<ValidationFunction> terminating_validation_functions     = {
-            [destination, tactic](std::shared_ptr<World> world_ptr,
-                                  ValidationCoroutine::push_type& yield) {
-                // Small rectangle around the destination point that the robot should be
-                // stationary within for 15 ticks
-                float threshold = 0.05f;
-                Rectangle expected_final_position(
-                        Point(destination.x() - threshold, destination.y() - threshold),
-                        Point(destination.x() + threshold, destination.y() + threshold));
-                robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
-            }};
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [destination, tactic](std::shared_ptr<World> world_ptr,
+                              ValidationCoroutine::push_type& yield) {
+            // Small rectangle around the destination point that the robot should be
+            // stationary within for 15 ticks
+            float threshold = 0.05f;
+            Rectangle expected_final_position(
+                Point(destination.x() - threshold, destination.y() - threshold),
+                Point(destination.x() + threshold, destination.y() + threshold));
+            robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
+        }};
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
@@ -130,17 +130,17 @@ TEST_F(SimulatedHRVOTest, test_three_robot_wall)
     setTactic(tactic);
     setFriendlyRobotId(1);
 
-    std::vector<ValidationFunction> terminating_validation_functions     = {
-            [destination, tactic](std::shared_ptr<World> world_ptr,
-                                  ValidationCoroutine::push_type& yield) {
-                // Small rectangle around the destination point that the robot should be
-                // stationary within for 15 ticks
-                float threshold = 0.05f;
-                Rectangle expected_final_position(
-                        Point(destination.x() - threshold, destination.y() - threshold),
-                        Point(destination.x() + threshold, destination.y() + threshold));
-                robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
-            }};
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [destination, tactic](std::shared_ptr<World> world_ptr,
+                              ValidationCoroutine::push_type& yield) {
+            // Small rectangle around the destination point that the robot should be
+            // stationary within for 15 ticks
+            float threshold = 0.05f;
+            Rectangle expected_final_position(
+                Point(destination.x() - threshold, destination.y() - threshold),
+                Point(destination.x() + threshold, destination.y() + threshold));
+            robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
+        }};
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
@@ -162,17 +162,17 @@ TEST_F(SimulatedHRVOTest, test_single_enemy_directly_infront)
     setTactic(tactic);
     setFriendlyRobotId(1);
 
-    std::vector<ValidationFunction> terminating_validation_functions     = {
-            [destination, tactic](std::shared_ptr<World> world_ptr,
-                                  ValidationCoroutine::push_type& yield) {
-                // Small rectangle around the destination point that the robot should be
-                // stationary within for 15 ticks
-                float threshold = 0.05f;
-                Rectangle expected_final_position(
-                        Point(destination.x() - threshold, destination.y() - threshold),
-                        Point(destination.x() + threshold, destination.y() + threshold));
-                robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
-            }};
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [destination, tactic](std::shared_ptr<World> world_ptr,
+                              ValidationCoroutine::push_type& yield) {
+            // Small rectangle around the destination point that the robot should be
+            // stationary within for 15 ticks
+            float threshold = 0.05f;
+            Rectangle expected_final_position(
+                Point(destination.x() - threshold, destination.y() - threshold),
+                Point(destination.x() + threshold, destination.y() + threshold));
+            robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
+        }};
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
@@ -212,17 +212,17 @@ TEST_F(SimulatedHRVOTest, test_zig_zag_movement)
     setTactic(tactic);
     setFriendlyRobotId(1);
 
-    std::vector<ValidationFunction> terminating_validation_functions     = {
-            [destination, tactic](std::shared_ptr<World> world_ptr,
-                                  ValidationCoroutine::push_type& yield) {
-                // Small rectangle around the destination point that the robot should be
-                // stationary within for 15 ticks
-                float threshold = 0.05f;
-                Rectangle expected_final_position(
-                        Point(destination.x() - threshold, destination.y() - threshold),
-                        Point(destination.x() + threshold, destination.y() + threshold));
-                robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
-            }};
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [destination, tactic](std::shared_ptr<World> world_ptr,
+                              ValidationCoroutine::push_type& yield) {
+            // Small rectangle around the destination point that the robot should be
+            // stationary within for 15 ticks
+            float threshold = 0.05f;
+            Rectangle expected_final_position(
+                Point(destination.x() - threshold, destination.y() - threshold),
+                Point(destination.x() + threshold, destination.y() + threshold));
+            robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
+        }};
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
@@ -246,17 +246,17 @@ TEST_F(SimulatedHRVOTest, test_start_in_local_minima)
     setTactic(tactic);
     setFriendlyRobotId(1);
 
-    std::vector<ValidationFunction> terminating_validation_functions     = {
-            [destination, tactic](std::shared_ptr<World> world_ptr,
-                                  ValidationCoroutine::push_type& yield) {
-                // Small rectangle around the destination point that the robot should be
-                // stationary within for 15 ticks
-                float threshold = 0.05f;
-                Rectangle expected_final_position(
-                        Point(destination.x() - threshold, destination.y() - threshold),
-                        Point(destination.x() + threshold, destination.y() + threshold));
-                robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
-            }};
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [destination, tactic](std::shared_ptr<World> world_ptr,
+                              ValidationCoroutine::push_type& yield) {
+            // Small rectangle around the destination point that the robot should be
+            // stationary within for 15 ticks
+            float threshold = 0.05f;
+            Rectangle expected_final_position(
+                Point(destination.x() - threshold, destination.y() - threshold),
+                Point(destination.x() + threshold, destination.y() + threshold));
+            robotStationaryInPolygon(1, expected_final_position, 15, world_ptr, yield);
+        }};
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
