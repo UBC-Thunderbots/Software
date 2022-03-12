@@ -3,25 +3,24 @@ import pyqtgraph.console as pg_console
 from proto.play_info_msg_pb2 import PlayInfo
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 import software.thunderscope.constants as constants
+import queue
 
 from proto.robot_log_msg_pb2 import RobotLog
 
 
 class playInfoWidget(pg.DataTreeWidget):
-    def __init__(self):
+    def __init__(self, buffer_size=10):
         pg.DataTreeWidget.__init__(self)
 
-        self.playinfo_receiver = ThreadedUnixListener(
-            constants.UNIX_SOCKET_BASE_PATH + PlayInfo.DESCRIPTOR.full_name, PlayInfo, max_buffer_size=1
-      
-        )
-        self.cached_playinfo = PlayInfo()
+        self.log_buffer = queue.Queue(buffer_size)
         
-
     def refresh(self):
-        """Update the log widget with another log message
+        """Update the play info widget with new robot information
         """
-        playinfo = self.playinfo_receiver.maybe_pop()
+        try:
+            playinfo = self.log_buffer.get_nowait()
+        except queue.Empty as empty:
+            return
 
         d = {
             'play name': playinfo.play.play_name,
@@ -37,8 +36,6 @@ class playInfoWidget(pg.DataTreeWidget):
                         'tactic fsm state' : playinfo.robot_tactic_assignment[4].tactic_fsm_state},
             'robot 5': {'tactic name' : playinfo.robot_tactic_assignment[5].tactic_name,
                         'tactic fsm state' : playinfo.robot_tactic_assignment[5].tactic_fsm_state}           
-
-
         }
 
         self.setData(d)

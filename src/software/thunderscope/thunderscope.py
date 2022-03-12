@@ -13,14 +13,12 @@ from proto.team_pb2 import Robot, Team
 from proto.ball_pb2 import Ball
 from threading import Thread
 from software.thunderscope.log.g3log_widget import g3logWidget
-<<<<<<< HEAD
 from software.thunderscope.play.playinfo_widget import playInfoWidget
-=======
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
 from proto.visualization_pb2 import NamedValue
 from proto.robot_log_msg_pb2 import RobotLog
+from proto.play_info_msg_pb2 import PlayInfo
 from software.networking.threaded_unix_listener import ThreadedUnixListener
->>>>>>> 5d89a851f469db79fb97980305c35d95bdeaae80
 from field import obstacle_layer, path_layer, world_layer
 from proto_receiver import ProtoReceiver
 import software.thunderscope.constants as constants
@@ -67,43 +65,32 @@ if __name__ == "__main__":
 
     # Setup Console Widget
     logs = g3logWidget()
-<<<<<<< HEAD
     playInfo = playInfoWidget()
-=======
     proto_receiver.register_observer(RobotLog, logs.log_buffer)
->>>>>>> 5d89a851f469db79fb97980305c35d95bdeaae80
 
     log_dock = Dock("logs", size=(500, 100))
     log_dock.addWidget(logs)
 
-<<<<<<< HEAD
     playInfo_dock = Dock("playInfo", size = (500,100))
     playInfo_dock.addWidget(playInfo)
-=======
+    proto_receiver.register_observer(PlayInfo, playInfo.log_buffer)
     # Setup Arbitrary Plot Widget
     named_value_plotter = NamedValuePlotter()
     named_value_plotter_dock = Dock("Performance", size=(500, 100))
     named_value_plotter_dock.addWidget(named_value_plotter.plot)
     proto_receiver.register_observer(NamedValue, named_value_plotter.named_value_buffer)
->>>>>>> 5d89a851f469db79fb97980305c35d95bdeaae80
 
     # Configure Docks
     dock_area.addDock(field_dock, "left")
     dock_area.addDock(log_dock, "bottom", field_dock)
-<<<<<<< HEAD
     dock_area.addDock(playInfo_dock, "bottom", log_dock)
-=======
     dock_area.addDock(named_value_plotter_dock, "right", log_dock)
->>>>>>> 5d89a851f469db79fb97980305c35d95bdeaae80
 
     def update():
         field.refresh()
         logs.refresh()
-<<<<<<< HEAD
         playInfo.refresh()
-=======
         named_value_plotter.refresh()
->>>>>>> 5d89a851f469db79fb97980305c35d95bdeaae80
 
     timer = QtCore.QTimer()
     timer.timeout.connect(update)
