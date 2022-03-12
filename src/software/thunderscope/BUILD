@@ -8,9 +8,11 @@ py_binary(
     deps = [
         "//proto:software_py_proto",
         "//software/networking:threaded_unix_listener_py",
+        "//software/thunderscope:ProtoReceiver",
         "//software/thunderscope:colors",
         "//software/thunderscope:common_widgets",
         "//software/thunderscope:constants",
+        "//software/thunderscope/arbitrary_plot:named_value_plotter",
         "//software/thunderscope/chicker",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
@@ -18,6 +20,11 @@ py_binary(
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],
+)
+
+py_library(
+    name = "ProtoReceiver",
+    srcs = ["proto_receiver.py"],
 )
 
 py_library(

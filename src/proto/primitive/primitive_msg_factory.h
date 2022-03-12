@@ -26,8 +26,8 @@
  */
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const Point &dest, double final_speed_m_per_s, const Angle &final_angle,
-    DribblerMode dribbler_mode, AutoChipOrKick auto_chip_or_kick,
-    MaxAllowedSpeedMode max_allowed_speed_mode, double target_spin_rev_per_s,
+    TbotsProto::DribblerMode dribbler_mode, AutoChipOrKick auto_chip_or_kick,
+    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode, double target_spin_rev_per_s,
     RobotConstants_t robot_constants);
 
 /**
@@ -69,7 +69,7 @@ std::unique_ptr<TbotsProto::Primitive> createEstopPrimitive();
  *
  * @return the dribbler speed in RPM
  */
-double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode,
+double convertDribblerModeToDribblerSpeed(TbotsProto::DribblerMode dribbler_mode,
                                           RobotConstants_t robot_constants);
 
 /**
@@ -81,4 +81,5 @@ double convertDribblerModeToDribblerSpeed(DribblerMode dribbler_mode,
  * @return the max allowed speed in m/s
  */
 double convertMaxAllowedSpeedModeToMaxAllowedSpeed(
-    MaxAllowedSpeedMode max_allowed_speed_mode, RobotConstants_t robot_constants);
+    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode,
+    RobotConstants_t robot_constants);

@@ -102,11 +102,6 @@ message Referee
         // The yellow team just scored a goal.
         // For information only.
         // For rules compliance, teams must treat as STOP.
-        // Deprecated: Use the score field from the team infos instead. That way, you can
-        // also detect revoked goals.
-        GOAL_YELLOW = 14 [deprecated = true];
-        // The blue team just scored a goal. See also GOAL_YELLOW.
-        GOAL_BLUE = 15 [deprecated = true];
         // Equivalent to STOP, but the yellow team must pick up the ball and
         // drop it in the Designated Position.
         BALL_PLACEMENT_YELLOW = 16;
@@ -180,11 +175,6 @@ message Referee
     // True, if the blue team will have it's goal on the positive x-axis of the ssl-vision
     // coordinate system. Obviously, the yellow team will play on the opposite half.
     optional bool blue_team_on_positive_half = 10;
-
-    // The game event that caused the referee command.
-    // deprecated in favor of game_events.
-    //    optional Game_Event game_event = 11 [deprecated = true];
-    reserved 11;
 
     // The command that will be issued after the current stoppage and ball placement to
     // continue the game.
