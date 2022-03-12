@@ -152,6 +152,4 @@ class SensorFusion
 
     // The timestamp, in seconds, of the most recently received vision packet
     double last_t_capture;
-
-    static constexpr int NUM_DROPPED_DETECTIONS_BEFORE_BALL_NOT_IN_DRIBBLER = 3;
 };

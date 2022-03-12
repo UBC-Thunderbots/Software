@@ -192,12 +192,12 @@ void SensorFusion::updateWorld(
             robot_status_msg.break_beam_status().ball_in_beam())
         {
             friendly_robot_id_with_ball_in_dribbler = robot_id;
-            ball_in_dribbler_timeout = NUM_DROPPED_DETECTIONS_BEFORE_BALL_NOT_IN_DRIBBLER;
+            ball_in_dribbler_timeout =
+                sensor_fusion_config->getNumDroppedDetectionsBeforeBallNotInDribbler()
+                    ->value();
         }
-        if ((!robot_status_msg.has_break_beam_status() ||
-             !robot_status_msg.break_beam_status().ball_in_beam()) &&
-            friendly_robot_id_with_ball_in_dribbler.has_value() &&
-            friendly_robot_id_with_ball_in_dribbler.value() == robot_id)
+        else if (friendly_robot_id_with_ball_in_dribbler.has_value() &&
+                 friendly_robot_id_with_ball_in_dribbler.value() == robot_id)
         {
             friendly_robot_id_with_ball_in_dribbler = std::nullopt;
             ball_in_dribbler_timeout                = 0;
@@ -280,7 +280,11 @@ void SensorFusion::updateWorld(const SSLProto::SSL_DetectionFrame &ssl_detection
                 .position =
                     robot_with_ball_in_dribbler->position() +
                     Vector::createFromAngle(robot_with_ball_in_dribbler->orientation())
-                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS - 0.01),
+                        // MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT of the ball should be
+                        // inside the robot
+                        .normalize(DIST_TO_FRONT_OF_ROBOT_METERS -
+                                   BALL_MAX_RADIUS_METERS *
+                                       MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT),
                 .distance_from_ground = 0,
                 .timestamp  = Timestamp::fromSeconds(ssl_detection_frame.t_capture()),
                 .confidence = 1}};
