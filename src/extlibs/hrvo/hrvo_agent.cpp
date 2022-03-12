@@ -447,26 +447,31 @@ void HRVOAgent::computePreferredVelocity()
     float speedAtGoal               = nextGoal->getDesiredSpeedAtCurrentGoal();
     Vector2 distVectorToGoal        = goalPosition - position_;
     auto distToGoal                 = abs(distVectorToGoal);
-    // Reduced max acceleration to avoid overshooting
-    const float offsetted_max_accel = max_accel_ - 1.f;
+    // Increasing deceleration distance to reduce the chance of overshooting the
+    // destination
+    float decel_dist_multiplier = 1.2f;
     // d = (Vf^2 - Vi^2) / 2a
     double startLinearDecelerationDistance =
         std::abs((std::pow(speedAtGoal, 2) - std::pow(prefSpeed_, 2)) /
-                 (2 * offsetted_max_accel));  // * 1.2f; // TODO: Tune constant
+                 (2 * max_accel_)) *
+        decel_dist_multiplier;
 
     if (distToGoal < startLinearDecelerationDistance)
     {
         // velocity given linear deceleration, distance away from goal, and desired final
         // speed
+        // Decreasing preferred speed during deceleration to reduce the chance of
+        // overshooting the destination
+        float decel_pref_speed_multiplier = 0.6f;
         // v_pref = sqrt(v_goal^2 + 2 * a * d_remainingToDestination)
-        float currPrefSpeed         = static_cast<float>(std::sqrt(
-            std::pow(speedAtGoal, 2) +
-            2 * offsetted_max_accel * distToGoal));  // * 0.6f; // TODO: Tune constant
+        float currPrefSpeed = static_cast<float>(std::sqrt(std::pow(speedAtGoal, 2) +
+                                                           2 * max_accel_ * distToGoal)) *
+                              decel_pref_speed_multiplier;
         Vector2 ideal_pref_velocity = normalize(distVectorToGoal) * currPrefSpeed;
 
         // Limit the preferred velocity to the kinematic limits
         const Vector2 dv = ideal_pref_velocity - velocity_;
-        if (abs(dv) <= offsetted_max_accel * simulator_->getTimeStep())
+        if (abs(dv) <= max_accel_ * simulator_->getTimeStep())
         {
             pref_velocity_ = ideal_pref_velocity;
         }
@@ -475,8 +480,7 @@ void HRVOAgent::computePreferredVelocity()
             // Calculate the maximum velocity towards the preferred velocity, given the
             // acceleration constraint
             pref_velocity_ =
-                velocity_ +
-                (offsetted_max_accel * simulator_->getTimeStep()) * (dv / abs(dv));
+                velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / abs(dv));
         }
     }
     else
