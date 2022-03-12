@@ -12,10 +12,10 @@ cc_library(
     ],
     deps = [
         "//shared:constants",
+        "//shared/parameter:cpp_configs",
         "//software/ai/evaluation:pass",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//shared/parameter:cpp_configs",
         "//software/ai/intent:move_intent",
         "//software/logger",
     ],

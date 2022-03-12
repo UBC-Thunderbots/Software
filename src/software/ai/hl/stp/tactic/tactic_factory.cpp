@@ -82,8 +82,8 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::CreaseDefenderTactic &tac
 std::shared_ptr<Tactic> createTactic(const TbotsProto::DribbleTactic &tactic_proto,
                                      std::shared_ptr<const AiConfig> ai_config)
 {
-    auto tactic                                    = std::make_shared<DribbleTactic>(ai_config);
-    std::optional<Point> dribble_destination       = std::nullopt;
+    auto tactic                              = std::make_shared<DribbleTactic>(ai_config);
+    std::optional<Point> dribble_destination = std::nullopt;
     std::optional<Angle> final_dribble_orientation = std::nullopt;
     if (tactic_proto.has_dribble_destination())
     {
@@ -111,8 +111,8 @@ std::shared_ptr<Tactic> createTactic(const TbotsProto::GetBehindBallTactic &tact
 std::shared_ptr<Tactic> createTactic(const TbotsProto::GoalieTactic &tactic_proto,
                                      std::shared_ptr<const AiConfig> ai_config)
 {
-    auto tactic = std::make_shared<GoalieTactic>(ai_config,
-                                                 tactic_proto.max_allowed_speed_mode());
+    auto tactic =
+        std::make_shared<GoalieTactic>(ai_config, tactic_proto.max_allowed_speed_mode());
     return tactic;
 }
 

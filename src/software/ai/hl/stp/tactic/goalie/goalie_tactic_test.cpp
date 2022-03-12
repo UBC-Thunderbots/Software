@@ -39,7 +39,8 @@ class GoalieTacticTest
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
-    std::shared_ptr<const AiConfig> ai_config = std::make_shared<const AiConfig>();
+    std::shared_ptr<const AiConfig> ai_config =
+        std::make_shared<ThunderbotsConfig>()->getAiConfig();
 };
 
 TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_straight_line)
@@ -77,8 +78,7 @@ TEST_F(GoalieTacticTest, test_panic_ball_very_fast_in_diagonal_line)
     auto friendly_robots = TestUtil::createStationaryRobotStatesWithId(
         {field.friendlyGoalCenter() + Vector(0, -0.5)});
 
-    auto tactic =
-        std::make_shared<GoalieTactic>(ai_config);
+    auto tactic = std::make_shared<GoalieTactic>(ai_config);
     setTactic(tactic);
     setFriendlyRobotId(0);
 

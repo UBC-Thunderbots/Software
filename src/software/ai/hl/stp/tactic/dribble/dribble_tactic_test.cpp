@@ -48,7 +48,8 @@ class DribbleTacticTest : public SimulatedErForceSimTacticTestFixture
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
-    std::shared_ptr<AiConfig> ai_config = std::make_shared<ThunderbotsConfig>()->getAiConfig();
+    std::shared_ptr<const AiConfig> ai_config =
+        std::make_shared<ThunderbotsConfig>()->getAiConfig();
 };
 
 TEST_F(DribbleTacticTest, test_intercept_ball_behind_enemy_robot)
@@ -82,7 +83,7 @@ TEST_F(DribbleTacticTest, test_stopped_ball)
     auto friendly_robots =
         TestUtil::createStationaryRobotStatesWithId({Point(3, 3), initial_position});
 
-    auto tactic = std::make_shared<DribbleTactic>();
+    auto tactic = std::make_shared<DribbleTactic>(ai_config);
     setTactic(tactic);
     setFriendlyRobotId(1);
 

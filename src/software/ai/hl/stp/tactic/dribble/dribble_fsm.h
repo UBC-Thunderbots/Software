@@ -1,8 +1,8 @@
 #pragma once
 
 #include "shared/constants.h"
-#include "software/ai/evaluation/pass.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
+#include "software/ai/evaluation/pass.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
@@ -23,7 +23,11 @@ struct DribbleFSM
      *
      * @param dribble_tactic_config The config to fetch parameters from
      */
-    explicit DribbleFSM(std::shared_ptr<const DribbleTacticConfig> dribble_tactic_config) : dribble_tactic_config(dribble_tactic_config),continuous_dribbling_start_point(Point()) {}
+    explicit DribbleFSM(std::shared_ptr<const DribbleTacticConfig> dribble_tactic_config)
+        : dribble_tactic_config(dribble_tactic_config),
+          continuous_dribbling_start_point(Point())
+    {
+    }
 
     struct ControlParams
     {

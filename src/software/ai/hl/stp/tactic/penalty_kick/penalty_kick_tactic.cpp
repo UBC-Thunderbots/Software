@@ -2,7 +2,8 @@
 
 PenaltyKickTactic::PenaltyKickTactic(std::shared_ptr<const AiConfig> ai_config)
     : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Kick}),
-      fsm{DribbleFSM(ai_config->getDribbleTacticConfig()), PenaltyKickFSM(), GetBehindBallFSM()}
+      fsm{DribbleFSM(ai_config->getDribbleTacticConfig()), PenaltyKickFSM(),
+          GetBehindBallFSM()}
 {
 }
 

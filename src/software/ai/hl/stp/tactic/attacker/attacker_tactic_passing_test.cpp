@@ -32,9 +32,11 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_passing)
     friendly_robots.emplace_back(robot_state);
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto ai_config = std::make_shared<AiConfig>();
+    auto ai_config = std::make_shared<ThunderbotsConfig>()->getMutableAiConfig();
     // force passing for this test by setting min acceptable shot angle very high
-    ai_config->getAttackerTacticConfig()->getMutableMinOpenAngleForShotDeg()->setValue(90);
+    ai_config->getMutableAttackerTacticConfig()
+        ->getMutableMinOpenAngleForShotDeg()
+        ->setValue(90);
     auto tactic = std::make_shared<AttackerTactic>(ai_config);
     tactic->updateControlParams(pass, true);
     setTactic(tactic);

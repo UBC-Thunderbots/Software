@@ -7,7 +7,8 @@
 GoalieTactic::GoalieTactic(std::shared_ptr<const AiConfig> ai_config,
                            TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
     : Tactic({RobotCapability::Move, RobotCapability::Dribble, RobotCapability::Chip}),
-      fsm(DribbleFSM(ai_config->getDribbleTacticConfig()), GoalieFSM(ai_config->getGoalieTacticConfig(), max_allowed_speed_mode))
+      fsm(DribbleFSM(ai_config->getDribbleTacticConfig()),
+          GoalieFSM(ai_config->getGoalieTacticConfig(), max_allowed_speed_mode))
 {
 }
 

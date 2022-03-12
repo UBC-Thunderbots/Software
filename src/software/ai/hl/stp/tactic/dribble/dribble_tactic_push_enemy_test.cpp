@@ -48,7 +48,8 @@ class DribbleTacticPushEnemyTest : public SimulatedErForceSimTacticTestFixture,
             {Point(1, 0), Point(1, 2.5), Point(1, -2.5), field.enemyGoalCenter(),
              field.enemyDefenseArea().negXNegYCorner(),
              field.enemyDefenseArea().negXPosYCorner()});
-    std::shared_ptr<const AiConfig> ai_config =     std::make_shared<AiConfig>();
+    std::shared_ptr<const AiConfig> ai_config =
+        std::make_shared<ThunderbotsConfig>()->getAiConfig();
 };
 
 TEST_P(DribbleTacticPushEnemyTest, test_steal_ball_from_behind_enemy)

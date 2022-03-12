@@ -16,7 +16,11 @@ struct AttackerFSM
      *
      * @param attacker_tactic_config The config to fetch parameters from
      */
-    explicit AttackerFSM(std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config) : attacker_tactic_config(attacker_tactic_config) {}
+    explicit AttackerFSM(
+        std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config)
+        : attacker_tactic_config(attacker_tactic_config)
+    {
+    }
 
     struct ControlParams
     {
@@ -81,7 +85,7 @@ struct AttackerFSM
             PivotKickFSM_S + Update_E / pivotKick_A, PivotKickFSM_S = X);
     }
 
-    private:
+   private:
     // the attacker tactic config
     std::shared_ptr<const AttackerTacticConfig> attacker_tactic_config;
 };
