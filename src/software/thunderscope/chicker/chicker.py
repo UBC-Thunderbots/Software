@@ -21,20 +21,62 @@ class ChickerWidget(QWidget):
     def __init__(self, parent=None):
         super(ChickerWidget, self).__init__(parent)
 
+        """
+        The Chicker Widget grid is laid out in the following way:
+                    ┌────────┐     ┌──────┐      ┌──────┐
+                    │ Charge │     │ Kick │      │ Chip │
+                    └────────┘     └──────┘      └──────┘
+
+                    ┌────────┐   ┌──────────┐ ┌─────────┐
+                    │No Auto │   │Auto Kick │ │Auto Chip│
+                    └────────┘   └──────────┘ └─────────┘
+
+                    ┌───────────────────────────────────┐
+                    │           Geneva Slider           │
+                    └───────────────────────────────────┘
+
+                    ┌───────────────────────────────────┐
+                    │           Power Slider            │
+                    └───────────────────────────────────┘
+        """
+        # grid --> groupBox --> button/slider
         grid = QGridLayout()
         self.radio_buttons = QButtonGroup()
-        # grid --> groupBox --> button/slider
-        grid.addWidget(self.createButton("Charge"), 0, 0)
-        grid.addWidget(self.createButton("Kick"), 0, 1)
-        grid.addWidget(self.createButton("Chip"), 0, 2)
-        grid.addWidget(self.createRadio("No Auto"), 1, 0)
-        grid.addWidget(self.createRadio("Auto Kick"), 1, 1)
-        grid.addWidget(self.createRadio("Auto Chip"), 1, 2)
-        grid.addWidget(self.createSlider("Geneva Slider", 1, 5, 1), 2, 0, 1, 3)
-        grid.addWidget(self.createSlider("Power Slider", 1, 100, 10), 3, 0, 1, 3)
+
+        self.charge_button_list = self.createButton("Charge")
+        self.charge_button = self.charge_button_list[1]
+        grid.addWidget(self.charge_button_list[0], 0, 0)
+
+        self.kick_button_list = self.createButton("Kick")
+        self.kick_button = self.kick_button_list[1]
+        grid.addWidget(self.kick_button_list[0], 0, 1)
+
+        self.chip_button_list = self.createButton("Chip")
+        self.chip_button = self.chip_button_list[1]
+        grid.addWidget(self.chip_button_list[0], 0, 2)
+
+        self.no_auto_list = self.createRadio("No Auto")
+        self.no_auto_button = self.no_auto_list[1]
+        grid.addWidget(self.no_auto_list[0], 1, 0)
+
+        self.auto_kick_list = self.createRadio("Auto Kick")
+        self.auto_kick_button = self.auto_kick_list[1]
+        grid.addWidget(self.auto_kick_list[0], 1, 1)
+
+        self.auto_chip_list = self.createRadio("Auto Chip")
+        self.auto_chip_button = self.auto_chip_list[1]
+        grid.addWidget(self.auto_chip_list[0], 1, 2)
+
+        self.geneva_slider_list = self.createSlider("Geneva Slider", 1, 5, 1)
+        self.geneva_slider = self.geneva_slider_list[1]
+        grid.addWidget(self.geneva_slider_list[0], 2, 0, 1, 3)
+
+        self.power_slider_list = self.createSlider("Power Slider", 1, 100, 10)
+        self.power_slider = self.power_slider_list[1]
+        grid.addWidget(self.power_slider_list[0], 3, 0, 1, 3)
+
         self.setLayout(grid)
         self.grid = grid
-
         # state of radio buttons in order NoAuto, AutoKick, AutoChip
         self.radioCheckable = [True, True, True]
         self.charged = False
@@ -54,7 +96,7 @@ class ChickerWidget(QWidget):
         vbox.addWidget(button)
         vbox.addStretch(1)
         groupBox.setLayout(vbox)
-        return groupBox
+        return groupBox, button
 
     def createRadio(self, text):
         groupBox = QGroupBox()
@@ -67,7 +109,7 @@ class ChickerWidget(QWidget):
         vbox.addWidget(radio)
         vbox.addStretch(1)
         groupBox.setLayout(vbox)
-        return groupBox
+        return groupBox, radio
 
     def createSlider(self, text, minVal, maxVal, tickSpacing):
         groupBox = QGroupBox(text)
@@ -81,147 +123,99 @@ class ChickerWidget(QWidget):
         vbox.addWidget(slider)
         vbox.addStretch(1)
         groupBox.setLayout(vbox)
-        return groupBox
+        return groupBox, slider
 
     def refresh(self):
+
         # set 'Charge'/'Discharge' text based on self.charged value
-        for button in self.grid.parentWidget().findChildren(QPushButton):
+        if self.charged:
+            self.charge_button.setText("Discharge")
+        else:
+            self.charge_button.setText("Charge")
+
+        # slider values
+        self.geneva_value = self.geneva_slider.value()
+        self.power_value = self.power_slider.value()
+
+        # button colors
+        if not self.charged:
+            self.charge_button.setStyleSheet("background-color: White")
+            self.charge_button.setCheckable(True)
+            self.chip_button.setStyleSheet("background-color: Grey")
+            self.chip_button.setCheckable(False)
+            self.kick_button.setStyleSheet("background-color: Grey")
+            self.kick_button.setCheckable(False)
+        else:
+            self.charge_button.setStyleSheet("background-color: White")
+            self.charge_button.setCheckable(True)
+            self.chip_button.setStyleSheet("background-color: White")
+            self.chip_button.setCheckable(True)
+            self.kick_button.setStyleSheet("background-color: White")
+            self.kick_button.setCheckable(True)
+
+        # check all buttons
+        if self.charge_button.isChecked():
+            self.charge_button.toggle()
             if self.charged:
-                if button.text() == "Charge":
-                    button.setText("Discharge")
-            elif not self.charged:
-                if button.text() == "Discharge":
-                    button.setText("Charge")
+                print("Discharge clicked")
+                self.charged = False
+            else:
+                print("Charge clicked")
+                self.charged = True
+            print("Geneva:", self.geneva_value, "Power:", self.power_value)
 
-        # iterate over all boxes - possibly the only way to access the widgets
-        # grid --> groupBox --> button/radio/slider
-        for item in self.grid.parentWidget().findChildren(QGroupBox):
+        if self.kick_button.isChecked():
+            self.kick_button.toggle()
+            self.charged = False
+            print("Kick clicked")
+            print("Geneva:", self.geneva_value, "Power:", self.power_value)
 
-            # update slider values
-            for slider in item.findChildren(QSlider):
-                # if slider.valueChanged():
-                if item.title() == "Geneva Slider":
-                    self.geneva_value = slider.value()
-                elif item.title() == "Power Slider":
-                    self.power_value = slider.value()
+        if self.chip_button.isChecked():
+            self.chip_button.toggle()
+            self.charged = False
+            print("Chip clicked")
+            print("Geneva:", self.geneva_value, "Power:", self.power_value)
 
-            # check all push buttons
-            for button in item.findChildren(QPushButton):
-                if not self.charged:
-                    # charge button white; text: "Charge"; setCheckable(True)
-                    if button.text() == "Charge":
-                        button.setStyleSheet("background-color: White")
-                        button.setCheckable(True)
-                    # kick/chip button grey; setCheckable(False)
-                    else:
-                        button.setStyleSheet("background-color: Grey")
-                        button.setCheckable(False)
-                    # behaviour upon clicking charge; change text to 'Discharge'; print; charged = True; toggle
-                    if button.text() == "Charge" and button.isChecked():
-                        # toggle the button right after clicking to only send the message once
-                        # this is done for all push buttons (not sure if we can use function callback for PushButtons in PyQt5)
-                        button.toggle()
-                        self.charged = True
-                        # ----- replace this line ----- (next PR)
-                        print("Charge clicked")
-                        print("Geneva:", self.geneva_value, "Power:", self.power_value)
+        # radio colors
+        if self.no_auto_button.isChecked():
+            self.radioCheckable[1] = True
+            self.radioCheckable[2] = True
+            if self.radioCheckable[0]:
+                print("No Auto clicked")
+                print("Geneva:", self.geneva_value, "Power:", self.power_value)
+            self.radioCheckable[0] = False
+            self.charge_button.setStyleSheet("background-color: White")
+            self.charge_button.setCheckable(True)
+            if self.charged:
+                self.chip_button.setStyleSheet("background-color: White")
+                self.chip_button.setCheckable(True)
+                self.kick_button.setStyleSheet("background-color: White")
+                self.kick_button.setCheckable(True)
 
-                elif self.charged:
-                    # discharge button white; text: "Discharge"; setCheckable(True)
-                    if button.text() == "Discharge":
-                        button.setStyleSheet("background-color: White")
-                        button.setCheckable(True)
-                    # kick/chip button white; setCheckable(True)
-                    else:
-                        button.setStyleSheet("background-color: White")
-                        button.setCheckable(True)
+        elif self.auto_kick_button.isChecked():
+            self.radioCheckable[0] = True
+            self.radioCheckable[2] = True
+            if self.radioCheckable[1]:
+                print("Auto Kick clicked")
+                print("Geneva:", self.geneva_value, "Power:", self.power_value)
+            self.radioCheckable[1] = False
+            self.chip_button.setStyleSheet("background-color: Grey")
+            self.chip_button.setCheckable(False)
+            self.kick_button.setStyleSheet("background-color: Grey")
+            self.kick_button.setCheckable(False)
+            self.charge_button.setStyleSheet("background-color: Grey")
+            self.charge_button.setCheckable(False)
 
-                    if button.isChecked():
-                        # discharge clicked; change text to 'Charge'; print; set 'No Auto' on; charged = False
-                        if button.text() == "Discharge":
-                            button.toggle()
-                            self.charged = False
-                            # ----- replace this line ----- (next PR)
-                            print("Discharge clicked")
-                            print(
-                                "Geneva:", self.geneva_value, "Power:", self.power_value
-                            )
-                        # kick/chip button clicked; change text to 'Charge';
-                        else:
-                            button.toggle()
-                            self.charged = False
-                            if button.text() == "Kick":
-                                # ----- replace this line ----- (next PR)
-                                print("Kick clicked")
-                                print(
-                                    "Geneva:",
-                                    self.geneva_value,
-                                    "Power:",
-                                    self.power_value,
-                                )
-                            elif button.text() == "Chip":
-                                # ----- replace this line ----- (next PR)
-                                print("Chip clicked")
-                                print(
-                                    "Geneva:",
-                                    self.geneva_value,
-                                    "Power:",
-                                    self.power_value,
-                                )
-
-            # check all radio buttons, regardless of self.charged value
-            for radio in item.findChildren(QRadioButton):
-                if radio.isChecked():
-                    # no auto clicked - change to no auto; Kick/chip white and enabled
-                    if radio.text() == "No Auto":
-                        self.radioCheckable[1] = True
-                        self.radioCheckable[2] = True
-                        if self.radioCheckable[0]:
-                            # ----- replace this line ----- (next PR)
-                            print("No Auto clicked")
-                            print(
-                                "Geneva:", self.geneva_value, "Power:", self.power_value
-                            )
-                            self.radioCheckable[0] = False
-                        # find kick/chip pushButtons, set them clickable
-                        for button in self.grid.parentWidget().findChildren(
-                            QPushButton
-                        ):
-                            if self.charged and (
-                                button.text() == "Kick" or button.text() == "Chip"
-                            ):
-                                button.setStyleSheet("background-color: White")
-                                button.setCheckable(True)
-                    # auto kick clicked - print; kick/chip grey, disabled
-                    elif radio.text() == "Auto Kick":
-                        self.radioCheckable[0] = True
-                        self.radioCheckable[2] = True
-                        if self.radioCheckable[1]:
-                            # ----- replace this line ----- (next PR)
-                            print("Auto Kick clicked")
-                            print(
-                                "Geneva:", self.geneva_value, "Power:", self.power_value
-                            )
-                            self.radioCheckable[1] = False
-                        for button in self.grid.parentWidget().findChildren(
-                            QPushButton
-                        ):
-                            button.setStyleSheet("background-color: Grey")
-                            button.setCheckable(False)
-                    # auto chip clicked - print; kick/chip grey, disabled
-                    elif radio.text() == "Auto Chip":
-                        self.radioCheckable[0] = True
-                        self.radioCheckable[1] = True
-                        if self.radioCheckable[2]:
-                            # ----- replace this line ----- (next PR)
-                            print("Auto Chip clicked")
-                            print(
-                                "Geneva:", self.geneva_value, "Power:", self.power_value
-                            )
-                            self.radioCheckable[2] = False
-                        # find kick/chip pushButtons
-                        for button in self.grid.parentWidget().findChildren(
-                            QPushButton
-                        ):
-                            button.setStyleSheet("background-color: Grey")
-                            button.setCheckable(False)
+        elif self.auto_chip_button.isChecked():
+            self.radioCheckable[0] = True
+            self.radioCheckable[1] = True
+            if self.radioCheckable[2]:
+                print("Auto Kick clicked")
+                print("Geneva:", self.geneva_value, "Power:", self.power_value)
+            self.radioCheckable[2] = False
+            self.chip_button.setStyleSheet("background-color: Grey")
+            self.chip_button.setCheckable(False)
+            self.kick_button.setStyleSheet("background-color: Grey")
+            self.kick_button.setCheckable(False)
+            self.charge_button.setStyleSheet("background-color: Grey")
+            self.charge_button.setCheckable(False)
