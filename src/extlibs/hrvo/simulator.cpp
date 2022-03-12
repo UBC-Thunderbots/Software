@@ -116,9 +116,9 @@ void HRVOSimulator::updateWorld(const World &world)
                 hrvo_agent.value()->setPosition(Vector2(position.x(), position.y()));
 
                 // Only update velocity if time has passed since the last time velocity
-                // was updated This is to allow SensorFusion to update the actual robot
-                // velocity in World after a doStep call
-                if (global_time - last_time_velocity_updated >= 10 * time_step)
+                // was updated. This is to allow SensorFusion to update the actual robot
+                // velocity in World.
+                if (global_time - last_time_velocity_updated >= 4 * time_step)
                 {
                     Vector velocity = friendly_robot.velocity();
                     hrvo_agent.value()->setVelocity(Vector2(velocity.x(), velocity.y()));

@@ -191,36 +191,6 @@ cc_library(
     ],
 )
 
-qt_cc_library(
-    name = "er_force_simulator_qt",
-    srcs = ["er_force_simulator.cpp"],
-    hdrs = ["er_force_simulator.h"],
-    deps = [
-        ":firmware_object_deleter",
-        ":physics_simulator_ball",
-        ":physics_simulator_robot",
-        ":simulator_ball_singleton",
-        "//extlibs/er_force_sim/src/amun/simulator",
-        "//firmware/app/primitives:primitive_manager",
-        "//firmware/app/world:firmware_world",
-        "//proto:defending_side_msg_cc_proto",
-        "//proto/message_translation:primitive_google_to_nanopb_converter",
-        "//proto/message_translation:ssl_detection",
-        "//proto/message_translation:ssl_geometry",
-        "//proto/message_translation:ssl_simulation_robot_control",
-        "//proto/message_translation:ssl_wrapper",
-        "//shared/parameter:cpp_configs",
-        "//software/jetson_nano:primitive_executor",
-        "//software/simulation/physics:physics_world",
-        "//software/world",
-        "//software/world:field",
-        "//software/world:team_colour",
-        "@qt//:qt_core",
-        "@qt//:qt_gui",
-        "@qt//:qt_widgets",
-    ],
-)
-
 cc_library(
     name = "er_force_simulator",
     srcs = ["er_force_simulator.cpp"],
@@ -230,7 +200,6 @@ cc_library(
         "//extlibs/er_force_sim/config/simulator:2020B.txt",
     ],
     deps = [
-        ":er_force_simulator_ball",
         ":firmware_object_deleter",
         ":physics_simulator_ball",
         ":physics_simulator_robot",

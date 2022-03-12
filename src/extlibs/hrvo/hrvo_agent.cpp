@@ -446,11 +446,12 @@ void HRVOAgent::computePreferredVelocity()
     Vector2 goalPosition            = nextGoal->getCurrentGoalPosition();
     float speedAtGoal               = nextGoal->getDesiredSpeedAtCurrentGoal();
     Vector2 distVectorToGoal        = goalPosition - position_;
-    auto distToGoal = static_cast<float>(std::sqrt(std::pow(distVectorToGoal.getX(), 2) +
-                                                   std::pow(distVectorToGoal.getY(), 2)));
+    auto distToGoal = abs(distVectorToGoal);
+    // Reduced max acceleration to avoid overshooting
+    const float offsetted_max_accel = max_accel_ - 0.8f;
     // d = (Vf^2 - Vi^2) / 2a
     double startLinearDecelerationDistance =
-        std::abs((std::pow(speedAtGoal, 2) - std::pow(prefSpeed_, 2)) / (2 * max_accel_)) * 1.2f; // TODO: Tune constant
+        std::abs((std::pow(speedAtGoal, 2) - std::pow(prefSpeed_, 2)) / (2 * offsetted_max_accel));// * 1.2f; // TODO: Tune constant
 
     if (distToGoal < startLinearDecelerationDistance)
     {
@@ -458,12 +459,12 @@ void HRVOAgent::computePreferredVelocity()
         // speed
         // v_pref = sqrt(v_goal^2 + 2 * a * d_remainingToDestination)
         float currPrefSpeed = static_cast<float>(
-            std::sqrt(std::pow(speedAtGoal, 2) + 2 * max_accel_ * distToGoal)) * 0.6f; // TODO: Tune constant
+            std::sqrt(std::pow(speedAtGoal, 2) + 2 * offsetted_max_accel * distToGoal));// * 0.6f; // TODO: Tune constant
         Vector2 ideal_pref_velocity = normalize(distVectorToGoal) * currPrefSpeed;
 
         // Limit the preferred velocity to the kinematic limits
         const Vector2 dv = ideal_pref_velocity - velocity_;
-        if (abs(dv) <= max_accel_ * simulator_->getTimeStep())
+        if (abs(dv) <= offsetted_max_accel * simulator_->getTimeStep())
         {
             pref_velocity_ = ideal_pref_velocity;
         }
@@ -472,7 +473,7 @@ void HRVOAgent::computePreferredVelocity()
             // Calculate the maximum velocity towards the preferred velocity, given the
             // acceleration constraint
             pref_velocity_ =
-                velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / abs(dv));
+                velocity_ + (offsetted_max_accel * simulator_->getTimeStep()) * (dv / abs(dv));
         }
     }
     else

@@ -12,7 +12,7 @@
 class SimulatedHRVOTest : public SimulatedErForceSimTacticTestFixture
 {
    protected:
-    FieldType field_type = FieldType::DIV_B;
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
     Field field          = Field::createField(field_type);
 };
 
@@ -167,7 +167,7 @@ TEST_F(SimulatedHRVOTest, test_zig_zag_movement)
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(15));
+            Duration::fromSeconds(10));
 }
 
 TEST_F(SimulatedHRVOTest, test_start_in_local_minima)
