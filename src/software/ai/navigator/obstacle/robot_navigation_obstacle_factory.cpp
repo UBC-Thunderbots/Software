@@ -66,6 +66,28 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
                 obstacles.push_back(
                     createFromShape(Circle(world.ball().position(), 0.5)));
             }
+            break;
+        case MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE:
+            Rectangle field_walls    = world.field().fieldBoundary();
+            Rectangle playable_field = world.field().fieldLines();
+            // put each boundary zone as an obstacle
+            Rectangle upper_boundary =
+                Rectangle(field_walls.posXNegYCorner(),
+                          {playable_field.xMax(), field_walls.yMax()});
+            Rectangle left_boundary =
+                Rectangle(field_walls.posXNegYCorner(),
+                          {field_walls.xMin(), playable_field.yMin()});
+            Rectangle right_boundary =
+                Rectangle({field_walls.xMax(), playable_field.yMax()},
+                          field_walls.negXPosYCorner());
+            Rectangle lower_boundary =
+                Rectangle({playable_field.xMin(), field_walls.yMin()},
+                          field_walls.negXPosYCorner());
+            obstacles.push_back(createFromShape(upper_boundary));
+            obstacles.push_back(createFromShape(left_boundary));
+            obstacles.push_back(createFromShape(right_boundary));
+            obstacles.push_back(createFromShape(lower_boundary));
+            break;
     }
 
     return obstacles;
