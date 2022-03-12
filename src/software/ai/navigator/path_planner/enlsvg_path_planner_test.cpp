@@ -6,6 +6,7 @@
 #include <random>
 
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
+#include "software/test_util/path_planning_test_util.h"
 #include "software/test_util/test_util.h"
 
 class TestEnlsvgPathPlanner : public testing::Test
@@ -20,78 +21,6 @@ class TestEnlsvgPathPlanner : public testing::Test
     RobotNavigationObstacleFactory robot_navigation_obstacle_factory;
 };
 
-void checkPathDoesNotExceedBoundingBox(std::vector<Point> path_points,
-                                       Rectangle bounding_box)
-{
-    for (auto const& path_point : path_points)
-    {
-        EXPECT_TRUE(contains(bounding_box, path_point))
-            << "Path point " << path_point << " not in bounding box {"
-            << bounding_box.negXNegYCorner() << "," << bounding_box.posXPosYCorner()
-            << "}";
-    }
-}
-
-void checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
-                                       std::vector<ObstaclePtr> obstacles)
-{
-    // If the path size is 1, just need to check that the point is not within the obstacle
-    if (path_points.size() == 1)
-    {
-        for (auto const& obstacle : obstacles)
-        {
-            EXPECT_FALSE(obstacle->contains(path_points[0]))
-                << "Only point on path " << path_points[0] << " is in obstacle "
-                << obstacle;
-        }
-    }
-
-    // Check that no line segment on the path intersects the obstacle
-    for (std::size_t i = 0; i < path_points.size() - 1; i++)
-    {
-        Segment path_segment(path_points[i], path_points[i + 1]);
-        for (auto const& obstacle : obstacles)
-        {
-            EXPECT_FALSE(obstacle->intersects(path_segment))
-                << "Line segment {" << path_points[i] << "," << path_points[i + 1]
-                << "} intersects obstacle " << obstacle;
-        }
-    }
-}
-
-/**
- * This function also expands obstacle polygons by the size of the robot radius.
- */
-void checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
-                                       std::vector<Polygon> obstacles)
-{
-    for_each(obstacles.begin(), obstacles.end(),
-             [](Polygon& shape) { shape = shape.expand(ROBOT_MAX_RADIUS_METERS); });
-
-    // If the path size is 1, just need to check that the point is not within the obstacle
-    if (path_points.size() == 1)
-    {
-        for (auto const& obstacle : obstacles)
-        {
-            EXPECT_FALSE(contains(obstacle, path_points[0]))
-                << "Only point on path " << path_points[0] << " is in obstacle "
-                << obstacle;
-        }
-    }
-
-    // Check that no line segment on the path intersects the obstacle
-    for (std::size_t i = 0; i < path_points.size() - 1; i++)
-    {
-        Segment path_segment(path_points[i], path_points[i + 1]);
-        for (auto const& obstacle : obstacles)
-        {
-            EXPECT_FALSE(intersects(obstacle, path_segment))
-                << "Line segment {" << path_points[i] << "," << path_points[i + 1]
-                << "} intersects obstacle " << obstacle;
-        }
-    }
-}
-
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_empty_grid)
 {
     Field field = Field::createSSLDivisionAField();
@@ -102,7 +31,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_empty_grid)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -124,7 +53,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_no_navigable_area)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path == std::nullopt);
 }
@@ -146,7 +75,7 @@ TEST_F(TestEnlsvgPathPlanner,
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
 
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -158,8 +87,8 @@ TEST_F(TestEnlsvgPathPlanner,
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box({-3.1, 1.3}, {3.1, -1.3});
-    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    checkPathDoesNotIntersectObstacle(path_points, {obstacle});
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path_points, {obstacle});
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_src)
@@ -178,7 +107,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_src)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -195,12 +124,12 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_src)
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-2.1, -0.1}, {3.1, 3.1});
-    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
     // Make sure path does not go through any obstacles, except for the first point, which
     // is in the obstacle blocking the start position
-    checkPathDoesNotIntersectObstacle({path_points.begin() + 1, path_points.end()},
-                                      obstacles);
+    TestUtil::checkPathDoesNotIntersectObstacle(
+        {path_points.begin() + 1, path_points.end()}, obstacles);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest)
@@ -220,7 +149,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -235,12 +164,12 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest)
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.3, -1.1}, {3.8, 2.1});
-    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
     // Make sure path does not go through any obstacles, except for the first point, which
     // is in the obstacle blocking the start position
-    checkPathDoesNotIntersectObstacle({path_points.begin() + 1, path_points.end()},
-                                      {obstacle});
+    TestUtil::checkPathDoesNotIntersectObstacle(
+        {path_points.begin() + 1, path_points.end()}, {obstacle});
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest_blocked_src)
@@ -261,7 +190,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest_blocked_src)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -281,12 +210,12 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_blocked_dest_blocked_src)
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.3, -1.1}, {3.8, 2.1});
-    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
     // Make sure path does not go through any obstacles, except for the first point, which
     // is in the obstacle blocking the start position
-    checkPathDoesNotIntersectObstacle({path_points.begin() + 1, path_points.end()},
-                                      {obstacle});
+    TestUtil::checkPathDoesNotIntersectObstacle(
+        {path_points.begin() + 1, path_points.end()}, {obstacle});
 }
 
 TEST_F(TestEnlsvgPathPlanner,
@@ -307,7 +236,7 @@ TEST_F(TestEnlsvgPathPlanner,
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -324,12 +253,12 @@ TEST_F(TestEnlsvgPathPlanner,
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.3, 0.9}, {5.1, 5.1});
-    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
     // Make sure path does not go through any obstacles, except for the first point, which
     // is in the obstacle blocking the start position
-    checkPathDoesNotIntersectObstacle({path_points.begin() + 1, path_points.end()},
-                                      {obstacle});
+    TestUtil::checkPathDoesNotIntersectObstacle(
+        {path_points.begin() + 1, path_points.end()}, {obstacle});
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_same_cell_dest)
@@ -346,7 +275,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_same_cell_dest)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -372,7 +301,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_outside_o
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -386,12 +315,12 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_outside_o
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-3.1, 0.1}, {3.1, -1.0});
-    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
     // Make sure path does not go through any obstacles, except for the first point, which
     // is in the obstacle blocking the start position
-    checkPathDoesNotIntersectObstacle({path_points.begin() + 1, path_points.end()},
-                                      {obstacle});
+    TestUtil::checkPathDoesNotIntersectObstacle(
+        {path_points.begin() + 1, path_points.end()}, {obstacle});
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_along_x_axis)
@@ -410,7 +339,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_along_x_a
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -422,8 +351,8 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_along_x_a
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.1, -1.3}, {3.1, 1.3});
-    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    checkPathDoesNotIntersectObstacle(path_points, obstacles);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path_points, obstacles);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_along_y_axis)
@@ -442,7 +371,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_along_y_a
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -454,8 +383,8 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_single_obstacle_along_y_a
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.1, -0.1}, {2.1, 3.1});
-    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    checkPathDoesNotIntersectObstacle(path_points, obstacles);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path_points, obstacles);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_not_centered_at_origin)
@@ -472,7 +401,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_not_centered_at_origin)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -484,8 +413,8 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_not_centered_at_origin)
 
     // Make the sure the path does not exceed a bounding box
     Rectangle bounding_box({0.4, 0.4}, {2.6, 2.6});
-    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    checkPathDoesNotIntersectObstacle(path_points, {obstacle});
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path_points, {obstacle});
 }
 
 TEST_F(TestEnlsvgPathPlanner,
@@ -501,7 +430,7 @@ TEST_F(TestEnlsvgPathPlanner,
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -526,7 +455,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_circular_obstacle)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -538,8 +467,8 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_circular_obstacle)
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({-1.46, -2.6}, {-1, -1.31});
-    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    checkPathDoesNotIntersectObstacle(path_points, obstacles);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path_points, obstacles);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enslvg_path_planner_check_obstacle_edge)
@@ -555,7 +484,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enslvg_path_planner_check_obstacle_edge)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     EXPECT_TRUE(path != std::nullopt);
 
@@ -566,8 +495,8 @@ TEST_F(TestEnlsvgPathPlanner, test_enslvg_path_planner_check_obstacle_edge)
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({-0.1, 2.9}, {3.1, 3.3});
-    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    checkPathDoesNotIntersectObstacle(path_points, obstacles);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path_points, obstacles);
 }
 
 TEST_F(TestEnlsvgPathPlanner,
@@ -584,7 +513,7 @@ TEST_F(TestEnlsvgPathPlanner,
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     ASSERT_TRUE(path != std::nullopt);
 
@@ -595,8 +524,8 @@ TEST_F(TestEnlsvgPathPlanner,
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({1.3, 2}, {-0.1, 3.1});
-    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    checkPathDoesNotIntersectObstacle(path_points, obstacles);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path_points, obstacles);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enslvg_path_planner_start_in_enemy_half)
@@ -613,7 +542,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enslvg_path_planner_start_in_enemy_half)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     ASSERT_TRUE(path != std::nullopt);
 
@@ -628,7 +557,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enslvg_path_planner_start_in_enemy_half)
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({4.1, 3.1}, {-0.3, -3});
-    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_start_in_boundary_margin)
@@ -647,7 +576,7 @@ TEST_F(TestEnlsvgPathPlanner, test_start_in_boundary_margin)
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     ASSERT_TRUE(path != std::nullopt);
 
@@ -664,8 +593,8 @@ TEST_F(TestEnlsvgPathPlanner, test_start_in_boundary_margin)
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({-1.1, -2.1}, {6.3, 4.8});
-    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    checkPathDoesNotIntersectObstacle(path->getKnots(), obstacles);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path->getKnots(), obstacles);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_one_path_planner_object_called_twice_for_same_path)
@@ -682,7 +611,7 @@ TEST_F(TestEnlsvgPathPlanner, test_one_path_planner_object_called_twice_for_same
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    auto path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path = planner.findPath(start, dest);
 
     ASSERT_TRUE(path != std::nullopt);
 
@@ -694,12 +623,12 @@ TEST_F(TestEnlsvgPathPlanner, test_one_path_planner_object_called_twice_for_same
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({-3.1, -4.1}, {2.1, 3.1});
-    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    checkPathDoesNotIntersectObstacle(path->getKnots(), obstacles);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path->getKnots(), obstacles);
 
     // Test same path using the same path planner object to make sure it still works when
     // being reused
-    auto same_path = planner.findPath(start, dest, navigable_area, obstacles);
+    auto same_path                      = planner.findPath(start, dest);
     std::vector<Point> same_path_points = path->getKnots();
 
     for (unsigned i = 0; i < path_points.size(); ++i)
@@ -723,7 +652,7 @@ TEST_F(TestEnlsvgPathPlanner,
 
     EnlsvgPathPlanner planner =
         EnlsvgPathPlanner(navigable_area, obstacles, field.boundaryMargin());
-    std::optional<Path> path = planner.findPath(start, dest, navigable_area, obstacles);
+    std::optional<Path> path = planner.findPath(start, dest);
 
     ASSERT_TRUE(path != std::nullopt);
 
@@ -735,14 +664,14 @@ TEST_F(TestEnlsvgPathPlanner,
 
     // Make sure path does not exceed a bounding box
     Rectangle bounding_box({-2.1, -1.1}, {4.1, 4.1});
-    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    checkPathDoesNotIntersectObstacle(path->getKnots(), obstacles);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path->getKnots(), obstacles);
 
     // Make sure that reusing the path planner still works by computing another path
     start = Point(5, 0);
     dest  = Point(-2, 0.5);
 
-    auto path_two = planner.findPath(start, dest, navigable_area, obstacles);
+    auto path_two = planner.findPath(start, dest);
     path_points   = path_two->getKnots();
 
     ASSERT_TRUE(path_two != std::nullopt);
@@ -757,8 +686,8 @@ TEST_F(TestEnlsvgPathPlanner,
 
     // Make sure path does not exceed a bounding box;
     bounding_box = Rectangle(Point(5.1, 1.8), Point(-2.1, -0.1));
-    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-    checkPathDoesNotIntersectObstacle(path_points, obstacles);
+    TestUtil::checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+    TestUtil::checkPathDoesNotIntersectObstacle(path_points, obstacles);
 }
 
 TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_speed_test)
@@ -801,7 +730,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_speed_test)
         Point start{x_distribution(random_num_gen), y_distribution(random_num_gen)};
         Point end{x_distribution(random_num_gen), y_distribution(random_num_gen)};
 
-        auto path = planner.findPath(start, end, navigable_area, obstacles);
+        auto path = planner.findPath(start, end);
     }
 
     double duration_ms = ::TestUtil::millisecondsSince(start_time);

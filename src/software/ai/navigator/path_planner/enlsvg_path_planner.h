@@ -2,9 +2,12 @@
 #include <queue>
 
 #include "extlibs/enlsvg/Pathfinding/ENLSVG.h"
-#include "path_planner.h"
+#include "software/ai/navigator/obstacle/obstacle.hpp"
+#include "software/geom/linear_spline2d.h"
 #include "software/logger/logger.h"
 #include "software/world/world.h"
+
+using Path = LinearSpline2d;
 
 /**
  * The Edge N-Level Sparse Visibility Graph algorithm is a fast pathfinding algorithm for
@@ -17,7 +20,7 @@
  * Since this algorithm requires precomputation to achieve fast pathfinding, obstacles are
  * passed into the constructor and is unmodifiable once it is created.
  */
-class EnlsvgPathPlanner : public PathPlanner
+class EnlsvgPathPlanner
 {
    public:
     /**
@@ -37,20 +40,18 @@ class EnlsvgPathPlanner : public PathPlanner
     EnlsvgPathPlanner(const Rectangle &navigable_area,
                       const std::vector<ObstaclePtr> &obstacles,
                       double boundary_margin_offset = 0.0, double resolution = 0.09);
+
     /**
-     * Returns a path that is an optimized path between start and end.
+     * Returns a path that is an optimized path between start and end. Has no checking on
+     * whether the start and end are valid and within field boundaries.
      *
-     * @param start start point
-     * @param end end point
-     * @param navigable_area Rectangle representing the navigable area
-     * @param obstacles ignored
+     * @param start  start point
+     * @param end    end point
      *
-     * @return a vector of points that is the optimal path avoiding obstacles
-     *         if no valid path then return empty vector
+     * @return   a vector of points that is the optimal path avoiding obstacles
+     *           if no valid path, then return an empty vector
      */
-    std::optional<Path> findPath(const Point &start, const Point &end,
-                                 const Rectangle &navigable_area,
-                                 const std::vector<ObstaclePtr> &) override;
+    std::optional<Path> findPath(const Point &start, const Point &end) const;
 
     /**
      * Returns internal resolution of the grid.
