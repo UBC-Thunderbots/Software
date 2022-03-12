@@ -78,3 +78,16 @@ cc_test(
         "//software/test_util",
     ],
 )
+
+cc_library(
+    name = "tactic_factory",
+    srcs = ["tactic_factory.cpp"],
+    hdrs = [
+        "tactic_factory.h",
+    ],
+    deps = [
+        ":all_tactics",
+        "//proto:tbots_cc_proto",
+        "//proto/message_translation:tbots_protobuf",
+    ],
+)
