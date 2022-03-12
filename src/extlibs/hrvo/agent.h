@@ -99,7 +99,7 @@ class Agent
      *
      * @return The goal radius of the agent
      */
-    float getGoalRadius() const;
+    float getPathRadius() const;
 
     /**
      * Return the preferred velocity of the agent
@@ -126,7 +126,7 @@ class Agent
      * Gets the the path for this agent
      * @return Path for this agent
      */
-    Path getPath();
+    const Path &getPath() const;
 
    protected:
     // Agent Properties

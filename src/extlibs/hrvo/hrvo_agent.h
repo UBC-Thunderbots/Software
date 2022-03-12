@@ -129,6 +129,7 @@ class HRVOAgent : public Agent
     float neighborDist_;
     float uncertaintyOffset_;
     std::multimap<float, Candidate> candidates_;
+    // distance -> Agent Index
     std::set<std::pair<float, std::size_t>> neighbors_;
     std::vector<VelocityObstacle> velocityObstacles_;
 

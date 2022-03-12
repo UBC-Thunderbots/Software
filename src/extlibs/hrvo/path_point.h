@@ -3,8 +3,6 @@
 
 #include "extlibs/hrvo/vector2.h"
 
-class Simulator;
-
 /**
  * A path point in an agent's path
  */
@@ -22,11 +20,14 @@ class PathPoint
      */
     explicit PathPoint(const Vector2 &position, const float speed_at_position);
 
+    Vector2 getPosition() const;
+
+    float getSpeed() const;
+
    private:
     // position for the path point
     Vector2 position_;
     // desired speed for the path point
     float speed_at_destination;
 
-    friend class Path;
 };

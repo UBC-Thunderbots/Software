@@ -10,7 +10,7 @@ LinearVelocityAgent::LinearVelocityAgent(Simulator *simulator, const Vector2 &po
 void LinearVelocityAgent::computeNewVelocity()
 {
     // Preferring a velocity which points directly towards goal
-    pref_velocity_ = path.getCurrentPathPointPosition() - position_;
+    pref_velocity_ = path.getCurrentPathPointPosition().value() - position_;
 
     if (abs(pref_velocity_) > max_speed_)
     {

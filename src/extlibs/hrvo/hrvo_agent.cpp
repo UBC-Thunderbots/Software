@@ -58,7 +58,7 @@ void HRVOAgent::computeNeighbors()
 
     float new_neighbor_dist =
         std::min(neighborDist_,
-                 abs(position_ - path.getCurrentPathPointPosition()) + path.goal_radius);
+                 abs(position_ - path.getCurrentPathPointPosition().value()) + path.path_radius);
 
     simulator_->kdTree_->query(this, new_neighbor_dist);
 }
@@ -441,8 +441,7 @@ void HRVOAgent::computePreferredVelocity()
         return;
     }
 
-    // std::unique_ptr<Goal> &nextGoal = simulator_->goals_[goal_index_];
-    Vector2 goalPosition     = path.getCurrentPathPointPosition();
+    Vector2 goalPosition     = path.getCurrentPathPointPosition().value();
     float speedAtGoal        = path.getDesiredSpeedAtCurrentPathPoint();
     Vector2 distVectorToGoal = goalPosition - position_;
     auto distToGoal = static_cast<float>(std::sqrt(std::pow(distVectorToGoal.getX(), 2) +
@@ -493,7 +492,7 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
         Vector2 other_agent_relative_pos = other_agent->getPosition() - position_;
         const float distSq               = absSq(other_agent_relative_pos);
 
-        Vector2 goal_pos          = path.getCurrentPathPointPosition();
+        Vector2 goal_pos          = path.getCurrentPathPointPosition().value();
         Vector2 relative_goal_pos = goal_pos - position_;
 
         // Whether the other robot is with in 45 degrees of the goal, relative to us

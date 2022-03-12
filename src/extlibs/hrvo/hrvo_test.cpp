@@ -201,9 +201,9 @@ class HRVOTest : public ::testing::Test
                 }
 
                 Vector2 goal_position =
-                    simulator.agents_[robot_id]->getPath().getCurrentPathPointPosition();
+                    simulator.agents_[robot_id]->getPath().getCurrentPathPointPosition().value();
 
-                float goal_radius = simulator.agents_[robot_id]->getGoalRadius();
+                float goal_radius = simulator.agents_[robot_id]->getPathRadius();
 
                 output_file << frame << "," << time << ","
                             << std::to_string(computation_time.count()) << "," << robot_id

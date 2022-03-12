@@ -40,8 +40,8 @@ void Agent::update()
 
     position_ += velocity_ * simulator_->timeStep_;
 
-    if (absSq(path.getCurrentPathPointPosition() - position_) <
-        path.goal_radius * path.goal_radius)
+    if (absSq(path.getCurrentPathPointPosition().value() - position_) <
+        path.path_radius * path.path_radius)
     {
         // Is at current goal position
         if (path.isGoingToFinalPathPoint())
@@ -92,12 +92,12 @@ bool Agent::hasReachedGoal() const
     return reached_goal_;
 }
 
-float Agent::getGoalRadius() const
+float Agent::getPathRadius() const
 {
-    return path.goal_radius;
+    return path.path_radius;
 }
 
-Path Agent::getPath()
+const Path &Agent::getPath() const
 {
     return path;
 }

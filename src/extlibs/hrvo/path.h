@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
+#include <optional>
 
 #include "extlibs/hrvo/path_point.h"
 #include "extlibs/hrvo/vector2.h"
@@ -29,13 +30,13 @@ class Path
      * Gets the next path point position in this path
      * @return the position of the next path point
      */
-    Vector2 getNextPathPointPosition();
+    std::optional<Vector2> getNextPathPointPosition();
 
     /**
      * Gets the current path point position in this path
      * @return the position of the current path point
      */
-    Vector2 getCurrentPathPointPosition();
+    std::optional<Vector2> getCurrentPathPointPosition() const;
 
     /**
      * Gets the desired speed of the current path point in this path
@@ -62,8 +63,8 @@ class Path
      */
     std::vector<PathPoint> getPathVector() const;
 
-    // goal radius for this robot
-    float goal_radius;
+    // path radius for this robot. The max distance away from any path point in this path
+    float path_radius;
 
 
    private:

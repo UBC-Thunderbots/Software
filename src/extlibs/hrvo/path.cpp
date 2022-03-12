@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <utility>
+#include <optional>
 
 #include "extlibs/hrvo/path_point.h"
 #include "extlibs/hrvo/vector2.h"
@@ -9,7 +10,7 @@
 
 Path::Path()
 {
-    goal_radius    = 0.0f;
+    path_radius    = 0.0f;
     Vector2 vector = Vector2();
     PathPoint path_point(vector);
     path.push_back(path_point);
@@ -18,24 +19,24 @@ Path::Path()
 Path::Path(const std::vector<PathPoint> &path_points, float goal_radius_)
 {
     path        = path_points;
-    goal_radius = goal_radius_;
+    path_radius = goal_radius_;
 }
 
-Vector2 Path::getNextPathPointPosition()
+std::optional<Vector2> Path::getNextPathPointPosition()
 {
     curr_goal_index++;
     return getCurrentPathPointPosition();
 }
 
-Vector2 Path::getCurrentPathPointPosition()
+std::optional<Vector2> Path::getCurrentPathPointPosition() const
 {
     if (curr_goal_index >= path.size())
     {
-        return Vector2();
+        return std::nullopt;
     }
     else
     {
-        return path[curr_goal_index].position_;
+        return path[curr_goal_index].getPosition();
     }
 }
 
@@ -47,7 +48,7 @@ float Path::getDesiredSpeedAtCurrentPathPoint()
     }
     else
     {
-        return path[curr_goal_index].speed_at_destination;
+        return path[curr_goal_index].getSpeed();
     }
 }
 
