@@ -13,17 +13,13 @@ from software.simulated_tests.validation import (
     flip_validation,
 )
 
-
 class RobotEntersRegion(Validation):
 
     """Checks if a Robot enters any of the provided regions."""
 
-    def __init__(self, flipped=False, regions=[]):
+    def __init__(self, regions=[]):
         self.regions = regions
-        self.flipped = flipped
-        self.failed_once = False
 
-    @flip_validation
     def get_validation_status(self, vision) -> ValidationStatus:
         """Checks if _any_ robot enters the provided regions
 
@@ -31,18 +27,14 @@ class RobotEntersRegion(Validation):
         :returns: FAILING until a robot enters any of the regions
                   PASSING when a robot enters
         """
-        if not self.failed_once:
-            for region in self.regions:
-                for robot_id, robot_states in vision.robot_states.items():
-                    if tbots_geom.contains(
-                        region, tbots_geom.createPoint(robot_states.global_position)
-                    ):
-                        return ValidationStatus.PASSING
+        for region in self.regions:
+            for robot_id, robot_states in vision.robot_states.items():
+                if tbots_geom.contains(
+                    region, tbots_geom.createPoint(robot_states.global_position)
+                ):
+                    return ValidationStatus.PASSING
 
-            return ValidationStatus.FAILING
-
-        else:
-            return ValidationStatus.FAILING
+        return ValidationStatus.FAILING
 
     def get_validation_geometry(self, vision) -> ValidationGeometry:
         """Returns the underlying geometry this validation is checking
@@ -53,5 +45,6 @@ class RobotEntersRegion(Validation):
         """
         return create_validation_geometry(self.regions)
 
-    def get_failure_message(self):
-        return "Robot didn't enter any of these regions: {}".format(self.regions)
+RobotEventuallyEntersRegion, RobotEventuallyExitsRegion, RobotStaysInRegion, RobotNeverEntersRegion =\
+    createValidationTypes(
+    )

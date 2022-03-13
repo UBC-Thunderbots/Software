@@ -16,8 +16,27 @@ class Validation(object):
     def get_validation_geometry(self, vision) -> ValidationGeometry:
         raise NotImplementedError("get_validation_geometry is not implemented")
 
-    def get_failure_message(self):
-        raise NotImplementedError("get_failure_message is not implemented")
+
+class EventuallyTrueValidation(object):
+
+    """Something that should eventually be true"""
+
+    def __init__(self, validation):
+        self.validation = validation
+
+    def get_validation_status(self, vision) -> ValidationStatus:
+        return self.get_validation_status(vision)
+
+        
+class EventuallyFalseValidation(object):
+    """A condition that should eventually be valid in the test
+    """
+    pass
+
+class AlwaysValidation(Validation):
+    """A condition that should always be valid during the test
+    """
+    pass
 
 
 ValidationSequence = List[Validation]
@@ -108,7 +127,8 @@ def run_validation_sequence_sets(
             status = validation.get_validation_status(vision)
 
             validation_proto.status.append(status)
-            validation_proto.geometry.append(validation.get_validation_geometry(vision))
+            validation_proto.geometry.append(
+                    validation.get_validation_geometry(vision))
 
             # If the current validation is pending, we don't care about
             # the next one. Keep evaluating until this one passes.

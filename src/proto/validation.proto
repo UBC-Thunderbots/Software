@@ -14,6 +14,14 @@ enum ValidationStatus
     FAILING = 1;
 }
 
+enum ValidationType
+{
+    EVENTUALLY_TRUE   = 0;
+    EVENTUALLY_FALSE  = 1;
+    ALWAYS_TRUE       = 2;
+    ALWAYS_FALSE      = 3;
+}
+
 message ValidationGeometry
 {
     repeated Polygon polygons = 1;
@@ -23,6 +31,7 @@ message ValidationGeometry
 
 message ValidationProto
 {
-    repeated ValidationGeometry geometry = 1;
-    repeated ValidationStatus status     = 2;
+    required ValidationType validtion_type  = 1;
+    repeated ValidationGeometry geometry    = 2;
+    repeated ValidationStatus status        = 3;
 }
