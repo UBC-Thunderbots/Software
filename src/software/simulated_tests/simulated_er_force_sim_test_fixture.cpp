@@ -381,9 +381,12 @@ void SimulatedErForceSimTestFixture::runTest(
         }
 
         // Output the statistics for ball and robots
-        LOG(INFO) << "max ball displacement: " << ball_displacement_stats.maximum << std::endl;
-        LOG(INFO) << "min ball displacement: " << ball_displacement_stats.minimum << std::endl;
-        LOG(INFO) << "avg ball displacement: " << ball_displacement_stats.average << std::endl;
+        LOG(INFO) << "max ball displacement: " << ball_displacement_stats.maximum
+                  << std::endl;
+        LOG(INFO) << "min ball displacement: " << ball_displacement_stats.minimum
+                  << std::endl;
+        LOG(INFO) << "avg ball displacement: " << ball_displacement_stats.average
+                  << std::endl;
         LOG(INFO) << "max ball velocity difference: " << ball_velocity_stats.maximum
                   << std::endl;
         LOG(INFO) << "min ball velocity difference: " << ball_velocity_stats.minimum
