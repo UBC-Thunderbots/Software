@@ -31,7 +31,8 @@ from software.logger.logger import createLogger
 
 logger = createLogger(__name__)
 
-PROCESS_BUFFER_DELAY = 0.01
+PROCESS_BUFFER_DELAY_S = 0.01
+PAUSE_AFTER_FAIL_DELAY_S = 3
 
 
 class TacticTestRunner(object):
@@ -59,6 +60,8 @@ class TacticTestRunner(object):
         self.yellow_full_system = FullSystem()
         time.sleep(launch_delay_s)
 
+        self.last_exception = None
+
     def run_test(
         self,
         always_validation_sequence_set=[[]],
@@ -78,17 +81,28 @@ class TacticTestRunner(object):
 
         """
 
-        def __stopper():
-            # Wait just a bit to let the last couple buffers empty
-            time.sleep(PROCESS_BUFFER_DELAY)
+        def __stopper(delay=PROCESS_BUFFER_DELAY_S):
+            """Stop running the test
+
+            :param delay: How long to wait before closing everything, defaults
+                          to PROCESS_BUFFER_DELAY_S to minimize buffer warnings
+
+            """
+            time.sleep(delay)
+
+            # Close everything
             self.simulator.simulator_process.kill()
             self.yellow_full_system.full_system_process.kill()
             self.simulator.simulator_process.wait()
             self.yellow_full_system.full_system_process.wait()
+
             if self.enable_thunderscope:
                 self.thunderscope.close()
 
         def __runner():
+            """Step simulation, full_system and run validation
+            """
+
             time_elapsed_s = 0
             cached_vision = Vision()
 
@@ -122,43 +136,41 @@ class TacticTestRunner(object):
                     cached_vision = vision
 
                 # Validate
-                validation.run_validation_sequence_sets(
-                        vision,
-                        eventually_validation_sequence_set,
-                        always_validation_sequence_set,
+                validation_proto_set = validation.run_validation_sequence_sets(
+                    vision,
+                    eventually_validation_sequence_set,
+                    always_validation_sequence_set,
                 )
-
-                # NOTE: The following line will raise AssertionError(
-                # on validation failure that will propagate to the main
-                # thread through the excepthook
-                if error_msg:
-                    raise AssertionError(error_msg)
 
                 if self.enable_thunderscope:
                     # Send out the validation proto to thunderscope
-                    self.validation_sender.send(validation)
+                    self.validation_sender.send(validation_proto_set)
+
+                # Check that all always validations are always valid
+                validation.check_always_validation(validation_proto_set)
 
                 # Step the primtives
                 self.simulator.send_yellow_primitive_set_and_vision(
                     vision, self.yellow_full_system.get_primitive_set(),
                 )
 
+            # Check that all eventually validations are eventually valid
+            validation.check_eventually_validation(validation_proto_set)
+
             __stopper()
 
         def excepthook(args):
-            """This function is _critical_ for pytest to work. Threads in python
-            manage their own exceptions, but we want the assertion error
-            (and any other exceptions) to propagate to the main test so that
-            pytest can fail correctly.
-
-            We re-raise the exception on the main-thread with a log to indicate
-            where the exception occurred
+            """This function is _critical_ for enable_thunderscope to work.
+            If the test Thread will raises an exception we won't be able to close
+            the window from the main thread.
 
             :param args: The args passed in from the hook
 
             """
+
             logger.critical("Exception triggered in {}".format(args.thread))
-            raise args.exc_value
+            __stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
+            self.last_exception = args.exc_value
 
         threading.excepthook = excepthook
 
@@ -166,9 +178,15 @@ class TacticTestRunner(object):
         # thunderscope on this thread. The excepthook is setup to catch
         # any test failures and propagate them to the main thread
         if self.enable_thunderscope:
+
             run_sim_thread = threading.Thread(target=__runner, daemon=True)
             run_sim_thread.start()
+
             self.thunderscope.show()
+            run_sim_thread.join()
+
+            if self.last_exception:
+                pytest.fail(str(self.last_exception))
 
         # If thunderscope is disabled, just run the test
         else:

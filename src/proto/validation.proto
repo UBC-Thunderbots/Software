@@ -16,10 +16,8 @@ enum ValidationStatus
 
 enum ValidationType
 {
-    EVENTUALLY_TRUE   = 0;
-    EVENTUALLY_FALSE  = 1;
-    ALWAYS_TRUE       = 2;
-    ALWAYS_FALSE      = 3;
+    EVENTUALLY = 0;
+    ALWAYS     = 1;
 }
 
 message ValidationGeometry
@@ -31,7 +29,13 @@ message ValidationGeometry
 
 message ValidationProto
 {
-    required ValidationType validtion_type  = 1;
-    repeated ValidationGeometry geometry    = 2;
-    repeated ValidationStatus status        = 3;
+    required string name                    = 1;
+    required ValidationType validation_type = 2;
+    required ValidationGeometry geometry    = 3;
+    required ValidationStatus status        = 4;
+}
+
+message ValidationProtoSet
+{
+    repeated ValidationProto validations = 1;
 }

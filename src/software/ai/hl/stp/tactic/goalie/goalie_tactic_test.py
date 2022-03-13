@@ -6,7 +6,10 @@ import software.geom.geometry as tbots_geom
 from proto.primitive_pb2 import MaxAllowedSpeedMode
 from proto.tactic_pb2 import AssignedTacticPlayControlParams, GoalieTactic, Tactic
 from software.simulated_tests.eventually_validation.robot_enters_region import (
-    RobotEntersRegion,
+    RobotEventuallyEntersRegion,
+    RobotEventuallyExitsRegion,
+    RobotStaysInRegion,
+    RobotNeverEntersRegion,
 )
 from software.simulated_tests.simulated_test_fixture import tactic_runner
 
@@ -57,11 +60,14 @@ def test_goalie_blocks_shot(
     eventually_sequences = [
         [
             # Goalie should be in the defense area
-            RobotEntersRegion(regions=[tbots_geom.Field().enemyDefenseArea()])
+            RobotNeverEntersRegion(regions=[tbots_geom.Field().enemyDefenseArea()])
         ]
     ]
 
-    tactic_runner.run_test(eventually_validation_sequence_set=eventually_sequences)
+    tactic_runner.run_test(
+        eventually_validation_sequence_set=[],
+        always_validation_sequence_set=eventually_sequences,
+    )
 
 
 if __name__ == "__main__":

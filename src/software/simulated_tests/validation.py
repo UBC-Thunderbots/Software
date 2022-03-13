@@ -1,9 +1,14 @@
 import pytest
 
-from typing import List, Set
 
 import software.geom.geometry as tbots_geom
-from proto.validation_pb2 import ValidationGeometry, ValidationProto, ValidationStatus
+from proto.validation_pb2 import (
+    ValidationGeometry,
+    ValidationProto,
+    ValidationProtoSet,
+    ValidationStatus,
+    ValidationType,
+)
 
 
 class Validation(object):
@@ -13,63 +18,247 @@ class Validation(object):
     def get_validation_status(self, vision) -> ValidationStatus:
         raise NotImplementedError("get_validation_status is not implemented")
 
+    def get_validation_type(self, vision) -> ValidationType:
+        raise NotImplementedError("get_validation_type is not implemented")
+
     def get_validation_geometry(self, vision) -> ValidationGeometry:
         raise NotImplementedError("get_validation_geometry is not implemented")
 
 
-class EventuallyTrueValidation(object):
-
-    """Something that should eventually be true"""
-
-    def __init__(self, validation):
-        self.validation = validation
-
-    def get_validation_status(self, vision) -> ValidationStatus:
-        return self.get_validation_status(vision)
-
-        
-class EventuallyFalseValidation(object):
-    """A condition that should eventually be valid in the test
-    """
-    pass
-
-class AlwaysValidation(Validation):
-    """A condition that should always be valid during the test
-    """
+class EventuallyTrueValidation(Validation):
     pass
 
 
-ValidationSequence = List[Validation]
-ValidationSequenceSet = Set[ValidationSequence]
+class EventuallyFalseValidation(Validation):
+    pass
 
 
-def flip_validation(get_validation_status_func):
-    """Decorator to flip the validation function logic if
-    should_flip is True.
+class AlwaysTrueValidation(Validation):
+    pass
 
-    :param flip: If true, the result is flipped
 
+class AlwaysFalseValidation(Validation):
+    pass
+
+
+def createValidationTypes(validation_class):
+    """Given a Validation implementation that returns ValidationStatus.PASSING
+    when true and ValidationStatus.FAILING when false, create the 4 validation
+    types with different visualization/passing/failing properties.
+     
+                              ┌───────────────────────┐      ┌─────────────────┐
+                              │                       │──────► EventuallyTrue  │
+                              │                       │      └─────────────────┘
+                              │                       │
+                              │                       │      ┌─────────────────┐
+                              │                       ├──────► EventuallyFalse │
+     ┌─────────────────┐      │ createValidationTypes │      └─────────────────┘
+     │    Validation   ├──────►                       │
+     └─────────────────┘      │                       │      ┌─────────────────┐
+                              │                       ├──────►   AlwaysTrue    │
+                              │                       │      └─────────────────┘
+                              │                       │
+                              │                       │      ┌─────────────────┐
+                              │                       ├──────►   AlwaysFalse   │
+                              └───────────────────────┘      └─────────────────┘
+
+    EventuallyTrue: Has to be true before the end of the test. A series of these
+                    validations
+    EventuallyFalse: Has to be false before the end of the test. Inverts the
+                     validation so passing becomes failing (and vice versa)
+    AlwaysTrue: Has to be true for the duration of the test.
+    AlwaysFalse: Has to be false for the duration of the test.
+
+    NOTE: EventuallyFalse validation is a flipped EventuallyTrue validation
+          AlwaysTrue validation checks the same condition, but will stay 
+          validation 
+
+    :param eventually_true: A validation function that is eventually_true
+    :returns: EventuallyTrueValidation, EventuallyFalseValidation,
+              AlwaysTrueValidation, AlwaysFalseValidation
     """
 
-    def inner(self, vision):
-        status = get_validation_status_func(self, vision)
+    def constructor(self, *args, **kwargs):
+        """The validations will be composed of the input validation type
 
-        flipped = {
+        :param args/kwargs: Pass through to the validation_class
+
+        """
+        self.validation = validation_class(*args, **kwargs)
+
+    def flip_validation(self, vision):
+        """Flip the validation status
+
+        :param vision: The vision msg to validate on
+
+        """
+
+        return {
             ValidationStatus.FAILING: ValidationStatus.PASSING,
             ValidationStatus.PASSING: ValidationStatus.FAILING,
-        }
+        }[self.validation.get_validation_status(vision)]
 
-        if self.flipped:
-            return flipped[status]
+    eventually_true = type(
+        "EventuallyTrueValidation",
+        (Validation,),
+        {
+            "__init__": constructor,
+            "get_validation_status": lambda self, vision: self.validation.get_validation_status(
+                vision
+            ),
+            "get_validation_type": lambda self: ValidationType.EVENTUALLY,
+            "get_validation_geometry": lambda self, vision: self.validation.get_validation_geometry(
+                vision
+            ),
+        },
+    )
 
-        return status
+    eventually_false = type(
+        "EventuallyFalseValidation",
+        (Validation,),
+        {
+            "__init__": constructor,
+            "get_validation_status": lambda self, vision: flip_validation(self, vision),
+            "get_validation_type": lambda self: ValidationType.EVENTUALLY,
+            "get_validation_geometry": lambda self, vision: self.validation.get_validation_geometry(
+                vision
+            ),
+        },
+    )
 
-    return inner
+    always_true = type(
+        "AlwaysTrueValidation",
+        (Validation,),
+        {
+            "__init__": constructor,
+            "get_validation_status": lambda self, vision: self.validation.get_validation_status(
+                vision
+            ),
+            "get_validation_type": lambda self: ValidationType.ALWAYS,
+            "get_validation_geometry": lambda self, vision: self.validation.get_validation_geometry(
+                vision
+            ),
+        },
+    )
+
+    always_false = type(
+        "AlwaysFalseValidation",
+        (Validation,),
+        {
+            "__init__": constructor,
+            "get_validation_status": lambda self, vision: flip_validation(self, vision),
+            "get_validation_type": lambda self: ValidationType.ALWAYS,
+            "get_validation_geometry": lambda self, vision: self.validation.get_validation_geometry(
+                vision
+            ),
+        },
+    )
+
+    return eventually_true, eventually_false, always_true, always_false
+
+
+def run_validation_sequence_sets(
+    vision, eventually_validation_sequence_set, always_validation_sequence_set
+):
+    """Given both eventually and always validation sequence sets, (and vision)
+    run validation and aggregate the results in a validation proto.
+
+    :raises AssertionError: If the test fails
+    :param vision: Vision to validate with
+    :param eventually_validation_sequence_set:
+            A collection of sequences of eventually validations to validate.
+    :param always_validation_sequence_set:
+            A collection of sequences of always validations to validate.
+
+    :returns: ValidationProto
+
+    """
+
+    # Proto that stores validation geometry and validation status
+    validation_proto_set = ValidationProtoSet()
+
+    # Validate the eventually validations. Eventually valids
+    for validation_sequence in eventually_validation_sequence_set:
+
+        # We only want to check the first
+        for validation in validation_sequence:
+
+            # Get result
+            status = validation.get_validation_status(vision)
+
+            # Stores the validation result
+            validation_proto = ValidationProto()
+
+            validation_proto.status = status
+            validation_proto.validation_type = validation.get_validation_type()
+            validation_proto.geometry.CopyFrom(
+                validation.get_validation_geometry(vision)
+            )
+            validation_proto.name = type(validation).__name__
+            validation_proto_set.validations.append(validation_proto)
+
+            # If the current validation is pending, we don't care about
+            # the next one. Keep evaluating until this one passes.
+            if status == ValidationStatus.FAILING:
+                break
+
+            # If the validation has passed, continue
+            # this line is not needed, but just added to be explicit
+            if status == ValidationStatus.PASSING:
+                continue
+
+    # Validate the eventually validations. Eventually valids
+    for validation_sequence in always_validation_sequence_set:
+
+        # We only want to check the first
+        for validation in validation_sequence:
+
+            # Get result
+            status = validation.get_validation_status(vision)
+
+            # Stores the validation result
+            validation_proto = ValidationProto()
+
+            validation_proto.status = status
+            validation_proto.validation_type = validation.get_validation_type()
+            validation_proto.geometry.CopyFrom(
+                validation.get_validation_geometry(vision)
+            )
+            validation_proto.name = type(validation).__name__
+            validation_proto_set.validations.append(validation_proto)
+
+    return validation_proto_set
+
+
+def check_always_validation(validation_proto_set):
+    """Check always validations and make sure its always true
+
+    :param validation_proto_set: Validation proto set
+    :raises: AssertionError
+
+    """
+    for validation_proto in validation_proto_set.validations:
+        if validation_proto.validation_type == ValidationType.ALWAYS:
+            if validation_proto.status == ValidationStatus.FAILING:
+                raise AssertionError(validation_proto.name)
+
+
+def check_eventually_validation(validation_proto_set):
+    """Check eventually validations and make sure they are all true
+
+    :param validation_proto_set: Validation proto set
+    :raises: AssertionError
+
+    """
+    for validation_proto in validation_proto_set.validations:
+        if validation_proto.validation_type == ValidationType.EVENTUALLY:
+            if validation_proto.status == ValidationStatus.FAILING:
+                raise AssertionError(validation_proto.name)
 
 
 def create_validation_geometry(geometry=[]) -> ValidationGeometry:
     """Given a list of (vectors, polygons, circles), creates a ValidationGeometry
-    proto containing the protobuf representations
+    proto containing the protobuf representations.
 
     :param geometry: A list of geom
     :returns: ValidationGeometry
@@ -98,46 +287,3 @@ def create_validation_geometry(geometry=[]) -> ValidationGeometry:
         )
 
     return validation_geometry
-
-def run_validation_sequence_sets(
-    vision, eventually_validation_sequence_set, always_validation_sequence_set
-):
-    """Given both eventually and always validation sequence sets, (and vision)
-    run validation and aggregate the results in a validation proto.
-
-    :raises AssertionError: If the test fails
-    :param vision: Vision to validate with
-    :param eventually_validation_sequence_set:
-            A collection of sequences of eventually validations to validate.
-    :param always_validation_sequence_set:
-            A collection of sequences of always validations to validate.
-
-    :returns: ValidationProto, error_msg
-
-    """
-
-    # Proto that stores validation geometry and validation status
-    validation_proto = ValidationProto()
-
-    # Validate
-    for validation_sequence in eventually_validation_sequence_set:
-
-        # We only want to check the first
-        for validation in validation_sequence:
-            status = validation.get_validation_status(vision)
-
-            validation_proto.status.append(status)
-            validation_proto.geometry.append(
-                    validation.get_validation_geometry(vision))
-
-            # If the current validation is pending, we don't care about
-            # the next one. Keep evaluating until this one passes.
-            if status == ValidationStatus.FAILING:
-                break
-
-            # If the validation has passed, continue
-            # this line is not needed, but just added to be explicit
-            if status == ValidationStatus.PASSING:
-                continue
-
-    return validation_proto
