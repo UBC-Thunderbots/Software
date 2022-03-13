@@ -1,5 +1,6 @@
 #pragma once
 
+#include "proto/tactic.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
@@ -11,9 +12,6 @@
 #include "software/geom/ray.h"
 #include "software/logger/logger.h"
 
-// Which way the crease defender should be aligned
-MAKE_ENUM(CreaseDefenderAlignment, LEFT, RIGHT, CENTRE);
-
 struct CreaseDefenderFSM
 {
    public:
@@ -24,9 +22,9 @@ struct CreaseDefenderFSM
         // The origin point of the enemy threat
         Point enemy_threat_origin;
         // The crease defender alignment with respect to the enemy threat
-        CreaseDefenderAlignment crease_defender_alignment;
+        TbotsProto::CreaseDefenderAlignment crease_defender_alignment;
         // The maximum allowed speed mode
-        MaxAllowedSpeedMode max_allowed_speed_mode;
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
     };
 
     // this struct defines the only event that the CreaseDefenderFSM responds to
@@ -44,7 +42,7 @@ struct CreaseDefenderFSM
      */
     static std::optional<Point> findBlockThreatPoint(
         const Field& field, const Point& enemy_threat_origin,
-        const CreaseDefenderAlignment& crease_defender_alignment,
+        const TbotsProto::CreaseDefenderAlignment& crease_defender_alignment,
         double robot_obstacle_inflation_factor);
 
     /**

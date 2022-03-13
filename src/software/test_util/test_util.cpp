@@ -8,9 +8,9 @@
 
 namespace TestUtil
 {
-    World createBlankTestingWorld()
+    World createBlankTestingWorld(std::unique_ptr<TbotsProto::Field> field_proto)
     {
-        Field field        = Field::createSSLDivisionBField();
+        Field field        = Field(*field_proto);
         Team friendly_team = Team(Duration::fromMilliseconds(1000));
         Team enemy_team    = Team(Duration::fromMilliseconds(1000));
         Ball ball          = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
@@ -18,6 +18,21 @@ namespace TestUtil
         World world = World(field, ball, friendly_team, enemy_team);
 
         return world;
+    }
+
+    World createBlankTestingWorld()
+    {
+        return createBlankTestingWorldDivB();
+    }
+
+    World createBlankTestingWorldDivA()
+    {
+        return createBlankTestingWorld(createField(Field::createSSLDivisionAField()));
+    }
+
+    World createBlankTestingWorldDivB()
+    {
+        return createBlankTestingWorld(createField(Field::createSSLDivisionBField()));
     }
 
     Team setRobotPositionsHelper(Team team, const std::vector<Point> &robot_positions,

@@ -15,3 +15,9 @@ message Obstacles
     repeated Polygon polygon = 1;
     repeated Circle circle   = 2;
 }
+
+message NamedValue
+{
+    string name = 1;
+    float value = 2;
+}

@@ -8,8 +8,9 @@
 CreaseDefensePlay::CreaseDefensePlay(std::shared_ptr<const AiConfig> config)
     : Play(config, true),
       fsm{CreaseDefensePlayFSM{config}},
-      control_params{.enemy_threat_origin    = Point(),
-                     .max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT}
+      control_params{
+          .enemy_threat_origin    = Point(),
+          .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT}
 {
 }
 
@@ -23,8 +24,9 @@ void CreaseDefensePlay::getNextTactics(TacticCoroutine::push_type &yield,
     }
 }
 
-void CreaseDefensePlay::updateControlParams(const Point &enemy_threat_origin,
-                                            MaxAllowedSpeedMode max_allowed_speed_mode)
+void CreaseDefensePlay::updateControlParams(
+    const Point &enemy_threat_origin,
+    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
 {
     control_params.enemy_threat_origin    = enemy_threat_origin;
     control_params.max_allowed_speed_mode = max_allowed_speed_mode;

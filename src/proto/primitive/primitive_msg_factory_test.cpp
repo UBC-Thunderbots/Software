@@ -26,10 +26,10 @@ TEST_F(PrimitiveFactoryTest, test_auto_chip_or_kick_equality)
 
 TEST_F(PrimitiveFactoryTest, test_create_move_primitive)
 {
-    auto move_primitive =
-        createMovePrimitive(Point(-5, 1), 3.0, Angle::threeQuarter(),
-                            DribblerMode::INDEFINITE, {AutoChipOrKickMode::OFF, 0},
-                            MaxAllowedSpeedMode::PHYSICAL_LIMIT, 5.0, robot_constants);
+    auto move_primitive = createMovePrimitive(
+        Point(-5, 1), 3.0, Angle::threeQuarter(), TbotsProto::DribblerMode::INDEFINITE,
+        {AutoChipOrKickMode::OFF, 0}, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        5.0, robot_constants);
 
     ASSERT_TRUE(move_primitive->has_move());
     auto destination = move_primitive->move().path().point().at(0);
@@ -48,10 +48,10 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive)
 
 TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autochip)
 {
-    auto move_primitive =
-        createMovePrimitive(Point(-5, 1), 3.0, Angle::threeQuarter(),
-                            DribblerMode::INDEFINITE, {AutoChipOrKickMode::AUTOCHIP, 2.5},
-                            MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
+    auto move_primitive = createMovePrimitive(
+        Point(-5, 1), 3.0, Angle::threeQuarter(), TbotsProto::DribblerMode::INDEFINITE,
+        {AutoChipOrKickMode::AUTOCHIP, 2.5},
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
 
 
     ASSERT_TRUE(move_primitive->has_move());
@@ -72,10 +72,10 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autochip)
 
 TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
 {
-    auto move_primitive =
-        createMovePrimitive(Point(-5, 1), 3.0, Angle::threeQuarter(),
-                            DribblerMode::INDEFINITE, {AutoChipOrKickMode::AUTOKICK, 3.5},
-                            MaxAllowedSpeedMode::STOP_COMMAND, 0.0, robot_constants);
+    auto move_primitive = createMovePrimitive(
+        Point(-5, 1), 3.0, Angle::threeQuarter(), TbotsProto::DribblerMode::INDEFINITE,
+        {AutoChipOrKickMode::AUTOKICK, 3.5},
+        TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND, 0.0, robot_constants);
 
     ASSERT_TRUE(move_primitive->has_move());
     auto destination = move_primitive->move().path().point().at(0);
