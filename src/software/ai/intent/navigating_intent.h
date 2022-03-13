@@ -21,10 +21,12 @@ class NavigatingIntent : public Intent
      * @param robot_constants The robot constants
      * @param max_allowed_speed_mode The mode of maximum speed allowed
      */
-    explicit NavigatingIntent(
-        unsigned int robot_id, Point destination, double final_speed,
-        BallCollisionType ball_collision_type, const RobotConstants_t& robot_constants,
-        MaxAllowedSpeedMode max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+    explicit NavigatingIntent(unsigned int robot_id, Point destination,
+                              double final_speed,
+                              TbotsProto::BallCollisionType ball_collision_type,
+                              const RobotConstants_t& robot_constants,
+                              TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+                                  TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     NavigatingIntent() = delete;
 
@@ -54,14 +56,14 @@ class NavigatingIntent : public Intent
      *
      * @return the maximum allowed speed mode
      */
-    MaxAllowedSpeedMode getMaxAllowedSpeedMode() const;
+    TbotsProto::MaxAllowedSpeedMode getMaxAllowedSpeedMode() const;
 
     /**
      * Gets the ball collision type
      *
      * @return The ball collision type
      */
-    const BallCollisionType& getBallCollisionType() const;
+    const TbotsProto::BallCollisionType& getBallCollisionType() const;
 
     /**
      * Returns the robot constants for this robot state
@@ -92,7 +94,7 @@ class NavigatingIntent : public Intent
    private:
     Point destination;
     double final_speed;
-    BallCollisionType ball_collision_type;
+    TbotsProto::BallCollisionType ball_collision_type;
     RobotConstants_t robot_constants;
-    MaxAllowedSpeedMode max_allowed_speed_mode;
+    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
 };

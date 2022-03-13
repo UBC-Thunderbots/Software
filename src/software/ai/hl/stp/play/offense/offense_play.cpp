@@ -44,8 +44,9 @@ void OffensePlay::updateTactics(const PlayUpdate &play_update)
                        }
                    }));
 
-    crease_defense_play->updateControlParams(play_update.world.ball().position(),
-                                             MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+    crease_defense_play->updateControlParams(
+        play_update.world.ball().position(),
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     crease_defense_play->updateTactics(
         PlayUpdate(play_update.world, num_defenders,

@@ -63,18 +63,18 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield,
             if (enemy_threats.at(3).robot.position().y() > 0)
             {
                 crease_defender_tactic->updateControlParams(
-                    world.ball().position(), CreaseDefenderAlignment::LEFT);
+                    world.ball().position(), TbotsProto::CreaseDefenderAlignment::LEFT);
             }
             else
             {
                 crease_defender_tactic->updateControlParams(
-                    world.ball().position(), CreaseDefenderAlignment::RIGHT);
+                    world.ball().position(), TbotsProto::CreaseDefenderAlignment::RIGHT);
             }
         }
         else
         {
-            crease_defender_tactic->updateControlParams(world.ball().position(),
-                                                        CreaseDefenderAlignment::CENTRE);
+            crease_defender_tactic->updateControlParams(
+                world.ball().position(), TbotsProto::CreaseDefenderAlignment::CENTRE);
         }
 
         tactics_to_run[0].emplace_back(crease_defender_tactic);

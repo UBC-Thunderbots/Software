@@ -4,6 +4,8 @@ package TbotsProto;
 
 import "proto/game_state.proto";
 import "proto/team.proto";
+import "proto/vision.proto";
+import "proto/geometry.proto";
 import "proto/ball.proto";
 import "proto/tbots_timestamp_msg.proto";
 
@@ -27,4 +29,53 @@ message World
     required Team enemy_team      = 4;
     required Ball ball            = 5;
     required GameState game_state = 6;
+}
+
+enum FieldType
+{
+    DIV_A = 0;
+    DIV_B = 1;
+}
+
+message Pass
+{
+    // The location of the passer
+    required Point passer_point = 1;
+
+    // The location of the receiver
+    required Point receiver_point = 2;
+
+    // The speed of the pass in meters/second
+    required double pass_speed_m_per_s = 3;
+}
+
+message EnemyThreat
+{
+    // The enemy robot
+    required Robot robot = 1;
+
+    // Whether or not this robot has possession of the ball
+    required bool has_ball = 2;
+
+    // How much of the goal the enemy robot can see
+    // This does not account for obstacles
+    // For example, robots in the corner would have a very small angle
+    // while robots directly in front of the net would have a large angle
+    required Angle goal_angle = 3;
+
+    // The largest angle the robot has to shoot on the friendly net, taking obstacles
+    // into account
+    optional Angle best_shot_angle = 4;
+
+    // The target the robot would shoot at
+    optional Point best_shot_target = 5;
+
+    // How many passes it would take for this robot to get the ball
+    // 0 - The robot already has the ball
+    // 1 - The robot needs 1 pass to get the ball
+    // 2 - ...etc
+    required int32 num_passes_to_get_possession = 6;
+
+    // The robot that would pass to this robot if necessary
+    optional Robot passer = 7;
 }

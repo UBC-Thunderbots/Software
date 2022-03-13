@@ -87,7 +87,7 @@ TEST(GoalieFSMTest, test_transitions)
 
     FSM<GoalieFSM> fsm(DribbleFSM(),
                        GoalieFSM(std::make_shared<const GoalieTacticConfig>(),
-                                 MaxAllowedSpeedMode::PHYSICAL_LIMIT));
+                                 TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT));
 
     // goalie starts in PositionToBlockState
     EXPECT_TRUE(fsm.is(boost::sml::state<GoalieFSM::PositionToBlockState>));
