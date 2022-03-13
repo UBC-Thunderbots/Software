@@ -4,6 +4,7 @@
 
 #include <chrono>
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "proto/robot_log_msg.nanopb.h"
 #include "shared/constants.h"
 #include "software/geom/algorithms/almost_equal.h"
@@ -34,6 +35,39 @@ namespace TestUtil
      * with no velocity.
      */
     World createBlankTestingWorld();
+
+    /**
+     * Creates a blank testing World given a Field.
+     *
+     * @param field_proto field to use when creating a field
+     *
+     * @return   a World object initialized with the given field, empty teams with 1000
+     * millisecond expiry buffers, and the Ball at the centre of the field with no
+     * velocity.
+     */
+    World createBlankTestingWorld(TbotsProto::Field field_proto);
+
+    /**
+     * Creates a World object with a normal SSL Division A field, default (empty)
+     * teams with 1000 milliseconds expiry buffers, and the Ball at the center of the
+     * field with no velocity.
+     *
+     * @return a World object initialized with a Division B SSL field, empty teams
+     * with 1000 millisecond expiry buffers, and the Ball at the center of the field
+     * with no velocity.
+     */
+    World createBlankTestingWorldDivA();
+
+    /**
+     * Creates a World object with a normal SSL Division B field, default (empty)
+     * teams with 1000 milliseconds expiry buffers, and the Ball at the center of the
+     * field with no velocity.
+     *
+     * @return a World object initialized with a Division B SSL field, empty teams
+     * with 1000 millisecond expiry buffers, and the Ball at the center of the field
+     * with no velocity.
+     */
+    World createBlankTestingWorldDivB();
 
     /**
      * Returns a new World object with friendly robots in the positions specified

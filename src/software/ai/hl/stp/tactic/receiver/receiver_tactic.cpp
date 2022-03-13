@@ -19,7 +19,7 @@ ReceiverTactic::ReceiverTactic()
     }
 }
 
-void ReceiverTactic::updateControlParams(const Pass& updated_pass,
+void ReceiverTactic::updateControlParams(std::optional<Pass> updated_pass,
                                          bool disable_one_touch_shot)
 {
     // Update the control parameters stored by this Tactic

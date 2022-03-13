@@ -22,8 +22,8 @@ class ShadowEnemyTacticTest : public SimulatedErForceSimTacticTestFixture
     }
 
    protected:
-    FieldType field_type = FieldType::DIV_B;
-    Field field          = Field::createField(field_type);
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
 };
 
 TEST_F(ShadowEnemyTacticTest, test_block_pass)

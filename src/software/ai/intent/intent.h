@@ -3,6 +3,7 @@
 #include <set>
 #include <string>
 
+#include "proto/primitive.pb.h"
 #include "proto/primitive/primitive_types.h"
 #include "software/ai/intent/intent_visitor.h"
 #include "software/ai/motion_constraint/motion_constraint.h"

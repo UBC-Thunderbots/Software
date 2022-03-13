@@ -32,6 +32,7 @@ void SimulatedTestFixture::SetUp()
         friendly_mutable_thunderbots_config);
     enemy_thunderbots_config = std::const_pointer_cast<const ThunderbotsConfig>(
         enemy_mutable_thunderbots_config);
+
     friendly_mutable_thunderbots_config->getMutableAiControlConfig()
         ->getMutableRunAi()
         ->setValue(!TbotsGtestMain::stop_ai_on_start);
@@ -104,6 +105,7 @@ void SimulatedTestFixture::SetUp()
     friendly_sensor_fusion =
         SensorFusion(friendly_thunderbots_config->getSensorFusionConfig());
     enemy_sensor_fusion = SensorFusion(enemy_thunderbots_config->getSensorFusionConfig());
+
     if (TbotsGtestMain::enable_visualizer)
     {
         enableVisualizer();

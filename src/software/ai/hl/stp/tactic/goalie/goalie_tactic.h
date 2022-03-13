@@ -23,9 +23,9 @@ class GoalieTactic : public Tactic
      * @param goalie_tactic_config The config to fetch parameters from
      * @param max_allowed_speed_mode The maximum allowed speed mode
      */
-    explicit GoalieTactic(
-        std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config,
-        MaxAllowedSpeedMode max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+    explicit GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config,
+                          TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+                              TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     GoalieTactic() = delete;
 

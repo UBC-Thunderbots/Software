@@ -40,7 +40,7 @@ struct GoalieFSM
      * @param max_allowed_speed_mode The maximum allowed speed mode
      */
     explicit GoalieFSM(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config,
-                       MaxAllowedSpeedMode max_allowed_speed_mode)
+                       TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode)
         : goalie_tactic_config(goalie_tactic_config),
           max_allowed_speed_mode(max_allowed_speed_mode)
     {
@@ -213,5 +213,5 @@ struct GoalieFSM
     // the goalie tactic config
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
     // The maximum allowed speed mode
-    MaxAllowedSpeedMode max_allowed_speed_mode;
+    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
 };

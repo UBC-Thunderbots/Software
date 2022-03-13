@@ -47,9 +47,10 @@ class CreaseDefenderTactic : public Tactic
      * @param alignment The alignment for this crease defender
      * @param max_allowed_speed_mode The mode of maximum speed allowed
      */
-    void updateControlParams(
-        const Point &enemy_threat_origin, const CreaseDefenderAlignment &alignment,
-        MaxAllowedSpeedMode max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+    void updateControlParams(const Point &enemy_threat_origin,
+                             const TbotsProto::CreaseDefenderAlignment &alignment,
+                             TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+                                 TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

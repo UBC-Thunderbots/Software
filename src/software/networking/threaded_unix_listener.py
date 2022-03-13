@@ -2,21 +2,22 @@ import socketserver
 import time
 import base64
 import os
-from google.protobuf import text_format
 from google.protobuf.any_pb2 import Any
 from threading import Thread
+import proto
 import queue
+import glob
+import importlib
+import inspect
+import os
 
 
 class ThreadedUnixListener:
-    def __init__(
-        self, unix_path, proto_class, max_buffer_size=3, convert_from_any=True
-    ):
+    def __init__(self, unix_path, max_buffer_size=3, convert_from_any=True):
 
         """Receive protobuf over unix sockets and buffers them
 
         :param unix_path: The unix path to receive the new protobuf to plot
-        :param proto_class: The type of protobuf we expect to receive
         :param max_buffer_size: The size of the buffer
         :param convert_from_any: Convert from any
 
@@ -29,8 +30,7 @@ class ThreadedUnixListener:
             pass
 
         self.server = socketserver.UnixDatagramServer(
-            unix_path,
-            handler_factory(proto_class, self.__buffer_protobuf, convert_from_any),
+            unix_path, handler_factory(self.__buffer_protobuf, convert_from_any)
         )
         self.stop = False
 
@@ -88,9 +88,8 @@ class ThreadedUnixListener:
 
 
 class Session(socketserver.BaseRequestHandler):
-    def __init__(self, proto_type, handle_callback, convert_from_any, *args, **keys):
+    def __init__(self, handle_callback, convert_from_any, *args, **keys):
         self.handle_callback = handle_callback
-        self.proto_type = proto_type
         self.convert_from_any = convert_from_any
         super().__init__(*args, **keys)
 
@@ -101,30 +100,54 @@ class Session(socketserver.BaseRequestHandler):
         Then, trigger the handle callback
 
         """
-        p = base64.b64decode(self.request[0])
-        msg = self.proto_type()
+        p = self.request[0]
+        type_name = str(p.split(b"!!!")[0], "utf-8")
+        proto_type = self.find_proto_class(type_name.split(".")[1])
+        msg = proto_type()
+        p = base64.b64decode(p.split(b"!!!")[1])
 
         if self.convert_from_any:
             any_msg = Any.FromString(p)
             any_msg.Unpack(msg)
         else:
-            msg = self.proto_type.FromString(p)
+            msg = proto_type.FromString(p)
 
         self.handle_callback(msg)
 
+    def find_proto_class(self, proto_class_name):
+        """Search through all protobufs and return class of proto_type
 
-def handler_factory(proto_type, handle_callback, convert_from_any):
+        :param proto_class_name: String of the proto class name to search for
+
+        """
+        proto_path = os.path.dirname(proto.__file__)
+
+        for file in glob.glob(proto_path + "**/*.py"):
+            name = os.path.splitext(os.path.basename(file))[0]
+
+            # Ignore __ files
+            if name.startswith("__"):
+                continue
+            module = importlib.import_module("proto." + name)
+
+            for member in dir(module):
+                handler_class = getattr(module, member)
+                if handler_class and inspect.isclass(handler_class):
+                    if str(member) == proto_class_name:
+                        return handler_class
+
+
+def handler_factory(handle_callback, convert_from_any):
     """To pass in an arbitrary handle callback into the SocketServer,
     we need to create a constructor that can create a Session object with
     appropriate handle function.
 
-    :param proto_type: The type of protobuf to handle
     :param handle_callback: The callback to run
     :param convert_from_any: If true, the message needs to be decoded
                              into Any before into the proto_type
     """
 
     def create_handler(*args, **keys):
-        return Session(proto_type, handle_callback, convert_from_any, *args, **keys)
+        return Session(handle_callback, convert_from_any, *args, **keys)
 
     return create_handler

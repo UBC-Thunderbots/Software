@@ -58,7 +58,7 @@ class Play
      *
      * @return the vector of intents to execute
      */
-    std::vector<std::unique_ptr<Intent>> get(
+    virtual std::vector<std::unique_ptr<Intent>> get(
         RobotToTacticAssignmentFunction robot_to_tactic_assignment_algorithm,
         MotionConstraintBuildFunction motion_constraint_builder, const World& new_world);
 
