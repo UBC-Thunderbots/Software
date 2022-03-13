@@ -29,7 +29,7 @@ class g3logWidget(pg_console.ConsoleWidget):
 
         # Creates checkbox widget
         self.checkboxWidget = g3logCheckboxes()
-        
+
         self.log_buffer = queue.Queue(buffer_size)
 
     def refresh(self):
