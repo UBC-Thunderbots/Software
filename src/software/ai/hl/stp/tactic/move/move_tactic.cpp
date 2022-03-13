@@ -6,14 +6,15 @@ MoveTactic::MoveTactic()
     : Tactic({RobotCapability::Move}),
       fsm(),
       fsm_map(),
-      control_params{.destination            = Point(),
-                     .final_orientation      = Angle::zero(),
-                     .final_speed            = 0.0,
+      control_params{
+          .destination            = Point(),
+          .final_orientation      = Angle::zero(),
+          .final_speed            = 0.0,
           .dribbler_mode          = TbotsProto::DribblerMode::OFF,
           .ball_collision_type    = TbotsProto::BallCollisionType::AVOID,
-                     .auto_chip_or_kick      = {AutoChipOrKickMode::OFF, 0},
+          .auto_chip_or_kick      = {AutoChipOrKickMode::OFF, 0},
           .max_allowed_speed_mode = TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-                     .target_spin_rev_per_s  = 0.0}
+          .target_spin_rev_per_s  = 0.0}
 {
     for (RobotId id = 0; id < MAX_ROBOT_IDS; id++)
     {

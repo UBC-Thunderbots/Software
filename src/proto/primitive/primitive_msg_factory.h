@@ -25,16 +25,18 @@
  * @return Pointer to Move Primitive Message
  */
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
-    const Point &dest, double final_speed_m_per_s, const Angle &final_angle,
+    const Point& dest, double final_speed_m_per_s, const Angle& final_angle,
     TbotsProto::DribblerMode dribbler_mode, AutoChipOrKick auto_chip_or_kick,
     TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode, double target_spin_rev_per_s,
     RobotConstants_t robot_constants);
 
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const Point& destination, const Angle& final_angle, double final_speed,
-    const TbotsProto::DribblerMode& dribbler_mode, const BallCollisionType& ball_collision_type,
+    const TbotsProto::DribblerMode& dribbler_mode,
+    const TbotsProto::BallCollisionType& ball_collision_type,
     const AutoChipOrKick& auto_chip_or_kick,
-    const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode, double target_spin_rev_per_s,
+    const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
+    double target_spin_rev_per_s,
     // TODO: delete default argument
     const RobotConstants_t& robot_constants, double cost = 1.0);
 

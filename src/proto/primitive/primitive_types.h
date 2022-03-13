@@ -4,8 +4,6 @@
 
 MAKE_ENUM(AutoChipOrKickMode, AUTOKICK, AUTOCHIP, OFF);
 
-MAKE_ENUM(BallCollisionType, AVOID, ALLOW);
-
 struct AutoChipOrKick
 {
     AutoChipOrKickMode auto_chip_kick_mode;

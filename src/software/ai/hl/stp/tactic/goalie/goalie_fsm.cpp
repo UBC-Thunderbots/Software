@@ -203,7 +203,8 @@ void GoalieFSM::panic(const Update &event)
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
 
     event.common.set_primitive(createMovePrimitive(
-        goalie_pos, goalie_orientation, 0.0, DribblerMode::OFF, BallCollisionType::ALLOW,
+        goalie_pos, goalie_orientation, 0.0, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
 }
@@ -248,8 +249,8 @@ void GoalieFSM::positionToBlock(const Update &event)
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
 
     event.common.set_primitive(createMovePrimitive(
-        goalie_pos, goalie_orientation, goalie_final_speed, DribblerMode::OFF,
-        BallCollisionType::ALLOW,
+        goalie_pos, goalie_orientation, goalie_final_speed, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
 }
@@ -269,13 +270,14 @@ void GoalieFSM::moveToGoalLine(const Update &event)
 {
     event.common.set_intent(std::make_unique<MoveIntent>(
         event.common.robot.id(), event.common.world.field().friendlyGoalCenter(),
-        Angle::zero(), 0, DribblerMode::OFF, BallCollisionType::AVOID,
+        Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}, max_allowed_speed_mode, 0.0,
         event.common.robot.robotConstants()));
 
     event.common.set_primitive(createMovePrimitive(
         event.common.world.field().friendlyGoalCenter(), Angle::zero(), 0,
-        DribblerMode::OFF, BallCollisionType::AVOID,
+        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}, max_allowed_speed_mode, 0.0,
         event.common.robot.robotConstants()));
 }

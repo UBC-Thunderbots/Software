@@ -45,7 +45,7 @@ class GoalieTactic : public Tactic
     std::map<RobotId, std::unique_ptr<FSM<GoalieFSM>>> fsm_map;
 
     std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
-    MaxAllowedSpeedMode max_allowed_speed_mode;
+    TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode;
 
     GoalieFSM::ControlParams control_params;
 };
