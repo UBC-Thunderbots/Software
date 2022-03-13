@@ -75,7 +75,7 @@ class SimulatedErForceSimTestFixture : public ::testing::Test
      * will fail.
      */
     void runTest(
-        const FieldType &field_type, const BallState &ball,
+        const TbotsProto::FieldType &field_type, const BallState &ball,
         const std::vector<RobotStateWithId> &friendly_robots,
         const std::vector<RobotStateWithId> &enemy_robots,
         const std::vector<ValidationFunction> &terminating_validation_functions,

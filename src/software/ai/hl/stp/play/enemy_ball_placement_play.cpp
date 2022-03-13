@@ -45,12 +45,12 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         // Create tactic vector (starting with Goalie)
         PriorityTacticVector tactics_to_run = {{}};
 
-        crease_defenders[0]->updateControlParams(placement_point,
-                                                 CreaseDefenderAlignment::LEFT);
-        crease_defenders[1]->updateControlParams(placement_point,
-                                                 CreaseDefenderAlignment::RIGHT);
-        crease_defenders[2]->updateControlParams(placement_point,
-                                                 CreaseDefenderAlignment::CENTRE);
+        crease_defenders[0]->updateControlParams(
+            placement_point, TbotsProto::CreaseDefenderAlignment::LEFT);
+        crease_defenders[1]->updateControlParams(
+            placement_point, TbotsProto::CreaseDefenderAlignment::RIGHT);
+        crease_defenders[2]->updateControlParams(
+            placement_point, TbotsProto::CreaseDefenderAlignment::CENTRE);
 
         tactics_to_run[0].emplace_back(crease_defenders[0]);
         tactics_to_run[0].emplace_back(crease_defenders[1]);

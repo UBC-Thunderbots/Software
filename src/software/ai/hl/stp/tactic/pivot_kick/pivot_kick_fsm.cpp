@@ -16,9 +16,10 @@ void PivotKickFSM::kickBall(const Update& event)
 {
     event.common.set_intent(std::make_unique<MoveIntent>(
         event.common.robot.id(), event.control_params.kick_origin,
-        event.control_params.kick_direction, 0, DribblerMode::OFF,
-        BallCollisionType::ALLOW, event.control_params.auto_chip_or_kick,
-        MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, event.common.robot.robotConstants()));
+        event.control_params.kick_direction, 0, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::ALLOW, event.control_params.auto_chip_or_kick,
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+        event.common.robot.robotConstants()));
 }
 
 bool PivotKickFSM::ballKicked(const Update& event)

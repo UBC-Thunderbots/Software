@@ -33,24 +33,24 @@ ControllerPrimitiveGenerator::createPrimitiveFromControllerInput(
         double kick_speed =
             controller_input_config->getKickSpeedMetersPerSecond()->value();
         auto move_with_kick_primitive = createMovePrimitive(
-            Point(), 0, Angle::zero(), DribblerMode::OFF,
+            Point(), 0, Angle::zero(), TbotsProto::DribblerMode::OFF,
             AutoChipOrKick{
                 AutoChipOrKickMode::AUTOKICK,
                 kick_speed,
             },
-            MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
         return move_with_kick_primitive;
     }
     else if (controller_input.isChipButtonPressed())
     {
         double chip_distance = controller_input_config->getChipDistanceMeters()->value();
         auto move_with_chip_primitive = createMovePrimitive(
-            Point(), 0, Angle::zero(), DribblerMode::OFF,
+            Point(), 0, Angle::zero(), TbotsProto::DribblerMode::OFF,
             AutoChipOrKick{
                 AutoChipOrKickMode::AUTOCHIP,
                 chip_distance,
             },
-            MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
         return move_with_chip_primitive;
     }
     else

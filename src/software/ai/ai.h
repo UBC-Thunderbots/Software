@@ -22,12 +22,11 @@ class AI final
     explicit AI(std::shared_ptr<const AiConfig> ai_config);
 
     /**
-     * Overrides the play constructor so whenever STP creates a new play it calls
-     * constructor
+     * Overrides the play
      *
-     * @param constructor the override constructor
+     * @param play play to override with
      */
-    void overridePlayConstructor(std::optional<PlayConstructor> constructor);
+    void overridePlay(std::unique_ptr<Play> play);
 
     /**
      * Calculates the Primitives that should be run by our Robots given the current
