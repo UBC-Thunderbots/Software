@@ -44,7 +44,8 @@ Agent::VelocityObstacle LinearVelocityAgent::createVelocityObstacle(
         // This Agent is not colliding with other agent
         velocityObstacle.apex_ = velocity_;
 
-        const float angle = (position_ - other_agent.getPosition()).orientation().toRadians();
+        const float angle =
+            (position_ - other_agent.getPosition()).orientation().toRadians();
 
         // opening angle = arcsin((rad_A + rad_B) / distance)
         const float openingAngle =
