@@ -74,8 +74,8 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
         std::pow(radius_ + other_agent.getRadius(), 2))
     {
         // This Agent is not colliding with other agent
-        const float angle = atan2((position_ - other_agent.getPosition()).y(),
-                                  (position_ - other_agent.getPosition()).x());
+        const float angle =
+            (position_ - other_agent.getPosition()).orientation().toRadians();
 
         // The opening angle of the velocity obstacle
         // opening angle = arcsin((rad_A + rad_B) / distance_BA)
