@@ -71,7 +71,7 @@ if __name__ == "__main__":
     log_dock = Dock("logs", size=(500, 100))
     log_dock.addWidget(logs)
 
-    playInfo_dock = Dock("playInfo", size = (500,100))
+    playInfo_dock = Dock("playInfo", size=(500, 100))
     playInfo_dock.addWidget(playInfo)
     proto_receiver.register_observer(PlayInfo, playInfo.log_buffer)
     # Setup Arbitrary Plot Widget
