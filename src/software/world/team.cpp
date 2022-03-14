@@ -116,7 +116,15 @@ void Team::removeRobotWithId(unsigned int robot_id)
 
 void Team::assignGoalie(unsigned int new_goalie_id)
 {
-    goalie_id = new_goalie_id;
+    if (getRobotById(new_goalie_id))
+    {
+        goalie_id = new_goalie_id;
+    }
+    else
+    {
+        LOG(WARNING) << "Warning: Tried to assign the goalie (id " << new_goalie_id
+                     << ") to a robot that is not a member of the team" << std::endl;
+    }
 }
 
 void Team::clearGoalie()
