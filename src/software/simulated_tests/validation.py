@@ -164,17 +164,18 @@ def run_validation_sequence_sets(
     # Proto that stores validation geometry and validation status
     validation_proto_set = ValidationProtoSet()
 
-    def create_validation_proto_helper(status, validation):
-        """Helper function that takes the computed status
-        and validation, and updates the validation_proto_set with
-        a new validation_proto
+    def create_validation_proto_helper(validation):
+        """Helper function that computes the status and creates a
+        validation_proto, and updates it in the validation_proto_set.
 
-        :param status: The result from validation
         :param validation: The validation to put into the proto
 
         """
         # Stores the validation result
         validation_proto = ValidationProto()
+
+        # Get status
+        status = validation.get_validation_status(vision)
 
         # Create validation proto
         validation_proto.status = status
@@ -184,29 +185,31 @@ def run_validation_sequence_sets(
 
         validation_proto_set.validations.append(validation_proto)
 
+        return status
+
     # Validate the eventually validations. Eventually valids
-    for validation_sequence in eventually_validation_sequence_set:
+    for validation_sequence in list(eventually_validation_sequence_set):
         for validation in validation_sequence:
 
             # Add to validation_proto_set and get status
-            status = validation.get_validation_status(vision)
+            status = create_validation_proto_helper(validation)
 
             # If the current validation is pending, we don't care about
             # the next one. Keep evaluating until this one passes.
             if status == ValidationStatus.FAILING:
-                create_validation_proto_helper(status, validation)
                 break
 
             # If the validation has passed, continue
             # this line is not needed, but just added to be explicit
             if status == ValidationStatus.PASSING:
+                validation_sequence.remove(validation)
                 continue
 
     # Validate the always validations. We need to look at all of them
     for validation_sequence in always_validation_sequence_set:
         for validation in validation_sequence:
-            status = validation.get_validation_status(vision)
-            create_validation_proto_helper(status, validation)
+
+            status = create_validation_proto_helper(validation)
 
     return validation_proto_set
 

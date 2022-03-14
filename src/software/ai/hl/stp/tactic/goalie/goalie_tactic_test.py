@@ -23,6 +23,17 @@ from software.simulated_tests.simulated_test_fixture import tactic_runner
 @pytest.mark.parametrize(
     "ball_initial_position,ball_initial_velocity,robot_initial_position",
     [
+        # test panic ball very fast in straight line
+        (geom.Point(0, 0), geom.Vector(-5, 0), geom.Point(-4, -1)),
+        # test panic ball very_fast in diagonal line
+        (
+            geom.Point(0, 0),
+            geom.Vector(-5.5, 0.25),
+            geom.Field().friendlyGoalCenter() + geom.Vector(0, -0.5),
+        ),
+        # test ball very fast misses net
+        (geom.Point(0, 0), geom.Vector(-5, 1), geom.Point(-4.5, 0)),
+        # test slow ball at sharp angle to friendly goal
         # ball slow inside friendly defense area
         (geom.Point(-4, 0.8), geom.Vector(-0.2, 0), geom.Point(0, 0)),
         # ball slow inside friendly defense area
