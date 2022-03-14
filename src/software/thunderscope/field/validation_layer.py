@@ -4,7 +4,7 @@ from proto.geometry_pb2 import Circle, Polygon
 from proto.validation_pb2 import (
     ValidationGeometry,
     ValidationProto,
-    ValidationType, 
+    ValidationType,
     ValidationProtoSet,
     ValidationStatus,
 )
@@ -89,7 +89,11 @@ class ValidationLayer(FieldLayer):
             if validation.status == ValidationStatus.PASSING:
                 if validation.validation_type == ValidationType.EVENTUALLY:
                     self.passed_validation_timeout_pairs.append(
-                        (validation, time.time() + ValidationLayer.PASSED_VALIDATION_PERSISTANCE_TIMEOUT_S)
+                        (
+                            validation,
+                            time.time()
+                            + ValidationLayer.PASSED_VALIDATION_PERSISTANCE_TIMEOUT_S,
+                        )
                     )
 
             self.draw_validation(painter, validation)
