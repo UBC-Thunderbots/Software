@@ -49,10 +49,10 @@ class RobotUi:
     def __init__(self):
 
         # Initialize redis server and our redis dictionary
-        self.r = redis.Redis(host="localhost", port=6379, db=0)
+        self.redis_client = redis.Redis(host="localhost", port=6379, db=0)
         self.redis_dict = {}
         for key in redis_keys:
-            self.redis_dict[key] = float(self.r.get(key).decode("UTF-8"))
+            self.redis_dict[key] = float(self.redis_client.get(key).decode("UTF-8"))
         self.shutdown = False  # This flag will be used to stop polling redis
 
         # Draw Tbots logo on first boot
@@ -80,9 +80,9 @@ class RobotUi:
                 self.lcd_display.show()
             elif status_codes["update redis"] in action:
                 payload = action[status_codes["update redis"]]
-                self.r.set(payload["redis key"], payload["value"])
+                self.redis_client.set(payload["redis key"], payload["value"])
                 self.redis_dict[payload["redis key"]] = payload["value"]
-                # print("Key: {}, Value: {}".format(payload["redis key"], self.r.get(payload["redis key"]).decode("UTF-8")))
+                # print("Key: {}, Value: {}".format(payload["redis key"], self.redis_client.get(payload["redis key"]).decode("UTF-8")))
 
         def on_clockwise_rotate():
             """ Execute the clockwise rotate callback of curr screen """
@@ -103,16 +103,16 @@ class RobotUi:
 
         self.rotary_encoder.start()
 
-    def poll_redis(self):
-        """ Update redis dict every 10 seconds """
+    def poll_redis(self, timeout=1):
+        """ Update redis dict every timeout seconds """
         while not self.shutdown:
             for key in redis_keys:
-                self.redis_dict[key] = float(self.r.get(key).decode("UTF-8"))
+                self.redis_dict[key] = float(self.redis_client.get(key).decode("UTF-8"))
 
             for _, screen in self.screens.items():
                 if _ != "Menu":
                     screen.update_values(self.redis_dict)
-            time.sleep(10)
+            time.sleep(timeout)
 
     def stop(self):
         """ Cleanup the GPIO pins """
@@ -127,10 +127,10 @@ if __name__ == "__main__":
     from threading import Thread
 
     def init_redis():
-        r = redis.Redis(host="localhost", port=6379, db=0)
+        redis_client = redis.Redis(host="localhost", port=6379, db=0)
         redis_dict = {}
         for key in redis_keys:
-            r.set(key, 0)
+            redis_client.set(key, 0)
 
     def start_polling(robot_ui):
         robot_ui.poll_redis()
