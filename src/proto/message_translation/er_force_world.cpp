@@ -17,7 +17,7 @@ Robot createRobot(world::SimRobot sim_robot, Timestamp timestamp)
     const Vector velocity(sim_robot.v_x(), sim_robot.v_y());
 
     const RobotState state(position, velocity, Angle::fromRadians(sim_robot.angle()),
-                          AngularVelocity::fromRadians(sim_robot.r_z()));
+                           AngularVelocity::fromRadians(sim_robot.r_z()));
     const Robot robot(id, state, timestamp);
     return robot;
 }

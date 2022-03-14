@@ -19,7 +19,7 @@ namespace TestUtil
         {
             average = 0;
             maximum = 0;
-            minimum = 200000;
+            minimum = DBL_MAX;
         }
     };
 
