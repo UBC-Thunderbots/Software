@@ -1,8 +1,10 @@
 import pyqtgraph as pg
+import time
 from proto.geometry_pb2 import Circle, Polygon
 from proto.validation_pb2 import (
     ValidationGeometry,
     ValidationProto,
+    ValidationType, 
     ValidationProtoSet,
     ValidationStatus,
 )
@@ -17,6 +19,9 @@ from software.thunderscope.field.field_layer import FieldLayer
 
 
 class ValidationLayer(FieldLayer):
+
+    PASSED_VALIDATION_PERSISTANCE_TIMEOUT_S = 1.0
+
     def __init__(self, buffer_size=10):
         FieldLayer.__init__(self)
 
@@ -28,6 +33,41 @@ class ValidationLayer(FieldLayer):
         )
 
         self.cached_validation_set = ValidationProtoSet()
+        self.passed_validation_timeout_pairs = []
+
+    def draw_validation(self, painter, validation):
+        """Draw Validation
+
+        :param painter: The painter object to draw with
+        :param validation: Validation proto
+
+        """
+        if validation.status == ValidationStatus.PASSING:
+            painter.setPen(pg.mkPen(colors.VALIDATION_PASSED_COLOR, width=3))
+
+        if validation.status == ValidationStatus.FAILING:
+            painter.setPen(pg.mkPen(colors.VALIDATION_FAILED_COLOR, width=3))
+
+        for circle in validation.geometry.circles:
+            painter.drawEllipse(
+                self.createCircle(
+                    constants.MM_PER_M * circle.origin.x_meters,
+                    constants.MM_PER_M * circle.origin.y_meters,
+                    constants.MM_PER_M * circle.radius,
+                )
+            )
+
+        for polygon in validation.geometry.polygons:
+            polygon_points = [
+                QtCore.QPoint(
+                    int(constants.MM_PER_M * point.x_meters),
+                    int(constants.MM_PER_M * point.y_meters),
+                )
+                for point in polygon.points
+            ]
+
+            poly = QtGui.QPolygon(polygon_points)
+            painter.drawPolygon(poly)
 
     def paint(self, painter, option, widget):
         """Paint this layer
@@ -46,29 +86,18 @@ class ValidationLayer(FieldLayer):
         self.cached_validation_set = validation_set
 
         for validation in validation_set.validations:
-
             if validation.status == ValidationStatus.PASSING:
-                painter.setPen(pg.mkPen(colors.VALIDATION_PASSED_COLOR, width=3))
-            if validation.status == ValidationStatus.FAILING:
-                painter.setPen(pg.mkPen(colors.VALIDATION_FAILED_COLOR, width=3))
-
-            for circle in validation.geometry.circles:
-                painter.drawEllipse(
-                    self.createCircle(
-                        constants.MM_PER_M * circle.origin.x_meters,
-                        constants.MM_PER_M * circle.origin.y_meters,
-                        constants.MM_PER_M * circle.radius,
+                if validation.validation_type == ValidationType.EVENTUALLY:
+                    self.passed_validation_timeout_pairs.append(
+                        (validation, time.time() + ValidationLayer.PASSED_VALIDATION_PERSISTANCE_TIMEOUT_S)
                     )
+
+            self.draw_validation(painter, validation)
+
+        for validation, stop_drawing_time in list(self.passed_validation_timeout_pairs):
+            if time.time() < stop_drawing_time:
+                self.draw_validation(painter, validation)
+            else:
+                self.passed_validation_timeout_pairs.remove(
+                    (validation, stop_drawing_time)
                 )
-
-            for polygon in validation.geometry.polygons:
-                polygon_points = [
-                    QtCore.QPoint(
-                        int(constants.MM_PER_M * point.x_meters),
-                        int(constants.MM_PER_M * point.y_meters),
-                    )
-                    for point in polygon.points
-                ]
-
-                poly = QtGui.QPolygon(polygon_points)
-                painter.drawPolygon(poly)
