@@ -29,7 +29,7 @@ message ValidationGeometry
 
 message ValidationProto
 {
-    required string name                    = 1;
+    required string failure_msg             = 1;
     required ValidationType validation_type = 2;
     required ValidationGeometry geometry    = 3;
     required ValidationStatus status        = 4;

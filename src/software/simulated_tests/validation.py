@@ -103,6 +103,8 @@ def createValidationTypes(validation_class):
         (Validation,),
         {
             "__init__": constructor,
+            "__str__": lambda self: "EventuallyTrueValidation: "
+            + self.validation.get_failure_message(),
             "get_validation_status": lambda self, vision: self.validation.get_validation_status(
                 vision
             ),
@@ -118,6 +120,8 @@ def createValidationTypes(validation_class):
         (Validation,),
         {
             "__init__": constructor,
+            "__str__": lambda self: "EventuallyFalseValidation: "
+            + self.validation.get_failure_message(),
             "get_validation_status": lambda self, vision: flip_validation(self, vision),
             "get_validation_type": lambda self: ValidationType.EVENTUALLY,
             "get_validation_geometry": lambda self, vision: self.validation.get_validation_geometry(
@@ -131,6 +135,8 @@ def createValidationTypes(validation_class):
         (Validation,),
         {
             "__init__": constructor,
+            "__str__": lambda self: "AlwaysTrueValidation: "
+            + self.validation.get_failure_message(),
             "get_validation_status": lambda self, vision: self.validation.get_validation_status(
                 vision
             ),
@@ -146,6 +152,8 @@ def createValidationTypes(validation_class):
         (Validation,),
         {
             "__init__": constructor,
+            "__str__": lambda self: "AlwaysFalseValidation: "
+            + self.validation.get_failure_message(),
             "get_validation_status": lambda self, vision: flip_validation(self, vision),
             "get_validation_type": lambda self: ValidationType.ALWAYS,
             "get_validation_geometry": lambda self, vision: self.validation.get_validation_geometry(
@@ -177,25 +185,38 @@ def run_validation_sequence_sets(
     # Proto that stores validation geometry and validation status
     validation_proto_set = ValidationProtoSet()
 
+    def create_validation_proto_helper(validation):
+        """Helper function call get_validation_status and add a
+        validation_proto to validation_proto_set.
+
+        :param validation: The validation to run
+        :return: Return status
+
+        """
+        # Stores the validation result
+        validation_proto = ValidationProto()
+
+        # Get result
+        status = validation.get_validation_status(vision)
+
+        # Create validation proto
+        validation_proto.status = status
+        validation_proto.failure_msg = str(validation) + " failed"
+        validation_proto.validation_type = validation.get_validation_type()
+        validation_proto.geometry.CopyFrom(validation.get_validation_geometry(vision))
+
+        validation_proto_set.validations.append(validation_proto)
+
+        return status
+
     # Validate the eventually validations. Eventually valids
     for validation_sequence in eventually_validation_sequence_set:
 
         # We only want to check the first
         for validation in validation_sequence:
 
-            # Get result
-            status = validation.get_validation_status(vision)
-
-            # Stores the validation result
-            validation_proto = ValidationProto()
-
-            validation_proto.status = status
-            validation_proto.validation_type = validation.get_validation_type()
-            validation_proto.geometry.CopyFrom(
-                validation.get_validation_geometry(vision)
-            )
-            validation_proto.name = type(validation).__name__
-            validation_proto_set.validations.append(validation_proto)
+            # Add to validation_proto_set and get status
+            status = create_validation_proto_helper(validation)
 
             # If the current validation is pending, we don't care about
             # the next one. Keep evaluating until this one passes.
@@ -213,19 +234,8 @@ def run_validation_sequence_sets(
         # We only want to check the first
         for validation in validation_sequence:
 
-            # Get result
-            status = validation.get_validation_status(vision)
-
-            # Stores the validation result
-            validation_proto = ValidationProto()
-
-            validation_proto.status = status
-            validation_proto.validation_type = validation.get_validation_type()
-            validation_proto.geometry.CopyFrom(
-                validation.get_validation_geometry(vision)
-            )
-            validation_proto.name = type(validation).__name__
-            validation_proto_set.validations.append(validation_proto)
+            # Add to validation_proto_set and get status
+            status = create_validation_proto_helper(validation)
 
     return validation_proto_set
 
@@ -240,7 +250,7 @@ def check_always_validation(validation_proto_set):
     for validation_proto in validation_proto_set.validations:
         if validation_proto.validation_type == ValidationType.ALWAYS:
             if validation_proto.status == ValidationStatus.FAILING:
-                raise AssertionError(validation_proto.name)
+                raise AssertionError(validation_proto.failure_msg)
 
 
 def check_eventually_validation(validation_proto_set):
@@ -253,7 +263,7 @@ def check_eventually_validation(validation_proto_set):
     for validation_proto in validation_proto_set.validations:
         if validation_proto.validation_type == ValidationType.EVENTUALLY:
             if validation_proto.status == ValidationStatus.FAILING:
-                raise AssertionError(validation_proto.name)
+                raise AssertionError(validation_proto.failure_msg)
 
 
 def create_validation_geometry(geometry=[]) -> ValidationGeometry:

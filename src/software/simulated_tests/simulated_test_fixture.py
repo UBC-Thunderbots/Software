@@ -118,7 +118,7 @@ class TacticTestRunner(object):
                     # TODO (#2518) we should remove this sleep and use
                     # blocking calls to make this loop run as fast as it
                     # possibly can.
-                    time.sleep(PROCESS_BUFFER_DELAY)
+                    time.sleep(PROCESS_BUFFER_DELAY_S)
 
                 # Send the sensor_proto and get vision
                 self.yellow_full_system.send_sensor_proto(
@@ -168,7 +168,6 @@ class TacticTestRunner(object):
 
             """
 
-            logger.critical("Exception triggered in {}".format(args.thread))
             __stopper(delay=PAUSE_AFTER_FAIL_DELAY_S)
             self.last_exception = args.exc_value
 

@@ -82,7 +82,13 @@ PYBIND11_MODULE(geometry, m)
         });
 
     py::class_<ConvexPolygon, Polygon>(m, "ConvexPolygon");
-    py::class_<Rectangle, ConvexPolygon>(m, "Rectangle").def(py::init<Point, Point>());
+    py::class_<Rectangle, ConvexPolygon>(m, "Rectangle")
+        .def(py::init<Point, Point>())
+        .def("__repr__", [](const Rectangle& v) {
+            std::stringstream stream;
+            stream << v;
+            return stream.str();
+        });
 
     py::class_<Segment>(m, "Segment")
         .def(py::init<Point, Point>())
