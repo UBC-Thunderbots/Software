@@ -171,6 +171,7 @@ py_library(
 py_library(
     name = "validation",
     srcs = [
+        "ball_enters_region.py",
         "robot_enters_region.py",
         "validation.py",
     ],

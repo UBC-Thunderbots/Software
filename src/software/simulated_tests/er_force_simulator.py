@@ -75,7 +75,7 @@ class ErForceSimulator(object):
             robot_map[robot_id].CopyFrom(
                 RobotState(
                     global_position=Point(
-                        x_meters=robot_location[0], y_meters=robot_location[1]
+                        x_meters=robot_location.x(), y_meters=robot_location.y()
                     ),
                     global_orientation=Angle(radians=0),
                     global_velocity=Vector(x_component_meters=0, y_component_meters=0),
