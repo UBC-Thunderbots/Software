@@ -18,9 +18,7 @@ from software.constants import SECONDS_TO_MS
 from pyqtgraph.Qt import QtCore, QtGui
 
 from software.networking.threaded_unix_sender import ThreadedUnixSender
-from software.simulated_tests.eventually_validation.robot_enters_region import (
-    RobotEntersRegion,
-)
+from software.simulated_tests.robot_enters_region import RobotEntersRegion
 
 from software.simulated_tests import validation
 from software.simulated_tests.full_system import FullSystem
@@ -50,6 +48,13 @@ class TacticTestRunner(object):
         :param runtime_dir: Directory to open sockets, store logs and any output files
 
         """
+
+        # Setup runtime directory
+        try:
+            os.mkdir(runtime_dir)
+        except:
+            pass
+
         self.enable_thunderscope = enable_thunderscope
 
         if self.enable_thunderscope:

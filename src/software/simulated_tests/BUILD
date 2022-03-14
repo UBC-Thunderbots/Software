@@ -128,7 +128,7 @@ py_library(
         "//software/logger:py_logger",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
-        "//software/simulated_tests/eventually_validation",
+        "//software/simulated_tests:validation",
         "//software/thunderscope",
     ],
 )
@@ -171,6 +171,7 @@ py_library(
 py_library(
     name = "validation",
     srcs = [
+        "robot_enters_region.py",
         "validation.py",
     ],
     data = [

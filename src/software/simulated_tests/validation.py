@@ -15,30 +15,11 @@ class Validation(object):
 
     """A validation function"""
 
-    def get_validation_status(self, vision) -> ValidationStatus:
-        raise NotImplementedError("get_validation_status is not implemented")
-
     def get_validation_type(self, vision) -> ValidationType:
         raise NotImplementedError("get_validation_type is not implemented")
 
     def get_validation_geometry(self, vision) -> ValidationGeometry:
         raise NotImplementedError("get_validation_geometry is not implemented")
-
-
-class EventuallyTrueValidation(Validation):
-    pass
-
-
-class EventuallyFalseValidation(Validation):
-    pass
-
-
-class AlwaysTrueValidation(Validation):
-    pass
-
-
-class AlwaysFalseValidation(Validation):
-    pass
 
 
 def createValidationTypes(validation_class):
@@ -103,12 +84,12 @@ def createValidationTypes(validation_class):
         (Validation,),
         {
             "__init__": constructor,
-            "__str__": lambda self: "EventuallyTrueValidation: "
-            + self.validation.get_failure_message(),
+            "__repr__": lambda self: "EventuallyTrueValidation: "
+            + repr(self.validation_class),
+            "get_validation_type": lambda self: ValidationType.EVENTUALLY,
             "get_validation_status": lambda self, vision: self.validation.get_validation_status(
                 vision
             ),
-            "get_validation_type": lambda self: ValidationType.EVENTUALLY,
             "get_validation_geometry": lambda self, vision: self.validation.get_validation_geometry(
                 vision
             ),
@@ -120,10 +101,10 @@ def createValidationTypes(validation_class):
         (Validation,),
         {
             "__init__": constructor,
-            "__str__": lambda self: "EventuallyFalseValidation: "
-            + self.validation.get_failure_message(),
-            "get_validation_status": lambda self, vision: flip_validation(self, vision),
+            "__repr__": lambda self: "EventuallyFalseValidation: "
+            + repr(self.validation),
             "get_validation_type": lambda self: ValidationType.EVENTUALLY,
+            "get_validation_status": lambda self, vision: flip_validation(self, vision),
             "get_validation_geometry": lambda self, vision: self.validation.get_validation_geometry(
                 vision
             ),
@@ -135,12 +116,11 @@ def createValidationTypes(validation_class):
         (Validation,),
         {
             "__init__": constructor,
-            "__str__": lambda self: "AlwaysTrueValidation: "
-            + self.validation.get_failure_message(),
+            "__repr__": lambda self: "AlwaysTrueValidation: " + repr(self.validation),
+            "get_validation_type": lambda self: ValidationType.ALWAYS,
             "get_validation_status": lambda self, vision: self.validation.get_validation_status(
                 vision
             ),
-            "get_validation_type": lambda self: ValidationType.ALWAYS,
             "get_validation_geometry": lambda self, vision: self.validation.get_validation_geometry(
                 vision
             ),
@@ -152,10 +132,9 @@ def createValidationTypes(validation_class):
         (Validation,),
         {
             "__init__": constructor,
-            "__str__": lambda self: "AlwaysFalseValidation: "
-            + self.validation.get_failure_message(),
-            "get_validation_status": lambda self, vision: flip_validation(self, vision),
+            "__repr__": lambda self: "AlwaysFalseValidation: " + repr(self.validation),
             "get_validation_type": lambda self: ValidationType.ALWAYS,
+            "get_validation_status": lambda self, vision: flip_validation(self, vision),
             "get_validation_geometry": lambda self, vision: self.validation.get_validation_geometry(
                 vision
             ),
@@ -211,8 +190,6 @@ def run_validation_sequence_sets(
 
     # Validate the eventually validations. Eventually valids
     for validation_sequence in eventually_validation_sequence_set:
-
-        # We only want to check the first
         for validation in validation_sequence:
 
             # Add to validation_proto_set and get status
@@ -228,14 +205,11 @@ def run_validation_sequence_sets(
             if status == ValidationStatus.PASSING:
                 continue
 
-    # Validate the eventually validations. Eventually valids
+    # Validate the always validations. We need to look at all of them
     for validation_sequence in always_validation_sequence_set:
-
-        # We only want to check the first
         for validation in validation_sequence:
 
-            # Add to validation_proto_set and get status
-            status = create_validation_proto_helper(validation)
+            create_validation_proto_helper(validation)
 
     return validation_proto_set
 

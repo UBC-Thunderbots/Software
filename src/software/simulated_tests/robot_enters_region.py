@@ -46,10 +46,8 @@ class RobotEntersRegion(Validation):
         """
         return create_validation_geometry(self.regions)
 
-    def get_failure_message(self):
-        return "Robot did not enter any of these regions " + ",".join(
-            repr(region) for region in self.regions
-        )
+    def __repr__(self):
+        return "Checking regions " + ",".join(repr(region) for region in self.regions)
 
 
 (

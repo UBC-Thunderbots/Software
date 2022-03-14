@@ -24,7 +24,7 @@ class ValidationLayer(FieldLayer):
         self.validation_set_receiver = ThreadedUnixListener(
             constants.UNIX_SOCKET_BASE_PATH + "validation",
             ValidationProtoSet,
-            max_buffer_size=1,
+            max_buffer_size=buffer_size,
         )
 
         self.cached_validation_set = ValidationProtoSet()
