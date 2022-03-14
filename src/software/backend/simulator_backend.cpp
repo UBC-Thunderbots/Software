@@ -45,12 +45,24 @@ void SimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
     {
         defending_side_output->sendProto(*createDefendingSide(FieldSide::NEG_X));
     }
+    // TODO (#2510) Find a new home once SimulatorBackend and ThreadedFullSystemGUI are
+    // gone
+    LOG(VISUALIZE) << *createNamedValue(
+        "Primitive Hz",
+        static_cast<float>(FirstInFirstOutThreadedObserver<
+                           TbotsProto::PrimitiveSet>::getDataReceivedPerSecond()));
 }
 
 void SimulatorBackend::onValueReceived(World world)
 {
     vision_output->sendProto(*createVision(world));
     LOG(VISUALIZE) << *createWorld(world);
+    // TODO (#2510) Find a new home once SimulatorBackend and ThreadedFullSystemGUI are
+    // gone
+    LOG(VISUALIZE) << *createNamedValue(
+        "World Hz",
+        static_cast<float>(
+            FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
 }
 
 void SimulatorBackend::receiveRobotLogs(TbotsProto::RobotLog log)

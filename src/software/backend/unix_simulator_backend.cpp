@@ -68,8 +68,8 @@ void UnixSimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
     // gone
     LOG(VISUALIZE) << *createNamedValue(
         "Primitive Hz",
-        static_cast<float>(
-            FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
+        static_cast<float>(FirstInFirstOutThreadedObserver<
+                           TbotsProto::PrimitiveSet>::getDataReceivedPerSecond()));
 }
 
 void UnixSimulatorBackend::onValueReceived(World world)

@@ -15,17 +15,23 @@ class Validation(object):
 
     """A validation function"""
 
+    def get_validation_status(self, vision) -> ValidationStatus:
+        raise NotImplementedError("get_validation_status is not implemented")
+
     def get_validation_type(self, vision) -> ValidationType:
         raise NotImplementedError("get_validation_type is not implemented")
 
     def get_validation_geometry(self, vision) -> ValidationGeometry:
         raise NotImplementedError("get_validation_geometry is not implemented")
 
+    def __repr__(self):
+        return "String representation of validation not implemented"
+
 
 def createValidationTypes(validation_class):
     """Given a Validation implementation that returns ValidationStatus.PASSING
     when true and ValidationStatus.FAILING when false, create the 4 validation
-    types with different visualization/passing/failing properties.
+    types with different visualization/passing/failing properties (described below)
      
                               ┌───────────────────────┐      ┌─────────────────┐
                               │                       │──────► EventuallyTrue  │
@@ -43,8 +49,7 @@ def createValidationTypes(validation_class):
                               │                       ├──────►   AlwaysFalse   │
                               └───────────────────────┘      └─────────────────┘
 
-    EventuallyTrue: Has to be true before the end of the test. A series of these
-                    validations
+    EventuallyTrue: Has to be true before the end of the test.
     EventuallyFalse: Has to be false before the end of the test. Inverts the
                      validation so passing becomes failing (and vice versa)
     AlwaysTrue: Has to be true for the duration of the test.
@@ -60,7 +65,7 @@ def createValidationTypes(validation_class):
     """
 
     def constructor(self, *args, **kwargs):
-        """The validations will be composed of the input validation type
+        """The 4 validation outputs will be composed of the input validation
 
         :param args/kwargs: Pass through to the validation_class
 
@@ -79,18 +84,26 @@ def createValidationTypes(validation_class):
             ValidationStatus.PASSING: ValidationStatus.FAILING,
         }[self.validation.get_validation_status(vision)]
 
+    # Generate the types: specifically, all Eventually validations will return
+    # EVENTUALLY when get_validation_type is called, and all Always validations
+    # will return ALWAYS. get_validation_status is inverted for the _False types.
+    # We simply pass the validation_geometry from the validation object through.
+    common = {
+        "__init__": constructor,
+        "get_validation_geometry": lambda self, vision: self.validation.get_validation_geometry(
+            vision
+        ),
+    }
+
     eventually_true = type(
         "EventuallyTrueValidation",
         (Validation,),
         {
-            "__init__": constructor,
+            **common,
             "__repr__": lambda self: "EventuallyTrueValidation: "
             + repr(self.validation),
             "get_validation_type": lambda self: ValidationType.EVENTUALLY,
             "get_validation_status": lambda self, vision: self.validation.get_validation_status(
-                vision
-            ),
-            "get_validation_geometry": lambda self, vision: self.validation.get_validation_geometry(
                 vision
             ),
         },
@@ -100,14 +113,11 @@ def createValidationTypes(validation_class):
         "EventuallyFalseValidation",
         (Validation,),
         {
-            "__init__": constructor,
+            **common,
             "__repr__": lambda self: "EventuallyFalseValidation: "
             + repr(self.validation),
             "get_validation_type": lambda self: ValidationType.EVENTUALLY,
             "get_validation_status": lambda self, vision: flip_validation(self, vision),
-            "get_validation_geometry": lambda self, vision: self.validation.get_validation_geometry(
-                vision
-            ),
         },
     )
 
@@ -115,13 +125,10 @@ def createValidationTypes(validation_class):
         "AlwaysTrueValidation",
         (Validation,),
         {
-            "__init__": constructor,
+            **common,
             "__repr__": lambda self: "AlwaysTrueValidation: " + repr(self.validation),
             "get_validation_type": lambda self: ValidationType.ALWAYS,
             "get_validation_status": lambda self, vision: self.validation.get_validation_status(
-                vision
-            ),
-            "get_validation_geometry": lambda self, vision: self.validation.get_validation_geometry(
                 vision
             ),
         },
@@ -131,13 +138,10 @@ def createValidationTypes(validation_class):
         "AlwaysFalseValidation",
         (Validation,),
         {
-            "__init__": constructor,
+            **common,
             "__repr__": lambda self: "AlwaysFalseValidation: " + repr(self.validation),
             "get_validation_type": lambda self: ValidationType.ALWAYS,
             "get_validation_status": lambda self, vision: flip_validation(self, vision),
-            "get_validation_geometry": lambda self, vision: self.validation.get_validation_geometry(
-                vision
-            ),
         },
     )
 
@@ -148,7 +152,7 @@ def run_validation_sequence_sets(
     vision, eventually_validation_sequence_set, always_validation_sequence_set
 ):
     """Given both eventually and always validation sequence sets, (and vision)
-    run validation and aggregate the results in a validation proto.
+    run validation and aggregate the results in a validation proto set.
 
     :raises AssertionError: If the test fails
     :param vision: Vision to validate with
@@ -157,11 +161,12 @@ def run_validation_sequence_sets(
     :param always_validation_sequence_set:
             A collection of sequences of always validations to validate.
 
-    :returns: ValidationProto
+    :returns: ValidationProtoSet
 
     """
 
-    # Proto that stores validation geometry and validation status
+    # Proto that stores validation geometry and validation status of
+    # all validations passed in
     validation_proto_set = ValidationProtoSet()
 
     def create_validation_proto_helper(validation):
@@ -199,8 +204,7 @@ def run_validation_sequence_sets(
             if status == ValidationStatus.FAILING:
                 break
 
-            # If the validation has passed, continue
-            # this line is not needed, but just added to be explicit
+            # If the validation has passed, remove it from the set.
             if status == ValidationStatus.PASSING:
                 validation_sequence.remove(validation)
                 continue
@@ -208,8 +212,7 @@ def run_validation_sequence_sets(
     # Validate the always validations. We need to look at all of them
     for validation_sequence in always_validation_sequence_set:
         for validation in validation_sequence:
-
-            status = create_validation_proto_helper(validation)
+            create_validation_proto_helper(validation)
 
     return validation_proto_set
 

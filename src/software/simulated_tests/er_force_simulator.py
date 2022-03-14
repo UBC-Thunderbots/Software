@@ -55,8 +55,7 @@ class ErForceSimulator(object):
 
         self.world_state = WorldState()
 
-        # TODO change to er_force_sim_main
-        self.simulator_process = Popen(["software/er_force_simulator_main"],)
+        self.simulator_process = Popen(["software/er_force_simulator_main"])
 
     def __setup_robots(self, robot_locations, team_colour):
         """Initializes the world from a list of robot locations

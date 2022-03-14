@@ -16,17 +16,17 @@ from software.simulated_tests.validation import (
 
 class BallEntersRegion(Validation):
 
-    """Checks if a Robot enters any of the provided regions."""
+    """Checks if a ball enters any of the provided regions."""
 
     def __init__(self, regions=[]):
         self.regions = regions
 
     def get_validation_status(self, vision) -> ValidationStatus:
-        """Checks if _any_ robot enters the provided regions
+        """Checks if the ball enters the provided regions
 
         :param vision: The vision msg to validate
-        :returns: FAILING until a robot enters any of the regions
-                  PASSING when a robot enters
+        :returns: FAILING until a ball enters any of the regions
+                  PASSING when a ball enters
         """
         for region in self.regions:
             if geom.contains(

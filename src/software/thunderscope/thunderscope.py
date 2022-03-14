@@ -1,5 +1,6 @@
 import os
 import signal
+import argparse
 
 import pyqtgraph as pg
 from proto.geometry_pb2 import Circle, Polygon
@@ -24,7 +25,17 @@ from software.thunderscope.proto_receiver import ProtoReceiver
 
 class Thunderscope(object):
 
-    """ Thunderscope """
+    """ Thunderscope is out main visualizer that can visualize our field,
+    obstacles, paths, performance metrics, logs, plots. Thunderscope also
+    provides tools to interact with the robots.
+
+    Thunderscope uses pyqtgraph, which is highly configurable during runtime.
+    Users can move docks (purple bar) around, double click to pop them out into
+    another window, etc.
+
+    The setup_* functions return docks. Its up to t
+
+    """
 
     def __init__(self, refresh_interval_ms=5):
 
@@ -47,83 +58,116 @@ class Thunderscope(object):
             pass
 
         self.proto_receiver = ProtoReceiver()
+        self.refresh_functions = []
 
+        def __refresh():
+            for refresh_func in self.refresh_functions:
+                refresh_func()
+
+        # Setup refresh Timer
+        self.refresh_timer = QtCore.QTimer()
+        self.refresh_timer.timeout.connect(__refresh)
+        self.refresh_timer.start(refresh_interval_ms)  # Refresh at 200hz
+
+    def register_refresh_function(self, refresh_func):
+        """Register the refresh functions to run at the refresh_interval_ms
+        passed into thunderscope.
+
+        :param refresh_func: The function to call at refresh_interval_ms
+
+        """
+        self.refresh_functions.append(refresh_func)
+
+    def configure_default_layout(self):
+        """Configure the default layout for thunderscope
+        """
+        # Configure Docks
         field_dock = self.setup_field_widget()
         log_dock = self.setup_log_widget()
         performance_dock = self.setup_performance_plot()
 
-        # Configure Docks
         self.dock_area.addDock(field_dock, "left")
         self.dock_area.addDock(log_dock, "bottom", field_dock)
         self.dock_area.addDock(performance_dock, "right", log_dock)
 
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.refresh)
-        self.timer.start(refresh_interval_ms)  # Refresh at 200hz
-
     def setup_field_widget(self):
-        """TODO: Docstring for setup_field.
+        """Setup the field widget will the Vision, Obstacles, Paths and
+        Validation layer.
 
-        :param function: TODO
-        :returns: TODO
+        :returns: The dock containing the field widget
 
         """
         self.field = Field()
 
+        # Create layers
         world = world_layer.WorldLayer()
         obstacles = obstacle_layer.ObstacleLayer()
         paths = path_layer.PathLayer()
         validation = validation_layer.ValidationLayer()
 
+        # Add field layers to field
         self.field.add_layer("Vision", world)
         self.field.add_layer("Obstacles", obstacles)
         self.field.add_layer("Paths", paths)
         self.field.add_layer("Validation", validation)
 
+        # Register observers
         self.proto_receiver.register_observer(World, world.world_buffer)
         self.proto_receiver.register_observer(Obstacles, obstacles.obstacle_buffer)
         self.proto_receiver.register_observer(
             PathVisualization, paths.path_visualization_buffer
         )
 
+        # Register refresh functions
+        self.register_refresh_function(self.field.refresh)
+
+        # Create and return dock
         field_dock = Dock("Field", size=(500, 2000))
         field_dock.addWidget(self.field)
 
         return field_dock
 
     def setup_log_widget(self):
-        """TODO: Docstring for setup_log_widget.
+        """Setup the wiget that receives logs from full system
 
-        :param function: TODO
-        :returns: TODO
+        :returns: The dock containing the log widget
 
         """
+        # Create widget
         self.logs = g3logWidget()
+
+        # Register observer
         self.proto_receiver.register_observer(RobotLog, self.logs.log_buffer)
 
+        # Register refresh function
+        self.register_refresh_function(self.logs.refresh)
+
+        # Create and return dock
         log_dock = Dock("logs", size=(500, 100))
         log_dock.addWidget(self.logs)
-
         return log_dock
 
     def setup_performance_plot(self):
-        self.named_value_plotter = NamedValuePlotter()
-        self.named_value_plotter_dock = Dock("Performance", size=(500, 100))
-        self.named_value_plotter_dock.addWidget(self.named_value_plotter.plot)
+        """Setup the performance plot
 
+        :returns: The performance plot setup in a dock
+
+        """
+        # Create widget
+        self.named_value_plotter = NamedValuePlotter()
+
+        # Register observer
         self.proto_receiver.register_observer(
             NamedValue, self.named_value_plotter.named_value_buffer
         )
 
+        # Register refresh funcntion
+        self.register_refresh_function(self.named_value_plotter.refresh)
+
+        # Create and return dock
         named_value_plotter_dock = Dock("Performance", size=(500, 100))
         named_value_plotter_dock.addWidget(self.named_value_plotter.plot)
-
         return named_value_plotter_dock
-
-    def refresh(self):
-        self.field.refresh()
-        self.logs.refresh()
-        self.named_value_plotter.refresh()
 
     def show(self):
         self.window.show()
@@ -134,5 +178,34 @@ class Thunderscope(object):
 
 
 if __name__ == "__main__":
-    thunderscope = Thunderscope()
-    thunderscope.show()
+    parser = argparse.ArgumentParser(description="Thunderscope")
+    parser.add_argument(
+        "--robot_diagnostics",
+        action="store_true",
+        help="Run thunderscope in the robot diagnostics configuration",
+    )
+    parser.add_argument(
+        "--run_simulator", action="store_true", help="Run the standalone simulator"
+    )
+
+    args = parser.parse_args()
+    print(args)
+
+    # Setup robot diagnostics dock-layout
+    if args.robot_diagnostics:
+        thunderscope = Thunderscope()
+
+        log_dock = thunderscope.setup_log_widget()
+        thunderscope.dock_area.addDock(log_dock)
+
+        thunderscope.show()
+
+    elif args.run_simulator:
+        print(
+            "TODO #2050, this isn't implemented, just run the current standalone simulator"
+        )
+
+    else:
+        thunderscope = Thunderscope()
+        thunderscope.configure_default_layout()
+        thunderscope.show()

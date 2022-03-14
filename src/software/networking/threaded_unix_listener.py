@@ -111,10 +111,10 @@ class Session(socketserver.BaseRequestHandler):
             self.handle_log_visualize()
 
     def handle_proto(self):
-        """If a specific protobuf class is passed in, this handler is called
+        """If a specific protobuf class is passed in, this handler is called.
 
-        :param function: TODO
-        :returns: TODO
+        It deserializes the incoming msg into the class and triggers the 
+        handle callback.
 
         """
         if self.proto_class:
@@ -128,9 +128,9 @@ class Session(socketserver.BaseRequestHandler):
         would need to setup a sender/receiver pair for every protobuf we want
         to visualize. 
         
-        So instead, we special case the communication coming from the ProtobufSink,
-        and send the typename prefixed at the beginning of the payload delimited
-        by the TYPE_DELIMITER (!!!).
+        So instead, we special case the communication coming from the ProtobufSink
+        (C++ side). The ProtobufSink sends the typename prefixed at the beginning
+        of the payload delimited by the TYPE_DELIMITER (!!!).
 
                               |         -- data --            |
         PackageName.TypeName!!!eW91Zm91bmR0aGVzZWNyZXRtZXNzYWdl
