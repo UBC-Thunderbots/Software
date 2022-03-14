@@ -15,6 +15,7 @@ py_binary(
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
         "//software/thunderscope/log:g3log_widget",
+        "//software/thunderscope/robot_diagnostics:drive_and_dribbler_widget",
         requirement("pyqtgraph"),
         requirement("numpy"),
     ],

@@ -17,6 +17,9 @@ from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValueP
 from proto.visualization_pb2 import NamedValue
 from proto.robot_log_msg_pb2 import RobotLog
 from software.networking.threaded_unix_listener import ThreadedUnixListener
+from software.thunderscope.robot_diagnostics.drive_and_dribbler_widget import (
+    DriveAndDribblerWidget,
+)
 from field import obstacle_layer, path_layer, world_layer
 from proto_receiver import ProtoReceiver
 import software.thunderscope.constants as constants
@@ -73,11 +76,18 @@ if __name__ == "__main__":
     named_value_plotter_dock = Dock("Performance", size=(500, 100))
     named_value_plotter_dock.addWidget(named_value_plotter.plot)
     proto_receiver.register_observer(NamedValue, named_value_plotter.named_value_buffer)
+    # Setup Diagnostics Widget
+    drive_and_dribbler = DriveAndDribblerWidget()
+
+    drive_and_dribbler_dock = Dock("robot diagnostics", size=(50, 100))
+    drive_and_dribbler_dock.addWidget(drive_and_dribbler)
 
     # Configure Docks
     dock_area.addDock(field_dock, "left")
     dock_area.addDock(log_dock, "bottom", field_dock)
+
     dock_area.addDock(named_value_plotter_dock, "right", log_dock)
+    dock_area.addDock(drive_and_dribbler_dock, "right", field_dock)
 
     def update():
         field.refresh()
