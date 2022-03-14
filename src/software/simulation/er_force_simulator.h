@@ -45,8 +45,6 @@ class ErForceSimulator
     ErForceSimulator()  = delete;
     ~ErForceSimulator() = default;
 
-    void setWorldState(const TbotsProto::WorldState& world_state);
-
     /**
      * Sets the state of the ball in the simulation. No more than 1 ball may exist
      * in the simulation at a time. If a ball does not already exist, a ball
@@ -74,6 +72,13 @@ class ErForceSimulator
                    gameController::Team team);
     void setRobots(const google::protobuf::Map<uint32_t, TbotsProto::RobotState>& robots,
                    gameController::Team side);
+
+    /**
+     * Set the world state from a WorldState proto in the simulation.
+     *
+     * @param world_state The new WorldState
+     */
+    void setWorldState(const TbotsProto::WorldState& world_state);
 
     /**
      * Sets the primitive being simulated by the robot on the corresponding team

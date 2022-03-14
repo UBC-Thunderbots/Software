@@ -112,7 +112,6 @@ def test_goalie_blocks_shot(
     # Always Validation
     always_validation_sequence_set = [
         [
-            # Goalie should be in the defense area
             RobotNeverEntersRegion(regions=[geom.Field().enemyDefenseArea()]),
             BallNeverEntersRegion(regions=[geom.Field().friendlyGoal()]),
         ]

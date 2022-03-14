@@ -59,6 +59,7 @@ class TacticTestRunner(object):
 
         if self.enable_thunderscope:
             self.thunderscope = Thunderscope()
+            self.thunderscope.configure_default_layout()
             self.validation_sender = ThreadedUnixSender(runtime_dir + "/validation")
 
         self.simulator = ErForceSimulator()

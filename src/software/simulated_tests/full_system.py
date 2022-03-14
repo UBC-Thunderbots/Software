@@ -61,27 +61,69 @@ class FullSystem(object):
         self.full_system_process = Popen(["software/unix_full_system"])
 
     def send_robot_status(self, robot_status):
+        """Send the robot_status to full_system
+
+        :param robot_status: The RobotStatus to send
+
+        """
         self.robot_status_sender.send(robot_status)
 
     def send_ssl_wrapper(self, ssl_wrapper_packet):
+        """Send the ssl_wrapper_packet to full_system
+
+        :param ssl_wrapper_packet: The packet to send
+
+        """
         self.ssl_wrapper_sender.send(ssl_wrapper_packet)
 
     def send_ssl_referee(self, ssl_referee_packet):
+        """Send the ssl_referee_packet to full_system
+
+        :param ssl_referee_packet: The packet to send
+
+        """
         self.ssl_referee_sender.send(ssl_referee_packet)
 
     def send_sensor_proto(self, sensor_proto):
+        """Send a sensor msg to full system.
+
+        :param sensor_proto: The sensor msg to send
+
+        """
         self.sensor_proto_sender.send(sensor_proto)
 
+    def send_tactic_override(self, assigned_tactic_play_control_params):
+        """Send the control params for the assigned tactic play to
+        run specific tactics on assigned robots.
+
+        :param assigned_tactic_play_control_params:
+                The control params of the AssignedTacticPlay
+        
+        """
+        self.tactic_override.send(assigned_tactic_play_control_params)
+
     def get_vision(self):
+        """Grabs the vision msg from the buffer if it exists, returns None
+        if buffer is empty.
+
+        :return: Vision or None
+
+        """
         return self.vision_listener.maybe_pop()
 
     def get_primitive_set(self):
+        """Grabs the primitive msg set from the buffer if it exists, returns
+        None if buffer is empty.
+
+        :return: PrimitiveSet or None
+
+        """
         return self.primitive_listener.maybe_pop()
 
-    def send_tactic_override(self, assigned_tactic_play_control_params):
-        return self.tactic_override.send(assigned_tactic_play_control_params)
-
     def stop():
+        """Stop all listeners and senders.
+
+        """
         self.robot_status_sender.force_stop()
         self.ssl_wrapper_sender.force_stop()
         self.ssl_referee_sender.force_stop()

@@ -33,7 +33,9 @@ class Thunderscope(object):
     Users can move docks (purple bar) around, double click to pop them out into
     another window, etc.
 
-    The setup_* functions return docks. Its up to t
+    The setup_* functions return docks. See configure_default_layout for an
+    example. The returned docks can be arranged differently based on the
+    use case (robot diagnostics, simulation, robocup, demo, etc..)
 
     """
 
@@ -189,9 +191,7 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    print(args)
 
-    # Setup robot diagnostics dock-layout
     if args.robot_diagnostics:
         thunderscope = Thunderscope()
 

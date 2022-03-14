@@ -28,7 +28,7 @@ class Validation(object):
         return "String representation of validation not implemented"
 
 
-def createValidationTypes(validation_class):
+def create_validtion_types(validation_class):
     """Given a Validation implementation that returns ValidationStatus.PASSING
     when true and ValidationStatus.FAILING when false, create the 4 validation
     types with different visualization/passing/failing properties (described below)
@@ -39,8 +39,8 @@ def createValidationTypes(validation_class):
                               │                       │
                               │                       │      ┌─────────────────┐
                               │                       ├──────► EventuallyFalse │
-     ┌─────────────────┐      │ createValidationTypes │      └─────────────────┘
-     │    Validation   ├──────►                       │
+     ┌─────────────────┐      │                       │      └─────────────────┘
+     │    Validation   ├──────►create_validation_types│
      └─────────────────┘      │                       │      ┌─────────────────┐
                               │                       ├──────►   AlwaysTrue    │
                               │                       │      └─────────────────┘
