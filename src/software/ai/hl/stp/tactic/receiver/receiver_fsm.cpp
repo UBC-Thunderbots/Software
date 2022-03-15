@@ -125,9 +125,11 @@ void ReceiverFSM::updateOnetouch(const Update& event)
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
             event.common.robot.robotConstants()));
 
+        DEFINE_PATH_POINTS(one_touch.getPointToShootAt())
+
         event.common.set_primitive(createMovePrimitive(
-            one_touch.getPointToShootAt(), one_touch.getOpenAngle(), 0,
-            TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
+            path_points, one_touch.getOpenAngle(), 0, TbotsProto::DribblerMode::OFF,
+            TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::AUTOKICK,
                            BALL_MAX_SPEED_METERS_PER_SECOND},
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
@@ -146,9 +148,11 @@ void ReceiverFSM::updateReceive(const Update& event)
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
             event.common.robot.robotConstants()));
+
+        DEFINE_PATH_POINTS(event.control_params.pass->receiverPoint())
+
         event.common.set_primitive(createMovePrimitive(
-            event.control_params.pass->receiverPoint(),
-            event.control_params.pass->receiverOrientation(), 0,
+            path_points, event.control_params.pass->receiverOrientation(), 0,
             TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
@@ -180,9 +184,12 @@ void ReceiverFSM::adjustReceive(const Update& event)
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
             event.common.robot.robotConstants()));
+
+        DEFINE_PATH_POINTS(ball_receive_pos)
+
         event.common.set_primitive(createMovePrimitive(
-            ball_receive_pos, ball_receive_orientation, 0,
-            TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+            path_points, ball_receive_orientation, 0, TbotsProto::DribblerMode::MAX_FORCE,
+            TbotsProto::BallCollisionType::ALLOW,
             AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
             TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
             event.common.robot.robotConstants()));

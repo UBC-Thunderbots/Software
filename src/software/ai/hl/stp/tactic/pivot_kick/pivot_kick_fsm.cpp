@@ -21,8 +21,10 @@ void PivotKickFSM::kickBall(const Update& event)
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
         event.common.robot.robotConstants()));
 
+    DEFINE_PATH_POINTS(event.control_params.kick_origin)
+
     event.common.set_primitive(createMovePrimitive(
-        event.control_params.kick_origin, event.control_params.kick_direction, 0,
+        path_points, event.control_params.kick_direction, 0,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         event.control_params.auto_chip_or_kick,
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,

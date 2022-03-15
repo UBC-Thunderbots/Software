@@ -50,8 +50,8 @@ class EnlsvgPathPlanner
      * @param start  start point
      * @param end    end point
      *
-     * @return   a vector of points that is the optimal path avoiding obstacles
-     *           if no valid path, then return an empty vector
+     * @return   Path that is the optimal path avoiding obstacles
+     *           if no valid path, then return nullopt
      */
     std::optional<Path> findPath(const Point &start, const Point &end) const;
 

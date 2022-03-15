@@ -202,8 +202,10 @@ void GoalieFSM::panic(const Update &event)
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
 
+    DEFINE_PATH_POINTS(goalie_pos)
+
     event.common.set_primitive(createMovePrimitive(
-        goalie_pos, goalie_orientation, 0.0, TbotsProto::DribblerMode::OFF,
+        path_points, goalie_orientation, 0.0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
@@ -248,9 +250,11 @@ void GoalieFSM::positionToBlock(const Update &event)
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
 
+    DEFINE_PATH_POINTS(goalie_pos)
+
     event.common.set_primitive(createMovePrimitive(
-        goalie_pos, goalie_orientation, goalie_final_speed, TbotsProto::DribblerMode::OFF,
-        TbotsProto::BallCollisionType::ALLOW,
+        path_points, goalie_orientation, goalie_final_speed,
+        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
 }
@@ -275,9 +279,11 @@ void GoalieFSM::moveToGoalLine(const Update &event)
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}, max_allowed_speed_mode, 0.0,
         event.common.robot.robotConstants()));
 
+    DEFINE_PATH_POINTS(event.common.world.field().friendlyGoalCenter())
+
     event.common.set_primitive(createMovePrimitive(
-        event.common.world.field().friendlyGoalCenter(), Angle::zero(), 0,
-        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::AVOID,
+        path_points, Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}, max_allowed_speed_mode, 0.0,
         event.common.robot.robotConstants()));
 }

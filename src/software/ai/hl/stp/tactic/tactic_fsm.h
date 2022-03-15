@@ -81,3 +81,9 @@ struct TacticUpdate
                 getCurrentFullStateName(*fsm_map.at(last_execution_robot.value()));      \
         return state_str;                                                                \
     }
+
+#define DEFINE_PATH_POINTS(DESTINATION)                                                  \
+    std::vector<Point> path_points =                                                     \
+        event.common.path_planner                                                        \
+            ->findPath(event.common.robot.position(), (DESTINATION))                     \
+            ->getKnots();

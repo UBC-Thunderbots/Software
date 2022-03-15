@@ -31,7 +31,7 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     RobotConstants_t robot_constants);
 
 std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
-    const Point& destination, const Angle& final_angle, double final_speed,
+    const std::vector<Point>& path, const Angle& final_angle, double final_speed,
     const TbotsProto::DribblerMode& dribbler_mode,
     const TbotsProto::BallCollisionType& ball_collision_type,
     const AutoChipOrKick& auto_chip_or_kick,
