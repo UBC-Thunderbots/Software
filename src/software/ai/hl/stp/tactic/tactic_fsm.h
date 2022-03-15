@@ -5,6 +5,7 @@
 #include "proto/primitive/primitive_msg_factory.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/ai/intent/intent.h"
+#include "software/ai/navigator/path_planner/enlsvg_path_planner.h"
 #include "software/ai/navigator/path_planner/path_planner.h"
 #include "software/util/sml_fsm/sml_fsm.h"
 #include "software/world/world.h"
@@ -28,7 +29,7 @@ struct TacticUpdate
 
     TacticUpdate(const Robot &robot, const World &world,
                  const SetPrimitiveCallback &set_primitive_fun,
-                 std::shared_ptr<const PathPlanner> path_planner)
+                 std::shared_ptr<const EnlsvgPathPlanner> path_planner)
         : robot(robot),
           world(world),
           set_intent([](std::unique_ptr<Intent>) {}),
@@ -45,7 +46,7 @@ struct TacticUpdate
     SetIntentCallback set_intent;
     SetPrimitiveCallback set_primitive;
 
-    std::shared_ptr<const PathPlanner> path_planner;
+    std::shared_ptr<const EnlsvgPathPlanner> path_planner;
 };
 
 /**

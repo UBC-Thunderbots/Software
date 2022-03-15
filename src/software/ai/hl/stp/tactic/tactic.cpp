@@ -41,7 +41,7 @@ void Tactic::setLastExecutionRobot(std::optional<RobotId> last_execution_robot)
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Tactic::get(
-    const World &world, std::shared_ptr<const PathPlanner> path_planner)
+    const World &world, std::shared_ptr<const EnlsvgPathPlanner> path_planner)
 {
     auto primitive_set = std::make_unique<TbotsProto::PrimitiveSet>();
     for (const auto &robot : world.friendlyTeam().getAllRobots())

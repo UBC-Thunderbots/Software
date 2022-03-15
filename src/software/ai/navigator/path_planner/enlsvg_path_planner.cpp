@@ -1,4 +1,4 @@
-#include "enlsvg_path_planner.h"
+#include "software/ai/navigator/path_planner/enlsvg_path_planner.h"
 
 EnlsvgPathPlanner::EnlsvgPathPlanner(const Rectangle &navigable_area,
                                      const std::vector<ObstaclePtr> &obstacles,

@@ -63,7 +63,6 @@ cc_library(
     deps = [
         "//extlibs/enlsvg",
         "//shared/parameter:cpp_configs",
-        "//software/ai/motion_constraint:motion_constraint_set_builder",
         "//software/ai/navigator/obstacle",
         "//software/ai/navigator/obstacle:robot_navigation_obstacle_factory",
         "//software/geom:linear_spline2d",
@@ -79,6 +78,7 @@ cc_library(
         ":enlsvg_path_planner",
         "//software/ai/hl/stp/tactic",
         "//software/ai/motion_constraint",
+        "//software/ai/motion_constraint:motion_constraint_set_builder",
         "//software/geom:linear_spline2d",
         "//software/geom:point",
     ],

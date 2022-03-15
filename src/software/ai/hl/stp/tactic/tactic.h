@@ -120,7 +120,7 @@ class Tactic
      * @return the next intent
      */
     std::unique_ptr<TbotsProto::PrimitiveSet> get(
-        const World &world, std::shared_ptr<const PathPlanner> path_planner);
+        const World &world, std::shared_ptr<const EnlsvgPathPlanner> path_planner);
 
     /**
      * Accepts a Tactic Visitor and calls the visit function on itself
