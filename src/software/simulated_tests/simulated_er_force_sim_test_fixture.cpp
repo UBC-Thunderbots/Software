@@ -6,11 +6,16 @@
 #include <cstdlib>
 #include <filesystem>
 
+#include "proto/message_translation/er_force_world.h"
 #include "proto/message_translation/ssl_wrapper.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "shared/2015_robot_constants.h"
+#include "shared/2021_robot_constants.h"
+#include "shared/test_util/test_util.h"
 #include "software/logger/logger.h"
 #include "software/test_util/test_util.h"
+
+using namespace TestUtil;
 
 SimulatedErForceSimTestFixture::SimulatedErForceSimTestFixture()
     : friendly_mutable_thunderbots_config(std::make_shared<ThunderbotsConfig>()),
@@ -299,22 +304,148 @@ void SimulatedErForceSimTestFixture::runTest(
     const Duration ai_time_step = Duration::fromSeconds(
         simulation_time_step.toSeconds() * CAMERA_FRAMES_PER_AI_TICK * speed_factor);
 
-    // Tick one frame to aid with visualization
-    bool validation_functions_done = tickTest(simulation_time_step, ai_time_step,
-                                              friendly_world, enemy_world, simulator);
+    // declare difference (velocity, position) variables
+    double ball_displacement;
+    double ball_velocity_diff;
+    double sum_ball_displacement;
+    double sum_ball_velocity;
+    std::vector<double> robots_displacement;
+    std::vector<double> robots_velocity_diff;
+    std::vector<double> sum_robots_displacement;
+    std::vector<double> sum_robots_velocity;
 
+    // declare struct for ball_displacement, velocity_diff; array of struct for robots
+    // fields
+    struct AggregateFunctions ball_displacement_stats = AggregateFunctions();
+    struct AggregateFunctions ball_velocity_stats     = AggregateFunctions();
+    std::vector<AggregateFunctions> robots_displacement_stats;
+    std::vector<AggregateFunctions> robots_velocity_stats;
+
+    // Tick one frame to aid with visualization
+    bool validation_functions_done = tickTest(
+        simulation_time_step, ai_time_step, friendly_world, enemy_world, simulator,
+        ball_displacement, ball_velocity_diff, robots_displacement, robots_velocity_diff);
+
+    // Initialize Values
+    ball_displacement_stats.maximum = ball_displacement;
+    ball_displacement_stats.minimum = ball_displacement;
+    ball_velocity_stats.maximum     = ball_velocity_diff;
+    ball_velocity_stats.minimum     = ball_velocity_diff;
+    sum_ball_displacement           = ball_displacement;
+    sum_ball_velocity               = ball_velocity_diff;
+    sum_robots_displacement         = robots_displacement;
+    sum_robots_velocity             = robots_velocity_diff;
+
+    size_t num_robots         = robots_displacement.size();
+    validation_functions_done = false;
     while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
     {
+        robots_displacement.clear();
+        robots_velocity_diff.clear();
         if (!friendly_thunderbots_config->getAiControlConfig()->getRunAi()->value())
+            validation_functions_done =
+                tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,
+                         simulator, ball_displacement, ball_velocity_diff,
+                         robots_displacement, robots_velocity_diff);
+
+        while (simulator->getTimestamp() < timeout_time && !validation_functions_done)
         {
-            auto ms_to_sleep = std::chrono::milliseconds(
-                static_cast<int>(ai_time_step.toMilliseconds()));
-            std::this_thread::sleep_for(ms_to_sleep);
-            continue;
+            if (!friendly_thunderbots_config->getAiControlConfig()->getRunAi()->value())
+            {
+                auto ms_to_sleep = std::chrono::milliseconds(
+                    static_cast<int>(ai_time_step.toMilliseconds()));
+                std::this_thread::sleep_for(ms_to_sleep);
+                continue;
+            }
+
+            validation_functions_done =
+                tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,
+                         simulator, ball_displacement, ball_velocity_diff,
+                         robots_displacement, robots_velocity_diff);
+
+            sum_ball_displacement += ball_displacement;
+            sum_ball_velocity += ball_velocity_diff;
+
+            ball_displacement_stats.maximum =
+                std::max(ball_displacement, ball_displacement_stats.maximum);
+            ball_displacement_stats.minimum =
+                std::min(ball_displacement, ball_displacement_stats.minimum);
+            ball_velocity_stats.maximum =
+                std::max(ball_velocity_diff, ball_velocity_stats.maximum);
+            ball_velocity_stats.minimum =
+                std::min(ball_velocity_diff, ball_velocity_stats.minimum);
+
+            for (size_t i = 0; i < num_robots; i++)
+            {
+                robots_displacement_stats.push_back(AggregateFunctions());
+                robots_velocity_stats.push_back(AggregateFunctions());
+                sum_robots_displacement[i] += robots_displacement[i];
+                sum_robots_velocity[i] += robots_velocity_diff[i];
+                robots_displacement_stats[i].maximum = std::max(
+                    robots_displacement[i], robots_displacement_stats[i].maximum);
+                robots_displacement_stats[i].minimum = std::min(
+                    robots_displacement[i], robots_displacement_stats[i].minimum);
+                robots_velocity_stats[i].maximum = std::max(
+                    robots_displacement[i], robots_displacement_stats[i].maximum);
+                robots_velocity_stats[i].minimum =
+                    std::min(robots_velocity_diff[i], robots_velocity_stats[i].minimum);
+            }
         }
 
-        validation_functions_done = tickTest(simulation_time_step, ai_time_step,
-                                             friendly_world, enemy_world, simulator);
+        auto total_tick_count = friendly_tick_count + enemy_tick_count;
+        // compute the averages
+        ball_displacement_stats.average =
+            (total_tick_count == 0) ? 0 : sum_ball_displacement / total_tick_count;
+        ball_velocity_stats.average =
+            (total_tick_count == 0) ? 0 : sum_ball_velocity / total_tick_count;
+
+        for (size_t i = 0; i < num_robots; i++)
+        {
+            robots_displacement_stats[i].average =
+                (total_tick_count == 0) ? 0
+                                        : sum_robots_displacement[i] / total_tick_count;
+            robots_velocity_stats[i].average =
+                (total_tick_count == 0) ? 0 : sum_robots_velocity[i] / total_tick_count;
+            validation_functions_done =
+                tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,
+                         simulator, ball_displacement, ball_velocity_diff,
+                         robots_displacement, robots_velocity_diff);
+        }
+
+        // Output the statistics for ball and robots
+        LOG(INFO) << "max ball displacement: " << ball_displacement_stats.maximum
+                  << std::endl;
+        LOG(INFO) << "min ball displacement: " << ball_displacement_stats.minimum
+                  << std::endl;
+        LOG(INFO) << "avg ball displacement: " << ball_displacement_stats.average
+                  << std::endl;
+        LOG(INFO) << "max ball velocity difference: " << ball_velocity_stats.maximum
+                  << std::endl;
+        LOG(INFO) << "min ball velocity difference: " << ball_velocity_stats.minimum
+                  << std::endl;
+        LOG(INFO) << "avg ball velocity difference: " << ball_velocity_stats.average
+                  << std::endl;
+        for (size_t i = 0; i < num_robots; i++)
+        {
+            LOG(INFO) << "Robot " << i << std::endl;
+            LOG(INFO) << "max robot displacement: " << ball_displacement_stats.maximum
+                      << std::endl;
+            LOG(INFO) << "min robot displacement: " << ball_displacement_stats.minimum
+                      << std::endl;
+            LOG(INFO) << "avg robot displacement: " << ball_displacement_stats.average
+                      << std::endl;
+            LOG(INFO) << "max robot velocity difference: " << ball_velocity_stats.maximum
+                      << std::endl;
+            LOG(INFO) << "min robot velocity difference: " << ball_velocity_stats.minimum
+                      << std::endl;
+            LOG(INFO) << "avg robot velocity difference: " << ball_velocity_stats.average
+                      << std::endl;
+        }
+
+        validation_functions_done =
+            tickTest(simulation_time_step, ai_time_step, friendly_world, enemy_world,
+                     simulator, ball_displacement, ball_velocity_diff,
+                     robots_displacement, robots_velocity_diff);
     }
     // Output the tick duration results
     if (friendly_tick_count > 0)
@@ -377,12 +508,95 @@ void SimulatedErForceSimTestFixture::registerEnemyTickTime(double tick_time_ms)
     enemy_tick_count++;
 }
 
-bool SimulatedErForceSimTestFixture::tickTest(Duration simulation_time_step,
-                                              Duration ai_time_step,
-                                              std::shared_ptr<World> friendly_world,
-                                              std::shared_ptr<World> enemy_world,
-                                              std::shared_ptr<ErForceSimulator> simulator)
+bool SimulatedErForceSimTestFixture::tickTest(
+    Duration simulation_time_step, Duration ai_time_step,
+    std::shared_ptr<World> friendly_world, std::shared_ptr<World> enemy_world,
+    std::shared_ptr<ErForceSimulator> simulator, double &ball_displacement,
+    double &ball_velocity_diff, std::vector<double> &robots_displacement,
+    std::vector<double> &robots_velocity_diff)
 {
+    /* extract world ball and robot */
+    Ball world_ball                          = friendly_world->ball();
+    Team world_friendly_team                 = friendly_world->friendlyTeam();
+    Team world_enemy_team                    = friendly_world->enemyTeam();
+    std::vector<Robot> world_friendly_robots = world_friendly_team.getAllRobots();
+    std::vector<Robot> world_enemy_robots    = world_enemy_team.getAllRobots();
+
+    /* extract simulator ball and robot */
+    world::SimulatorState simulator_state = simulator->getSimulatorState();
+    auto simulator_sim_ball               = simulator_state.ball();
+    auto simulator_friendly_sim_robots    = simulator_state.yellow_robots();
+    auto simulator_enemy_sim_robots       = simulator_state.blue_robots();
+
+    /* convert simball and simrobot to normal ball and robot in world for comparison */
+    Ball simulator_ball = createBall(simulator_sim_ball, Timestamp::fromSeconds(0));
+    std::vector<Robot> simulator_friendly_robots;
+    std::vector<Robot> simulator_enemy_robots;
+
+    for (int i = 0; i < simulator_friendly_sim_robots.size(); i++)
+    {
+        simulator_friendly_robots.push_back(
+            createRobot(simulator_friendly_sim_robots[i], Timestamp::fromSeconds(0)));
+    }
+    for (int i = 0; i < simulator_enemy_sim_robots.size(); i++)
+    {
+        simulator_enemy_robots.push_back(
+            createRobot(simulator_enemy_sim_robots[i], Timestamp::fromSeconds(0)));
+    }
+
+    /* compare ball position */
+    Point world_ball_pos     = world_ball.position();
+    Point simulator_ball_pos = simulator_ball.position();
+    ball_displacement        = (world_ball_pos - simulator_ball_pos).length();
+
+    /* compare ball velocity */
+    Vector world_ball_vel     = world_ball.velocity();
+    Vector simulator_ball_vel = simulator_ball.velocity();
+    ball_velocity_diff        = (world_ball_vel - simulator_ball_vel).length();
+
+    /* compare world and simulator friendly robots */
+    for (Robot world_robot : world_friendly_robots)
+    {
+        int robot_index = 0;
+        while (world_robot.id() != simulator_friendly_robots[robot_index++].id())
+            ;
+        Robot simulator_robot = simulator_friendly_robots[robot_index - 1];
+
+        /* find difference in robot[i] position */
+        Point world_robot_pos     = world_robot.position();
+        Point simulator_robot_pos = simulator_robot.position();
+        double robot_displacement = (world_robot_pos - simulator_robot_pos).length();
+
+        /* find difference in robot[i] velocity */
+        Vector world_robot_vel     = world_robot.velocity();
+        Vector simulator_robot_vel = simulator_robot.velocity();
+        double robot_velocity_diff = (world_robot_vel - simulator_robot_vel).length();
+
+        robots_displacement.push_back(robot_displacement);
+        robots_velocity_diff.push_back(robot_velocity_diff);
+    }
+
+    /* compare world and simulator enemy robots */
+    for (Robot world_robot : world_enemy_robots)
+    {
+        int robot_index = 0;
+        while (world_robot.id() != simulator_enemy_robots[robot_index++].id())
+            ;
+        Robot simulator_robot = simulator_enemy_robots[robot_index - 1];
+
+        /* find difference in robot[i] position */
+        Point world_robot_pos     = world_robot.position();
+        Point simulator_robot_pos = simulator_robot.position();
+        double robot_displacement = (world_robot_pos - simulator_robot_pos).length();
+
+        /* find difference in robot[i] velocity */
+        Vector world_robot_vel     = world_robot.velocity();
+        Vector simulator_robot_vel = simulator_robot.velocity();
+        double robot_velocity_diff = (world_robot_vel - simulator_robot_vel).length();
+        robots_displacement.push_back(robot_displacement);
+        robots_velocity_diff.push_back(robot_velocity_diff);
+    }
+
     auto wall_start_time           = std::chrono::steady_clock::now();
     bool validation_functions_done = false;
 
