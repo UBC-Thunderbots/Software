@@ -1,14 +1,19 @@
 from PIL import ImageFont
 import subprocess
 
-"""
-All new screens will inherit from this class. This class will handles editing variables and maintaining
-the current action the cursor is hovering.
-"""
-
-
 class Screen:
-    def __init__(self, lcd_display, status_codes, actions, action_map, draw_screen):
+    """
+    All new screens will inherit from this class. This class will handles editing variables and maintaining
+    the current action the cursor is hovering.
+    """
+    def __init__(self, lcd_display, screen_actions, actions, action_map, draw_screen):
+        """
+        @param lcd_display, an instance of the LcdDisplay class
+        @param screen_actions, an instance of ScreenActions class
+        @param actions, a list of callback function names associated with this screen
+        @param action_map, a dictionary for making callback function name to callback function
+        @param draw_screen, a callback function to re-render screen on lcd display
+        """
         self.lcd_display = lcd_display
         self.font_size = 12
         self.font = ImageFont.truetype(
@@ -18,7 +23,8 @@ class Screen:
         self.big_font = ImageFont.truetype(
             "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", self.big_font_size
         )
-        self.status_codes = status_codes
+        self.screen_actions = screen_actions
+        #self.status_codes = status_codes
         self.draw_screen = draw_screen
 
         # Screen actions
@@ -80,8 +86,8 @@ class Screen:
         action = self.action_map[self.actions[self.curr_action]]()
 
         # For editing settings
-        if self.status_codes["edit"] in action:
-            payload = action[self.status_codes["edit"]]
+        if self.screen_actions.EDIT_SCREEN in action:
+            payload = action[self.screen_actions.EDIT_SCREEN]
 
             self.param = payload["param"]
             self.setting = payload["setting"]
@@ -89,13 +95,13 @@ class Screen:
             self.redis_key = payload["redis key"]
             if self.edit_mode:
                 action = {
-                    self.status_codes["update redis"]: {
+                    self.screen_actions.UPDATE_REDIS: {
                         "redis key": self.redis_key,
                         "value": self.param[self.setting],
                     }
                 }
             else:
-                action = {self.status_codes["none"]: None}
+                action = {self.screen_actions.NONE: None}
             self.edit_mode = not self.edit_mode
         return action
 

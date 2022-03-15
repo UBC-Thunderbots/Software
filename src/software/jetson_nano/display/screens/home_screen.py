@@ -8,13 +8,18 @@ BASE_Y = 20
 BASE_X = 0
 BATTERY_VOLTAGE_BASE = 60
 
-"""
-This is the dashboard screen which shows basic robot diagnostics
-"""
 
 
 class HomeScreen(Screen):
-    def __init__(self, lcd_display, redis_dict, status_codes):
+    """
+    This is the dashboard screen which shows basic robot diagnostics
+    """
+    def __init__(self, lcd_display, redis_dict, screen_actions):
+        """
+        @param lcd_display, an instance of the LcdDisplay class
+        @param redis_dict, a dict of values from redis client to init variables on this screen
+        @param screen_actions, an instance of ScreenActions class
+        """
         self.ids = [
             redis_dict["robot id"],
             redis_dict["channel id"],
@@ -25,12 +30,12 @@ class HomeScreen(Screen):
 
         def menu():
             """ Action to go to Menu Screen """
-            return {self.status_codes["change screen"]: "Menu"}
+            return {self.screen_actions.CHANGE_SCREEN: "Menu"}
 
         def robot_id():
             """ Set Robot ID """
             return {
-                self.status_codes["edit"]: {
+                self.screen_actions.EDIT_SCREEN: {
                     "param": self.ids,
                     "setting": ROBOT_ID,
                     "delta": 1,
@@ -41,7 +46,7 @@ class HomeScreen(Screen):
         def channel_id():
             """ Set Channel ID """
             return {
-                self.status_codes["edit"]: {
+                self.screen_actions.EDIT_SCREEN: {
                     "param": self.ids,
                     "setting": CHANNEL_ID,
                     "delta": 1,
@@ -143,7 +148,7 @@ class HomeScreen(Screen):
 
         # Pass Home Screen parameters to super class
         super().__init__(
-            lcd_display, status_codes, self.actions, self.action_map, draw_screen
+            lcd_display, screen_actions, self.actions, self.action_map, draw_screen
         )
 
     def update_values(self, redis_dict):

@@ -6,13 +6,17 @@ KICK = 1
 PADDING = 6
 BASE_Y = 20
 
-"""
-This screen is used to edit the chip and kick speed settings
-"""
-
 
 class ChipAndKickScreen(Screen):
-    def __init__(self, lcd_display, redis_dict, status_codes):
+    """
+    This screen is used to edit the chip and kick speed settings
+    """
+    def __init__(self, lcd_display, redis_dict, screen_actions):
+        """
+        @param lcd_display, an instance of the LcdDisplay class
+        @param redis_dict, a dict of values from redis client to init variables on this screen
+        @param screen_actions, an instance of ScreenActions class
+        """
         self.enable = False if redis_dict["chip and kick enable"] == 0 else True
         self.speeds = [
             redis_dict["chip speed"],
@@ -24,7 +28,7 @@ class ChipAndKickScreen(Screen):
             """ Go to the menu screen """
             self.curr_action = 0
 
-            return {self.status_codes["change screen"]: "Menu"}
+            return {self.screen_actions.CHANGE_SCREEN: "Menu"}
 
         def set_chip_and_kick_speed():
             """ Enable and disable settings """
@@ -35,7 +39,7 @@ class ChipAndKickScreen(Screen):
 
             self.update_screen()
             return {
-                self.status_codes["update redis"]: {
+                self.screen_actions.UPDATE_REDIS: {
                     "redis key": "chip and kick enable",
                     "value": 1 if self.enable else 0,
                 }
@@ -44,7 +48,7 @@ class ChipAndKickScreen(Screen):
         def set_chip():
             """ Set chip speed """
             return {
-                self.status_codes["edit"]: {
+                self.screen_actions.EDIT_SCREEN: {
                     "param": self.speeds,
                     "setting": CHIP,
                     "delta": 0.5,
@@ -55,7 +59,7 @@ class ChipAndKickScreen(Screen):
         def set_kick():
             """ Set kick speed """
             return {
-                self.status_codes["edit"]: {
+                self.screen_actions.EDIT_SCREEN: {
                     "param": self.speeds,
                     "setting": KICK,
                     "delta": 0.5,
@@ -130,7 +134,7 @@ class ChipAndKickScreen(Screen):
 
         # Pass Wheel Screen parameters to super class
         super().__init__(
-            lcd_display, status_codes, self.actions, self.action_map, draw_screen
+            lcd_display, screen_actions, self.actions, self.action_map, draw_screen
         )
 
     def update_values(self, redis_dict):

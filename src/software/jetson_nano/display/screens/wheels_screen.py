@@ -8,13 +8,17 @@ BACK_RIGHT = 3
 PADDING = 6
 BASE_Y = 20
 
-"""
-This screen is used to edit wheel speed settings
-"""
-
 
 class WheelsScreen(Screen):
-    def __init__(self, lcd_display, redis_dict, status_codes):
+    """
+    This screen is used to edit wheel speed settings
+    """
+    def __init__(self, lcd_display, redis_dict, screen_actions):
+        """
+        @param lcd_display, an instance of the LcdDisplay class
+        @param redis_dict, a dict of values from redis client to init variables on this screen
+        @param screen_actions, an instance of ScreenActions class
+        """
         self.enable = False if redis_dict["wheels enable"] == 0 else True
         self.wheel_speeds = [
             redis_dict["fl wheel speed"],
@@ -27,7 +31,7 @@ class WheelsScreen(Screen):
         def menu():
             """ Go to the menu screen """
             self.curr_action = 0
-            return {self.status_codes["change screen"]: "Menu"}
+            return {self.screen_actions.CHANGE_SCREEN: "Menu"}
 
         def set_wheel_speed():
             """ Enable and disable settings """
@@ -37,7 +41,7 @@ class WheelsScreen(Screen):
                 self.enable = True
             self.update_screen()
             return {
-                self.status_codes["update redis"]: {
+                self.screen_actions.UPDATE_REDIS: {
                     "redis key": "wheels enable",
                     "value": 1 if self.enable else 0,
                 }
@@ -46,7 +50,7 @@ class WheelsScreen(Screen):
         def front_left():
             """ Set speed for front left wheel """
             return {
-                self.status_codes["edit"]: {
+                self.screen_actions.EDIT_SCREEN: {
                     "param": self.wheel_speeds,
                     "setting": FRONT_LEFT,
                     "delta": 0.5,
@@ -57,7 +61,7 @@ class WheelsScreen(Screen):
         def front_right():
             """ Set speed for front right wheel """
             return {
-                self.status_codes["edit"]: {
+                self.screen_actions.EDIT_SCREEN: {
                     "param": self.wheel_speeds,
                     "setting": FRONT_RIGHT,
                     "delta": 0.5,
@@ -68,7 +72,7 @@ class WheelsScreen(Screen):
         def back_left():
             """ Set speed for back left wheel """
             return {
-                self.status_codes["edit"]: {
+                self.screen_actions.EDIT_SCREEN: {
                     "param": self.wheel_speeds,
                     "setting": BACK_LEFT,
                     "delta": 0.5,
@@ -79,7 +83,7 @@ class WheelsScreen(Screen):
         def back_right():
             """ Set speed for back right wheel """
             return {
-                self.status_codes["edit"]: {
+                self.screen_actions.EDIT_SCREEN: {
                     "param": self.wheel_speeds,
                     "setting": BACK_RIGHT,
                     "delta": 0.5,
@@ -195,7 +199,7 @@ class WheelsScreen(Screen):
 
         # Pass Wheel Screen parameters to super class
         super().__init__(
-            lcd_display, status_codes, self.actions, self.action_map, draw_screen
+            lcd_display, screen_actions, self.actions, self.action_map, draw_screen
         )
 
     def update_values(self, redis_dict):

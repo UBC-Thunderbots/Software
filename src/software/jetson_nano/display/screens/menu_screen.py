@@ -3,25 +3,28 @@ from screen import Screen
 PADDING = 6
 BASE_Y = 20
 
-"""
-This screen is used to navigate between different configuration settings.
-"""
-
 
 class MenuScreen(Screen):
-    def __init__(self, lcd_display, status_codes):
+    """
+    This screen is used to navigate between different configuration settings.
+    """
+    def __init__(self, lcd_display, screen_actions):
+        """
+        @param lcd_display, an instance of the LcdDisplay class
+        @param screen_actions, an instance of ScreenActions class
+        """
         # Defining this screens actions
         def home():
             """ Action to go to Home Screen """
-            return {self.status_codes["change screen"]: "Home"}
+            return {self.screen_actions.CHANGE_SCREEN: "Home"}
 
         def config_wheels():
             """ Go to Wheel Screen """
-            return {self.status_codes["change screen"]: "Wheels"}
+            return {self.screen_actions.CHANGE_SCREEN: "Wheels"}
 
         def config_chip_and_kick():
             """ Go to Chip and Kick Screen """
-            return {self.status_codes["change screen"]: "Chip and Kick"}
+            return {self.screen_actions.CHANGE_SCREEN: "Chip and Kick"}
 
         # Listing actions for Menu Screen
         self.actions = ["Wheels", "Chip and Kick", "Home"]
@@ -70,7 +73,7 @@ class MenuScreen(Screen):
 
         # Pass Menu Screen parameters to super class
         super().__init__(
-            lcd_display, status_codes, self.actions, self.action_map, draw_screen
+            lcd_display, screen_actions, self.actions, self.action_map, draw_screen
         )
 
 

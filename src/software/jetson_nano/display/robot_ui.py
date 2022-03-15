@@ -20,7 +20,13 @@ PIN_1 = "GPIO_PE6"  # BOARD 40, TEGRA_SOC: 'DAP4_DOUT'
 PIN_2 = "DAP4_FS"  # BOARD 33, TEGRA_SOC: 'GPIO_PE6'
 
 # These keys indicate how to handle return values
-status_codes = {"none": 0, "change screen": 1, "edit": 2, "update redis": 3}
+#status_codes = {"none": 0, "change screen": 1, "edit": 2, "update redis": 3}
+class ScreenActions:
+    NONE = 0
+    CHANGE_SCREEN = 1
+    EDIT_SCREEN = 2
+    UPDATE_REDIS = 3
+screen_actions = ScreenActions()
 
 # These are the keys for the redis dicationary
 redis_keys = [
@@ -61,12 +67,13 @@ class RobotUi:
         self.curr_screen = "Home"
 
         # All of our screens
+        self.screen_actions = ScreenActions()
         self.screens = {
-            "Home": HomeScreen(self.lcd_display, self.redis_dict, status_codes),
-            "Menu": MenuScreen(self.lcd_display, status_codes),
-            "Wheels": WheelsScreen(self.lcd_display, self.redis_dict, status_codes),
+            "Home": HomeScreen(self.lcd_display, self.redis_dict, screen_actions),
+            "Menu": MenuScreen(self.lcd_display, screen_actions),
+            "Wheels": WheelsScreen(self.lcd_display, self.redis_dict, screen_actions),
             "Chip and Kick": ChipAndKickScreen(
-                self.lcd_display, self.redis_dict, status_codes
+                self.lcd_display, self.redis_dict, screen_actions
             ),
         }
 
@@ -74,12 +81,12 @@ class RobotUi:
             """ Execute on click callback of curr screen """
             action = self.screens[self.curr_screen].on_click()
 
-            if status_codes["change screen"] in action:
-                self.curr_screen = action[status_codes["change screen"]]
+            if screen_actions.CHANGE_SCREEN in action:
+                self.curr_screen = action[screen_actions.CHANGE_SCREEN]
                 self.screens[self.curr_screen].draw_screen()
                 self.lcd_display.show()
-            elif status_codes["update redis"] in action:
-                payload = action[status_codes["update redis"]]
+            elif screen_actions.UPDATE_REDIS in action:
+                payload = action[screen_actions.UPDATE_REDIS]
                 self.redis_client.set(payload["redis key"], payload["value"])
                 self.redis_dict[payload["redis key"]] = payload["value"]
                 # print("Key: {}, Value: {}".format(payload["redis key"], self.redis_client.get(payload["redis key"]).decode("UTF-8")))
