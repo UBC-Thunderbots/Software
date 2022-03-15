@@ -1,6 +1,7 @@
 import threading
 import argparse
 import time
+import os
 
 import pytest
 import software.geom.geometry as tbots_geom
