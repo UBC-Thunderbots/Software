@@ -9,6 +9,7 @@ from proto.robot_log_msg_pb2 import RobotLog
 from proto.world_pb2 import World
 from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
+from PyQt5.QtWidgets import QVBoxLayout, QWidget
 
 from software.networking import threaded_unix_sender
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
@@ -135,6 +136,10 @@ class Thunderscope(object):
         :returns: The dock containing the log widget
 
         """
+        # Create layout
+        layout = QVBoxLayout()
+        widget = QWidget()
+
         # Create widget
         self.logs = g3logWidget()
 
@@ -144,9 +149,15 @@ class Thunderscope(object):
         # Register refresh function
         self.register_refresh_function(self.logs.refresh)
 
+        # Setup Checkbox Widget
+        layout.addWidget(self.logs)
+        layout.addWidget(self.logs.checkbox_widget)
+        widget.setLayout(layout)
+
         # Create and return dock
-        log_dock = Dock("logs", size=(500, 100))
-        log_dock.addWidget(self.logs)
+        log_dock = Dock("Logs", size=(500, 100))
+        log_dock.addWidget(widget)
+
         return log_dock
 
     def setup_performance_plot(self):
