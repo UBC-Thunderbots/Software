@@ -63,7 +63,7 @@ class RobotUi:
         # Draw Tbots logo on first boot
         self.lcd_display = LcdDisplay()
         self.lcd_display.draw_image("./lcd_user_interface/imgs/tbots.jpg")
-        self.curr_screen = "Home"
+        self.curr_screen = "Menu"#"Home"
 
         # All of our screens
         self.screen_actions = ScreenActions()
@@ -79,16 +79,15 @@ class RobotUi:
         def on_click():
             """ Execute on click callback of curr screen """
             action = self.screens[self.curr_screen].on_click()
-
-            if screen_actions.CHANGE_SCREEN in action:
-                self.curr_screen = action[screen_actions.CHANGE_SCREEN]
+            
+            if screen_actions.CHANGE_SCREEN == action["screen action"]:
+                self.curr_screen = action["value"]
                 self.screens[self.curr_screen].draw_screen()
                 self.lcd_display.show()
-            elif screen_actions.UPDATE_REDIS in action:
-                payload = action[screen_actions.UPDATE_REDIS]
-                self.redis_client.set(payload["redis key"], payload["value"])
-                self.redis_dict[payload["redis key"]] = payload["value"]
-                print("Key: {}, Value: {}".format(payload["redis key"], self.redis_client.get(payload["redis key"]).decode("UTF-8")))
+            elif screen_actions.UPDATE_REDIS == action["screen action"]:
+                self.redis_client.set(action["redis key"], action["value"])
+                self.redis_dict[action["redis key"]] = action["value"]
+                print("Key: {}, Value: {}".format(action["redis key"], self.redis_client.get(action["redis key"]).decode("UTF-8")))
 
         def on_clockwise_rotate():
             """ Execute the clockwise rotate callback of curr screen """

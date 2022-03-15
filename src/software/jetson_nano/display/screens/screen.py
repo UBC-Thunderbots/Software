@@ -1,19 +1,30 @@
 from PIL import ImageFont
 import subprocess
 
+
 class Screen:
     """
     All new screens will inherit from this class. This class will handles editing variables and maintaining
     the current action the cursor is hovering.
     """
-    def __init__(self, lcd_display, screen_actions, actions, action_map, draw_screen):
+    def __init__(self, lcd_display, screen_actions, draw_screen, actions):
         """
         @param lcd_display, an instance of the LcdDisplay class
         @param screen_actions, an instance of ScreenActions class
-        @param actions, a list of callback function names associated with this screen
-        @param action_map, a dictionary for making callback function name to callback function
         @param draw_screen, a callback function to re-render screen on lcd display
+        @param actions, a list of dictionaries for the interactive elements on the screen
         """
+        self.actions = actions
+        self.edit_mode = False
+        self.action = None
+
+        self.screen_actions = screen_actions
+        self.draw_screen = draw_screen
+
+        # Maintain current action
+        self.len = len(self.actions)
+        self.curr_action = 0
+        
         self.lcd_display = lcd_display
         self.font_size = 12
         self.font = ImageFont.truetype(
@@ -23,22 +34,6 @@ class Screen:
         self.big_font = ImageFont.truetype(
             "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", self.big_font_size
         )
-        self.screen_actions = screen_actions
-        #self.status_codes = status_codes
-        self.draw_screen = draw_screen
-
-        # Screen actions
-        self.actions = actions
-        self.action_map = action_map
-
-        # Maintain current action
-        self.len = len(self.actions)
-        self.curr_action = 0
-
-        self.edit_mode = False
-        self.param = None
-        self.setting = None
-        self.delta = None
 
     def draw_header(self):
         """ Draw the display header """
@@ -83,26 +78,26 @@ class Screen:
 
     def on_click(self):
         """ Execute the current action """
-        action = self.action_map[self.actions[self.curr_action]]()
+        action = self.actions[self.curr_action]
 
         # For editing settings
-        if self.screen_actions.EDIT_SCREEN in action:
-            payload = action[self.screen_actions.EDIT_SCREEN]
-
-            self.param = payload["param"]
-            self.setting = payload["setting"]
-            self.delta = payload["delta"]
-            self.redis_key = payload["redis key"]
-            if self.edit_mode:
-                action = {
-                    self.screen_actions.UPDATE_REDIS: {
-                        "redis key": self.redis_key,
-                        "value": self.param[self.setting],
-                    }
-                }
+        if self.screen_actions.EDIT_SCREEN == action["screen action"]:
+            self.action = action
+            if not self.edit_mode:
+                action = {"screen action": self.screen_actions.NONE}
             else:
-                action = {self.screen_actions.NONE: None}
+                action = {
+                    "redis key": self.action["redis key"],
+                    "value": self.action["value"],
+                    "screen action": self.screen_actions.UPDATE_REDIS
+                }
             self.edit_mode = not self.edit_mode
+        elif action["type"] == bool:
+            action["value"] = 0 if action["value"] else 1
+            self.update_screen()
+        elif self.screen_actions.CHANGE_SCREEN == action["screen action"]:
+            self.curr_action = 0
+
         return action
 
     def on_clockwise_rotate(self):
@@ -125,8 +120,8 @@ class Screen:
 
     def inc_val(self):
         """ Increment self.param by self.delta"""
-        self.param[self.setting] += self.delta
+        self.action["value"] += self.action["delta"]
 
     def dec_val(self):
         """ Decrement self.param by self.delta """
-        self.param[self.setting] -= self.delta
+        self.action["value"] -= self.action["delta"]

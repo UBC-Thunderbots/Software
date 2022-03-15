@@ -13,26 +13,29 @@ class MenuScreen(Screen):
         @param lcd_display, an instance of the LcdDisplay class
         @param screen_actions, an instance of ScreenActions class
         """
-        # Defining this screens actions
-        def home():
-            """ Action to go to Home Screen """
-            return {self.screen_actions.CHANGE_SCREEN: "Home"}
-
-        def config_wheels():
-            """ Go to Wheel Screen """
-            return {self.screen_actions.CHANGE_SCREEN: "Wheels"}
-
-        def config_chip_and_kick():
-            """ Go to Chip and Kick Screen """
-            return {self.screen_actions.CHANGE_SCREEN: "Chip and Kick"}
-
-        # Listing actions for Menu Screen
-        self.actions = ["Wheels", "Chip and Kick", "Home"]
-        self.action_map = {
-            self.actions[0]: config_wheels,
-            self.actions[1]: config_chip_and_kick,
-            self.actions[2]: home,
-        }
+        actions = [              
+            {
+                "redis key": None,
+                "value": "Wheels",
+                "type": str,
+                "delta": None,
+                "screen action": screen_actions.CHANGE_SCREEN
+            },
+            {
+                "redis key": None,
+                "value": "Chip and Kick",
+                "type": str,
+                "delta": 0.5,
+                "screen action": screen_actions.CHANGE_SCREEN
+            },
+            {
+                "redis key": None,
+                "value": "Home",
+                "type": str,
+                "delta": None,
+                "screen action": screen_actions.CHANGE_SCREEN,
+            },
+        ]
 
         def draw_screen():
             """ Menu Screen Layout """
@@ -72,9 +75,7 @@ class MenuScreen(Screen):
             )
 
         # Pass Menu Screen parameters to super class
-        super().__init__(
-            lcd_display, screen_actions, self.actions, self.action_map, draw_screen
-        )
+        super().__init__(lcd_display, screen_actions, draw_screen, actions)
 
 
 if __name__ == "__main__":

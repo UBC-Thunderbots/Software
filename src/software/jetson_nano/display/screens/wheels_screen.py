@@ -1,9 +1,10 @@
 from screen import Screen
 
-FRONT_LEFT = 0
-FRONT_RIGHT = 1
-BACK_LEFT = 2
-BACK_RIGHT = 3
+ENABLE_INDEX = 0
+FL_INDEX = 1
+FR_INDEX = 2
+BL_INDEX = 3
+BR_INDEX = 4
 
 PADDING = 6
 BASE_Y = 20
@@ -19,88 +20,50 @@ class WheelsScreen(Screen):
         @param redis_dict, a dict of values from redis client to init variables on this screen
         @param screen_actions, an instance of ScreenActions class
         """
-        self.enable = False if redis_dict["wheels enable"] == 0 else True
-        self.wheel_speeds = [
-            redis_dict["fl wheel speed"],
-            redis_dict["fr wheel speed"],
-            redis_dict["bl wheel speed"],
-            redis_dict["br wheel speed"],
+        actions = [              
+            {
+                "redis key": "wheels enable",
+                "value": redis_dict["wheels enable"],
+                "type": bool,
+                "delta": None,
+                "screen action": screen_actions.UPDATE_REDIS
+            },
+            {
+                "redis key": "fl wheel speed",
+                "value": redis_dict["fl wheel speed"],
+                "type": float,
+                "delta": 0.5,
+                "screen action": screen_actions.EDIT_SCREEN
+            },
+            {
+                "redis key": "fr wheel speed",
+                "value": redis_dict["fr wheel speed"],
+                "type": float,
+                "delta": 0.5,
+                "screen action": screen_actions.EDIT_SCREEN
+            },
+            {
+                "redis key": "bl wheel speed",
+                "value": redis_dict["bl wheel speed"],
+                "type": float,
+                "delta": 0.5,
+                "screen action": screen_actions.EDIT_SCREEN
+            },
+            {
+                "redis key": "br wheel speed",
+                "value": redis_dict["br wheel speed"],
+                "type": float,
+                "delta": 0.5,
+                "screen action": screen_actions.EDIT_SCREEN
+            },
+            {
+                "redis key": None,
+                "value": "Menu",
+                "type": str,
+                "delta": None,
+                "screen action": screen_actions.CHANGE_SCREEN,
+            },
         ]
-
-        # Defining this screens actions
-        def menu():
-            """ Go to the menu screen """
-            self.curr_action = 0
-            return {self.screen_actions.CHANGE_SCREEN: "Menu"}
-
-        def set_wheel_speed():
-            """ Enable and disable settings """
-            if self.enable:
-                self.enable = False
-            else:
-                self.enable = True
-            self.update_screen()
-            return {
-                self.screen_actions.UPDATE_REDIS: {
-                    "redis key": "wheels enable",
-                    "value": 1 if self.enable else 0,
-                }
-            }
-
-        def front_left():
-            """ Set speed for front left wheel """
-            return {
-                self.screen_actions.EDIT_SCREEN: {
-                    "param": self.wheel_speeds,
-                    "setting": FRONT_LEFT,
-                    "delta": 0.5,
-                    "redis key": "fl wheel speed",
-                }
-            }
-
-        def front_right():
-            """ Set speed for front right wheel """
-            return {
-                self.screen_actions.EDIT_SCREEN: {
-                    "param": self.wheel_speeds,
-                    "setting": FRONT_RIGHT,
-                    "delta": 0.5,
-                    "redis key": "fr wheel speed",
-                }
-            }
-
-        def back_left():
-            """ Set speed for back left wheel """
-            return {
-                self.screen_actions.EDIT_SCREEN: {
-                    "param": self.wheel_speeds,
-                    "setting": BACK_LEFT,
-                    "delta": 0.5,
-                    "redis key": "bl wheel speed",
-                }
-            }
-
-        def back_right():
-            """ Set speed for back right wheel """
-            return {
-                self.screen_actions.EDIT_SCREEN: {
-                    "param": self.wheel_speeds,
-                    "setting": BACK_RIGHT,
-                    "delta": 0.5,
-                    "redis key": "br wheel speed",
-                }
-            }
-
-        # Listing actions for Config Wheels Screen
-        self.actions = ["Set Wheel Speed", "fLeft", "fRight", "bLeft", "bRight", "Menu"]
-        self.action_map = {
-            self.actions[0]: set_wheel_speed,
-            self.actions[1]: front_left,
-            self.actions[2]: front_right,
-            self.actions[3]: back_left,
-            self.actions[4]: back_right,
-            self.actions[5]: menu,
-        }
 
         def draw_screen():
             """ Wheels Screen Layout """
@@ -122,6 +85,7 @@ class WheelsScreen(Screen):
             # x and y coordinates for drawing on screen
             x = cursor_size
             y = BASE_Y
+            en = True if self.actions[ENABLE_INDEX]["value"] else False
 
             set_wheel_speed_str = "Set Wheel Speed: "
             self.lcd_display.draw.text(
@@ -130,9 +94,9 @@ class WheelsScreen(Screen):
             x += self.font.getsize(set_wheel_speed_str)[0]
             self.lcd_display.draw.text(
                 (x, y),
-                "{}".format(self.enable),
+                "{}".format(en),
                 font=self.font,
-                fill="#00ff00" if self.enable else "#0000ff",
+                fill="#00ff00" if en else "#0000ff",
             )
 
             x = cursor_size
@@ -144,7 +108,7 @@ class WheelsScreen(Screen):
             x += self.font.getsize(front_left_str)[0]
             self.lcd_display.draw.text(
                 (x, y),
-                str(round(self.wheel_speeds[FRONT_LEFT], 1)),
+                str(round(self.actions[FL_INDEX]["value"], 1)),
                 font=self.font,
                 fill="#00ffff",
             )
@@ -158,7 +122,7 @@ class WheelsScreen(Screen):
             x += self.font.getsize(front_right_str)[0]
             self.lcd_display.draw.text(
                 (x, y),
-                str(round(self.wheel_speeds[FRONT_RIGHT], 1)),
+                str(round(self.actions[FR_INDEX]["value"], 1)),
                 font=self.font,
                 fill="#00ffff",
             )
@@ -172,7 +136,7 @@ class WheelsScreen(Screen):
             x += self.font.getsize(back_left_str)[0]
             self.lcd_display.draw.text(
                 (x, y),
-                str(round(self.wheel_speeds[BACK_LEFT], 1)),
+                str(round(self.actions[BL_INDEX]["value"], 1)),
                 font=self.font,
                 fill="#00ffff",
             )
@@ -186,7 +150,7 @@ class WheelsScreen(Screen):
             x += self.font.getsize(back_right_str)[0]
             self.lcd_display.draw.text(
                 (x, y),
-                str(round(self.wheel_speeds[BACK_RIGHT], 1)),
+                str(round(self.actions[BR_INDEX]["value"], 1)),
                 font=self.font,
                 fill="#00ffff",
             )
@@ -199,16 +163,14 @@ class WheelsScreen(Screen):
 
         # Pass Wheel Screen parameters to super class
         super().__init__(
-            lcd_display, screen_actions, self.actions, self.action_map, draw_screen
+            lcd_display, screen_actions, draw_screen, actions
         )
 
     def update_values(self, redis_dict):
         """ Sync values with those from redis """
         if not self.edit_mode:
-            self.enable = False if redis_dict["wheels enable"] == 0 else True
-            self.wheel_speeds = [
-                redis_dict["fl wheel speed"],
-                redis_dict["fr wheel speed"],
-                redis_dict["bl wheel speed"],
-                redis_dict["br wheel speed"],
-            ]
+            self.actions[ENABLE_INDEX]["value"] = 1 if redis_dict["wheels enable"] else 0
+            self.actions[FL_INDEX]["value"] = redis_dict["fl wheel speed"]
+            self.actions[FR_INDEX]["value"] = redis_dict["fr wheel speed"]
+            self.actions[BL_INDEX]["value"] = redis_dict["bl wheel speed"]
+            self.actions[BR_INDEX]["value"] = redis_dict["br wheel speed"]

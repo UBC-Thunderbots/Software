@@ -1,7 +1,7 @@
 from screen import Screen
 
-ROBOT_ID = 0
-CHANNEL_ID = 1
+ROBOT_ID_INDEX = 0
+CHANNEL_ID_INDEX = 1
 
 PADDING = 6
 BASE_Y = 20
@@ -20,47 +20,32 @@ class HomeScreen(Screen):
         @param redis_dict, a dict of values from redis client to init variables on this screen
         @param screen_actions, an instance of ScreenActions class
         """
-        self.ids = [
-            redis_dict["robot id"],
-            redis_dict["channel id"],
+        actions = [              
+            {
+                "redis key": "robot id",
+                "value": redis_dict["robot id"],
+                "type": float,
+                "delta": 1,
+                "screen action": screen_actions.EDIT_SCREEN
+            },
+            {
+                "redis key": "channel id",
+                "value": redis_dict["channel id"],
+                "type": float,
+                "delta": 1,
+                "screen action": screen_actions.EDIT_SCREEN
+            },
+            {
+                "redis key": None,
+                "value": "Menu",
+                "type": str,
+                "delta": None,
+                "screen action": screen_actions.CHANGE_SCREEN,
+            },
         ]
         self.battery_voltage = redis_dict["battery voltage"]
         self.cap_voltage = redis_dict["cap voltage"]
         self.packet_loss = redis_dict["packet loss"]
-
-        def menu():
-            """ Action to go to Menu Screen """
-            return {self.screen_actions.CHANGE_SCREEN: "Menu"}
-
-        def robot_id():
-            """ Set Robot ID """
-            return {
-                self.screen_actions.EDIT_SCREEN: {
-                    "param": self.ids,
-                    "setting": ROBOT_ID,
-                    "delta": 1,
-                    "redis key": "robot id",
-                }
-            }
-
-        def channel_id():
-            """ Set Channel ID """
-            return {
-                self.screen_actions.EDIT_SCREEN: {
-                    "param": self.ids,
-                    "setting": CHANNEL_ID,
-                    "delta": 1,
-                    "redis key": "channel id",
-                }
-            }
-
-        # Listing actions for Home Screen
-        self.actions = ["Robot ID", "Channel ID", "Menu"]
-        self.action_map = {
-            self.actions[0]: robot_id,
-            self.actions[1]: channel_id,
-            self.actions[2]: menu,
-        }
 
         def draw_screen():
             """ Home Screen Layout """
@@ -86,14 +71,14 @@ class HomeScreen(Screen):
             x += self.font.getsize(channel_id_str)[0] / 2
             self.lcd_display.draw.text(
                 (x, y),
-                str(int(self.ids[CHANNEL_ID])),
+                str(int(self.actions[CHANNEL_ID_INDEX]["value"])),
                 font=self.big_font,
                 fill="#00ffff",
             )
 
             x = self.font.getsize(robot_id_str)[0] / 2
             self.lcd_display.draw.text(
-                (x, y), str(int(self.ids[ROBOT_ID])), font=self.big_font, fill="#00ffff"
+                (x, y), str(int(self.actions[ROBOT_ID_INDEX]["value"])), font=self.big_font, fill="#00ffff"
             )
 
             battery_str = "Battery Voltage: "
@@ -148,20 +133,17 @@ class HomeScreen(Screen):
 
         # Pass Home Screen parameters to super class
         super().__init__(
-            lcd_display, screen_actions, self.actions, self.action_map, draw_screen
+            lcd_display, screen_actions, draw_screen, actions
         )
 
     def update_values(self, redis_dict):
         """ Sync values with those from redis """
         if not self.edit_mode:
-            self.ids = [
-                redis_dict["robot id"],
-                redis_dict["channel id"],
-            ]
+            self.actions[ROBOT_ID_INDEX]["value"] = redis_dict["robot id"]
+            self.actions[CHANNEL_ID_INDEX]["value"] = redis_dict["channel id"]
         self.battery_voltage = redis_dict["battery voltage"]
         self.cap_voltage = redis_dict["cap voltage"]
         self.packet_loss = redis_dict["packet loss"]
-
 
 # For testing
 if __name__ == "__main__":
