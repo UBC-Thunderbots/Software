@@ -88,7 +88,9 @@ if [[ $(lsb_release -rs) == "18.04" ]]; then
     # the bazel install hasn't installed it properly
     host_software_packages+=(python-minimal)
     host_software_packages+=(libclang-dev)
+    host_software_packages+=(python2.7-dev)
     host_software_packages+=(python3.8)
+    host_software_packages+=(python3.8-dev)
     host_software_packages+=(python3.8-venv)
     host_software_packages+=(python3-setuptools)
 fi
