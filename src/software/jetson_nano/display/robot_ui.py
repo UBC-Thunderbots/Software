@@ -15,9 +15,9 @@ from wheels_screen import WheelsScreen
 from chip_and_kick_screen import ChipAndKickScreen
 
 # Pins for Rotary Encoder
-BUTTON_PIN = "DAP4_DOUT"  # BOARD 35, TEGRA_SOC: 'DAP4_FS'
-PIN_1 = "GPIO_PE6"  # BOARD 40, TEGRA_SOC: 'DAP4_DOUT'
-PIN_2 = "DAP4_FS"  # BOARD 33, TEGRA_SOC: 'GPIO_PE6'
+BUTTON_PIN = "DAP4_DOUT" # BOARD 40, TEGRA_SOC: 'DAP4_DOUT'
+PIN_1 = "GPIO_PE6" # BOARD 33, TEGRA_SOC: 'GPIO_PE6'
+PIN_2 = "DAP4_FS" # BOARD 35, TEGRA_SOC: 'DAP4_FS'
 
 # These keys indicate how to handle return values
 #status_codes = {"none": 0, "change screen": 1, "edit": 2, "update redis": 3}
@@ -45,13 +45,12 @@ redis_keys = [
     "br wheel speed",
 ]
 
-"""
-This is the top level class for the robot user interface. It ties together the 
-rotary encoder, lcd display, redis server, and all the screens.
-"""
-
 
 class RobotUi:
+    """
+    This is the top level class for the robot user interface. It ties together the 
+    rotary encoder, lcd display, redis server, and all the screens.
+    """
     def __init__(self):
 
         # Initialize redis server and our redis dictionary
@@ -89,7 +88,7 @@ class RobotUi:
                 payload = action[screen_actions.UPDATE_REDIS]
                 self.redis_client.set(payload["redis key"], payload["value"])
                 self.redis_dict[payload["redis key"]] = payload["value"]
-                # print("Key: {}, Value: {}".format(payload["redis key"], self.redis_client.get(payload["redis key"]).decode("UTF-8")))
+                print("Key: {}, Value: {}".format(payload["redis key"], self.redis_client.get(payload["redis key"]).decode("UTF-8")))
 
         def on_clockwise_rotate():
             """ Execute the clockwise rotate callback of curr screen """
