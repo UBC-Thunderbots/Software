@@ -10,7 +10,7 @@ from proto.world_pb2 import SimulatorTick, World, WorldState
 from software.simulated_tests.validation import (
     Validation,
     create_validation_geometry,
-    create_validtion_types,
+    create_validation_types,
 )
 
 
@@ -55,4 +55,4 @@ class RobotEntersRegion(Validation):
     RobotEventuallyExitsRegion,
     RobotStaysInRegion,
     RobotNeverEntersRegion,
-) = create_validtion_types(RobotEntersRegion)
+) = create_validation_types(RobotEntersRegion)

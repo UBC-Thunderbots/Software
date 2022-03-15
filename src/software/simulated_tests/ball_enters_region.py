@@ -10,7 +10,7 @@ from proto.world_pb2 import SimulatorTick, World, WorldState
 from software.simulated_tests.validation import (
     Validation,
     create_validation_geometry,
-    create_validtion_types,
+    create_validation_types,
 )
 
 
@@ -54,4 +54,4 @@ class BallEntersRegion(Validation):
     BallEventuallyExitsRegion,
     BallStaysInRegion,
     BallNeverEntersRegion,
-) = create_validtion_types(BallEntersRegion)
+) = create_validation_types(BallEntersRegion)
