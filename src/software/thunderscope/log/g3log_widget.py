@@ -2,10 +2,11 @@ import queue
 
 import pyqtgraph as pg
 import pyqtgraph.console as pg_console
-from proto.robot_log_msg_pb2 import RobotLog
+from proto.robot_log_msg_pb2 import RobotLog, LogLevel
 
 import software.thunderscope.constants as constants
 from software.networking.threaded_unix_listener import ThreadedUnixListener
+from software.thunderscope.log.g3log_checkboxes import g3logCheckboxes
 
 
 class g3logWidget(pg_console.ConsoleWidget):
@@ -27,6 +28,9 @@ class g3logWidget(pg_console.ConsoleWidget):
             }"""
         )
 
+        # Creates checkbox widget
+        self.checkbox_widget = g3logCheckboxes()
+
         self.log_buffer = queue.Queue(buffer_size)
 
     def refresh(self):
@@ -37,12 +41,32 @@ class g3logWidget(pg_console.ConsoleWidget):
         except queue.Empty as empty:
             return
 
-        log_str = "{} {} [{}->{}] {}\n".format(
-            log.created_timestamp.epoch_timestamp_seconds,
-            log.log_level,
-            log.file_name,
-            log.line_number,
-            log.log_msg,
-        )
-
-        self.write(log_str)
+        # Checks whether this type of log is enabled from checkboxes
+        if (
+            (
+                log.log_level == LogLevel.DEBUG
+                and self.checkbox_widget.debug_checkbox.isChecked()
+            )
+            or (
+                log.log_level == LogLevel.INFO
+                and self.checkbox_widget.info_checkbox.isChecked()
+            )
+            or (
+                log.log_level == LogLevel.WARNING
+                and self.checkbox_widget.warning_checkbox.isChecked()
+            )
+            or (
+                log.log_level == LogLevel.FATAL
+                and self.checkbox_widget.fatal_checkbox.isChecked()
+            )
+        ):
+            log_str = "{} {} [{}->{}] {}\n".format(
+                log.created_timestamp.epoch_timestamp_seconds,
+                log.log_level,
+                log.file_name,
+                log.line_number,
+                log.log_msg,
+            )
+            self.write(log_str)
+        else:
+            return

@@ -178,6 +178,76 @@ class Thunderscope(object):
     def close(self):
         self.window.close()
 
+=======
+    # Setup unix socket directory
+    try:
+        os.mkdir("/tmp/tbots")
+    except Exception as e:
+        print(e)
+        pass
+
+    proto_receiver = ProtoReceiver()
+
+    # Setup MainApp and initialize DockArea
+    app = pg.mkQApp("Thunderscope")
+    app.setStyleSheet("QMainWindow{background-color: black;border: 1px solid black;}")
+    window = QtGui.QMainWindow()
+    dock_area = DockArea()
+    window.setCentralWidget(dock_area)
+    window.setWindowTitle("Thunderscope")
+
+    # Setup Field + Layers
+    field = Field()
+    world = world_layer.WorldLayer()
+    obstacles = obstacle_layer.ObstacleLayer()
+    paths = path_layer.PathLayer()
+
+    proto_receiver.register_observer(World, world.world_buffer)
+    proto_receiver.register_observer(Obstacles, obstacles.obstacle_buffer)
+    proto_receiver.register_observer(PathVisualization, paths.path_visualization_buffer)
+
+    field.add_layer("Vision", world)
+    field.add_layer("Obstacles", obstacles)
+    field.add_layer("Path", paths)
+
+    field_dock = Dock("Field", size=(500, 2000))
+    field_dock.addWidget(field)
+
+    # Setup Console Widget
+    logs = g3logWidget()
+    proto_receiver.register_observer(RobotLog, logs.log_buffer)
+
+    log_dock = Dock("logs", size=(500, 100))
+    log_dock.addWidget(logs)
+
+    # Setup Checkbox Widget
+    check_boxes = logs.checkboxWidget
+
+    check_boxes_dock = Dock("Logs filter", size=(100, 100))
+    check_boxes_dock.addWidget(check_boxes)
+    # Setup Arbitrary Plot Widget
+    named_value_plotter = NamedValuePlotter()
+    named_value_plotter_dock = Dock("Performance", size=(500, 100))
+    named_value_plotter_dock.addWidget(named_value_plotter.plot)
+    proto_receiver.register_observer(NamedValue, named_value_plotter.named_value_buffer)
+
+    # Configure Docks
+    dock_area.addDock(field_dock, "left")
+    dock_area.addDock(log_dock, "bottom", field_dock)
+    dock_area.addDock(check_boxes_dock, "bottom", log_dock)
+    dock_area.addDock(named_value_plotter_dock, "right", log_dock)
+
+    def update():
+        field.refresh()
+        logs.refresh()
+        named_value_plotter.refresh()
+
+    timer = QtCore.QTimer()
+    timer.timeout.connect(update)
+    timer.start(5)  # Refresh at 200hz
+
+    window.show()
+>>>>>>> 4cc5517d0fcb3b966da9b64b866c896329760baf
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Thunderscope")
