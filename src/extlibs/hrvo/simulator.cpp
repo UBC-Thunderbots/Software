@@ -118,6 +118,7 @@ void HRVOSimulator::updateWorld(const World &world)
                 // Only update velocity if time has passed since the last time velocity
                 // was updated. This is to allow SensorFusion to update the actual robot
                 // velocity in World.
+                // TODO (#2531): Remove 4 multiplier and fix goal keeper moving slowly
                 if (global_time - last_time_velocity_updated >= 4 * time_step)
                 {
                     Vector velocity = friendly_robot.velocity();
