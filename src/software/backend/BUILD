@@ -43,11 +43,11 @@ cc_library(
         "//proto/primitive:primitive_msg_factory",
         "//shared:constants",
         "//software:constants",
-        "//software/estop:boost_uart_communication",
         "//software/estop:threaded_estop_reader",
         "//software/logger",
         "//software/networking:threaded_proto_udp_listener",
         "//software/networking:threaded_proto_udp_sender",
+        "//software/uart:boost_uart_communication",
         "//software/util/generic_factory",
     ],
     # We force linking so that the static variables required for the "factory"

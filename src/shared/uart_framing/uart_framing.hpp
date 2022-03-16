@@ -1,20 +1,9 @@
 #pragma once
 
 #include <cstdint>
-#include <optional>
 #include <vector>
 
 const uint8_t START_END_FLAG_BYTE = 0x00;
-template <typename T>
-struct UartMessageFrame;
-
-/**
- * Acts as a frame for uart messages
- * The type of message should be structs.
- * These structs should not include pointers or references.
- *
- * @tparam T the type of message being framed
- */
 
 namespace
 {
@@ -91,17 +80,17 @@ namespace
      * delimiter byte at the end as in the wikipedia example.
      *
      * @param to_decode the vector of bytes to decode
-     * @return a vector of bytes decoded with COBS
+     * @param decoded the vector that bytes are decoded to
+     * @return whether the decode was successful
      */
-    std::optional<std::vector<uint8_t>> cobsDecoding(
-        const std::vector<uint8_t>& to_decode)
+    bool cobsDecoding(
+        const std::vector<uint8_t>& to_decode, std::vector<uint8_t>& decoded)
     {
         if (to_decode.front() != START_END_FLAG_BYTE ||
             to_decode.back() != START_END_FLAG_BYTE)
         {
-            return std::nullopt;
+            return false;
         }
-        auto decoded = std::vector<uint8_t>();
 
         uint16_t i = 1;
         while (i < to_decode.size())
@@ -110,13 +99,13 @@ namespace
             // Check that overhead does not point to past the end of the vector
             if (overhead + i > to_decode.size())
             {
-                return std::nullopt;
+                return false;
             }
             // Check that instances of the START_END_FLAG_BYTE are not in the middle of
             // the vector
             if (overhead == START_END_FLAG_BYTE && i != to_decode.size())
             {
-                return std::nullopt;
+                return false;
             }
             for (uint16_t j = 1; i < to_decode.size() && j < overhead; j++)
             {
@@ -129,10 +118,17 @@ namespace
             }
         }
 
-        return decoded;
+        return true;
     }
 }  // anonymous namespace
 
+/**
+ * Acts as a frame for uart messages
+ * The type of message should be structs.
+ * These structs should not include pointers or references.
+ *
+ * @tparam T the type of message being framed
+ */
 template <typename T>
 struct UartMessageFrame
 {
@@ -192,36 +188,35 @@ UartMessageFrame<T> createUartMessageFrame(const T& data)
 }
 
 /**
- * Converts a vector of bytes to its corresponding UartMessageFrame if it exists.
- * Returns std::nullopt if bit or length errors are detected while decoding or through the
- * crc.
+ * Converts a vector of bytes to its corresponding UartMessageFrame.
  *
  * @tparam T type of UartMessageFrame to unmarshal to
  * @param data vector of bytes to unmarshal
- * @return a corresponding UartMessageFrame, if it exists
+ * @param message_frame frame to unmarshal to
+ * @return whether the unmarshall was successful
  *
  */
 template <typename T>
-std::optional<UartMessageFrame<T>> unmarshalUartPacket(const std::vector<uint8_t>& data)
+bool unmarshalUartPacket(const std::vector<uint8_t>& data, UartMessageFrame<T>& message_frame)
 {
-    auto decoded_data = cobsDecoding(data);
-    if (!decoded_data.has_value())
+    auto decoded = std::vector<uint8_t>();
+    if (!cobsDecoding(data, decoded))
     {
-        return std::nullopt;
+        return false;
     }
-    UartMessageFrame<T> message_frame;
-    if (decoded_data->size() != sizeof(message_frame))
+    if (decoded.size() != sizeof(message_frame))
     {
-        return std::nullopt;
+        return false;
     }
-    std::copy(decoded_data->begin(), decoded_data->end(),
+    std::copy(decoded.begin(), decoded.end(),
               reinterpret_cast<uint8_t*>(&message_frame));
-    if (message_frame.verifyLengthAndCrc())
-    {
-        return message_frame;
-    }
-    else
-    {
-        return std::nullopt;
-    }
+    return message_frame.verifyLengthAndCrc();
 }
+
+template <typename T>
+size_t getMarshalledSize(const T& data) {
+    auto data_ptr = reinterpret_cast<const char*>(&data);
+    std::vector<uint8_t>data_vector (data_ptr, data_ptr + sizeof(data));
+    return cobsEncoding(data_vector).size() + sizeof(UartMessageFrame<T>) - sizeof(T);
+}
+
