@@ -15,6 +15,12 @@ Ball::Ball(const BallState &initial_state, const Timestamp &timestamp,
 {
 }
 
+Ball::Ball(const TbotsProto::Ball &ball_proto)
+    : current_state_(BallState(ball_proto.current_state())),
+      timestamp_(Timestamp::fromTimestampProto(ball_proto.timestamp()))
+{
+}
+
 BallState Ball::currentState() const
 {
     return current_state_;

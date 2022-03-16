@@ -2,256 +2,82 @@
 
 #include <gtest/gtest.h>
 
-#include "software/ai/hl/stp/action/chip_action.h"
+#include <utility>
+
+#include "software/geom/algorithms/contains.h"
+#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
+#include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
+#include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
+#include "software/simulated_tests/validation/validation_function.h"
 #include "software/test_util/test_util.h"
+#include "software/time/duration.h"
+#include "software/world/world.h"
 
-void compareChipActions(std::shared_ptr<ChipAction> chip_action,
-                        std::shared_ptr<ChipAction> expected_chip_action)
+class ChipTacticTest : public SimulatedErForceSimTacticTestFixture,
+                       public ::testing::WithParamInterface<std::tuple<Vector, Angle>>
 {
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(expected_chip_action->getChipOrigin(),
-                                               chip_action->getChipOrigin(), 1e-6));
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(expected_chip_action->getChipDirection(),
-                                               chip_action->getChipDirection(),
-                                               Angle::fromDegrees(1e-6)));
-    EXPECT_TRUE(
-        TestUtil::equalWithinTolerance(expected_chip_action->getChipDistanceMeters(),
-                                       chip_action->getChipDistanceMeters(), 1e-6));
+   protected:
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
+};
+
+TEST_P(ChipTacticTest, chip_test)
+{
+    Vector ball_offset_from_robot = std::get<0>(GetParam());
+    Angle angle_to_kick_at        = std::get<1>(GetParam());
+
+    Point robot_position = Point(0, 0);
+    BallState ball_state(robot_position + ball_offset_from_robot, Vector(0, 0));
+
+    auto friendly_robots =
+        TestUtil::createStationaryRobotStatesWithId({Point(-3, 2.5), robot_position});
+    auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
+
+    auto tactic = std::make_shared<ChipTactic>();
+    tactic->updateControlParams(robot_position + ball_offset_from_robot, angle_to_kick_at,
+                                5);
+    setTactic(tactic);
+    setFriendlyRobotId(1);
+
+    std::vector<ValidationFunction> terminating_validation_functions = {
+        [angle_to_kick_at, tactic](std::shared_ptr<World> world_ptr,
+                                   ValidationCoroutine::push_type& yield) {
+            while (!tactic->done())
+            {
+                yield("Tactic did not complete!");
+            }
+            ballKicked(angle_to_kick_at, world_ptr, yield);
+        }};
+
+    std::vector<ValidationFunction> non_terminating_validation_functions = {};
+
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
+            terminating_validation_functions, non_terminating_validation_functions,
+            Duration::fromSeconds(5));
 }
 
-TEST(ChipTacticTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-
-    Robot robot = Robot(0, Point(-0.3, 0), Vector(0, 0), Angle::zero(),
-                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
-
-    ChipTactic tactic = ChipTactic(true);
-    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
-
-    tactic.updateRobot(robot);
-    tactic.updateControlParams(Point(0, 0), Point(1, 1));
-    auto action_ptr = tactic.getNextAction();
-
-    // Check an action was returned (the pointer is not null)
-    ASSERT_TRUE(action_ptr);
-
-    auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
-
-    std::shared_ptr<ChipAction> expected_chip_action = std::make_shared<ChipAction>();
-    expected_chip_action->updateControlParams(robot, ball.position(),
-                                              Angle::fromDegrees(45.0), sqrtf(2.0));
-
-    ASSERT_NE(chip_action, nullptr);
-    compareChipActions(chip_action, expected_chip_action);
-}
-
-TEST(ChipTacticTest, robot_behind_ball_chipping_towards_negative_x_positive_y)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-
-    Robot robot = Robot(0, Point(-1.3, 2), Vector(0, 0), Angle::zero(),
-                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
-
-    ChipTactic tactic = ChipTactic(true);
-
-    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
-
-
-    tactic.updateRobot(robot);
-    tactic.updateControlParams(Point(0, 0), Point(-1, 1));
-    auto action_ptr = tactic.getNextAction();
-
-    // Check an action was returned (the pointer is not null)
-    EXPECT_TRUE(action_ptr);
-
-    auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
-
-    std::shared_ptr<ChipAction> expected_chip_action = std::make_shared<ChipAction>();
-    expected_chip_action->updateControlParams(robot, ball.position(),
-                                              Angle::fromDegrees(135.0), sqrtf(2.0));
-
-    ASSERT_NE(chip_action, nullptr);
-    compareChipActions(chip_action, expected_chip_action);
-}
-
-TEST(ChipTacticTest, robot_behind_ball_chipping_towards_negative_x_negative_y)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-
-    Robot robot = Robot(0, Point(-0.5, 1.3), Vector(0, 0), Angle::zero(),
-                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
-
-    ChipTactic tactic = ChipTactic(true);
-
-    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
-
-
-    tactic.updateRobot(robot);
-    tactic.updateControlParams(Point(0, 0), Point(-1, -1));
-    auto action_ptr = tactic.getNextAction();
-
-    // Check an action was returned (the pointer is not null)
-    EXPECT_TRUE(action_ptr);
-
-    auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
-
-    std::shared_ptr<ChipAction> expected_chip_action = std::make_shared<ChipAction>();
-    expected_chip_action->updateControlParams(robot, ball.position(),
-                                              Angle::fromDegrees(225.0), sqrtf(2.0));
-
-    ASSERT_NE(chip_action, nullptr);
-    compareChipActions(chip_action, expected_chip_action);
-}
-
-TEST(ChipTacticTest, robot_behind_ball_chipping_towards_positive_x_negative_y)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-
-    Robot robot = Robot(0, Point(-1.2, 2.1), Vector(0, 0), Angle::zero(),
-                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
-
-    ChipTactic tactic = ChipTactic(true);
-
-    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
-
-
-    tactic.updateRobot(robot);
-    tactic.updateControlParams(Point(0, 0), Point(1, -1));
-    auto action_ptr = tactic.getNextAction();
-
-    // Check an action was returned (the pointer is not null)
-    EXPECT_TRUE(action_ptr);
-
-    auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
-
-    std::shared_ptr<ChipAction> expected_chip_action = std::make_shared<ChipAction>();
-    expected_chip_action->updateControlParams(robot, ball.position(),
-                                              Angle::fromDegrees(315.0), sqrtf(2.0));
-
-    ASSERT_NE(chip_action, nullptr);
-    compareChipActions(chip_action, expected_chip_action);
-}
-
-TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_positive_x_positive_y)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-
-    Robot robot = Robot(0, Point(0.3, 0), Vector(0, 0), Angle::zero(),
-                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
-
-    ChipTactic tactic = ChipTactic(true);
-
-    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
-
-
-    tactic.updateRobot(robot);
-    tactic.updateControlParams(Point(0, 0), Point(1, 1));
-    auto action_ptr = tactic.getNextAction();
-
-    // Check an action was returned (the pointer is not null)
-    EXPECT_TRUE(action_ptr);
-
-    auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
-
-    std::shared_ptr<ChipAction> expected_chip_action = std::make_shared<ChipAction>();
-    expected_chip_action->updateControlParams(robot, ball.position(),
-                                              Angle::fromDegrees(45.0), sqrtf(2.0));
-
-    ASSERT_NE(chip_action, nullptr);
-    compareChipActions(chip_action, expected_chip_action);
-}
-
-TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_negative_x_positive_y)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-
-    Robot robot = Robot(0, Point(1.1, 0.2), Vector(0, 0), Angle::zero(),
-                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
-
-    ChipTactic tactic = ChipTactic(true);
-
-    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
-
-
-    tactic.updateRobot(robot);
-    tactic.updateControlParams(Point(0, 0), Point(-1, 1));
-    auto action_ptr = tactic.getNextAction();
-
-    // Check an action was returned (the pointer is not null)
-    EXPECT_TRUE(action_ptr);
-
-    auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
-
-    std::shared_ptr<ChipAction> expected_chip_action = std::make_shared<ChipAction>();
-    expected_chip_action->updateControlParams(robot, ball.position(),
-                                              Angle::fromDegrees(135.0), sqrtf(2.0));
-
-    ASSERT_NE(chip_action, nullptr);
-    compareChipActions(chip_action, expected_chip_action);
-}
-
-TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_negative_x_negative_y)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-
-    Robot robot = Robot(0, Point(0.7, 2), Vector(0, 0), Angle::zero(),
-                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
-
-    ChipTactic tactic = ChipTactic(true);
-
-    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
-
-
-    tactic.updateRobot(robot);
-    tactic.updateControlParams(Point(0, 0), Point(-1, -1));
-    auto action_ptr = tactic.getNextAction();
-
-    // Check an action was returned (the pointer is not null)
-    EXPECT_TRUE(action_ptr);
-
-    auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
-
-    std::shared_ptr<ChipAction> expected_chip_action = std::make_shared<ChipAction>();
-    expected_chip_action->updateControlParams(robot, ball.position(),
-                                              Angle::fromDegrees(225.0), sqrtf(2.0));
-
-    ASSERT_NE(chip_action, nullptr);
-    compareChipActions(chip_action, expected_chip_action);
-}
-
-TEST(ChipTacticTest, robot_not_behind_ball_chipping_towards_positive_x_negative_y)
-{
-    World world = ::TestUtil::createBlankTestingWorld();
-    world = ::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
-
-    Robot robot = Robot(0, Point(1.3, 1.2), Vector(0, 0), Angle::zero(),
-                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
-
-    ChipTactic tactic = ChipTactic(true);
-
-    Ball ball({0, 0}, robot.position().toVector(), Timestamp::fromSeconds(0));
-
-
-    tactic.updateRobot(robot);
-    tactic.updateControlParams(Point(0, 0), Point(1, -1));
-    auto action_ptr = tactic.getNextAction();
-
-    // Check an action was returned (the pointer is not null)
-    EXPECT_TRUE(action_ptr);
-
-    auto chip_action = std::dynamic_pointer_cast<ChipAction>(action_ptr);
-
-    std::shared_ptr<ChipAction> expected_chip_action = std::make_shared<ChipAction>();
-    expected_chip_action->updateControlParams(robot, ball.position(),
-                                              Angle::fromDegrees(315.0), sqrtf(2.0));
-
-    ASSERT_NE(chip_action, nullptr);
-    compareChipActions(chip_action, expected_chip_action);
-}
+INSTANTIATE_TEST_CASE_P(
+    BallLocations, ChipTacticTest,
+    ::testing::Values(
+        // place the ball directly to the left of the robot
+        std::make_tuple(Vector(0, 0.5), Angle::zero()),
+        // place the ball directly to the right of the robot
+        std::make_tuple(Vector(0, -0.5), Angle::zero()),
+        // place the ball directly infront of the robot
+        std::make_tuple(Vector(0.5, 0), Angle::zero()),
+        // place the ball directly behind the robot
+        std::make_tuple(Vector(-0.5, 0), Angle::zero()),
+        // place the ball in the robots dribbler
+        std::make_tuple(Vector(ROBOT_MAX_RADIUS_METERS, 0), Angle::zero()),
+
+        // Repeat the same tests but kick in the opposite direction
+        // place the ball directly to the left of the robot
+        std::make_tuple(Vector(0, 0.5), Angle::half()),
+        // place the ball directly to the right of the robot
+        std::make_tuple(Vector(0, -0.5), Angle::half()),
+        // place the ball directly infront of the robot
+        std::make_tuple(Vector(0.5, 0), Angle::half()),
+        // place the ball directly behind the robot
+        std::make_tuple(Vector(-0.5, 0), Angle::half()),
+        // place the ball in the robots dribbler
+        std::make_tuple(Vector(ROBOT_MAX_RADIUS_METERS, 0), Angle::zero())));

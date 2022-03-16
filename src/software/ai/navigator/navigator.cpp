@@ -1,7 +1,9 @@
 #include "software/ai/navigator/navigator.h"
 
+#include "proto/message_translation/tbots_geometry.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "proto/primitive/primitive_msg_factory.h"
+#include "proto/visualization.pb.h"
 #include "software/ai/navigator/navigating_primitive_creator.h"
 #include "software/geom/algorithms/distance.h"
 #include "software/logger/logger.h"
@@ -49,6 +51,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Navigator::getAssignedPrimitives(
     auto robot_id_to_path =
         path_manager->getManagedPaths(path_objectives, navigable_area);
 
+    TbotsProto::PathVisualization path_visualization_proto;
+
     // Add primitives from navigating intents
     auto &robot_primitives_map = *primitive_set_msg->mutable_robot_primitives();
     for (const auto &intent : navigating_intents)
@@ -58,11 +62,22 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Navigator::getAssignedPrimitives(
         if (robot_id_to_path_iter != robot_id_to_path.end() &&
             robot_id_to_path_iter->second)
         {
-            planned_paths.push_back(robot_id_to_path_iter->second->getKnots());
+            auto knots = robot_id_to_path_iter->second->getKnots();
+            planned_paths.push_back(knots);
+
+            TbotsProto::Path path_proto;
+
+            for (auto knot : knots)
+            {
+                *(path_proto.add_point()) = *createPointProto(knot);
+            }
+
             robot_primitives_map[robot_id] =
                 NavigatingPrimitiveCreator(config).createNavigatingPrimitive(
                     *intent, *(robot_id_to_path_iter->second),
                     robot_navigation_obstacle_factory.createFromTeam(world.enemyTeam()));
+
+            *(path_visualization_proto.add_path()) = path_proto;
         }
         else
         {
@@ -72,6 +87,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Navigator::getAssignedPrimitives(
             robot_primitives_map[robot_id] = *createStopPrimitive(false);
         }
     }
+
+    LOG(VISUALIZE) << path_visualization_proto;
 
     return std::move(primitive_set_msg);
 }
@@ -123,7 +140,7 @@ std::unordered_set<PathObjective> Navigator::createPathObjectives(
             obstacles.insert(obstacles.end(), enemy_robot_obstacles.begin(),
                              enemy_robot_obstacles.end());
 
-            if (intent->getBallCollisionType() == BallCollisionType::AVOID)
+            if (intent->getBallCollisionType() == TbotsProto::BallCollisionType::AVOID)
             {
                 obstacles.push_back(ball_obstacle);
             }
@@ -141,6 +158,7 @@ std::unordered_set<PathObjective> Navigator::createPathObjectives(
             LOG(WARNING) << ss.str();
         }
     }
+
     return path_objectives;
 }
 

@@ -1,18 +1,11 @@
 #include "software/ai/hl/stp/play/play.h"
 
-Play::Play(std::shared_ptr<const PlayConfig> play_config, bool requires_goalie)
-    : play_config(play_config),
+Play::Play(std::shared_ptr<const AiConfig> ai_config, bool requires_goalie)
+    : ai_config(ai_config),
       requires_goalie(requires_goalie),
       tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
       world(std::nullopt)
 {
-}
-
-bool Play::done() const
-{
-    // If the coroutine "iterator" is done, the getNextTactics function has completed
-    // and has no more work to do. Therefore, the Play is done.
-    return !static_cast<bool>(tactic_sequence);
 }
 
 PriorityTacticVector Play::getTactics(const World &world)
@@ -27,16 +20,43 @@ PriorityTacticVector Play::getTactics(const World &world)
     {
         // Run the coroutine. This will call the bound getNextTactics function
         tactic_sequence();
+    }
+    else
+    {
+        // Make a new tactic_sequence
+        tactic_sequence = TacticCoroutine::pull_type(
+            boost::bind(&Play::getNextTacticsWrapper, this, _1));
+        // Run the coroutine. This will call the bound getNextTactics function
+        tactic_sequence();
+    }
 
-        // Check if the coroutine is still valid before getting the result. This makes
-        // sure we don't try get the result after "running out the bottom" of the
-        // coroutine function
+    // Check if the coroutine is still valid before getting the result. This makes
+    // sure we don't try get the result after "running out the bottom" of the
+    // coroutine function
+    if (tactic_sequence)
+    {
+        // Extract the result from the coroutine. This will be whatever value was
+        // yielded by the getNextTactics function
+        auto next_tactics = tactic_sequence.get();
+        return next_tactics;
+    }
+    else
+    {
+        // Make a new tactic_sequence
+        tactic_sequence = TacticCoroutine::pull_type(
+            boost::bind(&Play::getNextTacticsWrapper, this, _1));
+        // Run the coroutine. This will call the bound getNextTactics function
+        tactic_sequence();
         if (tactic_sequence)
         {
             // Extract the result from the coroutine. This will be whatever value was
             // yielded by the getNextTactics function
             auto next_tactics = tactic_sequence.get();
             return next_tactics;
+        }
+        else
+        {
+            LOG(WARNING) << "Failed to restart play" << std::endl;
         }
     }
     // If the coroutine "iterator" is done, the getNextTactics function has completed
@@ -50,7 +70,18 @@ std::vector<std::unique_ptr<Intent>> Play::get(
     MotionConstraintBuildFunction motion_constraint_builder, const World &new_world)
 {
     std::vector<std::unique_ptr<Intent>> intents;
-    PriorityTacticVector priority_tactics = getTactics(new_world);
+    PriorityTacticVector priority_tactics;
+    unsigned int num_tactics =
+        static_cast<unsigned int>(new_world.friendlyTeam().numRobots());
+    if (requires_goalie && new_world.friendlyTeam().goalie())
+    {
+        num_tactics--;
+    }
+    updateTactics(PlayUpdate(new_world, num_tactics,
+                             [&priority_tactics](PriorityTacticVector new_tactics) {
+                                 priority_tactics = std::move(new_tactics);
+                             }));
+
     ConstPriorityTacticVector const_priority_tactics;
 
     // convert pointers to const pointers
@@ -86,11 +117,6 @@ void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
     // never be seen/used by the rest of the system.
     yield({});
 
-    // Anytime after the first function call, the getNextTactics function will be
-    // used to perform the real logic. The calculateNextIntent function will yield its
-    // values to the top of the coroutine stack, where they will be retrieved by
-    // getNextAction, so we do not need to yield or return the result of this function
-    //
     // The getNextTactics function is given the World as a parameter rather than using
     // the member variable since it's more explicit and obvious where the World
     // comes from when implementing Plays. The World is passed as a reference, so when
@@ -100,4 +126,10 @@ void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
     {
         getNextTactics(yield, world.value());
     }
+}
+
+// TODO (#2359): delete once all plays are not coroutines
+void Play::updateTactics(const PlayUpdate &play_update)
+{
+    play_update.set_tactics(getTactics(play_update.world));
 }

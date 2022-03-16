@@ -38,8 +38,7 @@ class CreaseDefenderTactic : public Tactic
 
     CreaseDefenderTactic() = delete;
 
-    void updateWorldParams(const World &world) override;
-    bool done() const override;
+    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
     /**
      * Update control params for this tactic
@@ -48,9 +47,10 @@ class CreaseDefenderTactic : public Tactic
      * @param alignment The alignment for this crease defender
      * @param max_allowed_speed_mode The mode of maximum speed allowed
      */
-    void updateControlParams(
-        const Point &enemy_threat_origin, const CreaseDefenderAlignment &alignment,
-        MaxAllowedSpeedMode max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+    void updateControlParams(const Point &enemy_threat_origin,
+                             const TbotsProto::CreaseDefenderAlignment &alignment,
+                             TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+                                 TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -64,7 +64,6 @@ class CreaseDefenderTactic : public Tactic
     void accept(TacticVisitor &visitor) const override;
 
    private:
-    void calculateNextAction(ActionCoroutine::push_type &yield) override;
     void updateIntent(const TacticUpdate &tactic_update) override;
 
     // Tactic parameters

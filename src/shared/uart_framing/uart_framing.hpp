@@ -219,4 +219,3 @@ size_t getMarshalledSize(const T& data) {
     std::vector<uint8_t>data_vector (data_ptr, data_ptr + sizeof(data));
     return cobsEncoding(data_vector).size() + sizeof(UartMessageFrame<T>) - sizeof(T);
 }
-

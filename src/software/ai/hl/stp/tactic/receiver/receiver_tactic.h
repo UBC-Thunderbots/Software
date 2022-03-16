@@ -16,7 +16,6 @@
 class ReceiverTactic : public Tactic
 {
    public:
-    void updateWorldParams(const World& world);
     ReceiverTactic();
 
     /**
@@ -26,7 +25,7 @@ class ReceiverTactic : public Tactic
      * @param disable_one_touch_shot If set to true, the receiver will not perform a
      * one-touch The robot will simply receive and dribble.
      */
-    void updateControlParams(const Pass& updated_pass,
+    void updateControlParams(std::optional<Pass> updated_pass,
                              bool disable_one_touch_shot = false);
 
     /**
@@ -66,7 +65,8 @@ class ReceiverTactic : public Tactic
                                                      const Point& best_shot_target);
 
     void accept(TacticVisitor& visitor) const override;
-    bool done() const override;
+
+    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
     // The minimum proportion of open net we're shooting on vs the entire size of the net
@@ -77,7 +77,6 @@ class ReceiverTactic : public Tactic
     // enemy goal with
     static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(90);
 
-    void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
     /**

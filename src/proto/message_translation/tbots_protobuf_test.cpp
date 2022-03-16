@@ -12,29 +12,29 @@ class TbotsProtobufTest : public ::testing::Test
     static void assertPointMessageEqual(const Point& point,
                                         const TbotsProto::Point& point_msg)
     {
-        EXPECT_NEAR(point_msg.x_meters(), point.x(), 1e-6);
-        EXPECT_NEAR(point_msg.y_meters(), point.y(), 1e-6);
+        EXPECT_EQ(point_msg.x_meters(), point.x());
+        EXPECT_EQ(point_msg.y_meters(), point.y());
     }
 
     static void assertAngleMessageEqual(const Angle& angle,
                                         const TbotsProto::Angle& angle_msg)
     {
-        EXPECT_NEAR(angle_msg.radians(), angle.toRadians(), 1e-6);
+        EXPECT_EQ(angle_msg.radians(), angle.toRadians());
     }
 
     static void assertAngularVelocityMessageEqual(
         const AngularVelocity& angular_velocity,
         const TbotsProto::AngularVelocity& angular_velocity_msg)
     {
-        EXPECT_NEAR(angular_velocity_msg.radians_per_second(),
-                    angular_velocity.toRadians(), 1e-6);
+        EXPECT_EQ(angular_velocity_msg.radians_per_second(),
+                  angular_velocity.toRadians());
     }
 
     static void assertVectorMessageEqual(const Vector& vector,
                                          const TbotsProto::Vector& vector_msg)
     {
-        EXPECT_NEAR(vector_msg.x_component_meters(), vector.x(), 1e-6);
-        EXPECT_NEAR(vector_msg.y_component_meters(), vector.y(), 1e-6);
+        EXPECT_EQ(vector_msg.x_component_meters(), vector.x());
+        EXPECT_EQ(vector_msg.y_component_meters(), vector.y());
     }
 
     static void assertBallStateMessageFromBall(
@@ -84,8 +84,9 @@ TEST(TbotsProtobufTest, robot_state_msg_test)
 
     Robot robot(0, position, velocity, orientation, angular_velocity,
                 Timestamp::fromSeconds(0));
-    auto robot_state_msg = createRobotState(robot);
+    auto robot_state_msg = createRobotStateProto(robot);
 
+    EXPECT_EQ(robot.currentState(), createRobotState(*robot_state_msg));
     TbotsProtobufTest::assertRobotStateMessageFromRobot(robot, *robot_state_msg);
 }
 
@@ -123,42 +124,4 @@ TEST(TbotsProtobufTest, vision_msg_test)
                       TbotsProtobufTest::assertRobotStateMessageFromRobot(
                           robot, robot_states_map[robot.id()]);
                   });
-}
-
-TEST(TbotsProtobufTest, robot_state_test)
-{
-    auto position         = Point(4.20, 4.20);
-    auto velocity         = Vector(4.20, 4.20);
-    auto orientation      = Angle::fromRadians(4.20);
-    auto angular_velocity = Angle::fromRadians(4.20);
-
-    Robot robot(0, position, velocity, orientation, angular_velocity,
-                Timestamp::fromSeconds(0));
-    auto robot_state_msg = createRobotState(robot);
-    auto robot_state     = createRobotState(*robot_state_msg);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_state.position(),
-                                               robot.currentState().position(), 1e-3));
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_state.velocity(),
-                                               robot.currentState().velocity(), 1e-3));
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_state.orientation(),
-                                               robot.currentState().orientation(),
-                                               Angle::fromDegrees(1e-3)));
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(robot_state.angularVelocity(),
-                                               robot.currentState().angularVelocity(),
-                                               AngularVelocity::fromDegrees(1e-3)));
-}
-
-TEST(TbotsProtobufTest, ball_state_test)
-{
-    auto position = Point(4.20, 4.20);
-    auto velocity = Vector(4.20, 4.20);
-
-    Ball ball(position, velocity, Timestamp::fromSeconds(0));
-    auto ball_state_msg = createBallState(ball);
-
-    auto ball_state = createBallState(*ball_state_msg);
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(ball_state.position(),
-                                               ball.currentState().position(), 1e-3));
-    EXPECT_TRUE(TestUtil::equalWithinTolerance(ball_state.velocity(),
-                                               ball.currentState().velocity(), 1e-3));
 }

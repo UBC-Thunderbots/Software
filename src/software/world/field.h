@@ -1,8 +1,10 @@
 #pragma once
 
+#include "proto/world.pb.h"
 #include "software/geom/circle.h"
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
+#include "software/util/make_enum/make_enum.h"
 
 typedef enum
 {
@@ -47,6 +49,14 @@ class Field
      */
     static Field createSSLDivisionAField();
 
+    /**
+     * Creates a field with the standard SSL Division A or B dimensions
+     *
+     * @param field_type The field type
+     * @return a field with the standard SSL Division A or B dimensions
+     */
+    static Field createField(TbotsProto::FieldType field_type);
+
     Field() = delete;
 
     /**
@@ -70,6 +80,18 @@ class Field
     explicit Field(double field_x_length, double field_y_length, double defense_x_length,
                    double defense_y_length, double goal_x_length, double goal_y_length,
                    double boundary_buffer_size, double center_circle_radius);
+
+    /**
+     * Constructs a new field based on the TbotsProto::Field protobuf representation
+     *
+     * @pre all dimensions (except for the boundary buffer) must be > 0.
+     * @pre the boundary buffer must be >= 0
+     *
+     * @throws invalid_argument if at least one dimension is <= 0
+     *
+     * @param field_proto
+     */
+    explicit Field(const TbotsProto::Field &field_proto);
 
     /**
      * Gets the x-axis length of the field from goal-line to goal-line in metres.

@@ -214,7 +214,7 @@ void setupPlayOverrideComboBox(
 {
     const QString ai_selection_text = "Use AI Selection";
 
-    auto play_names = GenericFactory<std::string, Play, PlayConfig>::getRegisteredNames();
+    auto play_names = GenericFactory<std::string, Play, AiConfig>::getRegisteredNames();
 
     // Sort the entries in alphabetical order from a-z
     std::sort(play_names.begin(), play_names.end());

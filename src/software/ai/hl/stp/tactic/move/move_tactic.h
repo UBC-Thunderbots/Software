@@ -1,6 +1,5 @@
 #pragma once
 
-#include "software/ai/hl/stp/action/move_action.h"  // TODO (#1888): remove this dependency
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/move_intent.h"
@@ -14,15 +13,8 @@ class MoveTactic : public Tactic
    public:
     /**
      * Creates a new MoveTactic
-     *
-     * @param loop_forever Whether or not this Tactic should never complete. If true, the
-     * tactic will be restarted every time it completes
      */
-    explicit MoveTactic(bool loop_forever);
-
-    MoveTactic() = delete;
-
-    void updateWorldParams(const World& world) override;
+    explicit MoveTactic();
 
     /**
      * Updates the params assuming that the max allowed speed mode is the physical limits
@@ -39,11 +31,13 @@ class MoveTactic : public Tactic
      */
     void updateControlParams(
         Point destination, Angle final_orientation, double final_speed,
-        DribblerMode dribbler_mode                 = DribblerMode::OFF,
-        BallCollisionType ball_collision_type      = BallCollisionType::AVOID,
-        AutoChipOrKick auto_chip_or_kick           = {AutoChipOrKickMode::OFF, 0},
-        MaxAllowedSpeedMode max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT,
-        double target_spin_rev_per_s               = 0.0);
+        TbotsProto::DribblerMode dribbler_mode = TbotsProto::DribblerMode::OFF,
+        TbotsProto::BallCollisionType ball_collision_type =
+            TbotsProto::BallCollisionType::AVOID,
+        AutoChipOrKick auto_chip_or_kick = {AutoChipOrKickMode::OFF, 0},
+        TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        double target_spin_rev_per_s = 0.0);
 
     /**
      * Updates the params assuming that the dribbler and chicker and while avoiding the
@@ -57,7 +51,7 @@ class MoveTactic : public Tactic
      */
     void updateControlParams(Point destination, Angle final_orientation,
                              double final_speed,
-                             MaxAllowedSpeedMode max_allowed_speed_mode);
+                             TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -71,13 +65,16 @@ class MoveTactic : public Tactic
     double calculateRobotCost(const Robot& robot, const World& world) const override;
 
     void accept(TacticVisitor& visitor) const override;
-    bool done() const override;
+
+    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
-    void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
     FSM<MoveFSM> fsm;
 
     MoveFSM::ControlParams control_params;
 };
+
+// Creates a new tactic called PenaltySetupTactic that is a duplicate of MoveTactic
+COPY_TACTIC(PenaltySetupTactic, MoveTactic)

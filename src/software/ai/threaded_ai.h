@@ -1,6 +1,10 @@
 #pragma once
 
+#include <mutex>
+
+#include "proto/play.pb.h"
 #include "proto/play_info_msg.pb.h"
+#include "proto/tactic.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/ai/ai.h"
 #include "software/gui/drawing/draw_functions.h"
@@ -16,7 +20,7 @@
 class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
                    public Subject<TbotsProto::PrimitiveSet>,
                    public Subject<AIDrawFunction>,
-                   public Subject<PlayInfo>
+                   public Subject<TbotsProto::PlayInfo>
 {
    public:
     ThreadedAI() = delete;
@@ -25,12 +29,23 @@ class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
      * Create an AI with the given config
      *
      * @param ai_config The AI configuration
-     * @param control_config The AI control configuration
-     * @param play_config The play configuration
      */
-    explicit ThreadedAI(std::shared_ptr<const AiConfig> ai_config,
-                        std::shared_ptr<const AiControlConfig> control_config,
-                        std::shared_ptr<const PlayConfig> play_config);
+    explicit ThreadedAI(std::shared_ptr<const AiConfig> ai_config);
+
+    /**
+     * Override the AI play
+     *
+     * @param play_proto The play proto to use to override
+     */
+    void overridePlay(TbotsProto::Play play_proto);
+
+    /**
+     * Override Tactics
+     *
+     * @param assigned_tactic_play_control_params
+     */
+    void overrideTactics(
+        TbotsProto::AssignedTacticPlayControlParams assigned_tactic_play_control_params);
 
    private:
     void onValueReceived(World world) override;
@@ -48,5 +63,7 @@ class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
     void drawAI();
 
     AI ai;
+    std::shared_ptr<const AiConfig> ai_config;
     std::shared_ptr<const AiControlConfig> control_config;
+    std::mutex ai_mutex;
 };

@@ -13,25 +13,9 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/ball.h"
 
-CornerKickPlay::CornerKickPlay(std::shared_ptr<const PlayConfig> config)
+CornerKickPlay::CornerKickPlay(std::shared_ptr<const AiConfig> config)
     : Play(config, true)
 {
-}
-
-bool CornerKickPlay::isApplicable(const World &world) const
-{
-    double min_dist_to_corner =
-        std::min((world.field().enemyCornerPos() - world.ball().position()).length(),
-                 (world.field().enemyCornerNeg() - world.ball().position()).length());
-
-    return world.gameState().isOurFreeKick() &&
-           min_dist_to_corner <= BALL_IN_CORNER_RADIUS;
-}
-
-bool CornerKickPlay::invariantHolds(const World &world) const
-{
-    return (world.gameState().isPlaying() || world.gameState().isReadyState()) &&
-           (world.getTeamWithPossession() == TeamSide::FRIENDLY);
 }
 
 void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
@@ -62,7 +46,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield, const Wor
 
     // Perform the pass and wait until the receiver is finished
     auto attacker =
-        std::make_shared<AttackerTactic>(play_config->getAttackerTacticConfig());
+        std::make_shared<AttackerTactic>(ai_config->getAttackerTacticConfig());
     auto receiver = std::make_shared<ReceiverTactic>();
 
     do
@@ -89,23 +73,23 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
         std::make_shared<const EighteenZonePitchDivision>(world.field());
 
     PassGenerator<EighteenZoneId> pass_generator(pitch_division,
-                                                 play_config->getPassingConfig());
+                                                 ai_config->getPassingConfig());
 
     auto pass_eval = pass_generator.generatePassEvaluation(world);
     PassWithRating best_pass_and_score_so_far = pass_eval.getBestPassOnField();
 
     // This tactic will move a robot into position to initially take the free-kick
-    auto align_to_ball_tactic = std::make_shared<MoveTactic>(false);
+    auto align_to_ball_tactic = std::make_shared<MoveTactic>();
 
     auto zones_to_cherry_pick =
         pass_eval.rankZonesForReceiving(world, world.ball().position());
 
     // These tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>(false);
-    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>(false);
-    auto cherry_pick_tactic_3 = std::make_shared<MoveTactic>(false);
-    auto cherry_pick_tactic_4 = std::make_shared<MoveTactic>(false);
+    auto cherry_pick_tactic_1 = std::make_shared<MoveTactic>();
+    auto cherry_pick_tactic_2 = std::make_shared<MoveTactic>();
+    auto cherry_pick_tactic_3 = std::make_shared<MoveTactic>();
+    auto cherry_pick_tactic_4 = std::make_shared<MoveTactic>();
 
     auto update_cherry_pickers = [&](PassEvaluation<EighteenZoneId> pass_eval) {
         auto pass1 = pass_eval.getBestPassInZones({zones_to_cherry_pick[0]}).pass;
@@ -113,35 +97,19 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
         auto pass3 = pass_eval.getBestPassInZones({zones_to_cherry_pick[2]}).pass;
         auto pass4 = pass_eval.getBestPassInZones({zones_to_cherry_pick[3]}).pass;
 
-        cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
-                                                  pass1.receiverOrientation(), 0.0,
-                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-        cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
-                                                  pass2.receiverOrientation(), 0.0,
-                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-        cherry_pick_tactic_3->updateControlParams(pass3.receiverPoint(),
-                                                  pass3.receiverOrientation(), 0.0,
-                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-        cherry_pick_tactic_4->updateControlParams(pass4.receiverPoint(),
-                                                  pass4.receiverOrientation(), 0.0,
-                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_1->updateControlParams(
+            pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_2->updateControlParams(
+            pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_3->updateControlParams(
+            pass3.receiverPoint(), pass3.receiverOrientation(), 0.0,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_4->updateControlParams(
+            pass4.receiverPoint(), pass4.receiverOrientation(), 0.0,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     };
-
-    // Wait for a robot to be assigned to align to take the corner
-    while (!align_to_ball_tactic->getAssignedRobot())
-    {
-        LOG(DEBUG) << "Nothing assigned to align to ball yet";
-        updateAlignToBallTactic(align_to_ball_tactic, world);
-        update_cherry_pickers(pass_generator.generatePassEvaluation(world));
-
-        yield({{align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
-                cherry_pick_tactic_3, cherry_pick_tactic_4}});
-    }
-
-
-    // Set the passer on the pass generator
-    LOG(DEBUG) << "Aligning with robot " << align_to_ball_tactic->getAssignedRobot()->id()
-               << "as the passer";
 
     // Put the robot in roughly the right position to perform the kick
     LOG(DEBUG) << "Aligning to ball";
@@ -179,7 +147,7 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
         Duration time_since_commit_stage_start =
             world.getMostRecentTimestamp() - commit_stage_start_time;
         min_score = 1 - std::min(time_since_commit_stage_start.toSeconds() /
-                                     play_config->getCornerKickPlayConfig()
+                                     ai_config->getCornerKickPlayConfig()
                                          ->getMaxTimeCommitToPassSeconds()
                                          ->value(),
                                  1.0);
@@ -206,4 +174,4 @@ void CornerKickPlay::updateAlignToBallTactic(
 }
 
 // Register this play in the genericFactory
-static TGenericFactory<std::string, Play, CornerKickPlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, CornerKickPlay, AiConfig> factory;

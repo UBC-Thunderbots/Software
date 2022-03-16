@@ -20,13 +20,30 @@ cc_library(
     deps = [
         ":primitive_executor",
         "//proto:tbots_cc_proto",
+        "//software/jetson_nano/redis",
         "//software/jetson_nano/services:motor",
+        "//software/jetson_nano/services:network",
+        "//software/util/scoped_timespec_timer",
+    ],
+)
+
+cc_library(
+    name = "gpio",
+    srcs = ["gpio.cpp"],
+    hdrs = ["gpio.h"],
+    deps = [
+        "//software/logger",
+        "//software/util/make_enum",
     ],
 )
 
 cc_binary(
     name = "thunderloop_main",
     srcs = ["thunderloop_main.cpp"],
+    linkopts = [
+        "-lpthread",
+        "-lrt",
+    ],
     deps = [
         ":thunderloop",
         "//shared:constants",

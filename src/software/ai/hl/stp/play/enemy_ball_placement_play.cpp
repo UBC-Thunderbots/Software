@@ -8,19 +8,9 @@
 #include "software/util/generic_factory/generic_factory.h"
 #include "software/world/game_state.h"
 
-EnemyBallPlacementPlay::EnemyBallPlacementPlay(std::shared_ptr<const PlayConfig> config)
+EnemyBallPlacementPlay::EnemyBallPlacementPlay(std::shared_ptr<const AiConfig> config)
     : Play(config, true)
 {
-}
-
-bool EnemyBallPlacementPlay::isApplicable(const World &world) const
-{
-    return world.gameState().isTheirBallPlacement();
-}
-
-bool EnemyBallPlacementPlay::invariantHolds(const World &world) const
-{
-    return world.gameState().isTheirBallPlacement();
 }
 
 void EnemyBallPlacementPlay::ballPlacementWithShadow(
@@ -55,12 +45,12 @@ void EnemyBallPlacementPlay::ballPlacementWithShadow(
         // Create tactic vector (starting with Goalie)
         PriorityTacticVector tactics_to_run = {{}};
 
-        crease_defenders[0]->updateControlParams(placement_point,
-                                                 CreaseDefenderAlignment::LEFT);
-        crease_defenders[1]->updateControlParams(placement_point,
-                                                 CreaseDefenderAlignment::RIGHT);
-        crease_defenders[2]->updateControlParams(placement_point,
-                                                 CreaseDefenderAlignment::CENTRE);
+        crease_defenders[0]->updateControlParams(
+            placement_point, TbotsProto::CreaseDefenderAlignment::LEFT);
+        crease_defenders[1]->updateControlParams(
+            placement_point, TbotsProto::CreaseDefenderAlignment::RIGHT);
+        crease_defenders[2]->updateControlParams(
+            placement_point, TbotsProto::CreaseDefenderAlignment::CENTRE);
 
         tactics_to_run[0].emplace_back(crease_defenders[0]);
         tactics_to_run[0].emplace_back(crease_defenders[1]);
@@ -110,16 +100,16 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 3> crease_defenders = {
         std::make_shared<CreaseDefenderTactic>(
-            play_config->getRobotNavigationObstacleConfig()),
+            ai_config->getRobotNavigationObstacleConfig()),
         std::make_shared<CreaseDefenderTactic>(
-            play_config->getRobotNavigationObstacleConfig()),
+            ai_config->getRobotNavigationObstacleConfig()),
         std::make_shared<CreaseDefenderTactic>(
-            play_config->getRobotNavigationObstacleConfig()),
+            ai_config->getRobotNavigationObstacleConfig()),
     };
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_tactics = {
-        std::make_shared<MoveTactic>(true),
-        std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(),
+        std::make_shared<MoveTactic>(),
     };
 
     if (placement_point.has_value())
@@ -135,4 +125,4 @@ void EnemyBallPlacementPlay::getNextTactics(TacticCoroutine::push_type &yield,
     }
 }
 
-static TGenericFactory<std::string, Play, EnemyBallPlacementPlay, PlayConfig> factory;
+static TGenericFactory<std::string, Play, EnemyBallPlacementPlay, AiConfig> factory;

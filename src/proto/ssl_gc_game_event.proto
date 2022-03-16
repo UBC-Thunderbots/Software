@@ -80,32 +80,6 @@ message GameEvent
 
         UnsportingBehaviorMinor unsporting_behavior_minor = 35;
         UnsportingBehaviorMajor unsporting_behavior_major = 36;
-
-        // Deprecated events
-
-        // replaced by ready_to_continue flag
-        Prepared prepared = 1 [deprecated = true];
-        // obsolete
-        IndirectGoal indirect_goal = 9 [deprecated = true];
-        // replaced by the meta-information in the possible_goal event
-        ChippedGoal chipped_goal = 10 [deprecated = true];
-        // obsolete
-        KickTimeout kick_timeout = 12 [deprecated = true];
-        // rule removed
-        AttackerTouchedOpponentInDefenseArea attacker_touched_opponent_in_defense_area =
-            16 [deprecated = true];
-        // obsolete
-        AttackerTouchedOpponentInDefenseArea
-            attacker_touched_opponent_in_defense_area_skipped = 42 [deprecated = true];
-        // obsolete
-        BotCrashUnique bot_crash_unique_skipped = 23 [deprecated = true];
-        // can not be used as long as autoRefs do not judge pushing
-        BotPushedBot bot_pushed_bot_skipped = 25 [deprecated = true];
-        // rule removed
-        DefenderInDefenseAreaPartially defender_in_defense_area_partially = 30
-            [deprecated = true];
-        // the referee msg already indicates this
-        MultiplePlacementFailures multiple_placement_failures = 33 [deprecated = true];
     }
 
     // the ball left the field normally
@@ -589,18 +563,5 @@ message GameEvent
 
         UNSPORTING_BEHAVIOR_MINOR = 35;  // triggered by human ref
         UNSPORTING_BEHAVIOR_MAJOR = 36;  // triggered by human ref
-
-        // Deprecated events
-
-        PREPARED                                          = 1 [deprecated = true];
-        INDIRECT_GOAL                                     = 9 [deprecated = true];
-        CHIPPED_GOAL                                      = 10 [deprecated = true];
-        KICK_TIMEOUT                                      = 12 [deprecated = true];
-        ATTACKER_TOUCHED_OPPONENT_IN_DEFENSE_AREA         = 16 [deprecated = true];
-        ATTACKER_TOUCHED_OPPONENT_IN_DEFENSE_AREA_SKIPPED = 40 [deprecated = true];
-        BOT_CRASH_UNIQUE_SKIPPED                          = 23 [deprecated = true];
-        BOT_PUSHED_BOT_SKIPPED                            = 25 [deprecated = true];
-        DEFENDER_IN_DEFENSE_AREA_PARTIALLY                = 30 [deprecated = true];
-        MULTIPLE_PLACEMENT_FAILURES                       = 33 [deprecated = true];
     }
 }

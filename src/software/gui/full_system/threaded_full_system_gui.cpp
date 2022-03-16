@@ -3,22 +3,25 @@
 #include <QtCore/QTimer>
 #include <QtWidgets/QApplication>
 
+#include "proto/message_translation/tbots_protobuf.h"
+#include "proto/visualization.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/gui/drawing/world.h"
+#include "software/logger/logger.h"
 
 ThreadedFullSystemGUI::ThreadedFullSystemGUI(
     std::shared_ptr<ThunderbotsConfig> mutable_thunderbots_config)
     : FirstInFirstOutThreadedObserver<World>(),
       FirstInFirstOutThreadedObserver<AIDrawFunction>(),
-      FirstInFirstOutThreadedObserver<PlayInfo>(),
+      FirstInFirstOutThreadedObserver<TbotsProto::PlayInfo>(),
       FirstInFirstOutThreadedObserver<SensorProto>(),
       termination_promise_ptr(std::make_shared<std::promise<void>>()),
       world_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<WorldDrawFunction>>(
           WORLD_DRAW_FUNCTIONS_BUFFER_SIZE, false)),
       ai_draw_functions_buffer(std::make_shared<ThreadSafeBuffer<AIDrawFunction>>(
           AI_DRAW_FUNCTIONS_BUFFER_SIZE, false)),
-      play_info_msg_buffer(
-          std::make_shared<ThreadSafeBuffer<PlayInfo>>(PLAY_INFO_MSG_BUFFER_SIZE, false)),
+      play_info_msg_buffer(std::make_shared<ThreadSafeBuffer<TbotsProto::PlayInfo>>(
+          PLAY_INFO_MSG_BUFFER_SIZE, false)),
       sensor_msg_buffer(
           std::make_shared<ThreadSafeBuffer<SensorProto>>(SENSOR_MSG_BUFFER_SIZE)),
       view_area_buffer(
@@ -100,6 +103,13 @@ void ThreadedFullSystemGUI::onValueReceived(World world)
         remaining_attempts_to_set_view_area--;
         view_area_buffer->push(world.field().fieldBoundary());
     }
+
+    LOG(VISUALIZE) << *createNamedValue(
+        "World Hz",
+        static_cast<float>(
+            FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond()));
+
+
     worlds_received_per_second_buffer->push(
         FirstInFirstOutThreadedObserver<World>::getDataReceivedPerSecond());
 }
@@ -109,7 +119,7 @@ void ThreadedFullSystemGUI::onValueReceived(AIDrawFunction draw_function)
     ai_draw_functions_buffer->push(draw_function);
 }
 
-void ThreadedFullSystemGUI::onValueReceived(PlayInfo play_info_msg)
+void ThreadedFullSystemGUI::onValueReceived(TbotsProto::PlayInfo play_info_msg)
 {
     play_info_msg_buffer->push(play_info_msg);
 }
@@ -121,6 +131,11 @@ void ThreadedFullSystemGUI::onValueReceived(SensorProto sensor_msg)
 
 void ThreadedFullSystemGUI::onValueReceived(TbotsProto::PrimitiveSet primitive_msg)
 {
+    LOG(VISUALIZE) << *createNamedValue(
+        "Primitive Hz",
+        static_cast<float>(FirstInFirstOutThreadedObserver<
+                           TbotsProto::PrimitiveSet>::getDataReceivedPerSecond()));
+
     primitives_sent_per_second_buffer->push(
         FirstInFirstOutThreadedObserver<
             TbotsProto::PrimitiveSet>::getDataReceivedPerSecond());

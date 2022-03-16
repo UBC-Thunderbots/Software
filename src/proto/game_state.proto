@@ -3,7 +3,7 @@ syntax = "proto2";
 package TbotsProto;
 
 import "proto/geometry.proto";
-import "proto/vision.proto";
+import "proto/ball.proto";
 
 message GameState
 {
@@ -48,6 +48,6 @@ message GameState
     required PlayState play_state         = 1;
     required RestartReason restart_reason = 2;
     required RefereeCommand command       = 3;
-    optional BallState ball_state         = 4;
+    optional Ball ball                    = 4;
     optional Point ball_placement_point   = 5;
 }

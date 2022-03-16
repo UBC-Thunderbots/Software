@@ -11,6 +11,7 @@
 #include "software/logger/coloured_cout_sink.h"
 #include "software/logger/csv_sink.h"
 #include "software/logger/custom_logging_levels.h"
+#include "software/logger/protobuf_sink.h"
 
 // This undefines LOG macro defined by g3log
 #undef LOG
@@ -91,6 +92,11 @@ class LoggerSingleton
                 std::make_unique<LogRotate>(log_name + filter_suffix, log_directory),
                 level_filter),
             &LogRotateWithFilter::save);
+
+        // Sink for visualization
+        auto visualization_handle = logWorker->addSink(std::make_unique<ProtobufSink>(),
+                                                       &ProtobufSink::sendProtobuf);
+
 
         g3::initializeLogging(logWorker.get());
     }

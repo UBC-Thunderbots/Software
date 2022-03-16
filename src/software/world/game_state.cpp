@@ -2,6 +2,127 @@
 
 #include "software/logger/logger.h"
 
+GameState::GameState(const TbotsProto::GameState& game_state_proto) : our_restart_(false)
+{
+    if (game_state_proto.has_ball())
+    {
+        ball_ = Ball(game_state_proto.ball());
+    }
+    else
+    {
+        ball_ = std::nullopt;
+    }
+
+    if (game_state_proto.has_ball_placement_point())
+    {
+        ball_placement_point_ = Point(game_state_proto.ball_placement_point().x_meters(),
+                                      game_state_proto.ball_placement_point().y_meters());
+    }
+    else
+    {
+        ball_placement_point_ = std::nullopt;
+    }
+
+    switch (game_state_proto.play_state())
+    {
+        case TbotsProto::GameState_PlayState_PLAY_STATE_HALT:
+            play_state_ = GameState::PlayState::HALT;
+            break;
+        case TbotsProto::GameState_PlayState_PLAY_STATE_STOP:
+            play_state_ = GameState::PlayState::STOP;
+            break;
+        case TbotsProto::GameState_PlayState_PLAY_STATE_SETUP:
+            play_state_ = GameState::PlayState::SETUP;
+            break;
+        case TbotsProto::GameState_PlayState_PLAY_STATE_READY:
+            play_state_ = GameState::PlayState::READY;
+            break;
+        case TbotsProto::GameState_PlayState_PLAY_STATE_PLAYING:
+            play_state_ = GameState::PlayState::PLAYING;
+            break;
+    }
+
+    switch (game_state_proto.restart_reason())
+    {
+        case TbotsProto::GameState_RestartReason_RESTART_REASON_NONE:
+            restart_reason_ = GameState::RestartReason::NONE;
+            break;
+        case TbotsProto::GameState_RestartReason_RESTART_REASON_KICKOFF:
+            restart_reason_ = GameState::RestartReason::KICKOFF;
+            break;
+        case TbotsProto::GameState_RestartReason_RESTART_REASON_DIRECT:
+            restart_reason_ = GameState::RestartReason::DIRECT;
+            break;
+        case TbotsProto::GameState_RestartReason_RESTART_REASON_INDIRECT:
+            restart_reason_ = GameState::RestartReason::INDIRECT;
+            break;
+        case TbotsProto::GameState_RestartReason_RESTART_REASON_PENALTY:
+            restart_reason_ = GameState::RestartReason::PENALTY;
+            break;
+        case TbotsProto::GameState_RestartReason_RESTART_REASON_BALL_PLACEMENT:
+            restart_reason_ = GameState::RestartReason::BALL_PLACEMENT;
+            break;
+    }
+
+    switch (game_state_proto.command())
+    {
+        case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_HALT:
+            updateRefereeCommand(RefereeCommand::HALT);
+            break;
+        case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_STOP:
+            updateRefereeCommand(RefereeCommand::STOP);
+            break;
+        case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_NORMAL_START:
+            updateRefereeCommand(RefereeCommand::NORMAL_START);
+            break;
+        case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_FORCE_START:
+            updateRefereeCommand(RefereeCommand::FORCE_START);
+            break;
+        case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_PREPARE_KICKOFF_US:
+            updateRefereeCommand(RefereeCommand::PREPARE_KICKOFF_US);
+            break;
+        case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_PREPARE_KICKOFF_THEM:
+            updateRefereeCommand(RefereeCommand::PREPARE_KICKOFF_THEM);
+            break;
+        case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_PREPARE_PENALTY_US:
+            updateRefereeCommand(RefereeCommand::PREPARE_PENALTY_US);
+            break;
+        case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_PREPARE_PENALTY_THEM:
+            updateRefereeCommand(RefereeCommand::PREPARE_PENALTY_THEM);
+            break;
+        case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_DIRECT_FREE_US:
+            updateRefereeCommand(RefereeCommand::DIRECT_FREE_US);
+            break;
+        case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_DIRECT_FREE_THEM:
+            updateRefereeCommand(RefereeCommand::DIRECT_FREE_THEM);
+            break;
+        case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_INDIRECT_FREE_US:
+            updateRefereeCommand(RefereeCommand::INDIRECT_FREE_US);
+            break;
+        case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_INDIRECT_FREE_THEM:
+            updateRefereeCommand(RefereeCommand::INDIRECT_FREE_THEM);
+            break;
+        case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_TIMEOUT_US:
+            updateRefereeCommand(RefereeCommand::TIMEOUT_US);
+            break;
+        case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_TIMEOUT_THEM:
+            updateRefereeCommand(RefereeCommand::TIMEOUT_THEM);
+            break;
+        case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_GOAL_US:
+            updateRefereeCommand(RefereeCommand::GOAL_US);
+            break;
+        case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_GOAL_THEM:
+            updateRefereeCommand(RefereeCommand::GOAL_THEM);
+            break;
+        case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_BALL_PLACEMENT_US:
+            updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_US);
+            break;
+        case TbotsProto::GameState_RefereeCommand_REFEREE_COMMAND_BALL_PLACEMENT_THEM:
+            updateRefereeCommand(RefereeCommand::BALL_PLACEMENT_THEM);
+            break;
+    }
+}
+
 bool GameState::isHalted() const
 {
     return play_state_ == HALT;
@@ -108,6 +229,11 @@ bool GameState::isTheirBallPlacement() const
     return isBallPlacement() && !our_restart_;
 }
 
+GameState::PlayState GameState::getPlayState(void) const
+{
+    return play_state_;
+}
+
 // Robots must be in position for a restart
 bool GameState::isSetupRestart() const
 {
@@ -155,6 +281,11 @@ void GameState::setBallPlacementPoint(Point placement_point)
 std::optional<Point> GameState::getBallPlacementPoint() const
 {
     return ball_placement_point_;
+}
+
+std::optional<Ball> GameState::getBall(void) const
+{
+    return ball_;
 }
 
 // apologies for this monster switch statement
@@ -259,16 +390,16 @@ void GameState::updateBall(const Ball& ball)
 {
     if (play_state_ == READY && restart_reason_ != PENALTY)
     {
-        if (!ball_state_)
+        if (!ball_)
         {
             // Save the ball play_state_ so we can tell once it moves
-            ball_state_ = ball;
+            ball_ = ball;
         }
-        else if ((ball.position() - ball_state_->position()).length() > 0.03)
+        else if ((ball.position() - ball_->position()).length() > 0.03)
         {
             // Once the ball has moved enough, the restart is finished
             setRestartCompleted();
-            ball_state_ = std::nullopt;
+            ball_ = std::nullopt;
         }
     }
 }
@@ -294,7 +425,7 @@ bool GameState::operator==(const GameState& other) const
 {
     return this->play_state_ == other.play_state_ &&
            this->restart_reason_ == other.restart_reason_ &&
-           this->command_ == other.command_ && this->ball_state_ == other.ball_state_ &&
+           this->command_ == other.command_ && this->ball_ == other.ball_ &&
            this->our_restart_ == other.our_restart_ &&
            this->ball_placement_point_ == other.ball_placement_point_;
 }

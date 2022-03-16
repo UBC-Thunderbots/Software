@@ -26,17 +26,18 @@ TEST_F(PrimitiveFactoryTest, test_auto_chip_or_kick_equality)
 
 TEST_F(PrimitiveFactoryTest, test_create_move_primitive)
 {
-    auto move_primitive =
-        createMovePrimitive(Point(-5, 1), 3.0, Angle::threeQuarter(),
-                            DribblerMode::INDEFINITE, {AutoChipOrKickMode::OFF, 0},
-                            MaxAllowedSpeedMode::PHYSICAL_LIMIT, 5.0, robot_constants);
+    auto move_primitive = createMovePrimitive(
+        Point(-5, 1), 3.0, Angle::threeQuarter(), TbotsProto::DribblerMode::INDEFINITE,
+        {AutoChipOrKickMode::OFF, 0}, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT,
+        5.0, robot_constants);
 
     ASSERT_TRUE(move_primitive->has_move());
-    EXPECT_EQ(move_primitive->move().destination().x_meters(), -5);
-    EXPECT_EQ(move_primitive->move().destination().y_meters(), 1);
+    auto destination = move_primitive->move().path().point().at(0);
+    EXPECT_EQ(destination.x_meters(), -5);
+    EXPECT_EQ(destination.y_meters(), 1);
     EXPECT_EQ(move_primitive->move().final_speed_m_per_s(), 3.0);
     EXPECT_EQ(move_primitive->move().final_angle().radians(),
-              static_cast<float>(Angle::threeQuarter().toRadians()));
+              Angle::threeQuarter().toRadians());
     EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(),
               robot_constants.indefinite_dribbler_speed_rpm);
     EXPECT_FALSE(move_primitive->move().has_auto_chip_or_kick());
@@ -47,17 +48,19 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive)
 
 TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autochip)
 {
-    auto move_primitive =
-        createMovePrimitive(Point(-5, 1), 3.0, Angle::threeQuarter(),
-                            DribblerMode::INDEFINITE, {AutoChipOrKickMode::AUTOCHIP, 2.5},
-                            MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
+    auto move_primitive = createMovePrimitive(
+        Point(-5, 1), 3.0, Angle::threeQuarter(), TbotsProto::DribblerMode::INDEFINITE,
+        {AutoChipOrKickMode::AUTOCHIP, 2.5},
+        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants);
+
 
     ASSERT_TRUE(move_primitive->has_move());
-    EXPECT_EQ(move_primitive->move().destination().x_meters(), -5);
-    EXPECT_EQ(move_primitive->move().destination().y_meters(), 1);
+    auto destination = move_primitive->move().path().point().at(0);
+    EXPECT_EQ(destination.x_meters(), -5);
+    EXPECT_EQ(destination.y_meters(), 1);
     EXPECT_EQ(move_primitive->move().final_speed_m_per_s(), 3.0);
     EXPECT_EQ(move_primitive->move().final_angle().radians(),
-              static_cast<float>(Angle::threeQuarter().toRadians()));
+              Angle::threeQuarter().toRadians());
     EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(),
               robot_constants.indefinite_dribbler_speed_rpm);
     ASSERT_TRUE(move_primitive->move().has_auto_chip_or_kick());
@@ -69,17 +72,18 @@ TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autochip)
 
 TEST_F(PrimitiveFactoryTest, test_create_move_primitive_with_autokick)
 {
-    auto move_primitive =
-        createMovePrimitive(Point(-5, 1), 3.0, Angle::threeQuarter(),
-                            DribblerMode::INDEFINITE, {AutoChipOrKickMode::AUTOKICK, 3.5},
-                            MaxAllowedSpeedMode::STOP_COMMAND, 0.0, robot_constants);
+    auto move_primitive = createMovePrimitive(
+        Point(-5, 1), 3.0, Angle::threeQuarter(), TbotsProto::DribblerMode::INDEFINITE,
+        {AutoChipOrKickMode::AUTOKICK, 3.5},
+        TbotsProto::MaxAllowedSpeedMode::STOP_COMMAND, 0.0, robot_constants);
 
     ASSERT_TRUE(move_primitive->has_move());
-    EXPECT_EQ(move_primitive->move().destination().x_meters(), -5);
-    EXPECT_EQ(move_primitive->move().destination().y_meters(), 1);
+    auto destination = move_primitive->move().path().point().at(0);
+    EXPECT_EQ(destination.x_meters(), -5);
+    EXPECT_EQ(destination.y_meters(), 1);
     EXPECT_EQ(move_primitive->move().final_speed_m_per_s(), 3.0);
     EXPECT_EQ(move_primitive->move().final_angle().radians(),
-              static_cast<float>(Angle::threeQuarter().toRadians()));
+              Angle::threeQuarter().toRadians());
     EXPECT_EQ(move_primitive->move().dribbler_speed_rpm(),
               robot_constants.indefinite_dribbler_speed_rpm);
     ASSERT_TRUE(move_primitive->move().has_auto_chip_or_kick());

@@ -17,8 +17,6 @@ class DribbleTactic : public Tactic
    public:
     explicit DribbleTactic();
 
-    void updateWorldParams(const World& world) override;
-
     /**
      * Updates control params for optionally moving the ball to a dribble destination and
      * with the robot at a final dribble orientation
@@ -45,10 +43,10 @@ class DribbleTactic : public Tactic
     double calculateRobotCost(const Robot& robot, const World& world) const override;
 
     void accept(TacticVisitor& visitor) const override;
-    bool done() const override;
+
+    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
-    void calculateNextAction(ActionCoroutine::push_type& yield) override;
     void updateIntent(const TacticUpdate& tactic_update) override;
 
     FSM<DribbleFSM> fsm;

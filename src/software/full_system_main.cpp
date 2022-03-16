@@ -1,6 +1,6 @@
 #include <boost/program_options.hpp>
 #include <chrono>
-#include <experimental/filesystem>
+#include <filesystem>
 #include <iostream>
 #include <numeric>
 
@@ -85,10 +85,8 @@ int main(int argc, char** argv)
                 ->setValue(ArduinoUtil::getArduinoPort().value_or(""));
         }
 
-        if (args->getBackend()->value().empty())
-        {
-            LOG(FATAL) << "The option '--backend' is required but missing";
-        }
+        CHECK(!args->getBackend()->value().empty())
+            << "The option '--backend' is required but missing";
 
         // update command line arguments in BackendConfig
         auto mutable_backend_config =
@@ -100,9 +98,7 @@ int main(int argc, char** argv)
                 args->getBackend()->value(), thunderbots_config->getBackendConfig());
         auto sensor_fusion = std::make_shared<ThreadedSensorFusion>(
             thunderbots_config->getSensorFusionConfig());
-        auto ai = std::make_shared<ThreadedAI>(thunderbots_config->getAiConfig(),
-                                               thunderbots_config->getAiControlConfig(),
-                                               thunderbots_config->getPlayConfig());
+        auto ai = std::make_shared<ThreadedAI>(thunderbots_config->getAiConfig());
         std::shared_ptr<ThreadedFullSystemGUI> visualizer;
 
         // Connect observers
@@ -110,7 +106,6 @@ int main(int argc, char** argv)
         sensor_fusion->Subject<World>::registerObserver(ai);
         sensor_fusion->Subject<World>::registerObserver(backend);
         backend->Subject<SensorProto>::registerObserver(sensor_fusion);
-        sensor_fusion->Subject<World>::registerObserver(backend);
         if (!args->getHeadless()->value())
         {
             visualizer =
@@ -119,7 +114,7 @@ int main(int argc, char** argv)
             sensor_fusion->Subject<World>::registerObserver(visualizer);
             ai->Subject<TbotsProto::PrimitiveSet>::registerObserver(visualizer);
             ai->Subject<AIDrawFunction>::registerObserver(visualizer);
-            ai->Subject<PlayInfo>::registerObserver(visualizer);
+            ai->Subject<TbotsProto::PlayInfo>::registerObserver(visualizer);
             backend->Subject<SensorProto>::registerObserver(visualizer);
         }
 
@@ -138,7 +133,7 @@ int main(int argc, char** argv)
             std::string time_string(time_c_str);
 
 
-            namespace fs = std::experimental::filesystem;
+            namespace fs = std::filesystem;
             // we want to log protos, make the parent directory and pass the
             // subdirectories to the ProtoLoggers for each message type
             fs::path proto_log_output_dir(args->getProtoLogOutputDir()->value());

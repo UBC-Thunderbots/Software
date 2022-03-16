@@ -19,10 +19,10 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(
     const float LOCAL_EPSILON = 1e-6f;  // Avoid dividing by zero
 
     // Unpack current move primitive
+    auto destination              = move_primitive.path().point().at(0);
     const float dest_linear_speed = move_primitive.final_speed_m_per_s();
     const float max_speed_m_per_s = move_primitive.max_speed_m_per_s();
-    const Point final_position    = Point(move_primitive.destination().x_meters(),
-                                       move_primitive.destination().y_meters());
+    const Point final_position    = Point(destination.x_meters(), destination.y_meters());
     std::clamp(max_speed_m_per_s, 0.0f, robot_constants_.robot_max_speed_m_per_s);
 
     const float max_target_linear_speed = fmaxf(max_speed_m_per_s, dest_linear_speed);
@@ -66,7 +66,8 @@ AngularVelocity PrimitiveExecutor::getTargetAngularVelocity(
 {
     const float LOCAL_EPSILON = 1e-6f;  // Avoid dividing by zero
 
-    const float dest_orientation = move_primitive.final_angle().radians();
+    const float dest_orientation =
+        static_cast<float>(move_primitive.final_angle().radians());
     const float delta_orientation =
         dest_orientation - static_cast<float>(robot_state.orientation().toRadians());
     const float max_target_angular_speed = robot_constants_.robot_max_ang_speed_rad_per_s;
@@ -155,23 +156,20 @@ void PrimitiveExecutor::copyAutoChipOrKick(const TbotsProto::MovePrimitive& src,
 {
     switch (src.auto_chip_or_kick().auto_chip_or_kick_case())
     {
-        case TbotsProto::MovePrimitive::AutoChipOrKick::AutoChipOrKickCase::
-            kAutokickSpeedMPerS:
+        case TbotsProto::AutoChipOrKick::AutoChipOrKickCase::kAutokickSpeedMPerS:
         {
             dest->set_autokick_speed_m_per_s(
                 src.auto_chip_or_kick().autokick_speed_m_per_s());
 
             break;
         }
-        case TbotsProto::MovePrimitive::AutoChipOrKick::AutoChipOrKickCase::
-            kAutochipDistanceMeters:
+        case TbotsProto::AutoChipOrKick::AutoChipOrKickCase::kAutochipDistanceMeters:
         {
             dest->set_autochip_distance_meters(
                 src.auto_chip_or_kick().autochip_distance_meters());
             break;
         }
-        case TbotsProto::MovePrimitive::AutoChipOrKick::AutoChipOrKickCase::
-            AUTO_CHIP_OR_KICK_NOT_SET:
+        case TbotsProto::AutoChipOrKick::AutoChipOrKickCase::AUTO_CHIP_OR_KICK_NOT_SET:
         {
             dest->clear_chick_command();
             break;

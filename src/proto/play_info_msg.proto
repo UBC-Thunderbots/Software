@@ -1,16 +1,12 @@
 syntax = 'proto3';
 
+package TbotsProto;
 
 message PlayInfo
 {
     message Play
     {
         string play_name = 1;
-    }
-
-    message GameState
-    {
-        string referee_command_name = 1;
     }
 
     message Tactic
@@ -20,6 +16,5 @@ message PlayInfo
     }
 
     map<uint32, Tactic> robot_tactic_assignment = 1;
-    GameState game_state                        = 2;
-    Play play                                   = 3;
+    Play play                                   = 2;
 }

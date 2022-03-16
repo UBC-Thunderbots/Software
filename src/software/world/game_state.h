@@ -103,11 +103,19 @@ class GameState
         : play_state_(HALT),
           restart_reason_(NONE),
           command_(RefereeCommand::HALT),
-          ball_state_(std::nullopt),
+          ball_(std::nullopt),
           our_restart_(false),
           ball_placement_point_(std::nullopt)
     {
     }
+
+    /**
+     * Creates a new game state based on the TbotsProto::GameState protobuf representation
+     *
+     * @param game_state_proto The TbotsProto::GameState protobuf which this game state
+     * should be based on
+     */
+    explicit GameState(const TbotsProto::GameState& game_state_proto);
 
     /**
      * Updates the game state with a value from backend_input
@@ -320,6 +328,13 @@ class GameState
     bool isTheirBallPlacement() const;
 
     /**
+     * Returns the play state
+     *
+     * @return play state
+     */
+    PlayState getPlayState(void) const;
+
+    /**
      * Returns true if robots should be setting up for a restart e.g.
      * if a free kick is going to occur.
      *
@@ -399,6 +414,13 @@ class GameState
     std::optional<Point> getBallPlacementPoint(void) const;
 
     /**
+     * Returns the ball
+     *
+     * @return the ball state if one is specified, otherwise std::nullopt
+     */
+    std::optional<Ball> getBall(void) const;
+
+    /**
      * Sets the point on the field where the ball should be placed.
      * See Robocup SSL Rules Law 9.2.
      *
@@ -410,7 +432,7 @@ class GameState
     PlayState play_state_;
     RestartReason restart_reason_;
     RefereeCommand command_;
-    std::optional<Ball> ball_state_;
+    std::optional<Ball> ball_;
 
     // True if our team can kick the ball during a restart
     bool our_restart_;

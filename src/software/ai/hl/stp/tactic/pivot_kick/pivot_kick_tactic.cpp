@@ -3,8 +3,6 @@
 #include "shared/constants.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/action/stop_action.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/geom/point.h"
 #include "software/geom/ray.h"
@@ -12,14 +10,12 @@
 #include "software/logger/logger.h"
 
 PivotKickTactic::PivotKickTactic()
-    : Tactic(false, {RobotCapability::Move, RobotCapability::Kick, RobotCapability::Chip,
-                     RobotCapability::Dribble}),
-      fsm(DribbleFSM(std::make_shared<Point>())),
+    : Tactic({RobotCapability::Move, RobotCapability::Kick, RobotCapability::Chip,
+              RobotCapability::Dribble}),
+      fsm(DribbleFSM()),
       control_params(PivotKickFSM::ControlParams())
 {
 }
-
-void PivotKickTactic::updateWorldParams(const World &world) {}
 
 double PivotKickTactic::calculateRobotCost(const Robot &robot, const World &world) const
 {
@@ -30,17 +26,6 @@ double PivotKickTactic::calculateRobotCost(const Robot &robot, const World &worl
 
         return std::clamp<double>(cost, 0, 1);
     }
-}
-
-void PivotKickTactic::calculateNextAction(ActionCoroutine::push_type &yield)
-{
-    auto stop_action = std::make_shared<StopAction>(false);
-
-    do
-    {
-        stop_action->updateControlParams(*robot_, false);
-        yield(stop_action);
-    } while (!stop_action->done());
 }
 
 void PivotKickTactic::accept(TacticVisitor &visitor) const
@@ -55,11 +40,6 @@ void PivotKickTactic::updateControlParams(const Point &kick_origin,
     control_params.kick_origin       = kick_origin;
     control_params.kick_direction    = kick_direction;
     control_params.auto_chip_or_kick = auto_chip_or_kick;
-}
-
-bool PivotKickTactic::done() const
-{
-    return fsm.is(boost::sml::X);
 }
 
 void PivotKickTactic::updateIntent(const TacticUpdate &tactic_update)

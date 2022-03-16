@@ -20,6 +20,7 @@ extern "C"
 #include "proto/tbots_software_msgs.nanopb.h"
 }
 
+
 /**
  * The ErForceSimulator abstracts away the physics simulation of all objects in the world,
  * as well as the firmware simulation for the robots. This provides a simple interface
@@ -32,12 +33,13 @@ class ErForceSimulator : public QObject
      * Creates a new Simulator. The starting state of the simulation
      * will have the given field, with no robots or ball.
      *
-     * @param field The field to initialize the simulation with
+     * @param field_type The field type
      * @param robot_constants The robot constants
      * @param wheel_constants The wheel constants
      * @param simulator_config The config to fetch parameters from
      */
-    explicit ErForceSimulator(const Field& field, const RobotConstants_t& robot_constants,
+    explicit ErForceSimulator(const TbotsProto::FieldType& field_type,
+                              const RobotConstants_t& robot_constants,
                               const WheelConstants& wheel_constants,
                               std::shared_ptr<const SimulatorConfig> simulator_config);
     ErForceSimulator()  = delete;
@@ -64,8 +66,10 @@ class ErForceSimulator : public QObject
      *
      * @param robots the robots to add
      */
-    void addYellowRobots(const std::vector<RobotStateWithId>& robots);
-    void addBlueRobots(const std::vector<RobotStateWithId>& robots);
+    void setYellowRobots(const std::vector<RobotStateWithId>& robots);
+    void setBlueRobots(const std::vector<RobotStateWithId>& robots);
+    void setRobots(const std::vector<RobotStateWithId>& robots,
+                   gameController::Team team);
 
     /**
      * Sets the primitive being simulated by the robot on the corresponding team
@@ -93,6 +97,11 @@ class ErForceSimulator : public QObject
      * of the simulation
      */
     std::vector<SSLProto::SSL_WrapperPacket> getSSLWrapperPackets() const;
+
+    /**
+     * Returns the current Simulator State
+     */
+    world::SimulatorState getSimulatorState() const;
 
     /**
      * Returns the field in the simulation
@@ -154,6 +163,7 @@ class ErForceSimulator : public QObject
 
     RobotConstants_t robot_constants;
     WheelConstants wheel_constants;
+    Field field;
 
     const QString CONFIG_FILE      = "simulator/2020";
     const QString CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";

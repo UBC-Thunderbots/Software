@@ -3,6 +3,7 @@
 #include <memory>
 #include <optional>
 
+#include "proto/world.pb.h"
 #include "software/time/timestamp.h"
 #include "software/world/ball_state.h"
 
@@ -32,6 +33,13 @@ class Ball final
      */
     explicit Ball(const BallState &initial_state, const Timestamp &timestamp,
                   const Vector &acceleration = Vector(0, 0));
+
+    /**
+     * Creates a new ball based on the TbotsProto::Ball protobuf representation
+     *
+     * @param ball_proto The TbotsProto::Ball protobuf which this ball should be based on
+     */
+    explicit Ball(const TbotsProto::Ball &ball_proto);
 
     /**
      * Returns the current state of the ball

@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "attacker_tactic",
-    srcs = ["attacker_tactic.cpp"],
+    srcs = [
+        "attacker_fsm.cpp",
+        "attacker_tactic.cpp",
+    ],
     hdrs = [
         "attacker_fsm.h",
         "attacker_tactic.h",
@@ -30,8 +33,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_attacker_tactic_passing_test",
-    srcs = ["simulated_attacker_tactic_passing_test.cpp"],
+    name = "attacker_tactic_passing_test",
+    srcs = ["attacker_tactic_passing_test.cpp"],
     deps = [
         ":attacker_tactic",
         "//shared/test_util:tbots_gtest_main",
@@ -45,8 +48,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_attacker_tactic_shoot_goal_test",
-    srcs = ["simulated_attacker_tactic_shoot_goal_test.cpp"],
+    name = "attacker_tactic_shoot_goal_test",
+    srcs = ["attacker_tactic_shoot_goal_test.cpp"],
     deps = [
         ":attacker_tactic",
         "//shared/test_util:tbots_gtest_main",
@@ -60,8 +63,8 @@ cc_test(
 )
 
 cc_test(
-    name = "simulated_attacker_tactic_keep_away_test",
-    srcs = ["simulated_attacker_tactic_keep_away_test.cpp"],
+    name = "attacker_tactic_keep_away_test",
+    srcs = ["attacker_tactic_keep_away_test.cpp"],
     deps = [
         ":attacker_tactic",
         "//shared/test_util:tbots_gtest_main",

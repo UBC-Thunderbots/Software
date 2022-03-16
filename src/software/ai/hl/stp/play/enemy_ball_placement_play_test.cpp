@@ -5,7 +5,7 @@
 #include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/ai/navigator/obstacle/robot_navigation_obstacle_factory.h"
 #include "software/simulated_tests/non_terminating_validation_functions/robots_violating_motion_constraint.h"
-#include "software/simulated_tests/simulated_play_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_play_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_at_point_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_halt_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -14,11 +14,12 @@
 #include "software/world/world.h"
 
 class EnemyBallPlacementPlayTest
-    : public SimulatedPlayTestFixture,
+    : public SimulatedErForceSimPlayTestFixture,
       public ::testing::WithParamInterface<std::tuple<std::vector<Point>, BallState>>
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
 };
 
 TEST_P(EnemyBallPlacementPlayTest, test_ball_placement)
@@ -65,7 +66,7 @@ TEST_P(EnemyBallPlacementPlayTest, test_ball_placement)
                 MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }
@@ -113,7 +114,7 @@ TEST_F(EnemyBallPlacementPlayTest, test_no_placement)
                 MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
         }};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(10));
 }

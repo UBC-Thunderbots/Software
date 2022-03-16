@@ -23,22 +23,19 @@ class GoalieTactic : public Tactic
      * @param goalie_tactic_config The config to fetch parameters from
      * @param max_allowed_speed_mode The maximum allowed speed mode
      */
-    explicit GoalieTactic(
-        std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config,
-        MaxAllowedSpeedMode max_allowed_speed_mode = MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+    explicit GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config,
+                          TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
+                              TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
     GoalieTactic() = delete;
-
-    void updateWorldParams(const World &world) override;
 
     double calculateRobotCost(const Robot &robot, const World &world) const override;
 
     void accept(TacticVisitor &visitor) const override;
-    bool done() const override;
-    bool isGoalieTactic() const override;
+
+    DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
-    void calculateNextAction(ActionCoroutine::push_type &yield) override;
     void updateIntent(const TacticUpdate &tactic_update) override;
 
     FSM<GoalieFSM> fsm;

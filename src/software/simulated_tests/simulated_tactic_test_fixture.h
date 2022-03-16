@@ -89,13 +89,13 @@ class SimulatedTacticTestFixture : public SimulatedTestFixture
     void updateEnemyPrimitives(const World& world,
                                std::shared_ptr<Simulator> simulator_to_update);
 
-    std::optional<PlayInfo> getPlayInfo() override;
+    std::optional<TbotsProto::PlayInfo> getPlayInfo() override;
     AIDrawFunction getDrawFunctions() override;
 
     std::shared_ptr<Tactic> friendly_tactic;
     std::shared_ptr<Tactic> enemy_tactic;
-    std::optional<RobotId> friendly_robot_id;
-    std::optional<RobotId> enemy_robot_id;
+    std::optional<RobotId> friendly_robot_id_opt;
+    std::optional<RobotId> enemy_robot_id_opt;
 
     // Motion constraints to set for intent
     std::set<MotionConstraint> friendly_motion_constraints;
