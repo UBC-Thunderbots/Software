@@ -1,22 +1,24 @@
 #pragma once
 
+#include <atomic>
 #include <boost/asio.hpp>
 #include <thread>
-#include <atomic>
 
 #include "software/jetson_nano/services/service.h"
-#include "software/uart/boost_uart_communication.h"
 #include "software/logger/logger.h"
+#include "software/uart/boost_uart_communication.h"
 
 // Move different file with powerloop
-struct GenevaMotorCommand {
+struct GenevaMotorCommand
+{
     float angle_deg;
     float rotation_speed;
 };
 
-struct ChickerCommand {
-    bool  autochip;
-    bool  autokick;
+struct ChickerCommand
+{
+    bool autochip;
+    bool autokick;
     float chip_distance;
     float kick_distance;
     float pulse_width_sec;
@@ -24,15 +26,15 @@ struct ChickerCommand {
 
 struct PowerCommand
 {
-    ChickerCommand     chicker;
+    ChickerCommand chicker;
     GenevaMotorCommand geneva;
 };
 
 
 struct PowerStatus
 {
-    bool  breakbeam_tripped;
-    bool  flyback_fault;
+    bool breakbeam_tripped;
+    bool flyback_fault;
     float battery_voltage;
     float current_draw;
     float geneva_angle;
@@ -57,7 +59,8 @@ class PowerService : public Service
      * @param command The
      * @return
      */
-    std::unique_ptr<PowerStatus> poll(const PowerCommand & command);
+    std::unique_ptr<PowerStatus> poll(const PowerCommand& command);
+
    private:
     /**
      * Handler method called every time the timer expires a new read is requested

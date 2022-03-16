@@ -83,8 +83,8 @@ namespace
      * @param decoded the vector that bytes are decoded to
      * @return whether the decode was successful
      */
-    bool cobsDecoding(
-        const std::vector<uint8_t>& to_decode, std::vector<uint8_t>& decoded)
+    bool cobsDecoding(const std::vector<uint8_t>& to_decode,
+                      std::vector<uint8_t>& decoded)
     {
         if (to_decode.front() != START_END_FLAG_BYTE ||
             to_decode.back() != START_END_FLAG_BYTE)
@@ -197,7 +197,8 @@ UartMessageFrame<T> createUartMessageFrame(const T& data)
  *
  */
 template <typename T>
-bool unmarshalUartPacket(const std::vector<uint8_t>& data, UartMessageFrame<T>& message_frame)
+bool unmarshalUartPacket(const std::vector<uint8_t>& data,
+                         UartMessageFrame<T>& message_frame)
 {
     auto decoded = std::vector<uint8_t>();
     if (!cobsDecoding(data, decoded))
@@ -208,14 +209,14 @@ bool unmarshalUartPacket(const std::vector<uint8_t>& data, UartMessageFrame<T>& 
     {
         return false;
     }
-    std::copy(decoded.begin(), decoded.end(),
-              reinterpret_cast<uint8_t*>(&message_frame));
+    std::copy(decoded.begin(), decoded.end(), reinterpret_cast<uint8_t*>(&message_frame));
     return message_frame.verifyLengthAndCrc();
 }
 
 template <typename T>
-size_t getMarshalledSize(const T& data) {
+size_t getMarshalledSize(const T& data)
+{
     auto data_ptr = reinterpret_cast<const char*>(&data);
-    std::vector<uint8_t>data_vector (data_ptr, data_ptr + sizeof(data));
+    std::vector<uint8_t> data_vector(data_ptr, data_ptr + sizeof(data));
     return cobsEncoding(data_vector).size() + sizeof(UartMessageFrame<T>) - sizeof(T);
 }

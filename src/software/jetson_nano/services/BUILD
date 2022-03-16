@@ -29,7 +29,8 @@ cc_library(
         "//shared/uart_framing",
         "//software/logger",
         "//software/uart:boost_uart_communication",
-        "@boost//:asio"
+        "@boost//:asio",
+    ],
 )
 
 cc_library(
