@@ -18,8 +18,8 @@ class RobotEntersRegion(Validation):
 
     """Checks if a Robot enters any of the provided regions."""
 
-    def __init__(self, regions=[]):
-        self.regions = regions
+    def __init__(self, regions=None):
+        self.regions = regions if regions else []
 
     def get_validation_status(self, vision) -> ValidationStatus:
         """Checks if _any_ robot enters the provided regions
