@@ -447,9 +447,6 @@ void HRVOAgent::computePreferredVelocity()
     float speedAtGoal               = nextGoal->getDesiredSpeedAtCurrentGoal();
     Vector2 distVectorToGoal        = goalPosition - position_;
     auto distToGoal                 = abs(distVectorToGoal);
-    // Increasing deceleration distance to reduce the chance of overshooting the
-    // destination
-    float decel_dist_multiplier = 1.2f;
     // d = (Vf^2 - Vi^2) / 2a
     double startLinearDecelerationDistance =
         std::abs((std::pow(speedAtGoal, 2) - std::pow(prefSpeed_, 2)) /
@@ -460,9 +457,6 @@ void HRVOAgent::computePreferredVelocity()
     {
         // velocity given linear deceleration, distance away from goal, and desired final
         // speed
-        // Decreasing preferred speed during deceleration to reduce the chance of
-        // overshooting the destination
-        float decel_pref_speed_multiplier = 0.6f;
         // v_pref = sqrt(v_goal^2 + 2 * a * d_remainingToDestination)
         float currPrefSpeed = static_cast<float>(std::sqrt(std::pow(speedAtGoal, 2) +
                                                            2 * max_accel_ * distToGoal)) *
