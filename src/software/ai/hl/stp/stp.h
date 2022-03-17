@@ -134,6 +134,8 @@ class STP
         ConstPriorityTacticVector tactics, const World &world,
         bool automatically_assign_goalie);
 
+    std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitives(const World &world);
+
    private:
     /**
      * Gets the intents the current play wants to run
@@ -157,4 +159,5 @@ class STP
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
     bool override_play_changed;
     std::unique_ptr<Play> override_play;
+    GlobalPathPlannerFactory path_planner_factory;
 };

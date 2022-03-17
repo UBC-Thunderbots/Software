@@ -83,7 +83,10 @@ struct TacticUpdate
     }
 
 #define DEFINE_PATH_POINTS(DESTINATION)                                                  \
-    std::vector<Point> path_points =                                                     \
-        event.common.path_planner                                                        \
-            ->findPath(event.common.robot.position(), (DESTINATION))                     \
-            ->getKnots();
+    std::vector<Point> path_points = {event.common.robot.position()};                    \
+    auto path = event.common.path_planner->findPath(event.common.robot.position(),       \
+                                                    (DESTINATION));                      \
+    if (path.has_value())                                                                \
+    {                                                                                    \
+        path_points = path.value().getKnots();                                           \
+    }

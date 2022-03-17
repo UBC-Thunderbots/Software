@@ -27,7 +27,11 @@ STP::STP(std::shared_ptr<const AiConfig> ai_config)
       stop_tactics(),
       current_play(std::make_unique<HaltPlay>(ai_config)),
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config})),
-      override_play(nullptr)
+      override_play(nullptr),
+      path_planner_factory(
+          ai_config->getRobotNavigationObstacleConfig(),
+          World(Field::createSSLDivisionBField(),
+                Ball(Point(), Vector(), Timestamp::fromSeconds(0)), Team(), Team()))
 {
     ai_config->getAiControlConfig()->getCurrentAiPlay()->registerCallbackFunction(
         [this, ai_config](std::string new_override_play_name) {
@@ -49,6 +53,22 @@ STP::STP(std::shared_ptr<const AiConfig> ai_config)
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
     {
         stop_tactics.push_back(std::make_shared<StopTactic>(false));
+    }
+}
+
+std::unique_ptr<TbotsProto::PrimitiveSet> STP::getPrimitives(const World& world)
+{
+    fsm->process_event(PlaySelectionFSM::Update(
+        [this](std::unique_ptr<Play> play) { current_play = std::move(play); },
+        world.gameState()));
+
+    if (static_cast<bool>(override_play))
+    {
+        return override_play->get(path_planner_factory, world);
+    }
+    else
+    {
+        return current_play->get(path_planner_factory, world);
     }
 }
 

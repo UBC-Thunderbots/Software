@@ -66,13 +66,13 @@ class Play
     /**
      * Gets Primitives from the Play given the assignment algorithm and world
      *
-     * @param world The updated world
      * @param path_planner_factory The path planner factory
+     * @param world The updated world
      *
      * @return the vector of intents to execute
      */
     virtual std::unique_ptr<TbotsProto::PrimitiveSet> get(
-        const World& world, const GlobalPathPlannerFactory& path_planner_factory);
+        const GlobalPathPlannerFactory& path_planner_factory, const World& world);
 
     virtual ~Play() = default;
 

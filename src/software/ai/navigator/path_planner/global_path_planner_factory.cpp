@@ -30,6 +30,7 @@ GlobalPathPlannerFactory::GlobalPathPlannerFactory(
         }
 
         auto obstacles = obstacle_factory.createFromMotionConstraints(
+            // TODO: we should only need to pass in a field
             motion_constraint_obstacles, world);
         planners.emplace(std::make_pair(
             motion_constraint_obstacles,

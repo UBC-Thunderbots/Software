@@ -123,7 +123,7 @@ std::vector<std::unique_ptr<Intent>> Play::get(
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
-    const World &world, const GlobalPathPlannerFactory &path_planner_factory)
+    const GlobalPathPlannerFactory &path_planner_factory, const World &world)
 {
     PriorityTacticVector priority_tactics;
     unsigned int num_tactics =

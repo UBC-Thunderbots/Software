@@ -27,9 +27,7 @@ void AI::overridePlay(std::unique_ptr<Play> play)
 
 std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World &world) const
 {
-    std::vector<std::unique_ptr<Intent>> assigned_intents = stp->getIntents(world);
-
-    return navigator->getAssignedPrimitives(world, assigned_intents);
+    return stp->getPrimitives(world);
 }
 
 TbotsProto::PlayInfo AI::getPlayInfo() const
