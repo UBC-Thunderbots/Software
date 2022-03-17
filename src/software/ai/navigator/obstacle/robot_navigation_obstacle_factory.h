@@ -31,23 +31,23 @@ class RobotNavigationObstacleFactory
      * Create obstacles for the given motion constraints
      *
      * @param motion_constraints The motion constraints to create obstacles for
-     * @param world World we're enforcing motion constraints in
+     * @param field Field we're enforcing motion constraints in
      *
      * @return Obstacles representing the given motion constraints
      */
     std::vector<ObstaclePtr> createFromMotionConstraints(
-        const std::set<MotionConstraint> &motion_constraints, const World &world) const;
+        const std::set<MotionConstraint> &motion_constraints, const Field &field) const;
 
     /**
      * Create obstacles for the given motion constraint
      *
      * @param motion_constraint The motion constraint to create obstacles for
-     * @param world World we're enforcing motion constraints in
+     * @param field Field we're enforcing motion constraints in
      *
      * @return Obstacles representing the given motion constraint
      */
     std::vector<ObstaclePtr> createFromMotionConstraint(
-        const MotionConstraint &motion_constraint, const World &world) const;
+        const MotionConstraint &motion_constraint, const Field &field) const;
 
     /**
      * Create an obstacle representing the given robot

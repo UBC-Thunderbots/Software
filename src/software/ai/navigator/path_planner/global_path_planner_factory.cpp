@@ -2,7 +2,7 @@
 
 GlobalPathPlannerFactory::GlobalPathPlannerFactory(
     const std::shared_ptr<const RobotNavigationObstacleConfig> navigation_obstacle_config,
-    const World &world)
+    const Field &field)
 {
     RobotNavigationObstacleFactory obstacle_factory =
         RobotNavigationObstacleFactory(navigation_obstacle_config);
@@ -30,11 +30,10 @@ GlobalPathPlannerFactory::GlobalPathPlannerFactory(
         }
 
         auto obstacles = obstacle_factory.createFromMotionConstraints(
-            // TODO: we should only need to pass in a field
-            motion_constraint_obstacles, world);
+            motion_constraint_obstacles, field);
         planners.emplace(std::make_pair(
             motion_constraint_obstacles,
-            std::make_shared<EnlsvgPathPlanner>(world.field().fieldBoundary(), obstacles,
+            std::make_shared<EnlsvgPathPlanner>(field.fieldBoundary(), obstacles,
                                                 ROBOT_MAX_RADIUS_METERS)));
     }
 }

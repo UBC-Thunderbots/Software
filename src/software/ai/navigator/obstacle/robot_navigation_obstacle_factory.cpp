@@ -13,7 +13,7 @@ RobotNavigationObstacleFactory::RobotNavigationObstacleFactory(
 }
 
 std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraint(
-    const MotionConstraint &motion_constraint, const World &world) const
+    const MotionConstraint &motion_constraint, const Field &field) const
 {
     std::vector<ObstaclePtr> obstacles;
 
@@ -21,7 +21,7 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
     {
         case MotionConstraint::CENTER_CIRCLE:
             obstacles.push_back(createFromShape(
-                Circle(world.field().centerPoint(), world.field().centerCircleRadius())));
+                Circle(field.centerPoint(), field.centerCircleRadius())));
             break;
         case MotionConstraint::HALF_METER_AROUND_BALL:
             // 0.5 represents half a metre radius
@@ -30,29 +30,29 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
         case MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
         {
             obstacles.push_back(createFromFieldRectangle(
-                world.field().enemyDefenseArea(), world.field().fieldLines(),
-                world.field().fieldBoundary(), 0.3));
+                field.enemyDefenseArea(), field.fieldLines(),
+                field.fieldBoundary(), 0.3));
         }
         break;
         case MotionConstraint::FRIENDLY_DEFENSE_AREA:
             obstacles.push_back(createFromFieldRectangle(
-                world.field().friendlyDefenseArea(), world.field().fieldLines(),
-                world.field().fieldBoundary()));
+                field.friendlyDefenseArea(), field.fieldLines(),
+                field.fieldBoundary()));
             break;
         case MotionConstraint::ENEMY_DEFENSE_AREA:
-            obstacles.push_back(createFromFieldRectangle(world.field().enemyDefenseArea(),
-                                                         world.field().fieldLines(),
-                                                         world.field().fieldBoundary()));
+            obstacles.push_back(createFromFieldRectangle(field.enemyDefenseArea(),
+                                                         field.fieldLines(),
+                                                         field.fieldBoundary()));
             break;
         case MotionConstraint::FRIENDLY_HALF:
-            obstacles.push_back(createFromFieldRectangle(world.field().friendlyHalf(),
-                                                         world.field().fieldLines(),
-                                                         world.field().fieldBoundary()));
+            obstacles.push_back(createFromFieldRectangle(field.friendlyHalf(),
+                                                         field.fieldLines(),
+                                                         field.fieldBoundary()));
             break;
         case MotionConstraint::ENEMY_HALF:
-            obstacles.push_back(createFromFieldRectangle(world.field().enemyHalf(),
-                                                         world.field().fieldLines(),
-                                                         world.field().fieldBoundary()));
+            obstacles.push_back(createFromFieldRectangle(field.enemyHalf(),
+                                                         field.fieldLines(),
+                                                         field.fieldBoundary()));
             break;
         case MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:
             if (world.gameState().getBallPlacementPoint().has_value())
@@ -68,8 +68,8 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
             }
             break;
         case MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE:
-            Rectangle field_walls    = world.field().fieldBoundary();
-            Rectangle playable_field = world.field().fieldLines();
+            Rectangle field_walls    = field.fieldBoundary();
+            Rectangle playable_field = field.fieldLines();
             // put each boundary zone as an obstacle
             Rectangle upper_boundary =
                 Rectangle(field_walls.posXNegYCorner(),
