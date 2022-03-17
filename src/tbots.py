@@ -8,6 +8,12 @@ import argparse
 from thefuzz import fuzz
 from thefuzz import process
 
+# thefuzz is a fuzzy string matcher in python
+# https://github.com/seatgeek/thefuzz
+#
+# It returns a match ratio between the input and the choices
+# This is an experiemntally determined threshold that works
+# for our bazel commands
 THEFUZZ_MATCH_RATIO_THRESHOLD = 50
 
 if __name__ == "__main__":
@@ -63,7 +69,7 @@ if __name__ == "__main__":
     # Handle stop_ai_on_start
     if args.stop_ai_on_start:
         if args.action in "run":
-            command += ["--enable_visualizer"]
+            command += ["--stop_ai_on_start"]
         if args.action in "test":
             command += ['--test_arg="--stop_ai_on_start"']
 
