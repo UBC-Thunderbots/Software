@@ -12,7 +12,7 @@ from thefuzz import process
 # https://github.com/seatgeek/thefuzz
 #
 # It returns a match ratio between the input and the choices
-# This is an experiemntally determined threshold that works
+# This is an experimentally determined threshold that works
 # for our bazel commands
 THEFUZZ_MATCH_RATIO_THRESHOLD = 50
 
