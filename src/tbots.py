@@ -45,7 +45,7 @@ if __name__ == "__main__":
     command = ["bazel", args.action, target]
 
     # Handle visualizer argument
-    if args.enable_visualizer and args.action not in "build":
+    if args.action not in "build":
         command += ["--cache_test_results=false"]
     if args.enable_visualizer and args.action in "run":
         command += ["--", "--enable_visualizer"]
