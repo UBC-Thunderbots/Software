@@ -33,6 +33,7 @@ Thunderloop::Thunderloop(const RobotConstants_t& robot_constants,
     network_service_ = std::make_unique<NetworkService>(
         std::string(ROBOT_MULTICAST_CHANNELS[channel_id_]) + "%" + "eth0", VISION_PORT,
         PRIMITIVE_PORT, ROBOT_STATUS_PORT, true);
+    redis_client_ = std::make_unique<RedisClient>(REDIS_DEFAULT_HOST, REDIS_DEFAULT_PORT);
 }
 
 Thunderloop::~Thunderloop()

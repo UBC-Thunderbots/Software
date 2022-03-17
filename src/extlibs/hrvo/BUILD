@@ -20,7 +20,6 @@ cc_library(
         "kd_tree.cpp",
         "linear_velocity_agent.cpp",
         "simulator.cpp",
-        "vector2.cpp",
     ],
     hdrs = [
         "agent.h",
@@ -29,11 +28,10 @@ cc_library(
         "kd_tree.h",
         "linear_velocity_agent.h",
         "simulator.h",
-        "vector2.h",
     ],
-    visibility = ["//visibility:public"],
     deps = [
         "//proto/primitive:primitive_msg_factory",
+        "//software/geom:vector",
         "//software/world",
     ],
 )

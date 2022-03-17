@@ -2,17 +2,15 @@ import pyqtgraph as pg
 import pyqtgraph.console as pg_console
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 import software.thunderscope.constants as constants
+from software.thunderscope.log.g3log_checkboxes import g3logCheckboxes
 
-from proto.robot_log_msg_pb2 import RobotLog
+from proto.robot_log_msg_pb2 import RobotLog, LogLevel
+import queue
 
 
 class g3logWidget(pg_console.ConsoleWidget):
-    def __init__(self):
+    def __init__(self, buffer_size=10):
         pg_console.ConsoleWidget.__init__(self)
-
-        self.log_receiver = ThreadedUnixListener(
-            constants.UNIX_SOCKET_BASE_PATH + "log", RobotLog, convert_from_any=False
-        )
 
         # disable input and buttons
         self.input.hide()
@@ -29,20 +27,45 @@ class g3logWidget(pg_console.ConsoleWidget):
             }"""
         )
 
+        # Creates checkbox widget
+        self.checkboxWidget = g3logCheckboxes()
+
+        self.log_buffer = queue.Queue(buffer_size)
+
     def refresh(self):
         """Update the log widget with another log message
         """
-        log = self.log_receiver.maybe_pop()
-
-        if not log:
+        try:
+            log = self.log_buffer.get_nowait()
+        except queue.Empty as empty:
             return
 
-        log_str = "{} {} [{}->{}] {}\n".format(
-            log.created_timestamp.epoch_timestamp_seconds,
-            log.log_level,
-            log.file_name,
-            log.line_number,
-            log.log_msg,
-        )
-
-        self.write(log_str)
+        # Checks whether this type of log is enabled from checkboxes
+        if (
+            (
+                log.log_level == LogLevel.DEBUG
+                and self.checkboxWidget.debug_checkbox.isChecked()
+            )
+            or (
+                log.log_level == LogLevel.INFO
+                and self.checkboxWidget.info_checkbox.isChecked()
+            )
+            or (
+                log.log_level == LogLevel.WARNING
+                and self.checkboxWidget.warning_checkbox.isChecked()
+            )
+            or (
+                log.log_level == LogLevel.FATAL
+                and self.checkboxWidget.fatal_checkbox.isChecked()
+            )
+        ):
+            log_str = "{} {} [{}->{}] {}\n".format(
+                log.created_timestamp.epoch_timestamp_seconds,
+                log.log_level,
+                log.file_name,
+                log.line_number,
+                log.log_msg,
+            )
+            self.write(log_str)
+        else:
+            return

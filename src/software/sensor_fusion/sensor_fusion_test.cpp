@@ -178,6 +178,7 @@ class SensorFusionTest : public ::testing::Test
             friendly_robots.emplace_back(state.id, state.robot_state, current_time);
         }
         friendly_team.updateRobots(friendly_robots);
+        friendly_team.assignGoalie(0);
         Team enemy_team;
         std::vector<Robot> enemy_robots;
         for (const auto &state : initBlueRobotStates())
@@ -185,6 +186,7 @@ class SensorFusionTest : public ::testing::Test
             enemy_robots.emplace_back(state.id, state.robot_state, current_time);
         }
         enemy_team.updateRobots(enemy_robots);
+        enemy_team.assignGoalie(0);
         return World(field, ball, friendly_team, enemy_team);
     }
 
@@ -199,6 +201,7 @@ class SensorFusionTest : public ::testing::Test
             friendly_robots.emplace_back(state.id, state.robot_state, current_time);
         }
         friendly_team.updateRobots(friendly_robots);
+        friendly_team.assignGoalie(0);
         Team enemy_team;
         std::vector<Robot> enemy_robots;
         for (const auto &state : initInvertedBlueRobotStates())
@@ -206,6 +209,7 @@ class SensorFusionTest : public ::testing::Test
             enemy_robots.emplace_back(state.id, state.robot_state, current_time);
         }
         enemy_team.updateRobots(enemy_robots);
+        enemy_team.assignGoalie(0);
         return World(field, ball, friendly_team, enemy_team);
     }
 

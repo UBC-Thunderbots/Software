@@ -24,6 +24,8 @@ static const double BALL_MASS_KG = 0.004593;
 // The max allowed speed of the robot when the stop command is issued, in meters per
 // second
 static const double STOP_COMMAND_ROBOT_MAX_SPEED_METERS_PER_SECOND = 1.5;
+// The max allowed speed of the robot before collisions would incur a foul
+static const double COLLISION_ALLOWED_ROBOT_MAX_SPEED_METERS_PER_SECOND = 0.5;
 // The maximum number of robots we can communicate with over radio.
 static const unsigned MAX_ROBOTS_OVER_RADIO = 8;
 
@@ -68,6 +70,11 @@ static const char
         "ff02::c3d0:42d2:bb13", "ff02::c3d0:42d2:bb14", "ff02::c3d0:42d2:bb15",
         "ff02::c3d0:42d2:bb16",
 };
+
+// Redis default server connections properties
+#define REDIS_HOST_LENGTH 10
+static const char REDIS_DEFAULT_HOST[REDIS_HOST_LENGTH] = "127.0.0.1";
+static const short unsigned int REDIS_DEFAULT_PORT      = 6379;
 
 // the port robots are listening to for vision and primitives
 static const short unsigned int VISION_PORT    = 42069;

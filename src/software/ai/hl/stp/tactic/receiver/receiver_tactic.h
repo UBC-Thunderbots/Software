@@ -25,7 +25,7 @@ class ReceiverTactic : public Tactic
      * @param disable_one_touch_shot If set to true, the receiver will not perform a
      * one-touch The robot will simply receive and dribble.
      */
-    void updateControlParams(const Pass& updated_pass,
+    void updateControlParams(std::optional<Pass> updated_pass,
                              bool disable_one_touch_shot = false);
 
     /**

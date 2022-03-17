@@ -8,6 +8,7 @@ cc_library(
     deps = [
         ":tbots_geometry",
         "//proto:tbots_cc_proto",
+        "//proto:visualization_cc_proto",
         "//software/geom:angle",
         "//software/geom:point",
         "//software/geom:vector",
