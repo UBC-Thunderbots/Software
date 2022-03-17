@@ -8,6 +8,7 @@
 #include "software/ai/hl/stp/play/play_fsm.h"
 #include "software/ai/hl/stp/tactic/goalie/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/navigator/path_planner/global_path_planner_factory.h"
 
 using RobotToTacticAssignmentFunction =
     std::function<std::map<std::shared_ptr<const Tactic>, Robot>(
@@ -60,54 +61,28 @@ class Play
      */
     virtual std::vector<std::unique_ptr<Intent>> get(
         RobotToTacticAssignmentFunction robot_to_tactic_assignment_algorithm,
-        MotionConstraintBuildFunction motion_constraint_builder, const World& new_world);
+        MotionConstraintBuildFunction motion_constraint_builder, const World& world);
+
+    /**
+     * Gets Primitives from the Play given the assignment algorithm and world
+     *
+     * @param world The updated world
+     * @param path_planner_factory The path planner factory
+     *
+     * @return the vector of intents to execute
+     */
+    virtual std::unique_ptr<TbotsProto::PrimitiveSet> get(
+        const World& world, const GlobalPathPlannerFactory& path_planner_factory);
 
     virtual ~Play() = default;
 
-    // TODO (#2359): make pure virtual once all plays are not coroutines
     /**
-     * Updates the priority tactic vector with new tactics
+     * Selects primitives for the primitives
      *
-     * @param play_update The PlayUpdate struct that contains all the information for
-     * updating the tactics
-     */
-    virtual void updateTactics(const PlayUpdate& play_update);
-
-    /**
-     * Given a vector of vector of tactics and the current World, assigns robots
-     * from the friendly team to each tactic
+     * @param tactics The tactics from which to generate primitives to select from
+     * @param world The updated world
      *
-     * Some tactics may not be assigned a robot, depending on if there is a robot
-     * capable of performing that tactic
-     *
-     * This will clear all assigned robots from all tactics
-     *
-     * The outer vector ranks the inner vector of tactics by priority. Tactics in
-     * lower indexes of the outer vector will be assigned first. For example:
-     *
-     * {
-     *      {crease_defender_1, crease_defender_2},
-     *      {move_tactic},
-     * }
-     *
-     * The cost of assigning both the crease_defender tactics will be minimized across
-     * all robots first, followed by the move_tactic.
-     *
-     * The order of the given tactics in the inner vector also determines their priority,
-     * with the tactics at the beginning of the vector being a higher priority than those
-     * at the end. The priority determines which tactics will NOT be assigned if there are
-     * not enough robots on the field to assign them all. For example, if a Play returned
-     * 4 Tactics in total but there were only 3 robots on the field at the time, only the
-     * first 3 Tactics in the vectors would be assigned to robots and run. (In the example
-     * above, only the goalie and crease_defenders would be assigned)
-     *
-     * @param tactics The vector of vector of tactics that should be assigned a robot.
-     * Note that this function modifies tactics to make the correct assignments, because
-     * we need to modify the individual tactics _and_ possibly add/remove tactics
-     * @param world The state of the world, which contains the friendly Robots that will
-     * be assigned to each tactic
-     *
-     * @return map from assigned tactics to robot
+     * @return the primitive set holding the selected primitives
      */
     std::unique_ptr<TbotsProto::PrimitiveSet> selectPrimitives(
         ConstPriorityTacticVector tactics, const World& world);
@@ -119,6 +94,15 @@ class Play
 
     // Goalie tactic common to all plays
     std::shared_ptr<GoalieTactic> goalie_tactic;
+
+    // TODO (#2359): make pure virtual once all plays are not coroutines
+    /**
+     * Updates the priority tactic vector with new tactics
+     *
+     * @param play_update The PlayUpdate struct that contains all the information for
+     * updating the tactics
+     */
+    virtual void updateTactics(const PlayUpdate& play_update);
 
    private:
     /**
@@ -188,11 +172,12 @@ class Play
 
     // TODO (#2359): remove this
     // The Play's knowledge of the most up-to-date World
-    std::optional<World> world;
+    std::optional<World> world_;
 
     // TODO (#2359): remove this
     PriorityTacticVector priority_tactics;
 
+    // TODO: change this to robot id to tactic
     std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment;
 };
 

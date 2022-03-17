@@ -11,7 +11,7 @@ Play::Play(std::shared_ptr<const AiConfig> ai_config, bool requires_goalie)
       stop_tactics(),
       requires_goalie(requires_goalie),
       tactic_sequence(boost::bind(&Play::getNextTacticsWrapper, this, _1)),
-      world(std::nullopt)
+      world_(std::nullopt)
 {
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
     {
@@ -25,7 +25,7 @@ PriorityTacticVector Play::getTactics(const World &world)
     // getNextTacticsWrapper function (inside the coroutine) to pass the World data to
     // the getNextTactics function. This is easier than directly passing the World data
     // into the coroutine
-    this->world = world;
+    world_ = world;
     // Check the coroutine status to see if it has any more work to do.
     if (tactic_sequence)
     {
@@ -78,17 +78,17 @@ PriorityTacticVector Play::getTactics(const World &world)
 
 std::vector<std::unique_ptr<Intent>> Play::get(
     RobotToTacticAssignmentFunction robot_to_tactic_assignment_algorithm,
-    MotionConstraintBuildFunction motion_constraint_builder, const World &new_world)
+    MotionConstraintBuildFunction motion_constraint_builder, const World &world)
 {
     std::vector<std::unique_ptr<Intent>> intents;
     PriorityTacticVector priority_tactics;
     unsigned int num_tactics =
-        static_cast<unsigned int>(new_world.friendlyTeam().numRobots());
-    if (requires_goalie && new_world.friendlyTeam().goalie())
+        static_cast<unsigned int>(world.friendlyTeam().numRobots());
+    if (requires_goalie && world.friendlyTeam().goalie())
     {
         num_tactics--;
     }
-    updateTactics(PlayUpdate(new_world, num_tactics,
+    updateTactics(PlayUpdate(world, num_tactics,
                              [&priority_tactics](PriorityTacticVector new_tactics) {
                                  priority_tactics = std::move(new_tactics);
                              }));
@@ -104,7 +104,7 @@ std::vector<std::unique_ptr<Intent>> Play::get(
     });
 
     auto robot_tactic_assignment = robot_to_tactic_assignment_algorithm(
-        const_priority_tactics, new_world, requires_goalie);
+        const_priority_tactics, world, requires_goalie);
 
     for (auto tactic_vec : priority_tactics)
     {
@@ -113,13 +113,199 @@ std::vector<std::unique_ptr<Intent>> Play::get(
             auto iter = robot_tactic_assignment.find(tactic);
             if (iter != robot_tactic_assignment.end())
             {
-                auto intent = tactic->get(iter->second, new_world);
+                auto intent = tactic->get(iter->second, world);
                 intent->setMotionConstraints(motion_constraint_builder(*tactic));
                 intents.push_back(std::move(intent));
             }
         }
     }
     return intents;
+}
+
+std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
+    const World &world, const GlobalPathPlannerFactory &path_planner_factory)
+{
+    PriorityTacticVector priority_tactics;
+    unsigned int num_tactics =
+        static_cast<unsigned int>(world.friendlyTeam().numRobots());
+    if (requires_goalie && world.friendlyTeam().goalie())
+    {
+        num_tactics--;
+    }
+    updateTactics(PlayUpdate(world, num_tactics,
+                             [&priority_tactics](PriorityTacticVector new_tactics) {
+                                 priority_tactics = std::move(new_tactics);
+                             }));
+
+    auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
+
+    robot_tactic_assignment.clear();
+
+    std::optional<Robot> goalie_robot = world.friendlyTeam().goalie();
+    std::vector<Robot> robots         = world.friendlyTeam().getAllRobots();
+
+    if (requires_goalie)
+    {
+        if (goalie_robot.has_value())
+        {
+            RobotId goalie_robot_id = goalie_robot.value().id();
+            robot_tactic_assignment.emplace(goalie_tactic, goalie_robot.value());
+
+            robots.erase(std::remove(robots.begin(), robots.end(), goalie_robot.value()),
+                         robots.end());
+
+            auto motion_constraints =
+                buildMotionConstraintSet(world.gameState(), *goalie_tactic);
+            auto path_planner = path_planner_factory.getPathPlanner(motion_constraints);
+            auto primitive    = goalie_tactic->get(world, path_planner)
+                                 ->robot_primitives()
+                                 .at(goalie_robot_id);
+
+            primitives_to_run->mutable_robot_primitives()->insert(
+                google::protobuf::MapPair(goalie_robot_id, primitive));
+        }
+        else if (world.friendlyTeam().getGoalieId().has_value())
+        {
+            LOG(WARNING) << "Robot not found for goalie ID: "
+                         << std::to_string(world.friendlyTeam().getGoalieId().value())
+                         << std::endl;
+        }
+        else
+        {
+            LOG(WARNING) << "No goalie ID set!" << std::endl;
+        }
+    }
+
+    // This functions optimizes the assignment of robots to tactics by minimizing
+    // the total cost of assignment using the Hungarian algorithm
+    // (also known as the Munkres algorithm)
+    // https://en.wikipedia.org/wiki/Hungarian_algorithm
+    //
+    // https://github.com/saebyn/munkres-cpp is the implementation of the Hungarian
+    // algorithm that we use here
+    for (auto tactic_vector : priority_tactics)
+    {
+        size_t num_tactics = tactic_vector.size();
+
+        if (robots.size() < tactic_vector.size())
+        {
+            // We do not have enough robots to assign all the tactics to. We "drop"
+            // (aka don't assign) the tactics at the end of the vector since they are
+            // considered lower priority
+            tactic_vector.resize(robots.size());
+            num_tactics = tactic_vector.size();
+        }
+        else
+        {
+            // Assign rest of robots with StopTactic
+            for (unsigned int i = 0; i < (robots.size() - tactic_vector.size()); i++)
+            {
+                tactic_vector.push_back(stop_tactics[i]);
+            }
+        }
+
+        std::vector<std::unique_ptr<TbotsProto::PrimitiveSet>> primitive_sets;
+
+        for (auto tactic : tactic_vector)
+        {
+            auto motion_constraints =
+                buildMotionConstraintSet(world.gameState(), *goalie_tactic);
+            auto path_planner = path_planner_factory.getPathPlanner(motion_constraints);
+            primitive_sets.emplace_back(tactic->get(world, path_planner));
+        }
+
+        size_t num_rows = robots.size();
+        size_t num_cols = tactic_vector.size();
+
+        // The Matrix constructor will assert if the rows and columns of the matrix are
+        // not >= 1, so we perform that check first and skip over this tactic_vector if
+        // it is empty. This represents the cases where there are either no tactics or no
+        // robots
+        if (num_rows == 0 || num_cols == 0)
+        {
+            continue;
+        }
+
+        // The rows of the matrix are the "workers" (the robots) and the columns are the
+        // "jobs" (the Tactics).
+        Matrix<double> matrix(num_rows, num_cols);
+
+        // Initialize the matrix with the cost of assigning each Robot to each Tactic
+        for (size_t row = 0; row < num_rows; row++)
+        {
+            for (size_t col = 0; col < num_cols; col++)
+            {
+                Robot robot                    = robots.at(row);
+                std::shared_ptr<Tactic> tactic = tactic_vector.at(col);
+                double robot_cost_for_tactic =
+                    primitive_sets.at(col)->robot_primitives().at(robot.id()).cost();
+
+                std::set<RobotCapability> required_capabilities =
+                    tactic->robotCapabilityRequirements();
+                std::set<RobotCapability> robot_capabilities =
+                    robot.getAvailableCapabilities();
+                std::set<RobotCapability> missing_capabilities;
+                std::set_difference(
+                    required_capabilities.begin(), required_capabilities.end(),
+                    robot_capabilities.begin(), robot_capabilities.end(),
+                    std::inserter(missing_capabilities, missing_capabilities.begin()));
+
+                if (missing_capabilities.size() > 0)
+                {
+                    matrix(row, col) = robot_cost_for_tactic + 10.0f;
+                }
+                else
+                {
+                    // capability requirements are satisfied, use real cost
+                    matrix(row, col) = robot_cost_for_tactic;
+                }
+            }
+        }
+
+        // Apply the Munkres/Hungarian algorithm to the matrix.
+        Munkres<double> m;
+        m.solve(matrix);
+
+        // The Munkres matrix gets solved such that there will be exactly one 0 in every
+        // row and exactly one 0 in every column. All other values will be -1. The 0's
+        // indicate the "workers" and "jobs" (robots and tactics for us) that are most
+        // optimally paired together
+        //
+        // Example matrices:
+        //        -1, 0,-1,         and            0,-1,
+        //         0,-1,-1,                       -1, 0,
+        //        -1,-1, 0,
+        auto remaining_robots = robots;
+
+        for (size_t row = 0; row < num_rows; row++)
+        {
+            for (size_t col = 0; col < num_tactics; col++)
+            {
+                auto val = matrix(row, col);
+                if (val == 0)
+                {
+                    RobotId robot_id = robots.at(row).id();
+                    robot_tactic_assignment.emplace(tactic_vector.at(col),
+                                                    robots.at(row));
+                    primitives_to_run->mutable_robot_primitives()->insert(
+                        google::protobuf::MapPair(
+                            robot_id,
+                            primitive_sets.at(col)->robot_primitives().at(robot_id)));
+                    remaining_robots.erase(
+                        std::remove_if(remaining_robots.begin(), remaining_robots.end(),
+                                       [robots, row](const Robot &robot) {
+                                           return robot.id() == robots.at(row).id();
+                                       }),
+                        remaining_robots.end());
+                    break;
+                }
+            }
+        }
+
+        robots = remaining_robots;
+    }
+
+    return primitives_to_run;
 }
 
 void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
@@ -133,9 +319,9 @@ void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
     // comes from when implementing Plays. The World is passed as a reference, so when
     // the world member variable is updated the implemented Plays will have access
     // to the updated world as well.
-    if (world)
+    if (world_)
     {
-        getNextTactics(yield, world.value());
+        getNextTactics(yield, world_.value());
     }
 }
 
@@ -154,12 +340,31 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::selectPrimitives(
     std::optional<Robot> goalie_robot = world.friendlyTeam().goalie();
     std::vector<Robot> robots         = world.friendlyTeam().getAllRobots();
 
-    if (goalie_robot && requires_goalie)
+    if (requires_goalie)
     {
-        robot_tactic_assignment.emplace(goalie_tactic, goalie_robot.value());
+        if (goalie_robot.has_value())
+        {
+            robot_tactic_assignment.emplace(goalie_tactic, goalie_robot.value());
 
-        robots.erase(std::remove(robots.begin(), robots.end(), goalie_robot.value()),
-                     robots.end());
+            robots.erase(std::remove(robots.begin(), robots.end(), goalie_robot.value()),
+                         robots.end());
+
+            auto motion_constraints =
+                buildMotionConstraintSet(world.gameState(), *goalie_tactic);
+
+            // primitive_set->mutable_robot_primitives()->insert(
+            //    google::protobuf::MapPair(robot.id(), *primitive));
+        }
+        else if (world.friendlyTeam().getGoalieId().has_value())
+        {
+            LOG(WARNING) << "Robot not found for goalie ID: "
+                         << std::to_string(world.friendlyTeam().getGoalieId().value())
+                         << std::endl;
+        }
+        else
+        {
+            LOG(WARNING) << "No goalie ID set!" << std::endl;
+        }
     }
 
     // This functions optimizes the assignment of robots to tactics by minimizing
