@@ -28,5 +28,5 @@ void loop()
     unsigned char estop_val =
         digitalRead(ESTOP_BUTTON_PIN) == 1 ? ESTOP_PLAY_MSG : ESTOP_STOP_MSG;
 
-    Serial.write(ESTOP_BUTTON_PIN);
+    Serial.write(estop_val);
 }
