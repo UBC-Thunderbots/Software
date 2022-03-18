@@ -78,14 +78,14 @@ void HRVOSimulator::updateWorld(const World &world)
 
             // Enemy robot should not enter the friendly defense area
             std::unordered_set<Point> intersection_point_set =
-                    intersection(world.field().friendlyDefenseArea(), segment);
+                intersection(world.field().friendlyDefenseArea(), segment);
             if (intersection_point_set.empty() &&
                 contains(world.field().fieldLines(), enemy_robot.position()))
             {
                 // If the robot is in the field, then move in the current direction
                 // towards the field edge
                 intersection_point_set =
-                        intersection(world.field().fieldLines(), segment);
+                    intersection(world.field().fieldLines(), segment);
             }
 
             if (intersection_point_set.empty())
@@ -98,7 +98,7 @@ void HRVOSimulator::updateWorld(const World &world)
 
             Vector goal_position = intersection_point_set.begin()->toVector();
             std::size_t agent_index =
-                    addLinearVelocityRobotAgent(enemy_robot, goal_position);
+                addLinearVelocityRobotAgent(enemy_robot, goal_position);
             enemy_robot_id_map.emplace(enemy_robot.id(), agent_index);
         }
     }
@@ -147,7 +147,7 @@ void HRVOSimulator::updateWorld(const World &world)
             const Ball &ball = world.ball();
             Vector position(ball.position().x(), ball.position().y());
             Vector velocity(ball.velocity().x(), ball.velocity().y());
-            Vector goal_pos   = position + 100 * velocity;
+            Vector goal_pos    = position + 100 * velocity;
             float acceleration = ball.acceleration().length();
             // Minimum of 0.5-meter distance away from the ball, if the ball is an
             // obstacle
@@ -232,7 +232,7 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
     // Get this robot's destination point, if it has a primitive
     // If this robot does not have a primitive, then set its current position as its
     // destination
-    Vector destination_point    = position;
+    Vector destination_point     = position;
     float speed_at_goal          = 0.f;
     const auto &robot_primitives = primitive_set.robot_primitives();
     auto primitive_iter          = robot_primitives.find(robot.id());
@@ -297,9 +297,9 @@ std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radi
 }
 
 size_t HRVOSimulator::addLinearVelocityAgent(const Vector &position, float agent_radius,
-                                             const Vector &curr_velocity,
-                                             float max_speed, float max_accel,
-                                             size_t goal_index, float goal_radius)
+                                             const Vector &curr_velocity, float max_speed,
+                                             float max_accel, size_t goal_index,
+                                             float goal_radius)
 {
     std::shared_ptr<LinearVelocityAgent> agent = std::make_shared<LinearVelocityAgent>(
         this, position, agent_radius, curr_velocity, max_speed, max_accel, goal_index,

@@ -29,8 +29,7 @@ void LinearVelocityAgent::computeNewVelocity()
     {
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
-        new_velocity_ =
-            velocity_ + dv.normalize(max_accel_ * simulator_->getTimeStep());
+        new_velocity_ = velocity_ + dv.normalize(max_accel_ * simulator_->getTimeStep());
     }
 }
 
