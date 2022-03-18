@@ -604,7 +604,6 @@ def _jetson_nano_impl(ctx):
                     "-lm",
                     "-lc",
                     "-lgcc",
-                    "-static",
                     "-Wl,--end-group",
                 ])],
             ),

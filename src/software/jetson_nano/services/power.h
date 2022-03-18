@@ -1,8 +1,6 @@
 #pragma once
 
-#include <atomic>
 #include <boost/asio.hpp>
-#include <thread>
 
 #include "software/jetson_nano/services/service.h"
 #include "software/logger/logger.h"
@@ -49,41 +47,25 @@ class PowerService : public Service
      * Opens all the required ports and maintains them until destroyed.
      */
     PowerService();
-    ~PowerService();
+    ~PowerService() = default;
     void start() override;
     void stop() override;
     /**
-     * When the power service is polled it sends the given power and
+     * When the power service is polled it sends the given power command and
      * returns the latest power status
      *
-     * @param command The
-     * @return
+     * @param command The power command to send
+     * @return the latest power status
      */
     std::unique_ptr<PowerStatus> poll(const PowerCommand& command);
 
    private:
-    /**
-     * Handler method called every time the timer expires a new read is requested
-     */
-    void tick(const boost::system::error_code&);
-    /**
-     * Initiates timer for serial reading
-     */
-    void continuousRead();
-
     boost::asio::io_service io_service;
     std::unique_ptr<BoostUartCommunication> uart;
-
-    std::thread read_thread;
-    boost::asio::deadline_timer timer;
-    std::atomic_bool in_destructor = false;
-    std::atomic<PowerStatus> status;
+    PowerStatus status;
 
     // Constants
     const size_t READ_BUFFER_SIZE;
-    static constexpr unsigned int BAUD_RATE                 = 115200;
-    const std::string DEVICE_SERIAL_PORT                    = "/dev/ttyTHS1";
-    static constexpr int MAX_WRITE_ATTEMPTS                 = 3;
-    static constexpr unsigned int INTERVAL_BETWEEN_READS_MS = 5;
-    static constexpr unsigned int STARTUP_TIME_MS           = 0;
+    const unsigned int BAUD_RATE         = 115200;
+    const std::string DEVICE_SERIAL_PORT = "/dev/ttyTHS1";
 };
