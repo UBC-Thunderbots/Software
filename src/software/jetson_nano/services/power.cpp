@@ -17,22 +17,23 @@ void PowerService::stop() {}
 
 std::unique_ptr<PowerStatus> PowerService::poll(const PowerCommand& command)
 {
-    auto frame        = createUartMessageFrame(command);
-    auto write_buffer = frame.marshallUartPacket();
-    LOG(INFO) << "POLL";
-    if (uart->serialWrite(write_buffer))
-    {
-        uart->flushSerialPort(uart->flush_send);
-    }
-    else
-    {
-        LOG(WARNING)
-            << "Writing power command failed. Maximum number of attempts exceeded";
-    }
+    auto frame                = createUartMessageFrame(command);
+    auto power_command_buffer = frame.marshallUartPacket();
 
     std::vector<uint8_t> power_status_msg;
     try
     {
+        // Write power command
+        if (uart->serialWrite(power_command_buffer))
+        {
+            uart->flushSerialPort(uart->flush_send);
+        }
+        else
+        {
+            LOG(WARNING) << "Writing power command failed.";
+        }
+
+        // Read power status
         uart->flushSerialPort(uart->flush_receive);
         power_status_msg = uart->serialRead(READ_BUFFER_SIZE);
     }
