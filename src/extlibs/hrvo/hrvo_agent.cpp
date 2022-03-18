@@ -83,13 +83,11 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
         const float openingAngle =
             std::asin((radius_ + other_agent.getRadius()) /
                       (position_ - other_agent.getPosition()).length());
-
         // Direction of the two edges of the velocity obstacles
-        // TODO: Use create from angle
         velocityObstacle.side1_ =
-            Vector(std::cos(angle - openingAngle), std::sin(angle - openingAngle));
+            Vector::createFromAngle(Angle::fromRadians(angle - openingAngle));
         velocityObstacle.side2_ =
-            Vector(std::cos(angle + openingAngle), std::sin(angle + openingAngle));
+            Vector::createFromAngle(Angle::fromRadians(angle + openingAngle));
 
         const float d = std::sin(2.f * openingAngle);
 
