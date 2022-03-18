@@ -3,7 +3,6 @@ import signal
 import argparse
 
 import PyQt6
-from PyQt6 import QtCore, QtWidgets
 import pyqtgraph as pg
 from proto.geometry_pb2 import Circle, Polygon
 from proto.visualization_pb2 import NamedValue, Obstacles, PathVisualization
@@ -11,7 +10,7 @@ from proto.robot_log_msg_pb2 import RobotLog
 from proto.world_pb2 import World
 from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
-from PyQt6.QtWidgets import QVBoxLayout, QWidget
+from pyqtgraph.Qt.QtWidgets import QVBoxLayout, QWidget
 
 from software.networking import threaded_unix_sender
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
@@ -71,6 +70,7 @@ class Thunderscope(object):
 
         # Setup refresh Timer
         self.refresh_timer = QtCore.QTimer()
+        self.refresh_timer.setTimerType(QtCore.Qt.PreciseTimer)
         self.refresh_timer.timeout.connect(__refresh)
         self.refresh_timer.start(refresh_interval_ms)  # Refresh at 200hz
 
