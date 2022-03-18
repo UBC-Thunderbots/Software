@@ -89,4 +89,5 @@ if __name__ == "__main__":
     # Otherwise, run the command! We use os.system here because we don't
     # care about the output and subprocess doesn't seem to run qt for somereason
     else:
+        print(" ".join(command))
         os.system(" ".join(command))
