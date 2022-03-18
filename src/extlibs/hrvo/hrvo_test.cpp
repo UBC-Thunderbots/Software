@@ -141,9 +141,9 @@ class HRVOTest : public ::testing::Test
         std::vector<float> prev_y_pos_arr(num_robots);
         for (int agent_id = 0; agent_id < num_robots; agent_id++)
         {
-            Vector2 curr_robot_pos   = simulator.getAgentPosition(agent_id);
-            prev_x_pos_arr[agent_id] = curr_robot_pos.getX();
-            prev_y_pos_arr[agent_id] = curr_robot_pos.getY();
+            Vector curr_robot_pos    = simulator.getAgentPosition(agent_id);
+            prev_x_pos_arr[agent_id] = curr_robot_pos.x();
+            prev_y_pos_arr[agent_id] = curr_robot_pos.y();
         }
 
         float prev_frame_time = 0.f;
@@ -156,19 +156,19 @@ class HRVOTest : public ::testing::Test
             float time           = simulator.getGlobalTime();
             for (unsigned int robot_id = 0; robot_id < num_robots; robot_id++)
             {
-                Vector2 curr_robot_pos = simulator.getAgentPosition(robot_id);
-                float curr_robot_rad   = ROBOT_MAX_RADIUS_METERS;
+                Vector curr_robot_pos = simulator.getAgentPosition(robot_id);
+                float curr_robot_rad  = ROBOT_MAX_RADIUS_METERS;
 
                 // Check for collision with other robots
                 int has_collided = -1;
                 for (unsigned int other_robot_id = 0; other_robot_id < num_robots;
                      other_robot_id++)
                 {
-                    Vector2 other_robot_pos = simulator.getAgentPosition(other_robot_id);
-                    float other_robot_rad   = ROBOT_MAX_RADIUS_METERS;
+                    Vector other_robot_pos = simulator.getAgentPosition(other_robot_id);
+                    float other_robot_rad  = ROBOT_MAX_RADIUS_METERS;
                     if (robot_id != other_robot_id)
                     {
-                        if (absSq(curr_robot_pos - other_robot_pos) <
+                        if ((curr_robot_pos - other_robot_pos).lengthSquared() <
                             std::pow(curr_robot_rad + other_robot_rad, 2.f))
                         {
                             has_collided = other_robot_id;
@@ -188,8 +188,8 @@ class HRVOTest : public ::testing::Test
                     float prev_x_pos = prev_x_pos_arr[robot_id];
                     float prev_y_pos = prev_y_pos_arr[robot_id];
 
-                    float curr_x_pos = curr_robot_pos.getX();
-                    float curr_y_pos = curr_robot_pos.getY();
+                    float curr_x_pos = curr_robot_pos.x();
+                    float curr_y_pos = curr_robot_pos.y();
 
                     velocity_x = (curr_x_pos - prev_x_pos) / delta_time;
                     velocity_y = (curr_y_pos - prev_y_pos) / delta_time;
@@ -199,21 +199,20 @@ class HRVOTest : public ::testing::Test
                     prev_x_pos_arr[robot_id] = curr_x_pos;
                     prev_y_pos_arr[robot_id] = curr_y_pos;
                 }
-                Vector2 goal_position =
+                Vector goal_position =
                     simulator.goals[simulator.getAgents()[robot_id]->getGoalIndex()]
                         ->getCurrentGoalPosition();
                 float goal_radius = simulator.getAgents()[robot_id]->getGoalRadius();
 
                 output_file << frame << "," << time << ","
                             << std::to_string(computation_time.count()) << "," << robot_id
-                            << "," << robot_radius[robot_id] << ","
-                            << curr_robot_pos.getX() << "," << curr_robot_pos.getY()
-                            << "," << velocity_x << "," << velocity_y << "," << speed
-                            << "," << goal_position.getX() << "," << goal_position.getY()
-                            << "," << goal_radius << "," << has_collided << ","
-                            << simulator.getAgentPrefVelocity(robot_id).getX() << ","
-                            << simulator.getAgentPrefVelocity(robot_id).getY()
-                            << std::endl;
+                            << "," << robot_radius[robot_id] << "," << curr_robot_pos.x()
+                            << "," << curr_robot_pos.y() << "," << velocity_x << ","
+                            << velocity_y << "," << speed << "," << goal_position.x()
+                            << "," << goal_position.y() << "," << goal_radius << ","
+                            << has_collided << ","
+                            << simulator.getAgentPrefVelocity(robot_id).x() << ","
+                            << simulator.getAgentPrefVelocity(robot_id).y() << std::endl;
             }
 
             frame++;

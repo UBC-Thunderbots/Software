@@ -35,18 +35,18 @@
 #include <stdexcept>
 #include <utility>
 
-Goal::Goal(const Vector2 &position) : position_(position)
+Goal::Goal(const Vector &position) : position_(position)
 {
     positions_.push_back(position);
     speedAtPosition_.push_back(0.f);
 }
 
-Goal::Goal(std::vector<Vector2> positions) : positions_(std::move(positions))
+Goal::Goal(std::vector<Vector> positions) : positions_(std::move(positions))
 {
     speedAtPosition_ = std::vector<float>(positions_.size(), 0.f);
 }
 
-Goal::Goal(std::vector<Vector2> positions, std::vector<float> speed_at_positions)
+Goal::Goal(std::vector<Vector> positions, std::vector<float> speed_at_positions)
     : positions_(std::move(positions)), speedAtPosition_(std::move(speed_at_positions))
 {
     if (positions_.size() != speedAtPosition_.size())
@@ -56,17 +56,17 @@ Goal::Goal(std::vector<Vector2> positions, std::vector<float> speed_at_positions
     }
 }
 
-Vector2 Goal::getNextGoalPostion()
+Vector Goal::getNextGoalPostion()
 {
     currGoalIndex++;
     return getCurrentGoalPosition();
 }
 
-Vector2 Goal::getCurrentGoalPosition()
+Vector Goal::getCurrentGoalPosition()
 {
     if (currGoalIndex >= positions_.size())
     {
-        return Vector2();
+        return Vector();
     }
     else
     {

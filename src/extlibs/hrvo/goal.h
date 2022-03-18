@@ -33,7 +33,6 @@
 #pragma once
 #include <vector>
 
-#include "extlibs/hrvo/vector2.h"
 #include "software/geom/vector.h"
 
 class HRVOSimulator;
@@ -47,13 +46,13 @@ class Goal
     /**
      * @param position  The position of this goal.
      */
-    explicit Goal(const Vector2 &position);
+    explicit Goal(const Vector &position);
 
     /**
      * @param positions  The list of positions which the the robot should travel to in
      * order.
      */
-    explicit Goal(std::vector<Vector2> positions);
+    explicit Goal(std::vector<Vector> positions);
 
     /**
      * @param positions  The list of positions which the the robot should travel to in
@@ -62,17 +61,17 @@ class Goal
      * it reaches the matching position. Must be in the same order and of the same length
      * of the positions
      */
-    explicit Goal(std::vector<Vector2> positions, std::vector<float> speed_at_positions);
+    explicit Goal(std::vector<Vector> positions, std::vector<float> speed_at_positions);
 
    public:
-    Vector2 position_;
+    Vector position_;
     // Goal positions and speeds in the same order
-    std::vector<Vector2> positions_;
+    std::vector<Vector> positions_;
     std::vector<float> speedAtPosition_;
     unsigned int currGoalIndex = 0;
 
-    Vector2 getNextGoalPostion();
-    Vector2 getCurrentGoalPosition();
+    Vector getNextGoalPostion();
+    Vector getCurrentGoalPosition();
     float getDesiredSpeedAtCurrentGoal();
     bool isGoingToFinalGoal();
 

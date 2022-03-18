@@ -1,6 +1,6 @@
 #pragma once
 
-#include "extlibs/hrvo/vector2.h"
+#include "software/geom/vector.h"
 
 class HRVOSimulator;
 
@@ -23,8 +23,8 @@ class Agent
      * @param goalIndex          The index of the Goal which this agent should go to.
      * @param goalRadius         The goal radius of this agent.
      */
-    Agent(HRVOSimulator *simulator, const Vector2 &position, float radius,
-          const Vector2 &velocity, const Vector2 &prefVelocity, float maxSpeed,
+    Agent(HRVOSimulator *simulator, const Vector &position, float radius,
+          const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
           float maxAccel, std::size_t goalIndex, float goalRadius);
 
     virtual ~Agent() = default;
@@ -38,13 +38,13 @@ class Agent
         VelocityObstacle() = default;
 
         // The position of the apex of the hybrid reciprocal velocity obstacle.
-        Vector2 apex_;
+        Vector apex_;
 
         // The direction of the first side of the hybrid reciprocal velocity obstacle.
-        Vector2 side1_;
+        Vector side1_;
 
         // The direction of the second side of the hybrid reciprocal velocity obstacle.
-        Vector2 side2_;
+        Vector side2_;
     };
 
     /**
@@ -70,7 +70,7 @@ class Agent
      *
      * @return The current position of the agent
      */
-    const Vector2 &getPosition() const;
+    const Vector &getPosition() const;
 
     /**
      * Returns the agents radius
@@ -84,7 +84,7 @@ class Agent
      *
      * @return The current velocity of the agent
      */
-    const Vector2 &getVelocity() const;
+    const Vector &getVelocity() const;
 
     /**
      * Return the max acceleration of the agent
@@ -105,7 +105,7 @@ class Agent
      *
      * @return The preferred velocity of the agent
      */
-    const Vector2 &getPrefVelocity() const;
+    const Vector &getPrefVelocity() const;
 
     /**
      * Return the Goal index for this agent
@@ -125,7 +125,7 @@ class Agent
      * Update position of Agent
      * @param position New position
      */
-    void setPosition(const Vector2 &position);
+    void setPosition(const Vector &position);
 
     /**
      * Update radius of Agent
@@ -137,7 +137,7 @@ class Agent
      * Update the velocity of Agent
      * @param velocity New velocity
      */
-    void setVelocity(const Vector2 &velocity);
+    void setVelocity(const Vector &velocity);
 
     /**
      * Update the max speed of Agent
@@ -147,17 +147,17 @@ class Agent
 
    protected:
     // Agent Properties
-    Vector2 position_;
+    Vector position_;
     float radius_;
 
     // The actual current velocity of this Agent
-    Vector2 velocity_;
+    Vector velocity_;
     // The requested new velocity of this Agent
-    Vector2 new_velocity_;
+    Vector new_velocity_;
     // The desired new speed of this Agent
     // NOTE: HRVO algorithm will try to pick this speed, however, it may pick a different
     // speed to avoid collisions.
-    Vector2 pref_velocity_;
+    Vector pref_velocity_;
 
     float max_speed_;
     float max_accel_;

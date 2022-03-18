@@ -35,7 +35,7 @@
 #include <cstddef>
 #include <vector>
 
-#include "extlibs/hrvo/vector2.h"
+#include "software/geom/vector.h"
 
 class HRVOAgent;
 class HRVOSimulator;
