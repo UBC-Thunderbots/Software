@@ -4,11 +4,6 @@ package TbotsProto;
 
 import "proto/geometry.proto";
 
-message RobotId
-{
-    uint32 robot_id = 1;
-}
-
 enum TeamColour
 {
     BLUE   = 0;
