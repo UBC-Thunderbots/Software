@@ -107,9 +107,8 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
 
             velocityObstacle.apex_ =
                 velocity_ + s * velocityObstacle.side1_ -
-                (uncertaintyOffset_ * (position_ - other_agent.getPosition()).length() /
-                 (radius_ + other_agent.getRadius())) *
-                    (position_ - other_agent.getPosition()).normalize();
+                 (position_ - other_agent.getPosition()).normalize((uncertaintyOffset_ * (position_ - other_agent.getPosition()).length() /
+                                                                       (radius_ + other_agent.getRadius())));
         }
         else
         {
@@ -123,9 +122,8 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
 
             velocityObstacle.apex_ =
                 velocity_ + s * velocityObstacle.side2_ -
-                (uncertaintyOffset_ * (position_ - other_agent.getPosition()).length() /
-                 (other_agent.getRadius() + radius_)) *
-                    (position_ - other_agent.getPosition()).normalize();
+                 (position_ - other_agent.getPosition()).normalize(uncertaintyOffset_ * (position_ - other_agent.getPosition()).length() /
+                                                                      (other_agent.getRadius() + radius_));
         }
     }
     else
@@ -135,11 +133,10 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
         // apart from each other
         velocityObstacle.apex_ =
             0.5f * (other_agent.getVelocity() + velocity_) -
-            (uncertaintyOffset_ + 0.5f *
-                                      (other_agent.getRadius() + radius_ -
-                                       (position_ - other_agent.getPosition()).length()) /
-                                      simulator_->getTimeStep()) *
-                (position_ - other_agent.getPosition()).normalize();
+             (position_ - other_agent.getPosition()).normalize(uncertaintyOffset_ + 0.5f *
+                                                                                       (other_agent.getRadius() + radius_ -
+                                                                                        (position_ - other_agent.getPosition()).length()) /
+                                                                                       simulator_->getTimeStep());
         velocityObstacle.side1_ =
             (other_agent.getPosition() - position_).perpendicular().normalize();
         velocityObstacle.side2_ = -velocityObstacle.side1_;
@@ -177,8 +174,7 @@ void HRVOAgent::computeNewVelocity()
     }
     else
     {
-        // TODO: Use normalize(max_speed)
-        candidate.position_ = max_speed_ * pref_velocity_.normalize();
+        candidate.position_ = pref_velocity_.normalize(max_speed_);
     }
 
     candidates_.insert(std::make_pair(
@@ -482,7 +478,7 @@ void HRVOAgent::computePreferredVelocity()
         float currPrefSpeed = static_cast<float>(
             std::sqrt(std::pow(speedAtGoal, 2) + 2 * max_accel_ * distToGoal)) *
                               decel_pref_speed_multiplier;
-        Vector ideal_pref_velocity = distVectorToGoal.normalize() * currPrefSpeed;
+        Vector ideal_pref_velocity = distVectorToGoal.normalize(currPrefSpeed);
 
         // Limit the preferred velocity to the kinematic limits
         const Vector dv = ideal_pref_velocity - velocity_;
@@ -495,7 +491,7 @@ void HRVOAgent::computePreferredVelocity()
             // Calculate the maximum velocity towards the preferred velocity, given the
             // acceleration constraint
             pref_velocity_ =
-                velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv.normalize());
+                velocity_ + dv.normalize(max_accel_ * simulator_->getTimeStep());
         }
     }
     else
@@ -505,7 +501,7 @@ void HRVOAgent::computePreferredVelocity()
         float currPrefSpeed =
             std::min(static_cast<double>(prefSpeed_),
                      velocity_.length() + max_accel_ * simulator_->getTimeStep());
-        pref_velocity_ = distVectorToGoal.normalize() * currPrefSpeed;
+        pref_velocity_ = distVectorToGoal.normalize(currPrefSpeed);
     }
 }
 

@@ -23,7 +23,7 @@ void Agent::update()
     if (new_velocity_.length() >= max_speed_)
     {
         // New velocity can not be greater than max speed
-        new_velocity_ = new_velocity_.normalize() * max_speed_;
+        new_velocity_ = new_velocity_.normalize(max_speed_);
     }
 
     const Vector dv = new_velocity_ - velocity_;
@@ -63,12 +63,12 @@ void Agent::update()
     }
 }
 
-void Agent::setPosition(const Vector2 &position)
+void Agent::setPosition(const Vector &position)
 {
     position_ = position;
 }
 
-void Agent::setVelocity(const Vector2 &velocity)
+void Agent::setVelocity(const Vector &velocity)
 {
     velocity_ = velocity;
 }

@@ -78,14 +78,14 @@ void HRVOSimulator::updateWorld(const World &world)
 
             // Enemy robot should not enter the friendly defense area
             std::unordered_set<Point> intersection_point_set =
-                intersection(world.field().friendlyDefenseArea(), segment);
+                    intersection(world.field().friendlyDefenseArea(), segment);
             if (intersection_point_set.empty() &&
                 contains(world.field().fieldLines(), enemy_robot.position()))
             {
                 // If the robot is in the field, then move in the current direction
                 // towards the field edge
                 intersection_point_set =
-                    intersection(world.field().fieldLines(), segment);
+                        intersection(world.field().fieldLines(), segment);
             }
 
             if (intersection_point_set.empty())
@@ -96,10 +96,11 @@ void HRVOSimulator::updateWorld(const World &world)
                                               enemy_robot.velocity() * 5);
             }
 
-        Vector goal_position = intersection_point_set.begin()->toVector();
-        std::size_t agent_index =
-                addLinearVelocityRobotAgent(enemy_robot, goal_position);
-        enemy_robot_id_map.emplace(enemy_robot.id(), agent_index);
+            Vector goal_position = intersection_point_set.begin()->toVector();
+            std::size_t agent_index =
+                    addLinearVelocityRobotAgent(enemy_robot, goal_position);
+            enemy_robot_id_map.emplace(enemy_robot.id(), agent_index);
+        }
     }
     else
     {
@@ -109,8 +110,7 @@ void HRVOSimulator::updateWorld(const World &world)
             auto hrvo_agent = getFriendlyAgentFromRobotId(friendly_robot.id());
             if (hrvo_agent.has_value())
             {
-                Point position = friendly_robot.position();
-                hrvo_agent.value()->setPosition(Vector2(position.x(), position.y()));
+                hrvo_agent.value()->setPosition(friendly_robot.position().toVector());
 
                 // Only update velocity if time has passed since the last time velocity
                 // was updated. This is to allow SensorFusion to update the actual robot
@@ -118,7 +118,7 @@ void HRVOSimulator::updateWorld(const World &world)
                 if (global_time - last_time_velocity_updated >= 4 * time_step)
                 {
                     Vector velocity = friendly_robot.velocity();
-                    hrvo_agent.value()->setVelocity(Vector2(velocity.x(), velocity.y()));
+                    hrvo_agent.value()->setVelocity(friendly_robot.velocity());
                     last_time_velocity_updated = global_time;
                 }
             }
@@ -130,11 +130,8 @@ void HRVOSimulator::updateWorld(const World &world)
             if (agent_index_iter != enemy_robot_id_map.end())
             {
                 unsigned int agent_index = agent_index_iter->second;
-                Point position           = enemy_robot.position();
-                agents[agent_index]->setPosition(Vector2(position.x(), position.y()));
-
-                Vector velocity = enemy_robot.velocity();
-                agents[agent_index]->setVelocity(Vector2(velocity.x(), velocity.y()));
+                agents[agent_index]->setPosition(enemy_robot.position().toVector());
+                agents[agent_index]->setVelocity(enemy_robot.velocity());
             }
         }
     }
@@ -163,7 +160,7 @@ void HRVOSimulator::updateWorld(const World &world)
         else
         {
             Point position = world.ball().position();
-            agents[ball_agent_id]->setPosition(Vector2(position.x(), position.y()));
+            agents[ball_agent_id]->setPosition(position.toVector());
         }
     }
     else if (ball_agent_id != -1)
