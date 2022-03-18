@@ -147,6 +147,13 @@ if ! sudo /opt/tbotspython/bin/pip3 install thefuzz  ; then
     exit 1
 fi
 
+if ! sudo /opt/tbotspython/bin/pip3 install python-Levenshtein ; then
+    echo "##############################################################"
+    echo "Error: Installing python-Levelshtein failed"
+    echo "##############################################################"
+    exit 1
+fi
+
 if ! sudo /opt/tbotspython/bin/pip3 install --upgrade protobuf  ; then
     echo "##############################################################"
     echo "Error: Installing protobuf failed"

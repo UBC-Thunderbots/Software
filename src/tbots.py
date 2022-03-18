@@ -22,11 +22,14 @@ if __name__ == "__main__":
 
     parser.add_argument("action", choices=["build", "run", "test"])
     parser.add_argument("search_query")
-    parser.add_argument("-v", "--enable_visualizer", action="store_true")
-    parser.add_argument("-s", "--stop_ai_on_start", action="store_true")
     parser.add_argument("-p", "--print_command", action="store_true")
     parser.add_argument("-d", "--debug_build", action="store_true")
 
+    # These are shortcut args for commonly used arguments on our tests
+    # and full_system. All other arguments are passed through as-is
+    # to the underlying binary/test that is being run (unknown_args)
+    parser.add_argument("-v", "--enable_visualizer", action="store_true")
+    parser.add_argument("-s", "--stop_ai_on_start", action="store_true")
     args, unknown_args = parser.parse_known_args()
 
     bazel_queries = {
