@@ -68,7 +68,7 @@ host_software_packages=(
 )
 
 # delete tbotspython first
-sudo rm -r /opt/tbotspython
+sudo rm -rf /opt/tbotspython
 
 # Upgrade python3 pip, which some pip packages require
 echo "================================================================"
