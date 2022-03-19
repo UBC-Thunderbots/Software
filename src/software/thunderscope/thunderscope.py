@@ -10,7 +10,7 @@ from proto.robot_log_msg_pb2 import RobotLog
 from proto.world_pb2 import World
 from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
-from pyqtgraph.Qt.QtWidgets import QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QVBoxLayout, QWidget
 
 from software.networking import threaded_unix_sender
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
@@ -70,7 +70,10 @@ class Thunderscope(object):
 
         # Setup refresh Timer
         self.refresh_timer = QtCore.QTimer()
+<<<<<<< HEAD
         self.refresh_timer.setTimerType(QtCore.Qt.TimerType.PreciseTimer)
+=======
+>>>>>>> parent of f5cc0ff77... fix some more bugs
         self.refresh_timer.timeout.connect(__refresh)
         self.refresh_timer.start(refresh_interval_ms)  # Refresh at 200hz
 

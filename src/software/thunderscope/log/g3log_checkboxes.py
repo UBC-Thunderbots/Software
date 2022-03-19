@@ -1,4 +1,5 @@
-from pyqtgraph.Qt.QtWidgets import QWidget, QGridLayout, QCheckBox
+import pyqtgraph as pg
+from PyQt6.QtWidgets import *
 
 
 class g3logCheckboxes(QWidget):
