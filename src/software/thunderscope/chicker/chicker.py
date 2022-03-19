@@ -44,7 +44,7 @@ class ChickerWidget(QWidget):
         grid = QGridLayout()
         self.radio_buttons = QButtonGroup()
 
-        self.charge_button_list = common_widgets.create_button("Charge")
+        self.charge_button_list = common_widgets.create_button("Charge", True)
         self.charge_button = self.charge_button_list[1]
         grid.addWidget(self.charge_button_list[0], 0, 0)
 
@@ -60,11 +60,15 @@ class ChickerWidget(QWidget):
         self.no_auto_button = self.no_auto_list[1]
         grid.addWidget(self.no_auto_list[0], 1, 0)
 
-        self.auto_kick_list = common_widgets.create_radio("Auto Kick", self.radio_buttons)
+        self.auto_kick_list = common_widgets.create_radio(
+            "Auto Kick", self.radio_buttons
+        )
         self.auto_kick_button = self.auto_kick_list[1]
         grid.addWidget(self.auto_kick_list[0], 1, 1)
 
-        self.auto_chip_list = common_widgets.create_radio("Auto Chip", self.radio_buttons)
+        self.auto_chip_list = common_widgets.create_radio(
+            "Auto Chip", self.radio_buttons
+        )
         self.auto_chip_button = self.auto_chip_list[1]
         grid.addWidget(self.auto_chip_list[0], 1, 2)
 
@@ -72,7 +76,9 @@ class ChickerWidget(QWidget):
         self.geneva_slider = self.geneva_slider_list[1]
         grid.addWidget(self.geneva_slider_list[0], 2, 0, 1, 3)
 
-        self.power_slider_list = common_widgets.create_slider("Power Slider", 1, 100, 10)
+        self.power_slider_list = common_widgets.create_slider(
+            "Power Slider", 1, 100, 10
+        )
         self.power_slider = self.power_slider_list[1]
         grid.addWidget(self.power_slider_list[0], 3, 0, 1, 3)
 

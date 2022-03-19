@@ -14,12 +14,22 @@ from PyQt5.QtWidgets import (
     QSlider,
 )
 
-def create_button(text):
+
+def create_button(text, checkable_initially=False):
+    """
+    Creates a QPushButton object inside a QGroupBox object.
+    See line 47: src/software/thunderscope/chicker/chicker.py for an example.
+    The default color of button will be white with black background.
+
+    :param text: text to display on the button
+    :return: group_box: QGroupBox object - add this to the widget
+    :return: button: QPushButton object - use this to perform tasks on the button
+    """
     group_box = QGroupBox()
     button = QPushButton(text)
     group_box.setStyleSheet("color: black")
     button.setCheckable(True)
-    if text != "Charge":
+    if checkable_initially:
         button.setCheckable(False)
         button.setStyleSheet("background-color: Grey")
     vbox = QVBoxLayout()
@@ -28,7 +38,18 @@ def create_button(text):
     group_box.setLayout(vbox)
     return group_box, button
 
+
 def create_radio(text, radio_group):
+    """
+    Creates a QRadioButton object inside a QGroupBox object.
+    See line 59: src/software/thunderscope/chicker/chicker.py for an example.
+    The default color of button background will be white.
+
+    :param text: text to display beside the button
+    :param radio_group: QButtonGroup to add this button to
+    :return: group_box: QGroupBox object - add this to the widget
+    :return: button: QRadioButton object - use this to perform tasks on the button
+    """
     group_box = QGroupBox()
     radio = QRadioButton(text)
     group_box.setStyleSheet("color: black")
@@ -41,7 +62,20 @@ def create_radio(text, radio_group):
     group_box.setLayout(vbox)
     return group_box, radio
 
+
 def create_slider(text, min_val, max_val, tick_spacing):
+    """
+    Creates a QSlider object inside a QGroupBox object.
+    See line 71: src/software/thunderscope/chicker/chicker.py for an example.
+    The slider orientation will be horizontal.
+
+    :param text: text to display above the slider
+    :param min_val: lowest value of the slider
+    :param max_val: highest value of the slider
+    :param tick_spacing: interval between two ticks on the slider
+    :return: group_box: QGroupBox object - add this to the widget - see example
+    :return: slider: QSlider object - use this to perform tasks on the button
+    """
     group_box = QGroupBox(text)
     slider = QSlider(Qt.Horizontal)
     slider.setMinimum(min_val)
