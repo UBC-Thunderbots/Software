@@ -124,11 +124,12 @@ if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
     exit 1
 fi
 
-if ! sudo /opt/tbotspython/bin/pip3 install -r requirements.txt ; then
-    echo "##############################################################"
-    echo "Error: Installing python requirements failed"
-    echo "##############################################################"
-    exit 1
+if [[ $(lsb_release -rs) == "18.04" ]]; then
+    sudo /opt/tbotspython/bin/pip3 install -r ubuntu18_requirements.txt
+fi
+
+if [[ $(lsb_release -rs) == "20.04" ]]; then
+    sudo /opt/tbotspython/bin/pip3 install -r ubuntu20_requirements.txt
 fi
 
 echo "================================================================"

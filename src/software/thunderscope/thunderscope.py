@@ -2,7 +2,18 @@ import os
 import signal
 import argparse
 
-import PyQt6
+import platform
+
+# PyQt5 doesn't play nicely with i3 and Ubuntu 18, PyQt6 is much more stable
+# Unfortunately, PyQt6 doesn't install on Ubuntu 18. Thankfully both
+# libraries are interchangeable, and  we just need to swap them in this
+# one spot, and pyqtgraph will pick up on it and store the library under
+# pyqtgraph.Qt. So from PyQt5 import x becomes from pyqtgraph.Qt import x
+if "18.04" in platform.version():
+    import PyQt5
+else:
+    import PyQt6
+
 import pyqtgraph
 from proto.geometry_pb2 import Circle, Polygon
 from proto.visualization_pb2 import NamedValue, Obstacles, PathVisualization
@@ -10,7 +21,7 @@ from proto.robot_log_msg_pb2 import RobotLog
 from proto.world_pb2 import World
 from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
-from PyQt6.QtWidgets import QVBoxLayout, QWidget
+from pyqtgraph.Qt.QtWidgets import QVBoxLayout, QWidget
 
 from software.networking import threaded_unix_sender
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
