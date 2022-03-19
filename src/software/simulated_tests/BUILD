@@ -124,8 +124,7 @@ py_library(
     deps = [
         ":er_force_simulator",
         ":full_system",
-        "//proto:software_py_proto",
-        "//proto:tbots_py_proto",
+        "//proto:import_all_protos",
         "//software:py_constants",
         "//software/logger:py_logger",
         "//software/networking:threaded_unix_listener_py",

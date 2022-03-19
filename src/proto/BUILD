@@ -225,3 +225,14 @@ py_proto_library(
         ":tbots_py_proto",
     ],
 )
+
+py_library(
+    name = "import_all_protos",
+    srcs = [
+        "import_all_protos.py",
+    ],
+    deps = [
+        ":software_py_proto",
+        ":tbots_py_proto",
+    ],
+)

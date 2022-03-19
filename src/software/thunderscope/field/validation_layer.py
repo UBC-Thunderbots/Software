@@ -1,15 +1,7 @@
 import pyqtgraph as pg
 import time
-from proto.geometry_pb2 import Circle, Polygon
-from proto.validation_pb2 import (
-    ValidationGeometry,
-    ValidationProto,
-    ValidationType,
-    ValidationProtoSet,
-    ValidationStatus,
-)
-from proto.visualization_pb2 import Obstacles
-from proto.world_pb2 import SimulatorTick, World, WorldState
+from proto.import_all_protos import *
+
 from pyqtgraph.Qt import QtCore, QtGui
 
 from software.thunderscope.colors import Colors

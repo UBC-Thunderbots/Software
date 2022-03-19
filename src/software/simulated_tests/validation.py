@@ -2,13 +2,7 @@ import pytest
 
 
 import software.geom.geometry as tbots_geom
-from proto.validation_pb2 import (
-    ValidationGeometry,
-    ValidationProto,
-    ValidationProtoSet,
-    ValidationStatus,
-    ValidationType,
-)
+from proto.validation_pb2 import *
 
 
 class Validation(object):

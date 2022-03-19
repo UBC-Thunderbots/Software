@@ -5,16 +5,8 @@ import os
 
 import pytest
 import software.geom.geometry as tbots_geom
-from proto.geometry_pb2 import Angle, AngularVelocity, Point, Vector
-from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
-from proto.primitive_pb2 import MaxAllowedSpeedMode
-from proto.robot_status_msg_pb2 import RobotStatus
-from proto.sensor_msg_pb2 import SensorProto
-from proto.tactic_pb2 import AssignedTacticPlayControlParams, GoalieTactic, Tactic
-from proto.tbots_software_msgs_pb2 import Vision
-from proto.validation_pb2 import ValidationGeometry, ValidationProto, ValidationStatus
-from proto.vision_pb2 import BallState, RobotState
-from proto.world_pb2 import SimulatorTick, World, WorldState
+from proto.import_all_protos import *
+
 from software.constants import SECONDS_TO_MS
 from pyqtgraph.Qt import QtCore, QtGui
 
