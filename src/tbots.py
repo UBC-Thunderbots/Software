@@ -49,7 +49,9 @@ if __name__ == "__main__":
     print("Found target {} with confidence {}".format(target, confidence))
 
     if args.interactive or confidence < THEFUZZ_MATCH_RATIO_THRESHOLD:
-        filtered_targets = process.extract(args.search_query, targets, limit=NUM_FILTERED_MATCHES_TO_SHOW)
+        filtered_targets = process.extract(
+            args.search_query, targets, limit=NUM_FILTERED_MATCHES_TO_SHOW
+        )
         targets = [filtered_target[0] for filtered_target in filtered_targets]
         target = str(iterfzf.iterfzf(iter(targets)), encoding="utf-8")
         print("User selected {}".format(target))
