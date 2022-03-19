@@ -102,14 +102,15 @@ class FullSystem(object):
         """
         self.tactic_override.send(assigned_tactic_play_control_params)
 
-    def get_vision(self):
+    def get_vision(self, block=False):
         """Grabs the vision msg from the buffer if it exists, returns None
         if buffer is empty.
 
+        :param block: Whether or not we should block until we receive a packet
         :return: Vision or None
 
         """
-        return self.vision_listener.get_most_recent_message()
+        return self.vision_listener.get_most_recent_message(block)
 
     def get_primitive_set(self):
         """Grabs the primitive msg set from the buffer if it exists, returns

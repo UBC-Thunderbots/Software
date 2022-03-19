@@ -170,8 +170,14 @@ class ErForceSimulator(object):
         """
         return self.__get_sensor_proto(ssl_wrapper, self.yellow_robot_status_listener)
 
-    def get_ssl_wrapper_packet(self):
-        return self.ssl_wrapper_listener.get_most_recent_message()
+    def get_ssl_wrapper_packet(self, block=False):
+        """Get wrapper packet
+
+        :param block: If true, block until we receive a packet
+        :return: SSL_WrapperPacket
+
+        """
+        return self.ssl_wrapper_listener.get_most_recent_message(block)
 
     def tick(self, duration_ms):
         """Tick the simulator with the given duration

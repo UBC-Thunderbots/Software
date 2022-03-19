@@ -47,7 +47,7 @@ class RobotEntersRegion(Validation):
         return create_validation_geometry(self.regions)
 
     def __repr__(self):
-        return "Checking regions " + ",".join(repr(region) for region in self.regions)
+        return "Check for robot in regions " + ",".join(repr(region) for region in self.regions)
 
 
 (

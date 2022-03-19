@@ -46,13 +46,17 @@ class ThreadedUnixListener:
     def buffer(self):
         return self.proto_buffer
 
-    def get_most_recent_message(self):
+    def get_most_recent_message(self, block=False):
         """Pop from the buffer if a new packet exists. If not just return None
 
+        :param block: If true, blocks until a new message is received
         :return: proto if exists, else None
         :rtype: proto or None
 
         """
+        if block:
+            return self.proto_buffer.get()
+
         try:
             return self.proto_buffer.get_nowait()
         except queue.Empty as empty:

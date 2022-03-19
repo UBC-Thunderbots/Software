@@ -108,36 +108,21 @@ class TacticTestRunner(object):
             """
 
             time_elapsed_s = 0
-            cached_vision = Vision()
 
             while time_elapsed_s < test_timeout_s:
 
-                ssl_wrapper = self.simulator.get_ssl_wrapper_packet()
                 self.simulator.tick(tick_duration_s * SECONDS_TO_MS)
                 time_elapsed_s += tick_duration_s
 
                 if self.enable_thunderscope:
                     time.sleep(tick_duration_s)
-                else:
-                    # TODO (#2518) we should remove this sleep and use
-                    # blocking calls to make this loop run as fast as it
-                    # possibly can.
-                    time.sleep(PROCESS_BUFFER_DELAY_S)
 
                 # Send the sensor_proto and get vision
+                ssl_wrapper = self.simulator.get_ssl_wrapper_packet(block=True)
                 self.yellow_full_system.send_sensor_proto(
                     self.simulator.get_yellow_sensor_proto(ssl_wrapper)
                 )
-                vision = self.yellow_full_system.get_vision()
-
-                # IRL, the primitive executor running on real robots will
-                # "step" on the last frame they received. We try to emulate the
-                # same behaviour by caching the vision if we don't receive one
-                # from full_system this tick.
-                if vision is None:
-                    vision = cached_vision
-                else:
-                    cached_vision = vision
+                vision = self.yellow_full_system.get_vision(block=True)
 
                 # Validate
                 (
