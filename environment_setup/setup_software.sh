@@ -124,7 +124,7 @@ if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
     exit 1
 fi
 
-if ! sudo /opt/tbotspython/bin/pip3.8 install -r requirements.txt ; then
+if ! sudo /opt/tbotspython/bin/pip3 install -r requirements.txt ; then
     echo "##############################################################"
     echo "Error: Installing python requirements failed"
     echo "##############################################################"

@@ -5,7 +5,7 @@ from proto.geometry_pb2 import Circle, Polygon
 from proto.visualization_pb2 import Obstacles
 from pyqtgraph.Qt import QtCore, QtGui
 
-import software.thunderscope.colors as colors
+from software.thunderscope.colors import Colors
 import software.thunderscope.constants as constants
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.field.field_layer import FieldLayer
@@ -34,7 +34,7 @@ class ObstacleLayer(FieldLayer):
 
         self.cached_obstacles = obstacles
 
-        painter.setPen(pg.mkPen(colors.NAVIGATOR_OBSTACLE_COLOR, width=2))
+        painter.setPen(pg.mkPen(Colors.NAVIGATOR_OBSTACLE_COLOR, width=2))
 
         for polyobstacle in obstacles.polygon:
             polygon_points = [

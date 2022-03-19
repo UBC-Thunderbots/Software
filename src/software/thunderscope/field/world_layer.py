@@ -8,7 +8,7 @@ from proto.vision_pb2 import BallState, RobotState
 from proto.world_pb2 import Field, World
 from pyqtgraph.Qt import QtCore, QtGui
 
-import software.thunderscope.colors as colors
+from software.thunderscope.colors import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.constants import (
     BALL_RADIUS,
@@ -108,8 +108,8 @@ class WorldLayer(FieldLayer):
 
         """
 
-        painter.setPen(pg.mkPen(colors.BALL_COLOR))
-        painter.setBrush(pg.mkBrush(colors.BALL_COLOR))
+        painter.setPen(pg.mkPen(Colors.BALL_COLOR))
+        painter.setBrush(pg.mkBrush(Colors.BALL_COLOR))
         painter.drawEllipse(
             self.createCircle(
                 ball.current_state.global_position.x_meters * MM_PER_M,
@@ -138,5 +138,5 @@ class WorldLayer(FieldLayer):
 
         # TODO (#2399) Figure out which team color _we_ are and update the color
         # passed into the team.
-        self.draw_team(painter, colors.YELLOW_ROBOT_COLOR, world.friendly_team)
-        self.draw_team(painter, colors.BLUE_ROBOT_COLOR, world.enemy_team)
+        self.draw_team(painter, Colors.YELLOW_ROBOT_COLOR, world.friendly_team)
+        self.draw_team(painter, Colors.BLUE_ROBOT_COLOR, world.enemy_team)

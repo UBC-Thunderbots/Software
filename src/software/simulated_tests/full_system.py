@@ -109,7 +109,7 @@ class FullSystem(object):
         :return: Vision or None
 
         """
-        return self.vision_listener.maybe_pop()
+        return self.vision_listener.get_most_recent_message()
 
     def get_primitive_set(self):
         """Grabs the primitive msg set from the buffer if it exists, returns
@@ -118,16 +118,20 @@ class FullSystem(object):
         :return: PrimitiveSet or None
 
         """
-        return self.primitive_listener.maybe_pop()
+        return self.primitive_listener.get_most_recent_message()
 
     def stop():
         """Stop all listeners and senders.
 
         """
-        self.robot_status_sender.force_stop()
-        self.ssl_wrapper_sender.force_stop()
-        self.ssl_referee_sender.force_stop()
-        self.tactic_override.force_stop()
-        self.sensor_proto_sender.force_stop()
-        self.vision_listener.force_stop()
+
+        for unix_socket in [
+            self.robot_status_sender,
+            self.ssl_wrapper_sender,
+            self.ssl_referee_sender,
+            self.tactic_override,
+            self.sensor_proto_sender,
+            self.vision_listener,
+        ]:
+            unix_socket.force_stop()
         self.primitive_listener.force_stop()

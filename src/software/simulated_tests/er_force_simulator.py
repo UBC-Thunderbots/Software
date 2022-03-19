@@ -144,12 +144,12 @@ class ErForceSimulator(object):
         if ssl_wrapper:
             sensor_proto.ssl_vision_msg.CopyFrom(ssl_wrapper)
 
-        robot_status = robot_status_listener.maybe_pop()
+        robot_status = robot_status_listener.get_most_recent_message()
 
         packets = []
         while robot_status is not None:
             packets.append(robot_status)
-            robot_status = robot_status_listener.maybe_pop()
+            robot_status = robot_status_listener.get_most_recent_message()
 
         sensor_proto.robot_status_msgs.extend(packets)
         return sensor_proto
@@ -171,7 +171,7 @@ class ErForceSimulator(object):
         return self.__get_sensor_proto(ssl_wrapper, self.yellow_robot_status_listener)
 
     def get_ssl_wrapper_packet(self):
-        return self.ssl_wrapper_listener.maybe_pop()
+        return self.ssl_wrapper_listener.get_most_recent_message()
 
     def tick(self, duration_ms):
         """Tick the simulator with the given duration
@@ -206,12 +206,15 @@ class ErForceSimulator(object):
     def stop():
         """Stop all listeners and senders.
         """
-        self.sim_tick_sender.force_stop()
-        self.world_state_sender.force_stop()
-        self.blue_vision_sender.force_stop()
-        self.yellow_vision_sender.force_stop()
-        self.blue_primitive_set_sender.force_stop()
-        self.yellow_primitive_set_sender.force_stop()
-        self.ssl_wrapper_listener.force_stop()
-        self.blue_robot_status_listener.force_stop()
-        self.yellow_robot_status_listener.force_stop()
+        for unix_socket in [
+            self.sim_tick_sender,
+            self.world_state_sender,
+            self.blue_vision_sender,
+            self.yellow_vision_sender,
+            self.blue_primitive_set_sender,
+            self.yellow_primitive_set_sender,
+            self.ssl_wrapper_listener,
+            self.blue_robot_status_listener,
+            self.yellow_robot_status_listener,
+        ]:
+            unix_socket.force_stop()

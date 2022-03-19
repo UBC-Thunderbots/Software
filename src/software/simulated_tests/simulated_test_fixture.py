@@ -61,7 +61,12 @@ class TacticTestRunner(object):
         if self.enable_thunderscope:
             self.thunderscope = Thunderscope()
             self.thunderscope.configure_default_layout()
-            self.validation_sender = ThreadedUnixSender(runtime_dir + "/validation")
+            self.eventually_validation_sender = ThreadedUnixSender(
+                runtime_dir + "/eventually_validation"
+            )
+            self.always_validation_sender = ThreadedUnixSender(
+                runtime_dir + "/always_validation"
+            )
 
         self.simulator = ErForceSimulator()
         self.yellow_full_system = FullSystem()
@@ -143,7 +148,10 @@ class TacticTestRunner(object):
                     cached_vision = vision
 
                 # Validate
-                validation_proto_set = validation.run_validation_sequence_sets(
+                (
+                    eventually_validation_proto_set,
+                    always_validation_proto_set,
+                ) = validation.run_validation_sequence_sets(
                     vision,
                     eventually_validation_sequence_set,
                     always_validation_sequence_set,
@@ -151,10 +159,13 @@ class TacticTestRunner(object):
 
                 if self.enable_thunderscope:
                     # Send out the validation proto to thunderscope
-                    self.validation_sender.send(validation_proto_set)
+                    self.eventually_validation_sender.send(
+                        eventually_validation_proto_set
+                    )
+                    self.always_validation_sender.send(always_validation_proto_set)
 
                 # Check that all always validations are always valid
-                validation.check_always_validation(validation_proto_set)
+                validation.check_validation(always_validation_proto_set)
 
                 # Step the primtives
                 self.simulator.send_yellow_primitive_set_and_vision(
@@ -162,7 +173,7 @@ class TacticTestRunner(object):
                 )
 
             # Check that all eventually validations are eventually valid
-            validation.check_eventually_validation(validation_proto_set)
+            validation.check_validation(eventually_validation_proto_set)
 
             __stopper()
 
@@ -204,10 +215,10 @@ def load_command_line_arguments():
     """Load from command line arguments using argpase
 
     NOTE: Pytest has its own built in argument parser (conftest.py, pytest_addoption)
-    but it doesn't seem to play nicely with bazel. We juse use argparse instead.
+    but it doesn't seem to play nicely with bazel. We just use argparse instead.
 
     """
-    parser = argparse.ArgumentParser(description="Process some integers.")
+    parser = argparse.ArgumentParser(description="Run simulated pytests")
     parser.add_argument(
         "--enable_thunderscope", action="store_true", help="enable the visualizer"
     )

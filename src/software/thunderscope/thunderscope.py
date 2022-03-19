@@ -27,7 +27,7 @@ from software.thunderscope.proto_receiver import ProtoReceiver
 
 class Thunderscope(object):
 
-    """ Thunderscope is out main visualizer that can visualize our field,
+    """ Thunderscope is our main visualizer that can visualize our field,
     obstacles, paths, performance metrics, logs, plots. Thunderscope also
     provides tools to interact with the robots.
 
@@ -70,7 +70,7 @@ class Thunderscope(object):
 
         # Setup refresh Timer
         self.refresh_timer = QtCore.QTimer()
-        self.refresh_timer.setTimerType(QtCore.Qt.PreciseTimer)
+        self.refresh_timer.setTimerType(QtCore.Qt.TimerType.PreciseTimer)
         self.refresh_timer.timeout.connect(__refresh)
         self.refresh_timer.start(refresh_interval_ms)  # Refresh at 200hz
 
@@ -96,8 +96,7 @@ class Thunderscope(object):
         self.dock_area.addDock(performance_dock, "right", log_dock)
 
     def setup_field_widget(self):
-        """Setup the field widget will the Vision, Obstacles, Paths and
-        Validation layer.
+        """Setup the field widget with the constituent layers
 
         :returns: The dock containing the field widget
 

@@ -59,7 +59,7 @@ function run_bazel_formatting () {
 }
 
 # Format the imports and remove unused imports/variables
-# NOTE: Its important that this runs _before_ black formatting
+# NOTE: It's important that this runs _before_ black formatting
 function run_python_import_formatting(){
     /opt/tbotspython/bin/autoflake -r --in-place --remove-unused-variables $CURR_DIR/../src/software
 }

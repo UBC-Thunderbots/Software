@@ -20,6 +20,7 @@ enum ValidationType
     ALWAYS     = 1;
 }
 
+// Visual representation of the Validation
 message ValidationGeometry
 {
     repeated Polygon polygons = 1;

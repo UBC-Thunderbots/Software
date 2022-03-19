@@ -75,7 +75,7 @@ int main(int argc, char **argv)
                                                              YELLOW_ROBOT_STATUS_PATH);
 
         // Inputs
-        // Word State Input: Configures the ERForceSimulator
+        // World State Input: Configures the ERForceSimulator
         auto world_state_input = ThreadedProtoUnixListener<TbotsProto::WorldState>(
             runtime_dir + WORLD_STATE_PATH, [&](TbotsProto::WorldState input) {
                 std::scoped_lock lock(simulator_mutex);

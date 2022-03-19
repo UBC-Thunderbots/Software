@@ -56,8 +56,8 @@ def create_validation_types(validation_class):
     AlwaysFalse: Has to be false for the duration of the test.
 
     NOTE: EventuallyFalse validation is a flipped EventuallyTrue validation
-          AlwaysTrue validation checks the same condition, but will stay 
-          validation 
+          AlwaysTrue validation checks the same condition, but needs to be
+          always true. AlwaysFalse is the flipped AlwaysTrue
 
     :param eventually_true: A validation function that is eventually_true
     :returns: EventuallyTrueValidation, EventuallyFalseValidation,
@@ -161,18 +161,20 @@ def run_validation_sequence_sets(
     :param always_validation_sequence_set:
             A collection of sequences of always validations to validate.
 
-    :returns: ValidationProtoSet
+    :returns: Eventually ValidationProtoSet, Always ValidationProtoSet
 
     """
 
     # Proto that stores validation geometry and validation status of
     # all validations passed in
-    validation_proto_set = ValidationProtoSet()
+    always_validation_proto_set = ValidationProtoSet()
+    eventually_validation_proto_set = ValidationProtoSet()
 
-    def create_validation_proto_helper(validation):
+    def create_validation_proto_helper(validation_proto_set, validation):
         """Helper function that computes the status and creates a
         validation_proto, and updates it in the validation_proto_set.
 
+        :param validation_proto_set: The validation proto set to add to
         :param validation: The validation to put into the proto
 
         """
@@ -197,9 +199,11 @@ def run_validation_sequence_sets(
         for validation in validation_sequence:
 
             # Add to validation_proto_set and get status
-            status = create_validation_proto_helper(validation)
+            status = create_validation_proto_helper(
+                eventually_validation_proto_set, validation
+            )
 
-            # If the current validation is pending, we don't care about
+            # If the current validation is failing, we don't care about
             # the next one. Keep evaluating until this one passes.
             if status == ValidationStatus.FAILING:
                 break
@@ -212,39 +216,28 @@ def run_validation_sequence_sets(
     # Validate the always validations. We need to look at all of them
     for validation_sequence in always_validation_sequence_set:
         for validation in validation_sequence:
-            create_validation_proto_helper(validation)
+            create_validation_proto_helper(always_validation_proto_set, validation)
 
-    return validation_proto_set
-
-
-def check_always_validation(validation_proto_set):
-    """Check always validations and make sure its always true
-
-    :param validation_proto_set: Validation proto set
-    :raises: AssertionError
-
-    """
-    for validation_proto in validation_proto_set.validations:
-        if validation_proto.validation_type == ValidationType.ALWAYS:
-            if validation_proto.status == ValidationStatus.FAILING:
-                raise AssertionError(validation_proto.failure_msg)
+    return eventually_validation_proto_set, always_validation_proto_set
 
 
-def check_eventually_validation(validation_proto_set):
-    """Check eventually validations and make sure they are all true
+def check_validation(validation_proto_set):
+    """Check validation and make sure its always true
 
     :param validation_proto_set: Validation proto set
     :raises: AssertionError
 
     """
     for validation_proto in validation_proto_set.validations:
-        if validation_proto.validation_type == ValidationType.EVENTUALLY:
-            if validation_proto.status == ValidationStatus.FAILING:
-                raise AssertionError(validation_proto.failure_msg)
+        if validation_proto.status == ValidationStatus.FAILING:
+            raise AssertionError(validation_proto.failure_msg)
 
 
 def create_validation_geometry(geometry=[]) -> ValidationGeometry:
-    """Given a list of (vectors, polygons, circles), creates a ValidationGeometry
+    """Creates a ValidationGeometry which is a visual representation of the
+    validation to be rendered as either green (PASSING) or red (FAILING)
+
+    Given a list of (vectors, polygons, circles), creates a ValidationGeometry
     proto containing the protobuf representations.
 
     :param geometry: A list of geom
