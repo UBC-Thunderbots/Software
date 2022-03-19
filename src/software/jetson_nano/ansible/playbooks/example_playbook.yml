@@ -14,7 +14,7 @@
 
   - name: echo hello world
     register: res                         # save the result of this task in the variable "res"
-    tags: echo_hello_world
+    tags: echoHelloWorld
     shell: echo hello world
 
   - debug:
@@ -23,17 +23,25 @@
         - "stdout = {{ res.stdout_lines }} "
         - "stderr = {{ res.stderr }}"
 
-  - name: echo example variable
+  - name: copy file example
+    tags:
+      - copyFileExample
     register: res
-    tags: echo_example_var
-    shell: echo {{ example_var }}
+    copy:
+      src: copiedFile.txt
+      dest: /home/robot
 
-  - debug:
-      msg:
-        - "[Robot ID = {{ inventory_hostname }}]"
-        - "stdout = {{ res.stdout_lines }} "
-        - "stderr = {{ res.stderr }}"
-
-
-
-
+  - name: Reboot
+    become: true
+    become_user: root
+    become_method: sudo
+    register: res
+    tags:
+      - reboot
+    reboot:
+      msg: "Reboot initiated by Ansible"
+      connect_timeout: 20
+      reboot_timeout: 1200
+      pre_reboot_delay: 0
+      post_reboot_delay: 6
+      test_command: whoami

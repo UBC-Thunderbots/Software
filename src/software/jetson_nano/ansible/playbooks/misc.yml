@@ -31,3 +31,32 @@
       post_reboot_delay: 60
       test_command: whoami
 
+
+  - name: copy files
+    become: true
+    become_method: sudo
+    tags:
+      - copyFilesExample
+    register: res
+    copy:
+      src: /home/amr/thunderbots/Software/src/software/jetson_nano/systemd
+      dest: /etc/systemd/system
+
+  - name: systemd service
+    become_method: sudo
+    become: true
+    shell: systemctl start thunderbots.service
+    args:
+      chdir: /etc/systemd/system/systemd
+    tags:
+      - systemd
+    register: res
+
+  - debug:
+      tags:
+        - systemd
+      msg:
+        - "[Robot ID = {{ inventory_hostname }}]"
+        - "stdout = {{ res.stdout_lines }} "
+        - "stderr = {{ res.stderr }}"
+

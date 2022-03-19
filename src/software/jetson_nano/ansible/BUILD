@@ -6,7 +6,10 @@ load("@ansible_deps//:requirements.bzl", "requirement")
 py_binary(
     name = "run_ansible",
     srcs = ["run_ansible.py"],
-    data = [":playbooks"],
+    data = [
+        ":playbooks",
+        "//software/jetson_nano/systemd:systemdFiles",
+    ],
     deps = [
         requirement("ansible"),
         "//software/jetson_nano/broadcasts:robot_broadcast_receiver",

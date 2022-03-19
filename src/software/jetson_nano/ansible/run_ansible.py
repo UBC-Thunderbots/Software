@@ -11,9 +11,13 @@ from software.jetson_nano.broadcasts.robot_broadcast_receiver import (
 import os
 import argparse
 
+#Wrapper around Ansible's Python API, which is used to run scripts on multiple robots (hosts) at once
+# documentation can be found here: https://docs.ansible.com/ansible/latest/dev_guide/developing_api.html
+
 HOST_GROUP = "THUNDERBOTS_HOSTS"
-NANO_USER = "propbot"
+NANO_USER = "robot"
 ANNOUNCEMENT_LISTEN_DURATION_S = 2
+
 
 # loads variables, inventory, and play into Ansible API, then runs it
 def ansible_runner(playbook: str, options: dict = {}):
@@ -36,11 +40,12 @@ def ansible_runner(playbook: str, options: dict = {}):
             exit()
 
         announcements = receive_announcements(port=options['port'], duration=ANNOUNCEMENT_LISTEN_DURATION_S)
-        hosts = [a.ip_addr for a in announcements]
-        host_aliases = [a.robot_id for a in announcements]
+        hosts = {a.ip_addr for a in announcements}
+        host_aliases = {a.robot_id for a in announcements}
 
     num_forks = len(hosts)
 
+    #bunch of arguments that Ansible accepts
     context.CLIARGS = ImmutableDict(
         tags=tags,
         listtags=False,
@@ -72,7 +77,7 @@ def ansible_runner(playbook: str, options: dict = {}):
 
     group = inventory.add_group(HOST_GROUP)
 
-    # adding hosts and their aliases (robot IDs) to the inventory
+    # adding hosts and their aliases (robot IDs if available) to the inventory
     for host, alias in zip(hosts, host_aliases):
         inventory.add_host(host, group)
         variable_manager.set_host_variable(host, "inventory_hostname", alias)
@@ -100,8 +105,9 @@ def main():
         nargs="*",
         required=False,
         help="space separated list of hosts to run on, defaults to using robot announcements",
-        default=['192.168.1.78'],
+        default=[],
     )
+
     ap.add_argument(
         "--tags",
         "-t",

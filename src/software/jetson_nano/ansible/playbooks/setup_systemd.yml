@@ -1,0 +1,70 @@
+---
+
+- name: Setting up systemd
+  hosts: THUNDERBOTS_HOSTS
+
+  tasks:
+
+    - name: copy all relevant systemd files
+      become_method: sudo
+      become: true
+      tags:
+        - systemd
+      register: res
+      copy:
+        src: ../../systemd/
+        dest: /etc/systemd/system
+
+    - name: Enable path services
+      become: true
+      become_method: sudo
+      with_items:
+        - redis_watcher.path
+        - tftp_watcher.path
+        - thunderloop_watcher.path
+        - ui_watcher.path
+        - announcement_watcher.path
+      loop_control:
+        loop_var: service_name
+      shell: systemctl enable "{{ service_name }}"
+      register: res
+      args:
+        chdir: /etc/systemd/system
+      tags:
+        - systemd
+
+    - name: Enable system services
+      become: true
+      become_method: sudo
+      with_items:
+        - thunderbots
+        - redis
+        - tftp
+        - thunderloop
+        - ui
+        - announcement
+      loop_control:
+        loop_var: service_name
+      ansible.builtin.systemd:
+        name: "{{ service_name }}"
+        enabled: yes
+        masked: no
+        daemon_reload: yes
+      tags:
+        - systemd
+
+    - name: Reboot
+      become: true
+      become_user: root
+      become_method: sudo
+      register: res
+      tags:
+        - reboot
+        - systemd
+      reboot:
+        msg: "Reboot initiated by Ansible"
+        connect_timeout: 20
+        reboot_timeout: 1200
+        pre_reboot_delay: 0
+        post_reboot_delay: 10
+        test_command: whoami
