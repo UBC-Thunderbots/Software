@@ -1,6 +1,5 @@
 from pyqtgraph.Qt import QtCore, QtGui
 
-
 class Colors(object):
     FIELD_COLOR = "w"
     FIELD_LINE_COLOR = "w"

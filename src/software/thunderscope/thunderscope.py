@@ -3,7 +3,7 @@ import signal
 import argparse
 
 import PyQt6
-import pyqtgraph as pg
+import pyqtgraph
 from proto.geometry_pb2 import Circle, Polygon
 from proto.visualization_pb2 import NamedValue, Obstacles, PathVisualization
 from proto.robot_log_msg_pb2 import RobotLog
@@ -44,7 +44,7 @@ class Thunderscope(object):
     def __init__(self, refresh_interval_ms=5):
 
         # Setup MainApp and initialize DockArea
-        self.app = pg.mkQApp("Thunderscope")
+        self.app = pyqtgraph.mkQApp("Thunderscope")
         self.app.setStyleSheet(
             "QMainWindow{background-color: black;border: 1px solid black;}"
         )
@@ -185,7 +185,7 @@ class Thunderscope(object):
 
     def show(self):
         self.window.show()
-        pg.exec()
+        pyqtgraph.exec()
 
     def close(self):
         QtCore.QTimer.singleShot(0, self.window.close)
