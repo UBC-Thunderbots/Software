@@ -7,6 +7,8 @@ void robotsAvoidBall(double min_distance, std::vector<RobotId> excluded_robots,
                      std::shared_ptr<World> world_ptr,
                      ValidationCoroutine::push_type& yield)
 {
+    std::cout << "BALL x: " << world_ptr->ball().position().x()
+              << " y: " << world_ptr->ball().position().y() << std::endl;
     for (auto robot : world_ptr->friendlyTeam().getAllRobots())
     {
         double current_distance =
