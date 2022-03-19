@@ -5,18 +5,8 @@ import pytest
 import software.geom.geometry as geom
 from proto.primitive_pb2 import MaxAllowedSpeedMode
 from proto.tactic_pb2 import AssignedTacticPlayControlParams, GoalieTactic, Tactic
-from software.simulated_tests.robot_enters_region import (
-    RobotEventuallyEntersRegion,
-    RobotEventuallyExitsRegion,
-    RobotStaysInRegion,
-    RobotNeverEntersRegion,
-)
-from software.simulated_tests.ball_enters_region import (
-    BallEventuallyEntersRegion,
-    BallEventuallyExitsRegion,
-    BallStaysInRegion,
-    BallNeverEntersRegion,
-)
+from software.simulated_tests.robot_enters_region import *
+from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.simulated_test_fixture import tactic_runner
 
 
