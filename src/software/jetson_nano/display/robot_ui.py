@@ -20,7 +20,6 @@ PIN_1 = "GPIO_PE6" # BOARD 33, TEGRA_SOC: 'GPIO_PE6'
 PIN_2 = "DAP4_FS" # BOARD 35, TEGRA_SOC: 'DAP4_FS'
 
 # These keys indicate how to handle return values
-#status_codes = {"none": 0, "change screen": 1, "edit": 2, "update redis": 3}
 class ScreenActions:
     NONE = 0
     CHANGE_SCREEN = 1
@@ -63,10 +62,9 @@ class RobotUi:
         # Draw Tbots logo on first boot
         self.lcd_display = LcdDisplay()
         self.lcd_display.draw_image("./lcd_user_interface/imgs/tbots.jpg")
-        self.curr_screen = "Menu"#"Home"
+        self.curr_screen = "Home"
 
         # All of our screens
-        self.screen_actions = ScreenActions()
         self.screens = {
             "Home": HomeScreen(self.lcd_display, self.redis_dict, screen_actions),
             "Menu": MenuScreen(self.lcd_display, screen_actions),
@@ -82,7 +80,7 @@ class RobotUi:
             
             if screen_actions.CHANGE_SCREEN == action["screen action"]:
                 self.curr_screen = action["value"]
-                self.screens[self.curr_screen].draw_screen()
+                self.screens[self.curr_screen].update_screen()
                 self.lcd_display.show()
             elif screen_actions.UPDATE_REDIS == action["screen action"]:
                 self.redis_client.set(action["redis key"], action["value"])
@@ -138,7 +136,7 @@ if __name__ == "__main__":
             redis_client.set(key, 0)
 
     def start_polling(robot_ui):
-        robot_ui.poll_redis()
+        robot_ui.poll_redis(5)
 
     # start redis server
     cmd = "cd redis-test && sudo docker-compose up -d"

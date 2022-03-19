@@ -1,13 +1,17 @@
 from PIL import ImageFont
 import subprocess
 
+# TODO create a file for constants
+SCREEN_TYPE = str
+BASE_Y = 20
+PADDING = 6
 
 class Screen:
     """
     All new screens will inherit from this class. This class will handles editing variables and maintaining
     the current action the cursor is hovering.
     """
-    def __init__(self, lcd_display, screen_actions, draw_screen, actions):
+    def __init__(self, lcd_display, screen_actions, actions, draw_screen=None):
         """
         @param lcd_display, an instance of the LcdDisplay class
         @param screen_actions, an instance of ScreenActions class
@@ -72,7 +76,10 @@ class Screen:
 
     def update_screen(self):
         """ Draw the updated screen """
-        self.draw_screen()
+        if self.draw_screen != None:
+            self.draw_screen()
+        else:
+            self.draw_actions()
         self.lcd_display.show()
         self.draw_header()
 
@@ -125,3 +132,52 @@ class Screen:
     def dec_val(self):
         """ Decrement self.param by self.delta """
         self.action["value"] -= self.action["delta"]
+
+    def draw_actions(self):
+        """ Draws our list of actions """
+        self.lcd_display.prepare()
+        
+        cursor = ">"
+        cursor_size = self.font.getsize(cursor)[0]     
+        cursor_pos_x = 0
+
+        if self.curr_action != len(self.actions) - 1:
+            cursor_pos_y = BASE_Y + self.font_size * self.curr_action
+        else:
+            cursor_pos_y = self.lcd_display.height - self.font_size - PADDING
+
+        self.lcd_display.draw.text(
+            (cursor_pos_x, cursor_pos_y), cursor, font=self.font, fill="#ffffff"
+        )
+
+        x = cursor_size
+        y = BASE_Y        
+
+        for action in self.actions: 
+            if action == self.actions[-1]: # last action should take you to previous screen
+                y = self.lcd_display.height - self.font_size - PADDING
+            
+            self.lcd_display.draw.text(
+                (x, y), action["display string"],
+                font=self.font, fill="#ffffff"
+            )
+
+            if action["type"] != SCREEN_TYPE: 
+                x += self.font.getsize(action["display string"])[0]
+
+                if action["type"] == bool:
+                    en = True if action["value"] else False
+                    self.lcd_display.draw.text(
+                        (x, y),
+                        "{}".format(en),
+                        font=self.font,
+                        fill="#00ff00" if en else "#0000ff",
+                    )
+                else:
+                    self.lcd_display.draw.text(
+                        (x, y), str(round(action["value"], 1)),
+                        font=self.font, fill="#00ffff",
+                    )
+                x = cursor_size
+            
+            y += self.font_size

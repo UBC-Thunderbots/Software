@@ -26,35 +26,40 @@ class WheelsScreen(Screen):
                 "value": redis_dict["wheels enable"],
                 "type": bool,
                 "delta": None,
-                "screen action": screen_actions.UPDATE_REDIS
+                "screen action": screen_actions.UPDATE_REDIS,
+                "display string": "Set Wheel Speed: ",
             },
             {
                 "redis key": "fl wheel speed",
                 "value": redis_dict["fl wheel speed"],
                 "type": float,
                 "delta": 0.5,
-                "screen action": screen_actions.EDIT_SCREEN
+                "screen action": screen_actions.EDIT_SCREEN,
+                "display string": "Front Left: ",
             },
             {
                 "redis key": "fr wheel speed",
                 "value": redis_dict["fr wheel speed"],
                 "type": float,
                 "delta": 0.5,
-                "screen action": screen_actions.EDIT_SCREEN
+                "screen action": screen_actions.EDIT_SCREEN,
+                "display string": "Front Right: ",
             },
             {
                 "redis key": "bl wheel speed",
                 "value": redis_dict["bl wheel speed"],
                 "type": float,
                 "delta": 0.5,
-                "screen action": screen_actions.EDIT_SCREEN
+                "screen action": screen_actions.EDIT_SCREEN,
+                "display string": "Back Left: ",
             },
             {
                 "redis key": "br wheel speed",
                 "value": redis_dict["br wheel speed"],
                 "type": float,
                 "delta": 0.5,
-                "screen action": screen_actions.EDIT_SCREEN
+                "screen action": screen_actions.EDIT_SCREEN,
+                "display string": "Back Right: ",
             },
             {
                 "redis key": None,
@@ -62,108 +67,13 @@ class WheelsScreen(Screen):
                 "type": str,
                 "delta": None,
                 "screen action": screen_actions.CHANGE_SCREEN,
+                "display string": "Go to Menu screen",
             },
         ]
 
-        def draw_screen():
-            """ Wheels Screen Layout """
-            self.lcd_display.prepare()
-
-            # Displaying the cursor
-            cursor = ">"
-            cursor_size = self.font.getsize(cursor)[0]
-            cursor_pos_x = 0
-            if self.curr_action != len(self.actions) - 1:
-                cursor_pos_y = BASE_Y + self.font_size * self.curr_action
-            else:
-                cursor_pos_y = self.lcd_display.height - self.font_size - PADDING
-
-            self.lcd_display.draw.text(
-                (cursor_pos_x, cursor_pos_y), cursor, font=self.font, fill="#ffffff"
-            )
-
-            # x and y coordinates for drawing on screen
-            x = cursor_size
-            y = BASE_Y
-            en = True if self.actions[ENABLE_INDEX]["value"] else False
-
-            set_wheel_speed_str = "Set Wheel Speed: "
-            self.lcd_display.draw.text(
-                (x, y), set_wheel_speed_str, font=self.font, fill="#ffffff"
-            )
-            x += self.font.getsize(set_wheel_speed_str)[0]
-            self.lcd_display.draw.text(
-                (x, y),
-                "{}".format(en),
-                font=self.font,
-                fill="#00ff00" if en else "#0000ff",
-            )
-
-            x = cursor_size
-            y += self.font_size
-            front_left_str = "Front Left: "
-            self.lcd_display.draw.text(
-                (x, y), front_left_str, font=self.font, fill="#ffffff"
-            )
-            x += self.font.getsize(front_left_str)[0]
-            self.lcd_display.draw.text(
-                (x, y),
-                str(round(self.actions[FL_INDEX]["value"], 1)),
-                font=self.font,
-                fill="#00ffff",
-            )
-
-            x = cursor_size
-            y += self.font_size
-            front_right_str = "Front Right: "
-            self.lcd_display.draw.text(
-                (x, y), front_right_str, font=self.font, fill="#ffffff"
-            )
-            x += self.font.getsize(front_right_str)[0]
-            self.lcd_display.draw.text(
-                (x, y),
-                str(round(self.actions[FR_INDEX]["value"], 1)),
-                font=self.font,
-                fill="#00ffff",
-            )
-
-            x = cursor_size
-            y += self.font_size
-            back_left_str = "Back Left: "
-            self.lcd_display.draw.text(
-                (x, y), back_left_str, font=self.font, fill="#ffffff"
-            )
-            x += self.font.getsize(back_left_str)[0]
-            self.lcd_display.draw.text(
-                (x, y),
-                str(round(self.actions[BL_INDEX]["value"], 1)),
-                font=self.font,
-                fill="#00ffff",
-            )
-
-            x = cursor_size
-            y += self.font_size
-            back_right_str = "Back Right: "
-            self.lcd_display.draw.text(
-                (x, y), back_right_str, font=self.font, fill="#ffffff"
-            )
-            x += self.font.getsize(back_right_str)[0]
-            self.lcd_display.draw.text(
-                (x, y),
-                str(round(self.actions[BR_INDEX]["value"], 1)),
-                font=self.font,
-                fill="#00ffff",
-            )
-
-            x = cursor_size
-            y = self.lcd_display.height - self.font_size - PADDING
-            self.lcd_display.draw.text(
-                (x, y), "Go to Menu screen", font=self.font, fill="#ffffff",
-            )
-
         # Pass Wheel Screen parameters to super class
         super().__init__(
-            lcd_display, screen_actions, draw_screen, actions
+            lcd_display, screen_actions, actions
         )
 
     def update_values(self, redis_dict):

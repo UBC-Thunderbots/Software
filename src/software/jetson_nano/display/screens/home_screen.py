@@ -26,14 +26,14 @@ class HomeScreen(Screen):
                 "value": redis_dict["robot id"],
                 "type": float,
                 "delta": 1,
-                "screen action": screen_actions.EDIT_SCREEN
+                "screen action": screen_actions.EDIT_SCREEN,
             },
             {
                 "redis key": "channel id",
                 "value": redis_dict["channel id"],
                 "type": float,
                 "delta": 1,
-                "screen action": screen_actions.EDIT_SCREEN
+                "screen action": screen_actions.EDIT_SCREEN,
             },
             {
                 "redis key": None,
@@ -133,7 +133,7 @@ class HomeScreen(Screen):
 
         # Pass Home Screen parameters to super class
         super().__init__(
-            lcd_display, screen_actions, draw_screen, actions
+            lcd_display, screen_actions, actions, draw_screen
         )
 
     def update_values(self, redis_dict):
