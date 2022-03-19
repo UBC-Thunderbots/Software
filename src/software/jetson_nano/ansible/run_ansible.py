@@ -11,7 +11,7 @@ from software.jetson_nano.broadcasts.robot_broadcast_receiver import (
 import os
 import argparse
 
-#Wrapper around Ansible's Python API, which is used to run scripts on multiple robots (hosts) at once
+# Wrapper around Ansible's Python API, which is used to run scripts on multiple robots (hosts) at once
 # documentation can be found here: https://docs.ansible.com/ansible/latest/dev_guide/developing_api.html
 
 HOST_GROUP = "THUNDERBOTS_HOSTS"
@@ -35,17 +35,19 @@ def ansible_runner(playbook: str, options: dict = {}):
     host_aliases = hosts
 
     if not hosts:
-        if not options['port']:
+        if not options["port"]:
             print("Announcement Port not defined, exiting")
             exit()
 
-        announcements = receive_announcements(port=options['port'], duration=ANNOUNCEMENT_LISTEN_DURATION_S)
+        announcements = receive_announcements(
+            port=options["port"], duration=ANNOUNCEMENT_LISTEN_DURATION_S
+        )
         hosts = {a.ip_addr for a in announcements}
         host_aliases = {a.robot_id for a in announcements}
 
     num_forks = len(hosts)
 
-    #bunch of arguments that Ansible accepts
+    # bunch of arguments that Ansible accepts
     context.CLIARGS = ImmutableDict(
         tags=tags,
         listtags=False,
@@ -87,7 +89,7 @@ def ansible_runner(playbook: str, options: dict = {}):
         inventory=inventory,
         variable_manager=variable_manager,
         loader=loader,
-        passwords={"conn_pass": ssh_pass, 'become_pass': ssh_pass},
+        passwords={"conn_pass": ssh_pass, "become_pass": ssh_pass},
     )
 
     pbex.run()
