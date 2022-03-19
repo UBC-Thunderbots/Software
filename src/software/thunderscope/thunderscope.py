@@ -70,10 +70,7 @@ class Thunderscope(object):
 
         # Setup refresh Timer
         self.refresh_timer = QtCore.QTimer()
-<<<<<<< HEAD
         self.refresh_timer.setTimerType(QtCore.Qt.TimerType.PreciseTimer)
-=======
->>>>>>> parent of f5cc0ff77... fix some more bugs
         self.refresh_timer.timeout.connect(__refresh)
         self.refresh_timer.start(refresh_interval_ms)  # Refresh at 200hz
 
