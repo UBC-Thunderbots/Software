@@ -14,6 +14,7 @@ py_binary(
         "//software/thunderscope/arbitrary_plot:named_value_plotter",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
+        "//software/thunderscope/log:g3log_checkboxes",
         "//software/thunderscope/log:g3log_widget",
         requirement("pyqtgraph"),
         requirement("numpy"),
