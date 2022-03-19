@@ -50,43 +50,6 @@ class RobotNavigationObstacleFactory
         const MotionConstraint &motion_constraint, const Field &field) const;
 
     /**
-     * Create an obstacle representing the given robot
-     *
-     * These obstacles take into account the velocity of the robot to extend the
-     * created obstacle in the robot's direction of travel.
-     *
-     * @param robot The robot to get a representative obstacle for
-     *
-     * @return An obstacle representing the given robot
-     */
-    ObstaclePtr createFromRobot(const Robot &robot) const;
-
-    /**
-     * Create a list of obstacles representing the given team
-     *
-     * These obstacles take into account the velocity of the robot to extend the
-     * created obstacle in the robot's direction of travel.
-     *
-     * @param team The team to get representative obstacles for
-     *
-     * @return A list of obstacles representing the given team
-     */
-    std::vector<ObstaclePtr> createFromTeam(const Team &team) const;
-
-    /**
-     * Create a list of obstacles that stop enemy robot collision. These obstacles are
-     * scaled down if friendly_robot_speed is below a threshold set in the config to allow
-     * slow collisions with enemy robots
-     *
-     * @param enemy_team The enemy team to get representative obstacles for
-     * @param friendly_robot_speed The speed of the current friendly robot
-     *
-     * @return A list of obstacles representing the given team
-     */
-    std::vector<ObstaclePtr> createEnemyCollisionAvoidance(
-        const Team &enemy_team, double friendly_robot_speed) const;
-
-    /**
      * Create circle obstacle around robot with additional radius scaling
      *
      * @param robot_position robot position

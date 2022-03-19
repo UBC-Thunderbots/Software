@@ -30,11 +30,14 @@ namespace TestUtil
      * teams with 1000 milliseconds expiry buffers, and the Ball at the center of the
      * field with no velocity.
      *
+     * @param field_type The field type
+     *
      * @return a World object initialized with a Division B SSL field, empty teams
      * with 1000 millisecond expiry buffers, and the Ball at the center of the field
      * with no velocity.
      */
-    World createBlankTestingWorld();
+    World createBlankTestingWorld(
+        TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B);
 
     /**
      * Creates a blank testing World given a Field.
@@ -46,28 +49,6 @@ namespace TestUtil
      * velocity.
      */
     World createBlankTestingWorld(TbotsProto::Field field_proto);
-
-    /**
-     * Creates a World object with a normal SSL Division A field, default (empty)
-     * teams with 1000 milliseconds expiry buffers, and the Ball at the center of the
-     * field with no velocity.
-     *
-     * @return a World object initialized with a Division B SSL field, empty teams
-     * with 1000 millisecond expiry buffers, and the Ball at the center of the field
-     * with no velocity.
-     */
-    World createBlankTestingWorldDivA();
-
-    /**
-     * Creates a World object with a normal SSL Division B field, default (empty)
-     * teams with 1000 milliseconds expiry buffers, and the Ball at the center of the
-     * field with no velocity.
-     *
-     * @return a World object initialized with a Division B SSL field, empty teams
-     * with 1000 millisecond expiry buffers, and the Ball at the center of the field
-     * with no velocity.
-     */
-    World createBlankTestingWorldDivB();
 
     /**
      * Returns a new World object with friendly robots in the positions specified

@@ -8,7 +8,7 @@ void robotsViolatingMotionConstraint(
     MotionConstraint constraint)
 {
     std::vector<ObstaclePtr> obstacles =
-        obstacle_factory->createFromMotionConstraint(constraint, *world_ptr);
+        obstacle_factory->createFromMotionConstraint(constraint, world_ptr->field());
     for (auto robot : world_ptr->friendlyTeam().getAllRobots())
     {
         for (auto obstacle_ptr : obstacles)

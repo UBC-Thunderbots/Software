@@ -20,52 +20,31 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
     switch (motion_constraint)
     {
         case MotionConstraint::CENTER_CIRCLE:
-            obstacles.push_back(createFromShape(
-                Circle(field.centerPoint(), field.centerCircleRadius())));
-            break;
-        case MotionConstraint::HALF_METER_AROUND_BALL:
-            // 0.5 represents half a metre radius
-            obstacles.push_back(createFromShape(Circle(world.ball().position(), 0.5)));
+            obstacles.push_back(
+                createFromShape(Circle(field.centerPoint(), field.centerCircleRadius())));
             break;
         case MotionConstraint::INFLATED_ENEMY_DEFENSE_AREA:
         {
-            obstacles.push_back(createFromFieldRectangle(
-                field.enemyDefenseArea(), field.fieldLines(),
-                field.fieldBoundary(), 0.3));
+            obstacles.push_back(createFromFieldRectangle(field.enemyDefenseArea(),
+                                                         field.fieldLines(),
+                                                         field.fieldBoundary(), 0.3));
         }
         break;
         case MotionConstraint::FRIENDLY_DEFENSE_AREA:
             obstacles.push_back(createFromFieldRectangle(
-                field.friendlyDefenseArea(), field.fieldLines(),
-                field.fieldBoundary()));
+                field.friendlyDefenseArea(), field.fieldLines(), field.fieldBoundary()));
             break;
         case MotionConstraint::ENEMY_DEFENSE_AREA:
-            obstacles.push_back(createFromFieldRectangle(field.enemyDefenseArea(),
-                                                         field.fieldLines(),
-                                                         field.fieldBoundary()));
+            obstacles.push_back(createFromFieldRectangle(
+                field.enemyDefenseArea(), field.fieldLines(), field.fieldBoundary()));
             break;
         case MotionConstraint::FRIENDLY_HALF:
-            obstacles.push_back(createFromFieldRectangle(field.friendlyHalf(),
-                                                         field.fieldLines(),
-                                                         field.fieldBoundary()));
+            obstacles.push_back(createFromFieldRectangle(
+                field.friendlyHalf(), field.fieldLines(), field.fieldBoundary()));
             break;
         case MotionConstraint::ENEMY_HALF:
-            obstacles.push_back(createFromFieldRectangle(field.enemyHalf(),
-                                                         field.fieldLines(),
-                                                         field.fieldBoundary()));
-            break;
-        case MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:
-            if (world.gameState().getBallPlacementPoint().has_value())
-            {
-                obstacles.push_back(createFromBallPlacement(
-                    world.gameState().getBallPlacementPoint().value(),
-                    world.ball().position()));
-            }
-            else
-            {
-                obstacles.push_back(
-                    createFromShape(Circle(world.ball().position(), 0.5)));
-            }
+            obstacles.push_back(createFromFieldRectangle(
+                field.enemyHalf(), field.fieldLines(), field.fieldBoundary()));
             break;
         case MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE:
             Rectangle field_walls    = field.fieldBoundary();
@@ -94,106 +73,16 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
 }
 
 std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstraints(
-    const std::set<MotionConstraint> &motion_constraints, const World &world) const
+    const std::set<MotionConstraint> &motion_constraints, const Field &field) const
 {
     std::vector<ObstaclePtr> obstacles;
     for (auto motion_constraint : motion_constraints)
     {
-        auto new_obstacles = createFromMotionConstraint(motion_constraint, world);
+        auto new_obstacles = createFromMotionConstraint(motion_constraint, field);
         obstacles.insert(obstacles.end(), new_obstacles.begin(), new_obstacles.end());
     }
 
     return obstacles;
-}
-
-ObstaclePtr RobotNavigationObstacleFactory::createFromRobot(const Robot &robot) const
-{
-    // radius of a hexagonal approximation of a robot
-    double robot_hexagon_radius =
-        (ROBOT_MAX_RADIUS_METERS + robot_radius_expansion_amount) * 2.0 / std::sqrt(3);
-
-    // vector in the direction of the velocity and proportional to the magnitude of the
-    // velocity
-    Vector expanded_velocity_vector = robot.velocity().normalize(
-        robot.velocity().length() * config->getSpeedScalingFactor()->value() +
-        robot_radius_expansion_amount);
-
-    /* If the robot is travelling slower than a threshold, then a stationary robot
-     * obstacle will be returned. If the robot is travelling faster than a threshold, then
-     * the robot will be represented by a velocity obstacle, which is an irregular hexagon
-     * like so:
-     *
-     *                        _____
-     *                       /     \
-     *                      /       \
-     *       The robot >   +    R    +       <
-     *       is at R       |         |       |
-     *                     |         |       | The length of the velocity
-     *                     |         |       | obstacle extension is
-     *                     |         |       | proportional to the robot velocity
-     *                     |         |       |
-     *                     +---------+       <
-     *                          |
-     *                          |
-     *                          V
-     *                velocity of the robot
-     */
-
-    if (expanded_velocity_vector.length() > robot_hexagon_radius)
-    {
-        Vector velocity_norm_radius =
-            expanded_velocity_vector.normalize(robot_hexagon_radius);
-        return std::make_shared<GeomObstacle<Polygon>>(Polygon(
-            {// left side of robot
-             robot.position() + velocity_norm_radius.rotate(Angle::quarter()),
-             // back left of robot
-             robot.position() + velocity_norm_radius.rotate(Angle::fromDegrees(150)),
-             // back right of robot
-             robot.position() + velocity_norm_radius.rotate(Angle::fromDegrees(210)),
-             // right side of robot
-             robot.position() + velocity_norm_radius.rotate(Angle::threeQuarter()),
-             // right side of velocity obstacle extension
-             robot.position() + velocity_norm_radius.rotate(Angle::threeQuarter()) +
-                 expanded_velocity_vector,
-             // left side of velocity obstacle extension
-             robot.position() + velocity_norm_radius.rotate(Angle::quarter()) +
-                 expanded_velocity_vector}));
-    }
-    else
-    {
-        return createFromRobotPosition(robot.position());
-    }
-}
-
-std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromTeam(
-    const Team &team) const
-{
-    std::vector<ObstaclePtr> obstacles;
-    for (const auto &robot : team.getAllRobots())
-    {
-        obstacles.push_back(createFromRobot(robot));
-    }
-    return obstacles;
-}
-
-std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createEnemyCollisionAvoidance(
-    const Team &enemy_team, double friendly_robot_speed) const
-{
-    if (friendly_robot_speed < config->getAllowedRobotCollisionSpeed()->value())
-    {
-        std::vector<ObstaclePtr> obstacles;
-        for (const auto &robot : enemy_team.getAllRobots())
-        {
-            // allow collisions where friendly and enemy robots can be face to face
-            obstacles.push_back(std::make_shared<GeomObstacle<Circle>>(
-                Circle(robot.position(), 2 * DIST_TO_FRONT_OF_ROBOT_METERS)));
-        }
-        return obstacles;
-    }
-    else
-    {
-        return createFromTeam(enemy_team);
-    }
 }
 
 ObstaclePtr RobotNavigationObstacleFactory::createFromBallPosition(

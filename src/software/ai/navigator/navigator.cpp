@@ -74,8 +74,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Navigator::getAssignedPrimitives(
 
             robot_primitives_map[robot_id] =
                 NavigatingPrimitiveCreator(config).createNavigatingPrimitive(
-                    *intent, *(robot_id_to_path_iter->second),
-                    robot_navigation_obstacle_factory.createFromTeam(world.enemyTeam()));
+                    *intent, *(robot_id_to_path_iter->second), {});
 
             *(path_visualization_proto.add_path()) = path_proto;
         }
@@ -106,9 +105,9 @@ std::unordered_set<PathObjective> Navigator::createPathObjectives(
         auto robot = world.friendlyTeam().getRobotById(robot_id);
         if (robot)
         {
-            auto robot_obstacle =
-                robot_navigation_obstacle_factory.createFromRobot(*robot);
-            direct_primitive_intent_obstacles.push_back(robot_obstacle);
+            //            auto robot_obstacle =
+            //                robot_navigation_obstacle_factory.createFromRobot(*robot);
+            //            direct_primitive_intent_obstacles.push_back(robot_obstacle);
         }
         else
         {
@@ -128,17 +127,18 @@ std::unordered_set<PathObjective> Navigator::createPathObjectives(
 
         if (robot)
         {
-            auto motion_constraint_obstacles =
-                robot_navigation_obstacle_factory.createFromMotionConstraints(
-                    intent->getMotionConstraints(), world);
-            obstacles.insert(obstacles.end(), motion_constraint_obstacles.begin(),
-                             motion_constraint_obstacles.end());
-
-            std::vector<ObstaclePtr> enemy_robot_obstacles =
-                robot_navigation_obstacle_factory.createEnemyCollisionAvoidance(
-                    world.enemyTeam(), robot->velocity().length());
-            obstacles.insert(obstacles.end(), enemy_robot_obstacles.begin(),
-                             enemy_robot_obstacles.end());
+            //            auto motion_constraint_obstacles =
+            //                robot_navigation_obstacle_factory.createFromMotionConstraints(
+            //                    intent->getMotionConstraints(), world);
+            //            obstacles.insert(obstacles.end(),
+            //            motion_constraint_obstacles.begin(),
+            //                             motion_constraint_obstacles.end());
+            //
+            //            std::vector<ObstaclePtr> enemy_robot_obstacles =
+            //                robot_navigation_obstacle_factory.createEnemyCollisionAvoidance(
+            //                    world.enemyTeam(), robot->velocity().length());
+            //            obstacles.insert(obstacles.end(), enemy_robot_obstacles.begin(),
+            //                             enemy_robot_obstacles.end());
 
             if (intent->getBallCollisionType() == TbotsProto::BallCollisionType::AVOID)
             {

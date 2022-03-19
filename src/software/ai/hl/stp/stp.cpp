@@ -28,10 +28,9 @@ STP::STP(std::shared_ptr<const AiConfig> ai_config)
       current_play(std::make_unique<HaltPlay>(ai_config)),
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config})),
       override_play(nullptr),
-      path_planner_factory(
-          ai_config->getRobotNavigationObstacleConfig(),
-          World(Field::createSSLDivisionBField(),
-                Ball(Point(), Vector(), Timestamp::fromSeconds(0)), Team(), Team()))
+      path_planner_factory(ai_config->getRobotNavigationObstacleConfig(),
+                           // TODO: somehow do a look up??
+                           Field::createSSLDivisionBField())
 {
     ai_config->getAiControlConfig()->getCurrentAiPlay()->registerCallbackFunction(
         [this, ai_config](std::string new_override_play_name) {

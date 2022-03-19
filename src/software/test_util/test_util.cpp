@@ -20,19 +20,9 @@ namespace TestUtil
         return world;
     }
 
-    World createBlankTestingWorld()
+    World createBlankTestingWorld(TbotsProto::FieldType field_type)
     {
-        return createBlankTestingWorldDivB();
-    }
-
-    World createBlankTestingWorldDivA()
-    {
-        return createBlankTestingWorld(createField(Field::createSSLDivisionAField()));
-    }
-
-    World createBlankTestingWorldDivB()
-    {
-        return createBlankTestingWorld(createField(Field::createSSLDivisionBField()));
+        return createBlankTestingWorld(createField(Field::createField(field_type)));
     }
 
     Team setRobotPositionsHelper(Team team, const std::vector<Point> &robot_positions,

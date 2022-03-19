@@ -17,13 +17,9 @@ MAKE_ENUM(MotionConstraint,
           INFLATED_ENEMY_DEFENSE_AREA,
           // The center circle
           CENTER_CIRCLE,
-          // A half meter radius around the ball
-          HALF_METER_AROUND_BALL,
           // The enemy half of the field
           ENEMY_HALF,
           // The friendly half of the field
           FRIENDLY_HALF,
-          // Path between ball and placement point in ball placement
-          AVOID_BALL_PLACEMENT_INTERFERENCE,
           // Region around the playable zone
           AVOID_FIELD_BOUNDARY_ZONE);

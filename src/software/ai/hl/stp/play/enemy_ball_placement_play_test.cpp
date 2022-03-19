@@ -61,9 +61,9 @@ TEST_P(EnemyBallPlacementPlayTest, test_ball_placement)
                 yield("");
             }
 
-            robotsViolatingMotionConstraint(
-                world_ptr, yield, obstacle_factory,
-                MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
+            //            robotsViolatingMotionConstraint(
+            //                world_ptr, yield, obstacle_factory,
+            //                MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
         }};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
@@ -109,9 +109,9 @@ TEST_F(EnemyBallPlacementPlayTest, test_no_placement)
             {
                 yield("");
             }
-            robotsViolatingMotionConstraint(
-                world_ptr, yield, obstacle_factory,
-                MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
+            //            robotsViolatingMotionConstraint(
+            //                world_ptr, yield, obstacle_factory,
+            //                MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE);
         }};
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,

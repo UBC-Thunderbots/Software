@@ -87,13 +87,11 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
 
     if (ball_collision_type == TbotsProto::BallCollisionType::ALLOW)
     {
-        move_primitive_msg->mutable_move()->set_ball_collision_type(
-            TbotsProto::MovePrimitive::ALLOW);
+        move_primitive_msg->mutable_move()->set_ball_collision_type(TbotsProto::ALLOW);
     }
     else
     {
-        move_primitive_msg->mutable_move()->set_ball_collision_type(
-            TbotsProto::MovePrimitive::AVOID);
+        move_primitive_msg->mutable_move()->set_ball_collision_type(TbotsProto::AVOID);
     }
 
     move_primitive_msg->mutable_move()->set_target_spin_rev_per_s(

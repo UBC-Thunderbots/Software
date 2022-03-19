@@ -717,7 +717,7 @@ TEST_F(TestEnlsvgPathPlanner, test_enlsvg_path_planner_speed_test)
         robot_navigation_obstacle_factory.createFromMotionConstraints(
             {MotionConstraint::CENTER_CIRCLE, MotionConstraint::FRIENDLY_DEFENSE_AREA,
              MotionConstraint::ENEMY_DEFENSE_AREA},
-            world),
+            world.field()),
     };
 
     EnlsvgPathPlanner planner =

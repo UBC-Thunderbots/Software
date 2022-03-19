@@ -10,8 +10,8 @@ class TestGlobalPathPlanner : public testing::Test
 {
    public:
     TestGlobalPathPlanner()
-        : world(TestUtil::createBlankTestingWorldDivA()),
-          gpp(std::make_shared<RobotNavigationObstacleConfig>(), world),
+        : world(TestUtil::createBlankTestingWorld(TbotsProto::FieldType::DIV_A)),
+          gpp(std::make_shared<RobotNavigationObstacleConfig>(), world.field()),
           obstacle_factory(std::make_shared<const RobotNavigationObstacleConfig>())
     {
     }
@@ -47,7 +47,7 @@ TEST_F(TestGlobalPathPlanner,
         MotionConstraint::FRIENDLY_DEFENSE_AREA, MotionConstraint::ENEMY_DEFENSE_AREA,
         MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
-        obstacle_factory.createFromMotionConstraints(constraints, world);
+        obstacle_factory.createFromMotionConstraints(constraints, world.field());
 
     std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner(constraints);
     auto path                                        = planner->findPath(start, dest);
@@ -81,7 +81,7 @@ TEST_F(
         MotionConstraint::FRIENDLY_DEFENSE_AREA, MotionConstraint::ENEMY_DEFENSE_AREA,
         MotionConstraint::CENTER_CIRCLE, MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
-        obstacle_factory.createFromMotionConstraints(constraints, world);
+        obstacle_factory.createFromMotionConstraints(constraints, world.field());
 
     std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner(constraints);
     auto path                                        = planner->findPath(start, dest);
@@ -110,7 +110,7 @@ TEST_F(
         obstacle_factory.createFromMotionConstraints(
             {MotionConstraint::FRIENDLY_DEFENSE_AREA,
              MotionConstraint::ENEMY_DEFENSE_AREA},
-            world);
+            world.field());
     TestUtil::checkPathDoesNotIntersectObstacle(
         {path_points.begin() + 1, path_points.end()}, defense_area_obstacles);
     std::vector<Polygon> centre_circle_obstacle = {
@@ -128,7 +128,7 @@ TEST_F(TestGlobalPathPlanner,
         MotionConstraint::FRIENDLY_DEFENSE_AREA,
         MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
-        obstacle_factory.createFromMotionConstraints(constraints, world);
+        obstacle_factory.createFromMotionConstraints(constraints, world.field());
 
     std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner(constraints);
     auto path                                        = planner->findPath(start, dest);
@@ -155,7 +155,7 @@ TEST_F(TestGlobalPathPlanner, test_enemy_half_blocked_starting_and_ending_in_blo
         MotionConstraint::ENEMY_HALF, MotionConstraint::FRIENDLY_DEFENSE_AREA,
         MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
-        obstacle_factory.createFromMotionConstraints(constraints, world);
+        obstacle_factory.createFromMotionConstraints(constraints, world.field());
 
     std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner(constraints);
     auto path                                        = planner->findPath(start, dest);
@@ -184,7 +184,7 @@ TEST_F(TestGlobalPathPlanner, test_friendly_half_blocked_starting_in_blocked_are
         MotionConstraint::FRIENDLY_HALF, MotionConstraint::ENEMY_DEFENSE_AREA,
         MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE};
     std::vector<ObstaclePtr> obstacles =
-        obstacle_factory.createFromMotionConstraints(constraints, world);
+        obstacle_factory.createFromMotionConstraints(constraints, world.field());
 
     std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner(constraints);
     auto path                                        = planner->findPath(start, dest);
@@ -211,7 +211,7 @@ TEST_F(TestGlobalPathPlanner, test_leave_the_field)
     std::set<MotionConstraint> constraints = {MotionConstraint::ENEMY_DEFENSE_AREA,
                                               MotionConstraint::FRIENDLY_DEFENSE_AREA};
     std::vector<ObstaclePtr> obstacles =
-        obstacle_factory.createFromMotionConstraints(constraints, world);
+        obstacle_factory.createFromMotionConstraints(constraints, world.field());
 
     std::shared_ptr<const EnlsvgPathPlanner> planner = gpp.getPathPlanner(constraints);
     auto path                                        = planner->findPath(start, dest);

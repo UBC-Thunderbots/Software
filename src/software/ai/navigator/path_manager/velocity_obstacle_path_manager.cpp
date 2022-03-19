@@ -49,8 +49,8 @@ const std::map<RobotId, std::optional<Path>> VelocityObstaclePathManager::getMan
             Robot mock_path_robot(0, current_objective.start, initial_path_velocity,
                                   Angle::zero(), AngularVelocity::zero(),
                                   Timestamp::fromSeconds(0));
-            current_velocity_obstacles.emplace_back(
-                robot_navigation_obstacle_factory.createFromRobot(mock_path_robot));
+            //            current_velocity_obstacles.emplace_back(
+            //                robot_navigation_obstacle_factory.createFromRobot(mock_path_robot));
         }
     }
 
