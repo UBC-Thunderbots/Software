@@ -2,7 +2,7 @@
 
 #include "agent.h"
 #include "simulator.h"
-#include "vector2.h"
+#include "software/geom/vector.h"
 
 /**
  * An agent/robot in the simulation which has linear velocity.
@@ -21,8 +21,8 @@ class LinearVelocityAgent : public Agent
      * @param maxAccel    The maximum acceleration of this agent.
      * @param path        The path of this agent
      */
-    LinearVelocityAgent(Simulator *simulator, const Vector2 &position, float radius,
-                        const Vector2 &velocity, float maxSpeed, float maxAccel,
+    LinearVelocityAgent(Simulator *simulator, const Vector &position, float radius,
+                        const Vector &velocity, float maxSpeed, float maxAccel,
                         Path &path);
 
     /**

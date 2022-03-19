@@ -5,13 +5,13 @@
 #include <optional>
 
 #include "extlibs/hrvo/path_point.h"
-#include "extlibs/hrvo/vector2.h"
+#include "software/geom/vector.h"
 
 
 Path::Path()
 {
     path_radius    = 0.0f;
-    Vector2 vector = Vector2();
+    Vector vector = Vector();
     PathPoint path_point(vector);
     path.push_back(path_point);
 }
@@ -27,7 +27,7 @@ void Path::incrementPathIndex()
     curr_path_index++;
 }
 
-std::optional<Vector2> Path::getCurrentPathPointPosition() const
+std::optional<Vector> Path::getCurrentPathPointPosition() const
 {
     if (curr_path_index >= path.size())
     {

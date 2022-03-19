@@ -4,7 +4,7 @@
 #include <optional>
 
 #include "extlibs/hrvo/path_point.h"
-#include "extlibs/hrvo/vector2.h"
+#include "software/geom/vector.h"
 
 class PathPoint;
 
@@ -30,13 +30,13 @@ class Path
      * Gets the next path point position in this path
      * @return the position of the next path point
      */
-    std::optional<Vector2> getNextPathPointPosition();
+    std::optional<Vector> getNextPathPointPosition();
 
     /**
      * Gets the current path point position in this path
      * @return the position of the current path point
      */
-    std::optional<Vector2> getCurrentPathPointPosition() const;
+    std::optional<Vector> getCurrentPathPointPosition() const;
 
     /**
      * Gets the desired speed of the current path point in this path

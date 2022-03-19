@@ -3,20 +3,20 @@
 #include <stdexcept>
 #include <utility>
 
-#include "extlibs/hrvo/vector2.h"
+#include "software/geom/vector.h"
 
 
-PathPoint::PathPoint(const Vector2 &position)
+PathPoint::PathPoint(const Vector &position)
     : position_(position), speed_at_destination(0.0f)
 {
 }
 
-PathPoint::PathPoint(const Vector2 &position, const float destination_speed)
+PathPoint::PathPoint(const Vector &position, const float destination_speed)
     : position_(position), speed_at_destination(destination_speed)
 {
 }
 
-Vector2 PathPoint::getPosition() const{
+Vector PathPoint::getPosition() const{
     return position_;
 }
 

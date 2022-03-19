@@ -37,8 +37,8 @@
 
 #include "extlibs/hrvo/agent.h"
 #include "extlibs/hrvo/kd_tree.h"
-#include "extlibs/hrvo/vector2.h"
 #include "proto/tbots_software_msgs.pb.h"
+#include "software/geom/vector.h"
 #include "software/world/world.h"
 
 class Simulator
@@ -82,7 +82,7 @@ class Simulator
      * @return    The index of the agent.
      */
     std::size_t addLinearVelocityRobotAgent(const Robot &robot,
-                                            const Vector2 &destination);
+                                            const Vector &destination);
 
     /**
      *      Adds a new agent to the simulation.
@@ -100,8 +100,8 @@ class Simulator
      * @param curr_velocity      The initial velocity of this agent.
      * @return The index of the agent.
      */
-    std::size_t addHRVOAgent(const Vector2 &position, float agent_radius,
-                             const Vector2 &curr_velocity, float maxSpeed,
+    std::size_t addHRVOAgent(const Vector &position, float agent_radius,
+                             const Vector &curr_velocity, float maxSpeed,
                              float prefSpeed, float maxAccel, Path &path,
                              float neighborDist, std::size_t maxNeighbors,
                              float uncertaintyOffset);
@@ -117,10 +117,9 @@ class Simulator
      * @param goal_radius   The goal agent_radius of this agent.
      * @return The index of the agent.
      */
-    size_t addLinearVelocityAgent(const Vector2 &position, float agent_radius,
-                                  const Vector2 &curr_velocity, float max_speed,
+    size_t addLinearVelocityAgent(const Vector &position, float agent_radius,
+                                  const Vector &curr_velocity, float max_speed,
                                   float max_accel, Path &path);
-
 
     /**
      *      Returns a new path with a single path point
@@ -129,7 +128,7 @@ class Simulator
      * @param goal_radius   The goal radius of the path
      * @return a Path object
      */
-    Path addPath(const Vector2 &position, float goal_radius);
+    Path addPath(const Vector &position, float goal_radius);
 
     /**
      * Performs a simulation step; updates the position, and velocity
@@ -153,7 +152,7 @@ class Simulator
      * @param agentNo  The number of the agent whose position is to be retrieved.
      * @return    The present position of the (center of) the agent.
      */
-    Vector2 getAgentPosition(std::size_t agentNo) const;
+    Vector getAgentPosition(std::size_t agentNo) const;
 
     /**
      *      Returns the preferred velocity of a specified agent.
@@ -165,7 +164,7 @@ class Simulator
      * retrieved.
      * @return    The present preferred velocity of the agent.
      */
-    Vector2 getAgentPrefVelocity(std::size_t agentNo) const;
+    Vector getAgentPrefVelocity(std::size_t agentNo) const;
 
     /**
      *      Returns the radius of a specified agent.
@@ -190,7 +189,7 @@ class Simulator
      * @param agentNo  The number of the agent whose velocity is to be retrieved.
      * @return    The present velocity of the agent.
      */
-    Vector2 getAgentVelocity(std::size_t agentNo) const;
+    Vector getAgentVelocity(std::size_t agentNo) const;
 
     /**
      *   Returns the global time of the simulation.

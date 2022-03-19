@@ -21,7 +21,6 @@ cc_library(
         "path.cpp",
         "path_point.cpp",
         "simulator.cpp",
-        "vector2.cpp",
     ],
     hdrs = [
         "agent.h",
@@ -31,11 +30,10 @@ cc_library(
         "path.h",
         "path_point.h",
         "simulator.h",
-        "vector2.h",
     ],
-    visibility = ["//visibility:public"],
     deps = [
         "//proto/primitive:primitive_msg_factory",
+        "//software/geom:vector",
         "//software/world",
     ],
 )

@@ -40,7 +40,7 @@
 
 #include "agent.h"
 #include "simulator.h"
-#include "vector2.h"
+#include "software/geom/vector.h"
 
 /**
  * An agent/robot in the simulation which uses the HRVO algorithm to motion plan towards
@@ -65,8 +65,8 @@ class HRVOAgent : public Agent
      * @param maxAccel           The maximum acceleration of this agent.
      * @param velocity           The initial velocity of this agent.
      */
-    HRVOAgent(Simulator *simulator, const Vector2 &position, float neighborDist,
-              std::size_t maxNeighbors, float radius, const Vector2 &velocity,
+    HRVOAgent(Simulator *simulator, const Vector &position, float neighborDist,
+              std::size_t maxNeighbors, float radius, const Vector &velocity,
               float maxAccel, Path &path, float prefSpeed, float maxSpeed,
               float uncertaintyOffset);
 
@@ -114,7 +114,7 @@ class HRVOAgent : public Agent
         Candidate() : velocityObstacle1_(0), velocityObstacle2_(0) {}
 
         // The position of the candidate point.
-        Vector2 position_;
+        Vector position_;
 
         // The number of the first velocity obstacle.
         int velocityObstacle1_;

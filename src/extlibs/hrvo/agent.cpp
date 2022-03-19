@@ -3,8 +3,8 @@
 #include "extlibs/hrvo/path.h"
 #include "extlibs/hrvo/simulator.h"
 
-Agent::Agent(Simulator *simulator, const Vector2 &position, float radius,
-             const Vector2 &velocity, const Vector2 &prefVelocity, float maxSpeed,
+Agent::Agent(Simulator *simulator, const Vector &position, float radius,
+             const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
              float maxAccel, Path &path)
     : simulator_(simulator),
       position_(position),
@@ -20,14 +20,14 @@ Agent::Agent(Simulator *simulator, const Vector2 &position, float radius,
 
 void Agent::update()
 {
-    if (abs(new_velocity_) >= max_speed_)
+    if (new_velocity_.length() >= max_speed_)
     {
         // New velocity can not be greater than max speed
-        new_velocity_ = normalize(new_velocity_) * max_speed_;
+        new_velocity_ = new_velocity_.normalize() * max_speed_;
     }
 
-    const Vector2 dv = new_velocity_ - velocity_;
-    if (abs(dv) < max_accel_ * simulator_->getTimeStep() || abs(dv) == 0.f)
+    const Vector dv = new_velocity_ - velocity_;
+    if (dv.length() < max_accel_ * simulator_->getTimeStep() || dv.length() == 0.f)
     {
         velocity_ = new_velocity_;
     }
@@ -35,12 +35,13 @@ void Agent::update()
     {
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
-        velocity_ = velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / abs(dv));
+        velocity_ =
+            velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / dv.length());
     }
 
     position_ += velocity_ * simulator_->timeStep_;
 
-    Vector2 current_dest;
+    Vector current_dest;
 
     const std::optional<PathPoint> &path_point = path.getCurrentPathPoint();
     if (path_point == std::nullopt) {
@@ -51,7 +52,7 @@ void Agent::update()
         current_dest = path_point.value().getPosition();
     }
 
-    if (absSq(current_dest - position_) <
+    if ((current_dest - position_).lengthSquared() <
         path.path_radius * path.path_radius)
     {
         // Is at current goal position
@@ -78,7 +79,7 @@ float Agent::getMaxAccel() const
     return max_accel_;
 }
 
-const Vector2 &Agent::getVelocity() const
+const Vector &Agent::getVelocity() const
 {
     return velocity_;
 }
@@ -88,12 +89,12 @@ float Agent::getRadius() const
     return radius_;
 }
 
-const Vector2 &Agent::getPosition() const
+const Vector &Agent::getPosition() const
 {
     return position_;
 }
 
-const Vector2 &Agent::getPrefVelocity() const
+const Vector &Agent::getPrefVelocity() const
 {
     return pref_velocity_;
 }
