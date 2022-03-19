@@ -16,6 +16,7 @@ py_binary(
         "//software/thunderscope/chicker",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
+        "//software/thunderscope/log:g3log_checkboxes",
         "//software/thunderscope/log:g3log_widget",
         requirement("pyqtgraph"),
         requirement("numpy"),

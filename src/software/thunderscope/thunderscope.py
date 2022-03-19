@@ -14,6 +14,7 @@ from proto.ball_pb2 import Ball
 from threading import Thread
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.chicker.chicker import ChickerWidget
+from software.thunderscope.log.g3log_checkboxes import g3logCheckboxes
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
 from proto.visualization_pb2 import NamedValue
 from proto.robot_log_msg_pb2 import RobotLog
@@ -74,6 +75,12 @@ if __name__ == "__main__":
     chicker_dock = Dock("Chicker", size=(100, 100))
     chicker_dock.addWidget(chicker_widget)
 
+    # Setup Checkbox Widget
+    check_boxes = logs.checkboxWidget
+
+    check_boxes_dock = Dock("Logs filter", size=(100, 100))
+    check_boxes_dock.addWidget(check_boxes)
+
     # Setup Arbitrary Plot Widget
     named_value_plotter = NamedValuePlotter()
     named_value_plotter_dock = Dock("Performance", size=(500, 100))
@@ -83,7 +90,11 @@ if __name__ == "__main__":
     # Configure Docks
     dock_area.addDock(field_dock, "left")
     dock_area.addDock(log_dock, "bottom", field_dock)
+
     dock_area.addDock(chicker_dock, "right", field_dock)
+
+    dock_area.addDock(check_boxes_dock, "bottom", log_dock)
+
     dock_area.addDock(named_value_plotter_dock, "right", log_dock)
 
     def update():
