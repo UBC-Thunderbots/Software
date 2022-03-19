@@ -67,6 +67,35 @@ host_software_packages=(
     openssl # possibly also necessary for ssl in Python 3
 )
 
+if [[ $(lsb_release -rs) == "20.04" ]]; then
+    # This is required for bazel, we've seen some issues where
+    # the bazel install hasn't installed it properly
+    host_software_packages+=(python-is-python3)
+
+    # This is to setup the toolchain for bazel to run 
+    host_software_packages+=(clang)
+    host_software_packages+=(llvm-6.0)
+    host_software_packages+=(libclang-6.0-dev)
+    host_software_packages+=(libncurses5)
+    sudo apt-get -y install gcc-7 g++-7
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
+    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
+    
+    # This fixes missing headers by notifying the linker
+    ldconfig
+
+fi
+
+if [[ $(lsb_release -rs) == "18.04" ]]; then
+    # This is required for bazel, we've seen some issues where
+    # the bazel install hasn't installed it properly
+    host_software_packages+=(python-minimal)
+    host_software_packages+=(libclang-dev)
+    host_software_packages+=(python3.8)
+    host_software_packages+=(python3.8-venv)
+    host_software_packages+=(python3-setuptools)
+fi
+
 # delete tbotspython first
 sudo rm -rf /opt/tbotspython
 
@@ -89,36 +118,6 @@ if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
     exit 1
 fi
 
-if [[ $(lsb_release -rs) == "20.04" ]]; then
-    # This is required for bazel, we've seen some issues where
-    # the bazel install hasn't installed it properly
-    host_software_packages+=(python-is-python3)
-
-    # This is to setup the toolchain for bazel to run 
-    host_software_packages+=(clang)
-    host_software_packages+=(llvm-6.0)
-    host_software_packages+=(libclang-6.0-dev)
-    host_software_packages+=(libncurses5)
-    sudo apt-get -y install gcc-7 g++-7
-    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
-    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
-    # TODO (#2515) move to requirements.txt
-    sudo /opt/tbotspython/bin/pip3 install python-Levenshtein
-    
-    # This fixes missing headers by notifying the linker
-    ldconfig
-
-fi
-
-if [[ $(lsb_release -rs) == "18.04" ]]; then
-    # This is required for bazel, we've seen some issues where
-    # the bazel install hasn't installed it properly
-    host_software_packages+=(python-minimal)
-    host_software_packages+=(libclang-dev)
-    host_software_packages+=(python3.8)
-    host_software_packages+=(python3.8-venv)
-    host_software_packages+=(python3-setuptools)
-fi
 
 if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
     echo "##############################################################"
@@ -147,6 +146,11 @@ if ! sudo /opt/tbotspython/bin/pip3 install thefuzz  ; then
     echo "Error: Installing thefuzz failed"
     echo "##############################################################"
     exit 1
+fi
+
+# TODO (#2515) move to requirements.txt
+if [[ $(lsb_release -rs) == "20.04" ]]; then
+    sudo /opt/tbotspython/bin/pip3 install python-Levenshtein
 fi
 
 if ! sudo /opt/tbotspython/bin/pip3 install --upgrade protobuf  ; then
