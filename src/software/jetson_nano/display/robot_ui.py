@@ -15,9 +15,9 @@ from wheels_screen import WheelsScreen
 from chip_and_kick_screen import ChipAndKickScreen
 
 # Pins for Rotary Encoder
-BUTTON_PIN = "DAP4_DOUT" # BOARD 40, TEGRA_SOC: 'DAP4_DOUT'
-PIN_1 = "GPIO_PE6" # BOARD 33, TEGRA_SOC: 'GPIO_PE6'
-PIN_2 = "DAP4_FS" # BOARD 35, TEGRA_SOC: 'DAP4_FS'
+BUTTON_PIN = "DAP4_DOUT"  # BOARD 40, TEGRA_SOC: 'DAP4_DOUT'
+PIN_1 = "GPIO_PE6"  # BOARD 33, TEGRA_SOC: 'GPIO_PE6'
+PIN_2 = "DAP4_FS"  # BOARD 35, TEGRA_SOC: 'DAP4_FS'
 
 # These keys indicate how to handle return values
 class ScreenActions:
@@ -25,6 +25,8 @@ class ScreenActions:
     CHANGE_SCREEN = 1
     EDIT_SCREEN = 2
     UPDATE_REDIS = 3
+
+
 screen_actions = ScreenActions()
 
 # These are the keys for the redis dicationary
@@ -50,6 +52,7 @@ class RobotUi:
     This is the top level class for the robot user interface. It ties together the 
     rotary encoder, lcd display, redis server, and all the screens.
     """
+
     def __init__(self):
 
         # Initialize redis server and our redis dictionary
@@ -77,7 +80,7 @@ class RobotUi:
         def on_click():
             """ Execute on click callback of curr screen """
             action = self.screens[self.curr_screen].on_click()
-            
+
             if screen_actions.CHANGE_SCREEN == action["screen action"]:
                 self.curr_screen = action["value"]
                 self.screens[self.curr_screen].update_screen()
@@ -85,7 +88,12 @@ class RobotUi:
             elif screen_actions.UPDATE_REDIS == action["screen action"]:
                 self.redis_client.set(action["redis key"], action["value"])
                 self.redis_dict[action["redis key"]] = action["value"]
-                print("Key: {}, Value: {}".format(action["redis key"], self.redis_client.get(action["redis key"]).decode("UTF-8")))
+                print(
+                    "Key: {}, Value: {}".format(
+                        action["redis key"],
+                        self.redis_client.get(action["redis key"]).decode("UTF-8"),
+                    )
+                )
 
         def on_clockwise_rotate():
             """ Execute the clockwise rotate callback of curr screen """

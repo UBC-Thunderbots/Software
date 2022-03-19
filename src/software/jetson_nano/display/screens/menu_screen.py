@@ -8,12 +8,13 @@ class MenuScreen(Screen):
     """
     This screen is used to navigate between different configuration settings.
     """
+
     def __init__(self, lcd_display, screen_actions):
         """
         @param lcd_display, an instance of the LcdDisplay class
         @param screen_actions, an instance of ScreenActions class
         """
-        actions = [              
+        actions = [
             {
                 "redis key": None,
                 "value": "Wheels",
@@ -26,7 +27,7 @@ class MenuScreen(Screen):
                 "redis key": None,
                 "value": "Chip and Kick",
                 "type": str,
-                "delta": None, 
+                "delta": None,
                 "screen action": screen_actions.CHANGE_SCREEN,
                 "display string": "Configure Chip & Kick",
             },
