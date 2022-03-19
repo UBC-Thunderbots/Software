@@ -83,6 +83,14 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     
     # This fixes missing headers by notifying the linker
     ldconfig
+
+    # TODO (#2515) move to requirements.txt
+    if ! sudo /opt/tbotspython/bin/pip3 install python-Levenshtein ; then
+        echo "##############################################################"
+        echo "Error: Installing python-Levelshtein failed"
+        echo "##############################################################"
+        exit 1
+    fi
 fi
 
 if [[ $(lsb_release -rs) == "18.04" ]]; then
@@ -132,7 +140,7 @@ if ! sudo /opt/tbotspython/bin/pip3 install pyqt5  ; then
     exit 1
 fi
 
-# TODO (#2515) move iterfzf and fuzzywuzzy to requirements.txt
+# TODO (#2515) move iterfzf and thefuzz to requirements.txt
 if ! sudo /opt/tbotspython/bin/pip3 install iterfzf  ; then
     echo "##############################################################"
     echo "Error: Installing iterfzf failed"
@@ -143,13 +151,6 @@ fi
 if ! sudo /opt/tbotspython/bin/pip3 install thefuzz  ; then
     echo "##############################################################"
     echo "Error: Installing thefuzz failed"
-    echo "##############################################################"
-    exit 1
-fi
-
-if ! sudo /opt/tbotspython/bin/pip3 install python-Levenshtein ; then
-    echo "##############################################################"
-    echo "Error: Installing python-Levelshtein failed"
     echo "##############################################################"
     exit 1
 fi

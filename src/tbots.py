@@ -15,6 +15,7 @@ from thefuzz import process
 # This is an experimentally determined threshold that works
 # for our bazel commands
 THEFUZZ_MATCH_RATIO_THRESHOLD = 50
+NUM_FILTERED_MATCHES_TO_SHOW = 10
 
 if __name__ == "__main__":
 
@@ -24,6 +25,7 @@ if __name__ == "__main__":
     parser.add_argument("search_query")
     parser.add_argument("-p", "--print_command", action="store_true")
     parser.add_argument("-d", "--debug_build", action="store_true")
+    parser.add_argument("-i", "--interactive", action="store_true")
 
     # These are shortcut args for commonly used arguments on our tests
     # and full_system. All other arguments are passed through as-is
@@ -44,12 +46,11 @@ if __name__ == "__main__":
     target, confidence = process.extract(args.search_query, targets, limit=1)[0]
     target = str(target, encoding="utf-8")
 
-    # If the fuzz is confident, then just run it
-    if confidence > THEFUZZ_MATCH_RATIO_THRESHOLD:
-        print("Found target {} with confidence {}".format(target, confidence))
+    print("Found target {} with confidence {}".format(target, confidence))
 
-    # If not, launch FZF to let the user find the target
-    else:
+    if args.interactive or confidence < THEFUZZ_MATCH_RATIO_THRESHOLD:
+        filtered_targets = process.extract(args.search_query, targets, limit=NUM_FILTERED_MATCHES_TO_SHOW)
+        targets = [filtered_target[0] for filtered_target in filtered_targets]
         target = str(iterfzf.iterfzf(iter(targets)), encoding="utf-8")
         print("User selected {}".format(target))
 
