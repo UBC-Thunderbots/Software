@@ -44,7 +44,7 @@ class ChickerWidget(QWidget):
         grid = QGridLayout()
         self.radio_buttons = QButtonGroup()
 
-        self.charge_button_list = common_widgets.create_button("Charge", True)
+        self.charge_button_list = common_widgets.create_button("Charge", False)
         self.charge_button = self.charge_button_list[1]
         grid.addWidget(self.charge_button_list[0], 0, 0)
 

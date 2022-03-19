@@ -15,13 +15,14 @@ from PyQt5.QtWidgets import (
 )
 
 
-def create_button(text, checkable_initially=False):
+def create_button(text, checkable_initially=True):
     """
     Creates a QPushButton object inside a QGroupBox object.
     See line 47: src/software/thunderscope/chicker/chicker.py for an example.
     The default color of button will be white with black background.
 
     :param text: text to display on the button
+    :param: checkable_initially: by default button will be checkable, pass False to change this
     :return: group_box: QGroupBox object - add this to the widget
     :return: button: QPushButton object - use this to perform tasks on the button
     """
@@ -29,7 +30,7 @@ def create_button(text, checkable_initially=False):
     button = QPushButton(text)
     group_box.setStyleSheet("color: black")
     button.setCheckable(True)
-    if checkable_initially:
+    if not checkable_initially:
         button.setCheckable(False)
         button.setStyleSheet("background-color: Grey")
     vbox = QVBoxLayout()
