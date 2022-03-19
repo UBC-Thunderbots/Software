@@ -67,6 +67,9 @@ host_software_packages=(
     openssl # possibly also necessary for ssl in Python 3
 )
 
+# delete tbotspython first
+sudo rm -r /opt/tbotspython
+
 if [[ $(lsb_release -rs) == "20.04" ]]; then
     # This is required for bazel, we've seen some issues where
     # the bazel install hasn't installed it properly
@@ -80,17 +83,12 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     sudo apt-get -y install gcc-7 g++-7
     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
     sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
+    # TODO (#2515) move to requirements.txt
+    sudo /opt/tbotspython/bin/pip3 install python-Levenshtein
     
     # This fixes missing headers by notifying the linker
     ldconfig
 
-    # TODO (#2515) move to requirements.txt
-    if ! sudo /opt/tbotspython/bin/pip3 install python-Levenshtein ; then
-        echo "##############################################################"
-        echo "Error: Installing python-Levelshtein failed"
-        echo "##############################################################"
-        exit 1
-    fi
 fi
 
 if [[ $(lsb_release -rs) == "18.04" ]]; then
@@ -114,9 +112,6 @@ fi
 echo "================================================================"
 echo "Setting Up Virtual Python Environment"
 echo "================================================================"
-
-# delete tbotspython first
-sudo rm -r /opt/tbotspython
 
 if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
     echo "##############################################################"
