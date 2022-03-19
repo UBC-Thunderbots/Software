@@ -40,7 +40,18 @@ void Agent::update()
 
     position_ += velocity_ * simulator_->timeStep_;
 
-    if (absSq(path.getCurrentPathPointPosition().value() - position_) <
+    Vector2 current_dest;
+
+    const std::optional<PathPoint> &path_point = path.getCurrentPathPoint();
+    if (path_point == std::nullopt) {
+        // If there are no destinations, the robot should stay at its current position
+        current_dest = position_;
+    }
+    else {
+        current_dest = path_point.value().getPosition();
+    }
+
+    if (absSq(current_dest - position_) <
         path.path_radius * path.path_radius)
     {
         // Is at current goal position
@@ -50,7 +61,7 @@ void Agent::update()
         }
         else
         {
-            path.getNextPathPointPosition();
+            path.incrementPathIndex();
             reached_goal_             = false;
             simulator_->reachedGoals_ = false;
         }

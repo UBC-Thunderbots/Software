@@ -22,39 +22,53 @@ Path::Path(const std::vector<PathPoint> &path_points, float goal_radius_)
     path_radius = goal_radius_;
 }
 
-std::optional<Vector2> Path::getNextPathPointPosition()
+void Path::incrementPathIndex()
 {
-    curr_goal_index++;
-    return getCurrentPathPointPosition();
+    curr_path_index++;
 }
 
 std::optional<Vector2> Path::getCurrentPathPointPosition() const
 {
-    if (curr_goal_index >= path.size())
+    if (curr_path_index >= path.size())
     {
         return std::nullopt;
     }
     else
     {
-        return path[curr_goal_index].getPosition();
+        return path[curr_path_index].getPosition();
     }
 }
 
 float Path::getDesiredSpeedAtCurrentPathPoint()
 {
-    if (curr_goal_index >= path.size())
+    if (curr_path_index >= path.size())
     {
         return 0.f;
     }
     else
     {
-        return path[curr_goal_index].getSpeed();
+        return path[curr_path_index].getSpeed();
     }
+}
+
+std::optional<PathPoint> Path::getCurrentPathPoint() const
+{
+    if (curr_path_index >= path.size()) {
+        return std::nullopt;
+    }
+    else {
+        return path[curr_path_index];
+    }
+}
+
+PathPoint Path::getLastPathPoint() const
+{
+    return path[path.size() - 1];
 }
 
 bool Path::isGoingToFinalPathPoint()
 {
-    if (curr_goal_index >= path.size() - 1)
+    if (curr_path_index >= path.size() - 1)
     {
         return true;
     }
@@ -63,7 +77,7 @@ bool Path::isGoingToFinalPathPoint()
 
 unsigned int Path::getPathIndex() const
 {
-    return curr_goal_index;
+    return curr_path_index;
 }
 
 std::vector<PathPoint> Path::getPathVector() const

@@ -79,8 +79,8 @@ class HRVOTest : public ::testing::Test
                                                {}));
 
             TbotsProto::Primitive primitive = *createMovePrimitive(
-                dest, 0.0, Angle(), DribblerMode::MAX_FORCE, AutoChipOrKick(),
-                MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
+                dest, 0.0, Angle(), TbotsProto::DribblerMode::MAX_FORCE, AutoChipOrKick(),
+                TbotsProto::MaxAllowedSpeedMode(), 1.0, create2021RobotConstants());
             (*primitive_set.mutable_robot_primitives())[i] = primitive;
         }
         friendly_team.updateRobots(friendly_robots);
@@ -201,7 +201,7 @@ class HRVOTest : public ::testing::Test
                 }
 
                 Vector2 goal_position =
-                    simulator.agents_[robot_id]->getPath().getCurrentPathPointPosition().value();
+                    simulator.agents_[robot_id]->getPath().getCurrentPathPoint().value().getPosition();
 
                 float goal_radius = simulator.agents_[robot_id]->getPathRadius();
 

@@ -22,10 +22,10 @@ class MoveIntent : public NavigatingIntent
      */
     explicit MoveIntent(unsigned int robot_id, const Point& destination,
                         const Angle& final_angle, double final_speed,
-                        const DribblerMode& dribbler_mode,
-                        const BallCollisionType& ball_collision_type,
+                        const TbotsProto::DribblerMode& dribbler_mode,
+                        const TbotsProto::BallCollisionType& ball_collision_type,
                         const AutoChipOrKick& auto_chip_or_kick,
-                        const MaxAllowedSpeedMode& max_allowed_speed_mode,
+                        const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
                         double target_spin_rev_per_s,
                         const RobotConstants_t& robot_constants);
 
@@ -42,11 +42,11 @@ class MoveIntent : public NavigatingIntent
     const Angle& getFinalAngle() const;
 
     /**
-     * Gets DribblerMode for this move intent
+     * Gets TbotsProto::DribblerMode for this move intent
      *
      * @return dribbler mode
      */
-    const DribblerMode& getDribblerMode() const;
+    const TbotsProto::DribblerMode& getDribblerMode() const;
 
     /**
      * Gets the AutoChipOrKick for this move intent
@@ -83,7 +83,7 @@ class MoveIntent : public NavigatingIntent
 
    private:
     Angle final_angle;
-    DribblerMode dribbler_mode;
+    TbotsProto::DribblerMode dribbler_mode;
     AutoChipOrKick auto_chip_or_kick;
     double target_spin_rev_per_s;
 };

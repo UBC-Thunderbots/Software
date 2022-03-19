@@ -6,8 +6,8 @@ KickIntent::KickIntent(unsigned int robot_id, const Point &kick_origin,
     : DirectPrimitiveIntent(
           robot_id,
           *createMovePrimitive(
-              kick_origin, 0, kick_direction, DribblerMode::OFF,
+              kick_origin, 0, kick_direction, TbotsProto::DribblerMode::OFF,
               AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, kick_speed_meters_per_second},
-              MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants))
+              TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants))
 {
 }

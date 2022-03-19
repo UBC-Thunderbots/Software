@@ -16,7 +16,7 @@ class BallOcclusionTest
           BallState, std::vector<RobotStateWithId>, std::vector<RobotStateWithId>>>
 {
    protected:
-    FieldType field_type = FieldType::DIV_B;
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
 };
 
 TEST_P(BallOcclusionTest, test_ball_occlusion)

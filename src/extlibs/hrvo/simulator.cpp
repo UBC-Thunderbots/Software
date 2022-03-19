@@ -135,9 +135,10 @@ void Simulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set
                 {
                     // TODO (#2418): Update implementation of Primitive to support
                     // multiple path points
-                    path.getPathVector().emplace_back(PathPoint(Vector2(
-                        static_cast<float>(primitive.move().destination().x_meters()),
-                        static_cast<float>(primitive.move().destination().y_meters()))));
+
+                    auto destination = primitive.move().path().point().at(0);
+                    path.getPathVector().emplace_back(PathPoint(Vector2(static_cast<float>(destination.x_meters()), static_cast<float>(destination.y_meters()))));
+
                 }
             }
         }
@@ -181,9 +182,10 @@ std::size_t Simulator::addHRVORobotAgent(const Robot &robot, int max_neighbors)
     {
         TbotsProto::Primitive primitive = primitive_iter->second;
         TbotsProto::Point destination_point_proto;
+
         if (primitive.has_move())
         {
-            destination_point_proto = primitive.mutable_move()->destination();
+            destination_point_proto = primitive.mutable_move()->path().point().at(0);
             destination_point =
                 Vector2(static_cast<float>(destination_point_proto.x_meters()),
                         static_cast<float>(destination_point_proto.y_meters()));

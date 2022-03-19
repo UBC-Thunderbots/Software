@@ -10,7 +10,18 @@ LinearVelocityAgent::LinearVelocityAgent(Simulator *simulator, const Vector2 &po
 void LinearVelocityAgent::computeNewVelocity()
 {
     // Preferring a velocity which points directly towards goal
-    pref_velocity_ = path.getCurrentPathPointPosition().value() - position_;
+    Vector2 current_position;
+
+    //check if we have reached the end of the path
+    if (path.getCurrentPathPoint() == std::nullopt) {
+        // set the current_position as the previous position
+        current_position  = path.getLastPathPoint().getPosition();
+    }
+    else {
+        current_position = path.getCurrentPathPoint().value().getPosition();
+    }
+
+    pref_velocity_ = current_position - position_;
 
     if (abs(pref_velocity_) > max_speed_)
     {
