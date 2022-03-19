@@ -293,6 +293,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
             // normalized correctly
             auto direct_control = primitive_executor->stepPrimitive(
                 robot_id, RobotState(robot_proto_it->current_state()).orientation());
+            std::cout << "Actu Vel robot " << robot_id << " = " << RobotState(robot_proto_it->current_state()).velocity().length() << std::endl;
 
             auto command = *getRobotCommandFromDirectControl(
                 robot_id, std::move(direct_control), robot_constants, wheel_constants);
@@ -308,6 +309,20 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
 
     SSLSimulationProto::RobotControl yellow_robot_control =
         updateSimulatorRobots(yellow_primitive_executor_map, *yellow_team_world_msg);
+
+    for (auto& primitive_executor_with_id : yellow_primitive_executor_map)
+    {
+        unsigned int robot_id       = primitive_executor_with_id.first;
+        const auto& friendly_robots = yellow_team_world_msg->friendly_team().team_robots();
+        const auto& robot_proto_it =
+                std::find_if(friendly_robots.begin(), friendly_robots.end(),
+                             [&](const auto& robot) { return robot.id() == robot_id; });
+        if (robot_proto_it != friendly_robots.end())
+        {
+//            std::cout << "Actu Vel robot " << robot_id << " = " << RobotState(robot_proto_it->current_state()).velocity().length() << std::endl;
+            LOG(VISUALIZE) << *createNamedValue("Actual Vel robot " + std::to_string(robot_id), static_cast<float>(RobotState(robot_proto_it->current_state()).velocity().length()));
+        }
+    }
 
     SSLSimulationProto::RobotControl blue_robot_control =
         updateSimulatorRobots(blue_primitive_executor_map, *blue_team_world_msg);
