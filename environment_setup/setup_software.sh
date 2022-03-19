@@ -83,7 +83,6 @@ if [[ $(lsb_release -rs) == "20.04" ]]; then
     
     # This fixes missing headers by notifying the linker
     ldconfig
-
 fi
 
 if [[ $(lsb_release -rs) == "18.04" ]]; then
@@ -96,13 +95,20 @@ if [[ $(lsb_release -rs) == "18.04" ]]; then
     host_software_packages+=(python3-setuptools)
 fi
 
-# delete tbotspython first
-sudo rm -rf /opt/tbotspython
+if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
+    echo "##############################################################"
+    echo "Error: Installing utilities and dependencies failed"
+    echo "##############################################################"
+    exit 1
+fi
 
 # Upgrade python3 pip, which some pip packages require
 echo "================================================================"
 echo "Setting Up Virtual Python Environment"
 echo "================================================================"
+
+# delete tbotspython first
+sudo rm -rf /opt/tbotspython
 
 if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
     echo "##############################################################"
@@ -118,13 +124,6 @@ if ! sudo /opt/tbotspython/bin/python3 -m pip install --upgrade pip ; then
     exit 1
 fi
 
-
-if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
-    echo "##############################################################"
-    echo "Error: Installing utilities and dependencies failed"
-    echo "##############################################################"
-    exit 1
-fi
 
 if ! sudo /opt/tbotspython/bin/pip3 install pyqt5  ; then
     echo "##############################################################"
