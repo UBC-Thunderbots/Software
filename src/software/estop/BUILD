@@ -1,5 +1,23 @@
 package(default_visibility = ["//visibility:public"])
 
+# https://github.com/mum4k/platformio_rules/blob/master/docs/platformio_doc.md
+load(
+    "@platformio_rules//platformio:platformio.bzl",
+    "platformio_library",
+    "platformio_project",
+)
+
+# bazel run //software/emergency_stop:main to flash the estop
+platformio_project(
+    name = "main",
+    src = "main.cc",
+    board = "micro",
+    framework = "arduino",
+    deps = [
+        "//shared:constants_platformio",
+    ],
+)
+
 cc_library(
     name = "threaded_estop_reader",
     srcs = ["threaded_estop_reader.cpp"],

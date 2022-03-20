@@ -113,7 +113,7 @@ echo "Setting Up Virtual Python Environment"
 echo "================================================================"
 
 # delete tbotspython first
-sudo rm -r /opt/tbotspython
+sudo rm -rf /opt/tbotspython
 
 if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
     echo "##############################################################"
@@ -135,6 +135,14 @@ fi
 
 if [[ $(lsb_release -rs) == "20.04" ]]; then
     sudo /opt/tbotspython/bin/pip3 install -r ubuntu20_requirements.txt
+fi
+
+
+if ! sudo /opt/tbotspython/bin/pip3 install --upgrade protobuf  ; then
+    echo "##############################################################"
+    echo "Error: Installing protobuf failed"
+    echo "##############################################################"
+    exit 1
 fi
 
 echo "================================================================"
