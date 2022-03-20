@@ -11,24 +11,10 @@ AI::AI(std::shared_ptr<const AiConfig> ai_config)
       current_play(std::make_unique<HaltPlay>(ai_config)),
       path_planner_factory(ai_config->getRobotNavigationObstacleConfig(),
                            // TODO: somehow do a look up??
-                           Field::createSSLDivisionBField())
+                           Field::createSSLDivisionBField()),
+      prev_override(false),
+      prev_override_name("")
 {
-    ai_config->getAiControlConfig()->getCurrentAiPlay()->registerCallbackFunction(
-        [this, ai_config](std::string new_override_play_name) {
-            if (ai_config->getAiControlConfig()->getOverrideAiPlay()->value())
-            {
-                overridePlayFromName(new_override_play_name, ai_config);
-            }
-        });
-
-    ai_config->getAiControlConfig()->getOverrideAiPlay()->registerCallbackFunction(
-        [this, ai_config](bool new_override_ai_play) {
-            if (new_override_ai_play)
-            {
-                overridePlayFromName(
-                    ai_config->getAiControlConfig()->getCurrentAiPlay()->value(), ai_config);
-            }
-        });
 }
 
 void AI::overridePlay(std::unique_ptr<Play> play)
@@ -36,17 +22,28 @@ void AI::overridePlay(std::unique_ptr<Play> play)
     override_play = std::move(play);
 }
 
-void AI::overridePlayFromName(std::string name, std::shared_ptr<const AiConfig> ai_config)
+void AI::overridePlayFromName(std::string name)
 {
-auto play = GenericFactory<std::string, Play, AiConfig>::create(name, ai_config);
-if(static_cast<bool>(play))
-{
-    override_play = std::move(play);
-}
+    overridePlay(GenericFactory<std::string, Play, AiConfig>::create(name, ai_config));
 }
 
-std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World &world)
+void AI::checkAiConfig()
 {
+    bool current_override = ai_config->getAiControlConfig()->getOverrideAiPlay()->value();
+    std::string current_override_name =
+        ai_config->getAiControlConfig()->getCurrentAiPlay()->value();
+    if (current_override != prev_override || current_override_name != prev_override_name)
+    {
+        overridePlayFromName(
+            ai_config->getAiControlConfig()->getCurrentAiPlay()->value());
+    }
+    prev_override      = current_override;
+    prev_override_name = current_override_name;
+}
+
+std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World& world)
+{
+    checkAiConfig();
     fsm->process_event(PlaySelectionFSM::Update(
         [this](std::unique_ptr<Play> play) { current_play = std::move(play); },
         world.gameState()));
@@ -63,13 +60,13 @@ std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World &world)
 
 TbotsProto::PlayInfo AI::getPlayInfo() const
 {
-    std::string info_play_name = objectTypeName(*current_play);
+    std::string info_play_name   = objectTypeName(*current_play);
     auto robot_tactic_assignment = current_play->getRobotTacticAssignment();
 
     if (static_cast<bool>(override_play))
     {
-    info_play_name = objectTypeName(*override_play);
-    robot_tactic_assignment = override_play->getRobotTacticAssignment();
+        info_play_name          = objectTypeName(*override_play);
+        robot_tactic_assignment = override_play->getRobotTacticAssignment();
     }
 
     TbotsProto::PlayInfo info;

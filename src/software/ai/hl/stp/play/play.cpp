@@ -239,8 +239,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                 if (val == 0)
                 {
                     RobotId robot_id = robots.at(row).id();
-                    robot_tactic_assignment.emplace(tactic_vector.at(col),
-                                                    robot_id);
+                    robot_tactic_assignment.emplace(tactic_vector.at(col), robot_id);
                     tactic_vector.at(col)->setLastExecutionRobot(robot_id);
                     primitives_to_run->mutable_robot_primitives()->insert(
                         google::protobuf::MapPair(
@@ -263,7 +262,8 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     return primitives_to_run;
 }
 
-const std::map<std::shared_ptr<const Tactic>, RobotId> &Play::getRobotTacticAssignment() const
+const std::map<std::shared_ptr<const Tactic>, RobotId> &Play::getRobotTacticAssignment()
+    const
 {
     return robot_tactic_assignment;
 }

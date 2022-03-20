@@ -2,9 +2,9 @@
 
 #include <functional>
 
+#include "proto/play_info_msg.pb.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/play_selection_fsm.h"
-#include "proto/play_info_msg.pb.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
 
@@ -55,11 +55,15 @@ class AI final
      * @param name the play name
      * @param ai_config
      */
-    void overridePlayFromName(std::string name, std::shared_ptr<const AiConfig> ai_config);
+    void overridePlayFromName(std::string name);
+
+    void checkAiConfig();
 
     std::shared_ptr<const AiConfig> ai_config;
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
     std::unique_ptr<Play> override_play;
     std::unique_ptr<Play> current_play;
     GlobalPathPlannerFactory path_planner_factory;
+    bool prev_override;
+    std::string prev_override_name;
 };

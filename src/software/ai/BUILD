@@ -2,10 +2,12 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "ai",
-    srcs = ["ai.cpp", 
+    srcs = [
+        "ai.cpp",
         "play_selection_fsm.cpp",
     ],
-    hdrs = ["ai.h",
+    hdrs = [
+        "ai.h",
         "play_selection_fsm.h",
     ],
     # We include all the plays here so that the static
@@ -13,10 +15,10 @@ cc_library(
     # PlayFactory. This addresses the issue explained here:
     # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
     deps = [
+        "//proto:play_info_msg_cc_proto",
         "//software/ai/hl/stp/play:all_plays",
         "//software/ai/hl/stp/play:assigned_tactics_play",
         "//software/ai/hl/stp/play:halt_play",
-        "//proto:play_info_msg_cc_proto",
         "//software/ai/hl/stp/play:play_factory",
         "//software/ai/hl/stp/tactic:tactic_factory",
         "//software/time:timestamp",

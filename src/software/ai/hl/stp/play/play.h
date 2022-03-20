@@ -59,7 +59,8 @@ class Play
     virtual std::unique_ptr<TbotsProto::PrimitiveSet> get(
         const GlobalPathPlannerFactory& path_planner_factory, const World& world);
 
-    const std::map<std::shared_ptr<const Tactic>, RobotId> &getRobotTacticAssignment() const;
+    const std::map<std::shared_ptr<const Tactic>, RobotId>& getRobotTacticAssignment()
+        const;
 
     virtual ~Play() = default;
 

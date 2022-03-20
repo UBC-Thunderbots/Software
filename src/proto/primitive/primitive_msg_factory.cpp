@@ -52,10 +52,10 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
     double target_spin_rev_per_s, const RobotConstants_t& robot_constants)
 {
-    return createCostedMovePrimitive(path, final_angle, final_speed, dribbler_mode,
-                                     ball_collision_type, auto_chip_or_kick,
-                                     max_allowed_speed_mode, target_spin_rev_per_s,
-                                     robot_constants, pathLength(path, path.front()));
+    return createCostedMovePrimitive(
+        path, final_angle, final_speed, dribbler_mode, ball_collision_type,
+        auto_chip_or_kick, max_allowed_speed_mode, target_spin_rev_per_s, robot_constants,
+        pathLength(path, path.front()) + 1.0);
 }
 
 std::unique_ptr<TbotsProto::Primitive> createCostedMovePrimitive(
