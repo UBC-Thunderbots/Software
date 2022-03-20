@@ -262,13 +262,14 @@ void ErForceSimulator::setRobotPrimitive(
         }
         else
         {
-            LOG(WARNING) << "Primitive not included in PrimitiveSet for robot with ID "
-                         << id << std::endl;
+            LOG(WARNING) << "Robot with ID " << id
+                         << " not included in world proto message" << std::endl;
         }
     }
     else
     {
-        LOG(WARNING) << "Simulator robot with ID " << id << " not found" << std::endl;
+        LOG(WARNING) << "Primitive Executor for robot with ID " << id << " not found"
+                     << std::endl;
     }
 }
 
