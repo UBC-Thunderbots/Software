@@ -2,7 +2,6 @@
 
 #include "software/ai/hl/stp/tactic/stop/stop_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/stop_intent.h"
 
 /**
  * The StopTactic will stop the robot from moving. The robot will actively try and brake

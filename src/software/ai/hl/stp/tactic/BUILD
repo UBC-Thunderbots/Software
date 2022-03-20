@@ -42,9 +42,6 @@ cc_library(
     deps = [
         ":transition_conditions",
         "//proto/primitive:primitive_msg_factory",
-        "//software/ai/intent",
-        "//software/ai/intent:stop_intent",
-        "//software/ai/navigator/path_planner",
         "//software/ai/navigator/path_planner:enlsvg_path_planner",
         "//software/util/sml_fsm",
         "//software/util/typename",

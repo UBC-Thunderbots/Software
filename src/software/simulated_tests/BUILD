@@ -6,7 +6,6 @@ cc_library(
     srcs = ["simulated_test_fixture.cpp"],
     hdrs = ["simulated_test_fixture.h"],
     deps = [
-        "//software/gui/drawing:navigator",
         "//software/gui/full_system:threaded_full_system_gui",
         "//software/logger",
         "//proto/message_translation:primitive_google_to_nanopb_converter",
@@ -30,7 +29,6 @@ cc_library(
     srcs = ["simulated_er_force_sim_test_fixture.cpp"],
     hdrs = ["simulated_er_force_sim_test_fixture.h"],
     deps = [
-        "//software/gui/drawing:navigator",
         "//software/gui/full_system:threaded_full_system_gui",
         "//software/logger",
         "//proto/message_translation:primitive_google_to_nanopb_converter",
@@ -82,9 +80,6 @@ cc_library(
     deps = [
         ":simulated_test_fixture",
         "//software/ai/hl/stp/tactic",
-        "//software/ai/navigator",
-        "//software/ai/navigator/path_manager:velocity_obstacle_path_manager",
-        "//software/ai/navigator/path_planner:theta_star_path_planner",
         "@gtest",
     ],
 )
@@ -97,9 +92,6 @@ cc_library(
     deps = [
         ":simulated_er_force_sim_test_fixture",
         "//software/ai/hl/stp/tactic",
-        "//software/ai/navigator",
-        "//software/ai/navigator/path_manager:velocity_obstacle_path_manager",
-        "//software/ai/navigator/path_planner:theta_star_path_planner",
         "@gtest",
     ],
 )

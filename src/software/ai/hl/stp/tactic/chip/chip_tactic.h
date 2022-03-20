@@ -4,7 +4,6 @@
 
 #include "software/ai/hl/stp/tactic/chip/chip_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/chip_intent.h"
 
 /**
  * The ChipTactic will move the assigned robot to the given chip origin and then

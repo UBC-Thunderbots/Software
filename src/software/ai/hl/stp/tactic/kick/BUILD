@@ -14,7 +14,6 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/get_behind_ball:get_behind_ball_tactic",
-        "//software/ai/intent:kick_intent",
         "//software/logger",
     ],
 )

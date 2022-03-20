@@ -6,8 +6,6 @@
 #include "software/ai/hl/stp/tactic/kick/kick_fsm.h"
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/intent.h"
-#include "software/ai/intent/move_intent.h"
 #include "software/ai/passing/pass.h"
 #include "software/geom/algorithms/closest_point.h"
 #include "software/logger/logger.h"

@@ -123,21 +123,6 @@ cc_library(
 )
 
 cc_library(
-    name = "navigator",
-    srcs = ["navigator.cpp"],
-    hdrs = ["navigator.h"],
-    deps = [
-        ":colors",
-        ":draw_functions",
-        ":geom",
-        ":obstacle_artist",
-        "//software/ai/navigator",
-        "//software/gui:geometry_conversion",
-        "@qt//:qt_widgets",
-    ],
-)
-
-cc_library(
     name = "draw_functions",
     hdrs = ["draw_functions.h"],
     deps = [

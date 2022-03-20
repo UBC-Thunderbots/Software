@@ -16,7 +16,6 @@ cc_library(
         "//software/ai/evaluation:enemy_threat",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/intent:move_intent",
         "//software/logger",
     ],
 )

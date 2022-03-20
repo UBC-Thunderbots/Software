@@ -2,7 +2,6 @@
 
 #include "software/ai/hl/stp/tactic/dribble/dribble_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/move_intent.h"
 
 /**
  * The DribbleTactic will move the robot to intercept the ball and optionally dribble it

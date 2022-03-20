@@ -1,7 +1,6 @@
 #pragma once
 
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/move_intent.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/triangle.h"
 

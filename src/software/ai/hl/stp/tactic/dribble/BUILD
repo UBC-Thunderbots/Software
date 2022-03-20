@@ -15,7 +15,6 @@ cc_library(
         "//software/ai/evaluation:pass",
         "//software/ai/hl/stp/tactic",
         "//software/ai/hl/stp/tactic/move:move_tactic",
-        "//software/ai/intent:move_intent",
         "//software/logger",
     ],
 )

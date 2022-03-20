@@ -2,7 +2,6 @@
 
 #include "software/ai/hl/stp/tactic/move/move_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/move_intent.h"
 
 /**
  * The MoveTactic will move the assigned robot to the given destination and arrive
