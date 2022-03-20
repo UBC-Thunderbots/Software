@@ -140,7 +140,7 @@ std::unordered_set<PathObjective> Navigator::createPathObjectives(
             obstacles.insert(obstacles.end(), enemy_robot_obstacles.begin(),
                              enemy_robot_obstacles.end());
 
-            if (intent->getBallCollisionType() == BallCollisionType::AVOID)
+            if (intent->getBallCollisionType() == TbotsProto::BallCollisionType::AVOID)
             {
                 obstacles.push_back(ball_obstacle);
             }

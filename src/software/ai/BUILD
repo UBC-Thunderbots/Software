@@ -11,7 +11,10 @@ cc_library(
     deps = [
         "//software/ai/hl/stp",
         "//software/ai/hl/stp/play:all_plays",
+        "//software/ai/hl/stp/play:assigned_tactics_play",
         "//software/ai/hl/stp/play:halt_play",
+        "//software/ai/hl/stp/play:play_factory",
+        "//software/ai/hl/stp/tactic:tactic_factory",
         "//software/ai/navigator",
         "//software/ai/navigator/path_manager:velocity_obstacle_path_manager",
         "//software/ai/navigator/path_planner:theta_star_path_planner",
@@ -25,6 +28,7 @@ cc_library(
     srcs = ["threaded_ai.cpp"],
     hdrs = ["threaded_ai.h"],
     deps = [
+        "//proto:tbots_cc_proto",
         "//shared/parameter:cpp_configs",
         "//software/ai",
         "//software/gui/drawing:draw_functions",

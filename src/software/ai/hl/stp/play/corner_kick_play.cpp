@@ -97,18 +97,18 @@ Pass CornerKickPlay::setupPass(TacticCoroutine::push_type &yield, const World &w
         auto pass3 = pass_eval.getBestPassInZones({zones_to_cherry_pick[2]}).pass;
         auto pass4 = pass_eval.getBestPassInZones({zones_to_cherry_pick[3]}).pass;
 
-        cherry_pick_tactic_1->updateControlParams(pass1.receiverPoint(),
-                                                  pass1.receiverOrientation(), 0.0,
-                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-        cherry_pick_tactic_2->updateControlParams(pass2.receiverPoint(),
-                                                  pass2.receiverOrientation(), 0.0,
-                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-        cherry_pick_tactic_3->updateControlParams(pass3.receiverPoint(),
-                                                  pass3.receiverOrientation(), 0.0,
-                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
-        cherry_pick_tactic_4->updateControlParams(pass4.receiverPoint(),
-                                                  pass4.receiverOrientation(), 0.0,
-                                                  MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_1->updateControlParams(
+            pass1.receiverPoint(), pass1.receiverOrientation(), 0.0,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_2->updateControlParams(
+            pass2.receiverPoint(), pass2.receiverOrientation(), 0.0,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_3->updateControlParams(
+            pass3.receiverPoint(), pass3.receiverOrientation(), 0.0,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
+        cherry_pick_tactic_4->updateControlParams(
+            pass4.receiverPoint(), pass4.receiverOrientation(), 0.0,
+            TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
     };
 
     // Put the robot in roughly the right position to perform the kick

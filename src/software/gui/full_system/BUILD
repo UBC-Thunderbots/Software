@@ -7,7 +7,9 @@ cc_library(
     deps = [
         "//proto:play_info_msg_cc_proto",
         "//proto:sensor_msg_cc_proto",
+        "//proto:tbots_cc_proto",
         "//proto:visualization_cc_proto",
+        "//proto/message_translation:tbots_protobuf",
         "//software/gui/drawing:draw_functions",
         "//software/gui/drawing:world",
         "//software/gui/full_system/widgets:full_system_gui",
