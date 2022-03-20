@@ -57,7 +57,7 @@ class AI final
      */
     void overridePlayFromName(std::string name, std::shared_ptr<const AiConfig> ai_config);
 
-    std::shared_ptr<const AiConfig> ai_config_;
+    std::shared_ptr<const AiConfig> ai_config;
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
     std::unique_ptr<Play> override_play;
     std::unique_ptr<Play> current_play;
