@@ -102,6 +102,11 @@ if ! sudo apt-get install "${host_software_packages[@]}" -y ; then
     exit 1
 fi
 
+if [[ $(lsb_release -rs) == "18.04" ]]; then
+    sudo rm /usr/bin/python3 # remove symlink
+    sudo ln -s python3.8 /usr/bin/python3 # update symlink to python3.8
+fi
+
 # Upgrade python3 pip, which some pip packages require
 echo "================================================================"
 echo "Setting Up Virtual Python Environment"
