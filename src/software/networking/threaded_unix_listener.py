@@ -39,6 +39,8 @@ class ThreadedUnixListener:
         self.unix_path = unix_path
         self.proto_buffer = queue.Queue(max_buffer_size)
 
+        # We want to set daemon to true so that the program can exit
+        # even if there are still unix listener threads running
         self.thread = Thread(target=self.start, daemon=True)
         self.thread.start()
 
