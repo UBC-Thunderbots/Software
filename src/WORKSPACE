@@ -123,17 +123,6 @@ http_archive(
     ],
 )
 
-new_local_repository(
-    name = "python",
-    path = "/usr/include/python3.8",
-)
-
-# These headers are used by pybind11
-bind(
-    name = "python_headers",
-    actual = "//:python_headers",
-)
-
 load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
 
 boost_deps()
@@ -394,7 +383,14 @@ http_archive(
 
 load("@pybind11_bazel//:python_configure.bzl", "python_configure")
 
-python_configure(name = "local_config_python")
+python_configure(name = "local_config_python", python_version="3")
+
+# These headers are used by pybind11
+bind( 
+     name = "python_headers", 
+     actual = "@local_config_python//:python_headers", 
+)
+
 
 maybe(
     git_repository,
