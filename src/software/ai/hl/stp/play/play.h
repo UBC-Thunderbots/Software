@@ -60,18 +60,9 @@ class Play
     virtual std::unique_ptr<TbotsProto::PrimitiveSet> get(
         const GlobalPathPlannerFactory& path_planner_factory, const World& world);
 
-    virtual ~Play() = default;
+    const std::map<std::shared_ptr<const Tactic>, RobotId> &getRobotTacticAssignment() const;
 
-    /**
-     * Selects primitives for the primitives
-     *
-     * @param tactics The tactics from which to generate primitives to select from
-     * @param world The updated world
-     *
-     * @return the primitive set holding the selected primitives
-     */
-    std::unique_ptr<TbotsProto::PrimitiveSet> selectPrimitives(
-        ConstPriorityTacticVector tactics, const World& world);
+    virtual ~Play() = default;
 
    protected:
     // TODO (#2359): remove this
@@ -164,9 +155,5 @@ class Play
     PriorityTacticVector priority_tactics;
 
     // TODO: change this to robot id to tactic
-    std::map<std::shared_ptr<const Tactic>, Robot> robot_tactic_assignment;
+    std::map<std::shared_ptr<const Tactic>, RobotId> robot_tactic_assignment;
 };
-
-// Function that creates a play
-using PlayConstructor =
-    std::function<std::unique_ptr<Play>(std::shared_ptr<const AiConfig>)>;

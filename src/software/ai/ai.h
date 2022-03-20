@@ -17,9 +17,9 @@ class AI final
 
     /**
      * Create an AI with given configurations
-     * @param ai_config The AI configuration
+     * @param ai_config_ The AI configuration
      */
-    explicit AI(std::shared_ptr<const AiConfig> ai_config);
+    explicit AI(std::shared_ptr<const AiConfig> ai_config_);
 
     /**
      * Overrides the play
@@ -37,7 +37,7 @@ class AI final
      * @return the Primitives that should be run by our Robots given the current
      * state of the world.
      */
-    std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitives(const World& world) const;
+    std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitives(const World& world);
 
     /**
      * Returns information about the currently running plays and tactics, including the
@@ -50,6 +50,17 @@ class AI final
     std::shared_ptr<Navigator> getNavigator() const;
 
    private:
+    /**
+     * Overrides the play from the name
+     *
+     * @param name the play name
+     */
+    void overridePlayFromName(std::string name);
+
+    std::shared_ptr<const AiConfig> ai_config;
     std::shared_ptr<Navigator> navigator;
-    std::unique_ptr<STP> stp;
+    std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
+    std::unique_ptr<Play> override_play;
+    std::unique_ptr<Play> current_play;
+    GlobalPathPlannerFactory path_planner_factory;
 };

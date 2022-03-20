@@ -31,22 +31,6 @@ STP::STP(std::shared_ptr<const AiConfig> ai_config)
                            // TODO: somehow do a look up??
                            Field::createSSLDivisionBField())
 {
-    ai_config->getAiControlConfig()->getCurrentAiPlay()->registerCallbackFunction(
-        [this, ai_config](std::string new_override_play_name) {
-            if (ai_config->getAiControlConfig()->getOverrideAiPlay()->value())
-            {
-                overridePlayFromName(new_override_play_name);
-            }
-        });
-
-    ai_config->getAiControlConfig()->getOverrideAiPlay()->registerCallbackFunction(
-        [this, ai_config](bool new_override_ai_play) {
-            if (new_override_ai_play)
-            {
-                overridePlayFromName(
-                    ai_config->getAiControlConfig()->getCurrentAiPlay()->value());
-            }
-        });
 
     for (unsigned int i = 0; i < MAX_ROBOT_IDS; i++)
     {
