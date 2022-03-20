@@ -88,5 +88,6 @@ std::optional<TbotsProto::PlayInfo> SimulatedPlayTestFixture::getPlayInfo()
 
 AIDrawFunction SimulatedPlayTestFixture::getDrawFunctions()
 {
-    return drawNavigator(ai.getNavigator());
+    return AIDrawFunction([](QGraphicsScene* scene) {
+    });
 }

@@ -2,8 +2,9 @@
 
 #include <functional>
 
-#include "software/ai/hl/stp/stp.h"
-#include "software/ai/navigator/navigator.h"
+#include "software/ai/hl/stp/play/play.h"
+#include "software/ai/play_selection_fsm.h"
+#include "proto/play_info_msg.pb.h"
 #include "software/time/timestamp.h"
 #include "software/world/world.h"
 
@@ -19,7 +20,7 @@ class AI final
      * Create an AI with given configurations
      * @param ai_config_ The AI configuration
      */
-    explicit AI(std::shared_ptr<const AiConfig> ai_config_);
+    explicit AI(std::shared_ptr<const AiConfig> ai_config);
 
     /**
      * Overrides the play
@@ -47,18 +48,16 @@ class AI final
      */
     TbotsProto::PlayInfo getPlayInfo() const;
 
-    std::shared_ptr<Navigator> getNavigator() const;
-
    private:
     /**
      * Overrides the play from the name
      *
      * @param name the play name
+     * @param ai_config
      */
-    void overridePlayFromName(std::string name);
+    void overridePlayFromName(std::string name, std::shared_ptr<const AiConfig> ai_config);
 
-    std::shared_ptr<const AiConfig> ai_config;
-    std::shared_ptr<Navigator> navigator;
+    std::shared_ptr<const AiConfig> ai_config_;
     std::unique_ptr<FSM<PlaySelectionFSM>> fsm;
     std::unique_ptr<Play> override_play;
     std::unique_ptr<Play> current_play;

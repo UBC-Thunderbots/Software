@@ -40,7 +40,6 @@ using TacticCoroutine = boost::coroutines2::coroutine<PriorityTacticVector>;
 class Play
 {
    public:
-    friend class STP;
     /**
      * Creates a new Play
      *

@@ -3,19 +3,9 @@
 #include <chrono>
 
 #include "software/ai/hl/stp/play/halt_play.h"
-#include "software/ai/hl/stp/stp.h"
-#include "software/ai/navigator/path_manager/velocity_obstacle_path_manager.h"
-#include "software/ai/navigator/path_planner/theta_star_path_planner.h"
 
-AI::AI(std::shared_ptr<const AiConfig> ai_config_)
-    : ai_config(ai_config_),
-        navigator(std::make_shared<Navigator>(
-          std::make_unique<VelocityObstaclePathManager>(
-              std::make_unique<ThetaStarPathPlanner>(),
-              RobotNavigationObstacleFactory(
-                  ai_config->getRobotNavigationObstacleConfig())),
-          RobotNavigationObstacleFactory(ai_config->getRobotNavigationObstacleConfig()),
-          ai_config->getNavigatorConfig())),
+AI::AI(std::shared_ptr<const AiConfig> ai_config)
+    : ai_config_(ai_config),
       fsm(std::make_unique<FSM<PlaySelectionFSM>>(PlaySelectionFSM{ai_config})),
       override_play(nullptr),
       current_play(std::make_unique<HaltPlay>(ai_config)),
@@ -23,22 +13,6 @@ AI::AI(std::shared_ptr<const AiConfig> ai_config_)
                            // TODO: somehow do a look up??
                            Field::createSSLDivisionBField())
 {
-//    ai_config->getAiControlConfig()->getCurrentAiPlay()->registerCallbackFunction(
-//        [this](std::string new_override_play_name) {
-//            if (ai_config->getAiControlConfig()->getOverrideAiPlay()->value())
-//            {
-//                overridePlayFromName(new_override_play_name);
-//            }
-//        });
-//
-//    ai_config->getAiControlConfig()->getOverrideAiPlay()->registerCallbackFunction(
-//        [this](bool new_override_ai_play) {
-//            if (new_override_ai_play)
-//            {
-//                overridePlayFromName(
-//                    ai_config->getAiControlConfig()->getCurrentAiPlay()->value());
-//            }
-//        });
 }
 
 void AI::overridePlay(std::unique_ptr<Play> play)
@@ -46,9 +20,13 @@ void AI::overridePlay(std::unique_ptr<Play> play)
     override_play = std::move(play);
 }
 
-void AI::overridePlayFromName(std::string name)
+void AI::overridePlayFromName(std::string name, std::shared_ptr<const AiConfig> ai_config)
 {
-    overridePlay(GenericFactory<std::string, Play, AiConfig>::create(name, ai_config));
+auto play = GenericFactory<std::string, Play, AiConfig>::create(name, ai_config);
+if(static_cast<bool>(play))
+{
+    override_play = std::move(play);
+}
 }
 
 std::unique_ptr<TbotsProto::PrimitiveSet> AI::getPrimitives(const World &world)
@@ -90,9 +68,4 @@ TbotsProto::PlayInfo AI::getPlayInfo() const
     }
 
     return info;
-}
-
-std::shared_ptr<Navigator> AI::getNavigator() const
-{
-    return navigator;
 }
