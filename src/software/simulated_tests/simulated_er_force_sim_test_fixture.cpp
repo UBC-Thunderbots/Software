@@ -542,6 +542,9 @@ bool SimulatedErForceSimTestFixture::tickTest(
         Vector simulator_robot_vel = simulator_robot.velocity();
         double robot_velocity_diff = (world_robot_vel - simulator_robot_vel).length();
 
+//        LOG(VISUALIZE) << *createNamedValue("pos disp " + std::to_string(world_robot.id()), static_cast<float>(robot_displacement));
+//        LOG(VISUALIZE) << *createNamedValue("vel disp " + std::to_string(world_robot.id()), static_cast<float>(robot_velocity_diff));
+
         robots_displacement.push_back(robot_displacement);
         robots_velocity_diff.push_back(robot_velocity_diff);
     }

@@ -320,7 +320,20 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
         if (robot_proto_it != friendly_robots.end())
         {
 //            std::cout << "Actu Vel robot " << robot_id << " = " << RobotState(robot_proto_it->current_state()).velocity().length() << std::endl;
-            LOG(VISUALIZE) << *createNamedValue("Actual Vel robot " + std::to_string(robot_id), static_cast<float>(RobotState(robot_proto_it->current_state()).velocity().length()));
+            LOG(VISUALIZE) << *createNamedValue("Sensor fusion vel " + std::to_string(robot_id), static_cast<float>(RobotState(robot_proto_it->current_state()).velocity().length()));
+
+            auto world_state = getSimulatorState();
+
+            const auto& world_state_robot =
+                    std::find_if(world_state.yellow_robots().begin(), world_state.yellow_robots().end(),
+                                 [&](const auto& robot) { return robot.id() == robot_id; });
+            if (world_state_robot != world_state.yellow_robots().end())
+            {
+                Vector vel(world_state_robot->v_x(), world_state_robot->v_y());
+                LOG(VISUALIZE) << *createNamedValue("Actual vel " + std::to_string(robot_id),
+                                                    static_cast<float>(vel.length()));
+            }
+
         }
     }
 
