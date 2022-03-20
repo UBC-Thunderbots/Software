@@ -43,11 +43,6 @@ void ChipTactic::accept(TacticVisitor &visitor) const
     visitor.visit(*this);
 }
 
-void ChipTactic::updateIntent(const TacticUpdate &tactic_update)
-{
-    fsm.process_event(ChipFSM::Update(control_params, tactic_update));
-}
-
 void ChipTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
 {
     if (reset_fsm)

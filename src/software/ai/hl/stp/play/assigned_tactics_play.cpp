@@ -26,23 +26,11 @@ void AssignedTacticsPlay::updateControlParams(
     this->assigned_tactics = assigned_tactics;
 }
 
-std::vector<std::unique_ptr<Intent>> AssignedTacticsPlay::get(
-    RobotToTacticAssignmentFunction,
-    MotionConstraintBuildFunction motion_constraint_builder, const World &new_world)
+std::unique_ptr<TbotsProto::PrimitiveSet> AssignedTacticsPlay::get(
+    const GlobalPathPlannerFactory &path_planner_factory, const World &world)
 {
-    std::vector<std::unique_ptr<Intent>> intents;
-
-    for (const auto &robot : new_world.friendlyTeam().getAllRobots())
-    {
-        if (assigned_tactics.contains(robot.id()))
-        {
-            auto tactic = assigned_tactics.at(robot.id());
-            auto intent = tactic->get(robot, new_world);
-            intent->setMotionConstraints(motion_constraint_builder(*tactic));
-            intents.push_back(std::move(intent));
-        }
-    }
-    return intents;
+    auto primitives_to_run = std::make_unique<TbotsProto::PrimitiveSet>();
+    return primitives_to_run;
 }
 
 void AssignedTacticsPlay::updateTactics(const PlayUpdate &play_update) {}

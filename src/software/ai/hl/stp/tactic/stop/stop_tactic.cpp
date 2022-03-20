@@ -17,11 +17,6 @@ double StopTactic::calculateRobotCost(const Robot &robot, const World &world) co
     return 0.5;
 }
 
-void StopTactic::updateIntent(const TacticUpdate &tactic_update)
-{
-    fsm.process_event(StopFSM::Update({}, tactic_update));
-}
-
 void StopTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);

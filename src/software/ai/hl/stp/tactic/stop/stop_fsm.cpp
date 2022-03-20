@@ -2,8 +2,6 @@
 
 void StopFSM::updateStop(const Update& event)
 {
-    event.common.set_intent(std::make_unique<StopIntent>(event.common.robot.id(), coast));
-
     event.common.set_primitive(createStopPrimitive(coast));
 }
 

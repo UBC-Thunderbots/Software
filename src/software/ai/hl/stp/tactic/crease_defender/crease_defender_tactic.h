@@ -64,7 +64,6 @@ class CreaseDefenderTactic : public Tactic
     void accept(TacticVisitor &visitor) const override;
 
    private:
-    void updateIntent(const TacticUpdate &tactic_update) override;
     void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
 
     FSM<CreaseDefenderFSM> fsm;

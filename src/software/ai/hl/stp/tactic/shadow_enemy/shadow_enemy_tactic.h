@@ -42,7 +42,6 @@ class ShadowEnemyTactic : public Tactic
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 
    private:
-    void updateIntent(const TacticUpdate &tactic_update) override;
     void updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm) override;
 
     FSM<ShadowEnemyFSM> fsm;

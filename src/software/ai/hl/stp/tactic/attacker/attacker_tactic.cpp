@@ -34,30 +34,6 @@ void AttackerTactic::updateControlParams(std::optional<Point> chip_target)
     this->chip_target = chip_target;
 }
 
-void AttackerTactic::updateIntent(const TacticUpdate& tactic_update)
-{
-    std::optional<Shot> shot = calcBestShotOnGoal(
-        tactic_update.world.field(), tactic_update.world.friendlyTeam(),
-        tactic_update.world.enemyTeam(), tactic_update.world.ball().position(),
-        TeamType::ENEMY, {tactic_update.robot});
-    if (shot && shot->getOpenAngle() <
-                    Angle::fromDegrees(
-                        attacker_tactic_config->getMinOpenAngleForShotDeg()->value()))
-    {
-        // reject shots that have an open angle below the minimum
-        shot = std::nullopt;
-    }
-
-    AttackerFSM::ControlParams control_params{
-        .best_pass_so_far       = best_pass_so_far,
-        .pass_committed         = pass_committed,
-        .shot                   = shot,
-        .chip_target            = chip_target,
-        .attacker_tactic_config = attacker_tactic_config};
-
-    fsm.process_event(AttackerFSM::Update(control_params, tactic_update));
-}
-
 double AttackerTactic::calculateRobotCost(const Robot& robot, const World& world) const
 {
     // Default 0 cost assuming ball is in dribbler

@@ -50,26 +50,12 @@ class Play
     explicit Play(std::shared_ptr<const AiConfig> ai_config, bool requires_goalie);
 
     /**
-     * Gets Intents from the Play given the assignment algorithm and world
-     *
-     * @param robot_to_tactic_assignment_algorithm The algorithm for assigning robots to
-     * tactics
-     * @param motion_constraint_builder Builds motion constraints from tactics
-     * @param world The updated world
-     *
-     * @return the vector of intents to execute
-     */
-    virtual std::vector<std::unique_ptr<Intent>> get(
-        RobotToTacticAssignmentFunction robot_to_tactic_assignment_algorithm,
-        MotionConstraintBuildFunction motion_constraint_builder, const World& world);
-
-    /**
      * Gets Primitives from the Play given the assignment algorithm and world
      *
      * @param path_planner_factory The path planner factory
      * @param world The updated world
      *
-     * @return the vector of intents to execute
+     * @return the PrimitiveSet to execute
      */
     virtual std::unique_ptr<TbotsProto::PrimitiveSet> get(
         const GlobalPathPlannerFactory& path_planner_factory, const World& world);

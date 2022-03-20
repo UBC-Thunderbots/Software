@@ -32,11 +32,6 @@ double GetBehindBallTactic::calculateRobotCost(const Robot &robot,
     return std::clamp<double>(cost, 0, 1);
 }
 
-void GetBehindBallTactic::updateIntent(const TacticUpdate &tactic_update)
-{
-    fsm.process_event(GetBehindBallFSM::Update(control_params, tactic_update));
-}
-
 void GetBehindBallTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);

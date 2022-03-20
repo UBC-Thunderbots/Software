@@ -3,7 +3,6 @@
 #include "software/ai/hl/stp/tactic/tactic_fsm.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/ai/hl/stp/tactic/transition_conditions.h"
-#include "software/ai/intent/intent.h"
 #include "software/world/world.h"
 
 /**
@@ -32,7 +31,7 @@
  * - A passer
  * - A receiver (for a pass)
  *
- * Tactics are stateful, and use Intents to implement their behaviour. They also
+ * Tactics are stateful, and use Primitives to implement their behaviour. They also
  * make heavy use of our Evaluation functions in order to help them make decisions.
  */
 class Tactic
@@ -93,17 +92,6 @@ class Tactic
     virtual double calculateRobotCost(const Robot &robot, const World &world) const = 0;
 
     /**
-     * Updates and returns the next intent from this tactic
-     *
-     * @param robot The robot this tactic is being assigned
-     * @param world The updated world
-     *
-     * @return the next intent
-     */
-    std::unique_ptr<Intent> get(const Robot &robot, const World &world);
-
-
-    /**
      * Updates the last execution robot
      *
      * @param last_execution_robot The robot id of the robot that last executed the
@@ -117,7 +105,7 @@ class Tactic
      * @param world The updated world
      * @param path_planner The path planner to plan a path with
      *
-     * @return the next intent
+     * @return the next primitive
      */
     std::unique_ptr<TbotsProto::PrimitiveSet> get(
         const World &world, std::shared_ptr<const EnlsvgPathPlanner> path_planner);
@@ -135,16 +123,7 @@ class Tactic
     std::optional<RobotId> last_execution_robot;
 
    private:
-    std::unique_ptr<Intent> intent;
     std::unique_ptr<TbotsProto::Primitive> primitive;
-
-    /**
-     * Updates the intent ptr with the new intent
-     *
-     * @param tactic_update The tactic_update struct that contains all the information for
-     * updating the intent
-     */
-    virtual void updateIntent(const TacticUpdate &tactic_update) = 0;
 
     /**
      * Updates the primitive ptr with the new primitive

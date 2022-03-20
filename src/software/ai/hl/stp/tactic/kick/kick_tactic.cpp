@@ -43,11 +43,6 @@ void KickTactic::accept(TacticVisitor &visitor) const
     visitor.visit(*this);
 }
 
-void KickTactic::updateIntent(const TacticUpdate &tactic_update)
-{
-    fsm.process_event(KickFSM::Update(control_params, tactic_update));
-}
-
 void KickTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
 {
     if (reset_fsm)

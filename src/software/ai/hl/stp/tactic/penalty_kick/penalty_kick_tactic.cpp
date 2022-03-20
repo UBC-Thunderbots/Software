@@ -28,11 +28,6 @@ void PenaltyKickTactic::accept(TacticVisitor& visitor) const
     visitor.visit(*this);
 }
 
-void PenaltyKickTactic::updateIntent(const TacticUpdate& tactic_update)
-{
-    fsm.process_event(PenaltyKickFSM::Update({}, tactic_update));
-}
-
 void PenaltyKickTactic::updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm)
 {
     if (reset_fsm)

@@ -21,10 +21,9 @@ class AssignedTacticsPlay : public Play
      */
     void updateControlParams(std::map<RobotId, std::shared_ptr<Tactic>> assigned_tactics);
 
-    std::vector<std::unique_ptr<Intent>> get(
-        RobotToTacticAssignmentFunction,
-        MotionConstraintBuildFunction motion_constraint_builder,
-        const World &new_world) override;
+    std::unique_ptr<TbotsProto::PrimitiveSet> get(
+        const GlobalPathPlannerFactory &path_planner_factory,
+        const World &world) override;
 
    private:
     std::map<RobotId, std::shared_ptr<Tactic>> assigned_tactics;

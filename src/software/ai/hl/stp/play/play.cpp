@@ -76,52 +76,6 @@ PriorityTacticVector Play::getTactics(const World &world)
     return PriorityTacticVector();
 }
 
-std::vector<std::unique_ptr<Intent>> Play::get(
-    RobotToTacticAssignmentFunction robot_to_tactic_assignment_algorithm,
-    MotionConstraintBuildFunction motion_constraint_builder, const World &world)
-{
-    std::vector<std::unique_ptr<Intent>> intents;
-    PriorityTacticVector priority_tactics;
-    unsigned int num_tactics =
-        static_cast<unsigned int>(world.friendlyTeam().numRobots());
-    if (requires_goalie && world.friendlyTeam().goalie())
-    {
-        num_tactics--;
-    }
-    updateTactics(PlayUpdate(world, num_tactics,
-                             [&priority_tactics](PriorityTacticVector new_tactics) {
-                                 priority_tactics = std::move(new_tactics);
-                             }));
-
-    ConstPriorityTacticVector const_priority_tactics;
-
-    // convert pointers to const pointers
-    std::for_each(priority_tactics.begin(), priority_tactics.end(), [&](auto &tactics) {
-        ConstTacticVector const_tactics = {};
-        std::transform(tactics.begin(), tactics.end(), std::back_inserter(const_tactics),
-                       [](std::shared_ptr<Tactic> tactic) { return tactic; });
-        const_priority_tactics.push_back(const_tactics);
-    });
-
-    auto robot_tactic_assignment = robot_to_tactic_assignment_algorithm(
-        const_priority_tactics, world, requires_goalie);
-
-    for (auto tactic_vec : priority_tactics)
-    {
-        for (auto tactic : tactic_vec)
-        {
-            auto iter = robot_tactic_assignment.find(tactic);
-            if (iter != robot_tactic_assignment.end())
-            {
-                auto intent = tactic->get(iter->second, world);
-                intent->setMotionConstraints(motion_constraint_builder(*tactic));
-                intents.push_back(std::move(intent));
-            }
-        }
-    }
-    return intents;
-}
-
 std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     const GlobalPathPlannerFactory &path_planner_factory, const World &world)
 {

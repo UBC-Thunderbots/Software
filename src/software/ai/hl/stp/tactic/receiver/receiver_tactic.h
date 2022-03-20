@@ -77,7 +77,6 @@ class ReceiverTactic : public Tactic
     // enemy goal with
     static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::fromDegrees(90);
 
-    void updateIntent(const TacticUpdate& tactic_update) override;
     void updatePrimitive(const TacticUpdate& tactic_update, bool reset_fsm) override;
 
     FSM<ReceiverFSM> fsm;

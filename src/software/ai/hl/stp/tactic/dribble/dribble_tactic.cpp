@@ -42,11 +42,6 @@ double DribbleTactic::calculateRobotCost(const Robot &robot, const World &world)
     return std::clamp<double>(cost, 0, 1);
 }
 
-void DribbleTactic::updateIntent(const TacticUpdate &tactic_update)
-{
-    fsm.process_event(DribbleFSM::Update(control_params, tactic_update));
-}
-
 void DribbleTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);

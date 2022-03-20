@@ -13,14 +13,10 @@ void ChipFSM::updateGetBehindBall(
 
 void ChipFSM::updateChip(const Update &event)
 {
-    event.common.set_intent(std::make_unique<ChipIntent>(
-        event.common.robot.id(), event.control_params.chip_origin,
-        event.control_params.chip_direction, event.control_params.chip_distance_meters,
-        event.common.robot.robotConstants()));
-
     event.common.set_primitive(createChipPrimitive(
         event.control_params.chip_origin, event.control_params.chip_direction,
-        event.control_params.chip_distance_meters, event.common.robot.robotConstants()));
+        event.control_params.chip_distance_meters, event.common.robot.robotConstants(),
+        (event.common.robot.position() - event.control_params.chip_origin).length()));
 }
 
 bool ChipFSM::ballChicked(const Update &event)

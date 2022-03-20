@@ -38,11 +38,6 @@ double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world) 
     }
 }
 
-void GoalieTactic::updateIntent(const TacticUpdate &tactic_update)
-{
-    fsm.process_event(GoalieFSM::Update(control_params, tactic_update));
-}
-
 void GoalieTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);

@@ -44,11 +44,6 @@ double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &wo
     return std::clamp<double>(cost, 0, 1);
 }
 
-void ShadowEnemyTactic::updateIntent(const TacticUpdate &tactic_update)
-{
-    fsm.process_event(ShadowEnemyFSM::Update(control_params, tactic_update));
-}
-
 void ShadowEnemyTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);

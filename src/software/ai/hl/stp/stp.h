@@ -8,7 +8,6 @@
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play_selection_fsm.h"
-#include "software/ai/intent/intent.h"
 
 /**
  * The STP module is an implementation of the high-level logic Abstract class, that
@@ -33,9 +32,10 @@
  *   necessary information is provided before gameplay decisions are made.
  *
  * STP's main job is to decide what each robot should be doing at any point
- * in time (ie. what Intent each robot should be running). When STP is given
- * a new World and asked for Intents, it goes through the following steps:
+ * in time (ie. what Primitive each robot should be running). When STP is given
+ * a new World and asked for Primitives, it goes through the following steps:
  *
+ * TODO: rewrite this:
  * 1. Decide what Play should be running at this time. If the play is done then
  *    it is restarted.
  *
@@ -63,17 +63,6 @@ class STP
      * @param ai_config The Ai configuration
      */
     explicit STP(std::shared_ptr<const AiConfig> ai_config);
-
-    /**
-     * Given the state of the world, returns the Intent that each available Robot should
-     * be running.
-     *
-     * @param world The current state of the world
-     *
-     * @return A vector of unique pointers to the Intents our friendly robots should be
-     * running
-     */
-    std::vector<std::unique_ptr<Intent>> getIntents(const World &world);
 
     /**
      * Returns information about the currently running plays and tactics, including the
@@ -137,13 +126,6 @@ class STP
     std::unique_ptr<TbotsProto::PrimitiveSet> getPrimitives(const World &world);
 
    private:
-    /**
-     * Gets the intents the current play wants to run
-     *
-     * @return The vector of intents that should be run right now to execute the play
-     */
-    std::vector<std::unique_ptr<Intent>> getIntentsFromCurrentPlay(const World &world);
-
     /**
      * Overrides the play from the name
      *

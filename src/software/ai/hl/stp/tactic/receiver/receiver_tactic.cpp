@@ -27,11 +27,6 @@ void ReceiverTactic::updateControlParams(std::optional<Pass> updated_pass,
     control_params.disable_one_touch_shot = disable_one_touch_shot;
 }
 
-void ReceiverTactic::updateIntent(const TacticUpdate& tactic_update)
-{
-    fsm.process_event(ReceiverFSM::Update(control_params, tactic_update));
-}
-
 double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world) const
 {
     // If we have no receive point, make it expensive to assign this robot

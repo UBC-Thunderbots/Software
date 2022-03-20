@@ -47,11 +47,6 @@ void PivotKickTactic::updateControlParams(const Point &kick_origin,
     control_params.auto_chip_or_kick = auto_chip_or_kick;
 }
 
-void PivotKickTactic::updateIntent(const TacticUpdate &tactic_update)
-{
-    fsm.process_event(PivotKickFSM::Update(control_params, tactic_update));
-}
-
 void PivotKickTactic::updatePrimitive(const TacticUpdate &tactic_update, bool reset_fsm)
 {
     if (reset_fsm)

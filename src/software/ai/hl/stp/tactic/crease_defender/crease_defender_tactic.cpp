@@ -59,11 +59,6 @@ void CreaseDefenderTactic::updateControlParams(
     control_params.max_allowed_speed_mode    = max_allowed_speed_mode;
 }
 
-void CreaseDefenderTactic::updateIntent(const TacticUpdate &tactic_update)
-{
-    fsm.process_event(CreaseDefenderFSM::Update(control_params, tactic_update));
-}
-
 void CreaseDefenderTactic::updatePrimitive(const TacticUpdate &tactic_update,
                                            bool reset_fsm)
 {

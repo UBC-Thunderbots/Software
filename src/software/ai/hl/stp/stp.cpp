@@ -15,7 +15,6 @@
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/all_tactics.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/intent/stop_intent.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 #include "software/logger/logger.h"
 #include "software/util/generic_factory/generic_factory.h"
@@ -69,54 +68,6 @@ std::unique_ptr<TbotsProto::PrimitiveSet> STP::getPrimitives(const World& world)
     {
         return current_play->get(path_planner_factory, world);
     }
-}
-
-// TODO delete this
-std::vector<std::unique_ptr<Intent>> STP::getIntentsFromCurrentPlay(const World& world)
-{
-    fsm->process_event(PlaySelectionFSM::Update(
-        [this](std::unique_ptr<Play> play) { current_play = std::move(play); },
-        world.gameState()));
-
-    auto assignment_function = [this](const ConstPriorityTacticVector& tactics,
-                                      const World& world,
-                                      bool automatically_assign_goalie) {
-        return assignRobotsToTactics(tactics, world, automatically_assign_goalie);
-    };
-    auto motion_constraint_function = [world](const Tactic& tactic) {
-        return buildMotionConstraintSet(world.gameState(), tactic);
-    };
-
-    if (static_cast<bool>(override_play))
-    {
-        return override_play->get(assignment_function, motion_constraint_function, world);
-    }
-    else
-    {
-        return current_play->get(assignment_function, motion_constraint_function, world);
-    }
-}
-
-// TODO delete this
-std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
-{
-    auto intents = getIntentsFromCurrentPlay(world);
-
-    auto all_tactics = stop_tactics;
-    all_tactics.push_back(current_play->goalie_tactic);
-    for (auto tactic : all_tactics)
-    {
-        auto iter = robot_tactic_assignment.find(tactic);
-        if (iter != robot_tactic_assignment.end())
-        {
-            auto intent = tactic->get(iter->second, world);
-            intent->setMotionConstraints(
-                buildMotionConstraintSet(world.gameState(), *tactic));
-            intents.push_back(std::move(intent));
-        }
-    }
-
-    return intents;
 }
 
 // TODO: move this to AI
