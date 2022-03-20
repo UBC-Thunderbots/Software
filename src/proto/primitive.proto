@@ -45,7 +45,7 @@ message Primitive
         StopPrimitive stop                    = 3;
         DirectControlPrimitive direct_control = 4;
     }
-    double cost = 5;  // The cost of running this primitive, in [0, 1]
+    double cost = 5;
 }
 
 message EstopPrimitive {}

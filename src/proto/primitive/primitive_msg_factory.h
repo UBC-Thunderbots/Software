@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "proto/primitive.pb.h"
 #include "proto/primitive/primitive_types.h"
 #include "shared/constants.h"
@@ -36,9 +38,15 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const TbotsProto::BallCollisionType& ball_collision_type,
     const AutoChipOrKick& auto_chip_or_kick,
     const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
-    double target_spin_rev_per_s,
-    // TODO: delete default argument
-    const RobotConstants_t& robot_constants, double cost = 1.0);
+    double target_spin_rev_per_s, const RobotConstants_t& robot_constants);
+
+std::unique_ptr<TbotsProto::Primitive> createCostedMovePrimitive(
+    const std::vector<Point>& path, const Angle& final_angle, double final_speed,
+    const TbotsProto::DribblerMode& dribbler_mode,
+    const TbotsProto::BallCollisionType& ball_collision_type,
+    const AutoChipOrKick& auto_chip_or_kick,
+    const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
+    double target_spin_rev_per_s, const RobotConstants_t& robot_constants, double cost);
 
 std::unique_ptr<TbotsProto::Primitive> createChipPrimitive(
     const Point& chip_origin, const Angle& chip_direction, double chip_distance_meters,

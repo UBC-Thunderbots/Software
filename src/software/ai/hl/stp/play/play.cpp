@@ -252,7 +252,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
                 if (missing_capabilities.size() > 0)
                 {
-                    matrix(row, col) = robot_cost_for_tactic + 10.0f;
+                    matrix(row, col) = robot_cost_for_tactic * 10.0 + 10.0;
                 }
                 else
                 {
@@ -287,6 +287,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                     RobotId robot_id = robots.at(row).id();
                     robot_tactic_assignment.emplace(tactic_vector.at(col),
                                                     robots.at(row));
+                    tactic_vector.at(col)->setLastExecutionRobot(robot_id);
                     primitives_to_run->mutable_robot_primitives()->insert(
                         google::protobuf::MapPair(
                             robot_id,

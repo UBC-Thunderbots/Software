@@ -50,6 +50,20 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
     const TbotsProto::BallCollisionType& ball_collision_type,
     const AutoChipOrKick& auto_chip_or_kick,
     const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
+    double target_spin_rev_per_s, const RobotConstants_t& robot_constants)
+{
+    return createCostedMovePrimitive(path, final_angle, final_speed, dribbler_mode,
+                                     ball_collision_type, auto_chip_or_kick,
+                                     max_allowed_speed_mode, target_spin_rev_per_s,
+                                     robot_constants, pathLength(path, path.front()));
+}
+
+std::unique_ptr<TbotsProto::Primitive> createCostedMovePrimitive(
+    const std::vector<Point>& path, const Angle& final_angle, double final_speed,
+    const TbotsProto::DribblerMode& dribbler_mode,
+    const TbotsProto::BallCollisionType& ball_collision_type,
+    const AutoChipOrKick& auto_chip_or_kick,
+    const TbotsProto::MaxAllowedSpeedMode& max_allowed_speed_mode,
     double target_spin_rev_per_s, const RobotConstants_t& robot_constants, double cost)
 {
     auto move_primitive_msg = std::make_unique<TbotsProto::Primitive>();
@@ -104,7 +118,7 @@ std::unique_ptr<TbotsProto::Primitive> createChipPrimitive(
     const Point& chip_origin, const Angle& chip_direction, double chip_distance_meters,
     RobotConstants_t robot_constants, double cost)
 {
-    return createMovePrimitive(
+    return createCostedMovePrimitive(
         {chip_origin}, chip_direction, 0.0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, chip_distance_meters},
@@ -115,7 +129,7 @@ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
     const Point& kick_origin, const Angle& kick_direction,
     double kick_speed_meters_per_second, RobotConstants_t robot_constants, double cost)
 {
-    return createMovePrimitive(
+    return createCostedMovePrimitive(
         {kick_origin}, kick_direction, 0.0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, kick_speed_meters_per_second},
