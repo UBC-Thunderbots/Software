@@ -233,7 +233,7 @@ void SimulatedErForceSimTestFixture::runTest(
         Duration::fromSeconds(1.0 / SIMULATED_CAMERA_FPS);
 
     std::shared_ptr<ErForceSimulator> simulator(std::make_shared<ErForceSimulator>(
-        field_type, create2021RobotConstants(), create2021WheelConstants(),
+        field_type, create2015RobotConstants(), create2015WheelConstants(),
         friendly_thunderbots_config->getSimulatorConfig()));
 
     // TODO (#2419): remove this to re-enable sigfpe checks
