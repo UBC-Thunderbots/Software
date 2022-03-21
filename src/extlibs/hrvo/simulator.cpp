@@ -140,7 +140,7 @@ void HRVOSimulator::updateWorld(const World &world)
     //               update its radius based on the PrimitiveSet
     if (add_ball_agent)
     {
-        if (ball_agent_id == -1) 
+        if (ball_agent_id == -1)
         {
             // Ball should be treated as an agent (obstacle)
             const Ball &ball = world.ball();
@@ -148,13 +148,13 @@ void HRVOSimulator::updateWorld(const World &world)
             Vector velocity(ball.velocity().x(), ball.velocity().y());
             Vector goal_pos    = position + 100 * velocity;
             float acceleration = ball.acceleration().length();
-            // Minimum of 0.5-meter distance away from the ball, if the ball is an 
+            // Minimum of 0.5-meter distance away from the ball, if the ball is an
             // obstacle
             float ball_radius = 0.5f + BALL_AGENT_RADIUS_OFFSET;
 
-            Path path = addPath(goal_pos, 0.1f);
-            std::size_t agent_index = addLinearVelocityAgent(position, ball_radius, velocity, velocity.length(),
-                                acceleration, path);
+            Path path               = addPath(goal_pos, 0.1f);
+            std::size_t agent_index = addLinearVelocityAgent(
+                position, ball_radius, velocity, velocity.length(), acceleration, path);
             ball_agent_id = agent_index;
         }
         else
@@ -163,7 +163,7 @@ void HRVOSimulator::updateWorld(const World &world)
             agents[ball_agent_id]->setPosition(position.toVector());
         }
     }
-     else if (ball_agent_id != -1)
+    else if (ball_agent_id != -1)
     {
         agents[ball_agent_id]->setRadius(0.f);
     }
@@ -183,7 +183,7 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
         auto hrvo_agent = getFriendlyAgentFromRobotId(robot_id);
         if (hrvo_agent.has_value())
         {
-            //TODO change raw pointer
+            // TODO change raw pointer
             const Path *path = &hrvo_agent.value()->getPath();
             path->getPathVector().clear();
 
@@ -194,8 +194,9 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
                 auto destination = primitive.move().path().point().at(0);
                 path->getPathVector().emplace_back(
                     PathPoint(Vector(static_cast<float>(destination.x_meters()),
-                                        static_cast<float>(destination.y_meters())), primitive.move().final_speed_m_per_s()));
-                
+                                     static_cast<float>(destination.y_meters())),
+                              primitive.move().final_speed_m_per_s()));
+
                 float new_max_speed = primitive.move().max_speed_m_per_s();
                 hrvo_agent.value()->setMaxSpeed(new_max_speed);
                 hrvo_agent.value()->setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
@@ -283,10 +284,10 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
 }
 
 std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radius,
-                                    const Vector &curr_velocity, float maxSpeed,
-                                    float prefSpeed, float maxAccel, Path &path,
-                                    float neighborDist, std::size_t maxNeighbors,
-                                    float uncertaintyOffset)
+                                        const Vector &curr_velocity, float maxSpeed,
+                                        float prefSpeed, float maxAccel, Path &path,
+                                        float neighborDist, std::size_t maxNeighbors,
+                                        float uncertaintyOffset)
 {
     std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
         this, position, neighborDist, maxNeighbors, agent_radius, curr_velocity, maxAccel,
@@ -296,8 +297,8 @@ std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radi
 }
 
 size_t HRVOSimulator::addLinearVelocityAgent(const Vector &position, float agent_radius,
-                                         const Vector &curr_velocity, float max_speed,
-                                         float max_accel, Path &path)
+                                             const Vector &curr_velocity, float max_speed,
+                                             float max_accel, Path &path)
 {
     std::shared_ptr<LinearVelocityAgent> agent = std::make_shared<LinearVelocityAgent>(
         this, position, agent_radius, curr_velocity, max_speed, max_accel, path);
@@ -314,11 +315,12 @@ Path HRVOSimulator::addPath(const Vector &position, float goal_radius)
     return path;
 }
 
-Path HRVOSimulator::addPathPositions(const std::vector<PathPoint> &path_points, float goal_radius) 
+Path HRVOSimulator::addPathPositions(const std::vector<PathPoint> &path_points,
+                                     float goal_radius)
 {
     Path path(path_points, goal_radius);
     return path;
-} 
+}
 
 void HRVOSimulator::doStep()
 {

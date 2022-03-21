@@ -308,7 +308,6 @@ class HRVOSimulator
     std::map<unsigned int, unsigned int> enemy_robot_id_map;
 
    public:
-   
     // The scale which friendly robots should be larger than friendly robots
     // This scale is used to avoid close encounters, and reduce chance of collision
     static constexpr float FRIENDLY_ROBOT_RADIUS_SCALE = 1.25f;

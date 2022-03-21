@@ -66,16 +66,16 @@ class Path
     // path radius for this robot. The max distance away from any path point in this path
     float path_radius;
 
-    
+
     /**
-     * Increments the path point index of this path 
+     * Increments the path point index of this path
      */
     void incrementPathIndex();
 
     /**
      * Gets the current path point of this path
      * @returns an optional PathPoint
-     */ 
+     */
     std::optional<PathPoint> getCurrentPathPoint() const;
 
     // Assume that the path vector is not empty
