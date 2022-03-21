@@ -36,9 +36,9 @@ UnixSimulatorBackend::UnixSimulatorBackend(std::shared_ptr<const BackendConfig> 
         boost::bind(&Backend::receiveSensorProto, this, _1)));
 
     // Protobuf Outputs
-    vision_output.reset(new ThreadedProtoUnixSender<TbotsProto::Vision>(
+    world_output.reset(new ThreadedProtoUnixSender<TbotsProto::World>(
         config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
-        VISION_OUTPUT_PATH));
+        WORLD_OUTPUT_PATH));
 
     primitive_output.reset(new ThreadedProtoUnixSender<TbotsProto::PrimitiveSet>(
         config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
@@ -74,7 +74,7 @@ void UnixSimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)
 
 void UnixSimulatorBackend::onValueReceived(World world)
 {
-    vision_output->sendProto(*createVision(world));
+    world_output->sendProto(*createWorld(world));
     LOG(VISUALIZE) << *createWorld(world);
     // TODO (#2510) Find a new home once SimulatorBackend and ThreadedFullSystemGUI are
     // gone

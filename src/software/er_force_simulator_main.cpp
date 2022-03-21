@@ -36,9 +36,9 @@ int main(int argc, char **argv)
          *   Yellow Primitive Set │  │                      │  ├───────────────────►
          *                        │  │                      │  │ Yellow Robot Status
          *                        │  │  ER Force Simulator  │  │
-         *   Blue Vision          │  │                      │  │
+         *   Blue World           │  │                      │  │
          *   ─────────────────────►  │                      │  │
-         *   Yellow Vision        │  └──────────────────────┘  │
+         *   Yellow World         │  └──────────────────────┘  │
          *                        └────────────────────────────┘
          */
         std::shared_ptr<ErForceSimulator> er_force_sim;
@@ -58,9 +58,9 @@ int main(int argc, char **argv)
         }
         std::mutex simulator_mutex;
 
-        // Vision Buffer
-        TbotsProto::Vision blue_vision;
-        TbotsProto::Vision yellow_vision;
+        // World Buffer
+        TbotsProto::World blue_vision;
+        TbotsProto::World yellow_vision;
 
         // Outputs
         // SSL Wrapper Output
@@ -82,15 +82,15 @@ int main(int argc, char **argv)
                 er_force_sim->setWorldState(input);
             });
 
-        // Vision Input: Buffer vision until we have primitives to tick
+        // World Input: Buffer vision until we have primitives to tick
         // the simulator with
-        auto blue_vision_input = ThreadedProtoUnixListener<TbotsProto::Vision>(
-            runtime_dir + BLUE_VISION_PATH, [&](TbotsProto::Vision input) {
+        auto blue_vision_input = ThreadedProtoUnixListener<TbotsProto::World>(
+            runtime_dir + BLUE_WORLD_PATH, [&](TbotsProto::World input) {
                 std::scoped_lock lock(simulator_mutex);
                 blue_vision = input;
             });
-        auto yellow_vision_input = ThreadedProtoUnixListener<TbotsProto::Vision>(
-            runtime_dir + YELLOW_VISION_PATH, [&](TbotsProto::Vision input) {
+        auto yellow_vision_input = ThreadedProtoUnixListener<TbotsProto::World>(
+            runtime_dir + YELLOW_WORLD_PATH, [&](TbotsProto::World input) {
                 std::scoped_lock lock(simulator_mutex);
                 yellow_vision = input;
             });
@@ -101,7 +101,7 @@ int main(int argc, char **argv)
                 runtime_dir + YELLOW_PRIMITIVE_SET, [&](TbotsProto::PrimitiveSet input) {
                     std::scoped_lock lock(simulator_mutex);
                     er_force_sim->setYellowRobotPrimitiveSet(
-                        input, std::make_unique<TbotsProto::Vision>(yellow_vision));
+                        input, std::make_unique<TbotsProto::World>(yellow_vision));
                 });
 
         auto blue_primitive_set_input =
@@ -109,7 +109,7 @@ int main(int argc, char **argv)
                 runtime_dir + BLUE_PRIMITIVE_SET, [&](TbotsProto::PrimitiveSet input) {
                     std::scoped_lock lock(simulator_mutex);
                     er_force_sim->setBlueRobotPrimitiveSet(
-                        input, std::make_unique<TbotsProto::Vision>(blue_vision));
+                        input, std::make_unique<TbotsProto::World>(blue_vision));
                 });
 
         // Simulator Tick Input

@@ -32,7 +32,7 @@ class UnixSimulatorBackend : public Backend
     std::unique_ptr<ThreadedProtoUnixListener<SensorProto>> sensor_proto_input;
 
     // Outputs
-    std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::Vision>> vision_output;
+    std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::World>> world_output;
     std::unique_ptr<ThreadedProtoUnixSender<TbotsProto::PrimitiveSet>> primitive_output;
     std::unique_ptr<ThreadedProtoUnixSender<DefendingSideProto>> defending_side_output;
 };

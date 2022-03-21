@@ -15,8 +15,8 @@ SSL_WRAPPER_PACKET_PATH = "/ssl_wrapper_packet"
 BLUE_ROBOT_STATUS_PATH = "/blue_robot_status"
 YELLOW_ROBOT_STATUS_PATH = "/yellow_robot_status"
 SIMULATION_TICK_PATH = "/simulation_tick"
-YELLOW_VISION_PATH = "/yellow_vision"
-BLUE_VISION_PATH = "/blue_vision"
+YELLOW_WORLD_PATH = "/yellow_world"
+BLUE_WORLD_PATH = "/blue_world"
 BLUE_PRIMITIVE_SET = "/blue_primitive_set"
 YELLOW_PRIMITIVE_SET = "/yellow_primitive_set"
 
@@ -33,8 +33,8 @@ class ErForceSimulator(object):
         # inputs to er_force_simulator_main
         self.sim_tick_sender = ThreadedUnixSender(runtime_dir + SIMULATION_TICK_PATH)
         self.world_state_sender = ThreadedUnixSender(runtime_dir + WORLD_STATE_PATH)
-        self.blue_vision_sender = ThreadedUnixSender(runtime_dir + BLUE_VISION_PATH)
-        self.yellow_vision_sender = ThreadedUnixSender(runtime_dir + YELLOW_VISION_PATH)
+        self.blue_world_sender = ThreadedUnixSender(runtime_dir + BLUE_WORLD_PATH)
+        self.yellow_world_sender = ThreadedUnixSender(runtime_dir + YELLOW_WORLD_PATH)
         self.blue_primitive_set_sender = ThreadedUnixSender(
             runtime_dir + BLUE_PRIMITIVE_SET
         )
@@ -189,24 +189,24 @@ class ErForceSimulator(object):
         tick.milliseconds = duration_ms
         self.sim_tick_sender.send(tick)
 
-    def send_blue_primitive_set_and_vision(self, vision, primitive_set):
-        """Blue primitive set and vision
+    def send_blue_primitive_set_and_world(self, world, primitive_set):
+        """Blue primitive set and world
 
-        :param vision: The vision msg to send
+        :param world: The world msg to send
         :param primitive_set: The primitive set to send
 
         """
-        self.blue_vision_sender.send(vision)
+        self.blue_world_sender.send(world)
         self.blue_primitive_set_sender.send(primitive_set)
 
-    def send_yellow_primitive_set_and_vision(self, vision, primitive_set):
-        """Yellow primitive set and vision
+    def send_yellow_primitive_set_and_world(self, world, primitive_set):
+        """Yellow primitive set and world
 
-        :param vision: The vision msg to send
+        :param world: The world msg to send
         :param primitive_set: The primitive set to send
 
         """
-        self.yellow_vision_sender.send(vision)
+        self.yellow_world_sender.send(world)
         self.yellow_primitive_set_sender.send(primitive_set)
 
     def stop():
@@ -215,8 +215,8 @@ class ErForceSimulator(object):
         for unix_socket in [
             self.sim_tick_sender,
             self.world_state_sender,
-            self.blue_vision_sender,
-            self.yellow_vision_sender,
+            self.blue_world_sender,
+            self.yellow_world_sender,
             self.blue_primitive_set_sender,
             self.yellow_primitive_set_sender,
             self.ssl_wrapper_listener,

@@ -4,14 +4,13 @@ from proto.geometry_pb2 import Angle, AngularVelocity, Point, Vector
 from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
 from proto.robot_status_msg_pb2 import RobotStatus
 from proto.sensor_msg_pb2 import SensorProto
-from proto.tbots_software_msgs_pb2 import PrimitiveSet, Vision
-from proto.vision_pb2 import BallState, RobotState
-from proto.world_pb2 import SimulatorTick, WorldState
+from proto.tbots_software_msgs_pb2 import PrimitiveSet
+from proto.world_pb2 import SimulatorTick, WorldState, World
 
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.networking.threaded_unix_sender import ThreadedUnixSender
 
-VISION_INPUT_PATH = "/vision"
+VISION_INPUT_PATH = "/world"
 PRIMITIVE_INPUT_PATH = "/primitive"
 
 ROBOT_STATUS_OUTPUT_PATH = "/robot_status"
@@ -47,8 +46,8 @@ class FullSystem(object):
         )
 
         # outputs from full_system
-        self.vision_listener = ThreadedUnixListener(
-            runtime_dir + VISION_INPUT_PATH, Vision
+        self.world_listener = ThreadedUnixListener(
+            runtime_dir + VISION_INPUT_PATH, World
         )
         self.primitive_listener = ThreadedUnixListener(
             runtime_dir + PRIMITIVE_INPUT_PATH, PrimitiveSet
@@ -102,15 +101,15 @@ class FullSystem(object):
         """
         self.tactic_override.send(assigned_tactic_play_control_params)
 
-    def get_vision(self, block=False):
-        """Grabs the vision msg from the buffer if it exists, returns None
+    def get_world(self, block=False):
+        """Grabs the world msg from the buffer if it exists, returns None
         if buffer is empty.
 
         :param block: Whether or not we should block until we receive a packet
-        :return: Vision or None
+        :return: World or None
 
         """
-        return self.vision_listener.get_most_recent_message(block)
+        return self.world_listener.get_most_recent_message(block)
 
     def get_primitive_set(self):
         """Grabs the primitive msg set from the buffer if it exists, returns
@@ -132,7 +131,7 @@ class FullSystem(object):
             self.ssl_referee_sender,
             self.tactic_override,
             self.sensor_proto_sender,
-            self.vision_listener,
+            self.world_listener,
         ]:
             unix_socket.force_stop()
         self.primitive_listener.force_stop()

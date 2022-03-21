@@ -2,7 +2,6 @@ import pytest
 
 import software.geom.geometry as tbots_geom
 from proto.geometry_pb2 import Angle, AngularVelocity, Point, Vector
-from proto.tbots_software_msgs_pb2 import Vision
 from proto.validation_pb2 import ValidationGeometry, ValidationProto, ValidationStatus
 from proto.vision_pb2 import BallState, RobotState
 from proto.world_pb2 import SimulatorTick, World, WorldState
@@ -21,26 +20,26 @@ class RobotEntersRegion(Validation):
     def __init__(self, regions=None):
         self.regions = regions if regions else []
 
-    def get_validation_status(self, vision) -> ValidationStatus:
+    def get_validation_status(self, world) -> ValidationStatus:
         """Checks if _any_ robot enters the provided regions
 
-        :param vision: The vision msg to validate
+        :param world: The world msg to validate
         :returns: FAILING until a robot enters any of the regions
                   PASSING when a robot enters
         """
         for region in self.regions:
-            for robot_id, robot_states in vision.robot_states.items():
+            for robot in world.friendly_team.team_robots:
                 if tbots_geom.contains(
-                    region, tbots_geom.createPoint(robot_states.global_position)
+                    region, tbots_geom.createPoint(robot.current_state.global_position)
                 ):
                     return ValidationStatus.PASSING
 
         return ValidationStatus.FAILING
 
-    def get_validation_geometry(self, vision) -> ValidationGeometry:
+    def get_validation_geometry(self, world) -> ValidationGeometry:
         """Returns the underlying geometry this validation is checking
 
-        :param vision: The vision msg to validate
+        :param world: The world msg to create validation geometry from
         :returns: ValidationGeometry containing geometry to visualize
 
         """

@@ -117,19 +117,19 @@ class TacticTestRunner(object):
                 if self.enable_thunderscope:
                     time.sleep(tick_duration_s)
 
-                # Send the sensor_proto and get vision
+                # Send the sensor_proto and get world
                 ssl_wrapper = self.simulator.get_ssl_wrapper_packet(block=True)
                 self.yellow_full_system.send_sensor_proto(
                     self.simulator.get_yellow_sensor_proto(ssl_wrapper)
                 )
-                vision = self.yellow_full_system.get_vision(block=True)
+                world = self.yellow_full_system.get_world(block=True)
 
                 # Validate
                 (
                     eventually_validation_proto_set,
                     always_validation_proto_set,
                 ) = validation.run_validation_sequence_sets(
-                    vision,
+                    world,
                     eventually_validation_sequence_set,
                     always_validation_sequence_set,
                 )
@@ -145,8 +145,8 @@ class TacticTestRunner(object):
                 validation.check_validation(always_validation_proto_set)
 
                 # Step the primtives
-                self.simulator.send_yellow_primitive_set_and_vision(
-                    vision, self.yellow_full_system.get_primitive_set(),
+                self.simulator.send_yellow_primitive_set_and_world(
+                    world, self.yellow_full_system.get_primitive_set(),
                 )
 
             # Check that all eventually validations are eventually valid

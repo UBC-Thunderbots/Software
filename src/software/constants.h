@@ -24,7 +24,7 @@ static const std::string SIMULATOR_MULTICAST_CHANNELS[MAX_SIMULATOR_MULTICAST_CH
 
 // Unix Socket Paths
 const std::string TACTIC_OVERRIDE_UNIX_PATH = "/tactic_override";
-const std::string VISION_OUTPUT_PATH        = "/vision";
+const std::string WORLD_OUTPUT_PATH         = "/world";
 const std::string PRIMITIVE_OUTPUT_PATH     = "/primitive";
 const std::string ROBOT_STATUS_INPUT_PATH   = "/robot_status";
 const std::string DEFENDING_SIDE_OUTPUT     = "/defending_side";
@@ -36,7 +36,7 @@ const std::string SSL_WRAPPER_PACKET_PATH   = "/ssl_wrapper_packet";
 const std::string BLUE_ROBOT_STATUS_PATH    = "/blue_robot_status";
 const std::string YELLOW_ROBOT_STATUS_PATH  = "/yellow_robot_status";
 const std::string SIMULATION_TICK_PATH      = "/simulation_tick";
-const std::string YELLOW_VISION_PATH        = "/yellow_vision";
-const std::string BLUE_VISION_PATH          = "/blue_vision";
+const std::string YELLOW_WORLD_PATH         = "/yellow_world";
+const std::string BLUE_WORLD_PATH           = "/blue_world";
 const std::string BLUE_PRIMITIVE_SET        = "/blue_primitive_set";
 const std::string YELLOW_PRIMITIVE_SET      = "/yellow_primitive_set";

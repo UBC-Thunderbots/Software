@@ -14,6 +14,7 @@
 #include "proto/message_translation/ssl_simulation_robot_control.h"
 #include "proto/message_translation/ssl_wrapper.h"
 #include "proto/message_translation/tbots_protobuf.h"
+#include "proto/robot_status_msg.pb.h"
 #include "software/world/robot_state.h"
 
 ErForceSimulator::ErForceSimulator(
@@ -229,13 +230,11 @@ void ErForceSimulator::setRobots(
 
         if (side == gameController::Team::BLUE)
         {
-            blue_primitive_executor_map.insert(
-                {robot_state_with_id.id, robot_primitive_executor});
+            blue_primitive_executor_map.insert({id, robot_primitive_executor});
         }
         else
         {
-            yellow_primitive_executor_map.insert(
-                {robot_state_with_id.id, robot_primitive_executor});
+            yellow_primitive_executor_map.insert({id, robot_primitive_executor});
         }
     }
 }
