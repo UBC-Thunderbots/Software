@@ -124,10 +124,6 @@ class HRVOSimulator
                                   const Vector &curr_velocity, float max_speed,
                                   float max_accel, Path &path);
 
-<<<<<<< HEAD
-=======
-    // TODO (#2373): Remove goals list when goal is a part of Agent
->>>>>>> upstream/master
     /**
      *      Returns a new path with a single path point
      *
@@ -136,6 +132,8 @@ class HRVOSimulator
      * @return a Path object
      */
     Path addPath(const Vector &position, float goal_radius);
+
+    Path addPathPositions(const std::vector<PathPoint> &path_points, float goal_radius);
 
     /**
      * Performs a simulation step; updates the position, and velocity
@@ -253,19 +251,6 @@ class HRVOSimulator
     }
 
     /**
-<<<<<<< HEAD
-=======
-     *   Returns the count of goals in the simulation.
-     *
-     * @return The count of goals in the simulation.
-     */
-    std::size_t getNumGoals() const
-    {
-        return goals.size();
-    }
-
-    /**
->>>>>>> upstream/master
      *   Returns the time step of the simulation.
      *
      * @return The present time step of the simulation.
@@ -316,20 +301,14 @@ class HRVOSimulator
     std::unique_ptr<KdTree> kd_tree;
 
     // List of agents (robots) in this simulation
-<<<<<<< HEAD
-    std::vector<std::unique_ptr<Agent>> agents_;
-=======
     std::vector<std::shared_ptr<Agent>> agents;
->>>>>>> upstream/master
 
     // robot id to agent index
     std::map<unsigned int, unsigned int> friendly_robot_id_map;
     std::map<unsigned int, unsigned int> enemy_robot_id_map;
 
    public:
-    // TODO (#2373): Remove goals list when goal is a part of Agent
-    std::vector<std::unique_ptr<Goal>> goals;
-
+   
     // The scale which friendly robots should be larger than friendly robots
     // This scale is used to avoid close encounters, and reduce chance of collision
     static constexpr float FRIENDLY_ROBOT_RADIUS_SCALE = 1.25f;

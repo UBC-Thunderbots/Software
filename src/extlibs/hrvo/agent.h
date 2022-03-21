@@ -21,7 +21,7 @@ class Agent
      * @param prefVelocity       The preferred velocity of this agent.
      * @param maxSpeed           The maximum speed of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
-     * @peram path               The path for this agent
+     * @param path               The path for this agent
      * @param goalRadius         The goal radius of this agent.
      */
     Agent(HRVOSimulator *simulator, const Vector &position, float radius,
@@ -172,5 +172,5 @@ class Agent
     float max_accel_;
     bool reached_goal_;
 
-    Simulator *const simulator_;
+    HRVOSimulator *const simulator_;
 };

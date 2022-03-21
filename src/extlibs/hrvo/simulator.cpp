@@ -140,21 +140,7 @@ void HRVOSimulator::updateWorld(const World &world)
     //               update its radius based on the PrimitiveSet
     if (add_ball_agent)
     {
-<<<<<<< HEAD
-        // Ball should be treated as an agent (obstacle)
-        const Ball &ball = world.ball();
-        Vector position(ball.position().x(), ball.position().y());
-        Vector velocity(ball.velocity().x(), ball.velocity().y());
-        Vector goal_pos    = position + 100 * velocity;
-        float acceleration = ball.acceleration().length();
-        // Minimum of 0.5-meter distance away from the ball, if the ball is an obstacle
-        float ball_radius = 0.5f + BALL_AGENT_RADIUS_OFFSET;
-
-        Path path = addPath(goal_pos, 0.1f);
-        addLinearVelocityAgent(position, ball_radius, velocity, velocity.length(),
-                               acceleration, path);
-=======
-        if (ball_agent_id == -1)
+        if (ball_agent_id == -1) 
         {
             // Ball should be treated as an agent (obstacle)
             const Ball &ball = world.ball();
@@ -162,13 +148,13 @@ void HRVOSimulator::updateWorld(const World &world)
             Vector velocity(ball.velocity().x(), ball.velocity().y());
             Vector goal_pos    = position + 100 * velocity;
             float acceleration = ball.acceleration().length();
-            // Minimum of 0.5-meter distance away from the ball, if the ball is an
+            // Minimum of 0.5-meter distance away from the ball, if the ball is an 
             // obstacle
             float ball_radius = 0.5f + BALL_AGENT_RADIUS_OFFSET;
 
-            std::size_t agent_index =
-                addLinearVelocityAgent(position, ball_radius, velocity, velocity.length(),
-                                       acceleration, addGoal(goal_pos), 0.1f);
+            Path path = addPath(goal_pos, 0.1f);
+            std::size_t agent_index = addLinearVelocityAgent(position, ball_radius, velocity, velocity.length(),
+                                acceleration, path);
             ball_agent_id = agent_index;
         }
         else
@@ -177,10 +163,9 @@ void HRVOSimulator::updateWorld(const World &world)
             agents[ball_agent_id]->setPosition(position.toVector());
         }
     }
-    else if (ball_agent_id != -1)
+     else if (ball_agent_id != -1)
     {
         agents[ball_agent_id]->setRadius(0.f);
->>>>>>> upstream/master
     }
 }
 
@@ -198,44 +183,22 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
         auto hrvo_agent = getFriendlyAgentFromRobotId(robot_id);
         if (hrvo_agent.has_value())
         {
-<<<<<<< HEAD
-            unsigned int agent_index = agent_index_iter->second;
-            if (agent_index < agents_.size())
-            {
-                Path path = agents_[agent_index]->getPath();
-                path.getPathVector().clear();
-
-                // if there is new instructions, get destination, create path point, add
-                // to path
-                if (primitive.has_move())
-                {
-                    // TODO (#2418): Update implementation of Primitive to support
-                    // multiple path points
-
-                    auto destination = primitive.move().path().point().at(0);
-                    path.getPathVector().emplace_back(
-                        PathPoint(Vector(static_cast<float>(destination.x_meters()),
-                                         static_cast<float>(destination.y_meters()))));
-                }
-=======
-            std::unique_ptr<Goal> &goal = goals[hrvo_agent.value()->getGoalIndex()];
-            goal->positions_.clear();
-            goal->speedAtPosition_.clear();
+            //TODO change raw pointer
+            const Path *path = &hrvo_agent.value()->getPath();
+            path->getPathVector().clear();
 
             if (primitive.has_move())
             {
                 // TODO (#2418): Update implementation of Primitive to support
                 // multiple path points
                 auto destination = primitive.move().path().point().at(0);
-                goal->positions_.emplace_back(static_cast<float>(destination.x_meters()),
-                                              static_cast<float>(destination.y_meters()));
-                goal->speedAtPosition_.emplace_back(
-                    primitive.move().final_speed_m_per_s());
-
+                path->getPathVector().emplace_back(
+                    PathPoint(Vector(static_cast<float>(destination.x_meters()),
+                                        static_cast<float>(destination.y_meters())), primitive.move().final_speed_m_per_s()));
+                
                 float new_max_speed = primitive.move().max_speed_m_per_s();
                 hrvo_agent.value()->setMaxSpeed(new_max_speed);
                 hrvo_agent.value()->setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
->>>>>>> upstream/master
             }
         }
     }
@@ -287,19 +250,15 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
             max_speed     = move_primitive.max_speed_m_per_s();
         }
     }
-    Path path = addPath(destination_point, goal_radius);
 
     // Max distance which the robot can travel in one time step + scaling
-    float goal_radius        = (max_speed * time_step) / 2 * GOAL_RADIUS_SCALE;
+    float path_radius        = (max_speed * time_step) / 2 * GOAL_RADIUS_SCALE;
     float uncertainty_offset = 0.f;
 
+    Path path = addPath(destination_point, path_radius);
+
     return addHRVOAgent(position, agent_radius, velocity, max_speed, pref_speed,
-<<<<<<< HEAD
-                        max_accel, path, MAX_NEIGHBOR_SEARCH_DIST, max_neighbors,
-=======
-                        max_accel, addGoalPositions({destination_point}, {speed_at_goal}),
-                        goal_radius, MAX_NEIGHBOR_SEARCH_DIST, MAX_NEIGHBORS,
->>>>>>> upstream/master
+                        max_accel, path, MAX_NEIGHBOR_SEARCH_DIST, MAX_NEIGHBORS,
                         uncertainty_offset);
 }
 
@@ -323,88 +282,43 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
                                   path);
 }
 
-<<<<<<< HEAD
-std::size_t Simulator::addHRVOAgent(const Vector &position, float agent_radius,
+std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radius,
                                     const Vector &curr_velocity, float maxSpeed,
                                     float prefSpeed, float maxAccel, Path &path,
                                     float neighborDist, std::size_t maxNeighbors,
                                     float uncertaintyOffset)
 {
-    std::unique_ptr<HRVOAgent> agent = std::make_unique<HRVOAgent>(
+    std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
         this, position, neighborDist, maxNeighbors, agent_radius, curr_velocity, maxAccel,
         path, prefSpeed, maxSpeed, uncertaintyOffset);
-    agents_.push_back(std::move(agent));
-    return agents_.size() - 1;
-}
-
-size_t Simulator::addLinearVelocityAgent(const Vector &position, float agent_radius,
-                                         const Vector &curr_velocity, float max_speed,
-                                         float max_accel, Path &path)
-{
-    std::unique_ptr<LinearVelocityAgent> agent = std::make_unique<LinearVelocityAgent>(
-        this, position, agent_radius, curr_velocity, max_speed, max_accel, path);
-=======
-std::size_t HRVOSimulator::addHRVOAgent(const Vector &position, float agent_radius,
-                                        const Vector &curr_velocity, float maxSpeed,
-                                        float prefSpeed, float maxAccel,
-                                        std::size_t goal_index, float goalRadius,
-                                        float neighborDist, std::size_t maxNeighbors,
-                                        float uncertaintyOffset)
-{
-    std::shared_ptr<HRVOAgent> agent = std::make_shared<HRVOAgent>(
-        this, position, goal_index, neighborDist, maxNeighbors, agent_radius,
-        curr_velocity, maxAccel, goalRadius, prefSpeed, maxSpeed, uncertaintyOffset);
     agents.push_back(std::move(agent));
     return agents.size() - 1;
 }
 
 size_t HRVOSimulator::addLinearVelocityAgent(const Vector &position, float agent_radius,
-                                             const Vector &curr_velocity, float max_speed,
-                                             float max_accel, size_t goal_index,
-                                             float goal_radius)
+                                         const Vector &curr_velocity, float max_speed,
+                                         float max_accel, Path &path)
 {
     std::shared_ptr<LinearVelocityAgent> agent = std::make_shared<LinearVelocityAgent>(
-        this, position, agent_radius, curr_velocity, max_speed, max_accel, goal_index,
-        goal_radius);
->>>>>>> upstream/master
+        this, position, agent_radius, curr_velocity, max_speed, max_accel, path);
 
     agents.push_back(std::move(agent));
     return agents.size() - 1;
 }
 
-<<<<<<< HEAD
-Path Simulator::addPath(const Vector &position, float goal_radius)
+Path HRVOSimulator::addPath(const Vector &position, float goal_radius)
 {
     std::vector<PathPoint> path_points;
     path_points.emplace_back(position);
     Path path(path_points, goal_radius);
     return path;
-=======
-std::size_t HRVOSimulator::addGoal(const Vector &position)
-{
-    std::unique_ptr<Goal> goal = std::make_unique<Goal>(position);
-    goals.push_back(std::move(goal));
-
-    return goals.size() - 1;
 }
 
-std::size_t HRVOSimulator::addGoalPositions(const std::vector<Vector> &positions)
+Path HRVOSimulator::addPathPositions(const std::vector<PathPoint> &path_points, float goal_radius) 
 {
-    std::unique_ptr<Goal> goal = std::make_unique<Goal>(positions);
-    goals.push_back(std::move(goal));
-
-    return goals.size() - 1;
-}
-
-std::size_t HRVOSimulator::addGoalPositions(const std::vector<Vector> &positions,
-                                            const std::vector<float> &speedAtPosition)
-{
-    std::unique_ptr<Goal> goal = std::make_unique<Goal>(positions, speedAtPosition);
-    goals.push_back(std::move(goal));
-
-    return goals.size() - 1;
->>>>>>> upstream/master
-}
+    Path path(path_points, goal_radius);
+    return path;
+} 
 
 void HRVOSimulator::doStep()
 {
