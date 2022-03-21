@@ -7,7 +7,6 @@ import pytest
 import software.geom.geometry as tbots_geom
 from proto.import_all_protos import *
 
-from software.constants import SECONDS_TO_MS
 from pyqtgraph.Qt import QtCore, QtGui
 
 from software.networking.threaded_unix_sender import ThreadedUnixSender
@@ -17,6 +16,7 @@ from software.simulated_tests import validation
 from software.simulated_tests.full_system import FullSystem
 from software.simulated_tests.er_force_simulator import ErForceSimulator
 from software.thunderscope.thunderscope import Thunderscope
+from software.py_constants import MILLISECONDS_PER_SECOND
 
 from software.logger.logger import createLogger
 
@@ -111,7 +111,7 @@ class TacticTestRunner(object):
 
             while time_elapsed_s < test_timeout_s:
 
-                self.simulator.tick(tick_duration_s * SECONDS_TO_MS)
+                self.simulator.tick(tick_duration_s * MILLISECONDS_PER_SECOND)
                 time_elapsed_s += tick_duration_s
 
                 if self.enable_thunderscope:

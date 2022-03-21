@@ -84,12 +84,12 @@ int main(int argc, char **argv)
 
         // World Input: Buffer vision until we have primitives to tick
         // the simulator with
-        auto blue_vision_input = ThreadedProtoUnixListener<TbotsProto::World>(
+        auto blue_world_input = ThreadedProtoUnixListener<TbotsProto::World>(
             runtime_dir + BLUE_WORLD_PATH, [&](TbotsProto::World input) {
                 std::scoped_lock lock(simulator_mutex);
                 blue_vision = input;
             });
-        auto yellow_vision_input = ThreadedProtoUnixListener<TbotsProto::World>(
+        auto yellow_world_input = ThreadedProtoUnixListener<TbotsProto::World>(
             runtime_dir + YELLOW_WORLD_PATH, [&](TbotsProto::World input) {
                 std::scoped_lock lock(simulator_mutex);
                 yellow_vision = input;

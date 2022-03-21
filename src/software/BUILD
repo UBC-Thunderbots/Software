@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+
 cc_binary(
     # TODO (#2510) Rename to full_system
     name = "unix_full_system",
@@ -115,17 +117,26 @@ cc_library(
     hdrs = ["constants.h"],
 )
 
+pybind_library(
+    name = "py_constants_lib",
+    srcs = ["py_constants.cpp"],
+    deps = [
+        ":constants",
+        "//shared:constants",
+    ],
+)
+
+pybind_extension(
+    name = "py_constants",
+    deps = [
+        ":py_constants_lib",
+    ],
+)
+
 sh_binary(
     name = "restart_on_crash",
     srcs = ["restart_on_crash.sh"],
     deps = [
         "@bazel_tools//tools/bash/runfiles",
-    ],
-)
-
-py_library(
-    name = "py_constants",
-    srcs = [
-        "constants.py",
     ],
 )

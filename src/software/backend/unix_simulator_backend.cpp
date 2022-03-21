@@ -17,36 +17,36 @@ UnixSimulatorBackend::UnixSimulatorBackend(std::shared_ptr<const BackendConfig> 
     // Protobuf Inputs
     robot_status_input.reset(new ThreadedProtoUnixListener<TbotsProto::RobotStatus>(
         config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
-            ROBOT_STATUS_INPUT_PATH,
+            ROBOT_STATUS_PATH,
         boost::bind(&Backend::receiveRobotStatus, this, _1)));
 
     ssl_wrapper_input.reset(new ThreadedProtoUnixListener<SSLProto::SSL_WrapperPacket>(
         config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
-            SSL_WRAPPER_INPUT_PATH,
+            SSL_WRAPPER_PATH,
         boost::bind(&Backend::receiveSSLWrapperPacket, this, _1)));
 
     ssl_referee_input.reset(new ThreadedProtoUnixListener<SSLProto::Referee>(
         config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
-            SSL_REFEREE_INPUT_PATH,
+            SSL_REFEREE_PATH,
         boost::bind(&Backend::receiveSSLReferee, this, _1)));
 
     sensor_proto_input.reset(new ThreadedProtoUnixListener<SensorProto>(
         config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
-            SENSOR_PROTO_INPUT_PATH,
+            SENSOR_PROTO_PATH,
         boost::bind(&Backend::receiveSensorProto, this, _1)));
 
     // Protobuf Outputs
     world_output.reset(new ThreadedProtoUnixSender<TbotsProto::World>(
         config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
-        WORLD_OUTPUT_PATH));
+        WORLD_PATH));
 
     primitive_output.reset(new ThreadedProtoUnixSender<TbotsProto::PrimitiveSet>(
         config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
-        PRIMITIVE_OUTPUT_PATH));
+        PRIMITIVE_PATH));
 
     defending_side_output.reset(new ThreadedProtoUnixSender<DefendingSideProto>(
         config->getFullSystemMainCommandLineArgs()->getRuntimeDir()->value() +
-        DEFENDING_SIDE_OUTPUT));
+        DEFENDING_SIDE));
 }
 
 void UnixSimulatorBackend::onValueReceived(TbotsProto::PrimitiveSet primitives)

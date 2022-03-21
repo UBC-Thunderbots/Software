@@ -1,24 +1,10 @@
 from subprocess import Popen
 
-from proto.geometry_pb2 import Angle, AngularVelocity, Point, Vector
-from proto.messages_robocup_ssl_wrapper_pb2 import SSL_WrapperPacket
-from proto.robot_status_msg_pb2 import RobotStatus
-from proto.sensor_msg_pb2 import SensorProto
-from proto.tbots_software_msgs_pb2 import PrimitiveSet
-from proto.world_pb2 import SimulatorTick, WorldState, World
+from proto.import_all_protos import *
 
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.networking.threaded_unix_sender import ThreadedUnixSender
-
-VISION_INPUT_PATH = "/world"
-PRIMITIVE_INPUT_PATH = "/primitive"
-
-ROBOT_STATUS_OUTPUT_PATH = "/robot_status"
-SSL_WRAPPER_OUTPUT_PATH = "/ssl_wrapper"
-SSL_REFEREE_OUTPUT_PATH = "/ssl_referee"
-SENSOR_PROTO_OUTPUT_PATH = "/sensor_proto"
-
-TACTIC_OVERRIDE_PATH = "/tactic_override"
+from software.py_constants import *
 
 
 class FullSystem(object):
@@ -32,25 +18,15 @@ class FullSystem(object):
         """
 
         # inputs to full_system
-        self.robot_status_sender = ThreadedUnixSender(
-            runtime_dir + ROBOT_STATUS_OUTPUT_PATH
-        )
-        self.ssl_wrapper_sender = ThreadedUnixSender(
-            runtime_dir + SSL_WRAPPER_OUTPUT_PATH
-        )
-        self.ssl_referee_sender = ThreadedUnixSender(
-            runtime_dir + SSL_REFEREE_OUTPUT_PATH
-        )
-        self.sensor_proto_sender = ThreadedUnixSender(
-            runtime_dir + SENSOR_PROTO_OUTPUT_PATH
-        )
+        self.robot_status_sender = ThreadedUnixSender(runtime_dir + ROBOT_STATUS_PATH)
+        self.ssl_wrapper_sender = ThreadedUnixSender(runtime_dir + SSL_WRAPPER_PATH)
+        self.ssl_referee_sender = ThreadedUnixSender(runtime_dir + SSL_REFEREE_PATH)
+        self.sensor_proto_sender = ThreadedUnixSender(runtime_dir + SENSOR_PROTO_PATH)
 
         # outputs from full_system
-        self.world_listener = ThreadedUnixListener(
-            runtime_dir + VISION_INPUT_PATH, World
-        )
+        self.world_listener = ThreadedUnixListener(runtime_dir + WORLD_PATH, World)
         self.primitive_listener = ThreadedUnixListener(
-            runtime_dir + PRIMITIVE_INPUT_PATH, PrimitiveSet
+            runtime_dir + PRIMITIVE_PATH, PrimitiveSet
         )
 
         # override the tactic

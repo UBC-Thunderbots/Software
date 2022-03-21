@@ -29,3 +29,7 @@ build --disk_cache=~/.cache/thunderbots_bazel_disk_cache
 # to find the X-Window system and create windows
 build --test_env=XDG_RUNTIME_DIR
 build --test_env=DISPLAY
+
+# Setup python bin/lib to point to our venv
+build --define=PYTHON_BIN_PATH=/opt/tbotspython/bin/python3
+build --define=PYTHON_LIB_PATH=/opt/tbotspython/lib/python3.8

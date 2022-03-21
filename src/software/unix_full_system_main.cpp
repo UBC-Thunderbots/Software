@@ -48,7 +48,7 @@ int main(int argc, char** argv)
         // Overrides
         auto tactic_override_listener =
             ThreadedProtoUnixListener<TbotsProto::AssignedTacticPlayControlParams>(
-                runtime_path + TACTIC_OVERRIDE_UNIX_PATH,
+                runtime_path + TACTIC_OVERRIDE_PATH,
                 [&ai](TbotsProto::AssignedTacticPlayControlParams input) {
                     ai->overrideTactics(input);
                 });

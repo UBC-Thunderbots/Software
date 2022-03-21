@@ -121,11 +121,13 @@ py_library(
     srcs = [
         "simulated_test_fixture.py",
     ],
+    data = [
+        "//software:py_constants.so",
+    ],
     deps = [
         ":er_force_simulator",
         ":full_system",
         "//proto:import_all_protos",
-        "//software:py_constants",
         "//software/logger:py_logger",
         "//software/networking:threaded_unix_listener_py",
         "//software/networking:threaded_unix_sender_py",
@@ -141,6 +143,7 @@ py_library(
     ],
     data = [
         "//software:er_force_simulator_main",
+        "//software:py_constants.so",
     ],
     deps = [
         "//proto:software_py_proto",
@@ -157,6 +160,7 @@ py_library(
         "full_system.py",
     ],
     data = [
+        "//software:py_constants.so",
         "//software:unix_full_system",
         "//software/geom:geometry.so",
     ],
@@ -177,6 +181,7 @@ py_library(
         "validation.py",
     ],
     data = [
+        "//software:py_constants.so",
         "//software/geom:geometry.so",
     ],
     deps = [

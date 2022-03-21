@@ -9,16 +9,7 @@ from proto.world_pb2 import SimulatorTick, WorldState
 
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.networking.threaded_unix_sender import ThreadedUnixSender
-
-WORLD_STATE_PATH = "/world_state"
-SSL_WRAPPER_PACKET_PATH = "/ssl_wrapper_packet"
-BLUE_ROBOT_STATUS_PATH = "/blue_robot_status"
-YELLOW_ROBOT_STATUS_PATH = "/yellow_robot_status"
-SIMULATION_TICK_PATH = "/simulation_tick"
-YELLOW_WORLD_PATH = "/yellow_world"
-BLUE_WORLD_PATH = "/blue_world"
-BLUE_PRIMITIVE_SET = "/blue_primitive_set"
-YELLOW_PRIMITIVE_SET = "/yellow_primitive_set"
+from software.py_constants import *
 
 
 class ErForceSimulator(object):

@@ -15,13 +15,11 @@ else:
     import PyQt6
 
 import pyqtgraph
-from proto.geometry_pb2 import Circle, Polygon
-from proto.visualization_pb2 import NamedValue, Obstacles, PathVisualization
-from proto.robot_log_msg_pb2 import RobotLog
-from proto.world_pb2 import World
 from pyqtgraph.dockarea import *
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import QVBoxLayout, QWidget
+
+from proto.import_all_protos import *
 
 from software.networking import threaded_unix_sender
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
