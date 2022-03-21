@@ -3,7 +3,7 @@
 #include "extlibs/hrvo/path.h"
 #include "software/geom/vector.h"
 
-class Simulator;
+class HRVOSimulator;
 
 /**
  * An agent/robot in the HRVO simulation.
@@ -24,7 +24,7 @@ class Agent
      * @peram path               The path for this agent
      * @param goalRadius         The goal radius of this agent.
      */
-    Agent(Simulator *simulator, const Vector &position, float radius,
+    Agent(HRVOSimulator *simulator, const Vector &position, float radius,
           const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
           float maxAccel, Path &path);
 
@@ -128,6 +128,30 @@ class Agent
      */
     const Path &getPath() const;
 
+    /**
+     * Update position of Agent
+     * @param position New position
+     */
+    void setPosition(const Vector &position);
+
+    /**
+     * Update radius of Agent
+     * @param radius New radius
+     */
+    void setRadius(float radius);
+
+    /**
+     * Update the velocity of Agent
+     * @param velocity New velocity
+     */
+    void setVelocity(const Vector &velocity);
+
+    /**
+     * Update the max speed of Agent
+     * @param max_speed New max speed
+     */
+    void setMaxSpeed(float max_speed);
+
    protected:
     // Agent Properties
     Vector position_;
@@ -137,7 +161,9 @@ class Agent
     Vector velocity_;
     // The requested new velocity of this Agent
     Vector new_velocity_;
-    // The desired new velocity of this Agent
+    // The desired new speed of this Agent
+    // NOTE: HRVO algorithm will try to pick this speed, however, it may pick a different
+    // speed to avoid collisions.
     Vector pref_velocity_;
     // The path of this Agent
     Path path;

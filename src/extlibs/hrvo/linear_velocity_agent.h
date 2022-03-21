@@ -21,7 +21,7 @@ class LinearVelocityAgent : public Agent
      * @param maxAccel    The maximum acceleration of this agent.
      * @param path        The path of this agent
      */
-    LinearVelocityAgent(Simulator *simulator, const Vector &position, float radius,
+    LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position, float radius,
                         const Vector &velocity, float maxSpeed, float maxAccel,
                         Path &path);
 

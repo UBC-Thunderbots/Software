@@ -108,7 +108,7 @@ echo "Setting Up Virtual Python Environment"
 echo "================================================================"
 
 # delete tbotspython first
-sudo rm -r /opt/tbotspython
+sudo rm -rf /opt/tbotspython
 
 if ! sudo /usr/bin/python3.8 -m venv /opt/tbotspython ; then
     echo "##############################################################"
@@ -130,6 +130,26 @@ if ! sudo /opt/tbotspython/bin/pip3 install pyqt5  ; then
     echo "Error: Installing pyqt5 failed"
     echo "##############################################################"
     exit 1
+fi
+
+# TODO (#2515) move iterfzf and thefuzz to requirements.txt
+if ! sudo /opt/tbotspython/bin/pip3 install iterfzf  ; then
+    echo "##############################################################"
+    echo "Error: Installing iterfzf failed"
+    echo "##############################################################"
+    exit 1
+fi
+
+if ! sudo /opt/tbotspython/bin/pip3 install thefuzz  ; then
+    echo "##############################################################"
+    echo "Error: Installing thefuzz failed"
+    echo "##############################################################"
+    exit 1
+fi
+
+# TODO (#2515) move to requirements.txt
+if [[ $(lsb_release -rs) == "20.04" ]]; then
+    sudo /opt/tbotspython/bin/pip3 install python-Levenshtein
 fi
 
 if ! sudo /opt/tbotspython/bin/pip3 install --upgrade protobuf  ; then
