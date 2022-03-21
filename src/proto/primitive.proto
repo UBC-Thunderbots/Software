@@ -10,6 +10,17 @@ enum BallCollisionType
     AVOID = 1;
 }
 
+message MotionControl
+{
+    Path path                             = 1;
+    double path_length                    = 2;
+    BallCollisionType ball_collision_type = 3;
+    // A half meter radius around the ball
+    bool half_meter_around_ball = 4;
+    // Path between ball and placement point in ball placement
+    bool avoid_ball_placement_interference = 5;
+}
+
 enum DribblerMode
 {
     OFF        = 0;
@@ -61,18 +72,13 @@ message MovePrimitive
         };
     }
 
-    Path path                             = 1;
-    float final_speed_m_per_s             = 2;
-    Angle final_angle                     = 3;
-    float dribbler_speed_rpm              = 4;
-    float max_speed_m_per_s               = 5;
-    AutoChipOrKick auto_chip_or_kick      = 6;
-    float target_spin_rev_per_s           = 7;
-    BallCollisionType ball_collision_type = 8;
-    // A half meter radius around the ball
-    bool half_meter_around_ball = 9;
-    // Path between ball and placement point in ball placement
-    bool avoid_ball_placement_interference = 10;
+    MotionControl motion_control     = 1;
+    float final_speed_m_per_s        = 2;
+    Angle final_angle                = 3;
+    float dribbler_speed_rpm         = 4;
+    float max_speed_m_per_s          = 5;
+    AutoChipOrKick auto_chip_or_kick = 6;
+    float target_spin_rev_per_s      = 7;
 }
 
 message StopPrimitive

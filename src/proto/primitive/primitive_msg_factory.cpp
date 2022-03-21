@@ -13,7 +13,8 @@ std::unique_ptr<TbotsProto::Primitive> createMovePrimitive(
 
     TbotsProto::Path path_proto;
     *(path_proto.add_point()) = *createPointProto(Point(dest.x(), dest.y()));
-    *(move_primitive_msg->mutable_move()->mutable_path()) = path_proto;
+    *(move_primitive_msg->mutable_move()->mutable_motion_control()->mutable_path()) =
+        path_proto;
 
     auto final_angle_msg = createAngleProto(final_angle);
     *(move_primitive_msg->mutable_move()->mutable_final_angle()) = *final_angle_msg;
@@ -74,7 +75,8 @@ std::unique_ptr<TbotsProto::Primitive> createCostedMovePrimitive(
     auto final_angle_msg = createAngleProto(final_angle);
     *(move_primitive_msg->mutable_move()->mutable_final_angle()) = *final_angle_msg;
     *(path_proto.add_point())                                    = *dest_msg;
-    *(move_primitive_msg->mutable_move()->mutable_path())        = path_proto;
+    *(move_primitive_msg->mutable_move()->mutable_motion_control()->mutable_path()) =
+        path_proto;
     move_primitive_msg->mutable_move()->set_final_speed_m_per_s(
         static_cast<float>(final_speed));
     move_primitive_msg->mutable_move()->set_max_speed_m_per_s(
@@ -101,11 +103,15 @@ std::unique_ptr<TbotsProto::Primitive> createCostedMovePrimitive(
 
     if (ball_collision_type == TbotsProto::BallCollisionType::ALLOW)
     {
-        move_primitive_msg->mutable_move()->set_ball_collision_type(TbotsProto::ALLOW);
+        move_primitive_msg->mutable_move()
+            ->mutable_motion_control()
+            ->set_ball_collision_type(TbotsProto::ALLOW);
     }
     else
     {
-        move_primitive_msg->mutable_move()->set_ball_collision_type(TbotsProto::AVOID);
+        move_primitive_msg->mutable_move()
+            ->mutable_motion_control()
+            ->set_ball_collision_type(TbotsProto::AVOID);
     }
 
     move_primitive_msg->mutable_move()->set_target_spin_rev_per_s(
