@@ -47,74 +47,100 @@ class HomeScreen(Screen):
         self.cap_voltage = redis_dict["cap voltage"]
         self.packet_loss = redis_dict["packet loss"]
 
+
+
         def draw_screen():
             """ Home Screen Layout """
+            def setup_robot_id(x, y):
+                """ Draw the robot id setting on the screen """
+                robot_id_str = "Robot ID"
+                self.lcd_display.draw.text(
+                    (x, y), robot_id_str, font=self.font, fill=constants.WHITE
+                )
+                
+                channel_id_x = x + self.font.getsize(robot_id_str)[0] + cursor_size + constants.PADDING
+                
+                x = self.font.getsize(robot_id_str)[0] / 2
+                y += self.font_size
+                self.lcd_display.draw.text(
+                    (x, y), str(int(self.actions[ROBOT_ID_INDEX]["value"])), font=self.big_font, fill=constants.YELLOW
+                )
+
+                return channel_id_x
+
+            def setup_channel_id(x, y):
+                """ Draw the channel id setting on the screen """
+                channel_id_str = "Channel ID"
+                self.lcd_display.draw.text(
+                    (x, y), channel_id_str, font=self.font, fill=constants.WHITE
+                )
+                y += self.font.getsize(channel_id_str)[1]
+                x += self.font.getsize(channel_id_str)[0] / 2
+                self.lcd_display.draw.text(
+                    (x, y),
+                    str(int(self.actions[CHANNEL_ID_INDEX]["value"])),
+                    font=self.big_font,
+                    fill=constants.YELLOW,
+                )
+
+            def setup_battery_voltage(x, y):
+                """ Draw the battery voltage diagnostic on the screen """
+                battery_str = "Battery Voltage: "
+                x = cursor_size
+
+                y = BATTERY_VOLTAGE_BASE
+                self.lcd_display.draw.text(
+                    (x, y), battery_str, font=self.font, fill=constants.WHITE
+                )
+                x += (self.font.getsize(battery_str))[0]
+                self.lcd_display.draw.text(
+                    (x, y),
+                    str(round(self.battery_voltage, 1)),
+                    font=self.font,
+                    fill=constants.YELLOW,
+                )
+
+                return y + self.font_size
+
+            def setup_capacitor_voltage(x, y):
+                """ Draw the capacitor voltage diagnostic on the screen """
+                cap_str = "Capacitor Voltage: "
+                x = cursor_size
+                self.lcd_display.draw.text((x, y), cap_str, font=self.font, fill=constants.WHITE)
+                x += (self.font.getsize(cap_str))[0]
+                self.lcd_display.draw.text(
+                    (x, y), str(round(self.cap_voltage, 1)), font=self.font, fill=constants.YELLOW
+                )
+
+                return y + self.font_size
+
+            def setup_packet_loss(x, y):
+                """ Draw the packet loss diagnostic on the screen """
+                packet_loss_str = "Packet Loss %: "
+                x = cursor_size
+                self.lcd_display.draw.text(
+                    (x, y), packet_loss_str, font=self.font, fill=constants.WHITE
+                )
+                x += (self.font.getsize(packet_loss_str))[0]
+                self.lcd_display.draw.text(
+                    (x, y), str(round(self.packet_loss, 1)), font=self.font, fill=constants.YELLOW
+                )
+
             self.lcd_display.prepare()
 
             cursor_size = self.font.getsize(constants.CURSOR)[0]
 
             x = cursor_size
-            y = 20
+            y = constants.BASE_Y
 
-            robot_id_str = "Robot ID"
-            self.lcd_display.draw.text(
-                (x, y), robot_id_str, font=self.font, fill=constants.WHITE
-            )
+            x = setup_robot_id(x, y)
+            setup_channel_id(x, y)
 
-            x += self.font.getsize(robot_id_str)[0] + cursor_size + constants.PADDING
-            channel_id_str = "Channel ID"
-            self.lcd_display.draw.text(
-                (x, y), channel_id_str, font=self.font, fill=constants.WHITE
-            )
+            y = setup_battery_voltage(x, y)
+            y = setup_capacitor_voltage(x, y)
+            setup_packet_loss(x, y)
 
-            y += self.font.getsize(channel_id_str)[1]
-            x += self.font.getsize(channel_id_str)[0] / 2
-            self.lcd_display.draw.text(
-                (x, y),
-                str(int(self.actions[CHANNEL_ID_INDEX]["value"])),
-                font=self.big_font,
-                fill=constants.YELLOW,
-            )
-
-            x = self.font.getsize(robot_id_str)[0] / 2
-            self.lcd_display.draw.text(
-                (x, y), str(int(self.actions[ROBOT_ID_INDEX]["value"])), font=self.big_font, fill=constants.YELLOW
-            )
-
-            battery_str = "Battery Voltage: "
-            x = cursor_size
-            y = BATTERY_VOLTAGE_BASE
-            self.lcd_display.draw.text(
-                (x, y), battery_str, font=self.font, fill=constants.WHITE
-            )
-            x += (self.font.getsize(battery_str))[0]
-            self.lcd_display.draw.text(
-                (x, 48 + 12),
-                str(round(self.battery_voltage, 1)),
-                font=self.font,
-                fill=constants.YELLOW,
-            )
-
-            cap_str = "Capacitor Voltage: "
-            x = cursor_size
-            y += self.font_size
-            self.lcd_display.draw.text((x, y), cap_str, font=self.font, fill=constants.WHITE)
-            x += (self.font.getsize(cap_str))[0]
-            self.lcd_display.draw.text(
-                (x, y), str(round(self.cap_voltage, 1)), font=self.font, fill=constants.YELLOW
-            )
-
-            packet_loss_str = "Packet Loss %: "
-            x = cursor_size
-            y += self.font_size
-            self.lcd_display.draw.text(
-                (x, y), packet_loss_str, font=self.font, fill=constants.WHITE
-            )
-            x += (self.font.getsize(packet_loss_str))[0]
-            self.lcd_display.draw.text(
-                (x, y), str(round(self.packet_loss, 1)), font=self.font, fill=constants.YELLOW
-            )
-
+            # draw the back screen
             self.lcd_display.draw.text(
                 (cursor_size, self.lcd_display.height - constants.PADDING - self.font_size),
                 "Go to Menu screen",
@@ -122,10 +148,11 @@ class HomeScreen(Screen):
                 fill=constants.WHITE,
             )
 
+            # draw the cursor
             x = constants.BASE_X 
             y = constants.BASE_Y
             if self.curr_action == 1:
-                x = self.font.getsize(robot_id_str)[0] + cursor_size + constants.PADDING
+                x = self.font.getsize("Robot ID")[0] + cursor_size + constants.PADDING
             elif self.curr_action == 2:
                 y = self.lcd_display.height - constants.PADDING - self.font_size
 
