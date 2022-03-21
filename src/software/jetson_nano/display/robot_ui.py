@@ -4,6 +4,7 @@ import board
 from PIL import Image, ImageDraw, ImageOps
 import adafruit_rgb_display.st7735 as st7735
 
+# TODO: edit bazel build so don't need to import sys and append path
 sys.path.append("./screens/")
 sys.path.append("./lcd_user_interface/")
 sys.path.append("./rotary_encoder/")
@@ -14,10 +15,12 @@ from menu_screen import MenuScreen
 from wheels_screen import WheelsScreen
 from chip_and_kick_screen import ChipAndKickScreen
 
+import constants
+
 # Pins for Rotary Encoder
-BUTTON_PIN = "DAP4_DOUT" # BOARD 40, TEGRA_SOC: 'DAP4_DOUT'
-PIN_1 = "GPIO_PE6" # BOARD 33, TEGRA_SOC: 'GPIO_PE6'
-PIN_2 = "DAP4_FS" # BOARD 35, TEGRA_SOC: 'DAP4_FS'
+BUTTON_PIN = constants.BUTTON_PIN
+PIN_1 = constants.PIN_1
+PIN_2 = constants.PIN_2
 
 # These keys indicate how to handle return values
 class ScreenActions:
@@ -53,7 +56,7 @@ class RobotUi:
     def __init__(self):
 
         # Initialize redis server and our redis dictionary
-        self.redis_client = redis.Redis(host="localhost", port=6379, db=0)
+        self.redis_client = redis.Redis(host="localhost", port=constants.REDIS_PORT_NUMBER, db=0)
         self.redis_dict = {}
         for key in redis_keys:
             self.redis_dict[key] = float(self.redis_client.get(key).decode("UTF-8"))
@@ -112,8 +115,8 @@ class RobotUi:
             for key in redis_keys:
                 self.redis_dict[key] = float(self.redis_client.get(key).decode("UTF-8"))
 
-            for _, screen in self.screens.items():
-                if _ != "Menu":
+            for screen_name, screen in self.screens.items():
+                if screen_name != "Menu":
                     screen.update_values(self.redis_dict)
             time.sleep(timeout)
 
@@ -130,7 +133,7 @@ if __name__ == "__main__":
     from threading import Thread
 
     def init_redis():
-        redis_client = redis.Redis(host="localhost", port=6379, db=0)
+        redis_client = redis.Redis(host="localhost", port=constants.REDIS_PORT_NUMBER, db=0)
         redis_dict = {}
         for key in redis_keys:
             redis_client.set(key, 0)

@@ -1,8 +1,5 @@
 from screen import Screen
 
-PADDING = 6
-BASE_Y = 20
-
 
 class MenuScreen(Screen):
     """

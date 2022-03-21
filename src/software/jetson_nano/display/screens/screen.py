@@ -1,10 +1,12 @@
 from PIL import ImageFont
 import subprocess
 
-# TODO create a file for constants
+# TODO: move constants.py into bazel build so don't need to import sys
+import sys
+sys.path.append("../")
+import constants
+
 SCREEN_TYPE = str
-BASE_Y = 20
-PADDING = 6
 
 class Screen:
     """
@@ -43,8 +45,8 @@ class Screen:
         """ Draw the display header """
         self.lcd_display.draw.rectangle(
             (0, 0, self.lcd_display.width, self.font_size + 6),
-            outline="#000000",
-            fill="#ffffff",
+            outline=constants.BLACK,
+            fill=constants.WHITE,
         )
 
         # Get IP address
@@ -54,7 +56,7 @@ class Screen:
         except:
             IP = "  IP: N/A"
 
-        self.lcd_display.draw.text((0, 2), IP, font=self.font, fill="#000000")
+        self.lcd_display.draw.text((0, 2), IP, font=self.font, fill=constants.BLACK)
 
         # Get signal strength
         try:
@@ -69,7 +71,7 @@ class Screen:
             (self.lcd_display.width - self.font.getsize(signal)[0], 2),
             signal,
             font=self.font,
-            fill="#000000",
+            fill=constants.BLACK,
         )
 
         self.lcd_display.show()
@@ -137,29 +139,29 @@ class Screen:
         """ Draws our list of actions """
         self.lcd_display.prepare()
         
-        cursor = ">"
+        cursor = constants.CURSOR
         cursor_size = self.font.getsize(cursor)[0]     
-        cursor_pos_x = 0
+        cursor_pos_x = constants.BASE_X
 
         if self.curr_action != len(self.actions) - 1:
-            cursor_pos_y = BASE_Y + self.font_size * self.curr_action
+            cursor_pos_y = constants.BASE_Y + self.font_size * self.curr_action
         else:
-            cursor_pos_y = self.lcd_display.height - self.font_size - PADDING
+            cursor_pos_y = self.lcd_display.height - self.font_size - constants.PADDING
 
         self.lcd_display.draw.text(
-            (cursor_pos_x, cursor_pos_y), cursor, font=self.font, fill="#ffffff"
+            (cursor_pos_x, cursor_pos_y), cursor, font=self.font, fill=constants.WHITE
         )
 
         x = cursor_size
-        y = BASE_Y        
+        y = constants.BASE_Y        
 
         for action in self.actions: 
             if action == self.actions[-1]: # last action should take you to previous screen
-                y = self.lcd_display.height - self.font_size - PADDING
+                y = self.lcd_display.height - self.font_size - constants.PADDING
             
             self.lcd_display.draw.text(
                 (x, y), action["display string"],
-                font=self.font, fill="#ffffff"
+                font=self.font, fill=constants.WHITE
             )
 
             if action["type"] != SCREEN_TYPE: 
@@ -171,12 +173,12 @@ class Screen:
                         (x, y),
                         "{}".format(en),
                         font=self.font,
-                        fill="#00ff00" if en else "#0000ff",
+                        fill=constants.GREEN if en else constants.RED,
                     )
                 else:
                     self.lcd_display.draw.text(
                         (x, y), str(round(action["value"], 1)),
-                        font=self.font, fill="#00ffff",
+                        font=self.font, fill=constants.YELLOW,
                     )
                 x = cursor_size
             
