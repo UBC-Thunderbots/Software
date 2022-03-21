@@ -68,7 +68,7 @@ void HRVOAgent::computeNeighbors()
     }
 
     float new_neighbor_dist =
-        std::min(neighborDist_,
+        std::min(static_cast<double>(neighborDist_),
                  (position_ - current_position).length() + path.path_radius));
 
     simulator_->kdTree_->query(this, new_neighbor_dist);
