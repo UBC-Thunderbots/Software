@@ -16,10 +16,12 @@ PathPoint::PathPoint(const Vector &position, const float destination_speed)
 {
 }
 
-Vector PathPoint::getPosition() const{
+Vector PathPoint::getPosition() const
+{
     return position_;
 }
 
-float PathPoint::getSpeed() const{
+float PathPoint::getSpeed() const
+{
     return speed_at_destination;
 }

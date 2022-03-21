@@ -12,12 +12,14 @@ void LinearVelocityAgent::computeNewVelocity()
     // Preferring a velocity which points directly towards goal
     Vector current_position;
 
-    //check if we have reached the end of the path
-    if (path.getCurrentPathPoint() == std::nullopt) {
+    // check if we have reached the end of the path
+    if (path.getCurrentPathPoint() == std::nullopt)
+    {
         // set the current_position as the previous position
-        current_position  = path.getLastPathPoint().getPosition();
+        current_position = path.getLastPathPoint().getPosition();
     }
-    else {
+    else
+    {
         current_position = path.getCurrentPathPoint().value().getPosition();
     }
 

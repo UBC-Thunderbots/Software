@@ -1,8 +1,8 @@
 #include "extlibs/hrvo/path.h"
 
+#include <optional>
 #include <stdexcept>
 #include <utility>
-#include <optional>
 
 #include "extlibs/hrvo/path_point.h"
 #include "software/geom/vector.h"
@@ -10,7 +10,7 @@
 
 Path::Path()
 {
-    path_radius    = 0.0f;
+    path_radius   = 0.0f;
     Vector vector = Vector();
     PathPoint path_point(vector);
     path.push_back(path_point);
@@ -53,10 +53,12 @@ float Path::getDesiredSpeedAtCurrentPathPoint()
 
 std::optional<PathPoint> Path::getCurrentPathPoint() const
 {
-    if (curr_path_index >= path.size()) {
+    if (curr_path_index >= path.size())
+    {
         return std::nullopt;
     }
-    else {
+    else
+    {
         return path[curr_path_index];
     }
 }

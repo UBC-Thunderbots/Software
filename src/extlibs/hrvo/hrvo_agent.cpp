@@ -38,9 +38,8 @@
 #include <limits>
 
 #include "kd_tree.h"
-#include "software/geom/vector.h"
-
 #include "path.h"
+#include "software/geom/vector.h"
 
 
 HRVOAgent::HRVOAgent(Simulator *simulator, const Vector &position, float neighborDist,
@@ -60,10 +59,12 @@ void HRVOAgent::computeNeighbors()
     neighbors_.clear();
 
     Vector current_position;
-    if (path.getCurrentPathPoint() == std::nullopt) {
+    if (path.getCurrentPathPoint() == std::nullopt)
+    {
         current_position = path.getLastPathPoint().getPosition();
     }
-    else {
+    else
+    {
         current_position = path.getCurrentPathPoint().value().getPosition();
     }
 
@@ -471,20 +472,22 @@ void HRVOAgent::computePreferredVelocity()
     Vector goalPosition;
     float speedAtGoal;
 
-    //Check if we reached the end of the path
-    if (path.getCurrentPathPoint() == std::nullopt) {
-        //Keep the same goal position as the very last pathpoint
+    // Check if we reached the end of the path
+    if (path.getCurrentPathPoint() == std::nullopt)
+    {
+        // Keep the same goal position as the very last pathpoint
         goalPosition = path.getLastPathPoint().getPosition();
-        //Set speed to zero
+        // Set speed to zero
         speedAtGoal = 0.0f;
     }
-    else {
+    else
+    {
         goalPosition = path.getCurrentPathPoint().value().getPosition();
-        speedAtGoal = path.getCurrentPathPoint().value().getSpeed();
+        speedAtGoal  = path.getCurrentPathPoint().value().getSpeed();
     }
 
     Vector distVectorToGoal = goalPosition - position_;
-    auto distToGoal = static_cast<float>(distVectorToGoal.length());
+    auto distToGoal         = static_cast<float>(distVectorToGoal.length());
 
     // d = (Vf^2 - Vi^2) / 2a
     double startLinearDecelerationDistance =
@@ -535,10 +538,12 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
 
         Vector goal_pos;
         // check if we have reached the end of path
-        if (path.getCurrentPathPoint() == std::nullopt) {
+        if (path.getCurrentPathPoint() == std::nullopt)
+        {
             goal_pos = path.getLastPathPoint().getPosition();
         }
-        else {
+        else
+        {
             goal_pos = path.getCurrentPathPoint().value().getPosition();
         }
 

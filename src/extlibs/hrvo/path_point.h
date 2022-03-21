@@ -28,5 +28,4 @@ class PathPoint
     Vector position_;
     // desired speed for the path point
     float speed_at_destination;
-
 };

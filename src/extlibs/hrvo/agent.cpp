@@ -44,16 +44,17 @@ void Agent::update()
     Vector current_dest;
 
     const std::optional<PathPoint> &path_point = path.getCurrentPathPoint();
-    if (path_point == std::nullopt) {
+    if (path_point == std::nullopt)
+    {
         // If there are no destinations, the robot should stay at its current position
         current_dest = position_;
     }
-    else {
+    else
+    {
         current_dest = path_point.value().getPosition();
     }
 
-    if ((current_dest - position_).lengthSquared() <
-        path.path_radius * path.path_radius)
+    if ((current_dest - position_).lengthSquared() < path.path_radius * path.path_radius)
     {
         // Is at current goal position
         if (path.isGoingToFinalPathPoint())

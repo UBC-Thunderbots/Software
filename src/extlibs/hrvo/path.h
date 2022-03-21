@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
-#include <vector>
 #include <optional>
+#include <vector>
 
 #include "extlibs/hrvo/path_point.h"
 #include "software/geom/vector.h"
@@ -66,17 +66,15 @@ class Path
     // path radius for this robot. The max distance away from any path point in this path
     float path_radius;
 
-    //TODO: add documentation
+    // TODO: add documentation
     void incrementPathIndex();
 
     std::optional<PathPoint> getCurrentPathPoint() const;
 
-    //Assume that the path vector is not empty
+    // Assume that the path vector is not empty
     PathPoint getLastPathPoint() const;
 
-private:
+   private:
     std::vector<PathPoint> path;
     unsigned int curr_path_index = 0;
-
-
 };

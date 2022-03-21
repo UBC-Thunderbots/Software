@@ -101,10 +101,9 @@ class Simulator
      * @return The index of the agent.
      */
     std::size_t addHRVOAgent(const Vector &position, float agent_radius,
-                             const Vector &curr_velocity, float maxSpeed,
-                             float prefSpeed, float maxAccel, Path &path,
-                             float neighborDist, std::size_t maxNeighbors,
-                             float uncertaintyOffset);
+                             const Vector &curr_velocity, float maxSpeed, float prefSpeed,
+                             float maxAccel, Path &path, float neighborDist,
+                             std::size_t maxNeighbors, float uncertaintyOffset);
 
     /**
      *

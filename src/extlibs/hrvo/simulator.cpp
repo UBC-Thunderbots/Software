@@ -137,8 +137,9 @@ void Simulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set
                     // multiple path points
 
                     auto destination = primitive.move().path().point().at(0);
-                    path.getPathVector().emplace_back(PathPoint(Vector(static_cast<float>(destination.x_meters()), static_cast<float>(destination.y_meters()))));
-
+                    path.getPathVector().emplace_back(
+                        PathPoint(Vector(static_cast<float>(destination.x_meters()),
+                                         static_cast<float>(destination.y_meters()))));
                 }
             }
         }
