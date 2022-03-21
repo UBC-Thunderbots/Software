@@ -37,14 +37,6 @@ py_library(
 )
 
 py_library(
-    name = "import_all_protos",
-    srcs = ["import_all_protos.py"],
-    deps = [
-        "//proto:software_py_proto",
-    ],
-)
-
-py_library(
     name = "colors",
     srcs = ["colors.py"],
 )
