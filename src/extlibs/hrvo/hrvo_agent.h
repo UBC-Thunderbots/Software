@@ -165,6 +165,9 @@ class HRVOAgent : public Agent
     // overshooting the destination
     static constexpr float decel_pref_speed_multiplier = 1.0f;
 
+//    TODO: addedd for debugging
+    float in_decel_zone = 0.f;
+
     friend class KdTree;
     friend class Simulator;
 };

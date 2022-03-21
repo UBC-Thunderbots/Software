@@ -145,7 +145,10 @@ class Agent
      */
     void setMaxSpeed(float max_speed);
 
-   protected:
+    // TODO: Added for debugging
+    Vector old_vel;
+
+public: // TODO: protected:
     // Agent Properties
     Vector position_;
     float radius_;

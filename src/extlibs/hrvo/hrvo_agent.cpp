@@ -40,6 +40,8 @@
 #include "goal.h"
 #include "kd_tree.h"
 #include "software/geom/vector.h"
+#include "proto/message_translation/tbots_protobuf.h"
+#include "software/logger/logger.h"
 
 
 HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position,
@@ -470,6 +472,8 @@ void HRVOAgent::computePreferredVelocity()
                  (2 * max_accel_)) *
         decel_dist_multiplier;
 
+    // TODO: Debugging
+    in_decel_zone = distToGoal < startLinearDecelerationDistance ? 1.0f : 0.f;
     if (distToGoal < startLinearDecelerationDistance)
     {
         // velocity given linear deceleration, distance away from goal, and desired final

@@ -45,7 +45,7 @@ Vector PrimitiveExecutor::getTargetLinearVelocity(const unsigned int robot_id,
                               orientation.cos() * target_global_velocity.y();
 
 //    std::cout << "HRVO Vel robot " << robot_id << " = " << target_global_velocity.length() << std::endl;
-    LOG(VISUALIZE) << *createNamedValue("HRVO output " + std::to_string(robot_id), static_cast<float>(target_global_velocity.length()));
+//    LOG(VISUALIZE) << *createNamedValue("HRVO output " + std::to_string(robot_id), static_cast<float>(target_global_velocity.length()));
 
     return Vector(local_x_velocity, local_y_velocity)
         .normalize(target_global_velocity.length());

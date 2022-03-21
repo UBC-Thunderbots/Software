@@ -174,4 +174,7 @@ class ErForceSimulator : public QObject
 
     const QString CONFIG_FILE      = "simulator/2020";
     const QString CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";
+
+    Vector actual_prev_vel;
+    Vector sensor_prev_vel;
 };

@@ -294,7 +294,7 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
             // normalized correctly
             auto direct_control = primitive_executor->stepPrimitive(
                 robot_id, RobotState(robot_proto_it->current_state()).orientation());
-            std::cout << "Actu Vel robot " << robot_id << " = " << RobotState(robot_proto_it->current_state()).velocity().length() << std::endl;
+//            std::cout << "Actu Vel robot " << robot_id << " = " << RobotState(robot_proto_it->current_state()).velocity().length() << std::endl;
 
             auto command = *getRobotCommandFromDirectControl(
                 robot_id, std::move(direct_control), robot_constants, wheel_constants);
@@ -321,7 +321,10 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
         if (robot_proto_it != friendly_robots.end())
         {
 //            std::cout << "Actu Vel robot " << robot_id << " = " << RobotState(robot_proto_it->current_state()).velocity().length() << std::endl;
-            LOG(VISUALIZE) << *createNamedValue("Sensor fusion vel " + std::to_string(robot_id), static_cast<float>(RobotState(robot_proto_it->current_state()).velocity().length()));
+//            LOG(VISUALIZE) << *createNamedValue("Sensor fusion vel " + std::to_string(robot_id), static_cast<float>(RobotState(robot_proto_it->current_state()).velocity().length()));
+//            LOG(VISUALIZE) << *createNamedValue("Sensor fusion accel " + std::to_string(robot_id), static_cast<float>((RobotState(robot_proto_it->current_state()).velocity() - sensor_prev_vel).length() / time_step.toSeconds()));
+//            std::cout << "sensor accel " + std::to_string(robot_id) << " " << (RobotState(robot_proto_it->current_state()).velocity() - sensor_prev_vel).length() << std::endl;
+//            sensor_prev_vel = RobotState(robot_proto_it->current_state()).velocity();
 
             auto world_state = getSimulatorState();
 
@@ -330,11 +333,16 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
                                  [&](const auto& robot) { return robot.id() == robot_id; });
             if (world_state_robot != world_state.yellow_robots().end())
             {
-                Vector vel(world_state_robot->v_x(), world_state_robot->v_y());
-                LOG(VISUALIZE) << *createNamedValue("Actual vel " + std::to_string(robot_id),
-                                                    static_cast<float>(vel.length()));
+//                Vector vel(world_state_robot->v_x(), world_state_robot->v_y());
+//                LOG(VISUALIZE) << *createNamedValue("Actual vel " + std::to_string(robot_id),
+//                                                    static_cast<float>(vel.length()));
+//                LOG(VISUALIZE) << *createNamedValue("Actual accel " + std::to_string(robot_id),
+//                                                    static_cast<float>((vel - actual_prev_vel).length() * 60));
+//                std::cout << "accel " + std::to_string(robot_id) << " " << (vel - actual_prev_vel).length() << std::endl;
+//                std::cout << "vel " + std::to_string(robot_id) << " " << vel << std::endl;
+//                std::cout << "actual_prev_vel " + std::to_string(robot_id) << " " << actual_prev_vel << std::endl;
+//                actual_prev_vel = vel;
             }
-
         }
     }
 

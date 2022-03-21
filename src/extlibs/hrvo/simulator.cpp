@@ -44,6 +44,7 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/logger/logger.h"
+#include "proto/message_translation/tbots_protobuf.h"
 
 HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants)
     : global_time(0.0f),
@@ -402,6 +403,23 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
         {
             *(obstacle_proto.add_circle()) = *createCircleProto(candidate_circle);
         }
+
+        // TODO: Maybe compare to actual accel/vel
+//        LOG(VISUALIZE) << *createNamedValue("in linear deceleration zone " + std::to_string(robot_id), friendly_agent->in_decel_zone);
+//        LOG(VISUALIZE) << *createNamedValue("hrvo pref vel " + std::to_string(robot_id), static_cast<float>(friendly_agent->pref_velocity_.length()));
+//        LOG(VISUALIZE) << *createNamedValue("hrvo new vel " + std::to_string(robot_id), static_cast<float>(friendly_agent->new_velocity_.length()));
+        LOG(VISUALIZE) << *createNamedValue("hrvo actual vel " + std::to_string(robot_id), static_cast<float>(friendly_agent->velocity_.length()));
+
+//        LOG(VISUALIZE) << *createNamedValue(
+//                    "acceleration " + std::to_string(robot_id),
+//                    static_cast<float>((friendly_agent->getVelocity() - friendly_agent->old_vel).length() / getTimeStep()));
+//        LOG(VISUALIZE) << *createNamedValue(
+//                    "velocity " + std::to_string(robot_id),
+//                    static_cast<float>(friendly_agent->getVelocity().length()));
+//        Vector goal = goals[friendly_agent->getGoalIndex()]->getCurrentGoalPosition();
+//        LOG(VISUALIZE) << *createNamedValue(
+//                    "dist to goal " + std::to_string(robot_id),
+//                    static_cast<float>((friendly_agent->getPosition() - goal).length()));
     }
 
     // Add circles representing agents
@@ -411,7 +429,9 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
         *(obstacle_proto.add_circle()) =
             *createCircleProto(Circle(position, agent->getRadius()));
     }
-    // LOG(VISUALIZE) << obstacle_proto;
+
+
+//     LOG(VISUALIZE) << obstacle_proto;
 }
 
 std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(

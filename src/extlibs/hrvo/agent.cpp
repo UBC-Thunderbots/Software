@@ -1,6 +1,8 @@
 #include "agent.h"
 
 #include "extlibs/hrvo/simulator.h"
+#include "proto/message_translation/tbots_protobuf.h"
+#include "software/logger/logger.h"
 
 Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
              const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
@@ -20,6 +22,7 @@ Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
 
 void Agent::update()
 {
+    old_vel = velocity_;
     if (new_velocity_.length() >= max_speed_)
     {
         // New velocity can not be greater than max speed
