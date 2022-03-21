@@ -42,10 +42,11 @@
 #include "software/geom/vector.h"
 
 
-HRVOAgent::HRVOAgent(Simulator *simulator, const Vector &position, std::size_t goalIndex,
-                     float neighborDist, std::size_t maxNeighbors, float radius,
-                     const Vector &velocity, float maxAccel, float goalRadius,
-                     float prefSpeed, float maxSpeed, float uncertaintyOffset)
+HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position,
+                     std::size_t goalIndex, float neighborDist, std::size_t maxNeighbors,
+                     float radius, const Vector &velocity, float maxAccel,
+                     float goalRadius, float prefSpeed, float maxSpeed,
+                     float uncertaintyOffset)
     : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel,
             goalIndex, goalRadius),
       maxNeighbors_(maxNeighbors),
@@ -59,12 +60,12 @@ void HRVOAgent::computeNeighbors()
 {
     neighbors_.clear();
 
-    std::unique_ptr<Goal> &current_goal = simulator_->goals_[goal_index_];
+    std::unique_ptr<Goal> &current_goal = simulator_->goals[goal_index_];
     float new_neighbor_dist             = std::min(
         static_cast<double>(neighborDist_),
         (position_ - current_goal->getCurrentGoalPosition()).length() + goal_radius_);
 
-    simulator_->kdTree_->query(this, new_neighbor_dist);
+    simulator_->getKdTree()->query(this, new_neighbor_dist);
 }
 
 Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_agent)
@@ -82,12 +83,11 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
         const float openingAngle =
             std::asin((radius_ + other_agent.getRadius()) /
                       (position_ - other_agent.getPosition()).length());
-
         // Direction of the two edges of the velocity obstacles
         velocityObstacle.side1_ =
-            Vector(std::cos(angle - openingAngle), std::sin(angle - openingAngle));
+            Vector::createFromAngle(Angle::fromRadians(angle - openingAngle));
         velocityObstacle.side2_ =
-            Vector(std::cos(angle + openingAngle), std::sin(angle + openingAngle));
+            Vector::createFromAngle(Angle::fromRadians(angle + openingAngle));
 
         const float d = std::sin(2.f * openingAngle);
 
@@ -107,9 +107,10 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
 
             velocityObstacle.apex_ =
                 velocity_ + s * velocityObstacle.side1_ -
-                (uncertaintyOffset_ * (position_ - other_agent.getPosition()).length() /
-                 (radius_ + other_agent.getRadius())) *
-                    (position_ - other_agent.getPosition()).normalize();
+                (position_ - other_agent.getPosition())
+                    .normalize((uncertaintyOffset_ *
+                                (position_ - other_agent.getPosition()).length() /
+                                (radius_ + other_agent.getRadius())));
         }
         else
         {
@@ -123,9 +124,10 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
 
             velocityObstacle.apex_ =
                 velocity_ + s * velocityObstacle.side2_ -
-                (uncertaintyOffset_ * (position_ - other_agent.getPosition()).length() /
-                 (other_agent.getRadius() + radius_)) *
-                    (position_ - other_agent.getPosition()).normalize();
+                (position_ - other_agent.getPosition())
+                    .normalize(uncertaintyOffset_ *
+                               (position_ - other_agent.getPosition()).length() /
+                               (other_agent.getRadius() + radius_));
         }
     }
     else
@@ -135,11 +137,12 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
         // apart from each other
         velocityObstacle.apex_ =
             0.5f * (other_agent.getVelocity() + velocity_) -
-            (uncertaintyOffset_ + 0.5f *
-                                      (other_agent.getRadius() + radius_ -
-                                       (position_ - other_agent.getPosition()).length()) /
-                                      simulator_->timeStep_) *
-                (position_ - other_agent.getPosition()).normalize();
+            (position_ - other_agent.getPosition())
+                .normalize(uncertaintyOffset_ +
+                           0.5f *
+                               (other_agent.getRadius() + radius_ -
+                                (position_ - other_agent.getPosition()).length()) /
+                               simulator_->getTimeStep());
         velocityObstacle.side1_ =
             (other_agent.getPosition() - position_).perpendicular().normalize();
         velocityObstacle.side2_ = -velocityObstacle.side1_;
@@ -161,18 +164,13 @@ void HRVOAgent::computeNewVelocity()
     // Create Velocity Obstacles for neighbors
     for (const auto &neighbor : neighbors_)
     {
-        const std::unique_ptr<Agent> &other_agent = simulator_->agents_[neighbor.second];
+        std::shared_ptr<Agent> other_agent = simulator_->getAgents()[neighbor.second];
         VelocityObstacle velocity_obstacle = other_agent->createVelocityObstacle(*this);
         velocityObstacles_.push_back(velocity_obstacle);
     }
 
-    // Calculate what velocities (candidates) are not inside any velocity obstacle
-    // This is likely implementing the ClearPath efficient geometric algorithm as stated
-    // in the HRVO paper to find the closest possible velocity to our preferred velocity.
     candidates_.clear();
-
     Candidate candidate;
-
     candidate.velocityObstacle1_ = std::numeric_limits<int>::max();
     candidate.velocityObstacle2_ = std::numeric_limits<int>::max();
 
@@ -182,7 +180,7 @@ void HRVOAgent::computeNewVelocity()
     }
     else
     {
-        candidate.position_ = max_speed_ * pref_velocity_.normalize();
+        candidate.position_ = pref_velocity_.normalize(max_speed_);
     }
 
     candidates_.insert(std::make_pair(
@@ -461,23 +459,26 @@ void HRVOAgent::computePreferredVelocity()
         return;
     }
 
-    std::unique_ptr<Goal> &nextGoal = simulator_->goals_[goal_index_];
+    std::unique_ptr<Goal> &nextGoal = simulator_->goals[goal_index_];
     Vector goalPosition             = nextGoal->getCurrentGoalPosition();
     float speedAtGoal               = nextGoal->getDesiredSpeedAtCurrentGoal();
     Vector distVectorToGoal         = goalPosition - position_;
     auto distToGoal                 = static_cast<float>(distVectorToGoal.length());
     // d = (Vf^2 - Vi^2) / 2a
     double startLinearDecelerationDistance =
-        std::abs((std::pow(speedAtGoal, 2) - std::pow(prefSpeed_, 2)) / (2 * max_accel_));
+        std::abs((std::pow(speedAtGoal, 2) - std::pow(prefSpeed_, 2)) /
+                 (2 * max_accel_)) *
+        decel_dist_multiplier;
 
     if (distToGoal < startLinearDecelerationDistance)
     {
         // velocity given linear deceleration, distance away from goal, and desired final
         // speed
         // v_pref = sqrt(v_goal^2 + 2 * a * d_remainingToDestination)
-        float currPrefSpeed = static_cast<float>(
-            std::sqrt(std::pow(speedAtGoal, 2) + 2 * max_accel_ * distToGoal));
-        Vector ideal_pref_velocity = distVectorToGoal.normalize() * currPrefSpeed;
+        float currPrefSpeed = static_cast<float>(std::sqrt(std::pow(speedAtGoal, 2) +
+                                                           2 * max_accel_ * distToGoal)) *
+                              decel_pref_speed_multiplier;
+        Vector ideal_pref_velocity = distVectorToGoal.normalize(currPrefSpeed);
 
         // Limit the preferred velocity to the kinematic limits
         const Vector dv = ideal_pref_velocity - velocity_;
@@ -490,7 +491,7 @@ void HRVOAgent::computePreferredVelocity()
             // Calculate the maximum velocity towards the preferred velocity, given the
             // acceleration constraint
             pref_velocity_ =
-                velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv.normalize());
+                velocity_ + dv.normalize(max_accel_ * simulator_->getTimeStep());
         }
     }
     else
@@ -500,20 +501,20 @@ void HRVOAgent::computePreferredVelocity()
         float currPrefSpeed =
             std::min(static_cast<double>(prefSpeed_),
                      velocity_.length() + max_accel_ * simulator_->getTimeStep());
-        pref_velocity_ = distVectorToGoal.normalize() * currPrefSpeed;
+        pref_velocity_ = distVectorToGoal.normalize(currPrefSpeed);
     }
 }
 
 void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
 {
-    const std::unique_ptr<Agent> &other_agent = simulator_->agents_[agentNo];
+    std::shared_ptr<Agent> other_agent = simulator_->getAgents()[agentNo];
 
     if (this != other_agent.get())
     {
         Vector other_agent_relative_pos = other_agent->getPosition() - position_;
         const float distSq              = other_agent_relative_pos.lengthSquared();
 
-        Vector goal_pos = simulator_->goals_[goal_index_]->getCurrentGoalPosition();
+        Vector goal_pos = simulator_->goals[goal_index_]->getCurrentGoalPosition();
         Vector relative_goal_pos = goal_pos - position_;
 
         // Whether the other robot is with in 45 degrees of the goal, relative to us
@@ -530,7 +531,7 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
         bool is_other_agent_near_goal =
             (other_agent->getPosition() - goal_pos).lengthSquared() < 1.5f;
 
-        // Helper lambda function
+        // Helper lambda function for adding other_agent to list of neighbors
         auto add_other_agent = [&]() {
             if (neighbors_.size() == maxNeighbors_)
             {
@@ -545,7 +546,7 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
             }
         };
 
-        if (distSq < std::pow(radius_ + other_agent->getRadius(), 2) && distSq < rangeSq)
+        if (distSq < std::pow(radius_ + other_agent->getRadius(), 2))
         {
             // In collision with other agent, so the other neighbors are not important
             neighbors_.clear();
@@ -555,8 +556,8 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
         {
             add_other_agent();
         }
-        else if (distSq > rangeSq && is_other_agent_in_front &&
-                 is_other_agent_moving_towards_us && is_other_agent_near_goal)
+        else if (is_other_agent_in_front && is_other_agent_moving_towards_us &&
+                 is_other_agent_near_goal)
         {
             // This is an edge case for when the other agent is outside our search range,
             // but is moving towards us from behind our destination, so it is posing a
@@ -564,4 +565,38 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
             add_other_agent();
         }
     }
+}
+
+std::vector<Polygon> HRVOAgent::getVelocityObstaclesAsPolygons() const
+{
+    std::vector<Polygon> velocity_obstacles;
+    for (const Agent::VelocityObstacle &vo : velocityObstacles_)
+    {
+        std::vector<Point> points;
+        Vector shifted_apex  = position_ + vo.apex_;
+        Vector shifted_side1 = position_ + vo.side1_;
+        Vector shifted_side2 = position_ + vo.side2_;
+        points.emplace_back(Point(shifted_apex.x(), shifted_apex.y()));
+        points.emplace_back(Point(shifted_side1.x(), shifted_side1.y()));
+        points.emplace_back(Point(shifted_side2.x(), shifted_side2.y()));
+        velocity_obstacles.emplace_back(Polygon(points));
+    }
+    return velocity_obstacles;
+}
+
+std::vector<Circle> HRVOAgent::getCandidateVelocitiesAsCircles(
+    const float circle_rad) const
+{
+    std::vector<Circle> candidate_circles;
+    for (auto &candidate : candidates_)
+    {
+        Vector candidate_pos = position_ + candidate.second.position_;
+        candidate_circles.emplace_back(Circle(Point(candidate_pos), circle_rad));
+    }
+    return candidate_circles;
+}
+
+void HRVOAgent::setPreferredSpeed(float new_pref_speed)
+{
+    prefSpeed_ = new_pref_speed;
 }
