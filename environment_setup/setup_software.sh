@@ -144,13 +144,21 @@ echo "================================================================"
 echo "Done Setting Up Virtual Python Environment"
 echo "================================================================"
 
+FILE=/opt/mobile-gamepad.nar
+if [ ! -f "$FILE" ]; then
+    echo "Mobile Gamepad Binary not found, fetching"
+    # Download handheld controller
+    sudo curl -L https://github.com/UBC-Thunderbots/mobile-gamepad/releases/download/vtbots.0.1/mobile-gamepad-0.0.2-linux-x64.nar -o /opt/mobile-gamepad.nar
+fi
+
+
 # Install Bazel
 echo "================================================================"
 echo "Installing Bazel"
 echo "================================================================"
 
 # Adapted from https://docs.bazel.build/versions/master/install-ubuntu.html#install-on-ubuntu
-sudo apt install apt-transport-https curl gnupg
+sudo apt install apt-transport-https curl gnupg -y
 curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > bazel.gpg
 sudo mv bazel.gpg /etc/apt/trusted.gpg.d/
 echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
