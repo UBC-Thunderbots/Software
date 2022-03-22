@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@simulated_tests_deps//:requirements.bzl", "requirement")
+
 cc_library(
     name = "goalie_tactic",
     srcs = [
@@ -34,8 +36,20 @@ cc_test(
     ],
 )
 
-cc_test(
+py_test(
     name = "goalie_tactic_test",
+    srcs = [
+        "goalie_tactic_test.py",
+    ],
+    deps = [
+        "//software/simulated_tests:simulated_test_fixture",
+        "//software/simulated_tests:validation",
+        requirement("pytest"),
+    ],
+)
+
+cc_test(
+    name = "goalie_tactic_test_old",
     srcs = ["goalie_tactic_test.cpp"],
     deps = [
         ":goalie_tactic",

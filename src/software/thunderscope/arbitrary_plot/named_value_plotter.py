@@ -1,12 +1,14 @@
-import pyqtgraph as pg
-import time
-from software.networking.threaded_unix_listener import ThreadedUnixListener
-import software.thunderscope.constants as constants
-from proto.visualization_pb2 import NamedValue
 import queue
 import random
-from pyqtgraph.Qt import QtGui
+import time
 from collections import deque
+
+import pyqtgraph as pg
+from proto.visualization_pb2 import NamedValue
+from pyqtgraph.Qt import QtGui
+
+import software.thunderscope.constants as constants
+from software.networking.threaded_unix_listener import ThreadedUnixListener
 
 DEQUE_SIZE = 500
 MIN_Y_RANGE = 0
@@ -41,9 +43,9 @@ class NamedValuePlotter(object):
             if named_value.name not in self.plots:
                 self.plots[named_value.name] = self.win.plot(
                     pen=QtGui.QColor(
-                        random.randint(0, 255),
-                        random.randint(0, 255),
-                        random.randint(0, 255),
+                        random.randint(100, 255),
+                        random.randint(100, 255),
+                        random.randint(100, 255),
                     ),
                     name=named_value.name,
                     brush=None,
