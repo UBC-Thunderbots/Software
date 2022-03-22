@@ -1,4 +1,5 @@
 import os
+import time
 import signal
 import argparse
 
@@ -22,6 +23,7 @@ from pyqtgraph.Qt.QtWidgets import QVBoxLayout, QWidget
 from proto.import_all_protos import *
 
 from software.networking import threaded_unix_sender
+from software.networking import networking
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
 from software.thunderscope.field import (
     obstacle_layer,
@@ -32,6 +34,7 @@ from software.thunderscope.field import (
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_receiver import ProtoReceiver
+from software.thunderscope.robot_communication import mobile_gamepad
 
 
 class Thunderscope(object):
@@ -201,6 +204,12 @@ class Thunderscope(object):
 
 
 if __name__ == "__main__":
+    def received(bob):
+
+    listener = networking.RobotStatusProtoListener("ff02::c3d0:42d2:bb01%wlp4s0", 42500, received, True)
+    sender = networking.RobotStatusProtoSender("ff02::c3d0:42d2:bb01%wlp4s0", 42500, True)
+    sender.send_proto(RobotStatus())
+
     parser = argparse.ArgumentParser(description="Thunderscope")
     parser.add_argument(
         "--robot_diagnostics",

@@ -5,6 +5,9 @@ load("@thunderscope_deps//:requirements.bzl", "requirement")
 py_binary(
     name = "thunderscope",
     srcs = ["thunderscope.py"],
+    data = [
+        "//software/networking:networking.so",
+    ],
     deps = [
         "//proto:software_py_proto",
         "//software/networking:threaded_unix_listener_py",
@@ -13,6 +16,7 @@ py_binary(
         "//software/thunderscope:constants",
         "//software/thunderscope:proto_receiver",
         "//software/thunderscope/arbitrary_plot:named_value_plotter",
+        "//software/thunderscope/robot_communication:mobile_gamepad",
         "//software/thunderscope/field",
         "//software/thunderscope/field:field_layer",
         "//software/thunderscope/field:obstacle_layer",

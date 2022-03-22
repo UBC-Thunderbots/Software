@@ -149,6 +149,8 @@ if [ ! -f "$FILE" ]; then
     echo "Mobile Gamepad Binary not found, fetching"
     # Download handheld controller
     sudo curl -L https://github.com/UBC-Thunderbots/mobile-gamepad/releases/download/vtbots.0.1/mobile-gamepad-0.0.2-linux-x64.nar -o /opt/mobile-gamepad.nar
+    sudo chown -R $USER:$USER /opt/mobile-gamepad.nar
+    chmod +x /opt/mobile-gamepad.nar
 fi
 
 
