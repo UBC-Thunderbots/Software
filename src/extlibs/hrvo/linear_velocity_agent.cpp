@@ -1,6 +1,6 @@
 #include "linear_velocity_agent.h"
 
-LinearVelocityAgent::LinearVelocityAgent(Simulator *simulator, const Vector &position,
+LinearVelocityAgent::LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position,
                                          float radius, const Vector &velocity,
                                          float maxSpeed, float maxAccel,
                                          std::size_t goal_index, float goalRadius)
@@ -11,13 +11,13 @@ LinearVelocityAgent::LinearVelocityAgent(Simulator *simulator, const Vector &pos
 
 void LinearVelocityAgent::computeNewVelocity()
 {
+    // TODO (#2496): Fix bug where LinearVelocityAgents go past their destination
     // Preferring a velocity which points directly towards goal
-    pref_velocity_ =
-        simulator_->goals_[goal_index_]->getCurrentGoalPosition() - position_;
+    pref_velocity_ = simulator_->goals[goal_index_]->getCurrentGoalPosition() - position_;
 
     if (pref_velocity_.length() > max_speed_)
     {
-        pref_velocity_ = (pref_velocity_).normalize() * max_speed_;
+        pref_velocity_ = (pref_velocity_).normalize(max_speed_);
     }
 
     const Vector dv = pref_velocity_ - velocity_;
@@ -29,8 +29,7 @@ void LinearVelocityAgent::computeNewVelocity()
     {
         // Calculate the maximum velocity towards the preferred velocity, given the
         // acceleration constraint
-        new_velocity_ =
-            velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv.normalize());
+        new_velocity_ = velocity_ + dv.normalize(max_accel_ * simulator_->getTimeStep());
     }
 }
 

@@ -2,7 +2,7 @@
 
 #include "extlibs/hrvo/simulator.h"
 
-Agent::Agent(Simulator *simulator, const Vector &position, float radius,
+Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
              const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
              float maxAccel, std::size_t goalIndex, float goalRadius)
     : simulator_(simulator),
@@ -23,7 +23,7 @@ void Agent::update()
     if (new_velocity_.length() >= max_speed_)
     {
         // New velocity can not be greater than max speed
-        new_velocity_ = new_velocity_.normalize() * max_speed_;
+        new_velocity_ = new_velocity_.normalize(max_speed_);
     }
 
     const Vector dv = new_velocity_ - velocity_;
@@ -39,28 +39,38 @@ void Agent::update()
             velocity_ + (max_accel_ * simulator_->getTimeStep()) * (dv / dv.length());
     }
 
-    position_ += velocity_ * simulator_->timeStep_;
+    position_ += velocity_ * simulator_->time_step;
 
-    if ((simulator_->goals_[goal_index_]->getCurrentGoalPosition() - position_)
+    if ((simulator_->goals[goal_index_]->getCurrentGoalPosition() - position_)
             .lengthSquared() < goal_radius_ * goal_radius_)
     {
         // Is at current goal position
-        if (simulator_->goals_[goal_index_]->isGoingToFinalGoal())
+        if (simulator_->goals[goal_index_]->isGoingToFinalGoal())
         {
             reached_goal_ = true;
         }
         else
         {
-            simulator_->goals_[goal_index_]->getNextGoalPostion();
+            simulator_->goals[goal_index_]->getNextGoalPostion();
             reached_goal_             = false;
-            simulator_->reachedGoals_ = false;
+            simulator_->reached_goals = false;
         }
     }
     else
     {
         reached_goal_             = false;
-        simulator_->reachedGoals_ = false;
+        simulator_->reached_goals = false;
     }
+}
+
+void Agent::setPosition(const Vector &position)
+{
+    position_ = position;
+}
+
+void Agent::setVelocity(const Vector &velocity)
+{
+    velocity_ = velocity;
 }
 
 float Agent::getMaxAccel() const
@@ -101,4 +111,14 @@ bool Agent::hasReachedGoal() const
 float Agent::getGoalRadius() const
 {
     return goal_radius_;
+}
+
+void Agent::setMaxSpeed(float max_speed)
+{
+    max_speed_ = max_speed;
+}
+
+void Agent::setRadius(float radius)
+{
+    radius_ = radius;
 }
