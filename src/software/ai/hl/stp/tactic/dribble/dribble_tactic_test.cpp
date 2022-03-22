@@ -282,7 +282,7 @@ TEST_F(DribbleTacticTest,
 
     runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
-            Duration::fromSeconds(10));
+            Duration::fromSeconds(12));
 }
 
 TEST_F(DribbleTacticTest, test_running_into_enemy_robot_knocking_ball_away)
