@@ -6,7 +6,7 @@
 #include "software/logger/logger.h"
 #include "software/uart/boost_uart_communication.h"
 
-// TODO: change to protobuf/move to different file with addition of thunderloop
+// TODO(#2537): change to protobuf/move to different file with addition of thunderloop
 struct GenevaMotorCommand
 {
     float angle_deg;
