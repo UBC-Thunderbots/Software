@@ -49,6 +49,7 @@ py_proto_library(
         "tbots_software_msgs.proto",
         "tbots_timestamp_msg.proto",
         "team.proto",
+        "validation.proto",
         "vision.proto",
         "visualization.proto",
         "world.proto",
@@ -221,6 +222,17 @@ py_proto_library(
         "ssl_gc_referee_message.proto",
     ],
     deps = [
+        ":tbots_py_proto",
+    ],
+)
+
+py_library(
+    name = "import_all_protos",
+    srcs = [
+        "import_all_protos.py",
+    ],
+    deps = [
+        ":software_py_proto",
         ":tbots_py_proto",
     ],
 )

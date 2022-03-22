@@ -41,7 +41,7 @@ int main(int argc, char** argv)
     auto args           = std::make_shared<FullSystemMainCommandLineArgs>(arduino_config);
     bool help_requested = args->loadFromCommandLineArguments(argc, argv);
 
-    LoggerSingleton::initializeLogger(args->getLoggingDir()->value());
+    LoggerSingleton::initializeLogger(args->getRuntimeDir()->value());
 
     if (!help_requested)
     {
