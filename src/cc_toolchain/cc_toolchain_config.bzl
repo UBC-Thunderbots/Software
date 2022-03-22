@@ -343,6 +343,16 @@ def _make_common_features(ctx):
         ],
     )
 
+    result["cpp17_feature"] = feature(
+        name = "c++17",
+        flag_sets = [
+            flag_set(
+                actions = ALL_CPP_ACTIONS,
+                flag_groups = [flag_group(flags = ["-std=c++17", "-fconcepts"])],
+            ),
+        ],
+    )
+
     result["no-rtti"] = feature(
         name = "no-rtti",
         flag_sets = [
@@ -604,7 +614,6 @@ def _jetson_nano_impl(ctx):
                     "-lm",
                     "-lc",
                     "-lgcc",
-                    "-static",
                     "-Wl,--end-group",
                 ])],
             ),
@@ -643,7 +652,7 @@ def _jetson_nano_impl(ctx):
         name = "common",
         implies = [
             "build-id",
-            "c++2a",
+            "c++17",
             "colour",
             "determinism",
             "frame-pointer",
