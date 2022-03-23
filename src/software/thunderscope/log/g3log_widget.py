@@ -1,11 +1,12 @@
+import queue
+
 import pyqtgraph as pg
 import pyqtgraph.console as pg_console
-from software.networking.threaded_unix_listener import ThreadedUnixListener
-import software.thunderscope.constants as constants
-from software.thunderscope.log.g3log_checkboxes import g3logCheckboxes
-
 from proto.robot_log_msg_pb2 import RobotLog, LogLevel
-import queue
+
+import software.thunderscope.constants as constants
+from software.networking.threaded_unix_listener import ThreadedUnixListener
+from software.thunderscope.log.g3log_checkboxes import g3logCheckboxes
 
 
 class g3logWidget(pg_console.ConsoleWidget):
@@ -28,7 +29,7 @@ class g3logWidget(pg_console.ConsoleWidget):
         )
 
         # Creates checkbox widget
-        self.checkboxWidget = g3logCheckboxes()
+        self.checkbox_widget = g3logCheckboxes()
 
         self.log_buffer = queue.Queue(buffer_size)
 
@@ -44,19 +45,19 @@ class g3logWidget(pg_console.ConsoleWidget):
         if (
             (
                 log.log_level == LogLevel.DEBUG
-                and self.checkboxWidget.debug_checkbox.isChecked()
+                and self.checkbox_widget.debug_checkbox.isChecked()
             )
             or (
                 log.log_level == LogLevel.INFO
-                and self.checkboxWidget.info_checkbox.isChecked()
+                and self.checkbox_widget.info_checkbox.isChecked()
             )
             or (
                 log.log_level == LogLevel.WARNING
-                and self.checkboxWidget.warning_checkbox.isChecked()
+                and self.checkbox_widget.warning_checkbox.isChecked()
             )
             or (
                 log.log_level == LogLevel.FATAL
-                and self.checkboxWidget.fatal_checkbox.isChecked()
+                and self.checkbox_widget.fatal_checkbox.isChecked()
             )
         ):
             log_str = "{} {} [{}->{}] {}\n".format(

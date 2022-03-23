@@ -110,3 +110,10 @@ cc_library(
         "@g3log",
     ],
 )
+
+py_library(
+    name = "py_logger",
+    srcs = [
+        "logger.py",
+    ],
+)
