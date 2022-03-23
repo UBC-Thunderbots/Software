@@ -24,7 +24,7 @@ std::unique_ptr<ThreadedEstopReader> createThreadedEstopReader(std::string uart_
                                                                int baud_rate)
 {
     auto uart_device = std::make_unique<BoostUartCommunication>(baud_rate, uart_port);
-    return std::make_unique<ThreadedEstopReader>(std::move(uart_device), 0);
+    return std::make_unique<ThreadedEstopReader>(std::move(uart_device));
 }
 
 PYBIND11_MODULE(estop_reader, m)

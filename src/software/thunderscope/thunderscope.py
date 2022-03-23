@@ -36,6 +36,8 @@ from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_receiver import ProtoReceiver
 from software.thunderscope.robot_communication import mobile_gamepad
+from software.simulated_tests.full_system import FullSystem
+from software.simulated_tests.er_force_simulator import ErForceSimulator
 
 
 class Thunderscope(object):
@@ -205,13 +207,22 @@ class Thunderscope(object):
 
 
 if __name__ == "__main__":
-    def received(bob):
-        print(time.time())
-        print("ASDOIJASD", bob)
 
-    estop_reader = ThreadedEstopReader("/dev/ttyACM0", 115200)
-    listener = networking.RobotStatusProtoListener("ff02::c3d0:42d2:bb01%wlp4s0", 42500, received, True)
-    sender = networking.RobotStatusProtoSender("ff02::c3d0:42d2:bb01%wlp4s0", 42500, True)
+    full_system = FullSystem()
+
+    def relay_sensor_proto(bob):
+        # TODO is this thread safe?
+        print(time.time())
+
+    wrapper_packet_listener = networking.SSLWrapperPacketProtoListener(
+        "224.5.23.2", 10020, full_system.send_ssl_wrapper, True
+    )
+    referee_listener = networking.SSLRefereeProtoListener(
+        "224.5.23.2", 10003, full_system.send_ssl_referee, True
+    )
+    robot_status_listener = networking.RobotStatusProtoListener(
+        "ff02::c3d0:42d2:bb01%wlp4s0", 42500, full_system.send_robot_status, True
+    )
 
     parser = argparse.ArgumentParser(description="Thunderscope")
     parser.add_argument(
@@ -226,17 +237,17 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.robot_diagnostics:
-        thunderscope = Thunderscope()
 
+        estop_reader = ThreadedEstopReader("/dev/ttyACM0", 115200)
+
+        thunderscope = Thunderscope()
         log_dock = thunderscope.setup_log_widget()
         thunderscope.dock_area.addDock(log_dock)
 
         thunderscope.show()
 
     elif args.run_simulator:
-        print(
-            "TODO #2050, this isn't implemented, just run the current standalone simulator"
-        )
+        print("TODO #2050, this isn't implemented, just run the current standalone simulator")
 
     else:
         thunderscope = Thunderscope()

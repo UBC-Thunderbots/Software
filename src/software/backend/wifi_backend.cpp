@@ -34,7 +34,7 @@ WifiBackend::WifiBackend(std::shared_ptr<const BackendConfig> config)
     std::unique_ptr<BoostUartCommunication> uart_device =
         std::make_unique<BoostUartCommunication>(ARDUINO_BAUD_RATE,
                                                  arduino_config->getPort()->value());
-    estop_reader = std::make_unique<ThreadedEstopReader>(std::move(uart_device), 0);
+    estop_reader = std::make_unique<ThreadedEstopReader>(std::move(uart_device));
 
     // connect to current channel
     joinMulticastChannel(channel, network_interface);

@@ -8,7 +8,7 @@
 #include "software/logger/logger.h"
 
 
-ThreadedEstopReader::ThreadedEstopReader(std::unique_ptr<UartCommunication> uart_reader
+ThreadedEstopReader::ThreadedEstopReader(std::unique_ptr<UartCommunication> uart_reader)
     : estop_state(EstopState::STOP),
       timer(io_service),
       uart_reader(std::move(uart_reader))

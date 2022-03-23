@@ -6,7 +6,9 @@
 
 #include <sstream>
 
+#include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "proto/robot_status_msg.pb.h"
+#include "proto/ssl_gc_referee_message.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "proto/world.pb.h"
 #include "pybind11_protobuf/native_proto_caster.h"
@@ -36,7 +38,7 @@ void declareThreadedProtoUdpSender(py::module &m, std::string name)
 }
 
 template <typename T>
-void decleareThreadedProtoUdpListener(py::module &m, std::string name)
+void declareThreadedProtoUdpListener(py::module &m, std::string name)
 {
     using Class              = ThreadedProtoUdpListener<T>;
     std::string pyclass_name = name + "ProtoListener";
@@ -51,10 +53,12 @@ PYBIND11_MODULE(networking, m)
     pybind11_protobuf::ImportNativeProtoCasters();
 
     // Listeners
-    decleareThreadedProtoUdpListener<TbotsProto::RobotStatus>(m, "RobotStatus");
+    declareThreadedProtoUdpListener<SSLProto::Referee>(m, "SSLReferee");
+    declareThreadedProtoUdpListener<TbotsProto::RobotStatus>(m, "RobotStatus");
+    declareThreadedProtoUdpListener<SSLProto::SSL_WrapperPacket>(m, "SSLWrapperPacket");
 
     // Senders
-    declareThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(m, "PrimitiveSet");
     declareThreadedProtoUdpSender<TbotsProto::World>(m, "World");
     declareThreadedProtoUdpSender<TbotsProto::RobotStatus>(m, "RobotStatus");
+    declareThreadedProtoUdpSender<TbotsProto::PrimitiveSet>(m, "PrimitiveSet");
 }

@@ -154,9 +154,10 @@ pybind_library(
     name = "networking_lib",
     srcs = ["python_bindings.cpp"],
     deps = [
-        "//proto:tbots_cc_proto",
-        ":threaded_proto_udp_sender",
         ":threaded_proto_udp_listener",
+        ":threaded_proto_udp_sender",
+        "//proto:ssl_cc_proto",
+        "//proto:tbots_cc_proto",
         "//proto/message_translation:tbots_geometry",
         "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
     ],
