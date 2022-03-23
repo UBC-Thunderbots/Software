@@ -152,6 +152,12 @@ class Agent
      */
     void setMaxSpeed(float max_speed);
 
+    /**
+     * Sets a new path for this agent
+     * @param new_path new path for this agent
+     */
+    void setPath(const Path& new_path);
+
    protected:
     // Agent Properties
     Vector position_;
