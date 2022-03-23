@@ -10,7 +10,7 @@
 
 AgentPath::AgentPath()
 {
-    path_radius   = 0.0f;
+    path_radius = 0.0f;
 }
 
 AgentPath::AgentPath(const std::vector<PathPoint> &path_points, float goal_radius_)
@@ -28,10 +28,12 @@ std::optional<PathPoint> AgentPath::getCurrentPathPoint() const
 {
     if (curr_path_index >= path.size())
     {
-        if (!path.empty()) {
+        if (!path.empty())
+        {
             return path[path.size() - 1];
         }
-        else {
+        else
+        {
             return std::nullopt;
         }
     }
@@ -50,8 +52,7 @@ bool AgentPath::isGoingToFinalPathPoint()
     return false;
 }
 
-float AgentPath::getPathRadius() const {
-    
+float AgentPath::getPathRadius() const
+{
     return path_radius;
 }
-

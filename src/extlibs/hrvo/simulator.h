@@ -133,7 +133,8 @@ class HRVOSimulator
      */
     AgentPath addPath(const Vector &position, float goal_radius);
 
-    AgentPath addPathPositions(const std::vector<PathPoint> &path_points, float goal_radius);
+    AgentPath addPathPositions(const std::vector<PathPoint> &path_points,
+                               float goal_radius);
 
     /**
      * Performs a simulation step; updates the position, and velocity

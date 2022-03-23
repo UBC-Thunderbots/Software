@@ -62,7 +62,7 @@ void HRVOAgent::computeNeighbors()
     {
         return;
     }
-    
+
     Vector current_dest = path.getCurrentPathPoint().value().getPosition();
 
     float new_neighbor_dist =
@@ -457,7 +457,7 @@ void HRVOAgent::computeNewVelocity()
 void HRVOAgent::computePreferredVelocity()
 {
     auto path_point_opt = path.getCurrentPathPoint();
-    
+
     if (prefSpeed_ <= 0.01f || max_accel_ <= 0.01f || path_point_opt == std::nullopt)
     {
         // Used to avoid edge cases with division by zero
@@ -466,7 +466,7 @@ void HRVOAgent::computePreferredVelocity()
     }
 
     Vector goalPosition = path_point_opt.value().getPosition();
-    float speedAtGoal  = path_point_opt.value().getSpeed();   
+    float speedAtGoal   = path_point_opt.value().getSpeed();
 
     Vector distVectorToGoal = goalPosition - position_;
     auto distToGoal         = static_cast<float>(distVectorToGoal.length());
@@ -515,8 +515,8 @@ void HRVOAgent::computePreferredVelocity()
 void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
 {
     std::shared_ptr<Agent> other_agent = simulator_->getAgents()[agentNo];
-    auto path_point_opt = path.getCurrentPathPoint();
-    
+    auto path_point_opt                = path.getCurrentPathPoint();
+
     if (path_point_opt == std::nullopt || this == other_agent.get())
     {
         return;
@@ -525,7 +525,7 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
     Vector other_agent_relative_pos = other_agent->getPosition() - position_;
     const float distSq              = other_agent_relative_pos.lengthSquared();
 
-    Vector goal_pos = path_point_opt.value().getPosition();
+    Vector goal_pos          = path_point_opt.value().getPosition();
     Vector relative_goal_pos = goal_pos - position_;
 
     // Whether the other robot is with in 45 degrees of the goal, relative to us
@@ -568,14 +568,13 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
         add_other_agent();
     }
     else if (is_other_agent_in_front && is_other_agent_moving_towards_us &&
-                is_other_agent_near_goal)
+             is_other_agent_near_goal)
     {
         // This is an edge case for when the other agent is outside our search range,
         // but is moving towards us from behind our destination, so it is posing a
         // possible threat of collision if we ignore it.
         add_other_agent();
     }
-    
 }
 
 std::vector<Polygon> HRVOAgent::getVelocityObstaclesAsPolygons() const

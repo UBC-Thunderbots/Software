@@ -47,7 +47,7 @@ class AgentPath
     /**
      * Gets the path radius for this agent
      * @returns path radius for this agent
-     */ 
+     */
     float getPathRadius() const;
 
    private:
@@ -55,5 +55,4 @@ class AgentPath
     unsigned int curr_path_index = 0;
     // path radius for this robot. The max distance away from any path point in this path
     float path_radius;
-
 };

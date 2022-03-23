@@ -54,7 +54,8 @@ void Agent::update()
         current_dest = path_point.value().getPosition();
     }
 
-    if ((current_dest - position_).lengthSquared() < path.getPathRadius() * path.getPathRadius())
+    if ((current_dest - position_).lengthSquared() <
+        path.getPathRadius() * path.getPathRadius())
     {
         // Is at current goal position
         if (path.isGoingToFinalPathPoint())
@@ -75,7 +76,7 @@ void Agent::update()
     }
 }
 
-void Agent::setPath(const AgentPath& new_path)
+void Agent::setPath(const AgentPath &new_path)
 {
     path = new_path;
 }
@@ -90,7 +91,8 @@ void Agent::setVelocity(const Vector &velocity)
     velocity_ = velocity;
 }
 
-float Agent::getMaxSpeed() const {
+float Agent::getMaxSpeed() const
+{
     return max_speed_;
 }
 

@@ -131,7 +131,7 @@ class Agent
     /**
      * Gets the max speed for this agent
      * @return max speed for this agent
-     */ 
+     */
     float getMaxSpeed() const;
 
     /**
@@ -162,7 +162,7 @@ class Agent
      * Sets a new path for this agent
      * @param new_path new path for this agent
      */
-    void setPath(const AgentPath& new_path);
+    void setPath(const AgentPath &new_path);
 
    protected:
     // Agent Properties
