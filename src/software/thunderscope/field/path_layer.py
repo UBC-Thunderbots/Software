@@ -1,9 +1,12 @@
-import pyqtgraph as pg
 import queue
-from software.thunderscope.field.field_layer import FieldLayer
-import software.thunderscope.constants as constants
-from pyqtgraph.Qt import QtCore, QtGui
+
+import pyqtgraph as pg
 from proto.visualization_pb2 import PathVisualization
+from pyqtgraph.Qt import QtCore, QtGui
+
+import software.thunderscope.constants as constants
+from software.networking.threaded_unix_listener import ThreadedUnixListener
+from software.thunderscope.field.field_layer import FieldLayer
 
 
 class PathLayer(FieldLayer):
@@ -26,7 +29,7 @@ class PathLayer(FieldLayer):
             paths = self.cached_paths
 
         self.cached_paths = paths
-        painter.setPen(pg.mkPen("w"))
+        painter.setPen(pg.mkPen("b", width=2))
 
         for path in paths.path:
             polygon_points = [

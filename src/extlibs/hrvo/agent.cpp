@@ -75,6 +75,11 @@ void Agent::update()
     }
 }
 
+void Agent::setPath(const Path& new_path)
+{
+    path = new_path;
+}
+
 void Agent::setPosition(const Vector &position)
 {
     position_ = position;

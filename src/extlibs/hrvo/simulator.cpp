@@ -180,28 +180,30 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
     // Update all friendly agent's goal points based on the matching robot's primitive
     for (auto &[robot_id, primitive] : primitive_set.robot_primitives())
     {
-        auto hrvo_agent = getFriendlyAgentFromRobotId(robot_id);
-        if (hrvo_agent.has_value())
+        auto hrvo_agent_opt = getFriendlyAgentFromRobotId(robot_id);
+        if (hrvo_agent_opt.has_value())
         {
-            // TODO change raw pointer
-            const Path *path = &hrvo_agent.value()->getPath();
-            path->getPathVector().clear();
+            auto hrvo_agent = hrvo_agent_opt.value();
+            const Path path;
 
             if (primitive.has_move())
             {
                 // TODO (#2418): Update implementation of Primitive to support
                 // multiple path points
                 auto destination = primitive.move().path().point().at(0);
-                path->getPathVector().emplace_back(
-                    PathPoint(Vector(static_cast<float>(destination.x_meters()),
-                                     static_cast<float>(destination.y_meters())),
+                path.getPathVector().emplace_back(
+                    PathPoint(Vector(destination.x_meters(),
+                                     destination.y_meters()),
                               primitive.move().final_speed_m_per_s()));
 
                 float new_max_speed = primitive.move().max_speed_m_per_s();
-                hrvo_agent.value()->setMaxSpeed(new_max_speed);
-                hrvo_agent.value()->setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
+                hrvo_agent->setMaxSpeed(new_max_speed);
+                hrvo_agent->setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
             }
+
+            hrvo_agent->setPath(path);
         }
+        
     }
 }
 
