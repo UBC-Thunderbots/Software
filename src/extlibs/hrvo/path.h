@@ -11,38 +11,20 @@ class PathPoint;
 /**
  * An agent's path
  */
-class Path
+class AgentPath
 {
    public:
     /**
      * Default constructor for this path
      */
-    explicit Path();
+    explicit AgentPath();
 
     /**
      * Constructor for this path
      * @param path_points A vector that stores path points, which can be empty
      * @param goal_radius The goal radius for this path
      */
-    explicit Path(const std::vector<PathPoint> &path_points, float goal_radius);
-
-    /**
-     * Gets the next path point position in this path
-     * @return the position of the next path point
-     */
-    std::optional<Vector> getNextPathPointPosition();
-
-    /**
-     * Gets the current path point position in this path
-     * @return the position of the current path point
-     */
-    std::optional<Vector> getCurrentPathPointPosition() const;
-
-    /**
-     * Gets the desired speed of the current path point in this path
-     * @return the speed at destination for the current path point
-     */
-    float getDesiredSpeedAtCurrentPathPoint();
+    explicit AgentPath(const std::vector<PathPoint> &path_points, float goal_radius);
 
     /**
      * Checks if at final path point in a path
@@ -59,9 +41,9 @@ class Path
 
     /**
      * Gets the path point list of this path
-     * @return path point vector
+     * @return path point list
      */
-    std::vector<PathPoint> getPathVector() const;
+    std::vector<PathPoint> getPathList() const;
 
     // path radius for this robot. The max distance away from any path point in this path
     float path_radius;

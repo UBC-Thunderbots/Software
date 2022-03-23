@@ -106,7 +106,7 @@ class HRVOSimulator
      */
     std::size_t addHRVOAgent(const Vector &position, float agent_radius,
                              const Vector &curr_velocity, float maxSpeed, float prefSpeed,
-                             float maxAccel, Path &path, float neighborDist,
+                             float maxAccel, AgentPath &path, float neighborDist,
                              std::size_t maxNeighbors, float uncertaintyOffset);
 
     /**
@@ -122,7 +122,7 @@ class HRVOSimulator
      */
     size_t addLinearVelocityAgent(const Vector &position, float agent_radius,
                                   const Vector &curr_velocity, float max_speed,
-                                  float max_accel, Path &path);
+                                  float max_accel, AgentPath &path);
 
     /**
      *      Returns a new path with a single path point
@@ -131,9 +131,9 @@ class HRVOSimulator
      * @param goal_radius   The goal radius of the path
      * @return a Path object
      */
-    Path addPath(const Vector &position, float goal_radius);
+    AgentPath addPath(const Vector &position, float goal_radius);
 
-    Path addPathPositions(const std::vector<PathPoint> &path_points, float goal_radius);
+    AgentPath addPathPositions(const std::vector<PathPoint> &path_points, float goal_radius);
 
     /**
      * Performs a simulation step; updates the position, and velocity

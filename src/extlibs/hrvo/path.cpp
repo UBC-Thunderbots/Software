@@ -8,7 +8,7 @@
 #include "software/geom/vector.h"
 
 
-Path::Path()
+AgentPath::AgentPath()
 {
     path_radius   = 0.0f;
     Vector vector = Vector();
@@ -16,42 +16,18 @@ Path::Path()
     path.push_back(path_point);
 }
 
-Path::Path(const std::vector<PathPoint> &path_points, float goal_radius_)
+AgentPath::AgentPath(const std::vector<PathPoint> &path_points, float goal_radius_)
 {
     path        = path_points;
     path_radius = goal_radius_;
 }
 
-void Path::incrementPathIndex()
+void AgentPath::incrementPathIndex()
 {
     curr_path_index++;
 }
 
-std::optional<Vector> Path::getCurrentPathPointPosition() const
-{
-    if (curr_path_index >= path.size())
-    {
-        return std::nullopt;
-    }
-    else
-    {
-        return path[curr_path_index].getPosition();
-    }
-}
-
-float Path::getDesiredSpeedAtCurrentPathPoint()
-{
-    if (curr_path_index >= path.size())
-    {
-        return 0.f;
-    }
-    else
-    {
-        return path[curr_path_index].getSpeed();
-    }
-}
-
-std::optional<PathPoint> Path::getCurrentPathPoint() const
+std::optional<PathPoint> AgentPath::getCurrentPathPoint() const
 {
     if (curr_path_index >= path.size())
     {
@@ -63,12 +39,12 @@ std::optional<PathPoint> Path::getCurrentPathPoint() const
     }
 }
 
-PathPoint Path::getLastPathPoint() const
+PathPoint AgentPath::getLastPathPoint() const
 {
     return path[path.size() - 1];
 }
 
-bool Path::isGoingToFinalPathPoint()
+bool AgentPath::isGoingToFinalPathPoint()
 {
     if (curr_path_index >= path.size() - 1)
     {
@@ -77,12 +53,12 @@ bool Path::isGoingToFinalPathPoint()
     return false;
 }
 
-unsigned int Path::getPathIndex() const
+unsigned int AgentPath::getPathIndex() const
 {
     return curr_path_index;
 }
 
-std::vector<PathPoint> Path::getPathVector() const
+std::vector<PathPoint> AgentPath::getPathList() const
 {
     return path;
 }
