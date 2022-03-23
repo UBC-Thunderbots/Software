@@ -8,10 +8,9 @@
 #include "software/logger/logger.h"
 
 
-ThreadedEstopReader::ThreadedEstopReader(std::unique_ptr<UartCommunication> uart_reader,
-                                         unsigned int startup_time_ms)
+ThreadedEstopReader::ThreadedEstopReader(std::unique_ptr<UartCommunication> uart_reader
     : estop_state(EstopState::STOP),
-      timer(io_service, boost::posix_time::milliseconds(startup_time_ms)),
+      timer(io_service),
       uart_reader(std::move(uart_reader))
 {
     estop_thread = std::thread(boost::bind(&ThreadedEstopReader::continousRead, this));
