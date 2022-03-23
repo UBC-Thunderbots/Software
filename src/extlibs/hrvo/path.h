@@ -40,16 +40,6 @@ class AgentPath
     unsigned int getPathIndex() const;
 
     /**
-     * Gets the path point list of this path
-     * @return path point list
-     */
-    std::vector<PathPoint> getPathList() const;
-
-    // path radius for this robot. The max distance away from any path point in this path
-    float path_radius;
-
-
-    /**
      * Increments the path point index of this path
      */
     void incrementPathIndex();
@@ -60,10 +50,22 @@ class AgentPath
      */
     std::optional<PathPoint> getCurrentPathPoint() const;
 
-    // Assume that the path vector is not empty
+    /**
+     * Gets the path radius for this agent
+     * @returns path radius for this agent
+     */ 
+    float getPathRadius() const;
+
+    /**
+     * Gets the last path point for this agent
+     * @returns the last path point for this agent
+     */ 
     PathPoint getLastPathPoint() const;
 
    private:
     std::vector<PathPoint> path;
     unsigned int curr_path_index = 0;
+    // path radius for this robot. The max distance away from any path point in this path
+    float path_radius;
+
 };

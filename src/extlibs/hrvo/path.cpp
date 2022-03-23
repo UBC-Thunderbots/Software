@@ -11,9 +11,6 @@
 AgentPath::AgentPath()
 {
     path_radius   = 0.0f;
-    Vector vector = Vector();
-    PathPoint path_point(vector);
-    path.push_back(path_point);
 }
 
 AgentPath::AgentPath(const std::vector<PathPoint> &path_points, float goal_radius_)
@@ -63,7 +60,3 @@ unsigned int AgentPath::getPathIndex() const
     return curr_path_index;
 }
 
-std::vector<PathPoint> AgentPath::getPathList() const
-{
-    return path;
-}

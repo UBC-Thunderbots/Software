@@ -129,6 +129,12 @@ class Agent
     const AgentPath &getPath() const;
 
     /**
+     * Gets the max speed for this agent
+     * @return max speed for this agent
+     */ 
+    float getMaxSpeed() const;
+
+    /**
      * Update position of Agent
      * @param position New position
      */
