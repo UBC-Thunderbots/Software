@@ -67,7 +67,7 @@ class HRVOAgent : public Agent
      */
     HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
               std::size_t maxNeighbors, float radius, const Vector &velocity,
-              float maxAccel, Path &path, float prefSpeed, float maxSpeed,
+              float maxAccel, AgentPath &path, float prefSpeed, float maxSpeed,
               float uncertaintyOffset);
 
     /**

@@ -11,20 +11,20 @@ class PathPoint;
 /**
  * An agent's path
  */
-class Path
+class AgentPath
 {
    public:
     /**
      * Default constructor for this path
      */
-    explicit Path();
+    explicit AgentPath();
 
     /**
      * Constructor for this path
      * @param path_points A vector that stores path points, which can be empty
      * @param goal_radius The goal radius for this path
      */
-    explicit Path(const std::vector<PathPoint> &path_points, float goal_radius);
+    explicit AgentPath(const std::vector<PathPoint> &path_points, float goal_radius);
 
     /**
      * Gets the next path point position in this path

@@ -26,7 +26,7 @@ class Agent
      */
     Agent(HRVOSimulator *simulator, const Vector &position, float radius,
           const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
-          float maxAccel, Path &path);
+          float maxAccel, AgentPath &path);
 
     virtual ~Agent() = default;
 
@@ -126,7 +126,7 @@ class Agent
      * Gets the the path for this agent
      * @return Path for this agent
      */
-    const Path &getPath() const;
+    const AgentPath &getPath() const;
 
     /**
      * Update position of Agent
@@ -156,7 +156,7 @@ class Agent
      * Sets a new path for this agent
      * @param new_path new path for this agent
      */
-    void setPath(const Path& new_path);
+    void setPath(const AgentPath& new_path);
 
    protected:
     // Agent Properties
@@ -172,7 +172,7 @@ class Agent
     // speed to avoid collisions.
     Vector pref_velocity_;
     // The path of this Agent
-    Path path;
+    AgentPath path;
 
     float max_speed_;
     float max_accel_;

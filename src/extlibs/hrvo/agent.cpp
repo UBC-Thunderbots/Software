@@ -5,7 +5,7 @@
 
 Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
              const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
-             float maxAccel, Path &path)
+             float maxAccel, AgentPath &path)
     : simulator_(simulator),
       position_(position),
       radius_(radius),
@@ -75,7 +75,7 @@ void Agent::update()
     }
 }
 
-void Agent::setPath(const Path& new_path)
+void Agent::setPath(const AgentPath& new_path)
 {
     path = new_path;
 }
@@ -125,7 +125,7 @@ float Agent::getPathRadius() const
     return path.path_radius;
 }
 
-const Path &Agent::getPath() const
+const AgentPath &Agent::getPath() const
 {
     return path;
 }
