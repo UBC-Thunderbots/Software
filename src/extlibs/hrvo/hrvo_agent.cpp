@@ -456,29 +456,17 @@ void HRVOAgent::computeNewVelocity()
 
 void HRVOAgent::computePreferredVelocity()
 {
-    if (prefSpeed_ <= 0.01f || max_accel_ <= 0.01f)
+    auto path_point_opt = path.getCurrentPathPoint();
+    
+    if (prefSpeed_ <= 0.01f || max_accel_ <= 0.01f || path_point_opt == std::nullopt)
     {
         // Used to avoid edge cases with division by zero
         pref_velocity_ = Vector(0.f, 0.f);
         return;
     }
 
-    Vector goalPosition;
-    float speedAtGoal;
-
-    // Check if we reached the end of the path
-    if (path.getCurrentPathPoint() == std::nullopt)
-    {
-        // Keep the same goal position as the very last pathpoint
-        goalPosition = path.getLastPathPoint().getPosition();
-        // Set speed to zero
-        speedAtGoal = 0.0f;
-    }
-    else
-    {
-        goalPosition = path.getCurrentPathPoint().value().getPosition();
-        speedAtGoal  = path.getCurrentPathPoint().value().getSpeed();
-    }
+    Vector goalPosition = path_point_opt.value().getPosition();
+    float speedAtGoal  = path_point_opt.value().getSpeed();   
 
     Vector distVectorToGoal = goalPosition - position_;
     auto distToGoal         = static_cast<float>(distVectorToGoal.length());
@@ -527,73 +515,67 @@ void HRVOAgent::computePreferredVelocity()
 void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
 {
     std::shared_ptr<Agent> other_agent = simulator_->getAgents()[agentNo];
-
-    if (this != other_agent.get())
+    auto path_point_opt = path.getCurrentPathPoint();
+    
+    if (path_point_opt == std::nullopt || this == other_agent.get())
     {
-        Vector other_agent_relative_pos = other_agent->getPosition() - position_;
-        const float distSq              = other_agent_relative_pos.lengthSquared();
-
-        Vector goal_pos;
-        // check if we have reached the end of path
-        if (path.getCurrentPathPoint() == std::nullopt)
-        {
-            goal_pos = path.getLastPathPoint().getPosition();
-        }
-        else
-        {
-            goal_pos = path.getCurrentPathPoint().value().getPosition();
-        }
-
-        Vector relative_goal_pos = goal_pos - position_;
-
-        // Whether the other robot is with in 45 degrees of the goal, relative to us
-        const float forty_five_deg_ratio = 1.f / std::sqrt(2.f);
-        bool is_other_agent_in_front =
-            relative_goal_pos.normalize().dot(other_agent_relative_pos.normalize()) >
-            forty_five_deg_ratio;
-
-        bool is_other_agent_moving_towards_us =
-            velocity_.normalize().dot((other_agent->getVelocity()).normalize()) <
-            -forty_five_deg_ratio;
-
-        // Whether the other agent is within a 1.5-meter radius of our goal
-        bool is_other_agent_near_goal =
-            (other_agent->getPosition() - goal_pos).lengthSquared() < 1.5f;
-
-        // Helper lambda function for adding other_agent to list of neighbors
-        auto add_other_agent = [&]() {
-            if (neighbors_.size() == maxNeighbors_)
-            {
-                neighbors_.erase(--neighbors_.end());
-            }
-
-            neighbors_.insert(std::make_pair(distSq, agentNo));
-
-            if (neighbors_.size() == maxNeighbors_)
-            {
-                rangeSq = (--neighbors_.end())->first;
-            }
-        };
-
-        if (distSq < std::pow(radius_ + other_agent->getRadius(), 2))
-        {
-            // In collision with other agent, so the other neighbors are not important
-            neighbors_.clear();
-            add_other_agent();
-        }
-        else if (distSq < rangeSq)
-        {
-            add_other_agent();
-        }
-        else if (is_other_agent_in_front && is_other_agent_moving_towards_us &&
-                 is_other_agent_near_goal)
-        {
-            // This is an edge case for when the other agent is outside our search range,
-            // but is moving towards us from behind our destination, so it is posing a
-            // possible threat of collision if we ignore it.
-            add_other_agent();
-        }
+        return;
     }
+
+    Vector other_agent_relative_pos = other_agent->getPosition() - position_;
+    const float distSq              = other_agent_relative_pos.lengthSquared();
+
+    Vector goal_pos = path_point_opt.value().getPosition();
+    Vector relative_goal_pos = goal_pos - position_;
+
+    // Whether the other robot is with in 45 degrees of the goal, relative to us
+    const float forty_five_deg_ratio = 1.f / std::sqrt(2.f);
+    bool is_other_agent_in_front =
+        relative_goal_pos.normalize().dot(other_agent_relative_pos.normalize()) >
+        forty_five_deg_ratio;
+
+    bool is_other_agent_moving_towards_us =
+        velocity_.normalize().dot((other_agent->getVelocity()).normalize()) <
+        -forty_five_deg_ratio;
+
+    // Whether the other agent is within a 1.5-meter radius of our goal
+    bool is_other_agent_near_goal =
+        (other_agent->getPosition() - goal_pos).lengthSquared() < 1.5f;
+
+    // Helper lambda function for adding other_agent to list of neighbors
+    auto add_other_agent = [&]() {
+        if (neighbors_.size() == maxNeighbors_)
+        {
+            neighbors_.erase(--neighbors_.end());
+        }
+
+        neighbors_.insert(std::make_pair(distSq, agentNo));
+
+        if (neighbors_.size() == maxNeighbors_)
+        {
+            rangeSq = (--neighbors_.end())->first;
+        }
+    };
+
+    if (distSq < std::pow(radius_ + other_agent->getRadius(), 2))
+    {
+        // In collision with other agent, so the other neighbors are not important
+        neighbors_.clear();
+        add_other_agent();
+    }
+    else if (distSq < rangeSq)
+    {
+        add_other_agent();
+    }
+    else if (is_other_agent_in_front && is_other_agent_moving_towards_us &&
+                is_other_agent_near_goal)
+    {
+        // This is an edge case for when the other agent is outside our search range,
+        // but is moving towards us from behind our destination, so it is posing a
+        // possible threat of collision if we ignore it.
+        add_other_agent();
+    }
+    
 }
 
 std::vector<Polygon> HRVOAgent::getVelocityObstaclesAsPolygons() const

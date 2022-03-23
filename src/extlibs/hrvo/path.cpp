@@ -29,7 +29,7 @@ std::optional<PathPoint> AgentPath::getCurrentPathPoint() const
     if (curr_path_index >= path.size())
     {
         if (!path.empty()) {
-            return getLastPathPoint();
+            return path[path.size() - 1];
         }
         else {
             return std::nullopt;
@@ -39,11 +39,6 @@ std::optional<PathPoint> AgentPath::getCurrentPathPoint() const
     {
         return path[curr_path_index];
     }
-}
-
-PathPoint AgentPath::getLastPathPoint() const
-{
-    return path[path.size() - 1];
 }
 
 bool AgentPath::isGoingToFinalPathPoint()
@@ -58,5 +53,10 @@ bool AgentPath::isGoingToFinalPathPoint()
 unsigned int AgentPath::getPathIndex() const
 {
     return curr_path_index;
+}
+
+float AgentPath::getPathRadius() const {
+    
+    return path_radius;
 }
 

@@ -56,12 +56,6 @@ class AgentPath
      */ 
     float getPathRadius() const;
 
-    /**
-     * Gets the last path point for this agent
-     * @returns the last path point for this agent
-     */ 
-    PathPoint getLastPathPoint() const;
-
    private:
     std::vector<PathPoint> path;
     unsigned int curr_path_index = 0;

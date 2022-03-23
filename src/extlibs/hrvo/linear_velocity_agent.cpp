@@ -11,20 +11,18 @@ void LinearVelocityAgent::computeNewVelocity()
 {
     // TODO (#2496): Fix bug where LinearVelocityAgents go past their destination
     // Preferring a velocity which points directly towards goal
-    Vector current_position;
 
-    // check if we have reached the end of the path
-    if (path.getCurrentPathPoint() == std::nullopt)
+    auto path_point_opt = path.getCurrentPathPoint();
+    
+    if (path_point_opt == std::nullopt)
     {
-        // set the current_position as the previous position
-        current_position = path.getLastPathPoint().getPosition();
-    }
-    else
-    {
-        current_position = path.getCurrentPathPoint().value().getPosition();
+        pref_velocity_ = Vector(0.f, 0.f);
+        new_velocity_ = Vector(0.f, 0.f);
+        return;
     }
 
-    pref_velocity_ = current_position - position_;
+    Vector goal_pos = path_point_opt.value().getPosition();
+    pref_velocity_ = goal_pos - position_;
 
     if (pref_velocity_.length() > max_speed_)
     {
