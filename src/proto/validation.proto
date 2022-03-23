@@ -1,0 +1,42 @@
+syntax = "proto2";
+
+package TbotsProto;
+
+import "proto/game_state.proto";
+import "proto/team.proto";
+import "proto/vision.proto";
+import "proto/geometry.proto";
+import "proto/ball.proto";
+
+enum ValidationStatus
+{
+    PASSING = 0;
+    FAILING = 1;
+}
+
+enum ValidationType
+{
+    EVENTUALLY = 0;
+    ALWAYS     = 1;
+}
+
+// Visual representation of the Validation
+message ValidationGeometry
+{
+    repeated Polygon polygons = 1;
+    repeated Circle circles   = 2;
+    repeated Vector vectors   = 3;
+}
+
+message ValidationProto
+{
+    required string failure_msg             = 1;
+    required ValidationType validation_type = 2;
+    required ValidationGeometry geometry    = 3;
+    required ValidationStatus status        = 4;
+}
+
+message ValidationProtoSet
+{
+    repeated ValidationProto validations = 1;
+}
