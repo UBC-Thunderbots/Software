@@ -31,7 +31,12 @@ std::optional<PathPoint> AgentPath::getCurrentPathPoint() const
 {
     if (curr_path_index >= path.size())
     {
-        return std::nullopt;
+        if (!path.empty()) {
+            return getLastPathPoint();
+        }
+        else {
+            return std::nullopt;
+        }
     }
     else
     {

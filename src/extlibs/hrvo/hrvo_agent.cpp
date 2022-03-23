@@ -58,19 +58,16 @@ void HRVOAgent::computeNeighbors()
 {
     neighbors_.clear();
 
-    Vector current_position;
     if (path.getCurrentPathPoint() == std::nullopt)
     {
-        current_position = path.getLastPathPoint().getPosition();
+        return;
     }
-    else
-    {
-        current_position = path.getCurrentPathPoint().value().getPosition();
-    }
+    
+    Vector current_dest = path.getCurrentPathPoint().value().getPosition();
 
     float new_neighbor_dist =
         std::min(static_cast<double>(neighborDist_),
-                 (position_ - current_position).length() + path.path_radius);
+                 (position_ - current_dest).length() + path.path_radius);
 
     simulator_->getKdTree()->query(this, new_neighbor_dist);
 }
