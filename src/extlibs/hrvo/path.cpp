@@ -50,11 +50,6 @@ bool AgentPath::isGoingToFinalPathPoint()
     return false;
 }
 
-unsigned int AgentPath::getPathIndex() const
-{
-    return curr_path_index;
-}
-
 float AgentPath::getPathRadius() const {
     
     return path_radius;

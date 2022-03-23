@@ -34,12 +34,6 @@ class AgentPath
     bool isGoingToFinalPathPoint();
 
     /**
-     * Gets the current path index
-     * @return the current path index
-     */
-    unsigned int getPathIndex() const;
-
-    /**
      * Increments the path point index of this path
      */
     void incrementPathIndex();
