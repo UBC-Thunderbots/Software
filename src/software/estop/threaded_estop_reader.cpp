@@ -52,21 +52,27 @@ void ThreadedEstopReader::tick(const boost::system::error_code& error)
 
         EstopState new_state;
 
-        switch (estop_msg.at(0))
+        switch (static_cast<int>(estop_msg.at(0)))
         {
             case ESTOP_PLAY_MSG:
+            {
                 new_state                    = EstopState::PLAY;
                 num_consecutive_status_error = 0;
                 break;
+            }
             case ESTOP_STOP_MSG:
+            {
                 new_state                    = EstopState::STOP;
                 num_consecutive_status_error = 0;
                 break;
+            }
             default:
+            {
                 new_state = EstopState::STATUS_ERROR;
                 LOG(WARNING) << "read unexpected estop message";
                 num_consecutive_status_error++;
                 break;
+            }
         }
 
         if (new_state != estop_state)

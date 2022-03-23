@@ -25,6 +25,7 @@ from proto.import_all_protos import *
 from software.networking import threaded_unix_sender
 from software.networking import networking
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
+from software.estop.estop_reader import ThreadedEstopReader
 from software.thunderscope.field import (
     obstacle_layer,
     path_layer,
@@ -205,10 +206,21 @@ class Thunderscope(object):
 
 if __name__ == "__main__":
     def received(bob):
+        print("ASDOIJASD", bob)
 
-    listener = networking.RobotStatusProtoListener("ff02::c3d0:42d2:bb01%wlp4s0", 42500, received, True)
-    sender = networking.RobotStatusProtoSender("ff02::c3d0:42d2:bb01%wlp4s0", 42500, True)
-    sender.send_proto(RobotStatus())
+    estop_reader = ThreadedEstopReader("/dev/ttyACM0", 115200)
+
+    while True:
+        print("Estop: ", estop_reader.isEstopPlay())
+
+    # listener = networking.RobotStatusProtoListener("ff02::c3d0:42d2:bb01%wlp4s0", 42500, received, True)
+    # sender = networking.RobotStatusProtoSender("ff02::c3d0:42d2:bb01%wlp4s0", 42500, True)
+    sender.send_proto(RobotStatus(robot_id=1))
+    sender.send_proto(RobotStatus(robot_id=2))
+    sender.send_proto(RobotStatus(robot_id=3))
+    sender.send_proto(RobotStatus(robot_id=4))
+    sender.send_proto(RobotStatus(robot_id=5))
+    sender.send_proto(RobotStatus(robot_id=6))
 
     parser = argparse.ArgumentParser(description="Thunderscope")
     parser.add_argument(

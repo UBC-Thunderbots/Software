@@ -16,33 +16,10 @@
 namespace py = pybind11;
 
 /**
- * Create a ThreadedProtoUdpListener
- *
- * NOTE: When we are calling python functions from C++, we need to add the scoped global
- * interpreter log. We create a lambda that grabs the lock, and triggers the callback.
- *
- * @param ip_address The ip address of the endpoint
- * @param port The port to connect to
- * @param func The callback function to call when a new message arrives
- * @param multicast If we should join a multicast group
- *
- * @return ThreadedProtoUdpSender<T>
- */
-template <typename T>
-std::shared_ptr<ThreadedProtoUdpListener<T>> createThreaedProtoUdpListener(
-    const std::string &ip_address, unsigned short port,
-    const std::function<void(T)> &func, bool multicast)
-{
-    return std::make_shared<ThreadedProtoUdpListener<T>>(ip_address, port, func,
-                                                         multicast);
-}
-
-/**
  * Python doesn't have templating, but we would like to re-use the networking
- * libraries that we have in python.
+ * libraries that we have in C++, in python.
  *
- * From here:
- * https://stackoverflow.com/questions/47487888/pybind11-template-class-of-many-types
+ * Adapted from: https://stackoverflow.com/a/47749076
  *
  * @param m The module to define the sender/receiver in
  * @param The name to insert into the binded class name (ex. {name}ProtoSender)
@@ -65,7 +42,8 @@ void decleareThreadedProtoUdpListener(py::module &m, std::string name)
     std::string pyclass_name = name + "ProtoListener";
     py::class_<Class, std::shared_ptr<Class>>(m, pyclass_name.c_str(),
                                               py::buffer_protocol(), py::dynamic_attr())
-        .def(py::init<>(&createThreaedProtoUdpListener<T>));
+        .def(py::init<const std::string &, unsigned short, const std::function<void(T)> &,
+                      bool>());
 }
 
 PYBIND11_MODULE(networking, m)

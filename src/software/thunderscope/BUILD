@@ -7,6 +7,7 @@ py_binary(
     srcs = ["thunderscope.py"],
     data = [
         "//software/networking:networking.so",
+        "//software/estop:estop_reader.so",
     ],
     deps = [
         "//proto:software_py_proto",
