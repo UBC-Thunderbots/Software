@@ -209,6 +209,7 @@ class Thunderscope(object):
 if __name__ == "__main__":
 
     full_system = FullSystem()
+    mobile_gamepad.MobileGamepad()
 
     def relay_sensor_proto(bob):
         # TODO is this thread safe?

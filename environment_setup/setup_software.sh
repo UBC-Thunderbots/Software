@@ -144,13 +144,13 @@ echo "================================================================"
 echo "Done Setting Up Virtual Python Environment"
 echo "================================================================"
 
-FILE=/opt/mobile-gamepad.nar
+FILE=/opt/mobile_gamepad.zip
 if [ ! -f "$FILE" ]; then
     echo "Mobile Gamepad Binary not found, fetching"
     # Download handheld controller
-    sudo curl -L https://github.com/UBC-Thunderbots/mobile-gamepad/releases/download/vtbots.0.1/mobile-gamepad-0.0.2-linux-x64.nar -o /opt/mobile-gamepad.nar
-    sudo chown -R $USER:$USER /opt/mobile-gamepad.nar
-    chmod +x /opt/mobile-gamepad.nar
+    sudo curl -L https://github.com/UBC-Thunderbots/mobile-gamepad/releases/download/vtbots.0.1/gamepad.zip -o /opt/mobile_gamepad.zip
+    sudo unzip /opt/mobile_gamepad.zip -d /opt
+    sudo chown -R $USER:$USER /opt/mobile_gamepad
 fi
 
 
