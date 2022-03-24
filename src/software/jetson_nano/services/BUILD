@@ -17,14 +17,3 @@ cc_library(
         "@trinamic",
     ],
 )
-
-cc_library(
-    name = "redis",
-    srcs = ["redis.cpp"],
-    hdrs = ["redis.h"],
-    deps = [
-        ":service",
-        "//software/logger",
-        "@cpp_redis",
-    ],
-)
