@@ -50,6 +50,8 @@ PYBIND11_MODULE(geometry, m)
         .def("y", &Vector::y)
         .def("setX", &Vector::setX)
         .def("setY", &Vector::setY)
+        .def("length", &Vector::length)
+        .def("lengthSquared", &Vector::lengthSquared)
         .def("normalize", py::overload_cast<>(&Vector::normalize, py::const_))
         .def("normalize", py::overload_cast<double>(&Vector::normalize, py::const_))
         // Overloaded

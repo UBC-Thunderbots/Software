@@ -7,6 +7,7 @@ from proto.primitive_pb2 import MaxAllowedSpeedMode
 from proto.tactic_pb2 import AssignedTacticPlayControlParams, GoalieTactic, Tactic
 from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.ball_enters_region import *
+from software.simulated_tests.robots_halt import *
 from software.simulated_tests.simulated_test_fixture import tactic_runner
 
 
@@ -103,6 +104,7 @@ def test_goalie_blocks_shot(
     always_validation_sequence_set = [
         [
             RobotNeverEntersRegion(regions=[geom.Field().enemyDefenseArea()]),
+            RobotsEventuallyHalt(),
             BallNeverEntersRegion(regions=[geom.Field().friendlyGoal()]),
         ]
     ]

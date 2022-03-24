@@ -1,10 +1,5 @@
-import pytest
-
 import software.geom.geometry as geom
-from proto.geometry_pb2 import Angle, AngularVelocity, Point, Vector
-from proto.tbots_software_msgs_pb2 import Vision
-from proto.validation_pb2 import ValidationGeometry, ValidationProto, ValidationStatus
-from proto.world_pb2 import SimulatorTick, World, WorldState
+from proto.import_all_protos import *
 
 from software.simulated_tests.validation import (
     Validation,

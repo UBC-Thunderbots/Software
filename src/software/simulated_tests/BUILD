@@ -178,6 +178,7 @@ py_library(
     srcs = [
         "ball_enters_region.py",
         "robot_enters_region.py",
+        "robots_halt.py",
         "validation.py",
     ],
     data = [
