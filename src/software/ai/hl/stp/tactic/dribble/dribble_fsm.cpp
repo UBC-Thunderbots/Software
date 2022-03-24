@@ -109,20 +109,6 @@ void DribbleFSM::dribble(const Update &event)
             event.control_params.dribble_destination,
             event.control_params.final_dribble_orientation);
 
-    // T Defense
-    for (const auto &enemy_robot : event.common.world.enemyTeam().getAllRobots())
-    {
-        if (enemy_robot.isNearDribbler(ball_position, 0.005))
-        {
-            if (acuteAngle(enemy_robot.position(), event.common.robot.position(),
-                           ball_position) < Angle::fromDegrees(90))
-            {
-                target_orientation += Angle::fromDegrees(45);
-                break;
-            }
-        }
-    }
-
     event.common.set_intent(std::make_unique<MoveIntent>(
         event.common.robot.id(), target_destination, target_orientation, 0,
         TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
@@ -163,7 +149,7 @@ bool DribbleFSM::havePossession(const Update &event)
 bool DribbleFSM::lostPossession(const Update &event)
 {
     return !event.common.robot.isNearDribbler(
-        // avoid cases where ball is exactly on the edge fo the robot
+        // avoid cases where ball is exactly on the edge of the robot
         event.common.world.ball().position(),
         dribble_tactic_config->getLoseBallPossessionThreshold()->value());
 };
