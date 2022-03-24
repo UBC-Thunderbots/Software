@@ -102,7 +102,6 @@ void DribbleFSM::getPossession(const Update &event)
 
 void DribbleFSM::dribble(const Update &event)
 {
-    Point ball_position = event.common.world.ball().position();
     auto [target_destination, target_orientation] =
         calculateNextDribbleDestinationAndOrientation(
             event.common.world.ball(), event.common.robot,
@@ -143,7 +142,10 @@ void DribbleFSM::startDribble(const Update &event)
 
 bool DribbleFSM::havePossession(const Update &event)
 {
-    return event.common.robot.isNearDribbler(event.common.world.ball().position(), -0.01);
+    return event.common.robot.isNearDribbler(
+        event.common.world.ball().position(),
+        BALL_MAX_RADIUS_METERS -
+            2 * BALL_MAX_RADIUS_METERS * MAX_FRACTION_OF_BALL_COVERED_BY_ROBOT);
 }
 
 bool DribbleFSM::lostPossession(const Update &event)

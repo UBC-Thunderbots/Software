@@ -5,7 +5,6 @@
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
-#include "proto/robot_status_msg.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/jetson_nano/primitive_executor.h"
 #include "software/simulation/firmware_object_deleter.h"
