@@ -45,11 +45,7 @@ std::optional<PathPoint> AgentPath::getCurrentPathPoint() const
 
 bool AgentPath::isGoingToFinalPathPoint()
 {
-    if (curr_path_index >= path.size() - 1)
-    {
-        return true;
-    }
-    return false;
+    return curr_path_index >= path.size() - 1;
 }
 
 float AgentPath::getPathRadius() const

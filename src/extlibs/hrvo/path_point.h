@@ -9,18 +9,21 @@ class PathPoint
 {
    public:
     /**
-     * @param position  The position of this path point
-     */
-    explicit PathPoint(const Vector &position);
-
-    /**
      * @param position The position of this path point
      * @param speed_at_position The speed at this path point
      */
     explicit PathPoint(const Vector &position, const float speed_at_position);
 
+    /**
+     * Gets the position of the path point
+     * @return Vector position
+     */ 
     Vector getPosition() const;
 
+    /**
+     * Gets the speed of the path point
+     * @return float speed
+     */ 
     float getSpeed() const;
 
    private:
