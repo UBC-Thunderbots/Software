@@ -32,21 +32,27 @@
 
 #pragma once
 
+#include <fstream>
 #include <limits>
 #include <vector>
 
 #include "extlibs/hrvo/agent.h"
 #include "extlibs/hrvo/goal.h"
 #include "extlibs/hrvo/kd_tree.h"
-#include "extlibs/hrvo/vector2.h"
 #include "proto/tbots_software_msgs.pb.h"
+#include "software/geom/vector.h"
 #include "software/world/world.h"
 
-class Simulator
+class HRVOSimulator
 {
    public:
-    explicit Simulator(float time_step);
-    ~Simulator() = default;
+    /**
+     * Constructor
+     * @param time_step The time step between each step of the simulator
+     * @param robot_constants The robot constants to be used for all Agents representing a
+     * robot
+     */
+    explicit HRVOSimulator(float time_step, const RobotConstants_t &robot_constants);
 
     /**
      * Reset all agents to match the state of the given world.
@@ -61,19 +67,17 @@ class Simulator
     /**
      * Reset all friendly agents goal points to match the path of the given primitive set
      *
-     * @param primitive_set
+     * @param new_primitive_set
      */
-    void updatePrimitiveSet(const TbotsProto::PrimitiveSet &primitive_set);
+    void updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primitive_set);
 
     /**
      *      Adds a new Hybrid Reciprocal Agent to the simulation based on Robot.
      *
      * @param Robot    The robot which this agent should be based on
-     * @param velocity The number of neighboring agents which the HRVO algorithm should
-     * consider when calculating new velocity
      * @return    The index of the agent.
      */
-    std::size_t addHRVORobotAgent(const Robot &robot, int max_neighbors = 10);
+    std::size_t addHRVORobotAgent(const Robot &robot);
 
     /**
      *      Adds a new Linear Velocity Agent to the simulation based on Robot.
@@ -83,7 +87,7 @@ class Simulator
      * @return    The index of the agent.
      */
     std::size_t addLinearVelocityRobotAgent(const Robot &robot,
-                                            const Vector2 &destination);
+                                            const Vector &destination);
 
     /**
      *      Adds a new agent to the simulation.
@@ -101,14 +105,14 @@ class Simulator
      * @param curr_velocity      The initial velocity of this agent.
      * @return The index of the agent.
      */
-    std::size_t addHRVOAgent(const Vector2 &position, float agent_radius,
-                             const Vector2 &curr_velocity, float maxSpeed,
-                             float prefSpeed, float maxAccel, std::size_t goal_index,
-                             float goalRadius, float neighborDist,
-                             std::size_t maxNeighbors, float uncertaintyOffset);
+    std::size_t addHRVOAgent(const Vector &position, float agent_radius,
+                             const Vector &curr_velocity, float maxSpeed, float prefSpeed,
+                             float maxAccel, std::size_t goal_index, float goalRadius,
+                             float neighborDist, std::size_t maxNeighbors,
+                             float uncertaintyOffset);
 
     /**
-     *
+     * Add a new LinearlyVelocityAgent
      * @param position      The starting position of this agent.
      * @param agent_radius  The agent_radius of this agent.
      * @param curr_velocity The initial velocity of this agent.
@@ -118,20 +122,20 @@ class Simulator
      * @param goal_radius   The goal agent_radius of this agent.
      * @return The index of the agent.
      */
-    size_t addLinearVelocityAgent(const Vector2 &position, float agent_radius,
-                                  const Vector2 &curr_velocity, float max_speed,
+    size_t addLinearVelocityAgent(const Vector &position, float agent_radius,
+                                  const Vector &curr_velocity, float max_speed,
                                   float max_accel, size_t goal_index, float goal_radius);
 
-    // TODO (#2373): Remove goals_ list when goal is a part of Agent
+    // TODO (#2373): Remove goals list when goal is a part of Agent
     /**
      *      Adds a new goal to the simulation.
      *
      * @param position  The position of this goal.
      * @return    The number of the goal.
      */
-    std::size_t addGoal(const Vector2 &position);
-    std::size_t addGoalPositions(const std::vector<Vector2> &positions);
-    std::size_t addGoalPositions(const std::vector<Vector2> &positions,
+    std::size_t addGoal(const Vector &position);
+    std::size_t addGoalPositions(const std::vector<Vector> &positions);
+    std::size_t addGoalPositions(const std::vector<Vector> &positions,
                                  const std::vector<float> &speedAtPosition);
 
     /**
@@ -140,6 +144,40 @@ class Simulator
      * the simulation time_step seconds forward
      */
     void doStep();
+
+    /**
+     * Get the current friendly robot velocity
+     * @param robot_id The robot id of the friendly robot to retrieve velocity from
+     * @return Current global velocity of robot
+     */
+    Vector getRobotVelocity(unsigned int robot_id) const;
+
+    /**
+     * Get friendly HRVO agent from robot id. Returns std::nullopt if agent does not exist
+     * @param robot_id Robot id as represented in the real world
+     * @return Optional shared pointer to an HRVO agent
+     */
+    std::optional<std::shared_ptr<HRVOAgent>> getFriendlyAgentFromRobotId(
+        unsigned int robot_id) const;
+
+    /**
+     * Visualize this simulator to Thunderscope
+     * @param robot_id The friendly robot_id which we want its velocity obstacles to be
+     * visualized
+     */
+    void visualize(unsigned int robot_id) const;
+
+    /**
+     * Get the KDTree of Agents
+     * @return KDTree of Agents
+     */
+    const std::unique_ptr<KdTree> &getKdTree() const;
+
+    /**
+     * Get the list of Agents in this simulator
+     * @return List of Agents
+     */
+    const std::vector<std::shared_ptr<Agent>> &getAgents() const;
 
     /**
      *      Returns the maximum acceleration of a specified agent.
@@ -156,7 +194,7 @@ class Simulator
      * @param agentNo  The number of the agent whose position is to be retrieved.
      * @return    The present position of the (center of) the agent.
      */
-    Vector2 getAgentPosition(std::size_t agentNo) const;
+    Vector getAgentPosition(std::size_t agentNo) const;
 
     /**
      *      Returns the preferred velocity of a specified agent.
@@ -168,7 +206,7 @@ class Simulator
      * retrieved.
      * @return    The present preferred velocity of the agent.
      */
-    Vector2 getAgentPrefVelocity(std::size_t agentNo) const;
+    Vector getAgentPrefVelocity(std::size_t agentNo) const;
 
     /**
      *      Returns the radius of a specified agent.
@@ -193,7 +231,7 @@ class Simulator
      * @param agentNo  The number of the agent whose velocity is to be retrieved.
      * @return    The present velocity of the agent.
      */
-    Vector2 getAgentVelocity(std::size_t agentNo) const;
+    Vector getAgentVelocity(std::size_t agentNo) const;
 
     /**
      *   Returns the global time of the simulation.
@@ -202,7 +240,7 @@ class Simulator
      */
     float getGlobalTime() const
     {
-        return globalTime_;
+        return global_time;
     }
 
     /**
@@ -212,7 +250,7 @@ class Simulator
      */
     std::size_t getNumAgents() const
     {
-        return agents_.size();
+        return agents.size();
     }
 
     /**
@@ -222,7 +260,7 @@ class Simulator
      */
     std::size_t getNumGoals() const
     {
-        return goals_.size();
+        return goals.size();
     }
 
     /**
@@ -232,7 +270,7 @@ class Simulator
      */
     float getTimeStep() const
     {
-        return timeStep_;
+        return time_step;
     }
 
     /**
@@ -242,38 +280,49 @@ class Simulator
      */
     bool haveReachedGoals() const
     {
-        return reachedGoals_;
+        return reached_goals;
     }
 
-   public:
-    // KdTree used to calculate the K nearest agents
-    std::unique_ptr<KdTree> kdTree_;
-
-    // The global time of this hrvo simulation
-    float globalTime_;
-
-    // The amount of time which the simulator should advance by
-    float timeStep_;
-
-    // True if all agents have reached their destination
-    bool reachedGoals_;
-
-    // List of agents (robots) in this simulation
-    std::vector<std::unique_ptr<Agent>> agents_;
-    // TODO (#2373): Remove goals_ list when goal is a part of Agent
-    std::vector<std::unique_ptr<Goal>> goals_;
-
    private:
-    // friendly robot id to agent index
-    std::map<unsigned int, unsigned int> friendly_robot_id_map;
+    unsigned int frame = 0;
 
     // PrimitiveSet which includes the path which each friendly robot should take
-    TbotsProto::PrimitiveSet primitive_set_;
+    TbotsProto::PrimitiveSet primitive_set;
 
     // True if the ball should be treated as an agent (obstacle)
     // NOTE: This will take effect the next time we receive a world, and we know
     //       the current ball position and velocity
-    bool add_ball_agent = false;
+    bool add_ball_agent       = false;
+    std::size_t ball_agent_id = -1;
+
+    // The robot constants which all agents will use
+    RobotConstants_t robot_constants;
+
+    // The global time of this hrvo simulation
+    float global_time;
+
+    // The amount of time which the simulator should advance by
+    const float time_step;
+
+    // The last time which the velocity of the robot was updated
+    float last_time_velocity_updated;
+
+    // True if all agents have reached their destination
+    bool reached_goals;
+
+    // KdTree used to calculate the K nearest agents
+    std::unique_ptr<KdTree> kd_tree;
+
+    // List of agents (robots) in this simulation
+    std::vector<std::shared_ptr<Agent>> agents;
+
+    // robot id to agent index
+    std::map<unsigned int, unsigned int> friendly_robot_id_map;
+    std::map<unsigned int, unsigned int> enemy_robot_id_map;
+
+   public:
+    // TODO (#2373): Remove goals list when goal is a part of Agent
+    std::vector<std::unique_ptr<Goal>> goals;
 
     // The scale which friendly robots should be larger than friendly robots
     // This scale is used to avoid close encounters, and reduce chance of collision
@@ -281,7 +330,7 @@ class Simulator
 
     // The scale which enemy robots should be larger than their actual size
     // This scale is used to avoid close encounters, and reduce chance of collision
-    static constexpr float ENEMY_ROBOT_RADIUS_SCALE = 2.f;
+    static constexpr float ENEMY_ROBOT_RADIUS_SCALE = 1.5f;
 
     // How much larger should the goal radius be. This is added as a safety tolerance so
     // robots do not "teleport" over the goal between simulation frames.
@@ -295,12 +344,20 @@ class Simulator
     // The scale multiple of max robot speed which the preferred speed will be set at.
     // pref_speed = max_speed * PREF_SPEED_SCALE
     // NOTE: This scale multiple must be <= 1
-    static constexpr float PREF_SPEED_SCALE = 0.75f;
+    static constexpr float PREF_SPEED_SCALE = 0.85f;
 
     // The maximum distance which HRVO Agents will look for neighbors, in meters.
     // A large radius picked to allow for far visibility of neighbors so Agents have
     // enough space to decelerate and avoid collisions.
-    static constexpr float MAX_NEIGHBOR_SEARCH_DIST = 7.f;
+    static constexpr float MAX_NEIGHBOR_SEARCH_DIST = 2.5f;
+
+    // The maximum number of neighbors/agents to consider when drawing velocity obstacles.
+    static constexpr unsigned int MAX_NEIGHBORS = 15;
+
+    // The max allowed difference in speed of the two robots colliding is 1.5 m/s.
+    // Based on the rules, if the robot is travelling <= 0.6 m/s it will not receive a
+    // penalty after a collision. To be safe, the max collision speed is set to 0.5 m/s
+    static constexpr float MAX_COLLISION_SPEED = 0.5f;
 
     friend class Agent;
     friend class Goal;

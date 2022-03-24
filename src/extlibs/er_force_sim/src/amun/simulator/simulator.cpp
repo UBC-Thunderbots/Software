@@ -332,7 +332,6 @@ void Simulator::handleSimulatorTick(double time_s)
     // add gravity to all ACTIVE objects
     // thus has to be done after applying commands
     m_data->dynamicsWorld->applyGravity();
-    m_time += time_s * 1E9;
 }
 
 static bool checkCameraID(const int cameraId, const btVector3 &p,

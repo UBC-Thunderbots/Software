@@ -127,10 +127,23 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
 
     if (goalie_robot && automatically_assign_goalie)
     {
-        robot_tactic_assignment.emplace(goalie_tactic, goalie_robot.value());
+        if (goalie_robot.has_value())
+        {
+            robot_tactic_assignment.emplace(goalie_tactic, goalie_robot.value());
 
-        robots.erase(std::remove(robots.begin(), robots.end(), goalie_robot.value()),
-                     robots.end());
+            robots.erase(std::remove(robots.begin(), robots.end(), goalie_robot.value()),
+                         robots.end());
+        }
+        else if (world.friendlyTeam().getGoalieId().has_value())
+        {
+            LOG(WARNING) << "Robot not found for goalie ID: "
+                         << std::to_string(world.friendlyTeam().getGoalieId().value())
+                         << std::endl;
+        }
+        else
+        {
+            LOG(WARNING) << "No goalie ID set!" << std::endl;
+        }
     }
 
     // This functions optimizes the assignment of robots to tactics by minimizing

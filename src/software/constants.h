@@ -21,3 +21,22 @@ static const std::string SIMULATOR_MULTICAST_CHANNELS[MAX_SIMULATOR_MULTICAST_CH
         "ff02::c3d0:42d2:cc13", "ff02::c3d0:42d2:cc14", "ff02::c3d0:42d2:cc15",
         "ff02::c3d0:42d2:cc16",
 };
+
+// Unix Socket Paths
+const std::string TACTIC_OVERRIDE_PATH     = "/tactic_override";
+const std::string WORLD_PATH               = "/world";
+const std::string PRIMITIVE_PATH           = "/primitive";
+const std::string ROBOT_STATUS_PATH        = "/robot_status";
+const std::string DEFENDING_SIDE           = "/defending_side";
+const std::string SSL_WRAPPER_PATH         = "/ssl_wrapper";
+const std::string SSL_REFEREE_PATH         = "/ssl_referee";
+const std::string SENSOR_PROTO_PATH        = "/sensor_proto";
+const std::string WORLD_STATE_PATH         = "/world_state";
+const std::string SSL_WRAPPER_PACKET_PATH  = "/ssl_wrapper_packet";
+const std::string BLUE_ROBOT_STATUS_PATH   = "/blue_robot_status";
+const std::string YELLOW_ROBOT_STATUS_PATH = "/yellow_robot_status";
+const std::string SIMULATION_TICK_PATH     = "/simulation_tick";
+const std::string YELLOW_WORLD_PATH        = "/yellow_world";
+const std::string BLUE_WORLD_PATH          = "/blue_world";
+const std::string BLUE_PRIMITIVE_SET       = "/blue_primitive_set";
+const std::string YELLOW_PRIMITIVE_SET     = "/yellow_primitive_set";

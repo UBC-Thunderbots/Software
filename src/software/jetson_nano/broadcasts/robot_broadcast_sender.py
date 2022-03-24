@@ -1,11 +1,12 @@
-from proto.announcement_pb2 import Announcement
 import argparse
 import fcntl
+import os
 import socket
 import struct
-import os
 import sys
 from time import sleep
+
+from proto.announcement_pb2 import Announcement
 
 BROADCAST_INTERVAL_SECONDS = 2
 

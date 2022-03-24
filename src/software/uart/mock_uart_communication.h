@@ -1,7 +1,5 @@
 #pragma once
 
-#include <gmock/gmock.h>
-
 #include "uart_communication.h"
 
 

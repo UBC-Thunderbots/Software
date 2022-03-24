@@ -6,6 +6,20 @@
     description: The absolute minimum pass quality we're willing to attempt
 
 - double:
+    name: min_distance_to_pass
+    min: 0.0
+    max: 1.0
+    value: 0.05
+    description: Used in the passAbort guard to decide if robot is too far away from ball to pass it
+
+- double:
+      name: ball_is_in_flight_threshold
+      min: 0.0
+      max: 1.0
+      value: 0.5
+      description: Threshold speed of ball to decide if it has been passed to receiver
+
+- double:
     name: pass_score_ramp_down_duration
     min: 0.0
     max: 5.0

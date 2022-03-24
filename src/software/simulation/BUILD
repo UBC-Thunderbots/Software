@@ -102,22 +102,6 @@ cc_library(
 )
 
 cc_library(
-    name = "er_force_simulator_robot",
-    srcs = ["er_force_simulator_robot.cpp"],
-    hdrs = ["er_force_simulator_robot.h"],
-    deps = [
-        "//extlibs/er_force_sim/src/amun/simulator:simulator_qt",
-        "//proto:ssl_simulation_cc_proto",
-        "//proto:tbots_cc_proto",
-        "//proto/message_translation:ssl_simulation_robot_control",
-        "//shared:constants",
-        "//software/jetson_nano:primitive_executor",
-        "//software/simulation:simulator_robot",
-        "//software/world:robot_state",
-    ],
-)
-
-cc_library(
     name = "force_wheel_simulator_robot_singleton",
     srcs = ["force_wheel_simulator_robot_singleton.cpp"],
     hdrs = ["force_wheel_simulator_robot_singleton.h"],
@@ -216,8 +200,6 @@ cc_library(
         "//extlibs/er_force_sim/config/simulator:2020B.txt",
     ],
     deps = [
-        ":er_force_simulator_ball",
-        ":er_force_simulator_robot",
         ":firmware_object_deleter",
         ":physics_simulator_ball",
         ":physics_simulator_robot",
@@ -229,8 +211,10 @@ cc_library(
         "//proto/message_translation:primitive_google_to_nanopb_converter",
         "//proto/message_translation:ssl_detection",
         "//proto/message_translation:ssl_geometry",
+        "//proto/message_translation:ssl_simulation_robot_control",
         "//proto/message_translation:ssl_wrapper",
         "//shared/parameter:cpp_configs",
+        "//software/jetson_nano:primitive_executor",
         "//software/simulation/physics:physics_world",
         "//software/world",
         "//software/world:field",
@@ -317,19 +301,5 @@ cc_library(
         "//firmware/app/world:force_wheel",
         "//firmware/shared:physics",
         "//software/logger",
-    ],
-)
-
-cc_library(
-    name = "er_force_simulator_ball",
-    srcs = [
-        "er_force_simulator_ball.cpp",
-    ],
-    hdrs = [
-        "er_force_simulator_ball.h",
-    ],
-    deps = [
-        "//software/simulation:simulator_ball",
-        "//software/world:ball_state",
     ],
 )
