@@ -152,7 +152,7 @@ void HRVOSimulator::updateWorld(const World &world)
             // obstacle
             float ball_radius = 0.5f + BALL_AGENT_RADIUS_OFFSET;
 
-            AgentPath path = AgentPath({PathPoint(goal_pos, 0.0f)}, 0.1f);
+            AgentPath path          = AgentPath({PathPoint(goal_pos, 0.0f)}, 0.1f);
             std::size_t agent_index = addLinearVelocityAgent(
                 position, ball_radius, velocity, velocity.length(), acceleration, path);
             ball_agent_id = agent_index;
@@ -200,7 +200,8 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
                 float path_radius =
                     (hrvo_agent->getMaxSpeed() * time_step) / 2 * GOAL_RADIUS_SCALE;
                 path = AgentPath(
-                    {PathPoint(Vector(destination.x_meters(), destination.y_meters()), 0.0f)},
+                    {PathPoint(Vector(destination.x_meters(), destination.y_meters()),
+                               0.0f)},
                     path_radius);
             }
 

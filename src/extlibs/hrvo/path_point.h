@@ -17,13 +17,13 @@ class PathPoint
     /**
      * Gets the position of the path point
      * @return Vector position
-     */ 
+     */
     Vector getPosition() const;
 
     /**
      * Gets the speed of the path point
      * @return float speed
-     */ 
+     */
     float getSpeed() const;
 
    private:
