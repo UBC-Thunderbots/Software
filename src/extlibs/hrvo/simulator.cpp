@@ -188,6 +188,7 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
 
             if (primitive.has_move())
             {
+                float speed_at_dest = primitive.move().final_speed_m_per_s();
                 float new_max_speed = primitive.move().max_speed_m_per_s();
                 hrvo_agent->setMaxSpeed(new_max_speed);
                 hrvo_agent->setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
@@ -201,7 +202,7 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
                     (hrvo_agent->getMaxSpeed() * time_step) / 2 * GOAL_RADIUS_SCALE;
                 path = AgentPath(
                     {PathPoint(Vector(destination.x_meters(), destination.y_meters()),
-                               0.0f)},
+                               speed_at_dest)},
                     path_radius);
             }
 
