@@ -261,7 +261,8 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
     float path_radius        = (max_speed * time_step) / 2 * GOAL_RADIUS_SCALE;
     float uncertainty_offset = 0.f;
 
-    AgentPath path = AgentPath({PathPoint(destination_point, speed_at_goal)}, path_radius);
+    AgentPath path =
+        AgentPath({PathPoint(destination_point, speed_at_goal)}, path_radius);
 
     return addHRVOAgent(position, agent_radius, velocity, max_speed, pref_speed,
                         max_accel, path, MAX_NEIGHBOR_SEARCH_DIST, MAX_NEIGHBORS,
