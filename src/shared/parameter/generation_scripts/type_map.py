@@ -7,12 +7,10 @@ CPP_TYPE_MAP = {
     "enum": "std::string",
 }
 
-PROTO_TYPE_MAP = {
+C_TYPE_MAP = {
     "bool": "bool",
-    "int": "int32",
-    "uint": "uint32",
-    "double": "double",
+    "int": "int",
+    "uint": "unsigned",
     "float": "float",
-    "enum": "string",
-    "string": "string",
+    "string": "char*",
 }

@@ -230,19 +230,19 @@ class TestAutogenParameterList : public YamlLoadFixture
     void visit_parameters(ParameterVariant paramvar, const YAML::Node& current_config)
     {
         std::visit(overload{[&](std::shared_ptr<const Parameter<int>> param) {
-                                assertParameter<int>(param, current_config);
+                                assert_parameter<int>(param, current_config);
                             },
                             [&](std::shared_ptr<const Parameter<bool>> param) {
-                                assertParameter<bool>(param, current_config);
+                                assert_parameter<bool>(param, current_config);
                             },
                             [&](std::shared_ptr<const Parameter<std::string>> param) {
-                                assertParameter<std::string>(param, current_config);
+                                assert_parameter<std::string>(param, current_config);
                             },
                             [&](std::shared_ptr<const Parameter<double>> param) {
-                                assertParameter<double>(param, current_config);
+                                assert_parameter<double>(param, current_config);
                             },
                             [&](std::shared_ptr<const NumericParameter<unsigned>> param) {
-                                assertParameter<unsigned>(param, current_config);
+                                assert_parameter<unsigned>(param, current_config);
                             },
                             [&](std::shared_ptr<const Config> param) {
                                 const YAML::Node param_node =
@@ -263,8 +263,8 @@ class TestAutogenParameterList : public YamlLoadFixture
      * Internally asserts and creates failures
      */
     template <typename T>
-    void assertParameter(const std::shared_ptr<const Parameter<T>>& param,
-                         const YAML::Node& config_node)
+    void assert_parameter(const std::shared_ptr<const Parameter<T>>& param,
+                          const YAML::Node& config_node)
     {
         try
         {
@@ -306,7 +306,7 @@ class TestParameterMutation : public YamlLoadFixture
      *
      * Some parameters such as example_enum_param has a specific value set
      */
-    void mutateAllParameters(MutableParameterVariant paramvar)
+    void mutate_all_parameters(MutableParameterVariant paramvar)
     {
         static std::set<MutableParameterVariant> visited;
         visited.insert(paramvar);
@@ -341,7 +341,7 @@ class TestParameterMutation : public YamlLoadFixture
                                     if (visited.find(v) == visited.end())
                                     {
                                         // Only mutate once per parameter
-                                        mutateAllParameters(v);
+                                        mutate_all_parameters(v);
                                     }
                                 }
                             }},
@@ -352,7 +352,7 @@ class TestParameterMutation : public YamlLoadFixture
      * Tests that the mutations in the mutable parameter list tree are propagated to
      * the immutable tree, and that constant parameters have not changed
      */
-    void assertMutation(ParameterVariant paramvar, const YAML::Node& current_config)
+    void assert_mutation(ParameterVariant paramvar, const YAML::Node& current_config)
     {
         std::visit(
             overload{[&](std::shared_ptr<const NumericParameter<int>> param) {
@@ -451,7 +451,7 @@ class TestParameterMutation : public YamlLoadFixture
                              findParamNode(current_config, param->name());
                          for (auto& v : param->getParameterList())
                          {
-                             assertMutation(v, param_node);
+                             assert_mutation(v, param_node);
                          }
                      }},
             paramvar);
@@ -461,39 +461,13 @@ class TestParameterMutation : public YamlLoadFixture
 TEST_F(TestParameterMutation, DynamicParametersTest)
 {
     // This creates a shared ptr pointing to a ThunderbotsConfig which can be mutated
-    const std::shared_ptr<ThunderbotsConfig> mutable_dynamic_parameters =
+    const std::shared_ptr<ThunderbotsConfig> MutableDynamicParameters =
         std::make_shared<ThunderbotsConfig>();
 
     // This creates an immutable ThunderbotsConfig w/ proper const correctnesss
-    const std::shared_ptr<const ThunderbotsConfig> dynamic_params =
-        std::const_pointer_cast<const ThunderbotsConfig>(mutable_dynamic_parameters);
+    const std::shared_ptr<const ThunderbotsConfig> DynamicParameters =
+        std::const_pointer_cast<const ThunderbotsConfig>(MutableDynamicParameters);
 
-    mutateAllParameters(mutable_dynamic_parameters);
-    assertMutation(dynamic_params, config_yaml);
-}
-
-TEST_F(TestParameterMutation, ProtoGenerationTest)
-{
-    // This creates a shared ptr pointing to a ThunderbotsConfig which can be mutated
-    const std::shared_ptr<ThunderbotsConfig> mutable_dynamic_parameters =
-        std::make_shared<ThunderbotsConfig>();
-
-    // This creates an immutable ThunderbotsConfig w/ proper const correctnesss
-    const std::shared_ptr<const ThunderbotsConfig> dynamic_params =
-        std::const_pointer_cast<const ThunderbotsConfig>(mutable_dynamic_parameters);
-
-    // Mutate all the parameters
-    mutateAllParameters(mutable_dynamic_parameters);
-
-    // Save as a proto
-    auto proto = mutable_dynamic_parameters->toProto();
-
-    // Create a new top level config
-    const std::shared_ptr<ThunderbotsConfig> mutable_dynamic_param_loaded_from_proto =
-        std::make_shared<ThunderbotsConfig>();
-
-    // Load top level config from the proto and make sure that the mutations across all
-    // configs are reflected
-    mutable_dynamic_param_loaded_from_proto->loadFromProto(proto);
-    assertMutation(mutable_dynamic_param_loaded_from_proto, config_yaml);
+    mutate_all_parameters(MutableDynamicParameters);
+    assert_mutation(DynamicParameters, config_yaml);
 }
