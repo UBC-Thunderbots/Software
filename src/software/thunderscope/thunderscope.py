@@ -1,4 +1,5 @@
 import os
+import time
 import signal
 import argparse
 
@@ -16,6 +17,7 @@ else:
 
 import pyqtgraph
 from pyqtgraph.dockarea import *
+from pyqtgraph.parametertree import Parameter, ParameterTree
 from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import QVBoxLayout, QWidget
 
@@ -99,9 +101,11 @@ class Thunderscope(object):
         # Configure Docks
         field_dock = self.setup_field_widget()
         log_dock = self.setup_log_widget()
+        parameter_dock = self.setup_parameter_widget()
         performance_dock = self.setup_performance_plot()
 
         self.dock_area.addDock(field_dock, "left")
+        self.dock_area.addDock(parameter_dock, "left", field_dock)
         self.dock_area.addDock(log_dock, "bottom", field_dock)
         self.dock_area.addDock(performance_dock, "right", log_dock)
 
@@ -140,6 +144,71 @@ class Thunderscope(object):
         field_dock.addWidget(self.field)
 
         return field_dock
+
+    def setup_parameter_widget(self):
+        """
+        TODO
+        """
+
+        dict_obj = message_to_dict(ThunderbotsConfig())
+        print(dict_obj)
+        
+        params = [
+            {'name': 'Config', 'type': 'group', 'children': [
+                    {'name': 'run_ai', 'type': 'bool', 'value': True},
+                    {'name': 'threshold', 'type': 'slider', 'limits':[0,100], 'value': 0.0},
+            ]},
+        ]
+        params2 = [
+            {'name': 'Config', 'type': 'group', 'children': [
+                    {'name': 'run_ai', 'type': 'bool', 'value': True},
+            ]},
+        ]
+        
+        
+        # Create tree of Parameter objects
+        p = Parameter.create(name='params', type='group', children=params)
+
+
+        t = ParameterTree()
+        t.setParameters(p, showTop=False)
+
+        ## If anything changes in the tree, print a message
+        def change(param, changes):
+            print("tree changes:")
+            for param, change, data in changes:
+                path = p.childPath(param)
+                if path is not None:
+                    childName = '.'.join(path)
+                else:
+                    childName = param.name()
+                print('  parameter: %s'% childName)
+                print('  change:    %s'% change)
+                print('  data:      %s'% str(data))
+                print('  ----------')
+            
+        p.sigTreeStateChanged.connect(change)
+
+        def valueChanging(param, value):
+            print("Value changing (not finalized): %s %s" % (param, value))
+        
+        # Too lazy for recursion:
+        for child in p.children():
+            child.sigValueChanging.connect(valueChanging)
+            for ch2 in child.children():
+                ch2.sigValueChanging.connect(valueChanging)
+
+        win = QtGui.QWidget()
+        layout = QtGui.QVBoxLayout()
+        win.setLayout(layout)
+        layout.addWidget(t)
+
+        # Create and return dock
+        param_dock = Dock("Parameters", size=(20, 1000))
+        param_dock.addWidget(win)
+
+        return param_dock
+
 
     def setup_log_widget(self):
         """Setup the wiget that receives logs from full system
@@ -200,16 +269,7 @@ class Thunderscope(object):
     def close(self):
         QtCore.QTimer.singleShot(0, self.window.close)
 
-
-if __name__ == "__main__":
-
-    dict_obj = message_to_dict(ThunderbotsConfig())
-    print(dict_obj)
-
-    import sys
-
-    sys.exit(0)
-
+if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Thunderscope")
     parser.add_argument(
         "--robot_diagnostics",
