@@ -25,12 +25,8 @@ class RobotsHalt(Validation):
         return ValidationStatus.PASSING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """Returns the underlying geometry this validation is checking
-
-        :param world: The world msg to create validation geometry from
-        :returns: ValidationGeometry containing geometry to visualize
-
-        """
+        """override"""
+        # TODO: visualize
         return create_validation_geometry([])
 
     def __repr__(self):
