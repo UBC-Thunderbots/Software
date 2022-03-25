@@ -20,6 +20,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 from pyqtgraph.Qt.QtWidgets import QVBoxLayout, QWidget
 
 from proto.import_all_protos import *
+from proto.message_translation.message_to_dict import message_to_dict
 
 from software.networking import threaded_unix_sender
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
@@ -201,6 +202,14 @@ class Thunderscope(object):
 
 
 if __name__ == "__main__":
+
+    dict_obj = message_to_dict(ThunderbotsConfig())
+    print(dict_obj)
+
+    import sys
+
+    sys.exit(0)
+
     parser = argparse.ArgumentParser(description="Thunderscope")
     parser.add_argument(
         "--robot_diagnostics",

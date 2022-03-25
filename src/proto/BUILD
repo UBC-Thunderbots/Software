@@ -11,6 +11,7 @@ proto_library(
         "game_state.proto",
         "geometry.proto",
         "move_robot_and_ball_messages.proto",
+        "parameters.proto",
         "play.proto",
         "primitive.proto",
         "robot_log_msg.proto",
@@ -23,6 +24,7 @@ proto_library(
         "world.proto",
     ],
     deps = [
+        "@com_google_protobuf//:descriptor_proto",
         "@nanopb//:nanopb_options_proto",
     ],
 )
@@ -44,6 +46,7 @@ py_proto_library(
         "game_state.proto",
         "geometry.proto",
         "move_robot_and_ball_messages.proto",
+        "parameters.proto",
         "play.proto",
         "primitive.proto",
         "robot_status_msg.proto",

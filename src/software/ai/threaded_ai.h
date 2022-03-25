@@ -2,6 +2,7 @@
 
 #include <mutex>
 
+#include "proto/parameters.pb.h"
 #include "proto/play.pb.h"
 #include "proto/play_info_msg.pb.h"
 #include "proto/tactic.pb.h"
@@ -18,6 +19,7 @@
  * robots based on the World state, and sending them out.
  */
 class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
+                   public FirstInFirstOutThreadedObserver<TbotsProto::ThunderbotsConfig>,
                    public Subject<TbotsProto::PrimitiveSet>,
                    public Subject<AIDrawFunction>,
                    public Subject<TbotsProto::PlayInfo>
@@ -49,6 +51,7 @@ class ThreadedAI : public FirstInFirstOutThreadedObserver<World>,
 
    private:
     void onValueReceived(World world) override;
+    void onValueReceived(TbotsProto::ThunderbotsConfig config) override;
 
     /**
      * Get primitives for the new world from the AI and pass them to observers

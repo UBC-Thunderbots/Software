@@ -2,16 +2,19 @@
 
 #include <boost/bind.hpp>
 
+#include "proto/parameters.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/ai/hl/stp/play/assigned_tactics_play.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/tactic_factory.h"
 #include "software/gui/drawing/navigator.h"
+#include "software/multithreading/thread_safe_buffer.hpp"
 
 ThreadedAI::ThreadedAI(std::shared_ptr<const AiConfig> ai_config)
     // Disabling warnings on log buffer full, since buffer size is 1 and we always want AI
     // to use the latest World
-    : FirstInFirstOutThreadedObserver<World>(DEFAULT_BUFFER_SIZE, false),
+    : FirstInFirstOutThreadedObserver<World>(),
+      FirstInFirstOutThreadedObserver<TbotsProto::ThunderbotsConfig>(),
       ai(ai_config),
       ai_config(ai_config),
       control_config(ai_config->getAiControlConfig())
@@ -47,6 +50,11 @@ void ThreadedAI::onValueReceived(World world)
 {
     runAIAndSendPrimitives(world);
     drawAI();
+}
+
+void ThreadedAI::onValueReceived(TbotsProto::ThunderbotsConfig config)
+{
+    // Config
 }
 
 void ThreadedAI::runAIAndSendPrimitives(const World& world)
