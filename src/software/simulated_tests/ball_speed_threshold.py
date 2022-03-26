@@ -14,6 +14,9 @@ class BallSpeedThreshold(Validation):
     """Checks if the ball speed is at or above some threshold."""
 
     def __init__(self, speed_threshold):
+        """
+        :param speed_threshold The speed threshold
+        """
         self.speed_threshold = speed_threshold
 
     def get_validation_status(self, world) -> ValidationStatus:

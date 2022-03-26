@@ -181,6 +181,7 @@ py_library(
         "ball_speed_threshold.py",
         "friendly_has_ball_possession.py",
         "robot_enters_region.py",
+        "robot_speed_threshold.py",
         "robots_halt.py",
         "validation.py",
     ],
