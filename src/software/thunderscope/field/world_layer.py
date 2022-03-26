@@ -7,7 +7,7 @@ from proto.team_pb2 import Robot, Team
 from proto.vision_pb2 import BallState, RobotState
 from proto.world_pb2 import Field, World
 from pyqtgraph.Qt import QtCore, QtGui
-from QtCore import Qt
+from pyqtgraph.Qt.QtCore import Qt
 
 from software.thunderscope.colors import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
