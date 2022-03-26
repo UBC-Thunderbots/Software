@@ -37,7 +37,6 @@
 #include <vector>
 
 #include "extlibs/hrvo/agent.h"
-#include "extlibs/hrvo/goal.h"
 #include "extlibs/hrvo/kd_tree.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "software/geom/vector.h"
@@ -107,9 +106,8 @@ class HRVOSimulator
      */
     std::size_t addHRVOAgent(const Vector &position, float agent_radius,
                              const Vector &curr_velocity, float maxSpeed, float prefSpeed,
-                             float maxAccel, std::size_t goal_index, float goalRadius,
-                             float neighborDist, std::size_t maxNeighbors,
-                             float uncertaintyOffset);
+                             float maxAccel, AgentPath &path, float neighborDist,
+                             std::size_t maxNeighbors, float uncertaintyOffset);
 
     /**
      * Add a new LinearlyVelocityAgent
@@ -124,19 +122,7 @@ class HRVOSimulator
      */
     size_t addLinearVelocityAgent(const Vector &position, float agent_radius,
                                   const Vector &curr_velocity, float max_speed,
-                                  float max_accel, size_t goal_index, float goal_radius);
-
-    // TODO (#2373): Remove goals list when goal is a part of Agent
-    /**
-     *      Adds a new goal to the simulation.
-     *
-     * @param position  The position of this goal.
-     * @return    The number of the goal.
-     */
-    std::size_t addGoal(const Vector &position);
-    std::size_t addGoalPositions(const std::vector<Vector> &positions);
-    std::size_t addGoalPositions(const std::vector<Vector> &positions,
-                                 const std::vector<float> &speedAtPosition);
+                                  float max_accel, AgentPath &path);
 
     /**
      * Performs a simulation step; updates the position, and velocity
@@ -254,16 +240,6 @@ class HRVOSimulator
     }
 
     /**
-     *   Returns the count of goals in the simulation.
-     *
-     * @return The count of goals in the simulation.
-     */
-    std::size_t getNumGoals() const
-    {
-        return goals.size();
-    }
-
-    /**
      *   Returns the time step of the simulation.
      *
      * @return The present time step of the simulation.
@@ -321,9 +297,6 @@ class HRVOSimulator
     std::map<unsigned int, unsigned int> enemy_robot_id_map;
 
    public:
-    // TODO (#2373): Remove goals list when goal is a part of Agent
-    std::vector<std::unique_ptr<Goal>> goals;
-
     // The scale which friendly robots should be larger than friendly robots
     // This scale is used to avoid close encounters, and reduce chance of collision
     static constexpr float FRIENDLY_ROBOT_RADIUS_SCALE = 1.25f;
