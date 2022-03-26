@@ -1,18 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (
-    QApplication,
-    QCheckBox,
-    QGridLayout,
-    QGroupBox,
-    QButtonGroup,
-    QMenu,
-    QPushButton,
-    QRadioButton,
-    QVBoxLayout,
-    QHBoxLayout,
-    QWidget,
-    QSlider,
-)
+from PyQt5.QtWidgets import *
 
 
 def create_button(text, checkable_initially=True):

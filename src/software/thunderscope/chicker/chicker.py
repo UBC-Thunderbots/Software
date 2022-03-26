@@ -2,20 +2,7 @@ import pyqtgraph as pg
 import software.thunderscope.constants as constants
 import software.thunderscope.common_widgets as common_widgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (
-    QApplication,
-    QCheckBox,
-    QGridLayout,
-    QGroupBox,
-    QButtonGroup,
-    QMenu,
-    QPushButton,
-    QRadioButton,
-    QVBoxLayout,
-    QHBoxLayout,
-    QWidget,
-    QSlider,
-)
+from PyQt5.QtWidgets import *
 
 
 class ChickerWidget(QWidget):
@@ -84,11 +71,26 @@ class ChickerWidget(QWidget):
 
         self.setLayout(grid)
         self.grid = grid
-        # state of radio buttons in order NoAuto, AutoKick, AutoChip
-        self.radio_checkable = [True, True, True]
+        # state of radio buttons - to make sure message is only sent once
+        self.radio_checkable = {"no_auto": True, "auto_kick": True, "auto_chip": True}
         self.charged = False
         self.geneva_value = 1
         self.power_value = 1
+
+    def change_button_state(self, button, enable):
+        """
+        Change button color and clickable state.
+
+        :param button: button to change the state of
+        :param enable: bool: if True: enable this button, if False: disable
+        :return:
+        """
+        if enable:
+            button.setStyleSheet("background-color: White")
+            button.setCheckable(True)
+        else:
+            button.setStyleSheet("background-color: Grey")
+            button.setCheckable(False)
 
     def refresh(self):
 
@@ -104,19 +106,13 @@ class ChickerWidget(QWidget):
 
         # button colors
         if not self.charged:
-            self.charge_button.setStyleSheet("background-color: White")
-            self.charge_button.setCheckable(True)
-            self.chip_button.setStyleSheet("background-color: Grey")
-            self.chip_button.setCheckable(False)
-            self.kick_button.setStyleSheet("background-color: Grey")
-            self.kick_button.setCheckable(False)
+            self.change_button_state(self.charge_button, True)
+            self.change_button_state(self.chip_button, False)
+            self.change_button_state(self.kick_button, False)
         else:
-            self.charge_button.setStyleSheet("background-color: White")
-            self.charge_button.setCheckable(True)
-            self.chip_button.setStyleSheet("background-color: White")
-            self.chip_button.setCheckable(True)
-            self.kick_button.setStyleSheet("background-color: White")
-            self.kick_button.setCheckable(True)
+            self.change_button_state(self.charge_button, True)
+            self.change_button_state(self.chip_button, True)
+            self.change_button_state(self.kick_button, True)
 
         # check all buttons
         if self.charge_button.isChecked():
@@ -143,44 +139,35 @@ class ChickerWidget(QWidget):
 
         # radio colors
         if self.no_auto_button.isChecked():
-            self.radio_checkable[1] = True
-            self.radio_checkable[2] = True
-            if self.radio_checkable[0]:
+            self.radio_checkable["auto_kick"] = True
+            self.radio_checkable["auto_chip"] = True
+            if self.radio_checkable["no_auto"]:
                 print("No Auto clicked")
                 print("Geneva:", self.geneva_value, "Power:", self.power_value)
-            self.radio_checkable[0] = False
-            self.charge_button.setStyleSheet("background-color: White")
-            self.charge_button.setCheckable(True)
+            self.radio_checkable["no_auto"] = False
+            self.change_button_state(self.charge_button, True)
             if self.charged:
-                self.chip_button.setStyleSheet("background-color: White")
-                self.chip_button.setCheckable(True)
-                self.kick_button.setStyleSheet("background-color: White")
-                self.kick_button.setCheckable(True)
+                self.change_button_state(self.chip_button, True)
+                self.change_button_state(self.kick_button, True)
 
         elif self.auto_kick_button.isChecked():
-            self.radio_checkable[0] = True
-            self.radio_checkable[2] = True
-            if self.radio_checkable[1]:
+            self.radio_checkable["no_auto"] = True
+            self.radio_checkable["auto_chip"] = True
+            if self.radio_checkable["auto_kick"]:
                 print("Auto Kick clicked")
                 print("Geneva:", self.geneva_value, "Power:", self.power_value)
-            self.radio_checkable[1] = False
-            self.chip_button.setStyleSheet("background-color: Grey")
-            self.chip_button.setCheckable(False)
-            self.kick_button.setStyleSheet("background-color: Grey")
-            self.kick_button.setCheckable(False)
-            self.charge_button.setStyleSheet("background-color: Grey")
-            self.charge_button.setCheckable(False)
+            self.radio_checkable["auto_kick"] = False
+            self.change_button_state(self.chip_button, False)
+            self.change_button_state(self.kick_button, False)
+            self.change_button_state(self.charge_button, False)
 
         elif self.auto_chip_button.isChecked():
-            self.radio_checkable[0] = True
-            self.radio_checkable[1] = True
-            if self.radio_checkable[2]:
+            self.radio_checkable["no_auto"] = True
+            self.radio_checkable["auto_kick"] = True
+            if self.radio_checkable["auto_chip"]:
                 print("Auto Chip clicked")
                 print("Geneva:", self.geneva_value, "Power:", self.power_value)
-            self.radio_checkable[2] = False
-            self.chip_button.setStyleSheet("background-color: Grey")
-            self.chip_button.setCheckable(False)
-            self.kick_button.setStyleSheet("background-color: Grey")
-            self.kick_button.setCheckable(False)
-            self.charge_button.setStyleSheet("background-color: Grey")
-            self.charge_button.setCheckable(False)
+            self.radio_checkable["auto_chip"] = False
+            self.change_button_state(self.chip_button, False)
+            self.change_button_state(self.kick_button, False)
+            self.change_button_state(self.charge_button, False)
