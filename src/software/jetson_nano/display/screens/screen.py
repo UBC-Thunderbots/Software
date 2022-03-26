@@ -3,7 +3,7 @@ import subprocess
 
 # TODO: move constants.py into bazel build so don't need to import sys
 import sys
-sys.path.append("../")
+sys.path.append("../resources/")
 import constants
 from utils import get_ip_address, get_signal_strength
 
@@ -37,11 +37,11 @@ class Screen:
         self.lcd_display = lcd_display
         self.font_size = 12
         self.font = ImageFont.truetype(
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", self.font_size
+            "DejaVuSans.ttf", self.font_size
         )
         self.big_font_size = 22
         self.big_font = ImageFont.truetype(
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", self.big_font_size
+            "DejaVuSans.ttf", self.big_font_size
         )
 
     def draw_header(self):

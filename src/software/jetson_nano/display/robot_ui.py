@@ -8,14 +8,14 @@ import adafruit_rgb_display.st7735 as st7735
 sys.path.append("./screens/")
 sys.path.append("./lcd_user_interface/")
 sys.path.append("./rotary_encoder/")
+sys.path.append("./resources/")
 from lcd_user_interface import LcdDisplay
 from rotary_encoder import RotaryEncoder
 from home_screen import HomeScreen
 from menu_screen import MenuScreen
 from wheels_screen import WheelsScreen
 from chip_and_kick_screen import ChipAndKickScreen
-
-import constants
+from resources import constants
 
 # Pins for Rotary Encoder
 BUTTON_PIN = constants.BUTTON_PIN

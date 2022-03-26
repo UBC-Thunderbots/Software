@@ -5,7 +5,7 @@ CHANNEL_ID_INDEX = 1
 
 # TODO: move constants.py into bazel build so don't need to import sys
 import sys
-sys.path.append("../")
+sys.path.append("../constants/")
 import constants
 BATTERY_VOLTAGE_BASE = 60
 
