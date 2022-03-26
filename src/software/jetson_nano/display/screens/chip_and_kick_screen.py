@@ -12,13 +12,14 @@ class ChipAndKickScreen(Screen):
     """
     This screen is used to edit the chip and kick speed settings
     """
+
     def __init__(self, lcd_display, redis_dict, screen_actions):
         """
         @param lcd_display, an instance of the LcdDisplay class
         @param redis_dict, a dict of values from redis client to init variables on this screen
         @param screen_actions, an instance of ScreenActions class
         """
-        actions = [              
+        actions = [
             {
                 "redis key": "chip and kick enable",
                 "value": redis_dict["chip and kick enable"],
@@ -58,6 +59,8 @@ class ChipAndKickScreen(Screen):
 
     def update_values(self, redis_dict):
         if not self.edit_mode:
-            self.actions[ENABLE_INDEX]["value"] = 1 if redis_dict["chip and kick enable"] else 0
+            self.actions[ENABLE_INDEX]["value"] = (
+                1 if redis_dict["chip and kick enable"] else 0
+            )
             self.actions[CHIP_INDEX]["value"] = redis_dict["chip speed"]
             self.actions[KICK_INDEX]["value"] = redis_dict["kick speed"]

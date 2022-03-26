@@ -8,11 +8,13 @@ import constants
 
 SCREEN_TYPE = str
 
+
 class Screen:
     """
     All new screens will inherit from this class. This class will handles editing variables and maintaining
     the current action the cursor is hovering.
     """
+
     def __init__(self, lcd_display, screen_actions, actions, draw_screen=None):
         """
         @param lcd_display, an instance of the LcdDisplay class
@@ -30,7 +32,7 @@ class Screen:
         # Maintain current action
         self.len = len(self.actions)
         self.curr_action = 0
-        
+
         self.lcd_display = lcd_display
         self.font_size = 12
         self.font = ImageFont.truetype(
@@ -98,7 +100,7 @@ class Screen:
                 action = {
                     "redis key": self.action["redis key"],
                     "value": self.action["value"],
-                    "screen action": self.screen_actions.UPDATE_REDIS
+                    "screen action": self.screen_actions.UPDATE_REDIS,
                 }
             self.edit_mode = not self.edit_mode
         elif action["type"] == bool:
@@ -164,7 +166,7 @@ class Screen:
                 font=self.font, fill=constants.WHITE
             )
 
-            if action["type"] != SCREEN_TYPE: 
+            if action["type"] != SCREEN_TYPE:
                 x += self.font.getsize(action["display string"])[0]
 
                 if action["type"] == bool:
@@ -181,5 +183,5 @@ class Screen:
                         font=self.font, fill=constants.YELLOW,
                     )
                 x = cursor_size
-            
+
             y += self.font_size

@@ -14,13 +14,14 @@ class HomeScreen(Screen):
     """
     This is the dashboard screen which shows basic robot diagnostics
     """
+
     def __init__(self, lcd_display, redis_dict, screen_actions):
         """
         @param lcd_display, an instance of the LcdDisplay class
         @param redis_dict, a dict of values from redis client to init variables on this screen
         @param screen_actions, an instance of ScreenActions class
         """
-        actions = [              
+        actions = [
             {
                 "redis key": "robot id",
                 "value": redis_dict["robot id"],
@@ -159,9 +160,7 @@ class HomeScreen(Screen):
             self.lcd_display.draw.text((x, y), constants.CURSOR, font=self.font, fill=constants.WHITE)
 
         # Pass Home Screen parameters to super class
-        super().__init__(
-            lcd_display, screen_actions, actions, draw_screen
-        )
+        super().__init__(lcd_display, screen_actions, actions, draw_screen)
 
     def update_values(self, redis_dict):
         """ Sync values with those from redis """
@@ -171,6 +170,7 @@ class HomeScreen(Screen):
         self.battery_voltage = redis_dict["battery voltage"]
         self.cap_voltage = redis_dict["cap voltage"]
         self.packet_loss = redis_dict["packet loss"]
+
 
 # For testing
 if __name__ == "__main__":

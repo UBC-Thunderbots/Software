@@ -11,13 +11,14 @@ class WheelsScreen(Screen):
     """
     This screen is used to edit wheel speed settings
     """
+
     def __init__(self, lcd_display, redis_dict, screen_actions):
         """
         @param lcd_display, an instance of the LcdDisplay class
         @param redis_dict, a dict of values from redis client to init variables on this screen
         @param screen_actions, an instance of ScreenActions class
         """
-        actions = [              
+        actions = [
             {
                 "redis key": "wheels enable",
                 "value": redis_dict["wheels enable"],
@@ -69,14 +70,14 @@ class WheelsScreen(Screen):
         ]
 
         # Pass Wheel Screen parameters to super class
-        super().__init__(
-            lcd_display, screen_actions, actions
-        )
+        super().__init__(lcd_display, screen_actions, actions)
 
     def update_values(self, redis_dict):
         """ Sync values with those from redis """
         if not self.edit_mode:
-            self.actions[ENABLE_INDEX]["value"] = 1 if redis_dict["wheels enable"] else 0
+            self.actions[ENABLE_INDEX]["value"] = (
+                1 if redis_dict["wheels enable"] else 0
+            )
             self.actions[FL_INDEX]["value"] = redis_dict["fl wheel speed"]
             self.actions[FR_INDEX]["value"] = redis_dict["fr wheel speed"]
             self.actions[BL_INDEX]["value"] = redis_dict["bl wheel speed"]
