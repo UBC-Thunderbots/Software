@@ -89,11 +89,11 @@ void DribbleFSM::getPossession(const Update &event)
         (ball_position - event.common.robot.position()).orientation();
     Point intercept_position = findInterceptionPoint(
         event.common.robot, event.common.world.ball(), event.common.world.field());
-    DEFINE_PATH_POINTS(intercept_position)
 
     event.common.set_primitive(createMovePrimitive(
-        path_points, face_ball_orientation, 0, TbotsProto::DribblerMode::MAX_FORCE,
-        TbotsProto::BallCollisionType::ALLOW, AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
+        CREATE_MOTION_CONTROL(intercept_position), face_ball_orientation, 0,
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+        AutoChipOrKick{AutoChipOrKickMode::OFF, 0},
         TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
         event.common.robot.robotConstants()));
 }
@@ -117,12 +117,10 @@ void DribbleFSM::dribble(const Update &event)
             AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, DRIBBLE_KICK_SPEED};
     }
 
-    DEFINE_PATH_POINTS(target_destination)
-
     event.common.set_primitive(createCostedMovePrimitive(
-        path_points, target_orientation, 0, TbotsProto::DribblerMode::MAX_FORCE,
-        TbotsProto::BallCollisionType::ALLOW, auto_chip_or_kick,
-        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
+        CREATE_MOTION_CONTROL(target_destination), target_orientation, 0,
+        TbotsProto::DribblerMode::MAX_FORCE, TbotsProto::BallCollisionType::ALLOW,
+        auto_chip_or_kick, TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0,
         event.common.robot.robotConstants(), 0.0));
 }
 

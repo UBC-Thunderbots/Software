@@ -67,3 +67,6 @@ struct TacticUpdate
                 getCurrentFullStateName(*fsm_map.at(last_execution_robot.value()));      \
         return state_str;                                                                \
     }
+
+#define CREATE_MOTION_CONTROL(DESTINATION)                                               \
+    event.common.create_motion_control(event.common.robot.position(), DESTINATION)

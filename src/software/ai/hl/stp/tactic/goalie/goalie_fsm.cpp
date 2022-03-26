@@ -196,11 +196,9 @@ void GoalieFSM::panic(const Update &event)
     Angle goalie_orientation =
         (event.common.world.ball().position() - goalie_pos).orientation();
 
-    DEFINE_PATH_POINTS(goalie_pos)
-
     event.common.set_primitive(createMovePrimitive(
-        path_points, goalie_orientation, 0.0, TbotsProto::DribblerMode::OFF,
-        TbotsProto::BallCollisionType::ALLOW,
+        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, 0.0,
+        TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
 }
@@ -238,10 +236,8 @@ void GoalieFSM::positionToBlock(const Update &event)
     // faster
     auto goalie_final_speed = goalie_tactic_config->getGoalieFinalSpeed()->value();
 
-    DEFINE_PATH_POINTS(goalie_pos)
-
     event.common.set_primitive(createMovePrimitive(
-        path_points, goalie_orientation, goalie_final_speed,
+        CREATE_MOTION_CONTROL(goalie_pos), goalie_orientation, goalie_final_speed,
         TbotsProto::DribblerMode::OFF, TbotsProto::BallCollisionType::ALLOW,
         AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, YEET_CHIP_DISTANCE_METERS},
         max_allowed_speed_mode, 0.0, event.common.robot.robotConstants()));
@@ -260,10 +256,9 @@ bool GoalieFSM::shouldMoveToGoalLine(const Update &event)
 
 void GoalieFSM::moveToGoalLine(const Update &event)
 {
-    DEFINE_PATH_POINTS(event.common.world.field().friendlyGoalCenter())
-
     event.common.set_primitive(createMovePrimitive(
-        path_points, Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
+        CREATE_MOTION_CONTROL(event.common.world.field().friendlyGoalCenter()),
+        Angle::zero(), 0, TbotsProto::DribblerMode::OFF,
         TbotsProto::BallCollisionType::AVOID,
         AutoChipOrKick{AutoChipOrKickMode::OFF, 0.0}, max_allowed_speed_mode, 0.0,
         event.common.robot.robotConstants()));
