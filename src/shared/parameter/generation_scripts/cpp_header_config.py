@@ -20,7 +20,7 @@ CONFIG_CONSTRUCTOR_HEADER_NO_INCLUDES = "{config_name}()"
 
 CONFIG_CONSTRUCTOR_HEADER_WITH_INCLUDES = """{config_name}(
         {config_constructor_definition_args}
-    );"""
+    )"""
 
 INCLUDED_CONFIG_CONSTRUCTOR_ARG_ENTRY = (
     "std::shared_ptr<{config_name}> {config_arg_name}"

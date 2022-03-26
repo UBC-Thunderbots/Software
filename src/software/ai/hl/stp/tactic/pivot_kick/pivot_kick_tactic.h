@@ -12,9 +12,11 @@ class PivotKickTactic : public Tactic
     /**
      * Creates a new PivotKickTactic
      *
-     * @param robot_navigation_obstacle_config The config
+     * @param ai_config The AI configuration
      */
-    explicit PivotKickTactic();
+    explicit PivotKickTactic(std::shared_ptr<const AiConfig> ai_config);
+
+    PivotKickTactic() = delete;
 
     DEFINE_TACTIC_DONE_AND_GET_FSM_STATE
 

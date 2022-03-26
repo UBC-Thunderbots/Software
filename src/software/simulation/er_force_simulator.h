@@ -3,6 +3,7 @@
 #include "extlibs/er_force_sim/src/amun/simulator/simulator.h"
 #include "proto/defending_side_msg.pb.h"
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
+#include "proto/robot_status_msg.pb.h"
 #include "proto/tbots_software_msgs.pb.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/jetson_nano/primitive_executor.h"
@@ -25,7 +26,7 @@ extern "C"
  * as well as the firmware simulation for the robots. This provides a simple interface
  * to setup, run, and query the current state of the simulation.
  */
-class ErForceSimulator : public QObject
+class ErForceSimulator
 {
    public:
     /**
@@ -69,6 +70,15 @@ class ErForceSimulator : public QObject
     void setBlueRobots(const std::vector<RobotStateWithId>& robots);
     void setRobots(const std::vector<RobotStateWithId>& robots,
                    gameController::Team team);
+    void setRobots(const google::protobuf::Map<uint32_t, TbotsProto::RobotState>& robots,
+                   gameController::Team side);
+
+    /**
+     * Set the world state from a WorldState proto in the simulation.
+     *
+     * @param world_state The new WorldState
+     */
+    void setWorldState(const TbotsProto::WorldState& world_state);
 
     /**
      * Sets the primitive being simulated by the robot on the corresponding team
@@ -88,6 +98,14 @@ class ErForceSimulator : public QObject
      * @param time_step how much to advance the simulation by
      */
     void stepSimulation(const Duration& time_step);
+
+    /**
+     * Gets the blue and yellow robot statuses
+     *
+     * @return a vector of robot statuses from either blue or yellow robots
+     */
+    std::vector<TbotsProto::RobotStatus> getBlueRobotStatuses() const;
+    std::vector<TbotsProto::RobotStatus> getYellowRobotStatuses() const;
 
     /**
      * Returns the most recent SSL Wrapper Packets
@@ -171,6 +189,9 @@ class ErForceSimulator : public QObject
     RobotConstants_t robot_constants;
     WheelConstants wheel_constants;
     Field field;
+
+    std::optional<RobotId> blue_robot_with_ball;
+    std::optional<RobotId> yellow_robot_with_ball;
 
     const QString CONFIG_FILE      = "simulator/2020";
     const QString CONFIG_DIRECTORY = "extlibs/er_force_sim/config/";

@@ -45,13 +45,13 @@
      name: min_pass_speed_m_per_s
      min: 0
      max: 5
-     value: 3.5
+     value: 4
      description: "The minimum pass speed (in m/s)"
  - double:
      name: max_pass_speed_m_per_s
      min: 0
      max: 10
-     value: 5.5
+     value: 6
      description: "The maximum pass speed (in m/s)"
  - double:
      name: enemy_reaction_time

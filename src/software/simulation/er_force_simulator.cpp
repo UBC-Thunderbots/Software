@@ -14,6 +14,7 @@
 #include "proto/message_translation/ssl_simulation_robot_control.h"
 #include "proto/message_translation/ssl_wrapper.h"
 #include "proto/message_translation/tbots_protobuf.h"
+#include "proto/robot_status_msg.pb.h"
 #include "software/world/robot_state.h"
 
 ErForceSimulator::ErForceSimulator(
@@ -25,7 +26,9 @@ ErForceSimulator::ErForceSimulator(
       frame_number(0),
       robot_constants(robot_constants),
       wheel_constants(wheel_constants),
-      field(Field::createField(field_type))
+      field(Field::createField(field_type)),
+      blue_robot_with_ball(std::nullopt),
+      yellow_robot_with_ball(std::nullopt)
 {
     QString full_filename = CONFIG_DIRECTORY;
 
@@ -45,14 +48,17 @@ ErForceSimulator::ErForceSimulator(
         LOG(FATAL) << "Could not open configuration file " << full_filename.toStdString()
                    << std::endl;
     }
+
     QString str = file.readAll();
     file.close();
+
     std::string s = qPrintable(str);
     google::protobuf::TextFormat::Parser parser;
     parser.ParseFromString(s, &er_force_sim_setup);
     er_force_sim = std::make_unique<camun::simulator::Simulator>(er_force_sim_setup);
     auto simulator_setup_command = std::make_unique<amun::Command>();
     simulator_setup_command->mutable_simulator()->set_enable(true);
+
     // start with default robots, take ER-Force specs.
     robot::Specs ERForce;
     robotSetDefault(&ERForce);
@@ -71,6 +77,16 @@ ErForceSimulator::ErForceSimulator(
     er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
 
     this->resetCurrentTime();
+}
+
+void ErForceSimulator::setWorldState(const TbotsProto::WorldState& world_state)
+{
+    if (world_state.has_ball_state())
+    {
+        setBallState(createBallState(world_state.ball_state()));
+    }
+    setRobots(world_state.blue_robots(), gameController::Team::BLUE);
+    setRobots(world_state.yellow_robots(), gameController::Team::YELLOW);
 }
 
 void ErForceSimulator::setBallState(const BallState& ball_state)
@@ -108,6 +124,19 @@ void ErForceSimulator::setBlueRobots(const std::vector<RobotStateWithId>& robots
 void ErForceSimulator::setRobots(const std::vector<RobotStateWithId>& robots,
                                  gameController::Team side)
 {
+    google::protobuf::Map<uint32_t, TbotsProto::RobotState> proto_robots;
+    for (const auto& robot_state_with_id : robots)
+    {
+        proto_robots[robot_state_with_id.id] =
+            *createRobotStateProto(robot_state_with_id.robot_state);
+    }
+    setRobots(proto_robots, side);
+}
+
+void ErForceSimulator::setRobots(
+    const google::protobuf::Map<uint32_t, TbotsProto::RobotState>& robots,
+    gameController::Team side)
+{
     auto simulator_setup_command = std::make_unique<amun::Command>();
 
     robot::Specs ERForce;
@@ -124,11 +153,11 @@ void ErForceSimulator::setRobots(const std::vector<RobotStateWithId>& robots,
         team = simulator_setup_command->mutable_set_team_yellow();
     }
 
-    for (const auto& robot_state_with_id : robots)
+    for (auto& [id, robot_state] : robots)
     {
         auto* robot = team->add_robot();
         robot->CopyFrom(ERForce);
-        robot->set_id(robot_state_with_id.id);
+        robot->set_id(id);
     }
     er_force_sim->handleSimulatorSetupCommand(simulator_setup_command);
 
@@ -145,11 +174,11 @@ void ErForceSimulator::setRobots(const std::vector<RobotStateWithId>& robots,
     auto command_simulator = std::make_unique<amun::CommandSimulator>();
 
     // Add each robot to be added to the teleport robot repeated field
-    for (const auto& robot_state_with_id : robots)
+    for (auto& [id, robot_state] : robots)
     {
         auto teleport_robot             = std::make_unique<sslsim::TeleportRobot>();
         gameController::BotId* robot_id = new gameController::BotId();
-        robot_id->set_id(robot_state_with_id.id);
+        robot_id->set_id(static_cast<int>(id));
 
         if (side == gameController::Team::BLUE)
         {
@@ -161,21 +190,21 @@ void ErForceSimulator::setRobots(const std::vector<RobotStateWithId>& robots,
         }
 
         teleport_robot->set_x(static_cast<float>(
-            robot_state_with_id.robot_state.position().x() * MILLIMETERS_PER_METER));
+            robot_state.global_position().x_meters() * MILLIMETERS_PER_METER));
         teleport_robot->set_y(static_cast<float>(
-            robot_state_with_id.robot_state.position().y() * MILLIMETERS_PER_METER));
+            robot_state.global_position().y_meters() * MILLIMETERS_PER_METER));
         teleport_robot->set_allocated_id(robot_id);
         teleport_robot->set_present(true);
 
-        teleport_robot->set_orientation(static_cast<float>(
-            robot_state_with_id.robot_state.orientation().toRadians()));
+        teleport_robot->set_orientation(
+            static_cast<float>(robot_state.global_orientation().radians()));
 
         teleport_robot->set_v_x(static_cast<float>(
-            robot_state_with_id.robot_state.velocity().x() * MILLIMETERS_PER_METER));
+            robot_state.global_velocity().x_component_meters() * MILLIMETERS_PER_METER));
         teleport_robot->set_v_y(static_cast<float>(
-            robot_state_with_id.robot_state.velocity().y() * MILLIMETERS_PER_METER));
+            robot_state.global_velocity().x_component_meters() * MILLIMETERS_PER_METER));
         teleport_robot->set_v_angular(static_cast<float>(
-            robot_state_with_id.robot_state.angularVelocity().toRadians()));
+            robot_state.global_angular_velocity().radians_per_second()));
 
         *(simulator_control->add_teleport_robot()) = *teleport_robot;
     }
@@ -194,20 +223,18 @@ void ErForceSimulator::setRobots(const std::vector<RobotStateWithId>& robots,
         yellow_primitive_executor_map.clear();
     }
 
-    for (const auto& robot_state_with_id : robots)
+    for (auto& [id, robot_state] : robots)
     {
         auto robot_primitive_executor = std::make_shared<PrimitiveExecutor>(
             primitive_executor_time_step, robot_constants);
 
         if (side == gameController::Team::BLUE)
         {
-            blue_primitive_executor_map.insert(
-                {robot_state_with_id.id, robot_primitive_executor});
+            blue_primitive_executor_map.insert({id, robot_primitive_executor});
         }
         else
         {
-            yellow_primitive_executor_map.insert(
-                {robot_state_with_id.id, robot_primitive_executor});
+            yellow_primitive_executor_map.insert({id, robot_primitive_executor});
         }
     }
 }
@@ -294,7 +321,6 @@ SSLSimulationProto::RobotControl ErForceSimulator::updateSimulatorRobots(
             // normalized correctly
             auto direct_control = primitive_executor->stepPrimitive(
                 robot_id, RobotState(robot_proto_it->current_state()).orientation());
-//            std::cout << "Actu Vel robot " << robot_id << " = " << RobotState(robot_proto_it->current_state()).velocity().length() << std::endl;
 
             auto command = *getRobotCommandFromDirectControl(
                 robot_id, std::move(direct_control), robot_constants, wheel_constants);
@@ -311,49 +337,68 @@ void ErForceSimulator::stepSimulation(const Duration& time_step)
     SSLSimulationProto::RobotControl yellow_robot_control =
         updateSimulatorRobots(yellow_primitive_executor_map, *yellow_team_world_msg);
 
-    for (auto& primitive_executor_with_id : yellow_primitive_executor_map)
-    {
-        unsigned int robot_id       = primitive_executor_with_id.first;
-        const auto& friendly_robots = yellow_team_world_msg->friendly_team().team_robots();
-        const auto& robot_proto_it =
-                std::find_if(friendly_robots.begin(), friendly_robots.end(),
-                             [&](const auto& robot) { return robot.id() == robot_id; });
-        if (robot_proto_it != friendly_robots.end())
-        {
-//            std::cout << "Actu Vel robot " << robot_id << " = " << RobotState(robot_proto_it->current_state()).velocity().length() << std::endl;
-//            LOG(VISUALIZE) << *createNamedValue("Sensor fusion vel " + std::to_string(robot_id), static_cast<float>(RobotState(robot_proto_it->current_state()).velocity().length()));
-//            LOG(VISUALIZE) << *createNamedValue("Sensor fusion accel " + std::to_string(robot_id), static_cast<float>((RobotState(robot_proto_it->current_state()).velocity() - sensor_prev_vel).length() / time_step.toSeconds()));
-//            std::cout << "sensor accel " + std::to_string(robot_id) << " " << (RobotState(robot_proto_it->current_state()).velocity() - sensor_prev_vel).length() << std::endl;
-//            sensor_prev_vel = RobotState(robot_proto_it->current_state()).velocity();
-
-            auto world_state = getSimulatorState();
-
-            const auto& world_state_robot =
-                    std::find_if(world_state.yellow_robots().begin(), world_state.yellow_robots().end(),
-                                 [&](const auto& robot) { return robot.id() == robot_id; });
-            if (world_state_robot != world_state.yellow_robots().end())
-            {
-//                Vector vel(world_state_robot->v_x(), world_state_robot->v_y());
-//                LOG(VISUALIZE) << *createNamedValue("Actual vel " + std::to_string(robot_id),
-//                                                    static_cast<float>(vel.length()));
-//                LOG(VISUALIZE) << *createNamedValue("Actual accel " + std::to_string(robot_id),
-//                                                    static_cast<float>((vel - actual_prev_vel).length() * 60));
-//                std::cout << "accel " + std::to_string(robot_id) << " " << (vel - actual_prev_vel).length() << std::endl;
-//                std::cout << "vel " + std::to_string(robot_id) << " " << vel << std::endl;
-//                std::cout << "actual_prev_vel " + std::to_string(robot_id) << " " << actual_prev_vel << std::endl;
-//                actual_prev_vel = vel;
-            }
-        }
-    }
-
     SSLSimulationProto::RobotControl blue_robot_control =
         updateSimulatorRobots(blue_primitive_executor_map, *blue_team_world_msg);
 
-    er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);
-    er_force_sim->acceptBlueRobotControlCommand(blue_robot_control);
+    auto yellow_radio_responses =
+        er_force_sim->acceptYellowRobotControlCommand(yellow_robot_control);
+    auto blue_radio_responses =
+        er_force_sim->acceptBlueRobotControlCommand(blue_robot_control);
+
+    blue_robot_with_ball.reset();
+    yellow_robot_with_ball.reset();
+
+    for (const auto& response : yellow_radio_responses)
+    {
+        if (response.has_ball_detected() && response.ball_detected())
+        {
+            yellow_robot_with_ball = response.id();
+        }
+    }
+
+    for (const auto& response : blue_radio_responses)
+    {
+        if (response.has_ball_detected() && response.ball_detected())
+        {
+            blue_robot_with_ball = response.id();
+        }
+    }
+
     er_force_sim->stepSimulation(time_step.toSeconds());
 
     frame_number++;
+}
+
+std::vector<TbotsProto::RobotStatus> ErForceSimulator::getBlueRobotStatuses() const
+{
+    std::vector<TbotsProto::RobotStatus> robot_statuses;
+    if (blue_robot_with_ball.has_value())
+    {
+        auto robot_status = TbotsProto::RobotStatus();
+        robot_status.set_robot_id(blue_robot_with_ball.value());
+        auto break_beam_status = TbotsProto::BreakBeamStatus();
+        break_beam_status.set_ball_in_beam(true);
+        *(robot_status.mutable_break_beam_status()) = break_beam_status;
+        robot_statuses.push_back(robot_status);
+    }
+
+    return robot_statuses;
+}
+
+std::vector<TbotsProto::RobotStatus> ErForceSimulator::getYellowRobotStatuses() const
+{
+    std::vector<TbotsProto::RobotStatus> robot_statuses;
+    if (yellow_robot_with_ball.has_value())
+    {
+        auto robot_status = TbotsProto::RobotStatus();
+        robot_status.set_robot_id(yellow_robot_with_ball.value());
+        auto break_beam_status = TbotsProto::BreakBeamStatus();
+        break_beam_status.set_ball_in_beam(true);
+        *(robot_status.mutable_break_beam_status()) = break_beam_status;
+        robot_statuses.push_back(robot_status);
+    }
+
+    return robot_statuses;
 }
 
 std::vector<SSLProto::SSL_WrapperPacket> ErForceSimulator::getSSLWrapperPackets() const

@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/tactic/attacker/attacker_tactic.h"
 #include "software/ai/hl/stp/tactic/move/move_tactic.h"
 #include "software/geom/algorithms/contains.h"
-#include "software/simulated_tests/simulated_tactic_test_fixture.h"
+#include "software/simulated_tests/simulated_er_force_sim_tactic_test_fixture.h"
 #include "software/simulated_tests/terminating_validation_functions/ball_kicked_validation.h"
 #include "software/simulated_tests/terminating_validation_functions/robot_state_validation.h"
 #include "software/simulated_tests/validation/validation_function.h"
@@ -14,11 +14,12 @@
 #include "software/world/world.h"
 
 class AttackerTacticKeepAwayTest
-    : public SimulatedTacticTestFixture,
+    : public SimulatedErForceSimTacticTestFixture,
       public ::testing::WithParamInterface<std::tuple<Pass, RobotStateWithId, BallState>>
 {
    protected:
-    Field field = Field::createSSLDivisionBField();
+    TbotsProto::FieldType field_type = TbotsProto::FieldType::DIV_B;
+    Field field                      = Field::createField(field_type);
 };
 
 TEST_P(AttackerTacticKeepAwayTest, attacker_test_passing)
@@ -31,10 +32,12 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_passing)
     friendly_robots.emplace_back(robot_state);
     auto enemy_robots = TestUtil::createStationaryRobotStatesWithId({Point(4, 0)});
 
-    auto attacker_tactic_config = std::make_shared<AttackerTacticConfig>();
+    auto ai_config = std::make_shared<ThunderbotsConfig>()->getMutableAiConfig();
     // force passing for this test by setting min acceptable shot angle very high
-    attacker_tactic_config->getMutableMinOpenAngleForShotDeg()->setValue(90);
-    auto tactic = std::make_shared<AttackerTactic>(attacker_tactic_config);
+    ai_config->getMutableAttackerTacticConfig()
+        ->getMutableMinOpenAngleForShotDeg()
+        ->setValue(90);
+    auto tactic = std::make_shared<AttackerTactic>(ai_config);
     tactic->updateControlParams(pass, true);
     setTactic(tactic);
     setFriendlyRobotId(1);
@@ -59,7 +62,7 @@ TEST_P(AttackerTacticKeepAwayTest, attacker_test_passing)
 
     std::vector<ValidationFunction> non_terminating_validation_functions = {};
 
-    runTest(field, ball_state, friendly_robots, enemy_robots,
+    runTest(field_type, ball_state, friendly_robots, enemy_robots,
             terminating_validation_functions, non_terminating_validation_functions,
             Duration::fromSeconds(5));
 }

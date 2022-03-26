@@ -20,10 +20,10 @@ class GoalieTactic : public Tactic
     /**
      * Creates a new GoalieTactic
      *
-     * @param goalie_tactic_config The config to fetch parameters from
+     * @param ai_config The AI configuration
      * @param max_allowed_speed_mode The maximum allowed speed mode
      */
-    explicit GoalieTactic(std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config,
+    explicit GoalieTactic(std::shared_ptr<const AiConfig> ai_config,
                           TbotsProto::MaxAllowedSpeedMode max_allowed_speed_mode =
                               TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT);
 
@@ -39,5 +39,4 @@ class GoalieTactic : public Tactic
     void updateIntent(const TacticUpdate &tactic_update) override;
 
     FSM<GoalieFSM> fsm;
-    std::shared_ptr<const GoalieTacticConfig> goalie_tactic_config;
 };
