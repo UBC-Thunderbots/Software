@@ -108,15 +108,3 @@ bool operator!=(const Point &p, const Point &q)
 {
     return !(p == q);
 }
-
-double pathLength(const std::vector<Point> &path_points, const Point &robot_position)
-{
-    double length = 0.0;
-    Point prev_pt = robot_position;
-    for (const auto &pt : path_points)
-    {
-        length += (pt - prev_pt).length();
-        prev_pt = pt;
-    }
-    return length;
-}

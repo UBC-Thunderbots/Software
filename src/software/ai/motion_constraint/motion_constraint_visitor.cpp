@@ -11,14 +11,14 @@ void MotionConstraintVisitor::visit(const GoalieTactic &tactic)
 {
     current_allowed_constraints = std::set<MotionConstraint>({
         MotionConstraint::FRIENDLY_DEFENSE_AREA,
-        //MotionConstraint::HALF_METER_AROUND_BALL,
+        MotionConstraint::HALF_METER_AROUND_BALL,
         MotionConstraint::FRIENDLY_HALF
     });
 }
 
 void MotionConstraintVisitor::visit(const CreaseDefenderTactic &tactic) {
     current_allowed_constraints = std::set<MotionConstraint>({
-        //MotionConstraint::HALF_METER_AROUND_BALL,
+        MotionConstraint::HALF_METER_AROUND_BALL,
     });
 }
 
@@ -36,7 +36,7 @@ void MotionConstraintVisitor::visit(const KickoffChipTactic &tactic)
 {
     current_allowed_constraints = std::set<MotionConstraint>({
         MotionConstraint::CENTER_CIRCLE,
-        //MotionConstraint::HALF_METER_AROUND_BALL
+        MotionConstraint::HALF_METER_AROUND_BALL
     });
 }
 
@@ -45,7 +45,7 @@ void MotionConstraintVisitor::visit(const StopTactic &tactic) {}
 void MotionConstraintVisitor::visit(const PenaltyKickTactic &tactic)
 {
     current_allowed_constraints = std::set<MotionConstraint>({
-        //MotionConstraint::HALF_METER_AROUND_BALL,
+        MotionConstraint::HALF_METER_AROUND_BALL,
         MotionConstraint::ENEMY_DEFENSE_AREA,
         MotionConstraint::ENEMY_HALF
     });
@@ -57,7 +57,7 @@ void MotionConstraintVisitor::visit(const PenaltySetupTactic &tactic)
         MotionConstraint::ENEMY_HALF,
         MotionConstraint::ENEMY_DEFENSE_AREA,
         MotionConstraint::FRIENDLY_HALF,
-        //MotionConstraint::HALF_METER_AROUND_BALL
+        MotionConstraint::HALF_METER_AROUND_BALL
     });
 }
 

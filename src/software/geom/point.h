@@ -238,15 +238,3 @@ namespace std
         }
     };
 }  // namespace std
-
-
-/**
- * Compute the length of the path by summing the distance between consecutive points start
- * with the robot_position
- *
- * @param path_points The points on the path
- * @param robot_position The position of the robot
- *
- * @return the length of the path
- */
-double pathLength(const std::vector<Point> &path_points, const Point &robot_position);

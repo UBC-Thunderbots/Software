@@ -26,18 +26,17 @@ enum MotionConstraint
     FRIENDLY_HALF = 5;
     // Region around the playable zone
     AVOID_FIELD_BOUNDARY_ZONE = 6;
+    // A half meter radius around the ball
+    HALF_METER_AROUND_BALL = 7;
+    // Path between ball and placement point in ball placement
+    AVOID_BALL_PLACEMENT_INTERFERENCE = 8;
 }
 
 message MotionControl
 {
-    Path path                             = 1;
-    double path_length                    = 2;
-    BallCollisionType ball_collision_type = 3;
-    // A half meter radius around the ball
-    bool half_meter_around_ball = 4;
-    // Path between ball and placement point in ball placement
-    bool avoid_ball_placement_interference = 5;
-    repeated MotionConstraint motion_constraints= 6;
+    Path path                                    = 1;
+    double path_length                           = 2;
+    repeated MotionConstraint motion_constraints = 4;
 }
 
 enum DribblerMode
@@ -91,13 +90,14 @@ message MovePrimitive
         };
     }
 
-    MotionControl motion_control     = 1;
-    float final_speed_m_per_s        = 2;
-    Angle final_angle                = 3;
-    float dribbler_speed_rpm         = 4;
-    float max_speed_m_per_s          = 5;
-    AutoChipOrKick auto_chip_or_kick = 6;
-    float target_spin_rev_per_s      = 7;
+    MotionControl motion_control          = 1;
+    float final_speed_m_per_s             = 2;
+    Angle final_angle                     = 3;
+    float dribbler_speed_rpm              = 4;
+    float max_speed_m_per_s               = 5;
+    AutoChipOrKick auto_chip_or_kick      = 6;
+    float target_spin_rev_per_s           = 7;
+    BallCollisionType ball_collision_type = 8;
 }
 
 message StopPrimitive

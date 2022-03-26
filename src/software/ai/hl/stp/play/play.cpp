@@ -2,6 +2,7 @@
 
 #include <munkres/munkres.h>
 
+#include "proto/message_translation/tbots_protobuf.h"
 #include "software/ai/hl/stp/tactic/stop/stop_tactic.h"
 #include "software/ai/motion_constraint/motion_constraint_set_builder.h"
 
@@ -165,7 +166,36 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             auto motion_constraints =
                 buildMotionConstraintSet(world.gameState(), *goalie_tactic);
             auto path_planner = path_planner_factory.getPathPlanner(motion_constraints);
-            primitive_sets.emplace_back(tactic->get(world, path_planner));
+            CreateMotionControl create_motion_control =
+                [path_planner, motion_constraints](const Point &robot_position,
+                                                   const Point &destination) {
+                    TbotsProto::MotionControl motion_control;
+                    TbotsProto::Path path_proto;
+
+                    std::vector<Point> path_points = {robot_position};
+                    auto path = path_planner->findPath(robot_position, destination);
+
+                    if (path.has_value())
+                    {
+                        path_points = path.value().getKnots();
+                    }
+
+                    *(path_proto.add_point()) = *createPointProto(path_points.back());
+                    *(motion_control.mutable_path()) = path_proto;
+                    for (const auto &motion_constraint : motion_constraints)
+                    {
+                        TbotsProto::MotionConstraint_Parse(
+                            toString(motion_constraint),
+                            motion_control.add_motion_constraints());
+                    }
+
+                    motion_control.set_path_length(
+                        EnlsvgPathPlanner::pathLength(path_points, robot_position));
+                    return motion_control;
+                };
+
+
+            primitive_sets.emplace_back(tactic->get(world, create_motion_control));
         }
 
         size_t num_rows = robots.size();

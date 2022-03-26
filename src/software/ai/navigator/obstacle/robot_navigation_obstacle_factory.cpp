@@ -47,6 +47,7 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
                 field.enemyHalf(), field.fieldLines(), field.fieldBoundary()));
             break;
         case MotionConstraint::AVOID_FIELD_BOUNDARY_ZONE:
+        {
             Rectangle field_walls    = field.fieldBoundary();
             Rectangle playable_field = field.fieldLines();
             // put each boundary zone as an obstacle
@@ -66,6 +67,15 @@ std::vector<ObstaclePtr> RobotNavigationObstacleFactory::createFromMotionConstra
             obstacles.push_back(createFromShape(left_boundary));
             obstacles.push_back(createFromShape(right_boundary));
             obstacles.push_back(createFromShape(lower_boundary));
+            break;
+        }
+        case MotionConstraint::HALF_METER_AROUND_BALL:;
+            // HALF_METER_AROUND_BALL is not handled by this obstacle factory since it's a
+            // dynamic obstacle
+            break;
+        case MotionConstraint::AVOID_BALL_PLACEMENT_INTERFERENCE:;
+            // AVOID_BALL_PLACEMENT_INTERFERENCE is not handled by this obstacle factory
+            // since it's a dynamic obstacle
             break;
     }
 

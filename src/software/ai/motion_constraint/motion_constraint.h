@@ -22,4 +22,8 @@ MAKE_ENUM(MotionConstraint,
           // The friendly half of the field
           FRIENDLY_HALF,
           // Region around the playable zone
-          AVOID_FIELD_BOUNDARY_ZONE);
+          AVOID_FIELD_BOUNDARY_ZONE,
+          // A half meter radius around the ball
+          HALF_METER_AROUND_BALL,
+          // Path between ball and placement point in ball placement
+          AVOID_BALL_PLACEMENT_INTERFERENCE);

@@ -9,17 +9,19 @@
 #include "software/world/world.h"
 
 using SetPrimitiveCallback = std::function<void(std::unique_ptr<TbotsProto::Primitive>)>;
+using CreateMotionControl =
+    std::function<TbotsProto::MotionControl(const Point &, const Point &)>;
 
 // The tactic update struct is used to update tactics and set the new primitive
 struct TacticUpdate
 {
     TacticUpdate(const Robot &robot, const World &world,
                  const SetPrimitiveCallback &set_primitive_fun,
-                 std::shared_ptr<const EnlsvgPathPlanner> path_planner)
+                 const CreateMotionControl &create_motion_control)
         : robot(robot),
           world(world),
           set_primitive(set_primitive_fun),
-          path_planner(path_planner)
+          create_motion_control(create_motion_control)
     {
     }
 
@@ -29,8 +31,8 @@ struct TacticUpdate
     World world;
     // callback to return the next primitive
     SetPrimitiveCallback set_primitive;
-
-    std::shared_ptr<const EnlsvgPathPlanner> path_planner;
+    // creator for motion control
+    CreateMotionControl create_motion_control;
 };
 
 /**
@@ -64,13 +66,4 @@ struct TacticUpdate
             state_str =                                                                  \
                 getCurrentFullStateName(*fsm_map.at(last_execution_robot.value()));      \
         return state_str;                                                                \
-    }
-
-#define DEFINE_PATH_POINTS(DESTINATION)                                                  \
-    std::vector<Point> path_points = {event.common.robot.position()};                    \
-    auto path = event.common.path_planner->findPath(event.common.robot.position(),       \
-                                                    (DESTINATION));                      \
-    if (path.has_value())                                                                \
-    {                                                                                    \
-        path_points = path.value().getKnots();                                           \
     }

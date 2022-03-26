@@ -193,3 +193,16 @@ bool EnlsvgPathPlanner::isBlocked(const EnlsvgPoint &ep) const
 {
     return !isCoordNavigable(ep) || enlsvg_grid->isBlocked(ep.x, ep.y);
 }
+
+double EnlsvgPathPlanner::pathLength(const std::vector<Point> &path_points,
+                                     const Point &robot_position)
+{
+    double length = 0.0;
+    Point prev_pt = robot_position;
+    for (const auto &pt : path_points)
+    {
+        length += (pt - prev_pt).length();
+        prev_pt = pt;
+    }
+    return length;
+}
