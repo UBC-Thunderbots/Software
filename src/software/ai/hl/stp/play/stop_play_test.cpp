@@ -21,8 +21,8 @@ class StopPlayTest : public SimulatedErForceSimPlayTestFixture
     {
         return {
             [](std::shared_ptr<World> world_ptr, ValidationCoroutine::push_type& yield) {
-                // Wait 2 seconds for robots that start too close to the ball to move away
-                // EDIT: Updated to 4 seconds for Er Force Simulator
+                // Wait 4 seconds for robots that start too close to the ball to move away
+                // with ER Simulator
                 if (world_ptr->getMostRecentTimestamp() >= Timestamp::fromSeconds(4))
                 {
                     robotsSlowDown(1.5, world_ptr, yield);
@@ -80,7 +80,7 @@ TEST_F(StopPlayTest, test_stop_play_friendly_half_robots_spread_out)
             Duration::fromSeconds(10));
 }
 
-// TODO: Re-enable when test is fixed
+// TODO (#2544): Re-enable when test is fixed
 // Disabled when porting to ER_force simulator
 TEST_F(StopPlayTest, DISABLED_test_stop_play_friendly_half_corner_robots_close_together)
 {
