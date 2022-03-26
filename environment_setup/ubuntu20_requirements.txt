@@ -4,4 +4,3 @@ autoflake==1.4
 pyqt6 # version is embedded in the package
 thefuzz==0.19.0
 iterfzf==0.5.0.20.0
-jinja2==3.1.1

@@ -58,12 +58,3 @@ py_binary(
     ] + PYTHON_BINDINGS,
     deps = NOTEBOOK_DEPS,
 )
-
-py_test(
-    name = "notebooks_test",
-    srcs = ["notebooks_test.py"],
-    data = [
-        ":notebooks",
-    ] + PYTHON_BINDINGS,
-    deps = NOTEBOOK_DEPS,
-)
