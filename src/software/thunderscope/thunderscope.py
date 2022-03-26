@@ -1,5 +1,4 @@
 import os
-import time
 import signal
 import argparse
 
@@ -26,6 +25,7 @@ from proto.message_translation.message_to_dict import message_to_dict
 
 from software.networking import threaded_unix_sender
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
+from software.thunderscope.common.proto_configuration_widget import ProtoConfigurationWidget
 from software.thunderscope.field import (
     obstacle_layer,
     path_layer,
@@ -146,69 +146,16 @@ class Thunderscope(object):
         return field_dock
 
     def setup_parameter_widget(self):
-        """
-        TODO
-        """
+        def cak(p, t):
+            print(p, t)
 
-        dict_obj = message_to_dict(ThunderbotsConfig())
-        print(dict_obj)
-        
-        params = [
-            {'name': 'Config', 'type': 'group', 'children': [
-                    {'name': 'run_ai', 'type': 'bool', 'value': True},
-                    {'name': 'threshold', 'type': 'slider', 'limits':[0,100], 'value': 0.0},
-            ]},
-        ]
-        params2 = [
-            {'name': 'Config', 'type': 'group', 'children': [
-                    {'name': 'run_ai', 'type': 'bool', 'value': True},
-            ]},
-        ]
-        
-        
-        # Create tree of Parameter objects
-        p = Parameter.create(name='params', type='group', children=params)
-
-
-        t = ParameterTree()
-        t.setParameters(p, showTop=False)
-
-        ## If anything changes in the tree, print a message
-        def change(param, changes):
-            print("tree changes:")
-            for param, change, data in changes:
-                path = p.childPath(param)
-                if path is not None:
-                    childName = '.'.join(path)
-                else:
-                    childName = param.name()
-                print('  parameter: %s'% childName)
-                print('  change:    %s'% change)
-                print('  data:      %s'% str(data))
-                print('  ----------')
-            
-        p.sigTreeStateChanged.connect(change)
-
-        def valueChanging(param, value):
-            print("Value changing (not finalized): %s %s" % (param, value))
-        
-        # Too lazy for recursion:
-        for child in p.children():
-            child.sigValueChanging.connect(valueChanging)
-            for ch2 in child.children():
-                ch2.sigValueChanging.connect(valueChanging)
-
-        win = QtGui.QWidget()
-        layout = QtGui.QVBoxLayout()
-        win.setLayout(layout)
-        layout.addWidget(t)
+        p = ProtoConfigurationWidget(ThunderbotsConfig, cak)
 
         # Create and return dock
         param_dock = Dock("Parameters", size=(20, 1000))
-        param_dock.addWidget(win)
+        param_dock.addWidget(p)
 
         return param_dock
-
 
     def setup_log_widget(self):
         """Setup the wiget that receives logs from full system
@@ -269,7 +216,8 @@ class Thunderscope(object):
     def close(self):
         QtCore.QTimer.singleShot(0, self.window.close)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Thunderscope")
     parser.add_argument(
         "--robot_diagnostics",
