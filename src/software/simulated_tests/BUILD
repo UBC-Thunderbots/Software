@@ -181,10 +181,12 @@ py_library(
         "robot_enters_region.py",
         "robots_halt.py",
         "validation.py",
+        "friendly_has_ball_possession.py",
     ],
     data = [
         "//software:py_constants.so",
         "//software/geom:geometry.so",
+"//software/world:world.so",
     ],
     deps = [
         "//proto:software_py_proto",

@@ -151,3 +151,8 @@ const RobotConstants_t &Robot::robotConstants() const
 {
     return robot_constants_;
 }
+
+Robot createRobot(const TbotsProto::Robot &robot_proto)
+{
+    return Robot(robot_proto);
+}

@@ -9,6 +9,7 @@ from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.robots_halt import *
 from software.simulated_tests.ball_moves_forward import *
+from software.simulated_tests.friendly_has_ball_possession import *
 from software.simulated_tests.simulated_test_fixture import tactic_runner
 
 
@@ -115,6 +116,7 @@ def test_goalie_blocks_shot(
             # Goalie should be in the defense area
             RobotsEventuallyHalt(),
             RobotEventuallyEntersRegion(regions=[geom.Field().friendlyDefenseArea()]),
+            #FriendlyEventuallyHasBallPossession(),
             # BallEventuallyMovesForward(ball_initial_position),
         ]
     ]

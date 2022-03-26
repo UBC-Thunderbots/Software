@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+
 cc_library(
     name = "ball",
     srcs = ["ball.cpp"],
@@ -207,5 +209,22 @@ cc_test(
         "//proto/message_translation:tbots_protobuf",
         "//shared/test_util:tbots_gtest_main",
         "//software/test_util",
+    ],
+)
+
+pybind_library(
+    name = "world_lib",
+    srcs = ["python_bindings.cpp"],
+    deps = [
+        ":world",
+        "//proto/message_translation:tbots_geometry",
+        "@pybind11_protobuf//pybind11_protobuf:native_proto_caster",
+    ],
+)
+
+pybind_extension(
+    name = "world",
+    deps = [
+        ":world_lib",
     ],
 )
