@@ -116,7 +116,7 @@ def test_goalie_blocks_shot(
             # Goalie should be in the defense area
             RobotsEventuallyHalt(),
             RobotEventuallyEntersRegion(regions=[geom.Field().friendlyDefenseArea()]),
-            #FriendlyEventuallyHasBallPossession(),
+            FriendlyEventuallyHasBallPossession(),
             # BallEventuallyMovesForward(ball_initial_position),
         ]
     ]
