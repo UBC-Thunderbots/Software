@@ -33,7 +33,7 @@ class WorldLayer(FieldLayer):
         self.mouse_clicked = False
         self.mouse_click_pos = [0, 0]
         self.mouse_hover_pos = [0, 0]  # might not need later, see hoverMoveEvent
-        
+
     def keyPressEvent(self, event):
         """Detect when a key has been pressed (override)
         Note: function name format is different due to overriding the Qt function
@@ -131,7 +131,10 @@ class WorldLayer(FieldLayer):
             pos_x = robot_.current_state.global_position.x_meters
             pos_y = robot_.current_state.global_position.y_meters
             if (
-                math.sqrt((pos_x - mouse_x / MM_PER_M) ** 2 + (pos_y - mouse_y / MM_PER_M) ** 2)
+                math.sqrt(
+                    (pos_x - mouse_x / MM_PER_M) ** 2
+                    + (pos_y - mouse_y / MM_PER_M) ** 2
+                )
                 <= ROBOT_MAX_RADIUS / MM_PER_M
             ):
                 print(side)
@@ -144,14 +147,13 @@ class WorldLayer(FieldLayer):
         :param painter: The painter
 
         """
-        painter.setPen(pg.mkPen('g', width=2))
+        painter.setPen(pg.mkPen("g", width=2))
         painter.drawEllipse(
             self.createCircle(
                 self.mouse_click_pos[0], self.mouse_click_pos[1], BALL_RADIUS * 3,
             )
         )
         self.mouse_clicked = False
-
 
     def draw_field(self, painter, field: Field):
 
