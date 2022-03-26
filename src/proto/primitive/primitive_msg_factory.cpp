@@ -102,27 +102,29 @@ std::unique_ptr<TbotsProto::Primitive> createCostedMovePrimitive(
     return move_primitive_msg;
 }
 
-// std::unique_ptr<TbotsProto::Primitive> createChipPrimitive(
-//    const Point& chip_origin, const Angle& chip_direction, double chip_distance_meters,
-//    RobotConstants_t robot_constants, double cost)
-//{
+ std::unique_ptr<TbotsProto::Primitive> createChipPrimitive(
+    const Point& chip_origin, const Angle& chip_direction, double chip_distance_meters,
+    RobotConstants_t robot_constants, double cost)
+{
+    return std::make_unique<TbotsProto::Primitive>();
 //    return createCostedMovePrimitive(
 //        {chip_origin}, chip_direction, 0.0, TbotsProto::DribblerMode::OFF,
 //        TbotsProto::BallCollisionType::ALLOW,
 //        AutoChipOrKick{AutoChipOrKickMode::AUTOCHIP, chip_distance_meters},
 //        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants, cost);
-//}
-//
-// std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
-//    const Point& kick_origin, const Angle& kick_direction,
-//    double kick_speed_meters_per_second, RobotConstants_t robot_constants, double cost)
-//{
+}
+
+ std::unique_ptr<TbotsProto::Primitive> createKickPrimitive(
+    const Point& kick_origin, const Angle& kick_direction,
+    double kick_speed_meters_per_second, RobotConstants_t robot_constants, double cost)
+{
+    return std::make_unique<TbotsProto::Primitive>();
 //    return createCostedMovePrimitive(
 //        {kick_origin}, kick_direction, 0.0, TbotsProto::DribblerMode::OFF,
 //        TbotsProto::BallCollisionType::ALLOW,
 //        AutoChipOrKick{AutoChipOrKickMode::AUTOKICK, kick_speed_meters_per_second},
 //        TbotsProto::MaxAllowedSpeedMode::PHYSICAL_LIMIT, 0.0, robot_constants, cost);
-//}
+}
 
 std::unique_ptr<TbotsProto::Primitive> createStopPrimitive(bool coast)
 {

@@ -131,9 +131,11 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                     *(motion_control.mutable_path()) = path_proto;
                     for (const auto &motion_constraint : motion_constraints)
                     {
+                        TbotsProto::MotionConstraint motion_constraint_proto;
                         TbotsProto::MotionConstraint_Parse(
                             toString(motion_constraint),
-                            motion_control.mutable_motion_constraints()->Add());
+                            &motion_constraint_proto);
+motion_control.add_motion_constraints(motion_constraint_proto);
                     }
 
                     motion_control.set_path_length(
@@ -214,9 +216,11 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
                     *(motion_control.mutable_path()) = path_proto;
                     for (const auto &motion_constraint : motion_constraints)
                     {
+                        TbotsProto::MotionConstraint motion_constraint_proto;
                         TbotsProto::MotionConstraint_Parse(
                             toString(motion_constraint),
-                            motion_control.mutable_motion_constraints()->Add());
+                            &motion_constraint_proto);
+motion_control.add_motion_constraints(motion_constraint_proto);
                     }
 
                     motion_control.set_path_length(
