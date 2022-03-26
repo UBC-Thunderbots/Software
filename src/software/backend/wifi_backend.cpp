@@ -7,9 +7,9 @@
 #include "shared/constants.h"
 #include "shared/parameter/cpp_dynamic_parameters.h"
 #include "software/constants.h"
-#include "software/estop/boost_uart_communication.h"
 #include "software/estop/threaded_estop_reader.h"
 #include "software/logger/logger.h"
+#include "software/uart/boost_uart_communication.h"
 #include "software/util/generic_factory/generic_factory.h"
 
 

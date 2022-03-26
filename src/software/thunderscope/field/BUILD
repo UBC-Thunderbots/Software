@@ -46,19 +46,12 @@ py_library(
     ],
 )
 
-py_binary(
-    name = "world_layer_interactions",
-    srcs = ["world_layer_interactions.py"],
+py_library(
+    name = "validation_layer",
+    srcs = ["validation_layer.py"],
     deps = [
         ":field_layer",
-        requirement("pyqtgraph"),
-    ],
-)
-
-py_binary(
-    name = "key_press_window",
-    srcs = ["key_press_window.py"],
-    deps = [
+        "//proto:import_all_protos",
         requirement("pyqtgraph"),
     ],
 )
