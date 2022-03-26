@@ -68,6 +68,7 @@ class RotaryEncoder:
         self.on_counterclockwise_rotate = on_counterclockwise_rotate
         self.on_click = on_click
 
+        # -1 added to make UI smoother. May only be needed due to noise from breadboard causing some interrupts to be missed
         self.transitions_per_rotation = len(STATES) - 1
 
     def setup(self):

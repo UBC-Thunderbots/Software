@@ -5,6 +5,7 @@ import subprocess
 import sys
 sys.path.append("../")
 import constants
+from utils import get_ip_address, get_signal_strength
 
 SCREEN_TYPE = str
 
@@ -52,26 +53,14 @@ class Screen:
         )
 
         # Get IP address
-        try:
-            cmd = "hostname -I | cut -d' ' -f1"
-            IP = "  IP: " + subprocess.check_output(cmd, shell=True).decode("utf-8")
-        except:
-            IP = "  IP: N/A"
-
+        IP = " IP: " + get_ip_address()
         self.lcd_display.draw.text((0, 2), IP, font=self.font, fill=constants.BLACK)
 
         # Get signal strength
-        try:
-            cmd = "iwconfig | grep 'Signal level='"
-            signal = " " + subprocess.check_output(
-                cmd, stderr=subprocess.STDOUT, shell=True
-            ).decode("utf-8").split("Signal level=")[1].replace("\n", "")
-        except:
-            signal = "N/A"
-
+        signal_strength = " " + get_signal_strength()
         self.lcd_display.draw.text(
-            (self.lcd_display.width - self.font.getsize(signal)[0], 2),
-            signal,
+            (self.lcd_display.width - self.font.getsize(signal_strength)[0], 2),
+            signal_strength,
             font=self.font,
             fill=constants.BLACK,
         )
