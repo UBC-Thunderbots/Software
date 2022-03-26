@@ -22,10 +22,20 @@ class Field(pg.PlotWidget):
         self.layers = []
 
     def keyPressEvent(self, event):
+        """Propagate keypress event to all field layers
+        
+        :param event: The event
+        
+        """
         for layer in self.layers:
             layer.keyPressEvent(event)
 
     def keyReleaseEvent(self, event):
+        """Propagate keyrelease event to all field layers
+        
+        :param event: The event
+        
+        """
         for layer in self.layers:
             layer.keyReleaseEvent(event)
 

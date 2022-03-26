@@ -3,6 +3,7 @@ import math
 import queue
 
 from pyqtgraph.Qt import QtCore, QtGui
+from PyQt5.QtCore import Qt
 from proto.world_pb2 import World, Field
 from proto.team_pb2 import Robot, Team
 from proto.ball_pb2 import Ball
@@ -13,10 +14,7 @@ from software.thunderscope.constants import (
     BALL_RADIUS,
     MM_PER_M,
     UNIX_SOCKET_BASE_PATH,
-    KEY_CTRL,
-    KEY_M,
-    KEY_R,
-)
+
 from software.networking.threaded_unix_listener import ThreadedUnixListener
 import software.thunderscope.colors as colors
 
@@ -25,6 +23,7 @@ class WorldLayer(FieldLayer):
     def __init__(self, buffer_size=10):
         FieldLayer.__init__(self)
         self.cached_world = World()
+        self.world_buffer = queue.Queue(buffer_size)
         self.setAcceptHoverEvents(True)
         self.setAcceptTouchEvents(True)
         self.pressed_CTRL = False
@@ -33,53 +32,52 @@ class WorldLayer(FieldLayer):
         self.mouse_clicked = False
         self.mouse_click_pos = [0, 0]
         self.mouse_hover_pos = [0, 0]  # might not need later, see hoverMoveEvent
-
-    # Note: the function name formatting is different but this can't be changed since it's overriding the built-in Qt function
+        
     def keyPressEvent(self, event):
-        """Detect when a key has been pressed
+        """Detect when a key has been pressed (override)
+        Note: function name format is different due to overriding the Qt function
 
         :param event: The event
 
         """
-        if event.key() == KEY_R:
+        if event.key() == Qt.Key_R:
             # TODO (#2410) enter function to rotate the robot
             print("pressed R")
             self.pressed_R = True
 
-        elif event.key() == KEY_CTRL:
+        elif event.key() == Qt.Key_Control:
             # TODO (#2410) enter function to move the ball
             print("pressed CTRL")
 
-        elif event.key() == KEY_M:
+        elif event.key() == Qt.Key_M:
             # TODO (#2410) enter function to move the robot
             print("pressed M")
             self.pressed_M = True
 
     # Note: the function name formatting is different but this can't be changed since it's overriding the built-in Qt function
     def keyReleaseEvent(self, event):
-        """Detect when a key has been released
+        """Detect when a key has been released (override)
 
         :param event: The event
 
         """
-        if event.key() == KEY_R:
+        if event.key() == Qt.Key_R:
             # TODO (#2410) exit function to rotate the robot
             print("released R")
             self.pressed_R = False
 
-        elif event.key() == KEY_CTRL:
+        elif event.key() == Qt.Key_Control:
             # TODO (#2410) exit function to move the ball
             self.pressed_CTRL = False
             print("released CTRL")
 
-        elif event.key() == KEY_M:
+        elif event.key() == Qt.Key_M:
             # TODO (#2410) exit function to move the robot
             print("released M")
             self.pressed_M = False
 
-    # Note: the function name formatting is different but this can't be changed since it's overriding the built-in Qt function
     def hoverMoveEvent(self, event):
-        """Detect where the mouse is hovering on the field
+        """Detect where the mouse is hovering on the field (override)
         NOTE: Currently not used but may be useful in next part of (#2410)
 
         :param event: The event
@@ -87,9 +85,8 @@ class WorldLayer(FieldLayer):
         """
         self.mouse_hover_pos = [event.pos().x(), event.pos().y()]
 
-    # Note: the function name formatting is different but this can't be changed since it's overriding the built-in Qt function
     def mouseClickEvent(self, event):
-        """Detect whether the mouse was clicked anywhere on the field
+        """Detect whether the mouse was clicked anywhere on the field (override)
 
         :param event: The event
 
@@ -97,8 +94,8 @@ class WorldLayer(FieldLayer):
         # TODO (#2410) implement robot and ball interactivity through simulator, based on mouse and keyboard events
 
         # print the position of the mouse click
-        print("x: " + str(event.pos().x() / 1000))
-        print("y: " + str(event.pos().y() / 1000))
+        print("x: " + str(event.pos().x() / MM_PER_M))
+        print("y: " + str(event.pos().y() / MM_PER_M))
 
         self.mouse_clicked = True
         self.mouse_click_pos = [event.pos().x(), event.pos().y()]
@@ -133,8 +130,8 @@ class WorldLayer(FieldLayer):
             pos_x = robot_.current_state.global_position.x_meters
             pos_y = robot_.current_state.global_position.y_meters
             if (
-                math.sqrt((pos_x - mouse_x / 1000) ** 2 + (pos_y - mouse_y / 1000) ** 2)
-                <= ROBOT_MAX_RADIUS / 1000
+                math.sqrt((pos_x - mouse_x / MM_PER_M) ** 2 + (pos_y - mouse_y / MM_PER_M) ** 2)
+                <= ROBOT_MAX_RADIUS / MM_PER_M
             ):
                 print(side)
                 print(robot_.id)
@@ -146,8 +143,7 @@ class WorldLayer(FieldLayer):
         :param painter: The painter
 
         """
-        painter.setPen(pg.mkPen(colors.BLUE_ROBOT_COLOR))
-        painter.setBrush(pg.mkBrush(colors.BLUE_ROBOT_COLOR))
+        painter.setPen(pg.mkPen('g', width=2))
         painter.drawEllipse(
             self.createCircle(
                 self.mouse_click_pos[0], self.mouse_click_pos[1], BALL_RADIUS * 3,
@@ -155,7 +151,6 @@ class WorldLayer(FieldLayer):
         )
         self.mouse_clicked = False
 
-        self.world_buffer = queue.Queue(buffer_size)
 
     def draw_field(self, painter, field: Field):
 
