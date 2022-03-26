@@ -16,6 +16,8 @@ GlobalPathPlannerFactory::GlobalPathPlannerFactory(
     // (https://www.geeksforgeeks.org/generate-n-bit-gray-codes/)
     for (unsigned counter = 0; counter < std::pow(2, all_constraints.size()); ++counter)
     {
+        // TODO: somehow ignore dynamic motion constraints
+        // maybe use protobuf options
         std::set<MotionConstraint> motion_constraint_obstacles;
 
         // Use the value of the counter and bit arithmetic to get the motion constraint
