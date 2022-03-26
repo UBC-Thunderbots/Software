@@ -125,17 +125,6 @@ class HRVOSimulator
                                   float max_accel, AgentPath &path);
 
     /**
-     *      Returns a new path with a single path point
-     *
-     * @param position  The position of this
-     * @param goal_radius   The goal radius of the path
-     * @return a Path object
-     */
-    AgentPath addPath(const Vector &position, float goal_radius);
-
-    AgentPath addPathPositions(const std::vector<PathPoint> &path_points, float goal_radius);
-
-    /**
      * Performs a simulation step; updates the position, and velocity
      * of each agent, and the progress of each towards its goal by moving
      * the simulation time_step seconds forward

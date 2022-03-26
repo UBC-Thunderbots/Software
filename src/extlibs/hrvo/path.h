@@ -27,45 +27,11 @@ class AgentPath
     explicit AgentPath(const std::vector<PathPoint> &path_points, float goal_radius);
 
     /**
-     * Gets the next path point position in this path
-     * @return the position of the next path point
-     */
-    std::optional<Vector> getNextPathPointPosition();
-
-    /**
-     * Gets the current path point position in this path
-     * @return the position of the current path point
-     */
-    std::optional<Vector> getCurrentPathPointPosition() const;
-
-    /**
-     * Gets the desired speed of the current path point in this path
-     * @return the speed at destination for the current path point
-     */
-    float getDesiredSpeedAtCurrentPathPoint();
-
-    /**
      * Checks if at final path point in a path
      * @return True if the current path point is the final path point in the path,
      * otherwise False
      */
     bool isGoingToFinalPathPoint();
-
-    /**
-     * Gets the current path index
-     * @return the current path index
-     */
-    unsigned int getPathIndex() const;
-
-    /**
-     * Gets the path point list of this path
-     * @return path point vector
-     */
-    std::vector<PathPoint> getPathVector() const;
-
-    // path radius for this robot. The max distance away from any path point in this path
-    float path_radius;
-
 
     /**
      * Increments the path point index of this path
@@ -78,10 +44,15 @@ class AgentPath
      */
     std::optional<PathPoint> getCurrentPathPoint() const;
 
-    // Assume that the path vector is not empty
-    PathPoint getLastPathPoint() const;
+    /**
+     * Gets the path radius for this agent
+     * @returns path radius for this agent
+     */
+    float getPathRadius() const;
 
    private:
     std::vector<PathPoint> path;
     unsigned int curr_path_index = 0;
+    // path radius for this robot. The max distance away from any path point in this path
+    float path_radius;
 };

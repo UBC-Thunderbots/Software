@@ -5,12 +5,6 @@
 
 #include "software/geom/vector.h"
 
-
-PathPoint::PathPoint(const Vector &position)
-    : position_(position), speed_at_destination(0.0f)
-{
-}
-
 PathPoint::PathPoint(const Vector &position, const float destination_speed)
     : position_(position), speed_at_destination(destination_speed)
 {

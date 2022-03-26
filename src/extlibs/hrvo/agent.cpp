@@ -2,8 +2,6 @@
 
 #include "extlibs/hrvo/path.h"
 #include "extlibs/hrvo/simulator.h"
-#include "proto/message_translation/tbots_protobuf.h"
-#include "software/logger/logger.h"
 
 Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
              const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
@@ -22,7 +20,6 @@ Agent::Agent(HRVOSimulator *simulator, const Vector &position, float radius,
 
 void Agent::update()
 {
-    old_vel = velocity_;
     if (new_velocity_.length() >= max_speed_)
     {
         // New velocity can not be greater than max speed
@@ -57,7 +54,8 @@ void Agent::update()
         current_dest = path_point.value().getPosition();
     }
 
-    if ((current_dest - position_).lengthSquared() < path.path_radius * path.path_radius)
+    if ((current_dest - position_).lengthSquared() <
+        path.getPathRadius() * path.getPathRadius())
     {
         // Is at current goal position
         if (path.isGoingToFinalPathPoint())
@@ -78,7 +76,7 @@ void Agent::update()
     }
 }
 
-void Agent::setPath(const AgentPath& new_path)
+void Agent::setPath(const AgentPath &new_path)
 {
     path = new_path;
 }
@@ -91,6 +89,11 @@ void Agent::setPosition(const Vector &position)
 void Agent::setVelocity(const Vector &velocity)
 {
     velocity_ = velocity;
+}
+
+float Agent::getMaxSpeed() const
+{
+    return max_speed_;
 }
 
 float Agent::getMaxAccel() const
@@ -125,7 +128,7 @@ bool Agent::hasReachedGoal() const
 
 float Agent::getPathRadius() const
 {
-    return path.path_radius;
+    return path.getPathRadius();
 }
 
 const AgentPath &Agent::getPath() const

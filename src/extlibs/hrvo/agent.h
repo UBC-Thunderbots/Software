@@ -22,7 +22,6 @@ class Agent
      * @param maxSpeed           The maximum speed of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
      * @param path               The path for this agent
-     * @param goalRadius         The goal radius of this agent.
      */
     Agent(HRVOSimulator *simulator, const Vector &position, float radius,
           const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
@@ -129,6 +128,12 @@ class Agent
     const AgentPath &getPath() const;
 
     /**
+     * Gets the max speed for this agent
+     * @return max speed for this agent
+     */
+    float getMaxSpeed() const;
+
+    /**
      * Update position of Agent
      * @param position New position
      */
@@ -156,10 +161,7 @@ class Agent
      * Sets a new path for this agent
      * @param new_path new path for this agent
      */
-    void setPath(const AgentPath& new_path);
-
-    // TODO: Added for debugging
-    Vector old_vel;
+    void setPath(const AgentPath &new_path);
 
 public: // TODO: protected:
 

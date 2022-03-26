@@ -43,7 +43,6 @@
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/algorithms/intersection.h"
 #include "software/logger/logger.h"
-#include "proto/message_translation/tbots_protobuf.h"
 
 HRVOSimulator::HRVOSimulator(float time_step, const RobotConstants_t &robot_constants)
     : global_time(0.0f),
@@ -116,7 +115,7 @@ void HRVOSimulator::updateWorld(const World &world)
                 // was updated. This is to allow SensorFusion to update the actual robot
                 // velocity in World.
                 // TODO (#2531): Remove 4 multiplier and fix goal keeper moving slowly
-                if (global_time - last_time_velocity_updated >= time_step)
+                if (global_time - last_time_velocity_updated >= 4 * time_step)
                 {
                     Vector velocity = friendly_robot.velocity();
                     hrvo_agent.value()->setVelocity(friendly_robot.velocity());
@@ -153,7 +152,7 @@ void HRVOSimulator::updateWorld(const World &world)
             // obstacle
             float ball_radius = 0.5f + BALL_AGENT_RADIUS_OFFSET;
 
-            AgentPath path               = addPath(goal_pos, 0.1f);
+            AgentPath path          = AgentPath({PathPoint(goal_pos, 0.0f)}, 0.1f);
             std::size_t agent_index = addLinearVelocityAgent(
                 position, ball_radius, velocity, velocity.length(), acceleration, path);
             ball_agent_id = agent_index;
@@ -185,26 +184,30 @@ void HRVOSimulator::updatePrimitiveSet(const TbotsProto::PrimitiveSet &new_primi
         if (hrvo_agent_opt.has_value())
         {
             auto hrvo_agent = hrvo_agent_opt.value();
-            const AgentPath path;
+            AgentPath path;
 
             if (primitive.has_move())
             {
-                // TODO (#2418): Update implementation of Primitive to support
-                // multiple path points
-                auto destination = primitive.move().path().point().at(0);
-                path.getPathVector().emplace_back(
-                    PathPoint(Vector(destination.x_meters(),
-                                     destination.y_meters()),
-                              primitive.move().final_speed_m_per_s()));
-
+                float speed_at_dest = primitive.move().final_speed_m_per_s();
                 float new_max_speed = primitive.move().max_speed_m_per_s();
                 hrvo_agent->setMaxSpeed(new_max_speed);
                 hrvo_agent->setPreferredSpeed(new_max_speed * PREF_SPEED_SCALE);
+
+                // TODO (#2418): Update implementation of Primitive to support
+                // multiple path points
+                auto destination = primitive.move().path().point().at(0);
+
+                // Max distance which the robot can travel in one time step + scaling
+                float path_radius =
+                    (hrvo_agent->getMaxSpeed() * time_step) / 2 * GOAL_RADIUS_SCALE;
+                path = AgentPath(
+                    {PathPoint(Vector(destination.x_meters(), destination.y_meters()),
+                               speed_at_dest)},
+                    path_radius);
             }
 
             hrvo_agent->setPath(path);
         }
-        
     }
 }
 
@@ -259,7 +262,8 @@ std::size_t HRVOSimulator::addHRVORobotAgent(const Robot &robot)
     float path_radius        = (max_speed * time_step) / 2 * GOAL_RADIUS_SCALE;
     float uncertainty_offset = 0.f;
 
-    AgentPath path = addPath(destination_point, path_radius);
+    AgentPath path =
+        AgentPath({PathPoint(destination_point, speed_at_goal)}, path_radius);
 
     return addHRVOAgent(position, agent_radius, velocity, max_speed, pref_speed,
                         max_accel, path, MAX_NEIGHBOR_SEARCH_DIST, MAX_NEIGHBORS,
@@ -276,12 +280,12 @@ std::size_t HRVOSimulator::addLinearVelocityRobotAgent(const Robot &robot,
     float max_speed = robot_constants.robot_max_speed_m_per_s;
 
     // Max distance which the robot can travel in one time step + scaling
-    float goal_radius = (max_speed * time_step) / 2 * GOAL_RADIUS_SCALE;
+    float path_radius = (max_speed * time_step) / 2 * GOAL_RADIUS_SCALE;
 
     // Enemy agents should appear larger to friendly agents to avoid collision
     float agent_radius = ROBOT_MAX_RADIUS_METERS * ENEMY_ROBOT_RADIUS_SCALE;
 
-    AgentPath path = addPath(destination, goal_radius);
+    AgentPath path = AgentPath({PathPoint(destination, 0.0f)}, path_radius);
     return addLinearVelocityAgent(position, agent_radius, velocity, max_speed, max_accel,
                                   path);
 }
@@ -308,21 +312,6 @@ size_t HRVOSimulator::addLinearVelocityAgent(const Vector &position, float agent
 
     agents.push_back(std::move(agent));
     return agents.size() - 1;
-}
-
-AgentPath HRVOSimulator::addPath(const Vector &position, float goal_radius)
-{
-    std::vector<PathPoint> path_points;
-    path_points.emplace_back(position);
-    AgentPath path(path_points, goal_radius);
-    return path;
-}
-
-AgentPath HRVOSimulator::addPathPositions(const std::vector<PathPoint> &path_points,
-                                          float goal_radius)
-{
-    AgentPath path(path_points, goal_radius);
-    return path;
 }
 
 void HRVOSimulator::doStep()
@@ -393,23 +382,6 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
         {
             *(obstacle_proto.add_circle()) = *createCircleProto(candidate_circle);
         }
-
-        // TODO: Maybe compare to actual accel/vel
-//        LOG(VISUALIZE) << *createNamedValue("in linear deceleration zone " + std::to_string(robot_id), friendly_agent->in_decel_zone);
-//        LOG(VISUALIZE) << *createNamedValue("hrvo pref vel " + std::to_string(robot_id), static_cast<float>(friendly_agent->pref_velocity_.length()));
-//        LOG(VISUALIZE) << *createNamedValue("hrvo new vel " + std::to_string(robot_id), static_cast<float>(friendly_agent->new_velocity_.length()));
-        LOG(VISUALIZE) << *createNamedValue("hrvo actual vel " + std::to_string(robot_id), static_cast<float>(friendly_agent->velocity_.length()));
-
-//        LOG(VISUALIZE) << *createNamedValue(
-//                    "acceleration " + std::to_string(robot_id),
-//                    static_cast<float>((friendly_agent->getVelocity() - friendly_agent->old_vel).length() / getTimeStep()));
-//        LOG(VISUALIZE) << *createNamedValue(
-//                    "velocity " + std::to_string(robot_id),
-//                    static_cast<float>(friendly_agent->getVelocity().length()));
-//        Vector goal = goals[friendly_agent->getGoalIndex()]->getCurrentGoalPosition();
-//        LOG(VISUALIZE) << *createNamedValue(
-//                    "dist to goal " + std::to_string(robot_id),
-//                    static_cast<float>((friendly_agent->getPosition() - goal).length()));
     }
 
     // Add circles representing agents
@@ -419,9 +391,7 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
         *(obstacle_proto.add_circle()) =
             *createCircleProto(Circle(position, agent->getRadius()));
     }
-
-
-//     LOG(VISUALIZE) << obstacle_proto;
+    // LOG(VISUALIZE) << obstacle_proto;
 }
 
 std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(
