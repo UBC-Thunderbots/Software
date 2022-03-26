@@ -37,20 +37,18 @@
 #include <iostream>
 #include <limits>
 
-#include "goal.h"
 #include "kd_tree.h"
+#include "path.h"
 #include "software/geom/vector.h"
 #include "proto/message_translation/tbots_protobuf.h"
 #include "software/logger/logger.h"
 
 
-HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position,
-                     std::size_t goalIndex, float neighborDist, std::size_t maxNeighbors,
-                     float radius, const Vector &velocity, float maxAccel,
-                     float goalRadius, float prefSpeed, float maxSpeed,
+HRVOAgent::HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
+                     std::size_t maxNeighbors, float radius, const Vector &velocity,
+                     float maxAccel, AgentPath &path, float prefSpeed, float maxSpeed,
                      float uncertaintyOffset)
-    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel,
-            goalIndex, goalRadius),
+    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, path),
       maxNeighbors_(maxNeighbors),
       neighborDist_(neighborDist),
       prefSpeed_(prefSpeed),
@@ -62,10 +60,19 @@ void HRVOAgent::computeNeighbors()
 {
     neighbors_.clear();
 
-    std::unique_ptr<Goal> &current_goal = simulator_->goals[goal_index_];
-    float new_neighbor_dist             = std::min(
-        static_cast<double>(neighborDist_),
-        (position_ - current_goal->getCurrentGoalPosition()).length() + goal_radius_);
+    Vector current_position;
+    if (path.getCurrentPathPoint() == std::nullopt)
+    {
+        current_position = path.getLastPathPoint().getPosition();
+    }
+    else
+    {
+        current_position = path.getCurrentPathPoint().value().getPosition();
+    }
+
+    float new_neighbor_dist =
+        std::min(static_cast<double>(neighborDist_),
+                 (position_ - current_position).length() + path.path_radius);
 
     simulator_->getKdTree()->query(this, new_neighbor_dist);
 }
@@ -461,11 +468,26 @@ void HRVOAgent::computePreferredVelocity()
         return;
     }
 
-    std::unique_ptr<Goal> &nextGoal = simulator_->goals[goal_index_];
-    Vector goalPosition             = nextGoal->getCurrentGoalPosition();
-    float speedAtGoal               = nextGoal->getDesiredSpeedAtCurrentGoal();
-    Vector distVectorToGoal         = goalPosition - position_;
-    auto distToGoal                 = static_cast<float>(distVectorToGoal.length());
+    Vector goalPosition;
+    float speedAtGoal;
+
+    // Check if we reached the end of the path
+    if (path.getCurrentPathPoint() == std::nullopt)
+    {
+        // Keep the same goal position as the very last pathpoint
+        goalPosition = path.getLastPathPoint().getPosition();
+        // Set speed to zero
+        speedAtGoal = 0.0f;
+    }
+    else
+    {
+        goalPosition = path.getCurrentPathPoint().value().getPosition();
+        speedAtGoal  = path.getCurrentPathPoint().value().getSpeed();
+    }
+
+    Vector distVectorToGoal = goalPosition - position_;
+    auto distToGoal         = static_cast<float>(distVectorToGoal.length());
+
     // d = (Vf^2 - Vi^2) / 2a
     double startLinearDecelerationDistance =
         std::abs((std::pow(speedAtGoal, 2) - std::pow(prefSpeed_, 2)) /
@@ -518,7 +540,17 @@ void HRVOAgent::insertNeighbor(std::size_t agentNo, float &rangeSq)
         Vector other_agent_relative_pos = other_agent->getPosition() - position_;
         const float distSq              = other_agent_relative_pos.lengthSquared();
 
-        Vector goal_pos = simulator_->goals[goal_index_]->getCurrentGoalPosition();
+        Vector goal_pos;
+        // check if we have reached the end of path
+        if (path.getCurrentPathPoint() == std::nullopt)
+        {
+            goal_pos = path.getLastPathPoint().getPosition();
+        }
+        else
+        {
+            goal_pos = path.getCurrentPathPoint().value().getPosition();
+        }
+
         Vector relative_goal_pos = goal_pos - position_;
 
         // Whether the other robot is with in 45 degrees of the goal, relative to us

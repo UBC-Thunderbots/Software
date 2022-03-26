@@ -39,7 +39,6 @@
 #include <vector>
 
 #include "agent.h"
-#include "goal.h"
 #include "simulator.h"
 #include "software/geom/vector.h"
 
@@ -66,10 +65,10 @@ class HRVOAgent : public Agent
      * @param maxAccel           The maximum acceleration of this agent.
      * @param velocity           The initial velocity of this agent.
      */
-    HRVOAgent(HRVOSimulator *simulator, const Vector &position, std::size_t goalIndex,
-              float neighborDist, std::size_t maxNeighbors, float radius,
-              const Vector &velocity, float maxAccel, float goalRadius, float prefSpeed,
-              float maxSpeed, float uncertaintyOffset);
+    HRVOAgent(HRVOSimulator *simulator, const Vector &position, float neighborDist,
+              std::size_t maxNeighbors, float radius, const Vector &velocity,
+              float maxAccel, AgentPath &path, float prefSpeed, float maxSpeed,
+              float uncertaintyOffset);
 
     /**
      * Computes the new velocity of this agent.

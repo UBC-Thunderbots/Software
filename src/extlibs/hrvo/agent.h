@@ -1,5 +1,6 @@
 #pragma once
 
+#include "extlibs/hrvo/path.h"
 #include "software/geom/vector.h"
 
 class HRVOSimulator;
@@ -20,12 +21,12 @@ class Agent
      * @param prefVelocity       The preferred velocity of this agent.
      * @param maxSpeed           The maximum speed of this agent.
      * @param maxAccel           The maximum acceleration of this agent.
-     * @param goalIndex          The index of the Goal which this agent should go to.
+     * @param path               The path for this agent
      * @param goalRadius         The goal radius of this agent.
      */
     Agent(HRVOSimulator *simulator, const Vector &position, float radius,
           const Vector &velocity, const Vector &prefVelocity, float maxSpeed,
-          float maxAccel, std::size_t goalIndex, float goalRadius);
+          float maxAccel, AgentPath &path);
 
     virtual ~Agent() = default;
 
@@ -98,7 +99,7 @@ class Agent
      *
      * @return The goal radius of the agent
      */
-    float getGoalRadius() const;
+    float getPathRadius() const;
 
     /**
      * Return the preferred velocity of the agent
@@ -120,6 +121,12 @@ class Agent
      * @return True if this agent has reached its final goal, false otherwise.
      */
     bool hasReachedGoal() const;
+
+    /**
+     * Gets the the path for this agent
+     * @return Path for this agent
+     */
+    const AgentPath &getPath() const;
 
     /**
      * Update position of Agent
@@ -145,10 +152,17 @@ class Agent
      */
     void setMaxSpeed(float max_speed);
 
+    /**
+     * Sets a new path for this agent
+     * @param new_path new path for this agent
+     */
+    void setPath(const AgentPath& new_path);
+
     // TODO: Added for debugging
     Vector old_vel;
 
 public: // TODO: protected:
+
     // Agent Properties
     Vector position_;
     float radius_;
@@ -161,15 +175,12 @@ public: // TODO: protected:
     // NOTE: HRVO algorithm will try to pick this speed, however, it may pick a different
     // speed to avoid collisions.
     Vector pref_velocity_;
+    // The path of this Agent
+    AgentPath path;
 
     float max_speed_;
     float max_accel_;
-
-    std::size_t goal_index_;
-    float goal_radius_;
     bool reached_goal_;
 
-    // TODO (#2373): Remove once new Path class is added and add timeStep as a argument to
-    // update(time_step)
     HRVOSimulator *const simulator_;
 };

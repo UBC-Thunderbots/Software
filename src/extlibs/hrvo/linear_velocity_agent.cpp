@@ -2,10 +2,8 @@
 
 LinearVelocityAgent::LinearVelocityAgent(HRVOSimulator *simulator, const Vector &position,
                                          float radius, const Vector &velocity,
-                                         float maxSpeed, float maxAccel,
-                                         std::size_t goal_index, float goalRadius)
-    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel,
-            goal_index, goalRadius)
+                                         float maxSpeed, float maxAccel, AgentPath &path)
+    : Agent(simulator, position, radius, velocity, velocity, maxSpeed, maxAccel, path)
 {
 }
 
@@ -13,7 +11,20 @@ void LinearVelocityAgent::computeNewVelocity()
 {
     // TODO (#2496): Fix bug where LinearVelocityAgents go past their destination
     // Preferring a velocity which points directly towards goal
-    pref_velocity_ = simulator_->goals[goal_index_]->getCurrentGoalPosition() - position_;
+    Vector current_position;
+
+    // check if we have reached the end of the path
+    if (path.getCurrentPathPoint() == std::nullopt)
+    {
+        // set the current_position as the previous position
+        current_position = path.getLastPathPoint().getPosition();
+    }
+    else
+    {
+        current_position = path.getCurrentPathPoint().value().getPosition();
+    }
+
+    pref_velocity_ = current_position - position_;
 
     if (pref_velocity_.length() > max_speed_)
     {
