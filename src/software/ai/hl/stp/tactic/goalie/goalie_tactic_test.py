@@ -12,6 +12,7 @@ from software.simulated_tests.ball_moves_forward import *
 from software.simulated_tests.friendly_has_ball_possession import *
 from software.simulated_tests.ball_speed_threshold import *
 from software.simulated_tests.robot_speed_threshold import *
+from software.simulated_tests.excessive_dribbling import *
 from software.simulated_tests.simulated_test_fixture import tactic_runner
 
 
@@ -131,6 +132,7 @@ def test_goalie_blocks_shot(
             # FriendlyEventuallyHasBallPossession(),
             # BallSpeedEventuallyAtOrAboveThreshold(1),
             # RobotSpeedEventuallyAtOrAboveThreshold(1),
+            EventuallyExcessivelyDribbling(),
             # BallEventuallyMovesForward(ball_initial_position),
         ]
     ]

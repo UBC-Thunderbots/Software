@@ -20,10 +20,9 @@ class FriendlyHasBallPossession(Validation):
         :returns: FAILING when no friendly robot has possession of the ball
                   PASSING when any friendly robot has possession of the ball
         """
+        ball_position = tbots_geom.createPoint(world.ball.current_state.global_position)
         for robot in world.friendly_team.team_robots:
-            if tbots_world.Robot(robot).isNearDribbler(
-                tbots_geom.createPoint(world.ball.current_state.global_position), 0.01
-            ):
+            if tbots_world.Robot(robot).isNearDribbler(ball_position, 0.01):
                 return ValidationStatus.PASSING
         return ValidationStatus.FAILING
 
