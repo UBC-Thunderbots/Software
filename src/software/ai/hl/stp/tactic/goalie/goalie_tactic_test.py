@@ -2,7 +2,7 @@ import sys
 
 import pytest
 
-import software.geom.geometry as geom
+import software.geom.geometry as tbots_geom
 from proto.primitive_pb2 import MaxAllowedSpeedMode
 from proto.tactic_pb2 import AssignedTacticPlayControlParams, GoalieTactic, Tactic
 from software.simulated_tests.robot_enters_region import *
@@ -10,6 +10,7 @@ from software.simulated_tests.ball_enters_region import *
 from software.simulated_tests.robots_halt import *
 from software.simulated_tests.ball_moves_forward import *
 from software.simulated_tests.friendly_has_ball_possession import *
+from software.simulated_tests.ball_speed_threshold import *
 from software.simulated_tests.simulated_test_fixture import tactic_runner
 
 
@@ -17,70 +18,78 @@ from software.simulated_tests.simulated_test_fixture import tactic_runner
     "ball_initial_position,ball_initial_velocity,robot_initial_position",
     [
         # test panic ball very fast in straight line
-        (geom.Point(0, 0), geom.Vector(-5, 0), geom.Point(-4, -1)),
+        (tbots_geom.Point(0, 0), tbots_geom.Vector(-5, 0), tbots_geom.Point(-4, -1)),
         # test panic ball very_fast in diagonal line
         (
-            geom.Point(0, 0),
-            geom.Vector(-5.5, 0.25),
-            geom.Field().friendlyGoalCenter() + geom.Vector(0, -0.5),
+            tbots_geom.Point(0, 0),
+            tbots_geom.Vector(-5.5, 0.25),
+            tbots_geom.Field().friendlyGoalCenter() + tbots_geom.Vector(0, -0.5),
         ),
         # test ball very fast misses net
-        (geom.Point(0, 0), geom.Vector(-5, 1), geom.Point(-4.5, 0)),
+        (tbots_geom.Point(0, 0), tbots_geom.Vector(-5, 1), tbots_geom.Point(-4.5, 0)),
         # test slow ball at sharp angle to friendly goal
         # ball slow inside friendly defense area
-        (geom.Point(-4, 0.8), geom.Vector(-0.2, 0), geom.Point(0, 0)),
+        (tbots_geom.Point(-4, 0.8), tbots_geom.Vector(-0.2, 0), tbots_geom.Point(0, 0)),
         # ball slow inside friendly defense area
-        (geom.Point(-4, 0.8), geom.Vector(-0.2, 0), geom.Point(0, 2)),
+        (tbots_geom.Point(-4, 0.8), tbots_geom.Vector(-0.2, 0), tbots_geom.Point(0, 2)),
         # ball slow inside friendly defense area
-        (geom.Point(-4, 0.8), geom.Vector(-0.2, 0), geom.Point(0, 2)),
+        (tbots_geom.Point(-4, 0.8), tbots_geom.Vector(-0.2, 0), tbots_geom.Point(0, 2)),
         # ball slow inside friendly defense area
-        (geom.Point(-4, 0.8), geom.Vector(-0.2, 0), geom.Point(-4, 0)),
+        (
+            tbots_geom.Point(-4, 0.8),
+            tbots_geom.Vector(-0.2, 0),
+            tbots_geom.Point(-4, 0),
+        ),
         # ball stationary inside friendly defense area
-        (geom.Point(-4, 0.0), geom.Vector(0.0, 0), geom.Field().friendlyGoalpostPos()),
+        (
+            tbots_geom.Point(-4, 0.0),
+            tbots_geom.Vector(0.0, 0),
+            tbots_geom.Field().friendlyGoalpostPos(),
+        ),
         # ball stationary inside no-chip rectangle
         (
-            geom.Field().friendlyGoalCenter() + geom.Vector(0.1, 0.1),
-            geom.Vector(-0.2, 0),
-            geom.Point(-4, -1),
+            tbots_geom.Field().friendlyGoalCenter() + tbots_geom.Vector(0.1, 0.1),
+            tbots_geom.Vector(-0.2, 0),
+            tbots_geom.Point(-4, -1),
         ),
         # ball fast inside no-chip rectangle but no intersection with goal
         (
-            geom.Field().friendlyGoalCenter() + geom.Vector(0.1, 0),
-            geom.Vector(0, -0.5),
-            geom.Point(-3.5, 1),
+            tbots_geom.Field().friendlyGoalCenter() + tbots_geom.Vector(0.1, 0),
+            tbots_geom.Vector(0, -0.5),
+            tbots_geom.Point(-3.5, 1),
         ),
         # ball moving out from inside defense area
         (
-            geom.Field().friendlyGoalCenter() + geom.Vector(0.5, 0),
-            geom.Vector(0.5, 0),
-            geom.Point(-3.5, 0),
+            tbots_geom.Field().friendlyGoalCenter() + tbots_geom.Vector(0.5, 0),
+            tbots_geom.Vector(0.5, 0),
+            tbots_geom.Point(-3.5, 0),
         ),
         # ball slow inside no-chip rectangle
         (
-            geom.Field().friendlyGoalCenter() + geom.Vector(0.1, 0),
-            geom.Vector(0.1, -0.1),
-            geom.Point(-3.5, 1),
+            tbots_geom.Field().friendlyGoalCenter() + tbots_geom.Vector(0.1, 0),
+            tbots_geom.Vector(0.1, -0.1),
+            tbots_geom.Point(-3.5, 1),
         ),
         # TODO (#2167): This test fails so disabling for Robocup
         # ball moving into goal from inside defense area
         (
-            geom.Field().friendlyGoalCenter() + geom.Vector(0.5, 0),
-            geom.Vector(-0.5, 0),
-            geom.Point(-3.5, 0),
+            tbots_geom.Field().friendlyGoalCenter() + tbots_geom.Vector(0.5, 0),
+            tbots_geom.Vector(-0.5, 0),
+            tbots_geom.Point(-3.5, 0),
         ),
         # TODO (#2167): This test fails so disabling for Robocup
         # ball moving up and out of defense area
         (
-            geom.Field().friendlyGoalCenter() + geom.Vector(0.3, 0),
-            geom.Vector(0, 1),
-            geom.Point(-3.5, 0),
+            tbots_geom.Field().friendlyGoalCenter() + tbots_geom.Vector(0.3, 0),
+            tbots_geom.Vector(0, 1),
+            tbots_geom.Point(-3.5, 0),
         ),
         # TODO (#2167): This test fails so disabling for Robocup
         # ball moving down and out goal from defense area
         (
-            geom.Field().friendlyGoalCenter() + geom.Vector(0.3, 0),
-            geom.Vector(0, -0.7),
-            geom.Point(-3.5, 0),
+            tbots_geom.Field().friendlyGoalCenter() + tbots_geom.Vector(0.3, 0),
+            tbots_geom.Vector(0, -0.7),
+            tbots_geom.Point(-3.5, 0),
         ),
     ],
 )
@@ -105,8 +114,8 @@ def test_goalie_blocks_shot(
     # Always Validation
     always_validation_sequence_set = [
         [
-            RobotNeverEntersRegion(regions=[geom.Field().enemyDefenseArea()]),
-            BallNeverEntersRegion(regions=[geom.Field().friendlyGoal()]),
+            RobotNeverEntersRegion(regions=[tbots_geom.Field().enemyDefenseArea()]),
+            BallNeverEntersRegion(regions=[tbots_geom.Field().friendlyGoal()]),
         ]
     ]
 
@@ -115,8 +124,11 @@ def test_goalie_blocks_shot(
         [
             # Goalie should be in the defense area
             RobotsEventuallyHalt(),
-            RobotEventuallyEntersRegion(regions=[geom.Field().friendlyDefenseArea()]),
+            RobotEventuallyEntersRegion(
+                regions=[tbots_geom.Field().friendlyDefenseArea()]
+            ),
             # FriendlyEventuallyHasBallPossession(),
+            # BallSpeedEventuallyAtOrAboveThreshold(1),
             # BallEventuallyMovesForward(ball_initial_position),
         ]
     ]

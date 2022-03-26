@@ -1,5 +1,5 @@
-import software.geom.geometry as geom
-import software.world.world as world
+import software.geom.geometry as tbots_geom
+import software.world.world as tbots_world
 from proto.import_all_protos import *
 
 from software.simulated_tests.validation import (
@@ -21,8 +21,8 @@ class FriendlyHasBallPossession(Validation):
                   PASSING when any friendly robot has possession of the ball
         """
         for robot in world.friendly_team.team_robots:
-            if world.createRobot(robot).isNearDribbler(
-                geom.createPoint(world.ball.current_state.global_position), 0.01
+            if tbots_world.Robot(robot).isNearDribbler(
+                tbots_geom.createPoint(world.ball.current_state.global_position), 0.01
             ):
                 return ValidationStatus.PASSING
         return ValidationStatus.FAILING

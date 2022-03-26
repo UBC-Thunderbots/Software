@@ -18,11 +18,13 @@ PYBIND11_MODULE(world, m)
 
     py::class_<Robot>(m, "Robot")
         .def(py::init<unsigned, Point&, Vector&, Angle&, Angle&, Timestamp&>())
+        .def(py::init<TbotsProto::Robot>())
         .def("timestamp", &Robot::timestamp)
         .def("position", &Robot::position)
         .def("velocity", &Robot::velocity)
         .def("orientation", &Robot::orientation)
-        .def("angularVelocity", &Robot::angularVelocity);
+        .def("angularVelocity", &Robot::angularVelocity)
+        .def("isNearDribbler", &Robot::isNearDribbler);
 
     py::class_<Team>(m, "Team")
         .def(py::init<const std::vector<Robot>&>())
@@ -35,6 +37,4 @@ PYBIND11_MODULE(world, m)
         .def("friendlyTeam", &World::friendlyTeam)
         .def("enemyTeam", &World::enemyTeam)
         .def("ball", &World::ball);
-
-    m.def("createRobot", &createRobot);
 }

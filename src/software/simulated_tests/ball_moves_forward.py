@@ -1,4 +1,4 @@
-import software.geom.geometry as geom
+import software.geom.geometry as tbots_geom
 from proto.import_all_protos import *
 
 from software.simulated_tests.validation import (
@@ -23,7 +23,7 @@ class BallMovesForward(Validation):
                   PASSING if ball moves forward
         """
         validation_status = ValidationStatus.FAILING
-        current_ball_position = geom.createPoint(
+        current_ball_position = tbots_geom.createPoint(
             world.ball.current_state.global_position
         )
 

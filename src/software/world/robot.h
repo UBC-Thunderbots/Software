@@ -202,5 +202,3 @@ class Robot
     std::set<RobotCapability> unavailable_capabilities_;
     RobotConstants_t robot_constants_;
 };
-
-Robot createRobot(const TbotsProto::Robot &robot_proto);

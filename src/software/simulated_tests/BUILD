@@ -178,6 +178,7 @@ py_library(
     srcs = [
         "ball_enters_region.py",
         "ball_moves_forward.py",
+        "ball_speed_threshold.py",
         "friendly_has_ball_possession.py",
         "robot_enters_region.py",
         "robots_halt.py",

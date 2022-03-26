@@ -1,4 +1,4 @@
-import software.geom.geometry as geom
+import software.geom.geometry as tbots_geom
 from proto.import_all_protos import *
 
 from software.simulated_tests.validation import (
@@ -23,8 +23,8 @@ class BallEntersRegion(Validation):
                   PASSING when a ball enters
         """
         for region in self.regions:
-            if geom.contains(
-                region, geom.createPoint(world.ball.current_state.global_position)
+            if tbots_geom.contains(
+                region, tbots_geom.createPoint(world.ball.current_state.global_position)
             ):
                 return ValidationStatus.PASSING
 
