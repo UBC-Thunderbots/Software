@@ -1,19 +1,13 @@
 import math
 import queue
 
-<<<<<<< HEAD
-from pyqtgraph.Qt import QtCore, QtGui
-from PyQt5.QtCore import Qt
-from proto.world_pb2 import World, Field
-from proto.team_pb2 import Robot, Team
-=======
 import pyqtgraph as pg
->>>>>>> 65902efe9e2528d6d7ee52b4797d2b80373a2e60
 from proto.ball_pb2 import Ball
 from proto.team_pb2 import Robot, Team
 from proto.vision_pb2 import BallState, RobotState
 from proto.world_pb2 import Field, World
 from pyqtgraph.Qt import QtCore, QtGui
+from PyQt5.QtCore import Qt
 
 from software.thunderscope.colors import Colors
 from software.networking.threaded_unix_listener import ThreadedUnixListener
@@ -22,14 +16,8 @@ from software.thunderscope.constants import (
     MM_PER_M,
     ROBOT_MAX_RADIUS,
     UNIX_SOCKET_BASE_PATH,
-<<<<<<< HEAD
-
-from software.networking.threaded_unix_listener import ThreadedUnixListener
-import software.thunderscope.colors as colors
-=======
 )
 from software.thunderscope.field.field_layer import FieldLayer
->>>>>>> 65902efe9e2528d6d7ee52b4797d2b80373a2e60
 
 
 class WorldLayer(FieldLayer):
