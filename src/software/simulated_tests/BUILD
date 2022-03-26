@@ -178,15 +178,15 @@ py_library(
     srcs = [
         "ball_enters_region.py",
         "ball_moves_forward.py",
+        "friendly_has_ball_possession.py",
         "robot_enters_region.py",
         "robots_halt.py",
         "validation.py",
-        "friendly_has_ball_possession.py",
     ],
     data = [
         "//software:py_constants.so",
         "//software/geom:geometry.so",
-"//software/world:world.so",
+        "//software/world:world.so",
     ],
     deps = [
         "//proto:software_py_proto",

@@ -21,7 +21,9 @@ class FriendlyHasBallPossession(Validation):
                   PASSING when any friendly robot has possession of the ball
         """
         for robot in world.friendly_team.team_robots:
-            if world.createRobot(robot).isNearDribbler(geom.createPoint(world.ball.current_state.global_position), 0.01):
+            if world.createRobot(robot).isNearDribbler(
+                geom.createPoint(world.ball.current_state.global_position), 0.01
+            ):
                 return ValidationStatus.PASSING
         return ValidationStatus.FAILING
 

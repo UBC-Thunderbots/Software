@@ -4,11 +4,11 @@
 
 #include <sstream>
 
-#include "proto/team.pb.h"
 #include "proto/message_translation/tbots_geometry.h"
+#include "proto/team.pb.h"
 #include "pybind11_protobuf/native_proto_caster.h"
-#include "software/world/world.h"
 #include "software/world/robot.h"
+#include "software/world/world.h"
 
 namespace py = pybind11;
 
