@@ -153,8 +153,9 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
     //
     // https://github.com/saebyn/munkres-cpp is the implementation of the Hungarian
     // algorithm that we use here
-    for (auto tactic_vector : tactics)
+    for (unsigned int i = 0; i < tactics.size(); i++)
     {
+        auto tactic_vector = tactics[i];
         size_t num_tactics = tactic_vector.size();
 
         if (robots.size() < tactic_vector.size())
@@ -165,13 +166,12 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
             tactic_vector.resize(robots.size());
             num_tactics = tactic_vector.size();
         }
-        else
+        else if (i == (tactics.size() - 1))
         {
-            std::cout<<"assigning stop tactics"<<std::endl;
-            // Assign rest of robots with StopTactic
+            // If assigning the last tactic vector, then assign rest of robots with
+            // StopTactics
             for (unsigned int i = 0; i < (robots.size() - num_tactics); i++)
             {
-            std::cout<<"add a stop tactic"<<std::endl;
                 tactic_vector.push_back(stop_tactics[i]);
             }
         }
