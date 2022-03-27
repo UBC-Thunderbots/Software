@@ -167,9 +167,11 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
         }
         else
         {
+            std::cout<<"assigning stop tactics"<<std::endl;
             // Assign rest of robots with StopTactic
-            for (unsigned int i = 0; i < (robots.size() - tactic_vector.size()); i++)
+            for (unsigned int i = 0; i < (robots.size() - num_tactics); i++)
             {
+            std::cout<<"add a stop tactic"<<std::endl;
                 tactic_vector.push_back(stop_tactics[i]);
             }
         }
@@ -238,7 +240,7 @@ std::map<std::shared_ptr<const Tactic>, Robot> STP::assignRobotsToTactics(
 
         for (size_t row = 0; row < num_rows; row++)
         {
-            for (size_t col = 0; col < num_tactics; col++)
+            for (size_t col = 0; col < num_cols; col++)
             {
                 auto val = matrix(row, col);
                 if (val == 0)
