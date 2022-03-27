@@ -3,6 +3,12 @@ syntax = "proto3";
 package TbotsProto;
 
 import "proto/geometry.proto";
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.EnumValueOptions
+{
+    optional bool dynamic = 1000;
+}
 
 enum BallCollisionType
 {
@@ -27,9 +33,9 @@ enum MotionConstraint
     // Region around the playable zone
     AVOID_FIELD_BOUNDARY_ZONE = 6;
     // A half meter radius around the ball
-    HALF_METER_AROUND_BALL = 7;
+    HALF_METER_AROUND_BALL = 7[(dynamic) = true];
     // Path between ball and placement point in ball placement
-    AVOID_BALL_PLACEMENT_INTERFERENCE = 8;
+    AVOID_BALL_PLACEMENT_INTERFERENCE = 8 [(dynamic) = true];
 }
 
 message MotionControl
