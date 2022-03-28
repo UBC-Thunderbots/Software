@@ -79,6 +79,75 @@ class ProtoConfigurationWidget(QWidget):
                 child_name = param.name()
             self.on_change_callback(child_name, data)
 
+    @staticmethod
+    def __create_int_parameter(key, value, descriptor):
+
+        # Extract the options from the descriptor, and store it
+        # in the dictionary.
+        options = MessageToDict(
+            descriptor.GetOptions(), preserving_proto_field_name=True
+        )
+
+        try:
+            min_max = options["[TbotsProto.range]"]
+        except KeyError:
+            raise KeyError("{} missing ParameterRangeOptions".format(key))
+
+        return {
+                "name": key,
+                "type": "slider",
+                "value": value,
+                "default": value,
+                "limits": (options["min_int_value"], options["max_int_value"]),
+                "step": 1,
+            }
+
+    @staticmethod
+    def __create_double_parameter(key, value, descriptor):
+
+        # Extract the options from the descriptor, and store it
+        # in the dictionary.
+        options = MessageToDict(
+            descriptor.GetOptions(), preserving_proto_field_name=True
+        )
+
+        try:
+            min_max = options["[TbotsProto.range]"]
+        except KeyError:
+            raise KeyError("{} missing ParameterRangeOptions".format(key))
+
+        field_list.append(
+            {
+                "name": key,
+                "type": "slider",
+                "value": value,
+                "default": value,
+                "limits": (
+                    min_max["min_double_value"],
+                    min_max["max_double_value"],
+                ),
+                "step": 0.01,
+            }
+        )
+
+    @staticmethod
+    def __create_enum_parameter(key, value descriptor):
+        options = []
+
+        for enum_desc in descriptor.enum_type.values:
+            options.append(enum_desc.name)
+
+        field_list.append(
+            parametertree.parameterTypes.ListParameter(
+                name=key, default=None, value=None, limits=options + [None]
+            )
+        )
+
+    @staticmethod
+    def __create_bool_parameter(key, value, descriptor):
+        pass
+
+
     def config_proto_to_param_dict(
         self, message, search_term=None, convert_all_fields_to_bools=False
     ):
@@ -123,77 +192,16 @@ class ProtoConfigurationWidget(QWidget):
                 field_list.append({"name": key, "type": "bool", "value": value})
 
             elif descriptor.type == descriptor.TYPE_ENUM:
-                options = []
-
-                for enum_desc in descriptor.enum_type.values:
-                    options.append(enum_desc.name)
-
-                field_list.append(
-                    parametertree.parameterTypes.ListParameter(
-                        name=key, default=None, value=None, limits=options + [None]
-                    )
-                )
+                field_list.append(__create_enum_parameter(key, value, descriptor))
 
             elif descriptor.type == descriptor.TYPE_STRING:
                 pass
-                # field_list.append(
-                    # {
-                        # "name": key,
-                        # "type": "text",
-                        # "value": value,
-                        # "default": value,
-                    # }
-                # )
-
 
             elif descriptor.type == descriptor.TYPE_DOUBLE:
-
-                options = MessageToDict(
-                    descriptor.GetOptions(), preserving_proto_field_name=True
-                )
-
-                try:
-                    min_max = options["[TbotsProto.range]"]
-                except KeyError:
-                    raise KeyError("{} missing ParameterRangeOptions".format(key))
-
-                field_list.append(
-                    {
-                        "name": key,
-                        "type": "slider",
-                        "value": value,
-                        "default": value,
-                        "limits": (
-                            float(min_max["min_double_value"]),
-                            float(min_max["max_double_value"]),
-                        ),
-                        "step": 0.01,
-                    }
-                )
+                field_list.append(__create_double_parameter(key, value, descriptor))
 
             elif descriptor.type in [descriptor.TYPE_INT32, descriptor.TYPE_INT64]:
-
-                # Extract the options from the descriptor, and store it
-                # in the dictionary.
-                options = MessageToDict(
-                    descriptor.GetOptions(), preserving_proto_field_name=True
-                )
-
-                try:
-                    min_max = options["[TbotsProto.range]"]
-                except KeyError:
-                    raise KeyError("{} missing ParameterRangeOptions".format(key))
-
-                field_list.append(
-                    {
-                        "name": key,
-                        "type": "slider",
-                        "value": value,
-                        "default": value,
-                        "limits": (int(min_max["min_int_value"]), int(min_max["max_int_value"])),
-                        "step": 1,
-                    }
-                )
+                field_list.append(__create_int_parameter(key, value, descriptor))
 
             else:
                 raise NotImplementedError(
