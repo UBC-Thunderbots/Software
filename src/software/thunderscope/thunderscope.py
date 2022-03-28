@@ -227,6 +227,7 @@ class Thunderscope(object):
     def close(self):
         QtCore.QTimer.singleShot(0, self.window.close)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Thunderscope")
     parser.add_argument(
