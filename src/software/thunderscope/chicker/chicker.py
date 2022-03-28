@@ -1,8 +1,8 @@
 import pyqtgraph as pg
-import software.thunderscope.constants as constants
-import software.thunderscope.common_widgets as common_widgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import *
+import software.thunderscope.constants as constants
+import software.thunderscope.common_widgets as common_widgets
 
 
 class ChickerWidget(QWidget):
@@ -29,51 +29,49 @@ class ChickerWidget(QWidget):
         """
         # grid --> groupBox --> button/slider
         grid = QGridLayout()
-        self.radio_buttons = QButtonGroup()
+        self.radio_buttons_group = QButtonGroup()
 
-        self.charge_button_list = common_widgets.create_button("Charge", False)
-        self.charge_button = self.charge_button_list[1]
-        grid.addWidget(self.charge_button_list[0], 0, 0)
-
-        self.kick_button_list = common_widgets.create_button("Kick")
-        self.kick_button = self.kick_button_list[1]
-        grid.addWidget(self.kick_button_list[0], 0, 1)
-
-        self.chip_button_list = common_widgets.create_button("Chip")
-        self.chip_button = self.chip_button_list[1]
-        grid.addWidget(self.chip_button_list[0], 0, 2)
-
-        self.no_auto_list = common_widgets.create_radio("No Auto", self.radio_buttons)
-        self.no_auto_button = self.no_auto_list[1]
-        grid.addWidget(self.no_auto_list[0], 1, 0)
-
-        self.auto_kick_list = common_widgets.create_radio(
-            "Auto Kick", self.radio_buttons
+        # push button group box
+        self.push_button_box, self.push_buttons = common_widgets.create_button(
+            ["Charge", "Kick", "Chip"], 3
         )
-        self.auto_kick_button = self.auto_kick_list[1]
-        grid.addWidget(self.auto_kick_list[0], 1, 1)
+        self.charge_button = self.push_buttons[0]
+        self.kick_button = self.push_buttons[1]
+        self.chip_button = self.push_buttons[2]
+        grid.addWidget(self.push_button_box, 0, 0)
 
-        self.auto_chip_list = common_widgets.create_radio(
-            "Auto Chip", self.radio_buttons
+        # radio button group box
+        self.radio_button_box, self.radio_buttons = common_widgets.create_radio(
+            ["No Auto", "Auto Kick", "Auto Chip"], self.radio_buttons_group, 3
         )
-        self.auto_chip_button = self.auto_chip_list[1]
-        grid.addWidget(self.auto_chip_list[0], 1, 2)
+        self.no_auto_button = self.radio_buttons[0]
+        self.auto_kick_button = self.radio_buttons[1]
+        self.auto_chip_button = self.radio_buttons[2]
+        grid.addWidget(self.radio_button_box, 1, 0)
+        self.no_auto_button.setChecked(True)
 
-        self.geneva_slider_list = common_widgets.create_slider("Geneva Slider", 1, 5, 1)
-        self.geneva_slider = self.geneva_slider_list[1]
-        grid.addWidget(self.geneva_slider_list[0], 2, 0, 1, 3)
-
-        self.power_slider_list = common_widgets.create_slider(
-            "Power Slider", 1, 100, 10
+        # sliders
+        (
+            self.geneva_slider_box,
+            self.geneva_slider,
+            self.geneva_label,
+        ) = common_widgets.create_slider(
+            "Geneva Slider", 1, constants.GENEVA_NUM_POSITIONS, 1
         )
-        self.power_slider = self.power_slider_list[1]
-        grid.addWidget(self.power_slider_list[0], 3, 0, 1, 3)
+        grid.addWidget(self.geneva_slider_box, 2, 0)
+        (
+            self.power_slider_box,
+            self.power_slider,
+            self.power_label,
+        ) = common_widgets.create_slider("Power Slider", 1, 100, 10)
+        grid.addWidget(self.power_slider_box, 3, 0)
 
         self.setLayout(grid)
         self.grid = grid
-        # state of radio buttons - to make sure message is only sent once
+        # to manage the state of radio buttons - to make sure message is only sent once
         self.radio_checkable = {"no_auto": True, "auto_kick": True, "auto_chip": True}
         self.charged = False
+        # initial values
         self.geneva_value = 1
         self.power_value = 1
 
@@ -102,7 +100,9 @@ class ChickerWidget(QWidget):
 
         # slider values
         self.geneva_value = self.geneva_slider.value()
+        self.geneva_label.setText(str(self.geneva_value))
         self.power_value = self.power_slider.value()
+        self.power_label.setText(str(self.power_value))
 
         # button colors
         if not self.charged:
