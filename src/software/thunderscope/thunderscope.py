@@ -37,7 +37,7 @@ from software.thunderscope.field import (
 from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_receiver import ProtoReceiver
-
+import qdarktheme
 
 class Thunderscope(object):
 
@@ -59,9 +59,8 @@ class Thunderscope(object):
 
         # Setup MainApp and initialize DockArea
         self.app = pyqtgraph.mkQApp("Thunderscope")
-        self.app.setStyleSheet(
-            "QMainWindow{background-color: black;border: 1px solid black;}"
-        )
+        self.app.setStyleSheet(qdarktheme.load_stylesheet())
+
         signal.signal(signal.SIGINT, signal.SIG_DFL)
         self.dock_area = DockArea()
 
@@ -107,9 +106,9 @@ class Thunderscope(object):
         performance_dock = self.setup_performance_plot()
 
         self.dock_area.addDock(field_dock, "left")
-        self.dock_area.addDock(parameter_dock, "left", field_dock)
         self.dock_area.addDock(log_dock, "bottom", field_dock)
         self.dock_area.addDock(performance_dock, "right", log_dock)
+        self.dock_area.addDock(parameter_dock, "top", log_dock)
 
     def setup_field_widget(self):
         """Setup the field widget with the constituent layers
@@ -142,7 +141,7 @@ class Thunderscope(object):
         self.register_refresh_function(self.field.refresh)
 
         # Create and return dock
-        field_dock = Dock("Field", size=(500, 2000))
+        field_dock = Dock("Field", size=(500, 3000))
         field_dock.addWidget(self.field)
 
         return field_dock
@@ -154,7 +153,7 @@ class Thunderscope(object):
         p = ProtoConfigurationWidget(ThunderbotsConfig, cak)
 
         # Create and return dock
-        param_dock = Dock("Parameters", size=(20, 1000))
+        param_dock = Dock("Parameters", size=(20, 100))
         param_dock.addWidget(p)
 
         return param_dock
@@ -184,7 +183,7 @@ class Thunderscope(object):
         widget.setLayout(layout)
 
         # Create and return dock
-        log_dock = Dock("Logs", size=(500, 100))
+        log_dock = Dock("Logs", size=(50, 100))
         log_dock.addWidget(widget)
 
         return log_dock

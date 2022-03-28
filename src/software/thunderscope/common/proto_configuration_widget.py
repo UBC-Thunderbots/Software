@@ -54,26 +54,6 @@ class ProtoConfigurationWidget(QWidget):
 
         self.param_tree = parametertree.ParameterTree(showHeader=False)
         self.param_tree.setParameters(self.param_group, showTop=False)
-
-        # TODO (#2528) Remove the setStyleSheet call. Defaults to white theme
-        self.param_tree.setStyleSheet(
-            """
-            QTreeView {
-                background-color: '#000000';
-                alternate-background-color: '#000000';
-                color: white;
-            }
-            QLabel {
-                color: white;
-            }
-
-            QTreeView::item:has-children {
-                background-color: black;
-                color: white;
-            }
-        """
-        )
-
         self.param_group.sigTreeStateChanged.connect(self.handle_change)
 
         layout.addWidget(self.search_query)

@@ -23,10 +23,3 @@ class g3logCheckboxes(QWidget):
         self.fatal_checkbox = QCheckBox("FATAL")
         self.fatal_checkbox.setChecked(True)
         layout.addWidget(self.fatal_checkbox, 0, 3)
-
-        self.setStyleSheet(
-            "color : white;"
-            "background-color: black;"
-            "selection-background-color: #606060;"
-            "selection-color: #ffffff;"
-        )
