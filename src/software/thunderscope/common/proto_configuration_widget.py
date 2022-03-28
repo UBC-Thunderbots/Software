@@ -12,8 +12,13 @@ class ProtoConfigurationWidget(QWidget):
 
     """
 
-    def __init__(self, proto_to_configure, on_change_callback,
-                 convert_all_fields_to_bools=False, search_filter_threshold=60):
+    def __init__(
+        self,
+        proto_to_configure,
+        on_change_callback,
+        convert_all_fields_to_bools=False,
+        search_filter_threshold=60,
+    ):
         """Create a parameter widget given a protobuf
 
         NOTE: This class handles the ParameterRangeOptions
@@ -40,7 +45,8 @@ class ProtoConfigurationWidget(QWidget):
         self.proto_to_configure = proto_to_configure
 
         self.param_dict = self.config_proto_to_param_dict(
-                self.proto_to_configure(), self.convert_all_fields_to_bools)
+            self.proto_to_configure(), self.convert_all_fields_to_bools
+        )
 
         self.param_group = parametertree.Parameter.create(
             name="params", type="group", children=self.param_dict
@@ -74,9 +80,9 @@ class ProtoConfigurationWidget(QWidget):
         layout.addWidget(self.param_tree)
 
     def search_query_changed(self, search_term):
-        self.param_dict =\
-                self.config_proto_to_param_dict(
-                        self.proto_to_configure(), search_term, self.convert_all_fields_to_bools)
+        self.param_dict = self.config_proto_to_param_dict(
+            self.proto_to_configure(), search_term, self.convert_all_fields_to_bools
+        )
         self.param_group = parametertree.Parameter.create(
             name="params", type="group", children=self.param_dict
         )
@@ -93,10 +99,9 @@ class ProtoConfigurationWidget(QWidget):
                 child_name = param.name()
             self.on_change_callback(child_name, data)
 
-
-
     def config_proto_to_param_dict(
-            self, message, search_term=None, convert_all_fields_to_bools=False):
+        self, message, search_term=None, convert_all_fields_to_bools=False
+    ):
         """Converts a protobuf to a pyqtgraph parameter tree dictionary
         that can loaded directly into a ParameterTree
 
@@ -116,10 +121,10 @@ class ProtoConfigurationWidget(QWidget):
 
             key = descriptor.name
             value = getattr(message, descriptor.name)
-            
+
             if search_term and descriptor.type != descriptor.TYPE_MESSAGE:
                 print(fuzz.partial_ratio(search_term, key), key)
-                if(fuzz.partial_ratio(search_term, key) < self.search_filter_threshold):
+                if fuzz.partial_ratio(search_term, key) < self.search_filter_threshold:
                     continue
 
             if descriptor.type == descriptor.TYPE_MESSAGE:
@@ -128,7 +133,8 @@ class ProtoConfigurationWidget(QWidget):
                         "name": key,
                         "type": "group",
                         "children": self.config_proto_to_param_dict(
-                            value, search_term, convert_all_fields_to_bools),
+                            value, search_term, convert_all_fields_to_bools
+                        ),
                     }
                 )
 
@@ -148,6 +154,18 @@ class ProtoConfigurationWidget(QWidget):
                     )
                 )
 
+            elif descriptor.type == descriptor.TYPE_STRING:
+                pass
+                # field_list.append(
+                    # {
+                        # "name": key,
+                        # "type": "text",
+                        # "value": value,
+                        # "default": value,
+                    # }
+                # )
+
+
             elif descriptor.type == descriptor.TYPE_DOUBLE:
 
                 options = MessageToDict(
@@ -166,8 +184,8 @@ class ProtoConfigurationWidget(QWidget):
                         "value": value,
                         "default": value,
                         "limits": (
-                            min_max["min_double_value"],
-                            min_max["max_double_value"],
+                            float(min_max["min_double_value"]),
+                            float(min_max["max_double_value"]),
                         ),
                         "step": 0.01,
                     }
@@ -192,7 +210,7 @@ class ProtoConfigurationWidget(QWidget):
                         "type": "slider",
                         "value": value,
                         "default": value,
-                        "limits": (options["min_int_value"], options["max_int_value"]),
+                        "limits": (int(min_max["min_int_value"]), int(min_max["max_int_value"])),
                         "step": 1,
                     }
                 )

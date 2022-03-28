@@ -25,7 +25,9 @@ from proto.message_translation.message_to_dict import message_to_dict
 
 from software.networking import threaded_unix_sender
 from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
-from software.thunderscope.common.proto_configuration_widget import ProtoConfigurationWidget
+from software.thunderscope.common.proto_configuration_widget import (
+    ProtoConfigurationWidget,
+)
 from software.thunderscope.field import (
     obstacle_layer,
     path_layer,
