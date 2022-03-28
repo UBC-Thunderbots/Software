@@ -1,21 +1,22 @@
-import pyqtgraph as pg
 import math
 import queue
 
-from pyqtgraph.Qt import QtCore, QtGui
-from proto.world_pb2 import World, Field
-from proto.team_pb2 import Robot, Team
+import pyqtgraph as pg
 from proto.ball_pb2 import Ball
-from proto.vision_pb2 import RobotState, BallState
-from software.thunderscope.field.field_layer import FieldLayer
+from proto.team_pb2 import Robot, Team
+from proto.vision_pb2 import BallState, RobotState
+from proto.world_pb2 import Field, World
+from pyqtgraph.Qt import QtCore, QtGui
+
+from software.thunderscope.colors import Colors
+from software.networking.threaded_unix_listener import ThreadedUnixListener
 from software.thunderscope.constants import (
-    ROBOT_MAX_RADIUS,
     BALL_RADIUS,
     MM_PER_M,
+    ROBOT_MAX_RADIUS,
     UNIX_SOCKET_BASE_PATH,
 )
-from software.networking.threaded_unix_listener import ThreadedUnixListener
-import software.thunderscope.colors as colors
+from software.thunderscope.field.field_layer import FieldLayer
 
 
 class WorldLayer(FieldLayer):
@@ -33,7 +34,7 @@ class WorldLayer(FieldLayer):
         :param field: The field proto to draw
 
         """
-        painter.setPen(pg.mkPen("w"))
+        painter.setPen(pg.mkPen("w", width=2))
 
         # Draw Field Bounds
         painter.drawRect(
@@ -94,7 +95,7 @@ class WorldLayer(FieldLayer):
                     robot.current_state.global_position.y_meters * MM_PER_M,
                     ROBOT_MAX_RADIUS,
                 ),
-                (math.degrees(robot.current_state.global_orientation.radians) + 45)
+                int((math.degrees(robot.current_state.global_orientation.radians) + 45))
                 * convert_degree,
                 270 * convert_degree,
             )
@@ -107,8 +108,8 @@ class WorldLayer(FieldLayer):
 
         """
 
-        painter.setPen(pg.mkPen(colors.BALL_COLOR))
-        painter.setBrush(pg.mkBrush(colors.BALL_COLOR))
+        painter.setPen(pg.mkPen(Colors.BALL_COLOR))
+        painter.setBrush(pg.mkBrush(Colors.BALL_COLOR))
         painter.drawEllipse(
             self.createCircle(
                 ball.current_state.global_position.x_meters * MM_PER_M,
@@ -137,5 +138,5 @@ class WorldLayer(FieldLayer):
 
         # TODO (#2399) Figure out which team color _we_ are and update the color
         # passed into the team.
-        self.draw_team(painter, colors.YELLOW_ROBOT_COLOR, world.friendly_team)
-        self.draw_team(painter, colors.BLUE_ROBOT_COLOR, world.enemy_team)
+        self.draw_team(painter, Colors.YELLOW_ROBOT_COLOR, world.friendly_team)
+        self.draw_team(painter, Colors.BLUE_ROBOT_COLOR, world.enemy_team)

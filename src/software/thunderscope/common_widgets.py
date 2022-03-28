@@ -1,5 +1,5 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import *
+from pyqtgraph.Qt.QtCore import Qt
+from pyqtgraph.Qt.QtWidgets import *
 
 
 def create_button(text: list, num_buttons=1):
@@ -72,14 +72,13 @@ def create_slider(text, min_val, max_val, tick_spacing):
     :return: value_label: displays value of slider, update this when value is changed
     """
     group_box = QGroupBox(text)
-    slider = QSlider(Qt.Horizontal)
+    slider = QSlider(Qt.Orientation.Horizontal)
     slider.setMinimum(min_val)
     slider.setMaximum(max_val)
-    slider.setTickPosition(QSlider.TicksBothSides)
+    slider.setTickPosition(QSlider.TickPosition.TicksBothSides)
     slider.setTickInterval(tick_spacing)
 
     value_label = QLabel(str(slider.value()))
-    value_label.setAlignment(Qt.AlignCenter)
 
     group_box.setStyleSheet("color: white")
     vbox = QVBoxLayout()

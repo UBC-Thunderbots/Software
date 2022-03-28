@@ -136,6 +136,7 @@ py_library(
     srcs = ["threaded_unix_listener.py"],
     deps = [
         "//proto:software_py_proto",
+        "//software/logger:py_logger",
     ],
 )
 
@@ -144,5 +145,6 @@ py_library(
     srcs = ["threaded_unix_sender.py"],
     deps = [
         "//proto:software_py_proto",
+        "//software/logger:py_logger",
     ],
 )

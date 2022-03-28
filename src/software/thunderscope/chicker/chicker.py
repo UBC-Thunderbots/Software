@@ -1,6 +1,6 @@
 import pyqtgraph as pg
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import *
+from pyqtgraph.Qt.QtCore import Qt
+from pyqtgraph.Qt.QtWidgets import *
 import software.thunderscope.constants as constants
 import software.thunderscope.common_widgets as common_widgets
 
