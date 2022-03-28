@@ -150,6 +150,7 @@ class Thunderscope(object):
         def cak(p, t):
             print(p, t)
 
+        print(ThunderbotsConfig)
         p = ProtoConfigurationWidget(ThunderbotsConfig, cak)
 
         # Create and return dock
