@@ -33,17 +33,6 @@ from software.thunderscope.field.field import Field
 from software.thunderscope.log.g3log_widget import g3logWidget
 from software.thunderscope.proto_receiver import ProtoReceiver
 from software.thunderscope.chicker.chicker import ChickerWidget
-from software.thunderscope.log.g3log_checkboxes import g3logCheckboxes
-from software.thunderscope.arbitrary_plot.named_value_plotter import NamedValuePlotter
-from proto.visualization_pb2 import NamedValue
-from proto.robot_log_msg_pb2 import RobotLog
-from software.networking.threaded_unix_listener import ThreadedUnixListener
-from field import obstacle_layer, path_layer, world_layer
-from proto_receiver import ProtoReceiver
-import software.thunderscope.constants as constants
-import pyqtgraph as pg
-from pyqtgraph.Qt import QtCore, QtGui
-from pyqtgraph.dockarea import *
 
 
 class Thunderscope(object):
