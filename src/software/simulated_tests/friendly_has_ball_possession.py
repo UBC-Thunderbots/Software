@@ -26,7 +26,9 @@ class FriendlyHasBallPossession(Validation):
         return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """override"""
+        """
+        (override) highlights the dribbler area of the robots
+        """
         return create_validation_geometry(
             [
                 tbots.Robot(robot).dribblerArea()

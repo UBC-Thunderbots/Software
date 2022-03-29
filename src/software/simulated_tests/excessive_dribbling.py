@@ -12,6 +12,9 @@ class ExcessivelyDribbling(Validation):
 
     """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m."""
 
+    def __init__(self):
+        self.continous_dribbling_start_point = None
+
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if any friendly robot is excessively dribbling the ball, i.e. for over 1m.
 
@@ -23,22 +26,29 @@ class ExcessivelyDribbling(Validation):
         for robot in world.friendly_team.team_robots:
             if not tbots.Robot(robot).isNearDribbler(ball_position, 0.01):
                 self.continous_dribbling_start_point = ball_position
-            elif (ball_position - self.continous_dribbling_start_point).length() > 1.0:
+            elif (
+                ball_position - (self.continous_dribbling_start_point or ball_position)
+            ).length() > 1.0:
                 return ValidationStatus.FAILING
         return ValidationStatus.PASSING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """override"""
-        # TODO: visualize
-        return create_validation_geometry([])
+        """
+        (override) Shows the max allowed dribbling circle
+        """
+        return create_validation_geometry(
+            [tbots.Circle(self.continous_dribbling_start_point, 1.0)]
+            if self.continous_dribbling_start_point is not None
+            else []
+        )
 
     def __repr__(self):
-        return "Check that the friendly team has possession of the ball"
+        return "Check that the dribbling robot has not dribbled for more than 1m"
 
 
 (
-    EventuallyExcessivelyDribbling,
     EventuallyStopExcessivelyDribbling,
-    AlwaysExcessivelyDribbling,
+    EventuallyExcessivelyDribbling,
     NeverExcessivelyDribbling,
+    AlwaysExcessivelyDribbling,
 ) = create_validation_types(ExcessivelyDribbling)

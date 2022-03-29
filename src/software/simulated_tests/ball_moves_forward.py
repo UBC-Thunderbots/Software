@@ -13,7 +13,7 @@ class BallMovesForward(Validation):
     """Checks if ball is moving forward, i.e. in the +x direction"""
 
     def __init__(self, initial_ball_position):
-        self.last_ball_x_position = initial_ball_position.x()
+        self.last_ball_position = initial_ball_position
 
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if all robots halt
@@ -27,17 +27,27 @@ class BallMovesForward(Validation):
             world.ball.current_state.global_position
         )
 
-        if current_ball_position.x() > self.last_ball_x_position:
+        if current_ball_position.x() > self.last_ball_position.x():
             validation_status = ValidationStatus.PASSING
-        self.last_ball_x_position = current_ball_position
+        self.last_ball_position = current_ball_position
         return validation_status
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """override"""
-        # TODO
+        """
+        (override) Shows the last ball position line
+        """
         return create_validation_geometry(
             [
-                # tbots.Rectangle(tbots.Point(self.last_ball_x_position,world.field )
+                tbots.Rectangle(
+                    tbots.Point(
+                        self.last_ball_position.x(),
+                        tbots.Field(world.field).fieldBoundary().yMin(),
+                    ),
+                    tbots.Point(
+                        self.last_ball_position.x() + 0.01,
+                        tbots.Field(world.field).fieldBoundary().yMax(),
+                    ),
+                )
             ]
         )
 

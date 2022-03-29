@@ -7,7 +7,6 @@ from proto.primitive_pb2 import MaxAllowedSpeedMode
 from proto.tactic_pb2 import AssignedTacticPlayControlParams, GoalieTactic, Tactic
 from software.simulated_tests.robot_enters_region import *
 from software.simulated_tests.ball_enters_region import *
-from software.simulated_tests.robots_halt import *
 from software.simulated_tests.ball_moves_forward import *
 from software.simulated_tests.friendly_has_ball_possession import *
 from software.simulated_tests.ball_speed_threshold import *
@@ -126,6 +125,7 @@ def test_goalie_blocks_shot(
             BallNeverEntersRegion(
                 regions=[tbots.Field.createSSLDivisionBField().friendlyGoal()]
             ),
+            NeverExcessivelyDribbling(),
         ]
     ]
 
@@ -133,14 +133,12 @@ def test_goalie_blocks_shot(
     eventually_validation_sequence_set = [
         [
             # Goalie should be in the defense area
-            # RobotsEventuallyHalt(),
-            # RobotEventuallyEntersRegion(
-            #    regions=[tbots.Field.createSSLDivisionBField().friendlyDefenseArea()]
-            # ),
-            FriendlyEventuallyHasBallPossession(),
+            RobotEventuallyEntersRegion(
+                regions=[tbots.Field.createSSLDivisionBField().friendlyDefenseArea()]
+            ),
+            # FriendlyEventuallyHasBallPossession(),
             # BallSpeedEventuallyAtOrAboveThreshold(1),
             # RobotSpeedEventuallyAtOrAboveThreshold(1),
-            EventuallyExcessivelyDribbling(),
             # BallEventuallyMovesForward(ball_initial_position),
         ]
     ]

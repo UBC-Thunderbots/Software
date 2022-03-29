@@ -89,11 +89,25 @@ PYBIND11_MODULE(python_bindings, m)
     py::class_<ConvexPolygon, Polygon>(m, "ConvexPolygon");
     py::class_<Rectangle, ConvexPolygon>(m, "Rectangle")
         .def(py::init<Point, Point>())
-        .def("__repr__", [](const Rectangle& v) {
-            std::stringstream stream;
-            stream << v;
-            return stream.str();
-        });
+        .def("__repr__",
+             [](const Rectangle& v) {
+                 std::stringstream stream;
+                 stream << v;
+                 return stream.str();
+             })
+        .def("xLength", &Rectangle::xLength)
+        .def("yLength", &Rectangle::yLength)
+        .def("centre", &Rectangle::centre)
+        .def("posXPosYCorner", &Rectangle::posXPosYCorner)
+        .def("negXPosYCorner", &Rectangle::negXPosYCorner)
+        .def("negXNegYCorner", &Rectangle::negXNegYCorner)
+        .def("posXNegYCorner", &Rectangle::posXNegYCorner)
+        .def("xMax", &Rectangle::xMax)
+        .def("xMin", &Rectangle::xMin)
+        .def("yMax", &Rectangle::yMax)
+        .def("yMin", &Rectangle::yMin)
+        .def("diagonal", &Rectangle::diagonal)
+        .def("expand", &Rectangle::expand);
 
     py::class_<Segment>(m, "Segment")
         .def(py::init<Point, Point>())
@@ -148,11 +162,6 @@ PYBIND11_MODULE(python_bindings, m)
 
     py::class_<Ball>(m, "Ball").def("position", &Ball::position);
 
-    py::class_<World>(m, "World")
-        .def("friendlyTeam", &World::friendlyTeam)
-        .def("enemyTeam", &World::enemyTeam)
-        .def("ball", &World::ball);
-
     // https://pybind11.readthedocs.io/en/stable/classes.html
     py::class_<Field>(m, "Field")
         .def(py::init<TbotsProto::Field>())
@@ -193,4 +202,10 @@ PYBIND11_MODULE(python_bindings, m)
         .def("friendlyGoalpostPos", &Field::friendlyGoalpostPos)
         .def("friendlyGoalpostNeg", &Field::friendlyGoalpostNeg)
         .def("enemyGoalpostPos", &Field::enemyGoalpostPos);
+
+    py::class_<World>(m, "World")
+        .def("friendlyTeam", &World::friendlyTeam)
+        .def("enemyTeam", &World::enemyTeam)
+        .def("ball", &World::ball)
+        .def("field", &World::field);
 }

@@ -32,11 +32,8 @@ class RobotEntersRegion(Validation):
         return ValidationStatus.FAILING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
-        """Returns the underlying geometry this validation is checking
-
-        :param world: The world msg to create validation geometry from
-        :returns: ValidationGeometry containing geometry to visualize
-
+        """
+        (override) shows regions to enter
         """
         return create_validation_geometry(self.regions)
 
