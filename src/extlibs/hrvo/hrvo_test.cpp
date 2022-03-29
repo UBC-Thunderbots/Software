@@ -199,10 +199,14 @@ class HRVOTest : public ::testing::Test
                     prev_x_pos_arr[robot_id] = curr_x_pos;
                     prev_y_pos_arr[robot_id] = curr_y_pos;
                 }
-                Vector goal_position =
-                    simulator.goals[simulator.getAgents()[robot_id]->getGoalIndex()]
-                        ->getCurrentGoalPosition();
-                float goal_radius = simulator.getAgents()[robot_id]->getGoalRadius();
+
+                Vector goal_position = simulator.getAgents()[robot_id]
+                                           ->getPath()
+                                           .getCurrentPathPoint()
+                                           .value()
+                                           .getPosition();
+
+                float goal_radius = simulator.getAgents()[robot_id]->getPathRadius();
 
                 output_file << frame << "," << time << ","
                             << std::to_string(computation_time.count()) << "," << robot_id
