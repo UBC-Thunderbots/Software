@@ -17,7 +17,7 @@ class SimulatedHRVOTest : public SimulatedErForceSimTacticTestFixture
     Field field                      = Field::createField(field_type);
 };
 
-TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_from_behind)
+TEST_F(SimulatedHRVOTest, DISABLED_test_drive_in_straight_line_with_moving_enemy_robot_from_behind)
 {
     Point destination      = Point(3, 0);
     Point initial_position = Point(-2.3, 0);
@@ -50,7 +50,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_fr
             Duration::fromSeconds(6));
 }
 
-TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_from_side)
+TEST_F(SimulatedHRVOTest, DISABLED_test_drive_in_straight_line_with_moving_enemy_robot_from_side)
 {
     Point destination      = Point(3, 0);
     Point initial_position = Point(-2.5, 0);
@@ -83,7 +83,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_moving_enemy_robot_fr
             Duration::fromSeconds(6));
 }
 
-TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_no_obstacle)
+TEST_F(SimulatedHRVOTest, DISABLED_test_drive_in_straight_line_with_no_obstacle)
 {
     Point destination      = Point(3, 0);
     Point initial_position = Point(-2.5, 0);
@@ -115,7 +115,7 @@ TEST_F(SimulatedHRVOTest, test_drive_in_straight_line_with_no_obstacle)
             Duration::fromSeconds(6));
 }
 
-TEST_F(SimulatedHRVOTest, test_three_robot_wall)
+TEST_F(SimulatedHRVOTest, DISABLED_test_three_robot_wall)
 {
     Point destination      = Point(4, 0);
     Point initial_position = Point(0, 0);
@@ -148,7 +148,7 @@ TEST_F(SimulatedHRVOTest, test_three_robot_wall)
             Duration::fromSeconds(8));
 }
 
-TEST_F(SimulatedHRVOTest, test_single_enemy_directly_infront)
+TEST_F(SimulatedHRVOTest, DISABLED_test_single_enemy_directly_infront)
 {
     Point destination      = Point(2, 0);
     Point initial_position = Point(0.7, 0);
@@ -233,7 +233,7 @@ TEST_F(SimulatedHRVOTest, DISABLED_test_zig_zag_movement)
             Duration::fromSeconds(10));
 }
 
-TEST_F(SimulatedHRVOTest, test_start_in_local_minima)
+TEST_F(SimulatedHRVOTest, DISABLED_test_start_in_local_minima)
 {
     Point destination      = Point(4, 0);
     Point initial_position = Point(0.7, 0);

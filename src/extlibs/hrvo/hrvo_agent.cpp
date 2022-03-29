@@ -153,6 +153,8 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
 
 void HRVOAgent::computeNewVelocity()
 {
+    std::cout << "computeNewVelocity(): " << position_ << "\n";
+    
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
     computePreferredVelocity();
@@ -183,6 +185,7 @@ void HRVOAgent::computeNewVelocity()
         candidate.position_ = pref_velocity_.normalize(max_speed_);
     }
 
+    // part 1: preferred velocity
     candidates_.insert(std::make_pair(
         (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
 
@@ -205,6 +208,7 @@ void HRVOAgent::computeNewVelocity()
 
             if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
             {
+                // part 2: side 1 obstacle edge normalized to dot product of preferred velocity & side
                 candidates_.insert(std::make_pair(
                     (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
             }
@@ -219,6 +223,7 @@ void HRVOAgent::computeNewVelocity()
 
             if (candidate.position_.lengthSquared() < max_speed_ * max_speed_)
             {
+                // part 3: side 1 obstacle edge normalized to preferred velocity & side dot product
                 candidates_.insert(std::make_pair(
                     (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
             }
@@ -249,6 +254,7 @@ void HRVOAgent::computeNewVelocity()
             {
                 candidate.position_ =
                     velocityObstacles_[j].apex_ + t1 * velocityObstacles_[j].side1_;
+                // part 4
                 candidates_.insert(std::make_pair(
                     (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
             }
@@ -257,6 +263,7 @@ void HRVOAgent::computeNewVelocity()
             {
                 candidate.position_ =
                     velocityObstacles_[j].apex_ + t2 * velocityObstacles_[j].side1_;
+                // part 5
                 candidates_.insert(std::make_pair(
                     (pref_velocity_ - candidate.position_).lengthSquared(), candidate));
             }
@@ -415,11 +422,13 @@ void HRVOAgent::computeNewVelocity()
 
     int optimal = -1;
 
+    //checks that candidate points are not in other velocity obstacles
     for (std::pair<float, Candidate> candidate_pair : candidates_)
     {
         candidate  = candidate_pair.second;
         bool valid = true;
-
+        
+        // compare candidate points to all obstacles
         for (int j = 0; j < static_cast<int>(velocityObstacles_.size()); ++j)
         {
             if (j != candidate.velocityObstacle1_ && j != candidate.velocityObstacle2_ &&
@@ -428,23 +437,29 @@ void HRVOAgent::computeNewVelocity()
                     0.0f &&
                 (velocityObstacles_[j].side1_)
                         .determinant(candidate.position_ - velocityObstacles_[j].apex_) >
-                    0.0f)
+                    0.0f ||
+                (std::sqrt(std::pow(candidate.position_.x(), 2) + std::pow(candidate.position_.y(), 2)) < 0.01f))
             {
+                // if candidate point is inside velocity obstacle & isn't inside associated candidate point, 
                 valid = false;
 
                 if (j > optimal)
                 {
+                    // since we're using a sorted multimap, higher candidate points are optimal (the velcoity obstacles are further away)
                     optimal       = j;
                     new_velocity_ = candidate.position_;
                 }
 
+                // break if candidate is inside velocity obstacle, pick the closest VO
                 break;
             }
         }
 
+        // if the candiate point isnt inside any VO, just use it
         if (valid)
         {
             new_velocity_ = candidate.position_;
+            // pick the closest candidate point to the preferred velocity that isn inside a VO
             break;
         }
     }

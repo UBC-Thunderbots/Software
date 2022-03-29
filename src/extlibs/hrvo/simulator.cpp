@@ -364,6 +364,7 @@ void HRVOSimulator::doStep()
     for (auto &agent : agents)
     {
         agent->update();
+        std::cout << "robot at position: " << agent->getPosition() << " with velocity: " << agent->getVelocity() << "\n";
     }
 
     global_time += time_step;
