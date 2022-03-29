@@ -1,5 +1,4 @@
-import software.geom.geometry as tbots_geom
-import software.world.world as tbots_world
+import software.python_bindings as tbots
 from proto.import_all_protos import *
 
 from software.simulated_tests.validation import (
@@ -20,9 +19,9 @@ class ExcessivelyDribbling(Validation):
         :returns: FAILING when the robot is excessively dribbling
                   PASSING when the robot is not excessively dribbling
         """
-        ball_position = tbots_geom.createPoint(world.ball.current_state.global_position)
+        ball_position = tbots.createPoint(world.ball.current_state.global_position)
         for robot in world.friendly_team.team_robots:
-            if not tbots_world.Robot(robot).isNearDribbler(ball_position, 0.01):
+            if not tbots.Robot(robot).isNearDribbler(ball_position, 0.01):
                 self.continous_dribbling_start_point = ball_position
             elif (ball_position - self.continous_dribbling_start_point).length() > 1.0:
                 return ValidationStatus.FAILING

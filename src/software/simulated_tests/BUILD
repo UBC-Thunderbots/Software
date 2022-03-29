@@ -161,8 +161,8 @@ py_library(
     ],
     data = [
         "//software:py_constants.so",
+        "//software:python_bindings.so",
         "//software:unix_full_system",
-        "//software/geom:geometry.so",
     ],
     deps = [
         "//proto:software_py_proto",
@@ -188,8 +188,7 @@ py_library(
     ],
     data = [
         "//software:py_constants.so",
-        "//software/geom:geometry.so",
-        "//software/world:world.so",
+        "//software:python_bindings.so",
     ],
     deps = [
         "//proto:software_py_proto",

@@ -1,5 +1,4 @@
-import software.geom.geometry as tbots_geom
-import software.world.world as tbots_world
+import software.python_bindings as tbots
 from proto.import_all_protos import *
 
 from software.simulated_tests.validation import (
@@ -20,9 +19,9 @@ class FriendlyHasBallPossession(Validation):
         :returns: FAILING when no friendly robot has possession of the ball
                   PASSING when any friendly robot has possession of the ball
         """
-        ball_position = tbots_geom.createPoint(world.ball.current_state.global_position)
+        ball_position = tbots.createPoint(world.ball.current_state.global_position)
         for robot in world.friendly_team.team_robots:
-            if tbots_world.Robot(robot).isNearDribbler(ball_position, 0.01):
+            if tbots.Robot(robot).isNearDribbler(ball_position, 0.01):
                 return ValidationStatus.PASSING
         return ValidationStatus.FAILING
 
@@ -30,7 +29,7 @@ class FriendlyHasBallPossession(Validation):
         """override"""
         return create_validation_geometry(
             [
-                tbots_world.Robot(robot).dribblerArea()
+                tbots.Robot(robot).dribblerArea()
                 for robot in world.friendly_team.team_robots
             ]
         )

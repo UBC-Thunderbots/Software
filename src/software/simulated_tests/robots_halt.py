@@ -1,4 +1,4 @@
-import software.geom.geometry as tbots_geom
+import software.python_bindings as tbots
 from proto.import_all_protos import *
 
 from software.simulated_tests.validation import (
@@ -20,10 +20,7 @@ class RobotsHalt(Validation):
                   PASSING when all robots halt
         """
         for robot in world.friendly_team.team_robots:
-            if (
-                tbots_geom.createVector(robot.current_state.global_velocity).length()
-                < 0.05
-            ):
+            if tbots.createVector(robot.current_state.global_velocity).length() < 0.05:
                 return ValidationStatus.FAILING
         return ValidationStatus.PASSING
 

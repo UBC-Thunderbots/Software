@@ -1,4 +1,4 @@
-import software.geom.geometry as tbots_geom
+import software.python_bindings as tbots
 from proto.import_all_protos import *
 
 from software.simulated_tests.validation import (
@@ -13,7 +13,7 @@ class BallMovesForward(Validation):
     """Checks if ball is moving forward, i.e. in the +x direction"""
 
     def __init__(self, initial_ball_position):
-        self.last_ball_position = initial_ball_position
+        self.last_ball_x_position = initial_ball_position.x()
 
     def get_validation_status(self, world) -> ValidationStatus:
         """Checks if all robots halt
@@ -23,19 +23,23 @@ class BallMovesForward(Validation):
                   PASSING if ball moves forward
         """
         validation_status = ValidationStatus.FAILING
-        current_ball_position = tbots_geom.createPoint(
+        current_ball_position = tbots.createPoint(
             world.ball.current_state.global_position
         )
 
-        if current_ball_position.x() > self.last_ball_position.x():
+        if current_ball_position.x() > self.last_ball_x_position:
             validation_status = ValidationStatus.PASSING
-        self.last_ball_position = current_ball_position
+        self.last_ball_x_position = current_ball_position
         return validation_status
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """override"""
-        # TODO: visualize
-        return create_validation_geometry([])
+        # TODO
+        return create_validation_geometry(
+            [
+                # tbots.Rectangle(tbots.Point(self.last_ball_x_position,world.field )
+            ]
+        )
 
     def __repr__(self):
         return "Check that all robots halt"

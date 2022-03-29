@@ -1,5 +1,4 @@
-import software.geom.geometry as tbots_geom
-import software.world.world as tbots_world
+import software.python_bindings as tbots
 from proto.import_all_protos import *
 
 from software.simulated_tests.validation import (
@@ -28,7 +27,7 @@ class RobotSpeedThreshold(Validation):
         """
         for robot in world.friendly_team.team_robots:
             if (
-                tbots_geom.createVector(robot.current_state.global_velocity).length()
+                tbots.createVector(robot.current_state.global_velocity).length()
                 < self.speed_threshold
             ):
                 return ValidationStatus.FAILING

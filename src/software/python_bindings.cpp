@@ -6,6 +6,7 @@
 
 #include "proto/geometry.pb.h"
 #include "proto/message_translation/tbots_geometry.h"
+#include "proto/team.pb.h"
 #include "pybind11_protobuf/native_proto_caster.h"
 #include "software/geom/algorithms/contains.h"
 #include "software/geom/circle.h"
@@ -15,10 +16,12 @@
 #include "software/geom/rectangle.h"
 #include "software/geom/vector.h"
 #include "software/world/field.h"
+#include "software/world/robot.h"
+#include "software/world/world.h"
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(geometry, m)
+PYBIND11_MODULE(python_bindings, m)
 {
     pybind11_protobuf::ImportNativeProtoCasters();
 
@@ -127,10 +130,34 @@ PYBIND11_MODULE(geometry, m)
           py::overload_cast<const Segment&, const Point&, double, int>(&contains));
     m.def("contains", py::overload_cast<const Rectangle&, const Point&>(&contains));
 
+    py::class_<Robot>(m, "Robot")
+        .def(py::init<unsigned, Point&, Vector&, Angle&, Angle&, Timestamp&>())
+        .def(py::init<TbotsProto::Robot>())
+        .def("timestamp", &Robot::timestamp)
+        .def("position", &Robot::position)
+        .def("velocity", &Robot::velocity)
+        .def("orientation", &Robot::orientation)
+        .def("angularVelocity", &Robot::angularVelocity)
+        .def("isNearDribbler", &Robot::isNearDribbler)
+        .def("dribblerArea", &Robot::dribblerArea);
+
+    py::class_<Team>(m, "Team")
+        .def(py::init<const std::vector<Robot>&>())
+        .def("assignGoalie", &Team::assignGoalie)
+        .def("getAllRobots", &Team::getAllRobots);
+
+    py::class_<Ball>(m, "Ball").def("position", &Ball::position);
+
+    py::class_<World>(m, "World")
+        .def("friendlyTeam", &World::friendlyTeam)
+        .def("enemyTeam", &World::enemyTeam)
+        .def("ball", &World::ball);
+
     // https://pybind11.readthedocs.io/en/stable/classes.html
     py::class_<Field>(m, "Field")
-        .def(py::init(&Field::createSSLDivisionBField))  // Default to Div B Field
-        .def("createSSLDivisionAField", &Field::createSSLDivisionAField)
+        .def(py::init<TbotsProto::Field>())
+        .def_static("createSSLDivisionAField", &Field::createSSLDivisionAField)
+        .def_static("createSSLDivisionBField", &Field::createSSLDivisionBField)
         .def("xLength", &Field::xLength)
         .def("totalXLength", &Field::totalXLength)
         .def("yLength", &Field::yLength)
