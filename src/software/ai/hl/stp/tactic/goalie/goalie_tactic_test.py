@@ -125,11 +125,11 @@ def test_goalie_blocks_shot(
     eventually_validation_sequence_set = [
         [
             # Goalie should be in the defense area
-            RobotsEventuallyHalt(),
-            RobotEventuallyEntersRegion(
-                regions=[tbots_geom.Field().friendlyDefenseArea()]
-            ),
-            # FriendlyEventuallyHasBallPossession(),
+            # RobotsEventuallyHalt(),
+            # RobotEventuallyEntersRegion(
+            #    regions=[tbots_geom.Field().friendlyDefenseArea()]
+            # ),
+            FriendlyEventuallyHasBallPossession(),
             # BallSpeedEventuallyAtOrAboveThreshold(1),
             # RobotSpeedEventuallyAtOrAboveThreshold(1),
             EventuallyExcessivelyDribbling(),

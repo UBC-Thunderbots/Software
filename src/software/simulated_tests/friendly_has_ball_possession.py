@@ -28,8 +28,12 @@ class FriendlyHasBallPossession(Validation):
 
     def get_validation_geometry(self, world) -> ValidationGeometry:
         """override"""
-        # TODO: visualize
-        return create_validation_geometry([])
+        return create_validation_geometry(
+            [
+                tbots_world.Robot(robot).dribblerArea()
+                for robot in world.friendly_team.team_robots
+            ]
+        )
 
     def __repr__(self):
         return "Check that the friendly team has possession of the ball"

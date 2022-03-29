@@ -24,7 +24,8 @@ PYBIND11_MODULE(world, m)
         .def("velocity", &Robot::velocity)
         .def("orientation", &Robot::orientation)
         .def("angularVelocity", &Robot::angularVelocity)
-        .def("isNearDribbler", &Robot::isNearDribbler);
+        .def("isNearDribbler", &Robot::isNearDribbler)
+        .def("dribblerArea", &Robot::dribblerArea);
 
     py::class_<Team>(m, "Team")
         .def(py::init<const std::vector<Robot>&>())

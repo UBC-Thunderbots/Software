@@ -3,6 +3,7 @@
 #include <optional>
 
 #include "proto/team.pb.h"
+#include "software/geom/polygon.h"
 #include "software/time/timestamp.h"
 #include "software/world/robot_capabilities.h"
 #include "software/world/robot_state.h"
@@ -122,6 +123,13 @@ class Robot
      * @return the missing capabilities of the robot
      */
     const std::set<RobotCapability> &getUnavailableCapabilities() const;
+
+    /**
+     * Creates and returns a rectangle representing the dribbler area
+     *
+     * @return the dribbler area rectangle
+     */
+    Polygon dribblerArea() const;
 
     /**
      * Returns all available capabilities this robot has
