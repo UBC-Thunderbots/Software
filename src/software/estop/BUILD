@@ -60,7 +60,7 @@ pybind_library(
     name = "estop_reader_lib",
     srcs = ["python_bindings.cpp"],
     deps = [
-        ":boost_uart_communication",
+        "//software/uart:boost_uart_communication",
         ":threaded_estop_reader",
         "//proto/message_translation:tbots_geometry",
         "//software/geom/algorithms",
