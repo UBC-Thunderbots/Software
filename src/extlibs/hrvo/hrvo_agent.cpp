@@ -153,7 +153,7 @@ Agent::VelocityObstacle HRVOAgent::createVelocityObstacle(const Agent &other_age
 
 void HRVOAgent::computeNewVelocity()
 {
-    std::cout << "computeNewVelocity(): " << position_ << "\n";
+//    std::cout << "computeNewVelocity(): " << position_ << "\n";
     
     // Based on The Hybrid Reciprocal Velocity Obstacle paper:
     // https://gamma.cs.unc.edu/HRVO/HRVO-T-RO.pdf
@@ -438,7 +438,7 @@ void HRVOAgent::computeNewVelocity()
                 (velocityObstacles_[j].side1_)
                         .determinant(candidate.position_ - velocityObstacles_[j].apex_) >
                     0.0f ||
-                (std::sqrt(std::pow(candidate.position_.x(), 2) + std::pow(candidate.position_.y(), 2)) < 0.01f))
+                (candidate.position_.length() < 0.01*max_speed_))
             {
                 // if candidate point is inside velocity obstacle & isn't inside associated candidate point, 
                 valid = false;

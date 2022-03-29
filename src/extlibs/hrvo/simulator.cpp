@@ -123,6 +123,10 @@ void HRVOSimulator::updateWorld(const World &world)
                     last_time_velocity_updated = global_time;
                 }
             }
+            if (friendly_robot.id() == 1)
+            {
+                visualize(1);
+            }
         }
 
         for (const Robot &enemy_robot : enemy_team)
@@ -364,7 +368,7 @@ void HRVOSimulator::doStep()
     for (auto &agent : agents)
     {
         agent->update();
-        std::cout << "robot at position: " << agent->getPosition() << " with velocity: " << agent->getVelocity() << "\n";
+//        std::cout << "robot at position: " << agent->getPosition() << " with velocity: " << agent->getVelocity() << "\n";
     }
 
     global_time += time_step;
@@ -412,7 +416,7 @@ void HRVOSimulator::visualize(unsigned int robot_id) const
         *(obstacle_proto.add_circle()) =
             *createCircleProto(Circle(position, agent->getRadius()));
     }
-    // LOG(VISUALIZE) << obstacle_proto;
+    LOG(VISUALIZE) << obstacle_proto;
 }
 
 std::optional<std::shared_ptr<HRVOAgent>> HRVOSimulator::getFriendlyAgentFromRobotId(
