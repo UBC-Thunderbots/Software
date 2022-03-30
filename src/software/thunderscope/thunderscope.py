@@ -1,5 +1,7 @@
 import os
 import signal
+import time
+import shelve
 import argparse
 
 import platform
@@ -18,7 +20,7 @@ import pyqtgraph
 from pyqtgraph.dockarea import *
 from pyqtgraph.parametertree import Parameter, ParameterTree
 from pyqtgraph.Qt import QtCore, QtGui
-from pyqtgraph.Qt.QtWidgets import QVBoxLayout, QWidget
+from pyqtgraph.Qt.QtWidgets import *
 
 from proto.import_all_protos import *
 from proto.message_translation.message_to_dict import message_to_dict
@@ -86,6 +88,48 @@ class Thunderscope(object):
         self.refresh_timer.setTimerType(QtCore.Qt.TimerType.PreciseTimer)
         self.refresh_timer.timeout.connect(__refresh)
         self.refresh_timer.start(refresh_interval_ms)  # Refresh at 200hz
+
+
+        def __save_layout():
+
+            filename, _ = QtGui.QFileDialog.getSaveFileName(
+                    self.window,
+                    "Save layout",
+                    "~/dock_layout_{}.tscopelayout".format(int(time.time())),
+                    options=QFileDialog.Option.DontUseNativeDialog,
+            )
+
+            result = self.dock_area.saveState()
+
+            with shelve.open(filename, 'c') as shelf:
+                shelf['dock_state'] = result
+
+        def __load_layout():
+
+            filename, _ = QtGui.QFileDialog.getOpenFileName(
+                    self.window,
+                    "Open layout", "~/",
+                    options=QFileDialog.Option.DontUseNativeDialog,
+            )
+
+            with shelve.open(filename, 'r') as shelf:
+                self.dock_area.restoreState(shelf['dock_state'])
+
+
+        self.save_layout = QtGui.QShortcut(QtGui.QKeySequence('Ctrl+S'), self.window)
+        self.save_layout.activated.connect(__save_layout)
+
+        self.save_layout = QtGui.QShortcut(QtGui.QKeySequence('Ctrl+O'), self.window)
+        self.save_layout.activated.connect(__load_layout)
+
+        self.show_help = QtGui.QShortcut(QtGui.QKeySequence('h'), self.window)
+        self.show_help.activated.connect(lambda : QMessageBox.information(self.window,
+            'Help', """
+                Cntrl+S: Save Layout
+                Double Click Purple Bar to pop window out
+                Drag Purple Bar to rearrange docks
+                Click items in legends to select/deselect
+                """))
 
     def register_refresh_function(self, refresh_func):
         """Register the refresh functions to run at the refresh_interval_ms

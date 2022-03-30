@@ -1,4 +1,5 @@
-from pyqtgraph.Qt.QtWidgets import QWidget, QVBoxLayout, QLineEdit
+from pyqtgraph.Qt import QtCore, QtGui
+from pyqtgraph.Qt.QtWidgets import *
 from pyqtgraph import parametertree
 from google.protobuf.json_format import MessageToDict
 from thefuzz import fuzz
