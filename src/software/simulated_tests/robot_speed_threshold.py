@@ -14,7 +14,7 @@ class RobotSpeedThreshold(Validation):
 
     def __init__(self, speed_threshold):
         """
-        :param speed_threshold The speed threshold
+        :param speed_threshold: The speed threshold
         """
         self.speed_threshold = speed_threshold
 

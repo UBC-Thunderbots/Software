@@ -25,11 +25,13 @@ class ExcessivelyDribbling(Validation):
         ball_position = tbots.createPoint(world.ball.current_state.global_position)
         for robot in world.friendly_team.team_robots:
             if not tbots.Robot(robot).isNearDribbler(ball_position, 0.01):
-                self.continous_dribbling_start_point = ball_position
+                self.continous_dribbling_start_point = None
             elif (
                 ball_position - (self.continous_dribbling_start_point or ball_position)
             ).length() > 1.0:
                 return ValidationStatus.FAILING
+            elif self.continous_dribbling_start_point is None:
+                self.continous_dribbling_start_point = ball_position
         return ValidationStatus.PASSING
 
     def get_validation_geometry(self, world) -> ValidationGeometry:

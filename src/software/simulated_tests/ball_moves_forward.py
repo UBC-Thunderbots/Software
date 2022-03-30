@@ -16,7 +16,7 @@ class BallMovesForward(Validation):
         self.last_ball_position = initial_ball_position
 
     def get_validation_status(self, world) -> ValidationStatus:
-        """Checks if all robots halt
+        """Checks if ball is moving forward, i.e. in the +x direction
 
         :param world: The world msg to validate
         :returns: FAILING if ball doesn't move forward
@@ -52,7 +52,7 @@ class BallMovesForward(Validation):
         )
 
     def __repr__(self):
-        return "Check that all robots halt"
+        return "Check that the ball moves forward"
 
 
 (
