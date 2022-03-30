@@ -169,8 +169,9 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
     //
     // https://github.com/saebyn/munkres-cpp is the implementation of the Hungarian
     // algorithm that we use here
-    for (auto tactic_vector : priority_tactics)
+    for (unsigned int i = 0; i < priority_tactics.size(); i++)
     {
+        auto tactic_vector = priority_tactics[i];
         size_t num_tactics = tactic_vector.size();
 
         if (robots.size() < tactic_vector.size())
@@ -181,10 +182,11 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             tactic_vector.resize(robots.size());
             num_tactics = tactic_vector.size();
         }
-        else
+        else if (i == (priority_tactics.size() - 1))
         {
-            // Assign rest of robots with StopTactic
-            for (unsigned int i = 0; i < (robots.size() - tactic_vector.size()); i++)
+            // If assigning the last tactic vector, then assign rest of robots with
+            // StopTactics
+            for (unsigned int i = 0; i < (robots.size() - num_tactics); i++)
             {
                 tactic_vector.push_back(stop_tactics[i]);
             }
@@ -197,6 +199,7 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
             auto motion_constraints =
                 buildMotionConstraintSet(world.gameState(), *goalie_tactic);
             auto path_planner = path_planner_factory.getPathPlanner(motion_constraints);
+            // TODO: clean up duplication
             CreateMotionControl create_motion_control =
                 [path_planner, motion_constraints](const Point &robot_position,
                                                    const Point &destination) {
