@@ -237,6 +237,9 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Play::get(
 
 
             primitive_sets.emplace_back(tactic->get(world, create_motion_control));
+            CHECK(primitive_sets.back()->robot_primitives().size() ==
+                  world.friendlyTeam().numRobots())
+                << "Something bad happened with " << objectTypeName(*tactic);
         }
 
         size_t num_rows = robots.size();

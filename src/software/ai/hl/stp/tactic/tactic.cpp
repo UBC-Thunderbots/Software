@@ -44,6 +44,11 @@ std::unique_ptr<TbotsProto::PrimitiveSet> Tactic::get(
             primitive_set->mutable_robot_primitives()->insert(
                 google::protobuf::MapPair(robot.id(), *primitive));
         }
+        else
+        {
+            primitive_set->mutable_robot_primitives()->insert(
+                google::protobuf::MapPair(robot.id(), *createStopPrimitive(false)));
+        }
     }
     return primitive_set;
 }
