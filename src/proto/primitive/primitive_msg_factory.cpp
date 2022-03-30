@@ -76,6 +76,8 @@ std::unique_ptr<TbotsProto::Primitive> createCostedMovePrimitive(
         static_cast<float>(convertMaxAllowedSpeedModeToMaxAllowedSpeed(
             max_allowed_speed_mode, robot_constants)));
 
+    *(move_primitive_msg->mutable_move()->mutable_final_angle()) =
+        *createAngleProto(final_angle);
     move_primitive_msg->mutable_move()->set_dribbler_speed_rpm(static_cast<float>(
         convertDribblerModeToDribblerSpeed(dribbler_mode, robot_constants)));
 
