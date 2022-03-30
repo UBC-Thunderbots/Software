@@ -33,7 +33,7 @@ class ChickerWidget(QWidget):
 
         # push button group box
         self.push_button_box, self.push_buttons = common_widgets.create_button(
-            ["Charge", "Kick", "Chip"], 3
+            ["Charge", "Kick", "Chip"]
         )
         self.charge_button = self.push_buttons[0]
         self.kick_button = self.push_buttons[1]
@@ -42,7 +42,7 @@ class ChickerWidget(QWidget):
 
         # radio button group box
         self.radio_button_box, self.radio_buttons = common_widgets.create_radio(
-            ["No Auto", "Auto Kick", "Auto Chip"], self.radio_buttons_group, 3
+            ["No Auto", "Auto Kick", "Auto Chip"], self.radio_buttons_group
         )
         self.no_auto_button = self.radio_buttons[0]
         self.auto_kick_button = self.radio_buttons[1]
